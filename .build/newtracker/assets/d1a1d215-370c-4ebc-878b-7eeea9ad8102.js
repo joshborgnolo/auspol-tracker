@@ -3463,17 +3463,28 @@ const DEM_SPLITS = [
      the row and its Where-it-sits note say whose pair it is. */
   { id: "income", label: "Income", lo: "Lower income", hi: "Higher income", scope: "With an income breakdown",
     pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]] },
-  /* Birth country is a ONE-OFF cut: Roy Morgan's finding 10341 pooled
+  /* Other cuts: the home for one-off contrasts no shared axis can hold
+     (generalised from the Birth country split the same day it shipped,
+     user call 2026-10-09). Today it holds only Roy Morgan finding 10341:
      seven months of Single Source interviewing (Jan–Jul 2026, n=26,418)
-     into the 13 groups its release charts (five bars unreadably small are
-     left out, not backed into), another special release beside the weekly
-     series rather than part of it. Nothing to pool across waves, and its
-     own poll is noAgg, so the split stands here as the row facet income
-     does: pairs name an overseas-born group against the Australia-born
-     baseline, the starkest gaps first. */
-  { id: "country", label: "Birth country", lo: "Australia-born", hi: "Overseas-born", scope: "With a birth-country breakdown",
-    pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born"], ["Mainland China", "Australia", "China-born v Australia-born"],
-            ["South Africa", "Australia", "South Africa-born v Australia-born"], ["United Kingdom", "Australia", "UK-born v Australia-born"]] },
+     pooled into the 13 birth-country groups its release charts (five bars
+     unreadably small are left out, not backed into), another special
+     release beside the weekly series rather than part of it. Nothing to
+     pool across waves, and its own poll is noAgg, so the split stands
+     here as the row facet income does: pairs name an overseas-born group
+     against the Australia-born baseline, the starkest gaps first.
+     THE CONVENTION when a future odd cut files here: the split's lo/hi
+     stay as the empty-view fallback only ("Australia-born" pointing left
+     would lie about an electorate pair), and each pair carries its own
+     scale caps as [3] (name of the ◀ group) and [4] (name of the ▶
+     group); rd-allpolls shows a pair's caps only while every visible row
+     resolves to that same pair, so one odd cut never rides the labels of
+     another. */
+  { id: "country", label: "Other cuts", lo: "Australia-born", hi: "Overseas-born", scope: "With a one-off breakdown",
+    pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"],
+            ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"],
+            ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"],
+            ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"]] },
 ];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];   // grp's party order
 // a poll's groups by label: its printed table, with the pooled groups
@@ -3487,15 +3498,16 @@ function demGroupsOf(p) {
   (g.v || []).forEach((v, i) => { if (v && !m[G[i]]) m[G[i]] = Object.fromEntries(DEM_KEYS.map((k, j) => [k, v[j]])); });
   return m;
 }
-/* the split a row draws: { a, b, lab, A, B, gap }, gap = A − B per party in
-   points, or null where the poll printed neither pair */
+/* the split a row draws: { a, b, lab, loCap, hiCap, A, B, gap }, gap = A − B
+   per party in points, or null where the poll printed neither pair (loCap/
+   hiCap ride along only on splits whose pairs carry their own scale caps) */
 function demPairOf(p, split) {
   const sp = DEM_SPLITS.find((s) => s.id === split);
   const m = sp ? demGroupsOf(p) : null;
   if (!m) return null;
-  for (const [a, b, lab] of sp.pairs) if (m[a] && m[b]) {
+  for (const [a, b, lab, loCap, hiCap] of sp.pairs) if (m[a] && m[b]) {
     const gap = Object.fromEntries(DEM_KEYS.map((k) => [k, m[a][k] != null && m[b][k] != null ? +(m[a][k] - m[b][k]).toFixed(1) : null]));
-    return { a, b, lab, A: m[a], B: m[b], gap };
+    return { a, b, lab, loCap, hiCap, A: m[a], B: m[b], gap };
   }
   return null;
 }

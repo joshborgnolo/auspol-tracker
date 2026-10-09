@@ -81,7 +81,7 @@ check(seen.twopp.meta && seen.twopp.meta.includes("poll since"), "poll-facet met
 await pick("demographics");
 await sleep(400);
 const demHeads = [];
-for (const s of ["Age", "Gender", "Education", "Place", "Home", "Income", "Birth country"]) {
+for (const s of ["Age", "Gender", "Education", "Place", "Home", "Income", "Other cuts"]) {
   const ok = await page.evaluate((s) => { const b = [...document.querySelectorAll(".rd-ap-dpick button")].find((x) => x.textContent.trim() === s); if (b) b.click(); return !!b; }, s);
   if (!ok) continue;
   await sleep(400);

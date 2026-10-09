@@ -2117,8 +2117,12 @@ function RdAllPolls(P) {
      fits from 1150px up, so under 1140px both controls take their row.
      The picker's seventh button (Birth country, 2026-10-09) moved it
      again, measured the same day: the picker is 513px and the row fits
-     from ~1221px up, so under 1240px both controls take their row. */
-  const ctlNarrow = useNarrow("(max-width: 1240px)");
+     from ~1221px up, so under 1240px both controls take their row.
+     Its rename to Other cuts (same day, the split's generalisation to
+     one-off contrasts) took it down again, measured 2026-10-09: the
+     picker is 496px and the row fits from 1205px up (document overflow
+     first at 1200), so under 1220px both controls take their row. */
+  const ctlNarrow = useNarrow("(max-width: 1220px)");
   /* the demographics scale's nine ticks need the strip's full 410px: under
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
      the head keeps the phone's five */
@@ -2224,7 +2228,7 @@ function RdAllPolls(P) {
     [...box.children].forEach((c) => ro.observe(c));
     return () => ro.disconnect();
   }, [storiesKey]);
-  /* the narrow control row walks the same floor: under 1240px the 2PP
+  /* the narrow control row walks the same floor: under 1220px the 2PP
      and Demographics facets keep their controls in a row of their own
      beneath the tabs, which mounted and unmounted as the facet changed
      (the .rd-ap-pctl lesson Latest polls' pinPl comment calls "the live
@@ -2473,6 +2477,23 @@ function RdAllPolls(P) {
      a dot never moves under the reader as the filters change */
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find((x) => x.id === demSplit) || SPLITS[0];
+  /* the scale's end labels: a split whose pairs all cut one axis keeps its
+     own lo/hi (income's pairs disagree on bracket widths but all point
+     lower→higher). An odd-cuts split (pairs carrying their own caps, the
+     d1a1 convention) can't be spanned by any one caption pair, so the caps
+     come from the pair every visible row shares - and when the rows mix
+     pairs, no labels show at all rather than lying about one of the rows */
+  const [demCapLo, demCapHi] = (() => {
+    if (!spl.pairs.some((p) => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
+    const found = new Map();
+    for (const p of rows) {
+      const pr = window.demPairOf(p, demSplit);
+      if (pr) found.set(pr.a + "" + pr.b, [pr.loCap, pr.hiCap]);
+    }
+    if (found.size === 1) return [...found.values()][0];
+    if (found.size === 0) return [spl.lo, spl.hi];
+    return [null, null];
+  })();
   const DEM_M = 40;
   const gx = (v) => ((Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M)) * 100;
   // whole points: the groups are a few hundred people each, a decimal claims too much
@@ -2490,8 +2511,8 @@ function RdAllPolls(P) {
     return (
       <span className="rd-ap-scale" aria-hidden="true">
         <span className="rd-ap-in">
-          <b className="rd-ap-scl">◀ {spl.lo}</b>
-          <b className="rd-ap-scr">{spl.hi} ▶</b>
+          <b className="rd-ap-scl">{demCapLo ? "◀ " + demCapLo : ""}</b>
+          <b className="rd-ap-scr">{demCapHi ? demCapHi + " ▶" : ""}</b>
           {ticks.map(([v, lab]) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (short && v === -DEM_M ? " start" : "") + (short && v === DEM_M ? " end" : "")} style={{ left: gx(v) + "%" }}>{lab}</span>)}
         </span>
       </span>
@@ -2576,7 +2597,7 @@ function RdAllPolls(P) {
       </>}
       {facet === "demographics" && <>
         <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "dem." + k.id, { color: k.ink, title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups" })}</React.Fragment>)}</span>
-        <span role="columnheader" aria-label={"Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters"} className="rd-ap-hpic">{demScale(demMid)}</span>
+        <span role="columnheader" aria-label={demCapLo && demCapHi ? "Each party’s gap between the two groups, from stronger with " + demCapLo.toLowerCase() + " to stronger with " + demCapHi.toLowerCase() + " voters" : "Each party’s gap between the two groups named on its row"} className="rd-ap-hpic">{demScale(demMid)}</span>
         <span></span>
       </>}
       {/* the demographics breakpoint stands in for this head too: under

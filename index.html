@@ -90420,11 +90420,11 @@ const DEM_SPLITS = [{
   pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
 }, {
   id: "country",
-  label: "Birth country",
+  label: "Other cuts",
   lo: "Australia-born",
   hi: "Overseas-born",
-  scope: "With a birth-country breakdown",
-  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born"], ["Mainland China", "Australia", "China-born v Australia-born"], ["South Africa", "Australia", "South Africa-born v Australia-born"], ["United Kingdom", "Australia", "UK-born v Australia-born"]]
+  scope: "With a one-off breakdown",
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"]]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
 function demGroupsOf(p) {
@@ -90442,12 +90442,14 @@ function demPairOf(p, split) {
   const sp = DEM_SPLITS.find(s => s.id === split);
   const m = sp ? demGroupsOf(p) : null;
   if (!m) return null;
-  for (const [a, b, lab] of sp.pairs) if (m[a] && m[b]) {
+  for (const [a, b, lab, loCap, hiCap] of sp.pairs) if (m[a] && m[b]) {
     const gap = Object.fromEntries(DEM_KEYS.map(k => [k, m[a][k] != null && m[b][k] != null ? +(m[a][k] - m[b][k]).toFixed(1) : null]));
     return {
       a,
       b,
       lab,
+      loCap,
+      hiCap,
       A: m[a],
       B: m[b],
       gap
@@ -112120,7 +112122,7 @@ function RdAllPolls(P) {
   const noun1 = facet === "confidence" ? "release" : "poll";
   const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
-  const ctlNarrow = useNarrow("(max-width: 1240px)");
+  const ctlNarrow = useNarrow("(max-width: 1220px)");
   const demMid = useNarrow("(max-width: 1150px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
@@ -112464,6 +112466,17 @@ function RdAllPolls(P) {
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
+  const [demCapLo, demCapHi] = (() => {
+    if (!spl.pairs.some(p => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
+    const found = new Map();
+    for (const p of rows) {
+      const pr = window.demPairOf(p, demSplit);
+      if (pr) found.set(pr.a + "" + pr.b, [pr.loCap, pr.hiCap]);
+    }
+    if (found.size === 1) return [...found.values()][0];
+    if (found.size === 0) return [spl.lo, spl.hi];
+    return [null, null];
+  })();
   const DEM_M = 40;
   const gx = v => (Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M) * 100;
   const gapTxt = v => v == null ? "—" : Math.abs(v) < 0.5 ? "0" : (v > 0 ? "+" : "−") + Math.abs(Math.round(v));
@@ -112487,9 +112500,9 @@ function RdAllPolls(P) {
       className: "rd-ap-in"
     }, React.createElement("b", {
       className: "rd-ap-scl"
-    }, "\u25C0 ", spl.lo), React.createElement("b", {
+    }, demCapLo ? "◀ " + demCapLo : ""), React.createElement("b", {
       className: "rd-ap-scr"
-    }, spl.hi, " \u25B6"), ticks.map(([v, lab]) => React.createElement("span", {
+    }, demCapHi ? demCapHi + " ▶" : ""), ticks.map(([v, lab]) => React.createElement("span", {
       key: v,
       className: "rd-ap-tk" + (v === 0 ? " mid" : "") + (short && v === -DEM_M ? " start" : "") + (short && v === DEM_M ? " end" : ""),
       style: {
@@ -112610,7 +112623,7 @@ function RdAllPolls(P) {
     title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups"
   })))), React.createElement("span", {
     role: "columnheader",
-    "aria-label": "Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters",
+    "aria-label": demCapLo && demCapHi ? "Each party’s gap between the two groups, from stronger with " + demCapLo.toLowerCase() + " to stronger with " + demCapHi.toLowerCase() + " voters" : "Each party’s gap between the two groups named on its row",
     className: "rd-ap-hpic"
   }, demScale(demMid)), React.createElement("span", null)), facet === "confidence" && React.createElement(React.Fragment, null, th("Figure", "conf.v", {
     title: "Sort by the gauge’s printed figure (the panel chart’s dot)"
