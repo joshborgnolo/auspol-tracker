@@ -5255,6 +5255,47 @@ for (const p of POLLS) {
     }
   }
 }
+/* The ECONOMIC-SENTIMENT gauges publish on their own rhythms too - ANZ-Roy
+   Morgan consumer confidence weekly, Westpac-MI sentiment, Roy Morgan
+   business confidence and NAB's business survey monthly - and the release
+   calendar is where a reader plans around them. Minted like the monitors
+   above from the release dates data/confidence.json records, in the same
+   row shape, so the one measurement block below decides date vs window for
+   them as it does for every house. The series NAME is the row's firm:
+   "Roy Morgan Business Confidence" is not the Roy Morgan poll's walk, and
+   pollsterRules knows no such firm, so each row also carries its
+   where-it-lands-first page itself (siteUrl - the pollCadence push reads
+   it in place of a pollsterRules site). No clocks are recorded, so these
+   stay untimed; the weekly/monthly weekday habit is sampled like a poll
+   house's all the same. */
+{
+  const CONF_TRACKS = {
+    consumer: "ANZ–Roy Morgan Consumer Confidence",
+    westpacConsumer: "Westpac–MI Consumer Sentiment",
+    business: "Roy Morgan Business Confidence",
+    nabBusiness: "NAB Monthly Business Survey",
+  };
+  const CONF_SITES = {
+    consumer: "https://www.roymorgan.com/findings",
+    westpacConsumer: "https://www.westpaciq.com.au/economics/",
+    business: "https://www.roymorgan.com/findings",
+    nabBusiness: "https://www.nab.com.au/news/economy-markets",
+  };
+  for (const [lane, name] of Object.entries(CONF_TRACKS)) {
+    const s = CONF_FILE && CONF_FILE[lane];
+    if (!s || !(s.rows || []).length) continue;
+    // one release per day: a same-day re-reading keeps the last URL
+    const rel = {};
+    for (const w of s.rows) if (w && w.date) rel[w.date] = w.url || null;
+    const days = Object.keys(rel).sort();
+    if (days.length < CAD_MIN_POLLS) continue;
+    const rows = days.map((d) => ({ date: d, pub: d, mins: null, url: rel[d] }));
+    rows.tracked = "confidence";
+    rows.siteUrl = CONF_SITES[lane] || null;
+    (dowSamples[name] ||= []).push(...days.map((d) => new Date(d + "T00:00:00Z").getUTCDay()));
+    byHouse[name] = rows;
+  }
+}
 const pollCadence = [];
 for (const [firm, rows] of Object.entries(byHouse)) {
   const dates = rows.map((r) => r.date).sort();
@@ -5525,8 +5566,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
        after the last wave, with the bare 1st-to-last month as its fallback. */
     ...(calMonth ? { calMonth: true, calDays } : {}),
     waves: dates.length,
-    // the house's own release index, so a reader can go and check
-    site: (D.pollsterRules?.[firm] || {}).site || null,
+    // the house's own release index, so a reader can go and check - a
+    // tracked confidence series carries its page on the rows themselves,
+    // pollsterRules knowing no such firm
+    site: rows.siteUrl || (D.pollsterRules?.[firm] || {}).site || null,
     /* Slots confirmed absent AT THE PUBLISHER by the house's skip-confirm
        agent (pollsterRules.skippedSlots), where one exists. The projection
        rolls straight past them instead of holding the slot open as

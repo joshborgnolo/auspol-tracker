@@ -687,12 +687,13 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     : irregular(r) ? "About " + dm(r.release)
     : wdm(r.release);
   /* a house name links out to where its wave lands first (its
-     pollsterRules.site) - the same claim the Next column's date makes. A
-     tracked-release house says what its release monitors instead, so a
+     pollsterRules.site, or the series page a tracked confidence row
+     carries) - the same claim the Next column's date makes. A
+     tracked-release monitor says what its release monitors instead, so a
      direction survey never passes for a poll even at a glance */
   const calWho = (w, i) => (
     <span key={String(i)}>{i > 0 ? ", " : ""}{w.site
-      ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next poll lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
+      ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next release lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
       : w.name}{w.tracked && RD_CAL_TRACK[w.tracked]
       ? <span className="rd-cal-track">{RD_CAL_TRACK[w.tracked]}</span> : null}</span>);
 
@@ -811,7 +812,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
               </div>
             ))}
           </div>
-          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.</p>
+          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read. The confidence rows — ANZ–Roy Morgan and Westpac–MI for consumers, Roy Morgan and NAB for businesses — are the releases the Economic sentiment panel reads.</p>
         </details>
       )}
     </RdSec>
