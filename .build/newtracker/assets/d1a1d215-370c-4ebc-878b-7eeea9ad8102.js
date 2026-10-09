@@ -5297,21 +5297,56 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const bodyRef = useRef(null);
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
-    const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
-    if (!row) return;
-    const d = row.nextElementSibling;
-    const pair = d && (d.classList.contains("rd-ap-open") || d.classList.contains("detail-row")) ? d : null;
-    const top = row.getBoundingClientRect().top + window.scrollY;
-    const h = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
-    // the bar's own height, not its viewport bottom: on a hash-trip landing
-    // at the top of the page the un-pinned bar could sit anywhere in flow
-    const bar = document.querySelector(".tabs.sticky");
-    const clear = (bar ? bar.getBoundingClientRect().height : 0) + 10;
-    // centred inside the usable viewport below the pinned bar …
-    let y = top - (window.innerHeight + clear - h) / 2;
-    // … but a group taller than that tucks the row just under the bar
-    if (y > top - clear) y = top - clear;
-    window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
+    // one placement pass: centred inside the usable viewport below the pinned
+    // chrome; a pair taller than that tucks the row just under it
+    const place = () => {
+      if (!bodyRef.current) return;
+      const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
+      if (!row) return;
+      const d = row.nextElementSibling;
+      const pair = d && (d.classList.contains("rd-ap-open") || d.classList.contains("detail-row")) ? d : null;
+      const top = row.getBoundingClientRect().top + window.scrollY;
+      const h = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
+      // the bar's own height, not its viewport bottom: on a hash-trip landing
+      // at the top of the page the un-pinned bar could sit anywhere in flow.
+      // The archive's own pinned chrome rides with it - once the table is
+      // scrolled the .rd-ap-headwrap (column headings or the phone scale) sticks
+      // just under the tab bar, so the row has to clear that too. read the
+      // sticky top straight off the headwrap (it's already --rd-pin + 46/44,
+      // the tab-bar height plus the rung's gutter) and add its own height.
+      const bar = document.querySelector(".tabs.sticky");
+      const hw = document.querySelector(".rd-ap-headwrap");
+      const barH = bar ? bar.getBoundingClientRect().height : 0;
+      const hwTop = hw ? (parseFloat(getComputedStyle(hw).top) || 0) : 0;
+      const hwH = hw ? hw.offsetHeight : 0;
+      // hwTop already includes the tab-bar height (it reads calc(var(--rd-pin)+N)),
+      // so don't add barH again; the max() is a paranoia floor for the un-built
+      // case where the headwrap isn't mounted yet
+      const clear = Math.max(barH, hwTop + hwH) + 10;
+      // centred inside the usable viewport below the pinned chrome …
+      let y = top - (window.innerHeight + clear - h) / 2;
+      // … but a group taller than that tucks the row just under it
+      if (y > top - clear) y = top - clear;
+      window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
+    };
+    // the filters, facet and dem-split the focus trip just set re-render the
+    // table in stages - the row's page position and its open detail keep
+    // moving after the first commit (bumped month groups, arriving details).
+    // Re-place on each animation frame until the row's anchor holds still,
+    // so the landing isn't measured against a transient layout.
+    let raf = 0, last = -1, still = 0;
+    const t0 = Date.now();
+    const tick = () => {
+      raf = 0;
+      const row = bodyRef.current && bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
+      const top = row ? row.getBoundingClientRect().top + window.scrollY : -1;
+      if (top >= 0 && top !== last) { last = top; still = 0; } else still++;
+      place();
+      if (still < 2 && Date.now() - t0 < 900) raf = requestAnimationFrame(tick);
+    };
+    place();
+    raf = requestAnimationFrame(tick);
+    return () => { if (raf) cancelAnimationFrame(raf); };
   }, [focus, open, facet]);
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
