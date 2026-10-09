@@ -61,7 +61,9 @@
                  by gender, age bands 18–34/35–49/50–64/65+, the five
                  mainland states, education No tertiary / TAFE / University,
                  household income, working status, language at home and
-                 religion, hand-entered in NEWSPOLL_DEMO below and verified
+                 religion (the April–June 2026 quarter adds housing tenure:
+                 owned outright / owned with mortgage / rented),
+                 hand-entered in NEWSPOLL_DEMO below and verified
                  against the printed table (the same figures sit on
                  Wikipedia's subpopulation page and reconcile). "No
                  tertiary" spans Year-12-or-less AND TAFE-or-trade voters,
@@ -646,6 +648,67 @@ const NEWSPOLL_DEMO = {
       religion: {
         Christian: { alp: 32, lnp: 34, grn: 4, onp: 16, oth: 14 },
         "No religion": { alp: 40, lnp: 18, grn: 18, onp: 12, oth: 12 },
+      },
+    },
+  },
+  /* April–June 2026 quarter: this release printed no two-party table,
+     so no tpp dim rides along. The figures below are re-read from the
+     article's own Infogram "Primary vote by …" graphic (its All column
+     is the published national total), Wikipedia's subpopulation rows
+     agreeing cell for cell. Housing tenure joins the printed dims for
+     the first time this quarter. */
+  "2026-06-26": {
+    source: "https://www.theaustralian.com.au/nation/politics/labor-and-anthony-albanese-on-the-slide-in-three-states-newspoll-finds/news-story/04a868def1628a7d516955cdd4bb5222",
+    total: { alp: 31, lnp: 19, grn: 12, onp: 28, oth: 10 },
+    dims: {
+      gender: {
+        Men: { alp: 33, lnp: 19, grn: 10, onp: 28, oth: 10 },
+        Women: { alp: 29, lnp: 19, grn: 14, onp: 28, oth: 10 },
+      },
+      age: {
+        "18–34": { alp: 31, lnp: 13, grn: 27, onp: 19, oth: 10 },
+        "35–49": { alp: 32, lnp: 17, grn: 12, onp: 30, oth: 9 },
+        "50–64": { alp: 30, lnp: 22, grn: 5, onp: 32, oth: 11 },
+        "65+": { alp: 32, lnp: 25, grn: 3, onp: 31, oth: 9 },
+      },
+      state: {
+        NSW: { alp: 31, lnp: 16, grn: 13, onp: 29, oth: 11 },
+        Vic: { alp: 28, lnp: 21, grn: 14, onp: 25, oth: 12 },
+        Qld: { alp: 30, lnp: 22, grn: 9, onp: 32, oth: 7 },
+        SA: { alp: 32, lnp: 16, grn: 14, onp: 32, oth: 6 },
+        WA: { alp: 32, lnp: 22, grn: 12, onp: 26, oth: 8 },
+      },
+      education: {
+        "No tertiary": { alp: 27, lnp: 20, grn: 12, onp: 33, oth: 8 },
+        TAFE: { alp: 28, lnp: 16, grn: 10, onp: 36, oth: 10 },
+        University: { alp: 38, lnp: 20, grn: 14, onp: 17, oth: 11 },
+      },
+      income: {
+        "Under $50k": { alp: 33, lnp: 17, grn: 10, onp: 29, oth: 11 },
+        "$50–99k": { alp: 31, lnp: 19, grn: 11, onp: 31, oth: 8 },
+        "$100–149k": { alp: 30, lnp: 18, grn: 15, onp: 27, oth: 10 },
+        "$150k+": { alp: 33, lnp: 20, grn: 12, onp: 26, oth: 9 },
+      },
+      working: {
+        "Full time": { alp: 32, lnp: 18, grn: 11, onp: 29, oth: 10 },
+        "Part time": { alp: 30, lnp: 18, grn: 19, onp: 24, oth: 9 },
+        Retired: { alp: 32, lnp: 25, grn: 3, onp: 30, oth: 10 },
+        Other: { alp: 28, lnp: 14, grn: 20, onp: 27, oth: 11 },
+      },
+      language: {
+        "English only": { alp: 31, lnp: 19, grn: 11, onp: 29, oth: 10 },
+        "Other language": { alp: 32, lnp: 19, grn: 16, onp: 21, oth: 12 },
+      },
+      religion: {
+        Christian: { alp: 27, lnp: 24, grn: 5, onp: 35, oth: 9 },
+        "No religion": { alp: 35, lnp: 15, grn: 17, onp: 23, oth: 10 },
+      },
+      // (printed labels "Owned Outright" / "Owned with Mortgage" / "Rented",
+      //  tidied onto every other house's housing keys so the groups join)
+      housing: {
+        "Own outright": { alp: 29, lnp: 26, grn: 6, onp: 29, oth: 10 },
+        Mortgage: { alp: 31, lnp: 19, grn: 12, onp: 29, oth: 9 },
+        Renting: { alp: 35, lnp: 12, grn: 18, onp: 25, oth: 10 },
       },
     },
   },
