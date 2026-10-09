@@ -2712,11 +2712,13 @@ const demoPollOf = (w) => {
 };
 /* A table's shares taken to 100 (DEMO_KEYS order: §7g's), and a wave's own
    all-voters figure: the table's where it prints one, else the published
-   primaries. */
+   primaries. A printed zero stays 0 but an ABSENT key stays null – an
+   unprinted party (RedBridge Jul 2025's Others folds One Nation in) is
+   never read as a zero share by any pool downstream. */
 const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
 const demoNorm = (s) => {
   const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
-  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, 100 * (+s[k] || 0) / t])) : null;
+  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, s[k] == null ? null : 100 * (+s[k] || 0) / t])) : null;
 };
 const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm(w.total)
   : p && p.alp != null ? demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) }) : null);
@@ -2724,9 +2726,11 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
    onto its poll row, so the archive's CSV export carries them. `v` follows
    DEMO_GROUPS (null where the poll didn't ask), each [alp, lnp, grn, onp,
    oth] as published (RedBridge's two school rows merged, as the pooling
-   merges them); `r` is how the figures were read; `t` is the wave's own
-   all-voters figure in the same order, taken to 100, so the panel can plot
-   each poll's gap from it as §7g pools it. `d` is the wave's table exactly
+   merges them; an unprinted party is null, never a zero – RedBridge Jul
+   2025 has no One Nation cut at all); `r` is how the figures were read;
+   `t` is the wave's own all-voters figure in the same order, taken to 100,
+   so the panel can plot each poll's gap from it as §7g pools it. `d` is
+   the wave's table exactly
    as the house printed it – every cut but RedBridge's vote firmness, each
    group [label, [alp, lnp, grn, onp, oth]] in the house's own order – for
    the All-polls demographics facet: its rows compare two of these groups
@@ -2742,7 +2746,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   const v = DEMO_GROUPS.map((g) => {
     const st = DEMO_SETS.find((x) => x.groups.includes(g));
     const sh = h[st.id] && h[st.id][g];
-    return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(sh[k])) : null;
+    return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => (sh[k] == null ? null : r1(sh[k]))) : null;
   });
   /* each group's subsample size, estimated exactly the wv rug's way (rowN
      times the group's rough share of voters), so a group-view poll dot's
@@ -2755,7 +2759,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   // a wave everything harmonised out of (the pooled birth-country release
   // joins no common group) still carries its raw cuts to the facet
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
-    { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
+    { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}) });
 }
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
@@ -3622,6 +3626,9 @@ const demographics = (() => {
       used = true;
       const ym = ymOf(p ? p.date : w.date), M = allByYm.get(ym);
       for (const k of DEMO_KEYS) {
+        // a party the wave never printed contributes nothing – the fold
+        // of its Others is not a zero share of the unprinted party
+        if (g[k] == null || tot[k] == null) continue;
         (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, lab, rel: p ? p.date : w.date });
         if (M) (rowsM[set.id + "|" + group + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
       }
@@ -3650,17 +3657,21 @@ const demographics = (() => {
         return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
       }).filter(Boolean);
       /* the rug above the group's whisker: each wave the window holds, with
-         its own reading on the display scale. Waves push all five parties in
-         one loop, so the px arrays below stay identically ordered. The wave's
-         release date rides each pd entry so the panel can key the dot back to
-         its poll row (AP.pollRowKey) and open the poll on click. */
-      const win = (rows[key("alp")] || [])
-        .filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; })
-        .sort((a, b) => a.mid - b.mid);
+         its own reading on the display scale. The px arrays are rebuilt off
+         the alp-anchored win list by wave identity (firm|release) – a wave
+         that printed no such party leaves a null where its dot would be
+         (WvRug draws none; before the fold case existed each key's rows
+         were identical and this map was a straight filter/sort). The wave's
+         release date rides each pd entry so the panel can key the dot back
+         to its poll row (AP.pollRowKey) and open the poll on click. */
+      const inW = (r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; };
+      const win = (rows[key("alp")] || []).filter(inW).sort((a, b) => a.mid - b.mid);
+      const wId = (r) => r.firm + "|" + r.rel;
       const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n), r: r.rel }));
-      const px = Object.fromEntries(DEMO_KEYS.map((k) => [k,
-        (rows[key(k)] || []).filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; })
-          .sort((a, b) => a.mid - b.mid).map((r) => r1(ALL_T * r.x / t))]));
+      const px = Object.fromEntries(DEMO_KEYS.map((k) => {
+        const byW = new Map((rows[key(k)] || []).filter(inW).map((r) => [wId(r), r.x]));
+        return [k, win.map((r) => { const x = byW.get(wId(r)); return x == null ? null : r1(ALL_T * x / t); })];
+      }));
       return {
         label: group,
         v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),

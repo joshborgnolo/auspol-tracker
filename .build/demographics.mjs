@@ -37,13 +37,12 @@
                  home ownership and vote softness. The December 2025 and
                  January 2026 reports print the same table under an older
                  title – they ride FIRST_EXTRA through the same reader. The
-                 October 2025 wave's own report PDF is hand-entered in
-                 REDBRIDGE_OCT_DEMO. Three 2025 waves file nothing –
-                 nothing verifiable exists to file: 30 June's only
-                 breakdowns print in AFR's Datawrapper tables as four-party
-                 rows (Others folds One Nation and independents together);
-                 8 Sep's are a protected tweet's two-wave pool; 13 Nov's
-                 sit only in the paywalled AFR prose.
+                 July 2025 wave's AFR Datawrapper table is hand-entered in
+                 REDBRIDGE_JUL_DEMO, the October 2025 wave's own report PDF
+                 in REDBRIDGE_OCT_DEMO. Two 2025 waves file nothing –
+                 nothing verifiable exists to file: 8 Sep's breakdowns are
+                 a protected tweet's two-wave pool; 13 Nov's sit only in
+                 the paywalled AFR prose.
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
@@ -1129,6 +1128,49 @@ const DEMOSAU_MRP_DEMO = {
   },
 };
 
+/* RedBridge/Accent's July 2025 wave (fieldwork 19–30 Jun, published 2 Jul
+   in the AFR's "Youthquake: Coalition deserted by younger voters",
+   20250701-p5mbja) prints no report PDF; its only breakdowns are the
+   article's own Datawrapper table, "Current federal vote intention"
+   (embed FexJm/2 beside the two-party-by-group ZUOis/1; the dataset CSVs
+   re-fetched and re-read cell by cell). A FOUR-party table – Labor,
+   Coalition, Greens, "Others*" (*Other parties and candidates) folding
+   One Nation and the independents together (the poll row's onp 9 + ind 12
+   = the printed 21, so its all-voters row reconciles exactly). No
+   One Nation cut exists anywhere, so onp stays ABSENT from every row –
+   the site never reads the fold as a zero share; the pipeline (harmonize,
+   demoNorm, gen-data's pooling and rug) keeps the unprinted key null end
+   to end, this being the first wave on file with one. The location labels
+   are tidied onto the series' keys ("Inner and middle suburbs" → Inner
+   metro, "Outer suburbs" → Outer metro, "Provincial cities" → Provincial,
+   "Rural communities" → Rural). The 2PP table is not filed – the site's
+   demographics are first preference (Roy Morgan's 2PP-only aggregates
+   file nothing either). */
+const REDBRIDGE_JUL_DEMO = {
+  "2025-06-30": {
+    source: "https://datawrapper.dwcdn.net/FexJm/2/",
+    total: { alp: 37, lnp: 31, grn: 11, oth: 21 },
+    dims: {
+      age: {
+        "18–34": { alp: 40, lnp: 19, grn: 24, oth: 17 },
+        "35–49": { alp: 37, lnp: 25, grn: 11, oth: 27 },
+        "50–64": { alp: 37, lnp: 34, grn: 5, oth: 24 },
+        "65+": { alp: 36, lnp: 44, grn: 1, oth: 18 },
+      },
+      gender: {
+        Women: { alp: 36, lnp: 30, grn: 13, oth: 21 },
+        Men: { alp: 39, lnp: 32, grn: 8, oth: 21 },
+      },
+      location: {
+        "Inner metro": { alp: 43, lnp: 29, grn: 11, oth: 17 },
+        "Outer metro": { alp: 39, lnp: 30, grn: 12, oth: 19 },
+        Provincial: { alp: 34, lnp: 33, grn: 11, oth: 22 },
+        Rural: { alp: 32, lnp: 32, grn: 8, oth: 28 },
+      },
+    },
+  },
+};
+
 /* RedBridge/Accent's October 2025 report (its own PDF, predating the
    extractor's cached-text series): Tables 1 and 2, "Federal vote intention
    for the House of Representatives", hand-entered cell by cell from the
@@ -1428,7 +1470,8 @@ try {
   // YOUGOV_TAI_DEMO): one-off layouts and MRP reports the readers have never
   // learnt. HAND_KEYS above keeps the candidate loop off them.
   for (const [house, table] of [["DemosAU", DEMOSAU_EARLY_DEMO], ["DemosAU (MRP)", DEMOSAU_MRP_DEMO],
-    ["RedBridge/Accent", REDBRIDGE_OCT_DEMO], ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
+    ["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
+    ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
     for (const [date, h] of Object.entries(table)) {
       const k = house + "|" + date;
       if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }

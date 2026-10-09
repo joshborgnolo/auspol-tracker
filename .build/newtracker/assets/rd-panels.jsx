@@ -238,12 +238,14 @@ function RdPrimary({ rangeId, setRangeId }) {
       if (!M) return [];
       return parts.map((p) => {
         const i = GRPV_KEYS.indexOf(p.id);
+        // a party the wave never printed (an Others fold) draws no dot
+        if (gv[i] == null || tt[i] == null) return null;
         // the group's estimated subsample (gen-data's wave n × the group's
         // share of voters) overrides the tip's whole-wave n, as the rug does
         const subn = q.grp.n && q.grp.n[gi];
         return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: q, party: p.id,
                  sub: subn ? "n ≈ " + subn.toLocaleString() : undefined };
-      });
+      }).filter(Boolean);
     }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
   const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
@@ -1682,7 +1684,7 @@ function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
       const gap = (b.offsetWidth / w) * 100;
       const last = [-Infinity, -Infinity];
       const next = new Array(g.px[party].length).fill(0);
-      g.px[party].map((x, i) => ({ i, p: xp(x) })).sort((a, c) => a.p - c.p).forEach(({ i, p }) => {
+      g.px[party].map((x, i) => ({ i, p: x == null ? null : xp(x) })).filter((e) => e.p != null).sort((a, c) => a.p - c.p).forEach(({ i, p }) => {
         let l;
         if (p - last[0] >= gap) l = 0;
         else if (p - last[1] >= gap) l = 1;
@@ -1692,7 +1694,7 @@ function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
       });
       setUps((prev) => (prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next));
       const ringPx = b.offsetWidth / 2 + 2.75;
-      const nextRing = g.px[party].map((x) => Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
+      const nextRing = g.px[party].map((x) => x != null && Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
       setRings((prev) => (prev && prev.length === nextRing.length && nextRing.every((v, k) => v === prev[k]) ? prev : nextRing));
     };
     compute();
@@ -1715,6 +1717,7 @@ function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
   return (
     <span ref={rugBox} className={"rd-wv-rug" + (tip ? " lit" : "")}>
       {g.px[party].map((x, i) => {
+        if (x == null) return null;   // the wave printed no such party (an Others fold isn't a dot at zero)
         const d = g.pd[i] || null;
         if (!d) return <b key={i} className={rings && rings[i] ? "ring" : ""} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}><i aria-hidden="true"></i></b>;
         const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
@@ -2361,9 +2364,10 @@ function RdDemographics({ rangeId = "all" }) {
       const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })).filter((d) => d.x >= firstX - 0.01), x0);
       const dots = D.individualPolls.filter((q) => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap((q) => drawn.map((l) => {
         const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
-        const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+        const sum = v ? v.reduce((a, b) => a + (b || 0), 0) : 0;
         const base = allAt.get(q.ym);
-        return sum > 0 && q.grp.t[gpi] > 0 && base != null
+        // v[gpi] null: the wave printed no such party - an Others fold isn't a zero
+        return v && v[gpi] != null && sum > 0 && q.grp.t[gpi] > 0 && base != null
           ? { x: q.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: q } : null;
       }).filter(Boolean));
       return { st, drawn, allPts, dots, x0, x1, span: x1 - x0 };

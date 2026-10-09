@@ -103,11 +103,14 @@ const YG_REST = [["SA", 0.324], ["WA", 0.457], ["ACT/NT/Tas", 0.219]];
 /* One wave's groups on the common sets:
    { gender: { Men: shares, … }, age: { "18–34": shares, … }, generation, education,
      state, location, housing, language }.
-   A party a house left off a group (a segment that rounded to nothing) is 0. */
+   A party that printed a zero (a segment that rounded to nothing) stays 0;
+   a key ABSENT from the printed table stays null – RedBridge's July 2025
+   AFR table folds One Nation into Others, and reading that fold as a zero
+   share would pollute every One Nation pool the wave's groups join. */
 export function harmonize(w) {
   const d = (w && w.dims) || {}, out = {};
   const put = (set, group, sh) => {
-    if (sh) (out[set] ||= {})[group] = Object.fromEntries(KEYS.map((k) => [k, +sh[k] || 0]));
+    if (sh) (out[set] ||= {})[group] = Object.fromEntries(KEYS.map((k) => [k, sh[k] == null ? null : (+sh[k] || 0)]));
   };
   for (const g of ["Men", "Women"]) put("gender", g, d.gender && d.gender[g]);
   // only the bands whose edges match join: YouGov's 35–49 and 50+ find no key here

@@ -17,6 +17,8 @@ import { harmonize, DEMO_SETS, DEMO_SHARE } from "./newtracker/demo-groups.mjs";
 
 const polls = JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).polls;
 const poll = (house, date) => polls.find((p) => p.pollster === house && p.date === date);
+const demoWaves = JSON.parse(readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8")).waves; // two-party sums are the whole point here; the data re-derives from the sources every regeneration, so leave the file in shape for them
+const wave = (house, date) => demoWaves.find((w) => w.pollster === house && w.date === date);
 
 // ---- YouGov: the 24 Aug 2026 crosstab --------------------------------------------
 const t = crosstabOfHtml(readFileSync(path.join(ROOT, ".build/news24-src/ig-fixtures-2026-08-24/ig-YM46DvOTftyx9pNzV67y.html"), "utf8"));
@@ -180,6 +182,29 @@ const odd = `First preference vote intention
             Women     28      20          29          6        11        6`;
 assert.equal(redbridgeTable(odd), null, "an unknown party column");
 
+// the July 2025 fold table (AFR's four-party table folds One Nation into
+// "Others"): the gate reads only the keys that printed, and compares totals
+// only where BOTH sides carry the key – in either direction
+const jul = wave("RedBridge/Accent", "2025-06-30");
+assert.ok(jul, "the July 2025 AFR fold wave is filed");
+assert.equal(jul.source, "https://datawrapper.dwcdn.net/FexJm/2/");
+assert.equal(jul.read, "published table");
+assert.deepEqual(jul.total, { alp: 37, lnp: 31, grn: 11, oth: 21 }, "the four-party total sits with the poll row");
+assert.equal(totalProblem(jul.total, poll("RedBridge/Accent", "2025-06-30")), null,
+  "the fold-table total matches the poll row where both print");
+const junPNG = poll("RedBridge/Accent", "2025-06-30");
+assert.equal(totalProblem({ onp: junPNG.onp, ind: junPNG.ind }, jul.total), null,
+  "polled figures the table folds away are no defect of the table");
+assert.equal(totalProblem(jul.total, {}), null, "nothing to compare against is no defect");
+assert.equal(sharesProblem(jul.dims.age), null, "four-party rows sum to 100 on their own");
+assert.deepEqual(Object.keys(jul.dims.age["65+"]).sort(), ["alp", "grn", "lnp", "oth"], "no onp key in the fold wave");
+assert.equal(jul.dims.age["65+"].grn, 1, "the 65+ Greens cell, kept from the embed's CSV");
+assert.deepEqual(Object.keys(jul.dims.gender).sort(), ["Men", "Women"]);
+assert.deepEqual(jul.dims.location["Inner metro"], { alp: 43, lnp: 29, grn: 11, oth: 17 });
+assert.deepEqual(jul.dims.location["Rural"], { alp: 32, lnp: 32, grn: 8, oth: 28 });
+assert.deepEqual(jul.dims.age["50–64"], { alp: 37, lnp: 34, grn: 5, oth: 24 });
+assert.equal(sharesProblem(jul.dims.gender), null);
+
 // ---- Resolve: decoding and the series ------------------------------------------------
 assert.equal(decodeUx("2l"), 38);
 assert.equal(decodeUx("2l.83"), 38.83, "the fraction rides verbatim");
@@ -278,13 +303,14 @@ assert.deepEqual(Object.keys(yg.age), ["18–34"], "YouGov joins the age bands o
 assert.deepEqual(Object.keys(yg.generation), ["Gen Z", "Boomers"], "the Silent generation has no common group");
 assert.deepEqual(yg.education["TAFE or trade"], sh(22, 17, 34, 10, 17), "TAFE or college is TAFE or trade");
 assert.deepEqual(Object.keys(yg.education), ["Year 12 or less", "TAFE or trade", "University"]);
-// DemosAU: its bands match Resolve's; School and TAFE map across; a segment it left off is 0
+// DemosAU: its bands match Resolve's; School and TAFE map across; a segment
+// the printed table left off entirely stays null, never 0
 const dm = harmonize({ pollster: "DemosAU", dims: {
   age: { "18–34": sh(31, 14, 16, 25, 14), "35–54": sh(28, 21, 27, 13, 11), "55+": sh(22, 26, 33, 6, 13) },
   education: { School: { alp: 26, lnp: 19, onp: 35, oth: 20 }, TAFE: sh(24, 20, 34, 11, 11), University: sh(30, 25, 18, 15, 12) },
 } });
 assert.deepEqual(Object.keys(dm.age), ["18–34", "35–54", "55+"]);
-assert.deepEqual(dm.education["Year 12 or less"], sh(26, 19, 35, 0, 20), "School is Year 12 or less; a missing segment is 0");
+assert.deepEqual(dm.education["Year 12 or less"], sh(26, 19, 35, null, 20), "School is Year 12 or less; an unprinted party stays null, never a zero share");
 // RedBridge: its two school rows merge 39:61
 const rbH = harmonize({ pollster: "RedBridge/Accent", dims: {
   education: { "Below Year 12": sh(27, 25, 41, 3, 4), "Year 12": sh(28, 22, 17, 26, 7), "TAFE or trade": sh(26, 19, 37, 6, 12), University: sh(36, 26, 18, 13, 7) },
@@ -335,7 +361,19 @@ assert.deepEqual(Object.keys(harmonize({ pollster: "Resolve", dims: { state: {
 // so it joins no common group
 assert.equal(harmonize({ pollster: "YouGov", dims: { income: { "Under $50k": sh(26, 20, 30, 14, 10), "$150k+": sh(38, 28, 18, 6, 10) } } }).income,
   undefined, "income joins no common group");
+// the July 2025 AFR fold table (One Nation folded into Others): harmonize
+// keeps the unprinted party null on the common sets, never a zero share –
+// a printed zero and an unfilled cell must not pool the same
+const julFold = harmonize({ pollster: "RedBridge/Accent", dims: {
+  gender: { Men: { alp: 39, lnp: 32, grn: 8, oth: 21 }, Women: { alp: 36, lnp: 30, grn: 13, oth: 21 } },
+} });
+assert.deepEqual(julFold.gender.Men, { alp: 39, lnp: 32, onp: null, grn: 8, oth: 21 }, "the folded-away party is null, not 0");
+assert.deepEqual(julFold.gender.Women, { alp: 36, lnp: 30, onp: null, grn: 13, oth: 21 });
+// a printed zero is a real figure and stays one
+const printedZero = harmonize({ pollster: "YouGov", dims: { age: { "18–34": { alp: 30, lnp: 12, onp: 0, grn: 26, oth: 17 } } } });
+assert.deepEqual(printedZero.age["18–34"], sh(30, 12, 0, 26, 17), "a party that printed 0 keeps 0");
+
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
 
-console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts), Resolve series, Essential Primary Vote visuals, DemosAU labels, the gate, the common groups (place and home too)");
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels, the gate, the common groups (place and home too, unprinted parties null)");

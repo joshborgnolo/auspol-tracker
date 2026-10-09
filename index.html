@@ -42135,7 +42135,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "AFR report",
       "href": "https://www.afr.com/politics/federal/youthquake-coalition-deserted-by-younger-voters-20250701-p5mbja",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "grp": {
+      "r": "published table",
+      "v": [[40, 19, 24, null, 17], null, null, null, null, null, null, [39, 32, 8, null, 21], [36, 30, 13, null, 21], null, null, null, null, null, null, null, null, null, [43, 29, 11, null, 17], [39, 30, 12, null, 19], [34, 33, 11, null, 22], [32, 32, 8, null, 28]],
+      "d": {
+        "gender": [["Women", [36, 30, 13, null, 21]], ["Men", [39, 32, 8, null, 21]]],
+        "age": [["18–34", [40, 19, 24, null, 17]], ["35–49", [37, 25, 11, null, 27]], ["50–64", [37, 34, 5, null, 24]], ["65+", [36, 44, 1, null, 18]]],
+        "location": [["Inner metro", [43, 29, 11, null, 17]], ["Outer metro", [39, 30, 12, null, 19]], ["Provincial", [34, 33, 11, null, 22]], ["Rural", [32, 32, 8, null, 28]]]
+      },
+      "n": [840, 990, 1170, 570, 840, 750, 840, 1470, 1530, 1200, 930, 870, 930, 780, 600, 210, 300, 690, 900, 990, 480, 630],
+      "t": [37, 31, 11, null, 21]
+    }
   }, {
     "ym": "2025-07",
     "x": 2025.5033105022833,
@@ -99251,6 +99262,7 @@ function RdPrimary({
     if (!M) return [];
     return parts.map(p => {
       const i = GRPV_KEYS.indexOf(p.id);
+      if (gv[i] == null || tt[i] == null) return null;
       const subn = q.grp.n && q.grp.n[gi];
       return {
         x: q.x,
@@ -99262,7 +99274,7 @@ function RdPrimary({
         party: p.id,
         sub: subn ? "n ≈ " + subn.toLocaleString() : undefined
       };
-    });
+    }).filter(Boolean);
   }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map(d => hidden[d.party] ? {
     ...d,
@@ -101304,8 +101316,8 @@ function WvRug({
       const next = new Array(g.px[party].length).fill(0);
       g.px[party].map((x, i) => ({
         i,
-        p: xp(x)
-      })).sort((a, c) => a.p - c.p).forEach(({
+        p: x == null ? null : xp(x)
+      })).filter(e => e.p != null).sort((a, c) => a.p - c.p).forEach(({
         i,
         p
       }) => {
@@ -101316,7 +101328,7 @@ function WvRug({
       });
       setUps(prev => prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next);
       const ringPx = b.offsetWidth / 2 + 2.75;
-      const nextRing = g.px[party].map(x => Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
+      const nextRing = g.px[party].map(x => x != null && Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
       setRings(prev => prev && prev.length === nextRing.length && nextRing.every((v, k) => v === prev[k]) ? prev : nextRing);
     };
     compute();
@@ -101342,6 +101354,7 @@ function WvRug({
     ref: rugBox,
     className: "rd-wv-rug" + (tip ? " lit" : "")
   }, g.px[party].map((x, i) => {
+    if (x == null) return null;
     const d = g.pd[i] || null;
     if (!d) return React.createElement("b", {
       key: i,
@@ -102124,9 +102137,9 @@ function RdDemographics({
       })).filter(d => d.x >= firstX - 0.01), x0);
       const dots = D.individualPolls.filter(q => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap(q => drawn.map(l => {
         const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
-        const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+        const sum = v ? v.reduce((a, b) => a + (b || 0), 0) : 0;
         const base = allAt.get(q.ym);
-        return sum > 0 && q.grp.t[gpi] > 0 && base != null ? {
+        return v && v[gpi] != null && sum > 0 && q.grp.t[gpi] > 0 && base != null ? {
           x: q.x,
           y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1),
           color: l.color,
@@ -110631,10 +110644,13 @@ function RdApDetail({
       role: "row"
     }, React.createElement("span", {
       role: "rowheader"
-    }, "All voters"), cols.map(k => React.createElement("span", {
-      key: k.id,
-      role: "cell"
-    }, Math.round(tot[K.indexOf(k.id)]))));
+    }, "All voters"), cols.map(k => {
+      const tv = tot[K.indexOf(k.id)];
+      return React.createElement("span", {
+        key: k.id,
+        role: "cell"
+      }, tv == null ? "—" : Math.round(tv));
+    }));
     return React.createElement("div", {
       className: "rd-apd-demwrap"
     }, React.createElement("span", {

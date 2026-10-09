@@ -79,6 +79,90 @@
    }
   },
   {
+   "pollster": "RedBridge/Accent",
+   "date": "2025-06-30",
+   "dateStart": "2025-06-19",
+   "dateEnd": "2025-06-30",
+   "sample": 4036,
+   "article": "https://www.afr.com/politics/federal/youthquake-coalition-deserted-by-younger-voters-20250701-p5mbja",
+   "source": "https://datawrapper.dwcdn.net/FexJm/2/",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 40,
+      "lnp": 19,
+      "grn": 24,
+      "oth": 17
+     },
+     "35–49": {
+      "alp": 37,
+      "lnp": 25,
+      "grn": 11,
+      "oth": 27
+     },
+     "50–64": {
+      "alp": 37,
+      "lnp": 34,
+      "grn": 5,
+      "oth": 24
+     },
+     "65+": {
+      "alp": 36,
+      "lnp": 44,
+      "grn": 1,
+      "oth": 18
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 36,
+      "lnp": 30,
+      "grn": 13,
+      "oth": 21
+     },
+     "Men": {
+      "alp": 39,
+      "lnp": 32,
+      "grn": 8,
+      "oth": 21
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 43,
+      "lnp": 29,
+      "grn": 11,
+      "oth": 17
+     },
+     "Outer metro": {
+      "alp": 39,
+      "lnp": 30,
+      "grn": 12,
+      "oth": 19
+     },
+     "Provincial": {
+      "alp": 34,
+      "lnp": 33,
+      "grn": 11,
+      "oth": 22
+     },
+     "Rural": {
+      "alp": 32,
+      "lnp": 32,
+      "grn": 8,
+      "oth": 28
+     }
+    }
+   },
+   "total": {
+    "alp": 37,
+    "lnp": 31,
+    "grn": 11,
+    "oth": 21
+   }
+  },
+  {
    "pollster": "DemosAU",
    "date": "2025-07-06",
    "dateStart": "2025-07-05",

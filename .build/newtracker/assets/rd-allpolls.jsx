@@ -1243,7 +1243,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
       n += dm[1].length + 1;
     }
     const head = <div className="rd-apd-demr rd-apd-demh" role="row"><span></span>{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}</div>;
-    const all = tot && <div className="rd-apd-demr rd-apd-demall" role="row"><span role="rowheader">All voters</span>{cols.map((k) => <span key={k.id} role="cell">{Math.round(tot[K.indexOf(k.id)])}</span>)}</div>;
+    const all = tot && <div className="rd-apd-demr rd-apd-demall" role="row"><span role="rowheader">All voters</span>{cols.map((k) => { const tv = tot[K.indexOf(k.id)]; return <span key={k.id} role="cell">{tv == null ? "—" : Math.round(tv)}</span>; })}</div>;
     return (
       <div className="rd-apd-demwrap">
         <span className="rd-apd-h">The vote by group, {p.grp.r === "measured from the charts" ? "measured off " + p.pollster + "’s charts" : "as " + p.pollster + " printed it"}</span>
