@@ -27,6 +27,11 @@
 // Invocation honours the repo's agent conventions: the pinned CLI, print
 // mode, a hard wall-clock, and MATILDA_API_KEY already known to CI. No key
 // (a fork, a PR run, the laptop launchd copy) → skipped, deterministic path.
+// The job this runs in (poll-agent.yml `update`) holds a contents:write token
+// and a persisted git credential, so the model gets NO tool surface: the
+// bundle in the prompt is complete, the answer is one JSON object, and shell/
+// write/edit are excluded rather than --yolo'd ("at most local reads" below
+// is a courtesy, not a need).
 //
 // Usage:
 //   node .build/adjudicate.mjs --house <roymorgan|pollbludger> \
@@ -100,7 +105,7 @@ const prompt = readFileSync(PROMPT[house], "utf8") +
 
 const res = spawnSync(cli, [
   "-p", prompt,
-  "--yolo",
+  "--exclude-tools", "shell,write,edit",
   "--output-format", "text",
   "--max-wall-time", WALL,
   "--max-tool-calls", String(TOOL_BUDGET),

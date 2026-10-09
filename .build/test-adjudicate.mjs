@@ -10,7 +10,7 @@ import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 
 const { validate } = await import("./newtracker/validate.mjs");
-const { validateCases } = await import("./adjudicate-cases.mjs");
+const { validateCases, caseJson } = await import("./adjudicate-cases.mjs");
 
 const baseEnv = { ...process.env };
 delete baseEnv.MATILDA_API_KEY;
@@ -31,6 +31,10 @@ delete baseEnv.MATILDA_API_KEY;
   assert.equal(validateCases("pollbludger", [pend, mm], [{ case: pend.case, action: "defer" }, { case: mm.case, action: "same_wave" }]).ok, true);
   assert.equal(validateCases("pollbludger", [pend], [{ case: pend.case, action: "file_both" }]).ok, false, "house-mismatched action");
   assert.equal(validateCases("pollbludger", [{ case: "double:x:y" }]).ok, false, "unknown kind for house");
+  // the evidence-size guard the extractors gate emission on
+  assert.equal(caseJson({ case: "pending:1" }), JSON.stringify({ case: "pending:1" }), "small case serialises");
+  assert.equal(caseJson({ case: "pending:1", blob: "x".repeat(6000) }), null, "over-cap bundle refused");
+  assert.ok(caseJson({ case: "pending:1", blob: "x".repeat(6000) }, 8000), "the cap is the caller's knob");
 }
 console.log("contract table: ok");
 
@@ -39,6 +43,7 @@ const bin = mkdtempSync(path.join(tmpdir(), "adj-bin-"));
 const stub = `#!/usr/bin/env node
 // stub matilda CLI: answers from ADJ_STUB_MODE, derives case ids from the bundle
 const argv = process.argv.slice(2);
+if (process.env.ADJ_STUB_ARGV) require("node:fs").appendFileSync(process.env.ADJ_STUB_ARGV, JSON.stringify(argv) + "\\n");
 const p = argv[argv.indexOf("-p") + 1] || "";
 const mode = process.env.ADJ_STUB_MODE || "good";
 if (mode === "garbage") { console.log("Sorry, I cannot help with that."); process.exit(0); }
@@ -85,13 +90,21 @@ const MIXED = { ambiguous: [
   s = adjRun("pollbludger", { ambiguous: Array.from({ length: 6 }, (_, i) => ({ case: `pending:${i}` })) }, { MATILDA_API_KEY: "test" }).status;
   assert.equal(s.ran, false); assert.match(s.why, /too many cases/);
 
-  let t = adjRun("roymorgan", MIXED, { MATILDA_API_KEY: "test" });
+  const argvLog = path.join(bin, "argv.log");
+  let t = adjRun("roymorgan", MIXED, { MATILDA_API_KEY: "test", ADJ_STUB_ARGV: argvLog });
   assert.equal(t.status.ran, true); assert.equal(t.status.applied, true, "good verdict applies: " + JSON.stringify(t.status));
   assert.equal(t.status.decisions, 2);
   const v = JSON.parse(readFileSync(t.out, "utf8"));
   assert.deepEqual(v.decisions.map((d) => d.case), ["double:2026-09-20:2026-09-27", "reissue:2026-09-13"]);
   assert.deepEqual(v.decisions.map((d) => d.action), ["file_both", "escalate"]);
   assert.ok(v.decisions.every((d) => typeof d.reason === "string" && d.reason.length <= 240), "reasons capped");
+  // the verdict call runs with NO tool surface: no --yolo, shell/write/edit
+  // excluded; the hard budgets stay
+  const callArgv = JSON.parse(readFileSync(argvLog, "utf8").trim().split("\n").pop());
+  assert.ok(!callArgv.includes("--yolo"), "verdict call carries no --yolo");
+  assert.deepEqual((callArgv[callArgv.indexOf("--exclude-tools") + 1] || "").split(",").sort(),
+    ["edit", "shell", "write"], "shell/write/edit excluded from the verdict call");
+  assert.ok(callArgv.includes("--max-wall-time") && callArgv.includes("--max-tool-calls"), "hard budgets still present");
 
   t = adjRun("roymorgan", MIXED, { MATILDA_API_KEY: "test", ADJ_STUB_MODE: "garbage" });
   assert.equal(t.status.applied, false); assert.match(t.status.why, /no JSON object/);

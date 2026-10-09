@@ -65,7 +65,11 @@ a GENERATED build artifact — never hand-edit it.
     `clock` job skips a cron run's update when the clock already served
     every slot of its cron line (any doubt runs it), and coverage-check's
     heartbeat job goes red when under half the clock's slots in 24h were
-    dispatched (its token is a PAT that will expire).
+    dispatched (its token is a PAT that will expire). The table's
+    `generatedAt` gates what the heartbeat judges, so a retune can't
+    masquerade as a day of misses; the Worker's table read is retried
+    in-tick; and the FIXED_SLOTS ledgers' own cron lines ride the current
+    offset behind `tune-fixed` markers the tuner rewrites.
   - The launchd jobs run in their own clone,
     `~/Library/Application Support/auspol-agents/repo` — never in this
     checkout, whose edits made them refuse 51 of ~148 slots in Sep 2026. Its
@@ -93,11 +97,17 @@ a GENERATED build artifact — never hand-edit it.
   and Poll Bludger extractors used to punt (RM's same-week double releases
   and figure-diverging reissues; PB's in-grace pending waves and
   near-canonical mismatches) are CASES the extractor emits under
-  `--adjudicate` instead of answering alone. Case/decision shapes and the
-  vote constants (RM_DOUBLE_DAYS=4, RM_REISSUE_PT=0.5, PB_MISMATCH_PT=1.0)
-  live in `.build/adjudicate-cases.mjs`, the ONE module extractor, judge
-  and tests share. The wrapper then runs `.build/adjudicate.mjs` — one
-  pinned matilda CLI call, ≤5 cases, evidence-only JSON (figures are
+  `--adjudicate` instead of answering alone. Case/decision shapes, the
+  vote constants (RM_DOUBLE_DAYS=4, RM_REISSUE_PT=0.5, PB_MISMATCH_PT=1.0),
+  validateCases and the caseJson evidence-size cap (a case too big to
+  judge stays deterministic that run) live in
+  `.build/adjudicate-cases.mjs`; the extractors gate emission on the
+  constants + size cap, and adjudicate.mjs owns verdict validation (an
+  extractor trusts a --decisions file because only validated verdicts are
+  ever handed to it). The wrapper then runs `.build/adjudicate.mjs` — one
+  pinned matilda CLI call with NO tool surface (no --yolo; shell/write/
+  edit excluded — the evidence bundle is complete and the job holds a
+  contents:write credential), ≤5 cases, evidence-only JSON (figures are
   POISON_KEYS, never routing answers), invalid emission = deterministic
   no-op, always exit 0 — and re-runs the extractor with `--decisions`.
   Terminal verdicts and anti-spam `asked` marks persist in each house's

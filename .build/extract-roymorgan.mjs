@@ -121,7 +121,7 @@
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fetchText, TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, MONTHS, clean, writeAtomic, pool } from "./extract-common.mjs";
-import { RM_DOUBLE_DAYS, RM_REISSUE_PT } from "./adjudicate-cases.mjs";
+import { RM_DOUBLE_DAYS, RM_REISSUE_PT, caseJson } from "./adjudicate-cases.mjs";
 
 const argv = process.argv.slice(2);
 const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
@@ -595,12 +595,15 @@ try {
       status.notes.push(`adjudicated escalate: ${rec.r.date} (${(verdict.reason || "").slice(0, 120)}) — no data change; a correction is repair-agent or human work`);
       adjNow[CASE_ID] = { action: "escalate", decided: todayIso(), reason: verdict.reason || "" };
     } else if (ADJUDICATE && !adjNow[CASE_ID]) {
-      adjNow[CASE_ID] = { action: "asked", decided: todayIso() };
-      status.ambiguous.push({
-        case: CASE_ID, slug: rec.c.slug, date: rec.r.date, moved,
-        parsed: figSnap(rec.r), row: snapRow(row),
-      });
-      status.notes.push(`reissue case: ${rec.r.date} — parsed ${moved.join(", ")} moved >${RM_REISSUE_PT}pt vs the row`);
+      const emission = { case: CASE_ID, slug: rec.c.slug, date: rec.r.date, moved,
+        parsed: figSnap(rec.r), row: snapRow(row) };
+      if (caseJson(emission)) {
+        adjNow[CASE_ID] = { action: "asked", decided: todayIso() };
+        status.ambiguous.push(emission);
+        status.notes.push(`reissue case: ${rec.r.date} — parsed ${moved.join(", ")} moved >${RM_REISSUE_PT}pt vs the row`);
+      } else {
+        status.notes.push(`reissue case ${CASE_ID} oversized for the judge; staying deterministic this run`);
+      }
     }
   }
 
@@ -637,16 +640,23 @@ try {
       adjNow[verdict.slug] = { action: "never_file", decided: todayIso(), reason: verdict.reason || "" };
       dropSlugs.add(verdict.slug); // the rest of the cluster is a wave again — files below
     } else if (ADJUDICATE && !adjNow[CASE_ID] && !verdict) {
-      adjNow[CASE_ID] = { action: "asked", decided: todayIso() };
-      status.ambiguous.push({
+      const emission = {
         case: CASE_ID,
         waves: cluster.map((rec) => ({ slug: rec.c.slug, date: rec.r.date, dateStart: rec.r.dateStart,
           published: rec.r.published, sample: rec.r.sample, figures: figSnap(rec.r) })),
         nearbyRows: nearbyRmRows(cluster[0].r.date),
-      });
-      status.held.push(...cluster.map((rec) => rec.c.slug));
-      for (const rec of cluster) dropSlugs.add(rec.c.slug);
-      status.notes.push(`double case: ${CASE_ID} — ${cluster.length} candidates held for adjudication`);
+      };
+      if (caseJson(emission)) {
+        adjNow[CASE_ID] = { action: "asked", decided: todayIso() };
+        status.ambiguous.push(emission);
+        status.held.push(...cluster.map((rec) => rec.c.slug));
+        for (const rec of cluster) dropSlugs.add(rec.c.slug);
+        status.notes.push(`double case: ${CASE_ID} — ${cluster.length} candidates held for adjudication`);
+      } else {
+        // no ask, no hold: the plain rule (file everything) owns an
+        // over-sized bundle, exactly like any ask-less run
+        status.notes.push(`double case ${CASE_ID} oversized for the judge; filing by the plain rule this run`);
+      }
     }
     // every other state files everything: an answered verdict routes via the
     // branches above, and once the ask is spent the plain rule (file it) owns.

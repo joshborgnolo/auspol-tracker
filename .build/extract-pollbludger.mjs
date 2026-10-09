@@ -108,7 +108,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { writeJsonAtomic } from "./atomic-write.mjs";
-import { PB_MISMATCH_PT } from "./adjudicate-cases.mjs";
+import { PB_MISMATCH_PT, caseJson } from "./adjudicate-cases.mjs";
 
 const FEED = "https://www.pollbludger.net/fed2028/bludgertrack/xml/current.xml";
 const PAGE = "https://www.pollbludger.net/fed2028/bludgertrack/polldata.htm";
@@ -408,14 +408,18 @@ for (const p of points) {
         adjNow[p.id] = { action: "same_wave", decided: nowIso(), reason: mmVerdict.reason || "" };
         status.skipped.push({ id: p.id, pollster: p.pollster, end: p.end, why: `adjudicated same_wave (${(mmVerdict.reason || "").slice(0, 80)})` });
       } else if (ADJUDICATE && !led && figDiverges(p, near.row)) {
-        adjNow[p.id] = { action: "asked", decided: nowIso() };
-        status.ambiguous.push({
+        const emission = {
           case: MISMATCH_CASE, house: h.house, feedId: p.id,
-          hoursInWindow: null,
           feed: figSnapshot(p), canonical: canonSnap(near.row), daysApart: near.d,
           nearbyCanon: nearbyCanon(h.names, p.end),
-        });
-        status.pending.push({ id: p.id, pollster: h.house, end: p.end, adjudicating: true });
+        };
+        if (caseJson(emission)) {
+          adjNow[p.id] = { action: "asked", decided: nowIso() };
+          status.ambiguous.push(emission);
+          status.pending.push({ id: p.id, pollster: h.house, end: p.end, adjudicating: true });
+        } else {
+          status.notes.push(`mismatch case ${MISMATCH_CASE} oversized for the judge; stays deduped this run`);
+        }
       }
       continue;
     }
@@ -444,13 +448,18 @@ for (const p of points) {
     // put the judgement call to the LLM ONCE per wave; the "asked" mark
     // keeps later runs (verdict or not) on the plain clock
     if (ADJUDICATE && !led) {
-      adjNow[p.id] = { action: "asked", decided: nowIso() };
-      status.ambiguous.push({
+      const emission = {
         case: PEND_CASE, house: h.house, feedId: p.id,
         hoursSeen: r1(hours),
         feed: figSnapshot(p),
         nearbyCanon: nearbyCanon(h.names, p.end),
-      });
+      };
+      if (caseJson(emission)) {
+        adjNow[p.id] = { action: "asked", decided: nowIso() };
+        status.ambiguous.push(emission);
+      } else {
+        status.notes.push(`pending case ${PEND_CASE} oversized for the judge; stays on the plain grace clock`);
+      }
     }
     continue;
   }
