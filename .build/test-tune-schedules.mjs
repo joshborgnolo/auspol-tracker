@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-const { tune } = await import("./tune-schedules.mjs");
+const { tune, dispatchTable } = await import("./tune-schedules.mjs");
 
 // ---- fixture data -----------------------------------------------------------
 const poll = (pollster, published) => ({
@@ -165,11 +165,22 @@ const ipSlots = tj.slots.filter((x) => x.workflow === "ipsos-update.yml");
 assert.deepEqual([...new Set(ipSlots.map((x) => x.day))], ["Mon", "Tue", "Wed", "Thu", "Fri"], "Ipsos is dispatched on weekdays only");
 assert.equal(ipSlots.filter((x) => x.day === "Wed").length, 21, "Ipsos: 18 comb slots (11:20–17:00), follow-ups at 18:00 and 19:00, the 22:30 backstop");
 assert.equal(tableText.split("\n").filter((l) => l.startsWith("  {")).length, tj.slots.length, "one slot per line");
+assert.equal(tj.generatedAt, "2026-09-22T00:00:00.000Z", "generatedAt stamps the tune's clock");
 // DST rewrites every cron block; the table has no UTC in it and stays put
 res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true, tablePath: table });
 assert.equal(res.find((r) => r.target.workflow === "roymorgan-update.yml").status, "updated", "blocks move with DST");
 assert.equal(res.tableStatus, "current", "the table does not");
-assert.equal(readFileSync(table, "utf8"), tableText);
+assert.equal(readFileSync(table, "utf8"), tableText, "generatedAt included");
+
+// generatedAt moves only when the slot list does: the heartbeat's scored
+// window resets exactly then, and not with every regenerate
+const t1 = dispatchTable([], { now: new Date("2026-09-22T00:00:00Z") });
+assert.equal(t1.generatedAt, "2026-09-22T00:00:00.000Z", "a fresh table takes the tune clock");
+assert.equal(dispatchTable([], { previous: t1, now: new Date("2026-09-29T00:00:00Z") }).generatedAt, t1.generatedAt, "unchanged slots keep the stamp");
+const t3 = dispatchTable([{ target: { workflow: "w-update.yml" }, slots: [{ dow: null, mins: 360, label: "daily sweep" }] }],
+  { previous: t1, now: new Date("2026-09-29T00:00:00Z") });
+assert.equal(t3.generatedAt, "2026-09-29T00:00:00.000Z", "a changed slot list re-stamps");
+assert.ok(t3.slots.some((s) => s.workflow === "w-update.yml" && s.time === "06:00" && s.day === "daily"));
 
 // ---- the collision audit: per-house queues never collide; a shared group does ----
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true });
@@ -193,5 +204,27 @@ writeFileSync(path.join(dir, "redbridge-update.yml"), rb);
 writeFileSync(path.join(dir, "spectre-update.yml"), "name: x\non:\n  schedule:\n    - cron: '1 1 * * *'\n");
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true });
 assert.equal(res.find((r) => r.target.workflow === "spectre-update.yml").status, "no-markers");
+
+// ---- the fixed twins: FIXED_SLOTS' own cron lines follow the DST offset ------
+const twinFile = (name) => writeFileSync(path.join(dir, name), [
+  "name: x", "on:", "  schedule:",
+  "    # tune-fixed:begin", "    # tune-fixed:end",
+  "  workflow_dispatch:", "",
+].join("\n"));
+twinFile("np-score.yml");
+twinFile("prediction-refresh.yml");
+res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true });
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["updated", "updated"], "the first tune writes both twin lines");
+assert.ok(crons(readFileSync(path.join(dir, "np-score.yml"), "utf8")).some((c) => c.cron === "15 21 * * *"), "07:15 Sydney is 21:15 UTC in AEST");
+assert.ok(crons(readFileSync(path.join(dir, "prediction-refresh.yml"), "utf8")).some((c) => c.cron === "0 3 * * *"), "13:00 Sydney is 03:00 UTC in AEST");
+res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true });
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["updated", "updated"], "the DST switch moves the twins");
+assert.ok(crons(readFileSync(path.join(dir, "np-score.yml"), "utf8")).some((c) => c.cron === "15 20 * * *"), "07:15 Sydney is 20:15 UTC in AEDT");
+assert.ok(crons(readFileSync(path.join(dir, "prediction-refresh.yml"), "utf8")).some((c) => c.cron === "0 2 * * *"), "13:00 Sydney is 02:00 UTC in AEDT");
+res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true });
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["current", "current"], "and then they rest");
+// a fixture (or fork) without the twin files: reported, not fatal
+res = tune({ data, workflowsDir: mkdtempSync(path.join(tmpdir(), "tune-empty-")), now: new Date("2026-09-22T00:00:00Z"), apply: false });
+assert.deepEqual(res.fixedTwins.map((t) => t.status), ["no-file", "no-file"], "absent twin files are reported, skipped");
 
 console.log("test-tune-schedules: ok");

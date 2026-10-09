@@ -8,6 +8,12 @@ compatibility_date = "2026-09-01"
 [triggers]
 crons = ["* * * * *"]
 
+# persist the logs (Workers Logs): without this a failed dispatch is visible
+# only in a live `wrangler tail`, and by the time the daily heartbeat goes
+# red the evidence of why is gone
+[observability]
+enabled = true
+
 [vars]
 REPO = "joshborgnolo/auspol-tracker"
 TABLE_URL = "https://raw.githubusercontent.com/joshborgnolo/auspol-tracker/main/.build/dispatch-clock/schedule.json"

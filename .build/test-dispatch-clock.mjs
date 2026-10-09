@@ -39,6 +39,8 @@ assert.deepEqual(next.map((x) => x.workflows[0]), ["roymorgan-update.yml", "roym
 
 // ---- the committed table ----------------------------------------------------------
 assert.equal(table.timezone, "Australia/Sydney");
+assert.match(table.generatedAt || "", /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+  "generatedAt stamps the slots' last change — the heartbeat scores from it");
 assert.ok(table.slots.length > 20, "the table carries the combs");
 for (const s of table.slots) {
   assert.match(s.workflow, SAFE_WORKFLOW, `safe workflow name: ${s.workflow}`);
@@ -72,6 +74,24 @@ assert.deepEqual(JSON.parse(post.init.body), { ref: "main" });
 calls.length = 0;
 assert.deepEqual(await tick(new Date("2026-09-21T05:41:00Z"), env), [], "a quiet minute dispatches nothing");
 assert.equal(calls.filter((c) => c.init.method === "POST").length, 0);
+// a flaky table fetch is retried in-tick, and one workflow's error doesn't
+// take the rest of the minute with it
+const toy2 = { slots: [
+  { workflow: "a-update.yml", day: "Mon", time: "15:40", label: "x" },
+  { workflow: "b-update.yml", day: "Mon", time: "15:40", label: "y" },
+] };
+let flakes = 2;
+globalThis.fetch = async (url) => {
+  if (String(url).endsWith("schedule.json")) {
+    if (flakes-- > 0) throw new Error("edge hiccup");
+    return new Response(JSON.stringify(toy2), { status: 200 });
+  }
+  if (String(url).includes("a-update")) throw new Error("socket reset");
+  return new Response(null, { status: 204 });
+};
+assert.deepEqual(await tick(new Date("2026-09-21T05:40:00Z"), env),
+  [{ workflow: "a-update.yml", status: "error" }, { workflow: "b-update.yml", status: 204 }],
+  "the table fetch recovered on retry; the failed workflow degraded alone");
 
 // ---- served.mjs: cron lines as GitHub reads them ------------------------------------
 const at = (s) => new Date(s);
@@ -91,7 +111,10 @@ assert.equal(backupVerdict("0,10,20,30,40,50 6 * * 1", slim(all.slice(0, 3)), la
 const failed = [...all.slice(0, 5), run("2026-09-21T06:50:41Z", "failure")];
 assert.equal(backupVerdict("0,10,20,30,40,50 6 * * 1", slim(failed), late).served, false, "a failed dispatched run earns its backup");
 const running = [...all.slice(0, 5), run("2026-09-21T06:50:41Z", null, "in_progress")];
-assert.equal(backupVerdict("0,10,20,30,40,50 6 * * 1", slim(running), late).served, true, "a run still going counts");
+assert.equal(backupVerdict("0,10,20,30,40,50 6 * * 1", slim(running), late).served, false,
+  "a run still in flight after hours has stalled, not worked — the slot earns its backup");
+assert.equal(backupVerdict("50 6 * * 1", slim([run("2026-09-21T06:50:30Z", null, "in_progress")]), Date.parse("2026-09-21T06:53:00Z")).served, true,
+  "a prompt cron's fresh in-flight twin counts (don't double-run)");
 assert.equal(backupVerdict("0,10,20,30,40,50 6 * * 1", slim([run("2026-09-21T06:07:00Z")]), late).served, false, "a run 7 min off a slot is not that slot's");
 assert.equal(backupVerdict("2 19 * * *", slim(all), late).served, false, "a slot the clock never carried always runs");
 assert.equal(backupVerdict("0 20 * * 1", slim(all), Date.parse("2026-09-24T12:00:00Z")).served, false, "no slot of the line in the last day: run");
@@ -119,6 +142,20 @@ const moved = { slots: tbl.slots.map((x) => (x.time === "06:00" ? { ...x, time: 
 assert.equal(clockHealth(moved, slim(ran), noon).served, 4, "a slot a retune shifted a few minutes still finds its run");
 assert.equal(clockHealth(moved, slim([d("roymorgan-update.yml", "2026-09-24T19:40:00Z")]), noon).unserved.some((u) => u.startsWith("roymorgan")), true,
   "a run 25 min off is not the slot's");
+// one run midway between two slots of a comb serves ONE of them, not both
+const combTbl = { slots: [
+  { workflow: "essential-update.yml", day: "daily", time: "01:00", label: "comb" },
+  { workflow: "essential-update.yml", day: "daily", time: "01:10", label: "comb" },
+] };
+const midway = clockHealth(combTbl, slim([d("essential-update.yml", "2026-09-24T15:06:00Z")]), noon);
+assert.equal(midway.served, 1, "the midway run counts once");
+assert.equal(midway.unserved.length, 1, "…and the neighbour slot is still owed");
+// a table that changed an hour ago doesn't judge yesterday's slots
+const fresh = { ...tbl, generatedAt: "2026-09-25T01:40:00Z" };
+assert.equal(clockHealth(fresh, [], noon).due, 0, "slots before the table's last change aren't judged");
+assert.equal(clockHealth(fresh, [], noon).verdict, "healthy");
+const settledTable = { ...tbl, generatedAt: "2026-09-24T10:00:00Z" };
+assert.equal(clockHealth(settledTable, slim(ran), noon).due, 4, "an older table judges the full window as before");
 
 // ---- the CLI, through its test seams ---------------------------------------------------
 const tmp = mkdtempSync(join(tmpdir(), "served-"));
@@ -135,7 +172,10 @@ assert.match(readFileSync(join(tmp, "out"), "utf8"), /served=false\n$/, "...and 
 c = cli("heartbeat", { SERVED_RUNS: join(tmp, "missing.json") });
 assert.equal(c.status, 1, "heartbeat: unreadable history is inconclusive");
 writeFileSync(join(tmp, "none.json"), "[]");
-c = cli("heartbeat", { SERVED_RUNS: join(tmp, "none.json"), SERVED_NOW: "2026-09-25T02:00:00Z" });
+// the committed table's generatedAt gates the scored window, so pin the fake
+// clock just past it rather than at a wall date
+const afterTable = new Date(Date.parse(table.generatedAt) + 26 * 3600e3).toISOString();
+c = cli("heartbeat", { SERVED_RUNS: join(tmp, "none.json"), SERVED_NOW: afterTable });
 assert.equal(c.status, 3, "heartbeat: nothing dispatched against the committed table is a dead clock");
 assert.match(c.stdout, /the clock looks dead/);
 rmSync(tmp, { recursive: true, force: true });

@@ -22,14 +22,18 @@ Two checks read the clock's work back out of GitHub's run list
 
 - **The backup skips itself.** A cron-triggered run of a house workflow
   first asks whether the clock already started every slot of the cron line
-  that fired it, in the last day, and whether those runs are going or went
-  green (poll-agent.yml's `clock` job). If so, its update is skipped: the
-  second run would only fetch the pollster's site again. A slot the clock
-  never carries, a failed dispatched run, a cron line still on last week's
-  UTC offset or any API error means the update runs.
+  that fired it, in the last day, and whether those runs went green (or are
+  still in flight but fresh — a prompt cron must not double its own slot;
+  a run stalled in a queue for longer counts as undone). If so, its update
+  is skipped: the second run would only fetch the pollster's site again. A
+  slot the clock never carries, a failed dispatched run, a cron line still
+  on last week's UTC offset or any API error means the update runs.
 - **The heartbeat.** coverage-check.yml's heartbeat job counts the table's
   slots in the last 24h that got a dispatched run (within 10 minutes, so a
-  retune that nudged a comb doesn't count against it). Under 90% warns;
+  retune that nudged a comb doesn't count against it; one run serves one
+  slot). Slots before the table's own `generatedAt` stamp aren't judged:
+  a retune that adds or moves slots can't report yesterday's
+  impossible-to-have-served slots as misses. Under 90% warns;
   under half fails the job, which emails. The likeliest cause is the token
   below expiring.
 
@@ -38,12 +42,18 @@ Two checks read the clock's work back out of GitHub's run list
 - `schedule.json` is **generated** by `.build/tune-schedules.mjs` (run by
   `schedule-tune.yml`) from the same measured release habits as the cron
   blocks. Times are Australia/Sydney wall-clock, so DST never changes it.
+  Its `generatedAt` stamps the slot list's last change — the heartbeat
+  scores from it, so a retune doesn't read as a day of misses.
   It also carries `FIXED_SLOTS` from that script: np-score and
   prediction-refresh, the two daily ledgers, whose missed day can't be
-  recovered. The clock is their second trigger beside their own cron line.
+  recovered. The clock is their second trigger beside their own cron line,
+  which the tuner's weekly pass keeps on the current offset (the
+  `tune-fixed` markers in those files).
 - Every minute the Worker (`worker.mjs`, logic in `clock.mjs`) fetches the
   table from `main` and dispatches each workflow that has a slot in that
-  Sydney minute.
+  Sydney minute. A failed table read is retried in the same tick (Cloudflare
+  never retries a cron event), and one workflow's error can't take the rest
+  of the minute with it.
 - Opening the Worker's URL returns the Sydney time and the next twelve
   dispatches. It's read-only and holds no secrets.
 - `.build/test-dispatch-clock.mjs` pins the matching logic, the table's
@@ -84,6 +94,9 @@ Two checks read the clock's work back out of GitHub's run list
 - A retune shows up as a diff to `schedule.json` in a
   "Tune poll-agent schedules" commit. The Worker picks it up within about
   10 minutes (raw.githubusercontent.com and the edge both cache for about 5).
+- Logs persist: `[observability]` in wrangler.toml turns on Workers Logs, so
+  a failed dispatch is still findable when the daily heartbeat fires (plain
+  `npx wrangler tail` is live-only).
 - To pause the clock: `npx wrangler triggers deploy --crons ""`, or delete
   the Worker. The GitHub cron backup carries on either way.
 - The cron blocks no longer need thinning: while the clock works, their

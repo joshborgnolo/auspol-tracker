@@ -10,12 +10,14 @@
               GitHub's runners for four days in Sep 2026 — and doubles every
               run list. So a cron run first asks: was every slot of the cron
               line that fired me, in the last day, already started by a
-              dispatch that is running or went green? Then it is a duplicate
-              and its update job is skipped. Anything else runs, and any
-              doubt runs: a line this can't read, an API error, a slot the
-              clock never carried (Essential's 05:02 skip-confirm, DemosAU's
-              hourly gate), a cron block still on last week's UTC offset
-              after a DST change, a dispatched run that failed.
+              dispatch that went green (or is still in flight but fresh —
+              the prompt-twin case)? Then it is a duplicate and its update
+              job is skipped. Anything else runs, and any doubt runs: a line
+              this can't read, an API error, a slot the clock never carried
+              (Essential's 05:02 skip-confirm, DemosAU's hourly gate), a
+              cron block still on last week's UTC offset after a DST change,
+              a dispatched run that failed — or one stalled in a queue, an
+              in-flight trust that expires after TWIN_MS.
               Prints SERVED {json}; writes served=true|false to
               $GITHUB_OUTPUT; always exits 0.
 
@@ -26,6 +28,10 @@
               GitHub token expires or is revoked, the Cloudflare account
               lapses, schedule.json stops loading — the cron backup keeps
               the site updating, hours late, and nothing else would say so.
+              Slots the table lists for instants BEFORE its own last content
+              change (generatedAt) are not judged: a retune that adds or
+              moves slots would otherwise report yesterday's impossible-to-
+              have-served slots as misses for a day.
               Prints CLOCK_STATUS {json}; exit 0 healthy (or degraded, with
               a warning), 1 inconclusive (the run list unreadable), 3 the
               clock is dead or dying (under half its slots served).
@@ -82,8 +88,15 @@ export const slim = (runs) => runs.map((r) => ({
   created: Date.parse(r.created_at), status: r.status, conclusion: r.conclusion,
 }));
 const near = (r, t) => r.created >= t - EARLY_MS && r.created <= t + LATE_MS;
-// a slot's work is done, or being done, by this run
-const didWork = (r) => r.status !== "completed" || r.conclusion === "success";
+/* A slot's work is done, or being done, by this run. A run still in flight
+   counts only while it is FRESH: the case is a prompt cron arriving within
+   minutes of the clock's dispatch, where the backup must not run beside its
+   twin. A queued or in-progress run older than that has stalled, and a
+   stalled slot earns its backup like a failed one. */
+export const TWIN_MS = 15 * MIN;
+const didWork = (r, now) =>
+  (r.status === "completed" && r.conclusion === "success") ||
+  (r.status !== "completed" && now - r.created >= -MIN && now - r.created <= TWIN_MS);
 
 /* backup: `runs` are this workflow's workflow_dispatch runs. Every instant of
    the line in the last `hours` must have one near it that worked. */
@@ -93,7 +106,7 @@ export function backupVerdict(cron, runs, now, { hours = 24 } = {}) {
   const slots = [];
   for (let t = end; t > end - hours * 3600e3; t -= MIN) if (match(new Date(t))) slots.push(t);
   if (!slots.length) return { served: false, reason: `no slot of "${cron}" in the last ${hours}h (a run that late is its own backup)` };
-  const unserved = slots.filter((t) => !runs.some((r) => near(r, t) && didWork(r)));
+  const unserved = slots.filter((t) => !runs.some((r) => near(r, t) && didWork(r, now)));
   return unserved.length
     ? { served: false, slots: slots.length, unserved: unserved.slice(0, 6).map(iso), reason: "the clock did not start (or finish) every slot of this line" }
     : { served: true, slots: slots.length, reason: "the clock already started every slot of this line" };
@@ -107,11 +120,33 @@ export function backupVerdict(cron, runs, now, { hours = 24 } = {}) {
 export const HEARTBEAT_MS = 10 * MIN;
 export function clockHealth(table, runs, now, { hours = 24, settleMin = 15 } = {}) {
   const end = Math.floor((now - settleMin * MIN) / MIN) * MIN;
+  // Slots before the table's last content change can't have been dispatched
+  // from it; judge from its generatedAt (plus the Worker's edge-cache pickup)
+  // so a retune that adds or moves slots doesn't report yesterday's slots as
+  // a day of misses. Unchanged slots still match their runs ±HEARTBEAT_MS.
+  const since = table.generatedAt ? Date.parse(table.generatedAt) + 15 * MIN : null;
   const due = [];
-  for (let t = end; t > end - hours * 3600e3; t -= MIN)
+  for (let t = end; t > end - hours * 3600e3; t -= MIN) {
+    if (since && t < since) break;
     for (const workflow of dueWorkflows(table, new Date(t))) due.push({ workflow, t });
-  const unserved = due.filter(({ workflow, t }) =>
-    !runs.some((r) => r.workflow === workflow && Math.abs(r.created - t) <= HEARTBEAT_MS));
+  }
+  /* One run serves one slot. A run midway between two slots of a 10-minute
+     comb is inside HEARTBEAT_MS of both, and must not stand for both —
+     claim greedily, nearest first. */
+  const used = new Set();
+  const unserved = [];
+  for (const { workflow, t } of [...due].reverse()) {
+    let best = -1;
+    for (let i = 0; i < runs.length; i++) {
+      if (used.has(i)) continue;
+      const r = runs[i];
+      if (r.workflow !== workflow) continue;
+      const d = Math.abs(r.created - t);
+      if (d <= HEARTBEAT_MS && (best < 0 || d < Math.abs(runs[best].created - t))) best = i;
+    }
+    if (best < 0) unserved.push({ workflow, t });
+    else used.add(best);
+  }
   const served = due.length - unserved.length;
   const ratio = due.length ? served / due.length : 1;
   const verdict = !due.length || ratio >= 0.9 ? "healthy" : ratio >= 0.5 ? "degraded" : "dead";

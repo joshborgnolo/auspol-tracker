@@ -45,10 +45,31 @@ export function nextSlots(table, from, n = 10, horizonMinutes = 8 * 1440) {
 // ---- the tick: read the table, dispatch what is due ------------------------------
 const UA = "auspol-dispatch-clock (+https://github.com/joshborgnolo/auspol-tracker)";
 
-export async function loadTable(env) {
-  const res = await fetch(env.TABLE_URL, { headers: { "user-agent": UA }, cf: { cacheTtl: 300 } });
+/* The table fetch is retried in-tick: Cloudflare never retries a cron event,
+   so one transitory raw.githubusercontent hiccup would otherwise drop every
+   slot of that minute with no record until the daily heartbeat. */
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function fetchTableOnce(env) {
+  const res = await fetch(env.TABLE_URL, {
+    headers: { "user-agent": UA }, cf: { cacheTtl: 300 }, signal: AbortSignal.timeout(5000),
+  });
   if (!res.ok) throw new Error(`schedule.json fetch answered HTTP ${res.status}`);
   return res.json();
+}
+
+export async function loadTable(env) {
+  let err;
+  for (const wait of [0, 500, 1500]) {
+    if (wait) await sleep(wait);
+    try {
+      return await fetchTableOnce(env);
+    } catch (e) {
+      err = e;
+      console.error(`schedule.json fetch failed: ${e.message}${wait === 1500 ? " — giving up" : " — retrying"}`);
+    }
+  }
+  throw err;
 }
 
 export async function tick(when, env) {
@@ -56,20 +77,26 @@ export async function tick(when, env) {
   const due = dueWorkflows(table, when);
   const results = [];
   for (const wf of due) {
-    const res = await fetch(`https://api.github.com/repos/${env.REPO}/actions/workflows/${wf}/dispatches`, {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${env.GITHUB_TOKEN}`,
-        accept: "application/vnd.github+json",
-        "x-github-api-version": "2022-11-28",
-        "content-type": "application/json",
-        "user-agent": UA,
-      },
-      body: JSON.stringify({ ref: "main" }),
-    });
-    // 204 = started; anything else lands in the Worker's logs
-    results.push({ workflow: wf, status: res.status });
-    if (res.status !== 204) console.error(`dispatch ${wf}: HTTP ${res.status} ${await res.text()}`);
+    // a workflow's own failure must not take the rest of the minute with it
+    try {
+      const res = await fetch(`https://api.github.com/repos/${env.REPO}/actions/workflows/${wf}/dispatches`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${env.GITHUB_TOKEN}`,
+          accept: "application/vnd.github+json",
+          "x-github-api-version": "2022-11-28",
+          "content-type": "application/json",
+          "user-agent": UA,
+        },
+        body: JSON.stringify({ ref: "main" }),
+      });
+      // 204 = started; anything else lands in the Worker's logs
+      results.push({ workflow: wf, status: res.status });
+      if (res.status !== 204) console.error(`dispatch ${wf}: HTTP ${res.status} ${await res.text()}`);
+    } catch (e) {
+      results.push({ workflow: wf, status: "error" });
+      console.error(`dispatch ${wf}: ${e.message}`);
+    }
   }
   if (results.length) console.log(JSON.stringify({ at: when.toISOString(), sydney: sydneyClock(when), results }));
   return results;
