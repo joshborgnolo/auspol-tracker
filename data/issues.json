@@ -437,102 +437,6 @@
    }
   },
   {
-   "pollster": "RedBridge/Accent",
-   "date": "2026-03-27",
-   "dateStart": "2026-03-23",
-   "sample": 1003,
-   "sampleEff": null,
-   "source": "https://www.afr.com/politics/federal/one-nation-nears-labor-as-coalition-vote-hits-record-low-20260329-p5zjmk",
-   "read": "summary table",
-   "question": "rank top 3 of 14",
-   "issues": {
-    "col": {
-     "r1": 46,
-     "r2": 19,
-     "r3": 11,
-     "top3": 76
-    },
-    "health": {
-     "r1": 8,
-     "r2": 11,
-     "r3": 13,
-     "top3": 32
-    },
-    "housing": {
-     "r1": 7,
-     "r2": 17,
-     "r3": 11,
-     "top3": 35
-    },
-    "crime": {
-     "r1": 5,
-     "r2": 10,
-     "r3": 11,
-     "top3": 26
-    },
-    "immigration": {
-     "r1": 8,
-     "r2": 9,
-     "r3": 10,
-     "top3": 27
-    },
-    "climate": {
-     "r1": 4,
-     "r2": 4,
-     "r3": 4,
-     "top3": 12
-    },
-    "environment": {
-     "r1": 2,
-     "r2": 3,
-     "r3": 4,
-     "top3": 9
-    },
-    "economy": {
-     "r1": 5,
-     "r2": 5,
-     "r3": 7,
-     "top3": 17
-    },
-    "security": {
-     "r1": 3,
-     "r2": 5,
-     "r3": 6,
-     "top3": 14
-    },
-    "education": {
-     "r1": 1,
-     "r2": 2,
-     "r3": 4,
-     "top3": 7
-    },
-    "tax": {
-     "r1": 2,
-     "r2": 3,
-     "r3": 4,
-     "top3": 9
-    },
-    "debt": {
-     "r1": 2,
-     "r2": 3,
-     "r3": 4,
-     "top3": 9
-    },
-    "energy": {
-     "r1": 3,
-     "r2": 5,
-     "r3": 6,
-     "top3": 14
-    },
-    "transport": {
-     "r1": 0,
-     "r2": 2,
-     "r3": 3,
-     "top3": 5
-    }
-   }
-  },
-  {
    "pollster": "Ipsos",
    "date": "2026-04-15",
    "dateStart": "2026-04-08",
@@ -17641,108 +17545,6 @@
    }
   },
   {
-   "pollster": "RedBridge/Accent",
-   "date": "2026-03-27",
-   "dateStart": "2026-03-23",
-   "sample": 1003,
-   "sampleEff": null,
-   "source": "https://www.afr.com/politics/federal/one-nation-nears-labor-as-coalition-vote-hits-record-low-20260329-p5zjmk",
-   "read": "summary table",
-   "question": "best able to deal with",
-   "options": [
-    "alp",
-    "lnp",
-    "onp",
-    "grn",
-    "equal",
-    "none",
-    "unsure"
-   ],
-   "issues": {
-    "col": {
-     "alp": 23,
-     "lnp": 20,
-     "onp": 19,
-     "grn": 8,
-     "equal": 8,
-     "none": 10,
-     "unsure": 12
-    },
-    "health": {
-     "alp": 30,
-     "lnp": 18,
-     "onp": 14,
-     "grn": 7,
-     "equal": 10,
-     "none": 7,
-     "unsure": 14
-    },
-    "housing": {
-     "alp": 21,
-     "lnp": 16,
-     "onp": 19,
-     "grn": 8,
-     "equal": 9,
-     "none": 12,
-     "unsure": 15
-    },
-    "security": {
-     "alp": 25,
-     "lnp": 19,
-     "onp": 21,
-     "grn": 3,
-     "equal": 11,
-     "none": 7,
-     "unsure": 14
-    },
-    "climate": {
-     "alp": 18,
-     "lnp": 10,
-     "onp": 13,
-     "grn": 27,
-     "equal": 8,
-     "none": 12,
-     "unsure": 12
-    },
-    "immigration": {
-     "alp": 19,
-     "lnp": 14,
-     "onp": 40,
-     "grn": 5,
-     "equal": 5,
-     "none": 5,
-     "unsure": 12
-    },
-    "crime": {
-     "alp": 21,
-     "lnp": 17,
-     "onp": 24,
-     "grn": 5,
-     "equal": 12,
-     "none": 8,
-     "unsure": 13
-    },
-    "economy": {
-     "alp": 25,
-     "lnp": 27,
-     "onp": 15,
-     "grn": 4,
-     "equal": 7,
-     "none": 8,
-     "unsure": 14
-    },
-    "energy": {
-     "alp": 21,
-     "lnp": 18,
-     "onp": 16,
-     "grn": 13,
-     "equal": 8,
-     "none": 8,
-     "unsure": 16
-    }
-   }
-  },
-  {
    "pollster": "Ipsos",
    "date": "2026-04-15",
    "dateStart": "2026-04-08",
@@ -18164,7 +17966,7 @@
    "date": "2026-05-18",
    "dateStart": "2026-05-13",
    "sample": 1210,
-   "sampleEff": null,
+   "sampleEff": 653,
    "source": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
    "read": "report",
    "question": "best party to manage the cost of living",
@@ -18798,7 +18600,7 @@
    "date": "2026-07-13",
    "dateStart": "2026-07-02",
    "sample": 1975,
-   "sampleEff": null,
+   "sampleEff": 1244,
    "source": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
    "read": "report",
    "question": "best party to manage the cost of living",
@@ -19559,7 +19361,7 @@
    "date": "2026-09-14",
    "dateStart": "2026-09-08",
    "sample": 1659,
-   "sampleEff": null,
+   "sampleEff": 1095,
    "source": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
    "read": "report",
    "question": "best party to manage the cost of living",

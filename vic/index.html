@@ -3660,6 +3660,10 @@ body.rd .rd-tl-dotlink:focus-visible { outline: 2px solid var(--accent); outline
 body.rd .rd-tl-latest { width: 11px; height: 11px; background: var(--ink); }
 body.rd .rd-tl-next { width: 13px; height: 13px; box-sizing: border-box; border: 2px solid var(--ink); background: var(--bg); z-index: 3; }
 body.rd .rd-tl-next.missed { border-color: var(--mood-neg); }
+body.rd .rd-tl-x { width: 9px; height: 9px; transform: translate(-50%, -50%); z-index: 2; }
+body.rd .rd-tl-x::before, body.rd .rd-tl-x::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.75px; height: 11px; background: var(--ink-3); }
+body.rd .rd-tl-x::before { transform: translate(-50%, -50%) rotate(45deg); }
+body.rd .rd-tl-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-tl-later { width: 8px; height: 8px; box-sizing: border-box; border: 1.5px solid var(--ink-faint); background: var(--bg); }
 body.rd .rd-tl-alt { height: 6px; border-radius: 3px; background: var(--ink-faint); opacity: 0.55; transform: translateY(-50%); z-index: 2; }
 body.rd .rd-tl-win { height: 13px; box-sizing: border-box; border: 1.5px dashed var(--ink-2); border-radius: 7px; transform: translateY(-50%); z-index: 2; background: var(--bg); }
@@ -3671,6 +3675,10 @@ body.rd .rd-tl-ring { display: inline-block; width: 9px; height: 9px; box-sizing
 body.rd .rd-tl-keyalt { display: inline-block; width: 22px; height: 6px; border-radius: 3px; background: var(--ink-faint); opacity: 0.55; position: relative; }
 body.rd .rd-tl-keyalt::after { content: ""; position: absolute; right: -3px; top: 50%; width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--ink-faint); background: var(--bg); transform: translateY(-50%); }
 body.rd .rd-tl-keywin { display: inline-block; width: 26px; height: 12px; box-sizing: border-box; border: 1.5px dashed var(--ink-2); border-radius: 6px; }
+body.rd .rd-tl-keyx { display: inline-block; position: relative; width: 9px; height: 9px; }
+body.rd .rd-tl-keyx::before, body.rd .rd-tl-keyx::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.75px; height: 11px; background: var(--ink-3); }
+body.rd .rd-tl-keyx::before { transform: translate(-50%, -50%) rotate(45deg); }
+body.rd .rd-tl-keyx::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-pl-key { margin-top: 14px; }
 body.rd .rd-pl-detail {
   display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; row-gap: 24px;
@@ -4773,6 +4781,15 @@ body.rd .rd-ap-mrow { display: grid; align-items: end; padding: 24px 0 8px; bord
 body.rd .rd-ap-mlab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 body.rd .rd-ap-mlab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ap-mlab span { font-size: 13px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-frow { display: grid; align-items: end; padding: 26px 0 8px; border-bottom: 1px solid var(--ink-faint); cursor: pointer; }
+body.rd .rd-ap-frow:hover { background: var(--surface-2); }
+body.rd .rd-ap-frow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+body.rd .rd-ap-frow:hover .rd-ap-chev { color: var(--ink); }
+body.rd .rd-ap-flab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+body.rd .rd-ap-flab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-fcap { grid-column: 6; display: block; position: relative; min-height: 16px; min-width: 0; }
+body.rd .rd-ap-frow .rd-ap-chev { grid-column: 8; height: 20px; }
 body.rd .rd-ap-mavg { grid-column: 5 / span 2; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-ap-mavg b { font-weight: 600; color: var(--ink); }
 body.rd .rd-ap-mpn { grid-column: 5; font-size: 13px; color: var(--ink-3); }
@@ -5065,6 +5082,11 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
+  body.rd .rd-ap-frow { display: flex; align-items: baseline; gap: 8px; padding: 24px 0 8px; }
+  body.rd .rd-ap-flab { padding-left: 0; gap: 8px; min-width: 0; overflow: hidden; }
+  body.rd .rd-ap-flab span, body.rd .rd-ap-fcap { display: none; }
+  body.rd .rd-ap-flab .rd-ap-fn { display: inline; }
+  body.rd .rd-ap-frow .rd-ap-chev { margin-left: auto; flex: none; align-self: center; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
   body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 122px; }
@@ -11269,6 +11291,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
       "SA": [38.31, 28.45, 6.15, 13.42, 13.68],
       "WA": [35.59, 31.55, 7.61, 11.97, 13.28],
+      "ACT/NT/Tas": [40.95, 24.52, 3.97, 12.49, 18.07],
       "Non-NSW/Vic/Qld": [37.64, 29.01, 6.34, 12.55, 14.45]
     }
   };
@@ -11283,7 +11306,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }
   };
   const issues = null;
-  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language"];
+  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language"];
   const accuracy = null;
   const extAgg = {
     "bt": null,
@@ -19755,7 +19778,7 @@ window.AP = function () {
       verb: "far beyond sampling error"
     };
   }
-  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || []), ...(D.confidenceOnlyPolls || [])].map(p => p.pollster + "|" + p.released));
+  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || []), ...(D.confidenceOnlyPolls || []), ...(D.issuesOnlyPolls || [])].map(p => p.pollster + "|" + p.released));
   const pollRowKey = m => {
     if (!m || !m.pollster || !m.released) return null;
     const k = m.pollster + "|" + m.released;
@@ -20522,6 +20545,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
     let field = monthEnd ? stepFrom(Date.parse(c.last)) : Date.parse(c.last) + c.cadence * DAY_MS;
     let release = monthEnd ? field : relOf(field);
     let rolled = false;
+    const missedSlots = [];
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
       let meSlot = release;
@@ -20536,7 +20560,10 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
         release = relOf(field);
       };
       while ((c.skipped || []).includes(isoDay(release))) rollOn();
-      if (!c.loose) while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) rollOn();
+      if (!c.loose) while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) {
+        missedSlots.push(release);
+        rollOn();
+      }
     }
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
@@ -20563,6 +20590,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
             slotEarly: null,
             slotLate: null,
             rolled: false,
+            missedSlots: missedSlots.length ? missedSlots.slice() : null,
             inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
             opensIn: Math.round((open - t0) / DAY_MS),
             closesIn: Math.round((close - t0) / DAY_MS)
@@ -20585,6 +20613,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
         slotEarly: slotShift == null ? null : Math.max(0, c.spreadEarly + slotShift),
         slotLate: slotShift == null ? null : Math.max(0, c.spreadLate - slotShift),
         rolled: rolled && i === 0,
+        missedSlots: missedSlots.length ? missedSlots.slice() : null,
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
         closesIn: Math.round((release + winHalf * DAY_MS - t0) / DAY_MS),
@@ -26409,6 +26438,7 @@ const DEMO_WHO = {
   Qld: "voters in Queensland",
   SA: "voters in South Australia",
   WA: "voters in Western Australia",
+  "ACT/NT/Tas": "voters in Tasmania, the ACT, and the NT",
   "Non-NSW/Vic/Qld": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs",
   "Outer metro": "voters in the outer suburbs",
@@ -26904,7 +26934,7 @@ function DemographicsPanel({
     className: "table-hint"
   }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
     className: "table-hint"
-  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
+  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote (ACT/NT/Tas also stands as a group of its own, with Tasmania-, ACT- and NT-only readings drawn beside it as comparison points and pooled into nothing), and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
     className: "table-hint"
   }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("a", {
     className: "hi-term",
@@ -28270,6 +28300,26 @@ function sampleValue(x) {
     title: "Effective sample as published by the pollster (APC methodology statement)"
   }, x.sample != null && ", ", "n", React.createElement("sub", null, "eff"), " = ", x.sampleEff.toLocaleString()));
 }
+const SOLO_TERR_NAME = {
+  Tas: "Tasmania",
+  ACT: "ACT",
+  NT: "NT"
+};
+const SOLO_TERR_PROSE = {
+  Tas: "Tasmania",
+  ACT: "the ACT",
+  NT: "the NT"
+};
+function soloNote(x) {
+  if (!x.solo || !x.solo.length) return null;
+  const terrs = [...new Set(x.solo.filter(e => SOLO_TERR_NAME[e.terr]).map(e => e.terr))];
+  if (!terrs.length) return null;
+  const pts = terrs.length > 1 ? "comparison points" : "a comparison point";
+  if (x.solo.some(e => e.whole)) return "The whole poll asked " + SOLO_TERR_PROSE[terrs[0]] + " alone - an open ring beside the ACT/NT/Tas trio, " + pts + ", pooled into nothing.";
+  const bits = terrs.map(t => SOLO_TERR_NAME[t]);
+  const names = bits.length === 1 ? "A " + bits[0] + "-only" : bits.length === 2 ? bits[0] + "- and " + bits[1] + "-only" : bits[0] + "-, " + bits[1] + "- and " + bits[2] + "-only";
+  return names + " reading" + (bits.length > 1 ? "s stand" : " stands") + " beside the ACT/NT/Tas trio as " + (bits.length > 1 ? "open rings" : "an open ring") + " - " + pts + ", pooled into nothing.";
+}
 function releaseMetaRows(r) {
   const relRows = [];
   if (r.provisional) relRows.push(React.createElement("span", {
@@ -28502,7 +28552,13 @@ function PollDetail({
     className: "pd-meta-k"
   }, "Sample"), React.createElement("span", {
     className: "pd-meta-v"
-  }, sampleValue(r))), releaseMetaRows(r), r.eff && React.createElement(EffLines, {
+  }, sampleValue(r))), r.solo && React.createElement("span", {
+    className: "pd-meta-i"
+  }, React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Territory readings"), React.createElement("span", {
+    className: "pd-meta-v"
+  }, soloNote(r))), releaseMetaRows(r), r.eff && React.createElement(EffLines, {
     eff: r.eff
   }))), React.createElement(PollLedger, {
     r: r,
@@ -29195,6 +29251,7 @@ Object.assign(window, {
   releaseMetaRows,
   EffLines,
   sampleValue,
+  soloNote,
   pubStamp
 });</script>
   <script>const csvCell = v => {
@@ -32157,11 +32214,42 @@ const DEM_SPLITS = [{
   pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
 }, {
   id: "country",
-  label: "Birth country",
+  label: "Other cuts",
   lo: "Australia-born",
   hi: "Overseas-born",
-  scope: "With a birth-country breakdown",
-  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born"], ["Mainland China", "Australia", "China-born v Australia-born"], ["South Africa", "Australia", "South Africa-born v Australia-born"], ["United Kingdom", "Australia", "UK-born v Australia-born"]]
+  scope: "With a one-off breakdown",
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
+  fams: [{
+    id: "birth",
+    lab: "Birth country",
+    sub: "Seven months of Roy Morgan interviews pooled, Jan–Jul 2026",
+    pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"]]
+  }, {
+    id: "religion",
+    lab: "Religion",
+    sub: "Newspoll's pooled quarterly pulls",
+    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]]
+  }, {
+    id: "working",
+    lab: "Working status",
+    sub: "Newspoll's pooled quarterly pulls and YouGov's own weekly cut",
+    pairs: [["Full time", "Retired", "Full time v retired", "Retired", "Full time"]]
+  }, {
+    id: "children",
+    lab: "Children at home",
+    sub: "YouGov's weekly cut, 24 Mar 2026 on",
+    pairs: [["Children under 18", "No children", "Children at home v none", "No children", "Children at home"]]
+  }, {
+    id: "class",
+    lab: "Self-assessed class",
+    sub: "YouGov's weekly cut, 10 Feb 2026 on",
+    pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]]
+  }, {
+    id: "electorate",
+    lab: "Tasmanian electorates",
+    sub: "EMRS's one-off seat cut from the February 2026 federal wave",
+    pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
+  }]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
 function demGroupsOf(p) {
@@ -32175,16 +32263,21 @@ function demGroupsOf(p) {
   });
   return m;
 }
-function demPairOf(p, split) {
+function demPairOf(p, split, famId) {
   const sp = DEM_SPLITS.find(s => s.id === split);
   const m = sp ? demGroupsOf(p) : null;
   if (!m) return null;
-  for (const [a, b, lab] of sp.pairs) if (m[a] && m[b]) {
+  const pairs = famId ? ((sp.fams || []).find(f => f.id === famId) || {
+    pairs: []
+  }).pairs : sp.pairs;
+  for (const [a, b, lab, loCap, hiCap] of pairs) if (m[a] && m[b]) {
     const gap = Object.fromEntries(DEM_KEYS.map(k => [k, m[a][k] != null && m[b][k] != null ? +(m[a][k] - m[b][k]).toFixed(1) : null]));
     return {
       a,
       b,
       lab,
+      loCap,
+      hiCap,
       A: m[a],
       B: m[b],
       gap
@@ -32605,7 +32698,8 @@ function ArchPollDetail({
     PollLedger,
     pubStamp,
     releaseMetaRows,
-    EffLines
+    EffLines,
+    soloNote
   } = window;
   const dirSegments = p.dir ? [{
     label: "Right direction",
@@ -32661,7 +32755,14 @@ function ArchPollDetail({
     className: "pd-meta-k"
   }, "Sample"), React.createElement("span", {
     className: "pd-meta-v"
-  }, window.sampleValue(p))), (p.leanLnp != null || p.leanOn != null) && React.createElement("span", {
+  }, window.sampleValue(p))), p.solo && soloNote && React.createElement("span", {
+    className: "pd-meta-i",
+    key: "solo"
+  }, React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Territory readings"), React.createElement("span", {
+    className: "pd-meta-v"
+  }, soloNote(p))), (p.leanLnp != null || p.leanOn != null) && React.createElement("span", {
     className: "pd-meta-i",
     key: "lean"
   }, React.createElement("span", {
@@ -32800,7 +32901,7 @@ const AP_CLIENT_ALIASES = {
   "smh/age": "sydney morning herald the age",
   "australia inst.": "australia institute"
 };
-const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos", "ANZ–Roy Morgan", "Westpac–MI", "NAB"];
+const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos", "ANZ–Roy Morgan", "Westpac–MI", "NAB", "EMRS (Tas)"];
 const archMask = (order, set) => {
   let m = 0;
   order.forEach((name, i) => {
@@ -33971,7 +34072,7 @@ function AllPollsView({
     ppmFlag
   } = window;
   const pubBasis = tppBasis === "resp";
-  const baseHouse = h => h.replace(/ \((MRP|SMS)\)$/, "");
+  const baseHouse = h => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
   const {
     houses,
     housesDir,
@@ -35486,7 +35587,7 @@ function infoTerms(D) {
   D.individualPolls.forEach(p => {
     counts[p.pollster] = (counts[p.pollster] || 0) + 1;
   });
-  const baseHouse = h => h.replace(/ \((MRP|SMS)\)$/, "");
+  const baseHouse = h => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
   const houseCounts = {};
   Object.keys(counts).forEach(h => {
     houseCounts[baseHouse(h)] = (houseCounts[baseHouse(h)] || 0) + counts[h];
@@ -35997,7 +36098,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Limits."), " The margins can\u2019t see pollsters defining or weighting a group differently, and a pollster that joins the series part-way, reading a group its own way, can move a monthly line by that alone. The test looks for steady change, so a rise and a fall within the period cancel out."), working(React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Which pollsters count where."), " Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+.", " ", xref("generations", "who votes for whom", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
+      }, React.createElement("b", null, "Which pollsters count where."), " Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+.", " ", xref("generations", "who votes for whom", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at their shares of the 2025 vote. ACT/NT/Tas also stands alone, from YouGov\u2019s printed trio and DemosAU\u2019s modelling, with Tasmania-, ACT- and NT-only readings (Roy Morgan, EMRS, and the modelled cuts) drawn beside it as comparison points and pooled into nothing. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Pooling."), " The gaps are weighted as the headline\u2019s polls are, so newer and larger polls count for more. A group\u2019s 95% margin is the interval taken over its pooled gaps, each poll\u2019s sample for the group being the poll\u2019s sample times the group\u2019s share of adults."), React.createElement("span", {
         className: "info-p"
@@ -41495,6 +41596,27 @@ function RdPrimary({
   })).filter(a => a.points.length >= 2);
   const gi = G && D.demoGroups ? D.demoGroups.indexOf(sel.label) : -1;
   const aggByYm = React.useMemo(() => !G ? null : new Map(D.aggPrimary.filter(d => !d.election).map(d => [d.ym, d])), [G]);
+  const soloDotsOf = q => G && sel.label === "ACT/NT/Tas" && q.solo ? q.solo.flatMap(e => parts.map(p => {
+    const sv = e[p.id];
+    if (sv == null) return null;
+    let y;
+    if (e.whole) y = sv;else {
+      const M = aggByYm && aggByYm.get(q.ym);
+      if (!M || !q.p || q.p[p.id] == null) return null;
+      y = M[p.id] + (sv - q.p[p.id]);
+    }
+    return {
+      x: q.x,
+      y: +y.toFixed(2),
+      gv: sv,
+      color: p.color,
+      label: p.name,
+      meta: q,
+      party: p.id,
+      hollow: true,
+      sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "")
+    };
+  }).filter(Boolean)) : [];
   const scatter = React.useMemo(() => D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => {
     if (!G) return parts.filter(p => q.p && q.p[p.id] != null).map(p => ({
       x: q.x,
@@ -41506,9 +41628,9 @@ function RdPrimary({
     }));
     const gv = q.grp && q.grp.v && q.grp.v[gi],
       tt = q.grp && q.grp.t;
-    if (!gv || !tt) return [];
+    if (!gv || !tt) return soloDotsOf(q);
     const M = aggByYm && aggByYm.get(q.ym);
-    if (!M) return [];
+    if (!M) return soloDotsOf(q);
     return parts.map(p => {
       const i = GRPV_KEYS.indexOf(p.id);
       if (gv[i] == null || tt[i] == null) return null;
@@ -41523,7 +41645,7 @@ function RdPrimary({
         party: p.id,
         sub: subn ? "n ≈ " + subn.toLocaleString() : undefined
       };
-    }).filter(Boolean);
+    }).filter(Boolean).concat(soloDotsOf(q));
   }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map(d => hidden[d.party] ? {
     ...d,
@@ -41789,7 +41911,7 @@ function RdPrimary({
     copy: {
       title: "First-preference vote for each party" + (G ? ", " + sel.who : ""),
       sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
-      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
@@ -43491,6 +43613,7 @@ const RD_DEMO_SHORT = {
   Qld: "Queenslanders",
   SA: "South Australians",
   WA: "West Australians",
+  "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians",
   "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters",
   "Outer metro": "outer-suburban voters",
@@ -43876,9 +43999,10 @@ const RD_TREND_STATE = {
   Qld: "Queensland",
   SA: "South Australia",
   WA: "Western Australia",
+  "ACT/NT/Tas": "Tasmania, the ACT and the NT",
   "Non-NSW/Vic/Qld": "the non-eastern-mainland states"
 };
-const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"];
+const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
 const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
 const RD_TREND_LOC = {
   "Inner metro": {
@@ -43920,6 +44044,11 @@ const RD_TREND_GROUP = {
 const RD_STATE_NAME = {
   Vic: "Victoria",
   Qld: "Queensland"
+};
+const RD_SOLO_NAME = {
+  Tas: "Tasmania",
+  ACT: "the ACT",
+  NT: "the NT"
 };
 const rdRamp = (party, n, i) => n < 2 ? "var(--" + party + ")" : "var(--ramp-" + party + "-" + (1 + Math.round(i * 3 / (n - 1))) + ")";
 function RdDemographics({
@@ -44396,18 +44525,45 @@ function RdDemographics({
           meta: q
         } : null;
       }).filter(Boolean));
+      const solo = st.id === "state" ? D.individualPolls.filter(q => q.solo && q.x >= x0 && q.x <= x1).flatMap(q => q.solo.flatMap(e => {
+        const sv = e[pty];
+        if (sv == null) return [];
+        const sum = DEMO_GRP_PARTY.reduce((t2, k) => t2 + (e[k] || 0), 0);
+        if (!sum) return [];
+        const v = 100 * sv / sum;
+        const tip = {
+          x: q.x,
+          gv: sv,
+          label: RD_SOLO_NAME[e.terr] + " only",
+          meta: q,
+          hollow: true,
+          sub: "not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "")
+        };
+        if (e.whole) return [{
+          ...tip,
+          y: +v.toFixed(1)
+        }];
+        const base = allAt.get(q.ym);
+        const t = q.grp && q.grp.t ? q.grp.t[gpi] : null;
+        if (base == null || t == null) return [];
+        return [{
+          ...tip,
+          y: +(base + (v - t)).toFixed(1)
+        }];
+      })) : [];
       return {
         st,
         drawn,
         allPts,
         dots,
+        solo,
         x0,
         x1,
         span: x1 - x0
       };
     }).filter(Boolean);
   };
-  const yMaxOf = cs => Math.max(10, Math.ceil(Math.max(...cs.flatMap(c => c.drawn.flatMap(l => l.pts.map(p => p.y + (p.ci || 0))).concat(c.dots.map(d => d.y)))) / 10) * 10);
+  const yMaxOf = cs => Math.max(10, Math.ceil(Math.max(...cs.flatMap(c => c.drawn.flatMap(l => l.pts.map(p => p.y + (p.ci || 0))).concat(c.dots.map(d => d.y)).concat((c.solo || []).map(d => d.y)))) / 10) * 10);
   const chartsCached = pty => {
     const k = pty + "|" + tab.id + "|" + rangeLo + "|" + rangeHi;
     return chartCache.current[k] || (chartCache.current[k] = chartsFor(pty));
@@ -44520,6 +44676,10 @@ function RdDemographics({
         ...d,
         color: pColorNow
       }));
+      const mineTrioSolo = (c.solo || []).map(d => ({
+        ...d,
+        color: pColorNow
+      }));
       const se = D.demoStateElection;
       const seI = se && !pm ? T.order.indexOf(party) : -1;
       return React.createElement("div", {
@@ -44615,7 +44775,7 @@ function RdDemographics({
             color: pColorNow
           }] : [],
           ringAtX: seY != null ? se.x : null,
-          scatter: mine(cross ? cross.scatter : c.dots, g.label),
+          scatter: mine(cross ? cross.scatter : c.dots, g.label).concat(g.label === "ACT/NT/Tas" ? mineTrioSolo : []),
           scatterOut: mine(cross ? cross.scatterOut : [], g.label),
           scatterMove: mine(cross ? cross.scatterMove : [], g.label),
           fade: A ? t : 1,
@@ -44626,7 +44786,7 @@ function RdDemographics({
             label: "",
             value: "The election result"
           }] : ciUnshifted(i - 1) : ciUnshifted,
-          fmt: v => v.toFixed(1),
+          fmt: (v, pt) => (pt && pt.gv != null ? pt.gv : v).toFixed(1),
           copy: {
             title: rdCap(pVote) + ": " + name,
             sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
@@ -45601,7 +45761,7 @@ function RdIssues({
     if (!monthPts.length) return null;
     const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
     const pts = filterPts(monthPts, xDomain[0]);
-    const byRow = new Map(D.individualPolls.map(q => [q.pollster + "|" + q.released, q]));
+    const byRow = new Map([...D.individualPolls, ...(D.issuesOnlyPolls || [])].map(q => [q.pollster + "|" + q.released, q]));
     const dots = (x.dots || []).filter(d => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map(d => {
       const meta = byRow.get(d[1] + "|" + d[2]) || {
         pollster: demoHouse(d[1]),
@@ -48402,6 +48562,17 @@ function RdPolls({
       className: "rd-tl-dot"
     }), dm(e.pubMs)));
     if (r) {
+      (r.missedSlots || []).forEach(ms => {
+        if (ms < L || ms > R) return;
+        marks.push(React.createElement("span", {
+          key: "x" + ms,
+          className: "rd-tl-x",
+          style: {
+            left: pos(ms) + "%"
+          },
+          "aria-hidden": "true"
+        }));
+      });
       if (r.loose && !irregular(r)) {
         const a = Math.max(L, r.release - r.spread * DAY_MS),
           b = Math.min(R, r.release + r.spread * DAY_MS);
@@ -48997,9 +49168,14 @@ function RdPolls({
   }, React.createElement("span", {
     className: "rd-tl-keywin",
     "aria-hidden": "true"
-  }), "Window, for irregular pollsters")), React.createElement("p", {
+  }), "Window, for irregular pollsters"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-tl-keyx",
+    "aria-hidden": "true"
+  }), "A slot no release kept")), React.createElement("p", {
     className: "rd-note"
-  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
+  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date \u2014 the \xD7 marks where it stood.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
     className: "rd-evdrop rd-cal"
   }, React.createElement("summary", null, "Release calendar"), React.createElement("div", {
     className: "rd-cal-body"
@@ -51210,11 +51386,13 @@ function rdEffTbc(p) {
   if (p.sampleEff != null || !p.published) return false;
   if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
   const since = Date.parse(p.released) - 90 * 86400000;
-  return window.AUSPOL.individualPolls.some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
 }
 const RD_EFF_TBC_URL = {
   YouGov: "https://yougov.com/about/methodology/australian-polling-council",
-  "RedBridge/Accent": "https://www.accent-research.com/projects"
+  "RedBridge/Accent": "https://www.accent-research.com/projects",
+  Ipsos: "https://www.ipsos.com/en-au/polling-methodology-disclosure-statements"
 };
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
@@ -52855,7 +53033,9 @@ function RdApDetail({
       housing: "Housing",
       language: "Language at home",
       country: "Birth country",
-      religion: "Religion"
+      religion: "Religion",
+      children: "Children at home",
+      class: "Self-assessed class"
     };
     const cell = (v, k) => {
       const t = tot ? tot[K.indexOf(k)] : null;
@@ -53386,7 +53566,9 @@ function RdApDetail({
     className: "rd-apd-k"
   }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && !isConf && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
-  }, "In the aggregates"), React.createElement("span", null, p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates.")), fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "In the aggregates"), React.createElement("span", null, p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates.")), p.solo && window.soloNote && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Territory readings"), React.createElement("span", null, window.soloNote(p))), fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, RD_AP_KAL ? "Against the trend" : "Against the polls around it"), React.createElement("span", null, lean == null || !yd ? "No other poll was fielded within three weeks of it, so there’s nothing to set it against." : React.createElement(React.Fragment, null, Math.abs(lean) < 0.05 ? "Level with " : React.createElement(React.Fragment, null, React.createElement("b", {
     style: {
@@ -53839,7 +54021,7 @@ function RdAllPolls(P) {
   const noun1 = facet === "confidence" ? "release" : "poll";
   const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
-  const ctlNarrow = useNarrow("(max-width: 1240px)");
+  const ctlNarrow = useNarrow("(max-width: 1220px)");
   const demMid = useNarrow("(max-width: 1150px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
@@ -54028,7 +54210,7 @@ function RdAllPolls(P) {
     id,
     label: FACET_LAB[id]
   }));
-  const rowNav = (e, p) => {
+  const rowNav = (e, p, demFam) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
     if (e.key === "Enter" || e.key === " ") {
@@ -54055,12 +54237,14 @@ function RdAllPolls(P) {
     }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
-    const j = visRows.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
-    const nx = visRows[j];
+    const walk = demFam ? demFamRowsOf(demFam) : visRows;
+    const base = demFam ? demFamOffset(demFam) : 0;
+    const j = walk.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
+    const nx = walk[j];
     if (!nx) return;
     if (open === id) setOpen(rowKey(nx));
     const rows = bodyRef.current ? bodyRef.current.querySelectorAll(phone ? ".rd-ap-card" : ".rd-ap-row") : [];
-    if (rows[j]) rows[j].focus();
+    if (rows[base + j]) rows[base + j].focus();
   };
   const sentRef = useRef(null),
     headRef = useRef(null),
@@ -54183,6 +54367,58 @@ function RdAllPolls(P) {
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
+  const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
+  const [famShut, setFamShut] = useState(() => new Set());
+  const toggleFam = id => setFamShut(s => {
+    const n = new Set(s);
+    if (n.has(id)) n.delete(id);else n.add(id);
+    return n;
+  });
+  const [demCapLo, demCapHi] = (() => {
+    if (demFams && byDate) return [null, null];
+    if (!spl.pairs.some(p => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
+    const found = new Map();
+    for (const p of rows) {
+      const pr = window.demPairOf(p, demSplit);
+      if (pr) found.set(pr.a + "" + pr.b, [pr.loCap, pr.hiCap]);
+    }
+    if (found.size === 1) return [...found.values()][0];
+    if (found.size === 0) return [spl.lo, spl.hi];
+    return [null, null];
+  })();
+  const demFamTables = demFams && byDate ? demFams.map(fam => {
+    const list = (groups || []).flatMap(g => g.list).filter(p => window.demPairOf(p, demSplit, fam.id));
+    const gs = [];
+    for (const p of list) {
+      if (!gs.length || gs[gs.length - 1].ym !== p.ym) gs.push({
+        ym: p.ym,
+        list: []
+      });
+      gs[gs.length - 1].list.push(p);
+    }
+    return {
+      fam,
+      groups: gs,
+      rows: list
+    };
+  }).filter(t => t.rows.length) : null;
+  const famCapsOf = t => {
+    const found = new Map();
+    for (const p of t.rows) {
+      const pr = window.demPairOf(p, demSplit, t.fam.id);
+      if (pr && pr.loCap != null && pr.hiCap != null) found.set(pr.a + "" + pr.b, [pr.loCap, pr.hiCap]);
+    }
+    return found.size === 1 ? [...found.values()][0] : [null, null];
+  };
+  const demFamRowsOf = famId => demFamTables ? (demFamTables.find(t => t.fam.id === famId) || {}).rows || [] : [];
+  const demFamOffset = famId => {
+    let o = 0;
+    if (demFamTables) for (const t of demFamTables) {
+      if (t.fam.id === famId) break;
+      o += famShut.has(t.fam.id) ? 0 : t.rows.length;
+    }
+    return o;
+  };
   const DEM_M = 40;
   const gx = v => (Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M) * 100;
   const gapTxt = v => v == null ? "—" : Math.abs(v) < 0.5 ? "0" : (v > 0 ? "+" : "−") + Math.abs(Math.round(v));
@@ -54206,9 +54442,9 @@ function RdAllPolls(P) {
       className: "rd-ap-in"
     }, React.createElement("b", {
       className: "rd-ap-scl"
-    }, "\u25C0 ", spl.lo), React.createElement("b", {
+    }, demCapLo ? "◀ " + demCapLo : ""), React.createElement("b", {
       className: "rd-ap-scr"
-    }, spl.hi, " \u25B6"), ticks.map(([v, lab]) => React.createElement("span", {
+    }, demCapHi ? demCapHi + " ▶" : ""), ticks.map(([v, lab]) => React.createElement("span", {
       key: v,
       className: "rd-ap-tk" + (v === 0 ? " mid" : "") + (short && v === -DEM_M ? " start" : "") + (short && v === DEM_M ? " end" : ""),
       style: {
@@ -54329,7 +54565,7 @@ function RdAllPolls(P) {
     title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups"
   })))), React.createElement("span", {
     role: "columnheader",
-    "aria-label": "Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters",
+    "aria-label": demCapLo && demCapHi ? "Each party’s gap between the two groups, from stronger with " + demCapLo.toLowerCase() + " to stronger with " + demCapHi.toLowerCase() + " voters" : "Each party’s gap between the two groups named on its row",
     className: "rd-ap-hpic"
   }, demScale(demMid)), React.createElement("span", null)), facet === "confidence" && React.createElement(React.Fragment, null, th("Figure", "conf.v", {
     title: "Sort by the gauge’s printed figure (the panel chart’s dot)"
@@ -54410,7 +54646,7 @@ function RdAllPolls(P) {
       className: "rd-ap-tipnote"
     }, he != null ? "Further from its pollster’s usual lean than its margin, as about one poll in 20 should be" : "Outside its margin, as about one poll in 20 should be"));
   };
-  const rowFor = p => {
+  const rowFor = (p, demFam) => {
     const id = rowKey(p);
     const isOpen = open === id;
     const arrived = !!focus && focus.key === id;
@@ -54784,7 +55020,7 @@ function RdAllPolls(P) {
         } : null
       }, verdict(c)), bar(c.own))));
     } else if (facet === "demographics") {
-      const pr = window.demPairOf(p, demSplit);
+      const pr = window.demPairOf(p, demSplit, demFam);
       figs = React.createElement("span", {
         role: "cell",
         className: "rd-ap-fig rd-ap-dgap"
@@ -54918,7 +55154,7 @@ function RdAllPolls(P) {
         "aria-expanded": isOpen,
         onClick: toggle,
         tabIndex: 0,
-        onKeyDown: e => rowNav(e, p)
+        onKeyDown: e => rowNav(e, p, demFam)
       }, React.createElement("div", {
         className: "rd-ap-c1"
       }, React.createElement("span", {
@@ -54941,7 +55177,7 @@ function RdAllPolls(P) {
       "aria-expanded": isOpen,
       onClick: toggle,
       tabIndex: 0,
-      onKeyDown: e => rowNav(e, p)
+      onKeyDown: e => rowNav(e, p, demFam)
     }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), facet === "confidence" && React.createElement("span", null), React.createElement("button", {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
@@ -54960,7 +55196,7 @@ function RdAllPolls(P) {
       d: "M3 1.5L7.5 5 3 8.5z"
     })))), detail);
   };
-  const monthRow = g => {
+  const monthRow = (g, famId) => {
     const [y, m] = g.ym.split("-").map(Number);
     const n = g.list.length;
     const lab = D.monthNameFull(m) + " " + y;
@@ -55018,6 +55254,16 @@ function RdAllPolls(P) {
         role: "rowheader"
       }, React.createElement("b", null, lab), React.createElement("span", null, n + " release" + (n === 1 ? "" : "s"))));
     }
+    if (famId) {
+      return React.createElement("div", {
+        className: "rd-ap-mrow " + cls,
+        role: "row",
+        key: "m" + g.ym
+      }, React.createElement("span", {
+        className: "rd-ap-mlab",
+        role: "rowheader"
+      }, React.createElement("b", null, lab)));
+    }
     return React.createElement("div", {
       className: "rd-ap-mrow " + cls,
       role: "row",
@@ -55026,6 +55272,55 @@ function RdAllPolls(P) {
       className: "rd-ap-mlab",
       role: "rowheader"
     }, React.createElement("b", null, lab), React.createElement("span", null, count)));
+  };
+  const famHead = t => {
+    const [lo, hi] = famCapsOf(t);
+    const shut = famShut.has(t.fam.id);
+    return React.createElement("div", {
+      className: "rd-ap-frow " + cls + (shut ? " shut" : ""),
+      role: "row",
+      key: "f" + t.fam.id,
+      "aria-expanded": !shut,
+      onClick: () => toggleFam(t.fam.id),
+      tabIndex: 0,
+      onKeyDown: e => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        toggleFam(t.fam.id);
+      }
+    }, React.createElement("span", {
+      className: "rd-ap-flab",
+      role: "rowheader"
+    }, React.createElement("b", null, t.fam.lab), React.createElement("span", null, t.fam.sub), shut && React.createElement("span", {
+      className: "rd-ap-fn"
+    }, t.rows.length + " poll" + (t.rows.length === 1 ? "" : "s"))), !shut && React.createElement("span", {
+      className: "rd-ap-fcap",
+      "aria-hidden": !lo && !hi ? "true" : undefined,
+      title: lo && hi ? "Each party’s gap between the two groups, from stronger with " + lo.toLowerCase() + " voters on the left to stronger with " + hi.toLowerCase() + " voters on the right" : undefined
+    }, React.createElement("span", {
+      className: "rd-ap-in"
+    }, lo && React.createElement("b", {
+      className: "rd-ap-scl"
+    }, "\u25C0 ", lo), hi && React.createElement("b", {
+      className: "rd-ap-scr"
+    }, hi, " \u25B6"))), React.createElement("button", {
+      type: "button",
+      className: "rd-ap-chev" + (shut ? "" : " open"),
+      "aria-expanded": !shut,
+      "aria-label": (shut ? "Show" : "Hide") + " the " + t.fam.lab + " table",
+      onClick: e => {
+        e.stopPropagation();
+        toggleFam(t.fam.id);
+      }
+    }, React.createElement("svg", {
+      viewBox: "0 0 10 10",
+      width: "9",
+      height: "9",
+      "aria-hidden": "true"
+    }, React.createElement("path", {
+      d: "M3 1.5L7.5 5 3 8.5z"
+    }))));
   };
   const phoneHead = React.createElement("div", {
     className: "rd-ap-phead " + cls
@@ -55542,9 +55837,13 @@ function RdAllPolls(P) {
   }), React.createElement("div", {
     ref: headRef,
     className: "rd-ap-headwrap" + (pinned ? " pinned" : "")
-  }, pinBar, phone ? phoneHead : colHead), byDate ? groups.map(g => React.createElement(React.Fragment, {
+  }, pinBar, phone ? phoneHead : colHead), demFamTables ? demFamTables.map(t => React.createElement(React.Fragment, {
+    key: "fam" + t.fam.id
+  }, famHead(t), famShut.has(t.fam.id) ? null : t.groups.map(g => React.createElement(React.Fragment, {
+    key: t.fam.id + g.ym
+  }, monthRow(g, t.fam.id), g.list.map(p => rowFor(p, t.fam.id)))))) : byDate ? groups.map(g => React.createElement(React.Fragment, {
     key: g.ym
-  }, monthRow(g), g.list.map(rowFor))) : flat.map(rowFor), sorted.length === 0 && React.createElement("div", {
+  }, monthRow(g), g.list.map(p => rowFor(p, null)))) : flat.map(p => rowFor(p, null)), sorted.length === 0 && React.createElement("div", {
     className: "rd-ap-empty"
   }, "No ", noun, " match these filters. ", React.createElement("button", {
     type: "button",
