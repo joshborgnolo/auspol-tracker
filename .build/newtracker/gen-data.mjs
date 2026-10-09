@@ -3575,6 +3575,19 @@ const DEMO_LOC_ELECTION = {
    total are both taken to 100 first), so each group sums to its anchor's
    total; a group is rescaled only when a share is clamped at zero, and then
    to that total. */
+/* Multi-month pooled cross-sections (Newspoll's ~75-day quarterly
+   aggregate, n≈5,000; Roy Morgan's seven-month country-of-birth pool,
+   n≈26,000) average their whole collection window – they are no reading of
+   the present, so they join no pool here: not the current estimate, not
+   the rug, and not the monthly line, where a pooled quarter would sit in
+   its END month as if freshly polled, double-counting those electors
+   against the month's genuine waves. That used to fall out of the
+   midpoint window test by accident; POOLED_WAVE_DAYS makes it policy.
+   Normal waves span at most 27 days (Roy Morgan's combined Christmas
+   fortnight ending 2025-11-16); 35 sits between that and the thinnest
+   pooled wave (75d). The waves still display in the All-polls
+   demographics facet and the archive. */
+const POOLED_WAVE_DAYS = 35;
 const demographics = (() => {
   const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
   if (!waves.length || !primaryNow) return null;
@@ -3589,6 +3602,8 @@ const demographics = (() => {
   for (const w of waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
     if (!tot) continue;
+    // pooled cross-sections sit every pool out (POOLED_WAVE_DAYS)
+    if (Date.parse((p || w).date) - Date.parse((p || w).dateStart || (p || w).date) > POOLED_WAVE_DAYS * 864e5) continue;
     const mid = midMs(p || w), n = rowN(p || { sample: w.sample });
     const h = harmonize(w);
     // the fieldwork label the Who-votes rug cites for each dot's poll
