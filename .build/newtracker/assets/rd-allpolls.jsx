@@ -2506,6 +2506,11 @@ function RdAllPolls(P) {
      must not leak the stacked tables onto the other facets (the split
      persists across a facet hop) */
   const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
+  /* each family table folds away from its own head. Session state like the
+     split itself: it rides facet and split hops (they persist by design too)
+     and resets only with the component */
+  const [famShut, setFamShut] = useState(() => new Set());
+  const toggleFam = (id) => setFamShut((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const [demCapLo, demCapHi] = (() => {
     if (demFams && byDate) return [null, null];
     if (!spl.pairs.some((p) => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
@@ -2539,8 +2544,9 @@ function RdAllPolls(P) {
     return found.size === 1 ? [...found.values()][0] : [null, null];
   };
   // the fam-table a wave's row sits in, and its index among every fam row above it
+  // (a folded family renders no rows, so it contributes nothing to DOM positions)
   const demFamRowsOf = (famId) => (demFamTables ? ((demFamTables.find((t) => t.fam.id === famId) || {}).rows || []) : []);
-  const demFamOffset = (famId) => { let o = 0; if (demFamTables) for (const t of demFamTables) { if (t.fam.id === famId) break; o += t.rows.length; } return o; };
+  const demFamOffset = (famId) => { let o = 0; if (demFamTables) for (const t of demFamTables) { if (t.fam.id === famId) break; o += famShut.has(t.fam.id) ? 0 : t.rows.length; } return o; };
   const DEM_M = 40;
   const gx = (v) => ((Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M)) * 100;
   // whole points: the groups are a few hundred people each, a decimal claims too much
@@ -3030,16 +3036,24 @@ function RdAllPolls(P) {
      gate took off the pinned head land here instead) */
   const famHead = (t) => {
     const [lo, hi] = famCapsOf(t);
+    const shut = famShut.has(t.fam.id);
     return (
-      <div className={"rd-ap-frow " + cls} role="row" key={"f" + t.fam.id}>
-        <span className="rd-ap-flab" role="rowheader"><b>{t.fam.lab}</b><span>{t.fam.sub}</span></span>
-        <span className="rd-ap-fcap" aria-hidden={!lo && !hi ? "true" : undefined}
-              title={lo && hi ? "Each party’s gap between the two groups, from stronger with " + lo.toLowerCase() + " voters on the left to stronger with " + hi.toLowerCase() + " voters on the right" : undefined}>
-          <span className="rd-ap-in">
-            {lo && <b className="rd-ap-scl">◀ {lo}</b>}
-            {hi && <b className="rd-ap-scr">{hi} ▶</b>}
+      <div className={"rd-ap-frow " + cls + (shut ? " shut" : "")} role="row" key={"f" + t.fam.id}
+           aria-expanded={!shut} onClick={() => toggleFam(t.fam.id)} tabIndex={0}
+           onKeyDown={(e) => { if (e.target !== e.currentTarget) return; if (e.key !== "Enter" && e.key !== " ") return; e.preventDefault(); toggleFam(t.fam.id); }}>
+        <span className="rd-ap-flab" role="rowheader"><b>{t.fam.lab}</b><span>{t.fam.sub}</span>{shut && <span className="rd-ap-fn">{t.rows.length + " poll" + (t.rows.length === 1 ? "" : "s")}</span>}</span>
+        {!shut && (
+          <span className="rd-ap-fcap" aria-hidden={!lo && !hi ? "true" : undefined}
+                title={lo && hi ? "Each party’s gap between the two groups, from stronger with " + lo.toLowerCase() + " voters on the left to stronger with " + hi.toLowerCase() + " voters on the right" : undefined}>
+            <span className="rd-ap-in">
+              {lo && <b className="rd-ap-scl">◀ {lo}</b>}
+              {hi && <b className="rd-ap-scr">{hi} ▶</b>}
+            </span>
           </span>
-        </span>
+        )}
+        <button type="button" className={"rd-ap-chev" + (shut ? "" : " open")} aria-expanded={!shut}
+                aria-label={(shut ? "Show" : "Hide") + " the " + t.fam.lab + " table"}
+                onClick={(e) => { e.stopPropagation(); toggleFam(t.fam.id); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
       </div>
     );
   };
@@ -3378,7 +3392,7 @@ function RdAllPolls(P) {
           ? demFamTables.map((t) => (
             <React.Fragment key={"fam" + t.fam.id}>
               {famHead(t)}
-              {t.groups.map((g) => <React.Fragment key={t.fam.id + g.ym}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
+              {famShut.has(t.fam.id) ? null : t.groups.map((g) => <React.Fragment key={t.fam.id + g.ym}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
             </React.Fragment>
           ))
           : byDate

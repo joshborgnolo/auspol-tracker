@@ -4793,11 +4793,15 @@ body.rd .rd-ap-mrow { display: grid; align-items: end; padding: 24px 0 8px; bord
 body.rd .rd-ap-mlab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 body.rd .rd-ap-mlab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ap-mlab span { font-size: 13px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-body.rd .rd-ap-frow { display: grid; align-items: end; padding: 26px 0 8px; border-bottom: 1px solid var(--ink-faint); }
+body.rd .rd-ap-frow { display: grid; align-items: end; padding: 26px 0 8px; border-bottom: 1px solid var(--ink-faint); cursor: pointer; }
+body.rd .rd-ap-frow:hover { background: var(--surface-2); }
+body.rd .rd-ap-frow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+body.rd .rd-ap-frow:hover .rd-ap-chev { color: var(--ink); }
 body.rd .rd-ap-flab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 body.rd .rd-ap-flab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-fcap { grid-column: 6; display: block; position: relative; min-height: 16px; min-width: 0; }
+body.rd .rd-ap-frow .rd-ap-chev { grid-column: 8; height: 20px; }
 body.rd .rd-ap-mavg { grid-column: 5 / span 2; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-ap-mavg b { font-weight: 600; color: var(--ink); }
 body.rd .rd-ap-mpn { grid-column: 5; font-size: 13px; color: var(--ink-3); }
@@ -5091,8 +5095,10 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-frow { display: flex; align-items: baseline; gap: 8px; padding: 24px 0 8px; }
-  body.rd .rd-ap-flab { padding-left: 0; gap: 8px; }
+  body.rd .rd-ap-flab { padding-left: 0; gap: 8px; min-width: 0; overflow: hidden; }
   body.rd .rd-ap-flab span, body.rd .rd-ap-fcap { display: none; }
+  body.rd .rd-ap-flab .rd-ap-fn { display: inline; }
+  body.rd .rd-ap-frow .rd-ap-chev { margin-left: auto; flex: none; align-self: center; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
   body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 122px; }
@@ -112891,6 +112897,12 @@ function RdAllPolls(P) {
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
   const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
+  const [famShut, setFamShut] = useState(() => new Set());
+  const toggleFam = id => setFamShut(s => {
+    const n = new Set(s);
+    if (n.has(id)) n.delete(id);else n.add(id);
+    return n;
+  });
   const [demCapLo, demCapHi] = (() => {
     if (demFams && byDate) return [null, null];
     if (!spl.pairs.some(p => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
@@ -112932,7 +112944,7 @@ function RdAllPolls(P) {
     let o = 0;
     if (demFamTables) for (const t of demFamTables) {
       if (t.fam.id === famId) break;
-      o += t.rows.length;
+      o += famShut.has(t.fam.id) ? 0 : t.rows.length;
     }
     return o;
   };
@@ -113792,14 +113804,26 @@ function RdAllPolls(P) {
   };
   const famHead = t => {
     const [lo, hi] = famCapsOf(t);
+    const shut = famShut.has(t.fam.id);
     return React.createElement("div", {
-      className: "rd-ap-frow " + cls,
+      className: "rd-ap-frow " + cls + (shut ? " shut" : ""),
       role: "row",
-      key: "f" + t.fam.id
+      key: "f" + t.fam.id,
+      "aria-expanded": !shut,
+      onClick: () => toggleFam(t.fam.id),
+      tabIndex: 0,
+      onKeyDown: e => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        toggleFam(t.fam.id);
+      }
     }, React.createElement("span", {
       className: "rd-ap-flab",
       role: "rowheader"
-    }, React.createElement("b", null, t.fam.lab), React.createElement("span", null, t.fam.sub)), React.createElement("span", {
+    }, React.createElement("b", null, t.fam.lab), React.createElement("span", null, t.fam.sub), shut && React.createElement("span", {
+      className: "rd-ap-fn"
+    }, t.rows.length + " poll" + (t.rows.length === 1 ? "" : "s"))), !shut && React.createElement("span", {
       className: "rd-ap-fcap",
       "aria-hidden": !lo && !hi ? "true" : undefined,
       title: lo && hi ? "Each party’s gap between the two groups, from stronger with " + lo.toLowerCase() + " voters on the left to stronger with " + hi.toLowerCase() + " voters on the right" : undefined
@@ -113809,7 +113833,23 @@ function RdAllPolls(P) {
       className: "rd-ap-scl"
     }, "\u25C0 ", lo), hi && React.createElement("b", {
       className: "rd-ap-scr"
-    }, hi, " \u25B6"))));
+    }, hi, " \u25B6"))), React.createElement("button", {
+      type: "button",
+      className: "rd-ap-chev" + (shut ? "" : " open"),
+      "aria-expanded": !shut,
+      "aria-label": (shut ? "Show" : "Hide") + " the " + t.fam.lab + " table",
+      onClick: e => {
+        e.stopPropagation();
+        toggleFam(t.fam.id);
+      }
+    }, React.createElement("svg", {
+      viewBox: "0 0 10 10",
+      width: "9",
+      height: "9",
+      "aria-hidden": "true"
+    }, React.createElement("path", {
+      d: "M3 1.5L7.5 5 3 8.5z"
+    }))));
   };
   const phoneHead = React.createElement("div", {
     className: "rd-ap-phead " + cls
@@ -114328,7 +114368,7 @@ function RdAllPolls(P) {
     className: "rd-ap-headwrap" + (pinned ? " pinned" : "")
   }, pinBar, phone ? phoneHead : colHead), demFamTables ? demFamTables.map(t => React.createElement(React.Fragment, {
     key: "fam" + t.fam.id
-  }, famHead(t), t.groups.map(g => React.createElement(React.Fragment, {
+  }, famHead(t), famShut.has(t.fam.id) ? null : t.groups.map(g => React.createElement(React.Fragment, {
     key: t.fam.id + g.ym
   }, monthRow(g, t.fam.id), g.list.map(p => rowFor(p, t.fam.id)))))) : byDate ? groups.map(g => React.createElement(React.Fragment, {
     key: g.ym
