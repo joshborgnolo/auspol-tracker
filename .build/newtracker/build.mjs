@@ -541,6 +541,35 @@ catch (e) {
   try { shellChrome = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-now.json"), "utf8")).copy || null; } catch {}
 }
 writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow, ...(shellChrome ? { copy: shellChrome } : {}) }) + "\n");
+/* /preference-flows/' "forced to choose" section (2026-10-10): RedBridge/Accent
+   is the one house printing respondent-allocated two-party BY FIRST PREFERENCE
+   every month – polls.json's tpp_split (ALP share of the Labor-v-Coalition
+   forced choice, by Greens/One Nation/other voters) and tpp_split_on (the
+   Labor-v-One Nation choice, among Coalition/Greens/other voters; the June
+   2026 report printed none, so its splitOn is null). The section fetches this
+   file at view time, like site-shell.js fetches auspol-now.json above, so the
+   bars follow each wave with no page commit. Content is a pure function of
+   the dataset – no build stamp – so a no-change build never dirties the
+   tree. */
+{
+  const FLOWS_MY = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const flowRows = DATA.polls
+    .filter((r) => r.pollster === "RedBridge/Accent" && (r.tpp_split || r.tpp_split_on))
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  if (flowRows.length) {
+    writeAtomic(path.join(ROOT, "assets", "flow-splits.json"), JSON.stringify({
+      house: "AFR / RedBridge Group / Accent Research federal poll",
+      latestPublished: flowRows.map((r) => r.published).filter(Boolean).sort().at(-1) || null,
+      waves: flowRows.map((r) => {
+        const d = new Date((r.dateStart || r.date) + "T00:00:00");
+        return { date: r.date, wave: FLOWS_MY[d.getMonth()] + " " + d.getFullYear(),
+                 sample: r.sample != null ? r.sample : null,
+                 releaseUrl: r.releaseUrl || null,
+                 split: r.tpp_split || null, splitOn: r.tpp_split_on || null };
+      }),
+    }) + "\n");
+  }
+}
 for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
   const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
   if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");

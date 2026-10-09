@@ -28,6 +28,14 @@
      have one and the .toc labels prefix their headings exactly. Every count the
      page rests on is now an outbound link (there were none) — see .ss-src in the
      footer; re-check those URLs on any re-sync. -->
+<!-- 2026-10-10: #forced joins between #one-nation and #how-found — RedBridge/Accent's
+     respondent two-party splits BY FIRST PREFERENCE (the site's polls.json
+     tpp_split/tpp_split_on fields, gated by validate.mjs), drawn by the inline
+     script at the foot of <main> from /assets/flow-splits.json, which build.mjs
+     writes on every build; the section stands as copy alone if that fetch
+     fails. The .toc now lists twelve sections. The party hues are local --fs-*
+     mirrors of template.html's --alp/--lnp/--onp tokens, light and dark —
+     re-sync them if the live tokens move. -->
 <meta name="description" content="Every two-party figure on auspol tracker exists in two versions — the pollsters’ own published figures, and a figure implied from each poll’s primary votes at one fixed preference-flow table. What each basis is, why implied is the default, and where the fixed flow tables come from, worked line by line.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
@@ -173,7 +181,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 .toc li:first-child { border-top: 0; }
 /* The contents list is a list of links and does not need saying twice: the
    source-link rule below tints an underline under every link in running
-   prose, and eleven of them stacked here read as a wall. */
+   prose, and a dozen of them stacked here read as a wall. */
 .toc a { text-decoration: none; border-bottom: 0; }
 .toc a:hover, .toc a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 .toc span { color: var(--ink-3); }
@@ -239,6 +247,82 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
   overflow-x: auto; white-space: pre;
 }
 
+/* ------- #forced: the forced-choice split bars (data /assets/flow-splits.json) -------
+   Party hues are the live site's own tokens (template.html's --alp/--lnp/--onp,
+   light and dark) mirrored as local vars: the segments read as the parties
+   they name without this page having to load the tracker's stylesheet. */
+:root {
+  --fs-alp: oklch(0.55 0.150 27);
+  --fs-lnp: oklch(0.50 0.095 250);
+  --fs-onp: oklch(0.66 0.130 58);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.sh-light) {
+    --fs-alp: oklch(0.660 0.165 28);
+    --fs-lnp: oklch(0.680 0.130 252);
+    --fs-onp: oklch(0.760 0.135 64);
+  }
+}
+:root.sh-dark {
+  --fs-alp: oklch(0.660 0.165 28);
+  --fs-lnp: oklch(0.680 0.130 252);
+  --fs-onp: oklch(0.760 0.135 64);
+}
+.frame-wrap h3 {
+  font-family: var(--serif); font-size: 17.5px; font-weight: 600;
+  letter-spacing: -0.005em; color: var(--ink);
+  margin: 26px 0 4px;
+}
+.fsq { margin: 10px 0 30px; --fs-a: var(--fs-alp); }
+.fsq[data-b="onp"] { --fs-b: var(--fs-onp); }
+.fsq[data-b="lnp"] { --fs-b: var(--fs-lnp); }
+.fsq-ends {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+}
+.fsq-ends b {
+  font-family: var(--serif); font-weight: 600; font-size: 28px;
+  line-height: 1; letter-spacing: -0.01em;
+}
+.fsq-a { color: var(--fs-a); }
+.fsq-b { color: var(--fs-b); }
+.fsq-bar {
+  height: 16px; margin-top: 6px; border-radius: 4px; overflow: hidden;
+  display: flex; background: var(--line-2);
+}
+.fsq-bar i, .fs-row .fs-b i { display: block; height: 100%; }
+.fsq-sa { background: var(--fs-a); }
+.fsq-sb { background: var(--fs-b); }
+.fsq-cap { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+/* a caption link follows the page's running-prose link rule, a shade quieter */
+.fsq-cap a {
+  color: var(--ink-3); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-3) 40%, transparent);
+}
+.fsq-cap a:hover, .fsq-cap a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.fsq-hist { margin-top: 14px; border-top: 1px solid var(--line-2); }
+.fs-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid var(--line-2);
+}
+.fs-row .fs-w { flex: 0 0 62px; font-size: 11.5px; color: var(--ink-3); }
+.fs-row .fs-b {
+  flex: 1; height: 8px; border-radius: 3px; overflow: hidden;
+  display: flex; background: var(--line-2);
+}
+.fs-row .fs-n {
+  flex: 0 0 76px; text-align: right; font-size: 12px;
+  color: var(--ink-2); font-variant-numeric: tabular-nums;
+}
+.fs-row .fs-n b { font-weight: 600; }
+.fs-row.fs-miss .fs-b { background: transparent; border: 1px dashed var(--line); height: 7px; }
+.fs-row.fs-miss .fs-n { color: var(--ink-faint); font-size: 11.5px; }
+/* the per-wave sentence list is for screen readers, the bars show it visually */
+.fsq-sr {
+  position: absolute !important; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
 </style>
 <!--shell:head-->
 <link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
@@ -250,6 +334,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
 :root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); }
+:root.sh-dark { --fs-alp: oklch(0.660 0.165 28); --fs-lnp: oklch(0.680 0.130 252); --fs-onp: oklch(0.760 0.135 64); }
 </style>
 <!--/shell:head-->
 </head>
@@ -322,6 +407,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
     <li><a href="#why-implied">Why implied is the default</a></li>
     <li><a href="#classic">The classic table: Labor v Coalition</a> <span>&mdash; the 2025 election&rsquo;s counted flows, and one poll worked through</span></li>
     <li><a href="#one-nation">The Labor v One Nation table</a> <span>&mdash; three flows that don&rsquo;t officially exist</span></li>
+    <li><a href="#forced">What each party&rsquo;s voters say when forced to choose</a> <span>&mdash; RedBridge&rsquo;s monthly respondent splits</span></li>
     <li><a href="#how-found">How the Labor&ndash;One Nation table was built</a> <span>&mdash; the Senate anchor, the corrections, and the checks</span></li>
     <li><a href="#by-state">State by state, as the Senate counted it</a></li>
     <li><a href="#counts-2026">The counts that actually happened, 2026</a> <span>&mdash; South Australia and Secret Harbour, and what they moved</span></li>
@@ -484,6 +570,27 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
     <figcaption class="pred-note">The Senate record is 50.9%, trimmed by 4 points because nearly half the House &ldquo;others&rdquo; vote goes to independents, who are missing from the Senate&rsquo;s party-ticket pool and leaned more to Labor in 2025. South Australia&rsquo;s 2026 count of independents then landed at 44.1% to One Nation, inside the band: the one setting the first real test confirmed rather than moved.</figcaption>
   </figure>
 
+  <h2 id="forced">What each party&rsquo;s voters say when forced to choose</h2>
+  <p>The counted ballots above are one kind of evidence; another is simply asking. Every month the AFR / RedBridge Group / Accent Research poll asks its respondents who they would back in each head-to-head pairing, and prints the two-party answers <em>by first preference</em> &mdash; so its survey file records how Coalition voters break when made to pick between Labor and One Nation, and how One Nation voters break when made to pick between Labor and the Coalition. No other house publishes those splits monthly. The big bars are the latest wave; the rows beneath are every wave since the series began, and they redraw from the site&rsquo;s data with each new release. Poll answers are not counted ballots, so the Coalition read here can sit apart from the table&rsquo;s 68.5% setting for months at a time &mdash; both are on this page, and the drift chart described below is the referee between the two.</p>
+
+  <h3>If forced to choose between Labor and One Nation, Coalition voters say they&rsquo;d choose:</h3>
+  <figure class="fsq" id="fsq-lnp" data-b="onp">
+    <div class="fsq-ends" aria-hidden="true"><span class="fsq-side fsq-a"></span><span class="fsq-side fsq-b"></span></div>
+    <div class="fsq-bar" aria-hidden="true"></div>
+    <figcaption class="fsq-cap"></figcaption>
+    <div class="fsq-hist" aria-hidden="true"></div>
+  </figure>
+
+  <h3>If forced to choose between Labor and the Coalition, One Nation voters say they&rsquo;d choose:</h3>
+  <figure class="fsq" id="fsq-onp" data-b="lnp">
+    <div class="fsq-ends" aria-hidden="true"><span class="fsq-side fsq-a"></span><span class="fsq-side fsq-b"></span></div>
+    <div class="fsq-bar" aria-hidden="true"></div>
+    <figcaption class="fsq-cap"></figcaption>
+    <div class="fsq-hist" aria-hidden="true"></div>
+  </figure>
+
+  <p class="pred-tnote">A forced pair is not a changed vote: each number is the share of that party&rsquo;s voters who named the left-hand party <em>when made to choose between the two</em>, and the complement named the right. The sub-samples are small &mdash; Coalition first-preference voters are about a fifth of each wave&rsquo;s roughly 1,000 respondents, One Nation voters about a quarter to a third &mdash; so any single wave moves around more than the run of monthly rows does. The June 2026 report printed no Coalition-voter split, so its bar is empty rather than estimated. Each wave&rsquo;s caption links its Accent Research project page; these are one house&rsquo;s measured reads, not an aggregate.</p>
+
   <h2 id="how-found">How the Labor&ndash;One Nation table was built</h2>
   <ul class="pred-feats">
     <li>
@@ -588,11 +695,67 @@ Labor&ndash;One Nation two-party &asymp; 63.4 &ndash; 36.6   (band &plusmn;1.6)<
     <li><strong>Labor&ndash;One Nation anchor</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm" target="_blank" rel="noopener noreferrer">AEC 2025 Senate formal-preferences release</a> (7.43 million ranked above-the-line ballots), then chamber corrections.</li>
     <li><strong>Calibration</strong> &mdash; the 2026 South Australian statewide count, via <a href="https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s recomputation of the ECSA ballot record</a>; the 2026 Secret Harbour count, via <a href="https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/" target="_blank" rel="noopener noreferrer">Antony Green&rsquo;s read of the WAEC distribution</a> and the <a href="https://www.elections.wa.gov.au/2026-secret-harbour-election-results" target="_blank" rel="noopener noreferrer">WAEC result</a>.</li>
     <li><strong>Cross-checks, never inputs</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">AEC TCP flow by division</a> (Hunter, Maranoa), the Farrer by-election flow release, <a href="https://www.tallyroom.com.au/64676" target="_blank" rel="noopener noreferrer">Ben Raue&rsquo;s seat-by-seat tabulation of South Australia&rsquo;s raw distributions</a>, and <a href="https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s January 2026 reconstruction</a>.</li>
+    <li><strong>Monthly respondent splits</strong> &mdash; the <a href="https://www.accent-research.com/projects" target="_blank" rel="noopener noreferrer">AFR / RedBridge Group / Accent Research federal poll</a>, each wave since February 2026 printing respondent-allocated two-party answers by first preference, linked from its own chart caption in the section above.</li>
     <li><strong>Track record of last-election flows</strong> &mdash; <a href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham, <em>Wonk Central: The Track Record Of Last-Election Preferences</em></a> (September 2015, updated through 2022), the election-by-election record cited under &ldquo;Why implied is the default&rdquo;.</li>
     <li><strong>Estimator and interval conventions</strong> &mdash; the site&rsquo;s own aggregation engine.</li>
   </ul>
   <p class="ss-note">Companion to the &ldquo;?&rdquo; beside the two-party basis switch on the main page.</p>
 </main>
+<script>
+/* The two forced-choice charts in #forced, drawn at view time from
+   /assets/flow-splits.json (build.mjs writes it from polls.json's
+   tpp_split/tpp_split_on – RedBridge/Accent's per-wave respondent splits by
+   first preference). If the file is missing the section stands as copy
+   alone, by the satellite rule that a data hiccup never breaks a page. */
+(function () {
+  fetch("/assets/flow-splits.json", { cache: "no-cache" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.waves || !d.waves.length) return;
+      draw("fsq-lnp", d, "splitOn", "lnp", "One Nation");
+      draw("fsq-onp", d, "split", "onp", "The Coalition");
+    })
+    .catch(function () { /* copy alone */ });
+
+  function draw(id, d, key, pick, bName) {
+    var fig = document.getElementById(id);
+    if (!fig) return;
+    var waves = d.waves.map(function (w) {
+      var v = w[key] && typeof w[key][pick] === "number" ? w[key][pick] : null;
+      return { wave: w.wave, rel: w.releaseUrl, sample: w.sample, a: v, b: v == null ? null : 100 - v };
+    });
+    var latest = null, i;
+    for (i = waves.length - 1; i >= 0; i--) { if (waves[i].a != null) { latest = waves[i]; break; } }
+    if (!latest) return;
+
+    var sides = fig.querySelectorAll(".fsq-side");
+    sides[0].innerHTML = "<b>" + latest.a + "%</b> Labor";
+    sides[1].innerHTML = bName + " <b>" + latest.b + "%</b>";
+    fig.querySelector(".fsq-bar").innerHTML =
+      '<i class="fsq-sa" style="width:' + latest.a + '%"></i><i class="fsq-sb" style="width:' + latest.b + '%"></i>';
+    fig.querySelector(".fsq-cap").innerHTML = latest.wave + " wave" +
+      (latest.sample ? " · n = " + latest.sample.toLocaleString("en-AU") : "") +
+      (latest.rel ? ' · <a href="' + latest.rel + '" target="_blank" rel="noopener noreferrer">wave report</a>' : "");
+
+    fig.querySelector(".fsq-hist").innerHTML = waves.map(function (w) {
+      if (w.a == null) {
+        return '<div class="fs-row fs-miss"><span class="fs-w">' + w.wave +
+          '</span><span class="fs-b"></span><span class="fs-n">not published</span></div>';
+      }
+      return '<div class="fs-row"><span class="fs-w">' + w.wave + '</span><span class="fs-b">' +
+        '<i class="fsq-sa" style="width:' + w.a + '%"></i><i class="fsq-sb" style="width:' + w.b + '%"></i></span>' +
+        '<span class="fs-n"><b class="fsq-a">' + w.a + '%</b> · <b class="fsq-b">' + w.b + "%</b></span></div>";
+    }).join("");
+
+    var sr = document.createElement("ul");
+    sr.className = "fsq-sr";
+    sr.innerHTML = waves.filter(function (w) { return w.a != null; }).map(function (w) {
+      return "<li>" + w.wave + ": Labor " + w.a + " per cent, " + bName + " " + w.b + " per cent</li>";
+    }).join("");
+    fig.appendChild(sr);
+  }
+})();
+</script>
 <!--shell:footer-->
 <div class="sh-frame">
   <footer class="sh-foot">
