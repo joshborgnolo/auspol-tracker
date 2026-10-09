@@ -129,13 +129,14 @@ const POLLS = mergedPolls.filter((p) => !p.isElection);
    reason rides the row via NO_AGG_NOTE. Checks here key the full suffix
    string; the houses inventory (:3322) already folds "(SMS)" back into
    "Roy Morgan" for counting, as does "(pooled)". */
-const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)"]);
+const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newspoll (pooled)"]);
 /* why each no-aggregate house's figures sit outside the aggregates - the
    archive detail rail's note line (the SMS label keeps its established
    selection-bias wording; the pooled label reads as the timespan average) */
 const NO_AGG_NOTE = {
   "Roy Morgan (SMS)": "Because SMS polls have a strong selection bias, they do not count towards any aggregates.",
   "Roy Morgan (pooled)": "Because this release averages seven months of interviewing (January\u2013July 2026) into a single reading, it does not count towards any aggregates.",
+  "Newspoll (pooled)": "Because this release averages about ten weeks of interviewing into a single reading, it does not count towards any aggregates.",
 };
 const ppm = D.ppm;
 /* Leader satisfaction the fallback filed (D.fallbackApproval) joins the

@@ -54,6 +54,21 @@
                  unpredictable, so stale/dropped checks would misfire.
                  harmonize joins only NSW/Vic/Qld (no Tas or ACT/NT cut →
                  no Rest of Australia).
+   Newspoll   – the quarterly aggregate Newspoll publishes to The
+                 Australian: one reading per release pooled from about ten
+                 weeks of waves (filed in polls.json as NO_AGG "Newspoll
+                 (pooled)" rows), printing first-preference and two-party
+                 by gender, age bands 18–34/35–49/50–64/65+, the five
+                 mainland states, education No tertiary / TAFE / University,
+                 household income, working status, language at home and
+                 religion, hand-entered in NEWSPOLL_DEMO below and verified
+                 against the printed table (the same figures sit on
+                 Wikipedia's subpopulation page and reconcile). "No
+                 tertiary" spans Year-12-or-less AND TAFE-or-trade voters,
+                 so no common education group holds every wave's school row
+                 – harmonize drops the dim unless the wave prints a school
+                 row of its own. Newspoll cuts no Tas/ACT/NT, so its states
+                 join NSW/Vic/Qld/SA/WA only. Not in HOUSES.
    Fox & Hedgehog – every release's full-report PDF prints a
                  "PRIMARY VOTE, 3PP & TPP – DEMOGRAPHICS" table (page 8):
                  gender, age bands 18–34/35–49/50–64/65+, state as
@@ -528,6 +543,114 @@ const ROYMORGAN_COUNTRY = {
   },
 };
 
+/* Newspoll quarterly aggregates, hand-entered from The Australian's
+   printed demographic table (see the house note in the header). Keyed by
+   the NO_AGG poll row's date; every figure re-read from the paper's Voting
+   Intention and Two-party-preferred tables before entry, and Wikipedia's
+   subpopulation page carries the same numbers. dims carries the
+   first-preference side; tpp the printed ALP two-party share per group
+   (row value, 100 minus it the Coalition's). Working-status and religion
+   cuts print nowhere else, so they join no common group either. */
+const NEWSPOLL_DEMO = {
+  "2025-09-11": {
+    source: "https://www.theaustralian.com.au/nation/politics/newspoll-quarterly-australias-foreignborn-voters-stay-loyal-to-labor/news-story/a4900d97",
+    total: { alp: 36, lnp: 29, grn: 12, onp: 9, oth: 14 },
+    dims: {
+      gender: {
+        Men: { alp: 38, lnp: 29, grn: 10, onp: 9, oth: 14 },
+        Women: { alp: 34, lnp: 29, grn: 14, onp: 9, oth: 14 },
+      },
+      age: {
+        "18–34": { alp: 36, lnp: 18, grn: 26, onp: 7, oth: 13 },
+        "35–49": { alp: 38, lnp: 26, grn: 14, onp: 9, oth: 13 },
+        "50–64": { alp: 36, lnp: 31, grn: 5, onp: 10, oth: 18 },
+        "65+": { alp: 34, lnp: 40, grn: 3, onp: 11, oth: 12 },
+      },
+      // (Male/Female columns verified left-of-centre on the Sept 2025 table)
+      state: {
+        NSW: { alp: 38, lnp: 25, grn: 13, onp: 10, oth: 14 },
+        Vic: { alp: 35, lnp: 30, grn: 15, onp: 7, oth: 13 },
+        Qld: { alp: 32, lnp: 33, grn: 12, onp: 10, oth: 13 },
+        SA: { alp: 34, lnp: 29, grn: 10, onp: 11, oth: 16 },
+        WA: { alp: 39, lnp: 33, grn: 8, onp: 11, oth: 9 },
+      },
+      education: {
+        "No tertiary": { alp: 32, lnp: 32, grn: 13, onp: 11, oth: 12 },
+        TAFE: { alp: 37, lnp: 25, grn: 9, onp: 12, oth: 17 },
+        University: { alp: 38, lnp: 29, grn: 15, onp: 5, oth: 13 },
+      },
+      income: {
+        "<$50k": { alp: 39, lnp: 24, grn: 11, onp: 11, oth: 15 },
+        "$50–99k": { alp: 34, lnp: 30, grn: 13, onp: 11, oth: 12 },
+        "$100–149k": { alp: 35, lnp: 28, grn: 13, onp: 9, oth: 15 },
+        "$150k+": { alp: 38, lnp: 29, grn: 13, onp: 7, oth: 13 },
+      },
+      working: {
+        "Full time": { alp: 35, lnp: 30, grn: 13, onp: 9, oth: 13 },
+        "Part time": { alp: 36, lnp: 28, grn: 12, onp: 9, oth: 15 },
+        Retired: { alp: 35, lnp: 35, grn: 5, onp: 10, oth: 15 },
+        Other: { alp: 40, lnp: 23, grn: 17, onp: 8, oth: 12 },
+      },
+      language: {
+        "English only": { alp: 35, lnp: 29, grn: 12, onp: 10, oth: 14 },
+        "Other language": { alp: 38, lnp: 28, grn: 16, onp: 5, oth: 13 },
+      },
+      religion: {
+        Christian: { alp: 33, lnp: 34, grn: 8, onp: 11, oth: 14 },
+        "No religion": { alp: 43, lnp: 21, grn: 18, onp: 7, oth: 11 },
+      },
+    },
+  },
+  "2025-11-20": {
+    source: "https://www.theaustralian.com.au/nation/politics/key-groups-shift-from-coalition-to-pauline-hanson-newspoll-finds/news-story/8826bb431e5ebcd98764193fa481603c",
+    total: { alp: 36, lnp: 25, grn: 12, onp: 14, oth: 13 },
+    dims: {
+      gender: {
+        Men: { alp: 38, lnp: 26, grn: 10, onp: 14, oth: 12 },
+        Women: { alp: 35, lnp: 24, grn: 15, onp: 13, oth: 13 },
+      },
+      age: {
+        "18–34": { alp: 36, lnp: 19, grn: 26, onp: 8, oth: 11 },
+        "35–49": { alp: 37, lnp: 25, grn: 13, onp: 13, oth: 12 },
+        "50–64": { alp: 39, lnp: 27, grn: 6, onp: 15, oth: 13 },
+        "65+": { alp: 33, lnp: 33, grn: 2, onp: 18, oth: 14 },
+      },
+      state: {
+        NSW: { alp: 37, lnp: 24, grn: 12, onp: 14, oth: 13 },
+        Vic: { alp: 35, lnp: 26, grn: 16, onp: 11, oth: 12 },
+        Qld: { alp: 33, lnp: 27, grn: 10, onp: 18, oth: 12 },
+        SA: { alp: 38, lnp: 25, grn: 10, onp: 15, oth: 12 },
+        WA: { alp: 37, lnp: 28, grn: 12, onp: 14, oth: 9 },
+      },
+      education: {
+        "No tertiary": { alp: 30, lnp: 26, grn: 14, onp: 20, oth: 10 },
+        TAFE: { alp: 35, lnp: 24, grn: 9, onp: 19, oth: 13 },
+        University: { alp: 41, lnp: 26, grn: 13, onp: 6, oth: 14 },
+      },
+      income: {
+        "<$50k": { alp: 35, lnp: 23, grn: 11, onp: 17, oth: 14 },
+        "$50–99k": { alp: 35, lnp: 26, grn: 11, onp: 17, oth: 11 },
+        "$100–149k": { alp: 35, lnp: 24, grn: 15, onp: 11, oth: 15 },
+        "$150k+": { alp: 38, lnp: 28, grn: 11, onp: 10, oth: 13 },
+      },
+      working: {
+        "Full time": { alp: 38, lnp: 26, grn: 11, onp: 13, oth: 12 },
+        "Part time": { alp: 35, lnp: 20, grn: 11, onp: 17, oth: 17 },
+        Retired: { alp: 36, lnp: 32, grn: 2, onp: 17, oth: 13 },
+        Other: { alp: 30, lnp: 19, grn: 24, onp: 13, oth: 14 },
+      },
+      language: {
+        "English only": { alp: 36, lnp: 26, grn: 12, onp: 14, oth: 12 },
+        "Other language": { alp: 40, lnp: 23, grn: 14, onp: 9, oth: 14 },
+      },
+      religion: {
+        Christian: { alp: 32, lnp: 34, grn: 4, onp: 16, oth: 14 },
+        "No religion": { alp: 40, lnp: 18, grn: 18, onp: 12, oth: 12 },
+      },
+    },
+  },
+};
+
 function redbridgeCache(date) {
   const dir = path.join(ROOT, ".build", "redbridge-src");
   for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
@@ -653,6 +776,19 @@ try {
     push({ pollster: "Roy Morgan (pooled)", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
            article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
     console.log(`${k}: country(${Object.keys(h.country).join("/")})`);
+  }
+  // Newspoll quarterly aggregates (NEWSPOLL_DEMO) — the "Newspoll (pooled)"
+  // NO_AGG waves. Not in HOUSES: releases without a breakdown file nothing.
+  for (const [date, h] of Object.entries(NEWSPOLL_DEMO)) {
+    const k = "Newspoll (pooled)|" + date;
+    if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
+    const p = polls.find((x) => x.pollster === "Newspoll (pooled)" && x.date === date);
+    if (!p) { pend(k, "no Newspoll (pooled) poll row for this wave's date yet"); continue; }
+    const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
+    if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
+    push({ pollster: "Newspoll (pooled)", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
+           article: p.url ?? null, source: h.source, read: "published table", dims: h.dims, total: h.total });
+    console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
   }
   // Resolve: one fetch carries every month; rebuilt whole each run, or kept
   // whole from the file when the fetch or any month fails the gate

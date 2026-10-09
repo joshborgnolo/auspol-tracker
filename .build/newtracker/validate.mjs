@@ -46,6 +46,7 @@ export function validate(D) {
     "Redbridge",         // pre-"RedBridge/Accent" Australia Institute waves
     "Roy Morgan (SMS)",  // single SMS-mode Morgan release, mode tag not a house
     "Roy Morgan (pooled)", // finding 10341's 7-month Single Source cross-section
+    "Newspoll (pooled)", // quarterly aggregate releases, no aggregate weight
     "Agenda C Synesis",  // one-off news.com.au poll
   ]);
 

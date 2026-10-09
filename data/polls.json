@@ -1681,6 +1681,23 @@
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-15-9-2025"
     },
     {
+      "date": "2025-09-11",
+      "published": "2025-09-21T19:00",
+      "dateStart": "2025-07-14",
+      "pollster": "Newspoll (pooled)",
+      "client": "The Australian",
+      "sample": 3811,
+      "alp": 36,
+      "lnp": 29,
+      "grn": 12,
+      "onp": 9,
+      "ind": 14,
+      "oth": null,
+      "tpp_alp": 57,
+      "tpp_lnp": 43,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-men-young-voters-desert-coalition/news-story/a4900d97e061d1e17f19af7cde5db432"
+    },
+    {
       "date": "2025-09-13",
       "published": "2025-09-14T18:00",
       "dateStart": "2025-09-09",
@@ -2150,6 +2167,23 @@
       "tpp_lnp": 42,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-andrew-hastie-firms-as-liberal-alternative-to-sussan-ley/news-story/ae7d5d377e1f1d49da95f681615eb7db",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-24-11-2025"
+    },
+    {
+      "date": "2025-11-20",
+      "published": "2025-12-25T19:00",
+      "dateStart": "2025-09-29",
+      "pollster": "Newspoll (pooled)",
+      "client": "The Australian",
+      "sample": 3774,
+      "alp": 36,
+      "lnp": 25,
+      "grn": 12,
+      "onp": 14,
+      "ind": 13,
+      "oth": null,
+      "tpp_alp": 57,
+      "tpp_lnp": 43,
+      "url": "https://www.theaustralian.com.au/nation/politics/key-groups-shift-from-coalition-to-pauline-hanson-newspoll-finds/news-story/8826bb431e5ebcd98764193fa481603c"
     },
     {
       "date": "2025-11-24",
