@@ -553,3 +553,27 @@ people", the user reported "1088" from the methodology PDF. Procedure:
 4. Display-only per-poll "± x.x pts" remains possible with no schema
    change; any such figure must respect auspol-ci95-scales (share-scale
    vs lead-scale = 2×).
+
+## (pooled) waves — sum-of-constituents rollup (shipped 2026-10-09)
+
+Newspoll's quarterly demographic-tables release files as a
+`Newspoll (pooled)` poll row (NO_AGG_HOUSES) whose `sample` IS the sum
+of the plain-Newspoll waves' samples across its [dateStart, date]
+window — so its effective sample is the SUM of the constituent waves'
+published `sampleEff` values. extract-sampleeff.mjs's offline **pooled
+pass** stamps exactly that (`node .build/extract-sampleeff.mjs pooled`
+runs it alone; it also rides the weekly sweep after the statement legs,
+so a new quarterly wave self-stamps once its constituents carry state-
+ments). Verified identity on all five rows 2026-10-09: 2025-09-11 →
+3072 (958+1062+1052), 2025-11-20 → 3190, 2026-03-26 → 4277, 2026-06-26
+→ 4174, 2026-09-18 → 3745 — each row's constituent samples summed
+EXACTLY to its filed sample, which the pass guards on (identity break
+= exit-2 error; an unstamped constituent = note + abstain, never a
+partial sum). Eligibility is base pollster ∈ NEED_HOUSES, which keeps
+"Roy Morgan (pooled)" out by design: Roy Morgan publishes no effective
+sample at any level, and a figure the house never printed is never
+fabricated (the standing no-unstamped-house display rule). The rows
+are no-aggregate, so the stamps touch only per-poll surfaces — the
+archive Eff. n column, the expanded meta band, CSV export, and
+rdPollMargin's basis (the summed eff is the pool's true precision, not
+sample/1.6).

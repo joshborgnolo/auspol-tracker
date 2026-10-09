@@ -65,6 +65,19 @@
 //              stay unlinked by design; the constant-link waves with no
 //              cache (Oct-2025 snapshot, the May-2026 MRP) keep links but
 //              get no sampleEff – MRPs are never eff-stamped in any house.
+//   (pooled)  – no source of its own: a "<House> (pooled)" row (Newspoll's
+//              quarterly demographic-tables release) pools the house's own
+//              waves across its fieldwork window, so its raw sample IS the
+//              sum of theirs and its effective sample is the sum of their
+//              sampleEff values. A purely offline pass (after the statement
+//              legs, so waves stamped in the same run count) reads rows
+//              already in polls.json and stamps the sum, guarded on the
+//              raw-sample identity: the constituent samples must add to
+//              exactly the pooled row's own `sample`, or the pass errors
+//              like any other guard. Only houses with a statement leg are
+//              eligible (base pollster ∈ NEED_HOUSES) – "Roy Morgan
+//              (pooled)" publishes no effective samples at any level, and
+//              figures the house never printed are never fabricated.
 //
 // Matching: a statement is stamped onto the polls.json row of the SAME
 // pollster whose `date` (fieldwork end) is within ±1 day of the statement's
@@ -93,13 +106,15 @@
 //
 // Exit codes: 0 ok (SAMPLEEFF_STATUS line, changed:true/false), 1 fetch/parse
 // failure, 2 guard breach. Status line shape:
-//   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"methods":n,"samples":n,"failed":n,"skipped":n,"errors":[…]}
+//   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"pooled":n,"methods":n,"samples":n,"failed":n,"skipped":n,"errors":[…]}
 //
 // Usage: `node extract-sampleeff.mjs [leg]` – an optional positional leg
-// name (accent/yougov/newspoll/essential/demosau) runs JUST that leg's
+// name (accent/yougov/newspoll/essential/demosau/pooled) runs JUST that leg's
 // stamps. redbridge-updater.sh invokes the offline Accent pass this way
 // right after its own extractor so a newly-cached wave's eff + methodUrl
 // lands in the same commit instead of waiting for the weekly sweep.
+// `pooled` is the narrowest run: the (pooled)-rollup pass alone, with the
+// methodUrl and raw-sample reconciliation passes left to the weekly sweep.
 
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -621,6 +636,42 @@ for (const p of unstamped) {
   stamped.push(`${p.date} ${p.pollster}: ${pick.eff} (${pick.src})`);
 }
 
+/* ---- pass: (pooled) waves' effective sample -------------------------------
+   A "<House> (pooled)" row pools the house's own waves across [dateStart, date]:
+   its raw sample is the sum of theirs, so its effective sample is the sum of
+   their sampleEff values (each stamped from the wave's APC statement by the
+   legs above – running after the stamp loop means constituents stamped in
+   this same run count). Purely offline: rows already in polls.json are the
+   whole input, so `node extract-sampleeff.mjs pooled` is a deterministic
+   run. Guards, never weakened: a constituent wave without its sampleEff
+   abstains (a partial sum would be silently wrong – the note tells the
+   operator which wave the sweep is waiting on), and the constituent raw
+   samples must add to exactly the pooled row's own `sample`, a break in
+   that identity meaning the pooling assumption itself broke. */
+const pooled = [];
+if (!LEG_ONLY || LEG_ONLY === "pooled") {
+  for (const p of D.polls) {
+    const m = /^(.+) \(pooled\)$/.exec(p.pollster || "");
+    if (!m || p.sampleEff != null || !NEED_HOUSES.includes(m[1])) continue;
+    const cons = D.polls.filter((q) => q.pollster === m[1] && q.date >= p.dateStart && q.date <= p.date);
+    if (!cons.length || !p.dateStart) { console.log(`  note: ${p.date} ${p.pollster}: no ${m[1]} waves inside its window`); continue; }
+    const waiting = cons.filter((q) => q.sampleEff == null).map((q) => q.date);
+    if (waiting.length) { console.log(`  note: ${p.date} ${p.pollster}: waits on unstamped wave(s) ${waiting.join(", ")}`); continue; }
+    const rawSum = cons.reduce((s, q) => s + (q.sample || 0), 0);
+    if (rawSum !== p.sample) { errors.push(`guard: ${p.date} ${p.pollster} constituent samples sum to ${rawSum}, row says ${p.sample}`); continue; }
+    const eff = cons.reduce((s, q) => s + q.sampleEff, 0);
+    const rebuilt = {};
+    for (const [k, v] of Object.entries(p)) {
+      rebuilt[k] = v;
+      if (k === "sample") rebuilt.sampleEff = eff;
+    }
+    if (!("sample" in rebuilt)) rebuilt.sampleEff = eff;
+    for (const k of Object.keys(p)) delete p[k];
+    Object.assign(p, rebuilt);
+    pooled.push(`${p.date} ${p.pollster}: ${eff} (${cons.length} waves: ${cons.map((q) => q.sampleEff).join("+")})`);
+  }
+}
+
 /* methodUrl: a YouGov or Newspoll row carries its wave's APC statement
    link, a RedBridge/Accent row the link to its wave's Accent
    methodology-report PDF, and a DemosAU row the statement's own
@@ -633,15 +684,19 @@ for (const p of unstamped) {
    statement PDFs; the dedicated Essential block below only fills rows
    lacking a link. The commissioned YouGov waves file no statement with
    YouGov's APC listing, so they keep no link. */
+/* A `pooled` run is deliberately narrow: no leg fetched statement records,
+   so the link and reconciliation passes have nothing new to work from and
+   are left to the weekly sweep. */
+const tailOff = LEG_ONLY === "pooled";
 let npLinks = [];
-if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
+if (!tailOff && D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   const needDates = D.polls
     .filter((p) => p.pollster === "Newspoll" && p.methodUrl == null)
     .map((p) => (p.published || p.date).slice(0, 10));
   try { npLinks = await legNewspollLinks(needDates); }
   catch (e) { errors.push("leg newspoll-links: " + String(e.message).slice(0, 180)); }
 }
-const accentLinks = D.polls.some((p) => p.pollster.startsWith("RedBridge/Accent") && p.methodUrl == null)
+const accentLinks = !tailOff && D.polls.some((p) => p.pollster.startsWith("RedBridge/Accent") && p.methodUrl == null)
   ? legAccentLinks()
   : [];
 const methods = [];
@@ -739,7 +794,7 @@ if (!essSamplePool.length && cacheTxts.includes("essential-disclosure.txt"))
 samplePools.Essential = essSamplePool;
 
 const samples = [];
-for (const p of D.polls) {
+for (const p of tailOff ? [] : D.polls) {
   if (!NEED_HOUSES.includes(p.pollster)) continue;
   let cands;
   if (p.pollster.startsWith("YouGov")) {
@@ -792,8 +847,9 @@ for (const p of D.polls) {
   delete p.samplePending;
 }
 
-const out = { changed: stamped.length > 0 || methods.length > 0 || samples.length > 0, stamped: stamped.length, methods: methods.length, samples: samples.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
+const out = { changed: stamped.length > 0 || pooled.length > 0 || methods.length > 0 || samples.length > 0, stamped: stamped.length, pooled: pooled.length, methods: methods.length, samples: samples.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
 for (const s of stamped) console.log("  stamp " + s);
+for (const s of pooled) console.log("  pooled " + s);
 for (const s of methods) console.log("  method " + s);
 for (const s of samples) console.log("  sample " + s);
 for (const a of ambiguous) console.log("  AMBIGUOUS " + a);
@@ -801,7 +857,7 @@ if (errors.length) {
   for (const e of errors) console.log("  ERROR " + e);
   statusAndExit(out, 2);
 }
-if (stamped.length || methods.length || samples.length) {
+if (stamped.length || pooled.length || methods.length || samples.length) {
   const txt = readFileSync(OUT, "utf8");
   const trailingNl = txt.endsWith("\n") ? "\n" : "";
   const next = JSON.stringify(D, null, 2) + trailingNl;
