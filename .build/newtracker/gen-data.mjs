@@ -2768,7 +2768,10 @@ const FIELD_TBC_URL = { DemosAU: "https://demosau.com/methodology-statements/" }
    under the same words. Each link says whose it is: the house's own release
    ("Accent’s release"), its APC methodology statement, or the press report
    the row was read from, named by outlet ("AFR report"), which also tells
-   a reader before the click that it is probably paywalled. */
+   a reader before the click that it is probably paywalled. A house whose
+   releases also have a home — pollsterRules.releaseHub, today Essential's
+   Federal Political Insights — gets its rolling series page as a further
+   link, sitting beside the dated release it complements. */
 // hosts that are the pollster's own (its release, report PDF or statement)
 const OWN_HOSTS = ["roymorgan.com", "spectrestrategy.com", "demosau.com", "essentialreport.com.au",
   "usrfiles.com", "accent-research.com", "foxhedgehog.com.au", "freshwaterstrategy.com", "yougov.com",
@@ -2818,6 +2821,8 @@ const linksOf = (p) => {
     title: both ? by + "’s own release of this poll, which includes its APC methodology statement" : by + "’s own release of this poll" });
   else if (waiting && at.release) out.push({ k: "release", pending: true, t: by + "’s release" + (at.release === at.method ? (at.oneDoc ? ", with methodology" : " and methodology") : "") + ": not yet out", href: at.release,
     title: by + " hasn’t posted this poll’s release yet. This opens the page where it files them." });
+  if (RELEASE_HUB.has(house)) out.push({ k: "series", t: "Running series", href: RELEASE_HUB.get(house),
+    title: by + "’s rolling report collection – every wave of the house’s series, the historical vote tables included" });
   if (p.methodUrl && !both) out.push({ k: "method", t: "APC methodology", href: p.methodUrl, title: "This poll’s Australian Polling Council methodology statement" });
   else if (!p.methodUrl && waiting && at.method && !(!rel && at.release === at.method))
     out.push({ k: "method", pending: true, t: "APC methodology: not yet out", href: at.method,

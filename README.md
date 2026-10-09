@@ -64,8 +64,9 @@ new and worth looking at.
   wave's release page carries no `releaseUrl`. The house's rolling report
   collection page (Federal Political Insights) rides in
   `pollsterRules.Essential.releaseHub`; gen-data stamps it onto every
-  Essential wave beside `releaseUrl`, and the expanded poll shows both
-  addresses under the one "Pollster's release" pointer.
+  Essential wave beside `releaseUrl`, the expanded poll shows both
+  addresses under the one "Pollster's release" pointer, and the redesign's
+  poll links list it as a "Running series" link beside the dated release.
 - **Provisional rows.** When a house's own extractor has not landed a wave
   within 18 hours of it appearing on Poll Bludger's poll-data feed, the
   fallback agent (`.build/extract-pollbludger.mjs`) files it into
