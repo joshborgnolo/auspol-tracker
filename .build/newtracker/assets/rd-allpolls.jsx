@@ -1706,6 +1706,12 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             <span className="rd-apd-k">In the aggregates</span>
             <span>{p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates."}</span>
           </>}
+          {/* the single-territory readings the wave also carries (sentence
+              built beside sampleValue so every band voices it the one way) */}
+          {p.solo && window.soloNote && <>
+            <span className="rd-apd-k">Territory readings</span>
+            <span>{window.soloNote(p)}</span>
+          </>}
           {fig.a != null && <>
             <span className="rd-apd-k">{RD_AP_KAL ? "Against the trend" : "Against the polls around it"}</span>
             <span>{lean == null || !yd

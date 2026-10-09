@@ -3841,7 +3841,7 @@ function ArchLead({ p, measure, primaryFallback, basis }) {
    signed figures looked like a different kind of number */
 const signed1 = (v) => { const d = Math.round(v * 10) / 10; return (d < 0 ? "\u2212" : "+") + Math.abs(d).toFixed(1); };
 function ArchPollDetail({ p, onBack, backLabel }) {
-  const { PollLedger, pubStamp, releaseMetaRows, EffLines } = window;
+  const { PollLedger, pubStamp, releaseMetaRows, EffLines, soloNote } = window;
   /* The archive stores the unsure share and its change; the Latest table
      derives the residual instead. Same reading, two shapes – so the ledger
      takes the segments already built rather than guessing which it has. */
@@ -3879,6 +3879,10 @@ function ArchPollDetail({ p, onBack, backLabel }) {
        fact about one sample (builder shared with Latest polls) */
     <span className="pd-meta-i" key="sample"><span className="pd-meta-k">Sample</span>
       <span className="pd-meta-v">{window.sampleValue(p)}</span></span>,
+    /* the single-territory readings the wave also carries (sentence built
+       beside sampleValue so every band voices it the one way) */
+    p.solo && soloNote && <span className="pd-meta-i" key="solo"><span className="pd-meta-k">Territory readings</span>
+      <span className="pd-meta-v">{soloNote(p)}</span></span>,
     /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
        these read as figures, not as a range dash or a word break. One clause
        per contest the wave can be held against, in the 2PP agg. effect row's
@@ -7232,7 +7236,10 @@ function infoTerms(D) {
           Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school
           rows combined in proportion to its own group sizes. States: Resolve and, since June 2026,
           YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at
-          their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the
+          their shares of the 2025 vote. ACT/NT/Tas also stands alone, from YouGov’s printed trio
+          and DemosAU’s modelling, with Tasmania-, ACT- and NT-only readings (Roy Morgan, EMRS, and
+          the modelled cuts) drawn beside it as comparison points and pooled into nothing. Where
+          people live: YouGov and RedBridge, which draw the
           same four areas, and DemosAU for the two metropolitan ones, since its third combines
           provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for
           owners only, since its renters include others who don’t own. Language at home: YouGov and

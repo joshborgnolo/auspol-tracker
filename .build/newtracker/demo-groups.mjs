@@ -28,13 +28,17 @@
                  together are Non-NSW/Vic/Qld, merged at their shares of the
                  2025 formal vote (AEC event 31496) – a known split, not an
                  estimate. A wave missing any of the three doesn't join
-                 there. DemosAU (MRP) prints Tas, NT and ACT as their own
-                 rows, which are none of the common groups, so it joins at
-                 NSW, Vic, Qld, SA and WA alone. Roy Morgan (from the
-                 2026-09-27 wave's fortnight
-                 release PDF) prints NSW, Vic, Qld, SA and WA but no
-                 Tas/ACT/NT cut, so it joins at the three big states and at
-                 SA and WA, never at Non-NSW/Vic/Qld.
+                 there. ACT/NT/Tas is a common group of its own, fed only by
+                 cuts of exactly that trio: YouGov as printed (Jun 2026 on),
+                 and DemosAU (MRP)'s Tas, ACT and NT rows merged at the
+                 trio's own 2025 vote split (MRP_TRIO below) – again a known
+                 split, not an estimate. Roy Morgan's Tas-alone cut and
+                 EMRS (Tas)'s Tasmania-only polls are different people, so
+                 the trio never pools them (gen-data carries them onto the
+                 trio's view as solo display points instead). Roy Morgan
+                 (from the 2026-09-27 wave's fortnight
+                 release PDF) prints NSW, Vic, Qld, SA and WA, so it joins
+                 at those five and never at ACT/NT/Tas or Non-NSW/Vic/Qld.
      location    Inner metro, Outer metro, Provincial and Rural – YouGov and
                  RedBridge cut identically. DemosAU's Regional/Rural is
                  provincial and rural voters together, so it joins only at
@@ -67,7 +71,7 @@ export const DEMO_SETS = [
   { tab: "age", id: "generation", label: "By generation", groups: ["Gen Z", "Millennials", "Gen X", "Boomers"] },
   { tab: "gender", id: "gender", label: null, groups: ["Men", "Women"] },
   { tab: "education", id: "education", label: null, groups: ["Year 12 or less", "TAFE or trade", "University"] },
-  { tab: "place", id: "state", label: "By state", groups: ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"] },
+  { tab: "place", id: "state", label: "By state", groups: ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"] },
   { tab: "place", id: "location", label: "By location", groups: ["Inner metro", "Outer metro", "Provincial", "Rural"] },
   { tab: "home", id: "housing", label: "By housing", groups: ["Own outright", "Mortgage", "Renting"] },
   { tab: "home", id: "language", label: "By language at home", groups: ["English only", "Other language"] },
@@ -87,7 +91,7 @@ export const DEMO_SHARE = {
   "18–34": 0.28, "35–54": 0.33, "55+": 0.39,
   "Gen Z": 0.19, Millennials: 0.28, "Gen X": 0.25, Boomers: 0.28,
   "Year 12 or less": 0.40, "TAFE or trade": 0.31, University: 0.29,
-  NSW: 0.31, Vic: 0.26, Qld: 0.20, SA: 0.07, WA: 0.10, "Non-NSW/Vic/Qld": 0.23,
+  NSW: 0.31, Vic: 0.26, Qld: 0.20, SA: 0.07, WA: 0.10, "ACT/NT/Tas": 0.049, "Non-NSW/Vic/Qld": 0.23,
   "Inner metro": 0.30, "Outer metro": 0.33, Provincial: 0.16, Rural: 0.21,
   "Own outright": 0.32, Mortgage: 0.36, Renting: 0.32,
   "English only": 0.76, "Other language": 0.24,
@@ -99,6 +103,10 @@ const RB_SCHOOL = [["Below Year 12", 0.39], ["Year 12", 0.61]];
    vote (AEC event 31496: SA 7.3%, WA 10.3%, Tas, ACT and NT 4.9% of the
    national vote). */
 const YG_REST = [["SA", 0.324], ["WA", 0.457], ["ACT/NT/Tas", 0.219]];
+/* DemosAU (MRP)'s Tas, ACT and NT rows as shares of the trio's combined
+   2025 formal vote (event 31496: Tas 367,259 votes, ACT 290,565, NT
+   105,762). */
+const MRP_TRIO = [["Tas", 0.481], ["ACT", 0.3805], ["NT", 0.1385]];
 
 /* One wave's groups on the common sets:
    { gender: { Men: shares, … }, age: { "18–34": shares, … }, generation, education,
@@ -128,6 +136,12 @@ export function harmonize(w) {
   const st = d.state;
   if (st) {
     for (const g of ["NSW", "Vic", "Qld", "SA", "WA"]) put("state", g, st[g]);
+    /* the trio joins only from cuts of exactly that trio – a Tas-alone or
+       ACT-alone row (Roy Morgan, EMRS) is never read into it */
+    const trio = st["ACT/NT/Tas"] || (MRP_TRIO.every(([l]) => st[l])
+      ? Object.fromEntries(KEYS.map((k) => [k, MRP_TRIO.reduce((t, [l, wt]) => t + (+st[l][k] || 0) * wt, 0)]))
+      : null);
+    put("state", "ACT/NT/Tas", trio);
     const rest = st["Rest of Australia"] || (YG_REST.every(([l]) => st[l])
       ? Object.fromEntries(KEYS.map((k) => [k, YG_REST.reduce((t, [l, wt]) => t + (+st[l][k] || 0) * wt, 0)]))
       : null);

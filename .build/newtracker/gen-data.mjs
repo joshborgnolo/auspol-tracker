@@ -2809,6 +2809,36 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
     { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}) });
 }
+/* Solo single-territory readings for the ACT/NT/Tas group. Displayed on the
+   trio's view (open dots, flagged solo) and NEVER pooled, lined or counted
+   in any aggregate: a cut of one territory is not the trio's people. Two
+   sources, every figure the house's own print in DEMO_KEYS order:
+   - the crosstabs' Tas/ACT/NT state cuts (Roy Morgan's Tas-only cut;
+     DemosAU (MRP)'s three rows), from the same demographics.json dims the
+     common groups are harmonised from;
+   - a no-aggregate "(Tas)" state house (today EMRS): the whole poll IS the
+     territory, so the row's own primaries are the printed reading – the
+     suffix is parsed, so any future "(ACT)"/"(NT)" house flows in the same
+     way. */
+const SOLO_TERMS = ["Tas", "ACT", "NT"];
+const SOLO_BY_POLL = new Map();
+for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
+  const st = w.dims && w.dims.state;
+  const cuts = st ? SOLO_TERMS.filter((t) => st[t] && Object.keys(st[t]).length) : [];
+  if (!cuts.length) continue;
+  const p = demoPollOf(w);
+  if (!p) continue;
+  const list = cuts.map((t) => ({ terr: t, ...Object.fromEntries(DEMO_KEYS.map((k) => [k, st[t][k] == null ? null : +st[t][k]])) }));
+  SOLO_BY_POLL.set(p.date + "|" + p.pollster, (SOLO_BY_POLL.get(p.date + "|" + p.pollster) || []).concat(list));
+}
+for (const p of POLLS) {
+  const m = /\((Tas|ACT|NT)\)$/.exec(p.pollster || "");
+  if (!m || !noAggPoll(p) || p.alp == null) continue;
+  // whole: the whole poll IS the territory – drawn at its raw printed share
+  SOLO_BY_POLL.set(p.date + "|" + p.pollster,
+    [{ terr: m[1], whole: true, alp: p.alp ?? null, lnp: p.lnp ?? null, onp: p.onp ?? null, grn: p.grn ?? null,
+       oth: p.ind != null || p.oth != null ? (p.ind ?? 0) + (p.oth ?? 0) : null }]);
+}
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
 // where a house publishes the fieldwork dates a pending row is waiting for
@@ -3003,6 +3033,8 @@ const individualPolls = POLLS.map((p) => {
     ...(p.seats ? { seats: p.seats } : {}),
     // the vote by group and the vote-switching rates, for the CSV export
     ...(DEMO_BY_POLL.has(p.date + "|" + p.pollster) ? { grp: DEMO_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
+    // single-territory readings for the ACT/NT/Tas view (§5c; display-only)
+    ...(SOLO_BY_POLL.has(p.date + "|" + p.pollster) ? { solo: SOLO_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
     ...(VS_BY_POLL.has(p.date + "|" + p.pollster) ? { sw: VS_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
@@ -3570,7 +3602,9 @@ const primaryNow = primaryNowAt(refNow);
   summed (Liberal + The Nationals; + Liberal National Party of Queensland in
   Qld, + Country Liberal in the NT). Non-NSW/Vic/Qld = national less
   NSW+Vic+Qld (the panel's non-eastern-mainland group pools SA/WA/Tas/ACT/NT;
-  SA's and WA's marks come from their own state pages). x is the
+  SA's and WA's marks come from their own state pages); the trio's is the
+  TAS, ACT and NT pages vote-summed (763,586 formal votes; One Nation ran no
+  ACT lower-house candidates). x is the
   election's mid-month mark, as aggPrimary's election row carries. Nat is
   the national share, so the All-voters line can be led back to its own
   election point in the guide tip (no ring - it draws no panel of its
@@ -3585,6 +3619,7 @@ const DEMO_STATE_ELECTION = {
     "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
     "SA": [38.31, 28.45, 6.15, 13.42, 13.68],
     "WA": [35.59, 31.55, 7.61, 11.97, 13.28],
+    "ACT/NT/Tas": [40.95, 24.52, 3.97, 12.49, 18.07],
     "Non-NSW/Vic/Qld": [37.64, 29.01, 6.34, 12.55, 14.45],
   },
 };

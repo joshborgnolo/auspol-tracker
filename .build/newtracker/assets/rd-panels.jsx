@@ -227,15 +227,37 @@ function RdPrimary({ rangeId, setRangeId }) {
   const gi = G && D.demoGroups ? D.demoGroups.indexOf(sel.label) : -1;
   const aggByYm = React.useMemo(() => (!G ? null
     : new Map(D.aggPrimary.filter((d) => !d.election).map((d) => [d.ym, d]))), [G]);
+  /* the trio view's open rings: readings of Tasmania, the ACT or the NT
+     alone - Roy Morgan's Tas cut, DemosAU (MRP)'s three rows, and whole-
+     territory polls (EMRS) - drawn beside the trio's own dots for
+     comparison and NEVER pooled into its line, months or figures. The
+     wave's printed territory share rides the ring as `gv`; the tip says
+     whose reading it is */
+  const soloDotsOf = (q) => (G && sel.label === "ACT/NT/Tas" && q.solo ? q.solo.flatMap((e) => parts.map((p) => {
+    const sv = e[p.id];
+    if (sv == null) return null;
+    /* a whole-territory poll (EMRS) asks no all-voters counterpart, so its
+       ring sits at the raw printed share; a cut inside a national wave
+       lifts off that wave's own all-voters figure, as a trio dot does */
+    let y;
+    if (e.whole) y = sv;
+    else {
+      const M = aggByYm && aggByYm.get(q.ym);
+      if (!M || !q.p || q.p[p.id] == null) return null;
+      y = M[p.id] + (sv - q.p[p.id]);
+    }
+    return { x: q.x, y: +y.toFixed(2), gv: sv, color: p.color, label: p.name, meta: q, party: p.id, hollow: true,
+             sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "") };
+  }).filter(Boolean)) : []);
   const scatter = React.useMemo(() => D.individualPolls
     .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
     .flatMap((q) => {
       if (!G) return parts.filter((p) => q.p && q.p[p.id] != null)
         .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }));
       const gv = q.grp && q.grp.v && q.grp.v[gi], tt = q.grp && q.grp.t;
-      if (!gv || !tt) return [];
+      if (!gv || !tt) return soloDotsOf(q);
       const M = aggByYm && aggByYm.get(q.ym);
-      if (!M) return [];
+      if (!M) return soloDotsOf(q);
       return parts.map((p) => {
         const i = GRPV_KEYS.indexOf(p.id);
         // a party the wave never printed (an Others fold) draws no dot
@@ -245,7 +267,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         const subn = q.grp.n && q.grp.n[gi];
         return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: q, party: p.id,
                  sub: subn ? "n ≈ " + subn.toLocaleString() : undefined };
-      }).filter(Boolean);
+      }).filter(Boolean).concat(soloDotsOf(q));
     }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
   const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
@@ -487,6 +509,7 @@ function RdPrimary({ rangeId, setRangeId }) {
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
                     : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals."
+                      + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "")
                     : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
@@ -1601,7 +1624,8 @@ const RD_DEMO_SHORT = {
   "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s", "Gen Z": "Gen Z", Millennials: "Millennials",
   "Gen X": "Gen X", Boomers: "Boomers", Men: "men", Women: "women",
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters", University: "university graduates",
-  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", SA: "South Australians", WA: "West Australians", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
+  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", SA: "South Australians", WA: "West Australians",
+  "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
@@ -1887,8 +1911,8 @@ const RD_TREND_SKEW = {
   onp: "Its older, regional skew is no stronger or weaker now than it was then.",
   grn: "Its younger, urban skew remains.",
 };
-const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "Non-NSW/Vic/Qld": "the non-eastern-mainland states" };
-const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"];
+const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "ACT/NT/Tas": "Tasmania, the ACT and the NT", "Non-NSW/Vic/Qld": "the non-eastern-mainland states" };
+const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
 const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
 const RD_TREND_LOC = {
   "Inner metro": { adj: "inner-metro", ref: "the inner metros" },
@@ -1906,6 +1930,8 @@ const RD_TREND_GROUP = {
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
+/* a solo single-territory reading's territory, in words (gen-data §5c) */
+const RD_SOLO_NAME = { Tas: "Tasmania", ACT: "the ACT", NT: "the NT" };
 /* groups in order as one party colour's ramp, pale to dark (dark mode runs
    the other way, so the last group keeps the most contrast in both) */
 const rdRamp = (party, n, i) => (n < 2 ? "var(--" + party + ")" : "var(--ramp-" + party + "-" + (1 + Math.round((i * 3) / (n - 1))) + ")");
@@ -2370,10 +2396,32 @@ function RdDemographics({ rangeId = "all" }) {
         return v && v[gpi] != null && sum > 0 && q.grp.t[gpi] > 0 && base != null
           ? { x: q.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: q } : null;
       }).filter(Boolean));
-      return { st, drawn, allPts, dots, x0, x1, span: x1 - x0 };
+      /* the trio panel's open rings: single-territory readings (Roy Morgan's
+         Tas cut, DemosAU (MRP)'s three rows, EMRS's whole-territory polls),
+         for comparison only - never pooled into the lines or the dot cloud */
+      const solo = st.id === "state"
+        ? D.individualPolls.filter((q) => q.solo && q.x >= x0 && q.x <= x1).flatMap((q) => q.solo.flatMap((e) => {
+            const sv = e[pty];
+            if (sv == null) return [];
+            const sum = DEMO_GRP_PARTY.reduce((t2, k) => t2 + (e[k] || 0), 0);
+            if (!sum) return [];
+            const v = (100 * sv) / sum;
+            /* a whole-territory poll (EMRS) asks no all-voters counterpart,
+               so its ring sits at the raw share; a cut inside a national
+               wave lifts off that wave's own print, exactly as a dot does */
+            const tip = { x: q.x, gv: sv, label: RD_SOLO_NAME[e.terr] + " only", meta: q, hollow: true,
+                          sub: "not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "") };
+            if (e.whole) return [{ ...tip, y: +v.toFixed(1) }];
+            const base = allAt.get(q.ym);
+            const t = q.grp && q.grp.t ? q.grp.t[gpi] : null;
+            if (base == null || t == null) return [];
+            return [{ ...tip, y: +(base + (v - t)).toFixed(1) }];
+          }))
+        : [];
+      return { st, drawn, allPts, dots, solo, x0, x1, span: x1 - x0 };
     }).filter(Boolean);
   };
-  const yMaxOf = (cs) => Math.max(10, Math.ceil(Math.max(...cs.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y + (p.ci || 0))).concat(c.dots.map((d) => d.y)))) / 10) * 10);
+  const yMaxOf = (cs) => Math.max(10, Math.ceil(Math.max(...cs.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y + (p.ci || 0))).concat(c.dots.map((d) => d.y)).concat((c.solo || []).map((d) => d.y)))) / 10) * 10);
   const chartsCached = (pty) => {
     const k = pty + "|" + tab.id + "|" + rangeLo + "|" + rangeHi;
     return chartCache.current[k] || (chartCache.current[k] = chartsFor(pty));
@@ -2447,6 +2495,9 @@ function RdDemographics({ rangeId = "all" }) {
     );
     if (panelled(c)) {
       const mine = (arr, label) => (arr || []).filter((d) => d.label === label).map((d) => ({ ...d, color: pColorNow }));
+      /* open rings on the trio's own panel only - the label filter in
+         mine() must never sweep them up as a group's dot */
+      const mineTrioSolo = (c.solo || []).map((d) => ({ ...d, color: pColorNow }));
       /* each panel carries its state's 2025 election result as the site's
          usual ring, before the first monthly point; the spine picks the
          mark up so the May 2025 hover and its ring swatch exist (rd-ring,
@@ -2497,12 +2548,14 @@ function RdDemographics({ rangeId = "all" }) {
                     spine={spine}
                     marks={seY != null ? [{ x: se.x, y: seY, color: pColorNow }] : []}
                     ringAtX={seY != null ? se.x : null}
-                    scatter={mine(cross ? cross.scatter : c.dots, g.label)} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
+                    scatter={mine(cross ? cross.scatter : c.dots, g.label).concat(g.label === "ACT/NT/Tas" ? mineTrioSolo : [])} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
                     scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
                     fade={A ? t : 1} pollFacet="demographics" pollSplit={tab.id}
                     tooltipTitle={(i) => (seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "")}
                     extraRows={seY != null ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciUnshifted(i - 1))) : ciUnshifted}
-                    fmt={(v) => v.toFixed(1)}
+                    /* as the primary chart's: an open ring is drawn at the
+                       all-voters-lifted y but tips its printed share */
+                    fmt={(v, pt) => (pt && pt.gv != null ? pt.gv : v).toFixed(1)}
                     copy={{ title: rdCap(pVote) + ": " + name, sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
                             legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}
                   />

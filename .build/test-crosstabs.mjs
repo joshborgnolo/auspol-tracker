@@ -444,7 +444,9 @@ const merged = rbH.education["Year 12 or less"];
 for (const [k, want] of Object.entries({ alp: 27.61, lnp: 23.17, onp: 26.36, grn: 17.03, oth: 5.83 }))
   assert.ok(Math.abs(merged[k] - want) < 0.01, `RedBridge school rows merge 39:61 (${k} ${merged[k]})`);
 // YouGov's SA, WA and ACT/NT/Tas are the Non-NSW/Vic/Qld bucket at their 2025 vote shares; all three or none –
-// and SA and WA also join as common groups of their own (Roy Morgan cuts them too, no ACT/NT/Tas)
+// SA and WA also join as common groups of their own (Roy Morgan cuts them too), and the printed trio is itself
+// a common group (YouGov as printed; DemosAU (MRP)'s Tas/ACT/NT merged MRP_TRIO-wise) – a Tas-alone or ACT-alone
+// cut (Roy Morgan) never joins it
 const ygPlace = harmonize({ pollster: "YouGov", dims: {
   state: { NSW: sh(29, 19, 26, 12, 15), SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8), "ACT/NT/Tas": sh(36, 21, 21, 8, 14) },
   location: { "Inner metro": sh(36, 24, 15, 12, 13), Rural: sh(18, 21, 35, 12, 15) },
@@ -453,12 +455,26 @@ const ygPlace = harmonize({ pollster: "YouGov", dims: {
 const rest = ygPlace.state["Non-NSW/Vic/Qld"];
 for (const [k, want] of Object.entries({ alp: 35.809, lnp: 18.732, onp: 27.156, grn: 9.637, oth: 8.666 }))
   assert.ok(Math.abs(rest[k] - want) < 0.01, `YouGov's three smaller regions merge at 2025 vote shares (${k} ${rest[k]})`);
-assert.deepEqual(Object.keys(ygPlace.state), ["NSW", "SA", "WA", "Non-NSW/Vic/Qld"]);
+assert.deepEqual(Object.keys(ygPlace.state), ["NSW", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"]);
 assert.deepEqual(ygPlace.state.SA, sh(34, 14, 40, 6, 6), "SA passes through as its own group");
 assert.deepEqual(ygPlace.state.WA, sh(37, 21, 21, 13, 8), "WA passes through as its own group");
+assert.deepEqual(ygPlace.state["ACT/NT/Tas"], sh(36, 21, 21, 8, 14), "YouGov's printed trio passes through as its own group");
+// DemosAU (MRP): the trio merges Tas, ACT and NT at their shares of the trio's
+// own 2025 formal vote (Tas 0.481, ACT 0.3805, NT 0.1385) – all three or none
+const mrpTrio = harmonize({ pollster: "DemosAU (MRP)", dims: {
+  state: { Tas: sh(30, 25, 20, 10, 15), ACT: sh(40, 20, 10, 20, 10), NT: sh(35, 30, 25, 5, 5) },
+} });
+const trio = mrpTrio.state["ACT/NT/Tas"];
+assert.equal(Object.keys(mrpTrio.state).length, 1, "the merged trio is the MRP wave's only state group");
+for (const [k, want] of Object.entries({ alp: 34.4975, lnp: 23.79, onp: 16.8875, grn: 13.1125, oth: 11.7125 }))
+  assert.ok(Math.abs(trio[k] - want) < 0.01, `MRP's Tas/ACT/NT merge at the trio's 2025 vote split (${k} ${trio[k]})`);
+assert.equal(harmonize({ pollster: "DemosAU (MRP)", dims: { state: { Tas: sh(30, 25, 20, 10, 15), ACT: sh(40, 20, 10, 20, 10) } } }).state,
+  undefined, "an MRP wave missing a territory joins no state group");
 const morganLike = harmonize({ dims: { state: { SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8) } } });
 assert.deepEqual(Object.keys(morganLike.state), ["SA", "WA"],
   "a wave missing one of the three smaller regions doesn't join the Non-NSW/Vic/Qld bucket, but SA and WA still join on their own (Roy Morgan)");
+const morganTas = harmonize({ pollster: "Roy Morgan", dims: { state: { Tas: sh(34, 30, 20, 10, 6), NSW: sh(29, 20, 25, 12, 14) } } });
+assert.deepEqual(Object.keys(morganTas.state), ["NSW"], "Roy Morgan's Tas-alone cut never joins the trio (it renders as a solo point instead)");
 assert.deepEqual(Object.keys(ygPlace.location), ["Inner metro", "Rural"]);
 assert.deepEqual(ygPlace.housing.Renting, sh(29, 8, 27, 21, 16));
 // DemosAU's Regional or rural is two common groups at once, and joins at neither

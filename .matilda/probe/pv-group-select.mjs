@@ -9,7 +9,7 @@
           on phones
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Rural /
-          Non-NSW/Vic/Qld) drive figures, bracket, head/dek/meta, y-domain,
+          ACT/NT/Tas / Non-NSW/Vic/Qld) drive figures, bracket, head/dek/meta, y-domain,
           election sub-lines — figures asserted against window.AUSPOL itself.
           Every selection's x axis carries the Election landmark (2026-10-08:
           was "May 2025" for groups with no own election row); a cut group
@@ -184,7 +184,7 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
   ok("select exists", !!s.sel);
   if (!s.sel) continue;
   ok(`selected text is "All voters"`, s.sel.text === "All voters", s.sel.text);
-  ok("28 options (All voters + 27 groups)", s.sel.optCount === 28, s.sel.optCount);
+  ok("29 options (All voters + 28 groups)", s.sel.optCount === 29, s.sel.optCount);
   ok("8 optgroups", s.sel.groupCount === 8, s.sel.groupLabels.join(" | "));
   const g = s.geom;
   if (W > 640) {
@@ -226,9 +226,11 @@ const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "Ju
 const SHORT = {
   Men: "men", "18–34": "18–34s", "55+": "over-55s", "Gen Z": "Gen Z", University: "university graduates",
   NSW: "NSW voters", Rural: "rural voters", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
+  "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
-                           ["NSW", { chg: true }], ["University", {}], ["Rural", { tallTicks: true, chg: true }], ["Non-NSW/Vic/Qld", { chg: true }]]) {
+                           ["NSW", { chg: true }], ["University", {}], ["Rural", { tallTicks: true, chg: true }],
+                           ["ACT/NT/Tas", { chg: true }], ["Non-NSW/Vic/Qld", { chg: true }]]) {
   const exp = await expectedFor(label);
   const s = await collect(1280, 900, label);
   console.log(`--- ${label}`);
@@ -447,7 +449,7 @@ console.log("== Space walks the group menu ==");
   const curVal = () => page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").value);
   const order = await page.evaluate(() =>
     [...document.querySelectorAll("#primary-vote select.rd-pv-sel option")].map((o) => o.value));
-  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 28,
+  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 29,
      order.slice(0, 4).join("|") + " | n=" + order.length);
 
   /* park where #primary-vote alone holds the key: below the hero's whole
@@ -478,7 +480,7 @@ console.log("== Space walks the group menu ==");
     seen.push(await curVal());
     if (seen[i] !== order[i] && firstGap < 0) firstGap = i;
   }
-  ok("each Space steps to the menu's next option (all 27 groups)", JSON.stringify(seen) === JSON.stringify(order),
+  ok("each Space steps to the menu's next option (all 28 groups)", JSON.stringify(seen) === JSON.stringify(order),
      firstGap >= 0 ? `press ${firstGap}: got ${JSON.stringify(seen[firstGap])}, want ${JSON.stringify(order[firstGap])}` : seen.slice(0, 4).join(" -> "));
   await page.keyboard.press("Space");
   await sleep(150);
