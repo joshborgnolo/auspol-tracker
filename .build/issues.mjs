@@ -331,7 +331,9 @@ for (const f of fs.existsSync(daDir) ? fs.readdirSync(daDir).filter((x) => x.end
    cost of living", asked every (bi-monthly) wave. Shares come from
    extract-secnewgate.mjs's bank of the cached reports (data/sec-issues.json),
    the wave's dates, n and link from its direction row in data/polls.json
-   (the house asks no voting intention). One Nation and the Greens became
+   (the house asks no voting intention; the direction row's url is the
+   report PDF – its old article page 301s there). One Nation and the
+   Greens became
    options at the May 2026 wave; only those waves pool – the waves before
    aren't on the three-party answer set the ownership shares are pooled on. */
 const SEC = "SEC Newgate";

@@ -29,14 +29,14 @@ assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.date, r.sidecar.d
   [27, "2026-09-14", "2026-09-08", 1659],
 ], "the sidecars the extractor wrote");
 assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.url, r.sidecar.published]), [
-  [21, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2025/", "2025-07-29T16:58"],
-  [22, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-september-2025/", "2025-09-24T11:16"],
-  [23, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-november-2025/", "2025-11-10T17:24"],
-  [24, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-february-2026-1/", "2026-02-17T16:51"],
-  [25, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-may-2026-2/", "2026-05-27T13:03"],
-  [26, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2026/", "2026-07-21T16:50"],
-  [27, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-september-2026-report/", "2026-09-22T15:29"],
-], "the sidecar release links and publish stamps (site-local times)");
+  [21, "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf", "2025-07-29T16:58"],
+  [22, "https://www.secnewgate.com.au/wp-content/uploads/2025/09/SEC-Newgate-Mood-of-the-Nation-Report-September-2025.pdf", "2025-09-24T11:16"],
+  [23, "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf", "2025-11-10T17:24"],
+  [24, "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf", "2026-02-17T16:51"],
+  [25, "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf", "2026-05-27T13:03"],
+  [26, "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf", "2026-07-21T16:50"],
+  [27, "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf", "2026-09-22T15:29"],
+], "the sidecar release links (the report PDFs their posts 301 to) and publish stamps (site-local times)");
 assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.method]), [
   [21, "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf"],
   [22, "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf"],
@@ -81,10 +81,10 @@ assert.deepEqual(picked, [{
   ym: "2026-09",
   urls: [{
     url: "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
-    page: "https://www.secnewgate.com.au/report-september-2026/",
+    page: "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
     published: "2026-09-22T15:29",
   }],
-}], "the clean report only, with its article page and upload time: embargoed twin set aside, specials and Queensland out, pre-2025-07 out, non-PDFs out");
+}], "the clean report only, its PDF as the release link (the report posts 301 to it) and its upload time, the media item's page link ignored: embargoed twin set aside, specials and Queensland out, pre-2025-07 out, non-PDFs out");
 
 const onlyEmbargoed = pickReports([
   item("SEC Newgate Mood of the Nation Report -August-25- EMBARGOED",
@@ -93,8 +93,9 @@ const onlyEmbargoed = pickReports([
 assert.equal(onlyEmbargoed.length, 1, "an embargoed upload is used when it is the only one");
 assert.deepEqual(onlyEmbargoed[0].urls[0],
   { url: "https://www.secnewgate.com.au/wp-content/uploads/2025/08/Mood-of-the-Nation-Report-August-2025-EMBARGOED.pdf",
-    page: null, published: null },
-  "an item with no link/date still yields nulls, not a crash");
+    page: "https://www.secnewgate.com.au/wp-content/uploads/2025/08/Mood-of-the-Nation-Report-August-2025-EMBARGOED.pdf",
+    published: null },
+  "an item with no date still yields a null published stamp, not a crash");
 
 // ---- methodologyOf, directionPageOf, directionChartOf against the cache ---------
 for (const { slug, sidecar } of reports) {

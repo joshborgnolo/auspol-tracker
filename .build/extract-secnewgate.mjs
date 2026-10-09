@@ -33,7 +33,9 @@
    { date = fieldwork END, dateStart, pollster: "SEC Newgate",
      right, wrong, unsure = 100 − right − wrong,
      sample = the wave's n from the report's methodology block,
-     url = the report's article page, published = its upload time,
+     url = the report's PDF (the house's report pages 301 to their PDFs
+         now – check-citations 2026-10-09 – so the link is the served
+         document itself), published = its upload time,
      methodUrl = the wave's APC methodology statement }
    and the array re-sorted by date, like every house's writer. A rerun
    heals a row of the same wave within HEAL_DAYS of a prior entry, and
@@ -169,8 +171,10 @@ export function titleMonthOf(title) {
    month: "Mood of the Nation … report … .pdf", the Queensland edition
    and the one-off specials set aside, a non-embargoed upload preferred over
    its "-Embargoed" twin, and whichever variant is then first. Each
-   candidate carries the item's article page and upload time (site-local)
-   for the wave's release link and publish stamp. */
+   candidate carries the report PDF as its release link and its upload time
+   (site-local) for the publish stamp: the house's report posts 301 straight
+   to the PDF now (check-citations 2026-10-09), so the served document
+   itself is the link. */
 export function pickReports(items) {
   const byMonth = new Map();
   for (const it of items) {
@@ -182,7 +186,7 @@ export function pickReports(items) {
     const ym = titleMonthOf(title);
     if (!ym || ym < SEC_FIRST) continue;
     const embargo = /embargo/i.test(title) || /embargo/i.test(url);
-    const page = it.link || null;
+    const page = url || it.link || null;
     const published = it.date ? String(it.date).slice(0, 16) : null;
     const g = byMonth.get(ym) || [];
     g.push({ url, embargo, page, published });
