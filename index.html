@@ -3259,20 +3259,19 @@ body.rd .rd-cal-sec + .rd-cal-sec { margin-top: 14px; }
 body.rd .rd-cal-m { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-cal-list { list-style: none; margin: 2px 0 0; padding: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
 body.rd .rd-cal-list li { display: flex; align-items: baseline; gap: 14px; padding: 3px 0; }
-body.rd .rd-cal-d { flex: 0 0 auto; min-width: 86px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-cal-d { flex: 0 0 auto; min-width: 96px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
 body.rd .rd-cal-w a { color: inherit; text-decoration: none; }
 body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
-body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--ink-3); }
 body.rd .rd-cal-track::before { content: "("; }
 body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
-  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 98px; }
+  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 108px; }
 }
 body.rd .rd-xf { position: relative; }
 body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .13s ease-out both; }
@@ -75997,7 +75996,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "releaseDowN": 0,
     "declared": [],
     "waves": 7,
-    "site": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation",
+    "site": "https://www.secnewgate.com.au/news-views/?_category=research",
     "skipped": [],
     "skippedMonths": [],
     "recent": [{
@@ -104608,7 +104607,7 @@ const RD_PL_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
 const RD_STALE_DAYS = 42;
 const RD_CAL_DAYS = 62;
 const RD_CAL_TRACK = {
-  direction: "Direction tracker",
+  direction: "Mood of the Nation",
   issues: "Issues Monitor"
 };
 function rdPollRow(p) {
@@ -105488,7 +105487,7 @@ function RdPolls({
   const calSpanTxt = (a, b) => {
     const A = new Date(a),
       B = new Date(b);
-    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b);
+    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + "–" + dm(b);
   };
   const calDateTxt = it => it.win ? calSpanTxt(it.at, it.close) : it.irr ? "About " + dm(it.at) : WDs(it.at) + " " + new Date(it.at).getUTCDate();
   const calOverTxt = r => r.loose && !irregular(r) ? calSpanTxt(r.release - r.spread * DAY_MS, r.release + r.spread * DAY_MS) : irregular(r) ? "About " + dm(r.release) : wdm(r.release);
@@ -105725,7 +105724,7 @@ function RdPolls({
     className: "rd-cal-q"
   }, it.q))))))), React.createElement("p", {
     className: "rd-note"
-  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added. The Direction-tracker and Issues-Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.")));
+  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.")));
 }
 Object.assign(window, {
   RdPolls

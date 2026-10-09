@@ -19,9 +19,9 @@ const RD_STALE_DAYS = 42;
    projection the Next column reads, horizon widened to two months by name */
 const RD_CAL_DAYS = 62;
 /* the calendar's scope is TRACKED releases, not just polls (user call
-   2026-10-09): gen-data's `tracked` cadence rows join its list, labelled
-   with what they monitor - every other projection consumer stays poll-only */
-const RD_CAL_TRACK = { direction: "Direction tracker", issues: "Issues Monitor" };
+   2026-10-09): gen-data's `tracked` cadence rows join its list, named for
+   the monitor they schedule - every other projection consumer is poll-only */
+const RD_CAL_TRACK = { direction: "Mood of the Nation", issues: "Issues Monitor" };
 
 /* the table's shape of a poll, for a pollster with a projection but no row
    in the Latest table (one that has gone quiet) */
@@ -678,7 +678,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
      window keeps both ends, an irregular house keeps its "about" */
   const calSpanTxt = (a, b) => {
     const A = new Date(a), B = new Date(b);
-    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b);
+    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + "–" + dm(b);
   };
   const calDateTxt = (it) => it.win ? calSpanTxt(it.at, it.close)
     : it.irr ? "About " + dm(it.at)
@@ -811,7 +811,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
               </div>
             ))}
           </div>
-          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Direction-tracker and Issues-Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.</p>
+          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.</p>
         </details>
       )}
     </RdSec>

@@ -303,7 +303,9 @@ body.rd .rd-cal-sec + .rd-cal-sec { margin-top: 14px; }
 body.rd .rd-cal-m { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-cal-list { list-style: none; margin: 2px 0 0; padding: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
 body.rd .rd-cal-list li { display: flex; align-items: baseline; gap: 14px; padding: 3px 0; }
-body.rd .rd-cal-d { flex: 0 0 auto; min-width: 86px; color: var(--ink-3); white-space: nowrap; }
+/* one fixed column so every house name starts on the same vertical line;
+   96px is the widest date text (a cross-month span, "18 Sep–12 Oct") */
+body.rd .rd-cal-d { flex: 0 0 auto; min-width: 96px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
 /* a house name links to its where-it-lands-first page: no standing
    underline, the ↗ plink-mark carries the affordance (as rd-pl-main a) */
@@ -312,15 +314,14 @@ body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
-/* a tracked-release row's marker: not a poll - quiet text, no chip housing,
-   so it reads as a qualification of the name rather than a status */
-body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+/* a tracked-release row's marker: not a poll - quiet sentence-case text in
+   parens, so it reads as a qualification of the name rather than a status */
+body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--ink-3); }
 body.rd .rd-cal-track::before { content: "("; }
 body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
-  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 98px; }
+  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 108px; }
 }
 /* RdCrossfade: the view being left lies over the one arriving and fades */
 body.rd .rd-xf { position: relative; }

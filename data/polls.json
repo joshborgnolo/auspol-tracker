@@ -89,8 +89,8 @@
     },
     "SEC Newgate": {
       "tracked": true,
-      "note": "Direction-only house (Mood of the Nation, no voting intention), so it never files a poll row; the release calendar carries it as a tracked release from its direction[] wave timings. Site is the series' own page, which is also every wave's url.",
-      "site": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation"
+      "note": "Direction-only house (Mood of the Nation, no voting intention), so it never files a poll row; the release calendar carries it as a tracked release from its direction[] wave timings. Site is the research feed where each Mood of the Nation release posts.",
+      "site": "https://www.secnewgate.com.au/news-views/?_category=research"
     },
     "Ipsos": {
       "tracked": true,
