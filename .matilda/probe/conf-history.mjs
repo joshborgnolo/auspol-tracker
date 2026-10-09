@@ -50,8 +50,10 @@ const readState = () => page.evaluate(() => {
     boundary: t.includes("hit an error"),
     histLabel: t.includes("Show complete history"),
     backLabel: t.includes("Back to this term"),
-    tick1990: t.includes("1990"),
-    drawTerm: t.includes("Draw a past term"),
+    /* the draw-a-term menu's options carry year text ("1990" is a term
+       on file), so the calendar ruler is asked for its OWN tick text */
+    tick1990: [...sec.querySelectorAll("svg text")].some((el) => el.textContent.trim() === "1990"),
+    drawTerm: !!sec.querySelector("select.rd-confidence-sel"),
     histKey: t.includes("Monthly history back to 1973"),
   };
 });
@@ -120,7 +122,7 @@ check("back to term", s2, { found: true, boundary: false, histLabel: true, backL
    same kernel the monthly gauges get — a curve path, not straight
    segments) and DOTTED in its house's colour; the consumer twin is the
    gold Westpac–MI read of the same year. The business view stays
-   single — the term board carries Roy Morgan alone, no NAB twin. */
+   single — the term menu draws Roy Morgan alone, no NAB twin. */
 const seriesInfo = (id) => page.evaluate((sid) => {
   const sec = document.getElementById("confidence");
   const p = [...sec.querySelectorAll("svg path")].find((el) =>
@@ -128,6 +130,17 @@ const seriesInfo = (id) => page.evaluate((sid) => {
   return p ? { stroke: p.getAttribute("stroke"), dash: p.getAttribute("stroke-dasharray"),
                curve: /c/i.test(p.getAttribute("d") || "") } : null;
 }, id);
+/* the draw-a-term menu is a native select (the subpopulation menu's
+   control and style): set its value and fire its change to lift a term */
+const pickTerm = (yr) => page.evaluate((y) => {
+  const sec = document.getElementById("confidence");
+  const sel = sec && [...sec.querySelectorAll("select.rd-confidence-sel")]
+    .find((el) => !el.closest(".rd-crossfade-out"));
+  if (!sel || ![...sel.options].some((o) => o.value === y)) return false;
+  sel.value = y;
+  sel.dispatchEvent(new Event("change", { bubbles: true }));
+  return true;
+}, String(yr));
 const clearGhost = async () => {
   for (let i = 0; i < 20; i++) {
     if (await page.evaluate(() => !document.querySelector(".rd-crossfade-out"))) return;
@@ -136,9 +149,7 @@ const clearGhost = async () => {
   fails.push("crossfade ghost never cleared");
 };
 if (s2.found && s2.drawTerm) {
-  if (!await clickButtonMatching(/Draw a (past )?term/)) fails.push("draw-a-term chip not found");
-  await new Promise((r) => setTimeout(r, 400));
-  if (await clickButtonMatching(/^2019$/)) {
+  if (await pickTerm(2019)) {
     await new Promise((r) => setTimeout(r, 500));
     const cm = await seriesInfo("conf-term-2019"), ct = await seriesInfo("conf-term-2019-alt");
     if (!cm) fails.push("consumer 2019: main term line missing");
@@ -155,11 +166,11 @@ if (s2.found && s2.drawTerm) {
     }
     if (cm && ct && cm.dash === "0.1 3.6" && ct.dash === "0.1 3.6" && cm.curve && ct.curve)
       console.log("consumer 2019: plum + gold smoothed curves, both dotted(" + cm.dash + ") — ok");
-  } else fails.push("2019 term button not found on the consumer board");
+  } else fails.push("consumer view: 2019 option not offered by the draw-a-term menu");
   await clickButtonMatching(/^Businesses$/);
   await clearGhost();
   await new Promise((r) => setTimeout(r, 400));
-  if (await clickButtonMatching(/^2019$/)) {
+  if (await pickTerm(2019)) {
     await new Promise((r) => setTimeout(r, 500));
     const bm = await seriesInfo("conf-term-2019"), bt = await seriesInfo("conf-term-2019-alt");
     if (!bm) fails.push("business 2019: main term line missing");
@@ -168,9 +179,9 @@ if (s2.found && s2.drawTerm) {
       if (bm.dash !== "0.1 3.6") fails.push("business 2019: main line not dotted: dash=" + bm.dash);
       if (!bm.curve) fails.push("business 2019: main line not a smoothed curve");
     }
-    if (bt) fails.push("business 2019: unexpected twin (the business board draws no twin)");
+    if (bt) fails.push("business 2019: unexpected twin (the business view draws no twin)");
     if (bm && !bt && bm.dash === "0.1 3.6" && bm.curve) console.log("business 2019: single dotted smoothed plum term line, no twin — ok");
-  } else fails.push("2019 term button not found on the business board");
+  } else fails.push("business view: 2019 option not offered by the draw-a-term menu");
 }
 
 if (errors.length) fails.push("js errors: " + errors.join(" ;; ").slice(0, 400));

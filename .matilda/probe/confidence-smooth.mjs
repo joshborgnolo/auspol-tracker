@@ -88,8 +88,8 @@ const LANES = [
 ];
 const VIEW_TAB = { consumer: "Consumers", business: "Businesses" };
 const VIEW_HOUSES = { consumer: ["ANZ–Roy Morgan", "Westpac–MI"], business: ["Roy Morgan", "NAB"] };
-const VIEW_DASHKEY = {
-  consumer: "The Westpac–MI monthly read of the same household mood",
+const VIEW_ALTKEY = {
+  consumer: "The Westpac–MI monthly read of the same household confidence",
   business: "NAB’s net-balance read, drawn 100 points up",
 };
 /* the per-view card note (rd-panels.jsx vc.title / vc.note) */
@@ -520,7 +520,7 @@ async function checkCopy(viewKey) {
   const key = await texts("#confidence .rd-xf-now .rd-ckey .rd-key-item");
   check(key.some((t) => t === "One release, as printed") && key.some((t) => t === "Smoothed trend of the releases"),
     "key reads dot = one release as printed, line = smoothed trend");
-  check(key.some((t) => t === VIEW_DASHKEY[viewKey]), "key names the view's dashed twin gauge");
+  check(key.some((t) => t === VIEW_ALTKEY[viewKey]), "key names the view's twin gauge");
   const how = (await texts("#confidence details.view-how")).join(" ");
   check((await texts("#confidence details.view-how summary"))[0] === "How to read this chart", "HowTo summary standard");
   check(how.includes("split into two views") && how.includes("switched by the tabs"), "HowTo says the gauges split into two tab-switched views");

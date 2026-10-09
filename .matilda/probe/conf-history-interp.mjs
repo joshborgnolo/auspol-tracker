@@ -1,6 +1,9 @@
-/* Pins two confidence-panel fixes (2026-10-08):
-   A. The "Draw a past term" board closes on pointerdown outside its .rd-cc
-      wrapper, and the chip still toggles it open/shut (useDismissOutside).
+/* Pins two confidence-panel contracts:
+   A. The "Draw a past term" menu is a native select styled with the
+      primary-vote subpopulation menu's rules (shipped 2026-10-09,
+      replacing the chip + board): a "Draw a past term" label plus one
+      year per term on file; a pick draws the line (option marked drawn,
+      pills row names it, "Clear lines" joins to return them all).
    B. interpHover - the history-view guide tooltip carries EVERY in-range lane
       row continuously (deep quarterly lane and monthly lane interpolated
       between their own prints) instead of dropping rows on months a lane does
@@ -39,43 +42,49 @@ await page.evaluate(() => document.getElementById("confidence").scrollIntoView()
 let fails = 0;
 const ok = (cond, label) => { console.log(`${cond ? "  ok" : "FAIL"} ${label}`); if (!cond) fails++; };
 
-/* ---- A: Draw-a-term board outside-dismiss (term mode, the default) ---- */
-const clickChip = () => page.evaluate(() => {
+/* ---- A: the draw-a-term menu is a native select (the subpopulation
+   menu's control and style): label + one year option per term on file;
+   picking a year draws its line, and "Clear lines" empties the pills ---- */
+const menu = () => page.evaluate(() => {
   const sec = document.getElementById("confidence");
-  const b = [...sec.querySelectorAll("button")].find((el) => /Draw a past term/i.test(el.textContent));
-  if (!b) return false;
-  b.click();
+  const sel = sec && [...sec.querySelectorAll("select.rd-confidence-sel")]
+    .find((el) => !el.closest(".rd-crossfade-out"));
+  if (!sel) return null;
+  return { value: sel.value,
+           options: [...sel.options].map((o) => ({ v: o.value, label: o.textContent.trim() })) };
+});
+const pick = (v) => page.evaluate((val) => {
+  const sec = document.getElementById("confidence");
+  const sel = sec && [...sec.querySelectorAll("select.rd-confidence-sel")]
+    .find((el) => !el.closest(".rd-crossfade-out"));
+  if (!sel || ![...sel.options].some((o) => o.value === val)) return false;
+  sel.value = val;
+  sel.dispatchEvent(new Event("change", { bubbles: true }));
   return true;
+}, v);
+const pills = () => page.evaluate(() => {
+  const d = document.querySelector("#confidence .rd-cc-drawn");
+  return d ? d.innerText.replace(/\s+/g, " ").trim() : null;
 });
-ok(await clickChip(), "chip found and clicked");
-await new Promise((r) => setTimeout(r, 200));
-const open1 = await page.evaluate(() => {
-  const b = document.querySelector("#confidence .rd-cc-board");
-  if (!b) return false;
-  const r = b.getBoundingClientRect();
-  return r.width > 100 && r.height > 50;
-});
-ok(open1, "chip opens the draw-a-term board");
-await page.mouse.click(24, 850);                                  /* real pointerdown, far outside .rd-cc */
-await new Promise((r) => setTimeout(r, 200));
-ok(await page.evaluate(() => !document.querySelector("#confidence .rd-cc-board")),
-   "pointerdown outside closes the board");
-ok(await clickChip(), "chip re-opens it after dismissal");
-await new Promise((r) => setTimeout(r, 150));
-ok(await page.evaluate(() => !!document.querySelector("#confidence .rd-cc-board")), "board open again");
-const boardRect = await page.evaluate(() => {
-  const b = document.querySelector("#confidence .rd-cc-board");
-  const r = b.getBoundingClientRect();
-  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-});
-await page.mouse.click(boardRect.x, boardRect.y);                   /* click INSIDE the board */
-await new Promise((r) => setTimeout(r, 200));
-ok(await page.evaluate(() => !!document.querySelector("#confidence .rd-cc-board")),
-   "pointerdown inside the board leaves it open");
-ok(await clickChip(), "chip click (as toggle) shuts the open board");
-await new Promise((r) => setTimeout(r, 150));
-ok(await page.evaluate(() => !document.querySelector("#confidence .rd-cc-board")),
-   "chip toggled the open board shut");
+const m0 = await menu();
+ok(m0 && m0.value === "" && m0.options[0].label === "Draw a past term",
+   "draw-a-term select shows its label");
+ok(m0 && m0.options.filter((o) => /^\d{4}$/.test(o.v)).length >= 5,
+   `one option per past term on file (${m0 ? m0.options.length - 1 : 0})`);
+ok(m0 && !m0.options.some((o) => o.v === "clear"), "no Clear-lines entry while nothing is drawn");
+ok(await pick("2019"), "picked 2019 from the menu");
+await new Promise((r) => setTimeout(r, 400));
+const m1 = await menu();
+ok(m1 && m1.value === "", "the menu snaps back to its label after a pick");
+ok(m1 && m1.options.some((o) => o.v === "2019" && /drawn/.test(o.label)), "the 2019 option is marked drawn");
+ok(m1 && m1.options.some((o) => o.v === "clear"), "Clear lines joins the menu once a line is drawn");
+ok((await pills() || "").includes("2019"), "the drawn pills row names 2019");
+ok(await pick("clear"), "picked Clear lines");
+await new Promise((r) => setTimeout(r, 400));
+const m2 = await menu();
+ok(m2 && !m2.options.some((o) => o.v === "clear") && !m2.options.some((o) => /drawn/.test(o.label)),
+   "Clear lines returns every term to the band");
+ok((await pills()) === null, "no drawn pills after the clear");
 
 /* ---- B: history-view deep-region row completeness (interpHover) ---- */
 await page.evaluate(() => {

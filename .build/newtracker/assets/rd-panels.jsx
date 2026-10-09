@@ -4200,7 +4200,7 @@ function RdConfidence({ rangeId }) {
     for (let y = Math.ceil(histX0 / step) * step; y < D.domain.x1 - 0.9; y += step) t.push({ x: y, label: String(y) });
     return t;
   })() : null;
-  /* ---- past terms: the band, its average, and the board --------------
+  /* ---- past terms: the band, its average, and the drawn lines --------
      A straight lift of the past-cycles ribbon (its comment stands at the
      top of the file's History section): the middle half fills heavy, the
      middle 80% fills light, stretches built from fewer than three-quarters
@@ -4225,14 +4225,7 @@ function RdConfidence({ rangeId }) {
   })();
   /* which past terms are lifted out of the band, per view: a lift on the
      consumer view never reads as a phantom pill on the business one */
-  const [board, setBoard] = useState(false);
   const [liftedBy, setLiftedBy] = useState({ consumer: new Set(), business: new Set() });
-  /* the board opens under a chip but hangs like a popover: a gesture that
-     begins anywhere outside .rd-cc puts it away (the chip itself is inside
-     the ref, so it keeps working as a close toggle), the same dismiss the
-     past-cycles board gets */
-  const ccRef = React.useRef(null);
-  window.useDismissOutside(ccRef, board, () => setBoard(false));
   const lifted = liftedBy[histLane];
   const lift = (yr) => setLiftedBy((s) => {
     const n = new Set(s[histLane]);
@@ -4379,7 +4372,7 @@ function RdConfidence({ rangeId }) {
       <RdTabs swipe pin value={view} onChange={setView} options={RD_CONF_VIEWS} ariaLabel="Confidence of" className="rd-confidence-tabs" />
       <RdCrossfade k={view}>
       {(hband || deepDrawn.length > 0) && (
-      <div className="rd-cc rd-confidence-cc" ref={ccRef}>
+      <div className="rd-cc rd-confidence-cc">
         <div className="rd-confidence-draw">
           {deepDrawn.length > 0 && (
             <button type="button" className="rd-chip rd-confidence-hist" aria-pressed={histOn}
@@ -4388,7 +4381,22 @@ function RdConfidence({ rangeId }) {
             </button>
           )}
           {hband && !histOn && (
-            <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
+            /* the past-terms menu is the page's own control over a native
+               select, styled with the primary-vote subpopulation menu's
+               rules — picking a year toggles its line and the select snaps
+               back to its label: the drawn set lives on the pills row */
+            <select className="rd-confidence-sel" aria-label="Draw a past term" value=""
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === "clear") setLiftedBy((s) => ({ ...s, [histLane]: new Set() }));
+                      else if (v) lift(+v);
+                    }}>
+              <option value="">Draw a past term</option>
+              {histTerms.map((t) => (
+                <option key={t.year} value={t.year}>{t.year}{lifted.has(t.year) ? " (drawn)" : ""}</option>
+              ))}
+              {lifted.size > 0 && <option value="clear">Clear lines</option>}
+            </select>
           )}
           {!histOn && lifted.size > 0 && (
             <span className="rd-cc-drawn">
@@ -4402,32 +4410,6 @@ function RdConfidence({ rangeId }) {
             </span>
           )}
         </div>
-        {board && !histOn && (
-          <div className="rd-cc-board" role="dialog" aria-label="Past terms">
-            <div className="rd-cc-bhead">
-              <b>Past terms</b>
-              <span>{histTerms.length} on file{lifted.size ? ", " + lifted.size + " drawn as their own " + (lifted.size === 1 ? "line" : "lines") : ""}</span>
-              <span className="rd-grow"></span>
-              {lifted.size > 0 && <button type="button" className="rd-link" onClick={() => setLiftedBy((s) => ({ ...s, [histLane]: new Set() }))}>Clear lines</button>}
-              <button type="button" className="rd-iconbtn" aria-label="Close" onClick={() => setBoard(false)}>×</button>
-            </div>
-            <div className="rd-cc-grid">
-              {histTerms.map((t) => {
-                const on = lifted.has(t.year);
-                return (
-                  <span key={t.year} className={"rd-cc-term" + (on ? " drawn" : "")}>
-                    <button type="button" className="rd-cc-main" aria-pressed={on} onClick={() => lift(t.year)}
-                            title={on ? "Return " + t.year + " to the band" : "Draw " + t.year + " as its own line"}>
-                      <span className="rd-cc-rule" style={{ background: "var(--confidence-main)", opacity: on ? 1 : 0.4 }}></span>
-                      <b>{t.year}</b>
-                    </button>
-                  </span>
-                );
-              })}
-            </div>
-            <p className="rd-note">Click a term to draw its {histLane === "consumer" ? "consumer" : "business"} confidence line over the band, and again to put it back. {altTerms ? "Westpac–MI’s reading of the same term draws with it, dotted gold beside Roy Morgan’s dotted plum, wherever its series reaches back that far. " : ""}Each line is lined up on its own election month, as the band is, and runs to the next election or 36 months, whichever came first. Every drawn line is smoothed like the monthly gauges and dotted, whichever house printed it.</p>
-          </div>
-        )}
       </div>
       )}
       <div className="card rd-card rd-confidence-chart">
