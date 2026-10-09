@@ -54,7 +54,7 @@ const win = {};
 new Function("window", readFileSync(fileURLToPath(new URL(`./assets/${dataFile}`, import.meta.url)), "utf8"))(win);
 const polls = win.AUSPOL && win.AUSPOL.individualPolls;
 if (!Array.isArray(polls) || !polls.length) die("individualPolls missing from the data asset");
-const baseHouse = (h) => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
+const baseHouse = (h) => h.replace(/ \((MRP|SMS|pooled|shifts)\)$/, "");
 const liveHouses = [...new Set(polls.map((p) => baseHouse(p.pollster)))].sort();
 
 const eq = (a, b) => a.size === b.size && [...a].every((x) => b.has(x));

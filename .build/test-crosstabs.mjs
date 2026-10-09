@@ -231,6 +231,105 @@ assert.ok(Object.values(nov.dims.generation).every((r) => Object.keys(r).length 
   "Independents fold into Others across every group, as the table has it");
 assert.equal(sharesProblem(nov.dims.generation), null, "every group row sums to 100");
 
+// the shifts super-poll (June 2025 – March 2026 trend report, n=5,563): its
+// five trend tables backfill state/generation/country/language on the July
+// 2025 wave and file three previously unfiled waves – pinned cell by cell
+assert.deepEqual(jul.dims.state, {
+  NSW: { alp: 38, lnp: 30, grn: 9, oth: 23 }, Vic: { alp: 36, lnp: 31, grn: 12, oth: 21 },
+  Qld: { alp: 32, lnp: 35, grn: 12, oth: 21 }, WA: { alp: 41, lnp: 31, grn: 11, oth: 17 } },
+  "June states ride the wave's four-party fold (One Nation rises into Others)");
+assert.deepEqual(jul.dims.generation, {
+  "Gen Z": { alp: 41, lnp: 18, grn: 28, oth: 13 }, Millennials: { alp: 38, lnp: 22, grn: 14, oth: 26 },
+  "Gen X": { alp: 36, lnp: 33, grn: 6, oth: 25 }, Boomers: { alp: 37, lnp: 42, grn: 2, oth: 19 } });
+assert.deepEqual(jul.dims.country, {
+  Australia: { alp: 36, lnp: 31, grn: 11, oth: 22 },
+  "Another country": { alp: 44, lnp: 30, grn: 10, oth: 16 } });
+assert.deepEqual(jul.dims.language, {
+  "English only": { alp: 37, lnp: 31, grn: 11, oth: 21 },
+  "Other language": { alp: 46, lnp: 24, grn: 13, oth: 17 } });
+assert.equal(sharesProblem(jul.dims.state), null, "four-party state rows sum to 100");
+assert.equal(sharesProblem(jul.dims.language), null, "four-party language rows sum to 100");
+
+const sep = wave("RedBridge/Accent", "2025-09-08");
+assert.ok(sep, "the September 2025 wave, unfiled since the protected tweet, is filed");
+assert.equal(sep.read, "published table");
+assert.deepEqual(sep.total, { alp: 35, lnp: 30, grn: 11, onp: 11, oth: 13 },
+  "five-party as the shifts table prints it");
+assert.equal(totalProblem(sep.total, poll("RedBridge/Accent", "2025-09-08")), null,
+  "the total sits with the poll row");
+assert.deepEqual(sep.dims.gender, {
+  Men: { alp: 37, lnp: 32, grn: 7, onp: 12, oth: 12 },
+  Women: { alp: 33, lnp: 29, grn: 14, onp: 11, oth: 13 } });
+assert.deepEqual(sep.dims.generation, {
+  "Gen Z": { alp: 33, lnp: 18, grn: 31, onp: 5, oth: 13 },
+  Millennials: { alp: 38, lnp: 26, grn: 14, onp: 9, oth: 13 },
+  "Gen X": { alp: 34, lnp: 32, grn: 7, onp: 14, oth: 13 },
+  Boomers: { alp: 34, lnp: 38, grn: 2, onp: 14, oth: 12 } });
+assert.deepEqual(sep.dims.country, {
+  Australia: { alp: 33, lnp: 31, grn: 11, onp: 12, oth: 13 },
+  "Another country": { alp: 41, lnp: 30, grn: 8, onp: 9, oth: 12 } });
+assert.deepEqual(sep.dims.language, {
+  "English only": { alp: 34, lnp: 31, grn: 11, onp: 11, oth: 13 },
+  "Other language": { alp: 43, lnp: 21, grn: 15, onp: 9, oth: 12 } });
+assert.deepEqual(sep.dims.state, {
+  NSW: { alp: 34, lnp: 29, grn: 10, onp: 12, oth: 15 },
+  Vic: { alp: 34, lnp: 32, grn: 12, onp: 9, oth: 13 },
+  Qld: { alp: 31, lnp: 32, grn: 12, onp: 16, oth: 9 },
+  WA: { alp: 44, lnp: 28, grn: 7, onp: 10, oth: 11 } });
+assert.equal(sharesProblem(sep.dims.state), null, "five-party state rows sum to 100");
+
+const nov26 = wave("RedBridge/Accent", "2025-11-26");
+assert.ok(nov26, "the late-November 2025 wave is filed from the shifts tables");
+assert.deepEqual(nov26.total, { alp: 35, lnp: 26, grn: 10, onp: 18, oth: 11 });
+assert.equal(totalProblem(nov26.total, poll("RedBridge/Accent", "2025-11-26")), null,
+  "the total sits with the poll row");
+assert.deepEqual(nov26.dims.gender, {
+  Men: { alp: 37, lnp: 26, grn: 8, onp: 19, oth: 10 },
+  Women: { alp: 33, lnp: 26, grn: 13, onp: 16, oth: 12 } });
+assert.deepEqual(nov26.dims.generation, {
+  "Gen Z": { alp: 38, lnp: 18, grn: 27, onp: 8, oth: 9 },
+  Millennials: { alp: 37, lnp: 23, grn: 14, onp: 15, oth: 11 },
+  "Gen X": { alp: 33, lnp: 27, grn: 8, onp: 21, oth: 11 },
+  Boomers: { alp: 33, lnp: 32, grn: 2, onp: 22, oth: 11 } });
+assert.deepEqual(nov26.dims.country, {
+  Australia: { alp: 33, lnp: 26, grn: 11, onp: 19, oth: 11 },
+  "Another country": { alp: 44, lnp: 25, grn: 9, onp: 13, oth: 9 } });
+assert.deepEqual(nov26.dims.language, {
+  "English only": { alp: 34, lnp: 27, grn: 10, onp: 18, oth: 11 },
+  "Other language": { alp: 44, lnp: 19, grn: 13, onp: 12, oth: 12 } });
+assert.deepEqual(nov26.dims.state, {
+  NSW: { alp: 35, lnp: 23, grn: 10, onp: 18, oth: 14 },
+  Vic: { alp: 35, lnp: 30, grn: 11, onp: 14, oth: 10 },
+  Qld: { alp: 32, lnp: 30, grn: 9, onp: 22, oth: 7 },
+  WA: { alp: 39, lnp: 24, grn: 12, onp: 17, oth: 8 } });
+assert.equal(sharesProblem(nov26.dims.generation), null);
+
+const shifts = wave("RedBridge/Accent (shifts)", "2026-03-19");
+assert.ok(shifts, "the March 2026 super-poll wave is filed under its own NO_AGG house");
+assert.equal(shifts.sample, 5563, "the report's super-poll n");
+assert.equal("total" in shifts, false, "the report prints no all-voters topline, so none is filed");
+assert.deepEqual(shifts.dims.gender, {
+  Men: { alp: 32, lnp: 21, grn: 10, onp: 29, oth: 8 },
+  Women: { alp: 30, lnp: 20, grn: 13, onp: 27, oth: 10 } });
+assert.deepEqual(shifts.dims.generation, {
+  "Gen Z": { alp: 33, lnp: 13, grn: 31, onp: 15, oth: 8 },
+  Millennials: { alp: 32, lnp: 17, grn: 15, onp: 26, oth: 10 },
+  "Gen X": { alp: 31, lnp: 19, grn: 8, onp: 33, oth: 9 },
+  Boomers: { alp: 30, lnp: 27, grn: 3, onp: 32, oth: 8 } });
+assert.deepEqual(shifts.dims.country, {
+  Australia: { alp: 30, lnp: 21, grn: 12, onp: 28, oth: 9 },
+  "Another country": { alp: 36, lnp: 20, grn: 10, onp: 26, oth: 8 } });
+assert.deepEqual(shifts.dims.language, {
+  "English only": { alp: 30, lnp: 20, grn: 12, onp: 29, oth: 9 },
+  "Other language": { alp: 39, lnp: 20, grn: 15, onp: 16, oth: 10 } });
+assert.deepEqual(shifts.dims.state, {
+  NSW: { alp: 31, lnp: 20, grn: 11, onp: 28, oth: 10 },
+  Vic: { alp: 29, lnp: 23, grn: 14, onp: 25, oth: 9 },
+  Qld: { alp: 28, lnp: 22, grn: 10, onp: 33, oth: 7 },
+  WA: { alp: 35, lnp: 19, grn: 12, onp: 27, oth: 7 } },
+  "One Nation passes Labor in every printed state cut but Western Australia's");
+assert.equal(sharesProblem(shifts.dims.country), null);
+
 // ---- Resolve: decoding and the series ------------------------------------------------
 assert.equal(decodeUx("2l"), 38);
 assert.equal(decodeUx("2l.83"), 38.83, "the fraction rides verbatim");

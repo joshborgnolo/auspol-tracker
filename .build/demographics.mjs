@@ -43,9 +43,16 @@
                  one 2025 wave with no Accent report – is hand-entered in
                  REDBRIDGE_NOV_DEMO from the AFR piece's generational
                  table, recovered through Wikipedia's subpopulation
-                 chapter and verified against the piece's own text. That
-                 leaves ONE 2025 wave filing nothing: 8 Sep's breakdowns,
-                 a protected tweet's two-wave pool.
+                 chapter and verified against the piece's own text. The
+                 April 2026 "shifts" super-poll report (n=5,563 fielded
+                 6-19 Mar 2026, no national headline) backfilled the rest:
+                 REDBRIDGE_SEP_DEMO files the 8 Sep wave it had sat
+                 unfiled as a protected tweet's two-wave pool, and
+                 REDBRIDGE_NOV26_DEMO, REDBRIDGE_SHIFTS_DEMO and the
+                 extra dims on REDBRIDGE_JUL_DEMO all come from its
+                 Tables 1-5 trend breakdowns. The 2026-03-19 wave
+                 carries no total block – the report prints no all-voters
+                 topline.
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
@@ -1193,6 +1200,33 @@ const REDBRIDGE_JUL_DEMO = {
         Provincial: { alp: 34, lnp: 33, grn: 11, oth: 22 },
         Rural: { alp: 32, lnp: 32, grn: 8, oth: 28 },
       },
+      /* state, generation, birthplace and language come from Accent's
+         April 2026 "shifts" super-poll report, Figures 2–5's June 2025
+         column and Table 1's Jun row (the PDF behind REDBRIDGE_SHIFTS_DEMO
+         below) – the same wave by design, run 19–30 Jun 2025, so its cells
+         join this wave under its established four-party fold, one cell
+         (Men lnp/oth) a point off the Datawrapper read, left as filed. */
+      state: {
+        NSW: { alp: 38, lnp: 30, grn: 9, oth: 23 },
+        Vic: { alp: 36, lnp: 31, grn: 12, oth: 21 },
+        Qld: { alp: 32, lnp: 35, grn: 12, oth: 21 },
+        WA: { alp: 41, lnp: 31, grn: 11, oth: 17 },
+      },
+      generation: {
+        "Gen Z": { alp: 41, lnp: 18, grn: 28, oth: 13 },
+        Millennials: { alp: 38, lnp: 22, grn: 14, oth: 26 },
+        "Gen X": { alp: 36, lnp: 33, grn: 6, oth: 25 },
+        Boomers: { alp: 37, lnp: 42, grn: 2, oth: 19 },
+      },
+      // birthplace, filed under Roy Morgan's country-of-birth dim key
+      country: {
+        Australia: { alp: 36, lnp: 31, grn: 11, oth: 22 },
+        "Another country": { alp: 44, lnp: 30, grn: 10, oth: 16 },
+      },
+      language: {
+        "English only": { alp: 37, lnp: 31, grn: 11, oth: 21 },
+        "Other language": { alp: 46, lnp: 24, grn: 13, oth: 17 },
+      },
     },
   },
 };
@@ -1315,6 +1349,137 @@ const REDBRIDGE_NOV_DEMO = {
         Millennials: { alp: 34, lnp: 23, grn: 11, onp: 18, oth: 14 },
         "Gen X": { alp: 38, lnp: 26, grn: 6, onp: 20, oth: 10 },
         Boomers: { alp: 34, lnp: 30, grn: 3, onp: 24, oth: 9 },
+      },
+    },
+  },
+};
+
+/* Accent's April 2026 "shifts" super-poll – "Shifts in vote intention
+   since June 2025" (fieldwork 6–19 Mar 2026, n=5,563, published 1 Apr
+   2026; PDF behind REDBRIDGE_SHIFTS_DEMO's source, the usrfiles CDN
+   document the accent-research.com project page links). Its Figures 2–5
+   chart estimated shares by gender, generational cohort, birthplace and
+   language at FOUR waves of one design – June, September and November
+   2025 plus March 2026 – and Table 1 prints the four largest states at
+   those same four waves (the May column is the 2025 election, not a
+   poll). So a report published in April 2026 back-fills the shapes of
+   three waves whose own releases never printed them, beside the new one
+   it belongs to. These three constants enter those cells, read 'published
+   table' against Figure 2–5's plotted values (user-supplied transcription
+   – every group row sums to 100, and each wave column's cohort averages
+   sit inside a point of the poll row's published primaries) and Table 1
+   (read directly off the report text; SA, Tas and the territories print
+   nowhere – "limitations of the sample sizes"). Each wave's "Other"
+   column is the poll row's independents bucket (its ind value; oth null)
+   and the tables' Labor two-party columns are not filed – the site's
+   demographics are first preference.
+   The September 2025 wave (fieldwork to 8 Sep, AFR 13 Sep) is the one
+   whose breakdowns otherwise survived only in a protected tweet's
+   two-wave pool – it files five dims here for the first time. */
+const REDBRIDGE_SEP_DEMO = {
+  "2025-09-08": {
+    source: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
+    total: { alp: 35, lnp: 30, grn: 11, onp: 11, oth: 13 },
+    dims: {
+      gender: {
+        Men: { alp: 37, lnp: 32, grn: 7, onp: 12, oth: 12 },
+        Women: { alp: 33, lnp: 29, grn: 14, onp: 11, oth: 13 },
+      },
+      generation: {
+        "Gen Z": { alp: 33, lnp: 18, grn: 31, onp: 5, oth: 13 },
+        Millennials: { alp: 38, lnp: 26, grn: 14, onp: 9, oth: 13 },
+        "Gen X": { alp: 34, lnp: 32, grn: 7, onp: 14, oth: 13 },
+        Boomers: { alp: 34, lnp: 38, grn: 2, onp: 14, oth: 12 },
+      },
+      country: {
+        Australia: { alp: 33, lnp: 31, grn: 11, onp: 12, oth: 13 },
+        "Another country": { alp: 41, lnp: 30, grn: 8, onp: 9, oth: 12 },
+      },
+      language: {
+        "English only": { alp: 34, lnp: 31, grn: 11, onp: 11, oth: 13 },
+        "Other language": { alp: 43, lnp: 21, grn: 15, onp: 9, oth: 12 },
+      },
+      state: {
+        NSW: { alp: 34, lnp: 29, grn: 10, onp: 12, oth: 15 },
+        Vic: { alp: 34, lnp: 32, grn: 12, onp: 9, oth: 13 },
+        Qld: { alp: 31, lnp: 32, grn: 12, onp: 16, oth: 9 },
+        WA: { alp: 44, lnp: 28, grn: 7, onp: 10, oth: 11 },
+      },
+    },
+  },
+};
+
+/* The 26 Nov 2025 wave (fieldwork 7–26 Nov, AFR 1 Dec) from the same
+   super-poll report – its own monthly release printed topline only, so
+   Figures 2–5 and Table 1 are the first breakdowns on file for it. */
+const REDBRIDGE_NOV26_DEMO = {
+  "2025-11-26": {
+    source: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
+    total: { alp: 35, lnp: 26, grn: 10, onp: 18, oth: 11 },
+    dims: {
+      gender: {
+        Men: { alp: 37, lnp: 26, grn: 8, onp: 19, oth: 10 },
+        Women: { alp: 33, lnp: 26, grn: 13, onp: 16, oth: 12 },
+      },
+      generation: {
+        "Gen Z": { alp: 38, lnp: 18, grn: 27, onp: 8, oth: 9 },
+        Millennials: { alp: 37, lnp: 23, grn: 14, onp: 15, oth: 11 },
+        "Gen X": { alp: 33, lnp: 27, grn: 8, onp: 21, oth: 11 },
+        Boomers: { alp: 33, lnp: 32, grn: 2, onp: 22, oth: 11 },
+      },
+      country: {
+        Australia: { alp: 33, lnp: 26, grn: 11, onp: 19, oth: 11 },
+        "Another country": { alp: 44, lnp: 25, grn: 9, onp: 13, oth: 9 },
+      },
+      language: {
+        "English only": { alp: 34, lnp: 27, grn: 10, onp: 18, oth: 11 },
+        "Other language": { alp: 44, lnp: 19, grn: 13, onp: 12, oth: 12 },
+      },
+      state: {
+        NSW: { alp: 35, lnp: 23, grn: 10, onp: 18, oth: 14 },
+        Vic: { alp: 35, lnp: 30, grn: 11, onp: 14, oth: 10 },
+        Qld: { alp: 32, lnp: 30, grn: 9, onp: 22, oth: 7 },
+        WA: { alp: 39, lnp: 24, grn: 12, onp: 17, oth: 8 },
+      },
+    },
+  },
+};
+
+/* And the super-poll itself, 6–19 Mar 2026 (its own NO_AGG poll row,
+   "RedBridge/Accent (shifts)"): the release prints no national headline
+   figures at all – its raison d'être is state and group breakdowns off a
+   full-term panel design – so the wave files no total, and totalProblem's
+   against-the-poll-row check has nothing to compare (the row's primaries
+   are all null). Figure 5's March column, gendered against Table 3's
+   exact men/women splits, reconciles to the quoted cohort generation
+   averages the AFR's 8 Apr write-up carried. */
+const REDBRIDGE_SHIFTS_DEMO = {
+  "2026-03-19": {
+    source: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
+    dims: {
+      gender: {
+        Men: { alp: 32, lnp: 21, grn: 10, onp: 29, oth: 8 },
+        Women: { alp: 30, lnp: 20, grn: 13, onp: 27, oth: 10 },
+      },
+      generation: {
+        "Gen Z": { alp: 33, lnp: 13, grn: 31, onp: 15, oth: 8 },
+        Millennials: { alp: 32, lnp: 17, grn: 15, onp: 26, oth: 10 },
+        "Gen X": { alp: 31, lnp: 19, grn: 8, onp: 33, oth: 9 },
+        Boomers: { alp: 30, lnp: 27, grn: 3, onp: 32, oth: 8 },
+      },
+      country: {
+        Australia: { alp: 30, lnp: 21, grn: 12, onp: 28, oth: 9 },
+        "Another country": { alp: 36, lnp: 20, grn: 10, onp: 26, oth: 8 },
+      },
+      language: {
+        "English only": { alp: 30, lnp: 20, grn: 12, onp: 29, oth: 9 },
+        "Other language": { alp: 39, lnp: 20, grn: 15, onp: 16, oth: 10 },
+      },
+      state: {
+        NSW: { alp: 31, lnp: 20, grn: 11, onp: 28, oth: 10 },
+        Vic: { alp: 29, lnp: 23, grn: 14, onp: 25, oth: 9 },
+        Qld: { alp: 28, lnp: 22, grn: 10, onp: 33, oth: 7 },
+        WA: { alp: 35, lnp: 19, grn: 12, onp: 27, oth: 7 },
       },
     },
   },
@@ -1562,7 +1727,8 @@ try {
   // learnt. HAND_KEYS above keeps the candidate loop off them.
   for (const [house, table] of [["DemosAU", DEMOSAU_EARLY_DEMO], ["DemosAU (MRP)", DEMOSAU_MRP_DEMO],
     ["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
-    ["RedBridge/Accent", REDBRIDGE_NOV_DEMO],
+    ["RedBridge/Accent", REDBRIDGE_NOV_DEMO], ["RedBridge/Accent", REDBRIDGE_SEP_DEMO],
+    ["RedBridge/Accent", REDBRIDGE_NOV26_DEMO], ["RedBridge/Accent (shifts)", REDBRIDGE_SHIFTS_DEMO],
     ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
     for (const [date, h] of Object.entries(table)) {
       const k = house + "|" + date;

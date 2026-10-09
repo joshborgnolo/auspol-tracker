@@ -1186,18 +1186,18 @@ const bits = (o) => Object.entries(o)
 const items = feedWaves.map((w) => {
   const p = w.poll || null, year = w.date.slice(0, 4);
   const tpp = p && p.tpp_alp != null ? `ALP ${p.tpp_alp} – L/NP ${p.tpp_lnp}` : null;
+  const prim = p ? shareLine(p) : "";
   const head = tpp ? `2PP ${tpp}`
-    : p ? shareLine(p)
-    : w.dir ? `Right ${w.dir.right} · Wrong track ${w.dir.wrong}`
+    : prim || (w.dir ? `Right ${w.dir.right} · Wrong track ${w.dir.wrong}`
     : w.sal || w.own ? "the issues"
     : w.sw ? "vote switching"
     : w.demo ? "the vote by group"
-    : "polling release";
+    : "polling release");
   const title = `${w.house}, ${fieldLabel(w)} ${year} – ${head}`;
   const parts = [];
   if (p) {
-    parts.push(`Primary vote: ${shareLine(p)}.`);
-    parts.push(tpp ? `Two-party preferred: ${tpp}.` : "No two-party figure published.");
+    if (prim) parts.push(`Primary vote: ${prim}.`);
+    if (prim) parts.push(tpp ? `Two-party preferred: ${tpp}.` : "No two-party figure published.");
     if (p.tpp3) parts.push(`Three-way (ALP v L/NP v ON): ALP ${p.tpp3.alp} · L/NP ${p.tpp3.lnp} · ON ${p.tpp3.onp}.`);
     if (p.undecided != null) parts.push(`Undecided ${p.undecided}%.`);
     if (p.soft != null)

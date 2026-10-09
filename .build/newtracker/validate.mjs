@@ -47,6 +47,7 @@ export function validate(D) {
     "Roy Morgan (SMS)",  // single SMS-mode Morgan release, mode tag not a house
     "Roy Morgan (pooled)", // finding 10341's 7-month Single Source cross-section
     "Newspoll (pooled)", // quarterly aggregate releases, no aggregate weight
+    "RedBridge/Accent (shifts)", // 6–19 Mar 2026 super-poll: states/groups only, no national topline
     "Agenda C Synesis",  // one-off news.com.au poll
   ]);
 
@@ -187,7 +188,7 @@ export function validate(D) {
     //      the automated houses. Only those houses have a source to link.
     if (p.methodUrl != null && (typeof p.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.methodUrl)))
       fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
-    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge/Accent", "RedBridge/Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
+    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge/Accent", "RedBridge/Accent (MRP)", "RedBridge/Accent (shifts)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
       fail("method-url", `methodUrl on a row for ${p.pollster}`);
     // 2c3. tablesUrl is The Australian's demographic-tables supplement PDF
     //      for a pooled Newspoll wave, hosted on its origin CDN – only those
