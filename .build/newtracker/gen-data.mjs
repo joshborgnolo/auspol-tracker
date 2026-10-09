@@ -2049,23 +2049,51 @@ const ISS_BY = new Map();              // "date|pollster" → the wave's issues 
 /* Ipsos's waves, as rows of their own for the archive's issues facet – the
    one house that publishes its issue questions with no voting-intention or
    direction row for them to ride on. Empty stubs (p / appr) as with
-   directionOnlyPolls; its release link is the wave's report PDF, its
-   publish stamp unknown (Ipsos re-uploads move the file dates), so the
-   detail head shows the fieldwork only. */
+   directionOnlyPolls; its release link is the wave's report PDF.
+   `published` here is DATE-ONLY: Ipsos stamps no clock a page could quote,
+   and a re-hosted PDF keeps re-dating - but the FIRST CDN landing of a
+   wave's earliest variant is provable from the extractor's ipsos-src
+   sidecars (uploadedAt, else pdfCreated, else firstSeenAt; Jun 2026 shipped
+   two copies two minutes apart - the wave takes the earlier) and, for the
+   latest wave, from the issuesmonitor page's own dateModified. The rows
+   used to carry no stamp and show fieldwork only; the publish DATE was
+   knowable all along, only the hour never was. */
 const issuesOnlyPolls = (() => {
   if (!ISSUES_FILE) return [];
+  const MON3_IX = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  const pdfYm = (u) => {
+    const m = /^IM_Nat_([A-Za-z]+?)_?(\d{2})(?:_|\.|$)/.exec(path.basename(decodeURIComponent(u || "")));
+    const mo = m && MON3_IX[m[1].slice(0, 3).toLowerCase()];
+    return mo ? `20${m[2]}-${String(mo).padStart(2, "0")}` : null;
+  };
+  const firstLanding = (() => {
+    const dir = path.join(ROOT, ".build", "ipsos-src"), out = new Map();
+    if (fs.existsSync(dir))
+      for (const f of fs.readdirSync(dir)) {
+        if (!f.endsWith(".json")) continue;
+        let j; try { j = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")); } catch { continue; }
+        if (!j || j.kind !== "report") continue;
+        const ym = pdfYm(j.pdf);
+        if (!ym) continue;
+        const at = (j.uploadedAt || j.pdfCreated || j.firstSeenAt || "").slice(0, 10);
+        if (at && (!out.get(ym) || at < out.get(ym))) out.set(ym, at);
+      }
+    return out;
+  })();
   const byDate = new Map();
   for (const w of [...ISSUES_FILE.salience, ...ISSUES_FILE.ownership])
     if (ISS_ONLY.has(w.pollster) && MONTH_SET.has(ymOf(w.date))) byDate.set(w.date, w);
   return [...byDate.values()].map((w) => {
     const ym = ymOf(w.date), fym = w.dateStart ? ymOf(w.dateStart) : null;
     const field = fwLabel(w.dateStart, w.date);
+    const pub = firstLanding.get(pdfYm(w.source) || ym) || null;
     return {
       ym, x: mx(ym) + (dayOf(w.date) - 15) / 365, day: dayOf(w.date),
       pollster: w.pollster,
       ...(fym != null && fym !== ym ? { fym } : {}),
       field, dateLabel: field, released: w.date, sample: w.sample ?? null,
       ...(w.dateStart ? { fmid: fmidIso(w.dateStart, w.date) } : {}),
+      ...(pub ? { published: pub } : {}),
       ...(w.sampleEff != null ? { sampleEff: w.sampleEff } : {}),
       ...(w.source ? { url: w.source } : {}),
       ...(w.methodUrl ? { methodUrl: w.methodUrl } : {}),

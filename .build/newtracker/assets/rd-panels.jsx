@@ -3132,7 +3132,7 @@ function RdIssues({ rangeId = "all" }) {
     if (!monthPts.length) return null;
     const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
     const pts = filterPts(monthPts, xDomain[0]);
-    const byRow = new Map(D.individualPolls.map((q) => [q.pollster + "|" + q.released, q]));
+    const byRow = new Map([...D.individualPolls, ...(D.issuesOnlyPolls || [])].map((q) => [q.pollster + "|" + q.released, q]));
     const dots = (x.dots || []).filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map((d) => {
       const meta = byRow.get(d[1] + "|" + d[2]) || { pollster: demoHouse(d[1]), released: d[2] };
       return { x: d[0], pollster: d[1], date: d[2], n: meta.sample || 1000, meta, s: Object.fromEntries(P.map((q, i) => [q, d[3 + i]])) };

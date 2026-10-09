@@ -125,22 +125,26 @@ function rdApOut(stamp) {
    both unfiled waves once one statement lagged) and this wave is inside
    three weeks of release (older gaps are left unsaid). The 90-day bound
    retires the promise for a house that stops filing, rather than marking
-   every new wave TBC indefinitely. One rule for the header and the table's
-   Sample column, so they agree. */
+   every new wave TBC indefinitely. Ipsos's whole catalogue lives apart as
+   issuesOnlyPolls, so the habit look-back scans it too. One rule for the
+   header and the table's Sample column, so they agree. */
 function rdEffTbc(p) {
   if (p.sampleEff != null || !p.published) return false;
   if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
   const since = Date.parse(p.released) - 90 * 86400000;
-  return window.AUSPOL.individualPolls.some((q) => q.pollster === p.pollster && q.sampleEff != null
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
     && q.released < p.released && Date.parse(q.released) >= since);
 }
 /* "TBC" links to where the house will publish the figure: YouGov's APC
    methodology page (it sets out why the effective sample trails the
    release), Accent Research's projects page (the RedBridge report and its
-   methodology PDF land there days after the AFR story). */
+   methodology PDF land there days after the AFR story), Ipsos's disclosure
+   statements page (its APC statements feed it months late). */
 const RD_EFF_TBC_URL = {
   YouGov: "https://yougov.com/about/methodology/australian-polling-council",
   "RedBridge/Accent": "https://www.accent-research.com/projects",
+  Ipsos: "https://www.ipsos.com/en-au/polling-methodology-disclosure-statements",
 };
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
