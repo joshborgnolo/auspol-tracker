@@ -1,0 +1,23 @@
+{
+  "firstSeen": "2026-10-10",
+  "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20State%20and%20Federal%20Voting%20Intentions%20Report%20-%20August%202026%20-%20FINAL.pdf",
+  "title": "EMRS State and Federal Voting Intentions Report - August 2026",
+  "ym": "2026-08",
+  "fetched": "2026-10-10",
+  "date": "2026-08-18",
+  "dateStart": "2026-08-17",
+  "sample": 968,
+  "primaries": {
+    "alp": 29,
+    "lnp": 17,
+    "grn": 15,
+    "onp": 26,
+    "ind": 13,
+    "oth": 1
+  },
+  "tpp": {
+    "alp": 57,
+    "lnp": 43
+  },
+  "published": "2026-10-10"
+}

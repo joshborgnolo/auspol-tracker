@@ -1,0 +1,542 @@
+Omnibus – Federal
+Voting Intentions Report
+February 2026
+                                                                  EMRS Federal Voting Intentions Poll – February 2026
+                                                                                 REPORT VERSION: 1
+                                                                          This report has been prepared by
+                                                                     Enterprise Marketing and Research Services
+                                                                          60 Main Road, Moonah TAS 7009
+
+
+                                                                             All enquiries should be addressed to:
+                                                                                    Phone: (03) 6211 1222
+                                                                                      Fax: (03) 6211 1219
+                                                                               E-mail: enquiries@emrs.com.au
+                                                                            Post: PO Box 402, Moonah TAS 7009
+
+
+
+                                              The survey was conducted from the 16th to the 19th of February 2026.
+                 1,000 Tasmanian registered voters were interviewed, and responses weighted to reflect the Tasmanian adult voting population.
+                       A sample of this size provides a maximum margin of error of +/- 3.1 percentage points at the 95% confidence level.
+
+
+Enterprise Marketing and Research Services (EMRS). | ABN 29 009 546 561
+
+Confidential/ Disclaimer
+Notice: The information contained herein is confidential and has been supplied under a confidentiality agreement. If you are not authorised to view or to be in possession of this document you
+are hereby notified that any dissemination, distribution or duplication of this document is expressly prohibited. If you receive this document in error, please notify Enterprise Marketing and
+Research Services (EMRS) immediately on +61 3 6211 1222.
+
+Limitations/ Liability
+While all care and diligence has been exercised in the preparation of this report, EMRS does not warrant the accuracy of the information contained within and accepts no liability for any loss
+or damage that may be suffered as a result of reliance on this information, whether or not there has been any error, omission or negligence on the part of EMRS or its employees.
+
+The research complies with the EMRS Quality System, certified to ISO 20252:2019, the international standard for Social and Market Research,                                     © 2026 EMRS | 2
+certificate number 888027.
+METHODOLOGY
+
+•   EMRS adopted a quantitative survey methodology utilising Computer Assisted Telephone Interviewing (CATI), Computer
+    Assisted Web Interviewing (CAWI), and a small supplementary component of face-to-face interviewing (CAPI).
+•   The survey was conducted from 16-19 February 2026 utilising EMRS’ in-house call centre (44%), and online panels (56%),
+    ensuring high levels of quality control and that the target sample sizes, and their distribution regionally, were achieved or
+    closely achieved with low and statistically acceptable weightings.
+
+•   The target population was based on 411,000 Tasmanian residents aged 18 years and over (source: ABS Census, 2021). In
+    total, a sample of n=1,000 completed the survey, yielding overall results accurate to within ±3.10 percentage points at the
+    95% confidence level.
+
+•   The sample is robust and reliable. Cross-tab analysis was carried out to ensure the robustness of the findings.
+•   In order to gain a sample representative of the Tasmanian adult population, quotas were put in place for gender, age, and
+    region.
+•   Where the quotas were not achieved, weighting was applied to ensure results were accurate in reflecting the demographic
+    profile of the population. Results in this report are weighted by age, gender, electorate, and highest achieved education
+    level.
+•   This survey was conducted to the market and social research ISO20252:2019 standard.
+
+
+                                                                                                                      © 2026 EMRS | 3
+                              RESEARCH SAMPLE PROFILE (1)
+                                                   Table 1 – Sample size and weightings*
+
+
+      Region            %        Number                                               Electorate       %     Number
+       South            51%        511                                                         Bass    19%    189
+       North            28%       277                                                    Braddon       20%    201
+    North-West          21%       212                                                          Clark   23%    231
+                                                                                          Franklin     19%    185
+                                                                                           Lyons       19%    194
+  Employment
+                        %        Number
+    Status
+Employed full-time or
+                        42%       419                                                    Gender        %     Number
+  self-employed
+                                                                                               Male    49%    494
+Employed on a part-
+                        16%       156                                                     Female       50%    502
+ time/ casual basis
+ Engaged in home
+                        5%         49
+     duties
+                                                                                               Age     %     Number
+   Retired or on a
+                        32%       321                                                18 to 34 years    12%    123
+      pension
+    Unemployed          3%         31                                                35 to 54 years    37%    371
+
+     A student          2%         19                                                55 to 69 years    31%    305
+
+ Declined to answer     1%         5                                                    70+ years      20%    201
+
+
+
+
+                                                                                                                      © 2026 EMRS | 4
+                                         *The percentage figures tabled here are unweighted.
+                                          *Percentages may not sum to 100 due to rounding.
+                                   RESEARCH SAMPLE PROFILE (2)
+                                                      Table 2 – Sample size and weightings*
+
+
+   Household Situation                %               Number                                        Education         %     Number
+     Single, never married           12%                  123                                     No qualifications   3%        28
+   A couple with no children         13%                  127                                     Apprenticeship      4%        42
+  Family, no children over 16        15%                  153                                 Secondary school        23%      233
+Family, children over 16 at home     17%                  168                              Diploma or workplace
+                                                                                                                      32%      318
+ Married, no children at home                                                                   qualification
+                                     26%                  257
+           Widowed                                                                  Undergraduate or postgraduate
+                                      6%                   57                                                         38%      379
+                                                                                          university degree
+          Sole parent                 3%                   28
+                                                                                                       Other          0%        0
+    Separated or divorced             8%                   76
+      Declined to answer              1%                    11
+
+
+    Household Income                  %               Number
+        Under $20,000                 4%                   41
+ $20,000 and under $40,000           10%                  104
+ $40,000 and under $60,000            11%                  114
+ $60,000 and under $80,000            11%                  114
+$80,000 and under $100,000            9%                   90
+$100,000 and under $120,000           11%                  113
+      $120,000 and over              31%                  308
+      Declined to answer             12%                   116
+                                                                                                                            © 2026 EMRS | 5
+                                            *The percentage figures tabled here are unweighted.
+                                             *Percentages may not sum to 100 due to rounding.
+                                          Federal election vote preference –
+Respondents indicated a significant
+preference for the Labor Party overall
+                                          Tasmania
+(30%), followed by One Nation (24%),
+and the Liberals (18%).
+                                                     The Liberal Party                            18%
+Females (17%) were more likely to
+indicate a preference for the Greens,
+while males (30%) were more likely to
+indicate a preference for One Nation.                The Labor Party                                           30%
+
+Respondents aged 18 to 34 (24%)
+were more likely to indicate a                            The Greens                         13%
+preference for the Greens, those aged
+35 to 54 (32%) were more likely to
+indicate a preference for One Nation,
+and those aged 70 or older (20%) were              The National Party           1%
+more likely to indicate they would vote
+for an independent.
+Tasmanian residents in the west and       Pauline Hanson's One Nation                                    24%
+northwest (33%) were more likely to
+indicate a preference for One Nation.
+                                                      An Independent                       12%
+Residents in the electorate of Clark
+(25%) were more likely to vote for an
+independent.
+                                              Some other minor party           1%
+Respondents who were single and
+never married (29%) or had a
+university degree (23%) were more
+likely to indicate they would vote for
+the Greens.
+                                                       If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 6
+                                                                   Base: All respondents who gave a vote preference (n=953)
+                                      Federal election vote preference -
+Respondents in Bass were more         Bass
+likely to indicate a preference for
+the Labor party (29%), One Nation
+(25%), or the Liberals (23%).                    The Liberal Party                                 23%
+
+There were no notable differences
+within demographic sub-groups.                   The Labor Party                                          29%
+
+
+                                                      The Greens                          15%
+
+
+                                               The National Party          1%
+
+
+                                      Pauline Hanson's One Nation                                     25%
+
+
+                                                  An Independent                  7%
+
+
+                                          Some other minor party           1%
+
+
+
+
+                                                   If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 7
+                                                                          Base: All respondents in Bass (n=182)
+                                      Federal election vote preference -
+Respondents in Braddon were more      Braddon
+likely to indicate a preference for
+One Nation (34%) or the Labor
+Party (31%).                                     The Liberal Party                          16%
+
+There were no notable differences
+within demographic sub-groups.                   The Labor Party                                            31%
+
+
+                                                      The Greens                  7%
+
+
+                                               The National Party           2%
+
+
+                                      Pauline Hanson's One Nation                                              34%
+
+
+                                                  An Independent                     10%
+
+
+                                          Some other minor party           0%
+
+
+
+
+                                                   If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 8
+                                                                         Base: All respondents in Braddon (n=188)
+                                       Federal election vote preference -
+Respondents in the electorate of       Clark
+Clark were more likely to indicate
+they would vote for the Labor Party
+(27%), and significantly more likely              The Liberal Party                         15%
+to vote for an independent (25%).
+
+None (0%) of the respondents in                   The Labor Party                                        27%
+Clark indicated they would vote for
+the National Party.
+                                                       The Greens                             17%
+There were no further notable
+differences within demographic
+                                                The National Party         0%
+sub-groups.
+
+                                       Pauline Hanson's One Nation                           16%
+
+
+                                                   An Independent                                     25%
+
+
+                                           Some other minor party          0%
+
+
+
+
+                                                    If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 9
+                                                                           Base: All respondents in Clark (n=223)
+                                        Federal election vote preference -
+One-third (34%) of respondents in       Franklin
+Franklin were more likely to indicate
+a vote preference for the Labor
+Party.                                             The Liberal Party                               21%
+
+There were no notable differences
+within demographic sub-groups.                     The Labor Party                                               34%
+
+
+                                                        The Greens                               19%
+
+
+                                                 The National Party          1%
+
+
+                                        Pauline Hanson's One Nation                           17%
+
+
+                                                    An Independent                    9%
+
+
+                                            Some other minor party          0%
+
+
+
+
+                                                     If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 10
+                                                                           Base: All respondents in Franklin (n=174)
+                                      Federal election vote preference -
+Respondents in Lyons were more        Lyons
+likely to indicate a preference for
+the Labor Party (32%) or One
+Nation (29%).                                    The Liberal Party                          16%
+
+There were no notable differences
+within demographic sub-groups.                   The Labor Party                                             32%
+
+
+                                                      The Greens                    9%
+
+
+                                               The National Party            3%
+
+
+                                      Pauline Hanson's One Nation                                         29%
+
+
+                                                  An Independent                     9%
+
+
+                                          Some other minor party            2%
+
+
+
+
+                                                   If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 11
+                                                                          Base: All respondents in Lyons (n=186)
+                                          Preferred Prime Minister
+Nearly half of respondents (45%)
+indicated that they would prefer
+Anthony Albanese as Prime Minister
+compared to 31% who chose Angus
+Taylor, while almost one-quarter (23%)
+                                          Anthony Albanese                                                           45%
+were unsure.
+
+Males (37%) were more likely to
+indicate a preference for Angus Taylor.
+
+Respondents aged 35 to 54 (29%)
+                                              Angus Taylor                                          31%
+were more likely to be unsure who they
+preferred as Prime Minister.
+
+Respondents who indicated they
+would vote for the Labor Party (84%)
+or the Greens (69%) were more likely               Unsure                                  23%
+to prefer Anthony Albanese as Prime
+Minister, while those who indicated
+they would vote for the Liberals (62%)
+or One Nation (also 62%), were more
+likely to indicate a preference for
+Angus Taylor.
+
+Respondents with a tertiary degree
+(66%) were more likely to prefer
+Anthony Albanese as Prime Minister.
+                                                             In your opinion who do you think would make a better Prime Minister?   © 2026 EMRS | 12
+                                                                               Base: All respondents (n=1,000)
+                                       Prime Minister preference by
+All five electoral areas indicated a   electorate
+preference for Anthony Albanese as
+Prime Minister.                                                                   42%
+                                          Bass                       30%
+Residents in Bass (30%) and                                         28%
+Braddon (34%) were the only
+electorates to have Angus Taylor                                                 41%
+                                       Braddon                            34%
+come close, while the rest of the                                25%
+electorates showed a significant                                                                                         Anthony Albanese
+preference for Anthony Albanese as                                                            54%
+                                         Clark                         30%                                               Angus Taylor
+Prime Minister.
+                                                        16%
+                                                                                                                         Unsure
+                                                                                           50%
+                                       Franklin                     28%
+                                                              21%
+
+                                                                                  42%
+                                         Lyons                           33%
+                                                                  26%
+
+
+
+
+                                                  In your opinion who do you think would make a better Prime Minister?    © 2026 EMRS | 13
+                                                                    Base: All respondents (n=1,000)
+                                               Two Party Preferred – Labor v Liberal
+60% of respondents indicated they would
+preference Labor over Liberal (40%)
+under the preferential voting system.
+Females (65%) were more likely to place
+Labor first over Liberal, while males (46%)
+were more likely to place the Liberals
+ahead.                                          Labor Ahead                                                                                                  60%
+Respondents aged 18 to 34 (69%) were
+more likely to place Labor first, while
+those aged 70 or older (51%) were more
+likely to place the Liberals ahead.
+Respondents who would vote the Greens
+(90%), or an independent (80%), were           Liberal Ahead                                                                     40%
+more likely to place the Labor Party ahead
+of the Liberals.
+Those who would vote for One Nation
+(74%) were more likely to place the
+Liberals ahead.
+Respondents who were single and never
+married (77%) were more likely to place
+the Labor Party ahead of the Liberals.
+Those who were married with no children
+at home (50%) were more likely to place
+the Liberals ahead of Labor.
+Respondents with a tertiary degree (73%)
+were more likely to place the Labor Party
+ahead of the Liberals, while those with just
+a secondary school education (49%) were
+more likely to place the Liberals ahead of
+Labor.
+                                               Under the preferential voting system, you may ultimately assign a preference to either the Liberal Party or the Labor Party. Regardless
+                                               of WHERE you would place them on your preference list, would you put LABOR AHEAD OF LIBERAL or LIBERAL AHEAD OF LABOR?                    © 2026 EMRS | 14
+                                                                                      Base: All respondents who were NOT undecided (n=902)
+                                                 Two Party Preferred – Labor v One Nation
+Again, looking at the two-party preferred, but
+this time with Labor compared to One Nation,
+the results are similar, with respondents
+placing Labor (60%) ahead of One Nation
+(40%).
+Females (67%) were more likely to place
+Labor first over One Nation, while males (47%)             Labor Ahead                                                                                             60%
+were more likely to place One Nation ahead.
+Respondents aged 18 to 34 (71%) were more
+likely to place Labor ahead of One Nation.
+Respondents in the south and southeast
+(67%) were more likely to place Labor first,
+while those in the west and northwest and in       One Nation Ahead                                                                    40%
+the federal electorate of Braddon were more
+likely to be equally divided (50% each)
+between the two parties.
+Residents in the federal electorates of Clark
+and Franklin (70% each) were more likely to
+place Labor first.
+Respondents who would vote the Greens
+(93%), an independent (80%) or were unsure
+who they would vote for (82%) were more
+likely to place the Labor Party first.
+Those who would vote for the Liberals (62%)
+were more likely to place One Nation ahead of
+Labor.
+Respondents with a tertiary degree (79%)
+were more likely to place the Labor Party
+ahead of One Nation, while those with just a
+secondary school education (47%) were more
+likely to place One Nation ahead of Labor.
+                                                 Under the preferential voting system, you may ultimately assign a preference to either One Nation or the Labor Party. Regardl ess of WHERE
+                                                    you would place them on your preference list, would you put LABOR AHEAD OF ONE NATION or ONE NATION AHEAD OF LABOR?                       © 2026 EMRS | 15
+                                                                                          Base: All respondents who were NOT undecided (n=940)
+                                          Two Party Preferred by Electorate - Tasmania
+
+Looking at the two-party preferred                                               Electorate                                   Labor                     Liberal
+by electorate, all five federal                                                      Overall                                   60%                        40%
+electorates put the Labor Party                                                        Bass                                     56%                       44%
+ahead of the Liberal Party, with the                                                Braddon                                     54%                       46%
+closest seats on 2PP being Braddon
+                                                                                       Clark                                    67%                        33%
+54-46, followed by Bass 56-44.
+                                                                                     Franklin                                   62%                       38%
+                                                                                      Lyons                                     59%                        41%
+Comparing the Labor Party to One
+Nation, Labor were further ahead in
+the electorates of Clark* in both                                                Electorate                                   Labor                 One Nation
+and Franklin 70%-30%.                                                                Overall                                   60%                        40%
+Significantly, respondents in                                                          Bass                                     57%                       43%
+Braddon were evenly split (50%                                                      Braddon                                     50%                       50%
+each).                                                                                 Clark                                    70%                       30%
+                                                                                     Franklin                                   70%                       30%
+                                                                                      Lyons                                     56%                       44%
+
+*Note the Clark survey did not name the
+incumbent member Mr Wilkie.
+
+
+
+
+                                          Under the preferential voting system, you may ultimately assign a preference to either the Liberal Party or the Labor Party. Regardless
+                                          of WHERE you would place them on your preference list, would you put LABOR AHEAD OF LIBERAL or LIBERAL AHEAD OF LABOR?                    © 2026 EMRS | 16
+                                                                                 Base: All respondents who were NOT undecided (n=902)
+                                                                Top Federal Issues
+    The top nominated national issues that
+    would influence the way respondents
+    would vote were:                                                            Immigration policy and levels                                                             20%
+    •  Immigration policy and levels (20%)                                                        Cost of living                                                    17%
+    •  Cost of living (17%)                                                   Healthcare access and quality                                               12%
+    •  Healthcare access and quality (12%)                                  Housing affordability and supply                                          11%
+    •  Housing affordability and supply
+                                                                                     Economic management                                       9%
+       (11%)
+                                                                                   Environmental protection                         5%
+    • Economic management (9%)
+    • Environmental protection (5%)                                            Education funding and quality                      4%
+    • Education funding and quality (4%)                            Climate change and emissions reduction                        4%
+    • Climate change and emissions                                   National security and border protection                 3%
+       reduction (4%)                                                 Australian interests and infrastructure              2%
+    Females (17%) were more likely to                                            Social inequality and equity              2%
+    mention healthcare access and quality.                                           Crime and public safety              2%
+    Respondents who indicated they would                            Government accountability and integrity               2%
+    vote for the Greens were more likely to                                                      Tax reduction            2%
+    mention environmental protection                                                      Firearms legislation            2%
+    (17%)† and climate change and                                             Health sector funding increase              2%
+    emissions reduction (15%)†.                                                    Government performance                 2%
+    Those with a tertiary education were                        Other Australian Infrastructure And Interests            2%
+    more likely to mention environmental                                   Government budget management                  2%
+    protection (10%) and climate change                                                             No opinion                      5%
+    and emissions reduction (8%).
+                                                                                 What is the most important national issue that would influence the way you vote?               © 2026 EMRS | 17
+†Results must be regarded as indicative only due to the small
+                                                                                                        Base: All respondents (n=1,000)
+sample size.
+*Charts do not equal 100 percent due to multiple responses.
+                                                              Reasons for Voting for One Nation
+    The top four reasons for voting for
+    One Nation were: party policy
+    agreement (23%), immigration                                                                  Party policy agreement                           23%
+    policy stance (20%), major party
+                                                                                               Immigration policy stance                          20%
+    distrust/ general dissatisfaction
+    (14%), and Pauline Hanson                                                Major party distrust/ general dissatisfaction                  14%
+    leadership appeal (13%).                                                           Pauline Hanson leadership appeal                     13%
+
+    Respondents aged 35 to 54 were                                                     Party prioritizes Australian people             8%
+    more likely to indicate their reason                                                     Political change and reform              8%
+    for voting for One Nation was their                                                       Labor Party dissatisfaction             7%
+    interest in political change and
+                                                                                             Liberal Party dissatisfaction            7%
+    reform (16%)†.
+                                                                               Traditional Australian values preservation            6%
+    When looking at the overall type of                                          One Nation aligned with public interests            6%
+    respondents that indicated they
+    would vote for One Nation, they                                             Willingness to speak controversial truths            6%
+
+    were more likely to be male (60%),                                                    Australian values and interests            6%
+    aged 35 to 54 (40%), residing in the                                                      Strong decisive leadership             6%
+    federal electorate of Braddon (27%)                                                  One Nation as better alternative         4%
+    or Lyons (26%) or the south and
+                                                                                            National pride and advocacy           4%
+    southeast (39%), married with no
+    children at home (25%), employed                                   Cost of living and government spending concerns           3%
+
+    full-time or self-employed (48%),                                                    Clear and direct communication          2%
+    have a diploma or workplace                               Opposition to overcrowding and unsustainable development          1%
+    qualification (44%), and have a                                              Policy consistency and promise delivery        1%
+    household income of $120,000 and
+    over (33%).
+                                                                                                                                                         © 2026 EMRS | 18
+†Results must be regarded as indicative only due to the                              Base: All respondents who would vote for One Nation (n=205)
+small sample size.
+*Charts do not equal 100 percent due to multiple responses.
+emrs.com.au
+

@@ -13,7 +13,9 @@
 # Issues Monitor again behind the daily Ipsos run (.build/ipsos-updater.sh),
 # as the backstop (extract-ipsos.mjs caches it, issues.mjs reads it), and
 # likewise runs SEC Newgate's extractor again behind the daily
-# secnewgate-updater.sh, as the direction panel's backstop and quiet alarm.
+# secnewgate-updater.sh, as the direction panel's backstop and quiet alarm,
+# and runs EMRS (Tas)'s extractor again behind the daily emrs-updater.sh,
+# as that house's quiet alarm (QUIET_DAYS: ~6-monthly federal cadence).
 # And it
 # is the alarm for anything that stays unread: a wave still pending
 # STALE_DAYS after its fieldwork closed (listed as `stale` in the scripts'
@@ -85,6 +87,28 @@ case "$SECLAST" in
     UNFINISHED="$UNFINISHED secnewgate"
     ;;
 esac
+# EMRS (Tas)'s federal voting-intention reports are fetched daily by
+# .build/emrs-updater.sh; this weekly pass runs the extractor again, as the
+# backstop, and is the alarm for the house gone quiet (QUIET_DAYS), which
+# the extractor lists as `stale` in its status line. A page or PDF that
+# won't load is a warning here – the cache stays.
+EMRS="$(node .build/extract-emrs.mjs 2>&1)"
+EMRSLAST="$(echo "$EMRS" | tail -1)"
+log "$EMRSLAST"
+case "$EMRSLAST" in
+  EMRS_STATUS*'"guard":true'*)
+    # a canon mismatch or guard-tripping wave: the daily run fails on it
+    # and agent-repair takes it; the weekly run records the same
+    UNFINISHED="$UNFINISHED emrs"
+    ;;
+  EMRS_STATUS*)
+    S="$(echo "$EMRSLAST" | sed -n 's/.*"stale":\[\([^]]*\)\].*/\1/p')"
+    if [ -n "$S" ]; then STALE="$STALE emrs: $S"; fi
+    ;;
+  *)
+    UNFINISHED="$UNFINISHED emrs"
+    ;;
+esac
 for b in vote-switching demographics issues confidence; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
@@ -112,7 +136,7 @@ for b in vote-switching demographics issues confidence; do
   R="$(echo "$LAST" | sed -n 's/.*"reminders":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$R" ]; then REMIND="$REMIND $b: $R"; fi
 done
-if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then CHANGED=true; fi
+if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src .build/emrs-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then CHANGED=true; fi
 
 if $CHANGED; then
   log "crosstab tables changed; running validate/build/commit/push"
@@ -126,7 +150,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src .build/emrs-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

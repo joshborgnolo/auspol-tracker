@@ -47,6 +47,7 @@ on:
       - crosstabs-update
       - ipsos-update
       - secnewgate-update
+      - emrs-update
       - roymorgan-update
       - pollbludger-fallback
       - coverage-check
@@ -117,6 +118,7 @@ jobs:
             crosstabs-update)   HP=.build/crosstabs-repair-prompt.md ;;
             ipsos-update)       HP=.build/ipsos-repair-prompt.md ;;
             secnewgate-update)  HP=.build/secnewgate-repair-prompt.md ;;
+            emrs-update)        HP=.build/emrs-repair-prompt.md ;;
             roymorgan-update)   HP=.build/roymorgan-repair-prompt.md ;;
             pollbludger-fallback) HP=.build/pollbludger-repair-prompt.md ;;
             coverage-check)     HP=.build/coverage-doctor-repair-prompt.md ;;

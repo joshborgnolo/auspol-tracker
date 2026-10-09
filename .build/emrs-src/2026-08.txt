@@ -1,0 +1,373 @@
+EMRS State and
+Federal Voting
+Intentions Poll –
+Report
+August 2026
+                                                       EMRS State and Federal Voting Intentions Poll – Omnibus August 2026
+                                                                               REPORT VERSION: 1
+                                                                        This report has been prepared by
+                                                                  Enterprise Marketing and Research Services
+                                                                       60 Main Road, Moonah TAS 7009
+
+
+
+                                                                             All enquiries should be addressed to:
+                                                                                    Phone: (03) 6211 1222
+                                                                               E-mail: enquiries@emrs.com.au
+                                                                            Post: PO Box 402, Moonah TAS 7009
+
+
+
+                                           The current survey was conducted from the 17th to the 18th of August 2025.
+                 1,000 Tasmanian registered voters were interviewed, and responses weighted to reflect the Tasmanian adult voting population.
+                      A sample of this size provides a maximum margin of error of +/- 3.10 percentage points at the 95% confidence level.
+
+
+Enterprise Marketing and Research Services (EMRS). | ABN 29 009 546 561
+
+Confidential/ Disclaimer
+Notice: The information contained herein is confidential and has been supplied under a confidentiality agreement. If you are not authorised to view or to be in possession of this document you
+are hereby notified that any dissemination, distribution or duplication of this document is expressly prohibited. If you receive this document in error, please notify Enterprise Marketing and
+Research Services (EMRS) immediately on +61 3 6211 1222.
+
+Limitations/ Liability
+While all care and diligence has been exercised in the preparation of this report, EMRS does not warrant the accuracy of the information contained within and accepts no liability for any loss
+or damage that may be suffered as a result of reliance on this information, whether or not there has been any error, omission or negligence on the part of EMRS or its employees.
+
+The research complies with the EMRS Quality System, certified to ISO 20252:2019, the international standard for Social and Ma rket Research,                                    © 2026 EMRS | 2
+certificate number 888027.
+METHODOLOGY
+
+•   For the Omnibus surveys done by EMRS, 1000 Tasmanians are polled each quarter via an interviewer led questionnaire conducted
+    with Computer Assisted Telephone Interviewing (CATI) and online via Computer Assisted Web Interviewing (CAWI).
+
+•   Quotas are used to balance the age, gender and location of respondents to roughly align with the ABS Census, currently based on
+    the 2021 census data. The target population was based on 445,067 Tasmanian residents aged 18 years and over (source: ABS
+    Census, 2021). In total, a sample of n=1,000 completed the survey, yielding overall results accurate to within ±3.10 percentage
+    points at the 95% confidence level.
+
+•   Weighting is then applied to the data based on age group, gender, state region (ABS SA4 regions), highest education achieved and
+    past vote (Tasmanian House of Assembly) to ensure that balance and provide the most accurate results possible.
+
+•   The most recent Omnibus survey was conducted from 17-18 August 2026 utilising EMRS’ in-house call centre and online, ensuring
+    high levels of quality control and that the target sample sizes, and their distribution regionally, were achieved or closely achieved
+    with low and statistically acceptable weightings.
+
+•   The sample is robust and reliable. Cross-tab analysis was carried out to ensure the robustness of the findings.
+
+•   Statistically significant results are in bold and highlighted in a dark shade of green for results that are significantly higher or red for
+    results that is significantly lower at the 95% confidence interval.
+
+
+
+This survey was conducted to the market and social research ISO20252:2019 standard.
+
+
+                                                                                                                                   © 2026 EMRS | 3
+  SECTION 1
+
+State Voting Intentions
+                          © 2026 EMRS | 4
+   TASMANIAN STATE VOTING INTENTIONS
+
+                  Figure 1 – Decided Voters Supporting or Leaning towards a Major or Minor                                                                          Summary:
+                                          Party or an Independent                                                                                                  After excluding undecided voters:
+                                                                                                                                                                   • Support for the Liberal State Government has
+             Liberal         Labor           Greens           Independent            Jacqui Lambi Network                 One Nation            Other                 climbed to 26 per cent, up 1 point since May
+                                                                                                                                                                      2026.
+                                                                                                                                                                   • Support for Labor decreased by 1 point to 23
+                                                                                         40%                                                                          per cent, since May 2026.
+ 39%                                                                                                  38%
+              37%                      36%                                                                                                                         • Support for One Nation has increased by 2 points
+                          35%                      35%          34%                                               34%
+                                                                                                                                                                      to 21% since May 2026.
+                                                                            31%                                                29%
+                                                    31%
+              29%
+                          28%
+                                                                30%         29%                                                            25%          26%        • The Greens currently stand at 16 per cent, up 2
+ 26%                                   27%                                               26%                         25%                                              points since May 2026.
+                                                                                                     24%                                    24%           23%
+                                                                                                                               23%
+                                                                             17%                    19%              19%                        19%       21%      • Support for an independent is currently at 14
+                                                                                         15%                                                             16%          per cent, down by 2 points since May 2026.
+ 14%          14%                                                                                                 17%          15%            16%
+                           15%                                  13%
+                                           14%       14%                      14%                                                15%                    14%
+ 12%            10%                                                                      14%         13%                    14%               14%
+                            12%            12%          11%         12%
+9%                                        8%                     8%           6%
+              7%           7%                         6%                                              6%           6%
+               4%                                                            4%           5%
+  1%                       3%           3%          3%           3%                                                            3%
+                                                                                                                                            1%           1%
+ Feb.      Election  May              Aug.         Nov.        Feb.         May  Election Aug.       Nov.     Feb.    May    Aug.
+ 2024       result   2024             2024         2024        2025         2025   result   2025     2025    2026     2026   2026
+         (Mar. 2024)                                                            (Jul. 2025)
+                                                                      Jacqui Lambie
+            Liberal             Labor             Greens                                  One Nation      Independent      Other
+                                                                      Network
+Q. If the Tasmanian State Election for the House of Assembly was held today, who would you vote for? Would it be [ROTATE: the Liberal Party, the Labor Party], the Greens, an Independent,
+One Nation or some other minor party? If unsure, respondents were then asked a leaning question. The JLN was prompted for the first time in February 2024 in the electorates that had          © 2026 EMRS | 5
+candidates standing at the 2024 Tasmanian state election. The JLN was prompted in all electorates in the subsequent polls until they stopped running candidates in June 2025. One Nation
+was added in February 2026. Respondents who were not registered to vote were removed from analysis – August 2026: n=965
+   TASMANIAN STATE VOTING INTENTIONS
+
+                                              Figure 2 – Preferred Premier of Tasmania                                                             The proportion of voters stating a
+                                                                                                                                                   preference for Jeremy Rockliff as Preferred
+                                                                                                                                                   Premier has decreased to 37%, down 7
+                                                                                                                                                   points since May 2026. This is the lowest
+                                                                                                                                                   percentage for Jeremy Rockliff since he
+                                                                                                                                                   became Premier.
+
+                                                                                                                                                   The proportion of voters nominating Josh
+                                                                                                                                                   Willie as Preferred Premier stands at 30 per
+                                                                                                            50%                                    cent, up 5 points from May 2026.
+                                                             45%         43%         44%        44%                                44%
+             42%         42%
+ 40%                                 41%         40%                                                                    40%                        The proportion of voters indicating they
+ 38%         39%                                                         37%                                                              37%
+                         35%          38%                                                                                                          were unsure increased to 31% , up 2 points
+                                                 32%                                 34%         32%                                               since May 2026.
+                                                             30%                                                        31%               31%
+                                                                                                                                   29%    30%
+                                                 26%         25%                                               24%      26%        25%
+                         23%                                                                     23%
+                                     20%                                             21%                       23%
+ 18%         18%                                                         19%
+
+
+
+
+ May        August    November February          May        August    November February          May        August     February    May    August
+ 2023        2023       2023    2024             2024        2024       2024    2025             2025        2025       2026       2026    2026
+
+                                                                      Rebecca White                     Dean Winter
+                                     Jeremy Rockliff                   Josh Willie                Unsure/ Neither
+                                                                                                                                                                          © 2026 EMRS | 6
+Q. Who would you prefer to be the Premier of Tasmania? Respondents were read two options: Josh Willie and Jeremy Rockliff
+Respondents who were not registered to vote from November 2023 and onwards were removed from the analysis – August 2026: n=1,000
+                                                            Favourability – Leaders
+Respondents were asked how favourable                                       Figure 3 – Tracked Net Favourability - Leaders
+they were of each person on a scale of 0                     15%          10%
+                                                                                                   18%                                                                    Net Favourability†
+                                                                                       6%                       -1%           1%          4%
+to 10 where 0 is very unfavourable and 10                    14%
+                                                                           6%          5%                                                              -7%                    May 2026
+                                                                                                    4%
+                                                                                                                -4%          -4%          -4%                            Jeremy Rockliff: -7%
+is very favourable, respondents could also                                                                                                            -14%
+                                                                                                                             -6%          -5%                              Josh Willie: -14%
+indicate if they were not aware of the                                                                                                                -16%
+name.                                                                                                                                                                   Rosalie Woodruff: -16%
+                                                           November     February       May         August     November     February       May         August
+                                                             2024        2025          2025         2025        2025        2026          2026         2026
+In February 2026, Rosalie Woodruff was                                                                 Dean Winter
+added as the third state political party                                Jeremy Rockliff               Josh Willie               Rosalie Woodruff
+leader to the question.
+All three leaders recorded significant falls                              Favourable             Neutral          Unfavourable             Unsure            Never heard of
+                                                                          (7-10)                 (4-6)            (0-3)
+in their net favourabilities this quarter.
+                                                                        1%
+                                                                       3%                                               14%                                                   14%
+                                                                                                                                   16%                                                    20%
+                                                                               33%                               11%                                                  10%
+
+                                                            40%
+                                                                                                                                        29%                                                  21%
+                                                                                                                        30%                                                 36%
+                                                                            23%
+
+
+
+                                                               Jeremy Rockliff                                      Josh Willie                                         Rosalie Woodruff
+                                                     Q. I am now going to read out the names of some people who are active in public life. For each person, could you please tell me
+                                                      how favourable you are of them on a scale from 0 to 10 where 0 is very unfavourable and 10 is very favourable. If you do not
+                                                                                                 know the name, please let me know.
+                                                     †
+                                                         The net favourability score was arrived at by subtracting the total percentage of those who stated unfavourable from the total   © 2026 EMRS | 7
+                                                                                                  percentage of those who stated favourable.
+                                                                                                        Base: All respondents (n=1,000)
+*Charts may not equal 100 percent due to rounding.
+                                                                     State Voting Issues
+                                                                                                     Healthcare                                                                        20%
+When respondents were asked what the most
+import issue was that would influence how they                                                   Cost-of-Living                                                                    19%
+would vote in the next Tasmanian State
+                                                                                                 The Economy                                                     13%
+election, in August 2026, one-fifth (20%)
+indicated Healthcare was their most important                                                           Housing                                     10%
+issue.
+                                                                              Macquarie Point Stadium (Anti)                                      9%
+This was followed by the cost-of-living (19%),
+the economy (13%), housing (10%), and those                                                           Education                      5%
+who were against the Macquarie Point stadium
+build (9%).                                                             Government Accountability/ Honesty                          4%
+Females (27%) and those who stated they                                   Climate Change/ The Environment                           4%
+would vote for the Labor party (33%) were more
+likely to indicate that healthcare was their most                                       Government Spending                         4%
+important issue.
+                                                                                              Anti-Immigration                 3%
+Respondents who stated they would vote for
+the Liberals (29%) were more likely to mention                                                    Jobs/ Wages               2%
+the economy.
+                                                                                               Age Care/ NDIS               2%
+Those who indicated they would vote for an
+independent (25%) were more likely to mention                                Roads/ Transport Infrastructure              2%
+that they were against the Macquarie Point
+                                                                                                       Firearms           2%
+stadium build.
+                                                                                    Government Competency                 2%
+
+                                                                                                          Other                                         11%
+
+                                                                                                         Unsure              2%
+Responses of less than 2% include:
+Crime/ Policing, Salmon Industry/ Waterways, Tas Government
+Stability, Tasmanian Infrastructure, Social Issues (Conservative),                                      Nothing             2%
+Support Aus Business, Homelessness, and Mac Point Stadium
+                                                                     If the Tasmanian State Election for the House of Assembly were held today, what is the most important issue to you that   © 2026 EMRS | 8
+(Pro) (1% each).
+*Charts will not equal 100 percent due to responses of 1% or                                                    would influence the way you vote?
+                                                                                                                 Base: All respondents (n=965)
+less not being included.
+  SECTION 2
+
+Federal Voting Intentions
+                            © 2026 EMRS | 9
+                                          Federal election vote preference
+Respondents indicated a significant
+preference for the Labor Party overall
+(29%), followed by One Nation (26%),
+and the Liberals (17%).
+                                                     The Liberal Party                          17%
+Respondents aged 18 to 34 (26%)
+were more likely to indicate a
+preference for the Greens, and those
+                                                     The Labor Party                                         29%
+aged 70 or older (29%) were more
+likely to indicate they would vote for
+the Liberals.
+                                                          The Greens                           15%
+Those with a university degree (11%)
+were less likely to indicate they would
+vote for Pauline Hanson’s One Nation
+party.                                    Pauline Hanson's One Nation                                      26%
+
+Respondents residing in the South
+(19%) were more likely to vote for an                 An Independent                        13%
+independent and were less likely to
+indicate they would vote for Pauline
+Hanson’s One Nation party (19%).
+                                              Some other minor party           1%
+Residents in the electorate of Clark
+(28%) or the Legislative Council
+electorate of Nelson (31%) were more
+likely to vote for an independent.
+                                                       If a federal election were being held today, who would you vote for? Would it be...   © 2026 EMRS | 10
+                                                                   Base: All respondents who gave a vote preference (n=968)
+                                                     Prime Minister Preference
+ Nearly half of respondents (48%)
+ indicated that they would prefer
+ Anthony Albanese as Prime Minister
+ compared to 21% who chose Angus
+ Taylor, and 19% who chose Pauline                   Anthony Albanese                                                             48%
+ Hanson.
+ Respondents aged 35 to 54 (27%)
+ were more likely to choose Pauline                      Angus Taylor                              21%
+ Hanson as Prime Minister.
+
+
+                                                       Pauline Hanson                            19%
+
+
+
+
+                                                              Unsure                     13%
+
+
+
+
+                                                                        In your opinion who do you think would make a better Prime Minister?   © 2026 EMRS | 11
+                                                                                          Base: All respondents (n=1,000)
+*Charts may not equal 100 percent due to rounding.
+                                        Two Party Preferred Order – Labor and Liberal
+Just under three-fifths (57%) of
+respondents indicated they would
+preference Labor over Liberal (43%)
+under the preferential voting system.
+Respondents who would vote for the       Labor Ahead                                                                                              57%
+Greens (85%), or an independent
+(72%), were more likely to place the
+Labor Party ahead of the Liberals.
+Those who indicated a vote for One
+Nation were more likely to place the    Liberal Ahead                                                                         43%
+Liberals ahead (81%).
+
+
+
+
+                                        Under the preferential voting system, you may ultimately assign a preference to either the Liberal Party or the Labor Party. Regardless
+                                        of WHERE you would place them on your preference list, would you put LABOR AHEAD OF LIBERAL or LIBERAL AHEAD OF LABOR?                    © 2026 EMRS | 12
+                                                                               Base: All respondents who were NOT undecided (n=907)
+                                        Two Party Preferred Order – Labor and One Nation
+Again, looking at the two-party
+preferred, but this time with Labor
+compared to One Nation, the results
+are similar, with respondents placing
+Labor (63%) ahead of One Nation
+                                                  Labor Ahead                                                                                                63%
+(37%).
+
+Respondents who would vote for the
+Greens (96%), or for an independent
+(88%) were more likely to place the
+Labor Party first.                        One Nation Ahead                                                                 37%
+
+Notably, only 53% of Liberal voters
+indicated that they would place One
+Nation ahead of Labor.
+
+
+
+
+                                        Under the preferential voting system, you may ultimately assign a preference to either One Nation or the Labor Party. Regardl ess of WHERE
+                                           you would place them on your preference list, would you put LABOR AHEAD OF ONE NATION or ONE NATION AHEAD OF LABOR?                       © 2026 EMRS | 13
+                                                                                  Base: All respondents who were NOT undecided (n=957)
+                                                                Top Federal Issues
+The top five national issues that would
+influence the way respondents would
+vote were:                                                                            Cost-of-Living                                                               22%
+• Cost-of-living (22%)                                                              Anti-Immigration                                                      14%
+
+• Anti-immigration views (14%)                                                            Healthcare                                                  13%
+• Healthcare (13%)                                                                           Housing                                                12%
+• Housing (12%)                                                                        The Economy                                     8%
+• The economy (8%)                                                Climate Change/ The Environment                                 7%
+                                                                        Taxation/ Negative Gearing                           6%
+Respondents who indicated they would
+                                                                                    Age Care/ NDIS                           5%
+vote for Pauline Hanson’s One Nation
+                                                                           National Defence/ Aukus                  3%
+party (39%) were more likely to mention
+                                                                Government Accountability/ Honesty                  3%
+anti-immigration views.
+                                                                           Australian Foreign Policy                3%
+                                                                                       Jobs/ Wages                2%
+                                                                          Government Competency                   2%
+                                                                                     Crime/ Policing             2%
+                                                                        Social Issues (Conservative)             2%
+                                                                                           Education             2%
+                                                                                      Homelessness               2%
+                                                                             Government Spending                 2%
+                                                                                                Other                                  8%
+                                                                                              Nothing          1%
+                                                                                              Unsure                  3%
+
+                                                                                What is the most important national issue that would influence the way you vote?     © 2026 EMRS | 14
+†Results must be regarded as indicative only due to the small
+                                                                                                       Base: All respondents (n=1,000)
+sample size.
+*Charts do not equal 100 percent due to multiple responses.
+emrs.com.au
+

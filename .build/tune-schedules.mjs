@@ -153,6 +153,11 @@ const TARGETS = [
   // stamps in 2026 read 11:43–16:34 Sydney, every one on a weekday (Feb–Sep;
   // June's re-uploaded v4 set aside). Recheck them when the comb misses.
   { workflow: "ipsos-update.yml", houses: ["Ipsos"], window: ["11:43", "16:34"], mode: "weekdays", step: 20 },
+  // EMRS only dates its reports (both 2026 waves carry a date, no clock
+  // time), so like Ipsos its hours are declared: a Hobart business posts in
+  // office hours. The caller's hand-authored evening line covers a release
+  // landing on a weekend (both 2026 waves did — a Friday and a Saturday).
+  { workflow: "emrs-update.yml", houses: ["EMRS (Tas)"], window: ["09:00", "17:30"], mode: "weekdays", step: 20 },
 ];
 
 // ---- helpers --------------------------------------------------------------

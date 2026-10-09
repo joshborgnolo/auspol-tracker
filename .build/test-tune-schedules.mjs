@@ -54,7 +54,7 @@ const data = {
 const dir = mkdtempSync(path.join(tmpdir(), "tune-"));
 const files = ["roymorgan-update.yml", "resolve-update.yml", "essential-update.yml",
   "redbridge-update.yml", "newspoll-update.yml", "newspoll-watch.yml", "news24-update.yml", "demosau-update.yml",
-  "spectre-update.yml", "foxhedgehog-update.yml", "secnewgate-update.yml", "ipsos-update.yml"];
+  "spectre-update.yml", "foxhedgehog-update.yml", "secnewgate-update.yml", "ipsos-update.yml", "emrs-update.yml"];
 // each file keeps one hand-authored slot on a minute of its own (nine
 // writers on one minute would trip the collision audit, rightly)
 files.forEach((f, i) => {

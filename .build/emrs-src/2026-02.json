@@ -1,0 +1,23 @@
+{
+  "firstSeen": "2026-10-10",
+  "url": "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf",
+  "title": "EMRS - Federal Voting Intentions Report - February 2026",
+  "ym": "2026-02",
+  "fetched": "2026-10-10",
+  "date": "2026-02-19",
+  "dateStart": "2026-02-16",
+  "sample": 953,
+  "primaries": {
+    "alp": 30,
+    "lnp": 19,
+    "grn": 13,
+    "onp": 24,
+    "ind": 12,
+    "oth": 1
+  },
+  "tpp": {
+    "alp": 60,
+    "lnp": 40
+  },
+  "published": "2026-10-10"
+}

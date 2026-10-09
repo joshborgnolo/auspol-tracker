@@ -19,9 +19,10 @@ a GENERATED build artifact — never hand-edit it.
 - `data/polls.json` — canonical poll rows (never hand-edit; extractors write it)
 - `.build/extract-*.mjs` + `.build/*-updater.sh` — pollster extractors and
   their scheduled pipelines. GitHub Actions runs them: `poll-agent.yml`
-  (reusable) driven by thirteen caller workflows (nine houses, Roy Morgan's
-  included, plus the crosstabs, sample-size, Poll Bludger fallback and daily
-  Ipsos jobs); `coverage-check.yml` is the gap watchdog whose failure emails a
+  (reusable) driven by fifteen caller workflows (eleven houses — Roy
+  Morgan's, SEC Newgate's and EMRS (Tas)'s included — plus the crosstabs,
+  sample-size, Poll Bludger fallback and daily Ipsos jobs);
+  `coverage-check.yml` is the gap watchdog whose failure emails a
   missing-poll alert. Local launchd jobs mirror these as backup.
   - Writers queue PER HOUSE (`writers-<house>`), never in one shared group:
     GitHub keeps one pending run per group and cancels the rest, which cost
