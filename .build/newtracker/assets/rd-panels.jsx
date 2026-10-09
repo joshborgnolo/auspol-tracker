@@ -4597,7 +4597,7 @@ function RdConfidence({ rangeId }) {
           (user call 2026-10-09 evening) */}
       <RdConfCal />
       <div className="rd-foot">
-        <span className="rd-foot-text">Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</span>
+        <span className="rd-foot-text">The consumer and business confidence indices are displayed here just for extra context in today’s low-confidence environment.</span>
         <span className="rd-grow"></span>
         <button type="button" className="rd-how rd-confidence-csv" onClick={exportCsv}><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"></path></svg> Source data, CSV</button>
         <RdHow term="confidence" from="Economic sentiment" />
