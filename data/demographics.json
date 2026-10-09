@@ -1653,6 +1653,55 @@
    }
   },
   {
+   "pollster": "RedBridge/Accent",
+   "date": "2025-11-13",
+   "dateStart": "2025-11-07",
+   "dateEnd": "2025-11-13",
+   "sample": 1011,
+   "article": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
+   "source": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
+   "read": "published table",
+   "dims": {
+    "generation": {
+     "Gen Z": {
+      "alp": 51,
+      "lnp": 10,
+      "grn": 24,
+      "onp": 5,
+      "oth": 10
+     },
+     "Millennials": {
+      "alp": 34,
+      "lnp": 23,
+      "grn": 11,
+      "onp": 18,
+      "oth": 14
+     },
+     "Gen X": {
+      "alp": 38,
+      "lnp": 26,
+      "grn": 6,
+      "onp": 20,
+      "oth": 10
+     },
+     "Boomers": {
+      "alp": 34,
+      "lnp": 30,
+      "grn": 3,
+      "onp": 24,
+      "oth": 9
+     }
+    }
+   },
+   "total": {
+    "alp": 38,
+    "lnp": 24,
+    "grn": 9,
+    "onp": 18,
+    "oth": 11
+   }
+  },
+  {
    "pollster": "Roy Morgan",
    "date": "2025-11-16",
    "dateStart": "2025-10-20",
@@ -1982,24 +2031,24 @@
      },
      "$50–99k": {
       "alp": 35,
-      "lnp": 26,
+      "lnp": 25,
       "grn": 11,
       "onp": 17,
-      "oth": 11
+      "oth": 12
      },
      "$100–149k": {
-      "alp": 35,
+      "alp": 38,
       "lnp": 24,
       "grn": 15,
-      "onp": 11,
-      "oth": 15
+      "onp": 12,
+      "oth": 11
      },
      "$150k+": {
-      "alp": 38,
+      "alp": 39,
       "lnp": 28,
       "grn": 11,
       "onp": 10,
-      "oth": 13
+      "oth": 12
      }
     },
     "working": {
@@ -2013,9 +2062,9 @@
      "Part time": {
       "alp": 35,
       "lnp": 20,
-      "grn": 11,
-      "onp": 17,
-      "oth": 17
+      "grn": 20,
+      "onp": 12,
+      "oth": 13
      },
      "Retired": {
       "alp": 36,

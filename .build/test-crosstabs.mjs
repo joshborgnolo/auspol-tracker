@@ -205,6 +205,32 @@ assert.deepEqual(jul.dims.location["Rural"], { alp: 32, lnp: 32, grn: 8, oth: 28
 assert.deepEqual(jul.dims.age["50–64"], { alp: 37, lnp: 34, grn: 5, oth: 24 });
 assert.equal(sharesProblem(jul.dims.gender), null);
 
+// the November 2025 wave (REDBRIDGE_NOV_DEMO): no Accent report ever existed,
+// so the generational table enters by hand from the AFR piece's table as
+// Wikipedia's subpopulation chapter transcribed it – pinned cell by cell so
+// the transcription can't drift under a later "fix"
+const nov = wave("RedBridge/Accent", "2025-11-13");
+assert.ok(nov, "the November 2025 AFR wave is filed");
+assert.equal(nov.source, "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2");
+assert.equal(nov.read, "published table");
+assert.deepEqual(nov.total, { alp: 38, lnp: 24, grn: 9, onp: 18, oth: 11 },
+  "the printed five-party total maps the poll row's ind 11 to oth");
+assert.equal(totalProblem(nov.total, poll("RedBridge/Accent", "2025-11-13")), null,
+  "the total sits with the poll row");
+assert.deepEqual(Object.keys(nov.dims), ["generation"], "the piece printed only the generational cut");
+assert.deepEqual(Object.keys(nov.dims.generation), ["Gen Z", "Millennials", "Gen X", "Boomers"],
+  "series labels, not the table's 'Baby boomers'");
+assert.deepEqual(nov.dims.generation["Gen Z"], { alp: 51, lnp: 10, grn: 24, onp: 5, oth: 10 },
+  "Gen Z lnp 10 is the cell the AFR prose itself quotes");
+assert.deepEqual(nov.dims.generation["Millennials"], { alp: 34, lnp: 23, grn: 11, onp: 18, oth: 14 },
+  "Millennials lnp 23 likewise");
+assert.deepEqual(nov.dims.generation["Gen X"], { alp: 38, lnp: 26, grn: 6, onp: 20, oth: 10 },
+  "Gen X lnp 26 is the table's Lib 22 + Nat 4 combined");
+assert.deepEqual(nov.dims.generation["Boomers"], { alp: 34, lnp: 30, grn: 3, onp: 24, oth: 9 });
+assert.ok(Object.values(nov.dims.generation).every((r) => Object.keys(r).length === 5),
+  "Independents fold into Others across every group, as the table has it");
+assert.equal(sharesProblem(nov.dims.generation), null, "every group row sums to 100");
+
 // ---- Resolve: decoding and the series ------------------------------------------------
 assert.equal(decodeUx("2l"), 38);
 assert.equal(decodeUx("2l.83"), 38.83, "the fraction rides verbatim");

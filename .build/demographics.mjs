@@ -39,10 +39,13 @@
                  title – they ride FIRST_EXTRA through the same reader. The
                  July 2025 wave's AFR Datawrapper table is hand-entered in
                  REDBRIDGE_JUL_DEMO, the October 2025 wave's own report PDF
-                 in REDBRIDGE_OCT_DEMO. Two 2025 waves file nothing –
-                 nothing verifiable exists to file: 8 Sep's breakdowns are
-                 a protected tweet's two-wave pool; 13 Nov's sit only in
-                 the paywalled AFR prose.
+                 in REDBRIDGE_OCT_DEMO, and the November 2025 wave – the
+                 one 2025 wave with no Accent report – is hand-entered in
+                 REDBRIDGE_NOV_DEMO from the AFR piece's generational
+                 table, recovered through Wikipedia's subpopulation
+                 chapter and verified against the piece's own text. That
+                 leaves ONE 2025 wave filing nothing: 8 Sep's breakdowns,
+                 a protected tweet's two-wave pool.
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
@@ -85,7 +88,12 @@
                  rented; the January–March 2026 quarter does not print it),
                  hand-entered in NEWSPOLL_DEMO below and verified
                  against the printed table (the same figures sit on
-                 Wikipedia's subpopulation page and reconcile). "No
+                 Wikipedia's subpopulation page and reconcile). New
+                 quarters are filed by .build/extract-newspoll-quarterly.mjs
+                 into data/newspoll-quarterly.json (the polls.json row plus
+                 the full table, re-verified against source every run) and
+                 merged in beneath NEWSPOLL_DEMO's hand-entered keys – see
+                 the Newspoll loop below. "No
                  tertiary" spans Year-12-or-less AND TAFE-or-trade voters,
                  so no common education group holds every wave's school row
                  – harmonize drops the dim unless the wave prints a school
@@ -674,15 +682,21 @@ const NEWSPOLL_DEMO = {
         TAFE: { alp: 35, lnp: 24, grn: 9, onp: 19, oth: 13 },
         University: { alp: 41, lnp: 26, grn: 13, onp: 6, oth: 14 },
       },
+      /* Income and the part-time row re-verified against the tables PDF
+         (origin.theaustralian.com.au 2025/12/Newspoll.pdf) on 2026-10-09:
+         nine figures were column misreads on the first entry and are
+         corrected ($50–99k lnp 26→25/oth 11→12, $100–149k alp 35→38/
+         onp 11→12/oth 15→11, $150k+ alp 38→39/oth 13→12, Part time
+         grn 11→20/onp 17→12/oth 17→13). */
       income: {
         "Under $50k": { alp: 35, lnp: 23, grn: 11, onp: 17, oth: 14 },
-        "$50–99k": { alp: 35, lnp: 26, grn: 11, onp: 17, oth: 11 },
-        "$100–149k": { alp: 35, lnp: 24, grn: 15, onp: 11, oth: 15 },
-        "$150k+": { alp: 38, lnp: 28, grn: 11, onp: 10, oth: 13 },
+        "$50–99k": { alp: 35, lnp: 25, grn: 11, onp: 17, oth: 12 },
+        "$100–149k": { alp: 38, lnp: 24, grn: 15, onp: 12, oth: 11 },
+        "$150k+": { alp: 39, lnp: 28, grn: 11, onp: 10, oth: 12 },
       },
       working: {
         "Full time": { alp: 38, lnp: 26, grn: 11, onp: 13, oth: 12 },
-        "Part time": { alp: 35, lnp: 20, grn: 11, onp: 17, oth: 17 },
+        "Part time": { alp: 35, lnp: 20, grn: 20, onp: 12, oth: 13 },
         Retired: { alp: 36, lnp: 32, grn: 2, onp: 17, oth: 13 },
         Other: { alp: 30, lnp: 19, grn: 24, onp: 13, oth: 14 },
       },
@@ -1256,6 +1270,44 @@ const REDBRIDGE_OCT_DEMO = {
   },
 };
 
+/* RedBridge/Accent's November 2025 wave (fieldwork 7–13 Nov, AFR 16 Nov):
+   the one 2025 wave with NO Accent report – the house's monthly project
+   pages run October 2025 then December 2025, and no
+   afr…-november-2025-federal-poll slug ever existed (probed). So the
+   figures it published live only in Phillip Coorey's AFR piece: its text
+   quotes two cells, and the generational vote-intention table that rode
+   the piece (no fetchable dataset, unlike the June wave's FexJm) survives
+   verbatim in Wikipedia's next-election subpopulation chapter, whose four
+   generation tables carry the wave cited to the AFR article – the Gen X
+   row cites Kos Samaras's post too (x.com/KosSamaras/status/
+   1990511966826455110, "Dog whistling your way to 24%" – protected,
+   unreadable). Entered cell by cell from Wikipedia's transcription and
+   verified against every unblocked check: the AFR piece's own text,
+   re-read whole, says "the Coalition's primary support among Gen Z voters
+   is 10 per cent and 23 per cent among Millennials" – both cells match the
+   table exactly; every printed group row sums to 100 on its own keys; and
+   total() below sits within the gate of the poll row's published primaries.
+   Gen X is the one row printing a party split (Lib 22 + Nat 4 = the 26
+   filed combined); Independents print nowhere – the table's IND column is
+   N/A everywhere and they fold into Others, matching the poll row's
+   ind 11 / oth null. "Baby boomers" tidied to the series' Boomers. The
+   table's 2PP cells aren't filed – the site's demographics are first
+   preference. */
+const REDBRIDGE_NOV_DEMO = {
+  "2025-11-13": {
+    source: "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
+    total: { alp: 38, lnp: 24, grn: 9, onp: 18, oth: 11 },
+    dims: {
+      generation: {
+        "Gen Z": { alp: 51, lnp: 10, grn: 24, onp: 5, oth: 10 },
+        Millennials: { alp: 34, lnp: 23, grn: 11, onp: 18, oth: 14 },
+        "Gen X": { alp: 38, lnp: 26, grn: 6, onp: 20, oth: 10 },
+        Boomers: { alp: 34, lnp: 30, grn: 3, onp: 24, oth: 9 },
+      },
+    },
+  },
+};
+
 /* YouGov's Climate Council MRP (national report, 17 Nov 2025): the
    first-preference table's "Don't know" base (n=253) is already excluded
    from the printed shares; Independent and Another Party fold into oth,
@@ -1453,17 +1505,30 @@ try {
            sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
     console.log(`${k}: country(${Object.keys(h.country).join("/")})`);
   }
-  // Newspoll quarterly aggregates (NEWSPOLL_DEMO) — the "Newspoll (pooled)"
-  // NO_AGG waves. Not in HOUSES: releases without a breakdown file nothing.
-  for (const [date, h] of Object.entries(NEWSPOLL_DEMO)) {
+  // Newspoll quarterly aggregates — the "Newspoll (pooled)" NO_AGG waves.
+  // Not in HOUSES: releases without a breakdown file nothing. Two figure
+  // sources merge here, hand-entered keys winning: NEWSPOLL_DEMO below, and
+  // the machine layer data/newspoll-quarterly.json written and re-verified
+  // against source every run by extract-newspoll-quarterly.mjs (which also
+  // files the pooled polls.json rows a NEW quarter lands on).
+  const npqFile = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "newspoll-quarterly.json"), "utf8")); }
+    catch { return null; }
+  })();
+  const npFileDemo = {};
+  for (const w of npqFile?.waves ?? [])
+    if (w?.date && w.dims && !(w.date in NEWSPOLL_DEMO))
+      npFileDemo[w.date] = { dims: w.dims, total: w.total, source: w.article ?? w.source ?? null,
+                             read: w.kind === "infogram" ? "Infogram chart" : "tables pdf" };
+  for (const [date, h] of Object.entries({ ...npFileDemo, ...NEWSPOLL_DEMO })) {
     const k = "Newspoll (pooled)|" + date;
     if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
     const p = polls.find((x) => x.pollster === "Newspoll (pooled)" && x.date === date);
     if (!p) { pend(k, "no Newspoll (pooled) poll row for this wave's date yet"); continue; }
     const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
-    if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
+    if (bad) { pend(k, `${date in NEWSPOLL_DEMO ? "the hand-entered" : "the quarterly-agent's"} table failed the gate – ${bad}`); continue; }
     push({ pollster: "Newspoll (pooled)", date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
-           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims: h.dims, total: h.total });
+           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: h.read ?? "published table", dims: h.dims, total: h.total });
     console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
   }
   // The hand-entered waves of reader-covered houses (DEMOSAU_EARLY_DEMO…
@@ -1471,6 +1536,7 @@ try {
   // learnt. HAND_KEYS above keeps the candidate loop off them.
   for (const [house, table] of [["DemosAU", DEMOSAU_EARLY_DEMO], ["DemosAU (MRP)", DEMOSAU_MRP_DEMO],
     ["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
+    ["RedBridge/Accent", REDBRIDGE_NOV_DEMO],
     ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
     for (const [date, h] of Object.entries(table)) {
       const k = house + "|" + date;
