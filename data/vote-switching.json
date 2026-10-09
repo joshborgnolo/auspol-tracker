@@ -1,5 +1,5 @@
 {
- "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked by hand and found to carry no usable table.",
+ "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's and RedBridge's oth includes independents), dnr (didn't remember / didn't vote – DemosAU and RedBridge only), und (undecided / won't vote – RedBridge's chart prints it as a current-vote cell; other houses don't). `skipped` lists waves checked by hand and found to carry no usable table.",
  "weights2025": {
   "alp": 34.56,
   "lnp": 31.82,
@@ -264,6 +264,66 @@
     "grn": 13,
     "ind": 5,
     "oth": 7
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent (shifts)",
+   "date": "2026-03-19",
+   "dateStart": "2026-03-06",
+   "sample": 5563,
+   "article": "https://accent-research.com/projects/shifts%3A-shifts-in-vote-intention-since-june-2025",
+   "onp": null,
+   "source": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 71,
+     "lnp": 4,
+     "onp": 12,
+     "grn": 5,
+     "oth": 3,
+     "und": 5
+    },
+    "lnp": {
+     "alp": 3,
+     "lnp": 56,
+     "onp": 33,
+     "grn": 1,
+     "oth": 3,
+     "und": 4
+    },
+    "grn": {
+     "alp": 5,
+     "lnp": 2,
+     "onp": 3,
+     "grn": 84,
+     "oth": 4,
+     "und": 3
+    },
+    "onp": {
+     "alp": 0.7,
+     "lnp": 0.8,
+     "onp": 96,
+     "grn": 0.3,
+     "oth": 1.4,
+     "und": 0.4
+    },
+    "oth": {
+     "alp": 5,
+     "lnp": 5,
+     "onp": 27,
+     "grn": 3,
+     "oth": 55,
+     "und": 5
+    },
+    "dnr": {
+     "alp": 11,
+     "lnp": 8,
+     "onp": 18,
+     "grn": 5,
+     "oth": 12,
+     "und": 46
+    }
    }
   },
   {

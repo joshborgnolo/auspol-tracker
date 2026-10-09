@@ -501,4 +501,24 @@ assert.deepEqual(printedZero.age["18–34"], sh(30, 12, 0, 26, 17), "a party tha
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
 
-console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels, the gate, the common groups (place and home too, unprinted parties null)");
+// ---- vote-switching: the hand-entered shifts wave --------------------------------
+/* Accent's "shifts" report Figure 9 (fieldwork 6–19 Mar 2026, n=5,563) – a
+   stacked-bar chart measured by hand (printed labels where shown, bar widths
+   otherwise, an undecided/won't-vote residue cell no other house prints).
+   No automation reads this house, so vote-switching.mjs carries the wave
+   forward verbatim; pinned cell by cell so a later "fix" can't drift it. */
+const vsWaves = JSON.parse(readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")).waves;
+const shiftsVs = vsWaves.find((w) => w.pollster === "RedBridge/Accent (shifts)" && w.date === "2026-03-19");
+assert.ok(shiftsVs, "the shifts Figure 9 wave is filed");
+assert.equal(shiftsVs.read, "measured from the chart");
+assert.deepEqual(Object.keys(shiftsVs.rows).sort(), ["alp", "dnr", "grn", "lnp", "onp", "oth"],
+  "six recalled-vote cohorts, no ind row (folded into oth as the chart prints it)");
+assert.deepEqual(shiftsVs.rows.alp, { alp: 71, lnp: 4, onp: 12, grn: 5, oth: 3, und: 5 });
+assert.deepEqual(shiftsVs.rows.lnp, { alp: 3, lnp: 56, onp: 33, grn: 1, oth: 3, und: 4 });
+assert.deepEqual(shiftsVs.rows.grn, { alp: 5, lnp: 2, onp: 3, grn: 84, oth: 4, und: 3 });
+assert.deepEqual(shiftsVs.rows.onp, { alp: 0.7, lnp: 0.8, onp: 96, grn: 0.3, oth: 1.4, und: 0.4 },
+  "One Nation retention 96, the print's headline cell");
+assert.deepEqual(shiftsVs.rows.oth, { alp: 5, lnp: 5, onp: 27, grn: 3, oth: 55, und: 5 });
+assert.deepEqual(shiftsVs.rows.dnr, { alp: 11, lnp: 8, onp: 18, grn: 5, oth: 12, und: 46 });
+
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");

@@ -25,6 +25,11 @@
    where its losses went), which cannot place One Nation's gains, so it isn't
    read. Neither house published the table before February 2026.
 
+   Hand-entered waves from a house this script doesn't read (the
+   RedBridge/Accent (shifts) 2026-03-19 wave, measured by hand from the
+   report's Figure 9 chart) are carried forward verbatim every run, since
+   their pollster isn't in HOUSES.
+
    Weights: each group's share of the 2025 formal vote (AEC event 31496, the
    TPP flow file cached in .build/aec-flow-src/tpp-2025.txt: first
    preferences, with independents split from other minor parties because
@@ -104,6 +109,8 @@ try {
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true });
 }
+// hand-entered waves (a pollster this script doesn't read) are kept as-is
+for (const w of prev.waves || []) if (!HOUSES.includes(w.pollster)) waves.push(w);
 waves.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.pollster.localeCompare(b.pollster)));
 skipped.sort((a, b) => (a.date < b.date ? -1 : 1));
 
@@ -113,7 +120,7 @@ const onFile = new Set(waves.map(key)), skippedKeys = new Set(skipped.map(key));
 const stale = candidates.filter((p) => daysAgo(p.date) > STALE_DAYS && !onFile.has(key(p)) && !skippedKeys.has(key(p))).map(key);
 
 const doc = {
-  _about: "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked by hand and found to carry no usable table.",
+  _about: "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's and RedBridge's oth includes independents), dnr (didn't remember / didn't vote – DemosAU and RedBridge only), und (undecided / won't vote – RedBridge's chart prints it as a current-vote cell; other houses don't). `skipped` lists waves checked by hand and found to carry no usable table.",
   weights2025: WEIGHTS_2025,
   waves,
   skipped,
