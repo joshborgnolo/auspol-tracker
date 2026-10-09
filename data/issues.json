@@ -1363,6 +1363,75 @@
    }
   },
   {
+   "pollster": "Ipsos",
+   "date": "2026-09-16",
+   "dateStart": "2026-09-07",
+   "sample": 1000,
+   "sampleEff": null,
+   "source": "https://www.ipsos.com/sites/default/files/IM_Nat_Sep_26_V3.pdf",
+   "read": "report",
+   "question": "pick 3 of 19",
+   "issues": {
+    "col": {
+     "top3": 65
+    },
+    "housing": {
+     "top3": 39
+    },
+    "immigration": {
+     "top3": 25
+    },
+    "crime": {
+     "top3": 25
+    },
+    "economy": {
+     "top3": 24
+    },
+    "health": {
+     "top3": 22
+    },
+    "petrol": {
+     "top3": 16
+    },
+    "tax": {
+     "top3": 14
+    },
+    "population": {
+     "top3": 10
+    },
+    "poverty": {
+     "top3": 10
+    },
+    "environment": {
+     "top3": 9
+    },
+    "unemployment": {
+     "top3": 8
+    },
+    "personaldebt": {
+     "top3": 7
+    },
+    "racism": {
+     "top3": 5
+    },
+    "drugs": {
+     "top3": 5
+    },
+    "education": {
+     "top3": 5
+    },
+    "transport": {
+     "top3": 5
+    },
+    "security": {
+     "top3": 4
+    },
+    "indigenous": {
+     "top3": 2
+    }
+   }
+  },
+  {
    "pollster": "RedBridge/Accent",
    "date": "2026-10-02",
    "dateStart": "2026-09-28",
@@ -19435,6 +19504,72 @@
      "onp": 22,
      "grn": 12,
      "oth": 27
+    }
+   }
+  },
+  {
+   "pollster": "Ipsos",
+   "date": "2026-09-16",
+   "dateStart": "2026-09-07",
+   "sample": 1000,
+   "sampleEff": null,
+   "source": "https://www.ipsos.com/sites/default/files/IM_Nat_Sep_26_V3.pdf",
+   "read": "report",
+   "question": "most capable of managing",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "oth",
+    "unsure",
+    "none"
+   ],
+   "issues": {
+    "col": {
+     "lnp": 21,
+     "alp": 23,
+     "grn": 7,
+     "onp": 20,
+     "oth": 3,
+     "unsure": 18,
+     "none": 8
+    },
+    "housing": {
+     "lnp": 17,
+     "alp": 23,
+     "grn": 8,
+     "onp": 20,
+     "oth": 3,
+     "unsure": 20,
+     "none": 9
+    },
+    "immigration": {
+     "lnp": 15,
+     "alp": 21,
+     "grn": 7,
+     "onp": 35,
+     "oth": 2,
+     "unsure": 14,
+     "none": 6
+    },
+    "crime": {
+     "lnp": 20,
+     "alp": 21,
+     "grn": 6,
+     "onp": 24,
+     "oth": 3,
+     "unsure": 21,
+     "none": 7
+    },
+    "economy": {
+     "lnp": 23,
+     "alp": 25,
+     "grn": 6,
+     "onp": 18,
+     "oth": 2,
+     "unsure": 18,
+     "none": 7
     }
    }
   },
