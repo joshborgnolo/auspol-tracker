@@ -13,6 +13,10 @@
                  YouGov's Year 12 or less, and RedBridge's Below Year 12 and
                  Year 12 together are Year 12 or less; TAFE, TAFE or college
                  and TAFE or trade are TAFE or trade; University is University.
+                 DemosAU (MRP)'s five-level scale shares only its TAFE row;
+                 its Didn't Finish Grade 12 and Grade 12 pair and its
+                 Undergraduate and Postgraduate pair are the common school
+                 and university groups split in two, filed as printed.
                  RedBridge's two school rows merge 39:61, the split of its own
                  printed group sizes (Jul–Aug 2026: 216 and 343 respondents;
                  its earlier reports print none).
@@ -24,7 +28,10 @@
                  together are Non-NSW/Vic/Qld, merged at their shares of the
                  2025 formal vote (AEC event 31496) – a known split, not an
                  estimate. A wave missing any of the three doesn't join
-                 there. Roy Morgan (from the 2026-09-27 wave's fortnight
+                 there. DemosAU (MRP) prints Tas, NT and ACT as their own
+                 rows, which are none of the common groups, so it joins at
+                 NSW, Vic, Qld, SA and WA alone. Roy Morgan (from the
+                 2026-09-27 wave's fortnight
                  release PDF) prints NSW, Vic, Qld, SA and WA but no
                  Tas/ACT/NT cut, so it joins at the three big states and at
                  SA and WA, never at Non-NSW/Vic/Qld.
@@ -32,7 +39,8 @@
                  RedBridge cut identically. DemosAU's Regional/Rural is
                  provincial and rural voters together, so it joins only at
                  the two metro groups (as YouGov's age bands join only at
-                 18–34).
+                 18–34). DemosAU (MRP)'s Reg & Rur is that same combined
+                 cut, also filed as printed.
      housing     Own outright, Mortgage and Renting – YouGov and DemosAU.
                  RedBridge's Renting and other is wider than renters, so it
                  joins only at the two owner groups.

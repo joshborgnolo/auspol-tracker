@@ -19,14 +19,31 @@
      DemosAU   – the Gender, Age, Education, Location and Housing Tenure
                  charts (and Language Status from May) in the wave's report
                  PDF, measured from the rendered bars (.build/demosau-charts
-                 .mjs); from the April 2026 report (earlier reports used
-                 another layout without them). Its Income chart (personal
+                 .mjs); from the April 2026 report. The four 2025–26 national
+                 waves before it print the same breakdowns in layouts the
+                 measurer doesn't know (July 2025, 6 Jan, 21 Jan and 20 Feb
+                 2026) or as image-only charts (21 Jan 2026) – hand-entered
+                 in DEMOSAU_EARLY_DEMO below, the 21 Jan wave measured from
+                 a 300-dpi render of its report. Its Income chart (personal
                  income) is read to the same facet-only end as YouGov's.
+     DemosAU (MRP) / YouGov (MRP) – the two MRP reports print their
+                 demographic tables as native text: hand-entered in
+                 DEMOSAU_MRP_DEMO / YOUGOV_MRP_DEMO below (their Tas, NT and
+                 ACT rows are kept as printed – the common state set's
+                 smaller-region merge only knows YouGov's ACT/NT/Tas cut).
      RedBridge – the "First preference vote intention" table in the report
                  text extract-redbridge.mjs caches (.build/redbridge-src/),
-                 from February 2026 (earlier reports printed it as figures):
-                 generation, gender, location, education, home ownership and
-                 vote softness.
+                 from February 2026: generation, gender, location, education,
+                 home ownership and vote softness. The December 2025 and
+                 January 2026 reports print the same table under an older
+                 title – they ride FIRST_EXTRA through the same reader. The
+                 October 2025 wave's own report PDF is hand-entered in
+                 REDBRIDGE_OCT_DEMO. Three 2025 waves file nothing –
+                 nothing verifiable exists to file: 30 June's only
+                 breakdowns print in AFR's Datawrapper tables as four-party
+                 rows (Others folds One Nation and independents together);
+                 8 Sep's are a protected tweet's two-wave pool; 13 Nov's
+                 sit only in the paywalled AFR prose.
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
@@ -139,8 +156,11 @@ import { measureCharts, FIT_LIMIT } from "./demosau-charts.mjs";
 import { watchReminders } from "./demo-watch.mjs";
 
 const OUT = path.join(ROOT, "data", "demographics.json");
-const FIRST = "2026-02-01";            // no house published these breakdowns earlier this term (except FIRST_EXTRA's)
-const FIRST_EXTRA = new Set(["YouGov|2026-01-27"]);   // the Sky News Pulse wave's Infogram crosstab, found via KNOWN_IG
+const FIRST = "2026-02-01";            // the automated readers' window opens here; earlier waves with
+                                       // breakdowns ride FIRST_EXTRA (read through the readers) or the
+                                       // hand-entered tables below (checked by hand, figure by figure)
+const FIRST_EXTRA = new Set(["YouGov|2026-01-27",     // the Sky News Pulse wave's Infogram crosstab, found via KNOWN_IG
+  "RedBridge/Accent|2025-12-12", "RedBridge/Accent|2026-01-29"]);  // the older report layout, cached (see redbridgeTable)
 const FIRST_ESS = "2025-05-03";        // Essential's CSV visuals run since 2023 – read from the term's start
 const HOUSES = ["YouGov", "DemosAU", "RedBridge/Accent", "Resolve", "Essential"];
 const STALE_DAYS = 16;                 // a week to publish, then a weekly retry, then someone looks
@@ -150,8 +170,6 @@ const RESOLVE_MATCH_DAYS = 4;          // the interactive can date a month a day
 /* A wave checked by hand and found to carry no breakdowns: "house|date" →
    why. Clears both the automated-house loop and the watch reminders below. */
 const KNOWN_SKIP = {
-  "DemosAU|2026-02-20": "the February report predates the Gender, Age and Education charts (an older layout)",
-  "YouGov|2026-03-19": "an Australia Institute poll – no crosstab published",
   "YouGov|2026-06-16": "the wave's article carries no crosstab",
   "RedBridge/Accent|2026-03-27": "filed from the AFR article – Accent's March report was never cached",
 };
@@ -865,6 +883,402 @@ const NEWSPOLL_DEMO = {
   },
 };
 
+/* DemosAU's four 2025–26 national waves before the April-2026 report layout
+   the measurer knows (see the house note in the header), hand-entered from
+   each wave's own report. July 2025 and 6 Jan 2026 print native text tables
+   (the "Don't Know" column dropped – the note under the tables reads
+   "Undecided respondents are excluded from party vote share calculations"),
+   the printed labels tidied onto the series' keys (Males/Females → Men/
+   Women, Uni → University, Rented/Owned → Renting/Own outright, <$45K →
+   Under $45k, Regional/Rural → Regional or rural). 21 Jan 2026 prints the
+   same breakdowns as images only – measured from a 300-dpi render of the
+   report, every printed label matched. 20 Feb 2026's native table prints in
+   ALP/ONP/LNP/GRN/Oth order, re-keyed here. */
+const DEMOSAU_EARLY_DEMO = {
+  "2025-07-06": {
+    source: "https://demosau.com/wp-content/uploads/2025/07/DemosAU-Report-Federal-Voting-Intention-July-05-06-2025.pdf",
+    total: { alp: 36, lnp: 26, grn: 14, onp: 9, oth: 15 },
+    dims: {
+      gender: {
+        Men: { alp: 36, lnp: 28, grn: 12, onp: 9, oth: 15 },
+        Women: { alp: 36, lnp: 25, grn: 15, onp: 9, oth: 15 },
+      },
+      age: {
+        "18–34": { alp: 39, lnp: 16, grn: 31, onp: 4, oth: 10 },
+        "35–54": { alp: 36, lnp: 23, grn: 11, onp: 14, oth: 16 },
+        "55+": { alp: 35, lnp: 34, grn: 6, onp: 9, oth: 16 },
+      },
+      education: {
+        School: { alp: 34, lnp: 30, grn: 15, onp: 10, oth: 11 },
+        TAFE: { alp: 38, lnp: 20, grn: 11, onp: 11, oth: 20 },
+        University: { alp: 37, lnp: 28, grn: 15, onp: 6, oth: 14 },
+      },
+      housing: {
+        Renting: { alp: 33, lnp: 19, grn: 21, onp: 10, oth: 17 },
+        Mortgage: { alp: 40, lnp: 26, grn: 14, onp: 10, oth: 10 },
+        "Own outright": { alp: 34, lnp: 32, grn: 7, onp: 9, oth: 18 },
+      },
+    },
+  },
+  "2026-01-06": {
+    source: "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Australian-Federal-Poll-Jan-5-6-2026.pdf",
+    total: { alp: 29, lnp: 23, grn: 12, onp: 23, oth: 13 },
+    dims: {
+      gender: {
+        Men: { alp: 34, lnp: 24, grn: 7, onp: 24, oth: 11 },
+        Women: { alp: 24, lnp: 22, grn: 17, onp: 23, oth: 14 },
+      },
+      age: {
+        "18–34": { alp: 32, lnp: 19, grn: 26, onp: 12, oth: 11 },
+        "35–54": { alp: 27, lnp: 22, grn: 8, onp: 26, oth: 17 },
+        "55+": { alp: 28, lnp: 26, grn: 6, onp: 28, oth: 12 },
+      },
+      education: {
+        School: { alp: 30, lnp: 24, grn: 10, onp: 25, oth: 11 },
+        TAFE: { alp: 24, lnp: 20, grn: 9, onp: 30, oth: 17 },
+        University: { alp: 33, lnp: 26, grn: 18, onp: 13, oth: 10 },
+      },
+      income: {
+        "Under $45k": { alp: 28, lnp: 20, grn: 10, onp: 26, oth: 16 },
+        "$45–125k": { alp: 30, lnp: 23, grn: 14, onp: 22, oth: 11 },
+        "$125k+": { alp: 29, lnp: 36, grn: 14, onp: 18, oth: 3 },
+      },
+      location: {
+        "Inner metro": { alp: 37, lnp: 26, grn: 15, onp: 16, oth: 6 },
+        "Outer metro": { alp: 26, lnp: 23, grn: 11, onp: 24, oth: 16 },
+        "Regional or rural": { alp: 25, lnp: 20, grn: 11, onp: 32, oth: 12 },
+      },
+      housing: {
+        Renting: { alp: 30, lnp: 16, grn: 17, onp: 20, oth: 17 },
+        Mortgage: { alp: 29, lnp: 25, grn: 11, onp: 27, oth: 8 },
+        "Own outright": { alp: 28, lnp: 27, grn: 8, onp: 23, oth: 14 },
+      },
+    },
+  },
+  "2026-01-21": {
+    source: "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Federal-Poll-January-2026-FINAL.pdf",
+    read: "measured from the charts",
+    total: { alp: 30, lnp: 21, grn: 13, onp: 24, oth: 12 },
+    dims: {
+      gender: {
+        Men: { alp: 31, lnp: 22, grn: 12, onp: 25, oth: 10 },
+        Women: { alp: 29, lnp: 20, grn: 14, onp: 24, oth: 13 },
+      },
+      age: {
+        "18–34": { alp: 33, lnp: 16, grn: 29, onp: 13, oth: 9 },
+        "35–54": { alp: 31, lnp: 20, grn: 13, onp: 23, oth: 13 },
+        "55+": { alp: 28, lnp: 23, grn: 5, onp: 31, oth: 13 },
+      },
+      education: {
+        School: { alp: 28, lnp: 18, grn: 12, onp: 30, oth: 12 },
+        TAFE: { alp: 28, lnp: 20, grn: 13, onp: 27, oth: 12 },
+        University: { alp: 35, lnp: 26, grn: 14, onp: 14, oth: 11 },
+      },
+      income: {
+        "Under $45k": { alp: 30, lnp: 17, grn: 12, onp: 28, oth: 13 },
+        "$45–125k": { alp: 28, lnp: 24, grn: 15, onp: 23, oth: 10 },
+        "$125k+": { alp: 38, lnp: 25, grn: 11, onp: 19, oth: 7 },
+      },
+      location: {
+        "Inner metro": { alp: 38, lnp: 19, grn: 17, onp: 17, oth: 9 },
+        "Outer metro": { alp: 27, lnp: 23, grn: 14, onp: 25, oth: 11 },
+        "Regional or rural": { alp: 24, lnp: 20, grn: 8, onp: 32, oth: 16 },
+      },
+      housing: {
+        Renting: { alp: 30, lnp: 15, grn: 17, onp: 23, oth: 15 },
+        Mortgage: { alp: 31, lnp: 21, grn: 15, onp: 23, oth: 10 },
+        "Own outright": { alp: 28, lnp: 26, grn: 7, onp: 28, oth: 11 },
+      },
+    },
+  },
+  "2026-02-20": {
+    source: "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Federal-Poll-Feb-2026.pdf",
+    total: { alp: 29, lnp: 21, onp: 28, grn: 12, oth: 10 },
+    dims: {
+      gender: {
+        Men: { alp: 31, lnp: 21, onp: 28, grn: 9, oth: 11 },
+        Women: { alp: 27, lnp: 21, onp: 29, grn: 14, oth: 9 },
+      },
+      age: {
+        "18–34": { alp: 30, lnp: 15, onp: 21, grn: 26, oth: 8 },
+        "35–54": { alp: 31, lnp: 21, onp: 29, grn: 9, oth: 10 },
+        "55+": { alp: 26, lnp: 25, onp: 33, grn: 4, oth: 12 },
+      },
+      education: {
+        School: { alp: 28, lnp: 18, onp: 32, grn: 11, oth: 11 },
+        TAFE: { alp: 26, lnp: 21, onp: 32, grn: 10, oth: 11 },
+        University: { alp: 34, lnp: 25, onp: 19, grn: 14, oth: 8 },
+      },
+      housing: {
+        Renting: { alp: 28, lnp: 13, onp: 27, grn: 19, oth: 13 },
+        Mortgage: { alp: 32, lnp: 22, onp: 29, grn: 10, oth: 7 },
+        "Own outright": { alp: 26, lnp: 28, onp: 28, grn: 7, oth: 11 },
+      },
+      income: {
+        "Under $45k": { alp: 27, lnp: 16, onp: 31, grn: 12, oth: 14 },
+        "$45–125k": { alp: 30, lnp: 23, onp: 28, grn: 12, oth: 7 },
+        "$125k+": { alp: 31, lnp: 36, onp: 19, grn: 8, oth: 6 },
+      },
+      // printed labels Renter / Mortgage Holder / Home Owner (outright);
+      // the Inner-metro row sums to 101 as printed
+      location: {
+        "Inner metro": { alp: 36, lnp: 26, onp: 18, grn: 14, oth: 7 },
+        "Outer metro": { alp: 28, lnp: 21, onp: 30, grn: 11, oth: 10 },
+        "Regional or rural": { alp: 22, lnp: 16, onp: 37, grn: 10, oth: 15 },
+      },
+    },
+  },
+};
+
+/* The two DemosAU MRP reports print the same breakdowns as native text –
+   state by all eight states and territories, five education levels, five
+   income brackets ($45K/…/…K tidied onto Under $45k / $45–75k / … / $200k+,
+   the last printed ">$200K"), and "Reg & Rur" as the third location row
+   (the national series' combined cut, filed there as "Regional or rural").
+   Totals are the report's printed national MRP estimates. The March
+   report's header reads "Total Sample Size: 8,424" against the poll row's
+   recorded 8,484 – the wave's sample comes from the poll row, not here. */
+const DEMOSAU_MRP_DEMO = {
+  "2025-11-11": {
+    source: "https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL-1.pdf",
+    total: { alp: 33, lnp: 24, grn: 13, onp: 17, oth: 13 },
+    dims: {
+      gender: {
+        Men: { alp: 33, lnp: 25, grn: 10, onp: 18, oth: 14 },
+        Women: { alp: 33, lnp: 22, grn: 16, onp: 16, oth: 13 },
+      },
+      age: {
+        "18–34": { alp: 32, lnp: 19, grn: 26, onp: 11, oth: 12 },
+        "35–54": { alp: 34, lnp: 22, grn: 13, onp: 16, oth: 15 },
+        "55+": { alp: 33, lnp: 28, grn: 4, onp: 22, oth: 13 },
+      },
+      education: {
+        "Didn't Finish Grade 12": { alp: 32, lnp: 23, grn: 7, onp: 24, oth: 14 },
+        "Grade 12": { alp: 33, lnp: 22, grn: 16, onp: 16, oth: 13 },
+        TAFE: { alp: 31, lnp: 23, grn: 12, onp: 19, oth: 15 },
+        Undergraduate: { alp: 35, lnp: 27, grn: 16, onp: 10, oth: 12 },
+        Postgraduate: { alp: 40, lnp: 25, grn: 15, onp: 9, oth: 11 },
+      },
+      income: {
+        "Under $45k": { alp: 32, lnp: 22, grn: 13, onp: 19, oth: 14 },
+        "$45–75k": { alp: 33, lnp: 24, grn: 13, onp: 16, oth: 14 },
+        "$75–125k": { alp: 34, lnp: 25, grn: 14, onp: 14, oth: 13 },
+        "$125–200k": { alp: 35, lnp: 27, grn: 12, onp: 14, oth: 12 },
+        "$200k+": { alp: 31, lnp: 32, grn: 8, onp: 18, oth: 11 },
+      },
+      state: {
+        NSW: { alp: 33, lnp: 24, grn: 12, onp: 17, oth: 14 },
+        Vic: { alp: 33, lnp: 24, grn: 14, onp: 16, oth: 13 },
+        Qld: { alp: 30, lnp: 25, grn: 12, onp: 20, oth: 13 },
+        SA: { alp: 36, lnp: 21, grn: 14, onp: 16, oth: 13 },
+        WA: { alp: 34, lnp: 23, grn: 12, onp: 19, oth: 12 },
+        Tas: { alp: 36, lnp: 18, grn: 13, onp: 17, oth: 16 },
+        NT: { alp: 34, lnp: 25, grn: 12, onp: 19, oth: 10 },
+        ACT: { alp: 46, lnp: 20, grn: 16, onp: 6, oth: 12 },
+      },
+      location: {
+        "Inner metro": { alp: 38, lnp: 23, grn: 17, onp: 10, oth: 12 },
+        "Outer metro": { alp: 35, lnp: 23, grn: 12, onp: 17, oth: 13 },
+        "Reg & Rur": { alp: 24, lnp: 26, grn: 9, onp: 24, oth: 17 },
+      },
+    },
+  },
+  "2026-03-03": {
+    source: "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
+    total: { alp: 29, lnp: 21, grn: 12, onp: 27, oth: 11 },
+    dims: {
+      gender: {
+        Men: { alp: 28, lnp: 22, grn: 10, onp: 29, oth: 11 },
+        Women: { alp: 30, lnp: 20, grn: 15, onp: 25, oth: 10 },
+      },
+      age: {
+        "18–34": { alp: 28, lnp: 18, grn: 25, onp: 19, oth: 10 },
+        "35–54": { alp: 30, lnp: 19, grn: 12, onp: 27, oth: 12 },
+        "55+": { alp: 28, lnp: 24, grn: 5, onp: 33, oth: 10 },
+      },
+      education: {
+        "Didn't Finish Grade 12": { alp: 26, lnp: 18, grn: 7, onp: 38, oth: 11 },
+        "Grade 12": { alp: 28, lnp: 21, grn: 16, onp: 25, oth: 10 },
+        TAFE: { alp: 27, lnp: 19, grn: 12, onp: 30, oth: 12 },
+        Undergraduate: { alp: 32, lnp: 24, grn: 16, onp: 18, oth: 10 },
+        Postgraduate: { alp: 35, lnp: 24, grn: 16, onp: 17, oth: 8 },
+      },
+      income: {
+        "Under $45k": { alp: 28, lnp: 19, grn: 13, onp: 29, oth: 11 },
+        "$45–75k": { alp: 28, lnp: 21, grn: 14, onp: 27, oth: 10 },
+        "$75–125k": { alp: 30, lnp: 21, grn: 12, onp: 26, oth: 11 },
+        "$125–200k": { alp: 31, lnp: 24, grn: 11, onp: 24, oth: 10 },
+        "$200k+": { alp: 29, lnp: 34, grn: 8, onp: 19, oth: 10 },
+      },
+      state: {
+        NSW: { alp: 29, lnp: 21, grn: 12, onp: 26, oth: 12 },
+        Vic: { alp: 28, lnp: 21, grn: 14, onp: 27, oth: 10 },
+        Qld: { alp: 25, lnp: 21, grn: 12, onp: 31, oth: 11 },
+        SA: { alp: 34, lnp: 18, grn: 12, onp: 27, oth: 9 },
+        WA: { alp: 30, lnp: 20, grn: 13, onp: 27, oth: 10 },
+        Tas: { alp: 31, lnp: 15, grn: 11, onp: 27, oth: 16 },
+        NT: { alp: 31, lnp: 21, grn: 11, onp: 29, oth: 8 },
+        ACT: { alp: 42, lnp: 18, grn: 18, onp: 11, oth: 11 },
+      },
+      location: {
+        "Inner metro": { alp: 34, lnp: 22, grn: 17, onp: 17, oth: 10 },
+        "Outer metro": { alp: 30, lnp: 20, grn: 12, onp: 28, oth: 10 },
+        "Reg & Rur": { alp: 20, lnp: 21, grn: 8, onp: 37, oth: 14 },
+      },
+    },
+  },
+};
+
+/* RedBridge/Accent's October 2025 report (its own PDF, predating the
+   extractor's cached-text series): Tables 1 and 2, "Federal vote intention
+   for the House of Representatives", hand-entered cell by cell from the
+   fetched PDF, the party columns re-keyed (Labor, Coalition, Greens,
+   One Nation, Other parties and candidates; the LABOR 2PP column not
+   read) and the labels tidied onto the series' keys. Employment, occupation,
+   household income (weekly), financial stress, religion, birthplace and
+   language cuts print nowhere else in the house's series – kept as their
+   own dims, like Newspoll's working/religion tables. */
+const REDBRIDGE_OCT_DEMO = {
+  "2025-10-07": {
+    source: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_bfa36468f2104c90ba79a9bc66da0ab5.pdf",
+    total: { alp: 34, lnp: 29, grn: 11, onp: 14, oth: 12 },
+    dims: {
+      generation: {
+        "Gen Z": { alp: 37, lnp: 16, grn: 29, onp: 6, oth: 12 },
+        Millennials: { alp: 37, lnp: 24, grn: 13, onp: 13, oth: 13 },
+        "Gen X": { alp: 36, lnp: 31, grn: 7, onp: 15, oth: 11 },
+        Boomers: { alp: 31, lnp: 37, grn: 4, onp: 17, oth: 11 },
+      },
+      gender: {
+        Women: { alp: 32, lnp: 30, grn: 13, onp: 13, oth: 12 },
+        Men: { alp: 37, lnp: 28, grn: 8, onp: 15, oth: 12 },
+      },
+      location: {
+        "Inner metro": { alp: 39, lnp: 29, grn: 13, onp: 9, oth: 10 },
+        "Outer metro": { alp: 36, lnp: 27, grn: 13, onp: 13, oth: 11 },
+        Provincial: { alp: 33, lnp: 31, grn: 10, onp: 15, oth: 11 },
+        Rural: { alp: 29, lnp: 30, grn: 6, onp: 20, oth: 15 },
+      },
+      education: {
+        "Below Year 12": { alp: 26, lnp: 36, grn: 5, onp: 22, oth: 11 },
+        "Year 12": { alp: 33, lnp: 26, grn: 19, onp: 11, oth: 11 },
+        "TAFE or trade": { alp: 35, lnp: 26, grn: 8, onp: 18, oth: 13 },
+        University: { alp: 39, lnp: 32, grn: 12, onp: 6, oth: 11 },
+      },
+      religion: {
+        Protestant: { alp: 28, lnp: 40, grn: 3, onp: 19, oth: 10 },
+        Catholic: { alp: 35, lnp: 33, grn: 6, onp: 15, oth: 11 },
+        "Other religions": { alp: 34, lnp: 24, grn: 15, onp: 9, oth: 18 },
+        "No religion": { alp: 39, lnp: 22, grn: 16, onp: 12, oth: 11 },
+      },
+      language: {
+        "English only": { alp: 34, lnp: 29, grn: 11, onp: 14, oth: 12 },
+        "Other language": { alp: 45, lnp: 23, grn: 15, onp: 9, oth: 8 },
+      },
+      // birthplace, filed under Roy Morgan's country-of-birth dim key
+      country: {
+        Australia: { alp: 34, lnp: 27, grn: 12, onp: 15, oth: 12 },
+        "Another country": { alp: 39, lnp: 35, grn: 6, onp: 10, oth: 10 },
+      },
+      working: {
+        "Working full time": { alp: 36, lnp: 30, grn: 8, onp: 14, oth: 12 },
+        "Working part time": { alp: 34, lnp: 22, grn: 19, onp: 11, oth: 14 },
+        "Not working": { alp: 40, lnp: 17, grn: 16, onp: 16, oth: 11 },
+        Retired: { alp: 31, lnp: 38, grn: 4, onp: 16, oth: 11 },
+      },
+      occupation: {
+        "Professional and managerial": { alp: 38, lnp: 32, grn: 8, onp: 9, oth: 13 },
+        "Sales, services and clerical": { alp: 34, lnp: 23, grn: 18, onp: 15, oth: 10 },
+        "Blue collar": { alp: 32, lnp: 27, grn: 9, onp: 16, oth: 16 },
+      },
+      income: {
+        "$3,000+ a week": { alp: 36, lnp: 32, grn: 11, onp: 10, oth: 11 },
+        "$2,000–2,999 a week": { alp: 36, lnp: 30, grn: 11, onp: 12, oth: 11 },
+        "$1,000–1,999 a week": { alp: 34, lnp: 28, grn: 8, onp: 18, oth: 12 },
+        "Under $1,000 a week": { alp: 36, lnp: 24, grn: 12, onp: 14, oth: 14 },
+        "Prefer not to say": { alp: 32, lnp: 31, grn: 14, onp: 11, oth: 12 },
+      },
+      stress: {
+        "A great deal of stress": { alp: 26, lnp: 23, grn: 17, onp: 19, oth: 15 },
+        "Some stress": { alp: 36, lnp: 26, grn: 12, onp: 13, oth: 13 },
+        "Not much stress": { alp: 35, lnp: 34, grn: 7, onp: 13, oth: 11 },
+        "No stress at all": { alp: 41, lnp: 35, grn: 6, onp: 12, oth: 6 },
+      },
+      // printed labels Owned outright / Owned with a mortgage, tidied
+      housing: {
+        "Own outright": { alp: 32, lnp: 36, grn: 5, onp: 16, oth: 11 },
+        Mortgage: { alp: 37, lnp: 31, grn: 8, onp: 13, oth: 11 },
+        "Renting and other": { alp: 36, lnp: 18, grn: 21, onp: 12, oth: 13 },
+      },
+    },
+  },
+};
+
+/* YouGov's Climate Council MRP (national report, 17 Nov 2025): the
+   first-preference table's "Don't know" base (n=253) is already excluded
+   from the printed shares; Independent and Another Party fold into oth,
+   as the poll row (oth 10) has it. Age, gender and region cuts only. */
+const YOUGOV_MRP_DEMO = {
+  "2025-11-17": {
+    source: "https://www.climatecouncil.org.au/wp-content/uploads/2025/11/ClimateCouncil_EPA_MRP_Report_201125_national.pdf",
+    total: { alp: 34, lnp: 26, onp: 18, grn: 12, oth: 10 },
+    dims: {
+      gender: {
+        Men: { alp: 37, lnp: 26, onp: 18, grn: 10, oth: 9 },
+        Women: { alp: 32, lnp: 25, onp: 18, grn: 14, oth: 11 },
+      },
+      age: {
+        "18–24": { alp: 42, lnp: 11, onp: 4, grn: 32, oth: 11 },
+        "25–34": { alp: 35, lnp: 17, onp: 16, grn: 20, oth: 12 },
+        "35–49": { alp: 36, lnp: 24, onp: 16, grn: 13, oth: 11 },
+        "50–64": { alp: 32, lnp: 30, onp: 21, grn: 7, oth: 10 },
+        "65+": { alp: 31, lnp: 36, onp: 23, grn: 3, oth: 7 },
+      },
+      location: {
+        "Inner metro": { alp: 40, lnp: 24, onp: 9, grn: 17, oth: 10 },
+        "Outer metro": { alp: 35, lnp: 24, onp: 21, grn: 12, oth: 8 },
+        Provincial: { alp: 33, lnp: 27, onp: 21, grn: 10, oth: 9 },
+        Rural: { alp: 26, lnp: 30, onp: 23, grn: 9, oth: 12 },
+      },
+    },
+  },
+};
+
+/* YouGov's Australia Institute wave (poll of 19 Mar 2026): the summary
+   PDF's Tables 1–2 print a "Don't know" row (8% nationally) the poll row
+   has excluded, so the shares are filed renormalised off Don't know
+   (largest remainder per column – the printed figures rounded to whole
+   percents first, Independent folded into oth with Other). The state
+   table's "Other" column is Tas/ACT/NT together, filed "ACT/NT/Tas" so
+   the common state set's merge joins it. */
+const YOUGOV_TAI_DEMO = {
+  "2026-03-19": {
+    source: "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
+    total: { alp: 28, lnp: 21, grn: 13, onp: 26, oth: 12 },
+    dims: {
+      gender: {
+        Men: { alp: 33, lnp: 19, grn: 12, onp: 26, oth: 10 },
+        Women: { alp: 26, lnp: 22, grn: 14, onp: 27, oth: 11 },
+      },
+      age: {
+        "18–24": { alp: 30, lnp: 14, grn: 38, onp: 6, oth: 12 },
+        "25–34": { alp: 28, lnp: 12, grn: 25, onp: 18, oth: 17 },
+        "35–49": { alp: 29, lnp: 17, grn: 11, onp: 29, oth: 14 },
+        "50–64": { alp: 30, lnp: 25, grn: 9, onp: 28, oth: 8 },
+        "65+": { alp: 26, lnp: 29, grn: 4, onp: 34, oth: 7 },
+      },
+      state: {
+        NSW: { alp: 31, lnp: 18, grn: 14, onp: 26, oth: 11 },
+        Vic: { alp: 29, lnp: 22, grn: 16, onp: 21, oth: 12 },
+        Qld: { alp: 21, lnp: 27, grn: 10, onp: 33, oth: 9 },
+        WA: { alp: 31, lnp: 20, grn: 10, onp: 29, oth: 10 },
+        SA: { alp: 24, lnp: 10, grn: 19, onp: 29, oth: 18 },
+        "ACT/NT/Tas": { alp: 36, lnp: 16, grn: 10, onp: 18, oth: 20 },
+      },
+    },
+  },
+};
+
 function redbridgeCache(date) {
   const dir = path.join(ROOT, ".build", "redbridge-src");
   for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
@@ -888,10 +1302,15 @@ const push = (w) => { waves.push(w); if (!have.has(key(w))) added.push(key(w)); 
 const pend = (k, why) => { pending.push(`${k}: ${why}`); if (have.has(k)) waves.push(have.get(k)); };
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "demographics-"));
 const essWaves = essentialWaves(fs.readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8"));
+// the hand-entered waves below (DEMOSAU_EARLY_DEMO…YOUGOV_TAI_DEMO) cover
+// these rows themselves – the readers never get a second pass at them
+const HAND_KEYS = new Set(Object.keys(YOUGOV_TAI_DEMO).map((d) => "YouGov|" + d)
+  .concat(Object.keys(DEMOSAU_EARLY_DEMO).map((d) => "DemosAU|" + d)));
 try {
-  const candidates = polls.filter((p) => (["YouGov", "DemosAU", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
+  const candidates = polls.filter((p) => !HAND_KEYS.has(key(p))
+    && ((["YouGov", "DemosAU", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
     || FIRST_EXTRA.has(key(p))
-    || (p.pollster === "Essential" && p.date >= FIRST_ESS));
+    || (p.pollster === "Essential" && p.date >= FIRST_ESS)));
   for (const p of candidates) {
     const k = key(p);
     if (KNOWN_SKIP[k]) { skipped.push({ pollster: p.pollster, date: p.date, reason: KNOWN_SKIP[k] }); continue; }
@@ -1004,6 +1423,24 @@ try {
     push({ pollster: "Newspoll (pooled)", date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
            sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims: h.dims, total: h.total });
     console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
+  }
+  // The hand-entered waves of reader-covered houses (DEMOSAU_EARLY_DEMO…
+  // YOUGOV_TAI_DEMO): one-off layouts and MRP reports the readers have never
+  // learnt. HAND_KEYS above keeps the candidate loop off them.
+  for (const [house, table] of [["DemosAU", DEMOSAU_EARLY_DEMO], ["DemosAU (MRP)", DEMOSAU_MRP_DEMO],
+    ["RedBridge/Accent", REDBRIDGE_OCT_DEMO], ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
+    for (const [date, h] of Object.entries(table)) {
+      const k = house + "|" + date;
+      if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
+      const p = polls.find((x) => x.pollster === house && x.date === date);
+      if (!p) { pend(k, `no ${house} poll row for this wave's date yet`); continue; }
+      const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
+      if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
+      push({ pollster: house, date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
+             sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: h.read || "published table", dims: h.dims,
+             ...(h.total ? { total: h.total } : {}) });
+      console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
+    }
   }
   // Resolve: one fetch carries every month; rebuilt whole each run, or kept
   // whole from the file when the fetch or any month fails the gate

@@ -140,6 +140,24 @@ const apr = rb("april");
 assert.deepEqual(apr.columns, ["alp", "lnp", "lnp", "lnp", "lnp", "onp", "grn", "oth"]);
 assert.deepEqual(apr.dims.gender.Men, { alp: 35, lnp: 22, onp: 26, grn: 9, oth: 8 });
 assert.deepEqual(apr.dims.education.University, { alp: 38, lnp: 23, onp: 16, grn: 12, oth: 11 });
+// December 2025 and January 2026: no "First preference vote intention"
+// subtitle yet – the numbered-table title is the anchor, and the header's
+// last cell is one combined "LABOR 2PP" (its Figure caption above must not
+// anchor, nor the 2PP column read as a party)
+const dec = redbridgeTable(readFileSync(path.join(RB_DIR, "afr,-redbridge-group-and-accent-research-federal-poll.txt"), "utf8"));
+assert.deepEqual(dec.columns, ["alp", "lnp", "onp", "grn", "oth"], "Dec 2025: one Coalition column, then LABOR 2PP breaks");
+assert.deepEqual(dec.total, { alp: 35, lnp: 26, onp: 17, grn: 13, oth: 9 });
+assert.deepEqual(dec.dims.generation["Gen Z"], { alp: 30, lnp: 26, onp: 5, grn: 33, oth: 6 });
+assert.deepEqual(dec.dims.education["Below Year 12"], { alp: 28, lnp: 31, onp: 26, grn: 10, oth: 5 });
+assert.equal(dimsProblem(dec.dims), null, "Dec 2025: every group sums to about 100");
+assert.equal(totalProblem(dec.total, poll("RedBridge/Accent", "2025-12-12")), null, "Dec 2025: All voters matches the poll row");
+const jan = rb("january");
+assert.deepEqual(jan.columns, ["alp", "lnp", "lnp", "lnp", "lnp", "onp", "grn", "oth"], "Jan 2026: Coalition as four columns");
+assert.deepEqual(jan.total, { alp: 34, lnp: 19, onp: 26, grn: 11, oth: 10 }, "Jan 2026: the four Coalition columns sum to the published 19");
+assert.deepEqual(jan.dims.generation.Boomers, { alp: 35, lnp: 21, onp: 35, grn: 1, oth: 8 });
+assert.deepEqual(jan.dims.gender.Women, { alp: 36, lnp: 19, onp: 23, grn: 13, oth: 9 });
+assert.equal(dimsProblem(jan.dims), null, "Jan 2026: every group sums to about 100");
+assert.equal(totalProblem(jan.total, poll("RedBridge/Accent", "2026-01-29")), null, "Jan 2026: All voters matches the poll row");
 // August: one Coalition column, respondent-allocated two-party columns and N after the parties
 const aug = rb("august");
 assert.deepEqual(aug.columns, ["alp", "lnp", "onp", "grn", "oth"]);

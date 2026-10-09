@@ -182,7 +182,9 @@ export function rbLabel(dim, label) {
 function rbColumns(line) {
   const cols = [];
   for (const c of line.trim().split(/\s{2,}/)) {
-    if (/^vs\.?(\s|$)|^N$/i.test(c)) break;
+    // the first two-party column ends the party list ("vs. Coalition", "N",
+    // or the Dec-2025/Jan-2026 layout's combined "LABOR 2PP" cell)
+    if (/^vs\.?(\s|$)|^N$|\b2pp\b/i.test(c)) break;
     const s = c.toLowerCase();
     const k = s === "labor" ? "alp" : /^(liberal|liberal national|national|country|country liberal|coalition)$/.test(s) ? "lnp"
       : /^one( nation)?$/.test(s) ? "onp" : s === "greens" ? "grn" : /^other/.test(s) ? "oth" : null;
@@ -193,9 +195,16 @@ function rbColumns(line) {
 }
 export function redbridgeTable(txt) {
   const lines = txt.split("\n");
-  const start = lines.findIndex((l) => /First preference vote intention/.test(l));
+  // from February 2026 the table subtitles itself "First preference vote
+  // intention"; the December 2025 and January 2026 reports take no subtitle,
+  // so their numbered-table title is the anchor. Two same-worded neighbours
+  // must not anchor it: the Figure caption above, and the wave-history table
+  // ("Table N: …, by wave of the AFR/RedBridge/Accent Research poll")
+  const start = lines.findIndex((l) => /First preference vote intention|Table \d+: Federal vote intention for the House of Representatives, by demographic characteristics/.test(l));
   if (start < 0) return null;
-  const head = lines.slice(start + 1, start + 8).find((l) => /^Labor\s/.test(l.trim()));
+  // the header line: a two-or-more-space gap after "Labor" rules the
+  // title's own "Labor two-party vote share" continuation out
+  const head = lines.slice(start + 1, start + 8).find((l) => /^Labor\s{2}/.test(l.trim()));
   const cols = head && rbColumns(head);
   if (!cols) return null;
   /* No blank-line end-of-table heuristic: the September 2026 PDF paginated
