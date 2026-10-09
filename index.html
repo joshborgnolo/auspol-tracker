@@ -91828,15 +91828,18 @@ function AllPollsView({
       if (raf) cancelAnimationFrame(raf);
     };
   }, [focus, open, facet]);
-  const toggleTag = id => setTagSel(s => {
+  const toggleTag = id => React.startTransition(() => setTagSel(s => {
     const n = new Set(s);
     n.has(id) ? n.delete(id) : n.add(id);
     return n;
-  });
-  const onMeasure = mv => {
+  }));
+  const setRangeT = v => React.startTransition(() => setRange(v));
+  const setSelT = v => React.startTransition(() => setSel(v));
+  const setTagSelT = v => React.startTransition(() => setTagSel(v));
+  const onMeasure = React.useCallback(mv => {
     setMeasure(mv);
     setLead("all");
-  };
+  }, []);
   const onFacet = f => {
     setFacet(f);
     setSort({
@@ -91889,11 +91892,11 @@ function AllPollsView({
     key,
     dir: -1
   });
-  const toggleHouse = h => setSel(s => {
+  const toggleHouse = h => React.startTransition(() => setSel(s => {
     const n = new Set(s);
     n.has(h) ? n.delete(h) : n.add(h);
     return n;
-  });
+  }));
   const rows = React.useMemo(() => {
     const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
     const issOnly = facet === "issues" ? issOnlyAll : [];
@@ -92106,13 +92109,15 @@ function AllPollsView({
   const totalAll = D.individualPolls.length + dirOnlyAll.length + issOnlyAll.length;
   const clearAll = () => {
     setQ("");
-    setSel(new Set());
-    setLead("all");
-    setMeasure(DEFAULT_MEASURE);
-    setRange("all");
-    setTagSel(new Set());
-    setScope(false);
-    setPop(null);
+    React.startTransition(() => {
+      setSel(new Set());
+      setLead("all");
+      setMeasure(DEFAULT_MEASURE);
+      setRange("all");
+      setTagSel(new Set());
+      setScope(false);
+      setPop(null);
+    });
   };
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
   const RANGE_LAB = {
@@ -92145,7 +92150,7 @@ function AllPollsView({
   if (range !== "all") pills.push({
     k: "r",
     lab: RANGE_LAB[range],
-    off: () => setRange("all")
+    off: () => setRangeT("all")
   });
   [...tagSel].forEach(t => pills.push({
     k: "t" + t,
@@ -92256,12 +92261,12 @@ function AllPollsView({
     q: q,
     setQ: setQ,
     sel: sel,
-    setSel: setSel,
+    setSel: setSelT,
     toggleHouse: toggleHouse,
     range: range,
-    setRange: setRange,
+    setRange: setRangeT,
     tagSel: tagSel,
-    setTagSel: setTagSel,
+    setTagSel: setTagSelT,
     toggleTag: toggleTag,
     pills: pills,
     clearAll: clearAll,
@@ -112819,7 +112824,7 @@ function RdAllPolls(P) {
     onChange: e => setQ(e.target.value),
     autoCorrect: "off",
     spellCheck: false,
-    placeholder: "Search a pollster, a publisher, a date or a figure",
+    placeholder: "Search a pollster, a date, or a figure",
     "aria-label": "Search the polls"
   }), q && React.createElement("button", {
     type: "button",
@@ -114578,14 +114583,17 @@ function RdFlows() {
     }
   }, "Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster\u2019s first head-to-heads. This check corrects no other figure on the page."));
 }
+const RdDisagreeM = React.memo(RdDisagree);
+const RdHouseLeanM = React.memo(RdHouseLean);
+const RdFlowsM = React.memo(RdFlows);
 Object.assign(window, {
   RdAllPolls,
   RdApDetail,
   RdApSheet,
   rdPollMargin,
-  RdDisagree,
-  RdHouseLean,
-  RdFlows
+  RdDisagree: RdDisagreeM,
+  RdHouseLean: RdHouseLeanM,
+  RdFlows: RdFlowsM
 });</script>
   <script>const SETTLE_MS = 220;
 const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;

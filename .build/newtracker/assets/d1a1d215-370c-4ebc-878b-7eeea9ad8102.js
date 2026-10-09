@@ -5348,8 +5348,17 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     raf = requestAnimationFrame(tick);
     return () => { if (raf) cancelAnimationFrame(raf); };
   }, [focus, open, facet]);
-  const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
+  /* A filter pick re-filters the archive and re-renders the table in one
+     commit - the heaviest render in the view. As a transition, the commit is
+     interruptible (concurrent root): between chunks React yields, so the
+     menu the reader just pressed stays alive while the table catches up. */
+  const toggleTag = (id) => React.startTransition(() => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; }));
+  const setRangeT = (v) => React.startTransition(() => setRange(v));
+  const setSelT = (v) => React.startTransition(() => setSel(v));
+  const setTagSelT = (v) => React.startTransition(() => setTagSel(v));
+  /* useCallback, so a filter pick's re-render doesn't hand RdHouseLean a new
+     prop identity and defeat its memo (the window export in rd-allpolls) */
+  const onMeasure = React.useCallback((mv) => { setMeasure(mv); setLead("all"); }, []);
   const onFacet = (f) => {
     setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
     // the matchup survives the hop only if the 2PP facet is where we land –
@@ -5396,7 +5405,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   };
 
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
-  const toggleHouse = (h) => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; });
+  const toggleHouse = (h) => React.startTransition(() => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; }));
 
   /* The direction-only rows land here (why/what they are is at dirOnlyAll
      above): every count, panel option and filter below derives from this
@@ -5650,8 +5659,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      everything there is */
   const totalAll = D.individualPolls.length + dirOnlyAll.length + issOnlyAll.length;
   const clearAll = () => {
-    setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
-    setTagSel(new Set()); setScope(false); setPop(null);
+    setQ("");
+    React.startTransition(() => {
+      setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
+      setTagSel(new Set()); setScope(false); setPop(null);
+    });
   };
   // Boolean(): the chain ends on a Set size, so with no filters this was the
   // NUMBER 0 – and {0 && <button/>} renders a literal 0 next to the poll count.
@@ -5667,7 +5679,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const pills = [];
   if (ql) pills.push({ k: "q", lab: "“" + q.trim() + "”", off: () => setQ("") });
   [...sel].forEach((h) => pills.push({ k: "h" + h, lab: h, off: () => toggleHouse(h) }));
-  if (range !== "all") pills.push({ k: "r", lab: RANGE_LAB[range], off: () => setRange("all") });
+  if (range !== "all") pills.push({ k: "r", lab: RANGE_LAB[range], off: () => setRangeT("all") });
   [...tagSel].forEach((t) => pills.push({ k: "t" + t, lab: (POLL_TAG_META[t] || {}).label || t, off: () => toggleTag(t) }));
   if (lead !== "all") pills.push({ k: "l", lab: HOLDER_LAB[lead] + " ahead", off: () => setLead("all") });
   if (scoping && facet !== "twopp") pills.push({ k: "s", lab: scoping.label, auto: true, off: () => chooseScope(false) });
@@ -5786,8 +5798,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       <RdAllPolls rows={rows} sorted={sorted} total={total} houses={housesV} houseRank={houseRank} houseN={houseN}
         tagN={tagN} shownTags={shownTags} rangeN={rangeN} RANGE_LAB={RANGE_LAB}
         facet={facet} onFacet={onFacet} measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} setTppBasis={setTppBasis}
-        q={q} setQ={setQ} sel={sel} setSel={setSel} toggleHouse={toggleHouse} range={range} setRange={setRange}
-        tagSel={tagSel} setTagSel={setTagSel} toggleTag={toggleTag}
+        q={q} setQ={setQ} sel={sel} setSel={setSelT} toggleHouse={toggleHouse} range={range} setRange={setRangeT}
+        tagSel={tagSel} setTagSel={setTagSelT} toggleTag={toggleTag}
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
         ofTotal={totalAll} ofHouses={housesAll.length} demSplit={demSplit} setDemSplit={setDemSplit} />

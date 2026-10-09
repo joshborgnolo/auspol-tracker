@@ -3217,7 +3217,7 @@ function RdAllPolls(P) {
         <label className="rd-ap-search">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
           <input ref={searchRef} type="search" value={q} onChange={(e) => setQ(e.target.value)} autoCorrect="off" spellCheck={false}
-                 placeholder="Search a pollster, a publisher, a date or a figure" aria-label="Search the polls" />
+                 placeholder="Search a pollster, a date, or a figure" aria-label="Search the polls" />
           {q && <button type="button" className="rd-ap-x" onClick={() => setQ("")} aria-label="Clear search">×</button>}
         </label>
         <span className="rd-ap-pops">
@@ -4276,4 +4276,12 @@ function RdFlows() {
   );
 }
 
-Object.assign(window, { RdAllPolls, RdApDetail, RdApSheet, rdPollMargin, RdDisagree, RdHouseLean, RdFlows });
+/* The three sections render below the table but depend on none of its filter
+   state (RdDisagree/RdFlows take no props; RdHouseLean's props are stable
+   strings/callbacks). Memoised, a filter pick re-renders the table alone
+   instead of re-running three chart sections on the same commit. */
+const RdDisagreeM = React.memo(RdDisagree);
+const RdHouseLeanM = React.memo(RdHouseLean);
+const RdFlowsM = React.memo(RdFlows);
+
+Object.assign(window, { RdAllPolls, RdApDetail, RdApSheet, rdPollMargin, RdDisagree: RdDisagreeM, RdHouseLean: RdHouseLeanM, RdFlows: RdFlowsM });
