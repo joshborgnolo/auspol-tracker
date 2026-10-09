@@ -48,6 +48,7 @@ export function validate(D) {
     "Roy Morgan (pooled)", // finding 10341's 7-month Single Source cross-section
     "Newspoll (pooled)", // quarterly aggregate releases, no aggregate weight
     "Agenda C Synesis",  // one-off news.com.au poll
+    "EMRS (Tas)",        // Tasmanian-only federal waves, hand-entered (no extractor)
   ]);
 
   let prevTs = -Infinity, prevDate = null;

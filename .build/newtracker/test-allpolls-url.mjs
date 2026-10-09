@@ -64,11 +64,11 @@ const S = (...v) => new Set(v);
      direction/issues/confidence-only houses), covers every house the live
      data offers, and no order member matches the b-token grammar itself
      (or a legacy comma value could parse as a mask) --- */
-ok("URL_HOUSES is the pinned 17-house list", JSON.stringify(URL_HOUSES) === JSON.stringify([
+ok("URL_HOUSES is the pinned 18-house list", JSON.stringify(URL_HOUSES) === JSON.stringify([
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
   "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
   "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos",
-  "ANZ–Roy Morgan", "Westpac–MI", "NAB",
+  "ANZ–Roy Morgan", "Westpac–MI", "NAB", "EMRS (Tas)",
 ]), JSON.stringify(URL_HOUSES));
 ok("every live house has a bit in URL_HOUSES", liveHouses.every((h) => URL_HOUSES.includes(h)),
   `live-only: ${JSON.stringify(liveHouses.filter((h) => !URL_HOUSES.includes(h)))}`);

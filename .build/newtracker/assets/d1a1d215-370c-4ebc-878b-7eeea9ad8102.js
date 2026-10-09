@@ -4007,6 +4007,8 @@ const URL_HOUSES = [
   // Morgan's business index reuses "Roy Morgan" above, so only the three
   // new names take fresh bits
   "ANZ–Roy Morgan", "Westpac–MI", "NAB",
+  // display-only no-aggregate houses still get bits so their archive links survive
+  "EMRS (Tas)",
 ];
 const archMask = (order, set) => {
   let m = 0;

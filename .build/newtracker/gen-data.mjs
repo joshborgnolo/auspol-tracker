@@ -129,7 +129,7 @@ const POLLS = mergedPolls.filter((p) => !p.isElection);
    reason rides the row via NO_AGG_NOTE. Checks here key the full suffix
    string; the houses inventory (:3322) already folds "(SMS)" back into
    "Roy Morgan" for counting, as does "(pooled)". */
-const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newspoll (pooled)"]);
+const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newspoll (pooled)", "EMRS (Tas)"]);
 /* a second, row-level carrier: ONE release that must not aggregate while
    its house's regular tracker does. The March 2026 "shifts" super-poll
    (n=5,563) files under plain "RedBridge/Accent" - it is the same
@@ -152,6 +152,7 @@ const NO_AGG_NOTE = {
   "Roy Morgan (SMS)": "Because SMS polls have a strong selection bias, they do not count towards any aggregates.",
   "Roy Morgan (pooled)": "Because this release averages seven months of interviewing (January\u2013July 2026) into a single reading, it does not count towards any aggregates.",
   "Newspoll (pooled)": "Because this release averages about ten weeks of interviewing into a single reading, it does not count towards any aggregates.",
+  "EMRS (Tas)": "Because this poll surveyed Tasmanian voters only, its state-level figures sit outside the national aggregates.",
 };
 const noAggNoteFor = (p) => NO_AGG_NOTE[p.pollster] || (p.noAgg != null ? NO_AGG_ROW_NOTE[p.noAgg] : undefined);
 const ppm = D.ppm;
@@ -2350,7 +2351,7 @@ const UNDECIDED_BASES = [
   { id: "soft", label: "Not firm", dash: "9 3 2 3",
     note: "named a party but might still move – the soft share of the decided, Resolve’s “how firm are you”" },
 ];
-const undecidedRows = POLLS.map((p) => ({ p, u: undecidedOf(p) })).filter((r) => r.u);
+const undecidedRows = POLLS.map((p) => ({ p, u: undecidedOf(p) })).filter((r) => r.u && !noAggPoll(r.p));
 const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const rs = undecidedRows.filter((r) => r.u.basis === b.id);
   if (!rs.length) return null;

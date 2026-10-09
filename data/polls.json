@@ -2899,6 +2899,23 @@
       "methodUrl": "https://tinyurl.com/Feb26FEDPollFoxHedgehogAPC-1"
     },
     {
+      "date": "2026-02-19",
+      "published": "2026-02-20",
+      "dateStart": "2026-02-16",
+      "pollster": "EMRS (Tas)",
+      "client": "—",
+      "sample": 953,
+      "alp": 30,
+      "lnp": 19,
+      "grn": 13,
+      "onp": 24,
+      "ind": 12,
+      "oth": 1,
+      "tpp_alp": 60,
+      "tpp_lnp": 40,
+      "url": "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf"
+    },
+    {
       "date": "2026-02-20",
       "published": "2026-02-23T20:30",
       "dateStart": "2026-02-16",
@@ -5066,6 +5083,23 @@
         "Nat": 2.5
       },
       "url": "https://www.roymorgan.com/findings/10311-federal-voting-intention-august-17-2026"
+    },
+    {
+      "date": "2026-08-18",
+      "published": "2026-08-22",
+      "dateStart": "2026-08-17",
+      "pollster": "EMRS (Tas)",
+      "client": "—",
+      "sample": 968,
+      "alp": 29,
+      "lnp": 17,
+      "grn": 15,
+      "onp": 26,
+      "ind": 13,
+      "oth": 1,
+      "tpp_alp": 57,
+      "tpp_lnp": 43,
+      "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20State%20and%20Federal%20Voting%20Intentions%20Report%20-%20August%202026%20-%20FINAL.pdf"
     },
     {
       "date": "2026-08-20",
@@ -8284,6 +8318,12 @@
       "lnpVsOnp_lnp": 57
     },
     {
+      "date": "2026-02-19",
+      "firm": "EMRS (Tas)",
+      "alpVsOnp_alp": 60,
+      "lnpVsOnp_lnp": null
+    },
+    {
       "date": "2026-02-24",
       "firm": "YouGov",
       "alpVsOnp_alp": 56,
@@ -8521,6 +8561,12 @@
       "date": "2026-08-16",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 53,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-08-18",
+      "firm": "EMRS (Tas)",
+      "alpVsOnp_alp": 63,
       "lnpVsOnp_lnp": null
     },
     {
