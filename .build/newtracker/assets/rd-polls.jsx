@@ -18,6 +18,10 @@ const RD_STALE_DAYS = 42;
 /* how far out the Calendar fold-out under the table lays its slots: the same
    projection the Next column reads, horizon widened to two months by name */
 const RD_CAL_DAYS = 62;
+/* the calendar's scope is TRACKED releases, not just polls (user call
+   2026-10-09): gen-data's `tracked` cadence rows join its list, labelled
+   with what they monitor - every other projection consumer stays poll-only */
+const RD_CAL_TRACK = { direction: "Direction tracker", issues: "Issues Monitor" };
 
 /* the table's shape of a poll, for a pollster with a projection but no row
    in the Latest table (one that has gone quiet) */
@@ -630,17 +634,20 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   /* ---- the calendar fold-out: the projection laid out by month ---------
      The same projection the table's Next column reads, horizon widened to
-     two months (npProject's opts.horizonDays), as a list: a date is the
-     earliest that house's wave could land, a span a window the wave can
-     fall anywhere in. Only a house's first slot can already be due - the
-     walk stops there - so the due lead-in lists at most one per house, the
-     same standing claim the table makes rather than a second guess. */
-  const calProj = window.AP.nextPolls ? window.AP.nextPolls(null, { horizonDays: RD_CAL_DAYS }) : { rows: [] };
+     two months (npProject's opts.horizonDays) and scope widened to TRACKED
+     releases (opts.includeTracked: the direction and issues monitors ride
+     the same cadence table, flagged so nothing else renders them), as a
+     list: a date is the earliest that house's release could land, a span a
+     window the release can fall anywhere in. Only a house's first slot can
+     already be due - the walk stops there - so the due lead-in lists at
+     most one per house, the same standing claim the table makes rather
+     than a second guess. */
+  const calProj = window.AP.nextPolls ? window.AP.nextPolls(null, { horizonDays: RD_CAL_DAYS, includeTracked: true }) : { rows: [] };
   const calOver = [], calItems = [];
   const calDays = new Map();   /* a release date -> the houses landing on it */
   calProj.rows.forEach((r) => {
     if (r.overdue) { calOver.push(r); return; }
-    const me = { name: r.pollster, site: r.site };
+    const me = { name: r.pollster, site: r.site, tracked: r.tracked };
     if (r.loose && !irregular(r)) {
       calItems.push({ key: "w" + r.pollster, at: r.release - r.spread * DAY_MS, close: r.release + r.spread * DAY_MS, win: true, spread: r.spread, who: [me] });
     } else if (irregular(r)) {
@@ -680,11 +687,14 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     : irregular(r) ? "About " + dm(r.release)
     : wdm(r.release);
   /* a house name links out to where its wave lands first (its
-     pollsterRules.site) - the same claim the Next column's date makes */
+     pollsterRules.site) - the same claim the Next column's date makes. A
+     tracked-release house says what its release monitors instead, so a
+     direction survey never passes for a poll even at a glance */
   const calWho = (w, i) => (
     <span key={String(i)}>{i > 0 ? ", " : ""}{w.site
       ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next poll lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
-      : w.name}</span>);
+      : w.name}{w.tracked && RD_CAL_TRACK[w.tracked]
+      ? <span className="rd-cal-track">{RD_CAL_TRACK[w.tracked]}</span> : null}</span>);
 
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
@@ -779,7 +789,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                   {calOver.map((r) => (
                     <li key={r.pollster}>
                       <span className="rd-cal-d">{calOverTxt(r)}</span>
-                      <span className="rd-cal-w">{calWho({ name: r.pollster, site: r.site }, 0)}</span>
+                      <span className="rd-cal-w">{calWho({ name: r.pollster, site: r.site, tracked: r.tracked }, 0)}</span>
                       {r.missed && <span className="rd-cal-q">{when(r.closesIn)}</span>}
                     </li>
                   ))}
@@ -801,7 +811,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
               </div>
             ))}
           </div>
-          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added.</p>
+          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Direction-tracker and Issues-Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.</p>
         </details>
       )}
     </RdSec>

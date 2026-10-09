@@ -312,6 +312,12 @@ body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
+/* a tracked-release row's marker: not a poll - quiet text, no chip housing,
+   so it reads as a qualification of the name rather than a status */
+body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+body.rd .rd-cal-track::before { content: "("; }
+body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
   body.rd .rd-cal-q { flex-basis: 100%; padding-left: 98px; }

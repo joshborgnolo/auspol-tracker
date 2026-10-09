@@ -5169,6 +5169,58 @@ for (const p of POLLS) {
   // them as one release in the first place.
   else r.push({ date: p.date, pub, mins, url: p.url || null });
 }
+/* A TRACKED house files no poll row at all, yet the site tracks its releases
+   for another panel - SEC Newgate's Mood of the Nation feeds national
+   direction, Ipsos's Issues Monitor feeds the issues panel. pollsterRules
+   marks them ("tracked": true) so the release calendar can lay their slots
+   out beside the polls, labelled for what they are. The rows are minted in
+   exactly the shape the poll walk above produces (and ride the same
+   measurement code), tagged `tracked` so every poll-cadence consumer can
+   keep them out and only the calendar lets them in - the main projections
+   say what the poll schedule is, and a direction survey is not one. */
+{
+  const dirFirms = {};
+  for (const w of D.direction || []) if (w.published) (dirFirms[w.pollster] ||= []).push(w);
+  for (const firm of Object.keys(dirFirms)) {
+    // a poll house's own walk already covers it; and unmarked houses stay out
+    if (byHouse[firm] || (D.pollsterRules?.[firm] || {}).tracked !== true) continue;
+    const ws = dirFirms[firm].slice().sort((a, b) => String(a.published).localeCompare(String(b.published)));
+    const rows = ws.map((w) => {
+      const pub = w.published.slice(0, 10);
+      const cl = /T(\d{2}):(\d{2})/.exec(w.published);
+      return { date: w.date, pub, mins: cl ? +cl[1] * 60 + +cl[2] : null, url: w.url || null };
+    });
+    rows.tracked = "direction";
+    byHouse[firm] = rows;
+  }
+}
+/* Ipsos's releases are PDFs, dated only by what the .build/ipsos-src sidecars
+   record about when they appeared - the CDN's last-modified at first fetch
+   (uploadedAt), else the PDF's own creation, else when this site's job first
+   saw it. One row per release date (a re-uploaded version fetched twice under
+   a renamed link shares its date and collapses); the IM_Nat_ name gate keeps
+   the bound previous-year volume out, which is not a release in this rhythm. */
+{
+  const dir = path.join(ROOT, ".build", "ipsos-src");
+  if ((D.pollsterRules?.["Ipsos"] || {}).tracked === true && !byHouse["Ipsos"] && fs.existsSync(dir)) {
+    const posts = {};
+    for (const f of fs.readdirSync(dir)) {
+      if (!f.endsWith(".json")) continue;
+      try {
+        const j = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
+        if (j.kind !== "report" || !/^IM_Nat_/.test(path.basename(decodeURIComponent(j.pdf || "")))) continue;
+        const at = (j.uploadedAt || j.pdfCreated || j.firstSeenAt || "").slice(0, 10);
+        if (at) posts[at] = j.pdf;
+      } catch (e) { /* a half-written sidecar is a skip, never a build failure */ }
+    }
+    const days = Object.keys(posts).sort();
+    if (days.length >= CAD_MIN_POLLS) {
+      const rows = days.map((d) => ({ date: d, pub: d, mins: null, url: posts[d] || null }));
+      rows.tracked = "issues";
+      byHouse["Ipsos"] = rows;
+    }
+  }
+}
 const pollCadence = [];
 for (const [firm, rows] of Object.entries(byHouse)) {
   const dates = rows.map((r) => r.date).sort();
@@ -5375,6 +5427,9 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     : null;
   pollCadence.push({
     pollster: firm,
+    // a tracked-release house ("direction" | "issues"): the calendar lets it
+    // in labelled, every poll projection keeps it out (np-project's gate)
+    ...(rows.tracked ? { tracked: rows.tracked } : {}),
     last,
     // the anchor is a provisional wave's ESTIMATED publication, not a record
     ...(lastProvisional ? { lastProvisional: true } : {}),

@@ -3266,6 +3266,10 @@ body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
+body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+body.rd .rd-cal-track::before { content: "("; }
+body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
   body.rd .rd-cal-q { flex-basis: 100%; padding-left: 98px; }
@@ -75845,6 +75849,68 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }],
     "gapsUsed": 8
   }, {
+    "pollster": "Ipsos",
+    "tracked": "issues",
+    "last": "2026-09-02",
+    "cadence": 28,
+    "loose": true,
+    "spread": 12,
+    "spreadEarly": 11,
+    "spreadLate": 12,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": null,
+    "releaseTo": null,
+    "releaseMid": null,
+    "releaseTimed": 0,
+    "releaseVals": null,
+    "releaseMins": null,
+    "releaseDow": null,
+    "releaseDowN": 0,
+    "declared": [],
+    "waves": 8,
+    "site": "https://www.ipsos.com/en-au/issuesmonitor",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [{
+      "field": "2026-05-01",
+      "pub": "2026-05-01",
+      "mins": null,
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-05/IM_Nat_Apr26_v1.pdf",
+      "since": "2026-03-27",
+      "gap": 35
+    }, {
+      "field": "2026-06-10",
+      "pub": "2026-06-10",
+      "mins": null,
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-06/IM_Nat_May26_v2.pdf",
+      "since": "2026-05-01",
+      "gap": 40
+    }, {
+      "field": "2026-07-23",
+      "pub": "2026-07-23",
+      "mins": null,
+      "url": "https://www.ipsos.com/sites/default/files/IM_Nat_Jun_26_v4_0.pdf",
+      "since": "2026-06-10",
+      "gap": 43
+    }, {
+      "field": "2026-08-05",
+      "pub": "2026-08-05",
+      "mins": null,
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-08/IM_Nat_Jul_26_v2.pdf",
+      "since": "2026-07-23",
+      "gap": 13
+    }, {
+      "field": "2026-09-02",
+      "pub": "2026-09-02",
+      "mins": null,
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-09/IM_Nat_Aug_26_v1.pdf",
+      "since": "2026-08-05",
+      "gap": 28
+    }],
+    "gapsUsed": 7
+  }, {
     "pollster": "DemosAU",
     "last": "2026-09-17",
     "cadence": 29,
@@ -75907,6 +75973,68 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "gap": 24
     }],
     "gapsUsed": 8
+  }, {
+    "pollster": "SEC Newgate",
+    "tracked": "direction",
+    "last": "2026-09-22",
+    "cadence": 60,
+    "loose": true,
+    "spread": 26,
+    "spreadEarly": 13,
+    "spreadLate": 39,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": null,
+    "releaseTo": null,
+    "releaseMid": null,
+    "releaseTimed": 0,
+    "releaseVals": null,
+    "releaseMins": null,
+    "releaseDow": null,
+    "releaseDowN": 0,
+    "declared": [],
+    "waves": 7,
+    "site": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [{
+      "field": "2025-11-03",
+      "pub": "2025-11-10",
+      "mins": 1044,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-november-2025/",
+      "since": "2025-09-24",
+      "gap": 47
+    }, {
+      "field": "2026-02-09",
+      "pub": "2026-02-17",
+      "mins": 1011,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-february-2026-1/",
+      "since": "2025-11-10",
+      "gap": 99
+    }, {
+      "field": "2026-05-18",
+      "pub": "2026-05-27",
+      "mins": 783,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-may-2026-2/",
+      "since": "2026-02-17",
+      "gap": 99
+    }, {
+      "field": "2026-07-13",
+      "pub": "2026-07-21",
+      "mins": 1010,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2026/",
+      "since": "2026-05-27",
+      "gap": 55
+    }, {
+      "field": "2026-09-14",
+      "pub": "2026-09-22",
+      "mins": 929,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-september-2026-report/",
+      "since": "2026-07-21",
+      "gap": 63
+    }],
+    "gapsUsed": 6
   }, {
     "pollster": "Spectre Strategy",
     "last": "2026-07-23",
@@ -77186,25 +77314,27 @@ function spreadDays(c, sp) {
 let npProjMemo = null;
 function npProject(nowOverride, opts) {
   const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
+  const tracked = !!(opts && opts.includeTracked);
   if (!nowOverride) {
     const e = easternNow(),
       k = e.day + e.mins * 60000;
-    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays) return npProjMemo.v;
-    const v = npProjectAt(e, horizonDays);
+    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays && npProjMemo.t === tracked) return npProjMemo.v;
+    const v = npProjectAt(e, horizonDays, tracked);
     npProjMemo = {
       k,
       h: horizonDays,
+      t: tracked,
       v
     };
     return v;
   }
-  return npProjectAt(nowOverride, horizonDays);
+  return npProjectAt(nowOverride, horizonDays, tracked);
 }
-function npProjectAt(nowOverride, horizonDays) {
+function npProjectAt(nowOverride, horizonDays, includeTracked) {
   const {
     D
   } = window.AP;
-  const cad = D.pollCadence || [];
+  const cad = (D.pollCadence || []).filter(c => includeTracked || !c.tracked);
   if (!cad.length) return {
     rows: [],
     t0: 0,
@@ -104477,6 +104607,10 @@ const RD_PL_LABEL = {
 const RD_PL_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
 const RD_STALE_DAYS = 42;
 const RD_CAL_DAYS = 62;
+const RD_CAL_TRACK = {
+  direction: "Direction tracker",
+  issues: "Issues Monitor"
+};
 function rdPollRow(p) {
   const pub = p.published || p.released;
   const d = new Date(pub.slice(0, 10) + "T00:00:00Z");
@@ -105287,7 +105421,8 @@ function RdPolls({
     if (rows[j]) rows[j].focus();
   };
   const calProj = window.AP.nextPolls ? window.AP.nextPolls(null, {
-    horizonDays: RD_CAL_DAYS
+    horizonDays: RD_CAL_DAYS,
+    includeTracked: true
   }) : {
     rows: []
   };
@@ -105301,7 +105436,8 @@ function RdPolls({
     }
     const me = {
       name: r.pollster,
-      site: r.site
+      site: r.site,
+      tracked: r.tracked
     };
     if (r.loose && !irregular(r)) {
       calItems.push({
@@ -105366,7 +105502,9 @@ function RdPolls({
   }, w.name, React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
-  }, "\u2197")) : w.name);
+  }, "\u2197")) : w.name, w.tracked && RD_CAL_TRACK[w.tracked] ? React.createElement("span", {
+    className: "rd-cal-track"
+  }, RD_CAL_TRACK[w.tracked]) : null);
   return React.createElement(RdSec, {
     id: "latest-polls",
     cls: "rd-polls",
@@ -105566,7 +105704,8 @@ function RdPolls({
     className: "rd-cal-w"
   }, calWho({
     name: r.pollster,
-    site: r.site
+    site: r.site,
+    tracked: r.tracked
   }, 0)), r.missed && React.createElement("span", {
     className: "rd-cal-q"
   }, when(r.closesIn)))))), calMonths.map(g => React.createElement("div", {
@@ -105586,7 +105725,7 @@ function RdPolls({
     className: "rd-cal-q"
   }, it.q))))))), React.createElement("p", {
     className: "rd-note"
-  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added.")));
+  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added. The Direction-tracker and Issues-Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.")));
 }
 Object.assign(window, {
   RdPolls

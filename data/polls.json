@@ -86,6 +86,16 @@
     "Freshwater": {
       "stopped": true,
       "note": "Five waves, last 15 May 2026, silent since. Flagged by hand so its slot does not sit red on Next expected polls indefinitely; unflag if it resumes."
+    },
+    "SEC Newgate": {
+      "tracked": true,
+      "note": "Direction-only house (Mood of the Nation, no voting intention), so it never files a poll row; the release calendar carries it as a tracked release from its direction[] wave timings. Site is the series' own page, which is also every wave's url.",
+      "site": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation"
+    },
+    "Ipsos": {
+      "tracked": true,
+      "note": "Issues Monitor only (no voting intention), so it never files a poll row; the release calendar carries it as a tracked release from the .build/ipsos-src sidecar timings. Site is the national reports page the extractor reads.",
+      "site": "https://www.ipsos.com/en-au/issuesmonitor"
     }
   },
   "elections": {

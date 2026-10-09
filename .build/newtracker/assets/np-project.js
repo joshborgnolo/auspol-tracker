@@ -125,22 +125,27 @@ function spreadDays(c, sp) {
    `opts.horizonDays` widens the horizon a caller asks for (the Latest-polls
    calendar lays two months of slots out of the one projection); the memo
    keys on the pair, so the default call's cache is never poisoned by a
-   wider one. */
+   wider one. `opts.includeTracked` admits gen-data's `tracked` cadence rows -
+   the direction and issues monitors, which schedule releases but file no
+   poll; every other consumer keeps the default false, because a tab-bar
+   countdown or a "next poll" that includes a national-mood survey is a
+   mis-speak, labelled or not. */
 let npProjMemo = null;
 function npProject(nowOverride, opts) {
   const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
+  const tracked = !!(opts && opts.includeTracked);
   if (!nowOverride) {
     const e = easternNow(), k = e.day + e.mins * 60000;
-    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays) return npProjMemo.v;
-    const v = npProjectAt(e, horizonDays);
-    npProjMemo = { k, h: horizonDays, v };
+    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays && npProjMemo.t === tracked) return npProjMemo.v;
+    const v = npProjectAt(e, horizonDays, tracked);
+    npProjMemo = { k, h: horizonDays, t: tracked, v };
     return v;
   }
-  return npProjectAt(nowOverride, horizonDays);
+  return npProjectAt(nowOverride, horizonDays, tracked);
 }
-function npProjectAt(nowOverride, horizonDays) {
+function npProjectAt(nowOverride, horizonDays, includeTracked) {
   const { D } = window.AP;
-  const cad = D.pollCadence || [];
+  const cad = (D.pollCadence || []).filter((c) => includeTracked || !c.tracked);
   if (!cad.length) return { rows: [], t0: 0, nowMs: 0 };
   const eNow = nowOverride || easternNow();
   const t0 = eNow.day;
