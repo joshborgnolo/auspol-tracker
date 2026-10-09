@@ -184,6 +184,31 @@ for (const [date, m] of [...seen.entries()].sort()) {
 // a RedBridge wave read nowhere at all: pending until its report is cached
 for (const p of rbRows) if (!seen.has(p.date)) pending.push(`${RB}|${p.date}: no report cached for the wave and no later report reprints it`);
 
+/* RedBridge/Accent's November 2025 wave (fieldwork 7–13 Nov, AFR 16 Nov) –
+   older than FIRST_RB and the canonical Accent report for it was never
+   posted (the house's monthly project pages run October 2025 then December
+   2025; no afr…-november-2025-federal-poll slug ever existed, and the poll
+   row's releaseUrl is null). So the report-merge loop above — which pends
+   every post-FIRST_RB wave it hasn't cached — never sees it. But the AFR
+   piece printed a full "Party best able to handle key issues" chart (ffx
+   image ef046c74…, a stacked bar per issue), and every issue's seven cells
+   were entered by hand, each column summing to 100 inside the ±3 gate. If
+   the wave's poll row is ever absent (it is not now), drop nothing over it
+   — the gate rowOf guards it. */
+{
+  const p = rowOf(RB, "2025-11-13");
+  if (p) ownership.push(base(p, { read: "published chart", question: "best able to deal with",
+    options: ["alp", "lnp", "onp", "grn", "equal", "none", "unsure"],
+    issues: {
+      col:         { alp: 30, lnp: 21, onp: 11, grn: 7,  equal: 9,  none: 11, unsure: 11 },
+      health:      { alp: 34, lnp: 19, onp: 9,  grn: 7,  equal: 11, none: 8,  unsure: 12 },
+      housing:     { alp: 25, lnp: 17, onp: 11, grn: 8,  equal: 11, none: 15, unsure: 13 },
+      immigration: { alp: 20, lnp: 19, onp: 27, grn: 4,  equal: 8,  none: 10, unsure: 12 },
+      climate:     { alp: 18, lnp: 11, onp: 9,  grn: 27, equal: 11, none: 12, unsure: 12 },
+      security:    { alp: 27, lnp: 25, onp: 12, grn: 2,  equal: 12, none: 8,  unsure: 13 },
+    } }));
+}
+
 // ---- Resolve ------------------------------------------------------------------------
 try {
   const csv = fs.readFileSync(path.join(ROOT, "data", "resolve-political-monitor.csv"), "utf8");

@@ -16485,6 +16485,81 @@
    }
   },
   {
+   "pollster": "RedBridge/Accent",
+   "date": "2025-11-13",
+   "dateStart": "2025-11-07",
+   "sample": 1011,
+   "sampleEff": null,
+   "source": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
+   "read": "published chart",
+   "question": "best able to deal with",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "equal",
+    "none",
+    "unsure"
+   ],
+   "issues": {
+    "col": {
+     "alp": 30,
+     "lnp": 21,
+     "onp": 11,
+     "grn": 7,
+     "equal": 9,
+     "none": 11,
+     "unsure": 11
+    },
+    "health": {
+     "alp": 34,
+     "lnp": 19,
+     "onp": 9,
+     "grn": 7,
+     "equal": 11,
+     "none": 8,
+     "unsure": 12
+    },
+    "housing": {
+     "alp": 25,
+     "lnp": 17,
+     "onp": 11,
+     "grn": 8,
+     "equal": 11,
+     "none": 15,
+     "unsure": 13
+    },
+    "immigration": {
+     "alp": 20,
+     "lnp": 19,
+     "onp": 27,
+     "grn": 4,
+     "equal": 8,
+     "none": 10,
+     "unsure": 12
+    },
+    "climate": {
+     "alp": 18,
+     "lnp": 11,
+     "onp": 9,
+     "grn": 27,
+     "equal": 11,
+     "none": 12,
+     "unsure": 12
+    },
+    "security": {
+     "alp": 27,
+     "lnp": 25,
+     "onp": 12,
+     "grn": 2,
+     "equal": 12,
+     "none": 8,
+     "unsure": 13
+    }
+   }
+  },
+  {
    "pollster": "Ipsos",
    "date": "2025-12-07",
    "dateStart": "2025-12-02",
