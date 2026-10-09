@@ -2980,7 +2980,7 @@ function RdSwitching({ rangeId }) {
         note={"Rates are pooled across pollsters; a party’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the four parties, so Yes means the slope clears 95% — the test behind the “since " + sinceM + "” line above."}
       />
       <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters came from" }}>
-        2025 vote is as respondents recall it. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
+        2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
       </RdFoot>
     </RdSec>
   );
