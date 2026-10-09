@@ -1,4 +1,8 @@
 {
  "pdf": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-05/IM_Nat_Apr26_v1.pdf",
- "kind": "report"
+ "kind": "report",
+ "firstSeenAt": null,
+ "uploadedAt": "2026-05-01T05:47:01Z",
+ "uploadFolder": "2026-05",
+ "pdfCreated": "2026-05-01T05:40:04.000Z"
 }

@@ -15,7 +15,8 @@
        gives the effective sample size after weighting.
    Only what covers IP_FIRST on is cached. Each PDF becomes
    .build/ipsos-src/<slug>.txt (pdftotext -layout) and <slug>.json ({ pdf,
-   kind }), written once when first fetched and never touched again, so a
+   kind, firstSeenAt, uploadedAt, uploadFolder, pdfCreated }), written once
+   when first fetched and never touched again, so a
    run that finds nothing new changes nothing. A page that won't load is a
    warning, not a failure: the cache stays. The daily run
    (.build/ipsos-updater.sh) fails on the warning, once anything that did
@@ -23,9 +24,15 @@
    backstop, leaves the alarm to issues.mjs, which raises it if no new
    report arrives for too long.
 
-   No release date is kept: nothing in the PDFs states one, and their
-   Last-Modified stamps move when Ipsos re-uploads a corrected version
-   (June 2026's v4 reads 23 July, but its v3 was up on 2 July).
+   Release timing (why four fields): the PDFs state no release date.
+   firstSeenAt is when this job first cached the file (the daily run
+   catches a new report within a day) - null on files cached before the
+   field existed. uploadedAt is the CDN's Last-Modified at fetch time; it
+   MOVES when Ipsos re-uploads a corrected version (June 2026's v4 reads
+   23 July, but its v3 was up on 2 July), so for a re-versioned file the
+   earlier uploadFolder (the URL's /documents/YYYY-MM/ month) and
+   pdfCreated (the PDF's own CreationDate) are the better first-release
+   reads - never treat any of them as exact.
 
    Usage: node .build/extract-ipsos.mjs [--force]   (--force refetches PDFs
    already cached). IPSOS_SRC_DIR redirects the cache.
@@ -55,13 +62,14 @@ const MONTHS = ["january", "february", "march", "april", "may", "june", "july", 
                 "september", "october", "november", "december"];
 const MON3 = MONTHS.map((m) => m.slice(0, 3));
 
-async function get(url) {
+async function get(url, meta) {
   let last;
   for (let i = 1; i <= 3; i++) {
     try {
       const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (auspol-tracker data update)" },
                                      signal: AbortSignal.timeout(60_000), redirect: "follow" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (meta) meta.lastModified = res.headers.get("last-modified");
       return Buffer.from(await res.arrayBuffer());
     } catch (e) {
       last = e;
@@ -70,6 +78,28 @@ async function get(url) {
   }
   throw new Error(`${url}: ${last.message}`);
 }
+
+/* pdfinfo's CreationDate ("Mon Jun 22 10:21:20 2026 AEST") needs its zone
+   word mapped to an offset before Date can be trusted with it; absent
+   pdfinfo or an odd field gives null, never a fetch failure. */
+const pdfCreatedOf = (buf, slug) => {
+  const f = path.join(tmpdir(), `ipsos-info-${slug}.pdf`);
+  fs.writeFileSync(f, buf);
+  try {
+    for (const bin of ["pdfinfo", "/opt/homebrew/bin/pdfinfo", "/usr/local/bin/pdfinfo", "/usr/bin/pdfinfo"]) {
+      try {
+        const info = execFileSync(bin, [f], { encoding: "utf8", maxBuffer: 1 << 20 });
+        const m = info.match(/^CreationDate:\s*\w+ (\w+) +(\d+) (\d+:\d+:\d+) (\d{4}) *([^\n]*)$/m);
+        if (!m) return null;
+        const zone = { AEST: "+1000", AEDT: "+1100" }[m[5].trim()] || (/^[+-]\d{4}$/.test(m[5].trim()) ? m[5].trim() : null);
+        if (!zone) return null;
+        const d = new Date(`${m[2]} ${m[1]} ${m[4]} ${m[3]} GMT${zone}`);
+        return isNaN(+d) ? null : d.toISOString();
+      } catch (e) { if (e.code !== "ENOENT") return null; }
+    }
+    return null;
+  } finally { fs.rmSync(f, { force: true }); }
+};
 const pdfToText = (buf, slug) => {
   const f = path.join(tmpdir(), `ipsos-${slug}.pdf`);
   fs.writeFileSync(f, buf);
@@ -121,12 +151,20 @@ async function main() {
       if (fs.existsSync(txt) && !FORCE) continue;
       if (PROBE) { fetched.push(slug); continue; }
       try {
-        const buf = await get(url);
+        const meta = {};
+        const buf = await get(url, meta);
         if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") throw new Error("not a PDF");
         const text = pdfToText(buf, slug);
         fs.writeFileSync(txt + ".tmp", text);
         fs.renameSync(txt + ".tmp", txt);
-        fs.writeFileSync(path.join(SRC, slug + ".json"), JSON.stringify({ pdf: url, kind }, null, 1) + "\n");
+        const lm = meta.lastModified ? new Date(meta.lastModified) : null;
+        fs.writeFileSync(path.join(SRC, slug + ".json"), JSON.stringify({
+          pdf: url, kind,
+          firstSeenAt: new Date().toISOString(),
+          uploadedAt: lm && !isNaN(+lm) ? lm.toISOString() : null,
+          uploadFolder: (url.match(/\/documents\/(\d{4}-\d{2})\//) || [])[1] || null,
+          pdfCreated: pdfCreatedOf(buf, slug),
+        }, null, 1) + "\n");
         fetched.push(slug);
         console.log(`cached ${kind} ${slug}`);
       } catch (e) { warnings.push(`${slug}: ${e.message}`); }
