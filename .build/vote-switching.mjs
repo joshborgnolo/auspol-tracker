@@ -26,7 +26,7 @@
    read. Neither house published the table before February 2026.
 
    Hand-entered waves from a house this script doesn't read (the
-   RedBridge/Accent (shifts) 2026-03-19 wave, measured by hand from the
+   RedBridge/Accent 2026-03-19 "shifts" super-poll wave, measured by hand from the
    report's Figure 9 chart) are carried forward verbatim every run, since
    their pollster isn't in HOUSES.
 

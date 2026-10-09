@@ -65,6 +65,18 @@
 //              stay unlinked by design; the constant-link waves with no
 //              cache (Oct-2025 snapshot, the May-2026 MRP) keep links but
 //              get no sampleEff – MRPs are never eff-stamped in any house.
+//   SEC Newgate – direction-only house (Mood of the Nation): its rows live in
+//              polls.json's direction[] with their own wave's APC statement
+//              PDF as methodUrl, so the statement is read off the row itself –
+//              no listing page needed. SEC files the effective size as a
+//              PERCENTAGE of the raw n ("The total effective sample size after
+//              weighting was approximately 66%"), co-published with the
+//              report, which parseApcStatement's no-percent rule deliberately
+//              skips; this leg's own phrase parser converts it back against
+//              the row's filed sample (an absolute "effective sample size of
+//              N" reading is honoured too, for a statement that files one).
+//              Not in NEED_HOUSES: the stamp loop reaches the rows through
+//              `unstamped` directly, and NEED_HOUSES gates polls[] passes.
 //   (pooled)  – no source of its own: a "<House> (pooled)" row (Newspoll's
 //              quarterly demographic-tables release) pools the house's own
 //              waves across its fieldwork window, so its raw sample IS the
@@ -109,8 +121,8 @@
 //   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"pooled":n,"methods":n,"samples":n,"failed":n,"skipped":n,"errors":[…]}
 //
 // Usage: `node extract-sampleeff.mjs [leg]` – an optional positional leg
-// name (accent/yougov/newspoll/essential/demosau/pooled) runs JUST that leg's
-// stamps. redbridge-updater.sh invokes the offline Accent pass this way
+// name (accent/yougov/newspoll/essential/demosau/secnewgate/pooled) runs JUST
+// that leg's stamps. redbridge-updater.sh invokes the offline Accent pass this way
 // right after its own extractor so a newly-cached wave's eff + methodUrl
 // lands in the same commit instead of waiting for the weekly sweep.
 // `pooled` is the narrowest run: the (pooled)-rollup pass alone, with the
@@ -544,6 +556,48 @@ async function parsePdfAt(url, slug, fetcher = fetchBuffer) {
   return parseApcStatement(txt);
 }
 
+/* ---- leg: SEC Newgate per-wave statements -------------------------------
+   Mood of the Nation is a direction-only house; its waves sit in
+   polls.json's direction[] with the wave's own APC statement PDF already on
+   the row as methodUrl (co-published with the report), so no listing page
+   is crawled – the statement is read straight off each needing row. The
+   statement files the effective size as a percentage ("The total effective
+   sample size after weighting was approximately 66%, equating to a margin
+   of error …"), which the shared parser's no-percent rule skips; converted
+   here against the row's filed sample. An statement filing an absolute
+   count instead is parsed too. `end` is the row's own fieldwork end – the
+   row selected its statement, so no date matching stands in between. */
+async function legSecNewgate(rows) {
+  const out = [];
+  for (const d of rows) {
+    if (!Number.isInteger(d.sample)) { console.log("  warn: SEC row " + d.date + " has no filed sample to convert against"); continue; }
+    let txt;
+    try {
+      const buf = await fetchBuffer(d.methodUrl);
+      txt = cachedText("secnewgate-" + d.date, pdfToText(buf, "secnewgate-" + d.date));
+    } catch (e) {
+      console.log("  warn: secnewgate " + d.date + ": " + String(e.message).slice(0, 120));
+      continue;
+    }
+    const t = txt.replace(/\s+/g, " ");
+    const pct = t.match(/effective sample size[^.]{0,80}?approximately\s*(\d{1,3})\s*%/i);
+    const abs = !pct && t.match(/effective sample size[^.]{0,50}?(?:of|was|:|,)?\s*(?:approximately\s*)?(?:n\s*[=≈]\s*)?([0-9][0-9,]{2,})(?![\d.]*%)/i);
+    let eff = null;
+    if (pct) {
+      const p = +pct[1];
+      if (p < 20 || p > 100) { console.log("  warn: implausible SEC eff% " + p + " in " + d.methodUrl); continue; }
+      eff = Math.round((p / 100) * d.sample);
+    } else if (abs) {
+      eff = Number(abs[1].replace(/,/g, ""));
+    } else {
+      console.log("  warn: no SEC eff phrase in " + d.methodUrl);
+      continue;
+    }
+    out.push({ pollster: "SEC Newgate", series: "sec", end: d.date, eff, sample: d.sample, href: d.methodUrl, src: "SEC statement " + d.methodUrl.split("/").pop() });
+  }
+  return out;
+}
+
 /* ---- run the legs ------------------------------------------------------- */
 const rowSeries = (p) => {
   const u = p.url || "";
@@ -557,7 +611,11 @@ const rowSeries = (p) => {
   return "publicdata";
 };
 const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent"];
-const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sampleEff == null);
+/* SEC Newgate waves ride the same stamp loop (their eff text is the
+   per-wave statement's percentage phrase), matched off their own
+   methodUrl, so they join the pool directly from direction[]. */
+const secNeeds = (D.direction || []).filter((d) => d.pollster === "SEC Newgate" && d.sampleEff == null && d.methodUrl);
+const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sampleEff == null).concat(secNeeds);
 
 const records = [];
 const errors = [];
@@ -583,6 +641,7 @@ const legs = [
 ];
 if (unstamped.some((p) => p.pollster === "Newspoll"))
   legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);
+if (secNeeds.length) legs.push(["secnewgate", () => legSecNewgate(secNeeds)]);
 
 for (const [name, fn] of LEG_ONLY ? legs.filter(([n]) => n === LEG_ONLY) : legs) {
   try { records.push(...await fn()); }

@@ -47,7 +47,6 @@ export function validate(D) {
     "Roy Morgan (SMS)",  // single SMS-mode Morgan release, mode tag not a house
     "Roy Morgan (pooled)", // finding 10341's 7-month Single Source cross-section
     "Newspoll (pooled)", // quarterly aggregate releases, no aggregate weight
-    "RedBridge/Accent (shifts)", // 6–19 Mar 2026 super-poll: states/groups only, no national topline
     "Agenda C Synesis",  // one-off news.com.au poll
   ]);
 
@@ -188,7 +187,7 @@ export function validate(D) {
     //      the automated houses. Only those houses have a source to link.
     if (p.methodUrl != null && (typeof p.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.methodUrl)))
       fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
-    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge/Accent", "RedBridge/Accent (MRP)", "RedBridge/Accent (shifts)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
+    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge/Accent", "RedBridge/Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
       fail("method-url", `methodUrl on a row for ${p.pollster}`);
     // 2c3. tablesUrl is The Australian's demographic-tables supplement PDF
     //      for a pooled Newspoll wave, hosted on its origin CDN – only those
@@ -206,6 +205,14 @@ export function validate(D) {
       fail("sample-eff", `sampleEff = ${JSON.stringify(p.sampleEff)}`);
     if (p.sampleEff != null && p.sample > 0 && p.sampleEff > p.sample * 1.05)
       fail("sample-eff", `sampleEff ${p.sampleEff} exceeds raw sample ${p.sample}`);
+    // 2e. a row-level `noAgg` is ONE release of a regular house that stays
+    //     out of every aggregate while the house's tracker rows count
+    //     (gen-data's NO_AGG_ROW_NOTE / noAggPoll) – the token names the
+    //     release and must be one gen-data has a note for. A whole no-
+    //     aggregate HOUSE files under a suffix label instead (NO_AGG in
+    //     pollsterRules / gen-data's NO_AGG_HOUSES).
+    if (p.noAgg != null && !["shifts"].includes(p.noAgg))
+      fail("no-agg", `noAgg token "${p.noAgg}": gen-data has no NO_AGG_ROW_NOTE for it`);
     // 3. dates are ISO YYYY-MM-DD, not in the future, run oldest→newest, and
     //    fieldwork starts before it ends
     if (!ISO_DAY.test(p.date)) fail("date-format", `date "${p.date}" is not YYYY-MM-DD`);

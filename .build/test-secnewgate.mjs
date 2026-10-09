@@ -376,7 +376,9 @@ assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2
 // ---- polls.json carries exactly these rows --------------------------------------
 {
   const D = JSON.parse(fs.readFileSync("data/polls.json", "utf8"));
-  const mine = (D.direction || []).filter((d) => d.pollster === "SEC Newgate");
+  // extract-sampleeff.mjs layers sampleEff on afterwards from each wave's APC
+  // statement; it isn't this extractor's field, so it stays out of this pin
+  const mine = (D.direction || []).filter((d) => d.pollster === "SEC Newgate").map(({ sampleEff, ...rest }) => rest);
   assert.deepEqual(mine, reports.map((r) => ({
     date: r.sidecar.date, dateStart: r.sidecar.dateStart, pollster: "SEC Newgate",
     right: r.sidecar.endpoint.right, wrong: r.sidecar.endpoint.wrong,
@@ -386,6 +388,12 @@ assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2
     ...(r.sidecar.published != null ? { published: r.sidecar.published } : {}),
     ...(r.sidecar.method != null ? { methodUrl: r.sidecar.method } : {}),
   })), "the SEC Newgate direction rows, date-sorted, match the cached reports");
+  // ...but the layered effective samples are pinned against each wave's
+  // statement percentage (× its filed sample), date-keyed
+  assert.deepEqual(Object.fromEntries((D.direction || []).filter((d) => d.pollster === "SEC Newgate").map((d) => [d.date, d.sampleEff])), {
+    "2025-07-16": 1187, "2025-09-15": 970, "2025-11-03": 954, "2026-02-09": 1170,
+    "2026-05-18": 653, "2026-07-13": 1244, "2026-09-14": 1095,
+  }, "every SEC wave carries its statement's effective sample");
 }
 
 console.log("test-secnewgate: all assertions passed");

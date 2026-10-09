@@ -129,7 +129,22 @@ const POLLS = mergedPolls.filter((p) => !p.isElection);
    reason rides the row via NO_AGG_NOTE. Checks here key the full suffix
    string; the houses inventory (:3322) already folds "(SMS)" back into
    "Roy Morgan" for counting, as does "(pooled)". */
-const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newspoll (pooled)", "RedBridge/Accent (shifts)"]);
+const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newspoll (pooled)"]);
+/* a second, row-level carrier: ONE release that must not aggregate while
+   its house's regular tracker does. The March 2026 "shifts" super-poll
+   (n=5,563) files under plain "RedBridge/Accent" - it is the same
+   publisher as the monthly waves, so a "(shifts)" house suffix would
+   invent a pollster (the site's house counts, the filter select and the
+   release calendar would carry it as one); the row's `noAgg` token is
+   the key, and NO_AGG_ROW_NOTE gives it the reason the suffix labels
+   carry for theirs. noAggPoll() is then the ONE no-aggregate predicate
+   on the poll-row side; firm-level passes (the approval series, the
+   cadence house gate) stay on the suffix set alone, since a flagged row
+   publishes no figures those series could read. */
+const NO_AGG_ROW_NOTE = {
+  shifts: "Because this super-poll release (n=5,563) published state and demographic breakdowns only - no national headline figures - it does not count towards any aggregates.",
+};
+const noAggPoll = (p) => NO_AGG_HOUSES.has(p.pollster) || p.noAgg != null;
 /* why each no-aggregate house's figures sit outside the aggregates - the
    archive detail rail's note line (the SMS label keeps its established
    selection-bias wording; the pooled label reads as the timespan average) */
@@ -137,8 +152,8 @@ const NO_AGG_NOTE = {
   "Roy Morgan (SMS)": "Because SMS polls have a strong selection bias, they do not count towards any aggregates.",
   "Roy Morgan (pooled)": "Because this release averages seven months of interviewing (January\u2013July 2026) into a single reading, it does not count towards any aggregates.",
   "Newspoll (pooled)": "Because this release averages about ten weeks of interviewing into a single reading, it does not count towards any aggregates.",
-  "RedBridge/Accent (shifts)": "Because this super-poll release (n=5,563) published state and demographic breakdowns only - no national headline figures - it does not count towards any aggregates.",
 };
+const noAggNoteFor = (p) => NO_AGG_NOTE[p.pollster] || (p.noAgg != null ? NO_AGG_ROW_NOTE[p.noAgg] : undefined);
 const ppm = D.ppm;
 /* Leader satisfaction the fallback filed (D.fallbackApproval) joins the
    approval rows on the same terms as fallbackPolls above, but on its own:
@@ -339,7 +354,7 @@ const SPARSE_K = {
   weight: (d) => Math.exp(-LN2 * d / SPARSE_HALF)
     * (d <= SPARSE_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - SPARSE_TAPER) / (SPARSE_WINDOW - SPARSE_TAPER)))),
 };
-const tppRows = POLLS.filter((p) => p.tpp_alp != null && !NO_AGG_HOUSES.has(p.pollster)).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
+const tppRows = POLLS.filter((p) => p.tpp_alp != null && !noAggPoll(p)).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 /* Implied 2PP eligibility for the AGGREGATE: a poll's primaries can only be
    read into the standing implied series through the flow table when it
    files a full primary set with no documented anomaly (sumNote) – a set
@@ -420,7 +435,7 @@ const impliedOn = (p) =>
    its own ONP primary so §1c can re-price that one conversion cell per row
    (§1b's estimator never reads it). */
 const tppRowsSynth = POLLS
-  .filter((p) => impOk(p) && !NO_AGG_HOUSES.has(p.pollster))
+  .filter((p) => impOk(p) && !noAggPoll(p))
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, onp: p.onp, key: p.date + "|" + p.pollster }));
 /* Implied ALP–ON rows: the same waves re-read under the ALP-v-ON frozen
    table (FP_ON, above) instead of the AEC count's. Like the classic implied
@@ -433,7 +448,7 @@ const tppRowsSynth = POLLS
    just the n-weighted mean of its rows' ranges, which §1d lifts directly –
    no ratio, no simulation. */
 const tppRowsSynthOn = POLLS
-  .filter((p) => impOk(p) && p.onp != null && !NO_AGG_HOUSES.has(p.pollster))
+  .filter((p) => impOk(p) && p.onp != null && !noAggPoll(p))
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedOn(p),
                  bn: p.lnp * FP_ON_BAND.lnp + p.grn * FP_ON_BAND.grn
                      + ((p.ind || 0) + (p.oth || 0)) * FP_ON_BAND.oth,
@@ -882,7 +897,7 @@ const PRIMARY_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
 const primaryVal = (p, k) => (k === "oth" ? ((p.ind ?? null) === null && (p.oth ?? null) === null ? null : (p.ind ?? 0) + (p.oth ?? 0)) : p[k]);
 const primaryRows = {}, primaryHE = {};
 for (const k of PRIMARY_KEYS) {
-  primaryRows[k] = POLLS.filter((p) => primaryVal(p, k) != null && !NO_AGG_HOUSES.has(p.pollster))
+  primaryRows[k] = POLLS.filter((p) => primaryVal(p, k) != null && !noAggPoll(p))
     .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
@@ -947,8 +962,8 @@ function altRowsFor(field) {
   const out = [];
   for (const [key, v] of ALT_BY.entries()) {
     if (v[field] == null) continue;
-    if (NO_AGG_HOUSES.has(key.split("|")[1])) continue;
     const p = POLL_BY_KEY.get(key);
+    if (noAggPoll(p || { pollster: key.split("|")[1] })) continue;
     const date = key.split("|")[0];
     out.push({ ym: ymOf(date), mid: p ? midMs(p) : new Date(date).getTime(),
                x: v[field], n: rowN(p), firm: key.split("|")[1], key });
@@ -1051,7 +1066,7 @@ const effByKey = (() => {
     const out = new Map();
     const series = [["lnp", KF_NOW.tpp], ["imp", KF_NOW.imp], ["onimp", KF_NOW.on]].filter(([, kf]) => kf);
     for (const p of POLLS) {
-      if (NO_AGG_HOUSES.has(p.pollster)) continue;
+      if (noAggPoll(p)) continue;
       const key = p.date + "|" + p.pollster, eff = {};
       for (const [k, kf] of series) {
         if (!kf.obs.some((o) => o.key === key)) continue;
@@ -1088,7 +1103,7 @@ const effByKey = (() => {
   const onpMonth = alt2pp.alp_on.length ? alt2pp.alp_on[alt2pp.alp_on.length - 1] : null;
   const out = new Map();
   for (const p of POLLS) {
-    if (NO_AGG_HOUSES.has(p.pollster)) continue;
+    if (noAggPoll(p)) continue;
     const key = p.date + "|" + p.pollster;
     const eff = {};
     if (p.tpp_alp != null && cur2pp) {
@@ -1928,6 +1943,8 @@ const directionOnlyPolls = DIR
       ...(d.url ? { url: d.url } : {}),
       ...(d.published ? { published: d.published } : {}),
       ...(d.methodUrl ? { methodUrl: d.methodUrl } : {}),
+      // SEC Newgate's APC statements file an effective sample; carried like a poll row's
+      ...(d.sampleEff != null ? { sampleEff: d.sampleEff } : {}),
       client: CLIENT_BY_HOUSE.get(d.pollster) || "Self-published",
       p: {}, appr: {}, chg: null,
       dir: DIR_BY.get(d.date + "|" + d.pollster),
@@ -2914,7 +2931,7 @@ const individualPolls = POLLS.map((p) => {
     // a no-aggregate wave: the row renders with its figures whole, but every
     // series, monthly point and house effect above was built WITHOUT it -
     // the detail view's "How it counts" rail says why (see NO_AGG_HOUSES)
-    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true, noAggWhy: NO_AGG_NOTE[p.pollster] } : {}),
+    ...(noAggPoll(p) ? { noAgg: true, noAggWhy: noAggNoteFor(p) } : {}),
     /* When the wave was PUBLISHED, where the cited release says so. The
        archive's row detail has always had a line labelled "Published" and has
        always filled it with `released`, which is the last day of FIELDWORK -
@@ -3144,7 +3161,7 @@ const latestMs = Date.parse(LATEST_ISO);
    house — Newspoll's 18 Sep quarter sat over its 17 Sep wave — while the
    projection's fallback put the parent back as a SECOND row, so the table
    carried the house twice. Their waves display in the archive instead. */
-const recent = POLLS.filter((p) => !NO_AGG_HOUSES.has(p.pollster) && (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
+const recent = POLLS.filter((p) => !noAggPoll(p) && (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
 const perHouse = new Map();
 for (const p of recent.sort((a, b) => a.date.localeCompare(b.date))) perHouse.set(canon(p.pollster), p);
 const pollsterTable = [...perHouse.values()].map((p) => {
@@ -3179,7 +3196,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     // same no-aggregate flag as the archive emitter (see NO_AGG_HOUSES), so a
     // no-agg wave that ever lands in the Latest window carries the note too
-    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true, noAggWhy: NO_AGG_NOTE[p.pollster] } : {}),
+    ...(noAggPoll(p) ? { noAgg: true, noAggWhy: noAggNoteFor(p) } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -3420,9 +3437,8 @@ const FLOW_ON_BASE_MIN = 3;
 const driftOnResid = [];
 for (const [key, v] of ALT_BY.entries()) {
   if (v.ao == null) continue;
-  if (NO_AGG_HOUSES.has(key.split("|")[1])) continue;
   const p = POLL_BY_KEY.get(key);
-  if (!p || !impOk(p)) continue;
+  if (!p || noAggPoll(p) || !impOk(p)) continue;
   const x = v.ao;                          // published ALP share of the pairing (0-100)
   driftOnResid.push({ ym: ymOf(p.date), mid: midMs(p), n: rowN(p), firm: key.split("|")[1], key,
                       pq: (x / 100) * (1 - x / 100) * 1e4, x: x - impliedOn(p),
@@ -4389,7 +4405,7 @@ const showWorking = KF ? {} : (() => {   // /vic/'s figures are the trend's: no 
      which the guard below enforces. */
   let primary = null;
   if (primaryNow) {
-    const wPolls = POLLS.filter((p) => { if (p.alp == null) return false; if (NO_AGG_HOUSES.has(p.pollster)) return false; const d = ddays(refNow, midMs(p)); return d >= 0 && d <= HL_WINDOW; });
+    const wPolls = POLLS.filter((p) => { if (p.alp == null) return false; if (noAggPoll(p)) return false; const d = ddays(refNow, midMs(p)); return d >= 0 && d <= HL_WINDOW; });
     wPolls.sort((a, b) => midMs(a) - midMs(b));
     const waves = new Map();
     for (const p of wPolls) waves.set(p.pollster, (waves.get(p.pollster) || 0) + 1);

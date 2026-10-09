@@ -1,0 +1,917 @@
+METHODOLOGY DISCLOSURE STATEMENT
+
+ Project name                  Mood of the Nation (Wave 25)
+
+ Project reference             NGR 2203003
+
+
+
+ Research dates:               13th – 18th May 2026
+ Target population:            The target population for the research was Australian residents
+                               (all states and territories) aged 18+.
+ Research methodology:         The research comprised of a 20-minute self-complete online
+                               survey with n=1,210 participants, sourced from an ISO accredited
+                               market research panel.
+
+
+ Weighting approach:           The data was weighted using ABS Census population statistics on
+                               age, gender, location and occupation to match the estimated
+                               population of all Australian residents aged 18+. The total effective
+                               sample size after weighting was approximately 54%, equating to a
+                               margin of error of approximately +-3.1% (at the 95% confidence
+                               interval).
+ Research questions:           A combination of single choice, multiple choice and open-ended
+                               (text response) questions were used in the research. All questions
+                               and response options were displayed in full during interviews.
+
+
+ This research was conducted in accordance with the Australian Polling Council Quality Mark
+ standards which can be viewed here: https://www.australianpollingcouncil.com/
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PUBLISHED QUESTIONS
+PROG NOTE: ASK ALL RESPONDENTS
+
+Q. What are the main issues facing Australians that are most important to you right now – the specific
+cares, concerns, or priorities that you typically talk about with friends or family?
+
+(Please list these issues in the box below and be as specific as possible about them)
+
+PROG NOTE: OPEN TEXT FIELD. MINIMUM 10 CHARACTERS
+
+
+
+
+Q. Overall, do you think Australia, <insert state>, and your local area are heading in the right direction or
+the wrong direction? (Select one answer per item)
+
+PROG NOTE: RANDOMISE 1-2
+
+                    1                                  2
+
+     Heading in the right direction    Heading in the wrong direction
+
+A Australia
+
+B   (PROG NOTE: INSERT STATE/TERRITORY FROM Q)
+
+C Your local area
+
+
+
+PROG NOTE: ASK IF AUSTRALIA HEADING IN THE RIGHT DIRECTION IE CODE 1 IN Q. CODE 2 GO
+TO Q.
+
+Q. For what reasons do you think Australia is heading in the right direction?
+(Please list these reasons in the box below and be as specific as possible about them)
+PROG NOTE: OPEN TEXT FIELD. MINIMUM 10 CHARACTERS
+
+
+
+
+PROG NOTE: ASK IF AUSTRALIA HEADING IN THE WRONG DIRECTION IE CODE 2 IN Q. CODE 1
+GO TO Q.
+
+Q. For what reasons do you think Australia is heading in the wrong direction?
+(Please list these reasons in the box below and be as specific as possible about them)
+PROG NOTE: OPEN TEXT FIELD. MINIMUM 10 CHARACTERS
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+Q. In this question we will show you a series of 36 things that some people believe are important for
+Australia’s future.
+We know it’s a long list, but the results will provide important information to Australia’s leaders.
+
+How important are these things to you personally? (Select one answer per item)
+
+PROG NOTE: RANDOMISE 1-36
+
+                    1                         2                         3                         4
+
+          Extremely important         Quite important          Slightly important       Not important at all
+
+1        Reducing personal taxes
+
+2        Strengthening pensions, welfare payments and support for vulnerable people
+
+3        Improving representation and conditions for women in the workplace
+
+4        Promoting diversity, inclusion, and respect for minority groups
+
+5        Strengthening our economy
+
+6        Boosting jobs and addressing unemployment
+
+7        Supporting small businesses and encouraging entrepreneurship
+
+8        Addressing Aboriginal disadvantage and promoting reconciliation
+
+9        Acting decisively on climate change and transitioning to renewables
+
+10       Increasing our local manufacturing capacity
+
+11       Strengthening our defence capabilities
+
+12       Strengthening our borders against illegal immigration
+
+13       Increasing migration to fill workplace shortages
+
+14       Addressing the deliberate spread of misinformation and “fake news”
+
+15       Investing more to ensure quality affordable healthcare for all Australians
+
+16       Investing more to ensure access to affordable University and TAFE education
+
+17       Investing more to improve the quality of primary and high schools in all local communities
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+18      Investing more in public transport infrastructure
+
+19      Investing more to improve the aged care sector
+
+20      Improving the preparedness and support for fires, floods and other disasters
+
+21      Reducing government debt
+
+22      Improving pay and conditions for workers
+
+23      Investing more in road infrastructure
+
+24      Strengthening our response to racial and religious violence and intimidation in Australia
+
+25      Preserving freedom of speech and rejecting excessive political correctness
+
+26      Keeping interest rates low
+
+27      Reducing cost increases for household bills and other essential expenses
+
+28      Providing opportunities for more people to own their own home
+
+29      Increasing the availability of affordable rental housing
+
+30      Protecting the natural environment, habitats and wildlife
+
+31      Managing risks associated with the use of artificial intelligence (AI)
+
+32      Strengthening international alliances to counteract aggression from other countries
+
+33      Strengthening our response to violence against women
+
+34      Reducing crime and antisocial behaviour
+
+35      Investing more to increase the availability of affordable childcare services
+
+36      Dealing with international tariffs and supporting affected businesses
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+Q. Next please select the 3 of these things that are most important to you personally.
+
+        PROG NOTE: ONLY POPULATE WITH RESPONSES FROM Q THAT ARE NOTED AS BEING
+        “EXTREMELY IMPORTANT” (RESPONSE CODE =1). DO NOT ASK IF THERE ARE 3 OR LESS
+        RESPONSES WITH CODE 1 IN Q. FOR THESE PARTICIPANTS POPULATE ALL CODE 1
+        RESPONSES IN Q FOR Q. IF PARTICIPANT GAVE NO “CODE 1” RESPONSES IN Q THEN
+        POPULATE WITH CODE 2 RESPONSES. IF PARTICIPANT GAVE NO “CODE 1” OR “CODE 2”
+        RESPONSES IN Q THEN SKIP QUESTION. RANDOMISE OPTIONS
+
+                                                                                              Select 3
+
+ Reducing personal taxes                                                                         1
+
+ Strengthening pensions, welfare payments and support for vulnerable people                      2
+
+ Improving representation and conditions for women in the workplace                              3
+
+ Promoting diversity, inclusion, and respect for minority groups                                 4
+
+ Strengthening our economy                                                                       5
+
+ Boosting jobs and addressing unemployment                                                       6
+
+ Supporting small businesses and encouraging entrepreneurship                                    7
+
+ Addressing Aboriginal disadvantage and promoting reconciliation                                 8
+
+ Acting decisively on climate change and transitioning to renewables                             9
+
+ Increasing our local manufacturing capacity                                                    10
+
+ Strengthening our defence capabilities                                                         11
+
+ Strengthening our borders against illegal immigration                                          12
+
+ Increasing migration to fill workplace shortages                                               13
+
+ Addressing the deliberate spread of misinformation and “fake news”                             14
+
+ Investing more to ensure quality affordable healthcare for all Australians                     15
+
+ Investing more to ensure access to affordable University and TAFE education                    16
+
+ Investing more to improve the quality of primary and high schools in all local communities     17
+
+ Investing more in public transport infrastructure                                              18
+
+ Investing more to improve the aged care sector                                                 19
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+ Improving the preparedness and support for fires, floods and other disasters                            20
+
+ Reducing government debt                                                                                21
+
+ Improving pay and conditions for workers                                                                22
+
+ Investing more in road infrastructure                                                                   23
+
+ Strengthening our response to racial and religious violence and intimidation in Australia               24
+
+ Preserving freedom of speech and rejecting excessive political correctness                              25
+
+ Keeping interest rates low                                                                              26
+
+ Reducing cost increases for household bills and other essential expenses                                27
+
+ Providing opportunities for more people to own their own home                                           28
+
+ Increasing the availability of affordable rental housing                                                29
+
+ Protecting the natural environment, habitats and wildlife                                               30
+
+ Managing risks associated with the use of artificial intelligence (AI)                                  31
+
+ Strengthening international alliances to counteract aggression from other countries                     32
+
+ Strengthening our response to violence against women                                                    33
+
+ Reducing crime and antisocial behaviour                                                                 34
+
+ Investing more to increase the availability of affordable childcare services                            35
+
+ Dealing with international tariffs and supporting affected businesses                                   36
+
+
+
+Q. How do you think the Australian economy will change over the following time frames? (Select one
+answer per item)
+
+        PROG NOTE: SINGLE RESPONSE PER ROW. ROTATE BETWEEN 1-5 AND 5-1
+
+                               It will get a   It will get a     It will stay   It will get a   It will get a
+                                lot worse      little worse      the same       little better    lot better
+
+A     In 3 months                   1               2                 3              4               5
+
+B     In 12 months                  1               2                 3              4               5
+
+C     In 3 years                    1               2                 3              4               5
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+
+Q. Please select all the emotions that best describe how you have been feeling over the last few weeks?
+(Select all that apply)
+
+PROG NOTE: MULTIPLE RESPONSE. RANDOMISE 1-32
+
+1   Happy                      17 Anxious
+
+2   Grateful                   18 Envious
+
+3   Calm                       19 Bored
+
+4   Content                    20 Confused
+
+5   Inspired                   21 Pessimistic
+
+6   Confident                  22 Sad
+
+7   Optimistic                 23 Scared
+
+8   Loved                      24 Stressed
+
+9   Excited                    25 Lonely
+
+10 Ambitious                   26 Depressed
+
+11 Proud                       27 Exhausted
+
+12 Brave                       28 Disappointed
+
+13 Energised                   29 Rushed
+
+14 Joyful                      30 Overwhelmed
+
+15 Angry                       31 Included
+
+16 Annoyed                     32 Valued
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+
+Q. Overall, how would you rate the performance of the following governments? (Select one answer per
+item)
+
+PROG NOTE: SINGLE RESPONSE PER ROW. RANDOMISE A-B
+
+         1             2            3             4           5            6                99
+
+    Excellent      Very good       Good        Fair         Poor       Very poor    Don’t know
+
+A The (PROG NOTE: INSERT STATE/TERRITORY FROM Q) Government
+
+B The Federal Government
+
+
+
+Q. Thinking now about cost of living. How concerned, if at all, are you about the following cost of living
+issues?
+PROG NOTE: SINGLE RESPONSE PER ROW. RANDOMISE A-I. ROTATE BETWEEN 1,2,3,4,5 AND
+4,3,2,1,5
+
+             1                 2              3                   4             5
+
+       Extremely             Quite         Slightly           Not         This cost isn’t
+       concerned           concerned      concerned        concerned     relevant to me
+
+ A Petrol prices
+
+ B Gas bills
+
+ C Grocery prices
+
+ D Electricity bills
+
+ E Rent
+
+ F Mortgage repayments
+
+ G Insurance premiums
+
+ H Motorway tolls
+
+ I Water bills
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+Q. How would you describe your current financial situation? (Select one answer)
+PROG NOTE: SINGLE RESPONSE
+
+ 1      Doing well and feeling comfortable
+
+ 2      Doing OK and making ends meet
+
+ 3      Having some difficulty but just making ends meet
+
+ 4      Having a lot of difficulty paying bills and covering basic living
+        expenses
+
+
+Q. Overall, do you agree or disagree with the following statement about the current behaviour of large
+companies operating in Australia (i.e. Australia’s “corporate sector”)? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5 AND 5,4,3,2,1.
+
+               1               2                 3                  4                5
+
+          Strongly        Somewhat          Neither agree        Somewhat         Strongly
+           agree            agree           nor disagree          disagree        disagree
+
+ A They are behaving ethically and doing the right thing
+
+
+
+Q. Thinking about social cohesion – by that we mean the way in which different people and groups in
+society get along and feel connected to one another.
+
+How would you rate the level of social cohesion in Australia at the current time? (Select one answer)
+
+PROG NOTE: SINGLE RESPONSE
+    1   Excellent
+
+    2   Very good
+
+    3   Good
+
+    4   Fair
+
+    5   Poor
+
+    6   Very Poor
+
+
+
+Q. And how do you think social cohesion in Australia will change over the following time frames? (Select
+one answer per item)
+PROG NOTE: SINGLE RESPONSE PER ROW. ROTATE BETWEEN 1,2,3 AND 3,2,1
+
+                                   It will get    It will stay      It will get
+                                     worse        the same            better
+
+A       In 12 months                   1               2                3
+
+B       In 3 years                     1               2                3
+
+
+[NGR 2203003] Methodology Disclosure Statement
+Q. To what extent do you think each of these has a role in improving social cohesion in Australia?
+(Select one answer)
+PROG NOTE: SINGLE RESPONSE. RANDOMISE A-E. ROTATE BETWEEN 1,2,3,4 AND 4,3,2,1
+
+               1                     2                        3                            4
+
+           Major role           Moderate role            Minor role                    No role
+
+ A The media
+
+ B Governments
+
+ C Businesses
+
+ D Cultural and faith leaders
+
+ E Everyday people
+
+
+Q. Overall, do you feel positive or negative about Australia transitioning its electricity generation to
+renewables like solar, wind and hydro and moving away from coal and other fossil fuels? (Select one
+answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5, AND 5,4,3,2,1
+
+                                           Neither
+                        Somewhat                               Somewhat
+ Very positive                           positive nor                                Very negative
+                         positive                               negative
+                                          negative
+
+       1                    2                   3                     4                    5
+
+
+Q. In Australia, do you think the transition to renewable energy like solar, wind and hydro is currently
+moving… (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5 AND 5,4,3,2,1
+
+                                            At an
+                         A bit too                            A bit too
+ Far too quickly                         appropriate                           Far too slowly
+                          quickly                              slowly
+                                            pace
+
+        1                   2                   3                 4                    5
+
+
+Q. In principle, do you support or oppose Australia developing new electricity generation projects using
+the following types of energy? (Select one answer per item)
+
+PROG NOTE: SINGLE RESPONSE PER ROW. ROTATE BETWEEN 1,2,3,4,5 & 5,4,3,2,1. RANDOMISE
+A-M
+
+                                 Somewhat           Neither support
+       Strongly support                                                   Somewhat oppose        Strongly oppose
+                                  support            nor oppose
+
+                 1                   2                    3                      4                     5
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+ A    Coal fired power plants
+
+  B   Gas fired power plants
+
+ D    Offshore wind farms (typically 10-40 kilometers from the coastline)
+
+  E   Onshore wind farms (typically in regional areas)
+
+  F   Nuclear power
+
+ G    Solar farms
+
+ H    Rooftop solar
+
+  I   Hydro-electric power
+
+  J   Waste-to-energy projects (which use household and other waste as a fuel source)
+
+  K   Renewable gas (e.g. biomethane generated from farming and agricultural waste)
+
+  L   Hydrogen gas created from renewables such as solar and wind
+
+ M    Hydrogen gas created from fossil fuels such as coal and gas
+
+
+Q. Do you support or oppose the following actions related to energy in Australia? (Select one answer per
+item)
+PROG NOTE: SINGLE RESPONSE PER ROW. ROTATE BETWEEN 1,2,3,4,5 & 5,4,3,2,1.
+                                       Neither
+        Strongly      Somewhat                        Somewhat
+                                     support nor                        Strongly oppose
+        support        support                         oppose
+                                       oppose
+
+           1               2              3               4                     5
+
+      The Federal Government’s target to reduce carbon emissions by 62% to 70% by
+ B
+      2035 (compared to 2005 levels)
+
+      The Federal Government committing to “Net zero carbon emissions” by 2050
+ C    (meaning that carbon pollution released will be balanced by carbon storage or other
+      offsets)
+
+
+Q. How confident are you that each of the following will occur? (Select one answer per item)
+
+PROG NOTE: SINGLE RESPONSE PER ROW. ROTATE BETWEEN 1,2,3,4,5 AND 4,3,2,1,5.
+
+          Very           Somewhat          Not very
+                                                         Not at all confident       Don’t know
+        confident        confident        confident
+
+               1               2              3                   4                       5
+
+  B   Australia reducing carbon emissions by 62% to 70% by 2035 (compared to 2005 levels)
+
+      Australia achieving “Net zero carbon emissions” by 2050 (meaning that carbon pollution
+ C
+      released will be balanced by carbon storage or other offsets)
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+Q. Thinking now about the Federal Budget that was handed down recently on Tuesday 12 th May.
+Based on what you may have seen or heard about it, overall what type of impact do you think it will have
+on you and your immediate family? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5,99 AND 5,4,3,2,1,99
+
+ 1    A very positive impact
+
+ 2    A somewhat positive impact
+
+ 3    Neither positive nor negative impact
+
+ 4    Somewhat negative impact
+
+ 5    A very negative impact
+
+ 99   Don’t know
+
+
+Q. Based on what you may have seen or heard about the Federal Budget, overall what impact do you
+think it will have on Australia? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5,99 AND 5,4,3,2,1,99
+
+ 1    A very positive impact
+
+ 2    A somewhat positive impact
+
+ 3    Neither positive nor negative impact
+
+ 4    Somewhat negative impact
+
+ 5    A very negative impact
+
+ 99   Don’t know
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: RANDOMISE Q-Q
+Q. In the Federal Budget, the Federal Government announced changes to the capital gains tax (CGT)
+discount on assets (such as investment properties or shares) held for more than a year.
+•        The current rule – where only 50% of any profit is taxed - will be replaced.
+•        Under the new system, when an asset is sold, the profit will first be reduced to account for inflation
+         over the time it was held, and the remaining gain will then be taxed, with a minimum tax rate of 30%.
+•        These changes will apply to gains made from 1 July 2027 onwards, with existing gains remaining under
+         the current rules.
+Some argue this could help improve housing affordability, while others argue it may discourage
+investment in rental housing.
+Do you support or oppose this change? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5,99 AND 5,4,3,2,1,99
+
+    1      Strongly support
+
+    2      Somewhat support
+
+    3      Neither support nor oppose
+
+    4      Somewhat oppose
+
+    5      Strongly oppose
+
+    99     Don’t know
+
+Q. In the Federal Budget, the Federal Government announced changes to negative gearing for property
+investors. Negative gearing allows investors to offset losses from a rental property against other income,
+such as wages, to reduce the amount of tax they pay.
+• Under the new system, investors will only be able to use these losses to reduce tax on other income if
+the property is a newly built home.
+• For other investment properties, losses can only be offset against rental income or used later to reduce
+profits when a property is sold, rather than other income such as wages.
+• Existing investment properties will not be affected by these changes.
+Some argue this could help improve housing affordability, while others argue it may discourage
+investment in rental housing.
+Do you support or oppose this change? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5,99 AND 5,4,3,2,1,99
+
+    1      Strongly support
+
+    2      Somewhat support
+
+    3      Neither support nor oppose
+
+    4      Somewhat oppose
+
+    5      Strongly oppose
+
+    99     Don’t know
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+
+Q. Which of the following best describes your work status? (Select one answer)
+
+PROG NOTE: SINGLE RESPONSE
+
+ 1    Working full time
+
+ 2    Working part time
+
+ 3    Working casually
+
+ 4    Retired
+
+ 5    Unemployed
+
+ 6    Full-time student
+
+ 7    Full time home / parent duties
+
+ 98   Other
+
+
+
+PROG NOTE: ASK IF EMPLOYED IE CODE 1-3 IN Q. OTHERS GO TO Q
+
+Q. Thinking about job security in your current employment.
+
+How secure or insecure do you feel about your own job at the current point in time? (Select one answer)
+
+PROG NOTE: SINGLE RESPONSE
+
+ 1    Very secure
+
+ 2    Somewhat secure
+
+ 3    Somewhat insecure
+
+ 4    Very insecure
+
+ 99   Don’t know
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+
+Q. Thinking now about the availability of fuel for households and businesses in Australia. This includes
+petrol and diesel. How much of a problem, if at all, do you think fuel availability is or will be…
+(Select one answer per item)
+
+PROG NOTE: SINGLE RESPONSE PER ROW
+
+                                      Major problem    Minor             Not a problem       Don’t know
+                                                       problem
+
+ A    At the current point in time           1                   2               3                99
+
+ B    1 month from now                       1                   2               3                99
+
+ C    12 months from now                     1                   2               3                99
+
+
+
+Q. Do you think the Federal Government is currently doing too much, about the right amount or too little
+to manage the availability of fuel in Australia? (Select one answer)
+PROG NOTE: SINGLE RESPONSE
+
+ 1    Too much
+
+ 2    About the right amount
+
+ 3    Too little
+
+ 99   Don’t know
+
+
+Q. Would you support or oppose the following things in Australia to reduce the reliance on imports of
+fuel? (Select one answer per item)
+PROG NOTE: SINGLE RESPONSE PER ROW. RANDOMISE A-C
+
+                                            Strongly    Somewhat       Neither       Somewhat    Strongly   Don’t
+                                            support      support       support        oppose     oppose     know
+                                                                         nor
+                                                                       oppose
+
+ A    Allowing more oil and gas drilling         1           2            3             4           5        99
+      to produce more fuel
+
+ B    Developing more fuel refineries,           1           2            3             4           5        99
+      which turn raw or crude oil into
+      fuels
+
+ C    Developing bio-fuels using locally         1           2            3             4           5        99
+      grown agricultural materials (such
+      as Canola)
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+Q. Fuel rationing involves limiting how much petrol or diesel households and businesses can buy, to
+manage supply shortages. Overall, which one of the following best reflects your view? (Select one answer)
+
+PROG NOTE: SINGLE RESPONSE
+
+ 1    You support at least some level of fuel rationing being introduced now
+
+ 2    You support at least some level of fuel rationing but only if supply issues become
+      worse
+
+ 3    You don’t support fuel rationing at any time
+
+ 99   Don’t know
+
+
+Q. How much of an impact do you think fuel availability will have on each of the following over the next
+couple of months? (Select one answer per item)
+PROG NOTE: SINGLE RESPONSE PER ROW. RANDOMISE A-E
+
+                                                          Large        Small          No          Don’t
+                                                         impact       impact        impact        know
+
+ A    The Australian economy                                1            2             3           99
+
+ B    The cost of electricity                               1            2             3           99
+
+ C    The cost of housing                                   1            2             3           99
+
+ D    The cost of food and groceries                        1            2             3           99
+
+ E    The cost of air travel                                1            2             3           99
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+Q. Which of the following, if any, have you personally done specifically in response to recent rises in fuel
+prices? (Select all that apply)
+PROG NOTE: MULTI RESPONSE. RANDOMISE 1-9 THEN 99 LAST. CODE 99 IS EXCLUSIVE
+
+ 1    Driven less or combined multiple destinations into one trip
+
+ 2    PROG NOTE: ONLY SHOW IF EMPLOYED IE CODES 1-3 IN Q Worked from home more often
+
+ 3    PROG NOTE: ONLY SHOW IF EMPLOYED IE CODES 1-3 IN Q Changed or cancelled work travel
+      plans
+
+ 4    Changed holiday travel plans
+
+ 5    Cancelled holiday travel plans
+
+ 6    Used public transport more often than you otherwise would
+
+ 7    Shopped around for cheaper fuel more often than you otherwise would
+
+ 8    Changed vehicle use (e.g. used a more fuel efficient car)
+
+ 9    Carpooled with a colleague or friend
+
+ 99   None of the above
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+PROG NOTE: ASK ALL RESPONDENTS
+
+Q. How do you rate the current relationship between Australia and the following countries? (Select one
+answer per item)
+
+PROG NOTE: SINGLE RESPONSE PER ROW. RANDOMISE A-M
+
+              1                2                3             4          5        6         99
+
+                                                                                Very
+           Excellent       Very Good         Good            Fair       Poor            Don’t know
+                                                                                poor
+
+ A United States
+
+ B Russia
+
+ D China
+
+ E Indonesia
+
+ F South Korea
+
+ G Japan
+
+ H Canada
+
+ I India
+
+ J France
+
+ K Germany
+
+ L New Zealand
+
+ M United Kingdom
+
+
+Q. Australia, the United States and the United Kingdom have formed a long-term security partnership
+known as AUKUS.
+The agreement aims to strengthen defence and security cooperation in the Indo-Pacific region, including
+helping Australia acquire nuclear-powered submarines and access advanced defence technologies. Do
+you support or oppose Australia’s involvement in the AUKUS partnership? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5 AND 5,4,3,2,1
+  1   Strongly support
+
+  2   Somewhat support
+
+  3   Neither support nor oppose
+
+  4   Somewhat oppose
+
+  5   Strongly oppose
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+Q. Which one of the following do you think should be the main priority for the Federal Government when
+it comes to national security? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. RANDOMISE 1-2 THEN 3 LAST
+ 1   Strengthening our alliance with the USA
+
+ 2   Strengthening our alliance with other countries
+
+ 3   Don’t know
+
+
+Q. Overall, do you feel positive or negative towards US President Donald Trump? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4,5 AND 5,4,3,2,1
+ 1   Very positive
+
+ 2   Somewhat positive
+
+ 3   Neither positive nor negative
+
+ 4   Somewhat negative
+
+ 5   Very negative
+
+
+
+Q. Do you personally think US President Donald Trump is…? (Select one answer)
+PROG NOTE: SINGLE RESPONSE. ROTATE BETWEEN 1,2,3,4 AND 2,1,3,4
+ 1   Making the world a more safe place
+
+ 2   Making the world a less safe place
+
+ 3   Making no difference to how safe the world
+     is
+
+ 4   Don’t know
+
+
+
+
+[NGR 2203003] Methodology Disclosure Statement
+

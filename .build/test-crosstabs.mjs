@@ -304,8 +304,8 @@ assert.deepEqual(nov26.dims.state, {
   WA: { alp: 39, lnp: 24, grn: 12, onp: 17, oth: 8 } });
 assert.equal(sharesProblem(nov26.dims.generation), null);
 
-const shifts = wave("RedBridge/Accent (shifts)", "2026-03-19");
-assert.ok(shifts, "the March 2026 super-poll wave is filed under its own NO_AGG house");
+const shifts = wave("RedBridge/Accent", "2026-03-19");
+assert.ok(shifts, "the March 2026 super-poll wave is filed no-aggregate under its parent house");
 assert.equal(shifts.sample, 5563, "the report's super-poll n");
 assert.equal("total" in shifts, false, "the report prints no all-voters topline, so none is filed");
 assert.deepEqual(shifts.dims.gender, {
@@ -508,7 +508,7 @@ for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g]
    No automation reads this house, so vote-switching.mjs carries the wave
    forward verbatim; pinned cell by cell so a later "fix" can't drift it. */
 const vsWaves = JSON.parse(readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")).waves;
-const shiftsVs = vsWaves.find((w) => w.pollster === "RedBridge/Accent (shifts)" && w.date === "2026-03-19");
+const shiftsVs = vsWaves.find((w) => w.pollster === "RedBridge/Accent" && w.date === "2026-03-19");
 assert.ok(shiftsVs, "the shifts Figure 9 wave is filed");
 assert.equal(shiftsVs.read, "measured from the chart");
 assert.deepEqual(Object.keys(shiftsVs.rows).sort(), ["alp", "dnr", "grn", "lnp", "onp", "oth"],

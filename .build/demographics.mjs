@@ -1445,8 +1445,8 @@ const REDBRIDGE_NOV26_DEMO = {
   },
 };
 
-/* And the super-poll itself, 6–19 Mar 2026 (its own NO_AGG poll row,
-   "RedBridge/Accent (shifts)"): the release prints no national headline
+/* And the super-poll itself, 6–19 Mar 2026 (the RedBridge/Accent row with
+   noAgg: "shifts"): the release prints no national headline
    figures at all – its raison d'être is state and group breakdowns off a
    full-term panel design – so the wave files no total, and totalProblem's
    against-the-poll-row check has nothing to compare (the row's primaries
@@ -1728,7 +1728,7 @@ try {
   for (const [house, table] of [["DemosAU", DEMOSAU_EARLY_DEMO], ["DemosAU (MRP)", DEMOSAU_MRP_DEMO],
     ["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
     ["RedBridge/Accent", REDBRIDGE_NOV_DEMO], ["RedBridge/Accent", REDBRIDGE_SEP_DEMO],
-    ["RedBridge/Accent", REDBRIDGE_NOV26_DEMO], ["RedBridge/Accent (shifts)", REDBRIDGE_SHIFTS_DEMO],
+    ["RedBridge/Accent", REDBRIDGE_NOV26_DEMO], ["RedBridge/Accent", REDBRIDGE_SHIFTS_DEMO],
     ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
     for (const [date, h] of Object.entries(table)) {
       const k = house + "|" + date;
