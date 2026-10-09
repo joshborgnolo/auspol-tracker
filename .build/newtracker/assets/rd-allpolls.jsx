@@ -3227,21 +3227,21 @@ function RdAllPolls(P) {
               the select snaps back to its label, with the live set carried by
               the Showing pills row below the bar. Row counts are each
               option's poll count after the other active filters */}
-          <select className="rd-ap-sel" aria-label="Filter by pollster" value=""
+          <select className="rd-ap-sel rd-ap-sel-house" aria-label="Filter by pollster" value=""
                   onChange={(e) => { const v = e.target.value; if (v === "__clear") setSel(new Set()); else if (v) toggleHouse(v); }}>
             <option value="" disabled>Pollster</option>
             {houseRank.map((h) => <option key={h} value={h}>{(sel.has(h) ? "✓ " : "") + h + " (" + (houseN[h] || 0) + ")"}</option>)}
             {sel.size > 0 && <hr />}
             {sel.size > 0 && <option value="__clear">✕ Clear</option>}
           </select>
-          <select className="rd-ap-sel" aria-label="Filter by time span" value=""
+          <select className="rd-ap-sel rd-ap-sel-time" aria-label="Filter by time span" value=""
                   onChange={(e) => { const v = e.target.value; if (v) setRange(v); }}>
             <option value="" disabled>Time</option>
             {[["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => (
               <option key={id} value={id}>{(range === id ? "✓ " : "") + lab + " (" + rangeN(id) + ")"}</option>
             ))}
           </select>
-          <select className="rd-ap-sel" aria-label="Filter by what a poll published" value=""
+          <select className="rd-ap-sel rd-ap-sel-inc" aria-label="Filter by what a poll published" value=""
                   onChange={(e) => { const v = e.target.value; if (v === "__clear") setTagSel(new Set()); else if (v) toggleTag(v); }}>
             <option value="" disabled>Includes</option>
             {shownTags.map((t) => <option key={t.id} value={t.id}>{(tagSel.has(t.id) ? "✓ " : "") + rdApTagLab(t.id) + " (" + (tagN[t.id] || 0) + ")" + (RD_AP_TAGS[t.id] && RD_AP_TAGS[t.id].note ? " — " + RD_AP_TAGS[t.id].note : "")}</option>)}

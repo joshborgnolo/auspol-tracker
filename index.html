@@ -4662,6 +4662,9 @@ body.rd .rd-ap-search input::-webkit-search-cancel-button { display: none; }
 body.rd .rd-ap-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
 body.rd .rd-ap-pops { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 body.rd .rd-ap-pops .rd-ap-sel { min-height: 36px; box-sizing: border-box; }
+body.rd .rd-ap-sel-house { width: 110px; }
+body.rd .rd-ap-sel-time { width: 94px; }
+body.rd .rd-ap-sel-inc { width: 118px; }
 body.rd .rd-ap-bar .ap-popbtn, body.rd .rd-fl-ct .ap-popbtn {
   min-height: 36px; box-sizing: border-box; padding: 0 12px 0 14px; gap: 8px;
   border: 1px solid var(--line); background: var(--surface); border-radius: 18px;
@@ -112130,7 +112133,7 @@ function RdAllPolls(P) {
   }, "\xD7")), React.createElement("span", {
     className: "rd-ap-pops"
   }, React.createElement("select", {
-    className: "rd-ap-sel",
+    className: "rd-ap-sel rd-ap-sel-house",
     "aria-label": "Filter by pollster",
     value: "",
     onChange: e => {
@@ -112146,7 +112149,7 @@ function RdAllPolls(P) {
   }, (sel.has(h) ? "✓ " : "") + h + " (" + (houseN[h] || 0) + ")")), sel.size > 0 && React.createElement("hr", null), sel.size > 0 && React.createElement("option", {
     value: "__clear"
   }, "\u2715 Clear")), React.createElement("select", {
-    className: "rd-ap-sel",
+    className: "rd-ap-sel rd-ap-sel-time",
     "aria-label": "Filter by time span",
     value: "",
     onChange: e => {
@@ -112160,7 +112163,7 @@ function RdAllPolls(P) {
     key: id,
     value: id
   }, (range === id ? "✓ " : "") + lab + " (" + rangeN(id) + ")"))), React.createElement("select", {
-    className: "rd-ap-sel",
+    className: "rd-ap-sel rd-ap-sel-inc",
     "aria-label": "Filter by what a poll published",
     value: "",
     onChange: e => {
