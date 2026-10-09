@@ -91479,20 +91479,47 @@ function AllPollsView({
   const bodyRef = useRef(null);
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
-    const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
-    if (!row) return;
-    const d = row.nextElementSibling;
-    const pair = d && (d.classList.contains("rd-ap-open") || d.classList.contains("detail-row")) ? d : null;
-    const top = row.getBoundingClientRect().top + window.scrollY;
-    const h = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
-    const bar = document.querySelector(".tabs.sticky");
-    const clear = (bar ? bar.getBoundingClientRect().height : 0) + 10;
-    let y = top - (window.innerHeight + clear - h) / 2;
-    if (y > top - clear) y = top - clear;
-    window.scrollTo({
-      top: Math.max(0, y),
-      behavior: "auto"
-    });
+    const place = () => {
+      if (!bodyRef.current) return;
+      const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
+      if (!row) return;
+      const d = row.nextElementSibling;
+      const pair = d && (d.classList.contains("rd-ap-open") || d.classList.contains("detail-row")) ? d : null;
+      const top = row.getBoundingClientRect().top + window.scrollY;
+      const h = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
+      const bar = document.querySelector(".tabs.sticky");
+      const hw = document.querySelector(".rd-ap-headwrap");
+      const barH = bar ? bar.getBoundingClientRect().height : 0;
+      const hwTop = hw ? parseFloat(getComputedStyle(hw).top) || 0 : 0;
+      const hwH = hw ? hw.offsetHeight : 0;
+      const clear = Math.max(barH, hwTop + hwH) + 10;
+      let y = top - (window.innerHeight + clear - h) / 2;
+      if (y > top - clear) y = top - clear;
+      window.scrollTo({
+        top: Math.max(0, y),
+        behavior: "auto"
+      });
+    };
+    let raf = 0,
+      last = -1,
+      still = 0;
+    const t0 = Date.now();
+    const tick = () => {
+      raf = 0;
+      const row = bodyRef.current && bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
+      const top = row ? row.getBoundingClientRect().top + window.scrollY : -1;
+      if (top >= 0 && top !== last) {
+        last = top;
+        still = 0;
+      } else still++;
+      place();
+      if (still < 2 && Date.now() - t0 < 900) raf = requestAnimationFrame(tick);
+    };
+    place();
+    raf = requestAnimationFrame(tick);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [focus, open, facet]);
   const toggleTag = id => setTagSel(s => {
     const n = new Set(s);
