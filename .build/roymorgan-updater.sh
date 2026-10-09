@@ -6,6 +6,15 @@
 # failure exits non-zero before any commit, leaving the working tree for
 # manual review.
 #
+# DEMOGRAPHIC TABLES (2026-10-09): after the VI extract, the demographic
+# reader (extract-roymorgan-demo.mjs) OCRs the release's Primary Vote by
+# State / CITY-COUNTRY table images into data/roymorgan-demo.json, which
+# demographics.mjs merges. macOS-only (Vision OCR); the CI twin notes and
+# reports changed:false. Warn-only, never blocks the poll pipeline: a guard
+# trip is logged and demo-watch.mjs + the weekly crosstabs run are the
+# backstop. A move here is committed with the poll files when a wave also
+# landed, or alone (validate + rebuild) on a quiet fortnight.
+#
 # ADJUDICATION (2026-10-03): the extract runs with --adjudicate (a no-op
 # unless MATILDA_API_KEY is in the environment — poll-agent.yml carries it,
 # the laptop copies don't). Judgement calls the heuristics punt on — double
@@ -98,6 +107,30 @@ if echo "$LAST_LINE" | grep -q '"ambiguous":\[{'; then
   fi
 fi
 
+# Demographic table pass (see the header). Runs BEFORE the changed:false
+# early-exit below: a table wave that lands on a quiet fortnight must take
+# the demo-only commit path, not exit with the ledgers.
+DEMO_MOVED=false
+DEMO_OUT="$(node .build/extract-roymorgan-demo.mjs 2>&1)"
+DEMO_CODE=$?
+DEMO_LAST="$(echo "$DEMO_OUT" | tail -1)"
+if [ $DEMO_CODE -ne 0 ]; then
+  # exit 2 = guard trip (dropped OCR cell, layout change): warn only, the
+  # poll pipeline never waits on a table image
+  log "WARN demo-tables extract (exit $DEMO_CODE): $DEMO_LAST"
+elif ! echo "$DEMO_LAST" | grep -q '^RMD_STATUS '; then
+  log "WARN demo-tables extract (no RMD_STATUS line): $DEMO_LAST"
+else
+  log "$DEMO_LAST"
+  echo "$DEMO_OUT" | grep '^RMD_NOTE ' | while IFS= read -r l; do log "demo-tables: $l"; done
+  if echo "$DEMO_LAST" | grep -q '"changed":true'; then
+    DEMO_MOVED=true
+    # drop the machine read into data/demographics.json; non-fatal helper —
+    # a wave that fails the dims gate stays pending for the crosstabs run
+    refresh_crosstabs demographics
+  fi
+fi
+
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   # no poll row moved — but the adjudication ledger or verdict file may have
   LEDGER_FILES=()
@@ -107,17 +140,44 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
       LEDGER_FILES+=("$f")
     fi
   done
-  if [ ${#LEDGER_FILES[@]} -eq 0 ]; then
+  if [ "$DEMO_MOVED" != "true" ]; then
+    if [ ${#LEDGER_FILES[@]} -eq 0 ]; then
+      exit 0
+    fi
+    log "adjudication ledger(s) moved; committing them alone"
+    git add "${LEDGER_FILES[@]}" || { log "FAIL git add ledger"; exit 1; }
+    MSG="Roy Morgan adjudication ledger $(date '+%Y-%m-%d')"
+    if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
+      log "FAIL git commit"
+      exit 1
+    fi
+    if ! push_main "$MSG" "${LEDGER_FILES[@]}"; then
+      exit 1
+    fi
+    log "OK committed + pushed: $MSG"
     exit 0
   fi
-  log "adjudication ledger(s) moved; committing them alone"
-  git add "${LEDGER_FILES[@]}" || { log "FAIL git add ledger"; exit 1; }
-  MSG="Roy Morgan adjudication ledger $(date '+%Y-%m-%d')"
+  # Demo-only path: the table reader filed a wave or remembered a table-less
+  # release. The demographics land in the page build, so validate + rebuild
+  # exactly like a poll change, with any ledger movement riding along.
+  log "demographic tables moved; running validate/build/commit/push"
+  if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
+    log "FAIL validate (errors above); no commit made"
+    exit 1
+  fi
+  if ! refresh_site; then
+    log "FAIL build; no commit made"
+    exit 1
+  fi
+  FILES=(data/roymorgan-demo.json data/demographics.json "${SITE_FILES[@]}")
+  if [ ${#LEDGER_FILES[@]} -gt 0 ]; then FILES+=("${LEDGER_FILES[@]}"); fi
+  git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
+  MSG="Update Roy Morgan demographic tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
     log "FAIL git commit"
     exit 1
   fi
-  if ! push_main "$MSG" "${LEDGER_FILES[@]}"; then
+  if ! push_main "$MSG" "${FILES[@]}"; then
     exit 1
   fi
   log "OK committed + pushed: $MSG"
@@ -136,7 +196,7 @@ if ! refresh_site; then
   exit 1
 fi
 
-FILES=(data/polls.json .build/roymorgan-src/ "${SITE_FILES[@]}")
+FILES=(data/polls.json data/roymorgan-demo.json data/demographics.json .build/roymorgan-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update Roy Morgan poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

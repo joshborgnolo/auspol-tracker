@@ -369,6 +369,14 @@ const ROYMORGAN_DEMO = {
       },
     },
   },
+  // The first release ever to print the Primary Vote by State / by City-Country
+  // tables — the figures that motivated .build/extract-roymorgan-demo.mjs. This
+  // wave stays HAND-entered: the OCR reads every visible cell except Vic's
+  // Independents/Others "9" (provably printed, never read at any scale), and a
+  // machine-filed wave must read perfectly. The state figures were re-verified
+  // against the table images (the release's own PDF is an AccessDenied-private
+  // S3 object); the city/country pair files as `location` verbatim — those
+  // groups join no common-location key, like the birth-country table.
   "2026-09-27": {
     source: "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
     total: { alp: 26, lnp: 22.5, onp: 25.5, grn: 14.5, oth: 11 },
@@ -379,6 +387,10 @@ const ROYMORGAN_DEMO = {
         Qld: { alp: 20.5, lnp: 21, onp: 32.5, grn: 16, oth: 10 },
         SA: { alp: 28, lnp: 26.5, onp: 18.5, grn: 15.5, oth: 10.5 },
         WA: { alp: 27.5, lnp: 20, onp: 26, grn: 15, oth: 12 },
+      },
+      location: {
+        "Capital Cities": { alp: 28.5, lnp: 22.5, onp: 22, grn: 16, oth: 11.5 },
+        "Regional/Rural Areas": { alp: 22, lnp: 23, onp: 32, grn: 13, oth: 10 },
       },
     },
   },
@@ -1460,16 +1472,30 @@ try {
     }
   }
   // Roy Morgan: hand-entered breakdowns (ROYMORGAN_DEMO) — most releases
-  // carry none, so waves with none are left alone, not pending
-  for (const [date, h] of Object.entries(ROYMORGAN_DEMO)) {
+  // carry none, so waves with none are left alone, not pending. Two figure
+  // sources merge here, hand-entered keys winning: ROYMORGAN_DEMO, and the
+  // machine layer data/roymorgan-demo.json written and re-verified against
+  // its recorded table images every run by extract-roymorgan-demo.mjs (the
+  // release pages' Primary Vote by State / by City-Country PNGs, read by
+  // macOS Vision OCR — 29 Sep 2026's release was the first ever with them).
+  const rmdFile = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "roymorgan-demo.json"), "utf8")); }
+    catch { return null; }
+  })();
+  const rmFileDemo = {};
+  for (const w of rmdFile?.waves ?? [])
+    if (w?.date && w.dims && !(w.date in ROYMORGAN_DEMO))
+      rmFileDemo[w.date] = { dims: w.dims, ...(w.total ? { total: w.total } : {}),
+                             source: w.article ?? null, read: "chart OCR" };
+  for (const [date, h] of Object.entries({ ...rmFileDemo, ...ROYMORGAN_DEMO })) {
     const k = "Roy Morgan|" + date;
     if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
     const p = polls.find((x) => x.pollster === "Roy Morgan" && x.date === date);
     if (!p) { pend(k, "no Roy Morgan poll row for this wave's date yet"); continue; }
     const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
-    if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
+    if (bad) { pend(k, `${date in ROYMORGAN_DEMO ? "the hand-entered" : "the demo-agent's"} table failed the gate – ${bad}`); continue; }
     push({ pollster: "Roy Morgan", date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
-           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
+           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: h.read ?? "published table", dims: h.dims,
            ...(h.total ? { total: h.total } : {}) });
     console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
   }

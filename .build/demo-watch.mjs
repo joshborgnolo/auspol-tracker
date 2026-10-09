@@ -18,15 +18,19 @@
    (c) a fresh Roy Morgan wave whose findings-cache JSON prints the forms
        of a demographic release – per-state subsamples (finding 10363's
        state tables) or a special title (finding 10341's Country of
-       Birth). The signatures are precision-only: a wave we say nothing
-       about is a wave we did not catch, never a wave checked. */
+       Birth). The state/city caption tables are filed by the demo agent
+       (extract-roymorgan-demo.mjs) itself; this reminder is the backstop
+       for a reader guard trip or a table shape the agent doesn't read
+       (the country tables remain hand-entry). The signatures are
+       precision-only: a wave we say nothing about is a wave we did not
+       catch, never a wave checked. */
 export const NP_POOLED_LAG_DAYS = 10;         // a pooled aggregate's breakdowns are hand-entry work once this old
 export const NP_POOLED_CADENCE_DAYS = 110;    // Newspoll's quarterly-aggregate habit – this quiet means a release was missed
 export const RM_WATCH_DAYS = 45;              // the findings-cache probe reaches this far back for Roy Morgan waves
 
 export const RM_WATCH_SIGNS = [
-  [/\bNSW\s*\(n\s*=\s*[\d,]+\)[^<>]{0,80}\bVic\s*\(n\s*=\s*[\d,]+\)/, "per-state subsamples (10363's state tables – enter under ROYMORGAN_DEMO/ROYMORGAN_STATE)"],
-  [/(?:voting intentions?|primary vote)[^<>]{0,60}\bby (state|country of birth)\b/i, "a special demographic title (10341's Country of Birth – enter under ROYMORGAN_COUNTRY)"],
+  [/\bNSW\s*\(n\s*=\s*[\d,]+\)[^<>]{0,80}\bVic\s*\(n\s*=\s*[\d,]+\)/, "per-state subsamples (10363's state tables – the demo agent files these itself, so an unentered wave is a reader guard trip or a hand dim; check the log before entering under ROYMORGAN_DEMO/ROYMORGAN_STATE)"],
+  [/(?:voting intentions?|primary vote)[^<>]{0,60}\bby (state|country of birth)\b/i, "a special demographic title (10341's Country of Birth – the demo agent reads only state/city tables; enter under ROYMORGAN_COUNTRY)"],
 ];
 
 export const rmFindingId = (url) => /\/findings\/(\d+)/.exec(url || "")?.[1] || null;
@@ -76,7 +80,7 @@ export function watchReminders({ polls, waves, knownSkip, rmReleaseFor, now }) {
     const rel = id ? rmReleaseFor(id) : null;
     if (!rel) continue;                       // no cache to probe: silent
     const why = rmSignsWhy(rel);
-    if (why) reminders.push(`${k}: the findings cache carries ${why} – check the release for printed breakdowns, then hand-enter or KNOWN_SKIP it`);
+    if (why) reminders.push(`${k}: the findings cache carries ${why} – check the release and the demo agent's log (.build/logs/roymorgan.log), then hand-enter or KNOWN_SKIP it`);
   }
   return reminders;
 }

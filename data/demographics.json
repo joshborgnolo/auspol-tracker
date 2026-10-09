@@ -11823,6 +11823,22 @@
       "grn": 15,
       "oth": 12
      }
+    },
+    "location": {
+     "Capital Cities": {
+      "alp": 28.5,
+      "lnp": 22.5,
+      "onp": 22,
+      "grn": 16,
+      "oth": 11.5
+     },
+     "Regional/Rural Areas": {
+      "alp": 22,
+      "lnp": 23,
+      "onp": 32,
+      "grn": 13,
+      "oth": 10
+     }
     }
    },
    "total": {

@@ -195,6 +195,38 @@ a GENERATED build artifact — never hand-edit it.
   record, or when the last one is FULL_EVERY_DAYS (7) old — the net for
   a Flourish chart edited on a page whose `modified` never moved.
   Status: `crawl: "full" | "incremental" | "skipped"`.
+- `.build/extract-roymorgan-demo.mjs` + `rm-demo-parse.mjs` — Roy Morgan's
+  demographic tables machine reader (2026-10-09): the fortnightly releases
+  began carrying "Primary Vote by State" / "Primary Vote by CITY/COUNTRY"
+  table PNGs with finding 10363 (29 Sep 2026), figures that exist ONLY as
+  pixels (the PDF they came from is a private S3 object). The reader OCRs
+  them with macOS Vision (`.build/ocr-image.swift`, scale 3 + `fast`:
+  native scale drops figure cells, `.accurate` wedges), writes
+  `data/roymorgan-demo.json`, and `demographics.mjs` merges its waves
+  beneath ROYMORGAN_DEMO's hand-entered keys (a hand-entered date always
+  wins — 10363's own wave stays hand-owned because the OCR provably drops
+  its Vic Independents/Others "9"; a dropped cell is a GUARD, never
+  completed from the row sum). Machine-filed waves are re-read from their
+  recorded image URLs every run (drift = guard, never a rewrite), and
+  hand-owned waves get a read-only cell-by-cell recon (disagreements
+  surface as RMD_NOTE lines). Filing needs the whole-wave gate: no dropped
+  or colliding cells, every state/group column sums ≈100±1, and the city
+  table's printed TOTAL column equals the poll row's primaries.
+  "Independents/Others" rides the poll row's `ind` (row.oth is null); the
+  city table files as the `location` dim with its printed group names, the
+  release content comes from the VI extractor's committed findings cache
+  (read-only here; live fetch when a healer-filed row has none), and a
+  release with no caption pair is remembered in the store's `none` so the
+  slot doesn't re-check it every run. macOS-only — any other platform
+  notes and exits 0 changed:false, so the CI twin of roymorgan-updater.sh
+  is unaffected; the wrapper runs the pass warn-only (a guard trip never
+  blocks the poll pipeline) before its changed:false early-exit and
+  commits a moved demo store with the poll files, or alone via
+  validate+rebuild on a quiet fortnight. Pinned by test-roymorgan-demo.mjs
+  (the committed OCR reads of 10363's two tables are the oracles);
+  demo-watch.mjs's (c) reminder is now the backstop for a reader guard
+  trip or a table shape the agent doesn't read (country tables stay
+  hand-entry).
 - Wikipedia's federal polling table is read by TWO scripts — `check-coverage`
   (dates only) and `extract-news24` (YouGov's News24-only waves). Its layout
   changed on 2026-09-11 (rowspan data-cell dates; IND+OTH merged into one
