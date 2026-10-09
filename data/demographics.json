@@ -3174,6 +3174,222 @@
    }
   },
   {
+   "pollster": "Newspoll (pooled)",
+   "date": "2026-03-26",
+   "dateStart": "2026-01-12",
+   "sample": 4927,
+   "article": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-to-lead-labor-and-coalition-in-queensland/news-story/8e578a11d7ab609c38221490203dfc59",
+   "source": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-to-lead-labor-and-coalition-in-queensland/news-story/8e578a11d7ab609c38221490203dfc59",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 20,
+      "grn": 10,
+      "onp": 25,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 30,
+      "lnp": 19,
+      "grn": 14,
+      "onp": 26,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 30,
+      "lnp": 14,
+      "grn": 26,
+      "onp": 19,
+      "oth": 11
+     },
+     "35–49": {
+      "alp": 33,
+      "lnp": 18,
+      "grn": 11,
+      "onp": 27,
+      "oth": 11
+     },
+     "50–64": {
+      "alp": 32,
+      "lnp": 22,
+      "grn": 6,
+      "onp": 28,
+      "oth": 12
+     },
+     "65+": {
+      "alp": 32,
+      "lnp": 26,
+      "grn": 3,
+      "onp": 28,
+      "oth": 11
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 31,
+      "lnp": 18,
+      "grn": 12,
+      "onp": 27,
+      "oth": 12
+     },
+     "Vic": {
+      "alp": 32,
+      "lnp": 22,
+      "grn": 14,
+      "onp": 21,
+      "oth": 11
+     },
+     "Qld": {
+      "alp": 27,
+      "lnp": 23,
+      "grn": 11,
+      "onp": 30,
+      "oth": 9
+     },
+     "SA": {
+      "alp": 39,
+      "lnp": 13,
+      "grn": 12,
+      "onp": 27,
+      "oth": 9
+     },
+     "WA": {
+      "alp": 34,
+      "lnp": 20,
+      "grn": 9,
+      "onp": 27,
+      "oth": 10
+     }
+    },
+    "education": {
+     "No tertiary": {
+      "alp": 27,
+      "lnp": 19,
+      "grn": 12,
+      "onp": 34,
+      "oth": 8
+     },
+     "TAFE": {
+      "alp": 29,
+      "lnp": 19,
+      "grn": 10,
+      "onp": 30,
+      "oth": 12
+     },
+     "University": {
+      "alp": 36,
+      "lnp": 21,
+      "grn": 13,
+      "onp": 17,
+      "oth": 13
+     }
+    },
+    "income": {
+     "Under $50k": {
+      "alp": 33,
+      "lnp": 16,
+      "grn": 10,
+      "onp": 29,
+      "oth": 12
+     },
+     "$50–99k": {
+      "alp": 30,
+      "lnp": 21,
+      "grn": 12,
+      "onp": 25,
+      "oth": 12
+     },
+     "$100–149k": {
+      "alp": 30,
+      "lnp": 20,
+      "grn": 14,
+      "onp": 26,
+      "oth": 10
+     },
+     "$150k+": {
+      "alp": 35,
+      "lnp": 21,
+      "grn": 11,
+      "onp": 23,
+      "oth": 10
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 33,
+      "lnp": 19,
+      "grn": 12,
+      "onp": 25,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 30,
+      "lnp": 19,
+      "grn": 17,
+      "onp": 24,
+      "oth": 10
+     },
+     "Retired": {
+      "alp": 33,
+      "lnp": 25,
+      "grn": 3,
+      "onp": 28,
+      "oth": 11
+     },
+     "Other": {
+      "alp": 27,
+      "lnp": 14,
+      "grn": 19,
+      "onp": 25,
+      "oth": 15
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 31,
+      "lnp": 20,
+      "grn": 12,
+      "onp": 26,
+      "oth": 11
+     },
+     "Other language": {
+      "alp": 35,
+      "lnp": 19,
+      "grn": 15,
+      "onp": 19,
+      "oth": 12
+     }
+    },
+    "religion": {
+     "Christian": {
+      "alp": 28,
+      "lnp": 24,
+      "grn": 6,
+      "onp": 31,
+      "oth": 11
+     },
+     "No religion": {
+      "alp": 34,
+      "lnp": 16,
+      "grn": 17,
+      "onp": 21,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 32,
+    "lnp": 20,
+    "grn": 12,
+    "onp": 25,
+    "oth": 11
+   }
+  },
+  {
    "pollster": "Roy Morgan",
    "date": "2026-04-05",
    "dateStart": "2026-03-30",
@@ -8835,6 +9051,245 @@
     }
    },
    "fit": 0.06
+  },
+  {
+   "pollster": "Newspoll (pooled)",
+   "date": "2026-09-18",
+   "dateStart": "2026-07-13",
+   "sample": 4967,
+   "article": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
+   "source": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 19,
+      "grn": 10,
+      "onp": 31,
+      "oth": 9
+     },
+     "Women": {
+      "alp": 27,
+      "lnp": 19,
+      "grn": 16,
+      "onp": 29,
+      "oth": 9
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 29,
+      "lnp": 12,
+      "grn": 28,
+      "onp": 23,
+      "oth": 8
+     },
+     "35–49": {
+      "alp": 27,
+      "lnp": 18,
+      "grn": 12,
+      "onp": 33,
+      "oth": 10
+     },
+     "50–64": {
+      "alp": 29,
+      "lnp": 21,
+      "grn": 7,
+      "onp": 33,
+      "oth": 10
+     },
+     "65+": {
+      "alp": 29,
+      "lnp": 26,
+      "grn": 4,
+      "onp": 31,
+      "oth": 10
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 30,
+      "lnp": 17,
+      "grn": 12,
+      "onp": 31,
+      "oth": 10
+     },
+     "Vic": {
+      "alp": 29,
+      "lnp": 22,
+      "grn": 16,
+      "onp": 25,
+      "oth": 8
+     },
+     "Qld": {
+      "alp": 25,
+      "lnp": 19,
+      "grn": 12,
+      "onp": 36,
+      "oth": 8
+     },
+     "SA": {
+      "alp": 32,
+      "lnp": 13,
+      "grn": 14,
+      "onp": 31,
+      "oth": 10
+     },
+     "WA": {
+      "alp": 30,
+      "lnp": 21,
+      "grn": 11,
+      "onp": 29,
+      "oth": 9
+     }
+    },
+    "education": {
+     "No tertiary": {
+      "alp": 25,
+      "lnp": 18,
+      "grn": 14,
+      "onp": 35,
+      "oth": 8
+     },
+     "TAFE": {
+      "alp": 26,
+      "lnp": 16,
+      "grn": 10,
+      "onp": 37,
+      "oth": 11
+     },
+     "University": {
+      "alp": 37,
+      "lnp": 22,
+      "grn": 14,
+      "onp": 17,
+      "oth": 10
+     }
+    },
+    "income": {
+     "Under $50k": {
+      "alp": 27,
+      "lnp": 16,
+      "grn": 12,
+      "onp": 33,
+      "oth": 12
+     },
+     "$50–99k": {
+      "alp": 32,
+      "lnp": 17,
+      "grn": 12,
+      "onp": 31,
+      "oth": 8
+     },
+     "$100–149k": {
+      "alp": 26,
+      "lnp": 19,
+      "grn": 14,
+      "onp": 31,
+      "oth": 10
+     },
+     "$150k+": {
+      "alp": 31,
+      "lnp": 21,
+      "grn": 14,
+      "onp": 26,
+      "oth": 8
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 30,
+      "lnp": 19,
+      "grn": 11,
+      "onp": 31,
+      "oth": 9
+     },
+     "Part time": {
+      "alp": 28,
+      "lnp": 16,
+      "grn": 20,
+      "onp": 26,
+      "oth": 10
+     },
+     "Retired": {
+      "alp": 31,
+      "lnp": 24,
+      "grn": 4,
+      "onp": 31,
+      "oth": 10
+     },
+     "Other": {
+      "alp": 23,
+      "lnp": 13,
+      "grn": 24,
+      "onp": 30,
+      "oth": 10
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 28,
+      "lnp": 18,
+      "grn": 13,
+      "onp": 31,
+      "oth": 10
+     },
+     "Other language": {
+      "alp": 34,
+      "lnp": 22,
+      "grn": 16,
+      "onp": 20,
+      "oth": 8
+     }
+    },
+    "religion": {
+     "Christian": {
+      "alp": 25,
+      "lnp": 23,
+      "grn": 6,
+      "onp": 37,
+      "oth": 9
+     },
+     "No religion": {
+      "alp": 31,
+      "lnp": 15,
+      "grn": 19,
+      "onp": 24,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 30,
+      "lnp": 25,
+      "grn": 5,
+      "onp": 30,
+      "oth": 10
+     },
+     "Mortgage": {
+      "alp": 29,
+      "lnp": 20,
+      "grn": 13,
+      "onp": 30,
+      "oth": 8
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 11,
+      "grn": 21,
+      "onp": 30,
+      "oth": 11
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 19,
+    "grn": 13,
+    "onp": 30,
+    "oth": 9
+   }
   },
   {
    "pollster": "YouGov",

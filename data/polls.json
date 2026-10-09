@@ -3339,6 +3339,23 @@
       "methodUrl": "https://pyxispolling.com/api.php/images/document/24607993/NewspollMethodologyStatement30March2026byPyxis-AvvyTlYpA6zeoV2P_V_Yhg.pdf"
     },
     {
+      "date": "2026-03-26",
+      "published": "2026-04-05T19:00",
+      "dateStart": "2026-01-12",
+      "pollster": "Newspoll (pooled)",
+      "client": "The Australian",
+      "sample": 4927,
+      "alp": 32,
+      "lnp": 20,
+      "grn": 12,
+      "onp": 25,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-to-lead-labor-and-coalition-in-queensland/news-story/8e578a11d7ab609c38221490203dfc59"
+    },
+    {
       "date": "2026-03-27",
       "published": "2026-03-29T18:00",
       "dateStart": "2026-03-23",
@@ -5348,6 +5365,23 @@
       "tpp_lnp": null,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/28195281/NewspollMethodologyStatement21September2026byPyxis-bToKYVD66G-g0e4tmAkQNA.pdf"
+    },
+    {
+      "date": "2026-09-18",
+      "published": "2026-09-27T20:00",
+      "dateStart": "2026-07-13",
+      "pollster": "Newspoll (pooled)",
+      "client": "The Australian",
+      "sample": 4967,
+      "alp": 29,
+      "lnp": 19,
+      "grn": 13,
+      "onp": 30,
+      "ind": 9,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6"
     },
     {
       "date": "2026-09-20",

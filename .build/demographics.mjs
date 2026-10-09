@@ -61,8 +61,9 @@
                  by gender, age bands 18–34/35–49/50–64/65+, the five
                  mainland states, education No tertiary / TAFE / University,
                  household income, working status, language at home and
-                 religion (the April–June 2026 quarter adds housing tenure:
-                 owned outright / owned with mortgage / rented),
+                 religion (the April–June and July–September 2026 quarters
+                 add housing tenure: owned outright / owned with mortgage /
+                 rented; the January–March 2026 quarter does not print it),
                  hand-entered in NEWSPOLL_DEMO below and verified
                  against the printed table (the same figures sit on
                  Wikipedia's subpopulation page and reconcile). "No
@@ -651,6 +652,64 @@ const NEWSPOLL_DEMO = {
       },
     },
   },
+  /* January–March 2026 quarter: this release printed no two-party
+     table, so no tpp dim rides along. The figures below are re-read
+     from the full-tables PDF The Australian links from its article
+     (open origin.theaustralian.com.au CDN file newspapers5april… /
+     newspoll5april2026.pdf — Pyxis Polling & Insights, online, Jan 12
+     – Mar 26, n=4927, state bases 366–1557); its All column is the
+     published national total and reconciles with Poll Bludger's prose
+     checkpoints (Labor 32, One Nation 25, Coalition 20). Wikipedia
+     carries no subpopulation rows for this wave. Housing tenure is
+     not yet printed this quarter (debut April–June 2026). */
+  "2026-03-26": {
+    source: "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-to-lead-labor-and-coalition-in-queensland/news-story/8e578a11d7ab609c38221490203dfc59",
+    total: { alp: 32, lnp: 20, grn: 12, onp: 25, oth: 11 },
+    dims: {
+      gender: {
+        Men: { alp: 34, lnp: 20, grn: 10, onp: 25, oth: 11 },
+        Women: { alp: 30, lnp: 19, grn: 14, onp: 26, oth: 11 },
+      },
+      age: {
+        "18–34": { alp: 30, lnp: 14, grn: 26, onp: 19, oth: 11 },
+        "35–49": { alp: 33, lnp: 18, grn: 11, onp: 27, oth: 11 },
+        "50–64": { alp: 32, lnp: 22, grn: 6, onp: 28, oth: 12 },
+        "65+": { alp: 32, lnp: 26, grn: 3, onp: 28, oth: 11 },
+      },
+      state: {
+        NSW: { alp: 31, lnp: 18, grn: 12, onp: 27, oth: 12 },
+        Vic: { alp: 32, lnp: 22, grn: 14, onp: 21, oth: 11 },
+        Qld: { alp: 27, lnp: 23, grn: 11, onp: 30, oth: 9 },
+        SA: { alp: 39, lnp: 13, grn: 12, onp: 27, oth: 9 },
+        WA: { alp: 34, lnp: 20, grn: 9, onp: 27, oth: 10 },
+      },
+      education: {
+        "No tertiary": { alp: 27, lnp: 19, grn: 12, onp: 34, oth: 8 },
+        TAFE: { alp: 29, lnp: 19, grn: 10, onp: 30, oth: 12 },
+        University: { alp: 36, lnp: 21, grn: 13, onp: 17, oth: 13 },
+      },
+      income: {
+        "Under $50k": { alp: 33, lnp: 16, grn: 10, onp: 29, oth: 12 },
+        "$50–99k": { alp: 30, lnp: 21, grn: 12, onp: 25, oth: 12 },
+        "$100–149k": { alp: 30, lnp: 20, grn: 14, onp: 26, oth: 10 },
+        "$150k+": { alp: 35, lnp: 21, grn: 11, onp: 23, oth: 10 },
+      },
+      working: {
+        "Full time": { alp: 33, lnp: 19, grn: 12, onp: 25, oth: 11 },
+        "Part time": { alp: 30, lnp: 19, grn: 17, onp: 24, oth: 10 },
+        Retired: { alp: 33, lnp: 25, grn: 3, onp: 28, oth: 11 },
+        Other: { alp: 27, lnp: 14, grn: 19, onp: 25, oth: 15 },
+      },
+      language: {
+        "English only": { alp: 31, lnp: 20, grn: 12, onp: 26, oth: 11 },
+        "Other language": { alp: 35, lnp: 19, grn: 15, onp: 19, oth: 12 },
+      },
+      religion: {
+        Christian: { alp: 28, lnp: 24, grn: 6, onp: 31, oth: 11 },
+        "No religion": { alp: 34, lnp: 16, grn: 17, onp: 21, oth: 12 },
+      },
+    },
+  },
   /* April–June 2026 quarter: this release printed no two-party table,
      so no tpp dim rides along. The figures below are re-read from the
      article's own Infogram "Primary vote by …" graphic (its All column
@@ -709,6 +768,71 @@ const NEWSPOLL_DEMO = {
         "Own outright": { alp: 29, lnp: 26, grn: 6, onp: 29, oth: 10 },
         Mortgage: { alp: 31, lnp: 19, grn: 12, onp: 29, oth: 9 },
         Renting: { alp: 35, lnp: 12, grn: 18, onp: 25, oth: 10 },
+      },
+    },
+  },
+  /* July–September 2026 quarter: again no two-party table, so no tpp
+     dim rides along. Re-read from the article's own Infogram "Primary
+     vote by …" graphic (embed _/8Tko917VckLB6BkkGNwe — the article's
+     other three embeds carry Albanese satisfaction, the Albanese–
+     Hanson head-to-head and a Queensland seat map). Its All column is
+     the published national total, reconciling cell for cell with Poll
+     Bludger's prose checkpoints (Qld One Nation 36 / Labor 25, SA
+     Labor 32 / One Nation 31, renters Labor 27 / One Nation 30,
+     under-$50k One Nation 33; four weekly waves combined, Jul 13 –
+     Sep 18, n=4967). Wikipedia does not carry this wave. Housing
+     tenure prints for a second quarter, same tidied keys as above. */
+  "2026-09-18": {
+    source: "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
+    total: { alp: 29, lnp: 19, grn: 13, onp: 30, oth: 9 },
+    dims: {
+      gender: {
+        Men: { alp: 31, lnp: 19, grn: 10, onp: 31, oth: 9 },
+        Women: { alp: 27, lnp: 19, grn: 16, onp: 29, oth: 9 },
+      },
+      age: {
+        "18–34": { alp: 29, lnp: 12, grn: 28, onp: 23, oth: 8 },
+        "35–49": { alp: 27, lnp: 18, grn: 12, onp: 33, oth: 10 },
+        "50–64": { alp: 29, lnp: 21, grn: 7, onp: 33, oth: 10 },
+        "65+": { alp: 29, lnp: 26, grn: 4, onp: 31, oth: 10 },
+      },
+      state: {
+        NSW: { alp: 30, lnp: 17, grn: 12, onp: 31, oth: 10 },
+        Vic: { alp: 29, lnp: 22, grn: 16, onp: 25, oth: 8 },
+        Qld: { alp: 25, lnp: 19, grn: 12, onp: 36, oth: 8 },
+        SA: { alp: 32, lnp: 13, grn: 14, onp: 31, oth: 10 },
+        WA: { alp: 30, lnp: 21, grn: 11, onp: 29, oth: 9 },
+      },
+      education: {
+        "No tertiary": { alp: 25, lnp: 18, grn: 14, onp: 35, oth: 8 },
+        TAFE: { alp: 26, lnp: 16, grn: 10, onp: 37, oth: 11 },
+        University: { alp: 37, lnp: 22, grn: 14, onp: 17, oth: 10 },
+      },
+      income: {
+        "Under $50k": { alp: 27, lnp: 16, grn: 12, onp: 33, oth: 12 },
+        "$50–99k": { alp: 32, lnp: 17, grn: 12, onp: 31, oth: 8 },
+        "$100–149k": { alp: 26, lnp: 19, grn: 14, onp: 31, oth: 10 },
+        "$150k+": { alp: 31, lnp: 21, grn: 14, onp: 26, oth: 8 },
+      },
+      working: {
+        "Full time": { alp: 30, lnp: 19, grn: 11, onp: 31, oth: 9 },
+        "Part time": { alp: 28, lnp: 16, grn: 20, onp: 26, oth: 10 },
+        Retired: { alp: 31, lnp: 24, grn: 4, onp: 31, oth: 10 },
+        Other: { alp: 23, lnp: 13, grn: 24, onp: 30, oth: 10 },
+      },
+      language: {
+        "English only": { alp: 28, lnp: 18, grn: 13, onp: 31, oth: 10 },
+        "Other language": { alp: 34, lnp: 22, grn: 16, onp: 20, oth: 8 },
+      },
+      religion: {
+        Christian: { alp: 25, lnp: 23, grn: 6, onp: 37, oth: 9 },
+        "No religion": { alp: 31, lnp: 15, grn: 19, onp: 24, oth: 11 },
+      },
+      // printed labels identical to the April–June quarter's
+      housing: {
+        "Own outright": { alp: 30, lnp: 25, grn: 5, onp: 30, oth: 10 },
+        Mortgage: { alp: 29, lnp: 20, grn: 13, onp: 30, oth: 8 },
+        Renting: { alp: 27, lnp: 11, grn: 21, onp: 30, oth: 11 },
       },
     },
   },
