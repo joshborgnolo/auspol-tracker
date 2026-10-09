@@ -580,7 +580,7 @@ const NEWSPOLL_DEMO = {
         University: { alp: 38, lnp: 29, grn: 15, onp: 5, oth: 13 },
       },
       income: {
-        "<$50k": { alp: 39, lnp: 24, grn: 11, onp: 11, oth: 15 },
+        "Under $50k": { alp: 39, lnp: 24, grn: 11, onp: 11, oth: 15 },
         "$50–99k": { alp: 34, lnp: 30, grn: 13, onp: 11, oth: 12 },
         "$100–149k": { alp: 35, lnp: 28, grn: 13, onp: 9, oth: 15 },
         "$150k+": { alp: 38, lnp: 29, grn: 13, onp: 7, oth: 13 },
@@ -628,7 +628,7 @@ const NEWSPOLL_DEMO = {
         University: { alp: 41, lnp: 26, grn: 13, onp: 6, oth: 14 },
       },
       income: {
-        "<$50k": { alp: 35, lnp: 23, grn: 11, onp: 17, oth: 14 },
+        "Under $50k": { alp: 35, lnp: 23, grn: 11, onp: 17, oth: 14 },
         "$50–99k": { alp: 35, lnp: 26, grn: 11, onp: 17, oth: 11 },
         "$100–149k": { alp: 35, lnp: 24, grn: 15, onp: 11, oth: 15 },
         "$150k+": { alp: 38, lnp: 28, grn: 11, onp: 10, oth: 13 },
