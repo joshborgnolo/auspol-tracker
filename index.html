@@ -3535,7 +3535,7 @@ body.rd .rd-pv-chg { font-size: 13px; color: var(--ink-3); font-variant-numeric:
 body.rd .rd-pv-chart { margin-top: 28px; }
 body.rd .rd-pv-head { display: flex; align-items: flex-end; gap: 32px; }
 body.rd .rd-pv-head > div { flex: 1 1 auto; min-width: 0; }
-body.rd .rd-pv-sel, body.rd .rd-confidence-sel {
+body.rd .rd-pv-sel, body.rd .rd-confidence-sel, body.rd .rd-ap-sel {
   flex: 0 0 auto; appearance: none; -webkit-appearance: none; margin: 0;
   padding: 9px 36px 9px 14px; max-width: 100%; cursor: pointer;
   font-family: var(--sans); font-size: 14px; font-weight: 500; line-height: 1.2; color: var(--ink);
@@ -3543,8 +3543,8 @@ body.rd .rd-pv-sel, body.rd .rd-confidence-sel {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23808080' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 13px center;
 }
-body.rd .rd-pv-sel:hover, body.rd .rd-confidence-sel:hover { border-color: var(--ink-faint); }
-body.rd .rd-pv-sel:focus-visible, body.rd .rd-confidence-sel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.rd .rd-pv-sel:hover, body.rd .rd-confidence-sel:hover, body.rd .rd-ap-sel:hover { border-color: var(--ink-faint); }
+body.rd .rd-pv-sel:focus-visible, body.rd .rd-confidence-sel:focus-visible, body.rd .rd-ap-sel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 640px) {
   body.rd .rd-pv-head { display: block; }
   body.rd .rd-pv-sel { margin-top: 12px; }
@@ -4661,7 +4661,8 @@ body.rd .rd-ap-search input::-webkit-search-cancel-button { display: none; }
   body.rd .rd-ap-search input { font-size: 16px; }
 }
 body.rd .rd-ap-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
-body.rd .rd-ap-pops { display: inline-flex; gap: 10px; }
+body.rd .rd-ap-pops { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+body.rd .rd-ap-pops .rd-ap-sel { min-height: 36px; box-sizing: border-box; }
 body.rd .rd-ap-bar .ap-popbtn, body.rd .rd-fl-ct .ap-popbtn {
   min-height: 36px; box-sizing: border-box; padding: 0 12px 0 14px; gap: 8px;
   border: 1px solid var(--line); background: var(--surface); border-radius: 18px;
@@ -5054,6 +5055,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-bar { margin-top: 12px; flex-wrap: wrap; row-gap: 10px; column-gap: 8px; }
   body.rd .rd-ap-search { width: 100%; flex-shrink: 0; }
   body.rd .rd-ap-pops { width: 100%; gap: 8px; }
+  body.rd .rd-ap-pops .rd-ap-sel { min-height: 34px; padding: 7px 30px 7px 12px; font-size: 13px; }
   body.rd .rd-ap-bar .ap-popbtn { min-height: 34px; padding: 0 10px 0 12px; font-size: 13px; }
   body.rd .rd-ap-bar > .rd-grow { display: none; }
   body.rd .rd-ap-count { font-size: 13px; }
@@ -91563,8 +91565,6 @@ function AllPollsView({
     tagSel: tagSel,
     setTagSel: setTagSel,
     toggleTag: toggleTag,
-    pop: pop,
-    setPop: setPop,
     pills: pills,
     clearAll: clearAll,
     sort: sort,
@@ -110501,8 +110501,6 @@ function RdAllPolls(P) {
     tagSel,
     setTagSel,
     toggleTag,
-    pop,
-    setPop,
     pills,
     clearAll,
     sort,
@@ -112132,68 +112130,54 @@ function RdAllPolls(P) {
     "aria-label": "Clear search"
   }, "\xD7")), React.createElement("span", {
     className: "rd-ap-pops"
-  }, React.createElement(FilterPop, {
-    id: "who",
-    label: "Pollster",
-    open: pop,
-    setOpen: setPop,
-    summary: sel.size === 0 ? null : sel.size === 1 ? [...sel][0] : sel.size + " selected"
-  }, React.createElement("div", {
-    className: "ap-pop-head"
-  }, React.createElement("span", null, houses.length, " pollsters, tick any number"), sel.size > 0 && React.createElement("button", {
-    className: "ap-clear",
-    onClick: () => setSel(new Set())
-  }, "Clear")), React.createElement("div", {
-    className: "ap-poplist",
-    role: "group",
-    "aria-label": "Pollsters"
-  }, houseRank.map(h => React.createElement(PopRow, {
+  }, React.createElement("select", {
+    className: "rd-ap-sel",
+    "aria-label": "Filter by pollster",
+    value: "",
+    onChange: e => {
+      const v = e.target.value;
+      if (v === "__clear") setSel(new Set());else if (v) toggleHouse(v);
+    }
+  }, React.createElement("option", {
+    value: "",
+    disabled: true
+  }, "Pollster"), houseRank.map(h => React.createElement("option", {
     key: h,
-    on: sel.has(h),
-    label: h,
-    n: houseN[h] || 0,
-    onClick: () => toggleHouse(h)
-  })))), React.createElement(FilterPop, {
-    id: "when",
-    label: "Time",
-    open: pop,
-    setOpen: setPop,
-    summary: range === "all" ? null : RANGE_LAB[range]
-  }, React.createElement("div", {
-    className: "ap-poplist",
-    role: "radiogroup",
-    "aria-label": "Time span"
-  }, [["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => React.createElement(PopRow, {
+    value: h
+  }, (sel.has(h) ? "✓ " : "") + h + " (" + (houseN[h] || 0) + ")")), sel.size > 0 && React.createElement("hr", null), sel.size > 0 && React.createElement("option", {
+    value: "__clear"
+  }, "\u2715 Clear")), React.createElement("select", {
+    className: "rd-ap-sel",
+    "aria-label": "Filter by time span",
+    value: "",
+    onChange: e => {
+      const v = e.target.value;
+      if (v) setRange(v);
+    }
+  }, React.createElement("option", {
+    value: "",
+    disabled: true
+  }, "Time"), [["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => React.createElement("option", {
     key: id,
-    radio: true,
-    on: range === id,
-    label: lab,
-    n: rangeN(id),
-    onClick: () => setRange(id)
-  })))), React.createElement(FilterPop, {
-    id: "has",
-    label: "Includes",
-    open: pop,
-    setOpen: setPop,
-    summary: tagSel.size === 0 ? null : tagSel.size === 1 ? rdApTagLab([...tagSel][0]) : tagSel.size + " measures"
-  }, React.createElement("div", {
-    className: "ap-pop-head"
-  }, React.createElement("span", null, "What the poll published"), tagSel.size > 0 && React.createElement("button", {
-    className: "ap-clear",
-    onClick: () => setTagSel(new Set())
-  }, "Clear")), React.createElement("div", {
-    className: "ap-poplist",
-    role: "group",
-    "aria-label": "What the poll published"
-  }, shownTags.map(t => React.createElement(PopRow, {
+    value: id
+  }, (range === id ? "✓ " : "") + lab + " (" + rangeN(id) + ")"))), React.createElement("select", {
+    className: "rd-ap-sel",
+    "aria-label": "Filter by what a poll published",
+    value: "",
+    onChange: e => {
+      const v = e.target.value;
+      if (v === "__clear") setTagSel(new Set());else if (v) toggleTag(v);
+    }
+  }, React.createElement("option", {
+    value: "",
+    disabled: true
+  }, "Includes"), shownTags.map(t => React.createElement("option", {
     key: t.id,
-    on: tagSel.has(t.id),
-    label: rdApTagLab(t.id),
-    note: RD_AP_TAGS[t.id] && RD_AP_TAGS[t.id].note,
-    n: tagN[t.id] || 0,
-    onClick: () => toggleTag(t.id)
-  }))), React.createElement("p", {
-    className: "ap-pop-foot"
+    value: t.id
+  }, (tagSel.has(t.id) ? "✓ " : "") + rdApTagLab(t.id) + " (" + (tagN[t.id] || 0) + ")" + (RD_AP_TAGS[t.id] && RD_AP_TAGS[t.id].note ? " — " + RD_AP_TAGS[t.id].note : ""))), tagSel.size > 0 && React.createElement("hr", null), tagSel.size > 0 && React.createElement("option", {
+    value: "__clear"
+  }, "\u2715 Clear"), React.createElement("option", {
+    disabled: true
   }, "Ticking two asks for polls that published both."))), React.createElement("span", {
     className: "rd-grow"
   }), React.createElement("span", {

@@ -2083,7 +2083,7 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
 function RdAllPolls(P) {
   const { rows, sorted, total, houses, houseRank, houseN, tagN, shownTags, rangeN, RANGE_LAB,
           facet, onFacet, measure, onMeasure, tppBasis, setTppBasis,
-          q, setQ, sel, setSel, toggleHouse, range, setRange, tagSel, setTagSel, toggleTag, pop, setPop,
+          q, setQ, sel, setSel, toggleHouse, range, setRange, tagSel, setTagSel, toggleTag,
           pills, clearAll, sort, onSort, open, setOpen, focus, onBack, backLabel, exportCsv, bodyRef,
           ofTotal, ofHouses, demSplit, setDemSplit } = P;
   const D = window.AUSPOL;
@@ -3221,22 +3221,34 @@ function RdAllPolls(P) {
           {q && <button type="button" className="rd-ap-x" onClick={() => setQ("")} aria-label="Clear search">×</button>}
         </label>
         <span className="rd-ap-pops">
-          <FilterPop id="who" label="Pollster" open={pop} setOpen={setPop} summary={sel.size === 0 ? null : sel.size === 1 ? [...sel][0] : sel.size + " selected"}>
-            <div className="ap-pop-head"><span>{houses.length} pollsters, tick any number</span>{sel.size > 0 && <button className="ap-clear" onClick={() => setSel(new Set())}>Clear</button>}</div>
-            <div className="ap-poplist" role="group" aria-label="Pollsters">{houseRank.map((h) => <PopRow key={h} on={sel.has(h)} label={h} n={houseN[h] || 0} onClick={() => toggleHouse(h)} />)}</div>
-          </FilterPop>
-          <FilterPop id="when" label="Time" open={pop} setOpen={setPop} summary={range === "all" ? null : RANGE_LAB[range]}>
-            <div className="ap-poplist" role="radiogroup" aria-label="Time span">
-              {[["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => <PopRow key={id} radio on={range === id} label={lab} n={rangeN(id)} onClick={() => setRange(id)} />)}
-            </div>
-          </FilterPop>
-          <FilterPop id="has" label="Includes" open={pop} setOpen={setPop} summary={tagSel.size === 0 ? null : tagSel.size === 1 ? rdApTagLab([...tagSel][0]) : tagSel.size + " measures"}>
-            <div className="ap-pop-head"><span>What the poll published</span>{tagSel.size > 0 && <button className="ap-clear" onClick={() => setTagSel(new Set())}>Clear</button>}</div>
-            <div className="ap-poplist" role="group" aria-label="What the poll published">
-              {shownTags.map((t) => <PopRow key={t.id} on={tagSel.has(t.id)} label={rdApTagLab(t.id)} note={RD_AP_TAGS[t.id] && RD_AP_TAGS[t.id].note} n={tagN[t.id] || 0} onClick={() => toggleTag(t.id)} />)}
-            </div>
-            <p className="ap-pop-foot">Ticking two asks for polls that published both.</p>
-          </FilterPop>
+          {/* the three filter menus are native selects in the draw-a-past-term
+              action style: none of them holds a value - a pick ticks or
+              unticks the named item (or moves the time span, or clears) and
+              the select snaps back to its label, with the live set carried by
+              the Showing pills row below the bar. Row counts are each
+              option's poll count after the other active filters */}
+          <select className="rd-ap-sel" aria-label="Filter by pollster" value=""
+                  onChange={(e) => { const v = e.target.value; if (v === "__clear") setSel(new Set()); else if (v) toggleHouse(v); }}>
+            <option value="" disabled>Pollster</option>
+            {houseRank.map((h) => <option key={h} value={h}>{(sel.has(h) ? "✓ " : "") + h + " (" + (houseN[h] || 0) + ")"}</option>)}
+            {sel.size > 0 && <hr />}
+            {sel.size > 0 && <option value="__clear">✕ Clear</option>}
+          </select>
+          <select className="rd-ap-sel" aria-label="Filter by time span" value=""
+                  onChange={(e) => { const v = e.target.value; if (v) setRange(v); }}>
+            <option value="" disabled>Time</option>
+            {[["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => (
+              <option key={id} value={id}>{(range === id ? "✓ " : "") + lab + " (" + rangeN(id) + ")"}</option>
+            ))}
+          </select>
+          <select className="rd-ap-sel" aria-label="Filter by what a poll published" value=""
+                  onChange={(e) => { const v = e.target.value; if (v === "__clear") setTagSel(new Set()); else if (v) toggleTag(v); }}>
+            <option value="" disabled>Includes</option>
+            {shownTags.map((t) => <option key={t.id} value={t.id}>{(tagSel.has(t.id) ? "✓ " : "") + rdApTagLab(t.id) + " (" + (tagN[t.id] || 0) + ")" + (RD_AP_TAGS[t.id] && RD_AP_TAGS[t.id].note ? " — " + RD_AP_TAGS[t.id].note : "")}</option>)}
+            {tagSel.size > 0 && <hr />}
+            {tagSel.size > 0 && <option value="__clear">✕ Clear</option>}
+            <option disabled>Ticking two asks for polls that published both.</option>
+          </select>
         </span>
         <span className="rd-grow"></span>
         <span className="rd-ap-count"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span>
