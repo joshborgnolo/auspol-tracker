@@ -130,6 +130,19 @@
                  print it – from March 2026 the workbook's Primary Vote is
                  national totals only, so later waves file nothing.
                  Not in HOUSES.
+   EMRS (Tas) – the Hobart house's Tasmanian omnibus polls federal voting
+                 intention only occasionally, and its February 2026 federal
+                 report is the one release to chart the vote by Tasmania's
+                 five federal electorates (n 174–223 a seat) – hand-entered
+                 in EMRS_DEMO below and verified against the PDF figure by
+                 figure (Liberal + National fold to lnp, the poll row's
+                 sum; Independent and "Some other minor party" fold to oth,
+                 as the schema's keys carry them). The August 2026 federal
+                 report prints none (age/size callouts only – one cell a
+                 group, never a partition). The electorate cut is
+                 per-house only: no other house cuts seats, so it joins no
+                 common group and rides to the facet's Other cuts tables,
+                 income's route. Not in HOUSES.
    Groups are kept exactly as each house draws them – the age bands differ
    (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+, RedBridge by
    generation) – with labels only tidied. Party keys alp/lnp/onp/grn/oth;
@@ -1554,6 +1567,29 @@ const YOUGOV_TAI_DEMO = {
   },
 };
 
+/* EMRS (Tas) — the February 2026 federal report's per-electorate charts
+   (pages 7–11, "Base: All respondents in <seat> (n=…)"): the only
+   demographic crosstab the omnibus prints for the federal question.
+   Liberal and National fold to lnp (the poll row's lnp 19 is their
+   printed 18 + 1); Independent and "Some other minor party" fold to oth,
+   as the poll rows fold theirs. The August 2026 report carries no
+   electorate tables, so no wave beyond February's exists to file. */
+const EMRS_DEMO = {
+  "2026-02-19": {
+    source: "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf",
+    dims: {
+      electorate: {
+        Bass: { alp: 29, lnp: 24, grn: 15, onp: 25, oth: 8 },
+        Braddon: { alp: 31, lnp: 18, grn: 7, onp: 34, oth: 10 },
+        Lyons: { alp: 32, lnp: 19, grn: 9, onp: 29, oth: 11 },
+        Franklin: { alp: 34, lnp: 22, grn: 19, onp: 17, oth: 9 },
+        Clark: { alp: 27, lnp: 15, grn: 17, onp: 16, oth: 25 },
+      },
+    },
+    total: { alp: 30, lnp: 19, grn: 13, onp: 24, oth: 13 },
+  },
+};
+
 function redbridgeCache(date) {
   const dir = path.join(ROOT, ".build", "redbridge-src");
   for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
@@ -1733,7 +1769,7 @@ try {
     ["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
     ["RedBridge/Accent", REDBRIDGE_NOV_DEMO], ["RedBridge/Accent", REDBRIDGE_SEP_DEMO],
     ["RedBridge/Accent", REDBRIDGE_NOV26_DEMO], ["RedBridge/Accent", REDBRIDGE_SHIFTS_DEMO],
-    ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO]]) {
+    ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO], ["EMRS (Tas)", EMRS_DEMO]]) {
     for (const [date, h] of Object.entries(table)) {
       const k = house + "|" + date;
       if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
@@ -1811,7 +1847,7 @@ const reminders = watchReminders({
 });
 
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. YouGov's self-assessed class (Feb 2026 on), children-at-home (Mar on) and working-status columns (Jun on), and the Newspoll pooled waves' religion and working-status dims, ride dims[class|children|working|religion] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. YouGov's self-assessed class (Feb 2026 on), children-at-home (Mar on) and working-status columns (Jun on), the Newspoll pooled waves' religion and working-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };

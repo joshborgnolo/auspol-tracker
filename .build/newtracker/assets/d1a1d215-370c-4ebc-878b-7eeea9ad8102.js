@@ -3467,19 +3467,23 @@ const DEM_SPLITS = [
      (generalised from the Birth country split the same day it shipped,
      user call 2026-10-09; grown into five cut FAMILIES 2026-10-10 on the
      user's "actually no, put it in other cuts … one under the other"
-     call). The families, `fams`, stack one table under the other in the
+     call; a sixth, electorate, joined the same day for EMRS's Tasmanian
+     seats). The families, `fams`, stack one table under the other in the
      view, newest rows first in each:
-       birth    Roy Morgan finding 10341: seven months of Single Source
-                interviewing (Jan–Jul 2026, n=26,418) pooled into the 13
-                birth-country groups its release charts, another special
-                release beside the weekly series
-       religion Newspoll's pooled quarterly tables: Christian v no
-                religion (six waves, Sep 2025 on)
-       working  working status - Newspoll's pooled Full time v Retired
-                joins YouGov's weekly crosstabs (2 Jun 2026 on), the one
-                family two houses share on the same endpoints
-       children YouGov's children-under-18-at-home cut (24 Mar 2026 on)
-       class    YouGov's self-assessed class cut (10 Feb 2026 on)
+       birth     Roy Morgan finding 10341: seven months of Single Source
+                 interviewing (Jan–Jul 2026, n=26,418) pooled into the 13
+                 birth-country groups its release charts, another special
+                 release beside the weekly series
+       religion  Newspoll's pooled quarterly tables: Christian v no
+                 religion (six waves, Sep 2025 on)
+       working   working status - Newspoll's pooled Full time v Retired
+                 joins YouGov's weekly crosstabs (2 Jun 2026 on), the one
+                 family two houses share on the same endpoints
+       children  YouGov's children-under-18-at-home cut (24 Mar 2026 on)
+       class     YouGov's self-assessed class cut (10 Feb 2026 on)
+       electorate EMRS's one-off cut of its February 2026 federal wave by
+                 Tasmania's five seats - the omnibus's only demographic
+                 crosstab, and no common group spans state electorates
      Nothing here pools across waves (working is the one family two
      houses share; each of the rest is one house's habit), so each pair
      stays a within-poll contrast, as income's are.
@@ -3498,7 +3502,8 @@ const DEM_SPLITS = [
             ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"],
             ["Full time", "Retired", "Full time v retired", "Retired", "Full time"],
             ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"],
-            ["Working class", "Well off", "Working class v well off", "Well off", "Working class"]],
+            ["Working class", "Well off", "Working class v well off", "Well off", "Working class"],
+            ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
     fams: [
       { id: "birth", lab: "Birth country",
         sub: "Seven months of Roy Morgan interviews pooled, Jan–Jul 2026",
@@ -3514,6 +3519,8 @@ const DEM_SPLITS = [
         pairs: [["Children under 18", "No children", "Children at home v none", "No children", "Children at home"]] },
       { id: "class", lab: "Self-assessed class", sub: "YouGov's weekly cut, 10 Feb 2026 on",
         pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]] },
+      { id: "electorate", lab: "Tasmanian electorates", sub: "EMRS's one-off seat cut from the February 2026 federal wave",
+        pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]] },
     ] },
 ];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];   // grp's party order

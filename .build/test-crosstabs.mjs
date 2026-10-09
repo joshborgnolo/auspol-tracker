@@ -338,6 +338,31 @@ assert.deepEqual(shifts.dims.state, {
   "One Nation passes Labor in every printed state cut but Western Australia's");
 assert.equal(sharesProblem(shifts.dims.country), null);
 
+// ---- EMRS: the hand-entered February 2026 Tasmanian-electorate cut --------------------
+/* EMRS's federal Voting Intentions report of February 2026 (fieldwork
+   16–19 Feb, n=953) charts first preferences by Tasmania's five federal
+   electorates – the one release to do so; hand-entered in demographics.mjs
+   (EMRS_DEMO), independents and minor parties folding into oth as the
+   poll row's own table prints them. The wave rides only the facet's
+   Other cuts tables: no common group spans state electorates. */
+const emrs = wave("EMRS (Tas)", "2026-02-19");
+assert.ok(emrs, "the February 2026 EMRS wave is filed");
+assert.equal(emrs.source, "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf");
+assert.equal(emrs.read, "published table");
+assert.equal(emrs.sample, 953, "the Tasmania-wide omnibus n, 174–223 a seat");
+assert.deepEqual(Object.keys(emrs.dims), ["electorate"], "the seat cut is the wave's only dim");
+assert.deepEqual(emrs.dims.electorate.Bass, { alp: 29, lnp: 24, grn: 15, onp: 25, oth: 8 });
+assert.deepEqual(emrs.dims.electorate.Braddon, { alp: 31, lnp: 18, grn: 7, onp: 34, oth: 10 },
+  "One Nation top at 34 in its strongest seat");
+assert.deepEqual(emrs.dims.electorate.Lyons, { alp: 32, lnp: 19, grn: 9, onp: 29, oth: 11 });
+assert.deepEqual(emrs.dims.electorate.Franklin, { alp: 34, lnp: 22, grn: 19, onp: 17, oth: 9 });
+assert.deepEqual(emrs.dims.electorate.Clark, { alp: 27, lnp: 15, grn: 17, onp: 16, oth: 25 },
+  "Wilkie's seat, other top at 25");
+assert.deepEqual(emrs.total, { alp: 30, lnp: 19, grn: 13, onp: 24, oth: 13 });
+assert.equal(dimsProblem(emrs.dims), null, "every seat's shares sum to about 100");
+assert.equal(totalProblem(emrs.total, poll("EMRS (Tas)", "2026-02-19")), null,
+  "the seat tables' all-Tasmania column sits with the poll row");
+
 // ---- Resolve: decoding and the series ------------------------------------------------
 assert.equal(decodeUx("2l"), 38);
 assert.equal(decodeUx("2l.83"), 38.83, "the fraction rides verbatim");
@@ -545,4 +570,4 @@ assert.deepEqual(shiftsVs.rows.onp, { alp: 0.7, lnp: 0.8, onp: 96, grn: 0.3, oth
 assert.deepEqual(shiftsVs.rows.oth, { alp: 5, lnp: 5, onp: 27, grn: 3, oth: 55, und: 5 });
 assert.deepEqual(shiftsVs.rows.dnr, { alp: 11, lnp: 8, onp: 18, grn: 5, oth: 12, und: 46 });
 
-console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels, the EMRS Tasmanian-electorate cut, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");

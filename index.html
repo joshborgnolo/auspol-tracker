@@ -53299,6 +53299,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "href": "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf",
       "title": "The published report this poll’s figures were read from"
     }],
+    "grp": {
+      "r": "published table",
+      "v": [],
+      "d": {
+        "electorate": [["Bass", [29, 24, 15, 25, 8]], ["Braddon", [31, 18, 7, 34, 10]], ["Lyons", [32, 19, 9, 29, 11]], ["Franklin", [34, 22, 19, 17, 9]], ["Clark", [27, 15, 17, 16, 25]]]
+      },
+      "n": [],
+      "t": [30.3, 19.2, 13.1, 24.2, 13.1]
+    },
     "solo": [{
       "terr": "Tas",
       "whole": true,
@@ -90732,7 +90741,7 @@ const DEM_SPLITS = [{
   lo: "Australia-born",
   hi: "Overseas-born",
   scope: "With a one-off breakdown",
-  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"]],
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
   fams: [{
     id: "birth",
     lab: "Birth country",
@@ -90758,6 +90767,11 @@ const DEM_SPLITS = [{
     lab: "Self-assessed class",
     sub: "YouGov's weekly cut, 10 Feb 2026 on",
     pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]]
+  }, {
+    id: "electorate",
+    lab: "Tasmanian electorates",
+    sub: "EMRS's one-off seat cut from the February 2026 federal wave",
+    pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
   }]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];

@@ -2785,7 +2785,7 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
    (YouGov's 65+ and DemosAU's regional-or-rural voters join no common
    group, so `v` alone can't serve them) and an opened poll shows the lot. */
 const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
-const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "income", "working", "occupation", "country", "state", "location", "housing", "language", "religion", "children", "class", "stress"];
+const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "income", "working", "occupation", "country", "state", "location", "housing", "language", "religion", "children", "class", "stress", "electorate"];
 const DEMO_BY_POLL = new Map();
 for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
   const p = demoPollOf(w);
