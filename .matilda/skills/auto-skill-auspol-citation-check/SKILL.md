@@ -172,6 +172,34 @@ report posts began 301-ing straight to their report PDFs (commit 4046c12):
    more fragile than the redirect; named as intentional in the commit and
    reported so nobody "fixes" it later.
 
+## The Wayback archiving pass (added 2026-10-09)
+
+The watchdog gained its second half: detection AND a copy. After
+classification lands, every ok/wall/moved entry without a `wayback` stamp
+is submitted to `https://web.archive.org/save/<citation-url>`; a 2xx/3xx
+earns `wayback: "YYYY-MM-DD"` on the ledger entry. The full contract lives
+in `.build/citation-check-spec.md` ("The Wayback archiving pass"); the
+hard-won points:
+
+- **Off by default, on in CI only** (`CITATION_CHECK_WAYBACK=1` on the
+  workflow step) — a manual sweep never fires 300 saves.
+- **The stamp goes in the identity tuple**, so the weekly commit-on-change
+  lands new stamps and quiet weeks stay byte-identical.
+- **main() rebuilds every entry from scratch each run — any new per-entry
+  ledger field must be explicitly carried off `base`.** `hops` already
+  was; the first version of the save pass forgot to carry `wayback`, so
+  nothing ever counted as saved and every living link was re-saved every
+  run. `.build/test-wayback-save.mjs` (16 fixture assertions, a stub
+  `/save/` server) pins the carry-forward with its pre-stamped case.
+- Serves the ORIGINAL citation URL (Wayback follows today's redirects
+  itself); save failures NEVER move exit classes; inconclusive sweeps
+  fire none; budget-capped 30 min, resumable across runs — the mechanism
+  is the backfill, so the ~300-URL day-one backlog retires over runs, and
+  the workflow timeout went 25 → 75 min to fit sweep + pass.
+- Known deliberate edge: living documents (Essential's shared disclosure
+  PDF) are stamped once and never re-saved — the capture drifts behind
+  the file; named in the spec as accepted.
+
 ## Related
 
 - `auspol-site-check` — the sibling deployed-bytes watchdog; the two specs

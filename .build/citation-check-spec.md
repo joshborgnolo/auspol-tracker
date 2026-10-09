@@ -203,3 +203,51 @@ replacement paths surfaced from the institute's own post pages and WP
 media API, not guesses; the canonical CDN copy was preferred over a
 Wayback snapshot. The standing `gone` count is now zero; the next `gone`
 this ledger ever logs is a genuine regression by construction.
+
+## The Wayback archiving pass (added 2026-10-09)
+
+Detection without a copy is only half the job: a `gone` transition with no
+archived page is a citation you can mourn but not repair. (The Galaxy
+archive is the post-mortem path — a dead house CAN be rebuilt from the
+Wayback CDX, but only from what the crawler happened to catch on its own.)
+So the sweep gained a second half: after classification lands, every
+ok/wall/moved entry without a wayback stamp is submitted to
+`web.archive.org/save/<url>`, and a 2xx/3xx answer (SPN's normal answer is
+a redirect to the fresh capture) earns the entry a `wayback: "YYYY-MM-DD"`
+stamp in the ledger.
+
+Contract:
+
+- **Off by default; on in CI.** `CITATION_CHECK_WAYBACK` gates it — a bare
+  manual sweep never fires 300 saves; the weekly workflow sets it on the
+  step.
+- **The citation URL goes in, not finalUrl.** Wayback follows whatever
+  chain exists today; the capture lands where a reader clicking the link
+  would land.
+- **Stamps ride the identity tuple**, so the weekly commit-on-change lands
+  exactly the new stamps and a quiet week stays byte-identical. Once
+  stamped, an entry is never re-saved: old captures don't expire, and
+  courtesy is the scarce resource. (The stamps carry-forward lives beside
+  the hops one in main() — entries are rebuilt from scratch every run, and
+  any new per-entry field must be explicitly carried off `base`; the first
+  version of this pass forgot, re-stamped nothing, and re-saved every
+  living link every run. test-wayback-save.mjs's pre-stamped case pins it.)
+- **Failures are insurance, not evidence.** Budget-capped (30 min
+  default), concurrency 3, one retry on 429/5xx/network; a save failure
+  never changes an exit class, and an inconclusive (>20% error) sweep
+  fires none at all. `LINK_STATUS` carries
+  `wayback: {attempted, saved, failed, pending}` only when the pass ran.
+- **Resumable by construction**: whatever the budget cuts stays unstamped
+  for next week — the mechanism, not any single run, is the backfill. The
+  ~300-URL backlog from day one retires over the first couple of runs.
+- Walled pages archive as whatever the Wayback crawler sees at that moment
+  — honest, since a walled citation serves a walled page to readers too.
+- Save latency measured live 2026-10-09: ~5–40 s per URL, so the pass is
+  the slow half; the workflow timeout went 25 → 75 min to fit it.
+
+Known edge, deliberately unhandled: a LIVING document that keeps updating
+under one URL (Essential's shared disclosure-statement PDF, appended to
+each wave) is stamped once and never re-saved, so its capture drifts
+behind the live file. Re-saving belongs to a scheduler this watch doesn't
+have; if the document rots, the sweep still flags `gone` and the last live
+capture stands.

@@ -29,6 +29,22 @@
    dirties the file, same rule np-score.mjs follows for its identity
    tuple.
 
+   THE WAYBACK ARCHIVING PASS (added 2026-10-09): detection alone only
+   tells you a link died; the second half of the watchdog is making
+   sure a copy exists BEFORE it does. When CITATION_CHECK_WAYBACK is
+   set (the weekly workflow sets it; a bare manual run never fires 300
+   saves), every ok/wall/moved entry without a wayback stamp is
+   submitted to <BASE>/save/<citation-url> after classification lands.
+   A 2xx/3xx — SPN redirects to the fresh capture — earns the entry a
+   `wayback: "YYYY-MM-DD"` stamp, part of the identity tuple so the
+   weekly commit-on-change lands exactly the new stamps. Skipped on an
+   inconclusive sweep (a bad network day earns no stamps and makes
+   none). Budget-capped, concurrency-3, one retry on 429/5xx/network,
+   and a save failure NEVER crosses into an exit class: archiving is
+   insurance, not evidence. Whatever the budget cuts stays unstamped
+   and resumes next run — the mechanism, not any single run, is the
+   backfill.
+
    Exit classes (coverage-doctor.mjs conventions — check-coverage's
    `3` already means "actionable gap"; do not reuse it):
 
@@ -39,7 +55,8 @@
 
    Usage:   node .build/check-citations.mjs
    Last stdout line: LINK_STATUS {json} — {verdict, checked, counts,
-   newGone, newMoved}.
+   newGone, newMoved, wayback?} — the wayback key {attempted, saved,
+   failed, pending} is present only when the save pass ran.
 
    Env seams (testing):
      CITATION_CHECK_ROOT        repo root (default: this file's repo root)
@@ -50,6 +67,12 @@
      CITATION_CHECK_429_BACKOFF_MS  retry wait after a 429 (default 5000)
      CITATION_CHECK_MAX         sweep only the first N URLs (smoke runs)
      CITATION_CHECK_WALL_JSON   replace the wall-rule table (json array)
+     CITATION_CHECK_WAYBACK     any value enables the archiving pass
+     CITATION_CHECK_WAYBACK_BASE       default https://web.archive.org
+     CITATION_CHECK_WAYBACK_BUDGET_MS  pass time budget (default 30m)
+     CITATION_CHECK_WAYBACK_CONCURRENCY  parallel saves (default 3)
+     CITATION_CHECK_WAYBACK_TIMEOUT_MS per-save timeout (default 75000)
+     CITATION_CHECK_WAYBACK_BACKOFF_MS retry wait (default 8000)
    ==================================================================== */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -68,6 +91,12 @@ const MAX = Number(process.env.CITATION_CHECK_MAX) || Infinity;
 const ERROR_TOLERANCE = 0.2;
 const MAX_HOPS = 10;
 const UA = "auspol-citation-check (+https://github.com/joshborgnolo/auspol-tracker)";
+const WAYBACK_SAVE = !!process.env.CITATION_CHECK_WAYBACK;
+const WB_BASE = (process.env.CITATION_CHECK_WAYBACK_BASE || "https://web.archive.org").replace(/\/+$/, "");
+const WB_BUDGET_MS = Number(process.env.CITATION_CHECK_WAYBACK_BUDGET_MS ?? 30 * 60_000);
+const WB_CONCURRENCY = Number(process.env.CITATION_CHECK_WAYBACK_CONCURRENCY ?? 3);
+const WB_TIMEOUT_MS = Number(process.env.CITATION_CHECK_WAYBACK_TIMEOUT_MS ?? 75_000);
+const WB_BACKOFF_MS = Number(process.env.CITATION_CHECK_WAYBACK_BACKOFF_MS ?? 8000);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const today = () => new Date().toISOString().slice(0, 10);
@@ -206,6 +235,59 @@ async function fetchWithBackoff(url) {
   return fetchFinal(url);
 }
 
+/* --- the wayback save pass --------------------------------------------
+   One GET to <BASE>/save/<citation-url> per unstamped ok/wall/moved
+   entry: Wayback follows whatever redirects the citation takes today and
+   lands the capture at the destination, so the ORIGINAL url goes in the
+   request, not finalUrl. A 2xx or 3xx (SPN's answer is a redirect to the
+   fresh capture) earns the stamp; anything else — or a budget cut —
+   leaves the entry for the next run. Failures never propagate. */
+async function saveOnce(url) {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    let res = null;
+    try {
+      res = await fetch(`${WB_BASE}/save/${url}`, {
+        redirect: "manual",
+        signal: AbortSignal.timeout(WB_TIMEOUT_MS),
+        headers: { "user-agent": UA },
+      });
+    } catch {
+      /* a network miss is transient — worth the one retry */
+      if (attempt < 2) { await sleep(WB_BACKOFF_MS); continue; }
+      return false;
+    }
+    res.body?.cancel().catch(() => {});
+    if (res.status >= 200 && res.status < 400) return true;
+    /* a flat 4xx (not 429) is Wayback declining this url — a retry in
+       ten seconds will not change its mind; next week might */
+    if (!(res.status === 429 || res.status >= 500)) return false;
+    if (attempt < 2) await sleep(WB_BACKOFF_MS);
+  }
+  return false;
+}
+
+async function waybackSavePhase(entries) {
+  const eligible = entries.filter((e) => ["ok", "wall", "moved"].includes(e.verdict) && !e.wayback);
+  const wb = { attempted: 0, saved: 0, failed: 0, pending: 0 };
+  if (!eligible.length) return wb;
+  const deadline = Date.now() + WB_BUDGET_MS;
+  const queue = eligible.slice();
+  const stamp = today();
+  const worker = async () => {
+    while (queue.length && Date.now() < deadline) {
+      const e = queue.shift();
+      wb.attempted++;
+      const okSave = await saveOnce(e.url);
+      if (okSave) { e.wayback = stamp; wb.saved++; } else { wb.failed++; }
+      console.log(`citation-check: wayback ${okSave ? "saved " : "FAILED"} [${wb.attempted}/${eligible.length}] ${e.url}`);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(WB_CONCURRENCY, eligible.length) }, worker));
+  wb.pending = eligible.length - wb.attempted;
+  console.log(`citation-check: wayback pass — ${wb.saved} saved, ${wb.failed} failed, ${wb.pending} pending over budget`);
+  return wb;
+}
+
 /* classify one URL against its fetched response */
 function classify(url, got) {
   const fin = new URL(got.finalUrl);
@@ -312,6 +394,10 @@ async function main() {
     // hops[0] is the publisher's own first Location: the rewrite candidate
     const via = got ? got.visited.slice(1, -1) : base?.hops || [];
     if (via.length) entry.hops = via;
+    // a wayback stamp, once earned, rides the entry forever — an old
+    // capture never stops existing, and re-saving weekly would waste
+    // exactly the courtesy this pass depends on
+    if (base?.wayback) entry.wayback = base.wayback;
     // lastError carries no timestamp so an identical outage is a stable
     // identity tuple — it is part of the change-detection below
     if (verdict === "error") entry.lastError = note;
@@ -340,16 +426,33 @@ async function main() {
 
   /* state writes are change-triggered, not run-triggered: compare the
      identity tuple (url set + per-entry verdict/finalUrl/redirects/hops/
-     lastError) */
+     lastError/wayback) */
   const identity = (list) =>
-    JSON.stringify(list.map((e) => [e.url, e.verdict, e.finalUrl, e.redirects, e.hops || [], e.lastError || ""]).sort());
+    JSON.stringify(list.map((e) => [e.url, e.verdict, e.finalUrl, e.redirects, e.hops || [], e.lastError || "", e.wayback || ""]).sort());
   const prevList = [...prev.values()];
+  const inconclusive = counts.error / entries.length > ERROR_TOLERANCE;
+  const writeState = () =>
+    writeFileSync(STATE, JSON.stringify({ version: 1, generated: today(), links: entries }, null, 2) + "\n");
+  /* classification lands FIRST: if a hung save or the runner's timeout
+     kills the process from here on, the week's verdicts are already on
+     disk. The wayback pass then mutates entries in place (stamps) and a
+     second identity compare decides whether anything new needs writing. */
   const dirty = prevList.length !== entries.length || identity(prevList) !== identity(entries);
   if (dirty) {
-    writeFileSync(STATE, JSON.stringify({ version: 1, generated: today(), links: entries }, null, 2) + "\n");
+    writeState();
     console.log(`citation-check: state changed — wrote ${STATE}`);
   } else {
     console.log("citation-check: no state change — link-health.json untouched");
+  }
+  const writtenIdentity = identity(entries);
+
+  let wayback = null;
+  if (WAYBACK_SAVE && !inconclusive) {
+    wayback = await waybackSavePhase(entries);
+    if (identity(entries) !== writtenIdentity) {
+      writeState();
+      console.log("citation-check: wayback stamps landed — wrote link-health.json");
+    }
   }
 
   const status = {
@@ -359,7 +462,8 @@ async function main() {
     newGone,
     newMoved,
   };
-  if (counts.error / entries.length > ERROR_TOLERANCE) {
+  if (wayback) status.wayback = wayback;
+  if (inconclusive) {
     console.log(`citation-check: ${counts.error}/${entries.length} errored — inconclusive, not an alarm`);
     status.verdict = 1;
     emit(1, status);

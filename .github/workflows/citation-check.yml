@@ -13,6 +13,14 @@
 # people's publishers is rude. data/link-health.json comes back only on
 # a real change (the script writes nothing otherwise), committed by the
 # github-actions identity like np-score's calibration ledger.
+#
+# Since 2026-10-09 the same run also ARCHIVES (CITATION_CHECK_WAYBACK=1,
+# set on the sweep step): every ok/wall/moved link without a wayback
+# stamp is submitted to web.archive.org/save/<url> after classification
+# lands — detection without a copy was only ever half the job. The pass
+# is budget-capped and resumable, a save failure never moves the exit
+# class, and the stamp rides the ledger's identity tuple so a quiet week
+# still commits nothing.
 
 name: citation-check
 
@@ -30,7 +38,8 @@ concurrency:
 jobs:
   sweep:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    # sweep ~15-25m + the budget-capped wayback pass (nominal 30m)
+    timeout-minutes: 75
     permissions:
       contents: write
     steps:
@@ -49,6 +58,9 @@ jobs:
 
       - name: Run the citation sweep
         id: check
+        env:
+          # enables the wayback-save pass after classification
+          CITATION_CHECK_WAYBACK: "1"
         run: |
           set +e
           OUT="$(node .build/check-citations.mjs 2>&1)"
