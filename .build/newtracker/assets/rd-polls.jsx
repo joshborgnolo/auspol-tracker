@@ -775,7 +775,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       </RdKey>
       <p className="rd-note">
         Projections read each pollster’s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.
-        {" "}A pollster that misses its slot shows as overdue until the release is added.
+        {" "}A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date.
         {staleOnes.length > 0 && <> {staleOnes.map((e) => e.poll.pollster).join(" and ")} {staleOnes.length > 1 ? "have" : "has"} not published in six weeks, so {staleOnes.length > 1 ? "their polls are" : "its poll is"} outside the averages.</>}
       </p>
       {(calMonths.length > 0 || calOver.length > 0) && (

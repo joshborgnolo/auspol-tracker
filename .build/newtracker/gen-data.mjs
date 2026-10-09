@@ -4994,8 +4994,9 @@ const CYCLE_DEFS = CYC_META.map((c) => {
 
    Only houses on a genuine cadence are published: at least 4 waves, a spread
    small relative to the interval, and not declared stopped. Silence alone
-   does not remove one - an unrecorded release holds its slot, overdue, until
-   it is recorded. A house that has broken its own pattern is not "expected"
+   does not remove one - an unrecorded release keeps its house on the
+   projection, the slot itself rolling after a short grace, until the wave
+   is recorded. A house that has broken its own pattern is not "expected"
    and is left out rather than given a made-up date. */
 const CAD_DEFAULT_LAG = 1;
 /* npMonthEndSlot, taken from the SHIPPED np-project.js (a classic browser
@@ -5056,9 +5057,10 @@ const CAD_MIN_POLLS = 4;
    house was judged to have stopped and dropped from the projection. That
    turned a blown slot into a vanished one – exactly when a reader most
    needs to see it. Silence is not evidence of stoppage any more: an
-   unrecorded release HOLDS its slot, marked overdue, until it is recorded,
-   and a house that has genuinely stopped (Fox & Hedgehog among them) is
-   removed by hand instead, via pollsterRules.stopped. */
+   unrecorded release keeps its HOUSE on the list (the dated slot itself
+   rolls on after a short grace; a window holds its seat) until the wave is
+   recorded, and a house that has genuinely stopped (Fox & Hedgehog among
+   them) is removed by hand instead, via pollsterRules.stopped. */
 const CAD_MAX_REL_SPREAD = 0.30;
 /* The spread is half the RANGE of a house's recent intervals with the single
    most extreme at each end set aside - not a robust SD off the MAD, which is
@@ -5270,8 +5272,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     last = new Date(Date.parse(prov.date) + plag * 86400000).toISOString().slice(0, 10);
   }
   /* The only way OFF the projection: declared stopped by hand. Silence on
-     its own no longer removes a house – an unrecorded release holds its
-     slot until it is recorded (see CAD_MAX_REL_SPREAD above). */
+     its own no longer removes a house – an unrecorded release keeps its
+     house on the list (the dated slot itself rolls on after a short grace;
+     a window holds its seat) until the wave is recorded (see
+     CAD_MAX_REL_SPREAD above). */
   if ((D.pollsterRules?.[firm] || {}).stopped) continue;
   const ts = (timeSamples[firm] || []).slice(-CAD_RECENT);
   /* Some houses keep a weekday, not just an interval. Newspoll and Resolve

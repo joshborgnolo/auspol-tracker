@@ -4136,9 +4136,10 @@ function PollDetail({ r }) {
 
    Dates are computed here rather than at build time so the panel stays right
    as the page ages: a slot whose moment has passed without that release being
-   added is left exactly where it is and marked overdue, rather than rolled
-   forward onto a date nobody has published – the row isn't removed until the
-   data for it is.
+   added is marked overdue where it stands, not rolled onto a date nobody has
+   published – until two days of grace run out, when a dated slot is reckoned
+   skipped and the next plausible date takes the row (NP_ASSUME_SKIP_DAYS in
+   np-project.js).
    ==================================================================== */
 /* DAY_MS, the NP_* schedule constants, easternNow, spreadDays and the
    projection itself live in assets/np-project.js (the plain layer, ahead of

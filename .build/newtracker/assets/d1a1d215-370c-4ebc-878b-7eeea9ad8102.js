@@ -243,7 +243,8 @@ function NextPollTicker({ showScore }) {
 
   const title = "Projected from each house's recent publication intervals"
     + " – the earliest each wave could land, not the likeliest."
-    + " A slot that passes unrecorded counts up as overdue until the release is added";
+    + " A dated slot that passes unrecorded counts up as overdue for two days,"
+    + " then the expectation moves on to the house's next plausible date";
   return (
     /* with room for no house at all, the label alone would announce an
        empty list: the strip hides (still laid out, so the next fit pass can
@@ -7057,9 +7058,12 @@ function infoTerms(D) {
           the same weekday, it moves in whole weeks. A house too irregular for a date gets a window
           instead.</span>
           <span className="info-p"><b>Late polls.</b> When a date passes with no poll, the row stays
-          and keeps counting, turns red once the whole window has passed, and leaves only when the
-          poll is added. The countdown in the tab bar works the same way. Roy Morgan’s stated
-          schedule is taken at its word, even though it doesn’t always keep it.</span>
+          and keeps counting, turning red once the whole window has passed. A date gets two days of
+          grace for a poll simply running late; a dated slot still unrecorded on the third morning
+          is treated as skipped, and the forecast moves on to the house’s next plausible date. A
+          window forecast names no one day to break, so it holds its seat until the wave is added.
+          The countdown in the tab bar works the same way. Roy Morgan’s stated schedule is taken at
+          its word, even though it doesn’t always keep it.</span>
           <span className="info-p">Open a row to check the forecast against the house’s five most
           recent releases.</span>
           {working(<span className="info-p">Gaps are measured between publication dates where the
@@ -7852,8 +7856,11 @@ function infoTerms(D) {
             longest and shortest, and widens for releases further out. A house too irregular for a
             date gets a window instead.</span>
             <span className="info-p"><b>Late polls.</b> When a date passes with no poll, the row
-            stays and keeps counting, turns red once the whole window has passed, and leaves only
-            when the poll is added. The countdown in the tab bar works the same way.</span>
+            stays and keeps counting, turning red once the whole window has passed. A date gets two
+            days of grace for a poll simply running late; a dated slot still unrecorded on the
+            third morning is treated as skipped, and the forecast moves on to the house’s next
+            plausible date. A window forecast names no one day to break, so it holds its seat until
+            the wave is added. The countdown in the tab bar works the same way.</span>
             <span className="info-p">Open a row to check the forecast against the house’s five most
             recent releases.</span></>) },
         ] },

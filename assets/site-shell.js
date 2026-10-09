@@ -77,12 +77,24 @@
 
    Dates are computed here rather than at build time so the panel stays
    right as the page ages: a slot whose moment has passed without that
-   release being added is left exactly where it is and marked overdue,
-   rather than rolled forward onto a date nobody has published – the row
-   isn't removed until the data for it is.
+   release being added is marked overdue where it stands, not rolled
+   forward onto a date nobody has published on the strength of a guess. The
+   one bound on that is NP_ASSUME_SKIP_DAYS below: a dated slot that stays
+   unrecorded past its grace is treated as one that did not happen, and the
+   projection names the house's next plausible date instead.
    ==================================================================== */
 const DAY_MS = 86400000;
 const NP_HORIZON_DAYS = 28;   // how far out a house's 2nd, 3rd… slots reach
+/* A poll CAN run a day or two late (Roy Morgan files the odd Tuesday after
+   its Monday), so two full days of grace: a dated slot still unrecorded
+   three mornings on is treated as skipped - the house's next plausible date
+   takes the row, rolled to exactly as a publisher-confirmed absence rolls
+   it (the walk's skip step). The bar shows "1 day overdue", then "2 days
+   overdue", and on the third morning the slot is gone rather than counting
+   red forever. Only a DATE can break a promise this way: a loose window
+   (a calendar-month bracket, the summer resumption) has no single day to
+   miss and keeps its seat until the wave is recorded. */
+const NP_ASSUME_SKIP_DAYS = 2;
 /* A house nobody has timed keeps its whole day: with no hour recorded there is
    no moment to say has passed, so the row stays "today" until today is over
    rather than being rolled off the list by an hour we invented for it. */
@@ -293,14 +305,17 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
     const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
     const relOf = (f) => dayFloor(snap(f + c.lag * DAY_MS));
 
-    /* The next slot after the last recorded release – never rolled forward on
-       a guess. A slot whose moment has passed without that release being
-       added is overdue, not wrong: the wave may already be out and simply not
-       entered yet, or it may be running late, and this page cannot tell
-       which. Either way the honest row is the one the data on record actually
-       supports, left where it is and marked overdue – it leaves the list only
-       once a new release moves `c.last` past it, at which point this slot is
-       what got confirmed and the row after it is the fresh guess. */
+    /* The next slot after the last recorded release. A slot whose moment has
+       passed without that release being added is overdue, not wrong: the
+       wave may already be out and simply not entered yet, or it may be
+       running late, and this page cannot tell which. Either way the honest
+       row is the one the data on record actually supports, left where it is
+       and marked overdue - for two days of grace, after which a DATED slot
+       is reckoned a skipped one and the walk moves to the house's next
+       plausible date (NP_ASSUME_SKIP_DAYS; the roll the skip lists take,
+       below). A slot leaves the two ways the record can no longer back it:
+       a new release moves `c.last` past it, or the sky has sat on it past
+       its grace. */
     /* a month-end house steps month-end to month-end, not by interval:
        its slot IS the release day, so field and release coincide (and the
        slot-relative tails below need no weekday-snap shift) */
@@ -325,17 +340,33 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
     {
       const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
       let meSlot = release;
-      while ((c.skipped || []).includes(isoDay(release))) {
+      /* One roll step, shared by the confirmed absentees (skipped lists) and
+         the assumed ones (a dated slot past its grace, below): a month-end
+         house's first step is its measured late week, its second the next
+         month-end; a dated house's is one week; anyone else's a cadence. */
+      const rollOn = () => {
         rolled = true;
         if (monthEnd) {
           if (release === meSlot) release = meSlot + 7 * DAY_MS;
           else release = meSlot = stepFrom(meSlot);
           field = release;
-          continue;
+          return;
         }
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
-      }
+      };
+      while ((c.skipped || []).includes(isoDay(release))) rollOn();
+      /* The assumed skip: a dated slot still unrecorded past its grace is
+         one the wave did not keep, so the walk moves on to the next
+         plausible date rather than counting red forever (the bar's "1 day
+         overdue" / "2 days overdue" are the grace showing). Only a DATED
+         promise can break this way - a loose window names no single day and
+         holds its seat until the wave lands; and a slot in the summer break
+         is no date to be late for (rolling it would manufacture a January
+         date that reads overdue inside the resumption window), so a roll
+         stops at the break and the summer branch below shapes it instead. */
+      if (!c.loose)
+        while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) rollOn();
     }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
@@ -520,13 +551,16 @@ function npTickerItems(proj) {
     .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
 
   /* A slot whose whole tolerance has passed without its release being
-     recorded is not rolled forward onto next week's guess and not dropped:
-     it leads the bar in red, counting the days it is late - the same claim
-     the panel's red row makes, on the same `missed` flag. A late WINDOW
-     counts from its close; a late DAY from the day itself, matching the
-     number the panel prints. It leaves when the real release moves the
-     projection, never on a date guessed in its place. (Window rows sit
-     outside this too - see above.) */
+     recorded leads the bar in red, counting the days it is late - the same
+     claim the panel's red row makes, on the same `missed` flag. A late
+     WINDOW counts from its close - and a window, having no date it could
+     break, is the only lateness that can persist here; a late DAY counts
+     from the day itself, matching the number the panel prints, and only
+     for the two days of grace NP_ASSUME_SKIP_DAYS grants a dated slot
+     before the projection treats it as skipped and moves the expectation
+     on ("1 day overdue", "2 days overdue", gone on the third morning -
+     never "N days" into double figures). A row leaves for a real reason
+     only: the release recorded, or the slot reckoned skipped. */
   const overdueItems = rows
     .filter((r) => r.missed && !isWindowRow(r))
     .map((r) => {

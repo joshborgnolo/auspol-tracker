@@ -77343,6 +77343,7 @@ window.AP = function () {
 }();</script>
   <script>const DAY_MS = 86400000;
 const NP_HORIZON_DAYS = 28;
+const NP_ASSUME_SKIP_DAYS = 2;
 const NP_UNTIMED_MINS = 24 * 60;
 let npEastFmt = null;
 function easternNow() {
@@ -77480,16 +77481,18 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
       let meSlot = release;
-      while ((c.skipped || []).includes(isoDay(release))) {
+      const rollOn = () => {
         rolled = true;
         if (monthEnd) {
           if (release === meSlot) release = meSlot + 7 * DAY_MS;else release = meSlot = stepFrom(meSlot);
           field = release;
-          continue;
+          return;
         }
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
-      }
+      };
+      while ((c.skipped || []).includes(isoDay(release))) rollOn();
+      if (!c.loose) while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) rollOn();
     }
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
@@ -86308,7 +86311,7 @@ function NextPollTicker({
     };
   }, [itemsKey, showScore]);
   if (!items.length) return null;
-  const title = "Projected from each house's recent publication intervals" + " – the earliest each wave could land, not the likeliest." + " A slot that passes unrecorded counts up as overdue until the release is added";
+  const title = "Projected from each house's recent publication intervals" + " – the earliest each wave could land, not the likeliest." + " A dated slot that passes unrecorded counts up as overdue for two days," + " then the expectation moves on to the house's next plausible date";
   return (React.createElement("div", {
       ref: rootRef,
       className: "tab-next" + (fit === 0 ? " tn-none" : ""),
@@ -92856,7 +92859,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "The date"), " is the house\u2019s last release plus the median of its last eight gaps between releases, nudged by up to three days onto the weekday it usually publishes. ", React.createElement("b", null, "The \xB1"), " is half the spread of those gaps, leaving out the longest and shortest, and widens for releases further out; for a house that always publishes on the same weekday, it moves in whole weeks. A house too irregular for a date gets a window instead."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Late polls."), " When a date passes with no poll, the row stays and keeps counting, turns red once the whole window has passed, and leaves only when the poll is added. The countdown in the tab bar works the same way. Roy Morgan\u2019s stated schedule is taken at its word, even though it doesn\u2019t always keep it."), React.createElement("span", {
+      }, React.createElement("b", null, "Late polls."), " When a date passes with no poll, the row stays and keeps counting, turning red once the whole window has passed. A date gets two days of grace for a poll simply running late; a dated slot still unrecorded on the third morning is treated as skipped, and the forecast moves on to the house\u2019s next plausible date. A window forecast names no one day to break, so it holds its seat until the wave is added. The countdown in the tab bar works the same way. Roy Morgan\u2019s stated schedule is taken at its word, even though it doesn\u2019t always keep it."), React.createElement("span", {
         className: "info-p"
       }, "Open a row to check the forecast against the house\u2019s five most recent releases."), working(React.createElement("span", {
         className: "info-p"
@@ -93302,7 +93305,7 @@ function infoTerms(D) {
           className: "info-p"
         }, React.createElement("b", null, "The date"), " is the house\u2019s last release plus the median of its last eight gaps between releases, nudged by up to three days onto the weekday it usually publishes. ", React.createElement("b", null, "The \xB1"), " is half the spread of those gaps, leaving out the longest and shortest, and widens for releases further out. A house too irregular for a date gets a window instead."), React.createElement("span", {
           className: "info-p"
-        }, React.createElement("b", null, "Late polls."), " When a date passes with no poll, the row stays and keeps counting, turns red once the whole window has passed, and leaves only when the poll is added. The countdown in the tab bar works the same way."), React.createElement("span", {
+        }, React.createElement("b", null, "Late polls."), " When a date passes with no poll, the row stays and keeps counting, turning red once the whole window has passed. A date gets two days of grace for a poll simply running late; a dated slot still unrecorded on the third morning is treated as skipped, and the forecast moves on to the house\u2019s next plausible date. A window forecast names no one day to break, so it holds its seat until the wave is added. The countdown in the tab bar works the same way."), React.createElement("span", {
           className: "info-p"
         }, "Open a row to check the forecast against the house\u2019s five most recent releases."))
       }]
@@ -105765,7 +105768,7 @@ function RdPolls({
     "aria-hidden": "true"
   }), "Window, for irregular pollsters")), React.createElement("p", {
     className: "rd-note"
-  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue until the release is added.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
+  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
     className: "rd-evdrop rd-cal"
   }, React.createElement("summary", null, "Release calendar"), React.createElement("div", {
     className: "rd-cal-body"
