@@ -1,6 +1,6 @@
 ---
 name: auspol-citation-check
-description: auspol-tracker — the citation link-rot watchdog (check-citations.mjs + citation-check.yml, shipped 464d2e6) sweeps the archive's outbound polls[].url/releaseUrl/methodUrl and pollsterRules[].site/releaseHub URLs weekly (started at 175 unique polls[].url/releaseUrl/pollsterRules[].site URLs on 2026-09-01; the methodUrl and releaseHub categories joined 2026-09-02, see "Adding a sweep category") and ledgers verdicts in data/link-health.json. Hard-won core rules — (1) wall classification is CONTENT-keyed (bodyRe/titleRe), never status-keyed, because status codes lie in both directions (News Corp's titleless 403 crawler-bot page, news24's 404 cookie wall, x.com's 200 JS shell, thenewdaily's Cloudflare "Just a moment") and a status-pinned rule silently rots when the host swaps statuses; (2) a redirect chain's TERMINAL hop can be wall machinery, so entries carry `hops` (the intermediate redirect URLs, in chain order) — hops[0] is the publisher's own 301 1:1 mapping and the actionable rewrite candidate the wall-endpoint finalUrl would otherwise throw away. Exit classes 0/1/2 where 2 = a citation TRANSITIONED to gone; the original standing baseline (three Australia Institute PDFs gone) was adjudicated same-day — rewritten to the institute's OWN cdn.australiainstitute.org.au copies (their 2026-08-18 CDN migration) rather than Wayback snapshots — and the ledger is written only on identity-tuple change.
+description: auspol-tracker — the citation link-rot watchdog (check-citations.mjs + citation-check.yml, shipped 464d2e6) sweeps the archive's outbound polls[].url/releaseUrl/methodUrl and pollsterRules[].site/releaseHub URLs weekly (started at 175 unique polls[].url/releaseUrl/pollsterRules[].site URLs on 2026-09-01; the methodUrl and releaseHub categories joined 2026-09-02, see "Adding a sweep category") and ledgers verdicts in data/link-health.json. Hard-won core rules — (1) wall classification is CONTENT-keyed (bodyRe/titleRe), never status-keyed, because status codes lie in both directions (News Corp's titleless 403 crawler-bot page, news24's 404 cookie wall, x.com's 200 JS shell, thenewdaily's Cloudflare "Just a moment") and a status-pinned rule silently rots when the host swaps statuses; (2) a redirect chain's TERMINAL hop can be wall machinery, so entries carry `hops` (the intermediate redirect URLs, in chain order) — hops[0] is the publisher's own 301 1:1 mapping and the actionable rewrite candidate the wall-endpoint finalUrl would otherwise throw away. Exit classes 0/1/2 where 2 = a citation TRANSITIONED to gone; the original standing baseline (three Australia Institute PDFs gone) was adjudicated same-day — rewritten to the institute's OWN cdn.australiainstitute.org.au copies (their 2026-08-18 CDN migration) rather than Wayback snapshots — and the ledger is written only on identity-tuple change. Acting on a bank-wide `moved` finding is a heal chain in a fixed order (extractor contract first — a polls.json-only edit self-reverts — then extractor rerun, downstream generators, rebuild with URL-only artifact proof, and the re-sweep LAST because the census enumerates from the data files at launch; worked on the seven SEC Newgate posts→PDFs, commit 4046c12).
 source: auto-skill
 extracted_at: '2026-09-01T06:10:59.381Z'
 ---
@@ -129,6 +129,48 @@ field stays minimal. Design choices worth copying:
    overlaps: verify the tree directly (`git diff -- data/link-health.json`,
    grep the verdict counts) before believing, committing, or re-running
    anything on the strength of a stale tail.
+
+## Acting on a moved finding: heal data, THEN re-sweep (worked 2026-10-09)
+
+When a `moved` finding is bank-wide (a publisher starts 301-ing a class of
+article pages to their documents), the response is a full heal chain, and
+ORDER MATTERS because the checker enumerates its census from the data files
+on disk at launch. The worked case: all seven SEC Newgate Mood-of-the-Nation
+report posts began 301-ing straight to their report PDFs (commit 4046c12):
+
+1. **Fix the EXTRACTOR contract first, not the data file.** The rows a
+   house extractor owns are healed whenever its candidate and the row
+   differ (`cur.url !== row.url`), so a polls.json-only edit silently
+   self-reverts on the next extractor run. For SEC Newgate the change was
+   one line: `page = url || it.link || null` (the media item's vetted PDF
+   `source_url` first; the article-page `link` demoted to fallback).
+2. **Run the extractor** — its heal rewrites every owned surface in one
+   pass: the `<house>-src/*.json` sidecars (rewritten every run) AND
+   `data/polls.json` (all 7 direction rows healed clean).
+3. **Re-run every downstream generator that reads the row URL.** SEC
+   Newgate's direction rows feed `.build/issues.mjs` (ownership
+   `source: p.releaseUrl || p.url`), so 3 `data/issues.json` sources only
+   moved on that rerun — a data item, not a code change.
+4. **Rebuild the site and prove the artifacts URL-only** before
+   committing (shared-tree hygiene): a normalising node one-liner (rewrite
+   every affected-host URL string to a constant, string-compare current
+   artifact vs `git show HEAD:<artifact>`) proves index.html / feed.xml /
+   the data asset / auspol-now.json carry ONLY the citation change — this
+   guards against a sibling session's WIP gen-data.mjs leaking into your
+   committed artifacts (gen-data went dirty DURING this session AFTER the
+   rebuild; the artifacts stayed clean because they were built before).
+5. **Re-run the sweep LAST.** The first re-sweep (launched before
+   issues.mjs re-ran) ledgered the 3 stale post URLs under
+   `fields:["issues.source"]` even though polls.json was already healed —
+   entries gone only after a second full sweep. A transient `error 1`
+   (unidentified host flakiness) also appeared between sweeps and
+   SELF-CLEARED: confirm a single new error persists across a re-run
+   before investigating it.
+6. **Cosmetic redirects may be deliberately left.** The one Infogram
+   `?src=embed` `moved` entry is a cosmetic redirect to a tokenised embed
+   URL — the citation stays ON the post URL because the token target is
+   more fragile than the redirect; named as intentional in the commit and
+   reported so nobody "fixes" it later.
 
 ## Related
 

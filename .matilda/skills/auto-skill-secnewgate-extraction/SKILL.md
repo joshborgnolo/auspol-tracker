@@ -1,6 +1,6 @@
 ---
 name: secnewgate-extraction
-description: SEC Newgate "Mood of the Nation" bi-monthly survey — direction-only house (no VI). Discovery via the WP REST media API (predictable-URL probing fails), report PDFs carry "Fieldwork dates" + n on page 2, direction rows carry url (the item's article-page link, not the PDF source_url) + published (the media date, site-local) picked up in pickReports and healed onto older rows. April 2026 Special Edition has NO direction question and must be skipped. auspol-tracker.
+description: SEC Newgate "Mood of the Nation" bi-monthly survey — direction-only house (no VI). Discovery via the WP REST media API (predictable-URL probing fails), report PDFs carry "Fieldwork dates" + n on page 2, direction rows carry url (the report PDF itself since 2026-10-09 — the house's report posts 301 straight to their PDFs, so pickReports takes source_url with it.link only as fallback) + published (the media date, site-local). April 2026 Special Edition has NO direction question and must be skipped. auspol-tracker.
 source: auto-skill
 extracted_at: '2026-09-28T05:26:18.764Z'
 ---
@@ -101,14 +101,19 @@ the automation then keeps it current:
   `.build/secnewgate-src/<slug>.{txt,bbox.html,json}`, and it writes the
   `direction[]` rows ITSELF straight into `data/polls.json` (Roy-Morgan
   model — NOT the Ipsos model where a second script reads the cache).
-  Each media item also yields `page` (the item's `link` — the WP ARTICLE
-  page, never the PDF `source_url`) and `published`
+  Each media item also yields `page` (the media item's `source_url` —
+  the report PDF itself — since 2026-10-09: the house's report posts
+  now 301 straight to their PDFs, so `page = url || it.link || null`
+  with the article-page `link` demoted to fallback; before that change
+  `page` was the item's `link`, the WP article page, never the PDF) and
+  `published`
   (`date.slice(0,16)`, site-local UTC+10 — the upload stamp trails the
   fieldwork by days); the sidecar carries `url`/`published`, the
   direction row spreads them in, and the heal condition treats a missing
-  link/stamp as a heal target so rows filed before the fields existed get
-  back-filled (all 7 healed 2026-09-29; an item with no link/date yields
-  nulls, not a crash — pinned). Synthetic test items ride a
+  OR MISMATCHED link/stamp as a heal target so rows filed before the
+  fields existed get back-filled (all 7 healed 2026-09-29, and re-healed
+  2026-10-09 when the contract moved — commit 4046c12; an item with no
+  link/date yields nulls, not a crash — pinned). Synthetic test items ride a
   `(rendered, url, rest)` factory — `link`/`date` go in `rest`.
   `SEC_FIRST="2025-07"` (backfill floor), `QUIET_DAYS=75`, `HEAL_DAYS=8`,
   `unsure = 100 − right − wrong` (=0 on all waves so far, stored as int).
@@ -155,6 +160,11 @@ the automation then keeps it current:
      post-floor month for synthetic reports.
   3. Every cached bbox parses clean — do NOT pin an expected wave-1
      problem column that doesn't occur.
+  4. Since the 2026-10-09 link-contract change the pickReports pins
+     expect `page` = the PDF `source_url` (the media item's page `link`
+     IGNORED), and an embargoed-only wave links its embargoed PDF with
+     `published: null` rather than linking nothing — the page link is
+     fallback, the PDF is the contract.
 
 ## State direction bank (data/sec-direction-states.json, 2026-09-29)
 
