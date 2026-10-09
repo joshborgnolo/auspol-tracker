@@ -51,7 +51,10 @@
                  only, and from mid-May 2026 the weekly releases carry no
                  demographic table at all ("contact Julian McCrann" for
                  detail). Not in HOUSES: which waves print which dims is
-                 unpredictable, so stale/dropped checks would misfire.
+                 unpredictable, so stale/dropped checks would misfire – a
+                 new wave's findings cache is instead probed for the shapes
+                 a demographic release has taken (the `reminders` watch at
+                 the end of this file).
                  harmonize joins only NSW/Vic/Qld (no Tas or ACT/NT cut →
                  no Rest of Australia).
    Newspoll   – the quarterly aggregate Newspoll publishes to The
@@ -71,7 +74,10 @@
                  so no common education group holds every wave's school row
                  – harmonize drops the dim unless the wave prints a school
                  row of its own. Newspoll cuts no Tas/ACT/NT, so its states
-                 join NSW/Vic/Qld/SA/WA only. Not in HOUSES.
+                 join NSW/Vic/Qld/SA/WA only. Not in HOUSES: a pooled row
+                 whose breakdowns stay unentered, and a quarter gone
+                 quiet, surface as `reminders` (the watch at the end of
+                 this file).
    Fox & Hedgehog – every release's full-report PDF prints a
                  "PRIMARY VOTE, 3PP & TPP – DEMOGRAPHICS" table (page 8):
                  gender, age bands 18–34/35–49/50–64/65+, state as
@@ -114,23 +120,35 @@
    the house really stopped, keyed to the first wave without it so a later
    drop alarms again.
 
+   The hand-entered Roy Morgan and Newspoll waves get neither check. That
+   once let a printed quarterly sit unentered for three months (April–June
+   2026, published 3 Jul; filed in October), so the two houses watch for
+   their own release shapes and surface misses as `reminders` – a reminder
+   fails the weekly run until the wave is hand-entered, or KNOWN_SKIP
+   records it as checked by hand.
+
    Usage: node .build/demographics.mjs [--refresh]
      --refresh  re-read every wave, not just the new ones
-   Last line: DEMO_STATUS {"changed":…,"added":[…],"pending":[…],"stale":[…],"dropped":[…],"skipped":[…]} */
+   Last line: DEMO_STATUS {"changed":…,"added":[…],"pending":[…],"stale":[…],"dropped":[…],"reminders":[…],"skipped":[…]} */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { ROOT, youGovSource, youGovCrosstab, demosauReport, resolveData } from "./crosstab-sources.mjs";
 import { youGovDims, DEMOS_DIM, demosLabel, redbridgeTable, resolveWaves, essentialWaves, essentialMatch, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
 import { measureCharts, FIT_LIMIT } from "./demosau-charts.mjs";
+import { watchReminders } from "./demo-watch.mjs";
 
 const OUT = path.join(ROOT, "data", "demographics.json");
-const FIRST = "2026-02-01";            // no house published these breakdowns earlier this term
+const FIRST = "2026-02-01";            // no house published these breakdowns earlier this term (except FIRST_EXTRA's)
+const FIRST_EXTRA = new Set(["YouGov|2026-01-27"]);   // the Sky News Pulse wave's Infogram crosstab, found via KNOWN_IG
 const FIRST_ESS = "2025-05-03";        // Essential's CSV visuals run since 2023 – read from the term's start
 const HOUSES = ["YouGov", "DemosAU", "RedBridge/Accent", "Resolve", "Essential"];
 const STALE_DAYS = 16;                 // a week to publish, then a weekly retry, then someone looks
 const RESOLVE_MATCH_DAYS = 4;          // the interactive can date a month a day or two off the poll row
+// The hand-entered-house watch (reminders) lives in demo-watch.mjs.
 
+/* A wave checked by hand and found to carry no breakdowns: "house|date" →
+   why. Clears both the automated-house loop and the watch reminders below. */
 const KNOWN_SKIP = {
   "DemosAU|2026-02-20": "the February report predates the Gender, Age and Education charts (an older layout)",
   "YouGov|2026-03-19": "an Australia Institute poll – no crosstab published",
@@ -141,8 +159,17 @@ const KNOWN_SKIP = {
 /* Groups a house really stopped printing, checked by hand: "house|dim|group|
    date of the first wave without it" → why. See `dropped` in the header. */
 const KNOWN_DROP = {
-  "YouGov|age|50–64|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
-  "YouGov|age|65+|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
+  // 27 Jan 2026 cut the young band alone (18–24 and 25–34); from 10 Feb it
+  // prints the pair as one 18–34 band
+  "YouGov|age|18–24|2026-02-10": "YouGov printed 18–24 and 25–34 only on 27 Jan 2026; from 10 Feb they are one 18–34 band",
+  "YouGov|age|25–34|2026-02-10": "YouGov printed 18–24 and 25–34 only on 27 Jan 2026; from 10 Feb they are one 18–34 band",
+  "YouGov|age|50–64|2026-03-24": "YouGov printed 50–64 and 65+ only in Jan–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
+  "YouGov|age|65+|2026-03-24": "YouGov printed 50–64 and 65+ only in Jan–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
+  // four income brackets ran 27 Jan–10 Feb 2026 only (10 Feb printed just
+  // the top two); no income 24 Feb–24 Mar, and from 7 Apr the scheme is the
+  // two-bracket under/over $100k
+  "YouGov|income|$100–149k|2026-02-24": "YouGov's four-bracket household-income scheme ran 27 Jan–10 Feb 2026; no income columns until 7 Apr's two-bracket under/over-$100k scheme",
+  "YouGov|income|$150k+|2026-02-24": "YouGov's four-bracket household-income scheme ran 27 Jan–10 Feb 2026; no income columns until 7 Apr's two-bracket under/over-$100k scheme",
 };
 
 /* Roy Morgan breakdowns, hand-entered from the releases (see the house note
@@ -863,6 +890,7 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "demographics-"));
 const essWaves = essentialWaves(fs.readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8"));
 try {
   const candidates = polls.filter((p) => (["YouGov", "DemosAU", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
+    || FIRST_EXTRA.has(key(p))
     || (p.pollster === "Essential" && p.date >= FIRST_ESS));
   for (const p of candidates) {
     const k = key(p);
@@ -1024,6 +1052,22 @@ for (const house of HOUSES) {
   }
 }
 
+// watch – the hand-entered houses get no stale/dropped alarms, so their
+// release shapes are watched for directly (demo-watch.mjs; the "reminders"
+// paragraph in the header). A reminder fails the weekly crosstabs run until
+// the wave is hand-entered, or KNOWN_SKIP records it as checked by hand.
+const rmDir = path.join(ROOT, ".build", "roymorgan-src");
+const reminders = watchReminders({
+  polls, waves, knownSkip: KNOWN_SKIP,
+  rmReleaseFor: (id) => {
+    if (!fs.existsSync(rmDir)) return null;
+    const f = fs.readdirSync(rmDir).find((x) => x.startsWith(`release-${id}-`) && x.endsWith(".json"));
+    if (!f) return null;
+    try { return JSON.parse(fs.readFileSync(path.join(rmDir, f), "utf8")); } catch { return null; }
+  },
+  now: new Date(),
+});
+
 const doc = {
   _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
@@ -1034,7 +1078,8 @@ const changed = !fs.existsSync(OUT) || fs.readFileSync(OUT, "utf8") !== next;
 if (changed) { fs.writeFileSync(OUT + ".tmp", next); fs.renameSync(OUT + ".tmp", OUT); }
 for (const m of pending) console.log("pending", m);
 for (const k of dropped) console.log("dropped", k, "– missing from the newest wave; fix the reader, or record it in KNOWN_DROP once checked");
+for (const r of reminders) console.log("reminder", r);
 const rsAdded = added.filter((k) => k.startsWith("Resolve|")).length;
 console.log("DEMO_STATUS " + JSON.stringify({ changed,
   added: added.filter((k) => !k.startsWith("Resolve|")).concat(rsAdded ? [`Resolve (${rsAdded} months)`] : []),
-  pending: pending.map((m) => m.split(":")[0]), stale, dropped, skipped: skipped.map(key) }));
+  pending: pending.map((m) => m.split(":")[0]), stale, dropped, reminders, skipped: skipped.map(key) }));

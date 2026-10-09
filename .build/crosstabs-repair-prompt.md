@@ -16,7 +16,7 @@ and pushes `HEAD:main` itself after your session ends.
   Their headers document every source. Each prints `pending <wave>:
   <reason>` lines and a final `VS_STATUS` / `DEMO_STATUS {...}` line;
   demographics.mjs also prints `dropped <house|dim|group|date> …` lines.
-- The wrapper fails for one of three reasons, all named in the log:
+- The wrapper fails for one of four reasons, all named in the log:
   1. **did not finish** – a script threw; the stack trace is in the log.
   2. **stale** – a wave has stayed pending more than STALE_DAYS after its
      fieldwork closed. The `pending` line for that wave gives the reason.
@@ -24,6 +24,9 @@ and pushes `HEAD:main` itself after your session ends.
      printed in two waves running (`house|dim|group|date of the first wave
      without it`). Every table still passed the gate: a column or chart the
      reader no longer recognises, or a house that stopped printing it.
+  4. **reminders** – a hand-entered house's release is waiting on
+     hand-entry work or a checked-by-hand `KNOWN_SKIP` mark. These are not
+     reader bugs; see "Reading a reminder" below.
 - Shared code: `.build/crosstab-sources.mjs` (where each house's tables are
   fetched), `.build/crosstab-parse.mjs` (the pure parsers and the gate every
   table passes: shares summing to about 100, and the all-voters column
@@ -76,8 +79,48 @@ verifiably stopped printing it, add a `KNOWN_DROP` entry in
 `.build/demographics.mjs` under the exact key from the log, with the
 evidence in its reason.
 
-Re-run the two scripts until neither lists a stale wave or a dropped group,
-run `node .build/test-crosstabs.mjs`, then `bash .build/crosstabs-updater.sh`.
+## Reading a reminder
+
+Roy Morgan, Newspoll, Fox & Hedgehog and Freshwater breakdowns are
+hand-entered blocks in `.build/demographics.mjs` (`ROYMORGAN_DEMO`,
+`ROYMORGAN_STATE`, `ROYMORGAN_COUNTRY`, `NEWSPOLL_DEMO`, `FOXHEDGEHOG_DEMO`,
+`FRESHWATER_DEMO`), so the stale/dropped machinery can't catch a missed
+arrival: a `reminder` does that instead. This is hand-entry work, never a
+code fix; every figure is re-read from the release itself before entry, and
+the gate (`sum to 100`, all-voters column matching the published total)
+still verifies the table. The `reminder` line names the wave and what
+triggered it:
+
+- `Newspoll (pooled)|<date>: …breakdowns are unentered` – the pooled
+  aggregate row exists but its printed table wasn't. Find the quarterly
+  in The Australian (Matilda can read it via `.build/newspoll-read.mjs`'s
+  Chrome path; Wikipedia's subpopulation tables carry the same figures to
+  reconcile against), then enter the table in `NEWSPOLL_DEMO` under the
+  exact wave key. If the aggregate verifiably printed nothing, a
+  `KNOWN_SKIP` entry under its key.
+- `Newspoll (pooled): no quarterly aggregate in N days` – a quarter went
+  quiet. Check The Australian's Newspoll tag page for the missing
+  quarterly; if it appeared but never reached `polls.json`, file the row
+  as a `Newspoll (pooled)` NO_AGG wave beside the others there and enter
+  its table; a checked-and-absent wave gets `KNOWN_SKIP`. A house that
+  verifiably stopped the habit is a person decision – say so, don't
+  silence the alarm.
+- `Roy Morgan|<date>` (state subsamples or a special title) or `Roy Morgan
+  (pooled)|<date>` – the release named in the poll row's `url` printed
+  demographic tables. Re-read each figure from the release text (Wikipedia
+  reconciles; the figures must come from the release), enter under the
+  right RM block with the release URL as `source`, and run
+  `node .build/demographics.mjs` until the reminder clears. A signature
+  hit on prose alone, with no printed table, is `KNOWN_SKIP` for that key.
+
+After respecting the entry, re-run `node .build/demographics.mjs` and
+`node .build/test-crosstabs.mjs`. `REMIND` clears only by the block entries
+or `KNOWN_SKIP` – never by loosening `NP_POOLED_LAG_DAYS`,
+`NP_POOLED_CADENCE_DAYS`, `RM_WATCH_DAYS` or the probe signatures.
+
+Re-run the scripts until nothing lists a stale wave, a dropped group or a
+reminder, run `node .build/test-crosstabs.mjs`, then
+`bash .build/crosstabs-updater.sh`.
 
 ## The issues tables (issues.mjs → data/issues.json)
 

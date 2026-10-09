@@ -21,7 +21,11 @@
 # failure email and agent-repair (.build/crosstabs-repair-prompt.md) take it
 # from there. So does a group demographics.mjs lists as `dropped` (a house's
 # newest wave missing a group it printed two waves running: a renamed column
-# or chart the reader no longer finds, or a house that stopped). A script
+# or chart the reader no longer finds, or a house that stopped). And so does
+# a `reminder` demographics.mjs lists for the hand-entered houses (a
+# Newspoll quarterly whose breakdowns were never entered, or a Roy Morgan
+# wave whose findings cache prints a demographic table) – that is hand-entry
+# work, or a KNOWN_SKIP mark once a wave is checked. A script
 # that doesn't finish fails the run the same way.
 #
 # Every step logs one line to .build/logs/crosstabs.log.
@@ -54,6 +58,7 @@ UNFINISHED=""
 STALE=""
 DROPPED=""
 UNKNOWN=""
+REMIND=""
 # Ipsos's Issues Monitor reports (which issues matter, and which party is
 # most capable on them) are fetched daily by .build/ipsos-updater.sh; this
 # weekly pass fetches them again, as the backstop, for issues.mjs to read.
@@ -84,7 +89,7 @@ for b in vote-switching demographics issues confidence; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
   LAST="$(echo "$OUT" | tail -1)"
-  echo "$OUT" | grep '^\(pending\|dropped\) ' | while IFS= read -r l; do log "$b: $l"; done
+  echo "$OUT" | grep '^\(pending\|dropped\|reminder\) ' | while IFS= read -r l; do log "$b: $l"; done
   case "$LAST" in
     VS_STATUS*|DEMO_STATUS*|ISSUES_STATUS*|CONFIDENCE_STATUS*) ;;
     *) [ $CODE -eq 0 ] && CODE=1 ;;
@@ -103,6 +108,9 @@ for b in vote-switching demographics issues confidence; do
   # an issue label no reader maps is left out of the figures: someone maps it
   U="$(echo "$LAST" | sed -n 's/.*"unknown":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$U" ]; then UNKNOWN="$UNKNOWN $b: $U"; fi
+  # a hand-entered house's release needs hand-entry or a KNOWN_SKIP mark
+  R="$(echo "$LAST" | sed -n 's/.*"reminders":\[\([^]]*\)\].*/\1/p')"
+  if [ -n "$R" ]; then REMIND="$REMIND $b: $R"; fi
 done
 if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then CHANGED=true; fi
 
@@ -144,6 +152,11 @@ fi
 if [ -n "$UNKNOWN" ]; then
   log "FAIL unknown issue labels – left out of the figures until issues-parse.mjs maps them:$UNKNOWN"
   echo "::error::issue labels not mapped:$UNKNOWN"
+  exit 1
+fi
+if [ -n "$REMIND" ]; then
+  log "FAIL reminders – hand-entered houses' releases waiting on hand-entry or a KNOWN_SKIP mark:$REMIND"
+  echo "::error::demographic hand-entry reminders:$REMIND"
   exit 1
 fi
 if [ -n "$DROPPED" ]; then
