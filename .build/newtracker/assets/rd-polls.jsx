@@ -340,6 +340,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (e.pubMs >= L) marks.push(<span key="latest" className="rd-tl-latest" style={{ left: pos(e.pubMs) + "%" }}></span>);
     else marks.push(<span key="latest" className="rd-tl-off rd-tl-offl" aria-hidden="true"><span className="rd-tl-dot"></span>{dm(e.pubMs)}</span>);
     if (r) {
+      /* an × where a promised date came and went, the ghost of the ring the
+         rollover carried onto the next plausible date */
+      (r.missedSlots || []).forEach((ms) => {
+        if (ms < L || ms > R) return;
+        marks.push(<span key={"x" + ms} className="rd-tl-x" style={{ left: pos(ms) + "%" }} aria-hidden="true"></span>);
+      });
       if (r.loose && !irregular(r)) {
         const a = Math.max(L, r.release - r.spread * DAY_MS), b = Math.min(R, r.release + r.spread * DAY_MS);
         marks.push(<span key="win" className="rd-tl-win" style={{ left: pos(a) + "%", width: (pos(b) - pos(a)) + "%" }}></span>);
@@ -780,10 +786,11 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       ]}>
         <span className="rd-key-item"><span className="rd-tl-keyalt" aria-hidden="true"></span>Or a week later</span>
         <span className="rd-key-item"><span className="rd-tl-keywin" aria-hidden="true"></span>Window, for irregular pollsters</span>
+        <span className="rd-key-item"><span className="rd-tl-keyx" aria-hidden="true"></span>A slot no release kept</span>
       </RdKey>
       <p className="rd-note">
         Projections read each pollster’s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.
-        {" "}A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date.
+        {" "}A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date — the × marks where it stood.
         {staleOnes.length > 0 && <> {staleOnes.map((e) => e.poll.pollster).join(" and ")} {staleOnes.length > 1 ? "have" : "has"} not published in six weeks, so {staleOnes.length > 1 ? "their polls are" : "its poll is"} outside the averages.</>}
       </p>
       {(calMonths.length > 0 || calOver.length > 0) && (

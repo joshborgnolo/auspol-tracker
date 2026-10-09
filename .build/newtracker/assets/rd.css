@@ -876,6 +876,12 @@ body.rd .rd-tl-dotlink:focus-visible { outline: 2px solid var(--accent); outline
 body.rd .rd-tl-latest { width: 11px; height: 11px; background: var(--ink); }
 body.rd .rd-tl-next { width: 13px; height: 13px; box-sizing: border-box; border: 2px solid var(--ink); background: var(--bg); z-index: 3; }
 body.rd .rd-tl-next.missed { border-color: var(--mood-neg); }
+/* an × where a slot's date came and went unreleased - history, not alarm:
+   muted grey, deliberately not the red the live overdue ring wears */
+body.rd .rd-tl-x { width: 9px; height: 9px; transform: translate(-50%, -50%); z-index: 2; }
+body.rd .rd-tl-x::before, body.rd .rd-tl-x::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.75px; height: 11px; background: var(--ink-3); }
+body.rd .rd-tl-x::before { transform: translate(-50%, -50%) rotate(45deg); }
+body.rd .rd-tl-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-tl-later { width: 8px; height: 8px; box-sizing: border-box; border: 1.5px solid var(--ink-faint); background: var(--bg); }
 body.rd .rd-tl-alt { height: 6px; border-radius: 3px; background: var(--ink-faint); opacity: 0.55; transform: translateY(-50%); z-index: 2; }
 body.rd .rd-tl-win { height: 13px; box-sizing: border-box; border: 1.5px dashed var(--ink-2); border-radius: 7px; transform: translateY(-50%); z-index: 2; background: var(--bg); }
@@ -887,6 +893,10 @@ body.rd .rd-tl-ring { display: inline-block; width: 9px; height: 9px; box-sizing
 body.rd .rd-tl-keyalt { display: inline-block; width: 22px; height: 6px; border-radius: 3px; background: var(--ink-faint); opacity: 0.55; position: relative; }
 body.rd .rd-tl-keyalt::after { content: ""; position: absolute; right: -3px; top: 50%; width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--ink-faint); background: var(--bg); transform: translateY(-50%); }
 body.rd .rd-tl-keywin { display: inline-block; width: 26px; height: 12px; box-sizing: border-box; border: 1.5px dashed var(--ink-2); border-radius: 6px; }
+body.rd .rd-tl-keyx { display: inline-block; position: relative; width: 9px; height: 9px; }
+body.rd .rd-tl-keyx::before, body.rd .rd-tl-keyx::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.75px; height: 11px; background: var(--ink-3); }
+body.rd .rd-tl-keyx::before { transform: translate(-50%, -50%) rotate(45deg); }
+body.rd .rd-tl-keyx::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-pl-key { margin-top: 14px; }
 
 /* a row opened */

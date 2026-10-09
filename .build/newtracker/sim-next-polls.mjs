@@ -361,6 +361,8 @@ function eq(name, got, want) {
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
   eq("assumed-skipped slot rolled to today, flagged", es && [es.rolled, npFmt(es.release)], [true, "Wed 9 Sep"]);
+  eq("vacated 2 Sep rides as the one missed slot; confirmed 26 Aug is not recorded",
+    es && (es.missedSlots || []).map(npFmt), ["Wed 2 Sep"]);
   eq("due-day face, tolerance open to 16 Sep", [es && es.overdue, es && es.missed], [true, false]);
   eq("panel counts to the 16 Sep edge", es && panelWhen(es), "in 7 days (or earlier today)");
   eq("no red rows anywhere", rows.every((r) => !r.missed), true);
@@ -379,6 +381,7 @@ function eq(name, got, want) {
   const items = ticker(rows, t0, nowMs);
   const es = firm(rows, "Essential");
   eq("both slots confirmed: due-day face, tolerance open", [es && es.overdue, es && es.missed], [true, false]);
+  eq("confirmed absences leave no missed-slot record", es && es.missedSlots, null);
   eq("panel counts to the 16 Sep edge", es && panelWhen(es), "in 7 days (or earlier today)");
   eq("ticker offers Essential", items.some((i) => i.firm === "Essential" && i.when === "any moment now"), true);
 }
@@ -411,6 +414,7 @@ function eq(name, got, want) {
   eq("panel names only the late Wednesday", es && [pmLabel(es), dayAlt(es)], [" (or Wed 7 Oct)", " (or 34)"]);
   eq("panel composes the one-sided tail", es && panelWhen(es), "in 27 days (or 34)");
   eq("no overdue item in the ticker", items.every((i) => !i.overdue), true);
+  eq("recorded wave: no missed slots", es && es.missedSlots, null);
 }
 
 // S6 – Roy Morgan's Monday filing unrecorded, walked through the grace and
@@ -436,6 +440,7 @@ function eq(name, got, want) {
   console.log(`${day3.label}:  ticker → ${fmtT(items3)}`);
   const rm3 = firm(rows3, "Roy Morgan");
   eq("third morning: slot assumed skipped, next Monday stands", rm3 && [rm3.rolled, npFmt(rm3.release)], [true, "Mon 7 Sep"]);
+  eq("vacated Monday rides the rolled row", rm3 && (rm3.missedSlots || []).map(npFmt), ["Mon 31 Aug"]);
   eq("third morning: no overdue row for the house", rm3 && [rm3.overdue, rm3.missed], [false, false]);
   eq("third morning: ticker counts to the new slot", items3.filter((i) => i.firm === "Roy Morgan")
     .map((i) => [i.when, !!i.overdue]), [["4 days", false]]);
@@ -476,6 +481,15 @@ function eq(name, got, want) {
      ["Spectre Strategy", "43 days"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);
+  /* every vacated weekday accumulates: Morgan rolled four Mondays along to
+     Mon 12 Oct, Essential six assumed Wednesdays to Wed 14 Oct - and its
+     confirmed 26 Aug absence rides neither list */
+  eq("Roy Morgan's skipped Mondays accumulated",
+    firm(rows, "Roy Morgan") && firm(rows, "Roy Morgan").missedSlots.map(npFmt),
+    ["Mon 14 Sep", "Mon 21 Sep", "Mon 28 Sep", "Mon 5 Oct"]);
+  eq("Essential's assumed Wednesdays accumulated, confirmed skip unrecorded",
+    (firm(rows, "Essential").missedSlots || []).map(npFmt),
+    ["Wed 2 Sep", "Wed 9 Sep", "Wed 16 Sep", "Wed 23 Sep", "Wed 30 Sep", "Wed 7 Oct"]);
 }
 
 // S8 – Mon 28 Sep, 10am: September's measured window (9–27) closed yesterday

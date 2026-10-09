@@ -263,6 +263,22 @@ the fix-proofs. Pattern for a facet-rendering change:
   machine with an unfixed as-of-this-date bug: the tip sometimes opens past
   the screen edge on the SECOND dot click after another dot was clicked
   (first click is fine). Investigated 2026-09-28, root cause not landed.
+- The strip's **missed-slot × marks** (`.rd-tl-x`, shipped 9 Oct 2026):
+  each vacated ASSUMED-skip slot date rides the projection rows as
+  `missedSlots` (see the next-polls-projection skill), and `strip(e)`
+  draws a muted-grey × (`--ink-3`, two 45°/−45° rotated bars, ~9px box,
+  keyed `"x" + ms`) at every in-window one — settled history, deliberately
+  NOT the `.rd-tl-next.missed` red. Publisher-CONFIRMED skips
+  (skippedSlots) leave no sad record anywhere and render nothing. The key
+  gains `.rd-tl-keyx` ("A slot no release kept", a bare × glyph matching
+  the strip mark) and the `.rd-note` under the table explains the roll-off: "A
+  pollster that misses its slot shows as overdue for two days, then the
+  forecast moves on to the next plausible date — the × marks where it
+  stood." Mark is `aria-hidden` and stays out of the dot/interactive
+  stacking (z-index 2, no tooltip). Pinned by sim-next-polls S4–S7 (data
+  side) and probe `.matilda/probe/pl-missed-x.mjs` (Dom side, both
+  rungs: offsets vs pos(ms), inside-strip containment, legend, note, no
+  horizontal overflow).
 - Fonts: `tabular-nums` on `.rd-pl`; heavy `.rd-pl-main`/`rd-pl-sub` sizing map
   lives in `rd.css:588-598` with phone overrides in the 900px block.
 

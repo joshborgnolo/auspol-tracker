@@ -3672,6 +3672,10 @@ body.rd .rd-tl-dotlink:focus-visible { outline: 2px solid var(--accent); outline
 body.rd .rd-tl-latest { width: 11px; height: 11px; background: var(--ink); }
 body.rd .rd-tl-next { width: 13px; height: 13px; box-sizing: border-box; border: 2px solid var(--ink); background: var(--bg); z-index: 3; }
 body.rd .rd-tl-next.missed { border-color: var(--mood-neg); }
+body.rd .rd-tl-x { width: 9px; height: 9px; transform: translate(-50%, -50%); z-index: 2; }
+body.rd .rd-tl-x::before, body.rd .rd-tl-x::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.75px; height: 11px; background: var(--ink-3); }
+body.rd .rd-tl-x::before { transform: translate(-50%, -50%) rotate(45deg); }
+body.rd .rd-tl-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-tl-later { width: 8px; height: 8px; box-sizing: border-box; border: 1.5px solid var(--ink-faint); background: var(--bg); }
 body.rd .rd-tl-alt { height: 6px; border-radius: 3px; background: var(--ink-faint); opacity: 0.55; transform: translateY(-50%); z-index: 2; }
 body.rd .rd-tl-win { height: 13px; box-sizing: border-box; border: 1.5px dashed var(--ink-2); border-radius: 7px; transform: translateY(-50%); z-index: 2; background: var(--bg); }
@@ -3683,6 +3687,10 @@ body.rd .rd-tl-ring { display: inline-block; width: 9px; height: 9px; box-sizing
 body.rd .rd-tl-keyalt { display: inline-block; width: 22px; height: 6px; border-radius: 3px; background: var(--ink-faint); opacity: 0.55; position: relative; }
 body.rd .rd-tl-keyalt::after { content: ""; position: absolute; right: -3px; top: 50%; width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--ink-faint); background: var(--bg); transform: translateY(-50%); }
 body.rd .rd-tl-keywin { display: inline-block; width: 26px; height: 12px; box-sizing: border-box; border: 1.5px dashed var(--ink-2); border-radius: 6px; }
+body.rd .rd-tl-keyx { display: inline-block; position: relative; width: 9px; height: 9px; }
+body.rd .rd-tl-keyx::before, body.rd .rd-tl-keyx::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1.75px; height: 11px; background: var(--ink-3); }
+body.rd .rd-tl-keyx::before { transform: translate(-50%, -50%) rotate(45deg); }
+body.rd .rd-tl-keyx::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-pl-key { margin-top: 14px; }
 body.rd .rd-pl-detail {
   display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; row-gap: 24px;
@@ -78602,6 +78610,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
     let field = monthEnd ? stepFrom(Date.parse(c.last)) : Date.parse(c.last) + c.cadence * DAY_MS;
     let release = monthEnd ? field : relOf(field);
     let rolled = false;
+    const missedSlots = [];
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
       let meSlot = release;
@@ -78616,7 +78625,10 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
         release = relOf(field);
       };
       while ((c.skipped || []).includes(isoDay(release))) rollOn();
-      if (!c.loose) while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) rollOn();
+      if (!c.loose) while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) {
+        missedSlots.push(release);
+        rollOn();
+      }
     }
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
@@ -78643,6 +78655,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
             slotEarly: null,
             slotLate: null,
             rolled: false,
+            missedSlots: missedSlots.length ? missedSlots.slice() : null,
             inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
             opensIn: Math.round((open - t0) / DAY_MS),
             closesIn: Math.round((close - t0) / DAY_MS)
@@ -78665,6 +78678,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
         slotEarly: slotShift == null ? null : Math.max(0, c.spreadEarly + slotShift),
         slotLate: slotShift == null ? null : Math.max(0, c.spreadLate - slotShift),
         rolled: rolled && i === 0,
+        missedSlots: missedSlots.length ? missedSlots.slice() : null,
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
         closesIn: Math.round((release + winHalf * DAY_MS - t0) / DAY_MS),
@@ -106482,6 +106496,17 @@ function RdPolls({
       className: "rd-tl-dot"
     }), dm(e.pubMs)));
     if (r) {
+      (r.missedSlots || []).forEach(ms => {
+        if (ms < L || ms > R) return;
+        marks.push(React.createElement("span", {
+          key: "x" + ms,
+          className: "rd-tl-x",
+          style: {
+            left: pos(ms) + "%"
+          },
+          "aria-hidden": "true"
+        }));
+      });
       if (r.loose && !irregular(r)) {
         const a = Math.max(L, r.release - r.spread * DAY_MS),
           b = Math.min(R, r.release + r.spread * DAY_MS);
@@ -107077,9 +107102,14 @@ function RdPolls({
   }, React.createElement("span", {
     className: "rd-tl-keywin",
     "aria-hidden": "true"
-  }), "Window, for irregular pollsters")), React.createElement("p", {
+  }), "Window, for irregular pollsters"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-tl-keyx",
+    "aria-hidden": "true"
+  }), "A slot no release kept")), React.createElement("p", {
     className: "rd-note"
-  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
+  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue for two days, then the forecast moves on to the next plausible date \u2014 the \xD7 marks where it stood.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
     className: "rd-evdrop rd-cal"
   }, React.createElement("summary", null, "Release calendar"), React.createElement("div", {
     className: "rd-cal-body"

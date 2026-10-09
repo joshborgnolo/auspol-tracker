@@ -21,7 +21,10 @@
    forward onto a date nobody has published on the strength of a guess. The
    one bound on that is NP_ASSUME_SKIP_DAYS below: a dated slot that stays
    unrecorded past its grace is treated as one that did not happen, and the
-   projection names the house's next plausible date instead.
+   projection names the house's next plausible date instead. The vacated
+   slot dates ride the rows as `missedSlots` so a renderer can leave a mark
+   where a promised date came and went; publisher-confirmed absences stay
+   unrecorded, as before.
    ==================================================================== */
 const DAY_MS = 86400000;
 const NP_HORIZON_DAYS = 28;   // how far out a house's 2nd, 3rd… slots reach
@@ -280,6 +283,10 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
        well and the wave is not late any more, it is gone - the slot is the
        next month-end's, stepped from the original slot. */
     let rolled = false;
+    /* every ASSUMED skip's vacated slot, so a renderer can leave a mark
+       where a promised date came and went (confirmed absentees in the
+       skipped lists deliberately leave no trace) */
+    const missedSlots = [];
     {
       const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
       let meSlot = release;
@@ -309,7 +316,10 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
          date that reads overdue inside the resumption window), so a roll
          stops at the break and the summer branch below shapes it instead. */
       if (!c.loose)
-        while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) rollOn();
+        while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) {
+          missedSlots.push(release);
+          rollOn();
+        }
     }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
@@ -336,6 +346,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
             ...c, field, release: (open + close) / 2, ahead: 0,
             loose: true, summer: true, overdue: missed, missed,
             spread: half, winHalf: half, slotEarly: null, slotLate: null, rolled: false,
+            missedSlots: missedSlots.length ? missedSlots.slice() : null,
             inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
             opensIn: Math.round((open - t0) / DAY_MS),
             closesIn: Math.round((close - t0) / DAY_MS),
@@ -381,6 +392,7 @@ function npProjectAt(nowOverride, horizonDays, includeTracked) {
            the rolled 35-day slot then had 42 named as its miss) - only the
            first row of a walk can sit on it. */
         rolled: rolled && i === 0,
+        missedSlots: missedSlots.length ? missedSlots.slice() : null,
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
         /* Overdue is not missed while the ± window is still open: the row
