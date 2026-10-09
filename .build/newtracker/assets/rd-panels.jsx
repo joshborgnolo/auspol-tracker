@@ -4041,6 +4041,113 @@ const CONF_SHEET = {
 const confYmIdx = (ym) => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
 const confYmOf = (i) => Math.floor(i / 12) + "-" + String((i % 12) + 1).padStart(2, "0");
 const RD_CONF_VIEWS = [{ id: "consumer", label: "Consumers" }, { id: "business", label: "Businesses" }];
+/* ------------------------------------------------ Release calendar ----
+   The confidence gauges' own calendar fold under this panel (user call
+   2026-10-09: split out of the Latest-polls fold, which keeps polls and
+   the Newgate/Ipsos monitors). The same machinery lists it as lists the
+   polls calendar: gen-data mints each series' releases as a
+   tracked:"confidence" cadence row, np-project's walk projects it, and
+   this fold keeps ONLY those rows while the polls fold keeps everything
+   but them. Month heads, date cells and the "Due, not yet recorded"
+   lead-in are the polls fold's shapes, reused via the same rd-cal
+   classes. */
+const RD_CONF_CAL_DAYS = 62;
+function RdConfCal() {
+  const D = window.AUSPOL;
+  const proj = window.AP && window.AP.nextPolls
+    ? window.AP.nextPolls(null, { horizonDays: RD_CONF_CAL_DAYS, includeTracked: true })
+    : { rows: [], t0: 0 };
+  const { t0 } = proj;
+  const rows = proj.rows.filter((r) => r.tracked === "confidence");
+  if (!rows.length || !t0) return null;
+  const DAY = 86400000;
+  const WDs = (ms) => WD[new Date(ms).getUTCDay()].slice(0, 3);
+  const dm = (ms) => { const d = new Date(ms); return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1); };
+  const wdm = (ms) => WDs(ms) + " " + dm(ms);
+  const when = (n) => (n === -1 ? "yesterday" : n < 0 ? -n + " days overdue" : n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days");
+  const irregular = (r) => r && r.cadence > 60;
+  const over = [], items = [];
+  const days = new Map();   /* a release date -> the series landing on it */
+  rows.forEach((r) => {
+    if (r.overdue) { over.push(r); return; }
+    const me = { name: r.pollster, site: r.site, freq: r.cadence <= 10 ? "weekly" : "monthly" };
+    if (r.loose && !irregular(r)) {
+      items.push({ key: "w" + r.pollster, at: r.release - r.spread * DAY, close: r.release + r.spread * DAY, win: true, spread: r.spread, who: [me] });
+    } else if (irregular(r)) {
+      items.push({ key: "i" + r.pollster + "-" + (r.ahead || 0), at: r.release, irr: true, spread: r.spread, who: [me] });
+    } else {
+      const iso = new Date(r.release).toISOString().slice(0, 10);
+      let e = days.get(iso);
+      if (!e) { e = { key: "d" + iso, at: r.release, who: [] }; days.set(iso, e); items.push(e); }
+      e.who.push(me);
+    }
+  });
+  over.sort((a, b) => a.release - b.release);
+  items.sort((a, b) => a.at - b.at);
+  items.forEach((it) => {
+    if (it.win) it.q = it.at <= t0 ? "open now" : "window";
+    else if (it.irr) it.q = "give or take " + Math.round(it.spread) + " days";
+    else if (it.at === t0) it.q = "today";
+    else if (it.at === t0 + DAY) it.q = "tomorrow";
+  });
+  const months = [];
+  items.forEach((it) => {
+    const ym = new Date(it.at).toISOString().slice(0, 7);
+    const g = months[months.length - 1];
+    if (!g || g.ym !== ym) months.push({ ym, items: [it] });
+    else g.items.push(it);
+  });
+  const spanTxt = (a, b) => {
+    const A = new Date(a), B = new Date(b);
+    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + "–" + dm(b);
+  };
+  const dateTxt = (it) => it.win ? spanTxt(it.at, it.close)
+    : it.irr ? "About " + dm(it.at)
+    : WDs(it.at) + " " + new Date(it.at).getUTCDate();
+  const overTxt = (r) => r.loose && !irregular(r) ? spanTxt(r.release - r.spread * DAY, r.release + r.spread * DAY)
+    : irregular(r) ? "About " + dm(r.release)
+    : wdm(r.release);
+  const who = (w, i) => (
+    <span key={String(i)}>{i > 0 ? ", " : ""}{w.site
+      ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next release lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
+      : w.name}<span className="rd-cal-track">{w.freq}</span></span>);
+  return (
+    <details className="rd-evdrop rd-cal rd-conf-cal">
+      <summary>Release calendar</summary>
+      <div className="rd-cal-body">
+        {over.length > 0 && (
+          <div className="rd-cal-sec rd-cal-sec-over">
+            <h4 className="rd-cal-m">Due, not yet recorded</h4>
+            <ul className="rd-cal-list">
+              {over.map((r) => (
+                <li key={r.pollster}>
+                  <span className="rd-cal-d">{overTxt(r)}</span>
+                  <span className="rd-cal-w">{who({ name: r.pollster, site: r.site, freq: r.cadence <= 10 ? "weekly" : "monthly" }, 0)}</span>
+                  {r.missed && <span className="rd-cal-q">{when(r.closesIn)}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {months.map((g) => (
+          <div className="rd-cal-sec" key={g.ym}>
+            <h4 className="rd-cal-m">{rdMonthYear(g.ym)}</h4>
+            <ul className="rd-cal-list">
+              {g.items.map((it) => (
+                <li key={it.key}>
+                  <span className="rd-cal-d">{dateTxt(it)}</span>
+                  <span className="rd-cal-w">{it.who.map((w, i) => who(w, i))}</span>
+                  {it.q && <span className="rd-cal-q">{it.q}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <p className="rd-note">The next editions of the four gauges charted above — ANZ–Roy Morgan’s and Westpac–MI’s consumer series, Roy Morgan’s and NAB’s business series — projected from each series’ own release rhythm, exactly as the Latest-polls calendar projects a pollster. A date is the earliest a release could land, never a promise; a series that misses its slot stays listed in the due lead-in until the release is recorded.</p>
+    </details>
+  );
+}
 function RdConfidence({ rangeId }) {
   const { D, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
@@ -4477,6 +4584,7 @@ function RdConfidence({ rangeId }) {
         </RdKey>
       </div>
       </RdCrossfade>
+      <RdConfCal />
       <HowTo paras={[
         <>Four published gauges of economic confidence, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,

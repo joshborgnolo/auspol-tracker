@@ -5257,8 +5257,10 @@ for (const p of POLLS) {
 }
 /* The ECONOMIC-SENTIMENT gauges publish on their own rhythms too - ANZ-Roy
    Morgan consumer confidence weekly, Westpac-MI sentiment, Roy Morgan
-   business confidence and NAB's business survey monthly - and the release
-   calendar is where a reader plans around them. Minted like the monitors
+   business confidence and NAB's business survey monthly - and the Economic
+   sentiment panel's own Release calendar fold is where a reader plans
+   around them (RdConfCal; the Latest-polls fold filters them back out).
+   Minted like the monitors
    above from the release dates data/confidence.json records, in the same
    row shape, so the one measurement block below decides date vs window for
    them as it does for every house. The series NAME is the row's firm:

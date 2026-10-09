@@ -104724,6 +104724,150 @@ const RD_CONF_VIEWS = [{
   id: "business",
   label: "Businesses"
 }];
+const RD_CONF_CAL_DAYS = 62;
+function RdConfCal() {
+  const D = window.AUSPOL;
+  const proj = window.AP && window.AP.nextPolls ? window.AP.nextPolls(null, {
+    horizonDays: RD_CONF_CAL_DAYS,
+    includeTracked: true
+  }) : {
+    rows: [],
+    t0: 0
+  };
+  const {
+    t0
+  } = proj;
+  const rows = proj.rows.filter(r => r.tracked === "confidence");
+  if (!rows.length || !t0) return null;
+  const DAY = 86400000;
+  const WDs = ms => WD[new Date(ms).getUTCDay()].slice(0, 3);
+  const dm = ms => {
+    const d = new Date(ms);
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const wdm = ms => WDs(ms) + " " + dm(ms);
+  const when = n => n === -1 ? "yesterday" : n < 0 ? -n + " days overdue" : n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days";
+  const irregular = r => r && r.cadence > 60;
+  const over = [],
+    items = [];
+  const days = new Map();
+  rows.forEach(r => {
+    if (r.overdue) {
+      over.push(r);
+      return;
+    }
+    const me = {
+      name: r.pollster,
+      site: r.site,
+      freq: r.cadence <= 10 ? "weekly" : "monthly"
+    };
+    if (r.loose && !irregular(r)) {
+      items.push({
+        key: "w" + r.pollster,
+        at: r.release - r.spread * DAY,
+        close: r.release + r.spread * DAY,
+        win: true,
+        spread: r.spread,
+        who: [me]
+      });
+    } else if (irregular(r)) {
+      items.push({
+        key: "i" + r.pollster + "-" + (r.ahead || 0),
+        at: r.release,
+        irr: true,
+        spread: r.spread,
+        who: [me]
+      });
+    } else {
+      const iso = new Date(r.release).toISOString().slice(0, 10);
+      let e = days.get(iso);
+      if (!e) {
+        e = {
+          key: "d" + iso,
+          at: r.release,
+          who: []
+        };
+        days.set(iso, e);
+        items.push(e);
+      }
+      e.who.push(me);
+    }
+  });
+  over.sort((a, b) => a.release - b.release);
+  items.sort((a, b) => a.at - b.at);
+  items.forEach(it => {
+    if (it.win) it.q = it.at <= t0 ? "open now" : "window";else if (it.irr) it.q = "give or take " + Math.round(it.spread) + " days";else if (it.at === t0) it.q = "today";else if (it.at === t0 + DAY) it.q = "tomorrow";
+  });
+  const months = [];
+  items.forEach(it => {
+    const ym = new Date(it.at).toISOString().slice(0, 7);
+    const g = months[months.length - 1];
+    if (!g || g.ym !== ym) months.push({
+      ym,
+      items: [it]
+    });else g.items.push(it);
+  });
+  const spanTxt = (a, b) => {
+    const A = new Date(a),
+      B = new Date(b);
+    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + "–" + dm(b);
+  };
+  const dateTxt = it => it.win ? spanTxt(it.at, it.close) : it.irr ? "About " + dm(it.at) : WDs(it.at) + " " + new Date(it.at).getUTCDate();
+  const overTxt = r => r.loose && !irregular(r) ? spanTxt(r.release - r.spread * DAY, r.release + r.spread * DAY) : irregular(r) ? "About " + dm(r.release) : wdm(r.release);
+  const who = (w, i) => React.createElement("span", {
+    key: String(i)
+  }, i > 0 ? ", " : "", w.site ? React.createElement("a", {
+    href: w.site,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    title: "Where " + w.name + "’s next release lands first"
+  }, w.name, React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")) : w.name, React.createElement("span", {
+    className: "rd-cal-track"
+  }, w.freq));
+  return React.createElement("details", {
+    className: "rd-evdrop rd-cal rd-conf-cal"
+  }, React.createElement("summary", null, "Release calendar"), React.createElement("div", {
+    className: "rd-cal-body"
+  }, over.length > 0 && React.createElement("div", {
+    className: "rd-cal-sec rd-cal-sec-over"
+  }, React.createElement("h4", {
+    className: "rd-cal-m"
+  }, "Due, not yet recorded"), React.createElement("ul", {
+    className: "rd-cal-list"
+  }, over.map(r => React.createElement("li", {
+    key: r.pollster
+  }, React.createElement("span", {
+    className: "rd-cal-d"
+  }, overTxt(r)), React.createElement("span", {
+    className: "rd-cal-w"
+  }, who({
+    name: r.pollster,
+    site: r.site,
+    freq: r.cadence <= 10 ? "weekly" : "monthly"
+  }, 0)), r.missed && React.createElement("span", {
+    className: "rd-cal-q"
+  }, when(r.closesIn)))))), months.map(g => React.createElement("div", {
+    className: "rd-cal-sec",
+    key: g.ym
+  }, React.createElement("h4", {
+    className: "rd-cal-m"
+  }, rdMonthYear(g.ym)), React.createElement("ul", {
+    className: "rd-cal-list"
+  }, g.items.map(it => React.createElement("li", {
+    key: it.key
+  }, React.createElement("span", {
+    className: "rd-cal-d"
+  }, dateTxt(it)), React.createElement("span", {
+    className: "rd-cal-w"
+  }, it.who.map((w, i) => who(w, i))), it.q && React.createElement("span", {
+    className: "rd-cal-q"
+  }, it.q))))))), React.createElement("p", {
+    className: "rd-note"
+  }, "The next editions of the four gauges charted above \u2014 ANZ\u2013Roy Morgan\u2019s and Westpac\u2013MI\u2019s consumer series, Roy Morgan\u2019s and NAB\u2019s business series \u2014 projected from each series\u2019 own release rhythm, exactly as the Latest-polls calendar projects a pollster. A date is the earliest a release could land, never a promise; a series that misses its slot stays listed in the due lead-in until the release is recorded."));
+}
 function RdConfidence({
   rangeId
 }) {
@@ -105324,7 +105468,7 @@ function RdConfidence({
   }, React.createElement("span", {
     className: "rd-cs-keythin",
     "aria-hidden": "true"
-  }), "Monthly history back to ", histX0, ", as the house published it"))))), React.createElement(HowTo, {
+  }), "Monthly history back to ", histX0, ", as the house published it"))))), React.createElement(RdConfCal, null), React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Four published gauges of economic confidence, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
   }), React.createElement("div", {
     className: "rd-foot"
@@ -106214,10 +106358,11 @@ function RdPolls({
   }) : {
     rows: []
   };
+  const calRows = calProj.rows.filter(r => r.tracked !== "confidence");
   const calOver = [],
     calItems = [];
   const calDays = new Map();
-  calProj.rows.forEach(r => {
+  calRows.forEach(r => {
     if (r.overdue) {
       calOver.push(r);
       return;
@@ -106513,7 +106658,7 @@ function RdPolls({
     className: "rd-cal-q"
   }, it.q))))))), React.createElement("p", {
     className: "rd-note"
-  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read. The confidence rows \u2014 ANZ\u2013Roy Morgan and Westpac\u2013MI for consumers, Roy Morgan and NAB for businesses \u2014 are the releases the Economic sentiment panel reads.")));
+  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.")));
 }
 Object.assign(window, {
   RdPolls

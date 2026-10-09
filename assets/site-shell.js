@@ -198,10 +198,13 @@ function spreadDays(c, sp) {
    calendar lays two months of slots out of the one projection); the memo
    keys on the pair, so the default call's cache is never poisoned by a
    wider one. `opts.includeTracked` admits gen-data's `tracked` cadence rows -
-   the direction and issues monitors, which schedule releases but file no
-   poll; every other consumer keeps the default false, because a tab-bar
-   countdown or a "next poll" that includes a national-mood survey is a
-   mis-speak, labelled or not. */
+   the direction and issues monitors and the economic-confidence gauges,
+   which schedule releases but file no poll; every other consumer keeps the
+   default false, because a tab-bar countdown or a "next poll" that includes
+   a national-mood survey or a confidence index is a mis-speak, labelled or
+   not. The two calendar folds then split the tracked rows between them:
+   Latest polls keeps direction/issues, Economic sentiment keeps
+   confidence. */
 let npProjMemo = null;
 function npProject(nowOverride, opts) {
   const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;

@@ -20,7 +20,10 @@ const RD_STALE_DAYS = 42;
 const RD_CAL_DAYS = 62;
 /* the calendar's scope is TRACKED releases, not just polls (user call
    2026-10-09): gen-data's `tracked` cadence rows join its list, named for
-   the monitor they schedule - every other projection consumer is poll-only */
+   the monitor they schedule - every other projection consumer is poll-only.
+   The confidence gauges' tracked rows are folded back OUT of this fold
+   (they list under Economic sentiment's own Release calendar);
+   RD_CAL_TRACK names the kinds this fold does list */
 const RD_CAL_TRACK = { direction: "Mood of the Nation", issues: "Issues Monitor" };
 
 /* the table's shape of a poll, for a pollster with a projection but no row
@@ -641,11 +644,15 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
      window the release can fall anywhere in. Only a house's first slot can
      already be due - the walk stops there - so the due lead-in lists at
      most one per house, the same standing claim the table makes rather
-     than a second guess. */
+     than a second guess. The economic-confidence gauges ride the same
+     projection but list under Economic sentiment's own calendar fold, so
+     this fold keeps polls and the two monitors only (user call
+     2026-10-09). */
   const calProj = window.AP.nextPolls ? window.AP.nextPolls(null, { horizonDays: RD_CAL_DAYS, includeTracked: true }) : { rows: [] };
+  const calRows = calProj.rows.filter((r) => r.tracked !== "confidence");
   const calOver = [], calItems = [];
   const calDays = new Map();   /* a release date -> the houses landing on it */
-  calProj.rows.forEach((r) => {
+  calRows.forEach((r) => {
     if (r.overdue) { calOver.push(r); return; }
     const me = { name: r.pollster, site: r.site, tracked: r.tracked };
     if (r.loose && !irregular(r)) {
@@ -812,7 +819,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
               </div>
             ))}
           </div>
-          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read. The confidence rows — ANZ–Roy Morgan and Westpac–MI for consumers, Roy Morgan and NAB for businesses — are the releases the Economic sentiment panel reads.</p>
+          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added. The Mood of the Nation and Issues Monitor rows (SEC Newgate, Ipsos) publish no vote polls; they are the releases the Direction and issues panels read.</p>
         </details>
       )}
     </RdSec>
