@@ -43,9 +43,11 @@
 # Generated paths a rebase may resolve blindly (rung 1), as gitattributes
 # lines. prediction/ is NOT here: refresh-prediction.mjs, not build.mjs,
 # writes it, so a conflict there takes rung 3 and the re-run regenerates it.
+# vic/index.html IS here: BUILD_JUR=vic build.mjs writes it and refresh_site
+# regenerates it on rung 2 like the rest.
 push_main_regen_attrs() {
   printf '%s merge=auspol-regen\n' index.html feed.xml sitemap.xml robots.txt \
-    'assets/**' '.build/newtracker/assets/**'
+    vic/index.html 'assets/**' '.build/newtracker/assets/**'
 }
 
 # The wrapper that sourced this file, and its arguments, for rung 3. Only a
@@ -70,7 +72,7 @@ push_main() {
   log "push rejected; rebasing onto origin/main (generated files are rebuilt, not merged)"
   local f rebuild=false
   for f in "$@"; do
-    case "$f" in index.html|feed.xml|sitemap.xml|robots.txt|assets|assets/*) rebuild=true ;; esac
+    case "$f" in index.html|feed.xml|sitemap.xml|robots.txt|vic/index.html|assets|assets/*) rebuild=true ;; esac
   done
   # rung 1 — the attributes live in a scratch file inside .git, named by -c
   # for this one command, so no human merge ever inherits the blind driver
@@ -280,15 +282,17 @@ freshness_sync() {
 # favicon PNG joined the build (2026-09-19) its three files had to be added
 # to all twenty-two copies by hand. stage_dataset also stages assets/ whole
 # (hashed fonts and cycle-source rename themselves), so a file under assets/
-# can't be left behind even if it's missing here.
+# can't be left behind even if it's missing here. vic/index.html joined the
+# list when refresh_site began regenerating /vic/ too (2026-10-09).
 # shellcheck disable=SC2034 # read by the wrappers that source this file
-SITE_FILES=(index.html feed.xml sitemap.xml robots.txt
+SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
   assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
 
 # ---------------------------------------------------------------------------
 # refresh_site — the shared validate-then-write half of every data wrapper:
-# build → gated share-card redraw → gated favicon redraw → restamp build.
+# build → gated share-card redraw → gated favicon redraw → restamp build →
+# vic build.
 #
 # Why the builds and renders interleave this way: render-card draws from the
 # BUILT page, so the build has to run first or the card previews yesterday's
@@ -317,6 +321,18 @@ refresh_site() {
   fi
   if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
     log "FAIL build (card restamp)"; return 1
+  fi
+  # /vic/ is this same build on Victorian data (BUILD_JUR=vic), and nothing
+  # else writes vic/index.html – regenerate it on every refresh or the page
+  # rots against the shared templates, assets and fonts. The worked failure
+  # is the 2026-10-09 site-check red train: a federal font-list change swept
+  # the italic-600 woff2 the five-day-old vic @font-face still pointed at,
+  # and site-check failed class 2 on all fifteen pushes that day. Warn-only,
+  # like the card and favicon renders: a vic break must never block a
+  # federal data commit – test-vic-build (npm test) is the red surface.
+  if ! BUILD_JUR=vic node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+    log "WARN vic build failed; vic/index.html left stale"
+    echo "::warning::vic build failed; vic/index.html left stale"
   fi
   stage_dataset
   return 0
