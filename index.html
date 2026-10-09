@@ -3254,6 +3254,19 @@ body.rd .chart:has(> .chart-copy-btn) + .rd-evdrop { margin-top: 0; }
 body.rd .rd-evdrop > summary { cursor: pointer; width: fit-content; padding: 4px 0; font-weight: 600; font-size: 13px; color: var(--ink-2); }
 @media (hover: hover) { body.rd .rd-evdrop > summary:hover { color: var(--ink); } }
 body.rd .rd-evdrop .rd-evlist { margin-top: 8px; }
+body.rd .rd-cal-body { margin-top: 8px; }
+body.rd .rd-cal-sec + .rd-cal-sec { margin-top: 14px; }
+body.rd .rd-cal-m { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+body.rd .rd-cal-list { list-style: none; margin: 2px 0 0; padding: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
+body.rd .rd-cal-list li { display: flex; align-items: baseline; gap: 14px; padding: 3px 0; }
+body.rd .rd-cal-d { flex: 0 0 auto; min-width: 86px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
+body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
+@media (max-width: 640px) {
+  body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
+  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 98px; }
+}
 body.rd .rd-xf { position: relative; }
 body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .13s ease-out both; }
 body.rd .rd-xf-now.in { animation: rd-xf-in .2s ease-out .12s both; }
@@ -77164,21 +77177,23 @@ function spreadDays(c, sp) {
   return c.releaseDow != null && !c.loose ? 7 * Math.floor((sp + 3) / 7) : sp;
 }
 let npProjMemo = null;
-function npProject(nowOverride) {
+function npProject(nowOverride, opts) {
+  const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
   if (!nowOverride) {
     const e = easternNow(),
       k = e.day + e.mins * 60000;
-    if (npProjMemo && npProjMemo.k === k) return npProjMemo.v;
-    const v = npProjectAt(e);
+    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays) return npProjMemo.v;
+    const v = npProjectAt(e, horizonDays);
     npProjMemo = {
       k,
+      h: horizonDays,
       v
     };
     return v;
   }
-  return npProjectAt(nowOverride);
+  return npProjectAt(nowOverride, horizonDays);
 }
-function npProjectAt(nowOverride) {
+function npProjectAt(nowOverride, horizonDays) {
   const {
     D
   } = window.AP;
@@ -77196,7 +77211,7 @@ function npProjectAt(nowOverride) {
     return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
   };
   const rows = [];
-  const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
+  const horizon = t0 + (horizonDays || NP_HORIZON_DAYS) * DAY_MS;
   cad.forEach(c => {
     if (c.calMonth) {
       const ld = new Date(Date.parse(c.last));
@@ -104453,6 +104468,7 @@ const RD_PL_LABEL = {
 };
 const RD_PL_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
 const RD_STALE_DAYS = 42;
+const RD_CAL_DAYS = 62;
 function rdPollRow(p) {
   const pub = p.published || p.released;
   const d = new Date(pub.slice(0, 10) + "T00:00:00Z");
@@ -105262,6 +105278,72 @@ function RdPolls({
     const rows = plRef.current ? plRef.current.querySelectorAll(".rd-pl-item > .rd-pl-row") : [];
     if (rows[j]) rows[j].focus();
   };
+  const calProj = window.AP.nextPolls ? window.AP.nextPolls(null, {
+    horizonDays: RD_CAL_DAYS
+  }) : {
+    rows: []
+  };
+  const calOver = [],
+    calItems = [];
+  const calDays = new Map();
+  calProj.rows.forEach(r => {
+    if (r.overdue) {
+      calOver.push(r);
+      return;
+    }
+    if (r.loose && !irregular(r)) {
+      calItems.push({
+        key: "w" + r.pollster,
+        at: r.release - r.spread * DAY_MS,
+        close: r.release + r.spread * DAY_MS,
+        win: true,
+        spread: r.spread,
+        who: [r.pollster]
+      });
+    } else if (irregular(r)) {
+      calItems.push({
+        key: "i" + r.pollster + "-" + (r.ahead || 0),
+        at: r.release,
+        irr: true,
+        spread: r.spread,
+        who: [r.pollster]
+      });
+    } else {
+      const iso = new Date(r.release).toISOString().slice(0, 10);
+      let e = calDays.get(iso);
+      if (!e) {
+        e = {
+          key: "d" + iso,
+          at: r.release,
+          who: []
+        };
+        calDays.set(iso, e);
+        calItems.push(e);
+      }
+      e.who.push(r.pollster);
+    }
+  });
+  calOver.sort((a, b) => a.release - b.release);
+  calItems.sort((a, b) => a.at - b.at);
+  calItems.forEach(it => {
+    if (it.win) it.q = it.at <= t0 ? "open now" : "window";else if (it.irr) it.q = "give or take " + Math.round(it.spread) + " days";else if (it.at === t0) it.q = "today";else if (it.at === t0 + DAY_MS) it.q = "tomorrow";
+  });
+  const calMonths = [];
+  calItems.forEach(it => {
+    const ym = new Date(it.at).toISOString().slice(0, 7);
+    const g = calMonths[calMonths.length - 1];
+    if (!g || g.ym !== ym) calMonths.push({
+      ym,
+      items: [it]
+    });else g.items.push(it);
+  });
+  const calSpanTxt = (a, b) => {
+    const A = new Date(a),
+      B = new Date(b);
+    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b);
+  };
+  const calDateTxt = it => it.win ? calSpanTxt(it.at, it.close) : it.irr ? "About " + dm(it.at) : WDs(it.at) + " " + new Date(it.at).getUTCDate();
+  const calOverTxt = r => r.loose && !irregular(r) ? calSpanTxt(r.release - r.spread * DAY_MS, r.release + r.spread * DAY_MS) : irregular(r) ? "About " + dm(r.release) : wdm(r.release);
   return React.createElement(RdSec, {
     id: "latest-polls",
     cls: "rd-polls",
@@ -105443,7 +105525,42 @@ function RdPolls({
     "aria-hidden": "true"
   }), "Window, for irregular pollsters")), React.createElement("p", {
     className: "rd-note"
-  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue until the release is added.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")));
+  }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue until the release is added.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
+    className: "rd-evdrop rd-cal"
+  }, React.createElement("summary", null, "Calendar"), React.createElement("div", {
+    className: "rd-cal-body"
+  }, calOver.length > 0 && React.createElement("div", {
+    className: "rd-cal-sec rd-cal-sec-over"
+  }, React.createElement("h4", {
+    className: "rd-cal-m"
+  }, "Due, not yet recorded"), React.createElement("ul", {
+    className: "rd-cal-list"
+  }, calOver.map(r => React.createElement("li", {
+    key: r.pollster
+  }, React.createElement("span", {
+    className: "rd-cal-d"
+  }, calOverTxt(r)), React.createElement("span", {
+    className: "rd-cal-w"
+  }, r.pollster), r.missed && React.createElement("span", {
+    className: "rd-cal-q"
+  }, when(r.closesIn)))))), calMonths.map(g => React.createElement("div", {
+    className: "rd-cal-sec",
+    key: g.ym
+  }, React.createElement("h4", {
+    className: "rd-cal-m"
+  }, rdMonthYear(g.ym)), React.createElement("ul", {
+    className: "rd-cal-list"
+  }, g.items.map(it => React.createElement("li", {
+    key: it.key
+  }, React.createElement("span", {
+    className: "rd-cal-d"
+  }, calDateTxt(it)), React.createElement("span", {
+    className: "rd-cal-w"
+  }, it.who.join(", ")), it.q && React.createElement("span", {
+    className: "rd-cal-q"
+  }, it.q))))))), React.createElement("p", {
+    className: "rd-note"
+  }, "The table\u2019s own projections two months out: a date is the earliest that house\u2019s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house\u2019s recent rhythm, never from a promise \u2014 a house that misses its slot stays listed until its wave is added.")));
 }
 Object.assign(window, {
   RdPolls

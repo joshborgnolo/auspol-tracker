@@ -181,19 +181,24 @@ function spreadDays(c, sp) {
    passes it and always reads the live Sydney clock. */
 /* The same minute gives the same answer, and nothing downstream edits it, so
    the page's clock keeps one projection per minute: a switch re-renders the
-   tab bar and the polls table, and each used to work the schedule out afresh. */
+   tab bar and the polls table, and each used to work the schedule out afresh.
+   `opts.horizonDays` widens the horizon a caller asks for (the Latest-polls
+   calendar lays two months of slots out of the one projection); the memo
+   keys on the pair, so the default call's cache is never poisoned by a
+   wider one. */
 let npProjMemo = null;
-function npProject(nowOverride) {
+function npProject(nowOverride, opts) {
+  const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
   if (!nowOverride) {
     const e = easternNow(), k = e.day + e.mins * 60000;
-    if (npProjMemo && npProjMemo.k === k) return npProjMemo.v;
-    const v = npProjectAt(e);
-    npProjMemo = { k, v };
+    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays) return npProjMemo.v;
+    const v = npProjectAt(e, horizonDays);
+    npProjMemo = { k, h: horizonDays, v };
     return v;
   }
-  return npProjectAt(nowOverride);
+  return npProjectAt(nowOverride, horizonDays);
 }
-function npProjectAt(nowOverride) {
+function npProjectAt(nowOverride, horizonDays) {
   const { D } = window.AP;
   const cad = D.pollCadence || [];
   if (!cad.length) return { rows: [], t0: 0, nowMs: 0 };
@@ -214,7 +219,7 @@ function npProjectAt(nowOverride) {
      ~twenty weeks away for most of the year), because a panel that stays
      silent on a slow house only pretends not to know when it lands next. */
   const rows = [];
-  const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
+  const horizon = t0 + (horizonDays || NP_HORIZON_DAYS) * DAY_MS;
   cad.forEach((c) => {
     /* A CALENDAR-MONTH rhythm (DemosAU) has no day to project: one wave per
        month on no particular day of it, so the slot IS the month - the

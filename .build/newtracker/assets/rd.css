@@ -296,6 +296,21 @@ body.rd .chart:has(> .chart-copy-btn) + .rd-evdrop { margin-top: 0; }
 body.rd .rd-evdrop > summary { cursor: pointer; width: fit-content; padding: 4px 0; font-weight: 600; font-size: 13px; color: var(--ink-2); }
 @media (hover: hover) { body.rd .rd-evdrop > summary:hover { color: var(--ink); } }
 body.rd .rd-evdrop .rd-evlist { margin-top: 8px; }
+/* the Latest-polls Calendar: the projection's slots as a month-headed
+   list behind the fold - date column, then who, then the window note */
+body.rd .rd-cal-body { margin-top: 8px; }
+body.rd .rd-cal-sec + .rd-cal-sec { margin-top: 14px; }
+body.rd .rd-cal-m { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+body.rd .rd-cal-list { list-style: none; margin: 2px 0 0; padding: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
+body.rd .rd-cal-list li { display: flex; align-items: baseline; gap: 14px; padding: 3px 0; }
+body.rd .rd-cal-d { flex: 0 0 auto; min-width: 86px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
+body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
+@media (max-width: 640px) {
+  body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
+  body.rd .rd-cal-q { flex-basis: 100%; padding-left: 98px; }
+}
 /* RdCrossfade: the view being left lies over the one arriving and fades */
 body.rd .rd-xf { position: relative; }
 /* out, then in, as a chart's words hand over: two views' headlines half-seen

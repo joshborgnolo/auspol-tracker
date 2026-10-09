@@ -15,6 +15,9 @@ const RD_PL_FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Pr
 const RD_PL_LABEL = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
 const RD_PL_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
 const RD_STALE_DAYS = 42;
+/* how far out the Calendar fold-out under the table lays its slots: the same
+   projection the Next column reads, horizon widened to two months by name */
+const RD_CAL_DAYS = 62;
 
 /* the table's shape of a poll, for a pollster with a projection but no row
    in the Latest table (one that has gone quiet) */
@@ -625,6 +628,57 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (rows[j]) rows[j].focus();
   };
 
+  /* ---- the calendar fold-out: the projection laid out by month ---------
+     The same projection the table's Next column reads, horizon widened to
+     two months (npProject's opts.horizonDays), as a list: a date is the
+     earliest that house's wave could land, a span a window the wave can
+     fall anywhere in. Only a house's first slot can already be due - the
+     walk stops there - so the due lead-in lists at most one per house, the
+     same standing claim the table makes rather than a second guess. */
+  const calProj = window.AP.nextPolls ? window.AP.nextPolls(null, { horizonDays: RD_CAL_DAYS }) : { rows: [] };
+  const calOver = [], calItems = [];
+  const calDays = new Map();   /* a release date -> the houses landing on it */
+  calProj.rows.forEach((r) => {
+    if (r.overdue) { calOver.push(r); return; }
+    if (r.loose && !irregular(r)) {
+      calItems.push({ key: "w" + r.pollster, at: r.release - r.spread * DAY_MS, close: r.release + r.spread * DAY_MS, win: true, spread: r.spread, who: [r.pollster] });
+    } else if (irregular(r)) {
+      calItems.push({ key: "i" + r.pollster + "-" + (r.ahead || 0), at: r.release, irr: true, spread: r.spread, who: [r.pollster] });
+    } else {
+      const iso = new Date(r.release).toISOString().slice(0, 10);
+      let e = calDays.get(iso);
+      if (!e) { e = { key: "d" + iso, at: r.release, who: [] }; calDays.set(iso, e); calItems.push(e); }
+      e.who.push(r.pollster);
+    }
+  });
+  calOver.sort((a, b) => a.release - b.release);
+  calItems.sort((a, b) => a.at - b.at);
+  calItems.forEach((it) => {
+    if (it.win) it.q = it.at <= t0 ? "open now" : "window";
+    else if (it.irr) it.q = "give or take " + Math.round(it.spread) + " days";
+    else if (it.at === t0) it.q = "today";
+    else if (it.at === t0 + DAY_MS) it.q = "tomorrow";
+  });
+  const calMonths = [];
+  calItems.forEach((it) => {
+    const ym = new Date(it.at).toISOString().slice(0, 7);
+    const g = calMonths[calMonths.length - 1];
+    if (!g || g.ym !== ym) calMonths.push({ ym, items: [it] });
+    else g.items.push(it);
+  });
+  /* the date cell: weekday and day inside the month its head names; a
+     window keeps both ends, an irregular house keeps its "about" */
+  const calSpanTxt = (a, b) => {
+    const A = new Date(a), B = new Date(b);
+    return A.getUTCMonth() === B.getUTCMonth() ? A.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b);
+  };
+  const calDateTxt = (it) => it.win ? calSpanTxt(it.at, it.close)
+    : it.irr ? "About " + dm(it.at)
+    : WDs(it.at) + " " + new Date(it.at).getUTCDate();
+  const calOverTxt = (r) => r.loose && !irregular(r) ? calSpanTxt(r.release - r.spread * DAY_MS, r.release + r.spread * DAY_MS)
+    : irregular(r) ? "About " + dm(r.release)
+    : wdm(r.release);
+
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
            meta={entries.length + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
@@ -707,6 +761,42 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         {" "}A pollster that misses its slot shows as overdue until the release is added.
         {staleOnes.length > 0 && <> {staleOnes.map((e) => e.poll.pollster).join(" and ")} {staleOnes.length > 1 ? "have" : "has"} not published in six weeks, so {staleOnes.length > 1 ? "their polls are" : "its poll is"} outside the averages.</>}
       </p>
+      {(calMonths.length > 0 || calOver.length > 0) && (
+        <details className="rd-evdrop rd-cal">
+          <summary>Calendar</summary>
+          <div className="rd-cal-body">
+            {calOver.length > 0 && (
+              <div className="rd-cal-sec rd-cal-sec-over">
+                <h4 className="rd-cal-m">Due, not yet recorded</h4>
+                <ul className="rd-cal-list">
+                  {calOver.map((r) => (
+                    <li key={r.pollster}>
+                      <span className="rd-cal-d">{calOverTxt(r)}</span>
+                      <span className="rd-cal-w">{r.pollster}</span>
+                      {r.missed && <span className="rd-cal-q">{when(r.closesIn)}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {calMonths.map((g) => (
+              <div className="rd-cal-sec" key={g.ym}>
+                <h4 className="rd-cal-m">{rdMonthYear(g.ym)}</h4>
+                <ul className="rd-cal-list">
+                  {g.items.map((it) => (
+                    <li key={it.key}>
+                      <span className="rd-cal-d">{calDateTxt(it)}</span>
+                      <span className="rd-cal-w">{it.who.join(", ")}</span>
+                      {it.q && <span className="rd-cal-q">{it.q}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="rd-note">The table’s own projections two months out: a date is the earliest that house’s wave could land; a span is a window the wave can fall anywhere in, from a house that keeps no set day. Both come from each house’s recent rhythm, never from a promise — a house that misses its slot stays listed until its wave is added.</p>
+        </details>
+      )}
     </RdSec>
   );
 }
