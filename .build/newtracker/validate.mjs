@@ -189,6 +189,13 @@ export function validate(D) {
       fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
     if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge/Accent", "RedBridge/Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
       fail("method-url", `methodUrl on a row for ${p.pollster}`);
+    // 2c3. tablesUrl is The Australian's demographic-tables supplement PDF
+    //      for a pooled Newspoll wave, hosted on its origin CDN – only those
+    //      rows have such a document to link.
+    if (p.tablesUrl != null && (typeof p.tablesUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.tablesUrl)))
+      fail("tables-url", `tablesUrl = ${JSON.stringify(p.tablesUrl)}`);
+    if (p.tablesUrl != null && p.pollster !== "Newspoll (pooled)")
+      fail("tables-url", `tablesUrl on a row for ${p.pollster}`);
     // 2d. sampleEff (the house's published effective sample size) is a whole
     //     number never below 200 and never above its own raw sample – a
     //     design effect can only deflate. Absent-not-filled means the house

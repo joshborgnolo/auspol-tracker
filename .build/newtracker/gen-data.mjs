@@ -2823,6 +2823,11 @@ const linksOf = (p) => {
     title: by + " hasn’t posted this poll’s release yet. This opens the page where it files them." });
   if (RELEASE_HUB.has(house)) out.push({ k: "series", t: "Running series", href: RELEASE_HUB.get(house),
     title: by + "’s rolling report collection – every wave of the house’s series, the historical vote tables included" });
+  // Newspoll's pooled waves are the only rows carrying a tablesUrl: The
+  // Australian posts its demographic-tables supplement on its origin CDN
+  // (no redirect off the article page), so it links alongside the release
+  if (p.tablesUrl) out.push({ k: "tables", t: "Demographic tables (PDF)", href: p.tablesUrl,
+    title: "The Australian’s published demographic and breakdown tables for this poll" });
   if (p.methodUrl && !both) out.push({ k: "method", t: "APC methodology", href: p.methodUrl, title: "This poll’s Australian Polling Council methodology statement" });
   else if (!p.methodUrl && waiting && at.method && !(!rel && at.release === at.method))
     out.push({ k: "method", pending: true, t: "APC methodology: not yet out", href: at.method,
