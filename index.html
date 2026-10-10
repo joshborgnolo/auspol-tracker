@@ -112501,7 +112501,7 @@ function RdApDetail({
       return React.createElement("span", {
         role: "cell",
         className: "rd-apd-dv" + (d >= 5 ? " hi" : d <= -5 ? " lo" : "")
-      }, v == null ? "—" : Math.round(v));
+      }, v == null ? "—" : rdApNum(v));
     };
     const dims = Object.entries(p.grp.d);
     const per = Math.ceil(dims.reduce((a, [, r]) => a + r.length + 1, 0) / 3);
@@ -112536,7 +112536,7 @@ function RdApDetail({
       return React.createElement("span", {
         key: k.id,
         role: "cell"
-      }, tv == null ? "—" : Math.round(tv));
+      }, tv == null ? "—" : rdApNum(tv));
     }));
     return React.createElement("div", {
       className: "rd-apd-demwrap"

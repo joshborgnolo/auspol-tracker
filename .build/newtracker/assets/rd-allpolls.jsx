@@ -1220,10 +1220,14 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
      the house printed it: every cut, the parties in the row's aggregate
      order, the two groups the row compares marked, a figure shaded where the
      group sits five or more points above the poll's all-voters figure and
-     faded five or more below. Laid out in three columns balanced by row
-     count on a laptop - beside the poll in full it ran a 28-group YouGov
-     wave ~1,400px down against a short How-it-counts column - and one on a
-     phone, where the later columns drop their repeated heads */
+     faded five or more below (shading computed on the unrounded values),
+     and every figure printed with the house's own decimal via rdApNum -
+     Roy Morgan's table prints halves (NSW One Nation 26.5), so rounding
+     them would betray the heading's printed-it promise. Laid out in three
+     columns balanced by row count on a laptop - beside the poll in full it
+     ran a 28-group YouGov wave ~1,400px down against a short How-it-counts
+     column - and one on a phone, where the later columns drop their
+     repeated heads */
   const isDem = facet === "demographics";
   const demTable = (() => {
     if (!isDem || !p.grp || !p.grp.d) return null;
@@ -1235,7 +1239,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const cell = (v, k) => {
       const t = tot ? tot[K.indexOf(k)] : null;
       const d = v != null && t != null ? v - t : 0;
-      return <span role="cell" className={"rd-apd-dv" + (d >= 5 ? " hi" : d <= -5 ? " lo" : "")}>{v == null ? "—" : Math.round(v)}</span>;
+      return <span role="cell" className={"rd-apd-dv" + (d >= 5 ? " hi" : d <= -5 ? " lo" : "")}>{v == null ? "—" : rdApNum(v)}</span>;
     };
     const dims = Object.entries(p.grp.d);
     const per = Math.ceil(dims.reduce((a, [, r]) => a + r.length + 1, 0) / 3);
@@ -1247,7 +1251,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
       n += dm[1].length + 1;
     }
     const head = <div className="rd-apd-demr rd-apd-demh" role="row"><span></span>{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}</div>;
-    const all = tot && <div className="rd-apd-demr rd-apd-demall" role="row"><span role="rowheader">All voters</span>{cols.map((k) => { const tv = tot[K.indexOf(k.id)]; return <span key={k.id} role="cell">{tv == null ? "—" : Math.round(tv)}</span>; })}</div>;
+    const all = tot && <div className="rd-apd-demr rd-apd-demall" role="row"><span role="rowheader">All voters</span>{cols.map((k) => { const tv = tot[K.indexOf(k.id)]; return <span key={k.id} role="cell">{tv == null ? "—" : rdApNum(tv)}</span>; })}</div>;
     return (
       <div className="rd-apd-demwrap">
         <span className="rd-apd-h">The vote by group, {p.grp.r === "measured from the charts" ? "measured off " + p.pollster + "’s charts" : "as " + p.pollster + " printed it"}</span>
