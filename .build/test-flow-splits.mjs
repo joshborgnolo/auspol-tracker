@@ -67,6 +67,24 @@ assert.ok(ap.includes('rival="One Nation"') && ap.includes('rival="the Coalition
 assert.ok(ap.includes("D.flowForced"), "the charts read the data asset, not a fetch");
 assert.ok(ap.includes('className="rd-ff'), "the figure carries its styling hook");
 
+/* the card titles tell the story from the LATEST wave (user's call 2026-10-10):
+   "NN% of Coalition voters prefer Labor over One Nation" and "Just NN% of
+   One Nation voters prefer Labor over the Coalition", each gaining a
+   ", up/down from NN% in <first wave's month>" tail ONLY when the series'
+   own straight-line drift battery (w=1, Holm across the pair) says Yes —
+   the same Yes the pressed set of the trend-significance table shows */
+assert.ok(ap.includes('"% of Coalition voters prefer Labor over One Nation"'),
+  "the Coalition-voters title is the dynamic prefer-Labor line");
+assert.ok(ap.includes('"% of One Nation voters prefer Labor over the Coalition"')
+  && ap.includes('"Just " +'), "the One-Nation-voters title leads with Just and its latest share");
+assert.ok(ap.includes('"up"') && ap.includes('"down"') && ap.includes('"% in "') && ap.includes("rdMonthYear(f.ym)"),
+  "the title tail reads up/down from the first wave's share, month named dynamically");
+assert.ok(ap.includes('key: "pressed"'), "the pressed-choice rows join the trend-significance table as their own set");
+assert.ok(ap.includes('"First → last"'), "the table's first→last column head fits both gaps and shares");
+const css = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
+assert.ok(css.includes(".rd-ff-two .rd-fl-ct { min-height: 56px; }"),
+  "the forced pair's headroom floor keeps the two svgs row-aligned");
+
 // ---- the satellite is stripped ---------------------------------------------------------
 const page = fs.readFileSync(path.join(ROOT, "preference-flows", "index.html"), "utf8");
 for (const dead of ['id="forced"', '<a href="#forced"', "flow-splits.json", 'id="fsq-', ".fsq ", "--fs-alp",

@@ -4517,6 +4517,41 @@ function RdFlows() {
     { key: "co", label: "Against the Coalition", rows: flSetRows(FD) },
     { key: "on", label: "Against One Nation", rows: flSetRows(FO) },
   ];
+  /* the forced-choice pair gets the same battery: one straight line per
+     cohort through its published Labor-share dots (w=1 — the house's waves
+     are all ~n=1,000), Holm across the two. A Yes licenses that chart's
+     title tail ("…, up from 32% in <its first wave's month>"), so a title
+     never claims a move the table below won't stand behind */
+  const ff = FF ? [["coal", FF.coal], ["on", FF.on]].map(([key, waves]) => ({
+    key, waves,
+    fit: withinHouseSlope(waves.map((w) => ({ h: key, t: D.mx(w.ym), w: 1, y: w.a }))),
+  })) : null;
+  const ffBy = (k) => ff && ff.find((r) => r.key === k);
+  if (ff) {
+    const tested = ff.filter((r) => r.fit), sigK = [];
+    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (r.fit.p >= 0.05 / (tested.length - i)) break;
+      sigK.push(r.key);
+    }
+    for (const r of ff) r.sig = sigK.includes(r.key);
+  }
+  const ffTitle = (r) => {
+    const f = r.waves[0], la = r.waves[r.waves.length - 1];
+    const base = r.key === "coal"
+      ? la.a + "% of Coalition voters prefer Labor over One Nation"
+      : "Just " + la.a + "% of One Nation voters prefer Labor over the Coalition";
+    return !r.sig || la.a === f.a ? base
+      : base + ", " + (la.a > f.a ? "up" : "down") + " from " + f.a + "% in " + rdMonthYear(f.ym);
+  };
+  const ffSet = ff ? {
+    key: "pressed", label: "Pressed-choice Labor share",
+    rows: ff.map((r) => ({
+      key: r.key, name: r.key === "coal" ? "Coalition voters" : "One Nation voters", sig: r.sig,
+      cells: [r.waves[0].a + " → " + r.waves[r.waves.length - 1].a,
+        r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–",
+        r.fit ? (r.sig ? "Yes" : "No") : "–"],
+    })),
+  } : null;
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return (
     <section className="rd-sec rd-fl" id="flow-drift" aria-labelledby="rd-fl-t">
@@ -4555,22 +4590,24 @@ function RdFlows() {
         </div>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
-            <div className="rd-fl-ct"><h4 className="rd-ap-ct">Coalition voters, if forced to Labor or One Nation</h4></div>
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffBy("coal").waves.length > 1 ? ffTitle(ffBy("coal")) : "Coalition voters, if forced to Labor or One Nation"}</h4></div>
             <RdForced waves={FF.coal} rival="One Nation" W={cw} phone={phone} />
           </div>
           <div className="rd-fl-one">
-            <div className="rd-fl-ct"><h4 className="rd-ap-ct">One Nation voters, if forced to Labor or the Coalition</h4></div>
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffBy("on").waves.length > 1 ? ffTitle(ffBy("on")) : "One Nation voters, if forced to Labor or the Coalition"}</h4></div>
             <RdForced waves={FF.on} rival="the Coalition" W={cw} phone={phone} />
           </div>
         </div>
       </div>}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;
-          sets are the two contests, Holm's correction within each */}
+          sets are the two contests, Holm's correction within each — plus
+          one set for the pressed-choice pair's own battery (ff/ffSet) */}
       <RdTsig summary="Trend-significance table"
-        heads={["Pollster", "Gap, first → last", "Slope, pts/yr", "t", "Significant"]}
-        sets={flSets}
-        note={"One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes."}
+        heads={["Series", "First → last", "Slope, pts/yr", "t", "Significant"]}
+        sets={ffSet ? flSets.concat(ffSet) : flSets}
+        note={"One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes."
+          + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the two — a Yes is what the chart titles’ up/down-from tails ride." : "")}
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster’s first head-to-heads. This check corrects no other figure on the page.

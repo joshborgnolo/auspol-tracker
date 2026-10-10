@@ -3019,6 +3019,10 @@ body.rd .rd-fl-two { margin-top: 32px; display: grid; grid-template-columns: rep
 body.rd .rd-fl-one { display: flex; flex-direction: column; min-width: 0; }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
+/* the forced-choice titles run one to three lines as their tails come and
+   go - floor the headroom at three lines on the side-by-side grid rungs so
+   the pair's svgs stay on the same row regardless of each card's wrap */
+@media (min-width: 761px) { body.rd .rd-ff-two .rd-fl-ct { min-height: 56px; } }
 body.rd .rd-fl-chart { position: relative; margin-top: 8px; }
 body.rd .rd-fl-chart svg { display: block; overflow: visible; }
 body.rd .rd-fl-zero { stroke: var(--ink-faint); stroke-width: 1; }
