@@ -1625,7 +1625,7 @@ const RD_DEMO_SHORT = {
   "Gen X": "Gen X", Boomers: "Boomers", Men: "men", Women: "women",
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters", University: "university graduates",
   NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", SA: "South Australians", WA: "West Australians",
-  "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
+  "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians", "ACT/NT/Tas/WA/SA": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
@@ -1912,8 +1912,8 @@ const RD_TREND_SKEW = {
   onp: "Its older, regional skew is no stronger or weaker now than it was then.",
   grn: "Its younger, urban skew remains.",
 };
-const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "ACT/NT/Tas": "Tasmania, the ACT and the NT", "Non-NSW/Vic/Qld": "the non-eastern-mainland states" };
-const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
+const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "ACT/NT/Tas": "Tasmania, the ACT and the NT", "ACT/NT/Tas/WA/SA": "the non-eastern-mainland states" };
+const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "ACT/NT/Tas/WA/SA"];
 const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
 const RD_TREND_LOC = {
   "Inner metro": { adj: "inner-metro", ref: "the inner metros" },

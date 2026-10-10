@@ -9,7 +9,7 @@
           on phones
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Retired /
-          Rural / ACT/NT/Tas / Non-NSW/Vic/Qld) drive figures, bracket,
+          Rural / ACT/NT/Tas / ACT/NT/Tas/WA/SA) drive figures, bracket,
           head/dek/meta, y-domain,
           election sub-lines — figures asserted against window.AUSPOL itself.
           Every selection's x axis carries the Election landmark (2026-10-08:
@@ -227,12 +227,12 @@ const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "Ju
 const SHORT = {
   Men: "men", "18–34": "18–34s", "55+": "over-55s", "Gen Z": "Gen Z", University: "university graduates",
   Retired: "retirees", NSW: "NSW voters", Rural: "rural voters",
-  "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
+  "ACT/NT/Tas/WA/SA": "voters in the non-eastern-mainland states",
   "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
                            ["NSW", { chg: true }], ["University", {}], ["Retired", { level: true }], ["Rural", { tallTicks: true, chg: true }],
-                           ["ACT/NT/Tas", { chg: true }], ["Non-NSW/Vic/Qld", { chg: true }]]) {
+                           ["ACT/NT/Tas", { chg: true }], ["ACT/NT/Tas/WA/SA", { chg: true }]]) {
   const exp = await expectedFor(label);
   const s = await collect(1280, 900, label);
   console.log(`--- ${label}`);

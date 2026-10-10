@@ -3676,7 +3676,7 @@ const primaryNow = primaryNowAt(refNow);
   per-state first-prefs-by-vote-type pages (event 31496,
   HouseStateFirstPrefsByPartyByVoteType-31496-<state>.htm); Coalition rows
   summed (Liberal + The Nationals; + Liberal National Party of Queensland in
-  Qld, + Country Liberal in the NT). Non-NSW/Vic/Qld = national less
+  Qld, + Country Liberal in the NT). ACT/NT/Tas/WA/SA = national less
   NSW+Vic+Qld (the panel's non-eastern-mainland group pools SA/WA/Tas/ACT/NT;
   SA's and WA's marks come from their own state pages); the trio's is the
   TAS, ACT and NT pages vote-summed (763,586 formal votes; One Nation ran no
@@ -3696,7 +3696,7 @@ const DEMO_STATE_ELECTION = {
     "SA": [38.31, 28.45, 6.15, 13.42, 13.68],
     "WA": [35.59, 31.55, 7.61, 11.97, 13.28],
     "ACT/NT/Tas": [40.95, 24.52, 3.97, 12.49, 18.07],
-    "Non-NSW/Vic/Qld": [37.64, 29.01, 6.34, 12.55, 14.45],
+    "ACT/NT/Tas/WA/SA": [37.64, 29.01, 6.34, 12.55, 14.45],
   },
 };
 

@@ -2215,7 +2215,7 @@ const DEMO_WHO = {
   University: "university graduates",
   NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
   SA: "voters in South Australia", WA: "voters in Western Australia",
-  "Non-NSW/Vic/Qld": "voters in SA, WA, Tasmania, and the territories",
+  "ACT/NT/Tas/WA/SA": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
   Provincial: "voters in provincial towns and cities", Rural: "rural voters",
   "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
