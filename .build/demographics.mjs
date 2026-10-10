@@ -403,7 +403,8 @@ const ROYMORGAN_DEMO = {
   // machine-filed wave must read perfectly. The state figures were re-verified
   // against the table images (the release's own PDF is an AccessDenied-private
   // S3 object); the city/country pair files as `location` verbatim — those
-  // groups join no common-location key, like the birth-country table.
+  // groups join no common-location key, like the birth-country table (the
+  // All-polls Place split still draws their pair, via its alias triple).
   "2026-09-27": {
     source: "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
     total: { alp: 26, lnp: 22.5, onp: 25.5, grn: 14.5, oth: 11 },
