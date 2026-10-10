@@ -471,11 +471,12 @@ function eq(name, got, want) {
   eq("no dated row is missed", rows.every((r) => !(r.missed && !r.loose)), true);
   eq("the missed window parks at the foot, alone", rows[rows.length - 1] && rows[rows.length - 1].pollster, "DemosAU");
   /* the roll itself, one plausible date per house: Sun 11 Oct for the two
-     Sunday houses (Newspoll sorts ahead on the cadence table), Mon 12 for
-     Roy Morgan, Wed 14 for Essential, YouGov's own fortnight, the next
-     month-end for RedBridge, Spectre's standing far slot */
+     Sunday houses (same-day slots order by the house's measured release
+     hour - Resolve's 6pm ahead of Newspoll's 8pm), Mon 12 for Roy Morgan,
+     Wed 14 for Essential, YouGov's own fortnight, the next month-end for
+     RedBridge, Spectre's standing far slot */
   eq("ticker: dated houses rolled to plausible dates, no red", items.map((i) => [i.firm, i.when]),
-    [["Newspoll", "tomorrow"], ["Resolve", "tomorrow"],
+    [["Resolve", "tomorrow"], ["Newspoll", "tomorrow"],
      ["Roy Morgan", "2 days"], ["Essential", "4 days"],
      ["YouGov", "11 days"], ["RedBridge/Accent", "22 days"],
      ["Spectre Strategy", "43 days"]]);

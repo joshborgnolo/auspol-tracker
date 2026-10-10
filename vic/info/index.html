@@ -20709,10 +20709,11 @@ function npTickerItems(proj) {
       when: days === 1 ? "1 day overdue" : days + " days overdue"
     };
   }).sort((a, b) => b.days - a.days);
+  const dueOf = it => it.t.at + (it.t.byDay ? (it.r.releaseMins == null ? 24 * 60 : it.r.releaseMins) * 60000 : 0);
   const upcomingItems = rows.filter(r => !r.missed && !isWindowRow(r)).map(r => ({
     r,
     t: targetOf(r)
-  })).sort((a, b) => a.t.at - b.t.at).filter((seen => ({
+  })).sort((a, b) => dueOf(a) - dueOf(b)).filter((seen => ({
     r
   }) => !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set())).map(({
     r,

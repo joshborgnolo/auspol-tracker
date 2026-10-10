@@ -532,11 +532,22 @@ function npTickerItems(proj) {
      The panel sorts a missed wave by the slot it missed, because a reader
      looking at the schedule wants to see it is late; the bar is answering
      "what lands next", and after rolling, a Monday house due today comes
-     before a Wednesday one that slipped a week. */
+     before a Wednesday one that slipped a week.
+
+     Two slots on the SAME day break their day-floor tie on the house's
+     due moment - a weekday target carries no hour of its own (it is the
+     slot's midnight by design), but the houses still land in an order on
+     the day: a Sunday 6pm wave before a Sunday 9pm one, rather than
+     whichever came first in the cadence rows. A house nobody has timed
+     keeps its 24*60 day-end default, so a vague "today" trails the
+     same-day counts that can name their hour. */
+  const dueOf = (it) => it.t.at + (it.t.byDay
+    ? (it.r.releaseMins == null ? 24 * 60 : it.r.releaseMins) * 60000
+    : 0);
   const upcomingItems = rows
     .filter((r) => !r.missed && !isWindowRow(r))
     .map((r) => ({ r, t: targetOf(r) }))
-    .sort((a, b) => a.t.at - b.t.at)
+    .sort((a, b) => dueOf(a) - dueOf(b))
     /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
        soonest from EVERY house, and a weekly house's second slot inside the
        coming week only repeats a name instead of adding another house to
