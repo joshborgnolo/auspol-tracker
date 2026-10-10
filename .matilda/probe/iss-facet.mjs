@@ -49,6 +49,7 @@ const server = http.createServer(async (req, res) => {
 });
 await new Promise((r) => server.listen(Number(process.env.PORT || 9234), r));
 const PAGE = `http://127.0.0.1:${process.env.PORT || 9234}/index.html`;
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new",
@@ -187,7 +188,7 @@ const page1 = await browser.newPage();
 await page1.setViewport({ width: vw, height: vh });
 const errs1 = [];
 page1.on("pageerror", (e) => errs1.push(String(e)));
-await page1.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
+await page1.goto(`${APAGE}`, { waitUntil: "domcontentloaded" });
 await page1.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
 await new Promise((r) => setTimeout(r, 600));
 
@@ -532,7 +533,7 @@ await page1.close();
 console.log("== ?f=i deep link ==");
 const page2 = await browser.newPage();
 await page2.setViewport({ width: vw, height: vh });
-await page2.goto(`${PAGE}?f=i#allpolls`, { waitUntil: "domcontentloaded" });
+await page2.goto(`${APAGE}?f=i`, { waitUntil: "domcontentloaded" });
 await page2.waitForSelector(".rd-ap-row, .rd-ap-card", { timeout: 15000 });
 await new Promise((r) => setTimeout(r, 700));
 await showAll(page2);
@@ -549,7 +550,7 @@ const page3 = await browser.newPage();
 await page3.setViewport({ width: 390, height: 844 });
 const errs3 = [];
 page3.on("pageerror", (e) => errs3.push(String(e)));
-await page3.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
+await page3.goto(`${APAGE}`, { waitUntil: "domcontentloaded" });
 await page3.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
 await new Promise((r) => setTimeout(r, 600));
 await pickFacet(page3, /^Issues$/);
@@ -602,7 +603,7 @@ const page4 = await browser.newPage();
 await page4.setViewport({ width: 320, height: 900, isMobile: true, hasTouch: true });
 const errs4 = [];
 page4.on("pageerror", (e) => errs4.push(String(e)));
-await page4.goto(`${PAGE}?f=i#allpolls`, { waitUntil: "load" });
+await page4.goto(`${APAGE}?f=i`, { waitUntil: "load" });
 await page4.waitForSelector(".rd-ap-card", { timeout: 30000 });
 await new Promise((r) => setTimeout(r, 900));
 const fit320 = [];

@@ -1,6 +1,6 @@
 /* headless geometry probe of the RdForced "forced to choose" pair in the
    All-polls Preference flows section (moved from /preference-flows/ 2026-10-10;
-   data: gen-data §7db D.flowForced). Renders index.html#allpolls at desktop and
+   data: gen-data §7db D.flowForced). Renders allpolls/ at desktop and
    phone rungs and asserts GEOMETRY, never screenshots
    (auspol-headless-geometry-verify): the two figures share a row side by side
    on desktop and stack full-width on a phone, each svg vmaps every wave's a
@@ -32,6 +32,7 @@ import { fileURLToPath } from "url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PAGE = "file://" + path.join(ROOT, "index.html");
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 
@@ -93,7 +94,7 @@ page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300));
 
 const gotoFlows = async (w) => {
   await page.setViewport({ width: w, height: 1200, deviceScaleFactor: 1 });
-  await page.goto(PAGE + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(APAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".rd-ff svg .rd-ff-line.a", { timeout: 30000 });
   await page.evaluate(() => document.querySelector(".rd-ff").scrollIntoView({ block: "center" }));
   await new Promise((r) => setTimeout(r, 350));

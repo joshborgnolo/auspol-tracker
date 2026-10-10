@@ -39,7 +39,7 @@ async function measure(mobile) {
   await page.setViewport(mobile
     ? { width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }
     : { width: 1280, height: 800 });
-  await page.goto(`http://127.0.0.1:${PORT}/index.html#allpolls`, { waitUntil: "networkidle0" });
+  await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "networkidle0" });
   await page.waitForSelector(".rd-ap-search input", { timeout: 20000 });
   await sleep(600);
   return page.evaluate(() => ({

@@ -608,6 +608,13 @@ body.rd .rd-tpp-chart .rd-tabs .rd-check + .rd-check { margin-left: 8px; }
 @media (max-width: 640px) {
   body.rd .rd-tpp-chart > .rd-check { min-height: 30px; }
 }
+/* just above the phone rung the desktop row (range tabs plus the two check
+   boxes) is a hair wider than the card: unwrap it and the row overflows the
+   document. Wrap the checks onto a second line until the row genuinely
+   fits. */
+@media (min-width: 641px) and (max-width: 700px) {
+  body.rd .rd-tpp-chart .rd-tabs { flex-wrap: wrap; }
+}
 
 /* the lead gauge */
 body.rd .rd-lg { position: relative; height: 82px; margin-top: 18px; font-size: 12px; font-variant-numeric: tabular-nums; }

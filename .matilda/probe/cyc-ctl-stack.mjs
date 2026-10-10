@@ -28,7 +28,7 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css
 const server = http.createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end("nf"); }
@@ -109,7 +109,7 @@ const faceCentrePx = async (page, S) => {
       const pageErrors = [];
       page.on("pageerror", (e) => pageErrors.push(String(e)));
       await page.setViewport({ width: vw, height: vh, hasTouch: vw < 700 });
-      await page.goto(`http://127.0.0.1:${PORT}/#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded", timeout: 60000 });
       await page.waitForSelector("#cyc-primary .rd-cyc-ctls", { timeout: 45000 });
       await page.evaluate(() => document.fonts && document.fonts.ready);
       await new Promise((r) => setTimeout(r, 900));
@@ -177,7 +177,7 @@ const faceCentrePx = async (page, S) => {
       page.on("pageerror", (e) => pageErrors.push(String(e)));
       await page.setViewport({ width: 390, height: 844, hasTouch: true });
       await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
-      await page.goto(`http://127.0.0.1:${PORT}/#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded", timeout: 60000 });
       await page.waitForSelector("#cyc-primary .rd-cyc-ctls input", { timeout: 45000 });
       await new Promise((r) => setTimeout(r, 1200));
       let S = await page.evaluate(readScheme);

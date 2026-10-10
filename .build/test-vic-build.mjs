@@ -12,10 +12,14 @@ import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "vic-build-")), "index.html");
+const SCRATCH = fs.mkdtempSync(path.join(os.tmpdir(), "vic-build-"));
+const OUT = path.join(SCRATCH, "index.html");
 const FED = ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "assets/favicon.svg",
              "assets/masthead-dial.svg", "assets/auspol-now.json", "assets/auspol-latest.json",
-             "assets/site-shell.css", "assets/site-shell.js"];
+             "assets/site-shell.css", "assets/site-shell.js",
+             // the federal per-tab pages (real-URL tabs since 2026-10-10) are
+             // the federal build's alone
+             "cycles/index.html", "allpolls/index.html", "info/index.html"];
 const before = FED.map((f) => [f, fs.existsSync(path.join(ROOT, f)) ? fs.readFileSync(path.join(ROOT, f)) : null]);
 execFileSync(process.execPath, [path.join(ROOT, ".build/newtracker/build.mjs")],
   { cwd: ROOT, env: { ...process.env, BUILD_JUR: "vic", BUILD_OUT: OUT }, stdio: "pipe" });
@@ -29,6 +33,23 @@ assert.match(html, /<link rel="canonical" href="https:\/\/auspoltracker\.com\/vi
 assert.ok(!/(?:href|url\()=?"assets\//.test(html), "shared assets are referenced from the site root");
 assert.ok(!/og:image|application\/rss\+xml/.test(html), "no share card or feed of its own");
 assert.match(html, /<h1>vicpol tracker<\/h1>/, "the plain-text article is Victorian");
+assert.ok(!html.includes("window.AP_INITIAL_TAB="), "the Now document carries no initial-tab constant");
+
+// ---- the per-tab pages the same run emits beside OUT ------------------------------------
+// real-URL tabs (2026-10-10): Vic gets All polls and Info pages of its own,
+// written beside BUILD_OUT, and a Past cycles page only once a term closes –
+// Victoria has none yet, so cycles/ must NOT exist in the scratch dir
+for (const [id, label] of [["allpolls", "All polls"], ["info", "Info"]]) {
+  const t = fs.readFileSync(path.join(SCRATCH, id, "index.html"), "utf8");
+  assert.match(t, new RegExp(`<title>vicpol tracker – ${label}</title>`), `vic/${id}/ has its own title`);
+  assert.ok(t.includes(`<link rel="canonical" href="https://auspoltracker.com/vic/${id}/">`), `vic/${id}/ has its own canonical`);
+  assert.ok(t.includes(`<meta property="og:url" content="https://auspoltracker.com/vic/${id}/">`)
+    && t.includes(`<meta property="og:title" content="vicpol tracker – ${label}">`), `vic/${id}/ has its own og tags`);
+  assert.ok(t.includes(`window.AP_INITIAL_TAB=${JSON.stringify(id)};`), `vic/${id}/ opens straight into the ${id} tab`);
+  assert.ok(!/(?:href|url\()=?"assets\//.test(t), `vic/${id}/ references no relative assets`);
+  assert.ok(t.includes('AP_CYCLE_SRC=null'), `vic/${id}/ keeps the Vic build's null cycle source`);
+}
+assert.ok(!fs.existsSync(path.join(SCRATCH, "cycles")), "no Past cycles page while Victoria has no past terms");
 
 // ---- the dataset -------------------------------------------------------------------------
 const ctx = { window: {} };

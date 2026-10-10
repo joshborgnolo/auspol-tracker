@@ -19,8 +19,9 @@ const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/M
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml" };
 const server = http.createServer(async (req, res) => {
   try {
-    const p = join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "index.html");
-    const body = await readFile(p.endsWith("/") ? p + "index.html" : p);
+    let p = join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "index.html");
+    if (p.endsWith("/")) p += "index.html";
+    const body = await readFile(p);
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" }); res.end(body);
   } catch { res.writeHead(404); res.end("nf"); }
 });
@@ -36,10 +37,14 @@ try {
     const errs = []; page.on("pageerror", (e) => errs.push(String(e)));
     const touch = vw <= 640;
     await page.setViewport({ width: vw, height: 900, isMobile: touch, hasTouch: touch });
-    await page.goto(`http://127.0.0.1:${PORT}/#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForSelector("#cyc-summary .rd-cs-row", { timeout: 45000 });
     await sleep(1400);
-    const names = await page.$$eval("#cyc-summary .rd-cs-row", (rs) => rs.map((r) => r.querySelector(".rd-cs-name b").textContent.trim()));
+    /* rows are identity'd by data-key, never the display name - the two
+       Preferred-PM-lead rows ("Albanese over Taylor" / "... over Hanson")
+       share one display name */
+    const rows = await page.$$eval("#cyc-summary .rd-cs-row", (rs) => rs.map((r) => ({ key: r.dataset.key || "", name: r.querySelector(".rd-cs-name b").textContent.trim() })));
+    const lb = (r) => r.name + (rows.filter((x) => x.name === r.name).length > 1 ? " · " + r.key : "");
     const W = vw + "px";
 
     /* read one open row's list, strip and rank */
@@ -60,19 +65,19 @@ try {
         rows: [...l.querySelectorAll(".rd-csr-row")].map((r) => ({ k: +r.querySelector(".rd-csl-k").textContent, cur: r.classList.contains("cur"),
           v: +r.querySelector(".rd-csr-v").textContent.replace("−", "-").replace("+", "") })),
       }));
-      return { name: row.querySelector(".rd-cs-name b").textContent.trim(), expanded: row.getAttribute("aria-expanded"),
+      return { key: row.dataset.key || "", name: row.querySelector(".rd-cs-name b").textContent.trim(), expanded: row.getAttribute("aria-expanded"),
                rank: row.querySelector(".rd-cs-rank b") ? row.querySelector(".rd-cs-rank b").textContent : "",
                lad, stripDots, curX: cr ? cr.left + cr.width / 2 : null, recs,
                open: document.querySelectorAll("#cyc-summary .rd-csl").length,
                sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth };
     });
-    const openRow = async (name) => {
-      await page.evaluate((name) => {
-        const r = [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name);
+    const openRow = async (key) => {
+      await page.evaluate((key) => {
+        const r = [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key);
         r.scrollIntoView({ behavior: "instant", block: "center" });
-      }, name);
+      }, key);
       await sleep(150);
-      const el = await page.evaluateHandle((name) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name), name);
+      const el = await page.evaluateHandle((key) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key), key);
       const box = await el.boundingBox();
       if (touch) await page.touchscreen.tap(box.x + 40, box.y + 14); else await page.mouse.click(box.x + 40, box.y + 14);
       await sleep(1100);
@@ -86,10 +91,11 @@ try {
       return undefined;
     };
 
-    for (const name of names) {
-      await openRow(name);
+    for (const row of rows) {
+      const name = lb(row);
+      await openRow(row.key);
       const s = await read();
-      if (!s || s.name !== name) { check(`${W} ${name}: opens`, false, s ? "opened " + s.name : "nothing open"); continue; }
+      if (!s || s.key !== row.key) { check(`${W} ${name}: opens`, false, s ? "opened " + s.name : "nothing open"); continue; }
       check(`${W} ${name}: opens alone, aria-expanded`, s.open === 1 && s.expanded === "true", `panels ${s.open}`);
       check(`${W} ${name}: lists every strip term plus this one`, s.lad.length === s.stripDots.length + 1, `${s.lad.length} vs ${s.stripDots.length}+1`);
       const vals = s.lad.map((e) => +e.v.replace("+", ""));
@@ -138,28 +144,27 @@ try {
     });
     check(`${W} chart link sits by the list's heading, right-aligned, clear of the head's words`, lk && lk.above && lk.right && !lk.overlaps, JSON.stringify(lk));
     /* a second click closes */
-    const last = names[names.length - 1];
-    await openRow(last);
+    await openRow(rows[rows.length - 1].key);
     check(`${W} same row again closes`, (await read()) === null);
 
     /* opening a row below an open one keeps the clicked row where it stood */
-    await openRow(names[0]);
-    const target = names[2];
+    await openRow(rows[0].key);
+    const target = rows[2];
     /* the open list above pushes the target below the fold: bring it up,
        then click it - its own top must not move while the list above shuts */
-    await page.evaluate((name) => {
-      const r = [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name);
+    await page.evaluate((key) => {
+      const r = [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key);
       window.scrollBy(0, r.getBoundingClientRect().top - 300);
-    }, target);
+    }, target.key);
     await sleep(400);
-    const yBefore = await page.evaluate((name) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name).getBoundingClientRect().top, target);
-    const el2 = await page.evaluateHandle((name) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name), target);
+    const yBefore = await page.evaluate((key) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key).getBoundingClientRect().top, target.key);
+    const el2 = await page.evaluateHandle((key) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key), target.key);
     const b2 = await el2.boundingBox();
     if (touch) await page.touchscreen.tap(b2.x + 40, b2.y + 14); else await page.mouse.click(b2.x + 40, b2.y + 14);
     await sleep(1200);
-    const yAfter = await page.evaluate((name) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name).getBoundingClientRect().top, target);
+    const yAfter = await page.evaluate((key) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key).getBoundingClientRect().top, target.key);
     const s2 = await read();
-    check(`${W} opening a lower row closes the upper and holds the clicked row`, s2 && s2.name === target && Math.abs(yAfter - yBefore) <= 3, `moved ${(yAfter - yBefore).toFixed(1)}px`);
+    check(`${W} opening a lower row closes the upper and holds the clicked row`, s2 && s2.key === target.key && Math.abs(yAfter - yBefore) <= 3, `moved ${(yAfter - yBefore).toFixed(1)}px`);
 
     /* Level -> Change: the open list re-ranks in place */
     const before = (await read()).lad.map((e) => e.yr).join(",");
@@ -167,7 +172,7 @@ try {
     await sleep(1100);
     const sc = await read();
     const posC = sc.lad.findIndex((e) => e.cur) + 1, wantC = expectPos(sc.rank, sc.lad.length);
-    check(`${W} Change: still open, re-ranked, place agrees with "${sc.rank}"`, sc && sc.name === target && sc.lad.map((e) => e.yr).join(",") !== before && (wantC === null || posC === wantC), `at ${posC}, want ${wantC}`);
+    check(`${W} Change: still open, re-ranked, place agrees with "${sc.rank}"`, sc && sc.key === target.key && sc.lad.map((e) => e.yr).join(",") !== before && (wantC === null || posC === wantC), `at ${posC}, want ${wantC}`);
     check(`${W} Change: records titled as moves`, sc.recs.every((l) => /Furthest/.test(l.h)), sc.recs.map((l) => l.h).join(" | "));
     await page.evaluate(() => [...document.querySelectorAll("#cyc-summary .rd-tab")].find((b) => b.textContent.trim() === "Level").click());
     await sleep(900);
@@ -181,7 +186,7 @@ try {
 
     /* keyboard: Enter closes/opens, arrows carry the open list */
     if (!touch) {
-      await page.evaluate((name) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name).focus(), target);
+      await page.evaluate((key) => [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.dataset.key === key).focus(), target.key);
       await page.keyboard.press("Enter"); await sleep(600);
       const k1 = await read();
       await page.keyboard.press("Enter"); await sleep(900);
@@ -189,7 +194,7 @@ try {
       await page.keyboard.press("ArrowDown"); await sleep(900);
       const k3 = await read();
       const focused = await page.evaluate(() => document.activeElement && document.activeElement.dataset && document.activeElement.dataset.key);
-      check(`${W} keyboard: Enter closes, Enter opens, ArrowDown carries it`, k1 === null && k2 && k2.name === target && k3 && k3.name === names[3] && !!focused, `${k1 && k1.name} / ${k2 && k2.name} / ${k3 && k3.name}, focus ${focused}`);
+      check(`${W} keyboard: Enter closes, Enter opens, ArrowDown carries it`, k1 === null && k2 && k2.key === target.key && k3 && k3.key === rows[3].key && !!focused, `${k1 && k1.name} / ${k2 && k2.name} / ${k3 && k3.name}, focus ${focused}`);
       /* a focused row's left/right walk the Compare-with view (just as
          hovering the section does) instead of doing nothing */
       const cmpAt = () => page.evaluate(() => [...document.querySelectorAll('[aria-label="Compare with"] button')].findIndex((b) => b.getAttribute("aria-pressed") === "true"));
@@ -199,10 +204,10 @@ try {
       await page.keyboard.press("ArrowLeft"); await sleep(1000);
       const c2 = await cmpAt();
       const stillOnRow = await page.evaluate(() => !!(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.key));
-      const hash = await page.evaluate(() => location.hash);
-      check(`${W} keyboard: <-/-> on a focused row walk the compare view, focus keeps the row`, c0 === 0 && c1 === 1 && c2 === 0 && stillOnRow && hash === "#cycles", `${c0}->${c1}->${c2}, on-row ${stillOnRow}, hash ${hash}`);
+      const hash = await page.evaluate(() => location.pathname);
+      check(`${W} keyboard: <-/-> on a focused row walk the compare view, focus keeps the row`, c0 === 0 && c1 === 1 && c2 === 0 && stillOnRow && hash === "/cycles/", `${c0}->${c1}->${c2}, on-row ${stillOnRow}, hash ${hash}`);
       const afterArrows = await read();
-      check(`${W} keyboard: compare walk leaves the open list intact`, afterArrows && afterArrows.name === names[3], JSON.stringify(afterArrows && afterArrows.name));
+      check(`${W} keyboard: compare walk leaves the open list intact`, afterArrows && afterArrows.key === rows[3].key, JSON.stringify(afterArrows && afterArrows.name));
 
       /* hovering the Measure row claims <-/-> even from a focused row:
          arrows flip Level<->Change (the compare view is untouched, the
@@ -214,14 +219,14 @@ try {
       const measureAt = () => page.evaluate(() => { const b = [...document.querySelectorAll('#cyc-summary [aria-label="Measure"] button')].find((x) => x.getAttribute("aria-pressed") === "true"); return b ? b.textContent.trim() : ""; });
       const focusedRow = () => page.evaluate(() => document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key || null : null);
       const cHeld = await cmpAt();
-      const key3 = await page.evaluate((name) => { const el = [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name); return el ? el.dataset.key : null; }, names[3]);
+      const key3 = rows[3].key;
       await page.mouse.move(measBox.x, measBox.y); await sleep(300);
       await page.keyboard.press("ArrowRight"); await sleep(450);
       const m1 = await measureAt(), c1m = await cmpAt(), f1 = await focusedRow(), op1 = await read();
       await page.keyboard.press("ArrowLeft"); await sleep(900);
       const m2 = await measureAt(), c2m = await cmpAt();
       check(`${W} keyboard: hovering the measure row, arrows flip Level/Change only`, /^Change/.test(m1) && /^Level/.test(m2) && c1m === cHeld && c2m === cHeld, `measure "${m1}"/"${m2}", compare ${cHeld}->${c1m}->${c2m}`);
-      check(`${W} keyboard: the row keeps focus and its list through the measure walk`, f1 === key3 && op1 && op1.name === names[3], `focus ${f1} vs ${key3}, open ${op1 && op1.name}`);
+      check(`${W} keyboard: the row keeps focus and its list through the measure walk`, f1 === key3 && op1 && op1.key === key3, `focus ${f1} vs ${key3}, open ${op1 && op1.name}`);
       /* off the measure row, still over the section: the focused row's compare walk owns the keys again */
       await sleep(1000); /* let the 800ms measure-walk window lapse */
       await page.mouse.move(measBox.x, Math.max(measBox.y + 60, measBox.bottom + 20)); await sleep(300);
@@ -239,7 +244,7 @@ try {
   const page = await browser.newPage();
   const errs = []; page.on("pageerror", (e) => errs.push(String(e)));
   await page.setViewport({ width: 1280, height: 900 });
-  await page.goto(`http://127.0.0.1:${PORT}/?design=old#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await page.goto(`http://127.0.0.1:${PORT}/cycles/?design=old`, { waitUntil: "domcontentloaded", timeout: 60000 });
   await sleep(2500);
   const old = await page.evaluate(() => ({ rd: document.body.classList.contains("rd"), csl: document.querySelectorAll(".rd-csl, .rd-cs-exp").length }));
   check("old design: no list, no expander, no errors", !old.rd && old.csl === 0 && errs.length === 0, JSON.stringify(old) + " " + errs.slice(0, 2).join(" | "));

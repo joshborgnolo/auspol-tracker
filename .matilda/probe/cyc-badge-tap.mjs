@@ -89,7 +89,7 @@ const pressedRow = (page, secId, num) => page.evaluate((sid, n) => {
 // ---------- desktop pass: hover ----------
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 960 });
-await page.goto(`http://127.0.0.1:${PORT}/index.html#cycles`, { waitUntil: "domcontentloaded" });
+await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded" });
 let got = true;
 await page.waitForSelector("#cyc-primary .rd-badge", { timeout: 20000 }).catch(() => { got = false; });
 expect(got, "pair charts render numbered badges (#cyc-primary)");
@@ -135,7 +135,7 @@ await page.close();
 // ---------- phone pass: tap ----------
 const m = await browser.newPage();
 await m.setViewport({ width: 390, height: 844, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
-await m.goto(`http://127.0.0.1:${PORT}/index.html#cycles`, { waitUntil: "domcontentloaded" });
+await m.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded" });
 got = true;
 await m.waitForSelector("#cyc-primary .rd-badge", { timeout: 20000 }).catch(() => { got = false; });
 expect(got, "phone: pair charts render numbered badges");

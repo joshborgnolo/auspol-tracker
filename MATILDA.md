@@ -17,6 +17,38 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     log tails, where ~270 exception lines had pushed ERRORS out of view)
   - `render-card.mjs` — og:share card redraw (needs `puppeteer-core` +
     `CHROME` env)
+- THE FOUR TAB PAGES — the main page's tabs are real documents, not just
+  views: build.mjs "5a tab pages" block (~:1271) emits `cycles/index.html`,
+  `allpolls/index.html`, `info/index.html` beside root `index.html` (Now
+  stays the root), each with its own title, meta description, og:url,
+  canonical and static `buildTabSummary` article plus
+  `window.AP_INITIAL_TAB` so the client opens straight into the named tab;
+  tab clicks are instant client-side swaps (no fetch). Client routing
+  lives in the 73de0c58 asset (TAB_BASE / tabToPath / pathToTab /
+  TAB_HASH aliases — old `/#cycles`-style hashes still land on the right
+  tab; `snapshot→now` too). Vic gets the same treatment (`vic/allpolls/`,
+  `vic/info/`); `vic/cycles/` only appears once the Vic data records an
+  election older than its baseline. Every history write carries
+  `+ window.location.search` (query params survive a tab swap) and goes
+  through the module-scope `urlWrite(verb, to)` try/catch helper: a path
+  change throws SecurityError under `file://`, and unwrapped it killed the
+  whole app render there. The URL is a nicety over the tab state — it
+  must never veto the state itself. Consequences: file:// probes can
+  assert landing state but NOT the post-navigation pathname (writes are
+  swallowed by design — gate URL assertions on served-vs-file like
+  dem-facet.mjs's SERVED flag); served probes' tiny http servers must map
+  `p.endsWith("/") → p += "index.html"`. Pinned by
+  `.build/test-tab-pages.mjs` (in npm test), incl. "zero bare
+  history.pushState/replaceState remain in the asset".
+- RESPONSIVE 561–640 HEAD BAND — the masthead's phone arrangement
+  (meta hidden, `.head-right` display:contents, theme toggle pinned)
+  starts at `@media (max-width: 640px)` in template.html, NOT the 560px
+  rung the rest of the phone design uses: the un-wrapped head-meta line's
+  min-content overflows the document from 561 to ~636px. Same era's
+  companion fix: `.rd-tpp-chart .rd-tabs` gets `flex-wrap: wrap` at
+  641–700px (rd.css), where the desktop range-tabs + both check boxes
+  were ~5px wider than the card. Sweep recipe: scrollWidth ≤ viewport at
+  561/570/590/600/620/636/640/641/660/700 across all four tab documents.
 - `data/polls.json` — canonical poll rows (never hand-edit; extractors write it)
 - THE SECOND JURISDICTION — `/vic/` (wordmark "vicpol tracker", Victorian
   state election 28 Nov 2026) is the SAME BUILD on Victorian data, not a

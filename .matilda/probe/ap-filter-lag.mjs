@@ -43,7 +43,7 @@ await page.goto("about:blank");
 await page.setViewport({ width: 1366, height: 900, deviceScaleFactor: 1 });
 await page.emulateCPUThrottling(RATE);
 await cdp.send("Profiler.enable");
-await page.goto(URL0 + "#allpolls", { waitUntil: "networkidle0" });
+await page.goto(URL0 + "allpolls/", { waitUntil: "networkidle0" });
 await sleep(1500);
 await page.evaluate(() => { window.__lt.length = 0; });
 

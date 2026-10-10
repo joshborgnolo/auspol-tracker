@@ -28,7 +28,7 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 960 });
-await page.goto(`http://127.0.0.1:${PORT}/index.html#allpolls`, { waitUntil: "domcontentloaded" });
+await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "domcontentloaded" });
 await page.waitForSelector("#house-lean .rd-pl-flip", { timeout: 20000 });
 const fails = [];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

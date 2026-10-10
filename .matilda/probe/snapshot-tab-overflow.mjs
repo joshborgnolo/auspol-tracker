@@ -10,10 +10,11 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".json": "applica
 const server = createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
+    const body = await readFile(join(ROOT, p));
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
-    res.end(await readFile(join(ROOT, p)));
-  } catch { res.writeHead(404); res.end(); }
+    res.end(body);
+  } catch { if (!res.headersSent) { res.writeHead(404); res.end(); } }
 });
 await new Promise((r) => server.listen(PORT, r));
 
@@ -139,9 +140,9 @@ async function probe(view, label, fromHash) {
 /* from the deep end of another tab back to Snapshot, the click a reader makes */
 const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 };
 const LAPTOP = { width: 1280, height: 900 };
-await probe(PHONE, "phone from allpolls", "#allpolls");
-await probe(PHONE, "phone from cycles", "#cycles");
-await probe(LAPTOP, "laptop from allpolls", "#allpolls");
+await probe(PHONE, "phone from allpolls", "allpolls/");
+await probe(PHONE, "phone from cycles", "cycles/");
+await probe(LAPTOP, "laptop from allpolls", "allpolls/");
 
 await browser.close();
 server.close();

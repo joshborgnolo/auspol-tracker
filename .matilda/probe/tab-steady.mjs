@@ -15,31 +15,31 @@ const puppeteer = require("puppeteer-core");
 const ROOT = process.env.ROOT || fileURLToPath(new URL("../..", import.meta.url));
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml" };
 const server = http.createServer(async (req, res) => {
-  try { let p = decodeURIComponent(new URL(req.url, "http://x").pathname); if (p === "/") p = "/index.html";
+  try { let p = decodeURIComponent(new URL(req.url, "http://x").pathname); if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" }); res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end(); }
 });
 await new Promise((r) => server.listen(Number(process.env.PORT || 9233), r));
-const BASE = `http://127.0.0.1:${process.env.PORT || 9233}/index.html`;
+const BASE = `http://127.0.0.1:${process.env.PORT || 9233}/`;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // groups: [label, page hash/query, group selector, option selector within group]
 const GROUPS = [
-  ["main nav", "#now", ".tabs-set", ".tab"],
-  ["All polls facets", "#allpolls", ".rd-ap-tabs > [role=group]", "button"],
-  ["Latest polls facets", "#now", ".rd-pl-tabs [role=group]", "button"],
-  ["Who votes groups", "#now", "#who-votes .rd-wv-tabs [role=group]", "button"],
-  ["Who votes parties", "#now", "#who-votes .rd-wv-parties, #who-votes [aria-label*=arty]", "button"],
-  ["Leadership metric", "#now", ".rd-ld-panel .rd-tabs [role=group]", "button"],
-  ["Issues groups", "#now|whom", ".rd-iw-tabs [role=group]", "button"],
-  ["Issues chips", "#now|whom", ".rd-iw-chips", "button"],
-  ["Issues views", "#now", "#issues .rd-tabs [role=group]", "button"],
-  ["Pinned facets", "#allpolls|pin", ".rd-ap-pintabs", "button"],
-  ["Undecided views", "#now", "#undecided .rd-tabs [role=group], .rd-und .rd-tabs [role=group]", "button"],
-  ["House lean tabs", "#allpolls", ".rd-hl-tabs [role=group]", "button"],
-  ["Disagree tabs", "#allpolls", ".rd-dis-tabs [role=group]", "button"],
-  ["Split by (dem)", "?f=g#allpolls", ".rd-ap-dpick [role=radiogroup]", "button"],
-  ["Hero range", "#now", ".rd-tpp-chart .rd-tabs [role=group]", "button"],
+  ["main nav", "", ".tabs-set", ".tab"],
+  ["All polls facets", "allpolls/", ".rd-ap-tabs > [role=group]", "button"],
+  ["Latest polls facets", "", ".rd-pl-tabs [role=group]", "button"],
+  ["Who votes groups", "", "#who-votes .rd-wv-tabs [role=group]", "button"],
+  ["Who votes parties", "", "#who-votes .rd-wv-parties, #who-votes [aria-label*=arty]", "button"],
+  ["Leadership metric", "", ".rd-ld-panel .rd-tabs [role=group]", "button"],
+  ["Issues groups", "|whom", ".rd-iw-tabs [role=group]", "button"],
+  ["Issues chips", "|whom", ".rd-iw-chips", "button"],
+  ["Issues views", "", "#issues .rd-tabs [role=group]", "button"],
+  ["Pinned facets", "allpolls/|pin", ".rd-ap-pintabs", "button"],
+  ["Undecided views", "", "#undecided .rd-tabs [role=group], .rd-und .rd-tabs [role=group]", "button"],
+  ["House lean tabs", "allpolls/", ".rd-hl-tabs [role=group]", "button"],
+  ["Disagree tabs", "allpolls/", ".rd-dis-tabs [role=group]", "button"],
+  ["Split by (dem)", "allpolls/?f=g", ".rd-ap-dpick [role=radiogroup]", "button"],
+  ["Hero range", "", ".rd-tpp-chart .rd-tabs [role=group]", "button"],
 ];
 const results = [];
 for (const vw of (process.env.W || "1440,390,320").split(",").map(Number)) {

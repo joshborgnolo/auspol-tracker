@@ -810,7 +810,8 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     /* the tab list, rebuilt in the main page's order with its labels (the
        short label is the shell's own extra, baked in above). The contract
        carries WORDS only – href derives from the id exactly as mainTabs
-       derives it ("/#<id>"); writing t.href wrote the string "undefined",
+       derives it ("/" for Now, "/<id>/" otherwise; the tabs became real
+       pages 2026-10-10); writing t.href wrote the string "undefined",
        and a click went to <satellite>/undefined (2026-10-03 hotfix) */
     var set = document.querySelector(".sh-tabs-set");
     if (set && cp.tabs && cp.tabs.length) {
@@ -819,7 +820,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       while (set.firstChild) set.removeChild(set.firstChild);
       for (var ti = 0; ti < cp.tabs.length; ti++) {
         var t = cp.tabs[ti], a = document.createElement("a");
-        var h = "/#" + t.id;
+        var h = t.id === "now" ? "/" : "/" + t.id + "/";
         a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
         a.setAttribute("href", h);
         if (act === h) { a.className += " active"; a.setAttribute("aria-current", "page"); }
@@ -894,7 +895,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       if (disc) disc.textContent = F.disc;
       var fbp = document.querySelector(".sh-fb");
       if (fbp) {
-        fbp.innerHTML = esc(F.infoLead) + '<a href="/#info">' + esc(F.infoWord) + "</a>."
+        fbp.innerHTML = esc(F.infoLead) + '<a href="/info/">' + esc(F.infoWord) + "</a>."
           + (fbp.querySelector(".sh-fb-link") ? " " + esc(F.spot) + ' <a class="sh-fb-link" href="/feedback/">' + esc(F.linkWord) + "</a>." : "");
       }
       var arch = document.querySelector(".sh-arch");

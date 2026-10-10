@@ -35,6 +35,7 @@ if (!puppeteer) { console.error("puppeteer-core not resolvable"); process.exit(2
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const PAGE = process.env.LIVE ? "https://auspoltracker.com/" : `file://${ROOT}/index.html`;
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (label, ok, detail = "") => {
   console.log(`${ok ? "ok  " : "FAIL"}  ${label}${detail ? " — " + detail : ""}`);
@@ -90,7 +91,7 @@ async function rung(vw, vh, touch) {
   const worstL = Math.max(...tpp.rows.map((h, i) => Math.abs(h - lead.rows[i])));
   check(`${vw}px Latest rows: Leadership matches too`, worstL < EPS, `worst ${worstL.toFixed(3)}px`);
   if (vw > 1000) {
-    await page.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
+    await page.goto(`${APAGE}`, { waitUntil: "domcontentloaded" });
     await page.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
     await page.waitForSelector(".rd-hl-tabs button", { timeout: 30000 });
     await new Promise((r) => setTimeout(r, 1200));

@@ -24,7 +24,7 @@ await new Promise((r) => server.listen(0, r));
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--no-sandbox"] });
 const page = await browser.newPage();
 await page.setViewport({ width: 1366, height: 900, deviceScaleFactor: 1 });
-await page.goto(`http://127.0.0.1:${server.address().port}/index.html#allpolls`, { waitUntil: "networkidle0" });
+await page.goto(`http://127.0.0.1:${server.address().port}/allpolls/`, { waitUntil: "networkidle0" });
 await new Promise((r) => setTimeout(r, 1500));
 
 const pick = (cls, value) => page.evaluate(({ cls, value }) => {

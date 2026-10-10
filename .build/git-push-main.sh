@@ -283,9 +283,13 @@ freshness_sync() {
 # to all twenty-two copies by hand. stage_dataset also stages assets/ whole
 # (hashed fonts and cycle-source rename themselves), so a file under assets/
 # can't be left behind even if it's missing here. vic/index.html joined the
-# list when refresh_site began regenerating /vic/ too (2026-10-09).
+# list when refresh_site began regenerating /vic/ too (2026-10-09); the
+# per-tab pages joined when the tabs became real pages (2026-10-10) — Vic's
+# allpolls/info pair too (it has no cycles page until a term closes).
 # shellcheck disable=SC2034 # read by the wrappers that source this file
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
+  cycles/index.html allpolls/index.html info/index.html
+  vic/allpolls/index.html vic/info/index.html
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
   assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
 

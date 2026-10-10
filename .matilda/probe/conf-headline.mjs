@@ -23,6 +23,7 @@ import process from "process";
 
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PAGE = process.env.PAGE || "file://" + path.resolve(process.cwd(), "index.html");
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -37,7 +38,7 @@ const IDS = Object.keys(LAB);
 const open = async (w, qs = "") => {
   const phone = w <= 760;
   await page.setViewport({ width: w, height: 900, deviceScaleFactor: 1, isMobile: phone, hasTouch: phone });
-  await page.goto(PAGE + qs + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(APAGE + qs, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".rd-ap-tabs .rd-tab", { timeout: 30000 });
   await sleep(600);
 };

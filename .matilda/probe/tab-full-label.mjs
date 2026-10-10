@@ -27,7 +27,7 @@ for (const W of [420, 390, 360, 320]) {
   const page = await browser.newPage();
   await page.setViewport({ width: W, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 160)); fails.push(W + " pageerror"); });
-  await page.goto(`http://127.0.0.1:${server.address().port}/#cycles`, { waitUntil: "domcontentloaded" });
+  await page.goto(`http://127.0.0.1:${server.address().port}/cycles/`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".tabs .tab", { timeout: 45000 });
   await new Promise((r) => setTimeout(r, 900));
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

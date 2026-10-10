@@ -37,7 +37,7 @@ const newPage = async (w, h, hash) => {
   const page = await browser.newPage();
   page.on("pageerror", (e) => fails.push("pageerror: " + e.message));
   await page.setViewport({ width: w, height: h });
-  await page.goto(`http://127.0.0.1:${PORT}/index.html` + (hash || ""), { waitUntil: "domcontentloaded" });
+  await page.goto(`http://127.0.0.1:${PORT}/` + (hash || ""), { waitUntil: "domcontentloaded" });
   return page;
 };
 const scrollY = (page) => page.evaluate(() => window.scrollY);
@@ -148,7 +148,7 @@ const space = async (page) => { await page.keyboard.press("Space"); await sleep(
 
 /* ---------- C. All polls ---------------------------------------------- */
 {
-  const page = await newPage(1440, 960, "#allpolls");
+  const page = await newPage(1440, 960, "allpolls/");
   await page.waitForSelector("#rd-ap-top .rd-ap-table .rd-ap-row, #rd-ap-top .rd-ap-table .rd-ap-card", { timeout: 20000 });
   await sleep(700);
   await toCentre(page, "#rd-ap-top .rd-ap-table");
@@ -191,7 +191,7 @@ const space = async (page) => { await page.keyboard.press("Space"); await sleep(
 
 /* ---------- D. All polls, phone ---------------------------------------- */
 {
-  const page = await newPage(390, 844, "#allpolls");
+  const page = await newPage(390, 844, "allpolls/");
   await page.waitForSelector("#rd-ap-top .rd-ap-table .rd-ap-card, #rd-ap-top .rd-ap-table .rd-ap-row", { timeout: 20000 });
   await sleep(700);
   await toCentre(page, "#rd-ap-top .rd-ap-table");

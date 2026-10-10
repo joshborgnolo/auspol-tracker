@@ -48,7 +48,7 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1366, height: 900 });
   page.on("pageerror", (e) => console.log("PAGEERROR", String(e).slice(0, 200)));
-  await page.goto(`http://127.0.0.1:${PORT}/#allpolls`, { waitUntil: "domcontentloaded" });
+  await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".rd-ap-sel-house", { timeout: 20000 });
 
   const desk = await page.evaluate(async () => {
@@ -85,7 +85,7 @@ try {
   const ph = await browser.newPage();
   await ph.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   ph.on("pageerror", (e) => console.log("PAGEERROR", String(e).slice(0, 200)));
-  await ph.goto(`http://127.0.0.1:${PORT}/#allpolls`, { waitUntil: "domcontentloaded" });
+  await ph.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "domcontentloaded" });
   await ph.waitForSelector(".rd-ap-pinf", { timeout: 20000 });
   /* the bar is inert (aria-hidden, pointer-events none) until the section
      head scrolls past — pin it before clicking Filters */
