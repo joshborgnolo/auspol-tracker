@@ -250,9 +250,19 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
   "Independents/Others" rides the poll row's `ind` (row.oth is null); the
   city table files as the `location` dim with its printed group names, the
   release content comes from the VI extractor's committed findings cache
-  (read-only here; live fetch when a healer-filed row has none), and a
-  release with no caption pair is remembered in the store's `none` so the
-  slot doesn't re-check it every run. macOS-only — any other platform
+  (read-only here; live fetch when a healer-filed row has none, and —
+  since the 2026-10-10 hardening — when the cache is corrupt: noted and
+  re-fetched live once, never re-read silently run after run; a
+  contentless read is a note and a next-run retry, never a none-mark),
+  and a release with no caption is remembered in the store's `none` so
+  the slot doesn't re-check it every run — but a caption paired with an
+  <img> the parser can't resolve to a .png is a GUARD (the layout
+  shifted; a none-mark there would blind the wave for good), a wave
+  filing off ONE resolved table is noted with its partner's cross-checks
+  vacated, and the store's own shape is validated at load (a drifted
+  data/roymorgan-demo.json guards rather than being silently reset and
+  rewritten; the OCR temp dir is swept at every exit). macOS-only — any
+  other platform
   notes and exits 0 changed:false, so the CI twin of roymorgan-updater.sh
   is unaffected; the wrapper runs the pass warn-only (a guard trip never
   blocks the poll pipeline) before its changed:false early-exit and

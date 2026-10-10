@@ -43,6 +43,16 @@ export function num(t) {
 // The release content's table captions → the full-size image each captions.
 // The caption text sits immediately BEFORE its <img>; srcset thumbnails
 // (…-300x160.png) ride inside the same tag, but src is the full image.
+// CAPTION_RES is exported for the extractor's drift guard: a caption found
+// but no image resolved is a moved layout, not a table-less release — the
+// extractor and this parser must read the captions through the ONE regex
+// pair, or the two drift apart silently.
+const gap = "(?:<[^>]+>|\\s|&nbsp;)+";
+export const CAPTION_RES = {
+  city: new RegExp(`Primary${gap}Vote${gap}by${gap}City`, "i"),
+  state: new RegExp(`Primary${gap}Vote${gap}by${gap}(?:the${gap})?State\\b`, "i"),
+};
+export const SEEN_IMG_RE = /<img[\s>]/i;
 export function tableImages(html) {
   const find = (re) => {
     const i = String(html ?? "").search(re);
@@ -50,11 +60,7 @@ export function tableImages(html) {
     const m = /<img[^>]+src="([^"]+?\.png[^"]*)"/i.exec(String(html).slice(i));
     return m ? m[1] : null;
   };
-  const gap = "(?:<[^>]+>|\\s|&nbsp;)+";
-  return {
-    city: find(new RegExp(`Primary${gap}Vote${gap}by${gap}City`, "i")),
-    state: find(new RegExp(`Primary${gap}Vote${gap}by${gap}(?:the${gap})?State\\b`, "i")),
-  };
+  return { city: find(CAPTION_RES.city), state: find(CAPTION_RES.state) };
 }
 
 // Greedy y-clustering: tokens on one printed row agree in y within ~0.02,

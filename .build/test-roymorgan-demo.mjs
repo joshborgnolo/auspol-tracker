@@ -17,7 +17,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import {
-  tableImages, parseStateTable, parseCityTable, num,
+  tableImages, CAPTION_RES, SEEN_IMG_RE, parseStateTable, parseCityTable, num,
   CITY_GROUP, REGION_GROUP, PARTIES,
 } from "./rm-demo-parse.mjs";
 import { run, waveProblem, FIRST_WAVE, DEMO_POLLSTER } from "./extract-roymorgan-demo.mjs";
@@ -145,7 +145,7 @@ const CAPTIONED = `
 <p>Primary Vote by <strong>City/Country</strong> <img src="${IMG.city}" srcset="${IMG.city.replace(".png", "-300x160.png")} 300w"/></p>
 <p>Primary Vote by <strong>the State</strong>s <img src="${IMG.state}" srcset="${IMG.state.replace(".png", "-300x160.png")} 300w"/></p>`;
 
-function sandbox({ rows, caches, ocrMap, demoFile }) {
+function sandbox({ rows, caches = {}, cacheRaw, ocrMap, demoFile, fetchPost, rmdTmp }) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rmd-test-"));
   fs.writeFileSync(path.join(tmp, "polls.json"), JSON.stringify({ polls: rows }));
   fs.writeFileSync(path.join(tmp, "demographics.json"), JSON.stringify(demoFile ?? { waves: [FILE_WAVE] }));
@@ -153,7 +153,13 @@ function sandbox({ rows, caches, ocrMap, demoFile }) {
   fs.mkdirSync(src, { recursive: true });
   for (const [slug, content] of Object.entries(caches))
     fs.writeFileSync(path.join(src, `release-${slug}.json`), JSON.stringify({ content }));
+  for (const [slug, raw] of Object.entries(cacheRaw ?? {}))
+    fs.writeFileSync(path.join(src, `release-${slug}.json`), raw);
   const outPath = path.join(tmp, "roymorgan-demo.json");
+  if (rmdTmp) {
+    fs.mkdirSync(rmdTmp, { recursive: true });
+    fs.writeFileSync(path.join(rmdTmp, "marker"), "");
+  }
   const ctx = {
     pollsPath: path.join(tmp, "polls.json"),
     outPath,
@@ -162,11 +168,12 @@ function sandbox({ rows, caches, ocrMap, demoFile }) {
     writeFiles: true,
     todayIso: "2026-10-09",
     ocrImage: async (url) => {
-      if (!(url in ocrMap)) throw new Error(`unexpected image fetch ${url}`);
+      if (!(url in (ocrMap ?? {}))) throw new Error(`unexpected image fetch ${url}`);
       return ocrMap[url];
     },
-    fetchPost: async (slug) => { throw new Error(`no live fetch in tests (${slug})`); },
+    fetchPost: fetchPost ?? (async (slug) => { throw new Error(`no live fetch in tests (${slug})`); }),
   };
+  if (rmdTmp) ctx.tmpPath = rmdTmp;
   return { tmp, ctx, outPath };
 }
 
@@ -281,6 +288,135 @@ console.log("9. recon drift: guard, never a rewrite: OK");
   assert.match(r2.guard, new RegExp(`${SLUG_PLAIN}: the state table no longer parses`));
 }
 console.log("10. none memory + unparseable-table guard: OK");
+
+// 11: a corrupt committed cache is noted, re-fetched live and filed through
+// the usual gates — never re-read silently run after run
+{
+  let fetches = 0;
+  const { ctx, outPath } = sandbox({
+    rows: [POLL_ROW, NEW_ROW],
+    caches: { [SLUG_10363]: RELEASE_10363.content },
+    cacheRaw: { [SLUG_10370]: "{ this is not JSON" },
+    ocrMap: { [IMG.state]: FULL_STATE, [IMG.city]: CITY_LINES },
+    fetchPost: async () => { fetches += 1; return { content: CAPTIONED }; },
+  });
+  const r = await run(ctx);
+  assert.equal(r.exit, 0);
+  assert.equal(fetches, 1, "the unreadable cache is bypassed exactly once");
+  assert.ok(r.notes.some((n) => n.includes(`${SLUG_10370}: committed cache unreadable`)),
+    `the corrupt cache is told, not silent (got: ${r.notes.join(" | ") || "none"})`);
+  assert.deepEqual(r.filed, [`${DEMO_POLLSTER}|2026-10-05`], "the live-fetched release files through the usual gates");
+  assert.deepEqual(JSON.parse(fs.readFileSync(outPath, "utf8")).none, {},
+    "a corrupt cache is never remembered as no-tables");
+}
+console.log("11. corrupt cache: live fallback + note, filed as usual: OK");
+
+// 12: a contentless read (no cache, fetch down) is a note and a retry —
+// never a filing and never a none-mark
+{
+  let fetches = 0;
+  const { ctx, outPath } = sandbox({
+    rows: [NEW_ROW],
+    fetchPost: async () => { fetches += 1; throw new Error("upstream 503"); },
+  });
+  let r = await run(ctx);
+  assert.equal(r.exit, 0);
+  assert.equal(r.changed, false);
+  assert.equal(fetches, 1);
+  assert.ok(r.notes.some((n) => n.includes("release page fetch failed")), "the failure is told");
+  assert.equal(fs.existsSync(outPath), false, "nothing files, no none-mark lands on disk");
+  r = await run(ctx);
+  assert.equal(fetches, 2, "the next run retries the wave — it was never none-marked");
+  assert.equal(fs.existsSync(outPath), false);
+}
+console.log("12. contentless read: note now, retry next run, never none: OK");
+
+// 13: caption(s) with an unresolvable image = layout guard; caption prose
+// with no <img> stays a plain release
+{
+  const CAPTION_JPG = `<p>Primary Vote by <strong>the State</strong>s</p><p><img src="https://x/state-table.jpg"/></p>`;
+  const { ctx, outPath } = sandbox({ rows: [NEW_ROW], caches: { [SLUG_10370]: CAPTION_JPG }, ocrMap: {} });
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, new RegExp(`${SLUG_10370}: table caption and an <img> but no table image resolved`));
+  assert.equal(fs.existsSync(outPath), false, "a guarded layout writes no store — no poisoned none-mark");
+}
+{
+  const CAPTION_SQUOTE = `<p>Primary Vote by City</p><img src='https://x/city.png'/>`;
+  const { ctx } = sandbox({ rows: [NEW_ROW], caches: { [SLUG_10370]: CAPTION_SQUOTE }, ocrMap: {} });
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, /no table image resolved/, "a src the double-quote regex misses is drift, not a plain release");
+}
+{
+  const PROSE = `<p>Primary Vote by State tables return in the next release.</p>`;
+  const { ctx, outPath } = sandbox({ rows: [NEW_ROW], caches: { [SLUG_10370]: PROSE }, ocrMap: {} });
+  const r = await run(ctx);
+  assert.equal(r.exit, 0);
+  assert.equal(r.changed, true);
+  assert.deepEqual(r.checkedNone, [SLUG_10370], "caption prose without an image is a plain release");
+  assert.deepEqual(JSON.parse(fs.readFileSync(outPath, "utf8")).none, { [SLUG_10370]: "2026-10-09" });
+}
+assert.ok(CAPTION_RES.city.test(RELEASE_10363.content) && CAPTION_RES.state.test(RELEASE_10363.content)
+  && SEEN_IMG_RE.test(RELEASE_10363.content), "the exported guards ride the same captions the parser reads");
+console.log("13. caption+unresolved-image guards; prose captions stay plain: OK");
+
+// 14: one resolved table alone files with the vacated-check note, and its
+// wave stays recon-clean on re-run
+{
+  const CITY_ONLY = `<p>Primary Vote by <strong>City/Country</strong></p><p><img src="${IMG.city}"/></p>`;
+  const { ctx, outPath } = sandbox({
+    rows: [POLL_ROW, NEW_ROW],
+    caches: { [SLUG_10363]: RELEASE_10363.content, [SLUG_10370]: CITY_ONLY },
+    ocrMap: { [IMG.state]: STATE_LINES, [IMG.city]: CITY_LINES },
+  });
+  let r = await run(ctx);
+  assert.equal(r.exit, 0);
+  assert.deepEqual(r.filed, [`${DEMO_POLLSTER}|2026-10-05`]);
+  assert.ok(r.notes.some((n) => n.includes(`${SLUG_10370}: only the city table resolved`) && n.includes("state column-sum checks")),
+    `the vacated cross-check is told (got: ${r.notes.join(" | ") || "none"})`);
+  const w = JSON.parse(fs.readFileSync(outPath, "utf8")).waves.find((x) => x.date === "2026-10-05");
+  assert.equal(w.stateImg, null);
+  assert.deepEqual(Object.keys(w.dims), ["location"]);
+  r = await run(ctx);
+  assert.equal(r.exit, 0);
+  assert.equal(r.changed, false, "a one-table store wave is recon-clean on re-run");
+}
+console.log("14. one-table filing: vacated cross-check noted: OK");
+
+// 15: the demo store's own shape is guarded at load (never read into
+// memory, never rewritten), and run() sweeps the OCR temp dir at exit
+{
+  const { ctx, outPath } = sandbox({ rows: [NEW_ROW] });
+  fs.writeFileSync(outPath, "{ this is not JSON");
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, /demo store shape drifted — not an object/);
+  assert.equal(fs.readFileSync(outPath, "utf8"), "{ this is not JSON", "a drifted store is never rewritten");
+}
+{
+  const { ctx, outPath } = sandbox({ rows: [NEW_ROW] });
+  fs.writeFileSync(outPath, JSON.stringify({ waves: {}, none: {} }));
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, /waves is not an array/);
+}
+{
+  const { ctx, outPath } = sandbox({ rows: [NEW_ROW] });
+  fs.writeFileSync(outPath, JSON.stringify({ waves: [], none: { [SLUG_10370]: "yesterday" } }));
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, /none \S+: not an ISO day/);
+}
+{
+  const rmdTmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "rmd-pin-")), "rmd-work");
+  const { ctx } = sandbox({ rows: [NEW_ROW], rmdTmp });
+  assert.ok(fs.existsSync(path.join(rmdTmp, "marker")), "the sandbox pre-made the OCR dir");
+  const r = await run(ctx);
+  assert.equal(r.exit, 0);
+  assert.equal(fs.existsSync(rmdTmp), false, "run() swept the OCR temp dir at exit");
+}
+console.log("15. store-shape guard + temp-dir sweep: OK");
 
 console.log("All Roy Morgan demo-reader pins pass.");
 assert.equal(FIRST_WAVE, "2026-09-27");
