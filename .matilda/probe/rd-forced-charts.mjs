@@ -223,7 +223,7 @@ const FFexp = FF ? expectedForced(FF) : null;
 await gotoFlows(1366);
 const d = await measure();
 check(d.nFig === 2, `desktop: two forced-choice figures (${d.nFig})`);
-check(d.h3 === "When pressed, where do their voters go?", `desktop: section head is the forced-choice line`);
+check(d.h3 === "RedBridge/Accent’s respondent-allocated preferences", `desktop: section head is the respondent-allocated line`);
 check(d.orderKeyThenForced.iKey > -1 && d.orderKeyThenForced.iFF === d.orderKeyThenForced.iKey + 1,
   `desktop: the forced pair sits directly under the drift key (key idx ${d.orderKeyThenForced.iKey}, forced idx ${d.orderKeyThenForced.iFF})`);
 check(d.orderKeyThenForced.iTsig === d.orderKeyThenForced.iFF + 1,

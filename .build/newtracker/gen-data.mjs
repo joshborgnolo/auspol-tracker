@@ -3003,8 +3003,8 @@ const individualPolls = POLLS.map((p) => {
        Nation (tpp_split_on.lnp) and when One Nation voters are pressed
        Labor-v-the Coalition (tpp_split.onp), plus the Greens/other
        cohorts on both questions – the Coalition/One Nation pair are the
-       same fields the "When pressed, where do their voters go?" panel
-       charts; the archive detail lists them all in after-preferences, and
+       same fields the respondent-allocated-preferences panel charts; the
+       archive detail lists them all in after-preferences, and
        Jun 2026's press-only Coalition figure carries splitCoalEst. */
     ...(p.tpp_split_on && p.tpp_split_on.lnp != null
       ? { splitCoal: p.tpp_split_on.lnp, ...(HAND_SPLIT_ON.has(p.date) ? { splitCoalEst: true } : {}) }

@@ -546,3 +546,25 @@ hover, wave swap, mouse-out clear).
 - `new URL("..", import.meta.url)` has NO trailing slash → resolves to the
   parent of `.build/`, not repo root; use `new URL("../", import.meta.url)`
   and prefix `.build/newtracker/…` inside.
+
+## The forced-choice pair's head+dek are HAND-CURATED (2026-10-10)
+
+The RdFlows `rd-ff` block's `<h3 class="rd-ff-t">` + `<p class="rd-ff-d">`
+(rd-allpolls.jsx, formerly "When pressed, where do their voters go?") are
+user-dictated static strings that no longer regenerate — refresh by hand
+when the pool or the facts move (RD_DEMO_HOME convention):
+
+- Head: "RedBridge/Accent’s respondent-allocated preferences"
+- Dek: "RedBridge/Accent is the only pollster that publishes
+  respondent-allocated preferences. These tell us the extent to which
+  Coalition voters, for example, prefer One Nation over Labor. Take them
+  with a grain of salt, however, when it comes to predicting the
+  preference flows at the next election. Last-election preference flows
+  consistently perform better than respondent-allocated preference flows,
+  in that domain."
+
+The head is PINNED by the rd-forced-charts probe ("desktop: section head
+is the respondent-allocated line") — a copy change there must move the
+probe in the same commit. The older a11e1559/gen-data comments that used
+to name the panel by the old title now refer to the
+respondent-allocated-preferences panel instead.

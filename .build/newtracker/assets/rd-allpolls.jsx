@@ -4623,8 +4623,10 @@ function RdFlows() {
       </RdKey>
       {FF && <div className="rd-ff">
         <div className="rd-ff-head">
-          <h3 className="rd-ff-t">When pressed, where do their voters go?</h3>
-          <p className="rd-ff-d">RedBridge/Accent is the one pollster that asks: if their first preference can’t win, who do they pick — every month it publishes how each party’s voters say they’d break.</p>
+          {/* head + dek hand-curated (user's wording, 2026-10-10): refresh by
+              hand, they no longer regenerate */}
+          <h3 className="rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
+          <p className="rd-ff-d">RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently perform better than respondent-allocated preference flows, in that domain.</p>
         </div>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">

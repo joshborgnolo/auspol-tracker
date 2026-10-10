@@ -3177,8 +3177,8 @@ function tppLines(cs, r) {
       ],
     } });
     /* the house-printed cohort forced-choice figures (RedBridge/Accent's
-       Table 1 splits – the "When pressed, where do their voters go?"
-       panel's waves): published figures, so they sit in this section, each
+       Table 1 splits – the respondent-allocated-preferences panel's waves):
+       published figures, so they sit in this section, each
        with its own series delta exactly as the flows line above. The note
        names the cohort, or the pair alone can't say whose figure it is */
     if (c.kind === "2pp" && r.splitCoal != null) {
