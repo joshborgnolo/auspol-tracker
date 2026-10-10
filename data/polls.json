@@ -4473,6 +4473,11 @@
         "onp": 21,
         "oth": 62
       },
+      "tpp_split_on": {
+        "lnp": 36,
+        "grn": 92,
+        "oth": 70
+      },
       "firmness": {
         "all": [
           49,

@@ -4306,10 +4306,120 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   );
 }
 
+/* ---------------------------------------------------------------- preference flows — the forced-choice pair */
+/* RedBridge/Accent's monthly "forced to choose" tables, as lines (data:
+   gen-data §7db's D.flowForced, moved here from /preference-flows/' #forced
+   section 2026-10-10). Each chart is one cohort's answer when its first
+   preference can't win: Coalition voters pushed to Labor-or-One-Nation, and
+   One Nation voters pushed to Labor-or-the-Coalition. a/b sum to 100 by
+   construction. Drawing is deliberately light vs RdFlowChart above: no
+   estimator, no band — just the house's published waves. */
+function RdForced({ waves, rival, W, phone }) {
+  const D = window.AUSPOL;
+  const [tip, setTip] = useState(null);         // { ym, src }
+  const ptr = React.useRef(null);
+  const box = React.useRef(null);
+  const tipBox = React.useRef(null);
+  window.useDismissOutside(box, !!(tip && tip.src === "touch"), () => setTip(null));
+  /* same in-render clamp idiom as RdFlowChart's, one kind, so the card's
+     measured width corrects the next open of the same kind */
+  const [tipW, setTipW] = useState(0);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (el) setTipW((p) => (Math.abs(p - el.offsetWidth) > 0.5 ? el.offsetWidth : p));
+    if (el && box.current) {
+      el.style.top = "";
+      const b = box.current.getBoundingClientRect();
+      const minTop = 78 - b.top + el.offsetHeight;
+      if (minTop > -6) el.style.top = Math.round(minTop) + "px";
+    }
+  }, [tip]);
+  if (!waves || waves.length < 2) return null;
+  const H = phone ? 190 : 230;
+  const x0 = phone ? 30 : 36, rpad = phone ? 52 : 62, top = 16, bot = H - 34;
+  const x1 = W - rpad;
+  const ms = [];
+  for (const w of waves) if (!ms.includes(w.ym)) ms.push(w.ym);
+  /* month gap: March printed no Table 1, so Feb–Apr spines step over it
+     smoothly while the dot strip jumps (no dot where no wave was) */
+  const X = (ym) => x0 + (ms.indexOf(ym) / (ms.length - 1)) * (x1 - x0);
+  const Y = (v) => bot - (v / 100) * (bot - top);
+  const aPts = waves.map((w) => [X(w.ym), Y(w.a)]);
+  const bPts = waves.map((w) => [X(w.ym), Y(w.b)]);
+  const la = waves[waves.length - 1];
+  const ticks = rdApMonthTicks(ms, phone ? 2 : 1);
+  const show = (w, src) => setTip({ ym: w.ym, src, w });
+  const hide = (w, src) => setTip((t) => (t && t.ym === w.ym && (!src || t.src === src) ? null : t));
+  const tpx = tip ? X(tip.ym) : 0;
+  const half = Math.min((tipW || 220) / 2, W / 2 - 8);
+  return (
+    <figure className="rd-ff" ref={box}>
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
+           aria-label={`If forced to choose between Labor and ${rival}, ${rival === "the Coalition" ? "One Nation" : "Coalition"} voters' split by month: latest ${la.a} Labor, ${la.b} ${rival}.`}>
+        {[0, 25, 50, 75, 100].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={"rd-ff-gl" + (v === 50 ? " mid" : "")}></path>)}
+        {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
+        <path d={monotoneXY(aPts)} className="rd-ff-line a"></path>
+        <path d={monotoneXY(bPts)} className={"rd-ff-line b" + (rival === "the Coalition" ? " is-lnp" : "")}></path>
+        {waves.map((w) => (
+          <g key={w.ym}>
+            {tip && tip.ym === w.ym && <><circle cx={X(w.ym)} cy={Y(w.a)} r="6" className="rd-apd-dothi"></circle><circle cx={X(w.ym)} cy={Y(w.b)} r="6" className="rd-apd-dothi"></circle></>}
+            <circle cx={X(w.ym)} cy={Y(w.a)} r="3" className="rd-ff-dot a"></circle>
+            <circle cx={X(w.ym)} cy={Y(w.b)} r="3" className={"rd-ff-dot b" + (rival === "the Coalition" ? " is-lnp" : "")}></circle>
+            <circle cx={X(w.ym)} cy={Y(w.a)} r="9" className="rd-apd-hit"
+                    tabIndex="0" role="img"
+                    aria-label={`${rdMonthYear(w.ym)}: Labor ${w.a}, ${rival} ${w.b}${w.est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}`}
+                    onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                    onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, "mouse"); }}
+                    onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
+                    onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(w, "focus"); }}
+                    onBlur={() => hide(w, "focus")}
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      const pt = ev.detail === 0 ? "key" : ptr.current;
+                      ptr.current = null;
+                      if (pt === "mouse" || pt === "key") return;
+                      if (tip && tip.ym === w.ym) setTip(null); else show(w, "touch");
+                    }}></circle>
+            <circle cx={X(w.ym)} cy={Y(w.b)} r="9" className="rd-apd-hit"
+                    tabIndex="-1" aria-hidden="true"
+                    onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                    onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, "mouse"); }}
+                    onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      const pt = ev.detail === 0 ? "key" : ptr.current;
+                      ptr.current = null;
+                      if (pt === "mouse" || pt === "key") return;
+                      if (tip && tip.ym === w.ym) setTip(null); else show(w, "touch");
+                    }}></circle>
+          </g>
+        ))}
+        <text x={x1 + 8} y={Y(la.a) - 2} className="rd-ff-el a">Labor</text>
+        <text x={x1 + 8} y={Y(la.a) + 12} className="rd-ff-elv a">{la.a}</text>
+        <text x={x1 + 8} y={Y(la.b) - 2} className={"rd-ff-el b" + (rival === "the Coalition" ? " is-lnp" : "")}>{rival === "the Coalition" ? "Coalition" : "One Nation"}</text>
+        <text x={x1 + 8} y={Y(la.b) + 12} className={"rd-ff-elv b" + (rival === "the Coalition" ? " is-lnp" : "")}>{la.b}</text>
+        <path d={`M${x0} ${bot}H${x1}` + ticks.map((t) => `M${X(t.ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
+        {ticks.map((t) => <text key={t.ym} x={X(t.ym)} y={bot + 16} className="rd-dis-ax" textAnchor="middle">{t.lab}</text>)}
+      </svg>
+      {tip && (
+        <span ref={tipBox} className="tip rd-fl-tip rd-ff-tip" style={{ left: Math.min(W - 8 - half, Math.max(8 + half, tpx)) }}>
+          <span className="tip-title">{rdMonthYear(tip.ym)}</span>
+          <span className="tip-row"><span className="tip-label">Labor</span><span className="tip-val">{tip.w.a}%</span></span>
+          <span className="tip-row"><span className="tip-label">{rival === "the Coalition" ? "Coalition" : "One Nation"}</span><span className="tip-val">{tip.w.b}%</span></span>
+          {tip.w.n != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {tip.w.n.toLocaleString()}</span></span>}
+          {tip.w.url && <span className="tip-row tip-hintwrap"><a className="tip-hint rd-ff-lnk" href={tip.w.url} target="_blank" rel="noopener">RedBridge/Accent wave report ↗</a></span>}
+          {tip.w.est && <span className="tip-row tip-hintwrap"><span className="tip-sub tip-hint">June’s Coalition split combines the report’s printed CLP/LNP/Nat (34) and Liberal (37) rows — no combined row was printed</span></span>}
+        </span>
+      )}
+    </figure>
+  );
+}
+
 function RdFlows() {
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
   const FD = D.flowDrift, FO = D.flowDriftOn;
+  const FF = D.flowForced;
   const [pop, setPop] = useState(null);
   const [pick, setPick] = useState(null);
   const box = useRef(null);
@@ -4387,6 +4497,22 @@ function RdFlows() {
         <span className="rd-key-item"><span className="rd-fl-keywd" aria-hidden="true"></span>One published wave’s own gap – hover to read the wave</span>
         <span className="rd-key-item"><span className="rd-fl-keynow" aria-hidden="true"><i></i></span>Now: the latest weeks pooled, with its 95% interval</span>
       </RdKey>
+      {FF && <div className="rd-ff">
+        <div className="rd-ff-head">
+          <h3 className="rd-ff-t">When pressed, where do their voters go?</h3>
+          <p className="rd-ff-d">RedBridge/Accent is the one pollster that asks: if their first preference can’t win, who do they pick — every month it publishes how each party’s voters say they’d break.</p>
+        </div>
+        <div className="rd-fl-two rd-ff-two">
+          <div className="rd-fl-one">
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">Coalition voters, if forced to Labor or One Nation</h4></div>
+            <RdForced waves={FF.coal} rival="One Nation" W={cw} phone={phone} />
+          </div>
+          <div className="rd-fl-one">
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">One Nation voters, if forced to Labor or the Coalition</h4></div>
+            <RdForced waves={FF.on} rival="the Coalition" W={cw} phone={phone} />
+          </div>
+        </div>
+      </div>}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;
           sets are the two contests, Holm's correction within each */}
@@ -4397,6 +4523,7 @@ function RdFlows() {
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster’s first head-to-heads. This check corrects no other figure on the page.
+        {FF && " The pressed-choice pairs beneath are RedBridge/Accent’s published waves, read straight off its reports (link on each dot); only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."}
       </RdFoot>
     </section>
   );

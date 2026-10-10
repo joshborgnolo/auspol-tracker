@@ -2215,7 +2215,6 @@ const DEMO_WHO = {
   University: "university graduates",
   NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
   SA: "voters in South Australia", WA: "voters in Western Australia",
-  "ACT/NT/Tas": "voters in Tasmania, the ACT, and the NT",
   "Non-NSW/Vic/Qld": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
   Provincial: "voters in provincial towns and cities", Rural: "rural voters",
@@ -2606,7 +2605,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         <p className="table-hint">
           Groups pool only where pollsters cut them the same way
           {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34"
-            : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote (ACT/NT/Tas also stands as a group of its own, with Tasmania-, ACT- and NT-only readings drawn beside it as comparison points and pooled into nothing), and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
+            : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
             : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups"
             : ""}.
         </p>
@@ -3823,34 +3822,6 @@ function sampleValue(x) {
   );
 }
 
-/* gen-data §5c's single-territory figures ride a wave's OWN row - Roy
-   Morgan's printed Tasmanian table, DemosAU (MRP)'s three territory cuts,
-   and whole-territory polls such as EMRS's Tasmanian surveys. Elsewhere on
-   the site they are the open rings beside the ACT/NT/Tas trio: single-
-   territory readings shown for comparison, never pooled into the lines.
-   Three detail bands (Latest, Archive, All polls) disclose them, so the
-   sentence is built once, here, beside sampleValue - written so the bands
-   cannot drift. The territory names come in two forms: bare, for the
-   suspended-hyphen list ("Tasmania-, ACT- and NT-only"), and flowing, for
-   sentences ("the ACT"). */
-const SOLO_TERR_NAME = { Tas: "Tasmania", ACT: "ACT", NT: "NT" };
-const SOLO_TERR_PROSE = { Tas: "Tasmania", ACT: "the ACT", NT: "the NT" };
-function soloNote(x) {
-  if (!x.solo || !x.solo.length) return null;
-  const terrs = [...new Set(x.solo.filter((e) => SOLO_TERR_NAME[e.terr]).map((e) => e.terr))];
-  if (!terrs.length) return null;
-  const pts = terrs.length > 1 ? "comparison points" : "a comparison point";
-  if (x.solo.some((e) => e.whole))
-    return "The whole poll asked " + SOLO_TERR_PROSE[terrs[0]] + " alone - an open ring beside the ACT/NT/Tas trio, " + pts + ", pooled into nothing.";
-  const bits = terrs.map((t) => SOLO_TERR_NAME[t]);
-  const names = bits.length === 1 ? "A " + bits[0] + "-only"
-    : bits.length === 2 ? bits[0] + "- and " + bits[1] + "-only"
-    : bits[0] + "-, " + bits[1] + "- and " + bits[2] + "-only";
-  return names + " reading" + (bits.length > 1 ? "s stand" : " stands")
-    + " beside the ACT/NT/Tas trio as " + (bits.length > 1 ? "open rings" : "an open ring")
-    + " - " + pts + ", pooled into nothing.";
-}
-
 /* The pollster's own pages, as rows for the provenance band. Built here, in
    the file both tables share, but rendered INSIDE each table's own
    .pd-meta-items so they land in the same grid as fieldwork and sample - a
@@ -4146,10 +4117,6 @@ function PollDetail({ r }) {
               made the effective sample look like a separate measurement. */}
           <span className="pd-meta-i"><span className="pd-meta-k">Sample</span>
             <span className="pd-meta-v">{sampleValue(r)}</span></span>
-          {/* the single-territory readings the wave also carries (sentence
-              built beside sampleValue so every band voices it the one way) */}
-          {r.solo && <span className="pd-meta-i"><span className="pd-meta-k">Territory readings</span>
-            <span className="pd-meta-v">{soloNote(r)}</span></span>}
           {releaseMetaRows(r)}
           {/* the wave's pull on the standing aggregates closes the band –
               last rows of the same grid as the provenance above */}
@@ -4962,9 +4929,6 @@ Object.assign(window, { Segmented, TextToggle, Delta, HowTo, SortTh, fitDomain, 
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,
-  // the other two detail bands read the territory-readings sentence from
-  // here, so all three voice it the one way
-  soloNote,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp });

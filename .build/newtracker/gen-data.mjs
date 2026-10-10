@@ -3535,6 +3535,41 @@ const flowDriftOn = driftOnAnom.length ? {
   }).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster)),
 } : null;
 
+/* ---- 7db. "forced to choose" respondent splits, as lines ------------------
+   The data under what was /preference-flows/' #forced section until
+   2026-10-10, moved into the All-polls flow-drift section: RedBridge/Accent
+   is the one house printing a respondent-allocated two-party BY FIRST
+   PREFERENCE every month — tpp_split_on (the Labor-v-One Nation choice, by
+   Coalition/Greens/other voters) and tpp_split (the Labor-v-Coalition
+   choice, by Greens/One Nation/other voters). The panel draws two pairs of
+   lines from them: what Coalition voters pick when pushed to Labor-or-ON
+   (coal) and what One Nation voters pick when pushed to Labor-or-Coalition
+   (on). a is the named cohort's share to Labor, b its complement to the
+   rival. Jun 2026's coal row is the hand-derived 36/64 documented in
+   polls.schema.json's tpp_split_on note. Passthrough display data, noAgg
+   rows included: nothing here feeds an estimator. */
+const flowForced = (() => {
+  const rows = D.polls.filter((p) => p.pollster === "RedBridge/Accent" && (p.tpp_split || p.tpp_split_on))
+                    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  if (!rows.length) return null;
+  /* ym rides the FIELDWORK window (dateStart), matching the wave label
+     convention the section ships with (a late-month wave filed at the next
+     month's start still reads as its fieldwork month – Sep 2026's is
+     date 2026-10-02 fw 2026-09-28 → "2026-09") */
+  const wave = (p, y) => ({ date: p.date, ym: ymOf(p.dateStart || p.date), n: p.sample ?? null, url: p.releaseUrl || p.url || null, a: y, b: 100 - y });
+  /* waves whose lnp is hand-derived, not extractor-read — exactly the one
+     documented in polls.schema.json's tpp_split_on note (Jun 2026). est lets
+     the panel flag exactly those dots; onp waves are always verbatim. */
+  const HAND_SPLIT_ON = new Set(["2026-06-26"]);
+  const push = (arr, p, a, est) => arr.push({ ...wave(p, a), ...(est ? { est: true } : {}) });
+  const coal = [], on = [];
+  for (const p of rows) {
+    if (p.tpp_split_on && p.tpp_split_on.lnp != null) push(coal, p, p.tpp_split_on.lnp, HAND_SPLIT_ON.has(p.date));
+    if (p.tpp_split && p.tpp_split.onp != null) push(on, p, p.tpp_split.onp, false);
+  }
+  return coal.length && on.length ? { house: "RedBridge/Accent", coal, on } : null;
+})();
+
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null
    where the series can't support one (no reading inside the trailing window),
    which the hero reads as "fall back to the last monthly point". */
@@ -5933,6 +5968,10 @@ window.AUSPOL = (function () {
   /* the same diagnostic for the ALP-v-ON head-to-head (§7d) – null when the
      published per-cohort splits that anchor its implied table are absent */
   const flowDriftOn = ${JSON.stringify(flowDriftOn)};
+  /* RedBridge/Accent's monthly "forced to choose" respondent splits, per
+     contest, for the All-polls flow-drift section's two forced-choice line
+     charts (gen-data §7db) – display data only */
+  const flowForced = ${JSON.stringify(flowForced)};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
@@ -6091,7 +6130,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

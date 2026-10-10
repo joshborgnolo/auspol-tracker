@@ -3051,6 +3051,40 @@ body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; 
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
 
+/* preference flows — the pressed-choice pair (RedBridge/Accent's published
+   forced waves, moved here from /preference-flows/ 2026-10-10). Deliberately
+   lighter than the drift charts above: published spots, no estimator skin */
+body.rd .rd-ff { margin-top: 34px; }
+body.rd .rd-ff-head { margin: 0 0 6px; max-width: 640px; }
+body.rd .rd-ff-t { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; color: var(--ink); }
+body.rd .rd-ff-d { margin: 5px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+body.rd .rd-ff figure, body.rd figure.rd-ff { margin: 3px 0 0; }
+body.rd figure.rd-ff { position: relative; width: 100%; }
+body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
+body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
+body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
+body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+body.rd .rd-ff-line.a { stroke: var(--alp); }
+body.rd .rd-ff-line.b { stroke: var(--onp); }
+body.rd .rd-ff-line.b.is-lnp { stroke: var(--lnp); }
+body.rd .rd-ff-dot.a { fill: var(--alp); }
+body.rd .rd-ff-dot.b { fill: var(--onp); }
+body.rd .rd-ff-dot.b.is-lnp { fill: var(--lnp); }
+body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
+body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
+body.rd .rd-ff-el.a { fill: var(--alp); }
+body.rd .rd-ff-elv.a { fill: var(--alp); opacity: 0.85; }
+body.rd .rd-ff-el.b { fill: var(--onp); }
+body.rd .rd-ff-elv.b { fill: var(--onp); opacity: 0.85; }
+body.rd .rd-ff-el.b.is-lnp { fill: var(--lnp); }
+body.rd .rd-ff-elv.b.is-lnp { fill: var(--lnp); opacity: 0.85; }
+body.rd .rd-ff-tip { pointer-events: auto; white-space: normal; }
+/* the tip's link row and the June derivation note carry sentences, which the
+   tip chrome's nowrap would stretch past the card — wrap those two rows */
+body.rd .tip-hintwrap { white-space: normal; max-width: 230px; }
+body.rd .tip-hintwrap .tip-hint { margin-top: 2px; white-space: normal; }
+body.rd .rd-ff-lnk { color: var(--accent); }
+
 /* Narrower than 985px the house-lean measure row's seven tabs no longer
    fit across it, so its tab group scrolls sideways under a right-edge
    fade - the .rd-ap-pinnav pattern - rather than dropping the Greens and
