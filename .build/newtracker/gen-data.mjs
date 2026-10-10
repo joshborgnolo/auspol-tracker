@@ -4017,9 +4017,12 @@ const issues = (() => {
     const he = { at: (firm, t) => heV(ownHE[k][a], firm, t) - heV(ownHE[k][b], firm, t) };
     return weightedWithSe(nowcastPts(diff, he, refNow, SPARSE_K));
   };
-  /* the Who's-trusted change view's snapshot month: the first every issue
-     holds a three-way ownership reading (crime and economy enter April) */
-  const SNAP0 = "2026-04";
+  /* the Who's-trusted change view's snapshot month: November 2025, when
+     RedBridge's six-issue set is the month's only three-party reading –
+     crime, economy and everything else tile "Not polled" (user's call
+     2026-10-10, over April 2026, which sat too close to now to show
+     movement) */
+  const SNAP0 = "2025-11";
   const leadAt = (k, rows, a, b, ym) => {
     /* `lead`, pooled for one calendar month rather than nowcast – the same
        diff measure and variance, monthWithSe in place of nowcastPts, so a
@@ -4090,9 +4093,9 @@ const issues = (() => {
       const m = OWN3.map((q) => monthWithSe(o[q], ownHE[k][q], ym));
       return m.every(Boolean) ? [ym, ...m.map((e) => r1(e.v)), ...m.map((e) => r1(1.96 * e.se))] : null;
     }).filter(Boolean) : [];
-    /* the change view's April tile: the row verdict's lead test pooled on
-       the snapshot month's own waves (the "now" tile reuses own, which the
-       Who's-trusted rows already print - the two can never disagree) */
+    /* the change view's snapshot tile: the row verdict's lead test pooled
+       on the snapshot month's own waves (the "now" tile reuses own, which
+       the Who's-trusted rows already print - the two can never disagree) */
     const m0 = monthly.find((m) => m[0] === SNAP0);
     let snap = null;
     if (o && m0) {

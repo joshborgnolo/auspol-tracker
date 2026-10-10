@@ -3070,7 +3070,7 @@ function RdIssues({ rangeId = "all" }) {
   const I = D.issues;
   const [view, setView] = useState("trust");
   /* the trust view's sub-views: the rows-and-chart snapshot, and the change
-     tiles (who was trusted, April's snapshot month against now) */
+     tiles (who was trusted, a snapshot month against now) */
   const [snap, setSnap] = useState("snap");
   const [selId, setSelId] = useState(null);
   /* picking another issue asks the same three parties a different question,
@@ -3363,11 +3363,11 @@ function RdIssues({ rangeId = "all" }) {
      the data arrays stay keyed to P, this is presentation only */
   const pOrd = tally ? P.slice().sort((a, b) => tally[b] - tally[a]) : P;
 
-  /* ---- the change view: who was trusted, April against now -----------------
+  /* ---- the change view: who was trusted, the snapshot month against now ---
      Two month grids of tiles, one per issue, run off the row verdict's own
-     ahead/behind test – April pooled on that month's waves (gen-data's
-     snap), now the rows' own reading, so a tile can never colour against
-     what the Snapshot rows print just a crossfade away. */
+     ahead/behind test – the snapshot month pooled on that month's waves
+     (gen-data's snap), now the rows' own reading, so a tile can never
+     colour against what the Snapshot rows print just a crossfade away. */
   const iscNowYm = list.reduce((a, x) => {
     const ms = x.monthly || [];
     return ms.length && (!a || ms[ms.length - 1][0] > a) ? ms[ms.length - 1][0] : a;
