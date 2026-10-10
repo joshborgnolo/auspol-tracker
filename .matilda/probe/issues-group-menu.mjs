@@ -180,7 +180,7 @@ for (const vw of [320, 360, 375]) {
     await page.mouse.click(dot.x, dot.y);
     let landed = null;
     try {
-      await page.waitForFunction(() => location.hash === "#allpolls" && document.querySelector(".rd-ap-tabs button"), { timeout: 10000 });
+      await page.waitForFunction(() => location.pathname === "/allpolls/" && document.querySelector(".rd-ap-tabs button"), { timeout: 10000 });
       landed = await page.evaluate(() => {
         const active = ([...document.querySelectorAll(".rd-ap-tabs button")].find((b) => b.getAttribute("aria-pressed") === "true") || {}).textContent || null;
         return { active, open: !!document.querySelector(".rd-ap-open"), issTbl: !!document.querySelector(".rd-apd-isr") };

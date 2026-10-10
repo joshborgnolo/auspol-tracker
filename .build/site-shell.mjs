@@ -97,7 +97,8 @@ export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) |
    of truth, and the shell derives { id, label, href } from it at apply
    time, so a label edit on the main page (the 2026-10-03 Snapshot → Now
    rename that froze the old hand copy below) reaches every satellite with
-   the next apply. href is simply /#<id>. The views only – the archives and
+   the next apply. href is the main page's own per-tab path ("/" for Now,
+   "/<id>/" for the rest) – the tabs became real pages 2026-10-10. The views only – the archives and
    the other satellites keep out of it here, exactly as they do on the main
    page. pinHide comes down with the list; the pinned phone bar's SHORT
    label is the shell's one extra (SHELL_TAB_EXTRAS, baked into shellJs so
@@ -118,7 +119,7 @@ const mainTabs = (() => {
     const body = fs.readFileSync(path.join(dir, file), "utf8").match(/const TABS = \[([\s\S]*?)\n\s*\];/);
     if (!body) throw new Error("site-shell: TABS array in " + file + " did not parse");
     const tabs = [...body[1].matchAll(/\{ id: "([^"]+)", label: "([^"]+)"([\s\S]*?)\}/g)]
-      .map((m) => ({ id: m[1], label: m[2], href: "/#" + m[1],
+      .map((m) => ({ id: m[1], label: m[2], href: m[1] === "now" ? "/" : "/" + m[1] + "/",
                      ...(/pinHide:\s*true/.test(m[3]) ? { pinHide: true } : {}),
                      ...SHELL_TAB_EXTRAS[m[1]] }));
     if (!tabs.length || tabs[0].id !== "now") {
@@ -330,7 +331,7 @@ export function shellHeader({ tab } = {}) {
         ${tabs}
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
-      <a class="sh-score" href="/#now" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+      <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
 </nav>`;
@@ -348,8 +349,8 @@ export function shellHeader({ tab } = {}) {
 export function shellFooter({ page } = {}) {
   const F = CHROME().footer;
   const fb = page === "feedback"
-    ? `${F.infoLead}<a href="/#info">${F.infoWord}</a>.`
-    : `${F.infoLead}<a href="/#info">${F.infoWord}</a>. ${F.spot} <a class="sh-fb-link" href="/feedback/">${F.linkWord}</a>.`;
+    ? `${F.infoLead}<a href="/info/">${F.infoWord}</a>.`
+    : `${F.infoLead}<a href="/info/">${F.infoWord}</a>. ${F.spot} <a class="sh-fb-link" href="/feedback/">${F.linkWord}</a>.`;
   const arch = page === "archives" ? ""
     : `\n        <p class="sh-arch">${F.archLead}<a href="${F.archHref}">${F.archWord}</a>${F.archTail}</p>`;
   return `<div class="sh-frame">
@@ -1018,7 +1019,8 @@ ${npProjectSrc()}
     /* the tab list, rebuilt in the main page's order with its labels (the
        short label is the shell's own extra, baked in above). The contract
        carries WORDS only – href derives from the id exactly as mainTabs
-       derives it ("/#<id>"); writing t.href wrote the string "undefined",
+       derives it ("/" for Now, "/<id>/" otherwise; the tabs became real
+       pages 2026-10-10); writing t.href wrote the string "undefined",
        and a click went to <satellite>/undefined (2026-10-03 hotfix) */
     var set = document.querySelector(".sh-tabs-set");
     if (set && cp.tabs && cp.tabs.length) {
@@ -1027,7 +1029,7 @@ ${npProjectSrc()}
       while (set.firstChild) set.removeChild(set.firstChild);
       for (var ti = 0; ti < cp.tabs.length; ti++) {
         var t = cp.tabs[ti], a = document.createElement("a");
-        var h = "/#" + t.id;
+        var h = t.id === "now" ? "/" : "/" + t.id + "/";
         a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
         a.setAttribute("href", h);
         if (act === h) { a.className += " active"; a.setAttribute("aria-current", "page"); }
@@ -1102,7 +1104,7 @@ ${npProjectSrc()}
       if (disc) disc.textContent = F.disc;
       var fbp = document.querySelector(".sh-fb");
       if (fbp) {
-        fbp.innerHTML = esc(F.infoLead) + '<a href="/#info">' + esc(F.infoWord) + "</a>."
+        fbp.innerHTML = esc(F.infoLead) + '<a href="/info/">' + esc(F.infoWord) + "</a>."
           + (fbp.querySelector(".sh-fb-link") ? " " + esc(F.spot) + ' <a class="sh-fb-link" href="/feedback/">' + esc(F.linkWord) + "</a>." : "");
       }
       var arch = document.querySelector(".sh-arch");

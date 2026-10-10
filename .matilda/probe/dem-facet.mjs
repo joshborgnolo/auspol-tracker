@@ -41,6 +41,12 @@ if (!puppeteer) { console.error("puppeteer-core not resolvable from ~ or cwd"); 
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const PAGE = process.env.PAGE || `file://${ROOT}/index.html`;
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
+/* served runs can assert the URL landed on /allpolls/; file:// cannot - the
+   client's cross-path history write is refused there by design, so the URL
+   never names the tab even though the app arrives. Landing state (facet,
+   split, open row) is asserted either way. */
+const SERVED = /^https?:/.test(PAGE);
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new",
@@ -58,7 +64,7 @@ async function open(vw, qs = "", { touch = false, vh = 1000 } = {}) {
   page.errs = [];
   page.on("pageerror", (e) => page.errs.push(String(e).slice(0, 300)));
   await page.setViewport({ width: vw, height: vh, isMobile: touch, hasTouch: touch });
-  await page.goto(`${PAGE}${qs ? "?" + qs : ""}#allpolls`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${APAGE}${qs ? "?" + qs : ""}`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
   await settle(1500);
   return page;
@@ -154,7 +160,7 @@ for (const [vw, phone] of [[1440, false], [1280, false], [1001, false], [1000, f
   const page = await open(vw, "", { touch: phone });
   const G = {};
   for (const [name, qs] of [["twopp", ""], ["primary", "f=p"], ["dem", "f=g"]]) {
-    await page.goto(`${PAGE}${qs ? "?" + qs : ""}#allpolls`, { waitUntil: "domcontentloaded" });
+    await page.goto(`${APAGE}${qs ? "?" + qs : ""}`, { waitUntil: "domcontentloaded" });
     await page.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
     await settle(1200);
     G[name] = await geometry(page, phone);
@@ -254,7 +260,7 @@ console.log("== Who votes for whom dots open the facet ==");
   page.on("pageerror", (e) => page.errs.push(String(e).slice(0, 300)));
   await page.setViewport({ width: 1280, height: 900 });
   const landing = () => page.evaluate(() => ({
-    hash: location.hash,
+    hash: location.pathname,
     facet: ([...document.querySelectorAll(".rd-ap-tabs > [role=group] > button")].find((b) => b.getAttribute("aria-pressed") === "true") || {}).textContent,
     split: ([...document.querySelectorAll(".rd-ap-dpick button")].find((b) => b.getAttribute("aria-checked") === "true") || {}).textContent,
     open: !!document.querySelector(".rd-ap-row.open"),
@@ -262,7 +268,7 @@ console.log("== Who votes for whom dots open the facet ==");
     table: !!document.querySelector(".rd-ap-open .rd-apd-demwrap"),
   }));
   const toWv = async (tabLabel) => {
-    await page.goto(`${PAGE}#now`, { waitUntil: "domcontentloaded" });
+    await page.goto(`${PAGE}`, { waitUntil: "domcontentloaded" });
     await page.waitForSelector("#who-votes .rd-wv-tabs button", { timeout: 30000 });
     await settle(1200);
     if (tabLabel !== "Age") {
@@ -294,7 +300,7 @@ console.log("== Who votes for whom dots open the facet ==");
   await toWv("Age");
   const l1 = await clickRug(/^By age/, /^YouGov|^DemosAU|^Resolve/);
   const a1 = await landing();
-  check("an Age rug dot opens All polls", !!l1 && a1.hash === "#allpolls", l1 + " -> " + a1.hash);
+  check("an Age rug dot opens All polls", !!l1 && (!SERVED || a1.hash === "/allpolls/"), l1 + " -> " + a1.hash);
   check("…on Demographics, split by age, the poll open with its table", a1.facet === "Demographics" && a1.split === "Age" && a1.open && a1.table, JSON.stringify(a1));
   check("…the poll the dot named", !!l1 && l1.startsWith(a1.who), a1.who);
 
@@ -326,7 +332,7 @@ console.log("== Who votes for whom dots open the facet ==");
     await settle(1600);
   }
   const a4 = await landing();
-  check("a Gender trend-chart dot opens Demographics split by gender", !!hit && a4.hash === "#allpolls" && a4.facet === "Demographics" && a4.split === "Gender" && a4.open, JSON.stringify(a4));
+  check("a Gender trend-chart dot opens Demographics split by gender", !!hit && (!SERVED || a4.hash === "/allpolls/") && a4.facet === "Demographics" && a4.split === "Gender" && a4.open, JSON.stringify(a4));
   check("no page errors (dot trips)", page.errs.length === 0, page.errs.join(" | "));
   await page.close();
 }
@@ -338,7 +344,7 @@ console.log("== old design ==");
   const errs = [];
   page.on("pageerror", (e) => errs.push(String(e).slice(0, 300)));
   await page.setViewport({ width: 1280, height: 900 });
-  await page.goto(`${PAGE}?design=old&f=g#allpolls`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${APAGE}?design=old&f=g`, { waitUntil: "domcontentloaded" });
   await settle(2500);
   const r = await page.evaluate(() => ({ rows: document.querySelectorAll("tr.arch-row").length, f: new URLSearchParams(location.search).get("f") }));
   check("?design=old&f=g opens the old table", r.rows > 0, `${r.rows} rows`);

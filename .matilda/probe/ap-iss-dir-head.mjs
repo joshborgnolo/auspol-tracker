@@ -20,6 +20,7 @@ if (!puppeteer) { console.error("puppeteer-core not resolvable"); process.exit(2
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const PAGE = process.env.LIVE ? "https://auspoltracker.com/" : `file://${ROOT}/index.html`;
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (label, ok, detail = "") => {
   console.log(`${ok ? "ok  " : "FAIL"}  ${label}${detail ? " — " + detail : ""}`);
@@ -36,7 +37,7 @@ async function openAt(vw, vh) {
   const errs = [];
   page.on("pageerror", (e) => errs.push(String(e)));
   await page.setViewport({ width: vw, height: vh });
-  await page.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${APAGE}`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
   await new Promise((r) => setTimeout(r, 1200));
   return { page, errs };

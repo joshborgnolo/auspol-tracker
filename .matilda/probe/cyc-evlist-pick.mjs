@@ -93,7 +93,7 @@ const pairState = (page, secId) => page.evaluate((id) => {
 async function go(W, H, touch) {
   const page = await browser.newPage();
   await page.setViewport({ width: W, height: H, hasTouch: touch });
-  await page.goto(`http://127.0.0.1:${PORT}/index.html#cycles`, { waitUntil: "domcontentloaded" });
+  await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#cyc-primary ol.rd-evlist", { timeout: 20000 });
   await sleep(1200); /* the cycle-source fetch and the chart clock settle */
   return page;

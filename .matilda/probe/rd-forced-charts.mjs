@@ -3,7 +3,7 @@
    REGROUPED the same day from one chart per voter cohort to one chart per
    QUESTION; data: gen-data §7db D.flowForced = {house, vsOn, vsCoal}, each
    wave carrying every cohort's Labor share on the one date). Renders
-   index.html#allpolls at desktop and phone rungs and asserts GEOMETRY, never
+   allpolls/ at desktop and phone rungs and asserts GEOMETRY, never
    screenshots (auspol-headless-geometry-verify): the two figures share a row
    side by side on desktop and stack full-width on a phone, each svg draws ONE
    cohort-coloured line per cohort (Labor v One Nation asks Greens, Coalition
@@ -41,6 +41,7 @@ import { fileURLToPath } from "url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PAGE = "file://" + path.join(ROOT, "index.html");
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 
@@ -138,7 +139,7 @@ page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300));
 
 const gotoFlows = async (w) => {
   await page.setViewport({ width: w, height: 1200, deviceScaleFactor: 1 });
-  await page.goto(PAGE + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(APAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".rd-ff svg .rd-ff-line.grn", { timeout: 30000 });
   await page.evaluate(() => document.querySelector(".rd-ff").scrollIntoView({ block: "center" }));
   await new Promise((r) => setTimeout(r, 350));
@@ -210,7 +211,7 @@ const measure = () => page.evaluate(() => {
 
 const FF = await (async () => {
   await page.setViewport({ width: 1366, height: 1200, deviceScaleFactor: 1 });
-  await page.goto(PAGE + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(APAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".rd-ff svg .rd-ff-line.grn", { timeout: 30000 });
   return page.evaluate(() => window.AUSPOL.flowForced);
 })();

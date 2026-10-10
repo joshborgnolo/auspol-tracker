@@ -53,7 +53,7 @@ const ok = (name, cond, detail) => {
 async function atWidth(vw, vh) {
   const page = await browser.newPage();
   await page.setViewport({ width: vw, height: vh });
-  await page.goto(`http://127.0.0.1:${PORT}/#allpolls`, { waitUntil: "domcontentloaded" });
+  await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".rd-hl-tabs .rd-tab", { timeout: 20000 });
   await new Promise((r) => setTimeout(r, 300));
   return page;

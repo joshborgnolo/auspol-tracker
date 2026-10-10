@@ -3319,8 +3319,12 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
   .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }
-@media (max-width: 560px) {
-  .page { padding: 20px 16px 20px; }
+/* The head's phone arrangement begins here, not at 560: the un-wrapped
+   meta line's min-content (~576px with the theme toggle) only fits the
+   padded page from ~636px up, so in a 561-636px band the head used to
+   overflow the document's right edge. The rest of the phone design still
+   flips at 560. */
+@media (max-width: 640px) {
   /* tagline now carries the election context, so drop the whole meta block
      (incl. the Next election anchor) on small screens */
   .head-meta { display: none; }
@@ -3345,6 +3349,9 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
      absolutely pinned) so it can't add phantom column-gap above the rule */
   .head-right { display: contents; }
   .theme-seg { position: absolute; top: 0; right: 0; }
+}
+@media (max-width: 560px) {
+  .page { padding: 20px 16px 20px; }
   /* The desktop pair is heraldic: it mirrors around the rule, so Labor reads
      outward to the left and the Coalition outward to the right. What a phone
      cannot take is the STACK - "Labor 52.0" over "48.0 Coalition" put the two
@@ -3669,6 +3676,8 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.789); } /* 19 → 15 
   padding: 12px 1px 12px; font-family: var(--sans);
   display: inline-flex; align-items: baseline; gap: 7px; white-space: nowrap;
   color: var(--ink-3); transition: color .15s ease;
+  /* the tabs are real links (each is also a page): no anchor chrome */
+  text-decoration: none;
 }
 .tab-label {
   font-family: "Crimson Text", var(--serif);

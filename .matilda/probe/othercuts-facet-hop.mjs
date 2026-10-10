@@ -27,6 +27,7 @@ if (!puppeteer) { console.error("no puppeteer-core"); process.exit(2); }
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const PAGE = process.env.PAGE || `file://${ROOT}/index.html`;
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new",
@@ -44,7 +45,7 @@ async function open(vw, qs, { touch = false } = {}) {
   page.errs = [];
   page.on("pageerror", (e) => page.errs.push(String(e).slice(0, 300)));
   await page.setViewport({ width: vw, height: 900, isMobile: touch, hasTouch: touch });
-  await page.goto(`${PAGE}?${qs}#allpolls`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${APAGE}?${qs}`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
   await settle(1500);
   return page;

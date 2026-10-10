@@ -80,7 +80,7 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
       const pageErrors = [];
       page.on("pageerror", (e) => pageErrors.push(String(e)));
       await page.setViewport({ width: vw, height: 900 });
-      await page.goto(`http://127.0.0.1:${PORT}/#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded", timeout: 60000 });
       await page.waitForSelector("#cyc-tpp .rd-cyc-chart", { timeout: 45000 });
       await new Promise((r) => setTimeout(r, 1200));
 

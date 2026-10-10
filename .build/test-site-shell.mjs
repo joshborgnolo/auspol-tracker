@@ -124,17 +124,22 @@ for (const [what, v] of [["lede", chrome.footer.lede], ["disclaimer", chrome.foo
                          ["feedback clause", chrome.footer.spot], ["feedback link word", chrome.footer.linkWord],
                          ["archives lead", chrome.footer.archLead], ["archives tail", chrome.footer.archTail]])
   assert.ok(foot.includes(v), `shellFooter bakes the lifted ${what}`);
-assert.ok(foot.includes(chrome.footer.infoLead + '<a href="/#info">' + chrome.footer.infoWord), "the Info signpost lands first in sh-fb");
+assert.ok(foot.includes(chrome.footer.infoLead + '<a href="/info/">' + chrome.footer.infoWord), "the Info signpost lands first in sh-fb");
 assert.ok(foot.includes(`href="${chrome.footer.archHref}"`), "shellFooter bakes the lifted archives href");
 assert.ok(shellJs().includes('querySelector(".sh-lede")') && shellJs().includes('querySelector(".sh-arch")'),
   "site-shell.js re-applies the colophon from the copy block");
 // the runtime overlay shipped in the emitted js
 assert.ok(shellJs().includes("var fillCopy = function (cp)"), "site-shell.js carries the copy overlay");
 // …and its tab rebuild can never re-ship 2026-10-03's live bug: the contract carries
-// words only, so href comes from the id ("/#<id>"), never t.href ("undefined" – a
+// words only, so href comes from the id ("/" for Now, "/<id>/" for the rest – the
+// tabs became real pages 2026-10-10), never t.href ("undefined" – a
 // click went to <satellite>/undefined)
 assert.ok(!shellJs().includes('setAttribute("href", t.href)'), "the runtime tab reconcile never writes t.href");
-assert.ok(shellJs().includes('"/#" +'), "the runtime tab href derives from the tab id");
+assert.ok(shellJs().includes('t.id === "now" ? "/" : "/" + t.id + "/"'), "the runtime tab href derives from the tab id");
+// the baked header routes each tab to its real page
+assert.ok(head.includes('class="sh-tab" href="/"'), "shellHeader's Now tab links to /");
+assert.ok(head.includes('href="/allpolls/"') && head.includes('href="/cycles/"') && head.includes('href="/info/"'),
+  "shellHeader's other tabs link to their per-tab pages");
 // auspol-now.json (emitted by the build that precedes this test) carries the SAME parse
 const now = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-now.json"), "utf8"));
 assert.deepEqual(now.copy, chrome, "auspol-now.json's copy block is the chrome contract verbatim");

@@ -31,6 +31,7 @@ if (!puppeteer) { console.error("puppeteer-core not resolvable from ~ or cwd"); 
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const PAGE = `file://${ROOT}/index.html`;
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new",
@@ -124,7 +125,7 @@ await page1.setViewport({ width: vw, height: vh });
 const pageErrors = [];
 page1.on("pageerror", (e) => pageErrors.push(String(e)));
 
-await page1.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
+await page1.goto(`${APAGE}`, { waitUntil: "domcontentloaded" });
 await page1.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
 await selectDirection(page1);
 await page1.waitForSelector(".rd-ap-row, .rd-ap-card", { timeout: 15000 });
@@ -189,7 +190,7 @@ check("no page errors on the facet", pageErrors.length === 0, pageErrors[0] || "
 console.log("== ?f=d opens the Direction facet directly ==");
 const page2 = await browser.newPage();
 await page2.setViewport({ width: vw, height: vh });
-await page2.goto(`${PAGE}?f=d#allpolls`, { waitUntil: "domcontentloaded" });
+await page2.goto(`${APAGE}?f=d`, { waitUntil: "domcontentloaded" });
 await page2.waitForSelector(".rd-ap-row, .rd-ap-card", { timeout: 15000 });
 await new Promise((r) => setTimeout(r, 600));
 await showAll(page2);
@@ -219,7 +220,7 @@ const page4 = await browser.newPage();
 await page4.setViewport({ width: vw, height: vh });
 const errs4 = [];
 page4.on("pageerror", (e) => errs4.push(String(e)));
-await page4.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
+await page4.goto(`${APAGE}`, { waitUntil: "domcontentloaded" });
 await page4.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
 await new Promise((r) => setTimeout(r, 600));
 

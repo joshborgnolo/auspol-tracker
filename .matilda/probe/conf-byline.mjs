@@ -16,6 +16,7 @@ import process from "process";
 
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PAGE = "file://" + path.resolve(process.cwd(), "index.html");
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 
@@ -32,7 +33,7 @@ const page = await browser.newPage();
 page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300)); fails++; });
 
 await page.setViewport({ width: 1366, height: 980, deviceScaleFactor: 1 });
-await page.goto(PAGE + "?f=c#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+await page.goto(PAGE + "allpolls/?f=c", { waitUntil: "networkidle0", timeout: 60000 });
 await page.waitForFunction(
   () => {
     const a = document.querySelector(".rd-ap-tabs .rd-tab[aria-pressed='true']");

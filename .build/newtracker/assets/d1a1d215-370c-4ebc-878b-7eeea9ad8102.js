@@ -301,6 +301,14 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   const onTabKeyDown = (e) => {
     const ids = tabs.map((t) => t.id);
     const i = ids.indexOf(active);
+    /* Space: the tabs became real links (they are also each a page), and a
+       link activates on Enter natively but not on Space the way the buttons
+       they replaced did – keep the key the pattern promises. */
+    if (e.key === " " || e.key === "Spacebar") {
+      const hit = tabs.find((t) => btnRefs.current[t.id] === e.target);
+      if (hit) { e.preventDefault(); onChange(hit.id); }
+      return;
+    }
     let next = null;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") next = ids[(i + 1) % ids.length];
     else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = ids[(i - 1 + ids.length) % ids.length];
@@ -371,7 +379,13 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
           <div className="tabs-list" role="tablist" aria-label="Views"
                onKeyDown={onTabKeyDown}>
             {tabs.map((t) => (
-              <button key={t.id} role="tab" aria-selected={active === t.id}
+              /* Each tab is also a page of its own (build.mjs emits them), so
+                 the tab IS its link: a plain press swaps the view in place,
+                 a modified one opens the real document. The path map lives in
+                 the header bundle (window.AP.tabToPath); the fallback keeps a
+                 bar rendered before that bundle has run merely local. */
+              <a key={t.id} role="tab" aria-selected={active === t.id}
+                      href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}
                       id={"tab-" + t.id} aria-controls={"panel-" + t.id}
                       /* a tab's title is its hover caption; only Info carries
                          one today, so undefined just renders no attribute */
@@ -383,17 +397,22 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       className={"tab" + (active === t.id ? " active" : "")
                                  + (t.pinHide ? " tab-pinhide" : "")}
                       /* Pointer-click navigation must not leave focus on the
-                         nav tab: Chrome focuses buttons on click, and the
+                         nav tab: Chrome focuses links on click, and the
                          leftover focus then eats arrows as page turns and
                          vetoes every hover claim (their activeElement
                          guard). e.detail is 0 only for keyboard-activated
                          clicks, so Enter/Space activation keeps focus per
                          the ARIA tabs pattern. */
-                      onClick={(e) => { onChange(t.id); if (e.detail) e.currentTarget.blur(); }}>
+                      onClick={(e) => {
+                        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                        e.preventDefault();
+                        onChange(t.id);
+                        if (e.detail) e.currentTarget.blur();
+                      }}>
                 {/* the active tab label goes 600 in the redesign - its bold twin holds the width */}
                 <span className="tab-label">{window.RdTabW && typeof t.label === "string" ? <window.RdTabW t={t.label} /> : t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
-              </button>
+              </a>
             ))}
           </div>
           </div>
@@ -3450,7 +3469,10 @@ const DEM_SPLITS = [
     pairs: [["University", "School", "Uni v school"], ["University", "Year 12 or less", "Uni v Year 12"],
             ["University", "No tertiary", "Uni v no tertiary"], ["University", "High School", "Uni v high school"]] },
   { id: "place", label: "Place", lo: "Rural", hi: "Inner metro", scope: "With a city and country breakdown",
-    pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"]] },
+    pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"],
+            /* Roy Morgan's city/country table (in print since finding 10363)
+               files its two groups verbatim - no read-time normalisation */
+            ["Capital Cities", "Regional/Rural Areas", "Capital v regional/rural"]] },
   { id: "home", label: "Home", lo: "Owners", hi: "Renters", scope: "With a housing breakdown",
     pairs: [["Renting", "Own outright", "Renters v owners"], ["Renting and other", "Own outright", "Renters v owners"]] },
   /* Income is the odd one out in this list: the houses don't just slip on

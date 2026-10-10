@@ -611,6 +611,61 @@ if (favNow === "stale") console.log("  favicon PNG: drawn from an older glyph �
    judge the POST-script DOM, and both skip display:none content) extract.
    Derived from the same generated dataset as everything else, so it cannot
    drift from the charts. */
+/* The About + Reading-the-charts narrative, moved out of buildStaticSummary
+   so the Info tab's static article quotes the same words (the two would
+   otherwise drift in two files' worth of copies). Called with the caller's
+   own L/prim/acc, so buildStaticSummary's output is unchanged. */
+function ssAboutBlock(L, prim, acc) {
+  return `      <h2>About this tracker</h2>
+      <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
+        election. The two-party and primary-vote aggregates are weighted means: recent and larger
+        polls count for more, and each pollster&#8217;s figure is adjusted for its own lean against
+        the consensus of the houses polling around it &#8211; pooled with a 90-day half-life, so a
+        house&#8217;s lean tracks its current method rather than averaging its whole history &#8211;
+        and shrunk toward zero while the evidence is thin. The lean is measured separately for every measure &#8211; a firm
+        that leans one way on the classic two-party is not assumed to lean the same way on a primary
+        share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few houses ask is left as
+        a plain monthly average rather than adjusted on guesswork. The leaders&#8217; ratings and
+        national direction run through the same monthly weighting and adjustment; preferred prime
+        minister and the undecided share stay as plain averages, the differences there being a
+        matter of question wording rather than lean. Houses that publish no two-party
+        figure feed the primary-vote and leadership series only. Each poll&#8217;s weight rests on
+        its published effective sample where the house publishes one &#8211; Newspoll, YouGov, Essential,
+        DemosAU, RedBridge/Accent, and Fox &amp; Hedgehog do, in their Australian Polling Council
+        methodology statements &#8211; and otherwise on its raw sample, discounted by 1.6 for
+        weighting and capped at 3,000.</p>
+      <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
+        window and their sampling error &#8211; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
+        on ${L.method.nPolls} polls across ${L.method.windowDays} days (effective sample
+        ${L.alp2ppNEff} after weighting). It cannot cover error the whole industry shares: an
+        aggregate has no way to see a lean every poll in it carries. Movement smaller than the
+        interval is marked as such.</p>${acc ? `
+      <p>That caveat is not idle. Across the ${acc.cycles.length} elections from
+        ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year} the final polls missed
+        the two-party result by ${acc.meanAbs} points on average &#8211; at ${acc.worstCycle.year} by
+        ${Math.abs(acc.worstCycle.err)}, every house on the same side of it.
+        Past cycles carries the full record, house by house.</p>` : ""}
+
+      <h2>Reading the charts</h2>
+      <p>On the two-party chart each dot by default is one poll&#8217;s implied figure &#8211;
+        its primaries re-allocated at the 2025 election&#8217;s counted flows &#8211; and the
+        switch under the heading swaps the whole series to the pollsters&#8217; own published
+        figures, dots and all. Elsewhere each dot is one published poll. The lines are monthly
+        aggregates, shaded with the 95%
+        interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
+        margin of error. Leadership questions are asked irregularly, so those lines are monthly
+        aggregates too &#8211; adjusted per house for approval and favourability, joined straight
+        from published readings for preferred prime minister. A &#8220;&#8212;&#8221; in any
+        table means the pollster didn&#8217;t ask that question.</p>
+      <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
+        figure into a seat count assumes a uniform swing, and with One Nation near
+        ${Math.round(prim.onp)}% of the primary vote the assumption fails in exactly the seats that
+        would decide the election: a large minor party wins seats where its vote is concentrated and
+        none where it is not &#8211; and no national number knows the difference. Seat figures appear
+        on this page only where a pollster modelled them seat by seat and published the result, which
+        is what the MRP tag in the archive marks.</p>`;
+}
+
 function buildStaticSummary() {
   const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
@@ -711,54 +766,7 @@ function buildStaticSummary() {
       </table>
       </div>
 
-      <h2>About this tracker</h2>
-      <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
-        election. The two-party and primary-vote aggregates are weighted means: recent and larger
-        polls count for more, and each pollster&#8217;s figure is adjusted for its own lean against
-        the consensus of the houses polling around it &#8211; pooled with a 90-day half-life, so a
-        house&#8217;s lean tracks its current method rather than averaging its whole history &#8211;
-        and shrunk toward zero while the evidence is thin. The lean is measured separately for every measure &#8211; a firm
-        that leans one way on the classic two-party is not assumed to lean the same way on a primary
-        share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few houses ask is left as
-        a plain monthly average rather than adjusted on guesswork. The leaders&#8217; ratings and
-        national direction run through the same monthly weighting and adjustment; preferred prime
-        minister and the undecided share stay as plain averages, the differences there being a
-        matter of question wording rather than lean. Houses that publish no two-party
-        figure feed the primary-vote and leadership series only. Each poll&#8217;s weight rests on
-        its published effective sample where the house publishes one &#8211; Newspoll, YouGov, Essential,
-        DemosAU, RedBridge/Accent, and Fox &amp; Hedgehog do, in their Australian Polling Council
-        methodology statements &#8211; and otherwise on its raw sample, discounted by 1.6 for
-        weighting and capped at 3,000.</p>
-      <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
-        window and their sampling error &#8211; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
-        on ${L.method.nPolls} polls across ${L.method.windowDays} days (effective sample
-        ${L.alp2ppNEff} after weighting). It cannot cover error the whole industry shares: an
-        aggregate has no way to see a lean every poll in it carries. Movement smaller than the
-        interval is marked as such.</p>${acc ? `
-      <p>That caveat is not idle. Across the ${acc.cycles.length} elections from
-        ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year} the final polls missed
-        the two-party result by ${acc.meanAbs} points on average &#8211; at ${acc.worstCycle.year} by
-        ${Math.abs(acc.worstCycle.err)}, every house on the same side of it.
-        Past cycles carries the full record, house by house.</p>` : ""}
-
-      <h2>Reading the charts</h2>
-      <p>On the two-party chart each dot by default is one poll&#8217;s implied figure &#8211;
-        its primaries re-allocated at the 2025 election&#8217;s counted flows &#8211; and the
-        switch under the heading swaps the whole series to the pollsters&#8217; own published
-        figures, dots and all. Elsewhere each dot is one published poll. The lines are monthly
-        aggregates, shaded with the 95%
-        interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
-        margin of error. Leadership questions are asked irregularly, so those lines are monthly
-        aggregates too &#8211; adjusted per house for approval and favourability, joined straight
-        from published readings for preferred prime minister. A &#8220;&#8212;&#8221; in any
-        table means the pollster didn&#8217;t ask that question.</p>
-      <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
-        figure into a seat count assumes a uniform swing, and with One Nation near
-        ${Math.round(prim.onp)}% of the primary vote the assumption fails in exactly the seats that
-        would decide the election: a large minor party wins seats where its vote is concentrated and
-        none where it is not &#8211; and no national number knows the difference. Seat figures appear
-        on this page only where a pollster modelled them seat by seat and published the result, which
-        is what the MRP tag in the archive marks.</p>
+${ssAboutBlock(L, prim, acc)}
 
       <h2>Sources</h2>
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
@@ -852,6 +860,149 @@ function buildStaticSummaryVic() {
 
       <p class="ss-note" data-nosnippet>${esc(J.brand)} tracker is an unofficial aggregator of published ${esc(J.adj)} opinion polling,
         part of <a href="${SITE_URL}">auspol tracker</a>. The figures are estimates only.</p>
+    </article>`;
+}
+
+/* ---- the tab pages' static articles ------------------------------------
+   Each tab is also its own URL (Now is the root document; the rest one
+   segment under it), and a crawler or no-JS reader landing on one should
+   read that tab's subject, not the front page's. These articles fill their
+   documents' STATIC_SUMMARY slot; every fact is read back from the same
+   generated dataset as the Now summary, so a tab page can never quote
+   figures the root page hasn't published. */
+function tabSummaryFacts() {
+  const src = fs.readFileSync(DA(DATASET), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error("tab summary: " + name + " not found");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const L = headlineView(grab("latest"), grab("synthLatest"));
+  const polls = grab("individualPolls"), table = grab("pollsterTable"), acc = grab("accuracy");
+  const counts = {};
+  polls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
+  const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+  const latestRows = table.slice(0, 6).map((r) => `
+        <tr>
+          <th scope="row">${esc(r.pollster)}</th>
+          <td>${esc(r.field)}</td>
+          <td>${r.sample ? r.sample.toLocaleString("en-AU") : "&#8211;"}</td>
+          <td>${r.alpImp != null ? r.alpImp.toFixed(1) + "%" : "&#8211;"}</td>
+          <td>${r.alpImp != null ? (100 - r.alpImp).toFixed(1) + "%" : "&#8211;"}</td>
+        </tr>`).join("");
+  return { esc, L, prim: L.primary, polls, acc, sources, latestRows };
+}
+
+/* The closing pair every static article ends with: the Sources block and
+   the estimates-only note (the wording the Now and Vic summaries carry). */
+function ssTail(esc, sources) {
+  return VIC
+    ? `<h2>Sources</h2>
+      <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
+
+      <p class="ss-note" data-nosnippet>${esc(JV.brand)} tracker is an unofficial aggregator of published ${esc(JV.adj)} opinion polling,
+        part of <a href="${SITE_URL}">auspol tracker</a>. The figures are estimates only.</p>`
+    : `<h2>Sources</h2>
+      <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
+
+      <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregator of published federal opinion polling.
+        Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
+        sound, and informative, but they are, in the end, estimates only. Federal polling archives
+        I&#8217;ve located are stored <a href="https://auspoltracker.com/archives/newspoll/">here</a> for
+        safekeeping and convenience.</p>`;
+}
+
+function buildTabSummary(id) {
+  const { esc, L, prim, acc, sources, latestRows } = tabSummaryFacts();
+  if (id === "cycles") {
+    const els = Object.values(DATA.elections).sort((a, b) => a.date.localeCompare(b.date));
+    const eRows = els.map((E) => `
+        <tr>
+          <th scope="row">${E.date.slice(0, 4)}</th>
+          <td>${E.tpp_alp >= 50 ? "Labor" : "Coalition"}</td>
+          <td>${E.tpp_alp.toFixed(1)}%</td>
+          <td>${E.tpp_lnp.toFixed(1)}%</td>
+        </tr>`).join("");
+    const firstY = els[0].date.slice(0, 4), lastY = els[els.length - 1].date.slice(0, 4);
+    return `<article class="static-summary">
+      <h1>Past election cycles</h1>
+      <p class="ss-sub">${VIC ? "Victorian" : "Australian federal"} opinion polling set against history: every election
+        cycle's polling charted month by month, beside the result the campaign ended in. The current
+        campaign is on the <a href="${PAGE_URL}">front page</a>.</p>
+
+      <h2>Election results</h2>
+      <p class="ss-cap" id="ss-cyc-cap">${VIC ? "State" : "Federal"} election results, ${firstY}&#8211;${lastY} &#8211; the
+        base today's polls are measured against, and the final reading of each past cycle's charts.</p>
+      <div class="ss-tblwrap">
+      <table class="ss-table" aria-labelledby="ss-cyc-cap">
+        <thead><tr><th scope="col">Election</th><th scope="col">Won by</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
+        <tbody>${eRows}
+        </tbody>
+      </table>
+      </div>
+${acc ? `
+      <h2>How the final polls did</h2>
+      <p>Measured against the ${acc.cycles.length} elections from ${acc.cycles[0].year} to
+        ${acc.cycles[acc.cycles.length - 1].year}, the final published polls missed the two-party result by
+        ${acc.meanAbs} points on average &#8211; at ${acc.worstCycle.year} by ${Math.abs(acc.worstCycle.err)},
+        with every house on the same side of it. The full record, house by house and cycle by cycle, is
+        tabled on the live page.</p>
+` : ""}
+${ssTail(esc, sources)}
+    </article>`;
+  }
+  if (id === "allpolls") {
+    return `<article class="static-summary">
+      <h1>All polls</h1>
+      <p class="ss-sub">Every published ${esc(VIC ? JV.adj : "Australian federal")} opinion poll since the
+        ${VIC ? `${DATA.elections[JV.baseline].date.slice(0, 4)} Victorian` : "May 2025 federal"} election &#8211;
+        ${L.pollsTracked} polls from ${L.housesTracked} polling houses, most recently
+        <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time>. The live page filters them by house,
+        measure and fieldwork date; each wave's full published ledger opens from its row.</p>
+
+      <h2>Latest polls</h2>
+      <p class="ss-cap" id="ss-tab-polls-cap">Most recent published ${esc(VIC ? JV.adj : "national")} polls &#8211; the
+        two-party figures read each poll&#8217;s primaries at the same preference flows, so the table
+        compares house to house on one fixed allocation.</p>
+      <div class="ss-tblwrap">
+      <table class="ss-table" aria-labelledby="ss-tab-polls-cap">
+        <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
+        <tbody>${latestRows}
+        </tbody>
+      </table>
+      </div>
+
+      <h2>About the archive</h2>
+      <p>There is one row per published wave &#8211; never modelled or interpolated &#8211; and month rows
+        average the waves whose fieldwork closed within them. A &#8220;&#8212;&#8221; in any column means
+        the pollster didn&#8217;t ask that question. Primary votes, two-party figures, leadership
+        ratings and each poll&#8217;s links to its source release are all carried on the row.</p>
+
+${ssTail(esc, sources)}
+    </article>`;
+  }
+  /* info */
+  return `<article class="static-summary">
+      <h1>About ${VIC ? JV.brand : "auspol"} tracker</h1>
+      <p class="ss-sub">How the aggregate is made: the weighting and house-lean method, the pollsters it
+        tracks, and the terms the site uses.</p>
+
+${VIC ? `      <h2>About this tracker</h2>
+      <p>${esc(JV.brand)} tracker pools every published ${esc(JV.adj)} voting-intention poll of the current
+        term. The two-party and primary-vote lines are smoothed trends through every poll this term, each
+        poll counted by its sample and adjusted for its pollster&#8217;s lean against the other houses
+        polling around it, shrunk toward zero while the evidence is thin. The implied two-party reading
+        reallocates every poll&#8217;s primaries at ${esc(JV.flowsLabel)}, so every poll that publishes
+        primaries counts, not only those that file a two-party figure. Leadership ratings and preferred
+        premier are plain published readings. It is part of
+        <a href="${SITE_URL}">auspol tracker</a>, the federal poll aggregate.</p>
+      <p>The live page&#8217;s Info tab defines the terms both sites use &#8211; two-party preferred,
+        implied flows, house lean, the preference-flow machinery and the rest &#8211; and links every
+        pollster&#8217;s series and methodology statement.</p>
+` : ssAboutBlock(L, prim, acc)}
+
+${ssTail(esc, sources)}
     </article>`;
 }
 
@@ -1058,10 +1209,13 @@ html = html.replace(OG_ANCHOR, VIC
   ${fontLinks.join("\n  ")}
   ${websiteJsonLd}`);
 
+/* The one <title>/og:title string every document on this page carries –
+   the tab pages swap their own in for it below. */
+const FED_TITLE = "auspol tracker – Australian federal election polling";
+const BASE_TITLE = VIC ? `${JV.brand} tracker – ${JV.electionWords} election polling` : FED_TITLE;
 if (VIC) {
-  const t = `${JV.brand} tracker – ${JV.electionWords} election polling`;
-  html = html.replace("<title>auspol tracker – Australian federal election polling</title>", `<title>${t}</title>`)
-    .replace('<meta property="og:title" content="auspol tracker – Australian federal election polling">', `<meta property="og:title" content="${t}">`);
+  html = html.replace(`<title>${FED_TITLE}</title>`, `<title>${BASE_TITLE}</title>`)
+    .replace(`<meta property="og:title" content="${FED_TITLE}">`, `<meta property="og:title" content="${BASE_TITLE}">`);
 }
 
 /* ---- 5. inline every script ------------------------------------------- */
@@ -1084,7 +1238,10 @@ for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
 }
 writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
 }
-parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("assets/" + cycleSrcName)};<\/script>`);
+/* Absolute, not "assets/…": the tab pages sit a folder down from the root
+   document, and the browser resolves the cycle-source fetch against the
+   page's own URL. */
+parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
 for (const f of PLAIN)
@@ -1105,6 +1262,46 @@ html = html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g, (_, open, css, close
 html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
 /* /vic/ sits one folder down: the shared fonts are site-root assets */
 if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/');
+
+/* ---- 5a. every tab is also its own page --------------------------------
+   The tabs are one document's views of the same data, but a URL each lets
+   the archive, the past cycles and the method page be linked, crawled and
+   shared. Each of these documents is the root document with its own title,
+   description, canonical and static article, plus window.AP_INITIAL_TAB so
+   the client opens straight into the named tab. Nothing is added to the
+   Now document: absent the constant, the client defaults to Now, so the
+   build's root output is identical with or without these pages. */
+{
+  const BASE_DIR = path.dirname(OUT);
+  /* /vic/ has no past terms in its cycle data, so its client renders no
+     Past cycles tab and this page must not exist either; it appears once
+     the data records an election older than the term-opening baseline. */
+  const pastTab = !VIC || Object.keys(DATA.elections || {}).some((k) => k !== DATA.jurisdiction.baseline);
+  const BRAND = VIC ? JV.brand : "auspol";
+  const tabs = [
+    ...(pastTab ? [{ id: "cycles", label: "Past cycles",
+      desc: `${VIC ? "Victorian" : "Australian federal"} elections poll by poll – every campaign cycle in the tracker's record charted against its result, with each pollster's final-poll record.` }] : []),
+    { id: "allpolls", label: "All polls",
+      desc: `Every published ${VIC ? JV.adj : "Australian federal"} opinion poll since the ${VIC ? `${DATA.elections[JV.baseline].date.slice(0, 4)} Victorian` : "May 2025 federal"} election – primary votes, two-party preferred and leadership ratings, with fieldwork dates and samples, month by month.` },
+    { id: "info", label: "Info",
+      desc: `How ${BRAND} tracker works – the aggregate's weighting and house-lean method, the pollsters it tracks, and a glossary of the terms the site uses.` },
+  ];
+  for (const t of tabs) {
+    const url = PAGE_URL + t.id + "/";
+    let doc = html
+      .replace(`<title>${BASE_TITLE}</title>`, `<title>${BRAND} tracker – ${t.label}</title>`)
+      .replace(`<meta property="og:title" content="${BASE_TITLE}">`, `<meta property="og:title" content="${BRAND} tracker – ${t.label}">`)
+      .replaceAll(`content="${metaDesc}"`, `content="${t.desc}"`)
+      .replace(`<meta property="og:url" content="${PAGE_URL}">`, `<meta property="og:url" content="${url}">`)
+      .replace(`<link rel="canonical" href="${PAGE_URL}">`, `<link rel="canonical" href="${url}">`)
+      .replace(/<article class="static-summary">[\s\S]*?<\/article>/, () => buildTabSummary(t.id))
+      .replace("<script>window.AP_CYCLE_SRC=", `<script>window.AP_INITIAL_TAB=${JSON.stringify(t.id)};<\/script>\n  <script>window.AP_CYCLE_SRC=`);
+    if (!VIC) doc = doc.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/');
+    fs.mkdirSync(path.join(BASE_DIR, t.id), { recursive: true });
+    writeAtomic(path.join(BASE_DIR, t.id, "index.html"), doc);
+  }
+  console.log(`  + ${tabs.map((t) => (VIC ? "vic/" : "") + t.id + "/").join(", ")} · one document per tab`);
+}
 
 writeAtomic(OUT, html);
 if (VIC) {
@@ -1307,18 +1504,46 @@ const PREDICTION_STAMP = "2026-10-10";
    dated as this page is, by its data – the newest Victorian poll's
    fieldwork end – or by the rebuild onto this page's code, 2026-10-05,
    whichever is later. */
+const VIC_RAW = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vic-polls.json"), "utf8")); }
+  catch { return null; }
+})();
 const VIC_STAMP = (() => {
   const CODE = "2026-10-05";
+  if (!VIC_RAW) return CODE;
+  const data = [...(VIC_RAW.polls || []), ...(VIC_RAW.leadership || [])].map((r) => r.fwEnd || r.date).filter(Boolean).sort().pop() || CODE;
+  return data > CODE ? data : CODE;
+})();
+/* The Vic build emits the same tab pages through the same code path as 5a,
+   but the sitemap is a federal-pass output, so the federal pass lists them
+   here. /vic/cycles/ appears only once the mapped dataset records an
+   election older than the term-opening baseline (the raw file carries no
+   elections object, which is why this reads the schema map rather than the
+   file) – the same rule build 5a emits the page by. */
+const VIC_TAB_IDS = await (async () => {
+  if (!VIC_RAW) return ["allpolls", "info"];
   try {
-    const v = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vic-polls.json"), "utf8"));
-    const data = [...(v.polls || []), ...(v.leadership || [])].map((r) => r.fwEnd || r.date).filter(Boolean).sort().pop() || CODE;
-    return data > CODE ? data : CODE;
-  } catch { return CODE; }
+    const vd = (await import("../vic/to-main-schema.mjs")).vicToMain(VIC_RAW);
+    return Object.keys(vd.elections || {}).some((k) => k !== vd.jurisdiction.baseline)
+      ? ["cycles", "allpolls", "info"] : ["allpolls", "info"];
+  } catch { return ["allpolls", "info"]; }
 })();
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${SITE_URL}</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}cycles/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}allpolls/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}info/</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
   <url>
@@ -1364,7 +1589,11 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   <url>
     <loc>${SITE_URL}vic/</loc>
     <lastmod>${VIC_STAMP}</lastmod>
-  </url>
+  </url>${VIC_TAB_IDS.map((id) => `
+  <url>
+    <loc>${SITE_URL}vic/${id}/</loc>
+    <lastmod>${VIC_STAMP}</lastmod>
+  </url>`).join("")}
 </urlset>
 `;
 writeAtomic(path.join(ROOT, "sitemap.xml"), sitemapXml);

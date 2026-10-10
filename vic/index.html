@@ -1990,8 +1990,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
   .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }
-@media (max-width: 560px) {
-  .page { padding: 20px 16px 20px; }
+@media (max-width: 640px) {
   .head-meta { display: none; }
   .head-meta-compact {
     display: flex; align-items: center; gap: 8px;
@@ -2004,6 +2003,9 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   .lockup { padding-right: 92px; }
   .head-right { display: contents; }
   .theme-seg { position: absolute; top: 0; right: 0; }
+}
+@media (max-width: 560px) {
+  .page { padding: 20px 16px 20px; }
   .hero-readout { display: flex; align-items: center; gap: 20px; }
   .ro-party { display: flex; flex-wrap: wrap; align-items: center;
               gap: 5px 8px; flex: 1 1 0; min-width: 0; }
@@ -2150,6 +2152,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.789); }
   padding: 12px 1px 12px; font-family: var(--sans);
   display: inline-flex; align-items: baseline; gap: 7px; white-space: nowrap;
   color: var(--ink-3); transition: color .15s ease;
+  text-decoration: none;
 }
 .tab-label {
   font-family: "Crimson Text", var(--serif);
@@ -3461,6 +3464,9 @@ body.rd .rd-tpp-legend { margin: 0 0 4px; }
 body.rd .rd-tpp-chart .rd-tabs .rd-check + .rd-check { margin-left: 8px; }
 @media (max-width: 640px) {
   body.rd .rd-tpp-chart > .rd-check { min-height: 30px; }
+}
+@media (min-width: 641px) and (max-width: 700px) {
+  body.rd .rd-tpp-chart .rd-tabs { flex-wrap: wrap; }
 }
 body.rd .rd-lg { position: relative; height: 82px; margin-top: 18px; font-size: 12px; font-variant-numeric: tabular-nums; }
 body.rd .rd-lg > span { position: absolute; }
@@ -29654,6 +29660,14 @@ function Tabs({
   const onTabKeyDown = e => {
     const ids = tabs.map(t => t.id);
     const i = ids.indexOf(active);
+    if (e.key === " " || e.key === "Spacebar") {
+      const hit = tabs.find(t => btnRefs.current[t.id] === e.target);
+      if (hit) {
+        e.preventDefault();
+        onChange(hit.id);
+      }
+      return;
+    }
     let next = null;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") next = ids[(i + 1) % ids.length];else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = ids[(i - 1 + ids.length) % ids.length];else if (e.key === "Home") next = ids[0];else if (e.key === "End") next = ids[ids.length - 1];
     if (next == null) return;
@@ -29716,10 +29730,11 @@ function Tabs({
     role: "tablist",
     "aria-label": "Views",
     onKeyDown: onTabKeyDown
-  }, tabs.map(t => React.createElement("button", {
+  }, tabs.map(t => React.createElement("a", {
     key: t.id,
     role: "tab",
     "aria-selected": active === t.id,
+    href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
     id: "tab-" + t.id,
     "aria-controls": "panel-" + t.id,
     title: t.tip,
@@ -29729,6 +29744,8 @@ function Tabs({
     },
     className: "tab" + (active === t.id ? " active" : "") + (t.pinHide ? " tab-pinhide" : ""),
     onClick: e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
       onChange(t.id);
       if (e.detail) e.currentTarget.blur();
     }
@@ -32394,7 +32411,7 @@ const DEM_SPLITS = [{
   lo: "Rural",
   hi: "Inner metro",
   scope: "With a city and country breakdown",
-  pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"]]
+  pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"], ["Capital Cities", "Regional/Rural Areas", "Capital v regional/rural"]]
 }, {
   id: "home",
   label: "Home",
@@ -53346,7 +53363,7 @@ function RdApDetail({
       return React.createElement("span", {
         role: "cell",
         className: "rd-apd-dv" + (d >= 5 ? " hi" : d <= -5 ? " lo" : "")
-      }, v == null ? "—" : Math.round(v));
+      }, v == null ? "—" : rdApNum(v));
     };
     const dims = Object.entries(p.grp.d);
     const per = Math.ceil(dims.reduce((a, [, r]) => a + r.length + 1, 0) / 3);
@@ -53381,7 +53398,7 @@ function RdApDetail({
       return React.createElement("span", {
         key: k.id,
         role: "cell"
-      }, tv == null ? "—" : Math.round(tv));
+      }, tv == null ? "—" : rdApNum(tv));
     }));
     return React.createElement("div", {
       className: "rd-apd-demwrap"
@@ -58164,6 +58181,11 @@ Object.assign(window, {
 });</script>
   <script>const SETTLE_MS = 220;
 const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const urlWrite = (verb, to) => {
+  try {
+    history[verb](null, "", to);
+  } catch {}
+};
 function freshness(iso) {
   const then = Date.parse(iso);
   const days = Math.max(0, Math.round((easternNow().day - then) / 86400000));
@@ -58433,7 +58455,7 @@ function Header({
   useEffect(() => {
     if (window.location.hash === "#story") {
       openStory();
-      history.replaceState(null, "", window.location.pathname + window.location.search);
+      urlWrite("replaceState", window.location.pathname + window.location.search);
     }
   }, []);
   useEffect(() => {
@@ -59796,6 +59818,30 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 const TAB_IDS = TABS.map(t => t.id);
+const TAB_BASE = window.JUR ? "/vic/" : "/";
+const tabToPath = id => id === "now" ? TAB_BASE : TAB_BASE + id + "/";
+const pathToTab = () => {
+  const p = window.location.pathname;
+  if (!p.startsWith(TAB_BASE)) return null;
+  const seg = p.slice(TAB_BASE.length).replace(/\/+$/, "");
+  if (seg === "") return "now";
+  return TAB_IDS.includes(seg) ? seg : null;
+};
+const TAB_HASH = {
+  snapshot: "now",
+  now: "now",
+  cycles: "cycles",
+  allpolls: "allpolls",
+  info: "info"
+};
+const readLocation = () => {
+  const h = (window.location.hash || "").replace(/^#/, "");
+  if (h && TAB_IDS.includes(TAB_HASH[h])) return TAB_HASH[h];
+  const fromPath = pathToTab();
+  if (fromPath) return fromPath;
+  return TAB_IDS.includes(window.AP_INITIAL_TAB) ? window.AP_INITIAL_TAB : "now";
+};
+window.AP.tabToPath = tabToPath;
 const PrimaryVoteMemo = React.memo(PrimaryVotePanel);
 const NextPollsMemo = React.memo(NextPollsPanel);
 const LeadershipMemo = React.memo(LeadershipSection);
@@ -60007,23 +60053,34 @@ function App() {
       if (window.AP.tppBasis === tppBasis) delete window.AP.tppBasis;
     };
   }, [tppBasis]);
-  const readHash = () => {
-    const h = (window.location.hash || "").replace(/^#/, "");
-    if (h === "snapshot") return "now";
-    return TAB_IDS.includes(h) ? h : "now";
-  };
-  const [tab, setTab] = useState(readHash);
+  const [tab, setTab] = useState(readLocation);
   const [focusPoll, setFocusPoll] = useState(null);
   const [focusTerm, setFocusTerm] = useState(null);
   const [termPop, setTermPop] = useState(null);
   React.useEffect(() => {
-    const fn = () => setTab(readHash());
-    window.addEventListener("hashchange", fn);
-    return () => window.removeEventListener("hashchange", fn);
+    const h = (window.location.hash || "").replace(/^#/, "");
+    if (h && TAB_HASH[h]) {
+      const t = TAB_IDS.includes(TAB_HASH[h]) ? TAB_HASH[h] : null;
+      urlWrite("replaceState", (t ? tabToPath(t) : window.location.pathname) + window.location.search);
+    }
+    const onUrl = () => setTab(readLocation());
+    window.addEventListener("popstate", onUrl);
+    window.addEventListener("hashchange", onUrl);
+    return () => {
+      window.removeEventListener("popstate", onUrl);
+      window.removeEventListener("hashchange", onUrl);
+    };
   }, []);
-  const goTab = id => {
+  React.useEffect(() => {
+    if (!window.location.pathname.startsWith(TAB_BASE)) return;
+    if (window.location.pathname !== tabToPath(tab)) urlWrite("replaceState", tabToPath(tab) + window.location.search);
+  }, [tab]);
+  const navTab = (id, push) => {
     setTab(id);
-    if (id !== readHash()) window.location.hash = id;
+    if (push && window.location.pathname.startsWith(TAB_BASE) && pathToTab() !== id) urlWrite("pushState", tabToPath(id) + window.location.search);
+  };
+  const goTab = id => {
+    navTab(id, true);
     window.scrollTo({
       top: 0,
       behavior: "auto"
@@ -60185,13 +60242,12 @@ function App() {
         facet: facet || null,
         split: split || null,
         back: {
-          tab: readHash(),
+          tab: readLocation(),
           y: window.scrollY,
           from: from || "the chart"
         }
       });
-      setTab("allpolls");
-      if (readHash() !== "allpolls") window.location.hash = "allpolls";
+      navTab("allpolls", true);
     };
     const openTermPage = (id, from) => {
       if (!id) return;
@@ -60199,34 +60255,31 @@ function App() {
       setFocusTerm({
         id,
         back: {
-          tab: readHash(),
+          tab: readLocation(),
           y: window.scrollY,
           from: from || "where you were"
         }
       });
-      setTab("info");
-      if (readHash() !== "info") window.location.hash = "info";
+      navTab("info", true);
     };
     window.AP.openTerm = (id, from) => {
       if (!id) return;
-      if (readHash() === "info") openTermPage(id, from);else setTermPop({
+      if (readLocation() === "info") openTermPage(id, from);else setTermPop({
         id,
         from
       });
     };
     window.AP.openTermPage = openTermPage;
     window.AP.gotoNextPolls = () => {
-      if (readHash() === "now") {
+      if (readLocation() === "now") {
         npScrollNow();
         return;
       }
       npJumpRef.current = true;
-      setTab("now");
-      window.location.hash = "now";
+      navTab("now", true);
     };
     window.AP.gotoFinalPolls = () => {
-      setTab("cycles");
-      if (readHash() !== "cycles") window.location.hash = "cycles";
+      navTab("cycles", true);
       let tries = 0;
       const seek = () => {
         const el = document.getElementById("final-polls");
@@ -60256,8 +60309,7 @@ function App() {
     };
     setFocusPoll(null);
     restoreY.current = b.y;
-    setTab(b.tab);
-    if (readHash() !== b.tab) window.location.hash = b.tab;
+    navTab(b.tab, true);
   };
   const backFromTerm = () => {
     const b = focusTerm && focusTerm.back || {
@@ -60266,8 +60318,7 @@ function App() {
     };
     setFocusTerm(null);
     restoreY.current = b.y;
-    setTab(b.tab);
-    if (readHash() !== b.tab) window.location.hash = b.tab;
+    navTab(b.tab, true);
   };
   React.useLayoutEffect(() => {
     if (npJumpRef.current) {

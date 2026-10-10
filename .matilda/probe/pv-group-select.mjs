@@ -319,7 +319,7 @@ const clickDot = async (selValue) => {
     await new Promise((r) => setTimeout(r, 300));
     await page.mouse.click(dot.x, dot.y);
     try {
-      await page.waitForFunction(() => location.hash === "#allpolls" && document.querySelector(".rd-ap-tabs button"), { timeout: 10000 });
+      await page.waitForFunction(() => location.pathname === "/allpolls/" && document.querySelector(".rd-ap-tabs button"), { timeout: 10000 });
       landed = await page.evaluate(() => ({
         active: (([...document.querySelectorAll(".rd-ap-tabs button")].find((b) => b.getAttribute("aria-pressed") === "true")) || {}).textContent || null,
         split: (([...document.querySelectorAll('.rd-ap-dpick [role="radio"]')].find((b) => b.getAttribute("aria-checked") === "true")) || {}).textContent || null,

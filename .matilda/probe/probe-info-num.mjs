@@ -66,7 +66,7 @@ page.on("pageerror", (e) => pageErrors.push(String(e)));
 
 async function open(width, height) {
   await page.setViewport({ width, height, deviceScaleFactor: 1 });
-  await page.goto("file://" + path.join(BASE, "index.html") + "#info", { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto("file://" + path.join(BASE, "info", "index.html"), { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".info-index button", { timeout: 30000 });
   await sleep(300);
 }

@@ -15,6 +15,7 @@ import process from "process";
 
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PAGE = "file://" + path.resolve(process.cwd(), "index.html");
+const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.html$/, "allpolls/index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 
@@ -24,7 +25,7 @@ page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300));
 
 const gotoGroups = async (w) => {
   await page.setViewport({ width: w, height: 980, deviceScaleFactor: 1 });
-  await page.goto(PAGE + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(APAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".rd-ap-tabs .rd-tab", { timeout: 30000 });
   await page.evaluate(() => {
     const t = [...document.querySelectorAll(".rd-ap-tabs .rd-tab")].find((el) => /^(Demographics|Groups)$/.test(el.textContent.trim()));

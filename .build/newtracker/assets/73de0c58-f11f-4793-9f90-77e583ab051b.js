@@ -8,6 +8,14 @@ const SETTLE_MS = 220;
 const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* file:// origins cannot carry history writes at all (the path is a
+   filesystem path and every rewrite resolves off the root), and a
+   cross-path push can be refused anywhere the origin forbids it. The
+   URL is a nicety layered over the tab state - never let it veto the
+   state itself. Shared module-wide: the masthead's #story strip and the
+   router both write through here. */
+const urlWrite = (verb, to) => { try { history[verb](null, "", to); } catch {} };
+
 // relative freshness for the "last poll" stamp, which is measured off the
 // date that stamp SHOWS - the last publication, not the last fieldwork end,
 // or the page would read "26 Aug 2026, 2 days ago" on 26 August
@@ -323,7 +331,7 @@ function Header({ isDark, onToggleTheme, rd }) {
   useEffect(() => {
     if (window.location.hash === "#story") {
       openStory();
-      history.replaceState(null, "", window.location.pathname + window.location.search);
+      urlWrite("replaceState", window.location.pathname + window.location.search);
     }
   }, []);
   useEffect(() => {
@@ -1940,6 +1948,39 @@ const TABS = [
 if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1);
 const TAB_IDS = TABS.map((t) => t.id);
 
+/* Every tab is also a path of its own: Now is the site root (/vic/ for that
+   jurisdiction's page), the others one segment under it, and build.mjs emits
+   each as a real document. A tab click pushes its path; back and forward walk
+   the history again. pathToTab returns null off every tab path (a scratch
+   BUILD_OUT copy previewed directly), where callers leave the address bar
+   alone. */
+const TAB_BASE = window.JUR ? "/vic/" : "/";
+const tabToPath = (id) => (id === "now" ? TAB_BASE : TAB_BASE + id + "/");
+const pathToTab = () => {
+  const p = window.location.pathname;
+  if (!p.startsWith(TAB_BASE)) return null;
+  const seg = p.slice(TAB_BASE.length).replace(/\/+$/, "");
+  if (seg === "") return "now";
+  return TAB_IDS.includes(seg) ? seg : null;
+};
+/* Links from the hash era (and from before Now was Now, #snapshot) keep
+   landing on the right tab: the hash is honoured first at boot, then
+   normalised away to the path. */
+const TAB_HASH = { snapshot: "now", now: "now", cycles: "cycles", allpolls: "allpolls", info: "info" };
+const readLocation = () => {
+  const h = (window.location.hash || "").replace(/^#/, "");
+  if (h && TAB_IDS.includes(TAB_HASH[h])) return TAB_HASH[h];
+  const fromPath = pathToTab();
+  if (fromPath) return fromPath;
+  /* Off every tab path: trust the stamp the tab pages carry (build.mjs sets
+     it per page) so a previewed off-path copy still opens its own view. */
+  return TAB_IDS.includes(window.AP_INITIAL_TAB) ? window.AP_INITIAL_TAB : "now";
+};
+/* The other tabbed-views bundle renders the tab BAR; it reads the path map
+   back off the shared namespace rather than re-deriving the site's URL
+   grammar. Set here at module scope, so it exists before the first render. */
+window.AP.tabToPath = tabToPath;
+
 /* The sections that take nothing from the two-party switches, kept from
    re-rendering when one is pressed. Without this a matchup or basis press
    rebuilt the whole page - every chart in every section - inside the press,
@@ -2192,26 +2233,53 @@ function App() {
     return () => { if (window.AP.tppBasis === tppBasis) delete window.AP.tppBasis; };
   }, [tppBasis]);
 
-  // active tab, persisted in the URL hash so a refresh / share keeps the view
-  const readHash = () => {
-    const h = (window.location.hash || "").replace(/^#/, "");
-    /* the tab was Snapshot before it was Now: links shared under the old
-       #snapshot hash keep landing on it */
-    if (h === "snapshot") return "now";
-    return TAB_IDS.includes(h) ? h : "now";
-  };
-  const [tab, setTab] = useState(readHash);
+  // active tab, persisted in the URL path so a refresh / share keeps the view
+  const [tab, setTab] = useState(readLocation);
   const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
   const [focusTerm, setFocusTerm] = useState(null);   // the glossary entry a link sent us to
   const [termPop, setTermPop] = useState(null);       // a definition open over the page
   React.useEffect(() => {
-    const fn = () => setTab(readHash());
-    window.addEventListener("hashchange", fn);
-    return () => window.removeEventListener("hashchange", fn);
+    /* The address bar names the view. A legacy #tab hash is rewritten to its
+       path on mount (the search string carried: ?design=old and the archive's
+       filters live in it); popstate covers back/forward, hashchange covers a
+       hand-typed hash. #story is consumed and stripped upstream, in the
+       Masthead's mount effect. */
+    const h = (window.location.hash || "").replace(/^#/, "");
+    if (h && TAB_HASH[h]) {
+      const t = TAB_IDS.includes(TAB_HASH[h]) ? TAB_HASH[h] : null;
+      urlWrite("replaceState", (t ? tabToPath(t) : window.location.pathname) + window.location.search);
+    }
+    const onUrl = () => setTab(readLocation());
+    window.addEventListener("popstate", onUrl);
+    window.addEventListener("hashchange", onUrl);
+    return () => {
+      window.removeEventListener("popstate", onUrl);
+      window.removeEventListener("hashchange", onUrl);
+    };
   }, []);
-  const goTab = (id) => {
+  /* Whatever set the tab, the path ends up naming it. This is a GUARD, not
+     the writer: the entry points pushState, and the archive's query-string
+     writers then own the parameters on top of it. Off every tab path (a
+     scratch preview copy) the address bar is left alone. */
+  React.useEffect(() => {
+    if (!window.location.pathname.startsWith(TAB_BASE)) return;
+    if (window.location.pathname !== tabToPath(tab))
+      urlWrite("replaceState", tabToPath(tab) + window.location.search);
+  }, [tab]);
+  /* The two URL-writing entry points. goTab is the tab bar's own press: new
+     view, new history entry, back to the top. jumpTo is everything that
+     CROSSES views on a reader's behalf (a chart dot, a definition link, the
+     way back out of one) - same entry, but the scroll is managed by the
+     caller's own restore rather than a jump to the top. Both keep the
+     search string so a ?design= or a filter survives the crossing; neither
+     touches history off a tab path. */
+  const navTab = (id, push) => {
     setTab(id);
-    if (id !== readHash()) window.location.hash = id;
+    if (push && window.location.pathname.startsWith(TAB_BASE) && pathToTab() !== id)
+      urlWrite("pushState", tabToPath(id) + window.location.search);
+  };
+  const goTab = (id) => {
+    navTab(id, true);
     window.scrollTo({ top: 0, behavior: "auto" });
     // walking off with the tabs ends the trip: coming back to the archive later
     // should not still be holding a row open with a way back to a chart the
@@ -2401,9 +2469,8 @@ function App() {
     window.AP.openPoll = (key, facet, from, split) => {
       if (!key) return;
       setFocusPoll({ key, facet: facet || null, split: split || null,
-                     back: { tab: readHash(), y: window.scrollY, from: from || "the chart" } });
-      setTab("allpolls");
-      if (readHash() !== "allpolls") window.location.hash = "allpolls";
+                     back: { tab: readLocation(), y: window.scrollY, from: from || "the chart" } });
+      navTab("allpolls", true);
     };
     /* The same trip, for a definition. Any panel can send a reader to the term
        that explains a word it just used - the hero's method label is the first
@@ -2412,15 +2479,14 @@ function App() {
     const openTermPage = (id, from) => {
       if (!id) return;
       setTermPop(null);
-      setFocusTerm({ id, back: { tab: readHash(), y: window.scrollY, from: from || "where you were" } });
-      setTab("info");
-      if (readHash() !== "info") window.location.hash = "info";
+      setFocusTerm({ id, back: { tab: readLocation(), y: window.scrollY, from: from || "where you were" } });
+      navTab("info", true);
     };
     /* Away from Info a term opens in place (TermPop); on Info itself it is a
        cross-reference, and the page scroll it has always been is right. */
     window.AP.openTerm = (id, from) => {
       if (!id) return;
-      if (readHash() === "info") openTermPage(id, from);
+      if (readLocation() === "info") openTermPage(id, from);
       else setTermPop({ id, from });
     };
     window.AP.openTermPage = openTermPage;
@@ -2429,17 +2495,15 @@ function App() {
        wait for the snapshot view to mount, so the scroll is parked for the
        layout effect below the way a restore scroll is. */
     window.AP.gotoNextPolls = () => {
-      if (readHash() === "now") { npScrollNow(); return; }
+      if (readLocation() === "now") { npScrollNow(); return; }
       npJumpRef.current = true;
-      setTab("now");
-      window.location.hash = "now";
+      navTab("now", true);
     };
     /* Info's "How the final polls did" mention, as a real link: to Past
        cycles, then down to the panel once the view (and its lazily fetched
        source rows) has mounted it. */
     window.AP.gotoFinalPolls = () => {
-      setTab("cycles");
-      if (readHash() !== "cycles") window.location.hash = "cycles";
+      navTab("cycles", true);
       let tries = 0;
       const seek = () => {
         const el = document.getElementById("final-polls");
@@ -2462,15 +2526,13 @@ function App() {
     const b = (focusPoll && focusPoll.back) || { tab: "now", y: 0 };
     setFocusPoll(null);
     restoreY.current = b.y;
-    setTab(b.tab);
-    if (readHash() !== b.tab) window.location.hash = b.tab;
+    navTab(b.tab, true);
   };
   const backFromTerm = () => {
     const b = (focusTerm && focusTerm.back) || { tab: "now", y: 0 };
     setFocusTerm(null);
     restoreY.current = b.y;
-    setTab(b.tab);
-    if (readHash() !== b.tab) window.location.hash = b.tab;
+    navTab(b.tab, true);
   };
   React.useLayoutEffect(() => {
     if (npJumpRef.current) {

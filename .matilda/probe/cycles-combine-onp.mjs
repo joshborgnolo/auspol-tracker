@@ -44,7 +44,7 @@ const check = (name, ok, detail = "") => {
       const pageErrors = [];
       page.on("pageerror", (e) => pageErrors.push(String(e)));
       await page.setViewport({ width: vw, height: 900 });
-      await page.goto(`http://127.0.0.1:${PORT}/#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded", timeout: 60000 });
       // hash "cycles" lands the tab (readHash keys on it); no button hunt is
       // needed at either width - the phone row relabels it "Cycles"
       await page.waitForSelector("#cyc-primary .rd-cyc-chart", { timeout: 45000 });

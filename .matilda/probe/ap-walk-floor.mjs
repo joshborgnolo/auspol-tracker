@@ -23,13 +23,13 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css
 const server = createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end(); }
 });
 await new Promise((r) => server.listen(0, r));
-const URL0 = `http://127.0.0.1:${server.address().port}/index.html`;
+const URL0 = `http://127.0.0.1:${server.address().port}/`;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--no-sandbox"] });
 const page = await browser.newPage();
 let pageErr = 0;
@@ -47,7 +47,7 @@ const widths = (process.env.WIDTHS || "320,360,390,430,640,768,900,1024,1140,114
 for (const W of widths) {
   const phone = W < 700;
   await page.setViewport({ width: W, height: 850, deviceScaleFactor: 1, isMobile: phone, hasTouch: phone });
-  await page.goto(URL0 + "#allpolls", { waitUntil: "networkidle0" });
+  await page.goto(URL0 + "allpolls/", { waitUntil: "networkidle0" });
   await sleep(800);
   // hidden measurement stacks must never paint or hold height
   const vis = await page.evaluate(() => {
