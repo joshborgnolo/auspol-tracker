@@ -36,13 +36,33 @@ for (const vw of [390, 320]) {
   await page.setViewport({ width: vw, height: 844, deviceScaleFactor: 2 });
   await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "networkidle0", timeout: 60000 });
 
-  // Issues section, trust view, Change tab
-  await page.evaluate(() => {
+  // Issues section, trust view, Change tab — PARKED since 2026-10-10 (user's
+  // call: Nov 2025 and now read too alike): no Change tab is shown then and
+  // this probe's geometry is unreachable. While parked, assert the snapshot
+  // view renders with NO .rd-isc tabs and exit green; flip ISC_CHG_PARKED
+  // back to false in rd-panels.jsx and these checks live again unchanged.
+  const chgBtn = await page.evaluate(() => {
     document.getElementById("issues")?.scrollIntoView();
     const btn = [...document.querySelectorAll(".rd-isc-tabs button, .rd-isc-tabs [role=tab]")]
       .find((n) => (n.textContent || "").trim() === "Change");
     if (btn) btn.click();
+    return !!btn;
   });
+  if (!chgBtn) {
+    const parked = await page.evaluate(() => ({
+      tabs: [...document.querySelectorAll(".rd-isc-tabs")].length,
+      isc: [...document.querySelectorAll(".rd-isc")].length,
+      rows: [...document.querySelectorAll(".rd-is-row")].filter((r) => {
+        const b = r.getBoundingClientRect(); return b.width > 0 && b.height > 0;
+      }).length,
+    }));
+    if (errors.length) fail(`vw ${vw}: page errors: ${errors.join(" | ")}`);
+    if (parked.tabs || parked.isc) fail(`vw ${vw}: change-view chrome still on the page (tabs ${parked.tabs}, .rd-isc ${parked.isc})`);
+    else if (!parked.rows) fail(`vw ${vw}: parked view shows no snapshot issue rows`);
+    else ok(`vw ${vw}: parked — no Change tab, snapshot rows render (${parked.rows} rows)`);
+    await page.close();
+    continue;
+  }
   await page.waitForSelector(".rd-isc .rd-isc-m .rd-isc-tile", { timeout: 30000 });
   await new Promise((r) => setTimeout(r, 900)); // crossfade settles
 

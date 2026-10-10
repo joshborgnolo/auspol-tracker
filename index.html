@@ -104159,6 +104159,7 @@ function RdIssues({
   const I = D.issues;
   const [view, setView] = useState("trust");
   const [snap, setSnap] = useState("snap");
+  const ISC_CHG_PARKED = true;
   const [selId, setSelId] = useState(null);
   const selNow = selId || (I && I.list && I.list[0] ? I.list[0].id : null);
   const [issMorph, setSel] = window.AP.useMorph(selNow, v => setSelId(v), (a, b) => a !== b);
@@ -104742,7 +104743,7 @@ function RdIssues({
   }, view === "trust" ? React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: trustHead,
     dek: trustDek
-  }), React.createElement(RdTabs, {
+  }), !ISC_CHG_PARKED && React.createElement(RdTabs, {
     swipe: true,
     value: snap,
     onChange: setSnap,
@@ -104756,8 +104757,8 @@ function RdIssues({
       label: "Change"
     }]
   }), React.createElement(RdCrossfade, {
-    k: snap
-  }, snap !== "chg" || !iscMonths.length ? React.createElement(React.Fragment, null, React.createElement("div", {
+    k: ISC_CHG_PARKED ? "snap" : snap
+  }, ISC_CHG_PARKED || snap !== "chg" || !iscMonths.length ? React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-is-grid",
     ref: trGrid
   }, React.createElement("div", {

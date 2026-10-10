@@ -3072,6 +3072,11 @@ function RdIssues({ rangeId = "all" }) {
   /* the trust view's sub-views: the rows-and-chart snapshot, and the change
      tiles (who was trusted, a snapshot month against now) */
   const [snap, setSnap] = useState("snap");
+  /* the change view sits parked (user's call 2026-10-10): November 2025 and
+     now read too alike to make the comparison worth showing. Flip to false
+     to bring the Change tab, the tiles and their phone side-by-side layout
+     back; the code and the gen-data snap stay live underneath. */
+  const ISC_CHG_PARKED = true;
   const [selId, setSelId] = useState(null);
   /* picking another issue asks the same three parties a different question,
      so the chart reshapes into it (useMorph) rather than being swapped out.
@@ -3532,10 +3537,12 @@ function RdIssues({ rangeId = "all" }) {
       {view === "trust" ? (
         <>
           <RdHed head={trustHead} dek={trustDek} />
+          {!ISC_CHG_PARKED && (
           <RdTabs swipe value={snap} onChange={setSnap} ariaLabel="Who’s trusted view" className="rd-tabs-sm rd-isc-tabs"
                   options={[{ id: "snap", label: "Snapshot" }, { id: "chg", label: "Change" }]} />
-          <RdCrossfade k={snap}>
-          {snap !== "chg" || !iscMonths.length ? (
+          )}
+          <RdCrossfade k={ISC_CHG_PARKED ? "snap" : snap}>
+          {ISC_CHG_PARKED || snap !== "chg" || !iscMonths.length ? (
           <>
           <div className="rd-is-grid" ref={trGrid}>
             <div className="rd-is-left" ref={rowsRef}>
