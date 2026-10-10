@@ -1,9 +1,9 @@
 ---
 name: shell-command-pitfalls
-description: Shell-command pitfalls that have cost time in interactive Matilda sessions on this repo (macOS) — sleeps need a standalone call with an `# intentional-sleep: <reason>` trailing comment or the policy hook blocks them (and `sleep N && cmd` chains are refused, split the follow-up command into its own call). Never build a multi-line git commit message as `-m "$(cat <<'HEREDOC' … )"` — apostrophes, double quotes AND backticks in the body abort the commit (use `git commit -F - <<'HEREDOC'` or literal -m flags); the parse failure kills the WHOLE command line, so a same-line `git add` never runs either and the plain -m fallback retry commits EMPTY (one reached origin 2026-09-30 — run `git show --stat` before pushing after any such hiccup: 0 changes = soft-reset and redo, already-pushed = harmless litter, leave it). A hung `git add` is usually a stray `less` pager from an earlier git diff (pkill it, then retry). BSD grep chokes on brace literals ("invalid repetition count(s)") — use grep -F. `grep -c` exits 1 when the count is 0 — SUCCESS for an absence assertion. There is NO `timeout` command on stock macOS (don't reach for it; split chains instead), chaining several headless probe scripts in one call dies at the 120 s harness cap (run probes one call each), and an inline `node -e "…"` whose JS carries a backtick template literal gets its `${…}` executed by bash (exit 127 "…: command not found", 2026-10-01) — write the probe as a scratch .mjs file instead of fighting the quoting. A single-line sed pattern against the hashed asset sources (`.build/newtracker/assets/*.js`) silently matches ZERO when the JSX copy wraps the phrase across two source lines — read the region first, use the edit tool with the real line breaks, or an `&&` chain half-applies a copy sweep (2026-10-02). A pipe masks exit codes: `npm test 2>&1 | tail -5` shows green even when the tests FAILED (exit status is tail's) — re-verify with an unpiped run (`npm test >/dev/null 2>&1; echo $?`). `git add` of TRACKED files living under a gitignored DIRECTORY (`.matilda/probe/` is ignored but its probe files are committed) prints "The following paths are ignored by one of your .gitignore files" and exits 1 — yet stages them anyway; verify with `git status`/`git diff --cached` and do NOT reach for `-f` (only never-tracked files need it, and a chained `&&` after such an add silently dies even though the add worked) (2026-10-03). Corollary hit 2026-10-04: believing the add had failed wholesale, dropping the path from a RETRY add does NOT unstage it — the staging from the first "failed" add persists, so the commit includes a file the final add never named (a 3-path `git add` followed by commit produced `git show --stat` listing 4 files; harmless only because the probe file was a wanted deliverable). After such a hiccup always `git diff --cached --stat` BEFORE committing. A long-running process launched as a Matilda background shell (even with `completion: detached`) is REAPED when the chat session exits or restarts (vic-polish loop died silently ~15 min after turn end, 2026-10-04) — for anything that must outlive the session use `nohup cmd </dev/null >>log 2>&1 & disown` and verify `ps -o tty=` shows `??` (reparented to launchd). An inline `#` comment INSIDE a submitted one-liner comments out everything to the line's end — the loop's `fi`/`done` terminators die with it and bash dies with `syntax error: unexpected end of file` (2026-10-04).
+description: Shell-command pitfalls that have cost time in interactive Matilda sessions on this repo (macOS) — sleeps need a standalone call with an `# intentional-sleep: <reason>` trailing comment or the policy hook blocks them (and `sleep N && cmd` chains are refused, split the follow-up command into its own call). Never build a multi-line git commit message as `-m "$(cat <<'HEREDOC' … )"` — apostrophes, double quotes AND backticks in the body abort the commit (use `git commit -F - <<'HEREDOC'` or literal -m flags); the parse failure kills the WHOLE command line, so a same-line `git add` never runs either and the plain -m fallback retry commits EMPTY (one reached origin 2026-09-30 — run `git show --stat` before pushing after any such hiccup: 0 changes = soft-reset and redo, already-pushed = harmless litter, leave it). A hung `git add` is usually a stray `less` pager from an earlier git diff (pkill it, then retry). BSD grep chokes on brace literals ("invalid repetition count(s)") — use grep -F. `grep -c` exits 1 when the count is 0 — SUCCESS for an absence assertion. There is NO `timeout` command on stock macOS (don't reach for it; split chains instead), chaining several headless probe scripts in one call dies at the 120 s harness cap (run probes one call each), and an inline `node -e "…"` whose JS carries a backtick template literal gets its `${…}` executed by bash (exit 127 "…: command not found", 2026-10-01) — write the probe as a scratch .mjs file instead of fighting the quoting. A single-line sed pattern against the hashed asset sources (`.build/newtracker/assets/*.js`) silently matches ZERO when the JSX copy wraps the phrase across two source lines — read the region first, use the edit tool with the real line breaks, or an `&&` chain half-applies a copy sweep (2026-10-02). A pipe masks exit codes: `npm test 2>&1 | tail -5` shows green even when the tests FAILED (exit status is tail's) — re-verify with an unpiped run (`npm test >/dev/null 2>&1; echo $?`). `git add` of TRACKED files living under a gitignored DIRECTORY (`.matilda/probe/` is ignored but its probe files are committed) prints "The following paths are ignored by one of your .gitignore files" and exits 1 — yet stages them anyway; verify with `git status`/`git diff --cached` and do NOT reach for `-f` (only never-tracked files need it, and a chained `&&` after such an add silently dies even though the add worked) (2026-10-03). Corollary hit 2026-10-04: believing the add had failed wholesale, dropping the path from a RETRY add does NOT unstage it — the staging from the first "failed" add persists, so the commit includes a file the final add never named (a 3-path `git add` followed by commit produced `git show --stat` listing 4 files; harmless only because the probe file was a wanted deliverable). After such a hiccup always `git diff --cached --stat` BEFORE committing. A long-running process launched as a Matilda background shell (even with `completion: detached`) is REAPED when the chat session exits or restarts (vic-polish loop died silently ~15 min after turn end, 2026-10-04) — for anything that must outlive the session use `nohup cmd </dev/null >>log 2>&1 & disown` and verify `ps -o tty=` shows `??` (reparented to launchd). An inline `#` comment INSIDE a submitted one-liner comments out everything to the line's end — the loop's `fi`/`done` terminators die with it and bash dies with `syntax error: unexpected end of file` (2026-10-04). And a `head -N` truncation on an evidence-hunting grep hides hits N+1 onward — poll-PDF methodology pages match first, the findings never print, and "no X in this source" goes out wrong (2026-10-10).
 source: auto-skill
 extracted_at: '2026-09-30T12:25:25.215Z'
-updated_at: '2026-10-09'
+updated_at: '2026-10-10'
 ---
 
 # Shell-command pitfalls in interactive sessions (macOS, this repo)
@@ -257,6 +257,23 @@ substitution abort, never iterate on sanitising the message
 (removing one trigger class at a time) — go straight to the
 scratch-file `-F`. Used `.git/P2_COMMIT_MSG.txt` per the
 recurrence-ten `.git/` path form, `git commit -F`, `rm`.
+NINETEENTH 2026-10-10, the flow-splits section commit (later
+ab5c09e): NEW FAILURE MODE — this time `-m "$(cat <<'MSG' …)"`
+did NOT abort; the command EXITED 0 and produced the commit, but
+the message was GARBLED — the heredoc terminator line
+(`MSG\n)`) and quote-wrapping leaked INTO the body, so
+`git show -s --format=%B` showed the body trailing off with a
+literal `MSG`. Silent success with wrong content is worse than
+the loud abort: nothing in the harness output flagged it.
+Caught only because `git status` output looked odd and
+`git log -1 --format='%B'` was read before pushing. Recovery
+(a commit made but NOT yet pushed): `git commit --amend -F
+<scratch-file>` with the message written via write_file —
+amend is safe here precisely because the object hasn't left
+the machine. Standing rule addition: when you DO run the
+banned form, run `git log -1 --format='%B'` in the SAME chain
+so a garbled message is seen immediately; and any commit whose
+message matters gets the scratch-file `-F` in the first place.
 
 ## Background "detached" shells die with the session — nohup+disown survives
 
@@ -305,3 +322,20 @@ only safe as a trailing `cmd # intentional-sleep: <reason>` at the very
 end of the line (the policy-friendly sleep form), otherwise restructure
 the command without it — the identical retry minus the comment ran
 clean.
+
+## A `head -N` truncation on an evidence-hunting grep can hide the evidence itself
+
+(2026-10-10, EMRS demographics adjudication — see auspol-demographics-reader):
+`grep -inE 'male|female|age|income' feb.txt | head -20` on an extracted poll
+PDF returned exactly 20 hits, ALL of them sample-profile/quota lines — so
+"no demographic data in this report" went out to the user. The federal-VI
+prose callouts ("Respondents aged 18 to 34 (24%)…") and the per-electorate
+crosstab charts sat in hits 21+. `head` truncates to the FIRST N hits, and
+poll PDFs order methodology/sample pages before the findings — the
+methodology matches win the quota and the actual findings are invisible.
+Reported exit status stays green either way, so nothing flags the loss.
+Rules for absence claims: grep the whole file (or `sed -n` the finding
+sections) and count total hits BEFORE concluding anything; when the answer
+feeds a recorded adjudication, drop `head` entirely. Companion signal,
+same session: zero keyword hits across a clearly text-rich PDF means the
+extractor failed (font-encoded streams), not that the data is absent.

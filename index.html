@@ -104625,7 +104625,7 @@ function RdSwitching({
   const labOpts = geo.map((c, i) => ({
     nm: c.kept ? ["One Nation", "ON"] : [NAME[c.id]],
     sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
-    pts: c.kept ? ["≈ " + fmt1(keptPts)] : i === 0 ? ["≈ " + fmt1(c.pts) + " points of One Nation’s gain", "≈ " + fmt1(c.pts) + " points of ON’s gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)] : i === 1 ? ["≈ " + fmt1(c.pts) + " points of the gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)] : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
+    pts: c.kept ? ["≈ " + fmt1(keptPts)] : i <= 1 ? ["≈ " + fmt1(c.pts) + " points of One Nation’s gain", "≈ " + fmt1(c.pts) + " points of ON’s gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)] : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
     sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"]
   }));
   const lab = {};
@@ -104759,7 +104759,7 @@ function RdSwitching({
     style: {
       color: c.ink
     }
-  }, c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]), React.createElement("b", null, c.kept ? "≈ " + fmt1(keptPts) + " pts" : i === 0 ? "≈ " + fmt1(c.pts) + " points of ON’s gain" : i === 1 ? "≈ " + fmt1(c.pts) + " points of the gain" : "≈ " + fmt1(c.pts) + " pts")), React.createElement("div", {
+  }, c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]), React.createElement("b", null, c.kept ? "≈ " + fmt1(keptPts) + " pts" : i <= 1 ? "≈ " + fmt1(c.pts) + " points of ON’s gain" : "≈ " + fmt1(c.pts) + " pts")), React.createElement("div", {
     className: "rd-mo-rsub"
   }, React.createElement("span", null, fmt1(c.w), "% of 2025 voters"), React.createElement("span", null, c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi))), React.createElement("div", {
     className: "rd-mo-rbar",

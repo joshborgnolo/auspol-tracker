@@ -2878,14 +2878,14 @@ function RdSwitching({ rangeId }) {
   const labOpts = geo.map((c, i) => ({
     nm: c.kept ? ["One Nation", "ON"] : [NAME[c.id]],
     sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
-    /* the first two columns' points rows name what they count (full wording
-       on big screens, the ON short form on small, "of the gain" second);
-       every later column is bare. The phone rows say the same wordings */
-    pts: c.kept ? ["≈ " + fmt1(keptPts)] : i === 0
+    /* the first two columns' points rows name what they count (the full
+       wording first, the ON short form second); every later column is
+       bare. Both columns say "One Nation's" gain, never a bare "the
+       gain" (user, 2026-10-10: the Labor column's "of the gain" didn't
+       say whose). The phone rows say the short wording */
+    pts: c.kept ? ["≈ " + fmt1(keptPts)] : i <= 1
       ? ["≈ " + fmt1(c.pts) + " points of One Nation’s gain", "≈ " + fmt1(c.pts) + " points of ON’s gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)]
-      : i === 1
-        ? ["≈ " + fmt1(c.pts) + " points of the gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)]
-        : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
+      : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
     /* the share row is bare: its old "of the gain" tail duplicated what the
        pts row above already names (first-column-only from 2026-09-30, gone
        for good 2026-10-03, both layouts - user calls) */
@@ -2962,7 +2962,7 @@ function RdSwitching({ rangeId }) {
           the ± row needed no tail once the pts row named the gain */}
       {all.map((c, i) => (
         <div key={c.id} className="rd-mo-row">
-          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>{c.kept ? "≈ " + fmt1(keptPts) + " pts" : i === 0 ? "≈ " + fmt1(c.pts) + " points of ON’s gain" : i === 1 ? "≈ " + fmt1(c.pts) + " points of the gain" : "≈ " + fmt1(c.pts) + " pts"}</b></div>
+          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>{c.kept ? "≈ " + fmt1(keptPts) + " pts" : i <= 1 ? "≈ " + fmt1(c.pts) + " points of ON’s gain" : "≈ " + fmt1(c.pts) + " pts"}</b></div>
           <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi)}</span></div>
           <div className="rd-mo-rbar" style={{ height: Math.max(16, c.w * 2.6), background: c.tint }}>
             <span style={{ width: c.rate + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>

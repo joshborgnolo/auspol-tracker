@@ -5,8 +5,14 @@
       from the higher lnp/alp switch rate; dek = flocked-ratio sentence then
       the old gain-share head sentence. All figures recomputed from the LIVE
       data bundle (9f09dca2 asset evaluated in Node).
-   C. FIRST-COLUMN PTS SUFFIX: big screens render "≈ N points of One Nation's
-      gain", a phone renders the short/fallback forms, later columns bare. */
+   C. POINTS-ROW SUFFIXES: the first two columns (lnp, alp) name what they
+      count - "≈ N points of One Nation's gain" where it fits, "≈ N points
+      of ON's gain" short, phone rows fixed at the short form; later columns
+      bare. The alp column joined the lnp column's chain on 2026-10-10
+      (user: its "of the gain" didn't say whose). The SHARE (±) rows have
+      been tail-free everywhere since 327f569 (2026-10-03, user call).
+      The gain-share sentence's verb is "voted for" since 49a8b7f (the
+      "backed" pin was drift, repaired 2026-10-10). */
 import http from "node:http";
 import path from "node:path";
 import fs from "node:fs";
@@ -83,7 +89,7 @@ const readPanel = async (width) => {
     ok("head swaps to the rate sentence", new RegExp(`^(?:Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
     ok("head names the HIGHER-rate party", p.head.includes(P[hi]) && !p.head.includes(P[hi] === "Coalition" ? "Labor" : "Coalition"), P[hi] + " rate " + now[hi].rate.toFixed(1));
     ok("dek carries the flocked-ratio sentence", new RegExp(`${P[hi]} voters have flocked to One Nation at about ${String(RATIO).replace(".", "\\.")} times the rate of ${P[lo]} voters`).test(p.dek), p.dek.slice(0, 140));
-    ok("dek carries the old head’s gain-share sentence", /of One Nation.{1,3}new voters backed (the )?(Coalition|Labor|Greens|another party) in 2025\./.test(p.dek), p.dek.slice(0, 260));
+    ok("dek carries the old head’s gain-share sentence", /of One Nation.{1,3}new voters (?:voted for|backed) (the )?(Coalition|Labor|Greens|another party) in 2025\./.test(p.dek), p.dek.slice(0, 260));
     ok("old dek tail gone", !/now say they.{1,3}d vote for One Nation/i.test(p.dek));
     ok("mosaic aria back to rate-fills (revert of 742df1e)", /filled by the share now backing One Nation/.test(p.aria));
     const sorted = [...Object.entries(now)].sort((a, b) => b[1].gain - a[1].gain);
@@ -92,10 +98,10 @@ const readPanel = async (width) => {
     ok("gain-share sentence names the top gainer", p.dek.includes(topParty), topParty);
     const first = p.pts[0] || "";
     ok("first column ≈ pts carries the full gain suffix", /≈ .* points of One Nation.s gain/.test(first), JSON.stringify(first));
-    ok("second column ≈ pts says “of the gain”", /≈ .* points of the gain/.test(p.pts[1] || ""), JSON.stringify(p.pts[1] || ""));
+    ok("second column ≈ pts names One Nation's gain too (full or ON short form)", /≈ .* points of (?:One Nation|ON).s gain/.test(p.pts[1] || ""), JSON.stringify(p.pts[1] || ""));
+    ok("no column still says “of the gain”", p.pts.every((t) => !/of the gain/.test(t)), JSON.stringify(p.pts));
     ok("columns 3+ stay bare", p.pts.slice(2, 4).every((t) => /^≈ [\d.]+( points)?$/.test(t)), JSON.stringify(p.pts));
-    ok("first column share row says “of the gain” (not One Nation’s — the pts row above already has it)", /of the gain/.test(p.shs[0] || "") && !/of One Nation.s gain/.test(p.shs[0] || ""), JSON.stringify(p.shs[0]));
-    ok("second column share row is bare", !/of the gain|of One Nation.s gain/.test(p.shs[1] || "") && /±/.test(p.shs[1] || ""), JSON.stringify(p.shs));
+    ok("share rows are tail-free on every column (327f569)", p.shs.length >= 4 && p.shs.every((t) => !/gain/.test(t)), JSON.stringify(p.shs));
   }
 }
 
@@ -106,6 +112,7 @@ const readPanel = async (width) => {
   else {
     ok("phone head swaps to the rate sentence", new RegExp(`^(?:Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
     ok("phone rows render ≈ pts labels", p.moRows.length >= 4 && p.moRows.every((t) => t.startsWith("≈")), JSON.stringify(p.moRows));
+    ok("phone rows 1 and 2 both say “of ON's gain”", p.moRows.slice(0, 2).every((t) => /points of ON.s gain/.test(t)), JSON.stringify(p.moRows.slice(0, 3)));
     ok("phone dek carries the flocked-ratio sentence", p.dek.includes(P[hi]) && p.dek.includes(`${RATIO}`), p.dek.slice(0, 120));
   }
 }

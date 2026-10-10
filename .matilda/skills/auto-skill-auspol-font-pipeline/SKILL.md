@@ -147,6 +147,21 @@ expected to be UNCHANGED (c6f6d95 stayed "10 faces, 321 KB"):
    `git status` shows woff2 churn from a pure reassignment, something else rebuilt them;
    investigate before staging.
 
+## Removing a FONTS entry (pruning — the italic-600 site-check episode, 783084a/387e270/9a1e9c6)
+
+Deleting an entry — legitimately, as in "italic-600 had no consumer, re-registering is one
+line" — makes the **very next build of either jurisdiction** auto-sweep the hashed woff2 from
+`assets/fonts/`. The trap (worked 2026-10-09): `vic/index.html` embeds the SAME generated
+@font-face block but regenerates ONLY on an explicit `npm run build:vic` — refresh_site and
+every CI writer never touch it — so a federal rebuild commits the font-file deletion while the
+days-stale vic page (last built 5 Oct, af72596) still references the pruned hash. Site-check
+then fails class 2 (`referenced asset(s) missing`, live==local byte-identical) on **every
+push**, one failure email each, until the page is regenerated (heal: BUILD_JUR=vic in a clean
+worktree, commit vic/index.html alone — see auspol-ci-run-failure-triage). RULE: when you
+remove a FONTS entry, `grep -l '<swept-hash>' vic/index.html` (and any satellite that embeds
+the generated block) and regenerate alongside the federal rebuild — or wire BUILD_JUR=vic into
+the refresh path so it can't rot again (offered to the user 2026-10-09 as a follow-up).
+
 ## The hero figure's decimal point — static kerning era SUPERSEDED, now dynamic drift
 
 The hero 2PP figures render through `RollNum` (`window.RollNum`, asset 73de0c58 — hero
