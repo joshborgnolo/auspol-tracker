@@ -1629,6 +1629,7 @@ const RD_DEMO_SHORT = {
   "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
+  "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
 };
 /* one constant headline per switcher party, hand-curated against the pooled
    significances — every trait listed is a significant gap in the current
@@ -1927,6 +1928,7 @@ const RD_TREND_GROUP = {
   Men: "men", Women: "women",
   University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "voters with Year 12 or less",
   "Own outright": "outright homeowners", Mortgage: "mortgage holders", Renting: "renters",
+  "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };

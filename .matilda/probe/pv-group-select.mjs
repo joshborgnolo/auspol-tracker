@@ -8,8 +8,9 @@
           line with the dek's last line on big screens, stacked under the dek
           on phones
        2. the All-voters state is unchanged from the baseline
-       3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Rural /
-          ACT/NT/Tas / Non-NSW/Vic/Qld) drive figures, bracket, head/dek/meta, y-domain,
+       3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Retired /
+          Rural / ACT/NT/Tas / Non-NSW/Vic/Qld) drive figures, bracket,
+          head/dek/meta, y-domain,
           election sub-lines — figures asserted against window.AUSPOL itself.
           Every selection's x axis carries the Election landmark (2026-10-08:
           was "May 2025" for groups with no own election row); a cut group
@@ -184,8 +185,8 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
   ok("select exists", !!s.sel);
   if (!s.sel) continue;
   ok(`selected text is "All voters"`, s.sel.text === "All voters", s.sel.text);
-  ok("29 options (All voters + 28 groups)", s.sel.optCount === 29, s.sel.optCount);
-  ok("8 optgroups", s.sel.groupCount === 8, s.sel.groupLabels.join(" | "));
+  ok("32 options (All voters + 31 groups)", s.sel.optCount === 32, s.sel.optCount);
+  ok("9 optgroups", s.sel.groupCount === 9, s.sel.groupLabels.join(" | "));
   const g = s.geom;
   if (W > 640) {
     ok("at the right edge (within 2px of the stat strip's right)", g.selRect && g.statsRect && Math.abs(g.selRect.right - g.statsRect.right) <= 2,
@@ -225,11 +226,12 @@ console.log("== selections ==");
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const SHORT = {
   Men: "men", "18–34": "18–34s", "55+": "over-55s", "Gen Z": "Gen Z", University: "university graduates",
-  NSW: "NSW voters", Rural: "rural voters", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
+  Retired: "retirees", NSW: "NSW voters", Rural: "rural voters",
+  "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
-                           ["NSW", { chg: true }], ["University", {}], ["Rural", { tallTicks: true, chg: true }],
+                           ["NSW", { chg: true }], ["University", {}], ["Retired", { level: true }], ["Rural", { tallTicks: true, chg: true }],
                            ["ACT/NT/Tas", { chg: true }], ["Non-NSW/Vic/Qld", { chg: true }]]) {
   const exp = await expectedFor(label);
   const s = await collect(1280, 900, label);
@@ -242,7 +244,9 @@ for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}]
     const gotVals = s.stats.map((x) => x.val.replace(/\s+/g, ""));
     ok("figures match the payload (party order)", JSON.stringify(gotVals) === JSON.stringify(wantVals), JSON.stringify(gotVals));
     const top = g.parts[0], second = g.parts[1];
-    const wantGap = (top.v - second.v).toFixed(1);
+    /* the dek mirrors the renderer: a straight lead quotes top−second; a
+       level call (k≥2) quotes top−kth across the unseparable pack */
+    const wantGap = (top.v - (g.k >= 2 ? g.parts[g.k - 1] : second).v).toFixed(1);
     ok("dek quotes the gap", s.dek && (wantGap === "0.0" ? s.dek.includes("dead level") : s.dek.includes(wantGap + " points")),
       s.dek && s.dek.split(". ").slice(0, 2).join(". "));
     ok("dek contrasts all voters", s.dek && s.dek.includes("Among all voters"), s.dek);
@@ -449,7 +453,7 @@ console.log("== Space walks the group menu ==");
   const curVal = () => page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").value);
   const order = await page.evaluate(() =>
     [...document.querySelectorAll("#primary-vote select.rd-pv-sel option")].map((o) => o.value));
-  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 29,
+  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 32,
      order.slice(0, 4).join("|") + " | n=" + order.length);
 
   /* park where #primary-vote alone holds the key: below the hero's whole
@@ -480,7 +484,7 @@ console.log("== Space walks the group menu ==");
     seen.push(await curVal());
     if (seen[i] !== order[i] && firstGap < 0) firstGap = i;
   }
-  ok("each Space steps to the menu's next option (all 28 groups)", JSON.stringify(seen) === JSON.stringify(order),
+  ok("each Space steps to the menu's next option (all 31 groups)", JSON.stringify(seen) === JSON.stringify(order),
      firstGap >= 0 ? `press ${firstGap}: got ${JSON.stringify(seen[firstGap])}, want ${JSON.stringify(order[firstGap])}` : seen.slice(0, 4).join(" -> "));
   await page.keyboard.press("Space");
   await sleep(150);

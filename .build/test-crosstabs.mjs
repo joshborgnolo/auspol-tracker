@@ -535,6 +535,28 @@ assert.deepEqual(Object.keys(harmonize({ pollster: "Resolve", dims: { state: {
 // so it joins no common group
 assert.equal(harmonize({ pollster: "YouGov", dims: { income: { "Under $50k": sh(26, 20, 30, 14, 10), "$150k+": sh(38, 28, 18, 6, 10) } } }).income,
   undefined, "income joins no common group");
+// working status: YouGov's three rows pass through as printed, live since Jun 2026
+const ygWork = harmonize({ pollster: "YouGov", dims: { working: {
+  "Full time": sh(33, 27, 17, 9, 14), "Part time": sh(36, 23, 14, 11, 16), Retired: sh(34, 34, 11, 6, 15) } } }).working;
+assert.deepEqual(Object.keys(ygWork), ["Full time", "Part time", "Retired"]);
+assert.deepEqual(ygWork.Retired, sh(34, 34, 11, 6, 15), "YouGov's Retired row passes through as printed");
+// Newspoll's quarterly waves print the same three plus a not-working Other
+// residual; the residual joins nothing (Newspoll is its only live printer)
+const npWork = harmonize({ pollster: "Newspoll (pooled)", dims: { working: {
+  "Full time": sh(35, 30, 13, 9, 13), "Part time": sh(36, 28, 12, 9, 15), Retired: sh(35, 35, 5, 10, 15), Other: sh(40, 23, 17, 8, 12) } } }).working;
+assert.deepEqual(Object.keys(npWork), ["Full time", "Part time", "Retired"], "Newspoll's Other residual joins nothing");
+// RedBridge's Oct 2025 detail sheet: the two working rows under its own
+// words map across, Retired as printed; its Not working never joins either
+const rbWork = harmonize({ pollster: "RedBridge/Accent", dims: { working: {
+  "Working full time": sh(36, 30, 14, 8, 12), "Working part time": sh(34, 22, 11, 19, 14),
+  "Not working": sh(40, 17, 16, 16, 11), Retired: sh(31, 38, 4, 16, 11) } } }).working;
+assert.deepEqual(rbWork["Full time"], sh(36, 30, 14, 8, 12), "Working full time is the Full time group");
+assert.deepEqual(rbWork["Part time"], sh(34, 22, 11, 19, 14), "Working part time is the Part time group");
+assert.deepEqual(rbWork.Retired, sh(31, 38, 4, 16, 11));
+assert.ok(!("Not working" in rbWork), "Not working joins nothing");
+// a wave with no working dim emits no working set
+assert.equal(harmonize({ pollster: "DemosAU", dims: { gender: { Men: sh(30, 30, 15, 10, 15), Women: sh(36, 24, 14, 10, 16) } } }).working,
+  undefined, "a wave without the dim joins no working group");
 // the July 2025 AFR fold table (One Nation folded into Others): harmonize
 // keeps the unprinted party null on the common sets, never a zero share –
 // a printed zero and an unfilled cell must not pool the same

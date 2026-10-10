@@ -2220,6 +2220,7 @@ const DEMO_WHO = {
   Provincial: "voters in provincial towns and cities", Rural: "rural voters",
   "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
   "English only": "voters who speak only English at home", "Other language": "voters who speak another language at home",
+  "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
 };
 /* Per set: `all` names the groups together, `others` the rest of them beside
    one group, `step` the trend phrase for an ordered set (null where the
@@ -2235,6 +2236,7 @@ const DEMO_SET_WORDS = {
   location: { all: "the city and the country", others: "voters in other areas", step: "with each step further from the city", one: "area" },
   housing: { all: "owners and renters", others: "other voters", step: null, one: "group" },
   language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
+  working: { all: "work-status groups", others: "voters of other work statuses", step: null, one: "work-status group" },
 };
 const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others & independents" };
 // P(|Z| > z) for a standard normal (Abramowitz & Stegun 7.1.26, error under 1.5e-7)

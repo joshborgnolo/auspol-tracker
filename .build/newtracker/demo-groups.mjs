@@ -50,14 +50,28 @@
                  joins only at the two owner groups.
      language    English only and Other language at home – YouGov and
                  DemosAU.
+     working     Full time, Part time and Retired – Newspoll (pooled)
+                 prints the three rows quarterly (a not-working "Other"
+                 residual besides); YouGov just the three, fortnightly
+                 from Jun 2026. RedBridge's one demographic detail sheet
+                 (Oct 2025) reads "Working full time" and "Working part
+                 time" across the same first two. The residual –
+                 Newspoll's Other, RedBridge's Not working – is one group
+                 of people, but Newspoll is its only live printer, so it
+                 joins nothing.
 
-   Income is the ruled-out cut: YouGov's brackets (household income;
-   <50k/50–99k/100–149k/150k+, earlier just under/over $100k) share no cut
-   point with DemosAU's (personal income; <$45k/$45–125k/$125k+), and
-   Resolve, RedBridge and Morgan print none. Nothing here is reconcilable
-   without an estimate, so income joins no common group – the All-polls
-   demographics facet contrasts each poll's own brackets instead (the "same
-   people" rule above applied, 2026-10-07). */
+   Income is the ruled-out cut: the houses' brackets share no cut points
+   (YouGov household <50k/50–99k/100–149k/150k+, binary under/over $100k
+   since Apr 2026; DemosAU personal <$45k/$45–125k/$125k+; RedBridge
+   weekly brackets; Freshwater $75–150k; Resolve and Morgan print none).
+   Newspoll (pooled)'s four are YouGov's own four and merge pairwise onto
+   its live binary line, but a merge needs printed group sizes, and
+   neither of Newspoll's two quarterly tables PDFs (Q4-2025 and Q1-2026,
+   checked 2026-10-10) prints income-bracket bases – state bases only –
+   so the merge would be an estimate. Nothing here is reconcilable, so
+   income joins no common group: the All-polls demographics facet
+   contrasts each poll's own brackets instead (ruling of 2026-10-07,
+   confirmed 2026-10-10). */
 
 export const DEMO_TABS = [
   { id: "age", label: "Age" },
@@ -75,6 +89,7 @@ export const DEMO_SETS = [
   { tab: "place", id: "location", label: "By location", groups: ["Inner metro", "Outer metro", "Provincial", "Rural"] },
   { tab: "home", id: "housing", label: "By housing", groups: ["Own outright", "Mortgage", "Renting"] },
   { tab: "home", id: "language", label: "By language at home", groups: ["English only", "Other language"] },
+  { tab: "home", id: "working", label: "By work status", groups: ["Full time", "Part time", "Retired"] },
 ];
 
 /* Rough shares of the adult population. They size each group's sampling-
@@ -85,7 +100,11 @@ export const DEMO_SETS = [
    144 and 196 of 927), the same cut as YouGov's. Housing and language: the
    2021 census (dwellings owned outright 31%, with a mortgage 35%, rented
    31%; persons speaking only English at home 72%, another language 22%),
-   each taken to 100. */
+   each taken to 100. Work status: ABS Labour Force (March 2026 trend: 44%
+   of the civilian population 15 and over in a full-time job, 20% in a
+   part-time job) and Retirement and Retirement Intentions 2022-23 (4.2
+   million retirees, 19% of 15+); the not-working-not-retired residual
+   (~16%) joins no group. */
 export const DEMO_SHARE = {
   Men: 0.49, Women: 0.51,
   "18–34": 0.28, "35–54": 0.33, "55+": 0.39,
@@ -95,6 +114,7 @@ export const DEMO_SHARE = {
   "Inner metro": 0.30, "Outer metro": 0.33, Provincial: 0.16, Rural: 0.21,
   "Own outright": 0.32, Mortgage: 0.36, Renting: 0.32,
   "English only": 0.76, "Other language": 0.24,
+  "Full time": 0.44, "Part time": 0.20, Retired: 0.19,
 };
 
 const KEYS = ["alp", "lnp", "onp", "grn", "oth"];
@@ -110,7 +130,7 @@ const MRP_TRIO = [["Tas", 0.481], ["ACT", 0.3805], ["NT", 0.1385]];
 
 /* One wave's groups on the common sets:
    { gender: { Men: shares, … }, age: { "18–34": shares, … }, generation, education,
-     state, location, housing, language }.
+     state, location, housing, language, working }.
    A party that printed a zero (a segment that rounded to nothing) stays 0;
    a key ABSENT from the printed table stays null – RedBridge's July 2025
    AFR table folds One Nation into Others, and reading that fold as a zero
@@ -151,5 +171,14 @@ export function harmonize(w) {
   for (const g of ["Inner metro", "Outer metro", "Provincial", "Rural"]) put("location", g, d.location && d.location[g]);
   for (const g of ["Own outright", "Mortgage", "Renting"]) put("housing", g, d.housing && d.housing[g]);
   for (const g of ["English only", "Other language"]) put("language", g, d.language && d.language[g]);
+  const wk = d.working;
+  if (wk) {
+    /* Newspoll's Other and RedBridge's Not working – the not-working,
+       not-retired residual – find no key here: Newspoll is its only
+       live printer */
+    put("working", "Full time", wk["Full time"] || wk["Working full time"]);
+    put("working", "Part time", wk["Part time"] || wk["Working part time"]);
+    put("working", "Retired", wk.Retired);
+  }
   return out;
 }

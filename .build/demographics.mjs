@@ -14,12 +14,15 @@
                  over 2026). Its household-income columns are read too, but
                  only for the All-polls demographics facet (no house cuts
                  income like another, so it joins no common group –
-                 .build/newtracker/demo-groups.mjs' header). Its self-assessed
-                 class (Feb 2026 on), children-at-home (Mar on) and working-
-                 status (Jun on) columns are read to the same facet-only end:
-                 no shared axis can hold them across houses, so they ride to
-                 the facet's Other cuts tables (the Newspoll pooled waves'
-                 religion and working-status dims likewise).
+                 .build/newtracker/demo-groups.mjs' header). Its working-status
+                 columns (Jun on: Full time, Part time, Retired) join a common
+                 group alongside Newspoll's quarterly rows (demo-groups.mjs'
+                 `working` line); self-assessed class (Feb 2026 on) and
+                 children-at-home (Mar on) stay facet-only – no shared axis
+                 can hold them across houses, so they ride to the facet's
+                 Other cuts tables (the Newspoll pooled waves' religion dims
+                 likewise; its Other residual row stays facet-only too,
+                 no other house printing it).
      DemosAU   – the Gender, Age, Education, Location and Housing Tenure
                  charts (and Language Status from May) in the wave's report
                  PDF, measured from the rendered bars (.build/demosau-charts
@@ -640,8 +643,10 @@ const ROYMORGAN_COUNTRY = {
    Intention and Two-party-preferred tables before entry, and Wikipedia's
    subpopulation page carries the same numbers. dims carries the
    first-preference side; tpp the printed ALP two-party share per group
-   (row value, 100 minus it the Coalition's). Working-status and religion
-   cuts print nowhere else, so they join no common group either. */
+   (row value, 100 minus it the Coalition's). The Full time, Part time and
+   Retired rows join the common working-status groups with YouGov's (from
+   Jun 2026); religion cuts print nowhere else, so they still join no
+   common group. */
 const NEWSPOLL_DEMO = {
   "2025-09-11": {
     source: "https://www.theaustralian.com.au/nation/politics/newspoll-quarterly-australias-foreignborn-voters-stay-loyal-to-labor/news-story/a4900d97",
@@ -1847,7 +1852,7 @@ const reminders = watchReminders({
 });
 
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. YouGov's self-assessed class (Feb 2026 on), children-at-home (Mar on) and working-status columns (Jun on), the Newspoll pooled waves' religion and working-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. The working columns (YouGov from Jun 2026, Newspoll pooled's quarterly rows, RedBridge's Oct 2025 aliases) join the common Full time / Part time / Retired groups on the chart views; YouGov's self-assessed class (Feb 2026 on) and children-at-home (Mar on), the Newspoll pooled waves' religion and Other-work-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };
