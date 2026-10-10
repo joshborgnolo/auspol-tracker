@@ -2215,6 +2215,7 @@ const DEMO_WHO = {
   University: "university graduates",
   NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
   SA: "voters in South Australia", WA: "voters in Western Australia",
+  "ACT/NT/Tas": "voters in Tasmania, the ACT and the NT",
   "Non-NSW/Vic/Qld": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
   Provincial: "voters in provincial towns and cities", Rural: "rural voters",
@@ -2244,15 +2245,21 @@ function zTail(z) {
   const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + 0.3275911 * x);
   return t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
 }
-function demoVerdict(st, party) {
+/* The state set nests: SA, WA and ACT/NT/Tas sit inside the
+   non-eastern-mainland bucket, so a group and its own bucket share
+   respondents and are never compared as if they were separate people. */
+const DEMO_WITHIN = { SA: "Non-NSW/Vic/Qld", WA: "Non-NSW/Vic/Qld", "ACT/NT/Tas": "Non-NSW/Vic/Qld" };
+const demoNested = (a, b) => DEMO_WITHIN[a.label] === b.label || DEMO_WITHIN[b.label] === a.label;
+/* the sentence's finding as data, for copy that words it its own way: kind
+   "trend" (dir, every step significant), "top" or "bot" (g apart from every
+   other group), "pair" (a significantly above b: the set's only pair, or
+   failing the others its widest significant gap), or "none" */
+function demoFinding(st, party) {
   const gs = st.groups.filter((g) => g.v[party] != null && g.ci[party] != null);
   if (gs.length < 2) return null;
-  const words = DEMO_SET_WORDS[st.id] || { all: "these groups", others: "any other group", step: null };
-  const who = (g) => DEMO_WHO[g.label] || g.label;
-  const Who = (g) => { const s = who(g); return s[0].toUpperCase() + s.slice(1); };
-  const vote = "to vote for " + DEMO_VOTE_FOR[party];
+  const words = DEMO_SET_WORDS[st.id] || { step: null };
   // every gap against its own margin: z = gap / √(se_a² + se_b²), each ± being 1.96 se
-  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => {
+  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).filter((b) => !demoNested(a, b)).map((b) => {
     const m = Math.hypot(a.ci[party], b.ci[party]);
     return { a, b, p: m > 0 ? zTail(1.96 * (a.v[party] - b.v[party]) / m) : 1 };
   }));
@@ -2265,24 +2272,39 @@ function demoVerdict(st, party) {
   const cmp = (a, b) => (sig.has(gaps.find((g) => (g.a === a && g.b === b) || (g.a === b && g.b === a)))
     ? Math.sign(a.v[party] - b.v[party]) : 0);
   const pairs = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => [a, b, cmp(a, b)])).filter((p) => p[2]);
-  if (!pairs.length) return `There is no significant difference between ${words.all}.`;
+  if (!pairs.length) return { kind: "none" };
   if (gs.length === 2) {
     const [a, b] = gs[0].v[party] > gs[1].v[party] ? gs : [gs[1], gs[0]];
-    return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+    return { kind: "pair", a, b };
   }
   if (words.step && gs.length === st.groups.length) {
     const steps = gs.slice(1).map((g, i) => cmp(g, gs[i]));
-    if (steps[0] !== 0 && steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly ${words.step}.`;
+    if (steps[0] !== 0 && steps.every((s) => s === steps[0])) return { kind: "trend", dir: steps[0], first: gs[0], last: gs[gs.length - 1] };
   }
   const byV = [...gs].sort((a, b) => b.v[party] - a.v[party]);
   const top = byV[0], bot = byV[byV.length - 1];
-  const topApart = byV.slice(1).every((g) => cmp(top, g) > 0), botApart = byV.slice(0, -1).every((g) => cmp(bot, g) < 0);
-  const topGap = top.v[party] - byV[1].v[party], botGap = byV[byV.length - 2].v[party] - bot.v[party];
-  if (topApart && (!botApart || topGap >= botGap)) return `${Who(top)} are significantly more likely than ${words.others} ${vote}.`;
-  if (botApart) return `${Who(bot)} are significantly less likely than ${words.others} ${vote}.`;
+  // a group's rivals: every group but itself and its own bucket or members
+  const rivals = (x) => byV.filter((g) => g !== x && !demoNested(x, g));
+  const topApart = rivals(top).every((g) => cmp(top, g) > 0), botApart = rivals(bot).every((g) => cmp(bot, g) < 0);
+  const topGap = top.v[party] - rivals(top)[0].v[party], botGap = rivals(bot).slice(-1)[0].v[party] - bot.v[party];
+  if (topApart && (!botApart || topGap >= botGap)) return { kind: "top", g: top, other: rivals(top).slice(-1)[0] };
+  if (botApart) return { kind: "bot", g: bot, other: rivals(bot)[0] };
   const [a, b] = pairs.map(([x, y, s]) => (s > 0 ? [x, y] : [y, x]))
     .sort((p, q) => (q[0].v[party] - q[1].v[party]) - (p[0].v[party] - p[1].v[party]))[0];
-  return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+  return { kind: "pair", a, b };
+}
+function demoVerdict(st, party) {
+  const f = demoFinding(st, party);
+  if (!f) return null;
+  const words = DEMO_SET_WORDS[st.id] || { all: "these groups", others: "any other group", step: null };
+  const who = (g) => DEMO_WHO[g.label] || g.label;
+  const Who = (g) => { const s = who(g); return s[0].toUpperCase() + s.slice(1); };
+  const vote = "to vote for " + DEMO_VOTE_FOR[party];
+  if (f.kind === "none") return `There is no significant difference between ${words.all}.`;
+  if (f.kind === "trend") return `Support for ${DEMO_VOTE_FOR[party]} ${f.dir > 0 ? "rises" : "falls"} significantly ${words.step}.`;
+  if (f.kind === "top") return `${Who(f.g)} are significantly more likely than ${words.others} ${vote}.`;
+  if (f.kind === "bot") return `${Who(f.g)} are significantly less likely than ${words.others} ${vote}.`;
+  return `${Who(f.a)} are significantly more likely than ${who(f.b)} ${vote}.`;
 }
 /* A verdict that finds something carries the leads' highlighter; one that
    finds nothing ("no significant difference", "hasn’t changed significantly",

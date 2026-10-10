@@ -3854,6 +3854,10 @@ const demographics = (() => {
         ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
         n: est.alp.n, houses: housesIn(rows[key("alp")] || []), monthly,
         pd, px,
+        /* the group's rough share of adults (demo-groups' DEMO_SHARE): the
+           panel's headline ranks its claims by how far each moves the make-up
+           of a party's voters from the electorate's, share x (group ÷ all − 1) */
+        share: DEMO_SHARE[group],
       };
     }).filter(Boolean);
     return { tab: set.tab, id: set.id, label: set.label, groups,
@@ -3899,8 +3903,9 @@ if (demographics) {
    then the same fit on ln(group/all) – a group merely keeping its share of
    a party that has grown everywhere holds a constant RATIO to the average,
    so an absolute-gap slope alone reads pace-keeping as divergence. Only
-   combos significant on both count as a proportionality break, and only
-   they reach the renderer, which titles and deks the block from this list.
+   combos significant on both, in the same direction, count as a
+   proportionality break, and only they reach the renderer, which titles
+   and deks the block from this list.
    Monthly rows carry no n – their last five members are each party's 95%
    margin, monthWithSe's sampling-floor-aware interval – so each month is
    weighted by the party margin's precision, 1/se². Adjacent pooled months
@@ -3963,7 +3968,12 @@ const demoTrend = (() => {
           const lo = Math.min(...xs), hi = Math.max(...xs);
           const gl = wls(xs, gs, ws), al = wls(xs, as, ws);
           const g0 = rr(gl.at(lo)), g1 = rr(gl.at(hi)), a0 = rr(al.at(lo)), a1 = rr(al.at(hi));
-          const sig = !!(f1 && f2 && Math.abs(f1.t) >= 1.96 && Math.abs(f2.t) >= 1.96);
+          /* both tests must pass AND agree on the direction: a growing party
+             can lift a low group's ratio while its point gap still widens
+             (One Nation among graduates, Oct 2026: t on the gap −3.0, on the
+             ratio +2.6), and that is no move either way - the copy would read
+             "towards" with a negative figure */
+          const sig = !!(f1 && f2 && Math.abs(f1.t) >= 1.96 && Math.abs(f2.t) >= 1.96 && Math.sign(f1.t) === Math.sign(f2.t));
           rows.push({
             tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
             from: demographics.allMonthly[lo][0], to: demographics.allMonthly[hi][0],

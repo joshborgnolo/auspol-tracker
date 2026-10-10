@@ -7275,16 +7275,26 @@ function infoTerms(D) {
         poll’s sample for a group estimated from the group’s share of adults (18–34s are about
         28%). The sentences call a difference {xref("significance", "who votes for whom", "significant")}
         {" "}only when it passes that test, with the bar raised when three or more groups are
-        compared. They report what passes: no difference, a steady rise or fall across ordered
-        groups such as age (only when every step passes), one group apart from the others, or
-        failing those, the largest gap that passes.</span>
+        compared. They report what passes: a steady rise or fall across ordered groups such as
+        age (only when every step passes), one group apart from the others, or failing those,
+        the largest gap that passes. If no two groups differ, they name any group that sits clear
+        of all voters by more than its margin, and only if none does, no difference.</span>
+        <span className="info-p"><b>The headline.</b> It names a group only when the group’s figure
+        sits clear of all voters’ by more than its margin, and names each trait at most once each
+        way. On a scale such as age or education, a lean at both ends is one fact: a party with
+        older voters is named for them, not also for its missing young ones. A gap that stops short
+        of the far end is a fact of its own, and states, which have no order, are named both ways.
+        The age bands lead the generations. A generation replaces its band only when its gap is
+        clearly the larger, and when the two disagree, age is left out. Up to five claims make the
+        headline: those that most change the make-up of the party’s voters.</span>
         <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks
         whether a group has moved towards or away from the party, relative to all voters. The
         point-gap alone can’t say. When a party grows everywhere, a group keeping its usual share
         of the party’s vote sees its gap widen by arithmetic alone: a group at two-thirds of the
         national figure sits 3 points under when the party is on 8%, and 9 under at 27%. So each
         group is tested on its gap in points and on its ratio to all voters, which holds steady for
-        a group merely keeping pace, and a change counts only when both pass. Each test is a line
+        a group merely keeping pace, and a change counts only when both pass, in the same
+        direction. Each test is a line
         through the monthly readings, tighter months counting for more. A group needs five monthly
         readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</span>
         <span className="info-p"><b>Limits.</b> The margins can’t see pollsters defining or
@@ -7316,8 +7326,8 @@ function infoTerms(D) {
           trace drop out of r. y and r each get a weighted-least-squares slope on the month index,
           the weight the precision of the month’s own 95% margin – w = (1.96 ÷ margin)², the margin
           floored at 0.5 – t-tested on months − 2 degrees of freedom against the months’ own
-          scatter. A move counts only when both slopes clear |t| = 1.96: the point-gap drifting AND
-          the ratio drifting. Fewer than five monthly readings: untested. Seven or fewer: thin, and
+          scatter. A move counts only when both slopes clear |t| = 1.96 with the same sign: the
+          point-gap drifting AND the ratio drifting, the same way. Fewer than five monthly readings: untested. Seven or fewer: thin, and
           the sentence above hedges.</span>
           <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
           group must add up to 100, give or take rounding, and an all-voters column must match the

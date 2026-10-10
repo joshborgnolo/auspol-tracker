@@ -132,3 +132,19 @@ the retired per-poll `αₕ + βtᵢ` regression for three days after the
 2026-09-29 engine swap until a reader asked whether the test was
 explained in Info. See auto-skill-auspol-glossary-terms's
 "Engine-describing copy rots" section.
+
+## The two tests must agree in sign (2026-10-11)
+
+`sig` in §7gb used to need only |t| ≥ 1.96 on BOTH the gap slope (f1) and
+the log-ratio slope (f2). For a fast-growing party a low group can lift
+its RATIO while its point GAP still widens: One Nation among university
+graduates read t_gap −3.04, t_ratio +2.56, passed, and the dek printed
+"shifted towards … university graduates (−4.4 points)" — a direction from
+the ratio and a figure from the gap that contradict each other. Such a
+group is no proportionality break either way, so `sig` now also requires
+`Math.sign(f1.t) === Math.sign(f2.t)`; `dir` and the quoted relative
+points then always agree (rel has f1's sign exactly: same xs and weights,
+so the fitted-endpoint difference is the gap slope × span). The rows table
+shows the clash as "No"; its note says "…clear a t statistic of 1.96, in
+the same direction". Pinned in .matilda/probe/wv-copy-rules.mjs §4
+("every demoTrend move's two tests agree in sign").

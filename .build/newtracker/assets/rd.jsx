@@ -912,8 +912,9 @@ const RD_NUM_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven
 const rdNumWord = (n) => RD_NUM_WORDS[n] || String(n);
 const rdCap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 /* a share as a plain fraction a reader says aloud: "one in three",
-   "three in five", "about one in nine" */
-function rdFraction(p) {
+   "three in five", "about one in nine". rdFracSnap is the fraction it
+   snaps to, for copy that must check what the words imply */
+function rdFracSnap(p) {
   const cands = [[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 6], [1, 7], [1, 8],
                  [1, 9], [1, 10], [3, 10], [7, 10], [9, 10], [1, 12], [1, 15], [1, 20]];
   let best = null;
@@ -921,6 +922,10 @@ function rdFraction(p) {
     const err = Math.abs(p / 100 - a / b);
     if (!best || err < best.err) best = { a, b, err };
   }
+  return best;
+}
+function rdFraction(p) {
+  const best = rdFracSnap(p);
   const exact = best.err < 0.012;
   return (exact ? "" : "about ") + rdNumWord(best.a) + " in " + rdNumWord(best.b);
 }

@@ -1631,16 +1631,307 @@ const RD_DEMO_SHORT = {
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
 };
-/* one constant headline per switcher party, hand-curated against the pooled
-   significances — every trait listed is a significant gap in the current
-   pool, so refresh these by hand when the pool moves, as with RD_DEMO_SHORT */
-const RD_DEMO_HOME = {
-  onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
-  alp: "Labor voters are more likely to be under 55, university-educated, and inner-metro; less likely to be rural or live in the eastern mainland states, especially Queensland",
-  lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, Victorian, and outright homeowners; less likely to live in an outer metro",
-  grn: "Greens voters are more likely to be Gen Z, women, and renting; less likely to be rural or TAFE- or trade-qualified",
-  oth: "Voters for others & independents are more likely to be Gen Z and renting; less likely to live in provincial areas",
+/* ---- the headline: who each party's voters are ----------------------------
+   One line per party, constant across the grouping tabs, written from the
+   pooled figures by fixed rules so it turns over with the pool. (It replaced
+   the hand-curated RD_DEMO_HOME lines on 2026-10-11, when four of the five
+   still named a trait the pool no longer supported.)
+   1. Only a group clear of all voters by more than its own 95% margin - the
+      dot plot's filled dot - can be named.
+   2. Each trait (age, gender, education, area, state, home, language, work)
+      makes at most one "more likely" and one "less likely" claim.
+   3. On an ordered trait (age, education, area, home) the two ends leaning
+      opposite ways are ONE tilt - older, less educated, more regional -
+      named once, from the over-represented end. A gap that stops short of
+      the far end (the Coalition's outer suburbs beside its inner-metro
+      lead) is a fact of its own and keeps its own clause. Unordered traits
+      (states, work) name each direction: Queensland above and Victoria
+      below are two facts.
+   4. Neighbours leaning the same way share a name: provincial and rural are
+      "regional", Year 12 or less and TAFE "without a degree", 18–34 and
+      35–54 "under 55". A pole spanning all but one group, with no such
+      name, is said from the one group left instead.
+   5. Age has two rulers. The bands lead; a generation inside a band (Gen Z
+      in 18–34, Boomers in 55+) stands in for it only when its gap beats the
+      band's by more than the band's own margin - the band's lean is then
+      concentrated in that generation. A band and a generation inside it
+      leaning opposite ways means the rulers disagree, and age is left out.
+   6. Places nest: the non-eastern-mainland bucket speaks for SA, WA and
+      ACT/NT/Tas while none of them leans the other way.
+   7. Retirement that only repeats the age claim (retired with older, not
+      retired with younger) is left out.
+   8. Claims rank by how far they move the make-up of the party's voters
+      from the electorate's: the group's share of adults x (its figure ÷
+      all voters' − 1). The five heaviest stay, at most four "more likely"
+      and three "less likely", printed in the traits' fixed order. */
+const RD_DEMO_SUBJ = { onp: "One Nation voters", alp: "Labor voters", lnp: "Coalition voters", grn: "Greens voters", oth: "Voters for others & independents" };
+/* a group's words, or merged neighbours': [after "more likely to be",
+   after "less likely to"] */
+const RD_DEMO_PH = {
+  "18–34": ["18–34", "be 18–34"], "35–54": ["35–54", "be 35–54"], "55+": ["55+", "be 55+"],
+  "18–34|35–54": ["under 55", "be under 55"], "35–54|55+": ["35 or older", "be 35 or older"],
+  "Gen Z": ["Gen Z", "be Gen Z"], Millennials: ["Millennials", "be Millennials"], "Gen X": ["Gen X", "be Gen X"], Boomers: ["Boomers", "be Boomers"],
+  "Gen Z|Millennials": ["Gen Z or Millennials", "be Gen Z or Millennials"], "Millennials|Gen X": ["Millennials or Gen X", "be Millennials or Gen X"],
+  "Gen X|Boomers": ["Gen X or Boomers", "be Gen X or Boomers"],
+  Men: ["men", "be men"], Women: ["women", "be women"],
+  "Year 12 or less": ["educated to Year 12 or less", "be educated to Year 12 or less"],
+  "TAFE or trade": ["TAFE- or trade-qualified", "be TAFE- or trade-qualified"],
+  University: ["university-educated", "be university-educated"],
+  "Year 12 or less|TAFE or trade": ["without a degree", "be without a degree"],
+  "TAFE or trade|University": ["qualified beyond school", "have a post-school qualification"],
+  "Inner metro": ["inner-metro", "live in an inner metro"], "Outer metro": ["outer-metro", "live in an outer metro"],
+  Provincial: ["provincial", "live in provincial areas"], Rural: ["rural", "be rural"],
+  "Inner metro|Outer metro": ["metropolitan", "live in a metro area"], "Provincial|Rural": ["regional", "be regional"],
+  "Outer metro|Provincial": ["outer-metro or provincial", "live in an outer metro or a provincial area"],
+  "Own outright": ["outright homeowners", "own their home outright"], Mortgage: ["mortgage holders", "have a mortgage"], Renting: ["renting", "rent"],
+  "Own outright|Mortgage": ["homeowners", "own their home"], "Mortgage|Renting": ["paying off a mortgage or renting", "pay off a mortgage or rent"],
+  "Full time": ["working full time", "work full time"], "Part time": ["working part time", "work part time"], Retired: ["retired", "be retired"],
 };
+/* the states after "live in", and as "more likely to be ..." */
+const RD_DEMO_PLACE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia",
+  "ACT/NT/Tas": "Tasmania, the ACT and the NT", "Non-NSW/Vic/Qld": "the non-eastern-mainland states" };
+const RD_DEMO_PLACE_BE = { NSW: "from NSW", Vic: "Victorian", Qld: "Queenslanders", SA: "South Australian", WA: "West Australian",
+  "ACT/NT/Tas": "from Tasmania, the ACT or the NT", "Non-NSW/Vic/Qld": "from the non-eastern-mainland states" };
+/* the ordered traits' groups in order; the states in map order */
+const RD_DEMO_SCALE = { age: ["18–34", "35–54", "55+"], generation: ["Gen Z", "Millennials", "Gen X", "Boomers"],
+  education: ["Year 12 or less", "TAFE or trade", "University"], location: ["Inner metro", "Outer metro", "Provincial", "Rural"],
+  housing: ["Own outright", "Mortgage", "Renting"] };
+const RD_DEMO_MAP = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
+/* a generation wholly inside an age band */
+const RD_DEMO_IN_BAND = { "Gen Z": "18–34", Boomers: "55+" };
+const RD_DEMO_TRAITS = ["age", "gender", "education", "area", "state", "home", "language", "work"];
+const rdSerial = (xs, conj) => (xs.length < 2 ? xs[0] || "" : xs.length === 2 ? xs[0] + " " + conj + " " + xs[1]
+  : xs.slice(0, -1).join(", ") + ", " + conj + " " + xs[xs.length - 1]);
+/* every group against all voters, by label: its gap, whether its dot is
+   filled, and its weight - how far it moves the party's voter make-up */
+function rdDemoStand(T, party) {
+  const A = T.all[party], G = {};
+  for (const tab of T.tabs) for (const st of tab.sets) for (const g of st.groups) {
+    const v = g.v[party], ci = g.ci[party] || 0;
+    if (v == null) continue;
+    const d = v - A;
+    G[g.label] = { g, v, ci, d, dir: Math.sign(d), sig: Math.abs(d) > ci, w: (g.share || 0) * Math.abs(d) / A };
+  }
+  return G;
+}
+function rdDemoHead(T, party) {
+  const G = rdDemoStand(T, party);
+  const sigOf = (labels, dir) => labels.map((l) => G[l]).filter((s) => s && s.sig && s.dir === dir);
+  const claims = [];
+  /* a merged pole weighs what its groups weigh together (regional voters
+     are provincial plus rural); a clause naming two separate places weighs
+     its heavier one */
+  const add = (trait, dir, key, ss, places) => claims.push({ trait, dir, key, places,
+    w: places ? Math.max(...ss.map((s) => s.w)) : ss.reduce((a, s) => a + s.w, 0), labels: ss.map((s) => s.g.label) });
+  /* an ordered set's pole: neighbours merge under one name (rule 4); a pole
+     with no name falls back to its heaviest group */
+  const poleOf = (set, ss) => {
+    if (!ss.length) return null;
+    const ord = RD_DEMO_SCALE[set];
+    const ix = ss.map((s) => ord.indexOf(s.g.label)).sort((a, b) => a - b);
+    const key = ix.map((i) => ord[i]).join("|");
+    if (ss.length === 1 || (ix.every((x, i) => !i || x === ix[i - 1] + 1) && RD_DEMO_PH[key])) return { key, ss, ix };
+    const best = ss.slice().sort((a, b) => b.w - a.w)[0];
+    return { key: best.g.label, ss: [best], ix: [ord.indexOf(best.g.label)] };
+  };
+  /* rule 3: the two ends leaning opposite ways, each pole holding its end */
+  const tilt = (n, P, N) => !!(P && N) && ((Math.max(...P.ix) < Math.min(...N.ix) && P.ix.includes(0) && N.ix.includes(n - 1))
+    || (Math.min(...P.ix) > Math.max(...N.ix) && P.ix.includes(n - 1) && N.ix.includes(0)));
+  const scale = (trait, set) => {
+    const ord = RD_DEMO_SCALE[set];
+    const up = sigOf(ord, 1), down = sigOf(ord, -1);
+    const upKey = ord.filter((l) => up.some((s) => s.g.label === l)).join("|");
+    const flip = up.length > 1 && up.length >= ord.length - 1 && !RD_DEMO_PH[upKey] && down.length === 1;
+    const P = flip ? null : poleOf(set, up), N = poleOf(set, down);
+    if (P) add(trait, 1, P.key, P.ss);
+    if (N && (!P || !tilt(ord.length, P, N))) add(trait, -1, N.key, N.ss);
+  };
+  /* rule 5: age's two rulers. Returns the lean the work claims are read
+     against: +1 older, −1 younger, 0 none said */
+  const ageLean = (() => {
+    if (Object.entries(RD_DEMO_IN_BAND).some(([gen, band]) => G[gen] && G[band] && G[gen].sig && G[band].sig && G[gen].dir !== G[band].dir)) return 0;
+    const pick = (dir) => {
+      let pole = poleOf("age", sigOf(RD_DEMO_SCALE.age, dir));
+      if (pole && pole.ss.length === 1) {
+        const band = pole.ss[0];
+        const gen = Object.keys(RD_DEMO_IN_BAND).find((k) => RD_DEMO_IN_BAND[k] === band.g.label);
+        const s = gen && G[gen];
+        if (s && s.sig && s.dir === dir && Math.abs(s.d) - Math.abs(band.d) > band.ci) pole = { key: gen, ss: [s] };
+      }
+      return pole || poleOf("generation", sigOf(RD_DEMO_SCALE.generation, dir));
+    };
+    const end = (p) => (p.ss.some((s) => s.g.label === "18–34" || s.g.label === "Gen Z") ? -1
+      : p.ss.some((s) => s.g.label === "55+" || s.g.label === "Boomers") ? 1 : 0);
+    const P = pick(1), N = pick(-1);
+    if (P) add("age", 1, P.key, P.ss);
+    if (N && !(P && end(P) && end(N) === -end(P))) add("age", -1, N.key, N.ss);
+    return P ? end(P) : N ? -end(N) : 0;
+  })();
+  /* gender: a pair, said from whichever side is over-represented */
+  const sexes = [G.Men, G.Women].filter((s) => s && s.sig);
+  if (sexes.length) {
+    const s = sexes.slice().sort((a, b) => b.w - a.w)[0];
+    const label = s.dir > 0 ? s.g.label : s.g.label === "Men" ? "Women" : "Men";
+    claims.push({ trait: "gender", dir: 1, key: label, w: s.w, labels: [label] });
+  }
+  scale("education", "education");
+  scale("area", "location");
+  /* rule 6: the states, the bucket speaking for members that lean its way */
+  const BUCKET = "Non-NSW/Vic/Qld", inBucket = (l) => DEMO_WITHIN[l] === BUCKET;
+  for (const dir of [1, -1]) {
+    let ps = sigOf(RD_DEMO_MAP.filter((l) => l !== BUCKET), dir);
+    const b = G[BUCKET];
+    if (b && b.sig && b.dir === dir && !sigOf(RD_DEMO_MAP.filter(inBucket), -dir).length)
+      ps = ps.filter((s) => !inBucket(s.g.label)).concat([b]);
+    ps = ps.sort((x, y) => y.w - x.w).slice(0, 2).sort((x, y) => RD_DEMO_MAP.indexOf(x.g.label) - RD_DEMO_MAP.indexOf(y.g.label));
+    if (ps.length) add("state", dir, ps.map((s) => s.g.label).join("|"), ps, ps.map((s) => s.g.label));
+  }
+  scale("home", "housing");
+  /* language: a pair, said of the minority language either way */
+  const lo = G["Other language"], le = G["English only"];
+  const ldir = lo && lo.sig ? lo.dir : le && le.sig ? -le.dir : 0;
+  if (ldir) claims.push({ trait: "language", dir: ldir, key: "Other language", w: Math.max(lo ? lo.w : 0, le ? le.w : 0), labels: ["Other language"] });
+  /* work, less retirement that only repeats the age claim (rule 7) */
+  for (const dir of [1, -1]) {
+    const ss = sigOf(["Full time", "Part time", "Retired"], dir).filter((s) => !(s.g.label === "Retired" && ageLean === dir));
+    if (ss.length) { const s = ss.sort((a, b) => b.w - a.w)[0]; add("work", dir, s.g.label, [s]); }
+  }
+  /* rule 8: the heaviest five, then the traits' own order */
+  const kept = [];
+  for (const c of claims.slice().sort((a, b) => b.w - a.w)) {
+    if (kept.length >= 5) break;
+    if (kept.filter((k) => k.dir === c.dir).length >= (c.dir > 0 ? 4 : 3)) continue;
+    kept.push(c);
+  }
+  const order = (a, b) => RD_DEMO_TRAITS.indexOf(a.trait) - RD_DEMO_TRAITS.indexOf(b.trait);
+  const pos = kept.filter((c) => c.dir > 0).sort(order), neg = kept.filter((c) => c.dir < 0).sort(order);
+  const beOf = (c) => (c.trait === "state" ? (c.places.length === 1 ? RD_DEMO_PLACE_BE[c.places[0]] : "from " + rdSerial(c.places.map((p) => RD_DEMO_PLACE[p]), "or"))
+    : c.trait === "language" ? null : RD_DEMO_PH[c.key][0]);
+  const toOf = (c) => (c.trait === "state" ? "live in " + rdSerial(c.places.map((p) => RD_DEMO_PLACE[p]), "or")
+    : c.trait === "language" ? "speak a language other than English at home" : RD_DEMO_PH[c.key][1]);
+  /* "more likely to be A, B and C, and to speak ...": the be-list keeps its
+     Oxford comma unless a verb follows it */
+  const be = pos.filter((c) => beOf(c) != null).map(beOf), verbs = pos.filter((c) => beOf(c) == null).map(toOf);
+  const more = !be.length ? rdSerial(verbs, "and")
+    : "be " + (verbs.length ? (be.length < 2 ? be[0] : be.slice(0, -1).join(", ") + " and " + be[be.length - 1]) + ", and to " + rdSerial(verbs, "and") : rdSerial(be, "and"));
+  /* a place pair carries its own "or", so the list repeats "to" to keep
+     its items apart */
+  const outs = neg.map(toOf);
+  const less = outs.some((t) => / or /.test(t)) ? outs.map((t, i) => (!i ? "" : i === outs.length - 1 ? "or to " : "to ") + t).join(", ") : rdSerial(outs, "or");
+  const subj = RD_DEMO_SUBJ[party];
+  const head = !kept.length ? subj + " look much like the electorate as a whole"
+    : subj + " are " + [pos.length ? "more likely to " + more : "", neg.length ? "less likely to " + less : ""].filter(Boolean).join("; ");
+  return { head, claims, kept };
+}
+
+/* ---- the dek: what each split of the tab shows ----------------------------
+   Per set, the strongest statement the panel's tests support, so the dek
+   can never contradict the dots above it:
+   - demoFinding's pair tests (Holm-corrected): a steady rise or fall across
+     an ordered set (every step passing), one group apart from the rest, or
+     the widest gap that passes;
+   - failing those, the groups whose dot is filled - clear of all voters by
+     more than their margin - each with its figure beside all voters';
+   - only when neither finds anything, "much the same".
+   The first set leads with its finding and a figures sentence; later sets
+   fold their figures in and stay quiet when they have nothing to say. On
+   the Age tab a band and a generation inside it leaning opposite ways (two
+   rulers, mostly asked by different pollsters) is said outright. */
+/* two shares as fractions a reader says aloud, or null when snapping each to
+   its nearest fraction would misstate the gap between them by more than half
+   of it (or a point): 28.1 v 25.6 reads "about three in ten" v "one in
+   four", a five-point gap for a 2.5-point one */
+function rdFracPair(va, vb) {
+  const sa = rdFracSnap(va), sb = rdFracSnap(vb);
+  const off = Math.abs((sa.a / sa.b - sb.a / sb.b) * 100 - (va - vb));
+  return off > Math.max(1, Math.abs(va - vb) / 2) ? null : [rdFraction(va), rdFraction(vb)];
+}
+const RD_DEMO_TREND = { age: "with age", generation: "with each older generation", location: "with distance from the city" };
+function rdDemoDek(T, tab, party) {
+  const all = T.all[party];
+  const pName = DEMO_VOTE_FOR[party];
+  const pVote = party === "oth" ? "the vote for others & independents" : pName + (/s$/.test(pName) ? "’" : "’s") + " vote";
+  const pIt = rdPlural(party) ? "them" : "it";
+  const short = (g) => RD_DEMO_SHORT[g.label] || DEMO_WHO[g.label] || g.label;
+  const who = (g) => DEMO_WHO[g.label] || g.label;
+  const v = (g) => g.v[party];
+  const pct = (x) => x.toFixed(1) + "%";
+  const filled = (g) => v(g) != null && Math.abs(v(g) - all) > (g.ci[party] || 0);
+  const out = [];
+  let lastTrend = 0, allSaid = false;
+  tab.sets.forEach((st, si) => {
+    const f = demoFinding(st, party);
+    if (!f) return;
+    const words = DEMO_SET_WORDS[st.id] || {};
+    // the party is named in the first sentence, "it" or "them" after
+    const pRef = si ? pIt : pName;
+    // "one in three X back P, against one in six Y" - or as percentages
+    const contrast = (a, b) => {
+      const fr = rdFracPair(v(a), v(b));
+      return fr ? rdCap(fr[0]) + " " + short(a) + " back " + pName + ", against " + fr[1] + " " + short(b) + "."
+        : pct(v(a)) + " of " + short(a) + " back " + pName + ", against " + pct(v(b)) + " of " + short(b) + ".";
+    };
+    const both = (a, b, link) => {
+      const fr = rdFracPair(v(a), v(b));
+      return fr ? fr[0] + " " + short(a) + link + fr[1] + " " + short(b) : pct(v(a)) + " of " + short(a) + link + pct(v(b)) + " of " + short(b);
+    };
+    const figs = (a, b) => rdFracPair(v(a), v(b)) || [pct(v(a)), pct(v(b))];
+    const one = (g) => (rdFracPair(v(g), all) ? rdFraction(v(g)) : pct(v(g)));
+    const kind = f.kind;
+    if (kind === "trend") {
+      const phrase = (f.dir > 0 ? "climbs " : "falls ") + (RD_DEMO_TREND[st.id] || words.step);
+      if (!si) {
+        const [hi, lo] = v(f.last) >= v(f.first) ? [f.last, f.first] : [f.first, f.last];
+        out.push(rdCap(pVote) + " " + phrase + ".", contrast(hi, lo));
+      } else out.push(rdCap(pVote) + (lastTrend === f.dir ? " also " : " ") + phrase + ", from " + both(f.first, f.last, " to ") + ".");
+      lastTrend = f.dir;
+      return;
+    }
+    lastTrend = 0;
+    if (kind === "top" || kind === "bot") {
+      const lead = rdCap(who(f.g)) + " are " + (kind === "top" ? "more" : "less") + " likely than " + words.others + " to vote for " + pRef;
+      if (!si) out.push(lead + ".", kind === "top" ? contrast(f.g, f.other) : contrast(f.other, f.g));
+      else out.push(lead + ", at " + one(f.g) + ".");
+      return;
+    }
+    if (kind === "pair") {
+      const lead = rdCap(who(f.a)) + " are more likely than " + who(f.b) + " to vote for " + pRef;
+      if (!si) out.push(lead + ".", contrast(f.a, f.b));
+      else out.push(lead + ", at " + figs(f.a, f.b).join(" against ") + ".");
+      return;
+    }
+    /* no pair differs: the filled dots, the bucket speaking for members
+       that lean its way */
+    let marked = st.groups.filter(filled);
+    marked = marked.filter((g) => !marked.some((b) => DEMO_WITHIN[g.label] === b.label && Math.sign(v(b) - all) === Math.sign(v(g) - all)));
+    if (marked.length) {
+      const up = marked.filter((g) => v(g) > all), down = marked.filter((g) => v(g) < all);
+      const list = (gs) => rdSerial(gs.map((g) => short(g) + " (" + pct(v(g)) + ")"), "and");
+      const overall = "voters overall" + (allSaid ? "" : " (" + pct(all) + ")");
+      allSaid = true;
+      out.push(rdCap(up.length ? list(up) + " are more likely" : list(down) + " are less likely") + " than " + overall + " to vote for " + pRef
+        + (up.length && down.length ? ", and " + list(down) + " less likely" : "") + ".");
+      return;
+    }
+    if (!si) {
+      const pair2 = words.all === "men and women" || words.all === "owners and renters";
+      out.push(rdCap(pVote) + " is much the same across " + (words.all || "these groups") + ".",
+        rdCap(rdFraction(all)) + (pair2 ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + ".");
+    }
+  });
+  /* the Age tab's two rulers pulling apart */
+  if (tab.id === "age") {
+    const gs = tab.sets.flatMap((s) => s.groups);
+    for (const [gen, band] of Object.entries(RD_DEMO_IN_BAND)) {
+      const g = gs.find((x) => x.label === gen), b = gs.find((x) => x.label === band);
+      if (!g || !b || !filled(g) || !filled(b) || Math.sign(v(g) - all) === Math.sign(v(b) - all)) continue;
+      const [up, dn] = v(b) > all ? [b, g] : [g, b];
+      const apart = !(g.houses || []).some((h) => (b.houses || []).includes(h));
+      out.push("The two splits disagree here: " + short(up) + " sit above all voters but " + short(dn) + " below" + (apart ? ", and different pollsters ask each" : "") + ".");
+    }
+  }
+  return out.join(" ");
+}
 /* the usual (Pew) birth years behind the polls' generation labels: neither
    pollster publishes its own, so the "By generation" dot-plot labels bracket
    each row as ages derived from these. The Info glossary's "Generations"
@@ -1930,6 +2221,203 @@ const RD_TREND_GROUP = {
   "Own outright": "outright homeowners", Mortgage: "mortgage holders", Renting: "renters",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
 };
+/* ---- the composition trend: which groups have moved out of proportion ----
+   Titled and deked from D.demoTrend (gen-data's two-stage test, §7gb), on
+   the user's dictated shapes (2026-09-29): proportionality, so "away from /
+   towards" means beyond what the party's own national trend hands a group
+   merely for its starting level. Sets rank by their strongest move's
+   |t(log-ratio)|; the dek carries the top two. Figures quoted are the
+   signed moves relative to the all-voters shift, a move on seven or fewer
+   monthly points hedges "appears to", and (user dictate 2026-09-29: "it
+   must be significantly significant to make it") a thin move never CARRIES
+   a claim — it trails a solid one, only once every solid move's set is in
+   the dek, and a party whose moves are all thin renders the unchanged pair.
+   Verbs read against the party's own national line: a group moving
+   "towards" a falling party is holding up better, not gaining. */
+function rdDemoShift(dt, T, party) {
+  if (!dt || !dt.windowYm) return null;
+  const moves = dt.moves || [];
+  const solid = moves.filter((m) => !m.thin), thin = moves.filter((m) => m.thin);
+  const nameT = RD_TREND_NAME[party], nameD = RD_TREND_NAME_DEK[party];
+  const isAre = party === "oth" ? "are" : "is";
+  const poss = (s) => s + (/s$/.test(s) ? "’" : "’s");
+  /* the vote noun phrase, mid-sentence, keeps its article lower-case ("The
+     composition of the Coalition's vote"); others & independents can't
+     carry a possessive (user dictates 2026-09-30, 2026-10-07) */
+  const voteOf = party === "oth" ? "the vote for others & independents" : poss(nameD) + " vote";
+  const allOf = party === "oth" ? "all voters for others & independents" : "all " + (RD_TREND_BARE[party] || nameD) + " voters";
+  const serial = (ls) => rdSerial(ls, "and");
+  const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
+  if (!solid.length) {
+    const skew = RD_TREND_SKEW[party];
+    return {
+      head: "The composition of " + voteOf + " is unchanged",
+      dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : "."),
+    };
+  }
+  const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+  /* a move's points relative to the all-voters shift over the same window:
+     (g1−g0) − (a1−a0) — also a group claim's change in gap vs all voters */
+  const sgnPts = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
+  const relPts = (m) => sgnPts((m.g1 - m.g0) - (m.a1 - m.a0));
+  const bestOf = (ms) => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
+  // the party's national line over the move's window: +1 rising, −1 falling, 0 flat
+  const natDir = (m) => (m.a1 - m.a0 > 1 ? 1 : m.a1 - m.a0 < -1 ? -1 : 0);
+  const headVerb = (toward, m) => {
+    const n = natDir(m);
+    if (n < 0) return toward ? "holding up better in " : "losing voters faster in ";
+    if (n > 0) return toward ? "gaining faster in " : "gaining more slowly in ";
+    return toward ? "gaining ground in " : "losing ground in ";
+  };
+  /* the states nest - SA, WA and ACT/NT/Tas inside the non-eastern-mainland
+     bucket - so a side with no move of its own is the other side's
+     complement among the six base groups, named only when it has a name:
+     the eastern mainland, the bucket, or one or two states. A side with its
+     own move quotes its own figure (user dictate 2026-09-30); a
+     complement-named side stays bare. */
+  const BASE = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas"], BUCKET = "Non-NSW/Vic/Qld";
+  const members = (l) => (l === BUCKET ? BASE.filter((b) => DEMO_WITHIN[b] === BUCKET) : [l]);
+  const placeName = (ls) => {
+    const s = BASE.filter((l) => ls.includes(l));
+    if (s.length === 3 && RD_TREND_EASTERN.every((l) => s.includes(l))) return "the eastern-mainland states";
+    if (s.length && s.every((l) => DEMO_WITHIN[l] === BUCKET) && s.length === members(BUCKET).length) return RD_TREND_STATE[BUCKET];
+    return s.length && s.length <= 2 ? serial(s.map((l) => RD_TREND_STATE[l])) : null;
+  };
+  const stateDek = (ms, hedged, opens) => {
+    const towardMs = ms.filter((m) => m.dir > 0), awayMs = ms.filter((m) => m.dir < 0);
+    const tw = towardMs.flatMap((m) => members(m.group)), aw = awayMs.flatMap((m) => members(m.group));
+    const clash = tw.some((l) => aw.includes(l));
+    const rest = (ls) => BASE.filter((l) => !ls.includes(l));
+    const own = (gs) => placeName(gs.flatMap((m) => members(m.group)))
+      || serial(RD_TREND_STATE_ORDER.filter((l) => gs.some((m) => m.group === l)).map((l) => RD_TREND_STATE[l] || l));
+    const awayName = awayMs.length ? own(awayMs) : clash ? null : placeName(rest(tw));
+    const towardName = towardMs.length ? own(towardMs) : clash ? null : placeName(rest(aw));
+    let first = true;
+    const fig = (gs) => {
+      if (!gs.length) return "";
+      const f = " (" + relPts(bestOf(gs)) + " points" + (first ? " relative to " + allOf : "") + ")";
+      first = false;
+      return f;
+    };
+    const halves = [];
+    if (awayName) halves.push("away from " + awayName + fig(awayMs));
+    if (towardName) halves.push("towards " + towardName + fig(towardMs));
+    return {
+      head: nameT + " " + isAre + " " + headVerb(!awayName, bestOf(ms)) + (awayName || towardName),
+      /* only the dek's opening sentence names its subject; a later one is "it" */
+      dek: (opens ? "the composition of " + voteOf + " " + (hedged ? "appears to have" : "has")
+        : "it " + (hedged ? "also appears to have" : "has also")) + " shifted " + halves.join(", and "),
+    };
+  };
+  const locDek = (m) => {
+    const loc = RD_TREND_LOC[m.group] || { adj: m.group.toLowerCase(), ref: m.group };
+    if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
+    /* the quoted figure is the RELATIVE move, not the fitted from–to
+       levels, and the direction word moves into the national clause (user
+       dictate 2026-09-30: "... has increased by +3.7 points relative to the
+       overall decrease, rising even as the national vote has remained
+       flat"); the group's own word follows its own level, and the national
+       clause the national line's */
+    const n = natDir(m), gch = m.g1 - m.g0;
+    const own = Math.abs(gch) < 0.5 ? "holding steady" : gch > 0 ? "rising" : "falling";
+    const natSpan = (n < 0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
+    const clause = n === 0 ? own + " even as the national vote has remained flat"
+      : own === "holding steady" || Math.sign(gch) !== n ? own + " while the national vote has " + natSpan
+      : own + (m.dir * n > 0 ? " faster" : " more slowly") + " than the national vote, which has " + natSpan;
+    const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
+    const rel = (m.g1 - m.g0) - (m.a1 - m.a0);
+    return [
+      poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
+      support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to "
+        + (n < 0 ? "the overall decrease" : n > 0 ? "the overall increase" : "all voters") + ", " + clause,
+    ];
+  };
+  /* non-state, non-location moves merge into ONE "It has also shifted …"
+     sentence, each group quoting its own figure (user dictate 2026-09-30);
+     a sole GENDER move names a relative position instead ("Its relative
+     position among men has shrunk" — no "also", since a gender move often
+     sits after an opposite-direction location move, per the same dictate).
+     The sentence hedges only when every move it carries is thin. Opening
+     the dek, it names its subject rather than "it". */
+  const groupSentence = (gms, opens) => {
+    const fig = (m) => (RD_TREND_GROUP[m.group] || m.group) + " (" + relPts(m) + " points)";
+    const hedged = gms.every((m) => m.thin);
+    if (gms.length === 1 && gms[0].set === "gender") {
+      const m = gms[0], gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
+      const motion = Math.abs(gap1) > Math.abs(gap0) ? "grown" : "shrunk";
+      return (opens ? poss(nameD) + " relative position" : "Its relative position") + " among " + (RD_TREND_GROUP[m.group] || m.group)
+        + (hedged ? " appears to have " : " has ") + motion + " (" + relPts(m) + " points)";
+    }
+    const away = gms.filter((m) => m.dir < 0).map(fig);
+    const toward = gms.filter((m) => m.dir > 0).map(fig);
+    const halves = [];
+    if (away.length) halves.push("away from " + serial(away));
+    if (toward.length) halves.push("towards " + serial(toward));
+    return (opens ? "the composition of " + voteOf + (hedged ? " appears to have shifted " : " has shifted ")
+      : "It " + (hedged ? "also appears to have shifted " : "has also shifted ")) + halves.join(", and ");
+  };
+  const bySet = new Map();
+  for (const m of solid) {
+    const k = m.tab + "|" + m.set;
+    if (!bySet.has(k)) bySet.set(k, []);
+    bySet.get(k).push(m);
+  }
+  const allSets = [...bySet.values()]
+    .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
+    .sort((a, b) => b.top - a.top);
+  const setsRanked = allSets.slice(0, 2);
+  let head = null;
+  const parts = [];
+  const groupMoves = [];
+  for (const { ms } of setsRanked) {
+    const m0 = ms[0];
+    if (m0.set === "state") {
+      const b = stateDek(ms, false, !parts.length);
+      if (!head) head = b.head;
+      parts.push(b.dek);
+    } else if (m0.set === "location") {
+      const m = bestOf(ms), loc = RD_TREND_LOC[m.group] || { ref: m.group };
+      if (!head) head = nameT + " " + isAre + " " + headVerb(m.dir > 0, m) + loc.ref;
+      parts.push(...locDek(m));
+    } else {
+      if (!head) head = "The composition of " + voteOf + " is shifting";
+      groupMoves.push(bestOf(ms));
+    }
+  }
+  /* thin moves trail the solid claim (the thin locDek and the hedged
+     stateDek render "appears to"; a group sentence of only thin moves
+     hedges too); a set already carried by a solid move stays out, and none
+     trails while a solid set was left out for room - a hedged move never
+     takes the place of a firmer one. Thin sentences collect apart and join
+     LAST — a hedged sentence never opens the dek */
+  const carried = new Set(setsRanked.map(({ ms }) => ms[0].tab + "|" + ms[0].set));
+  const thinSets = new Map();
+  if (allSets.length <= setsRanked.length) for (const m of thin) {
+    const k = m.tab + "|" + m.set;
+    if (carried.has(k)) continue;
+    if (!thinSets.has(k)) thinSets.set(k, []);
+    thinSets.get(k).push(m);
+  }
+  const thinParts = [], thinGroupMoves = [];
+  [...thinSets.values()]
+    .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
+    .sort((a, b) => b.top - a.top)
+    .slice(0, 2)
+    .forEach(({ ms }) => {
+      const m0 = ms[0];
+      if (m0.set === "state") thinParts.push(stateDek(ms, true, false).dek);
+      else if (m0.set === "location") thinParts.push(...locDek(bestOf(ms)));
+      else thinGroupMoves.push(bestOf(ms));
+    });
+  if (groupMoves.length) parts.push(groupSentence(groupMoves, !parts.length));
+  /* thin group moves close the dek in their own sentence (all-thin, so
+     groupSentence hedges it) — never mixed unhedged into the solid one */
+  if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves, false));
+  const ordered = parts.concat(thinParts);
+  /* sentences after the first start a sentence of their own, so a
+     lower-case name ("others & independents") still opens capitalised */
+  return { head, dek: since + ordered.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
+}
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
 /* a solo single-territory reading's territory, in words (gen-data §5c) */
@@ -2025,282 +2513,14 @@ function RdDemographics({ rangeId = "all" }) {
      :1948, which made the same call for "…'s vote" in 2026-09-30) */
   const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
-  const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
-  const short = (g) => RD_DEMO_SHORT[g.label] || DEMO_WHO[g.label] || g.label;
 
-  /* ---- the finding -------------------------------------------------------- */
-  const st0 = tab.sets[0];
-  const verdict = demoVerdict(st0, party) || "";
-  const story = (() => {
-    let finding;
-    const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
-    const noDiff = /no significant difference/.test(verdict);
-    if (m && st0.id === "age") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
-    else if (m && st0.id === "generation") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
-    else if (m && st0.id === "location") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
-    else if (noDiff) finding = pVote + " is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
-    else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
-    const gs = st0.groups.filter((g) => g.v[party] != null);
-    const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
-    const top = byV[0], bot = byV[byV.length - 1];
-    /* when the polls can't split the groups, quote one fraction for the
-       whole set: the rounded top/bottom contrast can draw a gap twice as
-       wide as the real one (28.1 v 26.1 reads as three-in-ten v one-in-four) */
-    const words = DEMO_SET_WORDS[st0.id] || {};
-    const both = words.all === "men and women" || words.all === "owners and renters";
-    let dek = noDiff
-      ? rdCap(rdFraction(all)) + (both ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + "."
-      : top && bot && top !== bot
-        ? rdCap(rdFraction(top.v[party])) + " " + short(top) + " back " + pName + ", against " + rdFraction(bot.v[party]) + " " + short(bot) + "."
-        : "";
-    const st1 = tab.sets[1];
-    /* collect margin outliers from both the st0 (when noDiff: the headline's
-       "much the same" was also computed on st0) and st1 sets, merge by
-       snapped fraction ratio, and emit one sentence per ratio-group. */
-    const outFor = (groups) => groups.filter((g) => g.v[party] != null)
-      .map((g) => ({ g, d: g.v[party] - all, sig: Math.abs(g.v[party] - all) > (g.ci[party] || 0) }));
-    const st1Out = st1 ? outFor(st1.groups).filter((o) => o.sig).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)) : [];
-    const st0Out = noDiff ? outFor(st0.groups).filter((o) => o.sig) : [];
-    const snapRatio = (v) => {
-      const cands = [[1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,6],[1,7],[1,8],[1,9],[1,10],[3,10],[7,10],[9,10],[1,12],[1,15],[1,20]];
-      let best = null;
-      for (const [a, b] of cands) {
-        const err = Math.abs(v / 100 - a / b);
-        if (!best || err < best.err) best = { a, b, err };
-      }
-      return best.a + "/" + best.b;
-    };
-    const seen = new Set();
-    const outlierGroups = [];
-    const pick = (o) => {
-      const key = o.g.label;
-      if (seen.has(key)) return;
-      seen.add(key);
-      outlierGroups.push(o);
-    };
-    /* st1 first (its outlier was already displayed; keeps the existing
-       single-sentence form as default when st0 adds nothing new) */
-    st1Out.forEach(pick);
-    st0Out.forEach(pick);
-    const byRatio = new Map();
-    for (const o of outlierGroups) {
-      const r = snapRatio(o.g.v[party]);
-      if (!byRatio.has(r)) byRatio.set(r, []);
-      byRatio.get(r).push(o);
-    }
-    /* join labels by shared snapped ratio; one sentence per distinct ratio */
-    const ratioGroups = [...byRatio.values()].map((grp) => {
-      /* representative fraction: the largest-|d| member of the group */
-      const rep = grp.slice().sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
-      const labels = grp.map((o) => short(o.g));
-      const listed = labels.length === 1 ? labels[0] : labels.length === 2 ? labels.join(" and ") : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
-      return { grp, labels, listed, frac: rdFraction(rep.g.v[party]) };
-    });
-    let outlierSentence = "";
-    if (ratioGroups.length === 1) {
-      const g0 = ratioGroups[0];
-      const plural = g0.labels.length > 1 || /s$/.test(g0.labels[0]);
-      const verb = !plural || (/^Gen/.test(g0.grp[0].g.label) && g0.labels.length === 1) ? "is" : "are";
-      outlierSentence = rdCap(g0.listed) + " " + verb + " the " + (g0.labels.length > 1 ? "outliers" : "outlier") + ", at " + g0.frac + ".";
-    } else if (ratioGroups.length > 1) {
-      /* several ratio groups: one shared "The outliers are …" sentence, the
-         items semicolon-listed so the "at one in four" clauses don't drown in
-         commas — never "X is the outlier. Y is the outlier." back to back */
-      const items = ratioGroups.map((g) => g.listed + ", at " + g.frac);
-      const anyAnd = ratioGroups.some((g) => g.labels.length > 1);
-      const joined = items.length === 2 && !anyAnd
-        ? items[0] + ", and " + items[1]
-        : items.slice(0, -1).join("; ") + (items.length > 2 ? "; and " : "; ") + items[items.length - 1];
-      outlierSentence = "The outliers are " + joined + ".";
-    }
-    if (outlierSentence) dek += " " + outlierSentence;
-    /* the headline stays put as the grouping tab flips: the per-grouping
-       finding leads the dek instead, the figures sentences after it */
-    const home = RD_DEMO_HOME[party];
-    if (home) dek = dek ? rdCap(finding) + ". " + dek : rdCap(finding) + ".";
-    return { head: home || rdCap(finding), dek };
-  })();
+  /* ---- the finding: the party's headline (rdDemoHead, constant across the
+     grouping tabs) over the tab's dek (rdDemoDek) ---------------------------- */
+  const story = { head: rdDemoHead(T, party).head, dek: rdDemoDek(T, tab, party) };
 
-  /* ---- the composition trend: which groups have moved out of proportion ---
-     Titled and deked from D.demoTrend (gen-data's two-stage test, §7gb), on
-     the user's dictated shapes (2026-09-29): proportionality, so "away from /
-     towards" means beyond what the party's own national trend hands a group
-     merely for its starting level. Sets rank by their strongest move's
-     |t(log-ratio)|; the dek carries the top two. Figures quoted are the
-     signed moves relative to the all-voters shift, a move on seven or
-     fewer monthly points hedges "appears to", and (user dictate 2026-09-29:
-     "it must be significantly significant to make it") a thin move never
-     CARRIES a claim — it trails a solid one, and a party whose moves are
-     all thin renders the unchanged pair. */
-  const shift = (() => {
-    const dt = D.demoTrend && D.demoTrend[party];
-    if (!dt || !dt.windowYm) return null;
-    const moves = dt.moves || [];
-    /* the significance gate: thin moves (seven or fewer monthly points, the
-       t optimistic on shared samples) trail a solid claim as hedged
-       sentences but never make one */
-    const solid = moves.filter((m) => !m.thin);
-    const thin = moves.filter((m) => m.thin);
-    const nameT = RD_TREND_NAME[party] || P.name;
-    const nameD = RD_TREND_NAME_DEK[party] || pName;
-    const isAre = party === "oth" ? "are" : "is";
-    const poss = (s) => s + (/s$/.test(s) ? "’" : "’s");
-    /* the head's vote noun phrase: others & independents takes "the vote for
-       others & independents" — the 2026-10-07 dictate (pVote above) applied
-       to the trends' headline form as the 2026-09-30 one did the dek's */
-    const voteHead = party === "oth" ? "the vote for others & independents" : poss(nameT) + " vote";
-    const serial = (ls) => ls.length < 2 ? (ls[0] || "") : ls.length === 2 ? ls[0] + " and " + ls[1] : ls.slice(0, -1).join(", ") + ", and " + ls[ls.length - 1];
-    const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
-    if (!solid.length) {
-      const skew = RD_TREND_SKEW[party];
-      return {
-        head: "The composition of " + voteHead + " is unchanged",
-        dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : "."),
-      };
-    }
-    const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
-    /* a move's points relative to the all-voters shift over the same window:
-       (g1−g0) − (a1−a0) — also a group claim's change in gap vs all voters */
-    const sgnPts = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
-    const relPts = (m) => sgnPts((m.g1 - m.g0) - (m.a1 - m.a0));
-    const setGroupsOf = (m) => {
-      const tb = T.tabs.find((t) => t.id === m.tab);
-      const st = tb && tb.sets.find((s) => s.id === m.set);
-      return st ? st.groups.map((g) => g.label) : [];
-    };
-    const bestOf = (ms) => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
-    /* the vote noun phrase: others & independents can't carry a possessive
-       ("the vote for others & independents", user dictate 2026-09-30) */
-    const voteOf = party === "oth" ? "the vote for others & independents" : poss(nameD) + " vote";
-    const stateDek = (ms, hedged) => {
-      /* a side with no significant move of its own names the other side's
-         complement: "away from NSW, Victoria, and Queensland, and towards
-         the non-eastern-mainland states" is that bucket's single move read
-         the other way. A side with a move of its own QUOTES its own figure
-         (user dictate 2026-09-30); a complement-named side stays bare. */
-      const towardMs = ms.filter((m) => m.dir > 0), awayMs = ms.filter((m) => m.dir < 0);
-      const toward = towardMs.map((m) => m.group);
-      const away = awayMs.map((m) => m.group);
-      const others = ms.length ? setGroupsOf(ms[0]) : [];
-      if (!toward.length) toward.push(...others.filter((l) => !away.includes(l)));
-      if (!away.length) away.push(...others.filter((l) => !toward.includes(l)));
-      const order = (ls) => RD_TREND_STATE_ORDER.filter((l) => ls.includes(l));
-      const eastern = (ls) => ls.length === RD_TREND_EASTERN.length && RD_TREND_EASTERN.every((l) => ls.includes(l));
-      const named = (ls) => ls.map((l) => RD_TREND_STATE[l] || l);
-      const a = order(away), t = order(toward);
-      return {
-        // the title's pole: the three eastern states together name as one
-        pole: a.length ? (eastern(a) ? "the eastern-mainland states" : serial(named(a))) : (eastern(t) ? "the eastern-mainland states" : serial(named(t))),
-        toward: !a.length,
-        dek: "the composition of " + voteOf + " " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + " (" + relPts(bestOf(awayMs.length ? awayMs : ms)) + " points relative to all " + nameD + " voters), and towards " + serial(named(t)) + (towardMs.length ? " (" + relPts(bestOf(towardMs)) + " points)" : ""),
-      };
-    };
-    const locDek = (m) => {
-      const loc = RD_TREND_LOC[m.group] || { adj: m.group.toLowerCase(), ref: m.group };
-      if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
-      const flat = Math.abs(m.a1 - m.a0) < 1;
-      const national = (flat ? "even as the national vote has remained flat"
-        : "while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%");
-      const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
-      /* the quoted figure is the RELATIVE move, not the fitted from–to
-         levels, and the direction word moves into the national clause
-         (user dictate 2026-09-30): "... has increased by +3.7 points
-         relative to the overall decrease, rising even as the national vote
-         has remained flat" */
-      const rel = (m.g1 - m.g0) - (m.a1 - m.a0);
-      return [
-        poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
-        support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to the overall decrease, " + (m.dir > 0 ? "rising " : "falling ") + national,
-      ];
-    };
-    /* non-state, non-location moves merge into ONE "It has also shifted …"
-       sentence, each group quoting its own figure (user dictate 2026-09-30);
-       a sole GENDER move names a relative position instead ("Its relative
-       position among men has shrunk" — no "also", since a gender move often
-       sits after an opposite-direction location move, per the same dictate).
-       The sentence hedges only when every move it carries is thin. */
-    const groupSentence = (gms) => {
-      const fig = (m) => (RD_TREND_GROUP[m.group] || m.group) + " (" + relPts(m) + " points)";
-      const hedged = gms.every((m) => m.thin);
-      if (gms.length === 1 && gms[0].set === "gender") {
-        const m = gms[0], gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
-        const motion = Math.abs(gap1) > Math.abs(gap0) ? "grown" : "shrunk";
-        return "Its relative position among " + (RD_TREND_GROUP[m.group] || m.group) + (hedged ? " appears to have " : " has ") + motion + " (" + relPts(m) + " points)";
-      }
-      const away = gms.filter((m) => m.dir < 0).map(fig);
-      const toward = gms.filter((m) => m.dir > 0).map(fig);
-      const halves = [];
-      if (away.length) halves.push("away from " + serial(away));
-      if (toward.length) halves.push("towards " + serial(toward));
-      return "It " + (hedged ? "also appears to have shifted " : "has also shifted ") + halves.join(", and ");
-    };
-    const bySet = new Map();
-    for (const m of solid) {
-      const k = m.tab + "|" + m.set;
-      if (!bySet.has(k)) bySet.set(k, []);
-      bySet.get(k).push(m);
-    }
-    const setsRanked = [...bySet.values()]
-      .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
-      .sort((a, b) => b.top - a.top)
-      .slice(0, 2);
-    let head = null;
-    const parts = [];
-    const groupMoves = [];
-    for (const { ms } of setsRanked) {
-      const m0 = ms[0];
-      if (m0.set === "state") {
-        const b = stateDek(ms);
-        if (!head) head = nameT + " " + isAre + " " + (b.toward ? "gaining" : "losing") + " voters faster in " + b.pole;
-        parts.push(b.dek);
-      } else if (m0.set === "location") {
-        const m = bestOf(ms), loc = RD_TREND_LOC[m.group] || { ref: m.group };
-        if (!head) head = nameT + " " + isAre + " " + (m.dir > 0 ? "gaining in " : "losing voters faster in ") + loc.ref;
-        parts.push(...locDek(m));
-      } else {
-        if (!head) head = "The composition of " + voteHead + " is shifting";
-        groupMoves.push(bestOf(ms));
-      }
-    }
-    /* thin moves trail the solid claim (the thin locDek and the hedged
-       stateDek render "appears to"; a group sentence of only thin moves
-       hedges too); a set already carried by a solid move stays out. Thin
-       sentences collect apart and join LAST — a hedged sentence never
-       opens the dek, so the first claim is always solid */
-    const carried = new Set(setsRanked.map(({ ms }) => ms[0].tab + "|" + ms[0].set));
-    const thinSets = new Map();
-    for (const m of thin) {
-      const k = m.tab + "|" + m.set;
-      if (carried.has(k)) continue;
-      if (!thinSets.has(k)) thinSets.set(k, []);
-      thinSets.get(k).push(m);
-    }
-    const thinParts = [], thinGroupMoves = [];
-    [...thinSets.values()]
-      .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
-      .sort((a, b) => b.top - a.top)
-      .slice(0, 2)
-      .forEach(({ ms }) => {
-        const m0 = ms[0];
-        if (m0.set === "state") thinParts.push(stateDek(ms, true).dek);
-        else if (m0.set === "location") thinParts.push(...locDek(bestOf(ms)));
-        else thinGroupMoves.push(bestOf(ms));
-      });
-    /* a dek the group sentence OPENS drops the "also" and stays lower-case
-       ("Since …, it has shifted towards renters (+0.9 points)"); after a
-       state/location sentence it trails as dictated */
-    if (groupMoves.length) {
-      const s = groupSentence(groupMoves);
-      parts.push(parts.length ? s : s.replace(/^I(t|ts)/, (w) => w.toLowerCase()).replace(" also ", " "));
-    }
-    /* thin group moves close the dek in their own sentence (all-thin, so
-       groupSentence hedges it) — never mixed unhedged into the solid one */
-    if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves));
-    const ordered = parts.concat(thinParts);
-    /* sentences after the first start a sentence of their own, so a
-       lower-case name ("others & independents") still opens capitalised */
-    return { head, dek: since + ordered.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
-  })();
+  /* ---- the composition trend: which groups have moved out of proportion
+     (rdDemoShift, from gen-data §7gb's demoTrend) --------------------------- */
+  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], T, party);
 
   /* the full significance battery behind the dek: every tested group, pass
      or fail, in the tabs' own order — the Trend-significance table dropdown
@@ -2722,7 +2942,7 @@ function RdDemographics({ rangeId = "all" }) {
               ))}
             </table>
           </div>
-          <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>
+          <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96, in the same direction. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>
         </details>
       )}
       <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>
