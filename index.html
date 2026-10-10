@@ -4128,9 +4128,12 @@ body.rd .rd-isc-sub { font-size: 10px; font-weight: 600; margin-top: 2px; }
   body.rd .rd-isc-v { font-size: 14px; }
 }
 @media (max-width: 760px) {
-  body.rd .rd-isc { gap: 30px; }
-  body.rd .rd-isc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  body.rd .rd-isc-tile { padding: 8px 10px; }
+  body.rd .rd-isc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  body.rd .rd-isc-mlab { margin-bottom: 10px; font-size: 13px; }
+  body.rd .rd-isc-mlab b { font-size: 14px; }
+  body.rd .rd-isc-grid { grid-template-columns: 1fr; gap: 8px; }
+  body.rd .rd-isc-tile { width: auto; justify-self: stretch; padding: 8px 10px; }
+  body.rd .rd-isc-issue { top: 8px; left: 10px; right: 10px; }
   body.rd .rd-isc-v { font-size: 13px; }
 }
 body.rd .rd-iw { margin-top: 28px; }
