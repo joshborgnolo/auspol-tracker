@@ -1331,7 +1331,7 @@ const ARCHIVE_STAMP = "2026-09-24";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-10-09";
+const PREDICTION_STAMP = "2026-10-10";
 /* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
    dated as this page is, by its data – the newest Victorian poll's
    fieldwork end – or by the rebuild onto this page's code, 2026-10-05,

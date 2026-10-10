@@ -4099,6 +4099,28 @@ body.rd .rd-is-left .rd-note { margin-top: 12px; }
 body.rd .rd-is-ctop { display: flex; align-items: center; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); min-height: 28px; }
 body.rd .rd-is-chead { margin: 4px 0 0; font-family: var(--serif); font-weight: 700; font-size: 22px; line-height: 1.15; color: var(--ink); text-wrap: balance; }
 body.rd .rd-is-csub { margin: 6px 0 8px; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+body.rd .rd-isc-tabs { margin-top: 18px; }
+body.rd .rd-isc { margin-top: 28px; display: flex; flex-direction: column; gap: 40px; }
+body.rd .rd-isc-mlab { margin: 0 0 12px; font-size: 15px; color: var(--ink-2); }
+body.rd .rd-isc-mlab b { font-weight: 700; color: var(--ink); }
+body.rd .rd-isc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+body.rd .rd-isc-tile { position: relative; aspect-ratio: 1; border-radius: 12px; padding: 12px 14px;
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+  color: #fff; overflow: hidden; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.28); }
+body.rd .rd-isc-tile.na, body.rd .rd-isc-tile.none { background: var(--ink-3); }
+body.rd .rd-isc-issue { position: absolute; top: 12px; left: 14px; right: 14px; font-size: 13px; font-weight: 600; line-height: 1.25; }
+body.rd .rd-isc-v { font-size: 20px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+body.rd .rd-isc-sub { font-size: 12px; font-weight: 600; margin-top: 2px; }
+@media (max-width: 1000px) {
+  body.rd .rd-isc-grid { gap: 10px; }
+  body.rd .rd-isc-v { font-size: 18px; }
+}
+@media (max-width: 760px) {
+  body.rd .rd-isc { gap: 30px; }
+  body.rd .rd-isc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  body.rd .rd-isc-tile { padding: 10px 12px; }
+  body.rd .rd-isc-v { font-size: 17px; }
+}
 body.rd .rd-iw { margin-top: 28px; }
 body.rd .rd-iw-ctl { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); }
 body.rd .rd-iw-by { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
@@ -45661,6 +45683,7 @@ function RdIssues({
   const narrow = useNarrow("(max-width: 760px)");
   const I = D.issues;
   const [view, setView] = useState("trust");
+  const [snap, setSnap] = useState("snap");
   const [selId, setSelId] = useState(null);
   const selNow = selId || (I && I.list && I.list[0] ? I.list[0].id : null);
   const [issMorph, setSel] = window.AP.useMorph(selNow, v => setSelId(v), (a, b) => a !== b);
@@ -46030,6 +46053,75 @@ function RdIssues({
     return Object.fromEntries(P.map(q => [q, rows.reduce((a, x) => a + x.imp.v * x.own.v[q], 0) / wsum]));
   })();
   const pOrd = tally ? P.slice().sort((a, b) => tally[b] - tally[a]) : P;
+  const iscNowYm = list.reduce((a, x) => {
+    const ms = x.monthly || [];
+    return ms.length && (!a || ms[ms.length - 1][0] > a) ? ms[ms.length - 1][0] : a;
+  }, null);
+  const iscMonth = ym => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const iscMonths = I.snapYm ? [{
+    ym: I.snapYm,
+    snap: true,
+    label: iscMonth(I.snapYm)
+  }, ...(iscNowYm && iscNowYm !== I.snapYm ? [{
+    ym: iscNowYm,
+    snap: false,
+    label: iscMonth(iscNowYm)
+  }] : [])] : [];
+  const iscTile = (x, mo) => {
+    const m = (x.monthly || []).find(mm => mm[0] === mo.ym);
+    const sv = mo.snap ? x.snap : x.own;
+    if (!m || !sv) return React.createElement("div", {
+      key: x.id,
+      className: "rd-isc-tile na",
+      "aria-label": x.label + ": not polled in " + mo.label
+    }, React.createElement("span", {
+      className: "rd-isc-issue"
+    }, x.label), React.createElement("b", {
+      className: "rd-isc-v"
+    }, "Not polled"));
+    const v = Object.fromEntries(P.map((q, i) => [q, m[1 + i]]));
+    const aria = x.label + ", " + mo.label + ": " + P.map(q => pName(q) + " " + Math.round(v[q])).join(", ") + ". ";
+    if (sv.leadSig) {
+      const gap = Math.round(v[sv.lead] - v[sv.runner]);
+      return React.createElement("div", {
+        key: x.id,
+        className: "rd-isc-tile",
+        style: {
+          background: pColor(sv.lead)
+        },
+        "aria-label": aria + ISS_PARTY_CAP[sv.lead] + " ahead by about " + gap + " points."
+      }, React.createElement("span", {
+        className: "rd-isc-issue"
+      }, x.label), React.createElement("b", {
+        className: "rd-isc-v"
+      }, ISS_PARTY_CAP[sv.lead], " +", gap));
+    }
+    if (sv.pairSig) {
+      return React.createElement("div", {
+        key: x.id,
+        className: "rd-isc-tile",
+        style: {
+          background: "linear-gradient(135deg, " + pColor(sv.lead) + " 0 50%, " + pColor(sv.runner) + " 50% 100%)"
+        },
+        "aria-label": aria + pName(sv.lead) + " and " + pName(sv.runner) + " are level at the front, " + pName(sv.third) + " clearly behind."
+      }, React.createElement("span", {
+        className: "rd-isc-issue"
+      }, x.label), React.createElement("b", {
+        className: "rd-isc-v"
+      }, "Level"), React.createElement("small", {
+        className: "rd-isc-sub"
+      }, ISS_PARTY_CAP[sv.lead], " \xB7 ", ISS_PARTY_CAP[sv.runner]));
+    }
+    return React.createElement("div", {
+      key: x.id,
+      className: "rd-isc-tile none",
+      "aria-label": aria + "No party has a clear lead."
+    }, React.createElement("span", {
+      className: "rd-isc-issue"
+    }, x.label), React.createElement("b", {
+      className: "rd-isc-v"
+    }, "No clear lead"));
+  };
   const G = I.groups;
   const gtab = G && (G.tabs.find(x => x.id === gsetId) || G.tabs[0]);
   const allOf = k => G && G.all && G.all[k] || null;
@@ -46175,7 +46267,22 @@ function RdIssues({
   }, view === "trust" ? React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: trustHead,
     dek: trustDek
-  }), React.createElement("div", {
+  }), React.createElement(RdTabs, {
+    swipe: true,
+    value: snap,
+    onChange: setSnap,
+    ariaLabel: "Who\u2019s trusted view",
+    className: "rd-tabs-sm rd-isc-tabs",
+    options: [{
+      id: "snap",
+      label: "Snapshot"
+    }, {
+      id: "chg",
+      label: "Change"
+    }]
+  }), React.createElement(RdCrossfade, {
+    k: snap
+  }, snap !== "chg" || !iscMonths.length ? React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-is-grid",
     ref: trGrid
   }, React.createElement("div", {
@@ -46321,7 +46428,21 @@ function RdIssues({
       term: "issues",
       from: "The issues"
     }
-  }, "Figures pool the last ", I.window, " of polls, newer and larger polls counting for more. \u201CAhead\u201D means a lead larger than its own 95% margin; \u201Cbehind\u201D names a party clearly third. Pick an issue to follow it in the chart.")) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
+  }, "Figures pool the last ", I.window, " of polls, newer and larger polls counting for more. \u201CAhead\u201D means a lead larger than its own 95% margin; \u201Cbehind\u201D names a party clearly third. Pick an issue to follow it in the chart.")) : React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-isc"
+  }, iscMonths.map(mo => React.createElement("div", {
+    className: "rd-isc-m",
+    key: mo.ym
+  }, React.createElement("p", {
+    className: "rd-isc-mlab"
+  }, React.createElement("b", null, mo.label)), React.createElement("div", {
+    className: "rd-isc-grid"
+  }, list.map(x => iscTile(x, mo)))))), React.createElement(RdFoot, {
+    how: {
+      term: "issues",
+      from: "The issues"
+    }
+  }, "One square per issue, pooled as the Snapshot\u2019s figures are. A square takes the colour of the party ahead on it by more than the figures\u2019 own 95% margin; two colours share a square the polls can\u2019t split, the left-behind party clearly third; grey means nothing separates the three.")))) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: whomHead,
     dek: gVerdicts.length ? gVerdicts.map(v => v.text).join(" ") : "No two groups differ significantly on any of these issues."
   }), gtab ? React.createElement("div", {
