@@ -253,7 +253,8 @@ assert.equal(daOwnership(daRep("Capital-BriefDemosAU-Federal-Poll-August-2026"))
     assert.ok(row, `${ym}: its ownership row exists`);
     assert.deepEqual([row.dateStart, row.sample, row.source], [dir.dateStart, dir.sample, dir.url],
       `${ym}: dates, sample and link are the direction row's`);
-    assert.equal(row.sampleEff, null, `${ym}: SEC Newgate publishes no effective sample`);
+    assert.equal(row.sampleEff, { "2026-05": 653, "2026-07": 1244, "2026-09": 1095 }[ym],
+      `${ym}: the wave's statement-published effective sample rides the direction row`);
     assert.deepEqual(Object.keys(row.issues), ["col"], `${ym}: the one issue it asks about`);
     const b = bank[ym];
     assert.deepEqual(row.issues.col, { alp: b.alp, lnp: b.lnp, onp: b.onp, grn: b.grn, oth: b.rest },
