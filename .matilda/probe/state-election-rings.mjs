@@ -1,11 +1,11 @@
 /* state-election-rings.mjs — the By-state small-multiple election marks in
    the Who-votes panel (Place tab), per party chip:
    1. Each of the seven panels (NSW, Vic, Qld, SA, WA, ACT/NT/Tas,
-      ACT/NT/Tas/WA/SA) carries ONE ring, stroked in that panel's series-line
+      Non-NSW/Vic/Qld) carries ONE ring, stroked in that panel's series-line
       colour (not --ink).
    2. The ring's y pixel lands where the AEC 31496 share maps in the chart's
       y-domain: NSW 35.2 / Vic 33.95 / Qld 30.98 / SA 38.31 / WA 35.59 /
-      ACT/NT/Tas 40.95 / ACT/NT/Tas/WA/SA 37.64 on Labor.
+      ACT/NT/Tas 40.95 / Non-NSW/Vic/Qld 37.64 on Labor.
    3. Hovering the ring's x: a guide tooltip whose swatches all carry
       is-ring at the election; hovering a later month: plain squares.
    4. The tooltip shows both rows (state line + All voters) at the election
@@ -50,7 +50,7 @@ const ELECTION_LOC = {
   oth: [13.68, 12.45, 12.97, 20.56],
 };
 const PARTY_BUTTON = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
-const PANELS = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "ACT/NT/Tas/WA/SA"];
+const PANELS = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
 
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
 const server = http.createServer((req, res) => {

@@ -134,7 +134,7 @@ const againstRow = (label, setLab, grp) => {
 };
 /* the conversation case and one from each gate outcome */
 againstRow("ALP outer-metro", "By location", "Outer metro");
-againstRow("ALP non-eastern-mainland", "By state", "ACT/NT/Tas/WA/SA");
+againstRow("ALP non-eastern-mainland", "By state", "Non-NSW/Vic/Qld");
 againstRow("ALP territory trio", "By state", "ACT/NT/Tas");
 againstRow("ALP Queensland", "By state", "Qld");
 againstRow("ALP inner-metro", "By location", "Inner metro");
