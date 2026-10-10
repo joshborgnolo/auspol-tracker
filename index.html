@@ -4111,6 +4111,28 @@ body.rd .rd-is-left .rd-note { margin-top: 12px; }
 body.rd .rd-is-ctop { display: flex; align-items: center; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); min-height: 28px; }
 body.rd .rd-is-chead { margin: 4px 0 0; font-family: var(--serif); font-weight: 700; font-size: 22px; line-height: 1.15; color: var(--ink); text-wrap: balance; }
 body.rd .rd-is-csub { margin: 6px 0 8px; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+body.rd .rd-isc-tabs { margin-top: 18px; }
+body.rd .rd-isc { margin-top: 28px; display: flex; flex-direction: column; gap: 40px; }
+body.rd .rd-isc-mlab { margin: 0 0 12px; font-size: 15px; color: var(--ink-2); }
+body.rd .rd-isc-mlab b { font-weight: 700; color: var(--ink); }
+body.rd .rd-isc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+body.rd .rd-isc-tile { position: relative; aspect-ratio: 1; border-radius: 12px; padding: 12px 14px;
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+  color: #fff; overflow: hidden; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.28); }
+body.rd .rd-isc-tile.na, body.rd .rd-isc-tile.none { background: var(--ink-3); }
+body.rd .rd-isc-issue { position: absolute; top: 12px; left: 14px; right: 14px; font-size: 13px; font-weight: 600; line-height: 1.25; }
+body.rd .rd-isc-v { font-size: 20px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+body.rd .rd-isc-sub { font-size: 12px; font-weight: 600; margin-top: 2px; }
+@media (max-width: 1000px) {
+  body.rd .rd-isc-grid { gap: 10px; }
+  body.rd .rd-isc-v { font-size: 18px; }
+}
+@media (max-width: 760px) {
+  body.rd .rd-isc { gap: 30px; }
+  body.rd .rd-isc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  body.rd .rd-isc-tile { padding: 10px 12px; }
+  body.rd .rd-isc-v { font-size: 17px; }
+}
 body.rd .rd-iw { margin-top: 28px; }
 body.rd .rd-iw-ctl { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); }
 body.rd .rd-iw-by { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
@@ -39505,6 +39527,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve", "SEC Newgate", "Ipsos"]
       },
       "monthly": [["2025-11", 48.4, 33.9, 17.7, 4.9, 4.7, 3.8], ["2025-12", 47.5, 31.1, 21.3, 4.5, 4.2, 3.7], ["2026-01", 39, 32.2, 28.8, 4.5, 4.3, 4.1], ["2026-02", 35.9, 34.6, 29.5, 4, 2.8, 4.7], ["2026-04", 38.3, 33.3, 28.3, 4.4, 4.3, 4.1], ["2026-05", 36.5, 30.2, 33.3, 3.3, 3.3, 3.1], ["2026-06", 40.7, 29.2, 30, 3, 2.8, 2.8], ["2026-07", 37.6, 29.9, 32.5, 3, 3, 2.3], ["2026-08", 36.8, 30.1, 33.1, 1.8, 1.7, 1.7], ["2026-09", 34.9, 31.2, 33.8, 2.1, 2, 2.1], ["2026-10", 31.1, 32.7, 36.2, 4.1, 4.1, 4.2]],
+      "snap": {
+        "lead": "alp",
+        "runner": "lnp",
+        "third": "onp",
+        "leadSig": false,
+        "pairSig": false
+      },
       "dots": [[2025.87, "RedBridge/Accent", "2025-11-13", 48.4, 33.9, 17.7], [2025.95, "RedBridge/Accent", "2025-12-12", 47.5, 31.1, 21.3], [2026.08, "RedBridge/Accent", "2026-01-29", 39, 32.2, 28.8], [2026.14, "DemosAU", "2026-02-20", 34.3, 34.3, 31.3], [2026.16, "RedBridge/Accent", "2026-02-27", 38.3, 35, 26.7], [2026.33, "RedBridge/Accent", "2026-04-30", 38.3, 33.3, 28.3], [2026.38, "SEC Newgate", "2026-05-18", 38.3, 28.3, 33.3], [2026.4, "RedBridge/Accent", "2026-05-28", 35, 31.7, 33.3], [2026.44, "Ipsos", "2026-06-12", 42.6, 29.5, 27.9], [2026.48, "RedBridge/Accent", "2026-06-26", 40.7, 28.8, 30.5], [2026.52, "Resolve", "2026-07-11", 33.3, 33.3, 33.4], [2026.53, "SEC Newgate", "2026-07-13", 39.3, 23, 37.7], [2026.53, "Ipsos", "2026-07-14", 45.2, 29, 25.8], [2026.58, "RedBridge/Accent", "2026-07-30", 34.9, 33.3, 31.7], [2026.61, "Ipsos", "2026-08-13", 41.5, 30.8, 27.7], [2026.62, "Resolve", "2026-08-15", 32.6, 30.7, 36.8], [2026.64, "YouGov", "2026-08-24", 36.4, 30.3, 33.3], [2026.65, "RedBridge/Accent", "2026-08-28", 38.5, 30.8, 30.8], [2026.7, "Resolve", "2026-09-12", 31.5, 33.2, 35.3], [2026.7, "SEC Newgate", "2026-09-14", 37.7, 26.2, 36.1], [2026.71, "Ipsos", "2026-09-16", 35.9, 32.8, 31.3], [2026.75, "RedBridge/Accent", "2026-10-02", 30.6, 33.9, 35.5]]
     }, {
       "id": "housing",
@@ -39563,6 +39592,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve", "Ipsos"]
       },
       "monthly": [["2025-11", 47.2, 32.1, 20.8, 5.3, 5, 4.3], ["2025-12", 43.6, 34.5, 21.8, 4.7, 4.5, 3.9], ["2026-01", 42.6, 27.8, 29.6, 4.7, 4.3, 4.4], ["2026-02", 36.9, 32.1, 30.9, 5.1, 2.8, 6.1], ["2026-04", 37.7, 32.1, 30.2, 4.7, 4.5, 4.4], ["2026-05", 38.6, 29.8, 31.6, 4.4, 4.2, 4.2], ["2026-06", 42, 27.3, 30.7, 3.2, 2.9, 3.4], ["2026-07", 40.1, 29.1, 30.8, 3.8, 3.6, 2], ["2026-08", 37, 30.1, 32.9, 1.8, 1.7, 1.8], ["2026-09", 37.4, 28, 34.5, 3.5, 2.8, 2.6], ["2026-10", 31.7, 30.6, 37.6, 4.2, 4.2, 4.4]],
+      "snap": {
+        "lead": "alp",
+        "runner": "lnp",
+        "third": "onp",
+        "leadSig": false,
+        "pairSig": false
+      },
       "dots": [[2025.87, "RedBridge/Accent", "2025-11-13", 47.2, 32.1, 20.8], [2025.95, "RedBridge/Accent", "2025-12-12", 43.6, 34.5, 21.8], [2026.08, "RedBridge/Accent", "2026-01-29", 42.6, 27.8, 29.6], [2026.14, "DemosAU", "2026-02-20", 34.9, 31.7, 33.3], [2026.16, "RedBridge/Accent", "2026-02-27", 40, 32.7, 27.3], [2026.33, "RedBridge/Accent", "2026-04-30", 37.7, 32.1, 30.2], [2026.4, "RedBridge/Accent", "2026-05-28", 38.6, 29.8, 31.6], [2026.44, "Ipsos", "2026-06-12", 43.1, 27.6, 29.3], [2026.48, "RedBridge/Accent", "2026-06-26", 40.4, 26.9, 32.7], [2026.52, "Resolve", "2026-07-11", 37.1, 30.2, 32.7], [2026.53, "Ipsos", "2026-07-14", 48.2, 23.2, 28.6], [2026.58, "RedBridge/Accent", "2026-07-30", 37.3, 32.2, 30.5], [2026.61, "Ipsos", "2026-08-13", 41.4, 29.3, 29.3], [2026.62, "Resolve", "2026-08-15", 33.4, 30.7, 35.8], [2026.64, "YouGov", "2026-08-24", 37.1, 29, 33.9], [2026.65, "RedBridge/Accent", "2026-08-28", 37.7, 31.1, 31.1], [2026.7, "Resolve", "2026-09-12", 36.8, 27, 36.2], [2026.71, "Ipsos", "2026-09-16", 38.3, 28.3, 33.3], [2026.75, "RedBridge/Accent", "2026-10-02", 31.6, 31.6, 36.8]]
     }, {
       "id": "health",
@@ -39618,6 +39654,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve"]
       },
       "monthly": [["2025-11", 54.8, 30.6, 14.5, 4.9, 4.6, 3.5], ["2025-12", 57.1, 28.6, 14.3, 4.4, 4, 3.1], ["2026-01", 47.5, 32.8, 19.7, 4.5, 4.2, 3.6], ["2026-02", 46.4, 30.1, 23.5, 2.9, 2.7, 3.7], ["2026-04", 47.5, 30.5, 22, 4.6, 4.2, 3.8], ["2026-05", 45.8, 32.2, 22, 4.5, 4.2, 3.7], ["2026-06", 51.7, 25.9, 22.4, 4.7, 4.1, 3.9], ["2026-07", 44.7, 29, 26.3, 4.7, 3.2, 2.5], ["2026-08", 44.3, 29.4, 26.2, 3.5, 1.9, 3.2], ["2026-09", 44.8, 29, 26.2, 3.1, 2.9, 2.8], ["2026-10", 38.9, 31.3, 29.8, 4.3, 4.1, 4]],
+      "snap": {
+        "lead": "alp",
+        "runner": "lnp",
+        "third": "onp",
+        "leadSig": true
+      },
       "dots": [[2025.87, "RedBridge/Accent", "2025-11-13", 54.8, 30.6, 14.5], [2025.95, "RedBridge/Accent", "2025-12-12", 57.1, 28.6, 14.3], [2026.08, "RedBridge/Accent", "2026-01-29", 47.5, 32.8, 19.7], [2026.14, "DemosAU", "2026-02-20", 45.6, 29.4, 25], [2026.16, "RedBridge/Accent", "2026-02-27", 47.5, 31.1, 21.3], [2026.33, "RedBridge/Accent", "2026-04-30", 47.5, 30.5, 22], [2026.4, "RedBridge/Accent", "2026-05-28", 45.8, 32.2, 22], [2026.48, "RedBridge/Accent", "2026-06-26", 51.7, 25.9, 22.4], [2026.52, "Resolve", "2026-07-11", 40, 29.3, 30.7], [2026.53, "Ipsos", "2026-07-14", 54.1, 24.6, 21.3], [2026.58, "RedBridge/Accent", "2026-07-30", 41.5, 32.3, 26.2], [2026.62, "Resolve", "2026-08-15", 38, 31.4, 30.6], [2026.64, "YouGov", "2026-08-24", 44.6, 27.7, 27.7], [2026.65, "RedBridge/Accent", "2026-08-28", 47.7, 30.8, 21.5], [2026.7, "Resolve", "2026-09-12", 41.4, 29.4, 29.2], [2026.75, "RedBridge/Accent", "2026-10-02", 40.3, 32.3, 27.4]]
     }, {
       "id": "immigration",
@@ -39673,6 +39715,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve", "Ipsos"]
       },
       "monthly": [["2025-11", 30.3, 28.8, 40.9, 4.4, 4.3, 4.7], ["2025-12", 29.9, 28.4, 41.8, 3.9, 3.9, 4.2], ["2026-01", 23.9, 25.4, 50.7, 3.7, 3.7, 4.3], ["2026-02", 24.9, 25.7, 49.4, 3.5, 4.9, 8.4], ["2026-04", 25.4, 25.4, 49.3, 3.6, 3.6, 4.2], ["2026-05", 22.5, 21.1, 56.3, 3.4, 3.3, 4], ["2026-06", 31.3, 21.4, 47.4, 7.8, 2.4, 8.6], ["2026-07", 27.9, 23.8, 48.3, 7.9, 2, 9.2], ["2026-08", 30.4, 20.9, 48.7, 1.6, 1.4, 2.4], ["2026-09", 28, 21.4, 50.6, 2.3, 2.1, 2.5], ["2026-10", 25.2, 23.7, 51.1, 3.5, 3.5, 4.1]],
+      "snap": {
+        "lead": "onp",
+        "runner": "alp",
+        "third": "lnp",
+        "leadSig": true
+      },
       "dots": [[2025.87, "RedBridge/Accent", "2025-11-13", 30.3, 28.8, 40.9], [2025.95, "RedBridge/Accent", "2025-12-12", 29.9, 28.4, 41.8], [2026.08, "RedBridge/Accent", "2026-01-29", 23.9, 25.4, 50.7], [2026.14, "DemosAU", "2026-02-20", 26.4, 27.8, 45.8], [2026.16, "RedBridge/Accent", "2026-02-27", 22.9, 22.9, 54.3], [2026.33, "RedBridge/Accent", "2026-04-30", 25.4, 25.4, 49.3], [2026.4, "RedBridge/Accent", "2026-05-28", 22.5, 21.1, 56.3], [2026.44, "Ipsos", "2026-06-12", 34.8, 21.7, 43.5], [2026.48, "RedBridge/Accent", "2026-06-26", 26.9, 20.9, 52.2], [2026.52, "Resolve", "2026-07-11", 30.7, 24.3, 44.9], [2026.58, "RedBridge/Accent", "2026-07-30", 23, 23, 54.1], [2026.61, "Ipsos", "2026-08-13", 36.2, 21.7, 42], [2026.62, "Resolve", "2026-08-15", 30.3, 22.8, 46.9], [2026.64, "YouGov", "2026-08-24", 30.1, 19.2, 50.7], [2026.65, "RedBridge/Accent", "2026-08-28", 26, 20.5, 53.4], [2026.7, "Resolve", "2026-09-12", 29.5, 22.4, 48.2], [2026.71, "Ipsos", "2026-09-16", 29.6, 21.1, 49.3], [2026.75, "RedBridge/Accent", "2026-10-02", 22.2, 23.6, 54.2]]
     }, {
       "id": "crime",
@@ -39728,6 +39776,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve", "Ipsos"]
       },
       "monthly": [["2026-04", 31.7, 33.3, 35, 4.2, 4.3, 4.3], ["2026-05", 31.1, 29.5, 39.3, 4.1, 4, 4.3], ["2026-06", 35.7, 29.7, 34.6, 3.2, 2.8, 2.9], ["2026-07", 33.1, 31.4, 35.5, 5.2, 3.5, 2], ["2026-08", 31.6, 32.2, 36.2, 2, 2, 2], ["2026-09", 31.1, 30.8, 38.1, 3.5, 2.4, 2.5], ["2026-10", 30.6, 32.6, 36.8, 4, 4.1, 4.2]],
+      "snap": {
+        "lead": "onp",
+        "runner": "lnp",
+        "third": "alp",
+        "leadSig": false,
+        "pairSig": false
+      },
       "dots": [[2026.33, "RedBridge/Accent", "2026-04-30", 31.7, 33.3, 35], [2026.4, "RedBridge/Accent", "2026-05-28", 31.1, 29.5, 39.3], [2026.44, "Ipsos", "2026-06-12", 37.1, 29, 33.9], [2026.48, "RedBridge/Accent", "2026-06-26", 33.9, 30.5, 35.6], [2026.52, "Resolve", "2026-07-11", 31.3, 31.3, 37.4], [2026.53, "Ipsos", "2026-07-14", 42.6, 26.2, 31.1], [2026.58, "RedBridge/Accent", "2026-07-30", 27.7, 35.4, 36.9], [2026.61, "Ipsos", "2026-08-13", 35.9, 31.3, 32.8], [2026.62, "Resolve", "2026-08-15", 29.5, 32.4, 38], [2026.65, "RedBridge/Accent", "2026-08-28", 30.8, 32.3, 36.9], [2026.7, "Resolve", "2026-09-12", 31.3, 29.5, 39.2], [2026.71, "Ipsos", "2026-09-16", 32.3, 30.8, 36.9], [2026.75, "RedBridge/Accent", "2026-10-02", 29, 33.9, 37.1]]
     }, {
       "id": "economy",
@@ -39783,6 +39838,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve", "Ipsos"]
       },
       "monthly": [["2026-02", 34.3, 41.4, 24.3, 3.5, 3.6, 3.2], ["2026-04", 37.3, 41.8, 20.9, 4.2, 4.2, 3.5], ["2026-05", 34.4, 43.8, 21.9, 4.1, 4.3, 3.5], ["2026-06", 41.7, 34.9, 23.3, 3, 6, 2.9], ["2026-07", 37.9, 37.2, 24.9, 4.7, 4.1, 1.8], ["2026-08", 37.1, 38.4, 24.4, 1.8, 2.1, 1.6], ["2026-09", 33.8, 39.5, 26.7, 2.5, 2.6, 2.3], ["2026-10", 32.2, 40.6, 27.2, 4, 4.2, 3.8]],
+      "snap": {
+        "lead": "lnp",
+        "runner": "alp",
+        "third": "onp",
+        "leadSig": false,
+        "pairSig": true
+      },
       "dots": [[2026.14, "DemosAU", "2026-02-20", 34.3, 41.4, 24.3], [2026.33, "RedBridge/Accent", "2026-04-30", 37.3, 41.8, 20.9], [2026.4, "RedBridge/Accent", "2026-05-28", 34.4, 43.8, 21.9], [2026.44, "Ipsos", "2026-06-12", 43.1, 32.3, 24.6], [2026.48, "RedBridge/Accent", "2026-06-26", 40, 38.3, 21.7], [2026.52, "Resolve", "2026-07-11", 35.2, 37.9, 26.9], [2026.53, "Ipsos", "2026-07-14", 46.9, 29.7, 23.4], [2026.58, "RedBridge/Accent", "2026-07-30", 33.8, 42.6, 23.5], [2026.61, "Ipsos", "2026-08-13", 42.4, 34.8, 22.7], [2026.62, "Resolve", "2026-08-15", 36.3, 35, 28.7], [2026.64, "YouGov", "2026-08-24", 35.7, 40, 24.3], [2026.65, "RedBridge/Accent", "2026-08-28", 35.8, 43.3, 20.9], [2026.7, "Resolve", "2026-09-12", 32.2, 38.4, 29.4], [2026.71, "Ipsos", "2026-09-16", 37.9, 34.8, 27.3], [2026.75, "RedBridge/Accent", "2026-10-02", 31.3, 43.8, 25]]
     }, {
       "id": "climate",
@@ -39830,6 +39892,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve"]
       },
       "monthly": [["2025-11", 47.4, 28.9, 23.7, 6.3, 5.7, 5.4], ["2025-12", 50, 27.5, 22.5, 5.6, 5, 4.6], ["2026-01", 43.2, 27, 29.7, 5.7, 5.1, 5.3], ["2026-02", 40.8, 25.8, 33.3, 9.8, 3.6, 6.1], ["2026-04", 45.9, 24.3, 29.7, 5.8, 5, 5.3], ["2026-05", 40, 27.5, 32.5, 5.3, 4.8, 5.1], ["2026-06", 41.7, 25, 33.3, 5.8, 5.1, 5.6], ["2026-07", 41.1, 27.2, 31.7, 2.7, 2.4, 2.6], ["2026-08", 39.5, 25.3, 35.2, 2.3, 2.1, 2.3], ["2026-09", 39.7, 26.4, 33.9, 3.3, 2.9, 3.2], ["2026-10", 35.7, 32.7, 31.6, 5.2, 5, 5]],
+      "snap": {
+        "lead": "alp",
+        "runner": "onp",
+        "third": "lnp",
+        "leadSig": true
+      },
       "dots": [[2025.87, "RedBridge/Accent", "2025-11-13", 47.4, 28.9, 23.7], [2025.95, "RedBridge/Accent", "2025-12-12", 50, 27.5, 22.5], [2026.08, "RedBridge/Accent", "2026-01-29", 43.2, 27, 29.7], [2026.14, "DemosAU", "2026-02-20", 37.5, 27.1, 35.4], [2026.16, "RedBridge/Accent", "2026-02-27", 47.1, 23.5, 29.4], [2026.33, "RedBridge/Accent", "2026-04-30", 45.9, 24.3, 29.7], [2026.4, "RedBridge/Accent", "2026-05-28", 40, 27.5, 32.5], [2026.48, "RedBridge/Accent", "2026-06-26", 41.7, 25, 33.3], [2026.52, "Resolve", "2026-07-11", 41.3, 27.6, 31.1], [2026.58, "RedBridge/Accent", "2026-07-30", 40.5, 26.2, 33.3], [2026.62, "Resolve", "2026-08-15", 38.5, 27.1, 34.4], [2026.64, "YouGov", "2026-08-24", 38.6, 25, 36.4], [2026.65, "RedBridge/Accent", "2026-08-28", 41.9, 23.3, 34.9], [2026.7, "Resolve", "2026-09-12", 39.4, 27.2, 33.4], [2026.75, "RedBridge/Accent", "2026-10-02", 36.6, 31.7, 31.7]],
       "grnTop": {
         "house": "RedBridge",
@@ -39895,6 +39963,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "houses": ["RedBridge", "Resolve"]
       },
       "monthly": [["2025-11", 42.2, 39.1, 18.8, 4.8, 4.8, 3.8], ["2025-12", 44.4, 36.5, 19, 4.4, 4.3, 3.5], ["2026-01", 33.3, 36.5, 30.2, 4.2, 4.3, 4.1], ["2026-02", 34.7, 36.3, 29, 2.7, 2.7, 2.6], ["2026-04", 36.9, 33.8, 29.2, 4.2, 4.1, 4], ["2026-05", 33.3, 34.9, 31.7, 4.1, 4.1, 4], ["2026-06", 39.1, 29.7, 31.3, 4.3, 4, 4.1], ["2026-07", 33.5, 34.9, 31.6, 2.3, 2.3, 2.3], ["2026-08", 34.5, 35.8, 29.6, 2.1, 3.2, 2.7], ["2026-09", 34.3, 34.4, 31.3, 2.9, 2.9, 2.8], ["2026-10", 32.8, 35.7, 31.5, 4, 4.1, 4]],
+      "snap": {
+        "lead": "alp",
+        "runner": "lnp",
+        "third": "onp",
+        "leadSig": false,
+        "pairSig": false
+      },
       "dots": [[2025.87, "RedBridge/Accent", "2025-11-13", 42.2, 39.1, 18.8], [2025.95, "RedBridge/Accent", "2025-12-12", 44.4, 36.5, 19], [2026.08, "RedBridge/Accent", "2026-01-29", 33.3, 36.5, 30.2], [2026.14, "DemosAU", "2026-02-20", 33.8, 36.6, 29.6], [2026.16, "RedBridge/Accent", "2026-02-27", 35.9, 35.9, 28.1], [2026.33, "RedBridge/Accent", "2026-04-30", 36.9, 33.8, 29.2], [2026.4, "RedBridge/Accent", "2026-05-28", 33.3, 34.9, 31.7], [2026.48, "RedBridge/Accent", "2026-06-26", 39.1, 29.7, 31.3], [2026.52, "Resolve", "2026-07-11", 33.9, 35.2, 30.9], [2026.58, "RedBridge/Accent", "2026-07-30", 32.8, 34.3, 32.8], [2026.62, "Resolve", "2026-08-15", 32.6, 35.2, 32.2], [2026.64, "YouGov", "2026-08-24", 36.6, 33.8, 29.6], [2026.65, "RedBridge/Accent", "2026-08-28", 33.3, 39.4, 27.3], [2026.7, "Resolve", "2026-09-12", 33.6, 33.5, 33], [2026.75, "RedBridge/Accent", "2026-10-02", 32.3, 36.9, 30.8]]
     }],
     "labels": {
@@ -39937,6 +40012,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "issue": "economy",
       "v": 3.9
     },
+    "snapYm": "2026-04",
     "houses": ["RedBridge", "Ipsos", "Resolve", "SEC Newgate"],
     "polls": [{
       "pollster": "RedBridge",
@@ -104095,6 +104171,7 @@ function RdIssues({
   const narrow = useNarrow("(max-width: 760px)");
   const I = D.issues;
   const [view, setView] = useState("trust");
+  const [snap, setSnap] = useState("snap");
   const [selId, setSelId] = useState(null);
   const selNow = selId || (I && I.list && I.list[0] ? I.list[0].id : null);
   const [issMorph, setSel] = window.AP.useMorph(selNow, v => setSelId(v), (a, b) => a !== b);
@@ -104464,6 +104541,75 @@ function RdIssues({
     return Object.fromEntries(P.map(q => [q, rows.reduce((a, x) => a + x.imp.v * x.own.v[q], 0) / wsum]));
   })();
   const pOrd = tally ? P.slice().sort((a, b) => tally[b] - tally[a]) : P;
+  const iscNowYm = list.reduce((a, x) => {
+    const ms = x.monthly || [];
+    return ms.length && (!a || ms[ms.length - 1][0] > a) ? ms[ms.length - 1][0] : a;
+  }, null);
+  const iscMonth = ym => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const iscMonths = I.snapYm ? [{
+    ym: I.snapYm,
+    snap: true,
+    label: iscMonth(I.snapYm)
+  }, ...(iscNowYm && iscNowYm !== I.snapYm ? [{
+    ym: iscNowYm,
+    snap: false,
+    label: iscMonth(iscNowYm)
+  }] : [])] : [];
+  const iscTile = (x, mo) => {
+    const m = (x.monthly || []).find(mm => mm[0] === mo.ym);
+    const sv = mo.snap ? x.snap : x.own;
+    if (!m || !sv) return React.createElement("div", {
+      key: x.id,
+      className: "rd-isc-tile na",
+      "aria-label": x.label + ": not polled in " + mo.label
+    }, React.createElement("span", {
+      className: "rd-isc-issue"
+    }, x.label), React.createElement("b", {
+      className: "rd-isc-v"
+    }, "Not polled"));
+    const v = Object.fromEntries(P.map((q, i) => [q, m[1 + i]]));
+    const aria = x.label + ", " + mo.label + ": " + P.map(q => pName(q) + " " + Math.round(v[q])).join(", ") + ". ";
+    if (sv.leadSig) {
+      const gap = Math.round(v[sv.lead] - v[sv.runner]);
+      return React.createElement("div", {
+        key: x.id,
+        className: "rd-isc-tile",
+        style: {
+          background: pColor(sv.lead)
+        },
+        "aria-label": aria + ISS_PARTY_CAP[sv.lead] + " ahead by about " + gap + " points."
+      }, React.createElement("span", {
+        className: "rd-isc-issue"
+      }, x.label), React.createElement("b", {
+        className: "rd-isc-v"
+      }, ISS_PARTY_CAP[sv.lead], " +", gap));
+    }
+    if (sv.pairSig) {
+      return React.createElement("div", {
+        key: x.id,
+        className: "rd-isc-tile",
+        style: {
+          background: "linear-gradient(135deg, " + pColor(sv.lead) + " 0 50%, " + pColor(sv.runner) + " 50% 100%)"
+        },
+        "aria-label": aria + pName(sv.lead) + " and " + pName(sv.runner) + " are level at the front, " + pName(sv.third) + " clearly behind."
+      }, React.createElement("span", {
+        className: "rd-isc-issue"
+      }, x.label), React.createElement("b", {
+        className: "rd-isc-v"
+      }, "Level"), React.createElement("small", {
+        className: "rd-isc-sub"
+      }, ISS_PARTY_CAP[sv.lead], " \xB7 ", ISS_PARTY_CAP[sv.runner]));
+    }
+    return React.createElement("div", {
+      key: x.id,
+      className: "rd-isc-tile none",
+      "aria-label": aria + "No party has a clear lead."
+    }, React.createElement("span", {
+      className: "rd-isc-issue"
+    }, x.label), React.createElement("b", {
+      className: "rd-isc-v"
+    }, "No clear lead"));
+  };
   const G = I.groups;
   const gtab = G && (G.tabs.find(x => x.id === gsetId) || G.tabs[0]);
   const allOf = k => G && G.all && G.all[k] || null;
@@ -104609,7 +104755,22 @@ function RdIssues({
   }, view === "trust" ? React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: trustHead,
     dek: trustDek
-  }), React.createElement("div", {
+  }), React.createElement(RdTabs, {
+    swipe: true,
+    value: snap,
+    onChange: setSnap,
+    ariaLabel: "Who\u2019s trusted view",
+    className: "rd-tabs-sm rd-isc-tabs",
+    options: [{
+      id: "snap",
+      label: "Snapshot"
+    }, {
+      id: "chg",
+      label: "Change"
+    }]
+  }), React.createElement(RdCrossfade, {
+    k: snap
+  }, snap !== "chg" || !iscMonths.length ? React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-is-grid",
     ref: trGrid
   }, React.createElement("div", {
@@ -104755,7 +104916,21 @@ function RdIssues({
       term: "issues",
       from: "The issues"
     }
-  }, "Figures pool the last ", I.window, " of polls, newer and larger polls counting for more. \u201CAhead\u201D means a lead larger than its own 95% margin; \u201Cbehind\u201D names a party clearly third. Pick an issue to follow it in the chart.")) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
+  }, "Figures pool the last ", I.window, " of polls, newer and larger polls counting for more. \u201CAhead\u201D means a lead larger than its own 95% margin; \u201Cbehind\u201D names a party clearly third. Pick an issue to follow it in the chart.")) : React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-isc"
+  }, iscMonths.map(mo => React.createElement("div", {
+    className: "rd-isc-m",
+    key: mo.ym
+  }, React.createElement("p", {
+    className: "rd-isc-mlab"
+  }, React.createElement("b", null, mo.label)), React.createElement("div", {
+    className: "rd-isc-grid"
+  }, list.map(x => iscTile(x, mo)))))), React.createElement(RdFoot, {
+    how: {
+      term: "issues",
+      from: "The issues"
+    }
+  }, "One square per issue, pooled as the Snapshot\u2019s figures are. A square takes the colour of the party ahead on it by more than the figures\u2019 own 95% margin; two colours share a square the polls can\u2019t split, the left-behind party clearly third; grey means nothing separates the three.")))) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: whomHead,
     dek: gVerdicts.length ? gVerdicts.map(v => v.text).join(" ") : "No two groups differ significantly on any of these issues."
   }), gtab ? React.createElement("div", {

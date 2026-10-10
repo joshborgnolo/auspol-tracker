@@ -4017,6 +4017,20 @@ const issues = (() => {
     const he = { at: (firm, t) => heV(ownHE[k][a], firm, t) - heV(ownHE[k][b], firm, t) };
     return weightedWithSe(nowcastPts(diff, he, refNow, SPARSE_K));
   };
+  /* the Who's-trusted change view's snapshot month: the first every issue
+     holds a three-way ownership reading (crime and economy enter April) */
+  const SNAP0 = "2026-04";
+  const leadAt = (k, rows, a, b, ym) => {
+    /* `lead`, pooled for one calendar month rather than nowcast – the same
+       diff measure and variance, monthWithSe in place of nowcastPts, so a
+       tile's verdict is the row verdict's own test on the month's waves */
+    const diff = rows.alp.filter((r) => r.ym === ym).map((r) => {
+      const pa = r.s3[a] / 100, pb = r.s3[b] / 100;
+      return { ym: r.ym, x: r.s3[a] - r.s3[b], n: r.n, firm: r.firm, pq: Math.max(0, 1e4 * (pa + pb - (pa - pb) ** 2)) };
+    });
+    const he = { at: (firm, t) => heV(ownHE[k][a], firm, t) - heV(ownHE[k][b], firm, t) };
+    return monthWithSe(diff, he, ym);
+  };
   // ---- what matters: RedBridge's and Ipsos's top three, all voters
   const salRows = {}, salR1 = {};
   for (const w of F.salience) {
@@ -4076,7 +4090,22 @@ const issues = (() => {
       const m = OWN3.map((q) => monthWithSe(o[q], ownHE[k][q], ym));
       return m.every(Boolean) ? [ym, ...m.map((e) => r1(e.v)), ...m.map((e) => r1(1.96 * e.se))] : null;
     }).filter(Boolean) : [];
+    /* the change view's April tile: the row verdict's lead test pooled on
+       the snapshot month's own waves (the "now" tile reuses own, which the
+       Who's-trusted rows already print - the two can never disagree) */
+    const m0 = monthly.find((m) => m[0] === SNAP0);
+    let snap = null;
+    if (o && m0) {
+      const v0 = Object.fromEntries(OWN3.map((q, i) => [q, m0[1 + i]]));
+      const ord = [...OWN3].sort((a, b) => v0[b] - v0[a]);
+      const L0 = leadAt(k, o, ord[0], ord[1], SNAP0);
+      const leadSig0 = !!(L0 && L0.v > 1.96 * L0.se);
+      const L3 = leadSig0 ? null : leadAt(k, o, ord[1], ord[2], SNAP0);
+      snap = { lead: ord[0], runner: ord[1], third: ord[2], leadSig: leadSig0,
+               ...(L3 ? { pairSig: L3.v > 1.96 * L3.se } : {}) };
+    }
     return { id: k, label: F.issues[k], imp: salNow(k), own: ownNow, monthly,
+             ...(snap ? { snap } : {}),
              dots: (dots[k] || []).sort((a, b) => a[0] - b[0]), ...(grnTop[k] ? { grnTop: grnTop[k] } : {}) };
   }).filter((it) => it.own || it.imp);
   if (!list.length) return null;
@@ -4189,7 +4218,7 @@ const issues = (() => {
     }
   }
   return {
-    window: SPARSE_K.label, parties: OWN3, list, labels: F.issues, leanMax,
+    window: SPARSE_K.label, parties: OWN3, list, labels: F.issues, leanMax, snapYm: SNAP0,
     houses: creditHouses([...wavesIn.map((r) => ({ f: houseName(r.w.pollster), t: Date.parse(r.w.date) })),
                           ...salCredit.filter((b) => !wavesIn.some((r) => houseName(r.w.pollster) === b.house))
                             .map((b) => ({ f: b.house, t: Date.parse(b.date) }))], (r) => r.f, (r) => r.t),

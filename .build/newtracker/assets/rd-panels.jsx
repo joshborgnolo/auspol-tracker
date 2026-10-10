@@ -3069,6 +3069,9 @@ function RdIssues({ rangeId = "all" }) {
   const narrow = useNarrow("(max-width: 760px)");
   const I = D.issues;
   const [view, setView] = useState("trust");
+  /* the trust view's sub-views: the rows-and-chart snapshot, and the change
+     tiles (who was trusted, April's snapshot month against now) */
+  const [snap, setSnap] = useState("snap");
   const [selId, setSelId] = useState(null);
   /* picking another issue asks the same three parties a different question,
      so the chart reshapes into it (useMorph) rather than being swapped out.
@@ -3360,6 +3363,60 @@ function RdIssues({ rangeId = "all" }) {
      the data arrays stay keyed to P, this is presentation only */
   const pOrd = tally ? P.slice().sort((a, b) => tally[b] - tally[a]) : P;
 
+  /* ---- the change view: who was trusted, April against now -----------------
+     Two month grids of tiles, one per issue, run off the row verdict's own
+     ahead/behind test – April pooled on that month's waves (gen-data's
+     snap), now the rows' own reading, so a tile can never colour against
+     what the Snapshot rows print just a crossfade away. */
+  const iscNowYm = list.reduce((a, x) => {
+    const ms = x.monthly || [];
+    return ms.length && (!a || ms[ms.length - 1][0] > a) ? ms[ms.length - 1][0] : a;
+  }, null);
+  const iscMonth = (ym) => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const iscMonths = I.snapYm ? [
+    { ym: I.snapYm, snap: true, label: iscMonth(I.snapYm) },
+    ...(iscNowYm && iscNowYm !== I.snapYm ? [{ ym: iscNowYm, snap: false, label: iscMonth(iscNowYm) }] : []),
+  ] : [];
+  const iscTile = (x, mo) => {
+    const m = (x.monthly || []).find((mm) => mm[0] === mo.ym);
+    const sv = mo.snap ? x.snap : x.own;
+    if (!m || !sv) return (
+      <div key={x.id} className="rd-isc-tile na" aria-label={x.label + ": not polled in " + mo.label}>
+        <span className="rd-isc-issue">{x.label}</span>
+        <b className="rd-isc-v">Not polled</b>
+      </div>
+    );
+    const v = Object.fromEntries(P.map((q, i) => [q, m[1 + i]]));
+    const aria = x.label + ", " + mo.label + ": " + P.map((q) => pName(q) + " " + Math.round(v[q])).join(", ") + ". ";
+    if (sv.leadSig) {
+      const gap = Math.round(v[sv.lead] - v[sv.runner]);
+      return (
+        <div key={x.id} className="rd-isc-tile" style={{ background: pColor(sv.lead) }}
+             aria-label={aria + ISS_PARTY_CAP[sv.lead] + " ahead by about " + gap + " points."}>
+          <span className="rd-isc-issue">{x.label}</span>
+          <b className="rd-isc-v">{ISS_PARTY_CAP[sv.lead]} +{gap}</b>
+        </div>
+      );
+    }
+    if (sv.pairSig) {
+      return (
+        <div key={x.id} className="rd-isc-tile"
+             style={{ background: "linear-gradient(135deg, " + pColor(sv.lead) + " 0 50%, " + pColor(sv.runner) + " 50% 100%)" }}
+             aria-label={aria + pName(sv.lead) + " and " + pName(sv.runner) + " are level at the front, " + pName(sv.third) + " clearly behind."}>
+          <span className="rd-isc-issue">{x.label}</span>
+          <b className="rd-isc-v">Level</b>
+          <small className="rd-isc-sub">{ISS_PARTY_CAP[sv.lead]} · {ISS_PARTY_CAP[sv.runner]}</small>
+        </div>
+      );
+    }
+    return (
+      <div key={x.id} className="rd-isc-tile none" aria-label={aria + "No party has a clear lead."}>
+        <span className="rd-isc-issue">{x.label}</span>
+        <b className="rd-isc-v">No clear lead</b>
+      </div>
+    );
+  };
+
   /* ---- what matters to whom ------------------------------------------------ */
   const G = I.groups;
   const gtab = G && (G.tabs.find((x) => x.id === gsetId) || G.tabs[0]);
@@ -3475,6 +3532,11 @@ function RdIssues({ rangeId = "all" }) {
       {view === "trust" ? (
         <>
           <RdHed head={trustHead} dek={trustDek} />
+          <RdTabs swipe value={snap} onChange={setSnap} ariaLabel="Who’s trusted view" className="rd-tabs-sm rd-isc-tabs"
+                  options={[{ id: "snap", label: "Snapshot" }, { id: "chg", label: "Change" }]} />
+          <RdCrossfade k={snap}>
+          {snap !== "chg" || !iscMonths.length ? (
+          <>
           <div className="rd-is-grid" ref={trGrid}>
             <div className="rd-is-left" ref={rowsRef}>
               {/* Each head sits over its own column: the strip's words over the
@@ -3551,6 +3613,23 @@ function RdIssues({ rangeId = "all" }) {
           <RdFoot how={{ term: "issues", from: "The issues" }}>
             Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. Pick an issue to follow it in the chart.
           </RdFoot>
+          </>
+          ) : (
+          <>
+            <div className="rd-isc">
+              {iscMonths.map((mo) => (
+                <div className="rd-isc-m" key={mo.ym}>
+                  <p className="rd-isc-mlab"><b>{mo.label}</b></p>
+                  <div className="rd-isc-grid">{list.map((x) => iscTile(x, mo))}</div>
+                </div>
+              ))}
+            </div>
+            <RdFoot how={{ term: "issues", from: "The issues" }}>
+              One square per issue, pooled as the Snapshot’s figures are. A square takes the colour of the party ahead on it by more than the figures’ own 95% margin; two colours share a square the polls can’t split, the left-behind party clearly third; grey means nothing separates the three.
+            </RdFoot>
+          </>
+          )}
+          </RdCrossfade>
         </>
       ) : (
         <>
