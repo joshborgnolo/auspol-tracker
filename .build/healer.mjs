@@ -21,9 +21,13 @@
                  raw wikitext for News24/Wikipedia. Shape-canary-guarded and
                  capped, so a flapping source wastes at most a bounded fetch.
      the agent   (healer.yml, not this script) is a headless matilda-code
-                 session that reads the evidence files and writes candidate
-                 rows to .build/healer-out/<house>.json. It has no git
-                 credentials and touches no data file. Zero waves is a
+                 session that reads the evidence files and prints candidate
+                 rows as its final message; the workflow redirects that
+                 stdout into .build/healer-out/<house>.json. It runs with
+                 --exclude-tools shell,write,edit (the adjudicator's exact
+                 posture from adjudicate.mjs — read-only over untrusted
+                 fetched text, MATILDA_API_KEY in the env), has no git
+                 credentials and can touch no data file. Zero waves is a
                  successful, quiet outcome.
      acceptance  (--accept) decides what — if anything — becomes a commit
                  candidate. Three deterministic gates per wave, all of which
@@ -61,7 +65,7 @@
    snapshot instead of fetching (mirrors N24_WIKI_FILE). */
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fetchText, clean, TRACKER_UA, writeAtomic } from "./extract-common.mjs";
+import { fetchText, clean, TRACKER_UA, writeAtomic, melbourneMinute } from "./extract-common.mjs";
 import { classify } from "./classify-failure.mjs";
 
 const SRC_DIR = ".build/healer-src";
@@ -135,10 +139,20 @@ export function figureCandidates(v, kind) {
   return [...new Set([`${v}%`, `${Number(v).toFixed(1)}%`])];
 }
 
+/* Presence must be figure-anchored, not bare-substring: "27%" is also the
+   tail of "152%", "512" the tail of "1,512", and "1512" the head of a
+   digit-run. A candidate counts only when its own printed token appears —
+   no digit, dot or thousands-separator glued to its front, no digit at its
+   back. Trailing dots/percent-signs stay legal ("… to 27.5%." / "5.55%"
+   never contains "5.5%" as a token). */
+const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const containsFigure = (text, form) =>
+  new RegExp(`(?<![\\d.,])${escRe(form)}(?!\\d)`).test(text);
+
 export function unfaithfulFields(text, fields) {
   const miss = [];
   for (const f of fields)
-    if (!figureCandidates(f.value, f.kind).some((c) => text.includes(c))) miss.push(`${f.name}=${f.value}`);
+    if (!figureCandidates(f.value, f.kind).some((c) => containsFigure(text, c))) miss.push(`${f.name}=${f.value}`);
   return miss;
 }
 
@@ -146,19 +160,16 @@ const isNum = (v) => typeof v === "number" && Number.isFinite(v);
 const isDate = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const DAY = 86400000;
 
-// Mirrors the CMS-datetime conversion inline in extract-roymorgan.mjs's
-// main (post.date, UTC → Australia/Melbourne "YYYY-MM-DDTHH:MM"). Kept in
-// step by hand: the row's `published` must read exactly like an extractor
-// row's, which is why the agent is never asked to supply it.
+// The CMS post datetime, UTC (zone suffix optional) → Australia/Melbourne
+// "YYYY-MM-DDTHH:MM" — the shared melbourne-time.mjs conversion the
+// extractors use, never a fourth hand copy of it. The row's `published`
+// must read exactly like an extractor row's, which is why the agent is
+// never asked to supply it.
 function melbournePublished(pd) {
   if (!pd) return null;
   const d = new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(pd) ? pd : pd + "Z");
   if (isNaN(d)) return null;
-  const p = Object.fromEntries(new Intl.DateTimeFormat("en", {
-    timeZone: "Australia/Melbourne", year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-  }).formatToParts(d).map((x) => [x.type, x.value]));
-  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+  return melbourneMinute(d);
 }
 
 // ------------------------------------------------------------ fetch evidence
@@ -166,11 +177,27 @@ const RM_FEED_PAGES = 2; // newest first; the wave that tripped the guard is rec
 const RM_RECENT_DAYS = 21;
 const RM_RELEASE_CAP = 4;
 
+/* The dedupe list the prompt instructions used to have the agent shell out
+   to jq-like one-liners for — now the fetch itself records it (the agent has
+   no shell). The same pollster sets --accept's dedupe uses, read from the
+   same canon path at fetch time (repo-root cwd). null, never a wrong list,
+   when canon is unreadable — acceptance still dedupes deterministically. */
+const canonDates = (pollster) => {
+  try {
+    const D = JSON.parse(readFileSync(POLLS, "utf8"));
+    return [...new Set((D.polls ?? []).filter((p) => p.pollster === pollster).map((p) => p.date))]
+      .filter(Boolean).sort();
+  } catch { return null; }
+};
+
 async function fetchRmEvidence(dir) {
   const rm = await rmLib();
   mkdirSync(dir, { recursive: true });
   const files = [];
-  const manifest = { house: "roymorgan", fetched: new Date().toISOString(), feed: rm.FEED_DEFAULT, releases: [], feedError: null };
+  const manifest = {
+    house: "roymorgan", fetched: new Date().toISOString(), feed: rm.FEED_DEFAULT,
+    releases: [], feedError: null, existingDates: canonDates("Roy Morgan"),
+  };
   let posts = [];
   try {
     for (let page = 1; page <= RM_FEED_PAGES; page++) {
@@ -251,7 +278,10 @@ async function fetchN24Evidence(dir) {
     ? readFileSync(process.env.HEALER_WIKI_FILE, "utf8")
     : (await fetchText(n24.WIKI_RAW)).text;
   writeFileSync(join(dir, "wiki.txt"), wikiText);
-  const manifest = { house: "news24", fetched: new Date().toISOString(), source: n24.WIKI_RAW, files: ["wiki.txt"] };
+  const manifest = {
+    house: "news24", fetched: new Date().toISOString(), source: n24.WIKI_RAW,
+    files: ["wiki.txt"], existingDates: canonDates("YouGov"),
+  };
   writeFileSync(join(dir, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
   return ["wiki.txt", "manifest.json"];
 }
@@ -389,7 +419,29 @@ async function acceptN24({ llm, evidenceDir, D }) {
     });
     out.proofs.push({ date: w.date, url: w.url ?? null, client: w.client });
   }
+  // The extractor's own Wikipedia-fallback guard, mirrored: >MAX_WIKI_ADDS
+  // new wiki waves in one pass means an upstream layout shift (that's the
+  // exact guard trip this healer exists to answer — it must never file the
+  // overflow itself). Loud exit via the caller's catch, nothing written.
+  if (out.accepted.length > n24.MAX_WIKI_ADDS)
+    throw new Error(`wiki healer: ${out.accepted.length} new waves > cap ${n24.MAX_WIKI_ADDS}`);
   return out;
+}
+
+/* The output file the workflow hands acceptance is whatever the agent's
+   stdout carried — plain JSON by contract, but tolerate the fence/prose
+   wrapping the adjudicator also strips (adjudicate.mjs's extraction,
+   mirrored): try the whole file, then the first-{ through last-} span.
+   What parses is still validated end-to-end below; unfindable JSON is a
+   SyntaxError, which the entry point turns into a loud exit 2. */
+export function readLlmJson(path) {
+  let src = readFileSync(path, "utf8");
+  try { return JSON.parse(src); } catch { /* wrapped — fall through */ }
+  src = src.trim();
+  if (src.startsWith("```")) src = src.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
+  const i0 = src.indexOf("{"), i1 = src.lastIndexOf("}");
+  if (i0 < 0 || i1 <= i0) throw new SyntaxError(`no JSON object found in ${path}`);
+  return JSON.parse(src.slice(i0, i1 + 1));
 }
 
 /* Apply one agent-output file. Returns the status object (also printed as
@@ -402,7 +454,7 @@ export async function acceptRun(house, { outFile, evidenceDir, pollsPath = POLLS
     status.note = "no agent output file — the agent filed nothing, a successful outcome";
     return status;
   }
-  const llm = JSON.parse(readFileSync(outFile, "utf8")); // malformed JSON: caller turns this into exit 2
+  const llm = readLlmJson(outFile); // malformed JSON: caller turns this into exit 2
   if (!Array.isArray(llm.waves) || !llm.waves.length) {
     status.note = "the agent filed zero waves — nothing to accept, a successful outcome";
     status.agentNotes = llm.notes ?? null;

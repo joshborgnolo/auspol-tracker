@@ -341,18 +341,29 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
   an exit-2 guard trip passes — transients and races are never healer work
   — and it stands down while an unreviewed `repair/healer-<house>-*` branch
   exists. Its `file` job re-fetches the source into
-  `.build/healer-src/evidence/` (gitignored), runs a headless session with
-  a per-house prompt (`.build/healer-prompts/<house>.md`) whose only output
-  is `.build/healer-out/<house>.json`, then `healer.mjs --accept` decides:
-  the house's OWN guard functions (imported from the extractor — RM_LIB/
-  N24_LIB lib modes, never a weakened check), (pollster, date) dedupe, and
-  the faithfulness firewall (every figure verbatim in the fetched text).
-  Accepted rows get extractor-parity provenance sidecars plus a run proof
-  in `.build/healer-src/*-proof.json`, then the normal validate+build path
-  commits row + proof + SITE_FILES on the review branch; alert-issue.sh
-  files the deduped review issue. A merged healer row IS the canonical one
-  (no provisional stamp), which is why it waits on a human — and the fixed
-  extractor dedupes by pollster+date if agent-repair lands first. Pinned
+  `.build/healer-src/evidence/` (gitignored; the manifest records the
+  house's existing (pollster, date) list so the agent needs no shell),
+  runs a headless session in the adjudicator's exact posture
+  (`--exclude-tools shell,write,edit`, no `--yolo`, no git credentials) —
+  the model reads the evidence and its FINAL MESSAGE is the JSON filing,
+  which the workflow redirects into `.build/healer-out/<house>.json` —
+  then `healer.mjs --accept` decides: the house's OWN guard functions
+  (imported from the extractor — RM_LIB/N24_LIB lib modes, never a
+  weakened check), (pollster, date) dedupe, the faithfulness firewall
+  (every figure verbatim AND token-bounded in the fetched text — "152%"
+  never vouches for 52), and for the wiki house the extractor's own
+  MAX_WIKI_ADDS new-wave cap (the healer can't file the overflow the
+  extractor refused). Accepted rows get extractor-parity sidecars and a
+  run proof in `.build/healer-src/*-proof.json`, then the normal
+  validate+build path commits row + proof + SITE_FILES on the review
+  branch — a pre-accept `git checkout` restores the wave-touching data
+  paths to HEAD first, and the push step re-checks the branch doesn't
+  exist yet (a re-run of the same healer run generates the same branch
+  name, so without the check it would re-push the filing). The
+  alert-issue.sh call files the deduped review issue. A merged healer row
+  IS the canonical one (no provisional stamp), which is why it waits on a
+  human — and the fixed extractor dedupes by pollster+date if agent-repair
+  lands first. Pinned
   by `test-healer.mjs`; healer.yml's own watch list is pinned by
   `test-workflows.mjs` and it is NOT in agent-repair's (no repairs of
   repairs).

@@ -18,7 +18,7 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import assert from "node:assert/strict";
-import { gateVerdict, failLinesOf, unfaithfulFields, acceptRun } from "./healer.mjs";
+import { gateVerdict, failLinesOf, unfaithfulFields, acceptRun, readLlmJson } from "./healer.mjs";
 
 const tmp = () => mkdtempSync(join(tmpdir(), "healer-test-"));
 const put = (path, str) => { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, str); };
@@ -267,6 +267,100 @@ const N24_WAVES = [
   const st = await acceptRun("news24", { ...t, srcRoot: t.root });
   assert.equal(st.changed, false);
   assert.match(st.rejected[0].reasons.join(" "), /not future/);
+}
+
+// ------------------------------------- faithfulness wall, boundary anchors
+// A printed form counts only as its own token: "152%" never vouches for
+// 52, "1,512" never for 512, and a digit run's head is not a token either.
+{
+  assert.deepEqual(unfaithfulFields("152% of respondents", [{ name: "alp", value: 52, kind: "pct" }]), ["alp=52"],
+    "a glued-on leading digit does not print the figure");
+  assert.deepEqual(unfaithfulFields("1,512 electors", [{ name: "s", value: 512, kind: "sample" }]), ["s=512"],
+    "a thousands-group is not the tail figure");
+  assert.deepEqual(unfaithfulFields("51,512 electors", [{ name: "s", value: 1512, kind: "sample" }]), ["s=1512"],
+    "nor is a longer comma-grouped number");
+  assert.deepEqual(unfaithfulFields("batch 15125 ran", [{ name: "s", value: 1512, kind: "sample" }]), ["s=1512"],
+    "the head of a longer digit run is not a token");
+  assert.deepEqual(unfaithfulFields("growth of 2.5% year on year", [{ name: "g", value: 5, kind: "pct" }]), ["g=5"],
+    "a decimal is not its fractional tail");
+  assert.deepEqual(unfaithfulFields("a sample of 1,512. ask them", [{ name: "s", value: 1512, kind: "sample" }]), [],
+    "a trailing full stop is still the token");
+}
+
+// --------------------------------------------------------- output parsing
+// readLlmJson is the adjudicator's tolerant extraction: plain JSON parses
+// whole, fences are stripped, prose-wrapped JSON is found, garbage is a
+// loud SyntaxError (never a silent empty verdict).
+{
+  const dir = tmp();
+  const f = (name, text) => { const p = join(dir, name); writeFileSync(p, text); return p; };
+  assert.deepEqual(readLlmJson(f("plain.json", '{"waves":[],"notes":"ok"}\n')), { waves: [], notes: "ok" });
+  assert.deepEqual(readLlmJson(f("fenced.json", "```json\n{\"waves\":[]}\n```\n")), { waves: [] });
+  assert.deepEqual(readLlmJson(f("prose.json", "Here is my filing.\n{\"waves\":[]}\nDone.\n")), { waves: [] });
+  assert.throws(() => readLlmJson(f("garbage.json", "no object here at all")), SyntaxError);
+  assert.throws(() => readLlmJson(f("empty.json", "")), SyntaxError);
+}
+
+// ----------------------------------------- news24 cap: >4 new wiki waves
+// Five new waves in one pass is the same upstream shift the extractor's
+// MAX_WIKI_ADDS=4 guards — the healer refuses LOUDLY (exit 2, not a quiet
+// trim or a partial filing), writing nothing. End-to-end through the CLI.
+{
+  const root = tmp();
+  const rows = [], waves = [];
+  for (let i = 1; i <= 5; i++) {
+    const date = `2026-09-${String(i).padStart(2, "0")}`;
+    const sample = 1500 + i;
+    rows.push(`| ${i} Sep\n| [[YouGov]]\n| ${sample.toLocaleString("en-US")}\n| 34% || 36% || 12% || 13% || 3% || 2% || 51% || 49%`);
+    waves.push({ date, dateStart: date, sample, client: "News24", alp: 34, lnp: 36, grn: 12, onp: 13, ind: 3, oth: 2, tpp_alp: 51, tpp_lnp: 49 });
+  }
+  const wiki = [
+    "==2026==", '{| class="wikitable"',
+    "! Date !! Firm !! Sample !! ALP !! L/NP !! GRN !! ON !! IND !! OTH !! 2PP",
+    "|-", rows.join("\n|-\n"), "|}",
+  ].join("\n");
+  put(join(root, "evidence", "wiki.txt"), wiki + "\n");
+  const pollsPath = join(root, "polls.json");
+  writeFileSync(pollsPath, JSON.stringify({ polls: [] }) + "\n");
+  const outFile = join(root, "out.json");
+  writeFileSync(outFile, JSON.stringify({ waves }));
+  let err = null;
+  try {
+    execFileSync("node", [".build/healer.mjs", "--accept", "--house", "news24",
+      "--out", outFile, "--evidence-dir", join(root, "evidence"), "--polls", pollsPath],
+      { encoding: "utf8", stdio: "pipe" });
+  } catch (e) { err = e; }
+  assert.ok(err, "five new wiki waves in one pass must not land");
+  assert.equal(err.status, 2, "the refusal is loud (exit 2), not a quiet trim");
+  assert.match(String(err.stderr), /wiki healer: 5 new waves > cap 4/);
+  assert.equal(JSON.parse(readFileSync(pollsPath, "utf8")).polls.length, 0, "nothing was written");
+}
+
+// ------------------------------------------------------------- prompts
+// The two agent prompts are part of the chain's correctness: their example
+// JSON teaches the model what a valid wave looks like, so a mis-summed
+// example (the 110-total roymorgan one) teaches mis-sums. And the output
+// contract is stdout-only — no shell one-liners for dedupe (the agent has
+// no shell); the manifest's existingDates carries the filed-date list.
+for (const [file, primaries, tppKeys] of [
+  [".build/healer-prompts/roymorgan.md", ["alp", "lnp", "grn", "onp", "ind"], ["tpp_alp", "tpp_lnp"]],
+  [".build/healer-prompts/news24.md", ["alp", "lnp", "grn", "onp", "ind", "oth"], ["tpp_alp", "tpp_lnp"]],
+]) {
+  const md = readFileSync(file, "utf8");
+  const m = /```json\n([\s\S]*?)\n```/.exec(md);
+  assert.ok(m, `${file}: an example JSON block is present`);
+  const ex = JSON.parse(m[1].replace(/"https:\/\/… or omit"/g, "null"));
+  assert.ok(Array.isArray(ex.waves) && ex.waves.length, `${file}: the example has a wave`);
+  for (const w of ex.waves) {
+    const sum = primaries.reduce((a, k) => a + w[k], 0);
+    assert.ok(Math.abs(sum - 100) < 0.51, `${file}: example primaries sum to 100, got ${sum}`);
+    const [ta, tb] = tppKeys;
+    assert.equal(w[ta] + w[tb], 100, `${file}: example 2PP sums to 100`);
+    if ("lib" in w) assert.equal(w.lib + w.nat, w.lnp, `${file}: example lib+nat = lnp`);
+  }
+  assert.ok(!/node -e/.test(md), `${file}: no shell one-liners (the agent has no shell)`);
+  assert.ok(md.includes("existingDates"), `${file}: the dedupe list comes from the manifest's existingDates`);
+  assert.ok(/no\s+shell/i.test(md), `${file}: states the no-shell tool surface explicitly`);
 }
 
 console.log("test-healer: ok");

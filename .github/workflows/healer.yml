@@ -12,8 +12,11 @@
 #          exists (one filing awaits a human; a second never piles up), and
 #          runs the generic 3-sessions-per-24h circuit breaker.
 #   file   re-fetches the source into .build/healer-src/evidence/, runs a
-#          headless Matilda session that reads it and writes candidate waves
-#          as JSON (no credentials, no commits), then accepts or rejects
+#          headless Matilda session that reads it and prints candidate waves
+#          as its final message — stdout IS the filing, redirected by the
+#          workflow into .build/healer-out/ (the session itself has no
+#          shell/write/edit tools and no git credentials) — then accepts or
+#          rejects
 #          each wave DETERMINISTICALLY (.build/healer.mjs --accept: the
 #          house's own guard functions imported from the extractor, dedupe
 #          against polls.json, every figure verbatim in the evidence text).
@@ -199,6 +202,10 @@ jobs:
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
       # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
+      # The session runs in the adjudicator's exact posture (adjudicate.mjs):
+      # --exclude-tools rather than --yolo, the prompt as the whole input,
+      # stdout as the only output — the model can READ the fetched evidence
+      # and nothing else, so untrusted content in it can touch no data file.
       - name: Read the evidence and propose the wave
         if: steps.evidence.outcome == 'success'
         id: agent
@@ -210,7 +217,13 @@ jobs:
             echo "::warning::MATILDA_API_KEY secret not set; skipping the heal session. Add it in repo Settings > Secrets."
             exit 0
           fi
-          matilda -p "$(cat ".build/healer-prompts/${HOUSE}.md")" --yolo --output-format text --max-wall-time 15m --max-tool-calls 60
+          mkdir -p .build/healer-out
+          matilda -p "$(cat ".build/healer-prompts/${HOUSE}.md")" \
+            --exclude-tools shell,write,edit \
+            --output-format text \
+            --max-wall-time 15m \
+            --max-tool-calls 60 \
+            > ".build/healer-out/${HOUSE}.json"
 
       # The deterministic acceptance gate: house guard functions imported
       # from the extractor + (pollster,date) dedupe + verbatim figures.
@@ -221,6 +234,10 @@ jobs:
         env:
           HEALER_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          # Belt-and-braces before acceptance: the agent session had no
+          # write capability, but if anything still managed to move a path
+          # a healer filing touches, put it back to HEAD first.
+          git checkout -- data/polls.json .build/roymorgan-src .build/news24-src 2>/dev/null || true
           out="$(node .build/healer.mjs --accept --house "$HOUSE")"
           echo "$out"
           status="$(printf '%s\n' "$out" | sed -n 's/^HEALER_STATUS //p' | tail -1)"
@@ -270,6 +287,14 @@ jobs:
           FAILED_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ needs.gate.outputs.failed_run_id }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          # Re-check the branch right at the push: the gate's stand-down
+          # check ran minutes ago, and a re-run of this workflow reuses
+          # this exact branch name — an earlier attempt may already have
+          # pushed the same filing. Never force-push over it.
+          if git ls-remote --heads origin "$BRANCH" | grep -q .; then
+            echo "::notice::${BRANCH} already exists on origin — this filing was already pushed by an earlier attempt; not re-pushing"
+            exit 0
+          fi
           git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
             push origin "HEAD:${BRANCH}"
           COMPARE="https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"

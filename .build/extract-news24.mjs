@@ -122,7 +122,7 @@ const WIKI_TITLE = "Opinion_polling_for_the_next_Australian_federal_election";
 const WIKI_RAW = `https://en.wikipedia.org/w/index.php?title=${WIKI_TITLE}&action=raw`;
 const WIKI_FILE = process.env.N24_WIKI_FILE ?? null;
 const WIKI_DEBUG = !!process.env.N24_WIKI_DEBUG;
-const MAX_WIKI_ADDS = 4; // fortnightly series: >4 new fallback waves in one run = upstream layout shift
+export const MAX_WIKI_ADDS = 4; // fortnightly series: >4 new fallback waves in one run = upstream layout shift
 const NEWS24_FILE = process.env.N24_NEWS24_FILE ?? null;
 // News24's own Pulse topic page lists each release the morning it lands —
 // usually before Wikipedia does — so it is a second discovery source beside
