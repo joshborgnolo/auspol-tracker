@@ -116035,9 +116035,9 @@ function RdHouseLean({
   const bTicks = [];
   for (let v = bStep; v < BM - 1e-9; v += bStep) bTicks.push(+v.toFixed(2));
   const bx = v => (Math.max(-BM, Math.min(BM, v)) + BM) / (2 * BM) * 100;
-  let SM = 1;
+  let SMAX = 1;
   rows.forEach(r => r.s.forEach(d => {
-    SM = Math.max(SM, Math.ceil(Math.abs(d.v) - 0.05));
+    SMAX = Math.max(SMAX, Math.ceil(Math.abs(d.v) - 0.05));
   }));
   const ms = rdApMonths(RD_AP_TERM1);
   const hlFits = rows.map(r => {
@@ -116088,7 +116088,7 @@ function RdHouseLean({
   const rText = two ? (phone ? "" : "To ") + posName + " ▶" : "Higher ▶";
   const SH = phone ? 26 : 44;
   const sx = ym => 6 + ms.indexOf(ym) / (ms.length - 1) * (SW - 14);
-  const sy = v => SH / 2 - Math.max(-SM, Math.min(SM, v)) / SM * (SH / 2 - 3);
+  const sy = v => SH / 2 - Math.max(-SMAX, Math.min(SMAX, v)) / SMAX * (SH / 2 - 3);
   const tStep = Math.max(4, Math.ceil(56 * (ms.length - 1) / Math.max(1, SW - 14)));
   const spark = r => {
     const pts = r.s.filter(d => ms.includes(d.ym));
@@ -116332,7 +116332,7 @@ function RdHouseLean({
     className: "rd-ap-cap"
   }, "Since the election", React.createElement("em", null, React.createElement("span", {
     className: "rd-hl-sep"
-  }, ", "), "each row\u2019s height is ", SM === 1 ? "a point" : SM + " points", " either way")), rdApMonthTicks(ms, tStep).map(t => React.createElement("span", {
+  }, ", "), "each row\u2019s height is ", SMAX === 1 ? "a point" : SMAX + " points", " either way")), rdApMonthTicks(ms, tStep).map(t => React.createElement("span", {
     key: t.ym,
     className: "rd-ap-tk " + t.a,
     style: {

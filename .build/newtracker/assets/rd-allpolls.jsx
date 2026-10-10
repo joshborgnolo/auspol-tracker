@@ -3895,9 +3895,12 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const bTicks = [];
   for (let v = bStep; v < BM - 1e-9; v += bStep) bTicks.push(+v.toFixed(2));
   const bx = (v) => ((Math.max(-BM, Math.min(BM, v)) + BM) / (2 * BM)) * 100;
-  /* each row's line: a point either way, more where the leans run wider */
-  let SM = 1;
-  rows.forEach((r) => r.s.forEach((d) => { SM = Math.max(SM, Math.ceil(Math.abs(d.v) - 0.05)); }));
+  /* each row's line: a point either way, more where the leans run wider.
+     NOT "SM" - that name is the global's smooth/auto scroll behaviour
+     (window.SM), and shadowing it made the reveal effect's scrollTo call
+     throw a ScrollBehavior TypeError wherever the strip overflows */
+  let SMAX = 1;
+  rows.forEach((r) => r.s.forEach((d) => { SMAX = Math.max(SMAX, Math.ceil(Math.abs(d.v) - 0.05)); }));
   const ms = rdApMonths(RD_AP_TERM1);
   /* the Trend-significance fold: has any pollster's lean DRIFTED across the
      months since the election? One straight line per pollster through its
@@ -3935,7 +3938,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const rText = two ? (phone ? "" : "To ") + posName + " ▶" : "Higher ▶";
   const SH = phone ? 26 : 44;
   const sx = (ym) => 6 + (ms.indexOf(ym) / (ms.length - 1)) * (SW - 14);
-  const sy = (v) => SH / 2 - (Math.max(-SM, Math.min(SM, v)) / SM) * (SH / 2 - 3);
+  const sy = (v) => SH / 2 - (Math.max(-SMAX, Math.min(SMAX, v)) / SMAX) * (SH / 2 - 3);
   /* a month tick every four months, as drawn, and further apart where a
      narrow column would run their labels together (about 56px each) */
   const tStep = Math.max(4, Math.ceil((56 * (ms.length - 1)) / Math.max(1, SW - 14)));
@@ -4069,7 +4072,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
           {!phone && <span></span>}
           {!phone && (
             <span className="rd-hl-shead" role="columnheader" ref={boxRef}>
-              <span className="rd-ap-cap">Since the election<em><span className="rd-hl-sep">, </span>each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
+              <span className="rd-ap-cap">Since the election<em><span className="rd-hl-sep">, </span>each row’s height is {SMAX === 1 ? "a point" : SMAX + " points"} either way</em></span>
               {rdApMonthTicks(ms, tStep).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
             </span>
           )}
