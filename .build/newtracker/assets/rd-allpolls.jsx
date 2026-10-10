@@ -129,7 +129,11 @@ function rdApOut(stamp) {
    issuesOnlyPolls, so the habit look-back scans it too. One rule for the
    header and the table's Sample column, so they agree. */
 function rdEffTbc(p) {
-  if (p.sampleEff != null || !p.published) return false;
+  // confidence releases print their sample ON the release; an effective
+  // sample isn't a confidence concept, and the habit look-back scans the
+  // POLL houses ('Roy Morgan' the confidence lane borrowing Roy Morgan
+  // the poll house's filing habit shows why p.conf must bail first)
+  if (p.conf || p.sampleEff != null || !p.published) return false;
   if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
   const since = Date.parse(p.released) - 90 * 86400000;
   const A = window.AUSPOL;

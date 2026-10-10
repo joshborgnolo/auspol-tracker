@@ -2556,6 +2556,12 @@ const confidenceOnlyPolls = (() => {
       out.push({
         ym, x: mx(ym) + (dayOf(r.date) - 15) / 365, day: dayOf(r.date),
         pollster: by, field, dateLabel: field, released: r.date,
+        // the release date IS these waves' publication date (the extractor
+        // stamps a date, never a clock time — the date-only Ipsos precedent);
+        // the header sentence and the row cell's "released X" sub both read
+        // p.published, so without this key a confidence release never said
+        // when it came out
+        published: r.date,
         sample: r.n ?? sample,
         ...(r.fwStart ? { fmid: fmidIso(r.fwStart, r.fwEnd || r.date) } : {}),
         // the field cell prints the survey month (business lane) — the
