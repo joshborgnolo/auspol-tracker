@@ -2295,10 +2295,15 @@ const CHG_MEASURES = {
   /* RedBridge/Accent's cohort forced-choice figures, one measure each: the
      Labor share when Coalition voters are pressed into Labor-v-One Nation
      (tpp_split_on.lnp) and when One Nation voters are pressed Labor-v-the
-     Coalition (tpp_split.onp). One house prints them, so each series is
-     that house's own and the delta keys to its previous wave. */
+     Coalition (tpp_split.onp), plus the Greens/other cohorts on both
+     questions. One house prints them, so each series is that house's own
+     and the delta keys to its previous wave. */
   splitCoal: (p) => (p.tpp_split_on && p.tpp_split_on.lnp != null ? p.tpp_split_on.lnp : null),
   splitOnp:  (p) => (p.tpp_split && p.tpp_split.onp != null ? p.tpp_split.onp : null),
+  splitGrn:   (p) => (p.tpp_split && p.tpp_split.grn != null ? p.tpp_split.grn : null),
+  splitGrnOn: (p) => (p.tpp_split_on && p.tpp_split_on.grn != null ? p.tpp_split_on.grn : null),
+  splitOth:   (p) => (p.tpp_split && p.tpp_split.oth != null ? p.tpp_split.oth : null),
+  splitOthOn: (p) => (p.tpp_split_on && p.tpp_split_on.oth != null ? p.tpp_split_on.oth : null),
   // every implied-eligible wave's own implied figure – its primaries read
   // through the fixed 2025 flow table (the same number the detail shows as
   // alpImp). The series the implied-basis "Since last wave" moves key to,
@@ -2996,14 +3001,19 @@ const individualPolls = POLLS.map((p) => {
     /* RedBridge/Accent's cohort forced-choice figures (absent-not-zero):
        the Labor share when Coalition voters are pressed into Labor-v-One
        Nation (tpp_split_on.lnp) and when One Nation voters are pressed
-       Labor-v-the Coalition (tpp_split.onp) – the same fields the "When
-       pressed, where do their voters go?" panel charts; the archive detail
-       lists them in after-preferences, and Jun 2026's press-only Coalition
-       figure carries splitCoalEst. */
+       Labor-v-the Coalition (tpp_split.onp), plus the Greens/other
+       cohorts on both questions – the Coalition/One Nation pair are the
+       same fields the "When pressed, where do their voters go?" panel
+       charts; the archive detail lists them all in after-preferences, and
+       Jun 2026's press-only Coalition figure carries splitCoalEst. */
     ...(p.tpp_split_on && p.tpp_split_on.lnp != null
       ? { splitCoal: p.tpp_split_on.lnp, ...(HAND_SPLIT_ON.has(p.date) ? { splitCoalEst: true } : {}) }
       : {}),
     ...(p.tpp_split && p.tpp_split.onp != null ? { splitOnp: p.tpp_split.onp } : {}),
+    ...(p.tpp_split && p.tpp_split.grn != null ? { splitGrn: p.tpp_split.grn } : {}),
+    ...(p.tpp_split_on && p.tpp_split_on.grn != null ? { splitGrnOn: p.tpp_split_on.grn } : {}),
+    ...(p.tpp_split && p.tpp_split.oth != null ? { splitOth: p.tpp_split.oth } : {}),
+    ...(p.tpp_split_on && p.tpp_split_on.oth != null ? { splitOthOn: p.tpp_split_on.oth } : {}),
     // this poll's pull on the standing aggregates (leave-one-out, §3b) –
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
@@ -3250,6 +3260,10 @@ const pollsterTable = [...perHouse.values()].map((p) => {
       ? { splitCoal: p.tpp_split_on.lnp, ...(HAND_SPLIT_ON.has(p.date) ? { splitCoalEst: true } : {}) }
       : {}),
     ...(p.tpp_split && p.tpp_split.onp != null ? { splitOnp: p.tpp_split.onp } : {}),
+    ...(p.tpp_split && p.tpp_split.grn != null ? { splitGrn: p.tpp_split.grn } : {}),
+    ...(p.tpp_split_on && p.tpp_split_on.grn != null ? { splitGrnOn: p.tpp_split_on.grn } : {}),
+    ...(p.tpp_split && p.tpp_split.oth != null ? { splitOth: p.tpp_split.oth } : {}),
+    ...(p.tpp_split_on && p.tpp_split_on.oth != null ? { splitOthOn: p.tpp_split_on.oth } : {}),
     // this poll's own primaries implied at the fixed 2025 flows (same
     // impShow display rule as the archive emitter above) – the implied
     // line's default basis

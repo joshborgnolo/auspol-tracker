@@ -1465,6 +1465,24 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
               <span className="rd-apd-k">One Nation voters, if forced to choose</span>
               {cols.map((k) => <span key={k.id}>{k.id === "lnp" ? <>{pair(rdApNum(p.splitOnp), rdApNum(100 - p.splitOnp), "var(--lnp-text)")} {chg(c.splitOnp, 0)}</> : none}</span>)}
             </>}
+            {/* Greens and other cohorts were pressed on BOTH questions, so
+                their rows carry a figure in each column */}
+            {(p.splitGrnOn != null || p.splitGrn != null) && <>
+              <span className="rd-apd-k">Greens voters, if forced to choose</span>
+              {cols.map((k) => <span key={k.id}>{k.id === "onp" && p.splitGrnOn != null
+                ? <>{pair(rdApNum(p.splitGrnOn), rdApNum(100 - p.splitGrnOn), "var(--onp-text)")} {chg(c.splitGrnOn, 0)}</>
+                : k.id === "lnp" && p.splitGrn != null
+                ? <>{pair(rdApNum(p.splitGrn), rdApNum(100 - p.splitGrn), "var(--lnp-text)")} {chg(c.splitGrn, 0)}</>
+                : none}</span>)}
+            </>}
+            {(p.splitOthOn != null || p.splitOth != null) && <>
+              <span className="rd-apd-k">Other voters, if forced to choose</span>
+              {cols.map((k) => <span key={k.id}>{k.id === "onp" && p.splitOthOn != null
+                ? <>{pair(rdApNum(p.splitOthOn), rdApNum(100 - p.splitOthOn), "var(--onp-text)")} {chg(c.splitOthOn, 0)}</>
+                : k.id === "lnp" && p.splitOth != null
+                ? <>{pair(rdApNum(p.splitOth), rdApNum(100 - p.splitOth), "var(--lnp-text)")} {chg(c.splitOth, 0)}</>
+                : none}</span>)}
+            </>}
             {(ppmBy.onp || ppmBy.lnp) && <>
               <span className="rd-apd-k">{window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"}</span>
               {cols.map((k) => <span key={k.id}>{ppmBy[k.id] || none}</span>)}

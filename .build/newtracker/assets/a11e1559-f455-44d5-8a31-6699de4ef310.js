@@ -3207,6 +3207,61 @@ function tppLines(cs, r) {
         ],
       } });
     }
+    /* the Greens and other cohorts were pressed on BOTH questions (the
+       Coalition cohort only Labor-v-One Nation, the One Nation cohort only
+       Labor-v-the Coalition), so each carries two lines here */
+    if (c.kind === "2pp" && r.splitGrn != null) {
+      const dGrn = segDelta(r.chg, "splitGrn");
+      out.push({ alt: true, note: (
+        <>Greens voters, if forced to choose: Labor v the Coalition</>
+      ), c: {
+        kind: "split", lab: "forced, Greens voters, ALP v L/NP", flag: null,
+        segs: [
+          { label: "ALP", value: r.splitGrn, color: PARTY_C.alp, delta: dGrn },
+          { label: "L/NP", value: Math.round((100 - r.splitGrn) * 10) / 10, color: PARTY_C.lnp,
+                            delta: dGrn ? { v: +(-dGrn.v).toFixed(1), refDate: dGrn.refDate } : null },
+        ],
+      } });
+    }
+    if (c.kind === "2pp" && r.splitGrnOn != null) {
+      const dGrnOn = segDelta(r.chg, "splitGrnOn");
+      out.push({ alt: true, note: (
+        <>Greens voters, if forced to choose: Labor v One Nation</>
+      ), c: {
+        kind: "split", lab: "forced, Greens voters, ALP v ON", flag: null,
+        segs: [
+          { label: "ALP", value: r.splitGrnOn, color: PARTY_C.alp, delta: dGrnOn },
+          { label: "ON", value: Math.round((100 - r.splitGrnOn) * 10) / 10, color: PARTY_C.onp,
+                            delta: dGrnOn ? { v: +(-dGrnOn.v).toFixed(1), refDate: dGrnOn.refDate } : null },
+        ],
+      } });
+    }
+    if (c.kind === "2pp" && r.splitOth != null) {
+      const dOth = segDelta(r.chg, "splitOth");
+      out.push({ alt: true, note: (
+        <>Other voters, if forced to choose: Labor v the Coalition</>
+      ), c: {
+        kind: "split", lab: "forced, Other voters, ALP v L/NP", flag: null,
+        segs: [
+          { label: "ALP", value: r.splitOth, color: PARTY_C.alp, delta: dOth },
+          { label: "L/NP", value: Math.round((100 - r.splitOth) * 10) / 10, color: PARTY_C.lnp,
+                            delta: dOth ? { v: +(-dOth.v).toFixed(1), refDate: dOth.refDate } : null },
+        ],
+      } });
+    }
+    if (c.kind === "2pp" && r.splitOthOn != null) {
+      const dOthOn = segDelta(r.chg, "splitOthOn");
+      out.push({ alt: true, note: (
+        <>Other voters, if forced to choose: Labor v One Nation</>
+      ), c: {
+        kind: "split", lab: "forced, Other voters, ALP v ON", flag: null,
+        segs: [
+          { label: "ALP", value: r.splitOthOn, color: PARTY_C.alp, delta: dOthOn },
+          { label: "ON", value: Math.round((100 - r.splitOthOn) * 10) / 10, color: PARTY_C.onp,
+                            delta: dOthOn ? { v: +(-dOthOn.v).toFixed(1), refDate: dOthOn.refDate } : null },
+        ],
+      } });
+    }
   }
   return out.map((x) => ({ ...x, count: out.length }));
 }

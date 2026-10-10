@@ -12,9 +12,11 @@
    this poll in All polls" (never a wave-report link), a mouse click or Enter
    opens the poll row in All polls, and the wave's forced-choice figures sit
    in the opened poll's ledger: the archive drawer's matchup grid carries a
-   "Coalition voters, if forced to choose" / "One Nation voters, if forced to
-   choose" row each (RdApDetail), with the June wave's combined-rows note
-   under the grid.
+   "<Cohort> voters, if forced to choose" row per cohort — Coalition and
+   One Nation (one column each) plus Greens and Other (both columns) —
+   (RdApDetail), with the June wave's combined-rows note under the grid.
+   The Latest-tab poll detail carries the same figures as "forced, <cohort>
+   voters, ALP v …" ledger lines (tppLines).
 */
 import puppeteer from "puppeteer-core";
 import path from "path";
@@ -245,6 +247,12 @@ check(viewH === 230, `desktop: plot height 230 (${viewH})`);
     `ledger: Coalition-voters forced row 41 – 59 (▲ 9) in the v-One-Nation column (${JSON.stringify(coalRow)})`);
   check(!!onpRow && onpRow.cells.some((t) => t.includes("15") && t.includes("85") && t.includes("▼ 2")),
     `ledger: One-Nation-voters forced row 15 – 85 (▼ 2) in the v-Coalition column (${JSON.stringify(onpRow)})`);
+  const grnRow = land && land.forced.find((x) => x.key === "Greens voters, if forced to choose");
+  const othRow = land && land.forced.find((x) => x.key === "Other voters, if forced to choose");
+  check(!!grnRow && grnRow.cells.some((t) => t.includes("90 – 10") && t.includes("0")) && grnRow.cells.some((t) => t.includes("82 – 18") && t.includes("▲ 4")),
+    `ledger: Greens-voters forced row 90 – 10 v ON and 82 – 18 (▲ 4) v Coalition (${JSON.stringify(grnRow)})`);
+  check(!!othRow && othRow.cells.some((t) => t.includes("57 – 43") && t.includes("▼ 2")) && othRow.cells.some((t) => t.includes("50 – 50")),
+    `ledger: Other-voters forced row 57 – 43 (▼ 2) v ON and 50 – 50 v Coalition (${JSON.stringify(othRow)})`);
   check(!!land && land.estNote.every((n) => !n.includes("combined row was printed")),
     `ledger: no combined-rows note on a printed wave (${JSON.stringify(land && land.estNote)})`);
 }
@@ -275,8 +283,8 @@ check(viewH === 230, `desktop: plot height 230 (${viewH})`);
       return { keys, estNote, coalCell: cell };
     });
   } catch (e) { /* jun stays null */ }
-  check(!!jun && jun.keys.includes("Coalition voters, if forced to choose"),
-    `June wave drawer: Coalition-voters forced row present (${JSON.stringify(jun && jun.keys)})`);
+  check(!!jun && ["Coalition", "One Nation", "Greens", "Other"].every((c) => jun.keys.includes(`${c} voters, if forced to choose`)),
+    `June wave drawer: all four cohort forced rows present (${JSON.stringify(jun && jun.keys)})`);
   check(!!jun && Array.isArray(jun.coalCell) && jun.coalCell.some((t) => t.includes("36") && t.includes("64") && t.includes("▲ 4")),
     `June wave drawer: forced split 36 – 64 (▲ 4) rides the v-One-Nation column (${JSON.stringify(jun && jun.coalCell)})`);
   check(!!jun && jun.estNote.some((n) => n.includes("combined row was printed") && n.includes("CLP/LNP/Nat")),
