@@ -140,3 +140,13 @@ rd-panels.jsx for the live copy; touch the legacy block only if the change
 is explicitly meant for the old design too. Verify the rebuilt
 `index.html` carries the compiled template by grepping it for
 `Net mood` (ASCII — no babel-escape trap).
+
+## The since-May-2025 clause's gate (2026-10-11)
+
+The clause ("…, though it is down more than 30 points since May 2025")
+needs |net now − net first| ≥ 5 AND past hypot(netCi(now), netCi(first)),
+netCi = rightCi + wrongCi (a net's margin is at most its two shares'
+margins added, the shares of one sample moving against each other). May
+2025 rests on one poll (±3.5 each side), so a move under ~8 points since
+then is no longer claimed. Today's 34-point fall renders unchanged.
+Pinned by .matilda/probe/sig-gates.mjs.

@@ -1668,6 +1668,22 @@ const ppmMarginNow = currentReading(ppm.filter((p) => p.alb != null && p.opp != 
 const ppmHMarginNow = currentReading(D.ppmHeadToHead.filter((r) => r.alb != null && r.han != null)
   .map((r) => ({ firm: r.firm, mid: midMs({ date: r.date }), x: r.alb - r.han, n: ppmN(r),
                  pq: Math.max(0, 100 * (r.alb + r.han) - (r.alb - r.han) ** 2) })), null, SPARSE_K);
+/* Both leads for the Leadership panel's head, which says "leads" only where
+   the lead clears its own margin: each poll's lead pooled, its variance the
+   difference of two shares of ONE sample (the shares move against each
+   other, so the lead's margin is wider than the two shares' margins
+   combined would suggest). The opposition lead is the TWO-WAY question's
+   only, as the panel's bars and leaderNow.alb_pref are: ppmMarginNow above
+   pools three-way readings too (Albanese 31, Taylor 15 when Hanson is
+   offered), a different contest that read +9.6 against the two-way +2 in
+   Oct 2026. The Hanson lead is its own head-to-head pool, two-way already. */
+const ppm2MarginNow = currentReading(ppm.filter((p) => p.han == null && p.alb != null && p.opp != null && eraOf(p.date) === "taylor" && curOf("alb")(p))
+  .map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: p.alb - p.opp, n: ppmN(p),
+                 pq: Math.max(0, 100 * (p.alb + p.opp) - (p.alb - p.opp) ** 2) })), null, SPARSE_K);
+const leaderLead = {
+  taylor: ppm2MarginNow ? { v: ppm2MarginNow.v, ci95: ppm2MarginNow.ci95 } : null,
+  hanson: ppmHMarginNow ? { v: ppmHMarginNow.v, ci95: ppmHMarginNow.ci95 } : null,
+};
 
 /* A card's house credit-list names only houses still ASKING the question:
    anyone with a reading in the six months before the series' own newest.
@@ -6095,6 +6111,7 @@ window.AUSPOL = (function () {
   /* Current readings (gen-data currentReading): the leaders' nets and
      preferred PM, and the national direction – nowcasts, as the headline. */
   const leaderNow = ${JSON.stringify(leaderNow)};
+  const leaderLead = ${JSON.stringify(leaderLead)};
   const directionNow = ${JSON.stringify(directionNow)};
   /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
@@ -6199,7 +6216,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

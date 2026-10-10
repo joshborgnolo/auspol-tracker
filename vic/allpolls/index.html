@@ -11327,6 +11327,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "changeSig": false
     }
   };
+  const leaderLead = {
+    "taylor": null,
+    "hanson": null
+  };
   const directionNow = null;
   const demographics = null;
   const demoTrend = null;
@@ -19314,6 +19318,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     confidenceOnlyPolls,
     directionNow,
     leaderNow,
+    leaderLead,
     undecided,
     confidence,
     confHistory,
@@ -41144,10 +41149,11 @@ function RdHero(p) {
       co0 = coBy[f.ym].a,
       co1 = coBy[l.ym].a;
     const gap = on1 - co1;
-    const head = Math.abs(gap) < 1 ? "One Nation now runs Labor as close as the Coalition does" : gap < 0 ? "One Nation now runs Labor closer than the Coalition does" : "The Coalition still runs Labor closer than One Nation does";
+    const gapCi = Math.hypot(l.ci95 || 0, coBy[l.ym].ci95 || 0);
+    const head = Math.abs(gap) < 1 || Math.abs(gap) <= gapCi ? "One Nation now runs Labor as close as the Coalition does" : gap < 0 ? "One Nation now runs Labor closer than the Coalition does" : "The Coalition still runs Labor closer than One Nation does";
     const verb = (a, b) => b < a ? a - b >= 10 ? "plunged" : "fallen" : "risen";
     const pc = v => Math.round(v) + "%";
-    let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + " now; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
+    let dek = "Labor’s 2PP against One Nation has " + (Math.round(on0) === Math.round(on1) ? "held near " + pc(on1) + " since " + rdMonthYear(f.ym) : verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + " now") + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
     let k = both.length - 1,
       worst = Math.abs(gap);
     while (k > 0) {
@@ -41778,7 +41784,7 @@ function RdPrimary({
       head = rdPartyStart(top.id) + (G ? " leads among " + sel.who : " leads the primary vote");
       dek = (G ? "Among " + sel.who + ", " + rdPartyIn(top.id) : rdPartyStart(top.id)) + " leads on " + pc(top.v) + ", " + (top.v - parts[1].v).toFixed(1) + " points clear of " + rdPartyIn(parts[1].id) + " on " + pc(parts[1].v) + ".";
     }
-    const fallers = parts.slice(k).filter(p => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15).sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
+    const fallers = parts.slice(k).filter(p => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15 && p.was - p.v > (p.ci || 0)).sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
     if (fallers.length) {
       const f = fallers[0];
       dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost " + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + " election-night vote.";
@@ -42338,6 +42344,18 @@ function RdLeadership({
   const signed = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   const signed0 = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v));
   const get = k => N[k] ? N[k].v : null;
+  const leadTest = (L, ka, kb) => {
+    if (L) return Math.abs(L.v) > L.ci95;
+    const A = N[ka],
+      B = N[kb];
+    if (!A || !B) return false;
+    if (A.se == null || B.se == null) return Math.abs(A.v - B.v) >= 4;
+    const pa = A.v / 100,
+      pb = B.v / 100,
+      rho = Math.sqrt(pa * pb / ((1 - pa) * (1 - pb)));
+    return Math.abs(A.v - B.v) > 1.96 * Math.sqrt(A.se ** 2 + B.se ** 2 + 2 * rho * A.se * B.se);
+  };
+  const LL = D.leaderLead || {};
   const story = J ? (() => {
     const a = get("alb_pref"),
       o = get("taylor_pref");
@@ -42345,8 +42363,15 @@ function RdLeadership({
     if ((a == null || o == null) && !t3) return null;
     const two = a != null && o != null;
     const top = two ? a >= o ? pm : opp : t3[0][0];
-    const head = top.short + " leads as preferred " + J.office.alb;
-    let dek = two ? "Head to head, " + top.short + " leads " + (top === pm ? opp : pm).short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + "." : "Asked to choose from all three, " + t3.map(([Ld, v], i) => (i === 0 ? "" : i === t3.length - 1 ? " and " : ", ") + Ld.short + " has " + r1(v) + "%").join("") + ".";
+    const K3 = {
+      [pm.id]: "alb_pref3",
+      [opp.id]: "taylor_pref3",
+      [han.id]: "hanson_pref3"
+    };
+    const sig = two ? leadTest(null, "alb_pref", "taylor_pref") : leadTest(null, K3[t3[0][0].id], K3[t3[1][0].id]);
+    const second = two ? top === pm ? opp : pm : t3[1][0];
+    const head = sig ? top.short + " leads as preferred " + J.office.alb : top.short + " and " + second.short + " are level as preferred " + J.office.alb;
+    let dek = two ? "Head to head, " + top.short + (sig ? " leads " + second.short + " " : " and " + second.short + " are level, ") + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + "." : "Asked to choose from all three, " + t3.map(([Ld, v], i) => (i === 0 ? "" : i === t3.length - 1 ? " and " : ", ") + Ld.short + " has " + r1(v) + "%").join("") + ".";
     const prev = LM.slice().reverse().find(r => r.lead_taylor != null && r.alb_who && r.alb_who !== pm.short);
     if (prev) {
       const pl = prev.lead_taylor;
@@ -42364,17 +42389,23 @@ function RdLeadership({
     const net = get("alb_net");
     const first = LM.find(r => r.alb_net != null);
     if (a == null || o == null || net == null || !first) return null;
+    const oppSig = leadTest(LL.taylor, "alb_pref", "taylor_pref");
+    const leads = a > o,
+      lead = a - o;
     const fall = first.alb_net - net;
-    const leads = a > o;
+    const fallSig = Math.abs(fall) >= 10 && Math.abs(fall) > Math.hypot(N.alb_net ? N.alb_net.ci95 || 0 : 0, first.alb_netCi || 0);
     const round5 = v => Math.round(v / 5) * 5;
-    const head = (leads ? pm.short + " still leads as preferred PM" : opp.short + " leads as preferred PM") + (Math.abs(fall) >= 10 ? ", but his net approval has " + (fall > 0 ? "fallen " : "risen ") + round5(Math.abs(fall)) + " points" : "");
+    const moved = (fall > 0 ? "fallen " : "risen ") + round5(Math.abs(fall)) + " points";
+    const head = !oppSig ? pm.short + " and " + opp.short + " are level as preferred PM" + (fallSig ? ", and " + pm.short + "’s net approval has " + moved : "") : leads ? pm.short + " still leads as preferred PM" + (fallSig ? ", but his net approval has " + moved : "") : opp.short + " leads as preferred PM" + (fallSig ? ", and " + pm.short + "’s net approval has " + moved : "");
     const leyRows = LM.filter(r => r.alb_pref != null && r.ley_pref != null);
     const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + r.alb_pref - r.ley_pref, 0) / leyRows.length : null;
     const hanLead = aH != null && h != null ? aH - h : null;
+    const hanSig = hanLead != null && leadTest(LL.hanson, "alb_prefH", "hanson_prefH");
     const hanRows = LM.filter(r => r.alb_prefH != null && r.hanson_prefH != null);
-    const hanSteady = hanLead != null && hanRows.length > 0 && Math.abs(hanLead - (hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= 4;
-    let dek = leyLead != null && leads && leyLead - (a - o) >= 4 ? "His lead over the opposition leader has narrowed from " + signed0(leyLead) + " under Ley to " + signed0(a - o) + " under " + opp.short + "." : (leads ? "He leads " : "He trails ") + opp.short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + " head to head.";
-    if (hanLead != null && hanLead > 0) dek += " Over " + han.short + (hanLead > a - o ? " his lead is greater (" : " he leads by ") + signed0(hanLead) + (hanLead > a - o ? ")" : " points") + (hanSteady ? ", and has held steady since it was first measured." : ".");
+    const hanSteady = hanLead != null && hanRows.length > 0 && Math.abs(hanLead - (hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= (LL.hanson ? LL.hanson.ci95 : 4);
+    const narrowed = leyLead != null && leads && leyLead - lead > (LL.taylor ? LL.taylor.ci95 : 4);
+    let dek = narrowed ? (oppSig ? "His" : pm.short + "’s") + " lead over the opposition leader has narrowed from " + signed0(leyLead) + " under Ley to " + signed0(lead) + " under " + opp.short + (oppSig ? "." : ", inside the margin of error.") : !oppSig ? "He and " + opp.short + " are level head to head, " + r1(a) + "–" + r1(o) + "." : (leads ? "He leads " : "He trails ") + opp.short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + " head to head.";
+    if (hanLead != null && !hanSig) dek += " Head to head with " + han.short + ", the two are level.";else if (hanLead != null && hanLead > 0) dek += " Over " + han.short + (oppSig && hanLead > lead ? " his lead is greater (" + signed0(hanLead) + ")" + (hanSteady ? ", and has held steady since it was first measured." : ".") : " he leads by " + r1(hanLead) + " points" + (hanSteady ? ", a lead that has held steady since it was first measured." : "."));else if (hanLead != null) dek += " " + han.short + " leads him by " + r1(-hanLead) + " points head to head.";
     return {
       head,
       dek
@@ -43611,10 +43642,12 @@ function RdDirection({
   const head = plainShare(big) + " say Australia is " + (wrongLeads ? "on the wrong track" : "heading in the right direction") + (most ? ", the most this term" : "");
   const first = M[0];
   const sinceFirst = now.net - first.net;
+  const netCi = r => (r.rightCi || 0) + (r.wrongCi || 0);
+  const sinceSaid = Math.abs(sinceFirst) >= 5 && Math.abs(sinceFirst) > Math.hypot(netCi(now), netCi(first));
   const netVerb = (n, up) => n >= 10 ? up ? "soared" : "plummeted" : n >= 6 ? up ? "lifted" : "soured" : up ? "lifted slightly" : "soured slightly";
   const netWord = d => d > 0 ? "improved" : "worsened";
   const upDown = d => d > 0 ? "up " : "down ";
-  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say we’re " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + (now.chg == null ? "" : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month" : "Net mood has held steady for a month") + (Math.abs(sinceFirst) >= 5 ? now.chg == null ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025." : now.changeSig ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since May 2025." : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025." : ".");
+  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say we’re " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + (now.chg == null ? "" : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month" : "Net mood has held steady for a month") + (sinceSaid ? now.chg == null ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025." : now.changeSig ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since May 2025." : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025." : ".");
   const signedP = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   const dots = (D.directionPolls || []).filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap(d => [{
     x: d.x,
@@ -45704,7 +45737,9 @@ function RdSwitching({
   const nm = c => c.id === "lnp" ? "Coalition" : "Labor";
   const head = hiC ? rdCap(plainShare(hiC.rate)) + " 2025 " + nm(hiC) + " voters now back One Nation" : null;
   const gainOf = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters voted for " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025." : "";
-  const dek = !hiC || !loC ? null : nm(hiC) + " voters have flocked to One Nation at about " + Math.round(hiC.rate / loC.rate * 4) / 4 + " times the rate of " + nm(loC) + " voters. " + gainOf;
+  const ratioQ = hiC && loC ? Math.round(hiC.rate / loC.rate * 4) / 4 : null;
+  const ratesApart = hiC && loC && hiC.rate - loC.rate > Math.hypot(hiC.rateCi || 0, loC.rateCi || 0);
+  const dek = !hiC || !loC ? null : (!ratesApart ? "Coalition and Labor voters have moved to One Nation at much the same rate. " : ratioQ < 1.25 ? nm(hiC) + " voters have moved to One Nation faster than " + nm(loC) + " voters. " : nm(hiC) + " voters have flocked to One Nation at about " + ratioQ + " times the rate of " + nm(loC) + " voters. ") + gainOf;
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const firstX = Math.min(...cols.map(c => c.sr.rate.monthly[0].x));
   const x0 = Math.max(rangeLo, firstX - 0.075),
@@ -46604,9 +46639,16 @@ function RdIssues({
     const firstOf = cells => gtab.issues.slice().sort((a, b) => ((cells[b] || {}).v || 0) - ((cells[a] || {}).v || 0));
     const allRank = firstOf(Object.fromEntries(gtab.issues.map(k => [k, allOf(k) || {}])));
     const ranks = gtab.groups.map(g => firstOf(gtab.cells[g] || {}));
-    const sameFirst = ranks.every(r => r[0] === allRank[0]);
-    const first = ISS_PHRASE[allRank[0]] || allRank[0];
+    const X = allRank[0];
+    const sameFirst = ranks.every(r => r[0] === X);
+    const behind = gtab.groups.some(g => {
+      const cells = gtab.cells[g] || {},
+        cx = cells[X];
+      return !!cx && gtab.issues.some(k => k !== X && cells[k] && cells[k].v - cx.v > Math.hypot(cells[k].ci, cx.ci));
+    });
+    const first = ISS_PHRASE[X] || X;
     if (sameFirst) return rdCap(first) + " comes first for everyone.";
+    if (!behind) return rdCap(first) + " comes first, or level first, for everyone.";
     return rdCap(first) + " comes first for most voters, but not all.";
   })();
   const newestPoll = G && G.newest ? D.individualPolls.find(q => /^RedBridge/.test(q.pollster) && q.released === G.newest) : null;
@@ -47387,8 +47429,16 @@ function RdUndecided({
     const gapSig = apart(young, old);
     const anyChg = rows.filter(r => r.sig);
     const note = "Resolve doesn’t publish how many people it asked in each age group, so each group is weighted by its share of adults (2021 Census). " + (gapSig ? "The gap between 18–34s and over-55s is significant; " : "The gap between 18–34s and over-55s is not significant; ") + (anyChg.length ? rdList(anyChg.map(r => r.label + "s")) + "’ change is significant." : "no group’s change is.");
-    const least = rows.slice().sort((a, b) => b.now - a.now)[0];
-    const sub = least.id === "18-34" && gapSig ? "Young voters are the least firm" : least.id === "55+" && gapSig ? "Older voters are the least firm" : "No age group is clearly less firm than the others";
+    const AGE_WHO = {
+      "18-34": "young voters",
+      "35-54": "middle-aged voters",
+      "55+": "older voters"
+    };
+    const byLoose = rows.slice().sort((a, b) => b.now - a.now);
+    const least = byLoose[0],
+      firmest = byLoose[byLoose.length - 1];
+    const leastApart = byLoose.slice(1).every(r => apart(A.now[least.id], A.now[r.id]));
+    const sub = leastApart ? rdCap(AGE_WHO[least.id]) + " are the least firm" : apart(A.now[least.id], A.now[firmest.id]) ? rdCap(AGE_WHO[least.id]) + " are less firm than " + AGE_WHO[firmest.id] : "No age group is clearly less firm than the others";
     const rolled = A.waves.map((w, i) => {
       const ws = A.waves.slice(Math.max(0, i - A.pool + 1), i + 1);
       const r = {

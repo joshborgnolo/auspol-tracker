@@ -434,13 +434,17 @@ function RdHero(p) {
     const f = both[0], l = both[both.length - 1];
     const on0 = f.a, on1 = l.a, co0 = coBy[f.ym].a, co1 = coBy[l.ym].a;
     const gap = on1 - co1;
-    const head = Math.abs(gap) < 1 ? "One Nation now runs Labor as close as the Coalition does"
+    /* "closer" only when the gap clears both contests' margins combined -
+       conservative, as the two share their polls - and never inside a point */
+    const gapCi = Math.hypot(l.ci95 || 0, coBy[l.ym].ci95 || 0);
+    const head = Math.abs(gap) < 1 || Math.abs(gap) <= gapCi ? "One Nation now runs Labor as close as the Coalition does"
       : gap < 0 ? "One Nation now runs Labor closer than the Coalition does"
       : "The Coalition still runs Labor closer than One Nation does";
     const verb = (a, b) => (b < a ? (a - b >= 10 ? "plunged" : "fallen") : "risen");
     const pc = (v) => Math.round(v) + "%";
-    let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym)
-      + " to " + pc(on1) + " now; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
+    let dek = "Labor’s 2PP against One Nation has " + (Math.round(on0) === Math.round(on1) ? "held near " + pc(on1) + " since " + rdMonthYear(f.ym)
+      : verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + " now")
+      + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
     /* the longest recent run the two have stayed close */
     let k = both.length - 1, worst = Math.abs(gap);
     while (k > 0) {

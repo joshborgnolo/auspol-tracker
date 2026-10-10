@@ -157,3 +157,14 @@ times out), and overlap asserts need both axes (phone stacks the cousins).
   (above). Probe: `.matilda/probe-decidedness.mjs` (scratch) serves the
   repo, asserts heading === "Decidedness" and the party view's `.rd-sub`
   head matches the expected sentence, and fails on stale "mid-2025".
+
+## By-age sub's gate (2026-10-11)
+
+"<Group> are the least firm" needs the softest group apart (gap past
+hypot of the two ci95s) from BOTH others; it used to test only 18–34 v
+55+, so a softest 35–54 always read "No age group is clearly less firm"
+even when it stood clear. Failing "apart from both", the clear pair is
+said ("Young voters are less firm than older voters"); failing that, the
+old no-difference line. Names: young / middle-aged / older voters. Today
+(33.3 / 28.7 / 19.7) renders "Young voters are the least firm",
+unchanged. Pinned by .matilda/probe/sig-gates.mjs.

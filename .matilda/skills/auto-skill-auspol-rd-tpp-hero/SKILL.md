@@ -248,3 +248,14 @@ dashed series path. Drive matchups by clicking `section.rd-tpp
 button.rd-chip` by visible text ("Labor v Coalition" / "Labor v One
 Nation"); read the current matchup from `.rd-tpp-side.rd-b .rd-tpp-name`;
 wait ~900ms per pill click (matchup morph ~320ms).
+
+## The chart finding's "closer" gate (2026-10-11)
+
+"One Nation now runs Labor closer than the Coalition does" (or the
+reverse) needs the latest month's gap between the two contests to clear
+1 point AND hypot of the two months' ci95s; inside that it reads "as
+close as". The hypot is conservative: the two contests share their polls,
+so their gap's true margin is narrower; a sharper test would pool each
+poll's own gap in gen-data. The dek's verb no longer says "risen" for an
+unchanged figure ("has held near 51% since …"). Pinned by
+.matilda/probe/sig-gates.mjs.

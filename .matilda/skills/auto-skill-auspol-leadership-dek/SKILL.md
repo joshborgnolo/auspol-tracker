@@ -83,3 +83,36 @@ would have regressed the between-panel gap on stacked layouts.
 - Rebuild `node .build/newtracker/build.mjs`; `grep -o 'has narrowed from[^.]*' index.html`
   finds the fragment (ASCII-safe), but only the probe confirms the computed
   numbers.
+
+## Significance gates (2026-10-11)
+
+The head said "Albanese still leads as preferred PM" on a 40.7–38.5 split:
+a +2.3 lead whose own margin is ±3.7 (two shares of one sample move
+against each other, so the lead's margin is WIDER than the shares'
+±2.0 each combined). Now:
+- gen-data emits `leaderLead = { taylor, hanson }` ({v, ci95}): each poll's
+  own lead pooled with the one-sample variance (pq = 100(a+b) − (a−b)²),
+  SPARSE_K window. taylor is the TWO-WAY question only (`ppm2MarginNow`,
+  p.han == null): `ppmMarginNow` (Past cycles' ppmm) pools three-way
+  readings too and read +9.6 against the two-way +2.3. hanson =
+  ppmHMarginNow (its own head-to-head pool).
+- RdLeadership's `leadTest(L, ka, kb)`: |L.v| > L.ci95; with no pooled lead
+  (/vic/) the shares' se's widened by the multinomial correlation
+  ρ = √(pa·pb / ((1−pa)(1−pb))).
+- Inside the margin the head reads "Albanese and Taylor are level as
+  preferred PM, and Albanese’s net approval has fallen 40 points" (the
+  approval clause names Albanese whenever he isn't the one leading, so no
+  "his" can read as Taylor's); the dek opens "Albanese’s lead … narrowed
+  from +18 under Ley to +2 under Taylor, inside the margin of error";
+  "narrowed" needs the Ley-era average down by more than the current
+  lead's margin; the approval fall needs ≥10 points AND to clear
+  hypot(now ci95, first month's alb_netCi). Hanson: level inside its
+  margin ("Head to head with Hanson, the two are level."), "he leads by
+  11 points, a lead that has held steady since it was first measured"
+  (steady = within the lead's own margin of the first month), "his lead is
+  greater (+11)" only beside a significant opposition lead.
+- /vic/ (J branch) uses the same test: two Victorian polls (Carroll
+  26.8 ± 10.4, Wilson 34.2 ± 9.4) now read "Wilson and Carroll are level
+  as preferred Premier".
+Pinned by .matilda/probe/sig-gates.mjs (mutated-payload cases: level,
+Albanese ahead, Taylor ahead, Hanson level).

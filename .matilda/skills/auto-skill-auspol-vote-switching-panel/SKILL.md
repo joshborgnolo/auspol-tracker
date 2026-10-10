@@ -226,3 +226,13 @@ automation-reads. Schema choices that kept the consumers happy:
   cohort's →ON share plus ON retention (96).
 - `_about` extended for the new `und` key AND the same text written into
   vote-switching.mjs's constant, so regeneration preserves it.
+
+## The ratio sentence's gate (2026-10-11)
+
+"<Coalition> voters have flocked to One Nation at about N times the rate
+of <Labor> voters" is said only while the two rates clear each other's
+margins (hypot of rate.now.ci95) and the quarter-rounded ratio is 1.25 or
+more; apart but under that: "<X> voters have moved to One Nation faster
+than <Y> voters"; inside the margins: "Coalition and Labor voters have
+moved to One Nation at much the same rate." Today (38.6 ± 4.2 v 13.7 ±
+2.1, 2.75×) renders unchanged. Pinned by .matilda/probe/sig-gates.mjs.
