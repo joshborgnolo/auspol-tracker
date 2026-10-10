@@ -3598,17 +3598,29 @@ const flowForced = (() => {
   /* ym rides the FIELDWORK window (dateStart), matching the wave label
      convention the section ships with (a late-month wave filed at the next
      month's start still reads as its fieldwork month – Sep 2026's is
-     date 2026-10-02 fw 2026-09-28 → "2026-09") */
-  const wave = (p, y) => ({ date: p.date, ym: ymOf(p.dateStart || p.date), n: p.sample ?? null, url: p.releaseUrl || p.url || null, a: y, b: 100 - y });
-  /* HAND_SPLIT_ON lives with the emitters: est lets the panel flag exactly
-     those dots; onp waves are always verbatim. */
-  const push = (arr, p, a, est) => arr.push({ ...wave(p, a), ...(est ? { est: true } : {}) });
-  const coal = [], on = [];
+     date 2026-10-02 fw 2026-09-28 → "2026-09"). Each wave carries every
+     cohort's Labor share on the one date, so the two charts group by
+     QUESTION (Labor v One Nation / Labor v the Coalition) with one line
+     per cohort, rather than by voter cohort as before. */
+  const wave = (p) => ({ date: p.date, ym: ymOf(p.dateStart || p.date), n: p.sample ?? null, url: p.releaseUrl || p.url || null });
+  const vsOn = [], vsCoal = [];
   for (const p of rows) {
-    if (p.tpp_split_on && p.tpp_split_on.lnp != null) push(coal, p, p.tpp_split_on.lnp, HAND_SPLIT_ON.has(p.date));
-    if (p.tpp_split && p.tpp_split.onp != null) push(on, p, p.tpp_split.onp, false);
+    /* HAND_SPLIT_ON lives with the emitters: estCohort names exactly which
+       cohort's figure is derived (June 2026's Coalition split combines the
+       printed CLP/LNP/Nat and Liberal rows); every other cell is verbatim. */
+    if (p.tpp_split_on) {
+      const w = wave(p);
+      for (const ck of ["lnp", "grn", "oth"]) if (p.tpp_split_on[ck] != null) w[ck === "lnp" ? "coal" : ck] = p.tpp_split_on[ck];
+      if (HAND_SPLIT_ON.has(p.date)) w.estCohort = "coal";
+      if (w.coal != null || w.grn != null || w.oth != null) vsOn.push(w);
+    }
+    if (p.tpp_split) {
+      const w = wave(p);
+      for (const ck of ["grn", "onp", "oth"]) if (p.tpp_split[ck] != null) w[ck] = p.tpp_split[ck];
+      if (w.grn != null || w.onp != null || w.oth != null) vsCoal.push(w);
+    }
   }
-  return coal.length && on.length ? { house: "RedBridge/Accent", coal, on } : null;
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null

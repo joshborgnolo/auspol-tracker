@@ -5311,20 +5311,24 @@ body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
 body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
 body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
 body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
-body.rd .rd-ff-line.a { stroke: var(--alp); }
-body.rd .rd-ff-line.b { stroke: var(--onp); }
-body.rd .rd-ff-line.b.is-lnp { stroke: var(--lnp); }
-body.rd .rd-ff-dot.a { fill: var(--alp); }
-body.rd .rd-ff-dot.b { fill: var(--onp); }
-body.rd .rd-ff-dot.b.is-lnp { fill: var(--lnp); }
+body.rd .rd-ff-line.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-line.grn { stroke: var(--grn); }
+body.rd .rd-ff-line.onp { stroke: var(--onp); }
+body.rd .rd-ff-line.oth { stroke: var(--oth); }
+body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
+body.rd .rd-ff-dot.grn { fill: var(--grn); }
+body.rd .rd-ff-dot.onp { fill: var(--onp); }
+body.rd .rd-ff-dot.oth { fill: var(--oth); }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
-body.rd .rd-ff-el.a { fill: var(--alp); }
-body.rd .rd-ff-elv.a { fill: var(--alp); opacity: 0.85; }
-body.rd .rd-ff-el.b { fill: var(--onp); }
-body.rd .rd-ff-elv.b { fill: var(--onp); opacity: 0.85; }
-body.rd .rd-ff-el.b.is-lnp { fill: var(--lnp); }
-body.rd .rd-ff-elv.b.is-lnp { fill: var(--lnp); opacity: 0.85; }
+body.rd .rd-ff-el.lnp { fill: var(--lnp); }
+body.rd .rd-ff-elv.lnp { fill: var(--lnp); opacity: 0.85; }
+body.rd .rd-ff-el.grn { fill: var(--grn); }
+body.rd .rd-ff-elv.grn { fill: var(--grn); opacity: 0.85; }
+body.rd .rd-ff-el.onp { fill: var(--onp); }
+body.rd .rd-ff-elv.onp { fill: var(--onp); opacity: 0.85; }
+body.rd .rd-ff-el.oth { fill: var(--oth); }
+body.rd .rd-ff-elv.oth { fill: var(--oth); opacity: 0.85; }
 body.rd .rd-ff-tip { pointer-events: auto; white-space: normal; }
 body.rd .tip-hintwrap { white-space: normal; max-width: 230px; }
 body.rd .tip-hintwrap .tip-hint { margin-top: 2px; white-space: normal; }
@@ -13662,106 +13666,120 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   };
   const flowForced = {
     "house": "RedBridge/Accent",
-    "coal": [{
+    "vsOn": [{
       "date": "2026-02-27",
       "ym": "2026-02",
       "n": 1006,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
-      "a": 32,
-      "b": 68
+      "coal": 32,
+      "grn": 89,
+      "oth": 68
     }, {
       "date": "2026-04-30",
       "ym": "2026-04",
       "n": 1014,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
-      "a": 31,
-      "b": 69
+      "coal": 31,
+      "grn": 92,
+      "oth": 66
     }, {
       "date": "2026-05-28",
       "ym": "2026-05",
       "n": 1005,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
-      "a": 32,
-      "b": 68
+      "coal": 32,
+      "grn": 92,
+      "oth": 67
     }, {
       "date": "2026-06-26",
       "ym": "2026-06",
       "n": 1006,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
-      "a": 36,
-      "b": 64,
-      "est": true
+      "coal": 36,
+      "grn": 92,
+      "oth": 70,
+      "estCohort": "coal"
     }, {
       "date": "2026-07-30",
       "ym": "2026-07",
       "n": 1001,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
-      "a": 44,
-      "b": 56
+      "coal": 44,
+      "grn": 91,
+      "oth": 61
     }, {
       "date": "2026-08-28",
       "ym": "2026-08",
       "n": 1006,
       "url": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
-      "a": 32,
-      "b": 68
+      "coal": 32,
+      "grn": 90,
+      "oth": 59
     }, {
       "date": "2026-10-02",
       "ym": "2026-09",
       "n": 1000,
       "url": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll",
-      "a": 41,
-      "b": 59
+      "coal": 41,
+      "grn": 90,
+      "oth": 57
     }],
-    "on": [{
+    "vsCoal": [{
       "date": "2026-02-27",
       "ym": "2026-02",
       "n": 1006,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
-      "a": 23,
-      "b": 77
+      "grn": 83,
+      "onp": 23,
+      "oth": 61
     }, {
       "date": "2026-04-30",
       "ym": "2026-04",
       "n": 1014,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
-      "a": 25,
-      "b": 75
+      "grn": 90,
+      "onp": 25,
+      "oth": 56
     }, {
       "date": "2026-05-28",
       "ym": "2026-05",
       "n": 1005,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
-      "a": 21,
-      "b": 79
+      "grn": 90,
+      "onp": 21,
+      "oth": 60
     }, {
       "date": "2026-06-26",
       "ym": "2026-06",
       "n": 1006,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
-      "a": 21,
-      "b": 79
+      "grn": 85,
+      "onp": 21,
+      "oth": 62
     }, {
       "date": "2026-07-30",
       "ym": "2026-07",
       "n": 1001,
       "url": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
-      "a": 16,
-      "b": 84
+      "grn": 87,
+      "onp": 16,
+      "oth": 61
     }, {
       "date": "2026-08-28",
       "ym": "2026-08",
       "n": 1006,
       "url": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
-      "a": 17,
-      "b": 83
+      "grn": 78,
+      "onp": 17,
+      "oth": 50
     }, {
       "date": "2026-10-02",
       "ym": "2026-09",
       "n": 1000,
       "url": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll",
-      "a": 15,
-      "b": 85
+      "grn": 82,
+      "onp": 15,
+      "oth": 50
     }]
   };
   const leaderMonths = [{
@@ -116789,8 +116807,27 @@ function RdFlowChart({
     }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"));
   })());
 }
+const FF_COHORTS = {
+  coal: {
+    name: "Coalition",
+    cls: "lnp"
+  },
+  grn: {
+    name: "Greens",
+    cls: "grn"
+  },
+  onp: {
+    name: "One Nation",
+    cls: "onp"
+  },
+  oth: {
+    name: "Other",
+    cls: "oth"
+  }
+};
 function RdForced({
   waves,
+  cohorts,
   rival,
   W,
   phone
@@ -116815,7 +116852,7 @@ function RdForced({
   if (!waves || waves.length < 2) return null;
   const H = phone ? 190 : 230;
   const x0 = phone ? 30 : 36,
-    rpad = phone ? 52 : 62,
+    rpad = phone ? 78 : 84,
     top = 16,
     bot = H - 34;
   const x1 = W - rpad;
@@ -116823,12 +116860,34 @@ function RdForced({
   for (const w of waves) if (!ms.includes(w.ym)) ms.push(w.ym);
   const X = ym => x0 + ms.indexOf(ym) / (ms.length - 1) * (x1 - x0);
   const Y = v => bot - v / 100 * (bot - top);
-  const aPts = waves.map(w => [X(w.ym), Y(w.a)]);
-  const bPts = waves.map(w => [X(w.ym), Y(w.b)]);
-  const la = waves[waves.length - 1];
+  const series = cohorts.map(ck => {
+    const pts = waves.filter(w => w[ck] != null).map(w => [X(w.ym), Y(w[ck])]);
+    const last = pts.length ? [...waves].reverse().find(w => w[ck] != null) : null;
+    return {
+      ck,
+      pts,
+      last
+    };
+  }).filter(s => s.pts.length >= 2 && s.last);
   const ticks = rdApMonthTicks(ms, phone ? 2 : 1);
-  const show = (w, src) => setTip({
+  const FF_GAP = 28;
+  const labels = series.map(s => ({
+    ck: s.ck,
+    y: Y(s.last[s.ck])
+  })).sort((a, b) => a.y - b.y);
+  const labY = new Map();
+  for (let i = 0; i < labels.length;) {
+    let j = i,
+      sum = 0;
+    for (; j < labels.length && (j === i || labels[j].y - labels[j - 1].y < FF_GAP); j++) sum += labels[j].y;
+    const n = j - i,
+      mid = sum / n;
+    for (let k = i; k < j; k++) labY.set(labels[k].ck, mid + (k - i - (n - 1) / 2) * FF_GAP);
+    i = j;
+  }
+  const show = (w, ck, src) => setTip({
     ym: w.ym,
+    ck,
     src,
     w
   });
@@ -116849,7 +116908,7 @@ function RdForced({
     height: H,
     viewBox: `0 0 ${W} ${H}`,
     role: "img",
-    "aria-label": `If forced to choose between Labor and ${rival}, ${rival === "the Coalition" ? "One Nation" : "Coalition"} voters' split by month: latest ${la.a} Labor, ${la.b} ${rival}.`
+    "aria-label": `If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map(s => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.`
   }, [0, 25, 50, 75, 100].map(v => React.createElement("path", {
     key: v,
     d: `M${x0} ${Y(v)}H${x1}`,
@@ -116860,13 +116919,11 @@ function RdForced({
     y: Y(v) + 3.5,
     className: "rd-dis-ax",
     textAnchor: "end"
-  }, v)), React.createElement("path", {
-    d: monotoneXY(aPts),
-    className: "rd-ff-line a"
-  }), React.createElement("path", {
-    d: monotoneXY(bPts),
-    className: "rd-ff-line b" + (rival === "the Coalition" ? " is-lnp" : "")
-  }), waves.map(w => {
+  }, v)), series.map(s => React.createElement("path", {
+    key: s.ck,
+    d: monotoneXY(s.pts),
+    className: "rd-ff-line " + FF_COHORTS[s.ck].cls
+  })), waves.map(w => {
     const k = keyOf(w);
     const open = () => {
       if (k && window.AP.openPoll) {
@@ -116876,106 +116933,73 @@ function RdForced({
     };
     return React.createElement("g", {
       key: w.ym
-    }, tip && tip.ym === w.ym && React.createElement(React.Fragment, null, React.createElement("circle", {
+    }, tip && tip.ym === w.ym && w[tip.ck] != null && React.createElement("circle", {
       cx: X(w.ym),
-      cy: Y(w.a),
+      cy: Y(w[tip.ck]),
       r: "6",
       className: "rd-apd-dothi"
-    }), React.createElement("circle", {
+    }), series.map(s => w[s.ck] != null && React.createElement("circle", {
+      key: s.ck,
       cx: X(w.ym),
-      cy: Y(w.b),
-      r: "6",
-      className: "rd-apd-dothi"
-    })), React.createElement("circle", {
-      cx: X(w.ym),
-      cy: Y(w.a),
+      cy: Y(w[s.ck]),
       r: "3",
-      className: "rd-ff-dot a"
-    }), React.createElement("circle", {
-      cx: X(w.ym),
-      cy: Y(w.b),
-      r: "3",
-      className: "rd-ff-dot b" + (rival === "the Coalition" ? " is-lnp" : "")
-    }), React.createElement("circle", {
-      cx: X(w.ym),
-      cy: Y(w.a),
-      r: "9",
-      className: "rd-apd-hit" + (k ? " link" : ""),
-      tabIndex: "0",
-      role: k ? "button" : "img",
-      "aria-label": `${rdMonthYear(w.ym)}: Labor ${w.a}, ${rival} ${w.b}${w.est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : ""),
-      onPointerDown: ev => {
-        ptr.current = ev.pointerType;
-      },
-      onPointerEnter: ev => {
-        if (ev.pointerType === "mouse") show(w, "mouse");
-      },
-      onPointerLeave: ev => {
-        if (ev.pointerType === "mouse") hide(w, "mouse");
-      },
-      onFocus: ev => {
-        if (ev.target.matches(":focus-visible")) show(w, "focus");
-      },
-      onBlur: () => hide(w, "focus"),
-      onClick: ev => {
-        ev.stopPropagation();
-        const pt = ev.detail === 0 ? "key" : ptr.current;
-        ptr.current = null;
-        if (pt === "mouse" || pt === "key") {
-          open();
-          return;
+      className: "rd-ff-dot " + FF_COHORTS[s.ck].cls
+    })), series.map((s, si) => {
+      if (w[s.ck] == null) return null;
+      const est = w.estCohort === s.ck;
+      const aria = `${rdMonthYear(w.ym)}: ${FF_COHORTS[s.ck].name} voters — Labor ${w[s.ck]}, ${rival} ${100 - w[s.ck]}${est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "");
+      return React.createElement("circle", _extends({
+        key: s.ck,
+        cx: X(w.ym),
+        cy: Y(w[s.ck]),
+        r: "9",
+        className: "rd-apd-hit" + (k ? " link" : ""),
+        tabIndex: si === 0 ? "0" : "-1",
+        role: si === 0 && k ? "button" : "img",
+        "aria-label": aria,
+        onPointerDown: ev => {
+          ptr.current = ev.pointerType;
+        },
+        onPointerEnter: ev => {
+          if (ev.pointerType === "mouse") show(w, s.ck, "mouse");
+        },
+        onPointerLeave: ev => {
+          if (ev.pointerType === "mouse") hide(w, "mouse");
         }
-        if (tip && tip.ym === w.ym) setTip(null);else show(w, "touch");
-      },
-      onKeyDown: ev => {
-        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
-        ev.preventDefault();
-        open();
-      }
-    }), React.createElement("circle", {
-      cx: X(w.ym),
-      cy: Y(w.b),
-      r: "9",
-      className: "rd-apd-hit" + (k ? " link" : ""),
-      tabIndex: "-1",
-      "aria-hidden": "true",
-      onPointerDown: ev => {
-        ptr.current = ev.pointerType;
-      },
-      onPointerEnter: ev => {
-        if (ev.pointerType === "mouse") show(w, "mouse");
-      },
-      onPointerLeave: ev => {
-        if (ev.pointerType === "mouse") hide(w, "mouse");
-      },
-      onClick: ev => {
-        ev.stopPropagation();
-        const pt = ev.detail === 0 ? "key" : ptr.current;
-        ptr.current = null;
-        if (pt === "mouse" || pt === "key") {
+      }, si === 0 ? {
+        onFocus: ev => {
+          if (ev.target.matches(":focus-visible")) show(w, s.ck, "focus");
+        },
+        onBlur: () => hide(w, "focus"),
+        onKeyDown: ev => {
+          if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+          ev.preventDefault();
           open();
-          return;
         }
-        if (tip && tip.ym === w.ym) setTip(null);else show(w, "touch");
-      }
+      } : {}, {
+        onClick: ev => {
+          ev.stopPropagation();
+          const pt = ev.detail === 0 ? "key" : ptr.current;
+          ptr.current = null;
+          if (pt === "mouse" || pt === "key") {
+            open();
+            return;
+          }
+          if (tip && tip.ym === w.ym && tip.ck === s.ck) setTip(null);else show(w, s.ck, "touch");
+        }
+      }));
     }));
-  }), React.createElement("text", {
+  }), series.map(s => React.createElement("g", {
+    key: "el" + s.ck
+  }, React.createElement("text", {
     x: x1 + 8,
-    y: Y(la.a) - 2,
-    className: "rd-ff-el a"
-  }, "Labor"), React.createElement("text", {
+    y: labY.get(s.ck) - 2,
+    className: "rd-ff-el " + FF_COHORTS[s.ck].cls
+  }, FF_COHORTS[s.ck].name), React.createElement("text", {
     x: x1 + 8,
-    y: Y(la.a) + 12,
-    className: "rd-ff-elv a"
-  }, la.a), React.createElement("text", {
-    x: x1 + 8,
-    y: Y(la.b) - 2,
-    className: "rd-ff-el b" + (rival === "the Coalition" ? " is-lnp" : "")
-  }, rival === "the Coalition" ? "Coalition" : "One Nation"), React.createElement("text", {
-    x: x1 + 8,
-    y: Y(la.b) + 12,
-    className: "rd-ff-elv b" + (rival === "the Coalition" ? " is-lnp" : "")
-  }, la.b), React.createElement("path", {
+    y: labY.get(s.ck) + 12,
+    className: "rd-ff-elv " + FF_COHORTS[s.ck].cls
+  }, s.last[s.ck]))), React.createElement("path", {
     d: `M${x0} ${bot}H${x1}` + ticks.map(t => `M${X(t.ym)} ${bot}v4`).join(""),
     className: "rd-dis-base"
   }), ticks.map(t => React.createElement("text", {
@@ -116992,19 +117016,19 @@ function RdForced({
     }
   }, React.createElement("span", {
     className: "tip-title"
-  }, rdMonthYear(tip.ym)), React.createElement("span", {
+  }, rdMonthYear(tip.ym), " \xB7 ", FF_COHORTS[tip.ck].name, " voters"), React.createElement("span", {
     className: "tip-row"
   }, React.createElement("span", {
     className: "tip-label"
   }, "Labor"), React.createElement("span", {
     className: "tip-val"
-  }, tip.w.a, "%")), React.createElement("span", {
+  }, tip.w[tip.ck], "%")), React.createElement("span", {
     className: "tip-row"
   }, React.createElement("span", {
     className: "tip-label"
   }, rival === "the Coalition" ? "Coalition" : "One Nation"), React.createElement("span", {
     className: "tip-val"
-  }, tip.w.b, "%")), tip.w.n != null && React.createElement("span", {
+  }, 100 - tip.w[tip.ck], "%")), tip.w.n != null && React.createElement("span", {
     className: "tip-row"
   }, React.createElement("span", {
     className: "tip-label"
@@ -117012,7 +117036,7 @@ function RdForced({
     className: "tip-val"
   }, "n = ", tip.w.n.toLocaleString())), tipK && tip.src !== "touch" && React.createElement("div", {
     className: "tip-hint"
-  }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"), tip.w.est && React.createElement("span", {
+  }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"), tip.w.estCohort === tip.ck && React.createElement("span", {
     className: "tip-row tip-hintwrap"
   }, React.createElement("span", {
     className: "tip-sub tip-hint"
@@ -117078,17 +117102,34 @@ function RdFlows() {
     label: "Against One Nation",
     rows: flSetRows(FO)
   }];
-  const ff = FF ? [["coal", FF.coal], ["on", FF.on]].map(([key, waves]) => ({
-    key,
-    waves,
-    fit: withinHouseSlope(waves.map(w => ({
-      h: key,
-      t: D.mx(w.ym),
-      w: 1,
-      y: w.a
-    })))
+  const ffQ = FF ? [{
+    q: "on",
+    waves: FF.vsOn,
+    cohorts: ["grn", "coal", "oth"],
+    rival: "One Nation",
+    fallback: "Greens, Coalition and Other voters, if forced to Labor or One Nation"
+  }, {
+    q: "co",
+    waves: FF.vsCoal,
+    cohorts: ["grn", "onp", "oth"],
+    rival: "the Coalition",
+    fallback: "Greens, One Nation and Other voters, if forced to Labor or the Coalition"
+  }] : null;
+  const ff = FF ? ffQ.flatMap(def => def.cohorts.map(ck => {
+    const s = def.waves.filter(w => w[ck] != null);
+    return {
+      key: def.q + ck,
+      ck,
+      q: def.q,
+      waves: s,
+      fit: withinHouseSlope(s.map(w => ({
+        h: def.q + ck,
+        t: D.mx(w.ym),
+        w: 1,
+        y: w[ck]
+      })))
+    };
   })) : null;
-  const ffBy = k => ff && ff.find(r => r.key === k);
   if (ff) {
     const tested = ff.filter(r => r.fit),
       sigK = [];
@@ -117098,20 +117139,31 @@ function RdFlows() {
     }
     for (const r of ff) r.sig = sigK.includes(r.key);
   }
-  const ffTitle = r => {
-    const f = r.waves[0],
-      la = r.waves[r.waves.length - 1];
-    const base = r.key === "coal" ? la.a + "% of Coalition voters prefer Labor over One Nation" : "Just " + la.a + "% of One Nation voters prefer Labor over the Coalition";
-    return !r.sig || la.a === f.a ? base : base + ", " + (la.a > f.a ? "up" : "down") + " from " + f.a + "% in " + rdMonthYear(f.ym);
+  const ffTitle = q => {
+    const def = ffQ.find(d => d.q === q);
+    if (def.waves.length < 2) return def.fallback;
+    const parts = def.cohorts.map(ck => {
+      const w = def.waves.filter(x => x[ck] != null).pop();
+      return `${w[ck]}% of ${FF_COHORTS[ck].name} voters`;
+    });
+    const list = parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
+    const moved = ff.filter(r => r.q === q && r.sig && r.waves[0][r.ck] !== r.waves[r.waves.length - 1][r.ck]);
+    const tail = moved.length !== 1 ? "" : (() => {
+      const r = moved[0],
+        f = r.waves[0][r.ck],
+        la = r.waves[r.waves.length - 1][r.ck];
+      return " — " + FF_COHORTS[r.ck].name + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + rdMonthYear(r.waves[0].ym);
+    })();
+    return list + " prefer Labor over " + def.rival + tail;
   };
   const ffSet = ff ? {
     key: "pressed",
     label: "Pressed-choice Labor share",
     rows: ff.map(r => ({
       key: r.key,
-      name: r.key === "coal" ? "Coalition voters" : "One Nation voters",
+      name: FF_COHORTS[r.ck].name + " voters, v " + (r.q === "on" ? "One Nation" : "Coalition"),
       sig: r.sig,
-      cells: [r.waves[0].a + " → " + r.waves[r.waves.length - 1].a, r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? r.sig ? "Yes" : "No" : "–"]
+      cells: [r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck], r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? r.sig ? "Yes" : "No" : "–"]
     }))
   } : null;
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
@@ -117223,8 +117275,9 @@ function RdFlows() {
     className: "rd-fl-ct"
   }, React.createElement("h4", {
     className: "rd-ap-ct"
-  }, ffBy("coal").waves.length > 1 ? ffTitle(ffBy("coal")) : "Coalition voters, if forced to Labor or One Nation")), React.createElement(RdForced, {
-    waves: FF.coal,
+  }, ffTitle("on"))), React.createElement(RdForced, {
+    waves: FF.vsOn,
+    cohorts: ["grn", "coal", "oth"],
     rival: "One Nation",
     W: cw,
     phone: phone
@@ -117234,8 +117287,9 @@ function RdFlows() {
     className: "rd-fl-ct"
   }, React.createElement("h4", {
     className: "rd-ap-ct"
-  }, ffBy("on").waves.length > 1 ? ffTitle(ffBy("on")) : "One Nation voters, if forced to Labor or the Coalition")), React.createElement(RdForced, {
-    waves: FF.on,
+  }, ffTitle("co"))), React.createElement(RdForced, {
+    waves: FF.vsCoal,
+    cohorts: ["grn", "onp", "oth"],
     rival: "the Coalition",
     W: cw,
     phone: phone
@@ -117243,7 +117297,7 @@ function RdFlows() {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
-    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the two — a Yes is what the chart titles’ up/down-from tails ride." : "")
+    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the six — a Yes licenses that cohort’s tail in its chart’s title." : "")
   }), React.createElement(RdFoot, {
     how: {
       term: "preference-flows",

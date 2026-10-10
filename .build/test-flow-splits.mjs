@@ -1,11 +1,15 @@
 /* test-flow-splits.mjs – pins the RedBridge/Accent "forced to choose" pair.
    Moved 2026-10-10 from the /preference-flows/ satellite's #forced section
-   (fetch-drawn bars off assets/flow-splits.json) into the main page's All-polls
-   Preference flows section as two RdForced line charts fed by gen-data's
-   D.flowForced (§7db). This test pins the NEW contract: the data asset carries
-   the waves read straight off polls.json's tpp_split/tpp_split_on rows, the
-   June-2026 Coalition est flag rides exactly one wave, the renderer mounts both
-   charts, and the satellite no longer carries the retired machinery. Runs
+   (fetch-drawn bars off assets/flow-splits.json) into the main page's
+   All-polls Preference flows section as two RdForced line charts fed by
+   gen-data's D.flowForced (§7db); REGROUPED the same day from one chart per
+   voter cohort ({coal, on}) to one chart per QUESTION ({vsOn, vsCoal}, each
+   wave carrying every cohort's Labor share on the one date). This test pins
+   the CURRENT contract: the data asset carries the waves read straight off
+   polls.json's tpp_split/tpp_split_on rows, verbatim per cohort cell, the
+   June-2026 Coalition est derivation rides exactly one cohort of one wave
+   (estCohort "coal"), the renderer mounts both charts with their cohort
+   rosters, and the satellite no longer carries the retired machinery. Runs
    after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -23,67 +27,79 @@ vm.runInNewContext(assetSrc, sandbox, { filename: "9f09dca2.js" });
 const FF = sandbox.window.AUSPOL && sandbox.window.AUSPOL.flowForced;
 assert.ok(FF && typeof FF === "object", "flowForced is emitted on the data asset");
 assert.equal(FF.house, "RedBridge/Accent", "the forced pair is credited to its one house");
-assert.ok(Array.isArray(FF.coal) && Array.isArray(FF.on) && FF.coal.length >= 6 && FF.on.length >= 6,
-  "both cohort series carry the run of waves");
+assert.ok(Array.isArray(FF.vsOn) && Array.isArray(FF.vsCoal) && FF.vsOn.length >= 6 && FF.vsCoal.length >= 6,
+  "both question series carry the run of waves");
 
-/* every wave is ReaBridge's own polls.json row, verbatim: a is the published
-   split figure, b its complement, the June Coalition wave alone estimated */
+/* every cohort cell is RedBridge's own polls.json row, verbatim: vsOn maps
+   tpp_split_on's lnp→coal/grn/oth, vsCoal maps tpp_split's grn/onp/oth */
 const polls = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
 const src = polls.polls.filter((r) => r.pollster === "RedBridge/Accent");
 const byDate = new Map(src.map((r) => [r.date, r]));
-const withSplitOn = src.filter((r) => r.tpp_split_on && r.tpp_split_on.lnp != null);
-const withSplit = src.filter((r) => r.tpp_split && r.tpp_split.onp != null);
-assert.equal(FF.coal.length, withSplitOn.length, "coal waves = the tpp_split_on.lnp rows");
-assert.equal(FF.on.length, withSplit.length, "on waves = the tpp_split.onp rows");
-for (const [series, pull] of [[FF.coal, (r) => r.tpp_split_on && r.tpp_split_on.lnp],
-                              [FF.on, (r) => r.tpp_split && r.tpp_split.onp]]) {
-  for (const w of series) {
+const has = (r, f, ck) => r[f] && r[f][ck] != null;
+assert.equal(FF.vsOn.length, src.filter((r) => ["lnp", "grn", "oth"].some((ck) => has(r, "tpp_split_on", ck))).length,
+  "vsOn waves = the rows with any tpp_split_on cohort");
+assert.equal(FF.vsCoal.length, src.filter((r) => ["grn", "onp", "oth"].some((ck) => has(r, "tpp_split", ck))).length,
+  "vsCoal waves = the rows with any tpp_split cohort");
+const COHORTS = [[FF.vsOn, "coal", (r) => has(r, "tpp_split_on", "lnp"), (r) => r.tpp_split_on.lnp],
+                 [FF.vsOn, "grn", (r) => has(r, "tpp_split_on", "grn"), (r) => r.tpp_split_on.grn],
+                 [FF.vsOn, "oth", (r) => has(r, "tpp_split_on", "oth"), (r) => r.tpp_split_on.oth],
+                 [FF.vsCoal, "grn", (r) => has(r, "tpp_split", "grn"), (r) => r.tpp_split.grn],
+                 [FF.vsCoal, "onp", (r) => has(r, "tpp_split", "onp"), (r) => r.tpp_split.onp],
+                 [FF.vsCoal, "oth", (r) => has(r, "tpp_split", "oth"), (r) => r.tpp_split.oth]];
+for (const [series, ck, test, pull] of COHORTS) {
+  assert.equal(series.filter((w) => w[ck] != null).length, src.filter(test).length,
+    `${ck}: dot count = the row count for its cohort`);
+  for (const w of series.filter((w) => w[ck] != null)) {
     const row = byDate.get(w.date);
-    assert.ok(row, `${w.date}: forced wave resolves to a polls.json row`);
-    assert.equal(w.a, pull(row), `${w.date}: a is the row's published split figure`);
-    assert.equal(w.b, 100 - w.a, `${w.date}: b is the strict complement`);
+    assert.ok(row, `${w.date}: ${ck} wave resolves to a polls.json row`);
+    assert.equal(w[ck], pull(row), `${w.date}: ${ck} is the row's published split figure`);
     const ym = (row.dateStart || row.date).slice(0, 7);
     assert.equal(w.ym, ym, `${w.date}: ym is the FIELDWORK month (dateStart || date)`);
-    assert.ok(w.a >= 0 && w.a <= 100, `${w.date}: share in range`);
+    assert.ok(w[ck] >= 0 && w[ck] <= 100, `${w.date}: ${ck} share in range`);
   }
 }
-/* the June-2026 Coalition split is the ONE hand-derived wave (CLP/LNP/Nat 34 +
-   Liberal 37 combined → 36; schema documents the derivation). est rides
-   exactly it, on the coal series alone — chart B's June (21) is printed */
-const estMarks = [...FF.coal, ...FF.on].filter((w) => w.est);
-assert.equal(estMarks.length, 1, "exactly one wave carries the est flag");
-assert.equal(estMarks[0].date, "2026-06-26", "the est wave is the June 2026 wave");
-assert.ok(FF.coal.some((w) => w.est), "est marks the Coaliton (coal) series, not the One Nation one");
+/* the June-2026 Coalition split is the ONE hand-derived cell (CLP/LNP/Nat 34
+   + Liberal 37 combined → 36; schema documents the derivation). estCohort
+   rides exactly it, on the vsOn series alone — every other cell is printed */
+const estMarks = [...FF.vsOn, ...FF.vsCoal].flatMap((w) => (w.estCohort ? [{ date: w.date, cohort: w.estCohort }] : []));
+assert.deepEqual(estMarks, [{ date: "2026-06-26", cohort: "coal" }],
+  "exactly one cohort of one wave carries the est derivation, and it is June's Coalition split");
 const jun = byDate.get("2026-06-26");
 assert.equal(jun.tpp_split_on.lnp, 36, "June's derived Coalition split is 36/64 on the row");
 
 // ---- the renderer wiring --------------------------------------------------------------
 const ap = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
 assert.ok(/function RdForced\(/.test(ap), "the RdForced component exists");
+assert.ok(ap.includes("FF_COHORTS"), "the cohort lexicon (names + class tokens) exists");
 assert.equal(ap.match(/<RdForced /g).length, 2, "RdForced is mounted exactly twice");
-assert.ok(ap.includes("waves={FF.coal}") && ap.includes("waves={FF.on}"), "both series are charted");
+assert.ok(ap.includes('cohorts={["grn", "coal", "oth"]}') && ap.includes('cohorts={["grn", "onp", "oth"]}'),
+  "the two charts ask their cohort rosters: grn/coal/oth on Labor v One Nation, grn/onp/oth on Labor v the Coalition");
+assert.ok(ap.includes("waves={FF.vsOn}") && ap.includes("waves={FF.vsCoal}"), "both question series are charted");
 assert.ok(ap.includes('rival="One Nation"') && ap.includes('rival="the Coalition"'),
-  "the two contests read as Coalition-voters-v-One-Nation and One-Nation-voters-v-Coalition");
+  "the two contests read as Labor-v-One-Nation and Labor-v-the-Coalition");
 assert.ok(ap.includes("D.flowForced"), "the charts read the data asset, not a fetch");
 assert.ok(ap.includes('className="rd-ff'), "the figure carries its styling hook");
 
 /* the card titles tell the story from the LATEST wave (user's call 2026-10-10):
-   "NN% of Coalition voters prefer Labor over One Nation" and "Just NN% of
-   One Nation voters prefer Labor over the Coalition", each gaining a
-   ", up/down from NN% in <first wave's month>" tail ONLY when the series'
-   own straight-line drift battery (w=1, Holm across the pair) says Yes —
-   the same Yes the pressed set of the trend-significance table shows */
-assert.ok(ap.includes('"% of Coalition voters prefer Labor over One Nation"'),
-  "the Coalition-voters title is the dynamic prefer-Labor line");
-assert.ok(ap.includes('"% of One Nation voters prefer Labor over the Coalition"')
-  && ap.includes('"Just " +'), "the One-Nation-voters title leads with Just and its latest share");
-assert.ok(ap.includes('"up"') && ap.includes('"down"') && ap.includes('"% in "') && ap.includes("rdMonthYear(f.ym)"),
-  "the title tail reads up/down from the first wave's share, month named dynamically");
+   every cohort's latest Labor share named in one line ("NN% of Greens
+   voters, NN% of Coalition voters and NN% of Other voters prefer Labor over
+   One Nation"), gaining a "— <Cohort> voters up/down from NN% in <its first
+   wave's month>" tail ONLY when that cohort's own straight-line drift
+   battery (w=1, Holm across the six) says Yes — a title never claims a move
+   the pressed set of the trend-significance table won't stand behind */
+assert.ok(ap.includes("% of ") && ap.includes(" prefer Labor over "),
+  "each title lists every cohort's latest share, prefer-Labor phrased");
+assert.ok(ap.includes('"up"') && ap.includes('"down"') && ap.includes('"% in "') && ap.includes("rdMonthYear("),
+  "the title tail reads up/down from the cohort's first-wave share, month named dynamically");
+assert.ok(ap.includes("moved.length !== 1"), "the tail names a cohort only when EXACTLY ONE moved");
 assert.ok(ap.includes('key: "pressed"'), "the pressed-choice rows join the trend-significance table as their own set");
 assert.ok(ap.includes('"First → last"'), "the table's first→last column head fits both gaps and shares");
 const css = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
 assert.ok(css.includes(".rd-ff-two .rd-fl-ct { min-height: 56px; }"),
   "the forced pair's headroom floor keeps the two svgs row-aligned");
+for (const cls of ["grn", "lnp", "onp", "oth"])
+  assert.ok(css.includes(`.rd-ff-line.${cls}`) && css.includes(`.rd-ff-dot.${cls}`),
+    `the cohort's line and dot rules are its party hue (.${cls})`);
 
 // ---- the satellite is stripped ---------------------------------------------------------
 const page = fs.readFileSync(path.join(ROOT, "preference-flows", "index.html"), "utf8");

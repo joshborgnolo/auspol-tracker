@@ -3068,20 +3068,24 @@ body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
 body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
 body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
 body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
-body.rd .rd-ff-line.a { stroke: var(--alp); }
-body.rd .rd-ff-line.b { stroke: var(--onp); }
-body.rd .rd-ff-line.b.is-lnp { stroke: var(--lnp); }
-body.rd .rd-ff-dot.a { fill: var(--alp); }
-body.rd .rd-ff-dot.b { fill: var(--onp); }
-body.rd .rd-ff-dot.b.is-lnp { fill: var(--lnp); }
+body.rd .rd-ff-line.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-line.grn { stroke: var(--grn); }
+body.rd .rd-ff-line.onp { stroke: var(--onp); }
+body.rd .rd-ff-line.oth { stroke: var(--oth); }
+body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
+body.rd .rd-ff-dot.grn { fill: var(--grn); }
+body.rd .rd-ff-dot.onp { fill: var(--onp); }
+body.rd .rd-ff-dot.oth { fill: var(--oth); }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
-body.rd .rd-ff-el.a { fill: var(--alp); }
-body.rd .rd-ff-elv.a { fill: var(--alp); opacity: 0.85; }
-body.rd .rd-ff-el.b { fill: var(--onp); }
-body.rd .rd-ff-elv.b { fill: var(--onp); opacity: 0.85; }
-body.rd .rd-ff-el.b.is-lnp { fill: var(--lnp); }
-body.rd .rd-ff-elv.b.is-lnp { fill: var(--lnp); opacity: 0.85; }
+body.rd .rd-ff-el.lnp { fill: var(--lnp); }
+body.rd .rd-ff-elv.lnp { fill: var(--lnp); opacity: 0.85; }
+body.rd .rd-ff-el.grn { fill: var(--grn); }
+body.rd .rd-ff-elv.grn { fill: var(--grn); opacity: 0.85; }
+body.rd .rd-ff-el.onp { fill: var(--onp); }
+body.rd .rd-ff-elv.onp { fill: var(--onp); opacity: 0.85; }
+body.rd .rd-ff-el.oth { fill: var(--oth); }
+body.rd .rd-ff-elv.oth { fill: var(--oth); opacity: 0.85; }
 body.rd .rd-ff-tip { pointer-events: auto; white-space: normal; }
 /* the tip's link row and the June derivation note carry sentences, which the
    tip chrome's nowrap would stretch past the card — wrap those two rows */

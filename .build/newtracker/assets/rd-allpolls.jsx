@@ -4344,12 +4344,20 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
 /* ---------------------------------------------------------------- preference flows — the forced-choice pair */
 /* RedBridge/Accent's monthly "forced to choose" tables, as lines (data:
    gen-data §7db's D.flowForced, moved here from /preference-flows/' #forced
-   section 2026-10-10). Each chart is one cohort's answer when its first
-   preference can't win: Coalition voters pushed to Labor-or-One-Nation, and
-   One Nation voters pushed to Labor-or-the-Coalition. a/b sum to 100 by
-   construction. Drawing is deliberately light vs RdFlowChart above: no
-   estimator, no band — just the house's published waves. */
-function RdForced({ waves, rival, W, phone }) {
+   section 2026-10-10; regrouped the same day from one chart per voter
+   cohort to one chart per QUESTION (user's call): Greens, Coalition and
+   Other voters pressed Labor v One Nation on one chart, Greens, One Nation
+   and Other voters pressed Labor v the Coalition on the other, one
+   cohort-coloured line per cohort, each tracing the share that picks
+   Labor. Drawing is deliberately light vs RdFlowChart above: no estimator,
+   no band — just the house's published waves. */
+const FF_COHORTS = {
+  coal: { name: "Coalition", cls: "lnp" },
+  grn:  { name: "Greens", cls: "grn" },
+  onp:  { name: "One Nation", cls: "onp" },
+  oth:  { name: "Other", cls: "oth" },
+};
+function RdForced({ waves, cohorts, rival, W, phone }) {
   const D = window.AUSPOL;
   const [tip, setTip] = useState(null);         // { ym, src }
   const ptr = React.useRef(null);
@@ -4371,7 +4379,7 @@ function RdForced({ waves, rival, W, phone }) {
   }, [tip]);
   if (!waves || waves.length < 2) return null;
   const H = phone ? 190 : 230;
-  const x0 = phone ? 30 : 36, rpad = phone ? 52 : 62, top = 16, bot = H - 34;
+  const x0 = phone ? 30 : 36, rpad = phone ? 78 : 84, top = 16, bot = H - 34;
   const x1 = W - rpad;
   const ms = [];
   for (const w of waves) if (!ms.includes(w.ym)) ms.push(w.ym);
@@ -4379,11 +4387,26 @@ function RdForced({ waves, rival, W, phone }) {
      smoothly while the dot strip jumps (no dot where no wave was) */
   const X = (ym) => x0 + (ms.indexOf(ym) / (ms.length - 1)) * (x1 - x0);
   const Y = (v) => bot - (v / 100) * (bot - top);
-  const aPts = waves.map((w) => [X(w.ym), Y(w.a)]);
-  const bPts = waves.map((w) => [X(w.ym), Y(w.b)]);
-  const la = waves[waves.length - 1];
+  const series = cohorts.map((ck) => {
+    const pts = waves.filter((w) => w[ck] != null).map((w) => [X(w.ym), Y(w[ck])]);
+    const last = pts.length ? [...waves].reverse().find((w) => w[ck] != null) : null;
+    return { ck, pts, last };
+  }).filter((s) => s.pts.length >= 2 && s.last);
   const ticks = rdApMonthTicks(ms, phone ? 2 : 1);
-  const show = (w, src) => setTip({ ym: w.ym, src, w });
+  /* cluster-centred end-label dodge: one name+value block per cohort, so a
+     tight finish (Sep 2026's Other 57 sits ~29px above Coalition 41 on the
+     Labor-v-One-Nation chart) still never crowns one label on another */
+  const FF_GAP = 28;
+  const labels = series.map((s) => ({ ck: s.ck, y: Y(s.last[s.ck]) })).sort((a, b) => a.y - b.y);
+  const labY = new Map();
+  for (let i = 0; i < labels.length;) {
+    let j = i, sum = 0;
+    for (; j < labels.length && (j === i || labels[j].y - labels[j - 1].y < FF_GAP); j++) sum += labels[j].y;
+    const n = j - i, mid = sum / n;
+    for (let k = i; k < j; k++) labY.set(labels[k].ck, mid + (k - i - (n - 1) / 2) * FF_GAP);
+    i = j;
+  }
+  const show = (w, ck, src) => setTip({ ym: w.ym, ck, src, w });
   const hide = (w, src) => setTip((t) => (t && t.ym === w.ym && (!src || t.src === src) ? null : t));
   /* RdFlowChart's wave-dot idiom: every forced wave files on its house's
      poll row, so the dots open that row in the archive (mouse click or
@@ -4396,73 +4419,71 @@ function RdForced({ waves, rival, W, phone }) {
   return (
     <figure className="rd-ff" ref={box}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`If forced to choose between Labor and ${rival}, ${rival === "the Coalition" ? "One Nation" : "Coalition"} voters' split by month: latest ${la.a} Labor, ${la.b} ${rival}.`}>
+           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.`}>
         {[0, 25, 50, 75, 100].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={"rd-ff-gl" + (v === 50 ? " mid" : "")}></path>)}
         {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
-        <path d={monotoneXY(aPts)} className="rd-ff-line a"></path>
-        <path d={monotoneXY(bPts)} className={"rd-ff-line b" + (rival === "the Coalition" ? " is-lnp" : "")}></path>
+        {series.map((s) => <path key={s.ck} d={monotoneXY(s.pts)} className={"rd-ff-line " + FF_COHORTS[s.ck].cls}></path>)}
         {waves.map((w) => {
           const k = keyOf(w);
           const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the forced-choice flow chart"); } };
           return (
           <g key={w.ym}>
-            {tip && tip.ym === w.ym && <><circle cx={X(w.ym)} cy={Y(w.a)} r="6" className="rd-apd-dothi"></circle><circle cx={X(w.ym)} cy={Y(w.b)} r="6" className="rd-apd-dothi"></circle></>}
-            <circle cx={X(w.ym)} cy={Y(w.a)} r="3" className="rd-ff-dot a"></circle>
-            <circle cx={X(w.ym)} cy={Y(w.b)} r="3" className={"rd-ff-dot b" + (rival === "the Coalition" ? " is-lnp" : "")}></circle>
-            <circle cx={X(w.ym)} cy={Y(w.a)} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
-                    tabIndex="0" role={k ? "button" : "img"}
-                    aria-label={`${rdMonthYear(w.ym)}: Labor ${w.a}, ${rival} ${w.b}${w.est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "")}
-                    onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-                    onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, "mouse"); }}
-                    onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
-                    onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(w, "focus"); }}
-                    onBlur={() => hide(w, "focus")}
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      const pt = ev.detail === 0 ? "key" : ptr.current;
-                      ptr.current = null;
-                      if (pt === "mouse" || pt === "key") { open(); return; }
-                      if (tip && tip.ym === w.ym) setTip(null); else show(w, "touch");
-                    }}
-                    onKeyDown={(ev) => {
-                      if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
-                      ev.preventDefault();
-                      open();
-                    }}></circle>
-            <circle cx={X(w.ym)} cy={Y(w.b)} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
-                    tabIndex="-1" aria-hidden="true"
-                    onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-                    onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, "mouse"); }}
-                    onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      const pt = ev.detail === 0 ? "key" : ptr.current;
-                      ptr.current = null;
-                      if (pt === "mouse" || pt === "key") { open(); return; }
-                      if (tip && tip.ym === w.ym) setTip(null); else show(w, "touch");
-                    }}></circle>
+            {tip && tip.ym === w.ym && w[tip.ck] != null && <circle cx={X(w.ym)} cy={Y(w[tip.ck])} r="6" className="rd-apd-dothi"></circle>}
+            {series.map((s) => w[s.ck] != null && <circle key={s.ck} cx={X(w.ym)} cy={Y(w[s.ck])} r="3" className={"rd-ff-dot " + FF_COHORTS[s.ck].cls}></circle>)}
+            {series.map((s, si) => {
+              if (w[s.ck] == null) return null;
+              const est = w.estCohort === s.ck;
+              const aria = `${rdMonthYear(w.ym)}: ${FF_COHORTS[s.ck].name} voters — Labor ${w[s.ck]}, ${rival} ${100 - w[s.ck]}${est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "");
+              /* the first cohort's hit alone is the focusable button; every
+                 cohort keeps its own labelled hit (the June Coalition est
+                 note lives on the Coalition cohort, wherever it sits) */
+              return (
+              <circle key={s.ck} cx={X(w.ym)} cy={Y(w[s.ck])} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
+                      tabIndex={si === 0 ? "0" : "-1"} role={si === 0 && k ? "button" : "img"}
+                      aria-label={aria}
+                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, s.ck, "mouse"); }}
+                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
+                      {...(si === 0 ? { onFocus: (ev) => { if (ev.target.matches(":focus-visible")) show(w, s.ck, "focus"); },
+                                        onBlur: () => hide(w, "focus"),
+                                        onKeyDown: (ev) => {
+                                          if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                                          ev.preventDefault();
+                                          open();
+                                        } } : {})}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        const pt = ev.detail === 0 ? "key" : ptr.current;
+                        ptr.current = null;
+                        if (pt === "mouse" || pt === "key") { open(); return; }
+                        if (tip && tip.ym === w.ym && tip.ck === s.ck) setTip(null); else show(w, s.ck, "touch");
+                      }}></circle>
+              );
+            })}
           </g>
           );
         })}
-        <text x={x1 + 8} y={Y(la.a) - 2} className="rd-ff-el a">Labor</text>
-        <text x={x1 + 8} y={Y(la.a) + 12} className="rd-ff-elv a">{la.a}</text>
-        <text x={x1 + 8} y={Y(la.b) - 2} className={"rd-ff-el b" + (rival === "the Coalition" ? " is-lnp" : "")}>{rival === "the Coalition" ? "Coalition" : "One Nation"}</text>
-        <text x={x1 + 8} y={Y(la.b) + 12} className={"rd-ff-elv b" + (rival === "the Coalition" ? " is-lnp" : "")}>{la.b}</text>
+        {series.map((s) => (
+          <g key={"el" + s.ck}>
+            <text x={x1 + 8} y={labY.get(s.ck) - 2} className={"rd-ff-el " + FF_COHORTS[s.ck].cls}>{FF_COHORTS[s.ck].name}</text>
+            <text x={x1 + 8} y={labY.get(s.ck) + 12} className={"rd-ff-elv " + FF_COHORTS[s.ck].cls}>{s.last[s.ck]}</text>
+          </g>
+        ))}
         <path d={`M${x0} ${bot}H${x1}` + ticks.map((t) => `M${X(t.ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
         {ticks.map((t) => <text key={t.ym} x={X(t.ym)} y={bot + 16} className="rd-dis-ax" textAnchor="middle">{t.lab}</text>)}
       </svg>
       {tip && (
         <span ref={tipBox} className="tip rd-fl-tip rd-ff-tip" style={{ left: Math.min(W - 8 - half, Math.max(8 + half, tpx)) }}>
-          <span className="tip-title">{rdMonthYear(tip.ym)}</span>
-          <span className="tip-row"><span className="tip-label">Labor</span><span className="tip-val">{tip.w.a}%</span></span>
-          <span className="tip-row"><span className="tip-label">{rival === "the Coalition" ? "Coalition" : "One Nation"}</span><span className="tip-val">{tip.w.b}%</span></span>
+          <span className="tip-title">{rdMonthYear(tip.ym)} · {FF_COHORTS[tip.ck].name} voters</span>
+          <span className="tip-row"><span className="tip-label">Labor</span><span className="tip-val">{tip.w[tip.ck]}%</span></span>
+          <span className="tip-row"><span className="tip-label">{rival === "the Coalition" ? "Coalition" : "One Nation"}</span><span className="tip-val">{100 - tip.w[tip.ck]}%</span></span>
           {tip.w.n != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {tip.w.n.toLocaleString()}</span></span>}
           {/* the standard tip-hint chrome (accent div, per RdFlowChart's
               wave tip — the report link lives in the poll's ledger links);
               only for an input that can actually open the poll: a touch
               tap READS the dot, it never navigates */}
           {tipK && tip.src !== "touch" && <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
-          {tip.w.est && <span className="tip-row tip-hintwrap"><span className="tip-sub tip-hint">June’s Coalition split combines the report’s printed CLP/LNP/Nat (34) and Liberal (37) rows — no combined row was printed</span></span>}
+          {tip.w.estCohort === tip.ck && <span className="tip-row tip-hintwrap"><span className="tip-sub tip-hint">June’s Coalition split combines the report’s printed CLP/LNP/Nat (34) and Liberal (37) rows — no combined row was printed</span></span>}
         </span>
       )}
     </figure>
@@ -4521,15 +4542,22 @@ function RdFlows() {
     { key: "on", label: "Against One Nation", rows: flSetRows(FO) },
   ];
   /* the forced-choice pair gets the same battery: one straight line per
-     cohort through its published Labor-share dots (w=1 — the house's waves
-     are all ~n=1,000), Holm across the two. A Yes licenses that chart's
-     title tail ("…, up from 32% in <its first wave's month>"), so a title
-     never claims a move the table below won't stand behind */
-  const ff = FF ? [["coal", FF.coal], ["on", FF.on]].map(([key, waves]) => ({
-    key, waves,
-    fit: withinHouseSlope(waves.map((w) => ({ h: key, t: D.mx(w.ym), w: 1, y: w.a }))),
+     pressed cohort through its published Labor-share dots (w=1 — the
+     house's waves are all ~n=1,000), Holm across the six. A Yes is what a
+     chart's title tail ("— <Cohort> voters up from 32% in <its first
+     wave's month>") rides, so a title never claims a move the table below
+     won't stand behind; a tail only ever names the ONE cohort that moved */
+  const ffQ = FF ? [
+    { q: "on", waves: FF.vsOn, cohorts: ["grn", "coal", "oth"], rival: "One Nation",
+      fallback: "Greens, Coalition and Other voters, if forced to Labor or One Nation" },
+    { q: "co", waves: FF.vsCoal, cohorts: ["grn", "onp", "oth"], rival: "the Coalition",
+      fallback: "Greens, One Nation and Other voters, if forced to Labor or the Coalition" },
+  ] : null;
+  const ff = FF ? ffQ.flatMap((def) => def.cohorts.map((ck) => {
+    const s = def.waves.filter((w) => w[ck] != null);
+    return { key: def.q + ck, ck, q: def.q, waves: s,
+      fit: withinHouseSlope(s.map((w) => ({ h: def.q + ck, t: D.mx(w.ym), w: 1, y: w[ck] }))) };
   })) : null;
-  const ffBy = (k) => ff && ff.find((r) => r.key === k);
   if (ff) {
     const tested = ff.filter((r) => r.fit), sigK = [];
     for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
@@ -4538,19 +4566,26 @@ function RdFlows() {
     }
     for (const r of ff) r.sig = sigK.includes(r.key);
   }
-  const ffTitle = (r) => {
-    const f = r.waves[0], la = r.waves[r.waves.length - 1];
-    const base = r.key === "coal"
-      ? la.a + "% of Coalition voters prefer Labor over One Nation"
-      : "Just " + la.a + "% of One Nation voters prefer Labor over the Coalition";
-    return !r.sig || la.a === f.a ? base
-      : base + ", " + (la.a > f.a ? "up" : "down") + " from " + f.a + "% in " + rdMonthYear(f.ym);
+  const ffTitle = (q) => {
+    const def = ffQ.find((d) => d.q === q);
+    if (def.waves.length < 2) return def.fallback;
+    const parts = def.cohorts.map((ck) => {
+      const w = def.waves.filter((x) => x[ck] != null).pop();
+      return `${w[ck]}% of ${FF_COHORTS[ck].name} voters`;
+    });
+    const list = parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
+    const moved = ff.filter((r) => r.q === q && r.sig && r.waves[0][r.ck] !== r.waves[r.waves.length - 1][r.ck]);
+    const tail = moved.length !== 1 ? "" : (() => {
+      const r = moved[0], f = r.waves[0][r.ck], la = r.waves[r.waves.length - 1][r.ck];
+      return " — " + FF_COHORTS[r.ck].name + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + rdMonthYear(r.waves[0].ym);
+    })();
+    return list + " prefer Labor over " + def.rival + tail;
   };
   const ffSet = ff ? {
     key: "pressed", label: "Pressed-choice Labor share",
     rows: ff.map((r) => ({
-      key: r.key, name: r.key === "coal" ? "Coalition voters" : "One Nation voters", sig: r.sig,
-      cells: [r.waves[0].a + " → " + r.waves[r.waves.length - 1].a,
+      key: r.key, name: FF_COHORTS[r.ck].name + " voters, v " + (r.q === "on" ? "One Nation" : "Coalition"), sig: r.sig,
+      cells: [r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck],
         r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–",
         r.fit ? (r.sig ? "Yes" : "No") : "–"],
     })),
@@ -4593,12 +4628,12 @@ function RdFlows() {
         </div>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
-            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffBy("coal").waves.length > 1 ? ffTitle(ffBy("coal")) : "Coalition voters, if forced to Labor or One Nation"}</h4></div>
-            <RdForced waves={FF.coal} rival="One Nation" W={cw} phone={phone} />
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("on")}</h4></div>
+            <RdForced waves={FF.vsOn} cohorts={["grn", "coal", "oth"]} rival="One Nation" W={cw} phone={phone} />
           </div>
           <div className="rd-fl-one">
-            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffBy("on").waves.length > 1 ? ffTitle(ffBy("on")) : "One Nation voters, if forced to Labor or the Coalition"}</h4></div>
-            <RdForced waves={FF.on} rival="the Coalition" W={cw} phone={phone} />
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
+            <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} />
           </div>
         </div>
       </div>}
@@ -4610,7 +4645,7 @@ function RdFlows() {
         heads={["Series", "First → last", "Slope, pts/yr", "t", "Significant"]}
         sets={ffSet ? flSets.concat(ffSet) : flSets}
         note={"One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes."
-          + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the two — a Yes is what the chart titles’ up/down-from tails ride." : "")}
+          + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the six — a Yes licenses that cohort’s tail in its chart’s title." : "")}
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster’s first head-to-heads. This check corrects no other figure on the page.
