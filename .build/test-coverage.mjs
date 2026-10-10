@@ -10,8 +10,11 @@
    witness table is reported as first contact (name, dates, row refs) with
    the exit code untouched; the first-contact seen-file suppresses at the
    gate but never at emission; the seen-file writer keeps its
-   one-entry-per-line merge discipline; and the gate's pick verb caps a run
-   at three shell-safe names with recorded ones suppressed. Run:
+   one-entry-per-line merge discipline; the gate's pick verb caps a run
+   at three shell-safe names with recorded ones suppressed; and an MRP wave
+   parses in each of the live table's row forms, is covered only by its own
+   "(MRP)" pollster's rows, and is never masked by a nearby regular wave of
+   the same house. Run:
    node .build/test-coverage.mjs */
 import { mkdtempSync, writeFileSync, mkdirSync, cpSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -180,5 +183,56 @@ const contacts = ["JWS Research", "Acme Polling", "OMalley & Sons", "Poll$(whoam
 const picked = JSON.parse(fcCli(["pick", JSON.stringify(contacts)]));
 assert.deepEqual(picked.names, ["OMalley & Sons", "One More", "Two More"], "recorded names suppressed, cap at 3: " + JSON.stringify(picked));
 assert.deepEqual(picked.unsafe, ["Poll$(whoami)"], "shell metacharacters held back");
+
+// ---- MRP rows: the live table's forms, and the masking rule -----------------
+// Every MRP row on the live table wraps its date cell in {{nowrap|…}} (which
+// used to kill the date parse silently), and the firm cell comes LINKED with
+// a trailing parenthetical ("[[YouGov]] (MRP)") or PLAIN ("DemosAU (MRP)",
+// "RedBridge/Accent (MRP)") — the plain form used to fall into the
+// first-contact branch, where the known-name suppression swallowed it whole.
+const mrpRow = (dates, firmCell, cite) => `|-
+| rowspan="2" style="text-align:centre;" | {{nowrap|${dates}}}
+| rowspan="2" align="left" | ${firmCell}<ref>${cite}</ref>
+| rowspan="2" {{n/a}}
+| rowspan="2" | Online
+| rowspan="2" | 15,000
+| rowspan="2" | 27%
+| colspan="2" rowspan="2" | 21%
+| rowspan="2" | 13%
+| rowspan="2" | 28%
+| rowspan="2" | 11%
+| 53% || 47% ||
+|-
+| 52% || 48% ||
+`.replace(/\{\{n\/a\}\}/g, "| —");
+const mrpWiki = wiki.replace("|}\n",
+  mrpRow("18–21 Sept", "[[YouGov]] (MRP)", "u") + // nowrap date, linked "(MRP)" firm cell
+  mrpRow("10–14 Sept", "DemosAU (MRP)", "v") + // nowrap date, plain "(MRP)" firm cell
+  row("18–21 Sept", "YouGov", "u2") + // same house, same date, the regular product
+  "|}\n");
+
+// 11. all three forms parse as waves; tracked "(MRP)" rows cover them, and a
+// regular product on the same date does not swallow the MRP one (or vice versa)
+writeFileSync(WIKI, mrpWiki + "x".repeat(60_000));
+let D2 = base();
+D2.polls.push(poll("YouGov (MRP)", "2026-09-21"), poll("DemosAU (MRP)", "2026-09-14"), poll("YouGov", "2026-09-21"));
+write(D2);
+r = doctor();
+assert.equal(r.code, 0, r.out);
+assert.match(r.out, /26 witness waves/, "both 21 Sep YouGov products count (" + r.out + ")");
+c = check();
+assert.deepEqual(c.fc, [], "mapped MRP cells never leak into first contact");
+
+// 12. a regular wave inside the ±3-day slack must NOT mask a missing MRP wave
+// of the same house — the (MRP) variant is tracked here only by an older MRP
+// wave well outside the slack, the live dataset's actual shape
+D2.polls = D2.polls.filter((p) => p.pollster !== "DemosAU (MRP)");
+D2.polls.push(poll("DemosAU (MRP)", "2026-03-03"), poll("DemosAU", "2026-09-15"));
+write(D2);
+r = doctor();
+assert.equal(r.code, 2, r.out);
+assert.equal(r.st.defects.length, 1, "only the masked MRP wave is a defect: " + JSON.stringify(r.st));
+assert.match(r.st.defects[0], /2026-09-14\s+DemosAU \(MRP\) — listed by the witness/, r.st.defects[0]);
+assert.doesNotMatch(r.out, /\(MRP\) \(MRP\)/, "the (MRP) suffix does not double up on a named variant");
 
 console.log("test-coverage: ok");

@@ -70,7 +70,10 @@ const POLLS = process.env.DOCTOR_POLLS || ROOT + "data/polls.json";
 
 const res = process.env.DOCTOR_CHECK_CMD
   ? spawnSync(process.env.DOCTOR_CHECK_CMD, { cwd: ROOT, encoding: "utf8", shell: true })
-  : spawnSync(process.execPath, [".build/check-coverage.mjs", "--quiet"], { cwd: ROOT, encoding: "utf8" });
+  // DOCTOR_POLLS must reach the in-process check too — the check's own data
+  // read honours COVERAGE_POLLS.
+  : spawnSync(process.execPath, [".build/check-coverage.mjs", "--quiet"], { cwd: ROOT, encoding: "utf8",
+      env: process.env.DOCTOR_POLLS ? { ...process.env, COVERAGE_POLLS: process.env.DOCTOR_POLLS } : process.env });
 
 const statusLine = ((res.stdout || "") + "\n" + (res.stderr || ""))
   .split("\n").filter((l) => l.startsWith("COVERAGE_STATUS ")).pop();
@@ -103,7 +106,8 @@ const explanation = (house, last) => {
 // fallback has already put the wave on the page)
 const defects = [], provisional = [];
 for (const m of st.missing || []) {
-  (m.provisional ? provisional : defects).push(`${m.date}  ${m.house}${m.mrp ? " (MRP)" : ""} — listed by the witness, not in polls.json${m.provisional ? "; on the page provisionally via the Poll Bludger fallback" : ""}`);
+  // m.house already names the "(MRP)" variant when m.mrp is set
+  (m.provisional ? provisional : defects).push(`${m.date}  ${m.house} — listed by the witness, not in polls.json${m.provisional ? "; on the page provisionally via the Poll Bludger fallback" : ""}`);
 }
 for (const o of st.overdue || []) {
   if (o.witness_newer) (o.provisional ? provisional : defects).push(`${o.house}: ${o.days_since}d quiet (cadence ~${o.cadence_days}d) and the witness has a ${o.witness_newer} wave — missed, not quiet${o.provisional ? "; on the page provisionally via the Poll Bludger fallback" : ""}`);

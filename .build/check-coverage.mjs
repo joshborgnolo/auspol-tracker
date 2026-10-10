@@ -58,7 +58,9 @@ const argv = process.argv.slice(2);
 const JSON_ONLY = argv.includes("--json");
 const QUIET = argv.includes("--quiet");
 const WIKI_FILE = argv.includes("--wiki") ? argv[argv.indexOf("--wiki") + 1] : process.env.COVERAGE_WIKI_FILE || null;
-const OUT = "data/polls.json";
+// COVERAGE_POLLS swaps the tracker-data read — coverage-doctor's DOCTOR_POLLS
+// fixture seam depends on it (the doctor runs this script in-process).
+const OUT = process.env.COVERAGE_POLLS ?? "data/polls.json";
 const WIKI_TITLE = "Opinion_polling_for_the_next_Australian_federal_election";
 const WIKI_RAW = `https://en.wikipedia.org/w/index.php?title=${WIKI_TITLE}&action=raw`;
 const CACHE = ".build/logs/wiki-polls-cache.txt";
@@ -194,6 +196,12 @@ function firmCandidate(cell) {
 // in scope: a leadership or preferred-PM table repeats the same houses and
 // dates and would double-count every wave.
 function parseWitness(text) {
+  // {{nowrap|…}} wraps many live date cells (every MRP row carries one), and
+  // the date scan's lastIndexOf("|") cut then lands INSIDE the template and
+  // leaves "29 Apr – 14 May}}" for endDate's anchored patterns to reject —
+  // the row died silently. Unwrap the single-argument template up front;
+  // {{efn|…}} and friends are left alone.
+  text = text.replace(/\{\{\s*nowrap\s*\|([^{}]*)\}\}/gi, "$1");
   const waves = [], unknowns = [];
   let year = null, inVi = false;
   for (const chunk of text.split(/^\|-[^\n]*$/m)) {
@@ -239,7 +247,17 @@ function parseWitness(text) {
       }
     }
     const firm = firmCell ? firmCandidate(firmCell) : null;
-    if (!house && firm && HOUSE[houseKey(firm)]) { house = HOUSE[houseKey(firm)]; wikiName = firm; }
+    /* "(MRP)" firm cells are plain text on the live table ("DemosAU (MRP)",
+       "RedBridge/Accent (MRP)") and never match a HOUSE key as written, so
+       the row fell into the first-contact branch — where isKnownName's
+       substring suppression then swallowed it whole: neither a wave nor a
+       surfaced name. Match the house on the firm name minus the
+       parenthetical; isMrp below carries the variant. */
+    if (!house && firm) {
+      const base = firm.replace(/\s*\(MRP\)\s*$/i, "");
+      const hit = HOUSE[houseKey(firm)] ?? (base !== firm ? HOUSE[houseKey(base)] : undefined);
+      if (hit) { house = hit; wikiName = firm; }
+    }
     const isMrp = /\bMRP\b/.test(chunk);
 
     if (!house) {
@@ -254,10 +272,12 @@ function parseWitness(text) {
     }
     waves.push({ date, house, wikiName, mrp: isMrp });
   }
-  // The same wave can appear in more than one in-scope table.
+  // The same wave can appear in more than one in-scope table. An MRP row and
+  // a regular row of the one house on the one date are different products,
+  // not dupes — the flag is part of the key.
   const seen = new Set(), out = [];
   for (const w of waves) {
-    const k = `${w.house[0]}|${w.date}`;
+    const k = `${w.house[0]}|${w.mrp ? "m" : "r"}|${w.date}`;
     if (seen.has(k)) continue;
     seen.add(k); out.push(w);
   }
@@ -355,14 +375,17 @@ try {
   if (waves.length < 20) throw new Error(`witness parsed only ${waves.length} waves — table layout may have changed`);
 
   for (const w of waves) {
-    // An MRP is a different product from the same house and the tracker keeps
-    // it under its own "(MRP)" pollster, so match it against that variant
-    // rather than reporting every MRP as a missing headline poll.
+    /* An MRP is a different product from the same house and the tracker
+       keeps it under its own "(MRP)" pollster, so ONLY that variant's rows
+       can cover it — unioning the main series' dates in (as this used to)
+       let a regular wave within the slack silently mask a missing MRP
+       report. A wave whose house has no "(MRP)" variant in HOUSE has nothing
+       to match against and skips, as untracked-MRP waves always have. */
     const names = w.mrp
-      ? w.house.filter((h) => /\(MRP\)/.test(h)).concat(w.house.filter((h) => !/\(MRP\)/.test(h)))
+      ? w.house.filter((h) => /\(MRP\)/.test(h))
       : w.house.filter((h) => !/\(MRP\)/.test(h));
+    if (!names.some((h) => byHouse.has(h))) continue; // house (or its MRP) not tracked at all
     const tracked = names.flatMap((h) => byHouse.get(h) ?? []);
-    if (!names.some((h) => byHouse.has(h))) continue; // house not tracked at all
     const near = tracked.some((d) => Math.abs(daysBetween(d, w.date)) <= DATE_SLACK_DAYS);
     if (!near) status.missing.push({ date: w.date, house: names[0], wiki: w.wikiName, mrp: w.mrp,
       ...(provisionallyCovered(names, w.date) ? { provisional: true } : {}) });
@@ -395,7 +418,8 @@ if (!JSON_ONLY && !QUIET) {
   } else {
     if (n) {
       console.log(`coverage: ${n} wave${n === 1 ? "" : "s"} on Wikipedia that polls.json does not have —`);
-      for (const m of status.missing.slice(0, 15)) console.log(`  ${m.date}  ${m.house}${m.mrp ? " (MRP)" : ""}${m.provisional ? "  (on the page provisionally, via the Poll Bludger fallback)" : ""}`);
+      // m.house already carries the "(MRP)" variant name when m.mrp is set
+      for (const m of status.missing.slice(0, 15)) console.log(`  ${m.date}  ${m.house}${m.provisional ? "  (on the page provisionally, via the Poll Bludger fallback)" : ""}`);
       if (n > 15) console.log(`  … and ${n - 15} more`);
     }
     if (o) {
