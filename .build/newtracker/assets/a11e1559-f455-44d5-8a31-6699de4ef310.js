@@ -3174,6 +3174,39 @@ function tppLines(cs, r) {
                           delta: dFlows ? { v: +(-dFlows.v).toFixed(1), refDate: dFlows.refDate } : null },
       ],
     } });
+    /* the house-printed cohort forced-choice figures (RedBridge/Accent's
+       Table 1 splits – the "When pressed, where do their voters go?"
+       panel's waves): published figures, so they sit in this section, each
+       with its own series delta exactly as the flows line above. The note
+       names the cohort, or the pair alone can't say whose figure it is */
+    if (c.kind === "2pp" && r.splitCoal != null) {
+      const dCoal = segDelta(r.chg, "splitCoal");
+      out.push({ alt: true, note: (
+        <>Coalition voters, if forced to choose: Labor v One Nation{r.splitCoalEst
+          ? " — combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)"
+          : ""}</>
+      ), c: {
+        kind: "split", lab: "forced, Coalition voters, ALP v ON", flag: null,
+        segs: [
+          { label: "ALP", value: r.splitCoal, color: PARTY_C.alp, delta: dCoal },
+          { label: "ON", value: Math.round((100 - r.splitCoal) * 10) / 10, color: PARTY_C.onp,
+                            delta: dCoal ? { v: +(-dCoal.v).toFixed(1), refDate: dCoal.refDate } : null },
+        ],
+      } });
+    }
+    if (c.kind === "2pp" && r.splitOnp != null) {
+      const dOnp = segDelta(r.chg, "splitOnp");
+      out.push({ alt: true, note: (
+        <>One Nation voters, if forced to choose: Labor v the Coalition</>
+      ), c: {
+        kind: "split", lab: "forced, One Nation voters, ALP v L/NP", flag: null,
+        segs: [
+          { label: "ALP", value: r.splitOnp, color: PARTY_C.alp, delta: dOnp },
+          { label: "L/NP", value: Math.round((100 - r.splitOnp) * 10) / 10, color: PARTY_C.lnp,
+                            delta: dOnp ? { v: +(-dOnp.v).toFixed(1), refDate: dOnp.refDate } : null },
+        ],
+      } });
+    }
   }
   return out.map((x) => ({ ...x, count: out.length }));
 }

@@ -1452,6 +1452,19 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             <span></span>{cols.map((k) => <span key={k.id} className="rd-apd-th">{k.head}</span>)}
             <span className="rd-apd-k">Implied, on {rdElecYear} flows</span>{cols.map((k) => <span key={k.id}>{k.imp}</span>)}
             <span className="rd-apd-k">As {p.pollster} published</span>{cols.map((k) => <span key={k.id}>{k.pub}</span>)}
+            {/* RedBridge/Accent's forced-choice splits: each cohort's pair
+                lands under the column of the rival they were pressed between
+                (Coalition voters → the v One Nation column, One Nation
+                voters → the v Coalition column), so it travels with the matchup
+                basis flip; the other column dashes */}
+            {p.splitCoal != null && <>
+              <span className="rd-apd-k">Coalition voters, if forced to choose</span>
+              {cols.map((k) => <span key={k.id}>{k.id === "onp" ? <>{pair(rdApNum(p.splitCoal), rdApNum(100 - p.splitCoal), "var(--onp-text)")} {chg(c.splitCoal, 0)}</> : none}</span>)}
+            </>}
+            {p.splitOnp != null && <>
+              <span className="rd-apd-k">One Nation voters, if forced to choose</span>
+              {cols.map((k) => <span key={k.id}>{k.id === "lnp" ? <>{pair(rdApNum(p.splitOnp), rdApNum(100 - p.splitOnp), "var(--lnp-text)")} {chg(c.splitOnp, 0)}</> : none}</span>)}
+            </>}
             {(ppmBy.onp || ppmBy.lnp) && <>
               <span className="rd-apd-k">{window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"}</span>
               {cols.map((k) => <span key={k.id}>{ppmBy[k.id] || none}</span>)}
@@ -1462,6 +1475,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             </>}
           </div>
         )}
+        {p.splitCoalEst && <span className="rd-apd-sub rd-apd-note">The Coalition-voters split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed).</span>}
         {!isConf && decRow && (
           <div className="rd-apd-grid rd-apd-grid1">
             <span className="rd-apd-k">Decidedness</span>
@@ -4350,7 +4364,13 @@ function RdForced({ waves, rival, W, phone }) {
   const ticks = rdApMonthTicks(ms, phone ? 2 : 1);
   const show = (w, src) => setTip({ ym: w.ym, src, w });
   const hide = (w, src) => setTip((t) => (t && t.ym === w.ym && (!src || t.src === src) ? null : t));
+  /* RdFlowChart's wave-dot idiom: every forced wave files on its house's
+     poll row, so the dots open that row in the archive (mouse click or
+     Enter); a touch tap still only reads the tip */
+  const house = D.flowForced && D.flowForced.house;
+  const keyOf = (w) => (window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null);
   const tpx = tip ? X(tip.ym) : 0;
+  const tipK = tip ? keyOf(tip.w) : null;
   const half = Math.min((tipW || 220) / 2, W / 2 - 8);
   return (
     <figure className="rd-ff" ref={box}>
@@ -4360,14 +4380,17 @@ function RdForced({ waves, rival, W, phone }) {
         {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
         <path d={monotoneXY(aPts)} className="rd-ff-line a"></path>
         <path d={monotoneXY(bPts)} className={"rd-ff-line b" + (rival === "the Coalition" ? " is-lnp" : "")}></path>
-        {waves.map((w) => (
+        {waves.map((w) => {
+          const k = keyOf(w);
+          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the forced-choice flow chart"); } };
+          return (
           <g key={w.ym}>
             {tip && tip.ym === w.ym && <><circle cx={X(w.ym)} cy={Y(w.a)} r="6" className="rd-apd-dothi"></circle><circle cx={X(w.ym)} cy={Y(w.b)} r="6" className="rd-apd-dothi"></circle></>}
             <circle cx={X(w.ym)} cy={Y(w.a)} r="3" className="rd-ff-dot a"></circle>
             <circle cx={X(w.ym)} cy={Y(w.b)} r="3" className={"rd-ff-dot b" + (rival === "the Coalition" ? " is-lnp" : "")}></circle>
-            <circle cx={X(w.ym)} cy={Y(w.a)} r="9" className="rd-apd-hit"
-                    tabIndex="0" role="img"
-                    aria-label={`${rdMonthYear(w.ym)}: Labor ${w.a}, ${rival} ${w.b}${w.est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}`}
+            <circle cx={X(w.ym)} cy={Y(w.a)} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
+                    tabIndex="0" role={k ? "button" : "img"}
+                    aria-label={`${rdMonthYear(w.ym)}: Labor ${w.a}, ${rival} ${w.b}${w.est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "")}
                     onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                     onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, "mouse"); }}
                     onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
@@ -4377,10 +4400,15 @@ function RdForced({ waves, rival, W, phone }) {
                       ev.stopPropagation();
                       const pt = ev.detail === 0 ? "key" : ptr.current;
                       ptr.current = null;
-                      if (pt === "mouse" || pt === "key") return;
+                      if (pt === "mouse" || pt === "key") { open(); return; }
                       if (tip && tip.ym === w.ym) setTip(null); else show(w, "touch");
+                    }}
+                    onKeyDown={(ev) => {
+                      if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                      ev.preventDefault();
+                      open();
                     }}></circle>
-            <circle cx={X(w.ym)} cy={Y(w.b)} r="9" className="rd-apd-hit"
+            <circle cx={X(w.ym)} cy={Y(w.b)} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
                     tabIndex="-1" aria-hidden="true"
                     onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                     onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, "mouse"); }}
@@ -4389,11 +4417,12 @@ function RdForced({ waves, rival, W, phone }) {
                       ev.stopPropagation();
                       const pt = ev.detail === 0 ? "key" : ptr.current;
                       ptr.current = null;
-                      if (pt === "mouse" || pt === "key") return;
+                      if (pt === "mouse" || pt === "key") { open(); return; }
                       if (tip && tip.ym === w.ym) setTip(null); else show(w, "touch");
                     }}></circle>
           </g>
-        ))}
+          );
+        })}
         <text x={x1 + 8} y={Y(la.a) - 2} className="rd-ff-el a">Labor</text>
         <text x={x1 + 8} y={Y(la.a) + 12} className="rd-ff-elv a">{la.a}</text>
         <text x={x1 + 8} y={Y(la.b) - 2} className={"rd-ff-el b" + (rival === "the Coalition" ? " is-lnp" : "")}>{rival === "the Coalition" ? "Coalition" : "One Nation"}</text>
@@ -4407,7 +4436,11 @@ function RdForced({ waves, rival, W, phone }) {
           <span className="tip-row"><span className="tip-label">Labor</span><span className="tip-val">{tip.w.a}%</span></span>
           <span className="tip-row"><span className="tip-label">{rival === "the Coalition" ? "Coalition" : "One Nation"}</span><span className="tip-val">{tip.w.b}%</span></span>
           {tip.w.n != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {tip.w.n.toLocaleString()}</span></span>}
-          {tip.w.url && <span className="tip-row tip-hintwrap"><a className="tip-hint rd-ff-lnk" href={tip.w.url} target="_blank" rel="noopener">RedBridge/Accent wave report ↗</a></span>}
+          {/* the standard tip-hint chrome (accent div, per RdFlowChart's
+              wave tip — the report link lives in the poll's ledger links);
+              only for an input that can actually open the poll: a touch
+              tap READS the dot, it never navigates */}
+          {tipK && tip.src !== "touch" && <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
           {tip.w.est && <span className="tip-row tip-hintwrap"><span className="tip-sub tip-hint">June’s Coalition split combines the report’s printed CLP/LNP/Nat (34) and Liberal (37) rows — no combined row was printed</span></span>}
         </span>
       )}

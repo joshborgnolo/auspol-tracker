@@ -8,6 +8,13 @@
    published figure, end labels sit inside the radius, the rival class on the
    One-Nation-voters chart is `is-lnp` (blue, not orange), gridlines are five,
    and the June est note rides the June dot's aria-label on the coal chart only.
+   The dots ride the standard wave-dot idiom: tooltips carry "Click to open
+   this poll in All polls" (never a wave-report link), a mouse click or Enter
+   opens the poll row in All polls, and the wave's forced-choice figures sit
+   in the opened poll's ledger: the archive drawer's matchup grid carries a
+   "Coalition voters, if forced to choose" / "One Nation voters, if forced to
+   choose" row each (RdApDetail), with the June wave's combined-rows note
+   under the grid.
 */
 import puppeteer from "puppeteer-core";
 import path from "path";
@@ -114,7 +121,8 @@ check(d.orderKeyThenForced.iTsig === d.orderKeyThenForced.iFF + 1,
 }
 const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
 
-// tip: hover the Sep dot of the coal chart, expect the wave-report link
+// tip: hover the Sep dot of the coal chart — the standard open-poll hint,
+// not a report link (the report link lives in the opened poll's ledger)
 {
   await page.evaluate(() => {
     const hits = [...document.querySelectorAll("figure.rd-ff")][0].querySelectorAll("circle.rd-apd-hit[aria-label^='September 2026']");
@@ -136,7 +144,8 @@ const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff
       title: t.querySelector(".tip-title").textContent,
       rows: [...t.querySelectorAll(".tip-row .tip-label")].map((l) => l.textContent.trim()),
       vals: [...t.querySelectorAll(".tip-row .tip-val")].map((v) => v.textContent.trim()),
-      link: t.querySelector("a.rd-ff-lnk") ? t.querySelector("a.rd-ff-lnk").href : null,
+      hint: (t.querySelector("div.tip-hint") || {}).textContent || null,
+      link: !!t.querySelector("a.rd-ff-lnk"),
       est: t.querySelectorAll(".tip-sub.tip-hint").length,
     };
   });
@@ -144,7 +153,8 @@ const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff
   check(tip && tip.rows.includes("Labor") && tip.vals.includes("41%"), `coal Sep tip: Labor row 41% (${JSON.stringify(tip && tip.vals)})`);
   check(tip && tip.rows.includes("One Nation") && tip.vals.includes("59%"), `coal Sep tip: One Nation row 59%`);
   check(tip && tip.rows.includes("Sample") && tip.vals.includes("n = 1,000"), `coal Sep tip: sample row`);
-  check(tip && tip.link && tip.link.includes("accent-research.com"), `coal Sep tip: report link (${tip && tip.link})`);
+  check(tip && tip.hint === "Click to open this poll in All polls", `coal Sep tip: the standard open-poll hint (${JSON.stringify(tip && tip.hint)})`);
+  check(tip && tip.link === false, `coal Sep tip: no wave-report link in the tip (it moved to the ledger)`);
   check(tip && tip.est === 0, `coal Sep tip: no est note on a printed wave`);
 
   // June dot on the coal chart carries the est note
@@ -163,12 +173,14 @@ const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff
     return {
       title: t.querySelector(".tip-title").textContent,
       est: [...t.querySelectorAll(".tip-sub.tip-hint")].map((s) => s.textContent.trim()),
+      hint: (t.querySelector("div.tip-hint") || {}).textContent || null,
       wrap: t.querySelectorAll(".tip-row.tip-hintwrap").length,
     };
   });
   check(!!tipJ && tipJ.title === "June 2026" && tipJ.est.length === 1 && tipJ.est[0].includes("CLP/LNP/Nat (34)") && tipJ.est[0].includes("Liberal (37)"),
     `coal June tip: the combined-rows note rides the June dot (${JSON.stringify(tipJ && tipJ.est)})`);
-  check(tipJ && tipJ.wrap === 2, `coal June tip: link and est note both wrapped rows (${tipJ && tipJ.wrap})`);
+  check(tipJ && tipJ.hint === "Click to open this poll in All polls", `coal June tip: the open-poll hint beside the est note (${JSON.stringify(tipJ && tipJ.hint)})`);
+  check(tipJ && tipJ.wrap === 1, `coal June tip: only the est note is a wrapped row (${tipJ && tipJ.wrap})`);
 }
 
 // svg vmaps the data: y of each Labor dot equals the published share
@@ -187,6 +199,89 @@ const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff
   check(JSON.stringify(pairs) === JSON.stringify(expected), `coal chart Labor dots vmap the published splits (${JSON.stringify(pairs)})`);
 }
 check(viewH === 230, `desktop: plot height 230 (${viewH})`);
+
+// click the Sep dot of the coal chart with a real mouse: the wave opens in
+// All polls, named by the return button, and its wave's forced-choice
+// figures sit in the poll ledger's "as published" section
+{
+  const c = await page.evaluate(() => {
+    const h = [...document.querySelectorAll("figure.rd-ff")][0].querySelector("circle.rd-apd-hit[aria-label^='September 2026']");
+    h.scrollIntoView({ block: "center", behavior: "instant" });
+    const r = h.getBoundingClientRect();
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  });
+  await page.mouse.click(c.x, c.y);
+  let land = null;
+  try {
+    await page.waitForSelector(".rd-ap-row.open", { timeout: 8000 });
+    await new Promise((r) => setTimeout(r, 400));
+    land = await page.evaluate(() => {
+      const row = document.querySelector(".rd-ap-row.open");
+      const det = document.querySelector(".rd-ap-open");
+      if (!row || !det) return null;
+      const head = ((row.querySelector("[role=rowheader] b") || {}).textContent || "").replace(/↗/g, "").trim();
+      /* each forced row of the matchup grid: its key span followed by the
+         two column cells (only the rival's column carries figures) */
+      const forced = [...det.querySelectorAll(".rd-apd-grid .rd-apd-k")]
+        .filter((k) => k.textContent.includes("forced to choose"))
+        .map((k) => {
+          const cells = [];
+          for (let n = k.nextElementSibling; n && cells.length < 2; n = n.nextElementSibling)
+            cells.push(n.textContent.replace(/\s+/g, " ").trim());
+          return { key: k.textContent.trim(), cells };
+        });
+      const estNote = [...det.querySelectorAll(".rd-apd-note")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
+      const back = [...document.querySelectorAll("button")].map((b) => b.textContent.trim()).find((t) => t.startsWith("Back to "));
+      return { head, forced, estNote, back: back || null };
+    });
+  } catch (e) { /* land stays null */ }
+  check(!!land && land.head === "RedBridge/Accent",
+    `click Sep coal dot: the wave's poll row opens in All polls (${JSON.stringify(land && land.head)})`);
+  check(!!land && land.back === "Back to the forced-choice flow chart",
+    `…the return button names the forced-choice chart (${JSON.stringify(land && land.back)})`);
+  const coalRow = land && land.forced.find((x) => x.key === "Coalition voters, if forced to choose");
+  const onpRow = land && land.forced.find((x) => x.key === "One Nation voters, if forced to choose");
+  check(!!coalRow && coalRow.cells.some((t) => t.includes("41") && t.includes("59") && t.includes("▲ 9")),
+    `ledger: Coalition-voters forced row 41 – 59 (▲ 9) in the v-One-Nation column (${JSON.stringify(coalRow)})`);
+  check(!!onpRow && onpRow.cells.some((t) => t.includes("15") && t.includes("85") && t.includes("▼ 2")),
+    `ledger: One-Nation-voters forced row 15 – 85 (▼ 2) in the v-Coalition column (${JSON.stringify(onpRow)})`);
+  check(!!land && land.estNote.every((n) => !n.includes("combined row was printed")),
+    `ledger: no combined-rows note on a printed wave (${JSON.stringify(land && land.estNote)})`);
+}
+
+// the June wave's drawer carries the combined-rows note under the matchup grid
+{
+  await page.evaluate(() => window.AP.openPoll("RedBridge/Accent|2026-06-26", "twopp", "the probe"));
+  let jun = null;
+  try {
+    await page.waitForFunction(() => {
+      const row = document.querySelector(".rd-ap-row.open");
+      return row && ((row.querySelector("[role=rowheader] b") || {}).textContent || "").includes("RedBridge/Accent");
+    }, { timeout: 8000 });
+    await new Promise((r) => setTimeout(r, 300));
+    jun = await page.evaluate(() => {
+      const det = document.querySelector(".rd-ap-open");
+      if (!det) return null;
+      const keys = [...det.querySelectorAll(".rd-apd-grid .rd-apd-k")].map((k) => k.textContent.trim());
+      const estNote = [...det.querySelectorAll(".rd-apd-note")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
+      const cell = (() => {
+        const k = [...det.querySelectorAll(".rd-apd-grid .rd-apd-k")].find((x) => x.textContent.includes("Coalition voters"));
+        if (!k) return null;
+        const cells = [];
+        for (let n = k.nextElementSibling; n && cells.length < 2; n = n.nextElementSibling)
+          cells.push(n.textContent.replace(/\s+/g, " ").trim());
+        return cells;
+      })();
+      return { keys, estNote, coalCell: cell };
+    });
+  } catch (e) { /* jun stays null */ }
+  check(!!jun && jun.keys.includes("Coalition voters, if forced to choose"),
+    `June wave drawer: Coalition-voters forced row present (${JSON.stringify(jun && jun.keys)})`);
+  check(!!jun && Array.isArray(jun.coalCell) && jun.coalCell.some((t) => t.includes("36") && t.includes("64") && t.includes("▲ 4")),
+    `June wave drawer: forced split 36 – 64 (▲ 4) rides the v-One-Nation column (${JSON.stringify(jun && jun.coalCell)})`);
+  check(!!jun && jun.estNote.some((n) => n.includes("combined row was printed") && n.includes("CLP/LNP/Nat")),
+    `June wave drawer: the combined-rows note sits under the matchup grid (${JSON.stringify(jun && jun.estNote)})`);
+}
 
 // ---------------- phone rung ------------------------------------------------
 await gotoFlows(390);

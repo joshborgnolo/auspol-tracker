@@ -2292,6 +2292,13 @@ const CHG_MEASURES = {
   // 2025-election preference flows. Only those two houses carry it, so the
   // series is each house's own and the delta keys to its previous wave
   flows:     (p, a, pm) => p.tpp_flows ?? null,
+  /* RedBridge/Accent's cohort forced-choice figures, one measure each: the
+     Labor share when Coalition voters are pressed into Labor-v-One Nation
+     (tpp_split_on.lnp) and when One Nation voters are pressed Labor-v-the
+     Coalition (tpp_split.onp). One house prints them, so each series is
+     that house's own and the delta keys to its previous wave. */
+  splitCoal: (p) => (p.tpp_split_on && p.tpp_split_on.lnp != null ? p.tpp_split_on.lnp : null),
+  splitOnp:  (p) => (p.tpp_split && p.tpp_split.onp != null ? p.tpp_split.onp : null),
   // every implied-eligible wave's own implied figure – its primaries read
   // through the fixed 2025 flow table (the same number the detail shows as
   // alpImp). The series the implied-basis "Since last wave" moves key to,
@@ -2929,6 +2936,11 @@ const linksOf = (p) => {
 for (const p of [...directionOnlyPolls, ...issuesOnlyPolls, ...confidenceOnlyPolls])
   p.links = linksOf({ pollster: p.pollster, url: p.url, methodUrl: p.methodUrl, date: p.released });
 
+/* tpp_split_on waves whose lnp is hand-derived, not extractor-read —
+   exactly the one documented in polls.schema.json's tpp_split_on note
+   (Jun 2026). Read by both per-poll emitters (as splitCoalEst) and by the
+   forced-choice panel below (as est), so the one marks the other. */
+const HAND_SPLIT_ON = new Set(["2026-06-26"]);
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
   const fym = p.dateStart ? ymOf(p.dateStart) : null;
@@ -2981,6 +2993,17 @@ const individualPolls = POLLS.map((p) => {
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    /* RedBridge/Accent's cohort forced-choice figures (absent-not-zero):
+       the Labor share when Coalition voters are pressed into Labor-v-One
+       Nation (tpp_split_on.lnp) and when One Nation voters are pressed
+       Labor-v-the Coalition (tpp_split.onp) – the same fields the "When
+       pressed, where do their voters go?" panel charts; the archive detail
+       lists them in after-preferences, and Jun 2026's press-only Coalition
+       figure carries splitCoalEst. */
+    ...(p.tpp_split_on && p.tpp_split_on.lnp != null
+      ? { splitCoal: p.tpp_split_on.lnp, ...(HAND_SPLIT_ON.has(p.date) ? { splitCoalEst: true } : {}) }
+      : {}),
+    ...(p.tpp_split && p.tpp_split.onp != null ? { splitOnp: p.tpp_split.onp } : {}),
     // this poll's pull on the standing aggregates (leave-one-out, §3b) –
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
@@ -3221,6 +3244,12 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // RedBridge/Accent's vote-softness triple, same as the archive emitter
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    // RedBridge/Accent's cohort forced-choice figures, same as the archive
+    // emitter above (Latest-detail opens read this row set)
+    ...(p.tpp_split_on && p.tpp_split_on.lnp != null
+      ? { splitCoal: p.tpp_split_on.lnp, ...(HAND_SPLIT_ON.has(p.date) ? { splitCoalEst: true } : {}) }
+      : {}),
+    ...(p.tpp_split && p.tpp_split.onp != null ? { splitOnp: p.tpp_split.onp } : {}),
     // this poll's own primaries implied at the fixed 2025 flows (same
     // impShow display rule as the archive emitter above) – the implied
     // line's default basis
@@ -3557,10 +3586,8 @@ const flowForced = (() => {
      month's start still reads as its fieldwork month – Sep 2026's is
      date 2026-10-02 fw 2026-09-28 → "2026-09") */
   const wave = (p, y) => ({ date: p.date, ym: ymOf(p.dateStart || p.date), n: p.sample ?? null, url: p.releaseUrl || p.url || null, a: y, b: 100 - y });
-  /* waves whose lnp is hand-derived, not extractor-read — exactly the one
-     documented in polls.schema.json's tpp_split_on note (Jun 2026). est lets
-     the panel flag exactly those dots; onp waves are always verbatim. */
-  const HAND_SPLIT_ON = new Set(["2026-06-26"]);
+  /* HAND_SPLIT_ON lives with the emitters: est lets the panel flag exactly
+     those dots; onp waves are always verbatim. */
   const push = (arr, p, a, est) => arr.push({ ...wave(p, a), ...(est ? { est: true } : {}) });
   const coal = [], on = [];
   for (const p of rows) {
