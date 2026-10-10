@@ -1653,12 +1653,16 @@ const ldYard = (() => {
   return { at, line, breaks };
 })();
 
-/* The preferred-PM margin now – PM minus opponent, every format, as Past
-   cycles draws it – for the sitting term's latest point there (§10).
-   Taylor's era; sample-weighted, never house-adjusted, the six-week window,
-   as the preferred-PM readings are. A margin is a difference of two shares,
-   so it carries a net's sampling variance. */
-const ppmMarginNow = currentReading(ppm.filter((p) => p.alb != null && p.opp != null && eraOf(p.date) === "taylor" && curOf("alb")(p))
+/* The preferred-PM margin now – PM minus two-way opponent, as Past cycles
+   draws it – for the sitting term's latest point there (§10) and for the
+   Leadership panel's head. TWO-WAY rows only: a three-way prompt (Hanson
+   offered: Albanese 31, Taylor 15) is a different contest, a mixed pool
+   read the margin +9.6 against the two-way +2 in Oct 2026; her own lead
+   is ppmHMarginNow's pool. Taylor's era; sample-weighted, never
+   house-adjusted, the six-week window, as the preferred-PM readings are.
+   A margin is a difference of two shares, so it carries a net's sampling
+   variance. */
+const ppmMarginNow = currentReading(ppm.filter((p) => p.han == null && p.alb != null && p.opp != null && eraOf(p.date) === "taylor" && curOf("alb")(p))
   .map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: p.alb - p.opp, n: ppmN(p),
                  pq: Math.max(0, 100 * (p.alb + p.opp) - (p.alb - p.opp) ** 2) })), null, SPARSE_K);
 /* Albanese-over-Hanson preferred-PM margin now, for the sitting term's
@@ -1673,15 +1677,11 @@ const ppmHMarginNow = currentReading(D.ppmHeadToHead.filter((r) => r.alb != null
    difference of two shares of ONE sample (the shares move against each
    other, so the lead's margin is wider than the two shares' margins
    combined would suggest). The opposition lead is the TWO-WAY question's
-   only, as the panel's bars and leaderNow.alb_pref are: ppmMarginNow above
-   pools three-way readings too (Albanese 31, Taylor 15 when Hanson is
-   offered), a different contest that read +9.6 against the two-way +2 in
-   Oct 2026. The Hanson lead is its own head-to-head pool, two-way already. */
-const ppm2MarginNow = currentReading(ppm.filter((p) => p.han == null && p.alb != null && p.opp != null && eraOf(p.date) === "taylor" && curOf("alb")(p))
-  .map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: p.alb - p.opp, n: ppmN(p),
-                 pq: Math.max(0, 100 * (p.alb + p.opp) - (p.alb - p.opp) ** 2) })), null, SPARSE_K);
+   only, as the panel's bars and leaderNow.alb_pref are – ppmMarginNow
+   above takes exactly that basis; the Hanson lead is its own
+   head-to-head pool, two-way already. */
 const leaderLead = {
-  taylor: ppm2MarginNow ? { v: ppm2MarginNow.v, ci95: ppm2MarginNow.ci95 } : null,
+  taylor: ppmMarginNow ? { v: ppmMarginNow.v, ci95: ppmMarginNow.ci95 } : null,
   hanson: ppmHMarginNow ? { v: ppmHMarginNow.v, ci95: ppmHMarginNow.ci95 } : null,
 };
 
@@ -5103,8 +5103,12 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     netPts = debiasTerm(apprOnly.map((a) => leaderPt(a, a.alb)));
     oppPts = debiasTerm(apprOnly.map((a) => leaderPt(a, a.opp)), (p) => eraOf(p.iso));
     // current-term ppm readings are the live ppm table's per-wave margin –
-    // sample-weighted, never house-adjusted, as the live panel is
-    ppmPts = ppm.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.alb - p.opp, iso: p.date, firm: p.firm, t: Date.parse(p.date), n: ppmN(p) }));
+    // sample-weighted, never house-adjusted, as the live panel is; TWO-WAY
+    // rows only: a three-way prompt (han != null) is a different question
+    // (Albanese 31, Taylor 15) that read the margin +9.6 against the
+    // two-way +2 in Oct 2026; its own lead is ppmHMarginNow's pool
+    ppmPts = ppm.filter((p) => p.han == null && p.alb != null && p.opp != null)
+      .map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.alb - p.opp, iso: p.date, firm: p.firm, t: Date.parse(p.date), n: ppmN(p) }));
     // Albanese v Hanson on the same per-wave margin basis: a third question
     // asked as its own contest this term only (ppH above), so it takes the
     // live panel's treatment too – never house-adjusted, sparse months

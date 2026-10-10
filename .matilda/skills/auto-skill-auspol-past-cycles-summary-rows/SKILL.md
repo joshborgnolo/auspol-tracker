@@ -114,6 +114,24 @@ untouched (same hash); panicking over its unchanged name is a false alarm.** The
 series ride inside index.html's inline data (grep the built page for the quoted
 `"ppmh"` key, not for a filename).
 
+**The current term's ppmm is a TWO-WAY line** (shipped 2026-10-11): both current-cycle
+`ppmPts` in the `cycles` map and `ppmMarginNow` (the now-figure override) take
+`han == null` rows only — a Newspoll/RedBridge/DemosAU three-way preferred-PM prompt
+is a different question (PM's lead reads ~7pts narrower than the two-way margin —
+RedBridge's Albanese 31 / Taylor 15 pooled with YouGov's two-way +1 read the then
+now-figure +9.6 against the true two-way +2.3, the user-reported bug), and the site's
+§4b/cur2 convention never averages a three-way prompt with the head-to-head (the
+three-way's `extra` H2H pair stays out too — it belongs to its own reasoning; Hanson
+rides the separate ppmh row). The whole sitting-term line is therefore homogeneous
+two-way, monthly points and now-figure alike (the user's call: whole-line basis);
+past terms needed nothing (all two-way historically).
+`/vic/` inherits the filter verbatim — its recent preferred-Premier waves are named-Pickering
+three-ways (to-main-schema `han: hanKey ? … : null`), so the same rule purges them
+(the Vic now-figure went −7.3 → −15.8 on the same pass). The combination probe documenting
+the invariant end-to-end is `.matilda/probe/cyc-ppmm-twoway.mjs` (recomputes the series
+and nowcast from data/polls.json in Node, asserts every raw.ppmm month, the obs flags,
+the Taylor-era run end and the Now cell).
+
 ## Null rules that must hold when you add a row
 
 - Half-measured months stay null (`comb` sums only where BOTH tracked), so null terms

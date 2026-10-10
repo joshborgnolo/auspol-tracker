@@ -22,8 +22,9 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css
 
 const server = http.createServer(async (req, res) => {
   try {
-    const p = join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "index.html");
-    const body = await readFile(p.endsWith("/") ? p + "index.html" : p);
+    let p = join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "index.html");
+    if (p.endsWith("/")) p += "index.html";   // before extname: a dir URL must not answer application/octet-stream
+    const body = await readFile(p);
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(body);
   } catch { res.writeHead(404); res.end("nf"); }
