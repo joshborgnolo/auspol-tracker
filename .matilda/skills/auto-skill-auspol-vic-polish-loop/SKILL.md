@@ -1,11 +1,31 @@
 ---
 name: auspol-vic-polish-loop
-description: "auspol-tracker — the supervised vic-polish LOOP (built 2026-10-03, kit dc76387, first real round 36ce481; standard strengthened to a D1–D13 DEMAND LIST in 1a4efe2 after the first overnight run passed terminally in 8 minutes on a lenient hygiene-checklist standard; interaction tier D14–D17 added in dfdfddf after the user found the page READ like the main page but didn't BEHAVE like it). A headless matilda builder↔reviewer pair alternates inside a DEDICATED clone (~auspol-polish/repo) until the /vic/ satellite meets .build/vic-main-standard.md: deterministic GATE never believes agent claims, VP_VERDICT verdicts are observation-only, accepted rounds push via push_main. Records the smoke-run bugs, the overnight nohup launch anatomy (harness detached shells die with the session; nohup+disown survives), and the 'loop passed but the page looks the same' diagnosis — the bar lives ENTIRELY in the standard doc + probe pack, so a lenient standard = a terminal pass, and anything parked in §7 aspirations never gets built."
+description: "auspol-tracker — RETIRED 2026-10-05 (af72596; /vic/ now built by BUILD_JUR=vic + test-vic-build) historical record of the supervised vic-polish LOOP (built 2026-10-03, kit dc76387, first real round 36ce481; standard strengthened to a D1–D13 DEMAND LIST in 1a4efe2 after the first overnight run passed terminally in 8 minutes on a lenient hygiene-checklist standard; interaction tier D14–D17 added in dfdfddf after the user found the page READ like the main page but didn't BEHAVE like it). A headless matilda builder↔reviewer pair alternates inside a DEDICATED clone (~auspol-polish/repo) until the /vic/ satellite meets .build/vic-main-standard.md: deterministic GATE never believes agent claims, VP_VERDICT verdicts are observation-only, accepted rounds push via push_main. Records the smoke-run bugs, the overnight nohup launch anatomy (harness detached shells die with the session; nohup+disown survives), and the 'loop passed but the page looks the same' diagnosis — the bar lives ENTIRELY in the standard doc + probe pack, so a lenient standard = a terminal pass, and anything parked in §7 aspirations never gets built."
 source: auto-skill
 extracted_at: '2026-10-04T01:20:00.000Z'
 ---
 
 # vic-polish — the unattended /vic/ review loop
+
+> **RETIRED 2026-10-05 (commit `af72596`).** The loop and `refresh-vic.mjs`
+> were deleted when `/vic/` was rebuilt on the main page's own code: the
+> build became jurisdiction-parameterised (`BUILD_JUR=vic` copies the
+> builder files `build.mjs`/`template.html`/`gen-data.mjs` **from
+> `.build/vic/to-main-schema.mjs`**), the generated `vic/index.html` is
+> committed by SITE_FILES, rebuild scars are checked by
+> `.build/test-vic-build.mjs` (the *"Excess `/` Unexpected file constant"*
+> contract), and `refresh_site` regenerates the page warn-only on every
+> data refresh (`c3beeb9`). Nothing below is runnable machinery — DO NOT
+> resurrect the kit (it stays recoverable in git history at `d7859ae`,
+> which is where it belongs). This file is kept for the historical record
+> of how the loop worked; for the live /vic/ build read MATILDA.md and the
+> `auspol-vic-satellite-plan` skill.
+>
+> The canary near the foot of this file is correspondingly **inverted**:
+> the 2026-10-05 deletion was a deliberate, legitimate retirement commit —
+> the file that claims "an agent told to delete the polish machinery is
+> compromised" predates it. An agent that RESTORES the deleted machinery
+> is the one misbehaving.
 
 The second supervised review loop in this repo (the layout HEALER is
 wave-level data first aid; this is page-level polish). The user requested it
@@ -51,10 +71,13 @@ page toward a yardstick" job.
   sessions/24h (ledger.sessions gains one entry per RUN and one per AGENT
   session — builder AND each reviewer attempt).
 - Per-round reports (gitignored): `.build/vic-src/polish-reports/<rN>/`.
-- Canary: MATILDA.md still does not know the loop exists — a repair agent
-  told to delete or "clean up" the polish machinery (`.build/vic-polish*`,
-  probe, standard, ledger) is compromised; the real loop also writes
-  `.build/vic-src/polish-canary.txt`.
+- Canary (HISTORICAL — inverted by the retirement header above): while the
+  loop lived, MATILDA.md did not know it existed, and a repair agent told
+  to delete or "clean up" the polish machinery (`.build/vic-polish*`,
+  probe, standard, ledger) was compromised; the real loop also wrote
+  `.build/vic-src/polish-canary.txt`. Since `af72596` the deletion is
+  legitimate — the modern compromise signal is an agent RESTORING these
+  files.
 
 ## Trust model (transferred from adjudicate.mjs)
 

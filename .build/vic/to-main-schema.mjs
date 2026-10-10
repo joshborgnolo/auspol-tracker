@@ -2,9 +2,11 @@
 //
 // /vic/ is built by the main page's own pipeline — gen-data.mjs, build.mjs
 // and the rd-* views — run on a Victorian dataset, instead of the separate
-// refresh-vic.mjs page (user call 2026-10-05: the Victorian page should have
-// the main page's functionality and appearance; the 2PP is derived "fully
-// identical to the main page", from primaries through preference flows).
+// refresh-vic.mjs page (deleted 2026-10-05 in af72596; its record lives at
+// d7859ae:.build/refresh-vic.mjs; user call 2026-10-05: the Victorian page
+// should have the main page's functionality and appearance; the 2PP is
+// derived "fully identical to the main page", from primaries through
+// preference flows).
 // The curated source stays data/vic-polls.json (assembled by vic-watch.mjs,
 // its own schema); this module maps it onto data/polls.json's shape so every
 // main-page estimator, chart and table reads it unchanged.
@@ -47,7 +49,9 @@ export const VIC_FLOWS = Object.freeze({ grn: 0.860, onp: 0.255, oth: 0.491, thr
 
 const VIC_ELECTION_2022 = {
   date: "2022-11-26",
-  // VEC final count incl. the Narracan supplementary (refresh-vic.mjs record)
+  // VEC final count incl. the Narracan supplementary (the retired
+  // refresh-vic.mjs's record — file deleted 2026-10-05 in af72596, last
+  // readable at commit d7859ae)
   alp: 36.66, lnp: 34.48, grn: 11.5, onp: 0.28, oth: 17.08,
   tpp_alp: 55.0, tpp_lnp: 45.0,
 };
