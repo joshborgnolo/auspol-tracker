@@ -78,32 +78,6 @@ causes; the order below is what found them fast.
   bare `build.mjs` somewhere corrected data without re-rendering); heal per auspol-share-card's
   "Healing a stamp-skew red train", and if the tree carries sibling work commit ONLY
   `assets/auspol-card.json assets/auspol-card.png`.
-- site-check red train, `SITE_STATUS {"verdict":2,…,"reason":"referenced asset(s) missing",
-  "assets":{"failed":["<hashed-file>"]}}` with `liveBytes == localBytes` and `firstDiffAt: null`
-  → NOT deploy lag: a checked-in page references an asset the repo no longer tracks. Triage:
-  `git ls-files` the failed path (confirm it's gone, not just unpushed), `grep -l '<hash>'`
-  across the checked files (`index.html feed.xml archives/*/index.html atlas/ feedback/
-  preference-flows/ prediction/ vic/index.html assets/site-shell.{css,js}`) to find the
-  REFERRER, `git log -S '<string>' -- <referrer>` for when the reference appeared, and
-  `git show <first-red-sha> --name-status -- <asset-dir>` for the commit that swept the file
-  (build.mjs auto-sweeps unkept hashed outputs — fonts/ every build, cycle-source only in the
-  federal branch; either jurisdiction's build sweeps fonts/). **site-check is deliberately
-  UNWATCHED by agent-repair**, so unlike writer failures these trains never self-heal and one
-  email fires per push until a human/agent heals it (test the agent-repair `gh run list` with
-  the display-title filter before assuming silence means health). Worked 2026-10-09: 783084a
-  dropped crimsontext-italic-600 from FONTS, 387e270's federal rebuild swept the woff2, and
-  vic/index.html — regenerated ONLY on an explicit `npm run build:vic` (last built af72596,
-  5 Oct) — still anchored the swept hash in its generated @font-face block: 15 consecutive
-  push-reds. Heal (9a1e9c6): rebuild the stale satellite in a CLEAN detached worktree at HEAD —
-  `git worktree add .worktrees/<n> HEAD`, then `BUILD_JUR=vic node .build/newtracker/build.mjs`
-  (build.mjs vendors babel-standalone, so a bare worktree builds with NO npm install), verify
-  `node .build/test-vic-build.mjs`, copy the regenerated page into the main checkout, commit
-  ONLY that path (the checkout had sibling sessions' dirty WIP all over it). Root-cause fix
-  shipped the same day (user-approved, c3beeb9): refresh_site() in git-push-main.sh now runs
-  the vic build WARN-ONLY on every data refresh (never blocks a federal commit; test-vic-build
-  in npm test is the red surface) and vic/index.html rides SITE_FILES / the push-rebuild
-  trigger / push_main_regen_attrs, so a shared generated block (fonts, hashed assets,
-  templates) changing federally can no longer silently stale the satellite.
 
 Related: auspol-ci-alert-breaker-triage (circuit-breaker issues), poll-agent-no-show-triage
 (expected run absent), auspol-next-polls-projection (the sim fixture convention).

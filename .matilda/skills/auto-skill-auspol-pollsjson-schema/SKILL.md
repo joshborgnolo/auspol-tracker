@@ -68,27 +68,6 @@ June **2025** for a **2026-06-25** wave.
   `detail.{alb,opp,han}.{app,dis}`; ppm carries `extra:[{alb,opp}]` for the
   second (standard better-PM) pairing on a forced-choice row.
 
-#### The detail.opp wire-shape trap (worked 2026-10-09, commit 45970c1)
-
-- **Convention check before adding detail**: RedBridge/Accent approval rows
-  from 2026-02-27 onward ALL carry `detail.opp` (58 rows repo-wide) — a row
-  missing it on a house with that convention is a gap, backfillable when
-  the piece prints app + dis. Reconciliation is the verification: app − dis
-  must equal the row's ALREADY-stored net (13 − 34 = −21 = the stored
-  `opp: -21`), so the pair adds no new claim, only the printed evidence.
-- **BUILT-WIRE GOTCHA — do NOT "fix" the key**: gen-data's per-poll `appr`
-  object keys the opp detail under a FIXED current-leader SLOT
-  (`"taylor"` as of Oct 2026) labelled by the row's own `oppName`. A
-  Ley-era wave emits `"taylor": {app:13,dis:34}, "taylorNet": -21,
-  "oppName": "Ley"` — reads as misattribution, is only the slot convention
-  (the same row's `ppm` block IS name-keyed `"ley": 10`, which makes the
-  appr slot look doubly wrong). The era-aware pipelines split by date, not
-  by this key — eraOf (~gen-data.mjs:579), the ley/taylor pool splits
-  (~:1371, :1415, :1475) — and picked the pair up correctly: `ley_favCi`
-  narrowed 7.6 → 5.1 in the same rebuild (a Ley-era detailed wave joined
-  its pool). Verify a detail backfill by watching the era-CI move, never by
-  expecting a `ley` key in individualPolls' appr blocks.
-
 ### Probe hygiene
 
 - Filter `polls`/`direction` by `['pollster']`, leadership arrays by

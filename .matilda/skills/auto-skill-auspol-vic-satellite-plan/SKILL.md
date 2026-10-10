@@ -1,9 +1,9 @@
 ---
 name: auspol-vic-satellite-plan
-description: auspol-tracker — the /vic/ Victorian election satellite, SHIPPED 2026-10-03 (landing commit 69f0061 as /vicpoll/, renamed /vic/ by user call the same day; election day 28 Nov 2026). Read this before touching anything Vic-related — records the locked user decisions, the shipped data schema + estimator constants, the wikitext heading-level regex trap (ED-15, wiki ==== era headings mis-filed dozens of leadership rows), the data-legitimate null-cell allowance, and what remains UN-built (CI/launchd watch cadence). REFRESH (c3beeb9, 2026-10-09): refresh_site() regenerates vic/index.html (BUILD_JUR=vic, warn-only) on every data refresh — the page can no longer rot against shared generated blocks, the trap behind the 15-email site-check red train. The overnight vic-polish builder↔reviewer loop that grinds the page toward the main-page standard is its own skill: auspol-vic-polish-loop.
+description: auspol-tracker — the /vic/ Victorian election satellite, SHIPPED 2026-10-03 (landing commit 69f0061 as /vicpoll/, renamed /vic/ by user call the same day; election day 28 Nov 2026). Read this before touching anything Vic-related — records the locked user decisions, the shipped data schema + estimator constants, the wikitext heading-level regex trap (ED-15, wiki ==== era headings mis-filed dozens of leadership rows), the data-legitimate null-cell allowance, and what remains UN-built (CI/launchd watch cadence). The overnight vic-polish builder↔reviewer loop that grinds the page toward the main-page standard is its own skill: auspol-vic-polish-loop.
 source: auto-skill
 extracted_at: '2026-10-03T12:48:33.097Z'
-updated_at: '2026-10-09'
+updated_at: '2026-10-04'
 ---
 
 # auspol-vic — Victorian poll tracker satellite (SHIPPED 2026-10-03, 69f0061)
@@ -116,9 +116,6 @@ shared logic when NSW comes.
   `bash .build/git-push-main.sh "<msg>" data/vic-polls.json vic/index.html`.
   vic/index.html rides its OWN file list (prediction-refresh.sh:80
   precedent) — do NOT add it to shared SITE_FILES in git-push-main.sh.
-  (SUPERSEDED 2026-10-09 by c3beeb9: refresh_site now runs the vic build on
-  every data refresh and SITE_FILES stages vic/index.html — see the addendum
-  at the end. The refresh-vic.mjs landing path itself was retired 2026-10-05.)
   Optional stretch: 30-line `.build/vic-updater.sh` wrapper.
 - **Shell coupling**: ONE entry `{ file: "vic/index.html" }` in
   `SHELL_PAGES` + `applyShell()` in the generator (`.build/site-shell.mjs`).
@@ -204,44 +201,3 @@ reopening.
   `index.html` was NOT one of them — its diff was +14 lines of a sibling
   session's Option+D theme handler; regenerating a file locally does not
   make it yours.
-
-## 2026-10-09 addendum — the BUILD_JUR=vic era and the rebuild-only-stale trap
-
-**2026-10-05, `af72596` replaced the architecture above**: `.build/refresh-vic.mjs`
-and the vic-polish loop are RETIRED (untracked leftovers in `.build/`); `vic/index.html`
-is now the main page's own build on Victorian data — `BUILD_JUR=vic node
-.build/newtracker/build.mjs` (npm script `build:vic`; build.mjs writes ONLY
-`vic/index.html` in that mode and skips the federal side-outputs and the
-cycle-source sweep). `.build/test-vic-build.mjs` (in npm test) builds to a TMP
-BUILD_OUT and pins the Victorian identity — it does NOT keep the committed page
-fresh.
-
-The live-worked consequence (the 15-email site-check red train of 2026-10-09,
-heal `9a1e9c6`): **nothing ever runs the vic build routinely** — refresh_site/
-SITE_FILES never touch vic/index.html, no workflow runs BUILD_JUR=vic — while the
-page embeds GENERATED blocks shared with the federal build (the FONTS @font-face
-block, hashed asset/script references) that keep moving with federal commits.
-The page rots in-between, and when a federal commit deletes something the stale
-vic page still references (a pruned FONTS entry's woff2, swept by the next federal
-build's auto-sweep), site-check — which checks vic/index.html among its 15 files —
-goes red class 2 on EVERY push, one email each, and being deliberately unwatched by
-agent-repair it never self-heals. Heal and the full triage recipe are in
-auspol-ci-run-failure-triage (rebuild in a clean detached worktree — build.mjs
-vendors babel, no npm install needed — copy vic/index.html over, commit it alone).
-
-**Preventative fix SHIPPED the same day (user-approved, c3beeb9)** —
-this is the architecture now, not a proposal:
-
-- `refresh_site()` in `.build/git-push-main.sh` runs `BUILD_JUR=vic node
-  .build/newtracker/build.mjs` after the card/favicon restamp, WARN-ONLY like
-  the renders (`log "WARN …"` + `echo "::warning::"`) — a vic break must never
-  block a federal data commit; `test-vic-build` in npm test is the red surface.
-- `vic/index.html` joined `SITE_FILES` (staged by `stage_dataset`), push_main's
-  rebuild trigger (`case … vic/index.html … rebuild=true`) and
-  `push_main_regen_attrs`, so a rung-2 race rebase regenerates it like the rest.
-- Verified before commit: `node .build/test-push-main.mjs` passes UNCHANGED —
-  its toy repo's stub build.mjs is env-blind, so the new BUILD_JUR=vic call in
-  refresh_site just re-runs the same stub; `node .build/test-vic-build.mjs` green.
-- Consequence: every writer run (all *-updater.sh, prediction-refresh.sh,
-  card-watch.sh, agent-repair's publish, healer.yml) now refreshes /vic/ as a
-  side effect; a manual `npm run build:vic` remains fine for vic-only work.

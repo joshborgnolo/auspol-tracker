@@ -1,6 +1,6 @@
 ---
 name: auspol-estimator-arms-race
-description: "auspol-tracker — procedure for backtesting a change to headline-estimator constants/weights: VERBATIM estimator replica in a .matilda scratch, HEAD-pinned input, parity gate via GEN_DATA_POLLS/gen-data console line, LOO + paired bootstrap + election anchors. Plus: npm test's `deff-backtest` parity FAIL (A0 replica vs committed 9f09dca2 asset) is often PRE-EXISTING committed dataset drift, red at clean HEAD — verify pre-existence (HEAD commit messages document the drift / stash or worktree probe) before treating it as your regression; it halts the && chain before test-vic-build and `npm test | tail` exit codes are tail's."
+description: "auspol-tracker — procedure for backtesting a change to headline-estimator constants/weights (worked examples: 2026-09-05 DEFF race; 2026-10-02 HL_HALF 7→14 race, .matilda/hl-half-backtest.mjs): VERBATIM estimator replica scored in a .matilda scratch script, input pinned to `git show HEAD:data/polls.json` under sibling-dirty trees, PARITY GATE = gen-data's own console `headline 2PP:` line obtained via the GEN_DATA_POLLS+GEN_DATA_OUT test seams (never a grep of the minified asset — a bare \"alp2pp\" hit is a per-poll payload field), LOO with per-iteration house-effect refit + paired bootstrap + election anchors as corroboration only."
 source: auto-skill
 extracted_at: '2026-09-05T06:20:00.000Z'
 ---
@@ -160,38 +160,3 @@ tick → a row-SET difference (exclusion filter), not a weight bug.
   rule 2 (per-house deff would root as `pollsterRules.<house>.deff`) and
   its copy-homes list; CHG_MEASURES significance flags and the discord
   engine's 1.6 floor share the constant — they all move together.
-
-## `deff-backtest` red in npm test ≠ your regression — check pre-existence first
-
-`.build/newtracker/deff-backtest.mjs` sits near the END of the npm test
-`&&` chain (just before `test-vic-build.mjs`) and replays its A0 replica
-against the COMMITTED `9f09dca2` dataset asset; divergence prints
-`deff-backtest: FAIL — parity: A0 replica (X) != committed asset (Y)`.
-Committed or sibling-parked estimator drift (a gen-data.mjs edit landed
-without a `9f09dca2` dataset regen — exactly what the sibling §7gc
-demographicsTpp work did) makes it fail AT CLEAN HEAD with your tree in
-any state; the repo's own commit messages have documented this window
-(openly: "full suite green except pre-existing deff-backtest parity
-drift from sibling WIP (gen-data.mjs/9f09dca2 asset)"). Before treating
-the red as yours (worked 2026-10-10, the Other-cuts feature commit):
-
-1. `git log -5 --format=%B origin/main | grep -i drift` — the drift is
-   often already documented in HEAD's message; if so, your verdict is
-   free.
-2. Otherwise prove pre-existence: run only that script at clean HEAD.
-   On a shared dirty tree `git stash && node .build/newtracker/deff-backtest.mjs ;
-   git stash pop` works and pops clean (verified 2026-10-10), but the
-   cleaner shared-repo form is a detached worktree at HEAD (see
-   auspol-worktree-scratch-files / ci-run-failure-triage's heal recipe)
-   — never assume your feature caused it.
-3. Two chain-shape traps when the FAIL shows in a tail: (a) being red
-   HALTS the `&&` chain, so `test-vic-build.mjs` after it never ran —
-   "passed everything" claims need the vic test run explicitly; (b)
-   `npm test … | tail` exit codes are tail's (shell-command-pitfalls),
-   so prove status with `npm test >/dev/null 2>&1; echo $?`.
-4. If the drift IS new and yours: the replica copies inside
-   deff-backtest.mjs went stale relative to gen-data.mjs (re-sync per
-   this skill's recipe-1 header rule), or an estimator-affecting change
-   shipped without the dataset regen — regenerate per
-   forecast-history-ci-merge / the dataset convention, don't hand-edit
-   the asset.

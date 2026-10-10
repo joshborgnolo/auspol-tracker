@@ -1,10 +1,11 @@
 /* state-election-rings.mjs — the By-state small-multiple election marks in
    the Who-votes panel (Place tab), per party chip:
-   1. Each of the six panels (NSW, Vic, Qld, SA, WA, Non-NSW/Vic/Qld) carries ONE
-      ring, stroked in that panel's series-line colour (not --ink).
+   1. Each of the seven panels (NSW, Vic, Qld, SA, WA, ACT/NT/Tas,
+      Non-NSW/Vic/Qld) carries ONE ring, stroked in that panel's series-line
+      colour (not --ink).
    2. The ring's y pixel lands where the AEC 31496 share maps in the chart's
       y-domain: NSW 35.2 / Vic 33.95 / Qld 30.98 / SA 38.31 / WA 35.59 /
-      Non-NSW/Vic/Qld 37.64 on Labor.
+      ACT/NT/Tas 40.95 / Non-NSW/Vic/Qld 37.64 on Labor.
    3. Hovering the ring's x: a guide tooltip whose swatches all carry
       is-ring at the election; hovering a later month: plain squares.
    4. The tooltip shows both rows (state line + All voters) at the election
@@ -30,11 +31,11 @@ const EXPECT = {
 };
 /* party -> expected per-panel election shares, in DEMO_SETS state-group order */
 const ELECTION = {
-  alp: [35.2, 33.95, 30.98, 38.31, 35.59, 37.64],
-  lnp: [31.53, 32.2, 34.91, 28.45, 31.55, 29.01],
-  onp: [6.02, 5.79, 7.84, 6.15, 7.61, 6.34],
-  grn: [11.06, 13.59, 11.76, 13.42, 11.97, 12.55],
-  oth: [16.19, 14.48, 14.5, 13.68, 13.28, 14.45],
+  alp: [35.2, 33.95, 30.98, 38.31, 35.59, 40.95, 37.64],
+  lnp: [31.53, 32.2, 34.91, 28.45, 31.55, 24.52, 29.01],
+  onp: [6.02, 5.79, 7.84, 6.15, 7.61, 3.97, 6.34],
+  grn: [11.06, 13.59, 11.76, 13.42, 11.97, 12.49, 12.55],
+  oth: [16.19, 14.48, 14.5, 13.68, 13.28, 18.07, 14.45],
 };
 /* the All-voters row at the election month reads the NATIONAL result */
 const ELECTION_NAT = { alp: 34.56, lnp: 31.82, onp: 6.4, grn: 12.2, oth: 15.01 };
@@ -49,7 +50,7 @@ const ELECTION_LOC = {
   oth: [13.68, 12.45, 12.97, 20.56],
 };
 const PARTY_BUTTON = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
-const PANELS = ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"];
+const PANELS = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
 
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
 const server = http.createServer((req, res) => {
@@ -98,7 +99,7 @@ const openParty = async (party) => {
   }, PARTY_BUTTON[party], "Place");
   await sleep(500);
 };
-/* the panelled state chart is the one whose .rd-wv-panels holds six .rd-wv-panel */
+/* the panelled state chart is the one whose .rd-wv-panels holds seven .rd-wv-panel */
 const readPanels = () => page.evaluate(() => {
   const sec = document.getElementById("who-votes");
   const wrap = sec && sec.querySelector(".rd-wv-panels");
@@ -212,15 +213,15 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
     if (w) w.scrollIntoView({ block: "center" });
   });
   /* rings unmount while a party switch morphs and re-mount on its last
-     frame; poll until all six are back rather than trusting a settle */
+     frame; poll until all seven are back rather than trusting a settle */
   let P = null;
   for (let tries = 0; tries < 12; tries++) {
     await sleep(250);
     P = await readPanels();
-    if (P.found && P.panels.length === 6 && P.panels.every((p) => p.ringBox)) break;
+    if (P.found && P.panels.length === 7 && P.panels.every((p) => p.ringBox)) break;
   }
-  check(party + ": six state panels", P.found && P.panels.length === 6, P.panels && P.panels.map((p) => p.name).join(","));
-  if (!P.found || P.panels.length !== 6) continue;
+  check(party + ": seven state panels", P.found && P.panels.length === 7, P.panels && P.panels.map((p) => p.name).join(","));
+  if (!P.found || P.panels.length !== 7) continue;
   check(party + ": rings in every panel", P.panels.every((p) => p.ringBox), JSON.stringify(P.panels.map((p) => !!p.ringBox)));
   P.panels.forEach((p, i) => {
     check(party + " " + PANELS[i] + ": ring is the series colour", p.ringStroke && p.lines[1] && p.ringStroke === p.lines[1],
@@ -390,7 +391,7 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
     };
     return { panels: panes.map(strongOf), loc: strongOf(loc) };
   });
-  check("phone: every state panel falls back to E", phone.panels.length === 6 && phone.panels.every((s) => s === "E"),
+  check("phone: every state panel falls back to E", phone.panels.length === 7 && phone.panels.every((s) => s === "E"),
     JSON.stringify(phone.panels));
   check("phone: location falls back to E", phone.loc === "E", JSON.stringify(phone.loc));
   await page2.close();

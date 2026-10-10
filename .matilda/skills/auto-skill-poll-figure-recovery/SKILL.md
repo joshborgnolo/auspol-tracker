@@ -50,29 +50,11 @@ window, n, publisher, article title/URL) so every later search is targeted, not 
    text). Detect and move on — never regex a 126 KB wall page hoping body text is inside.
 
 5. **Chrome piggyback (.build/chrome-article.mjs) — LAST rung, and check it's alive.** In
-   the 2026-09-29 session it hard-failed with `CHROME_JS_ERROR: Executing JavaScript
-   through Apple Script is turned off` (user's Chrome ▸ View ▸ Developer ▸ "Allow
-   JavaScript from Apple Events" toggle was off). The tool's exit contract reports this;
-   do NOT retry in a loop — surface the one-line fix and continue down the ladder. See
+   this session it hard-failed with `CHROME_JS_ERROR: Executing JavaScript through Apple
+   Script is turned off` (user's Chrome ▸ View ▸ Developer ▸ "Allow JavaScript from Apple
+   Events" toggle was off). The tool's exit contract reports this; do NOT retry in a loop —
+   surface the one-line fix to the user and continue down the ladder. See
    chrome-session-piggyback skill.
-
-## Two rungs added 2026-10-09 (the wiki-subpop audit; see auspol-wiki-subpop-audit)
-
-- **AFR articles can serve the FULL body to a logged-out Chrome.** All three mid-2025
-  RedBridge waves' Coorey pieces (Jul-2025, Sep-2025, Nov-2025) came back complete via
-  chrome-article.mjs — no afr.com subscription on the profile; the page header says
-  "Log in" and renders subscribe CTAs, yet the whole article text is in the DOM (probe
-  the extracted text for the piece's ending boilerplate, e.g. "Go inside the big
-  political stories…", to distinguish full-text from a metered truncation). AFR's wall
-  is clearly metered/older-article-loose, not the News Corp "Nocookies" class.
-- **AFR chart iframes are Datawrapper — fetch dataset.csv as the machine-readable
-  SOURCE.** Body HTML carries `<iframe src="https://datawrapper.dwcdn.net/<ID>/<REV>/">`;
-  `curl -s "https://datawrapper.dwcdn.net/<ID>/<REV>/dataset.csv"` returns the exact
-  figure table the chart renders (the Jun-2025 wave's FexJm/2 primary + ZUOis/1 2PP
-  datasets held full age/gender/location crosstabs, verified wiki cell-for-cell).
-  GOTCHA: the revision segment is load-bearing — `<ID>/dataset.csv` without `/<REV>/`
-  404s (NoSuchKey); take the src verbatim from the iframe. This beats OCR of chart
-  images entirely, and it works with plain curl — no auth.
 
 ## Tooling traps hit in this session
 

@@ -1,6 +1,6 @@
 ---
 name: redbridge-accent-extraction
-description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair — and tpp_split + tpp_split_on per-cohort respondent splits since 2026-09-07, Table 1's classic and Labor-v-One-Nation blocks, whose only consumers are flowDrift's and §7d flowDriftOn's measured rows), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest), AFR-article-paste hand-entry procedure (second precedent 52a826e, Oct 2026: 4 sections from the paste, URL recovered off the unauthenticated AFR topic page, data/issues.json left for the PDF pipeline). TWO product lines (monthly ~1,000-sample tracker vs big 4-6k deep-dives incl. MRP), the five waves with NO published long methodology statement, and the 1 Apr 2026 cumulative 'Shifts in vote intention since June 2025' report whose big March 2026 survey (6-19 Mar, N=5,563) has NO polls.json row.
+description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair — and tpp_split + tpp_split_on per-cohort respondent splits since 2026-09-07, Table 1's classic and Labor-v-One-Nation blocks, whose only consumers are flowDrift's and §7d flowDriftOn's measured rows), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest), AFR-article-paste hand-entry procedure (second precedent 52a826e, Oct 2026: 4 sections from the paste, URL recovered off the unauthenticated AFR topic page, data/issues.json left for the PDF pipeline).
 source: auto-skill
 extracted_at: '2026-09-04T00:00:00.000Z'
 ---
@@ -30,11 +30,6 @@ prepared OCR before discovering Table 2 was live text — and the wave was alrea
 - accent-research.com is a Wix Thunderbolt site; `/projects/<slug>` pages are client-rendered
   dynamic-router pages (observed siteRevision 1270, metaSiteId
   `6b72024e-077a-44e2-88f5-dc1a0ed81099`). `/_api/v2/dynamicmodel` POST 403s via curl.
-  But curl is NOT useless: the pages are SERVER-rendered for text — a bare curl of a
-  `/projects/<slug>` page yields `<title>`, the `og:` metas, the page date and the FULL
-  body paragraphs (the whole methodology statement was readable as static HTML on the
-  2026-10-09 probe of the shifts page), and `/projects` returns every live slug for a
-  regex sweep. Only the PDF href is client-side (see next section).
 - **Don't guess slugs** — wrong guesses hit Wix "Page Not Found". Enumerate the `/projects`
   index or web-search first. Slugs can contain commas (`/projects/afr%2C-redbridge-group-and-...`).
 - **Slug prefix changed 2026-08 (commit 52de606)**: Accent DROPPED the encoded comma from
@@ -59,15 +54,6 @@ only when the viewer widget is clicked:
    `page.evaluate(() => document.querySelector('[data-hook="file-upload-viewer"] button').click())`.
 3. The PDF URL matches `https://{metaSiteId}.usrfiles.com/ugd/...pdf` (40MB+, 130+ pages).
    Existing polls.json rows cite either this usrfiles URL or the AFR article URL as `url`.
-
-Simpler one-off probe (works on this machine, 2026-10-09): repo `node_modules` has
-`puppeteer-core` and Google Chrome.app is installed —
-`puppeteer.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless:'new'})`,
-goto the page, poll for `[data-hook="file-upload-viewer"] button` (≈10 s hydration),
-then `page.mouse.click(centre-of-button)` — the click opens a popup target whose URL
-is the usrfiles PDF (`browser.on('targetcreated')` / `page.on('popup')`; the viewer DOM
-also gains the `<a data-hook="file-upload-link">` href afterwards). No debugging port or
-persistent profile needed.
 
 macOS/script gotchas: no GNU `timeout`; Bogan mode REFUSES write_file outside the workspace —
 put probe scripts under `.matilda/probe/` and `npm i puppeteer-core` there.
@@ -205,46 +191,6 @@ extraction is only needed if the agent reports mismatches.
 - **Never duplicates a wave already recorded under the other label**: history has
   `"Redbridge"` (≤ Apr 2026) and `"RedBridge/Accent"` (May 2026 on); such waves land in
   `notes` with "reconcile labels manually", not in the dataset.
-
-## TWO PRODUCT LINES + methodology-statement coverage (verified 2026-10-09)
-
-Accent publishes TWO distinct survey products under the same AFR commission — check the
-sample column of polls.json and they separate cleanly:
-
-- **Monthly tracker** n≈1,000 (Oct 2025 was 1,997): waves 2025-10-07, 2025-11-13,
-  2025-12-12, 2026-01-29, 2026-02-27, 2026-03-27, 2026-04-30, 2026-05-28, 2026-06-26,
-  2026-07-30, 2026-08-28, 2026-10-02. n≈1,003-1,014 typical.
-- **Big deep-dive surveys** n≈4,000-6,000: 2025-06-30 (4,036), 2025-09-08 (5,326),
-  2025-11-26 (4,775), and a March 2026 wave (N=5,563 — see MISSING WAVE below), plus the
-  2026-05-14 MRP (6,015, "(MRP)" suffix).
-
-**Waves with NO published per-wave long methodology statement** (no Accent project page /
-report PDF; polls.json rows carry no `methodUrl`, and none appeared by 2026-10-09):
-2025-06-30, 2025-09-08, 2025-11-13, 2025-11-26, 2026-03-27 — four big/tracker gaps the
-user may not all know (a 2026-10-09 query citing three of them missed 2025-06-30 and
-2026-03-27). To re-audit: dump every `RedBridge*` row's `methodUrl` from data/polls.json,
-curl `https://www.accent-research.com/projects` and diff slugs, then probe a candidate slug
-with a bare curl -o /dev/null -w "%{http_code}". Running `node .build/extract-redbridge.mjs`
-as-is doubles as a live probe — its RB_STATUS prints `verified` (waves whose PDFs parse
-clean today), `candidates`, and `skipped_slugs` (pages the extractor declines).
-
-**The "Shifts in vote intention since June 2025" cumulative report** (project slug
-`australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025`,
-page dated 1 April 2026, PDF `b86980_93009c71944d4ab1b6ae52afef76e20f.pdf`, 10.9MB) is a
-SERIES report, not a wave page: it reprints state + demographic tables for June 2025,
-Sept 2025, Nov 2025 (the 7–26 Nov big wave) and March 2026, but its methodology paragraph
-details ONLY the most recent survey (fieldwork Fri 6–Thu 19 March 2026, **N=5,563**,
-eff 4,614, MoE ±1.4, 8% undecided-excluded). For the 2025 waves it is the closest thing to
-a published statement — per-wave fieldwork windows/Ns for Jun/Sep/Nov 2025 remain
-unpublished by Accent. The extractor SKIPS this slug (it sits in `skipped_slugs`, not
-`candidates` — the slug doesn't match the monthly naming pattern, like the MRP page).
-
-**MISSING WAVE**: the report's March 2026 survey (6–19 Mar 2026, N=5,563) is NOT the
-2026-03-27 polls.json wave — that row is the monthly tracker (23–27 Mar, n=1,003). The big
-March survey has no row in polls.json at all: it had no AFR article of its own (the afr
-pipeline never saw it) and its project-page slug doesn't match the monthly candidates
-regex. If a task touches March-2026 RedBridge figures, treat this as a known data gap
-(candidate for healer/asimilation work) — reprint tables live only inside that shifts PDF.
 
 ## releaseUrl: the pollster-release link (added 2026-09-01, commit 75bcb18)
 

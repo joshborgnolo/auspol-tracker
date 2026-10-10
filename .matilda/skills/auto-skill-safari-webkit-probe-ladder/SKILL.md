@@ -45,28 +45,6 @@ unshadowed, user's exact dot (RedBridge/Accent 24–28 Aug, v=−3.3) raises +
 clears its wave tip — in WebKit as well as Chromium, on localhost AND the
 live site (parameterise the swift binary with URL + width/height argv).
 
-### Rung 1b — the WKWebView harness as a main-thread LAG MEASURER (2026-10-09)
-
-Second use of the same harness (`.matilda/probe-ap-filter-lag-wk.swift`):
-timing blocks, not hit-testing. "Control dead ~2s after a pick" that
-Chromium reports as ~100ms: there is NO Longtask API in WebKit, so the
-channel is a **rAF heartbeat** (chain requestAnimationFrame, record every
-inter-frame gap >40ms) plus a **syncYield** (`new Promise(r=>setTimeout(
-()=>r(performance.now()),0))` started the same microtask as the pick — its
-elapsed time IS the main-thread block). Companion measurer in Chromium:
-`.matilda/probe/ap-filter-lag.mjs` (CDP longtask observer + Profiler
-self-time; `page.emulateCPUThrottling(RATE)` — raw `Emulation.
-setCPUThrottleRate` "wasn't found" on puppeteer-core 25.10). This pair
-caught what Chromium hid: WebKit-biased commit cost on a React filter
-pick; fix in auto-skill-auspol-filter-commit-transition.
-
-TRAP 3 (same-day, cost one 60s timeout): a probe that posts a BOOT beacon
-then a FINAL result needs `userContentController(_:didReceive:)` to print
-EVERY message and `exit(0)` only on the final one (e.g.
-`if body.contains("\"final\":1")`). Copying wkprobe's "print + exit(0) on
-first message" handler exits at the boot beacon and the run ends in
-WKPROBE_TIMEOUT with zero pick data.
-
 ## Rung 2 — REAL HID events in WKWebView: a measured dead end
 
 `.matilda/probe-flow-dots-wkreal.swift` posts real `CGEvent` mouseMoved at

@@ -1,22 +1,17 @@
 ---
 name: auspol-tpp3-lead-measure
-description: auspol-tracker — the three-cornered preferred ('3PP') machinery end-to-end (shipped 2026-09-05): polls.json inline tpp3 field → gen-data build3cp() spread into BOTH row emitters (individualPolls + pollsterTable) → archive Lead popover's THREE maps/mechanisms that must move together (MEASURE_LAB, measure-radio list, holder map) PLUS the query-string persistence pair (MEAS_BY_URL restore + MEAS_BY_ID write, short letter v=3); 3PP figures are passthrough display data and enter NO aggregate series. First non-Fox-&-Hedgehog carrier 2026-10-09 (commit 4c887fa): Roy Morgan (SMS) 13–14 May 2026, finding 10221 — widening a 'house-X-only' per-poll field touches schema description + validate whitelist + gen-data comment + probe house/count pins together; the renderer needs NOTHING (data-agnostic).
+description: auspol-tracker — the three-cornered preferred ('3PP') machinery end-to-end (shipped 2026-09-05): polls.json inline tpp3 field → gen-data build3cp() spread into BOTH row emitters (individualPolls + pollsterTable) → archive Lead popover's THREE maps/mechanisms that must move together (MEASURE_LAB, measure-radio list, holder map) PLUS the query-string persistence pair (MEAS_BY_URL restore + MEAS_BY_ID write, short letter v=3); 3PP figures are passthrough display data and enter NO aggregate series.
 source: auto-skill
 extracted_at: '2026-09-05T00:00:00.000Z'
-updated_at: '2026-10-09'
 ---
 
 # Three-cornered preferred (3PP) machinery — auspol-tracker
 
-Fox & Hedgehog prints a three-cornered preferred ("3PP") every wave — and
-since 2026-10-09 Roy Morgan (SMS) carries ONE: its 13–14 May 2026 post-budget
-special (finding 10221, ALP 44.5 / L-NP 19 / ON 36.5, printed in the release
-prose) — ALP / Coalition / One Nation each get a slice of 100. Shipped
-2026-09-05 as a
+Fox & Hedgehog is the only house printing a three-cornered preferred ("3PP"):
+ALP / Coalition / One Nation each get a slice of 100. Shipped 2026-09-05 as a
 passthrough-only datapoint — the figures ride on the row for display and NEVER
 feed the 2PP aggregate, the alt-matchup series (ALT_BY/altNowcast), or any
-other-first composite. A carrier row keeps its canonical `tpp_alp/tpp_lnp`
-pair,
+other-first composite. A F&H row keeps its canonical `tpp_alp/tpp_lnp` pair,
 which is what the aggregate continues to consume.
 
 ## Data layer
