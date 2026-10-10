@@ -2536,10 +2536,10 @@ const confidence = CONF_FILE ? Object.fromEntries(["consumer", "westpacConsumer"
    year's 'YY suffix, so `year` rides every row – String(undefined) would
    print "’de". */
 const CONF_LANES = [
-  ["consumer", "ANZ–Roy Morgan", "Consumer Confidence", 100, null],
-  ["westpacConsumer", "Westpac–MI", "Consumer Sentiment", 100, 1200],
-  ["business", "Roy Morgan", "Business Confidence", 100, null],
-  ["nabBusiness", "NAB", "Business Confidence", 0, null],
+  ["consumer", "ANZ–Roy Morgan", "Consumer confidence", 100, null],
+  ["westpacConsumer", "Westpac–MI", "Consumer sentiment", 100, 1200],
+  ["business", "Roy Morgan", "Business confidence", 100, null],
+  ["nabBusiness", "NAB", "Business confidence", 0, null],
 ];
 const confidenceOnlyPolls = (() => {
   if (!CONF_FILE) return [];

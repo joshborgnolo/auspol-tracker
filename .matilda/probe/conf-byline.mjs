@@ -2,7 +2,7 @@
    checkout under test): the Confidence facet's opened-row sentence
    ("Conducted on …, published by …") must byline the HOUSE that prints the
    gauge, never its product line. A confidence release keeps its product
-   (Consumer Confidence, Consumer Sentiment, Business Confidence) in the
+   (Consumer confidence, Consumer sentiment, Business confidence) in the
    client slot, and rdPollHead read any non-self client as a publisher -
    every confidence row printed "published by the Consumer Confidence".
    The fix bylines the pollster slot's house on confidence rows (p.conf)
@@ -23,7 +23,7 @@ const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!o
 const LANES = [
   { match: (t) => t.includes("ANZ–Roy Morgan"), house: "ANZ–Roy Morgan", by: "published by ANZ–Roy Morgan" },
   { match: (t) => t.includes("Westpac–MI"), house: "Westpac–MI", by: "published by Westpac–MI" },
-  { match: (t) => t.includes("Business Confidence") && t.includes("Roy Morgan") && !t.includes("ANZ–Roy"), house: "Roy Morgan", by: "published by Roy Morgan" },
+  { match: (t) => t.includes("Business confidence") && t.includes("Roy Morgan") && !t.includes("ANZ–Roy"), house: "Roy Morgan", by: "published by Roy Morgan" },
   { match: (t) => t.includes("NAB"), house: "NAB", by: "published by NAB" },
 ];
 const PRODUCT_BYLINE = /published by the (Consumer|Business) (Confidence|Sentiment)/;
@@ -33,7 +33,7 @@ const page = await browser.newPage();
 page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300)); fails++; });
 
 await page.setViewport({ width: 1366, height: 980, deviceScaleFactor: 1 });
-await page.goto(PAGE + "allpolls/?f=c", { waitUntil: "networkidle0", timeout: 60000 });
+await page.goto(APAGE + "?f=c", { waitUntil: "networkidle0", timeout: 60000 });
 await page.waitForFunction(
   () => {
     const a = document.querySelector(".rd-ap-tabs .rd-tab[aria-pressed='true']");
