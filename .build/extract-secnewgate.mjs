@@ -52,7 +52,12 @@
    first fetched and never touched again, so a run that finds nothing new
    changes nothing (a cache file added later, as the grid page was for the
    heat-score bank, is back-filled from the still-listed PDF alone, the
-   existing cache bytes untouched). A page or PDF that won't load is a
+   existing cache bytes untouched). A title-filtered release that isn't
+   a tracking wave (the April 2026 "Special Edition" of the Mar 2026
+   report) still caches: { pdf, wave: null, special: true, published? }
+   with its <slug>.txt, so the wave loop, the probe and the banked
+   sweeps all treat the month as settled instead of re-fetching and
+   warning every run. A page or PDF that won't load is a
    warning, not a failure: the cache stays; a report that IS cached but
    won't read is
    pending and fails the run that landed it, once anything else is pushed.
@@ -186,7 +191,7 @@ export function pickReports(items) {
     const ym = titleMonthOf(title);
     if (!ym || ym < SEC_FIRST) continue;
     const embargo = /embargo/i.test(title) || /embargo/i.test(url);
-    const page = url || it.link || null;
+    const page = url;
     const published = it.date ? String(it.date).slice(0, 16) : null;
     const g = byMonth.get(ym) || [];
     g.push({ url, embargo, page, published });
@@ -268,7 +273,11 @@ export function directionPageOf(text) {
 export function directionChartOf(bboxHtml) {
   const words = [...bboxHtml.matchAll(/<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<\/word>/g)]
     .map((m) => ({ x: +m[1], y: +m[2], t: m[5].replace(/&apos;|&#039;/g, "\u2019") }));
-  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "June", "Jul", "Aug", "Sep", "Sept", "Oct", "Nov", "Dec"];
+  // three-letter abbreviations plus every full name – "June" and "Sept"
+  // have both printed, so a full-name label is only a layout whim away
+  const MON = ["Jan", "January", "Feb", "February", "Mar", "March", "Apr", "April", "May",
+    "Jun", "June", "Jul", "July", "Aug", "August", "Sep", "Sept", "September",
+    "Oct", "October", "Nov", "November", "Dec", "December"];
   const axisRow = (() => {   // the y carrying the month label row (>= 5 tokens)
     const tally = {};
     for (const w of words) {
@@ -387,7 +396,8 @@ export function stateTableOf(bboxHtml) {
    ten-or-so as "% MENTIONING EACH" against a MAR ’22 anchor column plus
    the wave's own and its two predecessors’ tracking waves (the April 2026
    Special Edition DID ask B1, unlike direction, so 2026-04 enters from the
-   May and July 2026 reprints – the special itself is never cached). The
+   May and July 2026 reprints – the special caches with wave: null and
+   never banks itself). The
    table is read from the whole-report -layout TEXT – the bbox cache holds
    only the direction and priorities-grid pages – where each MON column
    header trailed by its
@@ -524,6 +534,25 @@ export function gridPageOf(text) {
   return { page: i + 1, n };
 }
 
+/* The grid's tile count read off a CACHED grid page bbox, for the
+   cache-only sweeps below: the live pass reads the count off the "NN
+   national priorities" line of the -layout text, which a delisted wave's
+   sweep does not have – but the tile zone between the headline and the
+   Legend line (heatGridOf's own window) holds exactly N number tokens, so
+   the page carries its own count and no constant stands in for it (a
+   priority-count change must re-read, not fail every cached wave against
+   the era's 36). 0 when the zone does not read – the caller falls back to
+   the era's count. */
+export function gridTileCount(bboxHtml) {
+  const words = [...String(bboxHtml).matchAll(/<word xMin="[\d.]+" yMin="([\d.]+)" xMax="[\d.]+" yMax="[\d.]+">([^<]*)<\/word>/g)]
+    .map((m) => ({ y: +m[1], t: m[2] }));
+  const head = words.find((w) => w.t === "Tracking"
+    && words.some((o) => o.t === "importance" && Math.abs(o.y - w.y) < 3));
+  const legend = words.find((w) => w.t === "Legend");
+  if (!head || !legend) return 0;
+  return words.filter((w) => /^\d{1,2}$/.test(w.t) && w.y > head.y + 2 && w.y < legend.y - 2).length;
+}
+
 /* The summary grid's heat scores from a `pdftotext -bbox` of its page.
    The 36 numbered tiles sit in rows of six: the tile numbers anchor six
    x bands (a number's xMin is its band's left edge), a tile's box runs
@@ -654,6 +683,9 @@ async function main() {
     for (const g of groups) {
       const slug = slugOf(g.urls[0].url);
       const txtPath = path.join(SRC, slug + ".txt");
+      let special = false;
+      try { special = JSON.parse(fs.readFileSync(path.join(SRC, slug + ".json"), "utf8")).special === true; } catch {}
+      if (special) continue;   // a cached not-a-tracking-wave: settled, no work
       if (FORCE || !fs.existsSync(txtPath) || !fs.existsSync(path.join(SRC, slug + ".bbox.html"))) todo.push(slug);
       else if (!fs.existsSync(path.join(SRC, slug + ".grid.bbox.html")) && gridPageOf(fs.readFileSync(txtPath, "utf8")).page)
         todo.push(slug + " (grid page)");
@@ -695,7 +727,18 @@ async function main() {
         try {
           text = pdfToText(buf, slug, ["-layout"]);
           const meta0 = methodologyOf(text);
-          if (!meta0) break;   // not a tracking wave (a special): keep nothing
+          if (!meta0) {
+            // not a tracking wave (a special): cache the text with a
+            // wave:null sidecar so every later run – and probe – sees the
+            // month as settled instead of re-fetching and warning forever
+            fs.writeFileSync(txtPath + ".tmp", text); fs.renameSync(txtPath + ".tmp", txtPath);
+            writeAtomic(path.join(SRC, slug + ".json"),
+              JSON.stringify({ pdf: url, wave: null, special: true,
+                ...(cand.published ? { published: cand.published } : {}) }, null, 1) + "\n");
+            console.log(`cached report ${slug} (a special, not a tracking wave)`);
+            done = true;
+            break;
+          }
           const page = directionPageOf(text);
           if (!page) { status.pending.push(`${g.ym}: the report has no national direction chart page`); done = true; break; }
           bbox = pdfToText(buf, slug, ["-f", String(page), "-l", String(page), "-bbox"]);
@@ -708,14 +751,21 @@ async function main() {
         console.log(`cached report ${slug}`);
       }
       const meta = methodologyOf(text);
-      if (!meta) break;        // cached pre-refactor special: set aside
-      if (!meta.date) { status.pending.push(`${g.ym}: ${meta.problems.join("; ")}`); done = true; break; }
+      if (!meta) { done = true; break; }   // cached special (or pre-refactor cache): the month is settled
+      if (!meta.date || meta.problems.length) {
+        // a read problem moves the wave to pending, sample-format loss
+        // included: below, the exact-row heal would rewrite the row WITHOUT
+        // whatever stopped parsing – a silently dropped sample is data loss
+        // nobody is told about
+        status.pending.push(`${g.ym}: ${meta.problems.join("; ")}`);
+        done = true; break;
+      }
       // the grid page's bbox joined the cache with the heat-score bank:
       // back-fill it for waves cached before then, from the still-listed
       // PDF alone; a failure here only leaves the wave's heat unbanked
+      const grid0 = gridPageOf(text);
       if (!fs.existsSync(gridPath)) {
         try {
-          const grid0 = gridPageOf(text);
           if (grid0.page) {
             const buf = await get(url);
             if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") throw new Error("not a PDF");
@@ -735,7 +785,7 @@ async function main() {
         status.pending.push(`${g.ym}: wave ${meta.wave} but the chart has ${chart.columns.length} columns`);
         done = true; break;
       }
-      fs.writeFileSync(path.join(SRC, slug + ".json"),
+      writeAtomic(path.join(SRC, slug + ".json"),
         JSON.stringify({ pdf: url, wave: meta.wave, date: meta.date, dateStart: meta.dateStart, sample: meta.sample,
           ...(cand.page ? { url: cand.page } : {}), ...(cand.published ? { published: cand.published } : {}),
           ...(stmts.ok && stmts.map.get(meta.date.slice(0, 7)) ? { method: stmts.map.get(meta.date.slice(0, 7)) } : {}) }, null, 1) + "\n");
@@ -770,10 +820,15 @@ async function main() {
       }
       // the B6 heat-score grid banks the same way, off its page's bbox;
       // a wave with no grid cache yet (the PDF went unlisted before the
-      // back-fill reached it) just banks no heat
+      // back-fill reached it) just banks no heat. The expected tile count
+      // comes from the wave itself – the methodology line's declared n,
+      // else a count of the tiles in the cached grid – so a changed
+      // priority list re-reads instead of failing every cached wave
+      // against a number written when it shipped
       let heat = null;
       if (fs.existsSync(gridPath)) {
-        const grid = heatGridOf(fs.readFileSync(gridPath, "utf8"), gridPageOf(text).n || 36);
+        const cached = fs.readFileSync(gridPath, "utf8");
+        const grid = heatGridOf(cached, grid0.n || gridTileCount(cached) || 36);
         if (grid.problems.length) {
           status.pending.push(`${g.ym}: the heat grid didn't read (${grid.problems[0]})`);
         } else heat = grid.items;
@@ -800,6 +855,23 @@ async function main() {
       const own = x.cols[x.cols.length - 1];
       if (!s || s.wrong !== own.wrong || s.right !== own.right)
         status.warnings.push(`wave ${w}: own report ends ${own.wrong}/${own.right} but ` +
+          `the wave-${newest} chart reprints ${s ? `${s.wrong}/${s.right}` : "nothing"}`);
+    }
+    // delisted waves are still cached with their own reports: their
+    // endpoints cross-check against the newest printed series the same way
+    for (const f of fs.readdirSync(SRC).filter((f) => f.endsWith(".json")).sort()) {
+      let side;
+      try { side = JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")); } catch { continue; }
+      if (!side || side.wave == null || side.wave === newest || waves.has(side.wave)) continue;
+      const bboxPath = path.join(SRC, f.replace(/\.json$/, "") + ".bbox.html");
+      if (!fs.existsSync(bboxPath)) continue;
+      const x = directionChartOf(fs.readFileSync(bboxPath, "utf8"));
+      if (x.problems.length) { status.pending.push(`${f.replace(/\.json$/, "")}: the cached national chart didn't read (${x.problems[0]})`); continue; }
+      const s = series[side.wave - 1];
+      const own = x.columns[x.columns.length - 1];
+      if (!own) continue;
+      if (!s || s.wrong !== own.wrong || s.right !== own.right)
+        status.warnings.push(`delisted wave ${side.wave}: its cached report ends ${own.wrong}/${own.right} but ` +
           `the wave-${newest} chart reprints ${s ? `${s.wrong}/${s.right}` : "nothing"}`);
     }
   }
@@ -937,7 +1009,8 @@ async function main() {
       const slug = f.replace(/\.json$/, "");
       const gridPath = path.join(SRC, slug + ".grid.bbox.html");
       if (!fs.existsSync(gridPath)) continue;
-      const grid = heatGridOf(fs.readFileSync(gridPath, "utf8"), 36);
+      const cached = fs.readFileSync(gridPath, "utf8");
+      const grid = heatGridOf(cached, gridTileCount(cached) || 36);
       if (grid.problems.length) { status.pending.push(`${slug}: the cached heat grid didn't read (${grid.problems[0]})`); continue; }
       byWaveHeat.set(side.wave, { heat: grid.items, ym: side.date.slice(0, 7) });
     }

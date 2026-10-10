@@ -6,16 +6,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf, motnStatementsOf, motnStatementYm }
+import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf, gridTileCount, motnStatementsOf, motnStatementYm }
   from "./extract-secnewgate.mjs";
 
 const SRC = ".build/secnewgate-src";
-const reports = fs.readdirSync(SRC).filter((f) => f.endsWith(".json"))
+const cached = fs.readdirSync(SRC).filter((f) => f.endsWith(".json"))
   .map((f) => ({
     slug: f.replace(/\.json$/, ""),
     sidecar: JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")),
-  }))
+  }));
+// wave-null sidecars are the cached specials – keep them off the sort
+const reports = cached.filter((r) => r.sidecar.wave != null)
   .sort((a, b) => a.sidecar.wave - b.sidecar.wave);
+const specials = cached.filter((r) => r.sidecar.special === true);
+for (const s of specials) {
+  assert.equal(s.sidecar.wave, null, `${s.slug}: a special's sidecar carries wave: null`);
+  assert.ok(fs.existsSync(path.join(SRC, s.slug + ".txt")), `${s.slug}: its report text is cached with it`);
+}
 assert.equal(reports.length, 7, "the cached wave set (Jul 2025 on)");
 
 // ---- the cache facts, pinned ------------------------------------------------
@@ -290,6 +297,7 @@ for (const { slug, sidecar } of reports) {
   const info = gridPageOf(text);
   assert.equal(info.page, 4, `${slug}: the summary grid's page`);
   assert.equal(info.n, 36, `${slug}: 36 national priorities`);
+  assert.equal(gridTileCount(grid), 36, `${slug}: the grid page itself counts 36 tiles`);
   const g = heatGridOf(grid, info.n);
   assert.deepEqual(g.problems, [], `${slug}: heat grid clean`);
   assert.equal(Object.keys(g.items).length, 36, `${slug}: every tile read`);
@@ -340,6 +348,38 @@ assert.ok(!Object.keys(heatByMonth["2026-05"]).some((l) => l.includes("affordabl
 const special = "\fcover\n\fThe findings\n\nNo direction question was asked.\f";
 assert.equal(methodologyOf("no wave ordinal here\n" + special), null, "a special: no tracking marker");
 assert.equal(directionPageOf(special), 0, "a special: no direction page");
+
+// ---- gridTileCount: the cached grid page counts its own tiles ---------------
+// the tile zone between the 'Tracking…importance' headline and the Legend
+// line; 0 when either anchor is missing, so the caller falls back
+const word = (x, y, t) => `<word xMin="${x}" yMin="${y}" xMax="${x + 20}" yMax="${y + 10}">${t}</word>`;
+{
+  const zone = [word(10, 10, "Tracking"), word(40, 10, "importance"),
+    ...[1, 2, 3, 4, 5].map((n, i) => word(10 + i * 30, 50, String(n))),
+    word(10, 200, "Legend")];
+  assert.equal(gridTileCount(zone.join("")), 5, "the zone's own tile count");
+  assert.equal(gridTileCount([word(10, 50, "1"), word(10, 200, "Legend")].join("")), 0,
+    "no headline anchor: 0, and the next-era '36' never hard-codes it");
+  assert.equal(gridTileCount([word(10, 10, "Tracking"), word(40, 10, "importance"), word(10, 50, "1")].join("")), 0,
+    "no Legend anchor: 0");
+  // an out-of-zone digit token is not a tile
+  assert.equal(gridTileCount([...zone.slice(0, 2), word(10, 5, "12"), ...zone.slice(2)].join("")), 5,
+    "a page number above the headline stays out of the count");
+}
+
+// ---- directionChartOf: full-name month labels read the same as abbreviations
+// ("June" and "Sept" have both printed; a full name is a layout whim away)
+{
+  const labels = ["January", "March", "May", "July", "September", "November"];
+  const bbox = labels.flatMap((t, i) => {
+    const x = 100 + i * 100;
+    return [word(x, 500, t), word(x, 460, "60"), word(x, 480, "40")];
+  }).join("");
+  const chart = directionChartOf(`<page>${bbox}</page>`);
+  assert.deepEqual(chart.columns, labels.map(() => ({ wrong: 60, right: 40 })),
+    "full-name labels anchor one column each");
+  assert.deepEqual(chart.problems, [], "full-name labels: a clean read");
+}
 
 // ---- the disclosure-statements library --------------------------------------
 assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf"), "2025-07", "re-upload --1 suffix");
