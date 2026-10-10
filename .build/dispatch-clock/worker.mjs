@@ -22,7 +22,13 @@ export default {
   },
   // a read-only status page: the Sydney time, and what dispatches next
   async fetch(_request, env) {
-    const table = await loadTable(env);
+    let table;
+    try {
+      table = await loadTable(env);
+    } catch (err) {
+      return new Response(JSON.stringify({ error: "schedule.json unavailable", detail: String((err && err.message) || err) }, null, 1),
+        { status: 503, headers: { "content-type": "application/json" } });
+    }
     const now = new Date();
     return new Response(JSON.stringify({ sydney: sydneyClock(now), slots: table.slots.length, next: nextSlots(table, now, 12) }, null, 1),
       { headers: { "content-type": "application/json" } });

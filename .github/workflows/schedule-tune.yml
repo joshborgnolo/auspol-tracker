@@ -146,6 +146,14 @@ jobs:
             git --no-pager diff --stat -- .github/workflows .build/dispatch-clock/schedule.json
           fi
 
+      # The clock's table goes from here straight to main with no other
+      # review; run its pin before a broken table can be pushed (an emptied
+      # schedule.json otherwise reads as a healthy quiet day to the
+      # heartbeat — test-dispatch-clock.mjs also bans the DST edge band).
+      - name: Gate the clock's table on its pin
+        if: steps.tune.outputs.changed == 'true'
+        run: node .build/test-dispatch-clock.mjs
+
       - name: Commit and push the tuned schedules
         if: steps.tune.outputs.changed == 'true'
         env:

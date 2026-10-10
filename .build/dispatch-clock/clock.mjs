@@ -89,6 +89,8 @@ export async function tick(when, env) {
           "user-agent": UA,
         },
         body: JSON.stringify({ ref: "main" }),
+        // a hung GitHub socket must not stall the rest of the minute
+        signal: AbortSignal.timeout(10_000),
       });
       // 204 = started; anything else lands in the Worker's logs
       results.push({ workflow: wf, status: res.status });

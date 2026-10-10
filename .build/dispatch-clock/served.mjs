@@ -33,8 +33,9 @@
               moves slots would otherwise report yesterday's impossible-to-
               have-served slots as misses for a day.
               Prints CLOCK_STATUS {json}; exit 0 healthy (or degraded, with
-              a warning), 1 inconclusive (the run list unreadable), 3 the
-              clock is dead or dying (under half its slots served).
+              a warning), 1 inconclusive (the run list unreadable, or the
+              table carries no slots — a broken table never reads healthy),
+              3 the clock is dead or dying (under half its slots served).
 
    Env: GH_TOKEN, GITHUB_REPOSITORY; backup also CRON (github.event.schedule)
    and GITHUB_RUN_ID. Test seams: SERVED_NOW (an ISO instant) and SERVED_RUNS
@@ -119,6 +120,11 @@ export function backupVerdict(cron, runs, now, { hours = 24 } = {}) {
    yesterday's on-time dispatches against today's times. */
 export const HEARTBEAT_MS = 10 * MIN;
 export function clockHealth(table, runs, now, { hours = 24, settleMin = 15 } = {}) {
+  // A table carrying no slots dispatches nothing, and due=0 below would read
+  // it as a healthy quiet day — the tuner pushes schedule.json without a
+  // test gate, so the guard against an emptied table has to live here.
+  if (!Array.isArray(table.slots) || !table.slots.length)
+    return { verdict: "inconclusive", due: 0, served: 0, unserved: [], reason: "schedule.json carries no slots" };
   const end = Math.floor((now - settleMin * MIN) / MIN) * MIN;
   // Slots before the table's last content change can't have been dispatched
   // from it; judge from its generatedAt (plus the Worker's edge-cache pickup)
@@ -209,6 +215,7 @@ async function main(mode) {
     console.log("CLOCK_STATUS " + JSON.stringify(h));
     const line = `dispatch clock: ${h.served} of ${h.due} slots in the last 24h started on time`;
     if (h.verdict === "healthy") { console.log(`${line} — healthy`); return 0; }
+    if (h.verdict === "inconclusive") { console.log(`dispatch-clock heartbeat inconclusive: ${h.reason} — see .build/dispatch-clock/README.md`); return 1; }
     for (const u of h.unserved) console.log(`  unserved: ${u}`);
     if (h.verdict === "degraded") { console.log(`::warning::${line} — degraded; see .build/dispatch-clock/README.md`); return 0; }
     console.log(`::error::${line} — the clock looks dead. The cron backup still runs the updaters, 2–5h late. ` +

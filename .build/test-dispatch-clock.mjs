@@ -56,6 +56,11 @@ for (const wf of new Set(table.slots.map((s) => s.workflow))) {
 // Roy Morgan's Monday comb is dispatched — the window GitHub's cron dropped
 // on 14 and 21 Sep 2026
 assert.ok(table.slots.some((s) => s.workflow === "roymorgan-update.yml" && s.day === "Mon" && /release window/.test(s.label)));
+// Sydney's DST edge: 02:xx on a Sunday happens twice (autumn) or not at all
+// (spring) — a slot in that band would dispatch twice or never. None allowed.
+for (const s of table.slots)
+  assert.ok(!((s.day === "Sun" || s.day === "daily") && s.time.startsWith("2:")),
+    `DST edge band: no Sun/daily 02:xx slot in the table (${JSON.stringify(s)})`);
 
 // ---- one tick, end to end, against a stubbed fetch ---------------------------------
 const calls = [];
@@ -71,6 +76,7 @@ const post = calls.find((c) => c.init.method === "POST");
 assert.equal(post.url, "https://api.github.com/repos/owner/repo/actions/workflows/roymorgan-update.yml/dispatches");
 assert.equal(post.init.headers.authorization, "Bearer t0ken");
 assert.deepEqual(JSON.parse(post.init.body), { ref: "main" });
+assert.ok(post.init.signal instanceof AbortSignal, "the dispatch POST carries a timeout — a hung GitHub socket must not stall the minute");
 calls.length = 0;
 assert.deepEqual(await tick(new Date("2026-09-21T05:41:00Z"), env), [], "a quiet minute dispatches nothing");
 assert.equal(calls.filter((c) => c.init.method === "POST").length, 0);
@@ -156,6 +162,9 @@ assert.equal(clockHealth(fresh, [], noon).due, 0, "slots before the table's last
 assert.equal(clockHealth(fresh, [], noon).verdict, "healthy");
 const settledTable = { ...tbl, generatedAt: "2026-09-24T10:00:00Z" };
 assert.equal(clockHealth(settledTable, slim(ran), noon).due, 4, "an older table judges the full window as before");
+// an emptied table dispatches nothing; that is inconclusive, never healthy
+assert.equal(clockHealth({ slots: [] }, [], noon).verdict, "inconclusive", "an emptied table is inconclusive, not a quiet day");
+assert.equal(clockHealth({ slots: [] }, [], noon).due, 0, "…and owes no slots");
 
 // ---- the CLI, through its test seams ---------------------------------------------------
 const tmp = mkdtempSync(join(tmpdir(), "served-"));
