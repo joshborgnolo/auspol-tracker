@@ -4116,22 +4116,22 @@ body.rd .rd-isc { margin-top: 28px; display: flex; flex-direction: column; gap: 
 body.rd .rd-isc-mlab { margin: 0 0 12px; font-size: 15px; color: var(--ink-2); }
 body.rd .rd-isc-mlab b { font-weight: 700; color: var(--ink); }
 body.rd .rd-isc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-body.rd .rd-isc-tile { position: relative; aspect-ratio: 1; border-radius: 12px; padding: 12px 14px;
+body.rd .rd-isc-tile { position: relative; width: 60%; justify-self: center; aspect-ratio: 1; border-radius: 10px; padding: 10px 12px;
   display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
   color: #fff; overflow: hidden; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.28); }
 body.rd .rd-isc-tile.na, body.rd .rd-isc-tile.none { background: var(--ink-3); }
-body.rd .rd-isc-issue { position: absolute; top: 12px; left: 14px; right: 14px; font-size: 13px; font-weight: 600; line-height: 1.25; }
-body.rd .rd-isc-v { font-size: 20px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
-body.rd .rd-isc-sub { font-size: 12px; font-weight: 600; margin-top: 2px; }
+body.rd .rd-isc-issue { position: absolute; top: 10px; left: 12px; right: 12px; font-size: 11px; font-weight: 600; line-height: 1.25; }
+body.rd .rd-isc-v { font-size: 15px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+body.rd .rd-isc-sub { font-size: 10px; font-weight: 600; margin-top: 2px; }
 @media (max-width: 1000px) {
   body.rd .rd-isc-grid { gap: 10px; }
-  body.rd .rd-isc-v { font-size: 18px; }
+  body.rd .rd-isc-v { font-size: 14px; }
 }
 @media (max-width: 760px) {
   body.rd .rd-isc { gap: 30px; }
   body.rd .rd-isc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  body.rd .rd-isc-tile { padding: 10px 12px; }
-  body.rd .rd-isc-v { font-size: 17px; }
+  body.rd .rd-isc-tile { padding: 8px 10px; }
+  body.rd .rd-isc-v { font-size: 13px; }
 }
 body.rd .rd-iw { margin-top: 28px; }
 body.rd .rd-iw-ctl { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); }
