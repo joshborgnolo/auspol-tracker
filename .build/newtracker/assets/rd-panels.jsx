@@ -2189,7 +2189,7 @@ function DpRug({ items, color, dxp, fmt }) {
           setTip(null);
           window.AP.openPoll(rk, "leadership", "leadership");
         };
-        const lab = q.pollster + ", " + (q.fieldPending ? "fieldwork TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
+        const lab = q.pollster + ", " + (q.fieldPending ? "TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
         const on = tip && tip.i === i;
         return (
           <b key={key} className={[(it.fav ? "open" : ""), (rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined}

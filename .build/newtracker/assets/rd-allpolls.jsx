@@ -163,16 +163,16 @@ function rdEffTbcNote(p) {
 /* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
    article before the methodology PDF; a Resolve wave filed from the monitor
    csv before the SMH article carries its dates): the poll sits on the charts
-   by a provisional window, but every label says "Fieldwork TBC", the TBC
-   linking where the house will publish the dates (gen-data's fieldUrl).
-   rdFieldTxt is the plain-text form for tooltips and labels; rdFieldTbc the
-   linked one. */
+   by a provisional window, but every label says just "TBC" (user call
+   2026-10-11), linking where the house will publish the dates (gen-data's
+   fieldUrl). rdFieldTxt is the plain-text form for tooltips and labels;
+   rdFieldTbc the linked one. */
 const rdFieldTxt = (q) => (q && q.fieldPending ? "TBC" : (q && (q.field || q.dateLabel)) || "");
-function rdFieldTbc(p, bare) {
+function rdFieldTbc(p) {
   const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
-  return <>{bare ? "" : "Fieldwork "}{p.fieldUrl
+  return p.fieldUrl
     ? <a className="rd-tbc" href={p.fieldUrl} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
-    : <span title={note}>TBC</span>}</>;
+    : <span title={note}>TBC</span>;
 }
 /* A poll's header, one wording wherever a poll is opened (All polls, Latest
    and next polls): when it was in the field, how many were asked, and who
@@ -205,7 +205,7 @@ function rdPollHead(p) {
   const field = p.field || p.dateLabel;
   // pending dates read "Conducted on dates TBC" - the sentence shape the
   // probes pin (starts "Conducted on") and the copy card's anchors survive
-  if (p.fieldPending) return <>Conducted on dates {rdFieldTbc(p, true)} from {n}{", " + by + (out ? " on " + out : "")}</>;
+  if (p.fieldPending) return <>Conducted on dates {rdFieldTbc(p)} from {n}{", " + by + (out ? " on " + out : "")}</>;
   return <>{field ? "Conducted on " + field + " from " : "From "}{n}{", " + by + (out ? " on " + out : "")}</>;
 }
 
@@ -494,7 +494,7 @@ function RdApMini({ p, onM, pub }) {
       </svg>
       {dotTip && (() => { const d = dotTip; return (
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: d.cx + "px" }} aria-hidden="true">
-          <div className="tip-title">Fieldwork {rdFieldTxt(d.q) || d.q.released}</div>
+          <div className="tip-title">{d.q.fieldPending ? "TBC" : "Fieldwork " + (rdFieldTxt(d.q) || d.q.released)}</div>
           <div className="tip-sub">Labor {d.a.toFixed(1)} – {(100 - d.a).toFixed(1)} {rival}{pub ? ", as published" : ""}</div>
           {d.q.sample != null && <div className="tip-sub">n = {d.q.sample.toLocaleString()}{d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""}</div>}
           {tip.src !== "touch" && (d.key
@@ -576,7 +576,7 @@ function RdApDirMini({ p }) {
               <circle cx={d.cx} cy={Y(d.a)} r="4" className="rd-apd-dot"></circle>
               <circle cx={d.cx} cy={Y(d.a)} r="9" className={"rd-apd-hit" + (d.key ? " link" : "")}
                       tabIndex="0" role={d.key ? "button" : "img"}
-                      aria-label={`Net ${rdApSigned(d.a)}, ${p.pollster}’s reading of ${d.q.fieldPending ? "fieldwork TBC" : d.q.dateLabel || d.q.released}` + (d.key ? "; press Enter to open it" : "")}
+                      aria-label={`Net ${rdApSigned(d.a)}, ${p.pollster}’s reading of ${d.q.fieldPending ? "TBC" : d.q.dateLabel || d.q.released}` + (d.key ? "; press Enter to open it" : "")}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                       onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(d.id, "mouse"); }}
                       onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(d.id, "mouse"); }}
@@ -607,7 +607,7 @@ function RdApDirMini({ p }) {
       </svg>
       {dotTip && (
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
-          <div className="tip-title">Fieldwork {rdFieldTxt(dotTip.q) || dotTip.q.released}</div>
+          <div className="tip-title">{dotTip.q.fieldPending ? "TBC" : "Fieldwork " + (rdFieldTxt(dotTip.q) || dotTip.q.released)}</div>
           <div className="tip-sub">Right direction {rdApNum(dotTip.q.right)}, wrong track {rdApNum(dotTip.q.wrong)}: net {rdApSigned(dotTip.a)}</div>
           {dotTip.q.sample != null && <div className="tip-sub">n = {dotTip.q.sample.toLocaleString()}</div>}
           {tip.src !== "touch" && (dotTip.key
@@ -893,7 +893,7 @@ function RdApLdMini({ p, met }) {
               <circle cx={d.cx} cy={Y(pr.gap)} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
                       tabIndex="0" role={k ? "button" : "img"}
                       aria-label={rdApPm(d.q.appr) + "’s " + rdApLdMetWord(pr.met) + " minus " + pr.name + "’s, " + rdApLdWay(pr.gap, pr.name, rdApPm(d.q.appr))
-                        + ", " + d.q.pollster + "’s poll of " + (d.q.fieldPending ? "fieldwork TBC" : d.q.field || d.q.released)
+                        + ", " + d.q.pollster + "’s poll of " + (d.q.fieldPending ? "TBC" : d.q.field || d.q.released)
                         + (k ? "; press Enter to open it" : "")}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                       onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(id, "mouse"); }}
@@ -940,7 +940,7 @@ function RdApLdMini({ p, met }) {
       </svg>
       {dotTip && (
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
-          <div className="tip-title">Fieldwork {rdFieldTxt(dotTip.q) || dotTip.q.released}</div>
+          <div className="tip-title">{dotTip.q.fieldPending ? "TBC" : "Fieldwork " + (rdFieldTxt(dotTip.q) || dotTip.q.released)}</div>
           <div className="tip-sub">{rdApPm(dotTip.q.appr)}{" "}{rdApSigned(dotTip.q.appr.albNet)}, {dotTip.pr.name} {rdApSigned(dotTip.pr.net)} – {Math.abs(dotTip.pr.gap).toFixed(1)} points {rdApLdWay(dotTip.pr.gap, dotTip.pr.name, rdApPm(dotTip.q.appr))} ({rdApLdMetWord(dotTip.pr.met)})</div>
           {dotTip.q.sample != null && <div className="tip-sub">n = {dotTip.q.sample.toLocaleString()}</div>}
           {tip.src !== "touch" && (dotTip.key
@@ -1041,7 +1041,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const move = (e) => rdApSigned(Math.round((e.hi - e.lo) * 10) / 10);
   const inside = rdApInside(ydHe != null ? adj : lean, moe);
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
-  const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.fieldPending ? "fieldwork TBC" : p.field} ${yr} – `);
+  const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.fieldPending ? "TBC" : p.field} ${yr} – `);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
   /* on the direction facet the rail counts toward the DIRECTION headline
      instead: same steps, read off the national-direction series - the
@@ -2911,7 +2911,7 @@ function RdAllPolls(P) {
       <span className="rd-ap-sub">{p.client}</span>
     </span>
   );
-  const fieldTxt = (p) => (p.fieldPending ? "fieldwork TBC" : byDate ? p.field : p.field + " ’" + String(p.year).slice(2));
+  const fieldTxt = (p) => (p.fieldPending ? "TBC" : byDate ? p.field : p.field + " ’" + String(p.year).slice(2));
   const fieldCell = (p) => (
     <span role="cell" className="rd-ap-when"><b>{p.fieldPending ? rdFieldTbc(p) : fieldTxt(p)}</b>{p.published && <span className="rd-ap-sub">released {rdDate(p.published.slice(0, 10))}</span>}</span>
   );
@@ -2927,7 +2927,7 @@ function RdAllPolls(P) {
     const left = Math.max(22, Math.min(78, rdApX(lean)));
     return (
       <span className="tip rd-ap-tip" style={{ left: left + "%" }} role="tooltip">
-        <span className="tip-title">{p.pollster}, {p.fieldPending ? "fieldwork TBC" : p.field}</span>
+        <span className="tip-title">{p.pollster}, {p.fieldPending ? "TBC" : p.field}</span>
         <span className="tip-row"><span className="tip-label">Labor v {onM ? "One Nation" : "Coalition"}, {pub ? "published" : "implied"}</span><span className="tip-val">{f.txtA}</span></span>
         <span className="tip-row"><span className="tip-label">{RD_AP_KAL ? "The trend" : "The polls around it"}</span><span className="tip-val">{rdApYd(p, onM, pub) ? rdApYd(p, onM, pub).v.toFixed(1) : "—"}</span></span>
         <span className="tip-row"><span className="tip-label">Lean</span><span className="tip-val">{way(lean)}</span></span>
@@ -3225,7 +3225,7 @@ function RdAllPolls(P) {
           {pollsterCell(p)}{fieldCell(p)}{sampleCell(p)}<span></span>
           {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}
           <button type="button" className={"rd-ap-chev" + (isOpen ? " open" : "")} aria-expanded={isOpen}
-                  aria-label={(isOpen ? "Hide" : "Show") + " the full " + (facet === "confidence" ? "release" : "poll") + ": " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field)}
+                  aria-label={(isOpen ? "Hide" : "Show") + " the full " + (facet === "confidence" ? "release" : "poll") + ": " + p.pollster + ", " + (p.fieldPending ? "TBC" : p.field)}
                   onClick={(e) => { e.stopPropagation(); toggle(); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
         </div>
         {detail}

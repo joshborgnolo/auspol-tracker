@@ -3020,7 +3020,7 @@ const individualPolls = POLLS.map((p) => {
        Brief article before DemosAU's methodology PDF; a Resolve wave filed
        from the monitor csv before the SMH article carries its dates):
        `field` is the provisional window that places it on the charts and in
-       the headline, and the views say "Fieldwork TBC" instead, linking
+       the headline, and the views say "TBC" instead, linking
        `fieldUrl`, where the dates will be published. Leaves with the dates
        (extract-demosau.mjs; Resolve's hand-stamp on the SMH article). */
     ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: FIELD_TBC_URL[p.pollster] ?? null } : {}),

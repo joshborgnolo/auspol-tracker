@@ -3922,7 +3922,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">{p.conf ? "Gauge" : "Commissioned by"}</span>
       <span className="pd-meta-v">{p.client}</span></span>,
     <span className="pd-meta-i" key="field"><span className="pd-meta-k">Fieldwork</span>
-      <span className="pd-meta-v">{p.fieldPending ? rdFieldTbc(p, true) : p.field}</span></span>,
+      <span className="pd-meta-v">{p.fieldPending ? rdFieldTbc(p) : p.field}</span></span>,
     /* The date the poll came OUT, and the hour where the release recorded
        one. This line has always been labelled "Published" and has always
        printed `fullDate`, which is the last day of FIELDWORK - the same
@@ -4009,7 +4009,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
       const yr = p.year != null ? p.year
         : /^\d{4}-/.test(p.released || "") ? Number(p.released.slice(0, 4))
         : null;
-      const when = p.fieldPending ? "fieldwork TBC" : p.field ? p.field + (yr ? " " + yr : "")
+      const when = p.fieldPending ? "TBC" : p.field ? p.field + (yr ? " " + yr : "")
         : p.fullDate ? p.fullDate : "";
       return (
         <a className="back-to-chart pd-report" key="report"

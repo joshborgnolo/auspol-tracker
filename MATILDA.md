@@ -214,7 +214,7 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     carries `fieldworkPending: true` with a provisional window
     (CB_FIELD_LAG/CB_FIELD_SPAN = the Jul–Sep release habit) that places
     it on the charts and in the headline — every visible fieldwork
-    label instead says "Fieldwork TBC", linked to the house's
+    label instead says "TBC", linked to the house's
     methodology-statements page (gen-data §6 emits fieldPending/fieldUrl
     on individualPolls and pollsterTable) — and `samplePending: true`
     when the article states no n. When the PDF lands the match writes

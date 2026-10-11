@@ -42,7 +42,7 @@ itself when Matilda's citations verify (`.build/demosau-read.mjs`: all five
 primaries quoted verbatim, each change reconciling with the previous DemosAU
 wave): the row carries `fieldworkPending: true` with a provisional window
 (ending 4 days before the article, 4 days long) and, if the article states no
-sample, `samplePending: true`; the site shows "Fieldwork TBC", and the PDF
+sample, `samplePending: true`; the site shows "TBC", and the PDF
 later writes the real dates and sample and drops the flags. Exit 3 now means
 that reading did NOT verify (the status `notes` say why) — only then does the
 hand-entry procedure below apply. Never relax the reconciliation to make an

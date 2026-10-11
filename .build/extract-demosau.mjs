@@ -81,7 +81,7 @@
 // carries `fieldworkPending: true` with a provisional window (ending
 // CB_FIELD_LAG days before publication, CB_FIELD_SPAN days long — the
 // recent waves ran 3–5 days to publication) that places it on the chart
-// and in the headline; the site shows "Fieldwork TBC" linked to the
+// and in the headline; the site shows "TBC" linked to the
 // methodology statements. `samplePending` likewise when the article states
 // no sample. When the PDF lands, the match below writes the PDF's dates
 // and sample over the provisional ones and clears both flags. A reading

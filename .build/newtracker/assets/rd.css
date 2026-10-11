@@ -455,7 +455,7 @@ body.rd .rd-link:focus-visible { outline: 2px solid var(--accent); outline-offse
    underline to a text-only span instead (keeps the ↗ un-underlined) */
 body.rd .rd-link-ext { text-decoration: none; }
 body.rd .rd-link-ext .rd-link-t { text-decoration: underline; text-underline-offset: 3px; }
-/* a link the pollster hasn't posted yet: fainter, dotted like Fieldwork TBC */
+/* a link the pollster hasn't posted yet: fainter, dotted like the TBC placeholder */
 body.rd .rd-link-pend { color: var(--ink-3); font-weight: 400; }
 body.rd .rd-link-pend .rd-link-t { text-decoration-style: dotted; }
 

@@ -291,7 +291,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     return (
       <div ref={tlTipRef} className="tip tip-dot rd-tl-tip" style={{ left: t.left + "%", top: "50%" }} aria-hidden="true">
         <div className="tip-title">{q.pollster}</div>
-        <div className="rd-tl-tipdate">Fieldwork {pr.fieldPending ? "TBC" : pr.field}, published {pr.publishedLabel}</div>
+        <div className="rd-tl-tipdate">{pr.fieldPending ? "TBC" : "Fieldwork " + pr.field}, published {pr.publishedLabel}</div>
         {figCell({ poll: pr })}
         {q.sample ? <div className="tip-sub">n = {q.sample.toLocaleString()}</div> : null}
         {t.src !== "touch" && <div className="tip-hint">{t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
@@ -386,7 +386,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     const nx = nextWords(e);
     const then = e.proj.filter((x) => x.ahead === 1)[0];
     const yr = Number(String(r.released || ip.released || "").slice(0, 4));
-    const report = "/feedback/?msg=" + encodeURIComponent(`${r.pollster}, ${r.fieldPending ? "fieldwork TBC" : r.field} ${yr} – `);
+    const report = "/feedback/?msg=" + encodeURIComponent(`${r.pollster}, ${r.fieldPending ? "TBC" : r.field} ${yr} – `);
     const rhythm = pj && (
       <div className="rd-pld-rhythm">
         <div className="rd-pld-h">{r.pollster}’s rhythm, last {rdNumWord(recent.length)} releases</div>
