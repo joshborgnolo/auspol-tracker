@@ -66,6 +66,16 @@
   src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* the h1 asks for Crimson 700 (the .rd-hed cut) — without this block the
+   browser emboldened the 600 face instead, a visibly different headline */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
@@ -130,10 +140,18 @@ main.sh-frame {
   padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
 main > * { max-width: 66ch; }
+/* the head pair is the redesign's headline anatomy verbatim (rd.css):
+   the .rd-title cut over .rd-hed — same faces, weights, sizes, tracking
+   and the title→hed gap as "Two-party preferred" over "One Nation now…" */
+main .kicker {
+  margin: 0; font-family: var(--sans);
+  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
+  color: var(--ink);
+}
 main h1 {
   font-family: var(--serif); font-size: 46px; font-weight: 700;
   line-height: 1.08; letter-spacing: -0.01em;
-  margin: 0; color: var(--ink); text-wrap: pretty;
+  margin: 16px 0 0; color: var(--ink); text-wrap: pretty;
 }
 main h2 {
   margin: 44px 0 10px; padding-top: 12px;
@@ -256,7 +274,8 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 /* ------- the redesign's small steps: headline, dek, section titles 640px and under
    (the rd.css 640px block: .rd-hed 30px/1.1, .rd-dek 15/1.4, .rd-title 19px) ------- */
 @media (max-width: 640px) {
-  main h1 { font-size: 30px; line-height: 1.1; }
+  main .kicker { font-size: 19px; }
+  main h1 { margin-top: 14px; font-size: 30px; line-height: 1.1; }
   main p.ss-sub { margin-top: 8px; font-size: 15px; line-height: 1.4; }
   main h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .pred-num { font-size: 44px; }
@@ -330,7 +349,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 </nav>
 <!--/shell:header-->
 <main id="sh-content" class="sh-frame">
-  <p class="sh-kicker">Explainer</p>
+  <p class="kicker">Explainer</p>
   <h1>Preference flows</h1>
   <p class="ss-sub">Above the chart, one line says where the two-party figure comes from: &ldquo;Using implied preference flows&rdquo; or &ldquo;Using respondent-allocated preferences only&rdquo;. What follows is what each means, why the site uses the first by default, and where its numbers come from.</p>
 
