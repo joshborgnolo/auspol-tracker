@@ -22,7 +22,7 @@ const ROOT = new URL("../", import.meta.url);
 const POLLS_JSON = new URL("data/polls.json", ROOT);
 const DATA_ASSET = new URL(".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js", ROOT);
 
-const { impliedAlp2pp } = await import(new URL(".build/newtracker/flows.mjs", ROOT));
+const { impliedAlp2pp, FP_ON } = await import(new URL(".build/newtracker/flows.mjs", ROOT));
 const { HOUSE_RENAMES } = await import(new URL(".build/newtracker/house-renames.mjs", ROOT));
 
 /* ---- canonical dataset (gen-data.mjs:41-65, verbatim) ------------------ */
@@ -197,27 +197,17 @@ const ALT_BY = new Map(D.altTpp.map((r) => [r.date + "|" + r.firm, { ao: r.alpVs
       flow table for THIS pairing:
           implied = alp + lnp·f_lnp + grn·f_grn + (ind+oth)·f_oth
       — and no election count of an ALP-v-ON pairing exists, so the frozen
-      table cannot be election-anchored like §7c's. It is FIRST-PRINCIPLES:
-      the AEC 2025 Senate ATL ballot counts re-anchored on the 2026
-      lower-house counts where ON made the final two (SA state election,
-      Secret Harbour by-election) — senate-flows first-principles
-      derivations (~/Downloads/senate flows, 2026-09-08) — ON-side shares
-      Coal→ON 68.5 (66–71), GRN→ON 11 (8–14), others→ON 47 (44–50),
-      carried here ALP-side, with FP_ON_BAND the set's own ± range (stacked
-      linearly into the band §7f's quoted figure carries). LNP cell
-      recalibrated 2026-09-11 from 0.72/0.28: the Senate-ATL-derived
-      reading sat low against the counted 2026 evidence — Antony Green's
-      Secret Harbour preference analysis puts Coalition→Labor above 29.8
-      in a strong-ON seat (so the national figure must sit above it), and
-      SA 2026's whole-state count ran ~33–34 to Labor at a March ON
-      primary of 23.5% (the national ON primary has since firmed to ~27)
-      — anchor lands between the two counts at 31.5 to Labor / 68.5 to ON.
+      table cannot be election-anchored like §7c's. It is BUILT, and like
+      §7c's table it is imported, not copied: FP_ON in flows.mjs, where its
+      provenance lives (31.5 / 91 / 55 to Labor since 2026-10-11).
       This is the
       table the page QUOTES the pairing on (§7f), and it was chosen over
       RedBridge/Accent's respondent-allocated splits (tpp_split_on — the
       only published per-cohort allocation of the pairing, kept below as
-      the panel's measured RedBridge row) because revealed, re-validated
-      ballots beat a stated allocation with no count to anchor; the
+      the panel's measured RedBridge row) because revealed ballots beat a
+      stated allocation with no count to anchor, and respondents answer
+      without the how-to-vote card that close to half of Coalition voters
+      copy; the
       published head-to-heads themselves stay the corroboration this panel
       monitors. meta.anchor says null and the copy says so. (The drift
       series is baseline-subtracted per house anyway, so a level offset in
@@ -229,8 +219,6 @@ const ALT_BY = new Map(D.altTpp.map((r) => [r.date + "|" + r.firm, { ao: r.alpVs
       ALP-v-ON row is eight months in), so every firm anchors on its own
       first FLOW_ON_BASE_MIN residuals and meta.baseFrom records which date
       each series can speak from. */
-const FP_ON = { lnp: 0.315, grn: 0.89, oth: 0.53 };
-const FP_ON_BAND = { lnp: 0.025, grn: 0.03, oth: 0.03 };
 const FLOW_ON_BASE_MIN = 3;
 /* implied(reading primaries through the frozen table) is defined wherever a
    full primary set exists with no documented anomaly — exactly the

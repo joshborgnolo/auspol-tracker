@@ -53,15 +53,21 @@ D.* payloads); for the chart surface itself read
   merged into `synthLatest`.
 - gen-data ALP–ON emit (0365ba4) — `synthOn` (monthly implied ALP–ON
   points), `latest.onImp` = {a, b, band, flows, n, aPrev}, and per-poll
-  `alpOnImp`. ALP–ON flow constants FP_ON={lnp:0.315, grn:0.89, oth:0.53}
-  (bands .025/.03/.03) were deliberately recalibrated 2026-09-11
-  (Coalition 0.72→0.685) and already post-date the user's analysis doc —
-  do NOT "recalibrate" them again on that basis.
+  `alpOnImp`. ALP–ON flow constants live in flows.mjs since 2026-10-11:
+  FP_ON={lnp:0.315, grn:0.91, oth:0.55}, bands .03/.025/.04. The Coalition
+  cell was recalibrated 2026-09-11 (0.72→0.685 to ON) and the Greens/others
+  cells revised 2026-10-11 (0.89/0.53 → 0.91/0.55) after a sourced review
+  (memory alp-on-flow-review) — both post-date the user's Downloads-side
+  analysis doc, so do NOT "recalibrate" them again on that basis. Clients
+  read them from D.flowTables, never a copy.
 - Data asset (9f09dca2) — `synthLatest` shape is {alp, lnp, ci95, n, prev,
   changeSig, ...} — DIFFERENT from `latest` = {alp2pp, lnp2pp, alp2ppCi95,
   alp2ppPrev, method{nPolls,windowDays}, ...}. Never regex one with the
-  other's keys. `latest.onImp` carries `band` = the frozen ALP–ON
-  flow-table RANGE (labelled "flow range" in the UI, never "95% interval").
+  other's keys. `latest.onImp` carries `band` (the frozen ALP–ON
+  flow-table RANGE), `cs` (the level's 95% sampling interval) and `ci95` =
+  hypot(cs, band), the margin every ± and verdict reads (labelled "margin" /
+  "margin incl. flows", never "95% interval"; synthOn months carry the same
+  ci95/cs/cf triple). Until 2026-10-11 ci95 was the band alone.
 - Hero asset (73de0c58) — App state `tppBasis` (default "imp", mirrored to
   window.AP.tppBasis); gates at :783-785: `impOffered`/`impBasis`
   (classic) + `impOnOffered` (= `D.synthOn.length>1 && !!D.latest.onImp`) /
@@ -139,7 +145,7 @@ D.* payloads); for the chart surface itself read
   .hero-chartbar) had THREE comment+rule homes that all described the
   compare switch leading; leaving one stale rule reintroduces a
   double-sink.
-- Legend/caption (~:1497/) — ribbon label `impOnBasis ? "flow range" :
+- Legend/caption (~:1497/) — ribbon label `impOnBasis ? "margin incl. flows" :
   "95% interval"`; ALP v ON implied caption names "the site's fixed ALP–ON
   flow set" and notes "No election has counted this pairing".
 - `template.html` — `.hb-toggle` / `.hb-what` CSS (~:1138-1150, replaces
@@ -201,7 +207,7 @@ every svg per basis).
    "dots identical".
 4. Expected flip signatures (0365ba4): classic 51.5/48.5 ↔ 52.0/48.0,
    dots 318 ↔ 256; ALP v ON 51.3/48.7 ↔ 53.7/46.3, dots 318 ↔ 110,
-   interval label "flows range" → "95% interval" on the resp basis.
+   interval label "margin incl. flows" → "95% interval" on the resp basis.
 
 ## Verification checklist for basis work
 

@@ -690,8 +690,9 @@ const MATCHUPS = (() => {
    too thin to weight); otherwise its last monthly point. ONE exception:
    ALP v ON has TWO bases too, and honours the same toggle. Its implied
    default (D.latest.onImp – the current primaries run through a
-   first-principles flow set, carrying that set's flow band rather than a
-   sampling interval) leads because no election count of the pairing exists
+   first-principles flow set, with a margin that adds the polls' sampling
+   interval (cs) to that set's own range (cf) in quadrature, flagged
+   `flows`) leads because no election count of the pairing exists
    to discipline the houses' uncoordinated allocations; on "resp" it quotes
    the pollsters' own published head-to-head nowcast instead. LNP v ON is
    the only figure with a single basis. */
@@ -707,7 +708,7 @@ function tppLatest(id, basis) {
   if (imp) {
     if (basis === "resp" && D.altLatest && D.altLatest.alp_on)
       return { a: D.altLatest.alp_on.a, b: D.altLatest.alp_on.b, ci95: D.altLatest.alp_on.ci95 };
-    return { a: imp.a, b: imp.b, ci95: imp.band, flows: true };
+    return { a: imp.a, b: imp.b, ci95: imp.ci95 != null ? imp.ci95 : imp.band, cs: imp.cs, cf: imp.band, flows: true };
   }
   const al = D.altLatest ? D.altLatest[M.altKey] : null;
   if (al) return { a: al.a, b: al.b, ci95: al.ci95 };
@@ -1076,13 +1077,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   ]));
   /* The ALP–ON contest gets the same swap from its own payload: synthOn's
      monthly points are ALREADY {ym,x,a,b,ci95,k} (no remap needed), and its
-     per-wave implied dot is alpOnImp. ci95 there is the frozen flow table's
-     RANGE, not a sampling interval. Gated like impData, NOT on impOnBasis:
+     per-wave implied dot is alpOnImp. ci95 there is the month's MARGIN: its
+     sampling interval (cs) and the frozen flow table's range (cf) added in
+     quadrature, so the tooltip names both. Gated like impData, NOT on impOnBasis:
      matchup has already flipped when a morph AWAY from this contest renders,
      so a matchup-gated impOnData would vanish mid-morph - ptsOf/domainOf see
      the published series from frame zero and the y-window never travels. */
   const impOnDataFor = (b) => (impOnOffered && (b === undefined ? basis : b) === "imp")
-    ? (HERO_VIEWS.impOn || (HERO_VIEWS.impOn = D.synthOn.map((d) => ({ ym: d.ym, x: d.x, a: d.a, b: d.b, ci95: d.ci95, k: d.k }))))
+    ? (HERO_VIEWS.impOn || (HERO_VIEWS.impOn = D.synthOn.map((d) => ({ ym: d.ym, x: d.x, a: d.a, b: d.b, ci95: d.ci95, cs: d.cs, cf: d.cf, k: d.k }))))
     : null;
   const impOnData = impOnDataFor();
   const impOnScatter = heroPairs("impOn", (p) => (p.alpOnImp == null ? null : [
@@ -1163,8 +1165,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
      corroboration (see tppLatest). Gated on impOnBasis so a flip to
      respondent-allocated drops the implied level out of latest/unc/
      monthDelta at once – the published head-to-head (altL) takes over.
-     rides `flows` so the interval copy says "flows range" rather than
-     "95% interval". */
+     rides `flows` so the interval copy names a margin that counts the flow
+     table's doubt as well as the polls', rather than a "95% interval". */
   const onImpL = (m.altKey === "alp_on" && D.latest.onImp && impOnBasis) ? D.latest.onImp : null;
   const adjusted = m.real || !!onImpL || !!(D.adjusted && m.altKey && D.adjusted[m.altKey]);
   const latest = m.real
@@ -1404,13 +1406,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
             : null))
     : (onImpL
-        /* ci95 stays the frozen table's flow range (flows:true makes the
+        /* ci95 is the level's margin: the polls' sampling interval (cs) and
+           the frozen table's range (cf) in quadrature (flows:true makes the
            readout say so). changeSig rides alongside it because the change
            is a different question from the level: the same frozen table at
            both dates cancels out of the difference, leaving sampling error
            the pairing can actually be tested on. Undefined when the window
            is too thin, which reads as "make no claim", as everywhere else. */
-        ? { ci95: onImpL.band, n: onImpL.n, flows: true, changeSig: onImpL.changeSig }
+        ? { ci95: onImpL.ci95 != null ? onImpL.ci95 : onImpL.band, cs: onImpL.cs, cf: onImpL.band,
+            n: onImpL.n, flows: true, changeSig: onImpL.changeSig }
         : (altL && altL.ci95 != null
             ? { ci95: altL.ci95, n: altL.n, changeSig: altL.changeSig }
             : null));
@@ -1577,7 +1581,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                       error), so it is the shortest way to the definition. */}
                   {" "}
                   <button type="button" className="hi-range hi-term"
-                          title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
+                          title={unc.flows ? "The polls' sampling margin and the flow table's own range, together" : "What a margin of error means"}
                           onClick={() => window.AP.openTerm &&
                             window.AP.openTerm(unc.flows ? "fp-flows" : "margin-of-error",
                                                "two-party preferred")}>
@@ -1658,11 +1662,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                     error, so a click lands on the same page the ± figure and
                     the caveat's "margin" already open. */}
                 <button type="button" className="hi-note hi-term"
-                        title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
+                        title={unc.flows ? "The polls' sampling margin and the flow table's own range, together" : "What a margin of error means"}
                         onClick={() => window.AP.openTerm &&
                           window.AP.openTerm(unc.flows ? "fp-flows" : "margin-of-error",
                                              "two-party preferred")}>
-                  {unc.flows ? "flows range" : "95% interval"}
+                  {unc.flows ? "margin incl. flows" : "95% interval"}
                 </button>)
               </span>
             )}
@@ -1742,7 +1746,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
         extraRows={(i) => {
           const d = drawPts[i];
           if (!d || d.ci95 == null || !d.ci95) return [];
-          return [{ label: "95% interval", value: "± " + d.ci95.toFixed(1) + " pts"
+          /* the implied ALP v ON month's ± is a margin of two parts, named */
+          const parts = d.cf != null && d.cs != null ? " (polls ± " + d.cs.toFixed(1) + ", flows ± " + d.cf.toFixed(1) + ")" : "";
+          return [{ label: parts ? "Margin" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + parts
                     + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
         }}
         fmt={(v) => v.toFixed(1)}
@@ -1759,7 +1765,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
           </span>
           {scatterPolls > 0 && heroSeries.length > 0 && <span className="hl-item hl-polls"><span className="hl-dot"></span>Individual poll</span>}
           {heroAreas.length > 0 && (
-            <span className="hl-item"><span className="hl-band"></span>{impOnBasis ? "flow range" : "95% interval"}</span>
+            <span className="hl-item"><span className="hl-band"></span>{impOnBasis ? "margin incl. flows" : "95% interval"}</span>
           )}
           {synthOverlay.length > 0 && (
             <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>{m.altKey === "alp_on"
@@ -1804,8 +1810,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             ? <>The shading is the interval around the line. Where the two bands overlap, the lead
                is inside its own margin of error – the polls cannot separate the parties that month.</>
             : impOnBasis
-              ? <>The shading is the flow table’s own range. No election has counted this pairing, so
-                 the set is calibrated from preference counts, not anchored to a result.</>
+              ? <>The shading is the margin around the line: the polls’ sampling error and the flow
+                 table’s own range, together. No election has counted this pairing, so the set is
+                 built from the ballots that exist, not anchored to a result.</>
               : null,
         ]} />
       </div>

@@ -215,16 +215,17 @@ window.AP = (function () {
        and the two implied contests with the sampling floor of an implied
        figure: each respondent carries their party's flow to Labor, so the
        variance is that of the flows over the primaries, which p(1 − p)
-       overstates by about a quarter. The flows are gen-data's (the 2025 count
-       against the Coalition, the first-principles set against One Nation). */
+       overstates by about a quarter. The flows are gen-data's flowTables (the
+       counted table against the Coalition, the first-principles set against
+       One Nation), read rather than copied so they can never drift apart. */
     { id: "rd_right",   facet: "rd", label: "L/NP + ON", color: "var(--ink-2)",
       val: (p) => (p.p.lnp != null && p.p.onp != null ? p.p.lnp + p.p.onp : null), share: (p) => p.p.lnp + p.p.onp },
     { id: "rd_on_imp",  facet: "rd", label: "ALP v ON (implied)", color: "var(--onp)",
       val: (p) => p.alpOnImp, share: (p) => p.alpOnImp,
-      flows: { alp: 1, lnp: 0.315, grn: 0.89, onp: 0, oth: 0.53 } },
+      flows: D.flowTables.onp },
     { id: "rd_lnp_imp", facet: "rd", label: "ALP v L/NP (implied)", color: "var(--lnp)",
       val: (p) => p.alpImp, share: (p) => p.alpImp,
-      flows: { alp: 1, lnp: 0, grn: 0.8819, onp: 0.255, oth: 0.5455 } },
+      flows: D.flowTables.lnp },
   ];
   /* the variance of a respondent's flow to Labor over a poll's primaries */
   const flowVar = (p, F) => {

@@ -6490,6 +6490,11 @@ function FlowChart() {
 
 function infoTerms(D) {
   const L = D.latest, prim = D.latest.primary;
+  /* the Labor v One Nation flow table as the estimator reads it (gen-data's
+     flowTables), so these entries can never quote a stale setting */
+  const FT = D.flowTables.onp, FB = D.flowTables.onBand;
+  const fpc = (v) => +(100 * v).toFixed(1) + "%", fpt = (v) => String(+(100 * v).toFixed(1));
+  const onM = L.onImp && L.onImp.ci95 != null ? L.onImp.ci95 : (L.onImp ? L.onImp.band : null);
   const counts = {};
   D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
   /* One name per house, as the hero counts them (housesTracked): a house's
@@ -7029,7 +7034,10 @@ function infoTerms(D) {
       assumptions and a pollster’s methods sit outside it. Pooling polls narrows the chance part,
       which is why the two-party {xref("interval", "margin of error", "95% interval")}
       {" "}(±{hl.ci.toFixed(1)} today) is tighter than one poll’s ±3. The part every pollster shares
-      doesn’t shrink at all.</>) },
+      doesn’t shrink at all.
+      {L.onImp ? <> The implied Labor v One Nation figure’s margin adds one more doubt, about
+      {" "}its {xref("fp-flows", "margin of error", "flow table")}, so it is wider than the polls’
+      {" "}alone.</> : null}</>) },
     { id: "effective-sample", term: "Effective sample", body: (
       <>What a sample is worth once weighting is counted. A pollster’s
       {" "}{xref("apc-statement", "effective sample", "APC statement")} gives one for each poll,
@@ -7124,7 +7132,8 @@ function infoTerms(D) {
             <span className="info-p">Labor v One Nation uses a different table, the
             {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no election
             has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
-            {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)}.</span>
+            {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{onM.toFixed(1)} once doubt about that table
+            {" "}is added to the polls’ own margin.</span>
           ) : null}
           <span className="info-p">Past cycles reads each earlier term through the flows of the
           election that opened it (see
@@ -7154,24 +7163,29 @@ function infoTerms(D) {
         { id: "fp-flows", term: "First-principles flow set", body: (
           <>The preference table behind the Labor v One Nation figure, which the site built because
           no election has ever counted that contest. Three settings do all the work: Coalition
-          voters give 31.5% to Labor (±2.5), Greens 89% (±3) and everyone else 53% (±3). The rest go
-          to One Nation.
+          voters give {fpc(FT.lnp)} to Labor (±{fpt(FB.lnp)}), Greens {fpc(FT.grn)} (±{fpt(FB.grn)})
+          {" "}and everyone else {fpc(FT.oth)} (±{fpt(FB.oth)}). The rest go to One Nation.
           {L.onImp && prim ? (
             <span className="info-p">On today’s primaries: Labor’s {prim.alp.toFixed(1)}, plus
-            31.5% of the Coalition’s {prim.lnp.toFixed(1)}, 89% of the Greens’
-            {" "}{prim.grn.toFixed(1)} and 53% of the others’ {prim.oth.toFixed(1)}, gives
+            {" "}{fpc(FT.lnp)} of the Coalition’s {prim.lnp.toFixed(1)}, {fpc(FT.grn)} of the Greens’
+            {" "}{prim.grn.toFixed(1)} and {fpc(FT.oth)} of the others’ {prim.oth.toFixed(1)}, gives
             {" "}{L.onImp.a.toFixed(1)} to Labor and {L.onImp.b.toFixed(1)} to One Nation. The
-            ±{L.onImp.band.toFixed(1)} adds up the three settings’ ranges, and doubles to
-            ±{(2 * L.onImp.band).toFixed(1)} on the lead, the flow range the hero shows. It measures
-            doubt about the table, not sampling chance.</span>
+            table’s own range, ±{L.onImp.band.toFixed(1)}, adds up the three settings’ ranges. It
+            measures doubt about the table, not sampling chance, so the hero adds it to the polls’
+            {" "}own margin{L.onImp.cs != null ? <> (±{L.onImp.cs.toFixed(1)})</> : null} as a separate
+            {" "}error: ±{onM.toFixed(1)} in all, ±{(2 * onM).toFixed(1)} on the lead.</span>
           ) : null}
-          <span className="info-p"><b>Where the numbers come from.</b> The counted ballots that do
-          exist: the AEC’s 2025 Senate ballot data, re-checked against the 2026 lower-house contests
-          where One Nation made the final two, the SA state election and the Secret Harbour
-          by-election. The table stays fixed between such counts and is never fitted to current
-          polls. The pollsters’ own Labor v One Nation figures rest on what respondents say about
-          their preferences, with no count to check them against, so they stay on the chart as a
-          cross-check.</span></>) },
+          <span className="info-p"><b>Where the numbers come from.</b> The ballots that do exist.
+          The AEC’s 2025 Senate ballot data records how every Coalition, Greens and other voter
+          ranked Labor against One Nation. The 2026 lower-house contests where One Nation made the
+          final two, the SA state election and the Secret Harbour by-election, show how that
+          ranking carries into a House count, though both are estimates from partial data. The
+          settings also allow for voters those contests left out, such as Nationals voters. The
+          table stays fixed between such evidence and is never fitted to current polls. The
+          pollsters’ own Labor v One Nation figures rest on what respondents say, without the
+          how-to-vote card close to half of Coalition voters copy, so they stay on the chart as a
+          cross-check. The working is in{" "}
+          <a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
       ] },
     { id: "s-primary", title: "Primary vote", nav: "Primary vote",
       lead: { id: "primary-vote", body: (
@@ -7961,7 +7975,8 @@ function infoTerms(D) {
               <span className="info-p">Labor v One Nation uses a different table, the
               {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no
               election has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
-              {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)}.</span>
+              {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{onM.toFixed(1)} once doubt about that
+              {" "}table is added to the polls’ own margin.</span>
             ) : null}</>) },
           { id: "preference-flows", term: "Preference flows", body: (
             <>How minor-party votes split between the final two candidates once preferences are
@@ -7981,22 +7996,24 @@ function infoTerms(D) {
           { id: "fp-flows", term: "First-principles flow set", body: (
             <>The preference table behind the Labor v One Nation figure. No election has ever
             counted that contest, so the site built the table for the federal page, and Victoria’s
-            figure borrows it unchanged. Three settings do all the work: Coalition voters give 31.5%
-            to Labor (±2.5), Greens 89% (±3) and everyone else 53% (±3). The rest go to One Nation.
+            figure borrows it unchanged. Three settings do all the work: Coalition voters give
+            {" "}{fpc(FT.lnp)} to Labor (±{fpt(FB.lnp)}), Greens {fpc(FT.grn)} (±{fpt(FB.grn)}) and
+            everyone else {fpc(FT.oth)} (±{fpt(FB.oth)}). The rest go to One Nation.
             {L.onImp && prim ? (
               <span className="info-p">On today’s primaries: Labor’s {prim.alp.toFixed(1)}, plus
-              31.5% of the Coalition’s {prim.lnp.toFixed(1)}, 89% of the Greens’
-              {" "}{prim.grn.toFixed(1)} and 53% of the others’ {prim.oth.toFixed(1)}, gives
-              {" "}{L.onImp.a.toFixed(1)} to Labor and {L.onImp.b.toFixed(1)} to One Nation. The
-              ±{L.onImp.band.toFixed(1)} adds up the three settings’ ranges, and doubles to
-              ±{(2 * L.onImp.band).toFixed(1)} on the lead, the flow range the hero shows. It
-              measures doubt about the table, not sampling chance.</span>
+              {" "}{fpc(FT.lnp)} of the Coalition’s {prim.lnp.toFixed(1)}, {fpc(FT.grn)} of the
+              Greens’ {prim.grn.toFixed(1)} and {fpc(FT.oth)} of the others’ {prim.oth.toFixed(1)},
+              gives {L.onImp.a.toFixed(1)} to Labor and {L.onImp.b.toFixed(1)} to One Nation. The
+              table’s own range, ±{L.onImp.band.toFixed(1)}, adds up the three settings’ ranges. It
+              measures doubt about the table, not sampling chance, so the hero adds it to the polls’
+              {" "}own margin{L.onImp.cs != null ? <> (±{L.onImp.cs.toFixed(1)})</> : null} as a
+              {" "}separate error: ±{onM.toFixed(1)} in all, ±{(2 * onM).toFixed(1)} on the lead.</span>
             ) : null}
-            <span className="info-p"><b>Where the numbers come from.</b> The counted ballots that
-            do exist, all federal or from other states: the AEC’s 2025 Senate ballot data, re-checked
-            against the 2026 lower-house contests where One Nation made the final two, the SA state
-            election and the Secret Harbour by-election. The table stays fixed between such counts
-            and is never fitted to current polls.</span></>) },
+            <span className="info-p"><b>Where the numbers come from.</b> The ballots that do exist,
+            all federal or from other states: the AEC’s 2025 Senate ballot data, read through the
+            2026 lower-house contests where One Nation made the final two, the SA state election and
+            the Secret Harbour by-election. The table stays fixed between such evidence and is never
+            fitted to current polls.</span></>) },
         ] },
       { id: "s-primary", title: "Primary vote", nav: "Primary vote",
         lead: { id: "primary-vote", body: (

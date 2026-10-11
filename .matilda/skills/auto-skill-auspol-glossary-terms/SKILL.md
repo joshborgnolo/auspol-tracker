@@ -93,11 +93,15 @@ one cryptic paragraph inside preference-flows and the user judged it
   that noun — a side-paragraph inside a neighbouring term reads as
   unidentified assertion at the end of a two-hop link chain (hero's
   "Implied from primary votes" → implied-2pp → the set).
-- The term prints the three cells (Coal→ALP 31.5% ±2.5, GRN→ALP 89% ±3,
-  others→ALP 53% ±3) with a LIVE worked example guarded
+- The term prints the three cells (Coal→ALP 31.5% ±3, GRN→ALP 91% ±2.5,
+  others→ALP 55% ±4 since 2026-10-11) READ FROM `D.flowTables.onp` /
+  `.onBand` (never typed into copy again), with a LIVE worked example guarded
   `{L.onImp && prim ? … : null}` — parts read off `{prim.*}`
   (= `D.latest.primary`) and the result off `{L.onImp.*}`, so the numbers
   can never rot (proved necessary: polls moved within a day of the edit).
+  Its ± sentence explains the margin: the table's band added to the polls'
+  own sampling margin (`L.onImp.cs`) as a separate error, `L.onImp.ci95`
+  in all.
 - Copy-trap when printing cell percentages: FP_ON's constants are the
   ALP-side COMPLEMENTS of the published ON-side shares (Coal→ON 68.5 →
   FP_ON.lnp 0.315). The constant NAMES don't say which side they sit on —

@@ -59,25 +59,27 @@ rebasing, monthWithSe/nowcastAdj pooling, wave-equal ridge with pooled
 σ̂²w — cloned as a parallel block right after §7c with the constants
 prefixed `FLOW_ON_*`. The differences are the ones the data forces:
 
-- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.315, grn 0.89,
-  oth 0.53}` fractions at gen-data.mjs ~:1566, with `FP_ON_BAND =
-  {lnp 0.025, grn 0.03, oth 0.03}` the set's own ± range, stacked linearly
-  into the band §7f's quoted figure carries): derived from the AEC 2025
-  Senate ATL ballot counts, then the LNP cell was recalibrated 2026-09-11
-  from 0.28 to 0.315 against the counted 2026 evidence — Antony Green's
-  Secret Harbour preference analysis puts Coalition→Labor above 29.8 in a
-  strong-ON seat (national figure must sit above it), and SA 2026's
-  whole-state count ran ~33–34 to Labor at a March ON primary of 23.5%
-  (the national ON primary has since firmed to ~27); ON-side shares
-  Coal→ON 68.5 (66–71), GRN→ON 11 (8–14),
-  others→ON 47 (44–50) carried ALP-side. No election ever counts a
+- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.315, grn 0.91,
+  oth 0.55}` fractions in flows.mjs since 2026-10-11 — imported by gen-data
+  AND by flow-drift-check.mjs, like FLOW — with `FP_ON_BAND =
+  {lnp 0.03, grn 0.025, oth 0.04}` the set's own ± range, stacked linearly
+  at each poll's primaries and added to the sampling interval in quadrature
+  for the quoted margin): built from the AEC 2025 Senate ATL ballots, read
+  through the 2026 lower-house contests (Bonham's SA estimate ~66 Lib→ON;
+  Green's Secret Harbour early-voting-centre sample 70.2, full count "high
+  60s") with national allowances (Nationals, state lean). The LNP cell was
+  recalibrated 2026-09-11 (0.28→0.315); Greens/others revised 2026-10-11
+  (0.89/0.53 → 0.91/0.55) on like-for-like evidence. ON-side shares
+  Coal→ON 68.5 (65.5–71.5), GRN→ON 9 (6.5–11.5), others→ON 45 (41–49),
+  carried ALP-side; provenance in the flows.mjs comment. No election ever counts a
   Labor-v-ON pairing, so there is no election anchor — `impliedOn(p) =
   p.alp + p.lnp·FP_ON.lnp + p.grn·FP_ON.grn + (ind+oth)·FP_ON.oth`.
   Chosen 2026-09-09 over RedBridge/Accent's respondent-allocated splits
   (`tpp_split_on` — the only published per-cohort allocation of the
   pairing, kept as the panel's measured RedBridge row below) because
-  revealed, re-validated ballots beat a stated allocation with no count
-  to anchor; the published head-to-heads stay the corroboration this
+  revealed ballots beat a stated allocation with no count to anchor, and
+  respondents answer without the how-to-vote card close to half of
+  Coalition voters copy; the published head-to-heads stay the corroboration this
   panel monitors. This is the table the page QUOTES the pairing on
   (§7f's `impliedOnFp` hero figure); σ̂²w aside, the drift series is
   baseline-subtracted per house anyway, so a level offset costs nothing —

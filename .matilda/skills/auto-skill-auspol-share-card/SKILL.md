@@ -84,11 +84,13 @@ with and flips with the site's own ruling:
   dial and favicon already defer to it. (`rivalWalk`, `auspol-headline-estimator`.)
 - **make-card.js** builds ONE normalised `Q` view right after the `L` merge and
   everything downstream reads Q:
-  - ON pairing leads: figures from `latest.onImp` (a/b/the `band` flow RANGE,
-    aPrev, n); ONLY fallback `altLatest.alp_on` (published head-to-heads
-    nowcast). Caveat line says "flow range ±X pts" for the implied pairing —
-    NEVER "95% interval" (the band is the frozen flow table's range, not a
-    sampling interval; the hero words it the same way).
+  - ON pairing leads: figures from `latest.onImp` (a/b, `ci95` = the
+    sampling interval `cs` and the flow table's `band` in quadrature since
+    2026-10-11, aPrev, n); ONLY fallback `altLatest.alp_on` (published
+    head-to-heads nowcast). Caveat line says "margin incl. flows ±X pts" for
+    the implied pairing — NEVER "95% interval" (the band is a judgement
+    range, not a sampling probability; the old hero words it the same way).
+    build.mjs's cardContest mirrors it (alp2ppCi95 = onImp.ci95).
   - Otherwise: figures from `latest` (alp2pp, alp2ppCi95, "95% interval",
     `method.nPolls`).
   - Palette adds `onpFill`; masthead needle/standfirst/figures-row labels and

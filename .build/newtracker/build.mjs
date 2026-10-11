@@ -732,12 +732,14 @@ function buildStaticSummary() {
 
       ${/* The ALP v ON implied nowcast (latest.onImp, null when thin) – the
            second contest the page headlines, so the article carries it too.
-           Its ± stacks the flow table's own ranges, not sampling error, and
-           its basis is the first-principles set, not the 2025 flows – the
-           sentence has to say both, since the classic pair above is. */
+           Its ± is a margin of two parts, the polls' sampling error and the
+           flow table's own range, and its basis is the first-principles set,
+           not the 2025 flows – the sentence has to say both, since the
+           classic pair above is. */
       L.onImp ? `<p>Against One Nation the implied reading is
         <b>Labor ${L.onImp.a.toFixed(1)}%</b>, <b>One Nation ${L.onImp.b.toFixed(1)}%</b>
-        (&#177;${L.onImp.band.toFixed(1)} on the flow table, not the sample). No election
+        (&#177;${(L.onImp.ci95 != null ? L.onImp.ci95 : L.onImp.band).toFixed(1)}, counting both the polls&#8217;
+        sampling error and doubt about the flow table). No election
         night has ever counted a Labor v One Nation finish, so that figure runs on the
         site&#8217;s own first-principles preference set rather than the 2025
         election&#8217;s flows; the pollsters&#8217; few printed head-to-heads sit beside
@@ -1025,8 +1027,8 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + (VIC ? buildStaticSummar
    site leads with - gen-data's rivalLead, the deadbanded walk over the
    implied series that also picks the hero's contest and the favicon's
    needle. When that rival is One Nation the figures are latest.onImp's
-   (the pairing's only quoted level; its interval is the flow table's RANGE,
-   not a sampling interval), and the pollsters' published head-to-heads the
+   (the pairing's only quoted level; its ± is the margin of the polls'
+   sampling interval and the flow table's range), and the pollsters' published head-to-heads the
    only fallback. make-card.js's Q builds this same view from the same
    dataset - the two must never disagree about what the card says, or the
    stamp below calls a current card stale. */
@@ -1046,7 +1048,7 @@ function cardContest() {
   const s = onImp || onPub;
   return { ...hv, vs: "onp", oppLab: "One Nation",
            alp2pp: s.a, lnp2pp: s.b,
-           alp2ppCi95: onImp ? s.band : s.ci95,
+           alp2ppCi95: onImp ? (s.ci95 != null ? s.ci95 : s.band) : s.ci95,
            alp2ppPrev: s.aPrev, changeSig: !!s.changeSig,
            method: { ...hv.method, nPolls: s.n },
            basis: onImp ? "imp" : "pub" };
@@ -1495,7 +1497,7 @@ writeAtomic(path.join(ROOT, "feed.xml"), feed);
    changed, so anyone touching them bumps ARCHIVE_STAMP. /newspoll-archive/
    itself is only a redirect stub to /archives/newspoll/ and stays OUT of the
    sitemap (canonical entry points belong to the real pages). */
-const ARCHIVE_STAMP = "2026-09-24";
+const ARCHIVE_STAMP = "2026-10-11";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */

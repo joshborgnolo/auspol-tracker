@@ -70,8 +70,9 @@
      latest.onImp - the pairing's only quoted level, the primaries read
      through one first-principles flow set - with the pollsters' published
      head-to-heads (altLatest.alp_on) the only fallback. The implied
-     pairing's interval is that flow table's own RANGE, not a 95% sampling
-     interval, so the caveat line names it "flow range", as the hero does.
+     pairing's ± is its margin - the polls' sampling interval and the flow
+     table's own range in quadrature, not a 95% sampling interval alone - so
+     the caveat line names it "margin incl. flows", as the old hero does.
      Mirror: build.mjs's cardContest builds this same view. */
   const onImp = D.latest.onImp && D.latest.onImp.a != null ? D.latest.onImp : null;
   const onPub = D.altLatest && D.altLatest.alp_on && D.altLatest.alp_on.a != null
@@ -80,13 +81,14 @@
   /* One normalised view of the quoted contest, so nothing below branches on
      the matchup again. LNP: the implied merge above (published fallback),
      trend the classic aggregate, anchored at the 2025 count. ON: onImp's
-     figures, its flow range as the band, trend the implied ALP-ON monthly
+     figures, its polls-and-flows margin as the band, trend the implied ALP-ON monthly
      series (alt2pp.alp_on under the published fallback) - no anchor, no
      ALP-ON count of the 2025 election exists. */
   const Q = VS_ON ? {
     opp: "onp", oppLab: "One Nation",
     a: onImp ? onImp.a : onPub.a, b: onImp ? onImp.b : onPub.b,
-    ci: onImp ? onImp.band : onPub.ci95, ciLab: onImp ? "flow range" : "95% interval",
+    ci: onImp ? (onImp.ci95 != null ? onImp.ci95 : onImp.band) : onPub.ci95,
+    ciLab: onImp ? "margin incl. flows" : "95% interval",
     prev: onImp ? onImp.aPrev : onPub.aPrev,
     sig: !!(onImp ? onImp.changeSig : onPub.changeSig),
     n: onImp ? onImp.n : onPub.n, imp: !!onImp,

@@ -10,17 +10,15 @@
 
 /* ---------------------------------------------------------------- margins
    The two frozen flow tables the implied figures are read through, as the
-   share of each party's voters that reaches Labor: the 2025 count against
-   the Coalition, the site's first-principles set against One Nation (both
-   gen-data's). A poll's 95% margin on its implied two-party figure comes
+   share of each party's voters that reaches Labor: the counted table
+   against the Coalition, the site's first-principles set against One
+   Nation - read from gen-data's flowTables, the numbers the estimator
+   itself reads. A poll's 95% margin on its implied two-party figure comes
    from its own sample: each respondent carries their party's flow to Labor,
    so the variance is that of the flows over the primaries - about a fifth
    narrower than p(1 - p), since most voters' preferences are nearly certain.
    A published figure is each respondent's own call, so it keeps p(1 - p). */
-const RD_AP_FLOWS = {
-  lnp: { alp: 1, lnp: 0, grn: 0.8819, onp: 0.255, oth: 0.5455 },
-  onp: { alp: 1, lnp: 0.315, grn: 0.89, onp: 0, oth: 0.53 },
-};
+const rdApFlows = (contest) => window.AUSPOL.flowTables[contest === "onp" ? "onp" : "lnp"];
 const rdApDeff = () => {
   const L = window.AUSPOL.latest;
   return (L && L.method && L.method.deff) || 1.6;
@@ -34,7 +32,7 @@ function rdPollMargin(p, contest, pub) {
   }
   const q = p.p || {};
   if (["alp", "lnp", "grn", "onp"].some((k) => q[k] == null)) return null;
-  const F = RD_AP_FLOWS[contest === "onp" ? "onp" : "lnp"];
+  const F = rdApFlows(contest);
   const ks = Object.keys(F);
   const tot = ks.reduce((s, k) => s + (q[k] || 0), 0);
   if (!tot) return null;

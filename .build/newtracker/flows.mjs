@@ -23,6 +23,41 @@
 export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
 
 
+/* FP_ON – the Labor v One Nation table, as the share of each group's voters
+   that reaches Labor, with its own ± range in FP_ON_BAND. No count of that
+   final pairing has ever run nationally, so unlike FLOW this table is built,
+   not counted. Revised 2026-10-11 from .315/.89/.53 (bands .025/.03/.03);
+   the working, with sources, is on /preference-flows/.
+
+     Coalition .315 ± .03. 2025 Senate ballots put One Nation ahead of Labor
+       on 74.7% of Coalition ballots (75.5 without the ACT, where it ran no
+       group). The two 2026 lower-house readings of LIBERAL voters sit lower:
+       South Australia ~66 (Kevin Bonham's estimate from the published
+       distributions; ECSA's flows by first preference are due late 2026) and
+       Secret Harbour in the high 60s (Antony Green's early-voting-centre
+       count, 70.2, read against the full distribution). Neither holds
+       Nationals voters (Farrer: 69 to One Nation against the Liberals' 59;
+       Hunter's 82.9 was a Nationals flow), and SA and WA are the big states
+       least inclined to One Nation: together 2-4 points towards One Nation
+       nationally. The counts' One Nation-strong seats, and the 2025 cards
+       that put Labor first in seven urban seats, pull back. Net 30-32 to
+       Labor; the band takes in Bonham's 71-72% to One Nation.
+     Greens .91 ± .025. 88.2 reached Labor against the Coalition in 2025,
+       and every like-for-like comparison has Greens voters favouring Labor
+       more against One Nation: Senate ballots +4.6, Green's SA three-way
+       tables (same ballots) +2.5, Secret Harbour's 90.0 against WA's 87.1.
+     Others .55 ± .04. 54.5 reached Labor against the Coalition in 2025.
+       Independents (48% of the pool) favour Labor more against One Nation,
+       right-wing minor parties less; Bonham takes the two as cancelling
+       (54.7). SA's independents (55.9) and the respondent splits (RedBridge
+       57-70, Newspoll 62) sit higher. The widest band of the three.
+
+   FP_ON_BAND is a range, not a sampling interval. gen-data stacks it
+   linearly at each poll's primaries, and quotes the figure with that range
+   and the polls' own sampling margin added in quadrature. */
+export const FP_ON = Object.freeze({ lnp: 0.315, grn: 0.91, oth: 0.55 });
+export const FP_ON_BAND = Object.freeze({ lnp: 0.03, grn: 0.025, oth: 0.04 });
+
 /* Three-cornered contests — the term the formula below was missing.
    Points of national 2PP that leak from the Coalition to Labor in seats where
    BOTH Coalition partners run: one of them is excluded first and its

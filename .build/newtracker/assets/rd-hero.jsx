@@ -13,7 +13,8 @@ const RD_RANGES = [{ id: "3", label: "3 mo" }, { id: "6", label: "6 mo" },
 
 /* The lead and its margin on the lead's own scale: points either side of a
    tie, Labor's lead drawn to the LEFT, as the figures above read. The span is
-   the lead plus or minus its 95% margin (or the flows' range); a tie inside
+   the lead plus or minus its 95% margin (on implied Labor v One Nation, its
+   margin of polls and flows); a tie inside
    it is the verdict "too close to call", drawn. Plain boxes rather than svg
    geometry so the span and dot can travel on a CSS transition when the
    contest or basis changes, on the same curve the figures roll on. */
@@ -111,11 +112,21 @@ function RdHero(p) {
   /* ---- the figures and the words under them ---------------------------- */
   const lead = +(latest.a - latest.b).toFixed(1);
   const margin = unc ? +(2 * unc.ci95).toFixed(1) : null;       // on the lead's scale
-  const flows = !!(unc && unc.flows);
   const leader = lead > 0 ? m.a.name : lead < 0 ? m.b.name : null;
   const tooClose = margin != null && Math.abs(lead) <= margin;
-  const marginTerm = flows
-    ? <RdTerm id="fp-flows" from="two-party preferred" title="How far the flow table’s own range moves this pairing">flow range</RdTerm>
+  /* The implied Labor v One Nation margin has two parts, the polls' sampling
+     error and the doubt about the flow table, added in quadrature (gen-data
+     §7f). The verdict is judged on the whole and keeps the Coalition
+     verdict's shape, so a switch between the contests never changes its
+     line count (a "(polls ±3.4, flows ±2.8)" tail wrapped it at 480-600px);
+     the parts are named in the term's title, the "?" panel, the key and the
+     chart's tooltip. */
+  const partsOf = (u) => (u && u.flows && u.cs != null && u.cf != null
+    ? { cs: +(2 * u.cs).toFixed(1), cf: +(2 * u.cf).toFixed(1) } : null);
+  const parts = partsOf(unc);
+  const marginTerm = parts
+    ? <RdTerm id="fp-flows" from="two-party preferred"
+        title={"Polls ±" + parts.cs.toFixed(1) + " and flows ±" + parts.cf.toFixed(1) + ": the polls’ sampling error and the doubt about the flow table, together"}>margin</RdTerm>
     : <RdTerm id="margin-of-error" from="two-party preferred" title="What a margin of error means">margin</RdTerm>;
   const leadWords = Math.abs(lead).toFixed(1) + "-point lead";
   const verdict = margin == null
@@ -165,8 +176,9 @@ function RdHero(p) {
         : "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin.")
       : matchup === "alp_on"
         ? (window.JUR
-            ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page, and the ± is the doubt about them." + (KAL ? " The line is a smoothed trend through every poll." : "")
-            : "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself, and the ± is the doubt about them.")
+            ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page. The ± counts both the polls’ sampling error and the doubt about those flows." + (KAL ? " The line is a smoothed trend through every poll." : "")
+            : "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself. The ± counts both the polls’ sampling error and the doubt about those flows.")
+          + (parts ? " On the lead today that’s ±" + (2 * unc.ci95).toFixed(1) + ": ±" + parts.cs.toFixed(1) + " from the polls and ±" + parts.cf.toFixed(1) + " from the flows, added as independent errors." : "")
         : window.JUR
           ? "Each poll’s primary votes, run through the preference flows counted at the " + rdElecYear + " election (One Nation’s, too few then to measure, from the 2025 federal count)." + (KAL ? " The line is a smoothed trend through every poll, and the ± its 95% interval." : " The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.")
           : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
@@ -466,7 +478,7 @@ function RdHero(p) {
   const keyItems = [
     showScatter && settled.length ? { kind: "dot", color: mainCol, label: "One poll, " + (hasBases ? (onImp ? "implied flows" : "as published") : "as published") } : null,
     (adjusted || morph) ? { kind: bandPts.length >= 2 ? "lineband" : "line", color: mainCol,
-      label: (lineWord(shown, b0) === "trend" ? "Trend" : narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", flow range" : " and flow range") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
+      label: (lineWord(shown, b0) === "trend" ? "Trend" : narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", margin incl. flows" : " and its margin, polls and flows") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
     (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", " + lineWord(otherOf(shown), b0) } : null,
     cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp") } : null,
     extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
@@ -482,7 +494,7 @@ function RdHero(p) {
   const copyKey = [
     keyItems.find((k) => k && k.kind === "dot"),
     (adjusted || morph) ? { kind: "line", color: mainCol,
-      label: labelMain + ", " + lineWord(shown, b0) + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
+      label: labelMain + ", " + lineWord(shown, b0) + (bandPts.length >= 2 ? (flowsBand ? " and its margin, polls and flows" : " and its 95% interval") : "") } : null,
     labelOther ? { kind: "line", color: otherCol, label: labelOther + ", " + lineWord(otherOf(shown), b0) } : null,
     cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp") } : null,
     extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt } : null,
@@ -498,7 +510,9 @@ function RdHero(p) {
     // by date, not flag: the Coalition line's own first row is the result too
     if (d && ringOn && Math.abs(d.x - elec.x) < 1e-6) return [{ label: "", value: "The election result" }];
     if (!d || !d.ci95) return [];
-    return [{ label: flowsBand ? "Flow range" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
+    // the implied ALP v ON month's ± is a margin of two parts, named
+    const two = flowsBand && d.cs != null && d.cf != null ? " (polls ± " + d.cs.toFixed(1) + ", flows ± " + d.cf.toFixed(1) + ")" : "";
+    return [{ label: flowsBand ? "Margin" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + two + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
   };
 
   const meta = narrow
