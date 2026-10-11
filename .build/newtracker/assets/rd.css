@@ -3244,7 +3244,7 @@ body.rd .rd-ldg-tpp th:first-child { width: 42%; }
 body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: auto; min-width: 66%; }
 body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 128px; }
 body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 22px; padding-right: 0; }
-body.rd .rd-ldg-ppm { margin-top: 16px; }
+body.rd .rd-ldg-ppm, body.rd .rd-ldg-ldr + .rd-ldg-ldr { margin-top: 16px; }
 body.rd .rd-ldg-parts { display: none; }
 /* the primary vote */
 body.rd .rd-ldg-prim { display: flex; flex-wrap: wrap; gap: 8px; }

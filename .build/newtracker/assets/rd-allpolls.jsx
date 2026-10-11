@@ -1660,12 +1660,23 @@ function RdLgVote({ p, note }) {
 function RdLgLeaders({ p, note }) {
   const a = p.appr || {};
   const mb = a.metricBy || {};
+  const alt = a.alt || {};
   const c = (p.chg && p.chg.d) || {};
-  const rows = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, nk]) => a[nk] != null)
-    .map(([id, nk]) => ({ id, nk, name: id === "taylor" ? (a.oppName || rdLgWho(p, id)) : rdLgWho(a, id), L: a[id] || null, fav: mb[id] === "fav" }));
-  const nFav = rows.filter((r) => r.fav).length;
-  const allFav = rows.length > 0 && nFav === rows.length, mixed = nFav > 0 && nFav < rows.length;
-  const hasUns = rows.some((r) => r.L && r.L.unsure != null);
+  const nameOf = (id) => (id === "taylor" ? (a.oppName || rdLgWho(p, id)) : rdLgWho(a, id));
+  const rows0 = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, nk]) => a[nk] != null)
+    .map(([id, nk]) => ({ id, ck: nk, net: a[nk], name: nameOf(id), L: a[id] || null, fav: mb[id] === "fav" }));
+  /* a release that asks BOTH questions (Resolve: performance and likeability)
+     gets a table per question: the second reading (appr.alt) joins any
+     leader whose primary is already favourability, so each table holds one
+     question and the Change column compares like with like */
+  const altRows = ["alb", "taylor", "hanson"].filter((id) => alt[id] && alt[id].net != null)
+    .map((id) => ({ id, ck: id + "Fav", net: alt[id].net, name: nameOf(id), L: null, fav: true }));
+  const split = altRows.length > 0;
+  const groups = split
+    ? [rows0.filter((r) => !r.fav), [...rows0.filter((r) => r.fav).map((r) => ({ ...r, ck: r.id + "Fav" })), ...altRows]
+        .sort((x, y) => ["alb", "taylor", "hanson"].indexOf(x.id) - ["alb", "taylor", "hanson"].indexOf(y.id))].filter((g) => g.length)
+    : [rows0];
+  const rows = rows0;
   const sets = window.ppmContests ? window.ppmContests(p) : (p.ppmSets || []);
   const who = ["alb", "taylor", "ley", "hanson"].filter((k) => sets.some((s) => s[k] != null));
   const named = (s) => ["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null);
@@ -1677,33 +1688,39 @@ function RdLgLeaders({ p, note }) {
   };
   if (!rows.length && !sets.length) return null;
   const sum = (s) => who.reduce((t, k) => t + (s[k] || 0), 0);
+  const table = (rows, gi) => {
+    const nFav = rows.filter((r) => r.fav).length;
+    const allFav = rows.length > 0 && nFav === rows.length, mixed = nFav > 0 && nFav < rows.length;
+    const hasUns = rows.some((r) => r.L && r.L.unsure != null);
+    return (
+      <table key={gi} className="rd-ldg-t rd-ldg-ldr">
+        <thead><tr>
+          <th>{allFav ? "Net favourability" : mixed ? "Net rating" : "Net approval"}</th>
+          <th className="num pt">{allFav ? "Favourable" : mixed ? "For" : "Approve"}</th>
+          <th className="num pt">{allFav ? "Unfavourable" : mixed ? "Against" : "Disapprove"}</th>
+          {hasUns && <th className="num pt">Unsure</th>}
+          <th className="num">Net</th><th className="num">Change</th>
+        </tr></thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id}>
+              <th scope="row">{r.name}{mixed && <span className="rd-ldg-tail"> {r.fav ? "favourability" : "approval"}</span>}
+                {/* a phone folds the part columns away: the parts ride under the name */}
+                {r.L && r.L.app != null && <span className="rd-ldg-parts">{r.L.app} {r.fav ? "fav." : "approve"}, {r.L.dis} {r.fav ? "unfav." : "disapprove"}{r.L.unsure != null ? ", " + r.L.unsure + " unsure" : ""}</span>}</th>
+              <td className="num pt">{r.L && r.L.app != null ? r.L.app : "—"}</td>
+              <td className="num pt">{r.L && r.L.dis != null ? r.L.dis : "—"}</td>
+              {hasUns && <td className="num pt">{r.L && r.L.unsure != null ? r.L.unsure : "—"}</td>}
+              <td className="num"><b style={{ color: RD_LG_INK[r.id] }}>{rdLgNet(r.net)}</b></td>
+              <td className="num">{rdLgChg(c[r.ck], 0) ? <span className="rd-ldg-chg">{rdLgChg(c[r.ck], 0)}</span> : <span className="rd-ldg-none">—</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
   return (
     <>
-      {rows.length > 0 && (
-        <table className="rd-ldg-t rd-ldg-ldr">
-          <thead><tr>
-            <th>{allFav ? "Net favourability" : mixed ? "Net rating" : "Net approval"}</th>
-            <th className="num pt">{allFav ? "Favourable" : mixed ? "For" : "Approve"}</th>
-            <th className="num pt">{allFav ? "Unfavourable" : mixed ? "Against" : "Disapprove"}</th>
-            {hasUns && <th className="num pt">Unsure</th>}
-            <th className="num">Net</th><th className="num">Change</th>
-          </tr></thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id}>
-                <th scope="row">{r.name}{mixed && <span className="rd-ldg-tail"> {r.fav ? "favourability" : "approval"}</span>}
-                  {/* a phone folds the part columns away: the parts ride under the name */}
-                  {r.L && r.L.app != null && <span className="rd-ldg-parts">{r.L.app} {r.fav ? "fav." : "approve"}, {r.L.dis} {r.fav ? "unfav." : "disapprove"}{r.L.unsure != null ? ", " + r.L.unsure + " unsure" : ""}</span>}</th>
-                <td className="num pt">{r.L && r.L.app != null ? r.L.app : "—"}</td>
-                <td className="num pt">{r.L && r.L.dis != null ? r.L.dis : "—"}</td>
-                {hasUns && <td className="num pt">{r.L && r.L.unsure != null ? r.L.unsure : "—"}</td>}
-                <td className="num"><b style={{ color: RD_LG_INK[r.id] }}>{rdLgNet(a[r.nk])}</b></td>
-                <td className="num">{rdLgChg(c[r.nk], 0) ? <span className="rd-ldg-chg">{rdLgChg(c[r.nk], 0)}</span> : <span className="rd-ldg-none">—</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      {groups.map((g, gi) => table(g, gi))}
       {sets.length > 0 && (
         <table className="rd-ldg-t rd-ldg-ppm">
           <thead><tr>
@@ -1781,10 +1798,18 @@ function rdLgLines(p, { onM, demSplit }) {
     ))}</> });
   }
   const a = p.appr || {};
-  const nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
+  let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
   const sets = window.ppmContests ? window.ppmContests(p) : [];
   if (nets.length || sets.length) {
     const mb = a.metricBy || {};
+    /* with a second reading, the favourability run holds every leader's
+       favourability - a primary-favourability net moves over to it - so each
+       run is one question (as RdLgLeaders' two tables) */
+    const alt = a.alt || {};
+    const altNets = ["alb", "taylor", "hanson"].some((id) => alt[id] && alt[id].net != null)
+      ? ["alb", "taylor", "hanson"].map((id) => [id, mb[id] === "fav" ? a[id + "Net"] : alt[id] && alt[id].net]).filter(([, v]) => v != null)
+      : [];
+    if (altNets.length) nets = nets.filter(([id]) => mb[id] !== "fav");
     const allFav = nets.length > 0 && nets.every(([id]) => mb[id] === "fav");
     const contest = (s, i) => {
       const sk = ["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null);
@@ -1795,6 +1820,9 @@ function rdLgLines(p, { onM, demSplit }) {
     out.push({ id: "leadership", lab: "Leadership", body: <>
       {nets.length > 0 && <U lbl>{allFav ? "Net favourability" : "Net approval"}</U>}
       {nets.map(([id, k]) => <U key={id}>{id === "taylor" ? (a.oppName || "Taylor") : rdLgWho(a, id)} <b style={{ color: RD_LG_INK[id] }}>{rdLgNet(a[k])}</b></U>)}
+      {/* the release's second question (Resolve's likeability), as its own run */}
+      {altNets.length > 0 && <U lbl>Net favourability</U>}
+      {altNets.map(([id, v]) => <U key={"f" + id}>{id === "taylor" ? (a.oppName || "Taylor") : rdLgWho(a, id)} <b style={{ color: RD_LG_INK[id] }}>{rdLgNet(v)}</b></U>)}
       {sets.map(contest)}
     </> });
   }
@@ -1856,7 +1884,7 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
   const NOTE = {
     twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp", "splitCoal", "splitOnp", "splitGrn", "splitGrnOn", "splitOth", "splitOthOn"]),
     primary: rdLgChgNote(p, ["pAlp", "pLnp", "pGrn", "pOnp", "pOth", "und"]),
-    leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet"]),
+    leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet", "albFav", "taylorFav", "hansonFav"]),
   };
   const FULL = {
     primary: () => <RdLgVote p={p} note={NOTE.primary} />,

@@ -5394,7 +5394,7 @@ body.rd .rd-ldg-tpp th:first-child { width: 42%; }
 body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: auto; min-width: 66%; }
 body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 128px; }
 body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 22px; padding-right: 0; }
-body.rd .rd-ldg-ppm { margin-top: 16px; }
+body.rd .rd-ldg-ppm, body.rd .rd-ldg-ldr + .rd-ldg-ldr { margin-top: 16px; }
 body.rd .rd-ldg-parts { display: none; }
 body.rd .rd-ldg-prim { display: flex; flex-wrap: wrap; gap: 8px; }
 body.rd .rd-ldg-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
@@ -44629,6 +44629,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": 0.9,
         "albNet": -4,
         "taylorNet": 0,
+        "albFav": -1,
+        "taylorFav": -1,
         "ppmAlb": 1,
         "ppmOpp": 1
       },
@@ -44644,6 +44646,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2025-07-18",
         "albNet": "2025-07-18",
         "taylorNet": "2025-07-18",
+        "albFav": "2025-07-18",
+        "taylorFav": "2025-07-18",
         "ppmAlb": "2025-07-18",
         "ppmOpp": "2025-07-18"
       }
@@ -45556,6 +45560,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": -3,
         "albNet": 0,
         "taylorNet": 0,
+        "albFav": -8,
+        "taylorFav": -4,
         "ppmAlb": -3,
         "ppmOpp": 0
       },
@@ -45571,6 +45577,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2025-08-16",
         "albNet": "2025-08-16",
         "taylorNet": "2025-08-16",
+        "albFav": "2025-08-16",
+        "taylorFav": "2025-08-16",
         "ppmAlb": "2025-08-16",
         "ppmOpp": "2025-08-16"
       }
@@ -46718,6 +46726,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": -0.1,
         "albNet": -5,
         "taylorNet": -14,
+        "albFav": 5,
+        "taylorFav": -5,
         "ppmAlb": 2,
         "ppmOpp": -3
       },
@@ -46733,6 +46743,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2025-09-13",
         "albNet": "2025-09-13",
         "taylorNet": "2025-09-13",
+        "albFav": "2025-09-13",
+        "taylorFav": "2025-09-13",
         "ppmAlb": "2025-09-13",
         "ppmOpp": "2025-09-13"
       }
@@ -47946,6 +47958,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 6,
         "taylorNet": -2,
         "hansonNet": 7,
+        "albFav": -1,
+        "taylorFav": -2,
+        "hansonFav": 7,
         "ppmAlb": -1,
         "ppmOpp": 2
       },
@@ -47962,6 +47977,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2025-10-12",
         "taylorNet": "2025-10-12",
         "hansonNet": "2025-10-12",
+        "albFav": "2025-10-12",
+        "taylorFav": "2025-10-12",
+        "hansonFav": "2025-10-12",
         "ppmAlb": "2025-10-12",
         "ppmOpp": "2025-10-12"
       }
@@ -48887,7 +48905,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -0.9,
         "impOn": -5.2,
         "albNet": -13,
-        "hansonNet": 9
+        "hansonNet": 9,
+        "albFav": -13,
+        "hansonFav": 9
       },
       "r": {
         "alp2pp": "2025-07-01",
@@ -48899,7 +48919,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2025-07-01",
         "impOn": "2025-07-01",
         "albNet": "2025-07-01",
-        "hansonNet": "2025-07-01"
+        "hansonNet": "2025-07-01",
+        "albFav": "2025-07-01",
+        "hansonFav": "2025-07-01"
       }
     },
     "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-polling-update-november-2025",
@@ -50024,6 +50046,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 6,
         "taylorNet": 9,
         "hansonNet": -5,
+        "albFav": 10,
+        "taylorFav": 9,
+        "hansonFav": -5,
         "ppmAlb": 2,
         "ppmOpp": 1
       },
@@ -50040,6 +50065,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2025-11-08",
         "taylorNet": "2025-11-08",
         "hansonNet": "2025-11-08",
+        "albFav": "2025-11-08",
+        "taylorFav": "2025-11-08",
+        "hansonFav": "2025-11-08",
         "ppmAlb": "2025-11-08",
         "ppmOpp": "2025-11-08"
       }
@@ -50555,6 +50583,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 3,
         "taylorNet": 1,
         "hansonNet": -6,
+        "albFav": 3,
+        "taylorFav": 1,
+        "hansonFav": -6,
         "ppmAlb": 1,
         "ppmOpp": 2
       },
@@ -50570,6 +50601,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2025-11-13",
         "taylorNet": "2025-11-13",
         "hansonNet": "2025-11-13",
+        "albFav": "2025-11-13",
+        "taylorFav": "2025-11-13",
+        "hansonFav": "2025-11-13",
         "ppmAlb": "2025-11-13",
         "ppmOpp": "2025-11-13"
       }
@@ -51034,6 +51068,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": -2.5,
         "albNet": -15,
         "taylorNet": -5,
+        "albFav": -14,
+        "taylorFav": -7,
         "ppmAlb": -3,
         "ppmOpp": 4
       },
@@ -51049,6 +51085,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2025-12-07",
         "albNet": "2025-12-07",
         "taylorNet": "2025-12-07",
+        "albFav": "2025-12-07",
+        "taylorFav": "2025-12-07",
         "ppmAlb": "2025-12-07",
         "ppmOpp": "2025-12-07"
       }
@@ -52093,6 +52131,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -13,
         "taylorNet": -5,
         "hansonNet": 12,
+        "albFav": -10,
+        "taylorFav": -3,
+        "hansonFav": 12,
         "ppmAlb": -5,
         "ppmOpp": -1
       },
@@ -52109,6 +52150,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2025-12-20",
         "taylorNet": "2025-12-20",
         "hansonNet": "2025-12-07",
+        "albFav": "2025-12-20",
+        "taylorFav": "2025-12-20",
+        "hansonFav": "2025-12-07",
         "ppmAlb": "2025-12-20",
         "ppmOpp": "2025-12-20"
       }
@@ -52582,7 +52626,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -1.5,
         "impOn": -4.7,
         "albNet": -2,
-        "taylorNet": 0
+        "taylorNet": 0,
+        "albFav": -2,
+        "taylorFav": 0
       },
       "r": {
         "alp2pp": "2025-10-20",
@@ -52594,7 +52640,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2025-10-20",
         "impOn": "2025-10-20",
         "albNet": "2025-10-20",
-        "taylorNet": "2025-10-20"
+        "taylorNet": "2025-10-20",
+        "albFav": "2025-10-20",
+        "taylorFav": "2025-10-20"
       }
     },
     "url": "https://www.heraldsun.com.au/news/national/one-nation-support-surges-as-new-poll-reveals-voter-fears-over-immigration-and-crime/news-story/6fcdf878561d6d3b09afa88e2b60e267",
@@ -53530,6 +53578,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -11,
         "taylorNet": 9,
         "hansonNet": 16,
+        "albFav": -11,
+        "taylorFav": 9,
+        "hansonFav": 16,
         "ppmAlb": -4,
         "ppmOpp": -3
       },
@@ -53545,6 +53596,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2025-12-12",
         "taylorNet": "2025-12-12",
         "hansonNet": "2025-12-12",
+        "albFav": "2025-12-12",
+        "taylorFav": "2025-12-12",
+        "hansonFav": "2025-12-12",
         "ppmAlb": "2025-12-12",
         "ppmOpp": "2025-12-12"
       }
@@ -54821,7 +54875,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": 3.1,
         "impOn": 0.3,
         "albNet": 2,
-        "hansonNet": -8
+        "hansonNet": -8,
+        "albFav": 3,
+        "hansonFav": -8
       },
       "r": {
         "alp2pp": "2026-01-16",
@@ -54834,7 +54890,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-01-16",
         "impOn": "2026-01-16",
         "albNet": "2026-01-16",
-        "hansonNet": "2026-01-16"
+        "hansonNet": "2026-01-16",
+        "albFav": "2026-01-16",
+        "hansonFav": "2026-01-16"
       }
     },
     "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
@@ -55322,7 +55380,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -0.9,
         "impOn": -2.2,
         "albNet": -1,
-        "taylorNet": 28,
         "altAlpOn": -3,
         "altLnpOn": -6,
         "ppmAlb": -2,
@@ -55338,7 +55395,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-01-06",
         "impOn": "2026-01-06",
         "albNet": "2026-01-06",
-        "taylorNet": "2026-01-06",
         "altAlpOn": "2026-01-06",
         "altLnpOn": "2026-01-06",
         "ppmAlb": "2026-01-06",
@@ -55605,8 +55661,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -2,
         "impOn": -2.9,
         "albNet": -7,
-        "taylorNet": 14,
         "hansonNet": 4,
+        "albFav": -7,
+        "hansonFav": 4,
         "ppmAlb": -2,
         "ppmOpp": 3,
         "ppmHan": -1
@@ -55620,8 +55677,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-01-21",
         "impOn": "2026-01-21",
         "albNet": "2026-01-21",
-        "taylorNet": "2026-01-21",
         "hansonNet": "2026-01-21",
+        "albFav": "2026-01-21",
+        "hansonFav": "2026-01-21",
         "ppmAlb": "2026-01-21",
         "ppmOpp": "2026-01-21",
         "ppmHan": "2026-01-21"
@@ -56301,7 +56359,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -0.6,
         "impOn": 1.4,
         "albNet": 2,
-        "taylorNet": 28,
         "altAlpOn": 1,
         "ppmAlb": -2,
         "ppmOpp": 7
@@ -56316,7 +56373,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-02-10",
         "impOn": "2026-02-10",
         "albNet": "2026-01-27",
-        "taylorNet": "2026-01-27",
         "altAlpOn": "2026-02-10",
         "ppmAlb": "2026-01-27",
         "ppmOpp": "2026-01-27"
@@ -56477,7 +56533,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -1.9,
         "impOn": -1.3,
         "albNet": -5,
-        "taylorNet": 36,
         "ppmAlb": -4,
         "ppmOpp": 7
       },
@@ -56490,7 +56545,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-02-08",
         "impOn": "2026-02-08",
         "albNet": "2026-02-08",
-        "taylorNet": "2026-02-08",
         "ppmAlb": "2026-02-08",
         "ppmOpp": "2026-02-08"
       }
@@ -56698,8 +56752,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -1.7,
         "impOn": -1,
         "albNet": -3,
-        "taylorNet": 10,
         "hansonNet": 1,
+        "albFav": -3,
+        "hansonFav": 1,
         "ppmAlb": -3,
         "ppmOpp": 1
       },
@@ -56713,8 +56768,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-02-12",
         "impOn": "2026-02-12",
         "albNet": "2026-01-29",
-        "taylorNet": "2026-01-29",
         "hansonNet": "2026-01-29",
+        "albFav": "2026-01-29",
+        "hansonFav": "2026-01-29",
         "ppmAlb": "2026-01-29",
         "ppmOpp": "2026-01-29"
       }
@@ -57753,8 +57809,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": -1.3,
         "impOn": -1.9,
         "albNet": 3,
-        "taylorNet": 18,
         "hansonNet": 3,
+        "albFav": 0,
+        "taylorFav": 10,
+        "hansonFav": 3,
         "ppmAlb": 2,
         "ppmOpp": 2
       },
@@ -57768,8 +57826,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-02-14",
         "impOn": "2026-02-14",
         "albNet": "2026-02-14",
-        "taylorNet": "2026-01-16",
         "hansonNet": "2026-02-14",
+        "albFav": "2026-02-14",
+        "taylorFav": "2026-02-14",
+        "hansonFav": "2026-02-14",
         "ppmAlb": "2026-01-16",
         "ppmOpp": "2026-01-16"
       }
@@ -58606,8 +58666,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "pOth": 1,
         "imp": 1.2,
         "impOn": 0,
-        "albNet": -6,
-        "taylorNet": 19
+        "albNet": -6
       },
       "r": {
         "alp2pp": "2026-02-23",
@@ -58618,8 +58677,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "pOth": "2026-02-23",
         "imp": "2026-02-23",
         "impOn": "2026-02-23",
-        "albNet": "2026-02-23",
-        "taylorNet": "2026-01-23"
+        "albNet": "2026-02-23"
       }
     },
     "url": "https://www.theguardian.com/australia-news/2026/mar/25/guardian-essential-poll-only-a-quarter-of-australians-approve-of-us-israel-war-on-iran",
@@ -59563,6 +59621,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -4,
         "taylorNet": -2,
         "hansonNet": -1,
+        "albFav": -4,
+        "taylorFav": -2,
+        "hansonFav": -1,
         "altAlpOn": -1,
         "ppmAlb": -1,
         "ppmOpp": 4,
@@ -59580,6 +59641,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-02-27",
         "taylorNet": "2026-02-27",
         "hansonNet": "2026-02-27",
+        "albFav": "2026-02-27",
+        "taylorFav": "2026-02-27",
+        "hansonFav": "2026-02-27",
         "altAlpOn": "2026-02-27",
         "ppmAlb": "2026-02-27",
         "ppmOpp": "2026-02-27",
@@ -59765,8 +59829,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": 0.9,
         "impOn": -2.2,
         "albNet": -8,
-        "taylorNet": 19,
         "hansonNet": 4,
+        "albFav": -8,
+        "hansonFav": 4,
         "altAlpOn": -2,
         "ppmAlb": -6,
         "ppmOpp": 5
@@ -59781,8 +59846,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "imp": "2026-01-18",
         "impOn": "2026-01-18",
         "albNet": "2026-01-18",
-        "taylorNet": "2026-01-18",
         "hansonNet": "2026-01-18",
+        "albFav": "2026-01-18",
+        "hansonFav": "2026-01-18",
         "altAlpOn": "2026-01-18",
         "ppmAlb": "2025-10-20",
         "ppmOpp": "2025-10-20"
@@ -60570,6 +60636,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": -6.9,
         "albNet": -12,
         "hansonNet": 9,
+        "albFav": -12,
+        "hansonFav": 9,
         "ppmAlb": -5,
         "ppmOpp": 5
       },
@@ -60584,6 +60652,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2025-11-17",
         "albNet": "2025-11-17",
         "hansonNet": "2025-11-17",
+        "albFav": "2025-11-17",
+        "hansonFav": "2025-11-17",
         "ppmAlb": "2025-07-01",
         "ppmOpp": "2025-07-01"
       }
@@ -60953,6 +61023,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -3,
         "taylorNet": 1,
         "hansonNet": -4,
+        "albFav": -3,
+        "taylorFav": 1,
+        "hansonFav": -4,
         "ppmAlb": -2,
         "ppmOpp": 3,
         "ppmHan": -1
@@ -60968,6 +61041,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-02-20",
         "taylorNet": "2026-02-20",
         "hansonNet": "2026-02-20",
+        "albFav": "2026-02-20",
+        "taylorFav": "2026-02-20",
+        "hansonFav": "2026-02-20",
         "ppmAlb": "2026-02-20",
         "ppmOpp": "2026-02-20",
         "ppmHan": "2026-02-20"
@@ -61349,6 +61425,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 2,
         "taylorNet": 5,
         "hansonNet": -4,
+        "albFav": 0,
+        "taylorFav": 3,
+        "hansonFav": -4,
         "ppmAlb": -2,
         "ppmOpp": 1
       },
@@ -61365,6 +61444,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-03-14",
         "taylorNet": "2026-03-14",
         "hansonNet": "2026-03-14",
+        "albFav": "2026-03-14",
+        "taylorFav": "2026-03-14",
+        "hansonFav": "2026-03-14",
         "ppmAlb": "2026-03-14",
         "ppmOpp": "2026-03-14"
       }
@@ -62529,6 +62611,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 8,
         "taylorNet": 1,
         "hansonNet": 2,
+        "albFav": 8,
+        "taylorFav": 1,
+        "hansonFav": 2,
         "altAlpOn": 2,
         "ppmAlb": 0,
         "ppmOpp": 0,
@@ -62552,6 +62637,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-03-27",
         "taylorNet": "2026-03-27",
         "hansonNet": "2026-03-27",
+        "albFav": "2026-03-27",
+        "taylorFav": "2026-03-27",
+        "hansonFav": "2026-03-27",
         "altAlpOn": "2026-03-27",
         "ppmAlb": "2026-03-27",
         "ppmOpp": "2026-03-27",
@@ -62837,6 +62925,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 8,
         "taylorNet": -4,
         "hansonNet": -5,
+        "albFav": 8,
+        "taylorFav": -4,
+        "hansonFav": -5,
         "ppmAlb": 2,
         "ppmOpp": 2
       },
@@ -62852,6 +62943,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-03-29",
         "taylorNet": "2026-03-29",
         "hansonNet": "2026-03-29",
+        "albFav": "2026-03-29",
+        "taylorFav": "2026-03-29",
+        "hansonFav": "2026-03-29",
         "ppmAlb": "2026-03-29",
         "ppmOpp": "2026-03-29"
       }
@@ -63978,6 +64072,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": -2.8,
         "albNet": -10,
         "taylorNet": -1,
+        "albFav": -10,
+        "taylorFav": -1,
         "altAlpOn": -4,
         "ppmAlb": -4,
         "ppmOpp": 3
@@ -63993,6 +64089,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2026-04-30",
         "albNet": "2026-04-30",
         "taylorNet": "2026-04-30",
+        "albFav": "2026-04-30",
+        "taylorFav": "2026-04-30",
         "altAlpOn": "2026-03-29",
         "ppmAlb": "2026-04-30",
         "ppmOpp": "2026-04-30"
@@ -64167,6 +64265,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -7,
         "taylorNet": -7,
         "hansonNet": 6,
+        "albFav": -1,
+        "taylorFav": -5,
+        "hansonFav": 6,
         "ppmAlb": -3,
         "ppmOpp": 1
       },
@@ -64182,6 +64283,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-04-18",
         "taylorNet": "2026-04-18",
         "hansonNet": "2026-04-18",
+        "albFav": "2026-04-18",
+        "taylorFav": "2026-04-18",
+        "hansonFav": "2026-04-18",
         "ppmAlb": "2026-04-18",
         "ppmOpp": "2026-04-18"
       }
@@ -65064,6 +65168,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 0,
         "taylorNet": 4,
         "hansonNet": 8,
+        "albFav": 0,
+        "taylorFav": 4,
+        "hansonFav": 8,
         "ppmAlb": -1,
         "ppmOpp": 1,
         "ppmHan": 3
@@ -65079,6 +65186,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-04-14",
         "taylorNet": "2026-04-14",
         "hansonNet": "2026-04-14",
+        "albFav": "2026-04-14",
+        "taylorFav": "2026-04-14",
+        "hansonFav": "2026-04-14",
         "ppmAlb": "2026-04-14",
         "ppmOpp": "2026-04-14",
         "ppmHan": "2026-04-14"
@@ -66093,6 +66203,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -10,
         "taylorNet": -2,
         "hansonNet": 1,
+        "albFav": -10,
+        "taylorFav": -2,
+        "hansonFav": 1,
         "altAlpOn": -4,
         "ppmAlb": -2,
         "ppmOpp": 0,
@@ -66117,6 +66230,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-04-30",
         "taylorNet": "2026-04-30",
         "hansonNet": "2026-04-30",
+        "albFav": "2026-04-30",
+        "taylorFav": "2026-04-30",
+        "hansonFav": "2026-04-30",
         "altAlpOn": "2026-04-30",
         "ppmAlb": "2026-04-30",
         "ppmOpp": "2026-04-30",
@@ -67186,6 +67302,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 2,
         "taylorNet": -2,
         "hansonNet": 2,
+        "hansonFav": 2,
         "ppmAlb": -1,
         "ppmOpp": -17
       },
@@ -67201,6 +67318,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-05-16",
         "taylorNet": "2026-05-16",
         "hansonNet": "2026-05-16",
+        "hansonFav": "2026-05-16",
         "ppmAlb": "2026-05-16",
         "ppmOpp": "2026-05-16"
       }
@@ -67886,6 +68004,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -3,
         "taylorNet": -7,
         "hansonNet": -6,
+        "albFav": -3,
+        "taylorFav": -7,
+        "hansonFav": -6,
         "ppmAlb": 1,
         "ppmOpp": -4,
         "ppmHan": 1
@@ -67901,6 +68022,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-05-20",
         "taylorNet": "2026-05-20",
         "hansonNet": "2026-05-20",
+        "albFav": "2026-05-20",
+        "taylorFav": "2026-05-20",
+        "hansonFav": "2026-05-20",
         "ppmAlb": "2026-05-20",
         "ppmOpp": "2026-05-20",
         "ppmHan": "2026-05-20"
@@ -68520,6 +68644,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 1,
         "taylorNet": -5,
         "hansonNet": -10,
+        "albFav": 1,
+        "taylorFav": -5,
+        "hansonFav": -10,
         "altAlpOn": 5,
         "ppmAlb": 2,
         "ppmOpp": -3,
@@ -68544,6 +68671,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-05-28",
         "taylorNet": "2026-05-28",
         "hansonNet": "2026-05-28",
+        "albFav": "2026-05-28",
+        "taylorFav": "2026-05-28",
+        "hansonFav": "2026-05-28",
         "altAlpOn": "2026-05-28",
         "ppmAlb": "2026-05-28",
         "ppmOpp": "2026-05-28",
@@ -69803,6 +69933,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 0,
         "taylorNet": 3,
         "hansonNet": -6,
+        "albFav": 0,
+        "taylorFav": 3,
+        "hansonFav": -6,
         "ppmAlb": 0,
         "ppmOpp": 3,
         "ppmHan": -2
@@ -69818,6 +69951,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-06-18",
         "taylorNet": "2026-06-18",
         "hansonNet": "2026-06-18",
+        "albFav": "2026-06-18",
+        "taylorFav": "2026-06-18",
+        "hansonFav": "2026-06-18",
         "ppmAlb": "2026-06-18",
         "ppmOpp": "2026-06-18",
         "ppmHan": "2026-06-18"
@@ -70012,6 +70148,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": 0.5,
         "albNet": 6,
         "taylorNet": 0,
+        "albFav": -2,
+        "hansonFav": -11,
         "ppmAlb": 4,
         "ppmOpp": 5,
         "ppmHan": -8
@@ -70027,6 +70165,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2026-06-13",
         "albNet": "2026-06-13",
         "taylorNet": "2026-06-13",
+        "albFav": "2026-05-16",
+        "hansonFav": "2026-06-13",
         "ppmAlb": "2026-06-13",
         "ppmOpp": "2026-06-13",
         "ppmHan": "2026-06-13"
@@ -71349,6 +71489,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 7,
         "taylorNet": -10,
         "hansonNet": -4,
+        "albFav": 7,
+        "taylorFav": -10,
+        "hansonFav": -4,
         "altAlpOn": 2
       },
       "r": {
@@ -71363,6 +71506,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-04-08",
         "taylorNet": "2026-04-08",
         "hansonNet": "2026-04-08",
+        "albFav": "2026-04-08",
+        "taylorFav": "2026-04-08",
+        "hansonFav": "2026-04-08",
         "altAlpOn": "2026-04-08"
       }
     },
@@ -72238,6 +72384,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -1,
         "taylorNet": 3,
         "hansonNet": 0,
+        "albFav": -1,
+        "taylorFav": 3,
+        "hansonFav": 0,
         "altAlpOn": -3,
         "ppmAlb": -1,
         "ppmOpp": 4,
@@ -72262,6 +72411,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-06-26",
         "taylorNet": "2026-06-26",
         "hansonNet": "2026-06-26",
+        "albFav": "2026-06-26",
+        "taylorFav": "2026-06-26",
+        "hansonFav": "2026-06-26",
         "altAlpOn": "2026-06-26",
         "ppmAlb": "2026-06-26",
         "ppmOpp": "2026-06-26",
@@ -73463,7 +73615,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": 0,
         "albNet": -2,
         "taylorNet": 2,
-        "hansonNet": -9,
+        "albFav": 1,
+        "taylorFav": -4,
+        "hansonFav": 1,
         "ppmAlb": -1,
         "ppmOpp": -2,
         "ppmHan": 1
@@ -73479,7 +73633,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "impOn": "2026-07-11",
         "albNet": "2026-07-11",
         "taylorNet": "2026-07-11",
-        "hansonNet": "2026-06-13",
+        "albFav": "2026-07-11",
+        "taylorFav": "2026-05-16",
+        "hansonFav": "2026-07-11",
         "ppmAlb": "2026-07-11",
         "ppmOpp": "2026-07-11",
         "ppmHan": "2026-07-11"
@@ -74106,6 +74262,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 4,
         "taylorNet": -1,
         "hansonNet": -8,
+        "albFav": 4,
+        "taylorFav": -1,
+        "hansonFav": -8,
         "ppmAlb": 0,
         "ppmOpp": 1,
         "ppmHan": -4
@@ -74121,6 +74280,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-07-08",
         "taylorNet": "2026-07-08",
         "hansonNet": "2026-07-08",
+        "albFav": "2026-07-08",
+        "taylorFav": "2026-07-08",
+        "hansonFav": "2026-07-08",
         "ppmAlb": "2026-07-08",
         "ppmOpp": "2026-07-08",
         "ppmHan": "2026-07-08"
@@ -75107,6 +75269,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 2,
         "taylorNet": 3,
         "hansonNet": -2,
+        "albFav": 2,
+        "taylorFav": 3,
+        "hansonFav": -2,
         "altAlpOn": -1,
         "ppmAlb": -1,
         "ppmOpp": 0,
@@ -75131,6 +75296,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-07-30",
         "taylorNet": "2026-07-30",
         "hansonNet": "2026-07-30",
+        "albFav": "2026-07-30",
+        "taylorFav": "2026-07-30",
+        "hansonFav": "2026-07-30",
         "altAlpOn": "2026-07-30",
         "ppmAlb": "2026-07-30",
         "ppmOpp": "2026-07-30",
@@ -76304,6 +76472,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -2,
         "taylorNet": 1,
         "hansonNet": 5,
+        "albFav": -2,
+        "taylorFav": 3,
+        "hansonFav": 3,
         "ppmAlb": -3,
         "ppmOpp": 2,
         "ppmHan": -1
@@ -76320,6 +76491,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-08-15",
         "taylorNet": "2026-08-15",
         "hansonNet": "2026-08-15",
+        "albFav": "2026-08-15",
+        "taylorFav": "2026-08-15",
+        "hansonFav": "2026-08-15",
         "ppmAlb": "2026-08-15",
         "ppmOpp": "2026-08-15",
         "ppmHan": "2026-08-15"
@@ -76833,6 +77007,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 3,
         "taylorNet": 0,
         "hansonNet": 5,
+        "albFav": 3,
+        "taylorFav": 0,
+        "hansonFav": 5,
         "ppmAlb": 1,
         "ppmOpp": -2,
         "ppmHan": 3
@@ -76849,6 +77026,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-08-20",
         "taylorNet": "2026-08-20",
         "hansonNet": "2026-08-20",
+        "albFav": "2026-08-20",
+        "taylorFav": "2026-08-20",
+        "hansonFav": "2026-08-20",
         "ppmAlb": "2026-08-20",
         "ppmOpp": "2026-08-20",
         "ppmHan": "2026-08-20"
@@ -78179,6 +78359,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -10,
         "taylorNet": -3,
         "hansonNet": 2,
+        "albFav": -10,
+        "taylorFav": -3,
+        "hansonFav": 2,
         "altAlpOn": 0,
         "ppmAlb": 0,
         "ppmOpp": 0,
@@ -78203,6 +78386,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-08-28",
         "taylorNet": "2026-08-28",
         "hansonNet": "2026-08-28",
+        "albFav": "2026-08-28",
+        "taylorFav": "2026-08-28",
+        "hansonFav": "2026-08-28",
         "altAlpOn": "2026-08-28",
         "ppmAlb": "2026-08-28",
         "ppmOpp": "2026-08-28",
@@ -78721,6 +78907,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 0,
         "taylorNet": -2,
         "hansonNet": -6,
+        "albFav": 1,
+        "taylorFav": -2,
+        "hansonFav": -7,
         "ppmAlb": 3,
         "ppmOpp": 1,
         "ppmHan": 1
@@ -78737,6 +78926,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-09-12",
         "taylorNet": "2026-09-12",
         "hansonNet": "2026-09-12",
+        "albFav": "2026-09-12",
+        "taylorFav": "2026-09-12",
+        "hansonFav": "2026-09-12",
         "ppmAlb": "2026-09-12",
         "ppmOpp": "2026-09-12",
         "ppmHan": "2026-09-12"
@@ -78998,6 +79190,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 0,
         "taylorNet": -2,
         "hansonNet": -6,
+        "albFav": 1,
+        "taylorFav": -2,
+        "hansonFav": -7,
         "ppmAlb": 3,
         "ppmOpp": 1,
         "ppmHan": 1
@@ -79014,6 +79209,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-09-12",
         "taylorNet": "2026-09-12",
         "hansonNet": "2026-09-12",
+        "albFav": "2026-09-12",
+        "taylorFav": "2026-09-12",
+        "hansonFav": "2026-09-12",
         "ppmAlb": "2026-09-12",
         "ppmOpp": "2026-09-12",
         "ppmHan": "2026-09-12"
@@ -79390,6 +79588,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": -10,
         "taylorNet": -3,
         "hansonNet": 2,
+        "albFav": -10,
+        "taylorFav": -3,
+        "hansonFav": 2,
         "altAlpOn": 0,
         "ppmAlb": 0,
         "ppmOpp": 0,
@@ -79414,6 +79615,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-08-28",
         "taylorNet": "2026-08-28",
         "hansonNet": "2026-08-28",
+        "albFav": "2026-08-28",
+        "taylorFav": "2026-08-28",
+        "hansonFav": "2026-08-28",
         "altAlpOn": "2026-08-28",
         "ppmAlb": "2026-08-28",
         "ppmOpp": "2026-08-28",
@@ -80004,6 +80208,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": 3,
         "taylorNet": 0,
         "hansonNet": 5,
+        "albFav": 3,
+        "taylorFav": 0,
+        "hansonFav": 5,
         "ppmAlb": 1,
         "ppmOpp": -2,
         "ppmHan": 3
@@ -80020,6 +80227,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "albNet": "2026-08-20",
         "taylorNet": "2026-08-20",
         "hansonNet": "2026-08-20",
+        "albFav": "2026-08-20",
+        "taylorFav": "2026-08-20",
+        "hansonFav": "2026-08-20",
         "ppmAlb": "2026-08-20",
         "ppmOpp": "2026-08-20",
         "ppmHan": "2026-08-20"
@@ -117262,18 +117472,31 @@ function RdLgLeaders({
 }) {
   const a = p.appr || {};
   const mb = a.metricBy || {};
+  const alt = a.alt || {};
   const c = p.chg && p.chg.d || {};
-  const rows = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, nk]) => a[nk] != null).map(([id, nk]) => ({
+  const nameOf = id => id === "taylor" ? a.oppName || rdLgWho(p, id) : rdLgWho(a, id);
+  const rows0 = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, nk]) => a[nk] != null).map(([id, nk]) => ({
     id,
-    nk,
-    name: id === "taylor" ? a.oppName || rdLgWho(p, id) : rdLgWho(a, id),
+    ck: nk,
+    net: a[nk],
+    name: nameOf(id),
     L: a[id] || null,
     fav: mb[id] === "fav"
   }));
-  const nFav = rows.filter(r => r.fav).length;
-  const allFav = rows.length > 0 && nFav === rows.length,
-    mixed = nFav > 0 && nFav < rows.length;
-  const hasUns = rows.some(r => r.L && r.L.unsure != null);
+  const altRows = ["alb", "taylor", "hanson"].filter(id => alt[id] && alt[id].net != null).map(id => ({
+    id,
+    ck: id + "Fav",
+    net: alt[id].net,
+    name: nameOf(id),
+    L: null,
+    fav: true
+  }));
+  const split = altRows.length > 0;
+  const groups = split ? [rows0.filter(r => !r.fav), [...rows0.filter(r => r.fav).map(r => ({
+    ...r,
+    ck: r.id + "Fav"
+  })), ...altRows].sort((x, y) => ["alb", "taylor", "hanson"].indexOf(x.id) - ["alb", "taylor", "hanson"].indexOf(y.id))].filter(g => g.length) : [rows0];
+  const rows = rows0;
   const sets = window.ppmContests ? window.ppmContests(p) : p.ppmSets || [];
   const who = ["alb", "taylor", "ley", "hanson"].filter(k => sets.some(s => s[k] != null));
   const named = s => ["alb", "taylor", "ley", "hanson"].filter(k => s[k] != null);
@@ -117285,45 +117508,53 @@ function RdLgLeaders({
   };
   if (!rows.length && !sets.length) return null;
   const sum = s => who.reduce((t, k) => t + (s[k] || 0), 0);
-  return React.createElement(React.Fragment, null, rows.length > 0 && React.createElement("table", {
-    className: "rd-ldg-t rd-ldg-ldr"
-  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, allFav ? "Net favourability" : mixed ? "Net rating" : "Net approval"), React.createElement("th", {
-    className: "num pt"
-  }, allFav ? "Favourable" : mixed ? "For" : "Approve"), React.createElement("th", {
-    className: "num pt"
-  }, allFav ? "Unfavourable" : mixed ? "Against" : "Disapprove"), hasUns && React.createElement("th", {
-    className: "num pt"
-  }, "Unsure"), React.createElement("th", {
-    className: "num"
-  }, "Net"), React.createElement("th", {
-    className: "num"
-  }, "Change"))), React.createElement("tbody", null, rows.map(r => React.createElement("tr", {
-    key: r.id
-  }, React.createElement("th", {
-    scope: "row"
-  }, r.name, mixed && React.createElement("span", {
-    className: "rd-ldg-tail"
-  }, " ", r.fav ? "favourability" : "approval"), r.L && r.L.app != null && React.createElement("span", {
-    className: "rd-ldg-parts"
-  }, r.L.app, " ", r.fav ? "fav." : "approve", ", ", r.L.dis, " ", r.fav ? "unfav." : "disapprove", r.L.unsure != null ? ", " + r.L.unsure + " unsure" : "")), React.createElement("td", {
-    className: "num pt"
-  }, r.L && r.L.app != null ? r.L.app : "—"), React.createElement("td", {
-    className: "num pt"
-  }, r.L && r.L.dis != null ? r.L.dis : "—"), hasUns && React.createElement("td", {
-    className: "num pt"
-  }, r.L && r.L.unsure != null ? r.L.unsure : "—"), React.createElement("td", {
-    className: "num"
-  }, React.createElement("b", {
-    style: {
-      color: RD_LG_INK[r.id]
-    }
-  }, rdLgNet(a[r.nk]))), React.createElement("td", {
-    className: "num"
-  }, rdLgChg(c[r.nk], 0) ? React.createElement("span", {
-    className: "rd-ldg-chg"
-  }, rdLgChg(c[r.nk], 0)) : React.createElement("span", {
-    className: "rd-ldg-none"
-  }, "\u2014")))))), sets.length > 0 && React.createElement("table", {
+  const table = (rows, gi) => {
+    const nFav = rows.filter(r => r.fav).length;
+    const allFav = rows.length > 0 && nFav === rows.length,
+      mixed = nFav > 0 && nFav < rows.length;
+    const hasUns = rows.some(r => r.L && r.L.unsure != null);
+    return React.createElement("table", {
+      key: gi,
+      className: "rd-ldg-t rd-ldg-ldr"
+    }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, allFav ? "Net favourability" : mixed ? "Net rating" : "Net approval"), React.createElement("th", {
+      className: "num pt"
+    }, allFav ? "Favourable" : mixed ? "For" : "Approve"), React.createElement("th", {
+      className: "num pt"
+    }, allFav ? "Unfavourable" : mixed ? "Against" : "Disapprove"), hasUns && React.createElement("th", {
+      className: "num pt"
+    }, "Unsure"), React.createElement("th", {
+      className: "num"
+    }, "Net"), React.createElement("th", {
+      className: "num"
+    }, "Change"))), React.createElement("tbody", null, rows.map(r => React.createElement("tr", {
+      key: r.id
+    }, React.createElement("th", {
+      scope: "row"
+    }, r.name, mixed && React.createElement("span", {
+      className: "rd-ldg-tail"
+    }, " ", r.fav ? "favourability" : "approval"), r.L && r.L.app != null && React.createElement("span", {
+      className: "rd-ldg-parts"
+    }, r.L.app, " ", r.fav ? "fav." : "approve", ", ", r.L.dis, " ", r.fav ? "unfav." : "disapprove", r.L.unsure != null ? ", " + r.L.unsure + " unsure" : "")), React.createElement("td", {
+      className: "num pt"
+    }, r.L && r.L.app != null ? r.L.app : "—"), React.createElement("td", {
+      className: "num pt"
+    }, r.L && r.L.dis != null ? r.L.dis : "—"), hasUns && React.createElement("td", {
+      className: "num pt"
+    }, r.L && r.L.unsure != null ? r.L.unsure : "—"), React.createElement("td", {
+      className: "num"
+    }, React.createElement("b", {
+      style: {
+        color: RD_LG_INK[r.id]
+      }
+    }, rdLgNet(r.net))), React.createElement("td", {
+      className: "num"
+    }, rdLgChg(c[r.ck], 0) ? React.createElement("span", {
+      className: "rd-ldg-chg"
+    }, rdLgChg(c[r.ck], 0)) : React.createElement("span", {
+      className: "rd-ldg-none"
+    }, "\u2014"))))));
+  };
+  return React.createElement(React.Fragment, null, groups.map((g, gi) => table(g, gi)), sets.length > 0 && React.createElement("table", {
     className: "rd-ldg-t rd-ldg-ppm"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"), who.map(k => React.createElement("th", {
     key: k,
@@ -117460,10 +117691,13 @@ function rdLgLines(p, {
     });
   }
   const a = p.appr || {};
-  const nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
+  let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
   const sets = window.ppmContests ? window.ppmContests(p) : [];
   if (nets.length || sets.length) {
     const mb = a.metricBy || {};
+    const alt = a.alt || {};
+    const altNets = ["alb", "taylor", "hanson"].some(id => alt[id] && alt[id].net != null) ? ["alb", "taylor", "hanson"].map(id => [id, mb[id] === "fav" ? a[id + "Net"] : alt[id] && alt[id].net]).filter(([, v]) => v != null) : [];
+    if (altNets.length) nets = nets.filter(([id]) => mb[id] !== "fav");
     const allFav = nets.length > 0 && nets.every(([id]) => mb[id] === "fav");
     const contest = (s, i) => {
       const sk = ["alb", "taylor", "ley", "hanson"].filter(k => s[k] != null);
@@ -117498,7 +117732,15 @@ function rdLgLines(p, {
         style: {
           color: RD_LG_INK[id]
         }
-      }, rdLgNet(a[k])))), sets.map(contest))
+      }, rdLgNet(a[k])))), altNets.length > 0 && React.createElement(U, {
+        lbl: true
+      }, "Net favourability"), altNets.map(([id, v]) => React.createElement(U, {
+        key: "f" + id
+      }, id === "taylor" ? a.oppName || "Taylor" : rdLgWho(a, id), " ", React.createElement("b", {
+        style: {
+          color: RD_LG_INK[id]
+        }
+      }, rdLgNet(v)))), sets.map(contest))
     });
   }
   if (p.dir) {
@@ -117628,7 +117870,7 @@ function RdLedger({
   const NOTE = {
     twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp", "splitCoal", "splitOnp", "splitGrn", "splitGrnOn", "splitOth", "splitOthOn"]),
     primary: rdLgChgNote(p, ["pAlp", "pLnp", "pGrn", "pOnp", "pOth", "und"]),
-    leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet"])
+    leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet", "albFav", "taylorFav", "hansonFav"])
   };
   const FULL = {
     primary: () => React.createElement(RdLgVote, {

@@ -2362,6 +2362,12 @@ const CHG_MEASURES = {
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
   hansonNet: (p, a, pm) => (a ? a.han ?? null : null),
+  // favourability, whichever slot holds it: the primary net where that is the
+  // leader's metric at the house, else the release's second reading
+  // (detail.fav - Resolve's likeability beside its performance question)
+  albFav:    (p, a) => favOf(p, a, "alb"),
+  taylorFav: (p, a) => favOf(p, a, "opp"),
+  hansonFav: (p, a) => favOf(p, a, "han"),
   // the One Nation head-to-head 2PPs, each tracked as its own measure so the
   // 2nd/3rd matchups get their own change vs the pollster's last publication
   altAlpOn:  (p, a, pm, alt) => (alt ? alt.ao ?? null : null),
@@ -2370,6 +2376,21 @@ const CHG_MEASURES = {
   ppmAlb:    (p, a, pm) => (pm ? pm.alb ?? null : null),
   ppmOpp:    (p, a, pm) => (pm ? pm.opp ?? null : null),
   ppmHan:    (p, a, pm) => (pm ? pm.han ?? null : null),
+};
+function favOf(p, a, lk) {
+  if (!a) return null;
+  return metricOf(p.pollster, lk, p.date) === "fav" ? a[lk] ?? null : (a.splits && a.splits.fav ? a.splits.fav[lk] ?? null : null);
+}
+/* a leader's change is to the same question about the same person: a net
+   series is keyed by its metric (Resolve rated Hanson on likeability until
+   July 2026, performance after - a +5 performance is not 9 down on a +14
+   likeability) and the opposition leader's by name (Ley's last -23 is not
+   Taylor's baseline) */
+const CHG_LEADER = { albNet: "alb", taylorNet: "opp", hansonNet: "han", albFav: "alb", taylorFav: "opp", hansonFav: "han" };
+const chgSeries = (p, a, k) => {
+  const lk = CHG_LEADER[k];
+  if (!lk) return "";
+  return (k.endsWith("Net") ? "|" + metricOf(p.pollster, lk, p.date) : "") + (lk === "opp" && a && a.oppName ? "|" + a.oppName : "");
 };
 const chgByKey = {};
 const lastMV = {};   // "pollster|measure" → { val, date }
@@ -2381,7 +2402,7 @@ for (const p of [...POLLS].sort((a, b) => a.date.localeCompare(b.date) || a.poll
   for (const [k, fn] of Object.entries(CHG_MEASURES)) {
     const v = fn(p, a, pm, alt);
     if (v == null) continue;
-    const mk = p.pollster + "|" + k, prev = lastMV[mk];
+    const mk = p.pollster + "|" + k + chgSeries(p, a, k), prev = lastMV[mk];
     if (prev) { d[k] = +(v - prev.val).toFixed(1); r[k] = prev.date; }
     lastMV[mk] = { val: v, date: p.date };
   }
