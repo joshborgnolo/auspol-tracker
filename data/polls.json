@@ -5636,6 +5636,23 @@
       "published": "2026-10-07T05:00"
     },
     {
+      "date": "2026-10-08",
+      "published": "2026-10-11T20:00",
+      "dateStart": "2026-10-05",
+      "pollster": "Newspoll",
+      "client": "The Australian",
+      "sample": 1241,
+      "alp": 29,
+      "lnp": 20,
+      "grn": 14,
+      "onp": 28,
+      "ind": 9,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850"
+    },
+    {
       "date": "2026-10-10",
       "published": "2026-10-11T18:00",
       "dateStart": "2026-10-06",
@@ -6449,6 +6466,15 @@
       "date": "2026-10-06",
       "firm": "YouGov",
       "alb": 40,
+      "opp": 39,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-10-08",
+      "firm": "Newspoll",
+      "alb": 44,
       "opp": 39,
       "oppName": "Taylor",
       "han": null,
@@ -8300,6 +8326,15 @@
           "dis": 51
         }
       }
+    },
+    {
+      "date": "2026-10-08",
+      "firm": "Newspoll",
+      "alb": -24,
+      "opp": -11,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": null
     },
     {
       "date": "2026-10-10",
