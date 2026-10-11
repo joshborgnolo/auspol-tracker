@@ -1898,12 +1898,19 @@ for (const [f, ym] of Object.entries(dirLastYm)) {
   const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5));
   directionStoppedSince[f] = m === 12 ? (y + 1) + "-01" : y + "-" + String(m + 1).padStart(2, "0");
 }
-// The favourability houses present in the approval series (favFirms are the
-// ones asking positive/negative, not approve/disapprove): the approval
-// card's fav-mode subtitle names them. Same treatment – current houses in
+// The favourability houses present in the approval series. Fav is per-row,
+// not per-house: favFirms' rows are fav through and through, but Resolve's
+// likeability rides its approval rows as detail.fav (and Hanson pre-Jul-2026
+// in her positional slot via the resolve|han override) - the monthly lines,
+// the current readings and the gap rails all pool those alt readings onto
+// the fav line, so the roster counts a house wherever a row carries a
+// favourability READING (metric exists and has a value), not wherever the
+// firm is classed a favourability house. Same treatment: current houses in
 // creditHouses order, any stopped house last as "Name (inactive)".
 const favHouses = creditHousesWithStopped(
-  appr.filter((r) => FAV_FIRMS.has(canonFirm(r.firm))),
+  appr.filter((r) =>
+    APPR_SLOTS.some(([, lk]) => metricOf(r.firm, lk, r.date) === "fav" && r[lk] != null) ||
+    !!(r.splits && r.splits.fav && APPR_SLOTS.some(([, lk]) => r.splits.fav[lk] != null))),
   (r) => r.firm, (r) => Date.parse(r.date));
 // The complement roster: the net-APPROVAL houses of the approval series.
 // The federal page's net-mode copies name them; the same window and

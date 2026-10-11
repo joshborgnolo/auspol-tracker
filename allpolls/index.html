@@ -15038,7 +15038,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   const directionStoppedSince = {
     "Freshwater": "2025-11"
   };
-  const favHouses = ["DemosAU", "RedBridge/Accent", "Spectre Strategy", "Freshwater (inactive)"];
+  const favHouses = ["Resolve", "DemosAU", "RedBridge/Accent", "Spectre Strategy", "Freshwater (inactive)"];
   const apprHouses = ["YouGov", "Newspoll", "Resolve", "Essential", "Roy Morgan (SMS)", "Fox & Hedgehog (inactive)"];
   const directionPolls = [{
     "x": 2025.3561643835617,
@@ -88612,7 +88612,7 @@ function ApprovalPanel({
     onClick: () => window.AP.openTerm && window.AP.openTerm("favourability", "Leader net favourability")
   }, "Positive minus negative"), React.createElement(Houses, {
     after: " \u2013 the person, not the job"
-  }, houseList(D.favHouses), " ask favourability, not approval")))), React.createElement("div", {
+  }, houseList(D.favHouses, 5), " ask favourability, not approval")))), React.createElement("div", {
     className: "card-head-tools"
   }, !lockMetric && React.createElement(TextToggle, {
     caps: true,
@@ -105622,7 +105622,7 @@ function RdLeadership({
     return l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l);
   };
   const jApprBy = fav => jHouses(q => q.appr && ["alb", "taylor", "hanson"].some(k => q.appr[k + "Net"] != null && (q.appr.metricBy || {})[k] === "fav" === fav));
-  const capped = l => l && l.length ? l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l) : "";
+  const capped = l => l && l.length ? l.length > 5 ? l.slice(0, 3).join(", ") + " and others" : rdList(l) : "";
   const apprBy = fav => J ? jApprBy(fav) : capped(fav ? D.favHouses : D.apprHouses);
   const [ppmView, setPpmView] = useState(() => (J && !(N.alb_pref && N.taylor_pref) && N.alb_pref3 ? "three" : "two"));
   const ppmSlot = v => v === "three" ? "three" : "two";

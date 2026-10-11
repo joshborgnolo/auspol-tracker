@@ -659,7 +659,7 @@ function RdLeadership({ rangeId }) {
      the question within six months of the series' own newest reading, and
      a stopped house rides last as "Name (inactive)"), so the copies can't
      fall behind a house that started or stopped asking */
-  const capped = (l) => (l && l.length ? (l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l)) : "");
+  const capped = (l) => (l && l.length ? (l.length > 5 ? l.slice(0, 3).join(", ") + " and others" : rdList(l)) : "");
   const apprBy = (fav) => (J ? jApprBy(fav) : capped(fav ? D.favHouses : D.apprHouses));
   const [ppmView, setPpmView] = useState(() => (
     /* /vic/'s polls moved to the three-way question with One Nation's

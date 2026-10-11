@@ -123,7 +123,7 @@ window.AUSPOL = (function () {
   /* the net-FAVOURABILITY houses in the approval series, active first, a
      stopped house last as "Name (inactive)" – the approval card's fav-mode
      subtitle names them, so it can't drop a house that started (Spectre) */
-  const favHouses = ["DemosAU","RedBridge/Accent","Spectre Strategy","Freshwater (inactive)"];
+  const favHouses = ["Resolve","DemosAU","RedBridge/Accent","Spectre Strategy","Freshwater (inactive)"];
   /* the complement roster, net-APPROVAL houses of the same series, same
      window and "(inactive)" tail – the approval card's net-mode subtitle,
      the redesign leadership captions and its section meta name them, so

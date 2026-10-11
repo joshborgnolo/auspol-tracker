@@ -37,11 +37,21 @@ past 4.
 - `directionHousesAll` (157f35c) — active + stopped-labelled name list for the
   CARD-SUB caption (`D.directionHousesAll || D.directionHouses` in the JSX, so
   an older data bundle still renders).
-- `favHouses` (157f35c) — the net-FAVOURABILITY houses in the approval series
-  (`appl`/`appr` rows filtered by `FAV_FIRMS.has(canonFirm(r.firm))` — the firm
-  set from `metricRules.favFirms`, same order/stopped treatment); consumed by
-  the ApprovalPanel fav-mode card-sub. Stored firm names appear verbatim in the
-  list, e.g. "RedBridge/Accent".
+- `favHouses` (157f35c; row-level recast 2026-10-11) — the net-FAVOURABILITY
+  houses in the approval series. NOT a flat `FAV_FIRMS.has(canonFirm)` filter:
+  charted favourability is per-ROW (Resolve's likeability rides its approval
+  rows as `detail.fav`; Hanson pre-Jul-2026 sat in her positional slot via the
+  `resolve|han` metricRules override), and the monthly lines / leaderNow /
+  ldYard gap rails all pool those alt readings onto the fav line — so the
+  roster counts a house wherever a row carries a fav READING
+  (`metricOf(r.firm, lk, r.date) === "fav" && r[lk] != null` OR
+  `r.splits.fav[lk] != null` for some lk), matching what the charts plot.
+  Same order/stopped treatment; stored firm names verbatim (e.g.
+  "RedBridge/Accent"). Resolve appears in BOTH rosters (it asks both
+  questions). Consumed by the ApprovalPanel fav-mode card-sub
+  `houseList(D.favHouses, 5)` and the rd-panels leadership copies. Emitted
+  2026-10-11: `["Resolve","DemosAU","RedBridge/Accent","Spectre Strategy",
+  "Freshwater (inactive)"]`.
 - `apprHouses` (2026-10-11) — the complement roster: `appr` rows NOT in
   FAV_FIRMS (net-APPROVAL houses, "everyone else publishes net approval"),
   same helper/window/tail; a NO_AGG house can appear here (Roy Morgan (SMS)
@@ -124,14 +134,17 @@ const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
   - `directionHousesAll` — creditHousesWithStopped over the same MONTH_SET
     scope → the card-sub caption; DirectionPanel uses
     `D.directionHousesAll || D.directionHouses`.
-  - `favHouses` — creditHousesWithStopped over
-    `appr.filter((r) => FAV_FIRMS.has(canonFirm(r.firm)))` (FAV_FIRMS from
+  - `favHouses` — creditHousesWithStopped over the row-level fav-reading
+    filter (see "Where the lists live"): (FAV_FIRMS from
     `metricRules.favFirms`; `canonFirm` strips "(…)" and "/…" before lookup but
     the list shows the STORED name, e.g. "RedBridge/Accent") → the
     ApprovalPanel fav-mode subtitle, replacing the hard-coded roster that had
     named Freshwater live and omitted Spectre Strategy (a fav house since
-    Jul 2026). Only the FAV subtitle went data-driven; the NET-mode roster
-    string at a11e1559 ~:1155 is still literal copy.
+    Jul 2026). Until 2026-10-11 the filter was flat
+    `FAV_FIRMS.has(canonFirm(r.firm))`, which silently excluded Resolve's
+    `detail.fav` likeability even though the fav charts already pool and plot
+    it (user: "resolve data is already in there, in fav"), and until d630e7c
+    the NET-mode roster string at a11e1559 ~:1226 was literal copy.
 - Shipped 157f35c with these built values (2026-09-24):
   `directionHousesAll = ["Roy Morgan","Essential","Spectre Strategy","Freshwater (inactive)"]`,
   `favHouses = ["DemosAU","RedBridge/Accent","Spectre Strategy","Freshwater (inactive)"]`.

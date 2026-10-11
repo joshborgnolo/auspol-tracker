@@ -1224,7 +1224,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                      title="What the favourability question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("favourability", "Leader net favourability")}>Positive minus negative</button>
-                   <Houses after=" – the person, not the job">{houseList(D.favHouses)} ask favourability, not approval</Houses></>)}
+                   <Houses after=" – the person, not the job">{houseList(D.favHouses, 5)} ask favourability, not approval</Houses></>)}
           </p>
         </div>
         <div className="card-head-tools">
