@@ -151,7 +151,10 @@ const noAggPoll = (p) => NO_AGG_HOUSES.has(p.pollster) || p.noAgg != null;
 const NO_AGG_NOTE = {
   "Roy Morgan (SMS)": "Because SMS polls have a strong selection bias, they do not count towards any aggregates.",
   "Roy Morgan (pooled)": "Because this release averages seven months of interviewing (January\u2013July 2026) into a single reading, it does not count towards any aggregates.",
-  "Newspoll (pooled)": "Because this release averages about ten weeks of interviewing into a single reading, it does not count towards any aggregates.",
+  /* its vote figures are the same respondents as Newspoll's own polls in
+     the aggregates; its group tables count in §7g, read as those polls
+     (pooledParts) */
+  "Newspoll (pooled)": "This release combines the Newspoll polls from these dates, which already count in the aggregates, so its vote figures don’t count a second time. Its tables of each group’s vote do count in Who votes for whom, read as those polls.",
   "EMRS (Tas)": "Because this poll surveyed Tasmanian voters only, its state-level figures sit outside the national aggregates.",
 };
 const noAggNoteFor = (p) => NO_AGG_NOTE[p.pollster] || (p.noAgg != null ? NO_AGG_ROW_NOTE[p.noAgg] : undefined);
@@ -2857,6 +2860,32 @@ const demoPollOf = (w) => {
   return POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
     .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0] || null;
 };
+/* Multi-month pooled cross-sections (Newspoll's ~75-day quarterly tables,
+   n≈5,000; Roy Morgan's seven-month country-of-birth pool, n≈26,000)
+   average their whole collection window, so none reads as one fieldwork
+   wave: dated at its end, a quarter would sit in its last month as if
+   freshly polled. Normal waves span at most 27 days (Roy Morgan's combined
+   Christmas fortnight ending 2025-11-16); 35 sits between that and the
+   thinnest pooled wave (75d).
+   A "(pooled)" release is the house's own regular waves inside its dates,
+   their tables combined – each of Newspoll's five so far is exactly its
+   three or four fortnightly waves, samples summing to the pool's n – so
+   §7g reads it AS those waves: each carries the pool's group gaps at its
+   own dates, weighted as that wave is in the headline (rowN of the wave,
+   not a share of the pool's n, which SAMPLE_CAP would cut). Only its tables are
+   used this way; its vote figures stay out of the aggregates (NO_AGG_HOUSES),
+   since those waves' own figures are already in them. A long wave whose
+   parts can't be found or don't sum to its sample has none (null), and
+   sits out of §7g altogether. (Ruling 2026-10-11.) */
+const POOLED_WAVE_DAYS = 35;
+const isPooledSpan = (r) => Date.parse(r.date) - Date.parse(r.dateStart || r.date) > POOLED_WAVE_DAYS * 864e5;
+const pooledParts = (p) => {
+  const house = p && p.sample ? p.pollster.replace(/ \(pooled\)$/, "") : null;
+  if (!house || house === p.pollster) return null;
+  const parts = POLLS.filter((q) => q.pollster === house && q.sample && (q.dateStart || q.date) >= p.dateStart && q.date <= p.date);
+  const sum = parts.reduce((a, q) => a + q.sample, 0);
+  return parts.length && Math.abs(sum - p.sample) <= 0.01 * p.sample ? parts : null;
+};
 /* A table's shares taken to 100 (DEMO_KEYS order: §7g's), and a wave's own
    all-voters figure: the table's where it prints one, else the published
    primaries. A printed zero stays 0 but an ABSENT key stays null – an
@@ -2903,10 +2932,18 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   const tot = demoTotalOf(w, p);
   const d = Object.fromEntries(DEMO_RAW_DIMS.filter((k) => w.dims && w.dims[k]).map((k) => [k,
     Object.entries(w.dims[k]).map(([g, s]) => [g, ["alp", "lnp", "grn", "onp", "oth"].map((q) => (s[q] != null ? r1(+s[q]) : null))])]));
+  /* a pooled release's parts (pooledParts), where its groups reach the
+     charts as §7g pools them: one group-view dot per part, each at the
+     part's own date (x as individualPolls places a row) and anchored on
+     the part's month, `k` its weighting n over the release's (so the
+     group's n × k is the part's, as §7g sizes it), `l` its fieldwork –
+     never one dot at the release's end month */
+  const pp = v.some(Boolean) && isPooledSpan(p) ? pooledParts(p) : null;
   // a wave everything harmonised out of (the pooled birth-country release
   // joins no common group) still carries its raw cuts to the facet
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
-    { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}) });
+    { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}),
+      ...(pp ? { sp: pp.map((q) => ({ x: mx(ymOf(q.date)) + (dayOf(q.date) - 15) / 365, ym: ymOf(q.date), k: rowN(q) / rowN(p), l: fwLabel(q.dateStart, q.date) })) } : {}) });
 }
 /* Solo single-territory readings for the ACT/NT/Tas group. Displayed on the
    trio's view (open dots, flagged solo) and NEVER pooled, lined or counted
@@ -3912,19 +3949,17 @@ const DEMO_LOC_ELECTION = {
    total are both taken to 100 first), so each group sums to its anchor's
    total; a group is rescaled only when a share is clamped at zero, and then
    to that total. */
-/* Multi-month pooled cross-sections (Newspoll's ~75-day quarterly
-   aggregate, n≈5,000; Roy Morgan's seven-month country-of-birth pool,
-   n≈26,000) average their whole collection window – they are no reading of
-   the present, so they join no pool here: not the current estimate, not
-   the rug, and not the monthly line, where a pooled quarter would sit in
-   its END month as if freshly polled, double-counting those electors
-   against the month's genuine waves. That used to fall out of the
-   midpoint window test by accident; POOLED_WAVE_DAYS makes it policy.
-   Normal waves span at most 27 days (Roy Morgan's combined Christmas
-   fortnight ending 2025-11-16); 35 sits between that and the thinnest
-   pooled wave (75d). The waves still display in the All-polls
-   demographics facet and the archive. */
-const POOLED_WAVE_DAYS = 35;
+/* A pooled release (POOLED_WAVE_DAYS, §5c) joins as the waves it pooled
+   (pooledParts): each part's rows carry the release's gaps at the part's
+   own mid-date and month, sized as that wave (rowN), so
+   the window takes in only the parts inside it and each month's line only
+   that month's parts – the house's repeat-wave sqrt(m) then counts them as
+   the separate waves they were. The parts are still one poll to a reader:
+   the rug draws one dot per release (its in-window parts' samples summed)
+   and the group's poll count counts it once. A long wave without parts
+   sits out, as every pooled wave did before 2026-10-11. */
+// set|group -> the monthly rows §7gb tests (§7g's rowsT), never emitted
+const DEMO_TEST_MONTHLY = new Map();
 const demographics = (() => {
   const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
   if (!waves.length || !primaryNow) return null;
@@ -3935,32 +3970,52 @@ const demographics = (() => {
   const allByYm = new Map(aggPrimary.filter((d) => !d.election).map((d) => [d.ym, pick(d)]));
   const rows = {};                                // "set|group|party" -> nowcast rows
   const rowsM = {};                               // … -> monthly rows, anchored on each month's primaries
+  const rowsT = {};                               // … -> the same for §7gb's trend test (a pooled release once)
   const inWindow = [];                            // the waves the window holds, for the credits
   for (const w of waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
     if (!tot) continue;
-    // pooled cross-sections sit every pool out (POOLED_WAVE_DAYS)
-    if (Date.parse((p || w).date) - Date.parse((p || w).dateStart || (p || w).date) > POOLED_WAVE_DAYS * 864e5) continue;
-    const mid = midMs(p || w), n = rowN(p || { sample: w.sample });
+    const r0 = p || w, n = rowN(p || { sample: w.sample });
+    // a pooled release reads as its parts; one without parts sits out
+    const parts = isPooledSpan(r0) ? pooledParts(p) : null;
+    if (isPooledSpan(r0) && !parts) continue;
+    const reads = (parts || [r0]).map((q) => ({ mid: midMs(q), ym: ymOf(q.date), n: parts ? rowN(q) : n }));
     const h = harmonize(w);
     // the fieldwork label the Who-votes rug cites for each dot's poll
-    const lab = fwLabel(p ? p.dateStart : w.dateStart, p ? p.date : w.date);
+    const lab = fwLabel(r0.dateStart, r0.date);
     let used = false;
     for (const set of DEMO_SETS) for (const group of set.groups) {
       const g = h[set.id] && h[set.id][group] && demoNorm(h[set.id][group]);
       if (!g) continue;
       used = true;
-      const ym = ymOf(p ? p.date : w.date), M = allByYm.get(ym);
-      for (const k of DEMO_KEYS) {
-        // a party the wave never printed contributes nothing – the fold
-        // of its Others is not a zero share of the unprinted party
+      for (const { mid, ym, n } of reads) {
+        const M = allByYm.get(ym);
+        for (const k of DEMO_KEYS) {
+          // a party the wave never printed contributes nothing – the fold
+          // of its Others is not a zero share of the unprinted party
+          if (g[k] == null || tot[k] == null) continue;
+          (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, lab, rel: r0.date });
+          if (M) (rowsM[set.id + "|" + group + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
+        }
+      }
+      /* the trend test's rows: a wave as above, but a pooled release ONCE,
+         in its midpoint's month with its parts' samples summed. Spread over
+         its parts, one quarterly gap fills three or four months with the
+         same figure, and §7gb's t-tests – slope against the months' own
+         scatter, months − 2 degrees of freedom – read that as several
+         readings that happen to agree (Newspoll's Q3-2025 University gap
+         alone carried a Labor "move" at t 3.1 on 2026-10-11 data, every
+         other house flat) */
+      const one = parts ? { mid: midMs(r0), ym: ymOf(new Date(midMs(r0)).toISOString()), n: reads.reduce((a, r) => a + r.n, 0) } : reads[0];
+      const MT = allByYm.get(one.ym);
+      if (MT) for (const k of DEMO_KEYS) {
         if (g[k] == null || tot[k] == null) continue;
-        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, lab, rel: p ? p.date : w.date });
-        if (M) (rowsM[set.id + "|" + group + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
+        (rowsT[set.id + "|" + group + "|" + k] ||= []).push({ ym: one.ym, mid: one.mid, x: MT[k] + (g[k] - tot[k]), n: one.n * DEMO_SHARE[group], firm: w.pollster });
       }
     }
-    const d = ddays(refNow, mid);
-    if (used && d >= 0 && d <= SPARSE_K.window) inWindow.push({ w, p, d });
+    // in the window when any part is; ranked by its newest
+    const ds = reads.map((r) => ddays(refNow, r.mid)).filter((d) => d >= 0 && d <= SPARSE_K.window);
+    if (used && ds.length) inWindow.push({ w, p, d: Math.min(...ds) });
   }
   const housesIn = (rs) => [...new Set(rs.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))];
   const sets = DEMO_SETS.map((set) => {
@@ -3975,13 +4030,16 @@ const demographics = (() => {
          the interval every monthly line on the site is drawn with – a month
          resting on one poll shows its sampling floor – scaled as its share
          is. The panel draws it as the band around the group's line. */
-      const monthly = MONTHS.map((ym) => {
-        const m = DEMO_KEYS.map((k) => monthWithSe(rowsM[key(k)] || [], null, ym));
+      const monthlyOf = (rs) => MONTHS.map((ym) => {
+        const m = DEMO_KEYS.map((k) => monthWithSe(rs[key(k)] || [], null, ym));
         if (m.some((e) => !e)) return null;
         const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
         const T = total(allByYm.get(ym));
         return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
       }).filter(Boolean);
+      const monthly = monthlyOf(rowsM);
+      // the trend test's months (rowsT), kept off the page
+      DEMO_TEST_MONTHLY.set(set.id + "|" + group, monthlyOf(rowsT));
       /* the rug above the group's whisker: each wave the window holds, with
          its own reading on the display scale. The px arrays are rebuilt off
          the alp-anchored win list by wave identity (firm|release) – a wave
@@ -3991,8 +4049,10 @@ const demographics = (() => {
          release date rides each pd entry so the panel can key the dot back
          to its poll row (AP.pollRowKey) and open the poll on click. */
       const inW = (r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; };
-      const win = (rows[key("alp")] || []).filter(inW).sort((a, b) => a.mid - b.mid);
       const wId = (r) => r.firm + "|" + r.rel;
+      // a pooled release's parts are one poll here: one dot, their samples summed
+      const win = [...(rows[key("alp")] || []).filter(inW).sort((a, b) => a.mid - b.mid)
+        .reduce((m, r) => { const e = m.get(wId(r)); if (e) e.n += r.n; else m.set(wId(r), { ...r }); return m; }, new Map()).values()];
       const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n), r: r.rel }));
       const px = Object.fromEntries(DEMO_KEYS.map((k) => {
         const byW = new Map((rows[key(k)] || []).filter(inW).map((r) => [wId(r), r.x]));
@@ -4002,7 +4062,8 @@ const demographics = (() => {
         label: group,
         v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),
         ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
-        n: est.alp.n, houses: housesIn(rows[key("alp")] || []), monthly,
+        // polls, not rows: a pooled release's parts count once
+        n: win.length, houses: housesIn(rows[key("alp")] || []), monthly,
         pd, px,
         /* the group's rough share of adults (demo-groups' DEMO_SHARE): the
            panel's headline ranks its claims by how far each moves the make-up
@@ -4023,6 +4084,24 @@ const demographics = (() => {
     order: DEMO_KEYS,
     allMonthly: [...allByYm.entries()].map(([ym, a]) => [ym, ...DEMO_KEYS.map((k) => r1(a[k]))]),
     window: SPARSE_K.label, tabs,
+    /* every house that has ever fed each group (any party's rows, so a
+       One-Nation-less fold still counts), most waves first – the Info
+       entry's "which pollsters count where", derived so it can't drift from
+       the pooling again. Per set, groups fed by the same houses share a line. */
+    roster: tabs.flatMap((t) => t.sets.map((s) => {
+      const lines = [];
+      for (const g of s.groups) {
+        const cnt = new Map();
+        for (const k of DEMO_KEYS) for (const r of rows[s.id + "|" + g.label + "|" + k] || []) {
+          const c = cnt.get(r.firm) || new Set();
+          cnt.set(r.firm, c.add(r.rel));
+        }
+        const houses = [...cnt].sort((a, b) => b[1].size - a[1].size || (a[0] < b[0] ? -1 : 1)).map(([f]) => f);
+        const same = lines.find((l) => l.houses.join("|") === houses.join("|"));
+        if (same) same.groups.push(g.label); else lines.push({ groups: [g.label], houses });
+      }
+      return { id: s.id, label: s.label || t.label, lines };
+    })),
     houses: creditHouses(inWindow, (r) => r.w.pollster, (r) => Date.parse(r.w.date)),
     // the polls the window holds, newest first (the Info entry's working)
     polls: inWindow.map(({ w, p }) => ({
@@ -4095,7 +4174,10 @@ const demoTrend = (() => {
       for (const st of tab.sets) {
         for (const g of st.groups) {
           const xs = [], gs = [], as = [], ws = [];
-          for (const row of g.monthly || []) {
+          /* the test's own months (DEMO_TEST_MONTHLY): the drawn line's,
+             except that a pooled release counts once, not once per part */
+          const tm = DEMO_TEST_MONTHLY.get(st.id + "|" + g.label) || g.monthly || [];
+          for (const row of tm) {
             const a = anchor.get(row[0]);
             if (!a) continue;
             xs.push(ymIdx.get(row[0]));
@@ -4106,7 +4188,7 @@ const demoTrend = (() => {
             ws.push(1 / (se * se));
           }
           if (xs.length < 5) continue;
-          const firstYm = (g.monthly || [])[0]?.[0];
+          const firstYm = tm[0]?.[0];
           if (firstYm && (!windowYm || firstYm < windowYm)) windowYm = firstYm;
           const f1 = wls(xs, gs.map((v, i) => v - as[i]), ws);
           const lx = [], ly = [], lw = [];

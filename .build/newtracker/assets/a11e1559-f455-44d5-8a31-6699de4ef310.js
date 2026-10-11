@@ -2184,9 +2184,22 @@ const DEMO_PARTIES = [
   { id: "lnp", label: "Coalition", short: "L/NP" }, { id: "grn", label: "Greens", short: "GRN" },
   { id: "oth", label: "Others", short: "OTH" },
 ];
-const demoHouse = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h);
+// a house as the vote-by-group credits name it: Newspoll's pooled quarterly
+// tables are Newspoll's own polls (gen-data pooledParts), so they credit as it
+const demoHouse = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h.replace(/ \(pooled\)$/, ""));
 // a poll row's grp.v party order (gen-data DEMO_BY_POLL; the export's columns)
 const DEMO_GRP_PARTY = ["alp", "lnp", "grn", "onp", "oth"];
+/* Where a poll row's group figures sit on a chart: at the row, or – for a
+   pooled release (grp.sp, gen-data pooledParts) – at each poll it pooled,
+   `x`/`ym` that poll's place and month, `k` its share of the release's
+   weighting n, `l` its fieldwork, `part`/`of` its index and the count. The
+   group view draws a part where the vote-by-group lines count it, never one
+   dot at the release's end month. */
+const demoGrpAt = (q) => (q.grp && q.grp.sp ? q.grp.sp.map((s, i) => ({ ...s, part: i, of: q.grp.sp.length })) : [{ x: q.x, ym: q.ym, k: 1 }]);
+// a part dot's tooltip: its own fieldwork, and the release it was read from
+const demoPartMeta = (q, s) => (s.part == null ? q : { ...q, dateLabel: s.l });
+const demoPartSub = (q, s, n) => (s.part == null ? (n ? "n ≈ " + n.toLocaleString() : undefined)
+  : (n ? "n ≈ " + Math.round(n * s.k).toLocaleString() + " · " : "") + "one of " + s.of + " polls in the " + q.field + " tables");
 /* A set's groups as a ramp of the party's colour, first group full strength
    shading towards the page's own ink – dark on the light theme, pale on the
    dark one, so the ends of the ramp part in both and neither is mistaken for
@@ -2365,7 +2378,9 @@ function demoTrendVerdict(D, st, party, inX) {
     const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
     return sum > 0 ? 100 * ((100 * v[gpi] / sum) / p.grp.t[gpi] - 1) : null;
   };
-  const points = (y) => polls.map((p) => ({ h: p.pollster, t: p.x, w: p.sample || 1000, y: y(p) }))
+  // a pooled release is one reading, at the middle of the polls it pooled
+  const tOf = (p) => { const at = demoGrpAt(p); return at.reduce((a, s) => a + s.x, 0) / at.length; };
+  const points = (y) => polls.map((p) => ({ h: p.pollster, t: tOf(p), w: p.sample || 1000, y: y(p) }))
     .filter((d) => d.y != null && isFinite(d.y));
   const asked = polls.find((p) => st.groups.some((g) => gapOf(p, g) != null));
   if (!asked) return null;
@@ -2453,12 +2468,13 @@ function DemographicsPanel({ rangeId = "all" }) {
     const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), v: 0 }))
       .filter((d) => d.x >= firstX), xDomain[0]);
     const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, xDomain[0]) }));
-    const dots = D.individualPolls.filter((p) => p.grp && p.grp.t && inX(p.x)).flatMap((p) => drawn.map((l) => {
+    const dots = D.individualPolls.filter((p) => p.grp && p.grp.t).flatMap((p) => demoGrpAt(p).filter((s) => inX(s.x)).flatMap((s) => drawn.map((l) => {
       const v = p.grp.v[D.demoGroups.indexOf(l.g.label)];
       const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
       return sum > 0 && p.grp.t[gpi] > 0
-        ? { x: p.x, y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1), color: l.color, label: l.g.label, meta: p } : null;
-    }).filter(Boolean));
+        ? { x: s.x, y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1), color: l.color, label: l.g.label, meta: demoPartMeta(p, s),
+            ...(s.part != null ? { sub: demoPartSub(p, s) } : {}) } : null;
+    }).filter(Boolean)));
     // a share can't fall below zero, so neither can a band's floor fall below −100%
     const areas = drawn.map((l) => ({ id: "ci-" + l.g.label, color: l.color, className: "ci-band", edge: false,
       smooth: true, points: l.pts.filter((d) => d.ci != null)

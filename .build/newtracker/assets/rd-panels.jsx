@@ -252,25 +252,30 @@ function RdPrimary({ rangeId, setRangeId }) {
     return { x: q.x, y: +y.toFixed(2), gv: sv, color: p.color, label: p.name, meta: q, party: p.id, hollow: true,
              sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "") };
   }).filter(Boolean)) : []);
+  const inDom = (x) => x >= xDomain[0] && x <= xDomain[1];
   const scatter = React.useMemo(() => D.individualPolls
-    .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+    // a pooled release's parts (demoGrpAt) can sit inside the range its end doesn't
+    .filter((q) => inDom(q.x) || (G && q.grp && q.grp.sp))
     .flatMap((q) => {
       if (!G) return parts.filter((p) => q.p && q.p[p.id] != null)
         .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }));
       const gv = q.grp && q.grp.v && q.grp.v[gi], tt = q.grp && q.grp.t;
-      if (!gv || !tt) return soloDotsOf(q);
-      const M = aggByYm && aggByYm.get(q.ym);
-      if (!M) return soloDotsOf(q);
-      return parts.map((p) => {
-        const i = GRPV_KEYS.indexOf(p.id);
-        // a party the wave never printed (an Others fold) draws no dot
-        if (gv[i] == null || tt[i] == null) return null;
-        // the group's estimated subsample (gen-data's wave n × the group's
-        // share of voters) overrides the tip's whole-wave n, as the rug does
-        const subn = q.grp.n && q.grp.n[gi];
-        return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: q, party: p.id,
-                 sub: subn ? "n ≈ " + subn.toLocaleString() : undefined };
-      }).filter(Boolean).concat(soloDotsOf(q));
+      if (!gv || !tt) return inDom(q.x) ? soloDotsOf(q) : [];
+      /* each place the group's figures count (demoGrpAt): the wave itself,
+         or each poll a pooled release pooled, lifted off that poll's month */
+      return demoGrpAt(q).filter((s) => inDom(s.x)).flatMap((s) => {
+        const M = aggByYm && aggByYm.get(s.ym);
+        if (!M) return [];
+        return parts.map((p) => {
+          const i = GRPV_KEYS.indexOf(p.id);
+          // a party the wave never printed (an Others fold) draws no dot
+          if (gv[i] == null || tt[i] == null) return null;
+          // the group's estimated subsample (gen-data's wave n × the group's
+          // share of voters) overrides the tip's whole-wave n, as the rug does
+          return { x: s.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: demoPartMeta(q, s), party: p.id,
+                   sub: demoPartSub(q, s, q.grp.n && q.grp.n[gi]) };
+        }).filter(Boolean);
+      }).concat(inDom(q.x) ? soloDotsOf(q) : []);
     }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
   const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
@@ -2659,14 +2664,16 @@ function RdDemographics({ rangeId = "all" }) {
       const x0 = Math.max(rangeLo, firstX - 0.06), x1 = rangeHi;
       const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, x0) }));
       const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })).filter((d) => d.x >= firstX - 0.01), x0);
-      const dots = D.individualPolls.filter((q) => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap((q) => drawn.map((l) => {
+      // each place the wave's figures count (demoGrpAt: a pooled release at each poll it pooled)
+      const dots = D.individualPolls.filter((q) => q.grp && q.grp.t).flatMap((q) => demoGrpAt(q).filter((s) => s.x >= x0 && s.x <= x1).flatMap((s) => drawn.map((l) => {
         const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
         const sum = v ? v.reduce((a, b) => a + (b || 0), 0) : 0;
-        const base = allAt.get(q.ym);
+        const base = allAt.get(s.ym);
         // v[gpi] null: the wave printed no such party - an Others fold isn't a zero
         return v && v[gpi] != null && sum > 0 && q.grp.t[gpi] > 0 && base != null
-          ? { x: q.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: q } : null;
-      }).filter(Boolean));
+          ? { x: s.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: demoPartMeta(q, s),
+              ...(s.part != null ? { part: s.part, sub: demoPartSub(q, s) } : {}) } : null;
+      }).filter(Boolean)));
       /* the trio panel's open rings: single-territory readings (Roy Morgan's
          Tas cut, DemosAU (MRP)'s three rows, EMRS's whole-territory polls),
          for comparison only - never pooled into the lines or the dot cloud */
@@ -2758,7 +2765,7 @@ function RdDemographics({ rangeId = "all" }) {
       const cs = rs.map((r) => { const d = r.l.pts.find((q) => q.ym === ym); return d && d.ci != null ? (rs.length > 1 ? r.l.g.label + " " : "") + "±" + d.ci.toFixed(1) : null; }).filter(Boolean);
       return cs.length ? [{ label: label, value: cs.join(", ") }] : [];
     };
-    const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label) : null;
+    const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label + (d.part != null ? "|" + d.part : "")) : null;
     const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
     const yDom = A ? window.AP.blendDomain([0, fromYMax], [0, yMax], t) : [0, yMax];
     const head = (

@@ -6676,13 +6676,34 @@ function infoTerms(D) {
   /* The vote by group: the polls its six-week window holds, newest first. */
   const DEMO = D.demographics;
   const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education",
-    state: "state", location: "location", housing: "housing", language: "language at home" };
+    state: "state", location: "location", housing: "housing", language: "language at home", working: "work status" };
   // "Age, gender, and state": a list in sentence case, with the Oxford comma
   const demoSets = (ids) => {
     const n = ids.map((id) => DEMO_SET_NAME[id] || id);
     const s = n.length < 3 ? n.join(" and ") : n.slice(0, -1).join(", ") + ", and " + n[n.length - 1];
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
+  /* which pollsters have fed each group, ever (gen-data's demographics.roster,
+     derived from the pooled rows): a set's groups share a row where the same
+     houses feed them */
+  const DEMO_ROSTER_NAME = { "RedBridge/Accent": "RedBridge", "Newspoll (pooled)": "Newspoll", "YouGov (MRP)": "YouGov’s MRP" };
+  const demoRoster = DEMO && DEMO.roster && DEMO.roster.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work info-work-list">
+        <thead><tr><th>Groups</th><th>Pollsters</th></tr></thead>
+        <tbody>
+          {DEMO.roster.flatMap((r) => r.lines.map((l, i) => (
+            <tr key={r.id + i}>
+              <td>{r.lines.length > 1 ? r.label.replace(/^By /, "").replace(/^./, (c) => c.toUpperCase()) + ": " + l.groups.join(", ") : r.label.replace(/^By /, "").replace(/^./, (c) => c.toUpperCase())}</td>
+              <td>{l.houses.map((h) => DEMO_ROSTER_NAME[h] || h).join(", ")}</td>
+            </tr>
+          )))}
+        </tbody>
+      </table>
+      <p className="info-work-note">Every pollster whose polls have counted for each group this term,
+        most polls first.</p>
+    </div>
+  ) : null;
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? (
     <div className="info-work-wrap">
       <table className="info-work info-work-list">
@@ -7263,7 +7284,8 @@ function infoTerms(D) {
       lead: { id: "vote-by-group", body: (
         <>How each group says it will vote, from the tables pollsters publish with their polls:
         men and women, age groups, generations, education levels, states, where people live,
-        whether they own or rent, and the language they speak at home.
+        whether they own or rent, the language they speak at home, and whether they work full
+        time, part time or are retired.
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
         are pooled over the last six weeks of polls and added to the site’s current figure for all
@@ -7303,21 +7325,25 @@ function infoTerms(D) {
         group its own way, can move a monthly line by that alone. The test looks for steady change,
         so a rise and a fall within the period cancel out.</span>
         {working(<>
-          <span className="info-p"><b>Which pollsters count where.</b> Men and women: Resolve,
-          DemosAU, YouGov, and RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+:
-          Resolve and DemosAU, since YouGov’s bands are 35–49 and 50+.
-          {" "}{xref("generations", "who votes for whom", "Generations")}: YouGov and RedBridge.
-          Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school
-          rows combined in proportion to its own group sizes. States: Resolve and, since June 2026,
-          YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at
-          their shares of the 2025 vote. ACT/NT/Tas also stands alone, from YouGov’s printed trio
-          and DemosAU’s modelling, with Tasmania-, ACT- and NT-only readings (Roy Morgan, EMRS, and
-          the modelled cuts) drawn beside it as comparison points and pooled into nothing. Where
-          people live: YouGov and RedBridge, which draw the
-          same four areas, and DemosAU for the two metropolitan ones, since its third combines
-          provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for
-          owners only, since its renters include others who don’t own. Language at home: YouGov and
-          DemosAU.</span>
+          <span className="info-p"><b>Which pollsters count where.</b> A pollster counts for a
+          group only where it draws the group the same way as the others; the table below lists
+          who counts for each. YouGov’s age bands are 35–49 and 50+, so it counts at 18–34 alone.
+          {" "}{xref("generations", "who votes for whom", "Generations")} come from the pollsters
+          that name them. RedBridge’s two school rows are combined in proportion to its own group
+          sizes, and YouGov’s SA, WA, and ACT/NT/Tas columns into the non-eastern mainland at their
+          shares of the 2025 vote. Tasmania-, ACT- and NT-only readings (Roy Morgan, EMRS, and
+          DemosAU’s modelling) are drawn beside ACT/NT/Tas as comparison points and pooled into
+          nothing. DemosAU counts for the two metropolitan areas only, since its third combines
+          provincial and rural voters, and RedBridge for owners only, since its renters include
+          others who don’t own. DemosAU’s modelled polls sit out altogether: their fieldwork runs
+          past five weeks.</span>
+          <span className="info-p"><b>Newspoll’s tables.</b> Newspoll publishes its groups only
+          every three months, in one table combining the three or four polls it ran in that time.
+          The table counts as those polls, each at its own dates and sample, so it joins the
+          six-week window only through the polls inside it. In the test for change over time it
+          counts once, in its middle month: spread across its polls, one table would read as
+          several readings that happen to agree.</span>
+          {demoRoster}
           <span className="info-p"><b>Pooling.</b> The gaps are weighted as the headline’s polls
           are, so newer and larger polls count for more. A group’s 95% margin is the interval taken
           over its pooled gaps, each poll’s sample for the group being the poll’s sample times the
@@ -7335,8 +7361,8 @@ function infoTerms(D) {
           poll’s published vote.</span>
           <span className="info-p"><b>Sources.</b> Resolve’s monthly age, gender, and state series
           (its Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report
-          tables, and DemosAU’s report charts, measured from the chart in each report because small
-          bars carry no label. Each poll’s figures for these groups are in the All polls
+          tables, Newspoll’s quarterly tables in The Australian, and DemosAU’s report charts,
+          measured from the chart in each report because small bars carry no label. Each poll’s figures for these groups are in the All polls
           export.</span>
           {demoWork}
         </>)}</>) },
