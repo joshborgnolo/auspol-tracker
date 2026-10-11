@@ -2,83 +2,6 @@
  "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. The working columns (YouGov from Jun 2026, Newspoll pooled's quarterly rows, RedBridge's Oct 2025 aliases) join the common Full time / Part time / Retired groups on the chart views; YouGov's self-assessed class (Feb 2026 on) and children-at-home (Mar on), the Newspoll pooled waves' religion and Other-work-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
  "waves": [
   {
-   "pollster": "Resolve",
-   "date": "2025-05-03",
-   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
-   "read": "published series",
-   "dims": {
-    "age": {
-     "18–34": {
-      "lnp": 21,
-      "alp": 38,
-      "grn": 26,
-      "onp": 4,
-      "oth": 11
-     },
-     "35–54": {
-      "lnp": 29,
-      "alp": 35,
-      "grn": 9,
-      "onp": 7,
-      "oth": 18
-     },
-     "55+": {
-      "lnp": 40,
-      "alp": 32,
-      "grn": 3,
-      "onp": 7,
-      "oth": 17
-     }
-    },
-    "gender": {
-     "Men": {
-      "lnp": 32,
-      "alp": 37,
-      "grn": 9,
-      "onp": 7,
-      "oth": 16
-     },
-     "Women": {
-      "lnp": 31,
-      "alp": 32,
-      "grn": 14,
-      "onp": 6,
-      "oth": 14
-     }
-    },
-    "state": {
-     "NSW": {
-      "lnp": 32,
-      "alp": 35,
-      "grn": 11,
-      "onp": 6,
-      "oth": 16
-     },
-     "Vic": {
-      "lnp": 28,
-      "alp": 34,
-      "grn": 14,
-      "onp": 6,
-      "oth": 18
-     },
-     "Qld": {
-      "lnp": 35,
-      "alp": 31,
-      "grn": 12,
-      "onp": 8,
-      "oth": 14
-     },
-     "Rest of Australia": {
-      "lnp": 29,
-      "alp": 35,
-      "grn": 12,
-      "onp": 5,
-      "oth": 15
-     }
-    }
-   }
-  },
-  {
    "pollster": "RedBridge/Accent",
    "date": "2025-06-30",
    "dateStart": "2025-06-19",
@@ -7693,7 +7616,7 @@
   },
   {
    "pollster": "Resolve",
-   "date": "2026-05-17",
+   "date": "2026-05-16",
    "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
    "read": "published series",
    "dims": {
@@ -13804,6 +13727,83 @@
     "onp": 28,
     "grn": 15,
     "oth": 11
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-10-11",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 17.94,
+      "alp": 35.48,
+      "grn": 24.16,
+      "onp": 11.44,
+      "oth": 10.98
+     },
+     "35–54": {
+      "lnp": 23.81,
+      "alp": 29.74,
+      "grn": 8.77,
+      "onp": 26.05,
+      "oth": 11.62
+     },
+     "55+": {
+      "lnp": 26.32,
+      "alp": 22.66,
+      "grn": 5.23,
+      "onp": 35.47,
+      "oth": 10.33
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 25.4,
+      "alp": 28.17,
+      "grn": 12.12,
+      "onp": 25.4,
+      "oth": 8.92
+     },
+     "Women": {
+      "lnp": 20.76,
+      "alp": 29.27,
+      "grn": 11.69,
+      "onp": 25.35,
+      "oth": 12.93
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 20.2,
+      "alp": 28.8,
+      "grn": 12.35,
+      "onp": 27.4,
+      "oth": 11.24
+     },
+     "Vic": {
+      "lnp": 24.32,
+      "alp": 27.72,
+      "grn": 14.07,
+      "onp": 24.03,
+      "oth": 9.88
+     },
+     "Qld": {
+      "lnp": 22.72,
+      "alp": 30.95,
+      "grn": 11.74,
+      "onp": 21.8,
+      "oth": 12.79
+     },
+     "Rest of Australia": {
+      "lnp": 25.98,
+      "alp": 27.81,
+      "grn": 8.83,
+      "onp": 27.26,
+      "oth": 10.13
+     }
+    }
    }
   }
  ],

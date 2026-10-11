@@ -5632,6 +5632,27 @@
       "tpp_lnp": 48,
       "url": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
       "published": "2026-10-07T05:00"
+    },
+    {
+      "date": "2026-10-10",
+      "pollster": "Resolve",
+      "client": "SMH/Age",
+      "sample": null,
+      "alp": 29,
+      "lnp": 23,
+      "grn": 12,
+      "onp": 25,
+      "ind": 6,
+      "oth": 5,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "soft": 26,
+      "softAge": {
+        "18-34": 39,
+        "35-54": 26,
+        "55+": 17
+      },
+      "assimilated": true
     }
   ],
   "ppm": [
@@ -6427,6 +6448,16 @@
       "oppName": "Taylor",
       "han": null,
       "extra": null
+    },
+    {
+      "date": "2026-10-10",
+      "firm": "Resolve",
+      "alb": 32,
+      "opp": 22,
+      "oppName": "Taylor",
+      "han": 26,
+      "extra": null,
+      "assimilated": true
     }
   ],
   "approval": [
@@ -8173,6 +8204,25 @@
           "dis": 51
         }
       }
+    },
+    {
+      "date": "2026-10-10",
+      "firm": "Resolve",
+      "alb": -18,
+      "opp": 9,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 36,
+          "dis": 54
+        },
+        "opp": {
+          "app": 41,
+          "dis": 32
+        }
+      },
+      "assimilated": true
     }
   ],
   "ppmHeadToHead": [

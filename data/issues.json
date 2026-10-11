@@ -19551,6 +19551,152 @@
      "unsure": 17
     }
    }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-10-10",
+   "dateStart": null,
+   "sample": null,
+   "sampleEff": null,
+   "source": null,
+   "seriesDate": "2026-10-11",
+   "read": "published series",
+   "question": "perform best in each of these areas",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "oth",
+    "unsure"
+   ],
+   "issues": {
+    "economy": {
+     "lnp": 27.19,
+     "alp": 25.19,
+     "oth": 9.08,
+     "unsure": 16.69,
+     "onp": 21.85
+    },
+    "security": {
+     "lnp": 24.85,
+     "alp": 25.16,
+     "oth": 7.66,
+     "unsure": 20.16,
+     "onp": 22.16
+    },
+    "health": {
+     "lnp": 21.76,
+     "alp": 27.87,
+     "oth": 8.35,
+     "unsure": 20.27,
+     "onp": 21.76
+    },
+    "education": {
+     "lnp": 19.4,
+     "alp": 30.15,
+     "oth": 8.73,
+     "unsure": 19.92,
+     "onp": 21.79
+    },
+    "transport": {
+     "lnp": 22.97,
+     "alp": 26.57,
+     "oth": 7.9,
+     "unsure": 23.11,
+     "onp": 19.45
+    },
+    "ir": {
+     "lnp": 19.86,
+     "alp": 28.39,
+     "oth": 7.65,
+     "unsure": 23.14,
+     "onp": 20.96
+    },
+    "finances": {
+     "lnp": 26.18,
+     "alp": 25.13,
+     "oth": 7.94,
+     "unsure": 17.38,
+     "onp": 23.37
+    },
+    "indigenous": {
+     "lnp": 15.24,
+     "alp": 27.32,
+     "oth": 11.31,
+     "unsure": 24.27,
+     "onp": 21.86
+    },
+    "climate": {
+     "lnp": 17.3,
+     "alp": 25.98,
+     "oth": 13.29,
+     "unsure": 21.44,
+     "onp": 21.99
+    },
+    "jobs": {
+     "lnp": 23.74,
+     "alp": 27.94,
+     "oth": 8.71,
+     "unsure": 17.52,
+     "onp": 22.08
+    },
+    "welfare": {
+     "lnp": 20.96,
+     "alp": 29.79,
+     "oth": 8.47,
+     "unsure": 18,
+     "onp": 22.79
+    },
+    "energy": {
+     "lnp": 21.56,
+     "alp": 25.58,
+     "oth": 10.19,
+     "unsure": 19.57,
+     "onp": 23.11
+    },
+    "immigration": {
+     "lnp": 17.88,
+     "alp": 23.49,
+     "oth": 8.52,
+     "unsure": 15.32,
+     "onp": 34.8
+    },
+    "col": {
+     "lnp": 23.58,
+     "alp": 22.01,
+     "oth": 9.58,
+     "unsure": 19.32,
+     "onp": 25.5
+    },
+    "foreign": {
+     "lnp": 25.16,
+     "alp": 27.31,
+     "oth": 7.75,
+     "unsure": 18.03,
+     "onp": 21.75
+    },
+    "disasters": {
+     "lnp": 19.12,
+     "alp": 23.89,
+     "oth": 9.27,
+     "unsure": 30.15,
+     "onp": 17.58
+    },
+    "crime": {
+     "lnp": 21.24,
+     "alp": 22.43,
+     "oth": 8.04,
+     "unsure": 19.17,
+     "onp": 29.12
+    },
+    "housing": {
+     "lnp": 21.51,
+     "alp": 22.13,
+     "oth": 9.33,
+     "unsure": 21.11,
+     "onp": 25.92
+    }
+   }
   }
  ],
  "dropped": [
