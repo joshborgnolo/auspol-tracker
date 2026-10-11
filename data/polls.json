@@ -5368,6 +5368,7 @@
     {
       "date": "2026-09-12",
       "published": "2026-09-13T18:00",
+      "dateStart": "2026-09-06",
       "pollster": "Resolve",
       "client": "SMH/Age",
       "sample": 2250,
@@ -5635,11 +5636,11 @@
     },
     {
       "date": "2026-10-10",
-      "published": "2026-10-11",
-      "fieldworkPending": true,
+      "published": "2026-10-11T18:00",
+      "dateStart": "2026-10-06",
       "pollster": "Resolve",
       "client": "SMH/Age",
-      "sample": null,
+      "sample": 2250,
       "alp": 29,
       "lnp": 23,
       "grn": 12,
@@ -5654,7 +5655,8 @@
         "35-54": 26,
         "55+": 17
       },
-      "assimilated": true
+      "assimilated": true,
+      "url": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html"
     }
   ],
   "ppm": [

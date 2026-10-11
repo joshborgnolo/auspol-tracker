@@ -51,17 +51,17 @@ esac
 # every remaining exit-0 site by warn_check.
 WARN="$(node .build/status-warn.mjs RPM_STATUS "$LAST_LINE")"
 ASSIM_WARN=""
+ASSIM_OUT=""
 warn_check() {
   [ -n "$WARN" ] && { log "FAIL extract (exit 1): $WARN"; exit 1; }
   [ -n "$ASSIM_WARN" ] && { log "FAIL assimilate (exit 1): $ASSIM_WARN"; exit 1; }
   return 0
 }
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
-  warn_check
-  exit 0
-fi
+CHANGED=0
+echo "$LAST_LINE" | grep -q '"changed":true' && CHANGED=1
 
+if [ $CHANGED -eq 1 ]; then
 log "changed rows detected; assimilating new VI waves into polls.json"
 ASSIM_OUT="$(node .build/assimilate-resolve-vi.mjs --apply 2>&1)"
 ASSIM_CODE=$?
@@ -78,6 +78,27 @@ esac
 # The month's age and gender series join data/demographics.json, and its
 # best-party series data/issues.json, in this same commit (non-fatal; see refresh_crosstabs in git-push-main.sh).
 refresh_crosstabs demographics issues
+fi
+
+# The SMH article carries what data.json doesn't: the fieldwork window, the
+# sample, the url and the release time. Every sweep reads it for any Resolve
+# row still missing its window (resolve-article-read.mjs) - the article can
+# land before or after the payload. A failed read is a warning, never a block.
+READ_OUT="$(node .build/resolve-article-read.mjs --apply 2>&1)"
+echo "$READ_OUT" >> "$LOG"
+READ_LAST="$(echo "$READ_OUT" | tail -1)"
+READ_WARN=""
+case "$READ_LAST" in
+  RESOLVE_READ_STATUS*) READ_WARN="$(node .build/status-warn.mjs RESOLVE_READ_STATUS "$READ_LAST")"
+    echo "$READ_LAST" | grep -q '"applied":true' && { log "article read: $READ_LAST"; CHANGED=1; } ;;
+  *) READ_WARN="article reader printed no RESOLVE_READ_STATUS line: $READ_LAST" ;;
+esac
+[ -n "$READ_WARN" ] && [ -z "$WARN" ] && WARN="article: $READ_WARN"
+
+if [ $CHANGED -eq 0 ]; then
+  warn_check
+  exit 0
+fi
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -92,6 +113,7 @@ fi
 FILES=(data/resolve-political-monitor.csv data/polls.json data/demographics.json data/issues.json .build/resolve-rpm-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update Resolve monitor data $(date '+%Y-%m-%d')"
+[ -n "$ASSIM_OUT" ] || MSG="Resolve: fieldwork, sample and release time from the SMH article $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
