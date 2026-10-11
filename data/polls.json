@@ -55,7 +55,8 @@
       "site": "https://www.capitalbrief.com/topic/polling/"
     },
     "Resolve": {
-      "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html"
+      "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+      "releaseHub": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html"
     },
     "RedBridge/Accent": {
       "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd",

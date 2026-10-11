@@ -66,7 +66,10 @@ new and worth looking at.
   `pollsterRules.Essential.releaseHub`; gen-data stamps it onto every
   Essential wave beside `releaseUrl`, the expanded poll shows both
   addresses under the one "Pollster's release" pointer, and the redesign's
-  poll links list it as a "Running series" link beside the dated release.
+  poll links list it as a "Running data series" link beside the dated
+  release. Resolve carries one too — SMH's Resolve Political Monitor page
+  in `pollsterRules.Resolve.releaseHub`; any house with a living
+  collection page gets the same link the same way.
 - **Provisional rows.** When a house's own extractor has not landed a wave
   within 18 hours of it appearing on Poll Bludger's poll-data feed, the
   fallback agent (`.build/extract-pollbludger.mjs`) files it into
