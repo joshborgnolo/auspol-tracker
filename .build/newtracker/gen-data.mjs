@@ -1949,10 +1949,13 @@ const DIR_BY = new Map();
       right: d.right, wrong: d.wrong, unsure: d.unsure, net,
       ...(dirEffByKey.has(d.date + "|" + d.pollster) ? { eff: dirEffByKey.get(d.date + "|" + d.pollster) } : {}),
       ...(dirYard.at.has(d.date + "|" + d.pollster) ? { yd: dirYard.at.get(d.date + "|" + d.pollster) } : {}),
+      // unsure moves on the house's last reading too, so the facet's three
+      // share columns each carry their change (a two-answer house's 0 has none)
       ...(prev ? { chg: { net: r1(net - prev.net), right: r1(d.right - prev.right),
-                          wrong: r1(d.wrong - prev.wrong) }, ref: prev.date } : {}),
+                          wrong: r1(d.wrong - prev.wrong),
+                          ...(d.unsure > 0 && prev.unsure > 0 ? { unsure: r1(d.unsure - prev.unsure) } : {}) }, ref: prev.date } : {}),
     });
-    last[d.pollster] = { net, right: d.right, wrong: d.wrong, date: d.date };
+    last[d.pollster] = { net, right: d.right, wrong: d.wrong, unsure: d.unsure, date: d.date };
   }
 }
 

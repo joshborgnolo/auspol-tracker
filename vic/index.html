@@ -4754,19 +4754,19 @@ body.rd .rd-ap-pinf {
   display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 15px;
   background: var(--surface); font-size: 13px; color: var(--ink); white-space: nowrap;
 }
-body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(124px, 1fr) 40px; }
+body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(56px, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
-body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cconf { grid-template-columns: 200px 120px 76px 36px 84px minmax(0, 356px) 64px minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cconf { grid-template-columns: 200px 120px 76px 36px 84px minmax(0, 464px) minmax(64px, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
 body.rd .rd-ap-hrow > * { min-width: 0; }
-body.rd .rd-ap-hc1 { padding-left: 12px; }
+body.rd .rd-ap-hc1 { padding-left: 12px; font-size: 12px; line-height: 16px; }
 body.rd .rd-ap-th {
-  all: unset; cursor: pointer; box-sizing: border-box; padding-bottom: 2px;
+  all: unset; cursor: pointer; box-sizing: border-box; line-height: 16px;
   font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap;
 }
 body.rd span.rd-ap-th { cursor: default; }
@@ -4774,7 +4774,7 @@ body.rd .rd-ap-th.r { justify-self: end; text-align: right; }
 body.rd .rd-ap-th.on { color: var(--ink); }
 body.rd .rd-ap-th:hover { color: var(--ink); }
 body.rd .rd-ap-th:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-body.rd .rd-ap-arr { font-size: 10px; color: var(--ink-faint); }
+body.rd .rd-ap-arr { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 body.rd .rd-ap-th.on .rd-ap-arr { color: var(--ink); }
 body.rd .rd-ap-hpic { position: relative; align-self: stretch; display: block; min-height: 38px; }
 body.rd .rd-ap-scale { position: absolute; inset: 0; }
@@ -4879,7 +4879,7 @@ body.rd .rd-ap-pnums .rd-ap-half, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-half {
   font-size: 9.5px;
 }
 body.rd .rd-ap-hpn { align-self: end; }
-body.rd .rd-ap-nets { display: grid; grid-template-columns: repeat(3, 44px); justify-content: end; text-align: right; }
+body.rd .rd-ap-nets { display: grid; grid-template-columns: repeat(3, 40px); justify-content: end; text-align: right; }
 body.rd .rd-ap-nets > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-nets > b em { font-style: normal; font-weight: 400; font-size: 11px; color: var(--ink-3); margin-right: 3px; }
 body.rd .rd-ap-hnets { align-self: end; }
@@ -4995,25 +4995,25 @@ body.rd .rd-apd-isr > span:first-child { white-space: normal; overflow: visible;
 body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, transparent); color: var(--ink); font-weight: 600; border-radius: 3px; }
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(124px, 1fr) 32px; }
+  body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(48px, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
-  body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-cconf { grid-template-columns: 170px 110px 70px 16px 70px minmax(0, 356px) 56px minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 170px 110px 70px 16px 70px minmax(0, 464px) minmax(76px, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
-body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
+body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
 @media (max-width: 1000px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 48px 0 28px; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
-  body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
+  body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 124px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 356px) 56px minmax(0, 1fr) 28px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 464px) minmax(76px, 1fr) 28px; }
   body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-imap { column-gap: 8px; padding-right: 4px; }
   body.rd .rd-ap-icell > b { font-size: 13px; }
-  body.rd .rd-ap-imap.rd-ap-hpn > .rd-ap-th { font-size: 11px; letter-spacing: 0.03em; }
+  body.rd .rd-ap-hrow .rd-ap-th { font-size: 11px; letter-spacing: 0.03em; }
   body.rd .rd-apd-demcols.two { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-apd-demcols.two > .rd-apd-dem + .rd-apd-dem > .rd-apd-demh { display: none; }
   body.rd .rd-ap-cdem { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
@@ -5021,7 +5021,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
   body.rd .rd-ap-pnums { grid-template-columns: repeat(5, 40px); }
-  body.rd .rd-ap-nets { grid-template-columns: repeat(3, 40px); }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
@@ -5067,6 +5066,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
+  body.rd .rd-ap-phead .rd-ap-hdir .rd-ap-cap { right: 8px; white-space: normal; text-wrap: balance; }
   body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem, body.rd .rd-ap-cconf { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
@@ -5105,8 +5105,9 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-imapc b { display: flex; flex-direction: column; font-size: 13px; line-height: 15px; min-height: 30px; font-weight: 600; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
   body.rd .rd-ap-imapc .rd-ap-ibar { width: 88%; height: 5px; }
   body.rd .rd-ap-imaph { align-items: end; hyphens: manual; }
-  body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); }
-  body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
+  body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 1px; }
+  body.rd .rd-ap-cnets { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
+  body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -36686,7 +36687,7 @@ function AllPollsView({
       className: "dash"
     }, "\u2014")), React.createElement("td", {
       className: "num muted hide-md"
-    }, p.dir ? p.dir.unsure.toFixed(1) : "—"), React.createElement("td", {
+    }, p.dir && p.dir.unsure > 0 ? p.dir.unsure.toFixed(1) : "—"), React.createElement("td", {
       className: "num"
     }, React.createElement(ArchDirCell, {
       d: p.dir
@@ -52954,6 +52955,7 @@ function rdApChg(d, dec) {
   if (Math.abs(d) < (dec ? 0.05 : 0.5)) return dec ? 0 .toFixed(dec) : "0";
   return (d > 0 ? "▲ " : "▼ ") + (dec ? Math.abs(d).toFixed(dec) : String(Math.abs(Math.round(d))));
 }
+const rdApTick = v => (v < 0 ? "−" : "") + Math.abs(v);
 function rdApFig(p, onM, pub) {
   const imp = onM ? p.alpOnImp : p.alpImp;
   const pa = onM ? p.tppAlt ? p.tppAlt.alp : null : p.alp;
@@ -53429,7 +53431,7 @@ function RdApMini({
       style: op < 1 ? {
         opacity: op
       } : null
-    }, v);
+    }, rdApTick(v));
   }), avgPts.length > 1 && React.createElement("path", {
     d: monotoneXY(avgPts.map(a => [X(a.x), Y(a.v)])),
     className: "rd-apd-avgline",
@@ -53647,7 +53649,7 @@ function RdApDirMini({
     y: Y(v) + 4,
     className: "rd-apd-ax",
     textAnchor: "end"
-  }, v)), avg.length > 1 && React.createElement("path", {
+  }, rdApTick(v))), avg.length > 1 && React.createElement("path", {
     d: monotoneXY(avg.map(a => [X(a.x), Y(a.v)])),
     className: "rd-apd-avgline"
   }), avg.length > 0 && React.createElement("text", {
@@ -53850,7 +53852,7 @@ function RdApConfMini({
     y: Y(v) + 4,
     className: "rd-apd-ax",
     textAnchor: "end"
-  }, v === neut ? neut === 0 ? "0 ±" : "100" : v)), dots.map(d => {
+  }, rdApTick(v))), dots.map(d => {
     const open = () => {
       if (d.key && window.AP.openPoll) {
         setTip(null);
@@ -54159,7 +54161,7 @@ function RdApLdMini({
     y: Y(v) + 4,
     className: "rd-apd-ax",
     textAnchor: "end"
-  }, v)), avg.flatMap(al => al.segs.map((sg, i) => React.createElement("path", {
+  }, rdApTick(v))), avg.flatMap(al => al.segs.map((sg, i) => React.createElement("path", {
     key: al.riv + "|" + al.met + "|" + i,
     d: monotoneXY(sg.map(z => [X(z.x), Y(z.v)])),
     className: "rd-apd-avgline",
@@ -54361,7 +54363,7 @@ function RdApIssMini({
     y: Y(v) + 4,
     className: "rd-apd-ax",
     textAnchor: "end"
-  }, v)), PARTIES.map(([i,, ink]) => React.createElement("path", {
+  }, rdApTick(v))), PARTIES.map(([i,, ink]) => React.createElement("path", {
     key: i,
     d: monotoneXY(rows.map(r => [X(rdApDays(r[0] + "-15")), Y(r[i])])),
     className: "rd-apd-avgline",
@@ -54838,7 +54840,7 @@ function RdApDetail({
       className: "rd-apd-k"
     }, "The gauge"), React.createElement("span", null, CONF_BLURB[conf.k] || conf.lab + "."), React.createElement("span", {
       className: "rd-apd-k"
-    }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the confidence panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
+    }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. This table and the economic-sentiment panel both draw it 100 points up, so its 0 sits on the indices\u2019 neutral 100.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
       className: "rd-apd-k"
     }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
       className: "rd-link",
@@ -56669,13 +56671,18 @@ function RdAllPolls(P) {
   const confFig = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const confChg = v => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
   const CONF_TKS = [40, 60, 80, 100, 120];
-  const confScale = short => React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-ap-cap"
-  }, "100 = neutral; NAB drawn +100"), React.createElement("span", {
+  const confScale = phone => React.createElement("span", {
+    className: "rd-ap-scale",
+    "aria-hidden": "true"
+  }, React.createElement("span", {
     className: "rd-ap-in"
-  }, (short ? CONF_TKS.filter(v => v === 40 || v === 100 || v === 120) : CONF_TKS).map(v => React.createElement("span", {
+  }, React.createElement("b", {
+    className: "rd-ap-scl"
+  }, "\u25C0 Pessimistic"), React.createElement("b", {
+    className: "rd-ap-scr"
+  }, "Optimistic \u25B6"), CONF_TKS.map(v => React.createElement("span", {
     key: v,
-    className: "rd-ap-tk" + (v === 100 ? " mid" : ""),
+    className: "rd-ap-tk" + (v === 100 ? " mid" : "") + (phone && v === CF_LO ? " start" : "") + (phone && v === CF_HI ? " end" : ""),
     style: {
       left: cfx(v) + "%"
     }
@@ -56733,7 +56740,7 @@ function RdAllPolls(P) {
     className: "rd-ap-in"
   }, ldTicks.map(v => React.createElement("span", {
     key: v,
-    className: "rd-ap-tk" + (v === 0 ? " mid" : "") + (v === LD.hi ? " end" : ""),
+    className: "rd-ap-tk" + (v === 0 ? " mid" : ""),
     style: {
       left: ldx(v) + "%"
     }
@@ -56780,12 +56787,12 @@ function RdAllPolls(P) {
     title: "Sort by the gauge’s printed figure (the panel chart’s dot)"
   }), React.createElement("span", {
     role: "columnheader",
-    "aria-label": "Each gauge\u2019s figure on a fixed 40\u2013120 scale, 100 neutral \u2013 NAB\u2019s net balance drawn 100 points up, its figure printed as NAB\u2019s own",
+    "aria-label": "Each gauge\u2019s figure on a fixed 40\u2013120 scale, more pessimists than optimists below 100 and more optimists above it \u2013 NAB\u2019s net balance drawn 100 points up, its figure printed as NAB\u2019s own",
     className: "rd-ap-hpic"
-  }, confScale(demMid)), th("Change", "conf.chg", {
+  }, confScale(false)), th("Change", "conf.chg", {
     right: true,
-    title: "Change on the gauge’s own previous release – NAB’s rows also carry its trading-conditions reading"
-  }), React.createElement("span", null)), React.createElement("span", null));
+    title: "Change on the gauge’s own previous release"
+  })), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -57055,7 +57062,7 @@ function RdAllPolls(P) {
         "aria-hidden": "true"
       }, React.createElement("span", {
         className: "rd-ap-in"
-      }, ldTicks.filter(v => v !== 0).map(v => React.createElement("i", {
+      }, ldTicks.filter(v => v !== 0 && v !== LD.lo && v !== LD.hi).map(v => React.createElement("i", {
         key: v,
         className: "rd-ap-gl",
         style: {
@@ -57105,6 +57112,10 @@ function RdAllPolls(P) {
     } else if (facet === "direction") {
       const d = p.dir;
       const dc = d && d.chg || {};
+      const noU = !!d && !(d.unsure > 0);
+      const dChg = v => rdApChg(v, v != null && !Number.isInteger(v) ? 1 : 0);
+      const uChg = noU ? null : dChg(dc.unsure);
+      const subRow = d && (dChg(dc.right) || dChg(dc.wrong) || uChg);
       figs = d ? React.createElement(React.Fragment, null, React.createElement("span", {
         role: "cell",
         className: "rd-ap-dnum"
@@ -57112,28 +57123,31 @@ function RdAllPolls(P) {
         style: {
           color: "var(--mood-pos)"
         }
-      }, rdApNum(d.right)), rdApChg(dc.right, 0) && React.createElement("span", {
+      }, rdApNum(d.right)), dChg(dc.right) && React.createElement("span", {
         className: "rd-ap-sub"
-      }, rdApChg(dc.right, 0))), React.createElement("span", {
+      }, dChg(dc.right))), React.createElement("span", {
         role: "cell",
         className: "rd-ap-dnum"
       }, React.createElement("b", {
         style: {
           color: "var(--mood-neg)"
         }
-      }, rdApNum(d.wrong)), rdApChg(dc.wrong, 0) && React.createElement("span", {
+      }, rdApNum(d.wrong)), dChg(dc.wrong) && React.createElement("span", {
         className: "rd-ap-sub"
-      }, rdApChg(dc.wrong, 0))), React.createElement("span", {
+      }, dChg(dc.wrong))), React.createElement("span", {
         role: "cell",
         className: "rd-ap-dnum"
-      }, React.createElement("span", null, rdApNum(d.unsure)))) : React.createElement(React.Fragment, null, React.createElement("span", {
+      }, React.createElement("span", null, noU ? "—" : rdApNum(d.unsure)), subRow && React.createElement("span", {
+        className: "rd-ap-sub",
+        "aria-hidden": uChg ? undefined : "true"
+      }, uChg || "\u00a0"))) : React.createElement(React.Fragment, null, React.createElement("span", {
         role: "cell",
         className: "rd-ap-none"
       }, "\u2014"), React.createElement("span", null), React.createElement("span", null));
       pic = d ? React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": `Right direction ${rdApNum(d.right)}%, unsure ${rdApNum(d.unsure)}%, wrong track ${rdApNum(d.wrong)}%`
+        "aria-label": `Right direction ${rdApNum(d.right)}%, ${noU ? "" : `unsure ${rdApNum(d.unsure)}%, `}wrong track ${rdApNum(d.wrong)}%`
       }, React.createElement("span", {
         className: "rd-ap-dbar"
       }, React.createElement("i", {
@@ -57175,7 +57189,7 @@ function RdAllPolls(P) {
         style: {
           color: "var(--mood-neg)"
         }
-      }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure))) : null;
+      }, rdApNum(d.wrong)), noU ? "" : ", unsure " + rdApNum(d.unsure))) : null;
     } else if (facet === "issues") {
       const cells = IMAP.map(id => {
         const own = window.issOwnOf(p, id);
@@ -57284,19 +57298,20 @@ function RdAllPolls(P) {
       }, pic));
     } else if (facet === "confidence") {
       const c = p.conf;
+      const nab = c.vs === 0;
       figs = React.createElement("span", {
         role: "cell",
         className: "rd-ap-fig"
-      }, React.createElement("b", null, confFig(c.v)), c.cond != null && React.createElement("span", {
+      }, React.createElement("b", null, confFig(c.v)), nab && React.createElement("span", {
         className: "rd-ap-sub"
-      }, "conditions ", confFig(c.cond)));
+      }, "net balance"));
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": p.client + ", " + confFig(c.v) + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "") + (c.vs === 0 ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
+        "aria-label": p.client + ", " + confFig(c.v) + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "") + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
       }, React.createElement("span", {
         className: "rd-ap-in"
-      }, [60, 80, 120].map(v => React.createElement("i", {
+      }, [60, 80].map(v => React.createElement("i", {
         key: v,
         className: "rd-ap-gl",
         style: {
@@ -57323,12 +57338,9 @@ function RdAllPolls(P) {
         } : null
       }, c.chg != null ? confChg(c.chg) : "—");
       right1 = React.createElement("b", null, confFig(c.v));
-      right2 = c.chg != null ? React.createElement("span", {
-        className: "rd-ap-sub",
-        style: chgInk ? {
-          color: chgInk
-        } : null
-      }, confChg(c.chg), " on last") : null;
+      right2 = nab ? React.createElement("span", {
+        className: "rd-ap-sub"
+      }, "net balance") : null;
       body = React.createElement(React.Fragment, null, React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic), React.createElement("div", {
@@ -57337,7 +57349,7 @@ function RdAllPolls(P) {
         style: chgInk ? {
           color: chgInk
         } : null
-      }, confChg(c.chg)), " on last release") : "The gauge’s first release this term", c.cond != null && React.createElement(React.Fragment, null, "; conditions ", confFig(c.cond))));
+      }, confChg(c.chg)), " on last release") : "The gauge’s first release this term"));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
@@ -57388,7 +57400,7 @@ function RdAllPolls(P) {
       onClick: toggle,
       tabIndex: 0,
       onKeyDown: e => rowNav(e, p, demFam)
-    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), facet === "confidence" && React.createElement("span", null), React.createElement("button", {
+    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), React.createElement("button", {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
       "aria-expanded": isOpen,
@@ -57559,7 +57571,7 @@ function RdAllPolls(P) {
     className: "rd-ap-in"
   }, ldTicks.map(v => React.createElement("span", {
     key: v,
-    className: "rd-ap-tk" + (v === 0 ? " mid" : ""),
+    className: "rd-ap-tk" + (v === 0 ? " mid" : "") + (v === LD.lo ? " start" : "") + (v === LD.hi ? " end" : ""),
     style: {
       left: ldx(v) + "%"
     }

@@ -6276,7 +6276,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   <td className="num" style={{ color: "var(--mood-neg)", fontWeight: 600 }}>
                     {p.dir ? <>{p.dir.wrong.toFixed(1)}<ChgTag v={p.dir.chg && p.dir.chg.wrong} refDate={p.dir.ref} /></> : <span className="dash">—</span>}
                   </td>
-                  <td className="num muted hide-md">{p.dir ? p.dir.unsure.toFixed(1) : "—"}</td>
+                  {/* a two-answer reading (SEC Newgate) has no unsure share: a dash, not 0.0 */}
+                  <td className="num muted hide-md">{p.dir && p.dir.unsure > 0 ? p.dir.unsure.toFixed(1) : "—"}</td>
                   <td className="num"><ArchDirCell d={p.dir} /></td>
                   </>)}
                   {facet === "issues" && (<>

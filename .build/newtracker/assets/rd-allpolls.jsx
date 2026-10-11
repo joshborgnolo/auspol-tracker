@@ -78,6 +78,9 @@ function rdApChg(d, dec) {
   if (Math.abs(d) < (dec ? 0.05 : 0.5)) return dec ? (0).toFixed(dec) : "0";
   return (d > 0 ? "▲ " : "▼ ") + (dec ? Math.abs(d).toFixed(dec) : String(Math.abs(Math.round(d))));
 }
+/* an opened poll's mini-chart axis figure: a true minus, as the table prints
+   its own (a bare {v} put hyphens on the leadership, direction and NAB axes) */
+const rdApTick = (v) => (v < 0 ? "−" : "") + Math.abs(v);
 /* the figure a row shows for the table's contest and basis, and the other
    basis's pair beneath it */
 function rdApFig(p, onM, pub) {
@@ -441,7 +444,7 @@ function RdApMini({ p, onM, pub }) {
           <defs><clipPath id={clipId}><rect x={X(avgClip[0]) - 2} y={-20} width={Math.max(0, X(avgClip[1]) - X(avgClip[0]) + 4)} height={H + 40} /></clipPath></defs>
         )}
         {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 50 ? "rd-apd-even" : "rd-apd-gl"} style={op < 1 ? { opacity: op } : null}></path>; })}
-        {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end" style={op < 1 ? { opacity: op } : null}>{v}</text>; })}
+        {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end" style={op < 1 ? { opacity: op } : null}>{rdApTick(v)}</text>; })}
         {avgPts.length > 1 && <path d={monotoneXY(avgPts.map((a) => [X(a.x), Y(a.v)]))} className="rd-apd-avgline" clipPath={avgClip ? `url(#${clipId})` : undefined}></path>}
         {avgFirst && <text x={X(avgFirst.x)} y={Y(avgFirst.v) - 9} className="rd-apd-lab">{RD_AP_KAL ? "Trend" : "Average"}</text>}
         {dots.map((d) => {
@@ -558,7 +561,7 @@ function RdApDirMini({ p }) {
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
            aria-label={`${p.pollster}’s national-direction readings since ${rdMonthYear(ms[0])} as a net, right direction minus wrong track, against the average of every reading; this reading ${rdApSigned(own)}.`}>
         {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
-        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{rdApTick(v)}</text>)}
         {avg.length > 1 && <path d={monotoneXY(avg.map((a) => [X(a.x), Y(a.v)]))} className="rd-apd-avgline"></path>}
         {avg.length > 0 && <text x={X(avg[0].x)} y={Y(avg[0].v) - 9} className="rd-apd-lab">Average</text>}
         {dots.map((d) => {
@@ -674,7 +677,7 @@ function RdApConfMini({ p }) {
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
            aria-label={`${c.lab} releases since ${D.monthName(+ms[0].slice(5, 7)) + " " + ms[0].slice(0, 4)}, as published; this release ${fmt(c.v)}${neut === 0 ? ", a net balance, 0 neutral" : ", 100 neutral"}.`}>
         {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === neut ? "rd-apd-even" : "rd-apd-gl"}></path>)}
-        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v === neut ? (neut === 0 ? "0 ±" : "100") : v}</text>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{rdApTick(v)}</text>)}
         {dots.map((d) => {
           const open = () => { if (d.key && window.AP.openPoll) { setTip(null); window.AP.openPoll(d.key, "confidence", "the release you were looking at"); } };
           return (
@@ -869,7 +872,7 @@ function RdApLdMini({ p, met }) {
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
            aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} on the ${rdApLdWord(waves)} gap, ${rdApPmOffice()} minus ${rdApLdJoin([...new Set(waves.flatMap((w) => w.pairs.map((pr) => pr.name)))])}, against the average of every poll; ${own.length ? "this poll " + own.map((pr) => rdApLdWay(pr.gap, pr.name, rdApPm(p.appr))).join(" and ") : "this poll’s own readings are on the other question"}.`}>
         {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
-        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{rdApTick(v)}</text>)}
         {avg.flatMap((al) => al.segs.map((sg, i) => (
           <path key={al.riv + "|" + al.met + "|" + i} d={monotoneXY(sg.map((z) => [X(z.x), Y(z.v)]))} className="rd-apd-avgline"
                 style={{ stroke: `color-mix(in oklab, ${al.ink} 78%, transparent)`, strokeDasharray: al.met === "fav" ? "5 4" : undefined }}></path>
@@ -989,7 +992,7 @@ function RdApIssMini({ p }) {
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
            aria-label={`The share of those naming one of the three parties rating each of Labor, the Coalition and One Nation best on ${lab}, month by month, and this wave’s own figures on the same basis.`}>
         {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
-        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{rdApTick(v)}</text>)}
         {PARTIES.map(([i, , ink]) => (
           <path key={i} d={monotoneXY(rows.map((r) => [X(rdApDays(r[0] + "-15")), Y(r[i])]))} className="rd-apd-avgline" style={ink ? { stroke: `color-mix(in oklab, ${ink} 78%, transparent)` } : null}></path>
         ))}
@@ -1372,7 +1375,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
         <span>{CONF_BLURB[conf.k] || conf.lab + "."}</span>
         <span className="rd-apd-k">Neutral</span>
         <span>{conf.vs === 0
-          ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. It enters the confidence panel’s 40–120 meter shifted up 100, beside the index gauges.</>
+          ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. This table and the economic-sentiment panel both draw it 100 points up, so its 0 sits on the indices’ neutral 100.</>
           : <>An index print – 100 is neutral; above it optimists outnumber pessimists{confPeriod === "week" ? ", read weekly" : ""}.</>}</span>
         <span className="rd-apd-k">In today’s panel</span>
         <span>{confSer && confSer.latest && confSer.latest.released === p.released
@@ -2797,9 +2800,12 @@ function RdAllPolls(P) {
   };
   /* the confidence facet's meter: the four gauges' own printed figures on
      ONE fixed 40–120 scale - fixed so no release's dot moves under the
-     reader as the filters change. The indices print 100-neutral; NAB's net
-     balance prints 0-neutral and its dot is drawn +100 just as the panel
-     chart draws its line up, while the figure shown stays NAB's own. */
+     reader as the filters change (this term's prints run 58.8 to NAB's
+     107, so the window can't slide up to sit symmetric on 100). The
+     indices print 100-neutral; NAB's net balance prints 0-neutral and its
+     dot is drawn +100 just as the panel chart draws its line up, while the
+     figure shown stays NAB's own - its rows say "net balance" under it,
+     the note sitting with the only rows it explains. */
   const CF_LO = 40, CF_HI = 120;
   const cfx = (v) => ((Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO)) * 100;
   const confPlot = (c) => c.v + (c.vs === 0 ? 100 : 0);
@@ -2811,16 +2817,23 @@ function RdAllPolls(P) {
      whole numbers (the panel's NICE does the same) */
   const confFig = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const confChg = (v) => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
+  /* its head reads the way the two-party and group strips do: which way
+     is which at the ends (left of neutral, more pessimists than
+     optimists), the ticks under them. Every tick fits at every width -
+     a phone's 66px between ticks clears "Neutral" - and there, as on the
+     other phone heads, the end labels tuck inside the card */
   const CONF_TKS = [40, 60, 80, 100, 120];
-  const confScale = (short) => (
-    <>
-      <span className="rd-ap-cap">100 = neutral; NAB drawn +100</span>
+  const confScale = (phone) => (
+    <span className="rd-ap-scale" aria-hidden="true">
       <span className="rd-ap-in">
-        {(short ? CONF_TKS.filter((v) => v === 40 || v === 100 || v === 120) : CONF_TKS).map((v) => (
-          <span key={v} className={"rd-ap-tk" + (v === 100 ? " mid" : "")} style={{ left: cfx(v) + "%" }}>{v === 100 ? "Neutral" : v}</span>
+        <b className="rd-ap-scl">◀ Pessimistic</b>
+        <b className="rd-ap-scr">Optimistic ▶</b>
+        {CONF_TKS.map((v) => (
+          <span key={v} className={"rd-ap-tk" + (v === 100 ? " mid" : "") + (phone && v === CF_LO ? " start" : "") + (phone && v === CF_HI ? " end" : "")}
+                style={{ left: cfx(v) + "%" }}>{v === 100 ? "Neutral" : v}</span>
         ))}
       </span>
-    </>
+    </span>
   );
 
   const colHead = (
@@ -2853,7 +2866,7 @@ function RdAllPolls(P) {
         {th(window.JUR ? "Better " + window.JUR.office.alb : "Better PM", "ppm.alb")}
         <span className="rd-ap-hpic" aria-hidden="true">
           <span className="rd-ap-cap">Net rating: approve minus disapprove</span>
-          <span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (v === LD.hi ? " end" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span>
+          <span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span>
         </span>
         <span className="rd-ap-nets rd-ap-hnets">
           {th(window.JUR ? "Prem" : "Alb", "appr.albNet", { right: true, color: "var(--alp-text)" })}
@@ -2877,13 +2890,12 @@ function RdAllPolls(P) {
         <span role="columnheader" aria-label={demCapLo && demCapHi ? "Each party’s gap between the two groups, from stronger with " + demCapLo.toLowerCase() + " to stronger with " + demCapHi.toLowerCase() + " voters" : "Each party’s gap between the two groups named on its row"} className="rd-ap-hpic">{demScale(demMid)}</span>
         <span></span>
       </>}
-      {/* the demographics breakpoint stands in for this head too: under
-          ~1150px the strip keeps only the ends and the neutral mark */}
+      {/* Change ends the row beside the chevron, as every facet's own
+          summary figure does (Lean, the leaders' nets, Net) */}
       {facet === "confidence" && <>
         {th("Figure", "conf.v", { title: "Sort by the gauge’s printed figure (the panel chart’s dot)" })}
-        <span role="columnheader" aria-label="Each gauge’s figure on a fixed 40–120 scale, 100 neutral – NAB’s net balance drawn 100 points up, its figure printed as NAB’s own" className="rd-ap-hpic">{confScale(demMid)}</span>
-        {th("Change", "conf.chg", { right: true, title: "Change on the gauge’s own previous release – NAB’s rows also carry its trading-conditions reading" })}
-        <span></span>
+        <span role="columnheader" aria-label="Each gauge’s figure on a fixed 40–120 scale, more pessimists than optimists below 100 and more optimists above it – NAB’s net balance drawn 100 points up, its figure printed as NAB’s own" className="rd-ap-hpic">{confScale(false)}</span>
+        {th("Change", "conf.chg", { right: true, title: "Change on the gauge’s own previous release" })}
       </>}
       <span></span>
     </div>
@@ -3014,7 +3026,8 @@ function RdAllPolls(P) {
       pic = (
         <span className="rd-ap-pic" aria-hidden="true">
           <span className="rd-ap-in">
-            {ldTicks.filter((v) => v !== 0).map((v) => <i key={v} className="rd-ap-gl" style={{ left: ldx(v) + "%" }}></i>)}
+            {/* the inner ticks only: like every signed strip, the ends go unruled */}
+            {ldTicks.filter((v) => v !== 0 && v !== LD.lo && v !== LD.hi).map((v) => <i key={v} className="rd-ap-gl" style={{ left: ldx(v) + "%" }}></i>)}
             <i className="rd-ap-avg" style={{ left: ldx(0) + "%" }}></i>
             {[["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null).map(([k, col]) => (
               <i key={k} className="rd-ap-dot" style={{ left: ldx(a[k]) + "%", background: col }}></i>
@@ -3037,13 +3050,24 @@ function RdAllPolls(P) {
     } else if (facet === "direction") {
       const d = p.dir;
       const dc = (d && d.chg) || {};
+      /* a two-answer reading (SEC Newgate's right v wrong sums to 100) has
+         no unsure share to print: a dash, not a 0. The three share cells
+         keep one shape - a figure over its change - so the unsure figure
+         sits on the same line as the other two, its slot held open when
+         only they moved */
+      const noU = !!d && !(d.unsure > 0);
+      /* a change at its figures' printed precision: Roy Morgan prints
+         halves (21.5 after 21), so its move is 0.5, not a rounded 1 */
+      const dChg = (v) => rdApChg(v, v != null && !Number.isInteger(v) ? 1 : 0);
+      const uChg = noU ? null : dChg(dc.unsure);
+      const subRow = d && (dChg(dc.right) || dChg(dc.wrong) || uChg);
       figs = d ? <>
-        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>{rdApChg(dc.right, 0) && <span className="rd-ap-sub">{rdApChg(dc.right, 0)}</span>}</span>
-        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{rdApChg(dc.wrong, 0) && <span className="rd-ap-sub">{rdApChg(dc.wrong, 0)}</span>}</span>
-        <span role="cell" className="rd-ap-dnum"><span>{rdApNum(d.unsure)}</span></span>
+        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>{dChg(dc.right) && <span className="rd-ap-sub">{dChg(dc.right)}</span>}</span>
+        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{dChg(dc.wrong) && <span className="rd-ap-sub">{dChg(dc.wrong)}</span>}</span>
+        <span role="cell" className="rd-ap-dnum"><span>{noU ? "—" : rdApNum(d.unsure)}</span>{subRow && <span className="rd-ap-sub" aria-hidden={uChg ? undefined : "true"}>{uChg || "\u00a0"}</span>}</span>
       </> : <><span role="cell" className="rd-ap-none">—</span><span></span><span></span></>;
       pic = d ? (
-        <span className="rd-ap-pic" role="img" aria-label={`Right direction ${rdApNum(d.right)}%, unsure ${rdApNum(d.unsure)}%, wrong track ${rdApNum(d.wrong)}%`}>
+        <span className="rd-ap-pic" role="img" aria-label={`Right direction ${rdApNum(d.right)}%, ${noU ? "" : `unsure ${rdApNum(d.unsure)}%, `}wrong track ${rdApNum(d.wrong)}%`}>
           <span className="rd-ap-dbar">
             <i style={{ flexGrow: d.right, background: "var(--mood-pos)" }}></i>
             {/* a collapsed unsure strip still takes the flex gaps both sides,
@@ -3057,7 +3081,7 @@ function RdAllPolls(P) {
       val = <span role="cell" className="rd-ap-val">{d ? rdSigned(d.net, 0) : "—"}</span>;
       right1 = d ? <b className="rd-ap-pairfig">Net {rdSigned(d.net, 0)}</b> : <span className="rd-ap-none">—</span>;
       body = d ? <><div className="rd-ap-cpic">{pic}</div>
-        <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</div></> : null;
+        <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{noU ? "" : ", unsure " + rdApNum(d.unsure)}</div></> : null;
     } else if (facet === "issues") {
       /* who leads on what (user call 2026-10-04, design B of three mocked):
          the six most-asked issues across the row, each the party rated best
@@ -3125,23 +3149,27 @@ function RdAllPolls(P) {
         <div className="rd-ap-cpic">{pic}</div>
       </>;
     } else if (facet === "confidence") {
-      /* one release of one gauge: the figure as the house printed it (NAB
-         keeps its own net-balance number), drawn on the shared 40–120
-         meter; NAB's trading-conditions read rides under its figure */
+      /* one release of one gauge: the figure as the house printed it, drawn
+         on the shared 40–120 meter. NAB keeps its own net-balance number,
+         which reads 0 at neutral, so its rows name the measure under the
+         figure - why −8 sits just below Neutral. NAB's trading-conditions
+         read, a second measure, opens with the release */
       const c = p.conf;
+      const nab = c.vs === 0;
       figs = (
         <span role="cell" className="rd-ap-fig">
           <b>{confFig(c.v)}</b>
-          {c.cond != null && <span className="rd-ap-sub">conditions {confFig(c.cond)}</span>}
+          {nab && <span className="rd-ap-sub">net balance</span>}
         </span>
       );
       pic = (
         <span className="rd-ap-pic" role="img"
               aria-label={p.client + ", " + confFig(c.v)
                 + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "")
-                + (c.vs === 0 ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")}>
+                + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")}>
           <span className="rd-ap-in">
-            {[60, 80, 120].map((v) => <i key={v} className="rd-ap-gl" style={{ left: cfx(v) + "%" }}></i>)}
+            {/* the inner ticks only: like every signed strip, the ends go unruled */}
+            {[60, 80].map((v) => <i key={v} className="rd-ap-gl" style={{ left: cfx(v) + "%" }}></i>)}
             <i className="rd-ap-avg" style={{ left: cfx(100) + "%" }}></i>
             <i className="rd-ap-dot" style={{ left: cfx(confPlot(c)) + "%", background: confInk(c) }}></i>
           </span>
@@ -3153,13 +3181,15 @@ function RdAllPolls(P) {
           {c.chg != null ? confChg(c.chg) : "—"}
         </span>
       );
+      /* the phone card lays the desktop cells out in place: the figure (and
+         NAB's "net balance") at the top right, the change once, under the
+         strip */
       right1 = <b>{confFig(c.v)}</b>;
-      right2 = c.chg != null ? <span className="rd-ap-sub" style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)} on last</span> : null;
+      right2 = nab ? <span className="rd-ap-sub">net balance</span> : null;
       body = <>
         <div className="rd-ap-cpic">{pic}</div>
         <div className="rd-ap-csub">
           {c.chg != null ? <>Change <b style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)}</b> on last release</> : "The gauge’s first release this term"}
-          {c.cond != null && <>; conditions {confFig(c.cond)}</>}
         </div>
       </>;
     }
@@ -3189,7 +3219,7 @@ function RdAllPolls(P) {
       <React.Fragment key={id}>
         <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p, demFam)}>
           {pollsterCell(p)}{fieldCell(p)}{sampleCell(p)}<span></span>
-          {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}{facet === "confidence" && <span></span>}
+          {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}
           <button type="button" className={"rd-ap-chev" + (isOpen ? " open" : "")} aria-expanded={isOpen}
                   aria-label={(isOpen ? "Hide" : "Show") + " the full " + (facet === "confidence" ? "release" : "poll") + ": " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field)}
                   onClick={(e) => { e.stopPropagation(); toggle(); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
@@ -3286,7 +3316,7 @@ function RdAllPolls(P) {
     <div className={"rd-ap-phead " + cls}>
       {facet === "twopp" && <span className="rd-ap-hpic"><RdApScale onM={onM} phone /></span>}
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
-      {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
+      {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (v === LD.lo ? " start" : "") + (v === LD.hi ? " end" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
       {facet === "issues" && <span className="rd-ap-hpic rd-ap-imaph">{IMAP.map((id) => <span key={id}>{issHyph(id)}</span>)}</span>}
       {facet === "demographics" && <span className="rd-ap-hpic">{demScale(true)}</span>}

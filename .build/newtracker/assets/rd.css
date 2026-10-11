@@ -2393,24 +2393,43 @@ body.rd .rd-ap-pinf {
   background: var(--surface); font-size: 13px; color: var(--ink); white-space: nowrap;
 }
 
-/* the grids, one per view */
-body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
+/* the grids, one per view. Every view's first figure column starts at
+   the same x (the 2PP view's gutter was 28px to everyone else's 36px, so
+   its figures sat 8px left of every other facet's), and a view's summary
+   figures at the row's end - Lean and House lean, the leaders' nets,
+   Net, Change - hold a track of their own: a bare 1fr there gave them
+   nothing once the strip took its max, and from 1001 to 1279px the nets
+   drew over the leadership strip and Net over the chevron.
+   The Even and Neutral lines of Leadership, Demographics and Confidence
+   share one x, 857px into the 1152px table (the strips' 14px insets
+   count): the middle of Demographics' 390px strip (432 + 230 + 195), two
+   thirds along Leadership's 380px one (-40 to +20 while no net rating
+   passes them; 432 + 176 + 14 + 235) and three quarters along
+   Confidence's 464px one (40 to 120; 432 + 84 + 14 + 327). It holds from
+   1280px wide; narrower, the strips can't keep their widths and one line
+   at once. The 2PP average keeps its own place: centring it there would
+   cost its strip a third of its 400px */
+body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(124px, 1fr) 40px; }
+body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(56px, 1fr) 40px; }
 /* issues: the six issue cells take the row (who leads on what, 2026-10-04) */
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
 /* demographics: the Primary facet's tracks, gaps for primaries */
-body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
-/* confidence: Figure, its 40-120 meter, Change - the direction facet's
-   shape minus two of its three numeric columns */
-body.rd .rd-ap-cconf { grid-template-columns: 200px 120px 76px 36px 84px minmax(0, 356px) 64px minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
+/* confidence: Figure, its 40-120 meter, and Change at the row's end */
+body.rd .rd-ap-cconf { grid-template-columns: 200px 120px 76px 36px 84px minmax(0, 464px) minmax(64px, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px; /* every facet meets the scale-header facets' row, so hopping facets never shifts the data rows under the reader */ }
 body.rd .rd-ap-hrow > * { min-width: 0; }
-body.rd .rd-ap-hc1 { padding-left: 12px; }
+/* the Pollster name rides inline in this cell, so the cell's own strut
+   must be the names' 12/16 line or it lifts the baseline 1-2px */
+body.rd .rd-ap-hc1 { padding-left: 12px; font-size: 12px; line-height: 16px; }
+/* every label on the head's last line - column names, a strip's ticks,
+   Direction's caption - stands on one baseline: the same 16px line, flush
+   with the row's foot (the names sat 2.5px above the ticks beside them) */
 body.rd .rd-ap-th {
-  all: unset; cursor: pointer; box-sizing: border-box; padding-bottom: 2px;
+  all: unset; cursor: pointer; box-sizing: border-box; line-height: 16px;
   font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap;
 }
 body.rd span.rd-ap-th { cursor: default; }
@@ -2418,7 +2437,9 @@ body.rd .rd-ap-th.r { justify-self: end; text-align: right; }
 body.rd .rd-ap-th.on { color: var(--ink); }
 body.rd .rd-ap-th:hover { color: var(--ink); }
 body.rd .rd-ap-th:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-body.rd .rd-ap-arr { font-size: 10px; color: var(--ink-faint); }
+/* line-height 1 keeps the smaller sort arrow inside its name's 16px line;
+   at the inherited 16px it hung lower and pushed the name 1px up */
+body.rd .rd-ap-arr { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 body.rd .rd-ap-th.on .rd-ap-arr { color: var(--ink); }
 body.rd .rd-ap-hpic { position: relative; align-self: stretch; display: block; min-height: 38px; }
 body.rd .rd-ap-scale { position: absolute; inset: 0; }
@@ -2552,7 +2573,7 @@ body.rd .rd-ap-pnums .rd-ap-half, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-half {
   font-size: 9.5px;
 }
 body.rd .rd-ap-hpn { align-self: end; }
-body.rd .rd-ap-nets { display: grid; grid-template-columns: repeat(3, 44px); justify-content: end; text-align: right; }
+body.rd .rd-ap-nets { display: grid; grid-template-columns: repeat(3, 40px); justify-content: end; text-align: right; }
 body.rd .rd-ap-nets > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-nets > b em { font-style: normal; font-weight: 400; font-size: 11px; color: var(--ink-3); margin-right: 3px; }
 body.rd .rd-ap-hnets { align-self: end; }
@@ -2696,27 +2717,31 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
 /* a laptop's narrower column: shorter words over the scale */
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(124px, 1fr) 32px; }
+  body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(48px, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
-  body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-cconf { grid-template-columns: 170px 110px 70px 16px 70px minmax(0, 356px) 56px minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
+  /* Change's track keeps 16px between its name and the scale's 120 */
+  body.rd .rd-ap-cconf { grid-template-columns: 170px 110px 70px 16px 70px minmax(0, 464px) minmax(76px, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
-body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
+body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
 
 /* the middle widths drop the sample column: the opened poll carries it */
 @media (max-width: 1000px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 48px 0 28px; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
-  body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
+  body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 124px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 356px) 56px minmax(0, 1fr) 28px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 464px) minmax(76px, 1fr) 28px; }
   body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-imap { column-gap: 8px; padding-right: 4px; }
   body.rd .rd-ap-icell > b { font-size: 13px; }
-  body.rd .rd-ap-imap.rd-ap-hpn > .rd-ap-th { font-size: 11px; letter-spacing: 0.03em; }
+  /* every column name steps down with the Issues names: at 12px the
+     40px figure lattice ran "L/NP ▾" into "GRN ▾" and Direction's
+     "WRONG ▾" into "UNSURE ▾" (same 16px line, so the baseline holds) */
+  body.rd .rd-ap-hrow .rd-ap-th { font-size: 11px; letter-spacing: 0.03em; }
   body.rd .rd-apd-demcols.two { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-apd-demcols.two > .rd-apd-dem + .rd-apd-dem > .rd-apd-demh { display: none; }
   body.rd .rd-ap-cdem { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
@@ -2724,7 +2749,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
   body.rd .rd-ap-pnums { grid-template-columns: repeat(5, 40px); }
-  body.rd .rd-ap-nets { grid-template-columns: repeat(3, 40px); }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
@@ -2781,6 +2805,10 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
+  /* Direction's caption is the head's only words: on a 320px phone it
+     ran 17px past the head, so it wraps there, balanced, its last line
+     still on the tick baseline */
+  body.rd .rd-ap-phead .rd-ap-hdir .rd-ap-cap { right: 8px; white-space: normal; text-wrap: balance; }
   body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem, body.rd .rd-ap-cconf { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
@@ -2845,8 +2873,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-imapc b { display: flex; flex-direction: column; font-size: 13px; line-height: 15px; min-height: 30px; font-weight: 600; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
   body.rd .rd-ap-imapc .rd-ap-ibar { width: 88%; height: 5px; }
   body.rd .rd-ap-imaph { align-items: end; hyphens: manual; }
-  body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); }
-  body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
+  /* the 1px foot puts the 11/13 names on the other phone heads' tick
+     baseline, so a hop to Issues doesn't nudge the label line */
+  body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 1px; }
+  body.rd .rd-ap-cnets { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
+  /* a sentence, not a row of cells: as a flex line its 8px gaps cut every
+     comma loose from its figure ("Right 25 , wrong 60") */
+  body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
