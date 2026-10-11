@@ -129,14 +129,17 @@ async function openRowContaining(page, re) {
   if (!ok) return null;
   await new Promise((r) => setTimeout(r, 600));
   return page.evaluate(() => {
-    const detail = document.querySelector(".rd-ap-open .rd-apd");
+    /* the opened poll is the shared ledger (RdLedger): its blocks are the
+       lead's sections and the "Also in this poll" lines */
+    const detail = document.querySelector(".rd-ap-open .rd-ldg");
     if (!detail) return null;
+    const norm = (t) => t.replace(/\s+/g, " ").trim();
     return {
-      head: (detail.querySelector(".rd-apd-h") || {}).textContent || "",
-      grids: [...detail.querySelectorAll(".rd-apd-grid")].map((g) => g.textContent.replace(/\s+/g, " ").trim()),
+      head: (detail.querySelector(".rd-ldg-sent") || {}).textContent || "",
+      grids: [...detail.querySelectorAll(".rd-ldg-sec, .rd-ldg-line")].map((g) => norm(g.textContent)),
+      lines: [...detail.querySelectorAll(".rd-ldg-line")].map((g) => ({ lab: norm((g.querySelector(".rd-ldg-lab") || {}).textContent || ""), t: norm((g.querySelector(".rd-ldg-lbody") || {}).textContent || "") })),
       notes: [...detail.querySelectorAll(".rd-apd-note")].map((g) => g.textContent.replace(/\s+/g, " ").trim()),
-      issRows: detail.querySelectorAll(".rd-apd-issrow").length,
-      issBars: detail.querySelectorAll(".rd-apd-issbar i").length,
+      issRows: [...detail.querySelectorAll(".rd-ldg-line .rd-ldg-lab")].filter((n) => n.textContent.trim() === "Issues").length,
       rail: (detail.querySelector(".rd-apd-r") || {}).textContent.replace(/\s+/g, " ").trim(),
       railCtrl: (detail.querySelector(".rd-apd-r .rd-apd-ct") || {}).textContent || "",
       railSvg: !!detail.querySelector(".rd-apd-r svg"),
@@ -151,7 +154,7 @@ async function openRowContaining(page, re) {
       if (!t || !t.querySelector(".rd-apd-isr")) return null;
       const tables = [...t.querySelectorAll(".rd-apd-dem")];
       return {
-        first: detail.firstElementChild === t,
+        first: !!t.parentElement && t.parentElement.classList.contains("rd-ldg-lead") && t.parentElement.firstElementChild === t,
         h: (t.querySelector(".rd-apd-h") || {}).textContent || "",
         heads: [...tables[0].querySelector(".rd-apd-demh").children].map((c) => c.textContent.trim()),
         rows: tables.flatMap((tb) => [...tb.querySelectorAll(".rd-apd-isr:not(.rd-apd-demh)")]
@@ -368,9 +371,9 @@ check("an Ipsos row opens on its issue-by-issue table: Ranked, the parties, Unsu
   !!ipT && ipT.first && ipT.h === "Issue by issue" && ipT.heads[1] === "Ranked" && ipT.heads[ipT.heads.length - 1] === "Unsure"
     && ipT.rows.length >= 5 && /^1st · \d/.test(ipT.rows[0][1].t),
   ipT ? `${ipT.heads.join(" | ")} · ${ipT.rows.length} issues · first ${ipT.rows[0].map((c) => c.t).join(" ")}` : "no table");
-check("its salience bars and top-issue block are folded into the table (not repeated below)",
+check("its issues are the table alone (no Issues line repeats them below)",
   !!ipD && ipD.issRows === 0 && !ipD.grids.some((g) => /The issues voters name|Rated best on/.test(g)),
-  ipD ? `${ipD.issRows} bar rows; grids ${ipD.grids.map((g) => g.slice(0, 24)).join(" / ")}` : "no detail");
+  ipD ? `${ipD.issRows} issues lines; blocks ${ipD.grids.map((g) => g.slice(0, 24)).join(" / ")}` : "no detail");
 check("the table shades the party in front on each issue, and none when level",
   !!ipT && shadingOff(ipT).length === 0, ipT ? shadingOff(ipT).slice(0, 3).join(" | ") || "clean" : "no table");
 check("the table's note names the ranking and the question's own words",
@@ -464,7 +467,7 @@ check(`${viHouse} pools its top issue against the other house (pair / lean / pan
 // line — three-party shares summing to ~100 (the as-printed payload sums
 // well under; that was the always-low-dots bug, fixed in RdApIssMini)
 const dotVals = await page1.evaluate(() => {
-  const d = document.querySelector(".rd-ap-open .rd-apd");
+  const d = document.querySelector(".rd-ap-open .rd-ldg");
   const svg = d && d.querySelector(".rd-apd-mini svg");
   if (!svg) return null;
   const axes = [...svg.querySelectorAll(".rd-apd-ax")].map((t) => ({ v: +t.textContent, y: +t.getAttribute("y") - 4 }));
@@ -490,7 +493,7 @@ check("the wave’s own dots sit on the three-party basis (sum to ~100, like the
 await openRowContaining(page1, /^Ipsos/);
 const xOf = await page1.evaluate(() => {
   const D = window.AUSPOL;
-  const d = document.querySelector(".rd-ap-open .rd-apd");
+  const d = document.querySelector(".rd-ap-open .rd-ldg");
   const svg = d && d.querySelector(".rd-apd-mini svg");
   if (!svg) return null;
   const cand = (D.issuesOnlyPolls || []).filter((q) => /Ipsos/.test(q.pollster))
@@ -516,15 +519,16 @@ check("the wave dot sits at its fieldwork midpoint, not its release stamp",
   !!xOf && !xOf.err && Math.abs(xOf.cx - xOf.expMid) < 2 && Math.abs(xOf.cx - xOf.expRel) > 2,
   xOf ? (xOf.err || `${xOf.field}: cx ${xOf.cx.toFixed(1)} | mid ${xOf.expMid.toFixed(1)} | released ${xOf.expRel.toFixed(1)}`) : "no svg");
 
-// 8d: off the Issues facet an opened poll keeps its top-issue block, and
-// SEC's "Rated best on" key names its issue in sentence case (user call
-// 2026-10-03: "issues should take sentence case, no capital C")
+// 8d: off the Issues facet an opened poll carries its issues as one line,
+// the Issues tab's own row figures (SEC's one standing best-party question
+// reads "Cost of living ALP +1"), and no issue table
 await pickFacet(page1, /^Direction$/);
 await showAll(page1);
 const secDir = await openRowContaining(page1, /^SEC Newgate/);
-check("off the Issues facet, SEC's 'Rated best on' block names its issue in sentence case",
-  !!secDir && secDir.grids.some((g) => /^Rated best on [a-z]/.test(g)) && !secDir.grids.some((g) => /^Rated best on [A-Z]/.test(g)) && !secDir.tbl,
-  secDir ? (secDir.grids.find((g) => /^Rated best on/.test(g)) || "no best block").slice(0, 90) : "no detail");
+const secLine = secDir && secDir.lines.find((l) => l.lab === "Issues");
+check("off the Issues facet, SEC's issues ride one line in the row's own figures, no table",
+  !!secLine && /^Cost of living (ALP|L\/NP|ON|GRN) \+\d+|^Cost of living level/.test(secLine.t) && !secDir.tbl,
+  secLine ? secLine.t.slice(0, 90) : secDir ? "no Issues line" : "no detail");
 
 check("no page errors on the desktop pass", errs1.length === 0, errs1[0] || "");
 await page1.close();

@@ -4,14 +4,16 @@
    row was the unprincipled bit; shipped with hlViews/plParties/table
    columns in ac625e2/9b5e9b9/02cf021 and the detail/seats/dots here).
    Asserts on desktop:
-     1. an expanded card's .rd-apd-prim ladder follows walk order, per
+     1. an opened poll's primaries (the ledger's .rd-ldg-prim lead on the
+        Primary tab) follow walk order, per
         party present in the wave - including on a DISAGREEING wave (one
         whose own figures would rank parties differently);
      2. the row's five figure slots (.rd-ap-pnums) in walk order, dashes
         where the wave lacks a party;
      3. the row's primary picture aria and its dot DOM order in walk
         order (paint order: the walk now decides who sits on top);
-     4. the modelled-seats sentence orders parties by the walk too.
+     4. the modelled-seats line (the ledger's Seats line) orders parties
+        by the walk too.
    Truth for every row's figures comes from the same 9f09dca2 data asset
    the page reads (new Function fixture, hl-tabs-scroll pattern) - the
    probe pins the WIRING, never the day's data.
@@ -152,20 +154,20 @@ for (let i = 0; i < MAX_SCAN && !witness; i++) {
   }, i);
   await new Promise((r) => setTimeout(r, 900));
   const ladder = await page.evaluate(() => {
-    const apd = [...document.querySelectorAll(".rd-apd")].pop();
-    if (!apd) return null;
-    const prim = apd.querySelector(".rd-apd-prim");
+    const lg = [...document.querySelectorAll(".rd-ap-open .rd-ldg")].pop();
+    if (!lg) return null;
+    const prim = lg.querySelector(".rd-ldg-lead .rd-ldg-prim");
     if (!prim) return null;
     return [...prim.querySelectorAll(":scope > span")].map((s) => ({
       lab: (s.querySelector("b") || { textContent: "?" }).textContent.trim(),
-      v: (s.querySelector(".rd-apd-big") || { textContent: "?" }).textContent.trim(),
+      v: (s.querySelector(".rd-ldg-big") || { textContent: "?" }).textContent.trim(),
     }));
   });
   ok(`row ${i} detail ladder in walk order (${tag})`,
      ladder != null &&
      JSON.stringify(ladder.map((l) => l.lab)) === JSON.stringify(expLabs) &&
      ladder.every((l, j) => l.v === rdNum(w.p[present[j]])),
-     ladder ? ladder.map((l) => l.lab + " " + l.v).join(",") : "(no .rd-apd-prim)");
+     ladder ? ladder.map((l) => l.lab + " " + l.v).join(",") : "(no .rd-ldg-prim)");
 
   /* disagreement witness: the wave's OWN figures would rank differently */
   const ownRank = [...present].sort((a, b) => w.p[b] - w.p[a]);
@@ -186,11 +188,12 @@ await page.evaluate(() => {
 });
 await new Promise((r) => setTimeout(r, 900));
 const seatsTxt = await page.evaluate(() => {
-  const apd = [...document.querySelectorAll(".rd-apd")].pop();
-  if (!apd) return "";
-  const k = [...apd.querySelectorAll(".rd-apd-k")].find((n) => (n.textContent || "").trim() === "Seats, modelled");
-  const cell = k && k.parentElement ? k.parentElement.textContent : "";
-  return String(cell || "").replace(/\s+/g, " ");
+  const lg = [...document.querySelectorAll(".rd-ap-open .rd-ldg")].pop();
+  if (!lg) return "";
+  const line = [...lg.querySelectorAll(".rd-ldg-line")].find((n) => ((n.querySelector(".rd-ldg-lab") || {}).textContent || "").trim() === "Seats");
+  const body = line ? line.querySelector(".rd-ldg-lbody") : null;
+  /* units sit side by side with no space between them in textContent */
+  return body ? [...body.children].map((u) => u.textContent).join(" ").replace(/\s+/g, " ") : "";
 });
 const seatW = D.individualPolls.find((x) => x.seats && x.seats.rangeOnly && x.seats.p);
 const seatExpect = seatW ? walk.filter((k) => seatW.seats.p[k]).map((k) => LAB[k]) : null;

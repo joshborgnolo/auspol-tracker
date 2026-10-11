@@ -246,7 +246,7 @@ const rdApX = (v) => ((Math.max(-RD_AP_M, Math.min(RD_AP_M, v)) + RD_AP_M) / (2 
    its polls land with nothing but sampling at work, so a whisker that clears
    the tick, not the centre line, is the surprise. `tip` is the readout, drawn
    on hover by the row. */
-function RdApStrip({ lean, moe, he, onM, tip, phone }) {
+function RdApStrip({ lean, moe, he, onM, tip, phone, ink }) {
   const grid = phone ? [-3, 3] : [-4, -2, 2, 4];
   const lo = lean != null && moe != null ? lean - moe : null;
   const hi = lean != null && moe != null ? lean + moe : null;
@@ -258,7 +258,7 @@ function RdApStrip({ lean, moe, he, onM, tip, phone }) {
       {lo != null && <i className="rd-ap-wh" style={{ left: rdApX(lo) + "%", width: rdApX(hi) - rdApX(lo) + "%" }}></i>}
       {lo != null && <i className={"rd-ap-clip l" + (lo < -RD_AP_M ? " on" : "")}></i>}
       {hi != null && <i className={"rd-ap-clip r" + (hi > RD_AP_M ? " on" : "")}></i>}
-      {lean != null && <i className="rd-ap-dot" style={{ left: rdApX(lean) + "%", background: rdApLeanDot(lean, onM) }}></i>}
+      {lean != null && <i className="rd-ap-dot" style={{ left: rdApX(lean) + "%", background: ink || rdApLeanDot(lean, onM) }}></i>}
       {tip}
     </span>
   );
@@ -1008,102 +1008,9 @@ function RdApIssMini({ p }) {
   );
 }
 
-function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSplit }) {
+function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSplit, onFacet }) {
   const D = window.AUSPOL;
-  const q = p.p || {};
-  const c = (p.chg && p.chg.d) || {};
-  const refIso = p.chg && p.chg.r ? (p.chg.r.pOnp || p.chg.r.pAlp || p.chg.r.impOn || p.chg.r.imp) : null;
-  const prev = refIso ? D.individualPolls.find((x) => x.pollster === p.pollster && x.released === refIso) : null;
-  const CK = { alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" };
-  /* the expansion ranks by the SAME site-aggregate walk the row above it
-     rides (prims in RdAllPolls) - not the wave's own largest-first order;
-     two orders for one wave was the unprincipled bit (user call 2026-10-03) */
-  const prim = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => q[k.id] != null);
-  const pair = (a, b, bInk) => (
-    <b className="rd-apd-pair"><span style={{ color: "var(--alp-text)" }}>{a}</span><span className="rd-ap-dash"> – </span><span style={{ color: bInk }}>{b}</span></b>
-  );
-  const chg = (d, dec) => { const s = rdApChg(d, dec); return s ? <span className="rd-apd-chg">{s}</span> : null; };
-  const none = <span className="rd-apd-none">—</span>;
-  const ta = p.tppAlt;
-  const cols = [
-    { id: "onp", head: "v One Nation",
-      imp: p.alpOnImp != null ? <>{pair(p.alpOnImp.toFixed(1), (100 - p.alpOnImp).toFixed(1), "var(--onp-text)")} {chg(c.impOn, 1)}</> : none,
-      pub: ta ? <>{pair(rdApNum(ta.alp), rdApNum(ta.onp), "var(--onp-text)")} {chg(c.altAlpOn, 0)}</> : none },
-    { id: "lnp", head: "v Coalition",
-      imp: p.alpImp != null ? <>{pair(p.alpImp.toFixed(1), (100 - p.alpImp).toFixed(1), "var(--lnp-text)")} {chg(c.imp, 1)}</> : none,
-      pub: p.alp != null && p.lnp != null ? <>{pair(rdApNum(p.alp), rdApNum(p.lnp), "var(--lnp-text)")} {chg(c.alp2pp, 0)}</> : none },
-  ];
-  if (!onM) cols.reverse();
-  /* better PM: Hanson's contest beside One Nation, the opposition leader's
-     beside the Coalition; a three-way contest belongs to neither column, so
-     it takes a full-width row of its own (Newspoll and DemosAU ask both
-     forms - parking it in the Coalition cell dropped it whenever that cell
-     already held the head-to-head) */
-  const sets = window.ppmContests ? window.ppmContests(p) : (p.ppmSets || []);
-  const NAME = { alb: "Albanese", taylor: "Taylor", ley: "Ley", hanson: "Hanson" };
-  const INK = { alb: "var(--alp-text)", taylor: "var(--lnp-text)", ley: "var(--lnp-text)", hanson: "var(--onp-text)" };
-  const ppmCell = (s) => (
-    <span className="rd-apd-cell">
-      <span>{["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null).map((k, i) => (
-        <React.Fragment key={k}>{i > 0 ? ", " : ""}{apWho(p, k, NAME[k])} <b style={{ color: INK[k] }}>{s[k]}</b></React.Fragment>
-      ))}</span>
-      {/* a contest summing to 100 was printed without its undecided, not measured at none */}
-      <span className="rd-apd-sub">{s.unc ? s.unc + " undecided" : ""}</span>
-    </span>
-  );
-  const setHan = sets.find((s) => s.hanson != null && s.taylor == null && s.ley == null);
-  const setOpp = sets.find((s) => (s.taylor != null || s.ley != null) && s.hanson == null);
-  const setThree = sets.find((s) => s.hanson != null && (s.taylor != null || s.ley != null));
-  const ppmBy = { onp: setHan ? ppmCell(setHan) : null, lnp: setOpp ? ppmCell(setOpp) : null };
-  /* a wave with no voting intention behind it (SEC Newgate's direction-only
-     surveys, Essential's three mood-only waves of 2025) leaves every matchup
-     cell a dash — nothing to imply from, nothing published, no better-PM — so
-     the grid removes itself entirely */
-  const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta
-    || (p.alp != null && p.lnp != null) || ppmBy.onp != null || ppmBy.lnp != null || !!setThree;
-  const a = p.appr || {};
-  const mb = a.metricBy || {};
-  const leaders = [["alb", "albNet", rdApPm(a)], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", apWho(a, "hanson", "Hanson")]]
-    .filter(([, nk]) => a[nk] != null);
-  const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
-  const seats = p.seats && p.seats.p ? rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => p.seats.p[k.id]) : [];
-  /* the "Rated best on" block: the three-way ownership figures for the top
-     issue when the wave printed them (they're shares of those naming one of
-     the three parties), else SEC Newgate's printed best-party table */
-  const issBestBlock = (() => {
-    const iss = p.iss;
-    if (!iss) return null;
-    const topId = iss.top;
-    /* the key reads "Rated best on cost of living" - sentence case:
-       the label bank starts labels capital ("Cost of living"), the
-       "Rated best on …" key sits mid-sentence (user call 2026-10-03:
-       "issues should take sentence case, no capital C"). Only the
-       leading letter drops - "Pensions and older Australians" keeps
-       its interior capital */
-    const lab = (D.issues && D.issues.labels && D.issues.labels[topId]) || null;
-    const tit = lab ? lab.charAt(0).toLowerCase() + lab.slice(1) : "the top issue";
-    const rowOf = (q, sh) => {
-      const meta = window.ISS_PARTY_META[q] || [q, q, null];
-      return { k: q, v: sh[q], lab: q === "rest" || q === "oth" ? "the rest" : meta[0], ink: meta[2] };
-    };
-    const own = topId && iss.own && iss.own[topId] ? iss.own[topId] : null;
-    if (own) {
-      /* as-printed → shares of those naming one of the three parties,
-         the pooled ownership series’ basis (see §5i) */
-      const nm3 = own.alp + own.lnp + own.onp;
-      const o3 = nm3 > 0
-        ? Object.fromEntries(["alp", "lnp", "onp"].map((q) => [q, own[q] * 100 / nm3]))
-        : own;
-      const rows = ["alp", "lnp", "onp"].filter((q) => o3[q] != null).map((q) => rowOf(q, o3));
-      if (rows.length > 1) return { title: tit, rows, cap: "Shares of those naming one of these three, %" };
-    }
-    if (iss.bp) {
-      const rows = ["alp", "lnp", "grn", "onp", "rest"].filter((q) => iss.bp[q] != null).map((q) => rowOf(q, iss.bp));
-      if (rows.length > 1) return { title: tit, rows, cap: "SEC Newgate’s printed best-party figures, %" };
-    }
-    return null;
-  })();
 
   /* how it counts */
   const contest = onM ? "onp" : "lnp";
@@ -1113,7 +1020,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   /* the other polls around it (gen-data §3c), and the gap once this house's
      lean as of the poll is taken out - the gap the margin is about: a
      house's standing lean is no surprise in any one of its polls. Both on
-     the figures as printed (one decimal), so the sentences add up */
+     the figures as printed (one decimal), so the steps add up */
   const yd = rdApYd(p, onM, pub);
   const ydHe = yd && yd.he != null ? rdApR1(yd.he) : null;
   const adj = lean != null && ydHe != null ? rdApR1(lean - ydHe) : null;
@@ -1126,16 +1033,15 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const eff = p.eff && p.eff[effKey];
   const move = (e) => rdApSigned(Math.round((e.hi - e.lo) * 10) / 10);
   const inside = rdApInside(ydHe != null ? adj : lean, moe);
-  const marginTxt = inside ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : "";
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
   const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.fieldPending ? "fieldwork TBC" : p.field} ${yr} – `);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
   /* on the direction facet the rail counts toward the DIRECTION headline
-     instead: same three facts, read off the national-direction series -
-     the other readings around it are the average (gen-data's dir.yd, the
+     instead: same steps, read off the national-direction series - the
+     other readings around it are the average (gen-data's dir.yd, the
      headline's net read at its fieldwork midpoint without it), the house
-     lean is this house's right lean minus its wrong lean then,
-     and the footprint is the wave's share of today's net nowcast (gen-data's
+     lean is this house's right lean minus its wrong lean then, and the
+     footprint is the wave's share of today's net nowcast (gen-data's
      dir.eff). The margin reuses the estimator's pq for a net. */
   const isDir = facet === "direction";
   const dirNow = isDir ? D.directionNow || null : null;
@@ -1150,7 +1056,6 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     return 1.96 * Math.sqrt(pq / (p.sample / rdApDeff()));
   })();
   const insideD = rdApInside(dirHe != null ? dirAdj : dirLean, dirMoe);
-  const marginD = insideD ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : "";
   const dirWay = (v) => (v > 0 ? "right-direction" : "wrong-track");
   const dirHl = isDir && d ? (((D.directionHouseEffects || {}).net || {})[p.pollster] || null) : null;
   /* on the issues facet the rail tells the issues story instead: how the
@@ -1228,10 +1133,8 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
      and every figure printed with the house's own decimal via rdApNum -
      Roy Morgan's table prints halves (NSW One Nation 26.5), so rounding
      them would betray the heading's printed-it promise. Laid out in three
-     columns balanced by row count on a laptop - beside the poll in full it
-     ran a 28-group YouGov wave ~1,400px down against a short How-it-counts
-     column - and one on a phone, where the later columns drop their
-     repeated heads */
+     columns balanced by row count on a laptop and one on a phone, where the
+     later columns drop their repeated heads */
   const isDem = facet === "demographics";
   const demTable = (() => {
     if (!isDem || !p.grp || !p.grp.d) return null;
@@ -1313,9 +1216,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   /* on the confidence facet the rail tells the gauge's own story: what it
      measures, the neutral figure as printed, and whether this release is
      the one today's economic-sentiment panel heads with. The series is the
-     publisher's own (§5j), so there is no aggregate or lean to count toward
-     - and the generic twopp facts (the "no implied figure" line, the house
-     lean) would misread it, so isConf keeps them out below */
+     publisher's own (§5j), so there is no aggregate or lean to count toward */
   const isConf = facet === "confidence";
   const conf = isConf ? p.conf || null : null;
   const confSer = (conf && D.confidence && D.confidence[conf.k]) ? D.confidence[conf.k] : null;
@@ -1329,23 +1230,25 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     nabBusiness: "Business confidence as a net balance – optimistic firms minus pessimistic ones – from NAB’s monthly business survey.",
   };
 
-  /* on the issues facet the poll's every issue leads the opened poll, full
-     width: where voters ranked it among the issues that matter most (where
-     the poll asked), and the four parties' printed best-party shares with
-     the party in front shaded - one table in place of the salience bars and
-     the top-issue block the other facets keep further down. Shares keep the
-     decimal the house printed (Resolve's data prints them), so the row's
-     rounded lead is always the difference a reader can take here */
+  /* on the issues facet the poll's every issue leads the opened poll: where
+     voters ranked it among the issues that matter most (where the poll
+     asked), the share ranking it first where the poll printed that (the
+     figure the other tabs' issues line can't carry), and the four parties'
+     printed best-party shares with the party in front shaded. Shares keep
+     the decimal the house printed (Resolve's data prints them), so the
+     row's rounded lead is always the difference a reader can take here */
+  let issTwo = false;
   const issTable = (() => {
     if (!isIss || !p.iss) return null;
     const iq = p.iss;
     const labels = (D.issues && D.issues.labels) || {};
-    const ranked = (iq.sal && iq.sal.length ? iq.sal : iq.conc || []).map(([lab, v], i) => ({ id: window.ISS_ALIAS[lab] || null, lab, v, rank: i + 1 }));
+    const ranked = (iq.sal && iq.sal.length ? iq.sal : iq.conc || []).map(([lab, v, r1], i) => ({ id: window.ISS_ALIAS[lab] || null, lab, v, r1: r1 != null ? r1 : null, rank: i + 1 }));
     const seen = new Set(ranked.map((r) => r.id).filter(Boolean));
     const ownIds = Object.keys(iq.own || {}).concat(iq.bp && !(iq.own && iq.own.col) ? ["col"] : []);
     const pooled = ((D.issues && D.issues.list) || []).map((x) => x.id);
     const order = pooled.filter((id) => ownIds.includes(id)).concat(ownIds.filter((id) => !pooled.includes(id)));
-    const rows = ranked.concat(order.filter((id) => !seen.has(id)).map((id) => ({ id, lab: labels[id] || id, v: null, rank: null })));
+    const rows = ranked.concat(order.filter((id) => !seen.has(id)).map((id) => ({ id, lab: labels[id] || id, v: null, r1: null, rank: null })));
+    const hasR1 = rows.some((r) => r.r1 != null);
     const ownOf = (r) => (r.id ? window.issOwnOf(p, r.id) : null);
     const unsure = (o) => { const u = ["unsure", "none", "equal"].filter((k) => o && o[k] != null); return u.length ? u.reduce((a, k) => a + +o[k], 0) : null; };
     /* only the columns this poll fills: Resolve offers no Greens (and no One
@@ -1353,14 +1256,15 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => k.id !== "oth" && rows.some((r) => { const o = ownOf(r); return o && o[k.id] != null; }));
     const hasUnsure = rows.some((r) => unsure(ownOf(r)) != null);
     const hasRank = ranked.length > 0;
-    const nNum = (hasRank ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
+    const nNum = (hasRank ? 1 : 0) + (hasR1 ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
     // the column widths live in rd.css (--isr-*); which columns there are, here
-    const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
+    const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], hasR1 ? ["var(--isr-p)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
     // a long list splits in two side by side - only when the figures are few enough to leave each half room for the names
     const parts = rows.length > 9 && nNum <= 4 ? [rows.slice(0, Math.ceil(rows.length / 2)), rows.slice(Math.ceil(rows.length / 2))] : [rows];
+    issTwo = parts.length === 2;
     const ordTxt = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
     const rc = "rd-apd-demr rd-apd-isr" + (hasRank ? " rk" : "");
-    const head = <div className={rc + " rd-apd-demh"} role="row"><span></span>{hasRank && <span role="columnheader">Ranked</span>}{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}{hasUnsure && <span role="columnheader">Unsure</span>}</div>;
+    const head = <div className={rc + " rd-apd-demh"} role="row"><span></span>{hasRank && <span role="columnheader">Ranked</span>}{hasR1 && <span role="columnheader" title="The share ranking it the issue that matters most">First</span>}{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}{hasUnsure && <span role="columnheader">Unsure</span>}</div>;
     return (
       <div className="rd-apd-demwrap">
         <span className="rd-apd-h">Issue by issue</span>
@@ -1377,6 +1281,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
                   <div key={r.lab} className={rc} role="row">
                     <span role="rowheader">{r.lab}</span>
                     {hasRank && <span role="cell" className="rd-apd-dv">{r.rank ? ordTxt(r.rank) + " · " + rdApNum(r.v) : "—"}</span>}
+                    {hasR1 && <span role="cell" className="rd-apd-dv">{r.r1 != null ? rdApNum(r.r1) : "—"}</span>}
                     {cols.map((k) => { const lead = L && !L.level && L.who === k.id; return <span key={k.id} role="cell" className={"rd-apd-dv" + (lead ? " lead" : "")} style={lead ? { "--lead": k.dot } : null}>{o && o[k.id] != null ? rdApNum(o[k.id]) : "—"}</span>; })}
                     {hasUnsure && <span role="cell" className="rd-apd-dv">{rdApNum(u)}</span>}
                   </div>
@@ -1385,412 +1290,690 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             </div>
           ))}
         </div>
-        <span className="rd-apd-sub rd-apd-note">{iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it. "
+        <span className="rd-apd-sub rd-apd-note">{iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it" + (hasR1 ? "; First: the share naming it the one that matters most. " : ". ")
           : iq.conc ? "Ranked: the issue’s place among concerns named without prompting, and the share mentioning it. " : "This poll didn’t ask which issues matter most. "}
           The party columns are each party’s share of all respondents, as printed.{iq.q ? <> The question’s wording: “{iq.q}”{/[.?…]$/.test(iq.q) ? "" : "."}</> : ""} The party in front is shaded.</span>
       </div>
     );
   })();
+  /* the gauge leads its own facet: the figure as printed, its move on the
+     publisher's previous release, and what neutral is on its scale */
+  const confLead = conf && (
+    <section className="rd-ldg-sec" data-sec="confidence">
+      <h4 className="rd-ldg-h">{conf.lab}</h4>
+      <div className="rd-ldg-conf"><b>{confFmt(conf.v)}</b>{conf.chg != null && Math.abs(conf.chg) >= 0.05 ? <span>{", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod}</span> : null}</div>
+      <p className="rd-ldg-foot1">{conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral." : "Index reading – 100 neutral."}{conf.cond != null ? " NAB prints business conditions beside it: " + confFmt(conf.cond) + (conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : "") + "." : ""}</p>
+    </section>
+  );
 
-  /* the movable share of the electorate as THIS wave reads it, each house
-     on its own question: can't-say beside the primaries (first basis), the
-     not-firm share of the decided (soft), the residue a printed two-party
-     pair leaves inside its hundred (tpp), and RedBridge's vote-softness
-     triple read as its not-firm share (gen-data's firmAll) */
-  const decRow = (() => {
-    if (p.undecided != null) {
-      const b = p.undecidedBasis || "first";
-      return {
-        h: p.undecided + "%",
-        w: b === "soft" ? "not firm" : "undecided",
-        s: b === "soft" ? "Named a party, but might yet change their mind"
-          : b === "tpp" ? "Unallocated inside the printed two-party pair"
-          : "Couldn’t name a party when first asked",
-        d: c.und != null ? c.und : null,
-      };
-    }
-    const f = Array.isArray(p.firmAll) && p.firmAll.length === 3 ? p.firmAll : null;
-    if (f) return {
-      h: f[1] + f[2] + "%",
-      w: "not firm",
-      s: `Solid ${f[0]}, soft ${f[1]}, very soft ${f[2]} – from the wave’s own vote-softness table`,
-      d: null,
-    };
-    return null;
-  })();
-
-  return (
-    <div className="rd-apd">
-      {demTable}
-      {issTable}
-      <div className="rd-apd-l poll-detail" data-pollster={p.pollster}>
-        <span className="rd-apd-h">{rdPollHead(p)}</span>
-        {conf && (
-          <div className="rd-apd-grid rd-apd-grid1">
-            <span className="rd-apd-k">{conf.lab}</span>
-            <span className="rd-apd-cell">
-              <span><b>{confFmt(conf.v)}</b>{conf.chg != null && Math.abs(conf.chg) >= 0.05 ? ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod : ""}</span>
-              <span className="rd-apd-sub">{conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral" : "Index reading – 100 neutral"}</span>
-            </span>
-          </div>
-        )}
-        {conf && conf.cond != null && (
-          <div className="rd-apd-grid rd-apd-grid1">
-            <span className="rd-apd-k">Business conditions</span>
-            <span className="rd-apd-cell">
-              <span><b>{confFmt(conf.cond)}</b>{conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : ""}</span>
-              <span className="rd-apd-sub">NAB prints conditions beside confidence</span>
-            </span>
-          </div>
-        )}
-        {prim.length > 0 && (
-          <div className="rd-apd-prim">
-            {prim.map((k) => (
-              <span key={k.id}>
-                <b style={{ color: k.ink }}>{k.lab}</b>
-                <span className="rd-apd-big" style={{ color: k.ink }}>{rdApNum(q[k.id])}</span>
-                <span className="rd-apd-sub">{rdApChg(c[CK[k.id]], 0) || " "}</span>
-              </span>
-            ))}
-          </div>
-        )}
-        {prim.length > 0 && <span className="rd-apd-sub rd-apd-note">Primary vote, %.{prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""}</span>}
-        {hasMatchup && (
-          <div className="rd-apd-grid">
-            <span></span>{cols.map((k) => <span key={k.id} className="rd-apd-th">{k.head}</span>)}
-            <span className="rd-apd-k">Implied, on {rdElecYear} flows</span>{cols.map((k) => <span key={k.id}>{k.imp}</span>)}
-            <span className="rd-apd-k">As {p.pollster} published</span>{cols.map((k) => <span key={k.id}>{k.pub}</span>)}
-            {/* RedBridge/Accent's forced-choice splits: each cohort's pair
-                lands under the column of the rival they were pressed between
-                (Coalition voters → the v One Nation column, One Nation
-                voters → the v Coalition column), so it travels with the matchup
-                basis flip; the other column dashes */}
-            {p.splitCoal != null && <>
-              <span className="rd-apd-k">Coalition voters, if forced to choose</span>
-              {cols.map((k) => <span key={k.id}>{k.id === "onp" ? <>{pair(rdApNum(p.splitCoal), rdApNum(100 - p.splitCoal), "var(--onp-text)")} {chg(c.splitCoal, 0)}</> : none}</span>)}
-            </>}
-            {p.splitOnp != null && <>
-              <span className="rd-apd-k">One Nation voters, if forced to choose</span>
-              {cols.map((k) => <span key={k.id}>{k.id === "lnp" ? <>{pair(rdApNum(p.splitOnp), rdApNum(100 - p.splitOnp), "var(--lnp-text)")} {chg(c.splitOnp, 0)}</> : none}</span>)}
-            </>}
-            {/* Greens and other cohorts were pressed on BOTH questions, so
-                their rows carry a figure in each column */}
-            {(p.splitGrnOn != null || p.splitGrn != null) && <>
-              <span className="rd-apd-k">Greens voters, if forced to choose</span>
-              {cols.map((k) => <span key={k.id}>{k.id === "onp" && p.splitGrnOn != null
-                ? <>{pair(rdApNum(p.splitGrnOn), rdApNum(100 - p.splitGrnOn), "var(--onp-text)")} {chg(c.splitGrnOn, 0)}</>
-                : k.id === "lnp" && p.splitGrn != null
-                ? <>{pair(rdApNum(p.splitGrn), rdApNum(100 - p.splitGrn), "var(--lnp-text)")} {chg(c.splitGrn, 0)}</>
-                : none}</span>)}
-            </>}
-            {(p.splitOthOn != null || p.splitOth != null) && <>
-              <span className="rd-apd-k">Other voters, if forced to choose</span>
-              {cols.map((k) => <span key={k.id}>{k.id === "onp" && p.splitOthOn != null
-                ? <>{pair(rdApNum(p.splitOthOn), rdApNum(100 - p.splitOthOn), "var(--onp-text)")} {chg(c.splitOthOn, 0)}</>
-                : k.id === "lnp" && p.splitOth != null
-                ? <>{pair(rdApNum(p.splitOth), rdApNum(100 - p.splitOth), "var(--lnp-text)")} {chg(c.splitOth, 0)}</>
-                : none}</span>)}
-            </>}
-            {(ppmBy.onp || ppmBy.lnp) && <>
-              <span className="rd-apd-k">{window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"}</span>
-              {cols.map((k) => <span key={k.id}>{ppmBy[k.id] || none}</span>)}
-            </>}
-            {setThree && <>
-              <span className="rd-apd-k">{(window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister") + ", three‑way"}</span>
-              <span style={{ gridColumn: "2 / -1" }}>{ppmCell(setThree)}</span>
-            </>}
-          </div>
-        )}
-        {p.splitCoalEst && <span className="rd-apd-sub rd-apd-note">The Coalition-voters split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed).</span>}
-        {!isConf && decRow && (
-          <div className="rd-apd-grid rd-apd-grid1">
-            <span className="rd-apd-k">Decidedness</span>
-            <span className="rd-apd-cell">
-              <span><b>{decRow.h}</b> {decRow.w} {chg(decRow.d, 1)}</span>
-              <span className="rd-apd-sub">{decRow.s}</span>
-            </span>
-          </div>
-        )}
-        {leaders.length > 0 && (
-          <div className="rd-apd-grid rd-apd-grid1">
-            <span className="rd-apd-k">{allFav ? "Net favourability" : "Net approval"}</span>
-            <span className="rd-apd-leaders">
-              {leaders.map(([id, nk, name]) => {
-                const L = a[id] || null;
-                const fav = mb[id] === "fav";
-                return (
-                  <span key={id} className="rd-apd-cell">
-                    <span>{name} <b style={{ color: INK[id] }}>{rdSigned(a[nk], 0)}</b> {chg(c[nk], 0)}</span>
-                    {L && L.app != null ? <span className="rd-apd-sub">{L.app} {fav ? "favourable" : "approve"}, {L.dis} {fav ? "unfavourable" : "disapprove"}</span>
-                      : fav && !allFav ? <span className="rd-apd-sub">favourability</span> : null}
-                  </span>
-                );
-              })}
-            </span>
-          </div>
-        )}
-        {d && (
-          <div className="rd-apd-grid rd-apd-grid1">
-            <span className="rd-apd-k">The country is heading</span>
-            <span className="rd-apd-cell"><span>In the right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, on the wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</span></span>
-          </div>
-        )}
-        {!isIss && p.iss && (p.iss.sal || []).length > 0 && (
-          <div className="rd-apd-grid rd-apd-grid1 rd-apd-iss">
-            <span className="rd-apd-k">The issues voters name</span>
-            <span className="rd-apd-cell rd-apd-isslist">
-              {p.iss.sal.map(([label, v, r1]) => (
-                <span key={label} className="rd-apd-issrow">
-                  <span className="rd-apd-isslab">{label}</span>
-                  <span className="rd-apd-issbar" aria-hidden="true"><i style={{ width: Math.min(100, v) + "%" }}></i></span>
-                  <b>{rdApNum(v)}</b>
-                  {r1 != null && <span className="rd-apd-sub">{rdApNum(r1)} rank it first of all</span>}
-                </span>
-              ))}
-            </span>
-          </div>
-        )}
-        {!isIss && p.iss && (p.iss.sal || []).length > 0 && <span className="rd-apd-sub rd-apd-note">Share naming each issue in the three that matter most, %.{prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""}</span>}
-        {!isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && (
-          <div className="rd-apd-grid rd-apd-grid1 rd-apd-iss">
-            <span className="rd-apd-k">Named without prompting</span>
-            <span className="rd-apd-cell rd-apd-isslist">
-              {p.iss.conc.map(([label, v]) => (
-                <span key={label} className="rd-apd-issrow">
-                  <span className="rd-apd-isslab">{label}</span>
-                  <span className="rd-apd-issbar" aria-hidden="true"><i style={{ width: Math.min(100, v) + "%" }}></i></span>
-                  <b>{rdApNum(v)}</b>
-                </span>
-              ))}
-            </span>
-          </div>
-        )}
-        {!isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && <span className="rd-apd-sub rd-apd-note">Shares of any mentions, not a forced pick – these can’t sit beside the top-three numbers.</span>}
-        {!isIss && p.iss && issBestBlock && (
-          <div className="rd-apd-grid rd-apd-grid1 rd-apd-iss">
-            <span className="rd-apd-k">Rated best on {issBestBlock.title}</span>
-            <span className="rd-apd-cell rd-apd-isslist">
-              {issBestBlock.rows.map((r) => (
-                <span key={r.k} className="rd-apd-issrow">
-                  <span className="rd-apd-isslab" style={r.ink ? { color: r.ink } : null}>{r.lab}</span>
-                  <span className="rd-apd-issbar" aria-hidden="true"><i style={{ width: Math.min(100, r.v) + "%", background: r.ink || undefined }}></i></span>
-                  <b>{rdApNum(r.v)}</b>
-                </span>
-              ))}
-            </span>
-          </div>
-        )}
-        {!isIss && p.iss && issBestBlock && <span className="rd-apd-sub rd-apd-note">{issBestBlock.cap}</span>}
-        {seats.length > 0 && (
-          <div className="rd-apd-grid rd-apd-grid1">
-            <span className="rd-apd-k">Seats, modelled</span>
-            <span className="rd-apd-cell"><span>{seats.map((k, i) => { const s = p.seats.p[k.id]; return <React.Fragment key={k.id}>{i > 0 ? ", " : ""}{k.lab} <b style={{ color: k.ink }}>{s.est != null ? s.est : s.lo + "–" + s.hi}</b>{s.note ? " (" + s.note + ")" : ""}</React.Fragment>; })}</span></span>
-          </div>
-        )}
-        {seats.length > 0 && p.seats.rangeOnly && p.seats.method && <span className="rd-apd-sub rd-apd-note">Modelled range – {p.seats.method}.</span>}
-        <div className="rd-apd-links">
-          {/* the poll's sources take a line of their own, so a wrap never strands
-              one of them among the actions after it */}
-          {p.links && p.links.length > 0 && <span className="rd-apd-srcs">{rdPollLinks(p.links)}</span>}
-          <a className="rd-link" href={report} onClick={(e) => e.stopPropagation()}>Report an error</a>
-          {onBack && <button type="button" className="rd-link" onClick={(e) => { e.stopPropagation(); onBack(); }}>Back to {backLabel || "the chart"}</button>}
-        </div>
+  /* ---- How it counts. Where the facts are arithmetic (2PP, Leadership,
+     Direction) they read as a reckoning: one row a step, signed as the
+     table's own Lean and House lean columns are (+ toward Labor, toward
+     Albanese, toward right-direction), so the sum checks down the column.
+     Primary has its own (RdApPrimRail); Issues, Demographics and
+     Confidence explain rather than count, so they keep their sentences */
+  const rk = (lab, v, words, ink) => (
+    <tr key={lab}><th scope="row">{lab}</th><td className="num"><b style={ink ? { color: ink } : null}>{v}</b></td><td>{words}</td></tr>
+  );
+  const r1s = (v) => (v == null ? "—" : rdApSigned(v));
+  const outside = p.noAgg ? <p className="rd-ldg-noagg"><b>Outside the aggregates.</b> {p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates."}</p> : null;
+  /* the single-territory readings the wave also carries (sentence built
+     beside sampleValue so every band voices it the one way) */
+  const solo = p.solo && window.soloNote ? <div className="rd-apd-facts"><span className="rd-apd-k">Territory readings</span><span>{window.soloNote(p)}</span></div> : null;
+  const tppReckon = fig.a != null && (
+    <table className="rd-ldg-t rd-ldg-rk"><tbody>
+      {rk("This poll", fig.a.toFixed(1), "Labor v " + (onM ? "One Nation" : "Coalition") + (pub ? ", published" : ", implied"))}
+      {yd ? rk(RD_AP_KAL ? "The trend" : "Polls around it", yd.v.toFixed(1), RD_AP_KAL ? "the other polls’ trend" : (yd.n === 1 ? "one other poll" : rdNumWord(yd.n) + " others") + ", within three weeks")
+          : rk("Polls around it", "—", "none fielded within three weeks, so nothing to set it against")}
+      {yd && lean != null && rk("Lean", r1s(lean), (Math.abs(lean) < 0.05 ? "level with them" : sideOf(lean) + " way") + (ydHe == null && inside ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""), rdApLeanInk(lean, onM))}
+      {rk("House lean", ydHe != null ? r1s(ydHe) : hl != null ? r1s(rdApR1(hl)) : "—",
+          ydHe != null || hl != null ? "taken out before averaging" : "not measured yet: too few polls", rdApLeanInk(ydHe != null ? ydHe : hl, onM))}
+      {ydHe != null && lean != null && Math.abs(ydHe) >= 0.05 && rk("Less house lean", r1s(adj), inside ? inside[0].toUpperCase() + inside.slice(1) + " its ±" + moe.toFixed(1) + " margin" : (Math.abs(adj) < 0.05 ? "level" : sideOf(adj) + " way"), rdApLeanInk(adj, onM))}
+      {today && !p.noAgg && rk("In today’s " + today.a.toFixed(1), eff && eff.w ? move(eff) : eff && eff.t ? move(eff.t) : "—",
+          eff && eff.w ? "how far it moves it, as one of " + rdNumWord(winN)
+            : eff && eff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only")}
+    </tbody></table>
+  );
+  const ldReckon = ldOwn.length > 0 && (
+    <table className="rd-ldg-t rd-ldg-rk rd-ldg-rk2"><thead><tr><th></th>{ldOwn.map((pr) => <th key={pr.riv} className="num">v {pr.name}</th>)}<th></th></tr></thead><tbody>
+      <tr><th scope="row">This poll</th>{ldOwn.map((pr) => <td key={pr.riv} className="num"><b>{r1s(rdApR1(pr.gap))}</b></td>)}<td>{rdApPm(p.appr)}’s net minus each rival’s</td></tr>
+      {ldCmp.some(Boolean) && <>
+        <tr><th scope="row">Polls around it</th>{ldCmp.map((c, i) => <td key={i} className="num"><b>{c ? r1s(c.og) : "—"}</b></td>)}<td>the same gap elsewhere</td></tr>
+        <tr><th scope="row">Lean</th>{ldCmp.map((c, i) => <td key={i} className="num"><b>{c ? r1s(c.delta) : "—"}</b></td>)}<td>+ is {rdApPm(p.appr)}’s way</td></tr>
+        <tr><th scope="row">House lean</th>{ldCmp.map((c, i) => <td key={i} className="num"><b>{c ? r1s(c.he) : "—"}</b></td>)}<td>taken out before averaging</td></tr>
+        <tr><th scope="row">Less house lean</th>{ldCmp.map((c, i) => <td key={i} className="num"><b>{c ? r1s(c.adj) : "—"}</b></td>)}<td></td></tr>
+      </>}
+      {!ldCmp.some(Boolean) && ldLean.filter(Boolean).length > 0 && <tr><th scope="row">House lean</th>{ldOwn.map((pr, i) => { const l = ldLean[i]; return <td key={pr.riv} className="num"><b>{l ? r1s(rdApR1(l.v)) : "—"}</b></td>; })}<td>its usual lean on the gap</td></tr>}
+      {ldNow.filter(Boolean).length > 0 && <tr><th scope="row">Now</th>{ldNow.map((n, i) => <td key={i} className="num"><b>{n ? r1s(rdApR1(n.gap)) : "—"}</b></td>)}<td>today’s figures{ldOwn.some((pr) => pr.met === "fav") ? ", each on its own question" : ""}</td></tr>}
+    </tbody></table>
+  );
+  const dirReckon = d && (
+    <table className="rd-ldg-t rd-ldg-rk"><tbody>
+      {rk("This reading", r1s(d.net), "right direction minus wrong track")}
+      {dYd ? rk("Readings around it", r1s(rdApR1(dYd.v)), (dYd.n === 1 ? "one other reading" : rdNumWord(dYd.n) + " others") + ", within three weeks")
+           : rk("Readings around it", "—", "none taken within three weeks")}
+      {dirLean != null && rk("Lean", r1s(dirLean), (Math.abs(dirLean) < 0.05 ? "level with them" : "more " + dirWay(dirLean)) + (dirHe == null && insideD ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : ""), dirLean > 0 ? "var(--mood-pos)" : dirLean < 0 ? "var(--mood-neg)" : null)}
+      {rk("House lean", dirHe != null ? r1s(dirHe) : dirHl ? r1s(rdApR1(dirHl.v)) : "—", dirHe != null || dirHl ? "taken out before averaging" : "not measured yet: too few readings")}
+      {dirHe != null && Math.abs(dirHe) >= 0.05 && dirAdj != null && rk("Less house lean", r1s(dirAdj), insideD ? insideD[0].toUpperCase() + insideD.slice(1) + " its ±" + dirMoe.toFixed(1) + " margin" : (Math.abs(dirAdj) < 0.05 ? "level" : "more " + dirWay(dirAdj)), dirAdj > 0 ? "var(--mood-pos)" : dirAdj < 0 ? "var(--mood-neg)" : null)}
+      {dirNow && rk("In today’s " + rdApSigned(dirNow.net), dEff && dEff.w ? move(dEff) : dEff && dEff.t ? move(dEff.t) : "—",
+          dEff && dEff.w ? "how far it moves it, as one of " + rdNumWord(dirNow.n) : dEff && dEff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only")}
+    </tbody></table>
+  );
+  const since = D.monthNameFull(Number(from.slice(5)));
+  let railBody;
+  if (isConf) {
+    railBody = conf && <>
+      {confSer && <>
+        <span className="rd-apd-ct">{p.pollster}’s {conf.lab} releases since {since}, as published — no average; the gauge is the publisher’s own series</span>
+        <RdApConfMini p={p} />
+      </>}
+      <div className="rd-apd-facts">
+        <span className="rd-apd-k">The gauge</span>
+        <span>{CONF_BLURB[conf.k] || conf.lab + "."}</span>
+        <span className="rd-apd-k">Neutral</span>
+        <span>{conf.vs === 0
+          ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. It enters the confidence panel’s 40–120 meter shifted up 100, beside the index gauges.</>
+          : <>An index print – 100 is neutral; above it optimists outnumber pessimists{confPeriod === "week" ? ", read weekly" : ""}.</>}</span>
+        <span className="rd-apd-k">In today’s panel</span>
+        <span>{confSer && confSer.latest && confSer.latest.released === p.released
+          ? <>This is the latest {conf.lab} release, so the economic-sentiment panel reads the gauge at it.</>
+          : confSer && confSer.latest
+            ? <>The panel’s current read of this gauge is the {outLabel(confSer.latest)} release at {confFmt(confSer.latest.v)}{confSer.latest.url ? <>, <a className="rd-link" href={confSer.latest.url} onClick={(e) => e.stopPropagation()}>its source<span className="rd-apd-ext" aria-hidden="true">↗</span></a></> : ""}.</>
+            : <>The gauge’s series carries no published releases to panel against.</>}</span>
       </div>
-      <div className="rd-apd-r">
-        <span className="rd-apd-h">{isConf ? "How it reads" : "How it counts"}</span>
-        {!isDir && !isIss && !isLd && !isDem && !isConf && fig.a != null && (
-          <>
-            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the {RD_AP_AVG}, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
-            <RdApMini p={p} onM={onM} pub={pub} />
-          </>
-        )}
-        {isLd && ldOwn.length > 0 && ldWin && ldWin.waves.length > 0 && (
-          <>
-            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the average – {ldBoth
-              ? <button type="button" className="rd-apd-met"
-                        aria-label={"Showing " + rdApLdMetWord(ldAct) + ". Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
-                        title={"Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
-                        onClick={(e) => { e.stopPropagation(); setLdMet(ldAct === "fav" ? "approval" : "fav"); }}>{rdApLdMetWord(ldAct)}</button>
-              : ldWord}, {rdApPmOffice()} minus {rdApLdJoin(ldNames)}</span>
-            <RdApLdMini p={p} met={ldAct} />
-          </>
-        )}
-        {isDir && d && (
-          <>
-            <span className="rd-apd-ct">{p.pollster}’s readings since {D.monthNameFull(Number(from.slice(5)))} against the average, net right direction minus wrong track</span>
-            <RdApDirMini p={p} />
-          </>
-        )}
-        {isIss && D.issues && iss && iss.own && iss.own[iss.top] && (() => {
-          const cLab = (D.issues.labels && D.issues.labels[iss.top]) || iss.top;
-          // sentence case mid-sentence, user call 2026-10-03 (the "Rated best on"
-          // key case): the labels bank ships leading-capped, drop only the first letter
-          const cTit = cLab.charAt(0).toLowerCase() + cLab.slice(1);
-          return (
-            <>
-              <span className="rd-apd-ct">Who voters rate best on {cTit} since {D.monthNameFull(Number(from.slice(5)))}, the monthly pooled line and this wave’s own figures on the same basis — shares of those naming one of the three parties</span>
-              <RdApIssMini p={p} />
-            </>
-          );
-        })()}
-        {isConf && conf && confSer && (
-          <>
-            <span className="rd-apd-ct">{p.pollster}’s {conf.lab} releases since {D.monthNameFull(Number(from.slice(5)))}, as published — no average; the gauge is the publisher’s own series</span>
-            <RdApConfMini p={p} />
-          </>
-        )}
-        <div className="rd-apd-facts">
-          {demFacts}
-          {isConf && conf && <>
-            <span className="rd-apd-k">The gauge</span>
-            <span>{CONF_BLURB[conf.k] || conf.lab + "."}</span>
-            <span className="rd-apd-k">Neutral</span>
-            <span>{conf.vs === 0
-              ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. It enters the confidence panel’s 40–120 meter shifted up 100, beside the index gauges.</>
-              : <>An index print – 100 is neutral; above it optimists outnumber pessimists{confPeriod === "week" ? ", read weekly" : ""}.</>}</span>
-            <span className="rd-apd-k">In today’s panel</span>
-            <span>{confSer && confSer.latest && confSer.latest.released === p.released
-              ? <>This is the latest {conf.lab} release, so the economic-sentiment panel reads the gauge at it.</>
-              : confSer && confSer.latest
-                ? <>The panel’s current read of this gauge is the {outLabel(confSer.latest)} release at {confFmt(confSer.latest.v)}{confSer.latest.url ? <>, <a className="rd-link" href={confSer.latest.url} onClick={(e) => e.stopPropagation()}>its source<span className="rd-apd-ext" aria-hidden="true">↗</span></a></> : ""}.</>
-                : <>The gauge’s series carries no published releases to panel against.</>}</span>
-          </>}
-          {isIss && iss && <>
-            <span className="rd-apd-k">Asked</span>
-            <span>{issPrompted
-              ? <>Voters picked the three issues that matter most{iss.q ? <> – {p.pollster}’s wording: “{iss.q}”</> : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : ""}. SEC Newgate’s mentions count can’t sit in the same series, so each house’s wording is pooled against its pair first.</>
-              : iss.conc
-                ? <>SEC Newgate asks what concerns Australians, unprompted – anyone can name anything, so the shares are any-mentions, not forced picks. That reading can’t mix with the top-three series the issues panel pools, so it isn’t counted toward it.</>
-                : <>{p.pollster} asked only who’d be best on each issue{iss.q ? <> – its wording: “{iss.q}” –</> : ","} not which issues matter most, so this wave feeds the pooled best-party line and there’s no top-three list for it to join.</>}</span>
-            {issPair != null && <>
-              <span className="rd-apd-k">Between the question forms</span>
-              <span>RedBridge’s and Ipsos’s wordings for what matters sit a measured <b>{Math.abs(issPair).toFixed(1)}</b> points apart on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}; this wave’s reading was moved half that gap toward the other house’s before it entered any average.</span>
-            </>}
-            {issLeadMeta && <>
-              <span className="rd-apd-k">{rdApBreakable(p.pollster)}’s house lean</span>
-              <span>{issPlus.lean == null ? "None to speak of: its figures sit level with the other pollsters’"
-                : <>About <b>{Math.abs(issPlus.lean).toFixed(1)}</b> {issPlus.lean > 0 ? "richer" : "poorer"} for {issLeadMeta[0]} on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}, taken out before the figures are pooled</>}</span>
-            </>}
-            {issPlus && D.issues.window && <>
-              <span className="rd-apd-k">In today’s panel</span>
-              <span>{issPlus.w
-                ? <>One of the waves the issues panel’s current figures draw on (the last {D.issues.window}).</>
-                : <>Outside the {D.issues.window} the panel’s current figures draw on.</>}</span>
-            </>}
-          </>}
-          {isDir && d && <>
-            <span className="rd-apd-k">Against the readings around it</span>
-            <span>{dirLean == null
-              ? "No other reading was taken within three weeks of it, so there’s nothing to set it against."
-              : <>{Math.abs(dirLean) < 0.05 ? "Level with " : <><b style={{ color: dirLean > 0 ? "var(--mood-pos)" : "var(--mood-neg)" }}>{Math.abs(dirLean).toFixed(1)}</b> more {dirWay(dirLean)} than </>}
-                  {dYd.n === 1 ? "the one other reading taken within three weeks of it, a net of " : "the " + rdNumWord(dYd.n) + " other readings taken within three weeks of it, which average a net of "}{rdApSigned(dYd.v)}{dirHe == null ? marginD : ""}</>}</span>
-            <span className="rd-apd-k">{rdApBreakable(p.pollster)}’s house lean</span>
-            <span>{dirHe != null
-              ? (Math.abs(dirHe) < 0.05
-                ? <>None to speak of, so the gap above is this reading’s own{marginD}</>
-                : <><b>{Math.abs(dirHe).toFixed(1)}</b> more {dirWay(dirHe)}, taken out before the readings are averaged. Taken out here, it leaves this reading {Math.abs(dirAdj) < 0.05 ? "level with the others"
-                    : <><b style={{ color: dirAdj > 0 ? "var(--mood-pos)" : "var(--mood-neg)" }}>{Math.abs(dirAdj).toFixed(1)}</b> more {dirWay(dirAdj)} than the others</>}{marginD}</>)
-              : dirHl == null ? "Not measured yet: too few readings on the series"
-              : Math.abs(dirHl.v) < 0.05 ? "None to speak of: its readings sit level with the other pollsters’"
-              : <><b>{Math.abs(dirHl.v).toFixed(1)}</b> more {dirHl.v > 0 ? "right-direction" : "wrong-track"}, taken out before the readings are averaged</>}</span>
-            {dirNow && <>
-              <span className="rd-apd-k">In today’s {rdApSigned(dirNow.net)} net</span>
-              <span>{dEff && dEff.w
-                ? <>One of the {rdNumWord(dirNow.n)} readings it’s built from; this one moves it <b>{move(dEff)}</b></>
-                : dEff && dEff.t
-                  ? <>Not one of them: today’s figure uses the last three weeks of readings. When it came out, it moved the figure <b>{move(dEff.t)}</b></>
-                  : <>Not one of them: today’s figure uses the last three weeks of readings</>}</span>
-            </>}
-          </>}
-          {isDir && !d && <>
-            <span className="rd-apd-k">National direction</span>
-            <span>{p.pollster} didn’t ask the direction question in this poll, so there’s no reading to set against the direction figures.</span>
-          </>}
-          {isLd && ldOwn.length > 0 && <>
-            <span className="rd-apd-k">The gap in this poll</span>
-            <span>{ldOwn.map((pr, i) => (
-              <React.Fragment key={pr.riv}>{i > 0 ? "; " : ""}against {pr.name}, <b>{Math.abs(pr.gap) < 0.05 ? "level" : Math.abs(pr.gap).toFixed(1) + " points " + rdApLdWay(pr.gap, pr.name, rdApPm(p.appr))}</b> ({rdApPm(p.appr)}{" "}{rdApSigned(p.appr.albNet)}, {pr.name} {rdApSigned(pr.net)}) on {rdApLdMetWord(pr.met)}</React.Fragment>
-            ))}</span>
-            {ldCmp.some(Boolean) && <>
-              <span className="rd-apd-k">Against the polls around it</span>
-              <span>{ldCmp.filter(Boolean).map((c, i) => (
-                <React.Fragment key={c.riv}>{i > 0 ? "; against " + c.name + ", " : ""}the other polls fielded around it put the gap at <b>{rdApSigned(c.og)}</b>, so this poll reads {Math.abs(c.delta) < 0.05 ? "level with them" : <><b>{Math.abs(c.delta).toFixed(1)}</b> further {rdApLdWay(c.delta, c.name, rdApPm(p.appr))}</>}</React.Fragment>
-              ))}</span>
-            </>}
-            <span className="rd-apd-k">{rdApBreakable(p.pollster)}’s house lean</span>
-            <span>{ldCmp.some(Boolean)
-              ? <>{ldCmp.filter(Boolean).map((c, i) => (
-                  <React.Fragment key={c.riv}>{i > 0 ? "; on the gap against " + c.name + ", " : ""}{Math.abs(c.he) < 0.05 ? "none to speak of on the gap against " + c.name : <>about <b>{Math.abs(c.he).toFixed(1)}</b> points {c.he > 0 ? (window.JUR ? rdApPmOffice() + "’s" : "Albanese’s") : c.name + "’s"} way</>}</React.Fragment>
-                ))}, taken out before its figures are averaged with the rest.
-                {ldCmp.some((c) => c && Math.abs(c.he) >= 0.05) && <> Taken out here, it leaves this poll {ldCmp.filter(Boolean).map((c, i) => (
-                  <React.Fragment key={c.riv}>{i > 0 ? "; against " + c.name + ", " : ""}{Math.abs(c.adj) < 0.05 ? "level with the others" : <><b>{Math.abs(c.adj).toFixed(1)}</b> further {rdApLdWay(c.adj, c.name, rdApPm(p.appr))} than the others</>}</React.Fragment>
-                ))}.</>}</>
-              : ldLean.filter(Boolean).length
-              ? <>{ldLean.filter(Boolean).map((l, i) => (
-                  <React.Fragment key={l.name}>{i > 0 ? "; on the gap against " + l.name + ", " : ""}{Math.abs(l.v) < 0.05 ? "level with the other pollsters on the gap against " + l.name : <>about <b>{Math.abs(l.v).toFixed(1)}</b> points {l.v > 0 ? (window.JUR ? rdApPmOffice() + "’s" : "Albanese’s") : l.name + "’s"} way</>}</React.Fragment>
-                ))}, taken out before its figures are averaged with the rest</>
-              : "Not measured yet: too few readings on the series"}</span>
-            {ldNow.filter(Boolean).length > 0 && <>
-              <span className="rd-apd-k">Now</span>
-              <span>{ldNow.filter(Boolean).map((n, i) => (
-                <React.Fragment key={n.name}>{i > 0 ? "; against " + n.name + ", " : ""}<b>{Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name, rdApPmNow())}</b> ({rdApPmNow()}{" "}{rdApSigned(n.a)}, {n.name} {rdApSigned(n.o)}) on {rdApLdMetWord(n.met)}</React.Fragment>
-              ))}{ldOwn.some((pr) => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""}</span>
-            </>}
-          </>}
-          {isLd && !ldOwn.length && <>
-            <span className="rd-apd-k">Leader ratings</span>
-            <span>{p.pollster} didn’t ask {rdApPm(p.appr)} and {p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader"} on the same question in this poll, so there’s no net-approval gap to set against the leadership figures.</span>
-          </>}
-          {!isDir && !isIss && !isLd && !isDem && !isConf && <>
-          {p.noAgg && <>
-            <span className="rd-apd-k">In the aggregates</span>
-            <span>{p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates."}</span>
-          </>}
-          {/* the single-territory readings the wave also carries (sentence
-              built beside sampleValue so every band voices it the one way) */}
-          {p.solo && window.soloNote && <>
-            <span className="rd-apd-k">Territory readings</span>
-            <span>{window.soloNote(p)}</span>
-          </>}
-          {fig.a != null && <>
-            <span className="rd-apd-k">{RD_AP_KAL ? "Against the trend" : "Against the polls around it"}</span>
-            <span>{lean == null || !yd
-              ? "No other poll was fielded within three weeks of it, so there’s nothing to set it against."
-              : <>{Math.abs(lean) < 0.05 ? "Level with " : <><b style={{ color: rdApLeanInk(lean, onM) }}>{Math.abs(lean).toFixed(1)}</b> more {sideOf(lean)} way than </>}
-                  {RD_AP_KAL ? "the trend through the other polls, at " + yd.v.toFixed(1)
-                    : yd.n === 1 ? "the one other poll fielded within three weeks of it, at " + yd.v.toFixed(1)
-                    : "the " + rdNumWord(yd.n) + " other polls fielded within three weeks of it, which average " + yd.v.toFixed(1)}
-                  {ydHe == null ? marginTxt : ""}</>}</span>
-          </>}
-          {fig.a != null && moe != null && <>
-            <span className="rd-apd-k">Margin of error</span>
-            <span>±{moe.toFixed(1)} on its {pub ? "published" : "implied"} two-party figure, at 95%, {rdMarginBasis(p)}</span>
-          </>}
-          {fig.a == null && <>
-            <span className="rd-apd-k">Two-party</span>
-            <span>{fig.none[0].toUpperCase() + fig.none.slice(1)}, so this poll has no {pub ? "published" : "implied"} figure to set against the other polls.</span>
-          </>}
+    </>;
+  } else if (isDem) {
+    railBody = demFacts && <div className="rd-apd-facts">{demFacts}</div>;
+  } else if (isIss) {
+    railBody = iss && <>
+      {D.issues && iss.own && iss.own[iss.top] && (() => {
+        const cLab = (D.issues.labels && D.issues.labels[iss.top]) || iss.top;
+        // sentence case mid-sentence, user call 2026-10-03 (the "Rated best on"
+        // key case): the labels bank ships leading-capped, drop only the first letter
+        const cTit = cLab.charAt(0).toLowerCase() + cLab.slice(1);
+        return <>
+          <span className="rd-apd-ct">Who voters rate best on {cTit} since {since}, the monthly pooled line and this wave’s own figures on the same basis — shares of those naming one of the three parties</span>
+          <RdApIssMini p={p} />
+        </>;
+      })()}
+      <div className="rd-apd-facts">
+        <span className="rd-apd-k">Asked</span>
+        <span>{issPrompted
+          ? <>Voters picked the three issues that matter most{iss.q ? <> – {p.pollster}’s wording: “{iss.q}”</> : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : ""}. SEC Newgate’s mentions count can’t sit in the same series, so each house’s wording is pooled against its pair first.</>
+          : iss.conc
+            ? <>SEC Newgate asks what concerns Australians, unprompted – anyone can name anything, so the shares are any-mentions, not forced picks. That reading can’t mix with the top-three series the issues panel pools, so it isn’t counted toward it.</>
+            : <>{p.pollster} asked only who’d be best on each issue{iss.q ? <> – its wording: “{iss.q}” –</> : ","} not which issues matter most, so this wave feeds the pooled best-party line and there’s no top-three list for it to join.</>}</span>
+        {issPair != null && <>
+          <span className="rd-apd-k">Between the question forms</span>
+          <span>RedBridge’s and Ipsos’s wordings for what matters sit a measured <b>{Math.abs(issPair).toFixed(1)}</b> points apart on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}; this wave’s reading was moved half that gap toward the other house’s before it entered any average.</span>
+        </>}
+        {issLeadMeta && <>
           <span className="rd-apd-k">{rdApBreakable(p.pollster)}’s house lean</span>
-          <span>{ydHe != null && lean != null
-            ? (Math.abs(ydHe) < 0.05
-              ? <>None to speak of, so the gap above is this poll’s own{marginTxt}</>
-              : <><b>{Math.abs(ydHe).toFixed(1)}</b> to {ydHe > 0 ? "Labor" : onM ? "One Nation" : "the Coalition"}, taken out before the polls are averaged. Taken out here, it leaves this poll {Math.abs(adj) < 0.05 ? "level with the others"
-                  : <><b style={{ color: rdApLeanInk(adj, onM) }}>{Math.abs(adj).toFixed(1)}</b> more {sideOf(adj)} way than the others</>}{marginTxt}</>)
-            : hl == null ? "Not measured yet: too few polls on this contest"
-            : Math.abs(hl) < 0.05 ? "None to speak of: it sits level with the other pollsters"
-            : <><b>{Math.abs(hl).toFixed(1)}</b> to {hl > 0 ? "Labor" : onM ? "One Nation" : "the Coalition"}, taken out before the polls are averaged</>}</span>
-          {today && <>
-            <span className="rd-apd-k">In today’s {today.a.toFixed(1)}</span>
-            <span>{eff && eff.w
-              ? <>One of the {rdNumWord(winN)} polls {RD_AP_KAL ? "the trend is" : "it’s"} built from; this one moves it <b>{move(eff)}</b></>
-              : eff && eff.t
-                ? <>Not one of them: today’s figure uses the last three weeks of polls. When it came out, it moved the figure <b>{move(eff.t)}</b></>
-                : <>Not one of them: today’s figure uses the last three weeks of polls</>}</span>
-          </>}
-          </>}
-        </div>
+          <span>{issPlus.lean == null ? "None to speak of: its figures sit level with the other pollsters’"
+            : <>About <b>{Math.abs(issPlus.lean).toFixed(1)}</b> {issPlus.lean > 0 ? "richer" : "poorer"} for {issLeadMeta[0]} on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}, taken out before the figures are pooled</>}</span>
+        </>}
+        {issPlus && D.issues.window && <>
+          <span className="rd-apd-k">In today’s panel</span>
+          <span>{issPlus.w
+            ? <>One of the waves the issues panel’s current figures draw on (the last {D.issues.window}).</>
+            : <>Outside the {D.issues.window} the panel’s current figures draw on.</>}</span>
+        </>}
+      </div>
+    </>;
+  } else if (isLd) {
+    railBody = ldOwn.length ? <>
+      {ldWin && ldWin.waves.length > 0 && <>
+        <span className="rd-apd-ct">{p.pollster}’s polls since {since} against the average – {ldBoth
+          ? <button type="button" className="rd-apd-met"
+                    aria-label={"Showing " + rdApLdMetWord(ldAct) + ". Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
+                    title={"Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
+                    onClick={(e) => { e.stopPropagation(); setLdMet(ldAct === "fav" ? "approval" : "fav"); }}>{rdApLdMetWord(ldAct)}</button>
+          : ldWord}, {rdApPmOffice()} minus {rdApLdJoin(ldNames)}</span>
+        <RdApLdMini p={p} met={ldAct} />
+      </>}
+      {ldReckon}
+    </> : <div className="rd-apd-facts">
+      <span className="rd-apd-k">Leader ratings</span>
+      <span>{p.pollster} didn’t ask {rdApPm(p.appr)} and {p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader"} on the same question in this poll, so there’s no net-approval gap to set against the leadership figures.</span>
+    </div>;
+  } else if (isDir) {
+    railBody = d ? <>
+      <span className="rd-apd-ct">{p.pollster}’s readings since {since} against the average, net right direction minus wrong track</span>
+      <RdApDirMini p={p} />
+      {dirReckon}
+    </> : <div className="rd-apd-facts">
+      <span className="rd-apd-k">National direction</span>
+      <span>{p.pollster} didn’t ask the direction question in this poll, so there’s no reading to set against the direction figures.</span>
+    </div>;
+  } else if (facet === "primary" && p.pyd) {
+    railBody = <>{outside}<RdApPrimRail p={p} />{solo}</>;
+  } else {
+    railBody = fig.a != null ? <>
+      <span className="rd-apd-ct">{p.pollster}’s polls since {since} against the {RD_AP_AVG}, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
+      <RdApMini p={p} onM={onM} pub={pub} />
+      {outside}
+      {tppReckon}
+      {solo}
+    </> : <>
+      {outside}
+      <div className="rd-apd-facts">
+        {p.solo && window.soloNote && <><span className="rd-apd-k">Territory readings</span><span>{window.soloNote(p)}</span></>}
+        <span className="rd-apd-k">Two-party</span>
+        <span>{fig.none[0].toUpperCase() + fig.none.slice(1)}, so this poll has no {pub ? "published" : "implied"} figure to set against the other polls.</span>
+        <span className="rd-apd-k">{rdApBreakable(p.pollster)}’s house lean</span>
+        <span>{hl == null ? "Not measured yet: too few polls on this contest"
+          : Math.abs(hl) < 0.05 ? "None to speak of: it sits level with the other pollsters"
+          : <><b>{Math.abs(hl).toFixed(1)}</b> to {hl > 0 ? "Labor" : onM ? "One Nation" : "the Coalition"}, taken out before the polls are averaged</>}</span>
+      </div>
+    </>;
+  }
+  const rail = (
+    <div className="rd-apd-r">
+      <span className="rd-apd-h">{isConf ? "How it reads" : "How it counts"}</span>
+      {railBody}
+    </div>
+  );
+
+  /* a line pressed: the table moves to that line's tab with this row held
+     on its pixel (the row keeps its key across the hop, so it is the
+     anchor that persists - pinning the table top would let the reshuffled
+     rows carry it off) */
+  const lineGo = (id, el) => {
+    const open = el && el.closest(".rd-ap-open");
+    const row = open && open.previousElementSibling;
+    if (row) rdPinScroll([row], true);
+    if (onFacet) onFacet(id);
+  };
+  return (
+    <RdLedger p={p} facet={facet} onM={onM} side={rail}
+              lead={isDem ? demTable : isIss ? issTable : isConf ? confLead : null}
+              wide={isDem || (isIss && issTwo)}
+              onLine={onFacet ? lineGo : null} demSplit={demSplit} moe={rdLgMoe(p)}
+              sources={p.links && p.links.length > 0 ? rdPollLinks(p.links) : null}
+              foot={<>
+                <a className="rd-link" href={report} onClick={(e) => e.stopPropagation()}>Report an error</a>
+                {onBack && <button type="button" className="rd-link" onClick={(e) => { e.stopPropagation(); onBack(); }}>Back to {backLabel || "the chart"}</button>}
+              </>} />
+  );
+}
+
+/* ---------------------------------------------------------------- the poll ledger
+   One renderer for an opened poll, shared by the Latest and next polls
+   table and All polls (user call 2026-10-11, design A of two mocked):
+   - a head band: the poll's sentence, its sources and Report an error;
+   - the open tab's own measure in full, beside its companion - How it
+     counts in All polls, the release rhythm in the Latest table;
+   - one line for each other measure the poll carries, in a fixed order,
+     each giving the figures that measure's own tab shows in its row, a
+     press away from that tab.
+   Figures print as the house printed them (rdApNum keeps a half), and a
+   change prints at the figure's own precision (rdLgChg). */
+
+/* a change on the house's previous poll at the figure's printed precision:
+   a move between halves prints its half (▼ 0.5) - whole-point rounding
+   printed Roy Morgan's 54 → 53.5 as "▼ 0" (Math.round(-0.5) is -0) and a
+   half-point rise as "▲ 1" */
+const rdLgChg = (d, dec) => {
+  if (d == null) return null;
+  const r = Math.round(d * 10) / 10;
+  return rdApChg(r, dec || (Number.isInteger(r) ? 0 : 1));
+};
+function RdLgChg({ d, dec }) { const s = rdLgChg(d, dec); return s ? <span className="rd-ldg-chg">{s}</span> : null; }
+const RD_LG_LEADER = { alb: "Albanese", taylor: "Taylor", ley: "Ley", hanson: "Hanson" };
+const RD_LG_INK = { alb: "var(--alp-text)", taylor: "var(--lnp-text)", ley: "var(--lnp-text)", hanson: "var(--onp-text)" };
+const rdLgWho = (p, k) => apWho(p, k, RD_LG_LEADER[k] || rdCap(k));
+// parties in the site aggregate's order, as every other party listing (user call 2026-10-03)
+const rdLgPrims = () => rdApPrimList((window.AUSPOL.latest && window.AUSPOL.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
+const rdLgNet = (v) => (v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
+// the tab a line opens, named as the tab row names it
+const RD_LG_TAB = { primary: "Primary", twopp: "2PP", leadership: "Leadership", direction: "Direction", issues: "Issues", demographics: "Demographics" };
+const RD_LG_LATEST_TABS = { twopp: 1, primary: 1, leadership: 1 };
+/* which poll a lead's change markers are measured on: the house's previous
+   poll that printed each figure (gen-data's chg.r). One wave for the whole
+   lead names it; a lead whose figures reach back to different waves (a
+   house that skipped a question once) says so instead */
+function rdLgChgNote(p, keys) {
+  const r = (p.chg && p.chg.r) || {};
+  const refs = [...new Set(keys.map((k) => r[k]).filter(Boolean))];
+  if (!refs.length) return null;
+  if (refs.length > 1) return "▲▼ Changes are on each figure’s previous " + p.pollster + " poll.";
+  const prev = window.AUSPOL.individualPolls.find((x) => x.pollster === p.pollster && x.released === refs[0]);
+  return prev ? "▲▼ Changes are on " + p.pollster + "’s " + prev.field + " poll." : null;
+}
+
+/* the two-party figures' 95% margins, one per basis the house printed (a
+   range where its two contests' margins differ), with the sample they rest on */
+function rdLgMoe(p) {
+  const ms = [p.alpOnImp != null ? rdPollMargin(p, "onp", false) : null, p.alpImp != null ? rdPollMargin(p, "lnp", false) : null].filter((m) => m != null);
+  const mp = [p.tppAlt ? rdPollMargin(p, "onp", true) : null, p.alp != null ? rdPollMargin(p, "lnp", true) : null].filter((m) => m != null);
+  const rng = (a) => { const lo = Math.min(...a), hi = Math.max(...a); return "±" + (lo.toFixed(1) === hi.toFixed(1) ? lo.toFixed(1) : lo.toFixed(1) + "–" + hi.toFixed(1)); };
+  const bits = [ms.length ? rng(ms) + " on the implied" : null, mp.length ? rng(mp) + " on the published" : null].filter(Boolean);
+  return bits.length ? "Margin of error " + bits.join(", ") + (bits.length > 1 ? " figures" : " figure") + " at 95%, " + rdMarginBasis(p) + "." : null;
+}
+
+/* ---- the two-party section: one table, both matchups (the matchup in force
+   first), every basis the house printed - its second published pair on
+   2025 flows, the forced-choice cohorts under their own subhead, a
+   Coalition v One Nation pair and a three-cornered split where it printed
+   them. A row the house filled in neither column never draws */
+function RdLgTpp({ p, onM, moe, note }) {
+  const c = (p.chg && p.chg.d) || {};
+  const ta = p.tppAlt;
+  const pair = (a, b, ink) => <b className="rd-ldg-pair"><span style={{ color: "var(--alp-text)" }}>{a}</span><span className="rd-ldg-dash">–</span><span style={{ color: ink }}>{b}</span></b>;
+  /* the rival's share as the house printed it where it printed one -
+     Essential's pair leaves its undecided inside the hundred (48–46) -
+     else the complement */
+  const cell = (v, d, ink, dec, b) => (v == null ? <span className="rd-ldg-none">—</span>
+    : <>{pair(rdApNum(v), rdApNum(b != null ? b : 100 - v), ink)}<RdLgChg d={d} dec={dec} /></>);
+  const ON = { id: "onp", head: "v One Nation", ink: "var(--onp-text)" };
+  const LN = { id: "lnp", head: "v Coalition", ink: "var(--lnp-text)" };
+  const cols = onM ? [ON, LN] : [LN, ON];
+  const pubLab = p.tppFlows != null ? "Published, respondent-allocated" : "As published";
+  const rows = [
+    ["Implied, on " + rdElecYear + " flows", { onp: p.alpOnImp != null ? [p.alpOnImp, c.impOn, 1] : null, lnp: p.alpImp != null ? [p.alpImp, c.imp, 1] : null }],
+    [pubLab, { onp: ta ? [ta.alp, c.altAlpOn, 0, ta.onp] : null, lnp: p.alp != null ? [p.alp, c.alp2pp, 0, p.lnp] : null }],
+    ["Published, on " + rdElecYear + " flows", { onp: null, lnp: p.tppFlows != null ? [p.tppFlows, null, 0] : null }],
+  ].filter(([, v]) => v.onp || v.lnp);
+  const forced = [
+    ["Coalition voters", { onp: p.splitCoal != null ? [p.splitCoal, c.splitCoal, 0] : null, lnp: null }],
+    ["One Nation voters", { onp: null, lnp: p.splitOnp != null ? [p.splitOnp, c.splitOnp, 0] : null }],
+    ["Greens voters", { onp: p.splitGrnOn != null ? [p.splitGrnOn, c.splitGrnOn, 0] : null, lnp: p.splitGrn != null ? [p.splitGrn, c.splitGrn, 0] : null }],
+    ["Other voters", { onp: p.splitOthOn != null ? [p.splitOthOn, c.splitOthOn, 0] : null, lnp: p.splitOth != null ? [p.splitOth, c.splitOth, 0] : null }],
+  ].filter(([, v]) => v.onp || v.lnp);
+  if (!rows.length && !forced.length && !p.tpp3 && !p.tppAlt2) return null;
+  const tr = ([lab, v], sub) => (
+    <tr key={lab} className={sub ? "sub" : ""}>
+      <th scope="row">{lab}</th>
+      {cols.map((k) => <td key={k.id}>{v[k.id] ? cell(v[k.id][0], v[k.id][1], k.ink, v[k.id][2], v[k.id][3]) : <span className="rd-ldg-none">—</span>}</td>)}
+    </tr>
+  );
+  const noPub = !ta && p.alp == null;
+  return (
+    <>
+      <table className="rd-ldg-t rd-ldg-tpp">
+        <thead><tr><th></th>{cols.map((k, i) => <th key={k.id} className={i === 0 ? "on" : ""}>Labor {k.head}</th>)}</tr></thead>
+        <tbody>
+          {rows.map((r) => tr(r))}
+          {forced.length > 0 && <tr className="grp"><th scope="rowgroup" colSpan={3}>If forced to choose</th></tr>}
+          {forced.map((r) => tr(r, true))}
+          {p.tppAlt2 && <tr><th scope="row">Coalition v One Nation</th><td colSpan={2}><b className="rd-ldg-pair"><span style={{ color: "var(--lnp-text)" }}>{rdApNum(p.tppAlt2.lnp)}</span><span className="rd-ldg-dash">–</span><span style={{ color: "var(--onp-text)" }}>{rdApNum(p.tppAlt2.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
+          {p.tpp3 && <tr><th scope="row">Three-cornered</th><td colSpan={2}><b className="rd-ldg-tri"><span style={{ color: "var(--alp-text)" }}>ALP {rdApNum(p.tpp3.alp)}</span> <span style={{ color: "var(--lnp-text)" }}>L/NP {rdApNum(p.tpp3.lnp)}</span> <span style={{ color: "var(--onp-text)" }}>ON {rdApNum(p.tpp3.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
+        </tbody>
+      </table>
+      {(noPub || moe || note || p.splitCoalEst) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}
+        {/* June 2026's press-only Coalition figure (gen-data's splitCoalEst) */}
+        {p.splitCoalEst ? " The Coalition-voters split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)." : ""}{note ? " " + note : ""}</p>}
+    </>
+  );
+}
+
+/* ---- the primary vote: the poll's five figures, their changes, and how
+   decided the vote is on the house's own question - can't-say (first
+   basis), the not-firm share of the decided (soft), the residue inside a
+   printed two-party pair (tpp), or RedBridge's vote-softness triple
+   (gen-data's firmAll) */
+function rdLgDecided(p) {
+  if (p.undecided != null) {
+    const b = p.undecidedBasis || "first";
+    return { h: p.undecided + "%", w: b === "soft" ? "not firm" : "undecided", d: (p.chg && p.chg.d && p.chg.d.und) || null,
+             s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "couldn’t name a party when first asked" };
+  }
+  const f = Array.isArray(p.firmAll) && p.firmAll.length === 3 ? p.firmAll : null;
+  if (f) return { h: f[1] + f[2] + "%", w: "not firm", d: null, s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table" };
+  return null;
+}
+const RD_LG_CK = { alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" };
+function RdLgVote({ p, note }) {
+  const q = p.p || {};
+  const c = (p.chg && p.chg.d) || {};
+  const prim = rdLgPrims().filter((k) => q[k.id] != null);
+  if (!prim.length) return null;
+  const dec = rdLgDecided(p);
+  return (
+    <>
+      <div className="rd-ldg-prim">
+        {prim.map((k) => (
+          <span key={k.id}>
+            <b style={{ color: k.ink }}>{k.lab}</b>
+            <span className="rd-ldg-big" style={{ color: k.ink }}>{rdApNum(q[k.id])}</span>
+            <span className="rd-ldg-chg">{rdLgChg(c[RD_LG_CK[k.id]], 0) || " "}</span>
+          </span>
+        ))}
+      </div>
+      {dec && <p className="rd-ldg-foot1"><b>{dec.h}</b> {dec.w}<RdLgChg d={dec.d} dec={1} /> – {dec.s}.</p>}
+      {note && <p className="rd-ldg-note">{note}</p>}
+    </>
+  );
+}
+
+/* ---- leaders: one table of ratings with their parts, one of the better-PM
+   contests with the undecided share. A contest printed without its
+   undecided (it sums to 100) dashes that cell rather than claim none; a
+   wave that rates leaders on different questions says which is which */
+function RdLgLeaders({ p, note }) {
+  const a = p.appr || {};
+  const mb = a.metricBy || {};
+  const c = (p.chg && p.chg.d) || {};
+  const rows = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, nk]) => a[nk] != null)
+    .map(([id, nk]) => ({ id, nk, name: id === "taylor" ? (a.oppName || rdLgWho(p, id)) : rdLgWho(a, id), L: a[id] || null, fav: mb[id] === "fav" }));
+  const nFav = rows.filter((r) => r.fav).length;
+  const allFav = rows.length > 0 && nFav === rows.length, mixed = nFav > 0 && nFav < rows.length;
+  const hasUns = rows.some((r) => r.L && r.L.unsure != null);
+  const sets = window.ppmContests ? window.ppmContests(p) : (p.ppmSets || []);
+  const who = ["alb", "taylor", "ley", "hanson"].filter((k) => sets.some((s) => s[k] != null));
+  const named = (s) => ["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null);
+  const twos = sets.filter((s) => named(s).length === 2).length;
+  const setLab = (s) => {
+    const n = named(s);
+    if (n.length >= 3) return "Three-way";
+    return twos > 1 ? rdLgWho(p, "alb") + " v " + rdLgWho(p, n.find((k) => k !== "alb")) : "Head to head";
+  };
+  if (!rows.length && !sets.length) return null;
+  const sum = (s) => who.reduce((t, k) => t + (s[k] || 0), 0);
+  return (
+    <>
+      {rows.length > 0 && (
+        <table className="rd-ldg-t rd-ldg-ldr">
+          <thead><tr>
+            <th>{allFav ? "Net favourability" : mixed ? "Net rating" : "Net approval"}</th>
+            <th className="num pt">{allFav ? "Favourable" : mixed ? "For" : "Approve"}</th>
+            <th className="num pt">{allFav ? "Unfavourable" : mixed ? "Against" : "Disapprove"}</th>
+            {hasUns && <th className="num pt">Unsure</th>}
+            <th className="num">Net</th><th className="num">Change</th>
+          </tr></thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id}>
+                <th scope="row">{r.name}{mixed && <span className="rd-ldg-tail"> {r.fav ? "favourability" : "approval"}</span>}
+                  {/* a phone folds the part columns away: the parts ride under the name */}
+                  {r.L && r.L.app != null && <span className="rd-ldg-parts">{r.L.app} {r.fav ? "fav." : "approve"}, {r.L.dis} {r.fav ? "unfav." : "disapprove"}{r.L.unsure != null ? ", " + r.L.unsure + " unsure" : ""}</span>}</th>
+                <td className="num pt">{r.L && r.L.app != null ? r.L.app : "—"}</td>
+                <td className="num pt">{r.L && r.L.dis != null ? r.L.dis : "—"}</td>
+                {hasUns && <td className="num pt">{r.L && r.L.unsure != null ? r.L.unsure : "—"}</td>}
+                <td className="num"><b style={{ color: RD_LG_INK[r.id] }}>{rdLgNet(a[r.nk])}</b></td>
+                <td className="num">{rdLgChg(c[r.nk], 0) ? <span className="rd-ldg-chg">{rdLgChg(c[r.nk], 0)}</span> : <span className="rd-ldg-none">—</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {sets.length > 0 && (
+        <table className="rd-ldg-t rd-ldg-ppm">
+          <thead><tr>
+            <th>{window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"}</th>
+            {who.map((k) => <th key={k} className="num">{rdLgWho(p, k)}</th>)}
+            <th className="num">Undecided</th>
+          </tr></thead>
+          <tbody>
+            {sets.map((s, i) => (
+              <tr key={i}>
+                <th scope="row">{setLab(s)}</th>
+                {who.map((k) => <td key={k} className="num">{s[k] != null ? <b style={{ color: RD_LG_INK[k] }}>{s[k]}</b> : <span className="rd-ldg-none">—</span>}</td>)}
+                <td className="num">{s.unc ? s.unc : sum(s) >= 99.5 ? <span className="rd-ldg-none" title="Printed without its undecided share">—</span> : "0"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {note && rows.length > 0 && <p className="rd-ldg-note">{note}</p>}
+    </>
+  );
+}
+
+/* ---- direction: the three answers as one bar, the net beside it */
+function RdLgDir({ p }) {
+  const d = p.dir;
+  if (!d) return null;
+  const u = d.unsure != null ? d.unsure : Math.max(0, 100 - d.right - d.wrong);
+  return (
+    <div className="rd-ldg-dir">
+      <div className="rd-ldg-dirbar" aria-hidden="true">
+        <i style={{ width: d.right + "%", background: "var(--mood-pos)" }}></i>
+        <i style={{ width: u + "%", background: "var(--line)" }}></i>
+        <i style={{ width: d.wrong + "%", background: "var(--mood-neg)" }}></i>
+      </div>
+      <div className="rd-ldg-dirk">
+        <span>Right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b></span>
+        <span>Unsure <b>{rdApNum(u)}</b></span>
+        <span>Wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b></span>
+        <span className="rd-ldg-dirnet">Net <b>{rdApSigned(d.right - d.wrong).replace(/\.0$/, "")}</b></span>
       </div>
     </div>
+  );
+}
+
+/* ---- one line per measure: the figures that measure's own tab shows in
+   its row, so a line reads exactly like the row it opens */
+function rdLgLines(p, { onM, demSplit }) {
+  const out = [];
+  const q = p.p || {};
+  /* a unit never breaks inside itself; a long line wraps between units. A
+     lbl unit introduces the units after it */
+  const U = ({ children, soft, lbl }) => <span className={"rd-ldg-li" + (soft || lbl ? " rd-ldg-lisoft" : "") + (lbl ? " lbl" : "")}>{children}</span>;
+  const pty = (k, v) => <><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{v}</b></>;
+  const prim = rdLgPrims().filter((k) => q[k.id] != null);
+  if (prim.length) {
+    const dec = rdLgDecided(p);
+    out.push({ id: "primary", lab: "Primary", body: <>{prim.map((k) => <U key={k.id}>{pty(k.id, rdApNum(q[k.id]))}</U>)}{dec && <U soft>{dec.h} {dec.w}</U>}</> });
+  }
+  /* each matchup as its tab's row reads: the implied pair, then the
+     published one where the house printed it */
+  const ta = p.tppAlt;
+  const pairB = (a, b, id) => <b><span style={{ color: "var(--alp-text)" }}>{rdApNum(a)}</span>–<span style={{ color: "var(--" + id + "-text)" }}>{rdApNum(b)}</span></b>;
+  const mus = [
+    { id: "onp", n: "One Nation", imp: p.alpOnImp, pub: ta ? [ta.alp, ta.onp] : null },
+    { id: "lnp", n: "Coalition", imp: p.alpImp, pub: p.alp != null && p.lnp != null ? [p.alp, p.lnp] : null },
+  ].filter((m) => m.imp != null || m.pub);
+  if (!onM) mus.reverse();
+  if (mus.length) {
+    out.push({ id: "twopp", lab: "2PP", body: <>{mus.map((m) => (
+      <span key={m.id} className="rd-ldg-grp">
+        <U>v {m.n} {m.imp != null ? pairB(m.imp.toFixed(1), (100 - m.imp).toFixed(1), m.id) : pairB(m.pub[0], m.pub[1], m.id)}{m.imp == null ? <span className="rd-ldg-lisoft"> published</span> : m.pub ? "," : null}</U>
+        {m.imp != null && m.pub && <U soft>published {pairB(m.pub[0], m.pub[1], m.id)}</U>}
+      </span>
+    ))}</> });
+  }
+  const a = p.appr || {};
+  const nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
+  const sets = window.ppmContests ? window.ppmContests(p) : [];
+  if (nets.length || sets.length) {
+    const mb = a.metricBy || {};
+    const allFav = nets.length > 0 && nets.every(([id]) => mb[id] === "fav");
+    const contest = (s, i) => {
+      const sk = ["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null);
+      return <React.Fragment key={"s" + i}>{i === 0 && <U lbl>Better PM</U>}{sk.length === 2
+        ? <U>{rdLgWho(p, sk[0])} <b style={{ color: RD_LG_INK[sk[0]] }}>{s[sk[0]]}</b>–<b style={{ color: RD_LG_INK[sk[1]] }}>{s[sk[1]]}</b> {rdLgWho(p, sk[1])}</U>
+        : <U>{sk.map((k, j) => <React.Fragment key={k}>{j > 0 ? ", " : ""}{rdLgWho(p, k)} <b style={{ color: RD_LG_INK[k] }}>{s[k]}</b></React.Fragment>)}</U>}</React.Fragment>;
+    };
+    out.push({ id: "leadership", lab: "Leadership", body: <>
+      {nets.length > 0 && <U lbl>{allFav ? "Net favourability" : "Net approval"}</U>}
+      {nets.map(([id, k]) => <U key={id}>{id === "taylor" ? (a.oppName || "Taylor") : rdLgWho(a, id)} <b style={{ color: RD_LG_INK[id] }}>{rdLgNet(a[k])}</b></U>)}
+      {sets.map(contest)}
+    </> });
+  }
+  if (p.dir) {
+    const d = p.dir;
+    out.push({ id: "direction", lab: "Direction", body: <>
+      <U>right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b></U>
+      <U>wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b></U>
+      <U soft>unsure {rdApNum(d.unsure != null ? d.unsure : 100 - d.right - d.wrong)}</U>
+    </> });
+  }
+  if (p.iss) {
+    const IM = window.ISS_MAP || [], IL = window.ISS_MAP_LAB || {};
+    const cells = IM.map((id) => { const o = window.issOwnOf(p, id); const L = o ? window.issLeadOf(o) : null; return L ? { id, L } : null; }).filter(Boolean);
+    const sal = (p.iss.sal || p.iss.conc || []).slice(0, 3);
+    out.push({ id: "issues", lab: "Issues", body: <>
+      {cells.length > 0 ? cells.map(({ id, L }) => { const M = window.ISS_PARTY_META[L.who]; return <U key={id}>{IL[id]} {L.level ? <b>level</b> : <b style={{ color: M ? M[2] : null }}>{(M ? M[1] : L.who) + " +" + Math.round(L.lead)}</b>}</U>; })
+        : sal.map(([lab, v]) => <U key={lab}>{lab} <b>{rdApNum(v)}</b></U>)}
+    </> });
+  }
+  if (p.grp && p.grp.d) {
+    const nG = Object.values(p.grp.d).reduce((t, r) => t + r.length, 0), nC = Object.keys(p.grp.d).length;
+    /* the split the Demographics tab is on, else the first split this
+       poll's cuts can draw */
+    const pr = (() => {
+      if (!window.demPairOf) return null;
+      const ids = [demSplit || "age"].concat((window.DEM_SPLITS || []).map((x) => x.id));
+      for (const id of ids) { const r = window.demPairOf(p, id); if (r) return r; }
+      return null;
+    })();
+    const sg = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + rdApNum(Math.abs(v));
+    out.push({ id: "demographics", lab: "Demographics", body: <>
+      {pr && <U lbl>{pr.a} v {pr.b}</U>}
+      {pr && rdLgPrims().filter((k) => pr.gap[k.id] != null).map((k) => <U key={k.id}>{pty(k.id, sg(pr.gap[k.id]))}</U>)}
+      <U soft>{nG} groups in {rdNumWord(nC)} breakdown{nC === 1 ? "" : "s"}</U>
+    </> });
+  }
+  const seats = p.seats && p.seats.p ? rdLgPrims().filter((k) => p.seats.p[k.id]) : [];
+  if (seats.length) {
+    out.push({ id: "seats", lab: "Seats", body: <>{seats.map((k) => { const s = p.seats.p[k.id]; return <U key={k.id}>{pty(k.id, s.est != null ? s.est : s.lo + "–" + s.hi)}</U>; })}<U soft>modelled{p.seats.rangeOnly && p.seats.method ? " – " + p.seats.method : ""}</U></> });
+  }
+  if (p.sw) {
+    const w = p.sw;
+    out.push({ id: "switching", lab: "To One Nation", body: <>
+      <U lbl>Share of each {rdElecYear} vote now with One Nation</U>
+      {["lnp", "alp", "grn", "oth"].filter((k) => w[k] != null).map((k) => <U key={k}>{pty(k, rdApNum(w[k]))}</U>)}
+      {w.onp != null && <U>{pty("onp", rdApNum(w.onp))} <span className="rd-ldg-lisoft">kept</span></U>}
+    </> });
+  }
+  return out;
+}
+
+/* ---- the opened poll. side = the companion (How it counts, or the release
+   rhythm); lead = a facet's own wide table where it has one (issues,
+   groups, the gauge); onLine(id, el) = what pressing a line does; latest =
+   the Latest table, whose own tabs are 2PP, Primary and Leadership */
+function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demSplit, moe, latest }) {
+  const lines = rdLgLines(p, { onM, demSplit });
+  const NOTE = {
+    twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp", "splitCoal", "splitOnp", "splitGrn", "splitGrnOn", "splitOth", "splitOthOn"]),
+    primary: rdLgChgNote(p, ["pAlp", "pLnp", "pGrn", "pOnp", "pOth", "und"]),
+    leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet"]),
+  };
+  const FULL = {
+    primary: () => <RdLgVote p={p} note={NOTE.primary} />,
+    twopp: () => <RdLgTpp p={p} onM={onM} moe={moe} note={NOTE.twopp} />,
+    leadership: () => <RdLgLeaders p={p} note={NOTE.leadership} />,
+    direction: () => <RdLgDir p={p} />,
+  };
+  const HEAD = { primary: "Primary vote, %", twopp: "Two-party preferred", leadership: "Leaders", direction: "The country is heading" };
+  const body = lead || (FULL[facet] ? FULL[facet]() : null);
+  const rest = lines.filter((l) => l.id !== facet);
+  const ASKED = { primary: "primary vote", twopp: "two-party vote", leadership: "leaders", direction: "direction question", issues: "issues", demographics: "vote by group" };
+  return (
+    <div className={"rd-ldg poll-detail" + (wide ? " wide" : "") + (side ? "" : " noside")} data-pollster={p.pollster}>
+      <div className="rd-ldg-head">
+        <span className="rd-apd-h rd-ldg-sent">{rdPollHead(p)}</span>
+        {/* the actions sit apart from the sources: the copied card keeps
+            where the figures came from and drops what a reader can do here */}
+        {(sources || foot) && <div className="rd-ldg-srcs">{sources}{foot && <span className="rd-ldg-acts">{foot}</span>}</div>}
+      </div>
+      <div className="rd-ldg-lead">
+        {lead || (
+          <section className="rd-ldg-sec" data-sec={facet}>
+            <h4 className="rd-ldg-h">{HEAD[facet] || RD_LG_TAB[facet] || facet}</h4>
+            {body || <p className="rd-ldg-foot1">{p.pollster} didn’t publish a {ASKED[facet] || facet} figure in this poll.</p>}
+          </section>
+        )}
+      </div>
+      {side && <div className="rd-ldg-side">{side}</div>}
+      {rest.length > 0 && (
+        <div className="rd-ldg-also">
+          <h4 className="rd-ldg-h">Also in this poll</h4>
+          <div className="rd-ldg-lines">
+            {rest.map((l) => {
+              const can = !!(onLine && RD_LG_TAB[l.id]);
+              const Tag = can ? "button" : "div";
+              const away = latest && !RD_LG_LATEST_TABS[l.id];
+              return (
+                <Tag key={l.id} type={can ? "button" : undefined} className={"rd-ldg-line" + (can ? " go" : "")}
+                     onClick={can ? (e) => { e.stopPropagation(); onLine(l.id, e.currentTarget); } : undefined}
+                     title={can ? (away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab") : undefined}>
+                  <span className="rd-ldg-lab">{l.lab}</span>
+                  <span className="rd-ldg-lbody">{l.body}</span>
+                  {can && <span className="rd-ldg-arrow" aria-hidden="true">{away ? "↗" : "→"}</span>}
+                </Tag>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---- the Primary tab's How it counts: each party's printed share against
+   the polls fielded around it (gen-data §3c's pyd - the headline primary
+   estimator read at the wave's fieldwork midpoint without it), drawn as the
+   2PP table's lean strip, one per party: the dot is this poll's distance
+   from the polls around it, the whisker its margin on that party, the tick
+   the house's usual lean on it then - outside the margin means the whisker
+   misses the tick. The table below sums the same steps on the figures as
+   printed, then what the wave does to today's primaries (§7eb's peff) */
+function RdApPrimRail({ p }) {
+  const D = window.AUSPOL;
+  const q = p.p || {}, y = p.pyd || {};
+  const ks = rdLgPrims().filter((k) => q[k.id] != null && y[k.id]);
+  if (!ks.length) return null;
+  const n = p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0);
+  const rows = ks.map((k) => {
+    const x = +q[k.id], v = y[k.id][0], he = y[k.id][1];
+    const lean = rdApR1(x - v), less = he == null ? null : rdApR1(lean - he);
+    const m = n ? 196 * Math.sqrt((x / 100) * (1 - x / 100) / n) : null;
+    return { ...k, x, v, he, lean, less, m, out: rdApInside(less != null ? less : lean, m) === "outside" };
+  });
+  const e = p.peff || null;
+  const pairOf = (id) => (!e ? null : e.w ? e[id] : e.t ? e.t[id] : null);
+  const moves = e && !p.noAgg && rows.some((r) => pairOf(r.id));
+  const sg = (v) => (v == null ? "—" : rdApSigned(v));
+  const ms = rows.map((r) => r.m).filter((m) => m != null);
+  const mTxt = ms.length ? "±" + (Math.min(...ms).toFixed(1) === Math.max(...ms).toFixed(1) ? Math.min(...ms).toFixed(1) : Math.min(...ms).toFixed(1) + "–" + Math.max(...ms).toFixed(1)) : null;
+  const now = D.latest && D.latest.primary;
+  const around = RD_AP_KAL ? "The trend" : "Polls around it";
+  const anyOut = rows.some((r) => r.out);
+  const say = rows.map((r) => r.lab + " " + (Math.abs(r.lean) < 0.05 ? "level with" : Math.abs(r.lean).toFixed(1) + (r.lean > 0 ? " above" : " below")) + " " + (RD_AP_KAL ? "the trend" : "the polls around it")).join("; ");
+  return (
+    <>
+      <span className="rd-apd-ct">{p.pollster}’s primaries against {RD_AP_KAL ? "the trend through the other polls" : "the polls fielded around it"}, in points</span>
+      <div className="rd-ldg-pstrips" role="img" aria-label={say}>
+        <div className="rd-ldg-prow rd-ldg-phead" aria-hidden="true">
+          <span></span>
+          <span className="rd-ap-hpic"><span className="rd-ap-scale"><span className="rd-ap-in">
+            <b className="rd-ap-scl">◀ Lower</b>
+            <b className="rd-ap-scr">Higher ▶</b>
+            {[[-6, "6"], [-3, "3"], [0, RD_AP_KAL ? "Trend" : <><span className="rd-ldg-lg">Polls around it</span><span className="rd-ldg-sh">Around</span></>], [3, "3"], [6, "6 pts"]].map(([v, lab]) => (
+              <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (v === -6 ? " start" : "") + (v === 6 ? " end" : "") + (Math.abs(v) === 3 ? " rd-ldg-lg" : "")} style={{ left: rdApX(v) + "%" }}>{lab}</span>
+            ))}
+          </span></span></span>
+          <span></span>
+        </div>
+        {rows.map((r) => (
+          <div key={r.id} className="rd-ldg-prow">
+            <b style={{ color: r.ink }}>{r.lab}</b>
+            <span className="rd-ap-pic"><RdApStrip lean={r.lean} moe={r.m} he={r.he} ink={r.dot} /></span>
+            <span className="rd-ldg-pv" style={{ color: Math.abs(r.lean) >= 0.05 ? r.ink : null }}>{sg(r.lean)}</span>
+          </div>
+        ))}
+      </div>
+      <table className="rd-ldg-t rd-ldg-rk rd-ldg-rkp">
+        <thead><tr><th></th>{rows.map((r) => <th key={r.id} className="num" style={{ color: r.ink }}>{r.lab}</th>)}</tr></thead>
+        <tbody>
+          <tr><th scope="row">This poll</th>{rows.map((r) => <td key={r.id} className="num"><b>{rdApNum(r.x)}</b></td>)}</tr>
+          <tr><th scope="row">{around}</th>{rows.map((r) => <td key={r.id} className="num">{r.v.toFixed(1)}</td>)}</tr>
+          <tr><th scope="row">Lean</th>{rows.map((r) => <td key={r.id} className={"num" + (r.out && r.less == null ? " out" : "")}>{sg(r.lean)}</td>)}</tr>
+          <tr><th scope="row">House lean</th>{rows.map((r) => <td key={r.id} className="num">{sg(r.he)}</td>)}</tr>
+          {rows.some((r) => r.less != null) && <tr><th scope="row">Less house lean</th>{rows.map((r) => <td key={r.id} className={"num" + (r.out ? " out" : "")}>{sg(r.less)}</td>)}</tr>}
+          {moves && <tr><th scope="row">{e.w ? "Moves today’s" : "Moved them on release"}</th>{rows.map((r) => { const pr = pairOf(r.id); return <td key={r.id} className="num">{pr ? sg(rdApR1(pr[1] - pr[0])) : "—"}</td>; })}</tr>}
+        </tbody>
+      </table>
+      <p className="rd-ldg-foot1">
+        Lean is this poll minus {RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)"}, so + means higher; house lean is taken out before averaging.
+        {anyOut ? " Bold: outside the poll’s margin on that party." : ""}{mTxt ? " Margins " + mTxt + ", " + rdMarginBasis(p) + "." : ""}
+        {moves && e.w && now ? " Today’s figures: " + rows.filter((r) => now[r.id] != null).map((r) => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : ""}
+        {moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""}
+      </p>
+    </>
   );
 }
 
@@ -2983,7 +3166,7 @@ function RdAllPolls(P) {
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
         <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={RD_AP_KAL ? rows.filter((r) => !r.noAgg && figOf(r).a != null).length : win.length}
-                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} demSplit={demSplit} />
+                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} demSplit={demSplit} onFacet={onFacet} />
       </div>
     );
     if (phone) {
@@ -4674,4 +4857,4 @@ const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
 const RdFlowsM = React.memo(RdFlows);
 
-Object.assign(window, { RdAllPolls, RdApDetail, RdApSheet, rdPollMargin, RdDisagree: RdDisagreeM, RdHouseLean: RdHouseLeanM, RdFlows: RdFlowsM });
+Object.assign(window, { RdLedger, RdAllPolls, RdApDetail, RdApSheet, rdPollMargin, RdDisagree: RdDisagreeM, RdHouseLean: RdHouseLeanM, RdFlows: RdFlowsM });

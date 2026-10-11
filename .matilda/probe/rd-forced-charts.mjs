@@ -407,17 +407,13 @@ const lastOnYm = monY(lastOn.ym);
       const det = document.querySelector(".rd-ap-open");
       if (!row || !det) return null;
       const head = ((row.querySelector("[role=rowheader] b") || {}).textContent || "").replace(/↗/g, "").trim();
-      /* each forced row of the matchup grid: its key span followed by the
-         two column cells (only the asked rival's column carries figures) */
-      const forced = [...det.querySelectorAll(".rd-apd-grid .rd-apd-k")]
-        .filter((k) => k.textContent.includes("forced to choose"))
-        .map((k) => {
-          const cells = [];
-          for (let n = k.nextElementSibling; n && cells.length < 2; n = n.nextElementSibling)
-            cells.push(n.textContent.replace(/\s+/g, " ").trim());
-          return { key: k.textContent.trim(), cells };
-        });
-      const estNote = [...det.querySelectorAll(".rd-apd-note")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
+      /* each forced row of the ledger's two-party table: the cohort under
+         the "If forced to choose" subhead, then its two column cells (only
+         the asked rival's column carries figures) */
+      const forced = [...det.querySelectorAll(".rd-ldg-tpp tr.sub")]
+        .map((tr) => ({ key: tr.querySelector("th").textContent.trim(),
+                        cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.replace(/\s+/g, " ").trim()) }));
+      const estNote = [...det.querySelectorAll(".rd-ldg-tpp ~ .rd-ldg-foot1")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
       const back = [...document.querySelectorAll("button")].map((b) => b.textContent.trim()).find((t) => t.startsWith("Back to "));
       return { head, forced, estNote, back: back || null };
     });
@@ -435,11 +431,11 @@ const lastOnYm = monY(lastOn.ym);
   };
   const arrow = (v, p) => (v > p ? `▲ ${Math.abs(v - p)}` : v < p ? `▼ ${Math.abs(v - p)}` : null);
   const rowsByKey = Object.fromEntries((land && land.forced || []).map((x) => [x.key, x.cells]));
-  const row = (co) => rowsByKey[`${CONAME[co]} voters, if forced to choose`];
+  const row = (co) => rowsByKey[`${CONAME[co]} voters`];
   check(!!land && ["coal", "onp", "grn", "oth"].every((co) => row(co)), 
     `ledger: all four cohort forced rows present (${JSON.stringify(land && land.forced.map((x) => x.key))})`);
   const pairChk = (cells, v, p, tag) => {
-    const inCells = cells.some((t) => t.includes(`${v} – ${100 - v}`));
+    const inCells = cells.some((t) => t.replace(/\s*–\s*/g, "–").includes(`${v}–${100 - v}`));
     const a = arrow(v, p);
     return inCells && (a === null ? true : cells.some((t) => t.includes(a)));
   };
@@ -468,20 +464,16 @@ const lastOnYm = monY(lastOn.ym);
     jun = await page.evaluate(() => {
       const det = document.querySelector(".rd-ap-open");
       if (!det) return null;
-      const keys = [...det.querySelectorAll(".rd-apd-grid .rd-apd-k")].map((k) => k.textContent.trim());
-      const estNote = [...det.querySelectorAll(".rd-apd-note")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
+      const keys = [...det.querySelectorAll(".rd-ldg-tpp tr.sub th")].map((k) => k.textContent.trim());
+      const estNote = [...det.querySelectorAll(".rd-ldg-tpp ~ .rd-ldg-foot1")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
       const cell = (() => {
-        const k = [...det.querySelectorAll(".rd-apd-grid .rd-apd-k")].find((x) => x.textContent.includes("Coalition voters"));
-        if (!k) return null;
-        const cells = [];
-        for (let n = k.nextElementSibling; n && cells.length < 2; n = n.nextElementSibling)
-          cells.push(n.textContent.replace(/\s+/g, " ").trim());
-        return cells;
+        const tr = [...det.querySelectorAll(".rd-ldg-tpp tr.sub")].find((x) => x.querySelector("th").textContent.includes("Coalition voters"));
+        return tr ? [...tr.querySelectorAll("td")].map((td) => td.textContent.replace(/\s+/g, " ").trim()) : null;
       })();
       return { keys, estNote, coalCell: cell };
     });
   } catch (e) { /* jun stays null */ }
-  check(!!jun && ["Coalition", "One Nation", "Greens", "Other"].every((c) => jun.keys.includes(`${c} voters, if forced to choose`)),
+  check(!!jun && ["Coalition", "One Nation", "Greens", "Other"].every((c) => jun.keys.includes(`${c} voters`)),
     `June wave drawer: all four cohort forced rows present (${JSON.stringify(jun && jun.keys)})`);
   const juneOn = FF.vsOn.find((w) => w.ym === "2026-06");
   check(!!jun && Array.isArray(jun.coalCell) && jun.coalCell.some((t) => t.includes(`${juneOn.coal}`) && t.includes(`${100 - juneOn.coal}`)),

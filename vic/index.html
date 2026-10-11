@@ -3686,20 +3686,8 @@ body.rd .rd-tl-keyx::before, body.rd .rd-tl-keyx::after { content: ""; position:
 body.rd .rd-tl-keyx::before { transform: translate(-50%, -50%) rotate(45deg); }
 body.rd .rd-tl-keyx::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-pl-key { margin-top: 14px; }
-body.rd .rd-pl-detail {
-  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; row-gap: 24px;
-  padding: 16px 16px 20px; background: var(--surface-2); font-size: 13px; color: var(--ink-2);
-}
 body.rd .rd-pld-h { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 10px; }
-body.rd .rd-pld-prim { display: flex; gap: 22px; margin-bottom: 12px; }
-body.rd .rd-pld-prim > span { display: flex; flex-direction: column; gap: 2px; }
-body.rd .rd-pld-prim b { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
-body.rd .rd-pld-prim > span > span:not(.rd-apd-chg) { font-size: 19px; font-weight: 600; }
-body.rd .rd-pld-dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 5px; column-gap: 12px; margin: 0; }
-body.rd .rd-pld-dl dt { color: var(--ink-3); }
-body.rd .rd-pld-dl dd { margin: 0; color: var(--ink); }
 body.rd .rd-pld-site { margin-left: -4px; }
-body.rd .rd-pld-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; margin-left: -4px; }
 body.rd .rd-pld-tab { border-collapse: collapse; width: 100%; font-size: 13px; }
 body.rd .rd-pld-tab th { text-align: left; font-weight: 400; color: var(--ink-3); padding: 0 12px 4px 0; }
 body.rd .rd-pld-tab td { padding: 3px 12px 3px 0; color: var(--ink); }
@@ -3742,10 +3730,6 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-long { display: none; }
   body.rd .rd-pl-short { display: inline; }
   body.rd .rd-pl-prim { min-width: 150px; font-size: 14px; }
-  body.rd .rd-pl-detail { grid-template-columns: minmax(0, 1fr); padding: 14px 12px 16px; }
-  body.rd .rd-pld-dl { grid-template-columns: minmax(0, 1fr); }
-  body.rd .rd-pld-dl dt { margin-top: 6px; }
-  body.rd .rd-pld-prim { gap: 16px; }
 }
 body.rd .rd-pl-fig, body.rd .rd-pl-lead { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 body.rd .rd-pl-exp { font-size: 13px; }
@@ -4761,6 +4745,10 @@ body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32
 body.rd .rd-ap-pins:hover { background: var(--surface-2); color: var(--ink); }
 body.rd .rd-ap-pinn { align-self: center; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-ap-pinn b { font-weight: 600; color: var(--ink); }
+@media (max-width: 900px) {
+  body.rd .rd-ap-pinbar { gap: 14px; }
+  body.rd .rd-ap-pintabs { gap: 12px; }
+}
 body.rd .rd-ap-pinf {
   all: unset; cursor: pointer; align-self: center; flex-shrink: 0; box-sizing: border-box; height: 30px; padding: 0 12px;
   display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 15px;
@@ -4947,34 +4935,12 @@ body.rd .rd-ap-keybar { width: 40px; flex: none; vertical-align: middle; }
 body.rd .rd-ap-keyring { display: inline-block; width: 9px; height: 9px; box-sizing: border-box; border-radius: 50%; border: 1.75px solid var(--ink-3); }
 body.rd .rd-ap ~ .rd-sec .view-how, body.rd .rd-ap .view-how { margin-top: 10px; }
 body.rd .rd-ap-open { padding: 22px 24px 20px 52px; background: var(--surface-2); border-bottom: 1px solid var(--line-2); cursor: default; }
-body.rd .rd-apd { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); column-gap: 48px; row-gap: 28px; }
-body.rd .rd-apd-l.poll-detail { padding: 0; background: transparent; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; min-width: 0; align-self: start; }
-body.rd .rd-apd-l.poll-detail.copy-wide { padding: 28px 24px; background: var(--surface-2); }
-body.rd .rd-apd-l .poll-copy-btn { bottom: 8px; right: 0; }
 body.rd .rd-apd-r { display: flex; flex-direction: column; min-width: 0; }
 body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; white-space: nowrap; }
 body.rd .rd-apd-h { font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
-body.rd .rd-apd-prim { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-body.rd .rd-apd-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
-body.rd .rd-apd-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
-body.rd .rd-apd-big { font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 body.rd .rd-apd-sub { font-size: 12px; line-height: 1.4; color: var(--ink-3); }
 body.rd .rd-apd-note { margin-top: 6px; }
-body.rd .rd-apd-grid {
-  margin-top: 18px; display: grid; grid-template-columns: 176px minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; row-gap: 8px;
-  align-items: baseline; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums;
-}
-body.rd .rd-apd-grid1 { margin-top: 10px; grid-template-columns: 176px minmax(0, 1fr); }
-body.rd .rd-apd-th { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); }
 body.rd .rd-apd-k { color: var(--ink-3); }
-body.rd .rd-apd-pair { font-weight: 600; white-space: nowrap; }
-body.rd .rd-apd-chg { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
-body.rd .rd-apd-none { color: var(--ink-3); }
-body.rd .rd-apd-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-body.rd .rd-apd-cell b { font-weight: 600; }
-body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
-body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; font-size: 13px; }
-body.rd .rd-apd-srcs { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
 body.rd .rd-apd-met { all: unset; cursor: pointer; font: inherit; color: inherit; font-weight: inherit;
@@ -5006,13 +4972,6 @@ body.rd .rd-apd-facts {
   font-size: 14px; line-height: 1.45; color: var(--ink-2);
 }
 body.rd .rd-apd-facts b { font-weight: 600; color: var(--ink); }
-body.rd .rd-apd-isslist { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-body.rd .rd-apd-issrow { display: grid; grid-template-columns: minmax(0, 172px) minmax(0, 1fr) 36px; align-items: center; column-gap: 12px; row-gap: 2px; min-width: 0; }
-body.rd .rd-apd-issrow > .rd-apd-sub { grid-column: 1 / -1; }
-body.rd .rd-apd-isslab { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
-body.rd .rd-apd-issbar { position: relative; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
-body.rd .rd-apd-issbar i { display: block; height: 100%; border-radius: 4px; background: var(--ink-3); }
-body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 body.rd .rd-apd-demwrap { grid-column: 1 / -1; padding-bottom: 22px; border-bottom: 1px solid var(--line-2); }
 body.rd .rd-apd-demcols { margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 36px; align-items: start; }
 body.rd .rd-apd-dem { display: flex; flex-direction: column; min-width: 0; font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -5066,7 +5025,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
-  body.rd .rd-apd { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-apd-demcols { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-apd-dem + .rd-apd-dem > :is(.rd-apd-demh, .rd-apd-demall) { display: none; }
 }
@@ -5154,12 +5112,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-csub b { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-dbar { left: 0; right: 0; height: 14px; margin-top: -7px; }
   body.rd .rd-ap-open { padding: 16px 12px 18px; }
-  body.rd .rd-apd-issrow { grid-template-columns: minmax(0, 1fr) 40px; }
-  body.rd .rd-apd-issrow .rd-apd-issbar { grid-column: 1 / -1; grid-row: 2; }
-  body.rd .rd-apd-prim > span { width: 54px; }
-  body.rd .rd-apd-big { font-size: 22px; }
-  body.rd .rd-apd-grid { grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
-  body.rd .rd-apd-grid1 { grid-template-columns: 104px minmax(0, 1fr); }
   body.rd .rd-apd-facts { grid-template-columns: 104px minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
   body.rd .rd-ap-more { gap: 14px; }
   body.rd .rd-ap-shown { font-size: 12px; }
@@ -5390,6 +5342,156 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
 @media (max-width: 360px) {
   body.rd .rd-ap-pctl .rd-ap-dpick > .rd-pl-ctl-l { display: none; }
 }
+body.rd .rd-ldg {
+  display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  grid-template-areas: "head head" "lead side" "also side"; grid-template-rows: auto auto 1fr;
+  column-gap: 48px; row-gap: 20px; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  padding: 0; background: transparent; font-family: inherit; text-align: left;
+}
+body.rd .rd-ldg.wide { grid-template-areas: "head head" "lead lead" "also side"; }
+body.rd .rd-ldg.noside { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "also"; }
+body.rd .rd-ldg-head { grid-area: head; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 28px; row-gap: 8px; padding-right: 36px; }
+body.rd .rd-ldg-sent { flex: 0 1 auto; max-width: 64ch; }
+body.rd .rd-ldg-srcs { flex: 0 1 auto; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; row-gap: 2px; margin-left: -4px; font-size: 13px; }
+body.rd .rd-ldg-acts { display: inline-flex; flex-wrap: wrap; column-gap: 18px; }
+body.rd .rd-ldg-lead { grid-area: lead; min-width: 0; align-self: start; }
+body.rd .rd-ldg-side { grid-area: side; min-width: 0; align-self: start; }
+body.rd .rd-ldg-also { grid-area: also; min-width: 0; align-self: start; }
+body.rd .rd-ldg-lead .rd-apd-demwrap { padding-bottom: 0; border-bottom: 0; }
+body.rd .rd-ldg-h { margin: 0 0 10px; font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
+body.rd .rd-ldg-chg { margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ldg-none { color: var(--ink-faint); }
+body.rd .rd-ldg-tail { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-ldg-note, body.rd .rd-ldg-foot1 { margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+body.rd .rd-ldg-foot1 b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-noagg { margin: 12px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+body.rd .rd-ldg-noagg b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-t { border-collapse: collapse; width: 100%; font-size: 14px; }
+body.rd .rd-ldg-t thead th { padding: 0 10px 6px 0; border-bottom: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: left; white-space: nowrap; }
+body.rd .rd-ldg-t thead th.on { color: var(--ink); }
+body.rd .rd-ldg-t tbody th { padding: 6px 10px 0 0; font-weight: 400; color: var(--ink-2); text-align: left; white-space: nowrap; }
+body.rd .rd-ldg-t td { padding: 6px 10px 0 0; color: var(--ink); white-space: nowrap; }
+body.rd .rd-ldg-t .num, body.rd .rd-ldg-t thead th.num { text-align: right; }
+body.rd .rd-ldg-t tr.grp th { padding-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+body.rd .rd-ldg-t tr.sub th { padding-left: 12px; }
+body.rd .rd-ldg-pair { font-weight: 600; white-space: nowrap; }
+body.rd .rd-ldg-dash { margin: 0 3px; font-weight: 400; color: var(--ink-faint); }
+body.rd .rd-ldg-tri { font-weight: 600; }
+body.rd .rd-ldg-tpp th:first-child { width: 42%; }
+body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: auto; min-width: 66%; }
+body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 128px; }
+body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 22px; padding-right: 0; }
+body.rd .rd-ldg-ppm { margin-top: 16px; }
+body.rd .rd-ldg-parts { display: none; }
+body.rd .rd-ldg-prim { display: flex; flex-wrap: wrap; gap: 8px; }
+body.rd .rd-ldg-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
+body.rd .rd-ldg-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+body.rd .rd-ldg-big { font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+body.rd .rd-ldg-prim .rd-ldg-chg { margin-left: 0; }
+body.rd .rd-ldg-dirbar { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; }
+body.rd .rd-ldg-dirbar i { display: block; height: 100%; }
+body.rd .rd-ldg-dirk { margin-top: 8px; display: flex; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; }
+body.rd .rd-ldg-dirk b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-dirnet { margin-left: auto; }
+body.rd .rd-ldg-conf { font-size: 15px; color: var(--ink-2); }
+body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
+body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
+body.rd .rd-ldg-lines { display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
+body.rd .rd-ldg-line {
+  all: unset; box-sizing: border-box; display: grid; grid-template-columns: 96px minmax(0, 1fr) 14px; column-gap: 12px; align-items: baseline;
+  padding: 5px 4px 5px 0; border-bottom: 1px solid var(--line-2); font-size: 13.5px; line-height: 1.45; color: var(--ink-2);
+}
+body.rd .rd-ldg-line.go { cursor: pointer; }
+body.rd .rd-ldg-line.go:hover { background: color-mix(in oklab, var(--ink) 4%, transparent); }
+body.rd .rd-ldg-line.go:hover .rd-ldg-arrow { color: var(--ink); }
+body.rd .rd-ldg-line:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 3px; }
+body.rd .rd-ldg-lab { padding-left: 2px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+body.rd .rd-ldg-lbody { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 14px; row-gap: 1px; min-width: 0; }
+body.rd .rd-ldg-lbody b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-lbody em { font-style: normal; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+body.rd .rd-ldg-li { white-space: nowrap; }
+body.rd .rd-ldg-li.lbl { margin-right: -6px; }
+body.rd .rd-ldg-lisoft { color: var(--ink-3); }
+body.rd .rd-ldg-arrow { color: var(--ink-3); text-align: right; }
+body.rd .rd-ldg-rk { margin-top: 14px; }
+body.rd .rd-ldg-rk tbody th { width: 1%; padding-top: 5px; color: var(--ink-3); vertical-align: baseline; }
+body.rd .rd-ldg-rk td { padding-top: 5px; vertical-align: baseline; }
+body.rd .rd-ldg-rk td.num { width: 1%; padding-right: 14px; }
+body.rd .rd-ldg-rk td:last-child { white-space: normal; line-height: 1.4; color: var(--ink-2); }
+body.rd .rd-ldg-rk2 thead th { padding-top: 0; white-space: nowrap; }
+body.rd .rd-ldg-rk2 td.num { padding-left: 14px; padding-right: 0; }
+body.rd .rd-ldg-rk2 td:last-child { padding-left: 16px; font-size: 13px; color: var(--ink-3); }
+body.rd .rd-ldg-rkp td.num { width: auto; padding-left: 10px; padding-right: 0; }
+body.rd .rd-ldg-rkp td.num:last-child { color: var(--ink); }
+body.rd .rd-ldg-rkp thead th { padding-top: 0; }
+body.rd .rd-ldg-rkp td.out { font-weight: 700; color: var(--ink); }
+body.rd .rd-ldg-pstrips { margin-top: 10px; display: flex; flex-direction: column; }
+body.rd .rd-ldg-prow { display: grid; grid-template-columns: 40px minmax(0, 1fr) 44px; column-gap: 8px; align-items: center; min-height: 26px; }
+body.rd .rd-ldg-prow > b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+body.rd .rd-ldg-prow > .rd-ap-pic { min-height: 24px; }
+body.rd .rd-ldg-phead > .rd-ap-hpic { min-height: 36px; }
+body.rd .rd-ldg-pv { font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+body.rd .rd-ldg > .poll-copy-btn { top: -6px; right: -4px; bottom: auto; }
+body.rd .rd-ldg.copy-wide { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "also"; grid-template-rows: none; padding: 28px 24px; background: var(--surface-2); }
+body.rd .rd-ldg.copy-wide .rd-ldg-side, body.rd .rd-ldg.copy-wide .rd-ldg-acts, body.rd .rd-ldg.copy-wide .rd-ldg-arrow { display: none; }
+body.rd .rd-ldg.copy-wide .rd-ldg-head { padding-right: 0; }
+body.rd .rd-pl-detail { padding: 16px 16px 20px; background: var(--surface-2); }
+@media (max-width: 1000px) {
+  body.rd .rd-ap-open .rd-ldg, body.rd .rd-ap-open .rd-ldg.wide { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "side" "also"; grid-template-rows: none; }
+}
+@media (max-width: 900px) {
+  body.rd .rd-pl-detail { padding: 14px 12px 16px; }
+  body.rd .rd-pl-detail .rd-ldg { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "also" "side"; grid-template-rows: none; }
+}
+@media (max-width: 760px) {
+  body.rd .rd-ldg, body.rd .rd-ldg-t { font-size: 13px; }
+  body.rd .rd-ldg { row-gap: 18px; }
+  body.rd .rd-ldg-t thead th { white-space: normal; }
+  body.rd .rd-ldg-tpp th:first-child { width: auto; white-space: normal; }
+  body.rd .rd-ldg-tpp td { padding-right: 4px; }
+  body.rd .rd-ldg-tpp .rd-ldg-chg { margin-left: 4px; font-size: 11.5px; }
+  body.rd .rd-ldg-tpp .rd-ldg-dash { margin: 0 1px; }
+  body.rd .rd-ldg-tpp tr.sub th { padding-left: 8px; }
+  body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: 100%; }
+  body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 0; white-space: normal; }
+  body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 10px; }
+  body.rd .rd-ldg-prim > span { width: 54px; }
+  body.rd .rd-ldg-big { font-size: 22px; }
+  body.rd .rd-ldg-line { grid-template-columns: minmax(0, 1fr) 12px; column-gap: 8px; row-gap: 2px; padding: 8px 0; font-size: 13px; }
+  body.rd .rd-ldg-line > .rd-ldg-lab { grid-column: 1; grid-row: 1; }
+  body.rd .rd-ldg-line > .rd-ldg-lbody { grid-column: 1; grid-row: 2; }
+  body.rd .rd-ldg-line > .rd-ldg-arrow { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  body.rd .rd-ldg-rk tbody th { width: 30%; white-space: normal; }
+  body.rd .rd-ldg-rk2 td:last-child { display: none; }
+  body.rd .rd-ldg-rkp tbody th { width: auto; }
+  body.rd .rd-ldg-rkp td.num { padding-left: 6px; }
+}
+@media (max-width: 420px) {
+  body.rd .rd-ldg-ldr .pt { display: none; }
+  body.rd .rd-ldg-parts { display: block; font-size: 12px; color: var(--ink-3); white-space: normal; }
+  body.rd .rd-ldg-ldr tbody th { white-space: normal; }
+  body.rd .rd-ldg-ppm { font-size: 12.5px; }
+  body.rd .rd-ldg-ppm .num { padding-left: 6px; }
+  body.rd .rd-ldg-rkp { font-size: 12.5px; }
+}
+@media (max-width: 479px) {
+  body.rd .rd-apd-dem.isn7 > .rd-apd-demr.rd-apd-isr { grid-template-columns: minmax(0, 1.75fr) repeat(5, minmax(0, 1fr)) minmax(0, 1.35fr); padding: 5px 2px; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr > span:first-child { grid-column: 1 / -1; color: var(--ink); }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr.rd-apd-demh > span:first-child { display: none; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr > span:not(:first-child) { padding-right: 2px; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr.rk > span:nth-child(2) { white-space: nowrap; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr.rd-apd-demh { letter-spacing: 0.01em; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
+}
+body.rd .rd-ldg-sh { display: none; }
+@media (max-width: 420px) {
+  body.rd .rd-ldg-prim { flex-wrap: nowrap; gap: 6px; }
+  body.rd .rd-ldg-prim > span { width: auto; flex: 1 1 0; min-width: 0; }
+  body.rd .rd-ldg-big { font-size: 21px; }
+  body.rd .rd-ldg-phead .rd-ldg-lg { display: none; }
+  body.rd .rd-ldg-phead .rd-ldg-sh { display: inline; }
+}
+body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }
 </style>
 </head>
 <body>
@@ -11410,6 +11512,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [39, -0.2],
+      "lnp": [32.3, -1.1],
+      "grn": [12.1, -0.6],
+      "oth": [16, 2.3]
+    },
     "alp": null,
     "lnp": null,
     "alpN": null,
@@ -11453,7 +11562,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/support-for-daniel-andrews-rises-as-he-marks-3000-days-in-office-20230219-p5clok.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2023-04",
     "x": 2023.3108447488585,
@@ -11482,6 +11598,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [58.1, 58.1, 58.2, 58.3, 58.3, 58.4, 58.4, 58.5, 58.5, 58.6, 58.7, 58.7, 58.8, 58.8, 58.9, 58.9, 59, 59, 59.1, 59.2, 59.2, 59.3, 59.3, 59.4, 59.3, 59.3, 59.2, 59.1, 59.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [39.5, -0.2],
+      "lnp": [29.9, -1.1],
+      "grn": [12.6, -0.6],
+      "oth": [16, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -11547,7 +11670,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/labor-holds-lead-over-state-coalition-but-deeming-drama-fails-to-make-dent-20230421-p5d2cc.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2023-05",
     "x": 2023.3941780821917,
@@ -11572,6 +11702,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "he": null,
         "n": 59
       }
+    },
+    "pyd": {
+      "n": 59,
+      "alp": [40.4, null],
+      "lnp": [29.5, null],
+      "grn": [12.4, null],
+      "oth": [15.7, null]
     },
     "alp": 61.5,
     "lnp": 38.5,
@@ -11657,6 +11794,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [39.8, -0.2],
+      "lnp": [31.1, -1.1],
+      "grn": [12.1, -0.6],
+      "oth": [16, 2.3]
+    },
     "alp": null,
     "lnp": null,
     "alpN": null,
@@ -11712,7 +11856,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/can-t-get-much-lower-pesutto-s-coalition-sinks-to-new-low-in-polls-20230614-p5dgeq.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2023-07",
     "x": 2023.5553652968038,
@@ -11737,6 +11888,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "he": null,
         "n": 59
       }
+    },
+    "pyd": {
+      "n": 59,
+      "alp": [38.9, null],
+      "lnp": [30.1, null],
+      "grn": [12.5, null],
+      "oth": [17.1, null]
     },
     "alp": 53,
     "lnp": 47,
@@ -11844,6 +12002,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [38.2, -0.2],
+      "lnp": [31.6, -1.1],
+      "grn": [12.4, -0.6],
+      "oth": [17.1, 2.3]
+    },
     "alp": null,
     "lnp": null,
     "alpN": null,
@@ -11908,7 +12073,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/labor-s-lead-stays-strong-but-andrews-personal-popularity-falls-20230816-p5dx0e.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2023-09",
     "x": 2023.705593607306,
@@ -11953,6 +12125,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [39.3, 0.9],
+      "lnp": [30.6, 0.7],
+      "grn": [12.2, -0.2],
+      "oth": [16.4, -2.3]
+    },
     "alp": 56.5,
     "lnp": 43.5,
     "alpN": 56.5,
@@ -11991,7 +12170,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Report (redbridgegroup.com.au)",
       "href": "https://redbridgegroup.com.au/wp-content/uploads/2023/09/Vic-votes-survey-Sept-2023.pdf",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2023-10",
     "x": 2023.8355022831051,
@@ -12021,6 +12207,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [58.2, 58.1, 57.9, 57.8, 57.7, 57.5, 57.4, 57.3, 57.1, 57, 56.9, 56.9, 56.9, 56.8, 55.8, 55.8, 55.7, 55.7, 55.6, 55.6, 55.6, 55.5, 55.5, 55.4, 55.4, 55.4, 55.3, 55.3, 55.2, 55.2, 55.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [36.5, -0.2],
+      "lnp": [33.4, -1.1],
+      "grn": [12.7, -0.6],
+      "oth": [17.4, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -12086,7 +12279,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/jacinta-allan-maintains-commanding-lead-over-coalition-but-gap-narrows-20231010-p5eb5f.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2023-12",
     "x": 2023.9254566210045,
@@ -12114,6 +12314,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [56.2, 56.1, 56, 56, 55.9, 55.8, 55.8, 55.7, 55.6, 55.5, 55.5, 55.4, 55.3, 55.3, 55.2, 55.1, 55, 54.9, 54.9, 54.8, 54.7, 54.6, 54.5, 54.4, 54.3, 54.2, 54.2, 54.1, 54, 53.9]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [36.2, -0.2],
+      "lnp": [35.1, -1.1],
+      "grn": [12.8, -0.6],
+      "oth": [16.3, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -12179,7 +12386,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/support-for-allan-dips-but-labor-holds-strong-lead-over-coalition-20231208-p5eq38.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2023-12",
     "x": 2023.950114155251,
@@ -12222,6 +12436,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [54.7]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [36.6, 0.9],
+      "lnp": [33.2, 0.7],
+      "grn": [12.6, -0.2],
+      "oth": [17.3, -2.3]
     },
     "alp": 55.9,
     "lnp": 44.1,
@@ -12290,7 +12511,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/liberal-brand-a-very-damaged-product-in-victoria-redbridge-director-tony-barry-says/news-story/d6eac63bd65cf3568dceebb500796ca1",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2024-03",
     "x": 2024.2220319634703,
@@ -12333,6 +12561,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [54.4, 54.3, 54.2, 54.1, 54, 53.9, 53.8, 53.8, 53.7, 53.6, 53.5, 53.4, 53.3, 53.2, 53.1, 53.1, 53, 52.9, 52.8, 52.7, 52.6, 52.5, 52.4, 52.3, 52.2, 52.1, 52, 51.9, 51.8, 51.7, 51.6]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [33, 0.9],
+      "lnp": [36.1, 0.7],
+      "grn": [13.1, -0.2],
+      "oth": [17, -2.3]
     },
     "alp": 54,
     "lnp": 46,
@@ -12391,7 +12626,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/coalition-records-best-primary-vote-result-since-june-2021-poll/news-story/a8656e6e9eafd8960765483a9ffb51e8",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.3, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2024-03",
     "x": 2024.23299086758,
@@ -12433,6 +12675,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [54, 53.9, 53.8, 53.7, 53.6, 53.6, 53.5, 53.4, 53.3, 53.2, 53.1, 53, 52.9, 52.8, 52.7, 52.6, 52.5, 52.4, 52.4, 52.3, 52.2, 52.1, 52, 51.9, 51.8, 51.7, 51.7, 51.6, 51.5, 51.4]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [33.7, -0.2],
+      "lnp": [37.1, -1.1],
+      "grn": [12.7, -0.6],
+      "oth": [18, 2.3]
     },
     "alp": 54.6,
     "lnp": 45.4,
@@ -12498,7 +12747,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/slip-in-labor-support-pushes-pesutto-s-team-ahead-for-first-time-in-years-20240327-p5ffl9.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2024-05",
     "x": 2024.3859589041097,
@@ -12526,6 +12782,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [53.1, 53, 52.9, 52.9, 52.8, 52.8, 52.7, 52.6, 52.6, 52.5, 52.4, 52.4, 52.3, 52.3, 52.2, 52.1, 52.1, 52, 52, 51.9, 51.8, 51.7, 51.5, 51.4, 51.3, 51.1, 51, 50.9, 50.7, 50.6]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [32.5, -0.2],
+      "lnp": [37.4, -1.1],
+      "grn": [12.8, -0.6],
+      "oth": [16.8, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -12591,7 +12854,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/labor-s-popularity-plunges-as-voters-demand-government-tackle-debt-20240520-p5jf41.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2024-06",
     "x": 2024.4364155251142,
@@ -12633,6 +12903,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [52.1, 52, 51.8, 51.7, 51.6, 51.5, 51.4, 51.3, 51.1, 51, 50.9, 50.9, 50.8, 50.7, 50.7, 50.6, 50.5, 50.5, 50.4, 50.3, 50.3, 50.2, 50.2, 50.1, 50, 50, 49.9, 49.9, 49.8, 49.8]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [29.6, 0.9],
+      "lnp": [38, 0.7],
+      "grn": [12.8, -0.2],
+      "oth": [19, -2.3]
     },
     "alp": 55,
     "lnp": 45,
@@ -12691,7 +12968,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/jacinta-allans-labor-government-would-win-election-polling-shows/news-story/4c411835b5aa4ceba971d50f89df58ef",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2024-07",
     "x": 2024.5389269406394,
@@ -12719,6 +13003,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.6, 51.5, 51.5, 51.5, 51.5, 51.5, 51.4, 51.3, 51.2, 51.1, 51, 50.9, 50.8, 50.7, 50.7, 50.6, 50.5, 50.4, 50.3, 50.2, 50.1, 50, 49.9, 49.8, 49.7, 49.7, 49.6, 49.6]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [30.4, -0.2],
+      "lnp": [38.6, -1.1],
+      "grn": [12.8, -0.6],
+      "oth": [18.2, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -12784,7 +13075,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/national/victoria/labor-primary-vote-slumps-under-premier-jacinta-allan-20240717-p5jubs.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2024-08",
     "x": 2024.597602739726,
@@ -12826,6 +13124,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.4, 51.3, 51.1, 51, 50.9, 50.8, 50.7, 50.6, 50.5, 50.4, 50.3, 50.2, 50.2, 50.1, 50, 49.9, 49.8, 49.8, 49.7, 49.6, 49.6, 49.5, 49.5, 49.4, 49.4]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.7, 0.9],
+      "lnp": [38.7, 0.7],
+      "grn": [13, -0.2],
+      "oth": [18.5, -2.3]
     },
     "alp": 50,
     "lnp": 50,
@@ -12884,7 +13189,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/victorian-voters-vent-anger-at-allan-govt-in-shock-poll-result/news-story/c397c3fb09084fac8b1e36bc3c3e48a7",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2024-08",
     "x": 2024.6633561643835,
@@ -12928,6 +13240,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [29.1, -0.5],
+      "lnp": [38.8, 0.5],
+      "grn": [12.9, 0.8],
+      "oth": [19.1, -0.6]
+    },
     "alp": 48,
     "lnp": 52,
     "alpN": 48,
@@ -12966,7 +13285,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Report (wolfandsmith.com)",
       "href": "https://www.wolfandsmith.com/_files/ugd/78f0d6_e57dc0b5dbeb40beb34102811ab6374f.pdf",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.3, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2024-09",
     "x": 2024.6864155251142,
@@ -12994,6 +13320,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.6, 49.6, 49.5, 49.5, 49.4, 49.4, 49.3, 49.3, 49.2, 49.2, 49.2, 49.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [29, -0.2],
+      "lnp": [39.4, -1.1],
+      "grn": [12.8, -0.6],
+      "oth": [19, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -13059,7 +13392,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/john-pesutto-within-striking-distance-as-state-s-preferred-premier-20240910-p5k9d5.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2024-09",
     "x": 2024.7165525114156,
@@ -13101,6 +13441,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [50.3, 50.2, 50.1, 50, 49.9, 49.9, 49.8, 49.7, 49.7, 49.6, 49.6, 49.6, 49.5, 49.5, 49.4, 49.4, 49.3, 49.3, 49.3, 49.2, 49.2, 49.1, 49.1, 49, 49, 48.9, 48.9, 48.9, 48.8, 48.8]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.4, 0.9],
+      "lnp": [39.2, 0.7],
+      "grn": [13.1, -0.2],
+      "oth": [19.3, -2.3]
     },
     "alp": 50,
     "lnp": 50,
@@ -13159,7 +13506,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/allan-government-facing-voter-backlash-over-housing-affordability-as-suburban-rail-loop-concerns-mount/news-story/0fafb666e9f1374db1b698464fc16ecd",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2024-10",
     "x": 2024.758789954338,
@@ -13203,6 +13557,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.6, 49.6, 49.5, 49.5, 49.4, 49.4, 49.3, 49.2, 49.2, 49.2, 49.1, 49.1, 49.1, 49, 49, 49, 48.9, 48.9, 48.8, 48.8, 48.8, 48.7, 48.7, 48.6, 48.6, 48.5]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.4, 0.9],
+      "lnp": [39.5, 0.7],
+      "grn": [13.1, -0.2],
+      "oth": [18.7, -2.3]
     },
     "alp": 49,
     "lnp": 51,
@@ -13261,7 +13622,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/coalition-in-electionwinning-position-after-edging-ahead-of-labor/news-story/f2db9d30cb1d5881258fd12b7568ff43",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2024-11",
     "x": 2024.861301369863,
@@ -13289,6 +13657,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.2, 49.2, 49.1, 49.1, 49.1, 49, 49, 48.9, 48.9, 48.8, 48.8, 48.7, 48.7, 48.6, 48.6, 48.5, 48.5, 48.4, 48.4, 48.4, 48.3, 48.3, 48.2, 48.2, 48.1, 46.9, 46.9, 47]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.1, -0.2],
+      "lnp": [41, -1.1],
+      "grn": [12.9, -0.6],
+      "oth": [17.4, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -13354,7 +13729,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/national/victoria/john-pesutto-chalks-up-a-first-time-victory-over-jacinta-allan-in-latest-resolve-poll-20241111-p5kphq.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2024-11",
     "x": 2024.888698630137,
@@ -13397,6 +13779,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.1, 49, 49, 49, 48.9, 48.9, 48.8, 48.8, 48.7, 48.7, 48.6, 48.6, 48.5, 48.5, 48.5, 48.4, 48.4, 48.3, 48.3]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [27.7, 0.9],
+      "lnp": [39.6, 0.7],
+      "grn": [12.9, -0.2],
+      "oth": [19.4, -2.3]
     },
     "alp": 49,
     "lnp": 51,
@@ -13455,7 +13844,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/cashstrapped-victorians-shift-support-to-coalition-according-to-new-poll/news-story/1462038ab13029839c8b7c69bd546f1f",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-01",
     "x": 2025.0855022831051,
@@ -13485,6 +13881,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1, 49.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28, -0.2],
+      "lnp": [39.8, -1.1],
+      "grn": [13.4, -0.6],
+      "oth": [18.7, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -13550,7 +13953,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Report (archive.today)",
       "href": "https://archive.today/20250123215348/https://www.theage.com.au/politics/victoria/they-ve-turned-off-allan-victorian-labor-vote-plunges-to-historic-low-poll-shows-20250123-p5l6q1.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-03",
     "x": 2025.2247716894976,
@@ -13593,6 +14003,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [47.1, 47.2, 47.3, 47.4, 47.4, 47.5, 47.6, 47.6, 47.7, 47.8, 47.9, 47.9, 48, 48.1, 48.2, 48.2, 48.3, 48.4, 48.5, 48.6, 48.8, 48.9, 49, 49.2, 49.3, 49.5, 49.6, 49.7, 49.9, 50]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [26.8, -2.3],
+      "lnp": [40.7, 1.1],
+      "grn": [13.3, 1.2],
+      "oth": [19.2, 0.1]
     },
     "alp": 48,
     "lnp": 52,
@@ -13637,7 +14054,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "DemosAU’s release",
       "href": "https://demosau.com/news/victorian-poll/",
       "title": "DemosAU’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.3, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-03",
     "x": 2025.2494292237443,
@@ -13665,6 +14089,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [47.9, 48, 48.1, 48.2, 48.3, 48.4, 48.5, 48.6, 48.7, 48.8, 48.9, 49, 49.1, 49.1, 49.2, 49.3, 49.4, 49.5, 49.7, 49.8, 49.9, 50, 50.1, 50.2, 50.3, 50.4, 50.6, 50.7, 50.8, 50.9]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.2, -0.2],
+      "lnp": [39.4, -1.1],
+      "grn": [13.3, -0.6],
+      "oth": [19.5, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -13730,7 +14161,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/jacinta-allan-s-sinking-popularity-inflicts-brand-damage-on-albanese-s-election-hopes-20250331-p5lnyy.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-04",
     "x": 2025.2560502283106,
@@ -13774,6 +14212,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [47.6, 47.7, 47.8, 47.9, 48, 48, 48.1, 48.2, 48.3, 48.4, 48.4, 48.5, 48.5, 48.6, 48.7, 48.9, 49, 49.1, 49.3, 49.4, 49.5, 49.7, 49.8, 50, 50.1, 50.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [26.5, 0.9],
+      "lnp": [39.8, 0.7],
+      "grn": [13.4, -0.2],
+      "oth": [19.5, -2.3]
     },
     "alp": 49,
     "lnp": 51,
@@ -13846,7 +14291,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/victorian-premier-jacinta-allan-will-face-pressure-to-quit-if-labor-is-hit-hard-at-federal-election/news-story/ceec79f877c24b80e654fdcc2c073429",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-06",
     "x": 2025.4994292237443,
@@ -13889,6 +14341,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.3, 49.4, 49.6, 49.7, 49.8, 49.9, 50, 50.1, 50.3, 50.4, 50.5, 50.6, 50.7, 50.8, 51, 51, 51.1, 51.1, 51.2, 51.2, 51.2, 51.3, 51.3, 51.4, 51.4, 51.4, 51.5, 51.5, 51.6, 51.5]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [30.3, 1.2],
+      "lnp": [37.4, 0.4],
+      "grn": [13.5, -0.1],
+      "oth": [18.5, 0]
     },
     "alp": 53,
     "lnp": 47,
@@ -13943,7 +14402,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Australian’s report",
       "href": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-06",
     "x": 2025.4994292237443,
@@ -13986,6 +14452,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [49.4, 49.5, 49.6, 49.8, 49.9, 50, 50.1, 50.2, 50.3, 50.5, 50.6, 50.7, 50.8, 50.9, 51.1, 51.2, 51.2, 51.2, 51.3, 51.3, 51.3, 51.4, 51.4, 51.5, 51.5, 51.5, 51.6, 51.6, 51.6, 51.6]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [30.8, 0.9],
+      "lnp": [36.1, 0.7],
+      "grn": [13.3, -0.2],
+      "oth": [19.1, -2.3]
     },
     "alp": 51.5,
     "lnp": 48.5,
@@ -14044,7 +14517,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/labor-on-track-to-win-historic-fourth-election-in-victoria-coalition-support-falls-to-low-point/news-story/84aa44a2d3ff9eb4f43bc7176ba4ba35",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-08",
     "x": 2025.6304794520547,
@@ -14072,6 +14552,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.2, 51.4, 51.4, 51.4, 51.4, 51.4, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.6, 51.6, 51.6, 51.6, 51.6, 51.5]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [30.4, -0.2],
+      "lnp": [36.5, -1.1],
+      "grn": [13.4, -0.6],
+      "oth": [19.7, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -14128,7 +14615,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/allan-rises-from-historic-low-eyes-unprecedented-fourth-labor-term-20250818-p5mnuz.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-09",
     "x": 2025.6918949771689,
@@ -14171,6 +14665,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.8, 51.8, 51.8, 51.9, 51.9, 51.9, 51.9, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 51.9, 51.9, 51.9, 51.8, 51.8, 51.8, 51.7, 51.7, 51.6, 51.5, 51.5]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [31.1, -2.3],
+      "lnp": [35.8, 1.1],
+      "grn": [13.3, 1.2],
+      "oth": [20.2, 0.1]
     },
     "alp": 49,
     "lnp": 51,
@@ -14238,7 +14739,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "DemosAU’s release",
       "href": "https://demosau.com/wp-content/uploads/2025/09/DemosAUPremierNational-Release-Victorian-Poll-September-25-1-1.pdf",
       "title": "DemosAU’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.3, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-09",
     "x": 2025.6973744292236,
@@ -14281,6 +14789,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.5, 51.5, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.5, 51.5, 51.4, 51.4, 51.4, 51.5, 51.5, 51.5, 51.5, 51.5, 51.5, 51.6, 51.5, 51.5, 51.4, 51.4, 51.3, 51.3]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [29.9, 0.9],
+      "lnp": [36, 0.7],
+      "grn": [13.4, -0.2],
+      "oth": [20.4, -2.3]
     },
     "alp": 52,
     "lnp": 48,
@@ -14339,7 +14854,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/allan-labor-government-extends-lead-on-coalition-in-race-to-polls-as-voters-shift-toward-minor-parties-and-independents/news-story/ca732c4be8447edba6cc8a629714bb6e",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-10",
     "x": 2025.7834474885844,
@@ -14367,6 +14889,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.7, 51.7, 51.7, 51.7, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.5, 51.5, 51.5, 51.4, 51.4, 51.3, 51.3, 51.3, 51.2, 51.2, 51.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [30, -0.2],
+      "lnp": [36.3, -1.1],
+      "grn": [13.4, -0.6],
+      "oth": [20.4, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -14432,7 +14961,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/new-poll-delivers-bleak-outlook-for-terminal-battin-leadership-20251013-p5n24f.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-10",
     "x": 2025.7889269406394,
@@ -14475,6 +15011,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.7, 51.7, 51.7, 51.7, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.5, 51.5, 51.5, 51.5, 51.5, 51.4, 51.4, 51.3, 51.3, 51.3, 51.2, 51.2, 51.2, 51.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [29.7, 0.9],
+      "lnp": [35.5, 0.7],
+      "grn": [13.4, -0.2],
+      "oth": [21.2, -2.3]
     },
     "alp": 52,
     "lnp": 48,
@@ -14533,7 +15076,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "AFR report",
       "href": "https://www.afr.com/politics/poll-shows-turnaround-in-support-for-labor-in-victoria-20251016-p5n2xx",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-10",
     "x": 2025.8245433789955,
@@ -14576,6 +15126,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.8, 51.7, 51.7, 51.7, 51.7, 51.7, 51.7, 51.7, 51.7, 51.7, 51.8, 51.8, 51.7, 51.7, 51.6, 51.6, 51.5, 51.5, 51.5, 51.4, 51.4, 50, 50, 49.9, 49.7, 49.6, 49.5, 49.5, 49.4, 49.4]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [30.2, -2.3],
+      "lnp": [36, 1.1],
+      "grn": [13.3, 1.2],
+      "oth": [20.5, 0.1]
     },
     "alp": 49,
     "lnp": 51,
@@ -14643,7 +15200,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "DemosAU’s release",
       "href": "https://demosau.com/wp-content/uploads/2025/11/DemosAU-Victoria-Poll-Oct-25.pdf",
       "title": "DemosAU’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.3, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-11",
     "x": 2025.8804794520547,
@@ -14686,6 +15250,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.5, 51.4, 51.4, 51.3, 51.3, 51.3, 51.2, 51.2, 50, 49.9, 49.8, 49.7, 49.6, 49.5, 49.4, 49.4, 49.3, 49.3, 49.2, 49.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [29.3, 0.4],
+      "lnp": [36, 0.3],
+      "grn": [13.2, 1],
+      "oth": [20.7, -1.7]
     },
     "alp": 49,
     "lnp": 51,
@@ -14734,7 +15305,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Freshwater’s release",
       "href": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-171125.xlsx",
       "title": "Freshwater’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-11",
     "x": 2025.888698630137,
@@ -14777,6 +15355,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.6, 51.6, 51.6, 51.6, 51.6, 51.5, 51.5, 51.4, 51.4, 51.4, 51.3, 51.3, 51.2, 50, 49.9, 49.8, 49.7, 49.6, 49.5, 49.4, 49.4, 49.3, 49.3, 49.2, 49.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [29.1, 1.2],
+      "lnp": [36.9, 0.4],
+      "grn": [12.8, -0.1],
+      "oth": [18.7, 0]
     },
     "alp": 49,
     "lnp": 51,
@@ -14858,7 +15443,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Australian’s report",
       "href": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.3, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-11",
     "x": 2025.8996575342467,
@@ -14901,6 +15493,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.6, 51.6, 51.6, 51.6, 51.6, 51.6, 51.5, 51.5, 51.4, 51.4, 51.3, 51.3, 51.2, 51.2, 49.5, 49.5, 49.4, 49.3, 49.2, 49.2, 49.1, 49.1, 49.1, 49, 49, 48.9, 48.9, 48.9, 48.8, 48.8]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.2, 0.4],
+      "lnp": [36.6, 0.3],
+      "grn": [12.8, 1],
+      "oth": [19.2, -1.7]
     },
     "alp": 50,
     "lnp": 50,
@@ -14968,7 +15567,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Freshwater’s release",
       "href": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-241125.xlsx",
       "title": "Freshwater’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2025-12",
     "x": 2025.9364155251142,
@@ -14996,6 +15602,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.7, 51.6, 51.5, 51.5, 51.5, 51.4, 51.4, 51.4, 51.3, 50.3, 50.3, 50.2, 50.1, 50, 49.9, 49.9, 49.8, 49.7, 49.6, 49.5, 49.5, 49.4, 49.3, 49.2, 49.1, 49.1, 49, 48.9, 48.8]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.4, -0.2],
+      "lnp": [35.3, -1.1],
+      "grn": [12.9, -0.6],
+      "oth": [18.4, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -15061,7 +15674,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/victoria-enters-election-year-on-political-knife-s-edge-as-opposition-support-surges-20251208-p5nlso.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2025-12",
     "x": 2025.9391552511415,
@@ -15105,6 +15725,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.2, 50, 49.9, 49.8, 49.7, 49.5, 49.5, 49.4, 49.3, 49.3, 49.2, 49.2, 49.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [28.1, 0.9],
+      "lnp": [36, 0.7],
+      "grn": [13, -0.2],
+      "oth": [18.6, -2.3]
     },
     "alp": 50,
     "lnp": 50,
@@ -15163,7 +15790,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "AFR report",
       "href": "https://www.afr.com/politics/voters-see-vic-politics-as-the-deeply-unpopular-versus-the-untested-20251210-p5nmiw",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2026-02",
     "x": 2026.111301369863,
@@ -15220,6 +15854,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [53.4, 53.3, 53.2, 53.1, 53, 52.9, 52.8, 52.7, 52.6, 52.6, 52.5, 52.4, 52.4, 52.3, 52.2, 52.1, 52]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [26.9, -2.3],
+      "lnp": [30.2, 1.1],
+      "grn": [12.8, 1.2],
+      "onp": [16.8, -0.3],
+      "oth": [13.8, 0.1]
     },
     "ldYd": {
       "opp|fav": {
@@ -15309,7 +15951,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "DemosAU’s release",
       "href": "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Vic-Poll-Feb-2026-1.pdf",
       "title": "DemosAU’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-02",
     "x": 2026.1222602739726,
@@ -15353,6 +16003,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [52.1, 52, 52, 52, 52, 51.9, 51.9, 51.9, 51.9, 51.9, 51.8, 51.8, 51.8, 51.8, 51.7]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [26.3, -0.2],
+      "lnp": [30.3, -1.1],
+      "grn": [12.9, -0.6],
+      "onp": [20.5, -1.2],
+      "oth": [13.3, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -15410,7 +16068,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/none-of-the-above-poll-reveals-victorian-flight-from-major-parties-20260216-p5o2q9.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.3, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-02",
     "x": 2026.1277397260274,
@@ -15445,6 +16111,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "he": null,
         "n": 1
       }
+    },
+    "pyd": {
+      "n": 59,
+      "alp": [26.2, null],
+      "lnp": [28.8, null],
+      "grn": [12.8, null],
+      "onp": [20.1, null],
+      "oth": [12.4, null]
     },
     "alp": 52,
     "lnp": 48,
@@ -15593,6 +16267,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [25.6, 0.4],
+      "lnp": [28.7, 0.3],
+      "grn": [12.9, 1],
+      "onp": [20.2, 0.1],
+      "oth": [12.5, -1.7]
+    },
     "ldYd": {
       "opp|fav": {
         "v": -43.85,
@@ -15679,7 +16361,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Freshwater’s release",
       "href": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-230226.xlsx",
       "title": "Freshwater’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.3, 13.4],
+      "onp": [22.3, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-02",
     "x": 2026.1578767123287,
@@ -15736,6 +16426,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [53.5, 53.4, 53.3, 53.2, 53.1, 53.1, 53, 52.9, 52.8, 52.8, 52.7, 52.6, 52.5, 52.4, 52.3, 52.2, 52.1, 52, 51.9, 51.9, 51.8, 51.7]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [27.1, 0.9],
+      "lnp": [29.1, 0.7],
+      "grn": [12.8, -0.2],
+      "onp": [20.3, 1.8],
+      "oth": [11.7, -2.3]
     },
     "alp": 48,
     "lnp": 52,
@@ -15799,7 +16497,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Report (web.archive.org)",
       "href": "https://web.archive.org/web/20260308055403/https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-03",
     "x": 2026.2302511415523,
@@ -15856,6 +16562,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [53.1, 52.9, 52.8, 52.7, 52.6, 52.5, 52.4, 52.3, 52.2, 52.2, 52.1, 52, 51.9, 51.8, 51.8, 51.7, 51.6, 51.6, 51.5, 51.4, 51.4, 51.3, 51.3, 51.2, 51.1, 51.1, 51, 51]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [25.9, 0.4],
+      "lnp": [28.5, 0.3],
+      "grn": [12.8, 1],
+      "onp": [22.1, 0.1],
+      "oth": [11.4, -1.7]
     },
     "ldYd": {
       "opp|fav": {
@@ -15951,7 +16665,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Freshwater’s release",
       "href": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-230326.xlsx",
       "title": "Freshwater’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.3, 13.4],
+      "onp": [22.1, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-04",
     "x": 2026.299885844749,
@@ -15995,6 +16717,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [52.6, 52.5, 52.5, 52.4, 52.4, 52.3, 52.3, 52.2, 52.1, 52, 52, 51.9, 51.8, 51.7, 51.6, 51.6, 51.5, 51.4, 51.3, 51.2, 51.1, 51.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [25.6, -0.2],
+      "lnp": [28.3, -1.1],
+      "grn": [13, -0.6],
+      "onp": [21.6, -1.2],
+      "oth": [11, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -16054,7 +16784,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/one-nation-entrenched-as-third-force-as-victorians-adopt-drain-the-swamp-mentality-20260421-p5zps9.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-04",
     "x": 2026.3163242009134,
@@ -16084,6 +16822,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "he": null,
         "n": 22
       }
+    },
+    "pyd": {
+      "n": 59,
+      "alp": [25.7, null],
+      "lnp": [28.4, null],
+      "grn": [12.8, null],
+      "onp": [22.8, null],
+      "oth": [10.7, null]
     },
     "alp": 51,
     "lnp": 49,
@@ -16238,6 +16984,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [25, 0.4],
+      "lnp": [27.2, 0.3],
+      "grn": [12.8, 1],
+      "onp": [24, 0.1],
+      "oth": [10.5, -1.7]
+    },
     "ldYd": {
       "opp|fav": {
         "v": -51.03,
@@ -16326,7 +17080,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Poll Bludger post",
       "href": "https://www.pollbludger.net/2026/06/08/freshwater-strategy-labor-23-coalition-27-one-nation-25-in-victoria/",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.4, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.3, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2026-06",
     "x": 2026.4473744292236,
@@ -16383,6 +17145,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.8, 51.7, 51.7, 51.6, 51.5, 51.5, 51.4, 51.3, 51.3, 51.2, 51.1, 51.1, 51, 51, 50.9, 50.9, 50.9, 50.9, 50.9, 50.9, 50.9, 51, 51, 51, 51, 51.1, 51.1]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.9, -2.3],
+      "lnp": [26.5, 1.1],
+      "grn": [12.7, 1.2],
+      "onp": [24.6, -0.3],
+      "oth": [10.5, 0.1]
     },
     "ldYd": {
       "opp|fav": {
@@ -16469,7 +17239,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "DemosAU’s release",
       "href": "https://demosau.com/wp-content/uploads/2026/06/DemosAU-Vic-Poll-June-2026.pdf",
       "title": "DemosAU’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.3, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-06",
     "x": 2026.450114155251,
@@ -16513,6 +17291,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.5, 51.4, 51.3, 51.3, 51.2, 51.1, 51.1, 51, 50.9, 50.9]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.5, -0.2],
+      "lnp": [27.5, -1.1],
+      "grn": [12.8, -0.6],
+      "onp": [23.7, -1.2],
+      "oth": [10.7, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -16572,7 +17358,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/end-of-days-labor-s-own-supporters-say-time-s-up-for-allan-government-20260614-p606m1.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-06",
     "x": 2026.4939497716894,
@@ -16629,6 +17423,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.5, 51.4, 51.3, 51.2, 51.2, 51.1, 51, 50.9, 50.9, 50.8, 50.7, 50.7, 50.7, 50.8, 50.8, 50.8, 50.8, 50.8, 50.9, 50.9, 50.9, 51, 51, 51.3, 51.3, 51.2, 51.2, 51.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.6, 0.9],
+      "lnp": [27.1, 0.7],
+      "grn": [12.7, -0.2],
+      "onp": [23.8, 1.8],
+      "oth": [10.9, -2.3]
     },
     "ldYd": {
       "opp|fav": {
@@ -16721,7 +17523,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "AFR report",
       "href": "https://www.afr.com/politics/one-nation-overtakes-labor-liberals-in-victoria-allan-s-rating-dives-20260701-p60bnh",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.1, 22.1],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2026-07",
     "x": 2026.5279680365297,
@@ -16780,6 +17590,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [25.1, -1.2],
+      "lnp": [26.4, -0.2],
+      "grn": [12.8, 0.2],
+      "onp": [24.3, -0.1],
+      "oth": [10.2, 2.6]
+    },
     "alp": 46.2,
     "lnp": 53.8,
     "alpN": 46.2,
@@ -16819,7 +17637,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/new-premier-battles-to-keep-seat-as-liberal-treaty-pledge-falls-flat-20260806-p60m2s.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-07",
     "x": 2026.5334474885844,
@@ -16861,6 +17687,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.1, 51, 51, 50.9, 50.8, 50.7, 50.7, 50.7, 50.7, 50.7, 50.7, 50.7, 50.7, 50.7, 50.7, 50.7, 50.8, 50.8, 50.9, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.2, 51.2, 51.2, 51.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.9, -0.2],
+      "lnp": [26.3, -1.1],
+      "grn": [12.8, -0.6],
+      "onp": [23.9, -1.2],
+      "oth": [10.4, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -16929,7 +17763,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/even-with-one-nation-support-dropping-state-labor-still-has-reason-to-worry-ahead-of-november-20260713-p60etg.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-07",
     "x": 2026.5389269406394,
@@ -16971,6 +17813,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.2, 51.1, 51.1, 51, 51, 50.9, 50.9, 50.9, 51, 51, 51, 51.1, 51.1, 51.2, 51.2, 51.3, 51.3, 51.4, 51.3, 51.3, 51.2, 51.2, 51.2, 51.2, 51.2, 51.2, 51.3]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [25.4, 0.9],
+      "lnp": [28, 0.7],
+      "grn": [12.9, -0.2],
+      "onp": [22.6, 1.8],
+      "oth": [10.1, -2.3]
     },
     "alp": null,
     "lnp": null,
@@ -17030,7 +17880,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Poll Bludger post",
       "href": "https://www.pollbludger.net/2026/07/14/resolve-strategic-labor-27-coalition-27-one-nation-22-in-victoria/",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.1, 22.1],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2026-07",
     "x": 2026.5718036529681,
@@ -17087,6 +17945,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [50.8, 50.7, 50.6, 50.6, 50.6, 50.6, 50.7, 50.6, 50.6, 50.6, 50.6, 50.6, 50.6, 50.6, 50.6, 51.1, 51.1, 51.1, 51, 51, 51.1, 51.1, 51.1, 51.1, 51.2, 51.2, 51.2, 51.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.9, 1.2],
+      "lnp": [26.7, 0.4],
+      "grn": [12.8, -0.1],
+      "onp": [23.5, -1.2],
+      "oth": [10.6, 0]
     },
     "alp": 48,
     "lnp": 52,
@@ -17169,7 +18035,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Australian’s report",
       "href": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.4, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.3, 11.2]
+    }
   }, {
     "ym": "2026-08",
     "x": 2026.5866438356165,
@@ -17227,6 +18101,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [50.9, 50.8, 50.8, 50.9, 50.9, 50.9, 50.9, 50.9, 50.9, 50.9, 51, 51, 51, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.2, 51.2, 51.2, 51.3, 51.3, 51.3, 51.3, 51.4, 51.4, 51.4, 51.4]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [25, 0.9],
+      "lnp": [29, 0.7],
+      "grn": [13.2, -0.2],
+      "onp": [22.4, 1.8],
+      "oth": [10.2, -2.3]
     },
     "ldYd": {
       "opp|fav": {
@@ -17313,7 +18195,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Accent’s release",
       "href": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll",
       "title": "Accent’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.6, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.3, 13.4],
+      "onp": [22.1, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-08",
     "x": 2026.5921232876713,
@@ -17371,6 +18261,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [50.8, 50.9, 50.9, 50.9, 51, 51, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.1, 51.2, 51.2, 51.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.3, 0.4],
+      "lnp": [29, 0.3],
+      "grn": [13.4, 1],
+      "onp": [22, 0.1],
+      "oth": [11.2, -1.7]
     },
     "ldYd": {
       "opp|fav": {
@@ -17457,7 +18355,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Freshwater’s release",
       "href": "https://freshwaterstrategy.com/2026/08/04/herald-sun-freshwater-strategy-august-polling-data/",
       "title": "Freshwater’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.1, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-08",
     "x": 2026.603082191781,
@@ -17487,6 +18393,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "he": null,
         "n": 22
       }
+    },
+    "pyd": {
+      "n": 59,
+      "alp": [24.4, null],
+      "lnp": [29.2, null],
+      "grn": [13.3, null],
+      "onp": [22.2, null],
+      "oth": [10.8, null]
     },
     "alp": 49,
     "lnp": 51,
@@ -17628,6 +18542,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }
       }
     },
+    "pyd": {
+      "n": 58,
+      "alp": [24.3, -2.3],
+      "lnp": [28.7, 1.1],
+      "grn": [13.5, 1.2],
+      "onp": [22.4, -0.3],
+      "oth": [11, 0.1]
+    },
     "ldYd": {
       "opp|fav": {
         "v": -26.29,
@@ -17716,7 +18638,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "DemosAU’s release",
       "href": "https://demosau.com/news/coalition-holds-election-winning-lead-in-latest-victoria-poll/",
       "title": "DemosAU’s own release of this poll"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.5, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.5, 13.4],
+      "onp": [22.2, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-08",
     "x": 2026.6277397260274,
@@ -17758,6 +18688,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [50.8, 50.9, 50.9, 50.9, 51, 51, 51.3, 51.3, 51.3, 51.3, 51.3, 51.3, 51.3, 51.3, 51.3, 51.3, 51.4, 51.4, 51.4, 51.4, 51.4, 51.4, 51.4]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.4, -0.2],
+      "lnp": [29.3, -1.1],
+      "grn": [13.5, -0.6],
+      "onp": [22.1, -1.2],
+      "oth": [10.4, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -17831,7 +18769,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/revealed-how-leadership-coup-has-changed-labor-s-electoral-fortunes-20260817-p60p2l.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.4, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.5, 13.4],
+      "onp": [22.1, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-09",
     "x": 2026.7028538812785,
@@ -17873,6 +18819,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.2, 51.2, 51.2, 51.3, 51.3, 51.3, 51.4, 51.4, 51.5, 51.5, 51.5, 51.5, 51.5]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.5, -0.2],
+      "lnp": [28.7, -1.1],
+      "grn": [13.5, -0.6],
+      "onp": [22, -1.2],
+      "oth": [10.3, 2.3]
     },
     "alp": null,
     "lnp": null,
@@ -17944,7 +18898,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "The Age’s report",
       "href": "https://www.theage.com.au/politics/victoria/debt-concern-looms-large-for-voters-as-carroll-struggles-to-break-through-20260914-p60x45.html",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.4, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.5, 13.4],
+      "onp": [21.8, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-09",
     "x": 2026.705593607306,
@@ -18001,6 +18963,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51, 51, 51, 51.1, 51.2, 51.2, 51.2, 51.2, 51.2, 51.2, 51.2, 51.2, 51.3, 51.3, 51.3, 51.3, 51.4, 51.4, 51.4, 51.4, 51.4]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [25.2, 0.9],
+      "lnp": [29, 0.7],
+      "grn": [12.8, -0.2],
+      "onp": [22.3, 1.8],
+      "oth": [11.3, -2.3]
     },
     "alp": 44,
     "lnp": 56,
@@ -18074,7 +19044,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "APC methodology: not yet out",
       "href": "https://www.accent-research.com/projects",
       "title": "Accent hasn’t posted this poll’s Australian Polling Council methodology statement yet. This opens the page where it files them."
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [25, 24.5],
+      "lnp": [28.9, 28.8],
+      "grn": [12.8, 13.4],
+      "onp": [21.9, 22.1],
+      "oth": [11.8, 11.2]
+    }
   }, {
     "ym": "2026-09",
     "x": 2026.7220319634703,
@@ -18131,6 +19109,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [50.9, 51, 51.1, 51.1, 51.1, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24, -2.3],
+      "lnp": [28.7, 1.1],
+      "grn": [13.4, 1.2],
+      "onp": [23.2, -0.3],
+      "oth": [10.5, 0.1]
     },
     "ldYd": {
       "opp|fav": {
@@ -18217,7 +19203,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/ben-carrolls-promised-new-direction-failing-to-win-over-victorian-voters/news-story/b67ec2414f9c5867909abd57f6baac15",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [23.9, 24.5],
+      "lnp": [28.7, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.8, 22.1],
+      "oth": [11.2, 11.2]
+    }
   }, {
     "ym": "2026-09",
     "x": 2026.7439497716894,
@@ -18274,6 +19268,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "v": [51.1, 51.1, 51.2, 51.2, 51.2, 51.2, 51.2]
         }
       }
+    },
+    "pyd": {
+      "n": 58,
+      "alp": [24.9, 0.4],
+      "lnp": [28.8, 0.3],
+      "grn": [13.4, 1],
+      "onp": [22.4, 0.1],
+      "oth": [10.2, -1.7]
     },
     "ldYd": {
       "opp|fav": {
@@ -18364,7 +19366,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
       "title": "The published report this poll’s figures were read from"
-    }]
+    }],
+    "peff": {
+      "w": 1,
+      "alp": [24.9, 24.5],
+      "lnp": [28.8, 28.8],
+      "grn": [13.4, 13.4],
+      "onp": [22.4, 22.1],
+      "oth": [10.2, 11.2]
+    }
   }];
   const pollsterTable = [{
     "pollster": "Freshwater",
@@ -49304,51 +50314,7 @@ function RdPolls({
   const detail = e => {
     const r = e.poll,
       pj = e.next;
-    const f = figOf(r);
-    const cgd = r.chg && r.chg.d || {};
-    const plus = (k, dec) => {
-      const s = rdApChg(cgd[k], dec);
-      return s ? React.createElement(React.Fragment, null, " ", React.createElement("span", {
-        className: "rd-apd-chg"
-      }, s)) : null;
-    };
-    const clause = items => items.map(([txt, k, dec], i) => React.createElement(React.Fragment, {
-      key: k
-    }, i > 0 && ", ", txt, plus(k, dec)));
-    const imp = clause([r.alpOnImp != null ? ["Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation", "impOn", 1] : null, r.alpImp != null ? ["Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition", "imp", 1] : null].filter(Boolean));
-    const pub = clause([r.tppAlt ? ["Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation", "altAlpOn", 0] : null, r.alp2pp != null ? ["Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition", "alp2pp", 0] : null].filter(Boolean));
-    const ppm = ppmContests(r).map(s => {
-      const os = Object.keys(s).filter(k => k !== "alb" && k !== "unc");
-      return [apWho(r, "alb", "Albanese") + " " + s.alb, ...os.map(o => {
-        const Lm = (window.LEADER_META || {})[o];
-        return apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
-      })].join(", ");
-    }).join("; ");
-    const ip = D.individualPolls.find(q => q.pollster === r.pollster && q.released === r.released);
-    const moeOf = isPub => {
-      if (!ip) return null;
-      const ms = [isPub ? r.tppAlt ? "onp" : null : r.alpOnImp != null ? "onp" : null, isPub ? r.alp2pp != null ? "lnp" : null : r.alpImp != null ? "lnp" : null].filter(Boolean).map(c => rdPollMargin(ip, c, isPub)).filter(m => m != null).map(m => m.toFixed(1));
-      if (!ms.length) return null;
-      const lo = Math.min(...ms),
-        hi = Math.max(...ms);
-      return "±" + (lo === hi ? lo.toFixed(1) : lo.toFixed(1) + "–" + hi.toFixed(1)) + (isPub ? " on the published" : " on the implied");
-    };
-    const moes = [imp.length > 0 && moeOf(false), pub.length > 0 && moeOf(true)].filter(Boolean);
-    const moeTxt = moes.length ? moes.join(", ") + (moes.length > 1 ? " figures" : " figure") + ", " + rdMarginBasis(ip) : null;
-    const dec = (() => {
-      if (r.undecided != null) {
-        const b = r.undecidedBasis || "first";
-        return React.createElement(React.Fragment, null, r.undecided, "% ", b === "soft" ? "not firm" : "undecided", plus("und", 1), " – ", b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "couldn’t name a party when first asked");
-      }
-      const f = Array.isArray(r.firmAll) && r.firmAll.length === 3 ? r.firmAll : null;
-      if (f) return React.createElement(React.Fragment, null, f[1] + f[2], "% not firm", " – solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + ", on the wave’s own vote-softness table");
-      return null;
-    })();
-    const a = r.appr || {};
-    const net = v => v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
-    const nets = clause([[apWho(r, "alb", "Albanese"), a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], [apWho(r, "hanson", "Hanson"), a.hansonNet, "hansonNet"]].filter(([, v]) => v != null).map(([n, v, k]) => [n + " " + net(v), k, 0]));
-    const refIso = r.chg && r.chg.r ? r.chg.r.pOnp || r.chg.r.pAlp || r.chg.r.impOn || r.chg.r.imp || r.chg.r.alp2pp : null;
-    const prev = refIso ? D.individualPolls.find(x => x.pollster === r.pollster && x.released === refIso) : null;
+    const ip = D.individualPolls.find(q => q.pollster === r.pollster && q.released === r.released) || r;
     const key = window.AP.pollRowKey && window.AP.pollRowKey({
       pollster: r.pollster,
       released: r.released
@@ -49356,49 +50322,9 @@ function RdPolls({
     const recent = (pj && pj.recent || []).slice(-5).reverse();
     const nx = nextWords(e);
     const then = e.proj.filter(x => x.ahead === 1)[0];
-    return React.createElement("div", {
-      className: "rd-pl-detail"
-    }, React.createElement("div", {
-      className: "rd-pld-poll"
-    }, React.createElement("div", {
-      className: "rd-pld-h"
-    }, rdPollHead({
-      ...(D.individualPolls.find(q => q.pollster === r.pollster && q.released === r.released) || {}),
-      ...r
-    })), r.p && React.createElement("div", {
-      className: "rd-pld-prim"
-    }, plParties.map(([id, lab]) => r.p[id] != null && React.createElement("span", {
-      key: id
-    }, React.createElement("b", {
-      style: {
-        color: id === "oth" ? "var(--ink-3)" : inkOf("var(--" + id + ")")
-      }
-    }, lab), React.createElement("span", {
-      style: {
-        color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")")
-      }
-    }, +r.p[id].toFixed(1)), React.createElement("span", {
-      className: "rd-apd-chg"
-    }, rdApChg(cgd[{
-      alp: "pAlp",
-      lnp: "pLnp",
-      grn: "pGrn",
-      onp: "pOnp",
-      oth: "pOth"
-    }[id]], 0) || "\u00a0")))), React.createElement("dl", {
-      className: "rd-pld-dl"
-    }, imp.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Two-party, implied"), React.createElement("dd", null, imp)), pub.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "As published"), React.createElement("dd", null, pub)), moeTxt && React.createElement(React.Fragment, null, React.createElement("dt", null, "Margin of error"), React.createElement("dd", null, moeTxt)), dec && React.createElement(React.Fragment, null, React.createElement("dt", null, "Decidedness"), React.createElement("dd", null, dec)), ppm && React.createElement(React.Fragment, null, React.createElement("dt", null, window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"), React.createElement("dd", null, ppm)), nets.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Net approval"), React.createElement("dd", null, nets))), prev && React.createElement("div", {
-      className: "rd-apd-sub rd-apd-note"
-    }, "Changes are on ", r.pollster, "\u2019s ", prev.field, " poll."), React.createElement("div", {
-      className: "rd-pld-links"
-    }, key && window.AP.openPoll && React.createElement("button", {
-      type: "button",
-      className: "rd-link",
-      onClick: ev => {
-        ev.stopPropagation();
-        window.AP.openPoll(key, facet, "latest and next polls");
-      }
-    }, "Open in All polls \u2192"), rdPollLinks(r.links))), pj && React.createElement("div", {
+    const yr = Number(String(r.released || ip.released || "").slice(0, 4));
+    const report = "/feedback/?msg=" + encodeURIComponent(`${r.pollster}, ${r.fieldPending ? "fieldwork TBC" : r.field} ${yr} – `);
+    const rhythm = pj && React.createElement("div", {
       className: "rd-pld-rhythm"
     }, React.createElement("div", {
       className: "rd-pld-h"
@@ -49424,7 +50350,33 @@ function RdPolls({
     }, "Where the next one lands first"), " ", React.createElement("span", {
       className: "rd-apd-ext",
       "aria-hidden": "true"
-    }, "\u2197"))));
+    }, "\u2197")));
+    return React.createElement("div", {
+      className: "rd-pl-detail"
+    }, React.createElement(RdLedger, {
+      p: ip,
+      facet: facet,
+      onM: onMatch,
+      side: rhythm,
+      latest: true,
+      moe: rdLgMoe(ip),
+      onLine: id => {
+        if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
+      },
+      sources: r.links && r.links.length ? rdPollLinks(r.links) : null,
+      foot: React.createElement(React.Fragment, null, key && window.AP.openPoll && React.createElement("button", {
+        type: "button",
+        className: "rd-link",
+        onClick: ev => {
+          ev.stopPropagation();
+          window.AP.openPoll(key, facet, "latest and next polls");
+        }
+      }, "Open in All polls \u2192"), React.createElement("a", {
+        className: "rd-link",
+        href: report,
+        onClick: ev => ev.stopPropagation()
+      }, "Report an error"))
+    }));
   };
   const pinPl = () => {
     const sec = document.getElementById("latest-polls");
@@ -52182,7 +53134,8 @@ function RdApStrip({
   he,
   onM,
   tip,
-  phone
+  phone,
+  ink
 }) {
   const grid = phone ? [-3, 3] : [-4, -2, 2, 4];
   const lo = lean != null && moe != null ? lean - moe : null;
@@ -52219,7 +53172,7 @@ function RdApStrip({
     className: "rd-ap-dot",
     style: {
       left: rdApX(lean) + "%",
-      background: rdApLeanDot(lean, onM)
+      background: ink || rdApLeanDot(lean, onM)
     }
   }), tip);
 }
@@ -53453,130 +54406,11 @@ function RdApDetail({
   facet,
   onBack,
   backLabel,
-  demSplit
+  demSplit,
+  onFacet
 }) {
   const D = window.AUSPOL;
-  const q = p.p || {};
-  const c = p.chg && p.chg.d || {};
-  const refIso = p.chg && p.chg.r ? p.chg.r.pOnp || p.chg.r.pAlp || p.chg.r.impOn || p.chg.r.imp : null;
-  const prev = refIso ? D.individualPolls.find(x => x.pollster === p.pollster && x.released === refIso) : null;
-  const CK = {
-    alp: "pAlp",
-    lnp: "pLnp",
-    grn: "pGrn",
-    onp: "pOnp",
-    oth: "pOth"
-  };
-  const prim = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK).filter(k => q[k.id] != null);
-  const pair = (a, b, bInk) => React.createElement("b", {
-    className: "rd-apd-pair"
-  }, React.createElement("span", {
-    style: {
-      color: "var(--alp-text)"
-    }
-  }, a), React.createElement("span", {
-    className: "rd-ap-dash"
-  }, " \u2013 "), React.createElement("span", {
-    style: {
-      color: bInk
-    }
-  }, b));
-  const chg = (d, dec) => {
-    const s = rdApChg(d, dec);
-    return s ? React.createElement("span", {
-      className: "rd-apd-chg"
-    }, s) : null;
-  };
-  const none = React.createElement("span", {
-    className: "rd-apd-none"
-  }, "\u2014");
-  const ta = p.tppAlt;
-  const cols = [{
-    id: "onp",
-    head: "v One Nation",
-    imp: p.alpOnImp != null ? React.createElement(React.Fragment, null, pair(p.alpOnImp.toFixed(1), (100 - p.alpOnImp).toFixed(1), "var(--onp-text)"), " ", chg(c.impOn, 1)) : none,
-    pub: ta ? React.createElement(React.Fragment, null, pair(rdApNum(ta.alp), rdApNum(ta.onp), "var(--onp-text)"), " ", chg(c.altAlpOn, 0)) : none
-  }, {
-    id: "lnp",
-    head: "v Coalition",
-    imp: p.alpImp != null ? React.createElement(React.Fragment, null, pair(p.alpImp.toFixed(1), (100 - p.alpImp).toFixed(1), "var(--lnp-text)"), " ", chg(c.imp, 1)) : none,
-    pub: p.alp != null && p.lnp != null ? React.createElement(React.Fragment, null, pair(rdApNum(p.alp), rdApNum(p.lnp), "var(--lnp-text)"), " ", chg(c.alp2pp, 0)) : none
-  }];
-  if (!onM) cols.reverse();
-  const sets = window.ppmContests ? window.ppmContests(p) : p.ppmSets || [];
-  const NAME = {
-    alb: "Albanese",
-    taylor: "Taylor",
-    ley: "Ley",
-    hanson: "Hanson"
-  };
-  const INK = {
-    alb: "var(--alp-text)",
-    taylor: "var(--lnp-text)",
-    ley: "var(--lnp-text)",
-    hanson: "var(--onp-text)"
-  };
-  const ppmCell = s => React.createElement("span", {
-    className: "rd-apd-cell"
-  }, React.createElement("span", null, ["alb", "taylor", "ley", "hanson"].filter(k => s[k] != null).map((k, i) => React.createElement(React.Fragment, {
-    key: k
-  }, i > 0 ? ", " : "", apWho(p, k, NAME[k]), " ", React.createElement("b", {
-    style: {
-      color: INK[k]
-    }
-  }, s[k])))), React.createElement("span", {
-    className: "rd-apd-sub"
-  }, s.unc ? s.unc + " undecided" : ""));
-  const setHan = sets.find(s => s.hanson != null && s.taylor == null && s.ley == null);
-  const setOpp = sets.find(s => (s.taylor != null || s.ley != null) && s.hanson == null);
-  const setThree = sets.find(s => s.hanson != null && (s.taylor != null || s.ley != null));
-  const ppmBy = {
-    onp: setHan ? ppmCell(setHan) : null,
-    lnp: setOpp ? ppmCell(setOpp) : null
-  };
-  const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta || p.alp != null && p.lnp != null || ppmBy.onp != null || ppmBy.lnp != null || !!setThree;
-  const a = p.appr || {};
-  const mb = a.metricBy || {};
-  const leaders = [["alb", "albNet", rdApPm(a)], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", apWho(a, "hanson", "Hanson")]].filter(([, nk]) => a[nk] != null);
-  const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
-  const seats = p.seats && p.seats.p ? rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK).filter(k => p.seats.p[k.id]) : [];
-  const issBestBlock = (() => {
-    const iss = p.iss;
-    if (!iss) return null;
-    const topId = iss.top;
-    const lab = D.issues && D.issues.labels && D.issues.labels[topId] || null;
-    const tit = lab ? lab.charAt(0).toLowerCase() + lab.slice(1) : "the top issue";
-    const rowOf = (q, sh) => {
-      const meta = window.ISS_PARTY_META[q] || [q, q, null];
-      return {
-        k: q,
-        v: sh[q],
-        lab: q === "rest" || q === "oth" ? "the rest" : meta[0],
-        ink: meta[2]
-      };
-    };
-    const own = topId && iss.own && iss.own[topId] ? iss.own[topId] : null;
-    if (own) {
-      const nm3 = own.alp + own.lnp + own.onp;
-      const o3 = nm3 > 0 ? Object.fromEntries(["alp", "lnp", "onp"].map(q => [q, own[q] * 100 / nm3])) : own;
-      const rows = ["alp", "lnp", "onp"].filter(q => o3[q] != null).map(q => rowOf(q, o3));
-      if (rows.length > 1) return {
-        title: tit,
-        rows,
-        cap: "Shares of those naming one of these three, %"
-      };
-    }
-    if (iss.bp) {
-      const rows = ["alp", "lnp", "grn", "onp", "rest"].filter(q => iss.bp[q] != null).map(q => rowOf(q, iss.bp));
-      if (rows.length > 1) return {
-        title: tit,
-        rows,
-        cap: "SEC Newgate’s printed best-party figures, %"
-      };
-    }
-    return null;
-  })();
   const contest = onM ? "onp" : "lnp";
   const fig = rdApFig(p, onM, pub);
   const moe = rdPollMargin(p, contest, pub);
@@ -53593,7 +54427,6 @@ function RdApDetail({
   const eff = p.eff && p.eff[effKey];
   const move = e => rdApSigned(Math.round((e.hi - e.lo) * 10) / 10);
   const inside = rdApInside(ydHe != null ? adj : lean, moe);
-  const marginTxt = inside ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : "";
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
   const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.fieldPending ? "fieldwork TBC" : p.field} ${yr} – `);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
@@ -53610,7 +54443,6 @@ function RdApDetail({
     return 1.96 * Math.sqrt(pq / (p.sample / rdApDeff()));
   })();
   const insideD = rdApInside(dirHe != null ? dirAdj : dirLean, dirMoe);
-  const marginD = insideD ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : "";
   const dirWay = v => v > 0 ? "right-direction" : "wrong-track";
   const dirHl = isDir && d ? ((D.directionHouseEffects || {}).net || {})[p.pollster] || null : null;
   const isIss = facet === "issues";
@@ -53806,14 +54638,16 @@ function RdApDetail({
     business: "Business confidence – how firms rate trading conditions and the year ahead, read monthly by Roy Morgan.",
     nabBusiness: "Business confidence as a net balance – optimistic firms minus pessimistic ones – from NAB’s monthly business survey."
   };
+  let issTwo = false;
   const issTable = (() => {
     if (!isIss || !p.iss) return null;
     const iq = p.iss;
     const labels = D.issues && D.issues.labels || {};
-    const ranked = (iq.sal && iq.sal.length ? iq.sal : iq.conc || []).map(([lab, v], i) => ({
+    const ranked = (iq.sal && iq.sal.length ? iq.sal : iq.conc || []).map(([lab, v, r1], i) => ({
       id: window.ISS_ALIAS[lab] || null,
       lab,
       v,
+      r1: r1 != null ? r1 : null,
       rank: i + 1
     }));
     const seen = new Set(ranked.map(r => r.id).filter(Boolean));
@@ -53824,8 +54658,10 @@ function RdApDetail({
       id,
       lab: labels[id] || id,
       v: null,
+      r1: null,
       rank: null
     })));
+    const hasR1 = rows.some(r => r.r1 != null);
     const ownOf = r => r.id ? window.issOwnOf(p, r.id) : null;
     const unsure = o => {
       const u = ["unsure", "none", "equal"].filter(k => o && o[k] != null);
@@ -53837,9 +54673,10 @@ function RdApDetail({
     }));
     const hasUnsure = rows.some(r => unsure(ownOf(r)) != null);
     const hasRank = ranked.length > 0;
-    const nNum = (hasRank ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
-    const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
+    const nNum = (hasRank ? 1 : 0) + (hasR1 ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
+    const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], hasR1 ? ["var(--isr-p)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
     const parts = rows.length > 9 && nNum <= 4 ? [rows.slice(0, Math.ceil(rows.length / 2)), rows.slice(Math.ceil(rows.length / 2))] : [rows];
+    issTwo = parts.length === 2;
     const ordTxt = n => n + (n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
     const rc = "rd-apd-demr rd-apd-isr" + (hasRank ? " rk" : "");
     const head = React.createElement("div", {
@@ -53847,7 +54684,10 @@ function RdApDetail({
       role: "row"
     }, React.createElement("span", null), hasRank && React.createElement("span", {
       role: "columnheader"
-    }, "Ranked"), cols.map(k => React.createElement("span", {
+    }, "Ranked"), hasR1 && React.createElement("span", {
+      role: "columnheader",
+      title: "The share ranking it the issue that matters most"
+    }, "First"), cols.map(k => React.createElement("span", {
       key: k.id,
       role: "columnheader",
       style: {
@@ -53884,7 +54724,10 @@ function RdApDetail({
       }, r.lab), hasRank && React.createElement("span", {
         role: "cell",
         className: "rd-apd-dv"
-      }, r.rank ? ordTxt(r.rank) + " · " + rdApNum(r.v) : "—"), cols.map(k => {
+      }, r.rank ? ordTxt(r.rank) + " · " + rdApNum(r.v) : "—"), hasR1 && React.createElement("span", {
+        role: "cell",
+        className: "rd-apd-dv"
+      }, r.r1 != null ? rdApNum(r.r1) : "—"), cols.map(k => {
         const lead = L && !L.level && L.who === k.id;
         return React.createElement("span", {
           key: k.id,
@@ -53900,52 +54743,446 @@ function RdApDetail({
       }, rdApNum(u)));
     })))), React.createElement("span", {
       className: "rd-apd-sub rd-apd-note"
-    }, iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it. " : iq.conc ? "Ranked: the issue’s place among concerns named without prompting, and the share mentioning it. " : "This poll didn’t ask which issues matter most. ", "The party columns are each party\u2019s share of all respondents, as printed.", iq.q ? React.createElement(React.Fragment, null, " The question\u2019s wording: \u201C", iq.q, "\u201D", /[.?…]$/.test(iq.q) ? "" : ".") : "", " The party in front is shaded."));
+    }, iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it" + (hasR1 ? "; First: the share naming it the one that matters most. " : ". ") : iq.conc ? "Ranked: the issue’s place among concerns named without prompting, and the share mentioning it. " : "This poll didn’t ask which issues matter most. ", "The party columns are each party\u2019s share of all respondents, as printed.", iq.q ? React.createElement(React.Fragment, null, " The question\u2019s wording: \u201C", iq.q, "\u201D", /[.?…]$/.test(iq.q) ? "" : ".") : "", " The party in front is shaded."));
   })();
-  const decRow = (() => {
-    if (p.undecided != null) {
-      const b = p.undecidedBasis || "first";
-      return {
-        h: p.undecided + "%",
-        w: b === "soft" ? "not firm" : "undecided",
-        s: b === "soft" ? "Named a party, but might yet change their mind" : b === "tpp" ? "Unallocated inside the printed two-party pair" : "Couldn’t name a party when first asked",
-        d: c.und != null ? c.und : null
-      };
-    }
-    const f = Array.isArray(p.firmAll) && p.firmAll.length === 3 ? p.firmAll : null;
-    if (f) return {
-      h: f[1] + f[2] + "%",
-      w: "not firm",
-      s: `Solid ${f[0]}, soft ${f[1]}, very soft ${f[2]} – from the wave’s own vote-softness table`,
-      d: null
-    };
-    return null;
-  })();
-  return React.createElement("div", {
-    className: "rd-apd"
-  }, demTable, issTable, React.createElement("div", {
-    className: "rd-apd-l poll-detail",
-    "data-pollster": p.pollster
+  const confLead = conf && React.createElement("section", {
+    className: "rd-ldg-sec",
+    "data-sec": "confidence"
+  }, React.createElement("h4", {
+    className: "rd-ldg-h"
+  }, conf.lab), React.createElement("div", {
+    className: "rd-ldg-conf"
+  }, React.createElement("b", null, confFmt(conf.v)), conf.chg != null && Math.abs(conf.chg) >= 0.05 ? React.createElement("span", null, ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod) : null), React.createElement("p", {
+    className: "rd-ldg-foot1"
+  }, conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral." : "Index reading – 100 neutral.", conf.cond != null ? " NAB prints business conditions beside it: " + confFmt(conf.cond) + (conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : "") + "." : ""));
+  const rk = (lab, v, words, ink) => React.createElement("tr", {
+    key: lab
+  }, React.createElement("th", {
+    scope: "row"
+  }, lab), React.createElement("td", {
+    className: "num"
+  }, React.createElement("b", {
+    style: ink ? {
+      color: ink
+    } : null
+  }, v)), React.createElement("td", null, words));
+  const r1s = v => v == null ? "—" : rdApSigned(v);
+  const outside = p.noAgg ? React.createElement("p", {
+    className: "rd-ldg-noagg"
+  }, React.createElement("b", null, "Outside the aggregates."), " ", p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates.") : null;
+  const solo = p.solo && window.soloNote ? React.createElement("div", {
+    className: "rd-apd-facts"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Territory readings"), React.createElement("span", null, window.soloNote(p))) : null;
+  const tppReckon = fig.a != null && React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-rk"
+  }, React.createElement("tbody", null, rk("This poll", fig.a.toFixed(1), "Labor v " + (onM ? "One Nation" : "Coalition") + (pub ? ", published" : ", implied")), yd ? rk(RD_AP_KAL ? "The trend" : "Polls around it", yd.v.toFixed(1), RD_AP_KAL ? "the other polls’ trend" : (yd.n === 1 ? "one other poll" : rdNumWord(yd.n) + " others") + ", within three weeks") : rk("Polls around it", "—", "none fielded within three weeks, so nothing to set it against"), yd && lean != null && rk("Lean", r1s(lean), (Math.abs(lean) < 0.05 ? "level with them" : sideOf(lean) + " way") + (ydHe == null && inside ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""), rdApLeanInk(lean, onM)), rk("House lean", ydHe != null ? r1s(ydHe) : hl != null ? r1s(rdApR1(hl)) : "—", ydHe != null || hl != null ? "taken out before averaging" : "not measured yet: too few polls", rdApLeanInk(ydHe != null ? ydHe : hl, onM)), ydHe != null && lean != null && Math.abs(ydHe) >= 0.05 && rk("Less house lean", r1s(adj), inside ? inside[0].toUpperCase() + inside.slice(1) + " its ±" + moe.toFixed(1) + " margin" : Math.abs(adj) < 0.05 ? "level" : sideOf(adj) + " way", rdApLeanInk(adj, onM)), today && !p.noAgg && rk("In today’s " + today.a.toFixed(1), eff && eff.w ? move(eff) : eff && eff.t ? move(eff.t) : "—", eff && eff.w ? "how far it moves it, as one of " + rdNumWord(winN) : eff && eff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only")));
+  const ldReckon = ldOwn.length > 0 && React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-rk rd-ldg-rk2"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null), ldOwn.map(pr => React.createElement("th", {
+    key: pr.riv,
+    className: "num"
+  }, "v ", pr.name)), React.createElement("th", null))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "This poll"), ldOwn.map(pr => React.createElement("td", {
+    key: pr.riv,
+    className: "num"
+  }, React.createElement("b", null, r1s(rdApR1(pr.gap))))), React.createElement("td", null, rdApPm(p.appr), "\u2019s net minus each rival\u2019s")), ldCmp.some(Boolean) && React.createElement(React.Fragment, null, React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Polls around it"), ldCmp.map((c, i) => React.createElement("td", {
+    key: i,
+    className: "num"
+  }, React.createElement("b", null, c ? r1s(c.og) : "—"))), React.createElement("td", null, "the same gap elsewhere")), React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Lean"), ldCmp.map((c, i) => React.createElement("td", {
+    key: i,
+    className: "num"
+  }, React.createElement("b", null, c ? r1s(c.delta) : "—"))), React.createElement("td", null, "+ is ", rdApPm(p.appr), "\u2019s way")), React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "House lean"), ldCmp.map((c, i) => React.createElement("td", {
+    key: i,
+    className: "num"
+  }, React.createElement("b", null, c ? r1s(c.he) : "—"))), React.createElement("td", null, "taken out before averaging")), React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Less house lean"), ldCmp.map((c, i) => React.createElement("td", {
+    key: i,
+    className: "num"
+  }, React.createElement("b", null, c ? r1s(c.adj) : "—"))), React.createElement("td", null))), !ldCmp.some(Boolean) && ldLean.filter(Boolean).length > 0 && React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "House lean"), ldOwn.map((pr, i) => {
+    const l = ldLean[i];
+    return React.createElement("td", {
+      key: pr.riv,
+      className: "num"
+    }, React.createElement("b", null, l ? r1s(rdApR1(l.v)) : "—"));
+  }), React.createElement("td", null, "its usual lean on the gap")), ldNow.filter(Boolean).length > 0 && React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Now"), ldNow.map((n, i) => React.createElement("td", {
+    key: i,
+    className: "num"
+  }, React.createElement("b", null, n ? r1s(rdApR1(n.gap)) : "—"))), React.createElement("td", null, "today\u2019s figures", ldOwn.some(pr => pr.met === "fav") ? ", each on its own question" : ""))));
+  const dirReckon = d && React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-rk"
+  }, React.createElement("tbody", null, rk("This reading", r1s(d.net), "right direction minus wrong track"), dYd ? rk("Readings around it", r1s(rdApR1(dYd.v)), (dYd.n === 1 ? "one other reading" : rdNumWord(dYd.n) + " others") + ", within three weeks") : rk("Readings around it", "—", "none taken within three weeks"), dirLean != null && rk("Lean", r1s(dirLean), (Math.abs(dirLean) < 0.05 ? "level with them" : "more " + dirWay(dirLean)) + (dirHe == null && insideD ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : ""), dirLean > 0 ? "var(--mood-pos)" : dirLean < 0 ? "var(--mood-neg)" : null), rk("House lean", dirHe != null ? r1s(dirHe) : dirHl ? r1s(rdApR1(dirHl.v)) : "—", dirHe != null || dirHl ? "taken out before averaging" : "not measured yet: too few readings"), dirHe != null && Math.abs(dirHe) >= 0.05 && dirAdj != null && rk("Less house lean", r1s(dirAdj), insideD ? insideD[0].toUpperCase() + insideD.slice(1) + " its ±" + dirMoe.toFixed(1) + " margin" : Math.abs(dirAdj) < 0.05 ? "level" : "more " + dirWay(dirAdj), dirAdj > 0 ? "var(--mood-pos)" : dirAdj < 0 ? "var(--mood-neg)" : null), dirNow && rk("In today’s " + rdApSigned(dirNow.net), dEff && dEff.w ? move(dEff) : dEff && dEff.t ? move(dEff.t) : "—", dEff && dEff.w ? "how far it moves it, as one of " + rdNumWord(dirNow.n) : dEff && dEff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only")));
+  const since = D.monthNameFull(Number(from.slice(5)));
+  let railBody;
+  if (isConf) {
+    railBody = conf && React.createElement(React.Fragment, null, confSer && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-ct"
+    }, p.pollster, "\u2019s ", conf.lab, " releases since ", since, ", as published \u2014 no average; the gauge is the publisher\u2019s own series"), React.createElement(RdApConfMini, {
+      p: p
+    })), React.createElement("div", {
+      className: "rd-apd-facts"
+    }, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "The gauge"), React.createElement("span", null, CONF_BLURB[conf.k] || conf.lab + "."), React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the confidence panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
+      className: "rd-apd-k"
+    }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
+      className: "rd-link",
+      href: confSer.latest.url,
+      onClick: e => e.stopPropagation()
+    }, "its source", React.createElement("span", {
+      className: "rd-apd-ext",
+      "aria-hidden": "true"
+    }, "\u2197"))) : "", ".") : React.createElement(React.Fragment, null, "The gauge\u2019s series carries no published releases to panel against."))));
+  } else if (isDem) {
+    railBody = demFacts && React.createElement("div", {
+      className: "rd-apd-facts"
+    }, demFacts);
+  } else if (isIss) {
+    railBody = iss && React.createElement(React.Fragment, null, D.issues && iss.own && iss.own[iss.top] && (() => {
+      const cLab = D.issues.labels && D.issues.labels[iss.top] || iss.top;
+      const cTit = cLab.charAt(0).toLowerCase() + cLab.slice(1);
+      return React.createElement(React.Fragment, null, React.createElement("span", {
+        className: "rd-apd-ct"
+      }, "Who voters rate best on ", cTit, " since ", since, ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
+        p: p
+      }));
+    })(), React.createElement("div", {
+      className: "rd-apd-facts"
+    }, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Asked"), React.createElement("span", null, issPrompted ? React.createElement(React.Fragment, null, "Voters picked the three issues that matter most", iss.q ? React.createElement(React.Fragment, null, " \u2013 ", p.pollster, "\u2019s wording: \u201C", iss.q, "\u201D") : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : "", ". SEC Newgate\u2019s mentions count can\u2019t sit in the same series, so each house\u2019s wording is pooled against its pair first.") : iss.conc ? React.createElement(React.Fragment, null, "SEC Newgate asks what concerns Australians, unprompted \u2013 anyone can name anything, so the shares are any-mentions, not forced picks. That reading can\u2019t mix with the top-three series the issues panel pools, so it isn\u2019t counted toward it.") : React.createElement(React.Fragment, null, p.pollster, " asked only who\u2019d be best on each issue", iss.q ? React.createElement(React.Fragment, null, " \u2013 its wording: \u201C", iss.q, "\u201D \u2013") : ",", " not which issues matter most, so this wave feeds the pooled best-party line and there\u2019s no top-three list for it to join.")), issPair != null && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Between the question forms"), React.createElement("span", null, "RedBridge\u2019s and Ipsos\u2019s wordings for what matters sit a measured ", React.createElement("b", null, Math.abs(issPair).toFixed(1)), " points apart on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, "; this wave\u2019s reading was moved half that gap toward the other house\u2019s before it entered any average.")), issLeadMeta && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, rdApBreakable(p.pollster), "\u2019s house lean"), React.createElement("span", null, issPlus.lean == null ? "None to speak of: its figures sit level with the other pollsters’" : React.createElement(React.Fragment, null, "About ", React.createElement("b", null, Math.abs(issPlus.lean).toFixed(1)), " ", issPlus.lean > 0 ? "richer" : "poorer", " for ", issLeadMeta[0], " on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, ", taken out before the figures are pooled"))), issPlus && D.issues.window && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "In today\u2019s panel"), React.createElement("span", null, issPlus.w ? React.createElement(React.Fragment, null, "One of the waves the issues panel\u2019s current figures draw on (the last ", D.issues.window, ").") : React.createElement(React.Fragment, null, "Outside the ", D.issues.window, " the panel\u2019s current figures draw on.")))));
+  } else if (isLd) {
+    railBody = ldOwn.length ? React.createElement(React.Fragment, null, ldWin && ldWin.waves.length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-ct"
+    }, p.pollster, "\u2019s polls since ", since, " against the average \u2013 ", ldBoth ? React.createElement("button", {
+      type: "button",
+      className: "rd-apd-met",
+      "aria-label": "Showing " + rdApLdMetWord(ldAct) + ". Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav"),
+      title: "Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav"),
+      onClick: e => {
+        e.stopPropagation();
+        setLdMet(ldAct === "fav" ? "approval" : "fav");
+      }
+    }, rdApLdMetWord(ldAct)) : ldWord, ", ", rdApPmOffice(), " minus ", rdApLdJoin(ldNames)), React.createElement(RdApLdMini, {
+      p: p,
+      met: ldAct
+    })), ldReckon) : React.createElement("div", {
+      className: "rd-apd-facts"
+    }, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures."));
+  } else if (isDir) {
+    railBody = d ? React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-ct"
+    }, p.pollster, "\u2019s readings since ", since, " against the average, net right direction minus wrong track"), React.createElement(RdApDirMini, {
+      p: p
+    }), dirReckon) : React.createElement("div", {
+      className: "rd-apd-facts"
+    }, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "National direction"), React.createElement("span", null, p.pollster, " didn\u2019t ask the direction question in this poll, so there\u2019s no reading to set against the direction figures."));
+  } else if (facet === "primary" && p.pyd) {
+    railBody = React.createElement(React.Fragment, null, outside, React.createElement(RdApPrimRail, {
+      p: p
+    }), solo);
+  } else {
+    railBody = fig.a != null ? React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-ct"
+    }, p.pollster, "\u2019s polls since ", since, " against the ", RD_AP_AVG, ", Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
+      p: p,
+      onM: onM,
+      pub: pub
+    }), outside, tppReckon, solo) : React.createElement(React.Fragment, null, outside, React.createElement("div", {
+      className: "rd-apd-facts"
+    }, p.solo && window.soloNote && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Territory readings"), React.createElement("span", null, window.soloNote(p))), React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Two-party"), React.createElement("span", null, fig.none[0].toUpperCase() + fig.none.slice(1), ", so this poll has no ", pub ? "published" : "implied", " figure to set against the other polls."), React.createElement("span", {
+      className: "rd-apd-k"
+    }, rdApBreakable(p.pollster), "\u2019s house lean"), React.createElement("span", null, hl == null ? "Not measured yet: too few polls on this contest" : Math.abs(hl) < 0.05 ? "None to speak of: it sits level with the other pollsters" : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(hl).toFixed(1)), " to ", hl > 0 ? "Labor" : onM ? "One Nation" : "the Coalition", ", taken out before the polls are averaged"))));
+  }
+  const rail = React.createElement("div", {
+    className: "rd-apd-r"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, rdPollHead(p)), conf && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1"
+  }, isConf ? "How it reads" : "How it counts"), railBody);
+  const lineGo = (id, el) => {
+    const open = el && el.closest(".rd-ap-open");
+    const row = open && open.previousElementSibling;
+    if (row) rdPinScroll([row], true);
+    if (onFacet) onFacet(id);
+  };
+  return React.createElement(RdLedger, {
+    p: p,
+    facet: facet,
+    onM: onM,
+    side: rail,
+    lead: isDem ? demTable : isIss ? issTable : isConf ? confLead : null,
+    wide: isDem || isIss && issTwo,
+    onLine: onFacet ? lineGo : null,
+    demSplit: demSplit,
+    moe: rdLgMoe(p),
+    sources: p.links && p.links.length > 0 ? rdPollLinks(p.links) : null,
+    foot: React.createElement(React.Fragment, null, React.createElement("a", {
+      className: "rd-link",
+      href: report,
+      onClick: e => e.stopPropagation()
+    }, "Report an error"), onBack && React.createElement("button", {
+      type: "button",
+      className: "rd-link",
+      onClick: e => {
+        e.stopPropagation();
+        onBack();
+      }
+    }, "Back to ", backLabel || "the chart"))
+  });
+}
+const rdLgChg = (d, dec) => {
+  if (d == null) return null;
+  const r = Math.round(d * 10) / 10;
+  return rdApChg(r, dec || (Number.isInteger(r) ? 0 : 1));
+};
+function RdLgChg({
+  d,
+  dec
+}) {
+  const s = rdLgChg(d, dec);
+  return s ? React.createElement("span", {
+    className: "rd-ldg-chg"
+  }, s) : null;
+}
+const RD_LG_LEADER = {
+  alb: "Albanese",
+  taylor: "Taylor",
+  ley: "Ley",
+  hanson: "Hanson"
+};
+const RD_LG_INK = {
+  alb: "var(--alp-text)",
+  taylor: "var(--lnp-text)",
+  ley: "var(--lnp-text)",
+  hanson: "var(--onp-text)"
+};
+const rdLgWho = (p, k) => apWho(p, k, RD_LG_LEADER[k] || rdCap(k));
+const rdLgPrims = () => rdApPrimList(window.AUSPOL.latest && window.AUSPOL.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
+const rdLgNet = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
+const RD_LG_TAB = {
+  primary: "Primary",
+  twopp: "2PP",
+  leadership: "Leadership",
+  direction: "Direction",
+  issues: "Issues",
+  demographics: "Demographics"
+};
+const RD_LG_LATEST_TABS = {
+  twopp: 1,
+  primary: 1,
+  leadership: 1
+};
+function rdLgChgNote(p, keys) {
+  const r = p.chg && p.chg.r || {};
+  const refs = [...new Set(keys.map(k => r[k]).filter(Boolean))];
+  if (!refs.length) return null;
+  if (refs.length > 1) return "▲▼ Changes are on each figure’s previous " + p.pollster + " poll.";
+  const prev = window.AUSPOL.individualPolls.find(x => x.pollster === p.pollster && x.released === refs[0]);
+  return prev ? "▲▼ Changes are on " + p.pollster + "’s " + prev.field + " poll." : null;
+}
+function rdLgMoe(p) {
+  const ms = [p.alpOnImp != null ? rdPollMargin(p, "onp", false) : null, p.alpImp != null ? rdPollMargin(p, "lnp", false) : null].filter(m => m != null);
+  const mp = [p.tppAlt ? rdPollMargin(p, "onp", true) : null, p.alp != null ? rdPollMargin(p, "lnp", true) : null].filter(m => m != null);
+  const rng = a => {
+    const lo = Math.min(...a),
+      hi = Math.max(...a);
+    return "±" + (lo.toFixed(1) === hi.toFixed(1) ? lo.toFixed(1) : lo.toFixed(1) + "–" + hi.toFixed(1));
+  };
+  const bits = [ms.length ? rng(ms) + " on the implied" : null, mp.length ? rng(mp) + " on the published" : null].filter(Boolean);
+  return bits.length ? "Margin of error " + bits.join(", ") + (bits.length > 1 ? " figures" : " figure") + " at 95%, " + rdMarginBasis(p) + "." : null;
+}
+function RdLgTpp({
+  p,
+  onM,
+  moe,
+  note
+}) {
+  const c = p.chg && p.chg.d || {};
+  const ta = p.tppAlt;
+  const pair = (a, b, ink) => React.createElement("b", {
+    className: "rd-ldg-pair"
   }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, conf.lab), React.createElement("span", {
-    className: "rd-apd-cell"
-  }, React.createElement("span", null, React.createElement("b", null, confFmt(conf.v)), conf.chg != null && Math.abs(conf.chg) >= 0.05 ? ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod : ""), React.createElement("span", {
-    className: "rd-apd-sub"
-  }, conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral" : "Index reading – 100 neutral"))), conf && conf.cond != null && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1"
+    style: {
+      color: "var(--alp-text)"
+    }
+  }, a), React.createElement("span", {
+    className: "rd-ldg-dash"
+  }, "\u2013"), React.createElement("span", {
+    style: {
+      color: ink
+    }
+  }, b));
+  const cell = (v, d, ink, dec, b) => v == null ? React.createElement("span", {
+    className: "rd-ldg-none"
+  }, "\u2014") : React.createElement(React.Fragment, null, pair(rdApNum(v), rdApNum(b != null ? b : 100 - v), ink), React.createElement(RdLgChg, {
+    d: d,
+    dec: dec
+  }));
+  const ON = {
+    id: "onp",
+    head: "v One Nation",
+    ink: "var(--onp-text)"
+  };
+  const LN = {
+    id: "lnp",
+    head: "v Coalition",
+    ink: "var(--lnp-text)"
+  };
+  const cols = onM ? [ON, LN] : [LN, ON];
+  const pubLab = p.tppFlows != null ? "Published, respondent-allocated" : "As published";
+  const rows = [["Implied, on " + rdElecYear + " flows", {
+    onp: p.alpOnImp != null ? [p.alpOnImp, c.impOn, 1] : null,
+    lnp: p.alpImp != null ? [p.alpImp, c.imp, 1] : null
+  }], [pubLab, {
+    onp: ta ? [ta.alp, c.altAlpOn, 0, ta.onp] : null,
+    lnp: p.alp != null ? [p.alp, c.alp2pp, 0, p.lnp] : null
+  }], ["Published, on " + rdElecYear + " flows", {
+    onp: null,
+    lnp: p.tppFlows != null ? [p.tppFlows, null, 0] : null
+  }]].filter(([, v]) => v.onp || v.lnp);
+  const forced = [["Coalition voters", {
+    onp: p.splitCoal != null ? [p.splitCoal, c.splitCoal, 0] : null,
+    lnp: null
+  }], ["One Nation voters", {
+    onp: null,
+    lnp: p.splitOnp != null ? [p.splitOnp, c.splitOnp, 0] : null
+  }], ["Greens voters", {
+    onp: p.splitGrnOn != null ? [p.splitGrnOn, c.splitGrnOn, 0] : null,
+    lnp: p.splitGrn != null ? [p.splitGrn, c.splitGrn, 0] : null
+  }], ["Other voters", {
+    onp: p.splitOthOn != null ? [p.splitOthOn, c.splitOthOn, 0] : null,
+    lnp: p.splitOth != null ? [p.splitOth, c.splitOth, 0] : null
+  }]].filter(([, v]) => v.onp || v.lnp);
+  if (!rows.length && !forced.length && !p.tpp3 && !p.tppAlt2) return null;
+  const tr = ([lab, v], sub) => React.createElement("tr", {
+    key: lab,
+    className: sub ? "sub" : ""
+  }, React.createElement("th", {
+    scope: "row"
+  }, lab), cols.map(k => React.createElement("td", {
+    key: k.id
+  }, v[k.id] ? cell(v[k.id][0], v[k.id][1], k.ink, v[k.id][2], v[k.id][3]) : React.createElement("span", {
+    className: "rd-ldg-none"
+  }, "\u2014"))));
+  const noPub = !ta && p.alp == null;
+  return React.createElement(React.Fragment, null, React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-tpp"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null), cols.map((k, i) => React.createElement("th", {
+    key: k.id,
+    className: i === 0 ? "on" : ""
+  }, "Labor ", k.head)))), React.createElement("tbody", null, rows.map(r => tr(r)), forced.length > 0 && React.createElement("tr", {
+    className: "grp"
+  }, React.createElement("th", {
+    scope: "rowgroup",
+    colSpan: 3
+  }, "If forced to choose")), forced.map(r => tr(r, true)), p.tppAlt2 && React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Coalition v One Nation"), React.createElement("td", {
+    colSpan: 2
+  }, React.createElement("b", {
+    className: "rd-ldg-pair"
   }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Business conditions"), React.createElement("span", {
-    className: "rd-apd-cell"
-  }, React.createElement("span", null, React.createElement("b", null, confFmt(conf.cond)), conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : ""), React.createElement("span", {
-    className: "rd-apd-sub"
-  }, "NAB prints conditions beside confidence"))), prim.length > 0 && React.createElement("div", {
-    className: "rd-apd-prim"
+    style: {
+      color: "var(--lnp-text)"
+    }
+  }, rdApNum(p.tppAlt2.lnp)), React.createElement("span", {
+    className: "rd-ldg-dash"
+  }, "\u2013"), React.createElement("span", {
+    style: {
+      color: "var(--onp-text)"
+    }
+  }, rdApNum(p.tppAlt2.onp))), React.createElement("span", {
+    className: "rd-ldg-tail"
+  }, ", as published"))), p.tpp3 && React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Three-cornered"), React.createElement("td", {
+    colSpan: 2
+  }, React.createElement("b", {
+    className: "rd-ldg-tri"
+  }, React.createElement("span", {
+    style: {
+      color: "var(--alp-text)"
+    }
+  }, "ALP ", rdApNum(p.tpp3.alp)), " ", React.createElement("span", {
+    style: {
+      color: "var(--lnp-text)"
+    }
+  }, "L/NP ", rdApNum(p.tpp3.lnp)), " ", React.createElement("span", {
+    style: {
+      color: "var(--onp-text)"
+    }
+  }, "ON ", rdApNum(p.tpp3.onp))), React.createElement("span", {
+    className: "rd-ldg-tail"
+  }, ", as published"))))), (noPub || moe || note || p.splitCoalEst) && React.createElement("p", {
+    className: "rd-ldg-foot1"
+  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", p.splitCoalEst ? " The Coalition-voters split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)." : "", note ? " " + note : ""));
+}
+function rdLgDecided(p) {
+  if (p.undecided != null) {
+    const b = p.undecidedBasis || "first";
+    return {
+      h: p.undecided + "%",
+      w: b === "soft" ? "not firm" : "undecided",
+      d: p.chg && p.chg.d && p.chg.d.und || null,
+      s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "couldn’t name a party when first asked"
+    };
+  }
+  const f = Array.isArray(p.firmAll) && p.firmAll.length === 3 ? p.firmAll : null;
+  if (f) return {
+    h: f[1] + f[2] + "%",
+    w: "not firm",
+    d: null,
+    s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table"
+  };
+  return null;
+}
+const RD_LG_CK = {
+  alp: "pAlp",
+  lnp: "pLnp",
+  grn: "pGrn",
+  onp: "pOnp",
+  oth: "pOth"
+};
+function RdLgVote({
+  p,
+  note
+}) {
+  const q = p.p || {};
+  const c = p.chg && p.chg.d || {};
+  const prim = rdLgPrims().filter(k => q[k.id] != null);
+  if (!prim.length) return null;
+  const dec = rdLgDecided(p);
+  return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-ldg-prim"
   }, prim.map(k => React.createElement("span", {
     key: k.id
   }, React.createElement("b", {
@@ -53953,320 +55190,610 @@ function RdApDetail({
       color: k.ink
     }
   }, k.lab), React.createElement("span", {
-    className: "rd-apd-big",
+    className: "rd-ldg-big",
     style: {
       color: k.ink
     }
   }, rdApNum(q[k.id])), React.createElement("span", {
-    className: "rd-apd-sub"
-  }, rdApChg(c[CK[k.id]], 0) || " ")))), prim.length > 0 && React.createElement("span", {
-    className: "rd-apd-sub rd-apd-note"
-  }, "Primary vote, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), hasMatchup && React.createElement("div", {
-    className: "rd-apd-grid"
-  }, React.createElement("span", null), cols.map(k => React.createElement("span", {
-    key: k.id,
-    className: "rd-apd-th"
-  }, k.head)), React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Implied, on ", rdElecYear, " flows"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, k.imp)), React.createElement("span", {
-    className: "rd-apd-k"
-  }, "As ", p.pollster, " published"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, k.pub)), p.splitCoal != null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Coalition voters, if forced to choose"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, k.id === "onp" ? React.createElement(React.Fragment, null, pair(rdApNum(p.splitCoal), rdApNum(100 - p.splitCoal), "var(--onp-text)"), " ", chg(c.splitCoal, 0)) : none))), p.splitOnp != null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "One Nation voters, if forced to choose"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, k.id === "lnp" ? React.createElement(React.Fragment, null, pair(rdApNum(p.splitOnp), rdApNum(100 - p.splitOnp), "var(--lnp-text)"), " ", chg(c.splitOnp, 0)) : none))), (p.splitGrnOn != null || p.splitGrn != null) && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Greens voters, if forced to choose"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, k.id === "onp" && p.splitGrnOn != null ? React.createElement(React.Fragment, null, pair(rdApNum(p.splitGrnOn), rdApNum(100 - p.splitGrnOn), "var(--onp-text)"), " ", chg(c.splitGrnOn, 0)) : k.id === "lnp" && p.splitGrn != null ? React.createElement(React.Fragment, null, pair(rdApNum(p.splitGrn), rdApNum(100 - p.splitGrn), "var(--lnp-text)"), " ", chg(c.splitGrn, 0)) : none))), (p.splitOthOn != null || p.splitOth != null) && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Other voters, if forced to choose"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, k.id === "onp" && p.splitOthOn != null ? React.createElement(React.Fragment, null, pair(rdApNum(p.splitOthOn), rdApNum(100 - p.splitOthOn), "var(--onp-text)"), " ", chg(c.splitOthOn, 0)) : k.id === "lnp" && p.splitOth != null ? React.createElement(React.Fragment, null, pair(rdApNum(p.splitOth), rdApNum(100 - p.splitOth), "var(--lnp-text)"), " ", chg(c.splitOth, 0)) : none))), (ppmBy.onp || ppmBy.lnp) && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"), cols.map(k => React.createElement("span", {
-    key: k.id
-  }, ppmBy[k.id] || none))), setThree && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, (window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister") + ", three‑way"), React.createElement("span", {
+    className: "rd-ldg-chg"
+  }, rdLgChg(c[RD_LG_CK[k.id]], 0) || " ")))), dec && React.createElement("p", {
+    className: "rd-ldg-foot1"
+  }, React.createElement("b", null, dec.h), " ", dec.w, React.createElement(RdLgChg, {
+    d: dec.d,
+    dec: 1
+  }), " \u2013 ", dec.s, "."), note && React.createElement("p", {
+    className: "rd-ldg-note"
+  }, note));
+}
+function RdLgLeaders({
+  p,
+  note
+}) {
+  const a = p.appr || {};
+  const mb = a.metricBy || {};
+  const c = p.chg && p.chg.d || {};
+  const rows = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, nk]) => a[nk] != null).map(([id, nk]) => ({
+    id,
+    nk,
+    name: id === "taylor" ? a.oppName || rdLgWho(p, id) : rdLgWho(a, id),
+    L: a[id] || null,
+    fav: mb[id] === "fav"
+  }));
+  const nFav = rows.filter(r => r.fav).length;
+  const allFav = rows.length > 0 && nFav === rows.length,
+    mixed = nFav > 0 && nFav < rows.length;
+  const hasUns = rows.some(r => r.L && r.L.unsure != null);
+  const sets = window.ppmContests ? window.ppmContests(p) : p.ppmSets || [];
+  const who = ["alb", "taylor", "ley", "hanson"].filter(k => sets.some(s => s[k] != null));
+  const named = s => ["alb", "taylor", "ley", "hanson"].filter(k => s[k] != null);
+  const twos = sets.filter(s => named(s).length === 2).length;
+  const setLab = s => {
+    const n = named(s);
+    if (n.length >= 3) return "Three-way";
+    return twos > 1 ? rdLgWho(p, "alb") + " v " + rdLgWho(p, n.find(k => k !== "alb")) : "Head to head";
+  };
+  if (!rows.length && !sets.length) return null;
+  const sum = s => who.reduce((t, k) => t + (s[k] || 0), 0);
+  return React.createElement(React.Fragment, null, rows.length > 0 && React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-ldr"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, allFav ? "Net favourability" : mixed ? "Net rating" : "Net approval"), React.createElement("th", {
+    className: "num pt"
+  }, allFav ? "Favourable" : mixed ? "For" : "Approve"), React.createElement("th", {
+    className: "num pt"
+  }, allFav ? "Unfavourable" : mixed ? "Against" : "Disapprove"), hasUns && React.createElement("th", {
+    className: "num pt"
+  }, "Unsure"), React.createElement("th", {
+    className: "num"
+  }, "Net"), React.createElement("th", {
+    className: "num"
+  }, "Change"))), React.createElement("tbody", null, rows.map(r => React.createElement("tr", {
+    key: r.id
+  }, React.createElement("th", {
+    scope: "row"
+  }, r.name, mixed && React.createElement("span", {
+    className: "rd-ldg-tail"
+  }, " ", r.fav ? "favourability" : "approval"), r.L && r.L.app != null && React.createElement("span", {
+    className: "rd-ldg-parts"
+  }, r.L.app, " ", r.fav ? "fav." : "approve", ", ", r.L.dis, " ", r.fav ? "unfav." : "disapprove", r.L.unsure != null ? ", " + r.L.unsure + " unsure" : "")), React.createElement("td", {
+    className: "num pt"
+  }, r.L && r.L.app != null ? r.L.app : "—"), React.createElement("td", {
+    className: "num pt"
+  }, r.L && r.L.dis != null ? r.L.dis : "—"), hasUns && React.createElement("td", {
+    className: "num pt"
+  }, r.L && r.L.unsure != null ? r.L.unsure : "—"), React.createElement("td", {
+    className: "num"
+  }, React.createElement("b", {
     style: {
-      gridColumn: "2 / -1"
+      color: RD_LG_INK[r.id]
     }
-  }, ppmCell(setThree)))), p.splitCoalEst && React.createElement("span", {
-    className: "rd-apd-sub rd-apd-note"
-  }, "The Coalition-voters split combines the report\u2019s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)."), !isConf && decRow && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Decidedness"), React.createElement("span", {
-    className: "rd-apd-cell"
-  }, React.createElement("span", null, React.createElement("b", null, decRow.h), " ", decRow.w, " ", chg(decRow.d, 1)), React.createElement("span", {
-    className: "rd-apd-sub"
-  }, decRow.s))), leaders.length > 0 && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, allFav ? "Net favourability" : "Net approval"), React.createElement("span", {
-    className: "rd-apd-leaders"
-  }, leaders.map(([id, nk, name]) => {
-    const L = a[id] || null;
-    const fav = mb[id] === "fav";
-    return React.createElement("span", {
-      key: id,
-      className: "rd-apd-cell"
-    }, React.createElement("span", null, name, " ", React.createElement("b", {
-      style: {
-        color: INK[id]
-      }
-    }, rdSigned(a[nk], 0)), " ", chg(c[nk], 0)), L && L.app != null ? React.createElement("span", {
-      className: "rd-apd-sub"
-    }, L.app, " ", fav ? "favourable" : "approve", ", ", L.dis, " ", fav ? "unfavourable" : "disapprove") : fav && !allFav ? React.createElement("span", {
-      className: "rd-apd-sub"
-    }, "favourability") : null);
-  }))), d && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "The country is heading"), React.createElement("span", {
-    className: "rd-apd-cell"
-  }, React.createElement("span", null, "In the right direction ", React.createElement("b", {
+  }, rdLgNet(a[r.nk]))), React.createElement("td", {
+    className: "num"
+  }, rdLgChg(c[r.nk], 0) ? React.createElement("span", {
+    className: "rd-ldg-chg"
+  }, rdLgChg(c[r.nk], 0)) : React.createElement("span", {
+    className: "rd-ldg-none"
+  }, "\u2014")))))), sets.length > 0 && React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-ppm"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"), who.map(k => React.createElement("th", {
+    key: k,
+    className: "num"
+  }, rdLgWho(p, k))), React.createElement("th", {
+    className: "num"
+  }, "Undecided"))), React.createElement("tbody", null, sets.map((s, i) => React.createElement("tr", {
+    key: i
+  }, React.createElement("th", {
+    scope: "row"
+  }, setLab(s)), who.map(k => React.createElement("td", {
+    key: k,
+    className: "num"
+  }, s[k] != null ? React.createElement("b", {
+    style: {
+      color: RD_LG_INK[k]
+    }
+  }, s[k]) : React.createElement("span", {
+    className: "rd-ldg-none"
+  }, "\u2014"))), React.createElement("td", {
+    className: "num"
+  }, s.unc ? s.unc : sum(s) >= 99.5 ? React.createElement("span", {
+    className: "rd-ldg-none",
+    title: "Printed without its undecided share"
+  }, "\u2014") : "0"))))), note && rows.length > 0 && React.createElement("p", {
+    className: "rd-ldg-note"
+  }, note));
+}
+function RdLgDir({
+  p
+}) {
+  const d = p.dir;
+  if (!d) return null;
+  const u = d.unsure != null ? d.unsure : Math.max(0, 100 - d.right - d.wrong);
+  return React.createElement("div", {
+    className: "rd-ldg-dir"
+  }, React.createElement("div", {
+    className: "rd-ldg-dirbar",
+    "aria-hidden": "true"
+  }, React.createElement("i", {
+    style: {
+      width: d.right + "%",
+      background: "var(--mood-pos)"
+    }
+  }), React.createElement("i", {
+    style: {
+      width: u + "%",
+      background: "var(--line)"
+    }
+  }), React.createElement("i", {
+    style: {
+      width: d.wrong + "%",
+      background: "var(--mood-neg)"
+    }
+  })), React.createElement("div", {
+    className: "rd-ldg-dirk"
+  }, React.createElement("span", null, "Right direction ", React.createElement("b", {
     style: {
       color: "var(--mood-pos)"
     }
-  }, rdApNum(d.right)), ", on the wrong track ", React.createElement("b", {
+  }, rdApNum(d.right))), React.createElement("span", null, "Unsure ", React.createElement("b", null, rdApNum(u))), React.createElement("span", null, "Wrong track ", React.createElement("b", {
     style: {
       color: "var(--mood-neg)"
     }
-  }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)))), !isIss && p.iss && (p.iss.sal || []).length > 0 && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "The issues voters name"), React.createElement("span", {
-    className: "rd-apd-cell rd-apd-isslist"
-  }, p.iss.sal.map(([label, v, r1]) => React.createElement("span", {
-    key: label,
-    className: "rd-apd-issrow"
-  }, React.createElement("span", {
-    className: "rd-apd-isslab"
-  }, label), React.createElement("span", {
-    className: "rd-apd-issbar",
-    "aria-hidden": "true"
-  }, React.createElement("i", {
+  }, rdApNum(d.wrong))), React.createElement("span", {
+    className: "rd-ldg-dirnet"
+  }, "Net ", React.createElement("b", null, rdApSigned(d.right - d.wrong).replace(/\.0$/, "")))));
+}
+function rdLgLines(p, {
+  onM,
+  demSplit
+}) {
+  const out = [];
+  const q = p.p || {};
+  const U = ({
+    children,
+    soft,
+    lbl
+  }) => React.createElement("span", {
+    className: "rd-ldg-li" + (soft || lbl ? " rd-ldg-lisoft" : "") + (lbl ? " lbl" : "")
+  }, children);
+  const pty = (k, v) => React.createElement(React.Fragment, null, React.createElement("em", {
     style: {
-      width: Math.min(100, v) + "%"
+      color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null
     }
-  })), React.createElement("b", null, rdApNum(v)), r1 != null && React.createElement("span", {
-    className: "rd-apd-sub"
-  }, rdApNum(r1), " rank it first of all"))))), !isIss && p.iss && (p.iss.sal || []).length > 0 && React.createElement("span", {
-    className: "rd-apd-sub rd-apd-note"
-  }, "Share naming each issue in the three that matter most, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), !isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Named without prompting"), React.createElement("span", {
-    className: "rd-apd-cell rd-apd-isslist"
-  }, p.iss.conc.map(([label, v]) => React.createElement("span", {
-    key: label,
-    className: "rd-apd-issrow"
-  }, React.createElement("span", {
-    className: "rd-apd-isslab"
-  }, label), React.createElement("span", {
-    className: "rd-apd-issbar",
-    "aria-hidden": "true"
-  }, React.createElement("i", {
+  }, RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k), " ", React.createElement("b", null, v));
+  const prim = rdLgPrims().filter(k => q[k.id] != null);
+  if (prim.length) {
+    const dec = rdLgDecided(p);
+    out.push({
+      id: "primary",
+      lab: "Primary",
+      body: React.createElement(React.Fragment, null, prim.map(k => React.createElement(U, {
+        key: k.id
+      }, pty(k.id, rdApNum(q[k.id])))), dec && React.createElement(U, {
+        soft: true
+      }, dec.h, " ", dec.w))
+    });
+  }
+  const ta = p.tppAlt;
+  const pairB = (a, b, id) => React.createElement("b", null, React.createElement("span", {
     style: {
-      width: Math.min(100, v) + "%"
+      color: "var(--alp-text)"
     }
-  })), React.createElement("b", null, rdApNum(v)))))), !isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("span", {
-    className: "rd-apd-sub rd-apd-note"
-  }, "Shares of any mentions, not a forced pick \u2013 these can\u2019t sit beside the top-three numbers."), !isIss && p.iss && issBestBlock && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Rated best on ", issBestBlock.title), React.createElement("span", {
-    className: "rd-apd-cell rd-apd-isslist"
-  }, issBestBlock.rows.map(r => React.createElement("span", {
-    key: r.k,
-    className: "rd-apd-issrow"
-  }, React.createElement("span", {
-    className: "rd-apd-isslab",
-    style: r.ink ? {
-      color: r.ink
-    } : null
-  }, r.lab), React.createElement("span", {
-    className: "rd-apd-issbar",
-    "aria-hidden": "true"
-  }, React.createElement("i", {
+  }, rdApNum(a)), "\u2013", React.createElement("span", {
     style: {
-      width: Math.min(100, r.v) + "%",
-      background: r.ink || undefined
+      color: "var(--" + id + "-text)"
     }
-  })), React.createElement("b", null, rdApNum(r.v)))))), !isIss && p.iss && issBestBlock && React.createElement("span", {
-    className: "rd-apd-sub rd-apd-note"
-  }, issBestBlock.cap), seats.length > 0 && React.createElement("div", {
-    className: "rd-apd-grid rd-apd-grid1"
-  }, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Seats, modelled"), React.createElement("span", {
-    className: "rd-apd-cell"
-  }, React.createElement("span", null, seats.map((k, i) => {
-    const s = p.seats.p[k.id];
-    return React.createElement(React.Fragment, {
-      key: k.id
-    }, i > 0 ? ", " : "", k.lab, " ", React.createElement("b", {
-      style: {
-        color: k.ink
+  }, rdApNum(b)));
+  const mus = [{
+    id: "onp",
+    n: "One Nation",
+    imp: p.alpOnImp,
+    pub: ta ? [ta.alp, ta.onp] : null
+  }, {
+    id: "lnp",
+    n: "Coalition",
+    imp: p.alpImp,
+    pub: p.alp != null && p.lnp != null ? [p.alp, p.lnp] : null
+  }].filter(m => m.imp != null || m.pub);
+  if (!onM) mus.reverse();
+  if (mus.length) {
+    out.push({
+      id: "twopp",
+      lab: "2PP",
+      body: React.createElement(React.Fragment, null, mus.map(m => React.createElement("span", {
+        key: m.id,
+        className: "rd-ldg-grp"
+      }, React.createElement(U, null, "v ", m.n, " ", m.imp != null ? pairB(m.imp.toFixed(1), (100 - m.imp).toFixed(1), m.id) : pairB(m.pub[0], m.pub[1], m.id), m.imp == null ? React.createElement("span", {
+        className: "rd-ldg-lisoft"
+      }, " published") : m.pub ? "," : null), m.imp != null && m.pub && React.createElement(U, {
+        soft: true
+      }, "published ", pairB(m.pub[0], m.pub[1], m.id)))))
+    });
+  }
+  const a = p.appr || {};
+  const nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
+  const sets = window.ppmContests ? window.ppmContests(p) : [];
+  if (nets.length || sets.length) {
+    const mb = a.metricBy || {};
+    const allFav = nets.length > 0 && nets.every(([id]) => mb[id] === "fav");
+    const contest = (s, i) => {
+      const sk = ["alb", "taylor", "ley", "hanson"].filter(k => s[k] != null);
+      return React.createElement(React.Fragment, {
+        key: "s" + i
+      }, i === 0 && React.createElement(U, {
+        lbl: true
+      }, "Better PM"), sk.length === 2 ? React.createElement(U, null, rdLgWho(p, sk[0]), " ", React.createElement("b", {
+        style: {
+          color: RD_LG_INK[sk[0]]
+        }
+      }, s[sk[0]]), "\u2013", React.createElement("b", {
+        style: {
+          color: RD_LG_INK[sk[1]]
+        }
+      }, s[sk[1]]), " ", rdLgWho(p, sk[1])) : React.createElement(U, null, sk.map((k, j) => React.createElement(React.Fragment, {
+        key: k
+      }, j > 0 ? ", " : "", rdLgWho(p, k), " ", React.createElement("b", {
+        style: {
+          color: RD_LG_INK[k]
+        }
+      }, s[k])))));
+    };
+    out.push({
+      id: "leadership",
+      lab: "Leadership",
+      body: React.createElement(React.Fragment, null, nets.length > 0 && React.createElement(U, {
+        lbl: true
+      }, allFav ? "Net favourability" : "Net approval"), nets.map(([id, k]) => React.createElement(U, {
+        key: id
+      }, id === "taylor" ? a.oppName || "Taylor" : rdLgWho(a, id), " ", React.createElement("b", {
+        style: {
+          color: RD_LG_INK[id]
+        }
+      }, rdLgNet(a[k])))), sets.map(contest))
+    });
+  }
+  if (p.dir) {
+    const d = p.dir;
+    out.push({
+      id: "direction",
+      lab: "Direction",
+      body: React.createElement(React.Fragment, null, React.createElement(U, null, "right direction ", React.createElement("b", {
+        style: {
+          color: "var(--mood-pos)"
+        }
+      }, rdApNum(d.right))), React.createElement(U, null, "wrong track ", React.createElement("b", {
+        style: {
+          color: "var(--mood-neg)"
+        }
+      }, rdApNum(d.wrong))), React.createElement(U, {
+        soft: true
+      }, "unsure ", rdApNum(d.unsure != null ? d.unsure : 100 - d.right - d.wrong)))
+    });
+  }
+  if (p.iss) {
+    const IM = window.ISS_MAP || [],
+      IL = window.ISS_MAP_LAB || {};
+    const cells = IM.map(id => {
+      const o = window.issOwnOf(p, id);
+      const L = o ? window.issLeadOf(o) : null;
+      return L ? {
+        id,
+        L
+      } : null;
+    }).filter(Boolean);
+    const sal = (p.iss.sal || p.iss.conc || []).slice(0, 3);
+    out.push({
+      id: "issues",
+      lab: "Issues",
+      body: React.createElement(React.Fragment, null, cells.length > 0 ? cells.map(({
+        id,
+        L
+      }) => {
+        const M = window.ISS_PARTY_META[L.who];
+        return React.createElement(U, {
+          key: id
+        }, IL[id], " ", L.level ? React.createElement("b", null, "level") : React.createElement("b", {
+          style: {
+            color: M ? M[2] : null
+          }
+        }, (M ? M[1] : L.who) + " +" + Math.round(L.lead)));
+      }) : sal.map(([lab, v]) => React.createElement(U, {
+        key: lab
+      }, lab, " ", React.createElement("b", null, rdApNum(v)))))
+    });
+  }
+  if (p.grp && p.grp.d) {
+    const nG = Object.values(p.grp.d).reduce((t, r) => t + r.length, 0),
+      nC = Object.keys(p.grp.d).length;
+    const pr = (() => {
+      if (!window.demPairOf) return null;
+      const ids = [demSplit || "age"].concat((window.DEM_SPLITS || []).map(x => x.id));
+      for (const id of ids) {
+        const r = window.demPairOf(p, id);
+        if (r) return r;
       }
-    }, s.est != null ? s.est : s.lo + "–" + s.hi), s.note ? " (" + s.note + ")" : "");
-  })))), seats.length > 0 && p.seats.rangeOnly && p.seats.method && React.createElement("span", {
-    className: "rd-apd-sub rd-apd-note"
-  }, "Modelled range \u2013 ", p.seats.method, "."), React.createElement("div", {
-    className: "rd-apd-links"
-  }, p.links && p.links.length > 0 && React.createElement("span", {
-    className: "rd-apd-srcs"
-  }, rdPollLinks(p.links)), React.createElement("a", {
-    className: "rd-link",
-    href: report,
-    onClick: e => e.stopPropagation()
-  }, "Report an error"), onBack && React.createElement("button", {
-    type: "button",
-    className: "rd-link",
-    onClick: e => {
-      e.stopPropagation();
-      onBack();
-    }
-  }, "Back to ", backLabel || "the chart"))), React.createElement("div", {
-    className: "rd-apd-r"
-  }, React.createElement("span", {
-    className: "rd-apd-h"
-  }, isConf ? "How it reads" : "How it counts"), !isDir && !isIss && !isLd && !isDem && !isConf && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-ct"
-  }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the ", RD_AP_AVG, ", Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
-    p: p,
-    onM: onM,
-    pub: pub
-  })), isLd && ldOwn.length > 0 && ldWin && ldWin.waves.length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-ct"
-  }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the average \u2013 ", ldBoth ? React.createElement("button", {
-    type: "button",
-    className: "rd-apd-met",
-    "aria-label": "Showing " + rdApLdMetWord(ldAct) + ". Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav"),
-    title: "Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav"),
-    onClick: e => {
-      e.stopPropagation();
-      setLdMet(ldAct === "fav" ? "approval" : "fav");
-    }
-  }, rdApLdMetWord(ldAct)) : ldWord, ", ", rdApPmOffice(), " minus ", rdApLdJoin(ldNames)), React.createElement(RdApLdMini, {
-    p: p,
-    met: ldAct
-  })), isDir && d && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-ct"
-  }, p.pollster, "\u2019s readings since ", D.monthNameFull(Number(from.slice(5))), " against the average, net right direction minus wrong track"), React.createElement(RdApDirMini, {
-    p: p
-  })), isIss && D.issues && iss && iss.own && iss.own[iss.top] && (() => {
-    const cLab = D.issues.labels && D.issues.labels[iss.top] || iss.top;
-    const cTit = cLab.charAt(0).toLowerCase() + cLab.slice(1);
-    return React.createElement(React.Fragment, null, React.createElement("span", {
-      className: "rd-apd-ct"
-    }, "Who voters rate best on ", cTit, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
+      return null;
+    })();
+    const sg = v => (v > 0 ? "+" : v < 0 ? "−" : "") + rdApNum(Math.abs(v));
+    out.push({
+      id: "demographics",
+      lab: "Demographics",
+      body: React.createElement(React.Fragment, null, pr && React.createElement(U, {
+        lbl: true
+      }, pr.a, " v ", pr.b), pr && rdLgPrims().filter(k => pr.gap[k.id] != null).map(k => React.createElement(U, {
+        key: k.id
+      }, pty(k.id, sg(pr.gap[k.id])))), React.createElement(U, {
+        soft: true
+      }, nG, " groups in ", rdNumWord(nC), " breakdown", nC === 1 ? "" : "s"))
+    });
+  }
+  const seats = p.seats && p.seats.p ? rdLgPrims().filter(k => p.seats.p[k.id]) : [];
+  if (seats.length) {
+    out.push({
+      id: "seats",
+      lab: "Seats",
+      body: React.createElement(React.Fragment, null, seats.map(k => {
+        const s = p.seats.p[k.id];
+        return React.createElement(U, {
+          key: k.id
+        }, pty(k.id, s.est != null ? s.est : s.lo + "–" + s.hi));
+      }), React.createElement(U, {
+        soft: true
+      }, "modelled", p.seats.rangeOnly && p.seats.method ? " – " + p.seats.method : ""))
+    });
+  }
+  if (p.sw) {
+    const w = p.sw;
+    out.push({
+      id: "switching",
+      lab: "To One Nation",
+      body: React.createElement(React.Fragment, null, React.createElement(U, {
+        lbl: true
+      }, "Share of each ", rdElecYear, " vote now with One Nation"), ["lnp", "alp", "grn", "oth"].filter(k => w[k] != null).map(k => React.createElement(U, {
+        key: k
+      }, pty(k, rdApNum(w[k])))), w.onp != null && React.createElement(U, null, pty("onp", rdApNum(w.onp)), " ", React.createElement("span", {
+        className: "rd-ldg-lisoft"
+      }, "kept")))
+    });
+  }
+  return out;
+}
+function RdLedger({
+  p,
+  facet,
+  onM,
+  side,
+  lead,
+  wide,
+  onLine,
+  sources,
+  foot,
+  demSplit,
+  moe,
+  latest
+}) {
+  const lines = rdLgLines(p, {
+    onM,
+    demSplit
+  });
+  const NOTE = {
+    twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp", "splitCoal", "splitOnp", "splitGrn", "splitGrnOn", "splitOth", "splitOthOn"]),
+    primary: rdLgChgNote(p, ["pAlp", "pLnp", "pGrn", "pOnp", "pOth", "und"]),
+    leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet"])
+  };
+  const FULL = {
+    primary: () => React.createElement(RdLgVote, {
+      p: p,
+      note: NOTE.primary
+    }),
+    twopp: () => React.createElement(RdLgTpp, {
+      p: p,
+      onM: onM,
+      moe: moe,
+      note: NOTE.twopp
+    }),
+    leadership: () => React.createElement(RdLgLeaders, {
+      p: p,
+      note: NOTE.leadership
+    }),
+    direction: () => React.createElement(RdLgDir, {
       p: p
-    }));
-  })(), isConf && conf && confSer && React.createElement(React.Fragment, null, React.createElement("span", {
+    })
+  };
+  const HEAD = {
+    primary: "Primary vote, %",
+    twopp: "Two-party preferred",
+    leadership: "Leaders",
+    direction: "The country is heading"
+  };
+  const body = lead || (FULL[facet] ? FULL[facet]() : null);
+  const rest = lines.filter(l => l.id !== facet);
+  const ASKED = {
+    primary: "primary vote",
+    twopp: "two-party vote",
+    leadership: "leaders",
+    direction: "direction question",
+    issues: "issues",
+    demographics: "vote by group"
+  };
+  return React.createElement("div", {
+    className: "rd-ldg poll-detail" + (wide ? " wide" : "") + (side ? "" : " noside"),
+    "data-pollster": p.pollster
+  }, React.createElement("div", {
+    className: "rd-ldg-head"
+  }, React.createElement("span", {
+    className: "rd-apd-h rd-ldg-sent"
+  }, rdPollHead(p)), (sources || foot) && React.createElement("div", {
+    className: "rd-ldg-srcs"
+  }, sources, foot && React.createElement("span", {
+    className: "rd-ldg-acts"
+  }, foot))), React.createElement("div", {
+    className: "rd-ldg-lead"
+  }, lead || React.createElement("section", {
+    className: "rd-ldg-sec",
+    "data-sec": facet
+  }, React.createElement("h4", {
+    className: "rd-ldg-h"
+  }, HEAD[facet] || RD_LG_TAB[facet] || facet), body || React.createElement("p", {
+    className: "rd-ldg-foot1"
+  }, p.pollster, " didn\u2019t publish a ", ASKED[facet] || facet, " figure in this poll."))), side && React.createElement("div", {
+    className: "rd-ldg-side"
+  }, side), rest.length > 0 && React.createElement("div", {
+    className: "rd-ldg-also"
+  }, React.createElement("h4", {
+    className: "rd-ldg-h"
+  }, "Also in this poll"), React.createElement("div", {
+    className: "rd-ldg-lines"
+  }, rest.map(l => {
+    const can = !!(onLine && RD_LG_TAB[l.id]);
+    const Tag = can ? "button" : "div";
+    const away = latest && !RD_LG_LATEST_TABS[l.id];
+    return React.createElement(Tag, {
+      key: l.id,
+      type: can ? "button" : undefined,
+      className: "rd-ldg-line" + (can ? " go" : ""),
+      onClick: can ? e => {
+        e.stopPropagation();
+        onLine(l.id, e.currentTarget);
+      } : undefined,
+      title: can ? away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
+    }, React.createElement("span", {
+      className: "rd-ldg-lab"
+    }, l.lab), React.createElement("span", {
+      className: "rd-ldg-lbody"
+    }, l.body), can && React.createElement("span", {
+      className: "rd-ldg-arrow",
+      "aria-hidden": "true"
+    }, away ? "↗" : "→"));
+  }))));
+}
+function RdApPrimRail({
+  p
+}) {
+  const D = window.AUSPOL;
+  const q = p.p || {},
+    y = p.pyd || {};
+  const ks = rdLgPrims().filter(k => q[k.id] != null && y[k.id]);
+  if (!ks.length) return null;
+  const n = p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0);
+  const rows = ks.map(k => {
+    const x = +q[k.id],
+      v = y[k.id][0],
+      he = y[k.id][1];
+    const lean = rdApR1(x - v),
+      less = he == null ? null : rdApR1(lean - he);
+    const m = n ? 196 * Math.sqrt(x / 100 * (1 - x / 100) / n) : null;
+    return {
+      ...k,
+      x,
+      v,
+      he,
+      lean,
+      less,
+      m,
+      out: rdApInside(less != null ? less : lean, m) === "outside"
+    };
+  });
+  const e = p.peff || null;
+  const pairOf = id => !e ? null : e.w ? e[id] : e.t ? e.t[id] : null;
+  const moves = e && !p.noAgg && rows.some(r => pairOf(r.id));
+  const sg = v => v == null ? "—" : rdApSigned(v);
+  const ms = rows.map(r => r.m).filter(m => m != null);
+  const mTxt = ms.length ? "±" + (Math.min(...ms).toFixed(1) === Math.max(...ms).toFixed(1) ? Math.min(...ms).toFixed(1) : Math.min(...ms).toFixed(1) + "–" + Math.max(...ms).toFixed(1)) : null;
+  const now = D.latest && D.latest.primary;
+  const around = RD_AP_KAL ? "The trend" : "Polls around it";
+  const anyOut = rows.some(r => r.out);
+  const say = rows.map(r => r.lab + " " + (Math.abs(r.lean) < 0.05 ? "level with" : Math.abs(r.lean).toFixed(1) + (r.lean > 0 ? " above" : " below")) + " " + (RD_AP_KAL ? "the trend" : "the polls around it")).join("; ");
+  return React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
-  }, p.pollster, "\u2019s ", conf.lab, " releases since ", D.monthNameFull(Number(from.slice(5))), ", as published \u2014 no average; the gauge is the publisher\u2019s own series"), React.createElement(RdApConfMini, {
-    p: p
-  })), React.createElement("div", {
-    className: "rd-apd-facts"
-  }, demFacts, isConf && conf && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "The gauge"), React.createElement("span", null, CONF_BLURB[conf.k] || conf.lab + "."), React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the confidence panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
-    className: "rd-apd-k"
-  }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
-    className: "rd-link",
-    href: confSer.latest.url,
-    onClick: e => e.stopPropagation()
-  }, "its source", React.createElement("span", {
-    className: "rd-apd-ext",
+  }, p.pollster, "\u2019s primaries against ", RD_AP_KAL ? "the trend through the other polls" : "the polls fielded around it", ", in points"), React.createElement("div", {
+    className: "rd-ldg-pstrips",
+    role: "img",
+    "aria-label": say
+  }, React.createElement("div", {
+    className: "rd-ldg-prow rd-ldg-phead",
     "aria-hidden": "true"
-  }, "\u2197"))) : "", ".") : React.createElement(React.Fragment, null, "The gauge\u2019s series carries no published releases to panel against."))), isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Asked"), React.createElement("span", null, issPrompted ? React.createElement(React.Fragment, null, "Voters picked the three issues that matter most", iss.q ? React.createElement(React.Fragment, null, " \u2013 ", p.pollster, "\u2019s wording: \u201C", iss.q, "\u201D") : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : "", ". SEC Newgate\u2019s mentions count can\u2019t sit in the same series, so each house\u2019s wording is pooled against its pair first.") : iss.conc ? React.createElement(React.Fragment, null, "SEC Newgate asks what concerns Australians, unprompted \u2013 anyone can name anything, so the shares are any-mentions, not forced picks. That reading can\u2019t mix with the top-three series the issues panel pools, so it isn\u2019t counted toward it.") : React.createElement(React.Fragment, null, p.pollster, " asked only who\u2019d be best on each issue", iss.q ? React.createElement(React.Fragment, null, " \u2013 its wording: \u201C", iss.q, "\u201D \u2013") : ",", " not which issues matter most, so this wave feeds the pooled best-party line and there\u2019s no top-three list for it to join.")), issPair != null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Between the question forms"), React.createElement("span", null, "RedBridge\u2019s and Ipsos\u2019s wordings for what matters sit a measured ", React.createElement("b", null, Math.abs(issPair).toFixed(1)), " points apart on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, "; this wave\u2019s reading was moved half that gap toward the other house\u2019s before it entered any average.")), issLeadMeta && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, rdApBreakable(p.pollster), "\u2019s house lean"), React.createElement("span", null, issPlus.lean == null ? "None to speak of: its figures sit level with the other pollsters’" : React.createElement(React.Fragment, null, "About ", React.createElement("b", null, Math.abs(issPlus.lean).toFixed(1)), " ", issPlus.lean > 0 ? "richer" : "poorer", " for ", issLeadMeta[0], " on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, ", taken out before the figures are pooled"))), issPlus && D.issues.window && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "In today\u2019s panel"), React.createElement("span", null, issPlus.w ? React.createElement(React.Fragment, null, "One of the waves the issues panel\u2019s current figures draw on (the last ", D.issues.window, ").") : React.createElement(React.Fragment, null, "Outside the ", D.issues.window, " the panel\u2019s current figures draw on.")))), isDir && d && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Against the readings around it"), React.createElement("span", null, dirLean == null ? "No other reading was taken within three weeks of it, so there’s nothing to set it against." : React.createElement(React.Fragment, null, Math.abs(dirLean) < 0.05 ? "Level with " : React.createElement(React.Fragment, null, React.createElement("b", {
+  }, React.createElement("span", null), React.createElement("span", {
+    className: "rd-ap-hpic"
+  }, React.createElement("span", {
+    className: "rd-ap-scale"
+  }, React.createElement("span", {
+    className: "rd-ap-in"
+  }, React.createElement("b", {
+    className: "rd-ap-scl"
+  }, "\u25C0 Lower"), React.createElement("b", {
+    className: "rd-ap-scr"
+  }, "Higher \u25B6"), [[-6, "6"], [-3, "3"], [0, RD_AP_KAL ? "Trend" : React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-ldg-lg"
+  }, "Polls around it"), React.createElement("span", {
+    className: "rd-ldg-sh"
+  }, "Around"))], [3, "3"], [6, "6 pts"]].map(([v, lab]) => React.createElement("span", {
+    key: v,
+    className: "rd-ap-tk" + (v === 0 ? " mid" : "") + (v === -6 ? " start" : "") + (v === 6 ? " end" : "") + (Math.abs(v) === 3 ? " rd-ldg-lg" : ""),
     style: {
-      color: dirLean > 0 ? "var(--mood-pos)" : "var(--mood-neg)"
+      left: rdApX(v) + "%"
     }
-  }, Math.abs(dirLean).toFixed(1)), " more ", dirWay(dirLean), " than "), dYd.n === 1 ? "the one other reading taken within three weeks of it, a net of " : "the " + rdNumWord(dYd.n) + " other readings taken within three weeks of it, which average a net of ", rdApSigned(dYd.v), dirHe == null ? marginD : "")), React.createElement("span", {
-    className: "rd-apd-k"
-  }, rdApBreakable(p.pollster), "\u2019s house lean"), React.createElement("span", null, dirHe != null ? Math.abs(dirHe) < 0.05 ? React.createElement(React.Fragment, null, "None to speak of, so the gap above is this reading\u2019s own", marginD) : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(dirHe).toFixed(1)), " more ", dirWay(dirHe), ", taken out before the readings are averaged. Taken out here, it leaves this reading ", Math.abs(dirAdj) < 0.05 ? "level with the others" : React.createElement(React.Fragment, null, React.createElement("b", {
+  }, lab))))), React.createElement("span", null)), rows.map(r => React.createElement("div", {
+    key: r.id,
+    className: "rd-ldg-prow"
+  }, React.createElement("b", {
     style: {
-      color: dirAdj > 0 ? "var(--mood-pos)" : "var(--mood-neg)"
+      color: r.ink
     }
-  }, Math.abs(dirAdj).toFixed(1)), " more ", dirWay(dirAdj), " than the others"), marginD) : dirHl == null ? "Not measured yet: too few readings on the series" : Math.abs(dirHl.v) < 0.05 ? "None to speak of: its readings sit level with the other pollsters’" : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(dirHl.v).toFixed(1)), " more ", dirHl.v > 0 ? "right-direction" : "wrong-track", ", taken out before the readings are averaged")), dirNow && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "In today\u2019s ", rdApSigned(dirNow.net), " net"), React.createElement("span", null, dEff && dEff.w ? React.createElement(React.Fragment, null, "One of the ", rdNumWord(dirNow.n), " readings it\u2019s built from; this one moves it ", React.createElement("b", null, move(dEff))) : dEff && dEff.t ? React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of readings. When it came out, it moved the figure ", React.createElement("b", null, move(dEff.t))) : React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of readings")))), isDir && !d && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "National direction"), React.createElement("span", null, p.pollster, " didn\u2019t ask the direction question in this poll, so there\u2019s no reading to set against the direction figures.")), isLd && ldOwn.length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "The gap in this poll"), React.createElement("span", null, ldOwn.map((pr, i) => React.createElement(React.Fragment, {
-    key: pr.riv
-  }, i > 0 ? "; " : "", "against ", pr.name, ", ", React.createElement("b", null, Math.abs(pr.gap) < 0.05 ? "level" : Math.abs(pr.gap).toFixed(1) + " points " + rdApLdWay(pr.gap, pr.name, rdApPm(p.appr))), " (", rdApPm(p.appr), " ", rdApSigned(p.appr.albNet), ", ", pr.name, " ", rdApSigned(pr.net), ") on ", rdApLdMetWord(pr.met)))), ldCmp.some(Boolean) && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Against the polls around it"), React.createElement("span", null, ldCmp.filter(Boolean).map((c, i) => React.createElement(React.Fragment, {
-    key: c.riv
-  }, i > 0 ? "; against " + c.name + ", " : "", "the other polls fielded around it put the gap at ", React.createElement("b", null, rdApSigned(c.og)), ", so this poll reads ", Math.abs(c.delta) < 0.05 ? "level with them" : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(c.delta).toFixed(1)), " further ", rdApLdWay(c.delta, c.name, rdApPm(p.appr))))))), React.createElement("span", {
-    className: "rd-apd-k"
-  }, rdApBreakable(p.pollster), "\u2019s house lean"), React.createElement("span", null, ldCmp.some(Boolean) ? React.createElement(React.Fragment, null, ldCmp.filter(Boolean).map((c, i) => React.createElement(React.Fragment, {
-    key: c.riv
-  }, i > 0 ? "; on the gap against " + c.name + ", " : "", Math.abs(c.he) < 0.05 ? "none to speak of on the gap against " + c.name : React.createElement(React.Fragment, null, "about ", React.createElement("b", null, Math.abs(c.he).toFixed(1)), " points ", c.he > 0 ? window.JUR ? rdApPmOffice() + "’s" : "Albanese’s" : c.name + "’s", " way"))), ", taken out before its figures are averaged with the rest.", ldCmp.some(c => c && Math.abs(c.he) >= 0.05) && React.createElement(React.Fragment, null, " Taken out here, it leaves this poll ", ldCmp.filter(Boolean).map((c, i) => React.createElement(React.Fragment, {
-    key: c.riv
-  }, i > 0 ? "; against " + c.name + ", " : "", Math.abs(c.adj) < 0.05 ? "level with the others" : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(c.adj).toFixed(1)), " further ", rdApLdWay(c.adj, c.name, rdApPm(p.appr)), " than the others"))), ".")) : ldLean.filter(Boolean).length ? React.createElement(React.Fragment, null, ldLean.filter(Boolean).map((l, i) => React.createElement(React.Fragment, {
-    key: l.name
-  }, i > 0 ? "; on the gap against " + l.name + ", " : "", Math.abs(l.v) < 0.05 ? "level with the other pollsters on the gap against " + l.name : React.createElement(React.Fragment, null, "about ", React.createElement("b", null, Math.abs(l.v).toFixed(1)), " points ", l.v > 0 ? window.JUR ? rdApPmOffice() + "’s" : "Albanese’s" : l.name + "’s", " way"))), ", taken out before its figures are averaged with the rest") : "Not measured yet: too few readings on the series"), ldNow.filter(Boolean).length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Now"), React.createElement("span", null, ldNow.filter(Boolean).map((n, i) => React.createElement(React.Fragment, {
-    key: n.name
-  }, i > 0 ? "; against " + n.name + ", " : "", React.createElement("b", null, Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name, rdApPmNow())), " (", rdApPmNow(), " ", rdApSigned(n.a), ", ", n.name, " ", rdApSigned(n.o), ") on ", rdApLdMetWord(n.met))), ldOwn.some(pr => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""))), isLd && !ldOwn.length && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && !isConf && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "In the aggregates"), React.createElement("span", null, p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates.")), p.solo && window.soloNote && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Territory readings"), React.createElement("span", null, window.soloNote(p))), fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, RD_AP_KAL ? "Against the trend" : "Against the polls around it"), React.createElement("span", null, lean == null || !yd ? "No other poll was fielded within three weeks of it, so there’s nothing to set it against." : React.createElement(React.Fragment, null, Math.abs(lean) < 0.05 ? "Level with " : React.createElement(React.Fragment, null, React.createElement("b", {
+  }, r.lab), React.createElement("span", {
+    className: "rd-ap-pic"
+  }, React.createElement(RdApStrip, {
+    lean: r.lean,
+    moe: r.m,
+    he: r.he,
+    ink: r.dot
+  })), React.createElement("span", {
+    className: "rd-ldg-pv",
     style: {
-      color: rdApLeanInk(lean, onM)
+      color: Math.abs(r.lean) >= 0.05 ? r.ink : null
     }
-  }, Math.abs(lean).toFixed(1)), " more ", sideOf(lean), " way than "), RD_AP_KAL ? "the trend through the other polls, at " + yd.v.toFixed(1) : yd.n === 1 ? "the one other poll fielded within three weeks of it, at " + yd.v.toFixed(1) : "the " + rdNumWord(yd.n) + " other polls fielded within three weeks of it, which average " + yd.v.toFixed(1), ydHe == null ? marginTxt : ""))), fig.a != null && moe != null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Margin of error"), React.createElement("span", null, "\xB1", moe.toFixed(1), " on its ", pub ? "published" : "implied", " two-party figure, at 95%, ", rdMarginBasis(p))), fig.a == null && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "Two-party"), React.createElement("span", null, fig.none[0].toUpperCase() + fig.none.slice(1), ", so this poll has no ", pub ? "published" : "implied", " figure to set against the other polls.")), React.createElement("span", {
-    className: "rd-apd-k"
-  }, rdApBreakable(p.pollster), "\u2019s house lean"), React.createElement("span", null, ydHe != null && lean != null ? Math.abs(ydHe) < 0.05 ? React.createElement(React.Fragment, null, "None to speak of, so the gap above is this poll\u2019s own", marginTxt) : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(ydHe).toFixed(1)), " to ", ydHe > 0 ? "Labor" : onM ? "One Nation" : "the Coalition", ", taken out before the polls are averaged. Taken out here, it leaves this poll ", Math.abs(adj) < 0.05 ? "level with the others" : React.createElement(React.Fragment, null, React.createElement("b", {
+  }, sg(r.lean))))), React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-rk rd-ldg-rkp"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null), rows.map(r => React.createElement("th", {
+    key: r.id,
+    className: "num",
     style: {
-      color: rdApLeanInk(adj, onM)
+      color: r.ink
     }
-  }, Math.abs(adj).toFixed(1)), " more ", sideOf(adj), " way than the others"), marginTxt) : hl == null ? "Not measured yet: too few polls on this contest" : Math.abs(hl) < 0.05 ? "None to speak of: it sits level with the other pollsters" : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(hl).toFixed(1)), " to ", hl > 0 ? "Labor" : onM ? "One Nation" : "the Coalition", ", taken out before the polls are averaged")), today && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-k"
-  }, "In today\u2019s ", today.a.toFixed(1)), React.createElement("span", null, eff && eff.w ? React.createElement(React.Fragment, null, "One of the ", rdNumWord(winN), " polls ", RD_AP_KAL ? "the trend is" : "it’s", " built from; this one moves it ", React.createElement("b", null, move(eff))) : eff && eff.t ? React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of polls. When it came out, it moved the figure ", React.createElement("b", null, move(eff.t))) : React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of polls")))))));
+  }, r.lab)))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "This poll"), rows.map(r => React.createElement("td", {
+    key: r.id,
+    className: "num"
+  }, React.createElement("b", null, rdApNum(r.x))))), React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, around), rows.map(r => React.createElement("td", {
+    key: r.id,
+    className: "num"
+  }, r.v.toFixed(1)))), React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Lean"), rows.map(r => React.createElement("td", {
+    key: r.id,
+    className: "num" + (r.out && r.less == null ? " out" : "")
+  }, sg(r.lean)))), React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "House lean"), rows.map(r => React.createElement("td", {
+    key: r.id,
+    className: "num"
+  }, sg(r.he)))), rows.some(r => r.less != null) && React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, "Less house lean"), rows.map(r => React.createElement("td", {
+    key: r.id,
+    className: "num" + (r.out ? " out" : "")
+  }, sg(r.less)))), moves && React.createElement("tr", null, React.createElement("th", {
+    scope: "row"
+  }, e.w ? "Moves today’s" : "Moved them on release"), rows.map(r => {
+    const pr = pairOf(r.id);
+    return React.createElement("td", {
+      key: r.id,
+      className: "num"
+    }, pr ? sg(rdApR1(pr[1] - pr[0])) : "—");
+  })))), React.createElement("p", {
+    className: "rd-ldg-foot1"
+  }, "Lean is this poll minus ", RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)", ", so + means higher; house lean is taken out before averaging.", anyOut ? " Bold: outside the poll’s margin on that party." : "", mTxt ? " Margins " + mTxt + ", " + rdMarginBasis(p) + "." : "", moves && e.w && now ? " Today’s figures: " + rows.filter(r => now[r.id] != null).map(r => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : "", moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""));
 }
 const RD_AP_DEM_NOUN = {
   "18–34": "18–34-year-olds",
@@ -55824,7 +57351,8 @@ function RdAllPolls(P) {
       facet: facet,
       onBack: arrived ? onBack : null,
       backLabel: backLabel,
-      demSplit: demSplit
+      demSplit: demSplit,
+      onFacet: onFacet
     }));
     if (phone) {
       const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
@@ -58515,6 +60043,7 @@ const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
 const RdFlowsM = React.memo(RdFlows);
 Object.assign(window, {
+  RdLedger,
   RdAllPolls,
   RdApDetail,
   RdApSheet,

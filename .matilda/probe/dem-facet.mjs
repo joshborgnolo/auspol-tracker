@@ -215,8 +215,11 @@ for (const [vw, phone] of [[1280, false], [390, true]]) {
   await page.evaluate((phone) => document.querySelector(phone ? ".rd-ap-card" : ".rd-ap-row").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })), phone);
   await settle(800);
   const r = await page.evaluate((phone) => {
-    const d = document.querySelector(".rd-ap-open .rd-apd");
+    /* the opened poll is the shared ledger: the head band, then the lead -
+       on this facet the printed table */
+    const d = document.querySelector(".rd-ap-open .rd-ldg");
     if (!d) return null;
+    const lead = d.querySelector(":scope > .rd-ldg-lead");
     const row = document.querySelector(phone ? ".rd-ap-card.open" : ".rd-ap-row.open");
     const who = row.querySelector(phone ? ".rd-ap-firm" : "[role=rowheader] b").textContent.replace(/↗/g, "").trim();
     const D = window.AUSPOL;
@@ -228,7 +231,7 @@ for (const [vw, phone] of [[1280, false], [390, true]]) {
     const cols = [...d.querySelectorAll(".rd-apd-demcols > .rd-apd-dem")];
     const shownHeads = cols.filter((c) => { const h = c.querySelector(".rd-apd-demh"); return h && getComputedStyle(h).display !== "none"; }).length;
     return {
-      first: d.firstElementChild && d.firstElementChild.className,
+      first: lead && lead.previousElementSibling && lead.previousElementSibling.classList.contains("rd-ldg-head") && lead.firstElementChild ? lead.firstElementChild.className : null,
       groups: groups.length, poll: !!p, marked, pair: pr ? [pr.a, pr.b] : null,
       cols: cols.length, shownHeads,
       keys: [...d.querySelectorAll(".rd-apd-r .rd-apd-k")].map((k) => k.textContent.trim()),

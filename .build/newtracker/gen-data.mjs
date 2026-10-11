@@ -899,7 +899,7 @@ const primaryVal = (p, k) => (k === "oth" ? ((p.ind ?? null) === null && (p.oth 
 const primaryRows = {}, primaryHE = {};
 for (const k of PRIMARY_KEYS) {
   primaryRows[k] = POLLS.filter((p) => primaryVal(p, k) != null && !noAggPoll(p))
-    .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster }));
+    .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
 const aggPrimary = MONTHS.map((ym) => {
@@ -1206,7 +1206,7 @@ function aroundPts(rows, he, ref, skip, k = HEADLINE_K) {
   for (const p of pts) p.w /= Math.sqrt(waves.get(p.firm));
   return pts;
 }
-function yardSeries(rows, he, kf) {
+function yardSeries(rows, he, kf, bare = false) {
   const at = new Map();                          // key -> { v, he, n, p }
   const DAY = 86400000, isoOf = (d) => new Date(d * DAY).toISOString().slice(0, 10);
   /* the grid: whole days, every YARD_STEP from the first poll, and the
@@ -1233,9 +1233,9 @@ function yardSeries(rows, he, kf) {
       /* a wave reaches the whole smoothed path, but past ~two months either
          side its pull is under a hundredth of a point */
       at.set(r.key, { v: r2(pathAt(run, day(r.mid))), he: r2(kf.leans[r.firm] || 0), n: rest.length,
-                      p: patch(g, (d) => pathAt(run, d), r.mid, 60) });
+                      ...(bare ? {} : { p: patch(g, (d) => pathAt(run, d), r.mid, 60) }) });
     }
-    const line = g.map((d) => [isoOf(d), r1(kfAt(kf, d).mu)]);
+    const line = bare ? [] : g.map((d) => [isoOf(d), r1(kfAt(kf, d).mu)]);
     for (const y of at.values()) { const t = trimPatch(y.p, line); if (t) y.p = t; else delete y.p; }
     return { at, line, member: new Set(kf.obs.map((o) => o.key)), outside: (mid, firm) => ({ v: r2(kfAt(kf, day(mid)).mu), he: kf.leans[firm] != null ? r2(kf.leans[firm]) : null, n: kf.obs.length }) };
   }
@@ -1245,9 +1245,9 @@ function yardSeries(rows, he, kf) {
   for (const r of rows) {
     const e = weightedWithSe(aroundPts(rows, he, r.mid, r.key));
     if (e) at.set(r.key, { v: r2(e.v), he: r2(heV(he, r.firm, r.mid)), n: e.n,
-                           p: patch(g, (d) => est(Math.min(d * DAY, refNow), r.key), r.mid, HEADLINE_K.window) });
+                           ...(bare ? {} : { p: patch(g, (d) => est(Math.min(d * DAY, refNow), r.key), r.mid, HEADLINE_K.window) }) });
   }
-  const line = g.map((d) => { const v = est(Math.min(d * DAY, refNow), null); return [isoOf(d), v == null ? null : r1(v)]; });
+  const line = bare ? [] : g.map((d) => { const v = est(Math.min(d * DAY, refNow), null); return [isoOf(d), v == null ? null : r1(v)]; });
   for (const y of at.values()) { const t = trimPatch(y.p, line); if (t) y.p = t; else delete y.p; }
   /* a wave the series never took - an SMS poll (NO_AGG_HOUSES), or one whose
      primaries show rebased under a documented anomaly but stay out of the
@@ -1285,6 +1285,34 @@ for (const [k, s] of Object.entries(yardBy)) {
   for (const [key, y] of s.at) {
     if (!Number.isFinite(y.v) || !Number.isFinite(y.he) || y.v < 20 || y.v > 80)
       throw new Error(`poll yardstick out of range (${k} ${key}): ${JSON.stringify(y)}`);
+  }
+}
+/* The same for each party's primary, for the Primary tab's How it counts:
+   the headline primary estimator (§7e's nowcast construction, each party on
+   its own house effects) read at the wave's fieldwork midpoint, window open
+   both ways, the wave left out. Compact, at the one decimal the rail prints
+   (so its sums check down the column): pyd = { n, <party>: [v, he] } - v the
+   other polls' estimate, he this house's lean on the party then (null where
+   none is measured), n the most other polls any party's estimate rests on.
+   No line or patch: that rail draws one strip per party, not a chart. A
+   wave the aggregate never takes (an SMS poll) still meets the polls around
+   it, all of them in, as ydOf's outsiders do. */
+const primYardBy = Object.fromEntries(PRIMARY_KEYS.map((k) => [k, yardSeries(primaryRows[k], primaryHE[k], KF ? ((KF_NOW.primary || {})[k] || null) : null, true)]));
+const pydOf = (p) => {
+  const key = p.date + "|" + p.pollster, o = {};
+  let n = 0;
+  for (const k of PRIMARY_KEYS) {
+    const s = primYardBy[k];
+    const y = s.at.has(key) ? s.at.get(key) : !s.member.has(key) && primaryVal(p, k) != null ? s.outside(midMs(p), p.pollster) : null;
+    if (y) { o[k] = [r1(y.v), y.he == null ? null : r1(y.he)]; n = Math.max(n, y.n); }
+  }
+  return Object.keys(o).length ? { n, ...o } : null;
+};
+// a primary share past 0-70 is arithmetic gone wrong, not data
+for (const [k, s] of Object.entries(primYardBy)) {
+  for (const [key, y] of s.at) {
+    if (!Number.isFinite(y.v) || !Number.isFinite(y.he) || y.v < 0 || y.v > 70)
+      throw new Error(`primary yardstick out of range (${k} ${key}): ${JSON.stringify(y)}`);
   }
 }
 
@@ -3042,6 +3070,8 @@ const individualPolls = POLLS.map((p) => {
     // the polls around this one, each series it has a figure on (§3c),
     // and its leader gaps against the waves around it (§4c)
     ...(ydOf(p) ? { yd: ydOf(p) } : {}),
+    // the same per party, on its printed primaries (§3c)
+    ...(pydOf(p) ? { pyd: pydOf(p) } : {}),
     ...(ldYard.at.has(p.date + "|" + p.pollster) ? { ldYd: ldYard.at.get(p.date + "|" + p.pollster) } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     // this wave's implied 2PP (its own primaries at the 2025 flow table) –
@@ -3673,7 +3703,7 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    quotes. The five-party check is aggPrimary's own, applied to the window:
    debiased per party, plain-window total alongside, renormalised only if the
    totals disagree by more than half a point. */
-const primaryNowAt = (ref) => {
+const primaryNowAt = (ref, skip = null) => {
   if (KF) {   // /vic/: each party's trend at that day (§1a); null before a party's first reading
     const per = KF_NOW.primary || {}, out = {};
     for (const k of PRIMARY_KEYS) {
@@ -3683,13 +3713,14 @@ const primaryNowAt = (ref) => {
     }
     return { ...out, n: Math.max(...PRIMARY_KEYS.map((k) => per[k].obs.length)), parties: {}, plainTotal: null, adjTotal: null, rescaled: false };
   }
-  const win = (k) => primaryRows[k].filter((r) => { const d = ddays(ref, r.mid); return d >= 0 && d <= HL_WINDOW; });
+  const rowsOf = (k) => (skip ? primaryRows[k].filter((r) => r.key !== skip) : primaryRows[k]);
+  const win = (k) => rowsOf(k).filter((r) => { const d = ddays(ref, r.mid); return d >= 0 && d <= HL_WINDOW; });
   const adj = {}, parties = {};
   let plainTotal = 0, adjTotal = 0, n = 0;
   for (const k of PRIMARY_KEYS) {
     const rows = win(k);
     if (!rows.length) return null;
-    const est = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], ref));
+    const est = weightedWithSe(nowcastPts(rowsOf(k), primaryHE[k], ref));
     adj[k] = est.v;
     const plain = mean(rows.map((r) => r.x));
     parties[k] = { plain: r2(plain), adj: r2(est.v) };
@@ -3702,6 +3733,66 @@ const primaryNowAt = (ref) => {
   return { ...out, n, parties, plainTotal, adjTotal, rescaled };
 };
 const primaryNow = primaryNowAt(refNow);
+
+/* ---- 7eb. each poll's footprint on the current primaries -----------------
+   §3b's leave-one-out on the five-party nowcast, for the Primary tab's How it
+   counts: the current primaries recomputed without the wave (the same rows,
+   house effects and rescale rule - only the wave's own rows drop), beside
+   the standing figures, identically rounded. Compact, as pyd: peff =
+   { w: 1, <party>: [lo, hi] } for a wave inside the 21-day window, or
+   { w: 0, t: { <party>: [lo, hi] } } for one outside it - the same pair read
+   at the wave's own publication day (t absent where that day can't be
+   estimated). /vic/: today's trend without the wave, rerun through each
+   party's filter (every poll sits in the trend, so w is 1). */
+const primEffByKey = (() => {
+  const out = new Map();
+  if (!primaryNow) return out;
+  const KFP = KF ? (KF_NOW.primary || {}) : null;
+  const hiNow = primaryNow;
+  for (const p of POLLS) {
+    if (noAggPoll(p)) continue;
+    const key = p.date + "|" + p.pollster;
+    if (KF) {
+      const eff = { w: 1 };
+      for (const k of PRIMARY_KEYS) {
+        const kf = KFP[k];
+        if (!kf || !kf.obs.some((o) => o.key === key)) continue;
+        const lo = kalmanRun(kf.obs.filter((o) => o.key !== key), { ...kf.opts, smooth: false }).final.mu;
+        eff[k] = [r1(lo), r1(kf.final.mu)];
+      }
+      if (Object.keys(eff).length > 1) out.set(key, eff);
+      continue;
+    }
+    const has = PRIMARY_KEYS.filter((k) => primaryRows[k].some((r) => r.key === key));
+    if (!has.length) continue;
+    const mid = primaryRows[has[0]].find((r) => r.key === key).mid;
+    if (ddays(refNow, mid) >= 0 && ddays(refNow, mid) <= HL_WINDOW) {
+      const lo = primaryNowAt(refNow, key);
+      if (!lo) continue;
+      const eff = { w: 1 };
+      for (const k of has) eff[k] = [lo[k], hiNow[k]];
+      out.set(key, eff);
+    } else {
+      /* outside today's window: the move it made on its own day, read with
+         the rows that existed then (nowcastPts drops later ones) */
+      const at = new Date(p.date).getTime();
+      const hi = primaryNowAt(at), lo = primaryNowAt(at, key);
+      const t = hi && lo ? Object.fromEntries(has.map((k) => [k, [lo[k], hi[k]]])) : null;
+      out.set(key, { w: 0, ...(t ? { t } : {}) });
+    }
+  }
+  // one wave moving a party's nowcast past four points is a bug in this file
+  for (const [k, eff] of out) for (const [party, e] of Object.entries({ ...eff, ...(eff.t || {}) })) {
+    if (!Array.isArray(e)) continue;
+    if (!Number.isFinite(e[0]) || !Number.isFinite(e[1]) || Math.abs(e[1] - e[0]) > 4)
+      throw new Error(`primary footprint out of range (${k} ${party}): ${JSON.stringify(e)}`);
+  }
+  return out;
+})();
+for (const r of individualPolls) {
+  const e = primEffByKey.get(r.released + "|" + r.pollster);
+  if (e) r.peff = e;
+}
 
 /* ---- 7g. the vote by group (age, gender, education, place, home) -------------
 

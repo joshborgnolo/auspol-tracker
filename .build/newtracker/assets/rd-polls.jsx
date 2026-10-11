@@ -372,132 +372,59 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     );
   };
 
-  /* ---- a row opened: the poll in full, and the rhythm behind the projection */
+  /* ---- a row opened: the poll in full and the rhythm behind the projection.
+     The poll is the All-polls ledger (RdLedger, rd-allpolls.jsx), read off
+     the archive's copy of the wave, which carries every field it needs: the
+     table's own tab leads, the release rhythm stands beside it, and the
+     poll's other measures follow one line each - this table's tabs switch
+     in place, the rest open the poll on that All-polls tab */
   const detail = (e) => {
     const r = e.poll, pj = e.next;
-    const f = figOf(r);
-    /* the All-polls expansion's movement markers, beside the figures they
-       belong to: each measure's change on the same pollster's previous poll
-       that published it (gen-data's chg, keyed d[k] against ref date r[k]) */
-    const cgd = (r.chg && r.chg.d) || {};
-    const plus = (k, dec) => {
-      const s = rdApChg(cgd[k], dec);
-      return s ? <> <span className="rd-apd-chg">{s}</span></> : null;
-    };
-    const clause = (items) => items.map(([txt, k, dec], i) => (
-      <React.Fragment key={k}>{i > 0 && ", "}{txt}{plus(k, dec)}</React.Fragment>
-    ));
-    const imp = clause([r.alpOnImp != null ? ["Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation", "impOn", 1] : null,
-                        r.alpImp != null ? ["Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition", "imp", 1] : null].filter(Boolean));
-    const pub = clause([r.tppAlt ? ["Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation", "altAlpOn", 0] : null,
-                        r.alp2pp != null ? ["Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition", "alp2pp", 0] : null].filter(Boolean));
-    const ppm = ppmContests(r).map((s) => {
-      const os = Object.keys(s).filter((k) => k !== "alb" && k !== "unc");
-      return [apWho(r, "alb", "Albanese") + " " + s.alb, ...os.map((o) => {
-        const Lm = (window.LEADER_META || {})[o];
-        return apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
-      })].join(", ");
-    }).join("; ");
-    /* the two-party figures' 95% margins (All polls' rdPollMargin, read off
-       the archive's copy of this poll, which carries every field it needs),
-       one per basis: a range where the two contests' margins differ */
-    const ip = D.individualPolls.find((q) => q.pollster === r.pollster && q.released === r.released);
-    const moeOf = (isPub) => {
-      if (!ip) return null;
-      const ms = [isPub ? (r.tppAlt ? "onp" : null) : (r.alpOnImp != null ? "onp" : null),
-                  isPub ? (r.alp2pp != null ? "lnp" : null) : (r.alpImp != null ? "lnp" : null)]
-        .filter(Boolean).map((c) => rdPollMargin(ip, c, isPub)).filter((m) => m != null).map((m) => m.toFixed(1));
-      if (!ms.length) return null;
-      const lo = Math.min(...ms), hi = Math.max(...ms);
-      return "±" + (lo === hi ? lo.toFixed(1) : lo.toFixed(1) + "–" + hi.toFixed(1)) + (isPub ? " on the published" : " on the implied");
-    };
-    const moes = [imp.length > 0 && moeOf(false), pub.length > 0 && moeOf(true)].filter(Boolean);
-    const moeTxt = moes.length ? moes.join(", ") + (moes.length > 1 ? " figures" : " figure") + ", " + rdMarginBasis(ip) : null;
-    /* the movable share of the electorate as this wave reads it, on whichever
-       basis the house asks: can't-say (first), the not-firm share of the
-       decided (soft), the residue inside a printed two-party pair (tpp), or
-       RedBridge's vote-softness triple (gen-data's firmAll) - the All-polls
-       expansion's Decidedness row reads the same four bases */
-    const dec = (() => {
-      if (r.undecided != null) {
-        const b = r.undecidedBasis || "first";
-        return <>{r.undecided}% {b === "soft" ? "not firm" : "undecided"}{plus("und", 1)}{" – "}
-          {b === "soft" ? "named a party, but might yet change their mind"
-            : b === "tpp" ? "unallocated inside the printed two-party pair"
-            : "couldn’t name a party when first asked"}</>;
-      }
-      const f = Array.isArray(r.firmAll) && r.firmAll.length === 3 ? r.firmAll : null;
-      if (f) return <>{f[1] + f[2]}% not firm{" – solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + ", on the wave’s own vote-softness table"}</>;
-      return null;
-    })();
-    const a = r.appr || {};
-    const net = (v) => (v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
-    const nets = clause([[apWho(r, "alb", "Albanese"), a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], [apWho(r, "hanson", "Hanson"), a.hansonNet, "hansonNet"]]
-      .filter(([, v]) => v != null).map(([n, v, k]) => [n + " " + net(v), k, 0]));
-    /* where a change marker shows, name the poll it is measured against,
-       as the All-polls expansion's note does */
-    const refIso = r.chg && r.chg.r ? (r.chg.r.pOnp || r.chg.r.pAlp || r.chg.r.impOn || r.chg.r.imp || r.chg.r.alp2pp) : null;
-    const prev = refIso ? D.individualPolls.find((x) => x.pollster === r.pollster && x.released === refIso) : null;
+    const ip = D.individualPolls.find((q) => q.pollster === r.pollster && q.released === r.released) || r;
     const key = window.AP.pollRowKey && window.AP.pollRowKey({ pollster: r.pollster, released: r.released });
     const recent = ((pj && pj.recent) || []).slice(-5).reverse();
     const nx = nextWords(e);
     const then = e.proj.filter((x) => x.ahead === 1)[0];
+    const yr = Number(String(r.released || ip.released || "").slice(0, 4));
+    const report = "/feedback/?msg=" + encodeURIComponent(`${r.pollster}, ${r.fieldPending ? "fieldwork TBC" : r.field} ${yr} – `);
+    const rhythm = pj && (
+      <div className="rd-pld-rhythm">
+        <div className="rd-pld-h">{r.pollster}’s rhythm, last {rdNumWord(recent.length)} releases</div>
+        <table className="rd-pld-tab">
+          <thead><tr><th>Field to</th><th>Published</th><th>Gap</th></tr></thead>
+          <tbody>
+            {recent.map((x) => (
+              <tr key={x.field}>
+                <td>{isoD(x.field)}</td>
+                <td>{x.pub ? (x.url ? <a href={x.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}>{WDs(Date.parse(x.pub)) + " " + isoD(x.pub)}</a> : WDs(Date.parse(x.pub)) + " " + isoD(x.pub)) : "—"}</td>
+                <td>{x.gap != null ? x.gap + " days" : ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="rd-pld-foot">
+          {pj.calMonth
+            ? <>One release a month, on no set day: between the {pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end"} so far. <b>Next: {nx.date}.</b></>
+            : irregular(pj)
+              ? <>Median {Math.round(pj.cadence)} days between releases across the last {pj.gapsUsed} gaps, give or take {Math.round(pj.spread)}. <b>Next: {nx.date.replace(/^About/, "about")}.</b></>
+              : <>Median {pj.cadence} days between {pj.basis === "published" ? "publications" : "fieldwork ends"} across the last {pj.gapsUsed} gaps.{" "}
+                <b>Next: {nx.date}{hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""}</b>, at the earliest{then ? "; then " + wdm(then.release) : ""}.</>}
+        </p>
+        {/* the house's "where it lands first" page (pollsterRules.site) belongs
+            with the wait for the next poll, not on the name of the last one;
+            the row's Next date carries the same link */}
+        {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
+      </div>
+    );
     return (
       <div className="rd-pl-detail">
-        <div className="rd-pld-poll">
-          <div className="rd-pld-h">{rdPollHead({ ...(D.individualPolls.find((q) => q.pollster === r.pollster && q.released === r.released) || {}), ...r })}</div>
-          {r.p && (
-            <div className="rd-pld-prim">
-              {plParties.map(([id, lab]) => r.p[id] != null && (
-                <span key={id}><b style={{ color: id === "oth" ? "var(--ink-3)" : inkOf("var(--" + id + ")") }}>{lab}</b>
-                  <span style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{+r.p[id].toFixed(1)}</span>
-                  <span className="rd-apd-chg">{rdApChg(cgd[{ alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" }[id]], 0) || "\u00a0"}</span></span>
-              ))}
-            </div>
-          )}
-          <dl className="rd-pld-dl">
-            {imp.length > 0 && <><dt>Two-party, implied</dt><dd>{imp}</dd></>}
-            {pub.length > 0 && <><dt>As published</dt><dd>{pub}</dd></>}
-            {moeTxt && <><dt>Margin of error</dt><dd>{moeTxt}</dd></>}
-            {dec && <><dt>Decidedness</dt><dd>{dec}</dd></>}
-            {ppm && <><dt>{window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"}</dt><dd>{ppm}</dd></>}
-            {nets.length > 0 && <><dt>Net approval</dt><dd>{nets}</dd></>}
-          </dl>
-          {prev && <div className="rd-apd-sub rd-apd-note">Changes are on {r.pollster}’s {prev.field} poll.</div>}
-          <div className="rd-pld-links">
-            {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}
-            {rdPollLinks(r.links)}
-          </div>
-        </div>
-        {pj && (
-          <div className="rd-pld-rhythm">
-            <div className="rd-pld-h">{r.pollster}’s rhythm, last {rdNumWord(recent.length)} releases</div>
-            <table className="rd-pld-tab">
-              <thead><tr><th>Field to</th><th>Published</th><th>Gap</th></tr></thead>
-              <tbody>
-                {recent.map((x) => (
-                  <tr key={x.field}>
-                    <td>{isoD(x.field)}</td>
-                    <td>{x.pub ? (x.url ? <a href={x.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}>{WDs(Date.parse(x.pub)) + " " + isoD(x.pub)}</a> : WDs(Date.parse(x.pub)) + " " + isoD(x.pub)) : "—"}</td>
-                    <td>{x.gap != null ? x.gap + " days" : ""}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="rd-pld-foot">
-              {pj.calMonth
-                ? <>One release a month, on no set day: between the {pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end"} so far. <b>Next: {nx.date}.</b></>
-                : irregular(pj)
-                  ? <>Median {Math.round(pj.cadence)} days between releases across the last {pj.gapsUsed} gaps, give or take {Math.round(pj.spread)}. <b>Next: {nx.date.replace(/^About/, "about")}.</b></>
-                  : <>Median {pj.cadence} days between {pj.basis === "published" ? "publications" : "fieldwork ends"} across the last {pj.gapsUsed} gaps.{" "}
-                    <b>Next: {nx.date}{hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""}</b>, at the earliest{then ? "; then " + wdm(then.release) : ""}.</>}
-            </p>
-            {/* the house's "where it lands first" page (pollsterRules.site) belongs
-                with the wait for the next poll, not on the name of the last one;
-                the row's Next date carries the same link */}
-            {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
-          </div>
-        )}
+        <RdLedger p={ip} facet={facet} onM={onMatch} side={rhythm} latest moe={rdLgMoe(ip)}
+                  onLine={(id) => { if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id); else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls"); }}
+                  sources={r.links && r.links.length ? rdPollLinks(r.links) : null}
+                  foot={<>
+                    {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}
+                    <a className="rd-link" href={report} onClick={(ev) => ev.stopPropagation()}>Report an error</a>
+                  </>} />
       </div>
     );
   };

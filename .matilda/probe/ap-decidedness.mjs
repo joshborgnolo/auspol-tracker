@@ -1,13 +1,14 @@
-/* Decidedness line in the All-polls expanded detail (RdApDetail) AND in
-   the Latest table's row expansion (rd-polls' rd-pld-dl): each should read
-   "Decidedness" with the wave's movable share on its own basis -
-     RedBridge/Accent : `firmAll` triple → "54%"·"not firm", solid/soft/very-soft sub
-     Roy Morgan       : `undecided` (first) → "undecided" + "Couldn’t name…" sub
-     Resolve          : `undecided` (soft)  → "not firm" + "Named a party…" sub
-     Essential        : `undecided` (tpp)   → "undecided" + "Unallocated…" sub
-     YouGov           : neither field → NO Decidedness row (negative control)
-     Confidence facet : expanded gauge row → NO Decidedness row (isConf keeps
-                        the generic facts out)
+/* Decidedness in the opened poll (the shared ledger, RdLedger - one
+   renderer for All polls and the Latest table since the 2026-10-11 ledger
+   redesign). The wave's movable share, on its own basis, reads in full under
+   the primaries where the Primary tab leads, and as a short unit on the
+   Primary line ("Also in this poll") on every other tab:
+     RedBridge/Accent : `firmAll` triple → "54% not firm", solid/soft/very-soft
+     Roy Morgan       : `undecided` (first) → "undecided", "couldn’t name…"
+     Resolve          : `undecided` (soft)  → "not firm", "named a party…"
+     Essential        : `undecided` (tpp)   → "undecided", "unallocated…"
+     YouGov           : neither field → nothing (negative control)
+     Confidence facet : a gauge release → no Primary line, nothing
    Truth comes from the same 9f09dca2 data asset the page reads (new
    Function fixture, ap-prim-detail-order pattern) - the probe pins the
    WIRING, never the day's data. Rebuild first:
@@ -60,16 +61,16 @@ const W = p => p.field || p.released;
 const CASES = [
   pick("RedBridge/Accent", (p) => Array.isArray(p.firmAll), (p) => ({
     head: p.firmAll[1] + p.firmAll[2] + "%", word: "not firm",
-    sub: `Solid ${p.firmAll[0]}, soft ${p.firmAll[1]}, very soft ${p.firmAll[2]} – from the wave’s own vote-softness table`,
+    sub: `solid ${p.firmAll[0]}, soft ${p.firmAll[1]}, very soft ${p.firmAll[2]} on its vote-softness table`,
   }), "RedBridge"),
   pick("Roy Morgan", (p) => p.undecided != null, (p) => ({
-    head: p.undecided + "%", word: "undecided", sub: "Couldn’t name a party when first asked",
+    head: p.undecided + "%", word: "undecided", sub: "couldn’t name a party when first asked",
   }), "Roy Morgan"),
   pick("Resolve", (p) => p.undecided != null && p.undecidedBasis === "soft", (p) => ({
-    head: p.undecided + "%", word: "not firm", sub: "Named a party, but might yet change their mind",
+    head: p.undecided + "%", word: "not firm", sub: "named a party, but might yet change their mind",
   }), "Resolve"),
   pick("Essential", (p) => p.undecided != null && p.undecidedBasis === "tpp", (p) => ({
-    head: p.undecided + "%", word: "undecided", sub: "Unallocated inside the printed two-party pair",
+    head: p.undecided + "%", word: "undecided", sub: "unallocated inside the printed two-party pair",
   }), "Essential"),
   pick("YouGov", null, null, "YouGov"),
 ].filter(Boolean);
@@ -111,40 +112,55 @@ const clickRow = async (i) => {
   await sleep(900);
 };
 
+const tab = async (lab) => {
+  await page.evaluate((l) => {
+    const btn = [...document.querySelectorAll(".rd-ap-tabs [role=group] button")].find((n) => (n.textContent || "").trim() === l);
+    if (btn) btn.click();
+  }, lab);
+  await sleep(800);
+};
+/* the open ledger: the lead's decidedness sentence (Primary tab) and the
+   Primary line's units (any other tab) */
 const readDetail = () => page.evaluate(() => {
-  const apd = [...document.querySelectorAll(".rd-apd")].pop();
-  if (!apd) return null;
-  const keys = [...apd.querySelectorAll(".rd-apd-k")].map((k) => (k.textContent || "").trim());
-  const cell = [...apd.querySelectorAll(".rd-apd-grid1")].find((g) => {
-    const k = g.querySelector(".rd-apd-k");
-    return k && (k.textContent || "").trim() === "Decidedness";
-  });
+  const lg = [...document.querySelectorAll(".rd-ap-open .rd-ldg")].pop();
+  if (!lg) return null;
   const norm = (s) => (s || "").replace(/\s+/g, " ").trim();
-  return {
-    keys,
-    first: cell ? norm(cell.querySelector(".rd-apd-cell > span") && cell.querySelector(".rd-apd-cell > span").textContent) : null,
-    sub: cell ? norm(cell.querySelector(".rd-apd-sub") && cell.querySelector(".rd-apd-sub").textContent) : null,
-  };
+  const lead = lg.querySelector(".rd-ldg-lead");
+  const sentence = lead ? [...lead.querySelectorAll(".rd-ldg-foot1")].map((n) => norm(n.textContent)).find((t) => /% (not firm|undecided)/.test(t)) || null : null;
+  const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
+  return { sentence, line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null, lines: [...lg.querySelectorAll(".rd-ldg-lab")].map((n) => norm(n.textContent)) };
 });
 
 for (const cs of CASES) {
   const tag = `${cs.house} ${W(cs.q)}`;
+  /* the Primary tab: the full sentence under the primaries */
+  await tab("Primary");
   await search(cs.query);
   await clickRow(cs.idx);
   const d = await readDetail();
   if (cs.expect === null) {
-    ok(`negative control: no Decidedness row (${tag})`, d && !d.keys.includes("Decidedness"),
-       d ? "detail keys: " + d.keys.join(" | ") : "no detail");
+    ok(`negative control: no decidedness under the primaries (${tag})`, d && !d.sentence, d ? String(d.sentence) : "no detail");
   } else {
     const x = cs.expect(cs.q);
-    ok(`Decidedness row present (${tag})`, d && d.keys.includes("Decidedness"),
-       d ? "keys: " + d.keys.join(" | ") : "no detail");
-    ok(`head+word (${tag}: "${x.head} ${x.word}")`, d && d.first && d.first.includes(x.head) && d.first.toLowerCase().includes(x.word),
-       d ? d.first : "no cell");
-    ok(`basis sub (${tag})`, d && d.sub && d.sub.includes(x.sub.slice(0, 60)),
-       d ? d.sub : "no sub");
+    ok(`Primary tab: decidedness under the primaries (${tag}: "${x.head} ${x.word}")`,
+       d && d.sentence && d.sentence.includes(x.head + " " + x.word), d ? String(d.sentence) : "no detail");
+    ok(`Primary tab: its basis in words (${tag})`, d && d.sentence && d.sentence.includes(x.sub.slice(0, 60)), d ? String(d.sentence) : "no detail");
   }
-  await clickRow(cs.idx); /* collapse before the next search */
+  await clickRow(cs.idx); /* collapse */
+  /* the 2PP tab: the short form on the Primary line */
+  await tab("2PP");
+  await search(cs.query);
+  await clickRow(cs.idx);
+  const d2 = await readDetail();
+  if (cs.expect === null) {
+    ok(`negative control: the Primary line carries no decidedness (${tag})`, d2 && d2.line != null && !/% (not firm|undecided)/.test(d2.line),
+       d2 ? String(d2.line) : "no detail");
+  } else {
+    const x = cs.expect(cs.q);
+    ok(`2PP tab: the Primary line carries "${x.head} ${x.word}" (${tag})`, d2 && d2.line && d2.line.includes(x.head + " " + x.word),
+       d2 ? String(d2.line) : "no detail");
+  }
+  await clickRow(cs.idx);
 }
 
 /* the confidence facet keeps the generic facts out of its detail */
@@ -167,64 +183,79 @@ const nConf = await page.evaluate(() => document.querySelectorAll(".rd-ap-table 
 if (nConf > 0) {
   await clickRow(0);
   const d = await readDetail();
-  ok("confidence facet: no Decidedness row", d && !d.keys.includes("Decidedness"),
-     d ? "keys: " + d.keys.join(" | ") : "no detail");
+  ok("confidence facet: no decidedness, no Primary line", d && !d.sentence && !d.lines.includes("Primary"),
+     d ? "lines: " + d.lines.join(" | ") : "no detail");
 } else {
   console.log("  --  no confidence rows on this data: facet check skipped");
 }
 
-/* the same four bases caption the LATEST table's row expansion (rd-polls'
-   .rd-pld-dl facts list): reload to the default view, open a house's row,
-   read its Decidedness dd against the same bundle. RedBridge's newest wave
-   carries firmAll, Resolve's the soft basis, YouGov neither (negative). */
+/* the Latest table opens a poll with the same ledger: on its Primary tab the
+   sentence leads, on its 2PP tab the Primary line carries the short form.
+   RedBridge's newest wave carries firmAll, Resolve's the soft basis,
+   YouGov neither (negative) */
 await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "networkidle0", timeout: 60000 });
 await page.waitForSelector(".rd-pl-row", { timeout: 30000 });
+const latestTab = async (lab) => {
+  await page.evaluate((l) => {
+    const b = [...document.querySelectorAll("#latest-polls .rd-pl-tabs button")].find((n) => (n.textContent || "").trim() === l);
+    if (b) b.click();
+  }, lab);
+  await sleep(600);
+};
 const latestDetail = async (q) => {
   await page.evaluate((query) => {
-    const row = [...document.querySelectorAll(".rd-pl-row")].find((r) => (r.textContent || "").includes(query));
-    if (row) { row.scrollIntoView({ block: "center" }); row.click(); }
+    const item = [...document.querySelectorAll("#latest-polls .rd-pl-item")].find((r) => (r.querySelector(".rd-pl-c-name") || {}).textContent.includes(query));
+    if (item && !item.classList.contains("open")) { item.scrollIntoView({ block: "center" }); item.querySelector(".rd-pl-c-figs").click(); }
   }, q);
-  await sleep(900);
-  return page.evaluate(() => {
-    const det = [...document.querySelectorAll(".rd-pl-detail")].pop();
-    if (!det) return null;
+  await sleep(700);
+  return page.evaluate((query) => {
+    const item = [...document.querySelectorAll("#latest-polls .rd-pl-item.open")].find((r) => (r.querySelector(".rd-pl-c-name") || {}).textContent.includes(query));
+    const lg = item && item.querySelector(".rd-ldg");
+    if (!lg) return null;
     const norm = (s) => (s || "").replace(/\s+/g, " ").trim();
-    const dts = [...det.querySelectorAll(".rd-pld-dl dt")].map((n) => norm(n.textContent));
-    const dds = [...det.querySelectorAll(".rd-pld-dl dd")];
-    const at = dts.indexOf("Decidedness");
-    return { dts, txt: at >= 0 && dds[at] ? norm(dds[at].textContent) : null };
-  });
+    const sentence = [...lg.querySelectorAll(".rd-ldg-lead .rd-ldg-foot1")].map((n) => norm(n.textContent)).find((t) => /% (not firm|undecided)/.test(t)) || null;
+    const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
+    return { sentence, line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null };
+  }, q);
+};
+const closeLatest = async (q) => {
+  await page.evaluate((query) => {
+    const item = [...document.querySelectorAll("#latest-polls .rd-pl-item.open")].find((r) => (r.querySelector(".rd-pl-c-name") || {}).textContent.includes(query));
+    if (item) item.querySelector(".rd-pl-c-figs").click();
+  }, q);
+  await sleep(300);
 };
 const LATEST = [
   ["RedBridge", (() => {
-    const w = byHouse("RedBridge/Accent").find((p) => Array.isArray(p.firmAll));
-    return w ? { dd: w.firmAll[1] + w.firmAll[2] + "% not firm",
+    const w = byHouse("RedBridge/Accent")[0];
+    return w && Array.isArray(w.firmAll) ? { dd: w.firmAll[1] + w.firmAll[2] + "% not firm",
                  sub: "solid " + w.firmAll[0] + ", soft " + w.firmAll[1] + ", very soft " + w.firmAll[2] } : undefined;
   })()],
   ["Resolve", (() => {
-    const w = byHouse("Resolve").find((p) => p.undecided != null && p.undecidedBasis === "soft");
-    return w ? { dd: w.undecided + "% not firm", sub: "named a party" } : undefined;
+    const w = byHouse("Resolve")[0];
+    return w && w.undecided != null && w.undecidedBasis === "soft" ? { dd: w.undecided + "% not firm", sub: "named a party" } : undefined;
   })()],
   ["YouGov", null],
 ];
 for (const [house, exp] of LATEST) {
   if (exp === undefined) { console.log(`  --  no ${house} candidate wave in bundle: latest-expansion check skipped`); continue; }
+  await latestTab("Primary");
   const d = await latestDetail(house);
   if (exp === null) {
-    ok(`latest expansion: no Decidedness row (${house})`, d && !d.dts.includes("Decidedness"),
-       d ? "dts: " + d.dts.join(" | ") : "no detail");
+    ok(`latest, Primary tab: no decidedness (${house})`, d && !d.sentence, d ? String(d.sentence) : "no detail");
   } else {
-    ok(`latest expansion: Decidedness dd (${house}: "${exp.dd}")`, d && d.txt && d.txt.includes(exp.dd),
-       d ? String(d.txt) : "no detail");
-    ok(`latest expansion: basis detail (${house})`, d && d.txt && d.txt.toLowerCase().includes(exp.sub),
-       d ? String(d.txt) : "no detail");
+    ok(`latest, Primary tab: "${exp.dd}" under the primaries (${house})`, d && d.sentence && d.sentence.includes(exp.dd), d ? String(d.sentence) : "no detail");
+    ok(`latest, Primary tab: its basis in words (${house})`, d && d.sentence && d.sentence.toLowerCase().includes(exp.sub), d ? String(d.sentence) : "no detail");
   }
-  /* collapse the row before the next house */
-  await page.evaluate((q) => {
-    const row = [...document.querySelectorAll(".rd-pl-row")].find((r) => (r.textContent || "").includes(q));
-    if (row && row.getAttribute("aria-expanded") === "true") row.click();
-  }, house);
-  await sleep(400);
+  await closeLatest(house);
+  await latestTab("2PP");
+  const d2 = await latestDetail(house);
+  if (exp === null) {
+    ok(`latest, 2PP tab: the Primary line carries no decidedness (${house})`, d2 && d2.line != null && !/% (not firm|undecided)/.test(d2.line), d2 ? String(d2.line) : "no detail");
+  } else {
+    ok(`latest, 2PP tab: the Primary line carries "${exp.dd}" (${house})`, d2 && d2.line && d2.line.includes(exp.dd), d2 ? String(d2.line) : "no detail");
+  }
+  await closeLatest(house);
 }
 
 ok("no page errors", errors.length === 0, errors.join(" ; "));

@@ -907,22 +907,8 @@ body.rd .rd-tl-keyx::after { transform: translate(-50%, -50%) rotate(-45deg); }
 body.rd .rd-pl-key { margin-top: 14px; }
 
 /* a row opened */
-body.rd .rd-pl-detail {
-  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; row-gap: 24px;
-  padding: 16px 16px 20px; background: var(--surface-2); font-size: 13px; color: var(--ink-2);
-}
 body.rd .rd-pld-h { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 10px; }
-body.rd .rd-pld-prim { display: flex; gap: 22px; margin-bottom: 12px; }
-body.rd .rd-pld-prim > span { display: flex; flex-direction: column; gap: 2px; }
-body.rd .rd-pld-prim b { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
-/* the third column row under each primary is a change marker (rd-apd-chg,
-   sized like the All-polls expansion's) — exclude it from the number size */
-body.rd .rd-pld-prim > span > span:not(.rd-apd-chg) { font-size: 19px; font-weight: 600; }
-body.rd .rd-pld-dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 5px; column-gap: 12px; margin: 0; }
-body.rd .rd-pld-dl dt { color: var(--ink-3); }
-body.rd .rd-pld-dl dd { margin: 0; color: var(--ink); }
 body.rd .rd-pld-site { margin-left: -4px; }
-body.rd .rd-pld-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; margin-left: -4px; }
 body.rd .rd-pld-tab { border-collapse: collapse; width: 100%; font-size: 13px; }
 body.rd .rd-pld-tab th { text-align: left; font-weight: 400; color: var(--ink-3); padding: 0 12px 4px 0; }
 body.rd .rd-pld-tab td { padding: 3px 12px 3px 0; color: var(--ink); }
@@ -991,10 +977,6 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-long { display: none; }
   body.rd .rd-pl-short { display: inline; }
   body.rd .rd-pl-prim { min-width: 150px; font-size: 14px; }
-  body.rd .rd-pl-detail { grid-template-columns: minmax(0, 1fr); padding: 14px 12px 16px; }
-  body.rd .rd-pld-dl { grid-template-columns: minmax(0, 1fr); }
-  body.rd .rd-pld-dl dt { margin-top: 6px; }
-  body.rd .rd-pld-prim { gap: 16px; }
 }
 body.rd .rd-pl-fig, body.rd .rd-pl-lead { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 body.rd .rd-pl-exp { font-size: 13px; }
@@ -2397,6 +2379,14 @@ body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32
 body.rd .rd-ap-pins:hover { background: var(--surface-2); color: var(--ink); }
 body.rd .rd-ap-pinn { align-self: center; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-ap-pinn b { font-weight: 600; color: var(--ink); }
+/* From a tablet's 761px to 900px the seven figure tabs, search and count
+   outran the bar on Confidence, whose count says "releases": the bar sizes
+   the page even while hidden, so it scrolled sideways 20-27px at 761-790px.
+   Tighter gaps seat them all with ~25px to spare at 761px */
+@media (max-width: 900px) {
+  body.rd .rd-ap-pinbar { gap: 14px; }
+  body.rd .rd-ap-pintabs { gap: 12px; }
+}
 body.rd .rd-ap-pinf {
   all: unset; cursor: pointer; align-self: center; flex-shrink: 0; box-sizing: border-box; height: 30px; padding: 0 12px;
   display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 15px;
@@ -2639,38 +2629,14 @@ body.rd .rd-ap ~ .rd-sec .view-how, body.rd .rd-ap .view-how { margin-top: 10px;
 
 /* a poll opened */
 body.rd .rd-ap-open { padding: 22px 24px 20px 52px; background: var(--surface-2); border-bottom: 1px solid var(--line-2); cursor: default; }
-body.rd .rd-apd { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); column-gap: 48px; row-gap: 28px; }
-body.rd .rd-apd-l.poll-detail { padding: 0; background: transparent; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; min-width: 0; align-self: start; }
-body.rd .rd-apd-l.poll-detail.copy-wide { padding: 28px 24px; background: var(--surface-2); }
-body.rd .rd-apd-l .poll-copy-btn { bottom: 8px; right: 0; }
 body.rd .rd-apd-r { display: flex; flex-direction: column; min-width: 0; }
 /* a poll header's "n = 1,500 (eff. 1,053)": n is a sample's letter, and
    capitals would make it N, the population's */
 body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; white-space: nowrap; }
 body.rd .rd-apd-h { font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
-body.rd .rd-apd-prim { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-body.rd .rd-apd-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
-body.rd .rd-apd-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
-body.rd .rd-apd-big { font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 body.rd .rd-apd-sub { font-size: 12px; line-height: 1.4; color: var(--ink-3); }
 body.rd .rd-apd-note { margin-top: 6px; }
-body.rd .rd-apd-grid {
-  margin-top: 18px; display: grid; grid-template-columns: 176px minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; row-gap: 8px;
-  align-items: baseline; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums;
-}
-body.rd .rd-apd-grid1 { margin-top: 10px; grid-template-columns: 176px minmax(0, 1fr); }
-body.rd .rd-apd-th { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); }
 body.rd .rd-apd-k { color: var(--ink-3); }
-body.rd .rd-apd-pair { font-weight: 600; white-space: nowrap; }
-body.rd .rd-apd-chg { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
-body.rd .rd-apd-none { color: var(--ink-3); }
-body.rd .rd-apd-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-body.rd .rd-apd-cell b { font-weight: 600; }
-body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
-body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; font-size: 13px; }
-/* 13px, as in the Latest polls detail (.rd-pl-detail): .rd-link's `all: unset`
-   otherwise lets these inherit the page's 16px, larger than the panel's own text */
-body.rd .rd-apd-srcs { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
 body.rd .rd-apd-met { all: unset; cursor: pointer; font: inherit; color: inherit; font-weight: inherit;
@@ -2702,14 +2668,6 @@ body.rd .rd-apd-facts {
   font-size: 14px; line-height: 1.45; color: var(--ink-2);
 }
 body.rd .rd-apd-facts b { font-weight: 600; color: var(--ink); }
-/* the issues readouts inside an opened poll: label, share bar, figure */
-body.rd .rd-apd-isslist { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-body.rd .rd-apd-issrow { display: grid; grid-template-columns: minmax(0, 172px) minmax(0, 1fr) 36px; align-items: center; column-gap: 12px; row-gap: 2px; min-width: 0; }
-body.rd .rd-apd-issrow > .rd-apd-sub { grid-column: 1 / -1; }
-body.rd .rd-apd-isslab { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
-body.rd .rd-apd-issbar { position: relative; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
-body.rd .rd-apd-issbar i { display: block; height: 100%; border-radius: 4px; background: var(--ink-3); }
-body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 /* the demographics facet's opened poll: its whole table, full width */
 body.rd .rd-apd-demwrap { grid-column: 1 / -1; padding-bottom: 22px; border-bottom: 1px solid var(--line-2); }
 body.rd .rd-apd-demcols { margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 36px; align-items: start; }
@@ -2770,7 +2728,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
-  body.rd .rd-apd { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-apd-demcols { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-apd-dem + .rd-apd-dem > :is(.rd-apd-demh, .rd-apd-demall) { display: none; }
 }
@@ -2895,13 +2852,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-csub b { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-dbar { left: 0; right: 0; height: 14px; margin-top: -7px; }
   body.rd .rd-ap-open { padding: 16px 12px 18px; }
-  /* an opened poll's issue rows stack: label and figure over a full-width bar */
-  body.rd .rd-apd-issrow { grid-template-columns: minmax(0, 1fr) 40px; }
-  body.rd .rd-apd-issrow .rd-apd-issbar { grid-column: 1 / -1; grid-row: 2; }
-  body.rd .rd-apd-prim > span { width: 54px; }
-  body.rd .rd-apd-big { font-size: 22px; }
-  body.rd .rd-apd-grid { grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
-  body.rd .rd-apd-grid1 { grid-template-columns: 104px minmax(0, 1fr); }
   body.rd .rd-apd-facts { grid-template-columns: 104px minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
   body.rd .rd-ap-more { gap: 14px; }
   body.rd .rd-ap-shown { font-size: 12px; }
@@ -3206,3 +3156,189 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
 @media (max-width: 360px) {
   body.rd .rd-ap-pctl .rd-ap-dpick > .rd-pl-ctl-l { display: none; }
 }
+
+/* ---------------------------------------------------------------- the poll ledger
+   One opened poll, the same in both tables (RdLedger, rd-allpolls.jsx): a
+   head band across the top; the open tab's measure (lead) beside its
+   companion (side: How it counts in All polls, the release rhythm in the
+   Latest table); the poll's other measures as one line each (also) under
+   the lead. A wide lead (the group table, a split issue table) takes the
+   full width, with the lines and the companion side by side under it. One
+   column below 1000px in All polls, below 900px in the Latest table. */
+body.rd .rd-ldg {
+  display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  grid-template-areas: "head head" "lead side" "also side"; grid-template-rows: auto auto 1fr;
+  column-gap: 48px; row-gap: 20px; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  /* .poll-detail (the copy button's anchor) carries the classic panel's
+     paper and padding; the ledger sits on the drawer's own ground */
+  padding: 0; background: transparent; font-family: inherit; text-align: left;
+}
+body.rd .rd-ldg.wide { grid-template-areas: "head head" "lead lead" "also side"; }
+body.rd .rd-ldg.noside { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "also"; }
+/* the sentence, then its sources and the actions beside it where they fit;
+   the right pad keeps the copy button (top right) clear of them */
+body.rd .rd-ldg-head { grid-area: head; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 28px; row-gap: 8px; padding-right: 36px; }
+body.rd .rd-ldg-sent { flex: 0 1 auto; max-width: 64ch; }
+body.rd .rd-ldg-srcs { flex: 0 1 auto; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; row-gap: 2px; margin-left: -4px; font-size: 13px; }
+body.rd .rd-ldg-acts { display: inline-flex; flex-wrap: wrap; column-gap: 18px; }
+body.rd .rd-ldg-lead { grid-area: lead; min-width: 0; align-self: start; }
+body.rd .rd-ldg-side { grid-area: side; min-width: 0; align-self: start; }
+body.rd .rd-ldg-also { grid-area: also; min-width: 0; align-self: start; }
+body.rd .rd-ldg-lead .rd-apd-demwrap { padding-bottom: 0; border-bottom: 0; }
+/* headings speak the drawer's heading voice (.rd-apd-h) */
+body.rd .rd-ldg-h { margin: 0 0 10px; font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
+body.rd .rd-ldg-chg { margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ldg-none { color: var(--ink-faint); }
+body.rd .rd-ldg-tail { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-ldg-note, body.rd .rd-ldg-foot1 { margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+body.rd .rd-ldg-foot1 b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-noagg { margin: 12px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+body.rd .rd-ldg-noagg b { font-weight: 600; color: var(--ink); }
+/* the tables: two-party, leaders, better PM, the reckonings */
+body.rd .rd-ldg-t { border-collapse: collapse; width: 100%; font-size: 14px; }
+body.rd .rd-ldg-t thead th { padding: 0 10px 6px 0; border-bottom: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: left; white-space: nowrap; }
+body.rd .rd-ldg-t thead th.on { color: var(--ink); }
+body.rd .rd-ldg-t tbody th { padding: 6px 10px 0 0; font-weight: 400; color: var(--ink-2); text-align: left; white-space: nowrap; }
+body.rd .rd-ldg-t td { padding: 6px 10px 0 0; color: var(--ink); white-space: nowrap; }
+body.rd .rd-ldg-t .num, body.rd .rd-ldg-t thead th.num { text-align: right; }
+body.rd .rd-ldg-t tr.grp th { padding-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+body.rd .rd-ldg-t tr.sub th { padding-left: 12px; }
+body.rd .rd-ldg-pair { font-weight: 600; white-space: nowrap; }
+body.rd .rd-ldg-dash { margin: 0 3px; font-weight: 400; color: var(--ink-faint); }
+body.rd .rd-ldg-tri { font-weight: 600; }
+body.rd .rd-ldg-tpp th:first-child { width: 42%; }
+/* leaders and better PM keep their figures near the names they belong to */
+body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: auto; min-width: 66%; }
+body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 128px; }
+body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 22px; padding-right: 0; }
+body.rd .rd-ldg-ppm { margin-top: 16px; }
+body.rd .rd-ldg-parts { display: none; }
+/* the primary vote */
+body.rd .rd-ldg-prim { display: flex; flex-wrap: wrap; gap: 8px; }
+body.rd .rd-ldg-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
+body.rd .rd-ldg-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+body.rd .rd-ldg-big { font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+body.rd .rd-ldg-prim .rd-ldg-chg { margin-left: 0; }
+/* direction: one bar, its three answers and the net */
+body.rd .rd-ldg-dirbar { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; }
+body.rd .rd-ldg-dirbar i { display: block; height: 100%; }
+body.rd .rd-ldg-dirk { margin-top: 8px; display: flex; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; }
+body.rd .rd-ldg-dirk b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-dirnet { margin-left: auto; }
+body.rd .rd-ldg-conf { font-size: 15px; color: var(--ink-2); }
+body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
+/* the lines: a label, then units that wrap between themselves, never inside */
+body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
+body.rd .rd-ldg-lines { display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
+body.rd .rd-ldg-line {
+  all: unset; box-sizing: border-box; display: grid; grid-template-columns: 96px minmax(0, 1fr) 14px; column-gap: 12px; align-items: baseline;
+  padding: 5px 4px 5px 0; border-bottom: 1px solid var(--line-2); font-size: 13.5px; line-height: 1.45; color: var(--ink-2);
+}
+body.rd .rd-ldg-line.go { cursor: pointer; }
+body.rd .rd-ldg-line.go:hover { background: color-mix(in oklab, var(--ink) 4%, transparent); }
+body.rd .rd-ldg-line.go:hover .rd-ldg-arrow { color: var(--ink); }
+body.rd .rd-ldg-line:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 3px; }
+body.rd .rd-ldg-lab { padding-left: 2px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+body.rd .rd-ldg-lbody { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 14px; row-gap: 1px; min-width: 0; }
+body.rd .rd-ldg-lbody b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ldg-lbody em { font-style: normal; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+body.rd .rd-ldg-li { white-space: nowrap; }
+body.rd .rd-ldg-li.lbl { margin-right: -6px; }
+body.rd .rd-ldg-lisoft { color: var(--ink-3); }
+body.rd .rd-ldg-arrow { color: var(--ink-3); text-align: right; }
+/* How it counts as a reckoning: label, signed step, words */
+body.rd .rd-ldg-rk { margin-top: 14px; }
+body.rd .rd-ldg-rk tbody th { width: 1%; padding-top: 5px; color: var(--ink-3); vertical-align: baseline; }
+body.rd .rd-ldg-rk td { padding-top: 5px; vertical-align: baseline; }
+body.rd .rd-ldg-rk td.num { width: 1%; padding-right: 14px; }
+body.rd .rd-ldg-rk td:last-child { white-space: normal; line-height: 1.4; color: var(--ink-2); }
+body.rd .rd-ldg-rk2 thead th { padding-top: 0; white-space: nowrap; }
+body.rd .rd-ldg-rk2 td.num { padding-left: 14px; padding-right: 0; }
+body.rd .rd-ldg-rk2 td:last-child { padding-left: 16px; font-size: 13px; color: var(--ink-3); }
+/* the primaries' reckoning: a column a party, no words column */
+body.rd .rd-ldg-rkp td.num { width: auto; padding-left: 10px; padding-right: 0; }
+body.rd .rd-ldg-rkp td.num:last-child { color: var(--ink); }
+body.rd .rd-ldg-rkp thead th { padding-top: 0; }
+body.rd .rd-ldg-rkp td.out { font-weight: 700; color: var(--ink); }
+/* the primaries' strips: the 2PP row's lean strip, one per party */
+body.rd .rd-ldg-pstrips { margin-top: 10px; display: flex; flex-direction: column; }
+body.rd .rd-ldg-prow { display: grid; grid-template-columns: 40px minmax(0, 1fr) 44px; column-gap: 8px; align-items: center; min-height: 26px; }
+body.rd .rd-ldg-prow > b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
+body.rd .rd-ldg-prow > .rd-ap-pic { min-height: 24px; }
+body.rd .rd-ldg-phead > .rd-ap-hpic { min-height: 36px; }
+body.rd .rd-ldg-pv { font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+/* the copy button sits top right, by the actions; the copied card is the
+   poll alone - one column, no companion, no actions or arrows */
+body.rd .rd-ldg > .poll-copy-btn { top: -6px; right: -4px; bottom: auto; }
+body.rd .rd-ldg.copy-wide { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "also"; grid-template-rows: none; padding: 28px 24px; background: var(--surface-2); }
+body.rd .rd-ldg.copy-wide .rd-ldg-side, body.rd .rd-ldg.copy-wide .rd-ldg-acts, body.rd .rd-ldg.copy-wide .rd-ldg-arrow { display: none; }
+body.rd .rd-ldg.copy-wide .rd-ldg-head { padding-right: 0; }
+/* the Latest table's opened row */
+body.rd .rd-pl-detail { padding: 16px 16px 20px; background: var(--surface-2); }
+@media (max-width: 1000px) {
+  body.rd .rd-ap-open .rd-ldg, body.rd .rd-ap-open .rd-ldg.wide { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "side" "also"; grid-template-rows: none; }
+}
+@media (max-width: 900px) {
+  body.rd .rd-pl-detail { padding: 14px 12px 16px; }
+  /* one column in the Latest table keeps the poll together - its lead and
+     its other measures - and lets the release rhythm follow, as before */
+  body.rd .rd-pl-detail .rd-ldg { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lead" "also" "side"; grid-template-rows: none; }
+}
+@media (max-width: 760px) {
+  body.rd .rd-ldg, body.rd .rd-ldg-t { font-size: 13px; }
+  body.rd .rd-ldg { row-gap: 18px; }
+  body.rd .rd-ldg-t thead th { white-space: normal; }
+  body.rd .rd-ldg-tpp th:first-child { width: auto; white-space: normal; }
+  /* the two-party table keeps each change beside its pair: a tighter dash buys the room */
+  body.rd .rd-ldg-tpp td { padding-right: 4px; }
+  body.rd .rd-ldg-tpp .rd-ldg-chg { margin-left: 4px; font-size: 11.5px; }
+  body.rd .rd-ldg-tpp .rd-ldg-dash { margin: 0 1px; }
+  body.rd .rd-ldg-tpp tr.sub th { padding-left: 8px; }
+  body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: 100%; }
+  body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 0; white-space: normal; }
+  body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 10px; }
+  body.rd .rd-ldg-prim > span { width: 54px; }
+  body.rd .rd-ldg-big { font-size: 22px; }
+  /* a line's label takes its own row, the figures the full width under it */
+  body.rd .rd-ldg-line { grid-template-columns: minmax(0, 1fr) 12px; column-gap: 8px; row-gap: 2px; padding: 8px 0; font-size: 13px; }
+  body.rd .rd-ldg-line > .rd-ldg-lab { grid-column: 1; grid-row: 1; }
+  body.rd .rd-ldg-line > .rd-ldg-lbody { grid-column: 1; grid-row: 2; }
+  body.rd .rd-ldg-line > .rd-ldg-arrow { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  body.rd .rd-ldg-rk tbody th { width: 30%; white-space: normal; }
+  body.rd .rd-ldg-rk2 td:last-child { display: none; }
+  body.rd .rd-ldg-rkp tbody th { width: auto; }
+  body.rd .rd-ldg-rkp td.num { padding-left: 6px; }
+}
+@media (max-width: 420px) {
+  /* a phone keeps the net and its change in columns; the parts ride under the name */
+  body.rd .rd-ldg-ldr .pt { display: none; }
+  body.rd .rd-ldg-parts { display: block; font-size: 12px; color: var(--ink-3); white-space: normal; }
+  body.rd .rd-ldg-ldr tbody th { white-space: normal; }
+  body.rd .rd-ldg-ppm { font-size: 12.5px; }
+  body.rd .rd-ldg-ppm .num { padding-left: 6px; }
+  body.rd .rd-ldg-rkp { font-size: 12.5px; }
+}
+/* seven figures in an issue table (Ranked, First, four parties, Unsure): the
+   issue's name takes a line of its own sooner than five or six do */
+@media (max-width: 479px) {
+  body.rd .rd-apd-dem.isn7 > .rd-apd-demr.rd-apd-isr { grid-template-columns: minmax(0, 1.75fr) repeat(5, minmax(0, 1fr)) minmax(0, 1.35fr); padding: 5px 2px; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr > span:first-child { grid-column: 1 / -1; color: var(--ink); }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr.rd-apd-demh > span:first-child { display: none; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr > span:not(:first-child) { padding-right: 2px; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr.rk > span:nth-child(2) { white-space: nowrap; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr.rd-apd-demh { letter-spacing: 0.01em; }
+  body.rd .rd-apd-dem.isn7 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
+}
+body.rd .rd-ldg-sh { display: none; }
+@media (max-width: 420px) {
+  /* five primaries share the row on a narrow phone rather than wrap */
+  body.rd .rd-ldg-prim { flex-wrap: nowrap; gap: 6px; }
+  body.rd .rd-ldg-prim > span { width: auto; flex: 1 1 0; min-width: 0; }
+  body.rd .rd-ldg-big { font-size: 21px; }
+  /* the strips' scale keeps its ends and a short middle */
+  body.rd .rd-ldg-phead .rd-ldg-lg { display: none; }
+  body.rd .rd-ldg-phead .rd-ldg-sh { display: inline; }
+}
+/* a matchup's implied and published pairs hold together, wrapping between
+   themselves only when the line is too narrow for both */
+body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }

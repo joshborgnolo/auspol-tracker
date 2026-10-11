@@ -331,18 +331,21 @@ async function openRow(pageRe) {
     return true;
   }, pageRe.source);
   await new Promise((r) => setTimeout(r, 600));
+  /* the opened poll is the shared ledger (RdLedger): sentence and sources
+     in its head band, the two-party table where the poll has one */
   return page4.evaluate(() => {
-    const detail = document.querySelector(".rd-ap-open .rd-apd");
+    const detail = document.querySelector(".rd-ap-open .rd-ldg");
     if (!detail) return null;
     const rowHref = (document.querySelector(".rd-ap-row.open [role='rowheader'] b a, .rd-ap-card.open .rd-ap-firm a") || {}).href || null;
-    const head = (detail.querySelector(".rd-apd-h") || {}).textContent || "";
-    const links = [...detail.querySelectorAll(".rd-apd-links a")].map((a) => ({ t: a.textContent.trim(), href: a.href }));
+    const head = (detail.querySelector(".rd-ldg-sent") || {}).textContent || "";
+    const links = [...detail.querySelectorAll(".rd-ldg-srcs a")].map((a) => ({ t: a.textContent.trim(), href: a.href }));
     const rail = (detail.querySelector(".rd-apd-r") || {}).textContent || "";
     const railSvg = !!detail.querySelector(".rd-apd-r svg");
+    const tpp = detail.querySelector(".rd-ldg-tpp");
     return {
       rowHref, head, links, rail, railSvg,
-      grids: [...detail.querySelectorAll(".rd-apd-grid")].map((g) => g.textContent.replace(/\s+/g, " ").trim()),
-      thCount: detail.querySelectorAll(".rd-apd-th").length,
+      grids: [...detail.querySelectorAll(".rd-ldg-sec, .rd-ldg-line")].map((g) => g.textContent.replace(/\s+/g, " ").trim()),
+      thCount: tpp ? tpp.querySelectorAll("thead th:not(:first-child)").length : 0,
     };
   });
 }
@@ -351,25 +354,24 @@ const secD = await openRow(/SEC Newgate/);
 console.log("  sec detail:", JSON.stringify(secD && { head: secD.head, links: secD.links.filter((l) => /release|method/i.test(l.t)) }));
 check("SEC row opens with its release ↗ on the pollster cell",
   !!secD && /secnewgate\.com\.au/.test(secD.rowHref || ""), secD && secD.rowHref);
-check("SEC detail links 'Read the release' to the article page",
-  !!secD && secD.links.some((l) => /Read the release/.test(l.t) && /secnewgate\.com\.au\/.*mood-of-the-nation/.test(l.href)),
+check("SEC detail links its release to the article page",
+  !!secD && secD.links.some((l) => /SEC Newgate’s release/.test(l.t) && /secnewgate\.com\.au\/.*mood-of-the-nation/i.test(l.href)),
   secD && JSON.stringify(secD.links.map((l) => l.t)));
 check("SEC head sentence carries the publish time",
   !!secD && /published by SEC Newgate on \w+ \d+ \w+, \d+ [ap]m/.test(secD.head), secD && secD.head);
 check("SEC rail counts toward the direction headline, not the 2PP",
-  !!secD && /usual lean/.test(secD.rail) && /In today.{0,4}s\s+[−-]?\d+(\.\d)?\s+net/.test(secD.rail)
-    && (/more (right-direction|wrong-track) than the month’s average/.test(secD.rail) || /Level with the month’s average/.test(secD.rail))
-    && !/Labor’s/.test(secD.rail) && secD.railSvg,
+  !!secD && /Readings around it/.test(secD.rail) && /House lean/.test(secD.rail) && /In today.{0,4}s\s*[−-]?\d+(\.\d)?/.test(secD.rail)
+    && /right direction minus wrong track/.test(secD.rail) && !/Labor/.test(secD.rail) && secD.railSvg,
   secD ? secD.rail.replace(/\s+/g, " ").slice(0, 160) : "no detail");
-// a house with no voting intention behind it shows no matchup grid at all:
-// no "v …"/"v Coalition" head row (.rd-apd-th), no Implied/as-published rows
+// a house with no voting intention behind it shows no two-party table at
+// all: no "Labor v …" column heads, no Implied/as-published rows
 check("SEC detail hides the matchup grid (no VI behind the wave)",
   !!secD && secD.thCount === 0 && !secD.grids.join(" ").includes("Implied, on 2025 flows"),
   secD ? `${secD.thCount} th, grids: ${secD.grids.length}` : "no detail");
 
 const essD = await openRow(/Essential[\s\S]*7–11 May/);   // the 2025-05-11 mood-only wave
 check("the May 2025 direction-only Essential row opens with its report link",
-  !!essD && essD.links.some((l) => /Read the release/.test(l.t) && /essentialreport\.com\.au\/reports\/13-may-2025/.test(l.href)),
+  !!essD && essD.links.some((l) => /Essential’s release/.test(l.t) && /essentialreport\.com\.au\/reports\/13-may-2025/.test(l.href)),
   essD && JSON.stringify(essD.links.map((l) => l.t)));
 check("its head sentence carries the publish stamp",
   !!essD && /published by The Guardian on Tue 13 May, 1 am/.test(essD.head), essD && essD.head);
