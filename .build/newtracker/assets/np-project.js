@@ -598,9 +598,20 @@ function npTickerItems(proj) {
            which has counted the same mid for every timed house all along
            (rd-polls.jsx inHours). */
         const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
-        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+        /* "Any moment now" also EXPIRES when the house's own filing band
+           shuts. The phrase claims the release is being dropped as it
+           speaks, and a house whose measured filing hours have closed is
+           plainly not about to: Newspoll's band ends at 9pm, so the bar
+           still promising it "any moment" at 9:44pm (the report of
+           11 Oct 2026) was asserting an evening the habit record had
+           already watched end. The slot DAY is untouched - the row holds
+           its overdue grace and the roll tomorrow as before; only the
+           urgency claim dies with the band, back to the day's own word
+           until midnight. */
+        const bandShut = r.releaseTo != null && nowMs > t.at + r.releaseTo * 60000;
+        when = days === 0 ? (dueMs <= nowMs ? (bandShut ? "today" : "any moment now")
              : hourless ? (t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000
-               ? "any moment now" : "today")
+               && !bandShut ? "any moment now" : "today")
              : r.releaseMins != null && Math.round(left / 3600000) < 12
              ? tnUntil(left) : "today")
              : days === 1 ? "tomorrow"

@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The two-party figure, two ways – auspol tracker</title>
 <!-- Standalone explainer page, hand-maintained outside the .build/newtracker
-     pipeline; chrome follows the satellite recipe (680px column, Crimson Text headings over IBM Plex
-     Sans body, under the site's shared header and footer from .build/site-shell.mjs) and the layout/figure idiom is cloned from the 2025
-     ALP–ON flows analysis page. Linked from the "?" beside the hero's
+     pipeline. Chrome (masthead, tab bar, colophon, tide band) is the shared
+     shell from .build/site-shell.mjs; the article body follows the main
+     site's redesign idioms, each lifted from its home: the shell's own
+     .sh-frame box with the Info tab's long-form column (66ch), .rd-hed /
+     .rd-dek / .rd-title type from assets/rd.css, the .info-term body-text
+     rhythm, and .poll-table figure tables from newtracker/template.html.
+     Linked from the "?" beside the hero's
      "Using implied preference flows (default)" toggle (shipped 2026-09-18,
      basis system 6cdfa7e). The numbers quoted are the site's SHIPPED
      constants as at 11 October 2026: the classic pairing runs flows.mjs's
@@ -257,7 +261,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site-shell.css?v=4e5a6645d9">
+<link rel="stylesheet" href="/assets/site-shell.css?v=52fcde297b">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
@@ -608,7 +612,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js?v=4e5a6645d9" defer></script>
+<script src="/assets/site-shell.js?v=52fcde297b" defer></script>
 <!--/shell:footer-->
 </body>
 </html>
