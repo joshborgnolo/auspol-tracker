@@ -50,6 +50,14 @@
 //            date is in-schema (validate's ISO_PUBLISHED day precision, the
 //            EMRS first-seen precedent); the later real T-stamp overwrites it
 //            (the 1b77d28 hand-stamp).
+//   They also file `fieldworkPending`: the csv carries no fieldwork window,
+//            so row date = csv date - 1 is a PLACING, not a measurement —
+//            without the flag the site dresses that convention up as the
+//            fieldwork date ("10 Oct") through the whole interim. With it,
+//            every fieldwork label reads "dates TBC" (linked to the SMH
+//            topic page) until the article's real window is captured: the
+//            hand-stamp that writes dateStart/sample/url and the T-precision
+//            published drops the flag at the same time.
 // The CSV carries no sample/url/fieldwork window either; `assimilated: true`
 // records where the row came from and exempts it from the validator's
 // sample-size rule.
@@ -189,6 +197,8 @@ const statusWarnings = [...leaderNotes];
       // the csv wave date is the release day (see the header note): day
       // precision until the article's true T-stamp is captured and replaces it
       published: waveDate,
+      // and the dates are "dates TBC" until the article's window is captured
+      fieldworkPending: true,
       pollster: "Resolve",
       client: "SMH/Age",
       sample: null,

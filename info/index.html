@@ -78247,6 +78247,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "dateLabel": "10 Oct",
     "released": "2026-10-10",
     "sample": null,
+    "fieldPending": true,
+    "fieldUrl": "https://www.smh.com.au/topic/resolve-political-monitor-6fhy",
     "client": "SMH/Age",
     "published": "2026-10-11",
     "undecided": 26,
@@ -78537,6 +78539,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "field": "10 Oct",
     "released": "2026-10-10",
     "releasedLabel": "10 Oct",
+    "fieldPending": true,
+    "fieldUrl": "https://www.smh.com.au/topic/resolve-political-monitor-6fhy",
     "published": "2026-10-11",
     "publishedLabel": "11 Oct",
     "pubSort": "2026-10-11",
@@ -84556,7 +84560,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       const from = n.nodeValue;
       let to = null;
       const lead = /^(?:Conducted on (.*?) )?[Ff]rom $/.exec(from);
-      if (lead) to = house + " (" + (lead[1] ? "fieldwork " + lead[1] + ", " : "");else if (from === "a sample of ") to = "n = ";else if (from === "an unpublished sample") to = "sample not published";else {
+      if (lead) to = house + " (" + (lead[1] ? "fieldwork " + lead[1] + ", " : "");else if (from === "Conducted on dates ") to = house + " (fieldwork dates ";else if (from === " from " && head.querySelector(".rd-tbc")) to = ", ";else if (from === "a sample of ") to = "n = ";else if (from === "an unpublished sample") to = "sample not published";else {
         const by = /^, published by (.*) on (.*)$/.exec(from) || /^, published by (.*)()$/.exec(from);
         if (by) to = ", " + (by[1] === house ? "self-published" : "published by " + by[1]) + (by[2] ? ", " + by[2] : "") + ")";
       }
@@ -114702,7 +114706,7 @@ function rdPollHead(p) {
   const out = rdApOut(p.published);
   const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
-  if (p.fieldPending) return React.createElement(React.Fragment, null, rdFieldTbc(p), ", from ", n, ", " + by + (out ? " on " + out : ""));
+  if (p.fieldPending) return React.createElement(React.Fragment, null, "Conducted on dates ", rdFieldTbc(p, true), " from ", n, ", " + by + (out ? " on " + out : ""));
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));
 }
 const RD_AP_PRIM_META = {

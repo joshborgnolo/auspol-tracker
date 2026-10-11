@@ -2907,7 +2907,11 @@ for (const p of POLLS) {
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
 // where a house publishes the fieldwork dates a pending row is waiting for
-const FIELD_TBC_URL = { DemosAU: "https://demosau.com/methodology-statements/" };
+const FIELD_TBC_URL = {
+  DemosAU: "https://demosau.com/methodology-statements/",
+  // assimilated Resolve waves wait on the SMH article for their dates
+  Resolve: "https://www.smh.com.au/topic/resolve-political-monitor-6fhy",
+};
 
 /* ---- 6a. a poll's outbound links, named for what is behind each -------- */
 /* One list, built here, that both redesign views render as is, so a link
@@ -3013,10 +3017,12 @@ const individualPolls = POLLS.map((p) => {
     ...(fym != null && fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
     /* fieldwork not yet published (a DemosAU wave filed from the Capital
-       Brief article before DemosAU's methodology PDF): `field` is the
-       provisional window that places it on the charts and in the headline,
-       and the views say "Fieldwork TBC" instead, linking `fieldUrl`, where
-       the dates will be published. Leaves with the PDF (extract-demosau.mjs). */
+       Brief article before DemosAU's methodology PDF; a Resolve wave filed
+       from the monitor csv before the SMH article carries its dates):
+       `field` is the provisional window that places it on the charts and in
+       the headline, and the views say "Fieldwork TBC" instead, linking
+       `fieldUrl`, where the dates will be published. Leaves with the dates
+       (extract-demosau.mjs; Resolve's hand-stamp on the SMH article). */
     ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: FIELD_TBC_URL[p.pollster] ?? null } : {}),
     /* fieldwork mid-date ISO (see fmidIso) – the x basis every detail
        mini-chart draws the wave's own marker on; `released` is fieldwork's

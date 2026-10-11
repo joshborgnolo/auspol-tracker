@@ -161,10 +161,12 @@ function rdEffTbcNote(p) {
     : <span title={note}>TBC</span>}</>;
 }
 /* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
-   article before the methodology PDF): the poll sits on the charts by a
-   provisional window, but every label says "Fieldwork TBC", the TBC linking
-   where the house will publish the dates (gen-data's fieldUrl). rdFieldTxt
-   is the plain-text form for tooltips and labels; rdFieldTbc the linked one. */
+   article before the methodology PDF; a Resolve wave filed from the monitor
+   csv before the SMH article carries its dates): the poll sits on the charts
+   by a provisional window, but every label says "Fieldwork TBC", the TBC
+   linking where the house will publish the dates (gen-data's fieldUrl).
+   rdFieldTxt is the plain-text form for tooltips and labels; rdFieldTbc the
+   linked one. */
 const rdFieldTxt = (q) => (q && q.fieldPending ? "TBC" : (q && (q.field || q.dateLabel)) || "");
 function rdFieldTbc(p, bare) {
   const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
@@ -201,7 +203,9 @@ function rdPollHead(p) {
   // the byline comes from the house slot, not the product.
   const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
-  if (p.fieldPending) return <>{rdFieldTbc(p)}, from {n}{", " + by + (out ? " on " + out : "")}</>;
+  // pending dates read "Conducted on dates TBC" - the sentence shape the
+  // probes pin (starts "Conducted on") and the copy card's anchors survive
+  if (p.fieldPending) return <>Conducted on dates {rdFieldTbc(p, true)} from {n}{", " + by + (out ? " on " + out : "")}</>;
   return <>{field ? "Conducted on " + field + " from " : "From "}{n}{", " + by + (out ? " on " + out : "")}</>;
 }
 

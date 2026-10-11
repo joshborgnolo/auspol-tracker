@@ -171,6 +171,11 @@
       let to = null;
       const lead = /^(?:Conducted on (.*?) )?[Ff]rom $/.exec(from);
       if (lead) to = house + " (" + (lead[1] ? "fieldwork " + lead[1] + ", " : "");
+      /* a fieldwork-pending head splits its lead around the TBC link -
+         "Conducted on dates " · TBC · " from " - so rebuild it in two steps
+         instead of the single lead node above */
+      else if (from === "Conducted on dates ") to = house + " (fieldwork dates ";
+      else if (from === " from " && head.querySelector(".rd-tbc")) to = ", ";
       else if (from === "a sample of ") to = "n = ";
       else if (from === "an unpublished sample") to = "sample not published";
       else {

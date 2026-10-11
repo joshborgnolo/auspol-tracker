@@ -5636,6 +5636,7 @@
     {
       "date": "2026-10-10",
       "published": "2026-10-11",
+      "fieldworkPending": true,
       "pollster": "Resolve",
       "client": "SMH/Age",
       "sample": null,
