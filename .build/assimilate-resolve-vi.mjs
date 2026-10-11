@@ -41,6 +41,15 @@
 //            {app,dis}}; Hanson approval and the `fav` series are not in the
 //            payload (they come from the SMH article's own embeds), so auto
 //            rows omit them.
+//   VI rows get `published` at day precision: the csv wave date itself, which
+//            is the house's Sunday release day (row date = csv date - 1, and
+//            every recent wave's article carried the csv date at T-stamp
+//            precision). Without it the site stamps "published" from the
+//            fieldwork END between the wave landing and the article's true
+//            time being captured — one day stale the whole interim. A bare
+//            date is in-schema (validate's ISO_PUBLISHED day precision, the
+//            EMRS first-seen precedent); the later real T-stamp overwrites it
+//            (the 1b77d28 hand-stamp).
 // The CSV carries no sample/url/fieldwork window either; `assimilated: true`
 // records where the row came from and exempts it from the validator's
 // sample-size rule.
@@ -177,6 +186,9 @@ const statusWarnings = [...leaderNotes];
     const soft = softNear(date);
     const row = {
       date,
+      // the csv wave date is the release day (see the header note): day
+      // precision until the article's true T-stamp is captured and replaces it
+      published: waveDate,
       pollster: "Resolve",
       client: "SMH/Age",
       sample: null,
