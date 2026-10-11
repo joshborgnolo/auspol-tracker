@@ -117,27 +117,37 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- article: the static summary's column + type rhythm ------- */
-.frame-wrap {
-  flex: 1; display: flex; flex-direction: column;
-  max-width: 680px; width: 100%; margin: 0 auto;
-  padding: 40px 28px calc(64px + env(safe-area-inset-bottom, 0px)) 28px;
+/* ------- frame + headline anatomy: the shell's own box, the redesign's type -------
+   The main page's frame is --rd-maxw over --rd-gutter (assets/rd.css); the shell's
+   .sh-frame is that box verbatim for the satellites (the "page frame" comment in
+   site-shell.mjs), so <main> rides the class itself and the column's left edge
+   tracks the masthead's. The column inside is the main site's long-form measure
+   (.info, newtracker/template.html). h1/dek follow .rd-hed/.rd-dek, section h2s
+   the .rd-eyebrow/.rd-title idiom, body text the .info-term rhythm. */
+main.sh-frame {
+  flex: 1;
+  padding-top: 40px;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
-.frame-wrap h1 {
-  font-family: var(--serif); font-size: 34px; font-weight: 600;
-  letter-spacing: -0.01em; margin: 0 0 6px;
+main > * { max-width: 66ch; }
+main h1 {
+  font-family: var(--serif); font-size: 46px; font-weight: 700;
+  line-height: 1.08; letter-spacing: -0.01em;
+  margin: 0; color: var(--ink); text-wrap: pretty;
 }
-.frame-wrap h2 {
-  font-family: var(--serif); font-size: 20px; font-weight: 600;
-  margin: 30px 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
+main h2 {
+  margin: 44px 0 10px; padding-top: 12px;
+  border-top: 2px solid var(--ink);
+  font-family: var(--sans); font-size: 22px; font-weight: 600;
+  line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+  scroll-margin-top: 56px;
 }
-/* Body copy carries the static page's rendered values (the ss-sub/ss-note
-   rendered-size trap: copy the rendered 14.5px/1.6 ink-2, not template.css). */
-.frame-wrap p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 12px; }
-.frame-wrap p.ss-sub { margin: 0 0 4px; }
-.frame-wrap p.ss-note { margin: 20px 0 0; }
-.frame-wrap strong { color: var(--ink); font-weight: 600; }
-.frame-wrap a { color: var(--accent); }
+main h2 > span[id] { display: block; height: 0; scroll-margin-top: 56px; }
+main p { font-size: 15px; line-height: 1.62; color: var(--ink-2); margin: 0 0 14px; text-wrap: pretty; }
+main p.ss-sub { margin: 12px 0 4px; font-size: 18px; line-height: 1.5; text-wrap: pretty; }
+main p.ss-note { margin: 22px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); text-wrap: wrap; }
+main strong { color: var(--ink); font-weight: 600; }
+main a { color: var(--accent); }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 
@@ -168,17 +178,18 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 
 /* ------- "in one breath" summary ------- */
 .breath {
-  margin: 22px 0 6px; padding: 12px 14px;
-  border: 1px solid var(--line-2); border-radius: 8px;
-  font-size: 14.5px; line-height: 1.6; color: var(--ink-2);
+  margin: 24px 0 8px; padding: 14px 16px;
+  /* the site's card idiom: --line hairline, --radius corner (14px in the template) */
+  border: 1px solid var(--line); border-radius: 14px;
+  font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty;
 }
-.breath strong { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.breath strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
 
 /* ------- contents ------- */
-.toc { list-style: none; margin: 14px 0 2px; }
+.toc { list-style: none; margin: 18px 0 2px; }
 .toc li {
-  padding: 7px 0; border-top: 1px solid var(--line-2);
-  font-size: 14px; line-height: 1.5;
+  padding: 8px 0; border-top: 1px solid var(--line-2);
+  font-size: 15px; line-height: 1.5;
 }
 .toc li:first-child { border-top: 0; }
 /* The contents list is a list of links and does not need saying twice: the
@@ -188,14 +199,16 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 .toc a:hover, .toc a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 .toc span { color: var(--ink-3); }
 
-/* ------- the headline figures + their honesty bands ------- */
-.pred-fig { margin: 30px 0 4px; }
-.pred-fam { font-size: 12.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; }
+/* ------- the headline figures + their honesty bands -------
+   The numeral takes the redesign's figure idiom (.rd-tpp-num: the sans face,
+   medium weight, tight tracking); the label above it is the shell's .sh-kicker. */
+.pred-fig { margin: 32px 0 6px; }
+.pred-fam { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; }
 .pred-num {
-  font-family: var(--serif); font-weight: 600;
-  font-size: 52px; line-height: 1; letter-spacing: -0.015em;
+  font-family: var(--sans); font-weight: 500;
+  font-size: 54px; line-height: 1; letter-spacing: -0.03em;
 }
-.pred-cap { margin-top: 7px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.pred-cap { margin-top: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
 .pred-band { position: relative; height: 6px; margin-top: 20px; border-radius: 3px; background: var(--line-2); }
 .pred-ci {
   position: absolute; top: -2px; bottom: -2px;
@@ -215,44 +228,38 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 .pred-feats { list-style: none; margin: 2px 0 14px; }
 .pred-feats li {
   padding: 10px 0; border-top: 1px solid var(--line-2);
-  font-size: 14.5px; line-height: 1.6; color: var(--ink-2);
+  font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty;
 }
 .pred-feats li:first-child { border-top: 0; }
-.pred-feats strong { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.pred-feats strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
 
-/* ------- tables ------- */
-.pred-twrap { overflow-x: auto; margin: 6px 0 8px; }
+/* ------- tables: the site's poll-table idiom (template.html .poll-table) ------- */
+.pred-twrap { overflow-x: auto; margin: 8px 0 10px; }
 .pred-table { width: 100%; min-width: 520px; border-collapse: collapse; }
 .pred-table caption {
-  text-align: left; font-size: 12px; line-height: 1.5; color: var(--ink-3);
+  text-align: left; font-size: 12.5px; line-height: 1.5; color: var(--ink-3);
   padding: 0 0 8px; caption-side: top;
 }
-.pred-table th, .pred-table td { padding: 5px 6px; border-bottom: 1px solid var(--line-2); }
+.pred-table th, .pred-table td { padding: 6px 8px; border-bottom: 1px solid var(--line-2); font-variant-numeric: tabular-nums; }
 .pred-table thead th {
-  font-size: 11px; font-weight: 600; color: var(--ink-3); text-align: right;
-  border-bottom: 1px solid var(--line); white-space: nowrap;
+  font-size: 13px; font-weight: 600; color: var(--ink-3); text-align: right;
+  border-bottom: 1px solid var(--line); white-space: nowrap; letter-spacing: 0.02em;
 }
 .pred-table thead th.l, .pred-table td.l { text-align: left; }
-.pred-table td { font-size: 12.5px; text-align: right; white-space: nowrap; }
+.pred-table td { font-size: 13.5px; text-align: right; white-space: nowrap; }
 .pred-table td.sum { font-weight: 600; color: var(--ink); }
 .pred-table tr.sum td { font-weight: 600; color: var(--ink); border-top: 1px solid var(--line); }
 .pred-twrap .pred-table.tight { min-width: 0; }
 .pred-table td.c, .pred-table thead th.c { text-align: center; }
-.pred-tnote, .frame-wrap p.pred-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 0 0 12px; }
+.pred-tnote { font-size: 13px; line-height: 1.55; color: var(--ink-3); margin: 0 0 14px; }
 
-/* ------- verbatim arithmetic ------- */
-.pred-code {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 12px; line-height: 1.65; color: var(--ink-2);
-  background: color-mix(in oklch, var(--ink) 5%, transparent);
-  border-radius: 8px; padding: 11px 14px; margin: 2px 0 12px;
-  overflow-x: auto; white-space: pre;
-}
-
-.frame-wrap h3 {
-  font-family: var(--serif); font-size: 17.5px; font-weight: 600;
-  letter-spacing: -0.005em; color: var(--ink);
-  margin: 26px 0 4px;
+/* ------- the redesign's small steps: headline, dek, section titles 640px and under
+   (the rd.css 640px block: .rd-hed 30px/1.1, .rd-dek 15/1.4, .rd-title 19px) ------- */
+@media (max-width: 640px) {
+  main h1 { font-size: 30px; line-height: 1.1; }
+  main p.ss-sub { margin-top: 8px; font-size: 15px; line-height: 1.4; }
+  main h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
+  .pred-num { font-size: 44px; }
 }
 
 </style>
@@ -261,7 +268,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site-shell.css?v=52fcde297b">
+<link rel="stylesheet" href="/assets/site-shell.css?v=d56d2bd5de">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
@@ -322,7 +329,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
   </div>
 </nav>
 <!--/shell:header-->
-<main id="sh-content" class="frame-wrap">
+<main id="sh-content" class="sh-frame">
   <p class="sh-kicker">Methods</p>
   <h1>The two-party figure, two ways</h1>
   <p class="ss-sub">Above the chart, one line says where the two-party figure comes from: &ldquo;Using implied preference flows&rdquo; or &ldquo;Using respondent-allocated preferences only&rdquo;. What follows is what each means, why the site uses the first by default, and where its numbers come from.</p>
@@ -612,7 +619,7 @@ main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bott
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js?v=52fcde297b" defer></script>
+<script src="/assets/site-shell.js?v=d56d2bd5de" defer></script>
 <!--/shell:footer-->
 </body>
 </html>

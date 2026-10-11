@@ -658,20 +658,23 @@ function npTickerItems(proj) {
            which has counted the same mid for every timed house all along
            (rd-polls.jsx inHours). */
         const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
-        /* "Any moment now" also EXPIRES when the house's own filing band
-           shuts. The phrase claims the release is being dropped as it
+        /* "Any moment now" EXPIRES when the house's own filing band shuts
+           - and then the whole ITEM does: a shut band resolves the
+           evening. The phrase claims the release is dropping as it
            speaks, and a house whose measured filing hours have closed is
-           plainly not about to: Newspoll's band ends at 9pm, so the bar
-           still promising it "any moment" at 9:44pm (the report of
-           11 Oct 2026) was asserting an evening the habit record had
-           already watched end. The slot DAY is untouched - the row holds
-           its overdue grace and the roll tomorrow as before; only the
-           urgency claim dies with the band, back to the day's own word
-           until midnight. */
+           plainly not about to (a 9:44pm promise over Newspoll's 7-9pm
+           window, 11 Oct 2026); but the rest of its evening can't offer
+           "today" either - the wait is settled and there is no maybe, so
+           the slot LEAVES THE BAR until its day ends rather than linger
+           as "today (maybe)". The slot DAY is untouched - the row holds
+           its overdue grace and the roll walk as before, and the red
+           overdue items flag it from tomorrow; only the countdown item
+           goes. */
         const bandShut = r.releaseTo != null && nowMs > t.at + r.releaseTo * 60000;
-        when = days === 0 ? (dueMs <= nowMs ? (bandShut ? "today" : "any moment now")
+        if (days === 0 && bandShut) return null;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
              : hourless ? (t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000
-               && !bandShut ? "any moment now" : "today")
+               ? "any moment now" : "today")
              : r.releaseMins != null && Math.round(left / 3600000) < 12
              ? tnUntil(left) : "today")
              : days === 1 ? "tomorrow"
@@ -721,7 +724,10 @@ function npTickerItems(proj) {
          (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
          (r.releaseDow == null && half > 0));
       return { firm: r.pollster, when, maybe, site: r.site };
-    });
+    })
+    /* the shut-band slots nulled above are gone from the roll entirely
+       (their houses' LATER slots were already evicted one-per-house) */
+    .filter(Boolean);
 
   /* Overdue leads: an already-blown forecast is more news than any
      countdown. The tail is the fit pass's business - the candidate list is

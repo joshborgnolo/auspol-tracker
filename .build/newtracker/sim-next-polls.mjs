@@ -366,15 +366,16 @@ function eq(name, got, want) {
   eq("due-day face, tolerance open to 16 Sep", [es && es.overdue, es && es.missed], [true, false]);
   eq("panel counts to the 16 Sep edge", es && panelWhen(es), "in 7 days (or earlier today)");
   eq("no red rows anywhere", rows.every((r) => !r.missed), true);
-  // 10am is six hours past Essential's 1-4:36am filing band - "any moment
-  // now" expired with it and the bar is back to the slot day's word
-  eq("ticker offers Essential, band shut", items.some((i) => i.firm === "Essential" && i.when === "today"), true);
+  // 10am is six hours past Essential's 1-4:36am filing band - the shut band
+  // resolved the slot, so the bar no longer offers it: no "today", no
+  // "(maybe)" - there is no maybe once the hour record has ended
+  eq("ticker drops Essential once its band has shut", items.some((i) => i.firm === "Essential"), false);
 }
 
 // S4b – after the 05:02 sweep confirms 2 Sep absent as well, the projection
 // slips to Wed 9 Sep itself. The slot's own 1am moment is already past at
 // 10am, so it's the due-day face: tolerance open to 16 Sep, panel counts to
-// the edge, ticker back to plain "today" with the filing band shut — and no
+// the edge, the ticker drops the slot now the filing band has shut — and no
 // red.
 {
   const { label, t0, nowMs } = scen("Wed 9 Sep, 2 Sep confirmed too", "2026-09-09", 600);
@@ -386,7 +387,7 @@ function eq(name, got, want) {
   eq("both slots confirmed: due-day face, tolerance open", [es && es.overdue, es && es.missed], [true, false]);
   eq("confirmed absences leave no missed-slot record", es && es.missedSlots, null);
   eq("panel counts to the 16 Sep edge", es && panelWhen(es), "in 7 days (or earlier today)");
-  eq("ticker offers Essential, band shut", items.some((i) => i.firm === "Essential" && i.when === "today"), true);
+  eq("ticker drops Essential once its band has shut", items.some((i) => i.firm === "Essential"), false);
 }
 
 // S5 – the poll is recorded. Written when the 2 Sep wave still needed a
@@ -582,10 +583,12 @@ function eq(name, got, want) {
 // "today"; "any moment now" still only starts once the window does — the gate
 // d1a1d215 hangs the phrase on (dueMs). And it EXPIRES when the measured
 // filing band shuts: Morgan's 5pm habit promised "moments away" at 10pm (and
-// Newspoll's real 7-9pm band past 9pm) was the 11 Oct 2026 report — after
-// the band the bar reads "today", the slot day's own word until midnight
-// and the overdue/roll machinery after it. (Keep the scenario on whatever
-// slot the projection is counting Morgan to.)
+// Newspoll's real 7-9pm band past 9pm, followed by "today (maybe)") were the
+// 11 Oct 2026 reports — a shut band resolves the evening, so once it shuts
+// the slot LEAVES the bar outright: no "today", no "(maybe)", because there
+// is no maybe. The row's own day machinery stands; the red overdue items
+// take it from tomorrow. (Keep the scenario on whatever slot the projection
+// is counting Morgan to.)
 {
   const cad9 = JSON.parse(JSON.stringify(cad));
   Object.assign(cad9.find((c) => c.pollster === "Roy Morgan"),
@@ -608,7 +611,7 @@ function eq(name, got, want) {
   eq("window open reads any moment now", pmItems.some((i) => i.firm === "Roy Morgan" && i.when === "any moment now"), true);
   const eve = scen("Mon 14 Sep 10pm, band shut", "2026-09-14", 1320);
   const eveItems = ticker(project(cad9, eve.t0, eve.nowMs), eve.t0, eve.nowMs);
-  eq("10pm with a 5pm habit long shut reads today", eveItems.some((i) => i.firm === "Roy Morgan" && i.when === "today"), true);
+  eq("10pm with a 5pm habit long shut, the slot has left the bar", eveItems.some((i) => i.firm === "Roy Morgan"), false);
   // Newspoll's REAL 7-9pm Sunday band (cad's frozen world slots it to
   // 20 Sep): open at 8:30pm, shut at 9:30pm - the live case reported
   const npOpen = scen("Sun 20 Sep 8:30pm, Newspoll band open", "2026-09-20", 1230);
@@ -616,7 +619,7 @@ function eq(name, got, want) {
   eq("8:30pm inside Newspoll's band", npOpenItems.some((i) => i.firm === "Newspoll" && i.when === "any moment now"), true);
   const npShut = scen("Sun 20 Sep 9:30pm, Newspoll band shut", "2026-09-20", 1290);
   const npShutItems = ticker(project(cad, npShut.t0, npShut.nowMs), npShut.t0, npShut.nowMs);
-  eq("9:30pm past Newspoll's band reads today", npShutItems.some((i) => i.firm === "Newspoll" && i.when === "today"), true);
+  eq("9:30pm past Newspoll's band, the slot has left the bar", npShutItems.some((i) => i.firm === "Newspoll"), false);
 }
 
 // S10 – the hours countdown's edges, on a world with Resolve's release hour

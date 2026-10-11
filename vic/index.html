@@ -21898,7 +21898,8 @@ function npTickerItems(proj) {
       const left = dueMs - nowMs;
       const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
       const bandShut = r.releaseTo != null && nowMs > t.at + r.releaseTo * 60000;
-      when = days === 0 ? dueMs <= nowMs ? bandShut ? "today" : "any moment now" : hourless ? t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000 && !bandShut ? "any moment now" : "today" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
+      if (days === 0 && bandShut) return null;
+      when = days === 0 ? dueMs <= nowMs ? "any moment now" : hourless ? t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000 ? "any moment now" : "today" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
     } else {
       when = t.at <= nowMs ? "any day now" : Math.round((t.at - nowMs) / 3600000) < 36 ? tnUntil(t.at - nowMs) : Math.round((t.at - t0) / TN_DAY) + " days";
     }
@@ -21911,7 +21912,7 @@ function npTickerItems(proj) {
       maybe,
       site: r.site
     };
-  });
+  }).filter(Boolean);
   const items = [...overdueItems, ...upcomingItems, ...windowItems];
   return items;
 }
