@@ -4880,7 +4880,7 @@ function RdFlows() {
           {/* head + dek hand-curated (user's wording, 2026-10-10): refresh by
               hand, they no longer regenerate */}
           <h3 className="rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
-          <p className="rd-ff-d">RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently perform better than respondent-allocated preference flows, in that domain.</p>
+          <p className="rd-ff-d">RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
         </div>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
