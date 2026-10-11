@@ -335,8 +335,9 @@ function buildFavicon() {
   glyph.forEach((p) => { p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H); });
 
   /* --- needle: 2PP against Labor's rival, AS THE MASTHEAD RULES IT ---
-     The rival is gen-data's rivalLead - the deadband walk over the implied
-     series that decides which contest the hero leads with - and the margin
+     The rival is gen-data's rivalLead - the margin-gated ruling over the
+     implied series (2PP first, first preferences on a tie) that decides
+     which contest the hero leads with - and the margin
      is read on the same basis the hero prints: implied (synthLatest / onImp)
      where it exists, the published pair otherwise. This used to pick
      whichever challenger had the larger PUBLISHED 2PP share, with no
@@ -1024,7 +1025,7 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + (VIC ? buildStaticSummar
    correction to a poll's publisher moves one and not the other, so the check
    could call a card current while it showed a date the site no longer did. */
 /* The contest the card quotes. The card draws Labor against the rival the
-   site leads with - gen-data's rivalLead, the deadbanded walk over the
+   site leads with - gen-data's rivalLead, the margin-gated ruling over the
    implied series that also picks the hero's contest and the favicon's
    needle. When that rival is One Nation the figures are latest.onImp's
    (the pairing's only quoted level; its ± is the margin of the polls'

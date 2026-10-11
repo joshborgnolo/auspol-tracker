@@ -469,9 +469,10 @@ const CYC_METRICS = [
       <>That is the only table anyone could have used at the time. So a line moves when voting
       intentions move, not when pollsters change how they allocate preferences, and every term
       back to 1972 is on the same footing as today’s.</>,
-      <>The sitting term follows the rival Labor is doing worst against, as the headline does, and
-      marks where that changed. How the final polls did, below, still scores what the pollsters
-      published.</>,
+      <>The sitting term follows Labor’s main rival, as the headline does, and marks where that
+      changed: the rival running Labor clearly closer after preferences or, when the two are too
+      close to call, the one clearly ahead on first preferences. How the final polls did, below,
+      still scores what the pollsters published.</>,
     ] },
   /* primaryIs marks the two primary charts: it draws the sitting term's
      Others sum (Greens + One Nation + Others as one line) on either and
@@ -1160,7 +1161,7 @@ function cycDotDate(iso) {
 }
 
 /* Which rival the sitting term's 2PP is read against in a given month – the
-   hero's deadbanded ruling, walked month by month in gen-data. A month before
+   hero's margin-gated ruling, walked month by month in gen-data. A month before
    the walk starts (or an older payload without it) is Labor v Coalition. */
 function rivalOfMonth(D, ym) {
   let who = "alp_lnp";
@@ -1490,11 +1491,16 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   const contestEvents = eventCycle && eventCycle.current && M.key === "tpp" && eventCycle.raw.tppEras
     ? eventCycle.raw.tppEras.filter((e) => e.from).map((e) => {
         const rival = e.rival === "alp_on" ? "One Nation" : "the Coalition";
+        const other = e.rival === "alp_on" ? "the Coalition" : "One Nation";
         return {
           date: e.from, short: "Now " + (e.rival === "alp_on" ? "v One Nation" : "v Coalition"),
-          label: "Labor’s strongest rival becomes " + rival,
-          desc: "From here the line is Labor’s implied two-party vote against " + rival
-            + ", the rival it is doing worst against – the same ruling the headline follows.",
+          label: "Labor’s main rival becomes " + rival,
+          /* why: the rival ruling's test that handed over the spot (gen-data §8) */
+          desc: "From here the line is Labor’s implied two-party vote against " + rival + ". "
+            + (e.why === "primary"
+              ? "The two contests were too close to call after preferences, and " + rival
+                + " was clearly ahead of " + other + " on first preferences: the same ruling the headline follows."
+              : rival.charAt(0).toUpperCase() + rival.slice(1) + " ran Labor clearly closer after preferences: the same ruling the headline follows."),
           major: true, x: cycEventMonth(e.from, eventCycle.eDate),
         };
       })
@@ -5230,7 +5236,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   ].filter((f) => f.id !== "confidence" || confWide);
   /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
      highest leftmost, a party only overtaking once it leads by a full point,
-     same deadband rule as the hero's rival ruling). Presentation travels
+     a fixed deadband). Presentation travels
      with the column, so everything keys off party id. A copy of this def
      map lives in the Latest-polls renderer – the two move together. */
   const pOrder = (D.latest && D.latest.primaryOrder) || ["alp", "lnp", "grn", "onp", "oth"];
@@ -5268,9 +5274,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   // the demographics facet's split → URL letter's inverse; age, the default, rides no letter
   const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home", n: "income", b: "country" };
   const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", c: "lnp", onp: "onp", lnponp: "lnponp", "3cp": "3cp", lnp: "lnp" };
-  /* The lead column opens on the rival Labor is doing WORST against – the
-     hero's own ruling (latest.rivalLead, deadbanded in gen-data so it
-     doesn't flip month to month) – not on the traditional pairing. A URL
+  /* The lead column opens on Labor's main rival – the hero's own ruling
+     (latest.rivalLead, margin-gated in gen-data so it doesn't flip month to
+     month) – not on the traditional pairing. A URL
      names the matchup only when it departs from that default, so a shared
      link keeps meaning what it meant if the ruling later moves. */
   const DEFAULT_MEASURE = window.AP.measureOfMatchup((D.latest || {}).rivalLead);

@@ -4845,7 +4845,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
      highest leftmost, a party only overtaking once it leads by a full point,
-     same deadband rule as the hero's rival ruling). Presentation travels
+     a fixed deadband). Presentation travels
      with the column, so everything keys off party id. The archive renderer
      carries a copy of this def map – the two move together. */
   const pOrder = (D.latest && D.latest.primaryOrder) || ["alp", "lnp", "grn", "onp", "oth"];

@@ -63,7 +63,7 @@
     : D.latest;
   /* WHICH CONTEST THE CARD QUOTES
      Labor against the rival the site leads with - gen-data's rivalLead, the
-     deadbanded walk over the implied series that the hero, the favicon and
+     margin-gated ruling over the implied series that the hero, the favicon and
      the masthead all defer to. The card drew ALP v L/NP whatever the page
      led with, so while One Nation held the spot it previewed a contest the
      page had left. When the ON pairing is quoted its figures come from
@@ -92,7 +92,7 @@
     prev: onImp ? onImp.aPrev : onPub.aPrev,
     sig: !!(onImp ? onImp.changeSig : onPub.changeSig),
     n: onImp ? onImp.n : onPub.n, imp: !!onImp,
-    series: (onImp ? D.synthOn : D.alt2pp.alp_on).map((d) => ({ x: d.x, a: d.a, b: d.b })),
+    series: (onImp ? D.synthOn : D.alt2pp.alp_on).map((d) => ({ x: d.x, ym: d.ym, a: d.a, b: d.b })),
     anchor: null,
   } : {
     opp: "lnp", oppLab: "Coalition",
@@ -100,7 +100,7 @@
     ci: L.alp2ppCi95, ciLab: "95% interval",
     prev: L.alp2ppPrev, sig: !!L.changeSig,
     n: L.method.nPolls, imp: IS_IMP,
-    series: D.agg2pp.map((d) => ({ x: d.x, a: d.alp, b: d.lnp })),
+    series: D.agg2pp.map((d) => ({ x: d.x, ym: d.ym, a: d.alp, b: d.lnp })),
     anchor: "2025 election, Labor " + D.agg2pp[0].alp.toFixed(1),
   };
   const W = 1200, H = 630, S = 2;              // draw at 2x, export at 1x
@@ -210,7 +210,7 @@
     const P = (d, rr) => ({ x: cx + Math.sin((d * Math.PI) / 180) * rr,
                             y: cy - Math.cos((d * Math.PI) / 180) * rr });
     // the rival the site leads with - the same contest Q quotes (rivalLead's
-    // deadbanded ruling), so the needle, the figures and the page never mix
+    // margin-gated ruling), so the needle, the figures and the page never mix
     const top = { id: Q.opp, lab: Q.a, opp: Q.b };
     const oppCol = T[top.id], margin = top.lab - top.opp;
 
@@ -327,7 +327,12 @@
   const CX0 = 0, CX1 = W - PAD, CY0 = 392, CY1 = 578;
   const TS = Q.series;          // the quoted contest's term trend, [{x, a, b}]
   const xs = TS.map((d) => d.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
-  const y0 = 43, y1 = 57;
+  /* Symmetric about the tie, since the two lines are complements: ±7 points
+     at least (the classic pairing's term has always fitted 43-57), wider when
+     the term ran further from 50. The ALP v ON trend opened at 64-36, and a
+     fixed 43-57 sent both lines off the plot. */
+  const half = Math.max(7, Math.ceil(Math.max(...TS.map((d) => Math.abs(d.a - 50)))));
+  const y0 = 50 - half, y1 = 50 + half;
   const sx = (x) => CX0 + ((x - x0) / (x1 - x0)) * (CX1 - CX0);
   const sy = (y) => CY1 - ((y - y0) / (y1 - y0)) * (CY1 - CY0);
   const curve = (pts) => { for (let i = 0; i < pts.length - 1; i++) {
@@ -382,11 +387,15 @@
   /* Left end: the 2025 count, the classic pairing's own anchor. The ALP-ON
      pairing HAS no such count, so its trend opens on its first month
      instead - the right-hand label's own form, so the two ends match. */
+  /* Both ends read the rows' own months ("2025-06" -> "Jun ’25"). The left
+     once ran x - a decimal year - through new Date(), which reads it as
+     milliseconds since 1970 ("Jan ’70"), and the right was a frozen
+     "Aug ’26". */
   const MNS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const t0 = new Date(Q.series[0].x);
-  const leftLab = Q.anchor || MNS[t0.getUTCMonth()] + " ’" + String(t0.getUTCFullYear()).slice(2);
+  const ymLab = (ym) => MNS[Number(ym.slice(5, 7)) - 1] + " \u2019" + ym.slice(2, 4);
+  const leftLab = Q.anchor || ymLab(TS[0].ym);
   caps(leftLab, PAD, 604, 13.5, 0, T.ink3, 600);
-  c.textAlign = "right"; caps("Aug \u201926", W - PAD, 604, 13.5, 0, T.ink3, 600); c.textAlign = "left";
+  c.textAlign = "right"; caps(ymLab(TS[TS.length - 1].ym), W - PAD, 604, 13.5, 0, T.ink3, 600); c.textAlign = "left";
 
   /* ---- footer ------------------------------------------------------------ */
   /* No rule: the footer sits inside the plot's panel, and the panel's own top

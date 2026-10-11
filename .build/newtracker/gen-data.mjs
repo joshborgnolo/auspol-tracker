@@ -815,26 +815,16 @@ if (KF) {                                   // /vic/: the trend (§1a)
    not current-term accuracy. The kept-visible shortfall the old TCP-anchor
    comment described (implied 54.2 vs count 55.2) was a property of the TCP
    majors-only renormalisation, not of flow tables in general. */
-/* The implied monthly values UNROUNDED, keyed by month, for decisions taken
-   on them: the rival walk (§8) compares these, so the display's one-decimal
-   rounding never decides which contest the site leads with. SYNTH_ON_RAW is
-   §1d's twin. */
-const SYNTH_RAW = {}, SYNTH_ON_RAW = {};
 const agg2ppSynth = MONTHS.map((ym) => {
   const r = monthWithSe(tppRowsSynth, synthEffect, ym);
   if (!r) return null;
-  SYNTH_RAW[ym] = r.v;
   return { ym, x: mx(ym), alp: r1(r.v), lnp: r1(100 - r.v), ci95: r1(1.96 * r.se), k: r.n };
 }).filter(Boolean);
 // computed from the data, never hardcoded – flows.mjs changes, this moves
 agg2ppSynth.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(impliedAlp2pp(ELECTION)), lnp: r1(100 - impliedAlp2pp(ELECTION)), ci95: 0, k: 0, election: true });
 if (KF) {
   const kf = KF_NOW.imp = kfSeries(tppRowsSynth, "imp", impliedAlp2pp(ELECTION));
-  if (kf) Object.keys(SYNTH_RAW).forEach((k) => delete SYNTH_RAW[k]);   // the trend's months replace the means'
-  if (kf) agg2ppSynth.splice(1, Infinity, ...kfMonths(kf).map((m) => {
-    SYNTH_RAW[m.ym] = m.v;
-    return { ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k };
-  }));
+  if (kf) agg2ppSynth.splice(1, Infinity, ...kfMonths(kf).map((m) => ({ ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k })));
 }
 
 /* ---- 1c. flow-sensitivity band --------------------------------------------
@@ -896,18 +886,15 @@ const agg2ppSynthOn = MONTHS.map((ym) => {
     if (q.ym !== ym) continue;
     bnSum += q.n * q.bn; nSum += q.n;
   }
-  SYNTH_ON_RAW[ym] = r.v;
   return { ym, x: mx(ym), a: r1(r.v), b: r1(100 - r.v), ...onMargin(1.96 * r.se, bnSum / nSum), k: r.n };
 }).filter(Boolean);
 if (KF) {   // /vic/: the trend's line; the flow range is carried through a month with no poll
   const kf = KF_NOW.on = kfSeries(tppRowsSynthOn, "on", null);
   if (kf) {
     let band = null;
-    Object.keys(SYNTH_ON_RAW).forEach((k) => delete SYNTH_ON_RAW[k]);
     agg2ppSynthOn.splice(0, Infinity, ...kfMonths(kf).map((m) => {
       const rs = tppRowsSynthOn.filter((q) => q.ym === m.ym);
       if (rs.length) band = rs.reduce((t, q) => t + q.n * q.bn, 0) / rs.reduce((t, q) => t + q.n, 0);
-      SYNTH_ON_RAW[m.ym] = m.v;
       return { ym: m.ym, x: m.x, a: r1(m.v), b: r1(100 - m.v), ...onMargin(m.ci, band), k: m.k };
     }));
   }
@@ -4679,58 +4666,92 @@ const onImp = primaryNow && (() => {
    number says POLLSTERS, and "YouGov (MRP)" is YouGov. */
 const houses = new Set(POLLS.map((p) => p.pollster.replace(/ \((MRP|SMS|pooled)\)$/, "")));
 const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MNF[m - 1]} ${y}`; };
-/* Which rival leads the board: the contest Labor is doing WORST in goes
-   first, in the hero and in every legend that lists the two.
+/* Which rival leads the board: Labor's main rival goes first, in the hero
+   and in every legend that lists the two contests.
 
    Ranked on the IMPLIED basis, always, whatever the hero's own toggle says.
    That is not a shortcut: the two contests are only comparable when they are
    read through one frozen table, because the published ALP-v-ON figures are
    each house's private allocation and the published ALP-v-L/NP figures are a
-   different private allocation again. The bases disagree about the answer
-   today (implied says One Nation by 0.3, published says the Coalition by 1.7)
-   and the implied one is the comparison that means something.
+   different private allocation again.
 
-   The DEADBAND is the load-bearing part. One Nation has gone from 7.6 points
-   behind the Coalition as a rival to ahead of it, which is real; but the
-   crossover itself has been decided by 0.2-0.5 points a month, and a naive
-   "whoever is ahead this month" rule flips the site's headline contest three
-   times in five months on differences the page would not otherwise call real.
-   So a rival must lead by more than RIVAL_DEADBAND to take the spot, and
-   having taken it keeps it until it trails by more than that. Walked forward
-   from the first month of the term rather than stored, so the answer is a
-   pure function of the data and every build reproduces it: one switch across
-   this term, in June 2026, instead of three.
-
-   The walk compares the UNROUNDED monthly values (SYNTH_RAW, SYNTH_ON_RAW),
-   never the one-decimal display rows: on the flow table revised 2026-10-11
-   June's gap came to 1.02 (1.003 once DemosAU's MRPs left the aggregates
-   the same day), which the rounded rows read as 1.0 and so as no switch.
-   That June switch is a knife-edge - a revision to June's figures can
-   still flip the whole walk after it. */
-const RIVAL_DEADBAND = 1.0;
+   The ruling is two margin tests, walked forward month by month from the
+   first month of the term (a pure function of the data, so every build
+   reproduces it):
+   1. AFTER PREFERENCES. A rival takes the spot when it runs Labor closer by
+      more than the gap's own margin. The gap is read poll by poll (the two
+      implied figures come from the same primaries, so most of their sampling
+      error cancels in it: per respondent the variance is that of the flow
+      difference between the two tables) and its margin adds the One Nation
+      table's own range, which no number of polls can narrow.
+   2. FIRST PREFERENCES, when step 1 says the two contests are too close to
+      call: the rival clearly ahead on first preferences leads, because in a
+      preferential count the larger rival is Labor's opponent in more seats.
+      Its margin is the ON-minus-Coalition primary gap's own (a lead between
+      two shares of one sample is wider than the two shares' margins).
+   When both are too close to call, the incumbent keeps the spot.
+   Until 2026-10-11 a fixed one-point deadband on the 2PP gap decided it:
+   on the revised flow table One Nation held the spot on a June gap of 1.003
+   that the flow table's own doubt (~1.4) swamps, and any revision to June
+   could have flipped the board. Each month's ruling records which test
+   decided it (why: "2pp" | "primary" | "held"). */
+const rivalEvidence = (() => {
+  const onBy = new Map(tppRowsSynthOn.map((r) => [r.key, r]));
+  const share = (p) => {
+    const q = { alp: p.alp || 0, lnp: p.lnp || 0, grn: p.grn || 0, onp: p.onp || 0, oth: (p.ind || 0) + (p.oth || 0) };
+    const t = q.alp + q.lnp + q.grn + q.onp + q.oth;
+    return t ? Object.fromEntries(Object.entries(q).map(([k, v]) => [k, v / t])) : null;
+  };
+  // each respondent's flow to Labor against the Coalition minus against One
+  // Nation, in points: the 2PP gap's per-respondent spread (pq)
+  const dGap = { alp: 0, lnp: -100 * FP_ON.lnp, grn: 100 * (FLOW.grn - FP_ON.grn),
+                 onp: 100 * FLOW.onp, oth: 100 * (FLOW.oth - FP_ON.oth) };
+  const gapRows = [], primRows = [];
+  for (const r of tppRowsSynth) {
+    const o = onBy.get(r.key), p = POLL_BY_KEY.get(r.key), q = p && share(p);
+    if (!o || !q) continue;
+    const m1 = Object.keys(dGap).reduce((t, k) => t + q[k] * dGap[k], 0);
+    const m2 = Object.keys(dGap).reduce((t, k) => t + q[k] * dGap[k] ** 2, 0);
+    gapRows.push({ ...r, x: r.x - o.x, pq: Math.max(m2 - m1 * m1, 1) });
+    primRows.push({ ...r, x: p.onp - p.lnp, pq: Math.max(1e4 * ((q.onp + q.lnp) - (q.onp - q.lnp) ** 2), 1) });
+  }
+  const gapHE = houseEffectsFor(gapRows), primHE = houseEffectsFor(primRows);
+  const cfBy = Object.fromEntries(agg2ppSynthOn.map((d) => [d.ym, d.cf]));
+  return Object.fromEntries(MONTHS.map((ym) => {
+    const g = monthWithSe(gapRows, gapHE, ym), q = monthWithSe(primRows, primHE, ym);
+    return [ym, g && {
+      gap: g.v, gapM: Math.hypot(1.96 * g.se, cfBy[ym] || 0),
+      prim: q ? q.v : null, primM: q ? 1.96 * q.se : null,
+    }];
+  }));
+})();
 /* The walk is kept month by month, not just its end: Past cycles draws the
    sitting term's 2PP against whichever rival held the spot in each month, so
    that line and the hero can never disagree about who Labor was facing. */
 const rivalWalk = (() => {
   let who = "alp_lnp";
   return agg2ppSynth.map((d) => {
-    const c = d.election ? null : SYNTH_RAW[d.ym], o = SYNTH_ON_RAW[d.ym];
-    if (c != null && o != null) {
-      const gap = (100 - o) - (100 - c);     // One Nation's share minus the Coalition's
-      if (gap > RIVAL_DEADBAND) who = "alp_on";
-      else if (gap < -RIVAL_DEADBAND) who = "alp_lnp";
+    const e = d.election ? null : rivalEvidence[d.ym];
+    let why = "held";
+    if (e) {
+      if (e.gap > e.gapM) { who = "alp_on"; why = "2pp"; }            // One Nation clearly closer
+      else if (e.gap < -e.gapM) { who = "alp_lnp"; why = "2pp"; }     // the Coalition clearly closer
+      else if (e.prim != null && e.prim > e.primM) { who = "alp_on"; why = "primary"; }
+      else if (e.prim != null && e.prim < -e.primM) { who = "alp_lnp"; why = "primary"; }
     }
-    return { ym: d.ym, who };
+    return { ym: d.ym, who, why };
   });
 })();
 const rivalLead = rivalWalk.length ? rivalWalk[rivalWalk.length - 1].who : "alp_lnp";
 const rivalByYm = Object.fromEntries(rivalWalk.map((r) => [r.ym, r.who]));
+const rivalWhyByYm = Object.fromEntries(rivalWalk.map((r) => [r.ym, r.why]));
 
 /* The primary-vote facet's column order, shared by the Latest and All-polls
    tables. Highest aggregate sits leftmost – but the ALP/ON/LNP primaries have
    crossed and recrossed this term on 0.2-0.5-point monthly differences, and a
    naive "rank this month's numbers" rule would shuffle the columns on moves
-   the page would not otherwise call real. Same deadband as the rival ruling:
+   the page would not otherwise call real. A fixed deadband (the rival ruling
+   used the same one until 2026-10-11, when it moved to margin tests):
    a party overtakes the one above it only when its aggregate leads by more
    than PRIMARY_DEADBAND, and then holds the slot until the reverse happens.
    Walked forward monthly from the election anchor rather than stored, so the
@@ -5314,11 +5335,13 @@ const RIVAL_NAME = { alp_lnp: "v Coalition", alp_on: "v One Nation" };
 function rivalEras(pts, c, cap) {
   const segs = [];
   for (const p of pts) {
-    if (!segs.length || segs[segs.length - 1].who !== p.who) segs.push({ who: p.who, from: p.iso, pts: [] });
+    if (!segs.length || segs[segs.length - 1].who !== p.who) segs.push({ who: p.who, from: p.iso, why: p.why, pts: [] });
     segs[segs.length - 1].pts.push(p);
   }
   if (segs.length < 2) return null;
+  // why: which of the rival ruling's two tests handed over the spot ("2pp" | "primary")
   return segs.map((s, i) => ({ name: c.lead + " " + RIVAL_NAME[s.who], rival: s.who, from: i ? s.from : null,
+                               ...(i && s.why ? { why: s.why } : {}),
                                ...cycleSeries(s.pts, i === 0 ? c.eTpp : null, cap) }));
 }
 /* Each term's readings debiased as the site's live series are: house effects
@@ -5351,7 +5374,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     tppPts = agg2ppSynth.filter((d) => !d.election).map((d) => {
       const who = rivalByYm[d.ym] === "alp_on" && onBy[d.ym] ? "alp_on" : "alp_lnp";
       return { m: monthsSince(d.ym + "-15", c.eDate), v: who === "alp_on" ? onBy[d.ym].a : d.alp,
-               who, iso: d.ym + "-01" };
+               who, why: rivalWhyByYm[d.ym], iso: d.ym + "-01" };
     });
     /* The opposition chart reads the SAME term from the other side of the
        ballot box: same polls, same months, the losing party's column. Anchors
@@ -6279,8 +6302,9 @@ window.AUSPOL = (function () {
      meaningful beside the implied line; the hero draws it with the
      basis comparison. */
   const flowSens = ${JSON.stringify(synthBand)};
-  /* The rival ruling month by month (§8's rivalWalk): which contest Labor
-     was losing worst in each month, deadbanded. Past cycles draws the
+  /* The rival ruling month by month (§8's rivalWalk): Labor's main rival
+     each month, margin-gated (2PP first, first preferences on a tie), with
+     the test that decided it (why). Past cycles draws the
      sitting term's 2PP – line and dots – against this month's rival. */
   const rivalWalk = ${JSON.stringify(rivalWalk)};
   /* The flow tables Past cycles reads each term through (flows.mjs FLOW_LEF,

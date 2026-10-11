@@ -1,6 +1,6 @@
 // Fixture test for latest.primaryOrder – the deadband walk in gen-data.mjs
-// that ranks the primary-vote facet's columns (same >1pt rule as rivalLead's
-// matchup ruling): highest aggregate leftmost, and a party only overtakes the
+// that ranks the primary-vote facet's columns (a >1pt rule; rivalLead's
+// matchup ruling used it too until 2026-10-11): highest aggregate leftmost, and a party only overtakes the
 // one above it once its aggregate leads by more than a full point.
 //
 // The walk IS the contract: the test replays it verbatim against the live
