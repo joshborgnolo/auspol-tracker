@@ -21477,6 +21477,7 @@ window.AP = function () {
 const NP_HORIZON_DAYS = 28;
 const NP_ASSUME_SKIP_DAYS = 2;
 const NP_UNTIMED_MINS = 24 * 60;
+const NP_COUNT_SPAN = 2 * 60;
 let npEastFmt = null;
 function easternNow() {
   const d = new Date();
@@ -21771,7 +21772,7 @@ function npTickerItems(proj) {
       const days = Math.round((t.at - t0) / TN_DAY);
       const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
       const left = dueMs - nowMs;
-      const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom >= 60;
+      const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
       when = days === 0 ? dueMs <= nowMs ? "any moment now" : hourless ? t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000 ? "any moment now" : "today" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
     } else {
       when = t.at <= nowMs ? "any day now" : Math.round((t.at - nowMs) / 3600000) < 36 ? tnUntil(t.at - nowMs) : Math.round((t.at - t0) / TN_DAY) + " days";

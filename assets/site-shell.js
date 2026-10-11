@@ -102,6 +102,15 @@ const NP_ASSUME_SKIP_DAYS = 2;
    no moment to say has passed, so the row stays "today" until today is over
    rather than being rolled off the list by an hour we invented for it. */
 const NP_UNTIMED_MINS = 24 * 60;
+/* A TIMED house counts to its measured mid-hour while its recorded clock
+   times span no more than two hours - Resolve's 6pm, Morgan's 4pm-ish,
+   Newspoll's 7-9pm mid-8pm, RedBridge's 6-or-8pm, YouGov's 5-6am all fit.
+   A span past that keeps no one hour: Essential files somewhere across
+   1:00-4:36am (216 minutes), and counting the slot down to any single hour
+   of that morning is a claim the record doesn't make. (The Next-expected
+   panel's inHours has always counted releaseMins for every timed house;
+   this gate is what grants the ticker the same count.) */
+const NP_COUNT_SPAN = 2 * 60;
 /* "Now", in the frame this schedule is written in.
 
    Every date on this page is an Australian calendar date and every release
@@ -636,15 +645,19 @@ function npTickerItems(proj) {
            timed has no hour to count to and keeps "today", and twelve hours
            plus out the day is still the honest claim. */
         const left = dueMs - nowMs;
-        /* ...unless the house keeps no one hour. RedBridge files at 6pm or
-           8pm, so at 4pm the wait is "2 hours or 4 hours" - a count to
-           either is a claim the record doesn't make. A house whose recorded
-           hours span an hour or more says "any moment now" for the whole
-           count once the wait to its EARLIEST hour is no longer than its
-           own span of hours (RedBridge from 4pm), and "today" before that -
-           10am is not a moment away from 6pm. A house on one hour
-           (Resolve's 6pm, Roy Morgan's 4pm-ish) keeps counting it. */
-        const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom >= 60;
+        /* ...unless the house keeps no one hour - a recorded span past two
+           hours (NP_COUNT_SPAN). Essential files somewhere across 1-4:36am,
+           so its slot morning reads "any moment now" for as long as the
+           wait to the EARLIEST hour is no longer than the house's own span
+           of hours, and "today" before that - the span's span is the honest
+           window. A two-hours-or-less habit counts to the measured MID
+           instead: Newspoll's 7-9pm mid-8pm and RedBridge's 6-or-8pm used
+           to sit out here beside Essential (the bar was a span of one hour
+           or more), a rule that called an evening house hourless for filing
+           at 7pm the once - and left the ticker vaguer than the panel,
+           which has counted the same mid for every timed house all along
+           (rd-polls.jsx inHours). */
+        const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
         when = days === 0 ? (dueMs <= nowMs ? "any moment now"
              : hourless ? (t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000
                ? "any moment now" : "today")

@@ -697,17 +697,21 @@ function eq(name, got, want) {
   const sk2 = scen("Sun 4 Oct 10pm, the late Sunday absent too", "2026-10-04", 1320);
   const sk2Row = project(cadSkip, sk2.t0, sk2.nowMs).find((r) => r.pollster === "RedBridge/Accent");
   eq("a second skip goes to the next month-end", sk2Row && npFmt(sk2Row.release), "Sun 1 Nov");
-  // a house that files at 6pm OR 8pm has no one hour to count to: "today"
-  // until the wait to 6pm is no longer than that 2-hour span, then "any
-  // moment now" - never "2 hours" when it may as well be 4
+  // a house whose recorded hours span two hours or less counts to the
+  // measured mid like any timed house (NP_COUNT_SPAN, tightened from a
+  // one-hour bar: the old rule called an evening house hourless for one
+  // 7pm filing in an 8-9pm habit) - so RedBridge at 3:30pm on its slot
+  // day reads "3 hours", at 4:00pm "2 hours", counting down to its
+  // measured 6pm mid; only Essential's 216-minute 1-4:36am wander stays
+  // hourless
   cadSkip.find((c) => c.pollster === "RedBridge/Accent").skipped = ["2026-09-27"];
   const rbWhen = (mins) => {
     const s = scen("Sun 4 Oct", "2026-10-04", mins);
     const it = ticker(project(cadSkip, s.t0, s.nowMs), s.t0, s.nowMs).find((i) => i.firm === "RedBridge/Accent");
     return it && [it.when, !!it.maybe];
   };
-  eq("two-hour house at 3:30pm reads today", rbWhen(930), ["today", false]);
-  eq("two-hour house at 4pm reads any moment now", rbWhen(960), ["any moment now", false]);
+  eq("two-hour house at 3:30pm counts to the 6pm mid", rbWhen(930), ["3 hours", false]);
+  eq("two-hour house at 4pm keeps counting", rbWhen(960), ["2 hours", false]);
 }
 
 // S12b – the bar names the EARLIEST date, so a weekday house whose record
