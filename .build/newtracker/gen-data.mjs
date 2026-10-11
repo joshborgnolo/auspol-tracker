@@ -144,7 +144,21 @@ const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)", "Newsp
 const NO_AGG_ROW_NOTE = {
   shifts: "Because this super-poll release (n=5,563) published state and demographic breakdowns only - no national headline figures - it does not count towards any aggregates.",
 };
-const noAggPoll = (p) => NO_AGG_HOUSES.has(p.pollster) || p.noAgg != null;
+/* An MRP whose fieldwork CONTAINS the house's own regular waves is taken to
+   reuse their respondents (ruling 2026-10-11, "assume overlap"): DemosAU's
+   reports say only "DemosAU surveyed N respondents" over the dates, and its
+   Jan–Mar 2026 model's 8,484 is its two regular waves inside (1,933 +
+   1,551) plus exactly 5,000. Those waves already count, so the model joins
+   no aggregate and no vote-by-group pool (§7g) – its extra respondents are
+   unreported and can't be split out. A wave merely straddling an edge
+   (RedBridge's AFR MRP shares two days with its 24–30 Apr wave) isn't
+   contained and doesn't trip it; an MRP with no regular wave inside
+   (DemosAU Oct–Nov 2025) is its own survey and counts. */
+const reusesWaves = (p) => {
+  const house = /\(MRP\)$/.test(p.pollster || "") && p.dateStart ? p.pollster.replace(/ \(MRP\)$/, "") : null;
+  return !!house && POLLS.some((q) => q.pollster === house && (q.dateStart || q.date) >= p.dateStart && q.date <= p.date);
+};
+const noAggPoll = (p) => NO_AGG_HOUSES.has(p.pollster) || p.noAgg != null || reusesWaves(p);
 /* why each no-aggregate house's figures sit outside the aggregates - the
    archive detail rail's note line (the SMS label keeps its established
    selection-bias wording; the pooled label reads as the timespan average) */
@@ -157,7 +171,8 @@ const NO_AGG_NOTE = {
   "Newspoll (pooled)": "This release combines the Newspoll polls from these dates, which already count in the aggregates, so its vote figures don’t count a second time. Its tables of each group’s vote do count in Who votes for whom, read as those polls.",
   "EMRS (Tas)": "Because this poll surveyed Tasmanian voters only, its state-level figures sit outside the national aggregates.",
 };
-const noAggNoteFor = (p) => NO_AGG_NOTE[p.pollster] || (p.noAgg != null ? NO_AGG_ROW_NOTE[p.noAgg] : undefined);
+const noAggNoteFor = (p) => NO_AGG_NOTE[p.pollster] || (p.noAgg != null ? NO_AGG_ROW_NOTE[p.noAgg] : undefined)
+  || (reusesWaves(p) ? "Because this model\u2019s fieldwork contains " + p.pollster.replace(/ \(MRP\)$/, "") + "\u2019s own regular polls, which already count, it is taken to reuse their respondents, so it does not count towards any aggregates." : undefined);
 const ppm = D.ppm;
 /* Leader satisfaction the fallback filed (D.fallbackApproval) joins the
    approval rows on the same terms as fallbackPolls above, but on its own:
@@ -2920,7 +2935,12 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   const p = demoPollOf(w);
   if (!p) continue;
   const h = harmonize(w);
+  /* a model taken to reuse its house's own waves (reusesWaves) joins no
+     group, so it carries none – no group-view dot, no export columns – and
+     `x` tells the facet why; its printed table still shows (d) */
+  const reuse = reusesWaves(p);
   const v = DEMO_GROUPS.map((g) => {
+    if (reuse) return null;
     const st = DEMO_SETS.find((x) => x.groups.includes(g));
     const sh = h[st.id] && h[st.id][g];
     return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => (sh[k] == null ? null : r1(sh[k]))) : null;
@@ -2943,7 +2963,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   // a wave everything harmonised out of (the pooled birth-country release
   // joins no common group) still carries its raw cuts to the facet
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
-    { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}),
+    { r: w.read, v, d, n, ...(reuse ? { x: "reuse" } : {}), ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}),
       ...(pp ? { sp: pp.map((q) => ({ x: mx(ymOf(q.date)) + (dayOf(q.date) - 15) / 365, ym: ymOf(q.date), k: rowN(q) / rowN(p), l: fwLabel(q.dateStart, q.date) })) } : {}) });
 }
 /* Solo single-territory readings for the ACT/NT/Tas group. Displayed on the
@@ -3977,6 +3997,8 @@ const demographics = (() => {
   for (const w of waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
     if (!tot) continue;
+    // a model reusing the house's own waves' respondents (reusesWaves) sits out
+    if (p && reusesWaves(p)) continue;
     const r0 = p || w, n = rowN(p || { sample: w.sample });
     // a pooled release reads as its parts; one without parts sits out
     const parts = isPooledRelease(w) ? pooledParts(p) : null;

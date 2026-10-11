@@ -6946,8 +6946,13 @@ function infoTerms(D) {
       <span className="info-p"><b>Repeat polls.</b> A pollster with several polls in the window
       counts for the square root of their number, so three weekly Roy Morgan polls count as 1.7,
       not 3.</span>
-      <span className="info-p"><b>One exclusion.</b> Roy Morgan’s SMS polls stay in the archive
-      but count towards no aggregate: SMS polls have a strong selection bias.</span>
+      <span className="info-p"><b>Exclusions.</b> These stay in the archive but count towards no
+      aggregate. Roy Morgan’s SMS polls have a strong selection bias. Releases that combine a
+      pollster’s polls which already count would count those voters twice: Newspoll’s quarterly
+      tables, Roy Morgan’s seven-month release, and DemosAU’s 2026 models (MRP), whose fieldwork
+      contains DemosAU’s own regular polls and which are taken to reuse their respondents.
+      EMRS’s polls are of Tasmania only, and RedBridge’s March 2026 super-poll published
+      breakdowns but no national figures.</span>
       <span className="info-p"><b>Sparse measures.</b> Measures polled about once a week or less
       use a six-week window: favourability, Hanson’s approval, preferred prime minister, the One
       Nation split, the vote by group, the issues, and decidedness. There a poll’s weight halves
@@ -7336,10 +7341,12 @@ function infoTerms(D) {
           ACT and NT rows are drawn there one by one too, and count only combined, at their
           shares of the 2025 vote. DemosAU counts for the two metropolitan areas only, since its
           third combines provincial and rural voters, and RedBridge for owners only, since its
-          renters include others who don’t own. The modelled polls (MRP) from DemosAU and YouGov
-          count as one poll each, placed at the middle of their fieldwork as the headline places
-          every poll, though that fieldwork can run past six weeks. Their group figures are the
-          model’s estimates, not a table of answers.</span>
+          renters include others who don’t own. The modelled polls (MRP) count as one poll each,
+          placed at the middle of their fieldwork as the headline places every poll, though that
+          fieldwork can run past six weeks. Their group figures are the model’s estimates, not a
+          table of answers. A model whose fieldwork contains the pollster’s own regular polls –
+          DemosAU’s from January to March 2026 – is taken to reuse their respondents, whose
+          groups already count, and is left out.</span>
           <span className="info-p"><b>Newspoll’s tables.</b> Newspoll publishes its groups only
           every three months, in one table combining the three or four polls it ran in that time.
           The table counts as those polls, each at its own dates and sample, so it joins the

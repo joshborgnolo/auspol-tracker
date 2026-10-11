@@ -1212,7 +1212,11 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
       <span className="rd-apd-k">Printed</span>
       <span>{raw.length} groups across {rdNumWord(nCuts)} breakdown{nCuts === 1 ? "" : "s"}, {p.grp.r === "measured from the charts" ? "read off its charts to the nearest point" : "from its own table"}.</span>
       <span className="rd-apd-k">In Who votes for whom</span>
-      <span>{pooled.length ? <>{pooled.length} of its groups join</> : "None of its groups joins"} the pooled figures{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>
+      {/* a model taken to reuse its house's own polls (gen-data reusesWaves)
+          joins nothing for that reason, not for how it cuts its groups */}
+      {p.grp.x === "reuse"
+        ? <span>None of its groups joins the pooled figures: its fieldwork contains {p.pollster.replace(/ \(MRP\)$/, "")}’s own regular polls, whose groups already count, and it is taken to reuse their respondents.</span>
+        : <span>{pooled.length ? <>{pooled.length} of its groups join</> : "None of its groups joins"} the pooled figures{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>}
       {T.window && <>
         <span className="rd-apd-k">In today’s figures</span>
         <span>{inWin ? <>One of the polls the panel’s current figures draw on (the last {T.window}).</> : <>Outside the {T.window} the panel’s current figures draw on.</>}</span>
