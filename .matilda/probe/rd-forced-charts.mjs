@@ -200,9 +200,10 @@ const measure = () => page.evaluate(() => {
   out.orderKeyThenForced = (() => {
     const nodes = [...sec.children];
     const iKey = nodes.findIndex((el) => el.classList.contains("rd-ckey") && el.classList.contains("rd-fl-key"));
+    const iNote = nodes.findIndex((el) => el.classList.contains("rd-fl-read"));
     const iFF = nodes.findIndex((el) => el.classList.contains("rd-ff"));
     const iTsig = nodes.findIndex((el) => el.classList.contains("rd-tsig"));
-    return { iKey, iFF, iTsig };
+    return { iKey, iNote, iFF, iTsig };
   })();
   out.sw = document.documentElement.scrollWidth;
   out.iw = window.innerWidth;
@@ -225,8 +226,9 @@ await gotoFlows(1366);
 const d = await measure();
 check(d.nFig === 2, `desktop: two forced-choice figures (${d.nFig})`);
 check(d.h3 === "RedBridge/Accent’s respondent-allocated preferences", `desktop: section head is the respondent-allocated line`);
-check(d.orderKeyThenForced.iKey > -1 && d.orderKeyThenForced.iFF === d.orderKeyThenForced.iKey + 1,
-  `desktop: the forced pair sits directly under the drift key (key idx ${d.orderKeyThenForced.iKey}, forced idx ${d.orderKeyThenForced.iFF})`);
+check(d.orderKeyThenForced.iKey > -1 && d.orderKeyThenForced.iNote === d.orderKeyThenForced.iKey + 1
+    && d.orderKeyThenForced.iFF === d.orderKeyThenForced.iKey + 2,
+  `desktop: the reading note sits under the drift key, the forced pair under it (key idx ${d.orderKeyThenForced.iKey}, note idx ${d.orderKeyThenForced.iNote}, forced idx ${d.orderKeyThenForced.iFF})`);
 check(d.orderKeyThenForced.iTsig === d.orderKeyThenForced.iFF + 1,
   `desktop: the drift battery follows the forced pair (tsig idx ${d.orderKeyThenForced.iTsig})`);
 {

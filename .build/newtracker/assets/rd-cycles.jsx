@@ -1339,7 +1339,7 @@ function RdPastCycles(p) {
             <div key={v.key}><h2 className="rd-hed">{v.story.head}</h2><p className="rd-dek">{v.story.dek}</p></div>
           ))}
         </div>
-        {srcFailed && <p className="rd-note">The individual polls behind the past terms didn’t load; the monthly lines are unaffected. <button type="button" className="rd-link" onClick={retrySource}>Try again</button></p>}
+        {srcFailed && <p className="rd-note">The individual polls behind the past terms didn’t load; the monthly lines are unaffected. <button type="button" className="rd-link rd-link-in" onClick={retrySource}>Try again</button></p>}
         {controls}
         {summary}
         <div className="rd-foot">

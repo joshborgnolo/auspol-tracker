@@ -1387,7 +1387,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
         <span>{confSer && confSer.latest && confSer.latest.released === p.released
           ? <>This is the latest {conf.lab} release, so the economic-sentiment panel reads the gauge at it.</>
           : confSer && confSer.latest
-            ? <>The panel’s current read of this gauge is the {outLabel(confSer.latest)} release at {confFmt(confSer.latest.v)}{confSer.latest.url ? <>, <a className="rd-link" href={confSer.latest.url} onClick={(e) => e.stopPropagation()}>its source<span className="rd-apd-ext" aria-hidden="true">↗</span></a></> : ""}.</>
+            ? <>The panel’s current read of this gauge is the {outLabel(confSer.latest)} release at {confFmt(confSer.latest.v)}{confSer.latest.url ? <>, <a className="rd-link rd-link-in" href={confSer.latest.url} onClick={(e) => e.stopPropagation()}>its source<span className="rd-apd-ext" aria-hidden="true">↗</span></a></> : ""}.</>
             : <>The gauge’s series carries no published releases to panel against.</>}</span>
       </div>
     </>;
@@ -4423,15 +4423,20 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const x0 = phone ? 26 : 40, rpad = phone ? 66 : 76, top = 14, bot = phone ? 178 : 214;
   const x1 = W - rpad;
   const ms = rdApMonths(RD_AP_TERM1);
-  const X = (ym) => x0 + (ms.indexOf(ym) / (ms.length - 1)) * (x1 - x0);
-  /* a wave's released date sits INSIDE its month: the month's own x plus the
-     date's fraction of that month, so a dot lands where the wave was, not at
-     the month's mid-point */
+  /* one calendar axis, first month's first day to last month's last: a
+     month's figure sits at its MIDDLE (Xm), where the polls it averages
+     centre, and a wave at its released date (Xw), so the line runs through
+     its own dots. Ticks mark month starts (Xs). Indexing months to the axis
+     ends instead drew each figure half a month early and let a late-month
+     wave run past the plot into the Now mark */
+  const mw = (x1 - x0) / ms.length;
+  const Xs = (ym) => x0 + ms.indexOf(ym) * mw;
+  const X = (ym) => Xs(ym) + mw / 2;
   const Xw = (iso) => {
     const i = ms.indexOf(iso.slice(0, 7));
     if (i < 0) return null;
     const dim = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)), 0)).getUTCDate();
-    return x0 + ((i + (Number(iso.slice(8, 10)) - 1) / dim) / (ms.length - 1)) * (x1 - x0);
+    return x0 + (i + (Number(iso.slice(8, 10)) - 1) / dim) * mw;
   };
   const zero = (top + bot) / 2;
   const Y = (v) => zero - (v / 3.5) * (zero - top);
@@ -4471,11 +4476,14 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         {[-3, -2, -1, 0, 1, 2, 3].map((v) => <text key={"t" + v} x={x0 - 8} y={Y(v) + 4} className="rd-dis-ax" textAnchor="end">{v === 0 ? "0" : rdSigned(v, 0)}</text>)}
         <path d={band} className="rd-fl-band"></path>
         {/* the per-house monthly gaps carry NO painted dot — they read as
-            poll dots and "only served to confuse" (user call 2026-10-05);
-            an invisible hit ring remains at each house's month x so
-            hover/focus can still read the house's gap. A mark opens nothing
-            on click (it is not a poll); touch toggles the tip. */}
-        {Object.keys(houses).map((h) => houses[h].filter((d) => ms.includes(d.ym)).map((d, i) => {
+            poll dots and "only served to confuse" (user call 2026-10-05).
+            They read through the highlight instead: the picked pollster's
+            months draw as the thin pick line below, and a hit ring at each
+            of its vertices raises that month's tip. Unpicked houses keep no
+            rings - an unseen hover target the key could only describe in
+            words. A mark opens nothing on click (it is not a poll); touch
+            toggles the tip. */}
+        {(pickS ? [pick] : []).map((h) => houses[h].filter((d) => ms.includes(d.ym)).map((d, i) => {
           const vid = "vtx|" + h + "|" + d.ym;
           const vx = X(d.ym), vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
           const showV = (src) => setTip({ id: vid, src, hd: { h, ym: d.ym, v: d.v, fl: d.fl ?? null }, px: vx });
@@ -4517,7 +4525,8 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           return (
             <g key={id}>
               {tip && tip.id === id && <circle cx={px} cy={py} r="6" className="rd-apd-dothi"></circle>}
-              <circle cx={px} cy={py} r="2.2" className="rd-fl-wdot"></circle>
+              {/* a highlighted pollster's own waves come forward, the rest recede */}
+              <circle cx={px} cy={py} r={pickS && d.pollster === pick ? 3 : 2.2} className={"rd-fl-wdot" + (pickS ? (d.pollster === pick ? " on" : " off") : "")}></circle>
               <circle cx={px} cy={py} r="8" className={"rd-apd-hit" + (k ? " link" : "")}
                       tabIndex="0" role={k ? "button" : "img"}
                       aria-label={`${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}` + (k ? "; press Enter to open this poll" : "")}
@@ -4552,9 +4561,14 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         <text x={nx + 10} y={Y(nw.v) + 20} className="rd-fl-nowci">±{nw.ci95.toFixed(1)}</text>
         <text x={x0 + 6} y={Y(3.5) + 13} className="rd-fl-note">▲ Published kinder to Labor</text>
         <text x={x0 + 6} y={Y(-3.5) - 6} className="rd-fl-note">▼ Kinder to {rival}</text>
-        {emptyNote && X(mo[0].ym) - x0 > 110 && <text x={(x0 + X(mo[0].ym)) / 2} y={Y(1.4)} className="rd-fl-empty" textAnchor="middle">{emptyNote}</text>}
-        <path d={`M${x0} ${bot}H${x1}` + ticks.map(([ym]) => `M${X(ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
-        {ticks.map(([ym, lab]) => <text key={ym} x={X(ym)} y={bot + 20} className="rd-dis-ax" textAnchor="middle">{lab}</text>)}
+        {/* the longest phrasing that fits the empty span, measured (the
+            fixed 110px test let the long note run into the band at 1024px) */}
+        {(() => {
+          const t = emptyNote && emptyNote.find((n) => textWidth(n, 12, 400) <= X(mo[0].ym) - x0 - 14);
+          return t ? <text x={(x0 + X(mo[0].ym)) / 2} y={Y(1.4)} className="rd-fl-empty" textAnchor="middle">{t}</text> : null;
+        })()}
+        <path d={`M${x0} ${bot}H${x1}` + ticks.map(([ym]) => `M${Xs(ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
+        {ticks.map(([ym, lab]) => <text key={ym} x={Xs(ym)} y={bot + 20} className="rd-dis-ax" textAnchor="middle">{lab}</text>)}
         {hv && !tip && <path d={`M${X(hv.ym)} ${top}V${bot}`} className="rd-dis-guide"></path>}
         {hv && !tip && <circle cx={X(hv.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, hv.v)))} r="4" className="rd-fl-enddot"></circle>}
       </svg>
@@ -4637,18 +4651,23 @@ function RdForced({ waves, cohorts, rival, W, phone }) {
   const H = phone ? 190 : 230;
   const x0 = phone ? 30 : 36, rpad = phone ? 78 : 84, top = 16, bot = H - 34;
   const x1 = W - rpad;
+  /* a calendar axis, every month from the first wave's to the last's: March
+     printed no Table 1, so Feb–Apr spans two months' width with no dot in
+     between. Spacing the waves evenly drew that two-month step as one */
+  const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
+  const m0 = mi(waves[0].ym), mSpan = Math.max(1, mi(waves[waves.length - 1].ym) - m0);
   const ms = [];
-  for (const w of waves) if (!ms.includes(w.ym)) ms.push(w.ym);
-  /* month gap: March printed no Table 1, so Feb–Apr spines step over it
-     smoothly while the dot strip jumps (no dot where no wave was) */
-  const X = (ym) => x0 + (ms.indexOf(ym) / (ms.length - 1)) * (x1 - x0);
+  for (let k = 0; k <= mSpan; k++) { const m = m0 + k; ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0")); }
+  const X = (ym) => x0 + ((mi(ym) - m0) / mSpan) * (x1 - x0);
   const Y = (v) => bot - (v / 100) * (bot - top);
   const series = cohorts.map((ck) => {
     const pts = waves.filter((w) => w[ck] != null).map((w) => [X(w.ym), Y(w[ck])]);
     const last = pts.length ? [...waves].reverse().find((w) => w[ck] != null) : null;
     return { ck, pts, last };
   }).filter((s) => s.pts.length >= 2 && s.last);
-  const ticks = rdApMonthTicks(ms, phone ? 2 : 1);
+  /* every month where the labels clear each other ("Feb ’26" is ~42px),
+     every other month where they don't */
+  const ticks = rdApMonthTicks(ms, (x1 - x0) / mSpan >= 44 ? 1 : 2);
   /* cluster-centred end-label dodge: one name+value block per cohort, so a
      tight finish (Sep 2026's Other 57 sits ~29px above Coalition 41 on the
      Labor-v-One-Nation chart) still never crowns one label on another */
@@ -4751,15 +4770,17 @@ function RdFlows() {
   const phone = useNarrow("(max-width: 760px)");
   const FD = D.flowDrift, FO = D.flowDriftOn;
   const FF = D.flowForced;
-  const [pop, setPop] = useState(null);
   const [pick, setPick] = useState(null);
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
   if (!FD || !FO || !FD.now || !FO.now) return null;
   const nC = FD.now, nO = FO.now;
   const s1 = (v) => Math.abs(v).toFixed(1);
+  /* a lean towards the rival can only be in the rival's own contest, so it
+     needs no "against": "kinder to the Coalition against the Coalition"
+     said the party twice */
   const phr = (v, who) => (Math.abs(v) < 0.05 ? "level against " + who
-    : s1(v) + " points kinder to " + (v > 0 ? "Labor" : who) + " against " + who);
+    : s1(v) + " points kinder to " + (v > 0 ? "Labor against " + who : who));
   const ci = Math.max(nC.ci95, nO.ci95);
   const worst = Math.max(Math.abs(nC.v), Math.abs(nO.v));
   const outC = Math.abs(nC.v) > nC.ci95, outO = Math.abs(nO.v) > nO.ci95;
@@ -4854,36 +4875,45 @@ function RdFlows() {
         <span className="rd-meta">{"Whether preferences still flow the way they did at the " + rdElecYear + " election"}</span>
       </div>
       <RdHed head={head} dek={dek} />
+      {/* the pair's anatomy is the disagreement section's: one chart title
+          over both charts, then each chart's contest in its rival's ink.
+          The highlight is one control for both charts, at every width - the
+          page's own control over a native select (the rd-pv-sel idiom), where
+          a popover used to sit in the first chart's title row and a phone
+          never got it */}
+      <div className="rd-fl-head">
+        <h4 className="rd-ap-ct">Published minus implied two-party figure, relative to each pollster’s usual gap, points</h4>
+        <select className="rd-pv-sel rd-fl-sel" aria-label="Highlight a pollster" value={pick || ""}
+                onChange={(e) => setPick(e.target.value || null)}>
+          <option value="">{pick ? "No highlight" : "Highlight a pollster"}</option>
+          {houses.map((h) => <option key={h} value={h}>{h}</option>)}
+        </select>
+      </div>
       <div ref={box} className="rd-fl-two">
         <div className="rd-fl-one">
-          <div className="rd-fl-ct">
-            <h4 className="rd-ap-ct">Against the Coalition: published minus implied, points</h4>
-            {!phone && <FilterPop id="flowpick" label="Highlight a pollster" open={pop} setOpen={setPop} summary={pick}>
-              <div className="ap-poplist" role="radiogroup" aria-label="Pollster to highlight">
-                <PopRow radio on={!pick} label="None" onClick={() => { setPick(null); setPop(null); }} />
-                {houses.map((h) => <PopRow key={h} radio on={pick === h} label={h} onClick={() => { setPick(h); setPop(null); }} />)}
-              </div>
-            </FilterPop>}
-          </div>
+          <span className="rd-fl-name lnp">Labor v Coalition</span>
           <RdFlowChart fd={FD} rival="the Coalition" W={cw} phone={phone} pick={pick} />
         </div>
         <div className="rd-fl-one">
-          <div className="rd-fl-ct"><h4 className="rd-ap-ct">{phone ? "Against One Nation" : "Against One Nation: published minus implied, points"}</h4></div>
-          <RdFlowChart fd={FO} rival="One Nation" W={cw} phone={phone} pick={pick} emptyNote={phone ? "Nothing before Jan" : "No readings before January"} />
+          <span className="rd-fl-name onp">Labor v One Nation</span>
+          <RdFlowChart fd={FO} rival="One Nation" W={cw} phone={phone} pick={pick} emptyNote={["No readings before January", "Nothing before Jan", "None before Jan"]} />
         </div>
       </div>
-      <RdKey className="rd-ckey rd-fl-key" items={[{ kind: "line", color: "var(--ink)", label: "All pollsters, combined month by month" }, { kind: "band", color: "var(--ink-3)", label: "95% interval" }]}>
-        <span className="rd-key-item">Each pollster’s own gap – hover its month spot to read</span>
-        <span className="rd-key-item"><span className="rd-fl-keywd" aria-hidden="true"></span>One published wave’s own gap – hover to read the wave</span>
+      <RdKey className="rd-ckey rd-fl-key" items={[{ kind: "line", color: "var(--ink)", label: "All pollsters, month by month" }, { kind: "band", color: "var(--ink-3)", label: "95% interval" }]}>
+        <span className="rd-key-item"><span className="rd-fl-keywd" aria-hidden="true"></span>One poll</span>
         <span className="rd-key-item"><span className="rd-fl-keynow" aria-hidden="true"><i></i></span>Now: the latest weeks pooled, with its 95% interval</span>
+        {pick && <span className="rd-key-item"><span className="rd-fl-keypick" aria-hidden="true"></span>{pick}, month by month</span>}
       </RdKey>
+      {/* how to read the zero, beside the charts it sets (it used to close
+          the section, under the RedBridge/Accent pair and the table) */}
+      <p className="rd-note rd-fl-read">Implied is the figure a poll’s primary votes give on the {rdElecYear} election’s preference flows. Zero is each pollster’s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster’s first head-to-heads.</p>
       {FF && <div className="rd-ff">
-        <div className="rd-ff-head">
-          {/* head + dek hand-curated (user's wording, 2026-10-10): refresh by
-              hand, they no longer regenerate */}
-          <h3 className="rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
-          <p className="rd-ff-d">RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
-        </div>
+        {/* head + dek hand-curated (user's wording, 2026-10-10): refresh by
+            hand, they no longer regenerate. Set as the page's sub-story
+            (.rd-sub/.rd-subdek), as the two-party and leadership sections
+            set theirs */}
+        <h3 className="rd-sub rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
+        <p className="rd-subdek rd-ff-d">RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("on")}</h4></div>
@@ -4902,12 +4932,12 @@ function RdFlows() {
       <RdTsig summary="Trend-significance table"
         heads={["Series", "First → last", "Slope, pts/yr", "t", "Significant"]}
         sets={ffSet ? flSets.concat(ffSet) : flSets}
-        note={"One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes."
+        note={"One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the note under the charts says, not the election; pollsters with too few months for a fit show dashes."
           + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the six — a Yes licenses that cohort’s tail in its chart’s title." : "")}
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
-        Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster’s first head-to-heads. This check corrects no other figure on the page.
-        {FF && " The pressed-choice pairs beneath are RedBridge/Accent’s published waves, read straight off its reports (link on each dot); only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."}
+        This check corrects no other figure on the page.
+        {FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."}
       </RdFoot>
     </section>
   );

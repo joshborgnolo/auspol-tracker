@@ -3361,6 +3361,7 @@ body.rd .rd-qpanel .rd-qnote { font-size: 12px; color: var(--ink-3); margin-top:
 body.rd .rd-qpanel a { display: inline-flex; min-height: 44px; align-items: center; font-weight: 500; color: var(--ink); }
 body.rd .rd-link { all: unset; cursor: pointer; min-height: 44px; padding: 0 4px; display: inline-flex; align-items: center; font-weight: 500; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.rd .rd-link.rd-link-in { display: inline; min-height: 0; padding: 0; }
 body.rd .rd-link-ext { text-decoration: none; }
 body.rd .rd-link-ext .rd-link-t { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-link-pend { color: var(--ink-3); font-weight: 400; }
@@ -4678,15 +4679,14 @@ body.rd .rd-ap-pops .rd-ap-sel { min-height: 36px; box-sizing: border-box; }
 body.rd .rd-ap-sel-house { width: 110px; }
 body.rd .rd-ap-sel-time { width: 94px; }
 body.rd .rd-ap-sel-inc { width: 118px; }
-body.rd .rd-ap-bar .ap-popbtn, body.rd .rd-fl-ct .ap-popbtn {
+body.rd .rd-ap-bar .ap-popbtn {
   min-height: 36px; box-sizing: border-box; padding: 0 12px 0 14px; gap: 8px;
   border: 1px solid var(--line); background: var(--surface); border-radius: 18px;
   box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 1.5px var(--btn-shade), 0 3px 6px -3px var(--btn-shade);
   font-size: 14px; font-weight: 400; color: var(--ink-2);
 }
-body.rd .rd-fl-ct .ap-popbtn { min-height: 34px; font-size: 13px; }
-body.rd .rd-ap-bar .ap-popbtn.on, body.rd .rd-fl-ct .ap-popbtn.on { color: var(--ink); border-color: var(--ink-3); background: var(--surface); }
-body.rd .rd-ap-bar .ap-popbtn.open, body.rd .rd-fl-ct .ap-popbtn.open { border-color: var(--ink); color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+body.rd .rd-ap-bar .ap-popbtn.on { color: var(--ink); border-color: var(--ink-3); background: var(--surface); }
+body.rd .rd-ap-bar .ap-popbtn.open { border-color: var(--ink); color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
 body.rd .rd-ap-bar .ap-popbtn-val { font-weight: 600; }
 body.rd .rd-ap-bar .ap-panel { top: calc(100% + 6px); }
 body.rd .rd-ap-count { font-size: 14px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -5216,8 +5216,14 @@ body.rd .rd-hl-end { stroke: var(--bg); stroke-width: 1.5; }
 body.rd .rd-hl-hv { fill: var(--ink); stroke: var(--bg); stroke-width: 1.5; }
 body.rd .rd-hl-tip { position: absolute; bottom: calc(100% + 4px); top: auto; transform: translateX(-50%); z-index: 20; white-space: nowrap; }
 body.rd .rd-hl-measure { display: block; height: 0; }
-body.rd .rd-fl-two { margin-top: 32px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; }
+body.rd .rd-fl-head { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; column-gap: 24px; row-gap: 10px; }
+body.rd .rd-fl-head .rd-ap-ct { margin: 0; flex: 1 1 340px; min-width: 0; }
+body.rd .rd-fl-sel { min-height: 34px; padding-top: 7px; padding-bottom: 7px; font-size: 13px; }
+body.rd .rd-fl-two { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; }
 body.rd .rd-fl-one { display: flex; flex-direction: column; min-width: 0; }
+body.rd .rd-fl-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
+body.rd .rd-fl-name.onp { color: var(--onp-text); }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
 @media (min-width: 761px) { body.rd .rd-ff-two .rd-fl-ct { min-height: 56px; } }
@@ -5227,6 +5233,8 @@ body.rd .rd-fl-zero { stroke: var(--ink-faint); stroke-width: 1; }
 body.rd .rd-fl-band { fill: var(--ink-3); opacity: 0.14; }
 body.rd.dark .rd-fl-band { opacity: 0.22; }
 body.rd .rd-fl-wdot { fill: var(--ink-2); opacity: 0.5; }
+body.rd .rd-fl-wdot.on { fill: var(--ink); opacity: 0.9; }
+body.rd .rd-fl-wdot.off { opacity: 0.2; }
 body.rd .rd-fl-pick { fill: none; stroke: var(--ink); stroke-width: 1.25; opacity: 0.6; }
 body.rd .rd-fl-line { fill: none; stroke: var(--ink); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
 body.rd .rd-fl-enddot { fill: var(--ink); }
@@ -5244,14 +5252,13 @@ body.rd .rd-fl-nowci { font-size: 12px; fill: var(--ink-3); }
 body.rd .rd-fl-note { font-size: 12px; fill: var(--ink-2); }
 body.rd .rd-fl-empty { font-size: 12px; font-style: italic; fill: var(--ink-3); }
 body.rd .rd-fl-key { margin-top: 14px; }
+body.rd .rd-fl-keypick { display: inline-block; width: 24px; border-top: 1.5px solid var(--ink); opacity: 0.6; }
+body.rd .rd-fl-read { margin-top: 10px; }
 body.rd .rd-fl-keywd { display: inline-block; width: 6px; height: 6px; margin: 0 4px; border-radius: 50%; background: var(--ink-2); opacity: 0.5; }
 body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; height: 18px; }
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
-body.rd .rd-ff { margin-top: 34px; }
-body.rd .rd-ff-head { margin: 0 0 6px; max-width: 640px; }
-body.rd .rd-ff-t { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; color: var(--ink); }
-body.rd .rd-ff-d { margin: 5px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+body.rd .rd-ff-two { margin-top: 24px; }
 body.rd .rd-ff figure, body.rd figure.rd-ff { margin: 3px 0 0; }
 body.rd figure.rd-ff { position: relative; width: 100%; }
 body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
@@ -5318,7 +5325,9 @@ body.rd .rd-ff-lnk { color: var(--accent); }
   body.rd .rd-hl-bhead .rd-ap-in, body.rd .rd-hl-bar .rd-ap-in { left: 10px; right: 10px; }
   body.rd .rd-hl-now { font-size: 14px; }
   body.rd .rd-hl-sc { grid-column: 1 / -1; }
-  body.rd .rd-fl-two { grid-template-columns: minmax(0, 1fr); row-gap: 20px; margin-top: 22px; }
+  body.rd .rd-fl-two { grid-template-columns: minmax(0, 1fr); row-gap: 20px; margin-top: 14px; }
+  body.rd .rd-fl-head { margin-top: 22px; }
+  body.rd .rd-ff-two { margin-top: 18px; }
 }
 body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; flex-wrap: wrap; }
 body.rd .info { padding-top: 4px; }
@@ -52909,7 +52918,7 @@ function RdPastCycles(p) {
     className: "rd-note"
   }, "The individual polls behind the past terms didn\u2019t load; the monthly lines are unaffected. ", React.createElement("button", {
     type: "button",
-    className: "rd-link",
+    className: "rd-link rd-link-in",
     onClick: retrySource
   }, "Try again")), controls, summary, React.createElement("div", {
     className: "rd-foot"
@@ -54981,7 +54990,7 @@ function RdApDetail({
     }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. This table and the economic-sentiment panel both draw it 100 points up, so its 0 sits on the indices\u2019 neutral 100.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
       className: "rd-apd-k"
     }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
-      className: "rd-link",
+      className: "rd-link rd-link-in",
       href: confSer.latest.url,
       onClick: e => e.stopPropagation()
     }, "its source", React.createElement("span", {
@@ -59364,12 +59373,14 @@ function RdFlowChart({
     bot = phone ? 178 : 214;
   const x1 = W - rpad;
   const ms = rdApMonths(RD_AP_TERM1);
-  const X = ym => x0 + ms.indexOf(ym) / (ms.length - 1) * (x1 - x0);
+  const mw = (x1 - x0) / ms.length;
+  const Xs = ym => x0 + ms.indexOf(ym) * mw;
+  const X = ym => Xs(ym) + mw / 2;
   const Xw = iso => {
     const i = ms.indexOf(iso.slice(0, 7));
     if (i < 0) return null;
     const dim = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)), 0)).getUTCDate();
-    return x0 + (i + (Number(iso.slice(8, 10)) - 1) / dim) / (ms.length - 1) * (x1 - x0);
+    return x0 + (i + (Number(iso.slice(8, 10)) - 1) / dim) * mw;
   };
   const zero = (top + bot) / 2;
   const Y = v => zero - v / 3.5 * (zero - top);
@@ -59430,7 +59441,7 @@ function RdFlowChart({
   }, v === 0 ? "0" : rdSigned(v, 0))), React.createElement("path", {
     d: band,
     className: "rd-fl-band"
-  }), Object.keys(houses).map(h => houses[h].filter(d => ms.includes(d.ym)).map((d, i) => {
+  }), (pickS ? [pick] : []).map(h => houses[h].filter(d => ms.includes(d.ym)).map((d, i) => {
     const vid = "vtx|" + h + "|" + d.ym;
     const vx = X(d.ym),
       vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
@@ -59517,8 +59528,8 @@ function RdFlowChart({
     }), React.createElement("circle", {
       cx: px,
       cy: py,
-      r: "2.2",
-      className: "rd-fl-wdot"
+      r: pickS && d.pollster === pick ? 3 : 2.2,
+      className: "rd-fl-wdot" + (pickS ? d.pollster === pick ? " on" : " off" : "")
     }), React.createElement("circle", {
       cx: px,
       cy: py,
@@ -59599,17 +59610,20 @@ function RdFlowChart({
     x: x0 + 6,
     y: Y(-3.5) - 6,
     className: "rd-fl-note"
-  }, "\u25BC Kinder to ", rival), emptyNote && X(mo[0].ym) - x0 > 110 && React.createElement("text", {
-    x: (x0 + X(mo[0].ym)) / 2,
-    y: Y(1.4),
-    className: "rd-fl-empty",
-    textAnchor: "middle"
-  }, emptyNote), React.createElement("path", {
-    d: `M${x0} ${bot}H${x1}` + ticks.map(([ym]) => `M${X(ym)} ${bot}v4`).join(""),
+  }, "\u25BC Kinder to ", rival), (() => {
+    const t = emptyNote && emptyNote.find(n => textWidth(n, 12, 400) <= X(mo[0].ym) - x0 - 14);
+    return t ? React.createElement("text", {
+      x: (x0 + X(mo[0].ym)) / 2,
+      y: Y(1.4),
+      className: "rd-fl-empty",
+      textAnchor: "middle"
+    }, t) : null;
+  })(), React.createElement("path", {
+    d: `M${x0} ${bot}H${x1}` + ticks.map(([ym]) => `M${Xs(ym)} ${bot}v4`).join(""),
     className: "rd-dis-base"
   }), ticks.map(([ym, lab]) => React.createElement("text", {
     key: ym,
-    x: X(ym),
+    x: Xs(ym),
     y: bot + 20,
     className: "rd-dis-ax",
     textAnchor: "middle"
@@ -59772,9 +59786,15 @@ function RdForced({
     top = 16,
     bot = H - 34;
   const x1 = W - rpad;
+  const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
+  const m0 = mi(waves[0].ym),
+    mSpan = Math.max(1, mi(waves[waves.length - 1].ym) - m0);
   const ms = [];
-  for (const w of waves) if (!ms.includes(w.ym)) ms.push(w.ym);
-  const X = ym => x0 + ms.indexOf(ym) / (ms.length - 1) * (x1 - x0);
+  for (let k = 0; k <= mSpan; k++) {
+    const m = m0 + k;
+    ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0"));
+  }
+  const X = ym => x0 + (mi(ym) - m0) / mSpan * (x1 - x0);
   const Y = v => bot - v / 100 * (bot - top);
   const series = cohorts.map(ck => {
     const pts = waves.filter(w => w[ck] != null).map(w => [X(w.ym), Y(w[ck])]);
@@ -59785,7 +59805,7 @@ function RdForced({
       last
     };
   }).filter(s => s.pts.length >= 2 && s.last);
-  const ticks = rdApMonthTicks(ms, phone ? 2 : 1);
+  const ticks = rdApMonthTicks(ms, (x1 - x0) / mSpan >= 44 ? 1 : 2);
   const FF_GAP = 28;
   const labels = series.map(s => ({
     ck: s.ck,
@@ -59964,7 +59984,6 @@ function RdFlows() {
   const FD = D.flowDrift,
     FO = D.flowDriftOn;
   const FF = D.flowForced;
-  const [pop, setPop] = useState(null);
   const [pick, setPick] = useState(null);
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
@@ -59972,7 +59991,7 @@ function RdFlows() {
   const nC = FD.now,
     nO = FO.now;
   const s1 = v => Math.abs(v).toFixed(1);
-  const phr = (v, who) => Math.abs(v) < 0.05 ? "level against " + who : s1(v) + " points kinder to " + (v > 0 ? "Labor" : who) + " against " + who;
+  const phr = (v, who) => Math.abs(v) < 0.05 ? "level against " + who : s1(v) + " points kinder to " + (v > 0 ? "Labor against " + who : who);
   const ci = Math.max(nC.ci95, nO.ci95);
   const worst = Math.max(Math.abs(nC.v), Math.abs(nO.v));
   const outC = Math.abs(nC.v) > nC.ci95,
@@ -60098,42 +60117,27 @@ function RdFlows() {
     head: head,
     dek: dek
   }), React.createElement("div", {
+    className: "rd-fl-head"
+  }, React.createElement("h4", {
+    className: "rd-ap-ct"
+  }, "Published minus implied two-party figure, relative to each pollster\u2019s usual gap, points"), React.createElement("select", {
+    className: "rd-pv-sel rd-fl-sel",
+    "aria-label": "Highlight a pollster",
+    value: pick || "",
+    onChange: e => setPick(e.target.value || null)
+  }, React.createElement("option", {
+    value: ""
+  }, pick ? "No highlight" : "Highlight a pollster"), houses.map(h => React.createElement("option", {
+    key: h,
+    value: h
+  }, h)))), React.createElement("div", {
     ref: box,
     className: "rd-fl-two"
   }, React.createElement("div", {
     className: "rd-fl-one"
-  }, React.createElement("div", {
-    className: "rd-fl-ct"
-  }, React.createElement("h4", {
-    className: "rd-ap-ct"
-  }, "Against the Coalition: published minus implied, points"), !phone && React.createElement(FilterPop, {
-    id: "flowpick",
-    label: "Highlight a pollster",
-    open: pop,
-    setOpen: setPop,
-    summary: pick
-  }, React.createElement("div", {
-    className: "ap-poplist",
-    role: "radiogroup",
-    "aria-label": "Pollster to highlight"
-  }, React.createElement(PopRow, {
-    radio: true,
-    on: !pick,
-    label: "None",
-    onClick: () => {
-      setPick(null);
-      setPop(null);
-    }
-  }), houses.map(h => React.createElement(PopRow, {
-    key: h,
-    radio: true,
-    on: pick === h,
-    label: h,
-    onClick: () => {
-      setPick(h);
-      setPop(null);
-    }
-  }))))), React.createElement(RdFlowChart, {
+  }, React.createElement("span", {
+    className: "rd-fl-name lnp"
+  }, "Labor v Coalition"), React.createElement(RdFlowChart, {
     fd: FD,
     rival: "the Coalition",
     W: cw,
@@ -60141,23 +60145,21 @@ function RdFlows() {
     pick: pick
   })), React.createElement("div", {
     className: "rd-fl-one"
-  }, React.createElement("div", {
-    className: "rd-fl-ct"
-  }, React.createElement("h4", {
-    className: "rd-ap-ct"
-  }, phone ? "Against One Nation" : "Against One Nation: published minus implied, points")), React.createElement(RdFlowChart, {
+  }, React.createElement("span", {
+    className: "rd-fl-name onp"
+  }, "Labor v One Nation"), React.createElement(RdFlowChart, {
     fd: FO,
     rival: "One Nation",
     W: cw,
     phone: phone,
     pick: pick,
-    emptyNote: phone ? "Nothing before Jan" : "No readings before January"
+    emptyNote: ["No readings before January", "Nothing before Jan", "None before Jan"]
   }))), React.createElement(RdKey, {
     className: "rd-ckey rd-fl-key",
     items: [{
       kind: "line",
       color: "var(--ink)",
-      label: "All pollsters, combined month by month"
+      label: "All pollsters, month by month"
     }, {
       kind: "band",
       color: "var(--ink-3)",
@@ -60165,31 +60167,34 @@ function RdFlows() {
     }]
   }, React.createElement("span", {
     className: "rd-key-item"
-  }, "Each pollster\u2019s own gap \u2013 hover its month spot to read"), React.createElement("span", {
-    className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-fl-keywd",
     "aria-hidden": "true"
-  }), "One published wave\u2019s own gap \u2013 hover to read the wave"), React.createElement("span", {
+  }), "One poll"), React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-fl-keynow",
     "aria-hidden": "true"
-  }, React.createElement("i", null)), "Now: the latest weeks pooled, with its 95% interval")), FF && React.createElement("div", {
+  }, React.createElement("i", null)), "Now: the latest weeks pooled, with its 95% interval"), pick && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fl-keypick",
+    "aria-hidden": "true"
+  }), pick, ", month by month")), React.createElement("p", {
+    className: "rd-note rd-fl-read"
+  }, "Implied is the figure a poll\u2019s primary votes give on the ", rdElecYear, " election\u2019s preference flows. Zero is each pollster\u2019s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster\u2019s first head-to-heads."), FF && React.createElement("div", {
     className: "rd-ff"
-  }, React.createElement("div", {
-    className: "rd-ff-head"
   }, React.createElement("h3", {
-    className: "rd-ff-t"
+    className: "rd-sub rd-ff-t"
   }, "RedBridge/Accent\u2019s respondent-allocated preferences"), React.createElement("p", {
-    className: "rd-ff-d"
+    className: "rd-subdek rd-ff-d"
   }, "RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently ", React.createElement("a", {
-    className: "rd-link",
+    className: "rd-link rd-link-in",
     href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
   }, "perform better", React.createElement("span", {
     className: "rd-apd-ext",
     "aria-hidden": "true"
-  }, "\u2197")), " than respondent-allocated preference flows, in that domain.")), React.createElement("div", {
+  }, "\u2197")), " than respondent-allocated preference flows, in that domain."), React.createElement("div", {
     className: "rd-fl-two rd-ff-two"
   }, React.createElement("div", {
     className: "rd-fl-one"
@@ -60219,13 +60224,13 @@ function RdFlows() {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
-    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the six — a Yes licenses that cohort’s tail in its chart’s title." : "")
+    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the note under the charts says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the six — a Yes licenses that cohort’s tail in its chart’s title." : "")
   }), React.createElement(RdFoot, {
     how: {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster\u2019s first head-to-heads. This check corrects no other figure on the page.", FF && " The pressed-choice pairs beneath are RedBridge/Accent’s published waves, read straight off its reports (link on each dot); only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
