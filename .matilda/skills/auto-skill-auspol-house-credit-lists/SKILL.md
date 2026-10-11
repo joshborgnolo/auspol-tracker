@@ -23,12 +23,13 @@ favourability house since Jul 2026 — the hard-coded copy had fallen behind).
 
 ## Where the lists live
 
-Both credit lists are DATA, emitted by `.build/newtracker/gen-data.mjs` — never
-edit the asset JSX to change names; since 157f35c there is **no hard-coded
-house list anywhere in copy** (the last one was the ApprovalPanel fav subtitle,
-a11e1559 ~:1159, now `houseList(D.favHouses)`). Consumers render via
-`houseList(names, max=4)` (a11e1559 ~:1266): Oxford-comma join, capped
-"… and others" past 4.
+Every credit list is DATA, emitted by `.build/newtracker/gen-data.mjs` — never
+edit the asset JSX to change names; since 2026-10-11 there is **no hard-coded
+house list anywhere in copy** (the last holdouts, the a11e1559 ApprovalPanel NET-mode
+roster and the redesign leadership panel's five static strings, went
+data-driven in the apprHouses commit that day). a11e1559 consumers render via
+`houseList(names, max=4)` (~:1351): Oxford-comma join, capped "… and others"
+past 4.
 
 - `directionHouses` — ACTIVE houses only (the count source). Emitted as
   `const directionHouses = [...]`; consumed by `DirectionPanel` for the
@@ -40,12 +41,36 @@ a11e1559 ~:1159, now `houseList(D.favHouses)`). Consumers render via
   (`appl`/`appr` rows filtered by `FAV_FIRMS.has(canonFirm(r.firm))` — the firm
   set from `metricRules.favFirms`, same order/stopped treatment); consumed by
   the ApprovalPanel fav-mode card-sub. Stored firm names appear verbatim in the
-  list, e.g. "RedBridge/Accent". The NET-mode subtitle ("Newspoll, YouGov,
-  Resolve, Essential, and others") is STILL hard-coded at a11e1559 ~:1155 —
-  untouched, flagged only if a house set ever changes.
+  list, e.g. "RedBridge/Accent".
+- `apprHouses` (2026-10-11) — the complement roster: `appr` rows NOT in
+  FAV_FIRMS (net-APPROVAL houses, "everyone else publishes net approval"),
+  same helper/window/tail; a NO_AGG house can appear here (Roy Morgan (SMS)
+  asks the question) — credit names askers, not aggregators. Consumers:
+  the ApprovalPanel NET-mode card-sub `houseList(D.apprHouses)` (a11e1559
+  ~:1226, replacing the literal "Newspoll, YouGov, Resolve, Essential, and
+  others") and the redesign Leadership panel federal copies (rd-panels). At
+  emit time on 2026-10-11: `["YouGov","Newspoll","Resolve","Essential",
+  "Roy Morgan (SMS)","Fox & Hedgehog (inactive)"]`.
 - Undecided — per-series `series[].houses` plus overall `undecided.houses`,
   still plain creditHouses (no stopped tail requested there).
   See `auspol-undecided-basis-display` for the basis machinery.
+
+## Redesign leadership panel federal rosters (rd-panels.jsx, 2026-10-11)
+
+The /vic/ branches of the leadership copies were always derived (`jHouses` /
+`jApprBy` over `D.individualPolls`, >4 → "A, B, C and others"); the FEDERAL
+branch of each ternary was five static literals ("RedBridge, DemosAU,
+Freshwater and Spectre Strategy" / "Newspoll, YouGov, Resolve, Essential and
+others", chart captions + section meta + the panel-explainer pair, user:
+"make them dynamic"). Now shared via two component-local helpers after
+`jApprBy` (~:656): `capped(list)` mirrors jHouses' cap (>4 → first 3 +
+" and others", else `rdList`), and `apprBy(fav)` = `J ? jApprBy(fav) :
+capped(fav ? D.favHouses : D.apprHouses)`. All five sites collapsed onto
+apprBy except the section meta, which takes `capped(D.apprHouses)` (the
+static roster it replaced was the same one as the approval caption). The
+built page changes COPY when a house starts/stops asking (e.g. the favourability
+caption now names "DemosAU, RedBridge/Accent, Spectre Strategy and Freshwater
+(inactive)" instead of the stale live-Freshwater roster).
 
 ## The recency rule — creditHouses() (gen-data ~:1195)
 

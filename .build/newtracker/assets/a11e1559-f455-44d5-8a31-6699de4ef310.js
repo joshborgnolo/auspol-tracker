@@ -1219,7 +1219,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                      title="What the approval question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("approval", "Leader net approval")}>Approve minus disapprove</button>
-                   <Houses after=" – a verdict on the job they’re doing">Newspoll, YouGov, Resolve, Essential, and others</Houses></>)
+                   <Houses after=" – a verdict on the job they’re doing">{houseList(D.apprHouses)}</Houses></>)
               : (<><button type="button" className="hi-term"
                      title="What the favourability question asks"
                      onClick={() => window.AP.openTerm &&

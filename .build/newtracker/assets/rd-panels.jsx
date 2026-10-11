@@ -644,8 +644,9 @@ function RdLeadership({ rangeId }) {
   const SLOT = { alb: "alb", taylor: "opp", ley: "opp", hanson: "han" };
   const holderAt = (slot, iso) => { let n = null; if (J && iso) for (const e of J.eras[slot]) if (iso >= e.from) n = e.name; return n; };
   const sinceOf = (slot) => (J ? J.eras[slot][J.eras[slot].length - 1].from : null);
-  /* the houses that ask a leader question, for the copy's credits: the
-     federal lists are written out, /vic/'s are read off its polls */
+  /* the houses that ask a leader question, for the copy's credits:
+     /vic/'s are read off its polls; the federal rosters come from the
+     bundle (apprBy below) */
   const jHouses = (test) => {
     const n = new Map();
     D.individualPolls.forEach((q) => { if (test(q)) n.set(q.pollster, (n.get(q.pollster) || 0) + 1); });
@@ -653,6 +654,13 @@ function RdLeadership({ rangeId }) {
     return l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l);
   };
   const jApprBy = (fav) => jHouses((q) => q.appr && ["alb", "taylor", "hanson"].some((k) => q.appr[k + "Net"] != null && ((q.appr.metricBy || {})[k] === "fav") === fav));
+  /* the federal rosters are derived in gen-data from the approval series
+     (D.favHouses / D.apprHouses: a house is credited only where it asked
+     the question within six months of the series' own newest reading, and
+     a stopped house rides last as "Name (inactive)"), so the copies can't
+     fall behind a house that started or stopped asking */
+  const capped = (l) => (l && l.length ? (l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l)) : "");
+  const apprBy = (fav) => (J ? jApprBy(fav) : capped(fav ? D.favHouses : D.apprHouses));
   const [ppmView, setPpmView] = useState(() => (
     /* /vic/'s polls moved to the three-way question with One Nation's
        arrival: with no current two-way reading, it opens on the three-way */
@@ -1253,9 +1261,9 @@ function RdLeadership({ rangeId }) {
       /* read away from the panel: its name, its measure, and the key */
       copy: mt === "fav"
         ? { title: "Net favourability of " + leaderNames, sub: "Favourable minus unfavourable views of each leader as a person, month by month",
-            legend: [], caption: keyDots + (J ? " Polls by " + jApprBy(true) + "." : " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy.") }
+            legend: [], caption: keyDots + " Polls by " + apprBy(true) + "." }
         : { title: "Net approval of " + leaderNames, sub: "Approve minus disapprove of the job each leader is doing, month by month",
-            legend: [], caption: keyDots + (J ? " Polls by " + jApprBy(false) + "." : " Polls by Newspoll, YouGov, Resolve, Essential and others.") },
+            legend: [], caption: keyDots + " Polls by " + apprBy(false) + "." },
       extraRows: (i) => { const r = spine[i]; if (!r) return []; const cs = leaders.map((Ld) => { const row = pts.find((p) => p.ym === r.ym); const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci"; return row && row[k] != null ? "±" + row[k].toFixed(1) : null; }).filter(Boolean); return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : []; },
     });
   };
@@ -1458,7 +1466,7 @@ function RdLeadership({ rangeId }) {
   }, [ppmView, metric]);
 
   return (
-    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta={J ? "Preferred " + J.office.alb + " and net approval, " + jHouses((q) => !!(q.ppm || q.ppmSets || (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null)))) : "Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others"}>
+    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta={J ? "Preferred " + J.office.alb + " and net approval, " + jHouses((q) => !!(q.ppm || q.ppmSets || (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null)))) : "Preferred PM and net approval, " + capped(D.apprHouses)}>
       {story && <RdHed head={story.head} dek={story.dek} />}
       {/* "free" frees the panels from the shared desktop row grid: a "Both"
           view gives its panel extra children (a second chart, the dot-plot
@@ -1496,8 +1504,8 @@ function RdLeadership({ rangeId }) {
           </>)}
         {panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval",
           metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person."
-            : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + (J ? jApprBy(true) + "." : "RedBridge, DemosAU, Freshwater and Spectre Strategy.")
-            : "Approve minus disapprove of the job each leader is doing. " + (J ? jApprBy(false) + "." : "Newspoll, YouGov, Resolve, Essential and others."),
+            : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + apprBy(true) + "."
+            : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".",
           <RdTabs swipe value={metric} onChange={pickMetric} ariaLabel="Leader rating"
                   options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("appr", "leader ratings")}

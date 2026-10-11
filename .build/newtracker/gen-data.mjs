@@ -1905,6 +1905,12 @@ for (const [f, ym] of Object.entries(dirLastYm)) {
 const favHouses = creditHousesWithStopped(
   appr.filter((r) => FAV_FIRMS.has(canonFirm(r.firm))),
   (r) => r.firm, (r) => Date.parse(r.date));
+// The complement roster: the net-APPROVAL houses of the approval series.
+// The federal page's net-mode copies name them; the same window and
+// "(inactive)" tail apply.
+const apprHouses = creditHousesWithStopped(
+  appr.filter((r) => !FAV_FIRMS.has(canonFirm(r.firm))),
+  (r) => r.firm, (r) => Date.parse(r.date));
 // Every published reading behind the monthly line, for the panel's scatter.
 // Taken from the direction series rather than from the poll rows, because a
 // few waves asked this question without publishing voting intention and so
@@ -6198,6 +6204,11 @@ window.AUSPOL = (function () {
      stopped house last as "Name (inactive)" – the approval card's fav-mode
      subtitle names them, so it can't drop a house that started (Spectre) */
   const favHouses = ${JSON.stringify(favHouses)};
+  /* the complement roster, net-APPROVAL houses of the same series, same
+     window and "(inactive)" tail – the approval card's net-mode subtitle,
+     the redesign leadership captions and its section meta name them, so
+     none of those can fall behind a house that started or stopped */
+  const apprHouses = ${JSON.stringify(apprHouses)};
   const directionPolls = ${JSON.stringify(directionPolls)};
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
@@ -6341,7 +6352,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

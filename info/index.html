@@ -15025,6 +15025,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "Freshwater": "2025-11"
   };
   const favHouses = ["DemosAU", "RedBridge/Accent", "Spectre Strategy", "Freshwater (inactive)"];
+  const apprHouses = ["YouGov", "Newspoll", "Resolve", "Essential", "Roy Morgan (SMS)", "Fox & Hedgehog (inactive)"];
   const directionPolls = [{
     "x": 2025.3561643835617,
     "ym": "2025-05",
@@ -82699,6 +82700,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     directionHousesAll,
     directionStoppedSince,
     favHouses,
+    apprHouses,
     directionPolls,
     directionOnlyPolls,
     issuesOnlyPolls,
@@ -88589,7 +88591,7 @@ function ApprovalPanel({
     onClick: () => window.AP.openTerm && window.AP.openTerm("approval", "Leader net approval")
   }, "Approve minus disapprove"), React.createElement(Houses, {
     after: " \u2013 a verdict on the job they\u2019re doing"
-  }, "Newspoll, YouGov, Resolve, Essential, and others")) : React.createElement(React.Fragment, null, React.createElement("button", {
+  }, houseList(D.apprHouses))) : React.createElement(React.Fragment, null, React.createElement("button", {
     type: "button",
     className: "hi-term",
     title: "What the favourability question asks",
@@ -105606,6 +105608,8 @@ function RdLeadership({
     return l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l);
   };
   const jApprBy = fav => jHouses(q => q.appr && ["alb", "taylor", "hanson"].some(k => q.appr[k + "Net"] != null && (q.appr.metricBy || {})[k] === "fav" === fav));
+  const capped = l => l && l.length ? l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l) : "";
+  const apprBy = fav => J ? jApprBy(fav) : capped(fav ? D.favHouses : D.apprHouses);
   const [ppmView, setPpmView] = useState(() => (J && !(N.alb_pref && N.taylor_pref) && N.alb_pref3 ? "three" : "two"));
   const ppmSlot = v => v === "three" ? "three" : "two";
   const [ppmMorph, choosePpm] = window.AP.useMorph(ppmView, v => setPpmView(v), (from, to) => ppmSlot(from) !== ppmSlot(to));
@@ -106487,12 +106491,12 @@ function RdLeadership({
         title: "Net favourability of " + leaderNames,
         sub: "Favourable minus unfavourable views of each leader as a person, month by month",
         legend: [],
-        caption: keyDots + (J ? " Polls by " + jApprBy(true) + "." : " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy.")
+        caption: keyDots + " Polls by " + apprBy(true) + "."
       } : {
         title: "Net approval of " + leaderNames,
         sub: "Approve minus disapprove of the job each leader is doing, month by month",
         legend: [],
-        caption: keyDots + (J ? " Polls by " + jApprBy(false) + "." : " Polls by Newspoll, YouGov, Resolve, Essential and others.")
+        caption: keyDots + " Polls by " + apprBy(false) + "."
       },
       extraRows: i => {
         const r = spine[i];
@@ -106798,7 +106802,7 @@ function RdLeadership({
     id: "leadership",
     cls: "rd-lead",
     title: "Leadership",
-    meta: J ? "Preferred " + J.office.alb + " and net approval, " + jHouses(q => !!(q.ppm || q.ppmSets || q.appr && (q.appr.albNet != null || q.appr.taylorNet != null))) : "Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others"
+    meta: J ? "Preferred " + J.office.alb + " and net approval, " + jHouses(q => !!(q.ppm || q.ppmSets || q.appr && (q.appr.albNet != null || q.appr.taylorNet != null))) : "Preferred PM and net approval, " + capped(D.apprHouses)
   }, story && React.createElement(RdHed, {
     head: story.head,
     dek: story.dek
@@ -106835,7 +106839,7 @@ function RdLeadership({
     items: []
   }, React.createElement("span", {
     className: "rd-ld-keytxt"
-  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests." : keyLead + "; three-way figures are shares of all respondents."))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + (J ? jApprBy(true) + "." : "RedBridge, DemosAU, Freshwater and Spectre Strategy.") : "Approve minus disapprove of the job each leader is doing. " + (J ? jApprBy(false) + "." : "Newspoll, YouGov, Resolve, Essential and others."), React.createElement(RdTabs, {
+  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests." : keyLead + "; three-way figures are shares of all respondents."))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + apprBy(true) + "." : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".", React.createElement(RdTabs, {
     swipe: true,
     value: metric,
     onChange: pickMetric,
