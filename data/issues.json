@@ -19213,7 +19213,7 @@
   {
    "pollster": "Resolve",
    "date": "2026-09-12",
-   "dateStart": null,
+   "dateStart": "2026-09-06",
    "sample": 2250,
    "sampleEff": null,
    "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
@@ -19555,10 +19555,10 @@
   {
    "pollster": "Resolve",
    "date": "2026-10-10",
-   "dateStart": null,
-   "sample": null,
+   "dateStart": "2026-10-06",
+   "sample": 2250,
    "sampleEff": null,
-   "source": null,
+   "source": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
    "seriesDate": "2026-10-11",
    "read": "published series",
    "question": "perform best in each of these areas",
