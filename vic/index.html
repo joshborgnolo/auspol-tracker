@@ -11379,6 +11379,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   const directionHousesAll = [];
   const directionStoppedSince = {};
   const favHouses = ["DemosAU", "Freshwater", "RedBridge/Accent"];
+  const apprHouses = ["Roy Morgan (SMS)", "Newspoll", "Resolve"];
   const directionPolls = [];
   const directionOnlyPolls = [];
   const issuesOnlyPolls = [];
@@ -20376,6 +20377,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     directionHousesAll,
     directionStoppedSince,
     favHouses,
+    apprHouses,
     directionPolls,
     directionOnlyPolls,
     issuesOnlyPolls,
@@ -26381,14 +26383,14 @@ function ApprovalPanel({
     onClick: () => window.AP.openTerm && window.AP.openTerm("approval", "Leader net approval")
   }, "Approve minus disapprove"), React.createElement(Houses, {
     after: " \u2013 a verdict on the job they\u2019re doing"
-  }, "Newspoll, YouGov, Resolve, Essential, and others")) : React.createElement(React.Fragment, null, React.createElement("button", {
+  }, houseList(D.apprHouses))) : React.createElement(React.Fragment, null, React.createElement("button", {
     type: "button",
     className: "hi-term",
     title: "What the favourability question asks",
     onClick: () => window.AP.openTerm && window.AP.openTerm("favourability", "Leader net favourability")
   }, "Positive minus negative"), React.createElement(Houses, {
     after: " \u2013 the person, not the job"
-  }, houseList(D.favHouses), " ask favourability, not approval")))), React.createElement("div", {
+  }, houseList(D.favHouses, 5), " ask favourability, not approval")))), React.createElement("div", {
     className: "card-head-tools"
   }, !lockMetric && React.createElement(TextToggle, {
     caps: true,
@@ -27537,8 +27539,22 @@ const DEMO_PARTIES = [{
   label: "Others",
   short: "OTH"
 }];
-const demoHouse = h => h === "RedBridge/Accent" ? "RedBridge" : h;
+const demoHouse = h => h === "RedBridge/Accent" ? "RedBridge" : h.replace(/ \(pooled\)$/, "");
 const DEMO_GRP_PARTY = ["alp", "lnp", "grn", "onp", "oth"];
+const demoGrpAt = q => q.grp && q.grp.sp ? q.grp.sp.map((s, i) => ({
+  ...s,
+  part: i,
+  of: q.grp.sp.length
+})) : [{
+  x: q.x,
+  ym: q.ym,
+  k: 1
+}];
+const demoPartMeta = (q, s) => s.part == null ? q : {
+  ...q,
+  dateLabel: s.l
+};
+const demoPartSub = (q, s, n) => s.part == null ? n ? "n ≈ " + n.toLocaleString() : undefined : (n ? "n ≈ " + Math.round(n * s.k).toLocaleString() + " · " : "") + "one of " + s.of + " polls in the " + q.field + " tables";
 const demoRamp = (color, n, i) => n < 2 ? color : `color-mix(in oklch, ${color} ${Math.round(100 - i * 60 / (n - 1))}%, var(--ink))`;
 const DEMO_WHO = {
   "18–34": "voters aged 18–34",
@@ -27785,9 +27801,13 @@ function demoTrendVerdict(D, st, party, inX) {
     const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
     return sum > 0 ? 100 * (100 * v[gpi] / sum / p.grp.t[gpi] - 1) : null;
   };
+  const tOf = p => {
+    const at = demoGrpAt(p);
+    return at.reduce((a, s) => a + s.x, 0) / at.length;
+  };
   const points = y => polls.map(p => ({
     h: p.pollster,
-    t: p.x,
+    t: tOf(p),
     w: p.sample || 1000,
     y: y(p)
   })).filter(d => d.y != null && isFinite(d.y));
@@ -27906,17 +27926,20 @@ function DemographicsPanel({
       ...l,
       pts: filterPts(l.pts, xDomain[0])
     }));
-    const dots = D.individualPolls.filter(p => p.grp && p.grp.t && inX(p.x)).flatMap(p => drawn.map(l => {
+    const dots = D.individualPolls.filter(p => p.grp && p.grp.t).flatMap(p => demoGrpAt(p).filter(s => inX(s.x)).flatMap(s => drawn.map(l => {
       const v = p.grp.v[D.demoGroups.indexOf(l.g.label)];
       const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
       return sum > 0 && p.grp.t[gpi] > 0 ? {
-        x: p.x,
+        x: s.x,
         y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1),
         color: l.color,
         label: l.g.label,
-        meta: p
+        meta: demoPartMeta(p, s),
+        ...(s.part != null ? {
+          sub: demoPartSub(p, s)
+        } : {})
       } : null;
-    }).filter(Boolean));
+    }).filter(Boolean)));
     const areas = drawn.map(l => ({
       id: "ci-" + l.g.label,
       color: l.color,
@@ -37040,13 +37063,29 @@ function infoTerms(D) {
     state: "state",
     location: "location",
     housing: "housing",
-    language: "language at home"
+    language: "language at home",
+    working: "work status"
   };
   const demoSets = ids => {
     const n = ids.map(id => DEMO_SET_NAME[id] || id);
     const s = n.length < 3 ? n.join(" and ") : n.slice(0, -1).join(", ") + ", and " + n[n.length - 1];
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
+  const DEMO_ROSTER_NAME = {
+    "RedBridge/Accent": "RedBridge",
+    "Newspoll (pooled)": "Newspoll",
+    "YouGov (MRP)": "YouGov’s MRP",
+    "DemosAU (MRP)": "DemosAU’s MRP"
+  };
+  const demoRoster = DEMO && DEMO.roster && DEMO.roster.length ? React.createElement("div", {
+    className: "info-work-wrap"
+  }, React.createElement("table", {
+    className: "info-work info-work-list"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Groups"), React.createElement("th", null, "Pollsters"))), React.createElement("tbody", null, DEMO.roster.flatMap(r => r.lines.map((l, i) => React.createElement("tr", {
+    key: r.id + i
+  }, React.createElement("td", null, r.lines.length > 1 ? r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase()) + ": " + l.groups.join(", ") : r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase())), React.createElement("td", null, l.houses.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))))))), React.createElement("p", {
+    className: "info-work-note"
+  }, "Every pollster whose polls have counted for each group this term, most polls first.")) : null;
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? React.createElement("div", {
     className: "info-work-wrap"
   }, React.createElement("table", {
@@ -37399,7 +37438,7 @@ function infoTerms(D) {
     nav: "Who votes",
     lead: {
       id: "vote-by-group",
-      body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, and the language they speak at home.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, the language they speak at home, and whether they work full time, part time or are retired.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where."), React.createElement("span", {
         className: "info-p"
@@ -37411,7 +37450,9 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Limits."), " The margins can\u2019t see pollsters defining or weighting a group differently, and a pollster that joins the series part-way, reading a group its own way, can move a monthly line by that alone. The test looks for steady change, so a rise and a fall within the period cancel out."), working(React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Which pollsters count where."), " Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+.", " ", xref("generations", "who votes for whom", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at their shares of the 2025 vote. ACT/NT/Tas also stands alone, from YouGov\u2019s printed trio and DemosAU\u2019s modelling, with Tasmania-, ACT- and NT-only readings (Roy Morgan, EMRS, and the modelled cuts) drawn beside it as comparison points and pooled into nothing. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
+      }, React.createElement("b", null, "Which pollsters count where."), " A pollster counts for a group only where it draws the group the same way as the others; the table below lists who counts for each. YouGov\u2019s age bands are 35\u201349 and 50+, so it counts at 18\u201334 alone.", " ", xref("generations", "who votes for whom", "Generations"), " come from the pollsters that name them. RedBridge\u2019s two school rows are combined in proportion to its own group sizes, and YouGov\u2019s SA, WA, and ACT/NT/Tas columns into the non-eastern mainland at their shares of the 2025 vote. Tasmania-only readings (Roy Morgan, EMRS) are drawn beside ACT/NT/Tas as comparison points and pooled into nothing; DemosAU\u2019s modelled Tasmania, ACT and NT rows are drawn there one by one too, and count only combined, at their shares of the 2025 vote. DemosAU counts for the two metropolitan areas only, since its third combines provincial and rural voters, and RedBridge for owners only, since its renters include others who don\u2019t own. The modelled polls (MRP) from DemosAU and YouGov count as one poll each, placed at the middle of their fieldwork as the headline places every poll, though that fieldwork can run past six weeks. Their group figures are the model\u2019s estimates, not a table of answers."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Newspoll\u2019s tables."), " Newspoll publishes its groups only every three months, in one table combining the three or four polls it ran in that time. The table counts as those polls, each at its own dates and sample, so it joins the six-week window only through the polls inside it. In the test for change over time it counts once, in its middle month: spread across its polls, one table would read as several readings that happen to agree."), demoRoster, React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Pooling."), " The gaps are weighted as the headline\u2019s polls are, so newer and larger polls count for more. A group\u2019s 95% margin is the interval taken over its pooled gaps, each poll\u2019s sample for the group being the poll\u2019s sample times the group\u2019s share of adults."), React.createElement("span", {
         className: "info-p"
@@ -37419,7 +37460,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "A check."), " Every table is checked before it\u2019s used: each group must add up to 100, give or take rounding, and an all-voters column must match the poll\u2019s published vote."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Sources."), " Resolve\u2019s monthly age, gender, and state series (its Political Monitor interactive), YouGov\u2019s published crosstabs, RedBridge\u2019s report tables, and DemosAU\u2019s report charts, measured from the chart in each report because small bars carry no label. Each poll\u2019s figures for these groups are in the All polls export."), demoWork)))
+      }, React.createElement("b", null, "Sources."), " Resolve\u2019s monthly age, gender, and state series (its Political Monitor interactive), YouGov\u2019s published crosstabs, RedBridge\u2019s report tables, Newspoll\u2019s quarterly tables in The Australian, and DemosAU\u2019s report charts, measured from the chart in each report because small bars carry no label. Each poll\u2019s figures for these groups are in the All polls export."), demoWork)))
     },
     entries: [{
       id: "generations",
@@ -42935,7 +42976,8 @@ function RdPrimary({
       sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "")
     };
   }).filter(Boolean)) : [];
-  const scatter = React.useMemo(() => D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => {
+  const inDom = x => x >= xDomain[0] && x <= xDomain[1];
+  const scatter = React.useMemo(() => D.individualPolls.filter(q => inDom(q.x) || G && q.grp && q.grp.sp).flatMap(q => {
     if (!G) return parts.filter(p => q.p && q.p[p.id] != null).map(p => ({
       x: q.x,
       y: q.p[p.id],
@@ -42946,24 +42988,25 @@ function RdPrimary({
     }));
     const gv = q.grp && q.grp.v && q.grp.v[gi],
       tt = q.grp && q.grp.t;
-    if (!gv || !tt) return soloDotsOf(q);
-    const M = aggByYm && aggByYm.get(q.ym);
-    if (!M) return soloDotsOf(q);
-    return parts.map(p => {
-      const i = GRPV_KEYS.indexOf(p.id);
-      if (gv[i] == null || tt[i] == null) return null;
-      const subn = q.grp.n && q.grp.n[gi];
-      return {
-        x: q.x,
-        y: M[p.id] + (gv[i] - tt[i]),
-        gv: gv[i],
-        color: p.color,
-        label: p.name,
-        meta: q,
-        party: p.id,
-        sub: subn ? "n ≈ " + subn.toLocaleString() : undefined
-      };
-    }).filter(Boolean).concat(soloDotsOf(q));
+    if (!gv || !tt) return inDom(q.x) ? soloDotsOf(q) : [];
+    return demoGrpAt(q).filter(s => inDom(s.x)).flatMap(s => {
+      const M = aggByYm && aggByYm.get(s.ym);
+      if (!M) return [];
+      return parts.map(p => {
+        const i = GRPV_KEYS.indexOf(p.id);
+        if (gv[i] == null || tt[i] == null) return null;
+        return {
+          x: s.x,
+          y: M[p.id] + (gv[i] - tt[i]),
+          gv: gv[i],
+          color: p.color,
+          label: p.name,
+          meta: demoPartMeta(q, s),
+          party: p.id,
+          sub: demoPartSub(q, s, q.grp.n && q.grp.n[gi])
+        };
+      }).filter(Boolean);
+    }).concat(inDom(q.x) ? soloDotsOf(q) : []);
   }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map(d => hidden[d.party] ? {
     ...d,
@@ -43398,6 +43441,8 @@ function RdLeadership({
     return l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l);
   };
   const jApprBy = fav => jHouses(q => q.appr && ["alb", "taylor", "hanson"].some(k => q.appr[k + "Net"] != null && (q.appr.metricBy || {})[k] === "fav" === fav));
+  const capped = l => l && l.length ? l.length > 5 ? l.slice(0, 3).join(", ") + " and others" : rdList(l) : "";
+  const apprBy = fav => J ? jApprBy(fav) : capped(fav ? D.favHouses : D.apprHouses);
   const [ppmView, setPpmView] = useState(() => (J && !(N.alb_pref && N.taylor_pref) && N.alb_pref3 ? "three" : "two"));
   const ppmSlot = v => v === "three" ? "three" : "two";
   const [ppmMorph, choosePpm] = window.AP.useMorph(ppmView, v => setPpmView(v), (from, to) => ppmSlot(from) !== ppmSlot(to));
@@ -44279,12 +44324,12 @@ function RdLeadership({
         title: "Net favourability of " + leaderNames,
         sub: "Favourable minus unfavourable views of each leader as a person, month by month",
         legend: [],
-        caption: keyDots + (J ? " Polls by " + jApprBy(true) + "." : " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy.")
+        caption: keyDots + " Polls by " + apprBy(true) + "."
       } : {
         title: "Net approval of " + leaderNames,
         sub: "Approve minus disapprove of the job each leader is doing, month by month",
         legend: [],
-        caption: keyDots + (J ? " Polls by " + jApprBy(false) + "." : " Polls by Newspoll, YouGov, Resolve, Essential and others.")
+        caption: keyDots + " Polls by " + apprBy(false) + "."
       },
       extraRows: i => {
         const r = spine[i];
@@ -44590,7 +44635,7 @@ function RdLeadership({
     id: "leadership",
     cls: "rd-lead",
     title: "Leadership",
-    meta: J ? "Preferred " + J.office.alb + " and net approval, " + jHouses(q => !!(q.ppm || q.ppmSets || q.appr && (q.appr.albNet != null || q.appr.taylorNet != null))) : "Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others"
+    meta: J ? "Preferred " + J.office.alb + " and net approval, " + jHouses(q => !!(q.ppm || q.ppmSets || q.appr && (q.appr.albNet != null || q.appr.taylorNet != null))) : "Preferred PM and net approval, " + capped(D.apprHouses)
   }, story && React.createElement(RdHed, {
     head: story.head,
     dek: story.dek
@@ -44627,7 +44672,7 @@ function RdLeadership({
     items: []
   }, React.createElement("span", {
     className: "rd-ld-keytxt"
-  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests." : keyLead + "; three-way figures are shares of all respondents."))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + (J ? jApprBy(true) + "." : "RedBridge, DemosAU, Freshwater and Spectre Strategy.") : "Approve minus disapprove of the job each leader is doing. " + (J ? jApprBy(false) + "." : "Newspoll, YouGov, Resolve, Essential and others."), React.createElement(RdTabs, {
+  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests." : keyLead + "; three-way figures are shares of all respondents."))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + apprBy(true) + "." : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".", React.createElement(RdTabs, {
     swipe: true,
     value: metric,
     onChange: pickMetric,
@@ -46106,18 +46151,22 @@ function RdDemographics({
         x: D.mx(m[0]),
         y: m[1 + ki]
       })).filter(d => d.x >= firstX - 0.01), x0);
-      const dots = D.individualPolls.filter(q => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap(q => drawn.map(l => {
+      const dots = D.individualPolls.filter(q => q.grp && q.grp.t).flatMap(q => demoGrpAt(q).filter(s => s.x >= x0 && s.x <= x1).flatMap(s => drawn.map(l => {
         const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
         const sum = v ? v.reduce((a, b) => a + (b || 0), 0) : 0;
-        const base = allAt.get(q.ym);
+        const base = allAt.get(s.ym);
         return v && v[gpi] != null && sum > 0 && q.grp.t[gpi] > 0 && base != null ? {
-          x: q.x,
+          x: s.x,
           y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1),
           color: l.color,
           label: l.g.label,
-          meta: q
+          meta: demoPartMeta(q, s),
+          ...(s.part != null ? {
+            part: s.part,
+            sub: demoPartSub(q, s)
+          } : {})
         } : null;
-      }).filter(Boolean));
+      }).filter(Boolean)));
       const solo = st.id === "state" ? D.individualPolls.filter(q => q.solo && q.x >= x0 && q.x <= x1).flatMap(q => q.solo.flatMap(e => {
         const sv = e[pty];
         if (sv == null) return [];
@@ -46254,7 +46303,7 @@ function RdDemographics({
         value: cs.join(", ")
       }] : [];
     };
-    const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.label) : null;
+    const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.label + (d.part != null ? "|" + d.part : "")) : null;
     const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
     const yDom = A ? window.AP.blendDomain([0, fromYMax], [0, yMax], t) : [0, yMax];
     const head = React.createElement("div", {
@@ -60082,7 +60131,13 @@ function RdFlows() {
     className: "rd-ff-t"
   }, "RedBridge/Accent\u2019s respondent-allocated preferences"), React.createElement("p", {
     className: "rd-ff-d"
-  }, "RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently perform better than respondent-allocated preference flows, in that domain.")), React.createElement("div", {
+  }, "RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently ", React.createElement("a", {
+    className: "rd-link",
+    href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
+  }, "perform better", React.createElement("span", {
+    className: "rd-apd-ext",
+    "aria-hidden": "true"
+  }, "\u2197")), " than respondent-allocated preference flows, in that domain.")), React.createElement("div", {
     className: "rd-fl-two rd-ff-two"
   }, React.createElement("div", {
     className: "rd-fl-one"
