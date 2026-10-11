@@ -141,22 +141,15 @@ function rdEffTbc(p) {
   return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
     && q.released < p.released && Date.parse(q.released) >= since);
 }
-/* "TBC" links to where the house will publish the figure: YouGov's APC
-   methodology page (it sets out why the effective sample trails the
-   release), Accent Research's projects page (the RedBridge report and its
-   methodology PDF land there days after the AFR story), Ipsos's disclosure
-   statements page (its APC statements feed it months late). */
-const RD_EFF_TBC_URL = {
-  YouGov: "https://yougov.com/about/methodology/australian-polling-council",
-  "RedBridge/Accent": "https://www.accent-research.com/projects",
-  Ipsos: "https://www.ipsos.com/en-au/polling-methodology-disclosure-statements",
-};
+/* "TBC" links to the Australian Polling Council's statements register
+   (pyxispolling.com/apc) - every house's methodology statement lands there,
+   so it is where the pending effective sample will appear (user call
+   2026-10-12; replaced per-house guesses: YouGov's own APC page, Accent's
+   projects page, Ipsos's disclosure statements page). */
+const RD_EFF_TBC_URL = "https://pyxispolling.com/apc";
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
-  const url = RD_EFF_TBC_URL[p.pollster] || null;
-  return <>eff. {url
-    ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
-    : <span title={note}>TBC</span>}</>;
+  return <>eff. <a className="rd-tbc" href={RD_EFF_TBC_URL} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a></>;
 }
 /* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
    article before the methodology PDF; a Resolve wave filed from the monitor
