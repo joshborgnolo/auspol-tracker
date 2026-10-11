@@ -27,9 +27,10 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
    that reaches Labor, with its own ± range in FP_ON_BAND. No count of that
    final pairing has ever run nationally, so unlike FLOW this table is built,
    not counted. Revised 2026-10-11 from .315/.89/.53 (bands .025/.03/.03);
+   the Coalition cell then to .30 the same day, towards Bonham's .29;
    the working, with sources, is on /preference-flows/.
 
-     Coalition .315 ± .03. 2025 Senate ballots put One Nation ahead of Labor
+     Coalition .30 ± .03. 2025 Senate ballots put One Nation ahead of Labor
        on 74.7% of Coalition ballots (75.5 without the ACT, where it ran no
        group). The two 2026 lower-house readings of LIBERAL voters sit lower:
        South Australia ~66 (Kevin Bonham's estimate from the published
@@ -41,7 +42,10 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
        least inclined to One Nation: together 2-4 points towards One Nation
        nationally. The counts' One Nation-strong seats, and the 2025 cards
        that put Labor first in seven urban seats, pull back. Net 30-32 to
-       Labor; the band takes in Bonham's 71-72% to One Nation.
+       Labor on this reading; Kevin Bonham's independent estimate is 29 (71%
+       to One Nation). Set at 30 on 2026-10-11 (was .315): with the evidence
+       genuinely split, meeting an independent estimate partway beats
+       either alone. The band (27-33) takes in both and SA's raw ~34.
      Greens .91 ± .025. 88.2 reached Labor against the Coalition in 2025,
        and every like-for-like comparison has Greens voters favouring Labor
        more against One Nation: Senate ballots +4.6, Green's SA three-way
@@ -55,7 +59,7 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
    FP_ON_BAND is a range, not a sampling interval. gen-data stacks it
    linearly at each poll's primaries, and quotes the figure with that range
    and the polls' own sampling margin added in quadrature. */
-export const FP_ON = Object.freeze({ lnp: 0.315, grn: 0.91, oth: 0.55 });
+export const FP_ON = Object.freeze({ lnp: 0.30, grn: 0.91, oth: 0.55 });
 export const FP_ON_BAND = Object.freeze({ lnp: 0.03, grn: 0.025, oth: 0.04 });
 
 /* Three-cornered contests — the term the formula below was missing.

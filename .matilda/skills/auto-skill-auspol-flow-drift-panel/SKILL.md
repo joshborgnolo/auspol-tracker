@@ -1,6 +1,6 @@
 ---
 name: auspol-flow-drift-panel
-description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.315, grn 0.89, oth 0.53} (AEC 2025 Senate ATL ballots, LNP cell recalibrated 2026-09-11 on Green's Secret Harbour analysis + the SA 2026 count; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
+description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.30, grn 0.91, oth 0.55} in flows.mjs (AEC 2025 Senate ATL ballots read through the 2026 SA and Secret Harbour contests, revised 2026-10-11; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
 source: auto-skill
 extracted_at: '2026-09-07T00:00:00.000Z'
 ---
@@ -59,7 +59,7 @@ rebasing, monthWithSe/nowcastAdj pooling, wave-equal ridge with pooled
 σ̂²w — cloned as a parallel block right after §7c with the constants
 prefixed `FLOW_ON_*`. The differences are the ones the data forces:
 
-- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.315, grn 0.91,
+- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.30, grn 0.91,
   oth 0.55}` fractions in flows.mjs since 2026-10-11 — imported by gen-data
   AND by flow-drift-check.mjs, like FLOW — with `FP_ON_BAND =
   {lnp 0.03, grn 0.025, oth 0.04}` the set's own ± range, stacked linearly
@@ -68,9 +68,9 @@ prefixed `FLOW_ON_*`. The differences are the ones the data forces:
   through the 2026 lower-house contests (Bonham's SA estimate ~66 Lib→ON;
   Green's Secret Harbour early-voting-centre sample 70.2, full count "high
   60s") with national allowances (Nationals, state lean). The LNP cell was
-  recalibrated 2026-09-11 (0.28→0.315); Greens/others revised 2026-10-11
+  recalibrated 2026-09-11 (0.28→0.315) and 2026-10-11 to 0.30 (towards Bonham's 0.29); Greens/others revised 2026-10-11
   (0.89/0.53 → 0.91/0.55) on like-for-like evidence. ON-side shares
-  Coal→ON 68.5 (65.5–71.5), GRN→ON 9 (6.5–11.5), others→ON 45 (41–49),
+  Coal→ON 70 (67–73), GRN→ON 9 (6.5–11.5), others→ON 45 (41–49),
   carried ALP-side; provenance in the flows.mjs comment. No election ever counts a
   Labor-v-ON pairing, so there is no election anchor — `impliedOn(p) =
   p.alp + p.lnp·FP_ON.lnp + p.grn·FP_ON.grn + (ind+oth)·FP_ON.oth`.

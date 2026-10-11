@@ -3629,7 +3629,7 @@ const flowDrift = {
       2026 lower-house contests where One Nation made the final two (Bonham's
       SA estimate, Green's Secret Harbour count) with the adjustments a
       national figure needs (Nationals voters, state lean). Cells and
-      provenance live with FP_ON in flows.mjs: 31.5 / 91 / 55 to Labor,
+      provenance live with FP_ON in flows.mjs: 30 / 91 / 55 to Labor,
       ± 3 / 2.5 / 4 (revised 2026-10-11 from 31.5 / 89 / 53, ± 2.5 / 3 / 3;
       the Coalition cell came down from 72% to One Nation on 2026-09-11).
       This is the

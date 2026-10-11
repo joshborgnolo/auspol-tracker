@@ -54,7 +54,7 @@ D.* payloads); for the chart surface itself read
 - gen-data ALP–ON emit (0365ba4) — `synthOn` (monthly implied ALP–ON
   points), `latest.onImp` = {a, b, band, flows, n, aPrev}, and per-poll
   `alpOnImp`. ALP–ON flow constants live in flows.mjs since 2026-10-11:
-  FP_ON={lnp:0.315, grn:0.91, oth:0.55}, bands .03/.025/.04. The Coalition
+  FP_ON={lnp:0.30, grn:0.91, oth:0.55}, bands .03/.025/.04. The Coalition
   cell was recalibrated 2026-09-11 (0.72→0.685 to ON) and the Greens/others
   cells revised 2026-10-11 (0.89/0.53 → 0.91/0.55) after a sourced review
   (memory alp-on-flow-review) — both post-date the user's Downloads-side

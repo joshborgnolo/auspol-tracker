@@ -146,8 +146,8 @@ fully explained a 2–3pt divergence with zero bugs found. Companion skills:
   (flows.mjs; see auspol-flow-drift-panel). Live comparison (Sep 2026):
   51.8–48.2 (his) vs 50.7–49.3 (ours) — a 1.1pt gap, then inside our
   printed ±1.1 flow band. Since 2026-10-11 (Greens .91 / others .55) the two
-  TABLES sit ~0.5pt apart on current primaries (his 71/9/45 v our
-  68.5/9/45 to ON), and our ± is the margin of sampling and flows. Cite HIS critique when a reader cites a pollster's
+  TABLES sit ~0.2pt apart on current primaries (his 71/9/45 v our
+  70/9/45 to ON; the Coalition cell met him partway on 2026-10-11), and our ± is the margin of sampling and flows. Cite HIS critique when a reader cites a pollster's
   respondent-allocated ON pair rather than re-deriving the argument.
 - Morgan's weekly cadence and any small-house presence are style differences
   that move ≤0.6pt in arms — don't burn triage time there before checking the

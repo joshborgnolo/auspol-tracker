@@ -199,7 +199,7 @@ const ALT_BY = new Map(D.altTpp.map((r) => [r.date + "|" + r.firm, { ao: r.alpVs
       — and no election count of an ALP-v-ON pairing exists, so the frozen
       table cannot be election-anchored like §7c's. It is BUILT, and like
       §7c's table it is imported, not copied: FP_ON in flows.mjs, where its
-      provenance lives (31.5 / 91 / 55 to Labor since 2026-10-11).
+      provenance lives (30 / 91 / 55 to Labor since 2026-10-11).
       This is the
       table the page QUOTES the pairing on (§7f), and it was chosen over
       RedBridge/Accent's respondent-allocated splits (tpp_split_on — the
