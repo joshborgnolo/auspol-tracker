@@ -6535,7 +6535,20 @@
       "opp": 9,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 45,
+          "dis": 42
+        },
+        "opp": {
+          "app": 38,
+          "dis": 29
+        },
+        "fav": {
+          "alb": 4,
+          "opp": 11
+        }
+      }
     },
     {
       "date": "2025-07-29",
@@ -6567,11 +6580,24 @@
     {
       "date": "2025-08-16",
       "firm": "Resolve",
-      "alb": -2,
+      "alb": -1,
       "opp": 9,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 43,
+          "dis": 44
+        },
+        "opp": {
+          "app": 38,
+          "dis": 29
+        },
+        "fav": {
+          "alb": 3,
+          "opp": 10
+        }
+      }
     },
     {
       "date": "2025-08-26",
@@ -6621,7 +6647,20 @@
       "opp": 9,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 44,
+          "dis": 45
+        },
+        "opp": {
+          "app": 41,
+          "dis": 32
+        },
+        "fav": {
+          "alb": -5,
+          "opp": 6
+        }
+      }
     },
     {
       "date": "2025-09-29",
@@ -6679,8 +6718,21 @@
       "alb": -6,
       "opp": -5,
       "oppName": "Ley",
-      "han": null,
-      "detail": null
+      "han": 1,
+      "detail": {
+        "alb": {
+          "app": 41,
+          "dis": 47
+        },
+        "opp": {
+          "app": 33,
+          "dis": 38
+        },
+        "fav": {
+          "alb": 0,
+          "opp": 1
+        }
+      }
     },
     {
       "date": "2025-10-20",
@@ -6731,10 +6783,23 @@
       "date": "2025-11-08",
       "firm": "Resolve",
       "alb": 0,
-      "opp": -8,
+      "opp": -7,
       "oppName": "Ley",
-      "han": null,
-      "detail": null
+      "han": 8,
+      "detail": {
+        "alb": {
+          "app": 44,
+          "dis": 44
+        },
+        "opp": {
+          "app": 34,
+          "dis": 41
+        },
+        "fav": {
+          "alb": -1,
+          "opp": -1
+        }
+      }
     },
     {
       "date": "2025-11-09",
@@ -6814,7 +6879,7 @@
       "alb": 6,
       "opp": 2,
       "oppName": "Ley",
-      "han": null,
+      "han": 3,
       "detail": {
         "alb": {
           "app": 48,
@@ -6884,13 +6949,17 @@
       "date": "2025-12-20",
       "firm": "Resolve",
       "alb": -9,
-      "opp": -4,
+      "opp": -3,
       "oppName": "Ley",
       "han": null,
       "detail": {
         "alb": {
           "app": 40,
           "dis": 49
+        },
+        "opp": {
+          "app": 37,
+          "dis": 40
         },
         "fav": {
           "alb": -5,
@@ -6936,7 +7005,7 @@
       "alb": -22,
       "opp": -8,
       "oppName": "Ley",
-      "han": null,
+      "han": 15,
       "detail": {
         "alb": {
           "app": 34,
@@ -6947,7 +7016,8 @@
           "dis": 43
         },
         "fav": {
-          "alb": -15
+          "alb": -15,
+          "opp": -2
         }
       }
     },
@@ -7156,18 +7226,22 @@
     {
       "date": "2026-03-14",
       "firm": "Resolve",
-      "alb": -16,
-      "opp": 9,
+      "alb": -17,
+      "opp": 10,
       "oppName": "Taylor",
-      "han": null,
+      "han": 10,
       "detail": {
         "alb": {
-          "app": 36,
+          "app": 35,
           "dis": 52
         },
         "opp": {
-          "app": 35,
+          "app": 36,
           "dis": 26
+        },
+        "fav": {
+          "alb": -12,
+          "opp": 13
         }
       }
     },
@@ -7330,17 +7404,21 @@
       "date": "2026-04-18",
       "firm": "Resolve",
       "alb": -15,
-      "opp": 12,
+      "opp": 15,
       "oppName": "Taylor",
-      "han": null,
+      "han": 6,
       "detail": {
         "alb": {
           "app": 37,
           "dis": 52
         },
         "opp": {
-          "app": 34,
-          "dis": 22
+          "app": 41,
+          "dis": 26
+        },
+        "fav": {
+          "alb": -12,
+          "opp": 16
         }
       }
     },
@@ -7600,7 +7678,7 @@
       "alb": -20,
       "opp": 6,
       "oppName": "Taylor",
-      "han": null,
+      "han": 14,
       "detail": {
         "alb": {
           "app": 35,
@@ -7758,9 +7836,9 @@
       "date": "2026-07-11",
       "firm": "Resolve",
       "alb": -14,
-      "opp": 7,
+      "opp": 6,
       "oppName": "Taylor",
-      "han": 3,
+      "han": null,
       "detail": {
         "alb": {
           "app": 39,
@@ -7768,7 +7846,11 @@
         },
         "opp": {
           "app": 41,
-          "dis": 34
+          "dis": 35
+        },
+        "fav": {
+          "alb": -15,
+          "han": 3
         }
       }
     },
@@ -7931,7 +8013,7 @@
       "date": "2026-08-15",
       "firm": "Resolve",
       "alb": -16,
-      "opp": 7,
+      "opp": 8,
       "oppName": "Taylor",
       "han": 5,
       "detail": {
@@ -7940,7 +8022,7 @@
           "dis": 53
         },
         "opp": {
-          "app": 40,
+          "app": 41,
           "dis": 33
         },
         "han": {
@@ -8080,7 +8162,7 @@
       "alb": -18,
       "opp": 9,
       "oppName": "Taylor",
-      "han": null,
+      "han": 10,
       "detail": {
         "alb": {
           "app": 35,
@@ -8089,6 +8171,15 @@
         "opp": {
           "app": 39,
           "dis": 30
+        },
+        "han": {
+          "app": 47,
+          "dis": 37
+        },
+        "fav": {
+          "alb": -16,
+          "opp": 10,
+          "han": 7
         }
       },
       "assimilated": true
@@ -8213,9 +8304,9 @@
       "date": "2026-10-10",
       "firm": "Resolve",
       "alb": -18,
-      "opp": 9,
+      "opp": 7,
       "oppName": "Taylor",
-      "han": null,
+      "han": 4,
       "detail": {
         "alb": {
           "app": 36,
@@ -8223,7 +8314,16 @@
         },
         "opp": {
           "app": 41,
-          "dis": 32
+          "dis": 34
+        },
+        "han": {
+          "app": 45,
+          "dis": 41
+        },
+        "fav": {
+          "alb": -15,
+          "opp": 8,
+          "han": 0
         }
       },
       "assimilated": true

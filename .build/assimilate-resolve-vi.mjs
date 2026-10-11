@@ -280,17 +280,31 @@ if (pmName && /albanese/i.test(pmName) && oppLeaderName) {
       statusWarnings.push(`approval wave ${waveDate} skipped — incomplete leadership ratings`);
       continue;
     }
+    // A total that its own unrounded components contradict is a payload
+    // defect, not rounding: the 2026-10-11 wave's Taylor TOTAL POOR was 32 (a
+    // copy of "Good") while Poor 18.3 + Very poor 15.31 = 33.61, and the SMH
+    // story printed 34 ("rose 4 points to 34 per cent"). Pre-Oct-2026 waves
+    // carry whole-number components, where a 1-point gap is the house's own
+    // rounding and its total stands.
+    const tot = (w, T, a, b, who) => {
+      const sum = w[a] != null && w[b] != null ? w[a] + w[b] : null;
+      const unrounded = [w[a], w[b]].some((v) => v != null && !Number.isInteger(v));
+      if (unrounded && Math.abs(w[T] - sum) > 0.6) {
+        statusWarnings.push(`approval wave ${waveDate}: ${who} ${T} ${w[T]} contradicts ${a} + ${b} = ${sum.toFixed(2)}; filed the components' sum`);
+        return r0(sum);
+      }
+      return r0(w[T]);
+    };
+    const sp = (w, who) => ({ app: tot(w, "TOTAL GOOD", "Very good", "Good", who), dis: tot(w, "TOTAL POOR", "Poor", "Very poor", who) });
+    const albS = sp(pmW, "PM"), oppS = sp(oppW, "opposition leader");
     const row = {
       date,
       firm: FIRM,
-      alb: r0(pmW["TOTAL GOOD"]) - r0(pmW["TOTAL POOR"]),
-      opp: r0(oppW["TOTAL GOOD"]) - r0(oppW["TOTAL POOR"]),
+      alb: albS.app - albS.dis,
+      opp: oppS.app - oppS.dis,
       oppName: surname(oppLeaderName),
       han: null,
-      detail: {
-        alb: { app: r0(pmW["TOTAL GOOD"]), dis: r0(pmW["TOTAL POOR"]) },
-        opp: { app: r0(oppW["TOTAL GOOD"]), dis: r0(oppW["TOTAL POOR"]) },
-      },
+      detail: { alb: albS, opp: oppS },
       assimilated: true,
     };
     if (existing.some((p) => days(p.date, date) <= 10 && p.alb === row.alb && p.opp === row.opp)) continue;
