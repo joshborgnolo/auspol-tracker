@@ -63,8 +63,10 @@ assert.deepEqual(gd.ownership.col.total, { alp: 29, lnp: 19, onp: 13, grn: 6, eq
 assert.ok(gd.salience.col.dims.vote.Coalition, "December's vote groups print the Coalition whole");
 
 // ---- a wave printed twice agrees: each report's previous wave is the one before's own ----
+// afr-seen.json (the reader's settled-story ledger) shares the dir but is no report
 const byDate = fs.readdirSync(RB).filter((f) => f.endsWith(".json"))
-  .map((f) => JSON.parse(fs.readFileSync(path.join(RB, f), "utf8")).date).sort();
+  .map((f) => JSON.parse(fs.readFileSync(path.join(RB, f), "utf8")).date)
+  .filter((d) => typeof d === "string").sort();
 let compared = 0;
 for (let i = 1; i < byDate.length; i++) {
   const a = rbSalienceSummary(report(byDate[i - 1])), b = rbSalienceSummary(report(byDate[i]));
