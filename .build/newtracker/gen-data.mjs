@@ -2860,13 +2860,15 @@ const demoPollOf = (w) => {
   return POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
     .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0] || null;
 };
-/* Multi-month pooled cross-sections (Newspoll's ~75-day quarterly tables,
-   n≈5,000; Roy Morgan's seven-month country-of-birth pool, n≈26,000)
-   average their whole collection window, so none reads as one fieldwork
-   wave: dated at its end, a quarter would sit in its last month as if
-   freshly polled. Normal waves span at most 27 days (Roy Morgan's combined
-   Christmas fortnight ending 2025-11-16); 35 sits between that and the
-   thinnest pooled wave (75d).
+/* Pooled releases (Newspoll's ~75-day quarterly tables, n≈5,000; Roy
+   Morgan's seven-month country-of-birth pool, n≈26,000) combine a house's
+   regular waves, so none reads as one fieldwork wave: dated at its end, a
+   quarter would sit in its last month as if freshly polled. The "(pooled)"
+   label marks them, not the fieldwork's length: a single long survey – the
+   MRPs, 37–49 days for DemosAU's – is one reading, placed exactly as the
+   headline places every poll (midpoint for the window, end month for the
+   line, rowN), and counts in §7g as it does there (ruling 2026-10-11; the
+   35-day span test that kept the MRPs out went with it).
    A "(pooled)" release is the house's own regular waves inside its dates,
    their tables combined – each of Newspoll's five so far is exactly its
    three or four fortnightly waves, samples summing to the pool's n – so
@@ -2877,8 +2879,7 @@ const demoPollOf = (w) => {
    since those waves' own figures are already in them. A long wave whose
    parts can't be found or don't sum to its sample has none (null), and
    sits out of §7g altogether. (Ruling 2026-10-11.) */
-const POOLED_WAVE_DAYS = 35;
-const isPooledSpan = (r) => Date.parse(r.date) - Date.parse(r.dateStart || r.date) > POOLED_WAVE_DAYS * 864e5;
+const isPooledRelease = (r) => / \(pooled\)$/.test(r.pollster || "");
 const pooledParts = (p) => {
   const house = p && p.sample ? p.pollster.replace(/ \(pooled\)$/, "") : null;
   if (!house || house === p.pollster) return null;
@@ -2938,7 +2939,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
      the part's month, `k` its weighting n over the release's (so the
      group's n × k is the part's, as §7g sizes it), `l` its fieldwork –
      never one dot at the release's end month */
-  const pp = v.some(Boolean) && isPooledSpan(p) ? pooledParts(p) : null;
+  const pp = v.some(Boolean) && isPooledRelease(p) ? pooledParts(p) : null;
   // a wave everything harmonised out of (the pooled birth-country release
   // joins no common group) still carries its raw cuts to the facet
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
@@ -3950,7 +3951,7 @@ const DEMO_LOC_ELECTION = {
    total are both taken to 100 first), so each group sums to its anchor's
    total; a group is rescaled only when a share is clamped at zero, and then
    to that total. */
-/* A pooled release (POOLED_WAVE_DAYS, §5c) joins as the waves it pooled
+/* A pooled release (isPooledRelease, §5c) joins as the waves it pooled
    (pooledParts): each part's rows carry the release's gaps at the part's
    own mid-date and month, sized as that wave (rowN), so
    the window takes in only the parts inside it and each month's line only
@@ -3978,8 +3979,8 @@ const demographics = (() => {
     if (!tot) continue;
     const r0 = p || w, n = rowN(p || { sample: w.sample });
     // a pooled release reads as its parts; one without parts sits out
-    const parts = isPooledSpan(r0) ? pooledParts(p) : null;
-    if (isPooledSpan(r0) && !parts) continue;
+    const parts = isPooledRelease(w) ? pooledParts(p) : null;
+    if (isPooledRelease(w) && !parts) continue;
     const reads = (parts || [r0]).map((q) => ({ mid: midMs(q), ym: ymOf(q.date), n: parts ? rowN(q) : n }));
     const h = harmonize(w);
     // the fieldwork label the Who-votes rug cites for each dot's poll

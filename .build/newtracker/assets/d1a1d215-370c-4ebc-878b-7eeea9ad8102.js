@@ -6686,7 +6686,7 @@ function infoTerms(D) {
   /* which pollsters have fed each group, ever (gen-data's demographics.roster,
      derived from the pooled rows): a set's groups share a row where the same
      houses feed them */
-  const DEMO_ROSTER_NAME = { "RedBridge/Accent": "RedBridge", "Newspoll (pooled)": "Newspoll", "YouGov (MRP)": "YouGov’s MRP" };
+  const DEMO_ROSTER_NAME = { "RedBridge/Accent": "RedBridge", "Newspoll (pooled)": "Newspoll", "YouGov (MRP)": "YouGov’s MRP", "DemosAU (MRP)": "DemosAU’s MRP" };
   const demoRoster = DEMO && DEMO.roster && DEMO.roster.length ? (
     <div className="info-work-wrap">
       <table className="info-work info-work-list">
@@ -7331,12 +7331,15 @@ function infoTerms(D) {
           {" "}{xref("generations", "who votes for whom", "Generations")} come from the pollsters
           that name them. RedBridge’s two school rows are combined in proportion to its own group
           sizes, and YouGov’s SA, WA, and ACT/NT/Tas columns into the non-eastern mainland at their
-          shares of the 2025 vote. Tasmania-, ACT- and NT-only readings (Roy Morgan, EMRS, and
-          DemosAU’s modelling) are drawn beside ACT/NT/Tas as comparison points and pooled into
-          nothing. DemosAU counts for the two metropolitan areas only, since its third combines
-          provincial and rural voters, and RedBridge for owners only, since its renters include
-          others who don’t own. DemosAU’s modelled polls sit out altogether: their fieldwork runs
-          past five weeks.</span>
+          shares of the 2025 vote. Tasmania-only readings (Roy Morgan, EMRS) are drawn beside
+          ACT/NT/Tas as comparison points and pooled into nothing; DemosAU’s modelled Tasmania,
+          ACT and NT rows are drawn there one by one too, and count only combined, at their
+          shares of the 2025 vote. DemosAU counts for the two metropolitan areas only, since its
+          third combines provincial and rural voters, and RedBridge for owners only, since its
+          renters include others who don’t own. The modelled polls (MRP) from DemosAU and YouGov
+          count as one poll each, placed at the middle of their fieldwork as the headline places
+          every poll, though that fieldwork can run past six weeks. Their group figures are the
+          model’s estimates, not a table of answers.</span>
           <span className="info-p"><b>Newspoll’s tables.</b> Newspoll publishes its groups only
           every three months, in one table combining the three or four polls it ran in that time.
           The table counts as those polls, each at its own dates and sample, so it joins the
