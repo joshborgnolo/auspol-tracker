@@ -150,7 +150,11 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
   const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   D.polls = D.polls.filter((p) => !(p.pollster === POOLSTER && dropRows.includes(p.date)));
   fs.writeFileSync(path.join(sb, "data", "polls.json"), JSON.stringify(D, null, 2) + "\n");
-  fs.copyFileSync(path.join(ROOT, "data", "demographics.json"), path.join(sb, "data", "demographics.json"));
+  // validate.mjs's main block gates these data files (its run is the sandbox
+  // gate): keep this list beside its data-parsing checks or Linux CI fails
+  // the step-8/sandboxed validate on "missing or unparseable".
+  for (const f of ["demographics.json", "changelog.json", "pew-econ-sentiment.json"])
+    fs.copyFileSync(path.join(ROOT, "data", f), path.join(sb, "data", f));
   for (const f of ["validate.mjs", "flows.mjs", "house-renames.mjs", "field-tbc.mjs"])
     fs.copyFileSync(path.join(ROOT, ".build", "newtracker", f), path.join(sb, ".build", "newtracker", f));
   const texts = { [Q1_PDF]: q1Text, [Q4_PDF]: Q4_TXT };
@@ -192,9 +196,12 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
   };
   const validate = () => {
     try {
+      // TEMP-DIAG (2026-10-12): child-process marks to localise the CI kill.
+      console.log(`  8.mark validate child spawn (${sb})`);
       execFileSync(process.execPath, [path.join(sb, ".build", "newtracker", "validate.mjs")], { stdio: "pipe" });
+      console.log("  8.mark validate child exit 0");
       return true;
-    } catch (e) { return e.stdout; }
+    } catch (e) { console.log(`  8.mark validate child exit nonzero`); return e.stdout; }
   };
   return { sb, ctx, validate,
     polls: () => JSON.parse(fs.readFileSync(path.join(sb, "data", "polls.json"), "utf8")).polls,
@@ -203,8 +210,14 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
 
 // ---- 8. integration: file Q1 + Q3, dedupe the stale thread ------------------
 {
+  // TEMP-DIAG (2026-10-12): CI runners die after step 7 with no error; the
+  // marks below localise the kill. Remove once the red train is explained.
+  const t0 = Date.now();
+  const mark = (m) => console.log(`  8.mark +${Date.now() - t0}ms ${m}`);
   const { sb, ctx, validate, polls, store } = sandbox();
+  mark("sandbox built");
   const r1 = await run(ctx);
+  mark(`run #1 done exit=${r1.exit}`);
   assert.equal(r1.exit, 0);
   assert.equal(r1.changed, true);
   assert.deepEqual([...r1.filed].sort(), ["Newspoll (pooled)|2026-03-26", "Newspoll (pooled)|2026-09-18"],
@@ -241,12 +254,15 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
   assert.equal(st.waves[1].kind, "infogram");
   assert.deepEqual(st.waves[0].dims, waveOnFile("2026-03-26").dims, "store dims == committed Q1 wave");
   assert.deepEqual(st.waves[1].dims, waveOnFile("2026-09-18").dims, "store dims == committed Q3 wave");
+  mark("asserts r1 done");
   assert.equal(validate(), true, "the sandboxed validator accepts the two plain rows");
+  mark("sandbox validate returned");
   // run #2: nothing new – recon re-parses the two stored waves from source,
   // every discovery item dedupes, and no file is touched.
   const storeBytes = fs.readFileSync(path.join(sb, "data", "newspoll-quarterly.json"), "utf8");
   const pollsBytes = fs.readFileSync(path.join(sb, "data", "polls.json"), "utf8");
   const r2 = await run(ctx);
+  mark("run #2 done");
   assert.equal(r2.exit, 0);
   assert.equal(r2.changed, false, "recon re-parsing the filed waves converges (nothing drifts)");
   assert.deepEqual([...r2.skippedExisting].sort(),
