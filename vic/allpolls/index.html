@@ -19907,6 +19907,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "updatedISO": "2026-09-28",
     "published": "28 September 2026",
     "publishedISO": "2026-09-28",
+    "newest": {
+      "pollster": "Freshwater",
+      "field": "24–28 Sep",
+      "url": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377"
+    },
     "rivalLead": "alp_lnp",
     "primaryOrder": ["lnp", "alp", "onp", "grn", "oth"],
     "nextElectionDue": "Saturday 28 November 2026",
@@ -60530,7 +60535,7 @@ function Header({
   const pastTerms = D.cycles.filter(c => !c.current).length;
   const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
   const J = window.JUR;
-  const rdLatest = rd ? (D.pollsterTable || []).slice().sort((a, b) => a.pubSort < b.pubSort ? 1 : -1)[0] : null;
+  const rdLatest = rd ? D.latest.newest || null : null;
   const rdLatestUrl = rdLatest ? rdLatest.releaseUrl || rdLatest.url : null;
   const rdLatestFact = rdLatest ? rdLatestUrl ? React.createElement("a", {
     className: "mh-latest",

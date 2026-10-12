@@ -519,14 +519,14 @@ const shellNow = (() => {
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
   const L = grab("latest");
-  /* the newest row of pollsterTable, exactly as the main page's Header
-     picks it (pubSort desc) – releaseUrl over a media url citation is the
-     archive emitter's own precedence */
-  const newest = grab("pollsterTable").slice().sort((a, b) => (a.pubSort < b.pubSort ? 1 : -1))[0] || null;
+  /* the newest release by publication, the one the main page's Header
+     names (gen-data's latest.newest; its url is already releaseUrl over a
+     media citation), with the same "TBC" for fieldwork not yet published */
+  const newest = L.newest || null;
   return { latest: { published: L.published, publishedISO: L.publishedISO, nextElectionDue: L.nextElectionDue,
                      pollsTracked: L.pollsTracked, housesTracked: L.housesTracked,
-                     fact: newest ? newest.pollster + ", " + newest.field : null,
-                     factUrl: newest ? (newest.releaseUrl || newest.url || null) : null },
+                     fact: newest ? newest.pollster + ", " + (newest.fieldPending ? "TBC" : newest.field) : null,
+                     factUrl: newest ? newest.url : null },
            past: pastCycleWord(), pollCadence: grab("pollCadence") };
 })();
 /* The masthead's words and artwork as the main page renders them, lifted by

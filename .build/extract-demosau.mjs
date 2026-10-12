@@ -39,10 +39,16 @@
 //     exists only when published as prose ("On a two party preferred basis
 //     Labor leads the Coalition 56-44%" — Oct/Nov 25 MRP); a descriptive
 //     method with no topline figure (Feb/Mar 26 MRP) stays null and is noted.
-//   - MRP seats: the "Projection: Seats Won" table (MRP Estimate / 2025 Seats
-//     / Change) merged with the "Seat Classifications" party ranges (lo–hi),
-//     mapped Labor→alp, One Nation→onp, Coalition→lnp, Green(s)→grn,
-//     Other→ind (CA/KAP sub-splits are not published as tables and stay out).
+//   - MRP seats (demosau-seats.mjs): the "Projection: Seats Won" table (MRP
+//     Estimate / 2025 Seats / Change), or from May–Jul 2026 the "Central
+//     Seat Projection" (Projection / Seat Change), merged with the "Seat
+//     Classifications" party ranges (lo–hi), mapped Labor→alp, One
+//     Nation→onp, Coalition→lnp, Green(s)→grn, Other→oth (until 2026-10-12
+//     `ind`; CA/KAP sub-splits are not published as tables and stay out).
+//     An MRP report can miss the index (May–Jul 2026's was linked only from
+//     a news post), so while an MRP row filed from the Capital Brief article
+//     awaits its report, the site's WordPress media library is asked for MRP
+//     PDFs too; those only ever complete or verify that row.
 // Jan-2026-style releases put the topline table in an image — no anchor row
 // is found — which is fine while that wave already exists in polls.json.
 //
@@ -134,12 +140,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fetchBuffer, passSgCaptcha, FETCH_TRIES } from "./demosau-fetch.mjs";
 import { readDemosau, planCapitalBrief } from "./demosau-read.mjs";
+import { parseSeats } from "./demosau-seats.mjs";
 import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
 const FORCE = argv.includes("--force");
 const INDEX_URL = argv.find((a) => !a.startsWith("--")) || "https://demosau.com/methodology-statements/";
+// the site's WordPress media library, newest MRP uploads first (an MRP
+// report the index never lists: see the media check in main)
+const MEDIA_URL = "https://demosau.com/wp-json/wp/v2/media?search=MRP&per_page=20&orderby=date&order=desc&_fields=date,source_url,title,mime_type";
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/demosau-src";
 const CYCLE_START = "2025-05-04";
@@ -396,32 +406,7 @@ function parseTrendTable(lines) {
 }
 
 // ------------------------------------------------------------- seat tables
-const SEAT_LABEL = { labor: "alp", "one nation": "onp", coalition: "lnp", green: "grn", greens: "grn", other: "ind" };
-
-function parseSeats(text) {
-  const p = {};
-  const projIdx = text.search(/Projection:\s*Seats Won/i);
-  if (projIdx === -1) return { error: "no 'Projection: Seats Won' table" };
-  const proj = text.slice(projIdx, projIdx + 1500);
-  const projRe = /^\s*(Labor|One Nation|Coalition|Greens?|Other)\s+(\d+)\s+(\d+)\s+([+-]?\d+)\s*$/gim;
-  let m;
-  while ((m = projRe.exec(proj))) {
-    const k = SEAT_LABEL[m[1].toLowerCase()];
-    if (k) p[k] = { est: +m[2], chg: +m[4] };
-  }
-  if (Object.keys(p).length < 4) return { error: `seat projection parsed ${Object.keys(p).length}/5 parties` };
-
-  const clsIdx = text.search(/Seat\s*Clas+s?ifications/i);
-  if (clsIdx !== -1) {
-    const cls = text.slice(clsIdx, clsIdx + 1800);
-    const rngRe = new RegExp(`^\\s*(${Object.keys(SEAT_LABEL).map((s) => s[0].toUpperCase() + s.slice(1)).join("|")})\\s+\\d+\\s+\\d+\\s+\\d+\\s+\\d+\\s+(\\d+)\\s*-\\s*(\\d+)\\s*$`, "gim");
-    while ((m = rngRe.exec(cls))) {
-      const k = SEAT_LABEL[m[1].toLowerCase()];
-      if (k && p[k]) { p[k].lo = +m[2]; p[k].hi = +m[3]; }
-    }
-  }
-  return { seats: { total: 150, basis: "2025 election", p } };
-}
+// seat projections: parseSeats, demosau-seats.mjs
 
 // ------------------------------------------------------------ pdf → metrics
 function parsePdf(txt, slug, notes) {
@@ -631,7 +616,8 @@ function viDiffs(e, w) {
   if (w.tpp_lnp != null) cmp("tpp_lnp", w.tpp_lnp, e.tpp_lnp);
   if (w.seats && e.seats?.p)
     for (const [k, v] of Object.entries(w.seats.p)) {
-      const h = e.seats.p[k];
+      // the rows filed before May–Jul 2026 keep the report's Other as `ind`
+      const h = e.seats.p[k] ?? (k === "oth" ? e.seats.p.ind : undefined);
       if (!h) continue;
       if (h.est != null && h.est !== v.est) diffs.push(`seats.${k}.est: pdf=${v.est} vs file=${h.est}`);
       if (h.lo != null && v.lo != null && h.lo !== v.lo) diffs.push(`seats.${k}.lo: pdf=${v.lo} vs file=${h.lo}`);
@@ -654,7 +640,7 @@ function parseWave(txt, slug, isMRP) {
 // load → cache → (re)parse one wave PDF. Cached metrics carry CACHE_V; a
 // stale schema is re-derived from the cached pdftotext (committed alongside)
 // without re-downloading, fetch only when the txt is missing too.
-const CACHE_VER = 2;
+const CACHE_VER = 3; // 3: seats from the "Central Seat Projection" layout, others as `oth` (2026-10-12)
 async function loadWave(url, slug, isMRP) {
   const cachePath = `${SRC_DIR}/${slug}.json`;
   const txtPath = `${SRC_DIR}/${slug}.txt`;
@@ -793,6 +779,29 @@ try {
     if (!(isMRP || isFed) || STATE_RE.test(title)) { status.skipped_titles.push(title); continue; }
     candidates.push({ ...l, pollster: isMRP ? "DemosAU (MRP)" : "DemosAU", isMRP });
   }
+
+  // An MRP's report doesn't always reach the index above: May–Jul 2026's
+  // was linked only from DemosAU's news post. While an MRP row filed from
+  // the article awaits its report (fieldwork TBC, or no seats), ask the
+  // site's media library for MRP PDFs uploaded since that row's fieldwork
+  // began. Such a PDF may only complete or verify a row (matchOnly), never
+  // add one, and the library is asked only while a row is waiting.
+  const awaiting = existing.filter((e) => e.pollster === "DemosAU (MRP)" && (e.fieldworkPending || !e.seats));
+  if (awaiting.length) {
+    try {
+      const since = awaiting.map((e) => e.dateStart || e.date).sort()[0];
+      const media = JSON.parse((await fetchBuffer(MEDIA_URL)).toString("utf8"));
+      for (const m of [].concat(media)) {
+        const url = m?.source_url, title = String(m?.title?.rendered ?? "").replace(/&#8211;/g, "–").replace(/&amp;/g, "&").trim();
+        if (m?.mime_type !== "application/pdf" || typeof url !== "string" || !/^https:\/\/demosau\.com\/wp-content\/uploads\//.test(url)) continue;
+        if (String(m.date || "").slice(0, 10) < since || !/\bMRP\b/i.test(title + " " + url) || STATE_RE.test(title)) continue;
+        if (candidates.some((c) => c.url === url)) continue;
+        candidates.push({ url, title, pollster: "DemosAU (MRP)", isMRP: true, matchOnly: true });
+      }
+    } catch (err) {
+      status.notes.push(`media library check for an awaited MRP report failed: ${err?.message || err}`);
+    }
+  }
   status.candidates = candidates.map((c) => c.title);
 
   mkdirSync(SRC_DIR, { recursive: true });
@@ -857,6 +866,10 @@ try {
       continue;
     }
 
+    if (c.matchOnly) {
+      status.notes.push(`${slug}: an MRP report from the media library that matches no row; not filed from there`);
+      continue;
+    }
     const errs = guardNewWave(w, c.isMRP);
     if (errs.length) { guardFails.push(...errs.map((e) => `${slug}: ${e}`)); continue; }
 

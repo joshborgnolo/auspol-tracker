@@ -3094,6 +3094,23 @@ for (const p of [...directionOnlyPolls, ...issuesOnlyPolls, ...confidenceOnlyPol
    (Jun 2026). Read by both per-poll emitters (as splitCoalEst) and by the
    forced-choice panel below (as est), so the one marks the other. */
 const HAND_SPLIT_ON = new Set(["2026-06-26"]);
+/* A projection's seats as the views list them: Labor, One Nation, the
+   Coalition, the Greens and Others (`oth`). The MRP rows filed before the
+   May–Jul 2026 model split Others into independents, Centre Alliance and
+   KAP (`ind`/`ca`/`kap`), and the redesign's seat line and the CSV read
+   `oth` alone, so those rows showed no Others at all. Folded here: a lone
+   part keeps its range; several sum their central figures and changes
+   (ranges don't add). */
+const seatsOut = (s) => {
+  if (!s?.p || s.p.oth) return s;
+  const parts = ["ind", "ca", "kap"].filter((k) => s.p[k]);
+  if (!parts.length) return s;
+  const sumOf = (f) => (parts.every((k) => s.p[k][f] != null) ? parts.reduce((a, k) => a + s.p[k][f], 0) : null);
+  const oth = parts.length === 1 ? { ...s.p[parts[0]] }
+    : { ...(sumOf("est") != null ? { est: sumOf("est") } : {}), ...(sumOf("chg") != null ? { chg: sumOf("chg") } : {}) };
+  return { ...s, p: { ...Object.fromEntries(Object.entries(s.p).filter(([k]) => !parts.includes(k))), oth } };
+};
+
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
   const fym = p.dateStart ? ymOf(p.dateStart) : null;
@@ -3215,7 +3232,7 @@ const individualPolls = POLLS.map((p) => {
     // seat projections – MRPs only. Carried verbatim; their change basis is the
     // last ELECTION, not the pollster's previous poll, so it travels with the
     // data rather than being inferred by the views.
-    ...(p.seats ? { seats: p.seats } : {}),
+    ...(p.seats ? { seats: seatsOut(p.seats) } : {}),
     // the vote by group and the vote-switching rates, for the CSV export
     ...(DEMO_BY_POLL.has(p.date + "|" + p.pollster) ? { grp: DEMO_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
     // single-territory readings for the ACT/NT/Tas view (§5c; display-only)
@@ -3446,7 +3463,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(ISS_BY.has(p.date + "|" + p.pollster) ? { iss: ISS_BY.get(p.date + "|" + p.pollster) } : {}),
     // a modelled chamber travels with the poll here too, not only into the
     // archive – a projection published this week belongs in Latest polls
-    ...(p.seats ? { seats: p.seats } : {}),
+    ...(p.seats ? { seats: seatsOut(p.seats) } : {}),
   };
 }).sort((a, b) => b.released.localeCompare(a.released));
 
@@ -4784,6 +4801,15 @@ const primaryOrder = (() => {
   return order;
 })();
 
+/* The release the masthead names as its "Latest poll": the newest by
+   PUBLICATION among every poll LATEST_PUB_ISO reads, so the name and the
+   "published …" stamp beside it always come from the same row. It used to
+   be the newest row of the Latest polls table, which leaves out releases
+   that join no aggregate. On 12 Oct 2026 DemosAU's quarterly MRP,
+   published that morning, set the stamp to "today" while the name stayed
+   on the Newspoll from the night before. */
+const NEWEST_PUB = POLLS.reduce((b, p) => ((p.published || p.date) > (b ? b.published || b.date : "") ? p : b), null);
+
 const latest = {
   alp2pp: hlNow.alp, lnp2pp: r1(100 - hlNow.alp),
   alp2ppPrev: hl1mo ? hl1mo.alp : agg2pp[agg2pp.length - 2].alp,
@@ -4811,6 +4837,13 @@ const latest = {
   onImp,
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
   published: fmtDate(LATEST_PUB_ISO), publishedISO: LATEST_PUB_ISO,
+  /* the masthead's "Latest poll" (see NEWEST_PUB): pollster and fieldwork,
+     linked to the release – the pollster's own page over a media citation */
+  newest: NEWEST_PUB && {
+    pollster: NEWEST_PUB.pollster, field: fwLabel(NEWEST_PUB.dateStart, NEWEST_PUB.date),
+    ...(NEWEST_PUB.fieldworkPending ? { fieldPending: true } : {}),
+    url: NEWEST_PUB.releaseUrl || NEWEST_PUB.url || null,
+  },
   /* the id the hero opens on, and the order every legend listing the
      two Labor contests should use */
   rivalLead,
@@ -5843,8 +5876,12 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      release rhythm a reader plans around, and the parent's own walk already
      answers when The Australian's polling next lands. Its slot otherwise
      rode every cadence consumer (the table's Next column, the ticker, the
-     calendar fold) as a second Newspoll-branded entry. */
-  if (NO_AGG_HOUSES.has(firm)) continue;
+     calendar fold) as a second Newspoll-branded entry. A house's MRP series
+     is skipped on the same grounds: a model over months of the house's own
+     polling, whose next poll the parent's walk already projects. DemosAU's
+     quarterly model became measurable with its fourth release (12 Oct 2026)
+     and joined the ticker as "DemosAU (MRP) 78 days (maybe)". */
+  if (NO_AGG_HOUSES.has(firm) || /\(MRP\)$/.test(firm)) continue;
   if (dates.length < CAD_MIN_POLLS) continue;
   // the unbroken dated tail – see CAD_PUB_MIN
   let tail = 0;

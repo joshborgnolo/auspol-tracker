@@ -363,9 +363,13 @@ function Header({ isDark, onToggleTheme, rd }) {
      fails loudly instead of lifting /vic/'s words onto the satellites. */
   const J = window.JUR;
   /* The redesign's status block names the newest poll by its pollster and
-     fieldwork, so the masthead and the sections' "to 21 Sep" agree; the
-     election line counts the months left before it must be held. */
-  const rdLatest = rd ? (D.pollsterTable || []).slice().sort((a, b) => (a.pubSort < b.pubSort ? 1 : -1))[0] : null;
+     fieldwork; the election line counts the months left before it must be
+     held. "Newest" is by publication over every release (gen-data's
+     latest.newest), the row the "published …" stamp beside it comes from:
+     the Latest polls table leaves out releases outside the aggregates, so
+     picking from it named the night-before Newspoll under "published today"
+     when DemosAU's MRP landed (12 Oct 2026). */
+  const rdLatest = rd ? (D.latest.newest || null) : null;
   /* The newest poll's name+fieldwork open the pollster's own release, as a
      plain link styled invisible (a.mh-latest: no underline, no link icon -
      only a click gives it away). releaseUrl over a media `url` citation,

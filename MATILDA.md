@@ -229,7 +229,12 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     FOLLOWUP_DAYS of the newest release that state no figures, or only
     figures on file, are set aside (status.cb_followups), not prompted;
     demosau-updater.sh commits their cached readings so later slots don't
-    re-ask Matilda. Rules: planCapitalBrief.
+    re-ask Matilda. Rules: planCapitalBrief. Such an MRP row then waits
+    for its report: the hourly sweep runs for it (demosau-pending.mjs), and
+    the extractor also asks DemosAU's WordPress media library for MRP PDFs
+    (May–Jul 2026's report never reached the methodology index); a match
+    writes the report's fieldwork and its seat projection
+    (demosau-seats.mjs reads both report layouts, + test-demosau-seats.mjs).
   - REDBRIDGE/ACCENT — `extract-redbridge-afr.mjs` (+`test-redbridge-afr.mjs`,
     `.build/ocr-image.swift`): AFR's Sunday 18:00 article, 4–6 days
     before Accent's PDF; the key figures (Coalition primary, Other, the

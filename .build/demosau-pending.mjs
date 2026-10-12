@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Gate for the DemosAU hourly sweep in demosau-update.yml: exit 0 while a
-// Capital Brief hand-entered wave is still awaiting its methodology PDF.
+// Capital Brief hand-entered wave is still awaiting its methodology PDF —
+// or (2026-10-12) a quarterly MRP filed from the article awaits its report,
+// whose dates and seat projection the extractor fills when it lands.
 // The exit-3 repair path adds the polls row WITHOUT methodUrl; the row only
 // gains one when a human reconciles it against the landed PDF, so "recent
 // DemosAU row with no methodUrl" IS the pending signal — it clears itself at
@@ -27,7 +29,7 @@ const rows = JSON.parse(readFileSync(POLLS, "utf8")).polls;
 const cutoff = Date.now() - WATCH_HOURS * 3600e3;
 const pending = rows.filter(
   (r) =>
-    r.pollster === "DemosAU" && // excludes "DemosAU (MRP)"
+    (r.pollster === "DemosAU" || (r.pollster === "DemosAU (MRP)" && (r.fieldworkPending || !r.seats))) &&
     !r.methodUrl &&
     (toMillis(r.published || r.date) ?? 0) > cutoff,
 );

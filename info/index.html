@@ -48364,23 +48364,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "hi": 18,
           "chg": 12
         },
-        "ind": {
-          "est": 9,
-          "lo": 9,
-          "hi": 13,
-          "chg": -1
-        },
-        "ca": {
-          "est": 1
-        },
-        "kap": {
-          "est": 1
-        },
         "grn": {
           "est": 0,
           "lo": 0,
           "hi": 0,
           "chg": -1
+        },
+        "oth": {
+          "est": 11
         }
       }
     },
@@ -57292,25 +57283,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "hi": 17,
           "chg": -34
         },
-        "ind": {
-          "est": 5,
-          "lo": 2,
-          "hi": 6,
-          "chg": -5
-        },
         "grn": {
           "est": 1,
           "lo": 0,
           "hi": 3,
           "chg": 0
         },
-        "ca": {
-          "est": 0,
-          "chg": -1
-        },
-        "kap": {
-          "est": 0,
-          "chg": -1
+        "oth": {
+          "est": 5,
+          "chg": -7
         }
       }
     },
@@ -63911,29 +63892,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "hi": 21,
           "chg": -31
         },
-        "ind": {
-          "est": 8,
-          "lo": 5,
-          "hi": 9,
-          "chg": -2
-        },
-        "kap": {
-          "est": 1,
-          "lo": 0,
-          "hi": 1,
-          "chg": 0
-        },
         "grn": {
           "est": 0,
           "lo": 0,
           "hi": 1,
           "chg": -1
         },
-        "ca": {
-          "est": 0,
-          "lo": 0,
-          "hi": 1,
-          "chg": -1
+        "oth": {
+          "est": 9,
+          "chg": -3
         }
       }
     },
@@ -80654,6 +80621,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "updatedISO": "2026-10-10",
     "published": "12 October 2026",
     "publishedISO": "2026-10-12",
+    "newest": {
+      "pollster": "DemosAU (MRP)",
+      "field": "1 Aug–30 Sep",
+      "fieldPending": true,
+      "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/"
+    },
     "rivalLead": "alp_on",
     "primaryOrder": ["alp", "onp", "lnp", "grn", "oth"],
     "nextElectionDue": "By 20 May 2028",
@@ -82906,60 +82879,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "gap": 63
     }],
     "gapsUsed": 6
-  }, {
-    "pollster": "DemosAU (MRP)",
-    "last": "2026-09-30",
-    "cadence": 112,
-    "loose": false,
-    "spread": 25,
-    "spreadEarly": 31,
-    "spreadLate": 18,
-    "basis": "fieldwork",
-    "lag": 1,
-    "lagMeasured": 0,
-    "releaseFrom": null,
-    "releaseTo": null,
-    "releaseMid": null,
-    "releaseTimed": 0,
-    "releaseVals": null,
-    "releaseMins": null,
-    "releaseDow": null,
-    "releaseDowN": 0,
-    "declared": [],
-    "waves": 4,
-    "site": "https://www.capitalbrief.com/topic/polling/",
-    "skipped": [],
-    "skippedMonths": [],
-    "recent": [{
-      "field": "2025-11-11",
-      "pub": "2025-12-02",
-      "mins": 690,
-      "url": "https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL.pdf",
-      "since": null,
-      "gap": null
-    }, {
-      "field": "2026-03-03",
-      "pub": "2026-03-20",
-      "mins": 446,
-      "url": "https://www.capitalbrief.com/article/nationals-face-total-wipeout-as-one-nation-leads-with-male-voters-ae82f323-94e9-436a-b6b1-6dc1ec8cab6a/",
-      "since": "2025-11-11",
-      "gap": 112
-    }, {
-      "field": "2026-07-11",
-      "pub": "2026-07-27",
-      "mins": 430,
-      "url": "https://demosau.com/news/new-mrp-model-points-to-hung-parliament/",
-      "since": "2026-03-03",
-      "gap": 130
-    }, {
-      "field": "2026-09-30",
-      "pub": "2026-10-12",
-      "mins": 537,
-      "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
-      "since": "2026-07-11",
-      "gap": 81
-    }],
-    "gapsUsed": 3
   }, {
     "pollster": "Spectre Strategy",
     "last": "2026-07-23",
@@ -123118,7 +123037,7 @@ function Header({
   const pastTerms = D.cycles.filter(c => !c.current).length;
   const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
   const J = window.JUR;
-  const rdLatest = rd ? (D.pollsterTable || []).slice().sort((a, b) => a.pubSort < b.pubSort ? 1 : -1)[0] : null;
+  const rdLatest = rd ? D.latest.newest || null : null;
   const rdLatestUrl = rdLatest ? rdLatest.releaseUrl || rdLatest.url : null;
   const rdLatestFact = rdLatest ? rdLatestUrl ? React.createElement("a", {
     className: "mh-latest",

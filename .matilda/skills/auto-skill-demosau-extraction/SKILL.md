@@ -128,7 +128,12 @@ checked against the September poll, rejected, and turned six runs red, and
 three repair sessions ran out of context while filing it by hand. Follow-up
 pieces within 7 days of the newest release that state no figures, or only
 figures on file, land in `status.cb_followups`, not `cb_ahead`. Only what's
-left prompts. A CB-filed MRP has no seats until its report PDF matches it.
+left prompts. A CB-filed MRP has no seats until its report PDF matches it:
+while it waits, the extractor also reads DemosAU's WordPress media library
+(`MEDIA_URL`, MRP PDFs uploaded since the row's fieldwork began; match-only,
+never a new row), and parseSeats (demosau-seats.mjs) reads both the older
+"Projection: Seats Won" and the May–Jul 2026 "Central Seat Projection"
+layouts, others as `oth`.
 
 A recent DemosAU row with no `methodUrl` IS the awaiting-the-PDF signal:
 `.build/demosau-pending.mjs` exits 0 while such a row is younger than 36h,
