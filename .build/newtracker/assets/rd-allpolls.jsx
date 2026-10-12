@@ -4470,81 +4470,93 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         <path d={`M${x0} ${zero}H${x1}`} className="rd-fl-zero"></path>
         {[-3, -2, -1, 0, 1, 2, 3].map((v) => <text key={"t" + v} x={x0 - 8} y={Y(v) + 4} className="rd-dis-ax" textAnchor="end">{v === 0 ? "0" : rdSigned(v, 0)}</text>)}
         <path d={band} className="rd-fl-band"></path>
-        {/* the per-house monthly gaps carry NO painted dot — they read as
-            poll dots and "only served to confuse" (user call 2026-10-05).
-            They read through the highlight instead: the picked pollster's
-            months draw as the thin pick line below, and a hit ring at each
-            of its vertices raises that month's tip. Unpicked houses keep no
-            rings - an unseen hover target the key could only describe in
-            words. A mark opens nothing on click (it is not a poll); touch
-            toggles the tip. */}
-        {(pickS ? [pick] : []).map((h) => houses[h].filter((d) => ms.includes(d.ym)).map((d, i) => {
-          const vid = "vtx|" + h + "|" + d.ym;
-          const vx = X(d.ym), vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
-          const showV = (src) => setTip({ id: vid, src, hd: { h, ym: d.ym, v: d.v, fl: d.fl ?? null }, px: vx });
-          const hideV = (src) => setTip((tp) => (tp && tp.id === vid && (!src || tp.src === src) ? null : tp));
-          return (
-            <g key={h + i}>
-              {tip && tip.id === vid && <circle cx={vx} cy={vy} r="6" className="rd-apd-dothi"></circle>}
-              <circle cx={vx} cy={vy} r="8" className="rd-apd-hit rd-fl-vhit"
-                      tabIndex="0" role="img"
-                      aria-label={`${h}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}`}
-                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); showV("mouse"); } }}
-                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hideV("mouse"); }}
-                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) showV("focus"); }}
-                      onBlur={() => hideV("focus")}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        const pt = ev.detail === 0 ? "key" : ptr.current;
-                        ptr.current = null;
-                        if (pt === "mouse" || pt === "key") return;
-                        if (tip && tip.id === vid) setTip(null); else showV("touch");
-                      }}></circle>
-            </g>
-          );
-        }))}
-        {/* one dot per published wave: the wave's OWN gap at its release
-            date, reading like the dots on every other poll chart – hover to
-            read the wave, click to open the poll in the table (RdApMini's
-            hit-circle idiom) */}
-        {(fd.polls || []).map((d, i) => {
-          const px = Xw(d.released);
-          if (px == null) return null;
-          const py = Y(Math.max(-3.4, Math.min(3.4, d.v)));
-          const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
-          const id = d.pollster + "|" + d.released + "#" + i;
-          const show = (src) => setTip({ id, src, d, px });
-          const hide = (src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
-          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the preference-flow chart"); } };
-          return (
-            <g key={id}>
-              {tip && tip.id === id && <circle cx={px} cy={py} r="6" className="rd-apd-dothi"></circle>}
-              {/* a highlighted pollster's own waves come forward, the rest recede */}
-              <circle cx={px} cy={py} r={pickS && d.pollster === pick ? 3 : 2.2} className={"rd-fl-wdot" + (pickS ? (d.pollster === pick ? " on" : " off") : "")}></circle>
-              <circle cx={px} cy={py} r="8" className={"rd-apd-hit" + (k ? " link" : "")}
-                      tabIndex="0" role={k ? "button" : "img"}
-                      aria-label={`${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}` + (k ? "; press Enter to open this poll" : "")}
-                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); show("mouse"); } }}
-                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide("mouse"); }}
-                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show("focus"); }}
-                      onBlur={() => hide("focus")}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        const pt = ev.detail === 0 ? "key" : ptr.current;
-                        ptr.current = null;
-                        if (pt === "mouse" || pt === "key") { open(); return; }
-                        if (tip && tip.id === id) setTip(null); else show("touch");
-                      }}
-                      onKeyDown={(ev) => {
-                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
-                        ev.preventDefault();
-                        open();
-                      }}></circle>
-            </g>
-          );
-        })}
+        {(() => {
+          /* one dot per published wave: the wave's OWN gap at its release
+             date, reading like the dots on every other poll chart – hover to
+             read the wave, click to open the poll in the table (RdApMini's
+             hit-circle idiom) */
+          const wave = (d, i) => {
+            const px = Xw(d.released);
+            if (px == null) return null;
+            const py = Y(Math.max(-3.4, Math.min(3.4, d.v)));
+            const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
+            const id = d.pollster + "|" + d.released + "#" + i;
+            const show = (src) => setTip({ id, src, d, px });
+            const hide = (src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
+            const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the preference-flow chart"); } };
+            return (
+              <g key={id}>
+                {tip && tip.id === id && <circle cx={px} cy={py} r="6" className="rd-apd-dothi"></circle>}
+                {/* a highlighted pollster's own waves come forward, the rest recede */}
+                <circle cx={px} cy={py} r={pickS && d.pollster === pick ? 3 : 2.2} className={"rd-fl-wdot" + (pickS ? (d.pollster === pick ? " on" : " off") : "")}></circle>
+                <circle cx={px} cy={py} r="8" className={"rd-apd-hit" + (k ? " link" : "")}
+                        tabIndex="0" role={k ? "button" : "img"}
+                        aria-label={`${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}` + (k ? "; press Enter to open this poll" : "")}
+                        onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                        onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); show("mouse"); } }}
+                        onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide("mouse"); }}
+                        onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show("focus"); }}
+                        onBlur={() => hide("focus")}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          const pt = ev.detail === 0 ? "key" : ptr.current;
+                          ptr.current = null;
+                          if (pt === "mouse" || pt === "key") { open(); return; }
+                          if (tip && tip.id === id) setTip(null); else show("touch");
+                        }}
+                        onKeyDown={(ev) => {
+                          if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                          ev.preventDefault();
+                          open();
+                        }}></circle>
+              </g>
+            );
+          };
+          /* the per-house monthly gaps carry NO painted dot — they read as
+             poll dots and "only served to confuse" (user call 2026-10-05).
+             They read through the highlight instead: the picked pollster's
+             months draw as the thin pick line below, and a hit ring at each
+             of its vertices raises that month's tip. Unpicked houses keep no
+             rings - an unseen hover target the key could only describe in
+             words. A mark opens nothing on click (it is not a poll); touch
+             toggles the tip. */
+          const vtx = pickS ? houses[pick].filter((d) => ms.includes(d.ym)).map((d, i) => {
+            const vid = "vtx|" + pick + "|" + d.ym;
+            const vx = X(d.ym), vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
+            const showV = (src) => setTip({ id: vid, src, hd: { h: pick, ym: d.ym, v: d.v, fl: d.fl ?? null }, px: vx });
+            const hideV = (src) => setTip((tp) => (tp && tp.id === vid && (!src || tp.src === src) ? null : tp));
+            return (
+              <g key={pick + i}>
+                {tip && tip.id === vid && <circle cx={vx} cy={vy} r="6" className="rd-apd-dothi"></circle>}
+                <circle cx={vx} cy={vy} r="8" className="rd-apd-hit rd-fl-vhit"
+                        tabIndex="0" role="img"
+                        aria-label={`${pick}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}`}
+                        onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                        onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); showV("mouse"); } }}
+                        onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hideV("mouse"); }}
+                        onFocus={(ev) => { if (ev.target.matches(":focus-visible")) showV("focus"); }}
+                        onBlur={() => hideV("focus")}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          const pt = ev.detail === 0 ? "key" : ptr.current;
+                          ptr.current = null;
+                          if (pt === "mouse" || pt === "key") return;
+                          if (tip && tip.id === vid) setTip(null); else showV("touch");
+                        }}></circle>
+              </g>
+            );
+          }) : null;
+          /* paint order is hit order: with a pollster highlighted, the
+             faded waves go down first, then its line's month marks, then
+             its own waves on top - so a tap on the highlighted line reads
+             the line, not a faded neighbour's dot (2026-10-12) */
+          const ws = fd.polls || [];
+          return <>
+            {ws.map((d, i) => (pickS && d.pollster === pick ? null : wave(d, i)))}
+            {vtx}
+            {pickS && ws.map((d, i) => (d.pollster === pick ? wave(d, i) : null))}
+          </>;
+        })()}
         {pickS && pickS.length > 1 && <path d={monotoneXY(pickS.map((d) => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))]))} className="rd-fl-pick"></path>}
         {/* the line and its end dots obey the dots' ±3.4 clamp, or a month past the ±3.5 scale (Oct '26 −4.7, the first) dives through the axis into the tick labels and reads as a point BELOW the clamped wave dots; the true figure still reads in every tooltip */}
         <path d={monotoneXY(mo.map((d) => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))]))} className="rd-fl-line"></path>

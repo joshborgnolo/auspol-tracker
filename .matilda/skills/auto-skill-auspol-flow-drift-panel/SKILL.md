@@ -401,7 +401,7 @@ wave dots and the house month-vertex hit rings).
   design; tips on those waves simply omit the row. 2026-10-05 run:
   all-green including 39/17 strict vertex wins.
 
-## Per-house month marks — painted dots REMOVED, invisible hover stays (2026-10-05)
+## Per-house month marks — painted dots REMOVED (2026-10-05); rings now ride the highlight (2026-10-11)
 
 The chart's per-house monthly gaps (109 across the two halves, exact
 month-column x) rendered as `.rd-fl-hdot` circles sized like poll dots —
@@ -421,6 +421,67 @@ later-painted wave ring or a neighbour house's ring may win a shared
 centre — vertex tips are proven by strict-count), and clicking a vertex
 must never open a poll. The diag page rings the vhit marks magenta and
 names them MONTH MARK.
+
+**Superseded 2026-10-11 (9a92720) / 2026-10-12:** unpicked houses carry NO
+`.rd-fl-vhit` rings any more, and the swatchless key hint is gone - an
+unseen hover target was not a mark the key could name. A house's months
+read through the highlight: pick it and its thin `.rd-fl-pick` line draws
+with one ring per month. Paint order is hit order (2026-10-12): faded
+waves first, then the picked house's month rings, then its own waves - on
+the earlier order 5-6 of RedBridge/Accent's 14 month rings were won by a
+faded neighbour's wave ring at 1440/390px. Pinned by the tracked
+`.matilda/probe/flow-pick.mjs` (every month ring of the pick must read
+the pick). The gitignored vertex probes (`probe-flow-drift-dots`,
+`probe-flow-tip-overflow`, `probe-flow-tip-close`, `probe-fltip-overflow`)
+still expect rings on every house with nothing picked, so they fail by
+design until rewritten to pick first; independently, since the forced
+pair moved in (2026-10-10) `#flow-drift .rd-fl-one` matches FOUR halves,
+which is why `probe-flow-drift-dots` reports "both contest halves" and
+`probe-flow-line-clamp` throws on the forced charts' missing month line -
+both already failed that way on a1cd5fa.
+
+## The 2026-10-11 reshape (9a92720) - anatomy the probes and copy rely on
+
+User 2026-10-11: "improve the design of the preference flows section in
+the all polls tab". The section now follows the disagreement section's
+idioms:
+
+- **Head row `.rd-fl-head`**: ONE `h4.rd-ap-ct` over both drift charts
+  ("Published minus implied two-party figure, relative to each
+  pollster's usual gap, points") with the highlight menu at its right -
+  a native `select.rd-pv-sel.rd-fl-sel` (first option "Highlight a
+  pollster", "No highlight" once something is picked) at EVERY width.
+  The old FilterPop sat in the first chart's title row and was hidden on
+  phones; its `.rd-fl-ct .ap-popbtn` rules are gone (`.rd-fl-ct` remains
+  for the forced pair's titles).
+- **Contest names** `.rd-fl-name.lnp/.onp` ("Labor v Coalition", "Labor v
+  One Nation") in the rival's ink, like Disagree's two-party panels.
+- **Key**: line / band / "One poll" / Now, plus "<pick>, month by month"
+  (`.rd-fl-keypick`) while a pollster is picked.
+- **Reading note `p.rd-note.rd-fl-read`** directly under the key: what
+  implied is, what zero is, the Labor-v-One-Nation baseline. It used to
+  close the section; the foot now holds only "This check corrects no
+  other figure on the page." + the RedBridge provenance line. The tsig
+  note points at "the note under the charts".
+- **Calendar axis**: `mw = (x1 - x0) / ms.length`; `Xs` = month start
+  (ticks), `X` = month middle (line, band, rings, guide), `Xw` = a wave's
+  release date. The month-index axis drew each figure half a month early
+  and let a late-month wave run past x1 into the Now mark.
+- **Empty note** picks the longest of ["No readings before January",
+  "Nothing before Jan", "None before Jan"] whose `textWidth(n, 12, 400)`
+  fits the span less 14px (the fixed 110px test overlapped the band at
+  1024px).
+- **Dek phrasing**: a lean to the rival needs no "against" - "1.3 points
+  kinder to the Coalition, and 0.3 points kinder to Labor against One
+  Nation" (it had said "kinder to the Coalition against the Coalition").
+- **Forced pair**: waves sit on a calendar month axis (March 2026's
+  silent month is a gap, not a one-month step) and the tick step is 1
+  where months are >= 44px apart, else 2 ("Feb '26" collided with "Mar"
+  at 860px). Probe contract unchanged: rd-forced-charts re-pinned only for
+  the reading note's slot (key, note, forced pair, tsig).
+- **In-prose links**: `.rd-link.rd-link-in` (inline, no 44px box) for a
+  link inside a sentence - the "perform better" dek link, the Confidence
+  ledger's "its source", the cycles "Try again".
 
 ## RdFlowChart tips follow the cross-chart tooltip idiom (shipped d262781, 2026-10-05)
 
@@ -551,7 +612,8 @@ hover, wave swap, mouse-out clear).
 
 ## The forced-choice pair's head+dek are HAND-CURATED (2026-10-10)
 
-The RdFlows `rd-ff` block's `<h3 class="rd-ff-t">` + `<p class="rd-ff-d">`
+The RdFlows `rd-ff` block's `<h3 class="rd-sub rd-ff-t">` + `<p class="rd-subdek rd-ff-d">`
+(set as the page's sub-story since 2026-10-11)
 (rd-allpolls.jsx, formerly "When pressed, where do their voters go?") are
 user-dictated static strings that no longer regenerate — refresh by hand
 when the pool or the facts move (RD_DEMO_HOME convention):

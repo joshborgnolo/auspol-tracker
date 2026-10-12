@@ -59476,136 +59476,141 @@ function RdFlowChart({
   }, v === 0 ? "0" : rdSigned(v, 0))), React.createElement("path", {
     d: band,
     className: "rd-fl-band"
-  }), (pickS ? [pick] : []).map(h => houses[h].filter(d => ms.includes(d.ym)).map((d, i) => {
-    const vid = "vtx|" + h + "|" + d.ym;
-    const vx = X(d.ym),
-      vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
-    const showV = src => setTip({
-      id: vid,
-      src,
-      hd: {
-        h,
-        ym: d.ym,
-        v: d.v,
-        fl: d.fl ?? null
-      },
-      px: vx
-    });
-    const hideV = src => setTip(tp => tp && tp.id === vid && (!src || tp.src === src) ? null : tp);
-    return React.createElement("g", {
-      key: h + i
-    }, tip && tip.id === vid && React.createElement("circle", {
-      cx: vx,
-      cy: vy,
-      r: "6",
-      className: "rd-apd-dothi"
-    }), React.createElement("circle", {
-      cx: vx,
-      cy: vy,
-      r: "8",
-      className: "rd-apd-hit rd-fl-vhit",
-      tabIndex: "0",
-      role: "img",
-      "aria-label": `${h}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}`,
-      onPointerDown: ev => {
-        ptr.current = ev.pointerType;
-      },
-      onPointerEnter: ev => {
-        if (ev.pointerType === "mouse") {
-          setHv(null);
-          showV("mouse");
+  }), (() => {
+    const wave = (d, i) => {
+      const px = Xw(d.released);
+      if (px == null) return null;
+      const py = Y(Math.max(-3.4, Math.min(3.4, d.v)));
+      const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+        pollster: d.pollster,
+        released: d.released
+      }) : null;
+      const id = d.pollster + "|" + d.released + "#" + i;
+      const show = src => setTip({
+        id,
+        src,
+        d,
+        px
+      });
+      const hide = src => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
+      const open = () => {
+        if (k && window.AP.openPoll) {
+          setTip(null);
+          window.AP.openPoll(k, "twopp", "the preference-flow chart");
         }
-      },
-      onPointerLeave: ev => {
-        if (ev.pointerType === "mouse") hideV("mouse");
-      },
-      onFocus: ev => {
-        if (ev.target.matches(":focus-visible")) showV("focus");
-      },
-      onBlur: () => hideV("focus"),
-      onClick: ev => {
-        ev.stopPropagation();
-        const pt = ev.detail === 0 ? "key" : ptr.current;
-        ptr.current = null;
-        if (pt === "mouse" || pt === "key") return;
-        if (tip && tip.id === vid) setTip(null);else showV("touch");
-      }
-    }));
-  })), (fd.polls || []).map((d, i) => {
-    const px = Xw(d.released);
-    if (px == null) return null;
-    const py = Y(Math.max(-3.4, Math.min(3.4, d.v)));
-    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
-      pollster: d.pollster,
-      released: d.released
-    }) : null;
-    const id = d.pollster + "|" + d.released + "#" + i;
-    const show = src => setTip({
-      id,
-      src,
-      d,
-      px
-    });
-    const hide = src => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
-    const open = () => {
-      if (k && window.AP.openPoll) {
-        setTip(null);
-        window.AP.openPoll(k, "twopp", "the preference-flow chart");
-      }
-    };
-    return React.createElement("g", {
-      key: id
-    }, tip && tip.id === id && React.createElement("circle", {
-      cx: px,
-      cy: py,
-      r: "6",
-      className: "rd-apd-dothi"
-    }), React.createElement("circle", {
-      cx: px,
-      cy: py,
-      r: pickS && d.pollster === pick ? 3 : 2.2,
-      className: "rd-fl-wdot" + (pickS ? d.pollster === pick ? " on" : " off" : "")
-    }), React.createElement("circle", {
-      cx: px,
-      cy: py,
-      r: "8",
-      className: "rd-apd-hit" + (k ? " link" : ""),
-      tabIndex: "0",
-      role: k ? "button" : "img",
-      "aria-label": `${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}` + (k ? "; press Enter to open this poll" : ""),
-      onPointerDown: ev => {
-        ptr.current = ev.pointerType;
-      },
-      onPointerEnter: ev => {
-        if (ev.pointerType === "mouse") {
-          setHv(null);
-          show("mouse");
-        }
-      },
-      onPointerLeave: ev => {
-        if (ev.pointerType === "mouse") hide("mouse");
-      },
-      onFocus: ev => {
-        if (ev.target.matches(":focus-visible")) show("focus");
-      },
-      onBlur: () => hide("focus"),
-      onClick: ev => {
-        ev.stopPropagation();
-        const pt = ev.detail === 0 ? "key" : ptr.current;
-        ptr.current = null;
-        if (pt === "mouse" || pt === "key") {
+      };
+      return React.createElement("g", {
+        key: id
+      }, tip && tip.id === id && React.createElement("circle", {
+        cx: px,
+        cy: py,
+        r: "6",
+        className: "rd-apd-dothi"
+      }), React.createElement("circle", {
+        cx: px,
+        cy: py,
+        r: pickS && d.pollster === pick ? 3 : 2.2,
+        className: "rd-fl-wdot" + (pickS ? d.pollster === pick ? " on" : " off" : "")
+      }), React.createElement("circle", {
+        cx: px,
+        cy: py,
+        r: "8",
+        className: "rd-apd-hit" + (k ? " link" : ""),
+        tabIndex: "0",
+        role: k ? "button" : "img",
+        "aria-label": `${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}` + (k ? "; press Enter to open this poll" : ""),
+        onPointerDown: ev => {
+          ptr.current = ev.pointerType;
+        },
+        onPointerEnter: ev => {
+          if (ev.pointerType === "mouse") {
+            setHv(null);
+            show("mouse");
+          }
+        },
+        onPointerLeave: ev => {
+          if (ev.pointerType === "mouse") hide("mouse");
+        },
+        onFocus: ev => {
+          if (ev.target.matches(":focus-visible")) show("focus");
+        },
+        onBlur: () => hide("focus"),
+        onClick: ev => {
+          ev.stopPropagation();
+          const pt = ev.detail === 0 ? "key" : ptr.current;
+          ptr.current = null;
+          if (pt === "mouse" || pt === "key") {
+            open();
+            return;
+          }
+          if (tip && tip.id === id) setTip(null);else show("touch");
+        },
+        onKeyDown: ev => {
+          if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+          ev.preventDefault();
           open();
-          return;
         }
-        if (tip && tip.id === id) setTip(null);else show("touch");
-      },
-      onKeyDown: ev => {
-        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
-        ev.preventDefault();
-        open();
-      }
-    }));
-  }), pickS && pickS.length > 1 && React.createElement("path", {
+      }));
+    };
+    const vtx = pickS ? houses[pick].filter(d => ms.includes(d.ym)).map((d, i) => {
+      const vid = "vtx|" + pick + "|" + d.ym;
+      const vx = X(d.ym),
+        vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
+      const showV = src => setTip({
+        id: vid,
+        src,
+        hd: {
+          h: pick,
+          ym: d.ym,
+          v: d.v,
+          fl: d.fl ?? null
+        },
+        px: vx
+      });
+      const hideV = src => setTip(tp => tp && tp.id === vid && (!src || tp.src === src) ? null : tp);
+      return React.createElement("g", {
+        key: pick + i
+      }, tip && tip.id === vid && React.createElement("circle", {
+        cx: vx,
+        cy: vy,
+        r: "6",
+        className: "rd-apd-dothi"
+      }), React.createElement("circle", {
+        cx: vx,
+        cy: vy,
+        r: "8",
+        className: "rd-apd-hit rd-fl-vhit",
+        tabIndex: "0",
+        role: "img",
+        "aria-label": `${pick}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}`,
+        onPointerDown: ev => {
+          ptr.current = ev.pointerType;
+        },
+        onPointerEnter: ev => {
+          if (ev.pointerType === "mouse") {
+            setHv(null);
+            showV("mouse");
+          }
+        },
+        onPointerLeave: ev => {
+          if (ev.pointerType === "mouse") hideV("mouse");
+        },
+        onFocus: ev => {
+          if (ev.target.matches(":focus-visible")) showV("focus");
+        },
+        onBlur: () => hideV("focus"),
+        onClick: ev => {
+          ev.stopPropagation();
+          const pt = ev.detail === 0 ? "key" : ptr.current;
+          ptr.current = null;
+          if (pt === "mouse" || pt === "key") return;
+          if (tip && tip.id === vid) setTip(null);else showV("touch");
+        }
+      }));
+    }) : null;
+    const ws = fd.polls || [];
+    return React.createElement(React.Fragment, null, ws.map((d, i) => pickS && d.pollster === pick ? null : wave(d, i)), vtx, pickS && ws.map((d, i) => d.pollster === pick ? wave(d, i) : null));
+  })(), pickS && pickS.length > 1 && React.createElement("path", {
     d: monotoneXY(pickS.map(d => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))])),
     className: "rd-fl-pick"
   }), React.createElement("path", {
