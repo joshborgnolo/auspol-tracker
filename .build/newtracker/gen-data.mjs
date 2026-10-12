@@ -6323,7 +6323,7 @@ const changelog = JUR ? null : (() => {
       console.log(`changelog: seeded ${iso} (recording begins at ${seeded.state.lead ? seeded.state.lead.alp : "—"})`);
       return seeded.entries;
     }
-    const d = diffChangelog(committed.state, committed.entries || [], nextState, iso, pollInfo);
+    const d = diffChangelog(committed.state, committed.entries || [], nextState, iso, pollInfo, HOUSE_RENAMES);
     if (d.appended.length) {
       writeAtomic(file, JSON.stringify({ state: d.state, entries: d.entries }, null, 2) + "\n");
       console.log("changelog: +" + d.appended.map((e) => e.kind).join("+") + " →", d.appended.map((e) => e.text.length <= 72 ? e.text : e.text.slice(0, 69) + "…").join(" | "));

@@ -3,7 +3,7 @@
    diffChangelog can emit (poll/flows/finding/meta), plus the quiet-run
    idempotence the unattended writers rely on. Run: node .build/test-changelog.mjs */
 import assert from "node:assert/strict";
-import { flowsOf, stateOf, initChangelog, diffChangelog, isoLabel, isoLabelLong } from "./changelog.mjs";
+import { flowsOf, stateOf, initChangelog, diffChangelog, newPollKeys, isoLabel, isoLabelYear, isoLabelLong } from "./changelog.mjs";
 
 const FLOW0 = { grn: 0.882, onp: 0.255, oth: 0.546 };
 const FP0 = { lnp: 0.3, grn: 0.91, oth: 0.55 };
@@ -23,6 +23,7 @@ const diff = (prev, next, pollInfo) => diffChangelog(prev, SEED_COMMITTED, next,
 /* labels */
 assert.equal(isoLabel("2029-01-09"), "9 Jan");
 assert.equal(isoLabelLong("2029-01-09"), "9 January 2029");
+assert.equal(isoLabelYear("2029-01-09"), "9 Jan 2029", "entry labels carry the year");
 assert.ok(!isoLabel("2029-01-09").startsWith("0"));
 
 /* stateOf: key order in the raw object never changes the canonical state */
@@ -45,7 +46,7 @@ assert.equal(seed.entries.length, 1);
 assert.equal(seed.entries[0].kind, "seed");
 assert.match(seed.entries[0].text, /The change log starts here — the two-party preferred estimate is 52\.3 \(Labor v One Nation, implied flows\)/);
 assert.equal(seed.entries[0].date, "2029-01-18");
-assert.equal(seed.entries[0].label, "18 Jan");
+assert.equal(seed.entries[0].label, "18 Jan 2029");
 
 /* quiet run: identical state appends nothing and hands the entries back */
 {
@@ -64,7 +65,7 @@ assert.equal(seed.entries[0].label, "18 Jan");
   assert.equal(appended.length, 1);
   const e = appended[0];
   assert.equal(e.kind, "poll");
-  assert.equal(e.date, DAY); assert.equal(e.label, "19 Jan");
+  assert.equal(e.date, DAY); assert.equal(e.label, "19 Jan 2029");
   assert.match(e.text, /^Resolve \(fieldwork 8–10 Oct, n=1,136\) added — the two-party preferred estimate moved 52\.2 → 52\.3 \(Labor v One Nation, implied flows\)\.$/);
   assert.equal(e.url, "https://example.com/resolve");
 }
@@ -89,6 +90,33 @@ assert.equal(seed.entries[0].label, "18 Jan");
   });
   assert.equal(appended.length, 1);
   assert.match(appended[0].text, /^2 polls added — Newspoll \(fieldwork 6–8 Oct, n=1,200\); Resolve \(fieldwork 8–10 Oct, n=1,136\) — the two-party preferred estimate held at 52\.3 \(Labor v One Nation, implied flows\)\.$/);
+  /* one link per poll, named – a lone url named only the first */
+  assert.deepEqual(appended[0].links, [{ name: "Newspoll", url: "https://example.com/np" }, { name: "Resolve", url: "https://example.com/resolve" }]);
+  assert.ok(!("url" in appended[0]), "a several-poll entry links by `links`, not `url`");
+}
+
+/* corrections are not new polls: a moved end date or a renamed house pairs
+   off with the key it replaced; a genuinely new wave still counts */
+{
+  const P = ["2026-10-08|Newspoll", "2026-10-10|Resolve", "2026-09-01|Redbridge"];
+  assert.deepEqual(newPollKeys(P, ["2026-10-09|Newspoll", "2026-10-10|Resolve", "2026-09-01|Redbridge"]), [], "a corrected date");
+  assert.deepEqual(newPollKeys(P, ["2026-10-08|Newspoll", "2026-10-10|Resolve", "2026-09-01|RedBridge/Accent"], { Redbridge: "RedBridge/Accent" }), [], "a renamed house");
+  assert.deepEqual(newPollKeys(P, ["2026-10-08|Newspoll", "2026-10-10|Resolve", "2026-09-01|RedBridge/Accent"]), ["2026-09-01|RedBridge/Accent"], "no rename map, no pairing");
+  assert.deepEqual(newPollKeys(P, [...P, "2026-10-12|Newspoll"]), ["2026-10-12|Newspoll"], "nothing vanished: a new wave");
+  assert.deepEqual(newPollKeys(P, ["2026-10-22|Newspoll", "2026-10-10|Resolve", "2026-09-01|Redbridge"]), ["2026-10-22|Newspoll"], "past a week apart is new");
+  const corr = diff(S(), S({ polls: ["2026-10-09|Newspoll", "2026-10-10|Resolve"] })).appended;
+  assert.equal(corr.length, 0, "a correction alone logs nothing");
+}
+
+/* polls and flows in one refresh: the move is told once, in the poll entry */
+{
+  const k = "2026-10-12|Newspoll";
+  const prev = S();
+  const next = S({ polls: [...S().polls, k], flows: flowsOf(FLOW0, { ...FP0, lnp: 0.33 }, null), lead: { pair: "alp_on", basis: "imp", alp: 52.6 }, on: 52.6 });
+  const a = diff(prev, next, { [k]: { name: "Newspoll", fw: "9–11 Oct", sample: 1250, url: null } }).appended;
+  assert.deepEqual(a.map((e) => e.kind), ["flows", "poll"]);
+  assert.equal(a[0].text, "The preference-flow assumptions were updated: Coalition voters' preferences to Labor over One Nation 30.0% → 33.0%.");
+  assert.equal(a[1].text, "Newspoll (fieldwork 9–11 Oct, n=1,250) added — the two-party preferred estimate moved 52.3 → 52.6 (Labor v One Nation, implied flows), with the preference-flow update the same day.");
 }
 
 /* headline pairing switches */

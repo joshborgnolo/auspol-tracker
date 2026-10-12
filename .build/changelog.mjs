@@ -17,6 +17,9 @@ import { createHash } from "node:crypto";
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export const isoLabel = (iso) => `${+iso.slice(8, 10)} ${MONTH_SHORT[+iso.slice(5, 7) - 1]}`;
+/* an entry's display date carries its year – the log outlives a year, and
+   "12 Oct" alone stops saying which one (before 2026-10-12 it did) */
+export const isoLabelYear = (iso) => `${isoLabel(iso)} ${iso.slice(0, 4)}`;
 export const isoLabelLong = (iso) => `${+iso.slice(8, 10)} ${MONTH_LONG[+iso.slice(5, 7) - 1]} ${iso.slice(0, 4)}`;
 
 const f1 = (v) => (Math.round(v * 10) / 10).toFixed(1);
@@ -68,10 +71,44 @@ export function stateOf(raw) {
   };
 }
 
-const entry = (iso, kind, text, url) => ({
-  date: iso, label: isoLabel(iso), kind, text,
+/* `url` for a one-poll entry; `links` ([{name, url}], one per poll that has
+   a release) when several polls land in one entry – a single link there
+   named only the first */
+const entry = (iso, kind, text, url, links) => ({
+  date: iso, label: isoLabelYear(iso), kind, text,
   ...(url ? { url } : {}),
+  ...(links && links.length ? { links } : {}),
 });
+
+/* Polls are known by "date|pollster" – polls.json carries no id – so a
+   corrected end date or a house rename makes a key vanish and another
+   appear. Pair each such appearance with a vanished key of the same house
+   (the same name, or the name HOUSE_RENAMES maps the old one to) within
+   CORRECTION_DAYS, nearest first: those are corrections, not new polls,
+   and log nothing. What is left over is genuinely new. */
+const CORRECTION_DAYS = 7;
+export function newPollKeys(prevKeys, nextKeys, renames = {}) {
+  const prev = new Set(prevKeys || []);
+  const added = (nextKeys || []).filter((k) => !prev.has(k)).sort();
+  const next = new Set(nextKeys || []);
+  const gone = (prevKeys || []).filter((k) => !next.has(k));
+  const split = (k) => { const i = k.indexOf("|"); return [k.slice(0, i), k.slice(i + 1)]; };
+  const days = (a, b) => Math.abs(Date.parse(a) - Date.parse(b)) / 864e5;
+  const used = new Set();
+  return added.filter((k) => {
+    const [d, house] = split(k);
+    let best = null, bestGap = Infinity;
+    for (const g of gone) {
+      if (used.has(g)) continue;
+      const [gd, gh] = split(g);
+      if ((renames[gh] || gh) !== house) continue;
+      const gap = days(d, gd);
+      if (gap <= CORRECTION_DAYS && gap < bestGap) { best = g; bestGap = gap; }
+    }
+    if (best) { used.add(best); return false; }
+    return true;
+  });
+}
 
 export function initChangelog(nextState, iso) {
   const leadTxt = nextState.lead
@@ -99,8 +136,9 @@ const leadClause = (prev, next) => {
 /* prevState / nextState as canonicalised by stateOf; committed entries are
    returned in `entries` with any new ones appended. pollInfo maps each new
    poll's "date|pollster" key to { name, fw, sample, url }. */
-export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {}) {
+export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {}, renames = {}) {
   const appended = [];
+  const addedKeys = newPollKeys(prevState.polls, nextState.polls, renames);
 
   /* the headline pairing or its basis switched */
   if (prevState.lead && nextState.lead &&
@@ -137,9 +175,12 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
       }
     }
     if (bits.length) {
-      const lead = leadClause(prevState.lead, nextState.lead);
+      /* polls landing the same refresh move the estimate too, so the poll
+         entry reports the move (once, crediting this update) and this one
+         lists the figures alone */
+      const lead = addedKeys.length ? null : leadClause(prevState.lead, nextState.lead);
       const headlineIsClassicImp = nextState.lead && nextState.lead.pair === "alp_lnp" && nextState.lead.basis === "imp";
-      const imp = classicMoved && !headlineIsClassicImp && prevState.imp != null && nextState.imp != null
+      const imp = !addedKeys.length && classicMoved && !headlineIsClassicImp && prevState.imp != null && nextState.imp != null
         ? ` The implied-basis Labor v the Coalition estimate ${moveTxt(prevState.imp, nextState.imp)}.` : "";
       appended.push(entry(iso, "flows",
         `The preference-flow assumptions were updated: ${bits.join("; ")}.` +
@@ -147,9 +188,8 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     }
   }
 
-  /* polls added since the last logged state */
-  const prevPolls = new Set(prevState.polls || []);
-  const addedKeys = (nextState.polls || []).filter((k) => !prevPolls.has(k)).sort();
+  /* polls added since the last logged state (addedKeys, above: corrections
+     already paired off) */
   if (addedKeys.length) {
     const ps = addedKeys.map((k) => pollInfo[k] ||
       { name: (k.split("|")[1] || k), fw: null, sample: null, url: null });
@@ -158,11 +198,14 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     const descr = (p) => `${p.name}` + (p.fw
       ? ` (${/^fieldwork\b/.test(p.fw) ? p.fw : `fieldwork ${p.fw}`}${p.sample != null ? `, n=${p.sample.toLocaleString("en-AU")}` : ""})`
       : "");
-    const clause = leadClause(prevState.lead, nextState.lead);
+    const flowsToo = appended.some((e) => e.kind === "flows");
+    const clause0 = leadClause(prevState.lead, nextState.lead);
+    const clause = clause0 && flowsToo ? `${clause0}, with the preference-flow update the same day` : clause0;
     const text = ps.length === 1
       ? `${descr(ps[0])} added` + (clause ? ` — ${clause}.` : ".")
       : `${ps.length} polls added — ${ps.map(descr).join("; ")}` + (clause ? ` — ${clause}.` : ".");
-    appended.push(entry(iso, "poll", text, ps.find((p) => p.url)?.url || null));
+    if (ps.length === 1) appended.push(entry(iso, "poll", text, ps[0].url || null));
+    else appended.push(entry(iso, "poll", text, null, ps.filter((p) => p.url).map((p) => ({ name: p.name, url: p.url }))));
   }
 
   /* the two-party's month-on-month significance flipped */

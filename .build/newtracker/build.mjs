@@ -686,7 +686,8 @@ function ssChangelogBlock(esc) {
   if (!C || !Array.isArray(C.entries) || !C.entries.length) return "";
   const rows = [...C.entries].reverse().slice(0, 10).map((e) => `
       <p class="info-about-p"><time class="info-cl-date" datetime="${esc(e.date)}">${esc(e.label)}</time>
-        ${esc(e.text)}${e.url ? ` <a class="fb-link" href="${esc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</p>`).join("");
+        ${esc(e.text)}${e.links ? e.links.map((l) => ` <a class="fb-link" href="${esc(l.url)}">${esc(l.name)} &#8599;</a>`).join("")
+          : e.url ? ` <a class="fb-link" href="${esc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</p>`).join("");
   return `
 
       <h2>Change log</h2>
@@ -727,7 +728,8 @@ function changelogPage() {
     const kind = CL_KIND[e.kind] ? e.kind : "meta";
     const rep = i > 0 && newest[i - 1].date === e.date;
     return `
-      <li class="cl-e cl-k-${kind}"><time class="cl-date${rep ? " cl-rep" : ""}" datetime="${hesc(e.date)}">${hesc(e.date)}</time><span class="cl-tag">${CL_KIND[kind]}</span><p class="cl-text">${lit(e.text)}${e.url ? ` <a class="cl-src" href="${hesc(e.url)}">release&nbsp;&#8599;</a>` : ""}</p></li>`;
+      <li class="cl-e cl-k-${kind}"><time class="cl-date${rep ? " cl-rep" : ""}" datetime="${hesc(e.date)}">${hesc(e.date)}</time><span class="cl-tag">${CL_KIND[kind]}</span><p class="cl-text">${lit(e.text)}${e.links ? e.links.map((l) => ` <a class="cl-src" href="${hesc(l.url)}">${hesc(l.name)}&nbsp;&#8599;</a>`).join("")
+      : e.url ? ` <a class="cl-src" href="${hesc(e.url)}">release&nbsp;&#8599;</a>` : ""}</p></li>`;
   }).join("");
   const n = entries.length;
   const since = n ? entries[0].date : null;

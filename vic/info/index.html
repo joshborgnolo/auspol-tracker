@@ -1451,7 +1451,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-changelog { list-style: none; margin: 0 0 12px; padding: 0;
   font-size: 14px; line-height: 1.55; color: var(--ink-2); }
 .info-changelog li { margin: 0 0 7px; }
-.info-cl-date { display: inline-block; min-width: 47px; color: var(--ink-3);
+.info-cl-date { display: inline-block; min-width: 86px; color: var(--ink-3);
   font-variant-numeric: tabular-nums; }
 .info-group { font-family: var(--serif); font-size: 17px; font-weight: 600;
   color: var(--ink); margin: 26px 0 12px; break-after: avoid; }
@@ -37701,16 +37701,21 @@ function infoTerms(D) {
     href: "/feed.xml"
   }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release."), !window.JUR && D.changelog && D.changelog.length ? React.createElement(React.Fragment, null, React.createElement("p", {
     className: "info-about-p"
-  }, React.createElement("b", null, "Change log."), " What has moved the site\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away \u2014 also kept on ", React.createElement("a", {
+  }, React.createElement("b", null, "Change log."), " What has moved the site\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away.", D.changelog.length > 10 ? " The latest ten; " : " Also kept on ", React.createElement("a", {
     className: "fb-link",
     href: "/changelog/"
-  }, "the change log page"), ":"), React.createElement("ul", {
+  }, D.changelog.length > 10 ? "the change log page lists them all" : "the change log page"), D.changelog.length > 10 ? "." : ":"), React.createElement("ul", {
     className: "info-changelog"
-  }, [...D.changelog].reverse().map((e, i) => React.createElement("li", {
+  }, [...D.changelog].reverse().slice(0, 10).map((e, i) => React.createElement("li", {
     key: i
   }, React.createElement("span", {
     className: "info-cl-date"
-  }, e.label), " ", e.text, e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
+  }, e.label), " ", e.text, e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
+    key: j
+  }, " ", React.createElement("a", {
+    className: "fb-link",
+    href: l.url
+  }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
     className: "fb-link",
     href: e.url
   }, "the pollster\u2019s release \u2197")) : null)))) : null, React.createElement("p", {

@@ -7741,12 +7741,15 @@ function infoTerms(D) {
       each new poll as it is added, with a link to the pollster’s own release.</p>
       {!window.JUR && D.changelog && D.changelog.length ? (<>
       <p className="info-about-p"><b>Change log.</b> What has moved the site’s two-party
-      preferred estimate, and when each statistical finding appeared or fell away — also
-      kept on <a className="fb-link" href="/changelog/">the change log page</a>:</p>
+      preferred estimate, and when each statistical finding appeared or fell away.
+      {D.changelog.length > 10 ? " The latest ten; " : " Also kept on "}
+      <a className="fb-link" href="/changelog/">{D.changelog.length > 10 ? "the change log page lists them all" : "the change log page"}</a>{D.changelog.length > 10 ? "." : ":"}</p>
+      {/* the latest ten, as the static article lists – the page holds the rest */}
       <ul className="info-changelog">
-        {[...D.changelog].reverse().map((e, i) => (
+        {[...D.changelog].reverse().slice(0, 10).map((e, i) => (
           <li key={i}><span className="info-cl-date">{e.label}</span> {e.text}
-          {e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
+          {e.links ? e.links.map((l, j) => <React.Fragment key={j}> <a className="fb-link" href={l.url}>{l.name} ↗</a></React.Fragment>)
+            : e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
         ))}
       </ul>
       </>) : null}
