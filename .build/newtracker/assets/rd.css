@@ -1111,8 +1111,11 @@ body.rd .rd-dp-rug b { position: absolute; bottom: 0; left: 0; width: 6px; heigh
 body.rd .rd-dp-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 body.rd .rd-dp-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
 body.rd .rd-dp-rug b.open > i { background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--pcolor) 55%, transparent); }
-body.rd .rd-dp-rug b.on { cursor: pointer; }
-body.rd .rd-dp-rug b.on:hover > i, body.rd .rd-dp-rug b.on:focus-visible > i { background: var(--pcolor); box-shadow: none; }
+/* no per-dot cursor and no :hover fill: the corridor owns the pointer (the
+   rug span's inline cursor when its pick resolves openable) and the picked
+   dot's own .hi dress - physical :hover once lit the dot a newer neighbour's
+   ::before shadowed */
+body.rd .rd-dp-rug b.on:focus-visible > i { background: var(--pcolor); box-shadow: none; }
 body.rd .rd-dp-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 body.rd .rd-dp-rug b.hi { z-index: 2; }
 body.rd .rd-dp-rug b.hi > i { inset: -3px; background: var(--pcolor); box-shadow: 0 0 0 2px var(--bg); }
@@ -1288,8 +1291,9 @@ body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; bac
    punch bg holes through neighbours on dense rows (the blindness beb28b3
    dropped the ring for); the conditional keeps it */
 body.rd .rd-wv-rug b.ring > i { --ring-face: color-mix(in oklab, var(--pcolor) 55%, transparent); background: linear-gradient(var(--ring-face), var(--ring-face)), var(--bg); box-shadow: 0 0 0 2px var(--bg); }
-body.rd .rd-wv-rug b.on { cursor: pointer; }
-body.rd .rd-wv-rug b.on:hover > i, body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
+/* no per-dot cursor and no :hover fill: as in .rd-dp-rug, the corridor owns
+   the pointer and the picked dot wears .hi */
+body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 body.rd .rd-wv-rug b.hi { z-index: 2; }
 body.rd .rd-wv-rug b.hi > i { inset: -3px; background: var(--pcolor); box-shadow: 0 0 0 2px var(--bg); }

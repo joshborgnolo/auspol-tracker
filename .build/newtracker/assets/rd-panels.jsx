@@ -2013,6 +2013,28 @@ function RdGenBorn({ label }) {
     </button>
   );
 }
+/* rug dots pick the chart engine's way: the corridor, not the dots, decides
+   which dot a pointer meant. Each 6px dot wears an 18x16px ::before hit
+   strip and the lane dodge separates only the discs, so dots 6-12px apart
+   on one lane had overlapping strips - and DOM order (gen-data sorts oldest
+   first) put the newer dot's strip over its older neighbour's disc outright:
+   a click on YouGov's dot once opened the newer Resolve poll. The container
+   instead picks the nearest dot centre analytically from the data (the
+   container rect the only layout read), so overlaps can never shadow. */
+const RUG_PICK_MOUSE = 11, RUG_PICK_TOUCH = 22;
+function nearestRugIdx(rugEl, xs, lanes, clientX, clientY, rPx) {
+  const box = rugEl.getBoundingClientRect();
+  if (!box.width || !box.height) return null;
+  let best = null, bestD = rPx;
+  for (let i = 0; i < xs.length; i++) {
+    if (xs[i] == null) continue;
+    const dx = clientX - (box.left + (xs[i] / 100) * box.width);
+    const dy = clientY - (box.bottom - 3 - (lanes[i] || 0) * 6);
+    const d = Math.hypot(dx, dy);
+    if (d <= bestD) { best = i; bestD = d; }
+  }
+  return best;
+}
 /* a rug row's dots behave as a chart's do, in the chart's exact look. The
    tooltip IS the chart's dot readout: the shared .tip card under tip-dot's
    own transform (-50%, calc(-100% - 14px)) hung from the dot's centre, with
@@ -2084,39 +2106,65 @@ function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
   const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
   // a readout a finger raised stays up until the next tap lands outside its row
   window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  /* hoisted per-dot facts, so the corridor's handlers and the dots' own
+     rendering read the same row key and doc for an index */
+  const xs = g.px[party];
+  const keys = xs.map((x, i) => {
+    const d = x == null ? null : g.pd[i] || null;
+    return d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
+  });
+  const openIdx = (i) => {
+    const rk = keys[i];
+    if (!rk || !(window.AP && window.AP.openPoll)) return;
+    setTip(null);
+    /* the poll's own vote by group, on the split of the tab the dot
+       sits under (user call 2026-10-04: dots open the poll in the
+       All-polls demographics facet) */
+    window.AP.openPoll(rk, "demographics", "who votes for whom", split);
+  };
+  // the pick coordinates are the laid-out positions: the display percents
+  const posX = xs.map((x) => (x == null ? null : xp(x)));
+  const pickAt = (ev, rPx) => (rugBox.current ? nearestRugIdx(rugBox.current, posX, ups || [], ev.clientX, ev.clientY, rPx) : null);
+  const [cur, setCur] = useState(null);   // the pointer's current pick: drives the corridor cursor
   return (
-    <span ref={rugBox} className={"rd-wv-rug" + (tip ? " lit" : "")}>
-      {g.px[party].map((x, i) => {
+    <span ref={rugBox} className={"rd-wv-rug" + (tip ? " lit" : "")}
+         style={{ cursor: cur != null && keys[cur] ? "pointer" : undefined }}
+         onPointerMove={(ev) => {
+           if (ev.pointerType !== "mouse") return;
+           const i = pickAt(ev, RUG_PICK_MOUSE);
+           setCur(i);
+           setTip((tp) => {
+             if (i == null) return tp && tp.src === "mouse" ? null : tp;
+             if (tp && tp.i === i) return tp;
+             return { i, src: "mouse" };
+           });
+         }}
+         onPointerLeave={() => { setCur(null); setTip((tp) => (tp && tp.src === "mouse" ? null : tp)); }}
+         onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+         onClick={(ev) => {
+           const pt = ev.detail === 0 ? "key" : ptr.current;
+           ptr.current = null;
+           if (pt === "key") return;
+           const i = pickAt(ev, pt === "touch" ? RUG_PICK_TOUCH : RUG_PICK_MOUSE);
+           if (i == null) return;
+           ev.stopPropagation();
+           if (pt === "mouse") { openIdx(i); return; }
+           if (tip && tip.i === i && tip.src === "touch") setTip(null); else setTip({ i, src: "touch" });
+         }}>
+      {xs.map((x, i) => {
         if (x == null) return null;   // the wave printed no such party (an Others fold isn't a dot at zero)
         const d = g.pd[i] || null;
         if (!d) return <b key={i} className={rings && rings[i] ? "ring" : ""} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}><i aria-hidden="true"></i></b>;
-        const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
-        const open = () => {
-          if (!rk || !(window.AP && window.AP.openPoll)) return;
-          setTip(null);
-          /* the poll's own vote by group, on the split of the tab the dot
-             sits under (user call 2026-10-04: dots open the poll in the
-             All-polls demographics facet) */
-          window.AP.openPoll(rk, "demographics", "who votes for whom", split);
-        };
+        const rk = keys[i];
+        const open = () => openIdx(i);
         const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
         const on = tip && tip.i === i;
         return (
           <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : ""), (rings && rings[i] ? "ring" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}
              role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
              aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
-             onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-             onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(i, "mouse"); }}
-             onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(i, "mouse"); }}
              onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(i, "focus"); }}
              onBlur={() => hide(i, "focus")}
-             onClick={(ev) => {
-               ev.stopPropagation();
-               const pt = ev.detail === 0 ? "key" : ptr.current;
-               ptr.current = null;
-               if (pt === "mouse" || pt === "key") { open(); return; }
-               if (tip && tip.i === i) setTip(null); else setTip({ i, src: "touch" });
-             }}
              onKeyDown={(ev) => {
                if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
                ev.preventDefault();
@@ -2140,7 +2188,9 @@ function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
    row's figure pools rides the track as a small dot at its own reading, with
    WvRug's every mechanic - the doubled corridor dodging into two lanes
    measured off the rendered strip, the chart's dot tip, the Interaction
-   board's ring, click to open, a touch tap's readout dismissing on the next
+   board's ring, the corridor's own nearest-centre picking (the ::before hit
+   strips once let a newer dot shadow its older neighbour's clicks), click
+   to open, a touch tap's readout dismissing on the next
    tap outside (9ccaf8b). Items arrive ready-built from the parent's pool
    walk: q the wave's individualPolls row, y its own reading, fav the
    Both-row favourability face (the open marker's), label the tip's swatch
@@ -2191,36 +2241,60 @@ function DpRug({ items, color, dxp, fmt }) {
   const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
   // a readout a finger raised stays up until the next tap lands outside its row
   window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  /* hoisted per-dot facts, so the corridor's handlers and the dots' own
+     rendering read the same row key for an index */
+  const xs = items.map((it) => dxp(it.y));
+  const keys = items.map((it) => {
+    const q = it.q;
+    return window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
+  });
+  const openIdx = (i) => {
+    const rk = keys[i];
+    if (!rk || !(window.AP && window.AP.openPoll)) return;
+    setTip(null);
+    window.AP.openPoll(rk, "leadership", "leadership");
+  };
+  const pickAt = (ev, rPx) => (rugBox.current ? nearestRugIdx(rugBox.current, xs, ups || [], ev.clientX, ev.clientY, rPx) : null);
+  const [cur, setCur] = useState(null);   // the pointer's current pick: drives the corridor cursor
   return (
-    <span ref={rugBox} className={"rd-dp-rug" + (tip ? " lit" : "")}>
+    <span ref={rugBox} className={"rd-dp-rug" + (tip ? " lit" : "")}
+         style={{ cursor: cur != null && keys[cur] ? "pointer" : undefined }}
+         onPointerMove={(ev) => {
+           if (ev.pointerType !== "mouse") return;
+           const i = pickAt(ev, RUG_PICK_MOUSE);
+           setCur(i);
+           setTip((tp) => {
+             if (i == null) return tp && tp.src === "mouse" ? null : tp;
+             if (tp && tp.i === i) return tp;
+             return { i, src: "mouse" };
+           });
+         }}
+         onPointerLeave={() => { setCur(null); setTip((tp) => (tp && tp.src === "mouse" ? null : tp)); }}
+         onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+         onClick={(ev) => {
+           const pt = ev.detail === 0 ? "key" : ptr.current;
+           ptr.current = null;
+           if (pt === "key") return;
+           const i = pickAt(ev, pt === "touch" ? RUG_PICK_TOUCH : RUG_PICK_MOUSE);
+           if (i == null) return;
+           ev.stopPropagation();
+           if (pt === "mouse") { openIdx(i); return; }
+           if (tip && tip.i === i && tip.src === "touch") setTip(null); else setTip({ i, src: "touch" });
+         }}>
       {items.map((it, i) => {
         const q = it.q;
         const key = q.pollster + "|" + q.released + (it.fav ? "|f" : "");
-        const rk = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
-        const open = () => {
-          if (!rk || !(window.AP && window.AP.openPoll)) return;
-          setTip(null);
-          window.AP.openPoll(rk, "leadership", "leadership");
-        };
+        const rk = keys[i];
+        const open = () => openIdx(i);
         const lab = q.pollster + ", " + (q.fieldPending ? "TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
         const on = tip && tip.i === i;
         return (
           <b key={key} className={[(it.fav ? "open" : ""), (rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined}
-             style={{ "--x": dxp(it.y), "--pcolor": color, "--v": ups ? ups[i] : 0 }}
+             style={{ "--x": xs[i], "--pcolor": color, "--v": ups ? ups[i] : 0 }}
              role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
              aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
-             onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-             onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(i, "mouse"); }}
-             onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(i, "mouse"); }}
              onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(i, "focus"); }}
              onBlur={() => hide(i, "focus")}
-             onClick={(ev) => {
-               ev.stopPropagation();
-               const pt = ev.detail === 0 ? "key" : ptr.current;
-               ptr.current = null;
-               if (pt === "mouse" || pt === "key") { open(); return; }
-               if (tip && tip.i === i) setTip(null); else setTip({ i, src: "touch" });
-             }}
              onKeyDown={(ev) => {
                if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
                ev.preventDefault();
