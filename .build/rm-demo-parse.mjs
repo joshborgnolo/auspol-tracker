@@ -14,7 +14,15 @@
 //   lower-house general election sense the table means).
 //
 //   Primary Vote by City/Country — three single columns TOTAL / Capital
-//   Cities / Regional-Rural Areas, same five party rows plus TOTAL.
+//   Cities / Regional-Rural Areas, same five party rows plus TOTAL. From
+//   finding 10366 (12 Oct 2026) the national column is headed "Australia"
+//   instead of "TOTAL"; either head anchors it.
+//
+//   Primary Vote for Tasmania — from finding 10366 (12 Oct 2026), an HTML
+//   <table> on the page (no image, no OCR): one Last election | Now pair, the
+//   same five party rows plus TOTAL, on a FOUR-week pool (n≈200) where the
+//   other tables are the fortnight. parseTasTable() reads the Now column and
+//   the caption's period/n line.
 //
 // Everything the parsers accept as anchors is a constant below; group labels
 // filed in demographics.json are constants too, never OCR text (the OCR
@@ -51,6 +59,7 @@ const gap = "(?:<[^>]+>|\\s|&nbsp;)+";
 export const CAPTION_RES = {
   city: new RegExp(`Primary${gap}Vote${gap}by${gap}City`, "i"),
   state: new RegExp(`Primary${gap}Vote${gap}by${gap}(?:the${gap})?State\\b`, "i"),
+  tas: new RegExp(`Primary${gap}Vote${gap}for${gap}Tasmania`, "i"),
 };
 export const SEEN_IMG_RE = /<img[\s>]/i;
 export function tableImages(html) {
@@ -61,6 +70,52 @@ export function tableImages(html) {
     return m ? m[1] : null;
   };
   return { city: find(CAPTION_RES.city), state: find(CAPTION_RES.state) };
+}
+
+// The Tasmania table's HTML → { now {alp…oth}, totalOk, missing, period,
+// n } — null when no caption; { error } when a caption is there but the
+// table under it doesn't read (a layout change, which the extractor guards).
+const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const cellText = (h) => h.replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#160;/g, " ").replace(/\s+/g, " ").trim();
+export function parseTasTable(html) {
+  const src = String(html ?? "");
+  const i = src.search(CAPTION_RES.tas);
+  if (i < 0) return null;
+  const after = src.slice(i);
+  const tbl = /<table[\s\S]*?<\/table>/i.exec(after);
+  // the table must follow its caption before any other table caption
+  const nextCap = after.slice(1).search(/Primary(?:<[^>]+>|\s|&nbsp;)+Vote/i);
+  if (!tbl || (nextCap >= 0 && tbl.index > nextCap + 1)) return { error: "no <table> under the Tasmania caption" };
+  const rows = [...tbl[0].matchAll(/<tr[\s\S]*?<\/tr>/gi)].map((m) => [...m[0].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((c) => cellText(c[1])));
+  const head = rows.find((r) => r.some((c) => /^now$/i.test(c)));
+  if (!head) return { error: "the Tasmania table has no Now column" };
+  const col = head.findIndex((c) => /^now$/i.test(c));
+  const now = {}, missing = [];
+  let total = null;
+  for (const r of rows) {
+    const label = squash(r[0]);
+    const p = /^total/.test(label) ? "total" : /^onen/.test(label) ? "onp" : /^l.?np|^liberal/.test(label) ? "lnp"
+      : /green/.test(label) ? "grn" : /independent|others|^other$/.test(label) ? "oth" : /^alp|labor/.test(label) ? "alp" : null;
+    if (!p) continue;
+    const v = num(r[col]);
+    if (p === "total") total = v; else if (!(p in now)) now[p] = v;
+  }
+  for (const p of PARTIES) if (now[p] == null) missing.push(`${p} Tas`);
+  // "Interviewing dates of Tasmanian electors aged 18+: Sep. 14 – Oct 11, 2026 (n=204)"
+  const tail = cellText(after.slice(tbl.index + tbl[0].length, tbl.index + tbl[0].length + 1500));
+  const pm = /Tasmanian electors[^:]*:\s*([A-Za-z]{3})[a-z]*\.?\s*(\d{1,2})(?:,?\s*(\d{4}))?\s*[–-]\s*([A-Za-z]{3})[a-z]*\.?\s*(\d{1,2}),?\s*(\d{4})\s*\(n=([\d,]+)\)/i.exec(tail);
+  let period = null, n = null;
+  if (pm) {
+    const [, m1, d1, y1, m2, d2, y2, nn] = pm;
+    const mo1 = MONTHS[m1.toLowerCase()], mo2 = MONTHS[m2.toLowerCase()];
+    if (mo1 && mo2) {
+      const yStart = y1 ? +y1 : (mo1 > mo2 ? +y2 - 1 : +y2);
+      const iso = (y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      period = { dateStart: iso(yStart, mo1, +d1), dateEnd: iso(+y2, mo2, +d2) };
+      n = +nn.replace(/,/g, "");
+    }
+  }
+  return { now, missing, conflicts: [], totalOk: total != null && Math.abs(total - 100) <= 0.6, period, n };
 }
 
 // Greedy y-clustering: tokens on one printed row agree in y within ~0.02,
@@ -174,7 +229,7 @@ export function parseCityTable(lines) {
   const rows = skeleton(lines);
   if (!rows) return null;
   const head = headTokens(lines, rows).filter((t) => centre(t) > 0.25);
-  const tot = head.find((t) => squash(t.text) === "total");
+  const tot = head.find((t) => squash(t.text) === "total" || squash(t.text) === "australia");
   const cap = head.find((t) => squash(t.text).startsWith("capital"));
   const reg = head.find((t) => squash(t.text).startsWith("regional"));
   if (!tot || !cap || !reg) return null;

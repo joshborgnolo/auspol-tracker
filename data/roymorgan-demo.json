@@ -1,5 +1,88 @@
 {
-  "_about": "Built by .build/extract-roymorgan-demo.mjs — Roy Morgan's Primary Vote by State / CITY-COUNTRY table images, read by macOS Vision OCR. Machine-filed waves are re-read from their recorded images every run (drift = guard). Consumed by .build/demographics.mjs; ROYMORGAN_DEMO hand-entered keys win. `none` remembers releases checked and found to carry no tables.",
-  "waves": [],
+  "_about": "Built by .build/extract-roymorgan-demo.mjs — Roy Morgan's Primary Vote by State / CITY-COUNTRY table images, read by macOS Vision OCR, and the Primary Vote for Tasmania HTML table (dims.state.Tas; a four-week pool, its base in `tas`). Machine-filed waves are re-read from their recorded images every run (drift = guard). Consumed by .build/demographics.mjs; ROYMORGAN_DEMO hand-entered keys win. `none` remembers releases checked and found to carry no tables.",
+  "waves": [
+    {
+      "date": "2026-10-11",
+      "slug": "10366-federal-voting-intention-october-12-2026",
+      "article": "https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026",
+      "published": "2026-10-12T17:15",
+      "stateImg": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/10/12061252/image-10.png",
+      "cityImg": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/10/12061158/image-8.png",
+      "total": {
+        "alp": 26,
+        "lnp": 21.5,
+        "onp": 24,
+        "grn": 15,
+        "oth": 13.5
+      },
+      "dims": {
+        "state": {
+          "NSW": {
+            "alp": 27.5,
+            "lnp": 19,
+            "onp": 27.5,
+            "grn": 13.5,
+            "oth": 12.5
+          },
+          "Vic": {
+            "alp": 26.5,
+            "lnp": 27,
+            "onp": 19,
+            "grn": 16.5,
+            "oth": 11
+          },
+          "Qld": {
+            "alp": 25,
+            "lnp": 21,
+            "onp": 28,
+            "grn": 14.5,
+            "oth": 11.5
+          },
+          "SA": {
+            "alp": 28,
+            "lnp": 24,
+            "onp": 14.5,
+            "grn": 20.5,
+            "oth": 13
+          },
+          "WA": {
+            "alp": 22,
+            "lnp": 18.5,
+            "onp": 29.5,
+            "grn": 12,
+            "oth": 18
+          },
+          "Tas": {
+            "alp": 27.5,
+            "lnp": 14,
+            "onp": 23,
+            "grn": 17.5,
+            "oth": 18
+          }
+        },
+        "location": {
+          "Capital Cities": {
+            "alp": 29,
+            "lnp": 21,
+            "onp": 21,
+            "grn": 17,
+            "oth": 12
+          },
+          "Regional/Rural Areas": {
+            "alp": 21.5,
+            "lnp": 22,
+            "onp": 30.5,
+            "grn": 10.5,
+            "oth": 15.5
+          }
+        }
+      },
+      "tas": {
+        "dateStart": "2026-09-14",
+        "dateEnd": "2026-10-11",
+        "n": 204
+      }
+    }
+  ],
   "none": {}
 }

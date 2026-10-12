@@ -18,8 +18,12 @@
         "grn": 91,
         "oth": 55
       },
-      "band": null,
-      "hash": "7b6dd1cb2bff"
+      "band": {
+        "lnp": 3,
+        "grn": 2.5,
+        "oth": 4
+      },
+      "hash": "41627225df7c"
     },
     "polls": [
       "2025-06-01|Roy Morgan",
@@ -220,7 +224,6 @@
       "lnp|state|Vic": 1,
       "oth|language|English only": 1,
       "oth|location|Rural": 1,
-      "oth|state|NSW": 1,
       "oth|state|Non-NSW/Vic/Qld": -1,
       "oth|state|WA": 1,
       "oth|working|Retired": -1
@@ -306,11 +309,6 @@
         "group": "Rural",
         "setLabel": "By location"
       },
-      "oth|state|NSW": {
-        "party": "oth",
-        "group": "NSW",
-        "setLabel": "By state"
-      },
       "oth|state|Non-NSW/Vic/Qld": {
         "party": "oth",
         "group": "Non-NSW/Vic/Qld",
@@ -341,6 +339,12 @@
       "kind": "poll",
       "text": "Roy Morgan (fieldwork 28 Sep–11 Oct, n=2,655) added — the two-party preferred estimate moved 52.3 → 52.4 (Labor v One Nation, implied flows).",
       "url": "https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026"
+    },
+    {
+      "date": "2026-10-12",
+      "label": "12 Oct 2026",
+      "kind": "finding",
+      "text": "NSW voters (by state) no longer break significantly toward others, relative to all voters."
     }
   ]
 }

@@ -10,14 +10,16 @@
    contexts with fixture-backed fetches and OCR — a complete synthetic read
    files; a dropped cell, a broken skeleton and recon drift all guard (exit 2)
    with nothing written. No network, no real polls.json/demographics.json
-   writes. Run: node .build/test-roymorgan-demo.mjs */
+   writes. Finding 10366's reads (ocr-10366-{state,city}-{fast,accurate}.json)
+   pin the "Australia" column head, the OCR ladder (.accurate first, .fast
+   as the fallback) and the Primary Vote for Tasmania HTML table. Run: node .build/test-roymorgan-demo.mjs */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import {
-  tableImages, CAPTION_RES, SEEN_IMG_RE, parseStateTable, parseCityTable, num,
+  tableImages, CAPTION_RES, SEEN_IMG_RE, parseStateTable, parseCityTable, parseTasTable, num,
   CITY_GROUP, REGION_GROUP, PARTIES,
 } from "./rm-demo-parse.mjs";
 import { run, waveProblem, FIRST_WAVE, DEMO_POLLSTER } from "./extract-roymorgan-demo.mjs";
@@ -417,6 +419,108 @@ console.log("14. one-table filing: vacated cross-check noted: OK");
   assert.equal(fs.existsSync(rmdTmp), false, "run() swept the OCR temp dir at exit");
 }
 console.log("15. store-shape guard + temp-dir sweep: OK");
+
+// ---- 16. finding 10366 (12 Oct 2026): "Australia" heads the city table's
+// national column, and .fast drops cells that .accurate reads ------------------
+const SLUG_10366 = "10366-federal-voting-intention-october-12-2026";
+const RELEASE_10366 = JSON.parse(fs.readFileSync(path.join(RM_CACHE_DIR, `release-${SLUG_10366}.json`), "utf8"));
+const ROW_10366 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"))
+  .polls.find((p) => p.pollster === DEMO_POLLSTER && p.date === "2026-10-11");
+assert.ok(ROW_10366, "oracle: the 2026-10-11 Roy Morgan poll row is on file");
+const OCR_10366 = Object.fromEntries(["state", "city"].flatMap((t) => ["fast", "accurate"].map((m) =>
+  [`${t}-${m}`, JSON.parse(fs.readFileSync(path.join(FIX, `ocr-10366-${t}-${m}.json`), "utf8"))])));
+const IMG_10366 = tableImages(RELEASE_10366.content);
+{
+  const c = parseCityTable(OCR_10366["city-accurate"]);
+  assert.ok(c, "a city table headed Australia / Capital Cities / Regional parses");
+  assert.deepEqual([c.missing, c.conflicts, c.totalOk], [[], [], true]);
+  // oracles: the printed image, cell by cell
+  assert.deepEqual(c.total, { alp: 26, lnp: 21.5, onp: 24, grn: 15, oth: 13.5 });
+  assert.deepEqual(c.groups[CITY_GROUP], { alp: 29, lnp: 21, onp: 21, grn: 17, oth: 12 });
+  assert.deepEqual(c.groups[REGION_GROUP], { alp: 21.5, lnp: 22, onp: 30.5, grn: 10.5, oth: 15.5 });
+  assert.deepEqual(c.total, { alp: ROW_10366.alp, lnp: ROW_10366.lnp, onp: ROW_10366.onp, grn: ROW_10366.grn, oth: ROW_10366.ind },
+    "the Australia column is the poll row");
+  const s = parseStateTable(OCR_10366["state-accurate"]);
+  assert.deepEqual([s.missing, s.conflicts, s.totalOk], [[], [], true]);
+  assert.deepEqual(s.now.alp, { NSW: 27.5, Vic: 26.5, Qld: 25, SA: 28, WA: 22 });
+  assert.deepEqual(s.now.onp, { NSW: 27.5, Vic: 19, Qld: 28, SA: 14.5, WA: 29.5 });
+  // the .fast reads that guarded the release-night run
+  assert.ok(parseCityTable(OCR_10366["city-fast"]).missing.includes("lnp region"));
+  assert.deepEqual(parseStateTable(OCR_10366["state-fast"]).missing, ["alp WA"]);
+}
+{
+  // the ladder: .accurate first files the wave whole
+  const { ctx, outPath } = sandbox({ rows: [ROW_10366], caches: { [SLUG_10366]: RELEASE_10366.content }, demoFile: { waves: [] } });
+  const asked = [];
+  ctx.ocrImage = async (url, rung) => {
+    asked.push(rung.mode);
+    return OCR_10366[`${url === IMG_10366.state ? "state" : "city"}-${rung.mode}`];
+  };
+  let r = await run(ctx);
+  assert.equal(r.exit, 0, r.guard);
+  assert.deepEqual(r.filed, [`${DEMO_POLLSTER}|2026-10-11`]);
+  assert.deepEqual(asked, ["accurate", "accurate"], "a clean first rung reads no further");
+  const w = JSON.parse(fs.readFileSync(outPath, "utf8")).waves[0];
+  assert.equal(w.dims.state.WA.alp, 22);
+  assert.equal(w.dims.location[REGION_GROUP].lnp, 22);
+  // Tasmania: the HTML table on the page, its four-week base on the wave
+  assert.deepEqual(w.dims.state.Tas, { alp: 27.5, lnp: 14, onp: 23, grn: 17.5, oth: 18 });
+  assert.deepEqual(w.tas, { dateStart: "2026-09-14", dateEnd: "2026-10-11", n: 204 });
+  assert.deepEqual(Object.keys(w.dims.state), ["NSW", "Vic", "Qld", "SA", "WA", "Tas"]);
+  // a clean re-run re-reads the images and the Tasmania table, files nothing
+  r = await run(ctx);
+  assert.equal(r.exit, 0, r.guard);
+  assert.equal(r.changed, false);
+  assert.deepEqual(r.notes, []);
+  // .accurate wedged on the recon re-read: .fast reads short → a note, not a drift guard
+  const before = fs.readFileSync(outPath, "utf8");
+  ctx.ocrImage = async (url, rung) => {
+    if (rung.mode === "accurate") throw new Error("e5rt error 13");
+    return OCR_10366[`${url === IMG_10366.state ? "state" : "city"}-fast`];
+  };
+  r = await run(ctx);
+  assert.equal(r.exit, 0, r.guard);
+  assert.ok(r.notes.some((n) => /recon 2026-10-11: no OCR rung read the tables whole/.test(n)), r.notes.join(" | "));
+  assert.equal(fs.readFileSync(outPath, "utf8"), before, "a short recon read rewrites nothing");
+}
+{
+  // .accurate wedged on a fresh wave: the .fast rungs' dropped cell is a guard
+  const { ctx, outPath } = sandbox({ rows: [ROW_10366], caches: { [SLUG_10366]: RELEASE_10366.content }, demoFile: { waves: [] } });
+  ctx.ocrImage = async (url, rung) => {
+    if (rung.mode === "accurate") throw new Error("e5rt error 13");
+    return OCR_10366[`${url === IMG_10366.state ? "state" : "city"}-fast`];
+  };
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, /state table: OCR missed figure cell\(s\) alp WA/);
+  assert.equal(fs.existsSync(outPath), false);
+  // every rung failing is an OCR error, not a quiet parse failure
+  ctx.ocrImage = async () => { throw new Error("e5rt error 13"); };
+  await assert.rejects(run(ctx), /e5rt error 13/);
+}
+{
+  // parseTasTable: no caption → null; a caption over a table it can't read → error
+  assert.equal(parseTasTable(RELEASE_10363.content), null, "10363 printed no Tasmania table");
+  const t = parseTasTable(RELEASE_10366.content);
+  assert.deepEqual([t.missing, t.totalOk, t.n, t.period], [[], true, 204, { dateStart: "2026-09-14", dateEnd: "2026-10-11" }]);
+  const noNow = RELEASE_10366.content.replace(/<strong>Now<\/strong>/, "<strong>Latest</strong>");
+  assert.match(parseTasTable(noNow).error, /no Now column/);
+  // ... and that guards the wave, nothing written
+  const { ctx, outPath } = sandbox({ rows: [ROW_10366], caches: { [SLUG_10366]: noNow }, demoFile: { waves: [] } });
+  ctx.ocrImage = async (url, rung) => OCR_10366[`${url === IMG_10366.state ? "state" : "city"}-${rung.mode}`];
+  const r = await run(ctx);
+  assert.equal(r.exit, 2);
+  assert.match(r.guard, /the Tasmania table no longer parses \(the Tasmania table has no Now column\)/);
+  assert.equal(fs.existsSync(outPath), false);
+  // a Tasmania cell that doesn't add up is the gate's too
+  const off = RELEASE_10366.content.replace(/>27\.5</, ">29.5<");
+  const s2 = sandbox({ rows: [ROW_10366], caches: { [SLUG_10366]: off }, demoFile: { waves: [] } });
+  s2.ctx.ocrImage = ctx.ocrImage;
+  const r2 = await run(s2.ctx);
+  assert.equal(r2.exit, 2);
+  assert.match(r2.guard, /Tasmania table: the Now column sums 102/);
+}
+console.log("16. 10366: Australia-headed city table + OCR ladder + Tasmania table: OK");
 
 console.log("All Roy Morgan demo-reader pins pass.");
 assert.equal(FIRST_WAVE, "2026-09-27");

@@ -7,7 +7,8 @@
 // pixels in the release page's two PNGs (the PDF they came from rides the
 // findings payload's pdfDownload as an AccessDenied-private S3 object —
 // tried 10363's), so this reads them with macOS Vision OCR
-// (.build/ocr-image.swift [scale] [fast]) and the pure parsers in
+// (.build/ocr-image.swift [scale] [fast], through the RMD.OCR_LADDER
+// rungs) and the pure parsers in
 // rm-demo-parse.mjs (pinned by test-roymorgan-demo.mjs against the
 // committed OCR reads). Writes data/roymorgan-demo.json, which
 // demographics.mjs merges beneath ROYMORGAN_DEMO's hand-entered keys (a
@@ -38,6 +39,15 @@
 // validated at load: a drifted data/roymorgan-demo.json guards rather
 // than being silently reset and rewritten.
 //
+// Tasmania (from finding 10366, 12 Oct 2026): a third table, "Primary
+// Vote for Tasmania", printed as an HTML <table> on the page — read from
+// the release content by parseTasTable, no OCR. It files as dims.state.Tas
+// beside the fortnight's mainland states, though its base is a FOUR-week
+// pool (n≈200) — the way the hand-entered four-weekly aggregates of Nov
+// 2025–Feb 2026 already file their Tas cut; the wave records that base as
+// `tas {dateStart, dateEnd, n}`. A Tasmania caption whose table doesn't
+// read guards like a broken image table.
+//
 // recon 1: every wave THIS extractor filed is re-read from its recorded
 // image URLs and re-parsed every run; drift is a guard (exit 2), never a
 // rewrite. recon 2 (read-only): hand-owned waves on file in
@@ -58,8 +68,9 @@
 // Store shape: data/roymorgan-demo.json
 //   { _about, waves: [ { date, slug, article, published, stateImg, cityImg,
 //                        total {alp,lnp,onp,grn,oth} | null,
-//                        dims: { state: { NSW: {…} … }, location: { "Capital
-//                        Cities": {…}, "Regional/Rural Areas": {…} } } } ],
+//                        dims: { state: { NSW: {…} … Tas? }, location: { "Capital
+//                        Cities": {…}, "Regional/Rural Areas": {…} } },
+//                        tas? { dateStart, dateEnd, n } } ],
 //     none: { <slug>: <iso day checked> } }
 import fs from "node:fs";
 import os from "node:os";
@@ -67,7 +78,7 @@ import path from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { fetchText, writeAtomic, TRACKER_UA } from "./extract-common.mjs";
-import { tableImages, CAPTION_RES, SEEN_IMG_RE, parseStateTable, parseCityTable, PARTIES, CITY_GROUP, REGION_GROUP } from "./rm-demo-parse.mjs";
+import { tableImages, CAPTION_RES, SEEN_IMG_RE, parseStateTable, parseCityTable, parseTasTable, PARTIES, CITY_GROUP, REGION_GROUP } from "./rm-demo-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -76,7 +87,14 @@ const LIB_MODE = !process.argv[1] || path.resolve(process.argv[1]) !== fileURLTo
 export const DEMO_POLLSTER = "Roy Morgan";
 export const FIRST_WAVE = "2026-09-27";   // finding 10363's wave — the first release with the tables
 export const RMD = {
-  OCR_SCALE: "3",                         // small PNGs lose figure cells at native size
+  // Each table image is read rung by rung until one parses clean (no
+  // dropped or colliding cell, TOTALs ≈100). Small PNGs lose figure cells
+  // at native size, hence the upscale. .accurate leads: .fast dropped cells
+  // in both of 10366's tables (12 Oct 2026: ALP WA, L-NP Regional, two
+  // TOTALs) where .accurate read every one. .fast stays as the fallback for
+  // the days .accurate's Neural Engine path wedges (e5rt error 13, seen
+  // when this reader shipped 9 Oct) — a rung whose OCR fails steps down.
+  OCR_LADDER: [{ scale: "3", mode: "accurate" }, { scale: "3", mode: "fast" }, { scale: "4", mode: "fast" }],
   SUM_LIMIT: 1,                           // column sums and TOTAL rows sit within ±1 of 100
   ROW_LIMIT: 1,                           // the city table's TOTAL column vs the poll row
 };
@@ -96,14 +114,15 @@ function ocrBinary() {
   }
   return OCR_BIN;
 }
-function ocrFile(bin, file) {
+function ocrFile(bin, file, rung) {
   let why = "";
+  const args = [file, rung.scale, ...(rung.mode === "fast" ? ["fast"] : [])];
   for (let i = 0; i < 3; i++) {
-    const r = spawnSync(bin, [file, RMD.OCR_SCALE, "fast"], { encoding: "utf8", timeout: 120_000 });
+    const r = spawnSync(bin, args, { encoding: "utf8", timeout: 120_000 });
     if (r.status === 0) return JSON.parse(r.stdout);
     why = `${r.signal || "exit " + r.status}: ${(r.stderr || "").trim().slice(0, 160)}`;
   }
-  throw new Error(`OCR failed on ${file} (${why})`);
+  throw new Error(`OCR (${rung.scale}x ${rung.mode}) failed on ${file} (${why})`);
 }
 
 // ------------------------------------------------------------ runtime deps
@@ -113,13 +132,19 @@ function defaultCtx() {
   // and whatever was made is swept at every run() exit via tmpPath below.
   let tmp = null;
   const ensureTmp = () => (tmp ??= fs.mkdtempSync(path.join(os.tmpdir(), "rmd-")));
+  // ocrImage(url, rung) — the image is downloaded once per run and read at
+  // each rung the ladder asks for.
+  const files = new Map();
   const ocrImage = process.platform === "darwin"
-    ? async (url) => {
-      const buf = Buffer.from(await (await fetch(url, { headers: { "user-agent": TRACKER_UA },
-        signal: AbortSignal.timeout(60_000) })).arrayBuffer());
-      const f = path.join(ensureTmp(), `img-${Math.abs([...url].reduce((a, c) => a * 31 + c.charCodeAt(0) | 0, 7))}.png`);
-      fs.writeFileSync(f, buf);
-      return ocrFile(ocrBinary(), f);
+    ? async (url, rung = RMD.OCR_LADDER[0]) => {
+      if (!files.has(url)) {
+        const buf = Buffer.from(await (await fetch(url, { headers: { "user-agent": TRACKER_UA },
+          signal: AbortSignal.timeout(60_000) })).arrayBuffer());
+        const f = path.join(ensureTmp(), `img-${Math.abs([...url].reduce((a, c) => a * 31 + c.charCodeAt(0) | 0, 7))}.png`);
+        fs.writeFileSync(f, buf);
+        files.set(url, f);
+      }
+      return ocrFile(ocrBinary(), files.get(url), rung);
     }
     : null;
   return {
@@ -165,32 +190,51 @@ async function contentOf(ctx, slug, notes) {
   } catch (e) { notes.push(`${slug}: release page fetch failed (${String(e.message).slice(0, 120)})`); return null; }
 }
 
+// One table image through the OCR ladder: the first clean parse wins. When
+// no rung reads clean, the first skeleton-matching parse comes back, so the
+// filing gate names its dropped cells; null when no rung matched. A rung
+// whose OCR fails steps down; only a ladder where every rung failed throws.
+const cleanTable = (t) => !!t && !t.missing.length && !t.conflicts.length && t.totalOk;
+async function readImage(ctx, url, parse) {
+  let best = null, read = false, err = null;
+  for (const rung of RMD.OCR_LADDER) {
+    let t;
+    try { t = parse(await ctx.ocrImage(url, rung)); read = true; } catch (e) { err = e; continue; }
+    if (cleanTable(t)) return t;
+    best ??= t;
+  }
+  if (!read) throw err;
+  return best;
+}
+
 // Read one wave's tables end to end: caption → image → OCR → parse.
 // Returns { total, dims, imgs } or null when no captions exist (a plain
 // release). Throws on OCR/tool failures; null parses are reported through
 // `problems` (a guard at filing, a recon surprise at re-read).
-async function readTables(ctx, imgs, problems) {
-  const ocrT = async (url) => (url ? ctx.ocrImage(url) : null);
-  const stateT = imgs.state ? parseStateTable(await ocrT(imgs.state)) : null;
+async function readTables(ctx, imgs, problems, tas = null) {
+  if (tas?.error) problems.push(`the Tasmania table no longer parses (${tas.error})`);
+  const tasT = tas && !tas.error ? tas : null;
+  const stateT = imgs.state ? await readImage(ctx, imgs.state, parseStateTable) : null;
   if (imgs.state && !stateT) problems.push("the state table no longer parses");
-  const cityT = imgs.city ? parseCityTable(await ocrT(imgs.city)) : null;
+  const cityT = imgs.city ? await readImage(ctx, imgs.city, parseCityTable) : null;
   if (imgs.city && !cityT) problems.push("the city table no longer parses");
-  if (!stateT && !cityT) return null;
+  if (!stateT && !cityT && !tasT) return null;
   const dims = {};
   if (stateT) {
     dims.state = {};
     for (const st of stateT.states)
       dims.state[st] = Object.fromEntries(PARTIES.map((p) => [p, stateT.now[p][st]]));
   }
+  if (tasT) (dims.state ??= {}).Tas = Object.fromEntries(PARTIES.map((p) => [p, tasT.now[p] ?? null]));
   if (cityT) dims.location = { [CITY_GROUP]: cityT.groups[CITY_GROUP], [REGION_GROUP]: cityT.groups[REGION_GROUP] };
-  return { total: cityT ? cityT.total : null, dims, stateT, cityT };
+  return { total: cityT ? cityT.total : null, dims, stateT, cityT, tasT };
 }
 
 // The filing path's whole-wave check: no dropped cells, no collisions, the
 // printed TOTALs ≈ 100, every column sums ≈ 100, and the city table's TOTAL
 // column equals the poll row's primaries. A string is a guard reason.
 export function waveProblem(read, row) {
-  for (const [name, t] of [["state", read.stateT], ["city", read.cityT]]) {
+  for (const [name, t] of [["state", read.stateT], ["city", read.cityT], ["Tasmania", read.tasT]]) {
     if (!t) continue;
     if (t.missing.length) return `${name} table: OCR missed figure cell(s) ${t.missing.join(", ")} — never completed from the row sum`;
     if (t.conflicts.length) return `${name} table: colliding figure cells on ${t.conflicts.join(", ")}`;
@@ -201,6 +245,11 @@ export function waveProblem(read, row) {
       const s = PARTIES.reduce((a, p) => a + (read.stateT.now[p][st] ?? 0), 0);
       if (Math.abs(s - 100) > RMD.SUM_LIMIT) return `state table: the ${st} column sums ${+s.toFixed(1)}`;
     }
+  }
+  if (read.tasT) {
+    const s = PARTIES.reduce((a, p) => a + (read.tasT.now[p] ?? 0), 0);
+    if (Math.abs(s - 100) > RMD.SUM_LIMIT) return `Tasmania table: the Now column sums ${+s.toFixed(1)}`;
+    if (!read.tasT.period || !read.tasT.n) return "Tasmania table: its interviewing-dates line (period, n) doesn't read";
   }
   if (read.cityT) {
     for (const [g, v] of Object.entries(read.cityT.groups)) {
@@ -283,9 +332,22 @@ export async function run(overrides = {}) {
   for (const w of store.waves) {
     try {
       const problems = [];
-      const again = await readTables(ctx, { state: w.stateImg, city: w.cityImg }, problems);
+      // a wave filed with Tasmania re-reads it from the release content
+      let tas = null;
+      if (w.dims?.state?.Tas) {
+        const content = await contentOf(ctx, w.slug, notes);
+        if (content == null) { notes.push(`recon ${w.date}: release content unavailable — recon skipped`); continue; }
+        tas = parseTasTable(content) ?? { error: "the caption is gone" };
+      }
+      const again = await readTables(ctx, { state: w.stateImg, city: w.cityImg }, problems, tas);
       if (!again || problems.length)
         return done({ guard: `recon ${w.date}: source no longer parses (${problems.join("; ") || "no tables"})`, notes, exit: 2 });
+      // every rung read short this run (.accurate wedged, .fast dropping a
+      // cell): an OCR gap, not evidence the image moved — note, don't guard
+      if ([again.stateT, again.cityT].some((t) => t && !cleanTable(t))) {
+        notes.push(`recon ${w.date}: no OCR rung read the tables whole this run — recon skipped`);
+        continue;
+      }
       const dims = canon(w.dims) === canon(again.dims) && canon(w.total ?? null) === canon(again.total ?? null);
       if (!dims) return done({ guard: `recon ${w.date}: the images no longer read as the recorded wave`, notes, exit: 2 });
     } catch (e) { notes.push(`recon ${w.date}: ${String(e.message).slice(0, 120)}`); }
@@ -300,9 +362,10 @@ export async function run(overrides = {}) {
     try {
       const content = await contentOf(ctx, slug, notes);
       const imgs = content ? tableImages(content) : null;
-      if (!imgs || (!imgs.state && !imgs.city)) continue;
+      const tas = content ? parseTasTable(content) : null;
+      if (!imgs || (!imgs.state && !imgs.city && !tas)) continue;
       const problems = [];
-      const mine = await readTables(ctx, imgs, problems);
+      const mine = await readTables(ctx, imgs, problems, tas);
       if (!mine || problems.length) { notes.push(`recon ${p.date}: the machine read failed — the hand entry carries the wave`); continue; }
       const onFile = (demoFile.waves ?? []).find((w) => w.pollster === DEMO_POLLSTER && w.date === p.date);
       const diffs = [];
@@ -328,7 +391,8 @@ export async function run(overrides = {}) {
     const content = await contentOf(ctx, slug, notes);
     if (content == null) continue;   // a read failure: noted inside contentOf, retried next run, never remembered
     const imgs = tableImages(content);
-    if (!imgs.state && !imgs.city) {
+    const tas = parseTasTable(content);
+    if (!imgs.state && !imgs.city && !tas) {
       // A caption with an <img> we cannot resolve (jpg, a moved src, …) is
       // the table layout having moved — guard, never remember: a blind
       // none-mark silences the wave for good (the 12-day Wikipedia
@@ -340,12 +404,12 @@ export async function run(overrides = {}) {
       store.none[slug] = ctx.todayIso;
       continue;
     }
-    if (!imgs.state || !imgs.city)
+    if ((imgs.state || imgs.city) && (!imgs.state || !imgs.city))
       notes.push(imgs.city == null
         ? `${slug}: only the state table resolved — the city-TOTAL-vs-poll-row cross-check is vacated this wave`
         : `${slug}: only the city table resolved — the state column-sum checks are vacated this wave`);
     const problems = [];
-    const read = await readTables(ctx, imgs, problems);
+    const read = await readTables(ctx, imgs, problems, tas);
     if (problems.length) return done({ guard: `${slug}: ${problems.join("; ")}`, notes, exit: 2 });
     const bad = read && waveProblem(read, p);
     if (bad) return done({ guard: `${slug}: ${bad}`, notes, exit: 2 });
@@ -355,6 +419,7 @@ export async function run(overrides = {}) {
       published: p.published ?? null,
       stateImg: imgs.state ?? null, cityImg: imgs.city ?? null,
       total: read.total, dims: read.dims,
+      ...(read.tasT ? { tas: { ...read.tasT.period, n: read.tasT.n } } : {}),
     });
     store.waves.sort((a, b) => (a.date < b.date ? -1 : 1));
     changed = true;
@@ -362,7 +427,7 @@ export async function run(overrides = {}) {
   }
 
   if (changed && ctx.writeFiles) {
-    store._about = "Built by .build/extract-roymorgan-demo.mjs — Roy Morgan's Primary Vote by State / CITY-COUNTRY table images, read by macOS Vision OCR. Machine-filed waves are re-read from their recorded images every run (drift = guard). Consumed by .build/demographics.mjs; ROYMORGAN_DEMO hand-entered keys win. `none` remembers releases checked and found to carry no tables.";
+    store._about = "Built by .build/extract-roymorgan-demo.mjs — Roy Morgan's Primary Vote by State / CITY-COUNTRY table images, read by macOS Vision OCR, and the Primary Vote for Tasmania HTML table (dims.state.Tas; a four-week pool, its base in `tas`). Machine-filed waves are re-read from their recorded images every run (drift = guard). Consumed by .build/demographics.mjs; ROYMORGAN_DEMO hand-entered keys win. `none` remembers releases checked and found to carry no tables.";
     writeAtomic(ctx.outPath, JSON.stringify(store, null, 2) + "\n");
   }
   return done({ changed, filed, checkedNone, notes, exit: 0 });
