@@ -2942,7 +2942,10 @@ function RdAllPolls(P) {
   );
   const sampleCell = (p) => (
     <span role="cell" className="rd-ap-n"><span>{p.sample != null ? p.sample.toLocaleString() : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
-      : rdEffTbc(p) ? <span className="rd-ap-sub">{rdEffTbcNote(p)}</span> : null}</span>
+      : rdEffTbc(p) ? <span className="rd-ap-sub">{rdEffTbcNote(p)}</span>
+      /* an MRP files no effective sample (its APC statement prints "n/a for
+         MRP"), so say so rather than leave the sub-line empty */
+      : / \(MRP\)$/.test(p.pollster || "") ? <span className="rd-ap-sub">eff. n/a</span> : null}</span>
   );
   const tipCard = (p, f, m) => {
     const lean = p.lean;

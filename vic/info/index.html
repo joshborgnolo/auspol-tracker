@@ -56997,7 +56997,9 @@ function RdAllPolls(P) {
     className: "rd-ap-sub"
   }, "eff. ", p.sampleEff.toLocaleString()) : rdEffTbc(p) ? React.createElement("span", {
     className: "rd-ap-sub"
-  }, rdEffTbcNote(p)) : null);
+  }, rdEffTbcNote(p)) : / \(MRP\)$/.test(p.pollster || "") ? React.createElement("span", {
+    className: "rd-ap-sub"
+  }, "eff. n/a") : null);
   const tipCard = (p, f, m) => {
     const lean = p.lean;
     const he = rdApHe(p, onM, pub);
