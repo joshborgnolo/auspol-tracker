@@ -27,3 +27,4 @@
 {"ts":"2026-10-09T20:16:21.767Z","syd":"2026-10-10 07:16","pollster":"Roy Morgan","kind":"dated","anchor":"2026-09-29","release":"2026-10-12","open":"2026-10-12","close":"2026-10-12","winHalf":0,"rolled":true,"ahead":0}
 {"ts":"2026-10-11T20:16:41.890Z","syd":"2026-10-12 07:16","pollster":"Newspoll","kind":"dated","anchor":"2026-10-11","release":"2026-11-01","open":"2026-10-25","close":"2026-11-08","winHalf":7,"rolled":false,"ahead":0}
 {"ts":"2026-10-11T20:16:41.890Z","syd":"2026-10-12 07:16","pollster":"Resolve","kind":"dated","anchor":"2026-10-11","release":"2026-11-08","open":"2026-11-01","close":"2026-11-15","winHalf":7,"rolled":false,"ahead":0}
+{"ts":"2026-10-12T20:15:59.690Z","syd":"2026-10-13 07:15","pollster":"Roy Morgan","kind":"dated","anchor":"2026-10-12","release":"2026-10-19","open":"2026-10-19","close":"2026-10-19","winHalf":0,"rolled":false,"ahead":0}
