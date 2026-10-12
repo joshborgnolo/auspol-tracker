@@ -526,7 +526,9 @@ const shellNow = (() => {
   return { latest: { published: L.published, publishedISO: L.publishedISO, nextElectionDue: L.nextElectionDue,
                      pollsTracked: L.pollsTracked, housesTracked: L.housesTracked,
                      fact: newest ? newest.pollster + ", " + (newest.fieldPending ? "TBC" : newest.field) : null,
-                     factUrl: newest ? newest.url : null },
+                     factUrl: newest ? newest.url : null,
+                     // a TBC links where the fieldwork dates will appear, as on the main page
+                     ...(newest && newest.fieldPending ? { factHouse: newest.pollster, factTbcUrl: newest.fieldUrl || null } : {}) },
            past: pastCycleWord(), pollCadence: grab("pollCadence") };
 })();
 /* The masthead's words and artwork as the main page renders them, lifted by

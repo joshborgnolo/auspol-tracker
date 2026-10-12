@@ -78333,7 +78333,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "released": "2026-09-30",
     "sample": 9740,
     "fieldPending": true,
-    "fieldUrl": null,
+    "fieldUrl": "https://demosau.com/methodology-statements/",
     "fmid": "2026-08-31",
     "client": "Self-published",
     "noAgg": true,
@@ -80640,6 +80640,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "pollster": "DemosAU (MRP)",
       "field": "1 Aug–30 Sep",
       "fieldPending": true,
+      "fieldUrl": "https://demosau.com/methodology-statements/",
       "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/"
     },
     "rivalLead": "alp_on",
@@ -93048,7 +93049,7 @@ function PollsterTable({
       title: r.publishedLabel ? undefined : "Publication date not recorded for this poll – showing the last day of fieldwork"
     }, r.publishedLabel || r.releasedLabel)), React.createElement("td", {
       className: "ta-l muted"
-    }, r.fieldPending ? "TBC" : r.field), React.createElement("td", {
+    }, r.fieldPending ? rdFieldTbc(r) : r.field), React.createElement("td", {
       className: "num muted hide-md"
     }, r.sample != null ? r.sample.toLocaleString() : "—"), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("td", {
       className: "ta-l apub-col hide-md"
@@ -99242,7 +99243,7 @@ function AllPollsView({
       title: POLL_TAG_META[id].title
     }, POLL_TAG_META[id].label)))), React.createElement("td", {
       className: "ta-l muted"
-    }, p.fieldLabel), React.createElement("td", {
+    }, p.fieldPending ? rdFieldTbc(p) : p.fieldLabel), React.createElement("td", {
       className: "num muted hide-md"
     }, p.sample != null ? p.sample.toLocaleString() : "—"), React.createElement("td", {
       className: "num hide-md"
@@ -113395,7 +113396,7 @@ function RdPolls({
       className: "rd-pl-main"
     }, r.publishedLabel || r.releasedLabel), React.createElement("span", {
       className: "rd-pl-sub"
-    }, r.fieldPending ? "fieldwork TBC" : r.field, r.sample ? ", " + r.sample.toLocaleString() : "")), React.createElement("span", {
+    }, r.fieldPending ? React.createElement(React.Fragment, null, "fieldwork ", rdFieldTbc(r)) : r.field, r.sample ? ", " + r.sample.toLocaleString() : "")), React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-figs"
     }, React.createElement(RdSwap, {
@@ -113442,7 +113443,7 @@ function RdPolls({
     })))), React.createElement("span", {
       className: "rd-pl-foot1",
       "aria-hidden": "true"
-    }, React.createElement("span", null, React.createElement("b", null, r.publishedLabel || r.releasedLabel), ", ", r.fieldPending ? "fieldwork TBC" : r.field), React.createElement("span", {
+    }, React.createElement("span", null, React.createElement("b", null, r.publishedLabel || r.releasedLabel), ", ", r.fieldPending ? React.createElement(React.Fragment, null, "fieldwork ", rdFieldTbc(r, -1)) : r.field), React.createElement("span", {
       className: nx.missed ? "missed" : ""
     }, "Next ", React.createElement("b", null, nx.date), nx.sub ? ", " + nx.sub.replace(/, .*$/, "") : ""))), isOpen && detail(e));
   })), React.createElement(RdKey, {
@@ -115689,7 +115690,7 @@ function rdEffTbcNote(p) {
   }, "TBC"));
 }
 const rdFieldTxt = q => q && q.fieldPending ? "TBC" : q && (q.field || q.dateLabel) || "";
-function rdFieldTbc(p) {
+function rdFieldTbc(p, tabIndex) {
   const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
   return p.fieldUrl ? React.createElement("a", {
     className: "rd-tbc",
@@ -115697,6 +115698,7 @@ function rdFieldTbc(p) {
     target: "_blank",
     rel: "noopener noreferrer",
     title: note,
+    tabIndex: tabIndex,
     onClick: e => e.stopPropagation()
   }, "TBC") : React.createElement("span", {
     title: note
@@ -123056,12 +123058,17 @@ function Header({
   const J = window.JUR;
   const rdLatest = rd ? D.latest.newest || null : null;
   const rdLatestUrl = rdLatest ? rdLatest.releaseUrl || rdLatest.url : null;
-  const rdLatestFact = rdLatest ? rdLatestUrl ? React.createElement("a", {
+  const rdLatestFact = rdLatest ? rdLatest.fieldPending ? React.createElement(React.Fragment, null, rdLatestUrl ? React.createElement("a", {
     className: "mh-latest",
     href: rdLatestUrl,
     target: "_blank",
     rel: "noopener noreferrer"
-  }, rdLatest.pollster + ", " + (rdLatest.fieldPending ? "TBC" : rdLatest.field)) : rdLatest.pollster + ", " + (rdLatest.fieldPending ? "TBC" : rdLatest.field) : D.latest.published;
+  }, rdLatest.pollster) : rdLatest.pollster, ", ", rdFieldTbc(rdLatest)) : rdLatestUrl ? React.createElement("a", {
+    className: "mh-latest",
+    href: rdLatestUrl,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, rdLatest.pollster + ", " + rdLatest.field) : rdLatest.pollster + ", " + rdLatest.field : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
     if (!m) return null;

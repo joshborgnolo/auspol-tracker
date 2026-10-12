@@ -960,7 +960,20 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     var factEls = document.querySelectorAll(".sh-latest");
     for (var fi = 0; fi < factEls.length; fi++) {
       factEls[fi].textContent = "";
-      if (L.factUrl) {
+      if (L.factHouse && L.factTbcUrl) {
+        /* fieldwork not yet published: the name opens the release, the TBC
+           where the dates will appear – the main page's split */
+        var fn = document.createElement(L.factUrl ? "a" : "span");
+        if (L.factUrl) { fn.className = "mh-latest"; fn.href = L.factUrl; fn.target = "_blank"; fn.rel = "noopener noreferrer"; }
+        fn.textContent = L.factHouse;
+        var ft = document.createElement("a");
+        ft.className = "sh-tbc"; ft.href = L.factTbcUrl; ft.target = "_blank"; ft.rel = "noopener noreferrer";
+        ft.title = "Fieldwork dates not yet published for this poll";
+        ft.textContent = "TBC";
+        factEls[fi].appendChild(fn);
+        factEls[fi].appendChild(document.createTextNode(", "));
+        factEls[fi].appendChild(ft);
+      } else if (L.factUrl) {
         var fa = document.createElement("a");
         fa.className = "mh-latest"; fa.href = L.factUrl;
         fa.target = "_blank"; fa.rel = "noopener noreferrer";

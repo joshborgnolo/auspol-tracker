@@ -559,6 +559,8 @@ a.wordmark { text-decoration: none; }
 .sh-head-compact { display: none; }
 .sh-head a.mh-latest { color: inherit; text-decoration: none; }
 .sh-head a.mh-latest:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sh-head a.sh-tbc { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
+.sh-head a.sh-tbc:hover { text-decoration-style: solid; }
 .sh-right { display: flex; align-items: flex-start; gap: 28px; padding-top: 4px; }
 .sh-meta { display: flex; align-items: stretch; gap: 24px; font-family: var(--sans); line-height: 1.5; }
 .sh-meta[hidden] { display: none; }
@@ -1128,7 +1130,20 @@ ${npProjectSrc()}
     var factEls = document.querySelectorAll(".sh-latest");
     for (var fi = 0; fi < factEls.length; fi++) {
       factEls[fi].textContent = "";
-      if (L.factUrl) {
+      if (L.factHouse && L.factTbcUrl) {
+        /* fieldwork not yet published: the name opens the release, the TBC
+           where the dates will appear – the main page's split */
+        var fn = document.createElement(L.factUrl ? "a" : "span");
+        if (L.factUrl) { fn.className = "mh-latest"; fn.href = L.factUrl; fn.target = "_blank"; fn.rel = "noopener noreferrer"; }
+        fn.textContent = L.factHouse;
+        var ft = document.createElement("a");
+        ft.className = "sh-tbc"; ft.href = L.factTbcUrl; ft.target = "_blank"; ft.rel = "noopener noreferrer";
+        ft.title = "Fieldwork dates not yet published for this poll";
+        ft.textContent = "TBC";
+        factEls[fi].appendChild(fn);
+        factEls[fi].appendChild(document.createTextNode(", "));
+        factEls[fi].appendChild(ft);
+      } else if (L.factUrl) {
         var fa = document.createElement("a");
         fa.className = "mh-latest"; fa.href = L.factUrl;
         fa.target = "_blank"; fa.rel = "noopener noreferrer";

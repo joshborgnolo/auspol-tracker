@@ -4986,7 +4986,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                         {r.publishedLabel || r.releasedLabel}
                       </span>
                     </td>
-                    <td className="ta-l muted">{r.fieldPending ? "TBC" : r.field}</td>
+                    <td className="ta-l muted">{r.fieldPending ? rdFieldTbc(r) : r.field}</td>
                     <td className="num muted hide-md">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
                     {facet === "twopp" && (<>

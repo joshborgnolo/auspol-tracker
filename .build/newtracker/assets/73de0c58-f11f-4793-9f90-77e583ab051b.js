@@ -376,9 +376,16 @@ function Header({ isDark, onToggleTheme, rd }) {
      the archive emitter's own precedence. */
   const rdLatestUrl = rdLatest ? (rdLatest.releaseUrl || rdLatest.url) : null;
   const rdLatestFact = rdLatest
-    ? (rdLatestUrl
-        ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + ", " + (rdLatest.fieldPending ? "TBC" : rdLatest.field)}</a>
-        : rdLatest.pollster + ", " + (rdLatest.fieldPending ? "TBC" : rdLatest.field))
+    ? (rdLatest.fieldPending
+        /* fieldwork not yet published: the name opens the release and the
+           TBC where the dates will appear (gen-data's fieldUrl), as every
+           TBC on the site does */
+        ? <>{rdLatestUrl
+              ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster}</a>
+              : rdLatest.pollster}, {rdFieldTbc(rdLatest)}</>
+        : rdLatestUrl
+        ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + ", " + rdLatest.field}</a>
+        : rdLatest.pollster + ", " + rdLatest.field)
     : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");

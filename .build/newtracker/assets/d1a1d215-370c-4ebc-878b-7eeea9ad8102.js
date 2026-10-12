@@ -6222,7 +6222,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                       </span>
                     )}
                   </td>
-                  <td className="ta-l muted">{p.fieldLabel}</td>
+                  <td className="ta-l muted">{p.fieldPending ? rdFieldTbc(p) : p.fieldLabel}</td>
                   <td className="num muted hide-md">{p.sample != null ? p.sample.toLocaleString() : "—"}</td>
                   {/* only ever a house-filed figure - a dash means the pollster
                       published no effective sample, not that there is no n */}

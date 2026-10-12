@@ -159,10 +159,10 @@ function rdEffTbcNote(p) {
    fieldUrl). rdFieldTxt is the plain-text form for tooltips and labels;
    rdFieldTbc the linked one. */
 const rdFieldTxt = (q) => (q && q.fieldPending ? "TBC" : (q && (q.field || q.dateLabel)) || "");
-function rdFieldTbc(p) {
+function rdFieldTbc(p, tabIndex) {
   const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
   return p.fieldUrl
-    ? <a className="rd-tbc" href={p.fieldUrl} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
+    ? <a className="rd-tbc" href={p.fieldUrl} target="_blank" rel="noopener noreferrer" title={note} tabIndex={tabIndex} onClick={(e) => e.stopPropagation()}>TBC</a>
     : <span title={note}>TBC</span>;
 }
 /* A poll's header, one wording wherever a poll is opened (All polls, Latest

@@ -151,7 +151,7 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
   D.polls = D.polls.filter((p) => !(p.pollster === POOLSTER && dropRows.includes(p.date)));
   fs.writeFileSync(path.join(sb, "data", "polls.json"), JSON.stringify(D, null, 2) + "\n");
   fs.copyFileSync(path.join(ROOT, "data", "demographics.json"), path.join(sb, "data", "demographics.json"));
-  for (const f of ["validate.mjs", "flows.mjs", "house-renames.mjs"])
+  for (const f of ["validate.mjs", "flows.mjs", "house-renames.mjs", "field-tbc.mjs"])
     fs.copyFileSync(path.join(ROOT, ".build", "newtracker", f), path.join(sb, ".build", "newtracker", f));
   const texts = { [Q1_PDF]: q1Text, [Q4_PDF]: Q4_TXT };
   const bodies = {

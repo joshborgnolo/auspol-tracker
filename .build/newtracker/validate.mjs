@@ -13,6 +13,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { impliedAlp2pp, FLOW_ERAS, impliedEraAlp2pp } from "./flows.mjs";
 import { canonHouse } from "./house-renames.mjs";
+import { fieldTbcUrl } from "./field-tbc.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -286,6 +287,8 @@ export function validate(D) {
     //     row that already carries its methodology link has outlived that.
     if (p.fieldworkPending) {
       if (p.methodUrl) fail("fieldwork-pending", "fieldworkPending on a row that already has its methodUrl");
+      // its "TBC" must link where the dates will appear (field-tbc.mjs)
+      else if (!fieldTbcUrl(p.pollster)) fail("fieldwork-pending", `no page for ${p.pollster}'s TBC to link to – add the house to field-tbc.mjs`);
       else excuse("fieldwork-pending", "provisional fieldwork window", "published before the house's methodology statement; dates replaced when it lands");
     }
   });

@@ -59,6 +59,7 @@ const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : F
    deff-backtest.mjs, so the estimator and the gate can never disagree
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
+import { fieldTbcUrl } from "./field-tbc.mjs";
 import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
@@ -2996,12 +2997,6 @@ for (const p of POLLS) {
 }
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
-// where a house publishes the fieldwork dates a pending row is waiting for
-const FIELD_TBC_URL = {
-  DemosAU: "https://demosau.com/methodology-statements/",
-  // assimilated Resolve waves wait on the SMH article for their dates
-  Resolve: "https://www.smh.com.au/topic/resolve-political-monitor-6fhy",
-};
 
 /* ---- 6a. a poll's outbound links, named for what is behind each -------- */
 /* One list, built here, that both redesign views render as is, so a link
@@ -3131,7 +3126,7 @@ const individualPolls = POLLS.map((p) => {
        the headline, and the views say "TBC" instead, linking
        `fieldUrl`, where the dates will be published. Leaves with the dates
        (extract-demosau.mjs; Resolve's hand-stamp on the SMH article). */
-    ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: FIELD_TBC_URL[p.pollster] ?? null } : {}),
+    ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: fieldTbcUrl(p.pollster) } : {}),
     /* fieldwork mid-date ISO (see fmidIso) – the x basis every detail
        mini-chart draws the wave's own marker on; `released` is fieldwork's
        last day, so a marker at it sits right of the window it claims */
@@ -3406,7 +3401,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     pollster: p.pollster, client: p.client && p.client !== "—" ? p.client : "Self-published",
     field: fwLabel(p.dateStart, p.date), released: p.date, releasedLabel: `${day} ${monthName(m)}`,
     // fieldwork not yet published: the views say TBC (see individualPolls)
-    ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: FIELD_TBC_URL[p.pollster] ?? null } : {}),
+    ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: fieldTbcUrl(p.pollster) } : {}),
     /* When the poll was PUBLISHED, where the cited source says so. `released`
        above is the last day of fieldwork, which is not the same thing and is
        what the "Published" column had been showing for want of anything else.
@@ -4841,7 +4836,7 @@ const latest = {
      linked to the release – the pollster's own page over a media citation */
   newest: NEWEST_PUB && {
     pollster: NEWEST_PUB.pollster, field: fwLabel(NEWEST_PUB.dateStart, NEWEST_PUB.date),
-    ...(NEWEST_PUB.fieldworkPending ? { fieldPending: true } : {}),
+    ...(NEWEST_PUB.fieldworkPending ? { fieldPending: true, fieldUrl: fieldTbcUrl(NEWEST_PUB.pollster) } : {}),
     url: NEWEST_PUB.releaseUrl || NEWEST_PUB.url || null,
   },
   /* the id the hero opens on, and the order every legend listing the
