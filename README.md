@@ -248,45 +248,55 @@ plots it on load.
 
 ### Share card
 
-`assets/auspol-card.png` (1200x630) is the `og:image`, and it carries the live
-reading: the 2PP figures, the margin and its interval, and the whole term's
-trend with the lead shaded down to the majority line. Every value is read from
-the same `window.AUSPOL` the page renders from, so the card cannot contradict
-the page it previews. It states the uncertainty, and says so when a
-month-on-month move does not clear it — the page refuses to call such a move
-real, and a card that dropped that caveat would quote the site against itself.
+`assets/auspol-card.png` (1200x630) is the `og:image`: a stadium scoreboard
+carrying the live reading. It shows the two-party score against the rival the
+site leads with, the verdict on that lead, the move on a month ago, and the
+first-preference ladder. Every value is read from the same `window.AUSPOL` the
+page renders from, so the card cannot contradict the page it previews. It keeps
+the page's rules too. A lead inside its margin reads TOO CLOSE TO CALL. A
+month's move is called significant only when it clears its own margin. Parties
+share a ladder place (=1) when the gap between them is inside the margin.
 
 Because it carries figures it can be **wrong**, which the previous generic card
 could not be. Two things guard that:
 
-- `assets/auspol-card.json` records the data date the card was drawn for.
-  `build.mjs` compares it against the current data and prints a loud notice
-  when they diverge. It does not fail the build — the card is not load-bearing
-  — but it will not let a stale one pass unremarked. The check is only date
-  deep, though: revising a poll without moving the newest date leaves the card
-  passing and its figures wrong, so redraw after any edit to `data/polls.json`,
-  not only after a new poll arrives.
-- `og:image` carries `?v=<that date>`. Scrapers key their caches on the full
-  URL, so a redraw is a new URL and they refetch instead of serving the old
-  card.
+- `assets/auspol-card.json` records what the card was drawn for: the newest
+  poll's publication date, and a fig block holding everything the card prints
+  plus a hash of `make-card.js` and its font, so a redesign redraws it too.
+  `build.mjs` writes the same block for the current data into
+  `assets/auspol-latest.json` and prints a loud notice when the two diverge. It
+  does not fail the build, because the card is not load-bearing; the hourly
+  card-watch job redraws it.
+- `og:image` carries `?v=<that date>-<hash of the fig block>`. Scrapers key
+  their caches on the full URL, so a redraw is a new URL and they refetch
+  instead of serving the old card.
 
-`build.mjs` cannot draw it: there is no rasteriser in the toolchain, and the
-card needs the page's own webfonts — canvas text picks those up only from a
-document that has already loaded them, and rasterising an SVG instead falls
-back to system fonts, which is how the previous card drifted off-brand
-unnoticed. So the card is drawn by `.build/newtracker/make-card.js`, which runs
-inside the built page, and `.build/newtracker/render-card.mjs` drives it there:
+`build.mjs` cannot draw it: there is no rasteriser in the toolchain. Instead
+`.build/newtracker/make-card.js` builds the card as HTML inside the built page,
+and `.build/newtracker/render-card.mjs` photographs it there:
 
 ```
-node .build/newtracker/render-card.mjs   # rewrites the png and the date
-node .build/newtracker/build.mjs         # re-stamps og:image with that date
+node .build/newtracker/render-card.mjs   # rewrites the png and its stamp
+node .build/newtracker/build.mjs         # re-stamps og:image to match
 ```
 
-It serves the repo on an ephemeral port, opens the page in headless Chrome, and
-refuses to draw if either webface is missing rather than quietly shipping
-system fonts. Chrome and `puppeteer-core` are all it needs and neither is a
-build dependency — `build.mjs` never imports it — so on a machine without them
+It serves the repo on an ephemeral port, opens the page in headless Chrome and
+screenshots the card. Chrome and `puppeteer-core` are all it needs, and neither
+is a build dependency (`build.mjs` never imports it). On a machine without them,
 the console steps in the `make-card.js` header still work.
+
+The card's one face is Doto, a dot-matrix font under the SIL Open Font
+License. `.build/newtracker/fonts/doto-card.woff2` is a static instance (ROND
+100, wght 900) cut by Google Fonts' `text=` subsetter down to A–Z, 0–9 and the
+few marks the card prints. `make-card.js` loads it and refuses to build the
+card if it fails. The page never loads it, so it is not in `build.mjs`'s
+`FONTS` list. Doto has no ± and no arrows, and it draws "." as a cross, so the
+card draws those as dots on the font's own grid.
+
+Keep the PNG under about 300 KB, which some chat apps reportedly take as the
+limit for a link preview's image. The blurred glow is what costs bytes, so only
+the two scores carry the wide halo; `render-card.mjs` warns when a card comes
+out heavier.
 
 ### Fonts
 

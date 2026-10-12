@@ -1,46 +1,69 @@
-/* make-card.js – regenerate assets/auspol-card.png, the og:image share card.
+/* make-card.js – build assets/auspol-card.png, the og:image share card.
 
    WHY IT IS NOT PART OF build.mjs
    The card is a raster image and nothing in the toolchain can rasterise one:
-   the build is plain node, with no headless browser and no image library. It
-   also draws with the site's own typefaces, and canvas text picks those up
-   only from a document that has already loaded them - rasterising an SVG
-   instead falls back to system fonts, which is what let the previous card
-   drift off-brand without anyone noticing.
+   the build is plain node, with no headless browser and no image library. So
+   the card is built inside the page instead, from window.AUSPOL - the same
+   object the page renders from, which is what keeps the card from
+   contradicting the page it previews - and render-card.mjs photographs it
+   there in headless Chrome.
 
-   So it runs in the page, by hand. build.mjs cannot make the card, but it does
-   refuse to let it go stale silently: it compares assets/auspol-card.json
-   against the current data date and prints a loud notice when they diverge,
-   and it cache-busts the og:image URL with that date so scrapers refetch a new
-   card instead of serving a cached old one.
+   build.mjs cannot make the card, but it does refuse to let it go stale
+   silently: it compares assets/auspol-card.json against what the card would
+   show now and prints a loud notice when they diverge, and it cache-busts the
+   og:image URL with that stamp so scrapers refetch a new card instead of
+   serving a cached old one.
 
    WHAT IT SHOWS
-   The card used to be a title slide - the masthead and a standfirst - which
-   told a reader nothing the link text had not already. For most people a link
-   preview IS the article, so this one carries the actual reading: the 2PP
-   figures, the margin, the interval around it, and the whole term's trend with
-   the lead shaded from the leader's line down to the tie line. Every
-   value is read from window.AUSPOL, the same object the page renders from, so
-   the card cannot contradict the page it previews.
+   A stadium scoreboard, picked from the October 2026 mockups. For most people
+   a link preview IS the article, so the card carries the reading itself:
+   - the two-party score, Labor against the rival the site leads with;
+   - the verdict on the lead, judged against its own margin the way the hero
+     judges it, so a lead inside the margin reads TOO CLOSE TO CALL;
+   - the move on a month ago, called significant only when it clears its own
+     margin, as the hero calls it;
+   - the first-preference ladder. A party shares the place above it when the
+     gap is inside the two figures' margins combined: the primary-vote
+     panel's level test, run from the top of each group down. The arrows
+     count places gained or lost since the election result;
+   - ROUND n, the months since the election.
+   Every value is read from window.AUSPOL.
 
-   It states the uncertainty and, when a month-on-month move does not clear its
-   own interval, says so - the page refuses to call such a move real, and a
-   card that dropped that caveat would be quoting the site against itself.
+   HOW IT IS DRAWN
+   HTML and CSS in a shadow root pinned over the page's top-left corner at
+   1200x630, so none of the page's styles can reach it. Every glyph is Doto, a
+   dot-matrix face (SIL Open Font License), loaded here from
+   .build/newtracker/fonts/doto-card.woff2: a static ROND 100 / wght 900
+   instance cut down to the characters the card prints. The page never loads
+   it. Doto has no ± and no arrows, and it draws "." as a five-dot cross. So
+   those glyphs are SVG dots on Doto's own grid (100-unit pitch, 90-unit dots,
+   5 columns by 7 rows). A fallback font would put a system glyph in the
+   middle of an LED line, or a missing-glyph box on a CI runner with few
+   fonts.
+
+   The glow is rationed. Every blurred halo is a gradient the PNG encoder
+   cannot squeeze, and a halo on every line made a 399 KB card, past the
+   ~300 KB some chat apps take for a link preview. So the two scores keep the
+   wide halo, the names and the verdict a tight one, and the small type none:
+   about 230 KB, and no different at feed size.
 
    TO REGENERATE
      node .build/newtracker/render-card.mjs
 
-   That runs this file in real headless Chrome and writes both the png and the
-   date in assets/auspol-card.json; rebuild afterwards so og:image is stamped
-   with it. Everything about the drawing still lives here - render-card.mjs
-   only drives it.
+   That runs this file in real headless Chrome, photographs the card and
+   writes both the png and its stamp in assets/auspol-card.json; rebuild
+   afterwards so og:image is stamped with it. Everything about the card lives
+   here - render-card.mjs only drives it.
 
    By hand, if that machine has no Chrome or no puppeteer-core: node
    .claude/serve.js, open index.html, paste this whole file into the console,
-   move the download into assets/, and put the printed `updatedISO` into
+   then in Elements right-click <div id="auspol-card"> (the last child of
+   <html>) and choose Capture node screenshot. Move the download to
+   assets/auspol-card.png and put the stamp the console prints into
    assets/auspol-card.json.
 */
 (async () => {
+  try {
   await document.fonts.ready;
   const D = window.AUSPOL;
   /* Default basis is IMPLIED preference flows (the site's own default): each
@@ -51,7 +74,7 @@
   const IS_IMP = !!(D.synthLatest && D.synthLatest.alp != null);
   /* synthLatest carries alp/lnp/ci95/n, not the latest payload's
      alp2pp/alp2ppCi95/method – merge like build.mjs's headlineView so the
-     rest of the card reads one shape, whichever basis is drawn. published,
+     rest of the card reads one shape, whichever basis is drawn. The dates,
      windowDays and the primary panel are not basis-dependent. */
   const L = IS_IMP
     ? { ...D.latest,
@@ -64,376 +87,242 @@
   /* WHICH CONTEST THE CARD QUOTES
      Labor against the rival the site leads with - gen-data's rivalLead, the
      margin-gated ruling over the implied series that the hero, the favicon and
-     the masthead all defer to. The card drew ALP v L/NP whatever the page
-     led with, so while One Nation held the spot it previewed a contest the
-     page had left. When the ON pairing is quoted its figures come from
-     latest.onImp - the pairing's only quoted level, the primaries read
+     the masthead all defer to. When the ON pairing is quoted its figures come
+     from latest.onImp - the pairing's only quoted level, the primaries read
      through one first-principles flow set - with the pollsters' published
-     head-to-heads (altLatest.alp_on) the only fallback. The implied
-     pairing's ± is its margin - the polls' sampling interval and the flow
-     table's own range in quadrature, not a 95% sampling interval alone - so
-     the caveat line names it "margin incl. flows", as the old hero does.
+     head-to-heads (altLatest.alp_on) the only fallback. The implied pairing's
+     ± is its margin: the polls' sampling interval and the flow table's own
+     range in quadrature, the hero's "margin" too.
      Mirror: build.mjs's cardContest builds this same view. */
   const onImp = D.latest.onImp && D.latest.onImp.a != null ? D.latest.onImp : null;
   const onPub = D.altLatest && D.altLatest.alp_on && D.altLatest.alp_on.a != null
     ? D.altLatest.alp_on : null;
   const VS_ON = D.latest.rivalLead === "alp_on" && !!(onImp || onPub);
   /* One normalised view of the quoted contest, so nothing below branches on
-     the matchup again. LNP: the implied merge above (published fallback),
-     trend the classic aggregate, anchored at the 2025 count. ON: onImp's
-     figures, its polls-and-flows margin as the band, trend the implied ALP-ON monthly
-     series (alt2pp.alp_on under the published fallback) - no anchor, no
-     ALP-ON count of the 2025 election exists. */
+     the matchup again. */
   const Q = VS_ON ? {
     opp: "onp", oppLab: "One Nation",
     a: onImp ? onImp.a : onPub.a, b: onImp ? onImp.b : onPub.b,
     ci: onImp ? (onImp.ci95 != null ? onImp.ci95 : onImp.band) : onPub.ci95,
-    ciLab: onImp ? "margin incl. flows" : "95% interval",
     prev: onImp ? onImp.aPrev : onPub.aPrev,
     sig: !!(onImp ? onImp.changeSig : onPub.changeSig),
     n: onImp ? onImp.n : onPub.n, imp: !!onImp,
-    series: (onImp ? D.synthOn : D.alt2pp.alp_on).map((d) => ({ x: d.x, ym: d.ym, a: d.a, b: d.b })),
-    anchor: null,
   } : {
     opp: "lnp", oppLab: "Coalition",
     a: L.alp2pp, b: L.lnp2pp,
-    ci: L.alp2ppCi95, ciLab: "95% interval",
+    ci: L.alp2ppCi95,
     prev: L.alp2ppPrev, sig: !!L.changeSig,
     n: L.method.nPolls, imp: IS_IMP,
-    series: D.agg2pp.map((d) => ({ x: d.x, ym: d.ym, a: d.alp, b: d.lnp })),
-    anchor: "2025 election, Labor " + D.agg2pp[0].alp.toFixed(1),
-  };
-  const W = 1200, H = 630, S = 2;              // draw at 2x, export at 1x
-  const cv = document.createElement("canvas");
-  cv.width = W * S; cv.height = H * S;
-  const c = cv.getContext("2d"); c.scale(S, S);
-
-  // resolve the page's own oklch tokens rather than hardcoding hex
-  const R = (v) => { const p = document.createElement("span"); p.style.color = v;
-    document.body.appendChild(p); const x = getComputedStyle(p).color; p.remove(); return x; };
-  const T = {
-    bg: R("oklch(0.970 0.008 78)"), ink: R("oklch(0.27 0.012 55)"),
-    ink2: R("oklch(0.44 0.012 55)"), ink3: R("oklch(0.52 0.010 58)"),
-    line: R("oklch(0.895 0.008 75)"), alp: R("oklch(0.55 0.150 27)"),
-    lnp: R("oklch(0.50 0.095 250)"), grn: R("oklch(0.60 0.120 150)"),
-    onp: R("oklch(0.66 0.130 58)"),
-  };
-  T.panel = R("oklch(0.988 0.005 80)");
-  T.alpFill = R("oklch(0.55 0.150 27 / 0.13)");
-  T.lnpFill = R("oklch(0.50 0.095 250 / 0.13)");
-  T.onpFill = R("oklch(0.66 0.130 58 / 0.13)");
-
-  c.fillStyle = T.bg; c.fillRect(0, 0, W, H);
-  const PAD = 70;
-  c.textBaseline = "alphabetic";
-  const caps = (t, x, y, size, ls, col, w) => {
-    c.font = `${w || 700} ${size}px "IBM Plex Sans", sans-serif`;
-    c.fillStyle = col; c.letterSpacing = ls + "px"; c.fillText(t, x, y);
-    const m = c.measureText(t).width; c.letterSpacing = "0px"; return m;
   };
 
-  /* ---- masthead --------------------------------------------------------- */
-  /* One lockup, drawn from the site's spec - see .wm-name / .wm-track in
-     template.html: both words at 30px, told apart by weight alone. The card
-     used to set its own, 700 weight over 13px tracked caps, which made it a
-     third version of a wordmark that only has one. The offsets are the
-     header's own, read off the rendered lockup: the second baseline sits
-     29.5px under the first, and the dial's arc centre 43.8px right of the text
-     block and 20.33px under it - which is where the pivot has to sit for the
-     dial's painted extent to centre on the wordmark's, since the pivot is 11
-     units below the middle of what gets drawn. */
-  const BL1 = 92, BL2 = BL1 + 29.5;
-  /* The two words are set at different weights, so at their own tracking they
-     end at different places and the l of auspol and the r of tracker do not
-     line up. The header solves this by measuring the shortfall and closing it
-     over the narrower word's gaps rather than by hand-tuning a number; the
-     card drew its own fixed pair instead and stayed misaligned. Same algorithm
-     here, so the next change of face carries itself in both places.
+  /* ---- what the scoreboard says ----------------------------------------- */
+  const r1 = (v) => (Math.round(v * 10) / 10).toFixed(1);
+  const MON = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  const RIVAL = Q.oppLab.toUpperCase();
+  /* The verdict, on the hero's own terms (rd-hero.jsx): the lead and its
+     margin at one decimal, and a lead no bigger than its margin is too close
+     to call. Phrased for a ticker; the hero says the same in sentences. */
+  const lead = +(Q.a - Q.b).toFixed(1), margin = +(2 * Q.ci).toFixed(1);
+  const tooClose = Math.abs(lead) <= margin;
+  const leader = lead > 0 ? "LABOR" : lead < 0 ? RIVAL : null;
+  const verdict = !tooClose ? "▶ " + leader + " BY " + r1(Math.abs(lead)) + ", OUTSIDE ±" + r1(margin)
+    : leader ? "▶ TOO CLOSE TO CALL: " + leader + " BY " + r1(Math.abs(lead)) + ", INSIDE ±" + r1(margin)
+    : "▶ DEAD LEVEL, INSIDE ±" + r1(margin);
+  /* The month's move, called as the hero calls it: "within the margin" unless
+     the move clears its own interval. With no month-ago figure the line says
+     what the reading rests on instead. */
+  const mom = Q.prev != null ? +(Q.a - Q.prev).toFixed(1) : null;
+  const moveLine = mom == null ? Q.n + " POLLS IN " + L.method.windowDays + " DAYS"
+    : Math.abs(mom) < 0.05 ? "LABOR UNCHANGED ON A MONTH AGO"
+    : "LABOR " + (mom > 0 ? "▲" : "▼") + r1(Math.abs(mom)) + " ON A MONTH AGO, "
+      + (Q.sig ? "A SIGNIFICANT " + (mom > 0 ? "RISE" : "FALL") : "WITHIN THE MARGIN");
+  /* The date the page's own stamp shows: the newest poll's fieldwork end,
+     the hero's "updated", not the day it was published. */
+  const [uy, um, ud] = L.updatedISO.split("-").map(Number);
+  const dateLab = ud + " " + MON[um - 1] + " " + uy;
 
-     Letter-spacing lands after the LAST letter too, widening the box by one
-     more unit than it widens the ink. What has to line up is the ink, so the
-     trailing unit comes off both measurements before they are compared - the
-     header's note on the same subtraction. */
-  const ink = (text, weight, ls) => {
-    c.font = `${weight} 30px "Source Sans 3", sans-serif`;
-    c.letterSpacing = ls + "px";
-    const w = c.measureText(text).width;
-    c.letterSpacing = "0px";
-    return w - ls;
-  };
-  let lsName = -0.75, lsTrack = -0.9;
-  const inkName = ink("auspol", 800, lsName), inkTrack = ink("tracker", 400, lsTrack);
-  if (inkName >= inkTrack) lsTrack += (inkName - inkTrack) / ("tracker".length - 1);
-  else                     lsName += (inkTrack - inkName) / ("auspol".length - 1);
-  const wMark = Math.max(inkName, inkTrack);
-  c.font = '800 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsName + "px";
-  c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
-  c.font = '400 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsTrack + "px";
-  c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
-  c.letterSpacing = "0px";
-
-  /* Placement derived from the scale instead of baked for one of them. The
-     two numbers this replaces - 43.8 across and 20.33 down - were measured off
-     the lockup at k=1.485 and silently encoded it: at 1.5x they would have put
-     the dial's left edge 4px INSIDE the l of auspol and its top 12px above the
-     card's margin. Both are now what they always meant.
-
-     DIAL_LEFT and DIAL_DROP come off the header's own viewBox (0.58 0.07 38.39
-     26.73, pivot at 22 24.5): the drawing reaches 21.42 units left of the pivot
-     and the pivot sits 11.065 units below the middle of it. So the left edge
-     lands a fixed ink gap past the wordmark whatever the size, and the drawing
-     centres on the lockup rather than the pivot doing so - which is the whole
-     point of the second number, since the dial is far from symmetric about its
-     own pivot. */
-  const DIAL_K = 2.2275;            // 1.5x the 1.485 this was drawn at
-  const DIAL_GAP = 12;              // wordmark's right ink edge to the dial's left
-  const DIAL_LEFT = 21.42, DIAL_DROP = 11.065;
-  const WM_MID = 95.9;              // the lockup's optical centre, cap of auspol to baseline of tracker
-
-  /* The masthead dial. This is a hand-copy of the header's glyph, and it had
-     drifted: it drew the right half of the arc in Coalition blue and swung the
-     needle on ALP v L/NP no matter what, where the header and the favicon both
-     pick Labor's STRONGEST challenger - whichever opponent polls the highest
-     2PP against them. One Nation has been taking that place in some months, so
-     the card could state a contest the site was not showing. Its strokes had
-     drifted too: an opaque arc a third heavier than the header's half-opacity
-     hairline, bars seated further out, a needle with no tip, a pivot in the
-     wrong ink. All of it is the header's now, times k - which is what the
-     header itself does when it renders a 12-unit dial at 57px.
-
-     The favicon in build.mjs stays heavier on purpose: it is read at 16px,
-     where a 1.4-unit hairline disappears. Same data, same geometry, thicker
-     pen. This one is drawn near the header's own size, so it takes the
-     header's weights. */
-  (function dial(cx, cy, k) {
-    const r = 12 * k, rad = (d) => ((d - 90) * Math.PI) / 180;
-    const P = (d, rr) => ({ x: cx + Math.sin((d * Math.PI) / 180) * rr,
-                            y: cy - Math.cos((d * Math.PI) / 180) * rr });
-    // the rival the site leads with - the same contest Q quotes (rivalLead's
-    // margin-gated ruling), so the needle, the figures and the page never mix
-    const top = { id: Q.opp, lab: Q.a, opp: Q.b };
-    const oppCol = T[top.id], margin = top.lab - top.opp;
-
-    const arc = (a, b, col) => { c.beginPath(); c.arc(cx, cy, r, rad(a), rad(b));
-      c.strokeStyle = col; c.lineWidth = 1.4 * k; c.lineCap = "round"; c.stroke(); };
-    c.globalAlpha = 0.5; arc(-90, 0, T.alp); arc(0, 90, oppCol); c.globalAlpha = 1;
-
-    const lp = D.latest.primary;
-    const ps = [["alp", lp.alp], ["lnp", lp.lnp], ["grn", lp.grn], ["onp", lp.onp]]
-      .sort((a, b) => b[1] - a[1]);
-    const vs = ps.map((p) => p[1]), mn = Math.min(...vs), mx = Math.max(...vs);
-    [-54, -18, 18, 54].forEach((a, i) => {
-      const h = (mx === mn ? 10.5 : 5 + ((ps[i][1] - mn) / (mx - mn)) * 5.5) * k;
-      const q = P(a, r + 2 * k), o = P(a, r + 2 * k + h);
-      c.beginPath(); c.moveTo(q.x, q.y); c.lineTo(o.x, o.y);
-      c.strokeStyle = T[ps[i][0]]; c.lineWidth = 3.4 * k; c.lineCap = "butt"; c.stroke();
-    });
-
-    const deg = -Math.max(-1, Math.min(1, margin / 12)) * 34;
-    const col = margin >= 0 ? T.alp : oppCol, tip = P(deg, 8.6 * k);
-    c.beginPath(); c.moveTo(cx, cy); c.lineTo(tip.x, tip.y);
-    c.strokeStyle = col; c.lineWidth = 1.7 * k; c.lineCap = "round"; c.stroke();
-    c.beginPath(); c.arc(tip.x, tip.y, 1.9 * k, 0, 7); c.fillStyle = col; c.fill();
-    // pivot last, so it caps the needle rather than sitting under it
-    c.beginPath(); c.arc(cx, cy, 1.7 * k, 0, 7); c.fillStyle = T.ink3; c.fill();
-    console.log("card dial · needle " + deg.toFixed(1) + "deg vs " + top.id
-                + " · " + ps.map((x) => x[0] + " " + x[1].toFixed(1)).join(", "));
-  })(PAD + wMark + DIAL_GAP + DIAL_LEFT * DIAL_K, WM_MID + DIAL_DROP * DIAL_K, DIAL_K);
-
-  /* The reading rides in the masthead band, right-aligned under the date.
-     The band was 143px tall carrying one 14px line; the figures below need
-     the whole middle of the card, and this is the only place the standfirst
-     fits without taking it from them. */
-  const marg = Q.a - Q.b, chg = Q.prev != null ? Q.a - Q.prev : 0;
-  const basisTag = Q.imp ? ", implied preference flows" : "";
-  c.textAlign = "right";
-  /* The PUBLICATION date of the most recent poll, which is what the site's own
-     "Updated" stamp shows - not `updated`, the end of its fieldwork. The two
-     are routinely days apart (28 vs 30 August as this is written), so the card
-     was previewing the site as staler than it is.
-
-     Sentence case with the rest of the card: L.published already arrives as
-     "30 August 2026", so the upcasing that fed the caps setting simply goes,
-     and the 2.2px tracking with it, being what carried the caps. */
-  caps("Updated " + L.published, W - PAD, 74, 13.5, 0, T.ink3, 600);
-  c.font = '600 40px "Crimson Text", Georgia, serif'; c.fillStyle = T.ink;
-  c.fillText((marg >= 0 ? "Labor" : Q.oppLab) + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
-  // one line, not two: the caveats belong beside the sentence they qualify.
-  // The page will not call a move real unless it clears its own interval.
-  c.font = '400 15px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink3;
-  c.fillText(Q.ciLab + " ±" + Q.ci.toFixed(1) + " pts, "
-             + Q.n + " polls in " + L.method.windowDays + " days, "
-             + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " vs 1 month ago"
-             + (Q.sig ? "" : ", within the margin")
-             + basisTag, W - PAD, 142);
-  c.textAlign = "left";
-  c.strokeStyle = T.line; c.lineWidth = 1;
-  c.beginPath(); c.moveTo(PAD, 162.5); c.lineTo(W - PAD, 162.5); c.stroke();
-
-  /* ---- the figures ------------------------------------------------------ */
-  /* No eyebrow over them. "TWO-PARTY PREFERRED" labelled a row that already
-     says LABOR and COALITION inline, under a standfirst that has just said
-     who leads and by how much - three namings of one measure.
-
-     150px and centred on the card, arranged the way the page's own hero
-     arranges them - Labor 51.4 | 48.6 Coalition - so the labels sit inline
-     and no separate label row is needed. They are the only element that
-     survives a 360px thumbnail, so they get the middle. */
-  const FIG_Y = 330, FIG_PX = 150, GAP = 22, DOT = 4.5;
-  const figFont = "600 " + FIG_PX + 'px "Crimson Text", Georgia, serif';
-  /* Sentence case, so no tracking - 1.8px is what carries small caps and what
-     pulls lowercase apart - and 22px rather than 20 to hold the optical size
-     caps had, since only the L and the C now reach cap height. */
-  const LAB_PX = 22;
-  const measLabel = (t) => { c.font = `700 ${LAB_PX}px "IBM Plex Sans", sans-serif`;
-    return c.measureText(t).width; };
-  const measFig = (v) => { c.font = figFont; return c.measureText(v.toFixed(1)).width; };
-
-  const wLabTxt = measLabel("Labor"), wOppTxt = measLabel(Q.oppLab);
-  const wAlp = measFig(Q.a), wOpp = measFig(Q.b);
-  const rowW = DOT * 2 + 10 + wLabTxt + GAP + wAlp + GAP + 1 + GAP + wOpp
-             + GAP + wOppTxt + 10 + DOT * 2;
-  let x = (W - rowW) / 2;
-
-  /* Centred on the label's cap height, not floating above it - derived from
-     the size rather than the 7 that was measured for 20px caps, so it stays
-     centred if the label is ever resized again. */
-  const DOT_Y = FIG_Y - LAB_PX * 0.3625;
-  const dot = (cx, col) => { c.beginPath(); c.arc(cx, DOT_Y, DOT, 0, 7);
-    c.fillStyle = col; c.fill(); };
-  const figure = (v, col) => { c.font = figFont; c.fillStyle = col;
-    c.fillText(v.toFixed(1), x, FIG_Y); x += c.measureText(v.toFixed(1)).width; };
-
-  dot(x + DOT, T.alp); x += DOT * 2 + 10;
-  caps("Labor", x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wLabTxt + GAP;
-  figure(Q.a, T.alp); x += GAP;
-  c.strokeStyle = T.line; c.lineWidth = 1;
-  c.beginPath(); c.moveTo(x + 0.5, FIG_Y - 104); c.lineTo(x + 0.5, FIG_Y); c.stroke();
-  x += 1 + GAP;
-  figure(Q.b, T[Q.opp]); x += GAP;
-  caps(Q.oppLab, x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wOppTxt + 10;
-  dot(x + DOT, T[Q.opp]);
-
-  /* ---- the term's trend -------------------------------------------------- */
-  /* The plot sits on its own, lighter panel running the full width and bled
-     off the bottom edge. The panel is what makes the bleed read as deliberate
-     rather than as a forgotten margin, and the footer sits inside it, so no
-     rule is needed to close it off.
-
-     It bleeds LEFT but stops at the right margin: the past runs off the edge,
-     the present - the end dots, which are what the card is about - keeps its
-     70px of air. */
-  c.fillStyle = T.panel; c.fillRect(0, 372, W, H - 372);
-  const CX0 = 0, CX1 = W - PAD, CY0 = 392, CY1 = 578;
-  const TS = Q.series;          // the quoted contest's term trend, [{x, a, b}]
-  const xs = TS.map((d) => d.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
-  /* Symmetric about the tie, since the two lines are complements: ±7 points
-     at least (the classic pairing's term has always fitted 43-57), wider when
-     the term ran further from 50. The ALP v ON trend opened at 64-36, and a
-     fixed 43-57 sent both lines off the plot. */
-  const half = Math.max(7, Math.ceil(Math.max(...TS.map((d) => Math.abs(d.a - 50)))));
-  const y0 = 50 - half, y1 = 50 + half;
-  const sx = (x) => CX0 + ((x - x0) / (x1 - x0)) * (CX1 - CX0);
-  const sy = (y) => CY1 - ((y - y0) / (y1 - y0)) * (CY1 - CY0);
-  const curve = (pts) => { for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
-    c.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6,
-                    p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]); } };
-  const aPts = TS.map((d) => [sx(d.x), sy(d.a)]);
-  const lPts = TS.map((d) => [sx(d.x), sy(d.b)]);
-
-  /* Shade the LEAD - the leader's line down to 50% - not the gap between the
-     two lines. The lines are exact complements, so the gap is twice the margin
-     and reads as a heavier claim than the data makes; the lead is the margin
-     itself, and watching it thin out from the election to now is the story.
-
-     Both lines are shaded, each in its own tint, and the whole thing is
-     clipped to ABOVE the tie line. That is what makes a mid-term change of
-     lead render correctly: a line only encloses area above 50 while it is
-     actually ahead, and the stretch where it trails is clipped away. Shading
-     one line for the whole term instead - whoever happens to lead today -
-     drew a self-intersecting polygon that filled inverted for the period they
-     were behind. Today Labor leads throughout, so this changes nothing yet. */
-  c.save();
-  c.beginPath(); c.rect(0, CY0 - 40, W, sy(50) - (CY0 - 40)); c.clip();
-  [[aPts, T.alpFill], [lPts, T[Q.opp + "Fill"]]].forEach(([pts, fill]) => {
-    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
-    c.lineTo(CX1, sy(50)); c.lineTo(CX0, sy(50)); c.closePath();
-    c.fillStyle = fill; c.fill();
+  /* The ladder: the headline primaries (latest.primary, the figures the
+     primary-vote hero quotes), each with the latest month's 95% margin.
+     Mirror: build.mjs's cardLadder. */
+  const IDS = ["alp", "lnp", "grn", "onp", "oth"];
+  const ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ONP", oth: "OTH" };
+  const P = D.latest.primary;
+  const lastCi = (D.aggPrimary[D.aggPrimary.length - 1] || {}).ci || {};
+  const elect = D.aggPrimary.find((d) => d.election) || D.aggPrimary[0];
+  const rows = IDS.filter((id) => P[id] != null)
+    .map((id) => ({ id, v: P[id], ci: lastCi[id] || 0 }))
+    .sort((a, b) => b.v - a.v);
+  let anchor = null;
+  rows.forEach((p, i) => {
+    if (anchor && anchor.v - p.v < Math.hypot(anchor.ci, p.ci)) p.place = anchor.place;
+    else { p.place = i + 1; anchor = p; }
   });
-  c.restore();
-
-  /* The 50% rule, unlabelled. It carried "50% – TIE" - kept as "tie" rather
-     than "majority", since 50% 2PP is a tied national vote and not a majority
-     of seats - but the shading already runs from the leader's line down to
-     this rule, and the standfirst has said who leads and by how much. A
-     dashed line under a lead reads as the tie without being told. */
-  c.setLineDash([3, 6]); c.strokeStyle = T.ink3; c.lineWidth = 1.4; c.globalAlpha = 0.7;
-  c.beginPath(); c.moveTo(CX0, sy(50)); c.lineTo(CX1, sy(50)); c.stroke();
-  c.setLineDash([]); c.globalAlpha = 1;
-
-  [[lPts, T[Q.opp]], [aPts, T.alp]].forEach(([pts, col]) => {
-    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
-    c.strokeStyle = col; c.lineWidth = 5; c.lineCap = "round"; c.lineJoin = "round"; c.stroke();
-    const e = pts[pts.length - 1];
-    c.beginPath(); c.arc(e[0], e[1], 8, 0, 7); c.fillStyle = T.panel; c.fill();
-    c.beginPath(); c.arc(e[0], e[1], 5, 0, 7); c.fillStyle = col; c.fill();
+  const wasOrder = IDS.filter((id) => elect[id] != null).sort((a, b) => elect[b] - elect[a]);
+  rows.forEach((p) => {
+    p.tied = rows.filter((q) => q.place === p.place).length > 1;
+    const was = wasOrder.indexOf(p.id) + 1;
+    p.moved = was ? was - p.place : 0;
   });
-  // the term's two ends, so the trend is anchored rather than floating
-  /* Sentence case, so the tracking goes with it: 1.4px is what makes small
-     caps legible and what makes lowercase look pulled apart. The right-hand
-     label takes the chart axis's own form - month, curly apostrophe, two
-     digits - the same string buildXTicks writes on the site. */
-  /* Left end: the 2025 count, the classic pairing's own anchor. The ALP-ON
-     pairing HAS no such count, so its trend opens on its first month
-     instead - the right-hand label's own form, so the two ends match. */
-  /* Both ends read the rows' own months ("2025-06" -> "Jun ’25"). The left
-     once ran x - a decimal year - through new Date(), which reads it as
-     milliseconds since 1970 ("Jan ’70"), and the right was a frozen
-     "Aug ’26". */
-  const MNS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const ymLab = (ym) => MNS[Number(ym.slice(5, 7)) - 1] + " \u2019" + ym.slice(2, 4);
-  const leftLab = Q.anchor || ymLab(TS[0].ym);
-  caps(leftLab, PAD, 604, 13.5, 0, T.ink3, 600);
-  c.textAlign = "right"; caps(ymLab(TS[TS.length - 1].ym), W - PAD, 604, 13.5, 0, T.ink3, 600); c.textAlign = "left";
+  const elecYear = elect.ym.slice(0, 4);
+  /* ROUND n: whole months from the election to the reading */
+  const round = (uy - Number(elect.ym.slice(0, 4))) * 12 + um - Number(elect.ym.slice(5, 7));
 
-  /* ---- footer ------------------------------------------------------------ */
-  /* No rule: the footer sits inside the plot's panel, and the panel's own top
-     edge already divides it from the reading above. The old bottom ran 32px
-     from the plot to these labels and then 24px to the provenance with 13px
-     left under it, which read as cramped; it is 26 / 28 / 22 now. */
-  /* Centred, on the axis labels' own baseline. Dropping the provenance line
-     left the card stacking two right-aligned items 18px apart above an empty
-     left half; the bottom is one row now, and the margin under it went from
-     18px to 26. */
-  c.textAlign = "center"; c.font = '600 17px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink2;
-  c.fillText("auspoltracker.com", W / 2, 604); c.textAlign = "left";
+  /* ---- drawing ---------------------------------------------------------- */
+  const FONT_URL = ".build/newtracker/fonts/doto-card.woff2";
+  const face = new FontFace("Doto", "url(" + FONT_URL + ")", { weight: "900" });
+  await face.load();
+  document.fonts.add(face);
+  if (!document.fonts.check('900 60px "Doto"')) throw new Error("Doto did not load from " + FONT_URL);
 
-  /* ---- export at exactly 1200x630, supersampled from the 2x draw --------- */
-  const out = document.createElement("canvas"); out.width = W; out.height = H;
-  const oc = out.getContext("2d");
-  oc.imageSmoothingEnabled = true; oc.imageSmoothingQuality = "high";
-  oc.drawImage(cv, 0, 0, W, H);
-  const png = out.toDataURL("image/png");
-  /* Stamped on the date the card SHOWS. It used to stamp updatedISO while
-     showing the same field; now that the face carries `published`, a stamp on
-     fieldwork end would let the card go stale invisibly - a poll's publisher
-     being corrected moves `published` and not `updated`, which is a real edit
-     in this repo's history, and build.mjs would have called the card current
-     while it displayed the old date. */
-  /* The fig block lets render-card's staleness gate tell "date is fresh but
-     what the card SHOWS has moved" (decay drift, a cured wave) without
-     launching Chrome. Same shape build.mjs writes into
-     assets/auspol-latest.json – mirror any change in both files. */
-  window.__auspolCard = { png, publishedISO: L.publishedISO, fig: {
+  /* Doto's grid, in its own units: a 600 advance, 700 to the cap line, dots
+     of 90 at a pitch of 100, centred 50 in from the left edge and 50 up from
+     the baseline. Rows below run top to bottom, so the last sits at 650. The
+     arrows run a column or two wider than a letter so they read at the
+     ladder's size; a glyph's advance is its ink plus the 105 Doto leaves. */
+  const GLYPH = {
+    "▲": [".......", ".......", "...#...", "..###..", ".#####.", "#######", "......."],
+    "▼": [".......", ".......", "#######", ".#####.", "..###..", "...#...", "......."],
+    "▶": ["#...", "##..", "###.", "####", "###.", "##..", "#..."],
+    "±": [".....", "..#..", "#####", "..#..", ".....", "#####", "....."],
+  };
+  const svgDots = (dots, w) => '<svg class="g" viewBox="0 0 ' + w + ' 700" style="width:' + (w / 1000)
+    + 'em" aria-hidden="true">' + dots.map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="45"/>').join("") + "</svg>";
+  const glyph = (ch) => {
+    const dots = [], rows = GLYPH[ch];
+    rows.forEach((row, r) => [...row].forEach((c, k) => { if (c === "#") dots.push([50 + 100 * k, 50 + 100 * r]); }));
+    return svgDots(dots, Math.max(600, rows[0].length * 100 + 105));
+  };
+  /* A full stop is one dot on the baseline row in a 200-unit cell, placed so
+     the gaps to the glyphs either side match: Doto leaves 105 units after a
+     glyph's ink and 5 before the next one's. */
+  const point = () => svgDots([[50, 650]], 200);
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const led = (s) => [...s].map((ch) => ch === "." ? point() : GLYPH[ch] ? glyph(ch) : esc(ch)).join("");
+
+  const LED = {
+    alp: ["#FF5A4A", "255, 90, 74"], onp: ["#FFA53D", "255, 165, 61"], lnp: ["#5EB0FF", "94, 176, 255"],
+    grn: ["#5BE38A", "91, 227, 138"], oth: ["#D9D3C4", "217, 211, 196"],
+    white: ["#F4F1E8", "244, 241, 232"], amber: ["#FFC94D", "255, 201, 77"],
+    up: ["#5BE38A", "91, 227, 138"], down: ["#FF5A4A", "255, 90, 74"], flat: ["#B9B3A6", "0, 0, 0"],
+  };
+  const lit = (k) => "--c:" + LED[k][0] + ";--g:" + LED[k][1];
+
+  const team = (name, v, k, top, size) =>
+    '<div class="team" style="top:' + top + "px;" + lit(k) + '"><span class="name" style="font-size:' + size + 'px">'
+    + led(name) + '</span><span class="score">' + led(r1(v)) + "</span></div>";
+  const ladderRows = rows.map((p) => {
+    const mv = p.moved > 0 ? ["up", "▲" + p.moved] : p.moved < 0 ? ["down", "▼" + (-p.moved)] : ["flat", "="];
+    return '<div class="lrow"><span class="rank" style="' + lit("white") + '">' + (p.tied ? "=" : "") + p.place + "</span>"
+      + '<span class="abbr" style="' + lit(p.id) + '">' + led(ABBR[p.id]) + "</span>"
+      + '<span class="val" style="' + lit(p.id) + '">' + led(r1(p.v)) + "</span>"
+      + '<span class="mv" style="' + lit(mv[0]) + '">' + led(mv[1]) + "</span></div>";
+  }).join("");
+
+  const CSS = `
+    :host { all: initial; }
+    * { box-sizing: border-box; }
+    .card { position: relative; width: 1200px; height: 630px; padding: 16px; overflow: hidden;
+      background: #23272A; font: 900 30px/1 "Doto", monospace; letter-spacing: 0.04em; color: var(--c);
+      -webkit-font-smoothing: antialiased; }
+    .rivets { position: absolute; left: 0; right: 0; height: 16px;
+      background: radial-gradient(#3A4044 2px, transparent 2.6px) 12px 0 / 40px 16px; }
+    .panel { position: relative; width: 1168px; height: 598px; overflow: hidden; border-radius: 4px;
+      background: #060707 radial-gradient(#141817 1.5px, transparent 1.9px) 0 0 / 7px 7px;
+      box-shadow: inset 0 0 0 2px #000, inset 0 0 60px rgba(0, 0, 0, 0.9); }
+    [style*="--c"] { color: var(--c); }
+    .g { height: 0.7em; vertical-align: baseline; fill: currentColor; overflow: visible; }
+    .hdr { position: absolute; left: 30px; right: 30px; top: 22px; display: flex; justify-content: space-between; white-space: nowrap; }
+    .rule-h { position: absolute; left: 30px; right: 30px; height: 4px;
+      background: radial-gradient(#5D5A52 1.6px, transparent 2px) 0 0 / 7px 4px; }
+    .rule-v { position: absolute; left: 780px; top: 92px; width: 4px; height: 358px;
+      background: radial-gradient(#5D5A52 1.6px, transparent 2px) 0 0 / 4px 7px; }
+    .head { position: absolute; top: 94px; display: flex; align-items: baseline; justify-content: space-between;
+      font-size: 26px; white-space: nowrap; }
+    .head .sub { font-size: 18px; color: #B9B3A6; text-shadow: none; }
+    .team { position: absolute; left: 30px; width: 726px; height: 150px; display: flex; align-items: center;
+      justify-content: space-between; white-space: nowrap; }
+    .name { font-size: 72px; text-shadow: 0 0 7px rgba(var(--g), 0.85); }
+    .score { font-size: 150px; letter-spacing: 0.02em; text-shadow: 0 0 10px rgba(var(--g), 0.85), 0 0 34px rgba(var(--g), 0.4); }
+    .score .g { filter: drop-shadow(0 0 8px rgba(var(--g), 0.85)); }
+    .tick .g { filter: drop-shadow(0 0 4px rgba(var(--g), 0.85)); }
+    .ladder { position: absolute; left: 812px; top: 136px; width: 330px; }
+    .lrow { display: grid; grid-template-columns: 58px 112px 104px 56px; align-items: baseline; height: 50px;
+      font-size: 38px; white-space: nowrap; }
+    .rank { text-align: right; padding-right: 12px; }
+    .val, .mv { text-align: right; }
+    .mv { font-size: 26px; }
+    .key { position: absolute; left: 812px; width: 330px; font-size: 16px; line-height: 22px; color: #B9B3A6; white-space: nowrap; }
+    .tick { position: absolute; left: 30px; right: 30px; top: 492px; font-size: 40px; white-space: nowrap;
+      text-shadow: 0 0 7px rgba(var(--g), 0.85); }
+    .foot { position: absolute; left: 30px; right: 30px; top: 548px; display: flex; justify-content: space-between;
+      gap: 24px; font-size: 24px; white-space: nowrap; }
+  `;
+  const HTML = '<div class="card">'
+    + '<div class="rivets" style="top:0"></div><div class="rivets" style="bottom:0"></div>'
+    + '<div class="panel">'
+    + '<div class="hdr" style="' + lit("white") + '"><span>' + led("AUSPOL TRACKER") + '</span><span style="'
+      + lit("amber") + '">' + led(dateLab.toUpperCase()) + "</span><span>" + led("ROUND " + round) + "</span></div>"
+    + '<div class="rule-h" style="top:70px"></div>'
+    + '<div class="head" style="left:30px;width:726px;' + lit("white") + '"><span>' + led("TWO-PARTY PREFERRED")
+      + '</span><span class="sub">' + led(Q.imp ? "IMPLIED FLOWS" : "AS PUBLISHED") + "</span></div>"
+    + team("LABOR", Q.a, "alp", 128, 72)
+    + team(RIVAL, Q.b, Q.opp, 288, VS_ON ? 56 : 60)
+    + '<div class="rule-v"></div>'
+    + '<div class="head" style="left:812px;width:330px;' + lit("white") + '"><span>' + led("THE LADDER")
+      + '</span><span class="sub">' + led("1ST PREFS") + "</span></div>"
+    + '<div class="ladder">' + ladderRows + "</div>"
+    + '<div class="key" style="top:' + (136 + rows.length * 50 + 10) + 'px">'
+      + led("= LEVEL, INSIDE THE MARGIN") + "<br>" + led("▲▼ PLACES SINCE " + elecYear) + "</div>"
+    + '<div class="rule-h" style="top:470px"></div>'
+    + '<div class="tick" style="' + lit("amber") + '">' + led(verdict) + "</div>"
+    + '<div class="foot" style="' + lit("white") + '"><span>' + led(moveLine) + "</span><span>"
+      + led("AUSPOLTRACKER.COM") + "</span></div>"
+    + "</div></div>";
+
+  /* Pinned over the page's top-left corner, on <html> rather than <body> so
+     the boot-time body{visibility:hidden} and any body transform can't touch
+     it. A second run replaces the first. */
+  const old = document.getElementById("auspol-card");
+  if (old) old.remove();
+  const host = document.createElement("div");
+  host.id = "auspol-card";
+  host.style.cssText = "position:fixed;left:0;top:0;width:1200px;height:630px;z-index:2147483647;visibility:visible;margin:0;padding:0";
+  const root = host.attachShadow({ mode: "open" });
+  root.innerHTML = "<style>" + CSS + "</style>" + HTML;
+  document.documentElement.appendChild(host);
+  await document.fonts.ready;
+  /* Lines whose length the data sets shrink a pixel at a time until their
+     box holds them: the longest ticker ("TOO CLOSE TO CALL: ONE NATION BY
+     ...") runs past 1100px at the 40px it is set in. */
+  const shrink = (box, target) => {
+    for (let guard = 40; box.scrollWidth > box.clientWidth + 0.5 && guard > 0; guard--)
+      target.style.fontSize = parseFloat(getComputedStyle(target).fontSize) - 1 + "px";
+  };
+  root.querySelectorAll(".team").forEach((t) => shrink(t, t.querySelector(".name")));
+  shrink(root.querySelector(".tick"), root.querySelector(".tick"));
+  shrink(root.querySelector(".foot"), root.querySelector(".foot > span"));
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  /* Stamped on the date of the newest poll's publication, with the fig
+     block beside it: render-card's staleness gate compares both against
+     build.mjs's assets/auspol-latest.json, so a moved figure, a moved
+     ladder or a new fieldwork date all redraw the card without launching
+     Chrome when none has. Same shape as build.mjs's cardFigs – mirror any
+     change in both files. render-card.mjs appends the design hash. */
+  const fig = {
     vs: VS_ON ? "onp" : "lnp",
-    alp: Q.a.toFixed(1), lnp: Q.b.toFixed(1),
-    ci: Q.ci.toFixed(1),
-    n: Q.n, win: L.method.windowDays,
+    alp: Q.a.toFixed(1), lnp: Q.b.toFixed(1), ci: Q.ci.toFixed(1),
     mom: (Q.a - (Q.prev != null ? Q.prev : Q.a)).toFixed(1), sig: Q.sig,
-    basis: Q.imp ? "imp" : "pub" } };
-  console.log("card drawn for data dated " + L.publishedISO
-              + " – put this in assets/auspol-card.json");
-  const a = document.createElement("a");
-  a.download = "auspol-card.png"; a.href = png; a.click();
+    basis: Q.imp ? "imp" : "pub",
+    date: L.updatedISO,
+    prim: IDS.map((id) => (P[id] != null ? P[id].toFixed(1) : "-")).join("/"),
+    pci: IDS.map((id) => (lastCi[id] != null ? (+lastCi[id]).toFixed(1) : "-")).join("/"),
+  };
+  window.__auspolCard = { selector: "#auspol-card", publishedISO: L.publishedISO, fig };
+  console.log("card built for data published " + L.publishedISO + " – stamp for assets/auspol-card.json:\n"
+    + JSON.stringify({ publishedISO: L.publishedISO, fig }));
+  } catch (e) {
+    window.__auspolCard = { error: String((e && e.message) || e) };
+    console.error("make-card:", e);
+  }
 })();

@@ -428,7 +428,7 @@
   };
   const col = (el, prop) => (el ? getComputedStyle(el)[prop || "color"] : null);
   /* Resolved through a probe rather than read as a raw token, because a canvas
-     fillStyle wants a resolved colour - the same trick make-card.js uses. */
+     fillStyle wants a resolved colour. */
   const paint = (css) => {
     const el = document.createElement("span");
     el.style.color = css;

@@ -2,19 +2,18 @@
    a hand step.
 
    make-card.js has to execute inside the built page: it reads window.AUSPOL,
-   which is what keeps the card from contradicting the page it previews, and it
-   draws with the site's own webfonts, which canvas text picks up only from a
-   document that has already loaded them. That made regeneration manual – serve
-   the repo, open the page, paste the file into the console, move the download
-   – and the card fell behind twice over: it kept a github.io footer through a
-   whole domain move, and its figures drifted while build.mjs's date check
-   still reported it current.
+   which is what keeps the card from contradicting the page it previews. That
+   made regeneration manual – serve the repo, open the page, paste the file
+   into the console, save the image – and the card fell behind twice over: it
+   kept a github.io footer through a whole domain move, and its figures
+   drifted while build.mjs's date check still reported it current.
 
    So this drives the same file in real Chrome instead of a person doing it. It
    serves the repo on an ephemeral port, opens index.html headless, evaluates
-   make-card.js with its download tail neutered, and lifts the PNG back out of
-   window.__auspolCard. Nothing about the drawing lives here – make-card.js is
-   still the only place the card is designed.
+   make-card.js, and photographs the card it builds: one 1200x630 element
+   pinned over the page's corner, at a device scale of 1. Nothing about the
+   card lives here – make-card.js is still the only place it is designed, and
+   it loads and checks its own face (Doto, from .build/newtracker/fonts/).
 
      node .build/newtracker/render-card.mjs   # rewrites the png and the json
      node .build/newtracker/build.mjs         # re-stamps og:image with the date
@@ -25,6 +24,7 @@
    at the console steps in the make-card.js header, which still work. Override
    the browser with CHROME=/path/to/chrome. */
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import http from "node:http";
 import os from "node:os";
@@ -77,6 +77,15 @@ if (!puppeteer) die("puppeteer-core not found (npm i -g puppeteer-core, or draw\
 if (!fs.existsSync(CHROME)) die("no Chrome at " + CHROME + "\n  (set CHROME=/path/to/chrome).");
 
 const src = fs.readFileSync(path.join(HERE, "make-card.js"), "utf8");
+/* The card's design, as a hash of make-card.js and its face, joins the fig
+   block in the stamp. Without it a change to how the card looks left the
+   figures – and so the staleness gate and the og:image ?v= key – where they
+   were: no redraw, and scrapers serving the old design from cache.
+   Mirror: build.mjs's CARD_DESIGN hashes the same two files. */
+const DESIGN = crypto.createHash("sha1")
+  .update(fs.readFileSync(path.join(HERE, "make-card.js")))
+  .update(fs.readFileSync(path.join(HERE, "fonts", "doto-card.woff2")))
+  .digest("hex").slice(0, 8);
 if (!fs.existsSync(path.join(ROOT, "index.html")))
   die("no index.html – run build.mjs first; the card is drawn from the built page.");
 
@@ -116,37 +125,29 @@ try {
   await page.waitForFunction("!!(window.AUSPOL && window.AUSPOL.latest)", { timeout: 60000 });
   await page.evaluate("document.fonts.ready.then(() => 0)");
 
-  /* The whole reason the card is drawn in the page rather than rasterised from
-     an SVG is the typefaces; a run that silently fell back to system fonts
-     would reintroduce exactly the off-brand drift this replaced.
-
-     Ask for them explicitly before checking - make-card.js names the SHIPPED
-     faces directly rather than going through --serif/--sans, so the canvas
-     draw gets the webfont even if the page above the fold hasn't yet asked
-     for the weight or style the card needs. A file that genuinely cannot
-     load fails the check below. */
-  const FACES = ["Crimson Text", "IBM Plex Sans", "Source Sans 3"]; // SS3: the wordmark only
-  await page.evaluate(`Promise.all(${JSON.stringify(FACES)}.flatMap(
-    (f) => ["400", "600", "700"].map((w) => document.fonts.load(w + ' 60px "' + f + '"'))
-  )).then(() => 0)`);
-  const missing = await page.evaluate(`${JSON.stringify(FACES)}
-    .filter(f => !document.fonts.check('400 60px "' + f + '"'))`);
-  if (missing.length) die("webfont not loaded: " + missing.join(", ")
-    + "\n  refusing to draw – the card would fall back to system fonts.");
-
-  /* make-card.js ends by clicking a download link, which is the right ending
-     for a human at a console and the wrong one here. */
-  await page.evaluate("HTMLAnchorElement.prototype.click = function () {};\n"
-    + src + "\nundefined;");
+  /* make-card.js loads its face and refuses to build the card when it cannot:
+     a fallback font would put system glyphs on an LED board. That refusal, or
+     any other failure, comes back as window.__auspolCard.error. */
+  await page.evaluate(src + "\nundefined;");
   await page.waitForFunction("!!window.__auspolCard", { timeout: 60000 });
-  const { png, publishedISO, fig } = await page.evaluate("window.__auspolCard");
+  const { error, selector, publishedISO, fig } = await page.evaluate("window.__auspolCard");
+  if (error) die("make-card.js failed: " + error + "\n  refusing to draw.");
 
-  const buf = Buffer.from(png.replace(/^data:image\/png;base64,/, ""), "base64");
+  const card = await page.$(selector);
+  const box = card && await card.boundingBox();
+  if (!box || Math.round(box.width) !== 1200 || Math.round(box.height) !== 630)
+    die("the card is not a 1200x630 element (" + (box ? box.width + "x" + box.height : "missing") + ")");
+  const buf = Buffer.from(await card.screenshot({ type: "png" }));
   fs.writeFileSync(CARD, buf);
+  /* WhatsApp is reported to skip a link preview whose image is over ~300 KB,
+     and the LED texture is the expensive part of this one. Say so loudly
+     rather than ship a card one big app won't show. */
+  if (buf.length > 300 * 1024) console.warn("  ! the card is " + (buf.length / 1024).toFixed(0)
+    + " KB; some chat apps drop og:images over ~300 KB");
   // The fig block is what the staleness gate above compares against
   // build.mjs's auspol-latest.json — it must be written with the date so
   // figure drift (and not just new polls) triggers the next redraw.
-  fs.writeFileSync(STAMP, JSON.stringify({ publishedISO, fig }) + "\n");
+  fs.writeFileSync(STAMP, JSON.stringify({ publishedISO, fig: { ...fig, design: DESIGN } }) + "\n");
   console.log("drew assets/auspol-card.png · " + (buf.length / 1024).toFixed(0)
     + " KB · data dated " + publishedISO);
   console.log("stamped assets/auspol-card.json · run build.mjs to re-stamp og:image");

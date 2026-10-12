@@ -1328,17 +1328,19 @@ if (!html.includes("<!--STATIC_SUMMARY-->")) throw new Error("STATIC_SUMMARY mar
 html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + (VIC ? buildStaticSummaryVic() : buildStaticSummary()) + "\n  ");
 
 /* The share card carries live figures, so it can be WRONG in a way the old
-   generic one could not. build.mjs cannot draw it - no rasteriser here, and it
-   needs the page's own webfonts (see make-card.js) - but it can refuse to let
-   a stale one pass unremarked, and it can stop scrapers serving a cached old
-   card once a new one exists. The date the card was drawn for is recorded
-   beside it; ?v= makes every redraw a new URL as far as a scraper is
-   concerned, because they key their caches on the full URL.
+   generic one could not. build.mjs cannot draw it - there is no rasteriser
+   here; make-card.js builds it inside the page and render-card.mjs
+   photographs it - but it can refuse to let a stale one pass unremarked, and
+   it can stop scrapers serving a cached old card once a new one exists. What
+   the card was drawn for is recorded beside it; ?v= makes every redraw a new
+   URL as far as a scraper is concerned, because they key their caches on the
+   full URL.
 
-   Stamped on publishedISO, which is the date the card puts on its own face.
-   It was updatedISO - the end of the most recent poll's FIELDWORK - and a
-   correction to a poll's publisher moves one and not the other, so the check
-   could call a card current while it showed a date the site no longer did. */
+   The stamp's date is publishedISO, the newest poll's publication. The date
+   the card prints is updatedISO, that poll's fieldwork end, as the hero
+   prints it; it rides in the fig block with everything else the scoreboard
+   shows. A correction to a poll's publisher moves one date and not the
+   other, so the check needs both. */
 /* The contest the card quotes. The card draws Labor against the rival the
    site leads with - gen-data's rivalLead, the margin-gated ruling over the
    implied series that also picks the hero's contest and the favicon's
@@ -1356,7 +1358,10 @@ function cardContest() {
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
   const L = grab("latest"), S = grab("synthLatest"), alt = grab("altLatest");
-  const hv = headlineView(L, S);
+  /* the ladder's margins: the latest month's 95% intervals, as the
+     primary-vote panel's level test reads them */
+  const AP = grab("aggPrimary");
+  const hv = { ...headlineView(L, S), primCi: (AP[AP.length - 1] || {}).ci || {} };
   const onImp = L.onImp && L.onImp.a != null ? L.onImp : null;
   const onPub = alt && alt.alp_on && alt.alp_on.a != null ? alt.alp_on : null;
   if (L.rivalLead !== "alp_on" || (!onImp && !onPub))
@@ -1369,18 +1374,67 @@ function cardContest() {
            method: { ...hv.method, nPolls: s.n },
            basis: onImp ? "imp" : "pub" };
 }
-/* The card's figure block, in exactly the shape make-card.js stamps into
-   assets/auspol-card.json – mirror any change in both files. Written out as
-   a machine-readable sidecar so render-card's staleness gate (and any future
-   consumer) reads it here instead of string-splitting the dataset asset the
-   way grabLatest does. */
+/* The card's figure block: everything the scoreboard prints, in exactly the
+   shape and key order make-card.js stamps into assets/auspol-card.json –
+   mirror any change in both files. The two-party score and its verdict, the
+   month's move, the basis, the date, and the ladder's inputs (the five
+   primaries and their margins, slash-joined in CARD_IDS order); the places
+   and ties follow from those. Written out as a machine-readable sidecar so
+   render-card's staleness gate (and any future consumer) reads it here
+   instead of string-splitting the dataset asset the way grabLatest does. */
+const CARD_IDS = ["alp", "lnp", "grn", "onp", "oth"];
+/* The card's design, last in the block: a hash of make-card.js and its face,
+   so a redesign redraws the card and moves the og:image ?v= key even when no
+   figure has moved. render-card.mjs adds it to the stamp from the same two
+   files (make-card.js itself can't see its own source). */
+const CARD_DESIGN = crypto.createHash("sha1")
+  .update(fs.readFileSync(path.join(HERE, "make-card.js")))
+  .update(fs.readFileSync(path.join(HERE, "fonts", "doto-card.woff2")))
+  .digest("hex").slice(0, 8);
 function cardFigs(L) {
   return { vs: L.vs, alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
            ci: L.alp2ppCi95.toFixed(1),
-           n: L.method.nPolls, win: L.method.windowDays,
            mom: (L.alp2pp - (L.alp2ppPrev != null ? L.alp2ppPrev : L.alp2pp)).toFixed(1),
            sig: !!L.changeSig,
-           basis: L.basis };
+           basis: L.basis,
+           date: L.updatedISO,
+           prim: CARD_IDS.map((id) => (L.primary[id] != null ? L.primary[id].toFixed(1) : "-")).join("/"),
+           pci: CARD_IDS.map((id) => (L.primCi[id] != null ? (+L.primCi[id]).toFixed(1) : "-")).join("/"),
+           design: CARD_DESIGN };
+}
+/* The scoreboard in words, for og:image:alt, built from a fig block so the
+   alt can follow whichever card was drawn. The verdict and the ladder's
+   level groups are make-card.js's, in sentences: a lead no bigger than its
+   margin is too close to call, and a party joins the group above it while
+   the gap to that group's first party is inside their margins combined. */
+function cardAltOf(f, stampISO) {
+  const NAME = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
+  const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+                  "September", "October", "November", "December"];
+  const rival = f.vs === "onp" ? "One Nation" : "Coalition";
+  const lead = +(f.alp - f.lnp).toFixed(1), margin = +(2 * f.ci).toFixed(1);
+  const who = lead > 0 ? "Labor" : rival, by = Math.abs(lead).toFixed(1), pm = "±" + margin.toFixed(1);
+  const verdict = Math.abs(lead) > margin ? `${who} ahead by ${by}, outside the ${pm} margin`
+    : lead ? `too close to call, ${who}\u2019s ${by}-point lead inside the ${pm} margin`
+    : `level, inside the ${pm} margin`;
+  const [y, m, d] = String(f.date || stampISO || "").split("-").map(Number);
+  const when = d ? ` for ${d} ${MONTHS[m - 1]} ${y}` : "";
+  let ladder = "";
+  if (f.prim && f.pci) {
+    const v = f.prim.split("/"), c = f.pci.split("/");
+    const rows = CARD_IDS.map((id, i) => ({ id, v: +v[i], ci: +c[i] || 0 }))
+      .filter((r) => !Number.isNaN(r.v)).sort((p, q) => q.v - p.v);
+    const groups = [];
+    rows.forEach((r) => {
+      const g = groups[groups.length - 1];
+      if (g && g[0].v - r.v < Math.hypot(g[0].ci, r.ci)) g.push(r); else groups.push([r]);
+    });
+    const list = (a) => a.length < 3 ? a.join(" and ") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+    ladder = " First preferences: " + groups.map((g) => list(g.map((r) => `${NAME[r.id]} ${r.v.toFixed(1)}`))
+      + (g.length > 1 ? ", level inside the margin" : "")).join("; ") + ".";
+  }
+  return `auspol tracker scoreboard${when}. Two-party preferred${f.basis === "imp" ? " on implied preference flows" : ""}: `
+    + `Labor ${f.alp}, ${rival} ${f.lnp}, ${verdict}.${ladder}`;
 }
 const cardNow = cardContest();
 if (!VIC) writeAtomic(path.join(ROOT, "assets", "auspol-latest.json"),
@@ -1431,25 +1485,15 @@ const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${(cardStamp || dataStamp) 
    and fall back to a blank card. The ~35 KB saved isn't worth a conservative
    render for those embeds. WebP could ride parallel og:image entries once
    verified across every consumer of the share card. */
-/* The card is now a chart with figures on it, so its alt says them. Someone
-   who cannot see the preview should get the same reading from it. The card a
-   crawler fetches is the committed PNG, drawn for cardStamp – on the
-   warn-only path above that stays an older wave while the data has moved on,
-   so derive the alt from the DRAWN stamp's fig block (assets/auspol-card.json)
-   when it didn't draw today's wave, and the alt and the pixels always agree. */
+/* The card carries figures, so its alt says them. Someone who cannot see the
+   preview should get the same reading from it. The card a crawler fetches is
+   the committed PNG, drawn for cardStamp – on the warn-only path above that
+   stays an older wave while the data has moved on, so derive the alt from the
+   DRAWN stamp's fig block (assets/auspol-card.json) when it didn't draw
+   today's wave, and the alt and the pixels always agree. */
 const cl = cardContest();
-const cardAlt = (() => {
-  const f = cardStamp && cardStamp !== dataStamp && cardFigsDrawn;
-  if (!f) return `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, ${cl.oppLab} ${cl.lnp2pp.toFixed(1)} `
-    + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
-    + `with the trend since the 2025 election`;
-  const [sy, sm, sd] = String(cardStamp).split("-").map(Number);
-  const MM = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const when = sd ? `${sd} ${MM[(sm || 1) - 1]} ${sy}` : cardStamp;
-  return `auspol tracker: Labor ${f.alp}, ${f.vs === "onp" ? "One Nation" : "Coalition"} ${f.lnp} `
-    + `two-party preferred${f.basis === "imp" ? " on implied preference flows" : ""}, ±${f.ci} points, `
-    + `updated ${when}, with the trend since the 2025 election`;
-})();
+const cardAlt = cardStamp && cardStamp !== dataStamp && cardFigsDrawn
+  ? cardAltOf(cardFigsDrawn, cardStamp) : cardAltOf(cardFigs(cl));
 /* SERP + social description. It opens with the site's name because Google
    rewrites a snippet that doesn't match the query: on a search for "auspol
    tracker" it skipped the old tagline-first description and quoted the
