@@ -3173,7 +3173,44 @@
       },
       "url": "https://www.capitalbrief.com/article/nationals-face-total-wipeout-as-one-nation-leads-with-male-voters-ae82f323-94e9-436a-b6b1-6dc1ec8cab6a/",
       "releaseUrl": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
-      "methodUrl": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf"
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
+      "pref_flows": {
+        "onp_alp_lnp": 21.5,
+        "alp_onp": {
+          "inner": {
+            "lnp": 40,
+            "grn": 91,
+            "oth": 70
+          },
+          "outer": {
+            "lnp": 31,
+            "grn": 91,
+            "oth": 58
+          },
+          "regional": {
+            "lnp": 21,
+            "grn": 87,
+            "oth": 53
+          }
+        },
+        "lnp_onp": {
+          "inner": {
+            "alp": 72,
+            "grn": 82,
+            "oth": 77
+          },
+          "outer": {
+            "alp": 68,
+            "grn": 70,
+            "oth": 58
+          },
+          "regional": {
+            "alp": 64,
+            "grn": 77,
+            "oth": 54
+          }
+        }
+      }
     },
     {
       "date": "2026-03-08",
@@ -4722,7 +4759,44 @@
         }
       },
       "url": "https://demosau.com/news/new-mrp-model-points-to-hung-parliament/",
-      "methodUrl": "https://demosau.com/wp-content/uploads/2026/07/DemosAU-Report-May-July-2026-MRP-Model-.pdf"
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/07/DemosAU-Report-May-July-2026-MRP-Model-.pdf",
+      "pref_flows": {
+        "onp_alp_lnp": 20,
+        "alp_onp": {
+          "inner": {
+            "lnp": 39,
+            "grn": 91,
+            "oth": 67
+          },
+          "outer": {
+            "lnp": 32,
+            "grn": 91,
+            "oth": 55
+          },
+          "regional": {
+            "lnp": 29,
+            "grn": 87,
+            "oth": 48
+          }
+        },
+        "lnp_onp": {
+          "inner": {
+            "alp": 76,
+            "grn": 86,
+            "oth": 68
+          },
+          "outer": {
+            "alp": 71,
+            "grn": 83,
+            "oth": 60
+          },
+          "regional": {
+            "alp": 72,
+            "grn": 82,
+            "oth": 58
+          }
+        }
+      }
     },
     {
       "date": "2026-07-12",
@@ -5534,7 +5608,44 @@
       },
       "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
       "releaseUrl": "https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/",
-      "methodUrl": "https://demosau.com/wp-content/uploads/2026/10/DemosAU-Report-Aug-Sept-2026-MRP-Model-1.pdf"
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/10/DemosAU-Report-Aug-Sept-2026-MRP-Model-1.pdf",
+      "pref_flows": {
+        "onp_alp_lnp": 18,
+        "alp_onp": {
+          "inner": {
+            "lnp": 48,
+            "grn": 90,
+            "oth": 77
+          },
+          "outer": {
+            "lnp": 37,
+            "grn": 87,
+            "oth": 57
+          },
+          "regional": {
+            "lnp": 30,
+            "grn": 86,
+            "oth": 53
+          }
+        },
+        "lnp_onp": {
+          "inner": {
+            "alp": 82,
+            "grn": 88,
+            "oth": 78
+          },
+          "outer": {
+            "alp": 76,
+            "grn": 85,
+            "oth": 58
+          },
+          "regional": {
+            "alp": 72,
+            "grn": 87,
+            "oth": 61
+          }
+        }
+      }
     },
     {
       "date": "2026-09-20",

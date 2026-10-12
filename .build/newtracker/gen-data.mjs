@@ -3248,6 +3248,9 @@ const individualPolls = POLLS.map((p) => {
     // single-territory readings for the ACT/NT/Tas view (§5c; display-only)
     ...(SOLO_BY_POLL.has(p.date + "|" + p.pollster) ? { solo: SOLO_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
     ...(VS_BY_POLL.has(p.date + "|" + p.pollster) ? { sw: VS_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
+    // DemosAU MRP's printed preference flows by region (polls.json pref_flows;
+    // display-only: the opened poll's Preferences line cycles its regions)
+    ...(p.pref_flows ? { pf: p.pref_flows } : {}),
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
@@ -3802,7 +3805,20 @@ const flowForced = (() => {
       if (w.grn != null || w.onp != null || w.oth != null) vsCoal.push(w);
     }
   }
-  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal } : null;
+  /* DemosAU's MRP reports print one national respondent flow beside
+     RedBridge's: One Nation voters' share reaching Labor in Labor-v-Coalition
+     contests (pref_flows.onp_alp_lnp, from full five-option rankings over the
+     MRP sample). It rides the Labor v Coalition chart as marks, not a line –
+     three quarterly readings, another house – placed at the fieldwork
+     window's midpoint month, since an MRP spans six to seven weeks. */
+  const demos = D.polls.filter((p) => p.pollster === "DemosAU (MRP)" && p.pref_flows && p.pref_flows.onp_alp_lnp != null)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .map((p) => {
+      const t0 = new Date(p.dateStart || p.date).getTime(), t1 = new Date(p.date).getTime();
+      return { date: p.date, ym: ymOf(new Date((t0 + t1) / 2).toISOString().slice(0, 10)), from: p.dateStart || null,
+               n: p.sample ?? null, onp: p.pref_flows.onp_alp_lnp };
+    });
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, ...(demos.length ? { demos } : {}) } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null
