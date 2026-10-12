@@ -8,7 +8,13 @@
    reading, which must quote the same figures as the masthead; arrows step
    whole months; Home lands on election day; a timeline drag settles on a
    month; the month reel takes the wheel; R replays; Escape closes and hands
-   focus back to the masthead dial. Layout: at each viewport the controls
+   focus back to the masthead dial; once the playhead stops, the needle comes
+   to rest exactly on the reading. Shots (2026-10-12): each poll's knock is
+   signed by where it lands against the line - above knocks the needle
+   toward Labor, below toward the challenger - and every shot flies round to
+   the side it pushes from and arrives travelling that way, never through
+   the needle (a grid of needles and launch points through the same
+   gpShotPlan/gpShotAt the engine flies). Layout: at each viewport the controls
    stay on screen, bar readings stay clear of the month and on screen, and
    the caption block stays clear of the timeline (a screen under 560px tall
    scrolls by design, so it is skipped).
@@ -78,6 +84,20 @@ for (const reduce of [false, true]) {
   } else ok(s.play === "Play" && s.vt.startsWith("Now:"), "opens paused on the live reading");
   await page.keyboard.press("End"); await wait(reduce ? 200 : 900);
   s = await state(page); ok(s.vt.startsWith(quote), `End rests on the masthead's figures (${s.vt} vs ${quote})`);
+  // the polls' knocks die away: wait for the needle to stop, then read it
+  const rest = await page.evaluate(async () => {
+    const ang = () => +document.querySelector(".gp-needle").parentNode.getAttribute("transform").match(/-?[\d.]+/)[0];
+    let a = ang();
+    for (const t0 = performance.now(); performance.now() - t0 < 4000;) {
+      await new Promise((r) => setTimeout(r, 150));
+      const b = ang();
+      if (Math.abs(b - a) < 1e-3) break;
+      a = b;
+    }
+    const M = window.buildDialStory(window.AP.D);
+    return { a, want: M.at(M.x1).deg };
+  });
+  ok(Math.abs(rest.a - rest.want) < 0.05, `the needle comes to rest on the live reading (${rest.a.toFixed(2)} vs ${rest.want.toFixed(2)} degrees)`);
   const last = s.now;
   for (let i = 0; i < 3; i++) { await page.keyboard.press("ArrowLeft"); await wait(80); }
   await wait(reduce ? 200 : 1100);
@@ -104,6 +124,50 @@ for (const reduce of [false, true]) {
   ok(s.glyphOp === "", "the masthead dial is lit again after the return");
   ok(/wm-glyph/.test(s.active), "focus goes back to the masthead dial");
   ok(!errs.length, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
+  await page.close();
+}
+
+console.log("--- shots");
+{
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 800 });
+  await page.goto(base + "/", { waitUntil: "networkidle0" });
+  const r = await page.evaluate(() => {
+    const M = window.buildDialStory(window.AP.D);
+    // where each poll lands against the reading the needle holds there (same contest)
+    const devOk = M.polls.every((p) => { const a = M.at(p.x); return a.oppId !== p.opp || Math.abs(p.v - a.lab - p.dev) < 1e-9; });
+    const knock = window.gpKnock(1) < 0 && window.gpKnock(-1) > 0 && window.gpKnock(0) === 0;
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    let n = 0;
+    const bad = [];
+    for (const L of [56, 102, 140]) for (const deg of [-44, -30, -12, 0, 12, 30, 44]) for (const s of [1, -1])
+      for (const sx of [-600, -150, 0, 150, 600]) for (const sy of [1.6, 2.5, 4]) for (let k = 0; k < 4; k++) {
+        const a = (deg * Math.PI) / 180;
+        const g = { px: 0, py: 0, L, ux: Math.sin(a), uy: -Math.cos(a), nx: Math.cos(a), ny: Math.sin(a) };
+        const c = window.gpShotPlan(sx, sy * L, s, k / 3, g, rnd);
+        n++;
+        // crossing the needle's line while level with the needle = flying through it
+        let prev = null, through = false;
+        for (let i = 0; i <= 300; i++) {
+          const v = i / 300, [x, y] = window.gpShotAt(c, v, g);
+          const q = { across: x * g.nx + y * g.ny, along: x * g.ux + y * g.uy };
+          if (prev && v < 0.985 && (prev.across > 0) !== (q.across > 0) &&
+              Math.min(q.along, prev.along) > -2 && Math.max(q.along, prev.along) < L * 1.02) through = true;
+          prev = q;
+        }
+        // its heading into the strike, against the way it should push (-s across the needle)
+        const [x1, y1] = window.gpShotAt(c, 0.97, g), [x2, y2] = window.gpShotAt(c, 1, g);
+        const head = ((x2 - x1) * -s * g.nx + (y2 - y1) * -s * g.ny) / (Math.hypot(x2 - x1, y2 - y1) || 1);
+        if (through || head < 0.5) bad.push({ L, deg, s, sx, sy, through, head: +head.toFixed(2) });
+      }
+    return { devOk, knock, n, bad: bad.slice(0, 3), nbad: bad.length,
+             above: M.polls.filter((p) => p.dev > 0).length, below: M.polls.filter((p) => p.dev < 0).length };
+  });
+  ok(r.devOk, "each poll's dev is how far it lands above (+) or below (-) the reading the needle holds");
+  ok(r.knock, "a poll above the line knocks the needle toward Labor, one below toward the challenger");
+  ok(!r.nbad, `all ${r.n} test shots arrive travelling the way they push, none through the needle` + (r.nbad ? ": " + JSON.stringify(r.bad) : ""));
+  ok(r.above > 0 && r.below > 0, `polls land on both sides of the line (${r.above} above, ${r.below} below)`);
   await page.close();
 }
 

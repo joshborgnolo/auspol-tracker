@@ -14,12 +14,17 @@
    2. Wind back. The whole term is on screen for a beat, then the playhead runs
       backwards to election day: the trace un-draws, every poll lifts off the
       line, and the needle whips back through seventeen months.
-   3. Replay. Every poll drops onto the line as the playhead reaches it and
-      streaks into the needle, which takes a small kick toward that poll before
-      settling back onto the estimate - the aggregate, shown as what polls do to
-      it. A party passing another trades places on the arc; the challenger
-      changing hands floods the arc's right side with the new colour. Time
-      slows for those moments, so the caption naming each one can be read.
+   3. Replay. Every poll drops onto the line as the playhead reaches it and is
+      fired at the needle. A poll above the line swings round to the
+      challenger's side and strikes the needle travelling toward Labor, so it
+      knocks the needle Labor's way; a poll below the line comes round Labor's
+      side and knocks it back. Each knock is sized by how far the poll sits off
+      the line, the spent shot drops out of the needle, and the needle springs
+      back onto the estimate - the aggregate, shown as the point the polls'
+      knocks balance around. A party passing another trades places on the arc;
+      the challenger changing hands floods the arc's right side with the new
+      colour. Time slows for those moments, so the caption naming each one can
+      be read.
    4. Land on the live estimate - the headline's figure - with a shockwave and
       the whole field of polls shimmering once.
    5. Return. Closing flies the dial home, sliding back to the live reading on
@@ -33,14 +38,16 @@
    (tppLatest on the implied basis, latest.primary). The player this replaced
    rested its bars on September's monthly mean while quoting the live 2PP, so
    it could put One Nation ahead of Labor on first preferences while the
-   masthead it flew out of said the opposite. The needle's kicks are the one
-   liberty taken, and each decays back onto the estimate within half a second.
+   masthead it flew out of said the opposite. The polls' knocks are the one
+   liberty taken: the needle, its bend and the dial's shake all spring back
+   onto the estimate within a second of the last strike, so a dial at rest -
+   paused, stepped or finished - reads exactly.
 
    HOW IT RUNS
    One clock. React draws the structure once; a single requestAnimationFrame
    loop (gpEngine) owns everything that moves and writes it straight to the
    DOM and two canvases - transforms, a few SVG attributes, the dots and the
-   streaks. A month change costs React one small render (for the slider's
+   shots. A month change costs React one small render (for the slider's
    reading); nothing else goes through it. The loop sleeps when nothing is
    moving. Reduced motion gets the same instrument with no flight, no rewind,
    no particles and no springs: it opens on the live reading and steps month
@@ -58,6 +65,8 @@ const GP = {
   SWING_DEG: 34,
   BAR_SEP: 12,     // degrees two bars keep apart while trading places
   LABEL_SEP: 27,   // and their readings
+  KICK: 60,        // deg/s the needle is knocked per point a poll sits off the line
+  STOP: 44,        // the pegs just past either end of the scale
   VB: [-250, -286, 500, 304],
 };
 /* GlyphDial's own proportions, so the dial leaves and lands as that mark */
@@ -112,6 +121,57 @@ function gpSpring(s, target, k, c, dt) {
   }
 }
 const gpRest = (s, target, eps) => Math.abs(s.v) < eps && Math.abs(s.x - target) < eps;
+
+const gpBez = (x0, y0, x1, y1, x2, y2, x3, y3, e) => {
+  const q = 1 - e, a = q * q * q, b = 3 * q * q * e, c = 3 * q * e * e, d = e * e * e;
+  return [a * x0 + b * x1 + c * x2 + d * x3, a * y0 + b * y1 + c * y2 + d * y3];
+};
+/* Which way a poll knocks the needle, and how hard: a poll `dev` points
+   above the line (+) sends it toward Labor (negative degrees, as gpDeg
+   draws them), one below sends it toward the challenger. Returned as the
+   change in the needle's swing, in degrees a second. */
+const gpKnock = (dev) => -GP.KICK * dev;
+/* A shot's flight plan, fixed when it leaves the line at (sx, sy). s is the
+   side it strikes from - 1 for the challenger's, so it travels toward Labor
+   - and w (0-1) its weight. The draws from rnd vary where it strikes and how
+   wide it swings, so a barrage never flies in lockstep. g is the needle at
+   launch (needleGeom); the plan's lengths are taken from it. */
+function gpShotPlan(sx, sy, s, w, g, rnd) {
+  const c = { s, w, sx, sy,
+              dur: 470 + rnd() * 170 - 140 * w,  // heavier shots fly faster
+              r: 0.7 + rnd() * 0.28,             // where along the needle it strikes
+              wide: 0.9 + rnd() * 0.7,           // how far out past the pivot it swings
+              low: 0.12 + rnd() * 0.5,           // and how far below it
+              hook: 0.7 + rnd() * 0.6 };         // how wide it comes in across the needle
+  const wx = g.px + s * g.L * c.wide, wy = g.py + g.L * c.low;
+  const dx = wx - sx, dy = wy - sy, la = Math.hypot(dx, dy) || 1;
+  // through W heading the way it was going, turned upward
+  const tx = dx / la, ty = dy / la - 1.2, tn = Math.hypot(tx, ty);
+  c.tx = tx / tn; c.ty = ty / tn;
+  const lb = Math.hypot(g.px + g.ux * g.L * c.r - wx, g.py + g.uy * g.L * c.r - wy) + g.L * c.hook;
+  c.ax = sx + dx * 0.15; c.ay = sy + dy * 0.55 - la * 0.1;
+  c.h1 = la * 0.32; c.h2 = lb * 0.32; c.split = la / (la + lb);
+  return c;
+}
+/* A poll's shot at the needle, v (0-1) of the way along. It flies two legs:
+   up off the line and round beneath the pivot to the side it has to strike
+   from (W), then up past the pivot and hooked in across the needle, so it
+   always arrives travelling the way it pushes - a shot that came straight
+   at the needle from the wrong side would read as a pull. The legs share
+   their tangent at W and split the flight by length, so the speed carries
+   through the turn. g is the needle as it stands this frame (needleGeom):
+   the shot homes on wherever the needle has been knocked to. */
+function gpShotAt(c, v, g) {
+  const wx = g.px + c.s * g.L * c.wide, wy = g.py + g.L * c.low;
+  if (v < c.split) {
+    return gpBez(c.sx, c.sy, c.ax, c.ay, wx - c.tx * c.h1, wy - c.ty * c.h1, wx, wy, v / c.split);
+  }
+  const ix = g.px + g.ux * g.L * c.r, iy = g.py + g.uy * g.L * c.r, D = g.L * c.hook;
+  return gpBez(wx, wy, wx + c.tx * c.h2, wy + c.ty * c.h2, ix + c.s * g.nx * D, iy + c.s * g.ny * D, ix, iy,
+               (v - c.split) / (1 - c.split));
+}
+// off the line fast, and faster still into the needle
+const gpShotEase = (u) => 0.5 * (1 - (1 - u) * (1 - u)) + 0.5 * u * u * u * u;
 
 /* The data's decimal years: year + (day of year - 1) / 365, the way the
    events are written. */
@@ -283,13 +343,27 @@ function buildDialStory(D) {
       : k === 1 ? "1 poll this month" : k + " polls this month";
   });
 
-  /* every poll, on the same contest as the line it lands on */
+  /* What the needle holds for one contest - the same held roll as `at`, but
+     for a named challenger, so a poll landing just as the challenger changes
+     hands is still measured against its own contest. */
+  const heldLab = (x, id) => {
+    const fi = fOf(x), k = Math.max(0, Math.min(n - 2, Math.floor(fi)));
+    const e = gpSmooth(gpClamp((fi - k - EA) / EB, 0, 1));
+    const A = frames[k], B = frames[Math.min(n - 1, k + 1)];
+    const a = id === "onp" ? A.labO : A.labL, b = id === "onp" ? B.labO : B.labL;
+    return a == null || b == null ? at(x).lab : a + (b - a) * e;
+  };
+  /* every poll, on the same contest as the line it lands on. `dev` is how
+     far it lands above (+) or below (-) the line's leading edge - the
+     reading the needle holds at that moment - and is what sizes its knock */
   const polls = allPolls.map((p) => {
     if (p.x < x0 || p.x > x1 + 1e-6) return null;
     const c = contest(p.x);
     const v = implied ? (c.id === "onp" ? p.alpOnImp : p.alpImp)
                       : (c.id === "onp" ? (p.tppAlt ? p.tppAlt.alp : null) : p.alpN);
-    return v == null ? null : { x: Math.min(p.x, x1), v: +v, opp: c.id, house: p.pollster };
+    if (v == null) return null;
+    const x = Math.min(p.x, x1);
+    return { x, v: +v, opp: c.id, house: p.pollster, dev: +v - heldLab(x, c.id) };
   }).filter(Boolean);
 
   const ys = polls.map((p) => p.v).concat(frames.map((f) => f.lab), [50]);
@@ -418,14 +492,15 @@ function gpEngine(M, N, cb, opt) {
   const fly = !reduce && !!opt.origin && !!glyph;
   let raf = 0, last = T0, dead = false, finished = false;
 
-  const G = { k: 1, pivX: 0, pivY: 0, left: 0, top: 0, lb: {}, tips: {}, tl: null, dpr: 1, pal: null,
+  const G = { k: 1, fxk: 1, pivX: 0, pivY: 0, left: 0, top: 0, lb: {}, tips: {}, tl: null, dpr: 1, pal: null,
               tint: 0.2, narrow: false, mast: null, fxDirty: false, lineH: 40, cache: new WeakMap() };
   const tg0 = M.at(x1);
   const S = {
     x: x1, prevX: x1, mode: reduce || !fly ? "pause" : "intro", modeT: T0,
     fl: { x: fly ? 0 : 1, v: 0 }, shape: fly ? 0 : 1,
-    needle: { x: tg0.deg, v: 0 }, bead: { x: 0, v: 0 }, bars: {}, order: tg0.order.slice(),
-    arcBase: tg0.oppId, flood: null, shocks: [], comets: [], sparks: [], trail: [],
+    needle: { x: tg0.deg, v: 0 }, bead: { x: 0, v: 0 }, bars: {}, order: tg0.order.slice(), nd: tg0.deg,
+    flex: { x: 0, v: 0 }, shX: { x: 0, v: 0 }, shY: { x: 0, v: 0 },
+    arcBase: tg0.oppId, flood: null, shocks: [], comets: [], sparks: [], debris: [], rings: [], trail: [],
     dots: M.polls.map(() => ({ s: 2, t: 1, c: false, hit: true })),
     idx: -1, fe: n - 1, blur: 0, beat: null, beatQ: [], beatT: -1e9, ev: -2,
     drag: null, glide: null, coast: null, shimmer: -1, out: null, revealed: !fly, count: -1,
@@ -464,6 +539,7 @@ function gpEngine(M, N, cb, opt) {
     const r = N.dbox.getBoundingClientRect();
     G.left = r.left; G.top = r.top;
     G.k = r.width / M.VB[2];
+    G.fxk = gpClamp(G.k, 0.6, 1.12);    // shots, sparks and shake scale with the dial they hit
     G.pivX = -M.VB[0] * G.k; G.pivY = -M.VB[1] * G.k;
     N.flier.style.transformOrigin = G.pivX.toFixed(2) + "px " + G.pivY.toFixed(2) + "px";
     GP_IDS.forEach((id) => { const el = N.bl[id]; G.lb[id] = { w: el.offsetWidth, h: el.offsetHeight }; });
@@ -586,12 +662,21 @@ function gpEngine(M, N, cb, opt) {
       tg.order.forEach((id, slot) => { const b = S.bars[id]; b.a.x = GP.SLOTS[slot]; b.l.x = gpBarLen(tg.vals[id]); b.a.v = b.l.v = 0; });
     } else {
       gpSpring(S.needle, tg.deg, 200, 13, dt);
+      // knocked past either end of the scale, the needle meets a peg and bounces off it
+      if (Math.abs(S.needle.x) > GP.STOP) {
+        S.needle.x = Math.sign(S.needle.x) * GP.STOP;
+        if (S.needle.v * S.needle.x > 0) S.needle.v *= -0.45;
+      }
       tg.order.forEach((id, slot) => {
         const b = S.bars[id];
         gpSpring(b.a, GP.SLOTS[slot], 150, 17.5, dt);
         gpSpring(b.l, gpBarLen(tg.vals[id]), 240, 17, dt);
       });
       gpSpring(S.bead, 0, 320, 17, dt);
+      // the needle's bend under a strike, and the instrument's shake on its mounting
+      gpSpring(S.flex, 0, 1800, 20, dt);
+      gpSpring(S.shX, 0, 650, 21, dt);
+      gpSpring(S.shY, 0, 650, 21, dt);
     }
     // a party passing another: sparks off the overtaking bar, a ring off the dial
     const ord = tg.order.join();
@@ -614,6 +699,7 @@ function gpEngine(M, N, cb, opt) {
         shock(tg.oppId, t, 0.9);
         const [ax, ay] = gpPolar(45, GP.R);
         burst(G.left + G.pivX + ax * G.k, G.top + G.pivY + ay * G.k, tg.oppId, 16, 260);
+        thump(1);
       }
     }
   }
@@ -626,6 +712,12 @@ function gpEngine(M, N, cb, opt) {
     const [tx, ty] = gpPolar(b.a, b.r);
     burst(G.left + G.pivX + tx * G.k, G.top + G.pivY + ty * G.k, id, 18, 300);
     shock(id, t, 0.6);
+    thump(0.7);
+  }
+  // a jolt through the whole instrument: a big moment lands on its mounting
+  function thump(k) {
+    S.shY.v += 150 * k;
+    S.shX.v += (Math.random() - 0.5) * 120 * k;
   }
   function shock(color, t, k) {
     S.shocks.push({ t0: t, color, k: k || 1 });
@@ -633,14 +725,25 @@ function gpEngine(M, N, cb, opt) {
   }
   function burst(x, y, color, count, speed) {
     if (S.sparks.length > 320) return;
+    const k = G.fxk;
     for (let i = 0; i < count; i++) {
-      const a = Math.random() * Math.PI * 2, sp = speed * (0.35 + Math.random() * 0.9);
-      S.sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - speed * 0.25, age: 0,
-                      max: 0.5 + Math.random() * 0.55, col: color, w: 1.1 + Math.random() * 1.5 });
+      const a = Math.random() * Math.PI * 2, sp = speed * k * (0.35 + Math.random() * 0.9);
+      S.sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - speed * k * 0.25, age: 0,
+                      max: 0.5 + Math.random() * 0.55, col: color, w: (1.1 + Math.random() * 1.5) * Math.max(0.75, k) });
+    }
+  }
+  // sparks thrown on through a strike, fanned about the shot's heading (dx, dy)
+  function spray(x, y, dx, dy, color, count, speed) {
+    if (S.sparks.length > 420) return;
+    const base = Math.atan2(dy, dx), k = G.fxk;
+    for (let i = 0; i < count; i++) {
+      const a = base + (Math.random() - 0.5) * 2.3, sp = speed * k * (0.4 + Math.random() * 0.85);
+      S.sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, age: 0,
+                      max: 0.24 + Math.random() * 0.4, col: color, w: (1.1 + Math.random() * 1.5) * Math.max(0.75, k) });
     }
   }
 
-  /* ---- the polls: drop in, lift off, and streak into the needle ---- */
+  /* ---- the polls: drop in, lift off, and knock the needle about ---- */
   function updDots(dt, t) {
     const fwd = S.x >= S.prevX;
     const feed = !reduce && (S.mode === "play" || ((S.mode === "drag" || S.mode === "coast") && fwd));
@@ -664,38 +767,72 @@ function gpEngine(M, N, cb, opt) {
       N.count.textContent = count >= M.total ? M.total + " polls" : count + " of " + M.total + " polls";
     }
   }
+  /* A poll fires the moment it touches the line. Above the line it strikes
+     from the challenger's side (s = 1) and knocks the needle toward Labor;
+     below, from Labor's side (s = -1), knocking it back. Its weight (w) is
+     how far off the line it sits, out to three points: heavier shots fly
+     faster, hit harder, throw more sparks and, more than 1.2 points off the
+     line, shake the dial. */
   function comet(i, t) {
-    if (S.comets.length > 40 || !G.dotsPx) return;
+    if (S.comets.length > 64 || !G.dotsPx) return;
     const q = G.dotsPx[i], p = M.polls[i];
-    const side = Math.random() < 0.5 ? -1 : 1;
-    S.comets.push({ t0: t, dur: 520 + Math.random() * 300, sx: G.tl.left + q.px, sy: G.tl.top + q.py,
-                    cx: side * (30 + Math.random() * 110), cy: -(70 + Math.random() * 130),
-                    col: p.v >= 50 ? "alp" : p.opp, deg: gpDeg(2 * p.v - 100) });
+    const sx = G.tl.left + q.px, sy = G.tl.top + q.py, w = gpClamp(Math.abs(p.dev) / 3, 0, 1);
+    const c = gpShotPlan(sx, sy, p.dev >= 0 ? 1 : -1, w, needleGeom(), Math.random);
+    c.t0 = t; c.dev = p.dev; c.col = p.v >= 50 ? "alp" : p.opp;
+    S.comets.push(c);
+    S.rings.push({ x: sx, y: sy, t0: t, col: c.col, k: 0.35 + 0.4 * w, dur: 320 });
   }
   const needleLen = () => gpLerp(GP_MAST.needle, GP_LOOK.needle, S.shape);
+  /* the needle as it stands on screen this frame: its pivot, a unit vector
+     along it and one across it toward the challenger's side, and its length */
+  function needleGeom() {
+    const a = (S.nd * Math.PI) / 180;
+    return { px: G.left + G.pivX + S.shX.x, py: G.top + G.pivY + S.shY.x, L: needleLen() * G.k,
+             ux: Math.sin(a), uy: -Math.cos(a), nx: Math.cos(a), ny: Math.sin(a) };
+  }
   function beadPage() {
-    const a = (S.needle.x * Math.PI) / 180, L = needleLen() * G.k;
-    return { x: G.left + G.pivX + Math.sin(a) * L, y: G.top + G.pivY - Math.cos(a) * L };
+    const g = needleGeom();
+    return { x: g.px + g.ux * g.L, y: g.py + g.uy * g.L };
   }
   function updFx(dt, t) {
+    let g = null;
     for (let i = S.comets.length - 1; i >= 0; i--) {
       const c = S.comets[i];
-      if (t - c.t0 >= c.dur) {
-        // arrival: the bead flares and the needle is pulled toward the poll
-        S.bead.v += 5;
-        const dd = c.deg - S.needle.x;
-        S.needle.v += Math.sign(dd) * Math.min(20, Math.abs(dd) * 2.4);
-        S.comets.splice(i, 1);
-      }
+      if (t - c.t0 < c.dur) continue;
+      /* the strike: the needle is knocked the way the shot was travelling,
+         by as much as the poll sits off the line; it bends, the bead flares,
+         a heavy shot shakes the whole instrument, and the spent shot
+         rebounds and drops out of the needle */
+      g = g || needleGeom();
+      const [hx, hy] = gpShotAt(c, 1, g), fx = -c.s * g.nx, fy = -c.s * g.ny;
+      S.needle.v += gpKnock(c.dev);
+      S.flex.v += c.s * (50 + 170 * c.w);
+      S.bead.v += 2 + 5 * c.w;
+      if (c.w > 0.4) { const k = (40 + 160 * (c.w - 0.4) / 0.6) * G.fxk; S.shX.v += fx * k; S.shY.v += fy * k; }
+      spray(hx, hy, fx, fy, c.col, 4 + Math.round(12 * c.w), 260 + 380 * c.w);
+      S.rings.push({ x: hx, y: hy, t0: t, col: c.col, k: 0.6 + 0.9 * c.w, dur: 300 },
+                   { x: hx, y: hy, t0: t, col: c.col, k: c.w, dur: 150, fill: true });
+      const bounce = (60 + 110 * Math.random()) * G.fxk;
+      S.debris.push({ x: hx, y: hy, vx: -fx * bounce, vy: -fy * bounce - (90 + 150 * Math.random()) * G.fxk,
+                      age: 0, max: 0.55 + 0.35 * Math.random(), col: c.col, r: (2 + 1.4 * c.w) * G.fxk });
+      S.comets.splice(i, 1);
+    }
+    for (let i = S.debris.length - 1; i >= 0; i--) {
+      const d = S.debris[i];
+      d.age += dt;
+      if (d.age >= d.max) { S.debris.splice(i, 1); continue; }
+      d.vx *= Math.exp(-1.2 * dt); d.vy += 1500 * G.fxk * dt;
+      d.x += d.vx * dt; d.y += d.vy * dt;
     }
     const drag = Math.exp(-3.2 * dt);
     for (let i = S.sparks.length - 1; i >= 0; i--) {
       const s = S.sparks[i];
       s.age += dt;
       if (s.age >= s.max) { S.sparks.splice(i, 1); continue; }
-      s.vx *= drag; s.vy = s.vy * drag + 340 * dt;
+      s.vx *= drag; s.vy = s.vy * drag + 340 * G.fxk * dt;
       s.x += s.vx * dt; s.y += s.vy * dt;
     }
+    for (let i = S.rings.length - 1; i >= 0; i--) if (t - S.rings[i].t0 > S.rings[i].dur) S.rings.splice(i, 1);
     for (let i = S.shocks.length - 1; i >= 0; i--) if (t - S.shocks[i].t0 > 1000) S.shocks.splice(i, 1);
   }
 
@@ -806,6 +943,7 @@ function gpEngine(M, N, cb, opt) {
       shock(tg.margin >= 0 ? "alp" : tg.oppId, t, 1.3);
       const bp = beadPage();
       burst(bp.x, bp.y, tg.margin >= 0 ? "alp" : tg.oppId, 30, 380);
+      thump(1.4);
       S.shimmer = t;
     }
     announce();
@@ -823,7 +961,10 @@ function gpEngine(M, N, cb, opt) {
   /* ---- painting ---- */
   function flierTransform() {
     const p = S.fl.x;
-    if (!G.mast || p === 1) return "none";
+    if (!G.mast || p === 1) {
+      const x = S.shX.x, y = S.shY.x;
+      return Math.abs(x) < 0.05 && Math.abs(y) < 0.05 ? "none" : "translate(" + x.toFixed(2) + "px," + y.toFixed(2) + "px)";
+    }
     const sx = G.left + G.pivX, sy = G.top + G.pivY;
     const dx = G.mast.x - sx, dy = G.mast.y - sy;
     const s0 = G.mast.k / 10 / G.k, q = 1 - p;
@@ -854,8 +995,8 @@ function gpEngine(M, N, cb, opt) {
     const sIn = gpClamp((s - 0.35) / 0.65, 0, 1);
     css(N.scale, "opacity", sIn.toFixed(3));
     // displayed angles blend from the exact reading (as the masthead draws it)
-    // to the spring as the dial takes the stage, and back on the way home
-    const nd = gpLerp(tg.deg, S.needle.x, s);
+    // to the spring as the dial takes the stage, and back on the way home (S.nd)
+    const nd = S.nd;
     const merc = Math.abs(nd) > 0.4 ? gpArc(Math.min(0, nd), Math.max(0, nd), GP.R) : "M0 0";
     att(N.merc, "d", merc);
     css(N.merc, "stroke", "var(--" + lead + ")");
@@ -890,10 +1031,10 @@ function gpEngine(M, N, cb, opt) {
       const txt = tg.na && tg.na[b.id] ? "—" : tg.vals[b.id].toFixed(1);
       if (el.__v !== txt) { el.__v = txt; el.lastChild.textContent = txt; }
     });
-    // needle, bead, pivot
-    const L = needleLen();
+    // needle, bead, pivot; the needle bows while a strike rings through it
+    const L = needleLen(), bow = 2 * S.flex.x * s;
     att(N.needle, "transform", "rotate(" + nd.toFixed(3) + ")");
-    att(N.nl, "y2", (-L).toFixed(2));
+    att(N.nl, "d", "M0 0Q" + bow.toFixed(2) + " " + (-L / 2).toFixed(2) + " 0 " + (-L).toFixed(2));
     css(N.nl, "strokeWidth", gpLerp(GP_MAST.needleW, GP_LOOK.needleW, s).toFixed(2));
     css(N.nl, "stroke", "var(--" + lead + ")");
     att(N.bead, "cy", (-L).toFixed(2));
@@ -981,7 +1122,11 @@ function gpEngine(M, N, cb, opt) {
       if (d.s === 0) continue;
       const p = M.polls[i], q = G.dotsPx[i];
       let y = q.py, a = 0.8, r = r0;
-      if (d.s === 1) { y -= (1 - gpBounce(d.t)) * 34; a *= Math.min(1, d.t * 5); }
+      if (d.s === 1) {
+        y -= (1 - gpBounce(d.t)) * 34; a *= Math.min(1, d.t * 5);
+        // the kick of the shot leaving it
+        if (d.c && d.t > 0.36 && d.t < 0.62) { const k = 1 - (d.t - 0.36) / 0.26; r *= 1 + 1.2 * k; a = Math.min(1, a + 0.2 * k); }
+      }
       else if (d.s === 3) { y -= gpEaseOut3(d.t) * 18; a *= 1 - d.t; }
       if (S.shimmer > 0) {
         const ph = (t - S.shimmer) / 1100 - q.px / tl.w * 0.7;
@@ -1028,7 +1173,7 @@ function gpEngine(M, N, cb, opt) {
 
   function paintFx(t) {
     const g = G.fxx, P = G.pal;
-    if (!S.comets.length && !S.sparks.length) {
+    if (!S.comets.length && !S.sparks.length && !S.debris.length && !S.rings.length) {
       if (G.fxDirty) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, N.fx.width, N.fx.height); G.fxDirty = false; }
       return;
     }
@@ -1037,28 +1182,47 @@ function gpEngine(M, N, cb, opt) {
     g.clearRect(0, 0, N.fx.width, N.fx.height);
     g.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
     g.lineCap = "round";
-    const bp = beadPage();
+    // a ring where each shot leaves the line, and one where it lands
+    S.rings.forEach((r) => {
+      const u = gpClamp((t - r.t0) / r.dur, 0, 1), q = 1 - u;
+      if (r.fill) {     // the flash of a strike
+        g.fillStyle = gpRgba(P[r.col], 0.5 * q * q);
+        g.beginPath(); g.arc(r.x, r.y, (4 + 8 * r.k) * (0.6 + 0.4 * u) * G.fxk, 0, 6.2832); g.fill();
+        return;
+      }
+      g.strokeStyle = gpRgba(P[r.col], 0.7 * q * q);
+      g.lineWidth = 0.6 + 2.2 * q;
+      g.beginPath(); g.arc(r.x, r.y, (2 + (8 + 16 * r.k) * gpEaseOut3(u)) * G.fxk, 0, 6.2832); g.stroke();
+    });
+    // the shots in flight: a tapering tail that stretches as they speed up
+    const ng = needleGeom();
     S.comets.forEach((c) => {
-      const u = gpClamp((t - c.t0) / c.dur, 0, 1);
-      const col = P[c.col];
-      const pos = (v) => {
-        const e = Math.pow(v, 1.7), q = 1 - e;
-        const cx = c.sx + c.cx, cy = c.sy + c.cy;
-        return [q * q * c.sx + 2 * q * e * cx + e * e * bp.x, q * q * c.sy + 2 * q * e * cy + e * e * bp.y];
-      };
-      let [px, py] = pos(u);
-      for (let k = 1; k <= 7; k++) {
-        const v = u - k * 0.03;
-        if (v < 0) break;
-        const [qx, qy] = pos(v);
-        g.strokeStyle = gpRgba(col, 0.75 * (1 - k / 8));
-        g.lineWidth = 2.6 * (1 - k / 9);
+      const v = gpShotEase(gpClamp((t - c.t0) / c.dur, 0, 1)), col = P[c.col], R = (2.5 + 2.1 * c.w) * G.fxk;
+      const [hx, hy] = gpShotAt(c, v, ng);
+      let px = hx, py = hy;
+      g.lineCap = "butt";    // round ends would overlap at every joint and bead the tail
+      for (let k = 1; k <= 12; k++) {
+        const vv = v - k * 0.022;
+        if (vv < 0) break;
+        const [qx, qy] = gpShotAt(c, vv, ng);
+        g.strokeStyle = gpRgba(col, 0.9 * (1 - k / 13));
+        g.lineWidth = R * 1.7 * (1 - k / 13.5);
         g.beginPath(); g.moveTo(px, py); g.lineTo(qx, qy); g.stroke();
         px = qx; py = qy;
       }
-      const [hx, hy] = pos(u);
+      g.lineCap = "round";
+      g.fillStyle = gpRgba(col, 0.22);
+      g.beginPath(); g.arc(hx, hy, R * 2.6, 0, 6.2832); g.fill();
       g.fillStyle = gpRgba(col, 1);
-      g.beginPath(); g.arc(hx, hy, 2.2, 0, 6.2832); g.fill();
+      g.beginPath(); g.arc(hx, hy, R, 0, 6.2832); g.fill();
+    });
+    // the spent shots, falling out of the needle
+    S.debris.forEach((d) => {
+      const a = Math.pow(1 - d.age / d.max, 1.1);
+      g.strokeStyle = gpRgba(P[d.col], 0.45 * a); g.lineWidth = d.r * 1.3;
+      g.beginPath(); g.moveTo(d.x - d.vx * 0.035, d.y - d.vy * 0.035); g.lineTo(d.x, d.y); g.stroke();
+      g.fillStyle = gpRgba(P[d.col], 0.9 * a);
+      g.beginPath(); g.arc(d.x, d.y, d.r * (0.6 + 0.4 * a), 0, 6.2832); g.fill();
     });
     S.sparks.forEach((s) => {
       const a = Math.pow(1 - s.age / s.max, 1.2);
@@ -1071,10 +1235,11 @@ function gpEngine(M, N, cb, opt) {
   /* ---- the loop ---- */
   function busy(t) {
     if (S.mode !== "pause") return true;
-    if (S.comets.length || S.sparks.length || S.shocks.length || S.flood || G.fxDirty) return true;
+    if (S.comets.length || S.sparks.length || S.debris.length || S.rings.length || S.shocks.length || S.flood || G.fxDirty) return true;
     if (S.shimmer > 0 && t - S.shimmer < 2000) return true;
     if (S.fl.x !== 1 || S.shape < 1) return true;
     if (!gpRest(S.needle, M.at(S.x).deg, 0.02) || !gpRest(S.bead, 0, 0.002)) return true;
+    if (!gpRest(S.flex, 0, 0.02) || !gpRest(S.shX, 0, 0.02) || !gpRest(S.shY, 0, 0.02)) return true;
     for (const id of GP_IDS) { const b = S.bars[id]; if (Math.abs(b.a.v) > 0.02 || Math.abs(b.l.v) > 0.02) return true; }
     if (S.dots.some((d) => d.s === 1 || d.s === 3)) return true;
     if (S.trail.length > 1 && t - S.trail[0].t < 120) return true;
@@ -1091,6 +1256,7 @@ function gpEngine(M, N, cb, opt) {
     flight(t, dt);
     const tg = M.at(S.x);
     physics(tg, dt, t);
+    S.nd = gpLerp(tg.deg, S.needle.x, S.shape);
     updDots(dt, t);
     updFx(dt, t);
     updBeats(t);
@@ -1461,7 +1627,7 @@ function DialStory({ originRect, onClose }) {
                   ))}
                   <path className="gp-wake" ref={reg("wake")}></path>
                   <g ref={reg("needle")}>
-                    <line className="gp-needle" x1="0" y1="0" x2="0" ref={reg("nl")}></line>
+                    <path className="gp-needle" ref={reg("nl")}></path>
                     <circle className="gp-bead" cx="0" ref={reg("bead")}></circle>
                   </g>
                   <circle className="gp-pivot" cx="0" cy="0" ref={reg("pivot")}></circle>
@@ -1529,4 +1695,4 @@ function DialStory({ originRect, onClose }) {
   );
 }
 
-Object.assign(window, { DialStory, buildDialStory });
+Object.assign(window, { DialStory, buildDialStory, gpShotPlan, gpShotAt, gpKnock });
