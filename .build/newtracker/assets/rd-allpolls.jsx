@@ -1778,17 +1778,19 @@ function RdLgDir({ p }) {
    its row, so a line reads exactly like the row it opens */
 /* the Preferences line's region chip (data: polls.json pref_flows → p.pf,
    gen-data's individualPolls emit): DemosAU's MRP reports print respondent-
-   ranked preference flows per region, so the line's chip cycles the three
-   regions, its cells swapping in place, then "All regions": the site's
-   weighting of the three (gen-data's pf.all – each region's 2025 enrolment
-   times the group's vote there), which the report itself never prints. The
+   ranked preference flows per region, and the line opens on "All regions":
+   the site's weighting of the three (gen-data's pf.all – each region's 2025
+   enrolment times the group's vote there), which the report itself never
+   prints. Presses cycle through each printed region and back. The
    names stack in one grid cell (.rd-ldg-cycw, rd.css) so a press never
    resizes the chip or the line. */
 const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
 const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
 function RdLgPrefs({ pf }) {
   const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
-  const [ri, setRi] = React.useState(0);
+  /* All regions first: default to its index in regs (falls to 0 = Inner
+     metro on the rare wave whose weighting never computed) */
+  const [ri, setRi] = React.useState(() => Math.max(0, regs.findIndex(([k]) => k === "all")));
   const rk = regs[ri % regs.length][0], rn = regs[ri % regs.length][1], next = regs[(ri + 1) % regs.length][1];
   const cell = (k, v) => v != null && (
     <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b></span>
