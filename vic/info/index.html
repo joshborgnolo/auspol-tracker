@@ -5277,6 +5277,9 @@ body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
 body.rd .rd-ff-dot.grn { fill: var(--grn); }
 body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
+body.rd .rd-ff-dm { fill: none; stroke-width: 1.75; stroke-linejoin: round; }
+body.rd .rd-ff-dm.onp { stroke: var(--onp); }
+body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--onp); transform: rotate(45deg); vertical-align: 0; }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
 body.rd .rd-ff-el.lnp { fill: var(--lnp); }
@@ -5426,6 +5429,17 @@ body.rd .rd-ldg-lbody em { font-style: normal; font-size: 12px; font-weight: 600
 body.rd .rd-ldg-li { white-space: nowrap; }
 body.rd .rd-ldg-li.lbl { margin-right: -6px; }
 body.rd .rd-ldg-lisoft { color: var(--ink-3); }
+body.rd .rd-ldg-cyc {
+  all: unset; box-sizing: border-box; display: inline-flex; align-items: baseline; gap: 4px; cursor: pointer;
+  padding: 0 5px 0 6px; border: 1px solid var(--line); border-radius: 4px; line-height: 1.25;
+  font-weight: 600; color: var(--ink); white-space: nowrap;
+}
+body.rd .rd-ldg-cyc:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); border-color: var(--ink-3); }
+body.rd .rd-ldg-cyc:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.rd .rd-ldg-cycw { display: inline-grid; }
+body.rd .rd-ldg-cycw > span { grid-area: 1 / 1; visibility: hidden; }
+body.rd .rd-ldg-cycw > span.on { visibility: visible; }
+body.rd .rd-ldg-cyca { color: var(--ink-3); }
 body.rd .rd-ldg-arrow { color: var(--ink-3); text-align: right; }
 body.rd .rd-ldg-rk { margin-top: 14px; }
 body.rd .rd-ldg-rk tbody th { width: 1%; padding-top: 5px; color: var(--ink-3); vertical-align: baseline; }
@@ -5506,6 +5520,7 @@ body.rd .rd-ldg-sh { display: none; }
   body.rd .rd-ldg-phead .rd-ldg-sh { display: inline; }
 }
 body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }
+body.rd .rd-ldg-grp.rd-ldg-grpw { column-gap: 14px; }
 </style>
 </head>
 <body>
@@ -47335,6 +47350,7 @@ function RdSwitching({
       }],
       spine: pts,
       scatter: dots,
+      pollFacet: "demographics",
       areas: band.length >= 2 ? [{
         id: "ci-" + c.id,
         color: c.color,

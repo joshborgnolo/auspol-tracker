@@ -5289,6 +5289,9 @@ body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
 body.rd .rd-ff-dot.grn { fill: var(--grn); }
 body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
+body.rd .rd-ff-dm { fill: none; stroke-width: 1.75; stroke-linejoin: round; }
+body.rd .rd-ff-dm.onp { stroke: var(--onp); }
+body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--onp); transform: rotate(45deg); vertical-align: 0; }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
 body.rd .rd-ff-el.lnp { fill: var(--lnp); }
@@ -5438,6 +5441,17 @@ body.rd .rd-ldg-lbody em { font-style: normal; font-size: 12px; font-weight: 600
 body.rd .rd-ldg-li { white-space: nowrap; }
 body.rd .rd-ldg-li.lbl { margin-right: -6px; }
 body.rd .rd-ldg-lisoft { color: var(--ink-3); }
+body.rd .rd-ldg-cyc {
+  all: unset; box-sizing: border-box; display: inline-flex; align-items: baseline; gap: 4px; cursor: pointer;
+  padding: 0 5px 0 6px; border: 1px solid var(--line); border-radius: 4px; line-height: 1.25;
+  font-weight: 600; color: var(--ink); white-space: nowrap;
+}
+body.rd .rd-ldg-cyc:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); border-color: var(--ink-3); }
+body.rd .rd-ldg-cyc:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.rd .rd-ldg-cycw { display: inline-grid; }
+body.rd .rd-ldg-cycw > span { grid-area: 1 / 1; visibility: hidden; }
+body.rd .rd-ldg-cycw > span.on { visibility: visible; }
+body.rd .rd-ldg-cyca { color: var(--ink-3); }
 body.rd .rd-ldg-arrow { color: var(--ink-3); text-align: right; }
 body.rd .rd-ldg-rk { margin-top: 14px; }
 body.rd .rd-ldg-rk tbody th { width: 1%; padding-top: 5px; color: var(--ink-3); vertical-align: baseline; }
@@ -5518,6 +5532,7 @@ body.rd .rd-ldg-sh { display: none; }
   body.rd .rd-ldg-phead .rd-ldg-sh { display: inline; }
 }
 body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }
+body.rd .rd-ldg-grp.rd-ldg-grpw { column-gap: 14px; }
 </style>
 </head>
 <body>
@@ -13658,6 +13673,25 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": 82,
       "onp": 15,
       "oth": 50
+    }],
+    "demos": [{
+      "date": "2026-03-03",
+      "ym": "2026-02",
+      "from": "2026-01-13",
+      "n": 8484,
+      "onp": 21.5
+    }, {
+      "date": "2026-07-11",
+      "ym": "2026-06",
+      "from": "2026-05-27",
+      "n": 9343,
+      "onp": 20
+    }, {
+      "date": "2026-09-19",
+      "ym": "2026-08",
+      "from": "2026-08-04",
+      "n": 9740,
+      "onp": 18
     }]
   };
   const leaderMonths = [{
@@ -57429,6 +57463,43 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": 7,
       "oth": 24,
       "onp": 97
+    },
+    "pf": {
+      "onp_alp_lnp": 21.5,
+      "alp_onp": {
+        "inner": {
+          "lnp": 40,
+          "grn": 91,
+          "oth": 70
+        },
+        "outer": {
+          "lnp": 31,
+          "grn": 91,
+          "oth": 58
+        },
+        "regional": {
+          "lnp": 21,
+          "grn": 87,
+          "oth": 53
+        }
+      },
+      "lnp_onp": {
+        "inner": {
+          "alp": 72,
+          "grn": 82,
+          "oth": 77
+        },
+        "outer": {
+          "alp": 68,
+          "grn": 70,
+          "oth": 58
+        },
+        "regional": {
+          "alp": 64,
+          "grn": 77,
+          "oth": 54
+        }
+      }
     }
   }, {
     "ym": "2026-03",
@@ -70733,6 +70804,43 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": 8,
       "oth": 26,
       "onp": 97
+    },
+    "pf": {
+      "onp_alp_lnp": 20,
+      "alp_onp": {
+        "inner": {
+          "lnp": 39,
+          "grn": 91,
+          "oth": 67
+        },
+        "outer": {
+          "lnp": 32,
+          "grn": 91,
+          "oth": 55
+        },
+        "regional": {
+          "lnp": 29,
+          "grn": 87,
+          "oth": 48
+        }
+      },
+      "lnp_onp": {
+        "inner": {
+          "alp": 76,
+          "grn": 86,
+          "oth": 68
+        },
+        "outer": {
+          "alp": 71,
+          "grn": 83,
+          "oth": 60
+        },
+        "regional": {
+          "alp": 72,
+          "grn": 82,
+          "oth": 58
+        }
+      }
     }
   }, {
     "ym": "2026-07",
@@ -77807,6 +77915,43 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": 8,
       "oth": 20,
       "onp": 94
+    },
+    "pf": {
+      "onp_alp_lnp": 18,
+      "alp_onp": {
+        "inner": {
+          "lnp": 48,
+          "grn": 90,
+          "oth": 77
+        },
+        "outer": {
+          "lnp": 37,
+          "grn": 87,
+          "oth": 57
+        },
+        "regional": {
+          "lnp": 30,
+          "grn": 86,
+          "oth": 53
+        }
+      },
+      "lnp_onp": {
+        "inner": {
+          "alp": 82,
+          "grn": 88,
+          "oth": 78
+        },
+        "outer": {
+          "alp": 76,
+          "grn": 85,
+          "oth": 58
+        },
+        "regional": {
+          "alp": 72,
+          "grn": 87,
+          "oth": 61
+        }
+      }
     }
   }, {
     "ym": "2026-09",
@@ -110462,6 +110607,7 @@ function RdSwitching({
       }],
       spine: pts,
       scatter: dots,
+      pollFacet: "demographics",
       areas: band.length >= 2 ? [{
         id: "ci-" + c.id,
         color: c.color,

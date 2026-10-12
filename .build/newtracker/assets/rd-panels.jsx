@@ -3365,6 +3365,7 @@ function RdSwitching({ rangeId }) {
                 yTickFmt={() => ""} xTicks={smTicks} baseline
                 series={[{ id: c.id, label: LONG[c.id], color: c.color, rdWidth: narrow ? 2 : 2.5, endCap: false, points: pts }]}
                 spine={pts} scatter={dots}
+                pollFacet="demographics"
                 areas={band.length >= 2 ? [{ id: "ci-" + c.id, color: c.color, className: "ci-band", edge: false, points: band }] : []}
                 notes={rdYTicks(25, smTop, 25).map((v) => ({ x: "left", y: v, dy: -4, text: v + "%", size: 11, cls: "rd-sm-ylab" }))}
                 tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
