@@ -108,7 +108,7 @@ const setCase = (label) => {
   const got = dom.sets.find((s) => s.head.startsWith(label));
   return got && got.rows.length === want.length ? { got, want } : null;
 };
-check("By state set of 7 rows", !!setCase("By state"));
+check("By state set of 4 rows", !!setCase("By state"));
 check("By location set of 4 rows", !!setCase("By location"));
 const totalRows = dom.sets.reduce((n, s) => n + s.rows.length, 0);
 check("every tested group rendered (" + alpRows.length + ")", totalRows === alpRows.length, totalRows);
@@ -135,7 +135,6 @@ const againstRow = (label, setLab, grp) => {
 /* the conversation case and one from each gate outcome */
 againstRow("ALP outer-metro", "By location", "Outer metro");
 againstRow("ALP non-eastern-mainland", "By state", "Non-NSW/Vic/Qld");
-againstRow("ALP territory trio", "By state", "ACT/NT/Tas");
 againstRow("ALP Queensland", "By state", "Qld");
 againstRow("ALP inner-metro", "By location", "Inner metro");
 const locHead = dom.sets.find((s) => s.head.startsWith("By location")).head;

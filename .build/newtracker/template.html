@@ -934,6 +934,11 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
   border-radius: 4px;
 }
 .poll-row:focus-visible { outline-offset: -2.5px; } /* inset so the ring shows inside the table */
+/* same remedy as the poll rows, for the same reason: .tabs-inner clips to
+   the strip, and the shared ring's outward 2px offset put the whole ring
+   past the clip edges - keyboard focus on the main navigation was
+   invisible bar two vertical dashes between tabs */
+.tabs .tab:focus-visible { outline-offset: -2.5px; }
 
 /* ---------- accessibility: 44px tap targets ---------- */
 /* keep the tight editorial sizing visually, but extend the *hit* area to a
@@ -950,6 +955,12 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
   top: 50%; transform: translateY(-50%);
   height: 44px;
 }
+/* …but the docked score's overlay runs UP from the strip's foot, not
+   centred on the chip: the chip seats on the strip's bottom edge, so a
+   centred 44px would poke ~9px past the foot and .tabs-inner's overflow
+   would clip it. Nothing else lives at the strip's right end - an
+   upward-only overlay covers nothing it shouldn't. */
+.tab-score::after { top: auto; bottom: 0; transform: none; }
 /* Controls that had no inflated hit area (audit, Sep 2026): the "?" beside
    the basis line and the Info index. Pollster links sit two to a cell and
    inside a row that expands on tap, so they grow only to the 24px minimum -
@@ -3329,6 +3340,19 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
   .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }
+/* Just above the phone flip the head has the same problem one rung up:
+   at 641-700 the masthead wraps the meta line onto its own row under the
+   lockup, and the un-wrapping meta's min-content can outrun the padded
+   page again - Vic's "Saturday 28 November 2026" election measure adds
+   ~50px to the federal figure the 561-640 band was measured on, and the
+   vic masthead overflowed the document from 641 to ~684. Let the meta's
+   items wrap instead; the 1px divides would read as stray pipes wherever
+   a seam falls, so they go with the band. Same seam and remedy rd.css
+   gives the 2PP chart's range tabs (641-700, flex-wrap). */
+@media (min-width: 641px) and (max-width: 700px) {
+  .head-meta { flex-wrap: wrap; row-gap: 6px; }
+  .meta-divide { display: none; }
+}
 /* The head's phone arrangement begins here, not at 560: the un-wrapped
    meta line's min-content (~576px with the theme toggle) only fits the
    padded page from ~636px up, so in a 561-636px band the head used to
@@ -3715,7 +3739,14 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    base - 14.5 × 0.879 ≈ the old 16 × 0.8, 16 × 0.903 ≈ the old 19 × 0.76. */
 @media (max-width: 640px) {
   .tabs { margin: -18px -4px 18px; }
-  .tab { padding-block: 9px; }
+  /* 13px a side, not 9: the tabs were ~36px tall here, short of the 44px
+     tap target the rest of the phone chrome meets (and of the strip's own
+     desktop height, 12+19.5+12 ≈ 44). The taller in-flow tabs also give
+     the docked score's upward hit overlay room to live inside the strip
+     instead of clipping at its foot. The bar only grows: the top/bottom
+     boxes are the tab padding, and the pinned condense stays a pure
+     transform off the underline, so no pinned-layout oscillation. */
+  .tab { padding-block: 13px; }
   .tab-label { font-size: 14px; line-height: 18px; }
   body.editorial .tab-label { font-size: 16px; line-height: 19.5px; }
   .tabs-set { gap: 14px; }
@@ -4138,6 +4169,12 @@ body.dark .cyc-band.hi.thin { opacity: 0.13; }
   width: 13px; height: 13px; border: 1px solid var(--ink-faint); border-radius: 4px;
   background: var(--surface); cursor: pointer; position: relative;
   transition: background 0.12s ease, border-color 0.12s ease;
+}
+/* WCAG 2.5.8's 24px floor on touch: 13px stays the mouse look, but a tap
+   target under 24px misses too often - the box itself grows (with borders
+   22+1+1 = 24 square), and the masked tick scales with it (inset: 0). */
+@media (pointer: coarse) {
+  .pg-check input { width: 22px; height: 22px; }
 }
 .pg-check input:checked {
   background: linear-gradient(to bottom,
@@ -5097,6 +5134,42 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
 }
+
+/* ------------------------------------------------------------------------
+   Print (2026-10-13): paper is a first-class output. Interactive chrome is
+   junk on a sheet; a dark-theme print otherwise lands light ink on white
+   (backgrounds don't print), and pinned furniture would freeze mid-page.
+   ------------------------------------------------------------------------ */
+@media print {
+  /* the chrome a sheet can't use: the tab bar, the theme/meta affordances,
+     the copy-card buttons, the shortcut sheet, the feedback pill, the
+     decorative tide band */
+  .tabs, .head-right, .chart-copy-btn, .rd-keysheet, .rd-keysheet-scrim,
+  .ss-back, .tile-band { display: none; }
+  /* pinned furniture un-pins so the document flows across pages */
+  .poll-table.archive thead th, .rd-ap-headwrap, .info-index { position: static; }
+  /* nothing a reader is mid-way through splits across a page break */
+  .card, .poll-detail, tr, svg { break-inside: avoid; }
+  /* box-shadows DO print (the party dots' halo, card lifts) and on paper
+     they render as grey smudges */
+  * { box-shadow: none !important; text-shadow: none !important; }
+  /* black-on-white whatever the theme: backgrounds don't print, so a dark
+     theme's light ink would vanish onto the sheet. Re-pin the light ink and
+     surface tokens over every dark variant */
+  :root, body.dark, body.dark.cool, body.dark.editorial, body.dark.editorial.cool {
+    --bg: oklch(0.970 0.008 78);
+    --surface: oklch(0.992 0.004 85);
+    --surface-2: oklch(0.980 0.006 80);
+    --ink: oklch(0.27 0.012 55);
+    --ink-2: oklch(0.44 0.012 55);
+    --ink-3: oklch(0.52 0.010 58);
+    --ink-faint: oklch(0.70 0.008 65);
+    --line: oklch(0.895 0.008 75);
+    --line-2: oklch(0.935 0.006 78);
+    color-scheme: light;
+  }
+}
+@page { margin: 14mm 12mm; }
 
 </style>
   <style>/* The redesign – rules in .build/newtracker/assets/rd.css, spliced in by build.mjs. */

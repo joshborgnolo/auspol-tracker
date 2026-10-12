@@ -291,9 +291,9 @@ body {
 
 /* ------- archive tabs: the static page's article-column width ------- */
 .tabs {
-  display: flex; gap: 4px;
+  display: flex; gap: 4px; flex-wrap: wrap;
   max-width: var(--maxw); margin: 40px auto 0;
-  border-bottom: 1px solid var(--line);
+  padding: 0 28px; border-bottom: 1px solid var(--line);
 }
 .tab {
   display: inline-block;
@@ -309,7 +309,7 @@ body {
 /* ------- body: the static summary's type rhythm (verbatim tables stay wide) --- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
-  max-width: var(--maxw); width: 100%; margin: 0 auto;
+  max-width: var(--maxw); margin: 0 auto;
   padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
 }
 .frame-wrap h1 {

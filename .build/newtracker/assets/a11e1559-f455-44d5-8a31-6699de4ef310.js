@@ -4426,8 +4426,8 @@ function NextPollsPanel() {
      reader was away - the one thing they were looking at. */
   const [open, setOpenState] = useState(npOpenRow);
   const setOpen = (v) => { npOpenRow = v; setOpenState(v); };
-  const { rows, nowMs } = npProject();
-  if (!rows.length) return null;
+  const { rows: projRows, nowMs } = npProject();
+  if (!projRows.length) return null;
 
   /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
      midnight, so "today" has to be the same thing or the comparison measures
@@ -4446,7 +4446,9 @@ function NextPollsPanel() {
      to happen. So a projection is a moment, not a date, and it is spent once
      that moment passes. */
 
-  rows.length = Math.min(rows.length, NP_MAX_ROWS);
+  /* npProject's memoised array is shared with every other same-minute
+     consumer (the np-project.js header contract) - slice, never edit in place. */
+  const rows = projRows.slice(0, NP_MAX_ROWS);
 
   // UTC accessors, matching the frame the dates were parsed and compared in –
   // local ones would name the day before for any reader west of Greenwich

@@ -32,6 +32,15 @@ assert.match(html, /<title>vicpol tracker – Victorian state election polling<\
 assert.match(html, /<link rel="canonical" href="https:\/\/auspoltracker\.com\/vic\/">/, "its own canonical URL");
 assert.ok(!/(?:href|url\()=?"assets\//.test(html), "shared assets are referenced from the site root");
 assert.ok(!/og:image|application\/rss\+xml/.test(html), "no share card or feed of its own");
+// but it IS structured data and it DOES carry the site's raster icon (2026-10-13):
+// Googlebot-Image and iOS home-screens can't read the data-URI SVG icon, so the
+// federal PNG link must ride Vic's head too, and a WebPage JSON-LD files Vic
+// under the federal site so crawlers don't invent a second site
+assert.match(html, /"@type":"WebPage"/, "Vic carries its own WebPage JSON-LD");
+assert.ok(html.includes('"isPartOf":{"@type":"WebSite","name":"auspol tracker"'), "Vic's JSON-LD files it under the federal site");
+assert.ok(html.includes('<link rel="icon" type="image/png" sizes="192x192" href="https://auspoltracker.com/assets/favicon-192.png">')
+  && html.includes('<link rel="apple-touch-icon" href="https://auspoltracker.com/assets/favicon-192.png">'),
+  "the committed raster favicon is linked from Vic's head");
 assert.match(html, /<h1>vicpol tracker<\/h1>/, "the plain-text article is Victorian");
 assert.ok(!html.includes("window.AP_INITIAL_TAB="), "the Now document carries no initial-tab constant");
 

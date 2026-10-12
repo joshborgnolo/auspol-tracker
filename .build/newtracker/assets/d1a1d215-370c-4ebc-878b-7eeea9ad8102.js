@@ -1,5 +1,14 @@
 /* auspol tracker – tabbed views: Tabs nav (with docked 2PP score), Past cycles overlay, All polls archive */
 
+/* History writes get the same try/catch wrapper as the header bundle's
+   urlWrite - its own copy, not a shared top-level const: the assets land as
+   separate <script> blocks and two same-named top-level consts across
+   classic scripts are a duplicate global lexical declaration that kills the
+   second script outright. Under file:// a path write throws SecurityError
+   and, unwrapped, took the whole view down through ViewBoundary. The URL is
+   a nicety layered over the view state; a refused write must never veto it. */
+const writeUrl = (verb, to) => { try { history[verb](null, "", to); } catch {} };
+
 // ---- CSV export plumbing, shared by the archive and the past-cycles download ----
 const csvCell = (v) => {
   if (v == null) return "";
@@ -3144,7 +3153,7 @@ function PastCyclesView() {
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
-    if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
+    if (next !== L.pathname + L.search + L.hash) writeUrl("replaceState", next);
   }, [hidden, lifted]);
 
   /* The copy-as-image card needs the board twice over – for the "Past terms
@@ -5808,7 +5817,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
-    if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
+    if (next !== L.pathname + L.search + L.hash) writeUrl("replaceState", next);
   });
 
   // ---- CSV export of the CURRENTLY filtered + sorted rows -----------------

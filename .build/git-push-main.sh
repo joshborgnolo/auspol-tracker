@@ -301,6 +301,16 @@ SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   data/changelog.json
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
   assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
+# vic/cycles/index.html joins the list only once it EXISTS: the vic build
+# (build.mjs's 5a block) emits the page as soon as the Vic data records a
+# past term, and the sitemap's VIC_TAB_IDS lists it from the same day — so a
+# refresh commit must carry it or the live sitemap links a 404. The path is
+# absent until then, and a plain member above would break every wrapper:
+# `git add` errors on a pathspec with no match. Wrappers cd to $REPO before
+# sourcing this file, so the -f test scopes exactly like SITE_FILES itself.
+if [[ -f vic/cycles/index.html ]]; then
+  SITE_FILES+=(vic/cycles/index.html)
+fi
 
 # ---------------------------------------------------------------------------
 # refresh_site — the shared validate-then-write half of every data wrapper:

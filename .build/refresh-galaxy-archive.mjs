@@ -170,7 +170,7 @@ body {
 
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
-  max-width: var(--maxw); width: 100%; margin: 0 auto;
+  max-width: var(--maxw); margin: 0 auto;
   padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
 }
 .frame-wrap h1 { font-family: var(--serif); font-size: 34px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }

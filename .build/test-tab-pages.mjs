@@ -65,6 +65,11 @@ const push = read(path.join(".build", "git-push-main.sh"));
 for (const f of ["cycles/index.html", "allpolls/index.html", "info/index.html",
                  "vic/allpolls/index.html", "vic/info/index.html"])
   assert.ok(push.includes(f), `SITE_FILES commits ${f} (a data refresh regenerates it)`);
+// vic/cycles/index.html can't be a plain SITE_FILES member until a Vic term closes (the
+// build only emits it then, and `git add` errors on a missing path) — it joins conditionally
+assert.ok(push.includes('if [[ -f vic/cycles/index.html ]]; then')
+  && push.includes("SITE_FILES+=(vic/cycles/index.html)"),
+  "SITE_FILES picks up vic/cycles/index.html conditionally, found-day-one");
 
 // ---- the build emits them -----------------------------------------------------------------
 const build = read(path.join(".build", "newtracker", "build.mjs"));
@@ -110,6 +115,23 @@ assert.ok(hdr.includes('const urlWrite = (verb, to) => { try { history[verb](nul
   "history writes are wrapped so a refused write (file://) never kills the render");
 assert.ok(!/history\.(pushState|replaceState)\(/.test(hdr),
   "no bare history.pushState/replaceState survives outside urlWrite");
+/* …and the ban covers every asset, not just the header bundle: the view
+   layer's two writers (the cycles board and the All-polls filter sync) grew
+   bare replaceState calls behind a header-only grep. d1a1d215 declares its
+   own try/catch wrapper (writeUrl) because the assets land as separate
+   <script> blocks - a shared top-level const would be a duplicate global
+   lexical declaration across classic scripts. */
+{
+  const adir = path.join(".build", "newtracker", "assets");
+  for (const f of fs.readdirSync(path.join(ROOT, adir)))
+    if (/\.(js|jsx)$/.test(f))
+      assert.ok(!/history\.(pushState|replaceState)\(/.test(read(path.join(adir, f))),
+        `${f}: no bare history.pushState/replaceState (writes go through a try/catch wrapper)`);
+  const viewsSrc = read(path.join(adir, "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"));
+  assert.ok(viewsSrc.includes('const writeUrl = (verb, to) => { try { history[verb](null, "", to); } catch {} };')
+    && (viewsSrc.match(/writeUrl\("replaceState", next\)/g) || []).length === 2,
+    "both view-layer URL writers go through d1a1d215's own wrapper");
+}
 assert.ok(hdr.includes('urlWrite("replaceState", window.location.pathname + window.location.search);'),
   "the masthead #story strip writes through the wrapper too");
 assert.ok(hdr.includes("urlWrite(\"replaceState\", (t ? tabToPath(t) : window.location.pathname) + window.location.search);"),

@@ -24,10 +24,14 @@
   <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="https://auspoltracker.com/vic/allpolls/">
+  
+  <link rel="icon" type="image/png" sizes="192x192" href="https://auspoltracker.com/assets/favicon-192.png">
+  <link rel="apple-touch-icon" href="https://auspoltracker.com/assets/favicon-192.png">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'-1.04%20-7.42%2041.63%2041.63'%3E%3Cpath%20d%3D'M%2010%2024.5%20A%2012%2012%200%200%201%2022%2012.5'%20fill%3D'none'%20stroke%3D'%23b9463f'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cpath%20d%3D'M%2022%2012.5%20A%2012%2012%200%200%201%2034%2024.5'%20fill%3D'none'%20stroke%3D'%23356697'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cline%20x1%3D'10.35'%20y1%3D'16.04'%20x2%3D'1.86'%20y2%3D'9.86'%20stroke%3D'%23356697'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'17.55'%20y1%3D'10.8'%20x2%3D'14.78'%20y2%3D'2.28'%20stroke%3D'%23b9463f'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'26.45'%20y1%3D'10.8'%20x2%3D'28.96'%20y2%3D'3.09'%20stroke%3D'%23cc7c37'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'33.65'%20y1%3D'16.04'%20x2%3D'37.69'%20y2%3D'13.1'%20stroke%3D'%23439458'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'22'%20y1%3D'24.5'%20x2%3D'24.35'%20y2%3D'16.23'%20stroke%3D'%23356697'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E">
   <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – Victorian state election polling","url":"https://auspoltracker.com/vic/","description":"vicpol tracker averages every published Victorian state opinion poll. As of 28 September 2026, the Coalition leads Labor 52.8–47.2 two-party preferred on implied preference flows (±2), from 64 polls by 8 pollsters. Election day: Saturday 28 November 2026.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
   <style>
 @font-face {
   font-family: 'Crimson Text';
@@ -663,6 +667,7 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
   border-radius: 4px;
 }
 .poll-row:focus-visible { outline-offset: -2.5px; } 
+.tabs .tab:focus-visible { outline-offset: -2.5px; }
 .tt-opt, .theme-cell, .legend-chip, .seg-btn, .hb-toggle,
 .cyc-drawn-x, .ap-popbtn, .tab-score, .ap-clear { position: relative; }
 .tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after, .hb-toggle::after,
@@ -671,6 +676,7 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
   top: 50%; transform: translateY(-50%);
   height: 44px;
 }
+.tab-score::after { top: auto; bottom: 0; transform: none; }
 .hb-q, .info-index button { position: relative; }
 .hb-q::after, .info-index button::after {
   content: ""; position: absolute; left: 50%; top: 50%;
@@ -1996,6 +2002,10 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
   .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }
+@media (min-width: 641px) and (max-width: 700px) {
+  .head-meta { flex-wrap: wrap; row-gap: 6px; }
+  .meta-divide { display: none; }
+}
 @media (max-width: 640px) {
   .head-meta { display: none; }
   .head-meta-compact {
@@ -2177,7 +2187,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.789); }
 body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight: 600; font-size: 19px; line-height: 23.5px; letter-spacing: -0.01em; }
 @media (max-width: 640px) {
   .tabs { margin: -18px -4px 18px; }
-  .tab { padding-block: 9px; }
+  .tab { padding-block: 13px; }
   .tab-label { font-size: 14px; line-height: 18px; }
   body.editorial .tab-label { font-size: 16px; line-height: 19.5px; }
   .tabs-set { gap: 14px; }
@@ -2447,6 +2457,9 @@ body.dark .cyc-band.hi.thin { opacity: 0.13; }
   width: 13px; height: 13px; border: 1px solid var(--ink-faint); border-radius: 4px;
   background: var(--surface); cursor: pointer; position: relative;
   transition: background 0.12s ease, border-color 0.12s ease;
+}
+@media (pointer: coarse) {
+  .pg-check input { width: 22px; height: 22px; }
 }
 .pg-check input:checked {
   background: linear-gradient(to bottom,
@@ -3004,6 +3017,26 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
 }
+@media print {
+  .tabs, .head-right, .chart-copy-btn, .rd-keysheet, .rd-keysheet-scrim,
+  .ss-back, .tile-band { display: none; }
+  .poll-table.archive thead th, .rd-ap-headwrap, .info-index { position: static; }
+  .card, .poll-detail, tr, svg { break-inside: avoid; }
+  * { box-shadow: none !important; text-shadow: none !important; }
+  :root, body.dark, body.dark.cool, body.dark.editorial, body.dark.editorial.cool {
+    --bg: oklch(0.970 0.008 78);
+    --surface: oklch(0.992 0.004 85);
+    --surface-2: oklch(0.980 0.006 80);
+    --ink: oklch(0.27 0.012 55);
+    --ink-2: oklch(0.44 0.012 55);
+    --ink-3: oklch(0.52 0.010 58);
+    --ink-faint: oklch(0.70 0.008 65);
+    --line: oklch(0.895 0.008 75);
+    --line-2: oklch(0.935 0.006 78);
+    color-scheme: light;
+  }
+}
+@page { margin: 14mm 12mm; }
 </style>
   <style>
 body.rd {
@@ -3332,6 +3365,9 @@ body.rd .rd-evlist-b:focus-visible { outline: 2px solid var(--accent); outline-o
 }
 body.rd .rd-check { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; }
 body.rd .rd-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+@media (pointer: coarse) {
+  body.rd .rd-check input { width: 24px; height: 24px; }
+}
 body.rd .rd-check:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 body.rd .rd-term {
   all: unset; cursor: help; font: inherit; color: inherit;
@@ -4545,6 +4581,10 @@ body.rd .rd-cyc-ctls { display: contents; }
   body.rd .rd-cyc-chart .rd-check { line-height: 1.15; min-height: 0; }
   body.rd .rd-cyc-chart .rd-check input { width: 15px; height: 15px; margin-top: 1px; }
 }
+@media (pointer: coarse) and (max-width: 640px) {
+  body.rd .rd-cyc-chart .rd-check { min-height: 24px; }
+  body.rd .rd-cyc-chart .rd-check input { width: 24px; height: 24px; margin-top: 0; }
+}
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }
 body.rd .cyc-band.hi { fill: var(--ink-3); opacity: 0.17; }
 body.rd .cyc-band.lo.thin { opacity: 0.045; }
@@ -4687,7 +4727,7 @@ body.rd .rd-ap-search {
   border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink-3);
 }
 body.rd .rd-ap-search:focus-within { border-color: var(--ink-3); }
-body.rd .rd-ap-search input { all: unset; flex: 1; min-width: 0; font-size: 14px; color: var(--ink); }
+body.rd .rd-ap-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
 body.rd .rd-ap-search input::placeholder { color: var(--ink-3); opacity: 1; }
 body.rd .rd-ap-search input::-webkit-search-cancel-button { display: none; }
 @media (pointer: coarse) {
@@ -12635,7 +12675,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/liberal-brand-a-very-damaged-product-in-victoria-redbridge-director-tony-barry-says/news-story/d6eac63bd65cf3568dceebb500796ca1",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/liberal-brand-a-very-damaged-product-in-victoria-redbridge-director-tony-barry-says/news-story/d6eac63bd65cf3568dceebb500796ca1",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -12750,7 +12792,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/coalition-records-best-primary-vote-result-since-june-2021-poll/news-story/a8656e6e9eafd8960765483a9ffb51e8",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/coalition-records-best-primary-vote-result-since-june-2021-poll/news-story/a8656e6e9eafd8960765483a9ffb51e8",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -13092,7 +13136,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/jacinta-allans-labor-government-would-win-election-polling-shows/news-story/4c411835b5aa4ceba971d50f89df58ef",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/jacinta-allans-labor-government-would-win-election-polling-shows/news-story/4c411835b5aa4ceba971d50f89df58ef",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -13313,7 +13359,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/victorian-voters-vent-anger-at-allan-govt-in-shock-poll-result/news-story/c397c3fb09084fac8b1e36bc3c3e48a7",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/victorian-voters-vent-anger-at-allan-govt-in-shock-poll-result/news-story/c397c3fb09084fac8b1e36bc3c3e48a7",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -13409,7 +13457,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Report (wolfandsmith.com)",
       "href": "https://www.wolfandsmith.com/_files/ugd/78f0d6_e57dc0b5dbeb40beb34102811ab6374f.pdf",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.wolfandsmith.com/_files/ugd/78f0d6_e57dc0b5dbeb40beb34102811ab6374f.pdf",
+      "wbTitle": "The live link is dead on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -13630,7 +13680,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/allan-government-facing-voter-backlash-over-housing-affordability-as-suburban-rail-loop-concerns-mount/news-story/0fafb666e9f1374db1b698464fc16ecd",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/allan-government-facing-voter-backlash-over-housing-affordability-as-suburban-rail-loop-concerns-mount/news-story/0fafb666e9f1374db1b698464fc16ecd",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -13746,7 +13798,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/coalition-in-electionwinning-position-after-edging-ahead-of-labor/news-story/f2db9d30cb1d5881258fd12b7568ff43",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/coalition-in-electionwinning-position-after-edging-ahead-of-labor/news-story/f2db9d30cb1d5881258fd12b7568ff43",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -13968,7 +14022,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/cashstrapped-victorians-shift-support-to-coalition-according-to-new-poll/news-story/1462038ab13029839c8b7c69bd546f1f",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/cashstrapped-victorians-shift-support-to-coalition-according-to-new-poll/news-story/1462038ab13029839c8b7c69bd546f1f",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -14415,7 +14471,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/victorian-premier-jacinta-allan-will-face-pressure-to-quit-if-labor-is-hit-hard-at-federal-election/news-story/ceec79f877c24b80e654fdcc2c073429",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/victorian-premier-jacinta-allan-will-face-pressure-to-quit-if-labor-is-hit-hard-at-federal-election/news-story/ceec79f877c24b80e654fdcc2c073429",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -14526,7 +14584,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "The Australian’s report",
       "href": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -14641,7 +14701,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/labor-on-track-to-win-historic-fourth-election-in-victoria-coalition-support-falls-to-low-point/news-story/84aa44a2d3ff9eb4f43bc7176ba4ba35",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/labor-on-track-to-win-historic-fourth-election-in-victoria-coalition-support-falls-to-low-point/news-story/84aa44a2d3ff9eb4f43bc7176ba4ba35",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -14978,7 +15040,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/allan-labor-government-extends-lead-on-coalition-in-race-to-polls-as-voters-shift-toward-minor-parties-and-independents/news-story/ca732c4be8447edba6cc8a629714bb6e",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/allan-labor-government-extends-lead-on-coalition-in-race-to-polls-as-voters-shift-toward-minor-parties-and-independents/news-story/ca732c4be8447edba6cc8a629714bb6e",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -15565,7 +15629,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "The Australian’s report",
       "href": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -18167,7 +18233,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "The Australian’s report",
       "href": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -19351,7 +19419,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/ben-carrolls-promised-new-direction-failing-to-win-over-victorian-voters/news-story/b67ec2414f9c5867909abd57f6baac15",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/ben-carrolls-promised-new-direction-failing-to-win-over-victorian-voters/news-story/b67ec2414f9c5867909abd57f6baac15",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -19514,7 +19584,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }],
     "peff": {
       "w": 1,
@@ -19630,7 +19702,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }]
   }, {
     "pollster": "DemosAU",
@@ -19733,7 +19807,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "k": "cite",
       "t": "Herald Sun report",
       "href": "https://www.heraldsun.com.au/news/victoria/ben-carrolls-promised-new-direction-failing-to-win-over-victorian-voters/news-story/b67ec2414f9c5867909abd57f6baac15",
-      "title": "The published report this poll’s figures were read from"
+      "title": "The published report this poll’s figures were read from",
+      "wb": "https://web.archive.org/web/2/https://www.heraldsun.com.au/news/victoria/ben-carrolls-promised-new-direction-failing-to-win-over-victorian-voters/news-story/b67ec2414f9c5867909abd57f6baac15",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
     }]
   }, {
     "pollster": "RedBridge/Accent",
@@ -30100,11 +30176,11 @@ function NextPollsPanel() {
     setOpenState(v);
   };
   const {
-    rows,
+    rows: projRows,
     nowMs
   } = npProject();
-  if (!rows.length) return null;
-  rows.length = Math.min(rows.length, NP_MAX_ROWS);
+  if (!projRows.length) return null;
+  const rows = projRows.slice(0, NP_MAX_ROWS);
   const fmt = ms => {
     const d = new Date(ms);
     return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
@@ -30705,7 +30781,12 @@ Object.assign(window, {
   sampleValue,
   pubStamp
 });</script>
-  <script>const csvCell = v => {
+  <script>const writeUrl = (verb, to) => {
+  try {
+    history[verb](null, "", to);
+  } catch {}
+};
+const csvCell = v => {
   if (v == null) return "";
   const s = String(v);
   return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
@@ -33373,7 +33454,7 @@ function PastCyclesView() {
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
-    if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
+    if (next !== L.pathname + L.search + L.hash) writeUrl("replaceState", next);
   }, [hidden, lifted]);
   React.useEffect(() => {
     window.AP_CYC_BOARD = {
@@ -36231,7 +36312,7 @@ function AllPollsView({
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
-    if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
+    if (next !== L.pathname + L.search + L.hash) writeUrl("replaceState", next);
   });
   const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.fieldPending ? "TBC" : p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Effective sample", p => p.sampleEff == null ? "" : p.sampleEff], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["Poll lean", p => p.lean], ["House effect", p => p.hfx ? p.hfx.v : ""], ["PPM Albanese", p => {
     const c = ppmContests(p)[0];

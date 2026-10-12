@@ -183,7 +183,7 @@ body {
   padding: 8px 12px 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; text-decoration: none; }
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
-.frame-wrap { flex: 1; display: flex; flex-direction: column; max-width: var(--maxw); width: 100%;
+.frame-wrap { flex: 1; display: flex; flex-direction: column; max-width: var(--maxw);
   margin: 0 auto; padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px)); }
 .frame-wrap h1 { font-family: var(--serif); font-size: 34px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }
 .frame-wrap h2 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin: 32px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); }

@@ -755,7 +755,7 @@ function changelogPage() {
   unicode-range: ${LATIN};
 }`).join("\n");
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -768,10 +768,18 @@ function changelogPage() {
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="auspol tracker">
+<meta property="og:site_name" content="auspoltracker.com">
+<meta property="og:locale" content="en_AU">
 <meta property="og:title" content="Change log &#8211; auspol tracker">
 <meta property="og:description" content="${metaDesc}">
-<meta name="twitter:card" content="summary">
+<meta property="og:url" content="${SITE_URL}changelog/">
+<meta property="og:image" content="${cardUrl}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${cardAlt}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${cardUrl}">
+<meta name="twitter:image:alt" content="${cardAlt}">
 <link rel="canonical" href="${SITE_URL}changelog/">
 <link rel="icon" href="/assets/favicon.svg">
 <style>
@@ -1424,11 +1432,24 @@ const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${(cardStamp || dataStamp) 
    render for those embeds. WebP could ride parallel og:image entries once
    verified across every consumer of the share card. */
 /* The card is now a chart with figures on it, so its alt says them. Someone
-   who cannot see the preview should get the same reading from it. */
+   who cannot see the preview should get the same reading from it. The card a
+   crawler fetches is the committed PNG, drawn for cardStamp – on the
+   warn-only path above that stays an older wave while the data has moved on,
+   so derive the alt from the DRAWN stamp's fig block (assets/auspol-card.json)
+   when it didn't draw today's wave, and the alt and the pixels always agree. */
 const cl = cardContest();
-const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, ${cl.oppLab} ${cl.lnp2pp.toFixed(1)} `
-  + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
-  + `with the trend since the 2025 election`;
+const cardAlt = (() => {
+  const f = cardStamp && cardStamp !== dataStamp && cardFigsDrawn;
+  if (!f) return `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, ${cl.oppLab} ${cl.lnp2pp.toFixed(1)} `
+    + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
+    + `with the trend since the 2025 election`;
+  const [sy, sm, sd] = String(cardStamp).split("-").map(Number);
+  const MM = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const when = sd ? `${sd} ${MM[(sm || 1) - 1]} ${sy}` : cardStamp;
+  return `auspol tracker: Labor ${f.alp}, ${f.vs === "onp" ? "One Nation" : "Coalition"} ${f.lnp} `
+    + `two-party preferred${f.basis === "imp" ? " on implied preference flows" : ""}, ±${f.ci} points, `
+    + `updated ${when}, with the trend since the 2025 election`;
+})();
 /* SERP + social description. It opens with the site's name because Google
    rewrites a snippet that doesn't match the query: on a search for "auspol
    tracker" it skipped the old tagline-first description and quoted the
@@ -1472,6 +1493,27 @@ const websiteJsonLd = `<script type="application/ld+json">${
   }).replace(/</g, "\\u003c")
 }</script>`;
 
+/* /vic/ is a document of THIS site, with its own brand name: a WebPage node
+   whose isPartOf names the federal WebSite, so crawlers file Vicpol under
+   auspol tracker rather than inventing a second site. Reuses JV (defined
+   beside metaDesc) so the words can't drift. */
+const vicPageJsonLd = VIC ? `<script type="application/ld+json">${
+  JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `${JV.brand} tracker – ${JV.electionWords} election polling`,
+    url: PAGE_URL,
+    description: metaDesc,
+    inLanguage: "en-AU",
+    isPartOf: { "@type": "WebSite", name: "auspol tracker", url: SITE_URL },
+    publisher: {
+      "@type": "Organization",
+      name: "auspol tracker",
+      url: SITE_URL,
+    },
+  }).replace(/</g, "\\u003c")
+}</script>` : "";
+
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any
    title candidate whose text equals og:site_name when og:title exists (its
    site-name de-dup), so "auspol tracker" here disqualified the h1 and let
@@ -1489,8 +1531,15 @@ html = html.replace(OG_ANCHOR, VIC
   <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${PAGE_URL}">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}">
-  ${fontLinks.join("\n  ")}`
+  ${/* Googlebot-Image and iOS home-screen need a raster icon and can't read
+      the data-URI SVG below; the committed PNG is the site's brand icon, so
+      /vic/ carries it too. favPng is !VIC-gated for the federal head below,
+      so the Vic branch tests the disk itself. */""}
+  ${fs.existsSync(FAV_PNG) ? `<link rel="icon" type="image/png" sizes="192x192" href="${SITE_URL}assets/favicon-192.png">
+  <link rel="apple-touch-icon" href="${SITE_URL}assets/favicon-192.png">
+  ` : ""}<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}">
+  ${fontLinks.join("\n  ")}
+  ${vicPageJsonLd}`
   : `<meta name="description" content="${metaDesc}">
   <meta property="og:type" content="website">
   <meta property="og:description" content="${metaDesc}">
@@ -1684,15 +1733,28 @@ const shareLine = (p) => {
     .filter(([, v]) => v != null).map(([k, v]) => `${k} ${v}`);
   return bits.join(", ");
 };
-// `GRN 6 · IND 3` out of any {code: pct} bag; unknown codes print as-is
-const bits = (o) => Object.entries(o)
-  .filter(([, v]) => v != null)
-  .map(([k, v]) => `${PARTY[k] || k} ${r1(v)}`)
-  .join(" · ");
+// `GRN 6 · IND 3` out of any {code: pct} bag; unknown codes print as-is.
+// YouGov prints Community Strong as its own column, which files as the
+// machine codes community-strong[-australia] – fold those into OTH, as
+// gen-data's switching/flow reads do, and drop the und/dnr residue cells the
+// houses exclude from their totals rather than leaking raw codes to readers
+const bits = (o) => {
+  const flat = new Map();
+  for (const [k, v] of Object.entries(o)) {
+    if (v == null || k === "und" || k === "dnr") continue;
+    const key = k.startsWith("community-strong") ? "oth" : k;
+    flat.set(key, (flat.get(key) || 0) + v);
+  }
+  return [...flat].map(([k, v]) => `${PARTY[k] || k} ${r1(v)}`).join(" · ");
+};
 
 const items = feedWaves.map((w) => {
   const p = w.poll || null, year = w.date.slice(0, 4);
-  const tpp = p && p.tpp_alp != null ? `ALP ${p.tpp_alp} – L/NP ${p.tpp_lnp}` : null;
+  // a row can file tpp_alp with no pair complement (share2pp treats it as a
+  // legitimate schema state) - print the figure that exists, not "L/NP null"
+  const tpp = p && p.tpp_alp != null
+    ? `ALP ${p.tpp_alp}` + (p.tpp_lnp != null ? ` – L/NP ${p.tpp_lnp}` : "")
+    : null;
   const prim = p ? shareLine(p) : "";
   const head = tpp ? `2PP ${tpp}`
     : prim || (w.dir ? `Right ${w.dir.right} · Wrong track ${w.dir.wrong}`

@@ -68,7 +68,9 @@ for (let i = 0; i < CHIP_IDS.length; i++) {
   /* the generator drops a thin move whose set a solid move already carries,
      so only an uncarried thin move can ever put a hedge in the dek */
   const carriedKeys = new Set(solidMoves.map((m) => m.tab + "|" + m.set));
-  const visibleThin = thinMoves.filter((m) => !carriedKeys.has(m.tab + "|" + m.set));
+  /* and none trails while a solid set was left out for room (the dek
+     carries two solid sets; rule of 2026-10-11, rdDemoShift) */
+  const visibleThin = carriedKeys.size > 2 ? [] : thinMoves.filter((m) => !carriedKeys.has(m.tab + "|" + m.set));
   if (!solidMoves.length) {
     /* no solid moves (none, or all thin) -> the unchanged pair */
     check(/vote is unchanged$/.test(s.head), id + ": no solid moves -> title says the composition is unchanged");

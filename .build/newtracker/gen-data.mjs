@@ -674,11 +674,14 @@ function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
 function nowcastPts(rows, he, ref, k = HEADLINE_K) {
   const pts = [];
   const waves = new Map();                    // firm -> wave count inside the window
-  for (const a of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const a = rows[i];
     const d = ddays(ref, a.mid);
     if (d < 0 || d > k.window) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: (a.w0 ?? a.n) * k.weight(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
+    // ri ties a point back to its source row so the change-SE maths
+    // (changeSeOf) can match the same reading across two overlapping windows
+    pts.push({ ri: i, w: (a.w0 ?? a.n) * k.weight(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
   }
   /* A house with m waves in the window has not measured the electorate m
      independent times - same method, same house-effect residue - so its
@@ -693,18 +696,49 @@ function nowcastAdj(rows, he, ref) {
   const r = weightedWithSe(nowcastPts(rows, he, ref));
   return r && { v: r1(r.v), n: r.n, se: r2(r.se), nEff: r1(r.nEff), ci95: r1(1.96 * r.se) };
 }
+/* Sampling variance of ONE window point, mirroring weightedWithSe's floor: a
+   share carries p(1−p) at the window's mean, a non-share carries its pq. */
+const pointSampV = (p, mean) => HL_DEFF * (p.pq != null ? p.pq : (mean / 100) * (1 - mean / 100) * 1e4) / p.n;
+/* The SE of the 30-day change. Root-sum-square of the two windows' own SEs
+   assumes they share no reading – true of the three-week headline window
+   (two 21-day windows 30 days apart cannot overlap) but false of the
+   six-week sparse window, whose pair overlaps by 12 days. A reading in the
+   shared band lands in BOTH means with different weights, so its sampling
+   error multiplies by (a−b)² in the difference, not a²+b² – plain RSS
+   overstated the change SE and filed conservative "not significant"
+   verdicts on every sparse measure (Hanson/favourability, ppm margins,
+   undecided, salience, the vote-switching rates). Subtract the shared-poll
+   covariance, floored at the difference's exact sampling variance. With no
+   shared band the formula is the old RSS exactly, so the headline's own
+   change figure is untouched. */
+function changeSeOf(pNow, mNow, pPrev, mPrev) {
+  const swN = pNow.reduce((t, p) => t + p.w, 0), swP = pPrev.reduce((t, p) => t + p.w, 0);
+  const prevByRi = new Map(pPrev.map((p) => [p.ri, p]));
+  let cov = 0, floor = 0;
+  for (const p of pNow) {
+    const a = p.w / swN, v = pointSampV(p, mNow.v);
+    const q = prevByRi.get(p.ri);
+    if (!q) { floor += a * a * v; continue; }
+    const b = q.w / swP;
+    cov += a * b * v;
+    floor += (a - b) * (a - b) * v;
+    prevByRi.delete(p.ri);
+  }
+  for (const [, q] of prevByRi) { const b = q.w / swP; floor += b * b * pointSampV(q, mPrev.v); }
+  return Math.sqrt(Math.max(mNow.se ** 2 + mPrev.se ** 2 - 2 * cov, floor));
+}
 /* A panel's current reading, built as the headline is: the nowcast at the
-   newest poll, the same a month earlier, and whether the move clears both
-   readings' margins (two independent windows, root-sum-square – the
-   headline's own rule). Null when the window holds no poll. */
+   newest poll, the same a month earlier, and whether the move clears the
+   change's own margin (changeSeOf). Null when the window holds no poll. */
 function currentReading(rows, he, k = HEADLINE_K, ref = refNow) {
-  const at = (t) => weightedWithSe(nowcastPts(rows, he, t, k));
-  const now = at(ref);
+  const pNow = nowcastPts(rows, he, ref, k);
+  const now = weightedWithSe(pNow);
   if (!now) return null;
   const out = { v: r1(now.v), se: r2(now.se), ci95: r1(1.96 * now.se), n: now.n, nEff: r1(now.nEff) };
-  const prev = at(ref - 30 * 86400000);
+  const pPrev = nowcastPts(rows, he, ref - 30 * 86400000, k);
+  const prev = weightedWithSe(pPrev);
   if (prev) {
-    const seChg = Math.sqrt(now.se ** 2 + prev.se ** 2);
+    const seChg = changeSeOf(pNow, now, pPrev, prev);
     Object.assign(out, { prev: r1(prev.v), chg: r1(now.v - prev.v), changeCi95: r1(1.96 * seChg),
                          changeSig: Math.abs(now.v - prev.v) > 1.96 * seChg });
   }
@@ -2212,7 +2246,10 @@ const direction = dirRight.map((m) => {
   const right = r1(m.v), wrong = r1(w.v);
   const rSe = monthWithSe(dirRightRows, dirHe.right, m.ym);
   const wSe = monthWithSe(dirWrongRows, dirHe.wrong, m.ym);
-  return { ym: m.ym, x: m.x, right, wrong, unsure: r1(100 - right - wrong),
+  // unsure is the remainder, floored at 0: right and wrong are independently
+  // estimated series, and a thin month's two estimates can cross 100 - a
+  // negative share prints nonsense and breaks the stacked bar's geometry
+  return { ym: m.ym, x: m.x, right, wrong, unsure: r1(Math.max(0, 100 - right - wrong)),
            net: r1(right - wrong), n: m.k,
            rightCi: rSe ? r1(1.96 * rSe.se) : null,
            wrongCi: wSe ? r1(1.96 * wSe.se) : null };
@@ -2229,7 +2266,7 @@ const directionNow = (() => {
   const r = currentReading(dirRightRows, dirHe.right), w = currentReading(dirWrongRows, dirHe.wrong);
   const net = currentReading(dirNetRows, dirHeNet);
   if (!r || !w) return null;
-  const out = { right: r.v, wrong: w.v, unsure: r1(100 - r.v - w.v), net: r1(r.v - w.v),
+  const out = { right: r.v, wrong: w.v, unsure: r1(Math.max(0, 100 - r.v - w.v)), net: r1(r.v - w.v),
                 rightCi: r.ci95, wrongCi: w.ci95, n: Math.max(r.n, w.n) };
   if (r.prev != null && w.prev != null) {
     out.chg = r1((r.v - w.v) - (r.prev - w.prev));
@@ -2469,7 +2506,13 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const polls = rs.map(({ p, u }) => ({
     x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
     dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
-    sample: p.sample ?? null, v: u.v, basis: b.id,
+    sample: p.sample ?? null,
+    /* rowN's effective-sample rule must see sampleEff on the mapped row too:
+       without it the monthly means below weight a sampleEff wave (Essential
+       files one) by its raw sample while the panel's nowcast weighs the same
+       wave by sampleEff×HL_DEFF - one measure, two weights */
+    ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
+    v: u.v, basis: b.id,
   })).sort((a, b2) => a.x - b2.x);
   const monthly = MONTHS.map((ym) => {
     const m = polls.filter((d) => d.ym === ym);
@@ -2567,6 +2610,10 @@ const firmWaves = firmRows.map((p) => {
 const firmPooled = (ws) => Object.fromEntries(["all", ...FIRM_PARTIES].map((k) => {
   let sn = 0, snv = 0;
   for (const w of ws) { sn += w.n[k]; snv += w.n[k] * w.solid[k]; }
+  // a pool where no pooled wave filed the cohort's base (a wave can carry no
+  // ind/oth at all, and "oth" derives from them) divides by zero - stay
+  // absent (the usual null-for-no-figure contract) instead of printing NaN
+  if (!sn) return [k, { v: null, ci95: null, n: 0 }];
   const v = snv / sn, q = v / 100;
   return [k, { v: r1(v), ci95: r1(196 * Math.sqrt(q * (1 - q) / sn)), n: Math.round(sn) }];
 }));
@@ -4688,7 +4735,9 @@ const issues = (() => {
     const p = pollOf(w) || { date: w.date, dateStart: w.dateStart, sample: w.sample, sampleEff: w.sampleEff };
     for (const [k, v] of Object.entries(w.issues)) {
       const base = { ym: ymOf(w.date), mid: midMs(p), n: rowN(p), firm: w.pollster };
-      (salRows[k] ||= []).push({ ...base, x: v.top3, date: w.date });
+      // a null top3 must not enter as a point: x - heV coerces null to 0
+      // downstream, reading the wave as 0% salience with no error anywhere
+      if (v.top3 != null) (salRows[k] ||= []).push({ ...base, x: v.top3, date: w.date });
       // ranked first: RedBridge ranks its three, Ipsos doesn't
       if (v.r1 != null) (salR1[k] ||= []).push({ ...base, x: v.r1 });
     }
@@ -5743,7 +5792,14 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // and none asked the Albanese–Hanson pair, a 2026 question
     ppmhPts = [];
   }
-  const cap = c.current ? Math.max(1, Math.round(monthsSince(LATEST_ISO, c.eDate))) : 36;
+  /* The month cap is the term's own length, not a flat 36: 1998, 2004 and
+     2010 ran 36.5-37.5 months, and the flat cap silently dropped their
+     closing weeks from the drawn lines while endRes ringed the closing
+     election ~1.5 months past where the line stopped. cyclePolls is keyed
+     by the term, so a longer cap can never pull in a neighbouring term's
+     readings - it only stopped cutting real ones off. */
+  const cap = c.current ? Math.max(1, Math.round(monthsSince(LATEST_ISO, c.eDate)))
+    : (ELECTIONS["e" + c.src] ? Math.round(monthsSince(ELECTIONS["e" + c.src].date, c.eDate)) : 36);
   const prim = cycleSeries(primPts, c.ePrim, cap);
   const tpp = cycleSeries(tppPts, c.eTpp, cap);
   const eOpp = ELECTIONS["e" + c.year];             // the election that STARTED the term

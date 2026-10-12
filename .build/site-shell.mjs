@@ -80,6 +80,7 @@ export const ROOT = path.resolve(HERE, "..");
    two redirect stubs (archives/index.html, newspoll-archive/index.html)
    redirect before paint and carry nothing. */
 export const SHELL_PAGES = [
+  { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "preference-flows/index.html" },
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "changelog/index.html" },                         // written by .build/newtracker/build.mjs (federal pass)
@@ -762,10 +763,15 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
    centred on a column of its own – and the archives' switcher with it. The
    tab bar's margin is now the gap above it, as on the main page. margin-left
    lands the article text on the frame's content edge (frame-left + gutter,
-   less this column's own 28px padding). */
+   less this column's own 28px padding). max-width caps at that margin: a
+   page that pairs this rule with its own width:100% (or whose content's
+   max-content pins the flex item, auto margins killing stretch) must never
+   stick past the viewport's right edge. */
 .frame-wrap {
-  max-width: calc(692px + 56px); margin-right: auto;
-  margin-left: max(0px, calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) - 28px));
+  --sh-fw-ml: max(0px, calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) - 28px));
+  max-width: min(calc(692px + 56px), calc(100% - var(--sh-fw-ml)));
+  margin-right: auto;
+  margin-left: var(--sh-fw-ml);
 }
 .frame-wrap { padding-top: 0; }
 /* The Morgan and Trove archives run to ~30,000 table elements; laid out
@@ -840,6 +846,15 @@ nav.tabs[aria-label="Poll archives"] {
   .sh-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
 }
 @media (prefers-reduced-motion: reduce) { .sh-tab, .sh-tab::after, .sh-cell { transition: none; } }
+
+/* Print (2026-10-13, mirrors the main page's block): the shell chrome a sheet
+   can't use goes – the tab bar, the theme switch, the colophon and the
+   decorative tide band. */
+@media print {
+  .sh-tabs, .sh-theme, .sh-foot, .sh-band { display: none; }
+  * { box-shadow: none !important; text-shadow: none !important; }
+}
+@page { margin: 14mm 12mm; }
 `;
 }
 
