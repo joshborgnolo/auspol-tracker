@@ -3,13 +3,17 @@
 # failure from the failed run's log, reproduces it, and commits a minimal fix
 # on LOCAL main; a separate publish job gates those commits and pushes them.
 #
-# Three jobs, three trust levels (2026-09-25):
+# Four jobs (three trust levels, 2026-09-25; report job added 2026-10-13):
 #   gate     reads the failed run, decides whether it is repair work at all,
 #            and runs the circuit breaker (.build/repair-gate.sh: 3 agent
 #            sessions per workflow per 24h).
 #   repair   the agent. READ-ONLY token, git credentials stripped, no
 #            concurrency group: it holds nothing while it thinks. Its commits
-#            leave the job as a git bundle artifact — nothing else does.
+#            leave the job as a git bundle artifact — nothing else does. Its
+#            full report leaves as the repair-report artifact.
+#   report   when the agent ran but no commits will be pushed (crash, or a
+#            can't-fix verdict), files the report as a deduped ci-alert
+#            issue so the diagnosis isn't re-done by hand.
 #   publish  a FRESH runner (no process the agent started can still be
 #            alive to watch for a credential) checks the bundle against the
 #            deterministic gate — forbidden paths, syntax, validate.mjs —
@@ -182,7 +186,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.allowed == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 35 # 25m agent wall-clock + setup/bundle headroom
+    timeout-minutes: 65 # 2× 25m agent attempts (one retry after a crash) + setup/bundle headroom
     # Read-only: whatever the agent does, this job's token cannot write.
     # No concurrency group — nothing here touches origin.
     permissions:
@@ -192,6 +196,8 @@ jobs:
       base: ${{ steps.base.outputs.sha }}
       commits: ${{ steps.bundle.outputs.commits }}
       offmain: ${{ steps.bundle.outputs.offmain }}
+      ran: ${{ steps.agent.outputs.ran }}
+      agent_exit: ${{ steps.agent.outputs.exit_code }}
     steps:
       # checkout v5 still persists its credential as an extraheader in
       # .git/config, which the strip step below removes. v6+ moved it to a
@@ -269,6 +275,7 @@ jobs:
           } > .build/agent-repair-run.md
 
       - name: Run the repair agent
+        id: agent
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
           CHROME: /usr/bin/google-chrome
@@ -277,9 +284,30 @@ jobs:
         run: |
           if [ -z "$MATILDA_API_KEY" ]; then
             echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
+            echo "ran=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          matilda -p "$(cat .build/agent-repair-run.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
+          echo "ran=true" >> "$GITHUB_OUTPUT"
+          # The diagnosis is the deliverable even on failure, so tee it to a
+          # file the report job can file as an issue: a crashed agent used
+          # to take its whole diagnosis down with the CI log (np-score,
+          # 2026-10-12, context overflow after a complete root cause).
+          report=.build/agent-repair-report.txt
+          : > "$report"
+          rc=0
+          for attempt in 1 2; do
+            if [ "$attempt" -gt 1 ]; then
+              echo "::warning::agent attempt 1 exited $rc; retrying once"
+              printf '\n--- attempt %s ---\n\n' "$attempt" >> "$report"
+            fi
+            # no pipefail here: the tee survives a crashed agent and
+            # PIPESTATUS[0] is the agent's real exit code
+            matilda -p "$(cat .build/agent-repair-run.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80 2>&1 | tee -a "$report"
+            rc=${PIPESTATUS[0]}
+            [ "$rc" -eq 0 ] && break
+          done
+          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
+          exit "$rc"
 
       # an out-of-budget agent may still have left good commits
       - name: Bundle the repair commits for the publish job
@@ -310,6 +338,74 @@ jobs:
           path: ${{ runner.temp }}/repair.bundle
           retention-days: 7
           if-no-files-found: error
+
+      - name: Upload the agent report
+        if: always() && steps.agent.outputs.ran == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: repair-report
+          path: .build/agent-repair-report.txt
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # The diagnosis, surfaced (fourth job, 2026-10-13). When the agent ran but
+  # nothing will be pushed — it crashed (np-score's 2026-10-12 context
+  # overflow) or judged the failure not agent-repairable — its report used
+  # to live only in the CI log, so every failure meant a human re-diagnosing
+  # by hand. File the report as a deduped ci-alert issue instead. Kept out
+  # of the repair job on purpose: that job runs the agent with a read-only
+  # token, and this one must be able to write issues.
+  report:
+    needs: [gate, repair]
+    if: always() && needs.gate.outputs.allowed == 'true' && needs.repair.outputs.ran != 'false' && needs.repair.outputs.offmain != 'true' && (needs.repair.outputs.commits == '' || needs.repair.outputs.commits == '0')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read # checkout, for alert-issue.sh
+      issues: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Download the agent report
+        id: dl
+        continue-on-error: true # an abnormally-ended repair job may have no artifact; file the issue with links anyway
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: repair-report
+          path: report
+
+      - name: File the diagnosis issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WF: ${{ needs.gate.outputs.workflow_name }}
+          RUN_URL: ${{ needs.gate.outputs.run_url }}
+          AGENT_EXIT: ${{ needs.repair.outputs.agent_exit }}
+        run: |
+          set -u
+          {
+            case "$AGENT_EXIT" in
+              ""|0) echo "The repair agent ran for ${WF} but left no commits, so nothing was pushed. That's a can't-fix verdict (or a budget-capped session), not silence: the diagnosis it produced is below." ;;
+              *)    echo "The repair agent for ${WF} crashed (exit ${AGENT_EXIT}) and nothing was pushed. Its diagnosis up to the crash is below — it was good enough to not make a human re-do it." ;;
+            esac
+            echo
+            echo "- Failed run it responded to: ${RUN_URL}"
+            echo "- This agent-repair run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            # issues cap at 65536 chars; the agent's final message sits at
+            # the tail, after the [tool] lines (35k is safely under the cap
+            # once the fixed intro joins the body)
+            if [ -s report/agent-repair-report.txt ]; then
+              echo "Agent report (tail):"
+              echo
+              echo '```'
+              tail -c 35000 report/agent-repair-report.txt
+              echo
+              echo '```'
+              echo
+            fi
+            echo "If the diagnosis is sound, this is human (or interactive Matilda session) work from here."
+          } > report-body.md
+          bash .build/alert-issue.sh "Repair diagnosis: ${WF}" "$(cat report-body.md)"
 
   publish:
     needs: [gate, repair]

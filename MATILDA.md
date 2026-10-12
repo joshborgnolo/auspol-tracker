@@ -376,7 +376,7 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
   A watched workflow failing on main triggers it (workflow_run); tests,
   site-check, newspoll-watch, citation-check and schedule-tune are
-  deliberately unwatched. Three jobs:
+  deliberately unwatched. Four jobs (report added 2026-10-13):
   - `gate` maps the workflow to a house prompt (`.build/*-repair-prompt.md`;
     generic `.build/agent-repair-prompt.md` fallback), skips failures that
     are not repair work (coverage-check's heartbeat), and runs the circuit
@@ -384,7 +384,15 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     counted from runs whose `repair` job actually ran (it used to count the
     ~150 skipped runs a day and stayed shut).
   - `repair` runs headless Matilda with a read-only token and no git
-    credentials, and hands its commits over as a git bundle artifact.
+    credentials (retried once on a non-zero exit — np-score's 2026-10-12
+    context overflow showed a transient can kill a session mid-diagnosis),
+    and hands its commits over as a git bundle artifact. Its full report is
+    teed to `.build/agent-repair-report.txt` and leaves as the
+    repair-report artifact.
+  - `report` fires when the agent ran but no commits will be pushed (crash
+    or can't-fix verdict) and files the report as a deduped ci-alert issue
+    ("Repair diagnosis: <wf>") — before this, a crashed agent took its
+    whole diagnosis down with the CI log and a human re-diagnosed by hand.
   - `publish`, on a fresh runner, applies the gate — forbidden paths
     (`.github/`, manifests, CNAME, the clock, the laptop installer, and the
     repair machinery itself), syntax checks, validate.mjs — then discards

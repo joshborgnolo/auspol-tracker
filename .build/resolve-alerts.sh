@@ -2,8 +2,9 @@
 # resolve-alerts.sh — close ci-alert issues whose workflow has run green since.
 #
 # alert-issue.sh files an issue when the repair machinery wants a human
-# ("Repair circuit breaker: <wf>", "Repair gate blocked: <wf>"), and nothing
-# ever closed one: issues #1–#3 (Sep 2026) sat open for days after their
+# ("Repair circuit breaker: <wf>", "Repair gate blocked: <wf>",
+# "Repair diagnosis: <wf>"), and nothing ever closed one: issues #1–#3
+# (Sep 2026) sat open for days after their
 # workflows were green again, so an open ci-alert stopped meaning anything.
 # This runs once a day (coverage-check.yml's `alerts` job) and closes each
 # such issue whose workflow's newest completed run on main is green AND
@@ -19,7 +20,7 @@ closed=0
 while IFS=$'\t' read -r num updated title; do
   [ -n "$num" ] || continue
   case "$title" in
-    "Repair circuit breaker: "*|"Repair gate blocked: "*) wf="${title#*: }" ;;
+    "Repair circuit breaker: "*|"Repair gate blocked: "*|"Repair diagnosis: "*) wf="${title#*: }" ;;
     *) continue ;;
   esac
   # the Newspoll filer's breaker is labelled by its pipeline, not its file
