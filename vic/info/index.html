@@ -19840,6 +19840,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "title": "The published report this poll’s figures were read from"
     }]
   }];
+  const effTbcUrls = {
+    "RedBridge/Accent": "https://www.accent-research.com/projects",
+    "DemosAU": "https://demosau.com/methodology-statements/",
+    "Newspoll": "https://pyxispolling.com/apc",
+    "YouGov": "https://yougov.com/about/methodology/australian-polling-council",
+    "Essential": "https://essentialreport.com.au/methodology"
+  };
   const latest = {
     "alp2pp": 45.8,
     "lnp2pp": 54.2,
@@ -20445,6 +20452,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     extAgg,
     individualPolls,
     pollsterTable,
+    effTbcUrls,
     latest,
     cycles,
     events,
@@ -53127,16 +53135,18 @@ function rdEffTbc(p) {
   const A = window.AUSPOL;
   return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
 }
-const RD_EFF_TBC_URL = "https://pyxispolling.com/apc";
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
-  return React.createElement(React.Fragment, null, "eff. ", React.createElement("a", {
+  const url = (window.AUSPOL.effTbcUrls || {})[String(p.pollster || "").replace(/\s*\(.*\)$/, "")];
+  return React.createElement(React.Fragment, null, "eff. ", url ? React.createElement("a", {
     className: "rd-tbc",
-    href: RD_EFF_TBC_URL,
+    href: url,
     target: "_blank",
     rel: "noopener noreferrer",
     title: note,
     onClick: e => e.stopPropagation()
+  }, "TBC") : React.createElement("span", {
+    title: note
   }, "TBC"));
 }
 const rdFieldTxt = q => q && q.fieldPending ? "TBC" : q && (q.field || q.dateLabel) || "";

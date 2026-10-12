@@ -141,15 +141,17 @@ function rdEffTbc(p) {
   return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
     && q.released < p.released && Date.parse(q.released) >= since);
 }
-/* "TBC" links to the Australian Polling Council's statements register
-   (pyxispolling.com/apc) - every house's methodology statement lands there,
-   so it is where the pending effective sample will appear (user call
-   2026-10-12; replaced per-house guesses: YouGov's own APC page, Accent's
-   projects page, Ipsos's disclosure statements page). */
-const RD_EFF_TBC_URL = "https://pyxispolling.com/apc";
+/* "TBC" links to the page where THE HOUSE will file this wave's APC
+   statement - per house from gen-data's effTbcUrls (user call 2026-10-12:
+   YouGov's belongs at yougov.com's own APC page; one shared register at
+   pyxispolling.com/apc sent YouGov's readers to Newspoll's host). A wave
+   from a house with no entry named gets the bare titled span. */
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
-  return <>eff. <a className="rd-tbc" href={RD_EFF_TBC_URL} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a></>;
+  const url = (window.AUSPOL.effTbcUrls || {})[String(p.pollster || "").replace(/\s*\(.*\)$/, "")];
+  return <>eff. {url
+    ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
+    : <span title={note}>TBC</span>}</>;
 }
 /* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
    article before the methodology PDF; a Resolve wave filed from the monitor

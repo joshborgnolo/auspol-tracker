@@ -3038,6 +3038,12 @@ const PENDING_AT = {
   YouGov: { method: "https://yougov.com/about/methodology/australian-polling-council" },
   Essential: { method: "https://essentialreport.com.au/methodology" },
 };
+/* The "eff. TBC" marker beside a filing house's un-stamped wave links TBC to
+   the page where the house will file the wave's APC statement — per house
+   (user call 2026-10-12: YouGov's belongs at YouGov's own APC page, not
+   Newspoll's pyxispolling.com/apc register). The same landings the pending
+   links above use; any house without an entry renders TBC unlinked. */
+const effTbcUrls = Object.fromEntries(Object.entries(PENDING_AT).map(([house, at]) => [house, at.method]));
 // a pending link only on the house's newest wave, and only while it is recent
 // (a wave the house never posted for stops promising once the next one lands)
 const PENDING_DAYS = 60;
@@ -6492,6 +6498,9 @@ window.AUSPOL = (function () {
   const extAgg = ${JSON.stringify(extAgg)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
+  // where each eff-filing house posts its APC statements (the "eff. TBC"
+  // link's targets; derived from PENDING_AT's method landings, gen-data-side)
+  const effTbcUrls = ${JSON.stringify(effTbcUrls)};
   const latest = ${JSON.stringify(latest)};
   const showWorking = ${JSON.stringify(showWorking)};
   const events = ${JSON.stringify(events)};
@@ -6571,7 +6580,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
-    individualPolls, pollsterTable, latest, cycles, events, showWorking,
+    individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
