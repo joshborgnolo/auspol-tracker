@@ -5556,6 +5556,24 @@
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/09/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf"
     },
     {
+      "date": "2026-09-30",
+      "dateStart": "2026-08-01",
+      "published": "2026-10-12T08:57",
+      "pollster": "DemosAU (MRP)",
+      "client": "—",
+      "sample": 9740,
+      "alp": 27,
+      "lnp": 22,
+      "grn": 13,
+      "onp": 26,
+      "ind": 12,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
+      "fieldworkPending": true
+    },
+    {
       "date": "2026-10-02",
       "published": "2026-10-04T18:00",
       "dateStart": "2026-09-28",
