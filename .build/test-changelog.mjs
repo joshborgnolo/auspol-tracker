@@ -127,7 +127,43 @@ assert.equal(seed.entries[0].label, "18 Jan");
   assert.equal(appended.length, 1);
   const e = appended[0];
   assert.equal(e.kind, "flows");
-  assert.match(e.text, /^The preference-flow assumptions were updated: Greens voters' preferences to Labor 88\.2% → 87\.4%\. The implied-basis two-party estimate moved 52\.3 → 52\.1 \(Labor v the Coalition\)\.$/);
+  assert.match(e.text, /^The preference-flow assumptions were updated: Greens voters' preferences to Labor 88\.2% → 87\.4%\. The two-party preferred estimate held at 52\.3 \(Labor v One Nation, implied flows\)\. The implied-basis Labor v the Coalition estimate moved 52\.3 → 52\.1\.$/);
+}
+
+/* the Labor v One Nation table moves: named, and the headline's own move
+   reported (2026-10-12: it used to log only the Labor v Coalition figure) */
+{
+  const prev = S();
+  const next = S({ flows: flowsOf(FLOW0, { ...FP0, lnp: 0.33 }, null), lead: { pair: "alp_on", basis: "imp", alp: 52.6 }, on: 52.6 });
+  const { appended } = diff(prev, next);
+  assert.equal(appended.length, 1);
+  assert.equal(appended[0].text, "The preference-flow assumptions were updated: Coalition voters' preferences to Labor over One Nation 30.0% → 33.0%. The two-party preferred estimate moved 52.3 → 52.6 (Labor v One Nation, implied flows).");
+}
+
+/* the headline on the counted table: one estimate sentence, not two */
+{
+  const L = { pair: "alp_lnp", basis: "imp", alp: 52.3 };
+  const prev = S({ lead: L, imp: 52.3 });
+  const next = S({ lead: { ...L, alp: 52.1 }, imp: 52.1, flows: flowsOf({ ...FLOW0, grn: 0.874 }, FP0, null) });
+  assert.equal(diff(prev, next).appended[0].text, "The preference-flow assumptions were updated: Greens voters' preferences to Labor 88.2% → 87.4%. The two-party preferred estimate moved 52.3 → 52.1 (Labor v the Coalition, implied flows).");
+}
+
+/* per-cell bands (flows.mjs FP_ON_BAND is an object): stored, compared, and
+   a state written before they were (band: null) migrates without an entry */
+{
+  const B0 = { lnp: 0.03, grn: 0.025, oth: 0.04 };
+  assert.deepEqual(flowsOf(FLOW0, FP0, B0).band, { lnp: 3, grn: 2.5, oth: 4 });
+  const moved = diff(S({ flows: flowsOf(FLOW0, FP0, B0) }), S({ flows: flowsOf(FLOW0, FP0, { ...B0, lnp: 0.04 }) })).appended;
+  assert.equal(moved.length, 1);
+  assert.match(moved[0].text, /the doubt allowed on Coalition voters' flow to Labor over One Nation ±3\.0 → ±4\.0 points\./);
+  assert.equal(diff(S(), S({ flows: flowsOf(FLOW0, FP0, B0) })).appended.length, 0, "null → per-cell band is a migration, not an update");
+}
+
+/* a poll whose fieldwork is pending: the phrase is gen-data's whole, not "fieldwork fieldwork…" */
+{
+  const k = "2026-10-12|Newspoll";
+  const t = diff(S(), S({ polls: [...S().polls, k] }), { [k]: { name: "Newspoll", fw: "fieldwork dates TBC", sample: 1200, url: null } }).appended[0].text;
+  assert.match(t, /^Newspoll \(fieldwork dates TBC, n=1,200\) added/);
 }
 
 /* month-on-month significance flips both ways */

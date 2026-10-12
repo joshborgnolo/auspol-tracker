@@ -169,10 +169,15 @@ const clPage = fs.readFileSync(path.join(ROOT, "changelog", "index.html"), "utf8
 assert.ok(clPage.includes("<title>Change log &#8211; auspol tracker</title>"), "changelog page: the title");
 assert.ok(/<link rel="canonical" href="https:\/\/auspoltracker\.com\/changelog\/">/.test(clPage), "changelog page: the canonical");
 assert.ok(clPage.includes("<h1>What moved the estimate, and when</h1>"), "changelog page: the h1");
-const clTimes = [...clPage.matchAll(/<time class="cl-date" datetime="([^"]+)">([^<]+)<\/time>/g)];
-assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.label)]),
+// the console prints each entry's ISO date (a repeat of the line above's date is dimmed, cl-rep)
+const clTimes = [...clPage.matchAll(/<time class="cl-date(?: cl-rep)?" datetime="([^"]+)">([^<]+)<\/time>/g)];
+assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.date)]),
   "changelog page lists every entry of data/changelog.json, newest first");
-for (const e of clEntries) assert.ok(clPage.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
+// the text is lit in spans (figures, arrows), so compare it with the markup taken out
+const clPlain = clPage.replace(/<span class="cl-(?:n|ar)">([^<]*)<\/span>/g, "$1");
+for (const e of clEntries) assert.ok(clPlain.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
+assert.ok(/font-family: 'IBM Plex Mono';[^}]*url\("\/assets\/fonts\/ibmplexmono-400-latin\.[0-9a-f]{8}\.woff2"\)/.test(clPage),
+  "the console's mono face is linked by its hashed name");
 // a refresh commit carries it (2026-10-12: joined SITE_FILES with data/changelog.json)
 const siteFiles = (fs.readFileSync(path.join(ROOT, ".build", "git-push-main.sh"), "utf8").match(/SITE_FILES=\(([\s\S]*?)\)/) || [])[1] || "";
 assert.ok(/(^|\s)changelog\/index\.html(\s|$)/.test(siteFiles), "SITE_FILES commits changelog/index.html");

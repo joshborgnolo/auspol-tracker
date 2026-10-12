@@ -36,7 +36,14 @@ export function flowsOf(flow, fpOn, band) {
   const summary = {
     grn: r1(flow.grn * 100), onp: r1(flow.onp * 100), oth: r1(flow.oth * 100),
     on: { lnp: r1(fpOn.lnp * 100), grn: r1(fpOn.grn * 100), oth: r1(fpOn.oth * 100) },
-    band: band != null ? r1(band * 100) : null,
+    /* flows.mjs's FP_ON_BAND is per cell ({lnp, grn, oth}); a bare number
+       is still read as one band for all three. Before 2026-10-12 the object
+       was multiplied as a number – NaN, stored as null – so band edits never
+       registered; diffChangelog compares bands only when both sides have
+       one, so the old null state migrates without a phantom entry. */
+    band: band == null ? null
+      : typeof band === "number" ? r1(band * 100)
+      : Object.fromEntries(["lnp", "grn", "oth"].filter((k) => band[k] != null).map((k) => [k, r1(band[k] * 100)])),
   };
   return { ...summary, hash: createHash("sha1").update(JSON.stringify(summary)).digest("hex").slice(0, 12) };
 }
@@ -73,7 +80,7 @@ export function initChangelog(nextState, iso) {
   return {
     state: nextState,
     entries: [entry(iso, "seed",
-      `The change log starts here${leadTxt}. From today, every movement it makes and every statistical finding that comes or goes is recorded below.`)],
+      `The change log starts here${leadTxt}. From today, every movement it makes and every statistical finding that comes or goes is recorded here.`)],
   };
 }
 
@@ -107,17 +114,37 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     }
   }
 
-  /* the preference-flow assumptions moved */
+  /* the preference-flow assumptions moved: every figure that changed,
+     both tables, then what the headline did (and the implied Labor v the
+     Coalition figure too when the headline is another pairing and the
+     counted table moved). Decided on the figures, not the hash, so a
+     change of the state's own shape never logs an empty update. */
   if (prevState.flows && nextState.flows && prevState.flows.hash !== nextState.flows.hash) {
     const A = prevState.flows, B = nextState.flows, bits = [];
-    for (const [k, lab] of [["grn", "Greens voters' preferences to Labor"], ["onp", "One Nation voters' preferences to Labor"], ["oth", "other voters' preferences to Labor"]]) {
-      if (A[k] != null && B[k] != null && f1(A[k]) !== f1(B[k])) bits.push(`${lab} ${f1(A[k])}% → ${f1(B[k])}%`);
+    const cmp = (a, b, lab, unit = "%") => {
+      if (a != null && b != null && f1(a) !== f1(b)) bits.push(`${lab} ${f1(a)}${unit} → ${f1(b)}${unit}`);
+    };
+    for (const [k, lab] of [["grn", "Greens voters' preferences to Labor"], ["onp", "One Nation voters' preferences to Labor"], ["oth", "other voters' preferences to Labor"]]) cmp(A[k], B[k], lab);
+    const classicMoved = bits.length > 0;
+    for (const [k, lab] of [["lnp", "Coalition"], ["grn", "Greens"], ["oth", "other"]]) {
+      cmp(A.on && A.on[k], B.on && B.on[k], `${lab} voters' preferences to Labor over One Nation`);
     }
-    const moved = prevState.imp != null && nextState.imp != null ? moveTxt(prevState.imp, nextState.imp) : null;
-    appended.push(entry(iso, "flows",
-      "The preference-flow assumptions were updated" + (bits.length ? `: ${bits.join("; ")}` : "") +
-      ". " + (moved ? `The implied-basis two-party estimate ${moved} (Labor v the Coalition).`
-                    : `The implied-basis estimate reads ${nextState.imp != null ? f1(nextState.imp) : "—"} (Labor v the Coalition).`)));
+    const bandOf = (b, k) => (b == null ? null : typeof b === "number" ? b : b[k]);
+    if (A.band != null && B.band != null) {
+      for (const [k, lab] of [["lnp", "Coalition"], ["grn", "Greens"], ["oth", "other"]]) {
+        const a = bandOf(A.band, k), b = bandOf(B.band, k);
+        if (a != null && b != null && f1(a) !== f1(b)) bits.push(`the doubt allowed on ${lab} voters' flow to Labor over One Nation ±${f1(a)} → ±${f1(b)} points`);
+      }
+    }
+    if (bits.length) {
+      const lead = leadClause(prevState.lead, nextState.lead);
+      const headlineIsClassicImp = nextState.lead && nextState.lead.pair === "alp_lnp" && nextState.lead.basis === "imp";
+      const imp = classicMoved && !headlineIsClassicImp && prevState.imp != null && nextState.imp != null
+        ? ` The implied-basis Labor v the Coalition estimate ${moveTxt(prevState.imp, nextState.imp)}.` : "";
+      appended.push(entry(iso, "flows",
+        `The preference-flow assumptions were updated: ${bits.join("; ")}.` +
+        (lead ? ` ${lead[0].toUpperCase()}${lead.slice(1)}.` : "") + imp));
+    }
   }
 
   /* polls added since the last logged state */
@@ -126,7 +153,11 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
   if (addedKeys.length) {
     const ps = addedKeys.map((k) => pollInfo[k] ||
       { name: (k.split("|")[1] || k), fw: null, sample: null, url: null });
-    const descr = (p) => `${p.name}` + (p.fw ? ` (fieldwork ${p.fw}${p.sample != null ? `, n=${p.sample.toLocaleString("en-AU")}` : ""})` : "");
+    /* gen-data's fw is either a range ("8–10 Oct") or the whole phrase
+       "fieldwork dates TBC" – prefix only the range */
+    const descr = (p) => `${p.name}` + (p.fw
+      ? ` (${/^fieldwork\b/.test(p.fw) ? p.fw : `fieldwork ${p.fw}`}${p.sample != null ? `, n=${p.sample.toLocaleString("en-AU")}` : ""})`
+      : "");
     const clause = leadClause(prevState.lead, nextState.lead);
     const text = ps.length === 1
       ? `${descr(ps[0])} added` + (clause ? ` — ${clause}.` : ".")

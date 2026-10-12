@@ -200,6 +200,12 @@ const FONTS = [
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
+  /* IBM Plex Mono – the change log page's console (changelogPage below), and
+     nothing on the main page: pageOnly faces are hashed into assets/fonts/
+     and kept by the sweep, but never spliced into the template's
+     @font-face block, so the app documents don't carry them. */
+  { file: "ibmplexmono-400-latin.woff2",        family: "IBM Plex Mono", style: "normal", weight: "400", pageOnly: true },
+  { file: "ibmplexmono-600-latin.woff2",        family: "IBM Plex Mono", style: "normal", weight: "600", pageOnly: true },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });
@@ -212,6 +218,7 @@ const faceCss = FONTS.map((f) => {
   const name = f.file.replace(/\.woff2$/, `.${hash8(buf)}.woff2`);
   fontKeep.add(name);
   writeAtomic(path.join(FONT_DIR, name), buf);
+  if (f.pageOnly) return null;
   const href = `assets/fonts/${name}`;
   /* Only the faces that paint text on the way in are preloaded. The italic
      serif sets a handful of small labels, and Source Sans 3 waits for the
@@ -226,7 +233,7 @@ const faceCss = FONTS.map((f) => {
   src: url("${href}") format('woff2');
   unicode-range: ${LATIN};
 }`;
-}).join("\n");
+}).filter(Boolean).join("\n");
 // a hashed name changes when the bytes do, so sweep the ones nothing points at
 for (const old of fs.readdirSync(FONT_DIR)) {
   if (/\.woff2$/.test(old) && !fontKeep.has(old)) fs.unlinkSync(path.join(FONT_DIR, old));
@@ -696,13 +703,34 @@ function ssChangelogBlock(esc) {
    applied (site-shell.mjs applyShell, same as refresh-prediction writes
    /prediction/). Written on every federal build – a quiet refresh writes the
    same bytes, so the unattended slots see a clean tree; the Vic pass exits
-   long before here, so a Vic dataset never gets the page. */
+   long before here, so a Vic dataset never gets the page.
+   The head is /preference-flows/'s, which is the main page's (rd.css): a
+   kicker in the .rd-title cut over a Crimson 700 .rd-hed, then the dek, on
+   the shell's own .sh-frame so the column's edge is the masthead's. The
+   entries sit in a console set in IBM Plex Mono (user, 2026-10-12: "a
+   monospace font … a bit of a cool environment") – one line per entry,
+   ISO date, kind tag, text, the figures lit like syntax. */
+const CL_KIND = {
+  poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start",
+};
 function changelogPage() {
   let entries = [];
   try { entries = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || []; } catch {}
   const hesc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const rows = [...entries].reverse().map((e) => `
-    <li><time class="cl-date" datetime="${hesc(e.date)}">${hesc(e.label)}</time> ${hesc(e.text)}${e.url ? ` <a href="${hesc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</li>`).join("");
+  /* figures and arrows lit like syntax; hesc never writes a digit, so the
+     number pass can't land inside an entity it made */
+  const lit = (s) => hesc(s)
+    .replace(/(\d[\d,]*(?:\.\d+)?%?)/g, '<span class="cl-n">$1</span>')
+    .replace(/→/g, '<span class="cl-ar">→</span>');
+  const newest = [...entries].reverse();
+  const rows = newest.map((e, i) => {
+    const kind = CL_KIND[e.kind] ? e.kind : "meta";
+    const rep = i > 0 && newest[i - 1].date === e.date;
+    return `
+      <li class="cl-e cl-k-${kind}"><time class="cl-date${rep ? " cl-rep" : ""}" datetime="${hesc(e.date)}">${hesc(e.date)}</time><span class="cl-tag">${CL_KIND[kind]}</span><p class="cl-text">${lit(e.text)}${e.url ? ` <a class="cl-src" href="${hesc(e.url)}">release&nbsp;&#8599;</a>` : ""}</p></li>`;
+  }).join("");
+  const n = entries.length;
+  const since = n ? entries[0].date : null;
   const metaDesc = "What has moved the auspol tracker aggregate's two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as polls land.";
   /* the text faces, named by their content hashes this build (the FONTS
      registration above has already swept and written assets/fonts/) */
@@ -711,8 +739,10 @@ function changelogPage() {
     return f ? "/assets/fonts/" + f : null;
   };
   const faces = [["Crimson Text", "normal", "400", pageFont("crimsontext-400-latin.")],
-                 ["Crimson Text", "normal", "600", pageFont("crimsontext-600-latin.")],
-                 ["IBM Plex Sans", "normal", "300 700", pageFont("ibmplexsans-latin.")]]
+                 ["Crimson Text", "normal", "700", pageFont("crimsontext-700-latin.")],
+                 ["IBM Plex Sans", "normal", "300 700", pageFont("ibmplexsans-latin.")],
+                 ["IBM Plex Mono", "normal", "400", pageFont("ibmplexmono-400-latin.")],
+                 ["IBM Plex Mono", "normal", "600", pageFont("ibmplexmono-600-latin.")]]
     .filter((f) => f[3])
     .map(([family, style, weight, href]) => `@font-face {
   font-family: '${family}';
@@ -755,6 +785,20 @@ ${faces}
   --accent:    oklch(0.50 0.070 205);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* the console: the site's own dark ink as its ground in both themes */
+  --t-bg:     oklch(0.232 0.011 60);
+  --t-bar:    oklch(0.262 0.011 60);
+  --t-edge:   oklch(0.232 0.011 60);
+  --t-line:   oklch(0.325 0.010 62);
+  --t-ink:    oklch(0.945 0.008 80);
+  --t-ink-2:  oklch(0.820 0.009 78);
+  --t-dim:    oklch(0.640 0.009 70);
+  --t-faint:  oklch(0.480 0.009 66);
+  /* kind colours keep clear of the party hues: the site's teal, a violet, a rose */
+  --k-poll:    oklch(0.800 0.085 200);
+  --k-flows:   oklch(0.790 0.090 295);
+  --k-finding: oklch(0.800 0.095 345);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -766,6 +810,10 @@ ${faces}
     --line:      oklch(0.355 0.011 66);
     --line-2:    oklch(0.312 0.010 66);
     --accent:    oklch(0.70 0.080 205);
+    --t-bg:      oklch(0.165 0.009 62);
+    --t-bar:     oklch(0.190 0.009 62);
+    --t-edge:    oklch(0.330 0.010 64);
+    --t-line:    oklch(0.275 0.009 62);
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -785,45 +833,136 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- article: the static summary's column + type rhythm ------- */
-.frame-wrap {
-  flex: 1; display: flex; flex-direction: column;
-  max-width: 680px; width: 100%; margin: 0 auto;
-  padding: 40px 28px calc(64px + env(safe-area-inset-bottom, 0px)) 28px;
+/* ------- frame + head: /preference-flows/'s, which is rd.css's -------
+   the shell's .sh-frame box (the masthead's edge), the long-form 66ch
+   measure, the .rd-title kicker over the .rd-hed headline and .rd-dek */
+main.sh-frame {
+  flex: 1;
+  padding-top: 40px;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
-.frame-wrap h1 {
-  font-family: var(--serif); font-size: 34px; font-weight: 600;
-  letter-spacing: -0.01em; margin: 0 0 6px;
+main > * { max-width: 66ch; }
+main .kicker {
+  margin: 0; font-family: var(--sans);
+  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
+  color: var(--ink);
 }
-.frame-wrap p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 12px; }
-.frame-wrap p.ss-sub { margin: 0 0 4px; }
-.frame-wrap p.ss-note { margin: 20px 0 0; }
-.ss-note a { color: var(--ink-2); }
-.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
-.frame-wrap strong { color: var(--ink); font-weight: 600; }
+main h1 {
+  font-family: var(--serif); font-size: 46px; font-weight: 700;
+  line-height: 1.08; letter-spacing: -0.01em;
+  margin: 16px 0 0; color: var(--ink); text-wrap: pretty;
+}
+main p.ss-sub { margin: 12px 0 0; font-size: 18px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+main p.ss-note { margin: 22px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
+main p.ss-note a {
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+}
+main p.ss-note a:hover, main p.ss-note a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
 
-/* ------- the entries: dated, quiet, as the Info tab lists them ------- */
-.cl-list { list-style: none; margin: 22px 0 18px; padding: 0; }
-.cl-list li {
-  padding: 9px 0; border-top: 1px solid var(--line-2);
-  font-size: 14.5px; line-height: 1.6; color: var(--ink-2);
-  text-wrap: pretty;
+/* ------- the console -------
+   wider than the prose (a log line wants room); one grid line per entry:
+   date · kind · text, the text hanging under itself when it wraps */
+main > .cl-term { max-width: 880px; }
+.cl-term {
+  margin: 32px 0 0;
+  background: var(--t-bg); color: var(--t-ink-2);
+  border: 1px solid var(--t-edge); border-radius: 14px;
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.62;
+  font-feature-settings: normal;
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
+              0 18px 40px -24px oklch(0.2 0.02 60 / 0.55);
+  overflow: hidden;
 }
-.cl-list li:first-child { border-top: 0; }
-.cl-date {
-  display: inline-block; min-width: 60px;
-  font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums;
+.cl-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 11px 20px; background: var(--t-bar);
+  border-bottom: 1px solid var(--t-line);
+  font-size: 12px; color: var(--t-dim);
+}
+.cl-file { color: var(--t-ink-2); }
+.cl-file b { font-weight: 400; color: var(--t-faint); }
+.cl-live { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.cl-live i {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--k-poll);
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 60%, transparent);
+  animation: cl-pulse 2.4s ease-out infinite;
+}
+@keyframes cl-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 7px color-mix(in oklch, var(--k-poll) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.cl-body { padding: 16px 20px 18px; }
+.cl-cmt { color: var(--t-faint); margin: 0 0 12px; }
+.cl-log { list-style: none; }
+.cl-e {
+  display: grid; grid-template-columns: 10ch 10ch minmax(0, 1fr); column-gap: 2ch;
+  padding: 7px 0; border-top: 1px dashed var(--t-line);
+}
+.cl-e:first-child { border-top: 0; }
+.cl-date { color: var(--t-dim); font-variant-numeric: tabular-nums; }
+.cl-date.cl-rep { color: var(--t-faint); }
+.cl-tag { color: var(--t-dim); }
+.cl-tag::before { content: "["; color: var(--t-faint); }
+.cl-tag::after { content: "]"; color: var(--t-faint); }
+.cl-k-poll .cl-tag { color: var(--k-poll); }
+.cl-k-flows .cl-tag { color: var(--k-flows); }
+.cl-k-finding .cl-tag { color: var(--k-finding); }
+.cl-k-meta .cl-tag { color: var(--t-ink); font-weight: 600; }
+.cl-text { text-wrap: pretty; }
+.cl-n { color: var(--t-ink); }
+.cl-ar { color: var(--k-poll); }
+a.cl-src {
+  color: var(--k-poll); text-decoration: none; white-space: nowrap;
+  border-bottom: 1px solid color-mix(in oklch, var(--k-poll) 40%, transparent);
+}
+a.cl-src:hover, a.cl-src:focus-visible { border-bottom-color: currentColor; }
+a.cl-src:focus-visible { outline: 2px solid var(--k-poll); outline-offset: 2px; border-radius: 2px; }
+.cl-wait {
+  margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--t-line);
+  color: var(--t-dim);
+}
+.cl-wait b { font-weight: 400; color: var(--k-poll); margin-right: 1ch; }
+.cl-cur {
+  display: inline-block; width: 0.6em; height: 1.15em; margin-left: 0.5ch;
+  vertical-align: -0.2em; background: var(--t-ink-2);
+  animation: cl-blink 1.1s steps(1, end) infinite;
+}
+@keyframes cl-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .cl-live i, .cl-cur { animation: none; }
+}
+
+/* ------- the redesign's small steps, 640px and under (rd.css: .rd-hed
+   30px/1.1, .rd-dek 15/1.4, .rd-title 19px); the console drops to two
+   rows per entry – date and kind, then the text the full width ------- */
+@media (max-width: 640px) {
+  main .kicker { font-size: 19px; }
+  main h1 { margin-top: 14px; font-size: 30px; line-height: 1.1; }
+  main p.ss-sub { margin-top: 8px; font-size: 15px; line-height: 1.4; }
+  .cl-term { margin-top: 24px; font-size: 12.5px; line-height: 1.58; border-radius: 12px; }
+  .cl-bar, .cl-body { padding-left: 14px; padding-right: 14px; }
+  .cl-e { grid-template-columns: auto minmax(0, 1fr); column-gap: 2ch; row-gap: 2px; padding: 9px 0; }
+  .cl-text { grid-column: 1 / -1; }
 }
 </style>
 </head>
 <body>
-<main class="frame-wrap">
-  <p class="sh-kicker">Change log</p>
+<main id="sh-content" class="sh-frame">
+  <p class="kicker">Change log</p>
   <h1>What moved the estimate, and when</h1>
   <p class="ss-sub">What has moved the aggregate&#8217;s two-party preferred estimate, and when each
     statistical finding appeared or fell away &#8211; recorded entry by entry on every site refresh.</p>
-  <ul class="cl-list">${rows}
-  </ul>
+  <section class="cl-term" aria-label="Change log entries, newest first">
+    <div class="cl-bar"><span class="cl-file"><b>data/</b>changelog</span><span class="cl-live"><i aria-hidden="true"></i>recording</span></div>
+    <div class="cl-body">
+      <p class="cl-cmt"># ${n} ${n === 1 ? "entry" : "entries"}${since ? ` since ${hesc(since)}` : ""}</p>
+      <ol class="cl-log">${rows}
+      </ol>
+      <p class="cl-wait"><b aria-hidden="true">&#8250;</b>next entry when the next poll lands<span class="cl-cur" aria-hidden="true"></span></p>
+    </div>
+  </section>
   <p class="ss-note">A poll landing is what writes most of these &#8211; the
     <a href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the
     pollster&#8217;s own release, and <a href="/allpolls/">All polls</a> is the interactive archive.</p>
