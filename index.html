@@ -4039,6 +4039,19 @@ body.rd .rd-mo-rbar > em.rd-mo-first { display: flex; flex-direction: column; ga
 body.rd .rd-mo-big { font-size: 22px; font-weight: 600; }
 body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
 body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
+body.rd .rd-sw-cycle { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
+body.rd .rd-sw-cycle:hover, body.rd .rd-sw-cycle:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
+body.rd .rd-go-wrap { margin-top: 36px; }
+body.rd .rd-go-rows { display: flex; flex-direction: column; gap: 14px; font-variant-numeric: tabular-nums; }
+body.rd .rd-go-rtop, body.rd .rd-go-rsub { display: flex; justify-content: space-between; gap: 12px; }
+body.rd .rd-go-rtop { font-size: 15px; }
+body.rd .rd-go-rtop b { font-weight: 600; }
+body.rd .rd-go-rsub { font-size: 12px; color: var(--ink-3); margin: 1px 0 6px; }
+body.rd .rd-go-rbar { position: relative; height: 26px; }
+body.rd .rd-go-rbar > span { position: absolute; left: 0; top: 0; bottom: 0; transition: width .32s var(--morph-ease); }
+body.rd .rd-go-rbar > em { position: absolute; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 15px; font-weight: 600; }
+body.rd .rd-go-note { margin-top: 12px; }
+@media (max-width: 640px) { body.rd .rd-go-wrap { margin-top: 28px; } }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
 body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -34580,6 +34593,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 11,
         "oth": 24.1
       },
+      "dest": {
+        "lnp": {
+          "kept": 46,
+          "onp": 38,
+          "cross": 10,
+          "grn": 3,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 67,
+          "onp": 15,
+          "cross": 7,
+          "grn": 5,
+          "oth": 6
+        }
+      },
       "implied": 28.2,
       "onp": 28
     }, {
@@ -34609,6 +34638,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 12,
         "grn": 15,
         "oth": 28
+      },
+      "dest": {
+        "lnp": {
+          "kept": 59,
+          "onp": 35,
+          "cross": 4,
+          "grn": 0,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 77,
+          "onp": 12,
+          "cross": 3,
+          "grn": 5,
+          "oth": 3
+        }
       },
       "implied": 27.5,
       "onp": 28
@@ -34640,6 +34685,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 10,
         "oth": 23.6
       },
+      "dest": {
+        "lnp": {
+          "kept": 63,
+          "onp": 29,
+          "cross": 5,
+          "grn": 1,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 73,
+          "onp": 12,
+          "cross": 7,
+          "grn": 5,
+          "oth": 3
+        }
+      },
       "implied": 24.2,
       "onp": 24
     }, {
@@ -34669,6 +34730,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 10,
         "grn": 8,
         "oth": 25.5
+      },
+      "dest": {
+        "lnp": {
+          "kept": 55,
+          "onp": 36,
+          "cross": 5,
+          "grn": 0,
+          "oth": 4
+        },
+        "alp": {
+          "kept": 76,
+          "onp": 10,
+          "cross": 5,
+          "grn": 6,
+          "oth": 3
+        }
       },
       "implied": 25.4,
       "onp": 26
@@ -34700,6 +34777,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 3,
         "oth": 27
       },
+      "dest": {
+        "lnp": {
+          "kept": 58.3,
+          "onp": 34.4,
+          "cross": 3.1,
+          "grn": 1,
+          "oth": 3.1
+        },
+        "alp": {
+          "kept": 74.7,
+          "onp": 12.6,
+          "cross": 4.2,
+          "grn": 5.3,
+          "oth": 3.2
+        }
+      },
       "implied": 25.2,
       "onp": null
     }, {
@@ -34729,6 +34822,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 10,
         "grn": 5,
         "oth": 25.3
+      },
+      "dest": {
+        "lnp": {
+          "kept": 54,
+          "onp": 37,
+          "cross": 4,
+          "grn": 1,
+          "oth": 4
+        },
+        "alp": {
+          "kept": 76,
+          "onp": 10,
+          "cross": 4,
+          "grn": 6,
+          "oth": 4
+        }
       },
       "implied": 25.7,
       "onp": 25
@@ -34760,6 +34869,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 7,
         "oth": 28
       },
+      "dest": {
+        "lnp": {
+          "kept": 63,
+          "onp": 32,
+          "cross": 3,
+          "grn": 0,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 74,
+          "onp": 14,
+          "cross": 6,
+          "grn": 3,
+          "oth": 3
+        }
+      },
       "implied": 26.2,
       "onp": 26
     }, {
@@ -34789,6 +34914,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 11,
         "grn": 7,
         "oth": 24.1
+      },
+      "dest": {
+        "lnp": {
+          "kept": 52,
+          "onp": 39,
+          "cross": 5,
+          "grn": 1,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 72,
+          "onp": 11,
+          "cross": 6,
+          "grn": 5,
+          "oth": 6
+        }
       },
       "implied": 26.7,
       "onp": 27
@@ -34820,6 +34961,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 4,
         "oth": 23.4
       },
+      "dest": {
+        "lnp": {
+          "kept": 58,
+          "onp": 33,
+          "cross": 5,
+          "grn": 1,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 77,
+          "onp": 8,
+          "cross": 5,
+          "grn": 5,
+          "oth": 5
+        }
+      },
       "implied": 23.1,
       "onp": 24
     }, {
@@ -34849,6 +35006,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 13,
         "grn": 7,
         "oth": 16.1
+      },
+      "dest": {
+        "lnp": {
+          "kept": 57,
+          "onp": 34,
+          "cross": 3,
+          "grn": 2,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 70,
+          "onp": 13,
+          "cross": 7,
+          "grn": 7,
+          "oth": 3
+        }
       },
       "implied": 24.4,
       "onp": 25
@@ -34880,6 +35053,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 5,
         "oth": 25
       },
+      "dest": {
+        "lnp": {
+          "kept": 60,
+          "onp": 37,
+          "cross": 3,
+          "grn": 0,
+          "oth": 0
+        },
+        "alp": {
+          "kept": 71,
+          "onp": 17,
+          "cross": 7,
+          "grn": 3,
+          "oth": 2
+        }
+      },
       "implied": 28.3,
       "onp": 28
     }, {
@@ -34909,6 +35098,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 14,
         "grn": 9,
         "oth": 24.4
+      },
+      "dest": {
+        "lnp": {
+          "kept": 51,
+          "onp": 44,
+          "cross": 2,
+          "grn": 0,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 71,
+          "onp": 14,
+          "cross": 7,
+          "grn": 4,
+          "oth": 5
+        }
       },
       "implied": 29.3,
       "onp": 29
@@ -34940,6 +35145,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 6,
         "oth": 23
       },
+      "dest": {
+        "lnp": {
+          "kept": 51,
+          "onp": 43,
+          "cross": 3,
+          "grn": 1,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 71,
+          "onp": 16,
+          "cross": 6,
+          "grn": 3,
+          "oth": 4
+        }
+      },
       "implied": 29.4,
       "onp": 30
     }, {
@@ -34969,6 +35190,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 15,
         "grn": 3,
         "oth": 26.2
+      },
+      "dest": {
+        "lnp": {
+          "kept": 45,
+          "onp": 46,
+          "cross": 4,
+          "grn": 1,
+          "oth": 4
+        },
+        "alp": {
+          "kept": 72,
+          "onp": 15,
+          "cross": 6,
+          "grn": 4,
+          "oth": 3
+        }
       },
       "implied": 30.1,
       "onp": 30
@@ -35000,6 +35237,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 6,
         "oth": 24
       },
+      "dest": {
+        "lnp": {
+          "kept": 57,
+          "onp": 37,
+          "cross": 3,
+          "grn": 1,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 70,
+          "onp": 16,
+          "cross": 6,
+          "grn": 5,
+          "oth": 3
+        }
+      },
       "implied": 27.9,
       "onp": 29
     }, {
@@ -35029,6 +35282,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 15,
         "grn": 3,
         "oth": 19.3
+      },
+      "dest": {
+        "lnp": {
+          "kept": 54,
+          "onp": 38,
+          "cross": 6,
+          "grn": 0,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 68,
+          "onp": 15,
+          "cross": 6,
+          "grn": 5,
+          "oth": 7
+        }
       },
       "implied": 26.4,
       "onp": 26
@@ -35060,6 +35329,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 3,
         "oth": 20.2
       },
+      "dest": {
+        "lnp": {
+          "kept": 56,
+          "onp": 38,
+          "cross": 3,
+          "grn": 0,
+          "oth": 4
+        },
+        "alp": {
+          "kept": 72,
+          "onp": 11,
+          "cross": 7,
+          "grn": 6,
+          "oth": 4
+        }
+      },
       "implied": 25,
       "onp": 25
     }, {
@@ -35089,6 +35374,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 11,
         "grn": 6,
         "oth": 17.1
+      },
+      "dest": {
+        "lnp": {
+          "kept": 57,
+          "onp": 36,
+          "cross": 4,
+          "grn": 0,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 73,
+          "onp": 11,
+          "cross": 6,
+          "grn": 5,
+          "oth": 5
+        }
       },
       "implied": 24.3,
       "onp": 24
@@ -35120,6 +35421,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 4,
         "oth": 9
       },
+      "dest": {
+        "lnp": {
+          "kept": 67,
+          "onp": 31,
+          "cross": 1,
+          "grn": 0,
+          "oth": 1
+        },
+        "alp": {
+          "kept": 74,
+          "onp": 15,
+          "cross": 6,
+          "grn": 3,
+          "oth": 2
+        }
+      },
       "implied": 23,
       "onp": 24
     }, {
@@ -35149,6 +35466,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 11,
         "grn": 2,
         "oth": 37
+      },
+      "dest": {
+        "lnp": {
+          "kept": 56,
+          "onp": 35,
+          "cross": 4,
+          "grn": 2,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 71,
+          "onp": 11,
+          "cross": 8,
+          "grn": 4,
+          "oth": 6
+        }
       },
       "implied": 26.5,
       "onp": 26
@@ -35180,6 +35513,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 3,
         "oth": 23.8
       },
+      "dest": {
+        "lnp": {
+          "kept": 49,
+          "onp": 47,
+          "cross": 2,
+          "grn": 0,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 68,
+          "onp": 13,
+          "cross": 6,
+          "grn": 6,
+          "oth": 7
+        }
+      },
       "implied": 29.4,
       "onp": 30
     }, {
@@ -35209,6 +35558,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "alp": 14,
         "grn": 5,
         "oth": 16
+      },
+      "dest": {
+        "lnp": {
+          "kept": 52,
+          "onp": 35,
+          "cross": 8,
+          "grn": 2,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 68,
+          "onp": 14,
+          "cross": 8,
+          "grn": 6,
+          "oth": 4
+        }
       },
       "implied": 25.1,
       "onp": 26
@@ -35240,6 +35605,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 2,
         "oth": 23.1
       },
+      "dest": {
+        "lnp": {
+          "kept": 52,
+          "onp": 38,
+          "cross": 6,
+          "grn": 1,
+          "oth": 3
+        },
+        "alp": {
+          "kept": 65,
+          "onp": 15,
+          "cross": 9,
+          "grn": 6,
+          "oth": 5
+        }
+      },
       "implied": 26.9,
       "onp": 27
     }, {
@@ -35270,6 +35651,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "grn": 8,
         "oth": 30.5
       },
+      "dest": {
+        "lnp": {
+          "kept": 52,
+          "onp": 39,
+          "cross": 5,
+          "grn": 2,
+          "oth": 2
+        },
+        "alp": {
+          "kept": 67,
+          "onp": 13,
+          "cross": 8,
+          "grn": 8,
+          "oth": 4
+        }
+      },
       "implied": 28.3,
       "onp": 28
     }],
@@ -35282,7 +35679,2626 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "ind": 7.27,
       "oth": 7.74,
       "source": "AEC 2025 federal election, first preferences (event 31496; independents split from other minor parties)"
-    }
+    },
+    "going": [{
+      "id": "lnp",
+      "weight": 31.82,
+      "dests": [{
+        "id": "kept",
+        "now": {
+          "v": 51.9,
+          "se": 1.7,
+          "ci95": 3.3,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 55.7,
+          "chg": -3.8,
+          "changeCi95": 10.6,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 56.2,
+          "ci95": 9.8,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 57.8,
+          "ci95": 3.9,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 56.7,
+          "ci95": 6.8,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 58.4,
+          "ci95": 3.4,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 49.1,
+          "ci95": 3.9,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 56,
+          "ci95": 2.9,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 60.1,
+          "ci95": 6.9,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 51,
+          "ci95": 3.3,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 52,
+          "ci95": 5.7,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 46
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 59
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 63
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 55
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 58.3
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 54
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 63
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 52
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 58
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 57
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 60
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 51
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 51
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 45
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 57
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 54
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 56
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 57
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 67
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 56
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 49
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 52
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 52
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 52
+        }]
+      }, {
+        "id": "onp",
+        "now": {
+          "v": 38,
+          "se": 1.8,
+          "ci95": 3.5,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 39.5,
+          "chg": -1.5,
+          "changeCi95": 10.4,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 34.2,
+          "ci95": 5,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 34.7,
+          "ci95": 2.2,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 35.8,
+          "ci95": 4.2,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 34.8,
+          "ci95": 3.2,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 44.3,
+          "ci95": 3.3,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 37.5,
+          "ci95": 2.9,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 34,
+          "ci95": 3.1,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 39.7,
+          "ci95": 7.2,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 39,
+          "ci95": 5.5,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 38
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 35
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 29
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 36
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 34.4
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 37
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 32
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 39
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 33
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 34
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 37
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 44
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 43
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 46
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 37
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 38
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 38
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 36
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 31
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 35
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 47
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 35
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 38
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 39
+        }]
+      }, {
+        "id": "cross",
+        "now": {
+          "v": 5.9,
+          "se": 1.06,
+          "ci95": 2.1,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 2.3,
+          "chg": 3.6,
+          "changeCi95": 2.6,
+          "changeSig": true
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 6.1,
+          "ci95": 3.7,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 3.4,
+          "ci95": 2.2,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 4,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 3.6,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 3,
+          "ci95": 1.1,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 3.7,
+          "ci95": 2,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 3,
+          "ci95": 2,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 5.5,
+          "ci95": 3.5,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 5,
+          "ci95": 2.5,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 10
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 4
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 5
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 3.1
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 3
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 5
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 3
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 3
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 2
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 3
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 3
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 6
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 3
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 4
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 1
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 4
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 2
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 8
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 6
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 5
+        }]
+      }, {
+        "id": "grn",
+        "now": {
+          "v": 1.7,
+          "se": 0.44,
+          "ci95": 0.9,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 0.5,
+          "chg": 1.2,
+          "changeCi95": 1.4,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 1.2,
+          "ci95": 1.8,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 0.8,
+          "ci95": 1.2,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 0.6,
+          "ci95": 0.7,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 1,
+          "ci95": 1.2,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 0.7,
+          "ci95": 0.6,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 0.5,
+          "ci95": 0.8,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 0.7,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 1.1,
+          "ci95": 1.2,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 2,
+          "ci95": 1.6,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 3
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 0
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 1
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 0
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 1
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 1
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 0
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 1
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 1
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 2
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 0
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 0
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 1
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 1
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 1
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 0
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 0
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 0
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 0
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 2
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 0
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 2
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 1
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 2
+        }]
+      }, {
+        "id": "oth",
+        "now": {
+          "v": 2.5,
+          "se": 0.53,
+          "ci95": 1,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 2,
+          "chg": 0.5,
+          "changeCi95": 1.5,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 2.3,
+          "ci95": 1,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 3.2,
+          "ci95": 1.1,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 2.9,
+          "ci95": 1.1,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 1.9,
+          "ci95": 2,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 2.6,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 2.5,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 2.3,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 2.7,
+          "ci95": 1.1,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 2,
+          "ci95": 1.6,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 3
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 2
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 2
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 4
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 3.1
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 2
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 3
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 3
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 3
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 0
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 2
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 2
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 2
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 2
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 4
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 3
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 1
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 3
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 2
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 3
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 3
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 2
+        }]
+      }]
+    }, {
+      "id": "alp",
+      "weight": 34.56,
+      "dests": [{
+        "id": "kept",
+        "now": {
+          "v": 66.9,
+          "se": 1.54,
+          "ci95": 3,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 70.5,
+          "chg": -3.7,
+          "changeCi95": 4.6,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 72.8,
+          "ci95": 5.9,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 74.9,
+          "ci95": 1.9,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 74,
+          "ci95": 2.7,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 72.5,
+          "ci95": 4.2,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 71.3,
+          "ci95": 2.9,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 70,
+          "ci95": 2.6,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 72.7,
+          "ci95": 2.8,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 67.1,
+          "ci95": 3,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 67,
+          "ci95": 5.1,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 67
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 77
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 73
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 76
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 74.7
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 76
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 74
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 72
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 77
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 70
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 71
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 71
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 71
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 72
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 70
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 68
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 72
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 73
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 74
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 71
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 68
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 68
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 65
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 67
+        }]
+      }, {
+        "id": "onp",
+        "now": {
+          "v": 13.7,
+          "se": 1.12,
+          "ci95": 2.2,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 12.9,
+          "chg": 0.8,
+          "changeCi95": 3,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 12.9,
+          "ci95": 2.1,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 12.2,
+          "ci95": 3.1,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 11.8,
+          "ci95": 2.4,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 12.9,
+          "ci95": 5.1,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 15.1,
+          "ci95": 2.3,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 14.5,
+          "ci95": 3.2,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 12.4,
+          "ci95": 2.6,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 14,
+          "ci95": 2.2,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 13,
+          "ci95": 3.7,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 15
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 12
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 12
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 10
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 12.6
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 10
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 14
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 11
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 8
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 13
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 17
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 14
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 16
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 15
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 16
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 15
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 11
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 11
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 15
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 11
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 13
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 14
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 15
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 13
+        }]
+      }, {
+        "id": "cross",
+        "now": {
+          "v": 8.1,
+          "se": 0.89,
+          "ci95": 1.7,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 6.5,
+          "chg": 1.7,
+          "changeCi95": 2.3,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 5.4,
+          "ci95": 2.8,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 4.3,
+          "ci95": 0.9,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 5.4,
+          "ci95": 1.4,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 6.4,
+          "ci95": 1.6,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 6.3,
+          "ci95": 1.5,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 6.2,
+          "ci95": 1.4,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 6.7,
+          "ci95": 1.6,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 7.6,
+          "ci95": 1.7,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 8,
+          "ci95": 3,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 7
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 3
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 7
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 5
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 4.2
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 6
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 6
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 7
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 7
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 7
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 6
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 6
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 6
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 6
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 7
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 6
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 6
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 8
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 6
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 8
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 9
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 8
+        }]
+      }, {
+        "id": "grn",
+        "now": {
+          "v": 6.9,
+          "se": 0.83,
+          "ci95": 1.6,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 4.7,
+          "chg": 2.2,
+          "changeCi95": 2.4,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 5,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 5.4,
+          "ci95": 1,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 4.6,
+          "ci95": 1.8,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 5,
+          "ci95": 2.3,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 3.6,
+          "ci95": 1.2,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 5.2,
+          "ci95": 1.3,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 4,
+          "ci95": 1.2,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 6,
+          "ci95": 1.5,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 8,
+          "ci95": 3,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 5
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 5
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 6
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 5.3
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 6
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 3
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 5
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 7
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 3
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 4
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 3
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 5
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 5
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 6
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 5
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 3
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 4
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 6
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 6
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 6
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 8
+        }]
+      }, {
+        "id": "oth",
+        "now": {
+          "v": 4.4,
+          "se": 0.67,
+          "ci95": 1.3,
+          "n": 4,
+          "nEff": 2.9,
+          "prev": 5.4,
+          "chg": -1,
+          "changeCi95": 3.1,
+          "changeSig": false
+        },
+        "monthly": [{
+          "ym": "2026-02",
+          "x": 2026.125,
+          "v": 3.9,
+          "ci95": 2,
+          "k": 3
+        }, {
+          "ym": "2026-03",
+          "x": 2026.2083333333333,
+          "v": 3.2,
+          "ci95": 0.8,
+          "k": 2
+        }, {
+          "ym": "2026-04",
+          "x": 2026.2916666666667,
+          "v": 4.3,
+          "ci95": 1.8,
+          "k": 3
+        }, {
+          "ym": "2026-05",
+          "x": 2026.375,
+          "v": 3.3,
+          "ci95": 1.7,
+          "k": 3
+        }, {
+          "ym": "2026-06",
+          "x": 2026.4583333333333,
+          "v": 4,
+          "ci95": 1.2,
+          "k": 3
+        }, {
+          "ym": "2026-07",
+          "x": 2026.5416666666667,
+          "v": 4.2,
+          "ci95": 2.5,
+          "k": 3
+        }, {
+          "ym": "2026-08",
+          "x": 2026.625,
+          "v": 4.3,
+          "ci95": 2.4,
+          "k": 3
+        }, {
+          "ym": "2026-09",
+          "x": 2026.7083333333333,
+          "v": 5.3,
+          "ci95": 1.8,
+          "k": 3
+        }, {
+          "ym": "2026-10",
+          "x": 2026.7916666666667,
+          "v": 4,
+          "ci95": 2.1,
+          "k": 1
+        }],
+        "polls": [{
+          "x": 2026.109589041096,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Feb",
+          "released": "2026-02-10",
+          "sample": 1561,
+          "v": 6
+        }, {
+          "x": 2026.13698630137,
+          "ym": "2026-02",
+          "pollster": "DemosAU",
+          "dateLabel": "16–20 Feb",
+          "released": "2026-02-20",
+          "sample": 1551,
+          "v": 3
+        }, {
+          "x": 2026.1479452054793,
+          "ym": "2026-02",
+          "pollster": "YouGov",
+          "dateLabel": "17–24 Feb",
+          "released": "2026-02-24",
+          "sample": 1500,
+          "v": 3
+        }, {
+          "x": 2026.186301369863,
+          "ym": "2026-03",
+          "pollster": "YouGov",
+          "dateLabel": "3–10 Mar",
+          "released": "2026-03-10",
+          "sample": 1425,
+          "v": 3
+        }, {
+          "x": 2026.2109589041097,
+          "ym": "2026-03",
+          "pollster": "RedBridge/Accent",
+          "dateLabel": "6–19 Mar",
+          "released": "2026-03-19",
+          "sample": 5563,
+          "v": 3.2
+        }, {
+          "x": 2026.2630136986302,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "31 Mar–7 Apr",
+          "released": "2026-04-07",
+          "sample": 1502,
+          "v": 4
+        }, {
+          "x": 2026.282191780822,
+          "ym": "2026-04",
+          "pollster": "DemosAU",
+          "dateLabel": "9–14 Apr",
+          "released": "2026-04-14",
+          "sample": 1439,
+          "v": 3
+        }, {
+          "x": 2026.3013698630136,
+          "ym": "2026-04",
+          "pollster": "YouGov",
+          "dateLabel": "14–21 Apr",
+          "released": "2026-04-21",
+          "sample": 1501,
+          "v": 6
+        }, {
+          "x": 2026.3397260273973,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "28 Apr–5 May",
+          "released": "2026-05-05",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.3780821917808,
+          "ym": "2026-05",
+          "pollster": "YouGov",
+          "dateLabel": "12–19 May",
+          "released": "2026-05-19",
+          "sample": 1504,
+          "v": 3
+        }, {
+          "x": 2026.3808219178081,
+          "ym": "2026-05",
+          "pollster": "DemosAU",
+          "dateLabel": "15–20 May",
+          "released": "2026-05-20",
+          "sample": 1502,
+          "v": 2
+        }, {
+          "x": 2026.4164383561645,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "26 May–2 Jun",
+          "released": "2026-06-02",
+          "sample": 1471,
+          "v": 5
+        }, {
+          "x": 2026.4602739726026,
+          "ym": "2026-06",
+          "pollster": "DemosAU",
+          "dateLabel": "16–18 Jun",
+          "released": "2026-06-18",
+          "sample": 1497,
+          "v": 4
+        }, {
+          "x": 2026.4931506849316,
+          "ym": "2026-06",
+          "pollster": "YouGov",
+          "dateLabel": "23–30 Jun",
+          "released": "2026-06-30",
+          "sample": 1502,
+          "v": 3
+        }, {
+          "x": 2026.5150684931507,
+          "ym": "2026-07",
+          "pollster": "DemosAU",
+          "dateLabel": "3–8 Jul",
+          "released": "2026-07-08",
+          "sample": 2694,
+          "v": 3
+        }, {
+          "x": 2026.531506849315,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "7–14 Jul",
+          "released": "2026-07-14",
+          "sample": 1468,
+          "v": 7
+        }, {
+          "x": 2026.5698630136985,
+          "ym": "2026-07",
+          "pollster": "YouGov",
+          "dateLabel": "21–28 Jul",
+          "released": "2026-07-28",
+          "sample": 1519,
+          "v": 4
+        }, {
+          "x": 2026.6054794520549,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "4–10 Aug",
+          "released": "2026-08-10",
+          "sample": 1511,
+          "v": 5
+        }, {
+          "x": 2026.6328767123289,
+          "ym": "2026-08",
+          "pollster": "DemosAU",
+          "dateLabel": "18–20 Aug",
+          "released": "2026-08-20",
+          "sample": 1562,
+          "v": 2
+        }, {
+          "x": 2026.6438356164383,
+          "ym": "2026-08",
+          "pollster": "YouGov",
+          "dateLabel": "18–24 Aug",
+          "released": "2026-08-24",
+          "sample": 1510,
+          "v": 6
+        }, {
+          "x": 2026.6849315068494,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "1–8 Sep",
+          "released": "2026-09-08",
+          "sample": 1504,
+          "v": 7
+        }, {
+          "x": 2026.7013698630137,
+          "ym": "2026-09",
+          "pollster": "DemosAU",
+          "dateLabel": "10–14 Sep",
+          "released": "2026-09-14",
+          "sample": 1583,
+          "v": 4
+        }, {
+          "x": 2026.7205479452055,
+          "ym": "2026-09",
+          "pollster": "YouGov",
+          "dateLabel": "15–21 Sep",
+          "released": "2026-09-21",
+          "sample": 1500,
+          "v": 5
+        }, {
+          "x": 2026.7616438356165,
+          "ym": "2026-10",
+          "pollster": "YouGov",
+          "dateLabel": "29 Sep–6 Oct",
+          "released": "2026-10-06",
+          "sample": 1500,
+          "v": 4
+        }]
+      }]
+    }]
   };
   const leaderNow = {
     "alb_net": {
@@ -110724,6 +113740,7 @@ function RdSwitching({
   const S = D.onSources;
   const boxRef = React.useRef(null);
   const W = useRdWidth(boxRef, 1152);
+  const [view, setView] = useState("onp");
   if (!S || !S.series.length || !S.series.every(sr => sr.rate)) return null;
   const Wt = S.weights || {};
   const byId = {};
@@ -110834,6 +113851,313 @@ function RdSwitching({
     label: D.monthName(Number(ym.slice(5)))
   })) : [];
   const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap(c => pollRate(c.id).map(d => d.y).concat(c.sr.rate.monthly.map(m => m.v + (m.ci95 || 0))))) / 25) * 25);
+  const goRow = view !== "onp" ? (S.going || []).find(g => g.id === view) : null;
+  const V = goRow ? view : "onp";
+  const GO_NEXT = {
+    onp: "lnp",
+    lnp: "alp",
+    alp: "onp"
+  };
+  const GO_COHORT_W = {
+    lnp: "2025 Coalition voters",
+    alp: "2025 Labor voters"
+  };
+  const GO_OWN = {
+    lnp: "the Coalition",
+    alp: "Labor"
+  };
+  const GO_OTHER = {
+    lnp: "alp",
+    alp: "lnp"
+  };
+  const GO_HALF = {
+    lnp: "Coalition",
+    alp: "Labor"
+  };
+  const cyc = () => setView(GO_NEXT[V]);
+  const GO_HINT = {
+    onp: "Tap: where 2025 Coalition voters are going",
+    lnp: "Tap: where 2025 Labor voters are going",
+    alp: "Tap: where One Nation's voters came from"
+  };
+  const cycTitle = (() => {
+    const btn = w => React.createElement("button", {
+      type: "button",
+      className: "rd-sw-cycle",
+      title: GO_HINT[V],
+      "aria-label": GO_HINT[V],
+      onClick: cyc
+    }, w);
+    if (V === "lnp") return React.createElement(React.Fragment, null, "Where ", btn("the Coalition"), "\u2019s voters are going");
+    if (V === "alp") return React.createElement(React.Fragment, null, "Where ", btn("Labor"), "\u2019s voters are going");
+    return React.createElement(React.Fragment, null, "Where ", btn("One Nation"), "\u2019s voters came from");
+  })();
+  const goWords = id => {
+    const other = GO_OTHER[V];
+    const M = {
+      kept: {
+        nm: V === "lnp" ? "The Coalition" : "Labor",
+        noun: GO_OWN[V],
+        sd: "the share staying with " + GO_OWN[V],
+        color: "var(--" + V + ")",
+        tint: "var(--tint-" + V + ")",
+        fill: "var(--on-fill-" + V + ")"
+      },
+      onp: {
+        nm: "One Nation",
+        noun: "One Nation",
+        sd: "the move to One Nation",
+        color: "var(--onp)",
+        tint: "var(--tint-onp)",
+        fill: "var(--on-fill-onp)"
+      },
+      cross: {
+        nm: V === "lnp" ? "Labor" : "The Coalition",
+        noun: V === "lnp" ? "Labor" : "the Coalition",
+        sd: "the move to " + (V === "lnp" ? "Labor" : "the Coalition"),
+        color: "var(--" + other + ")",
+        tint: "var(--tint-" + other + ")",
+        fill: "var(--on-fill-" + other + ")"
+      },
+      grn: {
+        nm: "The Greens",
+        noun: "the Greens",
+        sd: "the move to the Greens",
+        color: "var(--grn)",
+        tint: "var(--tint-grn)",
+        fill: "var(--on-fill-grn)"
+      },
+      oth: {
+        nm: "Minors & independents",
+        noun: "minor parties or independents",
+        sd: "the move to minors or independents",
+        color: "var(--oth)",
+        tint: "var(--tint-oth)",
+        fill: "var(--on-fill-oth)"
+      }
+    };
+    return M[id];
+  };
+  const goShareWords = p => rdFracSnap(p).err < 0.025 || p >= 15 ? rdFraction(p) : "about one in " + Math.max(2, Math.round(100 / p));
+  const goRows = goRow ? goRow.dests.filter(d => d.now && d.now.v > 0).map(d => ({
+    id: d.id,
+    ...goWords(d.id),
+    now: d.now,
+    monthly: d.monthly,
+    polls: d.polls
+  })) : [];
+  const goKept = goRows.find(r => r.id === "kept");
+  const goHead = goKept && V !== "onp" ? rdCap(plainShare(goKept.now.v)) + " 2025 " + GO_HALF[V] + " voters are sticking with " + GO_OWN[V] : null;
+  const goRest = goRows.filter(r => r.id !== "kept").sort((a, b) => b.now.v - a.now.v);
+  const gd1 = goRest[0],
+    gd2 = goRest[1];
+  const goDek = !gd1 ? null : !(gd2 && gd2.now.v > 0.2) ? rdCap(goShareWords(gd1.now.v)) + " have moved to " + gd1.noun + ". The rest are scattered." : gd1.now.v - gd2.now.v <= Math.hypot(gd1.now.ci95 || 0, gd2.now.ci95 || 0) ? rdCap(gd1.noun) + " and " + gd2.noun + " have drawn " + GO_COHORT_W[V] + " at much the same rate — about " + goShareWords(gd1.now.v) + " and " + goShareWords(gd2.now.v) + "." : rdCap(goShareWords(gd1.now.v)) + " have moved to " + gd1.noun + " and " + goShareWords(gd2.now.v) + " to " + gd2.noun + ". ";
+  const goDots = r => r.polls.map(p => ({
+    x: p.x,
+    y: p.v,
+    h: p.pollster,
+    w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3),
+    meta: {
+      pollster: p.pollster,
+      released: p.released,
+      dateLabel: "",
+      sample: p.sample
+    }
+  }));
+  const goDotsClipped = r => goDots(r).filter(d => d.x >= x0 && d.x <= x1 + 0.02);
+  const goFits = goRows.map(r => ({
+    r,
+    fit: withinHouseSlope(r.polls.map(p => ({
+      h: p.pollster,
+      t: p.x,
+      w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3),
+      y: p.v
+    })))
+  })).filter(f => f.fit);
+  const goSig = [];
+  for (const [i, f] of [...goFits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (goFits.length - i)) break;
+    goSig.push(f);
+  }
+  const goSinceM = goRows.length && goRows[0].monthly.length ? D.monthNameFull(Number(goRows[0].monthly[0].ym.slice(5))) : "";
+  const goSubHead = !goSig.length ? "The shares have held since " + goSinceM : goSig.length === goRows.length ? "Every share has " + (goSig.every(f => f.fit.b > 0) ? "risen" : goSig.every(f => f.fit.b < 0) ? "fallen" : "moved") + " since " + goSinceM : "The shares have held since " + goSinceM + ", except for " + rdList(goSig.map(f => f.r.sd)) + ", which " + (goSig.length > 1 ? "have" : "has") + " " + (goSig.every(f => f.fit.b < 0) ? "fallen" : goSig.every(f => f.fit.b > 0) ? "risen" : "moved");
+  const goKs = goRows.flatMap(r => r.monthly.map(m => m.k)).filter(k => k != null);
+  const gkLo = goKs.length ? Math.min(...goKs) : 0,
+    gkHi = goKs.length ? Math.max(...goKs) : 0;
+  const goSubDek = "Where " + GO_COHORT_W[V] + " have landed: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. " + (gkLo ? "A month rests on " + (gkLo === gkHi ? rdNumWord(gkLo) : rdNumWord(gkLo) + " to " + rdNumWord(gkHi)) + " polls, so a move that stays inside the band is noise. " : "") + "Each chart sets its own scale: the kept share dwarfs every destination.";
+  const goSec = V === "onp" ? null : React.createElement(React.Fragment, null, goHead && React.createElement(RdHed, {
+    head: goHead,
+    dek: goDek
+  }), React.createElement("div", {
+    className: "card rd-card rd-go-wrap"
+  }, React.createElement("div", {
+    className: "rd-go-rows"
+  }, goRows.map(r => {
+    const inBar = r.now.v >= 18;
+    return React.createElement("div", {
+      key: r.id,
+      className: "rd-go-row"
+    }, React.createElement("div", {
+      className: "rd-go-rtop"
+    }, React.createElement("b", {
+      style: {
+        color: inkOf(r.color)
+      }
+    }, r.nm, r.id === "kept" ? ", kept" : ""), React.createElement("b", null, r.now.v.toFixed(1), "%")), React.createElement("div", {
+      className: "rd-go-rsub"
+    }, React.createElement("span", null, goShareWords(r.now.v)), React.createElement("span", null, "95% interval \xB1", r.now.ci95.toFixed(1))), React.createElement("div", {
+      className: "rd-go-rbar",
+      style: {
+        background: r.tint
+      }
+    }, React.createElement("span", {
+      style: {
+        width: r.now.v + "%",
+        background: r.color
+      }
+    }), React.createElement("em", {
+      style: inBar ? {
+        left: 12,
+        color: r.fill
+      } : {
+        left: "calc(" + r.now.v + "% + 8px)",
+        color: "var(--ink)"
+      }
+    }, r.now.v.toFixed(1), "%")));
+  })), React.createElement("p", {
+    className: "rd-note rd-go-note"
+  }, "Shares of all ", GO_COHORT_W[V], "; the five destinations sum to the cohort.")), React.createElement(RdSub, {
+    head: goSubHead,
+    dek: goSubDek
+  }), React.createElement("div", {
+    className: "rd-sm-grid"
+  }, goRows.map(r => {
+    const pts = filterPts(r.monthly, x0).map(m => ({
+      x: m.x,
+      y: m.v,
+      ym: m.ym,
+      ci: m.ci95
+    }));
+    const band = pts.filter(p => p.ci != null).map(p => ({
+      x: p.x,
+      y0: Math.max(0, p.y - p.ci),
+      y1: p.y + p.ci
+    }));
+    const dots = goDotsClipped(r).map(d => ({
+      x: d.x,
+      y: d.y,
+      color: r.color,
+      label: r.noun,
+      meta: d.meta
+    }));
+    const top = Math.max(10, Math.ceil(Math.max(...r.polls.map(p => p.v).concat(r.monthly.map(m => m.v + (m.ci95 || 0)))) / 25) * 25);
+    const step = top >= 50 ? 25 : top >= 25 ? 10 : 5;
+    return React.createElement("div", {
+      key: r.id,
+      className: "card rd-card rd-sm"
+    }, React.createElement("div", {
+      className: "rd-sm-top"
+    }, React.createElement("span", {
+      style: {
+        color: inkOf(r.color)
+      }
+    }, r.nm), React.createElement("b", null, r.now.v.toFixed(1), "%")), React.createElement(TrendChart, {
+      key: "rd-go-" + r.id,
+      heightPx: narrow ? 120 : 150,
+      padPx: {
+        l: 4,
+        r: 4,
+        t: 18,
+        b: 24
+      },
+      xDomain: [x0, x1],
+      yDomain: [0, top],
+      yTicks: rdYTicks(0, top, step),
+      yTickFmt: () => "",
+      xTicks: smTicks,
+      baseline: true,
+      series: [{
+        id: r.id,
+        label: r.noun,
+        color: r.color,
+        rdWidth: narrow ? 2 : 2.5,
+        endCap: false,
+        points: pts
+      }],
+      spine: pts,
+      scatter: dots,
+      pollFacet: "demographics",
+      areas: band.length >= 2 ? [{
+        id: "ci-go-" + r.id,
+        color: r.color,
+        className: "ci-band",
+        edge: false,
+        points: band
+      }] : [],
+      notes: rdYTicks(step, top, step).map(v => ({
+        x: "left",
+        y: v,
+        dy: -4,
+        text: v + "%",
+        size: 11,
+        cls: "rd-sm-ylab"
+      })),
+      tooltipTitle: i => pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "",
+      extraRows: i => pts[i] && pts[i].ci != null ? [{
+        label: "95% interval",
+        value: "±" + pts[i].ci.toFixed(1)
+      }] : [],
+      fmt: v => v.toFixed(1),
+      copy: {
+        title: GO_COHORT_W[V] + " now backing " + r.noun,
+        sub: "Share of those who voted " + (V === "lnp" ? "for the Coalition" : "Labor") + " at the 2025 election who now say they would vote " + r.noun + ", month by month",
+        legend: [{
+          label: "Monthly average",
+          color: r.color,
+          kind: "line"
+        }, {
+          label: "95% interval",
+          color: r.color,
+          kind: "band"
+        }]
+      }
+    }));
+  })), React.createElement(RdKey, {
+    className: "rd-ckey rd-sm-key",
+    items: [{
+      kind: "dot",
+      color: "var(--ink-3)",
+      label: "One poll"
+    }, {
+      kind: "lineband",
+      color: "var(--ink-3)",
+      label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval"
+    }]
+  }), React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: [GO_HALF[V] + " voters’ destination", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"],
+    sets: [{
+      key: "main",
+      rows: goRows.map(r => {
+        const ms = r.monthly,
+          fe = goFits.find(x => x.r === r),
+          f = fe && fe.fit,
+          sg = !!fe && goSig.includes(fe);
+        return {
+          key: r.id,
+          name: r.nm + (r.id === "kept" ? ", kept" : ""),
+          sig: sg,
+          cells: [rdTsSgn(ms[0].v) + " → " + rdTsSgn(ms[ms.length - 1].v), f ? rdTsSgn(f.b, true) : "–", f ? rdTsSgn(f.t) : "–", sg ? "Yes" : "No"]
+        };
+      })
+    }],
+    note: "Shares are pooled across pollsters; a destination’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample and the cohort’s share of it), Holm’s correction applied across the five destinations, so Yes means the slope clears 95% — the test behind the “since " + goSinceM + "” line above."
+  }), React.createElement(RdFoot, {
+    how: {
+      term: "vote-switching",
+      from: V === "lnp" ? "Where the Coalition’s voters are going" : "Where Labor’s voters are going"
+    }
+  }, "2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. Where a house prints an undecided cell for a cohort the row is re-scaled to its decided shares."));
   const GAP = 4,
     H = narrow ? 0 : 240;
   const all = cols.concat(onpW ? [{
@@ -111031,9 +114355,9 @@ function RdSwitching({
   return React.createElement(RdSec, {
     id: "switching",
     cls: "rd-sw",
-    title: "Where One Nation\u2019s voters came from",
+    title: cycTitle,
     meta: "How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")
-  }, head && React.createElement(RdHed, {
+  }, V === "onp" ? React.createElement(React.Fragment, null, head && React.createElement(RdHed, {
     head: head,
     dek: dek
   }), React.createElement("div", {
@@ -111186,7 +114510,7 @@ function RdSwitching({
       term: "vote-switching",
       from: "Where One Nation’s voters came from"
     }
-  }, "2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. ", narrow ? "Bar heights" : "Column widths", " use the AEC 2025 first-preference result."));
+  }, "2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. ", narrow ? "Bar heights" : "Column widths", " use the AEC 2025 first-preference result.")) : goSec);
 }
 function rdIssTrend(D, it, dots) {
   if (!dots.length) return null;

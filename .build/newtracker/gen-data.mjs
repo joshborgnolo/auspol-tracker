@@ -2728,6 +2728,31 @@ const ON_SOURCE_GROUPS = [
   { id: "oth", label: "Other voters", color: "var(--oth)", note: "voted for another party or an independent in 2025" },
   { id: "grn", label: "Greens voters", color: "var(--grn)", note: "voted Greens in 2025" },
 ];
+/* The reverse read of the same recall tables (the "where they're going"
+   views of §5b): a wave's 2025-cohort row as five DESTINATION shares of
+   that cohort – kept (the cohort's own party), onp, cross (the other
+   major), grn, and oth, which folds the independents and YouGov's
+   community-strong cell in, as the gain shares' oth branch already does.
+   RedBridge's printed `und` residue cell (no other house prints one) is
+   renormalised out so a row still sums to its decided cohort; absent cells
+   read as zero, the gain rates' own convention (a chart read rounds small
+   cells away). */
+const GO_COHORTS = ["lnp", "alp"];
+const GO_DESTS = ["kept", "onp", "cross", "grn", "oth"];
+const goDestRow = (row, cohort) => {
+  if (!row) return null;
+  const und = Math.min(99, row.und ?? 0), k = 100 / (100 - und);
+  const cell = (name) => (row[name] ?? 0) * k;
+  const cs = (row["community-strong"] ?? row["community-strong-australia"] ?? 0) * k;
+  const out = {
+    kept: cell(cohort),
+    onp: cell("onp"),
+    cross: cell(cohort === "lnp" ? "alp" : "lnp"),
+    grn: cell("grn"),
+    oth: cell("oth") + cell("ind") + cs,
+  };
+  return Object.fromEntries(GO_DESTS.map((d) => [d, r1(out[d])]));
+};
 const onSourceWaves = (() => {
   if (!Array.isArray(VOTE_SWITCHING?.waves) || !VOTE_SWITCHING.weights2025) return [];
   const W = VOTE_SWITCHING.weights2025;
@@ -2756,6 +2781,8 @@ const onSourceWaves = (() => {
       // other parties folded at their own 2025 weights, to match DemosAU)
       toOn: { lnp: toOn("lnp"), alp: toOn("alp"), grn: toOn("grn"),
               oth: w.rows.ind ? r1((W.ind * toOn("ind") + W.oth * toOn("oth")) / (W.ind + W.oth)) : toOn("oth") },
+      // the Coalition and Labor rows as destination shares (goDestRow)
+      dest: { lnp: goDestRow(w.rows.lnp, "lnp"), alp: goDestRow(w.rows.alp, "alp") },
       // what the table itself adds up to (gains + kept; DemosAU's non-recall
       // group excluded) beside the wave's published One Nation primary
       implied: r1(drawn + kept), onp: w.onp,
@@ -2792,6 +2819,43 @@ const onRateRows = (() => {
   }
   return out;
 })();
+/* Where a 2025 cohort's voters are GOING: each destination share pooled
+   like the gain rates above (six-week nowcast, month-by-month lines), each
+   wave's row weighted by the cohort's share of that poll's sample. Derived
+   from the same waves' dest rows, so the wave set and weights are §5b's
+   own; unlike the gain split, nothing here needs re-weighting through the
+   2025 result – a cohort's destination row is already conditional on it. */
+const goRateRows = (() => {
+  const out = {};
+  for (const c of GO_COHORTS) out[c] = Object.fromEntries(GO_DESTS.map((d) => [d, []]));
+  if (!onSourceWaves.length) return out;
+  const W = VOTE_SWITCHING.weights2025;
+  for (const w of onSourceWaves) {
+    const p = POLL_BY_KEY.get(w.date + "|" + w.pollster);
+    const n = rowN(p || { sample: w.sample }), mid = midMs(p || { dateStart: w.dateStart, date: w.date });
+    for (const c of GO_COHORTS) {
+      if (!w.dest?.[c]) continue;
+      for (const d of GO_DESTS) out[c][d].push({ ym: w.ym, mid, x: w.dest[c][d], n: n * W[c] / 100, firm: w.pollster });
+    }
+  }
+  return out;
+})();
+const going = !onSourceWaves.length ? [] : GO_COHORTS.map((c) => ({
+  id: c,
+  weight: VOTE_SWITCHING.weights2025[c],
+  dests: GO_DESTS.map((d) => ({
+    id: d,
+    now: currentReading(goRateRows[c][d], null, SPARSE_K),
+    monthly: MONTHS.map((ym) => {
+      const m = monthWithSe(goRateRows[c][d], null, ym);
+      return m && { ym, x: mx(ym), v: r1(m.v), ci95: r1(1.96 * m.se), k: m.n };
+    }).filter(Boolean),
+    polls: onSourceWaves.filter((w) => w.dest?.[c]).map((w) => ({
+      x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
+      sample: w.sample ?? null, v: w.dest[c][d],
+    })),
+  })),
+}));
 // the split from pooled rates: est[k] = { v: % of group k now One Nation, se }
 function onSplit(est) {
   if (ON_GAIN_KEYS.some((k) => !est[k])) return null;
@@ -2862,6 +2926,11 @@ const onSources = onSourceWaves.length ? {
   waves: onSourceWaves.map(({ x, ym, ...w }) => w),
   houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
   weights: VOTE_SWITCHING.weights2025,
+  /* the reverse read, for the panel's Coalition and Labor views: each
+     cohort's 2025 voters as destination shares (kept/onp/cross/grn/oth),
+     pooled nowcast + month-by-month, with a dot per poll – goDestRow's
+     folds documented there */
+  going,
 } : null;
 
 /* ---- 5c. the vote by group: the tables ---------------------------------------

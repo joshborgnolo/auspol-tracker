@@ -1433,6 +1433,24 @@ body.rd .rd-mo-rbar > em.rd-mo-first { display: flex; flex-direction: column; ga
 body.rd .rd-mo-big { font-size: 22px; font-weight: 600; }
 body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
 body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
+/* the section title's party name is a button: tapping it cycles One
+   Nation -> the Coalition -> Labor. It reads like the title text, plus the
+   dotted underline that marks the site's tap-to-swap words */
+body.rd .rd-sw-cycle { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
+body.rd .rd-sw-cycle:hover, body.rd .rd-sw-cycle:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
+/* where the majors' 2025 voters are going: one row per destination, the bar
+   a fraction of the cohort's full width - the kept bar dominates at 50-70% */
+body.rd .rd-go-wrap { margin-top: 36px; }
+body.rd .rd-go-rows { display: flex; flex-direction: column; gap: 14px; font-variant-numeric: tabular-nums; }
+body.rd .rd-go-rtop, body.rd .rd-go-rsub { display: flex; justify-content: space-between; gap: 12px; }
+body.rd .rd-go-rtop { font-size: 15px; }
+body.rd .rd-go-rtop b { font-weight: 600; }
+body.rd .rd-go-rsub { font-size: 12px; color: var(--ink-3); margin: 1px 0 6px; }
+body.rd .rd-go-rbar { position: relative; height: 26px; }
+body.rd .rd-go-rbar > span { position: absolute; left: 0; top: 0; bottom: 0; transition: width .32s var(--morph-ease); }
+body.rd .rd-go-rbar > em { position: absolute; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 15px; font-weight: 600; }
+body.rd .rd-go-note { margin-top: 12px; }
+@media (max-width: 640px) { body.rd .rd-go-wrap { margin-top: 28px; } }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
 body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }

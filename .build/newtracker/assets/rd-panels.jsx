@@ -3141,6 +3141,10 @@ function RdSwitching({ rangeId }) {
   const S = D.onSources;
   const boxRef = React.useRef(null);
   const W = useRdWidth(boxRef, 1152);
+  /* the panel's three views: where One Nation's new voters came from (the
+     default, and the one the probes gate on), and the reverse read of the
+     same waves - where each major 2025 cohort's voters have gone */
+  const [view, setView] = useState("onp");
   if (!S || !S.series.length || !S.series.every((sr) => sr.rate)) return null;
   const Wt = S.weights || {};
   const byId = {};
@@ -3221,6 +3225,160 @@ function RdSwitching({ rangeId }) {
   /* the scale clears the polls and the tops of the monthly bands */
   const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap((c) => pollRate(c.id).map((d) => d.y)
     .concat(c.sr.rate.monthly.map((m) => m.v + (m.ci95 || 0))))) / 25) * 25);
+
+  /* ---- where the majors' 2025 voters are going (the cycle views) -------------
+     The same waves read cohort-row-first: kept, gone to One Nation, gone to
+     the other major, gone to the Greens, gone to the minors - a full row
+     summing to the cohort, so no 2025-weight re-scaling is needed. */
+  const goRow = view !== "onp" ? (S.going || []).find((g) => g.id === view) : null;
+  const V = goRow ? view : "onp";
+  const GO_NEXT = { onp: "lnp", lnp: "alp", alp: "onp" };
+  const GO_COHORT_W = { lnp: "2025 Coalition voters", alp: "2025 Labor voters" };
+  const GO_OWN = { lnp: "the Coalition", alp: "Labor" };
+  const GO_OTHER = { lnp: "alp", alp: "lnp" };
+  const GO_HALF = { lnp: "Coalition", alp: "Labor" };
+  const cyc = () => setView(GO_NEXT[V]);
+  const GO_HINT = { onp: "Tap: where 2025 Coalition voters are going",
+                    lnp: "Tap: where 2025 Labor voters are going",
+                    alp: "Tap: where One Nation's voters came from" };
+  const cycTitle = (() => {
+    const btn = (w) => <button type="button" className="rd-sw-cycle" title={GO_HINT[V]} aria-label={GO_HINT[V]} onClick={cyc}>{w}</button>;
+    if (V === "lnp") return <>Where {btn("the Coalition")}’s voters are going</>;
+    if (V === "alp") return <>Where {btn("Labor")}’s voters are going</>;
+    return <>Where {btn("One Nation")}’s voters came from</>;
+  })();
+  /* a destination's words in the copy, by id: its display name, the noun in
+     a sentence, and the "the move to One Nation" form the trend line names */
+  const goWords = (id) => {
+    const other = GO_OTHER[V];
+    const M = {
+      kept: { nm: V === "lnp" ? "The Coalition" : "Labor",
+              noun: GO_OWN[V], sd: "the share staying with " + GO_OWN[V],
+              color: "var(--" + V + ")", tint: "var(--tint-" + V + ")", fill: "var(--on-fill-" + V + ")" },
+      onp: { nm: "One Nation", noun: "One Nation", sd: "the move to One Nation",
+             color: "var(--onp)", tint: "var(--tint-onp)", fill: "var(--on-fill-onp)" },
+      cross: { nm: V === "lnp" ? "Labor" : "The Coalition",
+               noun: V === "lnp" ? "Labor" : "the Coalition",
+               sd: "the move to " + (V === "lnp" ? "Labor" : "the Coalition"),
+               color: "var(--" + other + ")", tint: "var(--tint-" + other + ")", fill: "var(--on-fill-" + other + ")" },
+      grn: { nm: "The Greens", noun: "the Greens", sd: "the move to the Greens",
+             color: "var(--grn)", tint: "var(--tint-grn)", fill: "var(--on-fill-grn)" },
+      oth: { nm: "Minors & independents", noun: "minor parties or independents",
+             sd: "the move to minors or independents",
+             color: "var(--oth)", tint: "var(--tint-oth)", fill: "var(--on-fill-oth)" },
+    };
+    return M[id];
+  };
+  /* a share below the plain-fraction ladder's reach ("about one in twenty")
+     reads far enough out to say directly; the ladder's wording inside it */
+  const goShareWords = (p) => (rdFracSnap(p).err < 0.025 || p >= 15 ? rdFraction(p) : "about one in " + Math.max(2, Math.round(100 / p)));
+  const goRows = goRow ? goRow.dests.filter((d) => d.now && d.now.v > 0)
+    .map((d) => ({ id: d.id, ...goWords(d.id), now: d.now, monthly: d.monthly, polls: d.polls })) : [];
+  const goKept = goRows.find((r) => r.id === "kept");
+  const goHead = goKept && V !== "onp"
+    ? rdCap(plainShare(goKept.now.v)) + " 2025 " + GO_HALF[V] + " voters are sticking with " + GO_OWN[V]
+    : null;
+  const goRest = goRows.filter((r) => r.id !== "kept").sort((a, b) => b.now.v - a.now.v);
+  const gd1 = goRest[0], gd2 = goRest[1];
+  const goDek = !gd1 ? null
+    : (!(gd2 && gd2.now.v > 0.2) ? rdCap(goShareWords(gd1.now.v)) + " have moved to " + gd1.noun + ". The rest are scattered."
+      : (gd1.now.v - gd2.now.v <= Math.hypot(gd1.now.ci95 || 0, gd2.now.ci95 || 0)
+        ? rdCap(gd1.noun) + " and " + gd2.noun + " have drawn " + GO_COHORT_W[V] + " at much the same rate — about " + goShareWords(gd1.now.v) + " and " + goShareWords(gd2.now.v) + "."
+        : rdCap(goShareWords(gd1.now.v)) + " have moved to " + gd1.noun + " and " + goShareWords(gd2.now.v) + " to " + gd2.noun + ". "));
+  const goDots = (r) => r.polls.map((p) => ({
+    x: p.x, y: p.v, h: p.pollster, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3),
+    meta: { pollster: p.pollster, released: p.released, dateLabel: "", sample: p.sample } }));
+  const goDotsClipped = (r) => goDots(r).filter((d) => d.x >= x0 && d.x <= x1 + 0.02);
+  const goFits = goRows.map((r) => ({
+    r, fit: withinHouseSlope(r.polls.map((p) => ({ h: p.pollster, t: p.x, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3), y: p.v }))) })).filter((f) => f.fit);
+  const goSig = [];
+  for (const [i, f] of [...goFits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (goFits.length - i)) break;
+    goSig.push(f);
+  }
+  const goSinceM = goRows.length && goRows[0].monthly.length ? D.monthNameFull(Number(goRows[0].monthly[0].ym.slice(5))) : "";
+  /* the shares that moved, tested within each pollster, the rest said to
+     hold - the same construction as the gain rates' own head */
+  const goSubHead = !goSig.length ? "The shares have held since " + goSinceM
+    : goSig.length === goRows.length ? "Every share has " + (goSig.every((f) => f.fit.b > 0) ? "risen" : goSig.every((f) => f.fit.b < 0) ? "fallen" : "moved") + " since " + goSinceM
+    : "The shares have held since " + goSinceM + ", except for " + rdList(goSig.map((f) => f.r.sd)) + ", which "
+      + (goSig.length > 1 ? "have" : "has") + " " + (goSig.every((f) => f.fit.b < 0) ? "fallen" : goSig.every((f) => f.fit.b > 0) ? "risen" : "moved");
+  const goKs = goRows.flatMap((r) => r.monthly.map((m) => m.k)).filter((k) => k != null);
+  const gkLo = goKs.length ? Math.min(...goKs) : 0, gkHi = goKs.length ? Math.max(...goKs) : 0;
+  const goSubDek = "Where " + GO_COHORT_W[V] + " have landed: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. "
+    + (gkLo ? "A month rests on " + (gkLo === gkHi ? rdNumWord(gkLo) : rdNumWord(gkLo) + " to " + rdNumWord(gkHi)) + " polls, so a move that stays inside the band is noise. " : "")
+    + "Each chart sets its own scale: the kept share dwarfs every destination.";
+  const goSec = V === "onp" ? null : (
+    <>
+      {goHead && <RdHed head={goHead} dek={goDek} />}
+      <div className="card rd-card rd-go-wrap">
+        <div className="rd-go-rows">
+          {goRows.map((r) => {
+            const inBar = r.now.v >= 18;
+            return (
+              <div key={r.id} className="rd-go-row">
+                <div className="rd-go-rtop"><b style={{ color: inkOf(r.color) }}>{r.nm}{r.id === "kept" ? ", kept" : ""}</b><b>{r.now.v.toFixed(1)}%</b></div>
+                <div className="rd-go-rsub"><span>{goShareWords(r.now.v)}</span><span>95% interval ±{r.now.ci95.toFixed(1)}</span></div>
+                <div className="rd-go-rbar" style={{ background: r.tint }}>
+                  <span style={{ width: r.now.v + "%", background: r.color }}></span>
+                  <em style={inBar ? { left: 12, color: r.fill } : { left: "calc(" + r.now.v + "% + 8px)", color: "var(--ink)" }}>{r.now.v.toFixed(1)}%</em>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="rd-note rd-go-note">Shares of all {GO_COHORT_W[V]}; the five destinations sum to the cohort.</p>
+      </div>
+      <RdSub head={goSubHead} dek={goSubDek} />
+      <div className="rd-sm-grid">
+        {goRows.map((r) => {
+          const pts = filterPts(r.monthly, x0).map((m) => ({ x: m.x, y: m.v, ym: m.ym, ci: m.ci95 }));
+          const band = pts.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: Math.max(0, p.y - p.ci), y1: p.y + p.ci }));
+          const dots = goDotsClipped(r).map((d) => ({ x: d.x, y: d.y, color: r.color, label: r.noun, meta: d.meta }));
+          const top = Math.max(10, Math.ceil(Math.max(...r.polls.map((p) => p.v)
+            .concat(r.monthly.map((m) => m.v + (m.ci95 || 0)))) / 25) * 25);
+          const step = top >= 50 ? 25 : top >= 25 ? 10 : 5;
+          return (
+            <div key={r.id} className="card rd-card rd-sm">
+              <div className="rd-sm-top"><span style={{ color: inkOf(r.color) }}>{r.nm}</span><b>{r.now.v.toFixed(1)}%</b></div>
+              <TrendChart key={"rd-go-" + r.id} heightPx={narrow ? 120 : 150} padPx={{ l: 4, r: 4, t: 18, b: 24 }}
+                xDomain={[x0, x1]} yDomain={[0, top]} yTicks={rdYTicks(0, top, step)}
+                yTickFmt={() => ""} xTicks={smTicks} baseline
+                series={[{ id: r.id, label: r.noun, color: r.color, rdWidth: narrow ? 2 : 2.5, endCap: false, points: pts }]}
+                spine={pts}
+                scatter={dots}
+                pollFacet="demographics"
+                areas={band.length >= 2 ? [{ id: "ci-go-" + r.id, color: r.color, className: "ci-band", edge: false, points: band }] : []}
+                notes={rdYTicks(step, top, step).map((v) => ({ x: "left", y: v, dy: -4, text: v + "%", size: 11, cls: "rd-sm-ylab" }))}
+                tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
+                extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1) }] : [])}
+                fmt={(v) => v.toFixed(1)}
+                copy={{ title: GO_COHORT_W[V] + " now backing " + r.noun,
+                        sub: "Share of those who voted " + (V === "lnp" ? "for the Coalition" : "Labor") + " at the 2025 election who now say they would vote " + r.noun + ", month by month",
+                        legend: [{ label: "Monthly average", color: r.color, kind: "line" }, { label: "95% interval", color: r.color, kind: "band" }] }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <RdKey className="rd-ckey rd-sm-key" items={[
+        { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+        { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+      ]} />
+      <RdTsig summary="Trend-significance table"
+        heads={[GO_HALF[V] + " voters’ destination", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
+        sets={[{ key: "main", rows: goRows.map((r) => {
+          const ms = r.monthly, fe = goFits.find((x) => x.r === r), f = fe && fe.fit, sg = !!fe && goSig.includes(fe);
+          return { key: r.id, name: r.nm + (r.id === "kept" ? ", kept" : ""), sig: sg,
+            cells: [rdTsSgn(ms[0].v) + " → " + rdTsSgn(ms[ms.length - 1].v), f ? rdTsSgn(f.b, true) : "–", f ? rdTsSgn(f.t) : "–", sg ? "Yes" : "No"] };
+        }) }]}
+        note={"Shares are pooled across pollsters; a destination’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample and the cohort’s share of it), Holm’s correction applied across the five destinations, so Yes means the slope clears 95% — the test behind the “since " + goSinceM + "” line above."}
+      />
+      <RdFoot how={{ term: "vote-switching", from: V === "lnp" ? "Where the Coalition’s voters are going" : "Where Labor’s voters are going" }}>
+        2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. Where a house prints an undecided cell for a cohort the row is re-scaled to its decided shares.
+      </RdFoot>
+    </>
+  );
 
   /* ---- the mosaic ------------------------------------------------------------ */
   const GAP = 4, H = narrow ? 0 : 240;
@@ -3335,8 +3493,10 @@ function RdSwitching({ rangeId }) {
   );
 
   return (
-    <RdSec id="switching" cls="rd-sw" title="Where One Nation’s voters came from"
+    <RdSec id="switching" cls="rd-sw" title={cycTitle}
            meta={"How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
+      {V === "onp" ? (
+        <>
       {head && <RdHed head={head} dek={dek} />}
       <div className="card rd-card rd-mo-wrap" ref={boxRef}>
         {mosaic}
@@ -3395,6 +3555,8 @@ function RdSwitching({ rangeId }) {
       <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters came from" }}>
         2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
       </RdFoot>
+        </>
+      ) : goSec}
     </RdSec>
   );
 }
