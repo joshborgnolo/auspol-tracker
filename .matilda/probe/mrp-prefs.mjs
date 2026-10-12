@@ -1,6 +1,8 @@
 /* headless probe of DemosAU MRP preference flows (2026-10-12):
    - the opened MRP poll's "Preferences" line in Also in this poll: its region
-     chip opens on All regions (gen-data's enrolment-and-vote weighting) and
+     chip rides the eyebrow cell – BELOW the "Preferences" label on wide
+     screens, BESIDE it (to its right) on phones – opens on All regions
+     (gen-data's enrolment-and-vote weighting) and
      presses cycle Inner metro → Outer metro → Regional → All regions, showing
      that region's printed cells, and a press never moves the line's box
      (same width/height at every step); the groups share fixed slots (13ch
@@ -92,6 +94,23 @@ for (const w of [1440, 1024, 768, 390]) {
       if (have.length) colDesc.push(have.map((x) => x.toFixed(0)).join("/"));
     }
     check(cols.length < 2 || colOk, "wrapped rows' figures share columns (" + colDesc.join(", ") + ")");
+    /* the chip rides the eyebrow cell: beside the label on phones, below it
+       on wide screens */
+    const place = await page.evaluate(() => {
+      const line = document.querySelector(".rd-ldg-cyc").closest(".rd-ldg-line");
+      const lab = line.querySelector(".rd-ldg-lab");
+      const rng = document.createRange();
+      rng.selectNodeContents(lab.firstChild);
+      const t = rng.getBoundingClientRect(), c = line.querySelector(".rd-ldg-cyc").getBoundingClientRect();
+      return { tx: t.x, tr: t.right, ty: t.y, tb: t.bottom, cx: c.x, cy: c.y, cb: c.bottom };
+    });
+    if (w <= 760) {
+      check(place.cy >= place.ty - 6 && place.cy < place.tb && place.cx > place.tr,
+            "phone: the chip sits on the eyebrow row, just right of the label (dy " + (place.cy - place.ty).toFixed(1) + ", dx " + (place.cx - place.tr).toFixed(0) + ")");
+    } else {
+      check(place.cy >= place.tb - 3 && Math.abs(place.cx - place.tx) < 6,
+            "laptop: the chip sits below the eyebrow label (y+" + (place.cy - place.tb).toFixed(1) + ", x-off " + (place.cx - place.tx).toFixed(1) + ")");
+    }
     const lh = await page.evaluate(() => { const l = document.querySelector(".rd-ldg-lines .rd-ldg-line"); return l.getBoundingClientRect().height; });
     console.log("   line h " + steps[0].h + " (first line " + lh + "), chip " + steps[0].bw.toFixed(1) + "×" + steps[0].bh.toFixed(1));
   }

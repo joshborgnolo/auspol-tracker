@@ -475,7 +475,7 @@ body.dark .gp { --gp-tint: 0.3; }
 @keyframes gp-word { from { opacity: 0; transform: translateY(.6em) rotate(3deg); filter: blur(4px); } }
 @keyframes gp-under { to { background-size: 100% 2px; } }
 .gp-beat-s {
-  margin-top: 5px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+  margin-top: 5px; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; color: var(--ink-3);
   animation: gp-word .5s ease both; animation-delay: calc(var(--d0) + var(--i) * 34ms + .1s);
 }
 .gp-beat-in.out { animation: gp-leave .26s ease-in both; }
@@ -5444,6 +5444,7 @@ body.rd .rd-ldg-cycw > span { grid-area: 1 / 1; visibility: hidden; }
 body.rd .rd-ldg-cycw > span.on { visibility: visible; }
 body.rd .rd-ldg-cyca { color: var(--ink-3); }
 body.rd .rd-ldg-arrow { color: var(--ink-3); text-align: right; }
+body.rd .rd-ldg-line.prefs .rd-ldg-lab .rd-ldg-cyc { display: flex; align-self: start; margin-top: 3px; font-size: 13px; font-weight: 600; text-transform: none; letter-spacing: 0; }
 body.rd .rd-ldg-rk { margin-top: 14px; }
 body.rd .rd-ldg-rk tbody th { width: 1%; padding-top: 5px; color: var(--ink-3); vertical-align: baseline; }
 body.rd .rd-ldg-rk td { padding-top: 5px; vertical-align: baseline; }
@@ -5492,6 +5493,8 @@ body.rd .rd-pl-detail { padding: 16px 16px 20px; background: var(--surface-2); }
   body.rd .rd-ldg-line > .rd-ldg-lab { grid-column: 1; grid-row: 1; }
   body.rd .rd-ldg-line > .rd-ldg-lbody { grid-column: 1; grid-row: 2; }
   body.rd .rd-ldg-line > .rd-ldg-arrow { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  body.rd .rd-ldg-line.prefs .rd-ldg-lab { display: flex; align-items: baseline; column-gap: 10px; }
+  body.rd .rd-ldg-line.prefs .rd-ldg-lab .rd-ldg-cyc { margin-top: 0; }
   body.rd .rd-ldg-rk tbody th { width: 30%; white-space: normal; }
   body.rd .rd-ldg-rk2 td:last-child { display: none; }
   body.rd .rd-ldg-rkp tbody th { width: auto; }
@@ -55668,7 +55671,7 @@ function RdLgDir({
 }
 const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
 const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
-function RdLgPrefs({
+function RdLgPrefsLine({
   pf
 }) {
   const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
@@ -55692,7 +55695,11 @@ function RdLgPrefs({
   const at = t => rk === "all" ? pf.all && pf.all[t] || null : pf[t] ? pf[t][rk] : null;
   const a = at("alp_onp"),
     c = at("lnp_onp");
-  return React.createElement(React.Fragment, null, React.createElement("button", {
+  return React.createElement("div", {
+    className: "rd-ldg-line prefs"
+  }, React.createElement("span", {
+    className: "rd-ldg-lab"
+  }, "Preferences", React.createElement("button", {
     type: "button",
     className: "rd-ldg-cyc",
     title: (rk === "all" ? RD_LG_PREFS_ALL + ". " : "") + "Region shown: " + rn + " — press for " + next,
@@ -55710,9 +55717,11 @@ function RdLgPrefs({
   }, n))), React.createElement("span", {
     className: "rd-ldg-cyca",
     "aria-hidden": "true"
-  }, "\u21BB")), a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]), pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, React.createElement("span", {
+  }, "\u21BB"))), React.createElement("span", {
+    className: "rd-ldg-lbody"
+  }, a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]), pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, React.createElement("span", {
     className: "rd-ldg-lisoft"
-  }, ", nationwide")]]));
+  }, ", nationwide")]])));
 }
 function rdLgLines(p, {
   onM,
@@ -55783,10 +55792,8 @@ function rdLgLines(p, {
   }
   if (p.pf) out.push({
     id: "prefs",
-    lab: "Preferences",
-    body: React.createElement(RdLgPrefs, {
-      pf: p.pf
-    })
+    self: RdLgPrefsLine,
+    pf: p.pf
   });
   const a = p.appr || {};
   let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
@@ -56034,6 +56041,13 @@ function RdLedger({
   }, "Also in this poll"), React.createElement("div", {
     className: "rd-ldg-lines"
   }, rest.map(l => {
+    if (l.self) {
+      const Self = l.self;
+      return React.createElement(Self, {
+        key: l.id,
+        pf: l.pf
+      });
+    }
     const can = !!(onLine && RD_LG_TAB[l.id]);
     const Tag = can ? "button" : "div";
     const away = latest && !RD_LG_LATEST_TABS[l.id];

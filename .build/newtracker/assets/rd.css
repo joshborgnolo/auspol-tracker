@@ -3330,6 +3330,10 @@ body.rd .rd-ldg-cycw > span { grid-area: 1 / 1; visibility: hidden; }
 body.rd .rd-ldg-cycw > span.on { visibility: visible; }
 body.rd .rd-ldg-cyca { color: var(--ink-3); }
 body.rd .rd-ldg-arrow { color: var(--ink-3); text-align: right; }
+/* the Preferences line's region chip rides the EYEBROW cell: below the
+   label on wide screens, beside it on phones (the ≤760 rung turns the lab
+   into a flex row). The eyebrow's caps and tracking must not leak in */
+body.rd .rd-ldg-line.prefs .rd-ldg-lab .rd-ldg-cyc { display: flex; align-self: start; margin-top: 3px; font-size: 13px; font-weight: 600; text-transform: none; letter-spacing: 0; }
 /* How it counts as a reckoning: label, signed step, words */
 body.rd .rd-ldg-rk { margin-top: 14px; }
 body.rd .rd-ldg-rk tbody th { width: 1%; padding-top: 5px; color: var(--ink-3); vertical-align: baseline; }
@@ -3388,6 +3392,9 @@ body.rd .rd-pl-detail { padding: 16px 16px 20px; background: var(--surface-2); }
   body.rd .rd-ldg-line > .rd-ldg-lab { grid-column: 1; grid-row: 1; }
   body.rd .rd-ldg-line > .rd-ldg-lbody { grid-column: 1; grid-row: 2; }
   body.rd .rd-ldg-line > .rd-ldg-arrow { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  /* phone: the Preferences chip sits to the RIGHT of the eyebrow label */
+  body.rd .rd-ldg-line.prefs .rd-ldg-lab { display: flex; align-items: baseline; column-gap: 10px; }
+  body.rd .rd-ldg-line.prefs .rd-ldg-lab .rd-ldg-cyc { margin-top: 0; }
   body.rd .rd-ldg-rk tbody th { width: 30%; white-space: normal; }
   body.rd .rd-ldg-rk2 td:last-child { display: none; }
   body.rd .rd-ldg-rkp tbody th { width: auto; }

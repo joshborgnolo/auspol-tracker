@@ -1783,10 +1783,12 @@ function RdLgDir({ p }) {
    enrolment times the group's vote there), which the report itself never
    prints. Presses cycle through each printed region and back. The
    names stack in one grid cell (.rd-ldg-cycw, rd.css) so a press never
-   resizes the chip or the line. */
+   resizes the chip or the line. The chip rides the EYEBROW cell – below
+   "Preferences" on wide screens, beside it on phones (rd.css) – so the
+   whole line renders here, with the cycle state inside it. */
 const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
 const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
-function RdLgPrefs({ pf }) {
+function RdLgPrefsLine({ pf }) {
   const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
   /* All regions first: default to its index in regs (falls to 0 = Inner
      metro on the rare wave whose weighting never computed) */
@@ -1803,21 +1805,23 @@ function RdLgPrefs({ pf }) {
   );
   const at = (t) => (rk === "all" ? (pf.all && pf.all[t]) || null : pf[t] ? pf[t][rk] : null);
   const a = at("alp_onp"), c = at("lnp_onp");
-  return <>
-    <button type="button" className="rd-ldg-cyc" title={(rk === "all" ? RD_LG_PREFS_ALL + ". " : "") + "Region shown: " + rn + " — press for " + next}
+  return <div className="rd-ldg-line prefs">
+    <span className="rd-ldg-lab">Preferences<button type="button" className="rd-ldg-cyc" title={(rk === "all" ? RD_LG_PREFS_ALL + ". " : "") + "Region shown: " + rn + " — press for " + next}
             aria-label={rn + (rk === "all" ? " (" + RD_LG_PREFS_ALL + ")" : "") + " – show " + next}
             onClick={(ev) => { ev.stopPropagation(); setRi((ri + 1) % regs.length); }}>
       <span className="rd-ldg-cycw">{regs.map(([k, n], i) => <span key={k} aria-hidden="true" className={i === ri % regs.length ? "on" : ""}>{n}</span>)}</span>
       <span className="rd-ldg-cyca" aria-hidden="true">↻</span>
-    </button>
-    {a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]])}
-    {c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]])}
-    {/* the one flow the report prints nationally, in the same
-        contest-label-first shape as the other groups; the tail sits inside
-        the figure cell so the comma hugs it (a tail flex item would float
-        a column-gap away) */}
-    {pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, <span className="rd-ldg-lisoft">, nationwide</span>]])}
-  </>;
+    </button></span>
+    <span className="rd-ldg-lbody">
+      {a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]])}
+      {c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]])}
+      {/* the one flow the report prints nationally, in the same
+          contest-label-first shape as the other groups; the tail sits inside
+          the figure cell so the comma hugs it (a tail flex item would float
+          a column-gap away) */}
+      {pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, <span className="rd-ldg-lisoft">, nationwide</span>]])}
+    </span>
+  </div>;
 }
 
 function rdLgLines(p, { onM, demSplit }) {
@@ -1850,8 +1854,9 @@ function rdLgLines(p, { onM, demSplit }) {
     ))}</> });
   }
   /* respondent-ranked flows by region (the MRP wave's printed tables), its
-     own line under the 2PPs */
-  if (p.pf) out.push({ id: "prefs", lab: "Preferences", body: <RdLgPrefs pf={p.pf} /> });
+     own line under the 2PPs; renders itself so its chip's cycle state can
+     live beside the eyebrow */
+  if (p.pf) out.push({ id: "prefs", self: RdLgPrefsLine, pf: p.pf });
   const a = p.appr || {};
   let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
   const sets = window.ppmContests ? window.ppmContests(p) : [];
@@ -1973,6 +1978,7 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
           <h4 className="rd-ldg-h">Also in this poll</h4>
           <div className="rd-ldg-lines">
             {rest.map((l) => {
+              if (l.self) { const Self = l.self; return <Self key={l.id} pf={l.pf} />; }
               const can = !!(onLine && RD_LG_TAB[l.id]);
               const Tag = can ? "button" : "div";
               const away = latest && !RD_LG_LATEST_TABS[l.id];
