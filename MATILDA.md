@@ -216,7 +216,10 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     it on the charts and in the headline — every visible fieldwork
     label instead says "TBC", linked to the house's
     methodology-statements page (gen-data §6 emits fieldPending/fieldUrl
-    on individualPolls and pollsterTable) — and `samplePending: true`
+    on individualPolls and pollsterTable); ONLY the masthead's phone
+    compact line sheds the word (user call 2026-10-12: the short form
+    leaves TBC out; the big-screen meta block keeps it, linked) — and
+    `samplePending: true`
     when the article states no n. When the PDF lands the match writes
     the real window and sample IN PLACE and drops the flags
     (status.fieldworkFilled). validate.mjs excuses `fieldwork-pending`

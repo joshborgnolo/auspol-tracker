@@ -3124,7 +3124,10 @@ const individualPolls = POLLS.map((p) => {
        from the monitor csv before the SMH article carries its dates):
        `field` is the provisional window that places it on the charts and in
        the headline, and the views say "TBC" instead, linking
-       `fieldUrl`, where the dates will be published. Leaves with the dates
+       `fieldUrl`, where the dates will be published — EXCEPT the masthead's
+       phone compact line, which drops the word (its "today"-shortened form
+       sheds TBC; the big-screen masthead keeps it — user call 2026-10-12).
+       Leaves with the dates
        (extract-demosau.mjs; Resolve's hand-stamp on the SMH article). */
     ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: fieldTbcUrl(p.pollster) } : {}),
     /* fieldwork mid-date ISO (see fmidIso) – the x basis every detail

@@ -373,19 +373,26 @@ function Header({ isDark, onToggleTheme, rd }) {
   /* The newest poll's name+fieldwork open the pollster's own release, as a
      plain link styled invisible (a.mh-latest: no underline, no link icon -
      only a click gives it away). releaseUrl over a media `url` citation,
-     the archive emitter's own precedence. */
+     the archive emitter's own precedence. A poll still waiting on its
+     fieldwork window says "TBC" here (the big-screen form, linked to the
+     house's page like every TBC on the site) - only the phone's compact
+     line below drops the word (user call 2026-10-12: the compact line is
+     a shortening, and TBC is the fact to shed). */
   const rdLatestUrl = rdLatest ? (rdLatest.releaseUrl || rdLatest.url) : null;
   const rdLatestFact = rdLatest
     ? (rdLatest.fieldPending
-        /* fieldwork not yet published: the name opens the release and the
-           TBC where the dates will appear (gen-data's fieldUrl), as every
-           TBC on the site does */
         ? <>{rdLatestUrl
               ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster}</a>
               : rdLatest.pollster}, {rdFieldTbc(rdLatest)}</>
         : rdLatestUrl
         ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + ", " + rdLatest.field}</a>
         : rdLatest.pollster + ", " + rdLatest.field)
+    : D.latest.published;
+  /* phone compact: the same fact's short form, TBC shed when pending */
+  const rdLatestFactCompact = rdLatest
+    ? (rdLatestUrl
+        ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + (rdLatest.fieldPending ? "" : ", " + rdLatest.field)}</a>
+        : rdLatest.pollster + (rdLatest.fieldPending ? "" : ", " + rdLatest.field))
     : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
@@ -453,7 +460,7 @@ function Header({ isDark, onToggleTheme, rd }) {
            the phone 20px above the headline figure. */
         <div className="rd-head-compact">
           <span className={"fresh-dot " + fresh.state}></span>
-          <span><b>Latest poll</b> {rdLatestFact}, {fresh.label.toLowerCase()}, {D.latest.pollsTracked} polls</span>
+          <span><b>Latest poll</b> {rdLatestFactCompact}, {fresh.label.toLowerCase()}, {D.latest.pollsTracked} polls</span>
         </div>
       )}
       <div className="head-right">

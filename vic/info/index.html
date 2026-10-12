@@ -60517,6 +60517,12 @@ function Header({
     target: "_blank",
     rel: "noopener noreferrer"
   }, rdLatest.pollster + ", " + rdLatest.field) : rdLatest.pollster + ", " + rdLatest.field : D.latest.published;
+  const rdLatestFactCompact = rdLatest ? rdLatestUrl ? React.createElement("a", {
+    className: "mh-latest",
+    href: rdLatestUrl,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, rdLatest.pollster + (rdLatest.fieldPending ? "" : ", " + rdLatest.field)) : rdLatest.pollster + (rdLatest.fieldPending ? "" : ", " + rdLatest.field) : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
     if (!m) return null;
@@ -60586,7 +60592,7 @@ function Header({
     className: "rd-head-compact"
   }, React.createElement("span", {
     className: "fresh-dot " + fresh.state
-  }), React.createElement("span", null, React.createElement("b", null, "Latest poll"), " ", rdLatestFact, ", ", fresh.label.toLowerCase(), ", ", D.latest.pollsTracked, " polls")), React.createElement("div", {
+  }), React.createElement("span", null, React.createElement("b", null, "Latest poll"), " ", rdLatestFactCompact, ", ", fresh.label.toLowerCase(), ", ", D.latest.pollsTracked, " polls")), React.createElement("div", {
     className: "head-right"
   }, rd ? React.createElement("div", {
     className: "head-meta rd-head-meta"
