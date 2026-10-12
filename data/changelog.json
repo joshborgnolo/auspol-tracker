@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_on",
       "basis": "imp",
-      "alp": 52.3
+      "alp": 52.4
     },
-    "imp": 52.2,
-    "pub": 51.1,
-    "on": 52.3,
+    "imp": 52.3,
+    "pub": 51,
+    "on": 52.4,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -200,7 +200,8 @@
       "2026-10-02|RedBridge/Accent",
       "2026-10-06|YouGov",
       "2026-10-08|Newspoll",
-      "2026-10-10|Resolve"
+      "2026-10-10|Resolve",
+      "2026-10-11|Roy Morgan"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
@@ -333,6 +334,13 @@
       "label": "12 Oct",
       "kind": "seed",
       "text": "The change log starts here — the two-party preferred estimate is 52.3 (Labor v One Nation, implied flows). From today, every movement it makes and every statistical finding that comes or goes is recorded below."
+    },
+    {
+      "date": "2026-10-12",
+      "label": "12 Oct",
+      "kind": "poll",
+      "text": "Roy Morgan (fieldwork 28 Sep–11 Oct, n=2,655) added — the two-party preferred estimate moved 52.3 → 52.4 (Labor v One Nation, implied flows).",
+      "url": "https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026"
     }
   ]
 }
