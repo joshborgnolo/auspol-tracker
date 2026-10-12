@@ -3820,8 +3820,7 @@ body.rd .rd-dp-rug b { position: absolute; bottom: 0; left: 0; width: 6px; heigh
 body.rd .rd-dp-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 body.rd .rd-dp-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
 body.rd .rd-dp-rug b.open > i { background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--pcolor) 55%, transparent); }
-body.rd .rd-dp-rug b.on { cursor: pointer; }
-body.rd .rd-dp-rug b.on:hover > i, body.rd .rd-dp-rug b.on:focus-visible > i { background: var(--pcolor); box-shadow: none; }
+body.rd .rd-dp-rug b.on:focus-visible > i { background: var(--pcolor); box-shadow: none; }
 body.rd .rd-dp-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 body.rd .rd-dp-rug b.hi { z-index: 2; }
 body.rd .rd-dp-rug b.hi > i { inset: -3px; background: var(--pcolor); box-shadow: 0 0 0 2px var(--bg); }
@@ -3931,8 +3930,7 @@ body.rd .rd-wv-rug b { position: absolute; bottom: 0; left: 0; width: 6px; heigh
 body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
 body.rd .rd-wv-rug b.ring > i { --ring-face: color-mix(in oklab, var(--pcolor) 55%, transparent); background: linear-gradient(var(--ring-face), var(--ring-face)), var(--bg); box-shadow: 0 0 0 2px var(--bg); }
-body.rd .rd-wv-rug b.on { cursor: pointer; }
-body.rd .rd-wv-rug b.on:hover > i, body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
+body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 body.rd .rd-wv-rug b.hi { z-index: 2; }
 body.rd .rd-wv-rug b.hi > i { inset: -3px; background: var(--pcolor); box-shadow: 0 0 0 2px var(--bg); }
@@ -45477,6 +45475,25 @@ function RdGenBorn({
     onClick: () => setTapped(v => !v)
   }, "(", asYears ? born[0] + "–" + born[1] : "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]), ")");
 }
+const RUG_PICK_MOUSE = 11,
+  RUG_PICK_TOUCH = 22;
+function nearestRugIdx(rugEl, xs, lanes, clientX, clientY, rPx) {
+  const box = rugEl.getBoundingClientRect();
+  if (!box.width || !box.height) return null;
+  let best = null,
+    bestD = rPx;
+  for (let i = 0; i < xs.length; i++) {
+    if (xs[i] == null) continue;
+    const dx = clientX - (box.left + xs[i] / 100 * box.width);
+    const dy = clientY - (box.bottom - 3 - (lanes[i] || 0) * 6);
+    const d = Math.hypot(dx, dy);
+    if (d <= bestD) {
+      best = i;
+      bestD = d;
+    }
+  }
+  return best;
+}
 function WvRug({
   g,
   party,
@@ -45538,10 +45555,66 @@ function WvRug({
   });
   const hide = (i, src) => setTip(tp => tp && tp.i === i && (!src || tp.src === src) ? null : tp);
   window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  const xs = g.px[party];
+  const keys = xs.map((x, i) => {
+    const d = x == null ? null : g.pd[i] || null;
+    return d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: d.f,
+      released: d.r
+    }) : null;
+  });
+  const openIdx = i => {
+    const rk = keys[i];
+    if (!rk || !(window.AP && window.AP.openPoll)) return;
+    setTip(null);
+    window.AP.openPoll(rk, "demographics", "who votes for whom", split);
+  };
+  const posX = xs.map(x => x == null ? null : xp(x));
+  const pickAt = (ev, rPx) => rugBox.current ? nearestRugIdx(rugBox.current, posX, ups || [], ev.clientX, ev.clientY, rPx) : null;
+  const [cur, setCur] = useState(null);
   return React.createElement("span", {
     ref: rugBox,
-    className: "rd-wv-rug" + (tip ? " lit" : "")
-  }, g.px[party].map((x, i) => {
+    className: "rd-wv-rug" + (tip ? " lit" : ""),
+    style: {
+      cursor: cur != null && keys[cur] ? "pointer" : undefined
+    },
+    onPointerMove: ev => {
+      if (ev.pointerType !== "mouse") return;
+      const i = pickAt(ev, RUG_PICK_MOUSE);
+      setCur(i);
+      setTip(tp => {
+        if (i == null) return tp && tp.src === "mouse" ? null : tp;
+        if (tp && tp.i === i) return tp;
+        return {
+          i,
+          src: "mouse"
+        };
+      });
+    },
+    onPointerLeave: () => {
+      setCur(null);
+      setTip(tp => tp && tp.src === "mouse" ? null : tp);
+    },
+    onPointerDown: ev => {
+      ptr.current = ev.pointerType;
+    },
+    onClick: ev => {
+      const pt = ev.detail === 0 ? "key" : ptr.current;
+      ptr.current = null;
+      if (pt === "key") return;
+      const i = pickAt(ev, pt === "touch" ? RUG_PICK_TOUCH : RUG_PICK_MOUSE);
+      if (i == null) return;
+      ev.stopPropagation();
+      if (pt === "mouse") {
+        openIdx(i);
+        return;
+      }
+      if (tip && tip.i === i && tip.src === "touch") setTip(null);else setTip({
+        i,
+        src: "touch"
+      });
+    }
+  }, xs.map((x, i) => {
     if (x == null) return null;
     const d = g.pd[i] || null;
     if (!d) return React.createElement("b", {
@@ -45555,15 +45628,8 @@ function WvRug({
     }, React.createElement("i", {
       "aria-hidden": "true"
     }));
-    const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
-      pollster: d.f,
-      released: d.r
-    }) : null;
-    const open = () => {
-      if (!rk || !(window.AP && window.AP.openPoll)) return;
-      setTip(null);
-      window.AP.openPoll(rk, "demographics", "who votes for whom", split);
-    };
+    const rk = keys[i];
+    const open = () => openIdx(i);
     const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
     const on = tip && tip.i === i;
     return React.createElement("b", {
@@ -45577,32 +45643,10 @@ function WvRug({
       role: rk ? "button" : "img",
       tabIndex: rk ? 0 : undefined,
       "aria-label": lab + (rk ? ", press Enter to open this poll" : ""),
-      onPointerDown: ev => {
-        ptr.current = ev.pointerType;
-      },
-      onPointerEnter: ev => {
-        if (ev.pointerType === "mouse") show(i, "mouse");
-      },
-      onPointerLeave: ev => {
-        if (ev.pointerType === "mouse") hide(i, "mouse");
-      },
       onFocus: ev => {
         if (ev.target.matches(":focus-visible")) show(i, "focus");
       },
       onBlur: () => hide(i, "focus"),
-      onClick: ev => {
-        ev.stopPropagation();
-        const pt = ev.detail === 0 ? "key" : ptr.current;
-        ptr.current = null;
-        if (pt === "mouse" || pt === "key") {
-          open();
-          return;
-        }
-        if (tip && tip.i === i) setTip(null);else setTip({
-          i,
-          src: "touch"
-        });
-      },
       onKeyDown: ev => {
         if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
         ev.preventDefault();
@@ -45694,60 +45738,86 @@ function DpRug({
   });
   const hide = (i, src) => setTip(tp => tp && tp.i === i && (!src || tp.src === src) ? null : tp);
   window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
-  return React.createElement("span", {
-    ref: rugBox,
-    className: "rd-dp-rug" + (tip ? " lit" : "")
-  }, items.map((it, i) => {
+  const xs = items.map(it => dxp(it.y));
+  const keys = items.map(it => {
     const q = it.q;
-    const key = q.pollster + "|" + q.released + (it.fav ? "|f" : "");
-    const rk = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+    return window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
       pollster: q.pollster,
       released: q.released
     }) : null;
-    const open = () => {
-      if (!rk || !(window.AP && window.AP.openPoll)) return;
-      setTip(null);
-      window.AP.openPoll(rk, "leadership", "leadership");
-    };
+  });
+  const openIdx = i => {
+    const rk = keys[i];
+    if (!rk || !(window.AP && window.AP.openPoll)) return;
+    setTip(null);
+    window.AP.openPoll(rk, "leadership", "leadership");
+  };
+  const pickAt = (ev, rPx) => rugBox.current ? nearestRugIdx(rugBox.current, xs, ups || [], ev.clientX, ev.clientY, rPx) : null;
+  const [cur, setCur] = useState(null);
+  return React.createElement("span", {
+    ref: rugBox,
+    className: "rd-dp-rug" + (tip ? " lit" : ""),
+    style: {
+      cursor: cur != null && keys[cur] ? "pointer" : undefined
+    },
+    onPointerMove: ev => {
+      if (ev.pointerType !== "mouse") return;
+      const i = pickAt(ev, RUG_PICK_MOUSE);
+      setCur(i);
+      setTip(tp => {
+        if (i == null) return tp && tp.src === "mouse" ? null : tp;
+        if (tp && tp.i === i) return tp;
+        return {
+          i,
+          src: "mouse"
+        };
+      });
+    },
+    onPointerLeave: () => {
+      setCur(null);
+      setTip(tp => tp && tp.src === "mouse" ? null : tp);
+    },
+    onPointerDown: ev => {
+      ptr.current = ev.pointerType;
+    },
+    onClick: ev => {
+      const pt = ev.detail === 0 ? "key" : ptr.current;
+      ptr.current = null;
+      if (pt === "key") return;
+      const i = pickAt(ev, pt === "touch" ? RUG_PICK_TOUCH : RUG_PICK_MOUSE);
+      if (i == null) return;
+      ev.stopPropagation();
+      if (pt === "mouse") {
+        openIdx(i);
+        return;
+      }
+      if (tip && tip.i === i && tip.src === "touch") setTip(null);else setTip({
+        i,
+        src: "touch"
+      });
+    }
+  }, items.map((it, i) => {
+    const q = it.q;
+    const key = q.pollster + "|" + q.released + (it.fav ? "|f" : "");
+    const rk = keys[i];
+    const open = () => openIdx(i);
     const lab = q.pollster + ", " + (q.fieldPending ? "TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
     const on = tip && tip.i === i;
     return React.createElement("b", {
       key: key,
       className: [it.fav ? "open" : "", rk ? "on" : "", on ? "hi" : ""].filter(Boolean).join(" ") || undefined,
       style: {
-        "--x": dxp(it.y),
+        "--x": xs[i],
         "--pcolor": color,
         "--v": ups ? ups[i] : 0
       },
       role: rk ? "button" : "img",
       tabIndex: rk ? 0 : undefined,
       "aria-label": lab + (rk ? ", press Enter to open this poll" : ""),
-      onPointerDown: ev => {
-        ptr.current = ev.pointerType;
-      },
-      onPointerEnter: ev => {
-        if (ev.pointerType === "mouse") show(i, "mouse");
-      },
-      onPointerLeave: ev => {
-        if (ev.pointerType === "mouse") hide(i, "mouse");
-      },
       onFocus: ev => {
         if (ev.target.matches(":focus-visible")) show(i, "focus");
       },
       onBlur: () => hide(i, "focus"),
-      onClick: ev => {
-        ev.stopPropagation();
-        const pt = ev.detail === 0 ? "key" : ptr.current;
-        ptr.current = null;
-        if (pt === "mouse" || pt === "key") {
-          open();
-          return;
-        }
-        if (tip && tip.i === i) setTip(null);else setTip({
-          i,
-          src: "touch"
-        });
-      },
       onKeyDown: ev => {
         if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
         ev.preventDefault();
