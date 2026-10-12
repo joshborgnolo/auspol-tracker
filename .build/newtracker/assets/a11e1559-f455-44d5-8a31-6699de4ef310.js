@@ -3348,7 +3348,7 @@ function impliedLines(r) {
       <>under the{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
-                  window.AP.openTerm("fp-flows", "poll breakdown")}>first-principles flow set</button></>
+                  window.AP.openTerm("fp-flows", "poll breakdown")}>Labor v One Nation flows</button></>
     ),
   });
   return out.map((x) => ({ ...x, count: out.length }));

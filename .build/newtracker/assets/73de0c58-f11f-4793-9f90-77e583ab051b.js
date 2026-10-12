@@ -1267,7 +1267,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     ? (impOnBasis ? MATCHUPS.alp_on.data : D.synthOn)
     : (impBasis ? D.agg2pp : D.synth2pp);
   const cmpLabel = m.altKey === "alp_on"
-    ? (impOnBasis ? "Respondent-allocated ALP" : "Implied ALP (first-principles flows)")
+    ? (impOnBasis ? "Respondent-allocated ALP" : "Implied ALP (estimated flows)")
     : (impBasis ? "Respondent-allocated ALP" : "Implied ALP (fixed 2025 flows)");
   const synthOverlay = (showSynth && (matchup === "alp_lnp" || (m.altKey === "alp_on" && impOnOffered)) &&
       !morph && cmpSeries && cmpSeries.length > 1)

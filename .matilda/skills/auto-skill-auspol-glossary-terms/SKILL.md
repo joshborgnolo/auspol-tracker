@@ -88,7 +88,9 @@ one cryptic paragraph inside preference-flows and the user judged it
 "not explained or clearly identified". The durable lessons:
 
 - **Proper nouns need their own terms.** When page copy references a
-  concept as a proper noun ("the first-principles flow set") and link
+  concept as a proper noun ("the Labor v One Nation flows", term id fp-flows;
+  named "First-principles flow set" until 2026-10-12, renamed because the
+  table is estimated from ballots, not derived from first principles) and link
   text reads like a title, the xref/openTerm target must be a term NAMED
   that noun — a side-paragraph inside a neighbouring term reads as
   unidentified assertion at the end of a two-hop link chain (hero's

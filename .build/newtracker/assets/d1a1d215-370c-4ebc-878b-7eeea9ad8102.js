@@ -5053,9 +5053,9 @@ function FlowDriftOnPanel({ rangeId }) {
             from what the same polls’ primaries would read as under a
             {" "}<button type="button" className="hi-term"
               onClick={() => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference flows")}>preference</button>{" "}
-            table frozen at the first-principles set the page quotes the pairing on – AEC
-            Senate ballot counts re-anchored on the lower-house counts where One Nation made
-            the final two.
+            table frozen at the site&rsquo;s estimated Labor v One Nation flows – 2025 Senate
+            ballots, read through the 2026 lower-house contests where One Nation made the
+            final two.
           </p>
         </div>
       </div>
@@ -7136,7 +7136,7 @@ function infoTerms(D) {
           ) : null}</span>
           {L.onImp ? (
             <span className="info-p">Labor v One Nation uses a different table, the
-            {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no election
+            {" "}{xref("fp-flows", "implied 2PP", "Labor v One Nation flows")}, because no election
             has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
             {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{onM.toFixed(1)} once doubt about that table
             {" "}is added to the polls’ own margin.</span>
@@ -7144,8 +7144,8 @@ function infoTerms(D) {
           <span className="info-p">Past cycles reads each earlier term through the flows of the
           election that opened it (see
           {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}). Both tables, and
-          how polls become the headline, are set out line by line in
-          {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
+          the case for reading every poll through a fixed table, are set out in the
+          {" "}<a href="/preference-flows/">preference flows explainer</a>.</span></>) },
         { id: "preference-flows", term: "Preference flows", body: (
           <>How minor-party votes split between the final two candidates once preferences are
           distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} against the
@@ -7156,8 +7156,8 @@ function infoTerms(D) {
           <span className="info-chart"><FlowChart /></span>
           Party-by-party flows exist only from 1996, when full preference data was first
           published; One Nation’s line breaks where it barely stood candidates. Labor v One Nation
-          uses the {xref("fp-flows", "preference flows", "first-principles flow set")}, because no
-          election has counted that pairing.
+          uses its own {xref("fp-flows", "preference flows", "Labor v One Nation flows")}, estimated
+          because no election has counted that pairing.
           <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
           panel in All polls checks. The pollsters’ own two-party figures come largely from where their
           respondents say their preferences would go, so if those drift from where the pollster’s
@@ -7166,9 +7166,10 @@ function infoTerms(D) {
           election, or its first polls if it started later. With no counted Labor v One Nation
           flows, that chart shows drift since each pollster’s first head-to-heads. The check
           corrects no other figure.</span></>) },
-        { id: "fp-flows", term: "First-principles flow set", body: (
-          <>The preference table behind the Labor v One Nation figure, which the site built because
-          no election has ever counted that contest. Three settings do all the work: Coalition
+        { id: "fp-flows", term: "Labor v One Nation flows", body: (
+          <>The preference table behind the Labor v One Nation figure. No election has ever counted
+          that contest, so the site estimates the table from the ballots that do exist. Three
+          settings do all the work: Coalition
           voters give {fpc(FT.lnp)} to Labor (±{fpt(FB.lnp)}), Greens {fpc(FT.grn)} (±{fpt(FB.grn)})
           {" "}and everyone else {fpc(FT.oth)} (±{fpt(FB.oth)}). The rest go to One Nation.
           {L.onImp && prim ? (
@@ -7186,12 +7187,14 @@ function infoTerms(D) {
           ranked Labor against One Nation. The 2026 lower-house contests where One Nation made the
           final two, the SA state election and the Secret Harbour by-election, show how that
           ranking carries into a House count, though both are estimates from partial data. The
-          settings also allow for voters those contests left out, such as Nationals voters. The
-          table stays fixed between such evidence and is never fitted to current polls. The
+          settings also allow for voters those contests left out, such as Nationals voters, and
+          the Coalition setting sits partway between the site&rsquo;s reading and Kevin Bonham&rsquo;s
+          independent estimate. The table stays fixed between such evidence and is never fitted
+          to current polls. The
           pollsters’ own Labor v One Nation figures rest on what respondents say, without the
           how-to-vote card close to half of Coalition voters copy, so they stay on the chart as a
-          cross-check. The working is in{" "}
-          <a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
+          cross-check. The working is in the{" "}
+          <a href="/preference-flows/">preference flows explainer</a>.</span></>) },
       ] },
     { id: "s-primary", title: "Primary vote", nav: "Primary vote",
       lead: { id: "primary-vote", body: (
@@ -7990,7 +7993,7 @@ function infoTerms(D) {
             ) : null}</span>
             {L.onImp ? (
               <span className="info-p">Labor v One Nation uses a different table, the
-              {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no
+              {" "}{xref("fp-flows", "implied 2PP", "Labor v One Nation flows")}, because no
               election has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
               {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{onM.toFixed(1)} once doubt about that
               {" "}table is added to the polls’ own margin.</span>
@@ -8010,10 +8013,10 @@ function infoTerms(D) {
             their respondents say their preferences would go, so if those drift from where the
             pollster’s primary votes and the {eY} flows put them, voters may be sending preferences
             differently. The check corrects no other figure.</span></>) },
-          { id: "fp-flows", term: "First-principles flow set", body: (
+          { id: "fp-flows", term: "Labor v One Nation flows", body: (
             <>The preference table behind the Labor v One Nation figure. No election has ever
-            counted that contest, so the site built the table for the federal page, and Victoria’s
-            figure borrows it unchanged. Three settings do all the work: Coalition voters give
+            counted that contest, so the site estimates the table for the federal page from the
+            ballots that do exist, and Victoria’s figure borrows it unchanged. Three settings do all the work: Coalition voters give
             {" "}{fpc(FT.lnp)} to Labor (±{fpt(FB.lnp)}), Greens {fpc(FT.grn)} (±{fpt(FB.grn)}) and
             everyone else {fpc(FT.oth)} (±{fpt(FB.oth)}). The rest go to One Nation.
             {L.onImp && prim ? (

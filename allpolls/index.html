@@ -92098,7 +92098,7 @@ function impliedLines(r) {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.openTerm && window.AP.openTerm("fp-flows", "poll breakdown")
-    }, "first-principles flow set"))
+    }, "Labor v One Nation flows"))
   });
   return out.map(x => ({
     ...x,
@@ -98355,7 +98355,7 @@ function FlowDriftOnPanel({
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference flows")
-  }, "preference"), " ", "table frozen at the first-principles set the page quotes the pairing on \u2013 AEC Senate ballot counts re-anchored on the lower-house counts where One Nation made the final two."))), React.createElement(FlowLegend, {
+  }, "preference"), " ", "table frozen at the site\u2019s estimated Labor v One Nation flows \u2013 2025 Senate ballots, read through the 2026 lower-house contests where One Nation made the final two."))), React.createElement(FlowLegend, {
     pooledId: POOLED,
     pooled: fd.now,
     houseRows: houseRows,
@@ -100355,11 +100355,11 @@ function infoTerms(D) {
         className: "info-p"
       }, "Neither it nor the published figure is the true 2PP.", D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? React.createElement(React.Fragment, null, " Against the Coalition today, the implied figure reads ", D.synthLatest.alp.toFixed(1), " ", "and the published ", L.alp2pp.toFixed(1), ". With One Nation on ", onp, "% of the primary vote, five points of doubt about where its preferences go moves the two-party figure", " ", (prim.onp * 0.05).toFixed(1), " points either way.") : null), L.onImp ? React.createElement("span", {
         className: "info-p"
-      }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "first-principles flow set"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", onM.toFixed(1), " once doubt about that table", " ", "is added to the polls\u2019 own margin.") : null, React.createElement("span", {
+      }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "Labor v One Nation flows"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", onM.toFixed(1), " once doubt about that table", " ", "is added to the polls\u2019 own margin.") : null, React.createElement("span", {
         className: "info-p"
-      }, "Past cycles reads each earlier term through the flows of the election that opened it (see", " ", xref("last-election-flows", "implied 2PP", "Last-election flows"), "). Both tables, and how polls become the headline, are set out line by line in", " ", React.createElement("a", {
+      }, "Past cycles reads each earlier term through the flows of the election that opened it (see", " ", xref("last-election-flows", "implied 2PP", "Last-election flows"), "). Both tables, and the case for reading every poll through a fixed table, are set out in the", " ", React.createElement("a", {
         href: "/preference-flows/"
-      }, "The two-party figure, two ways"), "."))
+      }, "preference flows explainer"), "."))
     }, {
       id: "preference-flows",
       term: "Preference flows",
@@ -100369,19 +100369,19 @@ function infoTerms(D) {
         rel: "noopener noreferrer"
       }, "Greens 88.2%, One Nation 25.5% and all others 54.5% to Labor"), ").", React.createElement("span", {
         className: "info-chart"
-      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses the ", xref("fp-flows", "preference flows", "first-principles flow set"), ", because no election has counted that pairing.", React.createElement("span", {
+      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows panel in All polls checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
     }, {
       id: "fp-flows",
-      term: "First-principles flow set",
-      body: React.createElement(React.Fragment, null, "The preference table behind the Labor v One Nation figure, which the site built because no election has ever counted that contest. Three settings do all the work: Coalition voters give ", fpc(FT.lnp), " to Labor (\xB1", fpt(FB.lnp), "), Greens ", fpc(FT.grn), " (\xB1", fpt(FB.grn), ")", " ", "and everyone else ", fpc(FT.oth), " (\xB1", fpt(FB.oth), "). The rest go to One Nation.", L.onImp && prim ? React.createElement("span", {
+      term: "Labor v One Nation flows",
+      body: React.createElement(React.Fragment, null, "The preference table behind the Labor v One Nation figure. No election has ever counted that contest, so the site estimates the table from the ballots that do exist. Three settings do all the work: Coalition voters give ", fpc(FT.lnp), " to Labor (\xB1", fpt(FB.lnp), "), Greens ", fpc(FT.grn), " (\xB1", fpt(FB.grn), ")", " ", "and everyone else ", fpc(FT.oth), " (\xB1", fpt(FB.oth), "). The rest go to One Nation.", L.onImp && prim ? React.createElement("span", {
         className: "info-p"
       }, "On today\u2019s primaries: Labor\u2019s ", prim.alp.toFixed(1), ", plus", " ", fpc(FT.lnp), " of the Coalition\u2019s ", prim.lnp.toFixed(1), ", ", fpc(FT.grn), " of the Greens\u2019", " ", prim.grn.toFixed(1), " and ", fpc(FT.oth), " of the others\u2019 ", prim.oth.toFixed(1), ", gives", " ", L.onImp.a.toFixed(1), " to Labor and ", L.onImp.b.toFixed(1), " to One Nation. The table\u2019s own range, \xB1", L.onImp.band.toFixed(1), ", adds up the three settings\u2019 ranges. It measures doubt about the table, not sampling chance, so the hero adds it to the polls\u2019", " ", "own margin", L.onImp.cs != null ? React.createElement(React.Fragment, null, " (\xB1", L.onImp.cs.toFixed(1), ")") : null, " as a separate", " ", "error: \xB1", onM.toFixed(1), " in all, \xB1", (2 * onM).toFixed(1), " on the lead.") : null, React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Where the numbers come from."), " The ballots that do exist. The AEC\u2019s 2025 Senate ballot data records how every Coalition, Greens and other voter ranked Labor against One Nation. The 2026 lower-house contests where One Nation made the final two, the SA state election and the Secret Harbour by-election, show how that ranking carries into a House count, though both are estimates from partial data. The settings also allow for voters those contests left out, such as Nationals voters. The table stays fixed between such evidence and is never fitted to current polls. The pollsters\u2019 own Labor v One Nation figures rest on what respondents say, without the how-to-vote card close to half of Coalition voters copy, so they stay on the chart as a cross-check. The working is in", " ", React.createElement("a", {
+      }, React.createElement("b", null, "Where the numbers come from."), " The ballots that do exist. The AEC\u2019s 2025 Senate ballot data records how every Coalition, Greens and other voter ranked Labor against One Nation. The 2026 lower-house contests where One Nation made the final two, the SA state election and the Secret Harbour by-election, show how that ranking carries into a House count, though both are estimates from partial data. The settings also allow for voters those contests left out, such as Nationals voters, and the Coalition setting sits partway between the site\u2019s reading and Kevin Bonham\u2019s independent estimate. The table stays fixed between such evidence and is never fitted to current polls. The pollsters\u2019 own Labor v One Nation figures rest on what respondents say, without the how-to-vote card close to half of Coalition voters copy, so they stay on the chart as a cross-check. The working is in the", " ", React.createElement("a", {
         href: "/preference-flows/"
-      }, "The two-party figure, two ways"), "."))
+      }, "preference flows explainer"), "."))
     }]
   }, {
     id: "s-primary",
@@ -100833,7 +100833,7 @@ function infoTerms(D) {
           className: "info-p"
         }, "Neither it nor the published figure is the true 2PP.", D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? React.createElement(React.Fragment, null, " Against the Coalition today, the implied figure reads ", D.synthLatest.alp.toFixed(1), " ", "and the published ", L.alp2pp.toFixed(1), ". With One Nation on ", onp, "% of the primary vote, five points of doubt about where its preferences go moves the two-party figure", " ", (prim.onp * 0.05).toFixed(1), " points either way.") : null), L.onImp ? React.createElement("span", {
           className: "info-p"
-        }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "first-principles flow set"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", onM.toFixed(1), " once doubt about that", " ", "table is added to the polls\u2019 own margin.") : null)
+        }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "Labor v One Nation flows"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", onM.toFixed(1), " once doubt about that", " ", "table is added to the polls\u2019 own margin.") : null)
       }, {
         id: "preference-flows",
         term: "Preference flows",
@@ -100842,8 +100842,8 @@ function infoTerms(D) {
         }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows panel in All polls checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the ", eY, " flows put them, voters may be sending preferences differently. The check corrects no other figure."))
       }, {
         id: "fp-flows",
-        term: "First-principles flow set",
-        body: React.createElement(React.Fragment, null, "The preference table behind the Labor v One Nation figure. No election has ever counted that contest, so the site built the table for the federal page, and Victoria\u2019s figure borrows it unchanged. Three settings do all the work: Coalition voters give", " ", fpc(FT.lnp), " to Labor (\xB1", fpt(FB.lnp), "), Greens ", fpc(FT.grn), " (\xB1", fpt(FB.grn), ") and everyone else ", fpc(FT.oth), " (\xB1", fpt(FB.oth), "). The rest go to One Nation.", L.onImp && prim ? React.createElement("span", {
+        term: "Labor v One Nation flows",
+        body: React.createElement(React.Fragment, null, "The preference table behind the Labor v One Nation figure. No election has ever counted that contest, so the site estimates the table for the federal page from the ballots that do exist, and Victoria\u2019s figure borrows it unchanged. Three settings do all the work: Coalition voters give", " ", fpc(FT.lnp), " to Labor (\xB1", fpt(FB.lnp), "), Greens ", fpc(FT.grn), " (\xB1", fpt(FB.grn), ") and everyone else ", fpc(FT.oth), " (\xB1", fpt(FB.oth), "). The rest go to One Nation.", L.onImp && prim ? React.createElement("span", {
           className: "info-p"
         }, "On today\u2019s primaries: Labor\u2019s ", prim.alp.toFixed(1), ", plus", " ", fpc(FT.lnp), " of the Coalition\u2019s ", prim.lnp.toFixed(1), ", ", fpc(FT.grn), " of the Greens\u2019 ", prim.grn.toFixed(1), " and ", fpc(FT.oth), " of the others\u2019 ", prim.oth.toFixed(1), ", gives ", L.onImp.a.toFixed(1), " to Labor and ", L.onImp.b.toFixed(1), " to One Nation. The table\u2019s own range, \xB1", L.onImp.band.toFixed(1), ", adds up the three settings\u2019 ranges. It measures doubt about the table, not sampling chance, so the hero adds it to the polls\u2019", " ", "own margin", L.onImp.cs != null ? React.createElement(React.Fragment, null, " (\xB1", L.onImp.cs.toFixed(1), ")") : null, " as a", " ", "separate error: \xB1", onM.toFixed(1), " in all, \xB1", (2 * onM).toFixed(1), " on the lead.") : null, React.createElement("span", {
           className: "info-p"
@@ -124370,7 +124370,7 @@ function Hero({
     endLabel: m.b.abbr
   }];
   const cmpSeries = m.altKey === "alp_on" ? impOnBasis ? MATCHUPS.alp_on.data : D.synthOn : impBasis ? D.agg2pp : D.synth2pp;
-  const cmpLabel = m.altKey === "alp_on" ? impOnBasis ? "Respondent-allocated ALP" : "Implied ALP (first-principles flows)" : impBasis ? "Respondent-allocated ALP" : "Implied ALP (fixed 2025 flows)";
+  const cmpLabel = m.altKey === "alp_on" ? impOnBasis ? "Respondent-allocated ALP" : "Implied ALP (estimated flows)" : impBasis ? "Respondent-allocated ALP" : "Implied ALP (fixed 2025 flows)";
   const synthOverlay = showSynth && (matchup === "alp_lnp" || m.altKey === "alp_on" && impOnOffered) && !morph && cmpSeries && cmpSeries.length > 1 ? [{
     id: "synth",
     label: cmpLabel,

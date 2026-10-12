@@ -908,7 +908,7 @@ function buildStaticSummary() {
         (&#177;${(L.onImp.ci95 != null ? L.onImp.ci95 : L.onImp.band).toFixed(1)}, counting both the polls&#8217;
         sampling error and doubt about the flow table). No election
         night has ever counted a Labor v One Nation finish, so that figure runs on the
-        site&#8217;s own first-principles preference set rather than the 2025
+        site&#8217;s own estimated preference flows rather than the 2025
         election&#8217;s flows; the pollsters&#8217; few printed head-to-heads sit beside
         it on the live chart.</p>` : ""}
 
