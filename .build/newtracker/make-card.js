@@ -26,7 +26,8 @@
      gap is inside the two figures' margins combined: the primary-vote
      panel's level test, run from the top of each group down. The arrows
      count places gained or lost since the election result;
-   - ROUND n, the months since the election.
+   - ROUND n/N: n months since the election, of the N the term can run to
+     (the election to the latest date the next one can be held).
    Every value is read from window.AUSPOL.
 
    HOW IT IS DRAWN
@@ -164,8 +165,16 @@
     p.moved = was ? was - p.place : 0;
   });
   const elecYear = elect.ym.slice(0, 4);
-  /* ROUND n: whole months from the election to the reading */
-  const round = (uy - Number(elect.ym.slice(0, 4))) * 12 + um - Number(elect.ym.slice(5, 7));
+  /* ROUND n/N: whole months from the election to the reading, out of the
+     whole months from the election to the latest date the next one can be
+     held - read off nextElectionDue ("By 20 May 2028") with the masthead's
+     own pattern. With no date to read, the round stands alone. */
+  const ey = Number(elect.ym.slice(0, 4)), em = Number(elect.ym.slice(5, 7));
+  const round = (uy - ey) * 12 + um - em;
+  const due = /(\d{1,2}) (\w+) (\d{4})/.exec(L.nextElectionDue || "");
+  const dueMon = due ? MON.indexOf(due[2].slice(0, 3).toUpperCase()) + 1 : 0;
+  const termMonths = dueMon ? (Number(due[3]) - ey) * 12 + dueMon - em : null;
+  const roundLab = "ROUND " + round + (termMonths > round ? "/" + termMonths : "");
 
   /* ---- drawing ---------------------------------------------------------- */
   const FONT_URL = ".build/newtracker/fonts/doto-card.woff2";
@@ -261,7 +270,7 @@
     + '<div class="rivets" style="top:0"></div><div class="rivets" style="bottom:0"></div>'
     + '<div class="panel">'
     + '<div class="hdr" style="' + lit("white") + '"><span>' + led("AUSPOL TRACKER") + '</span><span style="'
-      + lit("amber") + '">' + led(dateLab.toUpperCase()) + "</span><span>" + led("ROUND " + round) + "</span></div>"
+      + lit("amber") + '">' + led(dateLab.toUpperCase()) + "</span><span>" + led(roundLab) + "</span></div>"
     + '<div class="rule-h" style="top:70px"></div>'
     + '<div class="head" style="left:30px;width:726px;' + lit("white") + '"><span>' + led("TWO-PARTY PREFERRED")
       + '</span><span class="sub">' + led(Q.imp ? "IMPLIED FLOWS" : "AS PUBLISHED") + "</span></div>"
@@ -317,6 +326,7 @@
     date: L.updatedISO,
     prim: IDS.map((id) => (P[id] != null ? P[id].toFixed(1) : "-")).join("/"),
     pci: IDS.map((id) => (lastCi[id] != null ? (+lastCi[id]).toFixed(1) : "-")).join("/"),
+    due: L.nextElectionDue || "",
   };
   window.__auspolCard = { selector: "#auspol-card", publishedISO: L.publishedISO, fig };
   console.log("card built for data published " + L.publishedISO + " – stamp for assets/auspol-card.json:\n"
