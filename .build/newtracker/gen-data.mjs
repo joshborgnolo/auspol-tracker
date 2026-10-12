@@ -3046,6 +3046,47 @@ for (const p of POLLS) {
 /* ---- 6. individual polls (full archive) -------------------------------- */
 
 /* ---- 6a. a poll's outbound links, named for what is behind each -------- */
+
+/* The citation watchdog's ledger (data/link-health.json — .build/
+   check-citations.mjs, weekly): per cited url, its last verdict and the
+   date a Wayback Machine capture was secured. linksOf annotates each
+   emitted link whose live target is not plainly healthy — paywalled,
+   moved or gone — so the views can offer the archived copy beside it:
+   the dated capture where the ledger holds a stamp, archive.org's
+   latest capture (the /web/2/ form) where it does not. A healthy link
+   earns nothing: a fallback is only a fallback where the live link can
+   fail the reader. The ledger file is optional at build time; a clone
+   without it simply builds the links as before. */
+const LINK_HEALTH = (() => {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "link-health.json"), "utf8"));
+    return new Map((j.links || []).map((e) => [e.url, e]));
+  } catch { return new Map(); }
+})();
+const LINK_FALLBACK_VERDICTS = new Set(["wall", "moved", "gone"]);
+const WAYBACK_MONTHS = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
+const waybackAnnotate = (l) => {
+  const h = l && l.href ? LINK_HEALTH.get(l.href) : null;
+  if (!h || l.pending) return;
+  // the /web/<yyyymmdd>/ form resolves to the nearest capture at the stamp
+  // date; for a stamped entry that is the very capture the pass secured
+  if (h.wayback && LINK_FALLBACK_VERDICTS.has(h.verdict)) {
+    const ymd = h.wayback.replace(/-/g, "");
+    l.wb = `https://web.archive.org/web/${ymd}/${l.href}`;
+    const day = Number(ymd.slice(6)), mon = WAYBACK_MONTHS[Number(ymd.slice(4, 6)) - 1], yr = ymd.slice(0, 4);
+    const why = h.verdict === "wall" ? "paywalled or blocked on the live site"
+      : h.verdict === "gone" ? "gone from the live site" : "moved or redirected on the live site";
+    l.wbTitle = `The live link is ${why}. This is the page as the Wayback Machine captured it on ${day} ${mon} ${yr}.`;
+  } else if (!h.wayback && LINK_FALLBACK_VERDICTS.has(h.verdict)) {
+    // failing on the live site and never stamped: offer archive.org's
+    // latest capture, if it holds one
+    l.wb = `https://web.archive.org/web/2/${l.href}`;
+    const why = h.verdict === "wall" ? "paywalled or blocked on the live site"
+      : h.verdict === "gone" ? "dead on the live site" : "moved or redirected on the live site";
+    l.wbTitle = `The live link is ${why}. This is the latest capture the Wayback Machine holds, if it has one.`;
+  }
+};
 /* One list, built here, that both redesign views render as is, so a link
    can't open the AFR article in Latest polls and Accent's page in All polls
    under the same words. Each link says whose it is: the house's own release
@@ -3127,6 +3168,8 @@ const linksOf = (p) => {
     const key = Object.keys(CITE_LABEL).find((d) => onHost(h, [d]));
     out.push({ k: "cite", t: key ? CITE_LABEL[key] : "Report (" + h + ")", href: p.url, title: "The published report this poll’s figures were read from" });
   }
+  // the archived copy rides on the link it falls back for (§6a header)
+  for (const l of out) waybackAnnotate(l);
   return out;
 };
 

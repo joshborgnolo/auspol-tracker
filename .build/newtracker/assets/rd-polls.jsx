@@ -44,14 +44,25 @@ function rdPollRow(p) {
    release, its APC methodology statement and the press report it was read
    from, each labelled for its source. A link the house hasn't posted yet
    reads "not yet out" in a fainter ink and opens the page it files them on.
-   Shared by the Latest polls detail and the opened poll in All polls. */
+   A link whose live target is paywalled, moved or gone carries its Wayback
+   twin on l.wb (gen-data's link-health ledger join): it renders as the
+   quiet "Archived copy" immediately behind its sibling. Shared by the
+   Latest polls detail and the opened poll in All polls. */
 function rdPollLinks(links) {
-  return (links || []).map((l) => (
-    <a key={l.k} className={"rd-link rd-link-ext" + (l.pending ? " rd-link-pend" : "")} href={l.href} target="_blank" rel="noopener noreferrer"
-       title={l.title} onClick={(ev) => ev.stopPropagation()}>
-      <span className="rd-link-t">{l.t}</span> <span className="rd-apd-ext" aria-hidden="true">↗</span>
-    </a>
-  ));
+  const out = [];
+  for (const l of links || []) {
+    out.push(
+      <a key={l.k} className={"rd-link rd-link-ext" + (l.pending ? " rd-link-pend" : "")} href={l.href} target="_blank" rel="noopener noreferrer"
+         title={l.title} onClick={(ev) => ev.stopPropagation()}>
+        <span className="rd-link-t">{l.t}</span> <span className="rd-apd-ext" aria-hidden="true">↗</span>
+      </a>);
+    if (l.wb) out.push(
+      <a key={l.k + "-wb"} className="rd-link rd-link-ext rd-link-arch" href={l.wb} target="_blank" rel="noopener noreferrer"
+         title={l.wbTitle || "An archived copy on the Wayback Machine"} onClick={(ev) => ev.stopPropagation()}>
+        <span className="rd-link-t">Archived copy</span> <span className="rd-apd-ext" aria-hidden="true">↗</span>
+      </a>);
+  }
+  return out;
 }
 
 /* where a pollster's NAME goes, in every row that shows one poll: that

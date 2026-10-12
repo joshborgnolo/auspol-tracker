@@ -16,6 +16,10 @@
      inconclusive skips      a >20%-error sweep makes no saves at all
      budget resumes later    the capped pass leaves pending; the next
                              run finishes them
+     availability pre-check  an existing capture stamps its own date and
+                             no save fires; a capture OLDER than the
+                             content falls through to the save, as do a
+                             miss and a dead api
 
    Run:  node .build/test-wayback-save.mjs    exits non-zero on failure
    ==================================================================== */
@@ -84,6 +88,8 @@ async function run(dir, wbPort, extraEnv = {}, wallRules = []) {
     CITATION_CHECK_POLLS: join(dir, "polls.json"),
     CITATION_CHECK_STATE: join(dir, "link-health.json"),
     CITATION_CHECK_ISSUES: join(dir, "issues.json"),
+    // same isolation for the second jurisdiction's data file
+    CITATION_CHECK_VIC: join(dir, "vic-polls.json"),
     CITATION_CHECK_DELAY_MS: "0",
     CITATION_CHECK_TIMEOUT_MS: "3000",
     CITATION_CHECK_429_BACKOFF_MS: "20",
@@ -92,6 +98,8 @@ async function run(dir, wbPort, extraEnv = {}, wallRules = []) {
     CITATION_CHECK_WAYBACK_BASE: `http://127.0.0.1:${wbPort}`,
     CITATION_CHECK_WAYBACK_BACKOFF_MS: "10",
     CITATION_CHECK_WAYBACK_TIMEOUT_MS: "4000",
+    // default suites pin the availability pre-check shut; its cases opt in
+    CITATION_CHECK_WAYBACK_AVAIL: "0",
     ...extraEnv,
   };
   let code = 0, stdout = "", stderr = "";
@@ -240,6 +248,119 @@ const entryOf = (dir, url) =>
     `first=${JSON.stringify(w1)} second=${JSON.stringify(w2)}`);
   content.server.close(); wb.server.close();
   fx.cleanup();
+}
+
+/* --- the availability pre-check -----------------------------------------
+   A fixture "archive.org/wayback/available" beside the usual save stub:
+   the plan maps a queried url to the payload archive.org would return.
+   Rows carry dates so the content-floor has something to bite on. */
+function serveAvail(plan = {}) {
+  const hits = [];
+  const server = createServer((req, res) => {
+    const u = new URL(req.url, "http://x");
+    if (u.pathname !== "/wayback/available") { res.writeHead(404); return res.end(); }
+    const url = u.searchParams.get("url");
+    hits.push(url);
+    const ans = plan[url];
+    if (ans === "500") { res.writeHead(500); return res.end("down"); }
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify(ans === undefined
+      ? { url, archived_snapshots: {} }
+      : { url, archived_snapshots: { closest: ans } }));
+  });
+  return new Promise((resolve) => server.listen(0, () =>
+    resolve({ server, port: server.address().port, hits })));
+}
+const capture = (timestamp, status = "200") => ({ available: true, url: "web", timestamp, status });
+
+{
+  const content = await serve(() => [200, PAGE]);
+  const p = content.port;
+  const u = (s) => `http://127.0.0.1:${p}/${s}`;
+  const urls = ["fresh", "old", "none", "sick", "hub"].map(u);
+  const dir = mkdtempSync(join(tmpdir(), "wayback-"));
+  writeFileSync(join(dir, "polls.json"), JSON.stringify({
+    polls: [
+      { url: urls[0], date: "2026-09-01" },   // capture after -> stamps
+      { url: urls[1], date: "2026-09-01" },   // capture before -> saves
+      { url: urls[2], date: "2026-09-01" },   // no capture -> saves
+      { url: urls[3], date: "2026-09-01" },   // api 500 -> saves
+    ],
+    pollsterRules: { House: { site: urls[4] } }, // undated: any capture counts
+  }));
+  const avail = await serveAvail({
+    [urls[0]]: capture("20260905120000"),
+    [urls[1]]: capture("20200101000000"),
+    [urls[3]]: "500",
+    [urls[4]]: capture("20190304000000"),
+  });
+  const wb = await serveWayback(302);
+  const r = await run(dir, wb.port, {
+    CITATION_CHECK_WAYBACK_AVAIL: "1",
+    CITATION_CHECK_WAYBACK_AVAIL_BASE: `http://127.0.0.1:${avail.port}/wayback/available`,
+  });
+  const w = r.status?.wayback || {};
+  ok("avail: exit 0", r.code === 0, `code=${r.code}\n${r.stdout}${r.stderr}`);
+  ok("avail: a post-content capture stamps its OWN date, no save fired",
+    entryOf(dir, urls[0])?.wayback === "2026-09-05" && !wb.hits.includes(urls[0]),
+    JSON.stringify(entryOf(dir, urls[0])) + " saves: " + JSON.stringify(wb.hits));
+  ok("avail: a pre-content capture falls through to a save stamped today",
+    /^\d{4}-\d{2}-\d{2}$/.test(entryOf(dir, urls[1])?.wayback || "") &&
+    entryOf(dir, urls[1])?.wayback !== "2020-01-01" &&
+    entryOf(dir, urls[1])?.wayback === new Date().toISOString().slice(0, 10),
+    JSON.stringify(entryOf(dir, urls[1])));
+  ok("avail: no capture at all falls through to a save",
+    wb.hits.includes(urls[2]) && !!entryOf(dir, urls[2])?.wayback,
+    JSON.stringify(entryOf(dir, urls[2])));
+  ok("avail: the api being down never blocks the save",
+    wb.hits.includes(urls[3]) && !!entryOf(dir, urls[3])?.wayback,
+    JSON.stringify(entryOf(dir, urls[3])));
+  ok("avail: an undated hub url accepts any capture's date",
+    entryOf(dir, urls[4])?.wayback === "2019-03-04" && !wb.hits.includes(urls[4]),
+    JSON.stringify(entryOf(dir, urls[4])));
+  ok("avail: tally separates existing captures from fresh saves",
+    w.existing === 2 && w.saved === 3 && w.failed === 0 && w.pending === 0 && w.attempted === 5,
+    JSON.stringify(w));
+  ok("avail: every target asked about; the api-500 one asked twice (one retry)",
+    avail.hits.length === 6 && avail.hits.filter((h) => h === urls[3]).length === 2,
+    JSON.stringify(avail.hits));
+  avail.server.close(); wb.server.close(); content.server.close();
+  rmSync(dir, { recursive: true, force: true });
+}
+
+/* --- a capture that reports a failure status counts as none ------------ */
+{
+  const content = await serve(() => [200, PAGE]);
+  const url = `http://127.0.0.1:${content.port}/redir`;
+  const dir = mkdtempSync(join(tmpdir(), "wayback-"));
+  writeFileSync(join(dir, "polls.json"), JSON.stringify({ polls: [{ url, date: "2026-09-01" }], pollsterRules: {} }));
+  const avail = await serveAvail({ [url]: capture("20260905000000", "404") });
+  const wb = await serveWayback(302);
+  const r = await run(dir, wb.port, {
+    CITATION_CHECK_WAYBACK_AVAIL: "1",
+    CITATION_CHECK_WAYBACK_AVAIL_BASE: `http://127.0.0.1:${avail.port}/wayback/available`,
+  });
+  ok("avail: a non-2xx capture is no copy of anything — falls through to a save",
+    r.status?.wayback?.existing === 0 && r.status?.wayback?.saved === 1 && wb.hits.includes(url),
+    JSON.stringify(r.status?.wayback));
+  avail.server.close(); wb.server.close(); content.server.close();
+  rmSync(dir, { recursive: true, force: true });
+}
+
+/* --- gracefully off when the env pins it shut --------------------------- */
+{
+  const content = await serve(() => [200, PAGE]);
+  const url = `http://127.0.0.1:${content.port}/plain`;
+  const dir = mkdtempSync(join(tmpdir(), "wayback-"));
+  writeFileSync(join(dir, "polls.json"), JSON.stringify({ polls: [{ url, date: "2026-09-01" }], pollsterRules: {} }));
+  const avail = await serveAvail({ [url]: capture("20260905000000") });
+  const wb = await serveWayback(302);
+  const r = await run(dir, wb.port, {}); // AVAIL defaults to "0" in this suite
+  ok("avail=0: no pre-check call, the save does the stamping",
+    avail.hits.length === 0 && wb.hits.includes(url) && r.status?.wayback?.saved === 1,
+    `availHits=${avail.hits.length} ${JSON.stringify(r.status?.wayback)}`);
+  avail.server.close(); wb.server.close(); content.server.close();
+  rmSync(dir, { recursive: true, force: true });
 }
 
 console.log(fails ? `\n${fails} FAILED` : "\nwayback-save test: all expectations held");

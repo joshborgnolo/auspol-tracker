@@ -462,6 +462,10 @@ body.rd .rd-link-ext .rd-link-t { text-decoration: underline; text-underline-off
 /* a link the pollster hasn't posted yet: fainter, dotted like the TBC placeholder */
 body.rd .rd-link-pend { color: var(--ink-3); font-weight: 400; }
 body.rd .rd-link-pend .rd-link-t { text-decoration-style: dotted; }
+/* the Wayback twin behind a failing live link: quiet, never competing
+   with what it falls back for */
+body.rd .rd-link-arch { color: var(--ink-3); font-weight: 400; }
+body.rd .rd-link-arch .rd-link-t { text-decoration-style: dotted; }
 
 /* ---------- masthead ------------------------------------------------------
    Identity left - the lockup a size up, the tagline in the serif - and on

@@ -1,6 +1,6 @@
 ---
 name: auspol-citation-check
-description: auspol-tracker — the citation link-rot watchdog (check-citations.mjs + citation-check.yml, shipped 464d2e6) sweeps the archive's outbound polls[].url/releaseUrl/methodUrl and pollsterRules[].site/releaseHub URLs weekly (started at 175 unique polls[].url/releaseUrl/pollsterRules[].site URLs on 2026-09-01; the methodUrl and releaseHub categories joined 2026-09-02, see "Adding a sweep category") and ledgers verdicts in data/link-health.json. Hard-won core rules — (1) wall classification is CONTENT-keyed (bodyRe/titleRe), never status-keyed, because status codes lie in both directions (News Corp's titleless 403 crawler-bot page, news24's 404 cookie wall, x.com's 200 JS shell, thenewdaily's Cloudflare "Just a moment") and a status-pinned rule silently rots when the host swaps statuses; (2) a redirect chain's TERMINAL hop can be wall machinery, so entries carry `hops` (the intermediate redirect URLs, in chain order) — hops[0] is the publisher's own 301 1:1 mapping and the actionable rewrite candidate the wall-endpoint finalUrl would otherwise throw away. Exit classes 0/1/2 where 2 = a citation TRANSITIONED to gone; the original standing baseline (three Australia Institute PDFs gone) was adjudicated same-day — rewritten to the institute's OWN cdn.australiainstitute.org.au copies (their 2026-08-18 CDN migration) rather than Wayback snapshots — and the ledger is written only on identity-tuple change. Acting on a bank-wide `moved` finding is a heal chain in a fixed order (extractor contract first — a polls.json-only edit self-reverts — then extractor rerun, downstream generators, rebuild with URL-only artifact proof, and the re-sweep LAST because the census enumerates from the data files at launch; worked on the seven SEC Newgate posts→PDFs, commit 4046c12).
+description: auspol-tracker — the citation link-rot watchdog (check-citations.mjs + citation-check.yml, shipped 464d2e6) sweeps the archive's outbound polls[].url/releaseUrl/methodUrl and pollsterRules[].site/releaseHub URLs weekly (started at 175 unique polls[].url/releaseUrl/pollsterRules[].site URLs on 2026-09-01; the methodUrl and releaseHub categories joined 2026-09-02, see "Adding a sweep category") and ledgers verdicts in data/link-health.json. Hard-won core rules — (1) wall classification is CONTENT-keyed (bodyRe/titleRe), never status-keyed, because status codes lie in both directions (News Corp's titleless 403 crawler-bot page, news24's 404 cookie wall, x.com's 200 JS shell, thenewdaily's Cloudflare "Just a moment") and a status-pinned rule silently rots when the host swaps statuses; (2) a redirect chain's TERMINAL hop can be wall machinery, so entries carry `hops` (the intermediate redirect URLs, in chain order) — hops[0] is the publisher's own 301 1:1 mapping and the actionable rewrite candidate the wall-endpoint finalUrl would otherwise throw away. Exit classes 0/1/2 where 2 = a citation TRANSITIONED to gone; the original standing baseline (three Australia Institute PDFs gone) was adjudicated same-day — rewritten to the institute's OWN cdn.australiainstitute.org.au copies (their 2026-08-18 CDN migration) rather than Wayback snapshots — and the ledger is written only on identity-tuple change. Acting on a bank-wide `moved` finding is a heal chain in a fixed order (extractor contract first — a polls.json-only edit self-reverts — then extractor rerun, downstream generators, rebuild with URL-only artifact proof, and the re-sweep LAST because the census enumerates from the data files at launch; worked on the seven SEC Newgate posts→PDFs, commit 4046c12). Since 2026-10-09 the same weekly run also ARCHIVES (commit bbc7153): every ok/wall/moved link is submitted to web.archive.org/save/<url> and a 2xx/3xx earns a `wayback: <date>` stamp on the ledger entry — decided over self-hosting after measuring the corpus at ~600 MB (~75% of it Accent's 10–41 MB monthly report PDFs). Completed 2026-10-12 on two fronts: the census swallowed the last two unswept citation categories (polls[].tablesUrl; vic-polls.json's three sourceUrl lists, env seam CITATION_CHECK_VIC), and an AVAILABILITY PRE-CHECK (archive.org/wayback/available) now stamps anyone's already-existing capture — content-floored at the url's earliest citing date, recorded at the capture's OWN date — before a throttled anonymous SPN save is attempted (the 2026-10-12 sweep saved only 31/180; the pre-check is what retires the backlog); and the DISPLAY half shipped: gen-data §6a waybackAnnotate reads the stamps into per-poll link objects, rdPollLinks emits a muted "Archived copy" twin (dated playback when stamped, /web/2/ latest-capture when not) beside every failing citation.
 source: auto-skill
 extracted_at: '2026-09-01T06:10:59.381Z'
 ---
@@ -199,6 +199,128 @@ hard-won points:
 - Known deliberate edge: living documents (Essential's shared disclosure
   PDF) are stamped once and never re-saved — the capture drifts behind
   the file; named in the spec as accepted.
+- **Why the weekly sweep owns the firing, not the 13 house updaters:**
+  single writer to link-health.json, no new shared-file push-race surface
+  across the writer fleet, and the ~300-link backfill is just the first
+  run — the cost is ≤7-day capture latency for a brand-new link (accepted;
+  rot is slow, and a per-updater hook can sit on top later if same-day
+  ever matters).
+
+### First live run (2026-10-09 backfill, run 37929262631)
+
+Day one's numbers looked alarming and were normal — pin them so nobody
+"fixes" them: `wayback {"attempted":177,"saved":50,"failed":127,
+"pending":143}` over 41 min (sweep ~22 min + the budgeted pass), the
+run green, `LINK_STATUS` verdict 0, and exactly the 50 stamps landing in
+the actions-bot commit (`085e9c2`). Reading the failure spread:
+
+- **Failed saves spread across EVERY host** (roymorgan 21,
+  theaustralian 12, smh 12, essential 12, news24 9, pyxis 7, afr 6 …) —
+  both open and walled. Host-independent spread = Wayback SPN throttling
+  back anonymous saves under concurrency 3, NOT content refusals, so no
+  per-house rule tuning is warranted. A save failure retries next weekly
+  run for free (the stamp never landed); only a host that keeps failing
+  week after week is worth a look — single-run failures are noise.
+- `pending 143` is the 30-min budget doing its job; "the mechanism is the
+  backfill" — expect the day-one backlog to retire over 2–3 weekly runs.
+- Verifying the run's commit when the LOCAL tree has sibling WIP:
+  `git pull --rebase` is refused on unstaged changes. Skip the stash
+  dance — the commit is already on origin, so verify read-only:
+  `git fetch origin main`, then
+  `git show origin/main:data/link-health.json | grep -c '"wayback"'`
+  must equal the run's saved tally, and `git log origin/main -1` is the
+  actions-bot commit. Only pull once local is clean again.
+- Mid-run log greps show NOTHING: `gh run view --log` only publishes
+  steps that have completed, and both sweep and save pass live inside
+  the ONE "Run the citation sweep" step — a run can sit at in_progress
+  for ~55 min with no visible output. Poll status, read the log after
+  completion.
+
+## The availability pre-check + full census (2026-10-12)
+
+Two closings of long-standing gaps, pushed together:
+
+1. **Census complete.** `polls[].tablesUrl` (Newspoll pooled's
+   demographic-tables PDFs on theaustralian's origin CDN) and the whole
+   second-jurisdiction ledger — `vic-polls.json`
+   (`polls`/`threeParty`/`leadership` rows' `sourceUrl`, tagged
+   `vic.sourceUrl`, date floor `v.date || v.approxDate || v.fwEnd`) —
+   were the only cited URLs the sweep had never touched. `collect()` now
+   returns `{targets, since}` where `since` maps every url to the
+   EARLIEST date of any row citing it (hub links carry none). New env
+   seam `CITATION_CHECK_VIC` — and that seam's absence was the session's
+   live-fire lesson: an un-isolated spawn of the checker against real
+   repo data hit live `web.archive.org/save/` and, worse, an earlier
+   smoke run WITHOUT `CITATION_CHECK_STATE` rewrote the committed
+   ledger to 3 entries (`git checkout -- data/link-health.json`
+   restored it; the identity-tuple write discipline means a clobber is
+   silent). When smoke-running, pass ALL the seams or use the fixtures.
+2. **Ask before you save.** Anonymous SPN throttling got worse, not
+   better (2026-10-09: 50/177 saved; 2026-10-12: 31/180) — a save-only
+   backfill converged in months. `availStamp(url, since)` asks
+   `archive.org/wayback/available` (one retry): a capture counts when
+   `available===true`, 14-digit timestamp, capture `status` 2xx, and
+   `ts >= since` (the earliest citing date — anyone's capture of the
+   page as it stood when we cited it — so a pre-dating capture of
+   something ELSE at the url is not a copy of this content). A hit
+   stamps the capture's OWN date and no save fires; miss/stale/API-500
+   fall THROUGH to the save, never block it. Off only under
+   `CITATION_CHECK_WAYBACK_AVAIL=0` (default in the fixture suites);
+   base overridable via `CITATION_CHECK_WAYBACK_AVAIL_BASE`. Tally
+   gains `existing` beside `{attempted,saved,failed,pending}`. Pinned
+   by test-wayback-save.mjs's `availability pre-check` battery (13
+   assertions over a fixture availability server; the api-500 case
+   proves the retry-then-save path with hit counts).
+
+## The display half: archived-copy fallbacks (2026-10-12)
+
+The ledger finally feeds the page (before this, NOTHING consumed
+link-health.json — detection and archiving with no reader-facing
+effect):
+
+- **gen-data.mjs §6a**: `LINK_HEALTH` (Map url→entry, try/catch empty,
+  so a clone without the file builds as before) and `waybackAnnotate(l)`
+  at the end of `linksOf`. Rules: stamped + verdict wall/moved/gone →
+  `l.wb=https://web.archive.org/web/<yyyymmdd>/<href>` (the dated form
+  resolves nearest-to = the very capture secured) + title naming the
+  capture date; failing but UNSTAMPED → `/web/2/<href>`
+  (archive.org's latest-capture form) + a hedged title — do NOT gate
+  the fallback on the stamp, or the day-shipped display shows ~1 link
+  out of ~60 failing ones (measured: 54 wall + 4 moved + 3 gone in the
+  ledger were unstamped at ship). Healthy links earn nothing — a
+  fallback is only a fallback where the live link can fail the reader.
+- **Renderer**: `rdPollLinks` (rd-polls.jsx — its ONE definition serves
+  both poll-detail homes, so this is an exception to the ledger
+  two-homes rule) emits a twin anchor right after the link when `l.wb`
+  is set: "Archived copy" ↗, key `l.k+"-wb"`, title tooltip from
+  `l.wbTitle`.
+- **CSS**: `body.rd .rd-link-arch` after the `.rd-link-pend` rules in
+  rd.css — `--ink-3`, weight 400, dotted underline on `.rd-link-t`;
+  muted so it never competes with the live link.
+- Ship-state proof: ~60 `"wb":"https://web.archive.org/web/…"` strings
+  in the 9f09dca2 data asset (grep the bundle — 1 dated + 59
+  best-effort at ship). The two fixture suites are in npm test, so the
+  whole chain is pinned.
+
+### Archive, don't host: the corpus measurement (2026-10-09)
+
+The archiving choice was evidence-backed. Asked "what would self-hosting
+the linked PDFs cost?", measured live: ~300 linked documents over 177 poll
+rows (176 `url` / 41 `releaseUrl` / 82 `methodUrl` pre-dedupe; DemosAU's
+releaseUrl mostly EQUALS its methodUrl). HEAD/GET-sampled real sizes per
+house — Accent's monthly report PDFs are the whale at 10.9–41.3 MB each
+(~32 MB mean × 15 ≈ 450 MB, ~75% of the corpus); DemosAU 1.3–3.9 MB;
+everything methodological is small (YouGov APC 160–304 KB, Essential
+265–374 KB, Pyxis Newspoll ~261 KB PDF or ~11 KB HTML-page links); HTML
+release pages ~90–750 KB each. Corpus ≈ **600 MB**; laptop-side that's
+~1.8 GB of transfer (download → push → second-clone pull) and ~2.4 GB of
+disk across the two checkouts since PDFs don't compress in git. Wayback
+SPN captures all of it for free, Accent monsters included — hence
+archive-don't-host. **Recipe if the question returns:** enumerate link
+fields out of data/polls.json with a node one-liner (group by pollster ×
+field), curl `-sIL` HEAD content-length for each house's newest URLs
+(pyxispolling's API doesn't honour HEAD — use a ranged GET instead;
+usrfiles gives clean content-lengths), then mean × count per house.
 
 ## Related
 

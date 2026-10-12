@@ -5,8 +5,9 @@
 
    Every poll row's citation is provenance, and nothing else verifies
    the unique URLs across polls[].url, polls[].releaseUrl,
-   polls[].methodUrl, pollsterRules[].site and
-   pollsterRules[].releaseHub. Status codes lie on this
+   polls[].methodUrl, polls[].tablesUrl, pollsterRules[].site,
+   pollsterRules[].releaseHub and the second jurisdiction's
+   vic-polls.json sourceUrl rows. Status codes lie on this
    archive in both
    directions — News Corp's mastheads answer anonymous GETs with a
    crawler-bot block page (403 to an honest UA today; the "No Cookies"
@@ -45,6 +46,20 @@
    and resumes next run — the mechanism, not any single run, is the
    backfill.
 
+   The pass knocks on the CHEAP door first (2026-10-12): archive.org's
+   availability API answers "is there already a capture, of anyone's,
+   no older than the content it cites?" for one JSON GET — peers,
+   crawlers and past saves included. A hit earns the stamp (the
+   capture's own date, so the front-end's /web/<date>/ pointer lands
+   exactly) and the heavyweight SPN crawl never fires for that url. An
+   anonymous SPN save failed 4 times in 5 on the 2026-10-09/12 runs —
+   throttling, not refusals — so the pre-check is also what retires the
+   backlog in weeks, not months. The date floor (each url's earliest
+   citing wave date) keeps a capture that predates the content from
+   masquerading as its fallback. A pre-check miss — no capture, api
+   down, whatever — simply falls through to the save, exactly as
+   before; CITATION_CHECK_WAYBACK_AVAIL=0 pins the door shut.
+
    Exit classes (coverage-doctor.mjs conventions — check-coverage's
    `3` already means "actionable gap"; do not reuse it):
 
@@ -62,6 +77,8 @@
      CITATION_CHECK_ROOT        repo root (default: this file's repo root)
      CITATION_CHECK_POLLS       polls.json path
      CITATION_CHECK_STATE       link-health.json path
+     CITATION_CHECK_ISSUES      issues.json path
+     CITATION_CHECK_VIC         vic-polls.json path
      CITATION_CHECK_DELAY_MS    inter-request delay (default 300)
      CITATION_CHECK_TIMEOUT_MS  per-hop fetch timeout (default 20000)
      CITATION_CHECK_429_BACKOFF_MS  retry wait after a 429 (default 5000)
@@ -73,6 +90,8 @@
      CITATION_CHECK_WAYBACK_CONCURRENCY  parallel saves (default 3)
      CITATION_CHECK_WAYBACK_TIMEOUT_MS per-save timeout (default 75000)
      CITATION_CHECK_WAYBACK_BACKOFF_MS retry wait (default 8000)
+     CITATION_CHECK_WAYBACK_AVAIL      "0" skips the availability pre-check
+     CITATION_CHECK_WAYBACK_AVAIL_BASE default https://archive.org/wayback/available
    ==================================================================== */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -84,6 +103,7 @@ const ROOT = process.env.CITATION_CHECK_ROOT ||
 const POLLS = process.env.CITATION_CHECK_POLLS || join(ROOT, "data/polls.json");
 const STATE = process.env.CITATION_CHECK_STATE || join(ROOT, "data/link-health.json");
 const ISSUES = process.env.CITATION_CHECK_ISSUES || join(ROOT, "data/issues.json");
+const VIC = process.env.CITATION_CHECK_VIC || join(ROOT, "data/vic-polls.json");
 const DELAY_MS = Number(process.env.CITATION_CHECK_DELAY_MS ?? 300);
 const TIMEOUT_MS = Number(process.env.CITATION_CHECK_TIMEOUT_MS ?? 20_000);
 const BACKOFF_429_MS = Number(process.env.CITATION_CHECK_429_BACKOFF_MS ?? 5000);
@@ -97,6 +117,8 @@ const WB_BUDGET_MS = Number(process.env.CITATION_CHECK_WAYBACK_BUDGET_MS ?? 30 *
 const WB_CONCURRENCY = Number(process.env.CITATION_CHECK_WAYBACK_CONCURRENCY ?? 3);
 const WB_TIMEOUT_MS = Number(process.env.CITATION_CHECK_WAYBACK_TIMEOUT_MS ?? 75_000);
 const WB_BACKOFF_MS = Number(process.env.CITATION_CHECK_WAYBACK_BACKOFF_MS ?? 8000);
+const WB_AVAIL = process.env.CITATION_CHECK_WAYBACK_AVAIL !== "0";
+const WB_AVAIL_BASE = (process.env.CITATION_CHECK_WAYBACK_AVAIL_BASE || "https://archive.org/wayback/available").replace(/\/+$/, "");
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const today = () => new Date().toISOString().slice(0, 10);
@@ -266,9 +288,46 @@ async function saveOnce(url) {
   return false;
 }
 
-async function waybackSavePhase(entries) {
+/* the cheap door first: archive.org's availability API answers whether
+   ANYONE's crawler has already captured this url — one JSON GET against
+   the heavyweight SPN crawl. A capture only counts as THIS content's
+   copy when its timestamp clears the url's earliest citing wave date
+   (a homepage capture from years before the poll is no fallback); a
+   2xx-status hit stamps the capture's own date. No hit, an api error or
+   a refusal all return null and leave the entry to the save queue. */
+async function availStamp(url, since) {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch(`${WB_AVAIL_BASE}?url=${encodeURIComponent(url)}`, {
+        redirect: "manual",
+        signal: AbortSignal.timeout(WB_TIMEOUT_MS),
+        headers: { "user-agent": UA },
+      });
+      if (res.status === 429 || res.status >= 500) {
+        if (attempt < 2) { await sleep(WB_BACKOFF_MS); continue; }
+        return null;
+      }
+      if (res.status < 200 || res.status >= 300) return null;
+      const j = await res.json().catch(() => null);
+      const c = j?.archived_snapshots?.closest;
+      const ts = c && String(c.timestamp || "");
+      if (c?.available !== true || !/^\d{14}$/.test(ts)) return null;
+      const status = Number(c.status);
+      if (!(status >= 200 && status < 300)) return null;
+      if (since && ts.slice(0, 8) < since.replace(/-/g, "")) return null;
+      return `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)}`;
+    } catch {
+      /* transient — the same one retry a save gets */
+      if (attempt < 2) { await sleep(WB_BACKOFF_MS); continue; }
+      return null;
+    }
+  }
+  return null;
+}
+
+async function waybackSavePhase(entries, sinceOf) {
   const eligible = entries.filter((e) => ["ok", "wall", "moved"].includes(e.verdict) && !e.wayback);
-  const wb = { attempted: 0, saved: 0, failed: 0, pending: 0 };
+  const wb = { attempted: 0, existing: 0, saved: 0, failed: 0, pending: 0 };
   if (!eligible.length) return wb;
   const deadline = Date.now() + WB_BUDGET_MS;
   const queue = eligible.slice();
@@ -277,6 +336,13 @@ async function waybackSavePhase(entries) {
     while (queue.length && Date.now() < deadline) {
       const e = queue.shift();
       wb.attempted++;
+      const have = WB_AVAIL && (await availStamp(e.url, sinceOf?.get(e.url)));
+      if (have) {
+        e.wayback = have;
+        wb.existing++;
+        console.log(`citation-check: wayback existing [${wb.attempted}/${eligible.length}] (${have}) ${e.url}`);
+        continue;
+      }
       const okSave = await saveOnce(e.url);
       if (okSave) { e.wayback = stamp; wb.saved++; } else { wb.failed++; }
       console.log(`citation-check: wayback ${okSave ? "saved " : "FAILED"} [${wb.attempted}/${eligible.length}] ${e.url}`);
@@ -284,7 +350,7 @@ async function waybackSavePhase(entries) {
   };
   await Promise.all(Array.from({ length: Math.min(WB_CONCURRENCY, eligible.length) }, worker));
   wb.pending = eligible.length - wb.attempted;
-  console.log(`citation-check: wayback pass — ${wb.saved} saved, ${wb.failed} failed, ${wb.pending} pending over budget`);
+  console.log(`citation-check: wayback pass — ${wb.existing} already captured, ${wb.saved} saved, ${wb.failed} failed, ${wb.pending} pending over budget`);
   return wb;
 }
 
@@ -315,32 +381,47 @@ function classify(url, got) {
   return { verdict: "error", note: `http ${got.status}` };
 }
 
-/* --- collect the sweep list -------------------------------------------- */
+/* --- collect the sweep list --------------------------------------------
+   Every outbound URL the pages cite. Each url also carries its earliest
+   citing wave date (`since`): the availability pre-check dates a capture
+   against it, so a snapshot from BEFORE the content existed never counts
+   as its copy. Hub pages (site/releaseHub) have no such date — any
+   capture of a rolling page is a capture. */
 function collect() {
   const data = JSON.parse(readFileSync(POLLS, "utf8"));
   const byUrl = new Map(); // url -> {url, fields:Set}
+  const since = new Map(); // url -> earliest citing date, "YYYY-MM-DD"
   const add = (u, field) => {
     if (!u || typeof u !== "string") return;
     if (!byUrl.has(u)) byUrl.set(u, { url: u, fields: new Set() });
     byUrl.get(u).fields.add(field);
   };
+  const cite = (u, field, date) => {
+    add(u, field);
+    if (!u || !/^\d{4}-\d{2}-\d{2}/.test(date || "")) return;
+    const d = date.slice(0, 10);
+    if (!since.has(u) || d < since.get(u)) since.set(u, d);
+  };
   for (const p of data.polls || []) {
-    add(p.url, "url");
-    add(p.releaseUrl, "releaseUrl");
-    add(p.methodUrl, "methodUrl");
+    cite(p.url, "url", p.date);
+    cite(p.releaseUrl, "releaseUrl", p.date);
+    cite(p.methodUrl, "methodUrl", p.date);
+    // the wave's demographic-tables supplement (Newspoll (pooled)'s URL
+    // on The Australian's origin CDN) — a citation like any other
+    cite(p.tablesUrl, "tablesUrl", p.date);
   }
   // the direction-only rows (SEC Newgate) carry the same outbound pair
   for (const d of data.direction || []) {
-    add(d.url, "url");
-    add(d.methodUrl, "methodUrl");
+    cite(d.url, "url", d.date);
+    cite(d.methodUrl, "methodUrl", d.date);
   }
   // Ipsos's issues waves (polled by nobody else) cite their report PDF and
   // APC statement from issues.json, not polls.json
   if (existsSync(ISSUES)) {
     const iss = JSON.parse(readFileSync(ISSUES, "utf8"));
     for (const w of [...(iss.salience || []), ...(iss.ownership || [])]) {
-      add(w.source, "issues.source");
-      add(w.methodUrl, "methodUrl");
+      cite(w.source, "issues.source", w.date);
+      cite(w.methodUrl, "methodUrl", w.date);
     }
   }
   // pollsterRules is an object keyed by pollster name
@@ -350,7 +431,18 @@ function collect() {
     // Federal Political Insights) — roving, so the sweep covers it too
     if (rule && rule.releaseHub) add(rule.releaseHub, "releaseHub");
   }
-  return [...byUrl.values()];
+  // the second jurisdiction: vic-polls.json rows cite their sources too,
+  // per wave and per leadership/first-preference reading alike. A row's
+  // own date is approxDate/fwEnd when no release date is curated at all
+  if (existsSync(VIC)) {
+    const vic = JSON.parse(readFileSync(VIC, "utf8"));
+    for (const list of [vic.polls, vic.threeParty, vic.leadership]) {
+      for (const v of list || []) {
+        cite(v.sourceUrl, "vic.sourceUrl", v.date || v.approxDate || v.fwEnd);
+      }
+    }
+  }
+  return { targets: [...byUrl.values()], since };
 }
 
 function emit(code, payload) {
@@ -359,7 +451,8 @@ function emit(code, payload) {
 }
 
 async function main() {
-  let targets = collect().slice(0, MAX === Infinity ? undefined : MAX);
+  const sw = collect();
+  const targets = sw.targets.slice(0, MAX === Infinity ? undefined : MAX);
   console.log(`citation-check: ${targets.length} unique URLs from ${POLLS}`);
 
   const prev = existsSync(STATE)
@@ -448,7 +541,7 @@ async function main() {
 
   let wayback = null;
   if (WAYBACK_SAVE && !inconclusive) {
-    wayback = await waybackSavePhase(entries);
+    wayback = await waybackSavePhase(entries, sw.since);
     if (identity(entries) !== writtenIdentity) {
       writeState();
       console.log("citation-check: wayback stamps landed — wrote link-health.json");

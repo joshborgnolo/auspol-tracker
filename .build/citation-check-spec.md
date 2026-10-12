@@ -15,6 +15,8 @@ ledger, 2026-09-01):
 | `polls[].releaseUrl` | 22 | the pollster's own release, beside the coverage link |
 | `pollsterRules.*.site` | 7 | the publisher index — **load-bearing** (10 deployments, 7 unique) |
 | `pollsterRules.*.releaseHub` | 1 | the house's rolling report collection page (Essential's Federal Political Insights) — roving, swept for drift like `site` |
+| `polls[].tablesUrl` | ~6 | Newspoll (pooled)'s demographic-tables supplement PDF on The Australian's origin CDN — a rot there would sit silent beside the article citation (joined 2026-10-12) |
+| vic-polls.json (`polls`/`threeParty`/`leadership`).`sourceUrl` | few | the second jurisdiction's provenance rows, tagged `vic.sourceUrl`; earliest citing date taken as `date || approxDate || fwEnd` (joined 2026-10-12) |
 
 Post-census: `polls[].methodUrl` joined the sweep 2026-09-02 (the YouGov /
 Newspoll APC statement links — YouGov's CloudFront
@@ -251,3 +253,57 @@ each wave) is stamped once and never re-saved, so its capture drifts
 behind the live file. Re-saving belongs to a scheduler this watch doesn't
 have; if the document rots, the sweep still flags `gone` and the last live
 capture stands.
+
+## The availability pre-check (added 2026-10-12)
+
+Anonymous SPN saves throttle hard (~80% of attempts; 31 of 180 saved on
+the 2026-10-12 sweep), so save-only backfill converged in months, not
+runs. But this archive cites *published* coverage other people wanted
+archived too: before spending a save, the pass now asks
+`archive.org/wayback/available?url=<url>` whether a capture already
+exists — one cheap JSON call, no submission budget at all.
+
+A capture counts only if it is a copy of *this* content:
+
+- `available === true` with a 14-digit timestamp and a 2xx capture
+  `status`;
+- and, when the URL is cited by a dated row (a wave's
+  `url`/`releaseUrl`/`methodUrl`/`tablesUrl`, an issues/direction row,
+  a vic row), the capture's timestamp must sit at or after the
+  **earliest citing date** across the census — anyone's capture of the
+  page as it stood when we cited it. Undated hub links
+  (`site`/`releaseHub`) carry no floor: any capture counts.
+
+A hit stamps the capture's *own* date (so the display layer's dated
+playback URL lands exactly on the live capture) and spends no save. A
+miss, a stale capture, or the API being down (one retry, tallied) falls
+through to the usual save, never blocks it. The tally gains `existing`
+beside `{attempted, saved, failed, pending}`; a run where archive.org
+found the copies reads `existing` in the dozens and `saved` near zero.
+Off only when `CITATION_CHECK_WAYBACK_AVAIL=0` (the fixture suites pin
+it so their save stubs never see the pre-check);
+`CITATION_CHECK_WAYBACK_AVAIL_BASE` points the call at a fixture.
+Pinned by `test-wayback-save.mjs`'s `availability pre-check` battery.
+
+## The display half: archived-copy fallbacks (added 2026-10-12)
+
+Detection and stamping now meet in the ledger, so the ledger feeds the
+page. `gen-data.mjs` §6a loads `data/link-health.json` (optional at
+build; a clone without it builds the links as before) and
+`waybackAnnotate()` marks each emitted link in `linksOf`:
+
+- stamped **and** failing (`wall`/`moved`/`gone`) → `l.wb` =
+  `/web/<yyyymmdd>/<url>` (the dated playback URL, resolving to the
+  very capture the pass secured) + a title naming the capture date;
+- failing but **unstamped** → `l.wb` = `/web/2/<url>` (archive.org's
+  latest-capture form) + a hedged "latest capture it holds, if any"
+  title — the fallback is offered wherever the live link can fail the
+  reader, not only where the backlog has retired;
+- `ok`/`error`/unledgered/pending links earn nothing.
+
+`rdPollLinks` (rd-polls.jsx — one renderer, both poll-detail homes)
+emits a muted twin after any annotated link: "Archived copy" ↗ with the
+title as its tooltip, styled `body.rd .rd-link-arch` in rd.css. Net
+effect at ship: ~60 of 322 ledgered citations show the twin — 54
+walled, 4 moved, 3 gone — and every fresh stamp deepens a fallback that
+already exists for every failing link on the page.

@@ -3371,6 +3371,8 @@ body.rd .rd-link-ext { text-decoration: none; }
 body.rd .rd-link-ext .rd-link-t { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-link-pend { color: var(--ink-3); font-weight: 400; }
 body.rd .rd-link-pend .rd-link-t { text-decoration-style: dotted; }
+body.rd .rd-link-arch { color: var(--ink-3); font-weight: 400; }
+body.rd .rd-link-arch .rd-link-t { text-decoration-style: dotted; }
 body.rd .site-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 16px; align-items: flex-start; }
 body.rd .wordmark, body.rd .wm-name, body.rd .wordmark.stacked .wm-track { font-size: 34px; }
 body.rd .wordmark.stacked .wm-track { color: var(--ink-2); }
@@ -50331,20 +50333,38 @@ function rdPollRow(p) {
   };
 }
 function rdPollLinks(links) {
-  return (links || []).map(l => React.createElement("a", {
-    key: l.k,
-    className: "rd-link rd-link-ext" + (l.pending ? " rd-link-pend" : ""),
-    href: l.href,
-    target: "_blank",
-    rel: "noopener noreferrer",
-    title: l.title,
-    onClick: ev => ev.stopPropagation()
-  }, React.createElement("span", {
-    className: "rd-link-t"
-  }, l.t), " ", React.createElement("span", {
-    className: "rd-apd-ext",
-    "aria-hidden": "true"
-  }, "\u2197")));
+  const out = [];
+  for (const l of links || []) {
+    out.push(React.createElement("a", {
+      key: l.k,
+      className: "rd-link rd-link-ext" + (l.pending ? " rd-link-pend" : ""),
+      href: l.href,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      title: l.title,
+      onClick: ev => ev.stopPropagation()
+    }, React.createElement("span", {
+      className: "rd-link-t"
+    }, l.t), " ", React.createElement("span", {
+      className: "rd-apd-ext",
+      "aria-hidden": "true"
+    }, "\u2197")));
+    if (l.wb) out.push(React.createElement("a", {
+      key: l.k + "-wb",
+      className: "rd-link rd-link-ext rd-link-arch",
+      href: l.wb,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      title: l.wbTitle || "An archived copy on the Wayback Machine",
+      onClick: ev => ev.stopPropagation()
+    }, React.createElement("span", {
+      className: "rd-link-t"
+    }, "Archived copy"), " ", React.createElement("span", {
+      className: "rd-apd-ext",
+      "aria-hidden": "true"
+    }, "\u2197")));
+  }
+  return out;
 }
 function rdPollNameLink(p, mark = "plink-mark") {
   const ok = (p.links || []).filter(x => !x.pending);

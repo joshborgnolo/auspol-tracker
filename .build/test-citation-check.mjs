@@ -96,6 +96,8 @@ async function run(dir, wallRules, extraEnv = {}) {
     CITATION_CHECK_STATE: join(dir, "link-health.json"),
     // the script's default is the repo's own issues.json — never the fixture's
     CITATION_CHECK_ISSUES: join(dir, "issues.json"),
+    // same for the second jurisdiction's data file
+    CITATION_CHECK_VIC: join(dir, "vic-polls.json"),
     CITATION_CHECK_DELAY_MS: "0",
     CITATION_CHECK_TIMEOUT_MS: "8000",
     CITATION_CHECK_429_BACKOFF_MS: "20",
@@ -341,6 +343,44 @@ for (const [name, seedVerdict] of [["ok", "ok"], ["wall", "wall"], ["moved", "mo
     !!verdictOf(dir, `http://127.0.0.1:${port}/ipsos-statement.pdf`));
   ok("direction+issues: issues report tagged issues.source",
     verdictOf(dir, `http://127.0.0.1:${port}/ipsos-report.pdf`)?.fields?.includes("issues.source"));
+  srv.server.close();
+  rmSync(dir, { recursive: true, force: true });
+}
+
+/* --- tablesUrl and the second jurisdiction's sources join the sweep ----
+   Newspoll (pooled)'s demographic-tables supplement lives on The
+   Australian's origin CDN; a rot there would sit silent beside the
+   article citation. And vic-polls.json is the archive's second ledger —
+   its sourceUrl rows are provenance the same way polls[].url is. */
+{
+  const srv = await serve((path) => path.endsWith(".pdf")
+    ? [200, "%PDF-simulated-bytes", { "content-type": "application/pdf" }]
+    : [200, PAGE]);
+  const port = srv.port;
+  const dir = mkdtempSync(join(tmpdir(), "cite-check-"));
+  writeFileSync(join(dir, "polls.json"), JSON.stringify({
+    polls: [{
+      url: `http://127.0.0.1:${port}/story`,
+      tablesUrl: `http://127.0.0.1:${port}/tables.pdf`,
+      date: "2026-09-01",
+    }],
+    pollsterRules: {},
+  }));
+  writeFileSync(join(dir, "vic-polls.json"), JSON.stringify({
+    polls: [{ sourceUrl: `http://127.0.0.1:${port}/vic-wave`, date: "2026-10-01" }],
+    threeParty: [{ sourceUrl: `http://127.0.0.1:${port}/vic-3cp`, fwEnd: "2026-10-05" }],
+    leadership: [{ sourceUrl: `http://127.0.0.1:${port}/vic-leader`, date: "2026-10-03" }],
+  }));
+  const r = await run(dir, []);
+  ok("tables+vic: exit 0, all five urls swept", r.code === 0 && r.status?.checked === 5,
+    `code=${r.code} ${JSON.stringify(r.status)}\n${r.stdout}${r.stderr}`);
+  ok("tables+vic: tables pdf tagged tablesUrl",
+    verdictOf(dir, `http://127.0.0.1:${port}/tables.pdf`)?.fields?.includes("tablesUrl"));
+  ok("tables+vic: vic rows swept from all three lists",
+    ["vic-wave", "vic-3cp", "vic-leader"].every((s) => !!verdictOf(dir, `http://127.0.0.1:${port}/${s}`)),
+    r.status?.checked + " checked");
+  ok("tables+vic: vic rows tagged vic.sourceUrl",
+    verdictOf(dir, `http://127.0.0.1:${port}/vic-3cp`)?.fields?.includes("vic.sourceUrl"));
   srv.server.close();
   rmSync(dir, { recursive: true, force: true });
 }
