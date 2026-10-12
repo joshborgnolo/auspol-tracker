@@ -9,7 +9,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { ROOT, crosstabOfHtml, decodeUx } from "./crosstab-sources.mjs";
 import {
-  switchingOf, ygGroup, youGovDims, demosLabel, redbridgeTable, resolveWaves,
+  switchingOf, ygGroup, youGovDims, demosLabel, demosauMrpDemo, redbridgeTable, resolveWaves,
   essentialWaves, essentialMatch,
   sharesProblem, dimsProblem, totalProblem,
 } from "./crosstab-parse.mjs";
@@ -407,6 +407,46 @@ assert.equal(demosLabel("income", "<$45K"), "Under $45k");
 assert.equal(demosLabel("income", "$45-125K"), "$45–125k");
 assert.equal(demosLabel("income", "$125K+"), "$125k+");
 
+// ---- DemosAU (MRP): the reports' demographic trend pages ---------------------------------
+{
+  const src = (slug) => readFileSync(path.join(ROOT, ".build/demosau-src", slug + ".txt"), "utf8");
+  const as = demosauMrpDemo(src("DemosAU-Report-Aug-Sept-2026-MRP-Model-1"));
+  const mj = demosauMrpDemo(src("DemosAU-Report-May-July-2026-MRP-Model-"));
+  assert.equal(as.period, "Aug-Sept 26", "the report's own model is each chart's last row");
+  assert.deepEqual(Object.keys(as.history), ["Oct-Nov 25", "Feb-March 26", "May-July 26"]);
+  assert.deepEqual(as.dims.gender, { Men: { alp: 26, grn: 11, oth: 11, lnp: 22, onp: 30 }, Women: { alp: 28, grn: 15, oth: 12, lnp: 22, onp: 23 } });
+  // the printed titles tidied onto DEMOSAU_MRP_DEMO's names ("75,001-$125,000" lacks its "$")
+  assert.deepEqual(Object.keys(as.dims.income), ["Under $45k", "$45–75k", "$75–125k", "$125–200k", "$200k+"]);
+  assert.deepEqual(as.dims.state.ACT, { alp: 39, grn: 16, oth: 12, lnp: 21, onp: 12 });
+  assert.deepEqual(as.dims.location["Reg & Rur"], { alp: 20, grn: 8, oth: 15, lnp: 23, onp: 34 });
+  assert.deepEqual(as.dims.education["Didn't Finish Grade 12"], { alp: 26, grn: 7, oth: 12, lnp: 21, onp: 34 }, "the curly apostrophe");
+  assert.equal(dimsProblem(as.dims), null);
+  assert.equal(mj.period, "May-July 26");
+  assert.deepEqual(as.history["May-July 26"], mj.dims, "the Aug–Sep report reprints the May–Jul model exactly");
+  // the reprinted earlier models against the hand entries from their own reports
+  const hand = (date) => wave("DemosAU (MRP)", date).dims;
+  const sorted = (d) => JSON.parse(JSON.stringify(d, (k, v) => (v && typeof v === "object" && !Array.isArray(v)
+    ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b))) : v)));
+  for (const r of [as, mj]) {
+    assert.deepEqual(sorted(r.history["Oct-Nov 25"]), sorted(hand("2025-11-11")), `the ${r.period} report's Oct–Nov rows match the hand entries`);
+    // one cell differs: both later reports reprint Feb–Mar's $45–75k as Greens 16 / One Nation 25,
+    // the March report itself printed 14 / 27 – the hand entry keeps the original
+    const fm = sorted(r.history["Feb-March 26"]);
+    assert.deepEqual([fm.income["$45–75k"].grn, fm.income["$45–75k"].onp], [16, 25]);
+    fm.income["$45–75k"] = { ...fm.income["$45–75k"], grn: 14, onp: 27 };
+    assert.deepEqual(fm, sorted(hand("2026-03-03")), `the ${r.period} report's Feb–Mar rows match the hand entries but for that cell`);
+  }
+  // the filed waves are the reader's output
+  assert.deepEqual(wave("DemosAU (MRP)", "2026-09-19").dims, as.dims);
+  assert.deepEqual(wave("DemosAU (MRP)", "2026-07-11").dims, mj.dims);
+  // the older one-chart-per-dimension layout is refused, never misread
+  assert.match(demosauMrpDemo(src("DemosAU-Federal-MRP-Model-FebMarch-2026-")).error, /gender: group .* isn't one this reader knows/);
+  assert.match(demosauMrpDemo(src("DemosAU-Fed-Poll-May-2026-FINAL")).error, /no demographic trend pages/);
+  // a row short a share is an error, not a partial group
+  const short = src("DemosAU-Report-Aug-Sept-2026-MRP-Model-1").replace(/(Aug-Sept 26\s+26%\s+)11%\s+/, "$1");
+  assert.match(demosauMrpDemo(short).error, /gender Men Aug-Sept 26: .* isn't one share per legend party/);
+}
+
 // ---- Essential: the Primary Vote+ visuals, matched wave by wave ----------------------------
 // the fold and the question filter, on a synthetic two-group wave
 const essRow = (vis, ans, v) => `2026-09-30,primary,"Primary Vote+",${vis},${ans},${v}`;
@@ -592,4 +632,4 @@ assert.deepEqual(shiftsVs.rows.onp, { alp: 0.7, lnp: 0.8, onp: 96, grn: 0.3, oth
 assert.deepEqual(shiftsVs.rows.oth, { alp: 5, lnp: 5, onp: 27, grn: 3, oth: 55, und: 5 });
 assert.deepEqual(shiftsVs.rows.dnr, { alp: 11, lnp: 8, onp: 18, grn: 5, oth: 12, und: 46 });
 
-console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels, the EMRS Tasmanian-electorate cut, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels and MRP trend pages, the EMRS Tasmanian-electorate cut, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");

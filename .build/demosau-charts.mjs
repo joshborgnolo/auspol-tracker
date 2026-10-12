@@ -52,6 +52,12 @@ function bin(name) {
   throw new Error(`${name} not found (install poppler)`);
 }
 
+// the report's text as extract-demosau.mjs caches it (pdftotext -layout) –
+// the MRP reports' demographic pages are read from this, not measured
+export function layoutText(pdf) {
+  return execFileSync(bin("pdftotext"), ["-layout", pdf, "-"], { encoding: "utf8", maxBuffer: 1 << 26 });
+}
+
 function pagesOf(pdf, tmp) {
   const html = path.join(tmp, "bbox.html");
   execFileSync(bin("pdftotext"), ["-bbox-layout", pdf, html]);

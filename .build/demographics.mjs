@@ -33,11 +33,17 @@
                  in DEMOSAU_EARLY_DEMO below, the 21 Jan wave measured from
                  a 300-dpi render of its report. Its Income chart (personal
                  income) is read to the same facet-only end as YouGov's.
-     DemosAU (MRP) / YouGov (MRP) – the two MRP reports print their
-                 demographic tables as native text: hand-entered in
-                 DEMOSAU_MRP_DEMO / YOUGOV_MRP_DEMO below (their Tas, NT and
-                 ACT rows are kept as printed – the common state set's
-                 smaller-region merge only knows YouGov's ACT/NT/Tas cut).
+     DemosAU (MRP) – from the May–Jul 2026 model the report's demographic
+                 trend pages (gender, age, education, income, location,
+                 state), read from its text by crosstab-parse.mjs'
+                 demosauMrpDemo: the report's own row of each chart. The
+                 Oct–Nov 2025 and Feb–Mar 2026 reports' older layout is
+                 hand-entered in DEMOSAU_MRP_DEMO below.
+     YouGov (MRP) – the MRP report prints its demographic tables as native
+                 text: hand-entered in YOUGOV_MRP_DEMO below. Both houses'
+                 Tas, NT and ACT rows are kept as printed – the common state
+                 set's smaller-region merge only knows YouGov's ACT/NT/Tas
+                 cut.
      RedBridge – the "First preference vote intention" table in the report
                  text extract-redbridge.mjs caches (.build/redbridge-src/),
                  from February 2026: generation, gender, location, education,
@@ -185,8 +191,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { ROOT, youGovSource, youGovCrosstab, demosauReport, resolveData } from "./crosstab-sources.mjs";
-import { youGovDims, DEMOS_DIM, demosLabel, redbridgeTable, resolveWaves, essentialWaves, essentialMatch, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
-import { measureCharts, FIT_LIMIT } from "./demosau-charts.mjs";
+import { youGovDims, DEMOS_DIM, demosLabel, demosauMrpDemo, redbridgeTable, resolveWaves, essentialWaves, essentialMatch, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
+import { measureCharts, FIT_LIMIT, layoutText } from "./demosau-charts.mjs";
 import { watchReminders } from "./demo-watch.mjs";
 
 const OUT = path.join(ROOT, "data", "demographics.json");
@@ -1092,7 +1098,12 @@ const DEMOSAU_EARLY_DEMO = {
    (the national series' combined cut, filed there as "Regional or rural").
    Totals are the report's printed national MRP estimates. The March
    report's header reads "Total Sample Size: 8,424" against the poll row's
-   recorded 8,484 – the wave's sample comes from the poll row, not here. */
+   recorded 8,484 – the wave's sample comes from the poll row, not here.
+   The May–Jul and Aug–Sep 2026 reports reprint both models as trend rows
+   (read automatically from then on – demosauMrpDemo). Every Oct–Nov figure
+   agrees with these entries. One Feb–Mar cell does not: $45–75k is reprinted
+   as Greens 16 / One Nation 25, against 14 / 27 in the March report itself.
+   The original report's figures stand here. */
 const DEMOSAU_MRP_DEMO = {
   "2025-11-11": {
     source: "https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL-1.pdf",
@@ -1622,10 +1633,11 @@ const essWaves = essentialWaves(fs.readFileSync(path.join(ROOT, "data", "essenti
 // the hand-entered waves below (DEMOSAU_EARLY_DEMO…YOUGOV_TAI_DEMO) cover
 // these rows themselves – the readers never get a second pass at them
 const HAND_KEYS = new Set(Object.keys(YOUGOV_TAI_DEMO).map((d) => "YouGov|" + d)
-  .concat(Object.keys(DEMOSAU_EARLY_DEMO).map((d) => "DemosAU|" + d)));
+  .concat(Object.keys(DEMOSAU_EARLY_DEMO).map((d) => "DemosAU|" + d))
+  .concat(Object.keys(DEMOSAU_MRP_DEMO).map((d) => "DemosAU (MRP)|" + d)));
 try {
   const candidates = polls.filter((p) => !HAND_KEYS.has(key(p))
-    && ((["YouGov", "DemosAU", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
+    && ((["YouGov", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
     || FIRST_EXTRA.has(key(p))
     || (p.pollster === "Essential" && p.date >= FIRST_ESS)));
   for (const p of candidates) {
@@ -1661,6 +1673,16 @@ try {
         if (bad) { pend(k, bad); continue; }
         push({ ...base, source: rep.url, read: "measured from the charts", dims, fit });
         console.log(`${k}: ${Object.keys(dims).join(", ")} (fit ${fit})`);
+      } else if (p.pollster === "DemosAU (MRP)") {
+        // an MRP filed from Capital Brief has no report until DemosAU posts it
+        if (p.fieldworkPending) { pend(k, "the MRP report isn't out yet (fieldwork TBC)"); continue; }
+        const rep = await demosauReport(p, tmp);
+        if (!rep) { pend(k, "the MRP report PDF isn't reachable yet"); continue; }
+        const r = demosauMrpDemo(layoutText(rep.file));
+        const bad = r.error || dimsProblem(r.dims);
+        if (bad) { pend(k, `the MRP report's demographic pages didn't read cleanly – ${bad}`); continue; }
+        push({ ...base, source: rep.url, read: "published table", dims: r.dims });
+        console.log(`${k}: ${r.period} – ${Object.entries(r.dims).map(([dm, g]) => `${dm}(${Object.keys(g).length})`).join(" ")}`);
       } else if (p.pollster === "Essential") {
         const dte = essentialMatch(essWaves, p);
         if (!dte) { pend(k, "no Primary Vote+ wave in essential-report.csv within five days of this row"); continue; }

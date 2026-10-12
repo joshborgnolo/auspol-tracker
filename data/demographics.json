@@ -9861,6 +9861,212 @@
    "fit": 0.29
   },
   {
+   "pollster": "DemosAU (MRP)",
+   "date": "2026-07-11",
+   "dateStart": "2026-05-27",
+   "dateEnd": "2026-07-11",
+   "sample": 9343,
+   "article": "https://demosau.com/news/new-mrp-model-points-to-hung-parliament/",
+   "source": "https://demosau.com/wp-content/uploads/2026/07/DemosAU-Report-May-July-2026-MRP-Model-.pdf",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 26,
+      "grn": 10,
+      "oth": 10,
+      "lnp": 21,
+      "onp": 33
+     },
+     "Women": {
+      "alp": 26,
+      "grn": 16,
+      "oth": 11,
+      "lnp": 20,
+      "onp": 27
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 26,
+      "grn": 25,
+      "oth": 9,
+      "lnp": 17,
+      "onp": 23
+     },
+     "35–54": {
+      "alp": 27,
+      "grn": 13,
+      "oth": 11,
+      "lnp": 19,
+      "onp": 30
+     },
+     "55+": {
+      "alp": 26,
+      "grn": 5,
+      "oth": 10,
+      "lnp": 25,
+      "onp": 34
+     }
+    },
+    "education": {
+     "Didn't Finish Grade 12": {
+      "alp": 24,
+      "grn": 7,
+      "oth": 11,
+      "lnp": 19,
+      "onp": 39
+     },
+     "Grade 12": {
+      "alp": 27,
+      "grn": 16,
+      "oth": 10,
+      "lnp": 21,
+      "onp": 26
+     },
+     "TAFE": {
+      "alp": 24,
+      "grn": 12,
+      "oth": 12,
+      "lnp": 18,
+      "onp": 34
+     },
+     "Undergraduate": {
+      "alp": 28,
+      "grn": 17,
+      "oth": 9,
+      "lnp": 25,
+      "onp": 21
+     },
+     "Postgraduate": {
+      "alp": 32,
+      "grn": 17,
+      "oth": 8,
+      "lnp": 23,
+      "onp": 20
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 26,
+      "grn": 13,
+      "oth": 11,
+      "lnp": 20,
+      "onp": 30
+     },
+     "$45–75k": {
+      "alp": 26,
+      "grn": 14,
+      "oth": 9,
+      "lnp": 20,
+      "onp": 31
+     },
+     "$75–125k": {
+      "alp": 27,
+      "grn": 11,
+      "oth": 11,
+      "lnp": 23,
+      "onp": 28
+     },
+     "$125–200k": {
+      "alp": 27,
+      "grn": 11,
+      "oth": 11,
+      "lnp": 23,
+      "onp": 28
+     },
+     "$200k+": {
+      "alp": 23,
+      "grn": 10,
+      "oth": 11,
+      "lnp": 29,
+      "onp": 27
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "grn": 18,
+      "oth": 11,
+      "lnp": 21,
+      "onp": 19
+     },
+     "Outer metro": {
+      "alp": 28,
+      "grn": 12,
+      "oth": 9,
+      "lnp": 21,
+      "onp": 30
+     },
+     "Reg & Rur": {
+      "alp": 18,
+      "grn": 9,
+      "oth": 12,
+      "lnp": 20,
+      "onp": 41
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 27,
+      "grn": 12,
+      "oth": 11,
+      "lnp": 20,
+      "onp": 30
+     },
+     "Vic": {
+      "alp": 25,
+      "grn": 14,
+      "oth": 10,
+      "lnp": 24,
+      "onp": 27
+     },
+     "Qld": {
+      "alp": 23,
+      "grn": 13,
+      "oth": 9,
+      "lnp": 21,
+      "onp": 34
+     },
+     "WA": {
+      "alp": 26,
+      "grn": 12,
+      "oth": 11,
+      "lnp": 19,
+      "onp": 32
+     },
+     "SA": {
+      "alp": 31,
+      "grn": 14,
+      "oth": 9,
+      "lnp": 19,
+      "onp": 27
+     },
+     "Tas": {
+      "alp": 26,
+      "grn": 11,
+      "oth": 19,
+      "lnp": 13,
+      "onp": 31
+     },
+     "ACT": {
+      "alp": 44,
+      "grn": 15,
+      "oth": 9,
+      "lnp": 16,
+      "onp": 16
+     },
+     "NT": {
+      "alp": 28,
+      "grn": 11,
+      "oth": 9,
+      "lnp": 18,
+      "onp": 34
+     }
+    }
+   }
+  },
+  {
    "pollster": "Resolve",
    "date": "2026-07-12",
    "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
@@ -12794,6 +13000,212 @@
     "grn": 13,
     "onp": 30,
     "oth": 9
+   }
+  },
+  {
+   "pollster": "DemosAU (MRP)",
+   "date": "2026-09-19",
+   "dateStart": "2026-08-04",
+   "dateEnd": "2026-09-19",
+   "sample": 9740,
+   "article": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
+   "source": "https://demosau.com/wp-content/uploads/2026/10/DemosAU-Report-Aug-Sept-2026-MRP-Model-1.pdf",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 26,
+      "grn": 11,
+      "oth": 11,
+      "lnp": 22,
+      "onp": 30
+     },
+     "Women": {
+      "alp": 28,
+      "grn": 15,
+      "oth": 12,
+      "lnp": 22,
+      "onp": 23
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 29,
+      "grn": 25,
+      "oth": 10,
+      "lnp": 19,
+      "onp": 17
+     },
+     "35–54": {
+      "alp": 28,
+      "grn": 12,
+      "oth": 13,
+      "lnp": 21,
+      "onp": 26
+     },
+     "55+": {
+      "alp": 25,
+      "grn": 6,
+      "oth": 11,
+      "lnp": 26,
+      "onp": 32
+     }
+    },
+    "education": {
+     "Didn't Finish Grade 12": {
+      "alp": 26,
+      "grn": 7,
+      "oth": 12,
+      "lnp": 21,
+      "onp": 34
+     },
+     "Grade 12": {
+      "alp": 28,
+      "grn": 16,
+      "oth": 11,
+      "lnp": 22,
+      "onp": 23
+     },
+     "TAFE": {
+      "alp": 25,
+      "grn": 12,
+      "oth": 13,
+      "lnp": 19,
+      "onp": 31
+     },
+     "Undergraduate": {
+      "alp": 29,
+      "grn": 16,
+      "oth": 11,
+      "lnp": 26,
+      "onp": 18
+     },
+     "Postgraduate": {
+      "alp": 30,
+      "grn": 16,
+      "oth": 11,
+      "lnp": 26,
+      "onp": 17
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 27,
+      "grn": 13,
+      "oth": 12,
+      "lnp": 21,
+      "onp": 27
+     },
+     "$45–75k": {
+      "alp": 27,
+      "grn": 13,
+      "oth": 11,
+      "lnp": 23,
+      "onp": 26
+     },
+     "$75–125k": {
+      "alp": 28,
+      "grn": 13,
+      "oth": 11,
+      "lnp": 23,
+      "onp": 25
+     },
+     "$125–200k": {
+      "alp": 27,
+      "grn": 11,
+      "oth": 11,
+      "lnp": 26,
+      "onp": 25
+     },
+     "$200k+": {
+      "alp": 23,
+      "grn": 8,
+      "oth": 15,
+      "lnp": 32,
+      "onp": 22
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 32,
+      "grn": 16,
+      "oth": 10,
+      "lnp": 23,
+      "onp": 19
+     },
+     "Outer metro": {
+      "alp": 28,
+      "grn": 13,
+      "oth": 11,
+      "lnp": 21,
+      "onp": 27
+     },
+     "Reg & Rur": {
+      "alp": 20,
+      "grn": 8,
+      "oth": 15,
+      "lnp": 23,
+      "onp": 34
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 27,
+      "grn": 12,
+      "oth": 12,
+      "lnp": 23,
+      "onp": 26
+     },
+     "Vic": {
+      "alp": 27,
+      "grn": 14,
+      "oth": 11,
+      "lnp": 23,
+      "onp": 25
+     },
+     "Qld": {
+      "alp": 24,
+      "grn": 12,
+      "oth": 12,
+      "lnp": 23,
+      "onp": 29
+     },
+     "WA": {
+      "alp": 27,
+      "grn": 13,
+      "oth": 11,
+      "lnp": 19,
+      "onp": 30
+     },
+     "SA": {
+      "alp": 33,
+      "grn": 13,
+      "oth": 10,
+      "lnp": 20,
+      "onp": 24
+     },
+     "Tas": {
+      "alp": 28,
+      "grn": 13,
+      "oth": 16,
+      "lnp": 16,
+      "onp": 27
+     },
+     "ACT": {
+      "alp": 39,
+      "grn": 16,
+      "oth": 12,
+      "lnp": 21,
+      "onp": 12
+     },
+     "NT": {
+      "alp": 30,
+      "grn": 12,
+      "oth": 9,
+      "lnp": 24,
+      "onp": 25
+     }
+    }
    }
   },
   {

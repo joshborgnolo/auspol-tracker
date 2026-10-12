@@ -783,20 +783,25 @@ try {
 
   // An MRP's report doesn't always reach the index above: May–Jul 2026's
   // was linked only from DemosAU's news post. While an MRP row filed from
-  // the article awaits its report (fieldwork TBC, or no seats), ask the
-  // site's media library for MRP PDFs uploaded since that row's fieldwork
-  // began. Such a PDF may only complete or verify a row (matchOnly), never
-  // add one, and the library is asked only while a row is waiting.
-  const awaiting = existing.filter((e) => e.pollster === "DemosAU (MRP)" && (e.fieldworkPending || !e.seats));
+  // the article awaits its report (fieldwork TBC, or no seats), or any MRP
+  // row has no report linked (the 2026-07-11 row, entered by hand from the
+  // news post – demographics.mjs reads the MRP's breakdowns from the report),
+  // ask the site's media library for MRP PDFs uploaded since that row's
+  // fieldwork began. Such a PDF may only complete or verify a row
+  // (matchOnly), never add one, and the library is asked only while a row is
+  // waiting.
+  const awaiting = existing.filter((e) => e.pollster === "DemosAU (MRP)" && (e.fieldworkPending || !e.seats || !e.methodUrl));
   // DemosAU's own write-up of an MRP (12 Oct 2026: on its site 44 minutes
   // before Capital Brief) is the row's release link, "DemosAU's release"
   // (user 2026-10-12). Found through the site's posts API: published within
   // three days of the row, it must name the MRP and state the row's Labor,
   // Coalition and One Nation primaries. Linked only, never read for figures.
-  if (awaiting.some((e) => !e.releaseUrl)) {
+  // (a row whose url is already DemosAU's own post needs no second link)
+  const unlinked = awaiting.filter((x) => !x.releaseUrl && x.published && !/^https:\/\/demosau\.com\/news\//.test(x.url || ""));
+  if (unlinked.length) {
     try {
       const posts = JSON.parse((await fetchBuffer(POSTS_URL)).toString("utf8"));
-      for (const e of awaiting.filter((x) => !x.releaseUrl && x.published)) {
+      for (const e of unlinked) {
         const pubMs = Date.parse(e.published.slice(0, 10));
         const hit = [].concat(posts).find((po) => {
           const text = String(po?.content?.rendered ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#8211;/g, " ");
@@ -866,6 +871,13 @@ try {
         match.sample = w.sample;
         delete match.samplePending;
         status.fieldworkFilled.push({ sample: w.sample, slug });
+        touched = true;
+      }
+      // an MRP row with no report linked links the one it matched (the media
+      // library lists newest uploads first, so a re-upload wins)
+      if (c.isMRP && !match.methodUrl) {
+        match.methodUrl = c.url;
+        status.fieldworkFilled.push({ linked: c.url, slug });
         touched = true;
       }
       // an MRP filed from the article (whose free lead gives one party's

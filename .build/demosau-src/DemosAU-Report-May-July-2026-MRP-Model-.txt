@@ -1,0 +1,506 @@
+    May-July 2026
+     MRP Model
+Seat Projection Overview
+ + Demographic Trends
+
+
+
+                           1
+Methodology Statement
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Conducted in assoication with Capital Brief
+
+  Fieldwork dates                                         27 May-11 July 2026
+
+  Mode of data collection                                 Internet panels and Random Device Engagement
+
+  Target population                                       Australians 18+ eligible to vote at elections
+
+  Sample size                                             9,343
+
+  Is voting intention published?                          Yes, in this report
+
+  Effective sample size after weighting applied           n/a for MRP
+
+  Margin of error associated with effective sample size   n/a for MRP (Approx. +/- 5% (for MRP seat estimates).
+
+  Variables used in weighting                             Age, gender, education, income, state, region, 2025 Federal Election vote, Christianity.
+
+  Weighting method used                                   Multilevel Regression and Post-stratification
+
+  Full question text, responses categories and            See Page 15
+  randomisation
+
+  Source of sample                                        Internet panels (98%), Random Device Engagement (2%)
+
+  Positioning of voting intention questions in            Federal voting intention was first substantive question after demographic questions.
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were asked a leaner question. Remaining undecided voters were excluded from final
+                                                          totals.
+
+  2PP calculation method                                  Using relevant 2025 federal election preference flows and selected respondent allocated preference flows for where ON is
+                                                          in the final count and ON preferences in ALP v L/NP final counts. See Pages 16 & 17 for more details
+
+
+
+
+                                                                                                                                                                                     2
+            Primary Vote
+
+                                                      Primary Vote %
+                                                ALP       GRN          OTH            LNP    ONP
+
+
+  May 25 Election                               34.6%                  12.2%                    15.0%                             31.8%        6.4%
+
+
+  Oct-Nov 25 MRP                              33.0%                   13.0%                 13.0%                       24.0%                 17.0%
+
+
+Feb-March 26 MRP                   29.0%                      12.0%                 11.0%                       21.0%                         27.0%
+
+
+ May/July 25 MRP              26.0%                     13.0%               10.0%                          21.0%                              30.0%
+
+                   0%   20%                                     40%                                 60%                 80%                      100%
+
+
+
+
+                                 Change since Last Election %
+                                                ALP       LNP          GRN            ONP    OTH
+
+                                      -8.6%
+
+                          -10.8%
+
+                                                                               0.8%
+
+                                                                                                                                      23.6%
+
+                                                      -5.0%
+
+               -20%       -10%                                         0%                                 10%                   20%
+
+
+
+
+                                                                                                                                          3
+Central Seat Projection
+
+
+
+
+                                           Seat
+                  Party      Projection
+                                          Change
+
+                  Labor         68         -26
+
+                One Nation      60          60
+
+                 Coalition       13        -30
+
+                  Green          3          2
+
+                  Other          6          -6
+
+
+
+
+                                                   4
+Range of Seat Outcomes
+
+
+
+
+                         5
+Seat Clasifications
+                        TOTAL
+                                          Firm              Lean              In Doubt         Seat Range
+                       LEADING
+
+
+      Labor                68               40                18                  10               60-72
+
+
+   One Nation              60               27                25                  8                53-66
+
+
+    Coalition              13               4                  4                  5                11-22
+
+
+      Green                 3               0                  1                  2                  1-5
+
+
+      Other                 6               3                  0                  3                 3-7
+
+The electorate vote shares indicated by the DemosAU MRP should be considered with a confidence interval at
+95% probability of +/- 5%. To reflect this uncertainty, each seat is classified based on a calculated probability of
+victory by the leading party. the strength of the result in the following three categories;
+
+In Doubt: Less than 70% probability of victory.
+Lean: 70-95% probability of victory. .
+Firm: Greater than 95% probability of victory.
+
+The seat ranges for each party or grouping are based on a Monte Carlo probability analysis of 20,000
+simulations. The seat ranges reflect a 95% confidence interval.
+                                                                                                   6
+                     Gender
+
+                                                                          Males
+                                                        ALP         GRN           OTH     LNP          ONP
+
+  Oct-Nov 25                                      33%                 10%                        14%                             25%         18%
+
+Feb-March 26                          28%                     10%                   11%                              22%                     29%
+
+ May-July 26                        26%                  10%                10%                                21%                           33%
+
+               0%             20%                                   40%                                 60%                      80%             100%
+
+
+
+
+                                                                    Females
+                                                        ALP         GRN           OTH      LNP         ONP
+
+   Oct-Nov 25                                     33%                               16%                  13%                           22%   16%
+
+ Feb-March 26                               30%                             15%             10%                            20%               25%
+
+  May-July 26                       26%                              16%                  11%                          20%                   27%
+
+                0%            20%                                   40%                                 60%                      80%             100%
+
+
+
+
+                                                                                                                                             7
+                     Age
+
+                                                                           18-34
+                                                     ALP           GRN         OTH          LNP          ONP
+
+  Oct-Nov 25                                  32%                                                  26%                      12%                             19%   11%
+
+Feb-March 26                        28%                                                25%                     10%                              18%               19%
+
+ May-July 26                      26%                                                25%                 9%                             17%                       23%
+
+               0%          20%                                     40%                                    60%                                   80%                   100%
+
+
+                                                                          35-54
+                                                      ALP          GRN         OTH          LNP          ONP
+
+   Oct-Nov 25                                       34%                        13%                            15%                                     22%         16%
+
+ Feb-March 26                             30%                       12%                     12%                                   19%                             27%
+
+  May-July 26                       27%                           13%                 11%                                   19%                                   30%
+
+                0%         20%                                     40%                                    60%                                   80%                   100%
+
+
+                                                                  55 and Over
+                                                       ALP          GRN         OTH          LNP          ONP
+
+    Oct-Nov 25                                   33%         4%                      13%                                                  28%                     22%
+
+  Feb-March 26                          28%          5%                  10%                                          24%                                         33%
+
+   May-July 26                     26%          5%                  10%                                              25%                                          34%
+
+                 0%         20%                                     40%                                       60%                                80%                  100%
+
+
+
+                                                                                                                                                                  8
+           Education
+
+                                                  Didn’t Finish G12
+                                     ALP            GRN                OTH            LNP             ONP
+
+  Oct-Nov 25                          32%            7%                             14%                                      23%                      24%
+Feb-March 26              26%            7%                      11%                                18%                                               38%
+  May-July 26           24%           7%                   11%                                    19%                                                 39%
+                0%    20%                                 40%                                     60%                                80%                100%
+                                                           Grade 12
+                                     ALP            GRN                OTH           LNP              ONP
+
+  Oct-Nov 25                           33%                               16%                          13%                                 22%         16%
+Feb-March 26                   28%                           16%                  10%                                       21%                       25%
+  May-July 26                 27%                          16%                  10%                                       21%                         26%
+                0%    20%                             40%                                         60%                                80%               100%
+                                                                 TAFE
+                                     ALP            GRN                OTH           LNP              ONP
+
+  Oct-Nov 25                         31%                   12%                              15%                                     23%               19%
+Feb-March 26                  27%                   12%                       12%                                   19%                               30%
+  May-July 26           24%                   12%                       12%                                  18%                                      34%
+                0%    20%                             40%                                         60%                                80%               100%
+                                      Undergraduate Degree
+                                     ALP            GRN                OTH           LNP              ONP
+
+  Oct-Nov 25                                35%                               16%                      12%                                      27%    10%
+Feb-March 26                          32%                               16%                 10%                                          24%           18%
+  May-July 26                  28%                               17%                 9%                                            25%                 21%
+                0%    20%                                 40%                                     60%                                80%                100%
+                                           Postgraduate Degree
+                                      ALP           GRN                OTH            LNP             ONP
+
+   Oct-Nov 25                                        40%                              15%                     11%                               25%     9%
+ Feb-March 26                               35%                              16%                 8%                                       24%          17%
+   May-July 26                        32%                                 17%               8%                                      23%               20%
+                 0%   20%                                 40%                                     60%                                80%               9
+                                                                                                                                                       100%
+            Annual Income
+                                                      Under $45,000
+                                      ALP              GRN                   OTH                 LNP         ONP
+
+  Oct-Nov 25                              32%                          13%                             14%                            22%          19%
+Feb-March 26                  28%                         13%                              11%                        19%                          29%
+  May-July 26               26%                        13%                          11%                             20%                            30%
+                0%    20%                                   40%                                          60%                          80%            100%
+                                                  $45,001-$75,000
+                                      ALP             GRN                OTH                     LNP         ONP
+
+  Oct-Nov 25                              33%                         13%                              14%                               24%       16%
+Feb-March 26                  28%                                  16%                       10%                               21%                 25%
+  May-July 26               26%                            14%                     9%                              20%                              31%
+                0%    20%                                   40%                                          60%                          80%           100%
+                                                      75,001-$125,000
+                                    ALP           GRN                  OTH                 LNP          ONP
+
+  Oct-Nov 25                                34%                              14%                         13%                                 25%   14%
+Feb-March 26                        30%                         12%                        11%                              21%                    26%
+  May-July 26                 27%                     11%                      11%                                       23%                       28%
+                0%    20%                                   40%                                          60%                          80%           100%
+                                                 $125,001-$200,000
+                                    ALP           GRN                  OTH                 LNP          ONP
+
+  Oct-Nov 25                                    35%                          12%                       12%                                   27%   14%
+Feb-March 26                          31%                        11%                     10%                                    24%                24%
+  May-July 26                 27%                     11%                          11%                                   23%                       28%
+                0%    20%                                   40%                                          60%                          80%            100%
+                                                            $200,001+
+                                          ALP          GRN                   OTH                 LNP         ONP
+
+   Oct-Nov 25                          31%                 8%                        11%                                               32%         18%
+ Feb-March 26                       29%               8%                     10%                                                      34%          19%
+   May-July 26          23%               10%                          11%                                                29%                      27%
+                 0%   20%                                    40%                                         60%                          80%           10
+                                                                                                                                                    100%
+                 Location
+                                                                  Inner Metro
+                                                ALP           GRN             OTH          LNP         ONP
+
+    Oct-Nov 25                                              38%                            17%               12%                       23%     10%
+  Feb-March 26                                        34%                            17%           10%                           22%           17%
+   May-July 26                                  31%                             18%                11%                      21%                19%
+                 0%           20%                                  40%                              60%                     80%                    100%
+
+
+                                                                  Outer Metro
+                                                ALP          GRN          OTH              LNP      ONP
+
+   Oct-Nov 25                                         35%                 12%                    13%                         23%              17%
+ Feb-March 26                              30%                     12%               10%                           20%                        28%
+  May-July 26                         28%                     12%              9%                              21%                            30%
+                0%            20%                                 40%                              60%                      80%                100%
+
+
+                                                             Rural/Regional
+                                          ALP          GRN              OTH          LNP         ONP
+
+  Oct-Nov 25                   24%              9%                             17%                                   26%                     24%
+Feb-March 26            20%          8%                           14%                               21%                                      37%
+ May-July 26           18%           9%                     12%                              20%                                             41%
+               0%            20%                              40%                                60%                       80%                100%
+
+                                                                                                                                                   11
+           State/Territory
+                                                                 NSW
+                                        ALP          GRN            OTH              LNP         ONP
+
+  Oct-Nov 25                              33%                    12%                       14%                               24%        17%
+Feb-March 26                      29%                   12%                        12%                               21%                26%
+ May-July 26                 27%                     12%                  11%                                 20%                       30%
+                0%    20%                               40%                                  60%                            80%           100%
+
+                                                           Victoria
+                                         ALP         GRN            OTH              LNP          ONP
+
+  Oct-Nov 25                              33%                       14%                     13%                                   24%   16%
+Feb-March 26                      28%                      14%                 10%                                   21%                27%
+  May-July 26               25%                      14%                10%                                         24%                 27%
+                0%    20%                                  40%                                   60%                         80%          100%
+
+                                                        Queensland
+                                    ALP          GRN             OTH               LNP       ONP
+
+  Oct-Nov 25                       30%                     12%                       13%                                   25%          20%
+Feb-March 26             25%                      12%                  11%                                    21%                        31%
+  May-July 26          23%                      13%              9%                                     21%                             34%
+                0%    20%                               40%                                  60%                            80%           100%
+
+                                                Western Australia
+                                        ALP          GRN          OTH               LNP          ONP
+
+   Oct-Nov 25                                  34%                  12%                    12%                               23%         19%
+ Feb-March 26                           30%                   13%                   10%                              20%                 27%
+   May-July 26                26%                    12%                     11%                              19%                        32%
+                 0%    20%                                 40%                                   60%                             80%          100%
+
+                                                                                                                                         12
+           State/Territory
+                                                South Australia
+                                     ALP          GRN               OTH           LNP          ONP
+
+  Oct-Nov 25                                36%                           14%                  13%                               21%               16%
+Feb-March 26                              34%                      12%            9%                             18%                               27%
+ May-July 26                        31%                           14%            9%                              19%                               27%
+                0%    20%                              40%                                    60%                          80%                      100%
+
+                                                      Tasmania
+                                     ALP          GRN               OTH           LNP          ONP
+
+  Oct-Nov 25                                36%                          13%                        16%                      18%                   17%
+Feb-March 26                        31%                     11%                         16%                      15%                               27%
+  May-July 26                26%                11%                                   19%                  13%                                     31%
+                0%    20%                              40%                                    60%                          80%                      100%
+
+                                   Australian Capital Territory
+                                   ALP          GRN               OTH           LNP         ONP
+
+  Oct-Nov 25                                                      46%                        16%                     12%                     20%    6%
+Feb-March 26                                           42%                                 18%                 11%                     18%          11%
+  May-July 26                                            44%                             15%              9%                     16%               16%
+                0%    20%                              40%                                    60%                          80%                      100%
+
+                                            Northern Territory
+                                   ALP          GRN                OTH          LNP           ONP
+
+   Oct-Nov 25                           34%                         12%               10%                                  25%                     19%
+ Feb-March 26                        31%                    11%            8%                                  21%                                 29%
+   May-July 26                 28%                    11%                9%                          18%                                           34%
+                 0%    20%                              40%                                   60%                          80%                      100%
+
+                                                                                                                                                    13
+             Past Federal Vote
+                                                Feb-March 26
+                                        ALP   GRN         OTH   LNP   ONP
+
+
+ALP 2025 Voter                                                                        76%    5%    4%       13%
+
+LNP 2025 Voter        4%                                               56%                                  37%
+
+GRN 2025 Voter         6%                                                                          82% 3%    7%
+
+ONP 2025 Voter                                                                                              97%
+
+OTH 2025 Voter        5%    4%                                                 61%    6%                    24%
+
+                 0%               20%               40%               60%                    80%             100%
+
+
+                                                    May-July 26
+                                        ALP   GRN         OTH   LNP   ONP
+
+
+ALP 2025 Voter                                                               69%     5% 3%    6%            17%
+
+LNP 2025 Voter    3%                                                  56%                                   39%
+
+GRN 2025 Voter        5%                                                                           84%      8%
+
+ONP 2025 Voter                                                                                              97%
+
+OTH 2025 Voter         6%    5%                                              57%     6%                     26%
+
+                 0%               20%               40%               60%                    80%             100%
+                                                                                                              14
+Questions in this Poll
+
+  Q.If a Federal Election was held today, which one of the following would you vote for?
+  Answers randomly listed except DK kept last
+  Labor (with Anthony Albanese as Leader)
+  Liberal National Coalition (with Angus Taylor as Leader)
+  The Greens (with Larissa Waters as Leader)
+  One Nation (with Pauline Hanson as Leader)
+  Any Other Candidate
+  Don't Know
+
+  If respondent chose Don’t Know they were asked
+  Q. Being undecided, which of the following would you have even a slight leaning towards?
+  Answers as above
+
+  If a respondent was not undecided after the 2 voting intention questions they were asked
+
+  Q. If a federal election for the House of Representatives was held tomorrow, and the following were on the
+  ballot in your electorate, how would you vote?Please number the options from 1 to 5 in order of your
+  preference.
+  Answers as above randomly listed with don’t know not offered.
+
+
+
+
+                                                                                                               15
+A Note on Preferences
+ To determine an estimated electorate two-candidate preferred result, a mixture of previous 2025 election preference data
+ and respondent allocated preference data is used.
+
+ Respondent allocated preference flow data is obtained by using the preferences indicated by over 9000 respondents
+ nation-wide in the polling for this MRP over the past 2 months. The respondent allocated preference were obtained from
+ respondents completely ranking the 5 voting options (ALP, L/NP, Grn, ONP, Oth).
+
+ Even at this scale we are only using preference flows informed by respondent data in relation to ALP-ONP, L/NP-ONP, Grn-
+ ONP, Oth-ONP TCP contests and the ON preferences in ALP-L/NP contests. In all other cases our preference flow
+ assumptions are informed by previous 2025 election preferences as before.
+
+ The final two in each electorate are determined by applying three candidate preferred flows to party/groups which
+ finished third or better on the primary vote. The 3CP flows are estimated using a mixture of previous 2025 election
+ preference data and respondent allocated preference data.
+
+ Please see the following page for an overview of TCP respondent allocated preference flows used for this model.
+
+
+
+
+                                                                                                                            16
+A Note on Preferences
+
+ ALP-L/NP TCP contests: A nationwide ON preference flow of L/NP 80% ALP 20% is modelled by increasing the Coalition share of ONP
+ preferences by 5 percentage points in every electorate.
+
+ ALP-ONP TCP contests
+ Inner Metro: L/NP 61-39 ON, Grn 91-9 ALP, Oth 67-33 ALP
+ Outer Metro: L/NP 68-32 ON, Grn 91-9 ALP, Oth 55-45 ALP
+ Regional/Rural: L/NP 71-29 ON, Grn 87-13 ALP, Oth 52-48 ON
+
+ L/NP-ONP TCP contests
+ Inner Metro: ALP 76-24 L/NP, Grn 86-14 L/NP, Oth 68-32 L/NP
+ Outer Metro: ALP 71-29 L/NP, Grn 83-17 L/NP, Oth 60-40 L/NP
+ Regional/Rural: ALP 72-38 L/NP, Grn 82-18 L/NP, Oth 58-42 L/NP
+
+
+
+ Oth-ONP TCP contests: ALP 72-28 Oth, L/NP 61-39 ONP, Grn 85-15 L/NP, Oth* 70-30 L/NP
+ *Others candidates not in final count
+
+ Grn-ONP TCP contests
+ Inner Metro: ALP 82-18 Grn, L/NP 62-38 ON Oth 75-25 Grn
+ Outer Metro: ALP 82-18 Grn, L/NP 69-31 ON, Oth 63-37 Grn
+ Regional/Rural: ALP 78-22 Grn, L/NP 72-28 ON, Oth 56-44 Grn
+
+
+
+
+                                                                                                                     17
+18
+

@@ -115,11 +115,12 @@ export const isPdf = (f) => {
   try { const b = Buffer.alloc(5); const fd = fs.openSync(f, "r"); fs.readSync(fd, b, 0, 5, 0); fs.closeSync(fd); return b.toString() === "%PDF-"; }
   catch { return false; }
 };
-/* The wave's report PDF: its releaseUrl (or url) where it links one, else the
-   report the extractor read for that fieldwork date (its cache names it by
-   slug, and DemosAU files reports under the month they went up). */
+/* The wave's report PDF: its methodUrl, releaseUrl or url where one links it
+   (an MRP filed from Capital Brief links the report only as methodUrl), else
+   the report the extractor read for that fieldwork date (its cache names it
+   by slug, and DemosAU files reports under the month they went up). */
 export function demosauPdfUrls(p) {
-  const urls = [p.releaseUrl, p.url].filter((u) => /^https:\/\/demosau\.com\/wp-content\/.+\.pdf$/i.test(u || ""));
+  const urls = [p.methodUrl, p.releaseUrl, p.url].filter((u) => /^https:\/\/demosau\.com\/wp-content\/.+\.pdf$/i.test(u || ""));
   const dir = path.join(ROOT, ".build", "demosau-src");
   for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
     if (!f.endsWith(".json")) continue;

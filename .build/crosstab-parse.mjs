@@ -176,6 +176,80 @@ export function demosLabel(dim, label) {
   return s;
 }
 
+// ---- DemosAU (MRP): the demographic trend pages in the MRP report's text ----------
+/* From the May–Jul 2026 MRP the report prints Gender, Age, Education, Annual
+   Income, Location and State/Territory as one stacked-bar chart per group,
+   with a row for every MRP since Oct–Nov 2025 ("Oct-Nov 25" … "Aug-Sept 26")
+   and every label in native text. pdftotext -layout gives each row as the
+   period and then the five shares, in the legend's left-to-right order (ALP
+   GRN OTH LNP ONP in both 2026 reports). The report's own model is each
+   chart's last row. The earlier rows reprint the earlier models; they come
+   back as `history`, so the tests can hold them to the hand entries. The Oct–
+   Nov 2025 and Feb–Mar 2026 reports used one chart per dimension, which this
+   reader does not read (they are hand-entered in demographics.mjs). An
+   unknown group, a row without one share per legend party, or a period
+   missing from a group is an error: a new layout is a reader fix, never a
+   guess. Group names are the ones DEMOSAU_MRP_DEMO files under, so the MRP
+   waves line up in the facet. */
+const MRP_SECTIONS = { Gender: "gender", Age: "age", Education: "education", "Annual Income": "income",
+  Location: "location", "State/Territory": "state" };
+const MRP_END = /^(Past Federal Vote|Questions in this Poll|A Note on Preferences)\b/;
+const MRP_PARTY = { ALP: "alp", LNP: "lnp", "L/NP": "lnp", GRN: "grn", ONP: "onp", ON: "onp", OTH: "oth" };
+// keys as mrpKey() leaves the printed titles: straight apostrophes, no "$" or ","
+const MRP_GROUPS = {
+  gender: { Males: "Men", Females: "Women" },
+  age: { "18-34": "18–34", "35-54": "35–54", "55 and Over": "55+" },
+  education: { "Didn't Finish G12": "Didn't Finish Grade 12", "Grade 12": "Grade 12", TAFE: "TAFE",
+    "Undergraduate Degree": "Undergraduate", "Postgraduate Degree": "Postgraduate" },
+  income: { "Under 45000": "Under $45k", "45001-75000": "$45–75k", "75001-125000": "$75–125k",
+    "125001-200000": "$125–200k", "200001+": "$200k+" },
+  location: { "Inner Metro": "Inner metro", "Outer Metro": "Outer metro", "Rural/Regional": "Reg & Rur" },
+  state: { NSW: "NSW", Victoria: "Vic", Queensland: "Qld", "South Australia": "SA", "Western Australia": "WA",
+    Tasmania: "Tas", "Australian Capital Territory": "ACT", "Northern Territory": "NT" },
+};
+const mrpKey = (s) => s.replace(/[‘’]/g, "'").replace(/[$,]/g, "").replace(/\s+/g, " ").trim();
+export function demosauMrpDemo(txt) {
+  const byPeriod = {}, periods = [];
+  let dim = null, group = null, cols = null, title = null;
+  for (const raw of txt.split("\n")) {
+    const s = raw.replace(/\f/g, "").trim();
+    if (!s) continue;
+    if (MRP_SECTIONS[s]) { dim = MRP_SECTIONS[s]; group = cols = title = null; continue; }
+    if (MRP_END.test(s)) { dim = null; continue; }
+    if (!dim) continue;
+    const toks = s.split(/\s+/);
+    // the legend: its group's title is the text line just above it
+    if (toks.length >= 5 && toks.every((t) => MRP_PARTY[t])) {
+      cols = toks.map((t) => MRP_PARTY[t]);
+      if (new Set(cols).size !== 5) return { error: `the ${dim} legend "${s}" doesn't name the five parties once each` };
+      group = title != null ? MRP_GROUPS[dim][mrpKey(title)] : null;
+      if (!group) return { error: `${dim}: group "${title}" above the legend isn't one this reader knows` };
+      title = null;
+      continue;
+    }
+    const first = toks.findIndex((t) => /^\d+%$/.test(t));
+    // an axis ("0%  20% … 100%") or a title line
+    if (first <= 0) { if (first < 0) title = s; continue; }
+    const period = toks.slice(0, first).join(" ");
+    if (!/^[A-Z][a-z]+-[A-Z][a-z]+ \d\d$/.test(period)) { title = s; continue; }
+    if (!group) return { error: `${dim}: a ${period} row before any legend` };
+    const shares = toks.slice(first);
+    if (shares.length !== cols.length || !shares.every((t) => /^\d+%$/.test(t)))
+      return { error: `${dim} ${group} ${period}: "${shares.join(" ")}" isn't one share per legend party` };
+    if (!byPeriod[period]) { byPeriod[period] = {}; periods.push(period); }
+    const sh = (byPeriod[period][dim] ||= {})[group] = {};
+    cols.forEach((k, i) => { sh[k] = parseInt(shares[i], 10); });
+  }
+  if (!periods.length) return { error: "no demographic trend pages (Gender, Age, Education, …) in the report" };
+  // every period must carry every group the report charts
+  const groupsOf = (p) => Object.entries(byPeriod[p]).flatMap(([dm, g]) => Object.keys(g).map((x) => `${dm}/${x}`));
+  const all = new Set(periods.flatMap(groupsOf));
+  for (const p of periods)
+    if (groupsOf(p).length !== all.size) return { error: `the ${p} rows don't cover every charted group` };
+  const period = periods[periods.length - 1];
+  return { period, dims: byPeriod[period], history: Object.fromEntries(periods.slice(0, -1).map((p) => [p, byPeriod[p]])) };
+}
+
 // ---- RedBridge: the first-preference table in the cached report text ---------------
 export const RB_SECTIONS = { "Vote softness": "softness", Generation: "generation", Gender: "gender", Location: "location",
                       Education: "education", "Home ownership": "housing" };

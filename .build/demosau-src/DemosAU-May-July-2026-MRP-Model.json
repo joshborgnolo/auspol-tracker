@@ -1,0 +1,53 @@
+{
+  "slug": "DemosAU-May-July-2026-MRP-Model",
+  "dateStart": "2026-05-27",
+  "date": "2026-07-11",
+  "sample": 9343,
+  "client": "—",
+  "tppNote": "2PP calculation method Using relevant 2025 federal election preference flows and selected respondent allocated preferenc",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "alp": 26,
+  "lnp": 21,
+  "grn": 13,
+  "onp": 30,
+  "ind": 10,
+  "seats": {
+    "total": 150,
+    "basis": "2025 election",
+    "p": {
+      "alp": {
+        "est": 68,
+        "chg": -26,
+        "lo": 60,
+        "hi": 72
+      },
+      "onp": {
+        "est": 60,
+        "chg": 60,
+        "lo": 53,
+        "hi": 66
+      },
+      "lnp": {
+        "est": 13,
+        "chg": -30,
+        "lo": 11,
+        "hi": 22
+      },
+      "grn": {
+        "est": 3,
+        "chg": 2,
+        "lo": 1,
+        "hi": 5
+      },
+      "oth": {
+        "est": 6,
+        "chg": -6,
+        "lo": 3,
+        "hi": 7
+      }
+    }
+  },
+  "extractedAt": "2026-10-12T08:48:40.396Z",
+  "cacheV": 3
+}
