@@ -2387,8 +2387,14 @@ body.rd .rd-ap-pinl { font-size: 12px; }
 body.rd .rd-ap-pinsep { align-self: center; width: 1px; height: 18px; background: var(--line); }
 body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
 body.rd .rd-ap-pins:hover { background: var(--surface-2); color: var(--ink); }
-body.rd .rd-ap-pinn { align-self: center; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ap-pinn { align-self: center; display: inline-grid; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-ap-pinn b { font-weight: 600; color: var(--ink); }
+/* the invisible-twin width lock: both spans share one grid cell, so the
+   slot is as wide as the widest facet count and the live count never
+   resizes it (the .rd-ldg-cycw idiom) */
+body.rd .rd-ap-pinn > span { grid-area: 1 / 1; }
+body.rd .rd-ap-pinn .rd-ap-pinnw { visibility: hidden; }
+body.rd .rd-ap-pinn .rd-ap-pinnl { justify-self: end; }
 /* From a tablet's 761px to 900px the seven figure tabs, search and count
    outran the bar on Confidence, whose count says "releases": the bar sizes
    the page even while hidden, so it scrolled sideways 20-27px at 761-790px.

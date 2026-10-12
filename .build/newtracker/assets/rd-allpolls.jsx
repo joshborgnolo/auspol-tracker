@@ -3576,6 +3576,14 @@ function RdAllPolls(P) {
     document.addEventListener("keydown", key, true);
     return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
   }, []);
+  /* The count below changed width by facet ("78 of 200 polls" … "122 of
+     200 releases") and the section links (flex 1) took up the difference,
+     sliding every tab sideways on a hop. An invisible "{total} of {total}"
+     twin (.rd-ap-pinnw, the .rd-ldg-cycw idiom) sets the slot width — in
+     the longest noun this page's facet set can use (releases exists only
+     where Confidence does, not on /vic/) — and the live count right-aligns
+     inside it. Pinned by .matilda/probe/ap-pin-steady.mjs */
+  const pinnWNoun = FACETS.some((f) => f.id === "confidence") ? "releases" : "polls";
   const pinBar = (
     <div className={"rd-ap-pinbar" + (pinned ? " on" : "")} aria-hidden={!pinned}>
       <nav className="rd-ap-pinnav" aria-label="On this page">
@@ -3595,7 +3603,7 @@ function RdAllPolls(P) {
         <button type="button" className="rd-ap-pins" aria-label="Search the polls" tabIndex={pinned ? 0 : -1} onClick={toSearch}>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
         </button>
-        <span className="rd-ap-pinn"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span>
+        <span className="rd-ap-pinn"><span className="rd-ap-pinnw" aria-hidden="true">{total} of {total} {pinnWNoun}</span><span className="rd-ap-pinnl"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span></span>
       </>}
     </div>
   );
