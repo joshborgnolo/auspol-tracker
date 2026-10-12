@@ -3394,10 +3394,18 @@ const latestMs = Date.parse(LATEST_ISO);
    parent house's seat whenever its window END is the freshest date in the
    house — Newspoll's 18 Sep quarter sat over its 17 Sep wave — while the
    projection's fallback put the parent back as a SECOND row, so the table
-   carried the house twice. Their waves display in the archive instead. */
-const recent = POLLS.filter((p) => !noAggPoll(p) && (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
+   carried the house twice. Their waves display in the archive instead.
+   One exception (user call 2026-10-12): a house's MRP takes a row of its
+   OWN, beside the house's regular poll rather than in its seat. A model
+   taken to reuse the house's waves (reusesWaves) is outside the aggregates,
+   but it is a new release with a new seat projection, and the masthead
+   names it when it is the newest; a pooled re-cut of waves already in the
+   table is neither. Its row carries the outside-the-aggregates note. */
+const isMrp = (p) => /\(MRP\)$/.test(p.pollster || "");
+const recent = POLLS.filter((p) => (!noAggPoll(p) || (isMrp(p) && reusesWaves(p) && p.noAgg == null && !NO_AGG_HOUSES.has(p.pollster)))
+  && (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
 const perHouse = new Map();
-for (const p of recent.sort((a, b) => a.date.localeCompare(b.date))) perHouse.set(canon(p.pollster), p);
+for (const p of recent.sort((a, b) => a.date.localeCompare(b.date))) perHouse.set(isMrp(p) ? p.pollster : canon(p.pollster), p);
 const pollsterTable = [...perHouse.values()].map((p) => {
   const m = Number(p.date.slice(5, 7)), day = dayOf(p.date);
   return {

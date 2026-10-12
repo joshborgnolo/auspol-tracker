@@ -418,7 +418,10 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     );
     return (
       <div className="rd-pl-detail">
-        <RdLedger p={ip} facet={facet} onM={onMatch} side={rhythm} latest moe={rdLgMoe(ip)}
+        {/* a house's MRP rides its own row here (gen-data §7) but counts in
+            no aggregate: it says so, as the same poll does in All polls */}
+        <RdLedger p={ip} facet={facet} onM={onMatch} latest moe={rdLgMoe(ip)}
+                  side={r.noAgg ? <><p className="rd-ldg-noagg"><b>Outside the aggregates.</b> {r.noAggWhy}</p>{rhythm}</> : rhythm}
                   onLine={(id) => { if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id); else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls"); }}
                   sources={r.links && r.links.length ? rdPollLinks(r.links) : null}
                   foot={<>
@@ -639,7 +642,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
-           meta={entries.length + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
+           meta={new Set(entries.map((e) => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
       <p className="rd-dek rd-pl-dek">
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}

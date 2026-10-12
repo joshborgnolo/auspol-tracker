@@ -5570,7 +5570,45 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "seats": {
+        "total": 150,
+        "basis": "2025 election",
+        "p": {
+          "alp": {
+            "est": 84,
+            "lo": 73,
+            "hi": 85,
+            "chg": -10
+          },
+          "lnp": {
+            "est": 34,
+            "lo": 25,
+            "hi": 44,
+            "chg": -9,
+            "note": "Nationals 4–11"
+          },
+          "onp": {
+            "est": 24,
+            "lo": 22,
+            "hi": 35,
+            "chg": 24
+          },
+          "grn": {
+            "est": 0,
+            "lo": 0,
+            "hi": 3,
+            "chg": -1
+          },
+          "oth": {
+            "est": 8,
+            "lo": 5,
+            "hi": 10,
+            "chg": -4
+          }
+        }
+      },
       "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
+      "releaseUrl": "https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/",
       "fieldworkPending": true
     },
     {

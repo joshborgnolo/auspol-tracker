@@ -149,6 +149,7 @@ const FORCE = argv.includes("--force");
 const INDEX_URL = argv.find((a) => !a.startsWith("--")) || "https://demosau.com/methodology-statements/";
 // the site's WordPress media library, newest MRP uploads first (an MRP
 // report the index never lists: see the media check in main)
+const POSTS_URL = "https://demosau.com/wp-json/wp/v2/posts?per_page=10&_fields=date,link,content";
 const MEDIA_URL = "https://demosau.com/wp-json/wp/v2/media?search=MRP&per_page=20&orderby=date&order=desc&_fields=date,source_url,title,mime_type";
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/demosau-src";
@@ -787,6 +788,28 @@ try {
   // began. Such a PDF may only complete or verify a row (matchOnly), never
   // add one, and the library is asked only while a row is waiting.
   const awaiting = existing.filter((e) => e.pollster === "DemosAU (MRP)" && (e.fieldworkPending || !e.seats));
+  // DemosAU's own write-up of an MRP (12 Oct 2026: on its site 44 minutes
+  // before Capital Brief) is the row's release link, "DemosAU's release"
+  // (user 2026-10-12). Found through the site's posts API: published within
+  // three days of the row, it must name the MRP and state the row's Labor,
+  // Coalition and One Nation primaries. Linked only, never read for figures.
+  if (awaiting.some((e) => !e.releaseUrl)) {
+    try {
+      const posts = JSON.parse((await fetchBuffer(POSTS_URL)).toString("utf8"));
+      for (const e of awaiting.filter((x) => !x.releaseUrl && x.published)) {
+        const pubMs = Date.parse(e.published.slice(0, 10));
+        const hit = [].concat(posts).find((po) => {
+          const text = String(po?.content?.rendered ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#8211;/g, " ");
+          return typeof po?.link === "string" && /^https:\/\/demosau\.com\/news\//.test(po.link)
+            && Math.abs(Date.parse(String(po.date).slice(0, 10)) - pubMs) <= 3 * DAY
+            && /\bMRP\b/.test(text) && [e.alp, e.lnp, e.onp].every((v) => new RegExp(`\\b${v}%`).test(text));
+        });
+        if (hit) { e.releaseUrl = hit.link; touched = true; status.fieldworkFilled.push({ releaseUrl: hit.link, date: e.date }); }
+      }
+    } catch (err) {
+      status.notes.push(`DemosAU posts check for an MRP write-up failed: ${err?.message || err}`);
+    }
+  }
   if (awaiting.length) {
     try {
       const since = awaiting.map((e) => e.dateStart || e.date).sort()[0];
@@ -830,6 +853,13 @@ try {
         match.date = w.date;
         match.dateStart = w.dateStart;
         delete match.fieldworkPending;
+        /* the report itself is now linked (user 2026-10-12: "pdf should also
+           be linked to when uploaded"): as the methodology statement, and as
+           the release where the row has none yet – the hand reconciliation's
+           releaseUrl/methodUrl pair, done here */
+        if (!match.methodUrl) match.methodUrl = c.url;
+        if (!match.releaseUrl) match.releaseUrl = c.url;
+        status.fieldworkFilled.push({ linked: c.url, slug });
         touched = true;
       }
       if (match.samplePending && w.sample != null) {

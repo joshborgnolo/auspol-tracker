@@ -50493,9 +50493,11 @@ function RdPolls({
       p: ip,
       facet: facet,
       onM: onMatch,
-      side: rhythm,
       latest: true,
       moe: rdLgMoe(ip),
+      side: r.noAgg ? React.createElement(React.Fragment, null, React.createElement("p", {
+        className: "rd-ldg-noagg"
+      }, React.createElement("b", null, "Outside the aggregates."), " ", r.noAggWhy), rhythm) : rhythm,
       onLine: id => {
         if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
       },
@@ -50744,7 +50746,7 @@ function RdPolls({
     cls: "rd-polls",
     facet: facet,
     title: "Latest and next polls",
-    meta: entries.length + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))
+    meta: new Set(entries.map(e => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))
   }, React.createElement("p", {
     className: "rd-dek rd-pl-dek"
   }, phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll." : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")), React.createElement(RdTabs, {

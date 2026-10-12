@@ -238,6 +238,11 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     (May–Jul 2026's report never reached the methodology index); a match
     writes the report's fieldwork and its seat projection
     (demosau-seats.mjs reads both report layouts, + test-demosau-seats.mjs).
+    The match also links the PDF (methodUrl, and releaseUrl if none); while
+    it waits, DemosAU's own write-up (found via the site's posts API, must
+    name the MRP and state the row's ALP/L-NP/ON figures) becomes its
+    releaseUrl, "DemosAU's release". MRPs that reuse the house's waves get
+    their own Latest polls row beside the house's (gen-data §7, 2026-10-12).
   - REDBRIDGE/ACCENT — `extract-redbridge-afr.mjs` (+`test-redbridge-afr.mjs`,
     `.build/ocr-image.swift`): AFR's Sunday 18:00 article, 4–6 days
     before Accent's PDF; the key figures (Coalition primary, Other, the
