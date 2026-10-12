@@ -1,0 +1,79 @@
+# Pew Global Attitudes — Australia economic-sentiment record
+# Source article: pewresearch.org/short-reads/2026/10/09/french-adults-stand-out-for-their-economic-pessimism/ (9 Oct 2026)
+# Underlying wave: Spring 2026 Global Attitudes Survey. Compiled 12 Oct 2026.
+# Machine-readable form of this record: data/pew-econ-sentiment.json
+# (shape-gated by validatePewSentiment in .build/newtracker/validate.mjs).
+
+Wave-level record (auspol-tracker confidence.json field shape):
+
+| Field | Value |
+|---|---|
+| House | Pew Research Center — Spring 2026 Global Attitudes Survey (Australia) |
+| Fieldwork (fwStart–fwEnd) | 30 Mar – 13 Apr 2026 |
+| Published | topline 23 Jun 2026; this analysis 9 Oct 2026 |
+| n | 2,064 |
+| Mode | Mixed-mode probability panel (Life in Australia™), 99% online / 1% phone |
+| Field firm | Social Research Centre |
+| Margin of sampling error | ±2.3 pts (design effect 1.15) |
+| Language | English |
+| Weighting | gender, age, education, geography, household size, language at home, selection probability + response propensity |
+| Release URL | https://www.pewresearch.org/short-reads/2026/10/09/french-adults-stand-out-for-their-economic-pessimism/ |
+| Method URL | https://www.pewresearch.org/methods/feature/international-methodology/global-attitudes-survey/australia/2026/ |
+| Topline PDF | https://www.pewresearch.org/wp-content/uploads/sites/20/2026/06/D_26.06.23_fielded-survey_topline.pdf |
+| Methods DB API | https://www.pewresearch.org/wp-json/prc-api/v2/interactive?slug=international-methodology-database |
+
+The measure (Q1: "How would you describe the current economic situation in Australia?"), Spring 2026:
+
+| Very good | Somewhat good | Total good | Somewhat bad | Very bad | Total bad | DK |
+|---|---|---|---|---|---|---|
+| 1 | 19 | 20 | 54 | 25 | 80 | 0 |
+
+Change on total bad: +18 pts year-on-year (62 → 80). Very bad: 13 → 25 (+12).
+Cross-country: Australia's 80% bad is 2nd-worst of the 18 high-income countries
+(behind France 85%), and 3rd-worst of all ~32 countries polled
+(only West Bank/East Jerusalem 90 and France 85 are worse).
+
+Australia trend with wave methodology. TWO survey families sit in this table.
+The unmarked rows are Pew's PRIMARY trend — the current survey mode (Life in
+Australia online probability panel) — which the topline's trend table runs
+back to June 2020. Rows marked * are Pew's separate "AUSTRALIA AND U.S. PHONE
+TRENDS FOR COMPARISON" table (telephone waves, 2008–Spring 2021), published
+for comparison only; Pew cautions against direct phone ↔ online comparison.
+Both families have a 2020 and a 2021 wave (the dual-mode transition years),
+so those years appear twice — June 2020 (primary, 28/72) vs *Summer 2020*
+(phone, 37/62), and March 2021 (primary, 69/31) vs *Spring 2021* (phone,
+74/26), are DIFFERENT surveys in different modes, not a data clash. The
+primary 2020/21 waves have no row in Pew's methods-database API (hence the
+dashes); the topline publishes their figures only.
+
+| Survey        | Fieldwork      | n     | Mode           | MoE  | Good | Bad |
+|---------------|----------------|-------|----------------|------|------|-----|
+| Spring 2026   | 30 Mar–13 Apr  | 2,064 | panel (99/1)   | ±2.3 | 20   | 80  |
+| Spring 2025   | 17–31 Mar      | 1,829 | panel (99/1)   | ±2.5 | 37   | 62  |
+| Spring 2024   | 19 Feb–4 Mar   | 2,021 | panel (99/1)   | ±2.4 | 37   | 62  |
+| Spring 2023   | 14–27 Mar      | 2,034 | panel (97/3)   | ±2.7 | 35   | 64  |
+| Spring 2022   | 15–28 Mar      | 2,034 | panel (97/3)   | ±2.8 | 45   | 55  |
+| March 2021    | not in meth. DB | —    | online panel   | —    | 69   | 31  |
+| June 2020     | not in meth. DB | —    | online panel   | —    | 28   | 72  |
+| *Spring 2021* | 15 Mar–2 May   | 1,000 | telephone      | ±3.8 | 74   | 26  |
+| *Summer 2020* | 11 Jun–25 Jul  | 1,016 | telephone      | ±3.8 | 37   | 62  |
+| *2019*        | 6 Jun–28 Jul   | 1,012 | telephone      | ±3.8 | 65   | 33  |
+| *2018*        | 24 May–12 Jul  | 1,149 | telephone      | ±3.4 | 66   | 31  |
+| *2017*        | 20 Feb–12 Mar  | 1,000 | telephone      | ±3.9 | 59   | 39  |
+| *2016*        | 6–28 Apr       | 1,000 | telephone      | ±4.1 | 57   | 40  |
+| *2015*        | 7–21 Apr       | 1,004 | telephone      | ±3.6 | 55   | 41  |
+| *2013*        | not in methods DB | —  | telephone      | —    | 67   | 30  |
+| *2008*        | not in methods DB | —  | telephone      | —    | 70   | 27  |
+
+Detail of "bad" side (somewhat bad / very bad) for the online-mode years:
+2026: 54/25 · 2025: 49/13 · 2024: 50/13 · 2023: 53/12 · 2022: 46/8
+June 2020: 56/16 · March 2021: 27/4
+
+Notes:
+- Pew has released no other economic questions from this wave yet (12-month
+  expectations, children's prospects held for future reports), and no Australian
+  demographic breakdowns of the economy rating. The one other Australia-specific
+  release from this wave (1 Oct 2026 topline) covers social media, not the economy.
+- No voting intention, leadership or approval data in this survey — nothing for
+  the polls/direction pipelines; only the confidence/sentiment lane takes an
+  annual measure of this kind.

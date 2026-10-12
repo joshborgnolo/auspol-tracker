@@ -686,10 +686,76 @@ export function validateChangelog() {
   return errors;
 }
 
+/* data/pew-econ-sentiment.json – the hand-curated Pew Global Attitudes
+   economy-rating record (see its _about). Figures transcribe Pew's topline
+   and methodology database, so the gate is internal consistency: the
+   four-point split reconciles with the printed totals, chg reconciles with
+   the same-series predecessor, and every wave either carries its full
+   methodology or is a documented gap (panel June/March 2020–21 and phone
+   2008/2013 have no methods-database row). */
+export function validatePewSentiment() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let P = null;
+  try { P = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "pew-econ-sentiment.json"), "utf8")); }
+  catch { fail("pew-econ-sentiment.json", "pew-shape", "missing or unparseable"); return errors; }
+  if (!Array.isArray(P.rows) || !P.rows.length) {
+    fail("pew-econ-sentiment.json", "pew-shape", "rows is not a non-empty array");
+    return errors;
+  }
+  // waves with no methodology row in Pew's methods database (documented in _about)
+  const KNOWN_METHOD_GAPS = new Set(["June, 2020|panel", "March, 2021|panel", "Spring, 2008|phone", "Spring, 2013|phone"]);
+  const seenWave = new Set();
+  const prevV = {}, prevFw = {};
+  P.rows.forEach((r, i) => {
+    const where = `pew #${i} "${r.wave}" (${r.series})`;
+    if (!r.wave || !["panel", "phone"].includes(r.series)) fail(where, "pew-shape", "needs {wave, series: panel|phone}");
+    const key = `${r.wave}|${r.series}`;
+    if (seenWave.has(key)) fail(where, "pew-shape", "duplicate wave+series");
+    seenWave.add(key);
+    for (const k of ["v", "good", "dk"]) {
+      if (typeof r[k] !== "number" || r[k] < 0 || r[k] > 100) fail(where, "range", `${k} = ${r[k]}`);
+    }
+    if (r.v + r.good + r.dk > 101 || r.v + r.good > 100)
+      fail(where, "total", `bad ${r.v} + good ${r.good} + dk ${r.dk} = ${r.v + r.good + r.dk}`);
+    const d = r.detail || {};
+    for (const k of ["vg", "sg", "sb", "vb"]) {
+      if (typeof d[k] !== "number") fail(where, "detail", `detail.${k} missing`);
+    }
+    if (typeof d.vg === "number") {
+      if (Math.abs(d.vg + d.sg - r.good) > 1) fail(where, "detail-sum", `vg+sg = ${d.vg + d.sg} vs printed TOTAL Good ${r.good}`);
+      if (Math.abs(d.sb + d.vb - r.v) > 1) fail(where, "detail-sum", `sb+vb = ${d.sb + d.vb} vs printed TOTAL Bad ${r.v}`);
+    }
+    for (const k of ["fwStart", "fwEnd", "published"]) {
+      if (r[k] != null && !ISO_DAY.test(r[k])) fail(where, "date-format", `${k} "${r[k]}" is not YYYY-MM-DD`);
+    }
+    if (r.fwStart && r.fwEnd && r.fwStart > r.fwEnd) fail(where, "date-order", `fwStart ${r.fwStart} after fwEnd ${r.fwEnd}`);
+    if (r.fwEnd && r.published && r.published < r.fwEnd) fail(where, "date-order", `published ${r.published} before fwEnd ${r.fwEnd}`);
+    if (!KNOWN_METHOD_GAPS.has(key)) {
+      for (const k of ["fwStart", "fwEnd", "n", "marginError", "designEffect", "vendor"]) {
+        if (r[k] == null) fail(where, "pew-method", `missing ${k} (no documented gap)`);
+      }
+    }
+    if (r.n != null && (typeof r.n !== "number" || r.n < 100 || r.n > 1e5)) fail(where, "range", `n = ${r.n}`);
+    if (r.marginError != null && (!(r.marginError > 0) || r.marginError > 10)) fail(where, "range", `marginError = ${r.marginError}`);
+    if (r.designEffect != null && (!(r.designEffect >= 1) || r.designEffect > 5)) fail(where, "range", `designEffect = ${r.designEffect}`);
+    const pv = prevV[r.series];
+    if (pv == null ? r.chg != null : r.chg !== r.v - pv)
+      fail(where, "pew-chg", `chg ${r.chg} ≠ v − same-series predecessor (${pv == null ? "none expected" : `${r.v} − ${pv} = ${r.v - pv}`})`);
+    prevV[r.series] = r.v;
+    if (r.fwEnd) {
+      if (prevFw[r.series] && r.fwEnd < prevFw[r.series]) fail(where, "date-order", `fwEnd precedes previous ${r.series} row (${prevFw[r.series]})`);
+      prevFw[r.series] = r.fwEnd;
+    }
+  });
+  return errors;
+}
+
 if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const { errors, exempted, orphans } = validate(D);
   errors.push(...validateChangelog());
+  errors.push(...validatePewSentiment());
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
