@@ -5818,6 +5818,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1241,
+      "sampleEff": 871,
       "alp": 29,
       "lnp": 20,
       "grn": 14,
@@ -5826,7 +5827,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850"
+      "url": "https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/28591766/NewspollMethodologyStatement12October2026byPyxis-9kKHvHQTEmIDHaVKW51xJA.pdf"
     },
     {
       "date": "2026-10-10",
