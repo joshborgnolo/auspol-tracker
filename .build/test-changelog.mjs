@@ -286,16 +286,23 @@ const RM_INFO = { [RM]: { name: "Roy Morgan", fw: "28 Sep–11 Oct", sample: 265
   assert.deepEqual(appended.map((e) => e.kind), ["seed"]);
   const t = appended[0].text;
   assert.match(t, /^From today the log also records the primary votes/);
-  assert.match(t, /Primary votes now: Labor 27\.5, the Coalition 21\.6, One Nation 26\.1, the Greens 13\.4, others 11\.4\./);
-  assert.match(t, /Leader ratings now: Albanese's net approval −21\.6, Taylor's net approval −6\.9, Hanson's net favourability −5\.6\./);
-  assert.match(t, /National direction now: right track 27\.1, wrong track 62\.2 \(net −35\.1\)\./);
-  assert.match(t, /Leading significantly as the best party now: the Coalition on economic management\./);
-  assert.match(t, /Moving significantly now: One Nation's primary vote \(up\); Albanese's net approval \(down\)\.$/, "primaries listed first");
+  assert.match(t, /Primary votes: Labor 27\.5, the Coalition 21\.6, One Nation 26\.1, the Greens 13\.4, others 11\.4\./);
+  assert.match(t, /Leader ratings: Albanese's net approval −21\.6, Taylor's net approval −6\.9, Hanson's net favourability −5\.6\./);
+  assert.match(t, /National direction: right track 27\.1, wrong track 62\.2 \(net −35\.1\)\./);
+  assert.match(t, /Leading significantly as the best party: the Coalition on economic management\./);
+  assert.match(t, /Moving significantly over the past month: One Nation's primary vote \(up\); Albanese's net approval \(down\)\.$/, "primaries listed first");
   /* and with a poll the same day, the poll entry carries no a → b figures */
   const both = diff(S(), W({ polls: [...S().polls, RM] }), RM_INFO).appended;
   assert.deepEqual(both.map((e) => e.kind), ["seed", "poll"]);
   assert.doesNotMatch(both[1].text, /Primary votes|→/);
   assert.match(both[1].text, /^Roy Morgan .* added — the two-party preferred estimate held at 52\.3 \(Labor v One Nation, implied flows\)\. House effect \(Labor v One Nation, implied flows; positive leans Labor\): Roy Morgan \+0\.7\.$/, "a lean with nothing before it reads as a level");
+}
+
+/* a log begun on a widened state opens with where everything stands */
+{
+  const t = initChangelog(W({ sig: { "prim|onp": 1 }, sigMeta: { "prim|onp": "One Nation's primary vote" } }), "2029-01-18").entries[0].text;
+  assert.match(t, /^The change log starts here — the two-party preferred estimate is 52\.3 \(Labor v One Nation, implied flows\)\. Primary votes: Labor 27\.5, the Coalition 21\.6, One Nation 26\.1, the Greens 13\.4, others 11\.4\. Leader ratings: /);
+  assert.match(t, /Moving significantly over the past month: One Nation's primary vote \(up\)\. From today, every movement in these figures and every statistical finding that comes or goes is recorded here\.$/);
 }
 
 /* quiet run on the widened state: nothing */

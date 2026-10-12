@@ -148,8 +148,27 @@ export function initChangelog(nextState, iso) {
   return {
     state: nextState,
     entries: [entry(iso, "seed",
-      `The change log starts here${leadTxt}. From today, every movement it makes and every statistical finding that comes or goes is recorded here.`)],
+      `The change log starts here${leadTxt}.${standingText(nextState)} From today, every movement in these figures and every statistical finding that comes or goes is recorded here.`)],
   };
+}
+
+/* where everything the widened log follows stands (2026-10-12): the seed's
+   opening reading, and the one-off entry a state written before the
+   widening migrates with. "" for a state with none of it. */
+function standingText(st) {
+  if (!st.prim) return "";
+  const P = st.prim, L = st.leaders || {};
+  const prim = PRIM_ORDER.filter((k) => P[k] != null).map((k) => `${PRIM_NAME[k]} ${f1(P[k])}`).join(", ");
+  const lead = LEADER_ORDER.filter((k) => L[k] != null).map((k) => `${leaderName(k)} ${sgn(L[k], f1)}`).join(", ");
+  const D = st.dir;
+  const IL = st.issLead || {};
+  const leads = Object.keys(IL).filter((k) => IL[k]).map((k) => `${PRIM_NAME[IL[k]]} on ${issueName(st, k)}`);
+  const sig = Object.keys(st.sig || {}).sort(sigOrder).map((k) => `${(st.sigMeta || {})[k] || k} (${st.sig[k] > 0 ? "up" : "down"})`);
+  return ` Primary votes: ${prim}.` +
+    (lead ? ` Leader ratings: ${lead}.` : "") +
+    (D ? ` National direction: right track ${f1(D.right)}, wrong track ${f1(D.wrong)} (net ${sgn(D.net, f1)}).` : "") +
+    (st.issLead ? (leads.length ? ` Leading significantly as the best party: ${leads.join("; ")}.` : " No party leads significantly as the best party on any issue.") : "") +
+    (sig.length ? ` Moving significantly over the past month: ${sig.join("; ")}.` : " No measure is moving significantly over the past month.");
 }
 
 /* "moved 52.2 → 52.3", or "held at 52.3", or null when either side is
@@ -228,23 +247,10 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
   /* the first refresh after the log widened (2026-10-12): say so once, with
      where everything stands, rather than logging every figure as a move */
   if (!prevState.prim && nextState.prim) {
-    const P = nextState.prim, L = nextState.leaders || {};
-    const prim = PRIM_ORDER.filter((k) => P[k] != null).map((k) => `${PRIM_NAME[k]} ${f1(P[k])}`).join(", ");
-    const lead = LEADER_ORDER.filter((k) => L[k] != null).map((k) => `${leaderName(k)} ${sgn(L[k], f1)}`).join(", ");
-    const sig = Object.keys(nextState.sig || {}).sort(sigOrder).map((k) =>
-      `${nextState.sigMeta[k] || k} (${nextState.sig[k] > 0 ? "up" : "down"})`);
-    const D = nextState.dir;
-    const dir = D ? ` National direction now: right track ${f1(D.right)}, wrong track ${f1(D.wrong)} (net ${sgn(D.net, f1)}).` : "";
-    const IL = nextState.issLead || {};
-    const leads = Object.keys(IL).filter((k) => IL[k]).map((k) => `${PRIM_NAME[IL[k]]} on ${issueName(nextState, k)}`);
-    const iss = nextState.issLead
-      ? (leads.length ? ` Leading significantly as the best party now: ${leads.join("; ")}.` : " No party leads significantly as the best party on any issue now.")
-      : "";
     appended.push(entry(iso, "seed",
       "From today the log also records the primary votes, the leaders' ratings, national direction and the house effect of each pollster that publishes, " +
-      "every measure whose month-on-month move becomes, or stops being, statistically significant, and changes in which party leads significantly as the best on each issue. " +
-      `Primary votes now: ${prim}.` + (lead ? ` Leader ratings now: ${lead}.` : "") + dir + iss +
-      (sig.length ? ` Moving significantly now: ${sig.join("; ")}.` : " No measure is moving significantly now.")));
+      "every measure whose month-on-month move becomes, or stops being, statistically significant, and changes in which party leads significantly as the best on each issue." +
+      standingText(nextState)));
   }
 
   /* the headline pairing or its basis switched */
