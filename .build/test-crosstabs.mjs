@@ -612,6 +612,47 @@ assert.deepEqual(printedZero.age["18–34"], sh(30, 12, 0, 26, 17), "a party tha
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
 
+// ---- vote-switching: DemosAU (MRP)'s 2025-vote charts, measured ---------------------------
+/* The measurer renders the PDF, so this holds its filed output to the report
+   text instead: every share the chart prints as a label (small segments go
+   unlabelled) must appear, in legend order, among the measured shares of its
+   row. The chart is the report's own model's: "By 2025 Election Result"
+   (Feb–Mar 2026, one chart) or the block under the period title on the
+   "Past Federal Vote" page. */
+{
+  const vsWaves = JSON.parse(readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")).waves;
+  const PK = { ALP: "alp", LNP: "lnp", GRN: "grn", ONP: "onp", OTH: "oth" };
+  const printed = (slug, period) => {
+    const lines = readFileSync(path.join(ROOT, ".build/demosau-src", slug + ".txt"), "utf8").split("\n");
+    let i = lines.findIndex((l) => /^\s*(Past Federal Vote|By 2025 Election Result)\s*$/.test(l));
+    if (period) i = lines.findIndex((l, j) => j > i && l.trim() === period);
+    const li = lines.findIndex((l, j) => j > i && /^\s*ALP\s/.test(l) && l.trim().split(/\s+/).every((t) => PK[t]));
+    const legend = lines[li].trim().split(/\s+/).map((t) => PK[t]);
+    const rows = {};
+    for (const l of lines.slice(li + 1)) {
+      if (/^\s*0%/.test(l)) break;
+      const m = l.match(/^\s*(ALP|LNP|GRN|ONP|OTH)\b/);
+      if (m) rows[PK[m[1]]] = [...l.matchAll(/(\d+)%/g)].map((x) => +x[1]);
+    }
+    return { legend, rows };
+  };
+  for (const [date, slug, period] of [["2026-03-03", "DemosAU-Federal-MRP-Model-FebMarch-2026-", null],
+    ["2026-07-11", "DemosAU-Report-May-July-2026-MRP-Model-", "May-July 26"],
+    ["2026-09-19", "DemosAU-Report-Aug-Sept-2026-MRP-Model-1", "August - September 26"]]) {
+    const w = vsWaves.find((x) => x.pollster === "DemosAU (MRP)" && x.date === date);
+    assert.ok(w, `the ${date} MRP's 2025-vote table is filed`);
+    assert.equal(sharesProblem(w.rows), null);
+    const { legend, rows } = printed(slug, period);
+    assert.deepEqual(Object.keys(rows).sort(), ["alp", "grn", "lnp", "onp", "oth"], `${date}: five 2025 groups printed`);
+    for (const [g, labels] of Object.entries(rows)) {
+      const measured = legend.map((k) => w.rows[g][k]).filter((v) => v != null);
+      let j = 0;
+      for (const v of measured) if (v === labels[j]) j++;
+      assert.equal(j, labels.length, `${date} ${g}: printed ${labels.join(",")} within measured ${measured.join(",")}`);
+    }
+  }
+}
+
 // ---- vote-switching: the hand-entered shifts wave --------------------------------
 /* Accent's "shifts" report Figure 9 (fieldwork 6–19 Mar 2026, n=5,563) – a
    stacked-bar chart measured by hand (printed labels where shown, bar widths
@@ -632,4 +673,4 @@ assert.deepEqual(shiftsVs.rows.onp, { alp: 0.7, lnp: 0.8, onp: 96, grn: 0.3, oth
 assert.deepEqual(shiftsVs.rows.oth, { alp: 5, lnp: 5, onp: 27, grn: 3, oth: 55, und: 5 });
 assert.deepEqual(shiftsVs.rows.dnr, { alp: 11, lnp: 8, onp: 18, grn: 5, oth: 12, und: 46 });
 
-console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels and MRP trend pages, the EMRS Tasmanian-electorate cut, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts + the July 2025 AFR fold), Resolve series, Essential Primary Vote visuals, DemosAU labels and MRP trend pages, the MRP 2025-vote charts against their printed labels, the EMRS Tasmanian-electorate cut, the gate, the common groups (place and home too, unprinted parties null), the shifts vote-switching wave");

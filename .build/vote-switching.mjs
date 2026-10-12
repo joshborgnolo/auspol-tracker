@@ -13,6 +13,13 @@
                 wave's report PDF, measured from the rendered bars by
                 .build/demosau-charts.mjs, since the PDF prints small
                 segments without a label.
+     DemosAU (MRP) – the MRP report's "By 2025 Election Result" (Feb–Mar
+                2026) or "Past Federal Vote" chart (May–Jul 2026 on, the
+                report's own model beside the previous one), measured the
+                same way (measureMrp). The model reuses the monthly waves'
+                respondents, so gen-data keeps it out of the One Nation
+                sources panel, as the headline keeps it out of the
+                aggregates; it reaches the CSV export.
    Nothing is saved on a guess: each row must sum to about 100, a YouGov
    table's all-voters column must match the wave's published primaries
    (crosstab-parse.mjs), and a DemosAU chart must measure close to whole
@@ -43,11 +50,11 @@ import os from "node:os";
 import path from "node:path";
 import { ROOT, youGovSource, youGovCrosstab, demosauReport } from "./crosstab-sources.mjs";
 import { switchingOf, sharesProblem, totalProblem } from "./crosstab-parse.mjs";
-import { measure as demosauMeasure, FIT_LIMIT } from "./demosau-charts.mjs";
+import { measure as demosauMeasure, measureMrp, FIT_LIMIT } from "./demosau-charts.mjs";
 
 const OUT = path.join(ROOT, "data", "vote-switching.json");
 const FIRST_TABLE = "2026-02-01";
-const HOUSES = ["YouGov", "DemosAU"];
+const HOUSES = ["YouGov", "DemosAU", "DemosAU (MRP)"];
 const STALE_DAYS = 16;                 // a week to publish, then a weekly retry, then someone looks
 
 const WEIGHTS_2025 = { alp: 34.56, lnp: 31.82, grn: 12.20, onp: 6.40, ind: 7.27, oth: 7.74,
@@ -91,9 +98,11 @@ try {
         push({ ...base, source: t.source, read: "published table", rows: s.rows, total: s.total });
         console.log(`${k}: ${Object.keys(s.rows).join(",")} (ON total ${s.total.onp}, poll ${p.onp})`);
       } else {
+        // an MRP filed from Capital Brief has no report until DemosAU posts it
+        if (p.fieldworkPending) { pend(k, "the report isn't out yet (fieldwork TBC)"); continue; }
         const rep = await demosauReport(p, tmp);
         if (!rep) { pend(k, "the report PDF isn't reachable yet (not on record, the site's captcha, or not up)"); continue; }
-        const t = demosauMeasure(rep.file);
+        const t = p.pollster === "DemosAU (MRP)" ? measureMrp(rep.file) : demosauMeasure(rep.file);
         const bad = t.error ? `${t.error} (no chart? add it to KNOWN_SKIP once checked)`
           : t.maxOffInteger > FIT_LIMIT ? `the chart read ${t.maxOffInteger} off whole percentages – a layout the measurer doesn't know?`
           : sharesProblem(t.rows);

@@ -2697,7 +2697,10 @@ const confidenceOnlyPolls = (() => {
    - A wave missing a group (YouGov 24 Mar 2026 printed no "other" column)
      can't be split, and is skipped.
    - DemosAU's table stores only segments that round above zero, so a group
-     row with no One Nation cell is a 0. */
+     row with no One Nation cell is a 0.
+   - An MRP taken to reuse its house's own waves (reusesWaves) sits out, as
+     it sits out of the aggregates: its respondents already count through
+     those waves. Its table still reaches the CSV export (VS_BY_POLL). */
 const VOTE_SWITCHING = (() => {
   if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")); }
@@ -2729,6 +2732,8 @@ const onSourceWaves = (() => {
   if (!Array.isArray(VOTE_SWITCHING?.waves) || !VOTE_SWITCHING.weights2025) return [];
   const W = VOTE_SWITCHING.weights2025;
   return VOTE_SWITCHING.waves.map((w) => {
+    const p = POLL_BY_KEY.get(w.date + "|" + w.pollster);
+    if (p && reusesWaves(p)) return null;
     const toOn = (g) => (w.rows?.[g] ? (w.rows[g].onp ?? 0) : null);
     const gain = {
       lnp: toOn("lnp") == null ? null : W.lnp * toOn("lnp") / 100,

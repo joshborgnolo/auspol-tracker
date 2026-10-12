@@ -192,6 +192,32 @@ export function measure(pdf) {
   }
 }
 
+/* An MRP report's 2025-vote chart: "By 2025 Election Result" (Feb–Mar 2026),
+   then "Past Federal Vote" (May–Jul 2026 on), which stacks the report's own
+   model and the previous one, each under its period title ("August -
+   September 26", "May-July 26") - in either order (May–Jul printed Feb–Mar
+   on top, Aug–Sep its own). The report's own is the newest period; its chart
+   runs from its title down to the next title, or the page's foot. */
+const MRP_PERIOD = /^[A-Z][a-z]+ ?- ?([A-Z][a-z]+) (\d\d)$/;
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const periodEnd = (t) => { const m = t.match(MRP_PERIOD); return 100 * +m[2] + MONTHS.indexOf(m[1].slice(0, 3).toLowerCase()); };
+export function measureMrp(pdf) {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "demosau-mrp-"));
+  try {
+    const pages = pagesOf(pdf, tmp);
+    const page = pages.find((p) => p.lines.some((l) => /^(Past Federal Vote|By 2025 Election Result)$/.test(l.text)));
+    if (!page) return { error: "no Past Federal Vote page" };
+    const titles = page.lines.filter((l) => MRP_PERIOD.test(l.text)).sort((a, b) => a.top - b.top);
+    const own = titles.length ? titles.reduce((a, b) => (periodEnd(b.text) > periodEnd(a.text) ? b : a)) : null;
+    const next = own && titles.find((t) => t.top > own.top);
+    const img = renderPage(pdf, page.n, tmp);
+    const r = measureRegion(page, img, own?.top ?? 0, next?.top ?? page.height, rowKey);
+    return r.error ? r : { page: page.n, period: own?.text ?? null, ...r };
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 /* Breakdown charts by heading. A chart runs from its heading line (a line
    that is exactly its name) to the next known heading on the page, or the
    page's foot; row labels are returned as printed. */

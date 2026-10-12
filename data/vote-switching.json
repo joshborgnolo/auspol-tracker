@@ -199,6 +199,54 @@
    }
   },
   {
+   "pollster": "DemosAU (MRP)",
+   "date": "2026-03-03",
+   "dateStart": "2026-01-13",
+   "sample": 8484,
+   "article": "https://www.capitalbrief.com/article/nationals-face-total-wipeout-as-one-nation-leads-with-male-voters-ae82f323-94e9-436a-b6b1-6dc1ec8cab6a/",
+   "onp": 27,
+   "source": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
+   "page": 8,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 76,
+     "lnp": 4,
+     "grn": 5,
+     "onp": 13,
+     "oth": 2
+    },
+    "lnp": {
+     "alp": 4,
+     "lnp": 56,
+     "grn": 1,
+     "onp": 37,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 6,
+     "lnp": 2,
+     "grn": 82,
+     "onp": 7,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 1,
+     "lnp": 1,
+     "grn": 1,
+     "onp": 97
+    },
+    "oth": {
+     "alp": 5,
+     "lnp": 6,
+     "grn": 4,
+     "onp": 24,
+     "oth": 61
+    }
+   },
+   "fit": 0.07
+  },
+  {
    "pollster": "YouGov",
    "date": "2026-03-10",
    "dateStart": "2026-03-03",
@@ -1007,6 +1055,54 @@
    "fit": 0.06
   },
   {
+   "pollster": "DemosAU (MRP)",
+   "date": "2026-07-11",
+   "dateStart": "2026-05-27",
+   "sample": 9343,
+   "article": "https://demosau.com/news/new-mrp-model-points-to-hung-parliament/",
+   "onp": 30,
+   "source": "https://demosau.com/wp-content/uploads/2026/07/DemosAU-Report-May-July-2026-MRP-Model-.pdf",
+   "page": 14,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 69,
+     "grn": 5,
+     "oth": 3,
+     "lnp": 6,
+     "onp": 17
+    },
+    "lnp": {
+     "alp": 3,
+     "grn": 1,
+     "oth": 1,
+     "lnp": 56,
+     "onp": 39
+    },
+    "grn": {
+     "alp": 5,
+     "grn": 84,
+     "oth": 2,
+     "lnp": 1,
+     "onp": 8
+    },
+    "onp": {
+     "alp": 1,
+     "oth": 1,
+     "lnp": 1,
+     "onp": 97
+    },
+    "oth": {
+     "alp": 6,
+     "grn": 5,
+     "oth": 57,
+     "lnp": 6,
+     "onp": 26
+    }
+   },
+   "fit": 0.09
+  },
+  {
    "pollster": "YouGov",
    "date": "2026-07-14",
    "dateStart": "2026-07-07",
@@ -1485,6 +1581,55 @@
      "oth": 23,
      "lnp": 11,
      "onp": 37
+    }
+   },
+   "fit": 0.06
+  },
+  {
+   "pollster": "DemosAU (MRP)",
+   "date": "2026-09-19",
+   "dateStart": "2026-08-04",
+   "sample": 9740,
+   "article": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
+   "onp": 26,
+   "source": "https://demosau.com/wp-content/uploads/2026/10/DemosAU-Report-Aug-Sept-2026-MRP-Model-1.pdf",
+   "page": 14,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 69,
+     "grn": 5,
+     "oth": 4,
+     "lnp": 7,
+     "onp": 15
+    },
+    "lnp": {
+     "alp": 4,
+     "grn": 2,
+     "oth": 2,
+     "lnp": 57,
+     "onp": 35
+    },
+    "grn": {
+     "alp": 6,
+     "grn": 79,
+     "oth": 3,
+     "lnp": 4,
+     "onp": 8
+    },
+    "onp": {
+     "alp": 2,
+     "grn": 1,
+     "oth": 1,
+     "lnp": 2,
+     "onp": 94
+    },
+    "oth": {
+     "alp": 5,
+     "grn": 4,
+     "oth": 63,
+     "lnp": 8,
+     "onp": 20
     }
    },
    "fit": 0.06
