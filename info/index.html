@@ -4759,8 +4759,11 @@ body.rd .rd-ap-pinl { font-size: 12px; }
 body.rd .rd-ap-pinsep { align-self: center; width: 1px; height: 18px; background: var(--line); }
 body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
 body.rd .rd-ap-pins:hover { background: var(--surface-2); color: var(--ink); }
-body.rd .rd-ap-pinn { align-self: center; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ap-pinn { align-self: center; display: inline-grid; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-ap-pinn b { font-weight: 600; color: var(--ink); }
+body.rd .rd-ap-pinn > span { grid-area: 1 / 1; }
+body.rd .rd-ap-pinn .rd-ap-pinnw { visibility: hidden; }
+body.rd .rd-ap-pinn .rd-ap-pinnl { justify-self: end; }
 @media (max-width: 900px) {
   body.rd .rd-ap-pinbar { gap: 14px; }
   body.rd .rd-ap-pintabs { gap: 12px; }
@@ -121367,6 +121370,7 @@ function RdAllPolls(P) {
       document.removeEventListener("keydown", key, true);
     };
   }, []);
+  const pinnWNoun = FACETS.some(f => f.id === "confidence") ? "releases" : "polls";
   const pinBar = React.createElement("div", {
     className: "rd-ap-pinbar" + (pinned ? " on" : ""),
     "aria-hidden": !pinned
@@ -121436,7 +121440,12 @@ function RdAllPolls(P) {
     d: "M21 21l-4.3-4.3"
   }))), React.createElement("span", {
     className: "rd-ap-pinn"
-  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " ", noun)));
+  }, React.createElement("span", {
+    className: "rd-ap-pinnw",
+    "aria-hidden": "true"
+  }, total, " of ", total, " ", pinnWNoun), React.createElement("span", {
+    className: "rd-ap-pinnl"
+  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " ", noun))));
   const qpop = React.createElement(RdQPop, {
     label: "How the two-party figures are counted, and the pollsters\u2019 published figures",
     align: "left"
