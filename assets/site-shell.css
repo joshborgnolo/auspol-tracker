@@ -473,5 +473,21 @@ nav.tabs[aria-label="Poll archives"] {
 @media print {
   .sh-tabs, .sh-theme, .sh-foot, .sh-band { display: none; }
   * { box-shadow: none !important; text-shadow: none !important; }
+  /* black-on-white whatever the theme: backgrounds don't print, so a dark
+     theme's light ink would vanish onto the sheet. The pages' own dark token
+     blocks sit on BOTH sides of this stylesheet and never yield to it, so
+     the re-pins take the one specificity step above them (html:root:not…
+     over their bare :root:not(:…) and :root.sh-dark). */
+  html:root:not(.sh-light), html:root.sh-light {
+    --ink: oklch(0.27 0.012 55);
+    --ink-2: oklch(0.44 0.012 55);
+    --ink-3: oklch(0.52 0.010 58);
+    --ink-faint: oklch(0.70 0.008 65);
+    --bg: oklch(0.970 0.008 78);
+    --sh-surface: oklch(0.992 0.004 85);
+    --line: oklch(0.895 0.008 75);
+    --line-2: oklch(0.935 0.006 78);
+    color-scheme: light;
+  }
 }
 @page { margin: 14mm 12mm; }

@@ -333,7 +333,7 @@ export function shellHeader({ tab } = {}) {
       <div class="sh-tabs-set">
         ${tabs}
       </div>
-      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
+      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
@@ -853,6 +853,22 @@ nav.tabs[aria-label="Poll archives"] {
 @media print {
   .sh-tabs, .sh-theme, .sh-foot, .sh-band { display: none; }
   * { box-shadow: none !important; text-shadow: none !important; }
+  /* black-on-white whatever the theme: backgrounds don't print, so a dark
+     theme's light ink would vanish onto the sheet. The pages' own dark token
+     blocks sit on BOTH sides of this stylesheet and never yield to it, so
+     the re-pins take the one specificity step above them (html:root:not…
+     over their bare :root:not(:…) and :root.sh-dark). */
+  html:root:not(.sh-light), html:root.sh-light {
+    --ink: oklch(0.27 0.012 55);
+    --ink-2: oklch(0.44 0.012 55);
+    --ink-3: oklch(0.52 0.010 58);
+    --ink-faint: oklch(0.70 0.008 65);
+    --bg: oklch(0.970 0.008 78);
+    --sh-surface: oklch(0.992 0.004 85);
+    --line: oklch(0.895 0.008 75);
+    --line-2: oklch(0.935 0.006 78);
+    color-scheme: light;
+  }
 }
 @page { margin: 14mm 12mm; }
 `;

@@ -27,9 +27,9 @@
       truth, few observations — a corroborator, not a discriminator.
 
    Estimator functions below are VERBATIM copies of gen-data.mjs's
-   houseEffectsFor / nowcastPts / weightedWithSe and its rowN/constant set
-   (HE_WINDOW, SHRINK_K, SAMPLE_CAP, HL_DEFF, HE_HALF, HL_WINDOW, HL_HALF,
-   HL_TAPER).
+   houseEffectsFor / nowcastPts / weightedWithSe / changeSeOf and its
+   rowN/constant set (HE_WINDOW, SHRINK_K, SAMPLE_CAP, HL_DEFF, HE_HALF,
+   HL_WINDOW, HL_HALF, HL_TAPER, HEADLINE_K).
    If gen-data's estimator changes, re-copy — otherwise the arms race is
    measuring a different estimator than the one that ships. tests.yml runs
    this file after every estimator-touching push; when the copies drift the
@@ -72,6 +72,9 @@ const noAggPoll = (p) => NO_AGG_HOUSES.has(p.pollster || p.firm) || p.noAgg != n
    recencyW pair. */
 const taperW = (d) => (d <= HL_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - HL_TAPER) / (HL_WINDOW - HL_TAPER))));
 const recencyW = (d) => Math.exp(-LN2 * d / HL_HALF) * taperW(d);
+/* The window descriptor the estimator entry points take (gen-data.mjs
+   HEADLINE_K). The sparse-measure SPARSE_K is not raced here. */
+const HEADLINE_K = { window: HL_WINDOW, weight: recencyW, label: "three weeks" };
 
 const ymOf = (d) => d.slice(0, 7);
 const ddays = (a, b) => (a - b) / 86400000;
@@ -141,14 +144,17 @@ function weightedWithSe(pts) {
   const se = Math.max(Number.isFinite(seSpread) ? seSpread : 0, seFloor);
   return { v: meanV, n: pts.length, se, nEff };
 }
-function nowcastPts(rows, he, ref) {
+function nowcastPts(rows, he, ref, k = HEADLINE_K) {
   const pts = [];
-  const waves = new Map();
-  for (const a of rows) {
+  const waves = new Map();                    // firm -> wave count inside the window
+  for (let i = 0; i < rows.length; i++) {
+    const a = rows[i];
     const d = ddays(ref, a.mid);
-    if (d < 0 || d > HL_WINDOW) continue;
+    if (d < 0 || d > k.window) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: a.n * recencyW(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
+    // ri ties a point back to its source row so the change-SE maths
+    // (changeSeOf) can match the same reading across two overlapping windows
+    pts.push({ ri: i, w: (a.w0 ?? a.n) * k.weight(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
   }
   for (const p of pts) p.w /= Math.sqrt(waves.get(p.firm));
   return pts;
@@ -157,6 +163,26 @@ function nowcastAdj(rows, he, ref) {
   const pts = nowcastPts(rows, he, ref);
   const r = weightedWithSe(pts);
   return r && { v: r.v, n: r.n, se: r.se, nEff: r.nEff, pts };
+}
+/* Sampling variance of ONE window point, mirroring weightedWithSe's floor: a
+   share carries p(1−p) at the window's mean, a non-share carries its pq.
+   Verbatim copy of gen-data.mjs's pointSampV / changeSeOf pair. */
+const pointSampV = (p, meanV) => HL_DEFF * (p.pq != null ? p.pq : (meanV / 100) * (1 - meanV / 100) * 1e4) / p.n;
+function changeSeOf(pNow, mNow, pPrev, mPrev) {
+  const swN = pNow.reduce((t, p) => t + p.w, 0), swP = pPrev.reduce((t, p) => t + p.w, 0);
+  const prevByRi = new Map(pPrev.map((p) => [p.ri, p]));
+  let cov = 0, floor = 0;
+  for (const p of pNow) {
+    const a = p.w / swN, v = pointSampV(p, mNow.v);
+    const q = prevByRi.get(p.ri);
+    if (!q) { floor += a * a * v; continue; }
+    const b = q.w / swP;
+    cov += a * b * v;
+    floor += (a - b) * (a - b) * v;
+    prevByRi.delete(p.ri);
+  }
+  for (const [, q] of prevByRi) { const b = q.w / swP; floor += b * b * pointSampV(q, mPrev.v); }
+  return Math.sqrt(Math.max(mNow.se ** 2 + mPrev.se ** 2 - 2 * cov, floor));
 }
 
 /* ---- rowN under an arm -------------------------------------------------- */
@@ -187,6 +213,28 @@ const refNow = new Date(LATEST_ISO).getTime();
   console.log(`   committed asset (${assetName || "?"}): ALP ${committed}`);
   if (committed == null) die("parity: could not read alp2pp from the committed data asset");
   if (r1(cur.v) !== committed) die(`parity: A0 replica (${r1(cur.v)}) != committed asset (${committed}). The estimator copies in this file have drifted from gen-data.mjs — re-sync them before trusting any arm.`);
+}
+/* changeSeOf synthetic self-check: a window pair that shares EVERY reading
+   (identical points, identical weights) must score a change SE of 0 —
+   floor = Σ(a−b)²v = 0 — while a window pair that shares NOTHING must fall
+   back to the plain root-sum-square of the two window SEs. If either arm
+   breaks, the ri/`k` re-sync above did not take. */
+{
+  const pts = [
+    { ri: 0, w: 900, x: 55.5, n: 1000 },
+    { ri: 1, w: 700, x: 54.8, n: 1100 },
+    { ri: 2, w: 400, x: 56.2, n: 1200 },
+  ];
+  const mA = weightedWithSe(pts), mB = weightedWithSe(pts);
+  const sameSe = changeSeOf(pts, mA, pts, mB);
+  if (Math.abs(sameSe) > 1e-9)
+    die(`changeSeOf: identical overlapping windows should give SE 0, got ${sameSe}`);
+  const other = pts.map((p) => ({ ...p, ri: p.ri + 100 }));
+  const diffSe = changeSeOf(pts, mA, other, mB);
+  const rss = Math.sqrt(mA.se ** 2 + mB.se ** 2);
+  if (Math.abs(diffSe - rss) > 1e-9)
+    die(`changeSeOf: disjoint windows should equal plain RSS (${rss}), got ${diffSe}`);
+  console.log(`   changeSeOf self-check: full-overlap SE ${sameSe.toExponential(2)} (~0), disjoint SE ${diffSe.toFixed(4)} = RSS ${rss.toFixed(4)}`);
 }
 function die(msg) { console.error("deff-backtest: FAIL — " + msg); process.exit(1); }
 function ARMS_A0() { return { flat: 1.6, perHouse: {} }; }

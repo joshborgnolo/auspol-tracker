@@ -13,17 +13,21 @@ const puppeteer = require("puppeteer-core");
 
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".woff2": "font/woff2", ".png": "image/png" };
 const server = http.createServer((req, res) => {
-  let p = decodeURIComponent(req.url.split("?")[0]);
+  let p;
+  try { p = decodeURIComponent((req.url || "/").split("?")[0]); }
+  catch { res.writeHead(400); return res.end("bad uri"); }
   if (p.endsWith("/")) p += "index.html";
-  const f = path.join(ROOT, p);
+  const f = path.resolve(ROOT, p.replace(/^\/+/, ""));
+  if (!f.startsWith(ROOT + path.sep)) { res.writeHead(403); return res.end("forbidden"); }
   if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
   res.writeHead(200, { "content-type": MIME[path.extname(f)] || "text/plain" });
   fs.createReadStream(f).pipe(res);
 });
-await new Promise((r) => server.listen(0, r));
+await new Promise((r) => server.listen(0, "127.0.0.1", r));
 const port = server.address().port;
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new", args: ["--no-sandbox"] });
 
+let fails = 0;
 for (const width of [641, 660, 700, 768]) {
   const pg = await browser.newPage();
   await pg.setViewport({ width, height: 900 });
@@ -45,9 +49,12 @@ for (const width of [641, 660, 700, 768]) {
     }
     return { scrollW: doc.scrollWidth, bad: bad.slice(0, 12) };
   }, width);
-  console.log(`\nw=${width} scrollW=${out.scrollW}`);
+  if (out.scrollW !== width) fails++;
+  console.log(`\nw=${width} scrollW=${out.scrollW}${out.scrollW !== width ? "  << OVERFLOW" : ""}`);
   for (const b of out.bad) console.log(" ", JSON.stringify(b));
   await pg.close();
 }
 await browser.close();
 server.close();
+console.log(fails ? `FAIL: document overflow at ${fails} width(s)` : "PASS: vic pages – no document overflow at 641–768");
+process.exit(fails ? 1 : 0);

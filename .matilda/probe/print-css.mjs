@@ -10,18 +10,22 @@
 import http from "node:http";
 import path from "node:path";
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
-const ROOT = "/Users/joshuaborgnolo/auspol tracker";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const require = createRequire(import.meta.url);
 const puppeteer = require("puppeteer-core");
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 const srv = http.createServer((req, res) => {
-  let p = decodeURIComponent((req.url || "/").split("?")[0].split("#")[0]);
+  let p;
+  try { p = decodeURIComponent((req.url || "/").split("?")[0].split("#")[0]); }
+  catch { res.writeHead(400); res.end("bad uri"); return; }
   if (p.endsWith("/")) p += "index.html";
-  const f = path.join(ROOT, p);
+  const f = path.resolve(ROOT, p.replace(/^\/+/, ""));
+  if (!f.startsWith(ROOT + path.sep)) { res.writeHead(403); res.end("forbidden"); return; }
   fs.readFile(f, (e, b) => { if (e) { res.writeHead(404); res.end(); } else { res.writeHead(200, { "content-type": MIME[path.extname(f)] || "text/plain" }); res.end(b); } });
 });
-await new Promise((r) => srv.listen(0, r));
+await new Promise((r) => srv.listen(0, "127.0.0.1", r));
 const port = srv.address().port;
 const base = `http://127.0.0.1:${port}`;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
@@ -73,6 +77,23 @@ const s = await page.evaluate(() => {
 if (s.tabs !== "none") fail(`shell print: .sh-tabs display=${s.tabs}`);
 if (s.theme !== null && s.theme !== "none") fail(`shell print: .sh-theme display=${s.theme}`);
 if (s.foot !== "none") fail(`shell print: .sh-foot display=${s.foot}`);
+
+// the shell's dark tokens can't stay dark at print either: force the class,
+// then the ink tokens must compute to the print block's light-sheet values
+await page.evaluate(() => { document.documentElement.classList.add("sh-dark"); document.documentElement.classList.remove("sh-light"); });
+await new Promise((r) => setTimeout(r, 100));
+const sd = await page.evaluate(() => {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (n) => cs.getPropertyValue(n).replace(/\s+/g, " ").trim();
+  return { ink: v("--ink"), ink2: v("--ink-2"), bg: v("--bg"), line: v("--line"), surf: v("--sh-surface"), scheme: cs.colorScheme || "" };
+});
+if (!sd.ink.includes("0.27")) fail(`shell print dark: --ink not forced dark-on-white (${sd.ink})`);
+if (!sd.ink2.includes("0.44")) fail(`shell print dark: --ink-2 (${sd.ink2})`);
+if (!sd.bg.includes("0.97")) fail(`shell print dark: --bg not forced light (${sd.bg})`);
+if (!sd.line.includes("0.895")) fail(`shell print dark: --line (${sd.line})`);
+if (!sd.surf.includes("0.992")) fail(`shell print dark: --sh-surface (${sd.surf})`);
+if (!sd.scheme.includes("light")) fail(`shell print dark: color-scheme (${sd.scheme})`);
+await page.evaluate(() => document.documentElement.classList.remove("sh-dark"));
 
 // ---- the rules exist in the documents served ------------------------------
 const idxHtml = await page.evaluate(async () => (await (await fetch("/index.html")).text()));

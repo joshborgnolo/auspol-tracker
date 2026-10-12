@@ -1,22 +1,26 @@
 import http from "node:http";
 import path from "node:path";
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
-const ROOT = "/Users/joshuaborgnolo/auspol tracker";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const require = createRequire(import.meta.url);
 const puppeteer = require("puppeteer-core");
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 const srv = http.createServer((req, res) => {
-  let p = decodeURIComponent((req.url || "/").split("?")[0].split("#")[0]);
+  let p;
+  try { p = decodeURIComponent((req.url || "/").split("?")[0].split("#")[0]); }
+  catch { res.writeHead(400); res.end("bad uri"); return; }
   if (p.endsWith("/")) p += "index.html";
-  const f = path.join(ROOT, p);
+  const f = path.resolve(ROOT, p.replace(/^\/+/, ""));
+  if (!f.startsWith(ROOT + path.sep)) { res.writeHead(403); res.end("forbidden"); return; }
   fs.readFile(f, (e, b) => { if (e) { res.writeHead(404); res.end(); } else { res.writeHead(200, { "content-type": MIME[path.extname(f)] || "text/plain" }); res.end(b); } });
 });
-await new Promise((r) => srv.listen(0, r));
+await new Promise((r) => srv.listen(0, "127.0.0.1", r));
 const port = srv.address().port;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 const page = await browser.newPage();
-// emulate the 404 at an arbitrary deep path, like GitHub Pages does
+// the 404 document directly, as GitHub Pages serves it for any missed path
 const base = `http://127.0.0.1:${port}`;
 let bad = 0;
 const fail = (m) => { console.log("FAIL: " + m); bad++; };
