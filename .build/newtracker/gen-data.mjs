@@ -2933,6 +2933,68 @@ const onSources = onSourceWaves.length ? {
   going,
 } : null;
 
+/* The whole table, pooled, for the masthead dial's replay (wm-story.jsx),
+   whose four primary bars trade mass in these proportions. Each table the
+   panel uses (every 2025 group printed; an MRP reusing its house's waves
+   left out) gives each 2025 group's split now across Labor, the Coalition,
+   the Greens, One Nation and everyone else. Each cell is pooled across the
+   tables as the panel's rates are - each table weighted by the respondents
+   its group is, a house's repeats deflated to sqrt(m) - then each group's
+   row is closed to 100.
+   - Everyone else is one group on both sides: other parties and
+     independents, YouGov's two groups folded at their 2025 weights and its
+     Community Strong column with them. Undecided (RedBridge prints it as a
+     current vote) is dropped and the row closed over the rest, as the
+     primaries are and as goDestRow does; voters with no 2025 vote to
+     recall are left out, as in the panel.
+   - One pool over the whole run, not month by month: each table already
+     counts the switching from the election to its date, and the panel's
+     rates have held since February, so months apart the cells differ by
+     sampling noise - which the replay would animate as voters changing
+     their minds back and forth.
+   flows[i][j]: points of the 2025 vote now with party j that voted for
+   group i in 2025 (i = j: kept). */
+const SWITCH_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+const switchFlows = (() => {
+  if (!onSourceWaves.length) return null;
+  const W = VOTE_SWITCHING.weights2025;
+  const share2025 = { alp: W.alp, lnp: W.lnp, grn: W.grn, onp: W.onp, oth: W.ind + W.oth };
+  const colOf = (k) => (k === "und" || k === "dnr" ? null : SWITCH_KEYS.includes(k) ? k : "oth");
+  const closed = (r) => {
+    if (!r) return null;
+    const o = Object.fromEntries(SWITCH_KEYS.map((k) => [k, 0]));
+    for (const [k, v] of Object.entries(r)) { const c = colOf(k); if (c && Number.isFinite(v)) o[c] += v; }
+    const s = SWITCH_KEYS.reduce((t, k) => t + o[k], 0);
+    return s > 0 ? Object.fromEntries(SWITCH_KEYS.map((k) => [k, (100 * o[k]) / s])) : null;
+  };
+  const byKey = new Map(VOTE_SWITCHING.waves.map((w) => [w.date + "|" + w.pollster, w]));
+  const tables = onSourceWaves.map((sw) => {
+    const R = byKey.get(sw.date + "|" + sw.pollster)?.rows || {};
+    const rows = Object.fromEntries(["alp", "lnp", "grn", "onp"].map((g) => [g, closed(R[g])]));
+    if (R.ind) {
+      const a = closed(R.ind), b = closed(R.oth);
+      rows.oth = a && b ? Object.fromEntries(SWITCH_KEYS.map((k) => [k, (W.ind * a[k] + W.oth * b[k]) / (W.ind + W.oth)])) : null;
+    } else rows.oth = closed(R.oth);
+    if (SWITCH_KEYS.some((g) => !rows[g])) return null;
+    const p = POLL_BY_KEY.get(sw.date + "|" + sw.pollster);
+    return { firm: sw.pollster, date: sw.date, n: rowN(p || { sample: sw.sample }), rows };
+  }).filter(Boolean);
+  if (!tables.length) return null;
+  const m = new Map();
+  for (const t of tables) m.set(t.firm, (m.get(t.firm) || 0) + 1);
+  const flows = {};
+  for (const g of SWITCH_KEYS) {
+    const rate = Object.fromEntries(SWITCH_KEYS.map((c) => [c, weightedWithSe(tables.map((t) => {
+      const n = (t.n * share2025[g]) / 100;
+      return { w: n / Math.sqrt(m.get(t.firm)), x: t.rows[g][c], n };
+    })).v]));
+    const s = SWITCH_KEYS.reduce((t, c) => t + rate[c], 0);
+    flows[g] = Object.fromEntries(SWITCH_KEYS.map((c) => [c, r2((share2025[g] * rate[c]) / s)]));
+  }
+  return { keys: SWITCH_KEYS, flows, tables: tables.length, from: tables[0].date, to: tables[tables.length - 1].date,
+           houses: [...m.keys()] };
+})();
+
 /* ---- 5c. the vote by group: the tables ---------------------------------------
    data/demographics.json (.build/demographics.mjs) – each house's groups, per
    wave, as published. The figures built from them are §7g: they anchor on
@@ -6799,6 +6861,10 @@ window.AUSPOL = (function () {
      group's part of what One Nation drew from outside its own 2025 vote,
      from DemosAU's and YouGov's vote-switching tables. */
   const onSources = ${JSON.stringify(onSources)};
+  /* The whole vote-switching table, pooled (§5b): points of the 2025 vote
+     each party now holds from each 2025 group - the proportions the
+     masthead dial's replay trades its bars' mass in. */
+  const switchFlows = ${JSON.stringify(switchFlows)};
   /* Current readings (gen-data currentReading): the leaders' nets and
      preferred PM, and the national direction – nowcasts, as the headline. */
   const leaderNow = ${JSON.stringify(leaderNow)};
@@ -6914,7 +6980,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

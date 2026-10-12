@@ -14,7 +14,12 @@
    toward Labor, below toward the challenger - and every shot flies round to
    the side it pushes from and arrives travelling that way, never through
    the needle (a grid of needles and launch points through the same
-   gpShotPlan/gpShotAt the engine flies). Layout: at each viewport the controls
+   gpShotPlan/gpShotAt the engine flies). The bars' exchange (2026-10-13):
+   the mass the bars trade nets to exactly each bar's change since the
+   election at every point of the term, is nothing on election day, keeps
+   the pooled switching tables' proportions for One Nation's inflow, and
+   once the last grain lands every bar is drawn at its figure; /vic/, with
+   no tables, has no exchange. Layout: at each viewport the controls
    stay on screen, bar readings stay clear of the month and on screen, and
    the caption block stays clear of the timeline (a screen under 560px tall
    scrolls by design, so it is skipped).
@@ -169,6 +174,64 @@ console.log("--- shots");
   ok(!r.nbad, `all ${r.n} test shots arrive travelling the way they push, none through the needle` + (r.nbad ? ": " + JSON.stringify(r.bad) : ""));
   ok(r.above > 0 && r.below > 0, `polls land on both sides of the line (${r.above} above, ${r.below} below)`);
   await page.close();
+}
+
+console.log("--- the bars' exchange");
+{
+  const page = await browser.newPage();
+  const errs = [];
+  page.on("pageerror", (e) => errs.push(e.message));
+  await page.setViewport({ width: 1280, height: 800 });
+  await page.goto(base + "/", { waitUntil: "networkidle0" });
+  const r = await page.evaluate(() => {
+    const M = window.buildDialStory(window.AP.D), SW = window.AP.D.switchFlows;
+    if (!M.flowAt || !SW) return { missing: true };
+    const K = M.swKeys, ids = K.slice(0, 4);
+    const vec = (vals) => K.map((k) => (k === "oth" ? 100 - ids.reduce((t, id) => t + vals[id], 0) : vals[k]));
+    const net = (E) => K.map((_, p) => E.reduce((t, row, i) => t + row[p] - E[p][i], 0));
+    const base = vec(M.at(M.x0).vals);
+    let worst = 0;
+    for (let i = 0; i <= 1000; i++) {
+      const x = M.x0 + ((M.x1 - M.x0) * i) / 1000, d = vec(M.at(x).vals).map((v, k) => v - base[k]);
+      net(M.flowAt(x)).forEach((v, k) => { worst = Math.max(worst, Math.abs(v - d[k])); });
+    }
+    const zero = M.flowAt(M.x0).flat().every((v) => v === 0);
+    // One Nation's inflow by source at the live reading, against the pooled tables'
+    const E = M.flowAt(M.x1), on = K.indexOf("onp"), src = K.filter((k) => k !== "onp");
+    const tot = src.reduce((t, k) => t + E[K.indexOf(k)][on], 0), tab = src.reduce((t, k) => t + SW.flows[k].onp, 0);
+    const gap = Math.max(...src.map((k) => Math.abs((100 * E[K.indexOf(k)][on]) / tot - (100 * SW.flows[k].onp) / tab)));
+    return { worst, zero, gap, tables: SW.tables };
+  });
+  ok(!r.missing, "the replay has the switching tables to trade the bars' mass by");
+  ok(r.worst < 1e-6, `the exchange nets to exactly each bar's change since the election, all term (worst ${(r.worst || 0).toExponential(1)})`);
+  ok(r.zero, "nothing has moved on election day");
+  ok(r.gap < 2, `One Nation's inflow keeps the tables' proportions to within ${(r.gap || 0).toFixed(1)} points (${r.tables} tables pooled)`);
+  await page.click("button.wm-glyph");
+  await wait(7000);
+  await page.keyboard.press("End");
+  const bars = await page.evaluate(async () => {
+    await new Promise((res) => setTimeout(res, 3500));
+    const M = window.buildDialStory(window.AP.D), v = M.at(M.x1).vals;
+    return [...document.querySelectorAll(".gp-bar")].map((el) => {
+      const id = ["alp", "lnp", "grn", "onp"].find((k) => el.getAttribute("stroke").includes("--" + k));
+      const len = Math.hypot(el.getAttribute("x2") - el.getAttribute("x1"), el.getAttribute("y2") - el.getAttribute("y1"));
+      return { id, len, want: Math.max(6, Math.min(1, v[id] / 40) * 150) };
+    });
+  });
+  ok(bars.length === 4 && bars.every((b) => Math.abs(b.len - b.want) < 0.05),
+     "once the last grain lands, every bar is drawn at its figure: " + bars.map((b) => `${b.id} ${b.len.toFixed(2)}/${b.want.toFixed(2)}`).join(", "));
+  ok(!errs.length, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
+  await page.close();
+  const vic = await browser.newPage();
+  await vic.setViewport({ width: 1280, height: 800 });
+  await vic.goto(base + "/vic/", { waitUntil: "networkidle0" });
+  await wait(500);
+  await vic.click("button.wm-glyph");
+  await wait(800);
+  const v = await vic.evaluate(() => ({ canvas: !!document.querySelector(".gp-gr"),
+    key: [...document.querySelectorAll(".gp-key li")].some((li) => /switching/i.test(li.textContent)) }));
+  ok(!v.canvas && !v.key, "/vic/, with no switching tables, has no exchange and no key entry for one");
+  await vic.close();
 }
 
 console.log("--- layout, paused on the live reading");

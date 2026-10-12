@@ -21,10 +21,12 @@
       side and knocks it back. Each knock is sized by how far the poll sits off
       the line, the spent shot drops out of the needle, and the needle springs
       back onto the estimate - the aggregate, shown as the point the polls'
-      knocks balance around. A party passing another trades places on the arc;
-      the challenger changing hands floods the arc's right side with the new
-      colour. Time slows for those moments, so the caption naming each one can
-      be read.
+      knocks balance around. The bars trade mass as they move: grains leave
+      one bar's tip and land on another's, in the proportions the
+      vote-switching tables give for who each party's 2025 voters back now.
+      A party passing another trades places on the arc; the challenger
+      changing hands floods the arc's right side with the new colour. Time
+      slows for those moments, so the caption naming each one can be read.
    4. Land on the live estimate - the headline's figure - with a shockwave and
       the whole field of polls shimmering once.
    5. Return. Closing flies the dial home, sliding back to the live reading on
@@ -41,7 +43,11 @@
    masthead it flew out of said the opposite. The polls' knocks are the one
    liberty taken: the needle, its bend and the dial's shake all spring back
    onto the estimate within a second of the last strike, so a dial at rest -
-   paused, stepped or finished - reads exactly.
+   paused, stepped or finished - reads exactly. The bars' exchange is
+   reconciled to the aggregate month by month, so it always nets to exactly
+   each bar's own change, and a bar reads its figure once its last grain is
+   in. Its proportions are the switching tables' pooled over February 2026
+   on; each counts from the election, so the months before borrow them.
 
    HOW IT RUNS
    One clock. React draws the structure once; a single requestAnimationFrame
@@ -75,6 +81,9 @@ const GP_MAST = { minH: 50, maxH: 105, needle: 86, needleW: 17, bead: 19, pivot:
 /* and the stage's: finer strokes on a bigger face */
 const GP_LOOK = { needle: 100, needleW: 7, bead: 11, pivot: 12, arcW: 11, barW: 26 };
 const GP_IDS = ["alp", "lnp", "grn", "onp"];
+/* where the bars' exchange can fly, in dial units around the pivot: loops
+   out past the tallest bar, and everyone else's grains off either flank */
+const GR_BOX = { x: -470, y: -520, w: 940, h: 660 };
 const GP_ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON" };
 const GP_NAME = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation" };
 const GP_SUBJ = { alp: "Labor", lnp: "The Coalition", grn: "The Greens", onp: "One Nation" };
@@ -172,6 +181,47 @@ function gpShotAt(c, v, g) {
 }
 // off the line fast, and faster still into the needle
 const gpShotEase = (u) => 0.5 * (1 - (1 - u) * (1 - u)) + 0.5 * u * u * u * u;
+
+/* The bars' exchange, kept to the aggregate. A[i][j] is how much of the
+   vote the switching tables have moving from party i to party j; d[p] is
+   how far party p has actually moved, by the aggregate. The answer stays as
+   close to the tables' pattern as it can - each party's inflows scaled up
+   and its outflows down by one factor (the I-projection: nothing added to
+   the tables that the aggregate doesn't force) - while netting to exactly
+   d, so the bars land on their figures. Newton on the factors' logs, the
+   last pinned at 0; five parties, a handful of steps. */
+function gpReconcile(A, d) {
+  const n = A.length, phi = new Array(n).fill(0);
+  const flows = (ph) => A.map((r, i) => r.map((a, j) => (i === j ? 0 : a * Math.exp(ph[j] - ph[i]))));
+  const F = (ph) => {
+    let s = 0;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (i !== j) s += A[i][j] * Math.exp(ph[j] - ph[i]);
+    return s - d.reduce((t, v, p) => t + v * ph[p], 0);
+  };
+  for (let it = 0; it < 60; it++) {
+    const G = flows(phi), g = d.map((v, p) => G.reduce((t, r, i) => t + r[p] - G[p][i], 0) - v);
+    if (Math.max(...g.map(Math.abs)) < 1e-9) break;
+    // the Hessian is the Laplacian of G + G'; solve it for the free factors
+    const m = n - 1, H = [];
+    for (let p = 0; p < m; p++) {
+      H.push([]);
+      for (let q = 0; q < m; q++) H[p].push(p === q ? G.reduce((t, r, i) => t + (i === p ? 0 : r[p] + G[p][i]), 0) : -(G[p][q] + G[q][p]));
+      H[p].push(-g[p]);
+    }
+    for (let c = 0; c < m; c++) {
+      let pv = c;
+      for (let r = c + 1; r < m; r++) if (Math.abs(H[r][c]) > Math.abs(H[pv][c])) pv = r;
+      [H[c], H[pv]] = [H[pv], H[c]];
+      for (let r = 0; r < m; r++) if (r !== c) { const f = H[r][c] / H[c][c]; for (let k = c; k <= m; k++) H[r][k] -= f * H[c][k]; }
+    }
+    const step = H.map((r, i) => r[m] / r[i]).concat(0);
+    const f0 = F(phi), slope = g.reduce((s, v, p) => s + v * step[p], 0);
+    let t = 1;
+    while (F(phi.map((v, p) => v + t * step[p])) > f0 + 1e-4 * t * slope && t > 1e-9) t /= 2;
+    for (let p = 0; p < n; p++) phi[p] += t * step[p];
+  }
+  return flows(phi);
+}
 
 /* The data's decimal years: year + (day of year - 1) / 365, the way the
    events are written. */
@@ -327,6 +377,39 @@ function buildDialStory(D) {
              na: (e < 0.5 ? A.na : B.na) || null };
   };
 
+  /* ---- the bars' exchange -------------------------------------------------
+     D.switchFlows pools every complete vote-switching table: how many points
+     of the 2025 vote have moved from each party to each other since the
+     election, everyone else as one group ("oth", no bar of its own). Month
+     by month the replay scales that pattern to how far the vote has moved
+     so far - by the aggregate, so not at all on election day - and
+     reconciles it to the bars (gpReconcile): the exchange always nets to
+     exactly each bar's change since the election, while every pair's part
+     of it stays as near the tables' as it can. Between months it rolls as
+     the bars do, so the two never disagree. The tables begin in February
+     2026; counting from the election, they stand for the months before. */
+  const SWK = GP_IDS.concat("oth");
+  const SW = !window.JUR && D.switchFlows && D.switchFlows.flows ? D.switchFlows : null;
+  let flowAt = null;
+  if (SW && SWK.every((k) => SW.flows[k])) {
+    const vec = (f) => SWK.map((k) => (k === "oth" ? 100 - GP_IDS.reduce((t, id) => t + f.vals[id], 0) : f.vals[k]));
+    const base = vec(frames[0]);
+    const P = SWK.map((i) => SWK.map((j) => (i === j ? 0 : +SW.flows[i][j] || 0)));
+    const gained = (d) => d.reduce((t, v) => t + Math.max(0, v), 0);
+    const scale = gained(SWK.map((_, p) => P.reduce((t, r, i) => t + r[p] - P[p][i], 0)));
+    frames.forEach((f) => {
+      const d = vec(f).map((v, i) => v - base[i]), a = gained(d) / scale;
+      f.flow = a > 1e-9 ? gpReconcile(P.map((r, i) => r.map((v, j) => (i === j ? 0 : a * v + 1e-4))), d)
+                        : SWK.map(() => SWK.map(() => 0));
+    });
+    flowAt = (x) => {
+      const fi = fOf(x), k = Math.max(0, Math.min(n - 2, Math.floor(fi)));
+      const e = gpSmooth(gpClamp((fi - k - EA) / EB, 0, 1));
+      const A = frames[k].flow, B = frames[Math.min(n - 1, k + 1)].flow;
+      return A.map((r, i) => r.map((v, j) => v + (B[i][j] - v) * e));
+    };
+  }
+
   const perMonth = {};
   allPolls.forEach((p) => { perMonth[p.ym] = (perMonth[p.ym] || 0) + 1; });
   const cur = (D.cycles || []).find((c) => c.current);
@@ -420,7 +503,7 @@ function buildDialStory(D) {
   // every poll counts toward the tally, including one with no implied figure to plot
   const tally = allPolls.map((p) => Math.min(p.x, x1)).filter((x) => x >= x0).sort((a, b) => a - b);
   return { frames, n, X, x0, x1, polls, events, beats, samples, lo, hi, at, contest, fOf, xOfF, EA, EB,
-           implied, VB: GP.VB, tally, total: tally.length };
+           implied, VB: GP.VB, tally, total: tally.length, flowAt, swKeys: SWK };
 }
 
 /* Captions. Party names carry their colour; everything else is plain. */
@@ -467,7 +550,7 @@ function gpPalette(host) {
   c.width = c.height = 1;
   const g = c.getContext("2d", { willReadFrequently: true });
   const P = {};
-  ["alp", "lnp", "grn", "onp", "ink", "ink-2", "ink-3", "ink-faint", "line", "surface", "bg"].forEach((k) => {
+  ["alp", "lnp", "grn", "onp", "oth", "ink", "ink-2", "ink-3", "ink-faint", "line", "surface", "bg"].forEach((k) => {
     probe.style.color = "var(--" + k + ")";
     g.clearRect(0, 0, 1, 1);
     g.fillStyle = "#000";
@@ -501,6 +584,8 @@ function gpEngine(M, N, cb, opt) {
     needle: { x: tg0.deg, v: 0 }, bead: { x: 0, v: 0 }, bars: {}, order: tg0.order.slice(), nd: tg0.deg,
     flex: { x: 0, v: 0 }, shX: { x: 0, v: 0 }, shY: { x: 0, v: 0 },
     arcBase: tg0.oppId, flood: null, shocks: [], comets: [], sparks: [], debris: [], rings: [], trail: [],
+    grains: [], mass: null, fLast: M.flowAt ? M.flowAt(x1) : null,
+    pend: M.swKeys.map(() => M.swKeys.map(() => 0)),
     dots: M.polls.map(() => ({ s: 2, t: 1, c: false, hit: true })),
     idx: -1, fe: n - 1, blur: 0, beat: null, beatQ: [], beatT: -1e9, ev: -2,
     drag: null, glide: null, coast: null, shimmer: -1, out: null, revealed: !fly, count: -1,
@@ -557,6 +642,14 @@ function gpEngine(M, N, cb, opt) {
     G.fw = window.innerWidth; G.fh = window.innerHeight;
     N.fx.width = Math.round(G.fw * dpr); N.fx.height = Math.round(G.fh * dpr);
     G.fxx = N.fx.getContext("2d");
+    if (N.gr) {
+      const gw = GR_BOX.w * G.k, gh = GR_BOX.h * G.k;
+      G.gr = { ox: -GR_BOX.x * G.k, oy: -GR_BOX.y * G.k, w: gw, h: gh, dirty: true };
+      Object.assign(N.gr.style, { left: (G.pivX - G.gr.ox).toFixed(1) + "px", top: (G.pivY - G.gr.oy).toFixed(1) + "px",
+                                  width: gw.toFixed(1) + "px", height: gh.toFixed(1) + "px" });
+      N.gr.width = Math.max(1, Math.round(gw * dpr)); N.gr.height = Math.max(1, Math.round(gh * dpr));
+      G.grx = N.gr.getContext("2d");
+    }
     G.trace = M.samples.map((s) => ({ px: xPx(s.x), py: yPx(s.v), id: s.id, x: s.x }));
     G.dotsPx = M.polls.map((p) => ({ px: xPx(p.x), py: yPx(p.v) }));
     if (glyph) G.mast = mastFrom(opt.origin && !G.mast ? opt.origin : glyph.getBoundingClientRect());
@@ -670,7 +763,7 @@ function gpEngine(M, N, cb, opt) {
       tg.order.forEach((id, slot) => {
         const b = S.bars[id];
         gpSpring(b.a, GP.SLOTS[slot], 150, 17.5, dt);
-        gpSpring(b.l, gpBarLen(tg.vals[id]), 240, 17, dt);
+        gpSpring(b.l, gpBarLen(S.mass ? S.mass[id] : tg.vals[id]), 240, 17, dt);
       });
       gpSpring(S.bead, 0, 320, 17, dt);
       // the needle's bend under a strike, and the instrument's shake on its mounting
@@ -834,6 +927,68 @@ function gpEngine(M, N, cb, opt) {
     }
     for (let i = S.rings.length - 1; i >= 0; i--) if (t - S.rings[i].t0 > S.rings[i].dur) S.rings.splice(i, 1);
     for (let i = S.shocks.length - 1; i >= 0; i--) if (t - S.shocks[i].t0 > 1000) S.shocks.splice(i, 1);
+  }
+
+  /* ---- the bars' exchange: grains of mass from bar to bar ----
+     The story's exchange (M.flowAt: points moved between each pair of
+     parties since the election) is spent as grains. Whatever it has added
+     since the last frame, pair by pair, leaves the one bar's tip and flies
+     to the other's; whatever it has taken back - a rewind, a scrub, a month
+     a party falls back - flies home. A bar's length is its figure less the
+     mass still on its way to it, plus any not yet sent from it, so every
+     bar shortens as grains leave it, grows as they land, and reads its
+     figure exactly once the last one is in. A grain's area is the bar area
+     its mass fills; everyone else (minor parties and independents) has no
+     bar, so its grains come in from, and go out to, the dial's sides. */
+  // about five pixels across on screen, whatever the dial's size
+  const grainMass = () => {
+    const r = (2.4 * Math.max(0.78, G.fxk)) / G.k;
+    return (Math.PI * r * r) / ((GP_LOOK.barW * GP.BAR_LEN) / GP.MAX_PCT);
+  };
+  function grain(from, to, m, t) {
+    if (S.grains.length > 480) return;      // a flood beyond this simply lands
+    S.grains.push({ from, to, m, t0: t, dur: 560 + Math.random() * 200,
+                    o1: Math.random() - 0.5, o2: Math.random() - 0.5,   // across the bar's end, leaving and landing
+                    h: 0.9 + Math.random() * 0.2,                       // the loop's height, within a stream
+                    side: Math.random() < 0.5 ? -1 : 1, jit: Math.random() });
+  }
+  function updGrains(tg, dt, t) {
+    S.mass = null;
+    if (!M.flowAt) return;
+    const E = M.flowAt(S.x), K = M.swKeys, nk = K.length;
+    for (let i = 0; i < nk; i++) for (let j = 0; j < nk; j++) if (i !== j) S.pend[i][j] += E[i][j] - S.fLast[i][j];
+    S.fLast = E;
+    if (reduce || S.out || S.shape < 1) {   // no flight: the bars just take their figures
+      S.pend.forEach((r) => r.fill(0));
+      S.grains = [];
+      return;
+    }
+    const q = grainMass(), still = S.x === S.prevX;
+    for (let i = 0; i < nk; i++) for (let j = 0; j < nk; j++) {
+      if (i === j) continue;
+      let p = S.pend[i][j];
+      // no more than four grains a pair a frame: a fast scrub sends bigger ones;
+      // once the playhead stops, the remainder goes as one last small grain
+      const big = Math.max(q, Math.abs(p) / 4);
+      while (p >= big - 1e-12 || (still && p > 1e-9)) { const m = Math.min(p, big); grain(i, j, m, t); p -= m; }
+      while (p <= -big + 1e-12 || (still && p < -1e-9)) { const m = Math.min(-p, big); grain(j, i, m, t); p += m; }
+      S.pend[i][j] = p;
+    }
+    for (let k = S.grains.length - 1; k >= 0; k--) {
+      const g = S.grains[k];
+      if (t - g.t0 < g.dur) continue;
+      S.grains.splice(k, 1);
+      const b = S.bars[K[g.to]];
+      if (b) b.l.v += 30 * Math.sqrt(g.m / q);   // it lands with a small push outward
+    }
+    const mass = {};
+    GP_IDS.forEach((id, p) => {
+      let v = tg.vals[id];
+      for (let j = 0; j < nk; j++) v += S.pend[p][j] - S.pend[j][p];
+      mass[id] = v;
+    });
+    for (const g of S.grains) if (g.to < GP_IDS.length) mass[K[g.to]] -= g.m;
+    S.mass = mass;
   }
 
   /* ---- the moments: queued in play so each caption gets read ---- */
@@ -1171,6 +1326,53 @@ function gpEngine(M, N, cb, opt) {
     g.beginPath(); g.arc(xp, yp, G.narrow ? 4.5 : 5.2, 0, 6.2832); g.fill(); g.stroke();
   }
 
+  /* The exchange, drawn in the flier under the bar readings, in dial units.
+     A grain leaves from somewhere across its bar's end and flies out along
+     the bar, loops over to the other bar and comes in along it, landing
+     somewhere across that bar's end - so a bar's end crumbles as a stream
+     leaves it and builds as one arrives. Grains of one pair share their
+     loop, which is what lets a stream read as one. */
+  function paintGrains(t) {
+    if (!G.grx) return;
+    const g = G.grx, gr = G.gr, P = G.pal, K = M.swKeys;
+    if (!S.grains.length) {
+      if (gr.dirty) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, N.gr.width, N.gr.height); gr.dirty = false; }
+      return;
+    }
+    gr.dirty = true;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, N.gr.width, N.gr.height);
+    const k = G.k * G.dpr;
+    g.setTransform(k, 0, 0, k, gr.ox * G.dpr, gr.oy * G.dpr);   // dial units, pivot at 0,0
+    g.lineCap = "round";
+    const area = (GP_LOOK.barW * GP.BAR_LEN) / GP.MAX_PCT;
+    const end = (id, o, gn) => {
+      if (id < GP_IDS.length && G.tips[K[id]]) {
+        const tip = G.tips[K[id]], [x, y] = gpPolar(tip.a, tip.r), [ax, ay] = gpPolar(tip.a + 90, o * GP_LOOK.barW * 0.84);
+        return [x + ax, y + ay, tip.a];
+      }
+      // everyone else (no bar): off the dial's flank, low on either side
+      const a = gn.side * (100 + 12 * gn.jit), [x, y] = gpPolar(a, GP.SEAT + GP.BAR_LEN * 0.9);
+      return [x, y, a];
+    };
+    const at = (gn, v) => {
+      const [x0, y0, a0] = end(gn.from, gn.o1, gn), [x3, y3, a3] = end(gn.to, gn.o2, gn);
+      const h = (36 + 0.32 * Math.hypot(x3 - x0, y3 - y0)) * gn.h;
+      const [u0x, u0y] = gpPolar(a0, h), [u3x, u3y] = gpPolar(a3, h);
+      return gpBez(x0, y0, x0 + u0x, y0 + u0y, x3 + u3x, y3 + u3y, x3, y3, v);
+    };
+    for (const gn of S.grains) {
+      const u = gpClamp((t - gn.t0) / gn.dur, 0, 1), v = 0.5 - 0.5 * Math.cos(Math.PI * u);
+      const r = Math.sqrt((gn.m * area) / Math.PI), oth = K.length - 1;
+      const fade = gn.from === oth ? Math.min(1, u / 0.25) : gn.to === oth ? Math.min(1, (1 - u) / 0.3) : 1;
+      const [x, y] = at(gn, v), [bx, by] = at(gn, Math.max(0, v - 0.014));
+      g.strokeStyle = g.fillStyle = gpRgba(P[K[gn.from]], 0.95 * fade);
+      g.lineWidth = r * 1.6;
+      g.beginPath(); g.moveTo(bx, by); g.lineTo(x, y); g.stroke();
+      g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+    }
+  }
+
   function paintFx(t) {
     const g = G.fxx, P = G.pal;
     if (!S.comets.length && !S.sparks.length && !S.debris.length && !S.rings.length) {
@@ -1236,6 +1438,7 @@ function gpEngine(M, N, cb, opt) {
   function busy(t) {
     if (S.mode !== "pause") return true;
     if (S.comets.length || S.sparks.length || S.debris.length || S.rings.length || S.shocks.length || S.flood || G.fxDirty) return true;
+    if (S.grains.length || S.pend.some((r) => r.some((v) => Math.abs(v) > 1e-9))) return true;
     if (S.shimmer > 0 && t - S.shimmer < 2000) return true;
     if (S.fl.x !== 1 || S.shape < 1) return true;
     if (!gpRest(S.needle, M.at(S.x).deg, 0.02) || !gpRest(S.bead, 0, 0.002)) return true;
@@ -1255,12 +1458,14 @@ function gpEngine(M, N, cb, opt) {
     if (dead || finished) return;
     flight(t, dt);
     const tg = M.at(S.x);
+    updGrains(tg, dt, t);
     physics(tg, dt, t);
     S.nd = gpLerp(tg.deg, S.needle.x, S.shape);
     updDots(dt, t);
     updFx(dt, t);
     updBeats(t);
     paintDial(tg, t);
+    paintGrains(t);
     paintRead(tg, t, dt);
     paintTimeline(tg, t);
     paintFx(t);
@@ -1418,6 +1623,7 @@ function gpEngine(M, N, cb, opt) {
       S.out = { t0: t, fl0: S.fl.x, sh0: S.shape };
       S.glide = { x: S.x, v: 0, to: x1 };
       S.comets = [];
+      S.grains = [];
       S.mode = "outro";
       wake();
     },
@@ -1632,6 +1838,7 @@ function DialStory({ originRect, onClose }) {
                   </g>
                   <circle className="gp-pivot" cx="0" cy="0" ref={reg("pivot")}></circle>
                 </svg>
+                {M.flowAt && !reduce && <canvas className="gp-gr" ref={reg("gr")} aria-hidden="true"></canvas>}
                 {GP_IDS.map((id) => (
                   <div key={id} className="gp-bl" ref={(el) => { N.bl[id] = el; }} aria-hidden="true">
                     <b style={{ color: "var(--" + id + "-text)" }}>{GP_ABBR[id]}</b><span>00.0</span>
@@ -1678,6 +1885,11 @@ function DialStory({ originRect, onClose }) {
         <ul className="gp-key" aria-label="Key">
           <li><svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true">
             <path d="M2 11V4M6 11V1M10 11V5M14 11V7" strokeWidth="2.6" style={{ stroke: "var(--ink-3)" }}></path></svg>First preferences</li>
+          {M.flowAt && !reduce && <li><svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true">
+            <path d="M2 11V6M14 11V3" strokeWidth="2.6" style={{ stroke: "var(--ink-3)" }}></path>
+            {[[5, 3.9], [8, 2.6], [11, 2.1]].map(([cx, cy]) => (
+              <circle key={cx} cx={cx} cy={cy} r="1.05" style={{ fill: "var(--ink-3)" }}></circle>
+            ))}</svg>Voters switching</li>}
           <li><svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true">
             <path d="M8 11L5 2.6" strokeWidth="1.7" strokeLinecap="round" style={{ stroke: "var(--ink-3)" }}></path>
             <circle cx="5" cy="2.6" r="1.7" style={{ fill: "var(--ink-3)" }}></circle></svg>Two-party preferred</li>
