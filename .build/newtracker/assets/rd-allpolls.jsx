@@ -1776,6 +1776,36 @@ function RdLgDir({ p }) {
 
 /* ---- one line per measure: the figures that measure's own tab shows in
    its row, so a line reads exactly like the row it opens */
+/* the Preferences line's region chip (data: polls.json pref_flows → p.pf,
+   gen-data's individualPolls emit): DemosAU's MRP reports print respondent-
+   ranked preference flows per region, so the line's chip cycles the three
+   regions, its cells swapping in place. The names stack in one grid cell
+   (.rd-ldg-cycw, rd.css) so a press never resizes the chip or the line. */
+const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
+function RdLgPrefs({ pf }) {
+  const [ri, setRi] = React.useState(0);
+  const rk = RD_LG_PREFS_REGIONS[ri][0];
+  const cell = (k, v) => v != null && (
+    <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b></span>
+  );
+  const grp = (title, cells) => cells && (
+    <span className="rd-ldg-grp rd-ldg-grpw">
+      <span className="rd-ldg-li lbl rd-ldg-lisoft">{title}</span>
+      {cells.map(([k, v]) => cell(k, v))}
+    </span>
+  );
+  const a = pf.alp_onp ? pf.alp_onp[rk] : null, c = pf.lnp_onp ? pf.lnp_onp[rk] : null;
+  return <>
+    <button type="button" className="rd-ldg-cyc" title={"Region shown: " + RD_LG_PREFS_REGIONS[ri][1] + " — press for the next"}
+            onClick={(ev) => { ev.stopPropagation(); setRi((ri + 1) % RD_LG_PREFS_REGIONS.length); }}>
+      <span className="rd-ldg-cycw">{RD_LG_PREFS_REGIONS.map(([k, n], i) => <span key={k} className={i === ri ? "on" : ""}>{n}</span>)}</span>
+      <span className="rd-ldg-cyca" aria-hidden="true">↻</span>
+    </button>
+    {a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]])}
+    {c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]])}
+  </>;
+}
+
 function rdLgLines(p, { onM, demSplit }) {
   const out = [];
   const q = p.p || {};
@@ -1805,6 +1835,9 @@ function rdLgLines(p, { onM, demSplit }) {
       </span>
     ))}</> });
   }
+  /* respondent-ranked flows by region (the MRP wave's printed tables), its
+     own line under the 2PPs */
+  if (p.pf) out.push({ id: "prefs", lab: "Preferences", body: <RdLgPrefs pf={p.pf} /> });
   const a = p.appr || {};
   let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
   const sets = window.ppmContests ? window.ppmContests(p) : [];
@@ -4648,7 +4681,7 @@ const FF_COHORTS = {
   onp:  { name: "One Nation", cls: "onp" },
   oth:  { name: "Other", cls: "oth" },
 };
-function RdForced({ waves, cohorts, rival, W, phone }) {
+function RdForced({ waves, cohorts, rival, W, phone, extras }) {
   const D = window.AUSPOL;
   const [tip, setTip] = useState(null);         // { ym, src }
   const ptr = React.useRef(null);
@@ -4715,7 +4748,7 @@ function RdForced({ waves, cohorts, rival, W, phone }) {
   return (
     <figure className="rd-ff" ref={box}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.`}>
+           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${extras && extras.length ? " Diamonds mark DemosAU’s MRP readings of One Nation voters’ share to Labor nationally, latest " + extras[extras.length - 1].onp + "." : ""}`}>
         {[0, 25, 50, 75, 100].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={"rd-ff-gl" + (v === 50 ? " mid" : "")}></path>)}
         {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
         {series.map((s) => <path key={s.ck} d={monotoneXY(s.pts)} className={"rd-ff-line " + FF_COHORTS[s.ck].cls}></path>)}
@@ -4759,6 +4792,14 @@ function RdForced({ waves, cohorts, rival, W, phone }) {
           </g>
           );
         })}
+        {extras && extras.map((d) => (
+          /* DemosAU MRP's national One Nation flow: a mark at each wave's
+             fieldwork-midpoint month, not a line (gen-data's demos block) */
+          <path key={d.date} className="rd-ff-dm onp"
+                d={`M${X(d.ym)} ${Y(d.onp) - 5.5}L${X(d.ym) + 4.5} ${Y(d.onp)}L${X(d.ym)} ${Y(d.onp) + 5.5}L${X(d.ym) - 4.5} ${Y(d.onp)}Z`}>
+            <title>DemosAU MRP {rdMonthYear(d.ym)} — One Nation voters: Labor {d.onp}, Coalition {100 - d.onp}</title>
+          </path>
+        ))}
         {series.map((s) => (
           <g key={"el" + s.ck}>
             <text x={x1 + 8} y={labY.get(s.ck) - 2} className={"rd-ff-el " + FF_COHORTS[s.ck].cls}>{FF_COHORTS[s.ck].name}</text>
@@ -4934,7 +4975,7 @@ function RdFlows() {
             (.rd-sub/.rd-subdek), as the two-party and leadership sections
             set theirs */}
         <h3 className="rd-sub rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
-        <p className="rd-subdek rd-ff-d">RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
+        <p className="rd-subdek rd-ff-d">RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU’s MRP reports print their own — DemosAU’s national One Nation reading is the diamonds on the Labor v Coalition chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("on")}</h4></div>
@@ -4942,9 +4983,12 @@ function RdFlows() {
           </div>
           <div className="rd-fl-one">
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
-            <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} />
+            <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} extras={FF.demos} />
           </div>
         </div>
+        {FF.demos && <RdKey className="rd-ckey rd-ff-key" items={[]}>
+          <span className="rd-key-item"><span className="rd-ff-keydm" aria-hidden="true"></span>One Nation voters’ share to Labor, national — DemosAU MRP</span>
+        </RdKey>}
       </div>}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;

@@ -118865,6 +118865,45 @@ function RdLgDir({
     className: "rd-ldg-dirnet"
   }, "Net ", React.createElement("b", null, rdApSigned(d.right - d.wrong).replace(/\.0$/, "")))));
 }
+const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
+function RdLgPrefs({
+  pf
+}) {
+  const [ri, setRi] = React.useState(0);
+  const rk = RD_LG_PREFS_REGIONS[ri][0];
+  const cell = (k, v) => v != null && React.createElement("span", {
+    key: k,
+    className: "rd-ldg-li"
+  }, React.createElement("em", {
+    style: {
+      color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null
+    }
+  }, RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k), " ", React.createElement("b", null, rdApNum(v)));
+  const grp = (title, cells) => cells && React.createElement("span", {
+    className: "rd-ldg-grp rd-ldg-grpw"
+  }, React.createElement("span", {
+    className: "rd-ldg-li lbl rd-ldg-lisoft"
+  }, title), cells.map(([k, v]) => cell(k, v)));
+  const a = pf.alp_onp ? pf.alp_onp[rk] : null,
+    c = pf.lnp_onp ? pf.lnp_onp[rk] : null;
+  return React.createElement(React.Fragment, null, React.createElement("button", {
+    type: "button",
+    className: "rd-ldg-cyc",
+    title: "Region shown: " + RD_LG_PREFS_REGIONS[ri][1] + " — press for the next",
+    onClick: ev => {
+      ev.stopPropagation();
+      setRi((ri + 1) % RD_LG_PREFS_REGIONS.length);
+    }
+  }, React.createElement("span", {
+    className: "rd-ldg-cycw"
+  }, RD_LG_PREFS_REGIONS.map(([k, n], i) => React.createElement("span", {
+    key: k,
+    className: i === ri ? "on" : ""
+  }, n))), React.createElement("span", {
+    className: "rd-ldg-cyca",
+    "aria-hidden": "true"
+  }, "\u21BB")), a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]));
+}
 function rdLgLines(p, {
   onM,
   demSplit
@@ -118932,6 +118971,13 @@ function rdLgLines(p, {
       }, "published ", pairB(m.pub[0], m.pub[1], m.id)))))
     });
   }
+  if (p.pf) out.push({
+    id: "prefs",
+    lab: "Preferences",
+    body: React.createElement(RdLgPrefs, {
+      pf: p.pf
+    })
+  });
   const a = p.appr || {};
   let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
   const sets = window.ppmContests ? window.ppmContests(p) : [];
@@ -123122,7 +123168,8 @@ function RdForced({
   cohorts,
   rival,
   W,
-  phone
+  phone,
+  extras
 }) {
   const D = window.AUSPOL;
   const [tip, setTip] = useState(null);
@@ -123206,7 +123253,7 @@ function RdForced({
     height: H,
     viewBox: `0 0 ${W} ${H}`,
     role: "img",
-    "aria-label": `If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map(s => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.`
+    "aria-label": `If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map(s => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${extras && extras.length ? " Diamonds mark DemosAU’s MRP readings of One Nation voters’ share to Labor nationally, latest " + extras[extras.length - 1].onp + "." : ""}`
   }, [0, 25, 50, 75, 100].map(v => React.createElement("path", {
     key: v,
     d: `M${x0} ${Y(v)}H${x1}`,
@@ -123287,7 +123334,11 @@ function RdForced({
         }
       }));
     }));
-  }), series.map(s => React.createElement("g", {
+  }), extras && extras.map(d => React.createElement("path", {
+    key: d.date,
+    className: "rd-ff-dm onp",
+    d: `M${X(d.ym)} ${Y(d.onp) - 5.5}L${X(d.ym) + 4.5} ${Y(d.onp)}L${X(d.ym)} ${Y(d.onp) + 5.5}L${X(d.ym) - 4.5} ${Y(d.onp)}Z`
+  }, React.createElement("title", null, "DemosAU MRP ", rdMonthYear(d.ym), " \u2014 One Nation voters: Labor ", d.onp, ", Coalition ", 100 - d.onp))), series.map(s => React.createElement("g", {
     key: "el" + s.ck
   }, React.createElement("text", {
     x: x1 + 8,
@@ -123550,7 +123601,7 @@ function RdFlows() {
     className: "rd-sub rd-ff-t"
   }, "RedBridge/Accent\u2019s respondent-allocated preferences"), React.createElement("p", {
     className: "rd-subdek rd-ff-d"
-  }, "RedBridge/Accent is the only pollster that publishes respondent-allocated preferences. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently ", React.createElement("a", {
+  }, "RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU\u2019s MRP reports print their own \u2014 DemosAU\u2019s national One Nation reading is the diamonds on the Labor v Coalition chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently ", React.createElement("a", {
     className: "rd-link rd-link-in",
     href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
   }, "perform better", React.createElement("span", {
@@ -123581,8 +123632,17 @@ function RdFlows() {
     cohorts: ["grn", "onp", "oth"],
     rival: "the Coalition",
     W: cw,
-    phone: phone
-  })))), React.createElement(RdTsig, {
+    phone: phone,
+    extras: FF.demos
+  }))), FF.demos && React.createElement(RdKey, {
+    className: "rd-ckey rd-ff-key",
+    items: []
+  }, React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-ff-keydm",
+    "aria-hidden": "true"
+  }), "One Nation voters\u2019 share to Labor, national \u2014 DemosAU MRP"))), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
