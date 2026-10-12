@@ -57581,6 +57581,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "grn": 77,
           "oth": 54
         }
+      },
+      "all": {
+        "alp_onp": {
+          "lnp": 29,
+          "grn": 90,
+          "oth": 58
+        },
+        "lnp_onp": {
+          "alp": 68,
+          "grn": 77,
+          "oth": 61
+        }
       }
     }
   }, {
@@ -70922,6 +70934,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "grn": 82,
           "oth": 58
         }
+      },
+      "all": {
+        "alp_onp": {
+          "lnp": 33,
+          "grn": 90,
+          "oth": 55
+        },
+        "lnp_onp": {
+          "alp": 73,
+          "grn": 84,
+          "oth": 61
+        }
       }
     }
   }, {
@@ -78032,6 +78056,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "alp": 72,
           "grn": 87,
           "oth": 61
+        }
+      },
+      "all": {
+        "alp_onp": {
+          "lnp": 37,
+          "grn": 88,
+          "oth": 60
+        },
+        "lnp_onp": {
+          "alp": 77,
+          "grn": 87,
+          "oth": 64
         }
       }
     }
@@ -118947,12 +118983,16 @@ function RdLgDir({
     className: "rd-ldg-dirnet"
   }, "Net ", React.createElement("b", null, rdApSigned(d.right - d.wrong).replace(/\.0$/, "")))));
 }
-const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
+const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
+const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
 function RdLgPrefs({
   pf
 }) {
+  const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
   const [ri, setRi] = React.useState(0);
-  const rk = RD_LG_PREFS_REGIONS[ri][0];
+  const rk = regs[ri % regs.length][0],
+    rn = regs[ri % regs.length][1],
+    next = regs[(ri + 1) % regs.length][1];
   const cell = (k, v) => v != null && React.createElement("span", {
     key: k,
     className: "rd-ldg-li"
@@ -118966,25 +119006,30 @@ function RdLgPrefs({
   }, React.createElement("span", {
     className: "rd-ldg-li lbl rd-ldg-lisoft"
   }, title), cells.map(([k, v]) => cell(k, v)));
-  const a = pf.alp_onp ? pf.alp_onp[rk] : null,
-    c = pf.lnp_onp ? pf.lnp_onp[rk] : null;
+  const at = t => rk === "all" ? pf.all && pf.all[t] || null : pf[t] ? pf[t][rk] : null;
+  const a = at("alp_onp"),
+    c = at("lnp_onp");
   return React.createElement(React.Fragment, null, React.createElement("button", {
     type: "button",
     className: "rd-ldg-cyc",
-    title: "Region shown: " + RD_LG_PREFS_REGIONS[ri][1] + " — press for the next",
+    title: (rk === "all" ? RD_LG_PREFS_ALL + ". " : "") + "Region shown: " + rn + " — press for " + next,
+    "aria-label": rn + (rk === "all" ? " (" + RD_LG_PREFS_ALL + ")" : "") + " – show " + next,
     onClick: ev => {
       ev.stopPropagation();
-      setRi((ri + 1) % RD_LG_PREFS_REGIONS.length);
+      setRi((ri + 1) % regs.length);
     }
   }, React.createElement("span", {
     className: "rd-ldg-cycw"
-  }, RD_LG_PREFS_REGIONS.map(([k, n], i) => React.createElement("span", {
+  }, regs.map(([k, n], i) => React.createElement("span", {
     key: k,
-    className: i === ri ? "on" : ""
+    "aria-hidden": "true",
+    className: i === ri % regs.length ? "on" : ""
   }, n))), React.createElement("span", {
     className: "rd-ldg-cyca",
     "aria-hidden": "true"
-  }, "\u21BB")), a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]));
+  }, "\u21BB")), a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]), pf.onp_alp_lnp != null && React.createElement("span", {
+    className: "rd-ldg-li rd-ldg-lisoft"
+  }, cell("onp", pf.onp_alp_lnp), " to ALP v L/NP, nationwide"));
 }
 function rdLgLines(p, {
   onM,
