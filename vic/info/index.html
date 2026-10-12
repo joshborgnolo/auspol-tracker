@@ -3449,6 +3449,7 @@ body.rd .rd-tpp-rule { width: 2px; height: 72px; background: var(--ink-faint); }
 body.rd .rd-tpp-verdict { margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink-2); text-wrap: balance; }
 body.rd .rd-tpp-verdict b { font-weight: 600; color: var(--ink); }
 body.rd .rd-tpp-change { margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+body.rd .rd-tpp-swing { white-space: nowrap; }
 body.rd .rd-tpp-prov { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 body.rd .rd-tpp-prov .rd-link { margin-block: -12px; }
 body.rd .rd-tpp-back { text-align: center; font-size: 12px; }
@@ -41956,7 +41957,9 @@ function RdHero(p) {
   }), " on a month ago") : "unchanged on a month ago", moved && sig === false && React.createElement(React.Fragment, null, ", within the ", React.createElement(RdTerm, {
     id: "margin-of-error",
     from: "two-party preferred"
-  }, "margin")), moved && sig === true && React.createElement(React.Fragment, null, ", a significant ", monthDelta > 0 ? "rise" : "fall"), leadSwing != null && Math.abs(leadSwing) >= 0.05 && React.createElement(React.Fragment, null, ", ", rdArrow(leadSwing), " ", Math.abs(leadSwing).toFixed(1), " since the ", rdElecYear, " election"));
+  }, "margin")), moved && sig === true && React.createElement(React.Fragment, null, ", a significant ", monthDelta > 0 ? "rise" : "fall"), leadSwing != null && Math.abs(leadSwing) >= 0.05 && React.createElement(React.Fragment, null, ", ", React.createElement("span", {
+    className: "rd-tpp-swing"
+  }, rdArrow(leadSwing), " ", Math.abs(leadSwing).toFixed(1), " since the ", rdElecYear, " election")));
   const hasBases = matchup === "alp_lnp" && impOffered || matchup === "alp_on" && impOnOffered;
   const onImp = hasBases && b0 === "imp";
   const basisWords = !hasBases ? m.real ? "Pollsters’ published figures" : "Published head-to-heads" : onImp ? narrow ? "Implied flows" : "Implied preference flows" : narrow ? "As published" : "Pollsters’ published figures";

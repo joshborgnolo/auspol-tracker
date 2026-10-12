@@ -141,7 +141,7 @@ function RdHero(p) {
       {m.a.name} {moved ? <>{rdArrow(monthDelta)} <RollNum value={Math.abs(monthDelta).toFixed(1)} /> on a month ago</> : "unchanged on a month ago"}
       {moved && sig === false && <>, within the <RdTerm id="margin-of-error" from="two-party preferred">margin</RdTerm></>}
       {moved && sig === true && <>, a significant {monthDelta > 0 ? "rise" : "fall"}</>}
-      {leadSwing != null && Math.abs(leadSwing) >= 0.05 && <>, {rdArrow(leadSwing)} {Math.abs(leadSwing).toFixed(1)} since the {rdElecYear} election</>}
+      {leadSwing != null && Math.abs(leadSwing) >= 0.05 && <>, <span className="rd-tpp-swing">{rdArrow(leadSwing)} {Math.abs(leadSwing).toFixed(1)} since the {rdElecYear} election</span></>}
     </>
   );
   const hasBases = (matchup === "alp_lnp" && impOffered) || (matchup === "alp_on" && impOnOffered);

@@ -588,6 +588,9 @@ body.rd .rd-tpp-rule { width: 2px; height: 72px; background: var(--ink-faint); }
 body.rd .rd-tpp-verdict { margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink-2); text-wrap: balance; }
 body.rd .rd-tpp-verdict b { font-weight: 600; color: var(--ink); }
 body.rd .rd-tpp-change { margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* the "since the <year> election" clause drops to its own line whole once
+   its line runs out, never splitting "… since the / <year> election" */
+body.rd .rd-tpp-swing { white-space: nowrap; }
 body.rd .rd-tpp-prov { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 /* the published basis adds "Back to implied flows" to this line: its 44px
    target hangs over the line as the "?" button's does, rather than making
