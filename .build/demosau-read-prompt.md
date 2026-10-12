@@ -27,14 +27,18 @@ Primary vote, percentages of voters: `alp` (Labor), `lnp` (the Coalition),
 - `from`: the figure in the PREVIOUS DemosAU poll as the quoted words give
   it — stated ("up from 24%") or implied by the change ("rose two points to
   28%" → 26; "steady on 13%" → 13). Null only if the article gives no
-  change for that figure.
+  change for that figure. DemosAU's quarterly MRP model states its changes
+  on the previous MRP ("up one percentage point from the same analysis
+  published in July", "down four points from the previous quarter"): give
+  that earlier figure all the same.
 - If the change for a figure is stated in a DIFFERENT sentence from the
   figure itself ("One Nation was close behind on 24%" … "its support
   tumbled five percentage points over the past month"), also give
   `changeQuote`: { "para", "quote" } — the exact words with that change.
 - A figure the article does not state is null.
-- `scope`: "demosau" when the article reports a new federal DemosAU poll's
-  primary votes; "other" otherwise (then `fields` may be empty).
+- `scope`: "demosau" when the article reports a federal DemosAU poll's (or
+  MRP model's) national primary votes; "other" otherwise (then `fields` may
+  be empty).
 
 Do not call any tools: everything you need is in the bundle. Reply with ONE
 JSON object and nothing else:

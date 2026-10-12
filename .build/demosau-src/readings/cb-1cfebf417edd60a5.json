@@ -1,0 +1,41 @@
+{
+  "url": "https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/",
+  "textHash": "d6fac43da2e01844",
+  "readAt": "2026-10-12T00:42:27.422Z",
+  "reading": {
+    "scope": "demosau",
+    "fields": {
+      "alp": {
+        "para": 5,
+        "quote": "Labor led on primary votes with 27% support, up one percentage point from the same analysis published in July",
+        "value": 27,
+        "from": 26
+      },
+      "lnp": {
+        "para": 6,
+        "quote": "The Coalition rose one point to 22%",
+        "value": 22,
+        "from": 21
+      },
+      "grn": {
+        "para": 6,
+        "quote": "the Greens held steady at 13%",
+        "value": 13,
+        "from": 13
+      },
+      "onp": {
+        "para": 6,
+        "quote": "One Nation recorded 26%, down four points from the previous quarter",
+        "value": 26,
+        "from": 30
+      },
+      "oth": {
+        "para": 6,
+        "quote": "others rose two points to 12%",
+        "value": 12,
+        "from": 10
+      }
+    },
+    "notes": "Quarterly MRP model (n=9,740, Aug-Sep fieldwork, as at 30 Sep); changes are vs the previous quarter's analysis published in July, per the MRP change convention."
+  }
+}

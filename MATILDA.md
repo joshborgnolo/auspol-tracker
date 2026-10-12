@@ -220,7 +220,16 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     when the article states no n. When the PDF lands the match writes
     the real window and sample IN PLACE and drops the flags
     (status.fieldworkFilled). validate.mjs excuses `fieldwork-pending`
-    and FAILS the flag on a row that already has its methodUrl.
+    and FAILS the flag on a row that already has its methodUrl. The
+    quarterly MRP runs in the same Capital Brief section with its changes
+    on the previous MRP: an article that says it is an MRP reconciles with
+    the previous `DemosAU (MRP)` row and files as one (2026-10-12), its
+    window the months it states (`fieldworkOf`; the window is what keeps it
+    out of the aggregates via reusesWaves). Follow-up pieces within
+    FOLLOWUP_DAYS of the newest release that state no figures, or only
+    figures on file, are set aside (status.cb_followups), not prompted;
+    demosau-updater.sh commits their cached readings so later slots don't
+    re-ask Matilda. Rules: planCapitalBrief.
   - REDBRIDGE/ACCENT — `extract-redbridge-afr.mjs` (+`test-redbridge-afr.mjs`,
     `.build/ocr-image.swift`): AFR's Sunday 18:00 article, 4–6 days
     before Accent's PDF; the key figures (Coalition primary, Other, the

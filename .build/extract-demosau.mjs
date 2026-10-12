@@ -88,18 +88,28 @@
 // that doesn't verify files nothing: exit 3 and the hand-entry prompt, as
 // before.
 //
+// MRPs AND FOLLOW-UPS (2026-10-12): Capital Brief runs DemosAU's quarterly
+// MRP in the same section, its changes on the previous MRP; the 12 Oct MRP
+// was checked against the September poll, rejected, and turned every run
+// red. An article that says it is an MRP now reconciles with the previous
+// `DemosAU (MRP)` row and files as one, its window the months the article
+// states (so gen-data's reusesWaves keeps it out of the aggregates, like
+// the May–Jul model); the report PDF later fills the dates and the seats.
+// Pieces Capital Brief runs on a poll in the days after it, stating no
+// figures or only figures on file, are set aside (status.cb_followups)
+// rather than prompting. The rules are planCapitalBrief's, demosau-read.mjs.
+//
 // SECONDARY WATCH — Capital Brief publishes the federal poll article (free
 // lead carries the full VI set + sample; the rest is paywalled) a few hours
 // to a day BEFORE the methodology PDF lands on the DemosAU index above
 // (Sep-2026: ~18h, the article alone greyed the cycle). After the PDF
 // pipeline, the extractor walks https://www.capitalbrief.com/topic/polling/
-// (JSON-LD ItemList, newest-first) and flags any article sectioned
+// (JSON-LD ItemList, newest-first) and reads every article sectioned
 // "Capital Brief / Demos AU Poll" that is newer than every DemosAU row's
-// date/published stamp: DEMOSAU_STATUS.cb_ahead, exit 3, nothing written
-// (article prose is not a datasource — no fieldwork dates, no 2PP note, no
-// cacheable artifact — so rows come only from PDFs or deliberate
-// hand-entry per demosau-repair-prompt.md). Once the PDF lands, the normal
-// verify/backfill paths reconcile the hand-entered row automatically.
+// date/published stamp, oldest first: filed, set aside, or — when its
+// figures don't verify — DEMOSAU_STATUS.cb_ahead, exit 3, for hand-entry
+// per demosau-repair-prompt.md. Once the PDF lands, the normal
+// verify/backfill paths reconcile the article's row automatically.
 // Watch failures degrade to a status note, never an extraction error.
 //
 // Usage: node .build/extract-demosau.mjs [--check] [--force] [index-url]
@@ -112,9 +122,10 @@
 //     wave's figure missing, sums off 100, implausible values, bad fieldwork
 //     span, trend table unparseable) — the upstream format changed or the
 //     parse went wrong; nothing is written
-//   - exit 3 = Capital Brief watch flagged a wave article ahead of every
-//     dataset row with no PDF on the index yet (status.cb_ahead carries
-//     {title, url, published}); nothing written — see the watch comment
+//   - exit 3 = Capital Brief watch flagged an article ahead of every
+//     dataset row whose figures didn't verify (status.cb_ahead carries
+//     {title, url, published}, the notes say why); nothing written — see
+//     the watch comment
 //   - --check computes everything, prints DEMOSAU_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "node:fs";
@@ -122,7 +133,7 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fetchBuffer, passSgCaptcha, FETCH_TRIES } from "./demosau-fetch.mjs";
-import { readDemosau } from "./demosau-read.mjs";
+import { readDemosau, planCapitalBrief } from "./demosau-read.mjs";
 import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
@@ -666,48 +677,29 @@ async function loadWave(url, slug, isMRP) {
 // capitalbrief.com runs the federal poll article (VI figures in the free
 // lead, body paywalled) hours-to-a-day before the methodology PDF lands on
 // the DemosAU index above. Watch the publisher directly so that gap can't
-// silence the tracker: a wave article newer than every DemosAU row is
-// flagged in DEMOSAU_STATUS.cb_ahead with exit 3 — a prompt to hand-enter
-// the wave (demosau-repair-prompt.md), NOT a datasource (no fieldwork
-// dates, no 2PP note, no cacheable PDF), so nothing is ever written here.
+// silence the tracker: every article newer than every DemosAU row is read
+// (demosau-read.mjs) and either FILED — a monthly poll, or since 2026-10-12
+// a quarterly MRP — or set aside as a follow-up on a release already on
+// file, or flagged in DEMOSAU_STATUS.cb_ahead with exit 3: a prompt to
+// hand-enter what didn't verify (demosau-repair-prompt.md).
 const STATE_RE = /victoria|tasmania|queensland|\bWA\b|western australia|\bNSW\b|new south wales|south australia|\bSA\b|sydney|melbourne|brisbane|greyhound/i;
 const CB_TOPIC_URL = "https://www.capitalbrief.com/topic/polling/";
 const CB_SECTION_RE = /demos\s*au\s*poll/i; // articleSection of a wave release
 const CB_MAX_ARTICLES = 5; // fetch cap per run; the topic list is newest-first
-const CB_FIELD_LAG = 4;  // provisional fieldwork end: days before the article
-const CB_FIELD_SPAN = 4; // ...and its length (Jul–Sep 2026: 3–5 / 2–5 days)
 const sydneyMinute = (isoStr) => {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
     day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(isoStr)).map((x) => [x.type, x.value]));
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
 };
-const shiftDay = (day, n) => new Date(Date.parse(day + "T00:00:00Z") + n * 86400000).toISOString().slice(0, 10);
 
-// The wave as a row from the Capital Brief article, or null (with a note)
-// when anything fails to verify — see CAPITAL BRIEF FILING in the header.
-async function rowFromCapitalBrief(ahead, D, notes) {
-  if (!matildaCli()) { notes.push("capital brief article not read: no Matilda CLI or key"); return null; }
-  const html = (await fetchBuffer(ahead.url)).toString("utf8");
-  const art = jsonLdNodes(html).find((n) => [].concat(n["@type"]).includes("NewsArticle"));
-  if (!art?.datePublished) { notes.push("capital brief article: no datePublished"); return null; }
-  const prev = D.polls.filter((r) => r.pollster === "DemosAU").sort((a, b) => (a.date < b.date ? -1 : 1)).pop();
-  const read = readDemosau({ url: ahead.url, html, cacheDir: `${SRC_DIR}/readings`, onNote: (n) => notes.push(n),
-    prev: prev ? { alp: prev.alp, lnp: prev.lnp, grn: prev.grn, onp: prev.onp, oth: prev.ind } : null });
-  if (read.errors.length) { notes.push(`capital brief article not filed: ${read.errors.join("; ")}`); return null; }
-  const published = sydneyMinute(art.datePublished);
-  const date = shiftDay(published.slice(0, 10), -CB_FIELD_LAG);
-  if (D.polls.some((r) => r.pollster === "DemosAU" && Math.abs(daysBetween(r.date, date)) <= 10)) {
-    notes.push(`capital brief article not filed: a DemosAU row already sits within 10 days of ${date}`);
-    return null;
-  }
-  return {
-    date, dateStart: shiftDay(date, -CB_FIELD_SPAN), published, pollster: "DemosAU", client: "Capital Brief",
-    sample: read.sample,
-    alp: read.ok.alp, lnp: read.ok.lnp, grn: read.ok.grn, onp: read.ok.onp, ind: read.ok.oth, oth: null,
-    tpp_alp: null, tpp_lnp: null, url: ahead.url,
-    fieldworkPending: true,
-    ...(read.sample == null ? { samplePending: true } : {}),
-  };
+// What to do with one article ahead of every row — { row } | { followUp } |
+// { prompt } (planCapitalBrief), or { note } when it can't be read at all.
+function capitalBriefPlan(a, D, notes) {
+  if (!matildaCli()) return { note: "capital brief article not read: no Matilda CLI or key" };
+  const { reading, paras } = readDemosau({ url: a.url, html: a.html, textKey: a.art.articleBody,
+    cacheDir: `${SRC_DIR}/readings`, onNote: (n) => notes.push(n) });
+  return planCapitalBrief({ reading, paras, rows: D.polls, lastDay: latestDemosauStamp(D),
+    art: { url: a.url, published: sydneyMinute(a.art.datePublished), freeText: String(a.art.articleBody || "") } });
 }
 
 const sydneyDay = (isoStr) =>
@@ -727,9 +719,10 @@ function jsonLdNodes(html) {
   return nodes;
 }
 
-// the newest federal-poll article on the topic page post-dating every
-// dataset row, or null. ItemList is newest-first, so the first article at
-// or below the anchor ends the walk.
+// every federal-poll article on the topic page post-dating every dataset
+// row, newest first (a poll's own article, then any follow-ups, can all be
+// ahead). ItemList is newest-first, so the first article at or below the
+// anchor ends the walk.
 async function capitalBriefAheadOf(anchorDay) {
   const topic = (await fetchBuffer(CB_TOPIC_URL)).toString("utf8");
   const list = jsonLdNodes(topic).find((n) => [].concat(n["@type"]).includes("ItemList"));
@@ -737,6 +730,7 @@ async function capitalBriefAheadOf(anchorDay) {
   const urls = [].concat(list.itemListElement || [])
     .map((el) => (typeof el === "string" ? el : el.url || el.item?.url || el.item?.["@id"] || el["@id"]))
     .filter((u) => typeof u === "string" && u.includes("/newsletter/"));
+  const ahead = [];
   let fetched = 0;
   for (const url of urls) {
     if (fetched >= CB_MAX_ARTICLES) break;
@@ -749,9 +743,9 @@ async function capitalBriefAheadOf(anchorDay) {
     const sections = [].concat(art.articleSection || []).concat(art.keywords || []).join(" ");
     if (!CB_SECTION_RE.test(sections)) continue;
     if (STATE_RE.test(String(art.headline || ""))) continue;
-    return { title: String(art.headline || "").trim(), url, published: day };
+    ahead.push({ title: String(art.headline || "").trim(), url, published: day, html, art });
   }
-  return null;
+  return ahead;
 }
 
 // latest field-end/published day across the committed DemosAU rows
@@ -833,6 +827,13 @@ try {
         match.sample = w.sample;
         delete match.samplePending;
         status.fieldworkFilled.push({ sample: w.sample, slug });
+        touched = true;
+      }
+      // an MRP filed from the article (whose free lead gives one party's
+      // seat range at most) takes the report's whole projection
+      if (c.isMRP && !match.seats && w.seats && Math.abs(Object.values(w.seats.p).reduce((a, b) => a + b.est, 0) - 150) <= 2) {
+        match.seats = w.seats;
+        status.fieldworkFilled.push({ seats: true, slug });
         touched = true;
       }
       const led = leadershipDiffs(match.date, w, D);
@@ -939,29 +940,43 @@ try {
     }
   }
 
-  // Capital Brief watch (see header): flag a publisher article ahead of
-  // every dataset row with no PDF on the index yet. Runs LAST because the
-  // flag is derived from the post-write content of D. A slot that already
-  // wrote rows still exits 0 so the wrapper commits this run's data — the
-  // flag rides the status line either way. Watch failure is a note only.
+  // Capital Brief watch (see header): every publisher article ahead of every
+  // dataset row, oldest first — a poll's own article files before its
+  // follow-ups are judged against it. Runs LAST because "ahead" is measured
+  // on the post-write content of D. A slot that already wrote rows still
+  // exits 0 so the wrapper commits this run's data — the flag rides the
+  // status line either way. Watch failure is a note only.
   try {
     const ahead = await capitalBriefAheadOf(latestDemosauStamp(D));
-    if (ahead) {
-      status.cb_ahead = ahead;
-      const row = await rowFromCapitalBrief(ahead, D, status.notes);
-      if (row) {
-        D.polls = [...D.polls, row].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-        const next = JSON.stringify(D, null, 2) + (orig.endsWith("\n") ? "\n" : "");
-        status.changed = next !== orig;
-        status.added.push({ date: row.date, pollster: row.pollster, via: "capital-brief", fieldworkPending: true,
-          ...(row.samplePending ? { samplePending: true } : {}), alp: row.alp, lnp: row.lnp, onp: row.onp, url: row.url });
-        if (!CHECK) {
-          writeFileSync(OUT + ".tmp", next);
-          renameSync(OUT + ".tmp", OUT);
-          wrote = true;
-          console.log(`wrote ${OUT}: DemosAU wave from Capital Brief (fieldwork TBC, provisional ${row.dateStart}..${row.date})`);
-        }
-        delete status.cb_ahead; // filed, so not a hand-entry prompt
+    const filed = [];
+    for (const a of ahead.reverse()) {
+      if (a.published <= latestDemosauStamp(D)) continue; // a row this run filed covers its day
+      const card = { title: a.title, url: a.url, published: a.published };
+      let plan;
+      try { plan = capitalBriefPlan(a, D, status.notes); }
+      catch (err) { plan = { note: `capital brief watch failed: ${err?.message || err}` }; }
+      if (plan.row) {
+        D.polls = [...D.polls, plan.row].sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+        filed.push(plan.row);
+        const r = plan.row;
+        status.added.push({ date: r.date, pollster: r.pollster, via: "capital-brief", ...(r.fieldworkPending ? { fieldworkPending: true } : {}),
+          ...(r.samplePending ? { samplePending: true } : {}), alp: r.alp, lnp: r.lnp, onp: r.onp, url: r.url });
+      } else if (plan.followUp) {
+        (status.cb_followups ??= []).push({ ...card, why: plan.followUp });
+      } else {
+        status.notes.push(plan.note ?? `capital brief article not filed: ${plan.prompt}`);
+        status.cb_ahead ??= card; // the oldest article that needs a hand
+      }
+    }
+    if (filed.length) {
+      const next = JSON.stringify(D, null, 2) + (orig.endsWith("\n") ? "\n" : "");
+      status.changed = next !== orig;
+      if (!CHECK) {
+        writeFileSync(OUT + ".tmp", next);
+        renameSync(OUT + ".tmp", OUT);
+        wrote = true;
+        for (const r of filed)
+          console.log(`wrote ${OUT}: ${r.pollster} from Capital Brief (${r.fieldworkPending ? `fieldwork TBC, provisional ${r.dateStart}..${r.date}` : `fieldwork ${r.dateStart}..${r.date}`})`);
       }
     }
   } catch (err) {

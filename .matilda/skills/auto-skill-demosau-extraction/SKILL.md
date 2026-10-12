@@ -118,6 +118,18 @@ PDF later). When the PDF lands, the matched-row verify reconciles the
 hand-entered row against it; fields the PDF states better (e.g. exact field
 window vs the article's published date) surface in `mismatches` for a human.
 
+Since 2026-10-05 the watch FILES what verifies (demosau-read.mjs, see
+MATILDA.md), and since 2026-10-12 it reads EVERY article ahead of the anchor,
+oldest first (`planCapitalBrief`): a monthly poll files as `DemosAU`; an
+article that says it is an MRP reconciles with the previous `DemosAU (MRP)`
+row (its changes are "from the same analysis published in July") and files
+as one with the months it states as the window — the 12 Oct 2026 MRP was
+checked against the September poll, rejected, and turned six runs red, and
+three repair sessions ran out of context while filing it by hand. Follow-up
+pieces within 7 days of the newest release that state no figures, or only
+figures on file, land in `status.cb_followups`, not `cb_ahead`. Only what's
+left prompts. A CB-filed MRP has no seats until its report PDF matches it.
+
 A recent DemosAU row with no `methodUrl` IS the awaiting-the-PDF signal:
 `.build/demosau-pending.mjs` exits 0 while such a row is younger than 36h,
 and demosau-update.yml's hourly sweep is gated on it — the PDF gets picked

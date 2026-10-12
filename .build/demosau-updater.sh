@@ -64,6 +64,20 @@ WAVE_CHANGED=1
 echo "$LAST_LINE" | grep -q '"changed":true' || WAVE_CHANGED=0
 
 if [ $WAVE_CHANGED -eq 0 ] && git diff --quiet -- data/vote-switching.json data/demographics.json data/issues.json; then
+  # The Capital Brief watch asks Matilda to read every article ahead of the
+  # newest row, and one it set aside (a follow-up piece on a poll already on
+  # file) stays ahead until the next poll lands. Commit its cached reading,
+  # or every slot until then asks Matilda again (a runner's checkout is new
+  # each run).
+  if [ -n "$(git status --porcelain -- .build/demosau-src/readings)" ]; then
+    CACHE_MSG="Cache DemosAU's Capital Brief article readings $(date '+%Y-%m-%d')"
+    git add .build/demosau-src/readings
+    if git commit -m "$CACHE_MSG" >> "$LOG" 2>&1 && push_main "$CACHE_MSG" .build/demosau-src/readings; then
+      log "OK committed + pushed: $CACHE_MSG"
+    else
+      log "WARN article readings not committed; the next slot reads them again"
+    fi
+  fi
   # No new wave and the crosstab refresh moved nothing: give the
   # skip-confirm a go. It verifies — from the
   # extractor's own status emitted a moment ago, not a cached state file —

@@ -49,6 +49,19 @@ hand-entry procedure below apply. Never relax the reconciliation to make an
 article file, and give a hand-entered row the same `fieldworkPending` flag
 and provisional window when the article states no fieldwork dates.
 
+Since 2026-10-12 the watch also files DemosAU's QUARTERLY MRP (Capital Brief
+runs it in the same section; the article says "MRP" / "multilevel
+regression", its sample is ~7–10k, and its changes are on the previous MRP:
+"from the same analysis published in July", "the previous quarter") as a
+`DemosAU (MRP)` row reconciled with the previous `DemosAU (MRP)` row, and
+sets aside follow-up pieces on a poll already on file. If an MRP article
+still reaches you, hand-enter it as `pollster: "DemosAU (MRP)"`, `client:
+"—"`, NOT as a monthly `DemosAU` row, with `dateStart`/`date` the fieldwork
+the article states (whole months: the 1st to the month's end) — the window
+decides whether gen-data's `reusesWaves` keeps it out of the aggregates, so
+never give it the 4-day provisional window. Its seats come later from the
+report.
+
 Exit 3 with `cb_ahead` in the status JSON means Capital Brief has published
 a federal DemosAU poll article (VI figures sit in the free lead; the rest is
 paywalled) but the methodology PDF is not yet on the DemosAU index. Capital
