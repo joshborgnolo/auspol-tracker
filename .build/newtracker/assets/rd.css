@@ -3420,3 +3420,4 @@ body.rd .rd-ldg-sh { display: none; }
 /* a matchup's implied and published pairs hold together, wrapping between
    themselves only when the line is too narrow for both */
 body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }
+body.rd .rd-ldg-grp.rd-ldg-grpw { column-gap: 14px; }
