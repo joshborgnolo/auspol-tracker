@@ -95,8 +95,12 @@ supersedes the 2026-09-03 "no masthead, no glyph" recipe further down.
   check for another unversioned asset link (fontPreloads is safe – fonts hash
   by filename already).
 - Generators call it before writing: refresh-prediction (daily in CI),
-  refresh-morgan-archive, refresh-galaxy-archive, refresh-trove-archive. Their
-  templates no longer contain the pill or the satellite note.
+  refresh-morgan-archive, refresh-galaxy-archive, refresh-trove-archive — and
+  newtracker/build.mjs itself for `changelog/index.html` (2026-10-12, the change
+  log as a page like the RSS feed; the first page the MAIN build both generates
+  AND shells, in its `if (!VIC)` federal zone. Full recipe incl. SITE_FILES +
+  sitemap + pins: auto-skill-auspol-changelog-page). Their templates no longer
+  contain the pill or the satellite note.
 
 **Theme**: the main page stores `{theme, accent, …}` in localStorage
 `auspol.tweaks`; the pre-paint script maps theme light|dark → `sh-light|sh-dark`

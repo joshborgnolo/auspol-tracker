@@ -1,8 +1,8 @@
 ---
 name: auspol-flow-drift-panel
-description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.30, grn 0.91, oth 0.55} in flows.mjs (AEC 2025 Senate ATL ballots read through the 2026 SA and Secret Harbour contests, revised 2026-10-11; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
+description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.30, grn 0.91, oth 0.55} in flows.mjs (AEC 2025 Senate ATL ballots read through the 2026 SA and Secret Harbour contests, revised 2026-10-11; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); §7db flowForced + RdForced = the forced-choice pair with DemosAU MRP hollow-diamond extras (demos printed-national; demosOn = the site's AEC-enrolment×first-pref all-regions weighting, admitted 960d7e3 2026-10-12 as wt-flagged marks — see the forced-choice section); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
 source: auto-skill
-extracted_at: '2026-09-07T00:00:00.000Z'
+extracted_at: '2026-10-12T00:00:00.000Z'
 ---
 
 # Preference-flow drift panel (All-polls 2PP facet)
@@ -610,7 +610,7 @@ hover, wave swap, mouse-out clear).
   parent of `.build/`, not repo root; use `new URL("../", import.meta.url)`
   and prefix `.build/newtracker/…` inside.
 
-## The forced-choice pair's head+dek are HAND-CURATED (2026-10-10)
+## The forced-choice pair's head+dek are HAND-CURATED (2026-10-10; dek extended 2026-10-12)
 
 The RdFlows `rd-ff` block's `<h3 class="rd-sub rd-ff-t">` + `<p class="rd-subdek rd-ff-d">`
 (set as the page's sub-story since 2026-10-11)
@@ -619,16 +619,97 @@ user-dictated static strings that no longer regenerate — refresh by hand
 when the pool or the facts move (RD_DEMO_HOME convention):
 
 - Head: "RedBridge/Accent’s respondent-allocated preferences"
-- Dek: "RedBridge/Accent is the only pollster that publishes
-  respondent-allocated preferences. These tell us the extent to which
+- Dek (current, 960d7e3): "RedBridge/Accent publishes respondent-allocated
+  preferences every wave, and DemosAU’s MRP reports print their own — the
+  diamonds: its printed national One Nation reading on the Labor v
+  Coalition chart, and our all-regions weighting of its regional tables
+  on the Labor v One Nation chart. These tell us the extent to which
   Coalition voters, for example, prefer One Nation over Labor. Take them
-  with a grain of salt, however, when it comes to predicting the
-  preference flows at the next election. Last-election preference flows
-  consistently perform better than respondent-allocated preference flows,
-  in that domain."
+  with a grain of salt, however, …" (the Bonham-link grain-of-salt tail
+  unchanged)
 
 The head is PINNED by the rd-forced-charts probe ("desktop: section head
 is the respondent-allocated line") — a copy change there must move the
 probe in the same commit. The older a11e1559/gen-data comments that used
 to name the panel by the old title now refer to the
-respondent-allocated-preferences panel instead.
+respondent-allocated-preferences panel instead. The diamonds clause and
+the key/footer/tooltip copy that names the site's weighting (demosOn)
+move with the dek — see the section below.
+
+## The forced-choice pair + DemosAU all-regions marks (RdForced; demosOn shipped 960d7e3, 2026-10-12)
+
+How the pair is built, and the settled answer to "why don't DemosAU's
+computable numbers ride these charts?": they do now, flagged as ours,
+whenever the computation is exact-enough arithmetic on AEC denominators.
+
+- **`flowForced` (gen-data §7db, ~:3820-3890 after flowDriftOn).** Waves
+  split by QUESTION, one line per cohort: `vsOn` reads RedBridge/Accent
+  `tpp_split_on` (cohort Labor shares vs One Nation; `lnp` → `coal` on
+  the way out) and `vsCoal` reads `tpp_split` (grn/onp/oth vs the
+  Coalition). `ym` rides the FIELDWORK window (`dateStart`), the section's
+  wave-label convention. `demos` = `DemosAU (MRP)` rows' nationally
+  printed `pref_flows.onp_alp_lnp` (the one national figure the MRP
+  adds up itself), placed at the fieldwork-MIDPOINT month since an MRP
+  spans six to seven weeks. **`demosOn`** (960d7e3) = each MRP's
+  Labor-v-One-Nation regional tables combined by `prefFlowsOut` into
+  all-regions figures — entries `{date, ym, from, n, wt: true, coal,
+  grn, oth}` (waves missing any cohort cell or the weighting inputs are
+  filtered out, absent-not-empty). Emitted only alongside `demos` on
+  the `{house: "RedBridge/Accent", vsOn, vsCoal, demos?, demosOn?}`
+  payload.
+- **`prefFlowsOut(p)` (~:2940, module scope before the individualPolls
+  emit, where it rides each MRP row as `pf`).** The all-regions
+  weighting, exact mechanics: cohort weight per region = the region's
+  2025 ENROLMENT (`PF_REGION_ENROL` over
+  `data/aec-2025-division-class.json`; regional = provincial + rural)
+  × that cohort's MRP-printed first-pref share there (`PF_LOC` =
+  "Inner metro"/"Outer metro"/"Reg & Rur" over demographics.json's
+  location dims). Deterministic arithmetic where the only estimated
+  inputs are the house's own printed numbers — the user's 2026-10-12
+  challenge ("isnt it accurate weighting — AEC classifications make up
+  definite proportions of the vote", citing the AEC demographic
+  first-prefs page) is what overrode the pair's printed-only contract.
+  Returns the row unchanged when `AEC_CLASS` or the location table is
+  missing (vic JUR → AEC_CLASS null; never throws).
+- **The set display contract** (960d7e3): charts that promise
+  "figures read straight off published reports" may still show a
+  SITE-WEIGHTED figure as MARKS — never as a line — provided the entry
+  carries `wt: true` and every surface names the provenance: diamond
+  `<title>` adds "(all regions — our weighting)", the key gets its own
+  glyph+item (`.rd-ff-keydm.mix`, ink-2 border), and the dek + RdFoot
+  provenance sentence + svg aria (`xnote`, which also says national-vs-
+  weighted and names the latest cohorts) all say "our weighting". The
+  RedBridge-only "read straight off" sentence stays literal about
+  RedBridge.
+- **RdForced renderer checklist for a NEW extras series**
+  (~:4712-4840 in rd-allpolls.jsx): extras entries carry COHORT KEYS
+  matching that chart's own `cohorts` list (`["grn","coal","oth"]` vsOn,
+  `["grn","onp","oth"]` vsCoal) and the diamond map renders
+  `cohorts.filter(ck => d[ck] != null)` — one hollow diamond per cohort
+  coloured `FF_COHORTS[ck].cls` (`coal` → `lnp`; `.rd-ff-dm` is
+  fill:none, cohort strokes in rd.css beside `.rd-ff-dm.onp`). No
+  click-to-open on marks (house-wave dots only). The x AXIS MUST UNION
+  the extras' months (960d7e3): `m0`/`mSpan` previously spanned
+  `waves[]` alone and a DemosAU midpoint outside the house's own months
+  would draw at negative `X` and clip silently off the left rail —
+  today's first MRP mid (2026-02) only escaped because it equals
+  RedBridge's first vsOn month. Now `xms = (extras||[]).map(mi)`,
+  min/max across both lists. Whole-number 0–100 y domain, no refs.
+- **Data reality to sanity-check against**: three MRP waves carry
+  `pref_flows` (2026-03-03 fw 2026-01-13, 2026-07-11, 2026-09-19) and
+  every one has a complete location dim — demosOn yields 3 extras =
+  9 diamonds on the One Nation chart (vsCoal keeps the 3 single-cohort
+  `demos`). The 2025-11-11 MRP has no `pref_flows` at all. MRP
+  midmonths: 2026-02, 2026-06, 2026-08.
+- **Probe**: tracked `.matilda/probe/mrp-prefs.mjs` pins the 9 vsOn
+  diamonds (class colours grn/lnp/oth ×3 waves), the 3 vsCoal ones,
+  both key glyphs, and (in the same file) the MRP ledger-line contract
+  — digit columns, chip placement, "ON 18, nationwide" regex. The
+  older references to `#flow-drift .rd-ff-dm` counting 3 were updated
+  in the same commit — count queries on the pair must scope per
+  `.rd-fl-one` half.
+- Vic gets the same renderer/CSS rebuild but `flowForced` is null there
+  (no RedBridge/Accent rows); the three-pass rebuild
+  (fed → vic → fed) stays the commit shape, and the fixed-name data
+  asset `9f09dca2-….js` rides the commit whenever gen-data output
+  changes.

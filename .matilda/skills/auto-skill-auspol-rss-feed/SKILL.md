@@ -73,6 +73,19 @@ Other mechanics: guid `auspol-tracker:<date>|<house>`; pubDate is `w.date + "T12
 previous day (in-source comment); the channel `<description>` was restated to cover the
 widened payload; build log line is `built feed.xml · N waves, newest <date> <house>`.
 
+## Links TO the feed must be root-absolute (9022029, 2026-10-12)
+
+The feed's in-app link homes: template.html's `<link rel="alternate">` (always absolute)
+and the Info tab "Following along." copy (d1a1d215 asset ~:7737). The Info copy carried
+`href="feed.xml"` — relative — which worked from `/` but 404'd the day tab pages shipped
+(2026-10-10: the link resolves against `/info/`). Every in-app URL is ROOT-absolute;
+the changelog/index.html page (5c block, added same day) links `/feed.xml` likewise.
+Grep trap when verifying built docs: JSX `href="/feed.xml"` compiles to the prop form
+`href: "/feed.xml"` — `grep 'href="/feed.xml"'` on built docs misses it. Regression
+pinned in test-site-shell.mjs (no `/href[:=]\s*"feed\.xml"/` across all 7 root docs).
+See auto-skill-auspol-changelog-page. Note the emitter neighbours: feed remains "5b";
+the changelog page is "5c"; robots moved 5c→5d.
+
 ## Verifying a feed change
 
 **No test pins feed content.** `test-site-check.mjs`'s "feed-mismatch" scenario is a

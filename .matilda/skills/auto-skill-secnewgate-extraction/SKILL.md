@@ -1,6 +1,6 @@
 ---
 name: secnewgate-extraction
-description: SEC Newgate "Mood of the Nation" bi-monthly survey — direction-only house (no VI). Discovery via the WP REST media API (predictable-URL probing fails), report PDFs carry "Fieldwork dates" + n on page 2, direction rows carry url (the report PDF itself since 2026-10-09 — the house's report posts 301 straight to their PDFs, so pickReports takes source_url with it.link only as fallback) + published (the media date, site-local). April 2026 Special Edition has NO direction question and must be skipped. auspol-tracker.
+description: SEC Newgate "Mood of the Nation" bi-monthly survey — direction-only house (no VI). Discovery via the WP REST media API (predictable-URL probing fails), report PDFs carry "Fieldwork dates" + n on page 2, direction rows carry url (the report PDF itself since 2026-10-09 — the house's report posts 301 straight to their PDFs, so pickReports takes the media item's source_url alone) + published (the media date, site-local). April 2026 Special Edition has NO direction question and must be skipped; likewise-shaped releases that slip the title filter settle their month via a wave-null special sidecar (2026-10-10 hardening, commit 14f2aa2). auspol-tracker.
 source: auto-skill
 extracted_at: '2026-09-28T05:26:18.764Z'
 ---
@@ -103,9 +103,10 @@ the automation then keeps it current:
   model — NOT the Ipsos model where a second script reads the cache).
   Each media item also yields `page` (the media item's `source_url` —
   the report PDF itself — since 2026-10-09: the house's report posts
-  now 301 straight to their PDFs, so `page = url || it.link || null`
-  with the article-page `link` demoted to fallback; before that change
-  `page` was the item's `link`, the WP article page, never the PDF) and
+  now 301 straight to their PDFs. `page = url` exactly — the
+  `|| it.link || null` chain was dead weight and was deleted 2026-10-10;
+  before the 2026-10-09 change `page` was the item's `link`, the WP
+  article page, never the PDF) and
   `published`
   (`date.slice(0,16)`, site-local UTC+10 — the upload stamp trails the
   fieldwork by days); the sidecar carries `url`/`published`, the
@@ -343,3 +344,61 @@ rates 14, own-home 12, borders 8, migration-for-shortages 1, tariffs 0.
 test-secnewgate.mjs pins gridPageOf (page 4, n 36), all-clean grids,
 six spot values, the label flip in both directions, cross-wave label-set
 equality (flip aside), and the merged bank == the file.
+
+## Hardening pass (commit 14f2aa2, 2026-10-10)
+
+Six defects from a full agent review, all landed and pushed in one
+commit. Each is now pipeline contract:
+
+1. **Methodology problems → `pending`, never silent.** The wave-loop
+   gate is `if (!meta.date || meta.problems.length)` — any methodology
+   read problem (a lost `"n = … Australians"` format included) moves
+   the wave to `status.pending` and the run fails, because the
+   exact-row heal rewrites the row WITHOUT whatever stopped parsing: a
+   dropped sample was data loss with no downstream check catching it.
+2. **The heat-grid expected tile count is derived, never hard-coded.**
+   `gridTileCount(bboxHtml)` (exported) counts the 1..N tile numbers in
+   the zone between the `Tracking…importance` headline and the `Legend`
+   line on a cached grid bbox, falling back to 0 when either anchor is
+   missing. Both heat-bank call sites pass
+   `grid0.n || gridTileCount(cached) || 36` (the 36 remains only as the
+   last-ditch era default): a changed priority list re-reads a wave
+   instead of failing every cached wave against the 2026-era constant.
+3. **Specials settle their month.** A listed release that slips the
+   title filter but proves not-a-tracking-wave caches `<slug>.txt` plus
+   a `{ pdf, wave: null, special: true, published? }` sidecar (atomic
+   `writeAtomic`); the wave loop, the `--probe` gate and every banked
+   sweep (`side.wave == null` skips) treat the month as DONE — no more
+   re-fetch+warn every run. (The April 2026 "Special Edition" is
+   title-filtered upstream and never reaches this path; the concernTableOf
+   header's old "the special itself is never cached" is now its inverse
+   — it caches but never banks.)
+4. **Delisted waves join the reprints-history cross-check.** The newest
+   chart's series sweep now ALSO sweeps every cached sidecar not in
+   `waves`: its own endpoint read off its `<slug>.bbox.html` must sit
+   at `series[wave-1]` of the newest report, else a warnings line. An
+   unreadable cached national chart in this sweep is `pending`, like
+   the state/concerns/heat sweeps. Carry-forward effect: a publish-day
+   correction to a wave no longer listed by the media API can no longer
+   hide.
+5. **directionChartOf month labels accept FULL names.** The MON array
+   is `["Jan","January","Feb","February","Mar","March","Apr","April",
+   "May","Jun","June","Jul","July","Aug","August","Sep","Sept",
+   "September","Oct","October","Nov","November","Dec","December"]` —
+   "June" and "Sept" had both printed when the era-sampled short list
+   was written, so a full-name label was one layout whim away from a
+   no-month-label-row guard trip.
+6. **Atomic success-path sidecar.** The wave-filed `<slug>.json` write
+   now goes through `writeAtomic` (temp+rename) like every other cache
+   write previously did; and pickReports' candidate is `page = url`
+   (see the pipeline section).
+
+Test pins added (test-secnewgate.mjs): `gridTileCount` = 36 on every
+cached wave's grid page + synthetic fixtures (5-tile zone counts 5;
+missing headline or Legend → 0; an out-of-zone page-number digit stays
+out); directionChartOf synthetic full-name labels anchor columns
+cleanly; the cached-wave set filters `sidecar.wave != null` before its
+wave sort so a committed special sidecar can't poison the sort, and any
+special sidecar must carry `wave: null` beside its cached `<slug>.txt`.
+The probe block itself (skips `special: true` sidecars) sits in main()
+and is NOT unit-testable — probe cleanliness is the gate.

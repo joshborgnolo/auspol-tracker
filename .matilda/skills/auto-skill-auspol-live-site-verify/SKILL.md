@@ -189,3 +189,54 @@ Debug corollary: when the user says "it's not there" and every server
 check passes, re-read the code path BEFORE writing the cache answer —
 the max-age=600 / hard-refresh story had become a reflex, and it was flat
 wrong here.
+
+## Message ≠ diff: the commit never carried its own fix (2026-10-12 instance)
+
+Sixth "can't see it" — the first where the push, the deploy AND the code
+layout were all fine, but the change **was never in the commit**. User:
+"fix is pushed (0c642e9, build b0812bb) — i can't see this in live". Every
+check passed: origin/main == HEAD, live curl had `last-modified` at the
+push minute, `age: 1`. The cache answer was NEVER plausible — but so was
+blaming the build: `b0812bb` ("Build: …") had regenerated index.html.
+
+The defect: `git show 0c642e9 --stat` → ONE file, and `git show 0c642e9`
+→ a single hunk implementing an UNRELATED sibling change (the RdLgPrefs
+All-regions default — fd8010e's own message admits it "rode in with
+0c642e9's build off this tree"). The width-lock code the message described
+("an invisible `{total} of {total} releases` twin") appeared NOWHERE —
+not in the source rd-allpolls.jsx, not in rd.css, not in the built HTML.
+The commit's message survived a **shared-tree session race** that its
+payload did not: the committing session staged only the sibling hunk it
+found in the tree; the described fix lived in another session's tree and
+was never committed. The later commit 4305e72 re-landed it from scratch
+using the message as the spec.
+
+**Signature checklist — cheap to run, do it before any "cache" conclusion:**
+
+1. `git show <sha> --stat` — does the commit's file list even cover the
+   files the change would have to live in? (Here: source rd-*.jsx present
+   yes, but the file's own diff showed a different change.)
+2. grep the **source assets** for the identifiers the change must add
+   (a grep of only the built HTML is not enough — see the grep traps; an
+   identifier absent from SOURCE is absent everywhere).
+3. If the commit message cites a pinning probe and the probe exists
+   locally, **run it on HEAD** — decisive. `.matilda/probe/ap-pin-steady.mjs`
+   (untracked; `.matilda/probe/` is gitignored — probes cited in commit
+   messages as "the local probe" are gitrepo-external by design, `git add`
+   on them errors and you never commit them) measured drift 28.9px at
+   1024px — proof, not warming cache, that the fix was missing.
+4. The repair is experience-shaped: re-implement from the commit's own
+   message (it doubles as a written spec), revive the surviving probe as
+   the acceptance gate, rebuild, re-probe, then **diff-audit the rebuilt
+   index.html** (`git diff HEAD -- index.html | grep "^[+-]"`) for foreign
+   WIP before staging explicit paths only (shared-repo-session-race rules
+   apply all over again when remaking lost code in the same shared tree).
+
+Jurisdiction corollary from the same repair: after the re-implemented fix
+went green on the federal build, the /vic/ probe line STILL failed
+(drift 33.2px, count widths 46.9→80) — `node .build/newtracker/build.mjs`
+alone does NOT touch vic pages. `npm run build:vic` rebuilt them and the
+"twin" then read `64 of 64 polls` (vic's no-Confidence-facet branch; the
+federal twin says `releases`). Probes in `.matilda/probe/` take `SUB=vic/`
+to re-verify the second jurisdiction — always probe both before telling
+the user a shared-view fix is live.

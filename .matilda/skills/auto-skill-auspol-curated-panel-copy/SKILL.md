@@ -321,3 +321,38 @@ via `dek: trustDek`):
   stayed data-driven through the freeze and the un-freeze; either
   direction of curation touches only the `trustDek` binding, one hunk.
 
+## The ninth form: static head+dek swap with a panel RETITLE (51b649d, 2026-10-10)
+
+The forced-choice pair ("Preference flows" section's `rd-ff` block): the
+user dictated a (title, dek) tuple replacing an already-STATIC `<h3
+class="rd-ff-t">` + `<p class="rd-ff-d">` pair in rd-allpolls.jsx ("When
+pressed, where do their voters go?" → "RedBridge/Accent's
+respondent-allocated preferences"). Not a freeze — there is no generator
+to freeze; the copy was a string in JSX already. Lessons:
+
+- **A tuple dictation maps title→title, dek→dek.** The user quoted the
+  current head+dek as the anchor and gave `'<new head>', '<new dek>'`;
+  both change (here a RETITLE naming the measure). A multi-message
+  dictation tail ("except say: …") consolidates into one final wording —
+  apply the LAST wording, state the consolidation in the reply.
+- **The retitle's edit kit is four homes, not one:** (1) the live copy
+  lines, (2) the headless probe's string pin for the head
+  (rd-forced-charts.mjs pinned `d.h3 === "When pressed…"` — a stale pin
+  is a failing check on the next run; repin in the SAME commit), (3)
+  code comments that name the panel by its old title — grep the quoted
+  title across `.build` (two existed: a11e1559's archive-detail comment
+  and gen-data's tpp_split comment; they exist to be greppable, so the
+  reference must move with the rename), (4) the portal-skill record
+  (auspol-flow-drift-panel got the frozen wording + "refresh by hand"
+  note, RD_DEMO_HOME convention).
+- **Truth-checking is claim-shaped, not blanket.** The dek's editorial
+  claims ("the only pollster that publishes respondent-allocated
+  preferences", "last-election flows consistently perform better") are
+  qualitative judgements, not payload figures — ship the dictation
+  verbatim; the §BUT-verify payload probe applies to NUMBERS.
+- **Execution when the panel's own source file is another lane's live
+  WIP:** detached worktree at origin/main, never edit-then-stash the
+  dirty file — see auspol-worktree-scratch-files's 51b649d notes
+  (fetch first, `git show origin/main:` is the base, vic regen folds the
+  previous commit's drift by rule, folded + named in the message).
+

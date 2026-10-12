@@ -1,7 +1,8 @@
 ---
 name: resolve-monitor-extraction
-description: Extract/update the SMH Resolve Political Monitor polling series — 2026 interactive's data.json (values xor-obfuscated parseInt(str,36)^123, scheme detected per-payload) with CryptoJS "sacho" fallback for the frozen-2021 endpoint -> repair-aware keyed merge into data/resolve-political-monitor.csv via .build/extract-resolve-rpm.mjs (exit-code contract, RPM_STATUS json); assimilate VI + preferred-pm + leadership approval into polls.json via .build/assimilate-resolve-vi.mjs. CI runs 07:00+23:00 AEST (2026-09-13 evening-payload gap fix f04b452); body has the manual landing recipe for missed waves, plus the post-assimilation enrichment gap (auto rows land without published/url/sample/dateStart — fill from the SMH article, published off article:published_time UTC→AEST).
+description: Extract/update the SMH Resolve Political Monitor polling series — 2026 interactive's data.json (values xor-obfuscated parseInt(str,36)^123, scheme detected per-payload) with CryptoJS "sacho" fallback for the frozen-2021 endpoint -> repair-aware keyed merge into data/resolve-political-monitor.csv via .build/extract-resolve-rpm.mjs (exit-code contract, RPM_STATUS json); assimilate VI + preferred-pm + leadership approval into polls.json via .build/assimilate-resolve-vi.mjs. CI runs 07:00+23:00 AEST (2026-09-13 evening-payload gap fix f04b452); body has the manual landing recipe for missed waves, plus the post-assimilation enrichment gap — since 271b209 (2026-10-11) VI rows file WITH day-precision `published` = the csv wave date (that date IS the house's Sunday release day), so hand-filling shrinks to url/sample/dateStart, and the article's published_time UTC→AEST T-stamp UPGRADES the day stamp in place.
 source: auto-skill
+updated_at: '2026-10-11'
 extracted_at: '2026-08-30T10:30:00.000Z'
 ---
 
@@ -69,22 +70,27 @@ node .build/assimilate-resolve-vi.mjs          # DRY FIRST — inspect the adds
 node .build/assimilate-resolve-vi.mjs --apply  # writes data/polls.json
 node .build/newtracker/validate.mjs            # exit-gated
 node .build/newtracker/build.mjs
-# commit exactly: data/polls.json data/resolve-political-monitor.csv
-#   index.html feed.xml sitemap.xml — then push
+# commit data/polls.json + data/resolve-political-monitor.csv + EVERY file
+#   the rebuild dirtied — git status is the list: index.html, the tab
+#   pages (allpolls|cycles|info/index.html), sitemap.xml, feed.xml when it
+#   moved, the 9f09dca2 gen-dataset when it moved, assets/auspol-card.*
+#   when the latest published date moved and render-card re-drew.
+#   Committing a SUBSET leaves generated dirt for the next writer
+#   (a follow-up "regenerate" commit is the tell); then push
 ```
 
 The push routinely races other writers in this repo; `git pull --rebase --autostash origin main && git push origin HEAD:main` resolves it in one shot (autostash carries sibling sessions' unstaged dirt through the rebase and back). If the push replies "cannot lock ref … No space left on device" AFTER the remote accepted the objects, the remote move DID happen — confirm `git ls-remote origin main` and repair the stale local ref with `git update-ref refs/remotes/origin/main <sha>`; then check `df -h` (a 100%-full disk starves launchd logs and builds next).
 
-## Post-assimilation enrichment: published / url / sample / dateStart (09-13 wave lesson)
+## Post-assimilation enrichment: published / url / sample / dateStart (09-13 wave lesson, contract changed 2026-10-11)
 
-**The assimilator leaves four fields blank by design — the payload never carries them.** A fresh auto row files with `published`, `url`, `sample`, `dateStart` ALL missing, and nothing downstream complains: `assimilated: true` gets a validator sample exemption, so validate.mjs stays green while the row has no source link, no published stamp, and no n. After ANY manual wave landing, check the row for the gap before calling it done.
+**As filed, an auto row carries three of the four blank — the payload never carries them.** Since 271b209 (2026-10-11) `published` is no longer blank: the assimilator stamps `published: <csv wave date>` on VI rows at filing, day precision — the csv wave date IS the house's Sunday release day (row date = csvDate − 1 = fieldwork end; every recent wave's article carried the csv date at T-stamp precision). Shipped after the 2026-10-11 wave sat live all morning reading "Resolve, 10 Oct — published yesterday": the masthead age label fell back to fieldwork-end `date` while the poll was released that very Sunday and its SMH article hadn't landed yet (user report; day stamp on that row healed to `2026-10-11` in the same commit). Bare-day ISO is in-schema (validate's ISO_PUBLISHED allows day precision; the EMRS first-seen stamp is the precedent), and `published-order` only needs published ≥ fieldwork end. `url`, `sample`, `dateStart` still land blank, and nothing downstream complains: `assimilated: true` gets a validator sample exemption, so validate.mjs stays green while the row has no source link and no n. After ANY manual wave landing, check the row for the gap before calling it done.
 
 Fill them from the wave's SMH/Age article (chrome-session-piggyback if paywalled):
 
 - `url` / `dateStart` / `sample` — read off the article page/prose (e.g. the 2026-09-13 wave's n = 2250). Assigning `sample` also RETIRES the validator's assimilated-row sample exemption, so the row starts counting in the estimator's n-weighting.
-- `published` — house convention (commit 6d7959b, "Published was the last day of fieldwork wearing another name"): read off the article's **`article:published_time` og meta**, store local AEST **without offset**, never assume. The meta is UTC: `2026-09-13T08:00:00.000+00:00` → `"2026-09-13T18:00"` — which matches the house's Sunday-6pm AEST pattern (prior curated rows stamp 17:59). `published` matters beyond display: next-expected-polls keys "when was it released" off it (fieldwork-end `date` otherwise), and the archive's "sort by release" uses it.
+- `published` — house contract since 271b209: the filing-time day stamp is REPLACED IN PLACE by the article's **`article:published_time` og meta** at T-precision, stored local AEST **without offset**, never assumed. The meta is UTC: `2026-09-13T08:00:00.000+00:00` → `"2026-09-13T18:00"` — matching the house's Sunday-6pm AEST pattern (prior curated rows stamp 17:59). This is the older 1b77d28 hand-stamp pattern from the 09-13 wave, now an UPGRADE of an existing value instead of a missing-field fill; the validator's `same-release` check keys house+published, and the in-place overwrite causes no trouble there. `published` matters beyond display: the masthead freshness label and next-expected-polls key "when was it released" off it (fieldwork-end `date` otherwise), and the archive's "sort by release" uses it.
 
-Worked example 2026-09-14 (wave landed manually 6b095ff without the stamps): `published`+`url` committed as 1b77d28, `sample: 2250` as d4dc5c3 — two commits only because the n arrived from the user later. Standard order: land wave → read article once → stamp all four in one commit (data/polls.json + build outputs index.html/feed.xml/sitemap.xml).
+Worked example 2026-09-14 (pre-contract-change, wave landed manually 6b095ff without any stamps): `published`+`url` committed as 1b77d28, `sample: 2250` as d4dc5c3 — two commits only because the n arrived from the user later. Standard order now: wave lands WITH day-precision published → read the article once → stamp url/dateStart/sample + the published T-precision upgrade, all in one commit (data/polls.json + every regenerated file git shows — see the manual recipe's commit note).
 
 ## poll.json assimilation (three sections — `.build/assimilate-resolve-vi.mjs`)
 
@@ -92,7 +98,7 @@ Rewritten Aug 2026 into `VI` / `preferred_pm` / `pm+opp approval`. Conventions (
 
 - Wave row dated **csvDate − 1 day** (curated rows use fieldwork-end); waves at/before each section's earliest curated row skipped (no backfill); **+/-2-day date-dup** and **+/-10-day figure-dup** skips → re-runs are no-ops, curated rows never duplicated. ppm leader shape: PM must be Albanese + exactly one non-Hanson, non-undecided opposition leader, Hanson optional; anything else skipped LOUDLY (logged), never guessed.
 - Rounding: CSV is unrounded; polls.json holds ints — half-up at the boundary. Known delta class: SMH's printed article ints are editorially rounded by Nine and can disagree with half-up by 1 on knife-edge values (curated 2026-08-15 opp approval 40 vs payload 40.86 → curated net 7, auto 8). Auto rows follow the PAYLOAD and carry `assimilated: true` (provenance + validator sample-size exemption).
-- Rows get `soft` from `vote_firmness` TOTAL SOFT (±2-day nearest-match); approval rows omit `han`/`fav` (not in the 2026 payload — SMH article embeds only).
+- Rows get `soft` from `vote_firmness` TOTAL SOFT (±2-day nearest-match); approval rows omit `han`/`fav` (not in the 2026 payload — SMH article embeds only). VI rows get `published: <csv wave date>` at filing, day precision (271b209; the assimilator's header note at ~lines 44-52 documents why — see the enrichment section above).
 - Verified by replay: delete the curated 2026-08-15 rows from a polls.json copy → dry-run regenerates VI 28/23/12/26/7/4 + ppm 32/19/26 (Taylor) EXACTLY, approval −16/8 (curated −16/7, the editorial delta). 2026-08-30 launchd run: dry-run adds 0 against the committed tree.
 
 Read-only cross-check remains `.build/check-resolve-vs-tracker.mjs`; historical repair writer is `.build/backfill-resolve-approval.mjs`; per-row `soft` backfill for pre-assimilation rows is `.build/assimilate-resolve-soft.mjs`. After any writer: `node .build/newtracker/validate.mjs` then `build.mjs`, clean before commit.

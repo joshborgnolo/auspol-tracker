@@ -90,6 +90,31 @@ Grepping the built `index.html` for curly-typography copy returns zero matches e
 correct — babel escapes non-ASCII in compiled JS strings to `\uXXXX` (see the
 auspol-built-html-verification skill for that side).
 
+**The dataset lives in TWO serialisations with DIFFERENT quoting — match your grep to the
+artifact.** The four tab documents (`index.html`, `allpolls/index.html`,
+`cycles/index.html`, `info/index.html`) INLINE the full dataset and compiled app
+pretty-printed — data keys appear as `"published": "2026-09-08"` (space after the colon);
+the dataset bundle `.build/newtracker/assets/9f09dca2-<uuid>.js` is COMPACT —
+`"published":"2026-09-08"`. A compact-form grep over the page (or a pretty-form grep over
+the bundle) returns 0 and reads falsely as "the keys never landed" (burned twice while
+landing `07a72b2`, 2026-10-11 — first panicked that the rebuild had lost 122 `published`
+keys when they were sitting pretty-printed in-page the whole time). Per-artifact check:
+`grep -c '"published": "' index.html` vs `grep -c '"published":"' .build/newtracker/assets/9f09dca2-*.js`.
+Confirming a UI-visible change landed on the page therefore verifies BOTH the inline rows
+AND — for renderer changes — the inlined app code itself (a JSX source edit lands in the
+four page documents, not in any dirty hashed asset file; `assets/` staying porcelain-clean
+is expected).
+
+**Porcelain-clean generated pages do NOT prove your feature is still in them.** In the
+shared checkout a sibling rebuild from THEIR sources regenerates the pages byte-identical
+to HEAD, silently erasing the outputs of your uncommitted rebuild (twice in the `07a72b2`
+landing: `git status` went clean on `index.html`×4 while the feature keys were ABSENT —
+the sibling's build had overwritten mine). Dirt is also transient mid-build noise from the
+other writer. The only trustworthy assertions are (a) your SOURCE edits are in the
+worktree (`grep` the source files), (b) the feature keys are in the CURRENT artifacts
+(grep both serialisations as above), checked as late as possible before commit; then
+rebuild → verify → commit explicit paths → push with the shortest possible gap.
+
 Exposing a NEW bundle const to the page is a TWO-step edit: the `const X = …`
 emit, AND adding `X` to the explicit shorthand `return { … }` inside
 `window.AUSPOL = (function () {…})()` (gen-data ~:3775). A

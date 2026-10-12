@@ -2051,3 +2051,55 @@ prove forward-compat against the INDEX blob) and ac625e2 (rebuild
 contaminated — clean-room the artefact): here nothing staged, nothing
 rebuilt yet, the overlap resolves itself by the sibling's own commit.
 
+## Queued corrective edit INVERTED by the sweep (re-derive a queued fix's premises) — 2026-10-11, a11a1e4
+
+Design-assimilation of `preference-flows/index.html` sat UNCOMMITTED in
+the shared tree awaiting the user's "push". Pre-compaction, my
+`node .build/site-shell.mjs` re-apply had restamped the page's two
+`?v=<SHELL_V>` asset URLs to a hash of the sibling's UNCOMMITTED
+`assets/site-shell.js` WIP (`d56d2bd5de`), so the compaction summary
+queued a corrective edit: revert the stamps to HEAD-era `52fcde297b`
+before committing, because committing a WIP-derived stamp orphans the
+page against the committed assets. Between queueing and executing, the
+sibling committed `a11a1e4` (their ticker follow-up) and swept BOTH
+their `assets/site-shell.js` WIP AND my design assimilation (its
+`show --stat` for my file was 64+/57- — exactly my known diff) plus a
+restamp of all ten satellites, and pushed: origin/main == local HEAD.
+Consequences, in the order they surfaced:
+
+1. **Executed the queued revert against stale premises.** With the
+   sibling's WIP now COMMITTED at HEAD, `d56d2bd5de` had become the
+   CORRECT stamp — the queued "fix" was now the bug (it would orphan
+   the page against HEAD's own assets). A corrective edit queued in a
+   compaction summary encodes git-state assumptions ("the stamp's
+   source WIP is uncommitted"); HEAD moving past the justification
+   INVERTS the correction. Before executing ANY queued fix on resume:
+   re-derive its premises against current state (`git log --format='%h
+   %s' -5`, `git diff HEAD -- <file>`, `git ls-remote origin main`),
+   same family as stale-main-reconcile's "compaction-summary git
+   claims are HYPOTHESES" rule.
+2. **The tell that the sweep already absorbed your work:** after the
+   revert edit, `git diff HEAD -- <file>` showed ONLY the `?v=` hunks
+   and NONE of the design hunks — impossible unless HEAD already
+   carried the feature. `git show HEAD --stat` + `git diff
+   <old-HEAD> HEAD --stat -- <file>` matching your remembered diff
+   exactly is the absorb-proof; `git log --format` then attributes the
+   carrier commit, and `git ls-remote origin main` (not just the local
+   ref) proves it's published.
+3. **Recovery is one `git checkout -- <file>`** — discard the inverted
+   correction; HEAD already holds the deliverable plus the correct
+   stamp. Re-verify coherence against the NEW state (here
+   `node .build/site-shell.mjs --check` — "current on all 10 pages"),
+   then report nothing-to-push with the carrier commit named.
+4. **SHELL_V mechanic worth remembering:** satellite `?v=` stamps are
+   content-hashes of `assets/site-shell.js`+CSS written by
+   `site-shell.mjs`. A stamp derived from uncommitted WIP is
+   wrong-now-but-correct-after-their-commit — so "revert the stamp" is
+   only right while HEAD lacks the WIP; adjudicate against current
+   HEAD before shipping it.
+
+Sibling note: the proper response to "push" when the sweep beat you to
+it is verification + report (nothing-to-push, carrier commit, live
+state green) — never a redundant delta that would now fight the
+committed state.
+

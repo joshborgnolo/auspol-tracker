@@ -1,8 +1,9 @@
 ---
 name: auspol-allpolls-confidence-facet
-description: auspol-tracker — the All-polls CONFIDENCE facet (?f=c, 7th facet; row set shipped 4328ee3, lane-constant sample column 4b15150, PER-RELEASE Sample + Fieldwork columns 5adfeb5, all 2026-10-07; user's brief "the home of the data used in the economic mood chart") end-to-end: gen-data.mjs confidenceOnlyPolls emitter + CONF_LANES lane tuples (~:2438, reads the SAME data/mood.json as the Snapshot mood panel — releases not polls, so like issuesOnlyPolls/directionOnlyPolls the facet REPLACES the row set with empty p:{}/appr:{} stubs and threads the "release/releases" noun through pinbar, count, CSV aria, empty state, sheet and chevron labels; no scope pill, no poll counts), the shared 40–120 meter with neutral-100 emphasised (NAB prints its true net balance, drawn +100), printed change + NAB conditions riding the change cell, sortable Figure/Change, month rows "N releases", and the Sample + Fieldwork columns' PER-RELEASE provenance law (data half committed 3fc015f + f9c2b9b): a row's figure is the release's OWN printed number (mood.json row.n, read off its release by .build/mood.mjs — ANZ 1,019 / RM Business 1,094 / NAB ~507 land per release), the tuple slot-5 constant stands in ONLY where a house prints one (Westpac–MI's 1200 adults), else an honest em-dash; field = fwLabel(row.fwStart–row.fwEnd), business rows print their survey MONTH (row.fwm → "Apr '25"), and year + conditional fmid keys ride every row (a missing year prints "'de" — renderer contract). Also the where-things-stand head/dek law (fixed 2026-10-07): the rebuild's RdHed renders on EVERY facet by design, but its window is computed from the facet's row set, so on this row-REPLACING facet it silently vanished — the window reads D.individualPolls here (probe conf-headline.mjs pins head/dek parity with the 2PP facet incl. ?f=c deep links). Also the paired "Economic mood" → "Economic sentiment" rename contract (visible copy moved, every identifier frozen). Also the opened-row byline fix (facac9e, 2026-10-07): the shared rdPollHead header sentence treated any non-self client as a PUBLISHER, so confidence rows printed "published by the Consumer Confidence" — p.conf rows now byline the house slot (pollster), never the product-line client; probe conf-byline.mjs (18 checks) pins all four lanes + a 2PP regression guard.
+description: auspol-tracker — the All-polls CONFIDENCE facet (?f=c, 7th facet; row set shipped 4328ee3, lane-constant sample column 4b15150, PER-RELEASE Sample + Fieldwork columns 5adfeb5, all 2026-10-07; user's brief "the home of the data used in the economic mood chart") end-to-end: gen-data.mjs confidenceOnlyPolls emitter + CONF_LANES lane tuples (~:2438, reads the SAME data/mood.json as the Snapshot mood panel — releases not polls, so like issuesOnlyPolls/directionOnlyPolls the facet REPLACES the row set with empty p:{}/appr:{} stubs and threads the "release/releases" noun through pinbar, count, CSV aria, empty state, sheet and chevron labels; no scope pill, no poll counts), the shared 40–120 meter with neutral-100 emphasised (NAB prints its true net balance, drawn +100), printed change + NAB conditions riding the change cell, sortable Figure/Change, month rows "N releases", and the Sample + Fieldwork columns' PER-RELEASE provenance law (data half committed 3fc015f + f9c2b9b): a row's figure is the release's OWN printed number (mood.json row.n, read off its release by .build/mood.mjs — ANZ 1,019 / RM Business 1,094 / NAB ~507 land per release), the tuple slot-5 constant stands in ONLY where a house prints one (Westpac–MI's 1200 adults), else an honest em-dash; field = fwLabel(row.fwStart–row.fwEnd), business rows print their survey MONTH (row.fwm → "Apr '25"), and year + conditional fmid keys ride every row (a missing year prints "'de" — renderer contract). Also the where-things-stand head/dek law (fixed 2026-10-07): the rebuild's RdHed renders on EVERY facet by design, but its window is computed from the facet's row set, so on this row-REPLACING facet it silently vanished — the window reads D.individualPolls here (probe conf-headline.mjs pins head/dek parity with the 2PP facet incl. ?f=c deep links). Also the paired "Economic mood" → "Economic sentiment" rename contract (visible copy moved, every identifier frozen). Also the opened-row byline fix (facac9e, 2026-10-07): the shared rdPollHead header sentence treated any non-self client as a PUBLISHER, so confidence rows printed "published by the Consumer Confidence" — p.conf rows now byline the house slot (pollster), never the product-line client; probe conf-byline.mjs (18 checks) pins all four lanes + a 2PP regression guard. Also the product-name SENTENCE-CASING (03186d5, 2026-10-11): CONF_LANES slot-3 now carries "Consumer confidence", "Consumer sentiment", "Business confidence" (one home feeding facet cell AND detail lab; regenerated index-family diffs are pure client/lab string hunks) while lane labels, cadence firm names, sheet CSV names and display titles deliberately stay title-cased; the conf-byline probe's LANES matchers re-cased and its page-goto fixed (unused APAGE const vs the index.htmlallpolls/ concat — had been failing at navigation, before any assertion).
 source: auto-skill
 extracted_at: '2026-10-07'
+updated_at: '2026-10-11'
 ---
 
 # All-polls Confidence facet — the economic-sentiment releases as table rows
@@ -45,6 +46,36 @@ The emitter comment documents the per-release provenance law and WHY
 Westpac's 1200 is the only non-null constant (verbatim boilerplate in
 every bulletin; the other houses print per-release or average figures) —
 keep it current if a house ever standardises its print.
+
+## Product-name casing (sentence case since 03186d5, 2026-10-11)
+
+User call 2026-10-11: the one home of the facet product name — CONF_LANES
+slot 3 — carries SENTENCE case ("Consumer confidence", "Consumer
+sentiment", "Business confidence" ×2), not title case. Slot 3 threads
+into BOTH the facet row's `client` (the pollster-cell `.rd-ap-sub` line,
+rd-allpolls.jsx ~:2704 `<b>{rdPollNameLink}</b>` + sub) and the
+release's detail `lab`, so the single tuple edit moved both surfaces;
+the regenerated index.html family's diffs are purely `"client":`/`"lab":`
+string hunks (grep the diff for `rdEffTbc`-style foreign symbols to
+prove no sibling leakage — see auspol-clean-artifact-commit).
+
+Deliberately NOT moved (display-cased titles the user did not ask
+about): the confidence.mjs SERIES lane labels (→ `D.confidence` lane
+labels on the mood panel), CONF_TRACKS cadence firm names, CONF_SHEET
+CSV names, and title-cased mentions in detail/copy text. Post-edit grep
+audits must partition `"client"/"lab"` hits from these homes before
+flagging leftovers (9 title-case hits remained by design).
+
+conf-byline probe notes from the same commit: a PRODUCT-string change
+there is a probe-drift fix too (LANES matchers grep row text for
+"Business confidence" — auspol-probe-drift-repair), and its page-goto
+hid a latent navigation bug: `page.goto(PAGE + "allpolls/")` produced
+`file:///…/index.htmlallpolls/` — `net::ERR_FILE_NOT_FOUND` at
+navigation, BEFORE any assertion could run — while the correct `APAGE`
+const (…`allpolls/index.html`) sat computed and UNUSED beside it. Fixed
+to `page.goto(APAGE + "?f=c")`. Probe-author lesson: a probe that fails
+at goto had never verified the facet since its page moved; a long
+string of "skipped because quiet" runs can mask a broken navigation.
 
 ## Render contract (both classic + redesign, kept NICE-parity)
 

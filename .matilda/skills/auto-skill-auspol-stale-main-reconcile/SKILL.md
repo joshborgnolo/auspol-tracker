@@ -1,6 +1,6 @@
 ---
 name: auspol-stale-main-reconcile
-description: auspol-tracker — multi-session repo hygiene, read side. Before re-fixing a reported bug, check whether a sibling session already shipped it to origin/main while your local main lagged behind with DUPLICATE commits of the same patches (git cherry proves patch-equivalence; rebase drops the dupes automatically). Safe reconcile recipe: snapshot porcelain → stash tracked-only (NEVER -u) → rebase → pop → comm-verify nothing vanished. Plus the forensic ladder for "files vanished from git status mid-session" (sibling relocated WIP to a worktree branch; dropped-stash objects are resurrectable by hash). Worked end-to-end 2026-10-05 (flow-drift hover fix 74ce1fa found on origin while local main sat on duplicate 55f209c; vic WIP vanished mid-session, found as vicwt-branch commit 1293361).
+description: auspol-tracker — multi-session repo hygiene, read side. Before re-fixing a reported bug, check whether a sibling session already shipped it to origin/main while your local main lagged behind with DUPLICATE commits of the same patches (git cherry proves patch-equivalence; rebase drops the dupes automatically). Safe reconcile recipe: snapshot porcelain → stash tracked-only (NEVER -u) → rebase → pop → comm-verify nothing vanished. Plus the forensic ladder for "files vanished from git status mid-session" (sibling relocated WIP to a worktree branch; dropped-stash objects are resurrectable by hash), and the resume-after-compaction SWEEP case: a pending staged edit of YOURS can already sit inside a sibling's pushed commit (their add-all/commit swallowed it — prove with git show HEAD:<file> | grep <unique text>, don't re-apply, commit only what remains). Worked 2026-10-05 (74ce1fa/55f209c dupes; vic WIP as vicwt-branch 1293361) and 2026-10-10 (MATILDA.md clock paragraph swept into 236b8a5, remainder committed dfcc9cc).
 source: auto-skill
 extracted_at: '2026-10-05T09:11:28.871Z'
 ---
@@ -39,6 +39,28 @@ as "fix not in the built page". Grep for the bare selector/class token
 (e.g. `grep -c 'rd-fl-line'`) and read context windows with
 `grep -o '.\{0,100\}TOKEN.\{0,120\}'`. (Built-page/escaping verification
 generally: see auspol-built-html-verification.)
+
+## Compaction-summary git claims are HYPOTHESES — prove every sha against git before reconciling
+
+A context-compaction summary can assert sibling git activity with full
+confidence and be WRONG — the 2026-10-09 Other-cuts ship half claimed
+"a sibling session committed ea0c167 containing the generalisation mid-
+flight", with a next-step plan to reconcile my staged work against it.
+Every piece of evidence refuted it: `git log --oneline` showed HEAD still
+at the pre-work commit (`bbc7153`), origin/main the same, and `git
+cat-file -t ea0c167` the object did not exist at all. The staged
+six-file set was the ONLY copy of the work — changing course would have
+meant abandoning it to chase a phantom (the numbered reconstructions of
+"where a sibling commit lives" in this skill all assume the object
+exists); the right move was commit + push it yourself (7001f17).
+
+Rule: ANY git-state assertion in a compaction summary — "sibling
+committed X", "staged", "pushed", "stash Y holds Z" — is a hypothesis
+reconstructed from partial logs, not a fact. Prove it against git BEFORE
+acting: `git log --oneline -5`, `git cat-file -t <named sha>`,
+`git status --porcelain`, `git stash list`. If the named object doesn't
+exist, discard the reconciliation plan the summary built around it and
+re-derive the next step from ACTUAL git state.
 
 ## Divergence classification: duplicates vs unique commits
 

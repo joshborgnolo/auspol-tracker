@@ -1,6 +1,6 @@
 ---
 name: auspol-wave-adjudication
-description: auspol-tracker — the CI-only LLM wave-adjudication chain (shipped 2026-10-03; user call "make an api llm agent for Dedupe/waveDedupe/wave adjudication at the boundary"). Extractor --adjudicate emits CASES for the judgement calls heuristics punted (RM double-release vs new wave, RM figure-diverging reissue, PB in-grace pending, PB near-canonical mismatch); .build/adjudicate.mjs asks the pinned matilda CLI once; the extractor re-runs --decisions to file/route. Covers the contract-module pattern, the ledger's distinct_wave `against:` prune-persistence find, heal_absent's exact allowlist, the wrapper re-run matrix, and both extractors' test seams (cwd-swap / env overrides / PATH-stubbed CLI).
+description: auspol-tracker — the CI-only LLM wave-adjudication chain (shipped 2026-10-03; hardened 2026-10-10 by commit 236b8a5 before its first production fire). Extractor --adjudicate emits CASES for the judgement calls heuristics punted (RM double-release vs new wave, RM figure-diverging reissue, PB in-grace pending, PB near-canonical mismatch); .build/adjudicate.mjs asks the pinned matilda CLI once with NO tool surface (--exclude-tools shell,write,edit — the job holds a contents:write credential); the extractor re-runs --decisions to file/route. Covers the contract-module pattern incl. the wired caseJson 6 KB emission cap, the ledger's distinct_wave `against:` prune-persistence find, heal_absent's exact allowlist, the wrapper re-run matrix, both extractors' test seams (cwd-swap / env overrides / PATH-stubbed CLI with argv capture), and the 2026-10-10 audit's reusable LLM-in-CI review recipe.
 source: auto-skill
 extracted_at: '2026-10-03T00:00:00.000Z'
 ---
@@ -37,17 +37,27 @@ tpp_flows + undecided + published + sample**.
 
 ## The contract module — the pattern to keep
 
-`.build/adjudicate-cases.mjs` is the ONE module all three sides import: extractor (emits cases,
-applies verdicts), adjudicate.mjs (prompt build + verdict validation), and the test suite. It
-owns the case shapes, the action enums, the vote constants and the validators, so the contract
-cannot drift between sides:
+`.build/adjudicate-cases.mjs` owns the case shapes, the action enums, the vote constants and
+the validators so the contract cannot drift between sides. As of the 236b8a5 hardening the extractors import
+the three constants plus `caseJson`; `validateCases` still runs solely inside adjudicate.mjs
+and the test, so an extractor's `--decisions` path trusts the file with no contract re-check
+(safe in-pipeline: the wrapper only ever hands back adjudicate.mjs's own validated output,
+and the extractors' membership checks degrade a malformed verdict to deterministic — this
+trust asymmetry is now explicitly documented in MATILDA.md's WAVE ADJUDICATION paragraph):
 
 - Constants: `RM_DOUBLE_DAYS = 4`, `RM_REISSUE_PT = 0.5`, `PB_MISMATCH_PT = 1.0`.
 - `validateCases(house, cases, decisions)` — case ids are `<kind>:<discriminator>`; decisions
   must reference known cases, one each, with an action in that kind's RULES table (and the
   field the action `needs` — `file_only`/`never_file` on an RM double need a `slug`).
-- `caseJson(c, 6000)` — evidence bundles that serialise too big return null and the extractor
-  keeps the case deterministic for that run (never hand the model a bloated case).
+- `caseJson(c, maxBytes = 6000)` — the evidence-size guard, WIRED by the 236b8a5 hardening:
+  every emission site in both extractors builds the case object, calls `caseJson(case_)`, and
+  only on a non-null serialisation persists the anti-spam `asked` mark + emits the case (RM
+  also holds). On a null (oversized/unserialisable) the site writes a run note saying it is
+  "staying deterministic this run" (the plain deterministic path proceeds — a case too big to
+  judge must not freeze a wave forever: no `asked` mark, so a cleaner run can try again).
+  A JSON.stringify throw also returns null (cyclic guards). The test pins three behaviours:
+  a small case serialises, a 6000+char case refuses, an 8000 custom cap accepts. If you add
+  an emission site, route it through `caseJson` the same way and extend the run-note.
 - Cases and decisions carry EVIDENCE and routing labels only, NEVER poll figures — figures are
   POISON_KEYS in adjudicate.mjs and any key like `alp` in the model's output voids the batch
   (`applied:false`, run stays green). The point: the LLM routes, it can never smuggle a number
@@ -89,9 +99,21 @@ while an unrelated `file_now` row survives. If you ever touch the pb prune loop,
 ## adjudicate.mjs internals
 
 - CLI probe: single `which matilda` spawn, falling back to
-  `npm i -g @maincode-ai/matilda-code@0.21.4` (pinned version). Flags verified against
-  agent-repair.yml's invocation: `matilda -p "$(cat prompt.md)" --yolo --output-format text`
-  here with a tighter budget `--max-wall-time 4m --max-tool-calls 12` and ≤5 cases per call.
+  `npm i -g @maincode-ai/matilda-code@0.21.4` (pinned version). Invocation as of the 236b8a5
+  hardening: `matilda -p "$(cat prompt.md)" --output-format text --exclude-tools
+  shell,write,edit --max-wall-time 4m --max-tool-calls 12`, ≤5 cases per call — NO `--yolo`.
+  `--yolo` auto-approves every tool including shell at host privilege with no sandbox, and
+  this runs in poll-agent.yml's `update` job, which holds `contents: write` AND a
+  checkout-persisted git credential in .git/config (checkout v5; the workflow comment already
+  knows v6 moves it out) — a yolo'd tool call could `git push` to main. The judge's task
+  needs zero tools (the test's stub CLI has none), so the bounded read-only recipe from the
+  CLI's own headless doc is exact-fit. Keep the 6-line header comment in adjudicate.mjs in
+  step if the flags change; agent-repair's standard (read-only token, no git credentials)
+  remains the aspiration if this ever graduates to its own job.
+- argv pinning: the test's stub CLI appends its argv to the file in `ADJ_STUB_ARGV`; the
+  good-verdict block asserts the real spawn never carries `--yolo`, that the excluded set is
+  exactly the sorted triplet edit/shell/write, and that both budgets are present. Extend
+  those assertions if you add flags.
 - Per-house prompt files: `.build/roymorgan-adjudicate-prompt.md`,
   `.build/pollbludger-adjudicate-prompt.md`.
 - ALWAYS exit 0; the verdict file is `{house, generated, cases, decisions}` with reasons capped
@@ -137,3 +159,38 @@ prune-loop touch; `bash -n` both wrappers; key-less live dry-runs of both extrac
 byte-quiet (`changed:false`, empty ambiguous/held/added). Full npm test exit 0 before
 committing. MATILDA.md's Poll Bludger bullet is followed by the WAVE ADJUDICATION paragraph —
 keep it in step if the chain changes.
+
+## Audit 2026-10-10 — findings, all FIXED same day pre-first-use (commit 236b8a5)
+
+Read-only review of contract module, judge, both extractors' adjudication paths, both
+wrappers, poll-agent.yml and the CLI's own docs; test-adjudicate.mjs green. The chain had
+NEVER fired in production (no `<house>-src/adjudicated.json` ledger exists), so all four
+findings were fixed pre-first-use — the fixes are described in the sections above; the
+original findings remain here as the review trail:
+
+1. **`--yolo` inside a contents:write job was the chain's weak point** (ENABLED the model
+   to `git push` to main: poll-agent.yml `update` job has `contents: write`, checkout v5
+   persists the token in .git/config, and `GIT_TERMINAL_PROMPT: "0"` only hides prompts).
+   FIXED: the spawn now excludes shell/write/edit (see adjudicate.mjs internals above); the
+   task provably needs zero tools (the test's stub has none), so full approval was needless.
+   Note the injection surface stays small because evidence bundles are structured-only —
+   both extractors emit slugs/dates/figures, never pollster prose.
+2. **`caseJson` was dead code** — zero call sites. FIXED: wired at every emission site
+   (contract-module bullet above).
+3. **"ONE module all three sides import" was untrue** — extractors imported only constants.
+   FIXED: they now import `caseJson` too, and MATILDA.md documents that adjudicate.mjs owns
+   verdict validation — an extractor trusts `--decisions` only because validated verdicts are
+   the only kind ever handed to it.
+4. **`hoursInWindow: null`** — dead placeholder in the pb mismatch case emission (the sibling
+   pending case carries a live `hoursSeen`). FIXED: the field was dropped from the mismatch
+   emission (populate-only-if-meaningful won).
+
+### LLM-in-CI review recipe (reusable to the healer / first-contact / LLM readers)
+
+(a) grep every exported guard of a "contract module" for call sites — documented defences
+are sometimes dead code; (b) trace the spawned CLI's env plus the workflow job's
+`permissions:` AND checkout major version — the exploitable unit is (LLM with tools) ×
+(reachable credential); (c) diff the prompt's evidence against what the extractor actually
+emits — structured data vs attacker-influenced prose sets the injection surface; (d) run the
+pinned test — its stubbed CLI tells you whether the task needs tools at all (if the stub has
+none, neither should the real call).
