@@ -7734,7 +7734,7 @@ function infoTerms(D) {
       <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, mostly
       by automated checks but also manually by me (some guy). Every figure is rebuilt when a new
       poll lands.</p>
-      <p className="info-about-p"><b>Following along.</b> The <a className="fb-link" href="feed.xml">RSS feed</a> lists
+      <p className="info-about-p"><b>Following along.</b> The <a className="fb-link" href="/feed.xml">RSS feed</a> lists
       each new poll as it is added, with a link to the pollster’s own release.</p>
       {!window.JUR && D.changelog && D.changelog.length ? (<>
       <p className="info-about-p"><b>Change log.</b> What has moved the site’s two-party
