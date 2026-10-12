@@ -257,4 +257,107 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   assert.deepEqual(appended.map((e) => e.kind), ["meta", "poll", "finding"]);
 }
 
-console.log("test-changelog.mjs: OK (states, seed, poll/flows/finding/meta entries, idempotence)");
+/* ---- the widened log (2026-10-12): primaries, leader ratings, direction,
+   house effects, every measure's month-on-month significance, and the issues'
+   best-party verdicts. W() is S() plus the new fields. */
+const PRIM0 = { alp: 27.5, lnp: 21.6, grn: 13.4, onp: 26.1, oth: 11.4 };
+const LEAD0 = { alb_net: -21.6, taylor_net: -6.9, hanson_fav: -5.6 };
+const DIR0 = { right: 27.1, wrong: 62.2, net: -35.1 };
+const LEAN0 = { key: "alp_on|imp", v: { "Roy Morgan": 0.7, Newspoll: -0.4, Resolve: 0.4 } };
+const W = (over = {}) => S({
+  prim: PRIM0, leaders: LEAD0, dir: DIR0, lean: LEAN0, sig: {}, sigMeta: {},
+  issLead: { economy: "lnp", housing: "" }, issLabel: { economy: "Economic management", housing: "Housing" },
+  ...over,
+});
+const RM = "2026-10-11|Roy Morgan";
+const RM_INFO = { [RM]: { name: "Roy Morgan", fw: "28 Sep–11 Oct", sample: 2655, url: null } };
+
+/* the old state has none of the new fields: they default to null */
+{
+  const st = S();
+  for (const k of ["prim", "leaders", "lean", "dir", "issLead", "sig"]) assert.equal(st[k], null, `${k} absent → null`);
+}
+
+/* migration: the first widened refresh says so once, with where everything
+   stands – no move or finding is logged against the missing old figures */
+{
+  const next = W({ sig: { "prim|onp": 1, "lead|alb_net": -1 }, sigMeta: { "prim|onp": "One Nation's primary vote", "lead|alb_net": "Albanese's net approval" } });
+  const { appended } = diff(S(), next);
+  assert.deepEqual(appended.map((e) => e.kind), ["seed"]);
+  const t = appended[0].text;
+  assert.match(t, /^From today the log also records the primary votes/);
+  assert.match(t, /Primary votes now: Labor 27\.5, the Coalition 21\.6, One Nation 26\.1, the Greens 13\.4, others 11\.4\./);
+  assert.match(t, /Leader ratings now: Albanese's net approval −21\.6, Taylor's net approval −6\.9, Hanson's net favourability −5\.6\./);
+  assert.match(t, /National direction now: right track 27\.1, wrong track 62\.2 \(net −35\.1\)\./);
+  assert.match(t, /Leading significantly as the best party now: the Coalition on economic management\./);
+  assert.match(t, /Moving significantly now: One Nation's primary vote \(up\); Albanese's net approval \(down\)\.$/, "primaries listed first");
+  /* and with a poll the same day, the poll entry carries no a → b figures */
+  const both = diff(S(), W({ polls: [...S().polls, RM] }), RM_INFO).appended;
+  assert.deepEqual(both.map((e) => e.kind), ["seed", "poll"]);
+  assert.doesNotMatch(both[1].text, /Primary votes|→/);
+  assert.match(both[1].text, /^Roy Morgan .* added — the two-party preferred estimate held at 52\.3 \(Labor v One Nation, implied flows\)\. House effect \(Labor v One Nation, implied flows; positive leans Labor\): Roy Morgan \+0\.7\.$/, "a lean with nothing before it reads as a level");
+}
+
+/* quiet run on the widened state: nothing */
+assert.equal(diff(W(), W()).appended.length, 0);
+
+/* a poll entry quotes what moved since the last entry, as the site prints it */
+{
+  const prev = W({ polls: S().polls });
+  const next = W({
+    polls: [...S().polls, RM],
+    prim: { ...PRIM0, alp: 27.3, onp: 26.4 },
+    leaders: { ...LEAD0, alb_net: -20.0 },
+    dir: { right: 28.0, wrong: 62.2, net: -34.2 },
+    lean: { ...LEAN0, v: { ...LEAN0.v, "Roy Morgan": 0.8, Newspoll: -0.2 } },
+  });
+  const { appended } = diff(prev, next, RM_INFO);
+  assert.equal(appended.length, 1);
+  assert.equal(appended[0].text,
+    "Roy Morgan (fieldwork 28 Sep–11 Oct, n=2,655) added — the two-party preferred estimate held at 52.3 (Labor v One Nation, implied flows)." +
+    " Primary votes: Labor 27.5 → 27.3, One Nation 26.1 → 26.4." +
+    " Leader ratings: Albanese's net approval −21.6 → −20.0." +
+    " National direction: right track 27.1 → 28.0, wrong track held at 62.2 (net −35.1 → −34.2)." +
+    " House effect (Labor v One Nation, implied flows; positive leans Labor): Roy Morgan +0.7 → +0.8.");
+}
+
+/* nothing moved: primaries say so, the rest stay silent; a house new to the
+   table shows its first lean; a different pairing/basis is not a move */
+{
+  const k = "2026-10-12|Wolf & Smith";
+  const next = W({ polls: [...S().polls, k], lean: { ...LEAN0, v: { ...LEAN0.v, "Wolf & Smith": 0.6 } } });
+  const t = diff(W(), next, { [k]: { name: "Wolf & Smith", fw: null, sample: null, url: null } }).appended[0].text;
+  assert.match(t, / Primary votes held\. House effect \(Labor v One Nation, implied flows; positive leans Labor\): Wolf & Smith \+0\.6\.$/);
+  const swapped = W({ polls: [...S().polls, RM], lean: { key: "alp_lnp|imp", v: { "Roy Morgan": 1.2 } } });
+  assert.match(diff(W(), swapped, RM_INFO).appended[0].text, /\(Labor v the Coalition, implied flows; positive leans Labor\): Roy Morgan \+1\.2\.$/, "no arrow across a basis switch");
+  const held = diff(W(), W({ polls: [...S().polls, RM] }), RM_INFO).appended[0].text;
+  assert.match(held, /Roy Morgan held at \+0\.7\.$/);
+  assert.doesNotMatch(held, /Leader ratings|National direction/, "unmoved leaders and direction stay out");
+}
+
+/* month-on-month significance on any measure: begins, ends, flips */
+{
+  const meta = { "prim|onp": "One Nation's primary vote", "dir|net": "the right-track-minus-wrong-track net" };
+  const on = diff(W(), W({ sig: { "prim|onp": 1, "dir|net": -1 }, sigMeta: meta })).appended;
+  assert.deepEqual(on.map((e) => e.text), [
+    "The rise in One Nation's primary vote over the past month is now statistically significant.",
+    "The fall in the right-track-minus-wrong-track net over the past month is now statistically significant.",
+  ]);
+  assert.ok(on.every((e) => e.kind === "finding"));
+  const off = diff(W({ sig: { "prim|onp": 1 }, sigMeta: meta }), W()).appended;
+  assert.deepEqual(off.map((e) => e.text), ["The month-on-month rise in One Nation's primary vote is no longer statistically significant."], "the label survives from the old state");
+  const flip = diff(W({ sig: { "prim|onp": 1 }, sigMeta: meta }), W({ sig: { "prim|onp": -1 }, sigMeta: meta })).appended;
+  assert.deepEqual(flip.map((e) => e.text.slice(0, 30)), ["The month-on-month rise in One", "The fall in One Nation's prima"]);
+}
+
+/* the issues' best-party verdict: gained, changed hands, lapsed; an issue
+   new to the panel says nothing */
+{
+  const iss = (economy, housing, extra = {}) => W({ issLead: { economy, housing, ...extra }, issLabel: { economy: "Economic management", housing: "Housing", crime: "Crime" } });
+  assert.deepEqual(diff(iss("lnp", ""), iss("lnp", "alp")).appended.map((e) => e.text), ["Labor now leads significantly as the best party on housing."]);
+  assert.deepEqual(diff(iss("lnp", ""), iss("onp", "")).appended.map((e) => e.text), ["One Nation now leads significantly as the best party on economic management, taking over from the Coalition."]);
+  assert.deepEqual(diff(iss("lnp", ""), iss("", "")).appended.map((e) => e.text), ["No party leads significantly as the best party on economic management any more (the Coalition did)."]);
+  assert.equal(diff(iss("lnp", ""), iss("lnp", "", { crime: "onp" })).appended.length, 0);
+}
+
+console.log("test-changelog.mjs: OK (states, seed, poll/flows/finding/meta entries, idempotence, the widened figures and findings)");

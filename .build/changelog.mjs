@@ -7,7 +7,12 @@
      - flows     — the flows.mjs preference-flow assumptions changed
      - finding   — a statistical finding appeared or fell away (the Who
                    votes for whom proportionality breaks; the 2PP's own
-                   month-on-month significance)
+                   month-on-month significance; since 2026-10-12 the same
+                   month-on-month test on every measure that carries one –
+                   the primaries, the leaders' ratings, preferred PM,
+                   national direction, the issues, One Nation's sources)
+   A poll entry also quotes, a → b since the last entry, the primary votes
+   and leader ratings that moved and the polling houses' house effects.
      - meta      — the headline pairing or basis switched
      - seed      — the day recording began
    Pure functions, no fs: gen-data hands in the parsed committed file and
@@ -68,7 +73,33 @@ export function stateOf(raw) {
     polls: [...(raw.polls || [])].sort(),
     moves: Object.fromEntries(Object.entries(raw.moves || {}).sort(([a], [b]) => (a < b ? -1 : 1))),
     movesMeta: Object.fromEntries(Object.entries(raw.movesMeta || {}).sort(([a], [b]) => (a < b ? -1 : 1))),
+    /* Since 2026-10-12. Each is null when the raw state has none, and the
+       diff compares a field only when both sides carry it, so a state
+       written before these existed migrates with one "start" entry rather
+       than a burst of phantom moves.
+         prim    — the headline primaries {alp, lnp, grn, onp, oth}
+         leaders — the leader readouts {alb_net, taylor_fav, …}, as printed
+         lean    — {key: "pair|basis", v: {house: lean}} – the House effect
+                   column's figure on the headline's pairing and basis
+         dir     — national direction {right, wrong, net}, as printed
+         issLead — {issue: party} – who leads significantly as the best
+                   party on each issue ("" where no one does: the Who's
+                   trusted verdict), issLabel its name
+         sig     — {measure: ±1} for each measure whose month-on-month move
+                   is significant (its sign the move's), sigMeta its label */
+    prim: raw.prim ? sortObj(raw.prim, r1) : null,
+    leaders: raw.leaders ? sortObj(raw.leaders, r1) : null,
+    lean: raw.lean ? { key: raw.lean.key, v: sortObj(raw.lean.v, r1) } : null,
+    dir: raw.dir ? { right: r1(raw.dir.right), wrong: r1(raw.dir.wrong), net: r1(raw.dir.net) } : null,
+    issLead: raw.issLead ? sortObj(raw.issLead, (x) => x) : null,
+    issLabel: raw.issLead ? sortObj(raw.issLabel || {}, (x) => x) : null,
+    sig: raw.sig ? sortObj(raw.sig, (d) => (d > 0 ? 1 : -1)) : null,
+    sigMeta: raw.sig ? sortObj(raw.sigMeta || {}, (x) => x) : null,
   };
+}
+function sortObj(o, f) {
+  return Object.fromEntries(Object.entries(o).filter(([, v]) => v != null)
+    .sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, f(v)]));
 }
 
 /* `url` for a one-poll entry; `links` ([{name, url}], one per poll that has
@@ -133,12 +164,88 @@ const leadClause = (prev, next) => {
   return `the two-party preferred estimate ${t} (${pairName(next.pair)}, ${basisName(next.basis)})`;
 };
 
+/* The figures a poll entry quotes besides the 2PP (since 2026-10-12): every
+   primary and leader rating that moved since the last entry, and each
+   polling house's house effect. Null where nothing is there to say. */
+const PRIM_ORDER = ["alp", "lnp", "onp", "grn", "oth"];
+const PRIM_NAME = { alp: "Labor", lnp: "the Coalition", onp: "One Nation", grn: "the Greens", oth: "others" };
+const LEADER_ORDER = ["alb_net", "alb_fav", "taylor_net", "taylor_fav", "hanson_net", "hanson_fav"];
+export const leaderName = (k) => {
+  const [who, metric] = k.split("_");
+  return `${{ alb: "Albanese", taylor: "Taylor", hanson: "Hanson" }[who] || who}'s net ${metric === "fav" ? "favourability" : "approval"}`;
+};
+/* signed as the site prints a net or a lean: +3.0, −8.4, 0.0 */
+const sgn = (v, f = (x) => String(x)) => (v > 0 ? "+" : v < 0 ? "−" : "") + f(Math.abs(v));
+const primClause = (A, B) => {
+  if (!A || !B) return null;
+  const bits = PRIM_ORDER.filter((k) => A[k] != null && B[k] != null && f1(A[k]) !== f1(B[k]))
+    .map((k) => `${PRIM_NAME[k]} ${f1(A[k])} → ${f1(B[k])}`);
+  return bits.length ? `Primary votes: ${bits.join(", ")}.` : "Primary votes held.";
+};
+const leaderClause = (A, B) => {
+  if (!A || !B) return null;
+  const bits = LEADER_ORDER.filter((k) => A[k] != null && B[k] != null && f1(A[k]) !== f1(B[k]))
+    .map((k) => `${leaderName(k)} ${sgn(A[k], f1)} → ${sgn(B[k], f1)}`);
+  return bits.length ? `Leader ratings: ${bits.join(", ")}.` : null;
+};
+const dirClause = (A, B) => {
+  if (!A || !B || (f1(A.right) === f1(B.right) && f1(A.wrong) === f1(B.wrong))) return null;
+  const mv = (a, b) => (f1(a) === f1(b) ? `held at ${f1(b)}` : `${f1(a)} → ${f1(b)}`);
+  return `National direction: right track ${mv(A.right, B.right)}, wrong track ${mv(A.wrong, B.wrong)} (net ${sgn(A.net, f1)} → ${sgn(B.net, f1)}).`;
+};
+const leanClause = (A, B, houses) => {
+  if (!B || !houses.length) return null;
+  const same = A && A.key === B.key;
+  const s1 = (v) => sgn(v, f1);
+  const bits = [...new Set(houses)].filter((h) => B.v[h] != null).map((h) => {
+    const a = same ? A.v[h] : null, b = B.v[h];
+    if (a == null) return `${h} ${s1(b)}`;
+    return f1(a) === f1(b) ? `${h} held at ${s1(b)}` : `${h} ${s1(a)} → ${s1(b)}`;
+  });
+  if (!bits.length) return null;
+  const [pair, basis] = B.key.split("|");
+  return `House effect${bits.length > 1 ? "s" : ""} (${pairName(pair)}, ${basisName(basis)}; positive leans Labor): ${bits.join(", ")}.`;
+};
+
+const cap = (t) => t[0].toUpperCase() + t.slice(1);
+const issueName = (st, k, alt) => String((st.issLabel || {})[k] || ((alt && alt.issLabel) || {})[k] || k).toLowerCase();
+
+/* significance keys are "family|measure"; entries list the headline's
+   inputs first */
+const SIG_FAMILIES = ["prim", "lead", "ppm", "dir", "iss", "onsrc", "onrate"];
+const sigOrder = (a, b) => {
+  const fa = SIG_FAMILIES.indexOf(a.split("|")[0]), fb = SIG_FAMILIES.indexOf(b.split("|")[0]);
+  return fa !== fb ? (fa < 0 ? 99 : fa) - (fb < 0 ? 99 : fb) : (a < b ? -1 : a > b ? 1 : 0);
+};
+
 /* prevState / nextState as canonicalised by stateOf; committed entries are
    returned in `entries` with any new ones appended. pollInfo maps each new
    poll's "date|pollster" key to { name, fw, sample, url }. */
 export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {}, renames = {}) {
   const appended = [];
   const addedKeys = newPollKeys(prevState.polls, nextState.polls, renames);
+
+  /* the first refresh after the log widened (2026-10-12): say so once, with
+     where everything stands, rather than logging every figure as a move */
+  if (!prevState.prim && nextState.prim) {
+    const P = nextState.prim, L = nextState.leaders || {};
+    const prim = PRIM_ORDER.filter((k) => P[k] != null).map((k) => `${PRIM_NAME[k]} ${f1(P[k])}`).join(", ");
+    const lead = LEADER_ORDER.filter((k) => L[k] != null).map((k) => `${leaderName(k)} ${sgn(L[k], f1)}`).join(", ");
+    const sig = Object.keys(nextState.sig || {}).sort(sigOrder).map((k) =>
+      `${nextState.sigMeta[k] || k} (${nextState.sig[k] > 0 ? "up" : "down"})`);
+    const D = nextState.dir;
+    const dir = D ? ` National direction now: right track ${f1(D.right)}, wrong track ${f1(D.wrong)} (net ${sgn(D.net, f1)}).` : "";
+    const IL = nextState.issLead || {};
+    const leads = Object.keys(IL).filter((k) => IL[k]).map((k) => `${PRIM_NAME[IL[k]]} on ${issueName(nextState, k)}`);
+    const iss = nextState.issLead
+      ? (leads.length ? ` Leading significantly as the best party now: ${leads.join("; ")}.` : " No party leads significantly as the best party on any issue now.")
+      : "";
+    appended.push(entry(iso, "seed",
+      "From today the log also records the primary votes, the leaders' ratings, national direction and the house effect of each pollster that publishes, " +
+      "every measure whose month-on-month move becomes, or stops being, statistically significant, and changes in which party leads significantly as the best on each issue. " +
+      `Primary votes now: ${prim}.` + (lead ? ` Leader ratings now: ${lead}.` : "") + dir + iss +
+      (sig.length ? ` Moving significantly now: ${sig.join("; ")}.` : " No measure is moving significantly now.")));
+  }
 
   /* the headline pairing or its basis switched */
   if (prevState.lead && nextState.lead &&
@@ -201,9 +308,16 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     const flowsToo = appended.some((e) => e.kind === "flows");
     const clause0 = leadClause(prevState.lead, nextState.lead);
     const clause = clause0 && flowsToo ? `${clause0}, with the preference-flow update the same day` : clause0;
-    const text = ps.length === 1
+    const figs = [
+      primClause(prevState.prim, nextState.prim),
+      leaderClause(prevState.leaders, nextState.leaders),
+      dirClause(prevState.dir, nextState.dir),
+      leanClause(prevState.lean, nextState.lean, ps.map((p) => p.name)),
+    ].filter(Boolean);
+    const text = (ps.length === 1
       ? `${descr(ps[0])} added` + (clause ? ` — ${clause}.` : ".")
-      : `${ps.length} polls added — ${ps.map(descr).join("; ")}` + (clause ? ` — ${clause}.` : ".");
+      : `${ps.length} polls added — ${ps.map(descr).join("; ")}` + (clause ? ` — ${clause}.` : ".")) +
+      figs.map((t) => ` ${t}`).join("");
     if (ps.length === 1) appended.push(entry(iso, "poll", text, ps[0].url || null));
     else appended.push(entry(iso, "poll", text, null, ps.filter((p) => p.url).map((p) => ({ name: p.name, url: p.url }))));
   }
@@ -213,6 +327,38 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     appended.push(entry(iso, "finding", nextState.momSig
       ? "The two-party preferred's move over the past month is now statistically significant (implied basis)."
       : "The two-party preferred's month-on-month move is no longer statistically significant (implied basis)."));
+  }
+
+  /* every other measure's month-on-month significance (since 2026-10-12):
+     a flip of direction ends one finding and starts another, as the Who
+     votes for whom breaks do below */
+  if (prevState.sig && nextState.sig) {
+    const A = prevState.sig, B = nextState.sig;
+    const labelOf = (k) => nextState.sigMeta[k] || (prevState.sigMeta || {})[k] || k;
+    const ended = (k) => entry(iso, "finding",
+      `The month-on-month ${A[k] > 0 ? "rise" : "fall"} in ${labelOf(k)} is no longer statistically significant.`);
+    const began = (k) => entry(iso, "finding",
+      `The ${B[k] > 0 ? "rise" : "fall"} in ${labelOf(k)} over the past month is now statistically significant.`);
+    const keys = [...new Set([...Object.keys(A), ...Object.keys(B)])].sort(sigOrder);
+    for (const k of keys) {
+      if (A[k] === B[k]) continue;
+      if (A[k] != null) appended.push(ended(k));
+      if (B[k] != null) appended.push(began(k));
+    }
+  }
+
+  /* who leads significantly as the best party on each issue (the Who's
+     trusted verdict) changed hands, appeared or lapsed */
+  if (prevState.issLead && nextState.issLead) {
+    const A = prevState.issLead, B = nextState.issLead;
+    for (const k of Object.keys(B)) {
+      if (A[k] == null || A[k] === B[k]) continue;    // an issue new to the panel has no verdict to change
+      const issue = issueName(nextState, k, prevState);
+      const a = A[k] ? PRIM_NAME[A[k]] : null, b = B[k] ? PRIM_NAME[B[k]] : null;
+      appended.push(entry(iso, "finding", b
+        ? `${cap(b)} now leads significantly as the best party on ${issue}` + (a ? `, taking over from ${a}.` : ".")
+        : `No party leads significantly as the best party on ${issue} any more (${a} did).`));
+    }
   }
 
   /* Who votes for whom proportionality-break findings came or went */

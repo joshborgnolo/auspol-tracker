@@ -3858,6 +3858,19 @@ const primaryNowAt = (ref, skip = null) => {
   return { ...out, n, parties, plainTotal, adjTotal, rescaled };
 };
 const primaryNow = primaryNowAt(refNow);
+/* Each primary's month-on-month move, tested as the 2PP's is (synthChg,
+   §7b): the party's nowcast now against the same thirty days earlier, two
+   independent windows, the margin their root-sum-square. Unrescaled - the
+   five-party renormalisation above is a display check, not a reading. The
+   change log's findings read it (§8d); null on /vic/, whose lines are the
+   Kalman trend. */
+const primaryChg = KF ? null : Object.fromEntries(PRIMARY_KEYS.map((k) => {
+  const nw = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], refNow));
+  const pv = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], refNow - 30 * 86400000));
+  if (!nw || !pv) return [k, null];
+  const seChg = Math.sqrt(nw.se ** 2 + pv.se ** 2);
+  return [k, { chg: r1(nw.v - pv.v), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(nw.v - pv.v) > 1.96 * seChg }];
+}));
 
 /* ---- 7eb. each poll's footprint on the current primaries -----------------
    §3b's leave-one-out on the five-party nowcast, for the Primary tab's How it
@@ -6273,7 +6286,15 @@ for (const c of CYC_META) {
 
 /* ---- 8d. the change log ---------------------------------------------------
    The Info tab's change log: what moved the two-party preferred estimate,
-   and which statistical findings appeared or fell away. State is computed
+   and which statistical findings appeared or fell away. Since 2026-10-12
+   (user: the log "doesn't log changes in net favorability, subpopulation
+   primary vote, even primary vote, or pollster lean"; then "national
+   direction", "issues") each poll entry also quotes the primaries, leader
+   ratings and direction that moved and the polling houses' house effects,
+   and the findings cover every measure carrying a month-on-month test plus
+   the issues' best-party verdicts. Subgroup primaries stay out as figures –
+   hundreds of small-sample cells – their significance breaks are already
+   findings. State is computed
    every build, but appended to data/changelog.json ONLY on a real site
    refresh (AUSPOL_SITE_REFRESH=1 – refresh_site's federal builds), never on
    quiet refreshes: the state stays frozen at the last logged refresh, so an
@@ -6302,6 +6323,58 @@ const changelog = JUR ? null : (() => {
     };
   }
   const onNow = onImp ? onImp.a : (altLatest.alp_on ? altLatest.alp_on.a : null);
+  const leadPair = rivalLead === "alp_on" ? "alp_on" : "alp_lnp";
+  const leadBasis = rivalLead === "alp_on" ? (onImp ? "imp" : "pub") : (synthNow ? "imp" : "pub");
+  /* the House effect column's figure on the headline's pairing and basis
+     (the all-history snapshot the All polls table prints) */
+  const leanHe = { "alp_on|imp": synthOnEffect, "alp_on|pub": altAON.he, "alp_lnp|imp": synthEffect, "alp_lnp|pub": houseEffect }[`${leadPair}|${leadBasis}`];
+  const lean = leanHe && typeof leanHe.snapshot === "function"
+    ? { key: `${leadPair}|${leadBasis}`, v: Object.fromEntries(Object.entries(leanHe.snapshot(Infinity)).map(([h, o]) => [h, o.v])) }
+    : null;
+  /* every measure whose month-on-month move is significant, on the test
+     its own panel reads: family|measure → ±1, and the label an entry names */
+  const sig = {}, sigMeta = {};
+  const putSig = (key, label, r) => {
+    if (r && r.changeSig && r.chg) { sig[key] = r.chg > 0 ? 1 : -1; sigMeta[key] = label; }
+  };
+  const PRIM_LAB = { alp: "Labor's", lnp: "the Coalition's", grn: "the Greens'", onp: "One Nation's", oth: "others'" };
+  for (const k of PRIMARY_KEYS) putSig(`prim|${k}`, `${PRIM_LAB[k]} primary vote`, primaryChg && primaryChg[k]);
+  const LEADERS = { alb: "Albanese", taylor: "Taylor", hanson: "Hanson" };
+  const leaders = {};
+  for (const [id, who] of Object.entries(LEADERS)) {
+    for (const [metric, what] of [["net", "net approval"], ["fav", "net favourability"]]) {
+      const r = leaderNow[`${id}_${metric}`];
+      if (!r) continue;
+      leaders[`${id}_${metric}`] = r.v;
+      putSig(`lead|${id}_${metric}`, `${who}'s ${what}`, r);
+    }
+  }
+  putSig("ppm|alb_taylor", "Albanese's preferred-PM margin over Taylor", ppmMarginNow);
+  putSig("ppm|alb_hanson", "Albanese's preferred-PM margin over Hanson", ppmHMarginNow);
+  putSig("dir|net", "the right-track-minus-wrong-track net", directionNow);
+  for (const it of (issues && issues.list) || []) {
+    const lab = String(it.label || it.id).toLowerCase();
+    putSig(`iss|${it.id}|imp`, `the share naming ${lab} a top-three issue`, it.imp);
+    if (it.own) {
+      for (const q of OWN3) {
+        putSig(`iss|${it.id}|${q}`, `${PRIM_LAB[q]} share as the best party on ${lab}`,
+          { chg: it.own.chg[q], changeSig: it.own.chgSig[q] });
+      }
+    }
+  }
+  /* the Who's trusted verdict per issue: the party that leads significantly
+     as the best party, or "" where none does */
+  const issLead = {}, issLabel = {};
+  for (const it of (issues && issues.list) || []) {
+    if (!it.own) continue;
+    issLead[it.id] = it.own.leadSig ? it.own.lead : "";
+    issLabel[it.id] = it.label || it.id;
+  }
+  for (const g of (onSources && onSources.series) || []) {
+    const grp = g.label.replace(/ voters$/, "").replace(/^Other$/, "other");
+    putSig(`onsrc|${g.id}`, `the share of One Nation's gains drawn from 2025 ${grp} voters`, g.now);
+    putSig(`onrate|${g.id}`, `the share of 2025 ${grp} voters now backing One Nation`, g.rate && g.rate.now);
+  }
   const nextState = stateOf({
     lead: rivalLead === "alp_on"
       ? { pair: "alp_on", basis: onImp ? "imp" : "pub", alp: onNow }
@@ -6313,6 +6386,10 @@ const changelog = JUR ? null : (() => {
     flows: flowsOf(FLOW, FP_ON, FP_ON_BAND),
     polls: Object.keys(pollInfo),
     moves, movesMeta,
+    prim: primaryNow ? Object.fromEntries(PRIMARY_KEYS.map((k) => [k, primaryNow[k]])) : null,
+    leaders, lean, sig, sigMeta,
+    dir: directionNow ? { right: directionNow.right, wrong: directionNow.wrong, net: directionNow.net } : null,
+    issLead, issLabel,
   });
   if (process.env.AUSPOL_SITE_REFRESH) {
     const iso = new Date().toLocaleDateString("sv-SE", { timeZone: "Australia/Sydney" });
