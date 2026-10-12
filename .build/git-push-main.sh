@@ -291,9 +291,13 @@ freshness_sync() {
 # itself on every federal refresh (2026-10-12): gen-data writes it under
 # AUSPOL_SITE_REFRESH, which only the two federal builds below set, so every
 # data commit has to carry it or the tree stays dirty for the next slot.
+# changelog/index.html joined the same day, when the change log became a
+# page of its own: the build's 5c block writes it on every federal pass (a
+# quiet refresh writes the same bytes).
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   vic/allpolls/index.html vic/info/index.html
+  changelog/index.html
   data/changelog.json
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
   assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)

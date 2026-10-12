@@ -43,8 +43,9 @@
      markers by applyShell: here (node .build/site-shell.mjs) for the
      hand-maintained pages, and by each generator that writes a satellite
      (refresh-prediction, refresh-morgan-archive, refresh-galaxy-archive,
-     refresh-trove-archive) for its own. build.mjs checks every page against
-     it and warns on drift – rerun this script and commit the pages.
+     refresh-trove-archive, newtracker/build.mjs for changelog/) for its own.
+     build.mjs checks every page against it and warns on drift – rerun this
+     script and commit the pages.
 
    The theme follows the reader's choice on the main page: the main page
    keeps its tweaks in localStorage "auspol.tweaks" (same origin), and the
@@ -81,6 +82,7 @@ export const ROOT = path.resolve(HERE, "..");
 export const SHELL_PAGES = [
   { file: "preference-flows/index.html" },
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
+  { file: "changelog/index.html" },                         // written by .build/newtracker/build.mjs (federal pass)
   { file: "atlas/index.html" },
   { file: "feedback/index.html", page: "feedback" },
   { file: "archives/newspoll/index.html", page: "archives" },

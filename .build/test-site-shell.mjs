@@ -162,4 +162,31 @@ assert.throws(() => parseChrome(noTag, scoreSrc, chrome.tabs), /tagline/, "a ref
 const noLede = headSrc.replace('className="colo-lede"', 'className="colo-gone"');
 assert.throws(() => parseChrome(noLede, scoreSrc, chrome.tabs), /colophon lede/, "a moved colophon anchor throws");
 
-console.log(`PASS: site shell – ${SHELL_PAGES.length} satellites current, idempotent, theme scoping, the unlisted pages unlisted, the chrome contract lifted`);
+// ---- changelog/index.html: the change log as a page of its own -------------------------
+const hesc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const clEntries = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || [];
+const clPage = fs.readFileSync(path.join(ROOT, "changelog", "index.html"), "utf8");
+assert.ok(clPage.includes("<title>Change log &#8211; auspol tracker</title>"), "changelog page: the title");
+assert.ok(/<link rel="canonical" href="https:\/\/auspoltracker\.com\/changelog\/">/.test(clPage), "changelog page: the canonical");
+assert.ok(clPage.includes("<h1>What moved the estimate, and when</h1>"), "changelog page: the h1");
+const clTimes = [...clPage.matchAll(/<time class="cl-date" datetime="([^"]+)">([^<]+)<\/time>/g)];
+assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.label)]),
+  "changelog page lists every entry of data/changelog.json, newest first");
+for (const e of clEntries) assert.ok(clPage.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
+// a refresh commit carries it (2026-10-12: joined SITE_FILES with data/changelog.json)
+const siteFiles = (fs.readFileSync(path.join(ROOT, ".build", "git-push-main.sh"), "utf8").match(/SITE_FILES=\(([\s\S]*?)\)/) || [])[1] || "";
+assert.ok(/(^|\s)changelog\/index\.html(\s|$)/.test(siteFiles), "SITE_FILES commits changelog/index.html");
+assert.ok(/<loc>https:\/\/auspoltracker\.com\/changelog\/<\/loc>/.test(fs.readFileSync(path.join(ROOT, "sitemap.xml"), "utf8")),
+  "the sitemap lists /changelog/");
+
+// ---- the feed link is absolute everywhere (the relative href="feed.xml" 404'd from /info/) --
+assert.ok(clPage.includes('href="/feed.xml"'), "the changelog page points at the feed");
+const rootDocs = ["index.html", "cycles/index.html", "allpolls/index.html", "info/index.html",
+  "vic/index.html", "vic/allpolls/index.html", "vic/info/index.html"];
+for (const f of rootDocs) {
+  const doc = fs.readFileSync(path.join(ROOT, f), "utf8");
+  assert.ok(!/href[:=]\s*"feed\.xml"/.test(doc), `${f}: no relative feed.xml link`);
+  assert.ok(doc.includes('href: "/feed.xml"'), `${f}: the app's Info copy links /feed.xml`);
+}
+
+console.log(`PASS: site shell – ${SHELL_PAGES.length} satellites current, idempotent, theme scoping, the unlisted pages unlisted, the chrome contract lifted, changelog page ${clEntries.length} entries, feed links absolute`);

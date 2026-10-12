@@ -7738,7 +7738,8 @@ function infoTerms(D) {
       each new poll as it is added, with a link to the pollster’s own release.</p>
       {!window.JUR && D.changelog && D.changelog.length ? (<>
       <p className="info-about-p"><b>Change log.</b> What has moved the site’s two-party
-      preferred estimate, and when each statistical finding appeared or fell away:</p>
+      preferred estimate, and when each statistical finding appeared or fell away — also
+      kept on <a className="fb-link" href="/changelog/">the change log page</a>:</p>
       <ul className="info-changelog">
         {[...D.changelog].reverse().map((e, i) => (
           <li key={i}><span className="info-cl-date">{e.label}</span> {e.text}

@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
-import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
+import { shellCss, shellJs, shellDrift, mainChrome, applyShell, shellOptsFor } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -685,7 +685,152 @@ function ssChangelogBlock(esc) {
       <h2>Change log</h2>
       <p>What has moved the aggregate&#8217;s two-party preferred estimate, and when each statistical
         finding appeared or fell away &#8211; updated as new polls land. The latest ten entries;
-        the live page&#8217;s Info tab lists them all.</p>${rows}`;
+        <a class="fb-link" href="/changelog/">the change log page</a> lists them all.</p>${rows}`;
+}
+
+/* changelog/index.html – the change log as a page of its own, like the feed:
+   a generated artefact at a stable address, so the list can be linked,
+   crawled and followed outside the app document. The Info tab keeps listing
+   entries inline; this page lists every one of them, newest first, straight
+   from data/changelog.json (gen-data §8d) with the satellites' shared chrome
+   applied (site-shell.mjs applyShell, same as refresh-prediction writes
+   /prediction/). Written on every federal build – a quiet refresh writes the
+   same bytes, so the unattended slots see a clean tree; the Vic pass exits
+   long before here, so a Vic dataset never gets the page. */
+function changelogPage() {
+  let entries = [];
+  try { entries = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || []; } catch {}
+  const hesc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const rows = [...entries].reverse().map((e) => `
+    <li><time class="cl-date" datetime="${hesc(e.date)}">${hesc(e.label)}</time> ${hesc(e.text)}${e.url ? ` <a href="${hesc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</li>`).join("");
+  const metaDesc = "What has moved the auspol tracker aggregate's two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as polls land.";
+  /* the text faces, named by their content hashes this build (the FONTS
+     registration above has already swept and written assets/fonts/) */
+  const pageFont = (prefix) => {
+    const f = fs.readdirSync(FONT_DIR).find((x) => x.startsWith(prefix) && x.endsWith(".woff2"));
+    return f ? "/assets/fonts/" + f : null;
+  };
+  const faces = [["Crimson Text", "normal", "400", pageFont("crimsontext-400-latin.")],
+                 ["Crimson Text", "normal", "600", pageFont("crimsontext-600-latin.")],
+                 ["IBM Plex Sans", "normal", "300 700", pageFont("ibmplexsans-latin.")]]
+    .filter((f) => f[3])
+    .map(([family, style, weight, href]) => `@font-face {
+  font-family: '${family}';
+  font-style: ${style};
+  font-weight: ${weight};
+  font-display: swap;
+  src: url("${href}") format('woff2');
+  unicode-range: ${LATIN};
+}`).join("\n");
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Change log &#8211; auspol tracker</title>
+<!-- GENERATED FILE – do not hand-edit. Rebuilt by .build/newtracker/build.mjs
+     on every federal build from data/changelog.json (gen-data §8d appends an
+     entry on each real site refresh). Shell chrome: .build/site-shell.mjs
+     applyShell, as on the other pages outside the main build. -->
+<meta name="description" content="${metaDesc}">
+<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="auspol tracker">
+<meta property="og:title" content="Change log &#8211; auspol tracker">
+<meta property="og:description" content="${metaDesc}">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="${SITE_URL}changelog/">
+<link rel="icon" href="/assets/favicon.svg">
+<style>
+${faces}
+:root {
+  --bg:        oklch(0.975 0.009 80);
+  --ink:       oklch(0.27 0.012 55);
+  --ink-2:     oklch(0.44 0.012 55);
+  --ink-3:     oklch(0.52 0.010 58);
+  --ink-faint: oklch(0.70 0.008 65);
+  --line:      oklch(0.895 0.008 75);
+  --line-2:    oklch(0.935 0.006 78);
+  --accent:    oklch(0.50 0.070 205);
+  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        oklch(0.205 0.010 65);
+    --ink:       oklch(0.940 0.008 80);
+    --ink-2:     oklch(0.800 0.009 78);
+    --ink-3:     oklch(0.670 0.009 72);
+    --ink-faint: oklch(0.545 0.009 68);
+    --line:      oklch(0.355 0.011 66);
+    --line-2:    oklch(0.312 0.010 66);
+    --accent:    oklch(0.70 0.080 205);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ------- article: the static summary's column + type rhythm ------- */
+.frame-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  max-width: 680px; width: 100%; margin: 0 auto;
+  padding: 40px 28px calc(64px + env(safe-area-inset-bottom, 0px)) 28px;
+}
+.frame-wrap h1 {
+  font-family: var(--serif); font-size: 34px; font-weight: 600;
+  letter-spacing: -0.01em; margin: 0 0 6px;
+}
+.frame-wrap p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 12px; }
+.frame-wrap p.ss-sub { margin: 0 0 4px; }
+.frame-wrap p.ss-note { margin: 20px 0 0; }
+.ss-note a { color: var(--ink-2); }
+.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+.frame-wrap strong { color: var(--ink); font-weight: 600; }
+
+/* ------- the entries: dated, quiet, as the Info tab lists them ------- */
+.cl-list { list-style: none; margin: 22px 0 18px; padding: 0; }
+.cl-list li {
+  padding: 9px 0; border-top: 1px solid var(--line-2);
+  font-size: 14.5px; line-height: 1.6; color: var(--ink-2);
+  text-wrap: pretty;
+}
+.cl-list li:first-child { border-top: 0; }
+.cl-date {
+  display: inline-block; min-width: 60px;
+  font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums;
+}
+</style>
+</head>
+<body>
+<main class="frame-wrap">
+  <p class="sh-kicker">Change log</p>
+  <h1>What moved the estimate, and when</h1>
+  <p class="ss-sub">What has moved the aggregate&#8217;s two-party preferred estimate, and when each
+    statistical finding appeared or fell away &#8211; recorded entry by entry on every site refresh.</p>
+  <ul class="cl-list">${rows}
+  </ul>
+  <p class="ss-note">A poll landing is what writes most of these &#8211; the
+    <a href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the
+    pollster&#8217;s own release, and <a href="/allpolls/">All polls</a> is the interactive archive.</p>
+</main>
+</body>
+</html>
+`;
 }
 
 function buildStaticSummary() {
@@ -1504,7 +1649,19 @@ ${items}
 `;
 writeAtomic(path.join(ROOT, "feed.xml"), feed);
 
-/* ---- 5c. robots.txt + sitemap.xml – be findable -------------------------
+/* ---- 5c. changelog/index.html – the change log as its own page ----------
+   The feed announces THAT a poll landed; the change log records what polls
+   did to the page. It lived only inside the app document (the Info tab),
+   which no URL can point a reader at as a document – this page is its
+   address, generated here because its text is the data's and nothing but,
+   and committed by the writers' SITE_FILES like the feed beside it. */
+const changeEntries = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || []; } catch { return []; } })();
+fs.mkdirSync(path.join(path.dirname(OUT), "changelog"), { recursive: true });
+writeAtomic(path.join(path.dirname(OUT), "changelog", "index.html"),
+  applyShell(changelogPage(), shellOptsFor("changelog/index.html")));
+console.log(`built changelog/index.html · ${changeEntries.length} entries`);
+
+/* ---- 5d. robots.txt + sitemap.xml – be findable -------------------------
    A single-page site is trivially mappable, but a crawler still has to learn
    the page exists and when it last changed. The sitemap carries the one
    canonical URL with the data date as lastmod; robots.txt points crawlers at
@@ -1568,6 +1725,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
   <url>
     <loc>${SITE_URL}info/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}changelog/</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
   <url>
