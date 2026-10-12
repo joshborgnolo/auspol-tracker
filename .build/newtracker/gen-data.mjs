@@ -3859,7 +3859,23 @@ const flowForced = (() => {
       return { date: p.date, ym: ymOf(new Date((t0 + t1) / 2).toISOString().slice(0, 10)), from: p.dateStart || null,
                n: p.sample ?? null, onp: p.pref_flows.onp_alp_lnp };
     });
-  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, ...(demos.length ? { demos } : {}) } : null;
+  /* The same reports' regional Labor-v-One-Nation tables make the pair's
+     other chart too – as the all-regions figures prefFlowsOut weights to
+     the whole country (cohort-region voter counts: 2025 enrolment by AEC
+     demographic class times the MRP's own printed first preferences there).
+     Computable, but our arithmetic, not a figure the report adds up for
+     you – wt marks the chart's tooltip and key so. One diamond per cohort
+     per MRP wave, placed at the fieldwork-midpoint month like demos. */
+  const demosOn = D.polls.filter((p) => p.pollster === "DemosAU (MRP)" && p.pref_flows && p.pref_flows.alp_onp)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .map((p) => {
+      const all = prefFlowsOut(p).all;
+      if (!all || !all.alp_onp || all.alp_onp.lnp == null || all.alp_onp.grn == null || all.alp_onp.oth == null) return null;
+      const t0 = new Date(p.dateStart || p.date).getTime(), t1 = new Date(p.date).getTime();
+      return { date: p.date, ym: ymOf(new Date((t0 + t1) / 2).toISOString().slice(0, 10)), from: p.dateStart || null,
+               n: p.sample ?? null, wt: true, coal: all.alp_onp.lnp, grn: all.alp_onp.grn, oth: all.alp_onp.oth };
+    }).filter(Boolean);
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}) } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null

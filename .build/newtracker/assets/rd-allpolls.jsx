@@ -4737,7 +4737,11 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
      printed no Table 1, so Feb–Apr spans two months' width with no dot in
      between. Spacing the waves evenly drew that two-month step as one */
   const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  const m0 = mi(waves[0].ym), mSpan = Math.max(1, mi(waves[waves.length - 1].ym) - m0);
+  /* the axis covers the extras' months too – a DemosAU midpoint falling
+     outside the house's own wave months must not clip off the edge */
+  const xms = (extras || []).map((d) => mi(d.ym));
+  const m0 = Math.min(mi(waves[0].ym), ...xms);
+  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms) - m0);
   const ms = [];
   for (let k = 0; k <= mSpan; k++) { const m = m0 + k; ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0")); }
   const X = (ym) => x0 + ((mi(ym) - m0) / mSpan) * (x1 - x0);
@@ -4772,11 +4776,20 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
   const keyOf = (w) => (window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null);
   const tpx = tip ? X(tip.ym) : 0;
   const tipK = tip ? keyOf(tip.w) : null;
+  /* the svg's spoken note on the DemosAU marks: which cohorts the latest
+     reading covers, and national print vs the site's all-regions
+     weighting (wt) of the printed regional tables */
+  const xnote = (() => {
+    if (!extras || !extras.length) return "";
+    const la = extras[extras.length - 1], cks = cohorts.filter((ck) => la[ck] != null);
+    if (!cks.length) return "";
+    return " Diamonds mark DemosAU’s MRP " + (la.wt ? "all-regions readings, our weighting of its printed regional tables" : "national readings") + " of " + cks.map((ck) => FF_COHORTS[ck].name).join(", ") + " voters’ share to Labor, latest " + cks.map((ck) => la[ck]).join(", ") + ".";
+  })();
   const half = Math.min((tipW || 220) / 2, W / 2 - 8);
   return (
     <figure className="rd-ff" ref={box}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${extras && extras.length ? " Diamonds mark DemosAU’s MRP readings of One Nation voters’ share to Labor nationally, latest " + extras[extras.length - 1].onp + "." : ""}`}>
+           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${xnote}`}>
         {[0, 25, 50, 75, 100].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={"rd-ff-gl" + (v === 50 ? " mid" : "")}></path>)}
         {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
         {series.map((s) => <path key={s.ck} d={monotoneXY(s.pts)} className={"rd-ff-line " + FF_COHORTS[s.ck].cls}></path>)}
@@ -4820,14 +4833,16 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
           </g>
           );
         })}
-        {extras && extras.map((d) => (
-          /* DemosAU MRP's national One Nation flow: a mark at each wave's
-             fieldwork-midpoint month, not a line (gen-data's demos block) */
-          <path key={d.date} className="rd-ff-dm onp"
-                d={`M${X(d.ym)} ${Y(d.onp) - 5.5}L${X(d.ym) + 4.5} ${Y(d.onp)}L${X(d.ym)} ${Y(d.onp) + 5.5}L${X(d.ym) - 4.5} ${Y(d.onp)}Z`}>
-            <title>DemosAU MRP {rdMonthYear(d.ym)} — One Nation voters: Labor {d.onp}, Coalition {100 - d.onp}</title>
+        {extras && extras.map((d) => cohorts.filter((ck) => d[ck] != null).map((ck) => (
+          /* DemosAU MRP marks: one hollow diamond per covered cohort at each
+             wave's fieldwork-midpoint month, never a line (gen-data's demos
+             blocks). wt entries are the site's all-regions weighting of the
+             printed regional tables, not a figure the house prints */
+          <path key={d.date + ck} className={"rd-ff-dm " + FF_COHORTS[ck].cls}
+                d={`M${X(d.ym)} ${Y(d[ck]) - 5.5}L${X(d.ym) + 4.5} ${Y(d[ck])}L${X(d.ym)} ${Y(d[ck]) + 5.5}L${X(d.ym) - 4.5} ${Y(d[ck])}Z`}>
+            <title>DemosAU MRP {rdMonthYear(d.ym)} — {FF_COHORTS[ck].name} voters: Labor {d[ck]}, {rival === "the Coalition" ? "Coalition" : "One Nation"} {100 - d[ck]}{d.wt ? " (all regions — our weighting)" : ""}</title>
           </path>
-        ))}
+        )))}
         {series.map((s) => (
           <g key={"el" + s.ck}>
             <text x={x1 + 8} y={labY.get(s.ck) - 2} className={"rd-ff-el " + FF_COHORTS[s.ck].cls}>{FF_COHORTS[s.ck].name}</text>
@@ -5003,19 +5018,20 @@ function RdFlows() {
             (.rd-sub/.rd-subdek), as the two-party and leadership sections
             set theirs */}
         <h3 className="rd-sub rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
-        <p className="rd-subdek rd-ff-d">RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU’s MRP reports print their own — DemosAU’s national One Nation reading is the diamonds on the Labor v Coalition chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
+        <p className="rd-subdek rd-ff-d">RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU’s MRP reports print their own — the diamonds: its printed national One Nation reading on the Labor v Coalition chart, and our all-regions weighting of its regional tables on the Labor v One Nation chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("on")}</h4></div>
-            <RdForced waves={FF.vsOn} cohorts={["grn", "coal", "oth"]} rival="One Nation" W={cw} phone={phone} />
+            <RdForced waves={FF.vsOn} cohorts={["grn", "coal", "oth"]} rival="One Nation" W={cw} phone={phone} extras={FF.demosOn} />
           </div>
           <div className="rd-fl-one">
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
             <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} extras={FF.demos} />
           </div>
         </div>
-        {FF.demos && <RdKey className="rd-ckey rd-ff-key" items={[]}>
-          <span className="rd-key-item"><span className="rd-ff-keydm" aria-hidden="true"></span>One Nation voters’ share to Labor, national — DemosAU MRP</span>
+        {(FF.demos || FF.demosOn) && <RdKey className="rd-ckey rd-ff-key" items={[]}>
+          {FF.demos && <span className="rd-key-item"><span className="rd-ff-keydm" aria-hidden="true"></span>One Nation voters’ share to Labor, national — DemosAU MRP</span>}
+          {FF.demosOn && <span className="rd-key-item"><span className="rd-ff-keydm mix" aria-hidden="true"></span>DemosAU MRP, all regions — the site’s enrolment-and-vote weighting of its printed regional tables</span>}
         </RdKey>}
       </div>}
       {/* the drift battery: has each pollster's gap MOVED over the term,
@@ -5030,7 +5046,7 @@ function RdFlows() {
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         This check corrects no other figure on the page.
-        {FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."}
+        {FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says. The DemosAU diamonds on the Labor v One Nation chart are all regions — our enrolment-and-vote weighting of its printed regional tables, not a figure the report adds up itself."}
       </RdFoot>
     </section>
   );

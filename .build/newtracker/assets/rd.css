@@ -3100,7 +3100,12 @@ body.rd .rd-ff-dot.oth { fill: var(--oth); }
    RedBridge dot in the same month still shows through */
 body.rd .rd-ff-dm { fill: none; stroke-width: 1.75; stroke-linejoin: round; }
 body.rd .rd-ff-dm.onp { stroke: var(--onp); }
+/* the Labor-v-One-Nation chart's DemosAU marks take their cohort's colour */
+body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-dm.grn { stroke: var(--grn); }
+body.rd .rd-ff-dm.oth { stroke: var(--oth); }
 body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--onp); transform: rotate(45deg); vertical-align: 0; }
+body.rd .rd-ff-keydm.mix { border-color: var(--ink-2); }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
 body.rd .rd-ff-el.lnp { fill: var(--lnp); }

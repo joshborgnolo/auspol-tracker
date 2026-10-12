@@ -9,8 +9,11 @@
      labels, 4ch party tags, 2ch figures) so wrapped rows read as columns, and
      the nationwide One Nation flow closes the line label-first like the
      other groups;
-   - the forced-choice Labor v Coalition chart carries one .rd-ff-dm diamond
-     per filed MRP, and the key names them.
+   - the forced-choice pair carries hollow DemosAU diamonds: the Labor v
+     Coalition chart one per filed MRP (the report's printed national One
+     Nation reading), the Labor v One Nation chart three per MRP – one per
+     cohort in the cohort's colour, the site's all-regions weighting of the
+     printed regional tables (flowForced demosOn) – and the key names both.
    Run against a built tree: node .matilda/probe/mrp-prefs.mjs [shotDir] */
 import puppeteer from "puppeteer-core";
 import path from "path";
@@ -34,10 +37,18 @@ for (const w of [1440, 1024, 768, 390]) {
   page.on("pageerror", (e) => errs.push(String(e)));
   await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector("#flow-drift", { timeout: 30000 });
-  const dm = await page.evaluate(() => ({ n: document.querySelectorAll("#flow-drift .rd-ff-dm").length,
-    key: !!document.querySelector("#flow-drift .rd-ff-keydm") }));
-  check(dm.n === 3, "three DemosAU diamonds (" + dm.n + ")");
-  check(dm.key, "the key names the diamonds");
+  const dm = await page.evaluate(() => {
+    const one = [...document.querySelectorAll("#flow-drift .rd-ff-two .rd-fl-one")];
+    const cls = (el) => (el ? [...el.querySelectorAll(".rd-ff-dm")].map((d) => d.getAttribute("class").replace("rd-ff-dm ", "")) : []);
+    const on = cls(one[0]), co = cls(one[1]);
+    return { on: on.length, co: co.length,
+      cohorts: ["lnp", "grn", "oth"].every((c) => on.filter((x) => x === c).length === 3),
+      key: !!document.querySelector("#flow-drift .rd-ff-keydm"), keyMix: !!document.querySelector("#flow-drift .rd-ff-keydm.mix") };
+  });
+  check(dm.on === 9, "Labor v One Nation: three hollow DemosAU diamonds per filed MRP (" + dm.on + ")");
+  check(dm.cohorts, "the One Nation chart's diamonds ride the three cohort colours");
+  check(dm.co === 3, "Labor v Coalition: three DemosAU diamonds (" + dm.co + ")");
+  check(dm.key && dm.keyMix, "the key names both diamond sets");
   if (SHOT) {
     const el = await page.$("#flow-drift .rd-ff");
     await el.evaluate((e) => e.scrollIntoView({ block: "center" }));

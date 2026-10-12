@@ -5294,7 +5294,11 @@ body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
 body.rd .rd-ff-dm { fill: none; stroke-width: 1.75; stroke-linejoin: round; }
 body.rd .rd-ff-dm.onp { stroke: var(--onp); }
+body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-dm.grn { stroke: var(--grn); }
+body.rd .rd-ff-dm.oth { stroke: var(--oth); }
 body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--onp); transform: rotate(45deg); vertical-align: 0; }
+body.rd .rd-ff-keydm.mix { border-color: var(--ink-2); }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
 body.rd .rd-ff-el.lnp { fill: var(--lnp); }
@@ -13784,6 +13788,34 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "from": "2026-08-04",
       "n": 9740,
       "onp": 18
+    }],
+    "demosOn": [{
+      "date": "2026-03-03",
+      "ym": "2026-02",
+      "from": "2026-01-13",
+      "n": 8484,
+      "wt": true,
+      "coal": 29,
+      "grn": 90,
+      "oth": 58
+    }, {
+      "date": "2026-07-11",
+      "ym": "2026-06",
+      "from": "2026-05-27",
+      "n": 9343,
+      "wt": true,
+      "coal": 33,
+      "grn": 90,
+      "oth": 55
+    }, {
+      "date": "2026-09-19",
+      "ym": "2026-08",
+      "from": "2026-08-04",
+      "n": 9740,
+      "wt": true,
+      "coal": 37,
+      "grn": 88,
+      "oth": 60
     }]
   };
   const leaderMonths = [{
@@ -123350,8 +123382,9 @@ function RdForced({
     bot = H - 34;
   const x1 = W - rpad;
   const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  const m0 = mi(waves[0].ym),
-    mSpan = Math.max(1, mi(waves[waves.length - 1].ym) - m0);
+  const xms = (extras || []).map(d => mi(d.ym));
+  const m0 = Math.min(mi(waves[0].ym), ...xms);
+  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms) - m0);
   const ms = [];
   for (let k = 0; k <= mSpan; k++) {
     const m = m0 + k;
@@ -123398,6 +123431,13 @@ function RdForced({
   }) : null;
   const tpx = tip ? X(tip.ym) : 0;
   const tipK = tip ? keyOf(tip.w) : null;
+  const xnote = (() => {
+    if (!extras || !extras.length) return "";
+    const la = extras[extras.length - 1],
+      cks = cohorts.filter(ck => la[ck] != null);
+    if (!cks.length) return "";
+    return " Diamonds mark DemosAU’s MRP " + (la.wt ? "all-regions readings, our weighting of its printed regional tables" : "national readings") + " of " + cks.map(ck => FF_COHORTS[ck].name).join(", ") + " voters’ share to Labor, latest " + cks.map(ck => la[ck]).join(", ") + ".";
+  })();
   const half = Math.min((tipW || 220) / 2, W / 2 - 8);
   return React.createElement("figure", {
     className: "rd-ff",
@@ -123407,7 +123447,7 @@ function RdForced({
     height: H,
     viewBox: `0 0 ${W} ${H}`,
     role: "img",
-    "aria-label": `If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map(s => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${extras && extras.length ? " Diamonds mark DemosAU’s MRP readings of One Nation voters’ share to Labor nationally, latest " + extras[extras.length - 1].onp + "." : ""}`
+    "aria-label": `If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map(s => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${xnote}`
   }, [0, 25, 50, 75, 100].map(v => React.createElement("path", {
     key: v,
     d: `M${x0} ${Y(v)}H${x1}`,
@@ -123488,11 +123528,11 @@ function RdForced({
         }
       }));
     }));
-  }), extras && extras.map(d => React.createElement("path", {
-    key: d.date,
-    className: "rd-ff-dm onp",
-    d: `M${X(d.ym)} ${Y(d.onp) - 5.5}L${X(d.ym) + 4.5} ${Y(d.onp)}L${X(d.ym)} ${Y(d.onp) + 5.5}L${X(d.ym) - 4.5} ${Y(d.onp)}Z`
-  }, React.createElement("title", null, "DemosAU MRP ", rdMonthYear(d.ym), " \u2014 One Nation voters: Labor ", d.onp, ", Coalition ", 100 - d.onp))), series.map(s => React.createElement("g", {
+  }), extras && extras.map(d => cohorts.filter(ck => d[ck] != null).map(ck => React.createElement("path", {
+    key: d.date + ck,
+    className: "rd-ff-dm " + FF_COHORTS[ck].cls,
+    d: `M${X(d.ym)} ${Y(d[ck]) - 5.5}L${X(d.ym) + 4.5} ${Y(d[ck])}L${X(d.ym)} ${Y(d[ck]) + 5.5}L${X(d.ym) - 4.5} ${Y(d[ck])}Z`
+  }, React.createElement("title", null, "DemosAU MRP ", rdMonthYear(d.ym), " \u2014 ", FF_COHORTS[ck].name, " voters: Labor ", d[ck], ", ", rival === "the Coalition" ? "Coalition" : "One Nation", " ", 100 - d[ck], d.wt ? " (all regions — our weighting)" : "")))), series.map(s => React.createElement("g", {
     key: "el" + s.ck
   }, React.createElement("text", {
     x: x1 + 8,
@@ -123755,7 +123795,7 @@ function RdFlows() {
     className: "rd-sub rd-ff-t"
   }, "RedBridge/Accent\u2019s respondent-allocated preferences"), React.createElement("p", {
     className: "rd-subdek rd-ff-d"
-  }, "RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU\u2019s MRP reports print their own \u2014 DemosAU\u2019s national One Nation reading is the diamonds on the Labor v Coalition chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently ", React.createElement("a", {
+  }, "RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU\u2019s MRP reports print their own \u2014 the diamonds: its printed national One Nation reading on the Labor v Coalition chart, and our all-regions weighting of its regional tables on the Labor v One Nation chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently ", React.createElement("a", {
     className: "rd-link rd-link-in",
     href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
   }, "perform better", React.createElement("span", {
@@ -123774,7 +123814,8 @@ function RdFlows() {
     cohorts: ["grn", "coal", "oth"],
     rival: "One Nation",
     W: cw,
-    phone: phone
+    phone: phone,
+    extras: FF.demosOn
   })), React.createElement("div", {
     className: "rd-fl-one"
   }, React.createElement("div", {
@@ -123788,15 +123829,20 @@ function RdFlows() {
     W: cw,
     phone: phone,
     extras: FF.demos
-  }))), FF.demos && React.createElement(RdKey, {
+  }))), (FF.demos || FF.demosOn) && React.createElement(RdKey, {
     className: "rd-ckey rd-ff-key",
     items: []
-  }, React.createElement("span", {
+  }, FF.demos && React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-ff-keydm",
     "aria-hidden": "true"
-  }), "One Nation voters\u2019 share to Labor, national \u2014 DemosAU MRP"))), React.createElement(RdTsig, {
+  }), "One Nation voters\u2019 share to Labor, national \u2014 DemosAU MRP"), FF.demosOn && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-ff-keydm mix",
+    "aria-hidden": "true"
+  }), "DemosAU MRP, all regions \u2014 the site\u2019s enrolment-and-vote weighting of its printed regional tables"))), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
@@ -123806,7 +123852,7 @@ function RdFlows() {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says. The DemosAU diamonds on the Labor v One Nation chart are all regions — our enrolment-and-vote weighting of its printed regional tables, not a figure the report adds up itself."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
