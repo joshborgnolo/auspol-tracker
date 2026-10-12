@@ -118907,7 +118907,7 @@ function RdLgPrefs({
   pf
 }) {
   const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
-  const [ri, setRi] = React.useState(0);
+  const [ri, setRi] = React.useState(() => Math.max(0, regs.findIndex(([k]) => k === "all")));
   const rk = regs[ri % regs.length][0],
     rn = regs[ri % regs.length][1],
     next = regs[(ri + 1) % regs.length][1];
