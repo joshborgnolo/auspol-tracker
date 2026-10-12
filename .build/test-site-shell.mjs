@@ -168,7 +168,7 @@ const clEntries = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.
 const clPage = fs.readFileSync(path.join(ROOT, "changelog", "index.html"), "utf8");
 assert.ok(clPage.includes("<title>Change log &#8211; auspol tracker</title>"), "changelog page: the title");
 assert.ok(/<link rel="canonical" href="https:\/\/auspoltracker\.com\/changelog\/">/.test(clPage), "changelog page: the canonical");
-assert.ok(clPage.includes("<h1>What moved the estimate, and when</h1>"), "changelog page: the h1");
+assert.ok(clPage.includes("<h1>Log of movements in figures and findings</h1>"), "changelog page: the h1");
 // the console prints each entry's ISO date (a repeat of the line above's date is dimmed, cl-rep)
 const clTimes = [...clPage.matchAll(/<time class="cl-date(?: cl-rep)?" datetime="([^"]+)">([^<]+)<\/time>/g)];
 assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.date)]),
