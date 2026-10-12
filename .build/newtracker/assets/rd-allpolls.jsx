@@ -1008,7 +1008,7 @@ function RdApIssMini({ p }) {
   );
 }
 
-function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSplit, onFacet }) {
+function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSplit, setDemSplit, onFacet }) {
   const D = window.AUSPOL;
   const d = p.dir;
 
@@ -1486,6 +1486,17 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const open = el && el.closest(".rd-ap-open");
     const row = open && open.previousElementSibling;
     if (row) rdPinScroll([row], true);
+    /* a demographics hop has to land on a split this poll can draw, or the
+       hop opens the facet on rows the poll isn't in - demSplit survives
+       facet hops by design, and a house that prints no age cut (Roy Morgan
+       files city/country and one-offs) would vanish from its own trip.
+       Same contract as the Who-votes dot trip and the line's own preview:
+       keep the sitting split where it draws this poll, else the first
+       split that does */
+    if (id === "demographics" && setDemSplit && window.demPairOf && !window.demPairOf(p, demSplit)) {
+      const fit = (window.DEM_SPLITS || []).find((x) => window.demPairOf(p, x.id));
+      if (fit) setDemSplit(fit.id);
+    }
     if (onFacet) onFacet(id);
   };
   return (
@@ -3228,7 +3239,7 @@ function RdAllPolls(P) {
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
         <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={RD_AP_KAL ? rows.filter((r) => !r.noAgg && figOf(r).a != null).length : win.length}
-                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} demSplit={demSplit} onFacet={onFacet} />
+                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} demSplit={demSplit} setDemSplit={setDemSplit} onFacet={onFacet} />
       </div>
     );
     if (phone) {

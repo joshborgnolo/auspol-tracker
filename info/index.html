@@ -98982,10 +98982,11 @@ function AllPollsView({
     setRange("all");
     setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
-    if (focus.split) {
+    if (focus.split || focus.facet === "demographics") {
+      const want = focus.split || demSplit;
       const fp = D.individualPolls.find(q => q.pollster + "|" + q.released === focus.key);
       const can = s => !!(fp && demPairOf(fp, s));
-      setDemSplit(can(focus.split) ? focus.split : DEM_SPLITS.map(s => s.id).find(can) || focus.split);
+      setDemSplit(can(want) ? want : DEM_SPLITS.map(s => s.id).find(can) || want);
     }
     setOpen(focus.key);
   }, [focus]);
@@ -117903,6 +117904,7 @@ function RdApDetail({
   onBack,
   backLabel,
   demSplit,
+  setDemSplit,
   onFacet
 }) {
   const D = window.AUSPOL;
@@ -118428,6 +118430,10 @@ function RdApDetail({
     const open = el && el.closest(".rd-ap-open");
     const row = open && open.previousElementSibling;
     if (row) rdPinScroll([row], true);
+    if (id === "demographics" && setDemSplit && window.demPairOf && !window.demPairOf(p, demSplit)) {
+      const fit = (window.DEM_SPLITS || []).find(x => window.demPairOf(p, x.id));
+      if (fit) setDemSplit(fit.id);
+    }
     if (onFacet) onFacet(id);
   };
   return React.createElement(RdLedger, {
@@ -120892,6 +120898,7 @@ function RdAllPolls(P) {
       onBack: arrived ? onBack : null,
       backLabel: backLabel,
       demSplit: demSplit,
+      setDemSplit: setDemSplit,
       onFacet: onFacet
     }));
     if (phone) {

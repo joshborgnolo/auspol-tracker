@@ -5362,11 +5362,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     /* a Who votes for whom dot names its tab's split; where the poll can't
        draw that pair (a Resolve dot from By state: it prints no city and
        country cut), it opens on the first split it can, so its row still
-       carries figures - the opened table shows every cut either way */
-    if (focus.split) {
+       carries figures - the opened table shows every cut either way. A
+       demographics trip that names no split (the Latest table's "Also in
+       this poll" line crosses here) is the same test against the split the
+       facet happens to be sitting on */
+    if (focus.split || focus.facet === "demographics") {
+      const want = focus.split || demSplit;
       const fp = D.individualPolls.find((q) => q.pollster + "|" + q.released === focus.key);
       const can = (s) => !!(fp && demPairOf(fp, s));
-      setDemSplit(can(focus.split) ? focus.split : DEM_SPLITS.map((s) => s.id).find(can) || focus.split);
+      setDemSplit(can(want) ? want : DEM_SPLITS.map((s) => s.id).find(can) || want);
     }
     setOpen(focus.key);
   }, [focus]);
