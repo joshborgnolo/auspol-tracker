@@ -113,3 +113,11 @@ reusable probes (all start an ephemeral http server — remember
   session's landing commit may invalidate a finding); probe files go in
   `.matilda/probe/` (gitignored); leave siblings' tracked WIP (e.g.
   PRODUCT.md) untouched.
+
+## 7. Follow-through
+
+After the top-N is fixed and committed, the stop-hook-goal pattern is to
+`/review` the fix commit and land the confirmed autofixes as a second
+commit — the full procedure (npm-test gate, the site-shell writer trap,
+the test-invariants structural-pinning pattern, report/cleanup/choreography)
+lives in the `auspol-review-autofix-loop` skill.
