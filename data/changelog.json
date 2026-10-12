@@ -196,11 +196,11 @@
       "2026-09-14|DemosAU",
       "2026-09-17|Newspoll",
       "2026-09-18|Newspoll (pooled)",
+      "2026-09-19|DemosAU (MRP)",
       "2026-09-20|Roy Morgan",
       "2026-09-21|YouGov",
       "2026-09-27|Roy Morgan",
       "2026-09-29|Essential",
-      "2026-09-30|DemosAU (MRP)",
       "2026-10-02|RedBridge/Accent",
       "2026-10-06|YouGov",
       "2026-10-08|Newspoll",
@@ -324,6 +324,74 @@
         "group": "Retired",
         "setLabel": "By work status"
       }
+    },
+    "prim": {
+      "alp": 27.5,
+      "grn": 13.4,
+      "lnp": 21.6,
+      "onp": 26.1,
+      "oth": 11.4
+    },
+    "leaders": {
+      "alb_fav": -20.7,
+      "alb_net": -21.6,
+      "hanson_fav": -5.6,
+      "hanson_net": -2.6,
+      "taylor_fav": -4.7,
+      "taylor_net": -6.9
+    },
+    "lean": {
+      "key": "alp_on|imp",
+      "v": {
+        "Agenda C Synesis": 0.7,
+        "DemosAU": -1,
+        "DemosAU (MRP)": -0.4,
+        "Essential": -0.4,
+        "Fox & Hedgehog": -0.4,
+        "Freshwater": 0.4,
+        "Newspoll": 0.6,
+        "RedBridge/Accent": -0.7,
+        "RedBridge/Accent (MRP)": -0.3,
+        "Resolve": 0.4,
+        "Roy Morgan": 0.8,
+        "Spectre Strategy": -0.8,
+        "Wolf & Smith": 0.6,
+        "YouGov": -0.4,
+        "YouGov (MRP)": -0.5
+      }
+    },
+    "dir": {
+      "right": 27.1,
+      "wrong": 62.2,
+      "net": -35.1
+    },
+    "issLead": {
+      "climate": "alp",
+      "col": "",
+      "crime": "onp",
+      "economy": "lnp",
+      "health": "alp",
+      "housing": "",
+      "immigration": "onp",
+      "security": ""
+    },
+    "issLabel": {
+      "climate": "Climate change",
+      "col": "Cost of living",
+      "crime": "Crime",
+      "economy": "Economic management",
+      "health": "Health",
+      "housing": "Housing",
+      "immigration": "Immigration",
+      "security": "National security"
+    },
+    "sig": {
+      "iss|economy|imp": 1,
+      "iss|housing|alp": -1
+    },
+    "sigMeta": {
+      "iss|economy|imp": "the share naming economic management a top-three issue",
+      "iss|housing|alp": "Labor's share as the best party on housing"
     }
   },
   "entries": [
@@ -345,6 +413,19 @@
       "label": "12 Oct 2026",
       "kind": "finding",
       "text": "NSW voters (by state) no longer break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-10-12",
+      "label": "12 Oct 2026",
+      "kind": "seed",
+      "text": "From today the log also records the primary votes, the leaders' ratings, national direction and the house effect of each pollster that publishes, every measure whose month-on-month move becomes, or stops being, statistically significant, and changes in which party leads significantly as the best on each issue. Primary votes now: Labor 27.5, the Coalition 21.6, One Nation 26.1, the Greens 13.4, others 11.4. Leader ratings now: Albanese's net approval −21.6, Albanese's net favourability −20.7, Taylor's net approval −6.9, Taylor's net favourability −4.7, Hanson's net approval −2.6, Hanson's net favourability −5.6. National direction now: right track 27.1, wrong track 62.2 (net −35.1). Leading significantly as the best party now: Labor on climate change; One Nation on crime; the Coalition on economic management; Labor on health; One Nation on immigration. Moving significantly now: the share naming economic management a top-three issue (up); Labor's share as the best party on housing (down)."
+    },
+    {
+      "date": "2026-10-12",
+      "label": "12 Oct 2026",
+      "kind": "poll",
+      "text": "DemosAU (MRP) (fieldwork 4 Aug–19 Sep, n=9,740) added — the two-party preferred estimate held at 52.4 (Labor v One Nation, implied flows). House effect (Labor v One Nation, implied flows; positive leans Labor): DemosAU (MRP) −0.4.",
+      "url": "https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/"
     }
   ]
 }

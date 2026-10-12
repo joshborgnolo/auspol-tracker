@@ -1,0 +1,49 @@
+{
+  "slug": "DemosAU-Report-Aug-Sept-2026-MRP-Model-1",
+  "dateStart": "2026-08-04",
+  "date": "2026-09-19",
+  "sample": 9740,
+  "client": "Conducted in assoication with Capital Brief",
+  "tppNote": "2PP calculation method Using relevant 2025 federal election preference flows and selected respondent allocated preferenc",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "trendError": "election anchor row has 0 percentage tokens, expected 5",
+  "seats": {
+    "total": 150,
+    "basis": "2025 election",
+    "p": {
+      "alp": {
+        "est": 84,
+        "chg": -10,
+        "lo": 73,
+        "hi": 85
+      },
+      "lnp": {
+        "est": 34,
+        "chg": -9,
+        "lo": 25,
+        "hi": 44
+      },
+      "onp": {
+        "est": 24,
+        "chg": 24,
+        "lo": 22,
+        "hi": 35
+      },
+      "grn": {
+        "est": 0,
+        "chg": -1,
+        "lo": 0,
+        "hi": 3
+      },
+      "oth": {
+        "est": 8,
+        "chg": -4,
+        "lo": 5,
+        "hi": 10
+      }
+    }
+  },
+  "extractedAt": "2026-10-12T07:26:08.441Z",
+  "cacheV": 3
+}
