@@ -69,6 +69,14 @@ De-SPACED (tracking removed after de-capping; do not re-add):
   "make eg this text in the glyph player sentence case … adjust the
   character spacing accordingly".
 
+- Glyph player beat caption (.gp-beat-s, template.html ~:683; f1eddd2,
+  2026-10-12): the animated caption under each story beat ("Over its
+  closest challenger, two-party preferred" and siblings, wm-story.jsx
+  beat.sub) lost `text-transform: uppercase` with tracking .1em→.02em —
+  same player, same ask, same .02em label convention as the eyebrow. The
+  same sub text's OTHER render site `.gp-wsub` (the steady strip under the
+  month reel) was never caps and stayed at .01em. No probe pins the rule.
+
 - Poll head sentence + its figures (3e34bc1, 2026-09-29): the rdPollHead
   "Conducted on … …" sentence kept `letter-spacing: 0.02em` on `.rd-pld-h`,
   `.rd-apd-h` AND the `.rd-nocaps` figure span as a leftover from the caps
