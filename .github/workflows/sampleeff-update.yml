@@ -1,12 +1,18 @@
 # Effective-sample-size updater. Statements post with releases and stay put,
-# and a missed week only delays a weight refinement, so a weekly sweep is
-# plenty. The wrapper no-ops when nothing new was stamped.
+# and a missed week only delays a weight refinement. Cadence: a weekly Monday
+# sweep plus an HOURLY sweep gated on a pending wave — a recent row still
+# missing its statement's sampleEff/methodUrl (.build/sampleeff-pending.mjs) —
+# so a release's statement is picked up within the hour instead of waiting for
+# Monday. Outside that window the gate makes the hourly run a no-op (checkout
+# + one local script — no fetches). The wrapper no-ops when nothing new was
+# stamped.
 
 name: sampleeff-update
 
 on:
   schedule:
-    - cron: '25 21 * * 0' # 07:25 AEST Monday (np-score holds 07:15)
+    - cron: '25 21 * * 0' # weekly sweep — 07:25 AEST Monday (np-score holds 07:15)
+    - cron: '47 * * * *' # hourly sweep, gated on a wave awaiting its statement
   workflow_dispatch:
     inputs:
       simulate_failure:
@@ -22,7 +28,29 @@ permissions:
   actions: read # poll-agent's transient-streak check reads earlier runs
 
 jobs:
+  pending:
+    # Cheap gate: exit 0 while a recently filed wave awaits its APC statement
+    # (a recent unstamped sampleEff/methodUrl row — clears when the sweep
+    # stamps it). No node setup needed: sampleeff-pending.mjs has no
+    # dependencies and the runner image ships node.
+    runs-on: ubuntu-24.04
+    outputs:
+      active: ${{ steps.check.outputs.active }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - id: check
+        run: |
+          if node .build/sampleeff-pending.mjs; then
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=false" >> "$GITHUB_OUTPUT"
+          fi
+
   run:
+    needs: pending
+    # Only the hourly sweep is gated on a pending wave; the weekly Monday
+    # sweep and a manual dispatch run whatever the ledger says.
+    if: needs.pending.outputs.active == 'true' || github.event.schedule != '47 * * * *'
     uses: ./.github/workflows/poll-agent.yml
     with:
       house: sampleeff

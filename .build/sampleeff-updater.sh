@@ -1,9 +1,10 @@
 #!/bin/bash
 # Scheduled effective-sample-size update: extract-sampleeff -> if polls.json
 # changed -> validate -> render-card -> build -> commit -> push. Statement
-# sources change slowly (statements post with releases and stay put), so this
-# runs weekly. Installed locally via launchd like the other house jobs, and
-# in CI by sampleeff-update.yml. Every step logs one line to
+# sources change slowly (statements post with releases and stay put), so CI
+# runs it weekly, plus hourly sweeps gated by sampleeff-pending.mjs on a
+# recent wave still awaiting its statement. Installed locally via launchd
+# like the other house jobs, and in CI by sampleeff-update.yml. Every step logs one line to
 # .build/logs/sampleeff.log; any failure exits non-zero before any commit,
 # leaving the working tree for manual review.
 set -uo pipefail
