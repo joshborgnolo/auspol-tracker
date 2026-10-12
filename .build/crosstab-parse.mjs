@@ -199,7 +199,7 @@ const MRP_PARTY = { ALP: "alp", LNP: "lnp", "L/NP": "lnp", GRN: "grn", ONP: "onp
 const MRP_GROUPS = {
   gender: { Males: "Men", Females: "Women" },
   age: { "18-34": "18–34", "35-54": "35–54", "55 and Over": "55+" },
-  education: { "Didn't Finish G12": "Didn't Finish Grade 12", "Grade 12": "Grade 12", TAFE: "TAFE",
+  education: { "Didn't Finish G12": "Less than year 12", "Grade 12": "Year 12", TAFE: "TAFE",
     "Undergraduate Degree": "Undergraduate", "Postgraduate Degree": "Postgraduate" },
   income: { "Under 45000": "Under $45k", "45001-75000": "$45–75k", "75001-125000": "$75–125k",
     "125001-200000": "$125–200k", "200001+": "$200k+" },

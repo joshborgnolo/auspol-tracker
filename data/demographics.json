@@ -1619,14 +1619,14 @@
      }
     },
     "education": {
-     "Didn't Finish Grade 12": {
+     "Less than year 12": {
       "alp": 32,
       "lnp": 23,
       "grn": 7,
       "onp": 24,
       "oth": 14
      },
-     "Grade 12": {
+     "Year 12": {
       "alp": 33,
       "lnp": 22,
       "grn": 16,
@@ -4981,14 +4981,14 @@
      }
     },
     "education": {
-     "Didn't Finish Grade 12": {
+     "Less than year 12": {
       "alp": 26,
       "lnp": 18,
       "grn": 7,
       "onp": 38,
       "oth": 11
      },
-     "Grade 12": {
+     "Year 12": {
       "alp": 28,
       "lnp": 21,
       "grn": 16,
@@ -9910,14 +9910,14 @@
      }
     },
     "education": {
-     "Didn't Finish Grade 12": {
+     "Less than year 12": {
       "alp": 24,
       "grn": 7,
       "oth": 11,
       "lnp": 19,
       "onp": 39
      },
-     "Grade 12": {
+     "Year 12": {
       "alp": 27,
       "grn": 16,
       "oth": 10,
@@ -13052,14 +13052,14 @@
      }
     },
     "education": {
-     "Didn't Finish Grade 12": {
+     "Less than year 12": {
       "alp": 26,
       "grn": 7,
       "oth": 12,
       "lnp": 21,
       "onp": 34
      },
-     "Grade 12": {
+     "Year 12": {
       "alp": 28,
       "grn": 16,
       "oth": 11,

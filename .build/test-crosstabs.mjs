@@ -419,7 +419,7 @@ assert.equal(demosLabel("income", "$125K+"), "$125k+");
   assert.deepEqual(Object.keys(as.dims.income), ["Under $45k", "$45–75k", "$75–125k", "$125–200k", "$200k+"]);
   assert.deepEqual(as.dims.state.ACT, { alp: 39, grn: 16, oth: 12, lnp: 21, onp: 12 });
   assert.deepEqual(as.dims.location["Reg & Rur"], { alp: 20, grn: 8, oth: 15, lnp: 23, onp: 34 });
-  assert.deepEqual(as.dims.education["Didn't Finish Grade 12"], { alp: 26, grn: 7, oth: 12, lnp: 21, onp: 34 }, "the curly apostrophe");
+  assert.deepEqual(as.dims.education["Less than year 12"], { alp: 26, grn: 7, oth: 12, lnp: 21, onp: 34 }, "the curly apostrophe");
   assert.equal(dimsProblem(as.dims), null);
   assert.equal(mj.period, "May-July 26");
   assert.deepEqual(as.history["May-July 26"], mj.dims, "the Aug–Sep report reprints the May–Jul model exactly");

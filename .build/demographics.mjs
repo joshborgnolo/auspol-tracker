@@ -1119,8 +1119,8 @@ const DEMOSAU_MRP_DEMO = {
         "55+": { alp: 33, lnp: 28, grn: 4, onp: 22, oth: 13 },
       },
       education: {
-        "Didn't Finish Grade 12": { alp: 32, lnp: 23, grn: 7, onp: 24, oth: 14 },
-        "Grade 12": { alp: 33, lnp: 22, grn: 16, onp: 16, oth: 13 },
+        "Less than year 12": { alp: 32, lnp: 23, grn: 7, onp: 24, oth: 14 },
+        "Year 12": { alp: 33, lnp: 22, grn: 16, onp: 16, oth: 13 },
         TAFE: { alp: 31, lnp: 23, grn: 12, onp: 19, oth: 15 },
         Undergraduate: { alp: 35, lnp: 27, grn: 16, onp: 10, oth: 12 },
         Postgraduate: { alp: 40, lnp: 25, grn: 15, onp: 9, oth: 11 },
@@ -1163,8 +1163,8 @@ const DEMOSAU_MRP_DEMO = {
         "55+": { alp: 28, lnp: 24, grn: 5, onp: 33, oth: 10 },
       },
       education: {
-        "Didn't Finish Grade 12": { alp: 26, lnp: 18, grn: 7, onp: 38, oth: 11 },
-        "Grade 12": { alp: 28, lnp: 21, grn: 16, onp: 25, oth: 10 },
+        "Less than year 12": { alp: 26, lnp: 18, grn: 7, onp: 38, oth: 11 },
+        "Year 12": { alp: 28, lnp: 21, grn: 16, onp: 25, oth: 10 },
         TAFE: { alp: 27, lnp: 19, grn: 12, onp: 30, oth: 12 },
         Undergraduate: { alp: 32, lnp: 24, grn: 16, onp: 18, oth: 10 },
         Postgraduate: { alp: 35, lnp: 24, grn: 16, onp: 17, oth: 8 },

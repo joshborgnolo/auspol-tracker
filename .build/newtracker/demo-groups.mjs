@@ -14,7 +14,7 @@
                  Year 12 together are Year 12 or less; TAFE, TAFE or college
                  and TAFE or trade are TAFE or trade; University is University.
                  DemosAU (MRP)'s five-level scale shares only its TAFE row;
-                 its Didn't Finish Grade 12 and Grade 12 pair and its
+                 its Less than year 12 and Year 12 pair and its
                  Undergraduate and Postgraduate pair are the common school
                  and university groups split in two, filed as printed.
                  RedBridge's two school rows merge 39:61, the split of its own
