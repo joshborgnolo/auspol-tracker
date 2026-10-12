@@ -2936,6 +2936,47 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
 const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
 const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "income", "working", "occupation", "country", "state", "location", "housing", "language", "religion", "children", "class", "stress", "electorate"];
 const DEMO_BY_POLL = new Map();
+
+/* DemosAU MRP preference flows, all regions. The reports print each contest's
+   flows by region only (Inner Metro, Outer Metro, Regional/Rural); `all` is
+   the site's weighting of those cells, carried beside them as pf.all. Each
+   cohort's region weight is the region's 2025 enrolment (AEC demographic
+   classification, data/aec-2025-division-class.json; Regional = provincial +
+   rural) times that cohort's share of the vote there in the same MRP
+   (demographics.json's location table), so a region counts by how many of
+   that cohort's voters live in it. Whole numbers, as the regions print. */
+const AEC_CLASS = (() => {
+  if (JUR) return null;
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "aec-2025-division-class.json"), "utf8")); }
+  catch { return null; }
+})();
+const PF_REGION_ENROL = AEC_CLASS ? AEC_CLASS.divisions.reduce((o, d) => {
+  const k = d.class === "provincial" || d.class === "rural" ? "regional" : d.class;
+  o[k] = (o[k] || 0) + d.enrolment;
+  return o;
+}, {}) : null;
+const PF_LOC = { inner: "Inner metro", outer: "Outer metro", regional: "Reg & Rur" };
+function prefFlowsOut(p) {
+  const pf = p.pref_flows;
+  const w = (DEMOGRAPHICS?.waves || []).find((x) => x.pollster === p.pollster && x.date === p.date);
+  const loc = w && w.dims && w.dims.location;
+  if (!PF_REGION_ENROL || !loc || !Object.values(PF_LOC).every((l) => loc[l])) return pf;
+  const one = (t, ks) => {
+    if (!t || !["inner", "outer", "regional"].every((r) => t[r])) return null;
+    const o = {};
+    for (const k of ks) {
+      let num = 0, den = 0;
+      for (const r of ["inner", "outer", "regional"]) {
+        const wt = PF_REGION_ENROL[r] * (loc[PF_LOC[r]][k] || 0);
+        num += wt * t[r][k]; den += wt;
+      }
+      if (den > 0) o[k] = Math.round(num / den);
+    }
+    return o;
+  };
+  const all = { alp_onp: one(pf.alp_onp, ["lnp", "grn", "oth"]), lnp_onp: one(pf.lnp_onp, ["alp", "grn", "oth"]) };
+  return all.alp_onp || all.lnp_onp ? { ...pf, all } : pf;
+}
 for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
   const p = demoPollOf(w);
   if (!p) continue;
@@ -3250,7 +3291,7 @@ const individualPolls = POLLS.map((p) => {
     ...(VS_BY_POLL.has(p.date + "|" + p.pollster) ? { sw: VS_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
     // DemosAU MRP's printed preference flows by region (polls.json pref_flows;
     // display-only: the opened poll's Preferences line cycles its regions)
-    ...(p.pref_flows ? { pf: p.pref_flows } : {}),
+    ...(p.pref_flows ? { pf: prefFlowsOut(p) } : {}),
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 

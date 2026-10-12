@@ -1,0 +1,906 @@
+{
+ "_about": "AEC demographic classification of the 150 House divisions at the 2025 federal election, with each division's enrolment, as the AEC's results site prints them (HouseDivisionClassifications-31496-<STATE>.htm, fetched 2026-10-12). Read by gen-data to weight DemosAU MRP regional preference flows (Inner Metro / Outer Metro / Regional-Rural = provincial + rural) into an all-regions figure.",
+ "source": "https://results.aec.gov.au/31496/Website/HouseDivisionClassifications-31496-NSW.htm",
+ "divisions": [
+  {
+   "name": "Bean",
+   "state": "ACT",
+   "enrolment": 113876,
+   "class": "inner"
+  },
+  {
+   "name": "Canberra",
+   "state": "ACT",
+   "enrolment": 102942,
+   "class": "inner"
+  },
+  {
+   "name": "Fenner",
+   "state": "ACT",
+   "enrolment": 105428,
+   "class": "inner"
+  },
+  {
+   "name": "Banks",
+   "state": "NSW",
+   "enrolment": 119323,
+   "class": "inner"
+  },
+  {
+   "name": "Barton",
+   "state": "NSW",
+   "enrolment": 120761,
+   "class": "inner"
+  },
+  {
+   "name": "Bennelong",
+   "state": "NSW",
+   "enrolment": 125953,
+   "class": "inner"
+  },
+  {
+   "name": "Berowra",
+   "state": "NSW",
+   "enrolment": 130869,
+   "class": "outer"
+  },
+  {
+   "name": "Blaxland",
+   "state": "NSW",
+   "enrolment": 116715,
+   "class": "inner"
+  },
+  {
+   "name": "Bradfield",
+   "state": "NSW",
+   "enrolment": 126860,
+   "class": "inner"
+  },
+  {
+   "name": "Calare",
+   "state": "NSW",
+   "enrolment": 124664,
+   "class": "rural"
+  },
+  {
+   "name": "Chifley",
+   "state": "NSW",
+   "enrolment": 116648,
+   "class": "outer"
+  },
+  {
+   "name": "Cook",
+   "state": "NSW",
+   "enrolment": 118855,
+   "class": "inner"
+  },
+  {
+   "name": "Cowper",
+   "state": "NSW",
+   "enrolment": 131639,
+   "class": "provincial"
+  },
+  {
+   "name": "Cunningham",
+   "state": "NSW",
+   "enrolment": 132139,
+   "class": "provincial"
+  },
+  {
+   "name": "Dobell",
+   "state": "NSW",
+   "enrolment": 122541,
+   "class": "provincial"
+  },
+  {
+   "name": "Eden-Monaro",
+   "state": "NSW",
+   "enrolment": 121376,
+   "class": "rural"
+  },
+  {
+   "name": "Farrer",
+   "state": "NSW",
+   "enrolment": 123752,
+   "class": "rural"
+  },
+  {
+   "name": "Fowler",
+   "state": "NSW",
+   "enrolment": 119951,
+   "class": "outer"
+  },
+  {
+   "name": "Gilmore",
+   "state": "NSW",
+   "enrolment": 128995,
+   "class": "rural"
+  },
+  {
+   "name": "Grayndler",
+   "state": "NSW",
+   "enrolment": 125552,
+   "class": "inner"
+  },
+  {
+   "name": "Greenway",
+   "state": "NSW",
+   "enrolment": 118906,
+   "class": "outer"
+  },
+  {
+   "name": "Hughes",
+   "state": "NSW",
+   "enrolment": 114887,
+   "class": "outer"
+  },
+  {
+   "name": "Hume",
+   "state": "NSW",
+   "enrolment": 117449,
+   "class": "outer"
+  },
+  {
+   "name": "Hunter",
+   "state": "NSW",
+   "enrolment": 132184,
+   "class": "rural"
+  },
+  {
+   "name": "Kingsford Smith",
+   "state": "NSW",
+   "enrolment": 117399,
+   "class": "inner"
+  },
+  {
+   "name": "Lindsay",
+   "state": "NSW",
+   "enrolment": 121306,
+   "class": "outer"
+  },
+  {
+   "name": "Lyne",
+   "state": "NSW",
+   "enrolment": 129584,
+   "class": "rural"
+  },
+  {
+   "name": "Macarthur",
+   "state": "NSW",
+   "enrolment": 115008,
+   "class": "outer"
+  },
+  {
+   "name": "Mackellar",
+   "state": "NSW",
+   "enrolment": 129339,
+   "class": "outer"
+  },
+  {
+   "name": "Macquarie",
+   "state": "NSW",
+   "enrolment": 121939,
+   "class": "provincial"
+  },
+  {
+   "name": "McMahon",
+   "state": "NSW",
+   "enrolment": 120536,
+   "class": "outer"
+  },
+  {
+   "name": "Mitchell",
+   "state": "NSW",
+   "enrolment": 122997,
+   "class": "outer"
+  },
+  {
+   "name": "New England",
+   "state": "NSW",
+   "enrolment": 131238,
+   "class": "rural"
+  },
+  {
+   "name": "Newcastle",
+   "state": "NSW",
+   "enrolment": 126226,
+   "class": "provincial"
+  },
+  {
+   "name": "Page",
+   "state": "NSW",
+   "enrolment": 129373,
+   "class": "rural"
+  },
+  {
+   "name": "Parkes",
+   "state": "NSW",
+   "enrolment": 130841,
+   "class": "rural"
+  },
+  {
+   "name": "Parramatta",
+   "state": "NSW",
+   "enrolment": 117501,
+   "class": "inner"
+  },
+  {
+   "name": "Paterson",
+   "state": "NSW",
+   "enrolment": 127926,
+   "class": "provincial"
+  },
+  {
+   "name": "Reid",
+   "state": "NSW",
+   "enrolment": 117810,
+   "class": "inner"
+  },
+  {
+   "name": "Richmond",
+   "state": "NSW",
+   "enrolment": 126814,
+   "class": "rural"
+  },
+  {
+   "name": "Riverina",
+   "state": "NSW",
+   "enrolment": 128537,
+   "class": "rural"
+  },
+  {
+   "name": "Robertson",
+   "state": "NSW",
+   "enrolment": 114922,
+   "class": "provincial"
+  },
+  {
+   "name": "Shortland",
+   "state": "NSW",
+   "enrolment": 122971,
+   "class": "provincial"
+  },
+  {
+   "name": "Sydney",
+   "state": "NSW",
+   "enrolment": 127445,
+   "class": "inner"
+  },
+  {
+   "name": "Warringah",
+   "state": "NSW",
+   "enrolment": 130761,
+   "class": "inner"
+  },
+  {
+   "name": "Watson",
+   "state": "NSW",
+   "enrolment": 116432,
+   "class": "inner"
+  },
+  {
+   "name": "Wentworth",
+   "state": "NSW",
+   "enrolment": 127463,
+   "class": "inner"
+  },
+  {
+   "name": "Werriwa",
+   "state": "NSW",
+   "enrolment": 117790,
+   "class": "outer"
+  },
+  {
+   "name": "Whitlam",
+   "state": "NSW",
+   "enrolment": 130093,
+   "class": "provincial"
+  },
+  {
+   "name": "Lingiari",
+   "state": "NT",
+   "enrolment": 76817,
+   "class": "rural"
+  },
+  {
+   "name": "Solomon",
+   "state": "NT",
+   "enrolment": 78702,
+   "class": "inner"
+  },
+  {
+   "name": "Blair",
+   "state": "QLD",
+   "enrolment": 142006,
+   "class": "provincial"
+  },
+  {
+   "name": "Bonner",
+   "state": "QLD",
+   "enrolment": 113498,
+   "class": "outer"
+  },
+  {
+   "name": "Bowman",
+   "state": "QLD",
+   "enrolment": 122940,
+   "class": "outer"
+  },
+  {
+   "name": "Brisbane",
+   "state": "QLD",
+   "enrolment": 127512,
+   "class": "inner"
+  },
+  {
+   "name": "Capricornia",
+   "state": "QLD",
+   "enrolment": 115141,
+   "class": "provincial"
+  },
+  {
+   "name": "Dawson",
+   "state": "QLD",
+   "enrolment": 117202,
+   "class": "rural"
+  },
+  {
+   "name": "Dickson",
+   "state": "QLD",
+   "enrolment": 119375,
+   "class": "outer"
+  },
+  {
+   "name": "Fadden",
+   "state": "QLD",
+   "enrolment": 135733,
+   "class": "outer"
+  },
+  {
+   "name": "Fairfax",
+   "state": "QLD",
+   "enrolment": 130658,
+   "class": "rural"
+  },
+  {
+   "name": "Fisher",
+   "state": "QLD",
+   "enrolment": 139064,
+   "class": "rural"
+  },
+  {
+   "name": "Flynn",
+   "state": "QLD",
+   "enrolment": 117901,
+   "class": "rural"
+  },
+  {
+   "name": "Forde",
+   "state": "QLD",
+   "enrolment": 134005,
+   "class": "outer"
+  },
+  {
+   "name": "Griffith",
+   "state": "QLD",
+   "enrolment": 123916,
+   "class": "inner"
+  },
+  {
+   "name": "Groom",
+   "state": "QLD",
+   "enrolment": 119008,
+   "class": "provincial"
+  },
+  {
+   "name": "Herbert",
+   "state": "QLD",
+   "enrolment": 121280,
+   "class": "provincial"
+  },
+  {
+   "name": "Hinkler",
+   "state": "QLD",
+   "enrolment": 127702,
+   "class": "provincial"
+  },
+  {
+   "name": "Kennedy",
+   "state": "QLD",
+   "enrolment": 123696,
+   "class": "rural"
+  },
+  {
+   "name": "Leichhardt",
+   "state": "QLD",
+   "enrolment": 122757,
+   "class": "rural"
+  },
+  {
+   "name": "Lilley",
+   "state": "QLD",
+   "enrolment": 118593,
+   "class": "inner"
+  },
+  {
+   "name": "Longman",
+   "state": "QLD",
+   "enrolment": 142744,
+   "class": "provincial"
+  },
+  {
+   "name": "Maranoa",
+   "state": "QLD",
+   "enrolment": 115520,
+   "class": "rural"
+  },
+  {
+   "name": "McPherson",
+   "state": "QLD",
+   "enrolment": 121545,
+   "class": "provincial"
+  },
+  {
+   "name": "Moncrieff",
+   "state": "QLD",
+   "enrolment": 125713,
+   "class": "provincial"
+  },
+  {
+   "name": "Moreton",
+   "state": "QLD",
+   "enrolment": 109260,
+   "class": "inner"
+  },
+  {
+   "name": "Oxley",
+   "state": "QLD",
+   "enrolment": 122449,
+   "class": "outer"
+  },
+  {
+   "name": "Petrie",
+   "state": "QLD",
+   "enrolment": 134359,
+   "class": "outer"
+  },
+  {
+   "name": "Rankin",
+   "state": "QLD",
+   "enrolment": 114950,
+   "class": "outer"
+  },
+  {
+   "name": "Ryan",
+   "state": "QLD",
+   "enrolment": 114860,
+   "class": "outer"
+  },
+  {
+   "name": "Wide Bay",
+   "state": "QLD",
+   "enrolment": 123153,
+   "class": "rural"
+  },
+  {
+   "name": "Wright",
+   "state": "QLD",
+   "enrolment": 140286,
+   "class": "rural"
+  },
+  {
+   "name": "Adelaide",
+   "state": "SA",
+   "enrolment": 131436,
+   "class": "inner"
+  },
+  {
+   "name": "Barker",
+   "state": "SA",
+   "enrolment": 127045,
+   "class": "rural"
+  },
+  {
+   "name": "Boothby",
+   "state": "SA",
+   "enrolment": 129524,
+   "class": "outer"
+  },
+  {
+   "name": "Grey",
+   "state": "SA",
+   "enrolment": 128707,
+   "class": "rural"
+  },
+  {
+   "name": "Hindmarsh",
+   "state": "SA",
+   "enrolment": 131379,
+   "class": "inner"
+  },
+  {
+   "name": "Kingston",
+   "state": "SA",
+   "enrolment": 127919,
+   "class": "outer"
+  },
+  {
+   "name": "Makin",
+   "state": "SA",
+   "enrolment": 123639,
+   "class": "outer"
+  },
+  {
+   "name": "Mayo",
+   "state": "SA",
+   "enrolment": 137818,
+   "class": "rural"
+  },
+  {
+   "name": "Spence",
+   "state": "SA",
+   "enrolment": 138898,
+   "class": "outer"
+  },
+  {
+   "name": "Sturt",
+   "state": "SA",
+   "enrolment": 130300,
+   "class": "inner"
+  },
+  {
+   "name": "Bass",
+   "state": "TAS",
+   "enrolment": 80378,
+   "class": "provincial"
+  },
+  {
+   "name": "Braddon",
+   "state": "TAS",
+   "enrolment": 84244,
+   "class": "rural"
+  },
+  {
+   "name": "Clark",
+   "state": "TAS",
+   "enrolment": 74304,
+   "class": "inner"
+  },
+  {
+   "name": "Franklin",
+   "state": "TAS",
+   "enrolment": 83693,
+   "class": "outer"
+  },
+  {
+   "name": "Lyons",
+   "state": "TAS",
+   "enrolment": 88977,
+   "class": "rural"
+  },
+  {
+   "name": "Aston",
+   "state": "VIC",
+   "enrolment": 122459,
+   "class": "outer"
+  },
+  {
+   "name": "Ballarat",
+   "state": "VIC",
+   "enrolment": 116238,
+   "class": "provincial"
+  },
+  {
+   "name": "Bendigo",
+   "state": "VIC",
+   "enrolment": 120088,
+   "class": "provincial"
+  },
+  {
+   "name": "Bruce",
+   "state": "VIC",
+   "enrolment": 127622,
+   "class": "outer"
+  },
+  {
+   "name": "Calwell",
+   "state": "VIC",
+   "enrolment": 115542,
+   "class": "outer"
+  },
+  {
+   "name": "Casey",
+   "state": "VIC",
+   "enrolment": 122351,
+   "class": "rural"
+  },
+  {
+   "name": "Chisholm",
+   "state": "VIC",
+   "enrolment": 122733,
+   "class": "inner"
+  },
+  {
+   "name": "Cooper",
+   "state": "VIC",
+   "enrolment": 119909,
+   "class": "inner"
+  },
+  {
+   "name": "Corangamite",
+   "state": "VIC",
+   "enrolment": 114123,
+   "class": "provincial"
+  },
+  {
+   "name": "Corio",
+   "state": "VIC",
+   "enrolment": 122756,
+   "class": "provincial"
+  },
+  {
+   "name": "Deakin",
+   "state": "VIC",
+   "enrolment": 126675,
+   "class": "outer"
+  },
+  {
+   "name": "Dunkley",
+   "state": "VIC",
+   "enrolment": 124350,
+   "class": "outer"
+  },
+  {
+   "name": "Flinders",
+   "state": "VIC",
+   "enrolment": 127540,
+   "class": "rural"
+  },
+  {
+   "name": "Fraser",
+   "state": "VIC",
+   "enrolment": 124191,
+   "class": "inner"
+  },
+  {
+   "name": "Gellibrand",
+   "state": "VIC",
+   "enrolment": 118962,
+   "class": "inner"
+  },
+  {
+   "name": "Gippsland",
+   "state": "VIC",
+   "enrolment": 118075,
+   "class": "rural"
+  },
+  {
+   "name": "Goldstein",
+   "state": "VIC",
+   "enrolment": 126139,
+   "class": "inner"
+  },
+  {
+   "name": "Gorton",
+   "state": "VIC",
+   "enrolment": 129230,
+   "class": "outer"
+  },
+  {
+   "name": "Hawke",
+   "state": "VIC",
+   "enrolment": 118785,
+   "class": "provincial"
+  },
+  {
+   "name": "Holt",
+   "state": "VIC",
+   "enrolment": 112953,
+   "class": "outer"
+  },
+  {
+   "name": "Hotham",
+   "state": "VIC",
+   "enrolment": 118993,
+   "class": "inner"
+  },
+  {
+   "name": "Indi",
+   "state": "VIC",
+   "enrolment": 120774,
+   "class": "rural"
+  },
+  {
+   "name": "Isaacs",
+   "state": "VIC",
+   "enrolment": 120753,
+   "class": "outer"
+  },
+  {
+   "name": "Jagajaga",
+   "state": "VIC",
+   "enrolment": 121269,
+   "class": "outer"
+  },
+  {
+   "name": "Kooyong",
+   "state": "VIC",
+   "enrolment": 124480,
+   "class": "inner"
+  },
+  {
+   "name": "La Trobe",
+   "state": "VIC",
+   "enrolment": 115425,
+   "class": "provincial"
+  },
+  {
+   "name": "Lalor",
+   "state": "VIC",
+   "enrolment": 114496,
+   "class": "outer"
+  },
+  {
+   "name": "Macnamara",
+   "state": "VIC",
+   "enrolment": 114579,
+   "class": "inner"
+  },
+  {
+   "name": "Mallee",
+   "state": "VIC",
+   "enrolment": 121604,
+   "class": "rural"
+  },
+  {
+   "name": "Maribyrnong",
+   "state": "VIC",
+   "enrolment": 123249,
+   "class": "inner"
+  },
+  {
+   "name": "McEwen",
+   "state": "VIC",
+   "enrolment": 117921,
+   "class": "rural"
+  },
+  {
+   "name": "Melbourne",
+   "state": "VIC",
+   "enrolment": 113369,
+   "class": "inner"
+  },
+  {
+   "name": "Menzies",
+   "state": "VIC",
+   "enrolment": 120989,
+   "class": "outer"
+  },
+  {
+   "name": "Monash",
+   "state": "VIC",
+   "enrolment": 116463,
+   "class": "rural"
+  },
+  {
+   "name": "Nicholls",
+   "state": "VIC",
+   "enrolment": 121390,
+   "class": "rural"
+  },
+  {
+   "name": "Scullin",
+   "state": "VIC",
+   "enrolment": 114926,
+   "class": "outer"
+  },
+  {
+   "name": "Wannon",
+   "state": "VIC",
+   "enrolment": 121788,
+   "class": "rural"
+  },
+  {
+   "name": "Wills",
+   "state": "VIC",
+   "enrolment": 125264,
+   "class": "inner"
+  },
+  {
+   "name": "Brand",
+   "state": "WA",
+   "enrolment": 112457,
+   "class": "outer"
+  },
+  {
+   "name": "Bullwinkel",
+   "state": "WA",
+   "enrolment": 121364,
+   "class": "outer"
+  },
+  {
+   "name": "Burt",
+   "state": "WA",
+   "enrolment": 119997,
+   "class": "outer"
+  },
+  {
+   "name": "Canning",
+   "state": "WA",
+   "enrolment": 119262,
+   "class": "outer"
+  },
+  {
+   "name": "Cowan",
+   "state": "WA",
+   "enrolment": 116491,
+   "class": "inner"
+  },
+  {
+   "name": "Curtin",
+   "state": "WA",
+   "enrolment": 117244,
+   "class": "inner"
+  },
+  {
+   "name": "Durack",
+   "state": "WA",
+   "enrolment": 119942,
+   "class": "rural"
+  },
+  {
+   "name": "Forrest",
+   "state": "WA",
+   "enrolment": 117485,
+   "class": "rural"
+  },
+  {
+   "name": "Fremantle",
+   "state": "WA",
+   "enrolment": 118331,
+   "class": "inner"
+  },
+  {
+   "name": "Hasluck",
+   "state": "WA",
+   "enrolment": 113257,
+   "class": "outer"
+  },
+  {
+   "name": "Moore",
+   "state": "WA",
+   "enrolment": 121758,
+   "class": "outer"
+  },
+  {
+   "name": "O'Connor",
+   "state": "WA",
+   "enrolment": 122006,
+   "class": "rural"
+  },
+  {
+   "name": "Pearce",
+   "state": "WA",
+   "enrolment": 115275,
+   "class": "outer"
+  },
+  {
+   "name": "Perth",
+   "state": "WA",
+   "enrolment": 114458,
+   "class": "inner"
+  },
+  {
+   "name": "Swan",
+   "state": "WA",
+   "enrolment": 116105,
+   "class": "inner"
+  },
+  {
+   "name": "Tangney",
+   "state": "WA",
+   "enrolment": 122584,
+   "class": "inner"
+  }
+ ]
+}

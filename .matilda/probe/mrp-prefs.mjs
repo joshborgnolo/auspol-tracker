@@ -1,6 +1,7 @@
 /* headless probe of DemosAU MRP preference flows (2026-10-12):
    - the opened MRP poll's "Preferences" line in Also in this poll: its region
-     chip cycles Inner metro → Outer metro → Regional → Inner metro, showing
+     chip cycles Inner metro → Outer metro → Regional → All regions (gen-data's
+     enrolment-and-vote weighting) → Inner metro, showing
      that region's printed cells, and a press never moves the line's box
      (same width/height at every step);
    - the forced-choice Labor v Coalition chart carries one .rd-ff-dm diamond
@@ -47,7 +48,7 @@ for (const w of [1440, 1024, 768, 390]) {
   check(opened, "opened the Aug–Sep MRP");
   await wait(1200);
   const steps = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     steps.push(await page.evaluate(() => {
       const b = document.querySelector(".rd-ldg-cyc");
       if (!b) return null;
@@ -55,7 +56,7 @@ for (const w of [1440, 1024, 768, 390]) {
       return { region: b.querySelector(".on").textContent, text: line.querySelector(".rd-ldg-lbody").innerText.replace(/\s+/g, " "),
                w: r.width, h: r.height, bw: br.width, bh: br.height };
     }));
-    if (SHOT && i < 3) {
+    if (SHOT && i < 4) {
       const el = await page.$(".rd-ldg-also");
       await el.evaluate((e) => e.scrollIntoView({ block: "center" }));
       await wait(100);
@@ -67,7 +68,8 @@ for (const w of [1440, 1024, 768, 390]) {
   check(steps.every(Boolean), "the Preferences line is there");
   if (steps.every(Boolean)) {
     console.log("   " + steps.map((s) => s.region + ": " + s.text).join("\n   "));
-    check(steps.map((s) => s.region).join(">") === "Inner metro>Outer metro>Regional>Inner metro", "cycles the three regions and wraps");
+    check(steps.map((s) => s.region).join(">") === "Inner metro>Outer metro>Regional>All regions>Inner metro", "cycles the three regions, then All regions, and wraps");
+    check(/ON 18 to ALP v L\/NP, nationwide/.test(steps[3].text), "the nationwide One Nation flow closes the line");
     check(steps.every((s) => s.w === steps[0].w && s.h === steps[0].h && s.bw === steps[0].bw), "line and chip hold their size");
     check(/L\/NP 48/.test(steps[0].text) && /L\/NP 37/.test(steps[1].text) && /L\/NP 30/.test(steps[2].text), "regional cells read through");
     const lh = await page.evaluate(() => { const l = document.querySelector(".rd-ldg-lines .rd-ldg-line"); return l.getBoundingClientRect().height; });

@@ -1779,12 +1779,17 @@ function RdLgDir({ p }) {
 /* the Preferences line's region chip (data: polls.json pref_flows → p.pf,
    gen-data's individualPolls emit): DemosAU's MRP reports print respondent-
    ranked preference flows per region, so the line's chip cycles the three
-   regions, its cells swapping in place. The names stack in one grid cell
-   (.rd-ldg-cycw, rd.css) so a press never resizes the chip or the line. */
-const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
+   regions, its cells swapping in place, then "All regions": the site's
+   weighting of the three (gen-data's pf.all – each region's 2025 enrolment
+   times the group's vote there), which the report itself never prints. The
+   names stack in one grid cell (.rd-ldg-cycw, rd.css) so a press never
+   resizes the chip or the line. */
+const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
+const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
 function RdLgPrefs({ pf }) {
+  const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
   const [ri, setRi] = React.useState(0);
-  const rk = RD_LG_PREFS_REGIONS[ri][0];
+  const rk = regs[ri % regs.length][0], rn = regs[ri % regs.length][1], next = regs[(ri + 1) % regs.length][1];
   const cell = (k, v) => v != null && (
     <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b></span>
   );
@@ -1794,15 +1799,19 @@ function RdLgPrefs({ pf }) {
       {cells.map(([k, v]) => cell(k, v))}
     </span>
   );
-  const a = pf.alp_onp ? pf.alp_onp[rk] : null, c = pf.lnp_onp ? pf.lnp_onp[rk] : null;
+  const at = (t) => (rk === "all" ? (pf.all && pf.all[t]) || null : pf[t] ? pf[t][rk] : null);
+  const a = at("alp_onp"), c = at("lnp_onp");
   return <>
-    <button type="button" className="rd-ldg-cyc" title={"Region shown: " + RD_LG_PREFS_REGIONS[ri][1] + " — press for the next"}
-            onClick={(ev) => { ev.stopPropagation(); setRi((ri + 1) % RD_LG_PREFS_REGIONS.length); }}>
-      <span className="rd-ldg-cycw">{RD_LG_PREFS_REGIONS.map(([k, n], i) => <span key={k} className={i === ri ? "on" : ""}>{n}</span>)}</span>
+    <button type="button" className="rd-ldg-cyc" title={(rk === "all" ? RD_LG_PREFS_ALL + ". " : "") + "Region shown: " + rn + " — press for " + next}
+            aria-label={rn + (rk === "all" ? " (" + RD_LG_PREFS_ALL + ")" : "") + " – show " + next}
+            onClick={(ev) => { ev.stopPropagation(); setRi((ri + 1) % regs.length); }}>
+      <span className="rd-ldg-cycw">{regs.map(([k, n], i) => <span key={k} aria-hidden="true" className={i === ri % regs.length ? "on" : ""}>{n}</span>)}</span>
       <span className="rd-ldg-cyca" aria-hidden="true">↻</span>
     </button>
     {a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]])}
     {c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]])}
+    {/* the one flow the report prints nationally, the same at every step */}
+    {pf.onp_alp_lnp != null && <span className="rd-ldg-li rd-ldg-lisoft">{cell("onp", pf.onp_alp_lnp)} to ALP v L/NP, nationwide</span>}
   </>;
 }
 
