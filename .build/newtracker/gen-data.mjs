@@ -17,6 +17,7 @@ import { writeAtomic } from "../atomic-write.mjs";
 import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
+import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -6270,6 +6271,70 @@ for (const c of CYC_META) {
   };
 }
 
+/* ---- 8d. the change log ---------------------------------------------------
+   The Info tab's change log: what moved the two-party preferred estimate,
+   and which statistical findings appeared or fell away. State is computed
+   every build, but appended to data/changelog.json ONLY on a real site
+   refresh (AUSPOL_SITE_REFRESH=1 – refresh_site's federal builds), never on
+   quiet refreshes: the state stays frozen at the last logged refresh, so an
+   entry's "moved a → b" reads entry to entry, and a drift-only run leaves
+   the tree untouched (a dirty tree is what makes the unattended jobs refuse
+   their slot). Every other caller – npm test, probes, dev builds, /vic/ –
+   just carries the committed entries through to the page. */
+const changelog = JUR ? null : (() => {
+  let committed = { state: null, entries: [] };
+  try { committed = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")); } catch { /* first ship: init below */ }
+  const moves = {}, movesMeta = {};
+  for (const [party, o] of Object.entries(demoTrend || {})) {
+    for (const m of (o && o.moves) || []) {
+      const k = `${party}|${m.set}|${m.group}`;
+      moves[k] = m.dir > 0 ? 1 : -1;
+      movesMeta[k] = { party, group: m.group, setLabel: m.setLabel };
+    }
+  }
+  const pollInfo = {};
+  for (const p of POLLS) {
+    pollInfo[`${p.date}|${p.pollster}`] = {
+      name: p.pollster,
+      fw: p.fieldworkPending || !p.dateStart ? "fieldwork dates TBC" : fwLabel(p.dateStart, p.date),
+      sample: p.sample ?? null,
+      url: p.releaseUrl || p.url || null,
+    };
+  }
+  const onNow = onImp ? onImp.a : (altLatest.alp_on ? altLatest.alp_on.a : null);
+  const nextState = stateOf({
+    lead: rivalLead === "alp_on"
+      ? { pair: "alp_on", basis: onImp ? "imp" : "pub", alp: onNow }
+      : { pair: "alp_lnp", basis: synthNow ? "imp" : "pub", alp: synthNow ? synthNow.alp : (hlNow ? hlNow.alp : null) },
+    imp: synthNow ? synthNow.alp : null,
+    pub: hlNow && hlNow.alp != null ? hlNow.alp : null,
+    on: onNow,
+    momSig: !!(synthChg && synthChg.changeSig),
+    flows: flowsOf(FLOW, FP_ON, FP_ON_BAND),
+    polls: Object.keys(pollInfo),
+    moves, movesMeta,
+  });
+  if (process.env.AUSPOL_SITE_REFRESH) {
+    const iso = new Date().toLocaleDateString("sv-SE", { timeZone: "Australia/Sydney" });
+    const file = path.join(ROOT, "data", "changelog.json");
+    if (!committed.state) {
+      const seeded = initChangelog(nextState, iso);
+      writeAtomic(file, JSON.stringify(seeded, null, 2) + "\n");
+      console.log(`changelog: seeded ${iso} (recording begins at ${seeded.state.lead ? seeded.state.lead.alp : "—"})`);
+      return seeded.entries;
+    }
+    const d = diffChangelog(committed.state, committed.entries || [], nextState, iso, pollInfo);
+    if (d.appended.length) {
+      writeAtomic(file, JSON.stringify({ state: d.state, entries: d.entries }, null, 2) + "\n");
+      console.log("changelog: +" + d.appended.map((e) => e.kind).join("+") + " →", d.appended.map((e) => e.text.length <= 72 ? e.text : e.text.slice(0, 69) + "…").join(" | "));
+    } else {
+      console.log("changelog: quiet refresh (state unchanged)");
+    }
+    return d.entries;
+  }
+  return committed.entries || [];
+})();
+
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
    Generated from ${JUR ? "data/vic-polls.json (via .build/vic/to-main-schema.mjs)" : "data/polls.json"} by .build/newtracker/gen-data.mjs – do
@@ -6504,6 +6569,10 @@ window.AUSPOL = (function () {
   const latest = ${JSON.stringify(latest)};
   const showWorking = ${JSON.stringify(showWorking)};
   const events = ${JSON.stringify(events)};
+  /* The Info tab's change log (gen-data §8d): poll additions, preference-
+     flow assumption changes and significance findings, appended on each
+     site refresh; null on a jurisdiction page. */
+  const changelog = ${JSON.stringify(changelog)};
 
   const CYCLE_DEFS = ${JSON.stringify(CYCLE_DEFS)};
   /* Individual readings behind each past cycle's lines – its dots, and the
@@ -6580,7 +6649,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
-    individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking,
+    individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },

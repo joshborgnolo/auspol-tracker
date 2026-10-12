@@ -1460,6 +1460,11 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-about { margin-bottom: 8px; }
+.info-changelog { list-style: none; margin: 0 0 12px; padding: 0;
+  font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+.info-changelog li { margin: 0 0 7px; }
+.info-cl-date { display: inline-block; min-width: 47px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums; }
 .info-group { font-family: var(--serif); font-size: 17px; font-weight: 600;
   color: var(--ink); margin: 26px 0 12px; break-after: avoid; }
 .info-group:first-of-type { margin-top: 4px; }
@@ -5612,6 +5617,13 @@ body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; mi
         none where it is not &#8211; and no national number knows the difference. Seat figures appear
         on this page only where a pollster modelled them seat by seat and published the result, which
         is what the MRP tag in the archive marks.</p>
+
+      <h2>Change log</h2>
+      <p>What has moved the aggregate&#8217;s two-party preferred estimate, and when each statistical
+        finding appeared or fell away &#8211; updated as new polls land. The latest ten entries;
+        the live page&#8217;s Info tab lists them all.</p>
+      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-12">12 Oct</time>
+        The change log starts here — the two-party preferred estimate is 52.3 (Labor v One Nation, implied flows). From today, every movement it makes and every statistical finding that comes or goes is recorded below.</p>
 
 <h2>Sources</h2>
       <p>Roy Morgan, YouGov, Newspoll, RedBridge/Accent, Resolve, Essential, DemosAU, Newspoll (pooled), Freshwater, Spectre Strategy, DemosAU (MRP), Fox &amp; Hedgehog, Wolf &amp; Smith, EMRS (Tas), YouGov (MRP), RedBridge/Accent (MRP), Roy Morgan (SMS), Agenda C Synesis, Roy Morgan (pooled). Field dates and sample sizes are listed per poll in the archive.</p>
@@ -81049,6 +81061,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "desc": "The Reserve Bank raises the cash-rate target to its highest level in 15 years.",
     "major": true
   }];
+  const changelog = [{
+    "date": "2026-10-12",
+    "label": "12 Oct",
+    "kind": "seed",
+    "text": "The change log starts here — the two-party preferred estimate is 52.3 (Labor v One Nation, implied flows). From today, every movement it makes and every statistical finding that comes or goes is recorded below."
+  }];
   const CYCLE_DEFS = [{
     "year": 1972,
     "gov": "alp",
@@ -83258,6 +83276,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     cycles,
     events,
     showWorking,
+    changelog,
     get cycleSource() {
       return _cycleSource || {};
     },
@@ -100378,7 +100397,18 @@ function infoTerms(D) {
   }, React.createElement("b", null, "Following along."), " The ", React.createElement("a", {
     className: "fb-link",
     href: "feed.xml"
-  }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release."), React.createElement("p", {
+  }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release."), !window.JUR && D.changelog && D.changelog.length ? React.createElement(React.Fragment, null, React.createElement("p", {
+    className: "info-about-p"
+  }, React.createElement("b", null, "Change log."), " What has moved the site\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away:"), React.createElement("ul", {
+    className: "info-changelog"
+  }, [...D.changelog].reverse().map((e, i) => React.createElement("li", {
+    key: i
+  }, React.createElement("span", {
+    className: "info-cl-date"
+  }, e.label), " ", e.text, e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
+    className: "fb-link",
+    href: e.url
+  }, "the pollster\u2019s release \u2197")) : null)))) : null, React.createElement("p", {
     className: "info-about-p"
   }, React.createElement("b", null, "Feedback."), " Spot a wrong number or have any other feedback?", " ", React.createElement("a", {
     className: "fb-link",

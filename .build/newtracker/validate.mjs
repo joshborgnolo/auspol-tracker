@@ -654,9 +654,42 @@ export function validate(D) {
   return { errors, exempted, orphans: [...new Set(orphans)] };
 }
 
+/* data/changelog.json – the Info-tab change log gen-data §8d appends to on
+   each site refresh. Shape only: the figures it records were checked when
+   the estimator computed them, not re-audited here. */
+export function validateChangelog() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let C = null;
+  try { C = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")); }
+  catch { fail("changelog.json", "changelog", "missing or unparseable"); return errors; }
+  if (!C.state || typeof C.state !== "object") fail("changelog.json", "changelog-shape", "no state object");
+  if (!Array.isArray(C.entries)) {
+    fail("changelog.json", "changelog-shape", "entries is not an array");
+    return errors;
+  }
+  const KINDS = new Set(["seed", "meta", "flows", "poll", "finding"]);
+  let prev = null;
+  C.entries.forEach((e, i) => {
+    const where = `changelog #${i} (${e && e.kind})`;
+    if (!e || typeof e !== "object") { fail(where, "changelog-shape", "entry is not an object"); return; }
+    if (typeof e.text !== "string" || !e.text.trim()) fail(where, "changelog-shape", "entry without text");
+    if (!KINDS.has(e.kind)) fail(where, "changelog-shape", `unknown kind "${e.kind}"`);
+    if (!ISO_DAY.test(e.date || "")) fail(where, "date-format", `date "${e.date}" is not YYYY-MM-DD`);
+    else {
+      if (prev && e.date < prev) fail(where, "date-order", `precedes previous entry (${prev})`);
+      prev = e.date;
+    }
+    if (typeof e.label !== "string" || !e.label) fail(where, "changelog-shape", "entry without a display label");
+    if (e.url != null && typeof e.url !== "string") fail(where, "changelog-shape", `url = ${JSON.stringify(e.url)}`);
+  });
+  return errors;
+}
+
 if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const { errors, exempted, orphans } = validate(D);
+  errors.push(...validateChangelog());
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }

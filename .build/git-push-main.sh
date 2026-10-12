@@ -287,9 +287,14 @@ freshness_sync() {
 # per-tab pages joined when the tabs became real pages (2026-10-10) — Vic's
 # allpolls/info pair too (it has no cycles page until a term closes).
 # shellcheck disable=SC2034 # read by the wrappers that source this file
+# data/changelog.json joined when the Info-tab change log learned to append
+# itself on every federal refresh (2026-10-12): gen-data writes it under
+# AUSPOL_SITE_REFRESH, which only the two federal builds below set, so every
+# data commit has to carry it or the tree stays dirty for the next slot.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   vic/allpolls/index.html vic/info/index.html
+  data/changelog.json
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
   assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
 
@@ -312,7 +317,10 @@ SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
 # cheap no-ops when nothing moved, and a redraw failure warns rather than
 # blocking the data commit over a preview image.
 refresh_site() {
-  if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+  # AUSPOL_SITE_REFRESH marks the two true federal refresh builds: gen-data
+  # appends to data/changelog.json only under it (see §8d there) - never in
+  # the vic build, never in push_main's rebase rebuild, never in tests.
+  if ! AUSPOL_SITE_REFRESH=1 node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
     log "FAIL build (pre-card)"; return 1
   fi
   if ! node .build/newtracker/render-card.mjs >> "$LOG" 2>&1; then
@@ -323,7 +331,7 @@ refresh_site() {
     log "WARN render-favicon failed; shipping with the previous favicon PNG"
     echo "::warning::render-favicon failed; shipped the previous favicon PNG"
   fi
-  if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+  if ! AUSPOL_SITE_REFRESH=1 node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
     log "FAIL build (card restamp)"; return 1
   fi
   # /vic/ is this same build on Victorian data (BUILD_JUR=vic), and nothing

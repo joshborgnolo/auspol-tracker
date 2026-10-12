@@ -669,6 +669,25 @@ function ssAboutBlock(L, prim, acc) {
         is what the MRP tag in the archive marks.</p>`;
 }
 
+/* The Info tab's static change log: the latest entries from
+   data/changelog.json (gen-data §8d, appended on each site refresh), so the
+   standalone info article carries what the live tab lists. Federal only – a
+   VIC build never has the file. Caller supplies its esc. */
+function ssChangelogBlock(esc) {
+  let C = null;
+  try { C = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")); } catch { /* absent on first build */ }
+  if (!C || !Array.isArray(C.entries) || !C.entries.length) return "";
+  const rows = [...C.entries].reverse().slice(0, 10).map((e) => `
+      <p class="info-about-p"><time class="info-cl-date" datetime="${esc(e.date)}">${esc(e.label)}</time>
+        ${esc(e.text)}${e.url ? ` <a class="fb-link" href="${esc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</p>`).join("");
+  return `
+
+      <h2>Change log</h2>
+      <p>What has moved the aggregate&#8217;s two-party preferred estimate, and when each statistical
+        finding appeared or fell away &#8211; updated as new polls land. The latest ten entries;
+        the live page&#8217;s Info tab lists them all.</p>${rows}`;
+}
+
 function buildStaticSummary() {
   const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
@@ -1005,7 +1024,7 @@ ${VIC ? `      <h2>About this tracker</h2>
       <p>The live page&#8217;s Info tab defines the terms both sites use &#8211; two-party preferred,
         implied flows, house lean, the preference-flow machinery and the rest &#8211; and links every
         pollster&#8217;s series and methodology statement.</p>
-` : ssAboutBlock(L, prim, acc)}
+` : ssAboutBlock(L, prim, acc) + ssChangelogBlock(esc)}
 
 ${ssTail(esc, sources)}
     </article>`;

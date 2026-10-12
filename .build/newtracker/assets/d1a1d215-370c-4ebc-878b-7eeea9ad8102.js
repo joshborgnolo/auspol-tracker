@@ -7736,6 +7736,16 @@ function infoTerms(D) {
       poll lands.</p>
       <p className="info-about-p"><b>Following along.</b> The <a className="fb-link" href="feed.xml">RSS feed</a> lists
       each new poll as it is added, with a link to the pollster’s own release.</p>
+      {!window.JUR && D.changelog && D.changelog.length ? (<>
+      <p className="info-about-p"><b>Change log.</b> What has moved the site’s two-party
+      preferred estimate, and when each statistical finding appeared or fell away:</p>
+      <ul className="info-changelog">
+        {[...D.changelog].reverse().map((e, i) => (
+          <li key={i}><span className="info-cl-date">{e.label}</span> {e.text}
+          {e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
+        ))}
+      </ul>
+      </>) : null}
       <p className="info-about-p"><b>Feedback.</b> Spot a wrong number or have any other feedback?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept

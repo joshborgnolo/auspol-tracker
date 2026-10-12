@@ -1,0 +1,181 @@
+/* changelog.mjs – the refresh change log behind the Info tab's "Change log"
+   section. gen-data.mjs §8c computes the site's headline state on every
+   build; a real site refresh (AUSPOL_SITE_REFRESH=1, set only by
+   .build/git-push-main.sh's refresh_site) diffs it against the committed
+   data/changelog.json and appends entries when something moved:
+     - poll      — new waves landed, and what the 2PP estimate did
+     - flows     — the flows.mjs preference-flow assumptions changed
+     - finding   — a statistical finding appeared or fell away (the Who
+                   votes for whom proportionality breaks; the 2PP's own
+                   month-on-month significance)
+     - meta      — the headline pairing or basis switched
+     - seed      — the day recording began
+   Pure functions, no fs: gen-data hands in the parsed committed file and
+   writes what comes back. Pinned by .build/test-changelog.mjs. */
+import { createHash } from "node:crypto";
+
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+export const isoLabel = (iso) => `${+iso.slice(8, 10)} ${MONTH_SHORT[+iso.slice(5, 7) - 1]}`;
+export const isoLabelLong = (iso) => `${+iso.slice(8, 10)} ${MONTH_LONG[+iso.slice(5, 7) - 1]} ${iso.slice(0, 4)}`;
+
+const f1 = (v) => (Math.round(v * 10) / 10).toFixed(1);
+const r1 = (v) => Math.round(v * 10) / 10;
+
+export const PARTY_NAME = {
+  alp: "Labor", lnp: "the Coalition", grn: "the Greens",
+  onp: "One Nation", oth: "others", ind: "independents",
+};
+const pairName = (pair) => (pair === "alp_on" ? "Labor v One Nation" : "Labor v the Coalition");
+const basisName = (basis) => (basis === "imp" ? "implied flows" : "published figures");
+
+/* The flows summary, hashed so any change to flows.mjs's tables (the counted
+   FLOW set, or the ALP-v-ON FP_ON set and its band) registers as a `flows`
+   entry next refresh; the summary doubles as the entry text's figures. */
+export function flowsOf(flow, fpOn, band) {
+  const summary = {
+    grn: r1(flow.grn * 100), onp: r1(flow.onp * 100), oth: r1(flow.oth * 100),
+    on: { lnp: r1(fpOn.lnp * 100), grn: r1(fpOn.grn * 100), oth: r1(fpOn.oth * 100) },
+    band: band != null ? r1(band * 100) : null,
+  };
+  return { ...summary, hash: createHash("sha1").update(JSON.stringify(summary)).digest("hex").slice(0, 12) };
+}
+
+/* Canonical state. Everything is rounded at the boundary so a recomputation
+   from identical data is byte-identical: identical state ⇒ no entries, and
+   gen-data leaves the committed file untouched (quiet refreshes must not
+   dirty the tree or the unattended jobs refuse to run). */
+export function stateOf(raw) {
+  return {
+    lead: raw.lead && raw.lead.alp != null
+      ? { pair: raw.lead.pair, basis: raw.lead.basis, alp: r1(raw.lead.alp) }
+      : null,
+    imp: raw.imp != null ? r1(raw.imp) : null,
+    pub: raw.pub != null ? r1(raw.pub) : null,
+    on: raw.on != null ? r1(raw.on) : null,
+    momSig: !!raw.momSig,
+    flows: raw.flows || null,
+    polls: [...(raw.polls || [])].sort(),
+    moves: Object.fromEntries(Object.entries(raw.moves || {}).sort(([a], [b]) => (a < b ? -1 : 1))),
+    movesMeta: Object.fromEntries(Object.entries(raw.movesMeta || {}).sort(([a], [b]) => (a < b ? -1 : 1))),
+  };
+}
+
+const entry = (iso, kind, text, url) => ({
+  date: iso, label: isoLabel(iso), kind, text,
+  ...(url ? { url } : {}),
+});
+
+export function initChangelog(nextState, iso) {
+  const leadTxt = nextState.lead
+    ? ` — the two-party preferred estimate is ${f1(nextState.lead.alp)} (${pairName(nextState.lead.pair)}, ${basisName(nextState.lead.basis)})`
+    : "";
+  return {
+    state: nextState,
+    entries: [entry(iso, "seed",
+      `The change log starts here${leadTxt}. From today, every movement it makes and every statistical finding that comes or goes is recorded below.`)],
+  };
+}
+
+/* "moved 52.2 → 52.3", or "held at 52.3", or null when either side is
+   missing (a basis that only just appeared has nothing to move FROM). */
+const moveTxt = (a, b) => {
+  if (a == null || b == null) return null;
+  return f1(a) === f1(b) ? `held at ${f1(b)}` : `moved ${f1(a)} → ${f1(b)}`;
+};
+const leadClause = (prev, next) => {
+  const t = prev && next && prev.pair === next.pair && prev.basis === next.basis ? moveTxt(prev.alp, next.alp) : null;
+  if (!t) return next ? `the estimate reads ${f1(next.alp)} (${pairName(next.pair)}, ${basisName(next.basis)})` : null;
+  return `the two-party preferred estimate ${t} (${pairName(next.pair)}, ${basisName(next.basis)})`;
+};
+
+/* prevState / nextState as canonicalised by stateOf; committed entries are
+   returned in `entries` with any new ones appended. pollInfo maps each new
+   poll's "date|pollster" key to { name, fw, sample, url }. */
+export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {}) {
+  const appended = [];
+
+  /* the headline pairing or its basis switched */
+  if (prevState.lead && nextState.lead &&
+      (prevState.lead.pair !== nextState.lead.pair || prevState.lead.basis !== nextState.lead.basis)) {
+    if (prevState.lead.pair !== nextState.lead.pair) {
+      appended.push(entry(iso, "meta",
+        `The headline pairing is now ${pairName(nextState.lead.pair)} (it was ${pairName(prevState.lead.pair)}); the estimate reads ${f1(nextState.lead.alp)} (${basisName(nextState.lead.basis)}).`));
+    } else {
+      appended.push(entry(iso, "meta",
+        `The headline two-party figure is now on ${basisName(nextState.lead.basis)} (it was on ${basisName(prevState.lead.basis)}); the estimate reads ${f1(nextState.lead.alp)}.`));
+    }
+  }
+
+  /* the preference-flow assumptions moved */
+  if (prevState.flows && nextState.flows && prevState.flows.hash !== nextState.flows.hash) {
+    const A = prevState.flows, B = nextState.flows, bits = [];
+    for (const [k, lab] of [["grn", "Greens voters' preferences to Labor"], ["onp", "One Nation voters' preferences to Labor"], ["oth", "other voters' preferences to Labor"]]) {
+      if (A[k] != null && B[k] != null && f1(A[k]) !== f1(B[k])) bits.push(`${lab} ${f1(A[k])}% → ${f1(B[k])}%`);
+    }
+    const moved = prevState.imp != null && nextState.imp != null ? moveTxt(prevState.imp, nextState.imp) : null;
+    appended.push(entry(iso, "flows",
+      "The preference-flow assumptions were updated" + (bits.length ? `: ${bits.join("; ")}` : "") +
+      ". " + (moved ? `The implied-basis two-party estimate ${moved} (Labor v the Coalition).`
+                    : `The implied-basis estimate reads ${nextState.imp != null ? f1(nextState.imp) : "—"} (Labor v the Coalition).`)));
+  }
+
+  /* polls added since the last logged state */
+  const prevPolls = new Set(prevState.polls || []);
+  const addedKeys = (nextState.polls || []).filter((k) => !prevPolls.has(k)).sort();
+  if (addedKeys.length) {
+    const ps = addedKeys.map((k) => pollInfo[k] ||
+      { name: (k.split("|")[1] || k), fw: null, sample: null, url: null });
+    const descr = (p) => `${p.name}` + (p.fw ? ` (fieldwork ${p.fw}${p.sample != null ? `, n=${p.sample.toLocaleString("en-AU")}` : ""})` : "");
+    const clause = leadClause(prevState.lead, nextState.lead);
+    const text = ps.length === 1
+      ? `${descr(ps[0])} added` + (clause ? ` — ${clause}.` : ".")
+      : `${ps.length} polls added — ${ps.map(descr).join("; ")}` + (clause ? ` — ${clause}.` : ".");
+    appended.push(entry(iso, "poll", text, ps.find((p) => p.url)?.url || null));
+  }
+
+  /* the two-party's month-on-month significance flipped */
+  if (prevState.momSig !== nextState.momSig) {
+    appended.push(entry(iso, "finding", nextState.momSig
+      ? "The two-party preferred's move over the past month is now statistically significant (implied basis)."
+      : "The two-party preferred's month-on-month move is no longer statistically significant (implied basis)."));
+  }
+
+  /* Who votes for whom proportionality-break findings came or went */
+  const prevMoves = prevState.moves || {}, nextMoves = nextState.moves || {};
+  const metaOf = (k) => nextState.movesMeta[k] || prevState.movesMeta[k] || {};
+  /* demoTrend's set labels mix "Education" and "By state" forms - the parenthesis
+     wants the bare dimension name either way */
+  const whoOf = (k) => {
+    const m = metaOf(k);
+    const party = PARTY_NAME[m.party] || m.party || k.split("|")[0];
+    const set = m.setLabel ? m.setLabel.toLowerCase().replace(/^by /, "") : null;
+    const who = `${m.group || k.split("|")[2] || "?"}${set ? ` voters (by ${set})` : " voters"}`;
+    return { party, who };
+  };
+  for (const k of Object.keys(nextMoves).sort()) {
+    const { party, who } = whoOf(k);
+    const dir = nextMoves[k];
+    if (prevMoves[k] === dir) continue;
+    const toward = dir > 0;
+    if (prevMoves[k] != null) {
+      /* a direction flip: the old finding ended and a new one began */
+      appended.push(entry(iso, "finding",
+        `${who} no longer break significantly ${prevMoves[k] > 0 ? "toward" : "away from"} ${party}, relative to all voters.`));
+    }
+    appended.push(entry(iso, "finding",
+      `${who} now break significantly ${toward ? "toward" : "away from"} ${party}, relative to all voters.`));
+  }
+  for (const k of Object.keys(prevMoves).sort()) {
+    if (nextMoves[k] != null) continue;
+    const { party, who } = whoOf(k);
+    appended.push(entry(iso, "finding",
+      `${who} no longer break significantly ${prevMoves[k] > 0 ? "toward" : "away from"} ${party}, relative to all voters.`));
+  }
+
+  return {
+    state: nextState,
+    entries: [...committed, ...appended],
+    appended,
+  };
+}
