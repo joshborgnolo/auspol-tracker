@@ -1792,13 +1792,13 @@ function RdLgPrefs({ pf }) {
      metro on the rare wave whose weighting never computed) */
   const [ri, setRi] = React.useState(() => Math.max(0, regs.findIndex(([k]) => k === "all")));
   const rk = regs[ri % regs.length][0], rn = regs[ri % regs.length][1], next = regs[(ri + 1) % regs.length][1];
-  const cell = (k, v) => v != null && (
-    <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b></span>
+  const cell = (k, v, suffix) => v != null && (
+    <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b>{suffix}</span>
   );
   const grp = (title, cells) => cells && (
-    <span className="rd-ldg-grp rd-ldg-grpw">
+    <span className="rd-ldg-grp rd-ldg-grpw rd-ldg-pgrp">
       <span className="rd-ldg-li lbl rd-ldg-lisoft">{title}</span>
-      {cells.map(([k, v]) => cell(k, v))}
+      {cells.map(([k, v, suffix]) => cell(k, v, suffix))}
     </span>
   );
   const at = (t) => (rk === "all" ? (pf.all && pf.all[t]) || null : pf[t] ? pf[t][rk] : null);
@@ -1812,8 +1812,11 @@ function RdLgPrefs({ pf }) {
     </button>
     {a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]])}
     {c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]])}
-    {/* the one flow the report prints nationally, the same at every step */}
-    {pf.onp_alp_lnp != null && <span className="rd-ldg-li rd-ldg-lisoft">{cell("onp", pf.onp_alp_lnp)} to ALP v L/NP, nationwide</span>}
+    {/* the one flow the report prints nationally, in the same
+        contest-label-first shape as the other groups; the tail sits inside
+        the figure cell so the comma hugs it (a tail flex item would float
+        a column-gap away) */}
+    {pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, <span className="rd-ldg-lisoft">, nationwide</span>]])}
   </>;
 }
 

@@ -3427,3 +3427,9 @@ body.rd .rd-ldg-sh { display: none; }
    themselves only when the line is too narrow for both */
 body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }
 body.rd .rd-ldg-grp.rd-ldg-grpw { column-gap: 14px; }
+/* the Preferences line's flow groups share one slot grid – 13ch labels (fits
+   'to ALP v L/NP'), 4ch party tags (fits 'L/NP'), 2ch right-aligned figures –
+   so rows wrapping beneath one another read as columns */
+body.rd .rd-ldg-pgrp .rd-ldg-li.lbl { display: inline-block; min-width: 13ch; }
+body.rd .rd-ldg-pgrp .rd-ldg-li em { display: inline-block; min-width: 4ch; }
+body.rd .rd-ldg-pgrp .rd-ldg-li b { display: inline-block; min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }

@@ -5536,6 +5536,9 @@ body.rd .rd-ldg-sh { display: none; }
 }
 body.rd .rd-ldg-grp { display: inline-flex; flex-wrap: wrap; column-gap: 5px; min-width: 0; }
 body.rd .rd-ldg-grp.rd-ldg-grpw { column-gap: 14px; }
+body.rd .rd-ldg-pgrp .rd-ldg-li.lbl { display: inline-block; min-width: 13ch; }
+body.rd .rd-ldg-pgrp .rd-ldg-li em { display: inline-block; min-width: 4ch; }
+body.rd .rd-ldg-pgrp .rd-ldg-li b { display: inline-block; min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -118996,19 +118999,19 @@ function RdLgPrefs({
   const rk = regs[ri % regs.length][0],
     rn = regs[ri % regs.length][1],
     next = regs[(ri + 1) % regs.length][1];
-  const cell = (k, v) => v != null && React.createElement("span", {
+  const cell = (k, v, suffix) => v != null && React.createElement("span", {
     key: k,
     className: "rd-ldg-li"
   }, React.createElement("em", {
     style: {
       color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null
     }
-  }, RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k), " ", React.createElement("b", null, rdApNum(v)));
+  }, RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k), " ", React.createElement("b", null, rdApNum(v)), suffix);
   const grp = (title, cells) => cells && React.createElement("span", {
-    className: "rd-ldg-grp rd-ldg-grpw"
+    className: "rd-ldg-grp rd-ldg-grpw rd-ldg-pgrp"
   }, React.createElement("span", {
     className: "rd-ldg-li lbl rd-ldg-lisoft"
-  }, title), cells.map(([k, v]) => cell(k, v)));
+  }, title), cells.map(([k, v, suffix]) => cell(k, v, suffix)));
   const at = t => rk === "all" ? pf.all && pf.all[t] || null : pf[t] ? pf[t][rk] : null;
   const a = at("alp_onp"),
     c = at("lnp_onp");
@@ -119030,9 +119033,9 @@ function RdLgPrefs({
   }, n))), React.createElement("span", {
     className: "rd-ldg-cyca",
     "aria-hidden": "true"
-  }, "\u21BB")), a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]), pf.onp_alp_lnp != null && React.createElement("span", {
-    className: "rd-ldg-li rd-ldg-lisoft"
-  }, cell("onp", pf.onp_alp_lnp), " to ALP v L/NP, nationwide"));
+  }, "\u21BB")), a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]), pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, React.createElement("span", {
+    className: "rd-ldg-lisoft"
+  }, ", nationwide")]]));
 }
 function rdLgLines(p, {
   onM,

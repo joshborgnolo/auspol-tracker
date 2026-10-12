@@ -3,7 +3,10 @@
      chip opens on All regions (gen-data's enrolment-and-vote weighting) and
      presses cycle Inner metro → Outer metro → Regional → All regions, showing
      that region's printed cells, and a press never moves the line's box
-     (same width/height at every step);
+     (same width/height at every step); the groups share fixed slots (13ch
+     labels, 4ch party tags, 2ch figures) so wrapped rows read as columns, and
+     the nationwide One Nation flow closes the line label-first like the
+     other groups;
    - the forced-choice Labor v Coalition chart carries one .rd-ff-dm diamond
      per filed MRP, and the key names them.
    Run against a built tree: node .matilda/probe/mrp-prefs.mjs [shotDir] */
@@ -69,9 +72,26 @@ for (const w of [1440, 1024, 768, 390]) {
   if (steps.every(Boolean)) {
     console.log("   " + steps.map((s) => s.region + ": " + s.text).join("\n   "));
     check(steps.map((s) => s.region).join(">") === "All regions>Inner metro>Outer metro>Regional>All regions", "opens on All regions, cycles the three regions and wraps");
-    check(/ON 18 to ALP v L\/NP, nationwide/.test(steps[0].text), "the nationwide One Nation flow closes the line");
+    check(/to ALP v L\/NP ON 18, nationwide/.test(steps[0].text), "the nationwide One Nation flow closes the line, label first, comma hugging the figure");
     check(steps.every((s) => s.w === steps[0].w && s.h === steps[0].h && s.bw === steps[0].bw), "line and chip hold their size");
     check(/L\/NP 48/.test(steps[1].text) && /L\/NP 37/.test(steps[2].text) && /L\/NP 30/.test(steps[3].text), "regional cells read through");
+    /* digits in columns: groups flush with the line's left edge are wrapped
+       rows; their figure columns must share x across those rows */
+    const cols = await page.evaluate(() => {
+      const line = document.querySelector(".rd-ldg-cyc").closest(".rd-ldg-line");
+      const L = line.getBoundingClientRect().x;
+      return [...line.querySelectorAll(".rd-ldg-pgrp")]
+        .filter((g) => Math.abs(g.getBoundingClientRect().x - L) < 2)
+        .map((g) => [...g.querySelectorAll(".rd-ldg-li b")].map((b) => b.getBoundingClientRect().x));
+    });
+    const colDesc = [];
+    let colOk = true;
+    for (let j = 0; j < 3; j++) {
+      const have = cols.filter((r) => r[j] != null).map((r) => r[j]);
+      if (have.length >= 2 && !have.every((x) => Math.abs(x - have[0]) < 1.5)) colOk = false;
+      if (have.length) colDesc.push(have.map((x) => x.toFixed(0)).join("/"));
+    }
+    check(cols.length < 2 || colOk, "wrapped rows' figures share columns (" + colDesc.join(", ") + ")");
     const lh = await page.evaluate(() => { const l = document.querySelector(".rd-ldg-lines .rd-ldg-line"); return l.getBoundingClientRect().height; });
     console.log("   line h " + steps[0].h + " (first line " + lh + "), chip " + steps[0].bw.toFixed(1) + "×" + steps[0].bh.toFixed(1));
   }
