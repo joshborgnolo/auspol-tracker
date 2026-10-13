@@ -1,13 +1,13 @@
 {
   "state": {
     "lead": {
-      "pair": "alp_on",
+      "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 52.4
+      "alp": 52.3
     },
     "imp": 52.3,
     "pub": 51,
-    "on": 52.4,
+    "on": 52.5,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -327,10 +327,10 @@
     },
     "prim": {
       "alp": 27.5,
-      "grn": 13.4,
+      "grn": 13.5,
       "lnp": 21.6,
       "onp": 26.1,
-      "oth": 11.4
+      "oth": 11.3
     },
     "leaders": {
       "alb_fav": -20.7,
@@ -341,23 +341,23 @@
       "taylor_net": -6.9
     },
     "lean": {
-      "key": "alp_on|imp",
+      "key": "alp_lnp|imp",
       "v": {
-        "Agenda C Synesis": 0.7,
-        "DemosAU": -1,
-        "DemosAU (MRP)": -0.4,
-        "Essential": -0.4,
-        "Fox & Hedgehog": -0.4,
-        "Freshwater": 0.4,
-        "Newspoll": 0.6,
-        "RedBridge/Accent": -0.7,
-        "RedBridge/Accent (MRP)": -0.3,
-        "Resolve": 0.4,
-        "Roy Morgan": 0.8,
+        "Agenda C Synesis": 0.8,
+        "DemosAU": -0.6,
+        "DemosAU (MRP)": 0.3,
+        "Essential": -1,
+        "Fox & Hedgehog": -1,
+        "Freshwater": -0.6,
+        "Newspoll": 1.5,
+        "RedBridge/Accent": 0.3,
+        "RedBridge/Accent (MRP)": 0.1,
+        "Resolve": -0.3,
+        "Roy Morgan": 0,
         "Spectre Strategy": -0.8,
-        "Wolf & Smith": 0.6,
-        "YouGov": -0.4,
-        "YouGov (MRP)": -0.5
+        "Wolf & Smith": 0,
+        "YouGov": 0.2,
+        "YouGov (MRP)": -0.2
       }
     },
     "dir": {
@@ -420,6 +420,12 @@
       "kind": "poll",
       "text": "DemosAU (MRP) (fieldwork 4 Aug–19 Sep, n=9,740) added — the two-party preferred estimate held at 52.4 (Labor v One Nation, implied flows). Primary votes held. House effect (Labor v One Nation, implied flows; positive leans Labor): DemosAU (MRP) held at −0.4.",
       "url": "https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/"
+    },
+    {
+      "date": "2026-10-13",
+      "label": "13 Oct 2026",
+      "kind": "meta",
+      "text": "The headline pairing is now Labor v the Coalition (it was Labor v One Nation); the estimate reads 52.3 (implied flows)."
     }
   ]
 }

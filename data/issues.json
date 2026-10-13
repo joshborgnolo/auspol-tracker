@@ -1271,8 +1271,9 @@
    "date": "2026-09-16",
    "dateStart": "2026-09-07",
    "sample": 1000,
-   "sampleEff": null,
+   "sampleEff": 982,
    "source": "https://www.ipsos.com/sites/default/files/IM_Nat_Sep_26_V3.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-10/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20September%202026_2.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -19389,8 +19390,9 @@
    "date": "2026-09-16",
    "dateStart": "2026-09-07",
    "sample": 1000,
-   "sampleEff": null,
+   "sampleEff": 982,
    "source": "https://www.ipsos.com/sites/default/files/IM_Nat_Sep_26_V3.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-10/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20September%202026_2.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
