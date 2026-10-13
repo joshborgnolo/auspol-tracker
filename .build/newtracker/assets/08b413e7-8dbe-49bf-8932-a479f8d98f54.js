@@ -893,6 +893,44 @@ function TrendChart(props) {
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
 
+  /* The guide, the hover markers and their readout glide on transform between
+     reads taken while a hover is LIVE. Both elements were kept mounted by
+     parking them at the last month (the markers at each line's end), so every
+     pointer entry had them sweeping the axis in from the chart's far edge,
+     every leave swept them back out through the fade, and every poll dot the
+     pointer crossed re-started the same flight – visible hundreds of px of
+     travel that read as broken, not as motion (user report 2026-10-13: the
+     month guide "goes flying over to the left of the screen"). Their rest
+     position is now where they last read: the entry frame cuts the transform
+     transition so they appear AT the pointer, and they fade out where they
+     stand. */
+  const guideOn = hoverX != null && !dot && !evt;
+  const guideWas = useRef(false);       // the last committed frame had the guide live
+  const guideRest = useRef(null);       // px x where the guide last read
+  const markRest = useRef(new Map());   // series id -> [px,py] of its marker's last read
+  /* This frame's live marker spots, computed once so the draw below and the
+     after-commit stamp agree on where each marker stands. */
+  const liveMark = new Map();
+  if (hi != null && !dot && !evt && spinePts[hi])
+    series.forEach((s) => {
+      if (s.opacity === 0 || (s.wipe != null && s.wipe >= 1)) return;
+      const p = ptAtXLine(s, spinePts[hi].x);
+      if (p) liveMark.set(s.id, [sx(p.x), sy(p.y)]);
+    });
+  React.useLayoutEffect(() => {
+    if (guideOn) { guideRest.current = hoverX; markRest.current = liveMark; }
+    guideWas.current = guideOn;
+  });
+  /* First live frame: keep the opacity fade but no transform transition, so
+     the furniture lands where the pointer is instead of arriving from its
+     parked spot. Cut inline, not by class – an inline transition is what
+     outranks the sheet's own transition list, and doing nothing leaves the
+     sheet's glide for every later frame. The reduced-motion media rule is
+     NOT !important, so an inline transition would silently re-arm motion for
+     the readers who asked for none; gate on the same query. */
+  const motionless = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const entrySnap = guideOn && !guideWas.current && !motionless;
+
   /* Which y ticks get a label. The axis font is sized to render ~11px on
      screen whatever the chart's width, so on a phone it occupies far more
      viewBox space than it does on a laptop — and a tick list that is
@@ -1613,12 +1651,14 @@ function TrendChart(props) {
         {vlines.map((v, i) => (v.x < win[0] || v.x > win[1]) ? null : (
           <line key={"vl" + i} x1={sx(v.x)} x2={sx(v.x)} y1={pad.t} y2={H - pad.b} className={"rd-vline" + (v.cls ? " " + v.cls : "")} />
         ))}
-        {/* hover guide – kept mounted; glides between months on transform */}
+        {/* hover guide – kept mounted; glides between months while a hover
+            is live, rests where it last read between them (guideOn above) */}
         {spinePts.length > 0 && (
           <line x1={0} x2={0} y1={pad.t} y2={H - pad.b} className="guide"
                 style={{
-                  transform: `translateX(${(hoverX != null ? hoverX : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
-                  opacity: hoverX != null && !dot && !evt ? 0.7 : 0,
+                  transform: `translateX(${(guideOn ? hoverX : (guideRest.current != null ? guideRest.current : sx(spinePts[spinePts.length - 1].x))).toFixed(2)}px)`,
+                  opacity: guideOn ? 0.7 : 0,
+                  ...(entrySnap ? { transition: "opacity .18s ease" } : null),
                 }} />
         )}
         {/* scatter – the heaviest thing on the chart at up to 240 circles, and
@@ -1647,21 +1687,25 @@ function TrendChart(props) {
                   strokeLinejoin="round" strokeLinecap="round" />
           )))}
         </g>
-        {/* hover markers – one per series, kept mounted so they glide along the line */}
+        {/* hover markers – one per series, gliding along the line while a
+            hover is live, resting where they last read between them (their
+            spots come from liveMark/markRest so this frame's draw and the
+            after-commit stamp never disagree) */}
         {series.map((s) => {
           // a line that is gone, or rubbed out, has no marker to glide along
           if (s.opacity === 0 || (s.wipe != null && s.wipe >= 1)) return null;
-          const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
-          const p = spx != null ? ptAtXLine(s, spx) : null;
-          const last = visEnd(s);
-          const at = p || last;
-          if (!at) return null;
+          const live = liveMark.get(s.id);
+          const rest = markRest.current.get(s.id);
+          const last = live || rest ? null : visEnd(s);
+          if (!live && !rest && !last) return null;
+          const at = live || rest || [sx(last.x), sy(last.y)];
           return (
             <circle key={"h" + s.id} cx={0} cy={0} r={rd ? PX(4.5) : 5}
                     className="hover-marker" data-series={s.id}
                     style={{
-                      transform: `translate(${sx(at.x).toFixed(2)}px, ${sy(at.y).toFixed(2)}px)`,
-                      opacity: p ? 1 : 0,
+                      transform: `translate(${at[0].toFixed(2)}px, ${at[1].toFixed(2)}px)`,
+                      opacity: live ? 1 : 0,
+                      ...(entrySnap && live ? { transition: "opacity .14s ease" } : null),
                     }}
                     fill="var(--chart-bg)" stroke={s.color} strokeWidth={rd ? 2 : 3} />
           );
@@ -1958,8 +2002,15 @@ function TrendChart(props) {
         })}
       </svg>
 
+      {/* kind is the key: a month readout, a poll readout and an event
+          readout are three boxes, and one element morphing between them left
+          the box gliding diagonally across the plot on every kind flip. A
+          remount opens the new one where its thing is (the tip-in fade); the
+          left/top glide below is then only ever month-to-month INSIDE one
+          kind, which is the motion it was put there for. */}
       {tip && (
-        <div ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")
+        <div key={evt ? "evt" : dot ? "dot" : "guide"}
+             ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")
                                      + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : "")}
              style={{ left: tip.left + "%", top: tip.top + "%", width: tipCols ? tipLay.w : undefined }}>
           {tip.title && <div className="tip-title">{tip.title}</div>}
