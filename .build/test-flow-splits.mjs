@@ -173,21 +173,22 @@ assert.ok(ap.includes("...(FF.bys || [])"), "the section's shared domain hears t
 
 /* the region menu (user asks 2026-10-13): All voters + the MRP's three named
    regions. On a named region, RedBridge's national dots and the 2026 crosses
-   vanish (a national wave can't speak to a region), the MRP carriers rekey
-   to the printed cells, and the Labor-v-Coalition chart stands aside for a
-   national-only empty cell — its waves, its triangles and the election's
-   rings are ALL national-only (the AEC counts no per-region TPP flows for
-   the rings to ride; user 2026-10-13: "Keep All-voters-only") */
+   vanish from the One Nation charts (a national wave can't speak to a region)
+   and the MRP carriers rekey to the printed cells; the Labor-v-Coalition
+   chart stays MOUNTED on every view — its waves, its triangles and the
+   election's rings are ALL national-only, and the user reversed the day's
+   empty-cell stand-in the same day (2026-10-13: "bring back regional view
+   for the ALP-v-L/NP chart - it's fine with just one nation there") */
 assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];'),
   "the region menu is All voters + the MRP's three named regions");
 assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={ffReg}') && ap.includes('setFfReg(e.target.value)'),
   "the select rides ffReg state beside the section hed, labelled for assistive tech");
 assert.ok(ap.includes("waves={ffReg ? [] : FF.vsOn}"),
   "on a named region RedBridge's dots drop out of the v-One-Nation chart entirely");
-assert.ok(ap.includes('{ffReg ? (') && ap.includes('className="rd-fl-emptycell"') && ap.includes("<RdForced q=\"co\""),
-  "a named region swaps the Labor-v-Coalition chart for a national-only empty cell — nothing on it can rekey (user 2026-10-13)");
-assert.ok(ap.includes("National-only — RedBridge/Accent’s waves, DemosAU’s MRP and the 2025 election all measured the country whole"),
-  "the empty cell says why nothing rekeys");
+assert.ok(ap.includes('<RdForced q="co"') && !ap.includes("rd-fl-emptycell") && !/\{ffReg \? \(\s*<p/.test(ap),
+  "the Labor-v-Coalition chart mounts on every menu view — all its sources are national-only, the empty-cell stand-in is gone (user 2026-10-13)");
+assert.ok(ap.includes("bring back regional view for the ALP-v-L/NP"),
+  "the chart's comment records the user's reversal");
 assert.ok(ap.includes("bys={ffReg ? [] : (FF.bys || [])}"),
   "on a named region the 2026-count crosses drop out too (national counts)");
 assert.ok(ap.includes('elec={FF.elec2025r ? FF.elec2025r.all : null}') && !ap.includes("elec2025r[ffReg") && !ap.includes("elec2025r.inner") && !ap.includes("elec2025r.outer") && !ap.includes("elec2025r.regional"),
@@ -224,14 +225,15 @@ assert.ok(cssRd.includes(".rd-ff-sw.mrp") && cssRd.includes(".rd-ff-sw.byelec"),
   "the tooltip swatches take the mark's shape: MRP triangles, 2026-count crosses");
 assert.ok(cssRd.includes(".rd-ff-keyring"), "the key names the 2025 election's rings");
 assert.ok(cssRd.includes(".rd-ff-keyln"), "the key's line token marks RedBridge/Accent's monthly run");
-assert.ok(/body\.rd \.rd-fl-emptycell \{[^}]*align-self: center;/.test(cssRd),
-  "the national-only empty cell is styled and centres in the chart's subgrid row");
+assert.ok(!cssRd.includes("rd-fl-emptycell"), "the national-only empty cell's styling is gone with the stand-in");
 
 // ---- the xnote and key in the renderer ------------------------------------------------
 assert.ok(ap.includes("Triangles mark DemosAU’s MRP readings"), "the svg's spoken note names the triangles");
 assert.ok(ap.includes("Crosses mark the 2026 state and by-election counts."), "the spoken note names the crosses where they're drawn");
 assert.ok(ap.includes("(FF.bys || []).length > 0") || ap.includes('(FF.bys || []).length'), "the crosses' key item is gated on crosses existing");
-assert.ok(ap.includes("FF.elec2025r && !ffReg &&"), "the rings' key item is gated on the carrier existing and the menu open on All voters");
+assert.ok(ap.includes('FF.elec2025r && <span className="rd-key-item"><span className="rd-ff-keyring"') &&
+  !ap.includes("FF.elec2025r && !ffReg &&"),
+  "the rings' key item is gated on the carrier existing alone — the rings ride the national count on every menu view, so their key does too");
 
 // ---- the Flows table fold (user 2026-10-13) --------------------------------------------
 assert.ok(ap.includes("<summary>Flows table</summary>"), "the Flows table fold mounts in the Preference-flows section");
@@ -253,7 +255,7 @@ assert.ok(/\.rd-ft-table \{/.test(cssRd) && /\.rd-ft-grid \{ grid-template-colum
   "the grids sit three abreast where they fit (rd.css .rd-ft-grid)");
 
 // ---- the renderer's earlier contract still stands --------------------------------------
-assert.ok(ap.includes('q="co" waves={FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series (its national-only drop happens in the region ternary above)");
+assert.ok(ap.includes('q="co" waves={FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series on every menu view (nothing on it rekeys — the menu leaves it alone)");
 assert.ok(ap.includes("const demoRows = FF ? rekeyMrp(FF.demosOn) : [];"),
   "the v-One-Nation chart's MRP extras come from the rekeyed demosOn carriers");
 assert.ok(ap.includes("moved.length !== 1"), "a title tail names a cohort only when EXACTLY ONE moved");

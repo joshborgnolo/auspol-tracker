@@ -5385,7 +5385,6 @@ body.rd .rd-ff-two { margin-top: 24px; }
 body.rd .rd-ff figure, body.rd figure.rd-ff { margin: 3px 0 0; }
 body.rd figure.rd-ff { position: relative; width: 100%; }
 body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
-body.rd .rd-fl-emptycell { margin: 3px 0 0; align-self: center; max-width: 30em; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
 body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
 body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
@@ -128405,9 +128404,7 @@ function RdFlows() {
       className: "rd-fl-ct"
     }, React.createElement("h4", {
       className: "rd-ap-ct"
-    }, ffTitle("co"))), ffReg ? React.createElement("p", {
-      className: "rd-fl-emptycell"
-    }, "National-only \u2014 RedBridge/Accent\u2019s waves, DemosAU\u2019s MRP and the 2025 election all measured the country whole; there\u2019s no ", ((FF_REGIONS.find(r => r[0] === ffReg) || [])[1] || "regional").toLowerCase(), " cut. \u201CAll voters\u201D shows them.") : React.createElement(RdForced, {
+    }, ffTitle("co"))), React.createElement(RdForced, {
       q: "co",
       waves: FF.vsCoal,
       cohorts: ["grn", "onp", "oth"],
@@ -128481,7 +128478,7 @@ function RdFlows() {
     }, React.createElement("span", {
       className: "rd-ff-keyx",
       "aria-hidden": "true"
-    }), "2026 state and by-election counts"), FF.elec2025r && !ffReg && React.createElement("span", {
+    }), "2026 state and by-election counts"), FF.elec2025r && React.createElement("span", {
       className: "rd-key-item"
     }, React.createElement("span", {
       className: "rd-ff-keyring",
@@ -128526,7 +128523,7 @@ function RdFlows() {
     }, " \xB1", ftFig(col.band[ck])));
   }))))))), React.createElement("p", {
     className: "rd-note rd-ft-note"
-  }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view, as on the charts." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement(RdTsig, {
+  }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and in the One Nation charts (the Labor v Coalition chart still draws its wave, as that chart’s sources are all national)." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
@@ -128536,7 +128533,7 @@ function RdFlows() {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from both charts — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot — the AEC counts no regional split of them, so a named region drops them from the chart. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from the One Nation charts — a national wave can’t speak to a region; the Labor-v-Coalition chart draws them on every view because everything else it carries is national-only too. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot — the AEC counts no regional split of them, so they stand on their chart on every menu view. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);

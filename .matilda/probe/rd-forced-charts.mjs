@@ -23,14 +23,15 @@
        Farrer's two crosses are GONE (user 2026-10-13: its counts measured
        independent national contests, not One Nation voters);
      - the region menu (All voters / Inner metro / Outer metro / Regional)
-       rekeys the DemosAU figures, and DROPS RedBridge's national dots on
-       BOTH RedBridge charts (waves=[]) — a national wave can't speak to a
-       named region; the v-Coalition chart's DemosAU triangles drop too
-       (that MRP split is national-only — no regional carrier exists, user
-       2026-10-13), and the election's national-only rings drop with them
-       (mirroring the demos triangles' national-only behaviour, user call:
-       "Keep All-voters-only") — the v-Coalition chart empties on a named
-       region, the other two keep their regional triangles;
+       rekeys the DemosAU figures on the One Nation pair, and DROPS
+       RedBridge's national dots there (waves=[]) — a national wave can't
+       speak to a named region. The v-Coalition chart the menu leaves
+       ALONE: every series it carries (RedBridge's waves, DemosAU's one
+       national MRP table, the national-count rings) is national-only, so
+       on a named region it draws its national marks unchanged and its
+       key item stands (user 2026-10-13, reversing the same-day unmount:
+       "no bring back regional view for alp v lnp chart - it's fine with
+       just one nation there");
      - the third chart's title paints Coalition in coalition blue and One
        Nation orange (probe asserts the two spans carry the party text-vars
        via getComputedStyle, not a hard-coded colour);
@@ -258,8 +259,9 @@ const measure = () => page.evaluate(() => {
     return s ? { aria: s.getAttribute("aria-label"), value: s.value,
                  options: [...s.options].map((o) => [o.value, o.textContent.trim()]) } : null;
   })();
-  /* the Labor-v-Coalition cell's national-only stand-in paragraph (named
-     region only: the chart itself unmounts then) */
+  /* the Labor-v-Coalition chart draws on every menu view now (user
+     2026-10-13 reversal) — the old stand-in paragraph is gone; kept as a
+     null pin so the stand-in can't quietly return */
   out.emptyCell = (sec.querySelector(".rd-fl-emptycell") || {}).textContent || null;
   /* the section carries TWO folds (2026-10-13): the Flows table in its
      own .rd-ft chrome (per-contest grids — its RdTsig ancestry ended with
@@ -697,7 +699,7 @@ const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff
 check(viewH === 236, `desktop: plot height 236 (${viewH})`);
 check(d.sw <= d.iw + 1, `desktop: no horizontal overflow (sw ${d.sw} vs iw ${d.iw})`);
 
-// ---- the region select: rekeys DemosAU + the rings, drops RedBridge on v-ON --
+// ---- the region select: rekeys DemosAU, drops RedBridge on v-ON, leaves the v-Co chart alone --
 const SWEEP = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
 const setReg = async (val) => {
   await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', val);
@@ -713,17 +715,26 @@ for (const [val, regName] of SWEEP) {
   const dr2 = await setReg(val);
   const bot2 = 236 - 34;
   check(dr2.sel && dr2.sel.value === val, `region ${regName}: the select reads ${val}`);
-  /* with RedBridge's waves, DemosAU's triangles AND the election's rings
-     all national-only (user 2026-10-13), a named region leaves the
-     Labor-v-Coalition chart NOTHING to draw — it unmounts (RdForced
-     returns null on zero groups) and its cell carries the national-only
-     paragraph. The two surviving figures shift up in DOM order, so
-     address the figures by their q from here on */
-  check(dr2.nFig === 2 && JSON.stringify(dr2.figs.map((f) => f.q)) === '["on","ln"]',
-    `region ${regName}: the Coalition chart unmounts — the One Nation pair stands (${dr2.figs.map((f) => f.q).join(",") || "none"})`);
-  check(dr2.emptyCell && dr2.emptyCell.startsWith("National-only — RedBridge/Accent’s waves"),
-    `region ${regName}: the Coalition chart's cell carries the national-only stand-in`);
+  /* user 2026-10-13, "no bring back regional view for alp v lnp chart -
+     it's fine with just one nation there": every series the Labor-v-
+     Coalition chart carries is national-only, so the named region
+     leaves it ALONE — all three figures stand, the Coalition chart
+     drawing its national marks unchanged; the menu rekeys the One
+     Nation pair only */
+  check(dr2.nFig === 3 && JSON.stringify(dr2.figs.map((f) => f.q)) === '["co","on","ln"]',
+    `region ${regName}: the Coalition chart stands — the menu rekeys the One Nation pair only (${dr2.figs.map((f) => f.q).join(",") || "none"})`);
+  check(dr2.emptyCell == null, `region ${regName}: no national-only stand-in paragraph (the chart draws instead)`);
   const byQ = Object.fromEntries(dr2.figs.map((f) => [f.q, f]));
+  {
+    /* the Coalition chart is the national one, bit for bit — dots,
+       triangles and rings exactly the All-voters view's */
+    const a = d.figs[FI.co], b = dr2.figs[FI.co];
+    check(JSON.stringify(a.dots) === JSON.stringify(b.dots) &&
+      JSON.stringify(a.tris) === JSON.stringify(b.tris) &&
+      JSON.stringify(a.rings) === JSON.stringify(b.rings) &&
+      a.nVa === b.nVa && a.nTr === b.nTr && a.nX === b.nX,
+      `region ${regName} v-Coalition: the national chart stands unchanged — every dot, triangle and ring of the All-voters view`);
+  }
   /* v-ON: NO RedBridge dots at all — the MRP's regional triangles alone */
   {
     const f = byQ.on, cam = CHARTS[FI.on];
@@ -758,8 +769,8 @@ for (const [val, regName] of SWEEP) {
     }
     check(f.aria.includes("all-regions weighting") === false, `region ${regName} Coalition-v-ON: no our-weighting note on printed cells`);
   }
-  check(JSON.stringify(dr2.keyItems) === JSON.stringify(d.keyItems.filter((k) => k !== "2025 election, as counted")),
-    `region ${regName}: the rings' key item drops with the rings ("2025 election, as counted"; the other three stand)`);
+  check(JSON.stringify(dr2.keyItems) === JSON.stringify(d.keyItems),
+    `region ${regName}: the key stands whole — the rings ride the national count on every view, so "2025 election, as counted" stays (${JSON.stringify(dr2.keyItems)})`);
   /* the flows table FOLLOWS the menu on a named region — RedBridge's
      column drops with its dots, DemosAU's regional cells print as the
      report does — while the Election column never moves (no regional

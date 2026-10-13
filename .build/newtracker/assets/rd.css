@@ -3217,10 +3217,6 @@ body.rd .rd-ff-two { margin-top: 24px; }
 body.rd .rd-ff figure, body.rd figure.rd-ff { margin: 3px 0 0; }
 body.rd figure.rd-ff { position: relative; width: 100%; }
 body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
-/* the Labor-v-Coalition cell on a named region: waves, triangles and
-   rings are all national-only, so the chart stands aside for this note
-   (sits in the subgrid's svg row, centred against the surviving chart) */
-body.rd .rd-fl-emptycell { margin: 3px 0 0; align-self: center; max-width: 30em; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
 body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
 body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
