@@ -18,10 +18,12 @@
    dots ride the standard wave-dot idiom: tooltips carry "Click to open this
    poll in All polls" (never a wave-report link), a mouse click or Enter
    opens the poll row, and the wave's forced-choice figures sit in the opened
-   poll's ledger: the archive drawer's matchup grid carries a "<Cohort>
-   voters, if forced to choose" row per cohort — Coalition and One Nation
-   (one column each) plus Greens and Other (both columns) — (RdApDetail),
-   with the June wave's combined-rows note under the grid. Every wave mark
+   poll's Also-in-this-poll as a Preferences line (RdLgFlowsLine, the DemosAU
+   MRP Preferences line's shape): an "If forced to choose" lead, one
+   contest-titled group per question ("to ALP v ON" / "to ALP v L/NP") with
+   the printed cohort shares as party-tagged figures, the June wave's
+   combined-rows note as the line's tail, and NOT A ROW of the drawer's
+   two-party table. Every wave mark
    rides its printed fieldwork window's TRUE midpoint: gen-data stamps each
    wave its fractional month index (xm — RedBridge's Mon→Mon windows land
    near month ends) and a printed-window label (win, "24–30 Sep 2026"),
@@ -521,9 +523,40 @@ for (const c of CHARTS) {
   check(tip && tip.hint === "Click to open this poll in All polls", `${c.q} DemosAU tip: opens its MRP's row (${JSON.stringify(tip && tip.hint)})`);
 }
 
+/* the drawer's forced splits ride an Also-in-this-poll Preferences line
+   (RdLgFlowsLine): this reader maps the line into {lead, head, groups,
+   tails}. puppeteer evaluates only its first argument as a function —
+   install the reader on the page and call it through the window from here
+   on */
+const PREFS_READ = (det) => {
+  const line = det.querySelector(".rd-ldg-line.flows");
+  if (!line) return null;
+  const txt = (el) => (el ? el.textContent.replace(/\s+/g, " ").trim() : null);
+  const groups = {};
+  for (const g of line.querySelectorAll(".rd-ldg-grp")) {
+    const t = txt(g.querySelector(".rd-ldg-li.lbl"));
+    groups[t] = Object.fromEntries([...g.querySelectorAll(".rd-ldg-li:not(.lbl)")].map((li) => {
+      const em = li.querySelector("em"), b = li.querySelector("b");
+      return em && b ? [em.textContent.trim(), Number(b.textContent.trim())] : null;
+    }).filter(Boolean));
+  }
+  return { lead: txt(line.querySelector(".rd-ldg-lab")),
+           head: txt(line.querySelector(".rd-ldg-lbody > .rd-ldg-li.lbl")),
+           groups,
+           tails: [...line.querySelectorAll(".rd-ldg-lbody > .rd-ldg-li:not(.lbl)")].map(txt) };
+};
+await page.evaluate((src) => { window.__prefsRead = (0, eval)("(" + src + ")"); }, PREFS_READ.toString());
+/* the line's figures keyed by its short party tags, recomputed against the
+   payload below — never trusted from the page */
+const GLAB = { coal: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
+const grpHas = (prefs, title, want) => {
+  const g = prefs && prefs.groups && prefs.groups[title];
+  return !!g && Object.entries(want).every(([k, v]) => v == null || g[GLAB[k]] === v);
+};
+
 // click the latest v-ON Coalition dot with a real mouse: the wave opens in
-// All polls, named by the return button, and its wave's forced-choice
-// figures sit in the poll ledger's "as published" section
+// All polls, named by the return button, and the wave's forced-choice
+// figures sit in its Also-in-this-poll Preferences line
 {
   const c = await hitAt(FI.on, RB(lastOnWin), "Coalition");
   await page.mouse.click(c.x, c.y);
@@ -536,51 +569,35 @@ for (const c of CHARTS) {
       const det = document.querySelector(".rd-ap-open");
       if (!row || !det) return null;
       const head = ((row.querySelector("[role=rowheader] b") || {}).textContent || "").replace(/↗/g, "").trim();
-      /* each forced row of the ledger's two-party table: the cohort under
-         the "If forced to choose" subhead, then its two column cells (only
-         the asked rival's column carries figures) */
-      const forced = [...det.querySelectorAll(".rd-ldg-tpp tr.sub")]
-        .map((tr) => ({ key: tr.querySelector("th").textContent.trim(),
-                        cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.replace(/\s+/g, " ").trim()) }));
-      const estNote = [...det.querySelectorAll(".rd-ldg-tpp ~ .rd-ldg-foot1")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
+      const tpp = det.querySelector(".rd-ldg-tpp");
       const back = [...document.querySelectorAll("button")].map((b) => b.textContent.trim()).find((t) => t.startsWith("Back to "));
-      return { head, forced, estNote, back: back || null };
+      return { head, back: back || null,
+               prefs: window.__prefsRead(det),
+               subRows: det.querySelectorAll(".rd-ldg-tpp tr.sub").length,
+               forcedLeft: !!tpp && /forced to choose/i.test(tpp.textContent) };
     });
   } catch (e) { /* land stays null */ }
   check(!!land && land.head === "RedBridge/Accent",
     `click ${lastOnWin} coal dot: the wave's poll row opens in All polls (${JSON.stringify(land && land.head)})`);
   check(!!land && land.back === "Back to the forced-choice flow chart",
     `…the return button names the forced-choice chart (${JSON.stringify(land && land.back)})`);
-  /* every forced row's figures recomputed from the payload: the pair text
-     "<v> – <100−v>" rides the asked rival's column, with the wave-on-wave
-     arrow iff the share moved */
-  const prevOf = (vs, ck) => {
-    const ws = vs.filter((w) => w[ck] != null);
-    return ws.length > 1 ? ws[ws.length - 2][ck] : ws[0][ck];
-  };
-  const arrow = (v, p) => (v > p ? `▲ ${Math.abs(v - p)}` : v < p ? `▼ ${Math.abs(v - p)}` : null);
-  const rowsByKey = Object.fromEntries((land && land.forced || []).map((x) => [x.key, x.cells]));
-  const row = (co) => rowsByKey[`${CONAME[co]} voters`];
-  check(!!land && ["coal", "onp", "grn", "oth"].every((co) => row(co)), 
-    `ledger: all four cohort forced rows present (${JSON.stringify(land && land.forced.map((x) => x.key))})`);
-  const pairChk = (cells, v, p, tag) => {
-    const inCells = cells.some((t) => t.replace(/\s*–\s*/g, "–").includes(`${v}–${100 - v}`));
-    const a = arrow(v, p);
-    return inCells && (a === null ? true : cells.some((t) => t.includes(a)));
-  };
-  check(!!row("coal") && pairChk(row("coal"), lastOn.coal, prevOf(FF.vsOn, "coal")),
-    `ledger: Coalition-voters row ${lastOn.coal} – ${100 - lastOn.coal} v One Nation (${JSON.stringify(row("coal"))})`);
-  check(!!row("onp") && pairChk(row("onp"), lastCo.onp, prevOf(FF.vsCoal, "onp")),
-    `ledger: One-Nation-voters row ${lastCo.onp} – ${100 - lastCo.onp} v Coalition (${JSON.stringify(row("onp"))})`);
-  check(!!row("grn") && pairChk(row("grn"), lastOn.grn, prevOf(FF.vsOn, "grn")) && pairChk(row("grn"), lastCo.grn, prevOf(FF.vsCoal, "grn")),
-    `ledger: Greens-voters row carries BOTH questions (${JSON.stringify(row("grn"))})`);
-  check(!!row("oth") && pairChk(row("oth"), lastOn.oth, prevOf(FF.vsOn, "oth")) && pairChk(row("oth"), lastCo.oth, prevOf(FF.vsCoal, "oth")),
-    `ledger: Other-voters row carries BOTH questions (${JSON.stringify(row("oth"))})`);
-  check(!!land && land.estNote.every((n) => !n.includes("combined row was printed")),
-    `ledger: no combined-rows note on a printed wave (${JSON.stringify(land && land.estNote)})`);
+  /* the forced rows left the drawer two-party table entirely */
+  check(!!land && land.subRows === 0 && land.forcedLeft === false,
+    `ledger: no forced rows left in the two-party table (${land && JSON.stringify([land.subRows, land.forcedLeft])})`);
+  check(!!land && land.prefs && land.prefs.lead === "Preferences" && land.prefs.head === "If forced to choose",
+    `ledger: the "If forced to choose" Preferences line leads the figures (${JSON.stringify(land && land.prefs)})`);
+  /* every figure recomputed from the payload: each cohort's printed Labor
+     share on the wave's one question group, never trusted from the page */
+  check(!!land && grpHas(land.prefs, "to ALP v ON", { coal: lastOn.coal, grn: lastOn.grn, oth: lastOn.oth }),
+    `ledger: ALP-v-One-Nation group — Coalition ${lastOn.coal}, Greens ${lastOn.grn}, Other ${lastOn.oth} (${JSON.stringify(land && land.prefs && land.prefs.groups["to ALP v ON"])})`);
+  check(!!land && grpHas(land.prefs, "to ALP v L/NP", { grn: lastCo.grn, onp: lastCo.onp, oth: lastCo.oth }),
+    `ledger: ALP-v-Coalition group — Greens ${lastCo.grn}, One Nation ${lastCo.onp}, Other ${lastCo.oth} (${JSON.stringify(land && land.prefs && land.prefs.groups["to ALP v L/NP"])})`);
+  check(!!land && land.prefs && land.prefs.tails.every((t) => !/combined row was printed/.test(t)),
+    `ledger: no combined-rows tail on a printed wave (${JSON.stringify(land && land.prefs && land.prefs.tails)})`);
 }
 
-// the June wave's drawer carries the combined-rows note under the matchup grid
+// the June wave's drawer rides the combined-rows note as its Preferences
+// line's tail (the wave's Coalition split is the dataset's one derived cell)
 {
   await page.evaluate(() => window.AP.openPoll("RedBridge/Accent|2026-06-26", "twopp", "the probe"));
   let jun = null;
@@ -593,22 +610,17 @@ for (const c of CHARTS) {
     jun = await page.evaluate(() => {
       const det = document.querySelector(".rd-ap-open");
       if (!det) return null;
-      const keys = [...det.querySelectorAll(".rd-ldg-tpp tr.sub th")].map((k) => k.textContent.trim());
-      const estNote = [...det.querySelectorAll(".rd-ldg-tpp ~ .rd-ldg-foot1")].map((s) => s.textContent.replace(/\s+/g, " ").trim());
-      const cell = (() => {
-        const tr = [...det.querySelectorAll(".rd-ldg-tpp tr.sub")].find((x) => x.querySelector("th").textContent.includes("Coalition voters"));
-        return tr ? [...tr.querySelectorAll("td")].map((td) => td.textContent.replace(/\s+/g, " ").trim()) : null;
-      })();
-      return { keys, estNote, coalCell: cell };
+      return { prefs: window.__prefsRead(det),
+               subRows: det.querySelectorAll(".rd-ldg-tpp tr.sub").length };
     });
   } catch (e) { /* jun stays null */ }
-  check(!!jun && ["Coalition", "One Nation", "Greens", "Other"].every((c) => jun.keys.includes(`${c} voters`)),
-    `June wave drawer: all four cohort forced rows present (${JSON.stringify(jun && jun.keys)})`);
+  check(!!jun && jun.prefs && jun.subRows === 0 && jun.prefs.head === "If forced to choose",
+    `June wave drawer: the splits ride the Preferences line, not the table (${JSON.stringify(jun && jun.prefs && jun.prefs.head)})`);
   const juneOn = FF.vsOn.find((w) => w.ym === "2026-06");
-  check(!!jun && Array.isArray(jun.coalCell) && jun.coalCell.some((t) => t.includes(`${juneOn.coal}`) && t.includes(`${100 - juneOn.coal}`)),
-    `June wave drawer: forced split ${juneOn.coal} – ${100 - juneOn.coal} rides the v-One-Nation column (${JSON.stringify(jun && jun.coalCell)})`);
-  check(!!jun && jun.estNote.some((n) => n.includes("combined row was printed") && n.includes("CLP/LNP/Nat")),
-    `June wave drawer: the combined-rows note sits under the matchup grid (${JSON.stringify(jun && jun.estNote)})`);
+  check(!!jun && grpHas(jun.prefs, "to ALP v ON", { coal: juneOn.coal }),
+    `June wave drawer: the derived Coalition split ${juneOn.coal} sits in the ALP-v-One-Nation group (${JSON.stringify(jun && jun.prefs && jun.prefs.groups["to ALP v ON"])})`);
+  check(!!jun && jun.prefs && jun.prefs.tails.some((t) => /combined row was printed/.test(t) && /CLP\/LNP\/Nat/.test(t)),
+    `June wave drawer: the combined-rows note is the Preferences line's tail (${JSON.stringify(jun && jun.prefs && jun.prefs.tails)})`);
 }
 
 // ---------------- phone rung ------------------------------------------------

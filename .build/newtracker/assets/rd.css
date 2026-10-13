@@ -3375,8 +3375,6 @@ body.rd .rd-ldg-t thead th.on { color: var(--ink); }
 body.rd .rd-ldg-t tbody th { padding: 6px 10px 0 0; font-weight: 400; color: var(--ink-2); text-align: left; white-space: nowrap; }
 body.rd .rd-ldg-t td { padding: 6px 10px 0 0; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ldg-t .num, body.rd .rd-ldg-t thead th.num { text-align: right; }
-body.rd .rd-ldg-t tr.grp th { padding-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-body.rd .rd-ldg-t tr.sub th { padding-left: 12px; }
 body.rd .rd-ldg-pair { font-weight: 600; white-space: nowrap; }
 body.rd .rd-ldg-dash { margin: 0 3px; font-weight: 400; color: var(--ink-faint); }
 body.rd .rd-ldg-tri { font-weight: 600; }
@@ -3485,7 +3483,6 @@ body.rd .rd-pl-detail { padding: 16px 16px 20px; background: var(--surface-2); }
   body.rd .rd-ldg-tpp td { padding-right: 4px; }
   body.rd .rd-ldg-tpp .rd-ldg-chg { margin-left: 4px; font-size: 11.5px; }
   body.rd .rd-ldg-tpp .rd-ldg-dash { margin: 0 1px; }
-  body.rd .rd-ldg-tpp tr.sub th { padding-left: 8px; }
   body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: 100%; }
   body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 0; white-space: normal; }
   body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 10px; }

@@ -1568,9 +1568,11 @@ function rdLgMoe(p) {
 
 /* ---- the two-party section: one table, both matchups (the matchup in force
    first), every basis the house printed - its second published pair on
-   2025 flows, the forced-choice cohorts under their own subhead, a
-   Coalition v One Nation pair and a three-cornered split where it printed
-   them. A row the house filled in neither column never draws */
+   2025 flows, a Coalition v One Nation pair and a three-cornered split
+   where it printed them. A row the house filled in neither column never
+   draws. The forced-choice 2025-cohort splits (RedBridge/Accent's tpp_split
+   tables) ride the Preferences line in Also in this poll (RdLgFlowsLine),
+   as DemosAU's MRP flows do */
 function RdLgTpp({ p, onM, moe, note }) {
   const c = (p.chg && p.chg.d) || {};
   const ta = p.tppAlt;
@@ -1589,15 +1591,9 @@ function RdLgTpp({ p, onM, moe, note }) {
     [pubLab, { onp: ta ? [ta.alp, c.altAlpOn, 0, ta.onp] : null, lnp: p.alp != null ? [p.alp, c.alp2pp, 0, p.lnp] : null }],
     ["Published, on " + rdElecYear + " flows", { onp: null, lnp: p.tppFlows != null ? [p.tppFlows, null, 0] : null }],
   ].filter(([, v]) => v.onp || v.lnp);
-  const forced = [
-    ["Coalition voters", { onp: p.splitCoal != null ? [p.splitCoal, c.splitCoal, 0] : null, lnp: null }],
-    ["One Nation voters", { onp: null, lnp: p.splitOnp != null ? [p.splitOnp, c.splitOnp, 0] : null }],
-    ["Greens voters", { onp: p.splitGrnOn != null ? [p.splitGrnOn, c.splitGrnOn, 0] : null, lnp: p.splitGrn != null ? [p.splitGrn, c.splitGrn, 0] : null }],
-    ["Other voters", { onp: p.splitOthOn != null ? [p.splitOthOn, c.splitOthOn, 0] : null, lnp: p.splitOth != null ? [p.splitOth, c.splitOth, 0] : null }],
-  ].filter(([, v]) => v.onp || v.lnp);
-  if (!rows.length && !forced.length && !p.tpp3 && !p.tppAlt2) return null;
-  const tr = ([lab, v], sub) => (
-    <tr key={lab} className={sub ? "sub" : ""}>
+  if (!rows.length && !p.tpp3 && !p.tppAlt2) return null;
+  const tr = ([lab, v]) => (
+    <tr key={lab}>
       <th scope="row">{lab}</th>
       {cols.map((k) => <td key={k.id}>{v[k.id] ? cell(v[k.id][0], v[k.id][1], k.ink, v[k.id][2], v[k.id][3]) : <span className="rd-ldg-none">—</span>}</td>)}
     </tr>
@@ -1609,15 +1605,11 @@ function RdLgTpp({ p, onM, moe, note }) {
         <thead><tr><th></th>{cols.map((k, i) => <th key={k.id} className={i === 0 ? "on" : ""}>Labor {k.head}</th>)}</tr></thead>
         <tbody>
           {rows.map((r) => tr(r))}
-          {forced.length > 0 && <tr className="grp"><th scope="rowgroup" colSpan={3}>If forced to choose</th></tr>}
-          {forced.map((r) => tr(r, true))}
           {p.tppAlt2 && <tr><th scope="row">Coalition v One Nation</th><td colSpan={2}><b className="rd-ldg-pair"><span style={{ color: "var(--lnp-text)" }}>{rdApNum(p.tppAlt2.lnp)}</span><span className="rd-ldg-dash">–</span><span style={{ color: "var(--onp-text)" }}>{rdApNum(p.tppAlt2.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
           {p.tpp3 && <tr><th scope="row">Three-cornered</th><td colSpan={2}><b className="rd-ldg-tri"><span style={{ color: "var(--alp-text)" }}>ALP {rdApNum(p.tpp3.alp)}</span> <span style={{ color: "var(--lnp-text)" }}>L/NP {rdApNum(p.tpp3.lnp)}</span> <span style={{ color: "var(--onp-text)" }}>ON {rdApNum(p.tpp3.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
         </tbody>
       </table>
-      {(noPub || moe || note || p.splitCoalEst) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}
-        {/* June 2026's press-only Coalition figure (gen-data's splitCoalEst) */}
-        {p.splitCoalEst ? " The Coalition-voters split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)." : ""}{note ? " " + note : ""}</p>}
+      {(noPub || moe || note) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{note ? " " + note : ""}</p>}
     </>
   );
 }
@@ -1788,21 +1780,26 @@ function RdLgDir({ p }) {
    whole line renders here, with the cycle state inside it. */
 const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
 const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
+/* the shared cell/group shape of a Preferences line: a contest label in its
+   slot, then party-tagged figures - the MRP line and RedBridge's forced
+   line both render through these */
+const rdLgFlowCell = (k, v, suffix) => v != null && (
+  <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b>{suffix}</span>
+);
+const rdLgFlowGrp = (title, cells) => cells && (
+  <span className="rd-ldg-grp rd-ldg-grpw rd-ldg-pgrp">
+    <span className="rd-ldg-li lbl rd-ldg-lisoft">{title}</span>
+    {cells.map(([k, v, suffix]) => rdLgFlowCell(k, v, suffix))}
+  </span>
+);
 function RdLgPrefsLine({ pf }) {
   const regs = RD_LG_PREFS_REGIONS.filter(([k]) => k !== "all" || pf.all);
   /* All regions first: default to its index in regs (falls to 0 = Inner
      metro on the rare wave whose weighting never computed) */
   const [ri, setRi] = React.useState(() => Math.max(0, regs.findIndex(([k]) => k === "all")));
   const rk = regs[ri % regs.length][0], rn = regs[ri % regs.length][1], next = regs[(ri + 1) % regs.length][1];
-  const cell = (k, v, suffix) => v != null && (
-    <span key={k} className="rd-ldg-li"><em style={{ color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null }}>{RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k}</em> <b>{rdApNum(v)}</b>{suffix}</span>
-  );
-  const grp = (title, cells) => cells && (
-    <span className="rd-ldg-grp rd-ldg-grpw rd-ldg-pgrp">
-      <span className="rd-ldg-li lbl rd-ldg-lisoft">{title}</span>
-      {cells.map(([k, v, suffix]) => cell(k, v, suffix))}
-    </span>
-  );
+  const cell = rdLgFlowCell;
+  const grp = rdLgFlowGrp;
   const at = (t) => (rk === "all" ? (pf.all && pf.all[t]) || null : pf[t] ? pf[t][rk] : null);
   const a = at("alp_onp"), c = at("lnp_onp");
   return <div className="rd-ldg-line prefs">
@@ -1820,6 +1817,23 @@ function RdLgPrefsLine({ pf }) {
           the figure cell so the comma hugs it (a tail flex item would float
           a column-gap away) */}
       {pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, <span className="rd-ldg-lisoft">, nationwide</span>]])}
+    </span>
+  </div>;
+}
+
+/* RedBridge/Accent's "If forced to choose, who would you vote for" splits
+   (its tpp_split tables, gen-data's split* fields): the same Preferences
+   line shape as the MRP's, one group per question, the printed 2025-vote
+   cohorts as its figures */
+function RdLgFlowsLine({ p }) {
+  const grp = rdLgFlowGrp;
+  return <div className="rd-ldg-line flows">
+    <span className="rd-ldg-lab">Preferences</span>
+    <span className="rd-ldg-lbody">
+      <span className="rd-ldg-li lbl rd-ldg-lisoft">If forced to choose</span>
+      {(p.splitCoal != null || p.splitGrnOn != null || p.splitOthOn != null) && grp("to ALP v ON", [["lnp", p.splitCoal], ["grn", p.splitGrnOn], ["oth", p.splitOthOn]])}
+      {(p.splitGrn != null || p.splitOnp != null || p.splitOth != null) && grp("to ALP v L/NP", [["grn", p.splitGrn], ["onp", p.splitOnp], ["oth", p.splitOth]])}
+      {p.splitCoalEst && <span className="rd-ldg-li rd-ldg-lisoft">the Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)</span>}
     </span>
   </div>;
 }
@@ -1857,6 +1871,10 @@ function rdLgLines(p, { onM, demSplit }) {
      own line under the 2PPs; renders itself so its chip's cycle state can
      live beside the eyebrow */
   if (p.pf) out.push({ id: "prefs", self: RdLgPrefsLine, pf: p.pf });
+  /* RedBridge/Accent's forced-to-choose splits ride their own line in the
+     same shape; self-rendering so the line never collides with the MRP's */
+  if (p.splitCoal != null || p.splitOnp != null || p.splitGrn != null || p.splitGrnOn != null || p.splitOth != null || p.splitOthOn != null)
+    out.push({ id: "flows", self: RdLgFlowsLine, p });
   const a = p.appr || {};
   let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
   const sets = window.ppmContests ? window.ppmContests(p) : [];
@@ -1942,7 +1960,7 @@ function rdLgLines(p, { onM, demSplit }) {
 function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demSplit, moe, latest }) {
   const lines = rdLgLines(p, { onM, demSplit });
   const NOTE = {
-    twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp", "splitCoal", "splitOnp", "splitGrn", "splitGrnOn", "splitOth", "splitOthOn"]),
+    twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp"]),
     primary: rdLgChgNote(p, ["pAlp", "pLnp", "pGrn", "pOnp", "pOth", "und"]),
     leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet", "albFav", "taylorFav", "hansonFav"]),
   };
@@ -1978,7 +1996,7 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
           <h4 className="rd-ldg-h">Also in this poll</h4>
           <div className="rd-ldg-lines">
             {rest.map((l) => {
-              if (l.self) { const Self = l.self; return <Self key={l.id} pf={l.pf} />; }
+              if (l.self) { const Self = l.self; return <Self key={l.id} pf={l.pf} p={l.p} />; }
               const can = !!(onLine && RD_LG_TAB[l.id]);
               const Tag = can ? "button" : "div";
               const away = latest && !RD_LG_LATEST_TABS[l.id];
