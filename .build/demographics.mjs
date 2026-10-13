@@ -20,7 +20,7 @@
                  `working` line); self-assessed class (Feb 2026 on) and
                  children-at-home (Mar on) stay facet-only – no shared axis
                  can hold them across houses, so they ride to the facet's
-                 Other cuts tables (the Newspoll pooled waves' religion dims
+                 Offcuts tables (the Newspoll pooled waves' religion dims
                  likewise; its Other residual row stays facet-only too,
                  no other house printing it).
      DemosAU   – the Gender, Age, Education, Location and Housing Tenure
@@ -65,7 +65,12 @@
                  extra dims on REDBRIDGE_JUL_DEMO all come from its
                  Tables 1-5 trend breakdowns. The 2026-03-19 wave
                  carries no total block – the report prints no all-voters
-                 topline.
+                 topline. REDBRIDGE_OCT_DEMO's one-off religion,
+                 weekly-income, financial-stress and occupation tables
+                 join no common group either – the income bands file
+                 beside the other houses' per-house splits, the rest to
+                 the facet's Offcuts tables (Religion, Occupation,
+                 Financial stress).
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
@@ -150,7 +155,7 @@
                  report prints none (age/size callouts only – one cell a
                  group, never a partition). The electorate cut is
                  per-house only: no other house cuts seats, so it joins no
-                 common group and rides to the facet's Other cuts tables,
+                 common group and rides to the facet's Offcuts tables,
                  income's route. Not in HOUSES.
    Groups are kept exactly as each house draws them – the age bands differ
    (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+, RedBridge by
@@ -1875,7 +1880,7 @@ const reminders = watchReminders({
 });
 
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. The working columns (YouGov from Jun 2026, Newspoll pooled's quarterly rows, RedBridge's Oct 2025 aliases) join the common Full time / Part time / Retired groups on the chart views; YouGov's self-assessed class (Feb 2026 on) and children-at-home (Mar on), the Newspoll pooled waves' religion and Other-work-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal, RedBridge weekly-household; no common brackets) – read for the All-polls demographics facet, never pooled. The working columns (YouGov from Jun 2026, Newspoll pooled's quarterly rows, RedBridge's Oct 2025 aliases) join the common Full time / Part time / Retired groups on the chart views; YouGov's self-assessed class (Feb 2026 on) and children-at-home (Mar on), the Newspoll pooled waves' religion and Other-work-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end, joined by the one-off religion, financial-stress and occupation tables RedBridge/Accent's Oct 2025 report prints (dims[religion|stress|occupation]). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };

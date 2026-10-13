@@ -67,7 +67,7 @@ console.log("== desktop 1280 ==");
 {
   const page = await open(1280, "f=g&g=b");
   let s = await snap(page);
-  check("lands Demographics / Offcuts, six stacked family tables", s.facet === "Demographics" && s.famRows === 6, JSON.stringify(s.famLabs));
+  check("lands Demographics / Offcuts, eight stacked family tables", s.facet === "Demographics" && s.famRows === 8, JSON.stringify(s.famLabs));
 
   // the user's UI path: leave via every tab
   for (const lab of ["2PP", "Primary", "Leadership", "Direction", "Issues", "Confidence"]) {
@@ -82,7 +82,7 @@ console.log("== desktop 1280 ==");
   await clickTab(page, "Demographics");
   await settle();
   s = await snap(page);
-  check("back on Demographics: Offcuts kept, families re-stack", s.facet === "Demographics" && s.famRows === 6, `famRows=${s.famRows}`);
+  check("back on Demographics: Offcuts kept, families re-stack", s.facet === "Demographics" && s.famRows === 8, `famRows=${s.famRows}`);
 
   // keyboard path: walk right off Demographics (Demographics → Confidence)
   await page.evaluate(() => {
@@ -109,7 +109,7 @@ console.log("== desktop 1280 ==");
   });
   await settle();
   s = await snap(page);
-  check("UI-picked Offcuts re-stacks", s.famRows === 6, `famRows=${s.famRows}`);
+  check("UI-picked Offcuts re-stacks", s.famRows === 8, `famRows=${s.famRows}`);
   await clickTab(page, "2PP");
   await settle();
   s = await snap(page);
@@ -122,7 +122,7 @@ console.log("== phone 390 ==");
 {
   const page = await open(390, "f=g&g=b", { touch: true });
   let s = await snap(page);
-  check("phone: Offcuts stacks", s.famRows === 6, `famRows=${s.famRows}`);
+  check("phone: Offcuts stacks", s.famRows === 8, `famRows=${s.famRows}`);
   // the phone facet menu is a button-backed <select> substitute: dispatch the
   // same change the menu would (its control sits in .rd-ap-tabs too)
   await clickTab(page, "2PP");

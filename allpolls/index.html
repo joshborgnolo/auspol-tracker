@@ -13900,28 +13900,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       },
       "sub": "Bonham’s estimates from the published distributions"
     }, {
-      "key": "farrlib",
-      "date": "2026-05-09",
-      "xm": 24316.2581,
-      "label": "Farrer by-election",
-      "win": "9 May 2026",
-      "coal": 41,
-      "lbl": {
-        "coal": "Liberal"
-      },
-      "sub": "the AEC’s flow release for the by-election"
-    }, {
-      "key": "farrnat",
-      "date": "2026-05-09",
-      "xm": 24316.2581,
-      "label": "Farrer by-election",
-      "win": "9 May 2026",
-      "coal": 31,
-      "lbl": {
-        "coal": "Nationals"
-      },
-      "sub": "the AEC’s flow release for the by-election"
-    }, {
       "key": "harbour",
       "date": "2026-08-29",
       "xm": 24319.9032,
@@ -91019,6 +90997,25 @@ function TrendChart(props) {
   };
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
+  const guideOn = hoverX != null && !dot && !evt;
+  const guideWas = useRef(false);
+  const guideRest = useRef(null);
+  const markRest = useRef(new Map());
+  const liveMark = new Map();
+  if (hi != null && !dot && !evt && spinePts[hi]) series.forEach(s => {
+    if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return;
+    const p = ptAtXLine(s, spinePts[hi].x);
+    if (p) liveMark.set(s.id, [sx(p.x), sy(p.y)]);
+  });
+  React.useLayoutEffect(() => {
+    if (guideOn) {
+      guideRest.current = hoverX;
+      markRest.current = liveMark;
+    }
+    guideWas.current = guideOn;
+  });
+  const motionless = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const entrySnap = guideOn && !guideWas.current && !motionless;
   const yLabelledOf = ticks => {
     if (!cw || ticks.length < 2) return new Set(ticks);
     const NEED = 15;
@@ -91828,8 +91825,11 @@ function TrendChart(props) {
     y2: H - pad.b,
     className: "guide",
     style: {
-      transform: `translateX(${(hoverX != null ? hoverX : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
-      opacity: hoverX != null && !dot && !evt ? 0.7 : 0
+      transform: `translateX(${(guideOn ? hoverX : guideRest.current != null ? guideRest.current : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
+      opacity: guideOn ? 0.7 : 0,
+      ...(entrySnap ? {
+        transition: "opacity .18s ease"
+      } : null)
     }
   }), React.createElement("g", {
     clipPath: `url(#${plotId})`
@@ -91861,11 +91861,11 @@ function TrendChart(props) {
     strokeLinecap: "round"
   }))), series.map(s => {
     if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return null;
-    const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
-    const p = spx != null ? ptAtXLine(s, spx) : null;
-    const last = visEnd(s);
-    const at = p || last;
-    if (!at) return null;
+    const live = liveMark.get(s.id);
+    const rest = markRest.current.get(s.id);
+    const last = live || rest ? null : visEnd(s);
+    if (!live && !rest && !last) return null;
+    const at = live || rest || [sx(last.x), sy(last.y)];
     return React.createElement("circle", {
       key: "h" + s.id,
       cx: 0,
@@ -91874,8 +91874,11 @@ function TrendChart(props) {
       className: "hover-marker",
       "data-series": s.id,
       style: {
-        transform: `translate(${sx(at.x).toFixed(2)}px, ${sy(at.y).toFixed(2)}px)`,
-        opacity: p ? 1 : 0
+        transform: `translate(${at[0].toFixed(2)}px, ${at[1].toFixed(2)}px)`,
+        opacity: live ? 1 : 0,
+        ...(entrySnap && live ? {
+          transition: "opacity .14s ease"
+        } : null)
       },
       fill: "var(--chart-bg)",
       stroke: s.color,
@@ -92150,6 +92153,7 @@ function TrendChart(props) {
       style: style
     }, n.text);
   })), tip && React.createElement("div", {
+    key: evt ? "evt" : dot ? "dot" : "guide",
     ref: tipRef,
     className: "tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide") + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : ""),
     style: {
@@ -100503,14 +100507,14 @@ const DEM_SPLITS = [{
   lo: "Lower income",
   hi: "Higher income",
   scope: "With an income breakdown",
-  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
+  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"], ["$3,000+ a week", "Under $1,000 a week", "$3k+ v <$1k a week"]]
 }, {
   id: "country",
   label: "Offcuts",
   lo: "Australia-born",
   hi: "Overseas-born",
   scope: "With a one-off breakdown",
-  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"], ["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"], ["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]],
   fams: [{
     id: "birth",
     lab: "Birth country",
@@ -100519,8 +100523,8 @@ const DEM_SPLITS = [{
   }, {
     id: "religion",
     lab: "Religion",
-    sub: "Newspoll’s pooled quarterly pulls",
-    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]]
+    sub: "Newspoll’s pooled quarterly pulls and RedBridge/Accent’s one-off cut",
+    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"]]
   }, {
     id: "working",
     lab: "Working status",
@@ -100541,6 +100545,16 @@ const DEM_SPLITS = [{
     lab: "Tasmanian electorates",
     sub: "EMRS’s one-off seat cut from the February 2026 federal wave",
     pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
+  }, {
+    id: "occupation",
+    lab: "Occupation",
+    sub: "RedBridge/Accent’s one-off cut from the October 2025 report",
+    pairs: [["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"]]
+  }, {
+    id: "stress",
+    lab: "Financial stress",
+    sub: "RedBridge/Accent’s one-off cut from the October 2025 report",
+    pairs: [["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]]
   }]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
@@ -127904,7 +127918,7 @@ function RdForced({
       }
       if (tip && tip.g === m.g.key && tip.ck === m.ck && pt !== "mouse") setTip(null);else show(m.g, m.ck, pt === "mouse" ? "mouse" : "touch");
     },
-    "aria-label": `If forced to choose between ${anchor} and ${rival}, the share of each group of voters picking ${anchorShort}, by fieldwork date: ${houseWord}’s latest ${series.map(s => say(s.ck, s.last[s.ck])).join(", ")}.${xnote}${enote}`
+    "aria-label": `If forced to choose between ${anchor} and ${rival}, the share of each group of voters picking ${anchorShort}, by fieldwork date${waves.length ? ": " + houseWord + "’s latest " + series.map(s => say(s.ck, s.last[s.ck])).join(", ") : ""}.${xnote}${enote}`
   }, [0, 25, 50, 75, 100].map(v => React.createElement("path", {
     key: v,
     d: `M${x0} ${Y(v)}H${x1}`,
@@ -128179,6 +128193,91 @@ function RdFlows() {
       };
     })
   } : null;
+  const ftCohorts = {
+    co: ["grn", "onp", "oth"],
+    on: ["grn", "coal", "oth"],
+    ln: ["alp", "grn", "oth"]
+  };
+  const ftCell = (d, cks) => d ? React.createElement("div", null, cks.filter(ck => d[ck] != null).map(ck => React.createElement("div", {
+    key: ck
+  }, FF_COHORTS[ck].name, " ", d[ck].toFixed(1)))) : "–";
+  const ftDash = ["–", "–", "–", "–"];
+  const ftLast = FF ? {
+    co: FF.vsCoal[FF.vsCoal.length - 1],
+    on: FF.vsOn[FF.vsOn.length - 1],
+    dm: FF.demos && FF.demos[FF.demos.length - 1],
+    mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
+    ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1]
+  } : null;
+  const ftPct = v => v * 100;
+  const ftBd = v => (v * 100).toFixed(1).replace(/\.0$/, "");
+  const ftSite = D.flowTables || null;
+  const ftSiteOn = ftSite ? React.createElement("div", null, [["coal", "lnp"], ["grn", "grn"], ["oth", "oth"]].map(([ck, bk]) => React.createElement("div", {
+    key: ck
+  }, FF_COHORTS[ck].name, " ", ftPct(ftSite.onp[bk]).toFixed(1), " ", React.createElement("span", {
+    className: "rd-note"
+  }, "\xB1 ", ftBd(ftSite.onBand[bk]))))) : "–";
+  const flowSets = FF ? [{
+    key: "ftco",
+    label: "Labor v Coalition — the share of each cohort choosing Labor",
+    rows: [{
+      key: "elec",
+      name: "2025 election, as counted",
+      cells: FF.elec2025r ? ["all", "inner", "outer", "regional"].map(k => ftCell(FF.elec2025r[k], ftCohorts.co)) : ftDash
+    }, {
+      key: "site",
+      name: "The flows this site uses",
+      cells: [ftCell(ftSite ? {
+        grn: ftPct(ftSite.lnp.grn),
+        onp: ftPct(ftSite.lnp.onp),
+        oth: ftPct(ftSite.lnp.oth)
+      } : null, ftCohorts.co), "–", "–", "–"]
+    }, ftLast.co && {
+      key: "rb",
+      name: "RedBridge/Accent, " + rdMonthYear(ftLast.co.ym),
+      cells: [ftCell(ftLast.co, ftCohorts.co), "–", "–", "–"]
+    }, ftLast.dm && {
+      key: "mrp",
+      name: "DemosAU MRP, " + ftLast.dm.win,
+      cells: [ftCell(ftLast.dm, ftCohorts.co), "–", "–", "–"]
+    }].filter(Boolean)
+  }, {
+    key: "fton",
+    label: "Labor v One Nation — the share of each cohort choosing Labor",
+    rows: [{
+      key: "elec",
+      name: "2025 election, as counted",
+      cells: ftDash
+    }, {
+      key: "site",
+      name: "The flows this site uses",
+      cells: [ftSiteOn, "–", "–", "–"]
+    }, ftLast.on && {
+      key: "rb",
+      name: "RedBridge/Accent, " + rdMonthYear(ftLast.on.ym),
+      cells: [ftCell(ftLast.on, ftCohorts.on), "–", "–", "–"]
+    }, ftLast.mn && {
+      key: "mrp",
+      name: "DemosAU MRP, " + ftLast.mn.win,
+      cells: ["all", "inner", "outer", "regional"].map(k => ftCell(ftLast.mn[k], ftCohorts.on))
+    }].filter(Boolean)
+  }, {
+    key: "ftln",
+    label: "Coalition v One Nation — the share of each cohort choosing the Coalition",
+    rows: [{
+      key: "elec",
+      name: "2025 election, as counted",
+      cells: ftDash
+    }, {
+      key: "site",
+      name: "The flows this site uses",
+      cells: ftDash
+    }, ftLast.ln && {
+      key: "mrp",
+      name: "DemosAU MRP, " + ftLast.ln.win,
+      cells: ["all", "inner", "outer", "regional"].map(k => ftCell(ftLast.ln[k], ftCohorts.ln))
+    }].filter(Boolean)
+  }] : null;
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return React.createElement("section", {
     className: "rd-sec rd-fl",
@@ -128297,14 +128396,14 @@ function RdFlows() {
       className: "rd-ap-ct"
     }, ffTitle("co"))), React.createElement(RdForced, {
       q: "co",
-      waves: FF.vsCoal,
+      waves: ffReg ? [] : FF.vsCoal,
       cohorts: ["grn", "onp", "oth"],
       anchor: "Labor",
       rival: "the Coalition",
       houseWord: "RedBridge/Accent",
       W: cw,
       phone: phone,
-      extras: FF.demos,
+      extras: ffReg ? [] : FF.demos,
       elec: FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025,
       dom: dom
     })), React.createElement("div", {
@@ -128375,7 +128474,12 @@ function RdFlows() {
       className: "rd-ff-keyring",
       "aria-hidden": "true"
     }), "2025 election, as counted")));
-  })(), React.createElement(RdTsig, {
+  })(), flowSets && React.createElement(RdTsig, {
+    summary: "Flows table",
+    heads: ["Flow", "All voters", "Inner metro", "Outer metro", "Regional"],
+    sets: flowSets,
+    note: "Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows, split by its inside-metro, outside-metro and rural-plus-provincial seat classes (the charts’ rings above); no national count of the two One Nation choices exists, so those cells are dashes. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."
+  }), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
@@ -128385,7 +128489,7 @@ function RdFlows() {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, split by the AEC’s own inside-metro, outside-metro and rural-plus-provincial seat classes. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Farrer and Secret Harbour by-elections — none of them joined to any line."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from both charts — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, split by the AEC’s own inside-metro, outside-metro and rural-plus-provincial seat classes. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);

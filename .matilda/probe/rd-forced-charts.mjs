@@ -18,12 +18,16 @@
      - the 2026 state/by-election counts ride as CROSSES (.rd-ff-x) on the
        Labor-v-One-Nation chart only, on their own election days, joined to
        NO line; on a named region they vanish (national counts); SA 2026
-       (Bonham estimates), Farrer's two Coalition partners (two crosses on
-       one day), Secret Harbour's early-voting-centre count;
+       (Bonham estimates), Secret Harbour's early-voting-centre count.
+       Farrer's two crosses are GONE (user 2026-10-13: its counts measured
+       independent national contests, not One Nation voters);
      - the region menu (All voters / Inner metro / Outer metro / Regional)
        rekeys the DemosAU figures AND the rings, and DROPS RedBridge's
-       national dots on the v-One-Nation chart (waves=[]) — a national
-       wave can't speak to a named region;
+       national dots on BOTH RedBridge charts (waves=[]) — a national
+       wave can't speak to a named region; the v-Coalition chart's DemosAU
+       triangles drop too (that MRP split is national-only — no regional
+       carrier exists, user 2026-10-13), leaving only the election's
+       rekeyed rings;
      - the third chart's title paints Coalition in coalition blue and One
        Nation orange (probe asserts the two spans carry the party text-vars
        via getComputedStyle, not a hard-coded colour);
@@ -73,8 +77,8 @@ const rekeyMrp = (ws, reg) => (ws || []).map((w) => {
 }).filter(Boolean);
 /* a chart's LINE-CARRYING waves at a region: a mixed list is just merged by
    date in the renderer — mirror it here. RedBridge drops out on a region. */
-const wavesOf = (FF, q, reg) => (q === "ln" ? rekeyMrp(FF.lnpOn, reg) : FF[CHARTS[FI[q]].vsKey]);
-const extOf = (FF, q, reg) => (q === "co" ? FF.demos || [] : q === "on" ? rekeyMrp(FF.demosOn, reg) : []);
+const wavesOf = (FF, q, reg) => (q === "ln" ? rekeyMrp(FF.lnpOn, reg) : reg ? [] : FF[CHARTS[FI[q]].vsKey]);
+const extOf = (FF, q, reg) => (q === "co" ? (reg ? [] : FF.demos || []) : q === "on" ? rekeyMrp(FF.demosOn, reg) : []);
 const bysOf = (FF, q, reg) => (q === "on" && !reg ? FF.bys || [] : []);
 const elecOf = (FF, q, reg) => (q === "co" && FF.elec2025r ? [Object.values(FF.elec2025r).map((r) => r.xm) && FF.elec2025r[reg || "all"]] : []);
 const isMrp = (w) => w.house === FF_MRP_HOUSE;
@@ -251,7 +255,13 @@ const measure = () => page.evaluate(() => {
     return s ? { aria: s.getAttribute("aria-label"), value: s.value,
                  options: [...s.options].map((o) => [o.value, o.textContent.trim()]) } : null;
   })();
-  const det = sec.querySelector("details.rd-tsig");
+  /* the section carries TWO .rd-tsig folds now (2026-10-13): the Flows
+     table directly above the trend-significance battery. Match each by
+     its summary text — never querySelector's first hit */
+  const dets = [...sec.querySelectorAll("details.rd-tsig")];
+  out.tsigOrder = dets.map((dt) => { const s = dt.querySelector("summary"); return s ? s.textContent.trim() : ""; });
+  const bySummary = (want) => dets.find((dt) => (dt.querySelector("summary") || {}).textContent === want);
+  const det = bySummary("Trend-significance table");
   if (det) {
     out.tsigHeads = [...det.querySelectorAll(".rd-tsig-table thead th")].map((h) => h.textContent.trim());
     const bodies = [...det.querySelectorAll(".rd-tsig-table tbody")];
@@ -264,6 +274,18 @@ const measure = () => page.evaluate(() => {
       cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.trim()),
       yes: tr.querySelectorAll("td.rd-tsig-yes").length,
     })) : null;
+  }
+  const ftab = bySummary("Flows table");
+  if (ftab) {
+    out.flowHeads = [...ftab.querySelectorAll(".rd-tsig-table thead th")].map((h) => h.textContent.trim());
+    out.flowSets = [...ftab.querySelectorAll(".rd-tsig-table tbody")].map((tb) => ({
+      set: ((tb.querySelector("tr.rd-tsig-set th") || {}).textContent || "").trim(),
+      rows: [...tb.querySelectorAll("tr:not(.rd-tsig-set)")].map((tr) => ({
+        name: (tr.querySelector("th") || {}).textContent.trim(),
+        cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.trim()),
+      })),
+    }));
+    out.flowNote = (ftab.querySelector(".rd-tsig-note") || {}).textContent || null;
   }
   /* the key row under the trio: line/triangle/cross/ring tokens in order */
   const key = [...sec.querySelectorAll(".rd-ff-key .rd-key-item")].map((k) => k.textContent.trim());
@@ -283,14 +305,19 @@ check(!!FF && FF.house === "RedBridge/Accent" && Array.isArray(FF.vsOn) && Array
   `payload: D.flowForced carries the pair, the lnpOn carriers, and its house`);
 check(!!FF && FF.elec2025r && ["all", "inner", "outer", "regional"].every((k) => FF.elec2025r[k] && FF.elec2025r[k].grn != null),
   `payload: elec2025r regions present (${FF && FF.elec2025r ? Object.keys(FF.elec2025r).join("/") : "none"})`);
-check(!!FF && Array.isArray(FF.bys) && FF.bys.length === 4,
-  `payload: four 2026-count crosses (${FF && (FF.bys || []).length})`);
+check(!!FF && Array.isArray(FF.bys) && FF.bys.length === 2,
+  `payload: two 2026-count crosses (${FF && (FF.bys || []).length})`);
+check(!!FF && (FF.bys || []).every((b) => !/^farr/.test(b.key)),
+  "payload: no Farrer cross survives (its counts measured independent contests)");
 const lineWavesOfNat = (q) => {
   const ws = q === "ln" ? rekeyMrp(FF.lnpOn, "") : FF[CHARTS[FI[q]].vsKey];
   const ex = q === "ln" ? [] : extOf(FF, q, "");
   return q === "ln" ? ws : [...ws, ...ex].sort((a, b) => a.xm - b.xm);
 };
 const FFexpNat = FF ? expectedForced(FF, "") : null;
+/* the site's own flow constants — the Flows table's second row per contest */
+const FT = await page.evaluate(() => window.AUSPOL.flowTables || null);
+check(!!FT && FT.lnp && FT.onp && FT.onBand, "payload: window.AUSPOL.flowTables carries the site's flow tables");
 
 // ---------------- desktop rung: national ----------------------------------
 await gotoFlows(1366);
@@ -467,13 +494,13 @@ for (const [i, f] of d.figs.entries()) {
   check(fOn.emptyNote === "No election count of this choice", `desktop v-ON: the empty-note says so (${JSON.stringify(fOn.emptyNote)})`);
 }
 
-/* the crosses on Labor v One Nation: four groups (SA 2026 / Farrer Lib /
-   Farrer Nat / Secret Harbour) at their own days, never on a line */
+/* the crosses on Labor v One Nation: two counts (SA 2026 / Secret Harbour)
+   at their own days, never on a line */
 {
   const f = d.figs[FI.on], tk = axisMap(f.ticks), bot2 = 236 - 34;
   const want = FF.bys;
   const nX = want.reduce((a, b) => a + ["coal", "grn", "oth"].filter((k) => b[k] != null).length, 0);
-  check(f.nX === nX, `desktop v-ON: ${nX} crosses, one per cohort cell of the four counts (${f.nX})`);
+  check(f.nX === nX, `desktop v-ON: ${nX} crosses, one per cohort cell of the two counts (${f.nX})`);
   for (const b of want) {
     const xs2 = [];
     for (const k of ["coal", "grn", "oth"]) {
@@ -482,19 +509,13 @@ for (const [i, f] of d.figs.entries()) {
       check(hit.length === 1, `desktop v-ON ${b.label} ${CONAME[k]}: a ${b[k]} cross on its own day (${hit.length} at its x)`);
     }
   }
-  /* the Farrer partner pair sits on one day, two separate crosses on the
-     Coalition lane */
-  const fl = f.xs.lnp.filter((p) => Math.abs(p.x - tk.x(FF.bys.find((b) => b.key === "farrlib").xm)) < 1.5);
-  check(fl.length === 2 && new Set(fl.map((p) => Math.round(p.y * 10))).size === 2,
-    `desktop v-ON: Farrer's two Coalition crosses share one day apart on the lane (y ${fl.map((p) => p.y.toFixed(1)).join("/")})`);
   /* crosses never join a line: asserted by the per-cohort vertex census
      above (each line's vertex count = its in-line marks, crosses excluded) */
   /* cross arias: name the count, the cohort, "preferences to Labor N" */
   check(f.xArias.length === nX, `desktop v-ON: every cross carries its own aria (${f.xArias.length})`);
   const aCross = (k, lbl) => f.xArias.find((a) => a.startsWith(k + ",") && a.includes(lbl + " voters, preferences to Labor"));
   const seen = [["South Australia 2026", "Liberal", 33.9], ["South Australia 2026", "Greens", 84.8],
-                ["South Australia 2026", "Independent", 55.9], ["Farrer by-election", "Liberal", 41],
-                ["Farrer by-election", "Nationals", 31], ["Secret Harbour by-election", "Liberal", 29.8],
+                ["South Australia 2026", "Independent", 55.9], ["Secret Harbour by-election", "Liberal", 29.8],
                 ["Secret Harbour by-election", "Greens", 90]];
   for (const [k, lbl, v] of seen) {
     const a = aCross(k, lbl);
@@ -569,6 +590,67 @@ for (const [i, exp] of FFexpNat.rows.entries()) {
    own head */
 check(d.tsigHeads && d.tsigHeads[0] === "Series" && d.tsigHeads.length === 5,
   `tsig heads (${JSON.stringify(d.tsigHeads)})`);
+
+/* the Flows table (user 2026-10-13): the fold directly above the battery,
+   recomputed here from the payload + the site's flowTables — three row
+   sets, election counted row then the site's constants then each house's
+   latest wave, across the four electorate views */
+{
+  check(JSON.stringify(d.tsigOrder) === JSON.stringify(["Flows table", "Trend-significance table"]),
+    `flows table: mounts directly above the trend-significance battery (${JSON.stringify(d.tsigOrder)})`);
+  check(JSON.stringify(d.flowHeads || []) === JSON.stringify(["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]),
+    `flows table: the four view columns (${JSON.stringify(d.flowHeads)})`);
+  const FT_COHORTS = { co: ["grn", "onp", "oth"], on: ["grn", "coal", "oth"], ln: ["alp", "grn", "oth"] };
+  const ftCell = (dd, cks) => (dd ? cks.filter((ck) => dd[ck] != null).map((ck) => CONAME[ck] + " " + dd[ck].toFixed(1)).join("") : "–");
+  const ftBd = (v) => (v * 100).toFixed(1).replace(/\.0$/, "");
+  const ftSiteOn = FT ? [["coal", "lnp"], ["grn", "grn"], ["oth", "oth"]]
+    .map(([ck, bk]) => CONAME[ck] + " " + (FT.onp[bk] * 100).toFixed(1) + " ± " + ftBd(FT.onBand[bk])).join("") : "–";
+  const lt = {
+    co: FF.vsCoal[FF.vsCoal.length - 1], on: FF.vsOn[FF.vsOn.length - 1],
+    dm: FF.demos && FF.demos[FF.demos.length - 1],
+    mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
+    ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1],
+  };
+  const VIEWS = ["all", "inner", "outer", "regional"];
+  const want = [
+    { set: "Labor v Coalition — the share of each cohort choosing Labor", rows: [
+      { name: "2025 election, as counted", cells: VIEWS.map((k) => ftCell(FF.elec2025r[k], FT_COHORTS.co)) },
+      { name: "The flows this site uses", cells: [ftCell(FT ? { grn: FT.lnp.grn * 100, onp: FT.lnp.onp * 100, oth: FT.lnp.oth * 100 } : null, FT_COHORTS.co), "–", "–", "–"] },
+      { name: "RedBridge/Accent, " + monY(lt.co.ym), cells: [ftCell(lt.co, FT_COHORTS.co), "–", "–", "–"] },
+      { name: "DemosAU MRP, " + lt.dm.win, cells: [ftCell(lt.dm, FT_COHORTS.co), "–", "–", "–"] },
+    ] },
+    { set: "Labor v One Nation — the share of each cohort choosing Labor", rows: [
+      { name: "2025 election, as counted", cells: ["–", "–", "–", "–"] },
+      { name: "The flows this site uses", cells: [ftSiteOn, "–", "–", "–"] },
+      { name: "RedBridge/Accent, " + monY(lt.on.ym), cells: [ftCell(lt.on, FT_COHORTS.on), "–", "–", "–"] },
+      { name: "DemosAU MRP, " + lt.mn.win, cells: VIEWS.map((k) => ftCell(lt.mn[k], FT_COHORTS.on)) },
+    ] },
+    { set: "Coalition v One Nation — the share of each cohort choosing the Coalition", rows: [
+      { name: "2025 election, as counted", cells: ["–", "–", "–", "–"] },
+      { name: "The flows this site uses", cells: ["–", "–", "–", "–"] },
+      { name: "DemosAU MRP, " + lt.ln.win, cells: VIEWS.map((k) => ftCell(lt.ln[k], FT_COHORTS.ln)) },
+    ] },
+  ];
+  check(d.flowSets && d.flowSets.length === 3, `flows table: three row sets (${d.flowSets && d.flowSets.length})`);
+  (d.flowSets || []).forEach((got, i) => {
+    const w = want[i];
+    check(got.set === w.set, `flows table set ${i}: label (${JSON.stringify(got.set)})`);
+    check(JSON.stringify(got.rows.map((r) => r.name)) === JSON.stringify(w.rows.map((r) => r.name)),
+      `flows table set ${i}: row order (${got.rows.map((r) => r.name).join(" | ")})`);
+    got.rows.forEach((r, j) =>
+      check(JSON.stringify(r.cells) === JSON.stringify(w.rows[j].cells),
+        `flows table ${w.rows[j].name} [${w.set.split(" — ")[0]}]: cells (${JSON.stringify(r.cells)})`));
+  });
+  check(!!d.flowNote && /RedBridge\/Accent is national-only/.test(d.flowNote) && /2026 state and by-election counts stay on the charts/.test(d.flowNote),
+    "flows table: the note records the chart-only 2026 counts and RedBridge's national-only waves");
+  /* the region select never rekeys the table — it lists every view */
+  const dReg = await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', "inner")
+    .then(() => new Promise((r) => setTimeout(r, 400))).then(measure);
+  check(JSON.stringify((dReg.flowSets || []).map((s) => s.rows.map((r) => r.cells))) === JSON.stringify(want.map((s) => s.rows.map((r) => r.cells))),
+    "flows table: the region select does not rekey it (all four views always listed)");
+  await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', "");
+  await new Promise((r) => setTimeout(r, 400));
+}
 const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
 check(viewH === 236, `desktop: plot height 236 (${viewH})`);
 check(d.sw <= d.iw + 1, `desktop: no horizontal overflow (sw ${d.sw} vs iw ${d.iw})`);
@@ -582,7 +664,7 @@ const setReg = async (val) => {
 };
 const lineWavesOfReg = (q, reg) => {
   if (q === "ln") return rekeyMrp(FF.lnpOn, reg);
-  const ws = q === "on" && reg ? [] : FF[CHARTS[FI[q]].vsKey];
+  const ws = reg ? [] : FF[CHARTS[FI[q]].vsKey];
   return [...ws, ...extOf(FF, q, reg)].sort((a, b) => a.xm - b.xm);
 };
 for (const [val, regName] of SWEEP) {
@@ -609,19 +691,24 @@ for (const [val, regName] of SWEEP) {
       `region ${regName} v-ON: the spoken note names triangles only — no weighting flag on printed cells, no crosses`);
     check(f.aria.includes("all-regions weighting") === false, `region ${regName} v-ON: no our-weighting note on printed cells`);
   }
-  /* Coalition chart: RedBridge stands (national question), the rings swap
-     to the region's own counted flows */
+  /* Coalition chart: RedBridge's dots AND DemosAU's triangles both drop
+     (both national-only, user 2026-10-13) — the election's own counted
+     rings, rekeyed to the region, are the only marks left */
   {
     const f = dr2.figs[FI.co], e = FF.elec2025r[val];
     const evals = [e.grn, e.onp, e.oth];
+    check(Object.values(f.dots).every((arr) => arr.length === 0),
+      `region ${regName} v-Coalition: RedBridge's dots drop too (its waves are national-only)`);
+    check(f.nTr === 0 && f.lines.length === 0 && f.leads.length === 0 && f.els.length === 0,
+      `region ${regName} v-Coalition: DemosAU's national-only triangles drop with them — no lines, lead-ins or end labels remain`);
     check(f.erings.length === 3 && ["grn", "onp", "oth"].every((ck) => {
       const ring = f.erings.find((g) => g.cls === CLS[ck]);
       return ring && Math.abs(100 * (bot2 - ring.y) / (bot2 - 16) - e[ck]) <= 0.06;
     }), `region ${regName} v-Coalition: the rings rekey to the region's counted flows (${evals.join("/")})`);
-    check(JSON.stringify(dr2.figs[FI.co].dots) === JSON.stringify(d.figs[FI.co].dots) && JSON.stringify(dr2.figs[FI.co].tris) === JSON.stringify(d.figs[FI.co].tris),
-      `region ${regName} v-Coalition: the wave dots and the national DemosAU triangle stand`);
     const scope = e.scopeNote || null;
     check(!!scope && f.aria.includes("for " + scope + ":"), `region ${regName} v-Coalition: the spoken note scopes the rings ("${scope}")`);
+    check(!f.aria.includes("Triangles mark") && !f.aria.includes("RedBridge/Accent’s latest"),
+      `region ${regName} v-Coalition: the spoken note names no national-only marks`);
   }
   /* the third chart rekeys to the region's printed cells */
   {

@@ -4100,12 +4100,14 @@ const flowForced = (() => {
   })();
   /* the 2026 state and by-election counts that MEASURED the Labor-v-One-
      Nation choice the second chart asks: crosses on the chart's own day,
-     joined to no line (user 2026-10-13). Figures and labels as the
-     preference-flows page's "2026 readings" table — SA is Bonham's
+     joined to no line (user 2026-10-13; Farrer's four Coalition reads
+     were removed the same day — its runners were Liberal-v-Nationals and
+     Liberal/One Nation INDEPENDENT contests, and an independent-national
+     count can't speak to One Nation voters' choices). Figures and labels
+     as the preference-flows page's "2026 readings" table — SA is Bonham's
      estimate from the published distributions (the state commission's
      own flows are due late 2026); Secret Harbour is Green's count of the
-     early voting centre; Farrer's two Coalition crosses ride one date,
-     its lbl naming the Coalition partner the reading counts. */
+     early voting centre. */
   const byX = (d) => {
     const y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
     const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
@@ -4115,12 +4117,6 @@ const flowForced = (() => {
     { key: "sa2026", date: "2026-03-21", xm: byX("2026-03-21"), label: "South Australia 2026", win: "21 Mar 2026",
       coal: 33.9, grn: 84.8, oth: 55.9, lbl: { coal: "Liberal", oth: "Independent" },
       sub: "Bonham’s estimates from the published distributions" },
-    { key: "farrlib", date: "2026-05-09", xm: byX("2026-05-09"), label: "Farrer by-election", win: "9 May 2026",
-      coal: 41, lbl: { coal: "Liberal" },
-      sub: "the AEC’s flow release for the by-election" },
-    { key: "farrnat", date: "2026-05-09", xm: byX("2026-05-09"), label: "Farrer by-election", win: "9 May 2026",
-      coal: 31, lbl: { coal: "Nationals" },
-      sub: "the AEC’s flow release for the by-election" },
     { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
       coal: 29.8, grn: 90.0, lbl: { coal: "Liberal" },
       sub: "Green’s count of the early voting centre, 47% of the votes" },
@@ -4148,6 +4144,9 @@ const flowForced = (() => {
   const demos = D.polls.filter((p) => p.pollster === "DemosAU (MRP)" && p.pref_flows && p.pref_flows.onp_alp_lnp != null)
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .map((p) => ({ date: p.date, ...mrpX(p), n: p.sample ?? null, onp: p.pref_flows.onp_alp_lnp }));
+  /* national-only, no region cells (the MRP reports' Labor-v-Coalition
+     split is never regional), so a named menu region drops these triangles
+     with RedBridge's waves (user 2026-10-13) */
   /* The same reports' regional Labor-v-One-Nation tables make the pair's
      other chart too – one diamond per cohort per MRP wave, at the same
      true-midpoint x as demos. The figures are carried four ways, like lnpOn

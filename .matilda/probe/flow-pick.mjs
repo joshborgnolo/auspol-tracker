@@ -1,10 +1,12 @@
 /* headless probe of the All-polls Preference flows highlight (#flow-drift,
    the two drift charts' "Highlight a pollster" menu, reshaped 2026-10-11):
-   the menu is ONE native select (.rd-fl-sel) over both charts, present at
-   every width (the old popover sat in the first chart's title row and a
-   phone never got it). With nothing picked there are NO per-house month
-   rings (.rd-fl-vhit) and no pick line - an unseen hover target is not a
-   mark the key can name. Picking a pollster:
+   the menu is ONE native select (targeted by its aria-label, not .rd-fl-sel:
+   that class is just the 34px sizing idiom and since 2026-10-13 the forced
+   charts' MRP-region menu rides it too, inside the same #flow-drift section)
+   over both charts, present at every width (the old popover sat in the first
+   chart's title row and a phone never got it). With nothing picked there are
+   NO per-house month rings (.rd-fl-vhit) and no pick line - an unseen hover
+   target is not a mark the key can name. Picking a pollster:
      - draws one .rd-fl-pick line per chart,
      - lays one .rd-fl-vhit ring at each of its months (payload's houses),
      - brings its waves forward (.rd-fl-wdot.on, one per payload wave) and
@@ -36,7 +38,7 @@ for (const w of [1440, 390]) {
   const errs = [];
   page.on("pageerror", (e) => errs.push(String(e)));
   await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector("#flow-drift select.rd-fl-sel", { timeout: 30000 });
+  await page.waitForSelector('#flow-drift select[aria-label="Highlight a pollster"]', { timeout: 30000 });
   const exp = await page.evaluate((pick) => {
     const D = window.AUSPOL, from = "2025-06";
     return {
@@ -47,7 +49,7 @@ for (const w of [1440, 390]) {
     };
   }, PICK);
   const before = await page.evaluate(() => ({
-    sels: document.querySelectorAll("#flow-drift select.rd-fl-sel").length,
+    sels: document.querySelectorAll('#flow-drift select[aria-label="Highlight a pollster"]').length,
     vhit: document.querySelectorAll("#flow-drift .rd-fl-vhit").length,
     pick: document.querySelectorAll("#flow-drift .rd-fl-pick").length,
     faded: document.querySelectorAll("#flow-drift .rd-fl-wdot.on, #flow-drift .rd-fl-wdot.off").length,
@@ -55,11 +57,11 @@ for (const w of [1440, 390]) {
   check(before.sels === 1, `${w}: one highlight menu for both charts (${before.sels})`);
   check(before.vhit === 0 && before.pick === 0 && before.faded === 0,
     `${w}: nothing picked - no month rings, no pick line, no faded dots (${before.vhit}/${before.pick}/${before.faded})`);
-  await page.select("#flow-drift select.rd-fl-sel", PICK);
+  await page.select('#flow-drift select[aria-label="Highlight a pollster"]', PICK);
   await wait(250);
   const after = await page.evaluate((pick) => {
     const halves = [...document.querySelectorAll("#flow-drift .rd-fl-chart")];
-    const s = document.querySelector("#flow-drift select.rd-fl-sel");
+    const s = document.querySelector('#flow-drift select[aria-label="Highlight a pollster"]');
     return {
       on: halves.map((h) => h.querySelectorAll(".rd-fl-wdot.on").length),
       off: halves.map((h) => h.querySelectorAll(".rd-fl-wdot.off").length),

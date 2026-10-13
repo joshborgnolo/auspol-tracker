@@ -3493,19 +3493,24 @@ const DEM_SPLITS = [
   /* Income is the odd one out in this list: the houses don't just slip on
      bracket widths (age) or name the same groups two ways (education) -
      they disagree on the quantity. YouGov's brackets are HOUSEHOLD income,
-     DemosAU's personal, so a paper "low v high" contrast would pool people
-     grouped by different yardsticks and the section excludes it from the
-     pooling. The pairs below stay named within-poll contrasts (YouGov's
-     two splits of its household brackets, DemosAU's personal-income split);
-     the row and its Where-it-sits note say whose pair it is. */
+     DemosAU's personal, RedBridge/Accent's weekly household, so a paper
+     "low v high" contrast would pool people grouped by different
+     yardsticks and the section excludes it from the pooling. The pairs
+     below stay named within-poll contrasts (YouGov's two splits of its
+     household brackets, DemosAU's personal-income split, RedBridge/
+     Accent's one-off weekly bands from the October 2025 report); the row
+     and its Where-it-sits note say whose pair it is. */
   { id: "income", label: "Income", lo: "Lower income", hi: "Higher income", scope: "With an income breakdown",
-    pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]] },
+    pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"], ["$3,000+ a week", "Under $1,000 a week", "$3k+ v <$1k a week"]] },
   /* Offcuts: the home for contrasts no shared axis can hold
      (generalised from the Birth country split the same day it shipped,
      user call 2026-10-09; grown into five cut FAMILIES 2026-10-10 on the
      user's "actually no, put it in other cuts … one under the other"
      call; a sixth, electorate, joined the same day for EMRS's Tasmanian
-     seats; renamed Offcuts on the user's 2026-10-13 call). The families,
+     seats; occupation (seventh) and financial stress (eighth) joined
+     2026-10-13 out of RedBridge/Accent's one-off October 2025 report,
+     whose religion table also joined the religion family; renamed
+     Offcuts on the user's 2026-10-13 call). The families,
      `fams`, stack one table under the other in the view, newest rows
      first in each:
        birth     Roy Morgan finding 10341: seven months of Single Source
@@ -3513,7 +3518,9 @@ const DEM_SPLITS = [
                  birth-country groups its release charts, another special
                  release beside the weekly series
        religion  Newspoll's pooled quarterly tables: Christian v no
-                 religion (six waves, Sep 2025 on)
+                 religion (six waves, Sep 2025 on), joined by
+                 RedBridge/Accent's one-off Protestant table from its
+                 October 2025 report
        working   working status - Newspoll's pooled Full time v Retired
                  joins YouGov's weekly crosstabs (2 Jun 2026 on), the one
                  family two houses share on the same endpoints
@@ -3522,6 +3529,10 @@ const DEM_SPLITS = [
        electorate EMRS's one-off cut of its February 2026 federal wave by
                  Tasmania's five seats - the omnibus's only demographic
                  crosstab, and no common group spans state electorates
+       occupation RedBridge/Accent's one-off three-band cut from the
+                 October 2025 report (managerial v blue collar)
+       stress    the same report's one-off financial-stress ladder
+                 (no stress at all v a great deal of stress)
      Nothing here pools across waves (working is the one family two
      houses share; each of the rest is one house's habit), so each pair
      stays a within-poll contrast, as income's are.
@@ -3538,10 +3549,13 @@ const DEM_SPLITS = [
             ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"],
             ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"],
             ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"],
+            ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"],
             ["Full time", "Retired", "Full time v retired", "Retired", "Full time"],
             ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"],
             ["Working class", "Well off", "Working class v well off", "Well off", "Working class"],
-            ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
+            ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"],
+            ["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"],
+            ["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]],
     fams: [
       { id: "birth", lab: "Birth country",
         sub: "Seven months of Roy Morgan interviews pooled, Jan–Jul 2026",
@@ -3549,8 +3563,8 @@ const DEM_SPLITS = [
                 ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"],
                 ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"],
                 ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"]] },
-      { id: "religion", lab: "Religion", sub: "Newspoll’s pooled quarterly pulls",
-        pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]] },
+      { id: "religion", lab: "Religion", sub: "Newspoll’s pooled quarterly pulls and RedBridge/Accent’s one-off cut",
+        pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"]] },
       { id: "working", lab: "Working status", sub: "Newspoll’s pooled quarterly pulls and YouGov’s own weekly cut",
         pairs: [["Full time", "Retired", "Full time v retired", "Retired", "Full time"]] },
       { id: "children", lab: "Children at home", sub: "YouGov’s weekly cut, 24 Mar 2026 on",
@@ -3559,6 +3573,10 @@ const DEM_SPLITS = [
         pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]] },
       { id: "electorate", lab: "Tasmanian electorates", sub: "EMRS’s one-off seat cut from the February 2026 federal wave",
         pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]] },
+      { id: "occupation", lab: "Occupation", sub: "RedBridge/Accent’s one-off cut from the October 2025 report",
+        pairs: [["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"]] },
+      { id: "stress", lab: "Financial stress", sub: "RedBridge/Accent’s one-off cut from the October 2025 report",
+        pairs: [["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]] },
     ] },
 ];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];   // grp's party order

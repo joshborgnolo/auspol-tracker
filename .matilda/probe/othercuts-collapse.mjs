@@ -4,8 +4,9 @@
 // "keep those rows closed by default … UNLESS number of entries < 2"), and
 // the split's rename Offcuts the same day.
 //
-// Each of the stacked family tables (six since 5fa1726 added Tasmanian
-// electorates) folds away from its own head
+// Each of the stacked family tables (eight since 2026-10-13 added RedBridge/
+// Accent's occupation and financial-stress families, 5fa1726's Tasmanian
+// electorates the sixth) folds away from its own head
 // (.rd-ap-frow, rd-allpolls.jsx's famHead -> famShut state). Pinned here:
 //  1. DEFAULT STATES: a family with 2+ polls starts SHUT (head closed,
 //     chevroned, "N polls" count on show); today that is religion, working
@@ -100,17 +101,18 @@ const pickSplit = (page, lab) => page.evaluate((lab) => {
   b.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
 }, lab);
 // today's data-dependent default vector (fam order: birth, religion,
-// working, children, class, electorate); only fams with 2+ polls start shut
+// working, children, class, electorate, occupation, stress); only fams
+// with 2+ polls start shut
 const defaultState = (s) => {
-  const want = { "Birth country": false, "Religion": true, "Working status": true, "Children at home": true, "Self-assessed class": true, "Tasmanian electorates": false };
-  return s.length === 6 && s.every((x) => want[x.lab] != null && x.shut === want[x.lab]);
+  const want = { "Birth country": false, "Religion": true, "Working status": true, "Children at home": true, "Self-assessed class": true, "Tasmanian electorates": false, "Occupation": false, "Financial stress": false };
+  return s.length === 8 && s.every((x) => want[x.lab] != null && x.shut === want[x.lab]);
 };
 
 console.log("== desktop 1280 ==");
 {
   const page = await open(1280, "f=g&g=b");
   let s = await segs(page);
-  check("six heads; 2+ poll fams start shut, one-entry fams open", defaultState(s) && s.every((x) => x.chev), JSON.stringify(s.map((x) => [x.lab, x.shut])));
+  check("eight heads; 2+ poll fams start shut, one-entry fams open", defaultState(s) && s.every((x) => x.chev), JSON.stringify(s.map((x) => [x.lab, x.shut])));
   check("shut heads: collapsed aria, closed chevron, N-polls count, no rows",
     s.filter((x) => x.shut).every((x) => x.expanded === "false" && !x.chevOpen && /^\d+ polls?$/.test(x.fn || "") && x.rows === 0 && x.months === 0),
     JSON.stringify(s.filter((x) => x.shut).map((x) => [x.lab, x.fn])));
@@ -135,7 +137,7 @@ console.log("== desktop 1280 ==");
   check("fold removes exactly the family's rows", afterFold === before.rows - before.first, `${before.rows} -> ${afterFold}`);
   check("folded head shows its poll count", s[0].fn === `${before.first} poll${before.first === 1 ? "" : "s"}`, s[0].fn);
   check("folded head's chevron closes", s[0].chev && !s[0].chevOpen, "");
-  check("the other heads keep their default states", s.slice(1, 5).every((x) => x.shut) && !s[5].shut && s[5].rows > 0, JSON.stringify(s.slice(1).map((x) => [x.lab, x.shut, x.rows])));
+  check("the other heads keep their default states", s.slice(1, 5).every((x) => x.shut) && s.slice(5).every((x) => !x.shut && x.rows > 0), JSON.stringify(s.slice(1).map((x) => [x.lab, x.shut, x.rows])));
 
   // chevron click (stopPropagation path) re-opens
   await clickHead(page, 0, true);
@@ -189,7 +191,7 @@ console.log("== desktop 1280 ==");
   await settle();
   s = await segs(page);
   check("back on Offcuts: birth shut, religion open, rest at defaults",
-    s.length === 6 && s[0].shut && !s[1].shut && s.slice(2, 5).every((x) => x.shut) && !s[5].shut,
+    s.length === 8 && s[0].shut && !s[1].shut && s.slice(2, 5).every((x) => x.shut) && s.slice(5).every((x) => !x.shut),
     JSON.stringify(s.map((x) => x.shut)));
 
   // ...and a split hop out (Gender) and back
@@ -200,7 +202,7 @@ console.log("== desktop 1280 ==");
   await pickSplit(page, "Offcuts");
   await settle(600);
   s = await segs(page);
-  check("Offcuts re-picked: fam states all kept", s.length === 6 && s[0].shut && !s[1].shut && s.slice(2, 5).every((x) => x.shut) && !s[5].shut, JSON.stringify(s.map((x) => x.shut)));
+  check("Offcuts re-picked: fam states all kept", s.length === 8 && s[0].shut && !s[1].shut && s.slice(2, 5).every((x) => x.shut) && s.slice(5).every((x) => !x.shut), JSON.stringify(s.map((x) => x.shut)));
   check("row total back", (await totalRows(page)) === beforeTotals, `${await totalRows(page)} vs ${beforeTotals}`);
 
   check("no page errors (desktop)", page.errs.length === 0, page.errs.join(" | "));
@@ -211,7 +213,7 @@ console.log("== phone 390 ==");
 {
   const page = await open(390, "f=g&g=b", { touch: true });
   let s = await segs(page);
-  check("phone: six heads, same default states", defaultState(s), JSON.stringify(s.map((x) => [x.lab, x.shut])));
+  check("phone: eight heads, same default states", defaultState(s), JSON.stringify(s.map((x) => [x.lab, x.shut])));
   const before = { rows: await totalRows(page), first: s[0].rows };
   await clickHead(page, 0);
   await settle(600);
