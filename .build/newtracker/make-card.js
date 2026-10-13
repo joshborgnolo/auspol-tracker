@@ -137,9 +137,10 @@
     : Math.abs(mom) < 0.05 ? "LABOR UNCHANGED ON A MONTH AGO"
     : "LABOR " + (mom > 0 ? "▲" : "▼") + r1(Math.abs(mom)) + " ON A MONTH AGO, "
       + (Q.sig ? "A SIGNIFICANT " + (mom > 0 ? "RISE" : "FALL") : "WITHIN THE MARGIN");
-  /* The date the page's own stamp shows: the newest poll's fieldwork end,
-     the hero's "updated", not the day it was published. */
-  const [uy, um, ud] = L.updatedISO.split("-").map(Number);
+  /* The date the stamp shows: the newest poll's publication day, not the
+     fieldwork end the hero's "updated" prints – a poll whose fieldwork
+     closes the day before it drops would always read a day stale. */
+  const [uy, um, ud] = L.publishedISO.split("-").map(Number);
   const dateLab = ud + " " + MON[um - 1] + " " + uy;
 
   /* The ladder: the headline primaries (latest.primary, the figures the
@@ -315,7 +316,7 @@
   /* Stamped on the date of the newest poll's publication, with the fig
      block beside it: render-card's staleness gate compares both against
      build.mjs's assets/auspol-latest.json, so a moved figure, a moved
-     ladder or a new fieldwork date all redraw the card without launching
+     ladder or a new publication date all redraw the card without launching
      Chrome when none has. Same shape as build.mjs's cardFigs – mirror any
      change in both files. render-card.mjs appends the design hash. */
   const fig = {
@@ -323,7 +324,7 @@
     alp: Q.a.toFixed(1), lnp: Q.b.toFixed(1), ci: Q.ci.toFixed(1),
     mom: (Q.a - (Q.prev != null ? Q.prev : Q.a)).toFixed(1), sig: Q.sig,
     basis: Q.imp ? "imp" : "pub",
-    date: L.updatedISO,
+    date: L.publishedISO,
     prim: IDS.map((id) => (P[id] != null ? P[id].toFixed(1) : "-")).join("/"),
     pci: IDS.map((id) => (lastCi[id] != null ? (+lastCi[id]).toFixed(1) : "-")).join("/"),
     due: L.nextElectionDue || "",

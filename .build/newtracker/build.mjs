@@ -1336,11 +1336,12 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + (VIC ? buildStaticSummar
    URL as far as a scraper is concerned, because they key their caches on the
    full URL.
 
-   The stamp's date is publishedISO, the newest poll's publication. The date
-   the card prints is updatedISO, that poll's fieldwork end, as the hero
-   prints it; it rides in the fig block with everything else the scoreboard
-   shows. A correction to a poll's publisher moves one date and not the
-   other, so the check needs both. */
+   The stamp's date and the date the card prints are both publishedISO, the
+   newest poll's publication; it rides in the fig block with everything else
+   the scoreboard shows. The fieldwork end (updatedISO) stays off the card -
+   a weekly house's fieldwork closes the day before it drops, so the card
+   would always read a day stale. It remains what the hero's "updated"
+   prints. */
 /* The contest the card quotes. The card draws Labor against the rival the
    site leads with - gen-data's rivalLead, the margin-gated ruling over the
    implied series that also picks the hero's contest and the favicon's
@@ -1398,7 +1399,7 @@ function cardFigs(L) {
            mom: (L.alp2pp - (L.alp2ppPrev != null ? L.alp2ppPrev : L.alp2pp)).toFixed(1),
            sig: !!L.changeSig,
            basis: L.basis,
-           date: L.updatedISO,
+           date: L.publishedISO,
            prim: CARD_IDS.map((id) => (L.primary[id] != null ? L.primary[id].toFixed(1) : "-")).join("/"),
            pci: CARD_IDS.map((id) => (L.primCi[id] != null ? (+L.primCi[id]).toFixed(1) : "-")).join("/"),
            due: L.nextElectionDue || "",
