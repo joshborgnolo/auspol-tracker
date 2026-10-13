@@ -649,10 +649,15 @@ whenever the computation is exact-enough arithmetic on AEC denominators.
   Coalition). `ym` rides the FIELDWORK window (`dateStart`), the section's
   wave-label convention. `demos` = `DemosAU (MRP)` rows' nationally
   printed `pref_flows.onp_alp_lnp` (the one national figure the MRP
-  adds up itself), placed at the fieldwork-MIDPOINT month since an MRP
-  spans six to seven weeks. **`demosOn`** (960d7e3) = each MRP's
+  adds up itself). Both extras series ride gen-data's `mrpX`: since an
+  MRP spans six to seven weeks its mark sits at the window's TRUE
+  midpoint — `xm` is the fractional month index (year·12 + month−1 +
+  the day-of-month's share, the renderer's `mi()` scale), the ONE mark
+  off the charts' whole-month grid — and `win` is the tooltip's
+  printed window ("4 Aug–19 Sep 2026"); entries `{date, xm, win, n,
+  onp}`. **`demosOn`** (960d7e3) = each MRP's
   Labor-v-One-Nation regional tables combined by `prefFlowsOut` into
-  all-regions figures — entries `{date, ym, from, n, wt: true, coal,
+  all-regions figures — entries `{date, xm, win, n, wt: true, coal,
   grn, oth}` (waves missing any cohort cell or the weighting inputs are
   filtered out, absent-not-empty). Emitted only alongside `demos` on
   the `{house: "RedBridge/Accent", vsOn, vsCoal, demos?, demosOn?}`
@@ -689,22 +694,30 @@ whenever the computation is exact-enough arithmetic on AEC denominators.
   coloured `FF_COHORTS[ck].cls` (`coal` → `lnp`; `.rd-ff-dm` is
   fill:none, cohort strokes in rd.css beside `.rd-ff-dm.onp`). No
   click-to-open on marks (house-wave dots only). The x AXIS MUST UNION
-  the extras' months (960d7e3): `m0`/`mSpan` previously spanned
+  the extras (960d7e3): `m0`/`mSpan` previously spanned
   `waves[]` alone and a DemosAU midpoint outside the house's own months
   would draw at negative `X` and clip silently off the left rail —
-  today's first MRP mid (2026-02) only escaped because it equals
-  RedBridge's first vsOn month. Now `xms = (extras||[]).map(mi)`,
-  min/max across both lists. Whole-number 0–100 y domain, no refs.
+  today's first MRP mid only escaped because it equals
+  RedBridge's first vsOn month. Now `xms = (extras||[]).map(xm)` with
+  floor/ceil around the union so the tick grid stays integral while the
+  diamonds ride their fractional `xm` (user call 2026-10-13: break the
+  month-grid convention for the MRP marks, whose windows span six to
+  seven weeks — a "midpoint month" read as a whole-month poll). The
+  diamond `<title>` names its window `win`, not a month. Whole-number
+  0–100 y domain, no refs.
 - **Data reality to sanity-check against**: three MRP waves carry
   `pref_flows` (2026-03-03 fw 2026-01-13, 2026-07-11, 2026-09-19) and
   every one has a complete location dim — demosOn yields 3 extras =
   9 diamonds on the One Nation chart (vsCoal keeps the 3 single-cohort
   `demos`). The 2025-11-11 MRP has no `pref_flows` at all. MRP
-  midmonths: 2026-02, 2026-06, 2026-08.
+  true midpoints: 7 Feb, 19 Jun, 27 Aug 2026 (`xm` fractions .18, .57,
+  .84 — none on a slot).
 - **Probe**: tracked `.matilda/probe/mrp-prefs.mjs` pins the 9 vsOn
   diamonds (class colours grn/lnp/oth ×3 waves), the 3 vsCoal ones,
-  both key glyphs, and (in the same file) the MRP ledger-line contract
-  — digit columns, chip placement, "ON 18, nationwide" regex. The
+  both key glyphs, each diamond's x at the empirical tick scale's
+  true-midpoint position (never snapped), and (in the same file) the
+  MRP ledger-line contract — digit columns, chip placement, "ON 18,
+  nationwide" regex. The
   older references to `#flow-drift .rd-ff-dm` counting 3 were updated
   in the same commit — count queries on the pair must scope per
   `.rd-fl-one` half.

@@ -70,8 +70,8 @@ Everything needed to re-derive the renderer sits committed:
   stack (all names in one cell, only `.on` visible, so the chip never
   resizes), `.rd-ldg-cyca` arrow child, the styling constants.
 - **gen-data.mjs**: the emit shape (`p.pf = polls.json.pref_flows`;
-  `flowForced.demos = [{date, ym, from, n, onp}]` at fieldwork-midpoint
-  month).
+  `flowForced.demos = [{date, xm, win, n, onp}]` — `xm` the window's
+  true-midpoint fractional month index, `win` its printed window).
 - **data/polls.json**: the actual values the probe asserts.
 
 Rebuild the smallest JSX that satisfies all four at once:

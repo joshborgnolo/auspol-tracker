@@ -4737,14 +4737,18 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
      printed no Table 1, so Feb–Apr spans two months' width with no dot in
      between. Spacing the waves evenly drew that two-month step as one */
   const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  /* the axis covers the extras' months too – a DemosAU midpoint falling
-     outside the house's own wave months must not clip off the edge */
-  const xms = (extras || []).map((d) => mi(d.ym));
-  const m0 = Math.min(mi(waves[0].ym), ...xms);
-  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms) - m0);
+  /* the extras' xm is gen-data's TRUE midpoint on this month-index scale –
+     the one mark off the whole-month grid (a house wave IS a month's
+     reading; an MRP spans six to seven weeks). floor/ceil keeps the
+     extras-covering union integral, so a midpoint outside the house's wave
+     months still can't clip off the edge */
+  const xms = (extras || []).map((d) => d.xm);
+  const m0 = Math.min(mi(waves[0].ym), ...xms.map(Math.floor));
+  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms.map(Math.ceil)) - m0);
   const ms = [];
   for (let k = 0; k <= mSpan; k++) { const m = m0 + k; ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0")); }
-  const X = (ym) => x0 + ((mi(ym) - m0) / mSpan) * (x1 - x0);
+  const Xi = (miN) => x0 + ((miN - m0) / mSpan) * (x1 - x0);
+  const X = (ym) => Xi(mi(ym));
   const Y = (v) => bot - (v / 100) * (bot - top);
   const series = cohorts.map((ck) => {
     const pts = waves.filter((w) => w[ck] != null).map((w) => [X(w.ym), Y(w[ck])]);
@@ -4833,16 +4837,21 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
           </g>
           );
         })}
-        {extras && extras.map((d) => cohorts.filter((ck) => d[ck] != null).map((ck) => (
-          /* DemosAU MRP marks: one hollow diamond per covered cohort at each
-             wave's fieldwork-midpoint month, never a line (gen-data's demos
-             blocks). wt entries are the site's all-regions weighting of the
-             printed regional tables, not a figure the house prints */
+        {extras && extras.map((d) => {
+          /* DemosAU MRP marks: one hollow diamond per covered cohort, at the
+             window's TRUE midpoint (gen-data's xm) – never a line, and the
+             one mark off this chart's whole-month grid, so the title names
+             the printed window (win) rather than a midpoint month. wt
+             entries are the site's all-regions weighting of the printed
+             regional tables, not a figure the house prints */
+          const dx = Xi(d.xm);
+          return cohorts.filter((ck) => d[ck] != null).map((ck) => (
           <path key={d.date + ck} className={"rd-ff-dm " + FF_COHORTS[ck].cls}
-                d={`M${X(d.ym)} ${Y(d[ck]) - 5.5}L${X(d.ym) + 4.5} ${Y(d[ck])}L${X(d.ym)} ${Y(d[ck]) + 5.5}L${X(d.ym) - 4.5} ${Y(d[ck])}Z`}>
-            <title>DemosAU MRP {rdMonthYear(d.ym)} — {FF_COHORTS[ck].name} voters: Labor {d[ck]}, {rival === "the Coalition" ? "Coalition" : "One Nation"} {100 - d[ck]}{d.wt ? " (all regions — our weighting)" : ""}</title>
+                d={`M${dx} ${Y(d[ck]) - 5.5}L${dx + 4.5} ${Y(d[ck])}L${dx} ${Y(d[ck]) + 5.5}L${dx - 4.5} ${Y(d[ck])}Z`}>
+            <title>DemosAU MRP, fieldwork {d.win} — {FF_COHORTS[ck].name} voters: Labor {d[ck]}, {rival === "the Coalition" ? "Coalition" : "One Nation"} {100 - d[ck]}{d.wt ? " (all regions — our weighting)" : ""}</title>
           </path>
-        )))}
+          ));
+        })}
         {series.map((s) => (
           <g key={"el" + s.ck}>
             <text x={x1 + 8} y={labY.get(s.ck) - 2} className={"rd-ff-el " + FF_COHORTS[s.ck].cls}>{FF_COHORTS[s.ck].name}</text>

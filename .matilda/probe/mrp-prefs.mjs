@@ -14,6 +14,9 @@
      Nation reading), the Labor v One Nation chart three per MRP – one per
      cohort in the cohort's colour, the site's all-regions weighting of the
      printed regional tables (flowForced demosOn) – and the key names both.
+     The diamonds ride each window's TRUE midpoint (payload xm, fractional
+     month index), the one marks off the charts' whole-month grid – pinned
+     here against the empirical tick scale, never snapped to a slot.
    Run against a built tree: node .matilda/probe/mrp-prefs.mjs [shotDir] */
 import puppeteer from "puppeteer-core";
 import path from "path";
@@ -49,6 +52,56 @@ for (const w of [1440, 1024, 768, 390]) {
   check(dm.cohorts, "the One Nation chart's diamonds ride the three cohort colours");
   check(dm.co === 3, "Labor v Coalition: three DemosAU diamonds (" + dm.co + ")");
   check(dm.key && dm.keyMix, "the key names both diamond sets");
+  if (w === 1440) {
+    /* the diamonds sit at the window's TRUE midpoint, the one marks off the
+       charts' whole-month grid: derive the empirical month-index → x map
+       from the printed tick labels (year tokens propagate), then each
+       diamond's x must match the payload's xm through it, not any slot */
+    const mids = await page.evaluate(() => {
+      const FF = window.AUSPOL.flowForced;
+      const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const figRes = (fig, extras) => {
+        /* the class is shared with the y-axis figures – keep the x ticks,
+           which are the month names (year token only on a year's first) */
+        const labs = [...fig.querySelectorAll("text.rd-dis-ax")]
+          .map((t) => ({ s: t.textContent.trim(), x: t.getAttribute("x") }))
+          .filter((l) => /^[A-Z]/.test(l.s));
+        const slots = [];
+        let yr = null;
+        for (const l of labs) {
+          const m = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)( ’(\d{2}))?$/.exec(l.s);
+          if (!m) return { err: "unparsed tick label " + JSON.stringify(l.s) };
+          if (m[3]) yr = 2000 + Number(m[3]);
+          if (yr == null) return { err: "first tick carries no year" };
+          slots.push([yr * 12 + MON.indexOf(m[1]), +l.x]);
+        }
+        const [m1, x1] = slots[0], [m2, x2] = slots[slots.length - 1];
+        const per = (x2 - x1) / (m2 - m1);
+        const got = [...fig.querySelectorAll(".rd-ff-dm")].map((p) => ({
+          title: p.querySelector("title").textContent,
+          x: +/^M([\d.]+)/.exec(p.getAttribute("d"))[1],
+        }));
+        return extras.map((e) => {
+          const want = x1 + (e.xm - m1) * per;
+          const on = got.filter((g) => g.title.includes(e.win));
+          return { win: e.win, xm: e.xm, n: on.length, off: on.map((o) => Math.abs(o.x - want)),
+                   slot: on.some((o) => { const k = (o.x - x1) / per; return Math.abs(k - Math.round(k)) < 0.05; }) };
+        });
+      };
+      const figs = [...document.querySelectorAll("figure.rd-ff")];
+      return { on: figRes(figs[0], FF.demosOn), co: figRes(figs[1], FF.demos) };
+    });
+    for (const [tag, rows] of [["v-ON", mids.on], ["v-Coalition", mids.co]]) {
+      check(rows.every((r) => !r.err), tag + ": tick labels parsed" + (rows.find((r) => r.err) ? " – " + rows.find((r) => r.err).err : ""));
+      check(rows.every((r) => r.xm % 1 > 0.01),
+        tag + ": every MRP window's true midpoint is off a month boundary (" + rows.map((r) => r.xm % 1 > 0.5 ? r.xm % 1 : (r.xm % 1).toFixed(2)).join(", ") + ")");
+      for (const r of rows) {
+        check(r.n === (tag === "v-ON" ? 3 : 1) && r.off.every((o) => o < 1.5),
+          tag + " " + r.win + ": its diamond" + (tag === "v-ON" ? "s" : "") + " sit at the true midpoint x (" + (r.off.length ? Math.max(...r.off).toFixed(2) : "–") + "px off expected)");
+        check(!r.slot, tag + " " + r.win + ": not snapped to a month slot");
+      }
+    }
+  }
   if (SHOT) {
     const el = await page.$("#flow-drift .rd-ff");
     await el.evaluate((e) => e.scrollIntoView({ block: "center" }));

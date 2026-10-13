@@ -13740,27 +13740,27 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }],
     "demos": [{
       "date": "2026-03-03",
-      "ym": "2026-02",
-      "from": "2026-01-13",
+      "xm": 24313.1786,
+      "win": "13 Jan–3 Mar 2026",
       "n": 8484,
       "onp": 21.5
     }, {
       "date": "2026-07-11",
-      "ym": "2026-06",
-      "from": "2026-05-27",
+      "xm": 24317.5667,
+      "win": "27 May–11 Jul 2026",
       "n": 9343,
       "onp": 20
     }, {
       "date": "2026-09-19",
-      "ym": "2026-08",
-      "from": "2026-08-04",
+      "xm": 24319.8387,
+      "win": "4 Aug–19 Sep 2026",
       "n": 9740,
       "onp": 18
     }],
     "demosOn": [{
       "date": "2026-03-03",
-      "ym": "2026-02",
-      "from": "2026-01-13",
+      "xm": 24313.1786,
+      "win": "13 Jan–3 Mar 2026",
       "n": 8484,
       "wt": true,
       "coal": 29,
@@ -13768,8 +13768,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "oth": 58
     }, {
       "date": "2026-07-11",
-      "ym": "2026-06",
-      "from": "2026-05-27",
+      "xm": 24317.5667,
+      "win": "27 May–11 Jul 2026",
       "n": 9343,
       "wt": true,
       "coal": 33,
@@ -13777,8 +13777,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "oth": 55
     }, {
       "date": "2026-09-19",
-      "ym": "2026-08",
-      "from": "2026-08-04",
+      "xm": 24319.8387,
+      "win": "4 Aug–19 Sep 2026",
       "n": 9740,
       "wt": true,
       "coal": 37,
@@ -127315,15 +127315,16 @@ function RdForced({
     bot = H - 34;
   const x1 = W - rpad;
   const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  const xms = (extras || []).map(d => mi(d.ym));
-  const m0 = Math.min(mi(waves[0].ym), ...xms);
-  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms) - m0);
+  const xms = (extras || []).map(d => d.xm);
+  const m0 = Math.min(mi(waves[0].ym), ...xms.map(Math.floor));
+  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms.map(Math.ceil)) - m0);
   const ms = [];
   for (let k = 0; k <= mSpan; k++) {
     const m = m0 + k;
     ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0"));
   }
-  const X = ym => x0 + (mi(ym) - m0) / mSpan * (x1 - x0);
+  const Xi = miN => x0 + (miN - m0) / mSpan * (x1 - x0);
+  const X = ym => Xi(mi(ym));
   const Y = v => bot - v / 100 * (bot - top);
   const series = cohorts.map(ck => {
     const pts = waves.filter(w => w[ck] != null).map(w => [X(w.ym), Y(w[ck])]);
@@ -127461,11 +127462,14 @@ function RdForced({
         }
       }));
     }));
-  }), extras && extras.map(d => cohorts.filter(ck => d[ck] != null).map(ck => React.createElement("path", {
-    key: d.date + ck,
-    className: "rd-ff-dm " + FF_COHORTS[ck].cls,
-    d: `M${X(d.ym)} ${Y(d[ck]) - 5.5}L${X(d.ym) + 4.5} ${Y(d[ck])}L${X(d.ym)} ${Y(d[ck]) + 5.5}L${X(d.ym) - 4.5} ${Y(d[ck])}Z`
-  }, React.createElement("title", null, "DemosAU MRP ", rdMonthYear(d.ym), " \u2014 ", FF_COHORTS[ck].name, " voters: Labor ", d[ck], ", ", rival === "the Coalition" ? "Coalition" : "One Nation", " ", 100 - d[ck], d.wt ? " (all regions — our weighting)" : "")))), series.map(s => React.createElement("g", {
+  }), extras && extras.map(d => {
+    const dx = Xi(d.xm);
+    return cohorts.filter(ck => d[ck] != null).map(ck => React.createElement("path", {
+      key: d.date + ck,
+      className: "rd-ff-dm " + FF_COHORTS[ck].cls,
+      d: `M${dx} ${Y(d[ck]) - 5.5}L${dx + 4.5} ${Y(d[ck])}L${dx} ${Y(d[ck]) + 5.5}L${dx - 4.5} ${Y(d[ck])}Z`
+    }, React.createElement("title", null, "DemosAU MRP, fieldwork ", d.win, " \u2014 ", FF_COHORTS[ck].name, " voters: Labor ", d[ck], ", ", rival === "the Coalition" ? "Coalition" : "One Nation", " ", 100 - d[ck], d.wt ? " (all regions — our weighting)" : "")));
+  }), series.map(s => React.createElement("g", {
     key: "el" + s.ck
   }, React.createElement("text", {
     x: x1 + 8,
