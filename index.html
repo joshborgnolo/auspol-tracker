@@ -4880,9 +4880,10 @@ body.rd .rd-ap-frow { display: grid; align-items: end; padding: 26px 0 8px; bord
 body.rd .rd-ap-frow:hover { background: var(--surface-2); }
 body.rd .rd-ap-frow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 body.rd .rd-ap-frow:hover .rd-ap-chev { color: var(--ink); }
-body.rd .rd-ap-flab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+body.rd .rd-ap-flab { grid-column: 1 / span 5; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 body.rd .rd-ap-flab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); min-width: 0; }
+body.rd .rd-ap-flab .rd-ap-fn { white-space: nowrap; flex: none; }
 body.rd .rd-ap-fcap { grid-column: 6; display: block; position: relative; min-height: 16px; min-width: 0; }
 body.rd .rd-ap-frow .rd-ap-chev { grid-column: 8; height: 20px; }
 body.rd .rd-ap-mavg { grid-column: 5 / span 2; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
@@ -100632,12 +100633,12 @@ const DEM_SPLITS = [{
   }, {
     id: "religion",
     lab: "Religion",
-    sub: "Newspoll’s pooled quarterly pulls and RedBridge/Accent’s one-off cut",
+    sub: "Newspoll’s pooled quarterly polls and RedBridge/Accent’s one-off cut",
     pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"]]
   }, {
     id: "working",
     lab: "Working status",
-    sub: "Newspoll’s pooled quarterly pulls and YouGov’s own weekly cut",
+    sub: "Newspoll’s pooled quarterly polls and YouGov’s own weekly cut",
     pairs: [["Full time", "Retired", "Full time v retired", "Retired", "Full time"]]
   }, {
     id: "children",
