@@ -110570,6 +110570,10 @@ function RdPrimary({
       }, pLive[0]]
     } : null;
   }).filter(Boolean) : [];
+  const gElecStop = G && base && base.x >= xDomain[0] - 1e-6 && (!pts.length || pts[0].x > base.x + 1e-6) ? {
+    x: base.x,
+    y: base.alp
+  } : null;
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
   const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
   const [evtOpen, setEvtOpen] = useState(null);
@@ -110781,7 +110785,7 @@ function RdPrimary({
     baseline: true,
     xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null),
     series: leads.length ? chartSeries.concat(leads) : chartSeries,
-    spine: series(live("alp"), "alp"),
+    spine: gElecStop ? [gElecStop].concat(series(live("alp"), "alp")) : series(live("alp"), "alp"),
     areas: areas,
     scatter: shownScatter,
     pollFacet: G ? "demographics" : "primary",
@@ -110791,9 +110795,13 @@ function RdPrimary({
     events: badges ? badges.events : evs,
     evt: evtOpen,
     onEvt: setEvtOpen,
-    tooltipTitle: i => pts[i] ? monthLabelFull(pts[i].ym) : "",
+    tooltipTitle: i => gElecStop && i === 0 ? monthLabelFull("2025-05") : pts[gElecStop ? i - 1 : i] ? monthLabelFull(pts[gElecStop ? i - 1 : i].ym) : "",
     extraRows: i => {
-      const d = pts[i];
+      if (gElecStop && i === 0) return [{
+        label: "",
+        value: "The election result"
+      }];
+      const d = pts[gElecStop ? i - 1 : i];
       if (!d || !d.ci || d.election) return d && d.election ? [{
         label: "",
         value: "The election result"

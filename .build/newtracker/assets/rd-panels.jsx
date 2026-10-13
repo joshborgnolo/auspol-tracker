@@ -328,6 +328,18 @@ function RdPrimary({ rangeId, setRangeId }) {
           : null;
       }).filter(Boolean)
     : [];
+  /* the counted stop the rings mark lives nowhere in a group's month rows,
+     so the spine carries it itself (the all-voters view gets it free from
+     aggPrimary's election row; group rows start months later). Without the
+     stop every ring hover snaps to the FIRST month polled and tips that
+     month's figures against the ring the cursor is on - reported 2026-10-13
+     ("can't hover over the election rings", the Provincial view). The
+     lead-in series already hold the count at the stop's x under the line's
+     own label, so the hover reads the count itself, swatch drawn as the
+     ring, as the by-state/location panels do. The gate skips a stop that
+     left the window, or already IS the first monthly row's x */
+  const gElecStop = G && base && base.x >= xDomain[0] - 1e-6 && (!pts.length || pts[0].x > base.x + 1e-6)
+    ? { x: base.x, y: base.alp } : null;
   /* the numbered events: the same set the 2PP hero marks, over this chart's
      window */
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
@@ -527,7 +539,9 @@ function RdPrimary({ rangeId, setRangeId }) {
              opens on election night, so without it the first tick reads
              "May 2025" against the all-voters chart's "Election" */
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null)}
-          series={leads.length ? chartSeries.concat(leads) : chartSeries} spine={series(live("alp"), "alp")} areas={areas}
+          series={leads.length ? chartSeries.concat(leads) : chartSeries}
+          spine={gElecStop ? [gElecStop].concat(series(live("alp"), "alp")) : series(live("alp"), "alp")}
+          areas={areas}
           /* a group view's dots open the poll on All polls' Demographics
              facet, its split the view's own (Gen Z → Age, Renting → Home);
              the all-voters chart keeps the Primary facet */
@@ -536,9 +550,13 @@ function RdPrimary({ rangeId, setRangeId }) {
           marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
-          tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
+          /* gElecStop shifts title/row lookups one place: stop 0 is the
+             count itself (the by-state panels' "2025-05" title + ring row),
+             the months sit one index back */
+          tooltipTitle={(i) => (gElecStop && i === 0 ? monthLabelFull("2025-05") : pts[gElecStop ? i - 1 : i] ? monthLabelFull(pts[gElecStop ? i - 1 : i].ym) : "")}
           extraRows={(i) => {
-            const d = pts[i];
+            if (gElecStop && i === 0) return [{ label: "", value: "The election result" }];
+            const d = pts[gElecStop ? i - 1 : i];
             if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
             return [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }];
           }}
