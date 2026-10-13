@@ -71,7 +71,8 @@ assert.equal(jun.tpp_split_on.lnp, 36, "June's derived Coalition split is 36/64 
 const ap = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
 assert.ok(/function RdForced\(/.test(ap), "the RdForced component exists");
 assert.ok(ap.includes("FF_COHORTS"), "the cohort lexicon (names + class tokens) exists");
-assert.equal(ap.match(/<RdForced /g).length, 2, "RdForced is mounted exactly twice");
+assert.equal(ap.match(/<RdForced /g).length, 3,
+  "RdForced mounts three charts: the RedBridge pair plus the DemosAU MRP Coalition v One Nation third chart");
 assert.ok(ap.includes('cohorts={["grn", "coal", "oth"]}') && ap.includes('cohorts={["grn", "onp", "oth"]}'),
   "the two charts ask their cohort rosters: grn/coal/oth on Labor v One Nation, grn/onp/oth on Labor v the Coalition");
 assert.ok(ap.includes("waves={FF.vsOn}") && ap.includes("waves={FF.vsCoal}"), "both question series are charted");
@@ -79,16 +80,44 @@ assert.ok(ap.includes('rival="One Nation"') && ap.includes('rival="the Coalition
   "the two contests read as Labor-v-One-Nation and Labor-v-the-Coalition");
 assert.ok(ap.includes("D.flowForced"), "the charts read the data asset, not a fetch");
 assert.ok(ap.includes('className="rd-ff'), "the figure carries its styling hook");
+/* the third chart (user asks 2026-10-13): DemosAU's MRP reports press the
+   Coalition against One Nation too; its cohorts are the LnPOn key order,
+   one chart of Labor / Greens / Other voters preferring the Coalition */
+assert.ok(ap.includes('q="ln" waves={lnWaves} cohorts={["alp", "grn", "oth"]}') &&
+          ap.includes('anchor="the Coalition" rival="One Nation" houseWord="DemosAU (MRP)"'),
+  "the third chart presses the Coalition against One Nation on the lnpOn series, cohorts alp/grn/oth");
+assert.ok(ap.includes("const lnWaves = FF ? rekeyMrp(FF.lnpOn) : [];"),
+  "the third chart's waves are the lnpOn series rekeyed by the region select");
+assert.ok(ap.includes("rekeyMrp") && ap.includes('{ ...w, ...w.all, wt: true }'),
+  "rekeyMrp lifts the region's cells; all voters is the enrolment-and-vote weighting (wt stamped)");
+/* the region select (user ask 2026-10-13): one menu above the charts on the
+   primary-vote panel's .rd-pv-sel idiom, All voters default, the MRP's own
+   regions; it rekeys DemosAU's readings only, RedBridge's lines stand */
+assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];'),
+  "the region menu is All voters + the MRP's three named regions");
+assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={ffReg}') && ap.includes('setFfReg(e.target.value)'),
+  "the select rides ffReg state beside the section hed, labelled for assistive tech");
+for (const regionCohort of ["demosOn", "inner", "lnpOn"])
+  assert.ok(assetSrc.includes(`"${regionCohort}"`) || assetSrc.includes(`${regionCohort}:`),
+    `the data asset carries the ${regionCohort === "inner" ? "region carriers" : regionCohort} block`);
+assert.ok(assetSrc.includes('"inner":{"coal":40') && assetSrc.includes('"regional":{"coal":21'),
+  "demosOn carries the MRP's printed regional cells beside the weighted all block");
+assert.ok(assetSrc.includes('"all":{"alp":68') && assetSrc.includes('"regional":{"alp":64'),
+  "lnpOn carries the MRP's Coalition-v-One-Nation cells per region");
+const cssRd = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
+assert.ok(cssRd.includes(".rd-ff-ln { width: calc((100% - 48px) / 2); }") && cssRd.includes("@media (min-width: 761px)"),
+  "the third chart is capped at the pair's column width on desktop (48px = the pair's column gap)");
 
 /* the card titles tell the story from the LATEST wave (user's call 2026-10-10):
-   every cohort's latest Labor share named in one line ("NN% of Greens
+   every cohort's latest share named in one line, anchored on the question's button ("NN% of Greens
    voters, NN% of Coalition voters and NN% of Other voters prefer Labor over
-   One Nation"), gaining a "— <Cohort> voters up/down from NN% in <its first
+   One Nation"; the third chart's title reads prefer the Coalition over One Nation),
+   gaining a "— <Cohort> voters up/down from NN% in <its first
    wave's month>" tail ONLY when that cohort's own straight-line drift
-   battery (w=1, Holm across the six) says Yes — a title never claims a move
+   battery (w=1, Holm across the nine) says Yes — a title never claims a move
    the pressed set of the trend-significance table won't stand behind */
-assert.ok(ap.includes("% of ") && ap.includes(" prefer Labor over "),
-  "each title lists every cohort's latest share, prefer-Labor phrased");
+assert.ok(ap.includes('% of ${FF_COHORTS[ck].prose} voters') && ap.includes('" prefer " + def.anchor + " over " + def.rival'),
+  "each title lists every cohort's latest share, anchored on its question's pair");
 assert.ok(ap.includes('"up"') && ap.includes('"down"') && ap.includes('"% in "') && ap.includes("rdMonthYear("),
   "the title tail reads up/down from the cohort's first-wave share, month named dynamically");
 assert.ok(ap.includes("moved.length !== 1"), "the tail names a cohort only when EXACTLY ONE moved");

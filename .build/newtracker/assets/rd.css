@@ -3099,6 +3099,21 @@ body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
   body.rd .rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }
   body.rd .rd-ff-two .rd-fl-ct { align-items: flex-start; padding-top: 4px; }
 }
+/* the pressed-choice section's head row carries the DemosAU region select
+   beside the sub-story hed, on the primary-vote panel's .rd-pv-head idiom */
+body.rd .rd-ff-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; column-gap: 24px; row-gap: 8px; }
+body.rd .rd-ff-head > div { flex: 1 1 auto; }
+/* the DemosAU-only third chart drops out of the pair's two-column grid onto
+   its own row; desktop caps it at the pair's column width (48px = .rd-fl-two
+   column-gap) so the figure doesn't stretch full-row */
+body.rd .rd-ff-ln { margin-top: 28px; }
+@media (min-width: 761px) {
+  body.rd .rd-ff-ln { width: calc((100% - 48px) / 2); }
+}
+@media (max-width: 760px) {
+  body.rd .rd-ff-head { display: block; }
+  body.rd .rd-ff-head .rd-pv-sel { margin-top: 8px; }
+}
 body.rd .rd-fl-chart { position: relative; margin-top: 8px; }
 body.rd .rd-fl-chart svg { display: block; overflow: visible; }
 body.rd .rd-fl-zero { stroke: var(--ink-faint); stroke-width: 1; }
@@ -3151,10 +3166,12 @@ body.rd .rd-ff-line.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-line.grn { stroke: var(--grn); }
 body.rd .rd-ff-line.onp { stroke: var(--onp); }
 body.rd .rd-ff-line.oth { stroke: var(--oth); }
+body.rd .rd-ff-line.alp { stroke: var(--alp); }
 body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
 body.rd .rd-ff-dot.grn { fill: var(--grn); }
 body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
+body.rd .rd-ff-dot.alp { fill: var(--alp); }
 /* DemosAU MRP's readings on the Labor v Coalition chart: hollow-centred
    diamonds, another house's marks rather than steps on RedBridge's line. The
    centre takes --chart-bg, never none (originally unfilled so a co-located
@@ -3168,6 +3185,7 @@ body.rd .rd-ff-dm.onp { stroke: var(--onp); }
 body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-dm.grn { stroke: var(--grn); }
 body.rd .rd-ff-dm.oth { stroke: var(--oth); }
+body.rd .rd-ff-dm.alp { stroke: var(--alp); }
 /* the key names each mark's SHAPE in neutral ink - the cohort colours are
    named at the lines' ends */
 body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); transform: rotate(45deg); vertical-align: 0; }
@@ -3181,11 +3199,13 @@ body.rd .rd-ff-ring.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-ring.grn { stroke: var(--grn); }
 body.rd .rd-ff-ring.onp { stroke: var(--onp); }
 body.rd .rd-ff-ring.oth { stroke: var(--oth); }
+body.rd .rd-ff-ring.alp { stroke: var(--alp); }
 body.rd .rd-ff-lead { fill: none; stroke-width: 2.25; stroke-linecap: round; }
 body.rd .rd-ff-lead.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-lead.grn { stroke: var(--grn); }
 body.rd .rd-ff-lead.onp { stroke: var(--onp); }
 body.rd .rd-ff-lead.oth { stroke: var(--oth); }
+body.rd .rd-ff-lead.alp { stroke: var(--alp); }
 /* display-only layers never steal a mark's hover */
 body.rd .rd-ff .rd-ff-line, body.rd .rd-ff .rd-ff-lead, body.rd .rd-ff .rd-ff-g, body.rd .rd-ff .rd-ff-guide,
 body.rd .rd-ff .rd-fl-empty, body.rd .rd-ff .rd-apd-dothi { pointer-events: none; }
@@ -3201,10 +3221,12 @@ body.rd .rd-ff-sw.wave.lnp { background: var(--lnp); }
 body.rd .rd-ff-sw.wave.grn { background: var(--grn); }
 body.rd .rd-ff-sw.wave.onp { background: var(--onp); }
 body.rd .rd-ff-sw.wave.oth { background: var(--oth); }
+body.rd .rd-ff-sw.wave.alp { background: var(--alp); }
 body.rd .rd-ff-sw.lnp { border-color: var(--lnp); }
 body.rd .rd-ff-sw.grn { border-color: var(--grn); }
 body.rd .rd-ff-sw.onp { border-color: var(--onp); }
 body.rd .rd-ff-sw.oth { border-color: var(--oth); }
+body.rd .rd-ff-sw.alp { border-color: var(--alp); }
 body.rd .rd-ff-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
 body.rd .rd-ff-tipsub { margin: -4px 0 3px; }
 body.rd .rd-ff-tipsub .tip-label { font-size: 12px; }
@@ -3218,6 +3240,8 @@ body.rd .rd-ff-el.onp { fill: var(--onp); }
 body.rd .rd-ff-elv.onp { fill: var(--onp); opacity: 0.85; }
 body.rd .rd-ff-el.oth { fill: var(--oth); }
 body.rd .rd-ff-elv.oth { fill: var(--oth); opacity: 0.85; }
+body.rd .rd-ff-el.alp { fill: var(--alp); }
+body.rd .rd-ff-elv.alp { fill: var(--alp); opacity: 0.85; }
 body.rd .rd-ff-tip { pointer-events: auto; white-space: normal; }
 /* the tip's link row and the June derivation note carry sentences, which the
    tip chrome's nowrap would stretch past the card — wrap those two rows */

@@ -4110,20 +4110,44 @@ const flowForced = (() => {
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .map((p) => ({ date: p.date, ...mrpX(p), n: p.sample ?? null, onp: p.pref_flows.onp_alp_lnp }));
   /* The same reports' regional Labor-v-One-Nation tables make the pair's
-     other chart too – as the all-regions figures prefFlowsOut weights to
-     the whole country (cohort-region voter counts: 2025 enrolment by AEC
-     demographic class times the MRP's own printed first preferences there).
-     Computable, but our arithmetic, not a figure the report adds up for
-     you – wt marks the chart's tooltip and key so. One diamond per cohort
-     per MRP wave, at the same true-midpoint x as demos. */
+     other chart too – one diamond per cohort per MRP wave, at the same
+     true-midpoint x as demos. The figures are carried four ways, like lnpOn
+     below: inner/outer/regional as printed (the reports' lnp key renames
+     to coal) and `all` as prefFlowsOut's enrolment-and-vote weighting of
+     them – computable, but our arithmetic, not a figure the report adds
+     up for you, so the page marks it wt wherever the region select's
+     "All voters" option shows. The select rekeys a wave, never recomputes. */
   const demosOn = D.polls.filter((p) => p.pollster === "DemosAU (MRP)" && p.pref_flows && p.pref_flows.alp_onp)
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .map((p) => {
       const all = prefFlowsOut(p).all;
       if (!all || !all.alp_onp || all.alp_onp.lnp == null || all.alp_onp.grn == null || all.alp_onp.oth == null) return null;
-      return { date: p.date, ...mrpX(p), n: p.sample ?? null, wt: true, coal: all.alp_onp.lnp, grn: all.alp_onp.grn, oth: all.alp_onp.oth };
+      const out = { date: p.date, ...mrpX(p), n: p.sample ?? null,
+                    all: { coal: all.alp_onp.lnp, grn: all.alp_onp.grn, oth: all.alp_onp.oth } };
+      for (const r of ["inner", "outer", "regional"]) {
+        const t = p.pref_flows.alp_onp[r];
+        out[r] = t && t.lnp != null && t.grn != null && t.oth != null ? { coal: t.lnp, grn: t.grn, oth: t.oth } : null;
+      }
+      return out;
     }).filter(Boolean);
-  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}) } : null;
+  /* The reports' other printed pairing, Coalition-v-One-Nation: each cohort's
+     share reaching the Coalition, by region (pref_flows.lnp_onp). It powers
+     the section's third, DemosAU-only chart. Each wave carries the figures
+     four ways – inner/outer/regional as printed, `all` as prefFlowsOut's
+     enrolment-and-vote weighting of them (the site's arithmetic, marked wt
+     wherever the region filter's "All voters" option shows them) – so the
+     page's region select only rekeys a wave, never recomputes it. */
+  const lnpOn = D.polls.filter((p) => p.pollster === "DemosAU (MRP)" && p.pref_flows && p.pref_flows.lnp_onp)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .map((p) => {
+      const all = prefFlowsOut(p).all;
+      if (!all || !all.lnp_onp || !["alp", "grn", "oth"].every((k) => all.lnp_onp[k] != null)) return null;
+      const out = { date: p.date, ym: ymOf(p.dateStart || p.date), ...mrpX(p), n: p.sample ?? null, url: p.releaseUrl || p.url || null,
+                    house: "DemosAU (MRP)", all: all.lnp_onp };
+      for (const r of ["inner", "outer", "regional"]) out[r] = p.pref_flows.lnp_onp[r] || null;
+      return out;
+    }).filter(Boolean);
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}), ...(lnpOn.length ? { lnpOn } : {}) } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null

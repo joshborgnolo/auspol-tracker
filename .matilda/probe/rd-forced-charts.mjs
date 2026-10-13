@@ -1,17 +1,27 @@
-/* headless geometry probe of the RdForced "forced to choose" pair in the
+/* headless geometry probe of the RdForced "forced to choose" trio in the
    All-polls Preference flows section (moved from /preference-flows/ 2026-10-10;
    REGROUPED the same day from one chart per voter cohort to one chart per
-   QUESTION; data: gen-data §7db D.flowForced = {house, vsOn, vsCoal, elec2025},
-   each wave carrying every cohort's Labor share on the one date). Renders
-   allpolls/ at desktop and phone rungs and asserts GEOMETRY, never
-   screenshots (auspol-headless-geometry-verify): the two figures share a row
-   side by side on desktop and stack full-width on a phone, each svg draws ONE
-   cohort-coloured line per cohort (Labor v One Nation asks Greens, Coalition
-   and Other voters; Labor v the Coalition asks Greens, One Nation and Other
-   voters), every line's dots vmap that cohort's published Labor shares at
-   distinct months, end labels ride a dodged per-cohort name+value block at
-   the last dot's x, gridlines are five, and the class tokens are the party
-   hues (grn/lnp/onp/oth), not an a/b alp/rival scheme. The June 2026
+   QUESTION, and a THIRD chart joined 2026-10-13: DemosAU's MRP prints the
+   Coalition pressed against One Nation by region alone, so its reading is
+   a DemosAU-only chart — all diamonds, never a line). Data: gen-data §7db
+   D.flowForced = {house, vsOn, vsCoal, elec2025, demos?, demosOn, lnpOn},
+   the MRP carriers keyed FOUR WAYS (inner/outer/regional as printed and
+   `all` the site's enrolment-and-vote weighting of them, marked wt) — the
+   region select above the charts only REKEYS a wave, never recomputes it.
+   The section head's DemosAU MRP region select (All voters / Inner metro /
+   Outer metro / Regional) rekeys the DemosAU figures on all three charts;
+   RedBridge/Accent's waves and the election's rings are national as printed.
+   Renders allpolls/ at desktop and phone rungs and asserts GEOMETRY, never
+   screenshots (auspol-headless-geometry-verify): the Labor-contest figures
+   share a row side by side on desktop with the Coalition v One Nation figure
+   below them, all three stacking full-width on a phone, the Labor charts
+   drawing ONE cohort-coloured line per cohort (Labor v One Nation asks
+   Greens, Coalition and Other voters; Labor v the Coalition asks Greens,
+   One Nation and Other voters; Coalition v One Nation asks Labor, Greens
+   and Other voters), every line's dots vmap that cohort's published shares
+   at distinct months, end labels ride a dodged per-cohort name+value block
+   at the last dot's x, gridlines are five, and the class tokens are the
+   party hues (grn/lnp/onp/oth/alp), not an a/b alp/rival scheme. The June 2026
    Coalition split is the dataset's one derived cell (estCohort "coal": the
    report printed CLP/LNP/Nat and Liberal rows, no combined row) — its note
    rides that cohort's June hit in the Labor-v-One-Nation chart alone. The
@@ -43,9 +53,11 @@
    in <that cohort's first wave month>" tail iff the straight-line drift
    battery says Yes for EXACTLY ONE cohort on the chart (a title never
    claims a move the table won't stand behind); the pressed-choice rows sit
-   in the trend-significance table as a third set, Holm's correction across
-   the six — both recomputed here independently from window.AUSPOL.flowForced,
-   never trusted from the page.
+   in the trend-significance table as a third set ("Pressed-choice share"),
+   Holm's correction across the NINE (three charts x three cohorts — the
+   Coalition's share on the third chart, Labor's on the pair) — recomputed
+   here independently from window.AUSPOL.flowForced, never trusted from the
+   page.
 */
 import puppeteer from "puppeteer-core";
 import path from "path";
@@ -60,26 +72,52 @@ const APAGE = PAGE.endsWith("/") ? PAGE + "allpolls/" : PAGE.replace(/index\.htm
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 
-/* the cohort lexicon and the two charts' rosters, mirroring the renderer's
-   FF_COHORTS map and its two call sites exactly */
-const CONAME = { grn: "Greens", coal: "Coalition", onp: "One Nation", oth: "Other" };
+/* the cohort lexicon, mirroring the renderer's FF_COHORTS map */
+const CONAME = { grn: "Greens", coal: "Coalition", onp: "One Nation", oth: "Other", alp: "Labor" };
 /* the titles' prose name ("50% of other voters") */
-const PROSE = { grn: "Greens", coal: "Coalition", onp: "One Nation", oth: "other" };
-const CLS = { grn: "grn", coal: "lnp", onp: "onp", oth: "oth" };
+const PROSE = { grn: "Greens", coal: "Coalition", onp: "One Nation", oth: "other", alp: "Labor" };
+const CLS = { grn: "grn", coal: "lnp", onp: "onp", oth: "oth", alp: "alp" };
 /* in page order since 2026-10-13: Labor v Coalition left, Labor v One
-   Nation right - the upper drift pair's order. extKey names the chart's
-   DemosAU MRP diamonds; the Coalition chart alone carries the election */
+   Nation right (the upper drift pair's order), Coalition v One Nation in
+   the .rd-ff-ln row beneath. extKey names a chart's DemosAU MRP diamond
+   extras - the third chart's readings ARE MRP carriers (lnpOn), so it has
+   none of its own and draws no line. The Coalition chart alone carries
+   the election */
 const CHARTS = [
-  { q: "co", cohorts: ["grn", "onp", "oth"], rival: "the Coalition", short: "Coalition", vsKey: "vsCoal", extKey: "demos", elec: true },
-  { q: "on", cohorts: ["grn", "coal", "oth"], rival: "One Nation", short: "One Nation", vsKey: "vsOn", extKey: "demosOn", elec: false },
+  { q: "co", cohorts: ["grn", "onp", "oth"], anchor: "Labor", anchorShort: "Labor", rival: "the Coalition", rivalShort: "Coalition", vsKey: "vsCoal", extKey: "demos", elec: true },
+  { q: "on", cohorts: ["grn", "coal", "oth"], anchor: "Labor", anchorShort: "Labor", rival: "One Nation", rivalShort: "One Nation", vsKey: "vsOn", extKey: "demosOn", elec: false },
+  { q: "ln", cohorts: ["alp", "grn", "oth"], anchor: "the Coalition", anchorShort: "the Coalition", rival: "One Nation", rivalShort: "One Nation", vsKey: null, extKey: null, elec: false },
 ];
-const FI = { co: 0, on: 1 };
+const FI = { co: 0, on: 1, ln: 2 };
+/* the battery's own definition order, mirroring the renderer's ffQ */
+const FF_DEFS = [CHARTS[1], CHARTS[0], CHARTS[2]];
+const FF_MRP_HOUSE = "DemosAU (MRP)";
+/* the region select's options, mirroring FF_REGIONS */
+const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
+
+/* the region menu's rekey, mirrored from the renderer's rekeyMrp: "" reads
+   a carrier's `all` (the site's enrolment-and-vote weighting, marked wt),
+   a named region its printed cells; a wave without that print drops out */
+const rekeyMrp = (ws, reg) => (ws || []).map((w) => {
+  if (!reg) return { ...w, ...w.all, wt: true };
+  const t = w[reg];
+  return t ? { ...w, ...t, wt: undefined } : null;
+}).filter(Boolean);
+/* a chart's wave list at a region: RedBridge's pair as printed, the ln
+   chart's MRP carriers rekeyed */
+const wavesOf = (FF, q, reg) => (q === "ln" ? rekeyMrp(FF.lnpOn, reg) : FF[CHARTS[FI[q]].vsKey]);
+const extOf = (FF, q, reg) => {
+  if (q === "co") return FF.demos || [];     /* DemosAU's ONE national print - the menu doesn't touch it */
+  if (q === "on") return rekeyMrp(FF.demosOn, reg);
+  return [];
+};
 
 /* the pressed-choice battery, recomputed independently of the page: one
-   straight line per (chart, cohort) through its Labor-share dots (w=1 like
-   the renderer's, x the mid-month decimal gen-data's D.mx mirrors), Holm
-   across the SIX; a cohort's Yes licenses a tail naming it in its chart's
-   title and its table row's verdict */
+   straight line per (chart, cohort) through its pressed-share dots (w=1
+   like the renderer's, x each wave's own xm/12 year fraction - the MRP
+   quarterlies sit between month ticks), Holm across the NINE; a cohort's
+   Yes licenses a tail naming it in its chart's title and its table row's
+   verdict */
 function tTail(t, df) {
   const th = Math.atan(Math.abs(t) / Math.sqrt(df)), c2 = Math.cos(th) ** 2;
   let term = 1, sum = 1;
@@ -115,22 +153,30 @@ const axisMap = (ticks) => {
 };
 const fmtMax = (got, want) => got.length ? Math.max(...got.map((x, k) => Math.abs(x - want[k]))).toFixed(2) : "–";
 const winInAria = (w, a) => a.startsWith("RedBridge/Accent, " + (w.win || monY(w.ym)) + ":");
-function lineFit(pts) {
+function lineFit(pts) {          /* pts: {x, v} - x the wave's own xm/12, exactly as the page fits */
   const n = pts.length;
-  if (n - 2 < 3) return null;
-  const tb = pts.reduce((a, p) => a + mxm(p.ym), 0) / n, yb = pts.reduce((a, p) => a + p.v, 0) / n;
-  const dm = pts.map((p) => ({ dt: mxm(p.ym) - tb, dy: p.v - yb }));
-  const df = n - 2, sxx = dm.reduce((a, p) => a + p.dt * p.dt, 0);
+  const df = n - 2;
+  if (df < 3) return null;
+  const tb = pts.reduce((a, p) => a + p.x, 0) / n, yb = pts.reduce((a, p) => a + p.v, 0) / n;
+  const dm = pts.map((p) => ({ dt: p.x - tb, dy: p.v - yb }));
+  const sxx = dm.reduce((a, p) => a + p.dt * p.dt, 0);
+  if (!(sxx > 0)) return null;
   const b = dm.reduce((a, p) => a + p.dt * p.dy, 0) / sxx;
   const se = Math.sqrt(dm.reduce((a, p) => a + (p.dy - b * p.dt) ** 2, 0) / df / sxx);
-  return { b, t: b / se, p: tTail(b / se, df) };
+  const t = se > 0 ? b / se : 0;
+  return { b, t, p: se > 0 ? tTail(t, df) : 1 };
 }
-function expectedForced(FF) {
-  /* the trend table keeps its own order: Labor v One Nation's cohorts first */
-  const rows = [CHARTS[1], CHARTS[0]].flatMap((c) => c.cohorts.map((ck) => {
-    const waves = FF[c.vsKey].filter((w) => w[ck] != null);
-    return { key: c.q + ck, ck, q: c.q, waves, fit: lineFit(waves.map((w) => ({ ym: w.ym, v: w[ck] }))) };
-  }));
+function expectedForced(FF, reg) {
+  /* the trend table keeps the renderer's ffQ order: Labor v One Nation
+     first, then Labor v the Coalition, then Coalition v One Nation */
+  const rows = FF_DEFS.flatMap((c) => {
+    const waves = wavesOf(FF, c.q, reg);
+    return c.cohorts.map((ck) => {
+      const ws = waves.filter((w) => w[ck] != null);
+      return { key: c.q + ck, ck, q: c.q, waves: ws,
+               fit: lineFit(ws.map((w) => ({ x: w.xm / 12, v: w[ck] }))) };
+    });
+  });
   const tested = rows.filter((r) => r.fit), sigK = [];
   for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
     if (r.fit.p >= 0.05 / (tested.length - i)) break;
@@ -138,7 +184,7 @@ function expectedForced(FF) {
   }
   for (const r of rows) r.sig = sigK.includes(r.key);
   const title = (c) => {
-    const waves = FF[c.vsKey];
+    const waves = wavesOf(FF, c.q, reg);
     const parts = c.cohorts.map((ck) => {
       const w = [...waves].reverse().find((x) => x[ck] != null);
       return `${w[ck]}% of ${PROSE[ck]} voters`;
@@ -149,20 +195,22 @@ function expectedForced(FF) {
       const r = moved[0], f = r.waves[0][r.ck], la = r.waves[r.waves.length - 1][r.ck];
       return " — " + PROSE[r.ck] + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + monY(r.waves[0].ym);
     })();
-    return list + " prefer Labor over " + c.rival + tail;
+    return list + " prefer " + c.anchor + " over " + c.rival + tail;
   };
   const cells = (r) => [r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck],
     r.fit ? sgn1(r.fit.b, true) : "–", r.fit ? sgn1(r.fit.t) : "–",
     r.fit ? (r.sig ? "Yes" : "No") : "–"];
-  const name = (r) => CONAME[r.ck] + " voters, v " + (r.q === "on" ? "One Nation" : "Coalition");
-  return { titles: [title(CHARTS[0]), title(CHARTS[1])],
+  const name = (r) => CONAME[r.ck] + " voters, " + (r.q === "co" ? "v Coalition" : "v One Nation");
+  return { titles: CHARTS.map(title),
            rows: rows.map((r) => ({ name: name(r), cells: cells(r), sig: r.sig })) };
 }
-/* per-fig expectations straight from the payload: dot sequences per cohort
-   (in wave order), latest share per cohort, hit tally */
-function expectFig(FF, ci) {
-  const c = CHARTS[ci], waves = FF[c.vsKey], ext = FF[c.extKey] || [], el = c.elec && FF.elec2025 ? [FF.elec2025] : [];
-  const dots = {}, latest = {}, counts = {};
+/* per-fig expectations straight from the payload at a region: dot and
+   diamond sequences per cohort (in payload order), the latest share per
+   cohort, hit tally. An MRP-housed wave draws diamonds, never a dot */
+function expectFig(FF, q, reg) {
+  const c = CHARTS[FI[q]], isMrp = (w) => w.house === FF_MRP_HOUSE;
+  const waves = wavesOf(FF, q, reg), ext = extOf(FF, q, reg), el = c.elec && FF.elec2025 ? [FF.elec2025] : [];
+  const dots = {}, dms = {}, latest = {}, counts = {}, dmCounts = {};
   /* one hit per (mark group, cohort) - wave dots, MRP diamonds, election
      rings alike; one tab stop per group; a button where the group has a
      poll row to open (waves and MRPs, never the election) */
@@ -170,13 +218,17 @@ function expectFig(FF, ci) {
   for (const w of [...waves, ...ext, ...el]) for (const ck of c.cohorts) if (w[ck] != null) nHits++;
   for (const ck of c.cohorts) {
     const ws = waves.filter((w) => w[ck] != null);
-    dots[CLS[ck]] = ws.map((w) => w[ck]);
-    counts[CLS[ck]] = ws.length;
+    const waveDots = ws.filter((w) => !isMrp(w)), waveDms = ws.filter(isMrp);
+    dots[CLS[ck]] = waveDots.map((w) => w[ck]);
+    counts[CLS[ck]] = waveDots.length;
+    dms[CLS[ck]] = [...waveDms, ...ext.filter((d) => d[ck] != null)].map((w) => w[ck]);
+    dmCounts[CLS[ck]] = dms[CLS[ck]].length;
     latest[ck] = ws.length ? ws[ws.length - 1][ck] : null;
   }
   const tabbable = waves.length + ext.length + el.length;
   const nButtons = waves.length + ext.length;
-  return { nHits, dots, counts, latest, tabbable, nButtons, nDm: ext.reduce((a, d) => a + c.cohorts.filter((ck) => d[ck] != null).length, 0),
+  return { nHits, dots, dms, counts, dmCounts, latest, tabbable, nButtons,
+           nDm: Object.values(dmCounts).reduce((a, n) => a + n, 0),
            ms: [...new Set(waves.map((w) => w.ym))] };
 }
 
@@ -203,8 +255,14 @@ const measure = () => page.evaluate(() => {
       d: p.getAttribute("d"),
     }));
     const dots = {};
-    for (const cls of ["grn", "lnp", "onp", "oth"])
+    const dmPts = {};
+    for (const cls of ["grn", "lnp", "onp", "oth", "alp"]) {
       dots[cls] = [...fig.querySelectorAll(".rd-ff-dot." + cls)].map((c) => ({ x: +c.getAttribute("cx"), y: +c.getAttribute("cy") }));
+      dmPts[cls] = [...fig.querySelectorAll("path.rd-ff-dm." + cls)].map((p) => {
+        const m = /^M([\d.]+) ([\d.]+)/.exec(p.getAttribute("d"));
+        return m ? { x: +m[1], y: +m[2] + 5.5 } : null;   /* the diamond's own centre */
+      }).filter(Boolean);
+    }
     const hits = [...fig.querySelectorAll("circle.rd-apd-hit")];
     const elsT = [...fig.querySelectorAll(".rd-ff-el")];
     const elvsT = [...fig.querySelectorAll(".rd-ff-elv")];
@@ -217,11 +275,13 @@ const measure = () => page.evaluate(() => {
       aria: svg.getAttribute("aria-label") || "",
       ticks: [...fig.querySelectorAll("text.rd-dis-ax")].map((t) => ({ s: t.textContent.trim(), x: +t.getAttribute("x") })).filter((l) => /^[A-Z]/.test(l.s)),
       q: fig.dataset.q,
+      inLn: !!fig.closest(".rd-ff-ln"),
       erings: [...fig.querySelectorAll("circle.rd-ring")].map((c) => ({ x: +c.getAttribute("cx"), y: +c.getAttribute("cy"),
                cls: c.getAttribute("class").replace("rd-ring rd-ff-ring ", "") })),
       leads: [...fig.querySelectorAll("path.rd-ff-lead")].map((p) => ({ cls: p.getAttribute("class").replace("rd-ff-lead ", ""),
                d: p.getAttribute("d"), dash: p.getAttribute("stroke-dasharray") })),
       nDm: fig.querySelectorAll("path.rd-ff-dm").length,
+      dmPts,
       waveArias: hits.filter((h) => h.classList.contains("wave")).map((h) => h.getAttribute("aria-label") || ""),
       titled: fig.querySelectorAll("title").length,
       lines, dots,
@@ -241,14 +301,20 @@ const measure = () => page.evaluate(() => {
   const sec = document.querySelector("#flow-drift");
   out.secW = Math.round(sec.getBoundingClientRect().width);
   out.h3 = sec.querySelector(".rd-ff-t") ? sec.querySelector(".rd-ff-t").textContent : null;
-  out.h4s = [...sec.querySelectorAll(".rd-ff-two .rd-fl-ct h4")].map((h) => h.textContent.trim());
+  out.ffDeK = !!sec.querySelector(".rd-ff-head .rd-ff-d");
+  out.h4s = [...sec.querySelectorAll(".rd-ff .rd-fl-one .rd-fl-ct h4")].map((h) => h.textContent.trim());
+  out.sel = (() => {
+    const s = sec.querySelector('.rd-ff-head select.rd-pv-sel');
+    return s ? { aria: s.getAttribute("aria-label"), value: s.value,
+                 options: [...s.options].map((o) => [o.value, o.textContent.trim()]) } : null;
+  })();
   const det = sec.querySelector("details.rd-tsig");
   if (det) {
     out.tsigHeads = [...det.querySelectorAll(".rd-tsig-table thead th")].map((h) => h.textContent.trim());
     const bodies = [...det.querySelectorAll(".rd-tsig-table tbody")];
     const pr = bodies.find((tb) => {
       const s = tb.querySelector("tr.rd-tsig-set th");
-      return s && s.textContent.trim() === "Pressed-choice Labor share";
+      return s && s.textContent.trim() === "Pressed-choice share";
     });
     out.pressed = pr ? [...pr.querySelectorAll("tr:not(.rd-tsig-set)")].map((tr) => ({
       name: tr.querySelector("th").textContent.trim(),
@@ -275,47 +341,64 @@ const FF = await (async () => {
   await page.waitForSelector(".rd-ff svg .rd-ff-line.grn", { timeout: 30000 });
   return page.evaluate(() => window.AUSPOL.flowForced);
 })();
-check(!!FF && FF.house === "RedBridge/Accent" && Array.isArray(FF.vsOn) && Array.isArray(FF.vsCoal),
-  `payload: D.flowForced is the question-keyed pair (${FF && Object.keys(FF).join("/")})`);
-const EXP = FF ? [expectFig(FF, 0), expectFig(FF, 1)] : null;
-const FFexp = FF ? expectedForced(FF) : null;
+check(!!FF && FF.house === "RedBridge/Accent" && Array.isArray(FF.vsOn) && Array.isArray(FF.vsCoal) && Array.isArray(FF.lnpOn),
+  `payload: D.flowForced carries the pair and the DemosAU lnpOn carriers (${FF && Object.keys(FF).join("/")})`);
+check(!!FF && FF.lnpOn.length >= 2 && FF.lnpOn.every((w) => w.all && w.all.alp != null && w.all.grn != null && w.all.oth != null && typeof w.all.alp === "number"),
+  `payload: every lnpOn carrier's \`all\` weighting keys alp/grn/oth (${FF && FF.lnpOn.length} waves)`);
+const EXP = FF ? CHARTS.map((c) => expectFig(FF, c.q, "")) : null;
+const FFexp = FF ? expectedForced(FF, "") : null;
 
 // ---------------- desktop rung --------------------------------------------
 await gotoFlows(1366);
 const d = await measure();
-check(d.nFig === 2, `desktop: two forced-choice figures (${d.nFig})`);
+check(d.nFig === 3, `desktop: three forced-choice figures, the pair plus Coalition v One Nation (${d.nFig})`);
 check(d.h3 === "What voters say they’d do with their preferences", `desktop: section head names no one house (${JSON.stringify(d.h3)})`);
-check(JSON.stringify(d.figs.map((f) => f.q)) === '["co","on"]' && d.figs[0].contest === "Labor v Coalition" && d.figs[1].contest === "Labor v One Nation",
-  `desktop: Labor v Coalition left, Labor v One Nation right, each led by its contest (${d.figs.map((f) => f.contest).join(" | ")})`);
-check(JSON.stringify(d.figs[0].ticks) === JSON.stringify(d.figs[1].ticks),
-  "desktop: the pair shares one month axis (identical tick labels and x)");
+check(d.ffDeK, "desktop: the dek rides the section head");
+check(JSON.stringify(d.figs.map((f) => f.q)) === '["co","on","ln"]' && d.figs[0].contest === "Labor v Coalition" && d.figs[1].contest === "Labor v One Nation" && d.figs[2].contest === "Coalition v One Nation",
+  `desktop: Labor v Coalition left, Labor v One Nation right, Coalition v One Nation below, each led by its contest (${d.figs.map((f) => f.contest).join(" | ")})`);
+check(!!d.sel && d.sel.aria === "DemosAU MRP region", `desktop: the region select rides the section head (${d.sel && d.sel.aria})`);
+check(d.sel && JSON.stringify(d.sel.options) === JSON.stringify(FF_REGIONS),
+  `desktop: region options are All voters / Inner metro / Outer metro / Regional (${JSON.stringify(d.sel && d.sel.options)})`);
+check(d.sel && d.sel.value === "", `desktop: the select opens on All voters (${JSON.stringify(d.sel && d.sel.value)})`);
+check(JSON.stringify(d.figs[0].ticks) === JSON.stringify(d.figs[1].ticks) && JSON.stringify(d.figs[0].ticks) === JSON.stringify(d.figs[2].ticks),
+  "desktop: all three charts share one month axis (identical tick labels and x)");
 check(d.figs.every((f) => f.titled === 0), "desktop: no native <title> tooltips - every mark tips through the shared card");
 check(d.orderKeyThenForced.iKey > -1 && d.orderKeyThenForced.iNote === d.orderKeyThenForced.iKey + 1
     && d.orderKeyThenForced.iFF === d.orderKeyThenForced.iKey + 2,
-  `desktop: the reading note sits under the drift key, the forced pair under it (key idx ${d.orderKeyThenForced.iKey}, note idx ${d.orderKeyThenForced.iNote}, forced idx ${d.orderKeyThenForced.iFF})`);
+  `desktop: the reading note sits under the drift key, the forced trio under it (key idx ${d.orderKeyThenForced.iKey}, note idx ${d.orderKeyThenForced.iNote}, forced idx ${d.orderKeyThenForced.iFF})`);
 check(d.orderKeyThenForced.iTsig === d.orderKeyThenForced.iFF + 1,
-  `desktop: the drift battery follows the forced pair (tsig idx ${d.orderKeyThenForced.iTsig})`);
+  `desktop: the drift battery follows the forced trio (tsig idx ${d.orderKeyThenForced.iTsig})`);
 {
-  const [a, b] = d.figs;
+  const [a, b, c] = d.figs;
   check(a.w > 400 && Math.abs(a.w - b.w) <= 2, `desktop: two equal-width charts side by side (${a.w}px, ${b.w}px)`);
   check(Math.abs(b.left - a.right) > 20, `desktop: a gap separates the two charts (${b.left - a.right}px)`);
   check(Math.abs(a.top - b.top) <= 1, `desktop: charts share a row (top ${a.top} vs ${b.top})`);
+  check(c.inLn && c.top > a.top + a.h - 1, `desktop: the third chart reads as its own row below the pair (top ${c.top} after ${a.top + a.h})`);
+  check(Math.abs(c.left - a.left) <= 1 && Math.abs(c.w - a.w) <= 2,
+    `desktop: the third chart opens the row at the pair's width (${c.left}px, ${c.w}px of ${a.w}px)`);
 }
 for (const [i, f] of d.figs.entries()) {
-  const cam = CHARTS[i], exp = EXP[i], tag = cam.q === "on" ? "v-ON chart" : "v-Coalition chart";
-  check(f.lines.length === 3, `desktop ${tag}: three cohort lines (${f.lines.length})`);
-  check(JSON.stringify(f.lines.map((l) => l.cls).sort()) === JSON.stringify(cam.cohorts.map((c) => CLS[c]).sort()),
-    `desktop ${tag}: line classes are the party hues ${cam.cohorts.map((c) => CLS[c]).join("/")} (${f.lines.map((l) => l.cls).join(", ")})`);
-  check(new Set(f.lines.map((l) => l.d)).size === 3, `desktop ${tag}: three distinct line paths`);
+  const cam = CHARTS[i], exp = EXP[i];
+  const tag = cam.q === "on" ? "v-ON chart" : cam.q === "co" ? "v-Coalition chart" : "Coalition-v-ON chart";
+  const lone = cam.q === "ln";
+  check(f.lines.length === (lone ? 0 : 3),
+    `desktop ${tag}: ${lone ? "no lines - a DemosAU-only chart is all diamonds" : "three cohort lines"} (${f.lines.length})`);
+  if (!lone) {
+    check(JSON.stringify(f.lines.map((l) => l.cls).sort()) === JSON.stringify(cam.cohorts.map((c) => CLS[c]).sort()),
+      `desktop ${tag}: line classes are the party hues ${cam.cohorts.map((c) => CLS[c]).join("/")} (${f.lines.map((l) => l.cls).join(", ")})`);
+    check(new Set(f.lines.map((l) => l.d)).size === 3, `desktop ${tag}: three distinct line paths`);
+  }
   for (const ck of cam.cohorts) {
     const cls = CLS[ck];
     check(f.dots[cls].length === exp.counts[cls],
       `desktop ${tag} ${CONAME[ck]}: ${exp.counts[cls]} dots, one per published wave (${f.dots[cls].length})`);
-    check(new Set(f.dots[cls].map((p) => Math.round(p.x))).size === f.dots[cls].length,
+    if (exp.counts[cls]) check(new Set(f.dots[cls].map((p) => Math.round(p.x))).size === f.dots[cls].length,
       `desktop ${tag} ${CONAME[ck]}: dots sit at distinct months`);
+    check(f.dmPts[cls].length === exp.dmCounts[cls],
+      `desktop ${tag} ${CONAME[ck]}: ${exp.dmCounts[cls]} DemosAU diamonds, one per MRP cohort cell (${f.dmPts[cls].length})`);
   }
   check(f.gls === 5, `desktop ${tag}: five gridlines`);
-  check(f.nHits === exp.nHits, `desktop ${tag}: ${exp.nHits} hit circles, one per cohort dot (${f.nHits})`);
+  check(f.nHits === exp.nHits, `desktop ${tag}: ${exp.nHits} hit circles, one per cohort mark (${f.nHits})`);
   check(f.tabbable === exp.tabbable && f.nButtons === exp.nButtons,
     `desktop ${tag}: one tab stop per mark group, a button wherever a poll row opens (${f.tabbable}/${f.nButtons} of ${exp.tabbable}/${exp.nButtons})`);
   check(f.nDm === exp.nDm, `desktop ${tag}: one DemosAU diamond per MRP cohort cell (${f.nDm} of ${exp.nDm})`);
@@ -328,30 +411,52 @@ for (const [i, f] of d.figs.entries()) {
   check(labYs.every((y, j) => j === 0 || y - labYs[j - 1] >= 27),
     `desktop ${tag}: the end-label dodge keeps blocks apart (min gap ${Math.min(...labYs.slice(1).map((y, j) => Math.round(y - labYs[j])))})`);
   const bot = 236 - 34;
-  check(Object.values(f.dots).every((arr) => arr.every((p) => p.y > 0 && p.y < bot)),
-    `desktop ${tag}: every dot inside the plot`);
+  check(Object.values(f.dots).every((arr) => arr.every((p) => p.y > 0 && p.y < bot))
+      && Object.values(f.dmPts).every((arr) => arr.every((p) => p.y > 16 && p.y < bot)),
+    `desktop ${tag}: every mark inside the plot`);
   for (const ck of cam.cohorts) {
     const got = f.dots[CLS[ck]].map((p) => Math.round(100 * (bot - p.y) / (bot - 16)));
     check(JSON.stringify(got) === JSON.stringify(exp.dots[CLS[ck]]),
       `desktop ${tag} ${CONAME[ck]}: dots vmap the published shares (${JSON.stringify(got)})`);
+    const gotDm = f.dmPts[CLS[ck]].map((p) => Math.round(1000 * (bot - p.y) / (bot - 16)) / 10);
+    check(JSON.stringify(gotDm) === JSON.stringify(exp.dms[CLS[ck]].map((v) => Math.round(10 * v) / 10)),
+      `desktop ${tag} ${CONAME[ck]}: diamonds vmap the MRP shares (${JSON.stringify(gotDm)} vs ${JSON.stringify(exp.dms[CLS[ck]])})`);
   }
-  /* every hit aria names the wave's own printed fieldwork window, not a
-     month-of-the-grid: the renderer speaks w.win */
-  const wsList = FF[cam.vsKey];
-  check(f.waveArias.length && f.waveArias.every((s) => wsList.some((w) => winInAria(w, s)) && /: (Greens|Coalition|One Nation|Other) voters, Labor \d+, (Coalition|One Nation) \d/.test(s)),
+  /* every wave hit aria names the wave's own printed fieldwork window, not
+     a month-of-the-grid: the renderer speaks w.win */
+  const wsList = cam.vsKey ? FF[cam.vsKey] : null;
+  if (wsList) check(f.waveArias.length && f.waveArias.every((s) => wsList.some((w) => winInAria(w, s)) && /: (Greens|Coalition|One Nation|Other) voters, Labor \d+, (Coalition|One Nation) \d/.test(s)),
     `desktop ${tag}: every wave hit's aria reads "RedBridge/Accent, <window>: <cohort> voters, Labor N, <rival> M"`);
-  /* dots ride each wave's TRUE fieldwork midpoint: derive the empirical
-     month-index → x map from the printed tick labels (year tokens
-     propagate), then every cohort dot must sit at its payload xm through
+  else {
+    const mA = f.arias.filter((s) => s.startsWith("DemosAU MRP, "));
+    check(mA.length === f.nHits && mA.every((s) => /: (Labor|Greens|Other) voters, the Coalition [\d.]+, One Nation [\d.]+/.test(s)),
+      `desktop ${tag}: every hit's aria reads "DemosAU MRP, <window>: <cohort> voters, the Coalition N, One Nation M"`);
+    check(mA.every((s) => s.includes("all regions, our weighting of DemosAU’s printed regional tables")),
+      `desktop ${tag} (All voters): every MRP aria flags our weighting (${mA.length})`);
+  }
+  /* every mark rides its wave's TRUE fieldwork midpoint: derive the
+     empirical month-index → x map from the printed tick labels (year
+     tokens propagate), then every mark must sit at its payload xm through
      it, not at its month's slot */
   const tk = axisMap(f.ticks);
   check(!!tk && !tk.err, `desktop ${tag}: tick labels parsed${tk && tk.err ? " – " + tk.err : ""}`);
   if (tk) {
-    for (const ck of cam.cohorts) {
-      const want = wsList.filter((w) => w[ck] != null).map((w) => tk.x(w.xm));
-      const got = f.dots[CLS[ck]].map((p) => p.x);
-      check(got.length === want.length && got.every((x, k) => Math.abs(x - want[k]) < 1.5),
-        `desktop ${tag} ${CONAME[ck]}: dots sit at their waves' true midpoints (max ${fmtMax(got, want)}px off expected)`);
+    const markXs = (arr, list) => {
+      const want = list.map((w) => tk.x(w.xm));
+      const got = arr.map((p) => p.x);
+      return got.length === want.length && got.every((x, k) => Math.abs(x - want[k]) < 1.5) ? null : [got, want];
+    };
+    if (wsList) for (const ck of cam.cohorts) {
+      const off = markXs(f.dots[CLS[ck]], wsList.filter((w) => w[ck] != null));
+      check(!off, `desktop ${tag} ${CONAME[ck]}: dots sit at their waves' true midpoints${off ? " (" + fmtMax(...off) + "px off)" : ""}`);
+    }
+    if (!lone) for (const ck of cam.cohorts) {
+      const extWaves = extOf(FF, cam.q, "").filter((w) => w[ck] != null);
+      const off = markXs(f.dmPts[CLS[ck]].slice(-extWaves.length), extWaves);
+      check(!off, `desktop ${tag} ${CONAME[ck]}: diamonds sit at their MRPs' true midpoints${off ? "" : ""}`);
+    } else for (const ck of cam.cohorts) {
+      const off = markXs(f.dmPts[CLS[ck]], wavesOf(FF, "ln", "").filter((w) => w[ck] != null));
+      check(!off, `desktop ${tag} ${CONAME[ck]}: diamonds sit at their MRPs' true midpoints${off ? "" : ""}`);
     }
     const e = FF.elec2025;
     if (cam.q === "co" && e) {
@@ -395,21 +500,74 @@ const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff
 check(viewH === 236, `desktop: plot height 236 (${viewH})`);
 
 // the titles tell all three cohorts' latest shares; tails ride the battery
-check(d.h4s.length === 2 && d.h4s[0] === FFexp.titles[0],
+check(d.h4s.length === 3 && d.h4s[0] === FFexp.titles[0],
   `desktop: v-Coalition title is the three-share line${FFexp.titles[0].includes(" — ") ? " + its one-cohort tail" : ""} (${JSON.stringify(d.h4s[0])})`);
-check(d.h4s.length === 2 && d.h4s[1] === FFexp.titles[1],
+check(d.h4s.length === 3 && d.h4s[1] === FFexp.titles[1],
   `desktop: v-ON title is the three-share line${FFexp.titles[1].includes(" — ") ? " + tail" : ""} (${JSON.stringify(d.h4s[1])})`);
-// the trend-significance table's pressed set carries the same battery, six rows
+check(d.h4s.length === 3 && d.h4s[2] === FFexp.titles[2],
+  `desktop: Coalition-v-ON title is the DemosAU three-share line${FFexp.titles[2].includes(" — ") ? " + tail" : ""} (${JSON.stringify(d.h4s[2])})`);
+// the trend-significance table's pressed set carries the same battery, nine rows
 check(d.tsigHeads && JSON.stringify(d.tsigHeads) === JSON.stringify(["Series", "First → last", "Slope, pts/yr", "t", "Significant"]),
   `tsig heads fit gaps and shares (${JSON.stringify(d.tsigHeads)})`);
-check(d.pressed && d.pressed.length === 6 && JSON.stringify(d.pressed.map((r) => r.name)) === JSON.stringify(FFexp.rows.map((r) => r.name)),
-  `pressed set: six rows, both charts' cohorts in order (${JSON.stringify((d.pressed || []).map((r) => r.name))})`);
+check(d.pressed && d.pressed.length === 9 && JSON.stringify(d.pressed.map((r) => r.name)) === JSON.stringify(FFexp.rows.map((r) => r.name)),
+  `pressed set: nine rows, all three charts' cohorts in ffQ order (${JSON.stringify((d.pressed || []).map((r) => r.name))})`);
 for (const [i, exp] of FFexp.rows.entries()) {
   const row = d.pressed && d.pressed[i];
   check(!!row && JSON.stringify(row.cells) === JSON.stringify(exp.cells),
     `pressed ${exp.name}: figures recomputed (${JSON.stringify(row && row.cells)} vs ${JSON.stringify(exp.cells)})`);
   check(!!row && row.yes === (exp.sig ? 1 : 0),
     `pressed ${exp.name}: Yes-wash iff the battery says Yes (${row && row.yes} yes-td on a ${exp.cells[3]})`);
+}
+
+// ---- the region select REKEYS the DemosAU marks, never recomputes --------
+{
+  const reg = "inner", regName = "Inner metro";
+  await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', reg);
+  await new Promise((r) => setTimeout(r, 300));
+  const dr = await measure();
+  const expIn = [expectFig(FF, "on", reg), expectFig(FF, "ln", reg)];
+  const fExpIn = expectedForced(FF, reg);
+  check(dr.sel && dr.sel.value === reg, `region menu: the select reads ${regName}`);
+  /* RedBridge's own pair are untouched: identical wave dots as before */
+  check(JSON.stringify(dr.figs[1].lines) === JSON.stringify(d.figs[1].lines)
+      && JSON.stringify(dr.figs[0].dots) === JSON.stringify(d.figs[0].dots),
+    `region menu: RedBridge's lines and the Coalition chart stay national as printed`);
+  /* DemosAU's diamonds re-key to the region's printed cells on BOTH the
+     v-ON chart's extras and the third chart; the co chart's national
+     diamonds stand */
+  const ln = dr.figs[2], on = dr.figs[1], bot2 = 236 - 34;
+  for (const ck of CHARTS[2].cohorts) {
+    const got = ln.dmPts[CLS[ck]].map((p) => Math.round(1000 * (bot2 - p.y) / (bot2 - 16)) / 10);
+    const want = expIn[1].dms[CLS[ck]].map((v) => Math.round(10 * v) / 10);
+    check(JSON.stringify(got) === JSON.stringify(want),
+      `region menu Coalition-v-ON ${CONAME[ck]}: diamonds now read the printed ${regName} cells (${JSON.stringify(got)})`);
+  }
+  for (const ck of CHARTS[1].cohorts) {
+    const got = on.dmPts[CLS[ck]].map((p) => Math.round(1000 * (bot2 - p.y) / (bot2 - 16)) / 10);
+    const want = expIn[0].dms[CLS[ck]].map((v) => Math.round(10 * v) / 10);
+    check(JSON.stringify(got) === JSON.stringify(want),
+      `region menu v-ON ${CONAME[ck]}: diamonds now read the printed ${regName} cells (${JSON.stringify(got)})`);
+  }
+  check(JSON.stringify(dr.figs[0].dmPts) === JSON.stringify(d.figs[0].dmPts),
+    "region menu: the Coalition chart's one national DemosAU diamond set is untouched");
+  /* our-weighting wording leaves the MRP arias on a named region - those
+     are the report's printed cells now */
+  check(ln.arias.filter((s) => s.startsWith("DemosAU MRP, ")).every((s) => !s.includes("our weighting")),
+    `region menu Coalition-v-ON: no our-weighting flag on ${regName} (printed cells)`);
+  /* the third chart's title and the battery recompute on the region's
+     cells; the RedBridge pair's rows stand */
+  check(dr.h4s.length === 3 && dr.h4s[2] === fExpIn.titles[2],
+    `region menu: the third chart's title follows the printed ${regName} cells (${JSON.stringify(dr.h4s[2])})`);
+  check(dr.h4s[0] === d.h4s[0] && dr.h4s[1] === d.h4s[1],
+    "region menu: the RedBridge pair's titles stand (national as printed)");
+  check(dr.pressed && dr.pressed.length === 9
+      && JSON.stringify(dr.pressed.map((r) => r.cells)) === JSON.stringify(fExpIn.rows.map((r) => r.cells)),
+    `region menu: the pressed rows follow the printed ${regName} cells (${JSON.stringify((dr.pressed || []).map((r) => r.cells[0]))})`);
+  await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', "");
+  await new Promise((r) => setTimeout(r, 300));
+  const dBack = await measure();
+  check(JSON.stringify(dBack.figs[2].dmPts) === JSON.stringify(d.figs[2].dmPts) && dBack.sel && dBack.sel.value === "",
+    "region menu: All voters restores our weighting of the regional tables");
 }
 
 /* hover/click helpers: find one cohort's hit on one figure by its aria
@@ -510,17 +668,22 @@ const RB = (win) => "RedBridge/Accent, " + win;
     `election ring tip: the three counted flows, ring swatches, hovered row picked (${JSON.stringify(tip && tip.vals)})`);
   check(tip && tip.hint === null, "election ring tip: no open hint (the election has no poll row)");
 }
-// DemosAU diamonds tip too, on both charts, and open their MRP's row
+// DemosAU diamonds tip too, on all three charts, and open their MRP's row
 for (const c of CHARTS) {
-  const ext = FF[c.extKey] || [];
-  if (!ext.length) continue;
-  const dd = ext[ext.length - 1], ck = c.cohorts.find((k) => dd[k] != null);
+  const mrp = c.q === "ln" ? wavesOf(FF, "ln", "") : extOf(FF, c.q, "");
+  if (!mrp.length) continue;
+  const dd = mrp[mrp.length - 1], ck = c.cohorts.find((k) => dd[k] != null);
   const tip = await hover(FI[c.q], "DemosAU MRP, " + dd.win, CONAME[ck]);
   check(!!tip && tip.title === "DemosAU MRP, " + dd.win && tip.vals.includes(dd[ck] + "%") && tip.sw.every((x) => x.startsWith("mrp ")),
     `${c.q} DemosAU diamond hover: titled by its window, diamond swatches, ${CONAME[ck]} ${dd[ck]}% (${JSON.stringify(tip && [tip.title, tip.vals])})`);
-  check(tip && tip.sub === "Would pick Labor over " + c.rival + (dd.wt ? " (all regions: our weighting)" : ""),
+  check(tip && tip.sub === "Would pick " + c.anchor + " over " + c.rival + (dd.wt ? " (all regions: our weighting)" : ""),
     `${c.q} DemosAU tip: the question, flagged where it's our weighting (${JSON.stringify(tip && tip.sub)})`);
   check(tip && tip.hint === "Click to open this poll in All polls", `${c.q} DemosAU tip: opens its MRP's row (${JSON.stringify(tip && tip.hint)})`);
+  if (c.q === "ln") {
+    check(tip && tip.on === CONAME[ck] + " voters" && tip.rows.filter((r) => r.endsWith(" voters")).length === 3,
+      `ln DemosAU tip: the hovered row picked out of the three cohorts (${JSON.stringify(tip && tip.rows)})`);
+    check(dd.n == null || (!!tip && tip.rows.includes("Sample") && tip.vals.includes(`n = ${dd.n.toLocaleString()}`)), `ln DemosAU tip: sample row ${dd.n}`);
+  }
 }
 
 /* the drawer's forced splits ride an Also-in-this-poll Preferences line
@@ -626,22 +789,24 @@ const grpHas = (prefs, title, want) => {
 // ---------------- phone rung ------------------------------------------------
 await gotoFlows(390);
 const m = await measure();
-check(m.nFig === 2, `phone: two figures (${m.nFig})`);
+check(m.nFig === 3, `phone: three figures (${m.nFig})`);
+check(!!m.sel && m.sel.value === "", `phone: the region select rides the head, still on All voters`);
 {
-  const [a, b] = m.figs;
-  check(Math.abs(a.w - m.secW) <= 2 && Math.abs(b.w - m.secW) <= 2, `phone: charts fill the section width (${a.w}px of ${m.secW}px)`);
-  check(b.top > a.top + a.h - 1, `phone: charts stack (${a.top}+${a.h} then ${b.top})`);
-  check(Math.abs(a.top - b.top) > 40, `phone: real vertical stride between charts (${b.top - a.top})`);
+  const [a, b, c] = m.figs;
+  check(m.figs.every((f) => Math.abs(f.w - m.secW) <= 2), `phone: all three charts fill the section width (${m.figs.map((f) => f.w).join("/")} of ${m.secW}px)`);
+  check(b.top > a.top + a.h - 1 && c.top > b.top + b.h - 1, `phone: the trio stacks (${a.top}, ${b.top}, ${c.top})`);
+  check(Math.abs(a.top - b.top) > 40 && Math.abs(b.top - c.top) > 40, `phone: real vertical stride between charts (${b.top - a.top}, ${c.top - b.top})`);
   check(m.sw <= m.iw + 1, `phone: no horizontal overflow (sw ${m.sw} vs iw ${m.iw})`);
-  for (const [i, f] of [a, b].entries()) {
-    const tag = CHARTS[i].q === "on" ? "v-ON" : "v-Coalition";
-    check(f.lines.length === 3, `phone ${tag}: three cohort lines (${f.lines.length})`);
-    check(f.nHits === EXP[i].nHits, `phone ${tag}: ${EXP[i].nHits} hit circles, one per cohort dot (${f.nHits})`);
-    check(JSON.stringify(f.els) === JSON.stringify(CHARTS[i].cohorts.map((c) => CONAME[c])),
+  check(c.inLn, "phone: the third chart rows through .rd-ff-ln on the phone too");
+  for (const [i, f] of [a, b, c].entries()) {
+    const cam = CHARTS[i], tag = cam.q === "on" ? "v-ON" : cam.q === "co" ? "v-Coalition" : "Coalition-v-ON";
+    check(f.lines.length === (cam.q === "ln" ? 0 : 3), `phone ${tag}: ${cam.q === "ln" ? "no lines - all diamonds" : "three cohort lines"} (${f.lines.length})`);
+    check(f.nHits === EXP[i].nHits, `phone ${tag}: ${EXP[i].nHits} hit circles, one per cohort mark (${f.nHits})`);
+    check(JSON.stringify(f.els) === JSON.stringify(cam.cohorts.map((x) => CONAME[x])),
       `phone ${tag}: same three cohort end labels (${f.els.join(" · ")})`);
   }
 }
-check(m.h4s.length === 2 && m.h4s[0] === FFexp.titles[0] && m.h4s[1] === FFexp.titles[1],
+check(m.h4s.length === 3 && m.h4s[0] === FFexp.titles[0] && m.h4s[1] === FFexp.titles[1] && m.h4s[2] === FFexp.titles[2],
   `phone: same dynamic titles as desktop (${JSON.stringify(m.h4s)})`);
 const viewH2 = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
 check(viewH2 === 200, `phone: plot height 200 (${viewH2})`);

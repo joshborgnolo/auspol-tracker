@@ -20,12 +20,12 @@
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/allpolls/">
-  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-6e4734c7">
+  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-d5dc574f">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="auspol tracker scoreboard for 11 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-6e4734c7">
+  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-d5dc574f">
   <meta name="twitter:image:alt" content="auspol tracker scoreboard for 11 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
   <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
@@ -5307,6 +5307,16 @@ body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
   body.rd .rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }
   body.rd .rd-ff-two .rd-fl-ct { align-items: flex-start; padding-top: 4px; }
 }
+body.rd .rd-ff-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; column-gap: 24px; row-gap: 8px; }
+body.rd .rd-ff-head > div { flex: 1 1 auto; }
+body.rd .rd-ff-ln { margin-top: 28px; }
+@media (min-width: 761px) {
+  body.rd .rd-ff-ln { width: calc((100% - 48px) / 2); }
+}
+@media (max-width: 760px) {
+  body.rd .rd-ff-head { display: block; }
+  body.rd .rd-ff-head .rd-pv-sel { margin-top: 8px; }
+}
 body.rd .rd-fl-chart { position: relative; margin-top: 8px; }
 body.rd .rd-fl-chart svg { display: block; overflow: visible; }
 body.rd .rd-fl-zero { stroke: var(--ink-faint); stroke-width: 1; }
@@ -5349,15 +5359,18 @@ body.rd .rd-ff-line.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-line.grn { stroke: var(--grn); }
 body.rd .rd-ff-line.onp { stroke: var(--onp); }
 body.rd .rd-ff-line.oth { stroke: var(--oth); }
+body.rd .rd-ff-line.alp { stroke: var(--alp); }
 body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
 body.rd .rd-ff-dot.grn { fill: var(--grn); }
 body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
+body.rd .rd-ff-dot.alp { fill: var(--alp); }
 body.rd .rd-ff-dm { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
 body.rd .rd-ff-dm.onp { stroke: var(--onp); }
 body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-dm.grn { stroke: var(--grn); }
 body.rd .rd-ff-dm.oth { stroke: var(--oth); }
+body.rd .rd-ff-dm.alp { stroke: var(--alp); }
 body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); transform: rotate(45deg); vertical-align: 0; }
 body.rd .rd-ff-keyring { display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); border-radius: 50%; vertical-align: -1px; }
 body.rd .rd-ff-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
@@ -5367,11 +5380,13 @@ body.rd .rd-ff-ring.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-ring.grn { stroke: var(--grn); }
 body.rd .rd-ff-ring.onp { stroke: var(--onp); }
 body.rd .rd-ff-ring.oth { stroke: var(--oth); }
+body.rd .rd-ff-ring.alp { stroke: var(--alp); }
 body.rd .rd-ff-lead { fill: none; stroke-width: 2.25; stroke-linecap: round; }
 body.rd .rd-ff-lead.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-lead.grn { stroke: var(--grn); }
 body.rd .rd-ff-lead.onp { stroke: var(--onp); }
 body.rd .rd-ff-lead.oth { stroke: var(--oth); }
+body.rd .rd-ff-lead.alp { stroke: var(--alp); }
 body.rd .rd-ff .rd-ff-line, body.rd .rd-ff .rd-ff-lead, body.rd .rd-ff .rd-ff-g, body.rd .rd-ff .rd-ff-guide,
 body.rd .rd-ff .rd-fl-empty, body.rd .rd-ff .rd-apd-dothi { pointer-events: none; }
 body.rd .rd-ff .rd-ff-hit { pointer-events: none; }
@@ -5383,10 +5398,12 @@ body.rd .rd-ff-sw.wave.lnp { background: var(--lnp); }
 body.rd .rd-ff-sw.wave.grn { background: var(--grn); }
 body.rd .rd-ff-sw.wave.onp { background: var(--onp); }
 body.rd .rd-ff-sw.wave.oth { background: var(--oth); }
+body.rd .rd-ff-sw.wave.alp { background: var(--alp); }
 body.rd .rd-ff-sw.lnp { border-color: var(--lnp); }
 body.rd .rd-ff-sw.grn { border-color: var(--grn); }
 body.rd .rd-ff-sw.onp { border-color: var(--onp); }
 body.rd .rd-ff-sw.oth { border-color: var(--oth); }
+body.rd .rd-ff-sw.alp { border-color: var(--alp); }
 body.rd .rd-ff-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
 body.rd .rd-ff-tipsub { margin: -4px 0 3px; }
 body.rd .rd-ff-tipsub .tip-label { font-size: 12px; }
@@ -5400,6 +5417,8 @@ body.rd .rd-ff-el.onp { fill: var(--onp); }
 body.rd .rd-ff-elv.onp { fill: var(--onp); opacity: 0.85; }
 body.rd .rd-ff-el.oth { fill: var(--oth); }
 body.rd .rd-ff-elv.oth { fill: var(--oth); opacity: 0.85; }
+body.rd .rd-ff-el.alp { fill: var(--alp); }
+body.rd .rd-ff-elv.alp { fill: var(--alp); opacity: 0.85; }
 body.rd .rd-ff-tip { pointer-events: auto; white-space: normal; }
 body.rd .tip-hintwrap { white-space: normal; max-width: 230px; }
 body.rd .tip-hintwrap .tip-hint { margin-top: 2px; white-space: normal; }
@@ -13835,28 +13854,161 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "xm": 24313.1786,
       "win": "13 Jan–3 Mar 2026",
       "n": 8484,
-      "wt": true,
-      "coal": 29,
-      "grn": 90,
-      "oth": 58
+      "all": {
+        "coal": 29,
+        "grn": 90,
+        "oth": 58
+      },
+      "inner": {
+        "coal": 40,
+        "grn": 91,
+        "oth": 70
+      },
+      "outer": {
+        "coal": 31,
+        "grn": 91,
+        "oth": 58
+      },
+      "regional": {
+        "coal": 21,
+        "grn": 87,
+        "oth": 53
+      }
     }, {
       "date": "2026-07-11",
       "xm": 24317.5667,
       "win": "27 May–11 Jul 2026",
       "n": 9343,
-      "wt": true,
-      "coal": 33,
-      "grn": 90,
-      "oth": 55
+      "all": {
+        "coal": 33,
+        "grn": 90,
+        "oth": 55
+      },
+      "inner": {
+        "coal": 39,
+        "grn": 91,
+        "oth": 67
+      },
+      "outer": {
+        "coal": 32,
+        "grn": 91,
+        "oth": 55
+      },
+      "regional": {
+        "coal": 29,
+        "grn": 87,
+        "oth": 48
+      }
     }, {
       "date": "2026-09-19",
       "xm": 24319.8387,
       "win": "4 Aug–19 Sep 2026",
       "n": 9740,
-      "wt": true,
-      "coal": 37,
-      "grn": 88,
-      "oth": 60
+      "all": {
+        "coal": 37,
+        "grn": 88,
+        "oth": 60
+      },
+      "inner": {
+        "coal": 48,
+        "grn": 90,
+        "oth": 77
+      },
+      "outer": {
+        "coal": 37,
+        "grn": 87,
+        "oth": 57
+      },
+      "regional": {
+        "coal": 30,
+        "grn": 86,
+        "oth": 53
+      }
+    }],
+    "lnpOn": [{
+      "date": "2026-03-03",
+      "ym": "2026-01",
+      "xm": 24313.1786,
+      "win": "13 Jan–3 Mar 2026",
+      "n": 8484,
+      "url": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
+      "house": "DemosAU (MRP)",
+      "all": {
+        "alp": 68,
+        "grn": 77,
+        "oth": 61
+      },
+      "inner": {
+        "alp": 72,
+        "grn": 82,
+        "oth": 77
+      },
+      "outer": {
+        "alp": 68,
+        "grn": 70,
+        "oth": 58
+      },
+      "regional": {
+        "alp": 64,
+        "grn": 77,
+        "oth": 54
+      }
+    }, {
+      "date": "2026-07-11",
+      "ym": "2026-05",
+      "xm": 24317.5667,
+      "win": "27 May–11 Jul 2026",
+      "n": 9343,
+      "url": "https://demosau.com/news/new-mrp-model-points-to-hung-parliament/",
+      "house": "DemosAU (MRP)",
+      "all": {
+        "alp": 73,
+        "grn": 84,
+        "oth": 61
+      },
+      "inner": {
+        "alp": 76,
+        "grn": 86,
+        "oth": 68
+      },
+      "outer": {
+        "alp": 71,
+        "grn": 83,
+        "oth": 60
+      },
+      "regional": {
+        "alp": 72,
+        "grn": 82,
+        "oth": 58
+      }
+    }, {
+      "date": "2026-09-19",
+      "ym": "2026-08",
+      "xm": 24319.8387,
+      "win": "4 Aug–19 Sep 2026",
+      "n": 9740,
+      "url": "https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/",
+      "house": "DemosAU (MRP)",
+      "all": {
+        "alp": 77,
+        "grn": 87,
+        "oth": 64
+      },
+      "inner": {
+        "alp": 82,
+        "grn": 88,
+        "oth": 78
+      },
+      "outer": {
+        "alp": 76,
+        "grn": 85,
+        "oth": 58
+      },
+      "regional": {
+        "alp": 72,
+        "grn": 87,
+        "oth": 61
+      }
     }]
   };
   const leaderMonths = [{
@@ -127404,9 +127556,15 @@ const FF_COHORTS = {
     name: "Other",
     prose: "other",
     cls: "oth"
+  },
+  alp: {
+    name: "Labor",
+    prose: "Labor",
+    cls: "alp"
   }
 };
 const FF_MRP_HOUSE = "DemosAU (MRP)";
+const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
 function RdForced({
   q,
   waves,
@@ -127417,7 +127575,9 @@ function RdForced({
   extras,
   elec,
   dom,
-  emptyNote
+  emptyNote,
+  anchor,
+  houseWord
 }) {
   const D = window.AUSPOL;
   const [tip, setTip] = useState(null);
@@ -127438,6 +127598,7 @@ function RdForced({
   }, [tip]);
   if (!waves || waves.length < 2) return null;
   const rivalShort = rival === "the Coalition" ? "Coalition" : rival;
+  const anchorShort = anchor === "the Coalition" ? "the Coalition" : anchor;
   const H = phone ? 200 : 236;
   const x0 = phone ? 30 : 36,
     rpad = phone ? 78 : 84,
@@ -127450,6 +127611,7 @@ function RdForced({
   const mSpan = Math.max(1, (dom ? dom[1] : Math.ceil(Math.max(...own))) - m0);
   const Xi = m => x0 + (m - m0) / mSpan * (x1 - x0);
   const Y = v => bot - v / 100 * (bot - top);
+  const isMrp = w => w.house === FF_MRP_HOUSE;
   const groups = [...(elec ? [{
     key: "e",
     kind: "elec",
@@ -127457,10 +127619,10 @@ function RdForced({
     d: elec
   }] : []), ...waves.map(w => ({
     key: "w" + w.date,
-    kind: "wave",
+    kind: isMrp(w) ? "mrp" : "wave",
     xm: w.xm ?? mi(w.ym),
     d: w,
-    house: D.flowForced && D.flowForced.house
+    house: w.house || D.flowForced && D.flowForced.house
   })), ...(extras || []).map(d => ({
     key: "m" + d.date,
     kind: "mrp",
@@ -127478,7 +127640,8 @@ function RdForced({
       ck,
       pts: ws.map(w => [Xi(w.xm ?? mi(w.ym)), Y(w[ck])]),
       first: ws[0],
-      last: ws[ws.length - 1]
+      last: ws[ws.length - 1],
+      mrp: ws.every(isMrp)
     };
   }).filter(s => s.pts.length >= 2);
   const per = (x1 - x0) / mSpan;
@@ -127575,7 +127738,7 @@ function RdForced({
     });
   };
   const gTitle = g => g.kind === "elec" ? "2025 election, " + g.d.win : (g.kind === "mrp" ? "DemosAU MRP" : g.house) + ", " + (g.d.win || rdMonthYear(g.d.ym));
-  const gSub = g => g.kind === "elec" ? "Preferences counted reaching Labor over the Coalition" : "Would pick Labor over " + rival + (g.kind === "mrp" && g.d.wt ? " (all regions: our weighting)" : "");
+  const gSub = g => g.kind === "elec" ? "Preferences counted reaching Labor over the Coalition" : "Would pick " + anchor + " over " + rival + (g.kind === "mrp" && g.d.wt ? " (all regions: our weighting)" : "");
   return React.createElement("figure", {
     className: "rd-ff",
     ref: box,
@@ -127616,7 +127779,7 @@ function RdForced({
       }
       if (tip && tip.g === m.g.key && tip.ck === m.ck && pt !== "mouse") setTip(null);else show(m.g, m.ck, pt === "mouse" ? "mouse" : "touch");
     },
-    "aria-label": `If forced to choose between Labor and ${rival}, the share of each group of voters picking Labor, by fieldwork date: RedBridge/Accent’s latest ${series.map(s => say(s.ck, s.last[s.ck])).join(", ")}.${xnote}${enote}`
+    "aria-label": `If forced to choose between ${anchor} and ${rival}, the share of each group of voters picking ${anchorShort}, by fieldwork date: ${houseWord}’s latest ${series.map(s => say(s.ck, s.last[s.ck])).join(", ")}.${xnote}${enote}`
   }, [0, 25, 50, 75, 100].map(v => React.createElement("path", {
     key: v,
     d: `M${x0} ${Y(v)}H${x1}`,
@@ -127640,7 +127803,7 @@ function RdForced({
     d: `M${Xi(elec.xm)} ${Y(elec[s.ck])}L${s.pts[0][0]} ${s.pts[0][1]}`,
     className: "rd-ff-lead " + FF_COHORTS[s.ck].cls,
     strokeDasharray: RD_ELECTION_LEAD
-  })), series.map(s => React.createElement("path", {
+  })), series.filter(s => !s.mrp).map(s => React.createElement("path", {
     key: s.ck,
     d: monotoneXY(s.pts),
     className: "rd-ff-line " + FF_COHORTS[s.ck].cls
@@ -127681,7 +127844,7 @@ function RdForced({
     };
     return cohorts.filter(ck => g.d[ck] != null).map((ck, ci) => {
       const est = g.d.estCohort === ck;
-      const aria = `${gTitle(g)}: ${FF_COHORTS[ck].name} voters, ${g.kind === "elec" ? "preferences to Labor" : "Labor"} ${g.d[ck]}, ${rivalShort} ${Math.round((100 - g.d[ck]) * 10) / 10}` + (g.kind === "mrp" && g.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "") + (est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : "") + (k ? "; press Enter to open this poll" : "");
+      const aria = `${gTitle(g)}: ${FF_COHORTS[ck].name} voters, ${g.kind === "elec" ? "preferences to " + anchorShort : anchorShort} ${g.d[ck]}, ${rivalShort} ${Math.round((100 - g.d[ck]) * 10) / 10}` + (g.kind === "mrp" && g.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "") + (est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : "") + (k ? "; press Enter to open this poll" : "");
       return React.createElement("circle", {
         key: g.key + ck,
         cx: Xi(g.xm),
@@ -127744,6 +127907,7 @@ function RdFlows() {
     FO = D.flowDriftOn;
   const FF = D.flowForced;
   const [pick, setPick] = useState(null);
+  const [ffReg, setFfReg] = useState("");
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
   if (!FD || !FO || !FD.now || !FO.now) return null;
@@ -127796,18 +127960,45 @@ function RdFlows() {
     label: "Against One Nation",
     rows: flSetRows(FO)
   }];
+  const rekeyMrp = ws => (ws || []).map(w => {
+    if (!ffReg) return {
+      ...w,
+      ...w.all,
+      wt: true
+    };
+    const t = w[ffReg];
+    return t ? {
+      ...w,
+      ...t,
+      wt: undefined
+    } : null;
+  }).filter(Boolean);
+  const demoRows = FF ? rekeyMrp(FF.demosOn) : [];
+  const lnWaves = FF ? rekeyMrp(FF.lnpOn) : [];
   const ffQ = FF ? [{
     q: "on",
     waves: FF.vsOn,
     cohorts: ["grn", "coal", "oth"],
+    anchor: "Labor",
     rival: "One Nation",
+    rowV: "v One Nation",
     fallback: "Greens, Coalition and Other voters, if forced to Labor or One Nation"
   }, {
     q: "co",
     waves: FF.vsCoal,
     cohorts: ["grn", "onp", "oth"],
+    anchor: "Labor",
     rival: "the Coalition",
+    rowV: "v Coalition",
     fallback: "Greens, One Nation and Other voters, if forced to Labor or the Coalition"
+  }, {
+    q: "ln",
+    waves: lnWaves,
+    cohorts: ["alp", "grn", "oth"],
+    anchor: "the Coalition",
+    rival: "One Nation",
+    rowV: "v One Nation",
+    fallback: "Labor, Greens and Other voters, if forced to the Coalition or One Nation"
   }] : null;
   const ff = FF ? ffQ.flatMap(def => def.cohorts.map(ck => {
     const s = def.waves.filter(w => w[ck] != null);
@@ -127818,7 +128009,7 @@ function RdFlows() {
       waves: s,
       fit: withinHouseSlope(s.map(w => ({
         h: def.q + ck,
-        t: D.mx(w.ym),
+        t: w.xm / 12,
         w: 1,
         y: w[ck]
       })))
@@ -127848,17 +128039,20 @@ function RdFlows() {
         la = r.waves[r.waves.length - 1][r.ck];
       return " — " + FF_COHORTS[r.ck].prose + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + rdMonthYear(r.waves[0].ym);
     })();
-    return list + " prefer Labor over " + def.rival + tail;
+    return list + " prefer " + def.anchor + " over " + def.rival + tail;
   };
   const ffSet = ff ? {
     key: "pressed",
-    label: "Pressed-choice Labor share",
-    rows: ff.map(r => ({
-      key: r.key,
-      name: FF_COHORTS[r.ck].name + " voters, v " + (r.q === "on" ? "One Nation" : "Coalition"),
-      sig: r.sig,
-      cells: [r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck], r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? r.sig ? "Yes" : "No" : "–"]
-    }))
+    label: "Pressed-choice share",
+    rows: ff.map(r => {
+      const defIn = ffQ.find(d => d.q === r.q);
+      return {
+        key: r.key,
+        name: FF_COHORTS[r.ck].name + " voters, " + defIn.rowV,
+        sig: r.sig,
+        cells: [r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck], r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? r.sig ? "Yes" : "No" : "–"]
+      };
+    })
   } : null;
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return React.createElement("section", {
@@ -127942,21 +128136,31 @@ function RdFlows() {
   }), pick, ", month by month")), React.createElement("p", {
     className: "rd-note rd-fl-read"
   }, "Implied is the figure a poll\u2019s primary votes give on the ", rdElecYear, " election\u2019s preference flows. Zero is each pollster\u2019s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster\u2019s first head-to-heads."), FF && (() => {
-    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || [])].map(d => d.xm).concat(FF.elec2025 ? [FF.elec2025.xm] : []).filter(v => v != null);
+    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || [])].map(d => d.xm).concat(lnWaves.map(w => w.xm)).concat(FF.elec2025 ? [FF.elec2025.xm] : []).filter(v => v != null);
     const dom = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs))];
     return React.createElement("div", {
       className: "rd-ff"
-    }, React.createElement("h3", {
+    }, React.createElement("div", {
+      className: "rd-ff-head"
+    }, React.createElement("div", null, React.createElement("h3", {
       className: "rd-sub rd-ff-t"
     }, "What voters say they\u2019d do with their preferences"), React.createElement("p", {
       className: "rd-subdek rd-ff-d"
-    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines), and DemosAU\u2019s MRP reports carry the same answers each quarter (the diamonds). The rings mark what preferences actually did at the 2025 election. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
+    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines). DemosAU\u2019s MRP reports carry the same answers each quarter (the diamonds) \u2014 printed by region, so they switch with the menu (\u201CAll voters\u201D is our weighting of the three regions). DemosAU\u2019s MRPs press the Coalition against One Nation too \u2014 the third chart below. The rings mark what preferences actually did at the 2025 election. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
       className: "rd-link rd-link-in",
       href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
     }, "predicted the next election better", React.createElement("span", {
       className: "rd-apd-ext",
       "aria-hidden": "true"
-    }, "\u2197")), " than the flows voters report."), React.createElement("div", {
+    }, "\u2197")), " than the flows voters report.")), React.createElement("select", {
+      className: "rd-pv-sel rd-fl-sel",
+      "aria-label": "DemosAU MRP region",
+      value: ffReg,
+      onChange: e => setFfReg(e.target.value)
+    }, FF_REGIONS.map(([k, name]) => React.createElement("option", {
+      key: k || "all",
+      value: k
+    }, name)))), React.createElement("div", {
       className: "rd-fl-two rd-ff-two"
     }, React.createElement("div", {
       className: "rd-fl-one"
@@ -127970,7 +128174,9 @@ function RdFlows() {
       q: "co",
       waves: FF.vsCoal,
       cohorts: ["grn", "onp", "oth"],
+      anchor: "Labor",
       rival: "the Coalition",
+      houseWord: "RedBridge/Accent",
       W: cw,
       phone: phone,
       extras: FF.demos,
@@ -127988,13 +128194,34 @@ function RdFlows() {
       q: "on",
       waves: FF.vsOn,
       cohorts: ["grn", "coal", "oth"],
+      anchor: "Labor",
       rival: "One Nation",
+      houseWord: "RedBridge/Accent",
       W: cw,
       phone: phone,
-      extras: FF.demosOn,
+      extras: demoRows,
       dom: dom,
       emptyNote: ["No election count of this choice", "No election count", "No count"]
-    }))), React.createElement(RdKey, {
+    }))), lnWaves.length > 0 && React.createElement("div", {
+      className: "rd-fl-one rd-ff-ln"
+    }, React.createElement("span", {
+      className: "rd-fl-name"
+    }, "Coalition v One Nation"), React.createElement("div", {
+      className: "rd-fl-ct"
+    }, React.createElement("h4", {
+      className: "rd-ap-ct"
+    }, ffTitle("ln"))), React.createElement(RdForced, {
+      q: "ln",
+      waves: lnWaves,
+      cohorts: ["alp", "grn", "oth"],
+      anchor: "the Coalition",
+      rival: "One Nation",
+      houseWord: "DemosAU (MRP)",
+      W: cw,
+      phone: phone,
+      dom: dom,
+      emptyNote: ["No election count of this choice", "No election count", "No count"]
+    })), React.createElement(RdKey, {
       className: "rd-ckey rd-ff-key",
       items: []
     }, React.createElement("span", {
@@ -128002,7 +128229,7 @@ function RdFlows() {
     }, React.createElement("span", {
       className: "rd-ff-keyln",
       "aria-hidden": "true"
-    }, React.createElement("i", null)), "RedBridge/Accent, monthly"), (FF.demos || FF.demosOn) && React.createElement("span", {
+    }, React.createElement("i", null)), "RedBridge/Accent, monthly"), (FF.demos || FF.demosOn || lnWaves.length > 0) && React.createElement("span", {
       className: "rd-key-item"
     }, React.createElement("span", {
       className: "rd-ff-keydm",
@@ -128017,13 +128244,13 @@ function RdFlows() {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
-    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the note under the charts says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s published Labor share on the pair above, Holm’s correction across the six — a Yes licenses that cohort’s tail in its chart’s title." : "")
+    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the note under the charts says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s share of the pressed choice on the charts above — Labor’s on the pair, the Coalition’s on the third — Holm’s correction across the rows: a Yes licenses that cohort’s tail in its chart’s title." : "")
   }), React.createElement(RdFoot, {
     how: {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its Labor v One Nation diamonds are our weighting of its printed regional tables by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
