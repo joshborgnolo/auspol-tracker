@@ -2411,10 +2411,19 @@ body.rd .rd-ap-pinbar {
   opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s linear .18s;
 }
 body.rd .rd-ap-pinbar.on { opacity: 1; visibility: visible; transition: opacity .18s ease; }
+/* Docked, the site bar, this bar and the headings read as ONE stack, so the
+   stack casts one shadow, at its foot (the headwrap's). The site bar's own
+   lift-off shadow fell across the top of this bar, a grey band that read as
+   a gap between the two (user report 2026-10-13). The seal runs this bar's
+   backdrop 8px up under the site bar (z 41 over the headwrap's 6), so a
+   rounded --rd-pin or Safari's fractional sticky offsets mid-scroll can
+   never open a sliver through which the rows show. */
+body.rd:has(.rd-ap-pinbar.on) .tabs.pinned::after { opacity: 0; }
 body.rd .rd-ap-pinbar::before, body.rd .rd-ap-headwrap.pinned::before {
   content: ""; position: absolute; top: 0; bottom: 0; left: calc(-50vw + 50%); right: calc(-50vw + 50%);
   background: var(--bg); z-index: -1;
 }
+body.rd .rd-ap-pinbar::before { top: -8px; }   /* the seal, above */
 /* The section links take whatever the figures' tabs, search and count leave,
    and scroll under a fade when that is too little. Sized to their words, they
    ran on under the tabs at every width from a tablet's 761px to 1024px. The
@@ -2436,8 +2445,11 @@ body.rd .rd-ap-pinl.on, body.rd .rd-ap-pint[aria-pressed="true"] { color: var(--
 body.rd .rd-ap-pinl:hover, body.rd .rd-ap-pint:hover { color: var(--ink); }
 body.rd .rd-ap-pinl:focus-visible, body.rd .rd-ap-pint:focus-visible, body.rd .rd-ap-pins:focus-visible, body.rd .rd-ap-pinf:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 body.rd .rd-ap-pintabs { display: flex; align-items: stretch; gap: 16px; }
-body.rd .rd-ap-pint { font-size: 13px; padding: 0 2px; }
-body.rd .rd-ap-pinl { font-size: 12px; }
+/* the section links and the figure tabs share the row and its active
+   style, so they share a size too: at 12px beside 13px the links read as a
+   slip, not a rank (user 2026-10-13). Their roles part by placement */
+body.rd .rd-ap-pint, body.rd .rd-ap-pinl { font-size: 13px; }
+body.rd .rd-ap-pint { padding: 0 2px; }
 body.rd .rd-ap-pinsep { align-self: center; width: 1px; height: 18px; background: var(--line); }
 body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
 body.rd .rd-ap-pins:hover { background: var(--surface-2); color: var(--ink); }
@@ -2511,6 +2523,12 @@ body.rd .rd-ap-th:focus-visible { outline: 2px solid var(--accent); outline-offs
    at the inherited 16px it hung lower and pushed the name 1px up */
 body.rd .rd-ap-arr { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 body.rd .rd-ap-th.on .rd-ap-arr { color: var(--ink); }
+/* the FIELDWORK/PUB split head: two sortable halves of the one grid cell
+   (2026-10-13). The halves ride inline like a phrase; the slash is quiet
+   chrome, never a button itself. The wrapper's 16px line keeps the cell's
+   baseline with every sibling label's */
+body.rd .rd-ap-hfp { line-height: 16px; white-space: nowrap; }
+body.rd .rd-ap-hfsep { font-size: 10px; line-height: 16px; color: var(--ink-faint); }
 body.rd .rd-ap-hpic { position: relative; align-self: stretch; display: block; min-height: 38px; }
 body.rd .rd-ap-scale { position: absolute; inset: 0; }
 body.rd .rd-ap-in { position: absolute; top: 0; bottom: 0; left: 14px; right: 14px; }
