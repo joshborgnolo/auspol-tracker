@@ -10,7 +10,7 @@ const SPLITS = [
   { id: "education", pairs: [["University","School"],["University","Year 12 or less"],["University","No tertiary"],["University","High School"]], dims: ["education"] },
   { id: "place",     pairs: [["Inner metro","Rural"],["Inner metro","Regional or rural"],["Capital Cities","Regional/Rural Areas"]], dims: ["place","location","state","region","citycountry"] },
   { id: "home",      pairs: [["Renting","Own outright"],["Renting and other","Own outright"]], dims: ["home","housing","tenure","rent"] },
-  { id: "income",    pairs: [["$150k+","Under $50k"],["$125k+","Under $45k"],["$100k or more","Under $100k"]], dims: ["income","salary","wages"] },
+  { id: "income",    pairs: [["$150k+","Under $50k"],["$125k+","Under $45k"],["$100k or more","Under $100k"],["$3,000+ a week","Under $1,000 a week"]], dims: ["income","salary","wages"] },
   { id: "country",   pairs: [["Vietnam","Australia"],["Mainland China","Australia"],["South Africa","Australia"],["United Kingdom","Australia"]], dims: ["country","birth","born"] },
 ];
 const norm = (s) => s.toLowerCase().replace(/[–—−]/g, "-").replace(/\s+/g, " ").trim();

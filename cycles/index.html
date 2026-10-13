@@ -91079,6 +91079,25 @@ function TrendChart(props) {
   };
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
+  const guideOn = hoverX != null && !dot && !evt;
+  const guideWas = useRef(false);
+  const guideRest = useRef(null);
+  const markRest = useRef(new Map());
+  const liveMark = new Map();
+  if (hi != null && !dot && !evt && spinePts[hi]) series.forEach(s => {
+    if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return;
+    const p = ptAtXLine(s, spinePts[hi].x);
+    if (p) liveMark.set(s.id, [sx(p.x), sy(p.y)]);
+  });
+  React.useLayoutEffect(() => {
+    if (guideOn) {
+      guideRest.current = hoverX;
+      markRest.current = liveMark;
+    }
+    guideWas.current = guideOn;
+  });
+  const motionless = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const entrySnap = guideOn && !guideWas.current && !motionless;
   const yLabelledOf = ticks => {
     if (!cw || ticks.length < 2) return new Set(ticks);
     const NEED = 15;
@@ -91888,8 +91907,11 @@ function TrendChart(props) {
     y2: H - pad.b,
     className: "guide",
     style: {
-      transform: `translateX(${(hoverX != null ? hoverX : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
-      opacity: hoverX != null && !dot && !evt ? 0.7 : 0
+      transform: `translateX(${(guideOn ? hoverX : guideRest.current != null ? guideRest.current : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
+      opacity: guideOn ? 0.7 : 0,
+      ...(entrySnap ? {
+        transition: "opacity .18s ease"
+      } : null)
     }
   }), React.createElement("g", {
     clipPath: `url(#${plotId})`
@@ -91921,11 +91943,11 @@ function TrendChart(props) {
     strokeLinecap: "round"
   }))), series.map(s => {
     if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return null;
-    const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
-    const p = spx != null ? ptAtXLine(s, spx) : null;
-    const last = visEnd(s);
-    const at = p || last;
-    if (!at) return null;
+    const live = liveMark.get(s.id);
+    const rest = markRest.current.get(s.id);
+    const last = live || rest ? null : visEnd(s);
+    if (!live && !rest && !last) return null;
+    const at = live || rest || [sx(last.x), sy(last.y)];
     return React.createElement("circle", {
       key: "h" + s.id,
       cx: 0,
@@ -91934,8 +91956,11 @@ function TrendChart(props) {
       className: "hover-marker",
       "data-series": s.id,
       style: {
-        transform: `translate(${sx(at.x).toFixed(2)}px, ${sy(at.y).toFixed(2)}px)`,
-        opacity: p ? 1 : 0
+        transform: `translate(${at[0].toFixed(2)}px, ${at[1].toFixed(2)}px)`,
+        opacity: live ? 1 : 0,
+        ...(entrySnap && live ? {
+          transition: "opacity .14s ease"
+        } : null)
       },
       fill: "var(--chart-bg)",
       stroke: s.color,
@@ -92210,6 +92235,7 @@ function TrendChart(props) {
       style: style
     }, n.text);
   })), tip && React.createElement("div", {
+    key: evt ? "evt" : dot ? "dot" : "guide",
     ref: tipRef,
     className: "tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide") + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : ""),
     style: {
@@ -100563,14 +100589,14 @@ const DEM_SPLITS = [{
   lo: "Lower income",
   hi: "Higher income",
   scope: "With an income breakdown",
-  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
+  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"], ["$3,000+ a week", "Under $1,000 a week", "$3k+ v <$1k a week"]]
 }, {
   id: "country",
   label: "Other cuts",
   lo: "Australia-born",
   hi: "Overseas-born",
   scope: "With a one-off breakdown",
-  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"], ["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"], ["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]],
   fams: [{
     id: "birth",
     lab: "Birth country",
@@ -100579,8 +100605,8 @@ const DEM_SPLITS = [{
   }, {
     id: "religion",
     lab: "Religion",
-    sub: "Newspoll's pooled quarterly pulls",
-    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]]
+    sub: "Newspoll's pooled quarterly pulls and RedBridge/Accent's one-off cut",
+    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"]]
   }, {
     id: "working",
     lab: "Working status",
@@ -100601,6 +100627,16 @@ const DEM_SPLITS = [{
     lab: "Tasmanian electorates",
     sub: "EMRS's one-off seat cut from the February 2026 federal wave",
     pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
+  }, {
+    id: "occupation",
+    lab: "Occupation",
+    sub: "RedBridge/Accent's one-off cut from the October 2025 report",
+    pairs: [["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"]]
+  }, {
+    id: "stress",
+    lab: "Financial stress",
+    sub: "RedBridge/Accent's one-off cut from the October 2025 report",
+    pairs: [["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]]
   }]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
