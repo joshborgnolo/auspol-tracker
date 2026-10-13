@@ -10,12 +10,14 @@
        RedBridge dots, just differently shaped" — so a cohort's line runs
        through both houses' marks in date order; the probe verifies every
        line path threads its triangles as well as its dots);
-     - the 2025 election's rings ride ONE national carrier, elec2025r.all,
-       typed from the estimate's own FLOW constants (the AEC's TPP flow
-       cut — every formal ballot redistributed ALP v Coalition; the AEC
-       counts no per-region TPP flows, so no regional election rings
-       exist); each ring is a one-cohort open ring at 3 May 2025 joined to
-       the first wave by its dotted lead-in;
+     - the 2025 election's rings ride elec2025r carriers: the NATIONAL
+       all, typed from the estimate's own FLOW constants (the AEC's TPP
+       flow cut — every formal ballot redistributed ALP v Coalition),
+       plus the three seat-classification replays (inner/outer/regional —
+       this site's per-seat DoP replay of the classic seats,
+       .build/aec-2025-region-tpp-flows.mjs; scoped and flagged der on
+       every consumer). Each ring is a one-cohort open ring at 3 May 2025;
+       on All voters it joins the first wave by its dotted lead-in;
      - the 2026 state/by-election counts ride as CROSSES (.rd-ff-x) on the
        Labor-v-One-Nation chart only, on their own election days, joined to
        NO line; on a named region they vanish (national counts); SA 2026
@@ -23,15 +25,15 @@
        Farrer's two crosses are GONE (user 2026-10-13: its counts measured
        independent national contests, not One Nation voters);
      - the region menu (All voters / Inner metro / Outer metro / Regional)
-       rekeys the DemosAU figures on the One Nation pair, and DROPS
-       RedBridge's national dots there (waves=[]) — a national wave can't
-       speak to a named region. The v-Coalition chart the menu leaves
-       ALONE: every series it carries (RedBridge's waves, DemosAU's one
-       national MRP table, the national-count rings) is national-only, so
-       on a named region it draws its national marks unchanged and its
-       key item stands (user 2026-10-13, reversing the same-day unmount:
-       "no bring back regional view for alp v lnp chart - it's fine with
-       just one nation there");
+       rekeys the DemosAU regional figures, and DROPS every national mark —
+       RedBridge/Accent's waves AND DemosAU's one national MRP table — from
+       EVERY chart (a national wave can't speak to a named region; user
+       2026-10-13, the day's third call on it: "in the regions view in the
+       Labor-v-Coalition preference flows chart, there should be no
+       RedBridge/Accent polls… It's just DemosAU, ALP, One Nation"). On a
+       named region the v-Coalition chart draws its three election rings
+       alone, rekeyed to that class's seat replay; All voters keeps its
+       national waves, triangles, rings and lead-ins;
      - the third chart's title paints Coalition in coalition blue and One
        Nation orange (probe asserts the two spans carry the party text-vars
        via getComputedStyle, not a hard-coded colour);
@@ -84,7 +86,7 @@ const rekeyMrp = (ws, reg) => (ws || []).map((w) => {
 const wavesOf = (FF, q, reg) => (q === "ln" ? rekeyMrp(FF.lnpOn, reg) : reg ? [] : FF[CHARTS[FI[q]].vsKey]);
 const extOf = (FF, q, reg) => (q === "co" ? (reg ? [] : FF.demos || []) : q === "on" ? rekeyMrp(FF.demosOn, reg) : []);
 const bysOf = (FF, q, reg) => (q === "on" && !reg ? FF.bys || [] : []);
-const elecOf = (FF, q, reg) => (q === "co" && !reg && FF.elec2025r ? [FF.elec2025r.all] : []);
+const elecOf = (FF, q, reg) => (q === "co" && FF.elec2025r ? [FF.elec2025r[reg] || FF.elec2025r.all] : []);
 const isMrp = (w) => w.house === FF_MRP_HOUSE;
 
 /* the pressed-choice battery, recomputed independently of the page */
@@ -328,10 +330,18 @@ const FF = await (async () => {
 })();
 check(!!FF && FF.house === "RedBridge/Accent" && Array.isArray(FF.vsOn) && Array.isArray(FF.lnpOn),
   `payload: D.flowForced carries the pair, the lnpOn carriers, and its house`);
-check(!!FF && FF.elec2025r && Object.keys(FF.elec2025r).join(",") === "all" && FF.elec2025r.all.grn != null,
-  `payload: elec2025r carries ONLY the national carrier, all (${FF && FF.elec2025r ? Object.keys(FF.elec2025r).join("/") : "none"})`);
+check(!!FF && FF.elec2025r && Object.keys(FF.elec2025r).sort().join(",") === "all,inner,outer,regional" && FF.elec2025r.all.grn != null,
+  `payload: elec2025r carries the national carrier plus the three seat-classification replays (${FF && FF.elec2025r ? Object.keys(FF.elec2025r).join("/") : "none"})`);
 check(!!FF && FF.elec2025r && Math.abs(FF.elec2025r.all.grn - 88.19) < 1e-9 && Math.abs(FF.elec2025r.all.onp - 25.5) < 1e-9 && Math.abs(FF.elec2025r.all.oth - 54.55) < 1e-9,
   `payload: the national carrier rides the AEC's TPP flow cut — GRN 88.19 / ON 25.50 / IND+OTH 54.55 to Labor (${FF && FF.elec2025r ? [FF.elec2025r.all.grn, FF.elec2025r.all.onp, FF.elec2025r.all.oth].join("/") : "none"})`);
+{
+  const REPLAY = { inner: [86.41, 33.8, 55.68], outer: [79.32, 35.34, 52.46], regional: [76.9, 31.46, 49.01] };
+  const ok = FF && Object.entries(REPLAY).every(([rk, want]) => {
+    const r = FF.elec2025r[rk];
+    return r && r.der === true && r.scopeTtl && r.scopeNote && [r.grn, r.onp, r.oth].every((v, i) => Math.abs(v - want[i]) < 1e-9);
+  });
+  check(!!ok, `payload: the region replacements ride the replay script's constants, flagged der with scope prose (${FF ? Object.entries(FF.elec2025r).filter(([k]) => k !== "all").map(([k, r]) => k + " " + r.grn + "/" + r.onp + "/" + r.oth).join("; ") : "none"})`);
+}
 check(!!FF && Array.isArray(FF.bys) && FF.bys.length === 2,
   `payload: two 2026-count crosses (${FF && (FF.bys || []).length})`);
 check(!!FF && (FF.bys || []).every((b) => !/^farr/.test(b.key)),
@@ -625,13 +635,14 @@ check(d.tsigHeads && d.tsigHeads[0] === "Series" && d.tsigHeads.length === 5,
    always the first thing under the forced-choice head, above the three
    charts, never a dropdown): recomputed from the payload + the site's
    flowTables — cohorts down the side, sources across: the election's
-   NATIONAL TPP count (the election column never rekeys — the AEC counts
-   no per-region TPP flows, so a named region keeps the national figures
-   under a "2025, national" label), the site's national constants as the
-   yardstick on every view, then each house's latest wave (RedBridge/Accent
-   and DemosAU's national MRP are national-only columns, DemosAU's
-   regional tables rekey). Figures print through the renderer's ftFig
-   precision rule, replicated here so float edges round identically */
+   TPP count (national on All voters; on a named region the class's seat
+   replay under a "2025, <class> seats" label — the AEC counts the cut
+   nationally only, so a regional column is this site's replay, flagged
+   as such), the site's national constants as the yardstick on every
+   view, then each house's latest wave (RedBridge/Accent and DemosAU's
+   national MRP are national-only columns, DemosAU's regional tables
+   rekey). Figures print through the renderer's ftFig precision rule,
+   replicated here so float edges round identically */
 const ftFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
 const SMON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const smonY = (ym) => { const [y, m] = ym.split("-").map(Number); return SMON[m - 1] + " " + y; };
@@ -644,10 +655,10 @@ const ftLt = {
 const mrpSub = (w) => "MRP, " + w.win.replace(/^.*?([A-Z][a-z]{2} \d{4})$/, "$1");
 /* reg: "" national view, else a region key + its menu name */
 const wantFlows = (reg, regName) => {
-  const elecH = "Election" + (reg ? "2025, national" : "2025 count");
+  const elecH = "Election" + (reg ? "2025, " + regName + " seats" : "2025 count");
   const siteH = "This site" + (reg ? "national" : "assumes");
   const mrp = (w) => (reg ? w[reg] : w.all);
-  const el = FF.elec2025r.all;
+  const el = (reg && FF.elec2025r[reg]) || FF.elec2025r.all;
   const stCo = FT && { grn: FT.lnp.grn * 100, onp: FT.lnp.onp * 100, oth: FT.lnp.oth * 100 };
   const stOn = FT && { coal: FT.onp.lnp * 100, grn: FT.onp.grn * 100, oth: FT.onp.oth * 100 };
   const stOnB = FT && { coal: FT.onBand.lnp * 100, grn: FT.onBand.grn * 100, oth: FT.onBand.oth * 100 };
@@ -693,11 +704,11 @@ const checkFlows = (g, reg, regName, tag) => {
     check(JSON.stringify(tb.rows) === JSON.stringify(wt.rows),
       `flows table ${tag} [${wt.caption.split("Share")[0]}]: cohort figures (${JSON.stringify(tb.rows.map((r) => r.cells))})`);
   });
-  /* the election column's figures never move, whatever the menu says —
-     the whole contract of the national TPP carrier */
-  const el = FF.elec2025r.all, elCells = [ftFig(el.grn, 1), ftFig(el.onp, 1), ftFig(el.oth, 1)];
+  /* the election column rekeys with the rings: the national TPP count on
+     All voters, the class's seat replay on a named region */
+  const el = (reg && FF.elec2025r[reg]) || FF.elec2025r.all, elCells = [ftFig(el.grn, 1), ftFig(el.onp, 1), ftFig(el.oth, 1)];
   check(!!g.ftTables && g.ftTables[0] && JSON.stringify(g.ftTables[0].rows.map((r) => r.cells[0])) === JSON.stringify(elCells),
-    `flows table ${tag}: the Election column stands at the national TPP count (${JSON.stringify(elCells)})`);
+    `flows table ${tag}: the Election column rides ${reg ? "the class's replay" : "the national TPP count"} (${JSON.stringify(elCells)})`);
 };
 {
   /* the un-folded contract (user 2026-10-13): the tables are the FIRST
@@ -710,14 +721,15 @@ const checkFlows = (g, reg, regName, tag) => {
     && JSON.stringify(d.dets) === JSON.stringify(["Trend-significance table"]),
     `flows table: no <details> carries it (folds left in the section: ${d.dets.join(", ") || "none"})`);
   checkFlows(d, "", null, "national");
-  check(!!d.ftNote && /no regional count exists/.test(d.ftNote) && /This site/.test(d.ftNote) && /2026 state and by-election counts stay on the charts/.test(d.ftNote),
-    "flows table: the note records the national-only election count, the this-site yardstick and the chart-only 2026 counts");
+  check(!!d.ftNote && /which the commission counts nationally/.test(d.ftNote) && /This site/.test(d.ftNote) && /2026 state and by-election counts stay on the charts/.test(d.ftNote),
+    "flows table: the note records the national election count, the this-site yardstick and the chart-only 2026 counts");
 }
 const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
 check(viewH === 236, `desktop: plot height 236 (${viewH})`);
 check(d.sw <= d.iw + 1, `desktop: no horizontal overflow (sw ${d.sw} vs iw ${d.iw})`);
 
-// ---- the region select: rekeys DemosAU, drops RedBridge on v-ON, leaves the v-Co chart alone --
+// ---- the region select: rekeys DemosAU, drops RedBridge from every chart,
+//      drops the v-Co chart's national marks too, and rekeys the rings ----
 const SWEEP = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
 const setReg = async (val) => {
   await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', val);
@@ -733,25 +745,41 @@ for (const [val, regName] of SWEEP) {
   const dr2 = await setReg(val);
   const bot2 = 236 - 34;
   check(dr2.sel && dr2.sel.value === val, `region ${regName}: the select reads ${val}`);
-  /* user 2026-10-13, "no bring back regional view for alp v lnp chart -
-     it's fine with just one nation there": every series the Labor-v-
-     Coalition chart carries is national-only, so the named region
-     leaves it ALONE — all three figures stand, the Coalition chart
-     drawing its national marks unchanged; the menu rekeys the One
-     Nation pair only */
+  /* user 2026-10-13, the day's third call: "in the regions view in the
+     Labor-v-Coalition preference flows chart, there should be no
+     RedBridge/Accent polls… It's just DemosAU, ALP, One Nation" — every
+     national mark (dots AND triangles) drops from every chart on a named
+     region; the Coalition chart stands on its three election rings alone,
+     rekeyed to the seat-classification replay */
   check(dr2.nFig === 3 && JSON.stringify(dr2.figs.map((f) => f.q)) === '["co","on","ln"]',
-    `region ${regName}: the Coalition chart stands — the menu rekeys the One Nation pair only (${dr2.figs.map((f) => f.q).join(",") || "none"})`);
-  check(dr2.emptyCell == null, `region ${regName}: no national-only stand-in paragraph (the chart draws instead)`);
+    `region ${regName}: all three figures stand — every national mark drops, the region's rings and DemosAU cells carry (${dr2.figs.map((f) => f.q).join(",") || "none"})`);
+  check(dr2.emptyCell == null, `region ${regName}: no national-only stand-in paragraph (the chart draws its rings)`);
   const byQ = Object.fromEntries(dr2.figs.map((f) => [f.q, f]));
   {
-    /* the Coalition chart is the national one, bit for bit — dots,
-       triangles and rings exactly the All-voters view's */
-    const a = d.figs[FI.co], b = dr2.figs[FI.co];
-    check(JSON.stringify(a.dots) === JSON.stringify(b.dots) &&
-      JSON.stringify(a.tris) === JSON.stringify(b.tris) &&
-      JSON.stringify(a.rings) === JSON.stringify(b.rings) &&
-      a.nVa === b.nVa && a.nTr === b.nTr && a.nX === b.nX,
-      `region ${regName} v-Coalition: the national chart stands unchanged — every dot, triangle and ring of the All-voters view`);
+    /* v-Coalition on a named region: NO dots, NO triangles, NO lines, NO
+       lead-ins — the three election rings alone, at the class replay's
+       own values */
+    const a = d.figs[FI.co], f = byQ.co, cam = CHARTS[FI.co];
+    const e = FF.elec2025r[val] || FF.elec2025r.all, botR = 236 - 34;
+    check(Object.values(f.dots).every((arr) => arr.length === 0) && f.nTr === 0 && f.nX === 0,
+      `region ${regName} v-Coalition: no RedBridge dots and no DemosAU triangles (dots ${Object.entries(f.dots).map(([k, v]) => k + ":" + v.length).join(",")}, tris ${f.nTr})`);
+    check(f.lines.length === 0 && f.leads.length === 0,
+      `region ${regName} v-Coalition: nothing left to draw a line or a lead-in through`);
+    check(f.gls === 5, `region ${regName} v-Coalition: five gridlines stand`);
+    check(f.erings.length === 3 && cam.cohorts.every((ck) => f.erings.some((g) => g.cls === CLS[ck])),
+      `region ${regName} v-Coalition: the three election rings stand alone on the chart`);
+    const tkR = axisMap(f.ticks);
+    const nat = FF.elec2025r.all;
+    check(cam.cohorts.every((ck) => {
+      const ring = f.erings.find((g) => g.cls === CLS[ck]);
+      return ring && Math.abs(ring.x - tkR.x(e.xm)) < 1.5 && Math.abs(100 * (botR - ring.y) / (botR - 16) - e[ck]) <= 0.06;
+    }), `region ${regName} v-Coalition: the rings vmap the class replay's figures ${e.grn}/${e.onp}/${e.oth} (not the national ${nat.grn}/${nat.onp}/${nat.oth})`);
+    check(cam.cohorts.some((ck) => Math.abs(f.erings.find((g) => g.cls === CLS[ck]).y - a.erings.find((g) => g.cls === CLS[ck]).y) > 4),
+      `region ${regName} v-Coalition: the rings visibly MOVE from the All-voters view's — the rekey shows`);
+    check(f.aria.includes(e.scopeNote) && f.aria.includes("Greens " + e.grn) && f.aria.includes("One Nation " + e.onp) && f.aria.includes("Other " + e.oth),
+      `region ${regName} v-Coalition: the spoken note scopes the replay and names its figures`);
+    check(f.elecArias.length === 3 && f.elecArias.every((s) => s.startsWith("2025 election, " + e.scopeTtl)),
+      `region ${regName} v-Coalition: the ring arias title the class's own count ("2025 election, ${e.scopeTtl}")`);
   }
   /* v-ON: NO RedBridge dots at all — the MRP's regional triangles alone */
   {
@@ -788,14 +816,15 @@ for (const [val, regName] of SWEEP) {
     check(f.aria.includes("all-regions weighting") === false, `region ${regName} Coalition-v-ON: no our-weighting note on printed cells`);
   }
   check(JSON.stringify(dr2.keyItems) === JSON.stringify(d.keyItems),
-    `region ${regName}: the key stands whole — the rings ride the national count on every view, so "2025 election, as counted" stays (${JSON.stringify(dr2.keyItems)})`);
+    `region ${regName}: the key stands whole — "2025 election, as counted" stays (${JSON.stringify(dr2.keyItems)})`);
   /* the flows table FOLLOWS the menu on a named region — RedBridge's
      column drops with its dots, DemosAU's regional cells print as the
-     report does — while the Election column never moves (no regional
-     TPP count exists) and This site stays the national yardstick */
+     report does, and the Election column rekeys to the class's seat
+     replay — while This site stays the national yardstick */
   checkFlows(dr2, val, regName, regName);
-  check(!!dr2.ftNote && /it stands unchanged on a regional view/.test(dr2.ftNote) && /the national one in every region/.test(dr2.ftNote),
-    `region ${regName} flows table: the note says the election column and this-site yardstick stay national on a regional view`);
+  const ofPhrase = { "Inner metro": "inner metro", "Outer metro": "outer metro", "Regional": "regional or rural" }[regName];
+  check(!!dr2.ftNote && dr2.ftNote.includes("on this view replayed for the seats classed " + ofPhrase) && /our replay, not its own/.test(dr2.ftNote) && /the national one in every region/.test(dr2.ftNote),
+    `region ${regName} flows table: the note says the election column replays the class's seats while the this-site yardstick stays national`);
   /* the pressed battery across all nine rows follows the region's cells */
   const fExp = expectedForced(FF, val);
   check(dr2.pressed && JSON.stringify(dr2.pressed.map((r) => r.cells)) === JSON.stringify(fExp.rows.map((r) => r.cells)),
