@@ -1,0 +1,184 @@
+                                                                                          Suite 6.01, Level 6,
+                                                                      59 Goulburn Street, Sydney, NSW 2000
+                                                                                            +61 2 9406 5800
+                                                                                              au.yougov.com
+
+Publication date: 6th October 2026
+
+
+ Short Methodology Statement
+
+ Research company                    YouGov Galaxy Pty Ltd
+
+ Client commissioning the            News24
+ research
+
+ Fieldwork dates                     29th September – 6th October 2026
+
+ Mode of data collection             Online recruited from research panel (100%)
+
+ Target population                   Australians eligible to vote
+
+ Sample size                         1505
+
+ Australian Polling Council          Yes
+ compliant
+
+ URL of Long Methodology             https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?      Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after         1024
+ weighting applied
+
+ Margin of error associated with     ±3.063
+ effective sample size
+
+ Quotas and weighting                Age, Gender, Education, AEC region, household income, 2025
+                                     Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used               Rim weighting.
+
+ Full question text, responses       Below for published questions
+ categories and randomisation
+
+ Source of online sample             Selected from previously recruited online panels of research
+                                     participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention     After demographics
+ questions in questionnaire?
+
+ How were undecided voters           Voters were given an option to select “Don’t know” and were
+ handled?                            excluded from final figures
+
+ 2PP calculation method              2pp Labor v ex Coalition 2025 Federal election flows
+                                     2pp Labor v One Nation Survey respondent ordering of
+                                     preferences.
+
+
+
+
+                                                            YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Angus Taylor is        Ask eligible
+                          doing his job as Leader of the Opposition?                            voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Angus Taylor
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+A10_A11        Which of the following do you think would make the best Prime         Ask eligible
+               Minister?                                                             voters
+
+               Please select one option only
+               Single select, reverse
+          1.   Anthony Albanese
+          2.   Pauline Hanson
+
+Q1             Thinking about the national disability insurance scheme, and it's Ask eligible
+               cost to the budget, do you think...                               voters
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   It’s affordable and is money well spent
+          2.   It’s a lot of money but it is an important scheme
+          3.   It’s a lot of money and we need to find some savings
+          4.   It’s a lot of money and we need to find major savings
+
+Q2             Which best describes how secure you feel Australia is from           Ask eligible
+               external threats?                                                    voters
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   Australia is secure from realistic external threats
+          2.   Australia is fairly secure now, but I am concerned we may not be
+               in the future
+          3.   Australia is not secure, and we need to urgently do more to
+               protect ourselves
+          4.   Don’t know                                                       Fixed
+
+Q3             The RBA has increased interest rates.                                Ask eligible
+                                                                                    voters
+               Treasurer Jim Chalmers has said that the interest rate rise is
+               primarily the result of conflict in the Middle East.
+
+               Do you agree or disagree?
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   Agree
+          2.   Disagree
+
+Q4             The Government has cut the number of backpacker visas as part Ask eligible
+               of its effort to bring down migration.                        voters
+
+               Farmers and regional councils are warning against the move
+               because they say there will be a worker shortage.
+
+               What is closest to your view
+
+               Single select, reverse
+          1.   Cut backpacker visas
+          2.   Don’t cut backpacker visas
+          3.   Don’t know                                                           Fixed
+
+
+
+
+                                                     YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

@@ -36018,7 +36018,7 @@ function AllPollsView({
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
-    key: "pub",
+    key: "date",
     dir: -1
   });
   const [facet, setFacet] = useState(urlInit.facet);
@@ -36110,7 +36110,7 @@ function AllPollsView({
   const onFacet = f => {
     setFacet(f);
     setSort({
-      key: "pub",
+      key: "date",
       dir: -1
     });
     setPop(null);
@@ -36278,7 +36278,7 @@ function AllPollsView({
         case "date":
           return p.x;
         case "pub":
-          return p.published ? Date.parse(p.published) : p.x;
+          return Date.parse(p.published || p.released);
         case "pollster":
           return p.pollster;
         case "sample":
@@ -57833,6 +57833,7 @@ function RdAllPolls(P) {
   }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
   const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
+  const gym = sort.key === "pub" ? p => p.published ? p.published.slice(0, 7) : p.ym : p => p.ym;
   const [minShown, setMinShown] = useState(30);
   const [flatLimit, setFlatLimit] = useState(40);
   const [showAll, setShowAll] = useState(false);
@@ -57885,12 +57886,13 @@ function RdAllPolls(P) {
   if (byDate) {
     groups = [];
     for (const p of sorted) {
+      const ym = gym(p);
       const g = groups[groups.length - 1];
-      if (!g || g.ym !== p.ym) {
-        const needOpen = openRow && !groups.some(x => x.ym === openRow.ym);
+      if (!g || g.ym !== ym) {
+        const needOpen = openRow && !groups.some(x => x.ym === gym(openRow));
         if (!showAll && nShown >= minShown && !needOpen) break;
         groups.push({
-          ym: p.ym,
+          ym,
           list: []
         });
       }
@@ -58104,8 +58106,9 @@ function RdAllPolls(P) {
     const list = (groups || []).flatMap(g => g.list).filter(p => window.demPairOf(p, demSplit, fam.id));
     const gs = [];
     for (const p of list) {
-      if (!gs.length || gs[gs.length - 1].ym !== p.ym) gs.push({
-        ym: p.ym,
+      const ym = gym(p);
+      if (!gs.length || gs[gs.length - 1].ym !== ym) gs.push({
+        ym,
         list: []
       });
       gs[gs.length - 1].list.push(p);
@@ -58195,9 +58198,16 @@ function RdAllPolls(P) {
     role: "row"
   }, React.createElement("span", {
     className: "rd-ap-hc1"
-  }, th("Pollster", "pollster")), th("Fieldwork", "date", {
+  }, th("Pollster", "pollster")), React.createElement("span", {
+    className: "rd-ap-hfp"
+  }, th("Fieldwork", "date", {
     title: "Sort by fieldwork, newest first"
-  }), th("Sample", "sample", {
+  }), React.createElement("span", {
+    className: "rd-ap-hfsep",
+    "aria-hidden": "true"
+  }, "/"), th("Pub", "pub", {
+    title: "Sort by the day the poll came out, newest first"
+  })), th("Sample", "sample", {
     right: true
   }), React.createElement("span", null), facet === "twopp" && React.createElement(React.Fragment, null, th("Labor v " + (onM ? "One Nation" : "Coalition"), "alp", {
     title: "Sort by Labor’s share",
@@ -59678,7 +59688,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Fieldwork/Pub heading sorts the table two ways \u2013 by fieldwork dates (the default) or, on its Pub half, by the day each poll came out, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
@@ -61526,6 +61536,12 @@ function RdFlows() {
   }).filter(Boolean);
   const demoRows = FF ? rekeyMrp(FF.demosOn) : [];
   const lnWaves = FF ? rekeyMrp(FF.lnpOn) : [];
+  const ffElec = FF && FF.elec2025r ? FF.elec2025r : null;
+  const FF_REG_OF = {
+    inner: "inner metro",
+    outer: "outer metro",
+    regional: "regional or rural"
+  };
   const ffQ = FF ? [{
     q: "on",
     waves: FF.vsOn,
@@ -61649,8 +61665,8 @@ function RdFlows() {
     cols: [FF.elec2025r && {
       key: "elec",
       h: "Election",
-      sub: ffReg ? "2025, national" : "2025 count",
-      d: FF.elec2025r.all,
+      sub: ffReg ? "2025, " + (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] + " seats" : "2025 count",
+      d: ffElec ? ffElec[ffReg] || ffElec.all : FF.elec2025r.all,
       dp: 1
     }, ftSiteCol(ftSite && {
       grn: ftSite.lnp.grn * 100,
@@ -61779,7 +61795,7 @@ function RdFlows() {
       className: "rd-sub rd-ff-t"
     }, "What voters say they\u2019d do with their preferences"), React.createElement("p", {
       className: "rd-subdek rd-ff-d"
-    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines). DemosAU\u2019s MRP reports carry the same answers each quarter (the triangles) \u2014 printed by region, so they switch with the menu (\u201CAll voters\u201D is our weighting of the three regions). DemosAU\u2019s MRPs press the Coalition against One Nation too \u2014 the third chart below. The rings mark what preferences actually did at the 2025 election, and the crosses the 2026 state and by-election counts. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
+    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines). DemosAU\u2019s MRP reports carry the same answers each quarter (the triangles) \u2014 printed by region, so they switch with the menu (\u201CAll voters\u201D is our weighting of the three regions). DemosAU\u2019s MRPs press the Coalition against One Nation too \u2014 the third chart below. The rings mark what preferences actually did at the 2025 election \u2014 on a named region they replay the seats classed to it \u2014 and the crosses the 2026 state and by-election counts. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
       className: "rd-link rd-link-in",
       href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
     }, "predicted the next election better", React.createElement("span", {
@@ -61832,7 +61848,7 @@ function RdFlows() {
       }, " \xB1", ftFig(col.band[ck])));
     }))))))), React.createElement("p", {
       className: "rd-note rd-ft-note"
-    }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and in the One Nation charts (the Labor v Coalition chart still draws its wave, as that chart’s sources are all national)." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement("div", {
+    }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings)" + (ffReg ? ", on this view replayed for the seats classed " + FF_REG_OF[ffReg] + ", aggregated from their classic seats’ counts — the commission counts the cut nationally only, so a regional column is our replay, not its own" : ", which the commission counts nationally") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and on all three charts." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement("div", {
       className: "rd-fl-two rd-ff-two"
     }, React.createElement("div", {
       className: "rd-fl-one"
@@ -61844,15 +61860,15 @@ function RdFlows() {
       className: "rd-ap-ct"
     }, ffTitle("co"))), React.createElement(RdForced, {
       q: "co",
-      waves: FF.vsCoal,
+      waves: ffReg ? [] : FF.vsCoal,
       cohorts: ["grn", "onp", "oth"],
       anchor: "Labor",
       rival: "the Coalition",
       houseWord: "RedBridge/Accent",
       W: cw,
       phone: phone,
-      extras: FF.demos,
-      elec: FF.elec2025r ? FF.elec2025r.all : null,
+      extras: ffReg ? [] : FF.demos,
+      elec: ffElec ? ffElec[ffReg] || ffElec.all : null,
       dom: dom
     })), React.createElement("div", {
       className: "rd-fl-one"
@@ -61932,7 +61948,7 @@ function RdFlows() {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from the One Nation charts — a national wave can’t speak to a region; the Labor-v-Coalition chart draws them on every view because everything else it carries is national-only too. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot — the AEC counts no regional split of them, so they stand on their chart on every menu view. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from every chart — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition — national-only too, so the named regions drop its triangles from the Labor v Coalition chart with them. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot; on a named region they — and the Flows table’s election column above — move to this site’s replay of the seats classed to it, each classic seat’s counted distributions aggregated over the class (the commission publishes no regional cut of its own, and its non-classic seats’ notional splits have no majors flow to replay). The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);

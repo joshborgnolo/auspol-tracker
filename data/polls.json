@@ -5799,7 +5799,8 @@
       "dateStart": "2026-09-29",
       "pollster": "YouGov",
       "client": "News24",
-      "sample": 1500,
+      "sample": 1505,
+      "sampleEff": 1024,
       "alp": 25,
       "lnp": 21,
       "grn": 15,
@@ -5809,6 +5810,7 @@
       "tpp_alp": 52,
       "tpp_lnp": 48,
       "url": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
+      "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_06_10_26_APC_Methodology_Statement.pdf",
       "published": "2026-10-07T05:00"
     },
     {
