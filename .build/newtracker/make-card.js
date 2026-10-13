@@ -126,9 +126,9 @@
   const lead = +(Q.a - Q.b).toFixed(1), margin = +(2 * Q.ci).toFixed(1);
   const tooClose = Math.abs(lead) <= margin;
   const leader = lead > 0 ? "LABOR" : lead < 0 ? RIVAL : null;
-  const verdict = !tooClose ? "▶ " + leader + " UP BY " + r1(Math.abs(lead)) + ", OUTSIDE ± " + r1(margin)
-    : leader ? "▶ TOO CLOSE TO CALL: " + leader + " UP BY " + r1(Math.abs(lead)) + ", INSIDE ± " + r1(margin)
-    : "▶ DEAD LEVEL, INSIDE ± " + r1(margin);
+  const verdict = !tooClose ? "▶ " + leader + " UP BY " + r1(Math.abs(lead)) + ", OUTSIDE ±" + r1(margin) + " MARGIN"
+    : leader ? "▶ TOO CLOSE TO CALL: " + leader + " UP BY " + r1(Math.abs(lead)) + ", INSIDE ±" + r1(margin) + " MARGIN"
+    : "▶ DEAD LEVEL, INSIDE ±" + r1(margin) + " MARGIN";
   /* The month's move, called as the hero calls it: "within the margin" unless
      the move clears its own interval. With no month-ago figure the line says
      what the reading rests on instead. */
@@ -301,8 +301,8 @@
   document.documentElement.appendChild(host);
   await document.fonts.ready;
   /* Lines whose length the data sets shrink a pixel at a time until their
-     box holds them: the longest ticker ("TOO CLOSE TO CALL: ONE NATION BY
-     ...") runs past 1100px at the 40px it is set in. */
+     box holds them: the longest ticker ("TOO CLOSE TO CALL: ONE NATION UP
+     BY ... MARGIN") runs past 1100px at the 40px it is set in. */
   const shrink = (box, target) => {
     for (let guard = 40; box.scrollWidth > box.clientWidth + 0.5 && guard > 0; guard--)
       target.style.fontSize = parseFloat(getComputedStyle(target).fontSize) - 1 + "px";
