@@ -108,14 +108,23 @@ function RdPrimary({ rangeId, setRangeId }) {
     id, color: D.PARTIES[id].color, name: (id === "oth" ? "Others & independents" : D.PARTIES[id].name),
     v: V[id], was: W ? W[id] : null, ci: C[id] || 0,
   })).sort((a, b) => b.v - a.v);
-  /* the level test, factored so the all-voters contrast behind a group's
-     dek runs the same check the drawn figures do */
-  const levelCount = (ps) => {
-    let kk = 1;
-    const t = ps[0];
-    while (kk < ps.length && t.v - ps[kk].v < Math.sqrt(t.ci * t.ci + ps[kk].ci * ps[kk].ci)) kk++;
-    return kk;
+  /* the level test, walking the ranking the way the share card's ladder
+     and the og:alt sentence already do (make-card.js, build.mjs
+     cardAltOf): a party joins the group above it while the gap to that
+     group's first party stays inside the two figures' margins combined; a
+     wider gap starts a fresh group, so a tie BELOW the leaders is its own
+     group. levelCount is the top group's size - the all-voters contrast
+     behind a group's dek asks only that. */
+  const levelRuns = (ps) => {
+    const rs = [];
+    ps.forEach((p) => {
+      const r = rs[rs.length - 1];
+      if (r && r[0].v - p.v < Math.sqrt(r[0].ci * r[0].ci + p.ci * p.ci)) r.push(p);
+      else rs.push([p]);
+    });
+    return rs;
   };
+  const levelCount = (ps) => levelRuns(ps)[0].length;
   const partsAll = mkParts(D.latest.primary, lastM.ci || {}, allBase);
   const kAll = levelCount(partsAll);
   const parts = G ? mkParts(G.v, G.ci, base) : partsAll;
@@ -126,20 +135,42 @@ function RdPrimary({ rangeId, setRangeId }) {
   const ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
   const firstPolled = G ? {} : Object.fromEntries(parts.map((p) => [p.id, D.aggPrimary.find((d) => !d.election && d[p.id] != null)]));
   const lateParties = !G && base ? parts.map((p) => p.id).filter((id) => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
-  /* the parties the leader cannot be told apart from: the gap to each is
-     inside the two figures' 95% margins combined */
-  const k = levelCount(parts);
-  const level = parts.slice(0, k);
+  /* runs[0]: the parties the leader cannot be told apart from, the gap to
+     each inside the two figures' 95% margins combined; every further run
+     of two or more is a tie below the leaders of its own */
+  const runs = levelRuns(parts);
+  const k = runs[0].length;
+  const level = runs[0];
+  /* runs → the drawn bits: the big screen's bracket columns, and the
+     phone's ordered blocks, where single parties between tied groups run
+     together in one rest block so their hairlines never break */
+  const levelBands = [], pvBlocks = [];
+  {
+    let col = 1;
+    runs.forEach((r) => {
+      if (r.length >= 2) {
+        levelBands.push({ col, run: r });
+        pvBlocks.push({ tied: r });
+      } else {
+        const last = pvBlocks[pvBlocks.length - 1];
+        if (last && !last.tied) last.rest.push(r[0]);
+        else pvBlocks.push({ rest: [r[0]] });
+      }
+      col += r.length;
+    });
+  }
 
   const story = (() => {
     const list = (arr) => arr.length === 2 ? arr.join(" and ") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
     const pc = (v) => v.toFixed(1) + "%";
+    /* "Labor, on 28.4%, and One Nation, on 26.0%" - the leader sentence's
+       party-and-figure list, its shape wherever a tie needs naming */
+    const pcSeg = (ps) => ps.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
+      s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "");
     let head, dek;
     if (k >= 2) {
       head = rdCap(list(level.map((p) => rdPartyIn(p.id)))) + " are level" + (G ? " among " + sel.who : "");
-      dek = (G ? "Among " + sel.who + ", " : "")
-        + level.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
-          s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "");
+      dek = (G ? "Among " + sel.who + ", " : "") + pcSeg(level);
       /* a group's level call is pooled from few polls, so the dek quotes the
          gap it cannot read as a margin (the all-voters dek doesn't need to);
          shares level to the tenth are simply dead level, not "0.0 points" */
@@ -156,6 +187,11 @@ function RdPrimary({ rangeId, setRangeId }) {
         + " leads on " + pc(top.v) + ", " + (top.v - parts[1].v).toFixed(1) + " points clear of "
         + rdPartyIn(parts[1].id) + " on " + pc(parts[1].v) + ".";
     }
+    /* a tie below the leaders names itself too - the same run walk the
+       stat blocks draw their bands from */
+    runs.slice(1).filter((r) => r.length >= 2).forEach((r) => {
+      dek += " " + pcSeg(r) + ", are too close to separate.";
+    });
     /* the biggest faller outside the leading group, if the fall is big (15%
        of its election vote or more) AND clears the current figure's own
        margin - the count it is measured from carries no sampling error, but
@@ -449,21 +485,22 @@ function RdPrimary({ rangeId, setRangeId }) {
       </div>
       {narrow ? (
         <div className="rd-pv-list">
-          {k >= 2 && (
-            <div className="rd-pv-group">
+          {pvBlocks.map((b, i) => b.tied ? (
+            <div key={"tg" + i} className="rd-pv-group">
               <div className="rd-pv-grouph">Within the margin of uncertainty</div>
-              {parts.slice(0, k).map(stat)}
+              {b.tied.map(stat)}
             </div>
-          )}
-          <div className="rd-pv-rest">{parts.slice(k >= 2 ? k : 0).map(stat)}</div>
+          ) : (
+            <div key={"rt" + i} className="rd-pv-rest">{b.rest.map(stat)}</div>
+          ))}
         </div>
       ) : (
-        <div className="rd-pv-stats" style={{ "--rd-k": k }}>
-          {k >= 2 && (
-            <div className="rd-pv-bracket" style={{ gridColumn: "1 / span " + k }}>
+        <div className="rd-pv-stats">
+          {levelBands.map((b) => (
+            <div key={"lv" + b.run[0].id} className="rd-pv-bracket" style={{ gridColumn: b.col + " / span " + b.run.length }}>
               <span></span>Within the margin of uncertainty<span></span>
             </div>
-          )}
+          ))}
           {parts.map(stat)}
         </div>
       )}

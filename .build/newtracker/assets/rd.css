@@ -758,6 +758,9 @@ body.rd .rd-pv-list { margin-top: 24px; display: flex; flex-direction: column; f
 body.rd .rd-pv-group { padding: 0 12px 4px; border-radius: 8px; background: color-mix(in oklab, var(--ink) 5%, var(--bg)); }
 body.rd .rd-pv-grouph { padding: 10px 0 4px; font-size: 12px; font-weight: 500; color: var(--ink-3); }
 body.rd .rd-pv-rest { padding: 0 12px; }
+/* a tied group below the list's first block keeps its own place: the
+   two-block layout needs no air, a second group (or one under singles) does */
+body.rd .rd-pv-rest + .rd-pv-group, body.rd .rd-pv-group + .rd-pv-group { margin-top: 8px; }
 body.rd .rd-pv-list .rd-pv-stat {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; row-gap: 2px;
   width: 100%; padding: 10px 0; border-top: 0; border-bottom: 1px solid var(--line);

@@ -3612,6 +3612,7 @@ body.rd .rd-pv-list { margin-top: 24px; display: flex; flex-direction: column; f
 body.rd .rd-pv-group { padding: 0 12px 4px; border-radius: 8px; background: color-mix(in oklab, var(--ink) 5%, var(--bg)); }
 body.rd .rd-pv-grouph { padding: 10px 0 4px; font-size: 12px; font-weight: 500; color: var(--ink-3); }
 body.rd .rd-pv-rest { padding: 0 12px; }
+body.rd .rd-pv-rest + .rd-pv-group, body.rd .rd-pv-group + .rd-pv-group { margin-top: 8px; }
 body.rd .rd-pv-list .rd-pv-stat {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; row-gap: 2px;
   width: 100%; padding: 10px 0; border-top: 0; border-bottom: 1px solid var(--line);
@@ -110045,12 +110046,15 @@ function RdPrimary({
     was: W ? W[id] : null,
     ci: C[id] || 0
   })).sort((a, b) => b.v - a.v);
-  const levelCount = ps => {
-    let kk = 1;
-    const t = ps[0];
-    while (kk < ps.length && t.v - ps[kk].v < Math.sqrt(t.ci * t.ci + ps[kk].ci * ps[kk].ci)) kk++;
-    return kk;
+  const levelRuns = ps => {
+    const rs = [];
+    ps.forEach(p => {
+      const r = rs[rs.length - 1];
+      if (r && r[0].v - p.v < Math.sqrt(r[0].ci * r[0].ci + p.ci * p.ci)) r.push(p);else rs.push([p]);
+    });
+    return rs;
   };
+  const levelCount = ps => levelRuns(ps)[0].length;
   const partsAll = mkParts(D.latest.primary, lastM.ci || {}, allBase);
   const kAll = levelCount(partsAll);
   const parts = G ? mkParts(G.v, G.ci, base) : partsAll;
@@ -110071,15 +110075,39 @@ function RdPrimary({
   };
   const firstPolled = G ? {} : Object.fromEntries(parts.map(p => [p.id, D.aggPrimary.find(d => !d.election && d[p.id] != null)]));
   const lateParties = !G && base ? parts.map(p => p.id).filter(id => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
-  const k = levelCount(parts);
-  const level = parts.slice(0, k);
+  const runs = levelRuns(parts);
+  const k = runs[0].length;
+  const level = runs[0];
+  const levelBands = [],
+    pvBlocks = [];
+  {
+    let col = 1;
+    runs.forEach(r => {
+      if (r.length >= 2) {
+        levelBands.push({
+          col,
+          run: r
+        });
+        pvBlocks.push({
+          tied: r
+        });
+      } else {
+        const last = pvBlocks[pvBlocks.length - 1];
+        if (last && !last.tied) last.rest.push(r[0]);else pvBlocks.push({
+          rest: [r[0]]
+        });
+      }
+      col += r.length;
+    });
+  }
   const story = (() => {
     const list = arr => arr.length === 2 ? arr.join(" and ") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
     const pc = v => v.toFixed(1) + "%";
+    const pcSeg = ps => ps.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) => s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "");
     let head, dek;
     if (k >= 2) {
       head = rdCap(list(level.map(p => rdPartyIn(p.id)))) + " are level" + (G ? " among " + sel.who : "");
-      dek = (G ? "Among " + sel.who + ", " : "") + level.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) => s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "");
+      dek = (G ? "Among " + sel.who + ", " : "") + pcSeg(level);
       const gapK = (top.v - level[k - 1].v).toFixed(1);
       if (G && gapK === "0.0") dek += ", are dead level";else {
         dek += ", are too close to separate";
@@ -110094,6 +110122,9 @@ function RdPrimary({
       head = rdPartyStart(top.id) + (G ? " leads among " + sel.who : " leads the primary vote");
       dek = (G ? "Among " + sel.who + ", " + rdPartyIn(top.id) : rdPartyStart(top.id)) + " leads on " + pc(top.v) + ", " + (top.v - parts[1].v).toFixed(1) + " points clear of " + rdPartyIn(parts[1].id) + " on " + pc(parts[1].v) + ".";
     }
+    runs.slice(1).filter(r => r.length >= 2).forEach(r => {
+      dek += " " + pcSeg(r) + ", are too close to separate.";
+    });
     const fallers = parts.slice(k).filter(p => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15 && p.was - p.v > (p.ci || 0)).sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
     if (fallers.length) {
       const f = fallers[0];
@@ -110400,23 +110431,23 @@ function RdPrimary({
     value: g.label
   }, g.label))))))), narrow ? React.createElement("div", {
     className: "rd-pv-list"
-  }, k >= 2 && React.createElement("div", {
+  }, pvBlocks.map((b, i) => b.tied ? React.createElement("div", {
+    key: "tg" + i,
     className: "rd-pv-group"
   }, React.createElement("div", {
     className: "rd-pv-grouph"
-  }, "Within the margin of uncertainty"), parts.slice(0, k).map(stat)), React.createElement("div", {
+  }, "Within the margin of uncertainty"), b.tied.map(stat)) : React.createElement("div", {
+    key: "rt" + i,
     className: "rd-pv-rest"
-  }, parts.slice(k >= 2 ? k : 0).map(stat))) : React.createElement("div", {
-    className: "rd-pv-stats",
-    style: {
-      "--rd-k": k
-    }
-  }, k >= 2 && React.createElement("div", {
+  }, b.rest.map(stat)))) : React.createElement("div", {
+    className: "rd-pv-stats"
+  }, levelBands.map(b => React.createElement("div", {
+    key: "lv" + b.run[0].id,
     className: "rd-pv-bracket",
     style: {
-      gridColumn: "1 / span " + k
+      gridColumn: b.col + " / span " + b.run.length
     }
-  }, React.createElement("span", null), "Within the margin of uncertainty", React.createElement("span", null)), parts.map(stat)), React.createElement("div", {
+  }, React.createElement("span", null), "Within the margin of uncertainty", React.createElement("span", null))), parts.map(stat)), React.createElement("div", {
     className: "card rd-card rd-pv-chart",
     ref: chartMark,
     "data-rd-swipe-exact": ""
