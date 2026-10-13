@@ -344,6 +344,8 @@ body.js.ss-view #root { display: none; }
 .lockup { display: flex; align-items: center; gap: 12px; }
 button.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent;  }
 button.wm-glyph:hover { background: transparent; }
+.wm-o { color: inherit; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.wm-o:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 1px; border-radius: 2px; }
 .gp {
   position: fixed; inset: 0; z-index: 200;
   display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto;
@@ -3443,6 +3445,8 @@ body.rd .tabs.pinned .tabs-set,
 body.rd.editorial .tabs.pinned .tabs-set { transform: scale(0.85); }
 @media (min-width: 1100px) {
   body.rd .tab-next { padding-bottom: 14px; gap: 16px; font-size: 13px; color: var(--ink-3); }
+  body.rd .tabs.pinned .tab-next { padding-bottom: 9px;
+    transition: transform .38s cubic-bezier(.22, 1, .36, 1), padding-bottom .38s cubic-bezier(.22, 1, .36, 1); }
 }
 body.rd .tn-lab { font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ink-2); }
 body.rd .tn-firm { font-weight: 600; color: var(--ink); }
@@ -5486,8 +5490,6 @@ body.rd .rd-ldg-t thead th.on { color: var(--ink); }
 body.rd .rd-ldg-t tbody th { padding: 6px 10px 0 0; font-weight: 400; color: var(--ink-2); text-align: left; white-space: nowrap; }
 body.rd .rd-ldg-t td { padding: 6px 10px 0 0; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ldg-t .num, body.rd .rd-ldg-t thead th.num { text-align: right; }
-body.rd .rd-ldg-t tr.grp th { padding-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-body.rd .rd-ldg-t tr.sub th { padding-left: 12px; }
 body.rd .rd-ldg-pair { font-weight: 600; white-space: nowrap; }
 body.rd .rd-ldg-dash { margin: 0 3px; font-weight: 400; color: var(--ink-faint); }
 body.rd .rd-ldg-tri { font-weight: 600; }
@@ -5577,7 +5579,6 @@ body.rd .rd-pl-detail { padding: 16px 16px 20px; background: var(--surface-2); }
   body.rd .rd-ldg-tpp td { padding-right: 4px; }
   body.rd .rd-ldg-tpp .rd-ldg-chg { margin-left: 4px; font-size: 11.5px; }
   body.rd .rd-ldg-tpp .rd-ldg-dash { margin: 0 1px; }
-  body.rd .rd-ldg-tpp tr.sub th { padding-left: 8px; }
   body.rd .rd-ldg-ldr, body.rd .rd-ldg-ppm { width: 100%; }
   body.rd .rd-ldg-ldr th:first-child, body.rd .rd-ldg-ppm th:first-child { min-width: 0; white-space: normal; }
   body.rd .rd-ldg-ldr .num, body.rd .rd-ldg-ppm .num { padding-left: 10px; }
@@ -56257,23 +56258,9 @@ function RdLgTpp({
     onp: null,
     lnp: p.tppFlows != null ? [p.tppFlows, null, 0] : null
   }]].filter(([, v]) => v.onp || v.lnp);
-  const forced = [["Coalition voters", {
-    onp: p.splitCoal != null ? [p.splitCoal, c.splitCoal, 0] : null,
-    lnp: null
-  }], ["One Nation voters", {
-    onp: null,
-    lnp: p.splitOnp != null ? [p.splitOnp, c.splitOnp, 0] : null
-  }], ["Greens voters", {
-    onp: p.splitGrnOn != null ? [p.splitGrnOn, c.splitGrnOn, 0] : null,
-    lnp: p.splitGrn != null ? [p.splitGrn, c.splitGrn, 0] : null
-  }], ["Other voters", {
-    onp: p.splitOthOn != null ? [p.splitOthOn, c.splitOthOn, 0] : null,
-    lnp: p.splitOth != null ? [p.splitOth, c.splitOth, 0] : null
-  }]].filter(([, v]) => v.onp || v.lnp);
-  if (!rows.length && !forced.length && !p.tpp3 && !p.tppAlt2) return null;
-  const tr = ([lab, v], sub) => React.createElement("tr", {
-    key: lab,
-    className: sub ? "sub" : ""
+  if (!rows.length && !p.tpp3 && !p.tppAlt2) return null;
+  const tr = ([lab, v]) => React.createElement("tr", {
+    key: lab
   }, React.createElement("th", {
     scope: "row"
   }, lab), cols.map(k => React.createElement("td", {
@@ -56287,12 +56274,7 @@ function RdLgTpp({
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null), cols.map((k, i) => React.createElement("th", {
     key: k.id,
     className: i === 0 ? "on" : ""
-  }, "Labor ", k.head)))), React.createElement("tbody", null, rows.map(r => tr(r)), forced.length > 0 && React.createElement("tr", {
-    className: "grp"
-  }, React.createElement("th", {
-    scope: "rowgroup",
-    colSpan: 3
-  }, "If forced to choose")), forced.map(r => tr(r, true)), p.tppAlt2 && React.createElement("tr", null, React.createElement("th", {
+  }, "Labor ", k.head)))), React.createElement("tbody", null, rows.map(r => tr(r)), p.tppAlt2 && React.createElement("tr", null, React.createElement("th", {
     scope: "row"
   }, "Coalition v One Nation"), React.createElement("td", {
     colSpan: 2
@@ -56330,9 +56312,9 @@ function RdLgTpp({
     }
   }, "ON ", rdApNum(p.tpp3.onp))), React.createElement("span", {
     className: "rd-ldg-tail"
-  }, ", as published"))))), (noPub || moe || note || p.splitCoalEst) && React.createElement("p", {
+  }, ", as published"))))), (noPub || moe || note) && React.createElement("p", {
     className: "rd-ldg-foot1"
-  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", p.splitCoalEst ? " The Coalition-voters split combines the report’s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)." : "", note ? " " + note : ""));
+  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", note ? " " + note : ""));
 }
 function rdLgDecided(p) {
   if (p.undecided != null) {
@@ -56552,6 +56534,19 @@ function RdLgDir({
 }
 const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
 const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";
+const rdLgFlowCell = (k, v, suffix) => v != null && React.createElement("span", {
+  key: k,
+  className: "rd-ldg-li"
+}, React.createElement("em", {
+  style: {
+    color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null
+  }
+}, RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k), " ", React.createElement("b", null, rdApNum(v)), suffix);
+const rdLgFlowGrp = (title, cells) => cells && React.createElement("span", {
+  className: "rd-ldg-grp rd-ldg-grpw rd-ldg-pgrp"
+}, React.createElement("span", {
+  className: "rd-ldg-li lbl rd-ldg-lisoft"
+}, title), cells.map(([k, v, suffix]) => rdLgFlowCell(k, v, suffix)));
 function RdLgPrefsLine({
   pf
 }) {
@@ -56560,19 +56555,8 @@ function RdLgPrefsLine({
   const rk = regs[ri % regs.length][0],
     rn = regs[ri % regs.length][1],
     next = regs[(ri + 1) % regs.length][1];
-  const cell = (k, v, suffix) => v != null && React.createElement("span", {
-    key: k,
-    className: "rd-ldg-li"
-  }, React.createElement("em", {
-    style: {
-      color: RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].ink : null
-    }
-  }, RD_AP_PRIM_META[k] ? RD_AP_PRIM_META[k].lab : k), " ", React.createElement("b", null, rdApNum(v)), suffix);
-  const grp = (title, cells) => cells && React.createElement("span", {
-    className: "rd-ldg-grp rd-ldg-grpw rd-ldg-pgrp"
-  }, React.createElement("span", {
-    className: "rd-ldg-li lbl rd-ldg-lisoft"
-  }, title), cells.map(([k, v, suffix]) => cell(k, v, suffix)));
+  const cell = rdLgFlowCell;
+  const grp = rdLgFlowGrp;
   const at = t => rk === "all" ? pf.all && pf.all[t] || null : pf[t] ? pf[t][rk] : null;
   const a = at("alp_onp"),
     c = at("lnp_onp");
@@ -56603,6 +56587,22 @@ function RdLgPrefsLine({
   }, a && grp("to ALP v ON", [["lnp", a.lnp], ["grn", a.grn], ["oth", a.oth]]), c && grp("to L/NP v ON", [["alp", c.alp], ["grn", c.grn], ["oth", c.oth]]), pf.onp_alp_lnp != null && grp("to ALP v L/NP", [["onp", pf.onp_alp_lnp, React.createElement("span", {
     className: "rd-ldg-lisoft"
   }, ", nationwide")]])));
+}
+function RdLgFlowsLine({
+  p
+}) {
+  const grp = rdLgFlowGrp;
+  return React.createElement("div", {
+    className: "rd-ldg-line flows"
+  }, React.createElement("span", {
+    className: "rd-ldg-lab"
+  }, "Preferences"), React.createElement("span", {
+    className: "rd-ldg-lbody"
+  }, React.createElement("span", {
+    className: "rd-ldg-li lbl rd-ldg-lisoft"
+  }, "If forced to choose"), (p.splitCoal != null || p.splitGrnOn != null || p.splitOthOn != null) && grp("to ALP v ON", [["lnp", p.splitCoal], ["grn", p.splitGrnOn], ["oth", p.splitOthOn]]), (p.splitGrn != null || p.splitOnp != null || p.splitOth != null) && grp("to ALP v L/NP", [["grn", p.splitGrn], ["onp", p.splitOnp], ["oth", p.splitOth]]), p.splitCoalEst && React.createElement("span", {
+    className: "rd-ldg-li rd-ldg-lisoft"
+  }, "the Coalition split combines the report\u2019s printed CLP/LNP/Nat and Liberal rows (no combined row was printed)")));
 }
 function rdLgLines(p, {
   onM,
@@ -56675,6 +56675,11 @@ function rdLgLines(p, {
     id: "prefs",
     self: RdLgPrefsLine,
     pf: p.pf
+  });
+  if (p.splitCoal != null || p.splitOnp != null || p.splitGrn != null || p.splitGrnOn != null || p.splitOth != null || p.splitOthOn != null) out.push({
+    id: "flows",
+    self: RdLgFlowsLine,
+    p
   });
   const a = p.appr || {};
   let nets = [["alb", "albNet"], ["taylor", "taylorNet"], ["hanson", "hansonNet"]].filter(([, k]) => a[k] != null);
@@ -56854,7 +56859,7 @@ function RdLedger({
     demSplit
   });
   const NOTE = {
-    twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp", "splitCoal", "splitOnp", "splitGrn", "splitGrnOn", "splitOth", "splitOthOn"]),
+    twopp: rdLgChgNote(p, ["impOn", "imp", "altAlpOn", "alp2pp"]),
     primary: rdLgChgNote(p, ["pAlp", "pLnp", "pGrn", "pOnp", "pOth", "und"]),
     leadership: rdLgChgNote(p, ["albNet", "taylorNet", "hansonNet", "albFav", "taylorFav", "hansonFav"])
   };
@@ -56926,7 +56931,8 @@ function RdLedger({
       const Self = l.self;
       return React.createElement(Self, {
         key: l.id,
-        pf: l.pf
+        pf: l.pf,
+        p: l.p
       });
     }
     const can = !!(onLine && RD_LG_TAB[l.id]);
@@ -61843,7 +61849,15 @@ function Header({
     className: "wordmark stacked"
   }, React.createElement("span", {
     className: "wm-textcol"
-  }, !J ? React.createElement("span", {
+  }, !J ? rd !== false ? React.createElement("span", {
+    className: "wm-name",
+    ref: wmName
+  }, "ausp", React.createElement("a", {
+    className: "wm-o",
+    href: "/changelog/",
+    title: "The change log",
+    "aria-describedby": "wm-o-where"
+  }, "o"), "l") : React.createElement("span", {
     className: "wm-name",
     ref: wmName
   }, "auspol") : React.createElement("span", {
@@ -61872,7 +61886,10 @@ function Header({
   })), React.createElement("span", {
     id: "wm-action",
     hidden: true
-  }, "Replays the term on the masthead dial")), !J ? React.createElement("p", {
+  }, "Replays the term on the masthead dial"), React.createElement("span", {
+    id: "wm-o-where",
+    hidden: true
+  }, "Opens the change log")), !J ? React.createElement("p", {
     className: "tagline"
   }, "Aggregated opinion polling for the next Australian ", React.createElement("br", {
     className: "tagline-br"

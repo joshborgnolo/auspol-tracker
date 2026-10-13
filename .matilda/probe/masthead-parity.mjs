@@ -118,6 +118,38 @@ const mainHoverBg = await page.evaluate(() => getComputedStyle(document.querySel
 ok(mainHoverBg === "rgba(0, 0, 0, 0)", `main dial grows no hover shape (${mainHoverBg})`);
 await page.mouse.move(0, 0);
 
+/* the wordmark's easter egg (2026-10-13): the "o" of "auspol" is a link to
+   the change log, indistinguishable from the word around it – assert the
+   letter, the destination, the contiguous word, the inherited ink, the
+   absent underline, and that the satellite wordmark carries NO anchor */
+const wmO = await page.evaluate(() => {
+  const a = document.querySelector("h1.wordmark .wm-o");
+  if (!a) return null;
+  const cs = getComputedStyle(a);
+  return { href: a.getAttribute("href"), text: a.textContent,
+           word: a.closest(".wm-name").textContent, title: a.getAttribute("title"),
+           describedby: a.getAttribute("aria-describedby"),
+           descText: (document.getElementById(a.getAttribute("aria-describedby")) || {}).textContent || null,
+           incolor: cs.color, parentColor: getComputedStyle(a.parentElement).color,
+           deco: cs.textDecorationLine, cursor: cs.cursor };
+});
+console.log("wm-o     ", JSON.stringify(wmO));
+ok(wmO && wmO.href === "/changelog/", `the "o" links the change log (${wmO && wmO.href})`);
+ok(wmO && wmO.text === "o" && wmO.word === "auspol", `the word still reads auspol (${wmO && wmO.word})`);
+ok(wmO && wmO.incolor === wmO.parentColor, "the letter wears the wordmark's ink");
+ok(wmO && wmO.deco === "none", "no underline gives it away");
+ok(wmO && wmO.cursor === "pointer", "the cursor is the only tell");
+ok(wmO && wmO.title === "The change log" && wmO.describedby === "wm-o-where" && wmO.descText === "Opens the change log",
+   "tooltip and sr description name the destination");
+
+/* …and the ARCHIVED design's wordmark stays plain text (rule 5): checked
+   on its own page so the main page's probes keep running below */
+const oldPage = await browser.newPage();
+await oldPage.goto(base + "/?design=old", { waitUntil: "load" }); await wait(1500);
+const oldHas = await oldPage.evaluate(() => !!document.querySelector("h1.wordmark .wm-o"));
+ok(!oldHas, "the archived ?design=old wordmark carries no egg");
+await oldPage.close();
+
 await page.setViewport({ width: 390, height: 844 });
 await wait(700);
 const phone = await page.evaluate(() => {
@@ -250,11 +282,13 @@ ok(JSON.stringify(satTabs) === JSON.stringify(mainTabs),
    `tab labels match the main page's (main ${mainTabs.join(" | ")}, sat ${satTabs.join(" | ")})`);
 /* …and the tabs must NAVIGATE: the fillCopy rebuild derives each href from
    the tab id (2026-10-03 hotfix – t.href wrote the string "undefined", and a
-   click on a satellite went to <satellite>/undefined). The scrape runs after
-   the page's own fetch, so this is the REBUILT set, not the bake */
+   click on a satellite went to <satellite>/undefined). The form moved from
+   "/#<id>" to REAL PAGES at "/<id>/" when the tabs shipped as documents
+   (2026-10-11; mainTabs/fillCopy derive them the same way). The scrape runs
+   after the page's own fetch, so this is the REBUILT set, not the bake */
 const chrome = mainChrome();
 const satTabHrefs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set .sh-tab")].map((t) => t.getAttribute("href")));
-const expectHrefs = chrome.tabs.map((t) => "/#" + t.id);
+const expectHrefs = chrome.tabs.map((t) => (t.id === "now" ? "/" : "/" + t.id + "/"));
 ok(!satTabHrefs.some((h) => h === null || /undefined|^#|^$/.test(h)), "no satellite tab href is undefined/empty");
 ok(JSON.stringify(satTabHrefs) === JSON.stringify(expectHrefs),
    `satellite tabs navigate to the main page's views (${satTabHrefs.join(" ")})`);

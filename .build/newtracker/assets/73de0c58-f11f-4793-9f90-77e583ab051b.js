@@ -357,10 +357,11 @@ function Header({ isDark, onToggleTheme, rd }) {
   const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
   /* /vic/'s words (window.JUR): "vicpol", "Victorian state". Each line the
      satellites' shell lifts from this source (site-shell.mjs parseChrome)
-     keeps its federal JSX verbatim; the jurisdiction's variant writes its
-     class as an expression (className={"wm-name"}), the same DOM, which the
-     parser's literal anchors never match - so a moved federal anchor still
-     fails loudly instead of lifting /vic/'s words onto the satellites. */
+     keeps its federal redesign JSX verbatim; the jurisdiction's variant AND
+     the archived old-design line write the class as an expression
+     (className={"wm-name"}), the same DOM, which the parser's literal
+     anchors never match - so a moved federal anchor still fails loudly
+     instead of lifting the wrong line's words onto the satellites. */
   const J = window.JUR;
   /* The redesign's status block names the newest poll by its pollster and
      fieldwork; the election line counts the months left before it must be
@@ -415,7 +416,16 @@ function Header({ isDark, onToggleTheme, rd }) {
         <div className="lockup">
           <h1 className="wordmark stacked">
             <span className="wm-textcol">
-              {!J ? <span className="wm-name" ref={wmName}>auspol</span>
+              {/* The lockup's one easter egg: the "o" of "auspol" is a link
+                  to the change log. The word must stay contiguous for site-
+                  shell's wordmark lift (parseChrome) and the squares-itself
+                  measure just above, so the anchor wraps the letter with NO
+                  whitespace around it. Redesign only - the archived old
+                  design (rd === false) and /vic/'s wordmark stay plain text,
+                  Vic having no change log of its own. */}
+              {!J ? (rd !== false
+                    ? <span className="wm-name" ref={wmName}>ausp<a className="wm-o" href="/changelog/" title="The change log" aria-describedby="wm-o-where">o</a>l</span>
+                    : <span className={"wm-name"} ref={wmName}>auspol</span>)
                   : <span className={"wm-name"} ref={wmName}>{J.brand}</span>}
               <span className="sr-only"> </span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
@@ -441,6 +451,7 @@ function Header({ isDark, onToggleTheme, rd }) {
             <GlyphDial className="wm-dial" svgRef={glyphRef} width="57" height="39.7" />
           </button>
           <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+          <span id="wm-o-where" hidden>Opens the change log</span>
         </div>
         {/* plain text: the design flip this sentence used to carry moved
             off the page 2026-10-03; the old design is viewable at

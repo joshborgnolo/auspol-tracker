@@ -20,12 +20,12 @@
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/info/">
-  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-e0053dfc">
+  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-6e4734c7">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="auspol tracker scoreboard for 11 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-e0053dfc">
+  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-6e4734c7">
   <meta name="twitter:image:alt" content="auspol tracker scoreboard for 11 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
   <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
@@ -352,6 +352,8 @@ body.js.ss-view #root { display: none; }
 .lockup { display: flex; align-items: center; gap: 12px; }
 button.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent;  }
 button.wm-glyph:hover { background: transparent; }
+.wm-o { color: inherit; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.wm-o:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 1px; border-radius: 2px; }
 .gp {
   position: fixed; inset: 0; z-index: 200;
   display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto;
@@ -128370,7 +128372,15 @@ function Header({
     className: "wordmark stacked"
   }, React.createElement("span", {
     className: "wm-textcol"
-  }, !J ? React.createElement("span", {
+  }, !J ? rd !== false ? React.createElement("span", {
+    className: "wm-name",
+    ref: wmName
+  }, "ausp", React.createElement("a", {
+    className: "wm-o",
+    href: "/changelog/",
+    title: "The change log",
+    "aria-describedby": "wm-o-where"
+  }, "o"), "l") : React.createElement("span", {
     className: "wm-name",
     ref: wmName
   }, "auspol") : React.createElement("span", {
@@ -128399,7 +128409,10 @@ function Header({
   })), React.createElement("span", {
     id: "wm-action",
     hidden: true
-  }, "Replays the term on the masthead dial")), !J ? React.createElement("p", {
+  }, "Replays the term on the masthead dial"), React.createElement("span", {
+    id: "wm-o-where",
+    hidden: true
+  }, "Opens the change log")), !J ? React.createElement("p", {
     className: "tagline"
   }, "Aggregated opinion polling for the next Australian ", React.createElement("br", {
     className: "tagline-br"

@@ -526,6 +526,14 @@ button.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent; 
    pill (inside the markers above); :focus-visible's ring stays — that is
    the keyboard user's pointer, not a hover shape. */
 button.wm-glyph:hover { background: transparent; }
+/* …and one letter of the wordmark is also a door: the "o" of "auspol"
+   opens the change log. It must paint and MEASURE exactly as the letters
+   it sits among — no ink, no underline, no hover shape — the pointer
+   cursor and the tooltip its only tells; :focus-visible's ring stays for
+   the keyboard. (The satellites never render a .wm-o: their wordmark is
+   already one whole-lockup link home.) */
+.wm-o { color: inherit; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.wm-o:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 1px; border-radius: 2px; }
 
 /* ---------- the dial, wound back (wm-story.jsx) -----------------------------
    A stage, not a card. The replay takes the whole viewport, on the page's own

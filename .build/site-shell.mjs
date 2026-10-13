@@ -161,7 +161,11 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
     if (!m) miss(what, where);
     return unesc(m[1]);
   };
-  const word = one(/className="wm-name"[^>]*>([^<]+)</, "wordmark name");
+  /* the federal wordmark splits "auspol" around its easter-egg anchor
+     (the "o" links /changelog/): lift the span's whole inner source and
+     reduce it back to the word the satellites bake */
+  const word = one(/className="wm-name"[^>]*>([\s\S]*?)<\/span>/, "wordmark name")
+    .replace(/<[^>]+>/g, "").replace(/\s+/g, "");
   const track = one(/className="wm-track"[^>]*>([^<]+)</, "wordmark track");
   const sr = one(/className="wm-sr">([^<]+)</, "wordmark screen-reader suffix");
   const tagM = headSrc.match(/className="tagline">([\s\S]*?)\{pastWord\}([\s\S]*?)<\/p>/);
