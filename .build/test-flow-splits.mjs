@@ -12,11 +12,14 @@
    flow download split by the AEC's own seat classes (elec2025r: all / inner /
    outer / rural+provincial→regional — the menu rekeys the rings), the 2026
    state and by-election counts ride the Labor-v-One-Nation chart as crosses
-   (bys: SA2026 Bonham estimates, Farrer's two Coalition partners, Secret
-   Harbour — on the days of the elections, joined to NO line, national only,
-   hidden on a named region), RedBridge's national dots likewise drop out on
-   a named region (the waves list goes empty), and the third chart's title
-   paints Coalition in coalition blue and One Nation in One Nation orange.
+   (bys: SA2026 Bonham estimates, Secret Harbour — on the days of the
+   elections, joined to NO line, national only, hidden on a named region;
+   Farrer's pair dropped 2026-10-13 — those counts measured independent
+   contests, not One Nation voters' choices), RedBridge's national dots
+   drop out on a named region (Both charts' waves lists go empty — the
+   Labor-v-Coalition chart was missed at first), and the third chart's
+   title paints Coalition in coalition blue and One Nation in One Nation
+   orange.
    Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -98,18 +101,19 @@ assert.ok(!FF.elec2025r.all.scopeNote && !!FF.elec2025r.regional.scopeNote,
   "only the named regions carry a scope note (the national rings speak for all of Australia)");
 
 /* the crosses (user 2026-10-13): the 2026 counts that measured the Labor-v-
-   One-Nation choice — SA 2026 (Bonham's estimates), the Farrer by-election's
-   two Coalition partners, Secret Harbour's early-voting-centre count. Each on
-   its election DAY, none joined to any line */
-assert.ok(Array.isArray(FF.bys) && FF.bys.length === 4, "bys carries the four 2026-count crosses");
+   One-Nation choice — SA 2026 (Bonham's estimates) and Secret Harbour's
+   early-voting-centre count. Each on its election DAY, none joined to any
+   line. Farrer's pair is GONE (the same day): its counts measured a
+   Liberal-v-Nationals contest and One-Nation-independent races, nothing to
+   do with One Nation voters' preferences */
+assert.ok(Array.isArray(FF.bys) && FF.bys.length === 2, "bys carries the two 2026-count crosses");
+assert.deepEqual([...FF.bys.map((d) => d.key)].sort(), ["harbour", "sa2026"],
+  "the surviving crosses are SA 2026 and Secret Harbour — no Farrer reading survives (its counts were an independent national contest's)");
 const byKey = new Map((FF.bys || []).map((d) => [d.key, d]));
 assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, byKey.get("sa2026")[k]])), { coal: 33.9, grn: 84.8, oth: 55.9 },
   "SA 2026: Bonham's estimates (Liberal 33.9 / Greens 84.8 / Independent 55.9 to Labor)");
 assert.equal(byKey.get("sa2026").date, "2026-03-21", "SA 2026 rides its election day");
 assert.equal(byKey.get("sa2026").lbl.coal, "Liberal", "SA's Coalition cohort names the partner");
-assert.equal(byKey.get("farrlib").coal, 41, "Farrer: 41% of Liberal prefs to Labor (the release's 59% to One Nation)");
-assert.equal(byKey.get("farrnat").coal, 31, "Farrer: 31% of Nationals prefs to Labor (the release's 69% to One Nation)");
-assert.equal(byKey.get("farrlib").date, "2026-05-09" , "Farrer rides its by-election day");
 assert.deepEqual([byKey.get("harbour").coal, byKey.get("harbour").grn], [29.8, 90],
   "Secret Harbour: Antony Green's early-voting-centre count (Liberal 29.8 / Greens 90.0 to Labor)");
 assert.equal(byKey.get("harbour").date, "2026-08-29", "Secret Harbour rides 29 Aug 2026");
@@ -176,6 +180,8 @@ assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={
   "the select rides ffReg state beside the section hed, labelled for assistive tech");
 assert.ok(ap.includes("waves={ffReg ? [] : FF.vsOn}"),
   "on a named region RedBridge's dots drop out of the v-One-Nation chart entirely");
+assert.ok(ap.includes("waves={ffReg ? [] : FF.vsCoal}"),
+  "on a named region RedBridge's dots drop out of the v-Coalition chart too (user 2026-10-13: its waves are national-only); the rings and DemosAU's national triangles ride on");
 assert.ok(ap.includes("bys={ffReg ? [] : (FF.bys || [])}"),
   "on a named region the 2026-count crosses drop out too (national counts)");
 assert.ok(ap.includes("elec={FF.elec2025r ? FF.elec2025r[ffReg || \"all\"] : FF.elec2025}"),
@@ -219,8 +225,22 @@ assert.ok(ap.includes("Crosses mark the 2026 state and by-election counts."), "t
 assert.ok(ap.includes("(FF.bys || []).length > 0") || ap.includes('(FF.bys || []).length'), "the crosses' key item is gated on crosses existing");
 assert.ok(ap.includes("FF.elec2025r &&"), "the rings' key item is gated on the region carriers existing");
 
+// ---- the Flows table fold (user 2026-10-13) --------------------------------------------
+assert.ok(ap.includes('summary="Flows table"'), "the Flows table fold mounts in the Preference-flows section");
+assert.ok(ap.indexOf('summary="Flows table"') > 0 && ap.indexOf('summary="Flows table"') < ap.lastIndexOf('summary="Trend-significance table"'),
+  "the Flows table sits directly above the section's trend-significance battery (the last RdTsig mount in the file)");
+assert.ok(ap.includes('name: "2025 election, as counted"') && ap.includes('name: "The flows this site uses"'),
+  "each contest's rows open with the election's counted flows, then the site's own tables");
+assert.ok(ap.includes("D.flowTables"), "the site's row reads the emitted flowTables constants (flows.mjs, the one home)");
+assert.ok(ap.includes('heads={["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]}'),
+  "the table's columns run the four electorate views");
+assert.ok(ap.includes("Labor v Coalition — the share of each cohort choosing Labor") &&
+          ap.includes("Labor v One Nation — the share of each cohort choosing Labor") &&
+          ap.includes("Coalition v One Nation — the share of each cohort choosing the Coalition"),
+  "one row set per contest, each naming where its shares land");
+
 // ---- the renderer's earlier contract still stands --------------------------------------
-assert.ok(ap.includes('q="co" waves={FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series");
+assert.ok(ap.includes('q="co" waves={ffReg ? [] : FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series (national-only, region-gated)");
 assert.ok(ap.includes("const demoRows = FF ? rekeyMrp(FF.demosOn) : [];"),
   "the v-One-Nation chart's MRP extras come from the rekeyed demosOn carriers");
 assert.ok(ap.includes("moved.length !== 1"), "a title tail names a cohort only when EXACTLY ONE moved");
