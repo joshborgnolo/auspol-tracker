@@ -3135,10 +3135,14 @@ body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
 body.rd .rd-ff-dot.grn { fill: var(--grn); }
 body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
-/* DemosAU MRP's readings on the Labor v Coalition chart: unfilled diamonds,
-   another house's marks rather than steps on RedBridge's line; unfilled so a
-   RedBridge dot in the same month still shows through */
-body.rd .rd-ff-dm { fill: none; stroke-width: 1.75; stroke-linejoin: round; }
+/* DemosAU MRP's readings on the Labor v Coalition chart: hollow-centred
+   diamonds, another house's marks rather than steps on RedBridge's line. The
+   centre takes --chart-bg, never none (originally unfilled so a co-located
+   RedBridge dot showed through, but a transparent centre let a cohort line
+   bisect the mark - and the ground-matched centre now inverts with the dark
+   palette on its own): the .rd-ring election-mark idiom (user call
+   2026-10-13) */
+body.rd .rd-ff-dm { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
 body.rd .rd-ff-dm.onp { stroke: var(--onp); }
 /* the Labor-v-One-Nation chart's DemosAU marks take their cohort's colour */
 body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }

@@ -4709,7 +4709,7 @@ const FF_COHORTS = {
   onp:  { name: "One Nation", cls: "onp" },
   oth:  { name: "Other", cls: "oth" },
 };
-function RdForced({ waves, cohorts, rival, W, phone, extras }) {
+function RdForced({ waves, cohorts, rival, W, phone, extras, elec }) {
   const D = window.AUSPOL;
   const [tip, setTip] = useState(null);         // { ym, src }
   const ptr = React.useRef(null);
@@ -4733,25 +4733,24 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
   const H = phone ? 190 : 230;
   const x0 = phone ? 30 : 36, rpad = phone ? 78 : 84, top = 16, bot = H - 34;
   const x1 = W - rpad;
-  /* a calendar axis, every month from the first wave's to the last's: March
-     printed no Table 1, so Feb–Apr spans two months' width with no dot in
-     between. Spacing the waves evenly drew that two-month step as one */
+  /* a TIME-proportional calendar axis: March printed no Table 1, so Feb–Apr
+     spans two months' width with no dot in between. Spacing the waves
+     evenly drew that two-month step as one */
   const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  /* the extras' xm is gen-data's TRUE midpoint on this month-index scale –
-     the one mark off the whole-month grid (a house wave IS a month's
-     reading; an MRP spans six to seven weeks). floor/ceil keeps the
-     extras-covering union integral, so a midpoint outside the house's wave
-     months still can't clip off the edge */
-  const xms = (extras || []).map((d) => d.xm);
-  const m0 = Math.min(mi(waves[0].ym), ...xms.map(Math.floor));
-  const mSpan = Math.max(1, Math.max(mi(waves[waves.length - 1].ym), ...xms.map(Math.ceil)) - m0);
+  /* every POINT's x is its fieldwork window's true midpoint (w.xm, the
+     same month-index scale), never the whole-month grid – the axis itself
+     keeps whole-month ticks via floor/ceil of the union of wave, extras
+     and election xm, so a midpoint outside the monthly bounds can't clip */
+  const xms = [...waves.map((w) => w.xm ?? mi(w.ym)), ...(extras || []).map((d) => d.xm), ...(elec ? [elec.xm] : [])];
+  const m0 = Math.floor(Math.min(...xms));
+  const mSpan = Math.max(1, Math.ceil(Math.max(...xms)) - m0);
   const ms = [];
   for (let k = 0; k <= mSpan; k++) { const m = m0 + k; ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0")); }
   const Xi = (miN) => x0 + ((miN - m0) / mSpan) * (x1 - x0);
-  const X = (ym) => Xi(mi(ym));
   const Y = (v) => bot - (v / 100) * (bot - top);
+  const xw = (w) => Xi(w.xm ?? mi(w.ym));
   const series = cohorts.map((ck) => {
-    const pts = waves.filter((w) => w[ck] != null).map((w) => [X(w.ym), Y(w[ck])]);
+    const pts = waves.filter((w) => w[ck] != null).map((w) => [xw(w), Y(w[ck])]);
     const last = pts.length ? [...waves].reverse().find((w) => w[ck] != null) : null;
     return { ck, pts, last };
   }).filter((s) => s.pts.length >= 2 && s.last);
@@ -4778,7 +4777,7 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
      Enter); a touch tap still only reads the tip */
   const house = D.flowForced && D.flowForced.house;
   const keyOf = (w) => (window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null);
-  const tpx = tip ? X(tip.ym) : 0;
+  const tpx = tip ? xw(tip.w) : 0;
   const tipK = tip ? keyOf(tip.w) : null;
   /* the svg's spoken note on the DemosAU marks: which cohorts the latest
      reading covers, and national print vs the site's all-regions
@@ -4789,11 +4788,12 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
     if (!cks.length) return "";
     return " Diamonds mark DemosAU’s MRP " + (la.wt ? "all-regions readings, our weighting of its printed regional tables" : "national readings") + " of " + cks.map((ck) => FF_COHORTS[ck].name).join(", ") + " voters’ share to Labor, latest " + cks.map((ck) => la[ck]).join(", ") + ".";
   })();
+  const enote = elec ? " Open rings mark the May 2025 election’s own result: " + cohorts.filter((ck) => elec[ck] != null).map((ck) => FF_COHORTS[ck].name + " " + elec[ck]).join(", ") + "." : "";
   const half = Math.min((tipW || 220) / 2, W / 2 - 8);
   return (
     <figure className="rd-ff" ref={box}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, by month: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${xnote}`}>
+           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, against fieldwork date: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${xnote}${enote}`}>
         {[0, 25, 50, 75, 100].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={"rd-ff-gl" + (v === 50 ? " mid" : "")}></path>)}
         {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
         {series.map((s) => <path key={s.ck} d={monotoneXY(s.pts)} className={"rd-ff-line " + FF_COHORTS[s.ck].cls}></path>)}
@@ -4801,18 +4801,20 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
           const k = keyOf(w);
           const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the forced-choice flow chart"); } };
           return (
-          <g key={w.ym}>
-            {tip && tip.ym === w.ym && w[tip.ck] != null && <circle cx={X(w.ym)} cy={Y(w[tip.ck])} r="6" className="rd-apd-dothi"></circle>}
-            {series.map((s) => w[s.ck] != null && <circle key={s.ck} cx={X(w.ym)} cy={Y(w[s.ck])} r="3" className={"rd-ff-dot " + FF_COHORTS[s.ck].cls}></circle>)}
+          <g key={w.date}>
+            {tip && tip.ym === w.ym && w[tip.ck] != null && <circle cx={xw(w)} cy={Y(w[tip.ck])} r="6" className="rd-apd-dothi"></circle>}
+            {series.map((s) => w[s.ck] != null && <circle key={s.ck} cx={xw(w)} cy={Y(w[s.ck])} r="3" className={"rd-ff-dot " + FF_COHORTS[s.ck].cls}></circle>)}
             {series.map((s, si) => {
               if (w[s.ck] == null) return null;
               const est = w.estCohort === s.ck;
-              const aria = `${rdMonthYear(w.ym)}: ${FF_COHORTS[s.ck].name} voters — Labor ${w[s.ck]}, ${rival} ${100 - w[s.ck]}${est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "");
+              /* the aria names the fieldwork window itself (win), not the
+                 month the dot would sit in on the old whole-month grid */
+              const aria = `${w.win || rdMonthYear(w.ym)}: ${FF_COHORTS[s.ck].name} voters — Labor ${w[s.ck]}, ${rival} ${100 - w[s.ck]}${est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "");
               /* the first cohort's hit alone is the focusable button; every
                  cohort keeps its own labelled hit (the June Coalition est
                  note lives on the Coalition cohort, wherever it sits) */
               return (
-              <circle key={s.ck} cx={X(w.ym)} cy={Y(w[s.ck])} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
+              <circle key={s.ck} cx={xw(w)} cy={Y(w[s.ck])} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
                       tabIndex={si === 0 ? "0" : "-1"} role={si === 0 && k ? "button" : "img"}
                       aria-label={aria}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
@@ -4852,18 +4854,28 @@ function RdForced({ waves, cohorts, rival, W, phone, extras }) {
           </path>
           ));
         })}
+        {/* the 2025 election's own reading of this chart's question, at the
+            election's true date: the .rd-ring idiom the primary chart
+            marks every result with (one ring per cohort, no line runs to
+            it) */}
+        {elec && cohorts.filter((ck) => elec[ck] != null).map((ck) => (
+          <g key={"ering" + ck}>
+            <circle cx={Xi(elec.xm)} cy={Y(elec[ck])} r="4.5" className="rd-ring"></circle>
+            <title>{elec.win} — {FF_COHORTS[ck].name} voters’ preferences reaching Labor: {elec[ck]}%</title>
+          </g>
+        ))}
         {series.map((s) => (
           <g key={"el" + s.ck}>
             <text x={x1 + 8} y={labY.get(s.ck) - 2} className={"rd-ff-el " + FF_COHORTS[s.ck].cls}>{FF_COHORTS[s.ck].name}</text>
             <text x={x1 + 8} y={labY.get(s.ck) + 12} className={"rd-ff-elv " + FF_COHORTS[s.ck].cls}>{s.last[s.ck]}</text>
           </g>
         ))}
-        <path d={`M${x0} ${bot}H${x1}` + ticks.map((t) => `M${X(t.ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
-        {ticks.map((t) => <text key={t.ym} x={X(t.ym)} y={bot + 16} className="rd-dis-ax" textAnchor="middle">{t.lab}</text>)}
+        <path d={`M${x0} ${bot}H${x1}` + ticks.map((t) => `M${Xi(mi(t.ym))} ${bot}v4`).join("")} className="rd-dis-base"></path>
+        {ticks.map((t) => <text key={t.ym} x={Xi(mi(t.ym))} y={bot + 16} className="rd-dis-ax" textAnchor="middle">{t.lab}</text>)}
       </svg>
       {tip && (
         <span ref={tipBox} className="tip rd-fl-tip rd-ff-tip" style={{ left: Math.min(W - 8 - half, Math.max(8 + half, tpx)) }}>
-          <span className="tip-title">{rdMonthYear(tip.ym)} · {FF_COHORTS[tip.ck].name} voters</span>
+          <span className="tip-title">{tip.w.win || rdMonthYear(tip.ym)} · {FF_COHORTS[tip.ck].name} voters</span>
           <span className="tip-row"><span className="tip-label">Labor</span><span className="tip-val">{tip.w[tip.ck]}%</span></span>
           <span className="tip-row"><span className="tip-label">{rival === "the Coalition" ? "Coalition" : "One Nation"}</span><span className="tip-val">{100 - tip.w[tip.ck]}%</span></span>
           {tip.w.n != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {tip.w.n.toLocaleString()}</span></span>}
@@ -5035,7 +5047,7 @@ function RdFlows() {
           </div>
           <div className="rd-fl-one">
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
-            <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} extras={FF.demos} />
+            <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} extras={FF.demos} elec={FF.elec2025} />
           </div>
         </div>
         {(FF.demos || FF.demosOn) && <RdKey className="rd-ckey rd-ff-key" items={[]}>

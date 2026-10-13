@@ -691,8 +691,10 @@ whenever the computation is exact-enough arithmetic on AEC denominators.
   matching that chart's own `cohorts` list (`["grn","coal","oth"]` vsOn,
   `["grn","onp","oth"]` vsCoal) and the diamond map renders
   `cohorts.filter(ck => d[ck] != null)` — one hollow diamond per cohort
-  coloured `FF_COHORTS[ck].cls` (`coal` → `lnp`; `.rd-ff-dm` is
-  fill:none, cohort strokes in rd.css beside `.rd-ff-dm.onp`). No
+  coloured `FF_COHORTS[ck].cls` (`coal` → `lnp`; `.rd-ff-dm` fills with
+  `--chart-bg` so a crossing line can't bisect the mark, cohort strokes
+  in rd.css beside `.rd-ff-dm.onp` — the .rd-ring election-mark idiom,
+  inverts with the dark palette on its own; user call 2026-10-13). No
   click-to-open on marks (house-wave dots only). The x AXIS MUST UNION
   the extras (960d7e3): `m0`/`mSpan` previously spanned
   `waves[]` alone and a DemosAU midpoint outside the house's own months

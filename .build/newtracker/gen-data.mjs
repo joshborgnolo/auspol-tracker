@@ -4049,7 +4049,14 @@ const flowForced = (() => {
      cohort's Labor share on the one date, so the two charts group by
      QUESTION (Labor v One Nation / Labor v the Coalition) with one line
      per cohort, rather than by voter cohort as before. */
-  const wave = (p) => ({ date: p.date, ym: ymOf(p.dateStart || p.date), n: p.sample ?? null, url: p.releaseUrl || p.url || null });
+  const wave = (p) => {
+    const mid = fmidIso(p.dateStart || p.date, p.date), y = +mid.slice(0, 4), mo = +mid.slice(5, 7), dy = +mid.slice(8);
+    const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    return { date: p.date, ym: ymOf(p.dateStart || p.date),
+             xm: Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4,
+             win: fwLabel(p.dateStart, p.date) + " " + y,
+             n: p.sample ?? null, url: p.releaseUrl || p.url || null };
+  };
   const vsOn = [], vsCoal = [];
   for (const p of rows) {
     /* HAND_SPLIT_ON lives with the emitters: estCohort names exactly which
@@ -4067,6 +4074,10 @@ const flowForced = (() => {
       if (w.grn != null || w.onp != null || w.oth != null) vsCoal.push(w);
     }
   }
+  /* the 2025 election's OWN reading of the Labor-v-Coalition question: the
+     AEC's printed vote totals flowing to Labor, rounded one decimal – same
+     pair the chart's mention of last-election flows measures against */
+  const elec2025 = { xm: 24314.0645, win: "The May 2025 election", grn: 88.2, onp: 25.5, oth: 54.6 };
   /* DemosAU's MRP reports print one national respondent flow beside
      RedBridge's: One Nation voters' share reaching Labor in Labor-v-Coalition
      contests (pref_flows.onp_alp_lnp, from full five-option rankings over the
@@ -4075,11 +4086,11 @@ const flowForced = (() => {
   /* xm/win for the DemosAU marks, shared by both charts' extras. An MRP
      spans six to seven weeks, so its diamond sits at the window's TRUE
      midpoint on the chart's month-index axis – xm is year·12 + (month−1) +
-     the day-of-month's share of its own month, the scale RdForced's mi()
-     keeps the axis on – the one mark that breaks the whole-month grid (a
-     house wave IS a month's reading). win hands the tooltip the printed
-     window itself ("4 Aug–19 Sep 2026"), since the mark sits between
-     ticks: RdForced's X() keys ym alone. */
+     the day-of-month's share of its own month, the scale RdForced anchors
+     every mark to (a house wave rides its own Mon→Mon midpoint off-slot
+     too, since 2026-10-13's fleet anchoring). win hands the tooltip the
+     printed window itself ("4 Aug–19 Sep 2026"): a midpoint sits between
+     the whole-month ticks. */
   const mrpX = (p) => {
     const mid = fmidIso(p.dateStart || p.date, p.date);
     const y = +mid.slice(0, 4), mo = +mid.slice(5, 7), dy = +mid.slice(8);
@@ -4104,7 +4115,7 @@ const flowForced = (() => {
       if (!all || !all.alp_onp || all.alp_onp.lnp == null || all.alp_onp.grn == null || all.alp_onp.oth == null) return null;
       return { date: p.date, ...mrpX(p), n: p.sample ?? null, wt: true, coal: all.alp_onp.lnp, grn: all.alp_onp.grn, oth: all.alp_onp.oth };
     }).filter(Boolean);
-  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}) } : null;
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}) } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null
