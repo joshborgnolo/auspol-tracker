@@ -1379,7 +1379,7 @@ function RdPastCycles(p) {
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
         {bandKey("tpp")}
         <RdFoot how={{ term: "last-election-flows", from: "Past cycles" }}>
-          Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows {govIn}’s main rival, as the headline does: the one running {govIn} clearly closer after preferences or, when the two are too close to call, the one clearly ahead on first preferences. Each line’s dotted start runs from the election’s counted result to the term’s first poll, and a past line’s dotted end runs from its final poll to the closing election’s count.
+          Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows {govIn}’s main rival, as the headline does: the Coalition, unless One Nation runs {govIn} clearly closer after preferences. Each line’s dotted start runs from the election’s counted result to the term’s first poll, and a past line’s dotted end runs from its final poll to the closing election’s count.
         </RdFoot>
       </RdSec>
       <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party">

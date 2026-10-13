@@ -5019,26 +5019,25 @@ const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return 
    each house's private allocation and the published ALP-v-L/NP figures are a
    different private allocation again.
 
-   The ruling is two margin tests, walked forward month by month from the
-   first month of the term (a pure function of the data, so every build
-   reproduces it):
-   1. AFTER PREFERENCES. A rival takes the spot when it runs Labor closer by
-      more than the gap's own margin. The gap is read poll by poll (the two
-      implied figures come from the same primaries, so most of their sampling
-      error cancels in it: per respondent the variance is that of the flow
-      difference between the two tables) and its margin adds the One Nation
-      table's own range, which no number of polls can narrow.
-   2. FIRST PREFERENCES, when step 1 says the two contests are too close to
-      call: the rival clearly ahead on first preferences leads, because in a
-      preferential count the larger rival is Labor's opponent in more seats.
-      Its margin is the ON-minus-Coalition primary gap's own (a lead between
-      two shares of one sample is wider than the two shares' margins).
-   When both are too close to call, the incumbent keeps the spot.
-   Until 2026-10-11 a fixed one-point deadband on the 2PP gap decided it:
-   on the revised flow table One Nation held the spot on a June gap of 1.003
-   that the flow table's own doubt (~1.4) swamps, and any revision to June
-   could have flipped the board. Each month's ruling records which test
-   decided it (why: "2pp" | "primary" | "held"). */
+   The ruling is one margin test, month by month (a pure function of the
+   data, so every build reproduces it). One Nation takes the spot only in a
+   month it runs Labor closer AFTER PREFERENCES by more than the gap's own
+   margin; every other month the Coalition holds it. The gap is read poll by
+   poll (the two implied figures come from the same primaries, so most of
+   their sampling error cancels in it: per respondent the variance is that of
+   the flow difference between the two tables) and its margin adds the One
+   Nation table's own range, which no number of polls can narrow.
+
+   The Coalition is the default because Labor v Coalition is the two-party
+   figure every pollster publishes, it has an election count to anchor it,
+   and it carries no assumed flow table, so its margin is the tighter one.
+   Until 2026-10-13 a tie went to the rival clearly ahead on FIRST
+   preferences, which handed One Nation the spot from February 2026 on a 2PP
+   gap no month ever cleared (never more than 1.2 points, against a margin
+   near 1.45); the user's call was that the default contest should be the
+   2PP one. Before 2026-10-11 a fixed one-point deadband decided it. Each
+   month's ruling records why (why: "2pp" when the gap decided it,
+   "default" otherwise). */
 const rivalEvidence = (() => {
   const onBy = new Map(tppRowsSynthOn.map((r) => [r.key, r]));
   const share = (p) => {
@@ -5073,17 +5072,10 @@ const rivalEvidence = (() => {
    sitting term's 2PP against whichever rival held the spot in each month, so
    that line and the hero can never disagree about who Labor was facing. */
 const rivalWalk = (() => {
-  let who = "alp_lnp";
   return agg2ppSynth.map((d) => {
     const e = d.election ? null : rivalEvidence[d.ym];
-    let why = "held";
-    if (e) {
-      if (e.gap > e.gapM) { who = "alp_on"; why = "2pp"; }            // One Nation clearly closer
-      else if (e.gap < -e.gapM) { who = "alp_lnp"; why = "2pp"; }     // the Coalition clearly closer
-      else if (e.prim != null && e.prim > e.primM) { who = "alp_on"; why = "primary"; }
-      else if (e.prim != null && e.prim < -e.primM) { who = "alp_lnp"; why = "primary"; }
-    }
-    return { ym: d.ym, who, why };
+    if (e && e.gap > e.gapM) return { ym: d.ym, who: "alp_on", why: "2pp" };    // One Nation clearly closer
+    return { ym: d.ym, who: "alp_lnp", why: e && e.gap < -e.gapM ? "2pp" : "default" };
   });
 })();
 const rivalLead = rivalWalk.length ? rivalWalk[rivalWalk.length - 1].who : "alp_lnp";
@@ -5699,7 +5691,7 @@ function rivalEras(pts, c, cap) {
     segs[segs.length - 1].pts.push(p);
   }
   if (segs.length < 2) return null;
-  // why: which of the rival ruling's two tests handed over the spot ("2pp" | "primary")
+  // why: what handed over the spot ("2pp": the gap cleared its margin; "default": it didn't)
   return segs.map((s, i) => ({ name: c.lead + " " + RIVAL_NAME[s.who], rival: s.who, from: i ? s.from : null,
                                ...(i && s.why ? { why: s.why } : {}),
                                ...cycleSeries(s.pts, i === 0 ? c.eTpp : null, cap) }));
