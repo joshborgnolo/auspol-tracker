@@ -5938,7 +5938,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         ofTotal={totalAll} ofHouses={housesAll.length} demSplit={demSplit} setDemSplit={setDemSplit} />
       <RdDisagree />
       <RdHouseLean measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} />
-      <RdFlows />
+      <RdFlows measure={measure} />
     </div>
   );
 
@@ -7205,8 +7205,10 @@ function infoTerms(D) {
           uses its own {xref("fp-flows", "preference flows", "Labor v One Nation flows")}, estimated
           because no election has counted that pairing.
           <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-          panel in All polls checks. The pollsters’ own two-party figures come largely from where their
-          respondents say their preferences would go, so if those drift from where the pollster’s
+          panel in All polls checks two ways, one contest at a time. It sets what each party’s voters
+          tell pollsters, when asked to choose between the final two, beside the flows the site
+          assumes. And it watches the pollsters’ own two-party figures, which come largely from where
+          their respondents say their preferences would go: if those drift from where the pollster’s
           primary votes and the 2025 flows put them, voters may be sending preferences differently.
           Each pollster is measured against its own habits: its polls in the six months after the
           election, or its first polls if it started later. With no counted Labor v One Nation

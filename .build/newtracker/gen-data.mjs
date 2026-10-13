@@ -4145,11 +4145,11 @@ const flowForced = (() => {
      contests (pref_flows.onp_alp_lnp, from full five-option rankings over the
      MRP sample). It rides the Labor v Coalition chart as marks, not a line –
      three quarterly readings, another house. */
-  /* xm/win for the DemosAU marks, shared by both charts' extras. An MRP
-     spans six to seven weeks, so its diamond sits at the window's TRUE
-     midpoint on the chart's month-index axis – xm is year·12 + (month−1) +
-     the day-of-month's share of its own month, the scale RdForced anchors
-     every mark to (a house wave rides its own Mon→Mon midpoint off-slot
+  /* xm/win for the DemosAU marks, shared by the ledger's contests. An MRP
+     spans six to seven weeks, so its triangle sits at the window's TRUE
+     midpoint on the ledger lines' month-index axis – xm is year·12 +
+     (month−1) + the day-of-month's share of its own month, the scale
+     RdFlowSpark anchors every mark to (a house wave rides its own Mon→Mon midpoint off-slot
      too, since 2026-10-13's fleet anchoring). win hands the tooltip the
      printed window itself ("4 Aug–19 Sep 2026"): a midpoint sits between
      the whole-month ticks. */

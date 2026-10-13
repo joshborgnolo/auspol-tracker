@@ -1102,6 +1102,11 @@ body.dark .sens-band { opacity: 0.10; }
 .tip-swatch.is-ring { border-radius: 50%; border: 1.5px solid; background: transparent; }
 .tip-label { color: var(--ink-3); }
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
+.tip-tight .tip-row { min-width: 0; }
+.tip-tight .tip-note { min-width: 0; white-space: normal; line-height: 1.3; }
+.tip-tight .tip-row-long { flex-wrap: wrap; row-gap: 0; white-space: normal; }
+.tip-tight .tip-row-long .tip-label { white-space: nowrap; }
+.tip-tight .tip-row-long .tip-val { min-width: 0; padding-left: 0; margin-left: 0; text-align: left; line-height: 1.35; font-weight: 600; }
 .tip-hint { margin-top: 5px; font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; }
 .tip-evt { width: max-content; max-width: 240px; min-width: 0; }
 .tip-evt .tip-title { white-space: normal; overflow-wrap: anywhere; }
@@ -5289,59 +5294,141 @@ body.rd .rd-hl-end { stroke: var(--bg); stroke-width: 1.5; }
 body.rd .rd-hl-hv { fill: var(--ink); stroke: var(--bg); stroke-width: 1.5; }
 body.rd .rd-hl-tip { position: absolute; bottom: calc(100% + 4px); top: auto; transform: translateX(-50%); z-index: 20; white-space: nowrap; }
 body.rd .rd-hl-measure { display: block; height: 0; }
-body.rd .rd-fl-head { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; column-gap: 24px; row-gap: 10px; }
-body.rd .rd-fl-head .rd-ap-ct { margin: 0; flex: 1 1 340px; min-width: 0; }
+body.rd .rd-fl-tabs { margin-top: 28px; }
 body.rd .rd-fl-sel { min-height: 34px; padding-top: 7px; padding-bottom: 7px; font-size: 13px; }
-body.rd .rd-fl-two { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; }
+body.rd .rd-fl-lhead { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; column-gap: 24px; row-gap: 8px; }
+body.rd .rd-fl-lhead .rd-ap-ct { margin: 0; flex: 1 1 340px; min-width: 0; }
+body.rd .rd-fl-reg { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-3); }
+body.rd .rd-fl-reg .rd-pv-sel { margin-top: 0; }
+body.rd .rd-fx { margin-top: 12px; font-variant-numeric: tabular-nums; }
+body.rd .rd-fx-hrow, body.rd .rd-fx-row { display: grid; }
+body.rd .rd-fx-hrow { align-items: end; padding-bottom: 6px; border-bottom: 1px solid var(--ink-faint); }
+body.rd .rd-fx-hrow > .rd-ap-th:first-child, body.rd .rd-fx-who { padding-left: 12px; }
+body.rd .rd-fx-hrow .rd-ap-th em { display: block; font-style: normal; font-weight: 400; letter-spacing: 0; text-transform: none; }
+body.rd .rd-fx-shead { position: relative; align-self: stretch; min-height: 38px; }
+body.rd .rd-fx-shead .rd-ap-cap { left: 6px; }
+body.rd .rd-fx-row { align-items: center; min-height: 84px; border-bottom: 1px solid var(--line-2); }
+body.rd .rd-fx-row > * { min-width: 0; }
+body.rd .rd-fx-who { display: flex; flex-direction: column; }
+body.rd .rd-fx-who b { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+body.rd .rd-fx-who .rd-ap-sub { padding-left: 17px; }
+body.rd .rd-fx-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--oth); }
+body.rd .rd-fx-swatch.alp { background: var(--alp); }
+body.rd .rd-fx-swatch.lnp { background: var(--lnp); }
+body.rd .rd-fx-swatch.grn { background: var(--grn); }
+body.rd .rd-fx-swatch.onp { background: var(--onp); }
+body.rd .rd-fx-n { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); }
+body.rd .rd-fx-n.ref { font-weight: 400; color: var(--ink-2); }
+body.rd .rd-fx-band { margin-left: 3px; font-size: 12px; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-fx-nil { font-weight: 400; color: var(--ink-3); }
+body.rd .rd-fx-chg { display: block; font-size: 12px; font-weight: 400; line-height: 1.3; color: var(--ink-3); }
+body.rd .rd-fx-spark { position: relative; }
+body.rd .rd-fx-spark svg { display: block; overflow: visible; }
+body.rd .rd-fx-spark svg.link { cursor: pointer; }
+body.rd .rd-fx.narrow .rd-fx-hrow, body.rd .rd-fx.narrow .rd-fx-row { grid-template-columns: minmax(0, 1fr) 56px 64px 64px; column-gap: 6px; }
+body.rd .rd-fx.narrow .rd-fx-row { align-items: start; row-gap: 6px; min-height: 0; padding: 10px 0 8px; }
+body.rd .rd-fx.narrow .rd-fx-hrow > .rd-ap-th:first-child, body.rd .rd-fx.narrow .rd-fx-who { padding-left: 0; }
+body.rd .rd-fx.narrow .rd-fx-hrow .rd-ap-th { font-size: 11px; letter-spacing: 0.02em; }
+body.rd .rd-fx.narrow .rd-fx-who b { gap: 7px; font-size: 14px; }
+body.rd .rd-fx.narrow .rd-fx-who .rd-ap-sub { padding-left: 16px; }
+body.rd .rd-fx.narrow .rd-fx-n { font-size: 14px; }
+body.rd .rd-fx.narrow .rd-fx-band { display: block; margin-left: 0; font-size: 11px; }
+body.rd .rd-fx.narrow .rd-fx-chg { font-size: 11px; line-height: 1.25; white-space: normal; }
+body.rd .rd-fx.narrow .rd-fx-sc { grid-column: 1 / -1; }
+body.rd .rd-fx-ticks { position: relative; height: 18px; margin-top: 2px; }
+body.rd .rd-fx-ticks .rd-ap-tk { top: 2px; bottom: auto; font-size: 11px; }
+body.rd .rd-fx-ref { fill: none; stroke: var(--rd-avgline); stroke-width: 1.25; stroke-dasharray: 3 3; }
+body.rd .rd-fx-refb { fill: var(--ink-3); opacity: 0.09; }
+body.rd .rd-fx-area { fill: var(--ink-2); opacity: 0.1; }
+body.rd.dark .rd-fx-area { opacity: 0.16; }
+body.rd .rd-fx-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+body.rd .rd-fx-mline { fill: none; stroke-width: 1.25; stroke-linejoin: round; opacity: 0.55; }
+body.rd .rd-fx-tr { fill: var(--chart-bg); stroke-width: 1.6; stroke-linejoin: round; }
+body.rd .rd-fx-x { fill: none; stroke-width: 1.7; stroke-linecap: round; }
+body.rd .rd-fx-end { stroke: var(--bg); stroke-width: 1.5; }
+body.rd .rd-fx-line.alp, body.rd .rd-fx-mline.alp, body.rd .rd-fx-tr.alp, body.rd .rd-fx-x.alp { stroke: var(--alp); }
+body.rd .rd-fx-line.lnp, body.rd .rd-fx-mline.lnp, body.rd .rd-fx-tr.lnp, body.rd .rd-fx-x.lnp { stroke: var(--lnp); }
+body.rd .rd-fx-line.grn, body.rd .rd-fx-mline.grn, body.rd .rd-fx-tr.grn, body.rd .rd-fx-x.grn { stroke: var(--grn); }
+body.rd .rd-fx-line.onp, body.rd .rd-fx-mline.onp, body.rd .rd-fx-tr.onp, body.rd .rd-fx-x.onp { stroke: var(--onp); }
+body.rd .rd-fx-line.oth, body.rd .rd-fx-mline.oth, body.rd .rd-fx-tr.oth, body.rd .rd-fx-x.oth { stroke: var(--oth); }
+body.rd .rd-fx-dot.alp, body.rd .rd-fx-end.alp { fill: var(--alp); }
+body.rd .rd-fx-dot.lnp, body.rd .rd-fx-end.lnp { fill: var(--lnp); }
+body.rd .rd-fx-dot.grn, body.rd .rd-fx-end.grn { fill: var(--grn); }
+body.rd .rd-fx-dot.onp, body.rd .rd-fx-end.onp { fill: var(--onp); }
+body.rd .rd-fx-dot.oth, body.rd .rd-fx-end.oth { fill: var(--oth); }
+body.rd .rd-fx-spark :is(.rd-fx-ref, .rd-fx-refb, .rd-fx-area, .rd-fx-line, .rd-fx-mline, .rd-fx-dot, .rd-fx-tr, .rd-fx-x, .rd-fx-end, .rd-apd-dothi, .rd-fl-empty) { pointer-events: none; }
+body.rd .rd-fx-hit { pointer-events: none; }
+body.rd .rd-fx-key { margin-top: 10px; }
+body.rd .rd-fx-keyref { position: relative; display: inline-block; width: 24px; height: 10px; }
+body.rd .rd-fx-keyref::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; border-top: 1.25px dashed var(--rd-avgline); }
+body.rd .rd-fx-keyref.band { background: color-mix(in oklab, var(--ink-3) 10%, transparent); }
+body.rd .rd-fx-keyarea { display: inline-block; width: 16px; height: 9px; border-radius: 2px; background: color-mix(in oklab, var(--ink-2) 12%, transparent); }
+body.rd .rd-fx-keydm { display: inline-block; width: 9px; height: 8px; margin: 0 7px 0 2px; background: var(--ink-2); clip-path: polygon(50% 0, 100% 100%, 0 100%); vertical-align: -1px; }
+body.rd .rd-fx-keyx { position: relative; display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; vertical-align: -1px; }
+body.rd .rd-fx-keyx::before, body.rd .rd-fx-keyx::after { content: ""; position: absolute; left: 0; right: 0; top: 3.5px; height: 1.75px; border-radius: 1px; background: var(--ink-2); }
+body.rd .rd-fx-keyx::before { transform: rotate(45deg); }
+body.rd .rd-fx-keyx::after { transform: rotate(-45deg); }
+body.rd .rd-fx-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
+body.rd .rd-fx-keyln::before { content: ""; position: absolute; left: 1px; right: 1px; top: 6px; height: 2px; border-radius: 1px; background: var(--ink-2); }
+body.rd .rd-fx-keyln i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--ink-2); }
+body.rd .rd-fx-note { margin-top: 10px; }
+body.rd .rd-fx-tip { width: max-content; white-space: normal; z-index: 30; }
+body.rd .rd-fx-tip .tip-row { white-space: nowrap; }
+body.rd .rd-fx-tip.below { transform: translate(-50%, 0); }
+body.rd .rd-fx-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
+body.rd .rd-fx-tsub { display: block; margin: -3px 0 5px; line-height: 1.35; }
+body.rd .rd-fx-tnote { display: block; margin-top: 6px; line-height: 1.35; }
+body.rd .rd-fx-tind { padding-left: 16px; }
+body.rd .rd-fx-tref { font-weight: 600; color: var(--ink-2); }
+body.rd .rd-fx-sw { background: var(--oth); }
+body.rd .rd-fx-sw.wave { border-radius: 50%; width: 8px; height: 8px; }
+body.rd .rd-fx-sw.mrp { width: 9px; height: 8px; border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+body.rd .rd-fx-sw.byelec { position: relative; border-radius: 0; background: transparent; }
+body.rd .rd-fx-sw.byelec::before, body.rd .rd-fx-sw.byelec::after { content: ""; position: absolute; left: 0.5px; right: 0.5px; top: 3.5px; height: 1.75px; border-radius: 1px; background: var(--oth); }
+body.rd .rd-fx-sw.byelec::before { transform: rotate(45deg); }
+body.rd .rd-fx-sw.byelec::after { transform: rotate(-45deg); }
+body.rd .rd-fx-sw.alp:not(.byelec) { background: var(--alp); }
+body.rd .rd-fx-sw.lnp:not(.byelec) { background: var(--lnp); }
+body.rd .rd-fx-sw.grn:not(.byelec) { background: var(--grn); }
+body.rd .rd-fx-sw.onp:not(.byelec) { background: var(--onp); }
+body.rd .rd-fx-sw.byelec.alp::before, body.rd .rd-fx-sw.byelec.alp::after { background: var(--alp); }
+body.rd .rd-fx-sw.byelec.lnp::before, body.rd .rd-fx-sw.byelec.lnp::after { background: var(--lnp); }
+body.rd .rd-fx-sw.byelec.grn::before, body.rd .rd-fx-sw.byelec.grn::after { background: var(--grn); }
+body.rd .rd-fx-sw.byelec.onp::before, body.rd .rd-fx-sw.byelec.onp::after { background: var(--onp); }
+body.rd .rd-fl-dblock { margin-top: 44px; }
+body.rd .rd-fl-dblock.solo { margin-top: 18px; }
+body.rd .rd-fl-dblock.solo .rd-fl-dsub { margin-top: 0; font-weight: 600; color: var(--ink); }
+body.rd .rd-fl-dhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; column-gap: 24px; row-gap: 10px; }
+body.rd .rd-fl-dtitle { flex: 1 1 420px; min-width: 0; }
+body.rd .rd-fl-dt { margin: 0; font-size: 26px; }
+body.rd .rd-fl-dsub { margin: 6px 0 0; max-width: 760px; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+body.rd .rd-fl-dgrid { margin-top: 14px; display: grid; column-gap: 44px; align-items: start; }
 body.rd .rd-fl-one { display: flex; flex-direction: column; min-width: 0; }
-body.rd .rd-fl-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
-body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
-body.rd .rd-fl-name.onp { color: var(--onp-text); }
-body.rd .rd-fl-xb { color: var(--lnp-text); }
-body.rd .rd-fl-xo { color: var(--onp-text); }
-body.rd .rd-ft { margin-top: 22px; }
-body.rd .rd-ft-view { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
-body.rd .rd-ft-view span { font-weight: 400; color: var(--ink-3); }
-body.rd .rd-ft-grid { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 560px); gap: 28px 40px; align-items: start; }
-@media (min-width: 1200px) { body.rd .rd-ft-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-body.rd .rd-ft-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-body.rd .rd-ft-table caption { text-align: left; caption-side: top; padding-bottom: 8px; }
-body.rd .rd-ft-table caption .rd-fl-name { display: block; }
-body.rd .rd-ft-to { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
-body.rd .rd-ft-table th, body.rd .rd-ft-table td { padding: 7px 0 7px 10px; font-size: 14px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
-body.rd .rd-ft-table :is(th, td):first-child { padding-left: 0; text-align: left; }
-body.rd .rd-ft-table thead th { font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--ink); vertical-align: bottom; white-space: normal; border-bottom: 1.5px solid var(--ink-2); }
-body.rd .rd-ft-table thead th span { display: block; font-weight: 400; color: var(--ink-3); }
-body.rd .rd-ft-table tbody th { font-weight: 500; color: var(--ink); }
-body.rd .rd-ft-table tbody td { color: var(--ink); }
-body.rd .rd-ft-table .rd-ft-site { background: color-mix(in oklab, var(--ink) 4%, var(--surface)); padding-right: 8px; padding-left: 8px; }
-body.rd .rd-ft-table thead .rd-ft-site { border-radius: 4px 4px 0 0; }
-body.rd .rd-ft-band { display: inline-block; min-width: 2.9em; padding-left: 3px; text-align: left; font-size: 12px; color: var(--ink-3); }
-body.rd .rd-ft-table thead th:not(:first-child) { width: 19%; }
-body.rd .rd-ft-nil { color: var(--ink-3); }
-body.rd .rd-ft-sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; background: var(--oth); }
-body.rd .rd-ft-sw.grn { background: var(--grn); }
-body.rd .rd-ft-sw.onp { background: var(--onp); }
-body.rd .rd-ft-sw.lnp { background: var(--lnp); }
-body.rd .rd-ft-sw.alp { background: var(--alp); }
-body.rd .rd-ft-note { margin-top: 14px; max-width: 72ch; }
-@media (max-width: 640px) { body.rd .rd-ft-table th, body.rd .rd-ft-table td { padding-left: 8px; } body.rd .rd-ft-table .rd-ft-site { padding-right: 6px; padding-left: 6px; } }
-body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
-body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
-@media (min-width: 761px) {
-  body.rd .rd-ff-two { grid-template-rows: auto auto auto; }
-  body.rd .rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }
-  body.rd .rd-ff-two .rd-fl-ct { align-items: flex-start; padding-top: 4px; }
-}
-body.rd .rd-ff-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; column-gap: 24px; row-gap: 8px; }
-body.rd .rd-ff-head > div { flex: 1 1 auto; }
-body.rd .rd-ff-ln { margin-top: 28px; }
-@media (min-width: 761px) {
-  body.rd .rd-ff-ln { width: calc((100% - 48px) / 2); }
+body.rd .rd-fl-dside { padding-top: 22px; min-width: 0; }
+body.rd .rd-fl-dbig { margin: 0; font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+body.rd .rd-fl-dbig span { margin-left: 6px; font-size: 16px; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-fl-dverd { margin: 8px 0 0; font-size: 15px; line-height: 1.45; color: var(--ink-2); }
+body.rd .rd-fl-key.v { flex-direction: column; align-items: flex-start; row-gap: 7px; margin-top: 16px; }
+@media (max-width: 900px) {
+  body.rd .rd-fl-dblock { margin-top: 36px; }
+  body.rd .rd-fl-dblock.solo { margin-top: 16px; }
+  body.rd .rd-fl-dgrid { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-fl-dside { padding-top: 0; }
 }
 @media (max-width: 760px) {
-  body.rd .rd-ff-head { display: block; }
-  body.rd .rd-ff-head .rd-pv-sel { margin-top: 8px; }
+  body.rd .rd-fl-dt { font-size: 22px; }
+  body.rd .rd-fl-tabs .rd-tab { font-size: 14px; }
+}
+@media (max-width: 620px) {
+  body.rd .rd-fl-tabs > div[role="group"] {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    padding-right: 24px;
+  }
+  body.rd .rd-fl-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
+  body.rd .rd-fl-tabs .rd-tab { flex: 0 0 auto; }
 }
 body.rd .rd-fl-chart { position: relative; margin-top: 8px; }
 body.rd .rd-fl-chart svg { display: block; overflow: visible; }
@@ -5374,105 +5461,8 @@ body.rd .rd-fl-keywd { display: inline-block; width: 6px; height: 6px; margin: 0
 body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; height: 18px; }
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
-body.rd .rd-ff-two { margin-top: 24px; }
-body.rd .rd-ff figure, body.rd figure.rd-ff { margin: 3px 0 0; }
-body.rd figure.rd-ff { position: relative; width: 100%; }
-body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
-body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
-body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
-body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
-body.rd .rd-ff-line.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-line.grn { stroke: var(--grn); }
-body.rd .rd-ff-line.onp { stroke: var(--onp); }
-body.rd .rd-ff-line.oth { stroke: var(--oth); }
-body.rd .rd-ff-line.alp { stroke: var(--alp); }
-body.rd .rd-ff-dot.lnp { fill: var(--lnp); }
-body.rd .rd-ff-dot.grn { fill: var(--grn); }
-body.rd .rd-ff-dot.onp { fill: var(--onp); }
-body.rd .rd-ff-dot.oth { fill: var(--oth); }
-body.rd .rd-ff-dot.alp { fill: var(--alp); }
-body.rd .rd-ff-tr { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
-body.rd .rd-ff-tr.onp { stroke: var(--onp); }
-body.rd .rd-ff-tr.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-tr.grn { stroke: var(--grn); }
-body.rd .rd-ff-tr.oth { stroke: var(--oth); }
-body.rd .rd-ff-tr.alp { stroke: var(--alp); }
-body.rd .rd-ff-x { fill: none; stroke-width: 1.75; stroke-linecap: round; }
-body.rd .rd-ff-x.onp { stroke: var(--onp); }
-body.rd .rd-ff-x.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-x.grn { stroke: var(--grn); }
-body.rd .rd-ff-x.oth { stroke: var(--oth); }
-body.rd .rd-ff-x.alp { stroke: var(--alp); }
-body.rd .rd-ff-keydm { display: inline-block; width: 9px; height: 8px; margin: 0 7px 0 2px; background: var(--ink-2); clip-path: polygon(50% 0, 100% 100%, 0 100%); vertical-align: -1px; }
-body.rd .rd-ff-keyring { display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); border-radius: 50%; vertical-align: -1px; }
-body.rd .rd-ff-keyx { position: relative; display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; vertical-align: -1px; }
-body.rd .rd-ff-keyx::before, body.rd .rd-ff-keyx::after { content: ""; position: absolute; left: 0; right: 0; top: 3.5px; height: 1.75px; border-radius: 1px; background: var(--ink-2); }
-body.rd .rd-ff-keyx::before { transform: rotate(45deg); }
-body.rd .rd-ff-keyx::after { transform: rotate(-45deg); }
-body.rd .rd-ff-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
-body.rd .rd-ff-keyln::before { content: ""; position: absolute; left: 1px; right: 1px; top: 6px; height: 2.25px; border-radius: 1px; background: var(--ink-2); }
-body.rd .rd-ff-keyln i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--ink-2); }
-body.rd .rd-ff-ring.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-ring.grn { stroke: var(--grn); }
-body.rd .rd-ff-ring.onp { stroke: var(--onp); }
-body.rd .rd-ff-ring.oth { stroke: var(--oth); }
-body.rd .rd-ff-ring.alp { stroke: var(--alp); }
-body.rd .rd-ff-lead { fill: none; stroke-width: 2.25; stroke-linecap: round; }
-body.rd .rd-ff-lead.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-lead.grn { stroke: var(--grn); }
-body.rd .rd-ff-lead.onp { stroke: var(--onp); }
-body.rd .rd-ff-lead.oth { stroke: var(--oth); }
-body.rd .rd-ff-lead.alp { stroke: var(--alp); }
-body.rd .rd-ff .rd-ff-line, body.rd .rd-ff .rd-ff-lead, body.rd .rd-ff .rd-ff-g, body.rd .rd-ff .rd-ff-guide,
-body.rd .rd-ff .rd-fl-empty, body.rd .rd-ff .rd-apd-dothi { pointer-events: none; }
-body.rd .rd-ff .rd-ff-hit { pointer-events: none; }
-body.rd .rd-ff svg.link { cursor: pointer; }
-body.rd .rd-ff-sw.wave { border-radius: 50%; width: 8px; height: 8px; }
-body.rd .rd-ff-sw.mrp { width: 9px; height: 8px; border-radius: 0; transform: none; border: 0; margin: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-body.rd .rd-ff-sw.elec { border-radius: 50%; background: transparent; border: 1.5px solid; }
-body.rd .rd-ff-sw.byelec { position: relative; border-radius: 0; background: transparent; }
-body.rd .rd-ff-sw.byelec::before, body.rd .rd-ff-sw.byelec::after { content: ""; position: absolute; left: 0.5px; right: 0.5px; top: 3.5px; height: 1.75px; border-radius: 1px; }
-body.rd .rd-ff-sw.byelec::before { transform: rotate(45deg); }
-body.rd .rd-ff-sw.byelec::after { transform: rotate(-45deg); }
-body.rd .rd-ff-sw.wave.lnp { background: var(--lnp); }
-body.rd .rd-ff-sw.wave.grn { background: var(--grn); }
-body.rd .rd-ff-sw.wave.onp { background: var(--onp); }
-body.rd .rd-ff-sw.wave.oth { background: var(--oth); }
-body.rd .rd-ff-sw.wave.alp { background: var(--alp); }
-body.rd .rd-ff-sw.lnp { border-color: var(--lnp); }
-body.rd .rd-ff-sw.grn { border-color: var(--grn); }
-body.rd .rd-ff-sw.onp { border-color: var(--onp); }
-body.rd .rd-ff-sw.oth { border-color: var(--oth); }
-body.rd .rd-ff-sw.alp { border-color: var(--alp); }
-body.rd .rd-ff-sw.mrp.lnp { background: var(--lnp); }
-body.rd .rd-ff-sw.mrp.grn { background: var(--grn); }
-body.rd .rd-ff-sw.mrp.onp { background: var(--onp); }
-body.rd .rd-ff-sw.mrp.oth { background: var(--oth); }
-body.rd .rd-ff-sw.mrp.alp { background: var(--alp); }
-body.rd .rd-ff-sw.byelec.lnp::before, body.rd .rd-ff-sw.byelec.lnp::after { background: var(--lnp); }
-body.rd .rd-ff-sw.byelec.grn::before, body.rd .rd-ff-sw.byelec.grn::after { background: var(--grn); }
-body.rd .rd-ff-sw.byelec.onp::before, body.rd .rd-ff-sw.byelec.onp::after { background: var(--onp); }
-body.rd .rd-ff-sw.byelec.oth::before, body.rd .rd-ff-sw.byelec.oth::after { background: var(--oth); }
-body.rd .rd-ff-sw.byelec.alp::before, body.rd .rd-ff-sw.byelec.alp::after { background: var(--alp); }
-body.rd .rd-ff-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
-body.rd .rd-ff-tipsub { margin: -4px 0 3px; }
-body.rd .rd-ff-tipsub .tip-label { font-size: 12px; }
-body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
-body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
-body.rd .rd-ff-el.lnp { fill: var(--lnp); }
-body.rd .rd-ff-elv.lnp { fill: var(--lnp); opacity: 0.85; }
-body.rd .rd-ff-el.grn { fill: var(--grn); }
-body.rd .rd-ff-elv.grn { fill: var(--grn); opacity: 0.85; }
-body.rd .rd-ff-el.onp { fill: var(--onp); }
-body.rd .rd-ff-elv.onp { fill: var(--onp); opacity: 0.85; }
-body.rd .rd-ff-el.oth { fill: var(--oth); }
-body.rd .rd-ff-elv.oth { fill: var(--oth); opacity: 0.85; }
-body.rd .rd-ff-el.alp { fill: var(--alp); }
-body.rd .rd-ff-elv.alp { fill: var(--alp); opacity: 0.85; }
-body.rd .rd-ff-tip { pointer-events: auto; white-space: normal; }
-body.rd .tip-hintwrap { white-space: normal; max-width: 230px; }
-body.rd .tip-hintwrap .tip-hint { margin-top: 2px; white-space: normal; }
-body.rd .rd-ff-lnk { color: var(--accent); }
+body.rd .rd-fl-tip { width: max-content; }
+body.rd .rd-fl-tip :is(.tip-sub, .tip-hint) { white-space: normal; }
 @media (max-width: 984px) {
   body.rd .rd-hl-tabs > div[role="group"] {
     flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden;
@@ -5511,9 +5501,6 @@ body.rd .rd-ff-lnk { color: var(--accent); }
   body.rd .rd-hl-bhead .rd-ap-in, body.rd .rd-hl-bar .rd-ap-in { left: 10px; right: 10px; }
   body.rd .rd-hl-now { font-size: 14px; }
   body.rd .rd-hl-sc { grid-column: 1 / -1; }
-  body.rd .rd-fl-two { grid-template-columns: minmax(0, 1fr); row-gap: 20px; margin-top: 14px; }
-  body.rd .rd-fl-head { margin-top: 22px; }
-  body.rd .rd-ff-two { margin-top: 18px; }
 }
 body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; flex-wrap: wrap; }
 body.rd .info { padding-top: 4px; }
@@ -24092,15 +24079,33 @@ function TrendChart(props) {
     w: 0
   });
   const [tipSpill, setTipSpill] = useState(false);
+  const [tipBox, setTipBox] = useState({
+    x: 0,
+    vw: 0
+  });
+  const [tipTight, setTipTight] = useState(null);
   React.useLayoutEffect(() => {
     const el = tipRef.current;
     if (!el) return;
     const w = el.offsetWidth;
     setTipW(prev => Math.abs(prev - w) > 0.5 ? w : prev);
+    if (ref.current) {
+      const x = ref.current.getBoundingClientRect().left,
+        vw = document.documentElement.clientWidth;
+      setTipBox(prev => Math.abs(prev.x - x) > 0.5 || Math.abs(prev.vw - vw) > 0.5 ? {
+        x,
+        vw
+      } : prev);
+    }
     const plotH = ref.current ? ref.current.offsetHeight : 0;
     const over = el.offsetTop + 10 + el.offsetHeight > plotH;
     setTipSpill(over && !el.classList.contains("tip-dot"));
     const rows = [...el.querySelectorAll(".tip-row")];
+    const spills = el.scrollWidth > el.clientWidth + 1;
+    if (spills && !(tipTight && tipTight.n === rows.length && tipTight.cw === cw)) setTipTight({
+      n: rows.length,
+      cw
+    });else if (!spills && tipTight && (tipTight.n !== rows.length || tipTight.cw !== cw)) setTipTight(null);
     if (!el.classList.contains("tip-guide") || rows.length === tipLay.n && cw === tipLay.cw) return;
     let colW = 0;
     for (const r of rows) {
@@ -24533,11 +24538,20 @@ function TrendChart(props) {
     };
   }
   const tipCols = !!(tip && !evt && !dot && tipLay.w && tip.rows.length === tipLay.n && cw === tipLay.cw);
+  const tipRoom = Math.max(140, (tipBox.vw || cw + 16) - 16);
+  const tight = !!(tip && !evt && !tipCols && tipTight && tip.rows.length === tipTight.n && cw === tipTight.cw);
   if (tip) {
     const assumed = Math.min(evt ? 240 : 156, cw);
-    const tipMax = Math.min(tipW || assumed, cw);
-    const halfPct = Math.min(50, tipMax / 2 / Math.max(cw, 1) * 100);
-    tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
+    const tw = Math.min(tipW || assumed, tipRoom);
+    if (tw <= cw || !tipBox.vw) {
+      const halfPct = Math.min(50, Math.min(tw, cw) / 2 / Math.max(cw, 1) * 100);
+      tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
+    } else {
+      const c = tip.left / 100 * cw;
+      const lo = 8 - tipBox.x + tw / 2,
+        hi = tipBox.vw - 8 - tipBox.x - tw / 2;
+      tip.left = Math.min(Math.max(lo, hi), Math.max(lo, c)) / Math.max(cw, 1) * 100;
+    }
   }
   const namedSeries = [...new Set(series.filter(s => s.label && s.opacity !== 0).map(s => s.label))];
   const spanFrom = tooltipTitle && spinePts.length ? tooltipTitle(0) : "";
@@ -25559,11 +25573,12 @@ function TrendChart(props) {
   })), tip && React.createElement("div", {
     key: evt ? "evt" : dot ? "dot" : "guide",
     ref: tipRef,
-    className: "tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide") + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : ""),
+    className: "tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide") + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : "") + (tight ? " tip-tight" : ""),
     style: {
       left: tip.left + "%",
       top: tip.top + "%",
-      width: tipCols ? tipLay.w : undefined
+      width: tipCols ? tipLay.w : tight ? tipRoom : undefined,
+      maxWidth: evt ? undefined : tipRoom
     }
   }, tip.title && React.createElement("div", {
     className: "tip-title"
@@ -25571,7 +25586,7 @@ function TrendChart(props) {
     className: "tip-date"
   }, tip.date), (() => {
     const row = (r, i) => React.createElement("div", {
-      className: "tip-row",
+      className: "tip-row" + (typeof r.value === "string" && r.value.length > 22 ? " tip-row-long" : ""),
       key: i
     }, r.color && React.createElement("span", {
       className: "tip-swatch" + (tip.ringSwatch ? " is-ring" : ""),
@@ -36556,7 +36571,9 @@ function AllPollsView({
     measure: measure,
     onMeasure: onMeasure,
     tppBasis: tppBasis
-  }), React.createElement(RdFlows, null));
+  }), React.createElement(RdFlows, {
+    measure: measure
+  }));
   return React.createElement("div", {
     className: "view view-allpolls"
   }, React.createElement("div", {
@@ -37725,7 +37742,7 @@ function infoTerms(D) {
         className: "info-chart"
       }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows panel in All polls checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
+      }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows panel in All polls checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
     }, {
       id: "fp-flows",
       term: "Labor v One Nation flows",
@@ -59942,6 +59959,31 @@ function RdDisagree() {
   const [hover, setHover] = useState(null);
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
+  const disTip = useRef(null);
+  const [disTipBox, setDisTipBox] = useState({
+    w: 0,
+    x: 0,
+    vw: 0
+  });
+  React.useLayoutEffect(() => {
+    const el = disTip.current;
+    if (!el) return;
+    const w = el.offsetWidth,
+      x = el.parentElement.getBoundingClientRect().left,
+      vw = document.documentElement.clientWidth;
+    setDisTipBox(p => Math.abs(p.w - w) > 0.5 || Math.abs(p.x - x) > 0.5 || Math.abs(p.vw - vw) > 0.5 ? {
+      w,
+      x,
+      vw
+    } : p);
+  }, [hover]);
+  const disTipLeft = (hx, pw) => {
+    const half = (disTipBox.w || 140) / 2;
+    if (2 * half <= pw || !disTipBox.vw) return Math.min(pw - half, Math.max(half, hx));
+    const lo = 8 - disTipBox.x + half,
+      hi = disTipBox.vw - 8 - disTipBox.x - half;
+    return Math.min(Math.max(lo, hi), Math.max(lo, pw / 2));
+  };
   const disHover = React.useRef(false);
   React.useEffect(() => {
     const sec = document.getElementById("poll-disagreement");
@@ -60095,9 +60137,11 @@ function RdDisagree() {
         ym
       } : null)
     }), hv && React.createElement("span", {
+      ref: disTip,
       className: "tip rd-dis-tip",
       style: {
-        left: Math.min(pw - 70, Math.max(70, hx))
+        left: disTipLeft(hx, pw),
+        maxWidth: Math.max(140, (disTipBox.vw || Wall + 16) - 16)
       }
     }, React.createElement("span", {
       className: "tip-title"
@@ -60987,7 +61031,8 @@ function RdFlowChart({
     ref: tipBox,
     className: "tip rd-fl-tip",
     style: {
-      left: tipLeft("m", X(hv.ym))
+      left: tipLeft("m", X(hv.ym)),
+      maxWidth: W - 16
     }
   }, React.createElement("span", {
     className: "tip-title"
@@ -61019,7 +61064,8 @@ function RdFlowChart({
       ref: tipBox,
       className: "tip rd-fl-tip",
       style: {
-        left: tipLeft("v", px)
+        left: tipLeft("v", px),
+        maxWidth: W - 16
       }
     }, React.createElement("span", {
       className: "tip-title"
@@ -61052,7 +61098,8 @@ function RdFlowChart({
       ref: tipBox,
       className: "tip rd-fl-tip",
       style: {
-        left: tipLeft("w", px)
+        left: tipLeft("w", px),
+        maxWidth: W - 16
       }
     }, React.createElement("span", {
       className: "tip-title"
@@ -61089,167 +61136,106 @@ const FF_COHORTS = {
   coal: {
     name: "Coalition",
     prose: "Coalition",
-    cls: "lnp"
+    cls: "lnp",
+    share: "lnp"
   },
   grn: {
     name: "Greens",
     prose: "Greens",
-    cls: "grn"
+    cls: "grn",
+    share: "grn"
   },
   onp: {
     name: "One Nation",
     prose: "One Nation",
-    cls: "onp"
+    cls: "onp",
+    share: "onp"
   },
   oth: {
     name: "Other",
     prose: "other",
-    cls: "oth"
+    cls: "oth",
+    share: "oth"
   },
   alp: {
     name: "Labor",
     prose: "Labor",
-    cls: "alp"
+    cls: "alp",
+    share: "alp"
   }
 };
 const FF_MRP_HOUSE = "DemosAU (MRP)";
 const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
-function RdForced({
-  q,
-  waves,
-  cohorts,
-  rival,
+const FF_REG_OF = {
+  inner: "inner metro",
+  outer: "outer metro",
+  regional: "regional or rural"
+};
+const FL_TABS = [{
+  id: "co",
+  label: "Labor v Coalition"
+}, {
+  id: "on",
+  label: "Labor v One Nation"
+}, {
+  id: "ln",
+  label: "Coalition v One Nation"
+}];
+const flWinMonths = win => {
+  const m = String(win || "").match(/[A-Z][a-z]{2}/g) || [];
+  return !m.length ? "" : m[0] === m[m.length - 1] ? m[0] : m[0] + "–" + m[m.length - 1];
+};
+const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1);
+function RdFlowSpark({
+  ck,
+  marks,
+  refv,
+  band,
   W,
-  phone,
-  extras,
-  bys,
-  elec,
+  H,
   dom,
+  yr,
+  tip,
+  onTip,
+  onOpen,
+  tipBody,
   emptyNote,
-  anchor,
-  houseWord
+  ariaHead
 }) {
-  const D = window.AUSPOL;
-  const [tip, setTip] = useState(null);
-  const ptr = React.useRef(null);
-  const box = React.useRef(null);
-  const tipBox = React.useRef(null);
-  window.useDismissOutside(box, !!(tip && tip.src === "touch"), () => setTip(null));
+  const ptr = useRef(null);
+  const tipRef = useRef(null);
+  const svgRef = useRef(null);
   const [tipW, setTipW] = useState(0);
+  const [below, setBelow] = useState(false);
+  const pl = 6,
+    pr = 6,
+    pt = 7,
+    pb = 7;
+  const X = m => pl + (m - dom[0]) / Math.max(1e-9, dom[1] - dom[0]) * (W - pl - pr);
+  const Y = v => pt + (1 - (v - yr[0]) / (yr[1] - yr[0])) * (H - pt - pb);
+  const cls = FF_COHORTS[ck].cls;
+  const rb = marks.filter(m => m.kind === "wave");
+  const dm = marks.filter(m => m.kind === "mrp");
+  const pts = rb.map(m => [X(m.xm), Y(m.v)]);
+  const tm = tip && tip.ck === ck ? marks.find(m => m.id === tip.id) : null;
   React.useLayoutEffect(() => {
-    const el = tipBox.current;
-    if (el) setTipW(p => Math.abs(p - el.offsetWidth) > 0.5 ? el.offsetWidth : p);
-    if (el && box.current) {
-      el.style.top = "";
-      const b = box.current.getBoundingClientRect();
-      const minTop = 78 - b.top + el.offsetHeight;
-      if (minTop > -6) el.style.top = Math.round(minTop) + "px";
-    }
-  }, [tip]);
-  const rivalShort = rival === "the Coalition" ? "Coalition" : rival;
-  const anchorShort = anchor === "the Coalition" ? "the Coalition" : anchor;
-  const H = phone ? 200 : 236;
-  const x0 = phone ? 30 : 36,
-    rpad = phone ? 78 : 84,
-    top = 16,
-    bot = H - 34;
-  const x1 = W - rpad;
-  const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  const own = [...waves.map(w => w.xm ?? mi(w.ym)), ...(extras || []).map(d => d.xm), ...(elec ? [elec.xm] : []), ...(bys || []).map(d => d.xm)];
-  const m0 = dom ? dom[0] : Math.floor(Math.min(...own));
-  const mSpan = Math.max(1, (dom ? dom[1] : Math.ceil(Math.max(...own))) - m0);
-  const Xi = m => x0 + (m - m0) / mSpan * (x1 - x0);
-  const Y = v => bot - v / 100 * (bot - top);
-  const isMrp = w => w.house === FF_MRP_HOUSE;
-  const groups = [...(elec ? [{
-    key: "e",
-    kind: "elec",
-    xm: elec.xm,
-    d: elec
-  }] : []), ...waves.map(w => ({
-    key: "w" + w.date,
-    kind: isMrp(w) ? "mrp" : "wave",
-    xm: w.xm ?? mi(w.ym),
-    d: w,
-    house: w.house || D.flowForced && D.flowForced.house
-  })), ...(extras || []).map(d => ({
-    key: "m" + d.date,
-    kind: "mrp",
-    xm: d.xm,
-    d,
-    house: FF_MRP_HOUSE
-  })), ...(bys || []).map(d => ({
-    key: "x" + d.key,
-    kind: "byelec",
-    xm: d.xm,
-    d
-  }))];
-  if (!groups.length) return null;
-  const inLine = g => g.kind === "wave" || g.kind === "mrp";
-  const keyOf = g => g.house && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
-    pollster: g.house,
-    released: g.d.date
-  }) : null;
-  const series = cohorts.map(ck => {
-    const ws = groups.filter(g => inLine(g) && g.d[ck] != null).sort((a, b) => a.xm - b.xm);
-    return {
-      ck,
-      ws,
-      pts: ws.map(g => [Xi(g.xm), Y(g.d[ck])]),
-      first: ws[0] && ws[0].d,
-      last: ws[ws.length - 1] && ws[ws.length - 1].d,
-      mrp: ws.every(g => g.kind === "mrp")
-    };
-  }).filter(s => s.pts.length >= 2);
-  const per = (x1 - x0) / mSpan;
-  const step = [1, 2, 3, 4, 6].find(k => per * k >= 50) || 12;
-  const ticks = [];
-  for (let k = 0, yr = null; k <= mSpan; k += step) {
-    const m = m0 + k,
-      y = Math.floor(m / 12),
-      mo = m % 12 + 1;
-    ticks.push({
-      m,
-      lab: D.monthName(mo) + (y !== yr ? " ’" + String(y).slice(2) : "")
-    });
-    yr = y;
-  }
-  const FF_GAP = 28;
-  const labels = series.map(s => ({
-    ck: s.ck,
-    y: Y(s.last[s.ck])
-  })).sort((a, b) => a.y - b.y);
-  const labY = new Map();
-  for (let i = 0; i < labels.length;) {
-    let j = i,
-      sum = 0;
-    for (; j < labels.length && (j === i || labels[j].y - labels[j - 1].y < FF_GAP); j++) sum += labels[j].y;
-    const n = j - i,
-      mid = sum / n;
-    for (let k = i; k < j; k++) labY.set(labels[k].ck, mid + (k - i - (n - 1) / 2) * FF_GAP);
-    i = j;
-  }
-  const show = (g, ck, src) => setTip({
-    g: g.key,
-    ck,
-    src
-  });
-  const hide = (g, src) => setTip(t => t && t.g === g.key && (!src || t.src === src) ? null : t);
-  const marks = groups.flatMap(g => cohorts.filter(ck => g.d[ck] != null).map(ck => ({
-    g,
-    ck,
-    x: Xi(g.xm),
-    y: Y(g.d[ck])
-  })));
+    const el = tipRef.current,
+      sv = svgRef.current;
+    if (!el || !sv || !tm) return;
+    setTipW(p => Math.abs(p - el.offsetWidth) > 0.5 ? el.offsetWidth : p);
+    const top = sv.getBoundingClientRect().top + Y(tm.v) - 10 - el.offsetHeight;
+    setBelow(top < 78);
+  }, [tm && tm.id]);
+  const half = Math.min((tipW || 240) / 2, W / 2 - 8);
+  const tipLeft = x => Math.min(W - 8 - half, Math.max(8 + half, x));
   const nearest = (ev, reach) => {
-    const svg = ev.currentTarget,
-      r = svg.getBoundingClientRect();
-    const px = (ev.clientX - r.left) * (W / r.width),
-      py = (ev.clientY - r.top) * (H / r.height);
+    const r = ev.currentTarget.getBoundingClientRect();
+    const px = ev.clientX - r.left,
+      py = ev.clientY - r.top;
     let best = null,
       bd = reach * reach;
     for (const m of marks) {
-      const dd = (m.x - px) ** 2 + (m.y - py) ** 2;
+      const dd = (X(m.xm) - px) ** 2 + ((Y(m.v) - py) / 2.5) ** 2;
       if (dd <= bd) {
         bd = dd;
         best = m;
@@ -61257,59 +61243,17 @@ function RdForced({
     }
     return best;
   };
-  const tg = tip ? groups.find(g => g.key === tip.g) : null;
-  const tipK = tg ? keyOf(tg) : null;
-  const half = Math.min((tipW || 220) / 2, W / 2 - 8);
-  const noElec = groups.filter(g => g.kind !== "elec");
-  const noteX = noElec.length ? Xi(Math.min(...noElec.map(g => g.xm))) : elec ? Xi(elec.xm) : x1;
-  const eNote = emptyNote && emptyNote.find(n => textWidth(n, 12, 400) <= noteX - x0 - 16);
-  const say = (ck, v) => FF_COHORTS[ck].name + " " + v;
-  const lastMrp = [...groups].reverse().find(g => g.kind === "mrp");
-  const mrpCks = lastMrp ? cohorts.filter(ck => lastMrp.d[ck] != null) : [];
-  const xnote = (mrpCks.length ? " Triangles mark DemosAU’s MRP readings" + (lastMrp.d.wt ? ", our all-regions weighting of its regional tables" : "") + ", latest " + mrpCks.map(ck => say(ck, lastMrp.d[ck])).join(", ") + "." : "") + (bys && bys.length ? " Crosses mark the 2026 state and by-election counts." : "");
-  const enote = elec ? " Open rings mark the 2025 election’s counted preferences" + (elec.scopeNote ? " for " + elec.scopeNote : "") + ": " + cohorts.filter(ck => elec[ck] != null).map(ck => say(ck, elec[ck])).join(", ") + "." : "";
-  const mark = (g, ck) => {
-    const x = Xi(g.xm),
-      y = Y(g.d[ck]),
-      cls = FF_COHORTS[ck].cls;
-    if (g.kind === "wave") return React.createElement("circle", {
-      key: ck,
-      cx: x,
-      cy: y,
-      r: "3",
-      className: "rd-ff-dot " + cls
-    });
-    if (g.kind === "mrp") return React.createElement("path", {
-      key: ck,
-      className: "rd-ff-tr " + cls,
-      d: `M${x} ${y - 5.4}L${x + 5} ${y + 4}L${x - 5} ${y + 4}Z`
-    });
-    if (g.kind === "byelec") return React.createElement("path", {
-      key: ck,
-      className: "rd-ff-x " + cls,
-      d: `M${x - 4.2} ${y - 4.2}L${x + 4.2} ${y + 4.2}M${x + 4.2} ${y - 4.2}L${x - 4.2} ${y + 4.2}`
-    });
-    return React.createElement("circle", {
-      key: ck,
-      cx: x,
-      cy: y,
-      r: "4.5",
-      className: "rd-ring rd-ff-ring " + cls
-    });
-  };
-  const gTitle = g => g.kind === "elec" ? "2025 election, " + (g.d.scopeTtl || g.d.win) : g.kind === "byelec" ? g.d.label + ", " + g.d.win : (g.kind === "mrp" ? "DemosAU MRP" : g.house) + ", " + (g.d.win || rdMonthYear(g.d.ym));
-  const gSub = g => g.kind === "elec" ? "Preferences counted reaching Labor over the Coalition" + (g.d.scopeNote ? " — " + g.d.scopeNote : "") : g.kind === "byelec" ? g.d.sub : "Would pick " + anchor + " over " + rival + (g.kind === "mrp" && g.d.wt ? " (all regions: our weighting)" : "");
-  const cname = (g, ck) => (g.d.lbl && g.d.lbl[ck] || FF_COHORTS[ck].name) + " voters";
-  return React.createElement("figure", {
-    className: "rd-ff",
-    ref: box,
-    "data-q": q
+  const C = v => Math.max(yr[0], Math.min(yr[1], v));
+  return React.createElement("div", {
+    className: "rd-fx-spark"
   }, React.createElement("svg", {
+    ref: svgRef,
     width: W,
     height: H,
     viewBox: `0 0 ${W} ${H}`,
     role: "img",
-    className: tip && tip.src === "mouse" && tipK ? "link" : null,
+    "aria-label": ariaHead,
+    className: tip && tip.ck === ck && tip.src === "mouse" && tm && tm.key ? "link" : null,
     onPointerDown: ev => {
       ptr.current = ev.pointerType;
     },
@@ -61317,172 +61261,460 @@ function RdForced({
       if (ev.pointerType !== "mouse") return;
       const m = nearest(ev, 14);
       if (m) {
-        if (!tip || tip.g !== m.g.key || tip.ck !== m.ck || tip.src !== "mouse") show(m.g, m.ck, "mouse");
-      } else if (tip && tip.src === "mouse") setTip(null);
+        if (!tip || tip.ck !== ck || tip.id !== m.id || tip.src !== "mouse") onTip({
+          ck,
+          id: m.id,
+          src: "mouse"
+        });
+      } else if (tip && tip.ck === ck && tip.src === "mouse") onTip(null);
     },
     onPointerLeave: ev => {
-      if (ev.pointerType === "mouse") setTip(t => t && t.src === "mouse" ? null : t);
+      if (ev.pointerType === "mouse" && tip && tip.ck === ck && tip.src === "mouse") onTip(null);
     },
     onClick: ev => {
-      const pt = ptr.current;
+      const p = ptr.current;
       ptr.current = null;
-      const m = nearest(ev, pt === "mouse" ? 14 : 22);
+      const m = nearest(ev, p === "mouse" ? 14 : 26);
       if (!m) {
-        if (pt !== "mouse") setTip(null);
+        if (p !== "mouse") onTip(null);
         return;
       }
       ev.stopPropagation();
-      const k = keyOf(m.g);
-      if (pt === "mouse" && k && window.AP.openPoll) {
-        setTip(null);
-        window.AP.openPoll(k, "twopp", "the forced-choice flow chart");
+      if (p === "mouse" && m.key) {
+        onTip(null);
+        onOpen(m.key);
         return;
       }
-      if (tip && tip.g === m.g.key && tip.ck === m.ck && pt !== "mouse") setTip(null);else show(m.g, m.ck, pt === "mouse" ? "mouse" : "touch");
-    },
-    "aria-label": `If forced to choose between ${anchor} and ${rival}, the share of each group of voters picking ${anchorShort}, by fieldwork date${waves.length ? ": " + houseWord + "’s latest " + series.map(s => say(s.ck, s.last[s.ck])).join(", ") : ""}.${xnote}${enote}`
-  }, [0, 25, 50, 75, 100].map(v => React.createElement("path", {
-    key: v,
-    d: `M${x0} ${Y(v)}H${x1}`,
-    className: "rd-ff-gl" + (v === 50 ? " mid" : "")
-  })), [0, 25, 50, 75, 100].map(v => React.createElement("text", {
-    key: "t" + v,
-    x: x0 - 6,
-    y: Y(v) + 3.5,
-    className: "rd-dis-ax",
-    textAnchor: "end"
-  }, v)), eNote && React.createElement("text", {
-    x: (x0 + noteX) / 2,
-    y: Y(37.5) + 4,
-    className: "rd-fl-empty",
-    textAnchor: "middle"
-  }, eNote), tg && React.createElement("path", {
-    d: `M${Xi(tg.xm)} ${top}V${bot}`,
-    className: "rd-dis-guide rd-ff-guide"
-  }), elec && series.filter(s => elec[s.ck] != null).map(s => React.createElement("path", {
-    key: "ld" + s.ck,
-    d: `M${Xi(elec.xm)} ${Y(elec[s.ck])}L${s.pts[0][0]} ${s.pts[0][1]}`,
-    className: "rd-ff-lead " + FF_COHORTS[s.ck].cls,
-    strokeDasharray: RD_ELECTION_LEAD
-  })), series.map(s => React.createElement("path", {
-    key: s.ck,
-    d: monotoneXY(s.pts),
-    className: "rd-ff-line " + FF_COHORTS[s.ck].cls
-  })), groups.map(g => React.createElement("g", {
-    key: g.key,
-    className: "rd-ff-g " + g.kind
-  }, cohorts.filter(ck => g.d[ck] != null).map(ck => mark(g, ck)))), tg && tg.d[tip.ck] != null && React.createElement("circle", {
-    cx: Xi(tg.xm),
-    cy: Y(tg.d[tip.ck]),
-    r: "7",
-    className: "rd-apd-dothi"
-  }), series.map(s => React.createElement("g", {
-    key: "el" + s.ck
-  }, React.createElement("text", {
-    x: x1 + 8,
-    y: labY.get(s.ck) - 2,
-    className: "rd-ff-el " + FF_COHORTS[s.ck].cls
-  }, FF_COHORTS[s.ck].name), React.createElement("text", {
-    x: x1 + 8,
-    y: labY.get(s.ck) + 12,
-    className: "rd-ff-elv " + FF_COHORTS[s.ck].cls
-  }, s.last[s.ck]))), React.createElement("path", {
-    d: `M${x0} ${bot}H${x1}` + ticks.map(t => `M${Xi(t.m)} ${bot}v4`).join(""),
-    className: "rd-dis-base"
-  }), ticks.map(t => React.createElement("text", {
-    key: t.m,
-    x: Xi(t.m),
-    y: bot + 16,
-    className: "rd-dis-ax",
-    textAnchor: "middle"
-  }, t.lab)), groups.map(g => {
-    const k = keyOf(g);
-    const open = () => {
-      if (k && window.AP.openPoll) {
-        setTip(null);
-        window.AP.openPoll(k, "twopp", "the forced-choice flow chart");
-      }
-    };
-    return cohorts.filter(ck => g.d[ck] != null).map((ck, ci) => {
-      const est = g.d.estCohort === ck;
-      const aria = `${gTitle(g)}: ${cname(g, ck)}, ${g.kind === "elec" || g.kind === "byelec" ? "preferences to " + anchorShort : anchorShort} ${g.d[ck]}, ${rivalShort} ${Math.round((100 - g.d[ck]) * 10) / 10}` + (g.kind === "mrp" && g.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "") + (g.kind === "byelec" && g.d.sub ? " — " + g.d.sub : "") + (est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : "") + (k ? "; press Enter to open this poll" : "");
-      return React.createElement("circle", {
-        key: g.key + ck,
-        cx: Xi(g.xm),
-        cy: Y(g.d[ck]),
-        r: "9",
-        className: "rd-apd-hit rd-ff-hit " + g.kind + (k ? " link" : ""),
-        tabIndex: ci === 0 ? "0" : "-1",
-        role: ci === 0 && k ? "button" : "img",
-        "aria-label": aria,
-        onFocus: ev => {
-          if (ev.target.matches(":focus-visible")) show(g, ck, "focus");
-        },
-        onBlur: () => hide(g, "focus"),
-        onKeyDown: ev => {
-          if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
-          ev.preventDefault();
-          if (k) open();else show(g, ck, "focus");
-        }
+      if (tip && tip.ck === ck && tip.id === m.id && p !== "mouse") onTip(null);else onTip({
+        ck,
+        id: m.id,
+        src: p === "mouse" ? "mouse" : "touch"
       });
-    });
-  })), tg && React.createElement("span", {
-    ref: tipBox,
-    className: "tip rd-fl-tip rd-ff-tip",
-    style: {
-      left: Math.min(W - 8 - half, Math.max(8 + half, Xi(tg.xm)))
     }
-  }, React.createElement("span", {
-    className: "tip-title"
-  }, gTitle(tg)), React.createElement("span", {
-    className: "tip-row rd-ff-tipsub"
-  }, React.createElement("span", {
-    className: "tip-label"
-  }, gSub(tg))), cohorts.filter(ck => tg.d[ck] != null).map(ck => React.createElement("span", {
-    key: ck,
-    className: "tip-row" + (ck === tip.ck ? " on" : "")
-  }, React.createElement("span", {
-    className: "tip-swatch rd-ff-sw " + tg.kind + " " + FF_COHORTS[ck].cls
-  }), React.createElement("span", {
-    className: "tip-label"
-  }, cname(tg, ck)), React.createElement("span", {
-    className: "tip-val"
-  }, tg.d[ck], "%"))), tg.d.n != null && React.createElement("span", {
-    className: "tip-row"
-  }, React.createElement("span", {
-    className: "tip-label"
-  }, "Sample"), React.createElement("span", {
-    className: "tip-val"
-  }, "n = ", tg.d.n.toLocaleString())), tipK && tip.src !== "touch" && React.createElement("div", {
+  }, refv != null && band != null && React.createElement("rect", {
+    className: "rd-fx-refb",
+    x: pl,
+    y: Y(C(refv + band)),
+    width: W - pl - pr,
+    height: Math.max(0, Y(C(refv - band)) - Y(C(refv + band)))
+  }), refv != null && pts.length > 1 && React.createElement("path", {
+    className: "rd-fx-area",
+    d: monotoneXY(pts) + `L${pts[pts.length - 1][0]} ${Y(refv)}L${pts[0][0]} ${Y(refv)}Z`
+  }), refv != null && React.createElement("path", {
+    className: "rd-fx-ref",
+    d: `M${pl} ${Y(refv)}H${W - pr}`
+  }), pts.length > 1 && React.createElement("path", {
+    className: "rd-fx-line " + cls,
+    d: monotoneXY(pts)
+  }), !rb.length && dm.length > 1 && React.createElement("path", {
+    className: "rd-fx-mline " + cls,
+    d: dm.map((m, i) => (i ? "L" : "M") + X(m.xm) + " " + Y(m.v)).join("")
+  }), rb.slice(0, -1).map(m => React.createElement("circle", {
+    key: m.id,
+    className: "rd-fx-dot " + cls,
+    cx: X(m.xm),
+    cy: Y(m.v),
+    r: "2.4"
+  })), dm.map(m => {
+    const x = X(m.xm),
+      y = Y(m.v);
+    return React.createElement("path", {
+      key: m.id,
+      className: "rd-fx-tr " + cls,
+      d: `M${x} ${y - 5.2}L${x + 4.8} ${y + 3.8}L${x - 4.8} ${y + 3.8}Z`
+    });
+  }), marks.filter(m => m.kind === "byelec").map(m => {
+    const x = X(m.xm),
+      y = Y(m.v);
+    return React.createElement("path", {
+      key: m.id,
+      className: "rd-fx-x " + cls,
+      d: `M${x - 3.6} ${y - 3.6}L${x + 3.6} ${y + 3.6}M${x + 3.6} ${y - 3.6}L${x - 3.6} ${y + 3.6}`
+    });
+  }), pts.length > 0 && React.createElement("circle", {
+    className: "rd-fx-end " + cls,
+    cx: pts[pts.length - 1][0],
+    cy: pts[pts.length - 1][1],
+    r: "3.6"
+  }), tm && React.createElement("circle", {
+    className: "rd-apd-dothi",
+    cx: X(tm.xm),
+    cy: Y(tm.v) + (tm.kind === "mrp" ? 0.6 : 0),
+    r: "7.5"
+  }), !marks.length && emptyNote && React.createElement("text", {
+    className: "rd-fl-empty",
+    x: W / 2,
+    y: refv != null && Y(refv) < H / 2 ? H - 9 : 17,
+    textAnchor: "middle"
+  }, emptyNote), marks.map(m => React.createElement("circle", {
+    key: "h" + m.id,
+    className: "rd-apd-hit rd-fx-hit" + (m.key ? " link" : ""),
+    cx: X(m.xm),
+    cy: Y(m.v),
+    r: "8",
+    tabIndex: "0",
+    role: m.key ? "button" : "img",
+    "aria-label": m.aria,
+    onFocus: ev => {
+      if (ev.target.matches(":focus-visible")) onTip({
+        ck,
+        id: m.id,
+        src: "focus"
+      });
+    },
+    onBlur: () => onTip(t => t && t.ck === ck && t.id === m.id && t.src === "focus" ? null : t),
+    onKeyDown: ev => {
+      if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+      ev.preventDefault();
+      if (m.key) {
+        onTip(null);
+        onOpen(m.key);
+      } else onTip({
+        ck,
+        id: m.id,
+        src: "focus"
+      });
+    }
+  }))), tm && React.createElement("span", {
+    ref: tipRef,
+    className: "tip rd-fl-tip rd-fx-tip" + (below ? " below" : ""),
+    style: {
+      left: tipLeft(X(tm.xm)),
+      top: Y(tm.v) + (below ? 14 : -10),
+      maxWidth: W - 16
+    }
+  }, tipBody(tm), tm.key && tip.src !== "touch" && React.createElement("div", {
     className: "tip-hint"
-  }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"), tg.d.estCohort && React.createElement("span", {
-    className: "tip-row tip-hintwrap"
-  }, React.createElement("span", {
-    className: "tip-sub tip-hint"
-  }, "June\u2019s Coalition figure combines the report\u2019s printed CLP/LNP/Nat (34) and Liberal (37) rows \u2014 no combined row was printed"))));
+  }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls")));
 }
-function RdFlows() {
+function RdFlows({
+  measure
+}) {
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
+  const narrow = useNarrow("(max-width: 900px)");
   const FD = D.flowDrift,
     FO = D.flowDriftOn;
-  const FF = D.flowForced;
+  const FF = D.flowForced,
+    FT = D.flowTables;
+  const tabOf = m => m === "onp" ? "on" : "co";
+  const [q, setQ] = useState(() => tabOf(measure));
+  const mWas = useRef(measure);
+  useEffect(() => {
+    if (mWas.current === measure) return;
+    mWas.current = measure;
+    setQ(tabOf(measure));
+  }, [measure]);
   const [pick, setPick] = useState(null);
   const [ffReg, setFfReg] = useState("");
+  const [tip, setTip] = useState(null);
+  const ledger = useRef(null);
+  window.useDismissOutside(ledger, !!(tip && tip.src === "touch"), () => setTip(null));
+  const tabsRef = useRef(null);
+  useEffect(() => {
+    const btn = tabsRef.current && tabsRef.current.querySelector('.rd-fl-tabs [aria-pressed="true"]');
+    const sc = btn && btn.closest('[role="group"]');
+    if (!sc || sc.scrollWidth <= sc.clientWidth + 1) return;
+    const r = btn.getBoundingClientRect(),
+      b = sc.getBoundingClientRect();
+    if (r.left < b.left) sc.scrollTo({
+      left: sc.scrollLeft + r.left - b.left - 28,
+      behavior: SM
+    });else if (r.right > b.right) sc.scrollTo({
+      left: sc.scrollLeft + r.right - b.right + 28,
+      behavior: SM
+    });
+  }, [q]);
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
   if (!FD || !FO || !FD.now || !FO.now) return null;
   const nC = FD.now,
     nO = FO.now;
+  const PR = D.latest && D.latest.primary || {};
+  const regName = ffReg ? (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] : "";
+  const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
+  const rekeyMrp = ws => (ws || []).map(w => {
+    if (!ffReg) return w.all ? {
+      ...w,
+      ...w.all,
+      wt: true
+    } : w;
+    const t = w[ffReg];
+    return t ? {
+      ...w,
+      ...t,
+      wt: undefined
+    } : null;
+  }).filter(Boolean);
+  const E = FF && FF.elec2025r;
+  const C = FF ? {
+    co: {
+      id: "co",
+      a: "Labor",
+      r: "the Coalition",
+      cohorts: ["grn", "onp", "oth"],
+      ref: E ? ffReg && E[ffReg] ? E[ffReg] : E.all : null,
+      refDp: 1,
+      band: null,
+      refHead: rdElecYear + " count",
+      refSub: ffReg ? regName + "*" : "as counted",
+      refName: rdElecYear + " count" + (ffReg ? ", our replay" : ""),
+      rb: ffReg ? [] : FF.vsCoal,
+      dm: ffReg ? [] : FF.demos || [],
+      bys: [],
+      drift: FD,
+      flows: "the " + rdElecYear + " flows"
+    },
+    on: {
+      id: "on",
+      a: "Labor",
+      r: "One Nation",
+      cohorts: ["coal", "grn", "oth"],
+      ref: FT ? {
+        coal: FT.onp.lnp * 100,
+        grn: FT.onp.grn * 100,
+        oth: FT.onp.oth * 100
+      } : null,
+      refDp: null,
+      band: FT ? {
+        coal: FT.onBand.lnp * 100,
+        grn: FT.onBand.grn * 100,
+        oth: FT.onBand.oth * 100
+      } : null,
+      refHead: "Site assumes",
+      refSub: ffReg ? "national" : "built, no count",
+      refName: "Site assumes",
+      rb: ffReg ? [] : FF.vsOn,
+      dm: rekeyMrp(FF.demosOn),
+      bys: ffReg ? [] : FF.bys || [],
+      drift: FO,
+      flows: "the site’s One Nation flows"
+    },
+    ln: {
+      id: "ln",
+      a: "the Coalition",
+      r: "One Nation",
+      cohorts: ["alp", "grn", "oth"],
+      ref: null,
+      refDp: null,
+      band: null,
+      refHead: "Site assumes",
+      refSub: "no count",
+      refName: null,
+      rb: [],
+      dm: rekeyMrp(FF.lnpOn),
+      bys: [],
+      drift: null,
+      flows: null
+    }
+  } : {
+    co: {
+      id: "co",
+      a: "Labor",
+      r: "the Coalition",
+      cohorts: [],
+      ref: null,
+      band: null,
+      rb: [],
+      dm: [],
+      bys: [],
+      drift: FD,
+      flows: "the " + rdElecYear + " flows"
+    },
+    on: {
+      id: "on",
+      a: "Labor",
+      r: "One Nation",
+      cohorts: [],
+      ref: null,
+      band: null,
+      rb: [],
+      dm: [],
+      bys: [],
+      drift: FO,
+      flows: "the site’s One Nation flows"
+    }
+  };
+  const tabs = FF ? FL_TABS : FL_TABS.filter(t => t.id !== "ln");
+  const allMrp = ws => (ws || []).map(w => w.all ? {
+    ...w,
+    ...w.all
+  } : w);
+  const ff = FF ? [["on", FF.vsOn, ["grn", "coal", "oth"]], ["co", FF.vsCoal, ["grn", "onp", "oth"]], ["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]]].flatMap(([cq, waves, cks]) => cks.map(ck => {
+    const s = waves.filter(w => w[ck] != null);
+    return {
+      key: cq + ck,
+      ck,
+      q: cq,
+      waves: s,
+      fit: withinHouseSlope(s.map(w => ({
+        h: cq + ck,
+        t: (w.xm ?? mi(w.ym)) / 12,
+        w: 1,
+        y: w[ck]
+      })))
+    };
+  })) : [];
+  {
+    const tested = ff.filter(r => r.fit),
+      sigK = [];
+    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (r.fit.p >= 0.05 / (tested.length - i)) break;
+      sigK.push(r.key);
+    }
+    for (const r of ff) r.sig = sigK.includes(r.key);
+  }
+  const movedOf = (cq, ck) => {
+    const r = ff.find(x => x.key === cq + ck);
+    if (!r || !r.sig) return null;
+    const f = r.waves[0][ck],
+      la = r.waves[r.waves.length - 1][ck];
+    return f === la ? null : {
+      from: f,
+      to: la,
+      ym: r.waves[0].ym,
+      up: la > f
+    };
+  };
   const s1 = v => Math.abs(v).toFixed(1);
   const phr = (v, who) => Math.abs(v) < 0.05 ? "level against " + who : s1(v) + " points kinder to " + (v > 0 ? "Labor against " + who : who);
   const ci = Math.max(nC.ci95, nO.ci95);
   const worst = Math.max(Math.abs(nC.v), Math.abs(nO.v));
   const outC = Math.abs(nC.v) > nC.ci95,
     outO = Math.abs(nO.v) > nO.ci95;
-  const head = !outC && !outO ? "Preferences are still flowing much as they did at the election" : outC && outO ? "Preferences have moved since the election, in both contests" : "Preferences " + (outO ? "against One Nation" : "against the Coalition") + " have moved " + ((outO ? nO.v : nC.v) > 0 ? "towards Labor" : "away from Labor") + " since the election";
-  const dek = "The pollsters’ own two-party figures sit where their primary votes and the " + rdElecYear + " flows put them: " + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ". A shift in where voters send their preferences would show here first.";
-  const houses = [...new Set(Object.keys(FD.houses || {}).concat(Object.keys(FO.houses || {})))].sort();
+  const moves = ff.filter(r => movedOf(r.q, r.ck)).map(r => ({
+    ...r,
+    m: movedOf(r.q, r.ck)
+  }));
+  const anchorOf = cq => cq === "ln" ? "the Coalition" : "Labor";
+  const rivalOf = cq => cq === "co" ? "the Coalition" : "One Nation";
+  const voiceMove = moves.length === 1 ? moves[0] : null;
+  const head = outC || outO ? outC && outO ? "Preferences have moved since the election, in both contests" : "Preferences " + (outO ? "against One Nation" : "against the Coalition") + " have moved " + ((outO ? nO.v : nC.v) > 0 ? "towards Labor" : "away from Labor") + " since the election" : voiceMove ? FF_COHORTS[voiceMove.ck].name + " voters say they’d now send " + anchorOf(voiceMove.q) + " " + (voiceMove.m.up ? "more" : "fewer") + " preferences" : moves.length > 1 ? "Voters say their preferences have shifted since " + rdMonthYear(moves[0].m.ym).split(" ")[0] : "Preferences are still flowing much as they did at the election";
+  const dekA = "This site’s two-party figures assume fixed preference flows: the " + rdElecYear + " count against the Coalition, and a table built from " + rdElecYear + "’s ballots against One Nation.";
+  const dekB = voiceMove ? (() => {
+    const r = voiceMove,
+      m = r.m;
+    const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the " + rdElecYear + " count sent " + anchorOf(r.q) + "’s way" : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
+    return " Asked to choose, " + m.to + "% of " + FF_COHORTS[r.ck].prose + " voters now pick " + anchorOf(r.q) + " over " + rivalOf(r.q) + " in " + (r.q === "ln" ? "DemosAU’s MRP" : "RedBridge/Accent’s poll") + ", " + (m.up ? "up" : "down") + " from " + m.from + "% in " + rdMonthYear(m.ym).split(" ")[0] + refTxt + ".";
+  })() : moves.length > 1 ? " Asked to choose, " + moves.map(r => FF_COHORTS[r.ck].prose + " voters " + (r.m.up ? "up" : "down") + " from " + r.m.from + "% to " + r.m.to + "%").join("; ") + "." : " Voters’ own answers to pollsters haven’t clearly moved since February either.";
+  const dekC = " The pollsters’ own two-party figures " + (outC || outO ? "have moved: they sit " : voiceMove || moves.length ? "don’t show it yet: they sit " : "sit where their primary votes and the flows put them: ") + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ".";
+  const dek = FF ? dekA + (voiceMove || moves.length ? dekB : "") + dekC : "The pollsters’ own two-party figures sit where their primary votes and the " + rdElecYear + " flows put them: " + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ". A shift in where voters send their preferences would show here first.";
+  const c = C[q] || C.co;
+  const allXm = FF ? [...FF.vsCoal, ...FF.vsOn, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.lnpOn || []), ...(FF.bys || [])].map(d => d.xm != null ? d.xm : d.ym ? mi(d.ym) : null).filter(v => v != null) : [];
+  const dom = allXm.length ? [Math.floor(Math.min(...allXm)), Math.ceil(Math.max(...allXm))] : [0, 1];
+  const ticks = [];
+  for (let m = dom[0], yr = null; m <= dom[1]; m += 2) {
+    const y = Math.floor(m / 12);
+    ticks.push({
+      m,
+      lab: D.monthName(m % 12 + 1) + (y !== yr ? " ’" + String(y).slice(2) : "")
+    });
+    yr = y;
+  }
+  const rbLast = c && c.rb.length ? c.rb[c.rb.length - 1] : null;
+  const dmLast = c && c.dm.length ? c.dm[c.dm.length - 1] : null;
+  const say = (v, dp) => flFig(v, dp);
+  const marksOf = ck => {
+    if (!c) return [];
+    const who = d => (d.lbl && d.lbl[ck] || FF_COHORTS[ck].name) + " voters";
+    const k = (house, date) => house && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: house,
+      released: date
+    }) : null;
+    const out = [...c.rb.filter(w => w[ck] != null).map(w => ({
+      id: "w" + w.date,
+      kind: "wave",
+      xm: w.xm ?? mi(w.ym),
+      v: w[ck],
+      d: w,
+      house: FF.house || "RedBridge/Accent"
+    })), ...c.dm.filter(w => w[ck] != null).map(w => ({
+      id: "m" + w.date,
+      kind: "mrp",
+      xm: w.xm,
+      v: w[ck],
+      d: w,
+      house: FF_MRP_HOUSE
+    })), ...c.bys.filter(w => w[ck] != null).map(w => ({
+      id: "x" + w.key,
+      kind: "byelec",
+      xm: w.xm,
+      v: w[ck],
+      d: w,
+      house: null
+    }))];
+    for (const m of out) {
+      m.key = k(m.house, m.d.date);
+      const src = m.kind === "byelec" ? m.d.label : m.kind === "mrp" ? "DemosAU MRP" : m.house;
+      m.aria = `${src}, ${m.d.win}: ${who(m.d)}, ${m.kind === "byelec" ? "preferences to " : ""}${c.a} ${say(m.v)}, ${c.r.replace(/^the /, "")} ${Math.round((100 - m.v) * 10) / 10}` + (m.kind === "mrp" && m.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "") + (m.kind === "mrp" && ffReg ? ` — ${regName} seats, as the report prints them` : "") + (m.kind === "byelec" && m.d.sub ? " — " + m.d.sub : "") + (m.d.estCohort === ck ? " — the June Coalition figure combines the report’s printed CLP/LNP/Nat and Liberal rows" : "") + (m.key ? "; press Enter to open this poll" : "");
+    }
+    return out.sort((a, b) => a.xm - b.xm);
+  };
+  const valsOf = ck => [...marksOf(ck).map(m => m.v), ...(c && c.ref ? [c.ref[ck] - (c.band ? c.band[ck] : 0), c.ref[ck] + (c.band ? c.band[ck] : 0)] : [])];
+  const need = c ? Math.max(0, ...c.cohorts.map(ck => {
+    const v = valsOf(ck);
+    return v.length ? Math.max(...v) - Math.min(...v) : 0;
+  })) : 0;
+  const span = Math.max(30, Math.ceil((need + 4) / 10) * 10);
+  const yrOf = ck => {
+    const v = valsOf(ck);
+    if (!v.length) return [0, span];
+    const mn = Math.min(...v),
+      mx = Math.max(...v);
+    let lo = Math.floor(((mn + mx) / 2 - span / 2) / 5) * 5;
+    lo = Math.max(0, Math.min(100 - span, lo));
+    if (mn < lo + 1) lo = Math.max(0, Math.floor((mn - 1) / 5) * 5);
+    if (mx > lo + span - 1) lo = Math.min(100 - span, Math.ceil((mx + 1 - span) / 5) * 5);
+    return [lo, lo + span];
+  };
+  const colW = Wall > 1100 ? [220, 100, 128, 100, 40] : [176, 92, 116, 92, 28];
+  const sparkW = narrow ? Wall : Math.max(160, Wall - colW.reduce((a, b) => a + b, 0));
+  const sparkH = narrow ? 52 : 64;
+  const grid = narrow ? undefined : {
+    gridTemplateColumns: colW.map(w => w + "px").join(" ") + " minmax(0, 1fr)"
+  };
+  const tipBody = m => {
+    const ck = m.ck;
+    const lbl = m.d.lbl && m.d.lbl[ck] || FF_COHORTS[ck].name;
+    const refV = c.ref ? c.ref[ck] : null;
+    return React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "tip-title"
+    }, m.kind === "byelec" ? m.d.label + ", " + m.d.win : (m.kind === "mrp" ? "DemosAU MRP" : m.house) + ", " + m.d.win), React.createElement("span", {
+      className: "tip-sub rd-fx-tsub"
+    }, m.kind === "byelec" ? m.d.sub : lbl + " voters choosing between " + c.a + " and " + c.r), React.createElement("span", {
+      className: "tip-row on"
+    }, React.createElement("span", {
+      className: "tip-swatch rd-fx-sw " + m.kind + " " + FF_COHORTS[ck].cls
+    }), React.createElement("span", {
+      className: "tip-label"
+    }, m.kind === "byelec" ? "Preferences to " + c.a : "Pick " + c.a), React.createElement("span", {
+      className: "tip-val"
+    }, say(m.v), "%")), refV != null && React.createElement("span", {
+      className: "tip-row"
+    }, React.createElement("span", {
+      className: "tip-label rd-fx-tind"
+    }, c.refName), React.createElement("span", {
+      className: "tip-val rd-fx-tref"
+    }, say(refV, c.refDp), c.band ? " ±" + say(c.band[ck]) : "")), m.d.n != null && React.createElement("span", {
+      className: "tip-row"
+    }, React.createElement("span", {
+      className: "tip-label rd-fx-tind"
+    }, "Sample"), React.createElement("span", {
+      className: "tip-val"
+    }, "n = ", m.d.n.toLocaleString())), m.kind === "mrp" && m.d.wt && React.createElement("span", {
+      className: "tip-sub rd-fx-tnote"
+    }, "All voters is our weighting of the report\u2019s three regional tables, by enrolment and vote."), m.kind === "mrp" && ffReg && React.createElement("span", {
+      className: "tip-sub rd-fx-tnote"
+    }, regName, " seats, as the report prints them."), m.d.estCohort === ck && React.createElement("span", {
+      className: "tip-sub rd-fx-tnote"
+    }, "June\u2019s Coalition figure combines the report\u2019s printed CLP/LNP/Nat (34) and Liberal (37) rows; no combined row was printed."));
+  };
+  const openPoll = k => {
+    if (window.AP.openPoll) window.AP.openPoll(k, "twopp", "the preference-flows ledger");
+  };
+  const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (PR[FF_COHORTS[b].share] || 0) - (PR[FF_COHORTS[a].share] || 0))[0] : null;
+  const stake = big && PR[FF_COHORTS[big].share] != null ? FF_COHORTS[big].name + " voters are " + PR[FF_COHORTS[big].share].toFixed(1) + "% of the vote, so each 10 points of their preferences moves " + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation") + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points." : "";
+  const ledgerNote = (q === "co" ? ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC counts this cut nationally only. No poll asks this contest by region. " : "The " + rdElecYear + " count is the flow every Labor v Coalition figure on this site uses. " : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range" + (ffReg ? ", and it is national on every view. " : ". ") : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ") + stake + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
   const flMonths = rdApMonths(RD_AP_TERM1);
   const flSetRows = fd => {
     const hs = fd.houses || {};
@@ -61512,198 +61744,27 @@ function RdFlows() {
       cells: [rdTsSgn(r.s[0].v) + " → " + rdTsSgn(r.s[r.s.length - 1].v), r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? sigH.includes(r.h) ? "Yes" : "No" : "–"]
     }));
   };
-  const flSets = [{
-    key: "co",
-    label: "Against the Coalition",
-    rows: flSetRows(FD)
-  }, {
-    key: "on",
-    label: "Against One Nation",
-    rows: flSetRows(FO)
-  }];
-  const rekeyMrp = ws => (ws || []).map(w => {
-    if (!ffReg) return {
-      ...w,
-      ...w.all,
-      wt: true
-    };
-    const t = w[ffReg];
-    return t ? {
-      ...w,
-      ...t,
-      wt: undefined
-    } : null;
-  }).filter(Boolean);
-  const demoRows = FF ? rekeyMrp(FF.demosOn) : [];
-  const lnWaves = FF ? rekeyMrp(FF.lnpOn) : [];
-  const ffElec = FF && FF.elec2025r ? FF.elec2025r : null;
-  const FF_REG_OF = {
-    inner: "inner metro",
-    outer: "outer metro",
-    regional: "regional or rural"
-  };
-  const ffQ = FF ? [{
-    q: "on",
-    waves: FF.vsOn,
-    cohorts: ["grn", "coal", "oth"],
-    anchor: "Labor",
-    rival: "One Nation",
-    rowV: "v One Nation",
-    fallback: "Greens, Coalition and Other voters, if forced to Labor or One Nation"
-  }, {
-    q: "co",
-    waves: FF.vsCoal,
-    cohorts: ["grn", "onp", "oth"],
-    anchor: "Labor",
-    rival: "the Coalition",
-    rowV: "v Coalition",
-    fallback: "Greens, One Nation and Other voters, if forced to Labor or the Coalition"
-  }, {
-    q: "ln",
-    waves: lnWaves,
-    cohorts: ["alp", "grn", "oth"],
-    anchor: "the Coalition",
-    rival: "One Nation",
-    rowV: "v One Nation",
-    fallback: "Labor, Greens and Other voters, if forced to the Coalition or One Nation"
-  }] : null;
-  const ff = FF ? ffQ.flatMap(def => def.cohorts.map(ck => {
-    const s = def.waves.filter(w => w[ck] != null);
-    return {
-      key: def.q + ck,
-      ck,
-      q: def.q,
-      waves: s,
-      fit: withinHouseSlope(s.map(w => ({
-        h: def.q + ck,
-        t: w.xm / 12,
-        w: 1,
-        y: w[ck]
-      })))
-    };
-  })) : null;
-  if (ff) {
-    const tested = ff.filter(r => r.fit),
-      sigK = [];
-    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
-      if (r.fit.p >= 0.05 / (tested.length - i)) break;
-      sigK.push(r.key);
-    }
-    for (const r of ff) r.sig = sigK.includes(r.key);
-  }
-  const ffTitle = q => {
-    const def = ffQ.find(d => d.q === q);
-    if (def.waves.length < 2) return def.fallback;
-    const parts = def.cohorts.map(ck => {
-      const w = def.waves.filter(x => x[ck] != null).pop();
-      return `${w[ck]}% of ${FF_COHORTS[ck].prose} voters`;
-    });
-    const list = parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
-    const moved = ff.filter(r => r.q === q && r.sig && r.waves[0][r.ck] !== r.waves[r.waves.length - 1][r.ck]);
-    const tail = moved.length !== 1 ? "" : (() => {
-      const r = moved[0],
-        f = r.waves[0][r.ck],
-        la = r.waves[r.waves.length - 1][r.ck];
-      return " — " + FF_COHORTS[r.ck].prose + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + rdMonthYear(r.waves[0].ym);
-    })();
-    return list + " prefer " + def.anchor + " over " + def.rival + tail;
-  };
-  const ffSet = ff ? {
-    key: "pressed",
-    label: "Pressed-choice share",
-    rows: ff.map(r => {
-      const defIn = ffQ.find(d => d.q === r.q);
-      return {
-        key: r.key,
-        name: FF_COHORTS[r.ck].name + " voters, " + defIn.rowV,
-        sig: r.sig,
-        cells: [r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck], r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? r.sig ? "Yes" : "No" : "–"]
-      };
-    })
-  } : null;
-  const ftLast = FF ? {
-    co: FF.vsCoal[FF.vsCoal.length - 1],
-    on: FF.vsOn[FF.vsOn.length - 1],
-    dm: FF.demos && FF.demos[FF.demos.length - 1],
-    mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
-    ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1]
-  } : null;
-  const ftSite = D.flowTables || null;
-  const ftMon = ym => {
-    const [y, m] = ym.split("-").map(Number);
-    return D.monthName(m) + " " + y;
-  };
-  const ftRb = w => !ffReg && w && {
-    key: "rb",
-    h: "RedBridge",
-    sub: ftMon(w.ym),
-    d: w
-  };
-  const ftMrp = (w, regional) => w && (regional ? ffReg ? w[ffReg] : w.all : !ffReg && w) && {
-    key: "mrp",
-    h: "DemosAU",
-    sub: "MRP, " + w.win.replace(/^.*?([A-Z][a-z]{2} \d{4})$/, "$1"),
-    d: regional ? ffReg ? w[ffReg] : w.all : w,
-    wt: regional && !ffReg
-  };
-  const ftSiteCol = (d, band, dp) => ftSite && {
-    key: "site",
-    h: "This site",
-    sub: ffReg ? "national" : "assumes",
-    d,
-    band,
-    dp,
-    site: true
-  };
-  const ftContests = FF ? [{
-    key: "co",
-    name: React.createElement("span", {
-      className: "rd-fl-name lnp"
-    }, "Labor v Coalition"),
-    to: "Labor",
-    cohorts: ["grn", "onp", "oth"],
-    cols: [FF.elec2025r && {
-      key: "elec",
-      h: "Election",
-      sub: ffReg ? "2025, " + (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] + " seats" : "2025 count",
-      d: ffElec ? ffElec[ffReg] || ffElec.all : FF.elec2025r.all,
-      dp: 1
-    }, ftSiteCol(ftSite && {
-      grn: ftSite.lnp.grn * 100,
-      onp: ftSite.lnp.onp * 100,
-      oth: ftSite.lnp.oth * 100
-    }, null, 1), ftRb(ftLast.co), ftMrp(ftLast.dm, false)].filter(Boolean)
-  }, {
-    key: "on",
-    name: React.createElement("span", {
-      className: "rd-fl-name onp"
-    }, "Labor v One Nation"),
-    to: "Labor",
-    cohorts: ["coal", "grn", "oth"],
-    cols: [ftSiteCol(ftSite && {
-      coal: ftSite.onp.lnp * 100,
-      grn: ftSite.onp.grn * 100,
-      oth: ftSite.onp.oth * 100
-    }, ftSite && {
-      coal: ftSite.onBand.lnp * 100,
-      grn: ftSite.onBand.grn * 100,
-      oth: ftSite.onBand.oth * 100
-    }), ftRb(ftLast.on), ftMrp(ftLast.mn, true)].filter(Boolean)
-  }, {
-    key: "ln",
-    name: React.createElement("span", {
-      className: "rd-fl-name"
-    }, React.createElement("span", {
-      className: "rd-fl-xb"
-    }, "Coalition"), " v ", React.createElement("span", {
-      className: "rd-fl-xo"
-    }, "One Nation")),
-    to: "the Coalition",
-    cohorts: ["alp", "grn", "oth"],
-    cols: [ftMrp(ftLast.ln, true)].filter(Boolean)
-  }].filter(c => c.cols.length) : null;
-  const ftFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1);
-  const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
+  const tsSets = [...(c.drift ? [{
+    key: "d" + q,
+    label: "Published minus implied, against " + c.r,
+    rows: flSetRows(c.drift)
+  }] : []), {
+    key: "p" + q,
+    label: "What voters say: share picking " + c.a,
+    rows: ff.filter(r => r.q === q).map(r => ({
+      key: r.key,
+      name: FF_COHORTS[r.ck].name + " voters",
+      sig: r.sig,
+      cells: [r.waves.length ? r.waves[0][r.ck] + " → " + r.waves[r.waves.length - 1][r.ck] : "–", r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? r.sig ? "Yes" : "No" : "–"]
+    }))
+  }].filter(t => t.rows.length);
+  const houses = c && c.drift ? Object.keys(c.drift.houses || {}).sort() : [];
+  const pickOn = pick && houses.includes(pick) ? pick : null;
+  const nw = c && c.drift ? c.drift.now : null;
+  const sideW = 340;
+  const cw = narrow ? Wall : Math.max(320, Wall - sideW - 44);
+  const verdict = nw ? (Math.abs(nw.v) < 0.05 ? "Published figures sit level with what " + c.flows + " give" : "Published figures now run " + s1(nw.v) + " points kinder to " + (nw.v > 0 ? "Labor" : c.r) + " than " + c.flows + " give") + (Math.abs(nw.v) <= nw.ci95 ? ". That is inside the margin, so no clear shift yet." : ". That is outside the ±" + nw.ci95.toFixed(1) + " margin, so the flows look to have shifted.") : "";
+  const zeroNote = q === "on" ? "Zero is each pollster’s usual gap, set by its first head-to-heads, as no count of this contest exists." : "Zero is each pollster’s usual gap, set by its polls in the six months after the election.";
   return React.createElement("section", {
     className: "rd-sec rd-fl",
     id: "flow-drift",
@@ -61715,53 +61776,230 @@ function RdFlows() {
     id: "rd-fl-t"
   }, "Preference flows"), React.createElement("span", {
     className: "rd-meta"
-  }, "Whether preferences still flow the way they did at the " + rdElecYear + " election")), React.createElement(RdHed, {
+  }, FF ? "Where other parties’ voters send their preferences, and whether that has changed since " + rdElecYear : "Whether preferences still flow the way they did at the " + rdElecYear + " election")), React.createElement(RdHed, {
     head: head,
     dek: dek
   }), React.createElement("div", {
-    className: "rd-fl-head"
+    ref: box,
+    className: "rd-fl-body"
+  }, React.createElement("div", {
+    ref: tabsRef,
+    className: "rd-fl-tabwrap"
+  }, React.createElement(RdTabs, {
+    swipe: true,
+    value: q,
+    onChange: v => {
+      setQ(v);
+      setTip(null);
+    },
+    ariaLabel: "Contest",
+    className: "rd-fl-tabs",
+    options: tabs
+  })), FF && React.createElement("div", {
+    className: "rd-fl-ledger",
+    ref: ledger
+  }, React.createElement("div", {
+    className: "rd-fl-lhead"
   }, React.createElement("h4", {
     className: "rd-ap-ct"
-  }, "Published minus implied two-party figure, relative to each pollster\u2019s usual gap, points"), React.createElement("select", {
+  }, "Share of each group\u2019s voters whose preferences go to ", c.a, " rather than ", c.r, ", %"), React.createElement("label", {
+    className: "rd-fl-reg"
+  }, React.createElement("span", null, "Voters"), React.createElement("select", {
+    className: "rd-pv-sel rd-fl-sel",
+    "aria-label": "Region",
+    value: ffReg,
+    onChange: e => {
+      setFfReg(e.target.value);
+      setTip(null);
+    }
+  }, FF_REGIONS.map(([k, name]) => React.createElement("option", {
+    key: k || "all",
+    value: k
+  }, name))))), React.createElement("div", {
+    className: "rd-fx" + (narrow ? " narrow" : ""),
+    role: "table",
+    "aria-label": "Where each group’s preferences go, " + FL_TABS.find(t => t.id === q).label + (ffReg ? ", " + regName + " seats" : "")
+  }, React.createElement("div", {
+    className: "rd-fx-hrow",
+    role: "row",
+    style: grid
+  }, React.createElement("span", {
+    className: "rd-ap-th",
+    role: "columnheader"
+  }, "Voters"), React.createElement("span", {
+    className: "rd-ap-th r wrap",
+    role: "columnheader"
+  }, narrow ? q === "co" ? rdElecYear : "Site" : c.refHead, React.createElement("em", null, narrow ? q === "co" ? ffReg ? "replay*" : "count" : q === "on" ? ffReg ? "national" : "assumes" : "–" : c.refSub)), React.createElement("span", {
+    className: "rd-ap-th r wrap",
+    role: "columnheader"
+  }, narrow ? "RedBr." : "RedBridge", React.createElement("em", null, c.rb.length ? narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave" : ffReg && q !== "ln" ? "national only" : "doesn’t ask")), React.createElement("span", {
+    className: "rd-ap-th r wrap",
+    role: "columnheader"
+  }, narrow ? "Demos" : "DemosAU", React.createElement("em", null, dmLast ? flWinMonths(dmLast.win) + (narrow ? "" : " MRP") + (q !== "co" && !ffReg ? "*" : "") : "national only")), !narrow && React.createElement("span", {
+    "aria-hidden": "true"
+  }), !narrow && React.createElement("span", {
+    className: "rd-fx-shead",
+    role: "columnheader"
+  }, React.createElement("span", {
+    className: "rd-ap-cap"
+  }, "Since ", D.monthNameFull(dom[0] % 12 + 1), React.createElement("em", null, ", each row spans ", span, " points")), ticks.map((t, i) => React.createElement("span", {
+    key: t.m,
+    className: "rd-ap-tk " + (i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle"),
+    style: {
+      left: 6 + (t.m - dom[0]) / Math.max(1e-9, dom[1] - dom[0]) * (sparkW - 12)
+    }
+  }, t.lab)))), c.cohorts.map(ck => {
+    const f = FF_COHORTS[ck];
+    const rbW = [...c.rb].reverse().find(w => w[ck] != null);
+    const dmW = [...c.dm].reverse().find(w => w[ck] != null);
+    const mv = !ffReg ? movedOf(q, ck) : null;
+    const marks = marksOf(ck).map(m => ({
+      ...m,
+      ck
+    }));
+    const share = PR[f.share];
+    return React.createElement("div", {
+      key: ck,
+      className: "rd-fx-row",
+      role: "row",
+      style: grid
+    }, React.createElement("span", {
+      className: "rd-fx-who",
+      role: "rowheader"
+    }, React.createElement("b", null, React.createElement("i", {
+      className: "rd-fx-swatch " + f.cls,
+      "aria-hidden": "true"
+    }), f.name, narrow ? "" : " voters"), share != null && React.createElement("span", {
+      className: "rd-ap-sub"
+    }, share.toFixed(1), "% of the vote")), React.createElement("span", {
+      className: "rd-fx-n ref",
+      role: "cell"
+    }, c.ref ? React.createElement(React.Fragment, null, say(c.ref[ck], c.refDp), c.band ? React.createElement("span", {
+      className: "rd-fx-band"
+    }, "\xB1", say(c.band[ck])) : null) : React.createElement("span", {
+      className: "rd-fx-nil",
+      "aria-label": "none"
+    }, "\u2013")), React.createElement("span", {
+      className: "rd-fx-n",
+      role: "cell"
+    }, rbW ? say(rbW[ck]) : React.createElement("span", {
+      className: "rd-fx-nil",
+      "aria-label": "not asked"
+    }, "\u2013"), mv && React.createElement("span", {
+      className: "rd-fx-chg"
+    }, mv.up ? "up" : "down", " from ", say(mv.from), " in ", D.monthName(Number(mv.ym.slice(5))))), React.createElement("span", {
+      className: "rd-fx-n",
+      role: "cell"
+    }, dmW ? say(dmW[ck]) : React.createElement("span", {
+      className: "rd-fx-nil",
+      "aria-label": "not asked"
+    }, "\u2013")), !narrow && React.createElement("span", {
+      "aria-hidden": "true"
+    }), React.createElement("span", {
+      className: "rd-fx-sc",
+      role: "cell"
+    }, React.createElement(RdFlowSpark, {
+      ck: ck,
+      marks: marks,
+      refv: c.ref ? c.ref[ck] : null,
+      band: c.band ? c.band[ck] : null,
+      W: sparkW,
+      H: sparkH,
+      dom: dom,
+      yr: yrOf(ck),
+      tip: tip,
+      onTip: setTip,
+      onOpen: openPoll,
+      tipBody: tipBody,
+      emptyNote: ffReg && q === "co" ? "No poll asks this by region" : "No readings",
+      ariaHead: f.name + " voters’ preferences to " + c.a + ", month by month" + (c.ref ? ", against " + (q === "co" ? "the " + rdElecYear + " count of " : "the site’s ") + say(c.ref[ck], c.refDp) : "")
+    })));
+  }), narrow && React.createElement("div", {
+    className: "rd-fx-ticks",
+    "aria-hidden": "true"
+  }, ticks.map((t, i) => React.createElement("span", {
+    key: t.m,
+    className: "rd-ap-tk " + (i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle"),
+    style: {
+      left: 6 + (t.m - dom[0]) / Math.max(1e-9, dom[1] - dom[0]) * (sparkW - 12)
+    }
+  }, t.lab)))), React.createElement(RdKey, {
+    className: "rd-ckey rd-fx-key",
+    items: []
+  }, c.rb.length > 0 && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fx-keyln",
+    "aria-hidden": "true"
+  }, React.createElement("i", null)), "RedBridge/Accent, monthly"), c.dm.length > 0 && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fx-keydm",
+    "aria-hidden": "true"
+  }), "DemosAU MRP, quarterly"), c.bys.length > 0 && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fx-keyx",
+    "aria-hidden": "true"
+  }), "2026 state and by-election counts"), c.ref && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fx-keyref" + (c.band ? " band" : ""),
+    "aria-hidden": "true"
+  }), q === "co" ? rdElecYear + " count" + (ffReg ? ", our replay" : "") : "Site’s assumption, with its range"), c.ref && c.rb.length > 0 && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fx-keyarea",
+    "aria-hidden": "true"
+  }), "Gap to it")), React.createElement("p", {
+    className: "rd-note rd-fx-note"
+  }, ledgerNote)), c.drift && React.createElement("div", {
+    className: "rd-fl-dblock" + (FF ? "" : " solo")
+  }, React.createElement("div", {
+    className: "rd-fl-dhead"
+  }, React.createElement("div", {
+    className: "rd-fl-dtitle"
+  }, FF && React.createElement("h3", {
+    className: "rd-sub rd-fl-dt"
+  }, "Do the pollsters\u2019 two-party figures show it?"), React.createElement("p", {
+    className: "rd-fl-dsub"
+  }, "Each poll\u2019s published two-party figure minus what its primary votes give on ", c.flows, ", set against that pollster\u2019s usual gap, points")), React.createElement("select", {
     className: "rd-pv-sel rd-fl-sel",
     "aria-label": "Highlight a pollster",
-    value: pick || "",
+    value: pickOn || "",
     onChange: e => setPick(e.target.value || null)
   }, React.createElement("option", {
     value: ""
-  }, pick ? "No highlight" : "Highlight a pollster"), houses.map(h => React.createElement("option", {
+  }, pickOn ? "No highlight" : "Highlight a pollster"), houses.map(h => React.createElement("option", {
     key: h,
     value: h
   }, h)))), React.createElement("div", {
-    ref: box,
-    className: "rd-fl-two"
+    className: "rd-fl-dgrid",
+    style: narrow ? undefined : {
+      gridTemplateColumns: cw + "px minmax(0, 1fr)"
+    }
   }, React.createElement("div", {
     className: "rd-fl-one"
-  }, React.createElement("span", {
-    className: "rd-fl-name lnp"
-  }, "Labor v Coalition"), React.createElement(RdFlowChart, {
-    fd: FD,
-    rival: "the Coalition",
+  }, React.createElement(RdFlowChart, {
+    key: q,
+    fd: c.drift,
+    rival: c.r,
     W: cw,
     phone: phone,
-    pick: pick
+    pick: pickOn,
+    emptyNote: q === "on" ? ["No readings before January", "Nothing before Jan", "None before Jan"] : null
   })), React.createElement("div", {
-    className: "rd-fl-one"
-  }, React.createElement("span", {
-    className: "rd-fl-name onp"
-  }, "Labor v One Nation"), React.createElement(RdFlowChart, {
-    fd: FO,
-    rival: "One Nation",
-    W: cw,
-    phone: phone,
-    pick: pick,
-    emptyNote: ["No readings before January", "Nothing before Jan", "None before Jan"]
-  }))), React.createElement(RdKey, {
-    className: "rd-ckey rd-fl-key",
+    className: "rd-fl-dside"
+  }, !narrow && nw && React.createElement("p", {
+    className: "rd-fl-dbig"
+  }, Math.abs(nw.v) < 0.05 ? "0.0" : rdSigned(nw.v, 1), React.createElement("span", null, "\xB1", nw.ci95.toFixed(1))), !narrow && React.createElement("p", {
+    className: "rd-fl-dverd"
+  }, verdict), React.createElement(RdKey, {
+    className: "rd-ckey rd-fl-key" + (narrow ? "" : " v"),
     items: [{
       kind: "line",
       color: "var(--ink)",
-      label: "All pollsters, month by month"
+      label: narrow ? "All pollsters, monthly" : "All pollsters, month by month"
     }, {
       kind: "band",
       color: "var(--ink-3)",
@@ -61777,178 +62015,24 @@ function RdFlows() {
   }, React.createElement("span", {
     className: "rd-fl-keynow",
     "aria-hidden": "true"
-  }, React.createElement("i", null)), "Now: the latest weeks pooled, with its 95% interval"), pick && React.createElement("span", {
+  }, React.createElement("i", null)), narrow ? "Now" : "Now: the latest weeks pooled"), pickOn && React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-fl-keypick",
     "aria-hidden": "true"
-  }), pick, ", month by month")), React.createElement("p", {
+  }), pickOn, ", month by month")), React.createElement("p", {
     className: "rd-note rd-fl-read"
-  }, "Implied is the figure a poll\u2019s primary votes give on the ", rdElecYear, " election\u2019s preference flows. Zero is each pollster\u2019s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster\u2019s first head-to-heads."), FF && (() => {
-    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.bys || [])].map(d => d.xm).concat(lnWaves.map(w => w.xm)).concat(FF.elec2025r ? [FF.elec2025r.all.xm] : []).filter(v => v != null);
-    const dom = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs))];
-    return React.createElement("div", {
-      className: "rd-ff"
-    }, React.createElement("div", {
-      className: "rd-ff-head"
-    }, React.createElement("div", null, React.createElement("h3", {
-      className: "rd-sub rd-ff-t"
-    }, "What voters say they\u2019d do with their preferences"), React.createElement("p", {
-      className: "rd-subdek rd-ff-d"
-    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines). DemosAU\u2019s MRP reports carry the same answers each quarter (the triangles) \u2014 printed by region, so they switch with the menu (\u201CAll voters\u201D is our weighting of the three regions). DemosAU\u2019s MRPs press the Coalition against One Nation too \u2014 the third chart below. The rings mark what preferences actually did at the 2025 election \u2014 on a named region they replay the seats classed to it \u2014 and the crosses the 2026 state and by-election counts. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
-      className: "rd-link rd-link-in",
-      href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
-    }, "predicted the next election better", React.createElement("span", {
-      className: "rd-apd-ext",
-      "aria-hidden": "true"
-    }, "\u2197")), " than the flows voters report.")), React.createElement("select", {
-      className: "rd-pv-sel rd-fl-sel",
-      "aria-label": "DemosAU MRP region",
-      value: ffReg,
-      onChange: e => setFfReg(e.target.value)
-    }, FF_REGIONS.map(([k, name]) => React.createElement("option", {
-      key: k || "all",
-      value: k
-    }, name)))), (ftContests || []).length > 0 && React.createElement("div", {
-      className: "rd-ft"
-    }, React.createElement("p", {
-      className: "rd-ft-view"
-    }, ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters", React.createElement("span", null, ", from the menu above")), React.createElement("div", {
-      className: "rd-ft-grid"
-    }, ftContests.map(c => React.createElement("table", {
-      key: c.key,
-      className: "rd-ft-table"
-    }, React.createElement("caption", null, c.name, React.createElement("span", {
-      className: "rd-ft-to"
-    }, "Share of each group\u2019s voters choosing ", c.to, ", %")), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
-      scope: "col"
-    }, React.createElement("span", {
-      className: "sr-only"
-    }, "Voters")), c.cols.map(col => React.createElement("th", {
-      key: col.key,
-      scope: "col",
-      className: col.site ? "rd-ft-site" : undefined
-    }, col.h, React.createElement("span", null, col.sub, col.wt ? "*" : ""))))), React.createElement("tbody", null, c.cohorts.map(ck => React.createElement("tr", {
-      key: ck
-    }, React.createElement("th", {
-      scope: "row"
-    }, React.createElement("i", {
-      className: "rd-ft-sw " + FF_COHORTS[ck].cls,
-      "aria-hidden": "true"
-    }), FF_COHORTS[ck].name), c.cols.map(col => {
-      const v = col.d && col.d[ck];
-      return React.createElement("td", {
-        key: col.key,
-        className: col.site ? "rd-ft-site" : undefined
-      }, v != null ? ftFig(v, col.dp) : React.createElement("span", {
-        className: "rd-ft-nil",
-        "aria-label": "not asked"
-      }, "\u2013"), v != null && col.band && React.createElement("span", {
-        className: "rd-ft-band"
-      }, " \xB1", ftFig(col.band[ck])));
-    }))))))), React.createElement("p", {
-      className: "rd-note rd-ft-note"
-    }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings)" + (ffReg ? ", on this view replayed for the seats classed " + FF_REG_OF[ffReg] + ", aggregated from their classic seats’ counts — the commission counts the cut nationally only, so a regional column is our replay, not its own" : ", which the commission counts nationally") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and on all three charts." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement("div", {
-      className: "rd-fl-two rd-ff-two"
-    }, React.createElement("div", {
-      className: "rd-fl-one"
-    }, React.createElement("span", {
-      className: "rd-fl-name lnp"
-    }, "Labor v Coalition"), React.createElement("div", {
-      className: "rd-fl-ct"
-    }, React.createElement("h4", {
-      className: "rd-ap-ct"
-    }, ffTitle("co"))), React.createElement(RdForced, {
-      q: "co",
-      waves: ffReg ? [] : FF.vsCoal,
-      cohorts: ["grn", "onp", "oth"],
-      anchor: "Labor",
-      rival: "the Coalition",
-      houseWord: "RedBridge/Accent",
-      W: cw,
-      phone: phone,
-      extras: ffReg ? [] : FF.demos,
-      elec: ffElec ? ffElec[ffReg] || ffElec.all : null,
-      dom: dom
-    })), React.createElement("div", {
-      className: "rd-fl-one"
-    }, React.createElement("span", {
-      className: "rd-fl-name onp"
-    }, "Labor v One Nation"), React.createElement("div", {
-      className: "rd-fl-ct"
-    }, React.createElement("h4", {
-      className: "rd-ap-ct"
-    }, ffTitle("on"))), React.createElement(RdForced, {
-      q: "on",
-      waves: ffReg ? [] : FF.vsOn,
-      cohorts: ["grn", "coal", "oth"],
-      anchor: "Labor",
-      rival: "One Nation",
-      houseWord: "RedBridge/Accent",
-      W: cw,
-      phone: phone,
-      extras: demoRows,
-      bys: ffReg ? [] : FF.bys || [],
-      dom: dom,
-      emptyNote: ["No election count of this choice", "No election count", "No count"]
-    }))), lnWaves.length > 0 && React.createElement("div", {
-      className: "rd-fl-one rd-ff-ln"
-    }, React.createElement("span", {
-      className: "rd-fl-name"
-    }, React.createElement("span", {
-      className: "rd-fl-xb"
-    }, "Coalition"), " v ", React.createElement("span", {
-      className: "rd-fl-xo"
-    }, "One Nation")), React.createElement("div", {
-      className: "rd-fl-ct"
-    }, React.createElement("h4", {
-      className: "rd-ap-ct"
-    }, ffTitle("ln"))), React.createElement(RdForced, {
-      q: "ln",
-      waves: lnWaves,
-      cohorts: ["alp", "grn", "oth"],
-      anchor: "the Coalition",
-      rival: "One Nation",
-      houseWord: "DemosAU (MRP)",
-      W: cw,
-      phone: phone,
-      dom: dom,
-      emptyNote: ["No election count of this choice", "No election count", "No count"]
-    })), React.createElement(RdKey, {
-      className: "rd-ckey rd-ff-key",
-      items: []
-    }, React.createElement("span", {
-      className: "rd-key-item"
-    }, React.createElement("span", {
-      className: "rd-ff-keyln",
-      "aria-hidden": "true"
-    }, React.createElement("i", null)), "RedBridge/Accent, monthly"), (FF.demos || FF.demosOn || lnWaves.length > 0) && React.createElement("span", {
-      className: "rd-key-item"
-    }, React.createElement("span", {
-      className: "rd-ff-keydm",
-      "aria-hidden": "true"
-    }), "DemosAU MRP, quarterly"), (FF.bys || []).length > 0 && React.createElement("span", {
-      className: "rd-key-item"
-    }, React.createElement("span", {
-      className: "rd-ff-keyx",
-      "aria-hidden": "true"
-    }), "2026 state and by-election counts"), FF.elec2025r && React.createElement("span", {
-      className: "rd-key-item"
-    }, React.createElement("span", {
-      className: "rd-ff-keyring",
-      "aria-hidden": "true"
-    }), "2025 election, as counted")));
-  })(), React.createElement(RdTsig, {
+  }, zeroNote, narrow ? "" : " A pollster that asks voters for their preferences would pull the line away from zero if those answers changed."))))), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
-    sets: ffSet ? flSets.concat(ffSet) : flSets,
-    note: "One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the note under the charts says, not the election; pollsters with too few months for a fit show dashes." + (ffSet ? " The pressed-choice rows run the same straight line through each cohort’s share of the pressed choice on the charts above — Labor’s on the pair, the Coalition’s on the third — Holm’s correction across the rows: a Yes licenses that cohort’s tail in its chart’s title." : "")
+    sets: tsSets,
+    note: (c.drift ? "Published minus implied: one straight line per pollster through its own monthly gaps since the election, t-tested, Holm’s correction within the contest. Yes means a gap is drifting, not just sitting off zero today; pollsters with too few months show dashes. " : "") + (FF ? "What voters say: one straight line per voter group through " + (q === "ln" ? "DemosAU’s quarterly MRP readings" : "RedBridge/Accent’s monthly answers") + ", Holm’s correction across every group in all three contests. A Yes is what the ledger’s “down from” and the section’s headline stand on." : "")
   }), React.createElement(RdFoot, {
     how: {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from every chart — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition — national-only too, so the named regions drop its triangles from the Labor v Coalition chart with them. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot; on a named region they — and the Flows table’s election column above — move to this site’s replay of the seats classed to it, each classic seat’s counted distributions aggregated over the class (the commission publishes no regional cut of its own, and its non-classic seats’ notional splits have no majors flow to replay). The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
+  }, FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is the AEC’s national two-party-preferred flow; on a named region it is our replay of the seats classed to it. This check corrects no other figure on the page." : "This check corrects no other figure on the page."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);

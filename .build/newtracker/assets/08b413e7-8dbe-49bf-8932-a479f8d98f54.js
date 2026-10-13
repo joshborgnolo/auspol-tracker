@@ -547,6 +547,18 @@ function TrendChart(props) {
                text, and the readout has to be the thing on top. */
   const [tipLay, setTipLay] = useState({ n: 0, cw: 0, w: 0 });
   const [tipSpill, setTipSpill] = useState(false);
+  /* where the chart sits on the screen: the clamp below keeps a readout
+     wider than its chart (a small multiple, a narrow phone) on the SCREEN
+     rather than centred on the chart, where it ran off the edge (2026-10-13
+     sweep: 207-220px tips over 150px panels sat 14px off a 360px phone) */
+  const [tipBox, setTipBox] = useState({ x: 0, vw: 0 });
+  /* tight: the readout's rows run past the screen cap (a row with a
+     headcount note - "Mean of past terms · 19 of 20 terms · 18 polled ·
+     +0.1" - is wider than a 320px phone). Kept while the row count and the
+     plot width hold, as the cols decision is, so it can't flip back and
+     forth as the wrapped shape measures narrower: the readout takes the
+     cap as its width and its notes wrap (template.html .tip-tight) */
+  const [tipTight, setTipTight] = useState(null);
   /* LAYOUT effect, not a plain one: it runs before the browser paints, so the
      corrected left lands in the same frame the readout appears in. Measured on
      every render and written back only when it actually moves, so a readout
@@ -558,12 +570,19 @@ function TrendChart(props) {
     if (!el) return;
     const w = el.offsetWidth;
     setTipW((prev) => (Math.abs(prev - w) > 0.5 ? w : prev));
+    if (ref.current) {
+      const x = ref.current.getBoundingClientRect().left, vw = document.documentElement.clientWidth;
+      setTipBox((prev) => (Math.abs(prev.x - x) > 0.5 || Math.abs(prev.vw - vw) > 0.5 ? { x, vw } : prev));
+    }
     const plotH = ref.current ? ref.current.offsetHeight : 0;
     // the readout hangs 10px under its top (.tip's translate); a dot readout
     // hangs above its point instead, inside the plot
     const over = el.offsetTop + 10 + el.offsetHeight > plotH;
     setTipSpill(over && !el.classList.contains("tip-dot"));
     const rows = [...el.querySelectorAll(".tip-row")];
+    const spills = el.scrollWidth > el.clientWidth + 1;
+    if (spills && !(tipTight && tipTight.n === rows.length && tipTight.cw === cw)) setTipTight({ n: rows.length, cw });
+    else if (!spills && tipTight && (tipTight.n !== rows.length || tipTight.cw !== cw)) setTipTight(null);
     if (!el.classList.contains("tip-guide") || (rows.length === tipLay.n && cw === tipLay.cw)) return;
     let colW = 0;
     for (const r of rows) {
@@ -1052,14 +1071,30 @@ function TrendChart(props) {
      the screen.
      So measure the element instead. The constants stay as the first-paint
      fallback only, and the next row nobody has thought of yet is contained
-     without anyone having to remember this line. A panel somehow wider than
-     its chart clamps to dead centre, which is the least-bad place for it. */
+     without anyone having to remember this line.
+     A readout wider than its chart used to clamp to the chart's dead
+     centre, and so ran off the screen wherever the chart is narrower than
+     the readout: a small multiple's 150px panel under a 219px poll readout,
+     or a phone's 320px plot under a 457px month readout whose "95%
+     intervals" row never wrapped (user report and site sweep, 2026-10-13).
+     Now no readout is wider than the screen less 8px a side (tipRoom, the
+     inline max-width; a long value wraps, rd.css/.tip-val), one that fits
+     over its chart keeps the chart's own clamp, and one that doesn't is
+     clamped to the SCREEN, as near its point as it can sit. */
   const tipCols = !!(tip && !evt && !dot && tipLay.w && tip.rows.length === tipLay.n && cw === tipLay.cw);
+  const tipRoom = Math.max(140, (tipBox.vw || cw + 16) - 16);
+  const tight = !!(tip && !evt && !tipCols && tipTight && tip.rows.length === tipTight.n && cw === tipTight.cw);
   if (tip) {
     const assumed = Math.min(evt ? 240 : 156, cw);
-    const tipMax = Math.min(tipW || assumed, cw);
-    const halfPct = Math.min(50, (tipMax / 2 / Math.max(cw, 1)) * 100);
-    tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
+    const tw = Math.min(tipW || assumed, tipRoom);
+    if (tw <= cw || !tipBox.vw) {
+      const halfPct = Math.min(50, (Math.min(tw, cw) / 2 / Math.max(cw, 1)) * 100);
+      tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
+    } else {
+      const c = (tip.left / 100) * cw;
+      const lo = 8 - tipBox.x + tw / 2, hi = tipBox.vw - 8 - tipBox.x - tw / 2;
+      tip.left = (Math.min(Math.max(lo, hi), Math.max(lo, c)) / Math.max(cw, 1)) * 100;
+    }
   }
 
   /* ---- accessible name ----------------------------------------------------
@@ -2011,13 +2046,20 @@ function TrendChart(props) {
       {tip && (
         <div key={evt ? "evt" : dot ? "dot" : "guide"}
              ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")
-                                     + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : "")}
-             style={{ left: tip.left + "%", top: tip.top + "%", width: tipCols ? tipLay.w : undefined }}>
+                                     + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : "") + (tight ? " tip-tight" : "")}
+             style={{ left: tip.left + "%", top: tip.top + "%", width: tipCols ? tipLay.w : tight ? tipRoom : undefined, maxWidth: evt ? undefined : tipRoom }}>
           {tip.title && <div className="tip-title">{tip.title}</div>}
           {tip.date && <div className="tip-date">{tip.date}</div>}
           {(() => {
+            /* a row whose value is a list ("95% intervals: Gen Z ±2.3,
+               Millennials ±2.5, …") may wrap its value - but only once the
+               readout is tight at the screen cap; otherwise every row holds
+               its line, so a readout anchored near the right edge never
+               squeezes its figures (shrink-to-fit measures the room right
+               of the anchor) and a laptop's readouts keep their shape. An
+               event readout keeps its own 240px cap (.tip-evt) */
             const row = (r, i) => (
-              <div className="tip-row" key={i}>
+              <div className={"tip-row" + (typeof r.value === "string" && r.value.length > 22 ? " tip-row-long" : "")} key={i}>
                 {r.color && <span className={"tip-swatch" + (tip.ringSwatch ? " is-ring" : "")}
                                   style={tip.ringSwatch ? { borderColor: r.color } : { background: r.color }}></span>}
                 <span className="tip-label">{r.label}</span>

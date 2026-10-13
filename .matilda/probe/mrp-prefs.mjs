@@ -9,14 +9,17 @@
      labels, 4ch party tags, 2ch figures) so wrapped rows read as columns, and
      the nationwide One Nation flow closes the line label-first like the
      other groups;
-   - the forced-choice pair carries hollow DemosAU diamonds: the Labor v
-     Coalition chart one per filed MRP (the report's printed national One
-     Nation reading), the Labor v One Nation chart three per MRP – one per
-     cohort in the cohort's colour, the site's all-regions weighting of the
-     printed regional tables (flowForced demosOn) – and the key names both.
-     The diamonds ride each window's TRUE midpoint (payload xm, fractional
-     month index), the one marks off the charts' whole-month grid – pinned
-     here against the empirical tick scale, never snapped to a slot.
+   - the Preference flows ledger (rebuilt 2026-10-13, design B: one contest
+     per tab) carries DemosAU's MRP readings as hollow triangles standing
+     apart from RedBridge/Accent's line: the Labor v Coalition tab's One
+     Nation row one per filed MRP (the report's printed national One Nation
+     reading), every row of the Labor v One Nation tab one per MRP in the
+     group's colour (the site's all-regions weighting of the printed
+     regional tables, flowForced demosOn), and the key names the shape.
+     The triangles ride each window's TRUE midpoint (payload xm, fractional
+     month index), the one mark off the ledger's whole-month ticks - pinned
+     here against the empirical tick scale of the line's column head,
+     never snapped to a month.
    Run against a built tree: node .matilda/probe/mrp-prefs.mjs [shotDir] */
 import puppeteer from "puppeteer-core";
 import path from "path";
@@ -40,77 +43,62 @@ for (const w of [1440, 1024, 768, 390]) {
   page.on("pageerror", (e) => errs.push(String(e)));
   await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector("#flow-drift", { timeout: 30000 });
-  const dm = await page.evaluate(() => {
-    const fig = (q) => document.querySelector(`#flow-drift figure.rd-ff[data-q="${q}"]`);
-    const cls = (el) => (el ? [...el.querySelectorAll(".rd-ff-dm")].map((d) => d.getAttribute("class").replace("rd-ff-dm ", "")) : []);
-    const on = cls(fig("on")), co = cls(fig("co"));
-    const keyDm = document.querySelector("#flow-drift .rd-ff-key .rd-ff-keydm");
-    return { on: on.length, co: co.length,
-      cohorts: ["lnp", "grn", "oth"].every((c) => on.filter((x) => x === c).length === 3),
-      key: !!keyDm && keyDm.parentElement.textContent.includes("DemosAU MRP") };
-  });
-  check(dm.on === 9, "Labor v One Nation: three hollow DemosAU diamonds per filed MRP (" + dm.on + ")");
-  check(dm.cohorts, "the One Nation chart's diamonds ride the three cohort colours");
-  check(dm.co === 3, "Labor v Coalition: three DemosAU diamonds (" + dm.co + ")");
-  check(dm.key, "the key names the diamond shape as DemosAU's MRP (the weighting caveat rides the tips and the foot)");
+  const tabTo = async (i) => { await page.evaluate((i) => document.querySelectorAll("#flow-drift .rd-fl-tabs .rd-tab")[i].click(), i); await wait(250); };
+  const rowsOf = () => page.evaluate(() => [...document.querySelectorAll("#flow-drift .rd-fx-row")].map((r) => ({
+    who: r.querySelector(".rd-fx-who b").textContent,
+    tris: [...r.querySelectorAll(".rd-fx-tr")].map((t) => ({ cls: t.getAttribute("class").replace("rd-fx-tr ", ""), x: +/^M([\d.]+)/.exec(t.getAttribute("d"))[1] })),
+  })));
+  await tabTo(1);
+  const on = await rowsOf();
+  const keyOn = await page.evaluate(() => { const k = document.querySelector("#flow-drift .rd-fx-key .rd-fx-keydm"); return !!k && k.parentElement.textContent.includes("DemosAU MRP"); });
+  await tabTo(0);
+  const co = await rowsOf();
+  const nOn = await page.evaluate(() => window.AUSPOL.flowForced.demosOn.length);
+  check(on.length === 3 && on.every((r) => r.tris.length === nOn), "Labor v One Nation: one hollow DemosAU triangle per filed MRP on every row (" + on.map((r) => r.tris.length) + ")");
+  check(on.every((r, i) => r.tris.every((t) => t.cls === ["lnp", "grn", "oth"][i])), "the triangles ride each group's own colour");
+  check(co[1] && co[1].tris.length === 3 && co[0].tris.length === 0 && co[2].tris.length === 0, "Labor v Coalition: DemosAU's three national One Nation readings, on the One Nation row alone");
+  check(keyOn, "the key names the triangle as DemosAU's MRP (the weighting caveat rides the tips and the note)");
   if (w === 1440) {
-    /* the diamonds sit at the window's TRUE midpoint, the one marks off the
-       charts' whole-month grid: derive the empirical month-index → x map
-       from the printed tick labels (year tokens propagate), then each
-       diamond's x must match the payload's xm through it, not any slot */
+    /* the triangles sit at the window's TRUE midpoint, the one mark off the
+       ledger's whole-month ticks: derive the empirical month-index -> x map
+       from the line column's printed ticks (year tokens propagate), then
+       each triangle's x must match the payload's xm through it, not a slot */
     const mids = await page.evaluate(() => {
       const FF = window.AUSPOL.flowForced;
       const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      const figRes = (fig, extras) => {
-        /* the class is shared with the y-axis figures – keep the x ticks,
-           which are the month names (year token only on a year's first) */
-        const labs = [...fig.querySelectorAll("text.rd-dis-ax")]
-          .map((t) => ({ s: t.textContent.trim(), x: t.getAttribute("x") }))
-          .filter((l) => /^[A-Z]/.test(l.s));
-        const slots = [];
-        let yr = null;
-        for (const l of labs) {
-          const m = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)( ’(\d{2}))?$/.exec(l.s);
-          if (!m) return { err: "unparsed tick label " + JSON.stringify(l.s) };
-          if (m[3]) yr = 2000 + Number(m[3]);
-          if (yr == null) return { err: "first tick carries no year" };
-          slots.push([yr * 12 + MON.indexOf(m[1]), +l.x]);
-        }
-        const [m1, x1] = slots[0], [m2, x2] = slots[slots.length - 1];
-        const per = (x2 - x1) / (m2 - m1);
-        const got = [...fig.querySelectorAll(".rd-ff-dm")].map((p) => ({
-          x: +/^M([\d.]+)/.exec(p.getAttribute("d"))[1],
-        }));
-        /* a diamond belongs to the MRP whose midpoint it sits nearest (the
-           three windows are months apart) */
-        const wantOf = (e) => x1 + (e.xm - m1) * per;
-        return extras.map((e) => {
-          const want = wantOf(e);
-          const on = got.filter((g) => extras.every((o) => Math.abs(g.x - want) <= Math.abs(g.x - wantOf(o))));
-          return { win: e.win, xm: e.xm, n: on.length, off: on.map((o) => Math.abs(o.x - want)),
-                   slot: on.some((o) => { const k = (o.x - x1) / per; return Math.abs(k - Math.round(k)) < 0.05; }) };
-        });
-      };
-      const figs = [...document.querySelectorAll("figure.rd-ff")];
-      const byQ = (q) => figs.find((f) => f.dataset.q === q);
-      return { on: figRes(byQ("on"), FF.demosOn), co: figRes(byQ("co"), FF.demos) };
+      const head = document.querySelector("#flow-drift .rd-fx-shead");
+      const sc = document.querySelector("#flow-drift .rd-fx-sc");
+      if (!head || !sc) return { err: "no line column head" };
+      const hx = head.getBoundingClientRect().left, sx = sc.querySelector("svg").getBoundingClientRect().left;
+      const slots = [];
+      let yr = null;
+      for (const t of head.querySelectorAll(".rd-ap-tk")) {
+        const m = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)( ’(\d{2}))?$/.exec(t.textContent.trim());
+        if (!m) return { err: "unparsed tick " + JSON.stringify(t.textContent) };
+        if (m[3]) yr = 2000 + Number(m[3]);
+        if (yr == null) return { err: "first tick carries no year" };
+        slots.push([yr * 12 + MON.indexOf(m[1]), parseFloat(t.style.left) + hx - sx]);
+      }
+      const [m1, x1] = slots[0], [m2, x2] = slots[slots.length - 1];
+      const per = (x2 - x1) / (m2 - m1);
+      return { per, x1, m1, wins: FF.demos.map((d) => ({ win: d.win, xm: d.xm, want: x1 + (d.xm - m1) * per })) };
     });
-    for (const [tag, rows] of [["v-ON", mids.on], ["v-Coalition", mids.co]]) {
-      check(rows.every((r) => !r.err), tag + ": tick labels parsed" + (rows.find((r) => r.err) ? " – " + rows.find((r) => r.err).err : ""));
-      check(rows.every((r) => r.xm % 1 > 0.01),
-        tag + ": every MRP window's true midpoint is off a month boundary (" + rows.map((r) => r.xm % 1 > 0.5 ? r.xm % 1 : (r.xm % 1).toFixed(2)).join(", ") + ")");
-      for (const r of rows) {
-        check(r.n === (tag === "v-ON" ? 3 : 1) && r.off.every((o) => o < 1.5),
-          tag + " " + r.win + ": its diamond" + (tag === "v-ON" ? "s" : "") + " sit at the true midpoint x (" + (r.off.length ? Math.max(...r.off).toFixed(2) : "–") + "px off expected)");
-        check(!r.slot, tag + " " + r.win + ": not snapped to a month slot");
+    check(!mids.err, "the line column's ticks parse" + (mids.err ? " – " + mids.err : ""));
+    if (!mids.err) {
+      const got = co[1].tris.map((t) => t.x);
+      for (const r of mids.wins) {
+        const near = got.reduce((a, g) => (Math.abs(g - r.want) < Math.abs(a - r.want) ? g : a), Infinity);
+        const k = (near - mids.x1) / mids.per;
+        check(Math.abs(near - r.want) < 1.5, "v-Coalition " + r.win + ": its triangle sits at the true midpoint x (" + Math.abs(near - r.want).toFixed(2) + "px off)");
+        check(r.xm % 1 > 0.01 && Math.abs(k - Math.round(k)) > 0.05, "v-Coalition " + r.win + ": off a month boundary, not snapped to a month");
       }
     }
   }
   if (SHOT) {
-    const el = await page.$("#flow-drift .rd-ff");
+    const el = await page.$("#flow-drift .rd-fl-ledger");
     await el.evaluate((e) => e.scrollIntoView({ block: "center" }));
     await wait(300);
-    await el.screenshot({ path: path.join(SHOT, `ff-${w}.png`) });
+    await el.screenshot({ path: path.join(SHOT, `fx-${w}.png`) });
   }
   const opened = await page.evaluate(() => {
     const k = window.AP.pollRowKey({ pollster: "DemosAU (MRP)", released: "2026-09-19" });

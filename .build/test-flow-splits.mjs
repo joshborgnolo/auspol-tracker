@@ -1,30 +1,30 @@
-/* test-flow-splits.mjs – pins the forced-choice preference-flows trio in the
-   All-polls Preference flows section (moved 2026-10-10 from the
-   /preference-flows/ satellite's #forced section; regrouped that day to one
-   chart per QUESTION; REWORKED 2026-10-13 to the four-mark-kinds contract).
-   Current contract: gen-data's D.flowForced (§7db) carries RedBridge/Accent's
-   waves read straight off polls.json's tpp_split/tpp_split_on rows verbatim,
-   the June-2026 Coalition est derivation rides exactly one cohort of one wave,
-   DemosAU's MRP carriers (demos/demosOn/lnpOn) ride the SAME lines as
-   RedBridge's dots — different shape, the user's call: "the MRP readings
-   behave like the RedBridge dots, just differently shaped" (triangles, not
-   diamonds) — the 2025 election's rings are elec2025r: the NATIONAL
-   carrier typed from flows.mjs's FLOW constants, the AEC's TPP flow cut
-   (elec2025r.all), plus the three seat-classification region carriers
-   (inner/outer/regional — this site's replay of the classic seats' counts,
-   the constants typed from .build/aec-2025-region-tpp-flows.mjs's output,
-   user call 2026-10-13: "the 2025 election flows are based on seat
-   classification, which she worked out already"), the 2026
-   state and by-election counts ride the Labor-v-One-Nation chart as crosses
-   (bys: SA2026 Bonham estimates, Secret Harbour — on the days of the
-   elections, joined to NO line, national only, hidden on a named region;
-   Farrer's pair dropped 2026-10-13 — those counts measured independent
-   contests, not One Nation voters' choices), RedBridge's national dots
-   drop out on a named region from EVERY chart (both charts' waves lists
-   go empty — the user, the day's third call on it: "there should be no
-   RedBridge/Accent polls" in a region's view), and the third chart's
-   title paints Coalition in coalition blue and One Nation in One Nation
-   orange.
+/* test-flow-splits.mjs – pins the preference-flows data and its renderer in
+   the All-polls Preference flows section (the forced-choice answers moved
+   2026-10-10 from the /preference-flows/ satellite's #forced section).
+   The data: gen-data's D.flowForced (§7db) carries RedBridge/Accent's waves
+   read straight off polls.json's tpp_split/tpp_split_on rows verbatim, the
+   June-2026 Coalition est derivation rides exactly one cohort of one wave,
+   DemosAU's MRP carriers (demos/demosOn/lnpOn) carry its printed figures
+   (the One Nation contests by region), the 2025 election's counted flows
+   are elec2025r: the NATIONAL carrier typed from flows.mjs's FLOW
+   constants, the AEC's TPP flow cut (elec2025r.all), plus the three
+   seat-classification region carriers (inner/outer/regional — this site's
+   replay of the classic seats' counts, the constants typed from
+   .build/aec-2025-region-tpp-flows.mjs's output, user call 2026-10-13: "the
+   2025 election flows are based on seat classification, which she worked
+   out already"), and the 2026 state and by-election counts (bys: SA2026
+   Bonham estimates, Secret Harbour — on the days of the elections; Farrer's
+   pair dropped 2026-10-13, those counts measured independent contests, not
+   One Nation voters' choices).
+   The renderer was REBUILT 2026-10-13 (evening; the user: "an ill-conceived
+   and disordered hodgepodge - especially on small screens"): the three
+   charts and the flows tables gave way to design B - contest tabs over a
+   ledger (one row per voter group: the assumed flow, RedBridge/Accent's and
+   DemosAU's latest answers, a line of RedBridge's answers against the
+   assumption, DemosAU's triangles apart from it), then the contest's drift
+   chart. A named region drops every national mark (the user: "there should
+   be no RedBridge/Accent polls" in a region's view) and rekeys the election
+   column to the class's seat replay.
    Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -149,155 +149,116 @@ for (const d of FF.bys) {
   assert.ok(d.label && d.win && d.sub, `${d.key}: the mark names its count, day and provenance`);
 }
 
-/* the MRP readings JOIN the lines: their marks ride the same cohort series
-   as RedBridge's waves (the renderer's line inputs), not a separate kind */
+/* the MRP carriers: DemosAU's regional tables for the two One Nation
+   contests (the ledger's region menu rekeys them) */
 assert.ok(Array.isArray(FF.demosOn) && FF.demosOn.length >= 2, "demosOn carries the MRP's Labor-v-One-Nation regional carriers");
 assert.ok(Array.isArray(FF.lnpOn) && FF.lnpOn.length >= 2, "lnpOn carries the MRP's Coalition-v-One-Nation carriers");
 
-// ---- the renderer wiring --------------------------------------------------------------
+// ---- the renderer: design B of 2026-10-13 (contest tabs, a ledger per contest, the drift chart) ----
+/* The section was rebuilt 2026-10-13 (the user: "an ill-conceived and
+   disordered hodgepodge - especially on small screens"; design B of that
+   day's mockups, their pick): contest tabs walk Labor v Coalition, Labor v
+   One Nation and Coalition v One Nation; each tab's ledger lists the
+   contest's voter groups - the assumed flow, RedBridge/Accent's and
+   DemosAU's latest answers, a line of RedBridge's monthly answers against
+   the assumption - then the contest's drift chart. DemosAU's triangles
+   stand APART from RedBridge's line (the user's call the same day,
+   reversing the morning's joined line) */
 const ap = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
-assert.ok(/function RdForced\(/.test(ap), "the RdForced component exists");
-assert.ok(ap.includes("FF_COHORTS"), "the cohort lexicon (names + class tokens) exists");
-assert.equal(ap.match(/<RdForced /g).length, 3,
-  "RdForced mounts three charts: the RedBridge pair plus the DemosAU MRP Coalition v One Nation third chart");
-assert.ok(ap.includes('cohorts={["grn", "coal", "oth"]}') && ap.includes('cohorts={["grn", "onp", "oth"]}'),
-  "the two charts ask their cohort rosters: grn/coal/oth on Labor v One Nation, grn/onp/oth on Labor v the Coalition");
-assert.ok(ap.includes('rival="One Nation"') && ap.includes('rival="the Coalition"'),
-  "the two contests read as Labor-v-One-Nation and Labor-v-the-Coalition");
-assert.ok(ap.includes('anchor="the Coalition" rival="One Nation" houseWord="DemosAU (MRP)"'),
-  "the third chart presses the Coalition against One Nation on the lnpOn series, DemosAU-housed");
-assert.ok(ap.includes("D.flowForced"), "the charts read the data asset, not a fetch");
+const cssRd = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
+const app = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"), "utf8");
+assert.ok(/function RdFlows\(\{ measure \}\)/.test(ap), "RdFlows takes the page's two-party contest");
+assert.ok(app.includes("<RdFlows measure={measure} />"), "the All-polls view hands RdFlows the page's contest");
+assert.ok(/function RdFlowSpark\(/.test(ap), "the ledger's per-group line component exists");
+assert.ok(!/function RdForced\(/.test(ap) && !ap.includes("<RdForced "), "the old three forced-choice charts are gone");
+assert.ok(ap.includes('const FL_TABS = [{ id: "co", label: "Labor v Coalition" }, { id: "on", label: "Labor v One Nation" }, { id: "ln", label: "Coalition v One Nation" }];'),
+  "three contest tabs, Labor v Coalition first");
+assert.ok(ap.includes('<RdTabs swipe value={q}') && ap.includes('className="rd-fl-tabs" options={tabs}')
+  && ap.includes('const tabs = FF ? FL_TABS : FL_TABS.filter((t) => t.id !== "ln");'),
+  "the tabs ride RdTabs (swipeable, the house-lean idiom); a jurisdiction with no forced-choice answers (/vic/) walks the two drift charts alone");
+assert.ok(ap.includes("{FF && (\n          <div className=\"rd-fl-ledger\" ref={ledger}>"),
+  "the ledger draws only where the forced-choice answers exist");
+assert.ok(ap.includes("const tabOf = (m) => (m === \"onp\" ? \"on\" : \"co\");") && ap.includes("setQ(tabOf(measure));"),
+  "the tab opens on the page's contest and follows its two-party flip");
+assert.ok(ap.includes("D.flowForced"), "the ledger reads the data asset, not a fetch");
+assert.ok(ap.includes("D.flowTables"), "the One Nation contest's assumption reads the emitted flowTables (flows.mjs, the one home)");
+assert.ok(ap.includes("FT.onp.lnp * 100") && ap.includes("FT.onBand.lnp * 100"),
+  "the Labor-v-One-Nation ledger sets the site's built table and its band beside the polls");
 
-/* four mark kinds, one shape apiece: RedBridge's dots and DemosAU's MRP
-   triangles BOTH join the lines (the user's 2026-10-13 call) — the line's
-   series filter is wave-or-mrp — the election's rings and the 2026 counts'
-   crosses sit outside every line */
-assert.ok(ap.includes('const inLine = (g) => g.kind === "wave" || g.kind === "mrp";'),
-  "waves AND MRP triangles join the cohort lines (the MRP affects the fit like a dot)");
-assert.ok(ap.includes("!groups.length"), "a chart with no groups at all stays unmounted (never an empty svg)");
-assert.ok(ap.includes('className={"rd-ff-tr " + cls}'), "the MRP mark is a triangle (.rd-ff-tr)");
-assert.ok(ap.includes('className={"rd-ff-x " + cls}'), "the 2026-count mark is a cross (.rd-ff-x)");
-assert.ok(ap.includes('className={"rd-ff-dot " + cls}') && ap.includes('"rd-ring rd-ff-ring "'),
-  "waves stay dots, the election stays the primary chart's open ring");
-
-/* triangles affect the lines: a cohort's series runs through every wave and
-   MRP mark in date order; rings and crosses never bend it */
-assert.ok(ap.includes('groups.filter((g) => inLine(g) && g.d[ck] != null).sort((a, b) => a.xm - b.xm)'),
-  "each cohort's line runs through waves and MRP marks alike, in date order");
-const lineCall = ap.match(/series\.map\(\(s\)\s*=>[\s\S]{0,160}?rd-ff-line /);
-assert.ok(lineCall && !/filter/.test(lineCall[0]),
-  "every built series draws its line (no 'lone triangles get no line' filter left over)");
-
-/* the bys/x domain story: crosses sit on their own days, the rings on the
-   election's day, all on the month-index scale; the shared domain spans the
-   waves, the MRPs, the crosses and the rings */
-assert.ok(ap.includes("...(bys || []).map((d) => d.xm)"), "a chart's own domain hears the crosses' days");
-assert.ok(ap.includes("...(FF.bys || [])"), "the section's shared domain hears the crosses");
-
-/* the region menu (user asks 2026-10-13): All voters + the MRP's three named
-   regions. On a named region, RedBridge/Accent's national dots, DemosAU's
-   national MRP triangles and the 2026 crosses vanish from EVERY chart (a
-   national wave can't speak to a region — user 2026-10-13, the day's third
-   call on it: "in the regions view in the Labor-v-Coalition preference
-   flows chart, there should be no RedBridge/Accent polls… It's just
-   DemosAU, ALP, One Nation") and the MRP regional carriers rekey to the
-   printed cells; the chart itself stays MOUNTED, drawing its election
-   rings rekeyed to the seat-classification replay */
+/* each menu on the part it steers: the region menu in the ledger's head,
+   the highlight menu in the drift chart's head */
+{
+  const iL = ap.indexOf('className="rd-fl-lhead"'), iReg = ap.indexOf('aria-label="Region"');
+  const iD = ap.indexOf('className="rd-fl-dhead"'), iPick = ap.indexOf('aria-label="Highlight a pollster"');
+  assert.ok(iL > 0 && iReg > iL && iD > iReg && iPick > iD,
+    "the region menu sits in the ledger's head, the highlight menu in the drift chart's head");
+}
 assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];'),
   "the region menu is All voters + the MRP's three named regions");
-assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={ffReg}') && ap.includes('setFfReg(e.target.value)'),
-  "the select rides ffReg state beside the section hed, labelled for assistive tech");
-assert.ok(ap.includes("waves={ffReg ? [] : FF.vsOn}"),
-  "on a named region RedBridge's dots drop out of the v-One-Nation chart entirely");
-assert.ok(ap.includes('waves={ffReg ? [] : FF.vsCoal}') && ap.includes('extras={ffReg ? [] : FF.demos}'),
-  "on a named region RedBridge's dots and DemosAU's national triangles drop out of the Labor-v-Coalition chart too (user 2026-10-13)");
-assert.ok(ap.includes('<RdForced q="co"') && !ap.includes("rd-fl-emptycell") && !/\{ffReg \? \(\s*<p/.test(ap),
-  "the Labor-v-Coalition chart mounts on every menu view — the election rings carry it alone, the empty-cell stand-in is gone (user 2026-10-13)");
-assert.ok(ap.includes("there should be no RedBridge/Accent polls"),
-  "the chart's comment records the user's regions-view call");
-assert.ok(ap.includes("bys={ffReg ? [] : (FF.bys || [])}"),
-  "on a named region the 2026-count crosses drop out too (national counts)");
-assert.ok(ap.includes("elec={ffElec ? ffElec[ffReg] || ffElec.all : null}"),
-  "the rings rekey to the named region's seat-classification replay, All voters to the national count");
-assert.ok(ap.includes("FF.elec2025r ? [FF.elec2025r.all.xm] : []"),
-  "the shared domain hears the election day's x (the region carriers share it)");
-assert.ok(ap.includes("extra") === false || ap.includes("extras={demoRows}"),
-  "the v-One-Nation chart's MRP extras ride the rekeyed demosOn rows");
 
-/* the rekey: All voters reads the wave's `all` (our enrolment-and-vote
-   weighting, marked wt); a named region reads the report's printed cells */
+/* the region contract (user 2026-10-13): a named region drops every
+   national mark - RedBridge/Accent's waves, DemosAU's one national
+   Labor-v-Coalition figure, the 2026 counts - and rekeys the election
+   column to the seat-classification replay; DemosAU's printed regional
+   cells ride the One Nation contests */
+assert.ok(ap.includes("rb: ffReg ? [] : FF.vsCoal") && ap.includes("rb: ffReg ? [] : FF.vsOn"),
+  "on a named region RedBridge/Accent's waves drop out of both contests (\"there should be no RedBridge/Accent polls\")");
+assert.ok(ap.includes("dm: ffReg ? [] : (FF.demos || [])"), "DemosAU's national Labor-v-Coalition figure drops on a named region");
+assert.ok(ap.includes("bys: ffReg ? [] : (FF.bys || [])"), "the 2026 counts drop on a named region (national counts)");
+assert.ok(ap.includes("ref: E ? (ffReg && E[ffReg] ? E[ffReg] : E.all) : null"),
+  "the election column rekeys to the class's seat replay, All voters the national count");
+assert.ok(ap.includes("dm: rekeyMrp(FF.demosOn)") && ap.includes("dm: rekeyMrp(FF.lnpOn)"),
+  "the One Nation contests' DemosAU cells ride the region menu");
 assert.ok(ap.includes("const rekeyMrp = (ws)") && ap.includes("...w, ...w.all, wt: true"),
   "rekeyMrp lifts the region's cells; All voters is the enrolment-and-vote weighting (wt stamped)");
 
-// ---- the third chart's coloured title ------------------------------------------------
-assert.ok(ap.includes('<span className="rd-fl-xb">Coalition</span> v <span className="rd-fl-xo">One Nation</span>'),
-  "the third chart's name splits into two party-inked spans");
-const cssRd = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
-assert.ok(/body\.rd \.rd-fl-xb \{ color: var\(--lnp-text\)/.test(cssRd),
-  "Coalition in the title paints coalition blue (--lnp-text), not inherits the page ink");
-assert.ok(/body\.rd \.rd-fl-xo \{ color: var\(--onp-text\)/.test(cssRd),
-  "One Nation in the title paints One Nation orange (--onp-text)");
+/* the line: RedBridge's waves alone draw it; DemosAU's triangles stand
+   apart, joined by a thin line only where DemosAU is the one house */
+assert.ok(ap.includes('const rb = marks.filter((m) => m.kind === "wave");') && ap.includes("const pts = rb.map((m) => [X(m.xm), Y(m.v)]);"),
+  "the group's line runs through RedBridge's waves alone");
+assert.ok(ap.includes('{pts.length > 1 && <path className={"rd-fx-line " + cls} d={monotoneXY(pts)}></path>}'),
+  "the line path is the waves' own curve");
+assert.ok(ap.includes("{!rb.length && dm.length > 1 && <path className={\"rd-fx-mline \" + cls}"),
+  "DemosAU's marks join only where no RedBridge line exists (the Coalition v One Nation contest, a named region)");
+assert.ok(ap.includes('className={"rd-fx-tr " + cls}') && ap.includes('className={"rd-fx-x " + cls}'),
+  "DemosAU's readings are triangles, the 2026 counts crosses");
+assert.ok(ap.includes('<path className="rd-fx-ref"') && ap.includes('<rect className="rd-fx-refb"'),
+  "the assumption is a dotted line across the row, its band shaded where it carries one");
 
-// ---- the new marks' CSS ----------------------------------------------------------------
-assert.ok(/\.rd-ff-tr\.\w+/.test(cssRd) && cssRd.includes("stroke-linejoin"),
-  "every cohort's triangle fills the chart ground and carries its party-inked stroke");
-assert.ok(/\.rd-ff-x\.\w+/.test(cssRd) && cssRd.includes("stroke-linecap"),
-  "every cohort's cross strokes its party ink, no fill");
-assert.ok(cssRd.includes(".rd-ff-keydm") && cssRd.includes("clip-path: polygon(50% 0, 100% 100%, 0 100%)"),
-  "the key's MRP token is a solid triangle matching the plot mark");
-assert.ok(cssRd.includes(".rd-ff-keyx") && cssRd.includes(".rd-ff-keyx::before") && cssRd.includes("rotate(-45deg)"),
-  "the key's 2026-count token is a cross");
-assert.ok(cssRd.includes(".rd-ff-sw.mrp") && cssRd.includes(".rd-ff-sw.byelec"),
-  "the tooltip swatches take the mark's shape: MRP triangles, 2026-count crosses");
-assert.ok(cssRd.includes(".rd-ff-keyring"), "the key names the 2025 election's rings");
-assert.ok(cssRd.includes(".rd-ff-keyln"), "the key's line token marks RedBridge/Accent's monthly run");
-assert.ok(!cssRd.includes("rd-fl-emptycell"), "the national-only empty cell's styling is gone with the stand-in");
+/* the battery stands on the All-voters series, never the menu's view, so
+   the head and the ledger's "down from" never move with the menu */
+assert.ok(ap.includes('["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]]'), "the battery reads DemosAU's All-voters series");
+assert.ok(ap.includes("withinHouseSlope(s.map((w) => ({ h: cq + ck, t: (w.xm ?? mi(w.ym)) / 12, w: 1, y: w[ck] })))"),
+  "one straight line per group, w=1, the year scale");
+assert.ok(ap.includes("if (r.fit.p >= 0.05 / (tested.length - i)) break;"), "Holm's correction across the battery");
+assert.ok(ap.includes("const mv = !ffReg ? movedOf(q, ck) : null;"), "the ledger's change note rides the battery's Yes, on All voters only");
 
-// ---- the xnote and key in the renderer ------------------------------------------------
-assert.ok(ap.includes("Triangles mark DemosAU’s MRP readings"), "the svg's spoken note names the triangles");
-assert.ok(ap.includes("Crosses mark the 2026 state and by-election counts."), "the spoken note names the crosses where they're drawn");
-assert.ok(ap.includes("(FF.bys || []).length > 0") || ap.includes('(FF.bys || []).length'), "the crosses' key item is gated on crosses existing");
-assert.ok(ap.includes('FF.elec2025r && <span className="rd-key-item"><span className="rd-ff-keyring"') &&
-  !ap.includes("FF.elec2025r && !ffReg &&"),
-  "the rings' key item is gated on the carrier existing alone — the rings draw on every menu view (national count or seat-class replay), so their key does too");
+/* the head's written rules: a drift clear of its margin leads; else a
+   group the battery says moved; else still flowing as at the election */
+assert.ok(ap.includes("const head = outC || outO") && ap.includes("voiceMove ? FF_COHORTS[voiceMove.ck].name + \" voters say they’d now send \"")
+  && ap.includes("\"Preferences are still flowing much as they did at the election\""),
+  "the head's three branches are written in code");
 
-// ---- the Flows table (user 2026-10-13: un-folded the same day it shipped - "take it out
-//      of that dropdown view and remove that dropdown view... just always display the
-//      tables above the charts") ----------------------------------------------------------------
-assert.ok(!ap.includes("<summary>Flows table</summary>") && !ap.includes('rd-evdrop rd-ft') && !ap.includes("<details className=\"rd-evdrop rd-ft\""),
-  "no Flows-table dropdown survives - the tables stand always-visible, never a fold");
-assert.ok(ap.includes('className="rd-ft"'), "the Flows table mounts as an always-on-show block (.rd-ft)");
-{ // mount order inside the forced-choice block: head, the tables, then the chart pair
-  const iHead = ap.indexOf('className="rd-ff-head"');
-  const iFt = ap.indexOf('className="rd-ft"');
-  const iTwo = ap.indexOf('className="rd-fl-two rd-ff-two"');
-  const iTsig = ap.lastIndexOf('summary="Trend-significance table"');
-  assert.ok(iHead > 0 && iFt > iHead && iTwo > iFt && iTsig > iTwo,
-    "the tables sit directly under the forced-choice head, above the three charts (the trend-significance battery still closes the section)");
-}
-assert.ok(!/<RdTsig summary="Flows table"/.test(ap),
-  "the Flows table wears its own chrome (.rd-ft), not RdTsig's - that table's No-row fade greys every row of a table with no test");
-// redesigned 2026-10-13: one grid per contest, cohorts down, sources across, one figure a cell
-assert.ok(ap.includes('className="rd-ft-table"') && ap.includes('{ key: "co", name:') && ap.includes('{ key: "on", name:') && ap.includes('{ key: "ln", name:'),
-  "one grid per contest - Labor v Coalition, Labor v One Nation, Coalition v One Nation");
-assert.ok(ap.includes('{ key: "elec", h: "Election"') && ap.includes('key: "site", h: "This site"'),
-  "the sources run election count, then the site's own tables, then the houses' latest waves");
-assert.ok(ap.includes("D.flowTables"), "the site's column reads the emitted flowTables constants (flows.mjs, the one home)");
-assert.ok(ap.includes("const ftRb = (w) => !ffReg && w &&"),
-  "the table follows the region menu: RedBridge/Accent (national-only) drops out of a regional view, as on the charts");
-assert.ok(ap.includes('h: "Election", sub: ffReg ? "2025, "') && ap.includes('d: ffElec ? ffElec[ffReg] || ffElec.all : FF.elec2025r.all'),
-  "the election column rekeys with the rings - All voters the national count, a named region the class's seat replay, labelled for its class");
-assert.ok(/\.rd-ft-table \{/.test(cssRd) && /\.rd-ft-grid \{ grid-template-columns: repeat\(3/.test(cssRd),
-  "the grids sit three abreast where they fit (rd.css .rd-ft-grid)");
+/* tooltips: never wider than their chart, sentences wrap (the bug the
+   user reported 2026-10-13 - the DemosAU tips ran 371-410px on a 390px
+   phone and widened the page) */
+assert.equal((ap.match(/maxWidth: W - 16/g) || []).length, 4,
+  "every preference-flows tip carries maxWidth W - 16: the drift chart's three kinds and the ledger's");
+assert.ok(cssRd.includes("body.rd .rd-fx-tip { width: max-content; white-space: normal; z-index: 30; }"),
+  "the ledger's tip sizes to its content and wraps its sentences");
+assert.ok(cssRd.includes("body.rd .rd-fl-tip :is(.tip-sub, .tip-hint) { white-space: normal; }"),
+  "the drift chart's tip sentences wrap");
+assert.ok(/@media \(max-width: 620px\) \{\s*body\.rd \.rd-fl-tabs > div\[role="group"\] \{[^}]*overflow-x: auto/.test(cssRd),
+  "a phone's contest tabs scroll under a fade, as the house-lean tabs do");
 
-// ---- the renderer's earlier contract still stands --------------------------------------
-assert.ok(ap.includes('q="co" waves={ffReg ? [] : FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series on All voters only (a named region empties it, as on the One Nation charts)");
-assert.ok(ap.includes("const demoRows = FF ? rekeyMrp(FF.demosOn) : [];"),
-  "the v-One-Nation chart's MRP extras come from the rekeyed demosOn carriers");
-assert.ok(ap.includes("moved.length !== 1"), "a title tail names a cohort only when EXACTLY ONE moved");
-assert.ok(ap.includes('key: "pressed"'), "the pressed-choice rows join the trend-significance table as their own set");
-assert.ok(cssRd.includes(".rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }"),
-  "the forced pair shares one subgrid (contest, title, chart) so the two svgs stay row-aligned however the titles wrap");
+/* the old furniture is gone, code and CSS */
+assert.ok(!/rd-ff-|rd-ft-|"rd-ft"/.test(ap), "no forced-chart or flows-table classes remain in the renderer");
+assert.ok(!/rd-ff-|rd-ft-/.test(cssRd), "no forced-chart or flows-table rules remain in rd.css");
+assert.ok(ap.includes('summary="Trend-significance table"') && ap.indexOf('summary="Trend-significance table"', ap.indexOf("function RdFlows(")) > ap.indexOf('className={"rd-fl-dblock"'),
+  "the trend-significance battery still closes the section, under the drift chart");
+assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-lhead"') > ap.indexOf("className=\"rd-fl-tabs\"")
+  && ap.indexOf('className={"rd-fl-dblock"') > ap.indexOf('className="rd-fl-lhead"'),
+  "reading order: tabs, then the ledger, then the drift chart");
 
 // ---- the satellite stays stripped -------------------------------------------------------
 const page = fs.readFileSync(path.join(ROOT, "preference-flows", "index.html"), "utf8");
