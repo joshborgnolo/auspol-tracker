@@ -5096,19 +5096,20 @@ function RdFlows() {
       };
     }),
   } : null;
-  /* the Flows table (user 2026-10-13): one fold above the significance
-     battery listing, per contest, the flows the charts draw from - first
-     the election's counted row, then the flowed constants this site reads
+  /* the Flows table (user 2026-10-13, redesigned the same day - "it sucks
+     currently"): one small grid per contest, the cohorts down the side and
+     the sources across - the election's count, the flows this site reads
      every implied two-party figure through (window.AUSPOL's flowTables),
-     then each house's latest wave, always across the four electorate
-     views so a region's printed cells sit beside the national reading.
-     The 2026 state and by-election counts stay chart-only - an electorate
-     count is no electorate-CLASS view. */
-  const ftCohorts = { co: ["grn", "onp", "oth"], on: ["grn", "coal", "oth"], ln: ["alp", "grn", "oth"] };
-  const ftCell = (d, cks) => d
-    ? <div>{cks.filter((ck) => d[ck] != null).map((ck) => <div key={ck}>{FF_COHORTS[ck].name} {d[ck].toFixed(1)}</div>)}</div>
-    : "–";
-  const ftDash = ["–", "–", "–", "–"];
+     then each house's latest wave - one figure per cell, so a cohort's row
+     reads straight across. It follows the section's region menu, as the
+     charts do: a named region keeps the sources printed for it (the AEC's
+     seat-class count, DemosAU's regional cells), keeps the site's national
+     flows as the yardstick, and drops RedBridge/Accent, a national-only
+     house, exactly as the charts drop its dots. The old fold (an RdTsig
+     with the four views across) stacked three labelled figures in every
+     cell, was half dashes and read grey: the significance chrome fades
+     every row without a Yes. The 2026 state and by-election counts stay
+     chart-only - an electorate's count is no electorate-class view. */
   const ftLast = FF ? {
     co: FF.vsCoal[FF.vsCoal.length - 1],
     on: FF.vsOn[FF.vsOn.length - 1],
@@ -5116,38 +5117,37 @@ function RdFlows() {
     mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
     ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1],
   } : null;
-  const ftPct = (v) => v * 100;
-  const ftBd = (v) => (v * 100).toFixed(1).replace(/\.0$/, "");
   const ftSite = D.flowTables || null;
-  const ftSiteOn = ftSite ? <div>{[["coal", "lnp"], ["grn", "grn"], ["oth", "oth"]].map(([ck, bk]) => (
-    <div key={ck}>{FF_COHORTS[ck].name} {ftPct(ftSite.onp[bk]).toFixed(1)} <span className="rd-note">± {ftBd(ftSite.onBand[bk])}</span></div>
-  ))}</div> : "–";
-  const flowSets = FF ? [
-    { key: "ftco", label: "Labor v Coalition — the share of each cohort choosing Labor", rows: [
-      { key: "elec", name: "2025 election, as counted",
-        cells: FF.elec2025r ? ["all", "inner", "outer", "regional"].map((k) => ftCell(FF.elec2025r[k], ftCohorts.co)) : ftDash },
-      { key: "site", name: "The flows this site uses",
-        cells: [ftCell(ftSite ? { grn: ftPct(ftSite.lnp.grn), onp: ftPct(ftSite.lnp.onp), oth: ftPct(ftSite.lnp.oth) } : null, ftCohorts.co), "–", "–", "–"] },
-      ftLast.co && { key: "rb", name: "RedBridge/Accent, " + rdMonthYear(ftLast.co.ym),
-        cells: [ftCell(ftLast.co, ftCohorts.co), "–", "–", "–"] },
-      ftLast.dm && { key: "mrp", name: "DemosAU MRP, " + ftLast.dm.win,
-        cells: [ftCell(ftLast.dm, ftCohorts.co), "–", "–", "–"] },
-    ].filter(Boolean) },
-    { key: "fton", label: "Labor v One Nation — the share of each cohort choosing Labor", rows: [
-      { key: "elec", name: "2025 election, as counted", cells: ftDash },
-      { key: "site", name: "The flows this site uses", cells: [ftSiteOn, "–", "–", "–"] },
-      ftLast.on && { key: "rb", name: "RedBridge/Accent, " + rdMonthYear(ftLast.on.ym),
-        cells: [ftCell(ftLast.on, ftCohorts.on), "–", "–", "–"] },
-      ftLast.mn && { key: "mrp", name: "DemosAU MRP, " + ftLast.mn.win,
-        cells: ["all", "inner", "outer", "regional"].map((k) => ftCell(ftLast.mn[k], ftCohorts.on)) },
-    ].filter(Boolean) },
-    { key: "ftln", label: "Coalition v One Nation — the share of each cohort choosing the Coalition", rows: [
-      { key: "elec", name: "2025 election, as counted", cells: ftDash },
-      { key: "site", name: "The flows this site uses", cells: ftDash },
-      ftLast.ln && { key: "mrp", name: "DemosAU MRP, " + ftLast.ln.win,
-        cells: ["all", "inner", "outer", "regional"].map((k) => ftCell(ftLast.ln[k], ftCohorts.ln)) },
-    ].filter(Boolean) },
-  ] : null;
+  const ftMon = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthName(m) + " " + y; };
+  const ftRb = (w) => !ffReg && w && { key: "rb", h: "RedBridge", sub: ftMon(w.ym), d: w };
+  const ftMrp = (w, regional) => w && (regional ? (ffReg ? w[ffReg] : w.all) : !ffReg && w) && {
+    key: "mrp", h: "DemosAU", sub: "MRP, " + w.win.replace(/^.*?([A-Z][a-z]{2} \d{4})$/, "$1"),
+    d: regional ? (ffReg ? w[ffReg] : w.all) : w, wt: regional && !ffReg };
+  const ftSiteCol = (d, band, dp) => ftSite && { key: "site", h: "This site", sub: ffReg ? "national" : "assumes", d, band, dp, site: true };
+  const ftContests = FF ? [
+    { key: "co", name: <span className="rd-fl-name lnp">Labor v Coalition</span>, to: "Labor", cohorts: ["grn", "onp", "oth"],
+      cols: [
+        FF.elec2025r && { key: "elec", h: "Election", sub: ffReg ? "2025, region" : "2025 count", d: FF.elec2025r[ffReg || "all"], dp: 1 },
+        ftSiteCol(ftSite && { grn: ftSite.lnp.grn * 100, onp: ftSite.lnp.onp * 100, oth: ftSite.lnp.oth * 100 }, null, 1),
+        ftRb(ftLast.co),
+        ftMrp(ftLast.dm, false),
+      ].filter(Boolean) },
+    { key: "on", name: <span className="rd-fl-name onp">Labor v One Nation</span>, to: "Labor", cohorts: ["coal", "grn", "oth"],
+      cols: [
+        ftSiteCol(ftSite && { coal: ftSite.onp.lnp * 100, grn: ftSite.onp.grn * 100, oth: ftSite.onp.oth * 100 },
+          ftSite && { coal: ftSite.onBand.lnp * 100, grn: ftSite.onBand.grn * 100, oth: ftSite.onBand.oth * 100 }),
+        ftRb(ftLast.on),
+        ftMrp(ftLast.mn, true),
+      ].filter(Boolean) },
+    { key: "ln", name: <span className="rd-fl-name"><span className="rd-fl-xb">Coalition</span> v <span className="rd-fl-xo">One Nation</span></span>, to: "the Coalition", cohorts: ["alp", "grn", "oth"],
+      cols: [ftMrp(ftLast.ln, true)].filter(Boolean) },
+  ].filter((c) => c.cols.length) : null;
+  /* printed precision: a column with a fixed precision (the counts and
+     the counted Coalition table carry one decimal, dp: 1) prints it on
+     every row - 23.99 reads 24.0 beside 84.5, never "24" - and the rest
+     print as their source does: the waves whole numbers, the built One
+     Nation table whole numbers, never a ".0" the source didn't print */
+  const ftFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return (
     <section className="rd-sec rd-fl" id="flow-drift" aria-labelledby="rd-fl-t">
@@ -5252,15 +5252,45 @@ function RdFlows() {
       </div>
         );
       })()}
-      {/* the flows themselves, tabulated: election table first, then the
-          site's own constants, then each house's latest per-view readings -
-          the same RdTsig fold idiom the battery beneath it uses */}
-      {flowSets && (
-        <RdTsig summary="Flows table"
-          heads={["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]}
-          sets={flowSets}
-          note={"Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows, split by its inside-metro, outside-metro and rural-plus-provincial seat classes (the charts’ rings above); no national count of the two One Nation choices exists, so those cells are dashes. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."}
-        />
+      {/* the flows themselves, tabulated: a fold of one grid per contest,
+          directly above the battery, following the region menu above the
+          charts. Its own chrome (.rd-ft), not RdTsig's - that table's
+          No-row fade would grey every row of a table with no test in it */}
+      {ftContests && ftContests.length > 0 && (
+        <details className="rd-evdrop rd-ft">
+          <summary>Flows table</summary>
+          <p className="rd-ft-view">{ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters"}<span>, from the menu above the charts</span></p>
+          <div className="rd-ft-grid">
+            {ftContests.map((c) => (
+              <table key={c.key} className="rd-ft-table">
+                <caption>{c.name}<span className="rd-ft-to">Share of each group’s voters choosing {c.to}, %</span></caption>
+                <thead>
+                  <tr>
+                    <th scope="col"><span className="sr-only">Voters</span></th>
+                    {c.cols.map((col) => (
+                      <th key={col.key} scope="col" className={col.site ? "rd-ft-site" : undefined}>{col.h}<span>{col.sub}{col.wt ? "*" : ""}</span></th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {c.cohorts.map((ck) => (
+                    <tr key={ck}>
+                      <th scope="row"><i className={"rd-ft-sw " + FF_COHORTS[ck].cls} aria-hidden="true"></i>{FF_COHORTS[ck].name}</th>
+                      {c.cols.map((col) => {
+                        const v = col.d && col.d[ck];
+                        return <td key={col.key} className={col.site ? "rd-ft-site" : undefined}>
+                          {v != null ? ftFig(v, col.dp) : <span className="rd-ft-nil" aria-label="not asked">–</span>}
+                          {v != null && col.band && <span className="rd-ft-band"> ±{ftFig(col.band[ck])}</span>}
+                        </td>;
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ))}
+          </div>
+          <p className="rd-note rd-ft-note">{"The election column is the Australian Electoral Commission’s count of the 2025 flows" + (ffReg ? ", for this region’s seats" : "") + " (the charts’ rings); no count of a One Nation contest exists. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view, as on the charts." : (ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".")) + " The 2026 state and by-election counts stay on the charts."}</p>
+        </details>
       )}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;
