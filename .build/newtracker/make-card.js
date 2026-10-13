@@ -26,7 +26,7 @@
      gap is inside the two figures' margins combined: the primary-vote
      panel's level test, run from the top of each group down. The arrows
      count places gained or lost since the election result;
-   - ROUND n/N: n months since the election, of the N the term can run to
+   - MONTH n/N: n months since the election, of the N the term can run to
      (the election to the latest date the next one can be held).
    Every value is read from window.AUSPOL.
 
@@ -126,9 +126,9 @@
   const lead = +(Q.a - Q.b).toFixed(1), margin = +(2 * Q.ci).toFixed(1);
   const tooClose = Math.abs(lead) <= margin;
   const leader = lead > 0 ? "LABOR" : lead < 0 ? RIVAL : null;
-  const verdict = !tooClose ? "▶ " + leader + " BY " + r1(Math.abs(lead)) + ", OUTSIDE ±" + r1(margin)
-    : leader ? "▶ TOO CLOSE TO CALL: " + leader + " BY " + r1(Math.abs(lead)) + ", INSIDE ±" + r1(margin)
-    : "▶ DEAD LEVEL, INSIDE ±" + r1(margin);
+  const verdict = !tooClose ? "▶ " + leader + " UP BY " + r1(Math.abs(lead)) + ", OUTSIDE ± " + r1(margin)
+    : leader ? "▶ TOO CLOSE TO CALL: " + leader + " UP BY " + r1(Math.abs(lead)) + ", INSIDE ± " + r1(margin)
+    : "▶ DEAD LEVEL, INSIDE ± " + r1(margin);
   /* The month's move, called as the hero calls it: "within the margin" unless
      the move clears its own interval. With no month-ago figure the line says
      what the reading rests on instead. */
@@ -165,16 +165,16 @@
     p.moved = was ? was - p.place : 0;
   });
   const elecYear = elect.ym.slice(0, 4);
-  /* ROUND n/N: whole months from the election to the reading, out of the
+  /* MONTH n/N: whole months from the election to the reading, out of the
      whole months from the election to the latest date the next one can be
      held - read off nextElectionDue ("By 20 May 2028") with the masthead's
-     own pattern. With no date to read, the round stands alone. */
+     own pattern. With no date to read, the month stands alone. */
   const ey = Number(elect.ym.slice(0, 4)), em = Number(elect.ym.slice(5, 7));
   const round = (uy - ey) * 12 + um - em;
   const due = /(\d{1,2}) (\w+) (\d{4})/.exec(L.nextElectionDue || "");
   const dueMon = due ? MON.indexOf(due[2].slice(0, 3).toUpperCase()) + 1 : 0;
   const termMonths = dueMon ? (Number(due[3]) - ey) * 12 + dueMon - em : null;
-  const roundLab = "ROUND " + round + (termMonths > round ? "/" + termMonths : "");
+  const monthLab = "MONTH " + round + (termMonths > round ? "/" + termMonths : "");
 
   /* ---- drawing ---------------------------------------------------------- */
   const FONT_URL = ".build/newtracker/fonts/doto-card.woff2";
@@ -270,7 +270,7 @@
     + '<div class="rivets" style="top:0"></div><div class="rivets" style="bottom:0"></div>'
     + '<div class="panel">'
     + '<div class="hdr" style="' + lit("white") + '"><span>' + led("AUSPOL TRACKER") + '</span><span style="'
-      + lit("amber") + '">' + led(dateLab.toUpperCase()) + "</span><span>" + led(roundLab) + "</span></div>"
+      + lit("amber") + '">' + led(dateLab.toUpperCase()) + "</span><span>" + led(monthLab) + "</span></div>"
     + '<div class="rule-h" style="top:70px"></div>'
     + '<div class="head" style="left:30px;width:726px;' + lit("white") + '"><span>' + led("TWO-PARTY PREFERRED")
       + '</span><span class="sub">' + led(Q.imp ? "IMPLIED FLOWS" : "AS PUBLISHED") + "</span></div>"

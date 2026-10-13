@@ -1379,7 +1379,7 @@ function cardContest() {
    mirror any change in both files. The two-party score and its verdict, the
    month's move, the basis, the date, the ladder's inputs (the five
    primaries and their margins, slash-joined in CARD_IDS order), and the
-   next election's latest date, which sets the round's /N; the places and
+   next election's latest date, which sets the month's /N; the places and
    ties follow from those. Written out as a machine-readable sidecar so
    render-card's staleness gate (and any future consumer) reads it here
    instead of string-splitting the dataset asset the way grabLatest does. */
