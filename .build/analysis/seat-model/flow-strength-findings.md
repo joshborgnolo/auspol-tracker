@@ -63,6 +63,52 @@ independents whose prefs flow heavily Labor + minor parties) — do not model
 as one population. Its pooled 52.8% is a category average, not a voter
 behaviour.
 
+## Cross-election replication (2022 / 2019 / 2016)
+
+Same method on the AEC DoP downloads for events 20499 (2016), 24310 (2019),
+27966 (2022) — identical CSV shape, ON code, and the no-exhaustion, N−2
+exclusion invariants all hold (pinned at parse). Vendored under
+`.build/analysis/seat-model/cache/` (gitignored); reproduce with
+`flow-strength-vs-primary-history.mjs`. One deliberate difference: with no
+historical W3 baseline, elected crossbenchers stay in `oth` (they are never
+excluded, so donor rows are unaffected — only `oth` primary shares are diluted
+by their votes).
+
+| Donor-cycle | seats w/ flow (contested) | Pooled ALP share | r | Verdict |
+|---|---|---|---|---|
+| GRN 2016 | 144 (150) | 78.5% | +0.21 | flat 76–79%, 83% at >18% |
+| GRN 2019 | 146 (151) | 77.7% | +0.38 | flat ~75%, 83–84% at >14% |
+| GRN 2022 | 142 (151) | 80.2% | +0.27 | flat ~79%, 86% at >18% |
+| **GRN 2025** | 140 (150) | 82.2% | +0.19 | **replicates the 2025 shape** |
+| ON 2016 | 14 (15) | 50.2% | +0.16 | too few to judge (raw rows only) |
+| ON 2019 | 58 (59) | 33.9% | +0.17 | no gradient (bins 27→37→34) |
+| ON 2022 | 149 (149) | 33.5% | +0.04 | **none — flat 32–37% at every level** |
+| **ON 2025** | 145 (145) | 24.3% | **+0.40** | **gradient is 2025-specific** |
+| OTH 2016 | 149 (149) | 43.0% | +0.15 | unstable, heterogeneous |
+| OTH 2019 | 151 (151) | 39.3% | +0.04 | flat |
+| OTH 2022 | 151 (151) | 43.0% | −0.24 | sign-flips cycle to cycle |
+| **OTH 2025** | 146 (150) | 52.8% | +0.10 | "do not model as one population" replicates |
+
+**The GRN and OTH findings replicate; the ON gradient — the one actionable
+finding — does not.** In 2022 the ON→ALP share of the majors flow was flat at
+~33% from the weakest ON seat to the strongest (r +0.04); 2025's 15%→27%
+gradient arrived with 2025's regime: ON preferences hardened nationally toward
+the Coalition (pooled ALP share 50.2% → 33.9% → 33.5% → **24.3%**, the well-
+known 2025 shift), and the gradient comes from the weak end collapsing to
+Liberal-like splits (15%) while strong regional seats softened far less (27%).
+
+Censoring is endemic to GRN in every cycle (the donor's strongest seats —
+Melbourne 43.7%→49.3%→49.6%→39.5%, Batman, Wills, Griffith — never distribute
+their pile). Inheritance medians are likewise stable: own-vote share of the
+donor's pile 0.82–0.84 GRN, 0.64–0.79 ON, 0.79–0.87 OTH across all four
+cycles.
+
+Levels note: these are the pile-at-exclusion-of-the-donor, majors-renormalised
+cut. The AEC's headline TCP-flow products sit a couple of points off for
+cut-definition reasons — the aec-flow-cuts skill reconciles exactly those
+cuts; cycle-to-cycle comparisons here are internally consistent, which is what
+the gradient question needs.
+
 ## Caveats
 
 1. **Pile ≠ pure first preferences.** The DoP pile carries votes inherited
@@ -83,18 +129,26 @@ behaviour.
 
 ## Seat-model implications (W2/W5/W6)
 
-- **ON needs a conditional.** For seats with no 2025 ON flow row — the three
-  uncontested ACT/Bean seats under W6's run-everywhere assumption, plus
-  Hunter/Maranoa — do not lift the pooled 75.7%-to-Coalition constant
-  blindly: condition on the modelled ON primary. A defensible first cut is
-  the bin table above (≈85% to Coalition below 3% primary, falling to ≈73%
-  above 12%).
-- **GRN and OTH constants can stay unconditional** where a seat read is
-  missing; ~82% ALP for GRN, and for OTH recompute per candidate-set rather
-  than using the pooled 52.8%.
-- **Seat-anchored Dirichlet draws (current W5 plan) already preserve the
-  cross-seat ON gradient** for the 145 seats with rows — the term matters
-  only for imputed/no-read seats. Optionally add the +0.8–1.0 pp/pp slope
-  as a weak prior when the draw must move with the simulated ON primary.
+Revised after the cross-cycle replication:
+
+- **Cycle-locality is the headline.** The ON→Coalition level moved 50→
+  66→ 66→76% across four cycles and the cross-seat ON gradient exists only
+  in 2025. Flow constants must come from the *current* cycle — do NOT lean
+  on the 2022 file, and plan Validation #2's flow backtest should expect
+  and tolerate level drift, not treat it as error. (The plan's Dirichlet
+  drift parameter is the right mechanism.)
+- **Seat anchoring (current W5 plan) carries the 2025 ON gradient for the
+  145 seats with rows** — correct choice; no extra term needed for them.
+- **No-read seats (W6's ON-everywhere set: Bean/Canberra/Fenner, plus
+  Hunter/Maranoa)**: the 2025 conditional (≈85% to Coalition below 3%
+  primary, ≈73% above 12%) is the best single prior — 2028's ON electorate
+  composition should look more like 2025's regime than 2022's — but it is
+  regime-contingent, not structural. Treat the pooled 75.7% as a fallback,
+  not a law.
+- **GRN**: flat ~78–82% to ALP in all four cycles, level drifting up
+  slowly (+~1pp/cycle since 2019); constant-per-cycle is adequate wherever
+  a seat read is missing, with the same current-cycle proviso.
+- **OTH**: unstable level (39–53%) and shape across cycles; never pool
+  across candidate types — recompute from the actual 2028e candidate set.
 - Ballot-level purity (caveat 1) is unresolved within this repo; treat the
   ON slope as an upper bound, not causal.

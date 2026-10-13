@@ -172,10 +172,12 @@ party-specific hacks** — ON is a set of parameter values, not a code path.
 - **W2 Seat flow matrix.** Extend the AEC constants extractor to per-seat
   distributions → `data/aec-2025-seat-flows.json`, with the aec-flow-cuts
   reconciliation pinned as a test. (Donor-strength heterogeneity measured
-  2026-10-13 → *flow-strength-findings.md*: ON splits shift with ON seat
-  strength (15%→27% to ALP across the primary range), GRN/OTH flat —
-  imputed no-read seats need an ON-conditional, seats with rows can rely on
-  seat anchoring alone.)
+  2026-10-13 → *flow-strength-findings.md*: 2025 ON splits shift with ON
+  seat strength — but the gradient does NOT replicate on 2022/2019/2016
+  (flat ~33% to Coalition in 2022), so it is regime-specific, and flow
+  levels drift hard cycle to cycle (ON→Coalition 50→66→66→76%). Seat
+  anchoring + a current-cycle rule for no-read seats is the design;
+  cross-cycle leakage of constants is the main risk.)
 - **W3 Baseline + invariant.** Candidate-grouped 2025 primaries/TCP per seat;
   GES reproduction test (150/150 winners exact or build fails).
 - **W4 Vote layer.** Hierarchical β fit + state deviations (read-only script,
