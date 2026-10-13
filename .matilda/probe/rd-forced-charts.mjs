@@ -261,10 +261,12 @@ const measure = () => page.evaluate(() => {
   /* the Labor-v-Coalition cell's national-only stand-in paragraph (named
      region only: the chart itself unmounts then) */
   out.emptyCell = (sec.querySelector(".rd-fl-emptycell") || {}).textContent || null;
-  /* the section carries TWO .rd-tsig folds now (2026-10-13): the Flows
-     table directly above the trend-significance battery. Match each by
-     its summary text — never querySelector's first hit */
-  const dets = [...sec.querySelectorAll("details.rd-tsig")];
+  /* the section carries TWO folds (2026-10-13): the Flows table in its
+     own .rd-ft chrome (per-contest grids — its RdTsig ancestry ended with
+     the day's redesign) directly above the .rd-tsig trend-significance
+     battery. Match each by its summary text among every fold, never
+     querySelector's first hit */
+  const dets = [...sec.querySelectorAll("details")];
   out.tsigOrder = dets.map((dt) => { const s = dt.querySelector("summary"); return s ? s.textContent.trim() : ""; });
   const bySummary = (want) => dets.find((dt) => (dt.querySelector("summary") || {}).textContent === want);
   const det = bySummary("Trend-significance table");
@@ -283,15 +285,20 @@ const measure = () => page.evaluate(() => {
   }
   const ftab = bySummary("Flows table");
   if (ftab) {
-    out.flowHeads = [...ftab.querySelectorAll(".rd-tsig-table thead th")].map((h) => h.textContent.trim());
-    out.flowSets = [...ftab.querySelectorAll(".rd-tsig-table tbody")].map((tb) => ({
-      set: ((tb.querySelector("tr.rd-tsig-set th") || {}).textContent || "").trim(),
-      rows: [...tb.querySelectorAll("tr:not(.rd-tsig-set)")].map((tr) => ({
-        name: (tr.querySelector("th") || {}).textContent.trim(),
-        cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.trim()),
+    /* .rd-ft anatomy: a view line, then one table per contest — caption
+       (contest + the "Share … %" clause), a header row whose first th is
+       the sr-only "Voters" corner (skipped), cohort rows down the side
+       (th.rd-ft-sw + name), figures in the cells (nil = "–") */
+    out.ftView = ((ftab.querySelector(".rd-ft-view") || {}).textContent || "").replace(/\s+/g, " ").trim() || null;
+    out.ftTables = [...ftab.querySelectorAll("table.rd-ft-table")].map((tb) => ({
+      caption: ((tb.querySelector("caption") || {}).textContent || "").replace(/\s+/g, " ").trim(),
+      cols: [...tb.querySelectorAll("thead th")].slice(1).map((h) => h.textContent.replace(/\s+/g, " ").trim()),
+      rows: [...tb.querySelectorAll("tbody tr")].map((tr) => ({
+        name: ((tr.querySelector("th") || {}).textContent || "").trim(),
+        cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.replace(/\s+/g, " ").trim()),
       })),
     }));
-    out.flowNote = (ftab.querySelector(".rd-tsig-note") || {}).textContent || null;
+    out.ftNote = ((ftab.querySelector(".rd-ft-note") || {}).textContent || "").replace(/\s+/g, " ").trim() || null;
   }
   /* the key row under the trio: line/triangle/cross/ring tokens in order */
   const key = [...sec.querySelectorAll(".rd-ff-key .rd-key-item")].map((k) => k.textContent.trim());
@@ -601,66 +608,90 @@ for (const [i, exp] of FFexpNat.rows.entries()) {
 check(d.tsigHeads && d.tsigHeads[0] === "Series" && d.tsigHeads.length === 5,
   `tsig heads (${JSON.stringify(d.tsigHeads)})`);
 
-/* the Flows table (user 2026-10-13): the fold directly above the battery,
-   recomputed here from the payload + the site's flowTables — three row
-   sets, election counted row (national-only: the AEC counts no per-region
-   TPP flows, its region cells are dashes) then the site's constants then
-   each house's latest wave, across the four electorate views */
+/* the Flows table (user 2026-10-13; the RdTsig fold became the .rd-ft
+   per-contest grids the same day): the fold directly above the battery,
+   recomputed from the payload + the site's flowTables — cohorts down the
+   side, sources across: the election's NATIONAL TPP count (the election
+   column never rekeys — the AEC counts no per-region TPP flows, so a
+   named region keeps the national figures under a "2025, national"
+   label), the site's national constants as the yardstick on every view,
+   then each house's latest wave (RedBridge/Accent and DemosAU's national
+   MRP are national-only columns, DemosAU's regional tables rekey).
+   Figures print through the renderer's ftFig precision rule, replicated
+   here so float edges round identically */
+const ftFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
+const SMON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const smonY = (ym) => { const [y, m] = ym.split("-").map(Number); return SMON[m - 1] + " " + y; };
+const ftLt = {
+  co: FF.vsCoal[FF.vsCoal.length - 1], on: FF.vsOn[FF.vsOn.length - 1],
+  dm: FF.demos && FF.demos[FF.demos.length - 1],
+  mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
+  ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1],
+};
+const mrpSub = (w) => "MRP, " + w.win.replace(/^.*?([A-Z][a-z]{2} \d{4})$/, "$1");
+/* reg: "" national view, else a region key + its menu name */
+const wantFlows = (reg, regName) => {
+  const elecH = "Election" + (reg ? "2025, national" : "2025 count");
+  const siteH = "This site" + (reg ? "national" : "assumes");
+  const mrp = (w) => (reg ? w[reg] : w.all);
+  const el = FF.elec2025r.all;
+  const stCo = FT && { grn: FT.lnp.grn * 100, onp: FT.lnp.onp * 100, oth: FT.lnp.oth * 100 };
+  const stOn = FT && { coal: FT.onp.lnp * 100, grn: FT.onp.grn * 100, oth: FT.onp.oth * 100 };
+  const stOnB = FT && { coal: FT.onBand.lnp * 100, grn: FT.onBand.grn * 100, oth: FT.onBand.oth * 100 };
+  const cells = (d0, cks, dp, band) => cks.map((ck) => (d0 && d0[ck] != null
+    ? ftFig(d0[ck], dp) + (band && band[ck] != null ? " ±" + ftFig(band[ck]) : "") : "–"));
+  const t = [];
+  t.push({
+    caption: "Labor v CoalitionShare of each group’s voters choosing Labor, %",
+    cols: [elecH, stCo && siteH, !reg && `RedBridge${smonY(ftLt.co.ym)}`, !reg && ftLt.dm && `DemosAU${mrpSub(ftLt.dm)}`].filter(Boolean),
+    rows: ["grn", "onp", "oth"].map((ck, i) => ({
+      name: CONAME[ck],
+      cells: [cells(el, [ck], 1)[0], stCo && cells(stCo, [ck], 1)[0],
+        !reg && cells(ftLt.co, [ck])[0], !reg && ftLt.dm && cells(ftLt.dm, [ck])[0]].filter((x) => x !== false),
+    })),
+  });
+  t.push({
+    caption: "Labor v One NationShare of each group’s voters choosing Labor, %",
+    cols: [stOn && siteH, !reg && `RedBridge${smonY(ftLt.on.ym)}`, ftLt.mn && `DemosAU${mrpSub(ftLt.mn)}${reg ? "" : "*"}`].filter(Boolean),
+    rows: ["coal", "grn", "oth"].map((ck) => ({
+      name: CONAME[ck],
+      cells: [stOn && cells(stOn, [ck], null, stOnB)[0],
+        !reg && cells(ftLt.on, [ck])[0], ftLt.mn && cells(mrp(ftLt.mn), [ck])[0]].filter((x) => x !== false),
+    })),
+  });
+  if (ftLt.ln) t.push({
+    caption: "Coalition v One NationShare of each group’s voters choosing the Coalition, %",
+    cols: [`DemosAU${mrpSub(ftLt.ln)}${reg ? "" : "*"}`],
+    rows: ["alp", "grn", "oth"].map((ck) => ({ name: CONAME[ck], cells: cells(mrp(ftLt.ln), [ck]) })),
+  });
+  return { view: (reg ? regName + " seats" : "All voters") + ", from the menu above the charts", tables: t };
+};
+const checkFlows = (g, reg, regName, tag) => {
+  const w = wantFlows(reg, regName);
+  check(g.ftView === w.view, `flows table ${tag}: the view line reads for this menu (${JSON.stringify(g.ftView)})`);
+  check(g.ftTables && g.ftTables.length === w.tables.length,
+    `flows table ${tag}: ${w.tables.length} contest tables (${g.ftTables && g.ftTables.length})`);
+  (g.ftTables || []).forEach((tb, i) => {
+    const wt = w.tables[i];
+    if (!wt) return;
+    check(tb.caption === wt.caption, `flows table ${tag} [${i}]: caption (${JSON.stringify(tb.caption)})`);
+    check(JSON.stringify(tb.cols) === JSON.stringify(wt.cols),
+      `flows table ${tag} [${i}]: source columns (${JSON.stringify(tb.cols)})`);
+    check(JSON.stringify(tb.rows) === JSON.stringify(wt.rows),
+      `flows table ${tag} [${wt.caption.split("Share")[0]}]: cohort figures (${JSON.stringify(tb.rows.map((r) => r.cells))})`);
+  });
+  /* the election column's figures never move, whatever the menu says —
+     the whole contract of the national TPP carrier */
+  const el = FF.elec2025r.all, elCells = [ftFig(el.grn, 1), ftFig(el.onp, 1), ftFig(el.oth, 1)];
+  check(!!g.ftTables && g.ftTables[0] && JSON.stringify(g.ftTables[0].rows.map((r) => r.cells[0])) === JSON.stringify(elCells),
+    `flows table ${tag}: the Election column stands at the national TPP count (${JSON.stringify(elCells)})`);
+};
 {
   check(JSON.stringify(d.tsigOrder) === JSON.stringify(["Flows table", "Trend-significance table"]),
     `flows table: mounts directly above the trend-significance battery (${JSON.stringify(d.tsigOrder)})`);
-  check(JSON.stringify(d.flowHeads || []) === JSON.stringify(["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]),
-    `flows table: the four view columns (${JSON.stringify(d.flowHeads)})`);
-  const FT_COHORTS = { co: ["grn", "onp", "oth"], on: ["grn", "coal", "oth"], ln: ["alp", "grn", "oth"] };
-  const ftCell = (dd, cks) => (dd ? cks.filter((ck) => dd[ck] != null).map((ck) => CONAME[ck] + " " + dd[ck].toFixed(1)).join("") : "–");
-  const ftBd = (v) => (v * 100).toFixed(1).replace(/\.0$/, "");
-  const ftSiteOn = FT ? [["coal", "lnp"], ["grn", "grn"], ["oth", "oth"]]
-    .map(([ck, bk]) => CONAME[ck] + " " + (FT.onp[bk] * 100).toFixed(1) + " ± " + ftBd(FT.onBand[bk])).join("") : "–";
-  const lt = {
-    co: FF.vsCoal[FF.vsCoal.length - 1], on: FF.vsOn[FF.vsOn.length - 1],
-    dm: FF.demos && FF.demos[FF.demos.length - 1],
-    mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
-    ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1],
-  };
-  const VIEWS = ["all", "inner", "outer", "regional"];
-  const want = [
-    { set: "Labor v Coalition — the share of each cohort choosing Labor", rows: [
-      { name: "2025 election, as counted", cells: [ftCell(FF.elec2025r.all, FT_COHORTS.co), "–", "–", "–"] },
-      { name: "The flows this site uses", cells: [ftCell(FT ? { grn: FT.lnp.grn * 100, onp: FT.lnp.onp * 100, oth: FT.lnp.oth * 100 } : null, FT_COHORTS.co), "–", "–", "–"] },
-      { name: "RedBridge/Accent, " + monY(lt.co.ym), cells: [ftCell(lt.co, FT_COHORTS.co), "–", "–", "–"] },
-      { name: "DemosAU MRP, " + lt.dm.win, cells: [ftCell(lt.dm, FT_COHORTS.co), "–", "–", "–"] },
-    ] },
-    { set: "Labor v One Nation — the share of each cohort choosing Labor", rows: [
-      { name: "2025 election, as counted", cells: ["–", "–", "–", "–"] },
-      { name: "The flows this site uses", cells: [ftSiteOn, "–", "–", "–"] },
-      { name: "RedBridge/Accent, " + monY(lt.on.ym), cells: [ftCell(lt.on, FT_COHORTS.on), "–", "–", "–"] },
-      { name: "DemosAU MRP, " + lt.mn.win, cells: VIEWS.map((k) => ftCell(lt.mn[k], FT_COHORTS.on)) },
-    ] },
-    { set: "Coalition v One Nation — the share of each cohort choosing the Coalition", rows: [
-      { name: "2025 election, as counted", cells: ["–", "–", "–", "–"] },
-      { name: "The flows this site uses", cells: ["–", "–", "–", "–"] },
-      { name: "DemosAU MRP, " + lt.ln.win, cells: VIEWS.map((k) => ftCell(lt.ln[k], FT_COHORTS.ln)) },
-    ] },
-  ];
-  check(d.flowSets && d.flowSets.length === 3, `flows table: three row sets (${d.flowSets && d.flowSets.length})`);
-  (d.flowSets || []).forEach((got, i) => {
-    const w = want[i];
-    check(got.set === w.set, `flows table set ${i}: label (${JSON.stringify(got.set)})`);
-    check(JSON.stringify(got.rows.map((r) => r.name)) === JSON.stringify(w.rows.map((r) => r.name)),
-      `flows table set ${i}: row order (${got.rows.map((r) => r.name).join(" | ")})`);
-    got.rows.forEach((r, j) =>
-      check(JSON.stringify(r.cells) === JSON.stringify(w.rows[j].cells),
-        `flows table ${w.rows[j].name} [${w.set.split(" — ")[0]}]: cells (${JSON.stringify(r.cells)})`));
-  });
-  check(!!d.flowNote && /RedBridge\/Accent is national-only/.test(d.flowNote) && /2026 state and by-election counts stay on the charts/.test(d.flowNote),
-    "flows table: the note records the chart-only 2026 counts and RedBridge's national-only waves");
-  /* the region select never rekeys the table — it lists every view */
-  const dReg = await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', "inner")
-    .then(() => new Promise((r) => setTimeout(r, 400))).then(measure);
-  check(JSON.stringify((dReg.flowSets || []).map((s) => s.rows.map((r) => r.cells))) === JSON.stringify(want.map((s) => s.rows.map((r) => r.cells))),
-    "flows table: the region select does not rekey it (all four views always listed)");
-  await page.select('.rd-ff-head select.rd-pv-sel[aria-label="DemosAU MRP region"]', "");
-  await new Promise((r) => setTimeout(r, 400));
+  checkFlows(d, "", null, "national");
+  check(!!d.ftNote && /no regional count exists/.test(d.ftNote) && /This site/.test(d.ftNote) && /2026 state and by-election counts stay on the charts/.test(d.ftNote),
+    "flows table: the note records the national-only election count, the this-site yardstick and the chart-only 2026 counts");
 }
 const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
 check(viewH === 236, `desktop: plot height 236 (${viewH})`);
@@ -729,6 +760,13 @@ for (const [val, regName] of SWEEP) {
   }
   check(JSON.stringify(dr2.keyItems) === JSON.stringify(d.keyItems.filter((k) => k !== "2025 election, as counted")),
     `region ${regName}: the rings' key item drops with the rings ("2025 election, as counted"; the other three stand)`);
+  /* the flows table FOLLOWS the menu on a named region — RedBridge's
+     column drops with its dots, DemosAU's regional cells print as the
+     report does — while the Election column never moves (no regional
+     TPP count exists) and This site stays the national yardstick */
+  checkFlows(dr2, val, regName, regName);
+  check(!!dr2.ftNote && /it stands unchanged on a regional view/.test(dr2.ftNote) && /the national one in every region/.test(dr2.ftNote),
+    `region ${regName} flows table: the note says the election column and this-site yardstick stay national on a regional view`);
   /* the pressed battery across all nine rows follows the region's cells */
   const fExp = expectedForced(FF, val);
   check(dr2.pressed && JSON.stringify(dr2.pressed.map((r) => r.cells)) === JSON.stringify(fExp.rows.map((r) => r.cells)),

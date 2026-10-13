@@ -231,21 +231,26 @@ assert.ok(/body\.rd \.rd-fl-emptycell \{[^}]*align-self: center;/.test(cssRd),
 assert.ok(ap.includes("Triangles mark DemosAU’s MRP readings"), "the svg's spoken note names the triangles");
 assert.ok(ap.includes("Crosses mark the 2026 state and by-election counts."), "the spoken note names the crosses where they're drawn");
 assert.ok(ap.includes("(FF.bys || []).length > 0") || ap.includes('(FF.bys || []).length'), "the crosses' key item is gated on crosses existing");
-assert.ok(ap.includes("FF.elec2025r &&"), "the rings' key item is gated on the region carriers existing");
+assert.ok(ap.includes("FF.elec2025r && !ffReg &&"), "the rings' key item is gated on the carrier existing and the menu open on All voters");
 
 // ---- the Flows table fold (user 2026-10-13) --------------------------------------------
-assert.ok(ap.includes('summary="Flows table"'), "the Flows table fold mounts in the Preference-flows section");
-assert.ok(ap.indexOf('summary="Flows table"') > 0 && ap.indexOf('summary="Flows table"') < ap.lastIndexOf('summary="Trend-significance table"'),
+assert.ok(ap.includes("<summary>Flows table</summary>"), "the Flows table fold mounts in the Preference-flows section");
+assert.ok(ap.indexOf("<summary>Flows table</summary>") > 0 && ap.indexOf("<summary>Flows table</summary>") < ap.lastIndexOf('summary="Trend-significance table"'),
   "the Flows table sits directly above the section's trend-significance battery (the last RdTsig mount in the file)");
-assert.ok(ap.includes('name: "2025 election, as counted"') && ap.includes('name: "The flows this site uses"'),
-  "each contest's rows open with the election's counted flows, then the site's own tables");
-assert.ok(ap.includes("D.flowTables"), "the site's row reads the emitted flowTables constants (flows.mjs, the one home)");
-assert.ok(ap.includes('heads={["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]}'),
-  "the table's columns run the four electorate views");
-assert.ok(ap.includes("Labor v Coalition — the share of each cohort choosing Labor") &&
-          ap.includes("Labor v One Nation — the share of each cohort choosing Labor") &&
-          ap.includes("Coalition v One Nation — the share of each cohort choosing the Coalition"),
-  "one row set per contest, each naming where its shares land");
+assert.ok(!/<RdTsig summary="Flows table"/.test(ap),
+  "the Flows table wears its own chrome (.rd-ft), not RdTsig's - that table's No-row fade greys every row of a table with no test");
+// redesigned 2026-10-13: one grid per contest, cohorts down, sources across, one figure a cell
+assert.ok(ap.includes('className="rd-ft-table"') && ap.includes('{ key: "co", name:') && ap.includes('{ key: "on", name:') && ap.includes('{ key: "ln", name:'),
+  "one grid per contest - Labor v Coalition, Labor v One Nation, Coalition v One Nation");
+assert.ok(ap.includes('{ key: "elec", h: "Election"') && ap.includes('key: "site", h: "This site"'),
+  "the sources run election count, then the site's own tables, then the houses' latest waves");
+assert.ok(ap.includes("D.flowTables"), "the site's column reads the emitted flowTables constants (flows.mjs, the one home)");
+assert.ok(ap.includes("const ftRb = (w) => !ffReg && w &&"),
+  "the table follows the region menu: RedBridge/Accent (national-only) drops out of a regional view, as on the charts");
+assert.ok(ap.includes('h: "Election", sub: ffReg ? "2025, national" : "2025 count", d: FF.elec2025r.all'),
+  "the election column NEVER rekeys - no per-region TPP count exists; a named region keeps the national count, labelled so");
+assert.ok(/\.rd-ft-table \{/.test(cssRd) && /\.rd-ft-grid \{ grid-template-columns: repeat\(3/.test(cssRd),
+  "the grids sit three abreast where they fit (rd.css .rd-ft-grid)");
 
 // ---- the renderer's earlier contract still stands --------------------------------------
 assert.ok(ap.includes('q="co" waves={FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series (its national-only drop happens in the region ternary above)");

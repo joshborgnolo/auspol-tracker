@@ -4,11 +4,15 @@
    renamed Other cuts the same day when the split generalised to one-off
    contrasts, moving the ctlNarrow handoff again: re-measured at 1220px -
    the row fits from 1205px up, first document overflow at 1200, with the
-   496px picker; rd-allpolls.jsx ctlNarrow comment). Asserts the row still
-   holds: on the demographics facet above 1220px the tab row carries the
-   picker with no horizontal document overflow, below/incl. 1220px it rides
-   its own strip, and prints the picker's measured width so the comment's
-   figure stays honest if it drifts. */
+   496px picker; rd-allpolls.jsx ctlNarrow comment). 2026-10-13 renamed it
+   Offcuts (user call) after a report of the old long label going to an
+   ellipsis on a wide-enough screen - this probe now also pins the last
+   button NEVER clipping: full width rendered, no text-overflow cut, at
+   every on-row viewport. Asserts the row still holds: on the demographics
+   facet above 1220px the tab row carries the picker with no horizontal
+   document overflow, below/incl. 1220px it rides its own strip, and prints
+   the picker's measured width so the comment's figure stays honest if it
+   drifts. */
 import puppeteer from "puppeteer-core";
 import path from "path";
 import process from "process";
@@ -38,26 +42,34 @@ const gotoGroups = async (w) => {
 
 /* on-row at 1221px+ and in its own strip at/below 1220px */
 let measured = null;
-for (const w of [1221, 1260, 1300, 1366]) {
+for (const w of [1221, 1260, 1300, 1366, 1440]) {
   await gotoGroups(w);
   await page.waitForSelector(".rd-ap-dpick button", { timeout: 20000 }).catch(() => {});
   const m = await page.evaluate(() => {
     const pick = document.querySelector(".rd-ap-dpick");
     const btns = pick ? [...pick.querySelectorAll("button")].map((b) => b.textContent.trim()) : [];
+    const last = pick ? pick.querySelectorAll("button")[btns.length - 1] : null;
+    const cs = last ? getComputedStyle(last) : null;
     return {
       buttons: btns,
       pickerW: pick ? Math.round(pick.getBoundingClientRect().width) : 0,
       ownRow: pick ? !pick.closest(".rd-ap-tabs") : null, // strip mode when not glued to the tab row
       scrollW: document.documentElement.scrollWidth,
       clientW: document.documentElement.clientWidth,
+      lastTxt: last ? last.textContent.trim() : null,
+      lastClip: last ? last.scrollWidth - last.clientWidth : null, // >1 means the label's pixels are cut off
+      lastOvf: cs ? cs.textOverflow + "/" + cs.overflow : null,
+      lastWs: cs ? cs.whiteSpace : null,
     };
   });
   const over = m.scrollW - m.clientW;
   if (measured == null) measured = m.pickerW;
-  check(m.buttons.length === 7 && m.buttons[m.buttons.length - 1] === "Other cuts",
-    `${w}px: seven split buttons ending in Other cuts (${m.buttons.join(" · ")})`);
+  check(m.buttons.length === 7 && m.buttons[m.buttons.length - 1] === "Offcuts",
+    `${w}px: seven split buttons ending in Offcuts (${m.buttons.join(" · ")})`);
   check(m.ownRow === false, `${w}px: picker glued to the tab row (${m.ownRow === null ? "NO PICKER" : m.ownRow ? "ON OWN STRIP" : "on row"})`);
   check(over <= 1, `${w}px: no horizontal overflow with the picker on the tab row (scrollWidth-clientWidth=${over}, picker ~${m.pickerW}px)`);
+  check(m.lastClip != null && m.lastClip <= 1,
+    `${w}px: the Offcuts button's full label renders (scroll-client=${m.lastClip}, ${m.lastOvf}, white-space:${m.lastWs})`);
 }
 /* the handoff below the cut: picker in its own row, no overflow either */
 for (const w of [900, 1000, 1140, 1200, 1220]) {
@@ -69,7 +81,7 @@ for (const w of [900, 1000, 1140, 1200, 1220]) {
   }));
   check(m.inPctl && m.scrollW - m.clientW <= 1, `${w}px: picker in its own strip, no overflow (${m.inPctl ? "strip" : "ON ROW"}, over=${m.scrollW - m.clientW})`);
 }
-console.log(`measured picker width: ~${measured}px (was 341 with five buttons, 412 with six; 513 with seven Birth country, 496 renamed Other cuts)`);
+console.log(`measured picker width: ~${measured}px (was 341 with five buttons, 412 with six; 513 with seven Birth country, 496 renamed Other cuts; re-measured 2026-10-13 renamed Offcuts)`);
 
 await browser.close();
 console.log(fails ? `FAIL (${fails})` : "ALL CHECKS PASSED");

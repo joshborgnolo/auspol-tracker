@@ -2465,7 +2465,10 @@ function RdAllPolls(P) {
      Its rename to Other cuts (same day, the split's generalisation to
      one-off contrasts) took it down again, measured 2026-10-09: the
      picker is 496px and the row fits from 1205px up (document overflow
-     first at 1200), so under 1220px both controls take their row. */
+     first at 1200), so under 1220px both controls take their row.
+     Renamed Offcuts 2026-10-13 (user call): three characters narrower,
+     so the row's fit can only improve - the 1220 breakpoint stands
+     conservatively until it is re-measured. */
   const ctlNarrow = useNarrow("(max-width: 1220px)");
   /* the demographics scale's nine ticks need the strip's full 410px: under
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
@@ -2626,7 +2629,14 @@ function RdAllPolls(P) {
   const todayTxt = today ? today.a.toFixed(1) : null;
 
   /* ---- paging, by whole months ---------------------------------------------- */
-  const byDate = sort.key === "date" && sort.dir < 0;
+  /* the chronological views are the fieldwork sort and the archive's new
+     default, the PUBLICATION sort (user call 2026-10-13: publication outranks
+     fieldwork at open, though it is no column). Rows file under their
+     fieldwork month either way - the month rows quote month aggregates, which
+     are fieldwork-month quantities - so under the publication default a wave
+     that crosses a month-end in the press can raise a month divider one place
+     out of monotonic order; that is the honest filing, not a bug. */
+  const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
   const [minShown, setMinShown] = useState(30);
   const [flatLimit, setFlatLimit] = useState(40);
   const [showAll, setShowAll] = useState(false);
@@ -2846,8 +2856,19 @@ function RdAllPolls(P) {
   const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
   /* each family table folds away from its own head. Session state like the
      split itself: it rides facet and split hops (they persist by design too)
-     and resets only with the component */
+     and resets only with the component. Every family starts SHUT except a
+     one-entry table, which greets you open (user call 2026-10-13: "keep
+     those rows closed by default … UNLESS number of entries < 2") - the
+     seed lands on the first render the fams exist in, from the rows then
+     listed, so opening the archive on another facet doesn't miss it. */
+  const famSeed = React.useRef(false);
   const [famShut, setFamShut] = useState(() => new Set());
+  if (!famSeed.current && demFams) {
+    famSeed.current = true;
+    const shut = new Set();
+    for (const fam of demFams) if (sorted.filter((p) => window.demPairOf(p, demSplit, fam.id)).length >= 2) shut.add(fam.id);
+    if (shut.size) setFamShut(shut);
+  }
   const toggleFam = (id) => setFamShut((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const [demCapLo, demCapHi] = (() => {
     if (demFams && byDate) return [null, null];
@@ -3764,15 +3785,21 @@ function RdAllPolls(P) {
           {pinBar}
           {phone ? phoneHead : colHead}
         </div>
+        {/* the group-fragment keys carry their position because the pub
+            sort can file the same fieldwork month in two places (a wave
+            that crosses a month-end in the press, e.g. DemosAU's MRP):
+            g.ym alone gave duplicate sibling keys, and React's key map
+            keeps only one of the pair - the other's DOM was never deleted
+            and its rows haunted the next facet's table as stale copies */}
         {demFamTables
           ? demFamTables.map((t) => (
             <React.Fragment key={"fam" + t.fam.id}>
               {famHead(t)}
-              {famShut.has(t.fam.id) ? null : t.groups.map((g) => <React.Fragment key={t.fam.id + g.ym}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
+              {famShut.has(t.fam.id) ? null : t.groups.map((g, gi) => <React.Fragment key={t.fam.id + "|" + gi}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
             </React.Fragment>
           ))
           : byDate
-            ? groups.map((g) => <React.Fragment key={g.ym}>{monthRow(g)}{g.list.map((p) => rowFor(p, null))}</React.Fragment>)
+            ? groups.map((g, gi) => <React.Fragment key={g.ym + "|" + gi}>{monthRow(g)}{g.list.map((p) => rowFor(p, null))}</React.Fragment>)
             : flat.map((p) => rowFor(p, null))}
         {sorted.length === 0 && <div className="rd-ap-empty">No {noun} match these filters. <button type="button" className="rd-link" onClick={clearAll}>Clear filters</button></div>}
       </div>
@@ -5096,19 +5123,21 @@ function RdFlows() {
       };
     }),
   } : null;
-  /* the Flows table (user 2026-10-13): one fold above the significance
-     battery listing, per contest, the flows the charts draw from - first
-     the election's counted row, then the flowed constants this site reads
+  /* the Flows table (user 2026-10-13, redesigned the same day - "it sucks
+     currently"): one small grid per contest, the cohorts down the side and
+     the sources across - the election's count, the flows this site reads
      every implied two-party figure through (window.AUSPOL's flowTables),
-     then each house's latest wave, always across the four electorate
-     views so a region's printed cells sit beside the national reading.
-     The 2026 state and by-election counts stay chart-only - an electorate
-     count is no electorate-CLASS view. */
-  const ftCohorts = { co: ["grn", "onp", "oth"], on: ["grn", "coal", "oth"], ln: ["alp", "grn", "oth"] };
-  const ftCell = (d, cks) => d
-    ? <div>{cks.filter((ck) => d[ck] != null).map((ck) => <div key={ck}>{FF_COHORTS[ck].name} {d[ck].toFixed(1)}</div>)}</div>
-    : "–";
-  const ftDash = ["–", "–", "–", "–"];
+     then each house's latest wave - one figure per cell, so a cohort's row
+     reads straight across. It follows the section's region menu, as the
+     charts do: a named region keeps the sources printed for it
+     (DemosAU's regional cells), keeps the election's national TPP count
+     and this site's national flows as the yardstick (no regional count
+     exists for either), and drops RedBridge/Accent, a national-only
+     house, exactly as the charts drop its dots. The old fold (an RdTsig
+     with the four views across) stacked three labelled figures in every
+     cell, was half dashes and read grey: the significance chrome fades
+     every row without a Yes. The 2026 state and by-election counts stay
+     chart-only - an electorate's count is no electorate-class view. */
   const ftLast = FF ? {
     co: FF.vsCoal[FF.vsCoal.length - 1],
     on: FF.vsOn[FF.vsOn.length - 1],
@@ -5116,38 +5145,43 @@ function RdFlows() {
     mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
     ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1],
   } : null;
-  const ftPct = (v) => v * 100;
-  const ftBd = (v) => (v * 100).toFixed(1).replace(/\.0$/, "");
   const ftSite = D.flowTables || null;
-  const ftSiteOn = ftSite ? <div>{[["coal", "lnp"], ["grn", "grn"], ["oth", "oth"]].map(([ck, bk]) => (
-    <div key={ck}>{FF_COHORTS[ck].name} {ftPct(ftSite.onp[bk]).toFixed(1)} <span className="rd-note">± {ftBd(ftSite.onBand[bk])}</span></div>
-  ))}</div> : "–";
-  const flowSets = FF ? [
-    { key: "ftco", label: "Labor v Coalition — the share of each cohort choosing Labor", rows: [
-      { key: "elec", name: "2025 election, as counted",
-        cells: FF.elec2025r ? [ftCell(FF.elec2025r.all, ftCohorts.co), "–", "–", "–"] : ftDash },
-      { key: "site", name: "The flows this site uses",
-        cells: [ftCell(ftSite ? { grn: ftPct(ftSite.lnp.grn), onp: ftPct(ftSite.lnp.onp), oth: ftPct(ftSite.lnp.oth) } : null, ftCohorts.co), "–", "–", "–"] },
-      ftLast.co && { key: "rb", name: "RedBridge/Accent, " + rdMonthYear(ftLast.co.ym),
-        cells: [ftCell(ftLast.co, ftCohorts.co), "–", "–", "–"] },
-      ftLast.dm && { key: "mrp", name: "DemosAU MRP, " + ftLast.dm.win,
-        cells: [ftCell(ftLast.dm, ftCohorts.co), "–", "–", "–"] },
-    ].filter(Boolean) },
-    { key: "fton", label: "Labor v One Nation — the share of each cohort choosing Labor", rows: [
-      { key: "elec", name: "2025 election, as counted", cells: ftDash },
-      { key: "site", name: "The flows this site uses", cells: [ftSiteOn, "–", "–", "–"] },
-      ftLast.on && { key: "rb", name: "RedBridge/Accent, " + rdMonthYear(ftLast.on.ym),
-        cells: [ftCell(ftLast.on, ftCohorts.on), "–", "–", "–"] },
-      ftLast.mn && { key: "mrp", name: "DemosAU MRP, " + ftLast.mn.win,
-        cells: ["all", "inner", "outer", "regional"].map((k) => ftCell(ftLast.mn[k], ftCohorts.on)) },
-    ].filter(Boolean) },
-    { key: "ftln", label: "Coalition v One Nation — the share of each cohort choosing the Coalition", rows: [
-      { key: "elec", name: "2025 election, as counted", cells: ftDash },
-      { key: "site", name: "The flows this site uses", cells: ftDash },
-      ftLast.ln && { key: "mrp", name: "DemosAU MRP, " + ftLast.ln.win,
-        cells: ["all", "inner", "outer", "regional"].map((k) => ftCell(ftLast.ln[k], ftCohorts.ln)) },
-    ].filter(Boolean) },
-  ] : null;
+  const ftMon = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthName(m) + " " + y; };
+  const ftRb = (w) => !ffReg && w && { key: "rb", h: "RedBridge", sub: ftMon(w.ym), d: w };
+  const ftMrp = (w, regional) => w && (regional ? (ffReg ? w[ffReg] : w.all) : !ffReg && w) && {
+    key: "mrp", h: "DemosAU", sub: "MRP, " + w.win.replace(/^.*?([A-Z][a-z]{2} \d{4})$/, "$1"),
+    d: regional ? (ffReg ? w[ffReg] : w.all) : w, wt: regional && !ffReg };
+  const ftSiteCol = (d, band, dp) => ftSite && { key: "site", h: "This site", sub: ffReg ? "national" : "assumes", d, band, dp, site: true };
+  const ftContests = FF ? [
+    { key: "co", name: <span className="rd-fl-name lnp">Labor v Coalition</span>, to: "Labor", cohorts: ["grn", "onp", "oth"],
+      cols: [
+        /* the election's column NEVER rekeys: the rings ride the AEC's
+           TPP flow cut, counted nationally (every formal ballot
+           redistributed Labor/Coalition) - the AEC publishes no
+           per-region TPP flows for a regional carrier to ride
+           (.build/aec-2025-region-tpp-flows.mjs documents the failed
+           derivation), so a named region keeps the national count */
+        FF.elec2025r && { key: "elec", h: "Election", sub: ffReg ? "2025, national" : "2025 count", d: FF.elec2025r.all, dp: 1 },
+        ftSiteCol(ftSite && { grn: ftSite.lnp.grn * 100, onp: ftSite.lnp.onp * 100, oth: ftSite.lnp.oth * 100 }, null, 1),
+        ftRb(ftLast.co),
+        ftMrp(ftLast.dm, false),
+      ].filter(Boolean) },
+    { key: "on", name: <span className="rd-fl-name onp">Labor v One Nation</span>, to: "Labor", cohorts: ["coal", "grn", "oth"],
+      cols: [
+        ftSiteCol(ftSite && { coal: ftSite.onp.lnp * 100, grn: ftSite.onp.grn * 100, oth: ftSite.onp.oth * 100 },
+          ftSite && { coal: ftSite.onBand.lnp * 100, grn: ftSite.onBand.grn * 100, oth: ftSite.onBand.oth * 100 }),
+        ftRb(ftLast.on),
+        ftMrp(ftLast.mn, true),
+      ].filter(Boolean) },
+    { key: "ln", name: <span className="rd-fl-name"><span className="rd-fl-xb">Coalition</span> v <span className="rd-fl-xo">One Nation</span></span>, to: "the Coalition", cohorts: ["alp", "grn", "oth"],
+      cols: [ftMrp(ftLast.ln, true)].filter(Boolean) },
+  ].filter((c) => c.cols.length) : null;
+  /* printed precision: a column with a fixed precision (the counts and
+     the counted Coalition table carry one decimal, dp: 1) prints it on
+     every row - 23.99 reads 24.0 beside 84.5, never "24" - and the rest
+     print as their source does: the waves whole numbers, the built One
+     Nation table whole numbers, never a ".0" the source didn't print */
+  const ftFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return (
     <section className="rd-sec rd-fl" id="flow-drift" aria-labelledby="rd-fl-t">
@@ -5260,15 +5294,45 @@ function RdFlows() {
       </div>
         );
       })()}
-      {/* the flows themselves, tabulated: election table first, then the
-          site's own constants, then each house's latest per-view readings -
-          the same RdTsig fold idiom the battery beneath it uses */}
-      {flowSets && (
-        <RdTsig summary="Flows table"
-          heads={["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]}
-          sets={flowSets}
-          note={"Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the same figures this site’s flow constants read; the chart rings above). The AEC counts no per-region TPP flows, so the row’s regional cells are dashes; and no count of the two One Nation choices exists at all, so those cells are dashes too. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."}
-        />
+      {/* the flows themselves, tabulated: a fold of one grid per contest,
+          directly above the battery, following the region menu above the
+          charts. Its own chrome (.rd-ft), not RdTsig's - that table's
+          No-row fade would grey every row of a table with no test in it */}
+      {ftContests && ftContests.length > 0 && (
+        <details className="rd-evdrop rd-ft">
+          <summary>Flows table</summary>
+          <p className="rd-ft-view">{ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters"}<span>, from the menu above the charts</span></p>
+          <div className="rd-ft-grid">
+            {ftContests.map((c) => (
+              <table key={c.key} className="rd-ft-table">
+                <caption>{c.name}<span className="rd-ft-to">Share of each group’s voters choosing {c.to}, %</span></caption>
+                <thead>
+                  <tr>
+                    <th scope="col"><span className="sr-only">Voters</span></th>
+                    {c.cols.map((col) => (
+                      <th key={col.key} scope="col" className={col.site ? "rd-ft-site" : undefined}>{col.h}<span>{col.sub}{col.wt ? "*" : ""}</span></th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {c.cohorts.map((ck) => (
+                    <tr key={ck}>
+                      <th scope="row"><i className={"rd-ft-sw " + FF_COHORTS[ck].cls} aria-hidden="true"></i>{FF_COHORTS[ck].name}</th>
+                      {c.cols.map((col) => {
+                        const v = col.d && col.d[ck];
+                        return <td key={col.key} className={col.site ? "rd-ft-site" : undefined}>
+                          {v != null ? ftFig(v, col.dp) : <span className="rd-ft-nil" aria-label="not asked">–</span>}
+                          {v != null && col.band && <span className="rd-ft-band"> ±{ftFig(col.band[ck])}</span>}
+                        </td>;
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ))}
+          </div>
+          <p className="rd-note rd-ft-note">{"The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view, as on the charts." : (ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".")) + " The 2026 state and by-election counts stay on the charts."}</p>
+        </details>
       )}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;
@@ -5282,7 +5346,7 @@ function RdFlows() {
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         This check corrects no other figure on the page.
-        {FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from both charts — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, split by the AEC’s own inside-metro, outside-metro and rural-plus-provincial seat classes. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."}
+        {FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from both charts — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot — the AEC counts no regional split of them, so a named region drops them from the chart. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."}
       </RdFoot>
     </section>
   );

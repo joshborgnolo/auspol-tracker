@@ -2544,9 +2544,14 @@ body.rd .rd-ap-frow { display: grid; align-items: end; padding: 26px 0 8px; bord
 body.rd .rd-ap-frow:hover { background: var(--surface-2); }
 body.rd .rd-ap-frow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 body.rd .rd-ap-frow:hover .rd-ap-chev { color: var(--ink); }
-body.rd .rd-ap-flab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+/* the label takes the scale head's column too (a fam head never draws the
+   month-average cell), and its source line wraps rather than truncating -
+   "Newspoll's pooled quarterly polls and YouGov's own weekly cut" is a
+   sentence the row has the width to print, not an ellipsis */
+body.rd .rd-ap-flab { grid-column: 1 / span 5; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 body.rd .rd-ap-flab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); min-width: 0; }
+body.rd .rd-ap-flab .rd-ap-fn { white-space: nowrap; flex: none; }
 body.rd .rd-ap-fcap { grid-column: 6; display: block; position: relative; min-height: 16px; min-width: 0; }
 /* the head folds its table: its chevron shares the poll rows' last column, at
    the head line's own height so the heading stands exactly as tall as before */
@@ -3091,6 +3096,37 @@ body.rd .rd-fl-name.onp { color: var(--onp-text); }
    2026-10-13), one token per side as the pair beside it reads */
 body.rd .rd-fl-xb { color: var(--lnp-text); }
 body.rd .rd-fl-xo { color: var(--onp-text); }
+/* the Flows table (redesigned 2026-10-13): one small grid per contest -
+   cohorts down, sources across, one figure a cell - three abreast where
+   they fit, stacked below that. Full ink throughout: no test sits behind
+   these rows, so nothing fades. The site's own column is the yardstick
+   the polls are read against, so it carries a faint wash */
+body.rd .rd-ft-view { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+body.rd .rd-ft-view span { font-weight: 400; color: var(--ink-3); }
+body.rd .rd-ft-grid { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 560px); gap: 28px 40px; align-items: start; }
+@media (min-width: 1200px) { body.rd .rd-ft-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+body.rd .rd-ft-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+body.rd .rd-ft-table caption { text-align: left; caption-side: top; padding-bottom: 8px; }
+body.rd .rd-ft-table caption .rd-fl-name { display: block; }
+body.rd .rd-ft-to { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+body.rd .rd-ft-table th, body.rd .rd-ft-table td { padding: 7px 0 7px 10px; font-size: 14px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+body.rd .rd-ft-table :is(th, td):first-child { padding-left: 0; text-align: left; }
+body.rd .rd-ft-table thead th { font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--ink); vertical-align: bottom; white-space: normal; border-bottom: 1.5px solid var(--ink-2); }
+body.rd .rd-ft-table thead th span { display: block; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-ft-table tbody th { font-weight: 500; color: var(--ink); }
+body.rd .rd-ft-table tbody td { color: var(--ink); }
+body.rd .rd-ft-table .rd-ft-site { background: color-mix(in oklab, var(--ink) 4%, var(--surface)); padding-right: 8px; padding-left: 8px; }
+body.rd .rd-ft-table thead .rd-ft-site { border-radius: 4px 4px 0 0; }
+body.rd .rd-ft-band { display: inline-block; min-width: 2.9em; padding-left: 3px; text-align: left; font-size: 12px; color: var(--ink-3); }
+body.rd .rd-ft-table thead th:not(:first-child) { width: 19%; }
+body.rd .rd-ft-nil { color: var(--ink-3); }
+body.rd .rd-ft-sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; background: var(--oth); }
+body.rd .rd-ft-sw.grn { background: var(--grn); }
+body.rd .rd-ft-sw.onp { background: var(--onp); }
+body.rd .rd-ft-sw.lnp { background: var(--lnp); }
+body.rd .rd-ft-sw.alp { background: var(--alp); }
+body.rd .rd-ft-note { margin-top: 14px; max-width: 72ch; }
+@media (max-width: 640px) { body.rd .rd-ft-table th, body.rd .rd-ft-table td { padding-left: 8px; } body.rd .rd-ft-table .rd-ft-site { padding-right: 6px; padding-left: 6px; } }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
 /* the forced-choice titles run two to four lines as their tails come and

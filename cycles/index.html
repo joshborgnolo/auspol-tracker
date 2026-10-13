@@ -4880,9 +4880,10 @@ body.rd .rd-ap-frow { display: grid; align-items: end; padding: 26px 0 8px; bord
 body.rd .rd-ap-frow:hover { background: var(--surface-2); }
 body.rd .rd-ap-frow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 body.rd .rd-ap-frow:hover .rd-ap-chev { color: var(--ink); }
-body.rd .rd-ap-flab { grid-column: 1 / span 4; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+body.rd .rd-ap-flab { grid-column: 1 / span 5; padding-left: 12px; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 body.rd .rd-ap-flab b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-flab span { font-size: 12px; color: var(--ink-3); min-width: 0; }
+body.rd .rd-ap-flab .rd-ap-fn { white-space: nowrap; flex: none; }
 body.rd .rd-ap-fcap { grid-column: 6; display: block; position: relative; min-height: 16px; min-width: 0; }
 body.rd .rd-ap-frow .rd-ap-chev { grid-column: 8; height: 20px; }
 body.rd .rd-ap-mavg { grid-column: 5 / span 2; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
@@ -5302,6 +5303,32 @@ body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
 body.rd .rd-fl-name.onp { color: var(--onp-text); }
 body.rd .rd-fl-xb { color: var(--lnp-text); }
 body.rd .rd-fl-xo { color: var(--onp-text); }
+body.rd .rd-ft-view { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+body.rd .rd-ft-view span { font-weight: 400; color: var(--ink-3); }
+body.rd .rd-ft-grid { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 560px); gap: 28px 40px; align-items: start; }
+@media (min-width: 1200px) { body.rd .rd-ft-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+body.rd .rd-ft-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+body.rd .rd-ft-table caption { text-align: left; caption-side: top; padding-bottom: 8px; }
+body.rd .rd-ft-table caption .rd-fl-name { display: block; }
+body.rd .rd-ft-to { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+body.rd .rd-ft-table th, body.rd .rd-ft-table td { padding: 7px 0 7px 10px; font-size: 14px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+body.rd .rd-ft-table :is(th, td):first-child { padding-left: 0; text-align: left; }
+body.rd .rd-ft-table thead th { font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--ink); vertical-align: bottom; white-space: normal; border-bottom: 1.5px solid var(--ink-2); }
+body.rd .rd-ft-table thead th span { display: block; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-ft-table tbody th { font-weight: 500; color: var(--ink); }
+body.rd .rd-ft-table tbody td { color: var(--ink); }
+body.rd .rd-ft-table .rd-ft-site { background: color-mix(in oklab, var(--ink) 4%, var(--surface)); padding-right: 8px; padding-left: 8px; }
+body.rd .rd-ft-table thead .rd-ft-site { border-radius: 4px 4px 0 0; }
+body.rd .rd-ft-band { display: inline-block; min-width: 2.9em; padding-left: 3px; text-align: left; font-size: 12px; color: var(--ink-3); }
+body.rd .rd-ft-table thead th:not(:first-child) { width: 19%; }
+body.rd .rd-ft-nil { color: var(--ink-3); }
+body.rd .rd-ft-sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; background: var(--oth); }
+body.rd .rd-ft-sw.grn { background: var(--grn); }
+body.rd .rd-ft-sw.onp { background: var(--onp); }
+body.rd .rd-ft-sw.lnp { background: var(--lnp); }
+body.rd .rd-ft-sw.alp { background: var(--alp); }
+body.rd .rd-ft-note { margin-top: 14px; max-width: 72ch; }
+@media (max-width: 640px) { body.rd .rd-ft-table th, body.rd .rd-ft-table td { padding-left: 8px; } body.rd .rd-ft-table .rd-ft-site { padding-right: 6px; padding-left: 6px; } }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
 @media (min-width: 761px) {
@@ -100566,7 +100593,7 @@ const DEM_SPLITS = [{
   pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"], ["$3,000+ a week", "Under $1,000 a week", "$3k+ v <$1k a week"]]
 }, {
   id: "country",
-  label: "Other cuts",
+  label: "Offcuts",
   lo: "Australia-born",
   hi: "Overseas-born",
   scope: "With a one-off breakdown",
@@ -100579,37 +100606,37 @@ const DEM_SPLITS = [{
   }, {
     id: "religion",
     lab: "Religion",
-    sub: "Newspoll's pooled quarterly pulls and RedBridge/Accent's one-off cut",
+    sub: "Newspoll’s pooled quarterly polls and RedBridge/Accent’s one-off cut",
     pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"]]
   }, {
     id: "working",
     lab: "Working status",
-    sub: "Newspoll's pooled quarterly pulls and YouGov's own weekly cut",
+    sub: "Newspoll’s pooled quarterly polls and YouGov’s own weekly cut",
     pairs: [["Full time", "Retired", "Full time v retired", "Retired", "Full time"]]
   }, {
     id: "children",
     lab: "Children at home",
-    sub: "YouGov's weekly cut, 24 Mar 2026 on",
+    sub: "YouGov’s weekly cut, 24 Mar 2026 on",
     pairs: [["Children under 18", "No children", "Children at home v none", "No children", "Children at home"]]
   }, {
     id: "class",
     lab: "Self-assessed class",
-    sub: "YouGov's weekly cut, 10 Feb 2026 on",
+    sub: "YouGov’s weekly cut, 10 Feb 2026 on",
     pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]]
   }, {
     id: "electorate",
     lab: "Tasmanian electorates",
-    sub: "EMRS's one-off seat cut from the February 2026 federal wave",
+    sub: "EMRS’s one-off seat cut from the February 2026 federal wave",
     pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
   }, {
     id: "occupation",
     lab: "Occupation",
-    sub: "RedBridge/Accent's one-off cut from the October 2025 report",
+    sub: "RedBridge/Accent’s one-off cut from the October 2025 report",
     pairs: [["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"]]
   }, {
     id: "stress",
     lab: "Financial stress",
-    sub: "RedBridge/Accent's one-off cut from the October 2025 report",
+    sub: "RedBridge/Accent’s one-off cut from the October 2025 report",
     pairs: [["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]]
   }]
 }];
@@ -102670,7 +102697,7 @@ function AllPollsView({
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
-    key: "date",
+    key: "pub",
     dir: -1
   });
   const [facet, setFacet] = useState(urlInit.facet);
@@ -102762,7 +102789,7 @@ function AllPollsView({
   const onFacet = f => {
     setFacet(f);
     setSort({
-      key: "date",
+      key: "pub",
       dir: -1
     });
     setPop(null);
@@ -102929,6 +102956,8 @@ function AllPollsView({
       switch (key) {
         case "date":
           return p.x;
+        case "pub":
+          return p.published ? Date.parse(p.published) : p.x;
         case "pollster":
           return p.pollster;
         case "sample":
@@ -110597,6 +110626,10 @@ function RdPrimary({
       }, pLive[0]]
     } : null;
   }).filter(Boolean) : [];
+  const gElecStop = G && base && base.x >= xDomain[0] - 1e-6 && (!pts.length || pts[0].x > base.x + 1e-6) ? {
+    x: base.x,
+    y: base.alp
+  } : null;
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
   const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
   const [evtOpen, setEvtOpen] = useState(null);
@@ -110808,7 +110841,7 @@ function RdPrimary({
     baseline: true,
     xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null),
     series: leads.length ? chartSeries.concat(leads) : chartSeries,
-    spine: series(live("alp"), "alp"),
+    spine: gElecStop ? [gElecStop].concat(series(live("alp"), "alp")) : series(live("alp"), "alp"),
     areas: areas,
     scatter: shownScatter,
     pollFacet: G ? "demographics" : "primary",
@@ -110818,9 +110851,13 @@ function RdPrimary({
     events: badges ? badges.events : evs,
     evt: evtOpen,
     onEvt: setEvtOpen,
-    tooltipTitle: i => pts[i] ? monthLabelFull(pts[i].ym) : "",
+    tooltipTitle: i => gElecStop && i === 0 ? monthLabelFull("2025-05") : pts[gElecStop ? i - 1 : i] ? monthLabelFull(pts[gElecStop ? i - 1 : i].ym) : "",
     extraRows: i => {
-      const d = pts[i];
+      if (gElecStop && i === 0) return [{
+        label: "",
+        value: "The election result"
+      }];
+      const d = pts[gElecStop ? i - 1 : i];
       if (!d || !d.ci || d.election) return d && d.election ? [{
         label: "",
         value: "The election result"
@@ -124474,7 +124511,7 @@ function RdAllPolls(P) {
     return () => ro.disconnect();
   }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
-  const byDate = sort.key === "date" && sort.dir < 0;
+  const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
   const [minShown, setMinShown] = useState(30);
   const [flatLimit, setFlatLimit] = useState(40);
   const [showAll, setShowAll] = useState(false);
@@ -124717,7 +124754,14 @@ function RdAllPolls(P) {
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
   const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
+  const famSeed = React.useRef(false);
   const [famShut, setFamShut] = useState(() => new Set());
+  if (!famSeed.current && demFams) {
+    famSeed.current = true;
+    const shut = new Set();
+    for (const fam of demFams) if (sorted.filter(p => window.demPairOf(p, demSplit, fam.id)).length >= 2) shut.add(fam.id);
+    if (shut.size) setFamShut(shut);
+  }
   const toggleFam = id => setFamShut(s => {
     const n = new Set(s);
     if (n.has(id)) n.delete(id);else n.add(id);
@@ -126208,10 +126252,10 @@ function RdAllPolls(P) {
     className: "rd-ap-headwrap" + (pinned ? " pinned" : "")
   }, pinBar, phone ? phoneHead : colHead), demFamTables ? demFamTables.map(t => React.createElement(React.Fragment, {
     key: "fam" + t.fam.id
-  }, famHead(t), famShut.has(t.fam.id) ? null : t.groups.map(g => React.createElement(React.Fragment, {
-    key: t.fam.id + g.ym
-  }, monthRow(g, t.fam.id), g.list.map(p => rowFor(p, t.fam.id)))))) : byDate ? groups.map(g => React.createElement(React.Fragment, {
-    key: g.ym
+  }, famHead(t), famShut.has(t.fam.id) ? null : t.groups.map((g, gi) => React.createElement(React.Fragment, {
+    key: t.fam.id + "|" + gi
+  }, monthRow(g, t.fam.id), g.list.map(p => rowFor(p, t.fam.id)))))) : byDate ? groups.map((g, gi) => React.createElement(React.Fragment, {
+    key: g.ym + "|" + gi
   }, monthRow(g), g.list.map(p => rowFor(p, null)))) : flat.map(p => rowFor(p, null)), sorted.length === 0 && React.createElement("div", {
     className: "rd-ap-empty"
   }, "No ", noun, " match these filters. ", React.createElement("button", {
@@ -128240,15 +128284,6 @@ function RdFlows() {
       };
     })
   } : null;
-  const ftCohorts = {
-    co: ["grn", "onp", "oth"],
-    on: ["grn", "coal", "oth"],
-    ln: ["alp", "grn", "oth"]
-  };
-  const ftCell = (d, cks) => d ? React.createElement("div", null, cks.filter(ck => d[ck] != null).map(ck => React.createElement("div", {
-    key: ck
-  }, FF_COHORTS[ck].name, " ", d[ck].toFixed(1)))) : "–";
-  const ftDash = ["–", "–", "–", "–"];
   const ftLast = FF ? {
     co: FF.vsCoal[FF.vsCoal.length - 1],
     on: FF.vsOn[FF.vsOn.length - 1],
@@ -128256,75 +128291,81 @@ function RdFlows() {
     mn: FF.demosOn && FF.demosOn[FF.demosOn.length - 1],
     ln: FF.lnpOn && FF.lnpOn[FF.lnpOn.length - 1]
   } : null;
-  const ftPct = v => v * 100;
-  const ftBd = v => (v * 100).toFixed(1).replace(/\.0$/, "");
   const ftSite = D.flowTables || null;
-  const ftSiteOn = ftSite ? React.createElement("div", null, [["coal", "lnp"], ["grn", "grn"], ["oth", "oth"]].map(([ck, bk]) => React.createElement("div", {
-    key: ck
-  }, FF_COHORTS[ck].name, " ", ftPct(ftSite.onp[bk]).toFixed(1), " ", React.createElement("span", {
-    className: "rd-note"
-  }, "\xB1 ", ftBd(ftSite.onBand[bk]))))) : "–";
-  const flowSets = FF ? [{
-    key: "ftco",
-    label: "Labor v Coalition — the share of each cohort choosing Labor",
-    rows: [{
+  const ftMon = ym => {
+    const [y, m] = ym.split("-").map(Number);
+    return D.monthName(m) + " " + y;
+  };
+  const ftRb = w => !ffReg && w && {
+    key: "rb",
+    h: "RedBridge",
+    sub: ftMon(w.ym),
+    d: w
+  };
+  const ftMrp = (w, regional) => w && (regional ? ffReg ? w[ffReg] : w.all : !ffReg && w) && {
+    key: "mrp",
+    h: "DemosAU",
+    sub: "MRP, " + w.win.replace(/^.*?([A-Z][a-z]{2} \d{4})$/, "$1"),
+    d: regional ? ffReg ? w[ffReg] : w.all : w,
+    wt: regional && !ffReg
+  };
+  const ftSiteCol = (d, band, dp) => ftSite && {
+    key: "site",
+    h: "This site",
+    sub: ffReg ? "national" : "assumes",
+    d,
+    band,
+    dp,
+    site: true
+  };
+  const ftContests = FF ? [{
+    key: "co",
+    name: React.createElement("span", {
+      className: "rd-fl-name lnp"
+    }, "Labor v Coalition"),
+    to: "Labor",
+    cohorts: ["grn", "onp", "oth"],
+    cols: [FF.elec2025r && {
       key: "elec",
-      name: "2025 election, as counted",
-      cells: FF.elec2025r ? [ftCell(FF.elec2025r.all, ftCohorts.co), "–", "–", "–"] : ftDash
-    }, {
-      key: "site",
-      name: "The flows this site uses",
-      cells: [ftCell(ftSite ? {
-        grn: ftPct(ftSite.lnp.grn),
-        onp: ftPct(ftSite.lnp.onp),
-        oth: ftPct(ftSite.lnp.oth)
-      } : null, ftCohorts.co), "–", "–", "–"]
-    }, ftLast.co && {
-      key: "rb",
-      name: "RedBridge/Accent, " + rdMonthYear(ftLast.co.ym),
-      cells: [ftCell(ftLast.co, ftCohorts.co), "–", "–", "–"]
-    }, ftLast.dm && {
-      key: "mrp",
-      name: "DemosAU MRP, " + ftLast.dm.win,
-      cells: [ftCell(ftLast.dm, ftCohorts.co), "–", "–", "–"]
-    }].filter(Boolean)
+      h: "Election",
+      sub: ffReg ? "2025, national" : "2025 count",
+      d: FF.elec2025r.all,
+      dp: 1
+    }, ftSiteCol(ftSite && {
+      grn: ftSite.lnp.grn * 100,
+      onp: ftSite.lnp.onp * 100,
+      oth: ftSite.lnp.oth * 100
+    }, null, 1), ftRb(ftLast.co), ftMrp(ftLast.dm, false)].filter(Boolean)
   }, {
-    key: "fton",
-    label: "Labor v One Nation — the share of each cohort choosing Labor",
-    rows: [{
-      key: "elec",
-      name: "2025 election, as counted",
-      cells: ftDash
-    }, {
-      key: "site",
-      name: "The flows this site uses",
-      cells: [ftSiteOn, "–", "–", "–"]
-    }, ftLast.on && {
-      key: "rb",
-      name: "RedBridge/Accent, " + rdMonthYear(ftLast.on.ym),
-      cells: [ftCell(ftLast.on, ftCohorts.on), "–", "–", "–"]
-    }, ftLast.mn && {
-      key: "mrp",
-      name: "DemosAU MRP, " + ftLast.mn.win,
-      cells: ["all", "inner", "outer", "regional"].map(k => ftCell(ftLast.mn[k], ftCohorts.on))
-    }].filter(Boolean)
+    key: "on",
+    name: React.createElement("span", {
+      className: "rd-fl-name onp"
+    }, "Labor v One Nation"),
+    to: "Labor",
+    cohorts: ["coal", "grn", "oth"],
+    cols: [ftSiteCol(ftSite && {
+      coal: ftSite.onp.lnp * 100,
+      grn: ftSite.onp.grn * 100,
+      oth: ftSite.onp.oth * 100
+    }, ftSite && {
+      coal: ftSite.onBand.lnp * 100,
+      grn: ftSite.onBand.grn * 100,
+      oth: ftSite.onBand.oth * 100
+    }), ftRb(ftLast.on), ftMrp(ftLast.mn, true)].filter(Boolean)
   }, {
-    key: "ftln",
-    label: "Coalition v One Nation — the share of each cohort choosing the Coalition",
-    rows: [{
-      key: "elec",
-      name: "2025 election, as counted",
-      cells: ftDash
-    }, {
-      key: "site",
-      name: "The flows this site uses",
-      cells: ftDash
-    }, ftLast.ln && {
-      key: "mrp",
-      name: "DemosAU MRP, " + ftLast.ln.win,
-      cells: ["all", "inner", "outer", "regional"].map(k => ftCell(ftLast.ln[k], ftCohorts.ln))
-    }].filter(Boolean)
-  }] : null;
+    key: "ln",
+    name: React.createElement("span", {
+      className: "rd-fl-name"
+    }, React.createElement("span", {
+      className: "rd-fl-xb"
+    }, "Coalition"), " v ", React.createElement("span", {
+      className: "rd-fl-xo"
+    }, "One Nation")),
+    to: "the Coalition",
+    cohorts: ["alp", "grn", "oth"],
+    cols: [ftMrp(ftLast.ln, true)].filter(Boolean)
+  }].filter(c => c.cols.length) : null;
+  const ftFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1);
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return React.createElement("section", {
     className: "rd-sec rd-fl",
@@ -128523,12 +128564,46 @@ function RdFlows() {
       className: "rd-ff-keyring",
       "aria-hidden": "true"
     }), "2025 election, as counted")));
-  })(), flowSets && React.createElement(RdTsig, {
-    summary: "Flows table",
-    heads: ["Flow", "All voters", "Inner metro", "Outer metro", "Regional"],
-    sets: flowSets,
-    note: "Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the same figures this site’s flow constants read; the chart rings above). The AEC counts no per-region TPP flows, so the row’s regional cells are dashes; and no count of the two One Nation choices exists at all, so those cells are dashes too. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."
-  }), React.createElement(RdTsig, {
+  })(), ftContests && ftContests.length > 0 && React.createElement("details", {
+    className: "rd-evdrop rd-ft"
+  }, React.createElement("summary", null, "Flows table"), React.createElement("p", {
+    className: "rd-ft-view"
+  }, ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters", React.createElement("span", null, ", from the menu above the charts")), React.createElement("div", {
+    className: "rd-ft-grid"
+  }, ftContests.map(c => React.createElement("table", {
+    key: c.key,
+    className: "rd-ft-table"
+  }, React.createElement("caption", null, c.name, React.createElement("span", {
+    className: "rd-ft-to"
+  }, "Share of each group\u2019s voters choosing ", c.to, ", %")), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "col"
+  }, React.createElement("span", {
+    className: "sr-only"
+  }, "Voters")), c.cols.map(col => React.createElement("th", {
+    key: col.key,
+    scope: "col",
+    className: col.site ? "rd-ft-site" : undefined
+  }, col.h, React.createElement("span", null, col.sub, col.wt ? "*" : ""))))), React.createElement("tbody", null, c.cohorts.map(ck => React.createElement("tr", {
+    key: ck
+  }, React.createElement("th", {
+    scope: "row"
+  }, React.createElement("i", {
+    className: "rd-ft-sw " + FF_COHORTS[ck].cls,
+    "aria-hidden": "true"
+  }), FF_COHORTS[ck].name), c.cols.map(col => {
+    const v = col.d && col.d[ck];
+    return React.createElement("td", {
+      key: col.key,
+      className: col.site ? "rd-ft-site" : undefined
+    }, v != null ? ftFig(v, col.dp) : React.createElement("span", {
+      className: "rd-ft-nil",
+      "aria-label": "not asked"
+    }, "\u2013"), v != null && col.band && React.createElement("span", {
+      className: "rd-ft-band"
+    }, " \xB1", ftFig(col.band[ck])));
+  }))))))), React.createElement("p", {
+    className: "rd-note rd-ft-note"
+  }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view, as on the charts." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,
@@ -128538,7 +128613,7 @@ function RdFlows() {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from both charts — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, split by the AEC’s own inside-metro, outside-metro and rural-plus-provincial seat classes. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. RedBridge/Accent’s waves are all-voters readings only, so the menu’s named regions drop its dots from both charts — a national wave can’t speak to a region. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, the national two-party-preferred cut of every formal ballot — the AEC counts no regional split of them, so a named region drops them from the chart. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Secret Harbour by-election — none of them joined to any line."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
