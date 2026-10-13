@@ -3075,10 +3075,16 @@ body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
 body.rd .rd-fl-name.onp { color: var(--onp-text); }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
-/* the forced-choice titles run one to three lines as their tails come and
-   go - floor the headroom at three lines on the side-by-side grid rungs so
-   the pair's svgs stay on the same row regardless of each card's wrap */
-@media (min-width: 761px) { body.rd .rd-ff-two .rd-fl-ct { min-height: 56px; } }
+/* the forced-choice titles run two to four lines as their tails come and
+   go and the column narrows. A fixed headroom floor (56px) let a 4-line
+   title push its chart below its neighbour's at 768; on the side-by-side
+   rungs the pair now shares one subgrid - contest name, title, chart - so
+   each row is as tall as the taller card's and both charts start level */
+@media (min-width: 761px) {
+  body.rd .rd-ff-two { grid-template-rows: auto auto auto; }
+  body.rd .rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }
+  body.rd .rd-ff-two .rd-fl-ct { align-items: flex-start; padding-top: 4px; }
+}
 body.rd .rd-fl-chart { position: relative; margin-top: 8px; }
 body.rd .rd-fl-chart svg { display: block; overflow: visible; }
 body.rd .rd-fl-zero { stroke: var(--ink-faint); stroke-width: 1; }
@@ -3148,8 +3154,46 @@ body.rd .rd-ff-dm.onp { stroke: var(--onp); }
 body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
 body.rd .rd-ff-dm.grn { stroke: var(--grn); }
 body.rd .rd-ff-dm.oth { stroke: var(--oth); }
-body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--onp); transform: rotate(45deg); vertical-align: 0; }
-body.rd .rd-ff-keydm.mix { border-color: var(--ink-2); }
+/* the key names each mark's SHAPE in neutral ink - the cohort colours are
+   named at the lines' ends */
+body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); transform: rotate(45deg); vertical-align: 0; }
+body.rd .rd-ff-keyring { display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); border-radius: 50%; vertical-align: -1px; }
+body.rd .rd-ff-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
+body.rd .rd-ff-keyln::before { content: ""; position: absolute; left: 1px; right: 1px; top: 6px; height: 2.25px; border-radius: 1px; background: var(--ink-2); }
+body.rd .rd-ff-keyln i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--ink-2); }
+/* the 2025 election's rings in their cohort's colour, each joined to its
+   line by the primary chart's dotted lead-in */
+body.rd .rd-ff-ring.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-ring.grn { stroke: var(--grn); }
+body.rd .rd-ff-ring.onp { stroke: var(--onp); }
+body.rd .rd-ff-ring.oth { stroke: var(--oth); }
+body.rd .rd-ff-lead { fill: none; stroke-width: 2.25; stroke-linecap: round; }
+body.rd .rd-ff-lead.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-lead.grn { stroke: var(--grn); }
+body.rd .rd-ff-lead.onp { stroke: var(--onp); }
+body.rd .rd-ff-lead.oth { stroke: var(--oth); }
+/* display-only layers never steal a mark's hover */
+body.rd .rd-ff .rd-ff-line, body.rd .rd-ff .rd-ff-lead, body.rd .rd-ff .rd-ff-g, body.rd .rd-ff .rd-ff-guide,
+body.rd .rd-ff .rd-fl-empty, body.rd .rd-ff .rd-apd-dothi { pointer-events: none; }
+/* the hit circles serve focus alone; the svg picks the nearest mark for a
+   pointer, so stacked marks never hide one another */
+body.rd .rd-ff .rd-ff-hit { pointer-events: none; }
+body.rd .rd-ff svg.link { cursor: pointer; }
+/* the tip's swatch takes the hovered mark's shape: dot, diamond, ring */
+body.rd .rd-ff-sw.wave { border-radius: 50%; width: 8px; height: 8px; }
+body.rd .rd-ff-sw.mrp { width: 7px; height: 7px; border-radius: 0; background: transparent; border: 1.5px solid; transform: rotate(45deg); margin: 0 1px; }
+body.rd .rd-ff-sw.elec { border-radius: 50%; background: transparent; border: 1.5px solid; }
+body.rd .rd-ff-sw.wave.lnp { background: var(--lnp); }
+body.rd .rd-ff-sw.wave.grn { background: var(--grn); }
+body.rd .rd-ff-sw.wave.onp { background: var(--onp); }
+body.rd .rd-ff-sw.wave.oth { background: var(--oth); }
+body.rd .rd-ff-sw.lnp { border-color: var(--lnp); }
+body.rd .rd-ff-sw.grn { border-color: var(--grn); }
+body.rd .rd-ff-sw.onp { border-color: var(--onp); }
+body.rd .rd-ff-sw.oth { border-color: var(--oth); }
+body.rd .rd-ff-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
+body.rd .rd-ff-tipsub { margin: -4px 0 3px; }
+body.rd .rd-ff-tipsub .tip-label { font-size: 12px; }
 body.rd .rd-ff-el { font-size: 12px; font-weight: 600; }
 body.rd .rd-ff-elv { font-size: 12px; font-variant-numeric: tabular-nums; }
 body.rd .rd-ff-el.lnp { fill: var(--lnp); }

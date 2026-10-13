@@ -95,8 +95,12 @@ assert.ok(ap.includes("moved.length !== 1"), "the tail names a cohort only when 
 assert.ok(ap.includes('key: "pressed"'), "the pressed-choice rows join the trend-significance table as their own set");
 assert.ok(ap.includes('"First → last"'), "the table's first→last column head fits both gaps and shares");
 const css = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
-assert.ok(css.includes(".rd-ff-two .rd-fl-ct { min-height: 56px; }"),
-  "the forced pair's headroom floor keeps the two svgs row-aligned");
+assert.ok(css.includes(".rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }"),
+  "the forced pair shares one subgrid (contest, title, chart) so the two svgs stay row-aligned however the titles wrap");
+/* the 2025 election rings sit at the election's own date: xm derived from
+   3 May 2025, never typed (a hand-typed 24314.0645 drew them in March 2026) */
+assert.ok(Math.abs(FF.elec2025.xm - (2025 * 12 + 4 + 2 / 31)) < 1e-3, `the election rings ride 3 May 2025 (xm ${FF.elec2025.xm})`);
+assert.deepEqual([FF.elec2025.grn, FF.elec2025.onp, FF.elec2025.oth], [88.2, 25.5, 54.6], "the rings read the 2025 counted flows");
 for (const cls of ["grn", "lnp", "onp", "oth"])
   assert.ok(css.includes(`.rd-ff-line.${cls}`) && css.includes(`.rd-ff-dot.${cls}`),
     `the cohort's line and dot rules are its party hue (.${cls})`);

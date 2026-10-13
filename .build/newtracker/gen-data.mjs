@@ -4075,9 +4075,17 @@ const flowForced = (() => {
     }
   }
   /* the 2025 election's OWN reading of the Labor-v-Coalition question: the
-     AEC's printed vote totals flowing to Labor, rounded one decimal – same
-     pair the chart's mention of last-election flows measures against */
-  const elec2025 = { xm: 24314.0645, win: "The May 2025 election", grn: 88.2, onp: 25.5, oth: 54.6 };
+     AEC's counted flows to Labor (flows.mjs FLOW_FED, the table the site's
+     implied 2PP runs on), as percentages to one decimal. xm is the election
+     DAY on the waves' month-index scale (year·12 + month−1 + the day's share
+     of its month), derived from the date: a hand-typed 24314.0645 put the
+     rings ten months late, in March 2026, beside the first wave */
+  const elec2025 = (() => {
+    const d = "2025-05-03", y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
+    const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    return { date: d, xm: Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4, win: "3 May 2025",
+             grn: r1(FLOW_FED.grn * 100), onp: r1(FLOW_FED.onp * 100), oth: r1(FLOW_FED.oth * 100) };
+  })();
   /* DemosAU's MRP reports print one national respondent flow beside
      RedBridge's: One Nation voters' share reaching Labor in Labor-v-Coalition
      contests (pref_flows.onp_alp_lnp, from full five-option rankings over the

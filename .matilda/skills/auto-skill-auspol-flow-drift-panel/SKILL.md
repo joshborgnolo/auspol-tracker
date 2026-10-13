@@ -610,31 +610,59 @@ hover, wave swap, mouse-out clear).
   parent of `.build/`, not repo root; use `new URL("../", import.meta.url)`
   and prefix `.build/newtracker/…` inside.
 
-## The forced-choice pair's head+dek are HAND-CURATED (2026-10-10; dek extended 2026-10-12)
+## The forced-choice pair's head+dek are HAND-CURATED (2026-10-10; rewritten 2026-10-13)
 
 The RdFlows `rd-ff` block's `<h3 class="rd-sub rd-ff-t">` + `<p class="rd-subdek rd-ff-d">`
-(set as the page's sub-story since 2026-10-11)
-(rd-allpolls.jsx, formerly "When pressed, where do their voters go?") are
-user-dictated static strings that no longer regenerate — refresh by hand
-when the pool or the facts move (RD_DEMO_HOME convention):
+are static strings in rd-allpolls.jsx; refresh by hand when the facts move.
+2026-10-13 (user: "bad titles … main title refers only to redbridge", full
+freedom granted) replaced the user's 10-10/10-12 wording:
 
-- Head: "RedBridge/Accent’s respondent-allocated preferences"
-- Dek (current, 960d7e3): "RedBridge/Accent publishes respondent-allocated
-  preferences every wave, and DemosAU’s MRP reports print their own — the
-  diamonds: its printed national One Nation reading on the Labor v
-  Coalition chart, and our all-regions weighting of its regional tables
-  on the Labor v One Nation chart. These tell us the extent to which
-  Coalition voters, for example, prefer One Nation over Labor. Take them
-  with a grain of salt, however, …" (the Bonham-link grain-of-salt tail
-  unchanged)
+- Head: "What voters say they’d do with their preferences" (names no house:
+  DemosAU's MRP and the 2025 election share the charts)
+- Dek: what the question is → RedBridge/Accent monthly (the lines), DemosAU
+  MRP quarterly (the diamonds), the rings = what preferences actually did
+  at the 2025 election → what the answers show → the grain-of-salt tail
+  with the Bonham link ("predicted the next election better").
+- Each chart is led by its contest tag in the rival's ink
+  (`.rd-fl-name lnp|onp`, "Labor v Coalition" / "Labor v One Nation"), the
+  upper drift pair's anatomy and ORDER: Coalition left, One Nation right.
+  Titles use `FF_COHORTS[ck].prose` ("50% of other voters").
 
-The head is PINNED by the rd-forced-charts probe ("desktop: section head
-is the respondent-allocated line") — a copy change there must move the
-probe in the same commit. The older a11e1559/gen-data comments that used
-to name the panel by the old title now refer to the
-respondent-allocated-preferences panel instead. The diamonds clause and
-the key/footer/tooltip copy that names the site's weighting (demosOn)
-move with the dek — see the section below.
+The head is PINNED by rd-forced-charts ("section head names no one house");
+a copy change moves the probe in the same commit.
+
+## RdForced marks, tips and axis (2026-10-13 rework)
+
+- **Three mark kinds, one tip.** `groups` = the election (`kind "elec"`),
+  each RedBridge wave (`"wave"`, dot), each MRP (`"mrp"`, hollow diamond).
+  Every mark tips through the one card: title = house + printed window
+  ("RedBridge/Accent, 24–30 Sep 2026" / "DemosAU MRP, …" / "2025 election,
+  3 May 2025"), a sub naming the question (MRP `wt` adds "(all regions: our
+  weighting)"), then EVERY cohort's Labor share at that date with a swatch
+  in the mark's shape (`.rd-ff-sw.wave|mrp|elec`), the hovered cohort's row
+  `.on`. No native `<title>`s anymore. Waves AND MRPs open their poll row
+  (pollRowKey house "DemosAU (MRP)"); the election opens nothing.
+- **Nearest-mark pointer.** The svg picks the nearest mark (14px mouse,
+  22px touch); `.rd-ff-hit` circles are `pointer-events: none` and serve
+  focus/aria only (one tab stop per group). Why: June 2026's MRP midpoint
+  (19 Jun) sits ~5px from RedBridge's June dot, and stacked r=9 hits made
+  the dot unhoverable.
+- **Election rings** (Labor v Coalition only): `elec2025.xm` is DERIVED from
+  "2025-05-03" (a hand-typed 24314.0645 drew them in March 2026), values
+  from flows.mjs FLOW_FED. Rings `.rd-ring.rd-ff-ring.<cls>` in the cohort
+  colour + `.rd-ff-lead` dotted lead-in (RD_ELECTION_LEAD "0.5 4") to the
+  cohort's first wave: the primary chart's idiom.
+- **Shared axis.** RdFlows passes both charts one `dom` (floor/ceil over
+  every wave, MRP and the election), so months line up side by side; the
+  One Nation chart labels the uncovered stretch via `emptyNote` ("No
+  election count of this choice"…). Ticks step 1/2/3/4/6 months, the
+  smallest giving 50px.
+- **Row alignment.** ≥761px the pair is a 3-row subgrid (contest, title,
+  chart) — the old 56px headroom floor let a 4-line title drop its chart
+  below its neighbour's at 768.
+- **Key** names shapes in neutral ink: RedBridge line+dot, DemosAU diamond,
+  2025 ring (`.rd-ff-keyln/.rd-ff-keydm/.rd-ff-keyring`; RdSwatch's ring
+  svg stretches in this key, so it has its own span).
 
 ## The forced-choice pair + DemosAU all-regions marks (RdForced; demosOn shipped 960d7e3, 2026-10-12)
 
@@ -679,9 +707,9 @@ whenever the computation is exact-enough arithmetic on AEC denominators.
 - **The set display contract** (960d7e3): charts that promise
   "figures read straight off published reports" may still show a
   SITE-WEIGHTED figure as MARKS — never as a line — provided the entry
-  carries `wt: true` and every surface names the provenance: diamond
-  `<title>` adds "(all regions — our weighting)", the key gets its own
-  glyph+item (`.rd-ff-keydm.mix`, ink-2 border), and the dek + RdFoot
+  carries `wt: true` and every surface names the provenance: the tip's
+  sub adds "(all regions: our weighting)" (since 10-13 the key names
+  only the diamond shape), and the dek + RdFoot
   provenance sentence + svg aria (`xnote`, which also says national-vs-
   weighted and names the latest cohorts) all say "our weighting". The
   RedBridge-only "read straight off" sentence stays literal about
@@ -694,8 +722,9 @@ whenever the computation is exact-enough arithmetic on AEC denominators.
   coloured `FF_COHORTS[ck].cls` (`coal` → `lnp`; `.rd-ff-dm` fills with
   `--chart-bg` so a crossing line can't bisect the mark, cohort strokes
   in rd.css beside `.rd-ff-dm.onp` — the .rd-ring election-mark idiom,
-  inverts with the dark palette on its own; user call 2026-10-13). No
-  click-to-open on marks (house-wave dots only). The x AXIS MUST UNION
+  inverts with the dark palette on its own; user call 2026-10-13). Since
+  the 10-13 rework MRP diamonds tip and open their poll row too (see
+  "RdForced marks, tips and axis" above). The x AXIS MUST UNION
   the extras (960d7e3): `m0`/`mSpan` previously spanned
   `waves[]` alone and a DemosAU midpoint outside the house's own months
   would draw at negative `X` and clip silently off the left rail —
@@ -705,7 +734,7 @@ whenever the computation is exact-enough arithmetic on AEC denominators.
   diamonds ride their fractional `xm` (user call 2026-10-13: break the
   month-grid convention for the MRP marks, whose windows span six to
   seven weeks — a "midpoint month" read as a whole-month poll). The
-  diamond `<title>` names its window `win`, not a month. Whole-number
+  diamond's tip names its window `win`, not a month. Whole-number
   0–100 y domain, no refs.
 - **Data reality to sanity-check against**: three MRP waves carry
   `pref_flows` (2026-03-03 fw 2026-01-13, 2026-07-11, 2026-09-19) and

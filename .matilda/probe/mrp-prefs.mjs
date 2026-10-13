@@ -41,17 +41,18 @@ for (const w of [1440, 1024, 768, 390]) {
   await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector("#flow-drift", { timeout: 30000 });
   const dm = await page.evaluate(() => {
-    const one = [...document.querySelectorAll("#flow-drift .rd-ff-two .rd-fl-one")];
+    const fig = (q) => document.querySelector(`#flow-drift figure.rd-ff[data-q="${q}"]`);
     const cls = (el) => (el ? [...el.querySelectorAll(".rd-ff-dm")].map((d) => d.getAttribute("class").replace("rd-ff-dm ", "")) : []);
-    const on = cls(one[0]), co = cls(one[1]);
+    const on = cls(fig("on")), co = cls(fig("co"));
+    const keyDm = document.querySelector("#flow-drift .rd-ff-key .rd-ff-keydm");
     return { on: on.length, co: co.length,
       cohorts: ["lnp", "grn", "oth"].every((c) => on.filter((x) => x === c).length === 3),
-      key: !!document.querySelector("#flow-drift .rd-ff-keydm"), keyMix: !!document.querySelector("#flow-drift .rd-ff-keydm.mix") };
+      key: !!keyDm && keyDm.parentElement.textContent.includes("DemosAU MRP") };
   });
   check(dm.on === 9, "Labor v One Nation: three hollow DemosAU diamonds per filed MRP (" + dm.on + ")");
   check(dm.cohorts, "the One Nation chart's diamonds ride the three cohort colours");
   check(dm.co === 3, "Labor v Coalition: three DemosAU diamonds (" + dm.co + ")");
-  check(dm.key && dm.keyMix, "the key names both diamond sets");
+  check(dm.key, "the key names the diamond shape as DemosAU's MRP (the weighting caveat rides the tips and the foot)");
   if (w === 1440) {
     /* the diamonds sit at the window's TRUE midpoint, the one marks off the
        charts' whole-month grid: derive the empirical month-index → x map
@@ -78,18 +79,21 @@ for (const w of [1440, 1024, 768, 390]) {
         const [m1, x1] = slots[0], [m2, x2] = slots[slots.length - 1];
         const per = (x2 - x1) / (m2 - m1);
         const got = [...fig.querySelectorAll(".rd-ff-dm")].map((p) => ({
-          title: p.querySelector("title").textContent,
           x: +/^M([\d.]+)/.exec(p.getAttribute("d"))[1],
         }));
+        /* a diamond belongs to the MRP whose midpoint it sits nearest (the
+           three windows are months apart) */
+        const wantOf = (e) => x1 + (e.xm - m1) * per;
         return extras.map((e) => {
-          const want = x1 + (e.xm - m1) * per;
-          const on = got.filter((g) => g.title.includes(e.win));
+          const want = wantOf(e);
+          const on = got.filter((g) => extras.every((o) => Math.abs(g.x - want) <= Math.abs(g.x - wantOf(o))));
           return { win: e.win, xm: e.xm, n: on.length, off: on.map((o) => Math.abs(o.x - want)),
                    slot: on.some((o) => { const k = (o.x - x1) / per; return Math.abs(k - Math.round(k)) < 0.05; }) };
         });
       };
       const figs = [...document.querySelectorAll("figure.rd-ff")];
-      return { on: figRes(figs[0], FF.demosOn), co: figRes(figs[1], FF.demos) };
+      const byQ = (q) => figs.find((f) => f.dataset.q === q);
+      return { on: figRes(byQ("on"), FF.demosOn), co: figRes(byQ("co"), FF.demos) };
     });
     for (const [tag, rows] of [["v-ON", mids.on], ["v-Coalition", mids.co]]) {
       check(rows.every((r) => !r.err), tag + ": tick labels parsed" + (rows.find((r) => r.err) ? " – " + rows.find((r) => r.err).err : ""));

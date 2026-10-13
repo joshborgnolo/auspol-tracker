@@ -4694,30 +4694,38 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
 }
 
 /* ---------------------------------------------------------------- preference flows — the forced-choice pair */
-/* RedBridge/Accent's monthly "forced to choose" tables, as lines (data:
-   gen-data §7db's D.flowForced, moved here from /preference-flows/' #forced
-   section 2026-10-10; regrouped the same day from one chart per voter
-   cohort to one chart per QUESTION (user's call): Greens, Coalition and
-   Other voters pressed Labor v One Nation on one chart, Greens, One Nation
-   and Other voters pressed Labor v the Coalition on the other, one
-   cohort-coloured line per cohort, each tracing the share that picks
-   Labor. Drawing is deliberately light vs RdFlowChart above: no estimator,
-   no band — just the house's published waves. */
+/* What voters say they'd do with their preferences, as lines (data: gen-data
+   §7db's D.flowForced, moved here from /preference-flows/' #forced section
+   2026-10-10). One chart per QUESTION (Labor v the Coalition, Labor v One
+   Nation), one cohort-coloured line per pressed cohort, each tracing the
+   share that picks Labor. Three kinds of mark share a chart, each with its
+   own shape and every one hoverable to the same tip (2026-10-13 rework):
+     - RedBridge/Accent's monthly waves: dots on the line;
+     - DemosAU MRP readings: hollow diamonds, another house's marks, never a
+       line;
+     - the 2025 election's counted flows (Labor v Coalition only): the
+       primary chart's open ring in the cohort's colour, joined to the
+       cohort's first wave by its dotted lead-in (RD_ELECTION_LEAD) - the
+       months between were never asked.
+   Both charts share one x domain (dom) so their months line up side by side;
+   the One Nation chart marks the stretch no count covers. Drawing is
+   deliberately light vs RdFlowChart above: no estimator, no band. */
 const FF_COHORTS = {
-  coal: { name: "Coalition", cls: "lnp" },
-  grn:  { name: "Greens", cls: "grn" },
-  onp:  { name: "One Nation", cls: "onp" },
-  oth:  { name: "Other", cls: "oth" },
+  coal: { name: "Coalition", prose: "Coalition", cls: "lnp" },
+  grn:  { name: "Greens", prose: "Greens", cls: "grn" },
+  onp:  { name: "One Nation", prose: "One Nation", cls: "onp" },
+  oth:  { name: "Other", prose: "other", cls: "oth" },
 };
-function RdForced({ waves, cohorts, rival, W, phone, extras, elec }) {
+const FF_MRP_HOUSE = "DemosAU (MRP)";
+function RdForced({ q, waves, cohorts, rival, W, phone, extras, elec, dom, emptyNote }) {
   const D = window.AUSPOL;
-  const [tip, setTip] = useState(null);         // { ym, src }
+  const [tip, setTip] = useState(null);         // { g: group key, ck, src }
   const ptr = React.useRef(null);
   const box = React.useRef(null);
   const tipBox = React.useRef(null);
   window.useDismissOutside(box, !!(tip && tip.src === "touch"), () => setTip(null));
-  /* same in-render clamp idiom as RdFlowChart's, one kind, so the card's
-     measured width corrects the next open of the same kind */
+  /* same in-render clamp idiom as RdFlowChart's, so the card's measured
+     width corrects the next open */
   const [tipW, setTipW] = useState(0);
   React.useLayoutEffect(() => {
     const el = tipBox.current;
@@ -4730,36 +4738,46 @@ function RdForced({ waves, cohorts, rival, W, phone, extras, elec }) {
     }
   }, [tip]);
   if (!waves || waves.length < 2) return null;
-  const H = phone ? 190 : 230;
+  const rivalShort = rival === "the Coalition" ? "Coalition" : rival;
+  const H = phone ? 200 : 236;
   const x0 = phone ? 30 : 36, rpad = phone ? 78 : 84, top = 16, bot = H - 34;
   const x1 = W - rpad;
-  /* a TIME-proportional calendar axis: March printed no Table 1, so Feb–Apr
-     spans two months' width with no dot in between. Spacing the waves
-     evenly drew that two-month step as one */
+  /* a TIME-proportional calendar axis on the month-index scale (year·12 +
+     month−1): every mark's x is its own true date - a wave's or an MRP's
+     fieldwork midpoint (xm), the election's day - never a whole-month slot.
+     The domain is the pair's shared [m0, m1] (whole months), so a mark
+     can't clip and both charts' months line up */
   const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  /* every POINT's x is its fieldwork window's true midpoint (w.xm, the
-     same month-index scale), never the whole-month grid – the axis itself
-     keeps whole-month ticks via floor/ceil of the union of wave, extras
-     and election xm, so a midpoint outside the monthly bounds can't clip */
-  const xms = [...waves.map((w) => w.xm ?? mi(w.ym)), ...(extras || []).map((d) => d.xm), ...(elec ? [elec.xm] : [])];
-  const m0 = Math.floor(Math.min(...xms));
-  const mSpan = Math.max(1, Math.ceil(Math.max(...xms)) - m0);
-  const ms = [];
-  for (let k = 0; k <= mSpan; k++) { const m = m0 + k; ms.push(Math.floor(m / 12) + "-" + String(m % 12 + 1).padStart(2, "0")); }
-  const Xi = (miN) => x0 + ((miN - m0) / mSpan) * (x1 - x0);
+  const own = [...waves.map((w) => w.xm ?? mi(w.ym)), ...(extras || []).map((d) => d.xm), ...(elec ? [elec.xm] : [])];
+  const m0 = dom ? dom[0] : Math.floor(Math.min(...own));
+  const mSpan = Math.max(1, (dom ? dom[1] : Math.ceil(Math.max(...own))) - m0);
+  const Xi = (m) => x0 + ((m - m0) / mSpan) * (x1 - x0);
   const Y = (v) => bot - (v / 100) * (bot - top);
-  const xw = (w) => Xi(w.xm ?? mi(w.ym));
+  /* one group per x: the election, each RedBridge wave, each MRP. A group
+     is what a tip reads - every cohort's figure at that date, the hovered
+     cohort's row picked out */
+  const groups = [
+    ...(elec ? [{ key: "e", kind: "elec", xm: elec.xm, d: elec }] : []),
+    ...waves.map((w) => ({ key: "w" + w.date, kind: "wave", xm: w.xm ?? mi(w.ym), d: w, house: D.flowForced && D.flowForced.house })),
+    ...(extras || []).map((d) => ({ key: "m" + d.date, kind: "mrp", xm: d.xm, d, house: FF_MRP_HOUSE })),
+  ];
+  const keyOf = (g) => (g.house && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: g.house, released: g.d.date }) : null);
   const series = cohorts.map((ck) => {
-    const pts = waves.filter((w) => w[ck] != null).map((w) => [xw(w), Y(w[ck])]);
-    const last = pts.length ? [...waves].reverse().find((w) => w[ck] != null) : null;
-    return { ck, pts, last };
-  }).filter((s) => s.pts.length >= 2 && s.last);
-  /* every month where the labels clear each other ("Feb ’26" is ~42px),
-     every other month where they don't */
-  const ticks = rdApMonthTicks(ms, (x1 - x0) / mSpan >= 44 ? 1 : 2);
+    const ws = waves.filter((w) => w[ck] != null);
+    return { ck, pts: ws.map((w) => [Xi(w.xm ?? mi(w.ym)), Y(w[ck])]), first: ws[0], last: ws[ws.length - 1] };
+  }).filter((s) => s.pts.length >= 2);
+  /* tick every k months, k the smallest of 1/2/3/4/6 that gives a "Feb ’26"
+     label (~42px) room; the year rides the first tick and each January */
+  const per = (x1 - x0) / mSpan;
+  const step = [1, 2, 3, 4, 6].find((k) => per * k >= 50) || 12;
+  const ticks = [];
+  for (let k = 0, yr = null; k <= mSpan; k += step) {
+    const m = m0 + k, y = Math.floor(m / 12), mo = m % 12 + 1;
+    ticks.push({ m, lab: D.monthName(mo) + (y !== yr ? " ’" + String(y).slice(2) : "") });
+    yr = y;
+  }
   /* cluster-centred end-label dodge: one name+value block per cohort, so a
-     tight finish (Sep 2026's Other 57 sits ~29px above Coalition 41 on the
-     Labor-v-One-Nation chart) still never crowns one label on another */
+     tight finish never crowns one label on another */
   const FF_GAP = 28;
   const labels = series.map((s) => ({ ck: s.ck, y: Y(s.last[s.ck]) })).sort((a, b) => a.y - b.y);
   const labY = new Map();
@@ -4770,121 +4788,140 @@ function RdForced({ waves, cohorts, rival, W, phone, extras, elec }) {
     for (let k = i; k < j; k++) labY.set(labels[k].ck, mid + (k - i - (n - 1) / 2) * FF_GAP);
     i = j;
   }
-  const show = (w, ck, src) => setTip({ ym: w.ym, ck, src, w });
-  const hide = (w, src) => setTip((t) => (t && t.ym === w.ym && (!src || t.src === src) ? null : t));
-  /* RdFlowChart's wave-dot idiom: every forced wave files on its house's
-     poll row, so the dots open that row in the archive (mouse click or
-     Enter); a touch tap still only reads the tip */
-  const house = D.flowForced && D.flowForced.house;
-  const keyOf = (w) => (window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null);
-  const tpx = tip ? xw(tip.w) : 0;
-  const tipK = tip ? keyOf(tip.w) : null;
-  /* the svg's spoken note on the DemosAU marks: which cohorts the latest
-     reading covers, and national print vs the site's all-regions
-     weighting (wt) of the printed regional tables */
+  const show = (g, ck, src) => setTip({ g: g.key, ck, src });
+  const hide = (g, src) => setTip((t) => (t && t.g === g.key && (!src || t.src === src) ? null : t));
+  /* the pointer picks the NEAREST mark, not whichever hit circle is on
+     top: a DemosAU diamond can sit a few px from a RedBridge dot (June
+     2026's MRP midpoint lands five days before the wave's), and stacked
+     r=9 circles left the dot under it unreachable. Within 14px for a
+     mouse, 22px for a fingertip */
+  const marks = groups.flatMap((g) => cohorts.filter((ck) => g.d[ck] != null).map((ck) => ({ g, ck, x: Xi(g.xm), y: Y(g.d[ck]) })));
+  const nearest = (ev, reach) => {
+    const svg = ev.currentTarget, r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * (W / r.width), py = (ev.clientY - r.top) * (H / r.height);
+    let best = null, bd = reach * reach;
+    for (const m of marks) {
+      const dd = (m.x - px) ** 2 + (m.y - py) ** 2;
+      if (dd <= bd) { bd = dd; best = m; }
+    }
+    return best;
+  };
+  const tg = tip ? groups.find((g) => g.key === tip.g) : null;
+  const tipK = tg ? keyOf(tg) : null;
+  const half = Math.min((tipW || 220) / 2, W / 2 - 8);
+  const firstX = Math.min(...groups.filter((g) => g.kind !== "elec").map((g) => g.xm));
+  const eNote = emptyNote && emptyNote.find((n) => textWidth(n, 12, 400) <= Xi(firstX) - x0 - 16);
+  const say = (ck, v) => FF_COHORTS[ck].name + " " + v;
   const xnote = (() => {
     if (!extras || !extras.length) return "";
     const la = extras[extras.length - 1], cks = cohorts.filter((ck) => la[ck] != null);
-    if (!cks.length) return "";
-    return " Diamonds mark DemosAU’s MRP " + (la.wt ? "all-regions readings, our weighting of its printed regional tables" : "national readings") + " of " + cks.map((ck) => FF_COHORTS[ck].name).join(", ") + " voters’ share to Labor, latest " + cks.map((ck) => la[ck]).join(", ") + ".";
+    return cks.length ? " Diamonds mark DemosAU’s MRP readings" + (la.wt ? ", our all-regions weighting of its regional tables" : "") + ", latest " + cks.map((ck) => say(ck, la[ck])).join(", ") + "." : "";
   })();
-  const enote = elec ? " Open rings mark the May 2025 election’s own result: " + cohorts.filter((ck) => elec[ck] != null).map((ck) => FF_COHORTS[ck].name + " " + elec[ck]).join(", ") + "." : "";
-  const half = Math.min((tipW || 220) / 2, W / 2 - 8);
+  const enote = elec ? " Open rings mark the 2025 election’s counted preferences: " + cohorts.filter((ck) => elec[ck] != null).map((ck) => say(ck, elec[ck])).join(", ") + "." : "";
+  /* a mark per kind: the wave's dot, the MRP's diamond, the election's ring */
+  const mark = (g, ck) => {
+    const x = Xi(g.xm), y = Y(g.d[ck]), cls = FF_COHORTS[ck].cls;
+    if (g.kind === "wave") return <circle key={ck} cx={x} cy={y} r="3" className={"rd-ff-dot " + cls}></circle>;
+    if (g.kind === "mrp") return <path key={ck} className={"rd-ff-dm " + cls} d={`M${x} ${y - 5.5}L${x + 4.5} ${y}L${x} ${y + 5.5}L${x - 4.5} ${y}Z`}></path>;
+    return <circle key={ck} cx={x} cy={y} r="4.5" className={"rd-ring rd-ff-ring " + cls}></circle>;
+  };
+  const gTitle = (g) => (g.kind === "elec" ? "2025 election, " + g.d.win
+    : (g.kind === "mrp" ? "DemosAU MRP" : g.house) + ", " + (g.d.win || rdMonthYear(g.d.ym)));
+  const gSub = (g) => (g.kind === "elec" ? "Preferences counted reaching Labor over the Coalition"
+    : "Would pick Labor over " + rival + (g.kind === "mrp" && g.d.wt ? " (all regions: our weighting)" : ""));
   return (
-    <figure className="rd-ff" ref={box}>
+    <figure className="rd-ff" ref={box} data-q={q}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`If forced to choose between Labor and ${rival}, the share of each cohort picking Labor, against fieldwork date: latest ${series.map((s) => FF_COHORTS[s.ck].name + " " + s.last[s.ck]).join(", ")}.${xnote}${enote}`}>
+           className={tip && tip.src === "mouse" && tipK ? "link" : null}
+           onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+           onPointerMove={(ev) => {
+             if (ev.pointerType !== "mouse") return;
+             const m = nearest(ev, 14);
+             if (m) { if (!tip || tip.g !== m.g.key || tip.ck !== m.ck || tip.src !== "mouse") show(m.g, m.ck, "mouse"); }
+             else if (tip && tip.src === "mouse") setTip(null);
+           }}
+           onPointerLeave={(ev) => { if (ev.pointerType === "mouse") setTip((t) => (t && t.src === "mouse" ? null : t)); }}
+           onClick={(ev) => {
+             const pt = ptr.current;
+             ptr.current = null;
+             const m = nearest(ev, pt === "mouse" ? 14 : 22);
+             if (!m) { if (pt !== "mouse") setTip(null); return; }
+             ev.stopPropagation();
+             const k = keyOf(m.g);
+             if (pt === "mouse" && k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the forced-choice flow chart"); return; }
+             if (tip && tip.g === m.g.key && tip.ck === m.ck && pt !== "mouse") setTip(null); else show(m.g, m.ck, pt === "mouse" ? "mouse" : "touch");
+           }}
+           aria-label={`If forced to choose between Labor and ${rival}, the share of each group of voters picking Labor, by fieldwork date: RedBridge/Accent’s latest ${series.map((s) => say(s.ck, s.last[s.ck])).join(", ")}.${xnote}${enote}`}>
         {[0, 25, 50, 75, 100].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={"rd-ff-gl" + (v === 50 ? " mid" : "")}></path>)}
         {[0, 25, 50, 75, 100].map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 3.5} className="rd-dis-ax" textAnchor="end">{v}</text>)}
+        {eNote && <text x={(x0 + Xi(firstX)) / 2} y={Y(37.5) + 4} className="rd-fl-empty" textAnchor="middle">{eNote}</text>}
+        {tg && <path d={`M${Xi(tg.xm)} ${top}V${bot}`} className="rd-dis-guide rd-ff-guide"></path>}
+        {/* the election ring's dotted lead-in to the cohort's first wave:
+            the primary chart's idiom - dotted because nothing between was
+            asked */}
+        {elec && series.filter((s) => elec[s.ck] != null).map((s) => (
+          <path key={"ld" + s.ck} d={`M${Xi(elec.xm)} ${Y(elec[s.ck])}L${s.pts[0][0]} ${s.pts[0][1]}`}
+                className={"rd-ff-lead " + FF_COHORTS[s.ck].cls} strokeDasharray={RD_ELECTION_LEAD}></path>
+        ))}
         {series.map((s) => <path key={s.ck} d={monotoneXY(s.pts)} className={"rd-ff-line " + FF_COHORTS[s.ck].cls}></path>)}
-        {waves.map((w) => {
-          const k = keyOf(w);
-          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the forced-choice flow chart"); } };
-          return (
-          <g key={w.date}>
-            {tip && tip.ym === w.ym && w[tip.ck] != null && <circle cx={xw(w)} cy={Y(w[tip.ck])} r="6" className="rd-apd-dothi"></circle>}
-            {series.map((s) => w[s.ck] != null && <circle key={s.ck} cx={xw(w)} cy={Y(w[s.ck])} r="3" className={"rd-ff-dot " + FF_COHORTS[s.ck].cls}></circle>)}
-            {series.map((s, si) => {
-              if (w[s.ck] == null) return null;
-              const est = w.estCohort === s.ck;
-              /* the aria names the fieldwork window itself (win), not the
-                 month the dot would sit in on the old whole-month grid */
-              const aria = `${w.win || rdMonthYear(w.ym)}: ${FF_COHORTS[s.ck].name} voters — Labor ${w[s.ck]}, ${rival} ${100 - w[s.ck]}${est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : ""}` + (k ? "; press Enter to open this poll" : "");
-              /* the first cohort's hit alone is the focusable button; every
-                 cohort keeps its own labelled hit (the June Coalition est
-                 note lives on the Coalition cohort, wherever it sits) */
-              return (
-              <circle key={s.ck} cx={xw(w)} cy={Y(w[s.ck])} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
-                      tabIndex={si === 0 ? "0" : "-1"} role={si === 0 && k ? "button" : "img"}
-                      aria-label={aria}
-                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
-                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(w, s.ck, "mouse"); }}
-                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(w, "mouse"); }}
-                      {...(si === 0 ? { onFocus: (ev) => { if (ev.target.matches(":focus-visible")) show(w, s.ck, "focus"); },
-                                        onBlur: () => hide(w, "focus"),
-                                        onKeyDown: (ev) => {
-                                          if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
-                                          ev.preventDefault();
-                                          open();
-                                        } } : {})}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        const pt = ev.detail === 0 ? "key" : ptr.current;
-                        ptr.current = null;
-                        if (pt === "mouse" || pt === "key") { open(); return; }
-                        if (tip && tip.ym === w.ym && tip.ck === s.ck) setTip(null); else show(w, s.ck, "touch");
-                      }}></circle>
-              );
-            })}
-          </g>
-          );
-        })}
-        {extras && extras.map((d) => {
-          /* DemosAU MRP marks: one hollow diamond per covered cohort, at the
-             window's TRUE midpoint (gen-data's xm) – never a line, and the
-             one mark off this chart's whole-month grid, so the title names
-             the printed window (win) rather than a midpoint month. wt
-             entries are the site's all-regions weighting of the printed
-             regional tables, not a figure the house prints */
-          const dx = Xi(d.xm);
-          return cohorts.filter((ck) => d[ck] != null).map((ck) => (
-          <path key={d.date + ck} className={"rd-ff-dm " + FF_COHORTS[ck].cls}
-                d={`M${dx} ${Y(d[ck]) - 5.5}L${dx + 4.5} ${Y(d[ck])}L${dx} ${Y(d[ck]) + 5.5}L${dx - 4.5} ${Y(d[ck])}Z`}>
-            <title>DemosAU MRP, fieldwork {d.win} — {FF_COHORTS[ck].name} voters: Labor {d[ck]}, {rival === "the Coalition" ? "Coalition" : "One Nation"} {100 - d[ck]}{d.wt ? " (all regions — our weighting)" : ""}</title>
-          </path>
-          ));
-        })}
-        {/* the 2025 election's own reading of this chart's question, at the
-            election's true date: the .rd-ring idiom the primary chart
-            marks every result with (one ring per cohort, no line runs to
-            it) */}
-        {elec && cohorts.filter((ck) => elec[ck] != null).map((ck) => (
-          <g key={"ering" + ck}>
-            <circle cx={Xi(elec.xm)} cy={Y(elec[ck])} r="4.5" className="rd-ring"></circle>
-            <title>{elec.win} — {FF_COHORTS[ck].name} voters’ preferences reaching Labor: {elec[ck]}%</title>
+        {groups.map((g) => (
+          <g key={g.key} className={"rd-ff-g " + g.kind}>
+            {cohorts.filter((ck) => g.d[ck] != null).map((ck) => mark(g, ck))}
           </g>
         ))}
+        {tg && tg.d[tip.ck] != null && <circle cx={Xi(tg.xm)} cy={Y(tg.d[tip.ck])} r="7" className="rd-apd-dothi"></circle>}
         {series.map((s) => (
           <g key={"el" + s.ck}>
             <text x={x1 + 8} y={labY.get(s.ck) - 2} className={"rd-ff-el " + FF_COHORTS[s.ck].cls}>{FF_COHORTS[s.ck].name}</text>
             <text x={x1 + 8} y={labY.get(s.ck) + 12} className={"rd-ff-elv " + FF_COHORTS[s.ck].cls}>{s.last[s.ck]}</text>
           </g>
         ))}
-        <path d={`M${x0} ${bot}H${x1}` + ticks.map((t) => `M${Xi(mi(t.ym))} ${bot}v4`).join("")} className="rd-dis-base"></path>
-        {ticks.map((t) => <text key={t.ym} x={Xi(mi(t.ym))} y={bot + 16} className="rd-dis-ax" textAnchor="middle">{t.lab}</text>)}
+        <path d={`M${x0} ${bot}H${x1}` + ticks.map((t) => `M${Xi(t.m)} ${bot}v4`).join("")} className="rd-dis-base"></path>
+        {ticks.map((t) => <text key={t.m} x={Xi(t.m)} y={bot + 16} className="rd-dis-ax" textAnchor="middle">{t.lab}</text>)}
+        {/* the keyboard's and the screen reader's marks: one per (group,
+            cohort), the first cohort's the group's one tab stop, Enter
+            opening the poll's row where it has one. The pointer never lands
+            on them (pointer-events off) - the svg's nearest-mark pick above
+            serves mouse and touch */}
+        {groups.map((g) => {
+          const k = keyOf(g);
+          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the forced-choice flow chart"); } };
+          return cohorts.filter((ck) => g.d[ck] != null).map((ck, ci) => {
+            const est = g.d.estCohort === ck;
+            const aria = `${gTitle(g)}: ${FF_COHORTS[ck].name} voters, ${g.kind === "elec" ? "preferences to Labor" : "Labor"} ${g.d[ck]}, ${rivalShort} ${Math.round((100 - g.d[ck]) * 10) / 10}`
+              + (g.kind === "mrp" && g.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "")
+              + (est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : "")
+              + (k ? "; press Enter to open this poll" : "");
+            return (
+              <circle key={g.key + ck} cx={Xi(g.xm)} cy={Y(g.d[ck])} r="9" className={"rd-apd-hit rd-ff-hit " + g.kind + (k ? " link" : "")}
+                      tabIndex={ci === 0 ? "0" : "-1"} role={ci === 0 && k ? "button" : "img"} aria-label={aria}
+                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(g, ck, "focus"); }}
+                      onBlur={() => hide(g, "focus")}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                        ev.preventDefault();
+                        if (k) open(); else show(g, ck, "focus");
+                      }}></circle>
+            );
+          });
+        })}
       </svg>
-      {tip && (
-        <span ref={tipBox} className="tip rd-fl-tip rd-ff-tip" style={{ left: Math.min(W - 8 - half, Math.max(8 + half, tpx)) }}>
-          <span className="tip-title">{tip.w.win || rdMonthYear(tip.ym)} · {FF_COHORTS[tip.ck].name} voters</span>
-          <span className="tip-row"><span className="tip-label">Labor</span><span className="tip-val">{tip.w[tip.ck]}%</span></span>
-          <span className="tip-row"><span className="tip-label">{rival === "the Coalition" ? "Coalition" : "One Nation"}</span><span className="tip-val">{100 - tip.w[tip.ck]}%</span></span>
-          {tip.w.n != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {tip.w.n.toLocaleString()}</span></span>}
-          {/* the standard tip-hint chrome (accent div, per RdFlowChart's
-              wave tip — the report link lives in the poll's ledger links);
-              only for an input that can actually open the poll: a touch
-              tap READS the dot, it never navigates */}
+      {tg && (
+        <span ref={tipBox} className="tip rd-fl-tip rd-ff-tip" style={{ left: Math.min(W - 8 - half, Math.max(8 + half, Xi(tg.xm))) }}>
+          <span className="tip-title">{gTitle(tg)}</span>
+          <span className="tip-row rd-ff-tipsub"><span className="tip-label">{gSub(tg)}</span></span>
+          {cohorts.filter((ck) => tg.d[ck] != null).map((ck) => (
+            <span key={ck} className={"tip-row" + (ck === tip.ck ? " on" : "")}>
+              <span className={"tip-swatch rd-ff-sw " + tg.kind + " " + FF_COHORTS[ck].cls}></span>
+              <span className="tip-label">{FF_COHORTS[ck].name} voters</span>
+              <span className="tip-val">{tg.d[ck]}%</span>
+            </span>
+          ))}
+          {tg.d.n != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {tg.d.n.toLocaleString()}</span></span>}
+          {/* the standard tip-hint chrome; only for an input that can
+              actually open the poll: a touch tap READS the mark */}
           {tipK && tip.src !== "touch" && <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
-          {tip.w.estCohort === tip.ck && <span className="tip-row tip-hintwrap"><span className="tip-sub tip-hint">June’s Coalition split combines the report’s printed CLP/LNP/Nat (34) and Liberal (37) rows — no combined row was printed</span></span>}
+          {tg.d.estCohort && <span className="tip-row tip-hintwrap"><span className="tip-sub tip-hint">June’s Coalition figure combines the report’s printed CLP/LNP/Nat (34) and Liberal (37) rows — no combined row was printed</span></span>}
         </span>
       )}
     </figure>
@@ -4974,13 +5011,13 @@ function RdFlows() {
     if (def.waves.length < 2) return def.fallback;
     const parts = def.cohorts.map((ck) => {
       const w = def.waves.filter((x) => x[ck] != null).pop();
-      return `${w[ck]}% of ${FF_COHORTS[ck].name} voters`;
+      return `${w[ck]}% of ${FF_COHORTS[ck].prose} voters`;
     });
     const list = parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
     const moved = ff.filter((r) => r.q === q && r.sig && r.waves[0][r.ck] !== r.waves[r.waves.length - 1][r.ck]);
     const tail = moved.length !== 1 ? "" : (() => {
       const r = moved[0], f = r.waves[0][r.ck], la = r.waves[r.waves.length - 1][r.ck];
-      return " — " + FF_COHORTS[r.ck].name + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + rdMonthYear(r.waves[0].ym);
+      return " — " + FF_COHORTS[r.ck].prose + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + rdMonthYear(r.waves[0].ym);
     })();
     return list + " prefer Labor over " + def.rival + tail;
   };
@@ -5033,28 +5070,44 @@ function RdFlows() {
       {/* how to read the zero, beside the charts it sets (it used to close
           the section, under the RedBridge/Accent pair and the table) */}
       <p className="rd-note rd-fl-read">Implied is the figure a poll’s primary votes give on the {rdElecYear} election’s preference flows. Zero is each pollster’s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster’s first head-to-heads.</p>
-      {FF && <div className="rd-ff">
-        {/* head + dek hand-curated (user's wording, 2026-10-10): refresh by
-            hand, they no longer regenerate. Set as the page's sub-story
-            (.rd-sub/.rd-subdek), as the two-party and leadership sections
-            set theirs */}
-        <h3 className="rd-sub rd-ff-t">RedBridge/Accent’s respondent-allocated preferences</h3>
-        <p className="rd-subdek rd-ff-d">RedBridge/Accent publishes respondent-allocated preferences every wave, and DemosAU’s MRP reports print their own — the diamonds: its printed national One Nation reading on the Labor v Coalition chart, and our all-regions weighting of its regional tables on the Labor v One Nation chart. These tell us the extent to which Coalition voters, for example, prefer One Nation over Labor. Take them with a grain of salt, however, when it comes to predicting the preference flows at the next election. Last-election preference flows consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">perform better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than respondent-allocated preference flows, in that domain.</p>
+      {FF && (() => {
+        /* one x domain for the pair (whole months over every mark either
+           chart draws), so the two charts' months line up side by side */
+        const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || [])].map((d) => d.xm)
+          .concat(FF.elec2025 ? [FF.elec2025.xm] : []).filter((v) => v != null);
+        const dom = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs))];
+        return (
+      <div className="rd-ff">
+        {/* head + dek hand-written (rewritten 2026-10-13: the old head named
+            RedBridge/Accent alone though DemosAU's MRP and the election
+            share the charts). Set as the page's sub-story (.rd-sub/.rd-subdek),
+            as the two-party and leadership sections set theirs */}
+        <h3 className="rd-sub rd-ff-t">What voters say they’d do with their preferences</h3>
+        <p className="rd-subdek rd-ff-d">Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines), and DemosAU’s MRP reports carry the same answers each quarter (the diamonds). The rings mark what preferences actually did at the 2025 election. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently <a className="rd-link rd-link-in" href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html">predicted the next election better<span className="rd-apd-ext" aria-hidden="true">↗</span></a> than the flows voters report.</p>
+        {/* the upper pair's order and anatomy: Labor v Coalition left,
+            Labor v One Nation right, each led by its contest in the rival's
+            ink, then the title the latest wave writes */}
         <div className="rd-fl-two rd-ff-two">
           <div className="rd-fl-one">
-            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("on")}</h4></div>
-            <RdForced waves={FF.vsOn} cohorts={["grn", "coal", "oth"]} rival="One Nation" W={cw} phone={phone} extras={FF.demosOn} />
+            <span className="rd-fl-name lnp">Labor v Coalition</span>
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
+            <RdForced q="co" waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} extras={FF.demos} elec={FF.elec2025} dom={dom} />
           </div>
           <div className="rd-fl-one">
-            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
-            <RdForced waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} rival="the Coalition" W={cw} phone={phone} extras={FF.demos} elec={FF.elec2025} />
+            <span className="rd-fl-name onp">Labor v One Nation</span>
+            <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("on")}</h4></div>
+            <RdForced q="on" waves={FF.vsOn} cohorts={["grn", "coal", "oth"]} rival="One Nation" W={cw} phone={phone} extras={FF.demosOn} dom={dom}
+                      emptyNote={["No election count of this choice", "No election count", "No count"]} />
           </div>
         </div>
-        {(FF.demos || FF.demosOn) && <RdKey className="rd-ckey rd-ff-key" items={[]}>
-          {FF.demos && <span className="rd-key-item"><span className="rd-ff-keydm" aria-hidden="true"></span>One Nation voters’ share to Labor, national — DemosAU MRP</span>}
-          {FF.demosOn && <span className="rd-key-item"><span className="rd-ff-keydm mix" aria-hidden="true"></span>DemosAU MRP, all regions — the site’s enrolment-and-vote weighting of its printed regional tables</span>}
-        </RdKey>}
-      </div>}
+        <RdKey className="rd-ckey rd-ff-key" items={[]}>
+          <span className="rd-key-item"><span className="rd-ff-keyln" aria-hidden="true"><i></i></span>RedBridge/Accent, monthly</span>
+          {(FF.demos || FF.demosOn) && <span className="rd-key-item"><span className="rd-ff-keydm" aria-hidden="true"></span>DemosAU MRP, quarterly</span>}
+          {FF.elec2025 && <span className="rd-key-item"><span className="rd-ff-keyring" aria-hidden="true"></span>2025 election, as counted</span>}
+        </RdKey>
+      </div>
+        );
+      })()}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;
           sets are the two contests, Holm's correction within each — plus
@@ -5067,7 +5120,7 @@ function RdFlows() {
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         This check corrects no other figure on the page.
-        {FF && " RedBridge/Accent’s figures are read straight off its published reports; only June 2026’s Coalition split combines two printed party rows, as that dot’s note says. The DemosAU diamonds on the Labor v One Nation chart are all regions — our enrolment-and-vote weighting of its printed regional tables, not a figure the report adds up itself."}
+        {FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its Labor v One Nation diamonds are our weighting of its printed regional tables by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election."}
       </RdFoot>
     </section>
   );

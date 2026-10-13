@@ -61,11 +61,17 @@ const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!o
 /* the cohort lexicon and the two charts' rosters, mirroring the renderer's
    FF_COHORTS map and its two call sites exactly */
 const CONAME = { grn: "Greens", coal: "Coalition", onp: "One Nation", oth: "Other" };
+/* the titles' prose name ("50% of other voters") */
+const PROSE = { grn: "Greens", coal: "Coalition", onp: "One Nation", oth: "other" };
 const CLS = { grn: "grn", coal: "lnp", onp: "onp", oth: "oth" };
+/* in page order since 2026-10-13: Labor v Coalition left, Labor v One
+   Nation right - the upper drift pair's order. extKey names the chart's
+   DemosAU MRP diamonds; the Coalition chart alone carries the election */
 const CHARTS = [
-  { q: "on", cohorts: ["grn", "coal", "oth"], rival: "One Nation", vsKey: "vsOn" },
-  { q: "co", cohorts: ["grn", "onp", "oth"], rival: "the Coalition", vsKey: "vsCoal" },
+  { q: "co", cohorts: ["grn", "onp", "oth"], rival: "the Coalition", short: "Coalition", vsKey: "vsCoal", extKey: "demos", elec: true },
+  { q: "on", cohorts: ["grn", "coal", "oth"], rival: "One Nation", short: "One Nation", vsKey: "vsOn", extKey: "demosOn", elec: false },
 ];
+const FI = { co: 0, on: 1 };
 
 /* the pressed-choice battery, recomputed independently of the page: one
    straight line per (chart, cohort) through its Labor-share dots (w=1 like
@@ -106,7 +112,7 @@ const axisMap = (ticks) => {
   return { x: (xm) => x1 + (xm - m1) * per };
 };
 const fmtMax = (got, want) => got.length ? Math.max(...got.map((x, k) => Math.abs(x - want[k]))).toFixed(2) : "–";
-const winInAria = (w, a) => (w.win ? a.startsWith(w.win + ":") : a.startsWith(monY(w.ym) + ":"));
+const winInAria = (w, a) => a.startsWith("RedBridge/Accent, " + (w.win || monY(w.ym)) + ":");
 function lineFit(pts) {
   const n = pts.length;
   if (n - 2 < 3) return null;
@@ -118,7 +124,8 @@ function lineFit(pts) {
   return { b, t: b / se, p: tTail(b / se, df) };
 }
 function expectedForced(FF) {
-  const rows = CHARTS.flatMap((c) => c.cohorts.map((ck) => {
+  /* the trend table keeps its own order: Labor v One Nation's cohorts first */
+  const rows = [CHARTS[1], CHARTS[0]].flatMap((c) => c.cohorts.map((ck) => {
     const waves = FF[c.vsKey].filter((w) => w[ck] != null);
     return { key: c.q + ck, ck, q: c.q, waves, fit: lineFit(waves.map((w) => ({ ym: w.ym, v: w[ck] }))) };
   }));
@@ -132,13 +139,13 @@ function expectedForced(FF) {
     const waves = FF[c.vsKey];
     const parts = c.cohorts.map((ck) => {
       const w = [...waves].reverse().find((x) => x[ck] != null);
-      return `${w[ck]}% of ${CONAME[ck]} voters`;
+      return `${w[ck]}% of ${PROSE[ck]} voters`;
     });
     const list = parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
     const moved = rows.filter((r) => r.q === c.q && r.sig && r.waves[0][r.ck] !== r.waves[r.waves.length - 1][r.ck]);
     const tail = moved.length !== 1 ? "" : (() => {
       const r = moved[0], f = r.waves[0][r.ck], la = r.waves[r.waves.length - 1][r.ck];
-      return " — " + CONAME[r.ck] + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + monY(r.waves[0].ym);
+      return " — " + PROSE[r.ck] + " voters " + (la > f ? "up" : "down") + " from " + f + "% in " + monY(r.waves[0].ym);
     })();
     return list + " prefer Labor over " + c.rival + tail;
   };
@@ -152,18 +159,22 @@ function expectedForced(FF) {
 /* per-fig expectations straight from the payload: dot sequences per cohort
    (in wave order), latest share per cohort, hit tally */
 function expectFig(FF, ci) {
-  const c = CHARTS[ci], waves = FF[c.vsKey];
+  const c = CHARTS[ci], waves = FF[c.vsKey], ext = FF[c.extKey] || [], el = c.elec && FF.elec2025 ? [FF.elec2025] : [];
   const dots = {}, latest = {}, counts = {};
+  /* one hit per (mark group, cohort) - wave dots, MRP diamonds, election
+     rings alike; one tab stop per group; a button where the group has a
+     poll row to open (waves and MRPs, never the election) */
   let nHits = 0;
-  for (const w of waves) for (const ck of c.cohorts) if (w[ck] != null) nHits++;
+  for (const w of [...waves, ...ext, ...el]) for (const ck of c.cohorts) if (w[ck] != null) nHits++;
   for (const ck of c.cohorts) {
     const ws = waves.filter((w) => w[ck] != null);
     dots[CLS[ck]] = ws.map((w) => w[ck]);
     counts[CLS[ck]] = ws.length;
     latest[ck] = ws.length ? ws[ws.length - 1][ck] : null;
   }
-  const tabbable = waves.filter((w) => w[c.cohorts[0]] != null).length;
-  return { nHits, dots, counts, latest, tabbable,
+  const tabbable = waves.length + ext.length + el.length;
+  const nButtons = waves.length + ext.length;
+  return { nHits, dots, counts, latest, tabbable, nButtons, nDm: ext.reduce((a, d) => a + c.cohorts.filter((ck) => d[ck] != null).length, 0),
            ms: [...new Set(waves.map((w) => w.ym))] };
 }
 
@@ -203,12 +214,19 @@ const measure = () => page.evaluate(() => {
       W: +svg.getAttribute("width"),
       aria: svg.getAttribute("aria-label") || "",
       ticks: [...fig.querySelectorAll("text.rd-dis-ax")].map((t) => ({ s: t.textContent.trim(), x: +t.getAttribute("x") })).filter((l) => /^[A-Z]/.test(l.s)),
+      q: fig.dataset.q,
       erings: [...fig.querySelectorAll("circle.rd-ring")].map((c) => ({ x: +c.getAttribute("cx"), y: +c.getAttribute("cy"),
-               t: (c.parentElement.querySelector("title") || { textContent: "" }).textContent })),
+               cls: c.getAttribute("class").replace("rd-ring rd-ff-ring ", "") })),
+      leads: [...fig.querySelectorAll("path.rd-ff-lead")].map((p) => ({ cls: p.getAttribute("class").replace("rd-ff-lead ", ""),
+               d: p.getAttribute("d"), dash: p.getAttribute("stroke-dasharray") })),
+      nDm: fig.querySelectorAll("path.rd-ff-dm").length,
+      waveArias: hits.filter((h) => h.classList.contains("wave")).map((h) => h.getAttribute("aria-label") || ""),
+      titled: fig.querySelectorAll("title").length,
       lines, dots,
       nHits: hits.length,
       tabbable: hits.filter((h) => h.getAttribute("tabindex") === "0").length,
       nButtons: hits.filter((h) => h.getAttribute("role") === "button").length,
+      contest: (fig.closest(".rd-fl-one").querySelector(".rd-fl-name") || {}).textContent || null,
       arias: hits.map((h) => h.getAttribute("aria-label") || ""),
       gls: fig.querySelectorAll(".rd-ff-gl").length,
       els: elsT.map((t) => t.textContent),
@@ -264,7 +282,12 @@ const FFexp = FF ? expectedForced(FF) : null;
 await gotoFlows(1366);
 const d = await measure();
 check(d.nFig === 2, `desktop: two forced-choice figures (${d.nFig})`);
-check(d.h3 === "RedBridge/Accent’s respondent-allocated preferences", `desktop: section head is the respondent-allocated line`);
+check(d.h3 === "What voters say they’d do with their preferences", `desktop: section head names no one house (${JSON.stringify(d.h3)})`);
+check(JSON.stringify(d.figs.map((f) => f.q)) === '["co","on"]' && d.figs[0].contest === "Labor v Coalition" && d.figs[1].contest === "Labor v One Nation",
+  `desktop: Labor v Coalition left, Labor v One Nation right, each led by its contest (${d.figs.map((f) => f.contest).join(" | ")})`);
+check(JSON.stringify(d.figs[0].ticks) === JSON.stringify(d.figs[1].ticks),
+  "desktop: the pair shares one month axis (identical tick labels and x)");
+check(d.figs.every((f) => f.titled === 0), "desktop: no native <title> tooltips - every mark tips through the shared card");
 check(d.orderKeyThenForced.iKey > -1 && d.orderKeyThenForced.iNote === d.orderKeyThenForced.iKey + 1
     && d.orderKeyThenForced.iFF === d.orderKeyThenForced.iKey + 2,
   `desktop: the reading note sits under the drift key, the forced pair under it (key idx ${d.orderKeyThenForced.iKey}, note idx ${d.orderKeyThenForced.iNote}, forced idx ${d.orderKeyThenForced.iFF})`);
@@ -277,7 +300,7 @@ check(d.orderKeyThenForced.iTsig === d.orderKeyThenForced.iFF + 1,
   check(Math.abs(a.top - b.top) <= 1, `desktop: charts share a row (top ${a.top} vs ${b.top})`);
 }
 for (const [i, f] of d.figs.entries()) {
-  const cam = CHARTS[i], exp = EXP[i], tag = i === 0 ? "v-ON chart" : "v-Coalition chart";
+  const cam = CHARTS[i], exp = EXP[i], tag = cam.q === "on" ? "v-ON chart" : "v-Coalition chart";
   check(f.lines.length === 3, `desktop ${tag}: three cohort lines (${f.lines.length})`);
   check(JSON.stringify(f.lines.map((l) => l.cls).sort()) === JSON.stringify(cam.cohorts.map((c) => CLS[c]).sort()),
     `desktop ${tag}: line classes are the party hues ${cam.cohorts.map((c) => CLS[c]).join("/")} (${f.lines.map((l) => l.cls).join(", ")})`);
@@ -291,8 +314,9 @@ for (const [i, f] of d.figs.entries()) {
   }
   check(f.gls === 5, `desktop ${tag}: five gridlines`);
   check(f.nHits === exp.nHits, `desktop ${tag}: ${exp.nHits} hit circles, one per cohort dot (${f.nHits})`);
-  check(f.tabbable === exp.tabbable && f.nButtons === exp.tabbable,
-    `desktop ${tag}: the first cohort's hit alone is the focusable button (${f.tabbable}/${f.nButtons} of ${exp.tabbable})`);
+  check(f.tabbable === exp.tabbable && f.nButtons === exp.nButtons,
+    `desktop ${tag}: one tab stop per mark group, a button wherever a poll row opens (${f.tabbable}/${f.nButtons} of ${exp.tabbable}/${exp.nButtons})`);
+  check(f.nDm === exp.nDm, `desktop ${tag}: one DemosAU diamond per MRP cohort cell (${f.nDm} of ${exp.nDm})`);
   check(f.els.length === 3 && JSON.stringify(f.els) === JSON.stringify(cam.cohorts.map((c) => CONAME[c])),
     `desktop ${tag}: end labels name the three cohorts (${f.els.join(" · ")})`);
   check(JSON.stringify(f.elvs) === JSON.stringify(cam.cohorts.map((c) => String(exp.latest[c]))),
@@ -301,7 +325,7 @@ for (const [i, f] of d.figs.entries()) {
   const labYs = [...f.elys].sort((p, q) => p - q);
   check(labYs.every((y, j) => j === 0 || y - labYs[j - 1] >= 27),
     `desktop ${tag}: the end-label dodge keeps blocks apart (min gap ${Math.min(...labYs.slice(1).map((y, j) => Math.round(y - labYs[j])))})`);
-  const bot = 230 - 34;
+  const bot = 236 - 34;
   check(Object.values(f.dots).every((arr) => arr.every((p) => p.y > 0 && p.y < bot)),
     `desktop ${tag}: every dot inside the plot`);
   for (const ck of cam.cohorts) {
@@ -312,8 +336,8 @@ for (const [i, f] of d.figs.entries()) {
   /* every hit aria names the wave's own printed fieldwork window, not a
      month-of-the-grid: the renderer speaks w.win */
   const wsList = FF[cam.vsKey];
-  check(f.arias.every((s) => wsList.some((w) => winInAria(w, s)) && /: (Greens|Coalition|One Nation|Other) voters — Labor \d/.test(s)),
-    `desktop ${tag}: every hit aria reads "<window>: <cohort> voters — Labor N, …"`);
+  check(f.waveArias.length && f.waveArias.every((s) => wsList.some((w) => winInAria(w, s)) && /: (Greens|Coalition|One Nation|Other) voters, Labor \d+, (Coalition|One Nation) \d/.test(s)),
+    `desktop ${tag}: every wave hit's aria reads "RedBridge/Accent, <window>: <cohort> voters, Labor N, <rival> M"`);
   /* dots ride each wave's TRUE fieldwork midpoint: derive the empirical
      month-index → x map from the printed tick labels (year tokens
      propagate), then every cohort dot must sit at its payload xm through
@@ -330,40 +354,49 @@ for (const [i, f] of d.figs.entries()) {
     const e = FF.elec2025;
     if (cam.q === "co" && e) {
       check(f.erings.length === 3, `desktop ${tag}: three election rings, one per cohort (${f.erings.length})`);
+      check(Math.abs(e.xm - (2025 * 12 + 4 + 2 / 31)) < 1e-3, `payload: the election rides 3 May 2025 on the month-index scale (xm ${e.xm})`);
+      check(JSON.stringify(f.erings.map((g) => g.cls).sort()) === JSON.stringify(cam.cohorts.map((c) => CLS[c]).sort()),
+        `desktop ${tag}: each ring takes its cohort's colour (${f.erings.map((g) => g.cls).join(",")})`);
+      /* each ring joins its cohort's first wave dot with the primary chart's
+         dotted lead-in */
+      check(f.leads.length === 3 && f.leads.every((l) => {
+        const ring = f.erings.find((g) => g.cls === l.cls), dot = f.dots[l.cls][0];
+        const m = /^M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)$/.exec(l.d);
+        return ring && dot && m && l.dash === "0.5 4" && Math.abs(+m[1] - ring.x) < 0.5 && Math.abs(+m[2] - ring.y) < 0.5
+          && Math.abs(+m[3] - dot.x) < 0.5 && Math.abs(+m[4] - dot.y) < 0.5;
+      }), `desktop ${tag}: three dotted lead-ins, ring to the cohort's first wave (${f.leads.length})`);
       const eVals = [["grn", e.grn], ["onp", e.onp], ["oth", e.oth]];
       check(f.erings.every((g) => Math.abs(g.x - tk.x(e.xm)) < 1.5),
         `desktop ${tag}: the rings sit at the election's true date x (${f.erings.map((g) => g.x.toFixed(1)).join(",")} vs ${tk.x(e.xm).toFixed(1)})`);
       check(JSON.stringify(f.erings.map((g) => Math.round(1000 * (bot - g.y) / (bot - 16)) / 10).sort((p, q) => p - q)) === JSON.stringify(eVals.map((p) => p[1]).sort((p, q) => p - q)),
         `desktop ${tag}: the rings vmap the election's flows (${eVals.map((p) => p[1]).join("/")})`);
-      check(f.erings.every((g) => eVals.some(([ck, v]) => g.t.includes(`The May 2025 election`) && g.t.includes(CONAME[ck] + " voters") && g.t.includes(String(v)))),
-        `desktop ${tag}: every ring's title names the election and its cohort's figure`);
-      check(f.aria.includes("Open rings mark the May 2025 election’s own result: Greens " + e.grn + ", One Nation " + e.onp + ", Other " + e.oth + "."),
+      check(f.aria.includes("Open rings mark the 2025 election’s counted preferences: Greens " + e.grn + ", One Nation " + e.onp + ", Other " + e.oth + "."),
         `desktop ${tag}: the svg's spoken note carries the election result`);
     } else {
-      check(f.erings.length === 0, `desktop ${tag}: no election rings on the v-One-Nation chart (${f.erings.length})`);
+      check(f.erings.length === 0 && f.leads.length === 0, `desktop ${tag}: no election rings or lead-ins on the v-One-Nation chart (${f.erings.length})`);
       check(!f.aria.includes("Open rings"), `desktop ${tag}: no election note in the aria`);
     }
   }
 }
 {
   const juneOn = FF.vsOn.find((w) => w.ym === "2026-06");
-  const ariaOn = d.figs[0].arias.filter((s) => s.startsWith(juneOn.win + ":"));
+  const ariaOn = d.figs[FI.on].waveArias.filter((s) => s.startsWith("RedBridge/Accent, " + juneOn.win + ":"));
   const juneCoal = ariaOn.find((s) => s.includes("Coalition voters"));
-  check(!!juneCoal && juneCoal.includes(`Coalition voters — Labor ${juneOn.coal}, One Nation ${100 - juneOn.coal}`) && juneCoal.includes("combines") && juneCoal.includes("CLP/LNP/Nat"),
+  check(!!juneCoal && juneCoal.includes(`Coalition voters, Labor ${juneOn.coal}, One Nation ${100 - juneOn.coal}`) && juneCoal.includes("combines") && juneCoal.includes("CLP/LNP/Nat"),
     `desktop v-ON June: the Coalition dot's aria reads the combined-rows note (${JSON.stringify(juneCoal)})`);
   check(ariaOn.filter((s) => !s.includes("Coalition voters")).every((s) => !s.includes("combines")),
     "desktop v-ON June: the printed cohorts' arias stay plain");
-  check(!d.figs[1].arias.some((s) => s.includes("combines")),
+  check(!d.figs[FI.co].arias.some((s) => s.includes("combines")),
     "desktop v-Coalition: no est note anywhere on the second chart (all cells printed)");
 }
 const viewH = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
-check(viewH === 230, `desktop: plot height 230 (${viewH})`);
+check(viewH === 236, `desktop: plot height 236 (${viewH})`);
 
 // the titles tell all three cohorts' latest shares; tails ride the battery
 check(d.h4s.length === 2 && d.h4s[0] === FFexp.titles[0],
-  `desktop: v-ON title is the three-share line${FFexp.titles[0].includes(" — ") ? " + its one-cohort tail" : ""} (${JSON.stringify(d.h4s[0])})`);
+  `desktop: v-Coalition title is the three-share line${FFexp.titles[0].includes(" — ") ? " + its one-cohort tail" : ""} (${JSON.stringify(d.h4s[0])})`);
 check(d.h4s.length === 2 && d.h4s[1] === FFexp.titles[1],
-  `desktop: v-Coalition title is the three-share line${FFexp.titles[1].includes(" — ") ? " + tail" : ""} (${JSON.stringify(d.h4s[1])})`);
+  `desktop: v-ON title is the three-share line${FFexp.titles[1].includes(" — ") ? " + tail" : ""} (${JSON.stringify(d.h4s[1])})`);
 // the trend-significance table's pressed set carries the same battery, six rows
 check(d.tsigHeads && JSON.stringify(d.tsigHeads) === JSON.stringify(["Series", "First → last", "Slope, pts/yr", "t", "Significant"]),
   `tsig heads fit gaps and shares (${JSON.stringify(d.tsigHeads)})`);
@@ -385,7 +418,7 @@ const hitAt = async (fi, ym, co) => {
     const fig = [...document.querySelectorAll("figure.rd-ff")][fi];
     return [...fig.querySelectorAll("circle.rd-apd-hit")].find((h) => {
       const a = h.getAttribute("aria-label") || "";
-      return a.startsWith(ym + ":") && a.includes(co + " voters");
+      return a.startsWith(ym + ":") && a.includes(": " + co + " voters");
     });
   };
   const has = await page.evaluate((fi, ym, co, sel) => {
@@ -408,6 +441,9 @@ const readTip = (fi) => page.evaluate((fi) => {
   if (!t || t.offsetParent === null) return null;
   return {
     title: t.querySelector(".tip-title").textContent,
+    sub: (t.querySelector(".rd-ff-tipsub .tip-label") || {}).textContent || null,
+    on: (t.querySelector(".tip-row.on .tip-label") || {}).textContent || null,
+    sw: [...t.querySelectorAll(".tip-row .rd-ff-sw")].map((x) => x.getAttribute("class").replace("tip-swatch rd-ff-sw ", "")),
     rows: [...t.querySelectorAll(".tip-row .tip-label")].map((l) => l.textContent.trim()),
     vals: [...t.querySelectorAll(".tip-row .tip-val")].map((v) => v.textContent.trim()),
     hint: (t.querySelector("div.tip-hint") || {}).textContent || null,
@@ -424,53 +460,72 @@ const hover = async (fi, ym, co) => {
   return readTip(fi);
 };
 
-// tips: the latest wave on the v-ON chart's Coalition cohort — the standard
-// open-poll chrome, per-cohort title, no report link, no est on a printed wave
+// tips: every mark tips through the one card - the group's title (house +
+// window, or the election), a sub naming the question, then every cohort's
+// Labor share at that date with a swatch in the mark's shape, the hovered
+// cohort's row picked out
 const lastOn = FF.vsOn[FF.vsOn.length - 1], lastCo = FF.vsCoal[FF.vsCoal.length - 1];
 const lastOnWin = lastOn.win;
+const RB = (win) => "RedBridge/Accent, " + win;
 {
-  const tip = await hover(0, lastOnWin, "Coalition");
-  check(!!tip && tip.title === `${lastOnWin} · Coalition voters`,
-    `v-ON ${lastOnWin} coal hover: tip titled "<window> · Coalition voters" (${JSON.stringify(tip && tip.title)})`);
-  check(tip && tip.rows.includes("Labor") && tip.vals.includes(`${lastOn.coal}%`),
-    `v-ON coal tip: Labor row ${lastOn.coal}% (${JSON.stringify(tip && tip.vals)})`);
-  check(tip && tip.rows.includes("One Nation") && tip.vals.includes(`${100 - lastOn.coal}%`),
-    `v-ON coal tip: One Nation row ${100 - lastOn.coal}%`);
-  check(tip && tip.rows.includes("Sample") && tip.vals.includes(`n = ${lastOn.n.toLocaleString()}`),
-    `v-ON coal tip: sample row ${lastOn.n}`);
-  check(tip && tip.hint === "Click to open this poll in All polls", `v-ON coal tip: the standard open-poll hint (${JSON.stringify(tip && tip.hint)})`);
-  check(tip && tip.link === false, "v-ON coal tip: no wave-report link in the tip (it lives in the opened poll's ledger)");
-  check(tip && tip.est.length === 0 && tip.wrap === 0, "v-ON coal tip: no est note on a printed wave");
+  const tip = await hover(FI.on, RB(lastOnWin), "Coalition");
+  check(!!tip && tip.title === RB(lastOnWin), `v-ON ${lastOnWin} coal hover: tip titled "RedBridge/Accent, <window>" (${JSON.stringify(tip && tip.title)})`);
+  check(tip && tip.sub === "Would pick Labor over One Nation", `v-ON tip: the question as its sub (${JSON.stringify(tip && tip.sub)})`);
+  check(tip && JSON.stringify(tip.rows.filter((r) => r.endsWith(" voters"))) === JSON.stringify(["Greens voters", "Coalition voters", "Other voters"])
+      && tip.vals.includes(`${lastOn.coal}%`) && tip.vals.includes(`${lastOn.grn}%`) && tip.vals.includes(`${lastOn.oth}%`),
+    `v-ON tip: every cohort's share at the wave (${JSON.stringify(tip && tip.vals)})`);
+  check(tip && tip.on === "Coalition voters", `v-ON tip: the hovered cohort's row is picked out (${JSON.stringify(tip && tip.on)})`);
+  check(tip && tip.sw.every((x) => x.startsWith("wave ")), `v-ON tip: dot swatches for a wave (${JSON.stringify(tip && tip.sw)})`);
+  check(tip && tip.rows.includes("Sample") && tip.vals.includes(`n = ${lastOn.n.toLocaleString()}`), `v-ON tip: sample row ${lastOn.n}`);
+  check(tip && tip.hint === "Click to open this poll in All polls", `v-ON tip: the standard open-poll hint (${JSON.stringify(tip && tip.hint)})`);
+  check(tip && tip.link === false, "v-ON tip: no wave-report link in the tip (it lives in the opened poll's ledger)");
+  check(tip && tip.est.length === 0 && tip.wrap === 0, "v-ON tip: no est note on a printed wave");
 }
-// the June est note rides only the v-ON chart's Coalition cohort
+// the June est note rides the v-ON chart's June wave alone
 {
   const juneOn = FF.vsOn.find((w) => w.ym === "2026-06");
-  const tipJ = await hover(0, juneOn.win, "Coalition");
-  check(!!tipJ && tipJ.title === `${juneOn.win} · Coalition voters`
-      && tipJ.est.length === 1 && tipJ.est[0].includes("CLP/LNP/Nat (34)") && tipJ.est[0].includes("Liberal (37)"),
-    `v-ON June coal tip: the combined-rows note rides the June dot (${JSON.stringify(tipJ && tipJ.est)})`);
-  check(tipJ && tipJ.hint === "Click to open this poll in All polls", `v-ON June coal tip: the open-poll hint beside the est note (${JSON.stringify(tipJ && tipJ.hint)})`);
-  check(tipJ && tipJ.wrap === 1, `v-ON June coal tip: only the est note is a wrapped row (${tipJ && tipJ.wrap})`);
-  check(tipJ && tipJ.vals.includes(`${juneOn.coal}%`), `v-ON June coal tip: the derived 36 (read ${JSON.stringify(tipJ && tipJ.vals)})`);
-  const tipG = await hover(0, juneOn.win, "Greens");
-  check(!!tipG && tipG.est.length === 0 && tipG.wrap === 0, "v-ON June Greens tip: no est note on a printed cohort");
+  const tipJ = await hover(FI.on, RB(juneOn.win), "Greens");
+  check(!!tipJ && tipJ.est.length === 1 && tipJ.est[0].includes("CLP/LNP/Nat (34)") && tipJ.est[0].includes("Liberal (37)"),
+    `v-ON June tip: the combined-rows note rides the June wave (${JSON.stringify(tipJ && tipJ.est)})`);
+  check(tipJ && tipJ.hint === "Click to open this poll in All polls", `v-ON June tip: the open-poll hint beside the est note (${JSON.stringify(tipJ && tipJ.hint)})`);
+  check(tipJ && tipJ.wrap === 1, `v-ON June tip: only the est note is a wrapped row (${tipJ && tipJ.wrap})`);
+  check(tipJ && tipJ.vals.includes(`${juneOn.coal}%`), `v-ON June tip: the derived 36 (read ${JSON.stringify(tipJ && tipJ.vals)})`);
 }
 // the v-Coalition chart's tips name the Coalition as the rival
 {
-  const tip = await hover(1, lastCo.win, "Greens");
-  check(!!tip && tip.title === `${lastCo.win} · Greens voters`,
-    `v-Coalition ${lastCo.win} Greens hover: per-cohort title (${JSON.stringify(tip && tip.title)})`);
-  check(tip && tip.rows.includes("Coalition") && !tip.rows.includes("the Coalition"),
-    `v-Coalition Greens tip: rival row reads Coalition bare (${JSON.stringify(tip && tip.rows)})`);
-  check(tip && tip.vals.includes(`${lastCo.grn}%`) && tip.vals.includes(`${100 - lastCo.grn}%`),
-    `v-Coalition Greens tip: ${lastCo.grn} / ${100 - lastCo.grn}`);
+  const tip = await hover(FI.co, RB(lastCo.win), "Greens");
+  check(!!tip && tip.title === RB(lastCo.win) && tip.sub === "Would pick Labor over the Coalition",
+    `v-Coalition ${lastCo.win} Greens hover: title + question (${JSON.stringify(tip && [tip.title, tip.sub])})`);
+  check(tip && tip.vals.includes(`${lastCo.grn}%`) && tip.vals.includes(`${lastCo.onp}%`), `v-Coalition tip: ${lastCo.grn} / ${lastCo.onp}`);
+}
+// the election rings tip like the primary chart's: ring swatches, no open hint
+{
+  const e = FF.elec2025;
+  const tip = await hover(FI.co, "2025 election, " + e.win, "One Nation");
+  check(!!tip && tip.title === "2025 election, " + e.win && tip.sub === "Preferences counted reaching Labor over the Coalition",
+    `election ring hover: tip names the election (${JSON.stringify(tip && [tip.title, tip.sub])})`);
+  check(tip && [e.grn, e.onp, e.oth].every((v) => tip.vals.includes(v + "%")) && tip.sw.every((x) => x.startsWith("elec ")) && tip.on === "One Nation voters",
+    `election ring tip: the three counted flows, ring swatches, hovered row picked (${JSON.stringify(tip && tip.vals)})`);
+  check(tip && tip.hint === null, "election ring tip: no open hint (the election has no poll row)");
+}
+// DemosAU diamonds tip too, on both charts, and open their MRP's row
+for (const c of CHARTS) {
+  const ext = FF[c.extKey] || [];
+  if (!ext.length) continue;
+  const dd = ext[ext.length - 1], ck = c.cohorts.find((k) => dd[k] != null);
+  const tip = await hover(FI[c.q], "DemosAU MRP, " + dd.win, CONAME[ck]);
+  check(!!tip && tip.title === "DemosAU MRP, " + dd.win && tip.vals.includes(dd[ck] + "%") && tip.sw.every((x) => x.startsWith("mrp ")),
+    `${c.q} DemosAU diamond hover: titled by its window, diamond swatches, ${CONAME[ck]} ${dd[ck]}% (${JSON.stringify(tip && [tip.title, tip.vals])})`);
+  check(tip && tip.sub === "Would pick Labor over " + c.rival + (dd.wt ? " (all regions: our weighting)" : ""),
+    `${c.q} DemosAU tip: the question, flagged where it's our weighting (${JSON.stringify(tip && tip.sub)})`);
+  check(tip && tip.hint === "Click to open this poll in All polls", `${c.q} DemosAU tip: opens its MRP's row (${JSON.stringify(tip && tip.hint)})`);
 }
 
 // click the latest v-ON Coalition dot with a real mouse: the wave opens in
 // All polls, named by the return button, and its wave's forced-choice
 // figures sit in the poll ledger's "as published" section
 {
-  const c = await hitAt(0, lastOnWin, "Coalition");
+  const c = await hitAt(FI.on, RB(lastOnWin), "Coalition");
   await page.mouse.click(c.x, c.y);
   let land = null;
   try {
@@ -567,7 +622,7 @@ check(m.nFig === 2, `phone: two figures (${m.nFig})`);
   check(Math.abs(a.top - b.top) > 40, `phone: real vertical stride between charts (${b.top - a.top})`);
   check(m.sw <= m.iw + 1, `phone: no horizontal overflow (sw ${m.sw} vs iw ${m.iw})`);
   for (const [i, f] of [a, b].entries()) {
-    const tag = i === 0 ? "v-ON" : "v-Coalition";
+    const tag = CHARTS[i].q === "on" ? "v-ON" : "v-Coalition";
     check(f.lines.length === 3, `phone ${tag}: three cohort lines (${f.lines.length})`);
     check(f.nHits === EXP[i].nHits, `phone ${tag}: ${EXP[i].nHits} hit circles, one per cohort dot (${f.nHits})`);
     check(JSON.stringify(f.els) === JSON.stringify(CHARTS[i].cohorts.map((c) => CONAME[c])),
@@ -577,7 +632,7 @@ check(m.nFig === 2, `phone: two figures (${m.nFig})`);
 check(m.h4s.length === 2 && m.h4s[0] === FFexp.titles[0] && m.h4s[1] === FFexp.titles[1],
   `phone: same dynamic titles as desktop (${JSON.stringify(m.h4s)})`);
 const viewH2 = await page.evaluate(() => +document.querySelectorAll("figure.rd-ff svg")[0].getAttribute("height"));
-check(viewH2 === 190, `phone: plot height 190 (${viewH2})`);
+check(viewH2 === 200, `phone: plot height 200 (${viewH2})`);
 
 await browser.close();
 console.log(fails ? `FAIL (${fails})` : "rd-forced-charts: ALL CHECKS PASSED");
