@@ -5253,6 +5253,50 @@ function RdFlows() {
             {FF_REGIONS.map(([k, name]) => <option key={k || "all"} value={k}>{name}</option>)}
           </select>
         </div>
+        {/* the flows themselves, tabulated: one grid per contest, ALWAYS on
+            show straight under the head, above the charts (user 2026-10-13:
+            "take it out of that dropdown view and remove that dropdown
+            view... just always display the tables above the charts" - the
+            day's first form folded away as a <details> beside the
+            trend-significance battery). It follows the region menu, as the
+            charts do, wearing its own chrome (.rd-ft), never RdTsig's - that
+            table's No-row fade would grey every row of a table with no test
+            in it */}
+        {(ftContests || []).length > 0 && (
+          <div className="rd-ft">
+            <p className="rd-ft-view">{ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters"}<span>, from the menu above</span></p>
+            <div className="rd-ft-grid">
+              {ftContests.map((c) => (
+                <table key={c.key} className="rd-ft-table">
+                  <caption>{c.name}<span className="rd-ft-to">Share of each group’s voters choosing {c.to}, %</span></caption>
+                  <thead>
+                    <tr>
+                      <th scope="col"><span className="sr-only">Voters</span></th>
+                      {c.cols.map((col) => (
+                        <th key={col.key} scope="col" className={col.site ? "rd-ft-site" : undefined}>{col.h}<span>{col.sub}{col.wt ? "*" : ""}</span></th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {c.cohorts.map((ck) => (
+                      <tr key={ck}>
+                        <th scope="row"><i className={"rd-ft-sw " + FF_COHORTS[ck].cls} aria-hidden="true"></i>{FF_COHORTS[ck].name}</th>
+                        {c.cols.map((col) => {
+                          const v = col.d && col.d[ck];
+                          return <td key={col.key} className={col.site ? "rd-ft-site" : undefined}>
+                            {v != null ? ftFig(v, col.dp) : <span className="rd-ft-nil" aria-label="not asked">–</span>}
+                            {v != null && col.band && <span className="rd-ft-band"> ±{ftFig(col.band[ck])}</span>}
+                          </td>;
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ))}
+            </div>
+            <p className="rd-note rd-ft-note">{"The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and in the One Nation charts (the Labor v Coalition chart still draws its wave, as that chart’s sources are all national)." : (ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".")) + " The 2026 state and by-election counts stay on the charts."}</p>
+          </div>
+        )}
         {/* the upper pair's order and anatomy: Labor v Coalition left,
             Labor v One Nation right, each led by its contest in the rival's
             ink, then the title the latest wave writes */}
@@ -5292,46 +5336,6 @@ function RdFlows() {
       </div>
         );
       })()}
-      {/* the flows themselves, tabulated: a fold of one grid per contest,
-          directly above the battery, following the region menu above the
-          charts. Its own chrome (.rd-ft), not RdTsig's - that table's
-          No-row fade would grey every row of a table with no test in it */}
-      {ftContests && ftContests.length > 0 && (
-        <details className="rd-evdrop rd-ft">
-          <summary>Flows table</summary>
-          <p className="rd-ft-view">{ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters"}<span>, from the menu above the charts</span></p>
-          <div className="rd-ft-grid">
-            {ftContests.map((c) => (
-              <table key={c.key} className="rd-ft-table">
-                <caption>{c.name}<span className="rd-ft-to">Share of each group’s voters choosing {c.to}, %</span></caption>
-                <thead>
-                  <tr>
-                    <th scope="col"><span className="sr-only">Voters</span></th>
-                    {c.cols.map((col) => (
-                      <th key={col.key} scope="col" className={col.site ? "rd-ft-site" : undefined}>{col.h}<span>{col.sub}{col.wt ? "*" : ""}</span></th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {c.cohorts.map((ck) => (
-                    <tr key={ck}>
-                      <th scope="row"><i className={"rd-ft-sw " + FF_COHORTS[ck].cls} aria-hidden="true"></i>{FF_COHORTS[ck].name}</th>
-                      {c.cols.map((col) => {
-                        const v = col.d && col.d[ck];
-                        return <td key={col.key} className={col.site ? "rd-ft-site" : undefined}>
-                          {v != null ? ftFig(v, col.dp) : <span className="rd-ft-nil" aria-label="not asked">–</span>}
-                          {v != null && col.band && <span className="rd-ft-band"> ±{ftFig(col.band[ck])}</span>}
-                        </td>;
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ))}
-          </div>
-          <p className="rd-note rd-ft-note">{"The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and in the One Nation charts (the Labor v Coalition chart still draws its wave, as that chart’s sources are all national)." : (ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".")) + " The 2026 state and by-election counts stay on the charts."}</p>
-        </details>
-      )}
       {/* the drift battery: has each pollster's gap MOVED over the term,
           not just sat off zero at the now-mark? Computed as flSets above;
           sets are the two contests, Holm's correction within each — plus

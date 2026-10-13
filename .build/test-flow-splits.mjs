@@ -235,10 +235,20 @@ assert.ok(ap.includes('FF.elec2025r && <span className="rd-key-item"><span class
   !ap.includes("FF.elec2025r && !ffReg &&"),
   "the rings' key item is gated on the carrier existing alone — the rings ride the national count on every menu view, so their key does too");
 
-// ---- the Flows table fold (user 2026-10-13) --------------------------------------------
-assert.ok(ap.includes("<summary>Flows table</summary>"), "the Flows table fold mounts in the Preference-flows section");
-assert.ok(ap.indexOf("<summary>Flows table</summary>") > 0 && ap.indexOf("<summary>Flows table</summary>") < ap.lastIndexOf('summary="Trend-significance table"'),
-  "the Flows table sits directly above the section's trend-significance battery (the last RdTsig mount in the file)");
+// ---- the Flows table (user 2026-10-13: un-folded the same day it shipped - "take it out
+//      of that dropdown view and remove that dropdown view... just always display the
+//      tables above the charts") ----------------------------------------------------------------
+assert.ok(!ap.includes("<summary>Flows table</summary>") && !ap.includes('rd-evdrop rd-ft') && !ap.includes("<details className=\"rd-evdrop rd-ft\""),
+  "no Flows-table dropdown survives - the tables stand always-visible, never a fold");
+assert.ok(ap.includes('className="rd-ft"'), "the Flows table mounts as an always-on-show block (.rd-ft)");
+{ // mount order inside the forced-choice block: head, the tables, then the chart pair
+  const iHead = ap.indexOf('className="rd-ff-head"');
+  const iFt = ap.indexOf('className="rd-ft"');
+  const iTwo = ap.indexOf('className="rd-fl-two rd-ff-two"');
+  const iTsig = ap.lastIndexOf('summary="Trend-significance table"');
+  assert.ok(iHead > 0 && iFt > iHead && iTwo > iFt && iTsig > iTwo,
+    "the tables sit directly under the forced-choice head, above the three charts (the trend-significance battery still closes the section)");
+}
 assert.ok(!/<RdTsig summary="Flows table"/.test(ap),
   "the Flows table wears its own chrome (.rd-ft), not RdTsig's - that table's No-row fade greys every row of a table with no test");
 // redesigned 2026-10-13: one grid per contest, cohorts down, sources across, one figure a cell

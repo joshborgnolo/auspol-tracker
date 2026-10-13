@@ -5307,6 +5307,7 @@ body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
 body.rd .rd-fl-name.onp { color: var(--onp-text); }
 body.rd .rd-fl-xb { color: var(--lnp-text); }
 body.rd .rd-fl-xo { color: var(--onp-text); }
+body.rd .rd-ft { margin-top: 22px; }
 body.rd .rd-ft-view { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
 body.rd .rd-ft-view span { font-weight: 400; color: var(--ink-3); }
 body.rd .rd-ft-grid { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 560px); gap: 28px 40px; align-items: start; }
@@ -128394,7 +128395,46 @@ function RdFlows() {
     }, FF_REGIONS.map(([k, name]) => React.createElement("option", {
       key: k || "all",
       value: k
-    }, name)))), React.createElement("div", {
+    }, name)))), (ftContests || []).length > 0 && React.createElement("div", {
+      className: "rd-ft"
+    }, React.createElement("p", {
+      className: "rd-ft-view"
+    }, ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters", React.createElement("span", null, ", from the menu above")), React.createElement("div", {
+      className: "rd-ft-grid"
+    }, ftContests.map(c => React.createElement("table", {
+      key: c.key,
+      className: "rd-ft-table"
+    }, React.createElement("caption", null, c.name, React.createElement("span", {
+      className: "rd-ft-to"
+    }, "Share of each group\u2019s voters choosing ", c.to, ", %")), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+      scope: "col"
+    }, React.createElement("span", {
+      className: "sr-only"
+    }, "Voters")), c.cols.map(col => React.createElement("th", {
+      key: col.key,
+      scope: "col",
+      className: col.site ? "rd-ft-site" : undefined
+    }, col.h, React.createElement("span", null, col.sub, col.wt ? "*" : ""))))), React.createElement("tbody", null, c.cohorts.map(ck => React.createElement("tr", {
+      key: ck
+    }, React.createElement("th", {
+      scope: "row"
+    }, React.createElement("i", {
+      className: "rd-ft-sw " + FF_COHORTS[ck].cls,
+      "aria-hidden": "true"
+    }), FF_COHORTS[ck].name), c.cols.map(col => {
+      const v = col.d && col.d[ck];
+      return React.createElement("td", {
+        key: col.key,
+        className: col.site ? "rd-ft-site" : undefined
+      }, v != null ? ftFig(v, col.dp) : React.createElement("span", {
+        className: "rd-ft-nil",
+        "aria-label": "not asked"
+      }, "\u2013"), v != null && col.band && React.createElement("span", {
+        className: "rd-ft-band"
+      }, " \xB1", ftFig(col.band[ck])));
+    }))))))), React.createElement("p", {
+      className: "rd-note rd-ft-note"
+    }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and in the One Nation charts (the Labor v Coalition chart still draws its wave, as that chart’s sources are all national)." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement("div", {
       className: "rd-fl-two rd-ff-two"
     }, React.createElement("div", {
       className: "rd-fl-one"
@@ -128484,46 +128524,7 @@ function RdFlows() {
       className: "rd-ff-keyring",
       "aria-hidden": "true"
     }), "2025 election, as counted")));
-  })(), ftContests && ftContests.length > 0 && React.createElement("details", {
-    className: "rd-evdrop rd-ft"
-  }, React.createElement("summary", null, "Flows table"), React.createElement("p", {
-    className: "rd-ft-view"
-  }, ffReg ? FF_REGIONS.find(([k]) => k === ffReg)[1] + " seats" : "All voters", React.createElement("span", null, ", from the menu above the charts")), React.createElement("div", {
-    className: "rd-ft-grid"
-  }, ftContests.map(c => React.createElement("table", {
-    key: c.key,
-    className: "rd-ft-table"
-  }, React.createElement("caption", null, c.name, React.createElement("span", {
-    className: "rd-ft-to"
-  }, "Share of each group\u2019s voters choosing ", c.to, ", %")), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
-    scope: "col"
-  }, React.createElement("span", {
-    className: "sr-only"
-  }, "Voters")), c.cols.map(col => React.createElement("th", {
-    key: col.key,
-    scope: "col",
-    className: col.site ? "rd-ft-site" : undefined
-  }, col.h, React.createElement("span", null, col.sub, col.wt ? "*" : ""))))), React.createElement("tbody", null, c.cohorts.map(ck => React.createElement("tr", {
-    key: ck
-  }, React.createElement("th", {
-    scope: "row"
-  }, React.createElement("i", {
-    className: "rd-ft-sw " + FF_COHORTS[ck].cls,
-    "aria-hidden": "true"
-  }), FF_COHORTS[ck].name), c.cols.map(col => {
-    const v = col.d && col.d[ck];
-    return React.createElement("td", {
-      key: col.key,
-      className: col.site ? "rd-ft-site" : undefined
-    }, v != null ? ftFig(v, col.dp) : React.createElement("span", {
-      className: "rd-ft-nil",
-      "aria-label": "not asked"
-    }, "\u2013"), v != null && col.band && React.createElement("span", {
-      className: "rd-ft-band"
-    }, " \xB1", ftFig(col.band[ck])));
-  }))))))), React.createElement("p", {
-    className: "rd-note rd-ft-note"
-  }, "The election column is the Australian Electoral Commission’s count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the charts’ rings); it is counted nationally, no regional count exists, so" + (ffReg ? " it stands unchanged on a regional view" : " it is national") + "; and no count of a One Nation contest exists at all. “This site” is the table every implied two-party figure on the page runs through" + (ffReg ? ", the national one in every region" : "") + "; against One Nation it is built rather than counted, and its ± is that table’s own uncertainty, not a sampling interval. The polls are each house’s latest reading — RedBridge/Accent’s monthly wave and DemosAU’s quarterly MRP" + (ffReg ? "; RedBridge/Accent asks nationally only, so it drops out of a regional view here and in the One Nation charts (the Labor v Coalition chart still draws its wave, as that chart’s sources are all national)." : ftLast.mn || ftLast.ln ? ". * DemosAU prints its One Nation contests by region only; All voters is our weighting of the three." : ".") + " The 2026 state and by-election counts stay on the charts.")), React.createElement(RdTsig, {
+  })(), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],
     sets: ffSet ? flSets.concat(ffSet) : flSets,

@@ -263,13 +263,22 @@ const measure = () => page.evaluate(() => {
      2026-10-13 reversal) — the old stand-in paragraph is gone; kept as a
      null pin so the stand-in can't quietly return */
   out.emptyCell = (sec.querySelector(".rd-fl-emptycell") || {}).textContent || null;
-  /* the section carries TWO folds (2026-10-13): the Flows table in its
-     own .rd-ft chrome (per-contest grids — its RdTsig ancestry ended with
-     the day's redesign) directly above the .rd-tsig trend-significance
-     battery. Match each by its summary text among every fold, never
-     querySelector's first hit */
+  /* the Flows table is NO FOLD (user 2026-10-13, hours after shipping the
+     <details> form: "take it out of that dropdown view and remove that
+     dropdown view... just always display the tables above the charts") -
+     an always-visible .rd-ft block directly under the forced-choice head,
+     above the three charts. The trend-significance battery is the
+     section's only fold left */
   const dets = [...sec.querySelectorAll("details")];
-  out.tsigOrder = dets.map((dt) => { const s = dt.querySelector("summary"); return s ? s.textContent.trim() : ""; });
+  out.dets = dets.map((dt) => { const s = dt.querySelector("summary"); return s ? s.textContent.trim() : ""; });
+  /* the forced block's direct children, as element-order tokens, so the
+     mount order head → tables → chart pair → third chart → key is pinned */
+  const ffc = sec.querySelector(".rd-ff");
+  out.ffKids = ffc ? [...ffc.children].map((el) => {
+    const has = (x) => el.classList && el.classList.contains(x);
+    return has("rd-ff-head") ? "head" : has("rd-ft") ? "tables" : has("rd-fl-two") ? "pair"
+      : has("rd-ff-ln") ? "ln" : has("rd-ckey") ? "key" : el.tagName.toLowerCase();
+  }) : [];
   const bySummary = (want) => dets.find((dt) => (dt.querySelector("summary") || {}).textContent === want);
   const det = bySummary("Trend-significance table");
   if (det) {
@@ -285,7 +294,8 @@ const measure = () => page.evaluate(() => {
       yes: tr.querySelectorAll("td.rd-tsig-yes").length,
     })) : null;
   }
-  const ftab = bySummary("Flows table");
+  const ftab = ffc ? ffc.querySelector(".rd-ft") : null;
+  out.ftInDetails = !!(ftab && ftab.closest("details"));
   if (ftab) {
     /* .rd-ft anatomy: a view line, then one table per contest — caption
        (contest + the "Share … %" clause), a header row whose first th is
@@ -611,16 +621,17 @@ check(d.tsigHeads && d.tsigHeads[0] === "Series" && d.tsigHeads.length === 5,
   `tsig heads (${JSON.stringify(d.tsigHeads)})`);
 
 /* the Flows table (user 2026-10-13; the RdTsig fold became the .rd-ft
-   per-contest grids the same day): the fold directly above the battery,
-   recomputed from the payload + the site's flowTables — cohorts down the
-   side, sources across: the election's NATIONAL TPP count (the election
-   column never rekeys — the AEC counts no per-region TPP flows, so a
-   named region keeps the national figures under a "2025, national"
-   label), the site's national constants as the yardstick on every view,
-   then each house's latest wave (RedBridge/Accent and DemosAU's national
-   MRP are national-only columns, DemosAU's regional tables rekey).
-   Figures print through the renderer's ftFig precision rule, replicated
-   here so float edges round identically */
+   per-contest grids, then the .rd-ft fold was UN-FOLDED the same day —
+   always the first thing under the forced-choice head, above the three
+   charts, never a dropdown): recomputed from the payload + the site's
+   flowTables — cohorts down the side, sources across: the election's
+   NATIONAL TPP count (the election column never rekeys — the AEC counts
+   no per-region TPP flows, so a named region keeps the national figures
+   under a "2025, national" label), the site's national constants as the
+   yardstick on every view, then each house's latest wave (RedBridge/Accent
+   and DemosAU's national MRP are national-only columns, DemosAU's
+   regional tables rekey). Figures print through the renderer's ftFig
+   precision rule, replicated here so float edges round identically */
 const ftFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
 const SMON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const smonY = (ym) => { const [y, m] = ym.split("-").map(Number); return SMON[m - 1] + " " + y; };
@@ -666,7 +677,7 @@ const wantFlows = (reg, regName) => {
     cols: [`DemosAU${mrpSub(ftLt.ln)}${reg ? "" : "*"}`],
     rows: ["alp", "grn", "oth"].map((ck) => ({ name: CONAME[ck], cells: cells(mrp(ftLt.ln), [ck]) })),
   });
-  return { view: (reg ? regName + " seats" : "All voters") + ", from the menu above the charts", tables: t };
+  return { view: (reg ? regName + " seats" : "All voters") + ", from the menu above", tables: t };
 };
 const checkFlows = (g, reg, regName, tag) => {
   const w = wantFlows(reg, regName);
@@ -689,8 +700,15 @@ const checkFlows = (g, reg, regName, tag) => {
     `flows table ${tag}: the Election column stands at the national TPP count (${JSON.stringify(elCells)})`);
 };
 {
-  check(JSON.stringify(d.tsigOrder) === JSON.stringify(["Flows table", "Trend-significance table"]),
-    `flows table: mounts directly above the trend-significance battery (${JSON.stringify(d.tsigOrder)})`);
+  /* the un-folded contract (user 2026-10-13): the tables are the FIRST
+     thing under the forced-choice head, above the three charts, wearing
+     no dropdown; the trend-significance battery is the section's only
+     fold left and carries "Flows table" nowhere */
+  check(JSON.stringify(d.ffKids) === JSON.stringify(["head", "tables", "pair", "ln", "key"]),
+    `flows table: always the first thing under the head, above the three charts (${d.ffKids.join(" > ")})`);
+  check(d.ftInDetails === false && !d.dets.includes("Flows table")
+    && JSON.stringify(d.dets) === JSON.stringify(["Trend-significance table"]),
+    `flows table: no <details> carries it (folds left in the section: ${d.dets.join(", ") || "none"})`);
   checkFlows(d, "", null, "national");
   check(!!d.ftNote && /no regional count exists/.test(d.ftNote) && /This site/.test(d.ftNote) && /2026 state and by-election counts stay on the charts/.test(d.ftNote),
     "flows table: the note records the national-only election count, the this-site yardstick and the chart-only 2026 counts");
@@ -1002,6 +1020,8 @@ await gotoFlows(390);
 const m2 = await measure();
 check(m2.nFig === 3, `phone: three figures (${m2.nFig})`);
 check(!!m2.sel && m2.sel.value === "", `phone: region select rides the head, on All voters (${m2.sel && m2.sel.value})`);
+check(JSON.stringify(m2.ffKids) === JSON.stringify(["head", "tables", "pair", "ln", "key"]),
+  `phone: the tables stand above the charts, no fold (${m2.ffKids.join(" > ")})`);
 {
   const [a, b, c] = m2.figs;
   check(a.w === b.w && b.w === c.w, `phone: the three charts share the section width (${a.w}/${b.w}/${c.w})`);

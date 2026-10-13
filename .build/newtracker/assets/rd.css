@@ -3114,11 +3114,15 @@ body.rd .rd-fl-name.onp { color: var(--onp-text); }
    2026-10-13), one token per side as the pair beside it reads */
 body.rd .rd-fl-xb { color: var(--lnp-text); }
 body.rd .rd-fl-xo { color: var(--onp-text); }
-/* the Flows table (redesigned 2026-10-13): one small grid per contest -
-   cohorts down, sources across, one figure a cell - three abreast where
-   they fit, stacked below that. Full ink throughout: no test sits behind
-   these rows, so nothing fades. The site's own column is the yardstick
-   the polls are read against, so it carries a faint wash */
+/* the Flows table (redesigned then UN-FOLDED 2026-10-13 - it rode the
+   morning as a <details> dropdown, and the user's call is always-on-show
+   straight under the forced-choice head, above the three charts): one
+   small grid per contest - cohorts down, sources across, one figure a
+   cell - three abreast where they fit, stacked below that. Full ink
+   throughout: no test sits behind these rows, so nothing fades. The
+   site's own column is the yardstick the polls are read against, so it
+   carries a faint wash */
+body.rd .rd-ft { margin-top: 22px; }
 body.rd .rd-ft-view { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
 body.rd .rd-ft-view span { font-weight: 400; color: var(--ink-3); }
 body.rd .rd-ft-grid { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 560px); gap: 28px 40px; align-items: start; }
