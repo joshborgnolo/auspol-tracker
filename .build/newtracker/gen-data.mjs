@@ -4144,6 +4144,9 @@ const flowForced = (() => {
   const demos = D.polls.filter((p) => p.pollster === "DemosAU (MRP)" && p.pref_flows && p.pref_flows.onp_alp_lnp != null)
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .map((p) => ({ date: p.date, ...mrpX(p), n: p.sample ?? null, onp: p.pref_flows.onp_alp_lnp }));
+  /* national-only, no region cells (the MRP reports' Labor-v-Coalition
+     split is never regional), so a named menu region drops these triangles
+     with RedBridge's waves (user 2026-10-13) */
   /* The same reports' regional Labor-v-One-Nation tables make the pair's
      other chart too – one diamond per cohort per MRP wave, at the same
      true-midpoint x as demos. The figures are carried four ways, like lnpOn

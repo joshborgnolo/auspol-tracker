@@ -5222,11 +5222,11 @@ function RdFlows() {
           <div className="rd-fl-one">
             <span className="rd-fl-name lnp">Labor v Coalition</span>
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
-            {/* RedBridge/Accent's waves are national-only (user 2026-10-13:
-                a named region drops them, as the v-One-Nation chart already
-                did); DemosAU's national triangles and the election's rings
-                ride the region view still */}
-            <RdForced q="co" waves={ffReg ? [] : FF.vsCoal} cohorts={["grn", "onp", "oth"]} anchor="Labor" rival="the Coalition" houseWord="RedBridge/Accent" W={cw} phone={phone} extras={FF.demos} elec={FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025} dom={dom} />
+            {/* RedBridge/Accent's waves and DemosAU's triangles are
+                national-only (user 2026-10-13: a named region drops them, as
+                the v-One-Nation chart already did); the election's own
+                regional rings ride every menu state */}
+            <RdForced q="co" waves={ffReg ? [] : FF.vsCoal} cohorts={["grn", "onp", "oth"]} anchor="Labor" rival="the Coalition" houseWord="RedBridge/Accent" W={cw} phone={phone} extras={ffReg ? [] : FF.demos} elec={FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025} dom={dom} />
           </div>
           <div className="rd-fl-one">
             <span className="rd-fl-name onp">Labor v One Nation</span>

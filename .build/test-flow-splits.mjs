@@ -181,7 +181,9 @@ assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={
 assert.ok(ap.includes("waves={ffReg ? [] : FF.vsOn}"),
   "on a named region RedBridge's dots drop out of the v-One-Nation chart entirely");
 assert.ok(ap.includes("waves={ffReg ? [] : FF.vsCoal}"),
-  "on a named region RedBridge's dots drop out of the v-Coalition chart too (user 2026-10-13: its waves are national-only); the rings and DemosAU's national triangles ride on");
+  "on a named region RedBridge's dots drop out of the v-Coalition chart too (user 2026-10-13: its waves are national-only); the rings ride on");
+assert.ok(ap.includes("extras={ffReg ? [] : FF.demos}"),
+  "on a named region the v-Coalition chart's DemosAU triangles drop too (user 2026-10-13: the MRP's Labor-v-Coalition split is national-only — no regional carrier exists)");
 assert.ok(ap.includes("bys={ffReg ? [] : (FF.bys || [])}"),
   "on a named region the 2026-count crosses drop out too (national counts)");
 assert.ok(ap.includes("elec={FF.elec2025r ? FF.elec2025r[ffReg || \"all\"] : FF.elec2025}"),

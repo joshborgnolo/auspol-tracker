@@ -24,7 +24,10 @@
      - the region menu (All voters / Inner metro / Outer metro / Regional)
        rekeys the DemosAU figures AND the rings, and DROPS RedBridge's
        national dots on BOTH RedBridge charts (waves=[]) — a national
-       wave can't speak to a named region;
+       wave can't speak to a named region; the v-Coalition chart's DemosAU
+       triangles drop too (that MRP split is national-only — no regional
+       carrier exists, user 2026-10-13), leaving only the election's
+       rekeyed rings;
      - the third chart's title paints Coalition in coalition blue and One
        Nation orange (probe asserts the two spans carry the party text-vars
        via getComputedStyle, not a hard-coded colour);
@@ -75,7 +78,7 @@ const rekeyMrp = (ws, reg) => (ws || []).map((w) => {
 /* a chart's LINE-CARRYING waves at a region: a mixed list is just merged by
    date in the renderer — mirror it here. RedBridge drops out on a region. */
 const wavesOf = (FF, q, reg) => (q === "ln" ? rekeyMrp(FF.lnpOn, reg) : reg ? [] : FF[CHARTS[FI[q]].vsKey]);
-const extOf = (FF, q, reg) => (q === "co" ? FF.demos || [] : q === "on" ? rekeyMrp(FF.demosOn, reg) : []);
+const extOf = (FF, q, reg) => (q === "co" ? (reg ? [] : FF.demos || []) : q === "on" ? rekeyMrp(FF.demosOn, reg) : []);
 const bysOf = (FF, q, reg) => (q === "on" && !reg ? FF.bys || [] : []);
 const elecOf = (FF, q, reg) => (q === "co" && FF.elec2025r ? [Object.values(FF.elec2025r).map((r) => r.xm) && FF.elec2025r[reg || "all"]] : []);
 const isMrp = (w) => w.house === FF_MRP_HOUSE;
@@ -688,30 +691,24 @@ for (const [val, regName] of SWEEP) {
       `region ${regName} v-ON: the spoken note names triangles only — no weighting flag on printed cells, no crosses`);
     check(f.aria.includes("all-regions weighting") === false, `region ${regName} v-ON: no our-weighting note on printed cells`);
   }
-  /* Coalition chart: RedBridge's dots drop too (its waves are national-only,
-     user 2026-10-13) — DemosAU's national triangles alone carry the One
-     Nation line; the Greens/Other rings stand unjoined. The rings swap to
-     the region's own counted flows */
+  /* Coalition chart: RedBridge's dots AND DemosAU's triangles both drop
+     (both national-only, user 2026-10-13) — the election's own counted
+     rings, rekeyed to the region, are the only marks left */
   {
     const f = dr2.figs[FI.co], e = FF.elec2025r[val];
     const evals = [e.grn, e.onp, e.oth];
     check(Object.values(f.dots).every((arr) => arr.length === 0),
       `region ${regName} v-Coalition: RedBridge's dots drop too (its waves are national-only)`);
+    check(f.nTr === 0 && f.lines.length === 0 && f.leads.length === 0 && f.els.length === 0,
+      `region ${regName} v-Coalition: DemosAU's national-only triangles drop with them — no lines, lead-ins or end labels remain`);
     check(f.erings.length === 3 && ["grn", "onp", "oth"].every((ck) => {
       const ring = f.erings.find((g) => g.cls === CLS[ck]);
       return ring && Math.abs(100 * (bot2 - ring.y) / (bot2 - 16) - e[ck]) <= 0.06;
     }), `region ${regName} v-Coalition: the rings rekey to the region's counted flows (${evals.join("/")})`);
-    const nDemo = FF.demos.length;
-    check(f.tris[CLS.onp].length === nDemo && f.nTr === nDemo,
-      `region ${regName} v-Coalition: DemosAU's ${nDemo} national triangles stand (the One Nation cell alone)`);
-    check(f.lines.length === 1 && f.lines[0].cls === CLS.onp && f.leads.length === 1 && f.leads[0].cls === CLS.onp,
-      `region ${regName} v-Coalition: one line, one lead-in — the triangles carry One Nation's cohort alone`);
-    check(f.els.length === 1 && f.els[0] === "One Nation",
-      `region ${regName} v-Coalition: one end label (${JSON.stringify(f.els)})`);
     const scope = e.scopeNote || null;
     check(!!scope && f.aria.includes("for " + scope + ":"), `region ${regName} v-Coalition: the spoken note scopes the rings ("${scope}")`);
-    check(!f.aria.includes("RedBridge/Accent’s latest"),
-      `region ${regName} v-Coalition: no RedBridge latest in the spoken note (the aria is conditional on waves)`);
+    check(!f.aria.includes("Triangles mark") && !f.aria.includes("RedBridge/Accent’s latest"),
+      `region ${regName} v-Coalition: the spoken note names no national-only marks`);
   }
   /* the third chart rekeys to the region's printed cells */
   {

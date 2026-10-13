@@ -128394,7 +128394,7 @@ function RdFlows() {
       houseWord: "RedBridge/Accent",
       W: cw,
       phone: phone,
-      extras: FF.demos,
+      extras: ffReg ? [] : FF.demos,
       elec: FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025,
       dom: dom
     })), React.createElement("div", {
