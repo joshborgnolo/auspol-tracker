@@ -100503,14 +100503,14 @@ const DEM_SPLITS = [{
   lo: "Lower income",
   hi: "Higher income",
   scope: "With an income breakdown",
-  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
+  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"], ["$3,000+ a week", "Under $1,000 a week", "$3k+ v <$1k a week"]]
 }, {
   id: "country",
   label: "Other cuts",
   lo: "Australia-born",
   hi: "Overseas-born",
   scope: "With a one-off breakdown",
-  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]],
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"], ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"], ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"], ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"], ["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"], ["Full time", "Retired", "Full time v retired", "Retired", "Full time"], ["Children under 18", "No children", "Children at home v none", "No children", "Children at home"], ["Working class", "Well off", "Working class v well off", "Well off", "Working class"], ["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"], ["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"], ["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]],
   fams: [{
     id: "birth",
     lab: "Birth country",
@@ -100519,8 +100519,8 @@ const DEM_SPLITS = [{
   }, {
     id: "religion",
     lab: "Religion",
-    sub: "Newspoll's pooled quarterly pulls",
-    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]]
+    sub: "Newspoll's pooled quarterly pulls and RedBridge/Accent's one-off cut",
+    pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"], ["Protestant", "No religion", "Protestant v no religion", "No religion", "Protestant"]]
   }, {
     id: "working",
     lab: "Working status",
@@ -100541,6 +100541,16 @@ const DEM_SPLITS = [{
     lab: "Tasmanian electorates",
     sub: "EMRS's one-off seat cut from the February 2026 federal wave",
     pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
+  }, {
+    id: "occupation",
+    lab: "Occupation",
+    sub: "RedBridge/Accent's one-off cut from the October 2025 report",
+    pairs: [["Professional and managerial", "Blue collar", "Managerial v blue collar", "Blue collar", "Professional and managerial"]]
+  }, {
+    id: "stress",
+    lab: "Financial stress",
+    sub: "RedBridge/Accent's one-off cut from the October 2025 report",
+    pairs: [["No stress at all", "A great deal of stress", "No stress v a great deal of stress", "A great deal of stress", "No stress at all"]]
   }]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];

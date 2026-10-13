@@ -2,8 +2,9 @@
 // (user: "make the different tables in 'other cuts' in demographics facet of
 // all polls table collapsable").
 //
-// Each of the stacked family tables (six since 5fa1726 added Tasmanian
-// electorates) folds away from its own head
+// Each of the stacked family tables (eight since 2026-10-13 added RedBridge/
+// Accent's occupation and financial-stress families, 5fa1726's Tasmanian
+// electorates the sixth) folds away from its own head
 // (.rd-ap-frow, rd-allpolls.jsx's famHead -> famShut state). Pinned here:
 //  1. heads render expanded by default (aria-expanded, open chevron, no count)
 //  2. clicking a head folds its table: rows AND month rows leave the DOM, the
@@ -98,7 +99,7 @@ console.log("== desktop 1280 ==");
 {
   const page = await open(1280, "f=g&g=b");
   let s = await segs(page);
-  check("six family heads, all expanded, chevroned, count hidden", s.length === 6 && s.every((x) => !x.shut && x.expanded === "true" && x.chev && x.chevOpen && x.fn == null),
+  check("eight family heads, all expanded, chevroned, count hidden", s.length === 8 && s.every((x) => !x.shut && x.expanded === "true" && x.chev && x.chevOpen && x.fn == null),
     JSON.stringify(s.map((x) => [x.lab, x.shut, x.expanded, x.rows])));
   const chevAlign = await page.evaluate(() => {
     const f = document.querySelector(".rd-ap-frow .rd-ap-chev").getBoundingClientRect();
@@ -164,7 +165,7 @@ console.log("== desktop 1280 ==");
   await clickTab(page, "Demographics");
   await settle();
   s = await segs(page);
-  check("back on Other cuts: fam 1 still folded, rest open", s.length === 6 && s[1].shut && s.every((x, i) => i === 1 || !x.shut), JSON.stringify(s.map((x) => x.shut)));
+  check("back on Other cuts: fam 1 still folded, rest open", s.length === 8 && s[1].shut && s.every((x, i) => i === 1 || !x.shut), JSON.stringify(s.map((x) => x.shut)));
 
   // ...and a split hop out (Gender) and back
   await pickSplit(page, "Gender");
@@ -173,7 +174,7 @@ console.log("== desktop 1280 ==");
   await pickSplit(page, "Other cuts");
   await settle(600);
   s = await segs(page);
-  check("Other cuts re-picked: fam 1 still folded", s.length === 6 && s[1].shut, JSON.stringify(s.map((x) => x.shut)));
+  check("Other cuts re-picked: fam 1 still folded", s.length === 8 && s[1].shut, JSON.stringify(s.map((x) => x.shut)));
 
   check("no page errors (desktop)", page.errs.length === 0, page.errs.join(" | "));
   await page.close();
@@ -183,7 +184,7 @@ console.log("== phone 390 ==");
 {
   const page = await open(390, "f=g&g=b", { touch: true });
   let s = await segs(page);
-  check("phone: six expanded family heads", s.length === 6 && s.every((x) => !x.shut), JSON.stringify(s.map((x) => x.lab)));
+  check("phone: eight expanded family heads", s.length === 8 && s.every((x) => !x.shut), JSON.stringify(s.map((x) => x.lab)));
   const before = { rows: await totalRows(page), first: s[0].rows };
   await clickHead(page, 0);
   await settle(600);
