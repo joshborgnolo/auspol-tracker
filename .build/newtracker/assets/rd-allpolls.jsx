@@ -2629,14 +2629,24 @@ function RdAllPolls(P) {
   const todayTxt = today ? today.a.toFixed(1) : null;
 
   /* ---- paging, by whole months ---------------------------------------------- */
-  /* the chronological views are the fieldwork sort and the archive's new
-     default, the PUBLICATION sort (user call 2026-10-13: publication outranks
-     fieldwork at open, though it is no column). Rows file under their
-     fieldwork month either way - the month rows quote month aggregates, which
-     are fieldwork-month quantities - so under the publication default a wave
-     that crosses a month-end in the press can raise a month divider one place
-     out of monotonic order; that is the honest filing, not a bug. */
+  /* the chronological views are the fieldwork sort (the default, restored
+     user call 2026-10-13) and the publication sort (the FIELDWORK/PUB
+     head's Pub half). Rows file under their month ON THE SORT'S BASIS:
+     fieldwork month in the fieldwork view, publication month in the
+     publication one, so a wave that crosses a month-end in the press (the
+     DemosAU MRP - Sep fieldwork, 12 Oct published) always sits beneath a
+     divider its own sort speaks to, never raising a fieldwork divider one
+     place out of monotonic order a la the half day's pub default. The
+     month rows quote the same calendar month's aggregate figures either
+     way. Three of 181 rows record no `published` (the 2025 election and
+     two mid-redesign YouGov waves) - they file at their fieldwork basis in
+     either view. */
   const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
+  /* a row's month under the sort's basis: publication month when the pub
+     sort sits live (the published day carried whole, sliced to its month),
+     fieldwork month otherwise - and always so for the three rows that
+     record no publication day */
+  const gym = sort.key === "pub" ? (p) => (p.published ? p.published.slice(0, 7) : p.ym) : (p) => p.ym;
   const [minShown, setMinShown] = useState(30);
   const [flatLimit, setFlatLimit] = useState(40);
   const [showAll, setShowAll] = useState(false);
@@ -2679,11 +2689,12 @@ function RdAllPolls(P) {
   if (byDate) {
     groups = [];
     for (const p of sorted) {
+      const ym = gym(p);
       const g = groups[groups.length - 1];
-      if (!g || g.ym !== p.ym) {
-        const needOpen = openRow && !groups.some((x) => x.ym === openRow.ym);
+      if (!g || g.ym !== ym) {
+        const needOpen = openRow && !groups.some((x) => x.ym === gym(openRow));
         if (!showAll && nShown >= minShown && !needOpen) break;
-        groups.push({ ym: p.ym, list: [] });
+        groups.push({ ym, list: [] });
       }
       groups[groups.length - 1].list.push(p);
       nShown++;
@@ -2888,7 +2899,8 @@ function RdAllPolls(P) {
     const list = (groups || []).flatMap((g) => g.list).filter((p) => window.demPairOf(p, demSplit, fam.id));
     const gs = [];
     for (const p of list) {
-      if (!gs.length || gs[gs.length - 1].ym !== p.ym) gs.push({ ym: p.ym, list: [] });
+      const ym = gym(p);
+      if (!gs.length || gs[gs.length - 1].ym !== ym) gs.push({ ym, list: [] });
       gs[gs.length - 1].list.push(p);
     }
     return { fam, groups: gs, rows: list };
@@ -2971,7 +2983,17 @@ function RdAllPolls(P) {
   const colHead = (
     <div className={"rd-ap-hrow " + cls} role="row">
       <span className="rd-ap-hc1">{th("Pollster", "pollster")}</span>
-      {th("Fieldwork", "date", { title: "Sort by fieldwork, newest first" })}
+      {/* the date column's head is TWO sorts, halves of one cell (user call
+          2026-10-13: "FIELDWORK/PUB - click on fieldwork, it's sorted by
+          fieldwork, click on pub, sorted by publication"). Fieldwork
+          carries the default; the month dividers file by whichever half
+          sits live (gym above). One grid item, two columnheader buttons,
+          the way the primary facet's five sit in one cell */}
+      <span className="rd-ap-hfp">
+        {th("Fieldwork", "date", { title: "Sort by fieldwork, newest first" })}
+        <span className="rd-ap-hfsep" aria-hidden="true">/</span>
+        {th("Pub", "pub", { title: "Sort by the day the poll came out, newest first" })}
+      </span>
       {th("Sample", "sample", { right: true })}
       <span></span>
       {facet === "twopp" && <>
@@ -3785,12 +3807,14 @@ function RdAllPolls(P) {
           {pinBar}
           {phone ? phoneHead : colHead}
         </div>
-        {/* the group-fragment keys carry their position because the pub
-            sort can file the same fieldwork month in two places (a wave
-            that crosses a month-end in the press, e.g. DemosAU's MRP):
-            g.ym alone gave duplicate sibling keys, and React's key map
-            keeps only one of the pair - the other's DOM was never deleted
-            and its rows haunted the next facet's table as stale copies */}
+        {/* the group-fragment keys carry their group POSITION, not only
+            their month: the half day's pub-default sort can no longer
+            duplicate a month in the table (rows now file under their month's
+            sort basis), but regrouping against different keys under a sort
+            change must never let React keep a past group's DOM keyed the
+            same - the stale-rows haunting of the ym-keyed short-lived
+            pub sort (a wave that crosses a month-end in the press filed
+            2026-09 twice) taught that lesson once */}
         {demFamTables
           ? demFamTables.map((t) => (
             <React.Fragment key={"fam" + t.fam.id}>
@@ -3839,7 +3863,7 @@ function RdAllPolls(P) {
         </RdKey>
       )}
       <HowTo label="How to read this table" paras={[
-        <>Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
+        <>Dates are fieldwork; the day the poll came out sits beneath. The Fieldwork/Pub heading sorts the table two ways – by fieldwork dates (the default) or, on its Pub half, by the day each poll came out, with the month dividers filing by that too. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
         facet === "twopp" && <>{pub
           ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it."
           : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}

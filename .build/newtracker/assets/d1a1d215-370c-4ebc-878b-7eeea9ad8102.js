@@ -5362,11 +5362,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const [measure, setMeasure] = useState(urlInit.measure); // lead matchup: lnp = ALP v L/NP, onp = ALP v ON
   const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
-  /* the archive's default sort is PUBLICATION day, newest first, though
-     publication is no column (user call 2026-10-13): fieldwork order made
-     a fresh release sit under a backfilled wave's older news at every
-     open. Facet hops reset to the same default (onFacet below). */
-  const [sort, setSort] = useState({ key: "pub", dir: -1 });
+  /* the archive's default sort is FIELDWORK day, newest first: publication
+     outranked it for half a day (user call 2026-10-13, reversed the same
+     day - publication is now the SECOND sort, reached from the
+     FIELDWORK/PUB column head's Pub half, so the table's resting order
+     speaks its own dates again). Facet hops reset to the same default
+     (onFacet below). */
+  const [sort, setSort] = useState({ key: "date", dir: -1 });
   const [facet, setFacet] = useState(urlInit.facet);
   const [demSplit, setDemSplit] = useState(urlInit.split);   // the demographics facet's split
   const [open, setOpen] = useState(null);     // expanded ROW
@@ -5483,7 +5485,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      prop identity and defeat its memo (the window export in rd-allpolls) */
   const onMeasure = React.useCallback((mv) => { setMeasure(mv); setLead("all"); }, []);
   const onFacet = (f) => {
-    setFacet(f); setSort({ key: "pub", dir: -1 }); setPop(null);
+    setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
     // the matchup survives the hop only if the 2PP facet is where we land –
     // every other facet resets it below – so seed the scope from the
     // matchup that will actually be in force
@@ -5707,12 +5709,14 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const getVal = (p, key) => {
       switch (key) {
         case "date": return p.x;
-        /* published day sits beside fieldwork at its own default sort
-           (2026-10-13). Three of 181 rows record no `published` (the 2025
-           election result and two mid-redesign YouGov waves) - file them at
-           their fieldwork close so they don't sink in the newest-first
-           publication view. */
-        case "pub": return p.published ? Date.parse(p.published) : p.x;
+        /* published day sits beside fieldwork as the archive's second sort
+           (2026-10-13): the FIELDWORK/PUB column head's Pub half. Three of
+           181 rows record no `published` (the 2025 election result and two
+           mid-redesign YouGov waves) - file them at their fieldwork close
+           so they don't sink in the newest-first publication view. The key
+           must stay on Date.parse's epoch-ms scale (p.x is a decimal YEAR -
+           mixing the two sank these rows a billion keys below the rest). */
+        case "pub": return Date.parse(p.published || p.released);
         case "pollster": return p.pollster;
         case "sample": return p.sample ?? -Infinity;
         case "alp": {
