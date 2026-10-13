@@ -4075,17 +4075,56 @@ const flowForced = (() => {
     }
   }
   /* the 2025 election's OWN reading of the Labor-v-Coalition question: the
-     AEC's counted flows to Labor (flows.mjs FLOW_FED, the table the site's
-     implied 2PP runs on), as percentages to one decimal. xm is the election
-     DAY on the waves' month-index scale (year·12 + month−1 + the day's share
-     of its month), derived from the date: a hand-typed 24314.0645 put the
-     rings ten months late, in March 2026, beside the first wave */
-  const elec2025 = (() => {
+     AEC's counted flows to Labor — and since 2026-10-13 on the FULL TCP
+     cut (HouseTcpFlowByDivisionDownload-31496.csv, majors-renormalised),
+     not flows.mjs's TPP constants (its implied-2PP anchor), so the rings
+     sit beside DemosAU's region menus on the same electorate map: every
+     division carries the AEC's own classification (data/aec-2025-division-
+     class.json) and rural+provincial pools to regional. The "all" carrier
+     reproduces the AEC's national TCP table to the vote (GRN 1,279,081 v
+     194,050; ON 244,177 v 656,962). Percentages to one decimal. xm is the
+     election DAY on the waves' month-index scale (year·12 + month−1 + the
+     day's share of its month), derived from the date: a hand-typed
+     24314.0645 put the rings ten months late, in March 2026, beside the
+     first wave */
+  const elec2025r = (() => {
     const d = "2025-05-03", y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
     const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
-    return { date: d, xm: Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4, win: "3 May 2025",
-             grn: r1(FLOW_FED.grn * 100), onp: r1(FLOW_FED.onp * 100), oth: r1(FLOW_FED.oth * 100) };
+    const xm = Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4;
+    return {
+      all: { date: d, xm, win: "as counted", grn: 86.83, onp: 27.10, oth: 48.61 },
+      inner: { date: d, xm, win: "as counted", scopeNote: "inner-metro seats", grn: 89.51, onp: 36.49, oth: 55.63 },
+      outer: { date: d, xm, win: "as counted", scopeNote: "outer-metro seats", grn: 87.11, onp: 28.03, oth: 49.71 },
+      regional: { date: d, xm, win: "as counted", scopeNote: "rural and provincial seats", grn: 84.48, onp: 23.99, oth: 45.85 },
+    };
   })();
+  /* the 2026 state and by-election counts that MEASURED the Labor-v-One-
+     Nation choice the second chart asks: crosses on the chart's own day,
+     joined to no line (user 2026-10-13). Figures and labels as the
+     preference-flows page's "2026 readings" table — SA is Bonham's
+     estimate from the published distributions (the state commission's
+     own flows are due late 2026); Secret Harbour is Green's count of the
+     early voting centre; Farrer's two Coalition crosses ride one date,
+     its lbl naming the Coalition partner the reading counts. */
+  const byX = (d) => {
+    const y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
+    const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    return Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4;
+  };
+  const bys = [
+    { key: "sa2026", date: "2026-03-21", xm: byX("2026-03-21"), label: "South Australia 2026", win: "21 Mar 2026",
+      coal: 33.9, grn: 84.8, oth: 55.9, lbl: { coal: "Liberal", oth: "Independent" },
+      sub: "Bonham’s estimates from the published distributions" },
+    { key: "farrlib", date: "2026-05-09", xm: byX("2026-05-09"), label: "Farrer by-election", win: "9 May 2026",
+      coal: 41, lbl: { coal: "Liberal" },
+      sub: "the AEC’s flow release for the by-election" },
+    { key: "farrnat", date: "2026-05-09", xm: byX("2026-05-09"), label: "Farrer by-election", win: "9 May 2026",
+      coal: 31, lbl: { coal: "Nationals" },
+      sub: "the AEC’s flow release for the by-election" },
+    { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
+      coal: 29.8, grn: 90.0, lbl: { coal: "Liberal" },
+      sub: "Green’s count of the early voting centre, 47% of the votes" },
+  ];
   /* DemosAU's MRP reports print one national respondent flow beside
      RedBridge's: One Nation voters' share reaching Labor in Labor-v-Coalition
      contests (pref_flows.onp_alp_lnp, from full five-option rankings over the
@@ -4147,7 +4186,7 @@ const flowForced = (() => {
       for (const r of ["inner", "outer", "regional"]) out[r] = p.pref_flows.lnp_onp[r] || null;
       return out;
     }).filter(Boolean);
-  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}), ...(lnpOn.length ? { lnpOn } : {}) } : null;
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025r, bys, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}), ...(lnpOn.length ? { lnpOn } : {}) } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null

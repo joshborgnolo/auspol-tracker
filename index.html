@@ -20,13 +20,13 @@
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/">
-  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-d5dc574f">
+  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-c1d6a0df">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="auspol tracker scoreboard for 11 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
+  <meta property="og:image:alt" content="auspol tracker scoreboard for 12 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-d5dc574f">
-  <meta name="twitter:image:alt" content="auspol tracker scoreboard for 11 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
+  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-12-c1d6a0df">
+  <meta name="twitter:image:alt" content="auspol tracker scoreboard for 12 October 2026. Two-party preferred on implied preference flows: Labor 52.3, Coalition 47.7, Labor ahead by 4.6, outside the ±2.6 margin. First preferences: Labor 27.5 and One Nation 26.1, level inside the margin; Coalition 21.6; Greens 13.5; Others 11.3.">
   <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
@@ -5300,6 +5300,8 @@ body.rd .rd-fl-one { display: flex; flex-direction: column; min-width: 0; }
 body.rd .rd-fl-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
 body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
 body.rd .rd-fl-name.onp { color: var(--onp-text); }
+body.rd .rd-fl-xb { color: var(--lnp-text); }
+body.rd .rd-fl-xo { color: var(--onp-text); }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
 @media (min-width: 761px) {
@@ -5365,14 +5367,24 @@ body.rd .rd-ff-dot.grn { fill: var(--grn); }
 body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
 body.rd .rd-ff-dot.alp { fill: var(--alp); }
-body.rd .rd-ff-dm { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
-body.rd .rd-ff-dm.onp { stroke: var(--onp); }
-body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-dm.grn { stroke: var(--grn); }
-body.rd .rd-ff-dm.oth { stroke: var(--oth); }
-body.rd .rd-ff-dm.alp { stroke: var(--alp); }
-body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); transform: rotate(45deg); vertical-align: 0; }
+body.rd .rd-ff-tr { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
+body.rd .rd-ff-tr.onp { stroke: var(--onp); }
+body.rd .rd-ff-tr.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-tr.grn { stroke: var(--grn); }
+body.rd .rd-ff-tr.oth { stroke: var(--oth); }
+body.rd .rd-ff-tr.alp { stroke: var(--alp); }
+body.rd .rd-ff-x { fill: none; stroke-width: 1.75; stroke-linecap: round; }
+body.rd .rd-ff-x.onp { stroke: var(--onp); }
+body.rd .rd-ff-x.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-x.grn { stroke: var(--grn); }
+body.rd .rd-ff-x.oth { stroke: var(--oth); }
+body.rd .rd-ff-x.alp { stroke: var(--alp); }
+body.rd .rd-ff-keydm { display: inline-block; width: 9px; height: 8px; margin: 0 7px 0 2px; background: var(--ink-2); clip-path: polygon(50% 0, 100% 100%, 0 100%); vertical-align: -1px; }
 body.rd .rd-ff-keyring { display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); border-radius: 50%; vertical-align: -1px; }
+body.rd .rd-ff-keyx { position: relative; display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; vertical-align: -1px; }
+body.rd .rd-ff-keyx::before, body.rd .rd-ff-keyx::after { content: ""; position: absolute; left: 0; right: 0; top: 3.5px; height: 1.75px; border-radius: 1px; background: var(--ink-2); }
+body.rd .rd-ff-keyx::before { transform: rotate(45deg); }
+body.rd .rd-ff-keyx::after { transform: rotate(-45deg); }
 body.rd .rd-ff-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
 body.rd .rd-ff-keyln::before { content: ""; position: absolute; left: 1px; right: 1px; top: 6px; height: 2.25px; border-radius: 1px; background: var(--ink-2); }
 body.rd .rd-ff-keyln i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--ink-2); }
@@ -5392,8 +5404,12 @@ body.rd .rd-ff .rd-fl-empty, body.rd .rd-ff .rd-apd-dothi { pointer-events: none
 body.rd .rd-ff .rd-ff-hit { pointer-events: none; }
 body.rd .rd-ff svg.link { cursor: pointer; }
 body.rd .rd-ff-sw.wave { border-radius: 50%; width: 8px; height: 8px; }
-body.rd .rd-ff-sw.mrp { width: 7px; height: 7px; border-radius: 0; background: transparent; border: 1.5px solid; transform: rotate(45deg); margin: 0 1px; }
+body.rd .rd-ff-sw.mrp { width: 9px; height: 8px; border-radius: 0; transform: none; border: 0; margin: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 body.rd .rd-ff-sw.elec { border-radius: 50%; background: transparent; border: 1.5px solid; }
+body.rd .rd-ff-sw.byelec { position: relative; border-radius: 0; background: transparent; }
+body.rd .rd-ff-sw.byelec::before, body.rd .rd-ff-sw.byelec::after { content: ""; position: absolute; left: 0.5px; right: 0.5px; top: 3.5px; height: 1.75px; border-radius: 1px; }
+body.rd .rd-ff-sw.byelec::before { transform: rotate(45deg); }
+body.rd .rd-ff-sw.byelec::after { transform: rotate(-45deg); }
 body.rd .rd-ff-sw.wave.lnp { background: var(--lnp); }
 body.rd .rd-ff-sw.wave.grn { background: var(--grn); }
 body.rd .rd-ff-sw.wave.onp { background: var(--onp); }
@@ -5404,6 +5420,16 @@ body.rd .rd-ff-sw.grn { border-color: var(--grn); }
 body.rd .rd-ff-sw.onp { border-color: var(--onp); }
 body.rd .rd-ff-sw.oth { border-color: var(--oth); }
 body.rd .rd-ff-sw.alp { border-color: var(--alp); }
+body.rd .rd-ff-sw.mrp.lnp { background: var(--lnp); }
+body.rd .rd-ff-sw.mrp.grn { background: var(--grn); }
+body.rd .rd-ff-sw.mrp.onp { background: var(--onp); }
+body.rd .rd-ff-sw.mrp.oth { background: var(--oth); }
+body.rd .rd-ff-sw.mrp.alp { background: var(--alp); }
+body.rd .rd-ff-sw.byelec.lnp::before, body.rd .rd-ff-sw.byelec.lnp::after { background: var(--lnp); }
+body.rd .rd-ff-sw.byelec.grn::before, body.rd .rd-ff-sw.byelec.grn::after { background: var(--grn); }
+body.rd .rd-ff-sw.byelec.onp::before, body.rd .rd-ff-sw.byelec.onp::after { background: var(--onp); }
+body.rd .rd-ff-sw.byelec.oth::before, body.rd .rd-ff-sw.byelec.oth::after { background: var(--oth); }
+body.rd .rd-ff-sw.byelec.alp::before, body.rd .rd-ff-sw.byelec.alp::after { background: var(--alp); }
 body.rd .rd-ff-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
 body.rd .rd-ff-tipsub { margin: -4px 0 3px; }
 body.rd .rd-ff-tipsub .tip-label { font-size: 12px; }
@@ -13905,14 +13931,92 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "onp": 15,
       "oth": 50
     }],
-    "elec2025": {
-      "date": "2025-05-03",
-      "xm": 24304.0645,
-      "win": "3 May 2025",
-      "grn": 88.2,
-      "onp": 25.5,
-      "oth": 54.6
+    "elec2025r": {
+      "all": {
+        "date": "2025-05-03",
+        "xm": 24304.0645,
+        "win": "as counted",
+        "grn": 86.83,
+        "onp": 27.1,
+        "oth": 48.61
+      },
+      "inner": {
+        "date": "2025-05-03",
+        "xm": 24304.0645,
+        "win": "as counted",
+        "scopeNote": "inner-metro seats",
+        "grn": 89.51,
+        "onp": 36.49,
+        "oth": 55.63
+      },
+      "outer": {
+        "date": "2025-05-03",
+        "xm": 24304.0645,
+        "win": "as counted",
+        "scopeNote": "outer-metro seats",
+        "grn": 87.11,
+        "onp": 28.03,
+        "oth": 49.71
+      },
+      "regional": {
+        "date": "2025-05-03",
+        "xm": 24304.0645,
+        "win": "as counted",
+        "scopeNote": "rural and provincial seats",
+        "grn": 84.48,
+        "onp": 23.99,
+        "oth": 45.85
+      }
     },
+    "bys": [{
+      "key": "sa2026",
+      "date": "2026-03-21",
+      "xm": 24314.6452,
+      "label": "South Australia 2026",
+      "win": "21 Mar 2026",
+      "coal": 33.9,
+      "grn": 84.8,
+      "oth": 55.9,
+      "lbl": {
+        "coal": "Liberal",
+        "oth": "Independent"
+      },
+      "sub": "Bonham’s estimates from the published distributions"
+    }, {
+      "key": "farrlib",
+      "date": "2026-05-09",
+      "xm": 24316.2581,
+      "label": "Farrer by-election",
+      "win": "9 May 2026",
+      "coal": 41,
+      "lbl": {
+        "coal": "Liberal"
+      },
+      "sub": "the AEC’s flow release for the by-election"
+    }, {
+      "key": "farrnat",
+      "date": "2026-05-09",
+      "xm": 24316.2581,
+      "label": "Farrer by-election",
+      "win": "9 May 2026",
+      "coal": 31,
+      "lbl": {
+        "coal": "Nationals"
+      },
+      "sub": "the AEC’s flow release for the by-election"
+    }, {
+      "key": "harbour",
+      "date": "2026-08-29",
+      "xm": 24319.9032,
+      "label": "Secret Harbour by-election",
+      "win": "29 Aug 2026",
+      "coal": 29.8,
+      "grn": 90,
+      "lbl": {
+        "coal": "Liberal"
+      },
+      "sub": "Green’s count of the early voting centre, 47% of the votes"
+    }],
     "demos": [{
       "date": "2026-03-03",
       "xm": 24313.1786,
@@ -127656,6 +127760,7 @@ function RdForced({
   W,
   phone,
   extras,
+  bys,
   elec,
   dom,
   emptyNote,
@@ -127679,7 +127784,6 @@ function RdForced({
       if (minTop > -6) el.style.top = Math.round(minTop) + "px";
     }
   }, [tip]);
-  if (!waves || waves.length < 2) return null;
   const rivalShort = rival === "the Coalition" ? "Coalition" : rival;
   const anchorShort = anchor === "the Coalition" ? "the Coalition" : anchor;
   const H = phone ? 200 : 236;
@@ -127689,7 +127793,7 @@ function RdForced({
     bot = H - 34;
   const x1 = W - rpad;
   const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
-  const own = [...waves.map(w => w.xm ?? mi(w.ym)), ...(extras || []).map(d => d.xm), ...(elec ? [elec.xm] : [])];
+  const own = [...waves.map(w => w.xm ?? mi(w.ym)), ...(extras || []).map(d => d.xm), ...(elec ? [elec.xm] : []), ...(bys || []).map(d => d.xm)];
   const m0 = dom ? dom[0] : Math.floor(Math.min(...own));
   const mSpan = Math.max(1, (dom ? dom[1] : Math.ceil(Math.max(...own))) - m0);
   const Xi = m => x0 + (m - m0) / mSpan * (x1 - x0);
@@ -127712,19 +127816,27 @@ function RdForced({
     xm: d.xm,
     d,
     house: FF_MRP_HOUSE
+  })), ...(bys || []).map(d => ({
+    key: "x" + d.key,
+    kind: "byelec",
+    xm: d.xm,
+    d
   }))];
+  if (!groups.length) return null;
+  const inLine = g => g.kind === "wave" || g.kind === "mrp";
   const keyOf = g => g.house && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
     pollster: g.house,
     released: g.d.date
   }) : null;
   const series = cohorts.map(ck => {
-    const ws = waves.filter(w => w[ck] != null);
+    const ws = groups.filter(g => inLine(g) && g.d[ck] != null).sort((a, b) => a.xm - b.xm);
     return {
       ck,
-      pts: ws.map(w => [Xi(w.xm ?? mi(w.ym)), Y(w[ck])]),
-      first: ws[0],
-      last: ws[ws.length - 1],
-      mrp: ws.every(isMrp)
+      ws,
+      pts: ws.map(g => [Xi(g.xm), Y(g.d[ck])]),
+      first: ws[0] && ws[0].d,
+      last: ws[ws.length - 1] && ws[ws.length - 1].d,
+      mrp: ws.every(g => g.kind === "mrp")
     };
   }).filter(s => s.pts.length >= 2);
   const per = (x1 - x0) / mSpan;
@@ -127786,16 +127898,14 @@ function RdForced({
   const tg = tip ? groups.find(g => g.key === tip.g) : null;
   const tipK = tg ? keyOf(tg) : null;
   const half = Math.min((tipW || 220) / 2, W / 2 - 8);
-  const firstX = Math.min(...groups.filter(g => g.kind !== "elec").map(g => g.xm));
-  const eNote = emptyNote && emptyNote.find(n => textWidth(n, 12, 400) <= Xi(firstX) - x0 - 16);
+  const noElec = groups.filter(g => g.kind !== "elec");
+  const noteX = noElec.length ? Xi(Math.min(...noElec.map(g => g.xm))) : elec ? Xi(elec.xm) : x1;
+  const eNote = emptyNote && emptyNote.find(n => textWidth(n, 12, 400) <= noteX - x0 - 16);
   const say = (ck, v) => FF_COHORTS[ck].name + " " + v;
-  const xnote = (() => {
-    if (!extras || !extras.length) return "";
-    const la = extras[extras.length - 1],
-      cks = cohorts.filter(ck => la[ck] != null);
-    return cks.length ? " Diamonds mark DemosAU’s MRP readings" + (la.wt ? ", our all-regions weighting of its regional tables" : "") + ", latest " + cks.map(ck => say(ck, la[ck])).join(", ") + "." : "";
-  })();
-  const enote = elec ? " Open rings mark the 2025 election’s counted preferences: " + cohorts.filter(ck => elec[ck] != null).map(ck => say(ck, elec[ck])).join(", ") + "." : "";
+  const lastMrp = [...groups].reverse().find(g => g.kind === "mrp");
+  const mrpCks = lastMrp ? cohorts.filter(ck => lastMrp.d[ck] != null) : [];
+  const xnote = (mrpCks.length ? " Triangles mark DemosAU’s MRP readings" + (lastMrp.d.wt ? ", our all-regions weighting of its regional tables" : "") + ", latest " + mrpCks.map(ck => say(ck, lastMrp.d[ck])).join(", ") + "." : "") + (bys && bys.length ? " Crosses mark the 2026 state and by-election counts." : "");
+  const enote = elec ? " Open rings mark the 2025 election’s counted preferences" + (elec.scopeNote ? " for " + elec.scopeNote : "") + ": " + cohorts.filter(ck => elec[ck] != null).map(ck => say(ck, elec[ck])).join(", ") + "." : "";
   const mark = (g, ck) => {
     const x = Xi(g.xm),
       y = Y(g.d[ck]),
@@ -127809,8 +127919,13 @@ function RdForced({
     });
     if (g.kind === "mrp") return React.createElement("path", {
       key: ck,
-      className: "rd-ff-dm " + cls,
-      d: `M${x} ${y - 5.5}L${x + 4.5} ${y}L${x} ${y + 5.5}L${x - 4.5} ${y}Z`
+      className: "rd-ff-tr " + cls,
+      d: `M${x} ${y - 5.4}L${x + 5} ${y + 4}L${x - 5} ${y + 4}Z`
+    });
+    if (g.kind === "byelec") return React.createElement("path", {
+      key: ck,
+      className: "rd-ff-x " + cls,
+      d: `M${x - 4.2} ${y - 4.2}L${x + 4.2} ${y + 4.2}M${x + 4.2} ${y - 4.2}L${x - 4.2} ${y + 4.2}`
     });
     return React.createElement("circle", {
       key: ck,
@@ -127820,8 +127935,9 @@ function RdForced({
       className: "rd-ring rd-ff-ring " + cls
     });
   };
-  const gTitle = g => g.kind === "elec" ? "2025 election, " + g.d.win : (g.kind === "mrp" ? "DemosAU MRP" : g.house) + ", " + (g.d.win || rdMonthYear(g.d.ym));
-  const gSub = g => g.kind === "elec" ? "Preferences counted reaching Labor over the Coalition" : "Would pick " + anchor + " over " + rival + (g.kind === "mrp" && g.d.wt ? " (all regions: our weighting)" : "");
+  const gTitle = g => g.kind === "elec" ? "2025 election, " + (g.d.scopeTtl || g.d.win) : g.kind === "byelec" ? g.d.label + ", " + g.d.win : (g.kind === "mrp" ? "DemosAU MRP" : g.house) + ", " + (g.d.win || rdMonthYear(g.d.ym));
+  const gSub = g => g.kind === "elec" ? "Preferences counted reaching Labor over the Coalition" + (g.d.scopeNote ? " — " + g.d.scopeNote : "") : g.kind === "byelec" ? g.d.sub : "Would pick " + anchor + " over " + rival + (g.kind === "mrp" && g.d.wt ? " (all regions: our weighting)" : "");
+  const cname = (g, ck) => (g.d.lbl && g.d.lbl[ck] || FF_COHORTS[ck].name) + " voters";
   return React.createElement("figure", {
     className: "rd-ff",
     ref: box,
@@ -127874,7 +127990,7 @@ function RdForced({
     className: "rd-dis-ax",
     textAnchor: "end"
   }, v)), eNote && React.createElement("text", {
-    x: (x0 + Xi(firstX)) / 2,
+    x: (x0 + noteX) / 2,
     y: Y(37.5) + 4,
     className: "rd-fl-empty",
     textAnchor: "middle"
@@ -127886,7 +128002,7 @@ function RdForced({
     d: `M${Xi(elec.xm)} ${Y(elec[s.ck])}L${s.pts[0][0]} ${s.pts[0][1]}`,
     className: "rd-ff-lead " + FF_COHORTS[s.ck].cls,
     strokeDasharray: RD_ELECTION_LEAD
-  })), series.filter(s => !s.mrp).map(s => React.createElement("path", {
+  })), series.map(s => React.createElement("path", {
     key: s.ck,
     d: monotoneXY(s.pts),
     className: "rd-ff-line " + FF_COHORTS[s.ck].cls
@@ -127927,7 +128043,7 @@ function RdForced({
     };
     return cohorts.filter(ck => g.d[ck] != null).map((ck, ci) => {
       const est = g.d.estCohort === ck;
-      const aria = `${gTitle(g)}: ${FF_COHORTS[ck].name} voters, ${g.kind === "elec" ? "preferences to " + anchorShort : anchorShort} ${g.d[ck]}, ${rivalShort} ${Math.round((100 - g.d[ck]) * 10) / 10}` + (g.kind === "mrp" && g.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "") + (est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : "") + (k ? "; press Enter to open this poll" : "");
+      const aria = `${gTitle(g)}: ${cname(g, ck)}, ${g.kind === "elec" || g.kind === "byelec" ? "preferences to " + anchorShort : anchorShort} ${g.d[ck]}, ${rivalShort} ${Math.round((100 - g.d[ck]) * 10) / 10}` + (g.kind === "mrp" && g.d.wt ? " — all regions, our weighting of DemosAU’s printed regional tables" : "") + (g.kind === "byelec" && g.d.sub ? " — " + g.d.sub : "") + (est ? " — the June Coalition split combines the report’s printed CLP/LNP/Nat and Liberal rows, which it prints no combined row for" : "") + (k ? "; press Enter to open this poll" : "");
       return React.createElement("circle", {
         key: g.key + ck,
         cx: Xi(g.xm),
@@ -127967,7 +128083,7 @@ function RdForced({
     className: "tip-swatch rd-ff-sw " + tg.kind + " " + FF_COHORTS[ck].cls
   }), React.createElement("span", {
     className: "tip-label"
-  }, FF_COHORTS[ck].name, " voters"), React.createElement("span", {
+  }, cname(tg, ck)), React.createElement("span", {
     className: "tip-val"
   }, tg.d[ck], "%"))), tg.d.n != null && React.createElement("span", {
     className: "tip-row"
@@ -128219,7 +128335,7 @@ function RdFlows() {
   }), pick, ", month by month")), React.createElement("p", {
     className: "rd-note rd-fl-read"
   }, "Implied is the figure a poll\u2019s primary votes give on the ", rdElecYear, " election\u2019s preference flows. Zero is each pollster\u2019s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster\u2019s first head-to-heads."), FF && (() => {
-    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || [])].map(d => d.xm).concat(lnWaves.map(w => w.xm)).concat(FF.elec2025 ? [FF.elec2025.xm] : []).filter(v => v != null);
+    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.bys || [])].map(d => d.xm).concat(lnWaves.map(w => w.xm)).concat(FF.elec2025r ? Object.values(FF.elec2025r).map(r => r.xm) : FF.elec2025 ? [FF.elec2025.xm] : []).filter(v => v != null);
     const dom = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs))];
     return React.createElement("div", {
       className: "rd-ff"
@@ -128229,7 +128345,7 @@ function RdFlows() {
       className: "rd-sub rd-ff-t"
     }, "What voters say they\u2019d do with their preferences"), React.createElement("p", {
       className: "rd-subdek rd-ff-d"
-    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines). DemosAU\u2019s MRP reports carry the same answers each quarter (the diamonds) \u2014 printed by region, so they switch with the menu (\u201CAll voters\u201D is our weighting of the three regions). DemosAU\u2019s MRPs press the Coalition against One Nation too \u2014 the third chart below. The rings mark what preferences actually did at the 2025 election. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
+    }, "Some pollsters ask voters to choose between Labor and its rival as if the two were the last ones left. RedBridge/Accent asks every month (the lines). DemosAU\u2019s MRP reports carry the same answers each quarter (the triangles) \u2014 printed by region, so they switch with the menu (\u201CAll voters\u201D is our weighting of the three regions). DemosAU\u2019s MRPs press the Coalition against One Nation too \u2014 the third chart below. The rings mark what preferences actually did at the 2025 election, and the crosses the 2026 state and by-election counts. The answers show, for example, how many Coalition voters would rather have One Nation than Labor. Take them with a grain of salt as a forecast, though: last-election flows have consistently ", React.createElement("a", {
       className: "rd-link rd-link-in",
       href: "https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html"
     }, "predicted the next election better", React.createElement("span", {
@@ -128263,7 +128379,7 @@ function RdFlows() {
       W: cw,
       phone: phone,
       extras: FF.demos,
-      elec: FF.elec2025,
+      elec: FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025,
       dom: dom
     })), React.createElement("div", {
       className: "rd-fl-one"
@@ -128275,7 +128391,7 @@ function RdFlows() {
       className: "rd-ap-ct"
     }, ffTitle("on"))), React.createElement(RdForced, {
       q: "on",
-      waves: FF.vsOn,
+      waves: ffReg ? [] : FF.vsOn,
       cohorts: ["grn", "coal", "oth"],
       anchor: "Labor",
       rival: "One Nation",
@@ -128283,13 +128399,18 @@ function RdFlows() {
       W: cw,
       phone: phone,
       extras: demoRows,
+      bys: ffReg ? [] : FF.bys || [],
       dom: dom,
       emptyNote: ["No election count of this choice", "No election count", "No count"]
     }))), lnWaves.length > 0 && React.createElement("div", {
       className: "rd-fl-one rd-ff-ln"
     }, React.createElement("span", {
       className: "rd-fl-name"
-    }, "Coalition v One Nation"), React.createElement("div", {
+    }, React.createElement("span", {
+      className: "rd-fl-xb"
+    }, "Coalition"), " v ", React.createElement("span", {
+      className: "rd-fl-xo"
+    }, "One Nation")), React.createElement("div", {
       className: "rd-fl-ct"
     }, React.createElement("h4", {
       className: "rd-ap-ct"
@@ -128317,7 +128438,12 @@ function RdFlows() {
     }, React.createElement("span", {
       className: "rd-ff-keydm",
       "aria-hidden": "true"
-    }), "DemosAU MRP, quarterly"), FF.elec2025 && React.createElement("span", {
+    }), "DemosAU MRP, quarterly"), (FF.bys || []).length > 0 && React.createElement("span", {
+      className: "rd-key-item"
+    }, React.createElement("span", {
+      className: "rd-ff-keyx",
+      "aria-hidden": "true"
+    }), "2026 state and by-election counts"), FF.elec2025r && React.createElement("span", {
       className: "rd-key-item"
     }, React.createElement("span", {
       className: "rd-ff-keyring",
@@ -128333,7 +128459,7 @@ function RdFlows() {
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election."));
+  }, "This check corrects no other figure on the page.", FF && " RedBridge/Accent’s figures are read straight off its reports; only June 2026’s Coalition figure combines two printed party rows, as that dot’s note says. DemosAU prints one national figure, for One Nation voters choosing between Labor and the Coalition. Its MRP’s other pressed tables — Labor against One Nation, and the Coalition against One Nation — come printed by region alone, so the menu’s named regions show those cells as printed and All voters is our weighting of them by enrolment and vote, not a figure the report adds up itself. The rings are the AEC’s counted preference flows at the 2025 election, split by the AEC’s own inside-metro, outside-metro and rural-plus-provincial seat classes. The crosses are the 2026 preference counts the AEC and other commissions have released for the South Australian election and the Farrer and Secret Harbour by-elections — none of them joined to any line."));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);

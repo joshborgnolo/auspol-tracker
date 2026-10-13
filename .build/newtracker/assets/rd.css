@@ -3087,6 +3087,10 @@ body.rd .rd-fl-one { display: flex; flex-direction: column; min-width: 0; }
 body.rd .rd-fl-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
 body.rd .rd-fl-name.lnp { color: var(--lnp-text); }
 body.rd .rd-fl-name.onp { color: var(--onp-text); }
+/* the Coalition v One Nation heading carries both rivals' inks (user
+   2026-10-13), one token per side as the pair beside it reads */
+body.rd .rd-fl-xb { color: var(--lnp-text); }
+body.rd .rd-fl-xo { color: var(--onp-text); }
 body.rd .rd-fl-ct { display: flex; align-items: center; gap: 12px; min-height: 36px; }
 body.rd .rd-fl-ct .rd-ap-ct { margin: 0; }
 /* the forced-choice titles run two to four lines as their tails come and
@@ -3173,23 +3177,35 @@ body.rd .rd-ff-dot.onp { fill: var(--onp); }
 body.rd .rd-ff-dot.oth { fill: var(--oth); }
 body.rd .rd-ff-dot.alp { fill: var(--alp); }
 /* DemosAU MRP's readings on the Labor v Coalition chart: hollow-centred
-   diamonds, another house's marks rather than steps on RedBridge's line. The
-   centre takes --chart-bg, never none (originally unfilled so a co-located
-   RedBridge dot showed through, but a transparent centre let a cohort line
-   bisect the mark - and the ground-matched centre now inverts with the dark
-   palette on its own): the .rd-ring election-mark idiom (user call
-   2026-10-13) */
-body.rd .rd-ff-dm { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
-body.rd .rd-ff-dm.onp { stroke: var(--onp); }
-/* the Labor-v-One-Nation chart's DemosAU marks take their cohort's colour */
-body.rd .rd-ff-dm.lnp { stroke: var(--lnp); }
-body.rd .rd-ff-dm.grn { stroke: var(--grn); }
-body.rd .rd-ff-dm.oth { stroke: var(--oth); }
-body.rd .rd-ff-dm.alp { stroke: var(--alp); }
+   triangles, another house's marks that JOIN the lines like RedBridge's
+   dots (user 2026-10-13: behave like the dots, just differently shaped).
+   The crosses are the 2026 state and by-election counts, joined to no
+   line. The triangle centre takes --chart-bg, never none (originally
+   unfilled so a co-located RedBridge dot showed through, but a transparent
+   centre let a cohort line bisect the mark - and the ground-matched centre
+   now inverts with the dark palette on its own): the .rd-ring election-mark
+   idiom (user call 2026-10-13). The cross is unfilled, drawn as one path
+   per cohort like the line idiom */
+body.rd .rd-ff-tr { fill: var(--chart-bg); stroke-width: 1.75; stroke-linejoin: round; }
+body.rd .rd-ff-tr.onp { stroke: var(--onp); }
+body.rd .rd-ff-tr.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-tr.grn { stroke: var(--grn); }
+body.rd .rd-ff-tr.oth { stroke: var(--oth); }
+body.rd .rd-ff-tr.alp { stroke: var(--alp); }
+body.rd .rd-ff-x { fill: none; stroke-width: 1.75; stroke-linecap: round; }
+body.rd .rd-ff-x.onp { stroke: var(--onp); }
+body.rd .rd-ff-x.lnp { stroke: var(--lnp); }
+body.rd .rd-ff-x.grn { stroke: var(--grn); }
+body.rd .rd-ff-x.oth { stroke: var(--oth); }
+body.rd .rd-ff-x.alp { stroke: var(--alp); }
 /* the key names each mark's SHAPE in neutral ink - the cohort colours are
    named at the lines' ends */
-body.rd .rd-ff-keydm { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); transform: rotate(45deg); vertical-align: 0; }
+body.rd .rd-ff-keydm { display: inline-block; width: 9px; height: 8px; margin: 0 7px 0 2px; background: var(--ink-2); clip-path: polygon(50% 0, 100% 100%, 0 100%); vertical-align: -1px; }
 body.rd .rd-ff-keyring { display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; border: 1.75px solid var(--ink-2); border-radius: 50%; vertical-align: -1px; }
+body.rd .rd-ff-keyx { position: relative; display: inline-block; width: 9px; height: 9px; margin: 0 7px 0 2px; vertical-align: -1px; }
+body.rd .rd-ff-keyx::before, body.rd .rd-ff-keyx::after { content: ""; position: absolute; left: 0; right: 0; top: 3.5px; height: 1.75px; border-radius: 1px; background: var(--ink-2); }
+body.rd .rd-ff-keyx::before { transform: rotate(45deg); }
+body.rd .rd-ff-keyx::after { transform: rotate(-45deg); }
 body.rd .rd-ff-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
 body.rd .rd-ff-keyln::before { content: ""; position: absolute; left: 1px; right: 1px; top: 6px; height: 2.25px; border-radius: 1px; background: var(--ink-2); }
 body.rd .rd-ff-keyln i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--ink-2); }
@@ -3213,10 +3229,15 @@ body.rd .rd-ff .rd-fl-empty, body.rd .rd-ff .rd-apd-dothi { pointer-events: none
    pointer, so stacked marks never hide one another */
 body.rd .rd-ff .rd-ff-hit { pointer-events: none; }
 body.rd .rd-ff svg.link { cursor: pointer; }
-/* the tip's swatch takes the hovered mark's shape: dot, diamond, ring */
+/* the tip's swatch takes the hovered mark's shape: dot, triangle, ring,
+   cross */
 body.rd .rd-ff-sw.wave { border-radius: 50%; width: 8px; height: 8px; }
-body.rd .rd-ff-sw.mrp { width: 7px; height: 7px; border-radius: 0; background: transparent; border: 1.5px solid; transform: rotate(45deg); margin: 0 1px; }
+body.rd .rd-ff-sw.mrp { width: 9px; height: 8px; border-radius: 0; transform: none; border: 0; margin: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 body.rd .rd-ff-sw.elec { border-radius: 50%; background: transparent; border: 1.5px solid; }
+body.rd .rd-ff-sw.byelec { position: relative; border-radius: 0; background: transparent; }
+body.rd .rd-ff-sw.byelec::before, body.rd .rd-ff-sw.byelec::after { content: ""; position: absolute; left: 0.5px; right: 0.5px; top: 3.5px; height: 1.75px; border-radius: 1px; }
+body.rd .rd-ff-sw.byelec::before { transform: rotate(45deg); }
+body.rd .rd-ff-sw.byelec::after { transform: rotate(-45deg); }
 body.rd .rd-ff-sw.wave.lnp { background: var(--lnp); }
 body.rd .rd-ff-sw.wave.grn { background: var(--grn); }
 body.rd .rd-ff-sw.wave.onp { background: var(--onp); }
@@ -3227,6 +3248,18 @@ body.rd .rd-ff-sw.grn { border-color: var(--grn); }
 body.rd .rd-ff-sw.onp { border-color: var(--onp); }
 body.rd .rd-ff-sw.oth { border-color: var(--oth); }
 body.rd .rd-ff-sw.alp { border-color: var(--alp); }
+/* solid shapes take the colour themselves: the triangle's fill, the cross's
+   two bars */
+body.rd .rd-ff-sw.mrp.lnp { background: var(--lnp); }
+body.rd .rd-ff-sw.mrp.grn { background: var(--grn); }
+body.rd .rd-ff-sw.mrp.onp { background: var(--onp); }
+body.rd .rd-ff-sw.mrp.oth { background: var(--oth); }
+body.rd .rd-ff-sw.mrp.alp { background: var(--alp); }
+body.rd .rd-ff-sw.byelec.lnp::before, body.rd .rd-ff-sw.byelec.lnp::after { background: var(--lnp); }
+body.rd .rd-ff-sw.byelec.grn::before, body.rd .rd-ff-sw.byelec.grn::after { background: var(--grn); }
+body.rd .rd-ff-sw.byelec.onp::before, body.rd .rd-ff-sw.byelec.onp::after { background: var(--onp); }
+body.rd .rd-ff-sw.byelec.oth::before, body.rd .rd-ff-sw.byelec.oth::after { background: var(--oth); }
+body.rd .rd-ff-sw.byelec.alp::before, body.rd .rd-ff-sw.byelec.alp::after { background: var(--alp); }
 body.rd .rd-ff-tip .tip-row.on .tip-label { color: var(--ink); font-weight: 600; }
 body.rd .rd-ff-tipsub { margin: -4px 0 3px; }
 body.rd .rd-ff-tipsub .tip-label { font-size: 12px; }

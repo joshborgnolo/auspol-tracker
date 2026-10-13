@@ -1,16 +1,23 @@
-/* test-flow-splits.mjs – pins the RedBridge/Accent "forced to choose" pair.
-   Moved 2026-10-10 from the /preference-flows/ satellite's #forced section
-   (fetch-drawn bars off assets/flow-splits.json) into the main page's
-   All-polls Preference flows section as two RdForced line charts fed by
-   gen-data's D.flowForced (§7db); REGROUPED the same day from one chart per
-   voter cohort ({coal, on}) to one chart per QUESTION ({vsOn, vsCoal}, each
-   wave carrying every cohort's Labor share on the one date). This test pins
-   the CURRENT contract: the data asset carries the waves read straight off
-   polls.json's tpp_split/tpp_split_on rows, verbatim per cohort cell, the
-   June-2026 Coalition est derivation rides exactly one cohort of one wave
-   (estCohort "coal"), the renderer mounts both charts with their cohort
-   rosters, and the satellite no longer carries the retired machinery. Runs
-   after the build in npm test's chain (the data asset only reflects the
+/* test-flow-splits.mjs – pins the forced-choice preference-flows trio in the
+   All-polls Preference flows section (moved 2026-10-10 from the
+   /preference-flows/ satellite's #forced section; regrouped that day to one
+   chart per QUESTION; REWORKED 2026-10-13 to the four-mark-kinds contract).
+   Current contract: gen-data's D.flowForced (§7db) carries RedBridge/Accent's
+   waves read straight off polls.json's tpp_split/tpp_split_on rows verbatim,
+   the June-2026 Coalition est derivation rides exactly one cohort of one wave,
+   DemosAU's MRP carriers (demos/demosOn/lnpOn) ride the SAME lines as
+   RedBridge's dots — different shape, the user's call: "the MRP readings
+   behave like the RedBridge dots, just differently shaped" (triangles, not
+   diamonds) — the 2025 election's rings derive from the AEC's TCP-by-division
+   flow download split by the AEC's own seat classes (elec2025r: all / inner /
+   outer / rural+provincial→regional — the menu rekeys the rings), the 2026
+   state and by-election counts ride the Labor-v-One-Nation chart as crosses
+   (bys: SA2026 Bonham estimates, Farrer's two Coalition partners, Secret
+   Harbour — on the days of the elections, joined to NO line, national only,
+   hidden on a named region), RedBridge's national dots likewise drop out on
+   a named region (the waves list goes empty), and the third chart's title
+   paints Coalition in coalition blue and One Nation in One Nation orange.
+   Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -67,6 +74,58 @@ assert.deepEqual(estMarks, [{ date: "2026-06-26", cohort: "coal" }],
 const jun = byDate.get("2026-06-26");
 assert.equal(jun.tpp_split_on.lnp, 36, "June's derived Coalition split is 36/64 on the row");
 
+/* the 2025 election rings: per-region carriers on the AEC's TCP-by-division
+   download (majors-renormalised flows), split by every division's AEC
+   demographic classification (data/aec-2025-division-class.json), rural +
+   provincial pooled to regional. The national carrier reproduces the AEC's
+   own national TCP flow table to the vote — and differs from the old TPP-cut
+   constants the rings used to ride */
+assert.ok(FF.elec2025r && ["all", "inner", "outer", "regional"].every((k) => FF.elec2025r[k]),
+  "elec2025r carries one rings carrier per region (all/inner/outer/regional)");
+assert.ok(!FF.elec2025, "the old single elec2025 carrier is gone — the rings ride the region set");
+assert.deepEqual(
+  Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.all[k]])), { grn: 86.83, onp: 27.1, oth: 48.61 },
+  "the national rings ride the AEC's TCP flow table (86.83/27.10/48.61), not the TPP constants");
+assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.inner[k]])), { grn: 89.51, onp: 36.49, oth: 55.63 },
+  "inner-metro rings = the inner-metro seats' summed flows");
+assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.outer[k]])), { grn: 87.11, onp: 28.03, oth: 49.71 },
+  "outer-metro rings = the outer-metro seats' summed flows");
+assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.regional[k]])), { grn: 84.48, onp: 23.99, oth: 45.85 },
+  "regional rings = the rural+provincial seats' summed flows");
+assert.ok(Math.abs(FF.elec2025r.all.xm - (2025 * 12 + 4 + 2 / 31)) < 1e-3,
+  `every carrier rides 3 May 2025 on the month-index scale (xm ${FF.elec2025r.all.xm})`);
+assert.ok(!FF.elec2025r.all.scopeNote && !!FF.elec2025r.regional.scopeNote,
+  "only the named regions carry a scope note (the national rings speak for all of Australia)");
+
+/* the crosses (user 2026-10-13): the 2026 counts that measured the Labor-v-
+   One-Nation choice — SA 2026 (Bonham's estimates), the Farrer by-election's
+   two Coalition partners, Secret Harbour's early-voting-centre count. Each on
+   its election DAY, none joined to any line */
+assert.ok(Array.isArray(FF.bys) && FF.bys.length === 4, "bys carries the four 2026-count crosses");
+const byKey = new Map((FF.bys || []).map((d) => [d.key, d]));
+assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, byKey.get("sa2026")[k]])), { coal: 33.9, grn: 84.8, oth: 55.9 },
+  "SA 2026: Bonham's estimates (Liberal 33.9 / Greens 84.8 / Independent 55.9 to Labor)");
+assert.equal(byKey.get("sa2026").date, "2026-03-21", "SA 2026 rides its election day");
+assert.equal(byKey.get("sa2026").lbl.coal, "Liberal", "SA's Coalition cohort names the partner");
+assert.equal(byKey.get("farrlib").coal, 41, "Farrer: 41% of Liberal prefs to Labor (the release's 59% to One Nation)");
+assert.equal(byKey.get("farrnat").coal, 31, "Farrer: 31% of Nationals prefs to Labor (the release's 69% to One Nation)");
+assert.equal(byKey.get("farrlib").date, "2026-05-09" , "Farrer rides its by-election day");
+assert.deepEqual([byKey.get("harbour").coal, byKey.get("harbour").grn], [29.8, 90],
+  "Secret Harbour: Antony Green's early-voting-centre count (Liberal 29.8 / Greens 90.0 to Labor)");
+assert.equal(byKey.get("harbour").date, "2026-08-29", "Secret Harbour rides 29 Aug 2026");
+for (const d of FF.bys) {
+  const [y, mo, dy] = d.date.split("-").map(Number);
+  const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+  assert.ok(Math.abs(d.xm - (y * 12 + mo - 1 + (dy - 1) / dim)) < 1e-3,
+    `${d.key}: xm is its own election day on the month-index scale`);
+  assert.ok(d.label && d.win && d.sub, `${d.key}: the mark names its count, day and provenance`);
+}
+
+/* the MRP readings JOIN the lines: their marks ride the same cohort series
+   as RedBridge's waves (the renderer's line inputs), not a separate kind */
+assert.ok(Array.isArray(FF.demosOn) && FF.demosOn.length >= 2, "demosOn carries the MRP's Labor-v-One-Nation regional carriers");
+assert.ok(Array.isArray(FF.lnpOn) && FF.lnpOn.length >= 2, "lnpOn carries the MRP's Coalition-v-One-Nation carriers");
+
 // ---- the renderer wiring --------------------------------------------------------------
 const ap = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
 assert.ok(/function RdForced\(/.test(ap), "the RdForced component exists");
@@ -75,66 +134,101 @@ assert.equal(ap.match(/<RdForced /g).length, 3,
   "RdForced mounts three charts: the RedBridge pair plus the DemosAU MRP Coalition v One Nation third chart");
 assert.ok(ap.includes('cohorts={["grn", "coal", "oth"]}') && ap.includes('cohorts={["grn", "onp", "oth"]}'),
   "the two charts ask their cohort rosters: grn/coal/oth on Labor v One Nation, grn/onp/oth on Labor v the Coalition");
-assert.ok(ap.includes("waves={FF.vsOn}") && ap.includes("waves={FF.vsCoal}"), "both question series are charted");
 assert.ok(ap.includes('rival="One Nation"') && ap.includes('rival="the Coalition"'),
   "the two contests read as Labor-v-One-Nation and Labor-v-the-Coalition");
+assert.ok(ap.includes('anchor="the Coalition" rival="One Nation" houseWord="DemosAU (MRP)"'),
+  "the third chart presses the Coalition against One Nation on the lnpOn series, DemosAU-housed");
 assert.ok(ap.includes("D.flowForced"), "the charts read the data asset, not a fetch");
-assert.ok(ap.includes('className="rd-ff'), "the figure carries its styling hook");
-/* the third chart (user asks 2026-10-13): DemosAU's MRP reports press the
-   Coalition against One Nation too; its cohorts are the LnPOn key order,
-   one chart of Labor / Greens / Other voters preferring the Coalition */
-assert.ok(ap.includes('q="ln" waves={lnWaves} cohorts={["alp", "grn", "oth"]}') &&
-          ap.includes('anchor="the Coalition" rival="One Nation" houseWord="DemosAU (MRP)"'),
-  "the third chart presses the Coalition against One Nation on the lnpOn series, cohorts alp/grn/oth");
-assert.ok(ap.includes("const lnWaves = FF ? rekeyMrp(FF.lnpOn) : [];"),
-  "the third chart's waves are the lnpOn series rekeyed by the region select");
-assert.ok(ap.includes("rekeyMrp") && ap.includes('{ ...w, ...w.all, wt: true }'),
-  "rekeyMrp lifts the region's cells; all voters is the enrolment-and-vote weighting (wt stamped)");
-/* the region select (user ask 2026-10-13): one menu above the charts on the
-   primary-vote panel's .rd-pv-sel idiom, All voters default, the MRP's own
-   regions; it rekeys DemosAU's readings only, RedBridge's lines stand */
+
+/* four mark kinds, one shape apiece: RedBridge's dots and DemosAU's MRP
+   triangles BOTH join the lines (the user's 2026-10-13 call) — the line's
+   series filter is wave-or-mrp — the election's rings and the 2026 counts'
+   crosses sit outside every line */
+assert.ok(ap.includes('const inLine = (g) => g.kind === "wave" || g.kind === "mrp";'),
+  "waves AND MRP triangles join the cohort lines (the MRP affects the fit like a dot)");
+assert.ok(ap.includes("!groups.length"), "a chart with no groups at all stays unmounted (never an empty svg)");
+assert.ok(ap.includes('className={"rd-ff-tr " + cls}'), "the MRP mark is a triangle (.rd-ff-tr)");
+assert.ok(ap.includes('className={"rd-ff-x " + cls}'), "the 2026-count mark is a cross (.rd-ff-x)");
+assert.ok(ap.includes('className={"rd-ff-dot " + cls}') && ap.includes('"rd-ring rd-ff-ring "'),
+  "waves stay dots, the election stays the primary chart's open ring");
+
+/* triangles affect the lines: a cohort's series runs through every wave and
+   MRP mark in date order; rings and crosses never bend it */
+assert.ok(ap.includes('groups.filter((g) => inLine(g) && g.d[ck] != null).sort((a, b) => a.xm - b.xm)'),
+  "each cohort's line runs through waves and MRP marks alike, in date order");
+const lineCall = ap.match(/series\.map\(\(s\)\s*=>[\s\S]{0,160}?rd-ff-line /);
+assert.ok(lineCall && !/filter/.test(lineCall[0]),
+  "every built series draws its line (no 'lone triangles get no line' filter left over)");
+
+/* the bys/x domain story: crosses sit on their own days, the rings on the
+   election's day, all on the month-index scale; the shared domain spans the
+   waves, the MRPs, the crosses and the rings */
+assert.ok(ap.includes("...(bys || []).map((d) => d.xm)"), "a chart's own domain hears the crosses' days");
+assert.ok(ap.includes("...(FF.bys || [])"), "the section's shared domain hears the crosses");
+
+/* the region menu (user asks 2026-10-13): All voters + the MRP's three named
+   regions. On a named region, RedBridge's national dots and the 2026 crosses
+   vanish (a national wave can't speak to a region), the MRP carriers rekey
+   to the printed cells, and the rings swap to that class's counted flows */
 assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];'),
   "the region menu is All voters + the MRP's three named regions");
 assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={ffReg}') && ap.includes('setFfReg(e.target.value)'),
   "the select rides ffReg state beside the section hed, labelled for assistive tech");
-for (const regionCohort of ["demosOn", "inner", "lnpOn"])
-  assert.ok(assetSrc.includes(`"${regionCohort}"`) || assetSrc.includes(`${regionCohort}:`),
-    `the data asset carries the ${regionCohort === "inner" ? "region carriers" : regionCohort} block`);
-assert.ok(assetSrc.includes('"inner":{"coal":40') && assetSrc.includes('"regional":{"coal":21'),
-  "demosOn carries the MRP's printed regional cells beside the weighted all block");
-assert.ok(assetSrc.includes('"all":{"alp":68') && assetSrc.includes('"regional":{"alp":64'),
-  "lnpOn carries the MRP's Coalition-v-One-Nation cells per region");
+assert.ok(ap.includes("waves={ffReg ? [] : FF.vsOn}"),
+  "on a named region RedBridge's dots drop out of the v-One-Nation chart entirely");
+assert.ok(ap.includes("bys={ffReg ? [] : (FF.bys || [])}"),
+  "on a named region the 2026-count crosses drop out too (national counts)");
+assert.ok(ap.includes("elec={FF.elec2025r ? FF.elec2025r[ffReg || \"all\"] : FF.elec2025}"),
+  "the rings swap to the region's own counted flows (all/inner/outer/regional)");
+assert.ok(ap.includes("FF.elec2025r ? Object.values(FF.elec2025r)"),
+  "the shared domain hears every ring carrier's date");
+assert.ok(ap.includes("extra") === false || ap.includes("extras={demoRows}"),
+  "the v-One-Nation chart's MRP extras ride the rekeyed demosOn rows");
+
+/* the rekey: All voters reads the wave's `all` (our enrolment-and-vote
+   weighting, marked wt); a named region reads the report's printed cells */
+assert.ok(ap.includes("const rekeyMrp = (ws)") && ap.includes("...w, ...w.all, wt: true"),
+  "rekeyMrp lifts the region's cells; All voters is the enrolment-and-vote weighting (wt stamped)");
+
+// ---- the third chart's coloured title ------------------------------------------------
+assert.ok(ap.includes('<span className="rd-fl-xb">Coalition</span> v <span className="rd-fl-xo">One Nation</span>'),
+  "the third chart's name splits into two party-inked spans");
 const cssRd = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
-assert.ok(cssRd.includes(".rd-ff-ln { width: calc((100% - 48px) / 2); }") && cssRd.includes("@media (min-width: 761px)"),
-  "the third chart is capped at the pair's column width on desktop (48px = the pair's column gap)");
+assert.ok(/body\.rd \.rd-fl-xb \{ color: var\(--lnp-text\)/.test(cssRd),
+  "Coalition in the title paints coalition blue (--lnp-text), not inherits the page ink");
+assert.ok(/body\.rd \.rd-fl-xo \{ color: var\(--onp-text\)/.test(cssRd),
+  "One Nation in the title paints One Nation orange (--onp-text)");
 
-/* the card titles tell the story from the LATEST wave (user's call 2026-10-10):
-   every cohort's latest share named in one line, anchored on the question's button ("NN% of Greens
-   voters, NN% of Coalition voters and NN% of Other voters prefer Labor over
-   One Nation"; the third chart's title reads prefer the Coalition over One Nation),
-   gaining a "— <Cohort> voters up/down from NN% in <its first
-   wave's month>" tail ONLY when that cohort's own straight-line drift
-   battery (w=1, Holm across the nine) says Yes — a title never claims a move
-   the pressed set of the trend-significance table won't stand behind */
-assert.ok(ap.includes('% of ${FF_COHORTS[ck].prose} voters') && ap.includes('" prefer " + def.anchor + " over " + def.rival'),
-  "each title lists every cohort's latest share, anchored on its question's pair");
-assert.ok(ap.includes('"up"') && ap.includes('"down"') && ap.includes('"% in "') && ap.includes("rdMonthYear("),
-  "the title tail reads up/down from the cohort's first-wave share, month named dynamically");
-assert.ok(ap.includes("moved.length !== 1"), "the tail names a cohort only when EXACTLY ONE moved");
+// ---- the new marks' CSS ----------------------------------------------------------------
+assert.ok(/\.rd-ff-tr\.\w+/.test(cssRd) && cssRd.includes("stroke-linejoin"),
+  "every cohort's triangle fills the chart ground and carries its party-inked stroke");
+assert.ok(/\.rd-ff-x\.\w+/.test(cssRd) && cssRd.includes("stroke-linecap"),
+  "every cohort's cross strokes its party ink, no fill");
+assert.ok(cssRd.includes(".rd-ff-keydm") && cssRd.includes("clip-path: polygon(50% 0, 100% 100%, 0 100%)"),
+  "the key's MRP token is a solid triangle matching the plot mark");
+assert.ok(cssRd.includes(".rd-ff-keyx") && cssRd.includes(".rd-ff-keyx::before") && cssRd.includes("rotate(-45deg)"),
+  "the key's 2026-count token is a cross");
+assert.ok(cssRd.includes(".rd-ff-sw.mrp") && cssRd.includes(".rd-ff-sw.byelec"),
+  "the tooltip swatches take the mark's shape: MRP triangles, 2026-count crosses");
+assert.ok(cssRd.includes(".rd-ff-keyring"), "the key names the 2025 election's rings");
+assert.ok(cssRd.includes(".rd-ff-keyln"), "the key's line token marks RedBridge/Accent's monthly run");
+
+// ---- the xnote and key in the renderer ------------------------------------------------
+assert.ok(ap.includes("Triangles mark DemosAU’s MRP readings"), "the svg's spoken note names the triangles");
+assert.ok(ap.includes("Crosses mark the 2026 state and by-election counts."), "the spoken note names the crosses where they're drawn");
+assert.ok(ap.includes("(FF.bys || []).length > 0") || ap.includes('(FF.bys || []).length'), "the crosses' key item is gated on crosses existing");
+assert.ok(ap.includes("FF.elec2025r &&"), "the rings' key item is gated on the region carriers existing");
+
+// ---- the renderer's earlier contract still stands --------------------------------------
+assert.ok(ap.includes('q="co" waves={FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series");
+assert.ok(ap.includes("const demoRows = FF ? rekeyMrp(FF.demosOn) : [];"),
+  "the v-One-Nation chart's MRP extras come from the rekeyed demosOn carriers");
+assert.ok(ap.includes("moved.length !== 1"), "a title tail names a cohort only when EXACTLY ONE moved");
 assert.ok(ap.includes('key: "pressed"'), "the pressed-choice rows join the trend-significance table as their own set");
-assert.ok(ap.includes('"First → last"'), "the table's first→last column head fits both gaps and shares");
-const css = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
-assert.ok(css.includes(".rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }"),
+assert.ok(cssRd.includes(".rd-ff-two .rd-fl-one { display: grid; grid-row: span 3; grid-template-rows: subgrid; }"),
   "the forced pair shares one subgrid (contest, title, chart) so the two svgs stay row-aligned however the titles wrap");
-/* the 2025 election rings sit at the election's own date: xm derived from
-   3 May 2025, never typed (a hand-typed 24314.0645 drew them in March 2026) */
-assert.ok(Math.abs(FF.elec2025.xm - (2025 * 12 + 4 + 2 / 31)) < 1e-3, `the election rings ride 3 May 2025 (xm ${FF.elec2025.xm})`);
-assert.deepEqual([FF.elec2025.grn, FF.elec2025.onp, FF.elec2025.oth], [88.2, 25.5, 54.6], "the rings read the 2025 counted flows");
-for (const cls of ["grn", "lnp", "onp", "oth"])
-  assert.ok(css.includes(`.rd-ff-line.${cls}`) && css.includes(`.rd-ff-dot.${cls}`),
-    `the cohort's line and dot rules are its party hue (.${cls})`);
 
-// ---- the satellite is stripped ---------------------------------------------------------
+// ---- the satellite stays stripped -------------------------------------------------------
 const page = fs.readFileSync(path.join(ROOT, "preference-flows", "index.html"), "utf8");
 for (const dead of ['id="forced"', '<a href="#forced"', "flow-splits.json", 'id="fsq-', ".fsq ", "--fs-alp",
                     'draw("fsq-'])
