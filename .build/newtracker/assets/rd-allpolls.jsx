@@ -5125,7 +5125,7 @@ function RdFlows() {
   const flowSets = FF ? [
     { key: "ftco", label: "Labor v Coalition — the share of each cohort choosing Labor", rows: [
       { key: "elec", name: "2025 election, as counted",
-        cells: FF.elec2025r ? ["all", "inner", "outer", "regional"].map((k) => ftCell(FF.elec2025r[k], ftCohorts.co)) : ftDash },
+        cells: FF.elec2025r ? [ftCell(FF.elec2025r.all, ftCohorts.co), "–", "–", "–"] : ftDash },
       { key: "site", name: "The flows this site uses",
         cells: [ftCell(ftSite ? { grn: ftPct(ftSite.lnp.grn), onp: ftPct(ftSite.lnp.onp), oth: ftPct(ftSite.lnp.oth) } : null, ftCohorts.co), "–", "–", "–"] },
       ftLast.co && { key: "rb", name: "RedBridge/Accent, " + rdMonthYear(ftLast.co.ym),
@@ -5193,7 +5193,7 @@ function RdFlows() {
            any chart draws), so their months line up beside one another */
         const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.bys || [])].map((d) => d.xm)
           .concat(lnWaves.map((w) => w.xm))
-          .concat(FF.elec2025r ? Object.values(FF.elec2025r).map((r) => r.xm) : (FF.elec2025 ? [FF.elec2025.xm] : []))
+          .concat(FF.elec2025r ? [FF.elec2025r.all.xm] : [])
           .filter((v) => v != null);
         const dom = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs))];
         return (
@@ -5202,9 +5202,11 @@ function RdFlows() {
             RedBridge/Accent alone though DemosAU's MRP and the election
             share the charts). Set as the page's sub-story (.rd-sub/.rd-subdek),
             as the two-party and leadership sections set theirs. The region
-            menu rekeys the DemosAU figures and the election's rings (the
-            AEC's flow release classifies every seat), and drops RedBridge's
-            national dots beside any regional reading they can't speak to */}
+            menu rekeys the DemosAU figures, drops RedBridge's national dots
+            beside any regional reading they can't speak to, and stands the
+            Labor-v-Coalition chart aside entirely (its rings are the
+            election's national TPP flows — the AEC counts no per-region
+            cut for them to rekey to) */}
         <div className="rd-ff-head">
           <div>
             <h3 className="rd-sub rd-ff-t">What voters say they’d do with their preferences</h3>
@@ -5222,11 +5224,17 @@ function RdFlows() {
           <div className="rd-fl-one">
             <span className="rd-fl-name lnp">Labor v Coalition</span>
             <div className="rd-fl-ct"><h4 className="rd-ap-ct">{ffTitle("co")}</h4></div>
-            {/* RedBridge/Accent's waves and DemosAU's triangles are
-                national-only (user 2026-10-13: a named region drops them, as
-                the v-One-Nation chart already did); the election's own
-                regional rings ride every menu state */}
-            <RdForced q="co" waves={ffReg ? [] : FF.vsCoal} cohorts={["grn", "onp", "oth"]} anchor="Labor" rival="the Coalition" houseWord="RedBridge/Accent" W={cw} phone={phone} extras={ffReg ? [] : FF.demos} elec={FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025} dom={dom} />
+            {/* RedBridge/Accent's waves, DemosAU's triangles and the 2025
+                election's rings are all national-only (user 2026-10-13: a
+                named region drops them, as the v-One-Nation chart already
+                did — the AEC counts no per-region TPP flows for the rings
+                to ride, so nothing on this chart can rekey; it stands aside
+                for a national-only empty cell instead of an empty svg) */}
+            {ffReg ? (
+              <p className="rd-fl-emptycell">National-only — RedBridge/Accent’s waves, DemosAU’s MRP and the 2025 election all measured the country whole; there’s no {((FF_REGIONS.find((r) => r[0] === ffReg) || [])[1] || "regional").toLowerCase()} cut. “All voters” shows them.</p>
+            ) : (
+              <RdForced q="co" waves={FF.vsCoal} cohorts={["grn", "onp", "oth"]} anchor="Labor" rival="the Coalition" houseWord="RedBridge/Accent" W={cw} phone={phone} extras={FF.demos} elec={FF.elec2025r ? FF.elec2025r.all : null} dom={dom} />
+            )}
           </div>
           <div className="rd-fl-one">
             <span className="rd-fl-name onp">Labor v One Nation</span>
@@ -5247,7 +5255,7 @@ function RdFlows() {
           <span className="rd-key-item"><span className="rd-ff-keyln" aria-hidden="true"><i></i></span>RedBridge/Accent, monthly</span>
           {(FF.demos || FF.demosOn || lnWaves.length > 0) && <span className="rd-key-item"><span className="rd-ff-keydm" aria-hidden="true"></span>DemosAU MRP, quarterly</span>}
           {(FF.bys || []).length > 0 && <span className="rd-key-item"><span className="rd-ff-keyx" aria-hidden="true"></span>2026 state and by-election counts</span>}
-          {FF.elec2025r && <span className="rd-key-item"><span className="rd-ff-keyring" aria-hidden="true"></span>2025 election, as counted</span>}
+          {FF.elec2025r && !ffReg && <span className="rd-key-item"><span className="rd-ff-keyring" aria-hidden="true"></span>2025 election, as counted</span>}
         </RdKey>
       </div>
         );
@@ -5259,7 +5267,7 @@ function RdFlows() {
         <RdTsig summary="Flows table"
           heads={["Flow", "All voters", "Inner metro", "Outer metro", "Regional"]}
           sets={flowSets}
-          note={"Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows, split by its inside-metro, outside-metro and rural-plus-provincial seat classes (the charts’ rings above); no national count of the two One Nation choices exists, so those cells are dashes. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."}
+          note={"Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the same figures this site’s flow constants read; the chart rings above). The AEC counts no per-region TPP flows, so the row’s regional cells are dashes; and no count of the two One Nation choices exists at all, so those cells are dashes too. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."}
         />
       )}
       {/* the drift battery: has each pollster's gap MOVED over the term,

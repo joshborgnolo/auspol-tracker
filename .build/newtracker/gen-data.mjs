@@ -4075,28 +4075,29 @@ const flowForced = (() => {
     }
   }
   /* the 2025 election's OWN reading of the Labor-v-Coalition question: the
-     AEC's counted flows to Labor — and since 2026-10-13 on the FULL TCP
-     cut (HouseTcpFlowByDivisionDownload-31496.csv, majors-renormalised),
-     not flows.mjs's TPP constants (its implied-2PP anchor), so the rings
-     sit beside DemosAU's region menus on the same electorate map: every
-     division carries the AEC's own classification (data/aec-2025-division-
-     class.json) and rural+provincial pools to regional. The "all" carrier
-     reproduces the AEC's national TCP table to the vote (GRN 1,279,081 v
-     194,050; ON 244,177 v 656,962). Percentages to one decimal. xm is the
-     election DAY on the waves' month-index scale (year·12 + month−1 + the
-     day's share of its month), derived from the date: a hand-typed
-     24314.0645 put the rings ten months late, in March 2026, beside the
-     first wave */
+     AEC's counted TPP flows to Labor (HouseTppFlowByStateByParty-31496,
+     every formal ballot redistributed ALP v Coalition) — the very cut the
+     estimate's implied-2PP anchor reads, so the carrier is TYPED FROM
+     FLOW_FED and the two can never drift (user 2026-10-13: the Flows
+     table's election row must be this cut, not the TCP majors-renormalised
+     cut it first shipped as). The AEC publishes TPP flows by party
+     nationally and by state only, never per division — the inner/outer/
+     regional carriers that rode the per-division TCP file were removed the
+     same day: a per-seat DoP replay (.build/aec-2025-region-tpp-flows.mjs)
+     misses the counted national rows by 7-9 points even for fully-classic
+     states (cascaded piles mix origins; ballot-level redistributions are
+     unpublished for the House), so the site shows NO regional election
+     flows. xm is the election DAY on the waves' month-index scale
+     (year·12 + month−1 + the day's share of its month), derived from the
+     date: a hand-typed 24314.0645 put the rings ten months late, in March
+     2026, beside the first wave */
   const elec2025r = (() => {
     const d = "2025-05-03", y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
     const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
     const xm = Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4;
-    return {
-      all: { date: d, xm, win: "as counted", grn: 86.83, onp: 27.10, oth: 48.61 },
-      inner: { date: d, xm, win: "as counted", scopeNote: "inner-metro seats", grn: 89.51, onp: 36.49, oth: 55.63 },
-      outer: { date: d, xm, win: "as counted", scopeNote: "outer-metro seats", grn: 87.11, onp: 28.03, oth: 49.71 },
-      regional: { date: d, xm, win: "as counted", scopeNote: "rural and provincial seats", grn: 84.48, onp: 23.99, oth: 45.85 },
-    };
+    return { all: { date: d, xm, win: "as counted",
+      grn: Math.round(FLOW_FED.grn * 1e4) / 100, onp: Math.round(FLOW_FED.onp * 1e4) / 100,
+      oth: Math.round(FLOW_FED.oth * 1e4) / 100 } };
   })();
   /* the 2026 state and by-election counts that MEASURED the Labor-v-One-
      Nation choice the second chart asks: crosses on the chart's own day,

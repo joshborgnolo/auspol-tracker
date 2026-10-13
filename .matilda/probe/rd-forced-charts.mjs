@@ -10,11 +10,12 @@
        RedBridge dots, just differently shaped" — so a cohort's line runs
        through both houses' marks in date order; the probe verifies every
        line path threads its triangles as well as its dots);
-     - the 2025 election's rings come from elec2025r — one carrier per
-       region (all/inner/outer/regional, the AEC's seat classes) at the
-       AEC's TCP-by-division flows — the region menu swaps them; each ring
-       is a one-cohort open ring at 3 May 2025 joined to the first wave by
-       its dotted lead-in;
+     - the 2025 election's rings ride ONE national carrier, elec2025r.all,
+       typed from the estimate's own FLOW constants (the AEC's TPP flow
+       cut — every formal ballot redistributed ALP v Coalition; the AEC
+       counts no per-region TPP flows, so no regional election rings
+       exist); each ring is a one-cohort open ring at 3 May 2025 joined to
+       the first wave by its dotted lead-in;
      - the 2026 state/by-election counts ride as CROSSES (.rd-ff-x) on the
        Labor-v-One-Nation chart only, on their own election days, joined to
        NO line; on a named region they vanish (national counts); SA 2026
@@ -22,12 +23,14 @@
        Farrer's two crosses are GONE (user 2026-10-13: its counts measured
        independent national contests, not One Nation voters);
      - the region menu (All voters / Inner metro / Outer metro / Regional)
-       rekeys the DemosAU figures AND the rings, and DROPS RedBridge's
-       national dots on BOTH RedBridge charts (waves=[]) — a national
-       wave can't speak to a named region; the v-Coalition chart's DemosAU
-       triangles drop too (that MRP split is national-only — no regional
-       carrier exists, user 2026-10-13), leaving only the election's
-       rekeyed rings;
+       rekeys the DemosAU figures, and DROPS RedBridge's national dots on
+       BOTH RedBridge charts (waves=[]) — a national wave can't speak to a
+       named region; the v-Coalition chart's DemosAU triangles drop too
+       (that MRP split is national-only — no regional carrier exists, user
+       2026-10-13), and the election's national-only rings drop with them
+       (mirroring the demos triangles' national-only behaviour, user call:
+       "Keep All-voters-only") — the v-Coalition chart empties on a named
+       region, the other two keep their regional triangles;
      - the third chart's title paints Coalition in coalition blue and One
        Nation orange (probe asserts the two spans carry the party text-vars
        via getComputedStyle, not a hard-coded colour);
@@ -80,7 +83,7 @@ const rekeyMrp = (ws, reg) => (ws || []).map((w) => {
 const wavesOf = (FF, q, reg) => (q === "ln" ? rekeyMrp(FF.lnpOn, reg) : reg ? [] : FF[CHARTS[FI[q]].vsKey]);
 const extOf = (FF, q, reg) => (q === "co" ? (reg ? [] : FF.demos || []) : q === "on" ? rekeyMrp(FF.demosOn, reg) : []);
 const bysOf = (FF, q, reg) => (q === "on" && !reg ? FF.bys || [] : []);
-const elecOf = (FF, q, reg) => (q === "co" && FF.elec2025r ? [Object.values(FF.elec2025r).map((r) => r.xm) && FF.elec2025r[reg || "all"]] : []);
+const elecOf = (FF, q, reg) => (q === "co" && !reg && FF.elec2025r ? [FF.elec2025r.all] : []);
 const isMrp = (w) => w.house === FF_MRP_HOUSE;
 
 /* the pressed-choice battery, recomputed independently of the page */
@@ -255,6 +258,9 @@ const measure = () => page.evaluate(() => {
     return s ? { aria: s.getAttribute("aria-label"), value: s.value,
                  options: [...s.options].map((o) => [o.value, o.textContent.trim()]) } : null;
   })();
+  /* the Labor-v-Coalition cell's national-only stand-in paragraph (named
+     region only: the chart itself unmounts then) */
+  out.emptyCell = (sec.querySelector(".rd-fl-emptycell") || {}).textContent || null;
   /* the section carries TWO .rd-tsig folds now (2026-10-13): the Flows
      table directly above the trend-significance battery. Match each by
      its summary text — never querySelector's first hit */
@@ -303,8 +309,10 @@ const FF = await (async () => {
 })();
 check(!!FF && FF.house === "RedBridge/Accent" && Array.isArray(FF.vsOn) && Array.isArray(FF.lnpOn),
   `payload: D.flowForced carries the pair, the lnpOn carriers, and its house`);
-check(!!FF && FF.elec2025r && ["all", "inner", "outer", "regional"].every((k) => FF.elec2025r[k] && FF.elec2025r[k].grn != null),
-  `payload: elec2025r regions present (${FF && FF.elec2025r ? Object.keys(FF.elec2025r).join("/") : "none"})`);
+check(!!FF && FF.elec2025r && Object.keys(FF.elec2025r).join(",") === "all" && FF.elec2025r.all.grn != null,
+  `payload: elec2025r carries ONLY the national carrier, all (${FF && FF.elec2025r ? Object.keys(FF.elec2025r).join("/") : "none"})`);
+check(!!FF && FF.elec2025r && Math.abs(FF.elec2025r.all.grn - 88.19) < 1e-9 && Math.abs(FF.elec2025r.all.onp - 25.5) < 1e-9 && Math.abs(FF.elec2025r.all.oth - 54.55) < 1e-9,
+  `payload: the national carrier rides the AEC's TPP flow cut — GRN 88.19 / ON 25.50 / IND+OTH 54.55 to Labor (${FF && FF.elec2025r ? [FF.elec2025r.all.grn, FF.elec2025r.all.onp, FF.elec2025r.all.oth].join("/") : "none"})`);
 check(!!FF && Array.isArray(FF.bys) && FF.bys.length === 2,
   `payload: two 2026-count crosses (${FF && (FF.bys || []).length})`);
 check(!!FF && (FF.bys || []).every((b) => !/^farr/.test(b.key)),
@@ -327,6 +335,7 @@ check(d.h3 === "What voters say they’d do with their preferences", `desktop: t
 check(d.ffDeK, "desktop: the dek rides the section head");
 check(JSON.stringify(d.figs.map((f) => f.q)) === '["co","on","ln"]',
   `desktop: page order co / on / ln (${d.figs.map((f) => f.q).join(" | ")})`);
+check(d.emptyCell == null, "desktop: no national-only empty cell at national");
 check(d.figs[0].contest === "Labor v Coalition" && d.figs[1].contest === "Labor v One Nation" && d.figs[2].contest === "Coalition v One Nation",
   `desktop: contest spans name the three charts (${d.figs.map((f) => f.contest).join(" | ")})`);
 check(!!d.sel && d.sel.aria === "DemosAU MRP region" && d.sel.value === "",
@@ -451,8 +460,9 @@ for (const [i, f] of d.figs.entries()) {
 }
 
 /* the election rings on the Coalition chart: one open ring per cohort at
-   the AEC's elec2025r.all TCP-cut figures, at 3 May 2025, each joined to
-   its cohort's first wave (dot or triangle — the MRP is the January one) */
+   the national elec2025r.all TPP-flow-cut figures, at 3 May 2025, each
+   joined to its cohort's first wave (dot or triangle — the MRP is the
+   January one) */
 {
   const f = d.figs[FI.co], cam = CHARTS[FI.co], tk = axisMap(f.ticks);
   const e = FF.elec2025r.all, bot2 = 236 - 34;
@@ -465,7 +475,7 @@ for (const [i, f] of d.figs.entries()) {
   check(f.erings.length === cam.cohorts.length && cam.cohorts.every((ck) => {
     const ring = f.erings.find((g) => g.cls === CLS[ck]);
     return ring && Math.abs(100 * (bot2 - ring.y) / (bot2 - 16) - e[ck]) <= 0.06;
-  }), `desktop v-Coalition: rings vmap the TCP-cut counted flows ${e.grn}/${e.onp}/${e.oth}`);
+  }), `desktop v-Coalition: rings vmap the TPP-flow-cut counted flows ${e.grn}/${e.onp}/${e.oth}`);
   const eVals = [["grn", e.grn], ["onp", e.onp], ["oth", e.oth]];
   /* each ring joins its cohort's first mark with the dotted lead-in —
      the MRP's Jan–Mar reading is the first point for the One Nation
@@ -593,8 +603,9 @@ check(d.tsigHeads && d.tsigHeads[0] === "Series" && d.tsigHeads.length === 5,
 
 /* the Flows table (user 2026-10-13): the fold directly above the battery,
    recomputed here from the payload + the site's flowTables — three row
-   sets, election counted row then the site's constants then each house's
-   latest wave, across the four electorate views */
+   sets, election counted row (national-only: the AEC counts no per-region
+   TPP flows, its region cells are dashes) then the site's constants then
+   each house's latest wave, across the four electorate views */
 {
   check(JSON.stringify(d.tsigOrder) === JSON.stringify(["Flows table", "Trend-significance table"]),
     `flows table: mounts directly above the trend-significance battery (${JSON.stringify(d.tsigOrder)})`);
@@ -614,7 +625,7 @@ check(d.tsigHeads && d.tsigHeads[0] === "Series" && d.tsigHeads.length === 5,
   const VIEWS = ["all", "inner", "outer", "regional"];
   const want = [
     { set: "Labor v Coalition — the share of each cohort choosing Labor", rows: [
-      { name: "2025 election, as counted", cells: VIEWS.map((k) => ftCell(FF.elec2025r[k], FT_COHORTS.co)) },
+      { name: "2025 election, as counted", cells: [ftCell(FF.elec2025r.all, FT_COHORTS.co), "–", "–", "–"] },
       { name: "The flows this site uses", cells: [ftCell(FT ? { grn: FT.lnp.grn * 100, onp: FT.lnp.onp * 100, oth: FT.lnp.oth * 100 } : null, FT_COHORTS.co), "–", "–", "–"] },
       { name: "RedBridge/Accent, " + monY(lt.co.ym), cells: [ftCell(lt.co, FT_COHORTS.co), "–", "–", "–"] },
       { name: "DemosAU MRP, " + lt.dm.win, cells: [ftCell(lt.dm, FT_COHORTS.co), "–", "–", "–"] },
@@ -671,9 +682,20 @@ for (const [val, regName] of SWEEP) {
   const dr2 = await setReg(val);
   const bot2 = 236 - 34;
   check(dr2.sel && dr2.sel.value === val, `region ${regName}: the select reads ${val}`);
+  /* with RedBridge's waves, DemosAU's triangles AND the election's rings
+     all national-only (user 2026-10-13), a named region leaves the
+     Labor-v-Coalition chart NOTHING to draw — it unmounts (RdForced
+     returns null on zero groups) and its cell carries the national-only
+     paragraph. The two surviving figures shift up in DOM order, so
+     address the figures by their q from here on */
+  check(dr2.nFig === 2 && JSON.stringify(dr2.figs.map((f) => f.q)) === '["on","ln"]',
+    `region ${regName}: the Coalition chart unmounts — the One Nation pair stands (${dr2.figs.map((f) => f.q).join(",") || "none"})`);
+  check(dr2.emptyCell && dr2.emptyCell.startsWith("National-only — RedBridge/Accent’s waves"),
+    `region ${regName}: the Coalition chart's cell carries the national-only stand-in`);
+  const byQ = Object.fromEntries(dr2.figs.map((f) => [f.q, f]));
   /* v-ON: NO RedBridge dots at all — the MRP's regional triangles alone */
   {
-    const f = dr2.figs[FI.on], cam = CHARTS[FI.on];
+    const f = byQ.on, cam = CHARTS[FI.on];
     const lineWaves = rekeyMrp(FF.demosOn, val);
     check(f.nTr === lineWaves.length * 3 && Object.values(f.dots).every((arr) => arr.length === 0),
       `region ${regName} v-ON: no RedBridge dots — ${f.nTr} triangles from ${lineWaves.length} regional MRPs`);
@@ -691,28 +713,9 @@ for (const [val, regName] of SWEEP) {
       `region ${regName} v-ON: the spoken note names triangles only — no weighting flag on printed cells, no crosses`);
     check(f.aria.includes("all-regions weighting") === false, `region ${regName} v-ON: no our-weighting note on printed cells`);
   }
-  /* Coalition chart: RedBridge's dots AND DemosAU's triangles both drop
-     (both national-only, user 2026-10-13) — the election's own counted
-     rings, rekeyed to the region, are the only marks left */
-  {
-    const f = dr2.figs[FI.co], e = FF.elec2025r[val];
-    const evals = [e.grn, e.onp, e.oth];
-    check(Object.values(f.dots).every((arr) => arr.length === 0),
-      `region ${regName} v-Coalition: RedBridge's dots drop too (its waves are national-only)`);
-    check(f.nTr === 0 && f.lines.length === 0 && f.leads.length === 0 && f.els.length === 0,
-      `region ${regName} v-Coalition: DemosAU's national-only triangles drop with them — no lines, lead-ins or end labels remain`);
-    check(f.erings.length === 3 && ["grn", "onp", "oth"].every((ck) => {
-      const ring = f.erings.find((g) => g.cls === CLS[ck]);
-      return ring && Math.abs(100 * (bot2 - ring.y) / (bot2 - 16) - e[ck]) <= 0.06;
-    }), `region ${regName} v-Coalition: the rings rekey to the region's counted flows (${evals.join("/")})`);
-    const scope = e.scopeNote || null;
-    check(!!scope && f.aria.includes("for " + scope + ":"), `region ${regName} v-Coalition: the spoken note scopes the rings ("${scope}")`);
-    check(!f.aria.includes("Triangles mark") && !f.aria.includes("RedBridge/Accent’s latest"),
-      `region ${regName} v-Coalition: the spoken note names no national-only marks`);
-  }
   /* the third chart rekeys to the region's printed cells */
   {
-    const f = dr2.figs[FI.ln], cam = CHARTS[FI.ln];
+    const f = byQ.ln, cam = CHARTS[FI.ln];
     const lineWaves = rekeyMrp(FF.lnpOn, val);
     check(f.lines.length === 3 && f.nTr === lineWaves.length * 3,
       `region ${regName} Coalition-v-ON: ${lineWaves.length} regional MRPs still draw three lines`);
@@ -724,8 +727,8 @@ for (const [val, regName] of SWEEP) {
     }
     check(f.aria.includes("all-regions weighting") === false, `region ${regName} Coalition-v-ON: no our-weighting note on printed cells`);
   }
-  check(JSON.stringify(dr2.keyItems) === JSON.stringify(d.keyItems),
-    `region ${regName}: the key row stands`);
+  check(JSON.stringify(dr2.keyItems) === JSON.stringify(d.keyItems.filter((k) => k !== "2025 election, as counted")),
+    `region ${regName}: the rings' key item drops with the rings ("2025 election, as counted"; the other three stand)`);
   /* the pressed battery across all nine rows follows the region's cells */
   const fExp = expectedForced(FF, val);
   check(dr2.pressed && JSON.stringify(dr2.pressed.map((r) => r.cells)) === JSON.stringify(fExp.rows.map((r) => r.cells)),

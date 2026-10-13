@@ -5354,6 +5354,7 @@ body.rd .rd-ff-two { margin-top: 24px; }
 body.rd .rd-ff figure, body.rd figure.rd-ff { margin: 3px 0 0; }
 body.rd figure.rd-ff { position: relative; width: 100%; }
 body.rd .rd-ff svg { display: block; width: 100%; height: auto; }
+body.rd .rd-fl-emptycell { margin: 3px 0 0; align-self: center; max-width: 30em; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 body.rd .rd-ff-gl { stroke: var(--line-2); stroke-width: 1; fill: none; }
 body.rd .rd-ff-gl.mid { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
 body.rd .rd-ff-line { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
@@ -13935,36 +13936,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "date": "2025-05-03",
         "xm": 24304.0645,
         "win": "as counted",
-        "grn": 86.83,
-        "onp": 27.1,
-        "oth": 48.61
-      },
-      "inner": {
-        "date": "2025-05-03",
-        "xm": 24304.0645,
-        "win": "as counted",
-        "scopeNote": "inner-metro seats",
-        "grn": 89.51,
-        "onp": 36.49,
-        "oth": 55.63
-      },
-      "outer": {
-        "date": "2025-05-03",
-        "xm": 24304.0645,
-        "win": "as counted",
-        "scopeNote": "outer-metro seats",
-        "grn": 87.11,
-        "onp": 28.03,
-        "oth": 49.71
-      },
-      "regional": {
-        "date": "2025-05-03",
-        "xm": 24304.0645,
-        "win": "as counted",
-        "scopeNote": "rural and provincial seats",
-        "grn": 84.48,
-        "onp": 23.99,
-        "oth": 45.85
+        "grn": 88.19,
+        "onp": 25.5,
+        "oth": 54.55
       }
     },
     "bys": [{
@@ -128296,7 +128270,7 @@ function RdFlows() {
     rows: [{
       key: "elec",
       name: "2025 election, as counted",
-      cells: FF.elec2025r ? ["all", "inner", "outer", "regional"].map(k => ftCell(FF.elec2025r[k], ftCohorts.co)) : ftDash
+      cells: FF.elec2025r ? [ftCell(FF.elec2025r.all, ftCohorts.co), "–", "–", "–"] : ftDash
     }, {
       key: "site",
       name: "The flows this site uses",
@@ -128433,7 +128407,7 @@ function RdFlows() {
   }), pick, ", month by month")), React.createElement("p", {
     className: "rd-note rd-fl-read"
   }, "Implied is the figure a poll\u2019s primary votes give on the ", rdElecYear, " election\u2019s preference flows. Zero is each pollster\u2019s usual gap between the two, set by its polls in the six months after the election, or by its first polls if it started later. No count of Labor v One Nation preferences exists, so that chart measures from each pollster\u2019s first head-to-heads."), FF && (() => {
-    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.bys || [])].map(d => d.xm).concat(lnWaves.map(w => w.xm)).concat(FF.elec2025r ? Object.values(FF.elec2025r).map(r => r.xm) : FF.elec2025 ? [FF.elec2025.xm] : []).filter(v => v != null);
+    const xs = [...FF.vsOn, ...FF.vsCoal, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.bys || [])].map(d => d.xm).concat(lnWaves.map(w => w.xm)).concat(FF.elec2025r ? [FF.elec2025r.all.xm] : []).filter(v => v != null);
     const dom = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs))];
     return React.createElement("div", {
       className: "rd-ff"
@@ -128467,17 +128441,19 @@ function RdFlows() {
       className: "rd-fl-ct"
     }, React.createElement("h4", {
       className: "rd-ap-ct"
-    }, ffTitle("co"))), React.createElement(RdForced, {
+    }, ffTitle("co"))), ffReg ? React.createElement("p", {
+      className: "rd-fl-emptycell"
+    }, "National-only \u2014 RedBridge/Accent\u2019s waves, DemosAU\u2019s MRP and the 2025 election all measured the country whole; there\u2019s no ", ((FF_REGIONS.find(r => r[0] === ffReg) || [])[1] || "regional").toLowerCase(), " cut. \u201CAll voters\u201D shows them.") : React.createElement(RdForced, {
       q: "co",
-      waves: ffReg ? [] : FF.vsCoal,
+      waves: FF.vsCoal,
       cohorts: ["grn", "onp", "oth"],
       anchor: "Labor",
       rival: "the Coalition",
       houseWord: "RedBridge/Accent",
       W: cw,
       phone: phone,
-      extras: ffReg ? [] : FF.demos,
-      elec: FF.elec2025r ? FF.elec2025r[ffReg || "all"] : FF.elec2025,
+      extras: FF.demos,
+      elec: FF.elec2025r ? FF.elec2025r.all : null,
       dom: dom
     })), React.createElement("div", {
       className: "rd-fl-one"
@@ -128541,7 +128517,7 @@ function RdFlows() {
     }, React.createElement("span", {
       className: "rd-ff-keyx",
       "aria-hidden": "true"
-    }), "2026 state and by-election counts"), FF.elec2025r && React.createElement("span", {
+    }), "2026 state and by-election counts"), FF.elec2025r && !ffReg && React.createElement("span", {
       className: "rd-key-item"
     }, React.createElement("span", {
       className: "rd-ff-keyring",
@@ -128551,7 +128527,7 @@ function RdFlows() {
     summary: "Flows table",
     heads: ["Flow", "All voters", "Inner metro", "Outer metro", "Regional"],
     sets: flowSets,
-    note: "Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows, split by its inside-metro, outside-metro and rural-plus-provincial seat classes (the charts’ rings above); no national count of the two One Nation choices exists, so those cells are dashes. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."
+    note: "Every figure is the share of that cohort’s voters reaching the first-named party, in percent. The election row is the Australian Electoral Commission’s own count of the 2025 flows — the two-party-preferred cut, every formal ballot redistributed between Labor and the Coalition (the same figures this site’s flow constants read; the chart rings above). The AEC counts no per-region TPP flows, so the row’s regional cells are dashes; and no count of the two One Nation choices exists at all, so those cells are dashes too. This site’s two tables are the ones every implied two-party figure on the page runs through — a counted table against the Coalition, and a built one against One Nation whose ± range is the table’s own uncertainty, never a sampling interval (their provenance is on the preference-flows page). The waves are each house’s latest readings: RedBridge/Accent is national-only, so the regional columns carry none of its figures, and DemosAU’s MRP prints regional cells for the One Nation contests alone. The 2026 state and by-election counts stay on the charts — an electorate’s own count is not an electorate-class view."
   }), React.createElement(RdTsig, {
     summary: "Trend-significance table",
     heads: ["Series", "First → last", "Slope, pts/yr", "t", "Significant"],

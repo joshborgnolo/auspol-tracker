@@ -8,9 +8,10 @@
    DemosAU's MRP carriers (demos/demosOn/lnpOn) ride the SAME lines as
    RedBridge's dots — different shape, the user's call: "the MRP readings
    behave like the RedBridge dots, just differently shaped" (triangles, not
-   diamonds) — the 2025 election's rings derive from the AEC's TCP-by-division
-   flow download split by the AEC's own seat classes (elec2025r: all / inner /
-   outer / rural+provincial→regional — the menu rekeys the rings), the 2026
+   diamonds) — the 2025 election's rings are ONE national carrier typed
+   from flows.mjs's FLOW constants, the AEC's TPP flow cut (elec2025r.all;
+   no regional carriers exist — the AEC counts no per-division TPP flows),
+   the 2026
    state and by-election counts ride the Labor-v-One-Nation chart as crosses
    (bys: SA2026 Bonham estimates, Secret Harbour — on the days of the
    elections, joined to NO line, national only, hidden on a named region;
@@ -27,6 +28,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
+import { FLOW as FLOW_PIN } from "./newtracker/flows.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // ---- the data-asset contract ----------------------------------------------------------
@@ -77,28 +79,27 @@ assert.deepEqual(estMarks, [{ date: "2026-06-26", cohort: "coal" }],
 const jun = byDate.get("2026-06-26");
 assert.equal(jun.tpp_split_on.lnp, 36, "June's derived Coalition split is 36/64 on the row");
 
-/* the 2025 election rings: per-region carriers on the AEC's TCP-by-division
-   download (majors-renormalised flows), split by every division's AEC
-   demographic classification (data/aec-2025-division-class.json), rural +
-   provincial pooled to regional. The national carrier reproduces the AEC's
-   own national TCP flow table to the vote — and differs from the old TPP-cut
-   constants the rings used to ride */
-assert.ok(FF.elec2025r && ["all", "inner", "outer", "regional"].every((k) => FF.elec2025r[k]),
-  "elec2025r carries one rings carrier per region (all/inner/outer/regional)");
-assert.ok(!FF.elec2025, "the old single elec2025 carrier is gone — the rings ride the region set");
+/* the 2025 election rings: ONE national carrier, typed from flows.mjs's
+   FLOW constants in gen-data — the AEC's TPP flow product (every ballot
+   redistributed ALP v Coalition), the cut the estimate's implied 2PP reads
+   (user 2026-10-13). The AEC counts no per-division TPP flows, so the
+   inner/outer/regional carriers that first shipped (off the TCP file) are
+   GONE and no regional election rings exist — see
+   .build/aec-2025-region-tpp-flows.mjs for why a region cut can't be
+   re-derived from published aggregates */
+assert.ok(FF.elec2025r && FF.elec2025r.all, "elec2025r carries the national rings carrier");
+assert.deepEqual(Object.keys(FF.elec2025r).sort(), ["all"],
+  "elec2025r carries ONLY the national carrier — no regional election flows exist to ride");
+assert.ok(!FF.elec2025, "the old single elec2025 carrier is gone — the rings ride elec2025r.all");
 assert.deepEqual(
-  Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.all[k]])), { grn: 86.83, onp: 27.1, oth: 48.61 },
-  "the national rings ride the AEC's TCP flow table (86.83/27.10/48.61), not the TPP constants");
-assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.inner[k]])), { grn: 89.51, onp: 36.49, oth: 55.63 },
-  "inner-metro rings = the inner-metro seats' summed flows");
-assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.outer[k]])), { grn: 87.11, onp: 28.03, oth: 49.71 },
-  "outer-metro rings = the outer-metro seats' summed flows");
-assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.regional[k]])), { grn: 84.48, onp: 23.99, oth: 45.85 },
-  "regional rings = the rural+provincial seats' summed flows");
+  Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.all[k]])),
+  Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, Math.round(FLOW_PIN[k] * 1e4) / 100])),
+  "the national rings ride the estimate's own constants (the AEC's TPP flow cut), to the hundredth");
+assert.deepEqual(
+  Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, FF.elec2025r.all[k]])), { grn: 88.19, onp: 25.5, oth: 54.55 },
+  "those constants remain the AEC's counted 2025 flows (GRN 88.19, ON 25.50, IND+OTH 54.55)");
 assert.ok(Math.abs(FF.elec2025r.all.xm - (2025 * 12 + 4 + 2 / 31)) < 1e-3,
-  `every carrier rides 3 May 2025 on the month-index scale (xm ${FF.elec2025r.all.xm})`);
-assert.ok(!FF.elec2025r.all.scopeNote && !!FF.elec2025r.regional.scopeNote,
-  "only the named regions carry a scope note (the national rings speak for all of Australia)");
+  `the carrier rides 3 May 2025 on the month-index scale (xm ${FF.elec2025r.all.xm})`);
 
 /* the crosses (user 2026-10-13): the 2026 counts that measured the Labor-v-
    One-Nation choice — SA 2026 (Bonham's estimates) and Secret Harbour's
@@ -173,23 +174,26 @@ assert.ok(ap.includes("...(FF.bys || [])"), "the section's shared domain hears t
 /* the region menu (user asks 2026-10-13): All voters + the MRP's three named
    regions. On a named region, RedBridge's national dots and the 2026 crosses
    vanish (a national wave can't speak to a region), the MRP carriers rekey
-   to the printed cells, and the rings swap to that class's counted flows */
+   to the printed cells, and the Labor-v-Coalition chart stands aside for a
+   national-only empty cell — its waves, its triangles and the election's
+   rings are ALL national-only (the AEC counts no per-region TPP flows for
+   the rings to ride; user 2026-10-13: "Keep All-voters-only") */
 assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];'),
   "the region menu is All voters + the MRP's three named regions");
 assert.ok(ap.includes('aria-label="DemosAU MRP region"') && ap.includes('value={ffReg}') && ap.includes('setFfReg(e.target.value)'),
   "the select rides ffReg state beside the section hed, labelled for assistive tech");
 assert.ok(ap.includes("waves={ffReg ? [] : FF.vsOn}"),
   "on a named region RedBridge's dots drop out of the v-One-Nation chart entirely");
-assert.ok(ap.includes("waves={ffReg ? [] : FF.vsCoal}"),
-  "on a named region RedBridge's dots drop out of the v-Coalition chart too (user 2026-10-13: its waves are national-only); the rings ride on");
-assert.ok(ap.includes("extras={ffReg ? [] : FF.demos}"),
-  "on a named region the v-Coalition chart's DemosAU triangles drop too (user 2026-10-13: the MRP's Labor-v-Coalition split is national-only — no regional carrier exists)");
+assert.ok(ap.includes('{ffReg ? (') && ap.includes('className="rd-fl-emptycell"') && ap.includes("<RdForced q=\"co\""),
+  "a named region swaps the Labor-v-Coalition chart for a national-only empty cell — nothing on it can rekey (user 2026-10-13)");
+assert.ok(ap.includes("National-only — RedBridge/Accent’s waves, DemosAU’s MRP and the 2025 election all measured the country whole"),
+  "the empty cell says why nothing rekeys");
 assert.ok(ap.includes("bys={ffReg ? [] : (FF.bys || [])}"),
   "on a named region the 2026-count crosses drop out too (national counts)");
-assert.ok(ap.includes("elec={FF.elec2025r ? FF.elec2025r[ffReg || \"all\"] : FF.elec2025}"),
-  "the rings swap to the region's own counted flows (all/inner/outer/regional)");
-assert.ok(ap.includes("FF.elec2025r ? Object.values(FF.elec2025r)"),
-  "the shared domain hears every ring carrier's date");
+assert.ok(ap.includes('elec={FF.elec2025r ? FF.elec2025r.all : null}') && !ap.includes("elec2025r[ffReg") && !ap.includes("elec2025r.inner") && !ap.includes("elec2025r.outer") && !ap.includes("elec2025r.regional"),
+  "the rings ride the national carrier directly — no region lookup remains (the AEC counts no per-region TPP flows)");
+assert.ok(ap.includes("FF.elec2025r ? [FF.elec2025r.all.xm] : []"),
+  "the shared domain hears the national ring carrier's day");
 assert.ok(ap.includes("extra") === false || ap.includes("extras={demoRows}"),
   "the v-One-Nation chart's MRP extras ride the rekeyed demosOn rows");
 
@@ -220,6 +224,8 @@ assert.ok(cssRd.includes(".rd-ff-sw.mrp") && cssRd.includes(".rd-ff-sw.byelec"),
   "the tooltip swatches take the mark's shape: MRP triangles, 2026-count crosses");
 assert.ok(cssRd.includes(".rd-ff-keyring"), "the key names the 2025 election's rings");
 assert.ok(cssRd.includes(".rd-ff-keyln"), "the key's line token marks RedBridge/Accent's monthly run");
+assert.ok(/body\.rd \.rd-fl-emptycell \{[^}]*align-self: center;/.test(cssRd),
+  "the national-only empty cell is styled and centres in the chart's subgrid row");
 
 // ---- the xnote and key in the renderer ------------------------------------------------
 assert.ok(ap.includes("Triangles mark DemosAU’s MRP readings"), "the svg's spoken note names the triangles");
@@ -242,7 +248,7 @@ assert.ok(ap.includes("Labor v Coalition — the share of each cohort choosing L
   "one row set per contest, each naming where its shares land");
 
 // ---- the renderer's earlier contract still stands --------------------------------------
-assert.ok(ap.includes('q="co" waves={ffReg ? [] : FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series (national-only, region-gated)");
+assert.ok(ap.includes('q="co" waves={FF.vsCoal}'), "the v-Coalition chart rides RedBridge's own series (its national-only drop happens in the region ternary above)");
 assert.ok(ap.includes("const demoRows = FF ? rekeyMrp(FF.demosOn) : [];"),
   "the v-One-Nation chart's MRP extras come from the rekeyed demosOn carriers");
 assert.ok(ap.includes("moved.length !== 1"), "a title tail names a cohort only when EXACTLY ONE moved");
