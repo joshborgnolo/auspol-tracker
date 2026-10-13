@@ -100506,7 +100506,7 @@ const DEM_SPLITS = [{
   pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
 }, {
   id: "country",
-  label: "Other cuts",
+  label: "Offcuts",
   lo: "Australia-born",
   hi: "Overseas-born",
   scope: "With a one-off breakdown",
@@ -100519,27 +100519,27 @@ const DEM_SPLITS = [{
   }, {
     id: "religion",
     lab: "Religion",
-    sub: "Newspoll's pooled quarterly pulls",
+    sub: "Newspoll’s pooled quarterly pulls",
     pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]]
   }, {
     id: "working",
     lab: "Working status",
-    sub: "Newspoll's pooled quarterly pulls and YouGov's own weekly cut",
+    sub: "Newspoll’s pooled quarterly pulls and YouGov’s own weekly cut",
     pairs: [["Full time", "Retired", "Full time v retired", "Retired", "Full time"]]
   }, {
     id: "children",
     lab: "Children at home",
-    sub: "YouGov's weekly cut, 24 Mar 2026 on",
+    sub: "YouGov’s weekly cut, 24 Mar 2026 on",
     pairs: [["Children under 18", "No children", "Children at home v none", "No children", "Children at home"]]
   }, {
     id: "class",
     lab: "Self-assessed class",
-    sub: "YouGov's weekly cut, 10 Feb 2026 on",
+    sub: "YouGov’s weekly cut, 10 Feb 2026 on",
     pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]]
   }, {
     id: "electorate",
     lab: "Tasmanian electorates",
-    sub: "EMRS's one-off seat cut from the February 2026 federal wave",
+    sub: "EMRS’s one-off seat cut from the February 2026 federal wave",
     pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]]
   }]
 }];
@@ -102600,7 +102600,7 @@ function AllPollsView({
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
-    key: "date",
+    key: "pub",
     dir: -1
   });
   const [facet, setFacet] = useState(urlInit.facet);
@@ -102692,7 +102692,7 @@ function AllPollsView({
   const onFacet = f => {
     setFacet(f);
     setSort({
-      key: "date",
+      key: "pub",
       dir: -1
     });
     setPop(null);
@@ -102859,6 +102859,8 @@ function AllPollsView({
       switch (key) {
         case "date":
           return p.x;
+        case "pub":
+          return p.published ? Date.parse(p.published) : p.x;
         case "pollster":
           return p.pollster;
         case "sample":
@@ -124404,7 +124406,7 @@ function RdAllPolls(P) {
     return () => ro.disconnect();
   }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
-  const byDate = sort.key === "date" && sort.dir < 0;
+  const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
   const [minShown, setMinShown] = useState(30);
   const [flatLimit, setFlatLimit] = useState(40);
   const [showAll, setShowAll] = useState(false);
@@ -124647,7 +124649,14 @@ function RdAllPolls(P) {
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
   const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
+  const famSeed = React.useRef(false);
   const [famShut, setFamShut] = useState(() => new Set());
+  if (!famSeed.current && demFams) {
+    famSeed.current = true;
+    const shut = new Set();
+    for (const fam of demFams) if (sorted.filter(p => window.demPairOf(p, demSplit, fam.id)).length >= 2) shut.add(fam.id);
+    if (shut.size) setFamShut(shut);
+  }
   const toggleFam = id => setFamShut(s => {
     const n = new Set(s);
     if (n.has(id)) n.delete(id);else n.add(id);
@@ -126138,10 +126147,10 @@ function RdAllPolls(P) {
     className: "rd-ap-headwrap" + (pinned ? " pinned" : "")
   }, pinBar, phone ? phoneHead : colHead), demFamTables ? demFamTables.map(t => React.createElement(React.Fragment, {
     key: "fam" + t.fam.id
-  }, famHead(t), famShut.has(t.fam.id) ? null : t.groups.map(g => React.createElement(React.Fragment, {
-    key: t.fam.id + g.ym
-  }, monthRow(g, t.fam.id), g.list.map(p => rowFor(p, t.fam.id)))))) : byDate ? groups.map(g => React.createElement(React.Fragment, {
-    key: g.ym
+  }, famHead(t), famShut.has(t.fam.id) ? null : t.groups.map((g, gi) => React.createElement(React.Fragment, {
+    key: t.fam.id + "|" + gi
+  }, monthRow(g, t.fam.id), g.list.map(p => rowFor(p, t.fam.id)))))) : byDate ? groups.map((g, gi) => React.createElement(React.Fragment, {
+    key: g.ym + "|" + gi
   }, monthRow(g), g.list.map(p => rowFor(p, null)))) : flat.map(p => rowFor(p, null)), sorted.length === 0 && React.createElement("div", {
     className: "rd-ap-empty"
   }, "No ", noun, " match these filters. ", React.createElement("button", {

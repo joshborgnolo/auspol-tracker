@@ -2465,7 +2465,10 @@ function RdAllPolls(P) {
      Its rename to Other cuts (same day, the split's generalisation to
      one-off contrasts) took it down again, measured 2026-10-09: the
      picker is 496px and the row fits from 1205px up (document overflow
-     first at 1200), so under 1220px both controls take their row. */
+     first at 1200), so under 1220px both controls take their row.
+     Renamed Offcuts 2026-10-13 (user call): three characters narrower,
+     so the row's fit can only improve - the 1220 breakpoint stands
+     conservatively until it is re-measured. */
   const ctlNarrow = useNarrow("(max-width: 1220px)");
   /* the demographics scale's nine ticks need the strip's full 410px: under
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
@@ -2626,7 +2629,14 @@ function RdAllPolls(P) {
   const todayTxt = today ? today.a.toFixed(1) : null;
 
   /* ---- paging, by whole months ---------------------------------------------- */
-  const byDate = sort.key === "date" && sort.dir < 0;
+  /* the chronological views are the fieldwork sort and the archive's new
+     default, the PUBLICATION sort (user call 2026-10-13: publication outranks
+     fieldwork at open, though it is no column). Rows file under their
+     fieldwork month either way - the month rows quote month aggregates, which
+     are fieldwork-month quantities - so under the publication default a wave
+     that crosses a month-end in the press can raise a month divider one place
+     out of monotonic order; that is the honest filing, not a bug. */
+  const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
   const [minShown, setMinShown] = useState(30);
   const [flatLimit, setFlatLimit] = useState(40);
   const [showAll, setShowAll] = useState(false);
@@ -2846,8 +2856,19 @@ function RdAllPolls(P) {
   const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
   /* each family table folds away from its own head. Session state like the
      split itself: it rides facet and split hops (they persist by design too)
-     and resets only with the component */
+     and resets only with the component. Every family starts SHUT except a
+     one-entry table, which greets you open (user call 2026-10-13: "keep
+     those rows closed by default … UNLESS number of entries < 2") - the
+     seed lands on the first render the fams exist in, from the rows then
+     listed, so opening the archive on another facet doesn't miss it. */
+  const famSeed = React.useRef(false);
   const [famShut, setFamShut] = useState(() => new Set());
+  if (!famSeed.current && demFams) {
+    famSeed.current = true;
+    const shut = new Set();
+    for (const fam of demFams) if (sorted.filter((p) => window.demPairOf(p, demSplit, fam.id)).length >= 2) shut.add(fam.id);
+    if (shut.size) setFamShut(shut);
+  }
   const toggleFam = (id) => setFamShut((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const [demCapLo, demCapHi] = (() => {
     if (demFams && byDate) return [null, null];
@@ -3764,15 +3785,21 @@ function RdAllPolls(P) {
           {pinBar}
           {phone ? phoneHead : colHead}
         </div>
+        {/* the group-fragment keys carry their position because the pub
+            sort can file the same fieldwork month in two places (a wave
+            that crosses a month-end in the press, e.g. DemosAU's MRP):
+            g.ym alone gave duplicate sibling keys, and React's key map
+            keeps only one of the pair - the other's DOM was never deleted
+            and its rows haunted the next facet's table as stale copies */}
         {demFamTables
           ? demFamTables.map((t) => (
             <React.Fragment key={"fam" + t.fam.id}>
               {famHead(t)}
-              {famShut.has(t.fam.id) ? null : t.groups.map((g) => <React.Fragment key={t.fam.id + g.ym}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
+              {famShut.has(t.fam.id) ? null : t.groups.map((g, gi) => <React.Fragment key={t.fam.id + "|" + gi}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
             </React.Fragment>
           ))
           : byDate
-            ? groups.map((g) => <React.Fragment key={g.ym}>{monthRow(g)}{g.list.map((p) => rowFor(p, null))}</React.Fragment>)
+            ? groups.map((g, gi) => <React.Fragment key={g.ym + "|" + gi}>{monthRow(g)}{g.list.map((p) => rowFor(p, null))}</React.Fragment>)
             : flat.map((p) => rowFor(p, null))}
         {sorted.length === 0 && <div className="rd-ap-empty">No {noun} match these filters. <button type="button" className="rd-link" onClick={clearAll}>Clear filters</button></div>}
       </div>

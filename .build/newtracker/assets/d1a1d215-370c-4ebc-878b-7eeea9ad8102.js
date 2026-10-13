@@ -3500,13 +3500,14 @@ const DEM_SPLITS = [
      the row and its Where-it-sits note say whose pair it is. */
   { id: "income", label: "Income", lo: "Lower income", hi: "Higher income", scope: "With an income breakdown",
     pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]] },
-  /* Other cuts: the home for contrasts no shared axis can hold
+  /* Offcuts: the home for contrasts no shared axis can hold
      (generalised from the Birth country split the same day it shipped,
      user call 2026-10-09; grown into five cut FAMILIES 2026-10-10 on the
      user's "actually no, put it in other cuts … one under the other"
      call; a sixth, electorate, joined the same day for EMRS's Tasmanian
-     seats). The families, `fams`, stack one table under the other in the
-     view, newest rows first in each:
+     seats; renamed Offcuts on the user's 2026-10-13 call). The families,
+     `fams`, stack one table under the other in the view, newest rows
+     first in each:
        birth     Roy Morgan finding 10341: seven months of Single Source
                  interviewing (Jan–Jul 2026, n=26,418) pooled into the 13
                  birth-country groups its release charts, another special
@@ -3531,7 +3532,7 @@ const DEM_SPLITS = [
      story, admission) tries birth first, exactly as before; and
      rd-allpolls shows caps beside each family's own heading, hiding the
      pinned head's when the visible rows mix pairs. */
-  { id: "country", label: "Other cuts", lo: "Australia-born", hi: "Overseas-born", scope: "With a one-off breakdown",
+  { id: "country", label: "Offcuts", lo: "Australia-born", hi: "Overseas-born", scope: "With a one-off breakdown",
     pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born", "Australia-born", "Overseas-born"],
             ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"],
             ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"],
@@ -3548,15 +3549,15 @@ const DEM_SPLITS = [
                 ["Mainland China", "Australia", "China-born v Australia-born", "Australia-born", "Overseas-born"],
                 ["South Africa", "Australia", "South Africa-born v Australia-born", "Australia-born", "Overseas-born"],
                 ["United Kingdom", "Australia", "UK-born v Australia-born", "Australia-born", "Overseas-born"]] },
-      { id: "religion", lab: "Religion", sub: "Newspoll's pooled quarterly pulls",
+      { id: "religion", lab: "Religion", sub: "Newspoll’s pooled quarterly pulls",
         pairs: [["Christian", "No religion", "Christian v no religion", "No religion", "Christian"]] },
-      { id: "working", lab: "Working status", sub: "Newspoll's pooled quarterly pulls and YouGov's own weekly cut",
+      { id: "working", lab: "Working status", sub: "Newspoll’s pooled quarterly pulls and YouGov’s own weekly cut",
         pairs: [["Full time", "Retired", "Full time v retired", "Retired", "Full time"]] },
-      { id: "children", lab: "Children at home", sub: "YouGov's weekly cut, 24 Mar 2026 on",
+      { id: "children", lab: "Children at home", sub: "YouGov’s weekly cut, 24 Mar 2026 on",
         pairs: [["Children under 18", "No children", "Children at home v none", "No children", "Children at home"]] },
-      { id: "class", lab: "Self-assessed class", sub: "YouGov's weekly cut, 10 Feb 2026 on",
+      { id: "class", lab: "Self-assessed class", sub: "YouGov’s weekly cut, 10 Feb 2026 on",
         pairs: [["Working class", "Well off", "Working class v well off", "Well off", "Working class"]] },
-      { id: "electorate", lab: "Tasmanian electorates", sub: "EMRS's one-off seat cut from the February 2026 federal wave",
+      { id: "electorate", lab: "Tasmanian electorates", sub: "EMRS’s one-off seat cut from the February 2026 federal wave",
         pairs: [["Braddon", "Clark", "Braddon v Clark", "Clark", "Braddon"]] },
     ] },
 ];
@@ -5343,7 +5344,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const [measure, setMeasure] = useState(urlInit.measure); // lead matchup: lnp = ALP v L/NP, onp = ALP v ON
   const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
-  const [sort, setSort] = useState({ key: "date", dir: -1 });
+  /* the archive's default sort is PUBLICATION day, newest first, though
+     publication is no column (user call 2026-10-13): fieldwork order made
+     a fresh release sit under a backfilled wave's older news at every
+     open. Facet hops reset to the same default (onFacet below). */
+  const [sort, setSort] = useState({ key: "pub", dir: -1 });
   const [facet, setFacet] = useState(urlInit.facet);
   const [demSplit, setDemSplit] = useState(urlInit.split);   // the demographics facet's split
   const [open, setOpen] = useState(null);     // expanded ROW
@@ -5460,7 +5465,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      prop identity and defeat its memo (the window export in rd-allpolls) */
   const onMeasure = React.useCallback((mv) => { setMeasure(mv); setLead("all"); }, []);
   const onFacet = (f) => {
-    setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
+    setFacet(f); setSort({ key: "pub", dir: -1 }); setPop(null);
     // the matchup survives the hop only if the 2PP facet is where we land –
     // every other facet resets it below – so seed the scope from the
     // matchup that will actually be in force
@@ -5684,6 +5689,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const getVal = (p, key) => {
       switch (key) {
         case "date": return p.x;
+        /* published day sits beside fieldwork at its own default sort
+           (2026-10-13). Three of 181 rows record no `published` (the 2025
+           election result and two mid-redesign YouGov waves) - file them at
+           their fieldwork close so they don't sink in the newest-first
+           publication view. */
+        case "pub": return p.published ? Date.parse(p.published) : p.x;
         case "pollster": return p.pollster;
         case "sample": return p.sample ?? -Infinity;
         case "alp": {

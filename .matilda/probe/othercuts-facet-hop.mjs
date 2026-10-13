@@ -1,16 +1,17 @@
-// Acceptance probe for the 2026-10-10 Other-cuts facet-leak fix (user bug:
-// "once you go on 'other cuts' in all polls table, navigating to the other
-// facets doesn't work. it gets stuck and you have to refresh").
+// Acceptance probe for the 2026-10-10 facet-leak fix on what is now the
+// Offcuts split (renamed from Other cuts on the user's 2026-10-13 call; user
+// bug: "once you go on 'other cuts' in all polls table, navigating to the
+// other facets doesn't work. it gets stuck and you have to refresh").
 //
-// Root cause: rd-allpolls.jsx's demFams (the Other-cuts stacked family
+// Root cause: rd-allpolls.jsx's demFams (the Offcuts stacked family
 // tables) computed without a facet gate, so the surviving demSplit="country"
 // state rendered the fam tables on EVERY facet after a hop (0 rows on
 // Confidence, franken-tables elsewhere).
 //
 // Fix: demFams is gated on facet === "demographics". Pinned here:
-//  1. demographics/Other-cuts still stacks (fam rows + family heads)
+//  1. demographics/Offcuts still stacks (fam rows + family heads)
 //  2. every facet hop from it draws normal rows, no fam rows, no errors
-//  3. hopping back to Demographics restores the stacked Other-cuts view
+//  3. hopping back to Demographics restores the stacked Offcuts view
 //  4. keyboard ArrowRight from the facet menu doesn't leak either (the
 //     rdTabs walk drives the same state)
 //  5. same at a phone width
@@ -66,7 +67,7 @@ console.log("== desktop 1280 ==");
 {
   const page = await open(1280, "f=g&g=b");
   let s = await snap(page);
-  check("lands Demographics / Other cuts, six stacked family tables", s.facet === "Demographics" && s.famRows === 6, JSON.stringify(s.famLabs));
+  check("lands Demographics / Offcuts, six stacked family tables", s.facet === "Demographics" && s.famRows === 6, JSON.stringify(s.famLabs));
 
   // the user's UI path: leave via every tab
   for (const lab of ["2PP", "Primary", "Leadership", "Direction", "Issues", "Confidence"]) {
@@ -81,7 +82,7 @@ console.log("== desktop 1280 ==");
   await clickTab(page, "Demographics");
   await settle();
   s = await snap(page);
-  check("back on Demographics: Other cuts kept, families re-stack", s.facet === "Demographics" && s.famRows === 6, `famRows=${s.famRows}`);
+  check("back on Demographics: Offcuts kept, families re-stack", s.facet === "Demographics" && s.famRows === 6, `famRows=${s.famRows}`);
 
   // keyboard path: walk right off Demographics (Demographics → Confidence)
   await page.evaluate(() => {
@@ -93,7 +94,7 @@ console.log("== desktop 1280 ==");
   s = await snap(page);
   check("ArrowRight to Confidence: normal rows, no fam rows", s.facet === "Confidence" && s.famRows === 0 && s.rows > 0, `famRows=${s.famRows} rows=${s.rows}`);
 
-  // split state must survive the round trip without leaking: pick Other cuts
+  // split state must survive the round trip without leaking: pick Offcuts
   // by UI from a flat split, then hop straight to 2PP
   await clickTab(page, "Demographics");
   await settle();
@@ -103,16 +104,16 @@ console.log("== desktop 1280 ==");
   });
   await settle(600);
   await page.evaluate(() => {
-    const b = [...document.querySelectorAll(".rd-ap-dpick button")].find((n) => n.textContent.trim() === "Other cuts");
+    const b = [...document.querySelectorAll(".rd-ap-dpick button")].find((n) => n.textContent.trim() === "Offcuts");
     b.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
   });
   await settle();
   s = await snap(page);
-  check("UI-picked Other cuts re-stacks", s.famRows === 6, `famRows=${s.famRows}`);
+  check("UI-picked Offcuts re-stacks", s.famRows === 6, `famRows=${s.famRows}`);
   await clickTab(page, "2PP");
   await settle();
   s = await snap(page);
-  check("hop to 2PP from a UI-picked Other cuts: clean", s.facet === "2PP" && s.famRows === 0 && s.rows > 0, `famRows=${s.famRows} rows=${s.rows}`);
+  check("hop to 2PP from a UI-picked Offcuts: clean", s.facet === "2PP" && s.famRows === 0 && s.rows > 0, `famRows=${s.famRows} rows=${s.rows}`);
   check("no page errors (desktop full walk)", page.errs.length === 0, page.errs.join(" | "));
   await page.close();
 }
@@ -121,7 +122,7 @@ console.log("== phone 390 ==");
 {
   const page = await open(390, "f=g&g=b", { touch: true });
   let s = await snap(page);
-  check("phone: Other cuts stacks", s.famRows === 6, `famRows=${s.famRows}`);
+  check("phone: Offcuts stacks", s.famRows === 6, `famRows=${s.famRows}`);
   // the phone facet menu is a button-backed <select> substitute: dispatch the
   // same change the menu would (its control sits in .rd-ap-tabs too)
   await clickTab(page, "2PP");
