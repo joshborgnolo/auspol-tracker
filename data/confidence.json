@@ -1,5 +1,5 @@
 {
- "_about": "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/mood.mjs header.",
+ "_about": "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/confidence.mjs header.",
  "consumer": {
   "label": "ANZ-Roy Morgan Consumer Confidence",
   "base": "ANZ-Roy Morgan, index, 100 = neutral",
@@ -2655,6 +2655,16 @@
     "n": 1019,
     "fwStart": "2026-09-28",
     "fwEnd": "2026-10-04"
+   },
+   {
+    "date": "2026-10-13",
+    "v": 68,
+    "chg": 0.9,
+    "url": "https://www.roymorgan.com/findings/10085-anz-roy-morgan-consumer-confidence-october-13",
+    "slug": "10085-anz-roy-morgan-consumer-confidence-october-13",
+    "n": 1026,
+    "fwStart": "2026-10-05",
+    "fwEnd": "2026-10-11"
    }
   ]
  },
