@@ -321,7 +321,7 @@ async function scrapeProjectPage(url) {
 function pdfToText(buf, slug) {
   const pdfPath = join(tmpdir(), `redbridge-${slug}.pdf`);
   writeFileSync(pdfPath, buf);
-  const bins = ["pdftotext", "/opt/homebrew/bin/pdftotext", "/usr/local/bin/pdftotext"];
+  const bins = ["pdftotext", "/opt/homebrew/bin/pdftotext", "/usr/local/bin/pdftotext", "/usr/bin/pdftotext"];
   let lastErr;
   for (const bin of bins) {
     try {
