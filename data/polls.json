@@ -909,6 +909,14 @@
       "unsure": 14
     },
     {
+      "date": "2026-01-29",
+      "dateStart": "2026-01-22",
+      "pollster": "RedBridge/Accent",
+      "right": 29,
+      "wrong": 55,
+      "unsure": 16
+    },
+    {
       "date": "2026-02-01",
       "dateStart": "2026-01-26",
       "pollster": "Roy Morgan",
