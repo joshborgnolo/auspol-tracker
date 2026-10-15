@@ -716,6 +716,22 @@ body.rd .rd-sens { opacity: 0.1; }
   body.rd .rd-lg { margin-top: 14px; font-size: 11px; }
 }
 
+/* on a phone the change line's wrap depends on the contest (its figure
+   string differs): two lines against the Coalition, one against One
+   Nation - and the card below jumped a line height on every flip. Reserve
+   both lines so a one-line reading sits in a two-line box. */
+@media (max-width: 640px) {
+  body.rd .rd-tpp-change { min-height: 39px; min-height: 2lh; }
+}
+/* same hazard one row down: around 330-350px the "Switch 2PP" lead-in wraps
+   to two lines only beside the WIDER chip (Labor v One Nation is longer
+   than Labor v Coalition), so the row's height used to depend on which
+   contest was on screen. Floor it at the wrapped height (2 x the lead-in's
+   18.85px line) and both contests hold the same 37.7px. */
+@media (max-width: 640px) {
+  body.rd .rd-tpp-switch { min-height: 37.7px; }
+}
+
 /* a chart block keeps the .card class for the copy-as-image composer, and
    none of a card's chrome */
 body.rd .rd-card { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; }

@@ -9,11 +9,14 @@
    desktop row beside the chart's name is untouched (checked at 1440 and
    760 - stacking must stay phone-only). Also: the phone stack must not
    push the page sideways, and the Hanson card's lone box keeps no wrapper.
-   Plus the theme contract: native controls answer to the resolved
-   color-scheme, and body/body.dark now pin it to the site's OWN theme
-   class - emulate a dark OS, the auto theme goes .dark and the unchecked
-   box paints dark; force the light theme and the box goes light even
-   though the device still says dark. */
+   Plus the theme contract: the boxes are now CSS-DRAWN (2026-10-15 -
+   appearance:none, transparent face, ink-3 ring, ink-2 fill with the tick
+   cut out of the page background), so there is no native face to follow
+   the OS scheme; what must flip with the site's own theme class are the
+   VARIABLES. Emulate a dark OS, the auto theme goes .dark and the fill is
+   light (tick cut from the dark page); force the light theme and the fill
+   goes dark with a light tick. body/body.dark still pin color-scheme for
+   the native controls elsewhere. */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -68,36 +71,36 @@ const readLayout = () => window.__cycCtlLayout = (() => {
     hanWrappers, docW: document.documentElement.scrollWidth, vw: window.innerWidth };
 })();
 
-/* the native checkbox answers to the resolved color-scheme: body pins it
-   light, body.dark pins it dark, so the site's own theme toggle (not the
-   device) decides how the box paints. Chrome's computed background-color
-   for a native checkbox is transparent both ways (the control face is
-   painted natively), so the rendered outcome is sampled as PIXELS: shot
-   the box's centre and decode it back through the page's own canvas */
-const readScheme = () => {
-  const bodyCs = getComputedStyle(document.body).colorScheme;
+/* the box is CSS-drawn now, so the theme contract is read from COMPUTED
+   styles instead of a pixel sample of a native face: transparent fill at
+   rest; an ink-3 edge; when ticked an ink-2 fill whose ::after tick is cut
+   from the page background. ink-2/ink-3/--bg flip with the site's own
+   theme class, and body/body.dark still pin color-scheme for the native
+   controls elsewhere on the page */
+const readFace = () => {
+  const lightOf = (v) => {
+    let m = v.match(/oklch\(\s*([\d.]+)/);
+    if (m) return +m[1];
+    m = v.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+    if (m) return +((0.2126 * m[1] + 0.7152 * m[2] + 0.0722 * m[3]) / 255).toFixed(3);
+    return null;
+  };
   const inp = document.querySelector("#cyc-primary .rd-cyc-ctls input");
-  inp.scrollIntoView({ block: "center" });
-  const r = inp.getBoundingClientRect();
-  return { darkClass: document.body.classList.contains("dark"), bodyCs,
-    cx: r.x + r.width / 2, cy: r.y + r.height / 2, w: r.width, h: r.height };
-};
-const faceCentrePx = async (page, S) => {
-  const clip = { x: Math.max(0, S.cx - 4), y: Math.max(0, S.cy - 4), width: 8, height: 8 };
-  const offX = S.cx - clip.x, offY = S.cy - clip.y;
-  const buf = await page.screenshot({ clip });
-  return page.evaluate(async (b64, offX, offY) => {
-    const img = new Image();
-    img.src = "data:image/png;base64," + b64;
-    await img.decode();
-    const c = document.createElement("canvas");
-    c.width = img.width; c.height = img.height;
-    const ctx = c.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(img, 0, 0);
-    const d = ctx.getImageData(Math.round(offX), Math.round(offY), 1, 1).data;
-    const lum = +((0.2126 * d[0] + 0.7152 * d[1] + 0.0722 * d[2]) / 255).toFixed(3);
-    return { rgb: [d[0], d[1], d[2]].join(","), lum };
-  }, buf.toString("base64"), offX, offY);
+  const u = getComputedStyle(inp);
+  const out = { darkClass: document.body.classList.contains("dark"),
+    bodyCs: getComputedStyle(document.body).colorScheme,
+    face: u.backgroundColor, faceL: lightOf(u.backgroundColor),
+    edge: u.borderTopColor, edgeL: lightOf(u.borderTopColor),
+    appearance: u.appearance || u.webkitAppearance };
+  inp.click();
+  const c = getComputedStyle(inp);
+  const af = getComputedStyle(inp, "::after");
+  out.fill = c.backgroundColor; out.fillL = lightOf(c.backgroundColor);
+  out.fillEdge = c.borderTopColor;
+  out.tick = af.backgroundColor; out.tickL = lightOf(af.backgroundColor);
+  out.hasTick = (af.webkitMaskImage || af.maskImage || "none") !== "none";
+  inp.click();
+  return out;
 };
 
 (async () => {
@@ -135,8 +138,8 @@ const faceCentrePx = async (page, S) => {
         check(t + ": the pair is tight (gap no more than 2px)",
           L.combTop - L.onp.bottom <= 2 && L.combTop - L.onp.bottom >= 0,
           "gap=" + (L.combTop - L.onp.bottom));
-        check(t + ": the phone rows are squeezed (no line-height slack)",
-          L.comb.h <= 17 && L.onp.h <= 17,
+        check(t + ": the phone rows sit on the 24px WCAG tap-target floor",
+          L.comb.h >= 23.4 && L.comb.h <= 24.6 && L.onp.h >= 23.4 && L.onp.h <= 24.6,
           "comb.h=" + L.comb.h + " onp.h=" + L.onp.h);
         check(t + ": the pair's column clears the chart name to its left",
           L.title.right <= L.ctls.x + 1, "title.right=" + L.title.right + " ctls.x=" + L.ctls.x);
@@ -166,11 +169,11 @@ const faceCentrePx = async (page, S) => {
       await page.close();
     }
 
-    /* --- the theme contract: native controls follow body.dark, not the OS.
-       Emulate a dark device; the auto theme should put .dark on the body and
-       the unchecked box should paint dark. Then force the light theme the
-       way the user's toggle does (the class comes off) and the box must go
-       light while the device still says dark. */
+    /* --- the theme contract: the drawn box's VARIABLES follow body.dark,
+       not the OS. Emulate a dark device; auto mode should put .dark on the
+       body, so the ticked fill goes LIGHT and the tick cutout goes dark.
+       Then force the light theme the way the user's toggle does (the class
+       comes) and the pair must invert while the device still says dark. */
     {
       const page = await browser.newPage();
       const pageErrors = [];
@@ -180,25 +183,32 @@ const faceCentrePx = async (page, S) => {
       await page.goto(`http://127.0.0.1:${PORT}/cycles/`, { waitUntil: "domcontentloaded", timeout: 60000 });
       await page.waitForSelector("#cyc-primary .rd-cyc-ctls input", { timeout: 45000 });
       await new Promise((r) => setTimeout(r, 1200));
-      let S = await page.evaluate(readScheme);
-      let px = await faceCentrePx(page, S);
+      let F = await page.evaluate(readFace);
       check("theme: a dark device in auto mode puts .dark on the body",
-        S.darkClass === true, JSON.stringify(S));
+        F.darkClass === true, JSON.stringify(F));
       check("theme: body pins the dark scheme for native controls",
-        S.bodyCs === "dark", "color-scheme=" + S.bodyCs);
-      check("theme: the unchecked box paints dark on the dark theme",
-        px.lum < 0.5, "face rgb=" + px.rgb + " lum=" + px.lum);
+        F.bodyCs === "dark", "color-scheme=" + F.bodyCs);
+      check("theme: the box is drawn, not native (appearance off, transparent rest face)",
+        F.appearance === "none" && /^rgba\(0, 0, 0, 0\)|^transparent/.test(F.face),
+        "appearance=" + F.appearance + " face=" + F.face);
+      check("theme: the ticked fill paints light on the dark theme",
+        F.fillL != null && F.fillL >= 0.6, "fill=" + F.fill + " L=" + F.fillL);
+      check("theme: the ticked ring merges into its fill",
+        F.fillEdge === F.fill, "edge=" + F.fillEdge + " fill=" + F.fill);
+      check("theme: the tick is cut from the dark page background",
+        F.hasTick && F.tickL != null && F.tickL < 0.5, "tick=" + F.tick + " L=" + F.tickL + " mask=" + F.hasTick);
 
       await page.evaluate(() => document.body.classList.remove("dark"));
       await new Promise((r) => setTimeout(r, 600));
-      S = await page.evaluate(readScheme);
-      px = await faceCentrePx(page, S);
+      F = await page.evaluate(readFace);
       check("theme: forcing the light theme takes .dark off the body",
-        S.darkClass === false, JSON.stringify(S));
+        F.darkClass === false, JSON.stringify(F));
       check("theme: body pins the light scheme for native controls",
-        S.bodyCs === "light", "color-scheme=" + S.bodyCs);
-      check("theme: the unchecked box paints light on the light theme (dark device or not)",
-        px.lum > 0.6, "face rgb=" + px.rgb + " lum=" + px.lum);
+        F.bodyCs === "light", "color-scheme=" + F.bodyCs);
+      check("theme: the ticked fill paints dark on the light theme (dark device or not)",
+        F.fillL != null && F.fillL < 0.5, "fill=" + F.fill + " L=" + F.fillL);
+      check("theme: the tick is cut from the light page background",
+        F.hasTick && F.tickL != null && F.tickL > 0.6, "tick=" + F.tick + " L=" + F.tickL);
       check("theme: no page exceptions", pageErrors.length === 0, pageErrors[0] || "");
       await page.close();
     }
