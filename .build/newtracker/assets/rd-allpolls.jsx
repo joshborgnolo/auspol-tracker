@@ -2158,6 +2158,7 @@ const RD_AP_DEM_NOUN = {
   Renting: "renters", "Renting and other": "renters", "Own outright": "outright owners",
   "$150k+": "those on $150k or more", "Under $50k": "those on under $50k", "$125k+": "those on $125k or more",
   "Under $45k": "those on under $45k", "$100k or more": "those on $100k or more", "Under $100k": "those on under $100k",
+  Retired: "retirees", "Full time": "full-time workers",
   Vietnam: "voters born in Vietnam", Australia: "voters born in Australia", "Mainland China": "voters born in mainland China",
   "South Africa": "voters born in South Africa", "United Kingdom": "voters born in the UK",
 };
