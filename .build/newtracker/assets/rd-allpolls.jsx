@@ -1967,8 +1967,25 @@ function rdLgLines(p, { onM, demSplit }) {
     const ks = ORDER.filter((k) => p.cons[k] != null);
     out.push({ id: "cons", lab: "Consideration", body: <>
       {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(p.cons[k])}</b></> : pty(k, rdApNum(p.cons[k]))}</U>)}
-      <U soft>parties the voter would consider, not votes</U>
+      <U soft>{p.consBasis ? p.consBasis + ", not votes" : "parties the voter would consider, not votes"}</U>
     </> });
+    /* a 0–10 propensity battery's extra tiers (RedBridge/Accent's April
+       2026 wave): the shares rating 4–10 and rating 0, rebased over
+       everyone (the pollster asked only non-voters of each party) */
+    if (p.consLoose) {
+      const ks2 = ORDER.filter((k) => p.consLoose[k] != null);
+      out.push({ id: "consloose", lab: "Consider (4+ of 10)", body: <>
+        {ks2.map((k) => <U key={k}>{pty(k, rdApNum(p.consLoose[k]))}</U>)}
+        <U soft>rated 4 or more of 10, rebased over everyone</U>
+      </> });
+    }
+    if (p.consNever) {
+      const ks3 = ORDER.filter((k) => p.consNever[k] != null);
+      out.push({ id: "consnever", lab: "Would never vote (0 of 10)", body: <>
+        {ks3.map((k) => <U key={k}>{pty(k, rdApNum(p.consNever[k]))}</U>)}
+        <U soft>rated 0 of 10, rebased over everyone</U>
+      </> });
+    }
   }
   return out;
 }
@@ -2475,6 +2492,44 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
 }
 
 /* ---------------------------------------------------------------- the table */
+/* a consideration row's RANGE cycler (user call 2026-10-15: "why not just
+   add a switch/cycle button through the different ranges, right where it
+   denotes the basis"). A wave whose consideration question came in more
+   than one range - RedBridge/Accent's April 2026 0-10 battery files the
+   three tiers of tiers[] - shows ONE range at a time, canonical first,
+   and the basis label under its figures is a button stepping through
+   them, figures and strip moving together. The state is per row and
+   ephemeral: the sort, the story, the ledger (which lists every range)
+   and the header scale all read the canonical range regardless. */
+function RdApConsCyc({ tiers, phone, primNums, primStrip, primCardNums }) {
+  const [ti, setTi] = useState(0);
+  const many = tiers.length > 1;
+  const t = tiers[Math.min(ti, tiers.length - 1)];
+  const next = tiers[(ti + 1) % tiers.length];
+  const basis = many ? (
+    <button type="button" className="rd-ap-conscyc"
+            title={"Switch to " + next.lab}
+            aria-label={"Consideration range: " + t.lab + ". Switch to " + next.lab}
+            onClick={(e) => { e.stopPropagation(); setTi((ti + 1) % tiers.length); }}>
+      {t.lab} <span aria-hidden="true">⇄</span>
+    </button>
+  ) : (phone ? <span className="rd-ap-csub">{t.lab}</span> : <span className="rd-ap-sub">{t.lab}</span>);
+  const ariaPre = "Voting consideration" + (many ? ", " + t.lab : "") + ": ";
+  const live = many ? { "aria-live": "polite" } : null;
+  if (phone) return (
+    <>
+      <div className="rd-ap-ctier" {...live}>{primCardNums(t.m)}{basis}</div>
+      <div className="rd-ap-cpic">{primStrip(t.m, ariaPre)}</div>
+    </>
+  );
+  return (
+    <>
+      <span role="cell" className="rd-ap-fig" {...live}>{primNums(t.m)}{basis}</span>
+      {primStrip(t.m, ariaPre)}
+    </>
+  );
+}
+
 function RdAllPolls(P) {
   const { rows, sorted, total, houses, houseRank, houseN, tagN, shownTags, rangeN, RANGE_LAB,
           facet, onFacet, measure, onMeasure, tppBasis, setTppBasis, consM, setConsM,
@@ -2884,12 +2939,38 @@ function RdAllPolls(P) {
   const ldx = (v) => ((v - LD.lo) / (LD.hi - LD.lo)) * 100;
   const ldTicks = [];
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
-  /* the primary strip's scale: consideration figures run to ~60 (Essential's
-     consideration-outright question), intention tops out near 40 */
-  const PMAX = (facet === "primary" && consM) ? 60 : 45;
-  const PTKS = [0, 10, 20, 30, 40].concat(PMAX === 60 ? [50] : []);
+  /* the primary strip's scale: consideration figures run past 60 on
+     Essential's and RedBridge/Accent's looser tiers, intention tops out
+     near 40 */
+  const PMAX = (facet === "primary" && consM) ? 70 : 45;
+  const PTKS = [];
+  for (let v = 0; v < PMAX; v += 10) PTKS.push(v);
   const PLAST = PTKS[PTKS.length - 1];
   const pdx = (v) => (Math.max(0, Math.min(PMAX, v)) / PMAX) * 100;
+  /* dots whose figures land within the glyph's width of each other paint
+     one over another and the later fill erases the earlier whole - the
+     YouGov consideration wave with Labor and One Nation both on 38 showed
+     One Nation alone (user call 2026-10-15: "if there's any dot overlap
+     over a certain amount, put one dot on top of the other - there's
+     enough space for it"). Any run of dots closer than ~11px on the track
+     (the 10px glyph plus its halo) fans out into a little tower instead:
+     the 28px strip holds ±6px of centre, so a stack spans its full height
+     and both neighbours keep their own ladder position in x. */
+  const rdApDodge = (xs) => {
+    const R = 3.2; /* ≈ the 13px glyph-and-halo's share of the 334-362px track */
+    const tops = new Array(xs.length).fill(0);
+    const ord = xs.map((_, i) => i).sort((a, b) => xs[a] - xs[b]);
+    for (let i = 0; i < ord.length;) {
+      let j = i;
+      while (j + 1 < ord.length && xs[ord[j + 1]] - xs[ord[j]] < R) j++;
+      if (j > i) {
+        const k = j - i + 1;
+        for (let n = 0; n < k; n++) tops[ord[i + n]] = (n - (k - 1) / 2) * (12 / (k - 1));
+      }
+      i = j + 1;
+    }
+    return tops;
+  };
   /* primary columns rank by the site aggregate like every other party
      listing - user call 2026-10-03: a fixed Labor, Coalition, Greens, One
      Nation, Other ladder is "unprincipled" */
@@ -3204,21 +3285,44 @@ function RdAllPolls(P) {
       </div>;
     } else if (facet === "primary") {
       const pr = (consM && p.cons) || p.p || {};
-      figs = <span role="cell" className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
-      pic = (
-        <span className="rd-ap-pic" role="img" aria-label={((consM && p.cons) ? "Voting consideration: " : "Primary vote: ") + prims.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
+      /* under consM every row names its consideration basis under the
+         figures (user call 2026-10-15, mirroring the demographics facet's
+         "18–34 v 55+, in points" sub). A wave carrying the extra 0–10
+         ranges (RedBridge/Accent's April 2026 battery) lists them behind
+         the canonical tier for RdApConsCyc to step through */
+      const tiers = !(consM && p.cons) ? null
+        : [{ m: p.cons, lab: p.consBasis || "consider" }]
+          .concat(p.consLoose ? [{ m: p.consLoose, lab: "consider (4+ of 10)" }] : [])
+          .concat(p.consNever ? [{ m: p.consNever, lab: "would never vote (0 of 10)" }] : []);
+      const primNums = (m) => <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>)}</span>;
+      const primStrip = (m, ariaPre) => {
+        const cols = prims.filter((k) => m[k.id] != null), tops = rdApDodge(cols.map((k) => pdx(m[k.id])));
+        return (
+        <span className="rd-ap-pic" role="img" aria-label={ariaPre + cols.map((k) => k.lab + " " + rdApNum(m[k.id])).join(", ")}>
           <span className="rd-ap-in">
             {PTKS.map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
-            {prims.filter((k) => pr[k.id] != null).map((k) => (
-              <i key={k.id} className="rd-ap-dot" style={{ left: pdx(pr[k.id]) + "%", background: k.dot }}></i>
+            {cols.map((k, di) => (
+              <i key={k.id} className="rd-ap-dot" style={{ left: pdx(m[k.id]) + "%", background: k.dot, ...(tops[di] ? { top: "calc(50% + " + tops[di] + "px)" } : null) }}></i>
             ))}
           </span>
         </span>
-      );
-      body = <>
-        <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b></span>)}</div>
-        <div className="rd-ap-cpic">{pic}</div>
-      </>;
+        );
+      };
+      const primCardNums = (m) => <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b></span>)}</div>;
+      if (tiers) {
+        /* the cycler's fragment is BOTH cells (figures cell then strip),
+           so it parks at the figs slot and pic stays empty */
+        const cyc = <RdApConsCyc tiers={tiers} phone={phone} primNums={primNums} primStrip={primStrip} primCardNums={primCardNums} />;
+        if (phone) body = cyc;
+        else { figs = cyc; pic = null; }
+      } else {
+        figs = <span role="cell" className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
+        pic = primStrip(pr, "Primary vote: ");
+        body = <>
+          {primCardNums(pr)}
+          <div className="rd-ap-cpic">{pic}</div>
+        </>;
+      }
     } else if (facet === "leadership") {
       const sets = window.ppmContests(p);
       const opp = sets.find((s) => (s.taylor != null || s.ley != null) && s.hanson == null);
@@ -3237,14 +3341,16 @@ function RdAllPolls(P) {
       figs = <span role="cell" className="rd-ap-fig">{main}<span className="rd-ap-sub">{sub}</span></span>;
       const a = p.appr || {};
       const mb = a.metricBy || {};
+      const ldCols = [["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null);
+      const ldTops = rdApDodge(ldCols.map(([k]) => ldx(a[k])));
       pic = (
         <span className="rd-ap-pic" aria-hidden="true">
           <span className="rd-ap-in">
             {/* the inner ticks only: like every signed strip, the ends go unruled */}
             {ldTicks.filter((v) => v !== 0 && v !== LD.lo && v !== LD.hi).map((v) => <i key={v} className="rd-ap-gl" style={{ left: ldx(v) + "%" }}></i>)}
             <i className="rd-ap-avg" style={{ left: ldx(0) + "%" }}></i>
-            {[["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null).map(([k, col]) => (
-              <i key={k} className="rd-ap-dot" style={{ left: ldx(a[k]) + "%", background: col }}></i>
+            {ldCols.map(([k, col], di) => (
+              <i key={k} className="rd-ap-dot" style={{ left: ldx(a[k]) + "%", background: col, ...(ldTops[di] ? { top: "calc(50% + " + ldTops[di] + "px)" } : null) }}></i>
             ))}
           </span>
         </span>
@@ -3346,13 +3452,15 @@ function RdAllPolls(P) {
           <span className="rd-ap-sub">{pr ? pr.lab + ", in points" : "no " + spl.label.toLowerCase() + " breakdown"}</span>
         </span>
       );
+      const demCols = pr ? prims.filter((k) => pr.gap[k.id] != null) : [];
+      const demTops = rdApDodge(demCols.map((k) => gx(pr.gap[k.id])));
       pic = (
-        <span className="rd-ap-pic" role="img" aria-label={pr ? pr.lab + ": " + prims.filter((k) => pr.gap[k.id] != null).map((k) => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"}>
+        <span className="rd-ap-pic" role="img" aria-label={pr ? pr.lab + ": " + demCols.map((k) => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"}>
           <span className="rd-ap-in">
             {[-30, -20, -10, 10, 20, 30].map((v) => <i key={v} className="rd-ap-gl" style={{ left: gx(v) + "%" }}></i>)}
             <i className="rd-ap-avg" style={{ left: gx(0) + "%" }}></i>
-            {pr && prims.filter((k) => pr.gap[k.id] != null).map((k) => (
-              <i key={k.id} className="rd-ap-dot" style={{ left: gx(pr.gap[k.id]) + "%", background: k.dot }}></i>
+            {demCols.map((k, di) => (
+              <i key={k.id} className="rd-ap-dot" style={{ left: gx(pr.gap[k.id]) + "%", background: k.dot, ...(demTops[di] ? { top: "calc(50% + " + demTops[di] + "px)" } : null) }}></i>
             ))}
           </span>
         </span>

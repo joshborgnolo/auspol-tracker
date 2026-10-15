@@ -4944,7 +4944,7 @@ body.rd .rd-ap-clip.l { left: -7px; border-right: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-clip.r { right: -7px; border-left: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-dot {
   top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
+  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), top .32s var(--morph-ease), background-color .32s ease;
 }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip, body.rd .rd-ap-he { transition: none; }
@@ -4986,6 +4986,10 @@ body.rd .rd-ap-ibar { display: flex; height: 6px; width: 100%; border-radius: 3p
 body.rd .rd-ap-ibar > i { display: block; height: 100%; flex: none; }
 body.rd .rd-ap-dgap { gap: 2px; }
 body.rd .rd-ap-dgap .rd-ap-pnums > b { font-variant-numeric: tabular-nums; }
+body.rd .rd-ap-conscyc { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; min-height: 28px; font-size: 12px; line-height: 1.35; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ap-conscyc span { color: var(--ink-3); }
+body.rd .rd-ap-conscyc:hover { text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
+body.rd .rd-ap-conscyc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 body.rd .rd-ap-dpick { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-tabs > .rd-ap-dpick { margin-bottom: -1px; }
 body.rd .rd-ap-dpick > [role="radiogroup"] { display: inline-flex; align-items: center; gap: 2px; }
@@ -5193,6 +5197,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 1px; }
   body.rd .rd-ap-cnets { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
+  body.rd .rd-ap-ctier { margin-top: 2px; }
+  body.rd .rd-ap-ctier .rd-ap-conscyc { font-size: 13px; }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -47947,6 +47953,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "ind": 14,
       "oth": 4
     },
+    "consBasis": "consider",
     "alp": null,
     "lnp": null,
     "alpN": null,
@@ -52796,6 +52803,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "onp": 21,
       "oth": 16
     },
+    "consBasis": "consider",
     "eff": {
       "imp": {
         "lo": 52.3,
@@ -59884,6 +59892,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "cons": {
       "onp": 58
     },
+    "consBasis": "consider",
     "eff": {
       "lnp": {
         "lo": 51,
@@ -60086,6 +60095,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "cons": {
       "onp": 48
     },
+    "consBasis": "would ever support",
     "eff": {
       "lnp": {
         "lo": 51,
@@ -66367,6 +66377,25 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "published": "2026-05-03T18:00",
     "firmAll": [52, 39, 9],
     "tppFlows": 53,
+    "cons": {
+      "alp": 45,
+      "lnp": 36,
+      "grn": 24,
+      "onp": 37
+    },
+    "consBasis": "seriously consider (7+ of 10)",
+    "consLoose": {
+      "alp": 62,
+      "lnp": 59,
+      "grn": 45,
+      "onp": 53
+    },
+    "consNever": {
+      "alp": 21,
+      "lnp": 16,
+      "grn": 32,
+      "onp": 30
+    },
     "splitCoal": 31,
     "splitOnp": 25,
     "splitGrn": 90,
@@ -70559,6 +70588,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "onp": 39,
       "none": 8
     },
+    "consBasis": "seriously consider",
     "eff": {
       "lnp": {
         "lo": 51,
@@ -71643,6 +71673,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "onp": 38,
       "none": 6
     },
+    "consBasis": "seriously consider",
     "eff": {
       "lnp": {
         "lo": 51,
@@ -73137,6 +73168,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "onp": 52,
       "oth": 56
     },
+    "consBasis": "consider",
     "eff": {
       "lnp": {
         "lo": 51,
@@ -73370,6 +73402,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "onp": 39,
       "none": 7
     },
+    "consBasis": "seriously consider",
     "eff": {
       "lnp": {
         "lo": 51,
@@ -123861,8 +123894,32 @@ function rdLgLines(p, {
         key: k
       }, k === "none" ? React.createElement(React.Fragment, null, "none ", React.createElement("b", null, rdApNum(p.cons[k]))) : pty(k, rdApNum(p.cons[k])))), React.createElement(U, {
         soft: true
-      }, "parties the voter would consider, not votes"))
+      }, p.consBasis ? p.consBasis + ", not votes" : "parties the voter would consider, not votes"))
     });
+    if (p.consLoose) {
+      const ks2 = ORDER.filter(k => p.consLoose[k] != null);
+      out.push({
+        id: "consloose",
+        lab: "Consider (4+ of 10)",
+        body: React.createElement(React.Fragment, null, ks2.map(k => React.createElement(U, {
+          key: k
+        }, pty(k, rdApNum(p.consLoose[k])))), React.createElement(U, {
+          soft: true
+        }, "rated 4 or more of 10, rebased over everyone"))
+      });
+    }
+    if (p.consNever) {
+      const ks3 = ORDER.filter(k => p.consNever[k] != null);
+      out.push({
+        id: "consnever",
+        lab: "Would never vote (0 of 10)",
+        body: React.createElement(React.Fragment, null, ks3.map(k => React.createElement(U, {
+          key: k
+        }, pty(k, rdApNum(p.consNever[k])))), React.createElement(U, {
+          soft: true
+        }, "rated 0 of 10, rebased over everyone"))
+      });
+    }
   }
   return out;
 }
@@ -124516,6 +124573,47 @@ function RdApSheet({
     onClick: onClose
   }, "Show ", count, " ", count === 1 ? noun1 : noun)));
 }
+function RdApConsCyc({
+  tiers,
+  phone,
+  primNums,
+  primStrip,
+  primCardNums
+}) {
+  const [ti, setTi] = useState(0);
+  const many = tiers.length > 1;
+  const t = tiers[Math.min(ti, tiers.length - 1)];
+  const next = tiers[(ti + 1) % tiers.length];
+  const basis = many ? React.createElement("button", {
+    type: "button",
+    className: "rd-ap-conscyc",
+    title: "Switch to " + next.lab,
+    "aria-label": "Consideration range: " + t.lab + ". Switch to " + next.lab,
+    onClick: e => {
+      e.stopPropagation();
+      setTi((ti + 1) % tiers.length);
+    }
+  }, t.lab, " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")) : phone ? React.createElement("span", {
+    className: "rd-ap-csub"
+  }, t.lab) : React.createElement("span", {
+    className: "rd-ap-sub"
+  }, t.lab);
+  const ariaPre = "Voting consideration" + (many ? ", " + t.lab : "") + ": ";
+  const live = many ? {
+    "aria-live": "polite"
+  } : null;
+  if (phone) return React.createElement(React.Fragment, null, React.createElement("div", _extends({
+    className: "rd-ap-ctier"
+  }, live), primCardNums(t.m), basis), React.createElement("div", {
+    className: "rd-ap-cpic"
+  }, primStrip(t.m, ariaPre)));
+  return React.createElement(React.Fragment, null, React.createElement("span", _extends({
+    role: "cell",
+    className: "rd-ap-fig"
+  }, live), primNums(t.m), basis), primStrip(t.m, ariaPre));
+}
 function RdAllPolls(P) {
   const {
     rows,
@@ -124912,10 +125010,26 @@ function RdAllPolls(P) {
   const ldx = v => (v - LD.lo) / (LD.hi - LD.lo) * 100;
   const ldTicks = [];
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
-  const PMAX = facet === "primary" && consM ? 60 : 45;
-  const PTKS = [0, 10, 20, 30, 40].concat(PMAX === 60 ? [50] : []);
+  const PMAX = facet === "primary" && consM ? 70 : 45;
+  const PTKS = [];
+  for (let v = 0; v < PMAX; v += 10) PTKS.push(v);
   const PLAST = PTKS[PTKS.length - 1];
   const pdx = v => Math.max(0, Math.min(PMAX, v)) / PMAX * 100;
+  const rdApDodge = xs => {
+    const R = 3.2;
+    const tops = new Array(xs.length).fill(0);
+    const ord = xs.map((_, i) => i).sort((a, b) => xs[a] - xs[b]);
+    for (let i = 0; i < ord.length;) {
+      let j = i;
+      while (j + 1 < ord.length && xs[ord[j + 1]] - xs[ord[j]] < R) j++;
+      if (j > i) {
+        const k = j - i + 1;
+        for (let n = 0; n < k; n++) tops[ord[i + n]] = (n - (k - 1) / 2) * (12 / (k - 1));
+      }
+      i = j + 1;
+    }
+    return tops;
+  };
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
@@ -125310,36 +125424,52 @@ function RdAllPolls(P) {
       }, rdApSigned(hl))));
     } else if (facet === "primary") {
       const pr = consM && p.cons || p.p || {};
-      figs = React.createElement("span", {
-        role: "cell",
+      const tiers = !(consM && p.cons) ? null : [{
+        m: p.cons,
+        lab: p.consBasis || "consider"
+      }].concat(p.consLoose ? [{
+        m: p.consLoose,
+        lab: "consider (4+ of 10)"
+      }] : []).concat(p.consNever ? [{
+        m: p.consNever,
+        lab: "would never vote (0 of 10)"
+      }] : []);
+      const primNums = m => React.createElement("span", {
         className: "rd-ap-pnums"
       }, prims.map(k => React.createElement("b", {
         key: k.id,
         style: {
           color: k.ink
         }
-      }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")));
-      pic = React.createElement("span", {
-        className: "rd-ap-pic",
-        role: "img",
-        "aria-label": (consM && p.cons ? "Voting consideration: " : "Primary vote: ") + prims.filter(k => pr[k.id] != null).map(k => k.lab + " " + rdApNum(pr[k.id])).join(", ")
-      }, React.createElement("span", {
-        className: "rd-ap-in"
-      }, PTKS.map(v => React.createElement("i", {
-        key: v,
-        className: "rd-ap-gl",
-        style: {
-          left: pdx(v) + "%"
-        }
-      })), prims.filter(k => pr[k.id] != null).map(k => React.createElement("i", {
-        key: k.id,
-        className: "rd-ap-dot",
-        style: {
-          left: pdx(pr[k.id]) + "%",
-          background: k.dot
-        }
-      }))));
-      body = React.createElement(React.Fragment, null, React.createElement("div", {
+      }, m[k.id] != null ? rdApPrimFig(m[k.id]) : "—")));
+      const primStrip = (m, ariaPre) => {
+        const cols = prims.filter(k => m[k.id] != null),
+          tops = rdApDodge(cols.map(k => pdx(m[k.id])));
+        return React.createElement("span", {
+          className: "rd-ap-pic",
+          role: "img",
+          "aria-label": ariaPre + cols.map(k => k.lab + " " + rdApNum(m[k.id])).join(", ")
+        }, React.createElement("span", {
+          className: "rd-ap-in"
+        }, PTKS.map(v => React.createElement("i", {
+          key: v,
+          className: "rd-ap-gl",
+          style: {
+            left: pdx(v) + "%"
+          }
+        })), cols.map((k, di) => React.createElement("i", {
+          key: k.id,
+          className: "rd-ap-dot",
+          style: {
+            left: pdx(m[k.id]) + "%",
+            background: k.dot,
+            ...(tops[di] ? {
+              top: "calc(50% + " + tops[di] + "px)"
+            } : null)
+          }
+        }))));
+      };
+      const primCardNums = m => React.createElement("div", {
         className: "rd-ap-cprim"
       }, prims.map(k => React.createElement("span", {
         key: k.id
@@ -125347,9 +125477,34 @@ function RdAllPolls(P) {
         style: {
           color: k.ink
         }
-      }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")))), React.createElement("div", {
-        className: "rd-ap-cpic"
-      }, pic));
+      }, m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"))));
+      if (tiers) {
+        const cyc = React.createElement(RdApConsCyc, {
+          tiers: tiers,
+          phone: phone,
+          primNums: primNums,
+          primStrip: primStrip,
+          primCardNums: primCardNums
+        });
+        if (phone) body = cyc;else {
+          figs = cyc;
+          pic = null;
+        }
+      } else {
+        figs = React.createElement("span", {
+          role: "cell",
+          className: "rd-ap-pnums"
+        }, prims.map(k => React.createElement("b", {
+          key: k.id,
+          style: {
+            color: k.ink
+          }
+        }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")));
+        pic = primStrip(pr, "Primary vote: ");
+        body = React.createElement(React.Fragment, null, primCardNums(pr), React.createElement("div", {
+          className: "rd-ap-cpic"
+        }, pic));
+      }
     } else if (facet === "leadership") {
       const sets = window.ppmContests(p);
       const opp = sets.find(s => (s.taylor != null || s.ley != null) && s.hanson == null);
@@ -125412,6 +125567,8 @@ function RdAllPolls(P) {
       }, sub));
       const a = p.appr || {};
       const mb = a.metricBy || {};
+      const ldCols = [["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null);
+      const ldTops = rdApDodge(ldCols.map(([k]) => ldx(a[k])));
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         "aria-hidden": "true"
@@ -125428,12 +125585,15 @@ function RdAllPolls(P) {
         style: {
           left: ldx(0) + "%"
         }
-      }), [["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null).map(([k, col]) => React.createElement("i", {
+      }), ldCols.map(([k, col], di) => React.createElement("i", {
         key: k,
         className: "rd-ap-dot",
         style: {
           left: ldx(a[k]) + "%",
-          background: col
+          background: col,
+          ...(ldTops[di] ? {
+            top: "calc(50% + " + ldTops[di] + "px)"
+          } : null)
         }
       }))));
       const fav = ["alb", "taylor", "hanson"].some(k => mb[k] === "fav" && a[k + "Net"] != null);
@@ -125612,10 +125772,12 @@ function RdAllPolls(P) {
       }, pr ? gapTxt(pr.gap[k.id]) : "—"))), React.createElement("span", {
         className: "rd-ap-sub"
       }, pr ? pr.lab + ", in points" : "no " + spl.label.toLowerCase() + " breakdown"));
+      const demCols = pr ? prims.filter(k => pr.gap[k.id] != null) : [];
+      const demTops = rdApDodge(demCols.map(k => gx(pr.gap[k.id])));
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": pr ? pr.lab + ": " + prims.filter(k => pr.gap[k.id] != null).map(k => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"
+        "aria-label": pr ? pr.lab + ": " + demCols.map(k => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"
       }, React.createElement("span", {
         className: "rd-ap-in"
       }, [-30, -20, -10, 10, 20, 30].map(v => React.createElement("i", {
@@ -125629,12 +125791,15 @@ function RdAllPolls(P) {
         style: {
           left: gx(0) + "%"
         }
-      }), pr && prims.filter(k => pr.gap[k.id] != null).map(k => React.createElement("i", {
+      }), demCols.map((k, di) => React.createElement("i", {
         key: k.id,
         className: "rd-ap-dot",
         style: {
           left: gx(pr.gap[k.id]) + "%",
-          background: k.dot
+          background: k.dot,
+          ...(demTops[di] ? {
+            top: "calc(50% + " + demTops[di] + "px)"
+          } : null)
         }
       }))));
       right1 = pr ? React.createElement("span", {

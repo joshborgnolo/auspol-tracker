@@ -1585,6 +1585,7 @@
         "ind": 14,
         "oth": 4
       },
+      "consBasis": "consider",
       "url": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf"
     },
     {
@@ -2212,6 +2213,7 @@
         "onp": 21,
         "oth": 16
       },
+      "consBasis": "consider",
       "url": "https://www.climatecouncil.org.au/wp-content/uploads/2025/11/ClimateCouncil_EPA_MRP_Report_201125_national.pdf"
     },
     {
@@ -3015,6 +3017,7 @@
       "consideration": {
         "onp": 58
       },
+      "consBasis": "consider",
       "url": "https://essentialreport.com.au/reports/federal-political-insights",
       "releaseUrl": "https://essentialreport.com.au/reports/25-february-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/02/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf"
@@ -3038,6 +3041,7 @@
       "consideration": {
         "onp": 48
       },
+      "consBasis": "would ever support",
       "lnpSplit": {
         "Lib": 15,
         "LNP": 5,
@@ -3874,6 +3878,25 @@
           14
         ]
       },
+      "consideration": {
+        "alp": 45,
+        "lnp": 36,
+        "grn": 24,
+        "onp": 37
+      },
+      "consBasis": "seriously consider (7+ of 10)",
+      "considerationLoose": {
+        "alp": 62,
+        "lnp": 59,
+        "grn": 45,
+        "onp": 53
+      },
+      "considerationNever": {
+        "alp": 21,
+        "lnp": 16,
+        "grn": 32,
+        "onp": 30
+      },
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf"
@@ -4373,6 +4396,7 @@
         "onp": 39,
         "none": 8
       },
+      "consBasis": "seriously consider",
       "url": "https://www.news24.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_02_06_26_APC_Methodology_Statement.pdf"
     },
@@ -4486,6 +4510,7 @@
         "onp": 38,
         "none": 6
       },
+      "consBasis": "seriously consider",
       "url": "https://www.news24.com.au/australia-news/politics/one-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll/news-story/0943b53d79d1e4fb27860c4020be7642",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_16_06_26_APC_Methodology_Statement.pdf"
     },
@@ -4677,6 +4702,7 @@
         "onp": 52,
         "oth": 56
       },
+      "consBasis": "consider",
       "url": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
       "releaseUrl": "https://essentialreport.com.au/reports/30-june-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf"
@@ -4704,6 +4730,7 @@
         "onp": 39,
         "none": 7
       },
+      "consBasis": "seriously consider",
       "url": "https://www.news24.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
       "releaseUrl": "https://yougov.com/articles/55081-labor-on-track-for-decisive-election-victory-as-coalition-support-hits-record-low",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Yougov_SkyPulse_02_07_26_APC_Methodology_Statement.pdf"

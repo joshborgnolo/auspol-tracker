@@ -2638,7 +2638,7 @@ body.rd .rd-ap-clip.l { left: -7px; border-right: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-clip.r { right: -7px; border-left: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-dot {
   top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
+  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), top .32s var(--morph-ease), background-color .32s ease;
 }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip, body.rd .rd-ap-he { transition: none; }
@@ -2696,6 +2696,14 @@ body.rd .rd-ap-ibar > i { display: block; height: 100%; flex: none; }
 /* the demographics facet: five gaps over the pair they were taken across */
 body.rd .rd-ap-dgap { gap: 2px; }
 body.rd .rd-ap-dgap .rd-ap-pnums > b { font-variant-numeric: tabular-nums; }
+/* the consideration basis labels (primary facet under consM): a plain
+   .rd-ap-sub line names a wave's single basis; a wave carrying extra
+   ranges shows one and cycles from this button (RdApConsCyc), shaped on
+   the facet flip but at sub-line size so its row keeps the shared rung */
+body.rd .rd-ap-conscyc { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; min-height: 28px; font-size: 12px; line-height: 1.35; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ap-conscyc span { color: var(--ink-3); }
+body.rd .rd-ap-conscyc:hover { text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
+body.rd .rd-ap-conscyc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 /* …and its split picker: words beside the tabs, the chosen one in ink. On
    the tab row it takes the tabs' own -1px foot, so the row stands 44px in
    every facet (86c1f6a's rule for the two-party control); under 1000px it
@@ -2974,6 +2982,10 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   /* a sentence, not a row of cells: as a flex line its 8px gaps cut every
      comma loose from its figure ("Right 25 , wrong 60") */
   body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
+  /* the consideration basis line on a phone card: the range cycler reads
+     at the .rd-ap-csub scale rather than the desktop 12px */
+  body.rd .rd-ap-ctier { margin-top: 2px; }
+  body.rd .rd-ap-ctier .rd-ap-conscyc { font-size: 13px; }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }

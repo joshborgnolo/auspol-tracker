@@ -150,13 +150,17 @@ export function validate(D) {
     }
     // 2b1ca. consideration – "which parties would you consider voting for"
     //      (multi-select, so no sum discipline). YouGov's News24/serious
-    //      waves, Essential's consideration module, and YouGov (MRP)'s
-    //      Climate Council and Blueprint Institute waves. Party keys from
-    //      alp/lnp/grn/onp/ind/oth/none (only the Blueprint wave offered an
-    //      Independent option, so ind rides it alone), at least one, each a
-    //      percentage or a hand-entered .5 multiple.
+    //      waves, Essential's consideration module, YouGov (MRP)'s Climate
+    //      Council and Blueprint Institute waves, and RedBridge/Accent's
+    //      April 2026 0–10 propensity battery (filed as three all-voter
+    //      tiers – below). Party keys from alp/lnp/grn/onp/ind/oth/none
+    //      (only the Blueprint wave offered an Independent option, so ind
+    //      rides it alone), at least one, each a percentage or a
+    //      hand-entered .5 multiple. consBasis is the row's short basis
+    //      label under the figures ("consider", "seriously consider",
+    //      RedBridge's range-bracketed tiers) and mandatory with the field.
     if (p.consideration != null) {
-      if (!["YouGov", "YouGov (MRP)", "Essential"].includes(p.pollster))
+      if (!["YouGov", "YouGov (MRP)", "Essential", "RedBridge/Accent"].includes(p.pollster))
         fail("cons-pollster", `consideration on a row for ${p.pollster}`);
       const keys = Object.keys(p.consideration).filter((k) => p.consideration[k] != null);
       if (!keys.length) fail("cons-shape", "consideration carries no figures");
@@ -168,7 +172,33 @@ export function validate(D) {
         if (!(v >= 1 && v <= 99))
           fail("cons-range", `consideration.${k} = ${v}`);
       }
-    }
+      if (typeof p.consBasis !== "string" || !p.consBasis.trim())
+        fail("cons-basis", `consideration without consBasis on ${p.pollster} ${p.date}`);
+      else if (p.consBasis.length > 40)
+        fail("cons-basis", `consBasis too long on ${p.pollster} ${p.date}: ${p.consBasis}`);
+      // 2b1cb. the extra tiers of a 0–10 propensity battery: loose = 4–10
+      //      of 10, never = 0 of 10 (the canonical map sits in the middle
+      //      at 7+). RedBridge/Accent's April 2026 wave only so far. Tiers
+      //      ride the canonical vocabulary, need the canonical map beside
+      //      them, and loose must never dip below the canonical share on a
+      //      shared key.
+      for (const f of ["considerationLoose", "considerationNever"]) {
+        if (p[f] == null) continue;
+        if (p.pollster !== "RedBridge/Accent")
+          fail("cons-tier-pollster", `${f} on a row for ${p.pollster}`);
+        for (const k of Object.keys(p[f]))
+          if (!["alp", "lnp", "grn", "onp", "ind", "oth", "none"].includes(k))
+            fail("cons-tier-key", `${f}.${k} is not a party key`);
+        for (const k of Object.keys(p[f]).filter((k) => p[f][k] != null)) {
+          const v = p[f][k];
+          if (!(v >= 1 && v <= 99))
+            fail("cons-tier-range", `${f}.${k} = ${v}`);
+          if (f === "considerationLoose" && typeof p.consideration[k] === "number" && v < p.consideration[k])
+            fail("cons-tier-order", `${f}.${k} = ${v} below canonical ${p.consideration[k]}`);
+        }
+      }
+    } else if (p.consBasis != null || p.considerationLoose != null || p.considerationNever != null)
+      fail("cons-basis", `consBasis/tier fields without consideration on ${p.pollster} ${p.date}`);
     // 2b1d. softAge – Resolve's "not firm" share by age band, the three
     //      bands or none, each a percentage.
     if (p.softAge != null) {
