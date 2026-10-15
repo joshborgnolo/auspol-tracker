@@ -62,8 +62,13 @@ export const YG_ISSUE = {
   "growing inequality": "inequality", "decent jobs and working rights": "jobs",
   "pensions and older australians": "pensions", "security and defence": "security",
   "international affairs and trade": "foreign", "education and childcare": "education",
+  // the 24 Feb 2026 battery labels its issues in long form
+  housing: "housing", "managing the economy and government debt": "economy",
+  "the growing gap between the very rich and poorest australians": "inequality",
+  "good paying, secure jobs and rights at work": "jobs",
+  "pensions and caring for older australians": "pensions",
 };
-const YG_ANSWER = { labor: "alp", coalition: "lnp", "one nation": "onp", "the greens": "grn", greens: "grn", "don't know": "unsure" };
+const YG_ANSWER = { labor: "alp", coalition: "lnp", "one nation": "onp", "the greens": "grn", greens: "grn", "don't know": "unsure", unsure: "unsure" };
 
 /* Ipsos prints short labels for the 19 issues its question lists in full
    (its methodology statement): "Crime" is "Crime/Law and Order/Violence/
@@ -332,12 +337,24 @@ function parseCsvLine(s) {
    columns Labor, Coalition, One Nation, The Greens and Don't know. Found by
    its shape – an issue label on every row this knows, the party columns,
    each row summing to about 100 – and its question text, never by its
-   position among the article's charts. Takes the chart's infographicData. */
-export function ygIssuesOf(data) {
+   position among the article's charts. Takes the chart's infographicData.
+   Three phrasings are in print: the battery's "best at handling" (its 24 Feb
+   2026 printing styles the title "best placed to handle" but its own source
+   line still says "best at handling") and the single-issue charts' "best at
+   managing" (May 2026's immigration and climate change, charted only when
+   republished that August). Two layouts too: issues down the side, or the 24
+   Feb battery's parties down the side – and May's singles carry "%" signs.
+   singles (hand-listed charts only) lets one-issue charts through; nothing
+   with fewer than five issues is ever taken from the extractor's list. */
+export function ygIssuesOf(data, { singles = false } = {}) {
   const ents = data?.elements?.content?.content?.entities || {};
   const texts = Object.values(ents).map((e) => JSON.stringify(e?.props || {})).join(" ");
-  if (!/best at handling/i.test(texts)) return null;
+  const verb = texts.match(/best (?:at handling|placed to handle|at managing)/i);
+  if (!verb) return null;
+  const question = /managing/i.test(verb[0]) ? "Which party is best at managing…" : "Which party is best at handling…";
   const fw = texts.match(/YouGov \((\w+) (\d{1,2})[–-](?:(\w+) )?(\d{1,2}), (\d{4})\)/);
+  const num = (v) => Number(String(v ?? "").trim().replace(/%$/, ""));
+  const minIssues = singles ? 1 : 5;
   for (const e of Object.values(ents)) {
     const cd = e?.props?.chartData;
     if (e?.type !== "CHART" || !cd?.data) continue;
@@ -345,19 +362,35 @@ export function ygIssuesOf(data) {
       if (!Array.isArray(sheet) || !Array.isArray(sheet[0])) continue;
       const rows = sheet.map((r) => r.map((c) => String(c?.value ?? c ?? "").trim()));
       const cols = rows[0].map((h) => YG_ANSWER[norm(h)] || null);
-      if (!["alp", "lnp", "onp", "unsure"].every((k) => cols.includes(k))) continue;
-      const issues = {}, unknown = [];
-      for (const r of rows.slice(1)) {
-        if (!r[0]) continue;
-        const k = YG_ISSUE[norm(r[0])];
-        if (!k) { unknown.push(r[0]); continue; }
-        const sh = {};
-        cols.forEach((c, n) => { if (c) sh[c] = Number(r[n]); });
-        issues[k] = sh;
+      if (["alp", "lnp", "onp", "unsure"].every((k) => cols.includes(k))) {
+        const issues = {}, unknown = [];
+        for (const r of rows.slice(1)) {
+          if (!r[0]) continue;
+          const k = YG_ISSUE[norm(r[0])];
+          if (!k) { unknown.push(r[0]); continue; }
+          const sh = {};
+          cols.forEach((c, n) => { if (c) sh[c] = num(r[n]); });
+          issues[k] = sh;
+        }
+        if (Object.keys(issues).length >= minIssues) {
+          return { issues, unknown, fieldwork: fw ? fw.slice(1).join(" ") : null, question };
+        }
       }
-      if (Object.keys(issues).length >= 5) {
-        return { issues, unknown, fieldwork: fw ? fw.slice(1).join(" ") : null,
-                 question: "Which party is best at handling…" };
+      // parties down the side: the header row is the issues
+      const rowAns = rows.map((r) => YG_ANSWER[norm(r[0] || "")] || null);
+      if (["alp", "lnp", "onp", "unsure"].every((k) => rowAns.includes(k))) {
+        const issues = {}, unknown = [];
+        rows[0].forEach((h, i) => {
+          if (i === 0) return;
+          const k = YG_ISSUE[norm(h)];
+          if (!k) { unknown.push(h); return; }
+          const sh = {};
+          rows.forEach((r, j) => { const a = rowAns[j]; if (a && j > 0) sh[a] = num(r[i]); });
+          issues[k] = sh;
+        });
+        if (Object.keys(issues).length >= minIssues) {
+          return { issues, unknown, fieldwork: fw ? fw.slice(1).join(" ") : null, question };
+        }
       }
     }
   }

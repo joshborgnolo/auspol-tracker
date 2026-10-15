@@ -17283,6 +17283,109 @@
    }
   },
   {
+   "pollster": "YouGov",
+   "date": "2026-02-24",
+   "dateStart": "2026-02-17",
+   "sample": 1500,
+   "sampleEff": 980,
+   "source": "https://e.infogram.com/_/PRIwIulL9llfREvxrK8v",
+   "read": "published chart",
+   "question": "Which party is best at handling…",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "unsure"
+   ],
+   "issues": {
+    "col": {
+     "alp": 25,
+     "lnp": 22,
+     "onp": 13,
+     "grn": 9,
+     "unsure": 31
+    },
+    "immigration": {
+     "alp": 20,
+     "lnp": 19,
+     "onp": 29,
+     "grn": 8,
+     "unsure": 24
+    },
+    "housing": {
+     "alp": 22,
+     "lnp": 18,
+     "onp": 15,
+     "grn": 10,
+     "unsure": 35
+    },
+    "health": {
+     "alp": 31,
+     "lnp": 20,
+     "onp": 12,
+     "grn": 9,
+     "unsure": 28
+    },
+    "climate": {
+     "alp": 20,
+     "lnp": 11,
+     "onp": 12,
+     "grn": 28,
+     "unsure": 29
+    },
+    "economy": {
+     "alp": 24,
+     "lnp": 31,
+     "onp": 12,
+     "grn": 6,
+     "unsure": 27
+    },
+    "inequality": {
+     "alp": 24,
+     "lnp": 14,
+     "onp": 15,
+     "grn": 12,
+     "unsure": 35
+    },
+    "jobs": {
+     "alp": 33,
+     "lnp": 19,
+     "onp": 13,
+     "grn": 8,
+     "unsure": 27
+    },
+    "security": {
+     "alp": 25,
+     "lnp": 27,
+     "onp": 13,
+     "grn": 4,
+     "unsure": 31
+    },
+    "pensions": {
+     "alp": 31,
+     "lnp": 16,
+     "onp": 14,
+     "grn": 7,
+     "unsure": 32
+    },
+    "education": {
+     "alp": 32,
+     "lnp": 19,
+     "onp": 11,
+     "grn": 8,
+     "unsure": 30
+    },
+    "foreign": {
+     "alp": 27,
+     "lnp": 25,
+     "onp": 13,
+     "grn": 5,
+     "unsure": 30
+    }
+   }
+  },
+  {
    "pollster": "RedBridge/Accent",
    "date": "2026-02-27",
    "dateStart": "2026-02-23",
@@ -17987,6 +18090,39 @@
      "onp": 20,
      "grn": 9,
      "oth": 31
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-05-19",
+   "dateStart": "2026-05-12",
+   "sample": 1504,
+   "sampleEff": 1004,
+   "source": "https://e.infogram.com/_/S35yUFnaiop6DAuLzJfN",
+   "read": "published chart",
+   "question": "Which party is best at managing…",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "unsure"
+   ],
+   "issues": {
+    "immigration": {
+     "alp": 18,
+     "lnp": 18,
+     "onp": 36,
+     "grn": 7,
+     "unsure": 21
+    },
+    "climate": {
+     "alp": 17,
+     "lnp": 13,
+     "onp": 17,
+     "grn": 26,
+     "unsure": 27
     }
    }
   },

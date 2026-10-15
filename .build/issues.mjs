@@ -88,8 +88,15 @@ const STALE_DAYS = 16;
 const IP_QUIET_DAYS = 90;
 const MATCH_DAYS = 4;                   // Resolve's series date sits a day or so off its poll row
 /* YouGov issue charts found by hand in waves whose chart list the News24
-   extractor no longer holds (its cache keeps only the newest wave). */
-const KNOWN_IG_ISSUES = { "2026-08-24": "_/TBlBtAE3k0f4YBE6MIpF" };
+   extractor no longer holds (its cache keeps only the newest wave). May's
+   two singles carry "(May 2026)" on their face, so they key on that wave,
+   not the August article that republished them; several charts for one wave
+   merge into its row. */
+const KNOWN_IG_ISSUES = {
+  "2026-08-24": "_/TBlBtAE3k0f4YBE6MIpF",
+  "2026-02-24": "_/PRIwIulL9llfREvxrK8v",
+  "2026-05-19": ["_/S35yUFnaiop6DAuLzJfN", "_/RUrK4eWYCgScfuW1zSRo"],
+};
 
 const polls = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).polls;
 const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, "utf8")) : {};
@@ -243,31 +250,48 @@ try {
 }
 
 // ---- YouGov --------------------------------------------------------------------------
-const ygRows = polls.filter((p) => p.pollster === "YouGov" && p.date >= FIRST_YG);
+/* A wave pre-dating FIRST_YG still enters when its chart ids were found by
+   hand and listed above – the gate is about discovering charts on Sky News
+   pages (a browser job), never about refusing a listed one. */
+const ygRows = polls.filter((p) => p.pollster === "YouGov" && (p.date >= FIRST_YG || KNOWN_IG_ISSUES[p.date]));
 for (const p of ygRows) {
   const kept = (prev.ownership || []).find((w) => w.pollster === "YouGov" && w.date === p.date);
   if (kept) { ownership.push(kept); continue; }
   const ids = [];
-  if (KNOWN_IG_ISSUES[p.date]) ids.push(KNOWN_IG_ISSUES[p.date]);
+  const known = KNOWN_IG_ISSUES[p.date];
+  for (const id of known ? [].concat(known) : []) ids.push({ id, hand: true });
   const f = path.join(ROOT, ".build", "news24-src", `news24-${p.date}.json`);
   if (fs.existsSync(f)) {
     const ig = JSON.parse(fs.readFileSync(f, "utf8")).infogram || {};
-    (ig.ids || []).forEach((id, i) => { if ((ig.kinds || [])[i] === "unmodelled") ids.push(id); });
+    (ig.ids || []).forEach((id, i) => { if ((ig.kinds || [])[i] === "unmodelled") ids.push({ id, hand: false }); });
   }
-  for (const id of ids) {
+  // every matching chart of a wave merges into its one row
+  const found = []; let lost = false;
+  for (const { id, hand } of ids) {
     let data = null;
-    try { data = infographicDataOf(await (await fetch(IG(id), { headers: { "User-Agent": "Mozilla/5.0" } })).text()); }
-    catch { pending.push(`YouGov|${p.date}: chart ${id} didn't load`); continue; }
-    const t = data && ygIssuesOf(data);
-    if (!t) continue;
-    for (const u of t.unknown) unknown.add(`YouGov ${p.date}: ${u}`);
-    const bad = Object.entries(t.issues).map(([k, sh]) => { const e = ownershipProblem(sh); return e && `${ISSUES[k]}: ${e}`; }).filter(Boolean);
-    if (bad.length) { pending.push(`YouGov|${p.date}: ${bad.slice(0, 3).join("; ")}`); break; }
-    ownership.push(base(p, { source: IG(id).replace("?src=embed", ""), read: "published chart", question: t.question,
-      options: ["alp", "lnp", "onp", "grn", "unsure"], issues: t.issues }));
-    console.log(`YouGov|${p.date}: issues chart ${id} – ${Object.keys(t.issues).length} issues`);
-    break;
+    try { data = infographicDataOf(await (await fetch(IG(id), { headers: { "User-Agent": "Mozilla/5.0" } })).text()); } catch {}
+    const t = data && ygIssuesOf(data, { singles: hand });
+    if (!data) {
+      pending.push(`YouGov|${p.date}: chart ${id} didn't load`);
+      if (hand) { lost = true; break; }   // a hand-listed chart going dark files nothing this run
+    } else if (t) found.push({ id, t });
   }
+  if (!found.length || lost) continue;
+  const issues = {}, bad = [], qs = new Set(); let src = null;
+  for (const { id, t } of found) {
+    if (!src) src = id;
+    qs.add(t.question);
+    for (const u of t.unknown) unknown.add(`YouGov ${p.date}: ${u}`);
+    for (const [k, sh] of Object.entries(t.issues)) {
+      if (issues[k] && JSON.stringify(issues[k]) !== JSON.stringify(sh)) { bad.push(`${ISSUES[k]}: two charts disagree`); continue; }
+      issues[k] = issues[k] || sh;
+    }
+  }
+  for (const [k, sh] of Object.entries(issues)) { const e = ownershipProblem(sh); if (e) bad.push(`${ISSUES[k]}: ${e}`); }
+  if (bad.length) { pending.push(`YouGov|${p.date}: ${bad.slice(0, 3).join("; ")}`); continue; }
+  ownership.push(base(p, { source: IG(src).replace("?src=embed", ""), read: "published chart", question: [...qs].join(" / "),
+    options: ["alp", "lnp", "onp", "grn", "unsure"], issues }));
+  console.log(`YouGov|${p.date}: issues chart${found.length > 1 ? `s ${src} +${found.length - 1}` : ` ${src}`} – ${Object.keys(issues).length} issues`);
 }
 
 // ---- Ipsos -----------------------------------------------------------------------------

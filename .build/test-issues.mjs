@@ -134,6 +134,25 @@ for (const [k, sh] of Object.entries(yg.issues)) assert.equal(ownershipProblem(s
 assert.equal(ygIssuesOf(fx("2026-09-08", "2uuEmz9Frirmdp7kioDC")), null, "another chart (immigration views) isn't taken for it");
 assert.equal(ygIssuesOf(fx("2026-08-24", "YM46DvOTftyx9pNzV67y")), null, "nor the crosstab");
 
+/* February 2026's battery (Sky News Pulse era): the sheet is TRANSPOSED –
+   issues across the top in long form, parties down the side. */
+const feb = ygIssuesOf(fx("2026-02-24", "PRIwIulL9llfREvxrK8v"));
+assert.equal(Object.keys(feb.issues).length, 12, "transposed layout still yields the 12 issues");
+assert.equal(feb.question, "Which party is best at handling…");
+assert.deepEqual(feb.issues.climate, { alp: 20, lnp: 11, onp: 12, grn: 28, unsure: 29 });
+assert.deepEqual(feb.issues.housing, { alp: 22, lnp: 18, onp: 15, grn: 10, unsure: 35 });
+assert.equal(feb.unknown.length, 0, "the long-form labels all map");
+for (const [k, sh] of Object.entries(feb.issues)) assert.equal(ownershipProblem(sh), null, `YouGov Feb ${k} passes the gate`);
+
+/* May 2026's two singles (immigration, climate): one issue each, parsed only
+   for a hand-listed chart (singles) so a random one-row chart never files. */
+const im1 = ygIssuesOf(fx("2026-05-19", "S35yUFnaiop6DAuLzJfN"), { singles: true });
+assert.equal(im1.question, "Which party is best at managing…");
+assert.deepEqual(im1.issues, { immigration: { alp: 18, lnp: 18, onp: 36, grn: 7, unsure: 21 } });
+const en1 = ygIssuesOf(fx("2026-05-19", "RUrK4eWYCgScfuW1zSRo"), { singles: true });
+assert.deepEqual(en1.issues, { climate: { alp: 17, lnp: 13, onp: 17, grn: 26, unsure: 27 } });
+assert.equal(ygIssuesOf(fx("2026-05-19", "S35yUFnaiop6DAuLzJfN")), null, "a one-issue sheet needs the singles opt-in");
+
 // ---- Ipsos: the Issues Monitor's national reports ------------------------------------
 const IPD = ".build/ipsos-src";
 const ip = (f) => ipReports(fs.readFileSync(path.join(IPD, f + ".txt"), "utf8"));
