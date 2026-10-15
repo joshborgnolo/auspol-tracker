@@ -1498,7 +1498,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --k-poll:    var(--accent);
   --k-flows:   oklch(0.50 0.085 295);
   --k-finding: oklch(0.53 0.095 345);
-  margin: 28px 0 0; width: 100%; max-width: 880px;
+  margin: 28px 0 0; width: min(1180px, calc(100vw - 32px));
+  position: relative; left: 50%; transform: translateX(-50%);
   background: var(--t-bg); color: var(--t-ink-2);
   border: 1px solid var(--t-edge); border-radius: 14px;
   font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -21714,6 +21715,38 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "href": "https://www.roymorgan.com/findings/10085-anz-roy-morgan-consumer-confidence-october-13",
       "title": "ANZ–Roy Morgan’s own release of this poll"
     }]
+  }, {
+    "ym": "2026-10",
+    "x": 2026.786187214612,
+    "day": 13,
+    "pollster": "NAB",
+    "field": "23–30 Sep",
+    "dateLabel": "23–30 Sep",
+    "released": "2026-10-13",
+    "published": "2026-10-13",
+    "sample": 296,
+    "fmid": "2026-09-26",
+    "year": 2026,
+    "url": "https://www.nab.com.au/news/economy-markets/triple-squeeze-hits-business-confidence---nab-monthly-business-s",
+    "client": "Business confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business confidence",
+      "v": -13,
+      "chg": -4,
+      "vs": 0,
+      "cond": -1,
+      "condChg": 0
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/triple-squeeze-hits-business-confidence---nab-monthly-business-s",
+      "title": "The published report this poll’s figures were read from"
+    }]
   }];
   const directionAvailable = true;
   const undecided = {
@@ -26519,14 +26552,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
         "cond": -1,
         "condChg": -5
+      }, {
+        "x": 2026.7808219178082,
+        "ym": "2026-10",
+        "released": "2026-10-13",
+        "v": -13,
+        "chg": -4,
+        "url": "https://www.nab.com.au/news/economy-markets/triple-squeeze-hits-business-confidence---nab-monthly-business-s",
+        "cond": -1,
+        "condChg": 0
       }],
       "latest": {
-        "v": -8,
-        "chg": -2,
-        "released": "2026-09-08",
-        "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
+        "v": -13,
+        "chg": -4,
+        "released": "2026-10-13",
+        "url": "https://www.nab.com.au/news/economy-markets/triple-squeeze-hits-business-confidence---nab-monthly-business-s",
         "cond": -1,
-        "condChg": -5
+        "condChg": 0
       }
     }
   };
@@ -87398,68 +87440,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }],
     "gapsUsed": 8
   }, {
-    "pollster": "NAB Monthly Business Survey",
-    "tracked": "confidence",
-    "last": "2026-09-08",
-    "cadence": 28,
-    "loose": false,
-    "spread": 4,
-    "spreadEarly": 0,
-    "spreadLate": 7,
-    "basis": "published",
-    "lag": 0,
-    "lagMeasured": 0,
-    "releaseFrom": null,
-    "releaseTo": null,
-    "releaseMid": null,
-    "releaseTimed": 0,
-    "releaseVals": null,
-    "releaseMins": null,
-    "releaseDow": 2,
-    "releaseDowN": 12,
-    "declared": [],
-    "waves": 15,
-    "site": "https://www.nab.com.au/news/economy-markets",
-    "skipped": [],
-    "skippedMonths": [],
-    "recent": [{
-      "field": "2026-05-12",
-      "pub": "2026-05-12",
-      "mins": null,
-      "url": "https://www.nab.com.au/news/economy-markets/costs-surge-activity-cools-in-april-business-survey",
-      "since": "2026-04-14",
-      "gap": 28
-    }, {
-      "field": "2026-06-09",
-      "pub": "2026-06-09",
-      "mins": null,
-      "url": "https://www.nab.com.au/news/economy-markets/costs-ease-confidence-lifts-off-a-low-base",
-      "since": "2026-05-12",
-      "gap": 28
-    }, {
-      "field": "2026-07-14",
-      "pub": "2026-07-14",
-      "mins": null,
-      "url": "https://www.nab.com.au/news/economy-markets/business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
-      "since": "2026-06-09",
-      "gap": 35
-    }, {
-      "field": "2026-08-11",
-      "pub": "2026-08-11",
-      "mins": null,
-      "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-july-2026",
-      "since": "2026-07-14",
-      "gap": 28
-    }, {
-      "field": "2026-09-08",
-      "pub": "2026-09-08",
-      "mins": null,
-      "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
-      "since": "2026-08-11",
-      "gap": 28
-    }],
-    "gapsUsed": 8
-  }, {
     "pollster": "DemosAU",
     "last": "2026-09-17",
     "cadence": 29,
@@ -87770,6 +87750,68 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "url": "https://www.westpaciq.com.au/economics/2026/10/consumer-sentiment-october-2026/",
       "since": "2026-09-08",
       "gap": 28
+    }],
+    "gapsUsed": 8
+  }, {
+    "pollster": "NAB Monthly Business Survey",
+    "tracked": "confidence",
+    "last": "2026-10-13",
+    "cadence": 31.5,
+    "loose": false,
+    "spread": 4,
+    "spreadEarly": 3.5,
+    "spreadLate": 3.5,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": null,
+    "releaseTo": null,
+    "releaseMid": null,
+    "releaseTimed": 0,
+    "releaseVals": null,
+    "releaseMins": null,
+    "releaseDow": 2,
+    "releaseDowN": 12,
+    "declared": [],
+    "waves": 16,
+    "site": "https://www.nab.com.au/news/economy-markets",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [{
+      "field": "2026-06-09",
+      "pub": "2026-06-09",
+      "mins": null,
+      "url": "https://www.nab.com.au/news/economy-markets/costs-ease-confidence-lifts-off-a-low-base",
+      "since": "2026-05-12",
+      "gap": 28
+    }, {
+      "field": "2026-07-14",
+      "pub": "2026-07-14",
+      "mins": null,
+      "url": "https://www.nab.com.au/news/economy-markets/business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
+      "since": "2026-06-09",
+      "gap": 35
+    }, {
+      "field": "2026-08-11",
+      "pub": "2026-08-11",
+      "mins": null,
+      "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-july-2026",
+      "since": "2026-07-14",
+      "gap": 28
+    }, {
+      "field": "2026-09-08",
+      "pub": "2026-09-08",
+      "mins": null,
+      "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
+      "since": "2026-08-11",
+      "gap": 28
+    }, {
+      "field": "2026-10-13",
+      "pub": "2026-10-13",
+      "mins": null,
+      "url": "https://www.nab.com.au/news/economy-markets/triple-squeeze-hits-business-confidence---nab-monthly-business-s",
+      "since": "2026-09-08",
+      "gap": 35
     }],
     "gapsUsed": 8
   }, {
@@ -101990,6 +102032,7 @@ const AP_CLIENT_ALIASES = {
   "smh/age": "sydney morning herald the age",
   "australia inst.": "australia institute"
 };
+const CONF_BUS_LANES = new Set(["business", "nabBusiness"]);
 const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos", "ANZ–Roy Morgan", "Westpac–MI", "NAB", "EMRS (Tas)"];
 const archMask = (order, set) => {
   let m = 0;
@@ -103368,6 +103411,7 @@ function AllPollsView({
     const sExplicit = get("s", "scope") != null;
     const meas = MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE;
     const consIn = view === "primary" && get("k") === "1";
+    const confBusIn = view === "confidence" && get("b") === "1";
     return {
       q: get("q") || "",
       who: (() => {
@@ -103384,6 +103428,7 @@ function AllPollsView({
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
       measure: meas,
       cons: consIn,
+      confBus: confBusIn,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       split: DEM_BY_URL[get("g")] || "age",
@@ -103401,6 +103446,7 @@ function AllPollsView({
   const [lead, setLead] = useState(urlInit.lead);
   const [measure, setMeasure] = useState(urlInit.measure);
   const [consM, setConsM] = useState(urlInit.cons);
+  const [confBus, setConfBus] = useState(urlInit.confBus);
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
@@ -103431,6 +103477,10 @@ function AllPollsView({
       const fp = D.individualPolls.find(q => q.pollster + "|" + q.released === focus.key);
       const can = s => !!(fp && demPairOf(fp, s));
       setDemSplit(can(want) ? want : DEM_SPLITS.map(s => s.id).find(can) || want);
+    }
+    if (focus.facet === "confidence") {
+      const fp = confOnlyAll.find(q => q.pollster + "|" + q.released === focus.key);
+      if (fp && fp.conf) setConfBus(CONF_BUS_LANES.has(fp.conf.k));
     }
     setOpen(focus.key);
   }, [focus]);
@@ -103524,7 +103574,7 @@ function AllPollsView({
   const rows = React.useMemo(() => {
     const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
     const issOnly = facet === "issues" ? issOnlyAll : [];
-    const confOnly = facet === "confidence" ? confOnlyAll : [];
+    const confOnly = facet === "confidence" ? window.AP.rd ? confOnlyAll.filter(p => p.conf && CONF_BUS_LANES.has(p.conf.k) === confBus) : confOnlyAll : [];
     const NOW_YEAR = new Date().getFullYear();
     return (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map(p => {
       const [y, mo] = p.ym.split("-").map(Number);
@@ -103589,7 +103639,7 @@ function AllPollsView({
         hay: hay + " " + hay.replace(/–/g, "-")
       };
     });
-  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll]);
+  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll, confBus]);
   const housesV = facet === "issues" ? housesIss : facet === "confidence" && confOnlyAll.length ? housesConf : facet === "direction" && dirOnlyAll.length ? housesDir : houses;
   const availableTags = new Set();
   rows.forEach(r => r.tags.forEach(tg => availableTags.add(tg)));
@@ -103727,7 +103777,7 @@ function AllPollsView({
   const [limit, setLimit] = useState(PAGE);
   React.useEffect(() => {
     setLimit(PAGE);
-  }, [ql, sel, lead, range, tagSel, scope, facet, consM, sort.key, sort.dir, measure]);
+  }, [ql, sel, lead, range, tagSel, scope, facet, consM, confBus, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex(p => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
   const fmtConfFig = (v, signed) => (v < 0 ? "−" : signed && v > 0 ? "+" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -103823,7 +103873,7 @@ function AllPollsView({
     onp: "o"
   };
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "b", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach(k => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -103834,6 +103884,7 @@ function AllPollsView({
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
     if (consM) p.set("k", "1");
+    if (confBus && facet === "confidence") p.set("b", "1");
     if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
     if (!scope && (FACET_SCOPE[facet] || consM)) p.set("s", "0");
     const qs = p.toString();
@@ -103888,6 +103939,8 @@ function AllPollsView({
     setTppBasis: setTppBasis,
     consM: consM,
     setConsM: setConsM,
+    confBus: confBus,
+    setConfBus: setConfBus,
     q: q,
     setQ: setQ,
     sel: sel,
@@ -104627,8 +104680,8 @@ function RdChangelog() {
     id: "rd-clog-t"
   }, "Changelog"), React.createElement("span", {
     className: "rd-meta"
-  }, "What moved the aggregate, and when")), React.createElement(RdHed, {
-    head: "Every move of the estimate, kept as it happened",
+  }, "What\u2019s moved numbers when")), React.createElement(RdHed, {
+    head: "Site updates and their effect",
     dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away \u2013 recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
       className: "fb-link",
       href: "/feed.xml"
@@ -125702,6 +125755,8 @@ function RdAllPolls(P) {
     setTppBasis,
     consM,
     setConsM,
+    confBus,
+    setConfBus,
     q,
     setQ,
     sel,
@@ -125729,7 +125784,7 @@ function RdAllPolls(P) {
     setDemSplit
   } = P;
   const D = window.AUSPOL;
-  const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
+  const ofT = facet === "confidence" ? (D.confidenceOnlyPolls || []).length !== total ? (D.confidenceOnlyPolls || []).length : null : ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const noun1 = facet === "confidence" ? "release" : "poll";
   const noun = noun1 + "s";
@@ -127267,6 +127322,10 @@ function RdAllPolls(P) {
     pinAp();
     setConsM(!consM);
   };
+  const confLanePick = () => {
+    pinAp();
+    setConfBus(!confBus);
+  };
   const splitPick = id => {
     pinAp();
     setDemSplit(id);
@@ -127296,7 +127355,7 @@ function RdAllPolls(P) {
     setTppBasis(pub ? "imp" : "resp");
   };
   const spaceFlip = React.useRef(null);
-  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : null;
+  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : facet === "confidence" ? confLanePick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
   const splitWalk = React.useRef(null);
@@ -127439,6 +127498,15 @@ function RdAllPolls(P) {
   }, consM ? "Voting consideration" : "Voting intention", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
+  const confLaneFlip = React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": confBus,
+    title: confBus ? "Switch to the consumer confidence gauges" : "Switch to the business confidence gauges",
+    onClick: confLanePick
+  }, confBus ? "Business" : "Consumer", " confidence ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"));
   const consQpop = !consM ? null : React.createElement(RdQPop, {
     label: "What voting consideration figures are, and which waves collected them",
     align: "left"
@@ -127504,7 +127572,11 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, "Vote:"), consFlip, consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
+  }, "Vote:"), consFlip, consQpop), facet === "confidence" && !ctlNarrow && React.createElement("span", {
+    className: "rd-pl-ctl"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Confidence:"), confLaneFlip)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-ap-ctlslot",
     style: ctlFloor ? {
       minHeight: ctlFloor + "px"
@@ -127521,7 +127593,9 @@ function RdAllPolls(P) {
     className: "rd-ap-pctl"
   }, consFlip, React.createElement("span", {
     className: "rd-grow"
-  }), consQpop)), React.createElement("div", {
+  }), consQpop), facet === "confidence" && React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, confLaneFlip)), React.createElement("div", {
     className: "rd-ap-ctlvar",
     ref: ctlVarRef,
     "aria-hidden": "true"
@@ -127547,7 +127621,14 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, "\u21C4")), React.createElement("span", {
     className: "rd-grow"
-  }), consQpop))), React.createElement("div", {
+  }), consQpop), React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip"
+  }, "Business confidence ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"))))), React.createElement("div", {
     className: "rd-ap-bar"
   }, React.createElement("label", {
     className: "rd-ap-search"

@@ -4224,6 +4224,11 @@ const AP_CLIENT_ALIASES = {
   "smh/age": "sydney morning herald the age",
   "australia inst.": "australia institute",
 };
+/* the confidence facet's ⇄ flip: the four gauges are two PUBLISHER pairs
+   (gen-data's CONF_LANES names), and the table lists one pair at a time –
+   consumer (ANZ–Roy Morgan, Westpac–MI) by default, business (Roy Morgan,
+   NAB) after the flip. Present off this set means consumer */
+const CONF_BUS_LANES = new Set(["business", "nabBusiness"]);
 /* URL state for the archive's two multi-selects (pollsters w=, tags h=) rides
    as a bitmask, same scheme as the cycles tab's ?c=: bit i = order[i]
    selected, rendered in base 36 and prefixed "b" – a shape no legacy value
@@ -5453,6 +5458,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
        URL write (the mode's figures read nowhere else, and an invisible
        flag would keep writing itself into unrelated links) */
     const consIn = view === "primary" && get("k") === "1";
+    /* the confidence facet's lane pair – b=1 picks the business gauges.
+       Restored only on the confidence facet; anywhere else the letter
+       normalises away on the first URL write (the consIn rule above) */
+    const confBusIn = view === "confidence" && get("b") === "1";
     return {
       q: get("q") || "",
       who: (() => {
@@ -5473,6 +5482,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
       measure: meas,
       cons: consIn,
+      confBus: confBusIn,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       split: DEM_BY_URL[get("g")] || "age",
@@ -5501,6 +5511,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      contest the table is keyed on). Only ever true while the primary facet
      is up: onFacet clears it everywhere else. */
   const [consM, setConsM] = useState(urlInit.cons);
+  /* the confidence facet's lane pair: business gauges on true. Only the
+     redesign reads it (the classic archive lists all four gauges), and it
+     rides ?b=1 only while the confidence facet is up, exactly like the
+     consM flag it sits beside */
+  const [confBus, setConfBus] = useState(urlInit.confBus);
   const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
   /* the archive's default sort is the PUBLISHED day, newest first (user
@@ -5548,6 +5563,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       const fp = D.individualPolls.find((q) => q.pollster + "|" + q.released === focus.key);
       const can = (s) => !!(fp && demPairOf(fp, s));
       setDemSplit(can(want) ? want : DEM_SPLITS.map((s) => s.id).find(can) || want);
+    }
+    /* and a confidence release lands on its own lane pair: sitting on the
+       consumer gauges while a business release is asked for hides the row,
+       so the lane follows the opened release (the demSplit trip's shape) */
+    if (focus.facet === "confidence") {
+      const fp = confOnlyAll.find((q) => q.pollster + "|" + q.released === focus.key);
+      if (fp && fp.conf) setConfBus(CONF_BUS_LANES.has(fp.conf.k));
     }
     setOpen(focus.key);
   }, [focus]);
@@ -5665,7 +5687,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const dirOnly = facet === "direction" ? dirOnlyAll
       : facet === "issues" ? dirOnlyAll.filter((p) => p.iss) : [];
     const issOnly = facet === "issues" ? issOnlyAll : [];
-    const confOnly = facet === "confidence" ? confOnlyAll : [];
+    const confOnly = facet === "confidence"
+      ? (window.AP.rd ? confOnlyAll.filter((p) => p.conf && CONF_BUS_LANES.has(p.conf.k) === confBus) : confOnlyAll)
+      : [];
     /* the fieldwork label carries no year (gen-data's fwLabel is a day–month
        range), so a row from a previous year can read as this year's – an old
        "25–30 Sep" looks like next week. Rows outside the current calendar
@@ -5761,7 +5785,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         hay: hay + " " + hay.replace(/–/g, "-"),   // hyphen typed in search matches the en dash
       };
     });
-  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll]);
+  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll, confBus]);
   const housesV = facet === "issues" ? housesIss
     : (facet === "confidence" && confOnlyAll.length) ? housesConf
     : (facet === "direction" && dirOnlyAll.length) ? housesDir : houses;
@@ -5899,7 +5923,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      (a chart dot, an open breakdown) always makes the cut. */
   const PAGE = 40;
   const [limit, setLimit] = useState(PAGE);
-  React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, consM, sort.key, sort.dir, measure]);
+  React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, consM, confBus, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex((p) => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
 
@@ -5959,7 +5983,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "b", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach((k) => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -5972,6 +5996,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     // like the split below, the consideration mode only means something on
     // its own facet – and consM can only stand there (onFacet, urlInit)
     if (consM) p.set("k", "1");
+    // the confidence lane likewise only means something on its own facet
+    if (confBus && facet === "confidence") p.set("b", "1");
     // the split only means something on its own facet, so only there is it written
     if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
     /* consider-mode's scope is its own (FACET_SCOPE.primary stays null), so
@@ -6062,7 +6088,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       <RdAllPolls rows={rows} sorted={sorted} total={total} houses={housesV} houseRank={houseRank} houseN={houseN}
         tagN={tagN} shownTags={shownTags} rangeN={rangeN} RANGE_LAB={RANGE_LAB}
         facet={facet} onFacet={onFacet} measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} setTppBasis={setTppBasis}
-        consM={consM} setConsM={setConsM}
+        consM={consM} setConsM={setConsM} confBus={confBus} setConfBus={setConfBus}
         q={q} setQ={setQ} sel={sel} setSel={setSelT} toggleHouse={toggleHouse} range={range} setRange={setRangeT}
         tagSel={tagSel} setTagSel={setTagSelT} toggleTag={toggleTag}
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
@@ -6620,9 +6646,9 @@ function RdChangelog() {
     <section className="rd-sec rd-changelog" id="changelog" aria-labelledby="rd-clog-t">
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-clog-t">Changelog</h2>
-        <span className="rd-meta">What moved the aggregate, and when</span>
+        <span className="rd-meta">What’s moved numbers when</span>
       </div>
-      <RdHed head="Every move of the estimate, kept as it happened"
+      <RdHed head="Site updates and their effect"
         dek={<>What has moved the aggregate’s two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing – the <a className="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the pollster’s own release.</>} />
       <ChangelogEntries />
     </section>

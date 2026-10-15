@@ -2382,7 +2382,11 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    ChangelogEntries in the d1a1d215 asset (the live tab, both designs) –
    page-level here, not rd-gated. The console carries its own palette on the
    element: a LIGHT console on the light page (this page's own surface and
-   inks) and, under body.dark, the old page's dark-terminal palette. */
+   inks) and, under body.dark, the old page's dark-terminal palette. Width
+   un-capped 2026-10-15 to the page's frame (user: the 880px cap left white
+   either side that "frames wrong" – "as wide as wv"): the terminal spans
+   min(1180px, viewport−32), viewport-centred so the static article's 680px
+   column doesn't keep it narrow either. */
 .cl-term {
   --t-bg: var(--surface); --t-bar: var(--surface-2);
   --t-edge: var(--line);   --t-line: var(--line-2);
@@ -2393,7 +2397,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --k-poll:    var(--accent);
   --k-flows:   oklch(0.50 0.085 295);
   --k-finding: oklch(0.53 0.095 345);
-  margin: 28px 0 0; width: 100%; max-width: 880px;
+  margin: 28px 0 0; width: min(1180px, calc(100vw - 32px));
+  position: relative; left: 50%; transform: translateX(-50%);
   background: var(--t-bg); color: var(--t-ink-2);
   border: 1px solid var(--t-edge); border-radius: 14px;
   font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
