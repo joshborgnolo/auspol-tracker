@@ -430,6 +430,20 @@ function RdCsUnroll({ className, style, children }) {
 }
 
 /* ---- the tab --------------------------------------------------------------- */
+/* The section foot's caveat links each word of "no predictive value" to
+   a source (the owner's 2026-10-15 ask): Bonham on preferred-PM scores,
+   the Guardian, and Armarium Interreta's test, which found approval
+   ratings add "little, if any, predictive value" to a polling average -
+   hence "little or no", not "no". A null url leaves its word plain. */
+const RD_CYC_CITES = [
+  ["https://kevinbonham.blogspot.com/2012/12/why-preferred-prime-ministerpremier.html", "Kevin Bonham: Why preferred prime minister/premier scores are rubbish"],
+  [null, "The Guardian: Personal popularity is no guarantee of poll success"],
+  ["https://web.archive.org/web/20211016043201/https://armariuminterreta.com/2021/08/23/approval-ratings-and-better-pm/", "Armarium Interreta: Approval ratings are rubbish, but they have value"],
+];
+const RD_CYC_CITE = (w, i) => (RD_CYC_CITES[i][0]
+  ? <a className="rd-link rd-link-in" href={RD_CYC_CITES[i][0]} target="_blank" rel="noopener noreferrer" title={RD_CYC_CITES[i][1]}>{w}</a>
+  : w);
+
 function RdPastCycles(p) {
   const { cycles, mode, setMode, hidden, lifted, hi, setHi, toggle, lift, unlift, chipClick, showAll, hideAll,
           showOutcome, outcomeShown, shapes, showHan, setShowHan, showOnp, setShowOnp, showComb, setShowComb, exportSource, srcFailed, retrySource } = p;
@@ -738,7 +752,7 @@ function RdPastCycles(p) {
         : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term"
         : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election"
         : null)
-      : gLow && oLow ? "Both major parties are at record lows for this point in a term"
+      : gLow && oLow ? "Both major parties’ primary votes are at record lows for this point in a term"
       : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term"
       : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term"
       : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
@@ -751,9 +765,7 @@ function RdPastCycles(p) {
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
     } else {
       if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point" + snc);
-      /* the opposition's record low is its own sentence when the combined
-         standing can ride its tail clause */
-      if (oLow && !combined) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
+      if (oLow) bits.push(gLow ? "and " + oppIn + "’s is the lowest of any opposition" : oppIn + "’s primary vote is the lowest of any opposition at the same point" + snc);
     }
     /* a rank counts this term among its peers, so "of 21" is 21 governments,
        twenty of them past */
@@ -763,12 +775,20 @@ function RdPastCycles(p) {
       : c2 ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were "
           + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now."
       : govName + "’s primary vote is " + rankWords(g) + " at this point.";
+    /* the opposition's vote with One Nation's added: a contrast ("though")
+       only when the pooled total ranks high against the record-low own vote */
+    const cbHigh = combined && /highest/.test(combined);
+    if (!c2 && oLow && combined) dek += cbHigh
+      ? " Add One Nation’s vote to " + oppIn + "’s, though, and the total is " + (/^(the|among) /.test(combined) ? "" : "the ") + combined + " on record at this stage."
+      : " Even with One Nation’s vote added, " + oppIn + "’s total is " + (/middle/.test(combined) ? "only " : "") + combined + " of past terms.";
+    /* after preferences: "even so" only where a record-low primary meets a
+       two-party figure that isn't low too */
     if (t.peers && t.v != null && !c2) {
-      const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments"
-        : t.v > t.peers.q3 ? "is above three in four of past governments" : "is below three in four of past governments";
-      dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
+      const lowT = t.v < t.peers.q1;
+      const where = !lowT && t.v <= t.peers.q3 ? "sits in the middle half of past governments at this point"
+        : t.v > t.peers.q3 ? "is higher than three in four past governments managed at this point" : "is lower than three in four past governments managed at this point";
+      dek += " " + (gLow && !lowT ? "Even so, after preferences " : "After preferences, ") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
-    if (!c2 && oLow && combined) dek += " But while " + oppIn + "’s primary vote is also the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
     return { head, dek };
   };
   const pageStory = storyFor(chg);
@@ -1380,7 +1400,7 @@ function RdPastCycles(p) {
         {controls}
         {summary}
         <div className="rd-foot">
-          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office.</span>
+          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings add little or {RD_CYC_CITE("no", 0)} {RD_CYC_CITE("predictive", 1)} {RD_CYC_CITE("value", 2)} on top of voting-intention data.</span>
           <span className="rd-grow"></span>
           <button type="button" className="rd-how rd-cyc-csv" onClick={exportSource}><DownloadIcon /> Source polls, CSV</button>
           <RdHow term="past-cycles" from="Past cycles" />
