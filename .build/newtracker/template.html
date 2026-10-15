@@ -401,6 +401,14 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+/* ...and never SHORTER than the window. The html canvas paints the tide
+   art for the rubber-band gutter (it needs it to tile below), so any
+   moment body's box falls short of the viewport - a compact menu page on
+   a tall screen, or a mid-swap frame before the heights resync - the
+   line art flashes through the gap. #root carries the floor: 252px less
+   than the viewport keeps the tide band's own 240+12 closing the page at
+   its foot. */
+body.js #root { min-height: calc(100vh - 252px); }
 /* ...and never taller than the app. The article is the page you LOADED,
    and a tab swap keeps it: arriving at a menu page from Now left Now's
    2,632px article standing under a 1,336px view, ~1,300px of blank page
@@ -5199,6 +5207,8 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
   html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
+  /* the floor follows the shorter band: 190+8 here, 240+12 above */
+  body.js #root { min-height: calc(100vh - 198px); }
 }
 
 /* ------------------------------------------------------------------------

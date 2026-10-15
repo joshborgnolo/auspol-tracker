@@ -2875,21 +2875,34 @@ function App() {
    the tide band on a blank screen for the frames in between. */
 const staticSummary = document.querySelector(".static-summary");
 if (staticSummary) {
-  const setStaticSummaryHeight = () =>
-    document.documentElement.style.setProperty(
-      "--ss-h",
-      staticSummary.offsetHeight + "px"
-    );
-  setStaticSummaryHeight();
+  const appRoot = document.getElementById("root");
+  /* --ss-h and --app-h must move in the SAME step. Each used to have its
+     own observer, and Chrome delivered them in separate batches with a
+     paint in between: on a swap to a shorter view the article's cap moved
+     (--app-h) while the pull-up still read the old, taller --ss-h, #root's
+     negative margin over-ate the article, body's box collapsed to zero
+     height for a frame, and the whole viewport drew the html canvas - the
+     tide-line art splashed across the screen on a menu-page swap. One
+     callback now sets both from one reading, and scrollHeight reaches the
+     article's natural height straight through the max-height clip, so the
+     pull-up gets min(full, cap) without the second cascade round that
+     produced the broken frame. No var before appRoot exists: the
+     consumers' fallbacks (0px, none) cover the no-JS and pre-mount
+     window. */
+  const syncHeights = () => {
+    if (!appRoot || !appRoot.offsetHeight) return;
+    const appH = appRoot.offsetHeight;
+    const se = document.documentElement.style;
+    se.setProperty("--app-h", appH + "px");
+    se.setProperty("--ss-h", Math.min(staticSummary.scrollHeight, appH) + "px");
+  };
+  syncHeights();
   /* webfonts swap in after mount and re-lay the article out; the pull-up
      must follow its height or a seam opens where it stood */
-  new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
+  new ResizeObserver(syncHeights).observe(staticSummary);
   /* the app's own height caps the article's (template.html: a tab swap
      keeps the loaded page's article, which can outrun a shorter view) */
-  const appRoot = document.getElementById("root");
-  if (appRoot) new ResizeObserver(() => {
-    if (appRoot.offsetHeight) document.documentElement.style.setProperty("--app-h", appRoot.offsetHeight + "px");
-  }).observe(appRoot);
+  if (appRoot) new ResizeObserver(syncHeights).observe(appRoot);
   /* opacity:0 hides it from EYES and from nothing else. A screen reader still
      walked the whole article - 3,690 characters, seven headings and a second
      <h1> - and then walked the app and heard every figure again. The comment

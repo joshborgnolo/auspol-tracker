@@ -291,6 +291,7 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+body.js #root { min-height: calc(100vh - 252px); }
 body.js:not(.ss-view) .static-summary {
   max-height: var(--app-h, none);
   overflow: hidden;
@@ -3055,6 +3056,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
   html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
+  body.js #root { min-height: calc(100vh - 198px); }
 }
 @media print {
   .tabs, .head-right, .chart-copy-btn, .rd-keysheet, .rd-keysheet-scrim,
@@ -65449,13 +65451,17 @@ function App() {
 }
 const staticSummary = document.querySelector(".static-summary");
 if (staticSummary) {
-  const setStaticSummaryHeight = () => document.documentElement.style.setProperty("--ss-h", staticSummary.offsetHeight + "px");
-  setStaticSummaryHeight();
-  new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
   const appRoot = document.getElementById("root");
-  if (appRoot) new ResizeObserver(() => {
-    if (appRoot.offsetHeight) document.documentElement.style.setProperty("--app-h", appRoot.offsetHeight + "px");
-  }).observe(appRoot);
+  const syncHeights = () => {
+    if (!appRoot || !appRoot.offsetHeight) return;
+    const appH = appRoot.offsetHeight;
+    const se = document.documentElement.style;
+    se.setProperty("--app-h", appH + "px");
+    se.setProperty("--ss-h", Math.min(staticSummary.scrollHeight, appH) + "px");
+  };
+  syncHeights();
+  new ResizeObserver(syncHeights).observe(staticSummary);
+  if (appRoot) new ResizeObserver(syncHeights).observe(appRoot);
   staticSummary.setAttribute("aria-hidden", "true");
   staticSummary.inert = true;
 }
