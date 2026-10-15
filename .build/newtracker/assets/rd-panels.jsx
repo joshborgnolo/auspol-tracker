@@ -3233,6 +3233,37 @@ function RdSwitching({ rangeId }) {
      default, and the one the probes gate on), and the reverse read of the
      same waves - where each major 2025 cohort's voters have gone */
   const [view, setView] = useState("onp");
+  const GO_NEXT = { onp: "lnp", lnp: "alp", alp: "onp" };
+  /* Space walks the same onp -> lnp -> alp cycle the title button taps
+     through, claimed while the section is on screen (the viewport-claim
+     convention); /vic/ carries no vote-switching payload, so the ref is
+     null there and Space keeps its scroll day job */
+  const spaceCyc = React.useRef(null);
+  spaceCyc.current = S && S.series.length && S.series.every((sr) => sr.rate)
+    ? () => setView((v) => GO_NEXT[v !== "onp" && !(S.going || []).some((g) => g.id === v) ? "onp" : v])
+    : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("switching");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver((es) => {
+      es.forEach((en) => { inView.current = en.isIntersecting; });
+    });
+    io.observe(sec);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceCyc.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceCyc.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
   if (!S || !S.series.length || !S.series.every((sr) => sr.rate)) return null;
   const Wt = S.weights || {};
   const byId = {};
@@ -3320,7 +3351,6 @@ function RdSwitching({ rangeId }) {
      summing to the cohort, so no 2025-weight re-scaling is needed. */
   const goRow = view !== "onp" ? (S.going || []).find((g) => g.id === view) : null;
   const V = goRow ? view : "onp";
-  const GO_NEXT = { onp: "lnp", lnp: "alp", alp: "onp" };
   const GO_COHORT_W = { lnp: "2025 Coalition voters", alp: "2025 Labor voters" };
   const GO_OWN = { lnp: "the Coalition", alp: "Labor" };
   const GO_OTHER = { lnp: "alp", alp: "lnp" };

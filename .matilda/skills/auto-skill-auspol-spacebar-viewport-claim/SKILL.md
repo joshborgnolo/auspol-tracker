@@ -1,6 +1,6 @@
 ---
 name: auspol-spacebar-viewport-claim
-description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). SEVEN claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), and the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2677 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
+description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). EIGHT claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2677 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload), and the voter-switching panel's title cycler `#switching` (2026-10-15, rd-panels.jsx ~:3236 — GO_NEXT onp→lnp→alp modulo wrap over the came-from/going views, ref nulled when the vote-switching payload is absent so /vic/ keeps the scroll day job). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
 source: auto-skill
 extracted_at: '2026-10-08T12:24:30.482Z'
 ---
@@ -88,7 +88,7 @@ Load-bearing details, in order of subtlety:
    ensure only one can be live (the comment on the house-lean block
    documents this explicitly).
 
-## The seven claim sites
+## The eight claim sites
 
 - **All-polls table** (a1c620d) — rd-allpolls.jsx ~:2363-2405,
   `#rd-ap-top`: table-level spaceFlip + splitWalk + pubFlip (Space
@@ -156,6 +156,25 @@ Load-bearing details, in order of subtlety:
   bottom itself has no scroll left, so the negative check fails
   spuriously if parked there). Keysheet copy rides the shared `Space`
   row of KBD_ROWS.
+- **Voter-switching title cycler** (2026-10-15) — rd-panels.jsx
+  ~:3236-3265 in `RdSwitching`, section `#switching`: `spaceCyc.current`
+  cycles the panel's three title-cycler views via hoisted
+  `GO_NEXT = {onp:"lnp",lnp:"alp",alp:"onp"}` — Where One Nation's
+  voters came from → where the Coalition's voters are going → where
+  Labor's voters are going → wrap — through a FUNCTIONAL `setView(v =>
+  …)` that mirrors the render path's V-collapse (a `view` not in
+  `S.going` resolves to `"onp"` first; `V` itself is derived post-guard
+  so it can't be captured at ref-assign time). Same canonical IO block
+  (hooks placed BEFORE the payload-guard early return or hooks-order
+  breaks); ref nulled when `!S || !S.series.length || !S.series.every(
+  rate)` — mirroring the panel's own not-rendered condition, so /vic/
+  (no vote-switching payload) keeps Space's scroll day job. The panel's
+  own title BUTTON taps do the same cycle by click; a FOCUSED title
+  button therefore natively taps itself exactly once on Space — the
+  claim stands aside per the BODY/HTML guard, so pin "taps exactly
+  once", not "does nothing". Probe: `.matilda/probe/sw-space-cycle.mjs`
+  (port 9024, 14 checks). Keysheet copy rides the shared `Space` row of
+  KBD_ROWS.
 
 ## Probe gotchas (first two cost a cycle in hl-space-flip; pv-group-select and wv-space-party paid for the rest)
 
