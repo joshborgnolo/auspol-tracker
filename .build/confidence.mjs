@@ -230,7 +230,11 @@ const IQ_SITEMAP = "https://www.westpaciq.com.au/sitemap.xml";
 const NAB_SITEMAP = "https://www.nab.com.au/sitemap.xml";
 const IQ_INCLUDE = /<loc>(https:\/\/www\.westpaciq\.com\.au\/economics\/(\d{4})\/(\d{2})\/([^<]*consumer-sentiment[^<]*)\/)/g;
 const NAB_URL = /<url>\s*<loc>(https:\/\/www\.nab\.com\.au\/news\/economy-markets\/([^<]+?))\/?<\/loc>\s*<lastmod>(\d{4}-\d{2}-\d{2})/g;
-const NAB_INCLUDE = /business-survey|costs-ease-confidence|narrowing-gap-between-conditions/;
+// The headline slugs are AEM-length-truncated when the headline runs long —
+// 2026-10's wave shipped as "triple-squeeze-hits-business-confidence---nab
+// -monthly-business-s" (the "survey <month>" tail cut off), so the survey
+// name alone is not truncation-safe; business-confidence is.
+const NAB_INCLUDE = /business-survey|business-confidence|costs-ease-confidence|narrowing-gap-between-conditions/;
 const NAB_EXCLUDE = /quarter|q[1-4]-|residential|wellbeing|consumer-sentiment|participate|pre-war|property|podcast|video/;
 const WM_BAND = [40, 125];
 const NAB_BAND = [-80, 80];
@@ -728,6 +732,47 @@ function parseNabPdf(txt, fwTxt = null) {
       if (got.level == null) got.level = lv;
       else if (got.level !== lv) got.level = null;
     }
+    // …and the banner's own move captions carry the wave's printed changes.
+    // The two caption columns interleave row-by-row when the layout is
+    // squeezed, so the banner region's "…Npts" moves come in confidence-
+    // then-conditions order (Aug-26: "Fell 2pts (unrounded) Fell 5pts to be
+    // in negative …"; Sep-26: "Fell 4pts (unrounded) to -13 index points,
+    // Was flat … at -1 index points") — order-pair them. A numeric move
+    // might read "Was flat … at ±N index points" instead (Sep-26's
+    // conditions): a zero move, claimed to the measure whose level the flat
+    // phrase itself prints. More than two moves means the caption shape has
+    // drifted — file nothing. Sentential moves never apply to banner waves:
+    // their prose can name a different move (Sep-26's trend line has the
+    // YEAR-ago "fallen 22pts"; a state table has the Vic/Qld "down 4pts"),
+    // so a banner wave with no usable caption move keeps chg null.
+    const capsEnd = sq.indexOf("Summary", big.index);
+    const caps = sq.slice(big.index + big[0].length, capsEnd >= 0 ? capsEnd : big.index + big[0].length + 400);
+    const moves = [...caps.matchAll(new RegExp(`\\b(${UP}|${DN})\\s+(?:a further\\s+)?([\\d.]+)\\s*(?:\\([^)]*\\)\\s*)?pts?\\b`, "gi"))];
+    if (moves.length <= 2) {
+      const flat = /\bwas\s+flat\b[^.]*?(?:to|at)\s+([+-]?\d+(?:\.\d+)?)\s*index\s*points?/i.exec(caps);
+      conf.chg = moves[0] ? upness(moves[0][1]) * +moves[0][2] : flat && +flat[1] === +big[1] ? 0 : null;
+      cond.chg = moves[1] ? upness(moves[1][1]) * +moves[1][2] : flat && +flat[1] === +big[2] ? 0 : null;
+    } else {
+      conf.chg = null;
+      cond.chg = null;
+    }
+    // Aug-26 names no caption moves at all — its Summary sentence carries
+    // them ("Business confidence rose 6pts to +6 index points …"). A
+    // sentential move earns a banner wave's chg only when the same sentence
+    // also prints the level AND it equals the banner's ("rose 6pts to +6
+    // index points") — the level anchor is exactly what the year-ago and
+    // state-table decoys ("22pts lower than a year ago", "both down 4pts")
+    // never carry.
+    for (const [got, lv, measure] of [[conf, +big[1], "confidence"], [cond, +big[2], "conditions"]]) {
+      if (got.chg != null) continue;
+      const anchored = new RegExp(
+        `business\\s+${measure}\\b[^.]{0,120}?\\b(${UP}|${DN})\\s+(?:a further\\s+)?([\\d.]+)\\s*(?:\\([^)]*\\)\\s*)?pts?\\b[^.]{0,120}?(?:to|at)\\s+([+-]?\\d+(?:\\.\\d+)?)\\s*index\\s*points?`,
+        "gi"
+      );
+      for (const m of mtxt.matchAll(anchored)) {
+        if (+m[3] === lv) got.chg = upness(m[1]) * +m[2];
+      }
+    }
   }
   // Table-1 national rows (2025 era) must agree where they exist; the 2026
   // industry/state tables simply don't match this shape and skip checking.
@@ -759,8 +804,10 @@ async function nabRows() {
     const atxt = htmlToText(html);
     const aConf = nabMeasure(atxt, "confidence"), aCond = nabMeasure(atxt, "conditions");
     // the PDF link lives under nab/documents/news/ (2025 era) or the email
-    // composer's embargo dir (2026 era); the 2026 filenames carry a junk suffix
-    const pm = /\/content\/dam\/nab(?:-email-composer\/[^"'\s)]*)?\/[^"'\s)]*?monthly[^"'\s)]*?business[^"'\s)]*?survey[^"'\s)]*?\.pdf/i.exec(html);
+    // composer's embargo dir (2026 era); the 2026 filenames carry a junk
+    // suffix — and Sep-2026's is "Sep%20Bus%20Survey.pdf", no "monthly":
+    // anchor on bus…survey only (parseNabPdf's monthly label is the guard)
+    const pm = /\/content\/dam\/nab(?:-email-composer\/[^"'\s)]*)?\/[^"'\s)]*?bus[^"'\s)]*?survey[^"'\s)]*?\.pdf/i.exec(html);
     if (!pm) { console.log(`nabBusiness ${u.url}: no PDF link — skipped`); continue; }
     const pdfUrl = pm[0].startsWith("http") ? pm[0] : `https://www.nab.com.au${pm[0]}`;
     let g;

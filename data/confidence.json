@@ -3992,6 +3992,19 @@
     "n": 455,
     "fwStart": "2026-08-24",
     "fwEnd": "2026-08-31"
+   },
+   {
+    "date": "2026-10-13",
+    "v": -13,
+    "chg": -4,
+    "cond": -1,
+    "condChg": 0,
+    "ym": "2026-09",
+    "url": "https://www.nab.com.au/news/economy-markets/triple-squeeze-hits-business-confidence---nab-monthly-business-s",
+    "slug": "triple-squeeze-hits-business-confidence---nab-monthly-business-s",
+    "n": 296,
+    "fwStart": "2026-09-23",
+    "fwEnd": "2026-09-30"
    }
   ]
  }
