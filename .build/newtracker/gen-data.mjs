@@ -3095,6 +3095,9 @@ const demoNorm = (s) => {
   const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
   return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, s[k] == null ? null : 100 * (+s[k] || 0) / t])) : null;
 };
+/* a shares-map's own five-party total – the group tables' and the income
+   bands' common normaliser beside demoNorm */
+const total = (s) => DEMO_KEYS.reduce((a, k) => a + s[k], 0);
 const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm(w.total)
   : p && p.alp != null ? demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) }) : null);
 /* Each wave's figures for the common groups – exactly what §7g pools – keyed
@@ -4443,18 +4446,99 @@ const DEMO_LOC_ELECTION = {
    sits out, as every pooled wave did before 2026-10-11. */
 // set|group -> the monthly rows §7gb tests (§7g's rowsT), never emitted
 const DEMO_TEST_MONTHLY = new Map();
-const demographics = (() => {
+/* The income tab's bands, exactly as each house stores them in
+   demographics.json: a wave whose income dim holds the right PAIR joins at
+   those keys; every other income layout (YouGov's pre-Apr-2026 four-bucket
+   and partial rows) finds no key, and the rest of each dim sits out because
+   only the extremes carry a common reading. Newspoll's quarterly tables
+   print the same four brackets YouGov used before its Apr-2026 binary
+   switch (the polls these pool are the same product), so Newspoll's
+   lowest PAIR joins YouGov's Under $100k and its $150k+ joins YouGov's
+   $100k-or-more partner – Newspoll's own printed cells, never an estimate.
+   Demo-groups' header (the "Income is the ruled-out cut" note) explains why
+   no harmonized group comes of them – every bracket shares no cut points –
+   and why it never will. */
+const INCOME_BANDS = {
+  "Newspoll (pooled)": { low: ["Under $50k", "$50–99k"], high: ["$150k+"] },
+  "YouGov": { low: ["Under $100k"], high: ["$100k or more"] },
+  "DemosAU": { low: ["Under $45k"], high: ["$125k+"] },
+  "DemosAU (MRP)": { low: ["Under $45k"], high: ["$200k+"] },
+  "RedBridge/Accent": { low: ["Under $1,000 a week"], high: ["$3,000+ a week"] },
+  "Freshwater": { low: ["Under $75k"], high: ["$150k or more"] },
+};
+// pooling machinery for §7g and §7g-income: one builder, two row stores
+function demoBuild(rows, rowsM, setsSpec, allbyYm, ALL, ALL_T, SPARSE, SHARES) {
+  const housesIn = (rs) => [...new Set(rs.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE.window; }).map((r) => r.firm))];
+  const inW = (r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE.window; };
+  return setsSpec.map((set) => {
+    const groups = set.groups.map((group) => {
+      const key = (k) => set.id + "|" + group + "|" + k;
+      const est = Object.fromEntries(DEMO_KEYS.map((k) => [k, weightedWithSe(nowcastPts(rows[key(k)] || [], null, refNow, SPARSE))]));
+      if (DEMO_KEYS.some((k) => !est[k])) return null;
+      const raw = Object.fromEntries(DEMO_KEYS.map((k) => [k, Math.max(0, est[k].v)]));
+      const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
+      /* [ym, …shares in DEMO_KEYS order, …each share's 95% margin in the same
+         order], months the group was polled in. The margin is monthWithSe's,
+         the interval every monthly line on the site is drawn with – a month
+         resting on one poll shows its sampling floor – scaled as its share
+         is. The panel draws it as the band around the group's line. */
+      const monthlyOf = (rs) => MONTHS.map((ym) => {
+        const m = DEMO_KEYS.map((k) => monthWithSe(rs[key(k)] || [], null, ym));
+        if (m.some((e) => !e)) return null;
+        const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
+        const T = total(allbyYm.get(ym));
+        return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
+      }).filter(Boolean);
+      const monthly = monthlyOf(rowsM);
+      /* the rug above the group's whisker: each wave the window holds, with
+         its own reading on the display scale. The px arrays are rebuilt off
+         the alp-anchored win list by wave identity (firm|release) – a wave
+         that printed no such party leaves a null where its dot would be
+         (WvRug draws none; before the fold case existed each key's rows
+         were identical and this map was a straight filter/sort). The wave's
+         release date rides each pd entry so the panel can key the dot back
+         to its poll row (AP.pollRowKey) and open the poll on click. */
+      const wId = (r) => r.firm + "|" + r.rel;
+      // a pooled release's parts are one poll here: one dot, their samples summed
+      const win = [...(rows[key("alp")] || []).filter(inW).sort((a, b) => a.mid - b.mid)
+        .reduce((m, r) => { const e = m.get(wId(r)); if (e) e.n += r.n; else m.set(wId(r), { ...r }); return m; }, new Map()).values()];
+      const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n), r: r.rel }));
+      const px = Object.fromEntries(DEMO_KEYS.map((k) => {
+        const byW = new Map((rows[key(k)] || []).filter(inW).map((r) => [wId(r), r.x]));
+        return [k, win.map((r) => { const x = byW.get(wId(r)); return x == null ? null : r1(ALL_T * x / t); })];
+      }));
+      return {
+        label: group,
+        v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),
+        ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
+        // polls, not rows: a pooled release's parts count once
+        n: win.length, houses: housesIn(rows[key("alp")] || []), monthly,
+        pd, px,
+        /* the group's rough share of adults (demo-groups' DEMO_SHARE): the
+           panel's headline ranks its claims by how far each moves the make-up
+           of a party's voters from the electorate's, share x (group ÷ all − 1) */
+        share: DEMO_SHARE[group],
+      };
+    }).filter(Boolean);
+    return { tab: set.tab, id: set.id, label: set.label, groups,
+             houses: [...new Set(groups.flatMap((g) => g.houses))] };
+  }).filter((s) => s.groups.length);
+}
+
+const { demo: demographics, income: demoIncome } = (() => {
   const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
-  if (!waves.length || !primaryNow) return null;
+  if (!waves.length || !primaryNow) return { demo: null, income: null };
   const pick = (s) => Object.fromEntries(DEMO_KEYS.map((k) => [k, s[k]]));
-  const total = (s) => DEMO_KEYS.reduce((a, k) => a + s[k], 0);
   const ALL = pick(primaryNow), ALL_T = total(ALL);
   // each month's aggregate primaries as the primary chart draws them (the monthly anchor)
   const allByYm = new Map(aggPrimary.filter((d) => !d.election).map((d) => [d.ym, pick(d)]));
   const rows = {};                                // "set|group|party" -> nowcast rows
   const rowsM = {};                               // … -> monthly rows, anchored on each month's primaries
   const rowsT = {};                               // … -> the same for §7gb's trend test (a pooled release once)
+  // the income tab's rows: "income|<Lower|Higher> earners|<party>" under its own stores
+  const iRows = {}, iRowsM = {};
   const inWindow = [];                            // the waves the window holds, for the credits
+  const incInWindow = [];                         // the income tab's own, keeping the shares apart
   for (const w of waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
     if (!tot) continue;
@@ -4498,72 +4582,63 @@ const demographics = (() => {
         (rowsT[set.id + "|" + group + "|" + k] ||= []).push({ ym: one.ym, mid: one.mid, x: MT[k] + (g[k] - tot[k]), n: one.n * DEMO_SHARE[group], firm: w.pollster });
       }
     }
+    /* the wave's income extremes, beside the harmonized groups (never the
+       SAME shared rows maps: an income wave feeds no common-group pool, nor
+       would a common-group wave accidentally feed the income tab). A wave
+       whose income layout isn't exactly the stored pair joins nothing:
+       YouGov's pre-Apr-2026 four-bucket and partial rows fail the pair. */
+    const ib = INCOME_BANDS[w.pollster];
+    let iUsed = false;
+    if (ib && w.dims && w.dims.income) {
+      const dim = w.dims.income;
+      for (const [grp, key] of [["Lower earners", "low"], ["Higher earners", "high"]]) {
+        /* the pair must ALL be present to read (Newspoll's low pair merges
+           as one – the house's own pairwise join of YouGov's binary – and a
+           partial layout, like YouGov's Feb-2026 pair, fails the check) */
+        const rowsIn = ib[key].map((bk) => dim[bk]);
+        if (rowsIn.some((r) => !r)) continue;
+        const sh = {};
+        for (const row of rowsIn) for (const k of DEMO_KEYS) {
+          if (row[k] != null) sh[k] = (sh[k] || 0) + (+row[k] || 0);
+        }
+        if (!Object.keys(sh).length) continue;
+        const g = demoNorm(sh);
+        if (!g) continue;
+        iUsed = true;
+        for (const { mid, ym, n } of reads) {
+          for (const k of DEMO_KEYS) {
+            if (g[k] == null || tot[k] == null) continue;
+            (iRows["income|" + grp + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[grp], firm: w.pollster, lab, rel: r0.date });
+            const M = allByYm.get(ym);
+            if (M) (iRowsM["income|" + grp + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[grp], firm: w.pollster });
+          }
+        }
+      }
+    }
     // in the window when any part is; ranked by its newest
     const ds = reads.map((r) => ddays(refNow, r.mid)).filter((d) => d >= 0 && d <= SPARSE_K.window);
     if (used && ds.length) inWindow.push({ w, p, d: Math.min(...ds) });
+    if (iUsed && ds.length) incInWindow.push({ w, p, d: Math.min(...ds) });
   }
-  const housesIn = (rs) => [...new Set(rs.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))];
-  const sets = DEMO_SETS.map((set) => {
-    const groups = set.groups.map((group) => {
-      const key = (k) => set.id + "|" + group + "|" + k;
-      const est = Object.fromEntries(DEMO_KEYS.map((k) => [k, weightedWithSe(nowcastPts(rows[key(k)] || [], null, refNow, SPARSE_K))]));
-      if (DEMO_KEYS.some((k) => !est[k])) return null;
-      const raw = Object.fromEntries(DEMO_KEYS.map((k) => [k, Math.max(0, est[k].v)]));
-      const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
-      /* [ym, …shares in DEMO_KEYS order, …each share's 95% margin in the same
-         order], months the group was polled in. The margin is monthWithSe's,
-         the interval every monthly line on the site is drawn with – a month
-         resting on one poll shows its sampling floor – scaled as its share
-         is. The panel draws it as the band around the group's line. */
-      const monthlyOf = (rs) => MONTHS.map((ym) => {
-        const m = DEMO_KEYS.map((k) => monthWithSe(rs[key(k)] || [], null, ym));
-        if (m.some((e) => !e)) return null;
-        const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
-        const T = total(allByYm.get(ym));
-        return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
-      }).filter(Boolean);
-      const monthly = monthlyOf(rowsM);
-      // the trend test's months (rowsT), kept off the page
-      DEMO_TEST_MONTHLY.set(set.id + "|" + group, monthlyOf(rowsT));
-      /* the rug above the group's whisker: each wave the window holds, with
-         its own reading on the display scale. The px arrays are rebuilt off
-         the alp-anchored win list by wave identity (firm|release) – a wave
-         that printed no such party leaves a null where its dot would be
-         (WvRug draws none; before the fold case existed each key's rows
-         were identical and this map was a straight filter/sort). The wave's
-         release date rides each pd entry so the panel can key the dot back
-         to its poll row (AP.pollRowKey) and open the poll on click. */
-      const inW = (r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; };
-      const wId = (r) => r.firm + "|" + r.rel;
-      // a pooled release's parts are one poll here: one dot, their samples summed
-      const win = [...(rows[key("alp")] || []).filter(inW).sort((a, b) => a.mid - b.mid)
-        .reduce((m, r) => { const e = m.get(wId(r)); if (e) e.n += r.n; else m.set(wId(r), { ...r }); return m; }, new Map()).values()];
-      const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n), r: r.rel }));
-      const px = Object.fromEntries(DEMO_KEYS.map((k) => {
-        const byW = new Map((rows[key(k)] || []).filter(inW).map((r) => [wId(r), r.x]));
-        return [k, win.map((r) => { const x = byW.get(wId(r)); return x == null ? null : r1(ALL_T * x / t); })];
-      }));
-      return {
-        label: group,
-        v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),
-        ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
-        // polls, not rows: a pooled release's parts count once
-        n: win.length, houses: housesIn(rows[key("alp")] || []), monthly,
-        pd, px,
-        /* the group's rough share of adults (demo-groups' DEMO_SHARE): the
-           panel's headline ranks its claims by how far each moves the make-up
-           of a party's voters from the electorate's, share x (group ÷ all − 1) */
-        share: DEMO_SHARE[group],
-      };
-    }).filter(Boolean);
-    return { tab: set.tab, id: set.id, label: set.label, groups,
-             houses: [...new Set(groups.flatMap((g) => g.houses))] };
-  }).filter((s) => s.groups.length);
+  const sets = demoBuild(rows, rowsM, DEMO_SETS.map((s) => ({ tab: s.tab, id: s.id, label: s.label, groups: s.groups })), allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
+  for (const set of DEMO_SETS) for (const group of set.groups) {
+    // the trend test's months (rowsT), kept off the page
+    const rowsTg = Object.fromEntries(DEMO_KEYS.map((k) => [k, rowsT[set.id + "|" + group + "|" + k] || []]));
+    DEMO_TEST_MONTHLY.set(set.id + "|" + group, MONTHS.map((ym) => {
+      const m = DEMO_KEYS.map((k) => monthWithSe(rowsTg[k] || [], null, ym));
+      if (m.some((e) => !e)) return null;
+      const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
+      const anchor = allByYm.get(ym) || {};
+      const T = DEMO_KEYS.reduce((a, k) => a + (anchor[k] || 0), 0);
+      return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
+    }).filter(Boolean));
+  }
   const tabs = DEMO_TABS.map((t) => ({ ...t, sets: sets.filter((s) => s.tab === t.id).map(({ tab, ...s }) => s) }))
     .filter((t) => t.sets.length);
-  if (!tabs.length) return null;
+  if (!tabs.length) return { demo: null, income: null };
   inWindow.sort((a, b) => a.d - b.d);
-  return {
+  incInWindow.sort((a, b) => a.d - b.d);
+  const demo = {
     all: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL[k])])),
     // the monthly lines' party order, and the all-voters line they sit against
     order: DEMO_KEYS,
@@ -4598,6 +4673,57 @@ const demographics = (() => {
         .map((s) => s.id),
     })),
   };
+  /* the income tab, emitted beside (never inside) D.demographics so the
+     classic design's data-driven panel never sees it (repo rule 5) – its
+     own houses, polls, groups and window so a house's income waves can
+     leave the shared window without making the classic panel's credits
+     lie. Null whenever no wave fed it (a vintage with no income printer,
+     or /vic/, whose DEMOGRAPHICS load already nulls). The roster's a
+     one-line entry under the panel's own working. */
+  let income = null;
+  {
+    const iSets = demoBuild(iRows, iRowsM, [{ id: "income", label: null, groups: ["Lower earners", "Higher earners"] }], allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
+    if (iSets.length) {
+      const iHouses = creditHouses(incInWindow, (r) => r.w.pollster, (r) => Date.parse(r.w.date));
+      income = {
+        id: "income", label: "Income",
+        houses: iHouses,
+        sets: [{
+          id: "income", label: null,
+          /* the note the sethead pill leads with: the brackets are each
+             house's own, and their EDGES differ – the dek says so up front,
+             the pill spells each house's */
+          note: "each house counts at its own lowest and highest bands",
+          bands: Object.fromEntries(Object.entries(INCOME_BANDS).map(([house, b]) => [house, {
+            low: b.low.slice(0, 2).filter(Boolean),
+            high: b.high.slice(0, 2).filter(Boolean),
+          }])),
+          groups: iSets[0].groups,
+          houses: iSets[0].houses,
+        }],
+        polls: incInWindow.map(({ w, p }) => ({
+          pollster: w.pollster === "RedBridge/Accent" ? "RedBridge" : w.pollster,
+          dateLabel: p ? fwLabel(p.dateStart, p.date) : fwLabel(w.dateStart, w.date),
+          source: w.source || null,
+          sets: ["income"],
+        })),
+        /* the roster the ledgers print: the set's houses, by their waves
+           (iSets[0].houses, computed over the pooled rows isn't what a
+           reader counts – the roster lists each house that HAS an income
+           wave the build read, so a house's lone Oct-2025 read still shows) */
+        roster: Object.keys(INCOME_BANDS).filter((house) =>
+          (DEMOGRAPHICS?.waves || []).some((w) => w.pollster === house && w.dims && w.dims.income && ibHasIncome(w, house))),
+        window: SPARSE_K.label,
+      };
+      function ibHasIncome(w, house) {
+        const b = INCOME_BANDS[house];
+        const dim = w.dims && w.dims.income;
+        if (!b || !dim) return false;
+        return b.low.every((bk) => dim[bk]) && b.high.every((bk) => dim[bk]);
+      }
+    }
+  }
+  return { demo, income };
 })();
 /* The all-voters row and dashed line ARE the quoted figures – the panel bills
    them as the headline's own – so a rescale creeping back in fails the build
@@ -7047,6 +7173,11 @@ window.AUSPOL = (function () {
   /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
   const demographics = ${JSON.stringify(demographics)};
+  /* The income cut of the vote (§7g): its OWN payload, beside (never
+     inside) demographics – the classic design's data-driven panel would
+     draw any tab it found there. Each house's lowest and highest income
+     bracket join as the pooled gaps from its own total. */
+  const demoIncome = ${JSON.stringify(demoIncome)};
   /* Composition trend (§7gb): per party, the groups that have moved toward
      or away from it out of proportion to the all-voters line. */
   const demoTrend = ${JSON.stringify(demoTrend)};
@@ -7154,7 +7285,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

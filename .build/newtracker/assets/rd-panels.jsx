@@ -1760,6 +1760,8 @@ const RD_DEMO_SHORT = {
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
+  // the income tab's two bands, each house's own lowest and highest
+  "Lower earners": "lower earners", "Higher earners": "higher earners",
 };
 /* ---- the headline: who each party's voters are ----------------------------
    One line per party, constant across the grouping tabs, written from the
@@ -2049,6 +2051,11 @@ function rdDemoDek(T, tab, party) {
         rdCap(rdFraction(all)) + (pair2 ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + ".");
     }
   });
+  /* the income tab's caveat, whichever way the finding landed */
+  if (tab.id === "income") {
+    const nt = tab.sets[0] && tab.sets[0].note;
+    if (nt) out.push(rdCap(nt) + ".");
+  }
   /* the Age tab's two rulers pulling apart */
   if (tab.id === "age") {
     const gs = tab.sets.flatMap((s) => s.groups);
@@ -2633,7 +2640,13 @@ const rdRamp = (party, n, i) => (n < 2 ? "var(--" + party + ")" : "var(--ramp-" 
 function RdDemographics({ rangeId = "all" }) {
   const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const T = D.demographics;
+  const Tdemo = D.demographics;
+  /* the income tab rides beside demographics, never inside it (repo rule 5):
+     spliced on here, one home, id last so it lands after Home. The party
+     headline and trend (all-voters anatomy claims) stay on Tdemo's own
+     tabs - an income-wave quirk must never rewrite "who Labor's voters
+     are" */
+  const T = Tdemo && D.demoIncome ? { ...Tdemo, tabs: [...Tdemo.tabs, D.demoIncome] } : Tdemo;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
   /* A party switch asks the same groups about another party, so it morphs:
@@ -2777,11 +2790,11 @@ function RdDemographics({ rangeId = "all" }) {
 
   /* ---- the finding: the party's headline (rdDemoHead, constant across the
      grouping tabs) over the tab's dek (rdDemoDek) ---------------------------- */
-  const story = { head: rdDemoHead(T, party).head, dek: rdDemoDek(T, tab, party) };
+  const story = { head: rdDemoHead(Tdemo, party).head, dek: rdDemoDek(T, tab, party) };
 
   /* ---- the composition trend: which groups have moved out of proportion
-     (rdDemoShift, from gen-data §7gb's demoTrend) --------------------------- */
-  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], T, party);
+     (rdDemoShift, from gen-data §7gb's demoTrend, which is income-free) ----- */
+  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
 
   /* the full significance battery behind the dek: every tested group, pass
      or fail, in the tabs' own order — the Trend-significance table dropdown
@@ -2810,7 +2823,15 @@ function RdDemographics({ rangeId = "all" }) {
   const dotSet = (st, idx) => (
     <div className="rd-wv-set" key={"s" + idx} role="table" aria-label={(st.label || tab.label) + ": " + pPoss + " share of each group’s vote"}>
       <div className="rd-wv-sethead" role="row">
-        <span role="columnheader"><b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span></span>
+        <span role="columnheader">
+          <b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span>
+          {/* which of the house's brackets each tilt pooled, spelled out by
+             house since no two houses' brackets agree (the dek says why up
+             front; the RR says the same pill beside its own set) */}
+          {st.bands ? <span className="rd-wv-bands">{st.houses.filter((h) => st.bands[h]).map((h) => (
+            <span className="rd-wv-band" key={h}><em>{demoHouse(h)}</em> {st.bands[h].low.join(", ")} <i>·</i> {st.bands[h].high.join(", ")}</span>
+          ))}</span> : null}
+        </span>
         <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ "--x": xp(all) }}>All voters <RollNum value={all.toFixed(1)} />%</span>}</span>
         <span className="rd-wv-vs" role="columnheader">{idx === 0 ? "vs all voters" : ""}</span>
       </div>

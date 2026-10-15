@@ -115,6 +115,12 @@ export const DEMO_SHARE = {
   "Own outright": 0.32, Mortgage: 0.36, Renting: 0.32,
   "English only": 0.76, "Other language": 0.24,
   "Full time": 0.44, "Part time": 0.20, Retired: 0.19,
+  /* the income tab's two tilt groups (gen-data §7g-income). Lower earners
+     take about half the adult population by the ABS Survey of Income and
+     Housing's equivalised quintiles; higher earners the top quintile and
+     some change. Like the rest, these size only the sampling-error floor
+     and cancel out of the pooled figure. */
+  "Lower earners": 0.5, "Higher earners": 0.15,
 };
 
 const KEYS = ["alp", "lnp", "onp", "grn", "oth"];

@@ -4187,6 +4187,11 @@ body.rd .rd-wv-set + .rd-wv-set { margin-top: 10px; padding-top: 10px; border-to
 body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-wv-sethead b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
+body.rd .rd-wv-bands { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
+body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
+body.rd .rd-wv-band + .rd-wv-band::before { content: "·"; color: var(--ink-4); }
+body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
@@ -41064,6 +41069,178 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "source": "https://e.infogram.com/_/tffIGyctHfK10P86g4Pb",
       "sets": ["age", "generation", "gender", "education", "state", "location", "housing", "language", "working"]
     }]
+  };
+  const demoIncome = {
+    "id": "income",
+    "label": "Income",
+    "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"],
+    "sets": [{
+      "id": "income",
+      "label": null,
+      "note": "each house counts at its own lowest and highest bands",
+      "bands": {
+        "Newspoll (pooled)": {
+          "low": ["Under $50k", "$50–99k"],
+          "high": ["$150k+"]
+        },
+        "YouGov": {
+          "low": ["Under $100k"],
+          "high": ["$100k or more"]
+        },
+        "DemosAU": {
+          "low": ["Under $45k"],
+          "high": ["$125k+"]
+        },
+        "DemosAU (MRP)": {
+          "low": ["Under $45k"],
+          "high": ["$200k+"]
+        },
+        "RedBridge/Accent": {
+          "low": ["Under $1,000 a week"],
+          "high": ["$3,000+ a week"]
+        },
+        "Freshwater": {
+          "low": ["Under $75k"],
+          "high": ["$150k or more"]
+        }
+      },
+      "groups": [{
+        "label": "Lower earners",
+        "v": {
+          "alp": 26.5,
+          "lnp": 21.1,
+          "onp": 29.4,
+          "grn": 11.6,
+          "oth": 11.4
+        },
+        "ci": {
+          "alp": 2,
+          "lnp": 1.9,
+          "onp": 2.1,
+          "grn": 1.4,
+          "oth": 2.7
+        },
+        "n": 5,
+        "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"],
+        "monthly": [["2025-07", 36.4, 27.6, 10, 12.2, 14, 4.3, 4, 2.7, 2.9, 3.1], ["2025-08", 35.7, 27.6, 11.4, 12, 13.6, 4.1, 3.8, 2.7, 2.8, 2.9], ["2025-09", 35.2, 26.3, 13.1, 11.7, 14.3, 4.1, 3.8, 2.9, 2.7, 3], ["2025-10", 34.4, 24.9, 14.4, 11.8, 14.1, 2, 2.4, 1.6, 1.3, 1.4], ["2025-11", 33, 24.3, 18, 11.7, 13, 2.4, 2.2, 2, 1.7, 1.7], ["2026-01", 29.8, 20.6, 25.2, 11, 13.4, 2.1, 1.9, 2, 1.5, 1.6], ["2026-02", 29.7, 18.7, 27.7, 11.2, 12.7, 2.3, 2.4, 2.3, 1.6, 2.1], ["2026-03", 29.4, 20.1, 27.2, 11.4, 12, 3.8, 3.3, 3.7, 2.6, 2.7], ["2026-04", 30.5, 21.1, 26, 11.1, 11.4, 2, 1.8, 1.9, 1.4, 2.6], ["2026-05", 29.5, 20.7, 27.9, 10.9, 11.2, 2.1, 1.9, 2.1, 1.9, 1.8], ["2026-06", 27.9, 17.5, 31.1, 12.4, 11.1, 1.8, 1.5, 1.9, 1.4, 2.1], ["2026-07", 27.3, 19.8, 28.6, 13, 11.1, 1.9, 1.9, 1.9, 1.4, 1.3], ["2026-08", 26.8, 19.5, 29.4, 12.4, 11.9, 1.8, 1.6, 2.8, 1.4, 2], ["2026-09", 26.3, 20.3, 30.2, 11.8, 11.2, 2, 1.9, 2.1, 1.5, 3.6], ["2026-10", 25.2, 22.6, 31.2, 10.5, 10.4, 3.8, 3.6, 4, 2.7, 2.6]],
+        "pd": [{
+          "f": "YouGov",
+          "l": "1–8 Sep",
+          "n": 822,
+          "r": "2026-09-08"
+        }, {
+          "f": "DemosAU",
+          "l": "10–14 Sep",
+          "n": 695,
+          "r": "2026-09-14"
+        }, {
+          "f": "Newspoll (pooled)",
+          "l": "13 Jul–18 Sep",
+          "n": 798,
+          "r": "2026-09-18"
+        }, {
+          "f": "YouGov",
+          "l": "15–21 Sep",
+          "n": 750,
+          "r": "2026-09-21"
+        }, {
+          "f": "YouGov",
+          "l": "29 Sep–6 Oct",
+          "n": 819,
+          "r": "2026-10-06"
+        }],
+        "px": {
+          "alp": [25.7, 25.5, 28, 27.5, 25.5],
+          "lnp": [22.8, 19.6, 19.1, 22.6, 22.6],
+          "onp": [31.5, 27.1, 28.1, 30.1, 31.1],
+          "grn": [12.6, 12.5, 12.5, 11.5, 10.5],
+          "oth": [7.4, 15.3, 12.3, 8.3, 10.3]
+        },
+        "share": 0.5
+      }, {
+        "label": "Higher earners",
+        "v": {
+          "alp": 29.2,
+          "lnp": 23.7,
+          "onp": 23.4,
+          "grn": 13.4,
+          "oth": 10.3
+        },
+        "ci": {
+          "alp": 3.7,
+          "lnp": 5.3,
+          "onp": 3.5,
+          "grn": 2.8,
+          "oth": 2.5
+        },
+        "n": 5,
+        "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"],
+        "monthly": [["2025-07", 37.9, 29.6, 6, 13.2, 13.5, 7.9, 7.5, 3.9, 5.5, 5.6], ["2025-08", 37.2, 29.6, 7.4, 13, 13.1, 7.5, 7.1, 4.1, 5.2, 5.2], ["2025-09", 36.7, 28.3, 9.1, 12.7, 13.8, 7.5, 7, 4.5, 5.2, 5.4], ["2025-10", 36.1, 30.5, 8.9, 11.6, 12.5, 3.6, 3.4, 2.1, 2.4, 2.4], ["2025-11", 33.7, 32.3, 15, 8.4, 10.6, 5.1, 5.1, 5.1, 4.1, 2.9], ["2026-01", 35.9, 27.7, 17.6, 10.9, 7.9, 4.1, 4.6, 3.3, 2.7, 3.6], ["2026-02", 33.4, 28.3, 20.5, 9.6, 8.3, 4.3, 9.7, 4.8, 2.7, 2.5], ["2026-03", 32.9, 22.6, 23.2, 11.4, 10, 7.1, 6.3, 6.4, 4.8, 4.5], ["2026-04", 32.5, 22.9, 24.4, 11.6, 8.8, 3.8, 3.4, 3.5, 2.6, 2.3], ["2026-05", 30.2, 24.4, 23.3, 12.7, 9.5, 3.8, 4.4, 3.5, 2.8, 2.5], ["2026-06", 28.8, 23.3, 27.7, 11.2, 9, 3.3, 5, 3.3, 2.3, 2.1], ["2026-07", 29.3, 24.8, 24.6, 10.7, 10.4, 3.4, 3.3, 3.3, 2.3, 2.3], ["2026-08", 30.7, 24.2, 21.1, 13.1, 10.8, 3.5, 3.2, 3.1, 2.6, 2.4], ["2026-09", 27.5, 25.1, 24.6, 12.8, 9.9, 3.7, 4.9, 3.6, 2.8, 2.6], ["2026-10", 31.5, 19.8, 23.5, 13.7, 11.5, 7.3, 6.3, 6.7, 5.4, 5]],
+        "pd": [{
+          "f": "YouGov",
+          "l": "1–8 Sep",
+          "n": 247,
+          "r": "2026-09-08"
+        }, {
+          "f": "DemosAU",
+          "l": "10–14 Sep",
+          "n": 209,
+          "r": "2026-09-14"
+        }, {
+          "f": "Newspoll (pooled)",
+          "l": "13 Jul–18 Sep",
+          "n": 240,
+          "r": "2026-09-18"
+        }, {
+          "f": "YouGov",
+          "l": "15–21 Sep",
+          "n": 225,
+          "r": "2026-09-21"
+        }, {
+          "f": "YouGov",
+          "l": "29 Sep–6 Oct",
+          "n": 246,
+          "r": "2026-10-06"
+        }],
+        "px": {
+          "alp": [28.8, 26.5, 29.5, 26.3, 31.8],
+          "lnp": [22.8, 32.6, 23.6, 22.4, 19.8],
+          "onp": [23.4, 23.1, 22.1, 25.8, 23.4],
+          "grn": [13.6, 11.5, 14.5, 13.4, 13.7],
+          "oth": [11.4, 6.3, 10.3, 12.2, 11.4]
+        },
+        "share": 0.15
+      }],
+      "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"]
+    }],
+    "polls": [{
+      "pollster": "YouGov",
+      "dateLabel": "29 Sep–6 Oct",
+      "source": "https://e.infogram.com/_/k58LEJVsGG4OersOUxEA",
+      "sets": ["income"]
+    }, {
+      "pollster": "YouGov",
+      "dateLabel": "15–21 Sep",
+      "source": "https://e.infogram.com/_/XdWD62anjLF6u5scKfkU",
+      "sets": ["income"]
+    }, {
+      "pollster": "Newspoll (pooled)",
+      "dateLabel": "13 Jul–18 Sep",
+      "source": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
+      "sets": ["income"]
+    }, {
+      "pollster": "DemosAU",
+      "dateLabel": "10–14 Sep",
+      "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+      "sets": ["income"]
+    }, {
+      "pollster": "YouGov",
+      "dateLabel": "1–8 Sep",
+      "source": "https://e.infogram.com/_/tffIGyctHfK10P86g4Pb",
+      "sets": ["income"]
+    }],
+    "roster": ["Newspoll (pooled)", "YouGov", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent", "Freshwater"],
+    "window": "six weeks"
   };
   const demoTrend = {
     "alp": {
@@ -88161,6 +88338,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     onSources,
     switchFlows,
     demographics,
+    demoIncome,
     demoTrend,
     demoStateElection,
     demoLocElection,
@@ -95287,7 +95465,9 @@ const DEMO_WHO = {
   "Other language": "voters who speak another language at home",
   "Full time": "full-time workers",
   "Part time": "part-time workers",
-  Retired: "retirees"
+  Retired: "retirees",
+  "Lower earners": "lower earners",
+  "Higher earners": "higher earners"
 };
 const DEMO_SET_WORDS = {
   age: {
@@ -95341,6 +95521,12 @@ const DEMO_SET_WORDS = {
     others: "voters of other work statuses",
     step: null,
     one: "work-status group"
+  },
+  income: {
+    all: "earner bands",
+    others: "higher earners",
+    step: null,
+    one: "earner band"
   }
 };
 const DEMO_VOTE_FOR = {
@@ -105010,7 +105196,8 @@ function infoTerms(D) {
     location: "location",
     housing: "housing",
     language: "language at home",
-    working: "work status"
+    working: "work status",
+    income: "income"
   };
   const demoSets = ids => {
     const n = ids.map(id => DEMO_SET_NAME[id] || id);
@@ -105029,7 +105216,9 @@ function infoTerms(D) {
     className: "info-work info-work-list"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Groups"), React.createElement("th", null, "Pollsters"))), React.createElement("tbody", null, DEMO.roster.flatMap(r => r.lines.map((l, i) => React.createElement("tr", {
     key: r.id + i
-  }, React.createElement("td", null, r.lines.length > 1 ? r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase()) + ": " + l.groups.join(", ") : r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase())), React.createElement("td", null, l.houses.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))))))), React.createElement("p", {
+  }, React.createElement("td", null, r.lines.length > 1 ? r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase()) + ": " + l.groups.join(", ") : r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase())), React.createElement("td", null, l.houses.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))))), D.demoIncome ? React.createElement("tr", {
+    key: "income"
+  }, React.createElement("td", null, "Income"), React.createElement("td", null, D.demoIncome.roster.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))) : null)), React.createElement("p", {
     className: "info-work-note"
   }, "Every pollster whose polls have counted for each group this term, most polls first.")) : null;
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? React.createElement("div", {
@@ -105386,9 +105575,9 @@ function infoTerms(D) {
     nav: "Who votes",
     lead: {
       id: "vote-by-group",
-      body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, the language they speak at home, and whether they work full time, part time or are retired.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, the language they speak at home, whether they work full time, part time or are retired, and how much they earn.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where."), React.createElement("span", {
+      }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where. Income is the exception: no two pollsters draw the same bracket, so the Income tab pools each house\u2019s own lowest and highest bands and names them there."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Reading a gap."), " Each figure carries its", " ", xref("interval", "who votes for whom", "95% margin"), ", usually 2 to 5 points, with each poll\u2019s sample for a group estimated from the group\u2019s share of adults (18\u201334s are about 28%). The sentences call a difference ", xref("significance", "who votes for whom", "significant"), " ", "only when it passes that test, with the bar raised when three or more groups are compared. They report what passes: a steady rise or fall across ordered groups such as age (only when every step passes), one group apart from the others, or failing those, the largest gap that passes. If no two groups differ, they name any group that sits clear of all voters by more than its margin, and only if none does, no difference."), React.createElement("span", {
         className: "info-p"
@@ -113550,7 +113739,9 @@ const RD_DEMO_SHORT = {
   "Other language": "voters who speak another language at home",
   "Full time": "full-time workers",
   "Part time": "part-time workers",
-  Retired: "retirees"
+  Retired: "retirees",
+  "Lower earners": "lower earners",
+  "Higher earners": "higher earners"
 };
 const RD_DEMO_SUBJ = {
   onp: "One Nation voters",
@@ -113851,6 +114042,10 @@ function rdDemoDek(T, tab, party) {
       out.push(rdCap(pVote) + " is much the same across " + (words.all || "these groups") + ".", rdCap(rdFraction(all)) + (pair2 ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + ".");
     }
   });
+  if (tab.id === "income") {
+    const nt = tab.sets[0] && tab.sets[0].note;
+    if (nt) out.push(rdCap(nt) + ".");
+  }
   if (tab.id === "age") {
     const gs = tab.sets.flatMap(s => s.groups);
     for (const [gen, band] of Object.entries(RD_DEMO_IN_BAND)) {
@@ -114528,7 +114723,11 @@ function RdDemographics({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const T = D.demographics;
+  const Tdemo = D.demographics;
+  const T = Tdemo && D.demoIncome ? {
+    ...Tdemo,
+    tabs: [...Tdemo.tabs, D.demoIncome]
+  } : Tdemo;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
   const [partyMorph, chooseParty] = window.AP.useMorph(party, v => setParty(v), (a, b) => a !== b);
@@ -114642,10 +114841,10 @@ function RdDemographics({
   const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const story = {
-    head: rdDemoHead(T, party).head,
+    head: rdDemoHead(Tdemo, party).head,
     dek: rdDemoDek(T, tab, party)
   };
-  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], T, party);
+  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
   const sgn1 = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
   const sigSets = (() => {
     const dt = D.demoTrend && D.demoTrend[party];
@@ -114680,7 +114879,12 @@ function RdDemographics({
     role: "row"
   }, React.createElement("span", {
     role: "columnheader"
-  }, React.createElement("b", null, st.label || "By " + tab.label.toLowerCase()), " ", React.createElement("span", null, rdList((st.houses || []).map(demoHouse)))), React.createElement("span", {
+  }, React.createElement("b", null, st.label || "By " + tab.label.toLowerCase()), " ", React.createElement("span", null, rdList((st.houses || []).map(demoHouse))), st.bands ? React.createElement("span", {
+    className: "rd-wv-bands"
+  }, st.houses.filter(h => st.bands[h]).map(h => React.createElement("span", {
+    className: "rd-wv-band",
+    key: h
+  }, React.createElement("em", null, demoHouse(h)), " ", st.bands[h].low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", st.bands[h].high.join(", ")))) : null), React.createElement("span", {
     className: "rd-wv-allcap",
     "aria-hidden": "true"
   }, idx === 0 && React.createElement("span", {

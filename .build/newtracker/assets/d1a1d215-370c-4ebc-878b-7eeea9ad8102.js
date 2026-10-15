@@ -6962,7 +6962,8 @@ function infoTerms(D) {
   /* The vote by group: the polls its six-week window holds, newest first. */
   const DEMO = D.demographics;
   const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education",
-    state: "state", location: "location", housing: "housing", language: "language at home", working: "work status" };
+    state: "state", location: "location", housing: "housing", language: "language at home", working: "work status",
+    income: "income" };
   // "Age, gender, and state": a list in sentence case, with the Oxford comma
   const demoSets = (ids) => {
     const n = ids.map((id) => DEMO_SET_NAME[id] || id);
@@ -6984,6 +6985,14 @@ function infoTerms(D) {
               <td>{l.houses.map((h) => DEMO_ROSTER_NAME[h] || h).join(", ")}</td>
             </tr>
           )))}
+          {/* the income tab's own roster folds in: gen-data carries only the
+             house names (label/line shape of the harmonized cuts is per-set) */}
+          {D.demoIncome ? (
+            <tr key="income">
+              <td>Income</td>
+              <td>{D.demoIncome.roster.map((h) => DEMO_ROSTER_NAME[h] || h).join(", ")}</td>
+            </tr>
+          ) : null}
         </tbody>
       </table>
       <p className="info-work-note">Every pollster whose polls have counted for each group this term,
@@ -7591,15 +7600,16 @@ function infoTerms(D) {
       lead: { id: "vote-by-group", body: (
         <>How each group says it will vote, from the tables pollsters publish with their polls:
         men and women, age groups, generations, education levels, states, where people live,
-        whether they own or rent, the language they speak at home, and whether they work full
-        time, part time or are retired.
+        whether they own or rent, the language they speak at home, whether they work full
+        time, part time or are retired, and how much they earn.
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
         are pooled over the last six weeks of polls and added to the site’s current figure for all
         voters. Measuring each poll against its own total removes its pollster’s lean. The charts
         follow each group month by month, built the same way, as a percentage above or below all
         voters. Groups pool only where pollsters cut the population the same way; the working
-        lists which count where.</span>
+        lists which count where. Income is the exception: no two pollsters draw the same bracket,
+        so the Income tab pools each house’s own lowest and highest bands and names them there.</span>
         <span className="info-p"><b>Reading a gap.</b> Each figure carries its
         {" "}{xref("interval", "who votes for whom", "95% margin")}, usually 2 to 5 points, with each
         poll’s sample for a group estimated from the group’s share of adults (18–34s are about

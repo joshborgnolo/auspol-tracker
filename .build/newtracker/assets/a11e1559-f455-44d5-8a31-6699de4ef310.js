@@ -2235,6 +2235,7 @@ const DEMO_WHO = {
   "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
   "English only": "voters who speak only English at home", "Other language": "voters who speak another language at home",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
+  "Lower earners": "lower earners", "Higher earners": "higher earners",
 };
 /* Per set: `all` names the groups together, `others` the rest of them beside
    one group, `step` the trend phrase for an ordered set (null where the
@@ -2251,6 +2252,8 @@ const DEMO_SET_WORDS = {
   housing: { all: "owners and renters", others: "other voters", step: null, one: "group" },
   language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
   working: { all: "work-status groups", others: "voters of other work statuses", step: null, one: "work-status group" },
+  // the income tab's own pair of tilts: the house's own lowest and highest bands
+  income: { all: "earner bands", others: "higher earners", step: null, one: "earner band" },
 };
 const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others & independents" };
 // P(|Z| > z) for a standard normal (Abramowitz & Stegun 7.1.26, error under 1.5e-7)
