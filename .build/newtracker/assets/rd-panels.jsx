@@ -3320,16 +3320,22 @@ function RdSwitching({ rangeId }) {
   const loC = hiC ? (hiC === lnp ? alp : lnp) : null;
   const nm = (c) => (c.id === "lnp" ? "Coalition" : "Labor");
   const head = hiC ? rdCap(plainShare(hiC.rate)) + " 2025 " + nm(hiC) + " voters now back One Nation" : null;
-  const gainOf = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters voted for " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025." : "";
-  /* the ratio is said only while the two rates clear each other's margins
-     (and as a ratio only from 1.25 up); closer than that, the polls can't
-     rank them */
-  const ratioQ = hiC && loC ? Math.round(hiC.rate / loC.rate * 4) / 4 : null;
+  /* where One Nation's new voters came from: the top source, and the second
+     while it is a sizeable part too (a fifth or more, rounded) */
+  const PARTY = { lnp: "the Coalition", alp: "Labor", grn: "the Greens", oth: "another party" };
+  const bySrc = cols.slice().sort((a, b) => b.gain - a.gain);
+  const src2 = bySrc[1] && bySrc[1].gain >= 15 ? bySrc[1] : null;
+  const gainOf = top ? "Of One Nation’s new voters, " + rdFraction(top.gain) + " voted for " + PARTY[top.id] + " in 2025"
+    + (src2 ? " and " + rdFraction(src2.gain) + " for " + PARTY[src2.id] : "") + "." : "";
+  /* the ratio is said only while the two rates clear each other's margins,
+     and as a ratio only from 1.25 up, to the nearest half (timesWords): a
+     ratio of two pooled rates is rarely known finer than that */
+  const ratio = hiC && loC ? hiC.rate / loC.rate : null;
   const ratesApart = hiC && loC && hiC.rate - loC.rate > Math.hypot(hiC.rateCi || 0, loC.rateCi || 0);
   const dek = (!hiC || !loC) ? null
     : (!ratesApart ? "Coalition and Labor voters have moved to One Nation at much the same rate. "
-      : ratioQ < 1.25 ? nm(hiC) + " voters have moved to One Nation faster than " + nm(loC) + " voters. "
-      : nm(hiC) + " voters have flocked to One Nation at about " + ratioQ + " times the rate of " + nm(loC) + " voters. ")
+      : ratio < 1.25 ? nm(hiC) + " voters have moved to One Nation faster than " + nm(loC) + " voters. "
+      : nm(hiC) + " voters have flocked to One Nation at " + timesWords(ratio) + " the rate of " + nm(loC) + " voters. ")
     + gainOf;
 
   /* ---- the rates, month by month -------------------------------------------- */
@@ -3416,16 +3422,40 @@ function RdSwitching({ rangeId }) {
   const goRows = goRow ? goRow.dests.filter((d) => d.now && d.now.v > 0)
     .map((d) => ({ id: d.id, ...goWords(d.id), now: d.now, monthly: d.monthly, polls: d.polls })) : [];
   const goKept = goRows.find((r) => r.id === "kept");
+  /* "more than half" / "almost half" claim a side of 50 the poll can't
+     always back: inside the 95% range of 50 it reads "about half" */
+  const goHalfSafe = (w, n) => (/half of$/.test(w) && Math.abs(n.v - 50) <= (n.ci95 || 0) ? "About half of" : rdCap(w));
   const goHead = goKept && V !== "onp"
-    ? rdCap(plainShare(goKept.now.v)) + " 2025 " + GO_HALF[V] + " voters are sticking with " + GO_OWN[V]
+    ? goHalfSafe(plainShare(goKept.now.v), goKept.now) + " 2025 " + GO_HALF[V] + " voters are sticking with " + GO_OWN[V]
     : null;
   const goRest = goRows.filter((r) => r.id !== "kept").sort((a, b) => b.now.v - a.now.v);
   const gd1 = goRest[0], gd2 = goRest[1];
-  const goDek = !gd1 ? null
-    : (!(gd2 && gd2.now.v > 0.2) ? rdCap(goShareWords(gd1.now.v)) + " have moved to " + gd1.noun + ". The rest are scattered."
-      : (gd1.now.v - gd2.now.v <= Math.hypot(gd1.now.ci95 || 0, gd2.now.ci95 || 0)
-        ? rdCap(gd1.noun) + " and " + gd2.noun + " have drawn " + GO_COHORT_W[V] + " at much the same rate — about " + goShareWords(gd1.now.v) + " and " + goShareWords(gd2.now.v) + "."
-        : rdCap(goShareWords(gd1.now.v)) + " have moved to " + gd1.noun + " and " + goShareWords(gd2.now.v) + " to " + gd2.noun + ". "));
+  /* the dek answers "where did the leavers go?": the top destination in the
+     headline's own words (plainShare from a fifth up, where its ladder is
+     exact enough; the finer ladder below), with its share of the leavers
+     while it is most of them; then the next destinations of 5% or more as
+     figures - a "similar" pair while they sit inside each other's margins */
+  const goApart = (a, b) => a.now.v - b.now.v > Math.hypot(a.now.ci95 || 0, b.now.ci95 || 0);
+  const goBig = (v) => (v >= 20 ? plainShare(v) : rdCap(rdFraction(v)));
+  const goVerb = (w) => (/\bone in\b/i.test(w) ? " has" : /of$/.test(w) ? " them have" : " have");
+  const goPc = (r) => Math.round(r.now.v) + "%";
+  const goLeft = goKept ? 100 - goKept.now.v : null;
+  const goDek = (() => {
+    if (!gd1) return null;
+    const named = goRest.filter((r) => r.now.v >= 5);
+    if (gd2 && named.includes(gd2) && !goApart(gd1, gd2))
+      return "Similar shares have moved to " + gd1.noun + " (" + goPc(gd1) + ") and " + gd2.noun + " (" + goPc(gd2) + ")."
+        + (named[2] ? " Another " + goPc(named[2]) + " have gone to " + named[2].noun + "." : "");
+    const w1 = goBig(gd1.now.v), most = goLeft && gd1.now.v / goLeft >= 0.6;
+    const s1 = w1 + goVerb(w1) + " moved to " + gd1.noun + (most ? ", " + rdFraction(100 * gd1.now.v / goLeft) + " of those who left" : "") + ".";
+    const next = named.slice(1, 3);
+    if (!next.length) return s1 + (goRest.length > 1 ? " The rest are scattered." : "");
+    const only = next[0].now.v < gd1.now.v / 4 ? "Only " : "Another ";
+    const s2 = next.length === 2 && !goApart(next[0], next[1])
+      ? "Smaller, similar shares have gone to " + next[0].noun + " (" + goPc(next[0]) + ") and " + next[1].noun + " (" + goPc(next[1]) + ")."
+      : only + goPc(next[0]) + " have gone to " + next[0].noun + (next[1] ? " and " + goPc(next[1]) + " to " + next[1].noun : "") + ".";
+    return s1 + " " + s2;
+  })();
   const goDots = (r) => r.polls.map((p) => ({
     x: p.x, y: p.v, h: p.pollster, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3),
     meta: { pollster: p.pollster, released: p.released, dateLabel: "", sample: p.sample } }));
