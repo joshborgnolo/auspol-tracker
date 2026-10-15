@@ -166,6 +166,33 @@ W("Consumer sentiment fell to 13.6 in June from 82.2 in May.", null);
   assert.equal(g.conf.chg, -2);
   assert.equal(g.cond.chg, -5);
 }
+// Sep-26's interleave: the two captions merge into one run-on ("…to -13
+// index points, Was flat … at -1 index points, …4 index points. points."),
+// and the prose beyond carries decoy moves — the year-ago "fallen 22pts"
+// and a state-table "(both down 4pts)". The change comes from the banner
+// captions alone: order-paired moves, or "Was flat" → 0. (Live wave filed
+// 2026-10-13, ym 2026-09.)
+{
+  const era3 = [
+    "September 2026",
+    "NAB Monthly Business Survey",
+    "   -13            Index",
+    "                 points                              -1            Index",
+    "                 points",
+    "   Business Confidence                                Business Conditions",
+    "   Fell 4pts (unrounded) to -13 index points,         Was flat in September at -1 index points,",
+    "   below its long-run average of 4 index              points.",
+    "   points.",
+    "Summary",
+    "Business confidence fell further in September and is now 18pts below its long-run average. Business conditions rose in all states except Vic and Qld (both down 4pts). After reaching a post-pandemic peak in September last year, business confidence has fallen 22pts.",
+  ].join("\n");
+  const g = parseNabPdf(era3);
+  assert.deepEqual(g.survey, { mon: 8, yr: 2026 });
+  assert.equal(g.conf.level, -13);
+  assert.equal(g.cond.level, -1);
+  assert.equal(g.conf.chg, -4, "confidence move from the banner caption");
+  assert.equal(g.cond.chg, 0, '"Was flat" files a zero move, not the state-table decoy');
+}
 // banner and sentence that disagree never average: the measure is dropped
 {
   const bad = [
