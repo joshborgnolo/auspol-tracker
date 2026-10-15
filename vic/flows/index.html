@@ -58472,15 +58472,12 @@ function rdApConsStory(upd) {
   };
   const top = ["alp", "lnp"].filter(id => newest.cons[id] != null).sort((a, b) => newest.cons[b] - newest.cons[a])[0];
   const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
-  const series = waves.filter(p => p.pollster === newest.pollster && basis(p) === basis(newest));
-  const [lo, hi] = [Math.min(...series.map(p => p.cons.onp)), Math.max(...series.map(p => p.cons.onp))];
   const askers = new Set(waves.map(p => p.pollster + "|" + basis(p))).size;
-  const own = series.length < 2 ? "" : "On that question, " + newest.pollster + "’s " + rdNumWord(series.length) + " polls since " + day(series[series.length - 1].released) + (lo === hi ? " have all put One Nation at " + pct(lo) + ". " : " have put One Nation between " + pct(lo) + " and " + pct(hi) + ". ");
   const full = waves.filter(p => p.cons.alp != null);
   const cnt = [1, 0, -1].map(r => full.filter(p => rel(p, "alp") === r).length);
   const parts = ["outscored", "came close to", "trailed"].map((v, i) => cnt[i] ? [v, cnt[i]] : null).filter(Boolean);
   const tallied = full.length < 2 ? "" : parts.length === 1 ? "In all " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + parts[0][0] + " Labor. " : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
-  const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "") + own + tallied + "Each party is asked about separately, so a poll’s figures don’t add to 100. " + "Below is every " + RD_AP_POLLS + " poll with consideration figures since the " + rdElecYear + " election, newest first, each linked to its source.";
+  const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "") + tallied;
   return {
     head,
     dek

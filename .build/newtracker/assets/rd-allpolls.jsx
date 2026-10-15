@@ -2403,7 +2403,7 @@ const rdApLeanFor = (p, onM, pub) => {
    quotes the last poll to ask ("when last asked", never "newest": these
    polls are months apart, and the date says how old) in its own question's words against the larger
    major party's figure in the same poll; the dek says to compare within a
-   pollster, gives the newest poll's own series, and tallies One Nation v
+   pollster and tallies One Nation v
    Labor over the polls that asked about every party. "Above"/"below" only
    past the two shares' combined 95% margin in that poll's sample. */
 function rdApConsStory(upd) {
@@ -2423,13 +2423,7 @@ function rdApConsStory(upd) {
   const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " "
     + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation"
     + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
-  /* the newest poll's own series: same pollster, same question */
-  const series = waves.filter((p) => p.pollster === newest.pollster && basis(p) === basis(newest));
-  const [lo, hi] = [Math.min(...series.map((p) => p.cons.onp)), Math.max(...series.map((p) => p.cons.onp))];
   const askers = new Set(waves.map((p) => p.pollster + "|" + basis(p))).size;
-  const own = series.length < 2 ? ""
-    : "On that question, " + newest.pollster + "’s " + rdNumWord(series.length) + " polls since " + day(series[series.length - 1].released)
-      + (lo === hi ? " have all put One Nation at " + pct(lo) + ". " : " have put One Nation between " + pct(lo) + " and " + pct(hi) + ". ");
   /* One Nation v Labor where every party was asked */
   const full = waves.filter((p) => p.cons.alp != null);
   const cnt = [1, 0, -1].map((r) => full.filter((p) => rel(p, "alp") === r).length);
@@ -2439,9 +2433,7 @@ function rdApConsStory(upd) {
     : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation "
       + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
   const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "")
-    + own + tallied
-    + "Each party is asked about separately, so a poll’s figures don’t add to 100. "
-    + "Below is every " + RD_AP_POLLS + " poll with consideration figures since the " + rdElecYear + " election, newest first, each linked to its source.";
+    + tallied;
   return { head, dek };
 }
 /* the 2PP facet's head and dek on one contest (onM: Labor v One Nation)
