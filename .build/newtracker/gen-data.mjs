@@ -4133,6 +4133,42 @@ const flowForced = (() => {
       outer: replay("Outer metro seats", "outer metro", "40 of 45", 79.32, 35.34, 52.46),
       regional: replay("Regional or rural seats", "regional or rural", "50 of 62", 76.9, 31.46, 49.01) };
   })();
+  /* the "…% of the vote" figures beside each ledger group: the current
+     headline under All voters, but on a NAMED region the "2025 election's
+     share of that seat class's vote — polling never cuts the vote
+     regional. Summed per class from the same vendored DoP
+     (data/aec-2025-seat-flows.json) and AEC division classes
+     (data/aec-2025-division-class.json; Regional = provincial + rural) as
+     the replay above, the AEC's own division classes doing the grouping —
+     every one of a class's seats counts (the classic-only cuts of
+     elec2025r were a flows problem; first preferences are complete in
+     every seat), IND's named members folded into the oth lump as
+     everywhere else on the site */
+  const elec2025p = (() => {
+    if (!AEC_CLASS) return null;
+    try {
+      const seats = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "aec-2025-seat-flows.json"), "utf8")).seats;
+      const clsOf = new Map(AEC_CLASS.divisions.map((d) => [d.name, d.class]));
+      const bucket = { inner: "inner", outer: "outer", provincial: "regional", rural: "regional" };
+      const MAJ = new Set(["alp", "lp", "np", "clp", "lnp"]);
+      const lump = (g) => (MAJ.has(g) ? (g === "alp" ? "alp" : "lnp") : g === "grn" ? "grn" : g === "on" ? "onp" : "oth");
+      const votes = { all: {}, inner: {}, outer: {}, regional: {} };
+      for (const s of seats) {
+        const b = bucket[clsOf.get(s.name)];
+        if (!b) throw new Error(s.name + " has no division class");
+        for (const c of s.candidates) {
+          const k = lump(c.group);
+          votes.all[k] = (votes.all[k] || 0) + c.votes;
+          votes[b][k] = (votes[b][k] || 0) + c.votes;
+        }
+      }
+      const shares = (o) => {
+        const tot = Object.values(o).reduce((a, x) => a + x, 0);
+        return Object.fromEntries(Object.entries(o).map(([k, v]) => [k, Math.round((v / tot) * 10000) / 100]));
+      };
+      return Object.fromEntries(Object.entries(votes).map(([k, o]) => [k, shares(o)]));
+    } catch { return null; }
+  })();
   /* the 2026 state and by-election counts that MEASURED the Labor-v-One-
      Nation choice the second chart asks: crosses on the chart's own day,
      joined to no line (user 2026-10-13; Farrer's four Coalition reads
@@ -4220,7 +4256,7 @@ const flowForced = (() => {
       for (const r of ["inner", "outer", "regional"]) out[r] = p.pref_flows.lnp_onp[r] || null;
       return out;
     }).filter(Boolean);
-  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025r, bys, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}), ...(lnpOn.length ? { lnpOn } : {}) } : null;
+  return vsOn.length && vsCoal.length ? { house: "RedBridge/Accent", vsOn, vsCoal, elec2025r, elec2025p, bys, ...(demos.length ? { demos } : {}), ...(demosOn.length ? { demosOn } : {}), ...(lnpOn.length ? { lnpOn } : {}) } : null;
 })();
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null
