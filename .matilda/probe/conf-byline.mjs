@@ -85,9 +85,17 @@ const pollHead = await page.evaluate(() => document.querySelector(".rd-ap-open .
 check(pollHead.includes("published by ") && (pollHead.startsWith("Conducted on ") || pollHead.startsWith("From ")),
   `poll row sentence intact (${JSON.stringify(pollHead.slice(0, 60))}…)`);
 
-/* SOURCE pin: confidence rows byline the house slot, not the product-slot client */
+/* SOURCE pins: confidence rows byline the house slot, not the product-slot
+   client; and "commissioned" is gated to the non-masthead client registry
+   (think tanks and campaign groups, user calls 2026-10-15) - mastheads
+   keep "published by". */
 const src = await import("fs").then((fs) => fs.default.readFileSync(path.resolve(process.cwd(), ".build/newtracker/assets/rd-allpolls.jsx"), "utf8"));
-check(src.includes('"published by " + (p.conf ? p.pollster : p.client'), "rdPollHead bylines the house on confidence rows");
+check(src.includes('const selfBy = p.conf || !(p.client && !/^self/i.test(p.client));')
+  && src.includes('(selfBy ? p.pollster : rdApThe(p.client))'),
+  "rdPollHead bylines the house on confidence rows");
+check(src.includes('RD_AP_COMMISSIONED = { "Blueprint Institute": 1, "Climate Council": 1, "Australia Inst.": 1, Amplify: 1 }')
+  && src.includes('const commissioned = !selfBy && RD_AP_COMMISSIONED[p.client]'),
+  "commissioned is gated to the non-masthead clients, published is the rule");
 
 await browser.close();
 console.log(fails ? `FAIL (${fails})` : "ALL CHECKS PASSED");

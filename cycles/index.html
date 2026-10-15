@@ -4859,8 +4859,7 @@ body.rd .rd-ap-th:hover { color: var(--ink); }
 body.rd .rd-ap-th:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body.rd .rd-ap-arr { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 body.rd .rd-ap-th.on .rd-ap-arr { color: var(--ink); }
-body.rd .rd-ap-hfp { line-height: 16px; white-space: nowrap; }
-body.rd .rd-ap-hfsep { font-size: 10px; line-height: 16px; color: var(--ink-faint); }
+body.rd .rd-ap-hfp { display: flex; flex-direction: column; align-items: flex-start; line-height: 16px; white-space: nowrap; }
 body.rd .rd-ap-hpic { position: relative; align-self: stretch; display: block; min-height: 38px; }
 body.rd .rd-ap-scale { position: absolute; inset: 0; }
 body.rd .rd-ap-in { position: absolute; top: 0; bottom: 0; left: 14px; right: 14px; }
@@ -48053,7 +48052,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "url": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf",
     "links": [{
       "k": "cite",
-      "t": "Report (blueprintinstitute.s3.ap-southeast-2.amazonaws.com)",
+      "t": "Report",
       "href": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf",
       "title": "The published report this poll’s figures were read from"
     }]
@@ -90115,8 +90114,8 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       let to = null;
       const lead = /^(?:Conducted on (.*?) )?[Ff]rom $/.exec(from);
       if (lead) to = house + " (" + (lead[1] ? "fieldwork " + lead[1] + ", " : "");else if (from === "Conducted on dates ") to = house + " (fieldwork dates ";else if (from === " from " && head.querySelector(".rd-tbc")) to = ", ";else if (from === "a sample of ") to = "n = ";else if (from === "an unpublished sample") to = "sample not published";else {
-        const by = /^, published by (.*) on (.*)$/.exec(from) || /^, published by (.*)()$/.exec(from);
-        if (by) to = ", " + (by[1] === house ? "self-published" : "published by " + by[1]) + (by[2] ? ", " + by[2] : "") + ")";
+        const by = /^, (published|commissioned) by (.*) on (.*)$/.exec(from) || /^, (published|commissioned) by (.*)()$/.exec(from);
+        if (by) to = ", " + (by[1] === "published" && by[2] === house ? "self-published" : by[1] + " by " + by[2]) + (by[3] ? ", " + by[3] : "") + ")";
       }
       if (to != null && to !== from) edits.push([n, from, to]);
     }
@@ -102886,7 +102885,7 @@ function AllPollsView({
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
-    key: "date",
+    key: "pub",
     dir: -1
   });
   const [facet, setFacet] = useState(urlInit.facet);
@@ -102979,7 +102978,7 @@ function AllPollsView({
   const onFacet = f => {
     setFacet(f);
     setSort({
-      key: "date",
+      key: "pub",
       dir: -1
     });
     setPop(null);
@@ -121310,13 +121309,21 @@ const RD_AP_BARE_CLIENTS = {
   Amplify: 1
 };
 const rdApThe = name => /^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? name : "the " + name;
+const RD_AP_COMMISSIONED = {
+  "Blueprint Institute": 1,
+  "Climate Council": 1,
+  "Australia Inst.": 1,
+  Amplify: 1
+};
 function rdPollHead(p) {
   const tbc = rdEffTbc(p);
   const n = p.sample != null ? React.createElement(React.Fragment, null, "a sample of ", React.createElement("span", {
     className: "rd-nocaps"
   }, p.sample.toLocaleString(), p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? React.createElement(React.Fragment, null, " (", rdEffTbcNote(p), ")") : "")) : "an unpublished sample";
   const out = rdApOut(p.published);
-  const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
+  const selfBy = p.conf || !(p.client && !/^self/i.test(p.client));
+  const commissioned = !selfBy && RD_AP_COMMISSIONED[p.client];
+  const by = (commissioned ? "commissioned by " : "published by ") + (selfBy ? p.pollster : rdApThe(p.client));
   const field = p.field || p.dateLabel;
   if (p.fieldPending) return React.createElement(React.Fragment, null, "Conducted on dates ", rdFieldTbc(p), " from ", n, ", " + by + (out ? " on " + out : ""));
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));
@@ -125117,13 +125124,10 @@ function RdAllPolls(P) {
     className: "rd-ap-hc1"
   }, th("Pollster", "pollster")), React.createElement("span", {
     className: "rd-ap-hfp"
-  }, th("Fieldwork", "date", {
-    title: "Sort by fieldwork, newest first"
-  }), React.createElement("span", {
-    className: "rd-ap-hfsep",
-    "aria-hidden": "true"
-  }, "/"), th("Pub", "pub", {
+  }, th("Published", "pub", {
     title: "Sort by the day the poll came out, newest first"
+  }), th("Fieldwork", "date", {
+    title: "Sort by fieldwork, newest first"
   })), th("Sample", "sample", {
     right: true
   }), React.createElement("span", null), facet === "twopp" && React.createElement(React.Fragment, null, th("Labor v " + (onM ? "One Nation" : "Coalition"), "alp", {
@@ -126273,14 +126277,13 @@ function RdAllPolls(P) {
   }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
-  const consRows = rows.filter(r => r.cons);
   const consFlip = React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": consM,
     title: consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)",
     onClick: consFlipPick
-  }, consM ? "Voting intention" : "Voting consideration", " ", React.createElement("span", {
+  }, consM ? "Voting consideration" : "Voting intention", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
   const consQpop = !consM ? null : React.createElement(RdQPop, {
@@ -126360,9 +126363,7 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, "Vote:"), consFlip, React.createElement("span", {
-    className: "rd-pl-ctl-l"
-  }, consM ? " — consider," : " — intend,", " on " + (consRows.length + " of " + rows.length), " waves"), consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
+  }, "Vote:"), consFlip, consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-ap-ctlslot",
     style: ctlFloor ? {
       minHeight: ctlFloor + "px"
@@ -126643,7 +126644,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Fieldwork/Pub heading sorts the table two ways \u2013 by fieldwork dates (the default) or, on its Pub half, by the day each poll came out, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Published/Fieldwork heading sorts the table two ways \u2013 by the day each poll came out (the default) or, on its Fieldwork half, by fieldwork dates, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {

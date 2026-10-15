@@ -5382,13 +5382,14 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const [consM, setConsM] = useState(urlInit.cons);
   const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
-  /* the archive's default sort is FIELDWORK day, newest first: publication
-     outranked it for half a day (user call 2026-10-13, reversed the same
-     day - publication is now the SECOND sort, reached from the
-     FIELDWORK/PUB column head's Pub half, so the table's resting order
-     speaks its own dates again). Facet hops reset to the same default
-     (onFacet below). */
-  const [sort, setSort] = useState({ key: "date", dir: -1 });
+  /* the archive's default sort is the PUBLISHED day, newest first (user
+     call 2026-10-15: "put pub first, before fieldwork, and call it
+     'PUBLISHED' and have it selected by default" - two days after the
+     fieldwork default it reverses; publication had outranked fieldwork
+     for half a day before that, reversed 2026-10-13). The split head's
+     Published half carries the live sort; facet hops reset to the same
+     default (onFacet below). */
+  const [sort, setSort] = useState({ key: "pub", dir: -1 });
   const [facet, setFacet] = useState(urlInit.facet);
   const [demSplit, setDemSplit] = useState(urlInit.split);   // the demographics facet's split
   const [open, setOpen] = useState(null);     // expanded ROW
@@ -5506,7 +5507,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      prop identity and defeat its memo (the window export in rd-allpolls) */
   const onMeasure = React.useCallback((mv) => { setMeasure(mv); setLead("all"); }, []);
   const onFacet = (f) => {
-    setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
+    setFacet(f); setSort({ key: "pub", dir: -1 }); setPop(null);
     /* the consideration mode is the primary facet's; landing on the facet
        keeps it, leaving drops it (and drops its scope with it, via the
        seed below) */

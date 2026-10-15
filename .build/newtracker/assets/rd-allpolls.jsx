@@ -175,12 +175,17 @@ function rdFieldTbc(p, tabIndex) {
    previous poll carried one, and this came out in the last three weeks;
    older gaps are left unsaid, since some waves never get one). A wave filed
    under a client is "published by the AFR" (mastheads take the article,
-   brands like News24 go bare); a self-published poll is published by its
-   pollster, and says so. A confidence release's "client" is its product
-   line (Consumer Confidence &c), not a publisher - its byline comes from
-   the house slot like a self-published poll's. */
+   brands like News24 go bare; the non-masthead clients take "commissioned"
+   instead - RD_AP_COMMISSIONED below); a self-published poll is published
+   by its pollster, and says so. A confidence release's "client" is its
+   product line (Consumer Confidence &c), not a publisher - its byline
+   comes from the house slot like a self-published poll's. */
 const RD_AP_BARE_CLIENTS = { News24: 1, "Capital Brief": 1, "News.com.au": 1, "News Australia": 1, Amplify: 1 };
 const rdApThe = (name) => (/^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? name : "the " + name);
+/* non-masthead clients: a think tank or campaign group commissions the
+   poll rather than publishing it - "commissioned by", not "published by"
+   (user calls 2026-10-15; the rest of the client list are mastheads) */
+const RD_AP_COMMISSIONED = { "Blueprint Institute": 1, "Climate Council": 1, "Australia Inst.": 1, Amplify: 1 };
 function rdPollHead(p) {
   const tbc = rdEffTbc(p);
   // the figure cluster stays glued so it never splits mid-figure; the
@@ -190,11 +195,14 @@ function rdPollHead(p) {
     ? <>a sample of <span className="rd-nocaps">{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</span></>
     : "an unpublished sample";
   const out = rdApOut(p.published);
-  // a commissioned wave credits its client; a self-published poll is
+  // a filed-under-client wave credits its client; a self-published poll is
   // published by its pollster, and says so. A confidence release keeps its
   // product line (the confidence lane's index name) in the client slot, so
-  // the byline comes from the house slot, not the product.
-  const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
+  // the byline comes from the house slot, not the product. The verb turns
+  // on the client's kind - mastheads publish, non-mastheads commission.
+  const selfBy = p.conf || !(p.client && !/^self/i.test(p.client));
+  const commissioned = !selfBy && RD_AP_COMMISSIONED[p.client];
+  const by = (commissioned ? "commissioned by " : "published by ") + (selfBy ? p.pollster : rdApThe(p.client));
   const field = p.field || p.dateLabel;
   // pending dates read "Conducted on dates TBC" - the sentence shape the
   // probes pin (starts "Conducted on") and the copy card's anchors survive
@@ -2670,17 +2678,18 @@ function RdAllPolls(P) {
   const todayTxt = today ? today.a.toFixed(1) : null;
 
   /* ---- paging, by whole months ---------------------------------------------- */
-  /* the chronological views are the fieldwork sort (the default, restored
-     user call 2026-10-13) and the publication sort (the FIELDWORK/PUB
-     head's Pub half). Rows file under their month ON THE SORT'S BASIS:
-     fieldwork month in the fieldwork view, publication month in the
-     publication one, so a wave that crosses a month-end in the press (the
-     DemosAU MRP - Sep fieldwork, 12 Oct published) always sits beneath a
-     divider its own sort speaks to, never raising a fieldwork divider one
-     place out of monotonic order a la the half day's pub default. The
-     month rows quote the same calendar month's aggregate figures either
-     way. Three of 181 rows record no `published` (the 2025 election and
-     two mid-redesign YouGov waves) - they file at their fieldwork basis in
+  /* the chronological views are the publication sort (PUBLISHED, the
+     default since user call 2026-10-15 - two days as fieldwork-default
+     2026-10-13/14) and the fieldwork sort (the head's second half). Rows
+     file under their month ON THE SORT'S BASIS: publication month in the
+     publication view, fieldwork month in the fieldwork one, so a wave
+     that crosses a month-end in the press (the DemosAU MRP - Sep
+     fieldwork, 12 Oct published) always sits beneath a divider its own
+     sort speaks to, never raising a fieldwork divider one place out of
+     monotonic order a la the half day's ym-keyed grouping. The month rows
+     quote the same calendar month's aggregate figures either way. Three
+     of 181 rows record no `published` (the 2025 election and two
+     mid-redesign YouGov waves) - they file at their fieldwork basis in
      either view. */
   const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
   /* a row's month under the sort's basis: publication month when the pub
@@ -3030,14 +3039,17 @@ function RdAllPolls(P) {
       <span className="rd-ap-hc1">{th("Pollster", "pollster")}</span>
       {/* the date column's head is TWO sorts, halves of one cell (user call
           2026-10-13: "FIELDWORK/PUB - click on fieldwork, it's sorted by
-          fieldwork, click on pub, sorted by publication"). Fieldwork
-          carries the default; the month dividers file by whichever half
-          sits live (gym above). One grid item, two columnheader buttons,
-          the way the primary facet's five sit in one cell */}
+          fieldwork, click on pub, sorted by publication"; Pub promoted to
+          PUBLISHED and first chair two days later, user call 2026-10-15:
+          "put pub first, before fieldwork, and call it 'PUBLISHED' and have
+          it selected by default"). Two nine-letter labels can't share the
+          120px track on one line, so the pair stacks - PUBLISHED above
+          FIELDWORK, the bottom line standing on the shared label baseline
+          (the phrase's slash went with the line). The month dividers file
+          by whichever half sits live (gym above) */}
       <span className="rd-ap-hfp">
+        {th("Published", "pub", { title: "Sort by the day the poll came out, newest first" })}
         {th("Fieldwork", "date", { title: "Sort by fieldwork, newest first" })}
-        <span className="rd-ap-hfsep" aria-hidden="true">/</span>
-        {th("Pub", "pub", { title: "Sort by the day the poll came out, newest first" })}
       </span>
       {th("Sample", "sample", { right: true })}
       <span></span>
@@ -3743,11 +3755,13 @@ function RdAllPolls(P) {
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
             onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
   );
-  const consRows = rows.filter((r) => r.cons);
   const consFlip = (
+    /* label reads the ACTIVE mode, the same contract the 2PP matchup flip
+       above keeps ("Labor v Coalition ⇄" when Coalition is up); the title
+       still announces where a press goes (user call 2026-10-15) */
     <button type="button" className="rd-pl-flip" aria-pressed={consM}
             title={consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)"}
-            onClick={consFlipPick}>{consM ? "Voting intention" : "Voting consideration"} <span aria-hidden="true">⇄</span></button>
+            onClick={consFlipPick}>{consM ? "Voting consideration" : "Voting intention"} <span aria-hidden="true">⇄</span></button>
   );
   const consQpop = !consM ? null : (
     <RdQPop label="What voting consideration figures are, and which waves collected them" align="left">
@@ -3796,7 +3810,7 @@ function RdAllPolls(P) {
         )}
         {facet === "demographics" && !ctlNarrow && splitPicker}
         {facet === "primary" && !ctlNarrow && (
-          <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Vote:</span>{consFlip}<span className="rd-pl-ctl-l">{consM ? " — consider," : " — intend,"}{" on " + (consRows.length + " of " + rows.length)} waves</span>{consQpop}</span>
+          <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Vote:</span>{consFlip}{consQpop}</span>
         )}
       </RdTabs>
       {ctlNarrow && (
@@ -3936,7 +3950,7 @@ function RdAllPolls(P) {
         </RdKey>
       )}
       <HowTo label="How to read this table" paras={[
-        <>Dates are fieldwork; the day the poll came out sits beneath. The Fieldwork/Pub heading sorts the table two ways – by fieldwork dates (the default) or, on its Pub half, by the day each poll came out, with the month dividers filing by that too. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
+        <>Dates are fieldwork; the day the poll came out sits beneath. The Published/Fieldwork heading sorts the table two ways – by the day each poll came out (the default) or, on its Fieldwork half, by fieldwork dates, with the month dividers filing by that too. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
         facet === "twopp" && <>{pub
           ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it."
           : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}

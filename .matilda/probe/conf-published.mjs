@@ -26,7 +26,7 @@ const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!o
 const LANES = [
   { match: (t) => t.includes("ANZ–Roy Morgan"), house: "ANZ–Roy Morgan" },
   { match: (t) => t.includes("Westpac–MI"), house: "Westpac–MI" },
-  { match: (t) => t.includes("Business Confidence") && t.includes("Roy Morgan") && !t.includes("ANZ–Roy"), house: "Roy Morgan" },
+  { match: (t) => t.includes("Business confidence") && t.includes("Roy Morgan") && !t.includes("ANZ–Roy"), house: "Roy Morgan" },
   { match: (t) => t.includes("NAB"), house: "NAB" },
 ];
 const TIME_TAIL = /, \d{1,2} (am|pm)$/;

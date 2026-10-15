@@ -152,12 +152,15 @@
 
   /* The redesign's opened detail has no meta band to re-title: its head
      line reads "Conducted on … from a sample of …, published by ‹name› on
-     …" because the row above it on screen already says the house. The
-     card travels alone, so for the measure the head names the house and
-     pulls the facts into a parenthetical - "YouGov (fieldwork …, n =
-     1,500 …, self-published, …)"; where the by-name IS the house (it
-     publishes its own work) the tail just says "self-published" rather
-     than name the house twice. Text values only: no swap, no size change
+     …" (a self-published house or a masthead client's wave) or "…
+     commissioned by ‹client› on …" (a non-masthead client's wave -
+     RD_AP_COMMISSIONED) because the row above it on screen already says
+     the house. The card travels alone, so for the measure the head names
+     the house and pulls the facts into a parenthetical - "YouGov (fieldwork
+     …, n = 1,500 …, self-published, …)"; where the by-name IS the house
+     (it publishes its own work) the tail just says "self-published"
+     rather than name the house twice, and a client's wave keeps whichever
+     verb the head carried. Text values only: no swap, no size change
      against the measure, and the originals go back afterwards. */
   const retitlePollHead = (panel, house) => {
     const head = (house && panel.querySelector(".rd-apd-h")) || null;
@@ -179,9 +182,12 @@
       else if (from === "a sample of ") to = "n = ";
       else if (from === "an unpublished sample") to = "sample not published";
       else {
-        const by = /^, published by (.*) on (.*)$/.exec(from) || /^, published by (.*)()$/.exec(from);
-        if (by) to = ", " + (by[1] === house ? "self-published" : "published by " + by[1]) +
-          (by[2] ? ", " + by[2] : "") + ")";
+        /* the by clause rides either verb: "published by ‹house›" (self-
+           published) or "commissioned by ‹client›" (user call 2026-10-15
+           - the client commissions, the house publishes) */
+        const by = /^, (published|commissioned) by (.*) on (.*)$/.exec(from) || /^, (published|commissioned) by (.*)()$/.exec(from);
+        if (by) to = ", " + (by[1] === "published" && by[2] === house ? "self-published" : by[1] + " by " + by[2]) +
+          (by[3] ? ", " + by[3] : "") + ")";
       }
       if (to != null && to !== from) edits.push([n, from, to]);
     }

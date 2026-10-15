@@ -3291,6 +3291,8 @@ const CITE_LABEL = {
   "thewest.com.au": "West Australian report", "abc.net.au": "ABC report", "heraldsun.com": "Herald Sun report",
   "pollbludger.net": "Poll Bludger post", "x.com": "Post on X", "twitter.com": "Post on X",
   "australiainstitute.org.au": "Australia Institute report", "climatecouncil.org.au": "Climate Council report",
+  // Blueprint's report sits on a raw S3 host - name it, else it fell back to "Report (<host>)"
+  "blueprintinstitute.s3.ap-southeast-2.amazonaws.com": "Report",
 };
 // the house as its own release is signed (Accent files RedBridge/Accent's)
 const RELEASE_BY = { "RedBridge/Accent": "Accent", Redbridge: "RedBridge", "Spectre Strategy": "Spectre" };

@@ -1,17 +1,22 @@
 /* Probe (run: node .matilda/probe/ap-fieldwork-pub-sort.mjs): the All-polls
-   table's FIELDWORK/PUB two-way sort head (user call 2026-10-13, reverting
-   b4a806e's publication-default sort half a day after it shipped). The date
-   column's head is two sortable halves in one cell: FIELDWORK (the default)
-   and PUB (publication day, newest first); the month dividers file rows by
-   the LIVE half's month - under Pub a wave that crossed a month-end in the
-   press (the DemosAU MRP, September fieldwork / published 12 Oct 2026) sits
-   under OCTOBER, where b4a806e's ym-keyed grouping made 2026-09 a duplicate
-   fragment key and the press says "October" beside a September divider.
-   Pins: the split head renders and defaults to Fieldwork-descending;
-   divider labels are unique + descending in both views; under Pub every
-   row's "released <d> <Mon>" sub names its divider's month; the two views
-   file at least one wave differently; clicking Fieldwork restores the exact
-   default grouping. */
+   table's PUBLISHED/FIELDWORK two-way sort head. The date column's head is
+   two sortable halves in one cell, stacked on two lines: PUBLISHED (the day
+   the poll came out, newest first - the default since user call 2026-10-15,
+   reversing the two-day-old fieldwork default) above FIELDWORK. They stack
+   because the two full words (~170px) can't share the 120px date track on
+   one line - the inline slash phrase overflowed its cell, so the halves go
+   full-word and vertical (the phrase's slash went with the line). The month
+   dividers file rows by the LIVE half's month - a wave that crossed a
+   month-end in the press (the DemosAU MRP, September fieldwork / published
+   12 Oct 2026) sits under OCTOBER in the Published view, where b4a806e's
+   ym-keyed grouping made 2026-09 a duplicate fragment key and the press
+   said "October" beside a September divider.
+   Pins: the split head stacks "Published ▸" over "Fieldwork", slash gone,
+   and defaults to Published-descending; the default view's divider labels
+   are unique + strictly descending and every row's "released <d> <Mon>" sub
+   names its divider's month; the Fieldwork view refiles at least one wave
+   and keeps the same divider invariants; re-clicking Published restores the
+   exact default grouping. */
 import puppeteer from "puppeteer-core";
 import path from "path";
 import process from "process";
@@ -82,63 +87,50 @@ const ymOrderOK = (groups) => {
 const head = await page.evaluate(() => {
   const hfp = document.querySelector(".rd-ap-hfp");
   if (!hfp) return null;
-  const ths = [...hfp.querySelectorAll(".rd-ap-th")].map((t) => ({
+  const els = [...hfp.querySelectorAll(".rd-ap-th")];
+  const ths = els.map((t) => ({
     txt: t.textContent.trim(),
     on: t.classList.contains("on"),
     sort: t.getAttribute("aria-sort"),
     tag: t.tagName.toLowerCase(),
+    top: Math.round(t.getBoundingClientRect().top),
   }));
-  return { ths, sep: !!hfp.querySelector(".rd-ap-hfsep"), ariaSortAttrPresent: ths.some((t) => t.sort) };
+  return { ths, sep: !!hfp.querySelector(".rd-ap-hfsep"), fits: hfp.scrollWidth <= hfp.clientWidth + 1,
+    stacked: els.length === 2 && els[1].getBoundingClientRect().top > els[0].getBoundingClientRect().top + 10 };
 });
 check(!!head && head.ths.length === 2 && head.ths.every((t) => t.tag === "button"),
   `date head is ONE cell of two columnheader buttons (got ${head ? head.ths.map((t) => t.tag + ":" + t.txt).join(" + ") : "NO .rd-ap-hfp"})`);
-check(!!head && /^Fieldwork/.test(head.ths[0].txt) && /^Pub/.test(head.ths[1].txt) && head.sep,
-  `halves read Fieldwork / Pub (got "${head ? head.ths.map((t) => t.txt).join(", ") : "—"}")`);
+check(!!head && /^Published/.test(head.ths[0].txt) && /^Fieldwork/.test(head.ths[1].txt),
+  `halves read Published / Fieldwork, in that order (got "${head ? head.ths.map((t) => t.txt).join(", ") : "—"}")`);
+check(!!head && head.stacked && !head.sep,
+  `the two full-word halves stack in the 120px track, slash gone (tops ${head && head.ths.map((t) => t.top).join("/")})`);
 check(!!head && head.ths[0].on && !head.ths[1].on && head.ths[0].sort === "descending",
-  `Fieldwork half is the live default, descending (on=${head && head.ths.map((t) => t.on).join("/")}, aria-sort=${head && head.ths[0].sort})`);
+  `Published half is the live default, descending (on=${head && head.ths.map((t) => t.on).join("/")}, aria-sort=${head && head.ths[0].sort})`);
+check(!!head && head.fits, "the stacked halves stay inside their cell (no PUBLISHED overflow)");
 
-/* 2. default view = fieldwork filing -------------------------------------- */
+/* 2. default view = publication filing ------------------------------------ */
 const g0 = await groupsOf();
 const o0 = ymOrderOK(g0);
 check(g0.length > 3 && o0.ok, `default dividers unique + strictly descending (${g0.length} groups${o0.uniq ? "" : ", DUPLICATE LABELS"})`);
-
-/* 3. Pub view --------------------------------------------------------------
-   flip via the second half of the split head */
-await page.evaluate(() => {
-  const ths = [...document.querySelectorAll(".rd-ap-hfp .rd-ap-th")];
-  const pub = ths.find((t) => /^Pub/.test(t.textContent.trim()));
-  if (pub) pub.click();
-});
-await page.waitForFunction(
-  () => [...document.querySelectorAll(".rd-ap-hfp .rd-ap-th")].some((t) => /^Pub/.test(t.textContent.trim()) && t.classList.contains("on")),
-  { timeout: 10000 });
-await openFold();
-const g1 = await groupsOf();
-const o1 = ymOrderOK(g1);
-check(g1.length > 3 && o1.ok, `Pub dividers unique + strictly descending (${g1.length} groups${o1.uniq ? "" : ", DUPLICATE LABELS"})`);
-/* every row with a "released" sub must name its Pub divider's month */
-let subbed = 0, mismatched = [];
-for (const g of g1) {
-  const dm = g.lab.match(/^([A-Z][a-z]+) (\d{4})/);
-  if (!dm) continue;
-  for (const r of g.rows) {
-    if (!r.sub || !/^released /.test(r.sub)) continue;
-    subbed++;
-    const sm = MN.find((mn) => new RegExp("released \\d{1,2} " + mn + "\\b").test(r.sub));
-    if (!sm || MNF[MN.indexOf(sm)] !== dm[1]) mismatched.push(`${r.id} (${r.sub}) under ${g.lab}`);
+/* every row with a "released" sub must name its divider's month */
+{
+  let subbed = 0, mismatched = [];
+  for (const g of g0) {
+    const dm = g.lab.match(/^([A-Z][a-z]+) (\d{4})/);
+    if (!dm) continue;
+    for (const r of g.rows) {
+      if (!r.sub || !/^released /.test(r.sub)) continue;
+      subbed++;
+      const sm = MN.find((mn) => new RegExp("released \\d{1,2} " + mn + "\\b").test(r.sub));
+      if (!sm || MNF[MN.indexOf(sm)] !== dm[1]) mismatched.push(`${r.id} (${r.sub}) under ${g.lab}`);
+    }
   }
+  check(mismatched.length === 0 && subbed >= 10,
+    `Published filing: every released sub names its divider's month (${subbed} rows checked${mismatched.length ? "; OFF BASIS: " + mismatched.slice(0, 3).join("; ") : ""})`);
 }
-check(mismatched.length === 0 && subbed >= 10,
-  `Pub filing: every released sub names its divider's month (${subbed} rows checked${mismatched.length ? "; OFF BASIS: " + mismatched.slice(0, 3).join("; ") : ""})`);
-/* the two views must file at least one wave differently (the month-crossing
-   witness - today the DemosAU MRP, Sep fieldwork / 12 Oct published) */
-const key0 = new Map(), key1 = new Map();
-g0.forEach((g) => g.rows.forEach((r) => key0.set(r.id, g.lab)));
-g1.forEach((g) => g.rows.forEach((r) => key1.set(r.id, g.lab)));
-const moved = [...key0.keys()].filter((k) => key1.has(k) && key1.get(k) !== key0.get(k));
-check(moved.length >= 1, `Pub filing refiles at least one wave to its release month (${moved.length ? moved.map((k) => k.split("|")[0]).slice(0, 2).join(", ") + (moved.length > 2 ? " …" : "") : "none - find the new witness if data changed"})`);
 
-/* 4. back to Fieldwork restores the exact default grouping ---------------- */
+/* 3. Fieldwork view ----------------------------------------------------------
+   flip via the second half of the split head */
 await page.evaluate(() => {
   const ths = [...document.querySelectorAll(".rd-ap-hfp .rd-ap-th")];
   const fw = ths.find((t) => /^Fieldwork/.test(t.textContent.trim()));
@@ -148,9 +140,30 @@ await page.waitForFunction(
   () => [...document.querySelectorAll(".rd-ap-hfp .rd-ap-th")].some((t) => /^Fieldwork/.test(t.textContent.trim()) && t.classList.contains("on")),
   { timeout: 10000 });
 await openFold();
+const g1 = await groupsOf();
+const o1 = ymOrderOK(g1);
+check(g1.length > 3 && o1.ok, `Fieldwork dividers unique + strictly descending (${g1.length} groups${o1.uniq ? "" : ", DUPLICATE LABELS"})`);
+/* the two views must file at least one wave differently (the month-crossing
+   witness - today the DemosAU MRP, Sep fieldwork / 12 Oct published) */
+const key0 = new Map(), key1 = new Map();
+g0.forEach((g) => g.rows.forEach((r) => key0.set(r.id, g.lab)));
+g1.forEach((g) => g.rows.forEach((r) => key1.set(r.id, g.lab)));
+const moved = [...key0.keys()].filter((k) => key1.has(k) && key1.get(k) !== key0.get(k));
+check(moved.length >= 1, `Fieldwork filing refiles at least one wave to its fieldwork month (${moved.length ? moved.map((k) => k.split("|")[0]).slice(0, 2).join(", ") + (moved.length > 2 ? " …" : "") : "none - find the new witness if data changed"})`);
+
+/* 4. back to Published restores the exact default grouping ---------------- */
+await page.evaluate(() => {
+  const ths = [...document.querySelectorAll(".rd-ap-hfp .rd-ap-th")];
+  const pb = ths.find((t) => /^Published/.test(t.textContent.trim()));
+  if (pb) pb.click();
+});
+await page.waitForFunction(
+  () => [...document.querySelectorAll(".rd-ap-hfp .rd-ap-th")].some((t) => /^Published/.test(t.textContent.trim()) && t.classList.contains("on")),
+  { timeout: 10000 });
+await openFold();
 const g2 = await groupsOf();
 const same = g2.length === g0.length && g2.every((g, i) => g.lab === g0[i].lab && g.rows.length === g0[i].rows.length && g.rows.every((r, j) => r.id === g0[i].rows[j].id));
-check(same, `Fieldwork re-click restores the exact default grouping (${g2.length} vs ${g0.length} groups)`);
+check(same, `Published re-click restores the exact default grouping (${g2.length} vs ${g0.length} groups)`);
 
 await browser.close();
 console.log(fails ? `FAIL (${fails})` : "ALL CHECKS PASSED");

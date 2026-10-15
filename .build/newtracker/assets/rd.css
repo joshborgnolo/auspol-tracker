@@ -2523,12 +2523,13 @@ body.rd .rd-ap-th:focus-visible { outline: 2px solid var(--accent); outline-offs
    at the inherited 16px it hung lower and pushed the name 1px up */
 body.rd .rd-ap-arr { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 body.rd .rd-ap-th.on .rd-ap-arr { color: var(--ink); }
-/* the FIELDWORK/PUB split head: two sortable halves of the one grid cell
-   (2026-10-13). The halves ride inline like a phrase; the slash is quiet
-   chrome, never a button itself. The wrapper's 16px line keeps the cell's
-   baseline with every sibling label's */
-body.rd .rd-ap-hfp { line-height: 16px; white-space: nowrap; }
-body.rd .rd-ap-hfsep { font-size: 10px; line-height: 16px; color: var(--ink-faint); }
+/* the PUBLISHED/FIELDWORK split head: two sortable halves of the one grid
+   cell, stacked a line each (2026-10-13 as the inline FIELDWORK/PUB phrase
+   with a quiet slash; 2026-10-15 the full "PUBLISHED" word won first chair
+   and the two nine-letter labels, ~170px against the 120px track, stacked
+   - the bottom half still stands on the shared label baseline). The
+   wrapper mimics the column's left edge like the dates beneath */
+body.rd .rd-ap-hfp { display: flex; flex-direction: column; align-items: flex-start; line-height: 16px; white-space: nowrap; }
 body.rd .rd-ap-hpic { position: relative; align-self: stretch; display: block; min-height: 38px; }
 body.rd .rd-ap-scale { position: absolute; inset: 0; }
 body.rd .rd-ap-in { position: absolute; top: 0; bottom: 0; left: 14px; right: 14px; }
