@@ -499,6 +499,10 @@ nav.tabs[aria-label="Poll archives"] {
   /* mirrors the main bar's pinned ☰ lead-in (rd.css): closed up, every gap
      collapsed to the padding's ~10px and the ☰ read as the last tab */
   .sh-tabs.pinned .sh-menu-btn { margin-left: 16px; }
+  /* the pinned ☰ doses the condense back out (~15px → its ~18px resting
+     face); a transform never touches the margin/clearance budget
+     (mirrors rd.css's .tab-menu-ic rule) */
+  .sh-tabs.pinned .sh-menu-ic { transform: scale(1.2); transform-origin: center; }
   .sh-tab { padding: 11px 6px 12px; font-size: 15px; line-height: 19px; }
   .sh-eyebrow { display: none; }
   .sh-score { gap: 6px; }

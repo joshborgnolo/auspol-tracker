@@ -67,6 +67,8 @@ for (const W of [390, 320]) {
   await page.setViewport({ width: W, height: 844 });
   await page.goto(base + "/", { waitUntil: "load" }); await wait(1600);
   const rest = await page.evaluate(gapsOf, ".tabs-set .tab");
+  const icRest = await page.evaluate(
+    () => +document.querySelector(".tab-menu-ic").getBoundingClientRect().width.toFixed(1));
   console.log(`main ${W} rest`, JSON.stringify(rest));
   ok(even(rest), `main ${W}: all five bar items space evenly (${rest.gaps.join("/")})`);
   ok(rest.gaps[3] > 0, `main ${W}: the ☰ is not glued to the tab before it (gap ${rest.gaps[3]})`);
@@ -80,7 +82,13 @@ for (const W of [390, 320]) {
     const s = document.querySelector(".tab-score");
     return s && getComputedStyle(s).opacity === "1" ? s.getBoundingClientRect().left : null;
   });
-  console.log(`main ${W} score`, JSON.stringify(score), "scoreL", scoreBox);
+  /* the pinned icon doses the condense scale out (~15px → its ~18px
+     resting face) so the ☰ never reads as a spindly mark beside the
+     score's full-size numerals (transforms don't shift the layout) */
+  const icPin = await page.evaluate(() => +document.querySelector(".tab-menu-ic").getBoundingClientRect().width.toFixed(1));
+  console.log(`main ${W} score`, JSON.stringify(score), "scoreL", scoreBox, "icon", icRest, "→pin", icPin);
+  ok(icPin >= icRest - 0.6,
+     `main ${W}: the pinned ☰ keeps its resting presence (${icRest} resting → ${icPin} pinned)`);
   ok(scoreBox !== null, `main ${W}: the 2PP score docks`);
   ok(dockedOk(score, W),
      `main ${W}: docked bar closes the tabs up left, the ☰ stands apart (${score.gaps.join("/")})`);

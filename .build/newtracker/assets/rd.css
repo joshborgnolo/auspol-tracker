@@ -595,6 +595,12 @@ body.rd .ts-sep { background: var(--line); }
      the unpinned spread gives it. The tightest rungs trim the lead (and the
      button's trailing pad) so the docked score keeps its clearance. */
   body.rd .tabs.pinned .tab-menu { margin-left: 16px; }
+  /* The icon doses the condense back out: the bar's 0.85 left the ☰ a
+     spindly ~15px mark beside the score's full-size numerals (user: "it
+     looks too small"). A centred 1.2 gives it its resting face back (~18px).
+     A transform can't recompute the flex layout, so neither the lead-in
+     margin above nor the score's clearance at 320 moves a hair. */
+  body.rd .tabs.pinned .tab-menu-ic { transform: scale(1.2); transform-origin: center; }
   body.rd .ts-num { font-size: 15px; }
   body.rd .tab-score { gap: 6px; }
 }
