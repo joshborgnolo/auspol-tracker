@@ -25,6 +25,10 @@
        bug the user reported: DemosAU tips 371-410px on a 390px phone), the
        page never widens; a tap outside puts a touch tip away; a desktop
        mouse click on a RedBridge mark opens that poll in the table;
+     - keys: with the pointer over the section <-/-> walks and wraps the
+       contest row both ways; while the section is on screen Space cycles
+       the region menu (All, inner, outer, regional) - claims released
+       off-screen and off-pointer;
      - the page's two-party flip (the house-lean section's switch) carries
        the tab to Labor v One Nation and back.
    Run against a built tree: node .matilda/probe/flows-ledger.mjs
@@ -172,6 +176,62 @@ for (const w of [1440, 390]) {
     await page.mouse.click(pt.x, pt.y); await wait(900);
     const opened = await page.evaluate(() => document.querySelectorAll(".rd-ldg").length);
     check(opened === 1, `${w}: clicking the mark opens its poll in the table (${pt.label.slice(0, 40)}…)`);
+
+    /* the hover claim hands the arrow keys to the contest row, wrapping
+       through the three matchups; blur first in case an earlier pick left
+       focus on the region menu */
+    await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+    await page.evaluate(() => { const el = document.getElementById("flow-drift"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 80); });
+    await wait(300);
+    const tabsPt = await page.evaluate(() => { const b = document.querySelector("#flow-drift .rd-fl-tabs").getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+    await page.mouse.move(tabsPt.x, tabsPt.y); await wait(150);
+    const onIx = (s) => s.tabs.findIndex((t) => t.on);
+    let walkOk = true, cur = -1;
+    for (const want of [1, 2, 0]) { await page.keyboard.press("ArrowRight"); await wait(160); cur = onIx(await read(page)); if (cur !== want) walkOk = false; }
+    check(walkOk, `${w}: the hover arrow walk steps the contests right and wraps to Labor v Coalition`);
+    walkOk = true;
+    for (const want of [2, 1, 0]) { await page.keyboard.press("ArrowLeft"); await wait(160); cur = onIx(await read(page)); if (cur !== want) walkOk = false; }
+    check(walkOk, `${w}: the hover arrow walk steps the contests left and wraps back`);
+
+    /* Space cycles the region menu while the section is on screen, and
+       keeps its scroll day job once the whole section is off it. Park
+       deep enough into the section that the earlier Space claimants
+       (the table, house-lean) no longer intersect - they would win the
+       key (listeners fire in registration order) */
+    const regVal = () => page.$eval('#flow-drift select[aria-label="Region"]', (el) => el.value);
+    let regsOk = (await regVal()) === "";
+    await page.evaluate(() => {
+      const el = document.getElementById("flow-drift");
+      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + Math.min(260, Math.max(0, el.offsetHeight - innerHeight - 100)));
+    });
+    await wait(350);
+    const neighboursOut = await page.evaluate(() => ["rd-ap-top", "house-lean"].every((id) => { const r = document.getElementById(id).getBoundingClientRect(); return r.bottom <= 0 || r.top >= innerHeight; }));
+    check(neighboursOut, `${w}: parked inside the flows section with the table and house-lean off-screen`);
+    for (const want of ["inner", "outer", "regional", ""]) { await page.keyboard.press("Space"); await wait(160); if ((await regVal()) !== want) regsOk = false; }
+    check(regsOk, `${w}: Space cycles the regions All → Inner metro → Outer metro → Regional → All`);
+    /* off-screen the flows claim releases. The section is the view's
+       last, so it can't be scrolled out below; parked just above it
+       (where house-lean legitimately owns Space) the menu is untouched */
+    await page.evaluate(() => { const el = document.getElementById("flow-drift"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - innerHeight - 100); });
+    await wait(350);
+    const fullyOut = await page.evaluate(() => { const r = document.getElementById("flow-drift").getBoundingClientRect(); return r.bottom <= 0 || r.top >= innerHeight; });
+    check(fullyOut, `${w}: scrolled clear of the flows section`);
+    const regRest = await regVal();
+    await page.keyboard.press("Space"); await wait(400);
+    check((await regVal()) === regRest, `${w}: off-screen, Space leaves the flows menu be`);
+
+    /* pointer off the section: the claim is gone and the page-level walk
+       resumes (page-turn check goes last - it unmounts the section). The
+       parked spot must itself be claim-free - the table, the disagreement
+       panel and house-lean all claim the arrows - so the tile band at the
+       document's end is the spot */
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await wait(300);
+    await page.mouse.move(720, 870); await wait(150);
+    const spotFree = await page.evaluate(() => { const el = document.elementFromPoint(720, innerHeight - 30); return el ? !el.closest("#flow-drift, #rd-ap-top, #house-lean, #poll-disagreement") : true; });
+    check(spotFree, `${w}: pointer parked on a claim-free spot`);
+    await page.keyboard.press("ArrowRight"); await wait(700);
+    check(await page.evaluate(() => !document.getElementById("flow-drift")), `${w}: pointer off the section, the claim yields to the page walk`);
   }
   check(errs.length === 0, `${w}: no page errors${errs.length ? " (" + errs[0].slice(0, 160) + ")" : ""}`);
   await page.close();

@@ -15,7 +15,7 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/jav
 const server = createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end(); }
@@ -38,7 +38,6 @@ await sleep(700);
 const label = async () => page.$eval("#house-lean .rd-pl-flip", (el) => el.textContent.replace(/\s+/g, " ").trim());
 const sideOf = (t) => (t.includes("Coalition") ? "co" : t.includes("One Nation") ? "on" : "?");
 const activeTag = () => page.evaluate(() => (document.activeElement ? document.activeElement.tagName : ""));
-const hash = () => page.evaluate(() => (window.location.hash || "").replace(/^#/, "") || "snapshot");
 const showLean = async () => {
   await page.evaluate(() => {
     document.getElementById("house-lean").scrollIntoView({ block: "start" });
@@ -124,7 +123,7 @@ await sleep(400);
 const g1 = await label();
 expect(sideOf(g1) === sideOf(g0), "P5: off-viewport Space leaves the contest alone");
 
-expect((await hash()) === "allpolls", "page stayed on allpolls throughout");
+expect(new URL(page.url()).pathname === "/allpolls/", "page stayed on allpolls throughout");
 
 console.log(fails.length ? "RESULT: FAIL (" + fails.join(" | ") + ")" : "RESULT: OK");
 await browser.close();

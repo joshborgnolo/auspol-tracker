@@ -5177,6 +5177,47 @@ function RdFlows({ measure }) {
   const [tip, setTip] = useState(null);       // the ledger's one open tip: { ck, id, src }
   const ledger = useRef(null);
   window.useDismissOutside(ledger, !!(tip && tip.src === "touch"), () => setTip(null));
+  /* hovering the section hands the arrow keys to the contest row, wrapping
+     through the matchups the row's own walk does (the claim never survives
+     the pointer leaving the section); the live tab list drops Coalition v
+     One Nation on a jurisdiction with no forced-choice answers */
+  useHoverClaim("flow-drift", true, null, (e) => {
+    const list = window.AUSPOL.flowForced ? FL_TABS : FL_TABS.filter((t) => t.id !== "ln");
+    const i = list.findIndex((t) => t.id === q);
+    if (i < 0 || list.length < 2) return false;
+    const nxt = list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length].id;
+    setQ(nxt); setTip(null);
+    return true;
+  }, [q]);
+  /* Space cycles the region menu while the section is on screen - the
+     all-polls table's and house lean's viewport claim, over the ledger's
+     own select; with no menu (a jurisdiction without forced-choice
+     answers) the key keeps its scroll day job */
+  const spaceReg = React.useRef(null);
+  spaceReg.current = FF ? () => {
+    setFfReg((r) => FF_REGIONS[(FF_REGIONS.findIndex(([k]) => k === r) + 1) % FF_REGIONS.length][0]);
+    setTip(null);
+  } : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("flow-drift");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver((es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceReg.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceReg.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
   const tabsRef = useRef(null);
   /* a phone's tab strip scrolls (see rd.css), so a pick - a tap, a swipe
      under the strip, or the page's two-party flip from elsewhere - glides

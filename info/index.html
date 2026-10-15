@@ -128490,6 +128490,47 @@ function RdFlows({
   const [tip, setTip] = useState(null);
   const ledger = useRef(null);
   window.useDismissOutside(ledger, !!(tip && tip.src === "touch"), () => setTip(null));
+  useHoverClaim("flow-drift", true, null, e => {
+    const list = window.AUSPOL.flowForced ? FL_TABS : FL_TABS.filter(t => t.id !== "ln");
+    const i = list.findIndex(t => t.id === q);
+    if (i < 0 || list.length < 2) return false;
+    const nxt = list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length].id;
+    setQ(nxt);
+    setTip(null);
+    return true;
+  }, [q]);
+  const spaceReg = React.useRef(null);
+  spaceReg.current = FF ? () => {
+    setFfReg(r => FF_REGIONS[(FF_REGIONS.findIndex(([k]) => k === r) + 1) % FF_REGIONS.length][0]);
+    setTip(null);
+  } : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("flow-drift");
+    if (!sec) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(sec);
+    const key = e => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceReg.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceReg.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const tabsRef = useRef(null);
   useEffect(() => {
     const btn = tabsRef.current && tabsRef.current.querySelector('.rd-fl-tabs [aria-pressed="true"]');
@@ -130955,7 +130996,7 @@ const KBD_ROWS = [{
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
-  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; step the all-polls demographics split"
+  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; step the all-polls demographics split and the preference-flows region menu"
 }, {
   keys: ["P"],
   what: "In the all-polls two-party table, published figures only"

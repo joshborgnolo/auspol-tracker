@@ -432,6 +432,22 @@ auspol-headless-geometry-verify. Selection-guard phases must drive
   for the missing effect BEFORE touching rdTabsKey. Probe:
   `.matilda/probe-hover-mood.mjs` (port 9010) — both wraps on the
   2-tab row, focused-tab priority, off-panel page-turn last.
+- **Preference flows ledger** (`RdFlows`, section `#flow-drift`,
+  rd-allpolls.jsx ~:5184; 2026-10-15) — `useHoverClaim("flow-drift",
+  true, null, handler, [q])` steps the contest tabs
+  (`FL_TABS` co/on/ln) with modulo wrap both ways, `setTip(null)` on a
+  step. The handler rebuilds the tab LIST from `window.AUSPOL.
+  flowForced ? FL_TABS : FL_TABS.filter(t => t.id !== "ln")` — /vic/
+  has no Coalition-v-One-Nation tab, so the walk must enumerate the
+  visible tabs, never the constant. The ledger's region menu separately
+  holds a SPACE viewport claim — that's in
+  auspol-spacebar-viewport-claim. Probe gotcha: a negative "claim
+  yields to the page walk" phase CANNOT park the pointer inside
+  `#house-lean` (rd-allpolls.jsx ~:4422 carries its OWN arrow claim —
+  the keydown arrives defaultPrevented and it looks like the new claim
+  leaked); park at the document bottom, guarded by an
+  `elementFromPoint` not-in-any-claim assert. Probe: the desktop block
+  of `.matilda/probe/flows-ledger.mjs`.
 
 ## Probe harness (reusable)
 
