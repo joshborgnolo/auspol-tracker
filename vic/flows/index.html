@@ -291,6 +291,10 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+body.js:not(.ss-view) .static-summary {
+  max-height: var(--app-h, none);
+  overflow: hidden;
+}
 html.boot body { visibility: hidden; }
 body.js.ss-view .static-summary { opacity: 1; pointer-events: auto; }
 body.js.ss-view #root { display: none; }
@@ -64887,6 +64891,10 @@ if (staticSummary) {
   const setStaticSummaryHeight = () => document.documentElement.style.setProperty("--ss-h", staticSummary.offsetHeight + "px");
   setStaticSummaryHeight();
   new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
+  const appRoot = document.getElementById("root");
+  if (appRoot) new ResizeObserver(() => {
+    if (appRoot.offsetHeight) document.documentElement.style.setProperty("--app-h", appRoot.offsetHeight + "px");
+  }).observe(appRoot);
   staticSummary.setAttribute("aria-hidden", "true");
   staticSummary.inert = true;
 }

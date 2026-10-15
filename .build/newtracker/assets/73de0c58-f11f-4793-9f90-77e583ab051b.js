@@ -2879,6 +2879,12 @@ if (staticSummary) {
   /* webfonts swap in after mount and re-lay the article out; the pull-up
      must follow its height or a seam opens where it stood */
   new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
+  /* the app's own height caps the article's (template.html: a tab swap
+     keeps the loaded page's article, which can outrun a shorter view) */
+  const appRoot = document.getElementById("root");
+  if (appRoot) new ResizeObserver(() => {
+    if (appRoot.offsetHeight) document.documentElement.style.setProperty("--app-h", appRoot.offsetHeight + "px");
+  }).observe(appRoot);
   /* opacity:0 hides it from EYES and from nothing else. A screen reader still
      walked the whole article - 3,690 characters, seven headings and a second
      <h1> - and then walked the app and heard every figure again. The comment

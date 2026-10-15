@@ -401,6 +401,17 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+/* ...and never taller than the app. The article is the page you LOADED,
+   and a tab swap keeps it: arriving at a menu page from Now left Now's
+   2,632px article standing under a 1,336px view, ~1,300px of blank page
+   below the colophon (2026-10-15). Capped at the app's height (--app-h,
+   from the mount script) the swap can't leave it longer than the view; on
+   the page that was loaded the article is always the shorter, so nothing is
+   clipped there. The plain-text view (ss-view) shows it whole. */
+body.js:not(.ss-view) .static-summary {
+  max-height: var(--app-h, none);
+  overflow: hidden;
+}
 /* Nothing paints before the app's first commit. The article used to stand
    in for those frames, so every load showed a different page for a beat and
    then the site. html.boot (set by the script at the top of <body>) hides the
