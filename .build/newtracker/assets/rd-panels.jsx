@@ -2675,6 +2675,39 @@ function RdDemographics({ rangeId = "all" }) {
       document.removeEventListener("keydown", key, true);
     };
   }, [tabId]);
+  /* Space walks the party chips while the panel is on screen - the
+     viewport claim, not the pointer (the primary panel's group menu, the
+     latest card's flip and the house-lean flip are the same claim on
+     their own sections): the chips' left-to-right order the digits 1..5
+     number, One Nation round again after Others. With no demographics
+     payload (/vic/) the panel never mounts and Space keeps its scroll
+     day job. */
+  const spaceParty = React.useRef(null);
+  spaceParty.current = T && T.tabs && T.tabs.length ? () => {
+    const i = DEMO_PARTIES.findIndex((x) => x.id === party);
+    pickParty(DEMO_PARTIES[(i + 1) % DEMO_PARTIES.length].id);
+  } : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("who-votes");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver(
+      (es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceParty.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceParty.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
   /* each party's charts, built once per grouping and range: a switch
      re-renders every frame, and rebuilding both parties' lines and poll
      dots (a pass over every poll) on each one starved the dot plot's own

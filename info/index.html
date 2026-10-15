@@ -113826,6 +113826,38 @@ function RdDemographics({
       document.removeEventListener("keydown", key, true);
     };
   }, [tabId]);
+  const spaceParty = React.useRef(null);
+  spaceParty.current = T && T.tabs && T.tabs.length ? () => {
+    const i = DEMO_PARTIES.findIndex(x => x.id === party);
+    pickParty(DEMO_PARTIES[(i + 1) % DEMO_PARTIES.length].id);
+  } : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("who-votes");
+    if (!sec) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(sec);
+    const key = e => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceParty.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceParty.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const chartCache = React.useRef({});
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
@@ -130996,7 +131028,7 @@ const KBD_ROWS = [{
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
-  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; step the all-polls demographics split and the preference-flows region menu"
+  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; step the all-polls demographics split and the preference-flows region menu"
 }, {
   keys: ["P"],
   what: "In the all-polls two-party table, published figures only"

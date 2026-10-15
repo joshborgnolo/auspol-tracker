@@ -1,6 +1,6 @@
 ---
 name: auspol-spacebar-viewport-claim
-description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). SIX claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), and the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
+description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). SEVEN claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), and the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2677 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
 source: auto-skill
 extracted_at: '2026-10-08T12:24:30.482Z'
 ---
@@ -80,7 +80,7 @@ Load-bearing details, in order of subtlety:
    ensure only one can be live (the comment on the house-lean block
    documents this explicitly).
 
-## The six claim sites
+## The seven claim sites
 
 - **All-polls table** (a1c620d) — rd-allpolls.jsx ~:2363-2405,
   `#rd-ap-top`: table-level spaceFlip + splitWalk + pubFlip (Space
@@ -128,8 +128,28 @@ Load-bearing details, in order of subtlety:
   check is "scrolled clear above → Space leaves the menu untouched",
   not "scrolled below" (impossible). Pinned in the desktop block of
   `.matilda/probe/flows-ledger.mjs`.
+- **Who-votes party chips** (2026-10-15) — rd-panels.jsx ~:2677-2709
+  in `RdDemographics`, section `#who-votes`: `spaceParty.current`
+  steps the party chips in DEMO_PARTIES order — onp One Nation → alp
+  Labor → lnp Coalition → grn Greens → oth Others → wrap to onp, the
+  same order the 1..5 digit keys number — via `pickParty` (the same
+  rdPinScroll + chooseParty morph a chip click runs), modulo:
+  `DEMO_PARTIES[(findIndex(party) + 1) % 5]`. Ref nulled when
+  `!T || !T.tabs || !T.tabs.length` — the panel never mounts without
+  the demographics payload (/vic/), so Space keeps its scroll day job
+  there. Same canonical IO block and guards (incl. shift). Probe:
+  `.matilda/probe/wv-space-party.mjs` (port 9023, 12 checks) — parks
+  the page where ONLY `#who-votes` of {two-party, latest-polls,
+  primary-vote, who-votes} claims, walks five steps asserting the
+  wrap, asserts scrollY never moved, pins that a FOCUSED chip natively
+  activates (pressed becomes THAT chip, not the next), and finds the
+  negative spot by scanning below the panel for a y that is both
+  claim-free AND ≥60px above `scrollHeight - innerHeight` (the page
+  bottom itself has no scroll left, so the negative check fails
+  spuriously if parked there). Keysheet copy rides the shared `Space`
+  row of KBD_ROWS.
 
-## Probe gotchas (first two cost a cycle in hl-space-flip; the rest in pv-group-select)
+## Probe gotchas (first two cost a cycle in hl-space-flip; pv-group-select and wv-space-party paid for the rest)
 
 1. **Blur after any tab/button click before the Space phase.** A probe
    that clicks a measure tab then presses Space will see the button
@@ -177,3 +197,16 @@ Load-bearing details, in order of subtlety:
    sequence straight from the rendered `<select>`'s `<option>`s —
    it pins both the cycle order and that the walk covers every option
    (26 = All voters + 25 groups on the primary panel).
+7. **The negative spot needs scroll HEADROOM, not just claim-freedom.**
+   Parking at `document.body.scrollHeight - innerHeight` (the page
+   bottom) to get clear of every claim leaves Space with nowhere to
+   scroll — "off-claim Space scrolls" fails on the floor, not on a
+   bug. Scan downward for a y that is claim-free AND
+   `scrollY < scrollHeight - innerHeight - 60` before pressing (the
+   wv-space-party probe found 7900 that way).
+8. **Native Space ACTIVATES a focused button.** The claim stands
+   aside for any focused control — so a focused chip/tab gets
+   natively pressed (`aria-pressed`/`aria-selected` flips to THAT
+   control, not the next in the walk). Pin the focused-case
+   expectation accordingly ("focused control owns Space"), then blur
+   and assert the claim resumes its walk from there.
