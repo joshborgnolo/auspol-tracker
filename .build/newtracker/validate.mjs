@@ -180,13 +180,13 @@ export function validate(D) {
         fail("cons-basis", `consBasis too long on ${p.pollster} ${p.date}: ${p.consBasis}`);
       // 2b1cb. the extra tiers around the canonical firm-intent map:
       //      RedBridge/Accent's April 2026 0–10 propensity battery (loose
-      //      = 4–10 of 10, canonical = 7+ of 10, never = 0 of 10) and
-      //      Essential's Feb/June 2026 banding (canonical = "definitely
-      //      vote", loose = definitely + open, never = "would never
-      //      vote"). Tiers ride the canonical vocabulary, need the
-      //      canonical map beside them, and loose must never dip below
-      //      the canonical share on a shared key.
-      for (const f of ["considerationLoose", "considerationNever"]) {
+      //      = 4–10 of 10, canonical = 7+ of 10, not = 0–3 of 10, never
+      //      = 0 of 10) and Essential's Feb/June 2026 banding
+      //      (canonical = "definitely vote", loose = definitely + open,
+      //      never = "would never vote"). Tiers ride the canonical
+      //      vocabulary, need the canonical map beside them, and loose
+      //      must never dip below the canonical share on a shared key.
+      for (const f of ["considerationLoose", "considerationNot", "considerationNever"]) {
         if (p[f] == null) continue;
         if (!["RedBridge/Accent", "Essential"].includes(p.pollster))
           fail("cons-tier-pollster", `${f} on a row for ${p.pollster}`);
@@ -201,7 +201,7 @@ export function validate(D) {
             fail("cons-tier-order", `${f}.${k} = ${v} below canonical ${p.consideration[k]}`);
         }
       }
-    } else if (p.consBasis != null || p.considerationLoose != null || p.considerationNever != null)
+    } else if (p.consBasis != null || p.considerationLoose != null || p.considerationNot != null || p.considerationNever != null)
       fail("cons-basis", `consBasis/tier fields without consideration on ${p.pollster} ${p.date}`);
     // 2b1d. softAge – Resolve's "not firm" share by age band, the three
     //      bands or none, each a percentage.

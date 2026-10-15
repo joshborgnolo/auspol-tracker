@@ -3890,12 +3890,18 @@
         "grn": 24,
         "onp": 37
       },
-      "consBasis": "Would seriously consider (7+/10)",
+      "consBasis": "Would seriously consider (≥7/10)",
       "considerationLoose": {
         "alp": 62,
         "lnp": 59,
         "grn": 45,
         "onp": 53
+      },
+      "considerationNot": {
+        "alp": 63,
+        "lnp": 55,
+        "grn": 62,
+        "onp": 69
       },
       "considerationNever": {
         "alp": 21,

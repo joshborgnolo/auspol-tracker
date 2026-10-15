@@ -1980,6 +1980,14 @@ function rdLgLines(p, { onM, demSplit }) {
         <U soft>{tier.note}</U>
       </> });
     }
+    if (p.consNot) {
+      const tier = rdApConsTier(p, "not");
+      const ks4 = ORDER.filter((k) => p.consNot[k] != null);
+      out.push({ id: "consnot", lab: tier.led, body: <>
+        {ks4.map((k) => <U key={k}>{pty(k, rdApNum(p.consNot[k]))}</U>)}
+        <U soft>{tier.note}</U>
+      </> });
+    }
     if (p.consNever) {
       const tier = rdApConsTier(p, "never");
       const ks3 = ORDER.filter((k) => p.consNever[k] != null);
@@ -2504,7 +2512,8 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
    sums). */
 const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
-    loose: { tab: "Would consider (4+/10)", led: "Would consider (4+/10)", note: "rated 4+/10, rebased over everyone" },
+    loose: { tab: "Would consider (≥4/10)", led: "Would consider (≥4/10)", note: "rated ≥4/10, rebased over everyone" },
+    not: { tab: "Would not vote (≤3/10)", led: "Would not vote (≤3/10)", note: "rated ≤3/10, rebased over everyone" },
     never: { tab: "Would never vote (0/10)", led: "Would never vote (0/10)", note: "rated 0/10, rebased over everyone" },
   },
   Essential: {
@@ -2518,9 +2527,9 @@ const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIE
    add a switch/cycle button through the different ranges, right where it
    denotes the basis"). A wave whose consideration question came in more
    than one range - RedBridge/Accent's April 2026 0-10 battery, or
-   Essential's Feb/June 2026 definitely/open/never banding, file the
-   three tiers of tiers[] - shows ONE range at a time, canonical first,
-   and the basis label is a button stepping through them, figures and
+   Essential's Feb/June 2026 definitely/open/never banding, file as
+   tiers of tiers[] - shows ONE range at a time, canonical first, and
+   the basis label is a button stepping through them, figures and
    strip moving together. The state is per row and ephemeral: the sort,
    the story, the ledger (which lists every range) and the header scale
    all read the canonical range regardless. */
@@ -2969,8 +2978,8 @@ function RdAllPolls(P) {
   const ldTicks = [];
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
   /* the primary strip's scale: consideration figures run past 60 on
-     Essential's and RedBridge/Accent's looser tiers, intention tops out
-     near 40 */
+     Essential's and RedBridge/Accent's looser tiers (the would-not tier
+     tops 69), intention tops out near 40 */
   const PMAX = (facet === "primary" && consM) ? 70 : 45;
   const PTKS = [];
   for (let v = 0; v < PMAX; v += 10) PTKS.push(v);
@@ -3325,6 +3334,7 @@ function RdAllPolls(P) {
       const tiers = !(consM && p.cons) ? null
         : [{ m: p.cons, lab: p.consBasis || "Would consider" }]
           .concat(p.consLoose ? [{ m: p.consLoose, lab: rdApConsTier(p, "loose").tab }] : [])
+          .concat(p.consNot ? [{ m: p.consNot, lab: rdApConsTier(p, "not").tab }] : [])
           .concat(p.consNever ? [{ m: p.consNever, lab: rdApConsTier(p, "never").tab }] : []);
       const primNums = (m) => <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>)}</span>;
       const primStrip = (m, ariaPre) => {

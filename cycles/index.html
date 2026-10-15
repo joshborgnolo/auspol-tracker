@@ -66482,12 +66482,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": 24,
       "onp": 37
     },
-    "consBasis": "Would seriously consider (7+/10)",
+    "consBasis": "Would seriously consider (≥7/10)",
     "consLoose": {
       "alp": 62,
       "lnp": 59,
       "grn": 45,
       "onp": 53
+    },
+    "consNot": {
+      "alp": 63,
+      "lnp": 55,
+      "grn": 62,
+      "onp": 69
     },
     "consNever": {
       "alp": 21,
@@ -124198,6 +124204,19 @@ function rdLgLines(p, {
         }, tier.note))
       });
     }
+    if (p.consNot) {
+      const tier = rdApConsTier(p, "not");
+      const ks4 = ORDER.filter(k => p.consNot[k] != null);
+      out.push({
+        id: "consnot",
+        lab: tier.led,
+        body: React.createElement(React.Fragment, null, ks4.map(k => React.createElement(U, {
+          key: k
+        }, pty(k, rdApNum(p.consNot[k])))), React.createElement(U, {
+          soft: true
+        }, tier.note))
+      });
+    }
     if (p.consNever) {
       const tier = rdApConsTier(p, "never");
       const ks3 = ORDER.filter(k => p.consNever[k] != null);
@@ -124867,9 +124886,14 @@ function RdApSheet({
 const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
     loose: {
-      tab: "Would consider (4+/10)",
-      led: "Would consider (4+/10)",
-      note: "rated 4+/10, rebased over everyone"
+      tab: "Would consider (≥4/10)",
+      led: "Would consider (≥4/10)",
+      note: "rated ≥4/10, rebased over everyone"
+    },
+    not: {
+      tab: "Would not vote (≤3/10)",
+      led: "Would not vote (≤3/10)",
+      note: "rated ≤3/10, rebased over everyone"
     },
     never: {
       tab: "Would never vote (0/10)",
@@ -125747,6 +125771,9 @@ function RdAllPolls(P) {
       }].concat(p.consLoose ? [{
         m: p.consLoose,
         lab: rdApConsTier(p, "loose").tab
+      }] : []).concat(p.consNot ? [{
+        m: p.consNot,
+        lab: rdApConsTier(p, "not").tab
       }] : []).concat(p.consNever ? [{
         m: p.consNever,
         lab: rdApConsTier(p, "never").tab

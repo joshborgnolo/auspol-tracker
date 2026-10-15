@@ -3443,11 +3443,12 @@ const individualPolls = POLLS.map((p) => {
     // voting for" shares; YouGov News24/serious waves, Essential's
     // consideration module, YouGov (MRP)'s Climate Council and Blueprint
     // Institute waves, and RedBridge/Accent's April 2026 0–10 propensity
-    // battery filed as three tiers – the canonical map minus the
-    // looser/never pair) – absent where a wave asked no consideration
+    // battery filed as four tiers – the canonical map plus the looser/
+    // not/never triple) – absent where a wave asked no consideration
     // question; display-only
     ...(p.consideration ? { cons: p.consideration, consBasis: p.consBasis,
       ...(p.considerationLoose ? { consLoose: p.considerationLoose } : {}),
+      ...(p.considerationNot ? { consNot: p.considerationNot } : {}),
       ...(p.considerationNever ? { consNever: p.considerationNever } : {}) } : {}),
     /* RedBridge/Accent's cohort forced-choice figures (absent-not-zero):
        the Labor share when Coalition voters are pressed into Labor-v-One
@@ -3721,6 +3722,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // voting consideration, same as the archive emitter above
     ...(p.consideration ? { cons: p.consideration, consBasis: p.consBasis,
       ...(p.considerationLoose ? { consLoose: p.considerationLoose } : {}),
+      ...(p.considerationNot ? { consNot: p.considerationNot } : {}),
       ...(p.considerationNever ? { consNever: p.considerationNever } : {}) } : {}),
     // RedBridge/Accent's cohort forced-choice figures, same as the archive
     // emitter above (Latest-detail opens read this row set)
