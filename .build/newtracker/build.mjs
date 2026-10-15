@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
-import { shellCss, shellJs, shellDrift, mainChrome, applyShell, shellOptsFor } from "../site-shell.mjs";
+import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -200,12 +200,9 @@ const FONTS = [
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
-  /* IBM Plex Mono – the change log page's console (changelogPage below), and
-     nothing on the main page: pageOnly faces are hashed into assets/fonts/
-     and kept by the sweep, but never spliced into the template's
-     @font-face block, so the app documents don't carry them. */
-  { file: "ibmplexmono-400-latin.woff2",        family: "IBM Plex Mono", style: "normal", weight: "400", pageOnly: true },
-  { file: "ibmplexmono-600-latin.woff2",        family: "IBM Plex Mono", style: "normal", weight: "600", pageOnly: true },
+  /* IBM Plex Mono went with the change log page's console (it became a tab
+     page 2026-10-15, set in the page's own type); both subsets stay in
+     fonts/ for re-registration. */
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });
@@ -676,310 +673,25 @@ function ssAboutBlock(L, prim, acc) {
         is what the MRP tag in the archive marks.</p>`;
 }
 
-/* The Info tab's static change log: the latest entries from
-   data/changelog.json (gen-data §8d, appended on each site refresh), so the
-   standalone info article carries what the live tab lists. Federal only – a
-   VIC build never has the file. Caller supplies its esc. */
+/* The Changelog tab page's static article: every entry of
+   data/changelog.json (gen-data §8d, appended on each site refresh), newest
+   first – a crawler or no-JS reader gets the whole run; the live tab
+   renders the same list from D.changelog. Federal only – a VIC build never
+   has the file. Caller supplies its esc. */
 function ssChangelogBlock(esc) {
   let C = null;
   try { C = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")); } catch { /* absent on first build */ }
   if (!C || !Array.isArray(C.entries) || !C.entries.length) return "";
-  const rows = [...C.entries].reverse().slice(0, 10).map((e) => `
+  const rows = [...C.entries].reverse().map((e) => `
       <p class="info-about-p"><time class="info-cl-date" datetime="${esc(e.date)}">${esc(e.label)}</time>
         ${esc(e.text)}${e.links ? e.links.map((l) => ` <a class="fb-link" href="${esc(l.url)}">${esc(l.name)} &#8599;</a>`).join("")
           : e.url ? ` <a class="fb-link" href="${esc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</p>`).join("");
   return `
 
-      <h2>Change log</h2>
-      <p>What has moved the aggregate&#8217;s two-party preferred estimate, and when each statistical
-        finding appeared or fell away &#8211; updated as new polls land. The latest ten entries;
-        <a class="fb-link" href="/changelog/">the change log page</a> lists them all.</p>${rows}`;
-}
-
-/* changelog/index.html – the change log as a page of its own, like the feed:
-   a generated artefact at a stable address, so the list can be linked,
-   crawled and followed outside the app document. The Info tab keeps listing
-   entries inline; this page lists every one of them, newest first, straight
-   from data/changelog.json (gen-data §8d) with the satellites' shared chrome
-   applied (site-shell.mjs applyShell, same as refresh-prediction writes
-   /prediction/). Written on every federal build – a quiet refresh writes the
-   same bytes, so the unattended slots see a clean tree; the Vic pass exits
-   long before here, so a Vic dataset never gets the page.
-   The head is the main page's (rd.css): a kicker in the .rd-title cut over
-   a Crimson 700 .rd-hed, then the dek, on the shell's own .sh-frame so the
-   column's edge is the masthead's. The entries sit in a console set in IBM
-   Plex Mono (user, 2026-10-12: "a
-   monospace font … a bit of a cool environment") – one line per entry,
-   ISO date, kind tag, text, the figures lit like syntax. */
-const CL_KIND = {
-  poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start",
-};
-function changelogPage() {
-  let entries = [];
-  try { entries = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || []; } catch {}
-  const hesc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  /* figures and arrows lit like syntax; hesc never writes a digit, so the
-     number pass can't land inside an entity it made */
-  const lit = (s) => hesc(s)
-    .replace(/(\d[\d,]*(?:\.\d+)?%?)/g, '<span class="cl-n">$1</span>')
-    .replace(/→/g, '<span class="cl-ar">→</span>');
-  const newest = [...entries].reverse();
-  const rows = newest.map((e, i) => {
-    const kind = CL_KIND[e.kind] ? e.kind : "meta";
-    const rep = i > 0 && newest[i - 1].date === e.date;
-    return `
-      <li class="cl-e cl-k-${kind}"><time class="cl-date${rep ? " cl-rep" : ""}" datetime="${hesc(e.date)}">${hesc(e.date)}</time><span class="cl-tag">${CL_KIND[kind]}</span><p class="cl-text">${lit(e.text)}${e.links ? e.links.map((l) => ` <a class="cl-src" href="${hesc(l.url)}">${hesc(l.name)}&nbsp;&#8599;</a>`).join("")
-      : e.url ? ` <a class="cl-src" href="${hesc(e.url)}">release&nbsp;&#8599;</a>` : ""}</p></li>`;
-  }).join("");
-  const n = entries.length;
-  const since = n ? entries[0].date : null;
-  const metaDesc = "What has moved the auspol tracker aggregate's two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as polls land.";
-  /* the text faces, named by their content hashes this build (the FONTS
-     registration above has already swept and written assets/fonts/) */
-  const pageFont = (prefix) => {
-    const f = fs.readdirSync(FONT_DIR).find((x) => x.startsWith(prefix) && x.endsWith(".woff2"));
-    return f ? "/assets/fonts/" + f : null;
-  };
-  const faces = [["Crimson Text", "normal", "400", pageFont("crimsontext-400-latin.")],
-                 ["Crimson Text", "normal", "700", pageFont("crimsontext-700-latin.")],
-                 ["IBM Plex Sans", "normal", "300 700", pageFont("ibmplexsans-latin.")],
-                 ["IBM Plex Mono", "normal", "400", pageFont("ibmplexmono-400-latin.")],
-                 ["IBM Plex Mono", "normal", "600", pageFont("ibmplexmono-600-latin.")]]
-    .filter((f) => f[3])
-    .map(([family, style, weight, href]) => `@font-face {
-  font-family: '${family}';
-  font-style: ${style};
-  font-weight: ${weight};
-  font-display: swap;
-  src: url("${href}") format('woff2');
-  unicode-range: ${LATIN};
-}`).join("\n");
-  return `<!DOCTYPE html>
-<html lang="en-AU">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Change log &#8211; auspol tracker</title>
-<!-- GENERATED FILE – do not hand-edit. Rebuilt by .build/newtracker/build.mjs
-     on every federal build from data/changelog.json (gen-data §8d appends an
-     entry on each real site refresh). Shell chrome: .build/site-shell.mjs
-     applyShell, as on the other pages outside the main build. -->
-<meta name="description" content="${metaDesc}">
-<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="auspoltracker.com">
-<meta property="og:locale" content="en_AU">
-<meta property="og:title" content="Change log &#8211; auspol tracker">
-<meta property="og:description" content="${metaDesc}">
-<meta property="og:url" content="${SITE_URL}changelog/">
-<meta property="og:image" content="${cardUrl}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${cardAlt}">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="${cardUrl}">
-<meta name="twitter:image:alt" content="${cardAlt}">
-<link rel="canonical" href="${SITE_URL}changelog/">
-<link rel="icon" href="/assets/favicon.svg">
-<style>
-${faces}
-:root {
-  --bg:        oklch(0.975 0.009 80);
-  --ink:       oklch(0.27 0.012 55);
-  --ink-2:     oklch(0.44 0.012 55);
-  --ink-3:     oklch(0.52 0.010 58);
-  --ink-faint: oklch(0.70 0.008 65);
-  --line:      oklch(0.895 0.008 75);
-  --line-2:    oklch(0.935 0.006 78);
-  --accent:    oklch(0.50 0.070 205);
-  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
-  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  /* the console: the site's own dark ink as its ground in both themes */
-  --t-bg:     oklch(0.232 0.011 60);
-  --t-bar:    oklch(0.262 0.011 60);
-  --t-edge:   oklch(0.232 0.011 60);
-  --t-line:   oklch(0.325 0.010 62);
-  --t-ink:    oklch(0.945 0.008 80);
-  --t-ink-2:  oklch(0.820 0.009 78);
-  --t-dim:    oklch(0.640 0.009 70);
-  --t-faint:  oklch(0.480 0.009 66);
-  /* kind colours keep clear of the party hues: the site's teal, a violet, a rose */
-  --k-poll:    oklch(0.800 0.085 200);
-  --k-flows:   oklch(0.790 0.090 295);
-  --k-finding: oklch(0.800 0.095 345);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:        oklch(0.205 0.010 65);
-    --ink:       oklch(0.940 0.008 80);
-    --ink-2:     oklch(0.800 0.009 78);
-    --ink-3:     oklch(0.670 0.009 72);
-    --ink-faint: oklch(0.545 0.009 68);
-    --line:      oklch(0.355 0.011 66);
-    --line-2:    oklch(0.312 0.010 66);
-    --accent:    oklch(0.70 0.080 205);
-    --t-bg:      oklch(0.165 0.009 62);
-    --t-bar:     oklch(0.190 0.009 62);
-    --t-edge:    oklch(0.330 0.010 64);
-    --t-line:    oklch(0.275 0.009 62);
-  }
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 14px;
-  font-feature-settings: "tnum" 1, "ss01" 1;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  line-height: 1.45;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-/* ------- frame + head: rd.css's, via the old /preference-flows/ page -------
-   the shell's .sh-frame box (the masthead's edge), the long-form 66ch
-   measure, the .rd-title kicker over the .rd-hed headline and .rd-dek */
-main.sh-frame {
-  flex: 1;
-  padding-top: 40px;
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-}
-main > * { max-width: 66ch; }
-main .kicker {
-  margin: 0; font-family: var(--sans);
-  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
-  color: var(--ink);
-}
-main h1 {
-  font-family: var(--serif); font-size: 46px; font-weight: 700;
-  line-height: 1.08; letter-spacing: -0.01em;
-  margin: 16px 0 0; color: var(--ink); text-wrap: pretty;
-}
-main p.ss-sub { margin: 12px 0 0; font-size: 18px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
-main p.ss-note { margin: 22px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
-main p.ss-note a {
-  color: var(--ink-2); text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
-}
-main p.ss-note a:hover, main p.ss-note a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
-
-/* ------- the console -------
-   wider than the prose (a log line wants room); one grid line per entry:
-   date · kind · text, the text hanging under itself when it wraps */
-main > .cl-term { max-width: 880px; }
-.cl-term {
-  margin: 32px 0 0;
-  background: var(--t-bg); color: var(--t-ink-2);
-  border: 1px solid var(--t-edge); border-radius: 14px;
-  font-family: var(--mono); font-size: 13.5px; line-height: 1.62;
-  font-feature-settings: normal;
-  box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
-              0 18px 40px -24px oklch(0.2 0.02 60 / 0.55);
-  overflow: hidden;
-}
-.cl-bar {
-  display: flex; align-items: center; gap: 16px;
-  padding: 11px 20px; background: var(--t-bar);
-  border-bottom: 1px solid var(--t-line);
-  font-size: 12px; color: var(--t-dim);
-}
-.cl-file { color: var(--t-ink-2); }
-.cl-file b { font-weight: 400; color: var(--t-faint); }
-.cl-live { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-.cl-live i {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--k-poll);
-  box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 60%, transparent);
-  animation: cl-pulse 2.4s ease-out infinite;
-}
-@keyframes cl-pulse {
-  0%   { box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 55%, transparent); }
-  70%  { box-shadow: 0 0 0 7px color-mix(in oklch, var(--k-poll) 0%, transparent); }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-.cl-body { padding: 16px 20px 18px; }
-.cl-cmt { color: var(--t-faint); margin: 0 0 12px; }
-.cl-log { list-style: none; }
-.cl-e {
-  display: grid; grid-template-columns: 10ch 10ch minmax(0, 1fr); column-gap: 2ch;
-  padding: 7px 0; border-top: 1px dashed var(--t-line);
-}
-.cl-e:first-child { border-top: 0; }
-.cl-date { color: var(--t-dim); font-variant-numeric: tabular-nums; }
-.cl-date.cl-rep { color: var(--t-faint); }
-.cl-tag { color: var(--t-dim); }
-.cl-tag::before { content: "["; color: var(--t-faint); }
-.cl-tag::after { content: "]"; color: var(--t-faint); }
-.cl-k-poll .cl-tag { color: var(--k-poll); }
-.cl-k-flows .cl-tag { color: var(--k-flows); }
-.cl-k-finding .cl-tag { color: var(--k-finding); }
-.cl-k-meta .cl-tag { color: var(--t-ink); font-weight: 600; }
-.cl-text { text-wrap: pretty; }
-.cl-n { color: var(--t-ink); }
-.cl-ar { color: var(--k-poll); }
-a.cl-src {
-  color: var(--k-poll); text-decoration: none; white-space: nowrap;
-  border-bottom: 1px solid color-mix(in oklch, var(--k-poll) 40%, transparent);
-}
-a.cl-src:hover, a.cl-src:focus-visible { border-bottom-color: currentColor; }
-a.cl-src:focus-visible { outline: 2px solid var(--k-poll); outline-offset: 2px; border-radius: 2px; }
-.cl-wait {
-  margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--t-line);
-  color: var(--t-dim);
-}
-.cl-wait b { font-weight: 400; color: var(--k-poll); margin-right: 1ch; }
-.cl-cur {
-  display: inline-block; width: 0.6em; height: 1.15em; margin-left: 0.5ch;
-  vertical-align: -0.2em; background: var(--t-ink-2);
-  animation: cl-blink 1.1s steps(1, end) infinite;
-}
-@keyframes cl-blink { 50% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) {
-  .cl-live i, .cl-cur { animation: none; }
-}
-
-/* ------- the redesign's small steps, 640px and under (rd.css: .rd-hed
-   30px/1.1, .rd-dek 15/1.4, .rd-title 19px); the console drops to two
-   rows per entry – date and kind, then the text the full width ------- */
-@media (max-width: 640px) {
-  main .kicker { font-size: 19px; }
-  main h1 { margin-top: 14px; font-size: 30px; line-height: 1.1; }
-  main p.ss-sub { margin-top: 8px; font-size: 15px; line-height: 1.4; }
-  .cl-term { margin-top: 24px; font-size: 12.5px; line-height: 1.58; border-radius: 12px; }
-  .cl-bar, .cl-body { padding-left: 14px; padding-right: 14px; }
-  .cl-e { grid-template-columns: auto minmax(0, 1fr); column-gap: 2ch; row-gap: 2px; padding: 9px 0; }
-  .cl-text { grid-column: 1 / -1; }
-}
-</style>
-</head>
-<body>
-<main id="sh-content" class="sh-frame">
-  <p class="kicker">Change log</p>
-  <h1>Log of movements in figures and findings</h1>
-  <p class="ss-sub">What has moved the aggregate&#8217;s two-party preferred estimate, and when each
-    statistical finding appeared or fell away &#8211; recorded entry by entry on every site refresh.</p>
-  <section class="cl-term" aria-label="Change log entries, newest first">
-    <div class="cl-bar"><span class="cl-file"><b>data/</b>changelog</span><span class="cl-live"><i aria-hidden="true"></i>recording</span></div>
-    <div class="cl-body">
-      <p class="cl-cmt"># ${n} ${n === 1 ? "entry" : "entries"}${since ? ` since ${hesc(since)}` : ""}</p>
-      <ol class="cl-log">${rows}
-      </ol>
-      <p class="cl-wait"><b aria-hidden="true">&#8250;</b>next entry when the next poll lands<span class="cl-cur" aria-hidden="true"></span></p>
-    </div>
-  </section>
-  <p class="ss-note">A poll landing is what writes most of these &#8211; the
-    <a href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the
-    pollster&#8217;s own release, and <a href="/allpolls/">All polls</a> is the interactive archive.</p>
-</main>
-</body>
-</html>
-`;
+      <h2>Every entry, newest first</h2>
+      <p>A poll landing is what writes most of these &#8211; the
+        <a class="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the
+        pollster&#8217;s own release.</p>${rows}`;
 }
 
 function buildStaticSummary() {
@@ -1338,6 +1050,21 @@ ${body.trim()}
         choose between the final two, and what the pollsters' own two-party figures imply &#8211; one
         contest at a time.`],
   };
+  // the change log's own menu page: every entry of data/changelog.json, restated
+  // in the Info about-block's date-smallcaps style; the static list IS the page
+  // for a no-JS reader or crawler (the client renders the same entries live)
+  if (id === "changelog") {
+    return `<article class="static-summary">
+  <h1>Changelog</h1>
+  <p class="ss-sub">What has moved the aggregate&#8217;s two-party preferred estimate, and when each
+    statistical finding appeared or fell away &#8211; recorded entry by entry as new polls land.</p>
+
+${ssChangelogBlock(esc)}
+
+  ${ssTail(esc, sources)}
+</article>`;
+  }
+
   if (MENU_SS[id]) {
     const [h1, sub] = MENU_SS[id];
     return `<article class="static-summary">
@@ -1365,7 +1092,7 @@ ${VIC ? `      <h2>About this tracker</h2>
       <p>The live page&#8217;s Info tab defines the terms both sites use &#8211; two-party preferred,
         implied flows, house lean, the preference-flow machinery and the rest &#8211; and links every
         pollster&#8217;s series and methodology statement.</p>
-` : ssAboutBlock(L, prim, acc) + ssChangelogBlock(esc)}
+` : ssAboutBlock(L, prim, acc)}
 
 ${ssTail(esc, sources)}
     </article>`;
@@ -1755,6 +1482,12 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
        page only, /vic/'s menu never holds it) */
     ...(VIC ? [] : [{ id: "flows-explained", label: "Preference flows explained",
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
+    /* the ☰ menu's fifth page, straight under the explainer (the user's
+       2026-10-15 call, same pass as the explainer: the change log was the
+       Info about-block's tail, then a console satellite at /changelog/;
+       now a page of the build – federal only, /vic/ has no change log) */
+    ...(VIC ? [] : [{ id: "changelog", label: "Changelog",
+      desc: "The auspol tracker change log – what has moved the aggregate's two-party preferred estimate, and when each statistical finding appeared or fell away, recorded entry by entry as new polls land." }]),
     { id: "info", label: "Info",
       desc: `How ${BRAND} tracker works – the aggregate's weighting and house-lean method, the pollsters it tracks, and a glossary of the terms the site uses.` },
   ];
@@ -1965,19 +1698,7 @@ ${items}
 `;
 writeAtomic(path.join(ROOT, "feed.xml"), feed);
 
-/* ---- 5c. changelog/index.html – the change log as its own page ----------
-   The feed announces THAT a poll landed; the change log records what polls
-   did to the page. It lived only inside the app document (the Info tab),
-   which no URL can point a reader at as a document – this page is its
-   address, generated here because its text is the data's and nothing but,
-   and committed by the writers' SITE_FILES like the feed beside it. */
-const changeEntries = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || []; } catch { return []; } })();
-fs.mkdirSync(path.join(path.dirname(OUT), "changelog"), { recursive: true });
-writeAtomic(path.join(path.dirname(OUT), "changelog", "index.html"),
-  applyShell(changelogPage(), shellOptsFor("changelog/index.html")));
-console.log(`built changelog/index.html · ${changeEntries.length} entries`);
-
-/* ---- 5d. robots.txt + sitemap.xml – be findable -------------------------
+/* ---- 5c. robots.txt + sitemap.xml – be findable -------------------------
    A single-page site is trivially mappable, but a crawler still has to learn
    the page exists and when it last changed. The sitemap carries the one
    canonical URL with the data date as lastmod; robots.txt points crawlers at

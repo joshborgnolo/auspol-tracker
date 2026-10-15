@@ -5,8 +5,9 @@
    the site works", serif headline, deck), its document heads are serif,
    and its contents list names destinations instead of numbering them:
    a rail beside the text at >=1100px, a pinned "Contents" disclosure under
-   that. The panel explainers group under "The panels". About's change log
-   shows the latest three and links /changelog/.
+   that. The panel explainers group under "The panels". The change log
+   moved out of About into the ☰ menu's own /changelog/ tab page on
+   2026-10-15 (About keeps a one-line signpost to it).
 
    Asserts headlessly against BASE (repo root or a worktree), served over
    http (the tab documents write urls on navigation):
@@ -270,7 +271,7 @@ scrim.after = await page.evaluate(() => !!document.querySelector(".info-toc-list
 check(scrim.before && !scrim.after, "the scrim shuts the open sheet");
 
 const clog = await page.evaluate(() => document.querySelectorAll(".info-changelog li").length);
-check(clog > 0 && clog <= 3, `About's change log shows at most three entries (${clog})`);
+check(clog === 0, `About no longer lists change-log entries – they moved to the Changelog menu page (${clog})`);
 
 check(pageErrors.length === 0, `no page errors on any rung${pageErrors.length ? ": " + pageErrors.join(" | ") : ""}`);
 

@@ -35,7 +35,7 @@ assert.equal((shellHeader({}).match(/<a class="sh-tab[" ]/g) || []).length, 4, "
 {
   const h = shellHeader({});
   assert.ok(h.includes('class="sh-tab sh-menu-btn" aria-haspopup="menu"'), "the bar ends in the ☰ button");
-  for (const href of ["/disagreement/", "/leans/", "/flows/", "/flows-explained/", "/info/"])
+  for (const href of ["/disagreement/", "/leans/", "/flows/", "/flows-explained/", "/changelog/", "/info/"])
     assert.ok(new RegExp(`<a role="menuitem"[^>]*href="${href}"`).test(h), `the menu links ${href}`);
   assert.ok(!/sh-menu-sep/.test(h + shellCss()), "the menu's explainer separator is retired");
   assert.ok(/class="sh-menu-item sh-menu-info"/.test(h), "Info rides the menu for the pinned phone bar");
@@ -173,22 +173,24 @@ assert.throws(() => parseChrome(noTag, scoreSrc, chrome.tabs), /tagline/, "a ref
 const noLede = headSrc.replace('className="colo-lede"', 'className="colo-gone"');
 assert.throws(() => parseChrome(noLede, scoreSrc, chrome.tabs), /colophon lede/, "a moved colophon anchor throws");
 
-// ---- changelog/index.html: the change log as a page of its own -------------------------
+// ---- changelog/index.html: the change log as a main-build tab page (the ☰ menu's fifth,
+// since 2026-10-15 – it was a shell satellite console page before that, and the Info about
+// block's three-entry list before that again)
 const hesc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const clEntries = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")).entries || [];
 const clPage = fs.readFileSync(path.join(ROOT, "changelog", "index.html"), "utf8");
-assert.ok(clPage.includes("<title>Change log &#8211; auspol tracker</title>"), "changelog page: the title");
+assert.ok(clPage.includes("<title>auspol tracker – Changelog</title>"), "changelog page: the title");
 assert.ok(/<link rel="canonical" href="https:\/\/auspoltracker\.com\/changelog\/">/.test(clPage), "changelog page: the canonical");
-assert.ok(clPage.includes("<h1>Log of movements in figures and findings</h1>"), "changelog page: the h1");
-// the console prints each entry's ISO date (a repeat of the line above's date is dimmed, cl-rep)
-const clTimes = [...clPage.matchAll(/<time class="cl-date(?: cl-rep)?" datetime="([^"]+)">([^<]+)<\/time>/g)];
-assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.date)]),
+assert.ok(clPage.includes("<h1>Changelog</h1>"), "changelog page: the h1");
+assert.ok(!/shell:(?:head|header|footer)/.test(clPage), "changelog page: a main-build tab page, not a shell satellite");
+assert.ok(clPage.includes('window.AP_INITIAL_TAB="changelog";'), "changelog page: opens straight into the changelog tab");
+// the static article lists every entry, newest first, in the Info date-smallcaps style –
+// a no-JS reader or crawler gets the whole run
+const clTimes = [...clPage.matchAll(/<time class="info-cl-date" datetime="([^"]+)">([^<]+)<\/time>/g)];
+assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.label)]),
   "changelog page lists every entry of data/changelog.json, newest first");
-// the text is lit in spans (figures, arrows), so compare it with the markup taken out
-const clPlain = clPage.replace(/<span class="cl-(?:n|ar)">([^<]*)<\/span>/g, "$1");
-for (const e of clEntries) assert.ok(clPlain.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
-assert.ok(/font-family: 'IBM Plex Mono';[^}]*url\("\/assets\/fonts\/ibmplexmono-400-latin\.[0-9a-f]{8}\.woff2"\)/.test(clPage),
-  "the console's mono face is linked by its hashed name");
+for (const e of clEntries) assert.ok(clPage.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
+assert.ok(!clPage.includes("IBM Plex Mono"), "the console satellite's mono face is retired");
 // a refresh commit carries it (2026-10-12: joined SITE_FILES with data/changelog.json)
 const siteFiles = (fs.readFileSync(path.join(ROOT, ".build", "git-push-main.sh"), "utf8").match(/SITE_FILES=\(([\s\S]*?)\)/) || [])[1] || "";
 assert.ok(/(^|\s)changelog\/index\.html(\s|$)/.test(siteFiles), "SITE_FILES commits changelog/index.html");
@@ -199,6 +201,7 @@ assert.ok(/<loc>https:\/\/auspoltracker\.com\/changelog\/<\/loc>/.test(fs.readFi
 assert.ok(clPage.includes('href="/feed.xml"'), "the changelog page points at the feed");
 const rootDocs = ["index.html", "cycles/index.html", "allpolls/index.html", "info/index.html",
   "disagreement/index.html", "leans/index.html", "flows/index.html", "flows-explained/index.html",
+  "changelog/index.html",
   "vic/index.html", "vic/allpolls/index.html", "vic/info/index.html",
   "vic/disagreement/index.html", "vic/leans/index.html", "vic/flows/index.html"];
 for (const f of rootDocs) {

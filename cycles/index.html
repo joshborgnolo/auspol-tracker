@@ -104488,7 +104488,7 @@ function MenuPageView({
     tppBasis: tppBasis
   }), id === "flows" && React.createElement(RdFlows, {
     measure: measure
-  }), id === "flows-explained" && React.createElement(RdExplained, null));
+  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "changelog" && React.createElement(RdChangelog, null));
   return React.createElement("div", {
     className: "view view-" + id
   }, id === "disagreement" && React.createElement(VariancePanel, {
@@ -104509,7 +104509,48 @@ function MenuPageView({
     dangerouslySetInnerHTML: {
       __html: window.EXPLAINED_ARTICLE || ""
     }
-  }));
+  }), id === "changelog" && React.createElement(ChangelogEntries, null));
+}
+function ChangelogEntries() {
+  const {
+    D
+  } = window.AP;
+  return React.createElement("ul", {
+    className: "info-changelog"
+  }, [...(D.changelog || [])].reverse().map((e, i) => React.createElement("li", {
+    key: i
+  }, React.createElement("time", {
+    className: "info-cl-date",
+    dateTime: e.date
+  }, e.label), " ", e.text, e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
+    key: j
+  }, " ", React.createElement("a", {
+    className: "fb-link",
+    href: l.url
+  }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
+    className: "fb-link",
+    href: e.url
+  }, "the pollster\u2019s release \u2197")) : null)));
+}
+function RdChangelog() {
+  return React.createElement("section", {
+    className: "rd-sec rd-changelog",
+    id: "changelog",
+    "aria-labelledby": "rd-clog-t"
+  }, React.createElement("div", {
+    className: "rd-eyebrow"
+  }, React.createElement("h2", {
+    className: "rd-title",
+    id: "rd-clog-t"
+  }, "Changelog"), React.createElement("span", {
+    className: "rd-meta"
+  }, "What moved the aggregate, and when")), React.createElement(RdHed, {
+    head: "Every move of the estimate, kept as it happened",
+    dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away \u2013 recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
+      className: "fb-link",
+      href: "/feed.xml"
+    }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.")
+  }), React.createElement(ChangelogEntries, null));
 }
 function FlowChart() {
   const narrow = useNarrow();
@@ -105337,26 +105378,10 @@ function infoTerms(D) {
   }, React.createElement("b", null, "Following along."), " The ", React.createElement("a", {
     className: "fb-link",
     href: "/feed.xml"
-  }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release."), !window.JUR && D.changelog && D.changelog.length ? React.createElement(React.Fragment, null, React.createElement("p", {
-    className: "info-about-p"
-  }, React.createElement("b", null, "Change log."), " What has moved the site\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away.", D.changelog.length > 3 ? " The latest three; " : " Also kept on ", React.createElement("a", {
+  }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.", !window.JUR ? React.createElement(React.Fragment, null, " The ", React.createElement("a", {
     className: "fb-link",
     href: "/changelog/"
-  }, D.changelog.length > 3 ? "the change log page lists them all" : "the change log page"), D.changelog.length > 3 ? "." : ":"), React.createElement("ul", {
-    className: "info-changelog"
-  }, [...D.changelog].reverse().slice(0, 3).map((e, i) => React.createElement("li", {
-    key: i
-  }, React.createElement("span", {
-    className: "info-cl-date"
-  }, e.label), " ", e.text, e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
-    key: j
-  }, " ", React.createElement("a", {
-    className: "fb-link",
-    href: l.url
-  }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
-    className: "fb-link",
-    href: e.url
-  }, "the pollster\u2019s release \u2197")) : null)))) : null, React.createElement("p", {
+  }, "change log"), " records what has moved the two-party preferred estimate and each statistical finding, entry by entry.") : null), React.createElement("p", {
     className: "info-about-p"
   }, React.createElement("b", null, "Feedback."), " Spot a wrong number or have any other feedback?", " ", React.createElement("a", {
     className: "fb-link",
@@ -131745,6 +131770,11 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
+  id: "changelog",
+  label: "Changelog",
+  menu: true,
+  tip: "What has moved the aggregate and each finding, entry by entry"
+}, {
   id: "info",
   label: "Info",
   pinHide: true,
@@ -131752,6 +131782,7 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));
 const TAB_BASE = window.JUR ? "/vic/" : "/";

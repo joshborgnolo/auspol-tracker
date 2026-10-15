@@ -21,7 +21,7 @@ const port = srv.address().port;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 const page = await browser.newPage();
 const WIDTHS = [320, 641, 700, 748, 1200, 1440];
-const PAGES = ["/preference-flows/", "/prediction/", "/changelog/", "/atlas/", "/feedback/"];
+const PAGES = ["/preference-flows/", "/prediction/", "/atlas/", "/feedback/"];
 let bad = 0;
 for (const pg of PAGES) {
   await page.setViewport({ width: 1440, height: 900 });

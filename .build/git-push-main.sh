@@ -292,10 +292,11 @@ freshness_sync() {
 # AUSPOL_SITE_REFRESH, which only the two federal builds below set, so every
 # data commit has to carry it or the tree stays dirty for the next slot.
 # changelog/index.html joined the same day, when the change log became a
-# page of its own: the build's 5c block writes it on every federal pass (a
-# quiet refresh writes the same bytes). flows-explained/index.html (the
-# explainer as a main-build tab page) and its preference-flows/ redirect
-# stub joined 2026-10-15.
+# page of its own – and stays on the list after 2026-10-15, when the change
+# log moved out of Info into the ☰ menu as a tab page of the 5a block (the
+# 5c satellite console page is gone; a quiet refresh writes the same
+# bytes). flows-explained/index.html (the explainer as a main-build tab
+# page) and its preference-flows/ redirect stub joined 2026-10-15 too.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   disagreement/index.html leans/index.html flows/index.html

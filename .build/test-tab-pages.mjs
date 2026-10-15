@@ -30,6 +30,7 @@ const TABS = [
   { id: "leans", label: "Pollster leans", h1: "Pollster leans", descFrag: "How each Australian federal pollster leans" },
   { id: "flows", label: "Preference flows", h1: "Preference flows", descFrag: "Where Australian federal preferences are flowing now" },
   { id: "flows-explained", label: "Preference flows explained", h1: "Preference flows explained", descFrag: "How preferences decide the Australian federal two-party figure" },
+  { id: "changelog", label: "Changelog", h1: "Changelog", descFrag: "recorded entry by entry as new polls land" },
   { id: "info", label: "Info", h1: "About auspol tracker", descFrag: "How auspol tracker works" },
 ];
 const rootHtml = read("index.html");
@@ -62,16 +63,18 @@ assert.ok(!read("vic/index.html").includes("window.AP_INITIAL_TAB="), "Vic's Now
 
 // ---- the sitemap and the push list -------------------------------------------------------
 const sm = read("sitemap.xml");
-for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "flows-explained/", "info/",
+for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "flows-explained/", "changelog/", "info/",
                  "vic/allpolls/", "vic/disagreement/", "vic/leans/", "vic/flows/", "vic/info/"])
   assert.ok(sm.includes(`<loc>https://auspoltracker.com/${u}</loc>`), `the sitemap carries /${u}`);
 assert.ok(!sm.includes("preference-flows/"), "the retired explainer satellite left the sitemap (its stub redirects)");
 assert.ok(!sm.includes("vic/flows-explained/"), "the explainer is federal-only");
+assert.ok(!sm.includes("vic/changelog/"), "the change log is federal-only (Vic never writes data/changelog.json)");
 assert.ok(!sm.includes("vic/cycles/"), "the sitemap does not foretell /vic/cycles/");
 const push = read(path.join(".build", "git-push-main.sh"));
 for (const f of ["cycles/index.html", "allpolls/index.html", "info/index.html",
                  "disagreement/index.html", "leans/index.html", "flows/index.html",
                  "flows-explained/index.html", "preference-flows/index.html",
+                 "changelog/index.html",
                  "vic/allpolls/index.html", "vic/info/index.html",
                  "vic/disagreement/index.html", "vic/leans/index.html", "vic/flows/index.html"])
   assert.ok(push.includes(f), `SITE_FILES commits ${f} (a data refresh regenerates it)`);
@@ -161,11 +164,14 @@ assert.ok(views.includes('href={window.AP.tabToPath ? window.AP.tabToPath(t.id) 
   "each tab renders as its own page's link");
 // ---- the ☰ menu's pages ------------------------------------------------------------------
 for (const [id, label] of [["disagreement", "Poll disagreement"], ["leans", "Pollster leans"], ["flows", "Preference flows"],
-                           ["flows-explained", "Preference flows explained"]])
+                           ["flows-explained", "Preference flows explained"], ["changelog", "Changelog"]])
   assert.ok(hdr.includes(`{ id: "${id}", label: "${label}", menu: true,`), `${id} is a menu page in TABS`);
 // the explainer is federal-only: the Vic client splices its entry out of TABS
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);'),
   "the Vic client drops the flows-explained tab");
+// the change log is federal-only too (Vic never writes data/changelog.json)
+assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);'),
+  "the Vic client drops the changelog tab");
 assert.ok(views.includes("const barTabs = tabs.filter((t) => !t.menu);") && views.includes("{barTabs.map((t, ti) => ("),
   "the bar renders only the non-menu tabs");
 assert.ok(views.includes('aria-haspopup="menu"') && views.includes('role="menu"') && views.includes("tab-menu-info"),
@@ -174,6 +180,8 @@ assert.ok(!views.includes("/preference-flows/"),
   "the menu's hardcoded explainer link is retired – flows-explained rides the TABS menu entries");
 assert.ok(views.includes('<MenuPageView id="flows-explained"') || views.includes('id === "flows-explained"'),
   "the menu-page view knows the explainer");
+assert.ok(views.includes('id === "changelog"') && views.includes("function RdChangelog("),
+  "the menu-page view knows the change log and renders it as a page of the site");
 const tpl = read(path.join(".build", "newtracker", "template.html"));
 assert.ok(!/\btab-menu-sep\b/.test(tpl), "the menu's explainer separator rule is retired from the template");
 assert.ok(/\.tabs\.show-score \.tab-pinhide \{ display: none; \}\s*\.tabs\.show-score \.tab-menu-info \{ display: flex; \}/.test(tpl),

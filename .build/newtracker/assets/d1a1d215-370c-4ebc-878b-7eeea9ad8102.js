@@ -6532,6 +6532,7 @@ function MenuPageView({ id, tppBasis }) {
       {id === "leans" && <RdHouseLean measure={measure} onMeasure={setMeasure} tppBasis={tppBasis} />}
       {id === "flows" && <RdFlows measure={measure} />}
       {id === "flows-explained" && <RdExplained />}
+      {id === "changelog" && <RdChangelog />}
     </div>
   );
   return (
@@ -6545,7 +6546,44 @@ function MenuPageView({ id, tppBasis }) {
           still renders (the .ex-* styles are page-level, not rd-gated), just
           without the rd head */}
       {id === "flows-explained" && <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />}
+      {/* the change log predates the redesign split: dated entries in quiet
+          site type, the same list the Info about block used to show three of */}
+      {id === "changelog" && <ChangelogEntries />}
     </div>
+  );
+}
+
+/* The change log's entries: every movement of the aggregate's two-party
+   figure and every finding's arrival or departure, kept entry by entry as
+   polls land (data/changelog.json → D.changelog, newest last there; the
+   page lists newest first). It was the Info about block's list until
+   2026-10-15, when it became the ☰ menu's fifth page. The redesign above
+   and the classic design both render THIS list – the redesign adds only
+   its own head around it. */
+function ChangelogEntries() {
+  const { D } = window.AP;
+  return (
+    <ul className="info-changelog">
+      {[...(D.changelog || [])].reverse().map((e, i) => (
+        <li key={i}><time className="info-cl-date" dateTime={e.date}>{e.label}</time> {e.text}
+        {e.links ? e.links.map((l, j) => <React.Fragment key={j}> <a className="fb-link" href={l.url}>{l.name} ↗</a></React.Fragment>)
+          : e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
+      ))}
+    </ul>
+  );
+}
+
+function RdChangelog() {
+  return (
+    <section className="rd-sec rd-changelog" id="changelog" aria-labelledby="rd-clog-t">
+      <div className="rd-eyebrow">
+        <h2 className="rd-title" id="rd-clog-t">Changelog</h2>
+        <span className="rd-meta">What moved the aggregate, and when</span>
+      </div>
+      <RdHed head="Every move of the estimate, kept as it happened"
+        dek={<>What has moved the aggregate’s two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing – the <a className="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the pollster’s own release.</>} />
+      <ChangelogEntries />
+    </section>
   );
 }
 
@@ -7911,20 +7949,10 @@ function infoTerms(D) {
       by automated checks but also manually by me (some guy). Every figure is rebuilt when a new
       poll lands.</p>
       <p className="info-about-p"><b>Following along.</b> The <a className="fb-link" href="/feed.xml">RSS feed</a> lists
-      each new poll as it is added, with a link to the pollster’s own release.</p>
-      {!window.JUR && D.changelog && D.changelog.length ? (<>
-      <p className="info-about-p"><b>Change log.</b> What has moved the site’s two-party
-      preferred estimate, and when each statistical finding appeared or fell away.
-      {D.changelog.length > 3 ? " The latest three; " : " Also kept on "}
-      <a className="fb-link" href="/changelog/">{D.changelog.length > 3 ? "the change log page lists them all" : "the change log page"}</a>{D.changelog.length > 3 ? "." : ":"}</p>
-      <ul className="info-changelog">
-        {[...D.changelog].reverse().slice(0, 3).map((e, i) => (
-          <li key={i}><span className="info-cl-date">{e.label}</span> {e.text}
-          {e.links ? e.links.map((l, j) => <React.Fragment key={j}> <a className="fb-link" href={l.url}>{l.name} ↗</a></React.Fragment>)
-            : e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
-        ))}
-      </ul>
-      </>) : null}
+      each new poll as it is added, with a link to the pollster’s own release.
+      {!window.JUR ? <> The <a className="fb-link" href="/changelog/">change log</a> records
+      what has moved the two-party preferred estimate and each statistical finding,
+      entry by entry.</> : null}</p>
       <p className="info-about-p"><b>Feedback.</b> Spot a wrong number or have any other feedback?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept
