@@ -3401,11 +3401,13 @@ body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; f
    The Info tab takes the same head every tab opens with (the sans kicker
    and its meta, then the serif headline and deck), and its document heads
    take the serif display face - the body's run-in entries stay bold sans.
-   The card chrome drops so the tab fills the site frame like the others.
+   The card chrome drops so the tab fills the site frame like the others -
+   and its head keeps the section padding every .rd-sec root gets
+   (--rd-sec-pad), so the kicker doesn't sit flush under the navbar.
    The contents list has two shapes: from 1100px a rail beside the text;
    under that a pinned "Contents" disclosure, one line high when shut. The
    template's strip rules stay for the classic design and print. */
-body.rd .info { padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+body.rd .info { padding: var(--rd-sec-pad) 0 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
 body.rd .info > .rd-eyebrow { border-top: 0; padding-top: 0; }
 body.rd .info-h {
   margin: 34px 0 16px; padding-top: 14px; border-top: 2px solid var(--rd-rule);
