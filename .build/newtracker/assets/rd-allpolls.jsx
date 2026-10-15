@@ -1967,7 +1967,7 @@ function rdLgLines(p, { onM, demSplit }) {
     const ks = ORDER.filter((k) => p.cons[k] != null);
     out.push({ id: "cons", lab: "Consideration", body: <>
       {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(p.cons[k])}</b></> : pty(k, rdApNum(p.cons[k]))}</U>)}
-      <U soft>{p.consBasis ? p.consBasis + ", not votes" : "parties the voter would consider, not votes"}</U>
+      <U soft>{p.consBasis || "parties the voter would consider"}</U>
     </> });
     /* a 0–10 propensity battery's extra tiers (RedBridge/Accent's April
        2026 wave): the shares rating 4–10 and rating 0, rebased over

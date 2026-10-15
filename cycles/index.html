@@ -123981,7 +123981,7 @@ function rdLgLines(p, {
         key: k
       }, k === "none" ? React.createElement(React.Fragment, null, "none ", React.createElement("b", null, rdApNum(p.cons[k]))) : pty(k, rdApNum(p.cons[k])))), React.createElement(U, {
         soft: true
-      }, p.consBasis ? p.consBasis + ", not votes" : "parties the voter would consider, not votes"))
+      }, p.consBasis || "parties the voter would consider"))
     });
     if (p.consLoose) {
       const ks2 = ORDER.filter(k => p.consLoose[k] != null);
