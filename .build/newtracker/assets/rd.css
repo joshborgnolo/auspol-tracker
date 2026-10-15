@@ -414,13 +414,27 @@ body.rd .rd-evlist-b:focus-visible { outline: 2px solid var(--accent); outline-o
 
 /* ---------- small controls ------------------------------------------------ */
 body.rd .rd-check { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; }
-body.rd .rd-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); cursor: pointer; }
-/* WCAG 2.5.8's 24px floor: the glyph is the target, so on touch it grows to
-   meet it (under 24px the label row was tall enough, the box was not). The
-   cycle-chart pair's phone squeeze overrides this back down one block later
-   in source order, so its own coarse clause re-raises it there. */
+/* a drawn box, lighter than the native solid-ink square: an ink-3 ring at
+   rest, and when ticked a mid-ink fill whose tick is cut from the page's own
+   background, so a ticked option can never out-dark the selected tab it
+   sits beside. The glyph is template.html's --tick-glyph, masked so this
+   control keeps its own tick colour; the mask follows the dark theme. */
+body.rd .rd-check input {
+  -webkit-appearance: none; appearance: none;
+  box-sizing: border-box; width: 16px; height: 16px; margin: 0; flex: none; position: relative;
+  border: 1.5px solid var(--ink-3); border-radius: 3px; background: transparent; cursor: pointer;
+}
+body.rd .rd-check input:checked { background: var(--ink-2); border-color: var(--ink-2); }
+body.rd .rd-check input:checked::after {
+  content: ""; position: absolute; inset: 0; background: var(--bg);
+  -webkit-mask: var(--tick-glyph) center / 100% 100% no-repeat;
+          mask: var(--tick-glyph) center / 100% 100% no-repeat;
+}
+/* WCAG 2.5.8's 24px floor is met by the label ROW, the whole of which is
+   the target (its 44px height is set above), so the glyph itself grows only
+   a step, to 18px, not all the way to the floor. */
 @media (pointer: coarse) {
-  body.rd .rd-check input { width: 24px; height: 24px; }
+  body.rd .rd-check input { width: 18px; height: 18px; }
 }
 body.rd .rd-check:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 body.rd .rd-term {
@@ -630,17 +644,21 @@ body.rd .rd-tpp-chart { margin-top: 16px; }
 body.rd .rd-tpp-top + .rd-tpp-chart { margin-top: 56px; }
 body.rd .rd-tabs-sm .rd-tab { font-size: 14px; padding: 0 10px; }
 body.rd .rd-tpp-legend { margin: 0 0 4px; }
-/* the synth + outside-estimates check boxes: the tabs row's 4px flex gap
-   crowds the pair on desktop, and the 44px touch-target height spreads the
-   stacked pair too far on the phone */
-body.rd .rd-tpp-chart .rd-tabs .rd-check + .rd-check { margin-left: 8px; }
+/* the compare pair, one group under a "Compare" lead-in: beside the range
+   tabs on a laptop, on its own row above the chart on a phone (next to the
+   legend it changes). The lead-in matches the "Switch 2PP" label so the
+   card's two control groups read as a pair. The group never splits across
+   lines on desktop - it wraps whole; a phone lets the second item drop
+   alone, so the lead-in and the first item always stay together. */
+body.rd .rd-tpp-cmp { display: flex; align-items: center; flex-wrap: nowrap; gap: 14px; }
+body.rd .rd-tpp-cmp-l { font-size: 13px; color: var(--ink-3); }
 @media (max-width: 640px) {
-  body.rd .rd-tpp-chart > .rd-check { min-height: 30px; }
+  body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 0 16px; margin-top: 12px; }
+  body.rd .rd-tpp-cmp .rd-check { font-size: 13px; }
 }
-/* just above the phone rung the desktop row (range tabs plus the two check
-   boxes) is a hair wider than the card: unwrap it and the row overflows the
-   document. Wrap the checks onto a second line until the row genuinely
-   fits. */
+/* just above the phone rung the desktop row (range tabs plus the group)
+   can outrun the card: wrap the tabs row and the group drops whole onto a
+   line of its own - it is one flex item, so the pair can never split. */
 @media (min-width: 641px) and (max-width: 700px) {
   body.rd .rd-tpp-chart .rd-tabs { flex-wrap: wrap; }
 }
@@ -1459,18 +1477,34 @@ body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; f
    dotted underline that marks the site's tap-to-swap words */
 body.rd .rd-sw-cycle { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
 body.rd .rd-sw-cycle:hover, body.rd .rd-sw-cycle:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
-/* where the majors' 2025 voters are going: one row per destination, the bar
-   a fraction of the cohort's full width - the kept bar dominates at 50-70% */
+/* where the majors' 2025 voters are going, drawn the came-from mosaic's
+   way: full-height columns per destination on a laptop (same figure
+   garment - big kept figure, its pts/sh rows under the baseline), the
+   mosaic's variable-height rows on a phone */
 body.rd .rd-go-wrap { margin-top: 36px; }
+body.rd .rd-go { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
+body.rd .rd-go text { font-family: var(--sans); }
+body.rd .rd-go-nm { font-size: 15px; font-weight: 600; }
+body.rd .rd-go-sz { font-size: 12px; fill: var(--ink-3); }
+body.rd .rd-go-big { font-size: 22px; font-weight: 600; }
+body.rd .rd-go-rates { font-size: 15px; font-weight: 600; }
+body.rd .rd-go-pts { font-size: 15px; font-weight: 600; fill: var(--ink); }
+body.rd .rd-go-sh { font-size: 12px; fill: var(--ink-3); }
+body.rd .rd-go-base { stroke: var(--ink-faint); stroke-width: 1; }
+body.rd .rd-go-note { margin-top: 4px; }
+body.rd .rd-go-key { margin-top: 12px; }
+body.rd .rd-go-howread { color: var(--ink-3); }
 body.rd .rd-go-rows { display: flex; flex-direction: column; gap: 14px; font-variant-numeric: tabular-nums; }
 body.rd .rd-go-rtop, body.rd .rd-go-rsub { display: flex; justify-content: space-between; gap: 12px; }
 body.rd .rd-go-rtop { font-size: 15px; }
 body.rd .rd-go-rtop b { font-weight: 600; }
 body.rd .rd-go-rsub { font-size: 12px; color: var(--ink-3); margin: 1px 0 6px; }
-body.rd .rd-go-rbar { position: relative; height: 26px; }
+body.rd .rd-go-rbar { position: relative; }
 body.rd .rd-go-rbar > span { position: absolute; left: 0; top: 0; bottom: 0; transition: width .32s var(--morph-ease); }
 body.rd .rd-go-rbar > em { position: absolute; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 15px; font-weight: 600; }
-body.rd .rd-go-note { margin-top: 12px; }
+body.rd .rd-go-rbar > em.rd-go-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
+body.rd .rd-go-nb { font-size: 12px; font-weight: 400; }
+body.rd .rd-go-rbar > i.rd-go-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
 @media (max-width: 640px) { body.rd .rd-go-wrap { margin-top: 28px; } }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
@@ -2136,23 +2170,23 @@ body.rd .rd-cyc-chart .rd-check { font-size: 13px; font-weight: 400; }
    alone; every other head keeps its flex-end), with the rows stretched to
    the widest label so the two checkbox glyphs line up on one x. The phone
    stack also squeezes the rows themselves: the site-wide 44px touch
-   target drops off these two labels, the native 18px box swaps for a 15px
-   one and the label line-height tightens, so the pair reads as one control
-   instead of two spaced lines */
+   target drops off these two labels and the label line-height tightens, so
+   the pair reads as one control instead of two spaced lines. The glyph
+   itself always wears the shared drawn box above (16px, 18px on touch) -
+   no pair-specific size of its own. */
 body.rd .rd-cyc-ctls { display: contents; }
 @media (max-width: 640px) {
   body.rd .rd-cyc-chart .rd-chead { align-items: flex-end; }
   body.rd .rd-cyc-chart .rd-chead:has(> .rd-cyc-ctls) { align-items: flex-start; }
   body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: stretch; row-gap: 0; margin-left: auto; }
   body.rd .rd-cyc-chart .rd-check { line-height: 1.15; min-height: 0; }
-  body.rd .rd-cyc-chart .rd-check input { width: 15px; height: 15px; margin-top: 1px; }
 }
-/* ...but not below WCAG 2.5.8's 24px floor: on touch the squeeze's 15px box
-   and flat row re-inflate to the floor (the stack still reads as one
-   control - the two rows stay adjacent, each just meets the target floor) */
+/* ...but not below WCAG 2.5.8's 24px floor: on touch the label row carries
+   the target, so the row's own squeeze comes off at coarse pointers (the
+   stack still reads as one control - the two rows stay adjacent, each just
+   meets the floor) */
 @media (pointer: coarse) and (max-width: 640px) {
   body.rd .rd-cyc-chart .rd-check { min-height: 24px; }
-  body.rd .rd-cyc-chart .rd-check input { width: 24px; height: 24px; margin-top: 0; }
 }
 /* the band in the redesign's warm grey */
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }
@@ -3351,40 +3385,89 @@ body.rd .rd-fl-tip :is(.tip-sub, .tip-hint) { white-space: normal; }
 body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; flex-wrap: wrap; }
 
 /* ---------- info ------------------------------------------------------------
-   The glossary keeps its reading measure and its run-in entries; its section
-   titles take the redesign's anatomy (a 2px ink rule over a sentence-case
-   title in the sans), and its index pins under the site's bar. */
-body.rd .info { padding-top: 4px; }
-body.rd .info-index { top: 46px; gap: 6px 20px; padding: 12px 0 10px; }
-body.rd .info-index button { font-weight: 500; color: var(--ink-2); }
-/* the template's .on rule loses specificity to the one above; the walk's
-   lit button must out-vote it (ink + the 600 of the pinned-tab idiom) */
-body.rd .info-index button.on { color: var(--ink); font-weight: 600; }
+   The Info tab takes the same head every tab opens with (the sans kicker
+   and its meta, then the serif headline and deck), and its document heads
+   take the serif display face - the body's run-in entries stay bold sans.
+   The card chrome drops so the tab fills the site frame like the others.
+   The contents list has two shapes: from 1100px a rail beside the text;
+   under that a pinned "Contents" disclosure, one line high when shut. The
+   template's strip rules stay for the classic design and print. */
+body.rd .info { padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+body.rd .info > .rd-eyebrow { border-top: 0; padding-top: 0; }
 body.rd .info-h {
-  margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
-  font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
+  margin: 34px 0 16px; padding-top: 14px; border-top: 2px solid var(--rd-rule);
+  font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em;
 }
-/* the rule marks a section break; About opens the page, so it wears none */
-body.rd .info-h#info-about { padding-top: 0; border-top: 0; }
 body.rd .info-h-faq { margin-top: 44px; }
-body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
-@media (max-width: 640px) {
-  /* pad so the buttons' 44px ::after hit areas ((44-19)/2 = 12.5px of
-     vertical reach each side) fit the row's box: overflow-x:auto computes
-     overflow-y to auto and any protrusion becomes scroll height, which
-     lets a thumb wobble the pinned row. Locking overflow-y stops the pan
-     but leaves 2px of scrollable slack; containing the targets kills the
-     slack itself (the base template rule carries the overflow-y lock) */
-  body.rd .info-index { top: 43px; padding: 14px 0; }
-  body.rd .info-h { font-size: 19px; }
-  /* a phone's index scrolls sideways; a fade at its right edge says so, as
-     All polls' pinned links do. A sticky end cap rather than a mask: the
-     index is pinned over the page, and a mask would let the text beneath
-     show through its faded edge. */
-  body.rd .info-index::after {
-    content: ""; position: sticky; right: 0; flex: 0 0 28px; margin-left: -28px; align-self: stretch;
-    background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none;
+body.rd .info-group { font-family: var(--serif); font-size: 20px; font-weight: 600; letter-spacing: -0.005em; }
+/* the two shapes share one entries list and one lit idiom: the button
+   owning the heading at the scroll line takes ink, the 600 weight and a
+   2px bar at its left edge (a rail's version of the pinned-tab underline) */
+body.rd .info-index, body.rd .info-toc-list { font-size: 13px; }
+body.rd .info-index button, body.rd .info-toc-list button {
+  display: block; width: 100%; padding: 5px 0 5px 12px; text-align: left;
+  font: inherit; line-height: 1.35; color: var(--ink-2);
+  background: none; border: 0; cursor: pointer; text-decoration: none;
+}
+body.rd .info-index button:hover, body.rd .info-toc-list button:hover { color: var(--ink); }
+body.rd .info-index button.on, body.rd .info-toc-list button.on {
+  color: var(--ink); font-weight: 600; box-shadow: inset 2px 0 0 var(--ink);
+}
+/* the chapter entries read as names, the panel explainers indent under
+   their group caption (selectors carry the button element to top the
+   shared entry rule above) */
+body.rd button.info-toc-c { font-weight: 500; }
+body.rd button.info-toc-g {
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line-2);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+body.rd button.info-toc-p { padding-left: 24px; }
+body.rd .info-index button.info-toc-g:hover, body.rd .info-toc-list button.info-toc-g:hover { color: var(--ink); }
+@media screen and (min-width: 1100px) {
+  body.rd .info { max-width: none; }
+  body.rd .info-cols { display: grid; grid-template-columns: 204px minmax(0, 1fr);
+    column-gap: 64px; align-items: start; margin-top: 8px; }
+  body.rd .info-main { max-width: 72ch; }
+  /* the rail rides beside the text: stacked, pinned under the tab bar.
+     The template inflates every index button's hit area to a centred 44px
+     (the strip's one row); stacked, the neighbours' overlays would overlap,
+     so the inflation comes off - the ~23px rows meet the 24px floor the
+     site uses for stacked links */
+  body.rd .info-index { position: sticky; top: 64px; display: flex; flex-direction: column;
+    align-items: stretch; gap: 0; padding: 0; margin: 0; background: none; box-shadow: none; }
+  body.rd .info-index button::after { content: none; }
+  body.rd .info [id] { scroll-margin-top: 64px; }
+}
+@media screen and (max-width: 1099px) {
+  body.rd .info-toc { display: block; position: sticky; top: 46px; z-index: 3;
+    margin: 12px 0 18px; background: var(--bg); box-shadow: 0 1px 0 var(--line-2); }
+  body.rd .info-index { display: none; }
+  body.rd .info [id] { scroll-margin-top: 104px; }
+  body.rd .info-toc-btn {
+    display: flex; align-items: baseline; gap: 7px; width: 100%;
+    padding: 11px 0; text-align: left; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: none; border: 0; cursor: pointer;
   }
+  body.rd .info-toc-caret { display: inline-block; font-size: 10px; color: var(--ink-3);
+    transition: transform .2s ease; }
+  body.rd .info-toc-caret.up { transform: rotate(180deg); }
+  body.rd .info-toc-on { margin-left: auto; max-width: 55%; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; font-weight: 400; color: var(--ink-3); }
+  /* the open sheet drops over the page; the scrim behind it shuts it */
+  body.rd .info-toc-list {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 4;
+    margin-top: 4px; padding: 8px 10px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); max-height: min(64vh, 460px); overflow-y: auto;
+  }
+  body.rd .info-toc-list button { padding-top: 6px; padding-bottom: 6px; }
+  body.rd .info-toc-scrim { position: fixed; inset: 0; z-index: 3; }
+}
+@media screen and (max-width: 640px) {
+  body.rd .info-toc { top: 43px; }
+  body.rd .info-h { margin-top: 26px; font-size: 23px; }
+  body.rd .info-group { font-size: 18px; }
 }
 
 /* the split picker's five words fit a 320px phone only without their label */

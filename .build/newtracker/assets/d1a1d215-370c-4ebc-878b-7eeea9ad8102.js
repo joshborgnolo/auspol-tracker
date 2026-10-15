@@ -7030,9 +7030,11 @@ function infoTerms(D) {
           own heading is its name) and carries the id that section's "How
           it's built" link opens, so the pop-over shows the whole method for
           what the reader was just looking at; the section's terms follow.
-     The four parts print numbered (1-4, the sections 4.1-4.12) and the
-     pinned index carries the same numbers (InfoView; probe-info-num pins
-     the two agreeing). What shows is what a figure means, how it's built,
+     A contents list in InfoView names those destinations - the four parts
+     plus one entry per explainer, grouped under "The panels" (rail beside
+     the text at >=1100px, a pinned "Contents" disclosure under it;
+     probe-info-toc pins rail, disclosure and spy agreeing). What shows is
+     what a figure means, how it's built,
      how to read it and its limits. Formulas, worked tables, exact
      question wordings,
      pollster-by-pollster lists, data checks and source lists sit in each
@@ -7917,11 +7919,10 @@ function infoTerms(D) {
       {!window.JUR && D.changelog && D.changelog.length ? (<>
       <p className="info-about-p"><b>Change log.</b> What has moved the site’s two-party
       preferred estimate, and when each statistical finding appeared or fell away.
-      {D.changelog.length > 10 ? " The latest ten; " : " Also kept on "}
-      <a className="fb-link" href="/changelog/">{D.changelog.length > 10 ? "the change log page lists them all" : "the change log page"}</a>{D.changelog.length > 10 ? "." : ":"}</p>
-      {/* the latest ten, as the static article lists – the page holds the rest */}
+      {D.changelog.length > 3 ? " The latest three; " : " Also kept on "}
+      <a className="fb-link" href="/changelog/">{D.changelog.length > 3 ? "the change log page lists them all" : "the change log page"}</a>{D.changelog.length > 3 ? "." : ":"}</p>
       <ul className="info-changelog">
-        {[...D.changelog].reverse().slice(0, 10).map((e, i) => (
+        {[...D.changelog].reverse().slice(0, 3).map((e, i) => (
           <li key={i}><span className="info-cl-date">{e.label}</span> {e.text}
           {e.links ? e.links.map((l, j) => <React.Fragment key={j}> <a className="fb-link" href={l.url}>{l.name} ↗</a></React.Fragment>)
             : e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
@@ -8428,28 +8429,39 @@ function InfoView({ focus, onBack, backLabel }) {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ block: "start", behavior: SM });
   };
-  /* The page reads as a short numbered document - chapters 1-4, the
-     twelve section explainers 4.1-4.12 - and the pinned index's buttons
-     carry the same numbers, so "see 4.6" resolves the same way on the
-     walk, the heading and the page. Entries keep their plain ids: those
-     are the link targets, not an outline. probe-info-num pins pill and
-     heading agreeing. A pop-over entry shows no number: it has left the
-     page the number refers to. */
-  const CH_PILLS = [["info-about", "1.", "About"], ["info-faq", "2.", "Questions"], ["info-method", "3.", "Method"]];
-  const secNum = (i) => "4." + (i + 1);
-  /* The index wears the redesign's pinned-walk idiom (All polls'
-     rd-ap-pinl): the heading reading under the bar owns the lit button.
-     A scroll spy walks the sixteen headings; the last one still above a
-     line just under the bar's bottom edge is current. */
+  /* The page reads as a short document - About, Questions, the shared
+     method, then the panel-by-panel explainers - and its contents list
+     names those destinations rather than numbering them (nothing else on
+     the site numbers its sections). The list has two shapes: a rail beside
+     the text at >=1100px, and a pinned "Contents" disclosure under that.
+     probe-info-toc pins rail, disclosure and spy agreeing. */
+  const CH = [["info-about", "About"], ["info-faq", "Questions"], ["info-method", "How the figures are built"]];
+  const PANELS_ID = "info-sections";
+  /* The walk's lit state comes from the same scroll spy as before: the
+     heading reading under the pinned furniture owns the lit entry, the
+     last one still above a line just under that furniture is current. On
+     the rail layout the furniture is just the tab bar; under 1100px the
+     disclosure bar's bottom edge is the line. */
   const [on, setOn] = React.useState("info-about");
+  const [tocOpen, setToc] = React.useState(false);
+  const onLabel = (() => {
+    const c = CH.find(([id]) => id === on);
+    if (c) return c[1];
+    if (on === PANELS_ID) return "The panels";
+    const g = sections.find((s) => s.id === on);
+    return g ? g.title : null;
+  })();
   React.useEffect(() => {
-    const els = ["info-about", "info-faq", "info-method", "info-sections",
+    const els = ["info-about", "info-faq", "info-method", PANELS_ID,
       ...sections.map((g) => g.id)]
       .map((id) => document.getElementById(id)).filter(Boolean);
     if (els.length < 2) return;
     const spy = () => {
-      const bar = document.querySelector(".info-index");
-      const line = (bar ? bar.getBoundingClientRect().bottom : 60) + 8;
+      const bar = document.querySelector(".info-toc");
+      /* Line clears the jump landing spot: a picked heading rests at each
+         rung's scroll-margin-top (64 rail / 104 under the pinned bar, ~80
+         tall), and the 26px pad always tops it. */
+      const line = (bar && bar.offsetParent ? bar.getBoundingClientRect().bottom : 56) + 26;
       let cur = els[0].id;
       for (const el of els) if (el.getBoundingClientRect().top <= line) cur = el.id;
       setOn((prev) => (prev === cur ? prev : cur));
@@ -8470,34 +8482,61 @@ function InfoView({ focus, onBack, backLabel }) {
       {target === t.id && onBack && <InfoBack onBack={onBack} backLabel={backLabel} />}
     </div>
   );
+  /* One contents list, drawn in both shapes: the rail beside the text and
+     the phone disclosure's sheet. A chapter or panel entry lights when its
+     heading owns the scroll line; "The panels" caption doubles as the
+     chapter head's jump and lit entry. A pick closes the sheet. */
+  const tocBtn = (id, label, cls) => (
+    <button key={id} type="button" className={cls + (on === id ? " on" : "")}
+      aria-current={on === id ? "true" : undefined}
+      onClick={() => { jump(id); setToc(false); }}>{label}</button>
+  );
+  const contents = (
+    <>
+      {CH.map(([id, label]) => tocBtn(id, label, "info-toc-c"))}
+      {tocBtn(PANELS_ID, "The panels", "info-toc-g")}
+      {sections.map((g) => tocBtn(g.id, g.title, "info-toc-p"))}
+    </>
+  );
   return (
     <section className="card info">
-      <nav className="info-index" aria-label="On this page">
-        {CH_PILLS.map(([id, num, label]) => (
-          <button key={id} type="button" className={on === id ? "on" : ""}
-            aria-current={on === id ? "true" : undefined} onClick={() => jump(id)}>
-            <span className="info-num">{num}</span> {label}</button>
-        ))}
-        {sections.map((g, i) => (
-          <button key={g.id} type="button" className={on === g.id ? "on" : ""}
-            aria-current={on === g.id ? "true" : undefined} onClick={() => jump(g.id)}>
-            <span className="info-num">{secNum(i)}</span> {g.nav}</button>
-        ))}
-      </nav>
-      <h2 id="info-about" className="card-title info-h"><span className="info-num">1.</span> About</h2>
-      <div className="info-about">{about}</div>
-      <h2 id="info-faq" className="card-title info-h info-h-faq"><span className="info-num">2.</span> Questions</h2>
-      {faqs.map((f) => entry(f, "h3"))}
-      <h2 id="info-method" className="card-title info-h info-h-faq"><span className="info-num">3.</span> How the figures are built</h2>
-      {method.map((t) => entry(t, "h3"))}
-      <h2 id="info-sections" className="card-title info-h info-h-faq"><span className="info-num">4.</span> Section by section</h2>
-      {sections.map((g, i) => (
-        <React.Fragment key={g.id}>
-          <h3 id={g.id} className="info-group"><span className="info-num">{secNum(i)}</span> {g.title}</h3>
-          {entry(g.lead, "h4")}
-          {g.entries.map((t) => entry(t, "h4"))}
-        </React.Fragment>
-      ))}
+      {/* the same head every tab opens with: the sans kicker and its meta,
+          then the finding as a serif headline and its deck */}
+      <div className="rd-eyebrow">
+        <h2 className="rd-title">Info</h2>
+        <span className="rd-meta">How the site works</span>
+      </div>
+      <RdHed level={2}
+        head="Every figure on the site, explained"
+        dek="What a figure means, how it is built, how to read it and its limits – one explainer per section, with the worked tables, formulas and exact question wordings folded under each entry." />
+      <div className="info-toc">
+        <button type="button" className="info-toc-btn" aria-expanded={tocOpen}
+          aria-controls="info-toc-list" onClick={() => setToc((o) => !o)}>
+          <span className={"info-toc-caret" + (tocOpen ? " up" : "")} aria-hidden="true">▾</span> Contents
+          {onLabel ? <span className="info-toc-on">{onLabel}</span> : null}
+        </button>
+        {tocOpen && <div className="info-toc-scrim" aria-hidden="true" onClick={() => setToc(false)}></div>}
+        {tocOpen && <nav className="info-toc-list" id="info-toc-list" aria-label="On this page">{contents}</nav>}
+      </div>
+      <div className="info-cols">
+        <nav className="info-index" aria-label="On this page">{contents}</nav>
+        <div className="info-main">
+          <h2 id="info-about" className="card-title info-h">About</h2>
+          <div className="info-about">{about}</div>
+          <h2 id="info-faq" className="card-title info-h info-h-faq">Questions</h2>
+          {faqs.map((f) => entry(f, "h3"))}
+          <h2 id="info-method" className="card-title info-h info-h-faq">How the figures are built</h2>
+          {method.map((t) => entry(t, "h3"))}
+          <h2 id={PANELS_ID} className="card-title info-h info-h-faq">The panels</h2>
+          {sections.map((g) => (
+            <React.Fragment key={g.id}>
+              <h3 id={g.id} className="info-group">{g.title}</h3>
+              {entry(g.lead, "h4")}
+              {g.entries.map((t) => entry(t, "h4"))}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

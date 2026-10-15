@@ -1464,6 +1464,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
     overflow-y: clip; scrollbar-width: none; white-space: nowrap; }
   .info-index::-webkit-scrollbar { display: none; }
 }
+.info-toc { display: none; }
 .info-index button { background: none; border: 0; padding: 0; cursor: pointer;
   color: var(--ink-3); font: inherit; }
 .info-index button:hover { color: var(--ink); }
@@ -3413,9 +3414,19 @@ body.rd .rd-evlist-b:focus-visible { outline: 2px solid var(--accent); outline-o
   body.rd .rd-evlist.inline .rd-evlist-l { flex-grow: 0; }
 }
 body.rd .rd-check { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; }
-body.rd .rd-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+body.rd .rd-check input {
+  -webkit-appearance: none; appearance: none;
+  box-sizing: border-box; width: 16px; height: 16px; margin: 0; flex: none; position: relative;
+  border: 1.5px solid var(--ink-3); border-radius: 3px; background: transparent; cursor: pointer;
+}
+body.rd .rd-check input:checked { background: var(--ink-2); border-color: var(--ink-2); }
+body.rd .rd-check input:checked::after {
+  content: ""; position: absolute; inset: 0; background: var(--bg);
+  -webkit-mask: var(--tick-glyph) center / 100% 100% no-repeat;
+          mask: var(--tick-glyph) center / 100% 100% no-repeat;
+}
 @media (pointer: coarse) {
-  body.rd .rd-check input { width: 24px; height: 24px; }
+  body.rd .rd-check input { width: 18px; height: 18px; }
 }
 body.rd .rd-check:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 body.rd .rd-term {
@@ -3554,9 +3565,11 @@ body.rd .rd-tpp-chart { margin-top: 16px; }
 body.rd .rd-tpp-top + .rd-tpp-chart { margin-top: 56px; }
 body.rd .rd-tabs-sm .rd-tab { font-size: 14px; padding: 0 10px; }
 body.rd .rd-tpp-legend { margin: 0 0 4px; }
-body.rd .rd-tpp-chart .rd-tabs .rd-check + .rd-check { margin-left: 8px; }
+body.rd .rd-tpp-cmp { display: flex; align-items: center; flex-wrap: nowrap; gap: 14px; }
+body.rd .rd-tpp-cmp-l { font-size: 13px; color: var(--ink-3); }
 @media (max-width: 640px) {
-  body.rd .rd-tpp-chart > .rd-check { min-height: 30px; }
+  body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 0 16px; margin-top: 12px; }
+  body.rd .rd-tpp-cmp .rd-check { font-size: 13px; }
 }
 @media (min-width: 641px) and (max-width: 700px) {
   body.rd .rd-tpp-chart .rd-tabs { flex-wrap: wrap; }
@@ -4115,15 +4128,29 @@ body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; f
 body.rd .rd-sw-cycle { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
 body.rd .rd-sw-cycle:hover, body.rd .rd-sw-cycle:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
 body.rd .rd-go-wrap { margin-top: 36px; }
+body.rd .rd-go { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
+body.rd .rd-go text { font-family: var(--sans); }
+body.rd .rd-go-nm { font-size: 15px; font-weight: 600; }
+body.rd .rd-go-sz { font-size: 12px; fill: var(--ink-3); }
+body.rd .rd-go-big { font-size: 22px; font-weight: 600; }
+body.rd .rd-go-rates { font-size: 15px; font-weight: 600; }
+body.rd .rd-go-pts { font-size: 15px; font-weight: 600; fill: var(--ink); }
+body.rd .rd-go-sh { font-size: 12px; fill: var(--ink-3); }
+body.rd .rd-go-base { stroke: var(--ink-faint); stroke-width: 1; }
+body.rd .rd-go-note { margin-top: 4px; }
+body.rd .rd-go-key { margin-top: 12px; }
+body.rd .rd-go-howread { color: var(--ink-3); }
 body.rd .rd-go-rows { display: flex; flex-direction: column; gap: 14px; font-variant-numeric: tabular-nums; }
 body.rd .rd-go-rtop, body.rd .rd-go-rsub { display: flex; justify-content: space-between; gap: 12px; }
 body.rd .rd-go-rtop { font-size: 15px; }
 body.rd .rd-go-rtop b { font-weight: 600; }
 body.rd .rd-go-rsub { font-size: 12px; color: var(--ink-3); margin: 1px 0 6px; }
-body.rd .rd-go-rbar { position: relative; height: 26px; }
+body.rd .rd-go-rbar { position: relative; }
 body.rd .rd-go-rbar > span { position: absolute; left: 0; top: 0; bottom: 0; transition: width .32s var(--morph-ease); }
 body.rd .rd-go-rbar > em { position: absolute; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 15px; font-weight: 600; }
-body.rd .rd-go-note { margin-top: 12px; }
+body.rd .rd-go-rbar > em.rd-go-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
+body.rd .rd-go-nb { font-size: 12px; font-weight: 400; }
+body.rd .rd-go-rbar > i.rd-go-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
 @media (max-width: 640px) { body.rd .rd-go-wrap { margin-top: 28px; } }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
@@ -4627,11 +4654,9 @@ body.rd .rd-cyc-ctls { display: contents; }
   body.rd .rd-cyc-chart .rd-chead:has(> .rd-cyc-ctls) { align-items: flex-start; }
   body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: stretch; row-gap: 0; margin-left: auto; }
   body.rd .rd-cyc-chart .rd-check { line-height: 1.15; min-height: 0; }
-  body.rd .rd-cyc-chart .rd-check input { width: 15px; height: 15px; margin-top: 1px; }
 }
 @media (pointer: coarse) and (max-width: 640px) {
   body.rd .rd-cyc-chart .rd-check { min-height: 24px; }
-  body.rd .rd-cyc-chart .rd-check input { width: 24px; height: 24px; margin-top: 0; }
 }
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }
 body.rd .cyc-band.hi { fill: var(--ink-3); opacity: 0.17; }
@@ -5528,24 +5553,70 @@ body.rd .rd-fl-tip :is(.tip-sub, .tip-hint) { white-space: normal; }
   body.rd .rd-hl-sc { grid-column: 1 / -1; }
 }
 body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-body.rd .info { padding-top: 4px; }
-body.rd .info-index { top: 46px; gap: 6px 20px; padding: 12px 0 10px; }
-body.rd .info-index button { font-weight: 500; color: var(--ink-2); }
-body.rd .info-index button.on { color: var(--ink); font-weight: 600; }
+body.rd .info { padding: 0; background: none; border: 0; border-radius: 0; box-shadow: none; }
+body.rd .info > .rd-eyebrow { border-top: 0; padding-top: 0; }
 body.rd .info-h {
-  margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
-  font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
+  margin: 34px 0 16px; padding-top: 14px; border-top: 2px solid var(--rd-rule);
+  font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em;
 }
-body.rd .info-h#info-about { padding-top: 0; border-top: 0; }
 body.rd .info-h-faq { margin-top: 44px; }
-body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
-@media (max-width: 640px) {
-  body.rd .info-index { top: 43px; padding: 14px 0; }
-  body.rd .info-h { font-size: 19px; }
-  body.rd .info-index::after {
-    content: ""; position: sticky; right: 0; flex: 0 0 28px; margin-left: -28px; align-self: stretch;
-    background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none;
+body.rd .info-group { font-family: var(--serif); font-size: 20px; font-weight: 600; letter-spacing: -0.005em; }
+body.rd .info-index, body.rd .info-toc-list { font-size: 13px; }
+body.rd .info-index button, body.rd .info-toc-list button {
+  display: block; width: 100%; padding: 5px 0 5px 12px; text-align: left;
+  font: inherit; line-height: 1.35; color: var(--ink-2);
+  background: none; border: 0; cursor: pointer; text-decoration: none;
+}
+body.rd .info-index button:hover, body.rd .info-toc-list button:hover { color: var(--ink); }
+body.rd .info-index button.on, body.rd .info-toc-list button.on {
+  color: var(--ink); font-weight: 600; box-shadow: inset 2px 0 0 var(--ink);
+}
+body.rd button.info-toc-c { font-weight: 500; }
+body.rd button.info-toc-g {
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line-2);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+body.rd button.info-toc-p { padding-left: 24px; }
+body.rd .info-index button.info-toc-g:hover, body.rd .info-toc-list button.info-toc-g:hover { color: var(--ink); }
+@media screen and (min-width: 1100px) {
+  body.rd .info { max-width: none; }
+  body.rd .info-cols { display: grid; grid-template-columns: 204px minmax(0, 1fr);
+    column-gap: 64px; align-items: start; margin-top: 8px; }
+  body.rd .info-main { max-width: 72ch; }
+  body.rd .info-index { position: sticky; top: 64px; display: flex; flex-direction: column;
+    align-items: stretch; gap: 0; padding: 0; margin: 0; background: none; box-shadow: none; }
+  body.rd .info-index button::after { content: none; }
+  body.rd .info [id] { scroll-margin-top: 64px; }
+}
+@media screen and (max-width: 1099px) {
+  body.rd .info-toc { display: block; position: sticky; top: 46px; z-index: 3;
+    margin: 12px 0 18px; background: var(--bg); box-shadow: 0 1px 0 var(--line-2); }
+  body.rd .info-index { display: none; }
+  body.rd .info [id] { scroll-margin-top: 104px; }
+  body.rd .info-toc-btn {
+    display: flex; align-items: baseline; gap: 7px; width: 100%;
+    padding: 11px 0; text-align: left; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: none; border: 0; cursor: pointer;
   }
+  body.rd .info-toc-caret { display: inline-block; font-size: 10px; color: var(--ink-3);
+    transition: transform .2s ease; }
+  body.rd .info-toc-caret.up { transform: rotate(180deg); }
+  body.rd .info-toc-on { margin-left: auto; max-width: 55%; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; font-weight: 400; color: var(--ink-3); }
+  body.rd .info-toc-list {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 4;
+    margin-top: 4px; padding: 8px 10px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); max-height: min(64vh, 460px); overflow-y: auto;
+  }
+  body.rd .info-toc-list button { padding-top: 6px; padding-bottom: 6px; }
+  body.rd .info-toc-scrim { position: fixed; inset: 0; z-index: 3; }
+}
+@media screen and (max-width: 640px) {
+  body.rd .info-toc { top: 43px; }
+  body.rd .info-h { margin-top: 26px; font-size: 23px; }
+  body.rd .info-group { font-size: 18px; }
 }
 @media (max-width: 360px) {
   body.rd .rd-ap-pctl .rd-ap-dpick > .rd-pl-ctl-l { display: none; }
@@ -105088,12 +105159,12 @@ function infoTerms(D) {
     href: "/feed.xml"
   }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release."), !window.JUR && D.changelog && D.changelog.length ? React.createElement(React.Fragment, null, React.createElement("p", {
     className: "info-about-p"
-  }, React.createElement("b", null, "Change log."), " What has moved the site\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away.", D.changelog.length > 10 ? " The latest ten; " : " Also kept on ", React.createElement("a", {
+  }, React.createElement("b", null, "Change log."), " What has moved the site\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away.", D.changelog.length > 3 ? " The latest three; " : " Also kept on ", React.createElement("a", {
     className: "fb-link",
     href: "/changelog/"
-  }, D.changelog.length > 10 ? "the change log page lists them all" : "the change log page"), D.changelog.length > 10 ? "." : ":"), React.createElement("ul", {
+  }, D.changelog.length > 3 ? "the change log page lists them all" : "the change log page"), D.changelog.length > 3 ? "." : ":"), React.createElement("ul", {
     className: "info-changelog"
-  }, [...D.changelog].reverse().slice(0, 10).map((e, i) => React.createElement("li", {
+  }, [...D.changelog].reverse().slice(0, 3).map((e, i) => React.createElement("li", {
     key: i
   }, React.createElement("span", {
     className: "info-cl-date"
@@ -105471,15 +105542,23 @@ function InfoView({
       behavior: SM
     });
   };
-  const CH_PILLS = [["info-about", "1.", "About"], ["info-faq", "2.", "Questions"], ["info-method", "3.", "Method"]];
-  const secNum = i => "4." + (i + 1);
+  const CH = [["info-about", "About"], ["info-faq", "Questions"], ["info-method", "How the figures are built"]];
+  const PANELS_ID = "info-sections";
   const [on, setOn] = React.useState("info-about");
+  const [tocOpen, setToc] = React.useState(false);
+  const onLabel = (() => {
+    const c = CH.find(([id]) => id === on);
+    if (c) return c[1];
+    if (on === PANELS_ID) return "The panels";
+    const g = sections.find(s => s.id === on);
+    return g ? g.title : null;
+  })();
   React.useEffect(() => {
-    const els = ["info-about", "info-faq", "info-method", "info-sections", ...sections.map(g => g.id)].map(id => document.getElementById(id)).filter(Boolean);
+    const els = ["info-about", "info-faq", "info-method", PANELS_ID, ...sections.map(g => g.id)].map(id => document.getElementById(id)).filter(Boolean);
     if (els.length < 2) return;
     const spy = () => {
-      const bar = document.querySelector(".info-index");
-      const line = (bar ? bar.getBoundingClientRect().bottom : 60) + 8;
+      const bar = document.querySelector(".info-toc");
+      const line = (bar && bar.offsetParent ? bar.getBoundingClientRect().bottom : 56) + 26;
       let cur = els[0].id;
       for (const el of els) if (el.getBoundingClientRect().top <= line) cur = el.id;
       setOn(prev => prev === cur ? prev : cur);
@@ -105502,57 +105581,77 @@ function InfoView({
     onBack: onBack,
     backLabel: backLabel
   }));
+  const tocBtn = (id, label, cls) => React.createElement("button", {
+    key: id,
+    type: "button",
+    className: cls + (on === id ? " on" : ""),
+    "aria-current": on === id ? "true" : undefined,
+    onClick: () => {
+      jump(id);
+      setToc(false);
+    }
+  }, label);
+  const contents = React.createElement(React.Fragment, null, CH.map(([id, label]) => tocBtn(id, label, "info-toc-c")), tocBtn(PANELS_ID, "The panels", "info-toc-g"), sections.map(g => tocBtn(g.id, g.title, "info-toc-p")));
   return React.createElement("section", {
     className: "card info"
+  }, React.createElement("div", {
+    className: "rd-eyebrow"
+  }, React.createElement("h2", {
+    className: "rd-title"
+  }, "Info"), React.createElement("span", {
+    className: "rd-meta"
+  }, "How the site works")), React.createElement(RdHed, {
+    level: 2,
+    head: "Every figure on the site, explained",
+    dek: "What a figure means, how it is built, how to read it and its limits \u2013 one explainer per section, with the worked tables, formulas and exact question wordings folded under each entry."
+  }), React.createElement("div", {
+    className: "info-toc"
+  }, React.createElement("button", {
+    type: "button",
+    className: "info-toc-btn",
+    "aria-expanded": tocOpen,
+    "aria-controls": "info-toc-list",
+    onClick: () => setToc(o => !o)
+  }, React.createElement("span", {
+    className: "info-toc-caret" + (tocOpen ? " up" : ""),
+    "aria-hidden": "true"
+  }, "\u25BE"), " Contents", onLabel ? React.createElement("span", {
+    className: "info-toc-on"
+  }, onLabel) : null), tocOpen && React.createElement("div", {
+    className: "info-toc-scrim",
+    "aria-hidden": "true",
+    onClick: () => setToc(false)
+  }), tocOpen && React.createElement("nav", {
+    className: "info-toc-list",
+    id: "info-toc-list",
+    "aria-label": "On this page"
+  }, contents)), React.createElement("div", {
+    className: "info-cols"
   }, React.createElement("nav", {
     className: "info-index",
     "aria-label": "On this page"
-  }, CH_PILLS.map(([id, num, label]) => React.createElement("button", {
-    key: id,
-    type: "button",
-    className: on === id ? "on" : "",
-    "aria-current": on === id ? "true" : undefined,
-    onClick: () => jump(id)
-  }, React.createElement("span", {
-    className: "info-num"
-  }, num), " ", label)), sections.map((g, i) => React.createElement("button", {
-    key: g.id,
-    type: "button",
-    className: on === g.id ? "on" : "",
-    "aria-current": on === g.id ? "true" : undefined,
-    onClick: () => jump(g.id)
-  }, React.createElement("span", {
-    className: "info-num"
-  }, secNum(i)), " ", g.nav))), React.createElement("h2", {
+  }, contents), React.createElement("div", {
+    className: "info-main"
+  }, React.createElement("h2", {
     id: "info-about",
     className: "card-title info-h"
-  }, React.createElement("span", {
-    className: "info-num"
-  }, "1."), " About"), React.createElement("div", {
+  }, "About"), React.createElement("div", {
     className: "info-about"
   }, about), React.createElement("h2", {
     id: "info-faq",
     className: "card-title info-h info-h-faq"
-  }, React.createElement("span", {
-    className: "info-num"
-  }, "2."), " Questions"), faqs.map(f => entry(f, "h3")), React.createElement("h2", {
+  }, "Questions"), faqs.map(f => entry(f, "h3")), React.createElement("h2", {
     id: "info-method",
     className: "card-title info-h info-h-faq"
-  }, React.createElement("span", {
-    className: "info-num"
-  }, "3."), " How the figures are built"), method.map(t => entry(t, "h3")), React.createElement("h2", {
-    id: "info-sections",
+  }, "How the figures are built"), method.map(t => entry(t, "h3")), React.createElement("h2", {
+    id: PANELS_ID,
     className: "card-title info-h info-h-faq"
-  }, React.createElement("span", {
-    className: "info-num"
-  }, "4."), " Section by section"), sections.map((g, i) => React.createElement(React.Fragment, {
+  }, "The panels"), sections.map(g => React.createElement(React.Fragment, {
     key: g.id
   }, React.createElement("h3", {
     id: g.id,
     className: "info-group"
-  }, React.createElement("span", {
-    className: "info-num"
-  }, secNum(i)), " ", g.title), entry(g.lead, "h4"), g.entries.map(t => entry(t, "h4")))));
+  }, g.title), entry(g.lead, "h4"), g.entries.map(t => entry(t, "h4")))))));
 }
 function TermPop({
   id,
