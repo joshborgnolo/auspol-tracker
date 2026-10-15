@@ -2825,12 +2825,6 @@ function RdDemographics({ rangeId = "all" }) {
       <div className="rd-wv-sethead" role="row">
         <span role="columnheader">
           <b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span>
-          {/* which of the house's brackets each tilt pooled, spelled out by
-             house since no two houses' brackets agree (the dek says why up
-             front; the RR says the same pill beside its own set) */}
-          {st.bands ? <span className="rd-wv-bands">{st.houses.filter((h) => st.bands[h]).map((h) => (
-            <span className="rd-wv-band" key={h}><em>{demoHouse(h)}</em> {st.bands[h].low.join(", ")} <i>·</i> {st.bands[h].high.join(", ")}</span>
-          ))}</span> : null}
         </span>
         <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ "--x": xp(all) }}>All voters <RollNum value={all.toFixed(1)} />%</span>}</span>
         <span className="rd-wv-vs" role="columnheader">{idx === 0 ? "vs all voters" : ""}</span>
@@ -3179,6 +3173,18 @@ function RdDemographics({ rangeId = "all" }) {
           { kind: "whisker", color: pColor, label: "95% interval" },
           { kind: "dot", color: pColor, label: "One poll pooled" },
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
+        {/* which of the house's brackets each tilt pooled, spelled out by
+           house since no two houses' brackets agree (the dek says why up
+           front) - just below the dot-plot's legend: inside the sethead it
+           grew the caption row and pushed the all-voters cap onto the
+           vertical line */}
+        {tab.sets.some((st) => st.bands) ? (
+          <div className="rd-wv-bands">
+            {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (
+              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span>
+            ))}
+          </div>
+        ) : null}
       </div>
       {/* the composition trend IS the change-over-time line here (it came
           down from under the headline and the per-tab gap pairs retired with

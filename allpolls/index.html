@@ -4187,7 +4187,7 @@ body.rd .rd-wv-set + .rd-wv-set { margin-top: 10px; padding-top: 10px; border-to
 body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-wv-sethead b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
-body.rd .rd-wv-bands { display: block; margin-top: 6px; margin-bottom: 8px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
+body.rd .rd-wv-bands { display: block; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
 body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
 body.rd .rd-wv-band + .rd-wv-band::before { content: "·"; color: var(--ink-4); }
@@ -114939,12 +114939,7 @@ function RdDemographics({
     role: "row"
   }, React.createElement("span", {
     role: "columnheader"
-  }, React.createElement("b", null, st.label || "By " + tab.label.toLowerCase()), " ", React.createElement("span", null, rdList((st.houses || []).map(demoHouse))), st.bands ? React.createElement("span", {
-    className: "rd-wv-bands"
-  }, st.houses.filter(h => st.bands[h]).map(h => React.createElement("span", {
-    className: "rd-wv-band",
-    key: h
-  }, React.createElement("em", null, demoHouse(h)), " ", st.bands[h].low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", st.bands[h].high.join(", ")))) : null), React.createElement("span", {
+  }, React.createElement("b", null, st.label || "By " + tab.label.toLowerCase()), " ", React.createElement("span", null, rdList((st.houses || []).map(demoHouse)))), React.createElement("span", {
     className: "rd-wv-allcap",
     "aria-hidden": "true"
   }, idx === 0 && React.createElement("span", {
@@ -115577,7 +115572,15 @@ function RdDemographics({
     }]
   }, React.createElement("span", {
     className: "rd-key-item rd-wv-keytxt"
-  }, "Right-hand column: difference from all voters, in points"))), shift && React.createElement(RdSub, {
+  }, "Right-hand column: difference from all voters, in points")), tab.sets.some(st => st.bands) ? React.createElement("div", {
+    className: "rd-wv-bands"
+  }, tab.sets.flatMap(st => st.bands ? st.houses.filter(h => st.bands[h]).map(h => ({
+    h,
+    b: st.bands[h]
+  })) : []).map(x => React.createElement("span", {
+    className: "rd-wv-band",
+    key: x.h
+  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true
