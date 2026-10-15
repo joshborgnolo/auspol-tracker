@@ -41220,52 +41220,40 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "sets": [{
       "id": "income",
       "label": null,
-      "note": "each house counts at its own lowest and highest bands",
+      "note": "each house's own brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
       "bands": {
-        "Newspoll (pooled)": {
-          "low": ["Under $50k", "$50–99k"],
-          "high": ["$150k+"]
-        },
         "YouGov": {
           "low": ["Under $100k"],
           "high": ["$100k or more"]
         },
+        "Newspoll (pooled)": {
+          "low": ["Under $50k"],
+          "high": ["$150k+"]
+        },
         "DemosAU": {
           "low": ["Under $45k"],
           "high": ["$125k+"]
-        },
-        "DemosAU (MRP)": {
-          "low": ["Under $45k"],
-          "high": ["$200k+"]
-        },
-        "RedBridge/Accent": {
-          "low": ["Under $1,000 a week"],
-          "high": ["$3,000+ a week"]
-        },
-        "Freshwater": {
-          "low": ["Under $75k"],
-          "high": ["$150k or more"]
         }
       },
       "groups": [{
         "label": "Lower earners",
         "v": {
-          "alp": 26.5,
+          "alp": 26.4,
           "lnp": 21.1,
-          "onp": 29.4,
-          "grn": 11.6,
+          "onp": 29.3,
+          "grn": 11.8,
           "oth": 11.4
         },
         "ci": {
           "alp": 2,
           "lnp": 1.9,
-          "onp": 2.1,
-          "grn": 1.4,
-          "oth": 2.7
+          "onp": 2,
+          "grn": 1.5,
+          "oth": 2.5
         },
         "n": 5,
         "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"],
-        "monthly": [["2025-07", 36.4, 27.6, 10, 12.2, 14, 4.3, 4, 2.7, 2.9, 3.1], ["2025-08", 35.7, 27.6, 11.4, 12, 13.6, 4.1, 3.8, 2.7, 2.8, 2.9], ["2025-09", 35.2, 26.3, 13.1, 11.7, 14.3, 4.1, 3.8, 2.9, 2.7, 3], ["2025-10", 34.4, 24.9, 14.4, 11.8, 14.1, 2, 2.4, 1.6, 1.3, 1.4], ["2025-11", 33, 24.3, 18, 11.7, 13, 2.4, 2.2, 2, 1.7, 1.7], ["2026-01", 29.8, 20.6, 25.2, 11, 13.4, 2.1, 1.9, 2, 1.5, 1.6], ["2026-02", 29.7, 18.7, 27.7, 11.2, 12.7, 2.3, 2.4, 2.3, 1.6, 2.1], ["2026-03", 29.4, 20.1, 27.2, 11.4, 12, 3.8, 3.3, 3.7, 2.6, 2.7], ["2026-04", 30.5, 21.1, 26, 11.1, 11.4, 2, 1.8, 1.9, 1.4, 2.6], ["2026-05", 29.5, 20.7, 27.9, 10.9, 11.2, 2.1, 1.9, 2.1, 1.9, 1.8], ["2026-06", 27.9, 17.5, 31.1, 12.4, 11.1, 1.8, 1.5, 1.9, 1.4, 2.1], ["2026-07", 27.3, 19.8, 28.6, 13, 11.1, 1.9, 1.9, 1.9, 1.4, 1.3], ["2026-08", 26.8, 19.5, 29.4, 12.4, 11.9, 1.8, 1.6, 2.8, 1.4, 2], ["2026-09", 26.3, 20.3, 30.2, 11.8, 11.2, 2, 1.9, 2.1, 1.5, 3.6], ["2026-10", 25.2, 22.6, 31.2, 10.5, 10.4, 3.8, 3.6, 4, 2.7, 2.6]],
+        "monthly": [["2025-07", 36.5, 27.2, 9.8, 12.2, 14.5, 4.3, 4, 2.7, 2.9, 3.2], ["2025-08", 35.8, 27.2, 11.2, 12, 14.1, 4.1, 3.8, 2.7, 2.8, 3], ["2025-09", 35.3, 25.9, 12.9, 11.7, 14.8, 4.1, 3.7, 2.9, 2.7, 3], ["2025-10", 34.5, 25.8, 14.6, 11.4, 13.3, 1.9, 1.8, 1.4, 1.3, 1.4], ["2025-11", 33.2, 24.2, 17.6, 12, 13, 2.4, 2.2, 2, 1.7, 1.7], ["2026-01", 29.9, 21.9, 25.3, 10.7, 12.2, 1.9, 2.1, 1.8, 1.3, 1.8], ["2026-02", 29.7, 18.4, 28, 11.5, 12.3, 2.3, 2.5, 2.3, 1.6, 1.8], ["2026-03", 29.3, 19.9, 27.4, 11.7, 11.7, 3.8, 3.3, 3.7, 2.7, 2.7], ["2026-04", 30.4, 21.2, 25.7, 11.5, 11.3, 2, 1.8, 1.9, 1.4, 2.3], ["2026-05", 29.5, 20.6, 27.8, 11, 11.2, 2.1, 1.9, 2.1, 1.4, 1.4], ["2026-06", 28.1, 17.4, 30.7, 12.7, 11, 1.8, 1.5, 1.9, 1.3, 1.7], ["2026-07", 27.4, 19.8, 28.6, 13, 11.1, 1.8, 1.7, 1.9, 1.4, 1.3], ["2026-08", 26.4, 19.7, 29.5, 12.5, 11.7, 1.8, 1.7, 2.4, 1.4, 1.6], ["2026-09", 26.2, 20.2, 30.1, 12, 11.2, 2, 2, 2.1, 1.5, 3.4], ["2026-10", 25.4, 22.5, 30.9, 10.6, 10.4, 3.8, 3.6, 4, 2.7, 2.6]],
         "pd": [{
           "f": "YouGov",
           "l": "1–8 Sep",
@@ -41293,32 +41281,32 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "r": "2026-10-06"
         }],
         "px": {
-          "alp": [25.7, 25.5, 28, 27.5, 25.5],
-          "lnp": [22.8, 19.6, 19.1, 22.6, 22.6],
-          "onp": [31.5, 27.1, 28.1, 30.1, 31.1],
-          "grn": [12.6, 12.5, 12.5, 11.5, 10.5],
-          "oth": [7.4, 15.3, 12.3, 8.3, 10.3]
+          "alp": [25.9, 26.1, 27, 27.5, 25.7],
+          "lnp": [22.8, 19.1, 19.3, 22.6, 22.5],
+          "onp": [31.2, 27.1, 28.2, 29.9, 30.8],
+          "grn": [12.6, 12.9, 12.8, 11.6, 10.6],
+          "oth": [7.5, 14.8, 12.7, 8.4, 10.3]
         },
         "share": 0.5
       }, {
         "label": "Higher earners",
         "v": {
-          "alp": 29.2,
-          "lnp": 23.7,
-          "onp": 23.4,
-          "grn": 13.4,
-          "oth": 10.3
+          "alp": 30.5,
+          "lnp": 22.7,
+          "onp": 21.9,
+          "grn": 14.5,
+          "oth": 10.4
         },
         "ci": {
-          "alp": 3.7,
-          "lnp": 5.3,
-          "onp": 3.5,
-          "grn": 2.8,
-          "oth": 2.5
+          "alp": 3.8,
+          "lnp": 4.1,
+          "onp": 3.4,
+          "grn": 2.9,
+          "oth": 3.2
         },
         "n": 5,
         "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"],
-        "monthly": [["2025-07", 37.9, 29.6, 6, 13.2, 13.5, 7.9, 7.5, 3.9, 5.5, 5.6], ["2025-08", 37.2, 29.6, 7.4, 13, 13.1, 7.5, 7.1, 4.1, 5.2, 5.2], ["2025-09", 36.7, 28.3, 9.1, 12.7, 13.8, 7.5, 7, 4.5, 5.2, 5.4], ["2025-10", 36.1, 30.5, 8.9, 11.6, 12.5, 3.6, 3.4, 2.1, 2.4, 2.4], ["2025-11", 33.7, 32.3, 15, 8.4, 10.6, 5.1, 5.1, 5.1, 4.1, 2.9], ["2026-01", 35.9, 27.7, 17.6, 10.9, 7.9, 4.1, 4.6, 3.3, 2.7, 3.6], ["2026-02", 33.4, 28.3, 20.5, 9.6, 8.3, 4.3, 9.7, 4.8, 2.7, 2.5], ["2026-03", 32.9, 22.6, 23.2, 11.4, 10, 7.1, 6.3, 6.4, 4.8, 4.5], ["2026-04", 32.5, 22.9, 24.4, 11.6, 8.8, 3.8, 3.4, 3.5, 2.6, 2.3], ["2026-05", 30.2, 24.4, 23.3, 12.7, 9.5, 3.8, 4.4, 3.5, 2.8, 2.5], ["2026-06", 28.8, 23.3, 27.7, 11.2, 9, 3.3, 5, 3.3, 2.3, 2.1], ["2026-07", 29.3, 24.8, 24.6, 10.7, 10.4, 3.4, 3.3, 3.3, 2.3, 2.3], ["2026-08", 30.7, 24.2, 21.1, 13.1, 10.8, 3.5, 3.2, 3.1, 2.6, 2.4], ["2026-09", 27.5, 25.1, 24.6, 12.8, 9.9, 3.7, 4.9, 3.6, 2.8, 2.6], ["2026-10", 31.5, 19.8, 23.5, 13.7, 11.5, 7.3, 6.3, 6.7, 5.4, 5]],
+        "monthly": [["2025-07", 36.7, 30.7, 5.6, 13.7, 13.5, 7.9, 7.5, 3.8, 5.6, 5.6], ["2025-08", 36, 30.7, 7, 13.5, 13.1, 7.5, 7.2, 4, 5.3, 5.2], ["2025-09", 35.5, 29.4, 8.7, 13.2, 13.8, 7.5, 7.1, 4.4, 5.3, 5.4], ["2025-10", 36.6, 31.3, 8.4, 11.8, 11.5, 3.6, 3.4, 2.1, 2.4, 2.4], ["2025-11", 35.9, 29.2, 12, 11.6, 11.3, 4.5, 4.3, 3.1, 3, 3], ["2026-01", 33.8, 26, 17.2, 12.9, 10, 3.6, 3.7, 2.8, 2.5, 3.7], ["2026-02", 32.6, 26.9, 18.3, 12.2, 10.1, 3.7, 4, 5.9, 2.6, 5.2], ["2026-03", 32, 23.6, 22.5, 12.5, 9.6, 7, 6.4, 6.3, 5, 4.4], ["2026-04", 32, 23.8, 23.8, 13, 7.6, 3.7, 3.4, 3.4, 2.7, 2.8], ["2026-05", 30, 24, 23.9, 13, 9.2, 3.8, 3.6, 3.6, 3.2, 2.5], ["2026-06", 30.2, 22.6, 26.8, 12.1, 8.3, 3.4, 3.1, 3.3, 2.4, 2.2], ["2026-07", 30.7, 25.1, 23.9, 10.5, 9.6, 3.5, 3.3, 3.2, 2.7, 2.2], ["2026-08", 30.4, 25.5, 20.9, 13.7, 9.5, 3.5, 3.3, 3.1, 2.6, 2.2], ["2026-09", 28.3, 24.1, 23.6, 13.7, 10.1, 3.7, 3.5, 3.5, 2.9, 3.8], ["2026-10", 34, 18.7, 20.4, 14.9, 11.9, 7.5, 6.2, 6.4, 5.6, 5.1]],
         "pd": [{
           "f": "YouGov",
           "l": "1–8 Sep",
@@ -41346,11 +41334,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "r": "2026-10-06"
         }],
         "px": {
-          "alp": [28.8, 26.5, 29.5, 26.3, 31.8],
-          "lnp": [22.8, 32.6, 23.6, 22.4, 19.8],
-          "onp": [23.4, 23.1, 22.1, 25.8, 23.4],
-          "grn": [13.6, 11.5, 14.5, 13.4, 13.7],
-          "oth": [11.4, 6.3, 10.3, 12.2, 11.4]
+          "alp": [29.9, 29.2, 29.3, 25.8, 34.3],
+          "lnp": [22.8, 28.4, 24.2, 22.3, 18.7],
+          "onp": [20.3, 23.5, 21.8, 24.2, 20.3],
+          "grn": [14, 13.6, 14.9, 14.1, 14.9],
+          "oth": [13, 5.2, 9.8, 13.6, 11.8]
         },
         "share": 0.15
       }],
@@ -41382,7 +41370,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "source": "https://e.infogram.com/_/tffIGyctHfK10P86g4Pb",
       "sets": ["income"]
     }],
-    "roster": ["Newspoll (pooled)", "YouGov", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent", "Freshwater"],
+    "roster": ["YouGov", "Newspoll (pooled)", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent", "Freshwater"],
     "window": "six weeks"
   };
   const demoTrend = {
@@ -105720,7 +105708,7 @@ function infoTerms(D) {
       id: "vote-by-group",
       body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, the language they speak at home, whether they work full time, part time or are retired, and how much they earn.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where. Income is the exception: no two pollsters draw the same bracket, so the Income tab pools each house\u2019s own lowest and highest bands and names them there."), React.createElement("span", {
+      }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where. Income is the exception: no two pollsters draw the same bracket, so the Income tab fits each poll a line across the income scale \u2013 its brackets mapped onto the census income distribution, each weighted by how many voters it holds \u2013 and reads every poll at the same two bands of the electorate, the bottom half and the top 15% plus. The note by the chart names each house\u2019s own end brackets."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Reading a gap."), " Each figure carries its", " ", xref("interval", "who votes for whom", "95% margin"), ", usually 2 to 5 points, with each poll\u2019s sample for a group estimated from the group\u2019s share of adults (18\u201334s are about 28%). The sentences call a difference ", xref("significance", "who votes for whom", "significant"), " ", "only when it passes that test, with the bar raised when three or more groups are compared. They report what passes: a steady rise or fall across ordered groups such as age (only when every step passes), one group apart from the others, or failing those, the largest gap that passes. If no two groups differ, they name any group that sits clear of all voters by more than its margin, and only if none does, no difference."), React.createElement("span", {
         className: "info-p"

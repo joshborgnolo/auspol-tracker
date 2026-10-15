@@ -1,0 +1,169 @@
+{
+ "aweRatio": 1.1991,
+ "weeksPerYear": 52.17857,
+ "axes": {
+  "household": {
+   "base": "occupied private dwellings, weekly household income ($2021)",
+   "bands": [
+    {
+     "lo": 0,
+     "hi": 149,
+     "n": 226299
+    },
+    {
+     "lo": 150,
+     "hi": 299,
+     "n": 112028
+    },
+    {
+     "lo": 300,
+     "hi": 399,
+     "n": 202370
+    },
+    {
+     "lo": 400,
+     "hi": 499,
+     "n": 510377
+    },
+    {
+     "lo": 500,
+     "hi": 649,
+     "n": 377629
+    },
+    {
+     "lo": 650,
+     "hi": 799,
+     "n": 535291
+    },
+    {
+     "lo": 800,
+     "hi": 999,
+     "n": 549428
+    },
+    {
+     "lo": 1000,
+     "hi": 1249,
+     "n": 636539
+    },
+    {
+     "lo": 1250,
+     "hi": 1499,
+     "n": 656179
+    },
+    {
+     "lo": 1500,
+     "hi": 1749,
+     "n": 517131
+    },
+    {
+     "lo": 1750,
+     "hi": 1999,
+     "n": 505350
+    },
+    {
+     "lo": 2000,
+     "hi": 2499,
+     "n": 1043667
+    },
+    {
+     "lo": 2500,
+     "hi": 2999,
+     "n": 662269
+    },
+    {
+     "lo": 3000,
+     "hi": 3499,
+     "n": 582378
+    },
+    {
+     "lo": 3500,
+     "hi": 3999,
+     "n": 363735
+    },
+    {
+     "lo": 4000,
+     "hi": null,
+     "n": 1152598
+    }
+   ],
+   "total": 8633268
+  },
+  "personal": {
+   "base": "persons 15+, weekly personal income ($2021)",
+   "bands": [
+    {
+     "lo": 0,
+     "hi": 149,
+     "n": 2496157
+    },
+    {
+     "lo": 150,
+     "hi": 299,
+     "n": 1005054
+    },
+    {
+     "lo": 300,
+     "hi": 399,
+     "n": 1573592
+    },
+    {
+     "lo": 400,
+     "hi": 499,
+     "n": 1581589
+    },
+    {
+     "lo": 500,
+     "hi": 649,
+     "n": 1511142
+    },
+    {
+     "lo": 650,
+     "hi": 799,
+     "n": 1438961
+    },
+    {
+     "lo": 800,
+     "hi": 999,
+     "n": 1680604
+    },
+    {
+     "lo": 1000,
+     "hi": 1249,
+     "n": 1866790
+    },
+    {
+     "lo": 1250,
+     "hi": 1499,
+     "n": 1402840
+    },
+    {
+     "lo": 1500,
+     "hi": 1749,
+     "n": 1229032
+    },
+    {
+     "lo": 1750,
+     "hi": 1999,
+     "n": 908580
+    },
+    {
+     "lo": 2000,
+     "hi": 2999,
+     "n": 1575049
+    },
+    {
+     "lo": 3000,
+     "hi": 3499,
+     "n": 366351
+    },
+    {
+     "lo": 3500,
+     "hi": null,
+     "n": 662725
+    }
+   ],
+   "total": 19298466
+  }
+ },
+ "_about": "National weekly-income histograms for the Who-votes Income tab's standardised pooling (gen-data §7g-income): 2021 Census GCP commonwealth-electoral-division sums (household G33, personal G17B+G17C; not-stated dropped, Negative/Nil folded into $0–149), $ axis wage-indexed 2021→2026 by aweRatio = AWE(ABS 6302.0 s.a. full-time adult ordinary time) May 2026 $2,083.00 / May 2021 $1,737.10 (the household axis rides the same ratio — one indexed constant, honestly labelled, rather than two fake-precise ones). Poll brackets map in by edge×1000/weeksPerYear/aweRatio with uniform interpolation inside histogram bands; above the open top band an edge saturates to quantile 1. Built by .build/extract-income-dist.mjs; refresh with --fetch on a new census datapack (2026 census ~June 2027) and re-verify aweRatio."
+}

@@ -2252,7 +2252,7 @@ const DEMO_SET_WORDS = {
   housing: { all: "owners and renters", others: "other voters", step: null, one: "group" },
   language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
   working: { all: "work-status groups", others: "voters of other work statuses", step: null, one: "work-status group" },
-  // the income tab's own pair of tilts: the house's own lowest and highest bands
+  // the income tab's own pair of tilts: the fitted-line reads at the two standard bands
   income: { all: "earner bands", others: "higher earners", step: null, one: "earner band" },
 };
 const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others & independents" };

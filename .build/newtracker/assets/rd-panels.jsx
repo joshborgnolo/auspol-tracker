@@ -1760,7 +1760,7 @@ const RD_DEMO_SHORT = {
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
-  // the income tab's two bands, each house's own lowest and highest
+  // the income tab's two standard bands: the electorate's bottom half and its top 15%+
   "Lower earners": "lower earners", "Higher earners": "higher earners",
 };
 /* ---- the headline: who each party's voters are ----------------------------
@@ -3173,11 +3173,11 @@ function RdDemographics({ rangeId = "all" }) {
           { kind: "whisker", color: pColor, label: "95% interval" },
           { kind: "dot", color: pColor, label: "One poll pooled" },
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
-        {/* which of the house's brackets each tilt pooled, spelled out by
-           house since no two houses' brackets agree (the dek says why up
-           front) - just below the dot-plot's legend: inside the sethead it
-           grew the caption row and pushed the all-voters cap onto the
-           vertical line */}
+        {/* the house's own end brackets each tilt was read from, spelled
+           out by house since no two houses' brackets agree (the dek says
+           why up front) - just below the dot-plot's legend: inside the
+           sethead it grew the caption row and pushed the all-voters cap
+           onto the vertical line */}
         {tab.sets.some((st) => st.bands) ? (
           <div className="rd-wv-bands">
             {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (

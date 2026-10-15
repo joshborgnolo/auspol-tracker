@@ -297,6 +297,10 @@ freshness_sync() {
 # 5c satellite console page is gone; a quiet refresh writes the same
 # bytes). flows-explained/index.html (the explainer as a main-build tab
 # page) and its preference-flows/ redirect stub joined 2026-10-15 too.
+# data/income-dist.json joined 2026-10-16 with the Who-votes Income tab's
+# standardised pooling: gen-data reads it every build, so a data commit
+# must carry it alongside the other generated files or a fresh clone's
+# build emits the roster without the income tab.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   disagreement/index.html leans/index.html flows/index.html
@@ -304,7 +308,7 @@ SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   vic/allpolls/index.html vic/info/index.html
   vic/disagreement/index.html vic/leans/index.html vic/flows/index.html
   changelog/index.html
-  data/changelog.json
+  data/changelog.json data/income-dist.json
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
   assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
 # vic/cycles/index.html joins the list only once it EXISTS: the vic build

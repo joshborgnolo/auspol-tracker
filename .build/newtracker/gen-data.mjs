@@ -61,7 +61,7 @@ const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : F
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
 import { fieldTbcUrl } from "./field-tbc.mjs";
-import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize } from "./demo-groups.mjs";
+import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, incomeQuantiles, incomeFit } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;
@@ -3051,6 +3051,13 @@ const DEMOGRAPHICS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8")); }
   catch { return null; }
 })();
+/* the national census income histograms the income tab standardises
+   through (§7g-income; built by .build/extract-income-dist.mjs) */
+const INCOME_DIST = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "income-dist.json"), "utf8")); }
+  catch { return null; }
+})();
 // the wave's poll row: its own date, or – Resolve's series date sits a day or
 // so off its polls.json row – the nearest row of that house within four days
 const demoPollOf = (w) => {
@@ -4446,26 +4453,45 @@ const DEMO_LOC_ELECTION = {
    sits out, as every pooled wave did before 2026-10-11. */
 // set|group -> the monthly rows §7gb tests (§7g's rowsT), never emitted
 const DEMO_TEST_MONTHLY = new Map();
-/* The income tab's bands, exactly as each house stores them in
-   demographics.json: a wave whose income dim holds the right PAIR joins at
-   those keys; every other income layout (YouGov's pre-Apr-2026 four-bucket
-   and partial rows) finds no key, and the rest of each dim sits out because
-   only the extremes carry a common reading. Newspoll's quarterly tables
-   print the same four brackets YouGov used before its Apr-2026 binary
-   switch (the polls these pool are the same product), so Newspoll's
-   lowest PAIR joins YouGov's Under $100k and its $150k+ joins YouGov's
-   $100k-or-more partner – Newspoll's own printed cells, never an estimate.
-   Demo-groups' header (the "Income is the ruled-out cut" note) explains why
-   no harmonized group comes of them – every bracket shares no cut points –
-   and why it never will. */
-const INCOME_BANDS = {
-  "Newspoll (pooled)": { low: ["Under $50k", "$50–99k"], high: ["$150k+"] },
-  "YouGov": { low: ["Under $100k"], high: ["$100k or more"] },
-  "DemosAU": { low: ["Under $45k"], high: ["$125k+"] },
-  "DemosAU (MRP)": { low: ["Under $45k"], high: ["$200k+"] },
-  "RedBridge/Accent": { low: ["Under $1,000 a week"], high: ["$3,000+ a week"] },
-  "Freshwater": { low: ["Under $75k"], high: ["$150k or more"] },
-};
+/* §7g-income's standardiser: a wave's income dim becomes standardised
+   band shares by fitting, per party, a vote-share line over the
+   quantile axis through the house's printed brackets (INCOME_GRIDS,
+   mapped to quantiles via the census histograms), and reading it at
+   INCOME_STD_BANDS' midpoints. The 8acacb93 naive design pooled each
+   house's lowest and highest BRACKETS directly – YouGov's ~66% of
+   households and DemosAU's ~46% of persons were pooled as if the same
+   group of people, and the pooled bias drifted with the window's house
+   mix. Here every house's brackets meet on the quantile axis instead,
+   and every wave reads at the SAME two bands of the electorate.
+   Standard for one wave and group, or null (no grid variant the wave
+   printed at least two cells of, or no census distribution loaded). */
+function incomeStandardise(house, dim) {
+  if (!dim || !INCOME_DIST) return null;
+  const variants = incomeQuantiles(house, INCOME_DIST);
+  if (!variants) return null;
+  /* the era's own layout: the variant the wave printed the most cells
+     of – eras never share keys, so the match is unambiguous */
+  const fitted = variants
+    .map((v) => ({ fit: incomeFit(v.cells, dim), cells: v.cells, present: v.cells.filter((c) => dim[c.key]) }))
+    .filter((x) => x.fit)
+    .sort((a, b) => b.present.length - a.present.length)[0];
+  if (!fitted) return null;
+  const shares = {};
+  for (const { group, lo, hi } of INCOME_STD_BANDS) {
+    const mid = (lo + hi) / 2, sh = {};
+    for (const k of DEMO_KEYS) {
+      const f = fitted.fit.fits[k], sup = fitted.fit.support[k];
+      /* a standard band outside the printed cells' support is never
+         extrapolated (a partial YouGov row holding only its top two
+         brackets reads nothing at the lower band) */
+      if (f && sup && mid >= sup[0] && mid <= sup[1]) sh[k] = f.a + f.b * mid;
+    }
+    if (Object.keys(sh).length) shares[group] = sh;
+  }
+  if (!Object.keys(shares).length) return null;
+  const inCells = fitted.cells.filter((c) => dim[c.key]);
+  return { shares, band: [inCells[0].key, inCells[inCells.length - 1].key] };
+}
 // pooling machinery for §7g and §7g-income: one builder, two row stores
 function demoBuild(rows, rowsM, setsSpec, allbyYm, ALL, ALL_T, SPARSE, SHARES) {
   const housesIn = (rs) => [...new Set(rs.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE.window; }).map((r) => r.firm))];
@@ -4582,27 +4608,17 @@ const { demo: demographics, income: demoIncome } = (() => {
         (rowsT[set.id + "|" + group + "|" + k] ||= []).push({ ym: one.ym, mid: one.mid, x: MT[k] + (g[k] - tot[k]), n: one.n * DEMO_SHARE[group], firm: w.pollster });
       }
     }
-    /* the wave's income extremes, beside the harmonized groups (never the
-       SAME shared rows maps: an income wave feeds no common-group pool, nor
-       would a common-group wave accidentally feed the income tab). A wave
-       whose income layout isn't exactly the stored pair joins nothing:
-       YouGov's pre-Apr-2026 four-bucket and partial rows fail the pair. */
-    const ib = INCOME_BANDS[w.pollster];
+    /* the wave's standardised income bands, beside the harmonized groups
+       (never the SAME shared rows maps: an income wave feeds no common-
+       group pool, nor would a common-group wave accidentally feed the
+       income tab). incomeStandardise fits the wave's printed brackets
+       and reads them at the standard bands; a wave whose layout fits
+       nothing (single-cell partials, no grid variant) joins nothing. */
+    const inc = incomeStandardise(w.pollster, w.dims && w.dims.income);
     let iUsed = false;
-    if (ib && w.dims && w.dims.income) {
-      const dim = w.dims.income;
-      for (const [grp, key] of [["Lower earners", "low"], ["Higher earners", "high"]]) {
-        /* the pair must ALL be present to read (Newspoll's low pair merges
-           as one – the house's own pairwise join of YouGov's binary – and a
-           partial layout, like YouGov's Feb-2026 pair, fails the check) */
-        const rowsIn = ib[key].map((bk) => dim[bk]);
-        if (rowsIn.some((r) => !r)) continue;
-        const sh = {};
-        for (const row of rowsIn) for (const k of DEMO_KEYS) {
-          if (row[k] != null) sh[k] = (sh[k] || 0) + (+row[k] || 0);
-        }
-        if (!Object.keys(sh).length) continue;
-        const g = demoNorm(sh);
+    if (inc) {
+      for (const { group: grp } of INCOME_STD_BANDS) {
+        const g = inc.shares[grp] && demoNorm(inc.shares[grp]);
         if (!g) continue;
         iUsed = true;
         for (const { mid, ym, n } of reads) {
@@ -4618,7 +4634,7 @@ const { demo: demographics, income: demoIncome } = (() => {
     // in the window when any part is; ranked by its newest
     const ds = reads.map((r) => ddays(refNow, r.mid)).filter((d) => d >= 0 && d <= SPARSE_K.window);
     if (used && ds.length) inWindow.push({ w, p, d: Math.min(...ds) });
-    if (iUsed && ds.length) incInWindow.push({ w, p, d: Math.min(...ds) });
+    if (iUsed && ds.length) incInWindow.push({ w, p, d: Math.min(...ds), band: inc ? inc.band : null });
   }
   const sets = demoBuild(rows, rowsM, DEMO_SETS.map((s) => ({ tab: s.tab, id: s.id, label: s.label, groups: s.groups })), allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
   for (const set of DEMO_SETS) for (const group of set.groups) {
@@ -4690,14 +4706,17 @@ const { demo: demographics, income: demoIncome } = (() => {
         houses: iHouses,
         sets: [{
           id: "income", label: null,
-          /* the note the sethead pill leads with: the brackets are each
-             house's own, and their EDGES differ – the dek says so up front,
-             the pill spells each house's */
-          note: "each house counts at its own lowest and highest bands",
-          bands: Object.fromEntries(Object.entries(INCOME_BANDS).map(([house, b]) => [house, {
-            low: b.low.slice(0, 2).filter(Boolean),
-            high: b.high.slice(0, 2).filter(Boolean),
-          }])),
+          /* the note the sethead pill leads with: every house fitted in
+             its own brackets and READ at the same two bands of the
+             electorate – the dek says so up front, the pill spells each
+             house's own end brackets */
+          note: "each house's own brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
+          /* each house's own end brackets as its newest in-window wave
+             printed them (incInWindow rides newest-first), so a switch of
+             layout era never shows the stale era's brackets */
+          bands: Object.fromEntries(incInWindow.filter((e) => e.band)
+            .filter((e, i, a) => a.findIndex((x) => x.w.pollster === e.w.pollster) === i)
+            .map((e) => [e.w.pollster, { low: [e.band[0]], high: [e.band[1]] }])),
           groups: iSets[0].groups,
           houses: iSets[0].houses,
         }],
@@ -4711,16 +4730,10 @@ const { demo: demographics, income: demoIncome } = (() => {
            (iSets[0].houses, computed over the pooled rows isn't what a
            reader counts – the roster lists each house that HAS an income
            wave the build read, so a house's lone Oct-2025 read still shows) */
-        roster: Object.keys(INCOME_BANDS).filter((house) =>
-          (DEMOGRAPHICS?.waves || []).some((w) => w.pollster === house && w.dims && w.dims.income && ibHasIncome(w, house))),
+        roster: Object.keys(INCOME_GRIDS).filter((house) =>
+          (DEMOGRAPHICS?.waves || []).some((w) => w.pollster === house && incomeStandardise(house, w.dims && w.dims.income))),
         window: SPARSE_K.label,
       };
-      function ibHasIncome(w, house) {
-        const b = INCOME_BANDS[house];
-        const dim = w.dims && w.dims.income;
-        if (!b || !dim) return false;
-        return b.low.every((bk) => dim[bk]) && b.high.every((bk) => dim[bk]);
-      }
     }
   }
   return { demo, income };
