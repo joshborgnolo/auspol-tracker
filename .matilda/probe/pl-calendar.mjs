@@ -99,6 +99,50 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
     const expectedLi = over + wins + irrs + days.size;
     const liCount = det.querySelectorAll(".rd-cal-list li").length;
     const overCount = det.querySelectorAll(".rd-cal-sec-over li").length;
+    /* filing-hour assertions: dated slots name the hour the house files
+       at after their linked name (the same hourWords recline as the Next
+       column's), while windows, irregular slots and the due-in list carry
+       none. The expectations are derived IN PAGE from each projection
+       row's release fields, replicating rd-polls.jsx's hourWords and the
+       wall-clock renderers of the a11e1559 asset, so nothing here
+       hardcodes a house's habit. */
+    const clockParts = (mins) => {
+      const h = Math.floor(mins / 60), mi = mins % 60;
+      const ap = h < 12 ? "am" : "pm";
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      return { num: mi ? `${h12}:${String(mi).padStart(2, "0")}` : `${h12}`, ap };
+    };
+    const clockLabel = (mins) => { const c = clockParts(mins); return `${c.num} ${c.ap}`; };
+    const RELEASE_TIGHT_MINS = 120;
+    const releaseLabel = (from, to, mid, vals) => {
+      if (from == null || to == null) return null;
+      if (from === to) return clockLabel(from);
+      if (vals && vals.length >= 2) {
+        const ps = vals.map(clockParts);
+        return ps.every((p) => p.ap === ps[0].ap)
+          ? `${ps.slice(0, -1).map((p) => p.num).join(", ")} or ${ps[ps.length - 1].num} ${ps[0].ap}`
+          : vals.slice(0, -1).map(clockLabel).join(", ") + ` or ${clockLabel(vals[vals.length - 1])}`;
+      }
+      if (to - from > RELEASE_TIGHT_MINS) return clockLabel(Math.round(mid != null ? mid : (from + to) / 2));
+      const a = clockParts(from), b = clockParts(to);
+      return a.ap === b.ap ? `${a.num}–${b.num} ${b.ap}`
+                           : `${clockLabel(from)}–${clockLabel(to)}`;
+    };
+    const hourWords = (r) => {
+      if (r.releaseFrom == null || r.releaseTo == null) return null;
+      if (r.releaseVals && r.releaseVals.length >= 2) return releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid, r.releaseVals);
+      if (r.releaseTo - r.releaseFrom <= 20) return clockLabel(r.releaseFrom);
+      return "about " + clockLabel(Math.round((r.releaseMid != null ? r.releaseMid : (r.releaseFrom + r.releaseTo) / 2) / 60) * 60);
+    };
+    const expectedHours = {};
+    calRows.forEach((r) => {
+      if (r.tracked === "confidence") return;
+      if (r.overdue) return;
+      if (r.loose && !irr(r)) return;
+      if (irr(r)) return;
+      const hr = hourWords(r);
+      if (hr) (expectedHours[r.pollster] = expectedHours[r.pollster] || []).push(hr);
+    });
     /* month heads, in render order, vs expected ym sequence */
     const heads = [...det.querySelectorAll(".rd-cal-m")].map((el) => el.textContent.trim());
     const items = [];
@@ -146,6 +190,21 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
         txt: a.textContent.trim(), href: a.getAttribute("href") || "",
         tgt: a.getAttribute("target"), mark: !!a.querySelector(".plink-mark") })),
       emptyW: [...det.querySelectorAll(".rd-cal-w")].filter((c) => !c.children.length).length,
+      expectedHours,
+      /* per who-entry: the pollster name and, if rendered, the hour text
+         that trails it (", 6 pm" shape). The overdue list and the window
+         /irregular items must show NONE of these. */
+      calWi: [...det.querySelectorAll(".rd-cal-list .rd-cal-wi")].map((wi) => {
+        const a = wi.querySelector("a");
+        const t = wi.querySelector(".rd-cal-t");
+        let n = a ? a.textContent : "";
+        if (!n) { const tn = [...wi.childNodes].find((x) => x.nodeType === 3 && x.textContent.trim()); n = tn ? tn.textContent : ""; }
+        return { n: n.replace(/↗\s*$/, "").trim(), hr: t ? t.textContent : null,
+                 afterLink: t ? !!(t.previousSibling && t.previousSibling.nodeType !== 9) : false };
+      }),
+      calHours: [...det.querySelectorAll(".rd-cal-t")].map((t) => t.textContent),
+      calOverT: det.querySelectorAll(".rd-cal-sec-over .rd-cal-t").length,
+      calOverWi: det.querySelectorAll(".rd-cal-sec-over .rd-cal-wi").length,
     };
   });
   check(`${vp.tag} opens`, r1.ok !== false, r1.why);
@@ -177,7 +236,23 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
         r1.links.every((l) => /^https:\/\//.test(l.href) && l.tgt === "_blank" && l.mark && l.txt.endsWith("↗")),
         JSON.stringify((r1.links || []).slice(0, 3)));
   check(`${vp.tag} no empty name cells`, r1.ok && r1.emptyW === 0, "empty=" + r1.emptyW);
-  if (vp.tag === "desktop") console.log("   first rows:", JSON.stringify(r1.liTexts), "quals:", JSON.stringify(r1.qualSample));
+  /* filing hours: the multiset a dated slot prints after its name must be
+     exactly hourWords(projection row) - same house, same instances. */
+  const hrGot = {};
+  (r1.calWi || []).forEach((w) => { if (w.hr) (hrGot[w.n] = hrGot[w.n] || []).push(w.hr.replace(/^, /, "")); });
+  const hrNorm = (o) => JSON.stringify(Object.fromEntries(Object.entries(o)
+    .map(([k, v]) => [k, [...v].sort()]).sort()));
+  check(`${vp.tag} fold hours == hourWords(projection)`, r1.ok && hrNorm(hrGot) === hrNorm(r1.expectedHours || {}),
+        `got=${hrNorm(hrGot)} want=${hrNorm(r1.expectedHours || {})}`);
+  check(`${vp.tag} at least one dated slot shows its hour`,
+        r1.ok && Object.values(r1.expectedHours || {}).flat().length >= 1 && (r1.calWi || []).some((w) => w.hr),
+        JSON.stringify(r1.expectedHours));
+  check(`${vp.tag} overdue rows carry no hour`, r1.ok && r1.calOverT === 0, `overT=${r1.calOverT}`);
+  check(`${vp.tag} hour text shaped like ', 6 pm'`, r1.ok && (r1.calHours || [])
+        .every((t) => /^, (?:about )?.*(am|pm)$/.test(t)),
+        JSON.stringify((r1.calHours || []).slice(0, 5)));
+  if (vp.tag === "desktop") console.log("   first rows:", JSON.stringify(r1.liTexts), "quals:", JSON.stringify(r1.qualSample),
+                                        "hours:", JSON.stringify(Object.values(r1.expectedHours || {}).flat().slice(0, 6)));
 
   const r2 = await page.evaluate(() => ({
     hOver: document.documentElement.scrollWidth - document.documentElement.clientWidth,

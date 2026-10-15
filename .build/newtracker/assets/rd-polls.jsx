@@ -615,7 +615,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const iso = new Date(r.release).toISOString().slice(0, 10);
       let e = calDays.get(iso);
       if (!e) { e = { key: "d" + iso, at: r.release, who: [] }; calDays.set(iso, e); calItems.push(e); }
-      e.who.push(me);
+      /* a dated slot names its filing hour where the house has one - the
+         same hourWords the Next column prints beside the date, so the fold
+         and the table never tell the hour two ways. A window or an
+         irregular slot carries none: no hour belongs to them (the untimed
+         and the confidence rows also fall out here, hourWords null) */
+      e.who.push({ ...me, hr: hourWords(r) });
     }
   });
   calOver.sort((a, b) => a.release - b.release);
@@ -653,7 +658,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const calWho = (w, i) => (
     <span key={String(i)} className="rd-cal-wi">{i > 0 ? <span className="rd-cal-wsep" aria-hidden="true">, </span> : null}{w.site
       ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next release lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
-      : w.name}{w.tracked && RD_CAL_TRACK[w.tracked]
+      : w.name}{w.hr ? <span className="rd-cal-t">, {w.hr}</span> : null}{w.tracked && RD_CAL_TRACK[w.tracked]
       ? <span className="rd-cal-track">{RD_CAL_TRACK[w.tracked]}</span> : null}</span>);
 
   return (

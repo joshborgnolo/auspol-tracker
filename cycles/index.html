@@ -3508,6 +3508,7 @@ body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
 body.rd .rd-cal-w a { color: inherit; text-decoration: none; }
 body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
+body.rd .rd-cal-t { font-weight: 400; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
 body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--ink-3); }
@@ -119896,7 +119897,10 @@ function RdPolls({
         calDays.set(iso, e);
         calItems.push(e);
       }
-      e.who.push(me);
+      e.who.push({
+        ...me,
+        hr: hourWords(r)
+      });
     }
   });
   calOver.sort((a, b) => a.release - b.release);
@@ -119934,7 +119938,9 @@ function RdPolls({
   }, w.name, React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
-  }, "\u2197")) : w.name, w.tracked && RD_CAL_TRACK[w.tracked] ? React.createElement("span", {
+  }, "\u2197")) : w.name, w.hr ? React.createElement("span", {
+    className: "rd-cal-t"
+  }, ", ", w.hr) : null, w.tracked && RD_CAL_TRACK[w.tracked] ? React.createElement("span", {
     className: "rd-cal-track"
   }, RD_CAL_TRACK[w.tracked]) : null);
   return React.createElement(RdSec, {

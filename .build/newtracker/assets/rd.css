@@ -312,6 +312,9 @@ body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
 body.rd .rd-cal-w a { color: inherit; text-decoration: none; }
 body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
+/* the filing hour rides its house name, quiet like the date it tempers
+   (the who cell is 500; the hour is a qualifier, not the name) */
+body.rd .rd-cal-t { font-weight: 400; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
 /* a tracked-release row's marker: not a poll - quiet sentence-case text in
@@ -586,8 +589,17 @@ body.rd .ts-sep { background: var(--line); }
      "All polls" and pushed Info off the bar. The switch rides the pin, when
      the bar is already moving; the bar's height never changes. */
   body.rd .tabs.pinned .tabs-set { width: auto; justify-content: flex-start; }
+  /* ...but closed up, EVERY label gap collapsed to the padding's ~10px, and
+     the ☰ read as the row's last tab ("part of All polls"). A lead-in margin
+     re-seats it as a unit apart from the tab cluster, closest to the rhythm
+     the unpinned spread gives it. The tightest rungs trim the lead (and the
+     button's trailing pad) so the docked score keeps its clearance. */
+  body.rd .tabs.pinned .tab-menu { margin-left: 16px; }
   body.rd .ts-num { font-size: 15px; }
   body.rd .tab-score { gap: 6px; }
+}
+@media (max-width: 345px) {
+  body.rd .tabs.pinned .tab-menu { margin-left: 5px; padding-right: 3px; }
 }
 /* the narrowest phones: Info leaves the docked bar for the ☰ menu from
    420px and the score drops its party letters from 380px, in both designs
