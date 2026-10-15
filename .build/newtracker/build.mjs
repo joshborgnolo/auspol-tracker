@@ -200,9 +200,12 @@ const FONTS = [
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
-  /* IBM Plex Mono went with the change log page's console (it became a tab
-     page 2026-10-15, set in the page's own type); both subsets stay in
-     fonts/ for re-registration. */
+  /* IBM Plex Mono – the Changelog tab page's console (ssChangelogBlock below;
+     ChangelogEntries in the d1a1d215 asset). Restored 2026-10-15 after the
+     page's first day as a tab set it in prose type (user: keep the old
+     code-like chunk). Not preloaded: only the one tab page consumes it. */
+  { file: "ibmplexmono-400-latin.woff2",        family: "IBM Plex Mono", style: "normal", weight: "400" },
+  { file: "ibmplexmono-600-latin.woff2",        family: "IBM Plex Mono", style: "normal", weight: "600" },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });
@@ -675,23 +678,47 @@ function ssAboutBlock(L, prim, acc) {
 
 /* The Changelog tab page's static article: every entry of
    data/changelog.json (gen-data §8d, appended on each site refresh), newest
-   first – a crawler or no-JS reader gets the whole run; the live tab
-   renders the same list from D.changelog. Federal only – a VIC build never
-   has the file. Caller supplies its esc. */
+   first, as the console the retired /changelog/ satellite page introduced
+   (2026-10-12) – one grid line per entry, ISO date, [kind] tag, the figures
+   lit like syntax. Restored 2026-10-15 after the page's first day as a tab
+   set the entries as quiet prose; the live tab renders the same console
+   from D.changelog (ChangelogEntries, d1a1d215 asset – keep the two in
+   step), and the .cl-* styles live in template.html. Federal only – a VIC
+   build never has the file. Caller supplies its esc. */
+const CL_KIND = { poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start" };
 function ssChangelogBlock(esc) {
   let C = null;
   try { C = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")); } catch { /* absent on first build */ }
   if (!C || !Array.isArray(C.entries) || !C.entries.length) return "";
-  const rows = [...C.entries].reverse().map((e) => `
-      <p class="info-about-p"><time class="info-cl-date" datetime="${esc(e.date)}">${esc(e.label)}</time>
-        ${esc(e.text)}${e.links ? e.links.map((l) => ` <a class="fb-link" href="${esc(l.url)}">${esc(l.name)} &#8599;</a>`).join("")
-          : e.url ? ` <a class="fb-link" href="${esc(e.url)}">the pollster&#8217;s release &#8599;</a>` : ""}</p>`).join("");
+  /* figures and arrows lit like syntax; esc never writes a digit, so the
+     number pass can't land inside an entity it made */
+  const lit = (s) => esc(s)
+    .replace(/(\d[\d,]*(?:\.\d+)?%?)/g, '<span class="cl-n">$1</span>')
+    .replace(/→/g, '<span class="cl-ar">→</span>');
+  const newest = [...C.entries].reverse();
+  const rows = newest.map((e, i) => {
+    const kind = CL_KIND[e.kind] ? e.kind : "meta";
+    const rep = i > 0 && newest[i - 1].date === e.date;
+    return `
+        <li class="cl-e cl-k-${kind}"><time class="cl-date${rep ? " cl-rep" : ""}" datetime="${esc(e.date)}">${esc(e.date)}</time><span class="cl-tag">${CL_KIND[kind]}</span><p class="cl-text">${lit(e.text)}${e.links ? e.links.map((l) => ` <a class="cl-src" href="${esc(l.url)}">${esc(l.name)}&nbsp;&#8599;</a>`).join("")
+          : e.url ? ` <a class="cl-src" href="${esc(e.url)}">release&nbsp;&#8599;</a>` : ""}</p></li>`;
+  }).join("");
+  const n = C.entries.length;
   return `
 
-      <h2>Every entry, newest first</h2>
-      <p>A poll landing is what writes most of these &#8211; the
-        <a class="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the
-        pollster&#8217;s own release.</p>${rows}`;
+      <section class="cl-term" aria-label="Change log entries, newest first">
+        <div class="cl-bar"><span class="cl-file"><b>data/</b>changelog</span><span class="cl-live"><i aria-hidden="true"></i>recording</span></div>
+        <div class="cl-body">
+          <p class="cl-cmt"># ${n} ${n === 1 ? "entry" : "entries"} since ${esc(C.entries[0].date)}</p>
+          <ol class="cl-log">${rows}
+          </ol>
+          <p class="cl-wait"><b aria-hidden="true">&#8250;</b>next entry when the next poll lands<span class="cl-cur" aria-hidden="true"></span></p>
+        </div>
+      </section>
+      <p class="ss-note">A poll landing is what writes most of these &#8211; the
+        <a class="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a
+        link to the pollster&#8217;s own release, and <a class="fb-link" href="/allpolls/">All polls</a>
+        is the interactive archive.</p>`;
 }
 
 function buildStaticSummary() {
@@ -1050,9 +1077,10 @@ ${body.trim()}
         choose between the final two, and what the pollsters' own two-party figures imply &#8211; one
         contest at a time.`],
   };
-  // the change log's own menu page: every entry of data/changelog.json, restated
-  // in the Info about-block's date-smallcaps style; the static list IS the page
-  // for a no-JS reader or crawler (the client renders the same entries live)
+  // the change log's own menu page: every entry of data/changelog.json as the
+  // console the retired satellite page introduced (ssChangelogBlock); the
+  // static list IS the page for a no-JS reader or crawler (the client renders
+  // the same entries live, ChangelogEntries in the d1a1d215 asset)
   if (id === "changelog") {
     return `<article class="static-summary">
   <h1>Changelog</h1>

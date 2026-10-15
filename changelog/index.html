@@ -97,6 +97,22 @@
   src: url("/assets/fonts/sourcesans3-latin.ac057a55.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexmono-400-latin.c36f509c.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexmono-600-latin.ad4580d8.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 </style>
   <style>
 :root {
@@ -1474,11 +1490,100 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-about { margin-bottom: 8px; }
-.info-changelog { list-style: none; margin: 0 0 12px; padding: 0;
-  font-size: 14px; line-height: 1.55; color: var(--ink-2); }
-.info-changelog li { margin: 0 0 7px; }
-.info-cl-date { display: inline-block; min-width: 86px; color: var(--ink-3);
-  font-variant-numeric: tabular-nums; }
+.cl-term {
+  --t-bg: var(--surface); --t-bar: var(--surface-2);
+  --t-edge: var(--line);   --t-line: var(--line-2);
+  --t-ink: var(--ink);     --t-ink-2: var(--ink-2);
+  --t-dim: var(--ink-3);   --t-faint: var(--ink-faint);
+  --k-poll:    var(--accent);
+  --k-flows:   oklch(0.50 0.085 295);
+  --k-finding: oklch(0.53 0.095 345);
+  margin: 28px 0 0; width: 100%; max-width: 880px;
+  background: var(--t-bg); color: var(--t-ink-2);
+  border: 1px solid var(--t-edge); border-radius: 14px;
+  font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13.5px; line-height: 1.62;
+  font-feature-settings: normal;
+  box-shadow: 0 1px 0 oklch(1 0 0 / 0.6) inset,
+              0 18px 40px -24px oklch(0.2 0.02 60 / 0.30);
+  overflow: hidden;
+}
+body.dark .cl-term {
+  --t-bg: oklch(0.165 0.009 62);   --t-bar: oklch(0.190 0.009 62);
+  --t-edge: oklch(0.330 0.010 64); --t-line: oklch(0.275 0.009 62);
+  --t-ink: oklch(0.945 0.008 80);  --t-ink-2: oklch(0.820 0.009 78);
+  --t-dim: oklch(0.640 0.009 70);  --t-faint: oklch(0.480 0.009 66);
+  --k-poll:    oklch(0.800 0.085 200);
+  --k-flows:   oklch(0.790 0.090 295);
+  --k-finding: oklch(0.800 0.095 345);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
+              0 18px 40px -24px oklch(0.2 0.02 60 / 0.55);
+}
+.cl-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 11px 20px; background: var(--t-bar);
+  border-bottom: 1px solid var(--t-line);
+  font-size: 12px; color: var(--t-dim);
+}
+.cl-file { color: var(--t-ink-2); }
+.cl-file b { font-weight: 400; color: var(--t-faint); }
+.cl-live { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.cl-live i {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--k-poll);
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 60%, transparent);
+  animation: cl-pulse 2.4s ease-out infinite;
+}
+@keyframes cl-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 7px color-mix(in oklch, var(--k-poll) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.cl-body { padding: 16px 20px 18px; }
+.cl-cmt { color: var(--t-faint); margin: 0 0 12px; }
+.cl-log { list-style: none; margin: 0; padding: 0; }
+.cl-e {
+  display: grid; grid-template-columns: 10ch 10ch minmax(0, 1fr); column-gap: 2ch;
+  padding: 7px 0; border-top: 1px dashed var(--t-line);
+}
+.cl-e:first-child { border-top: 0; }
+.cl-date { color: var(--t-dim); font-variant-numeric: tabular-nums; }
+.cl-date.cl-rep { color: var(--t-faint); }
+.cl-tag { color: var(--t-dim); }
+.cl-tag::before { content: "["; color: var(--t-faint); }
+.cl-tag::after  { content: "]"; color: var(--t-faint); }
+.cl-k-poll .cl-tag    { color: var(--k-poll); }
+.cl-k-flows .cl-tag   { color: var(--k-flows); }
+.cl-k-finding .cl-tag { color: var(--k-finding); }
+.cl-k-meta .cl-tag    { color: var(--t-ink); font-weight: 600; }
+.cl-text { margin: 0; text-wrap: pretty; }
+.cl-n  { color: var(--t-ink); }
+.cl-ar { color: var(--k-poll); }
+a.cl-src {
+  color: var(--k-poll); text-decoration: none; white-space: nowrap;
+  border-bottom: 1px solid color-mix(in oklch, var(--k-poll) 40%, transparent);
+}
+a.cl-src:hover, a.cl-src:focus-visible { border-bottom-color: currentColor; }
+a.cl-src:focus-visible { outline: 2px solid var(--k-poll); outline-offset: 2px; border-radius: 2px; }
+.cl-wait {
+  margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--t-line);
+  color: var(--t-dim);
+}
+.cl-wait b { font-weight: 400; color: var(--k-poll); margin-right: 1ch; }
+.cl-cur {
+  display: inline-block; width: 0.6em; height: 1.15em; margin-left: 0.5ch;
+  vertical-align: -0.2em; background: var(--t-ink-2);
+  animation: cl-blink 1.1s steps(1, end) infinite;
+}
+@keyframes cl-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .cl-live i, .cl-cur { animation: none; }
+}
+@media (max-width: 640px) {
+  .cl-term { margin-top: 24px; font-size: 12.5px; line-height: 1.58; border-radius: 12px; }
+  .cl-bar, .cl-body { padding-left: 14px; padding-right: 14px; }
+  .cl-e { grid-template-columns: auto minmax(0, 1fr); column-gap: 2ch; row-gap: 2px; padding: 9px 0; }
+  .cl-text { grid-column: 1 / -1; }
+}
 .info-group { font-family: var(--serif); font-size: 17px; font-weight: 600;
   color: var(--ink); margin: 26px 0 12px; break-after: avoid; }
 .info-group:first-of-type { margin-top: 4px; }
@@ -5904,22 +6009,25 @@ body.rd .rd-ldg-pgrp .rd-ldg-li b { display: inline-block; min-width: 2ch; text-
 
 
 
-      <h2>Every entry, newest first</h2>
-      <p>A poll landing is what writes most of these &#8211; the
-        <a class="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the
-        pollster&#8217;s own release.</p>
-      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-15">15 Oct 2026</time>
-        YouGov (MRP) (fieldwork 10–29 Jul, n=5,007) added — the two-party preferred estimate held at 52.3 (Labor v the Coalition, implied flows). Primary votes held. Leader ratings: Albanese's net approval −21.6 → −21.7. House effect (Labor v the Coalition, implied flows; positive leans Labor): YouGov (MRP) held at −0.2. <a class="fb-link" href="https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf">the pollster&#8217;s release &#8599;</a></p>
-      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-13">13 Oct 2026</time>
-        The headline pairing is now Labor v the Coalition (it was Labor v One Nation); the estimate reads 52.3 (implied flows).</p>
-      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-12">12 Oct 2026</time>
-        DemosAU (MRP) (fieldwork 4 Aug–19 Sep, n=9,740) added — the two-party preferred estimate held at 52.4 (Labor v One Nation, implied flows). Primary votes held. House effect (Labor v One Nation, implied flows; positive leans Labor): DemosAU (MRP) held at −0.4. <a class="fb-link" href="https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/">the pollster&#8217;s release &#8599;</a></p>
-      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-12">12 Oct 2026</time>
-        NSW voters (by state) no longer break significantly toward others, relative to all voters.</p>
-      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-12">12 Oct 2026</time>
-        Roy Morgan (fieldwork 28 Sep–11 Oct, n=2,655) added — the two-party preferred estimate moved 52.3 → 52.4 (Labor v One Nation, implied flows). Primary votes: Labor 27.6 → 27.5, the Coalition 21.8 → 21.6, One Nation 26.3 → 26.1, others 10.9 → 11.4. Leader ratings: Albanese's net approval −21.7 → −21.6. National direction: right track 24.0 → 27.1, wrong track 63.9 → 62.2 (net −39.9 → −35.1). House effect (Labor v One Nation, implied flows; positive leans Labor): Roy Morgan held at +0.8. <a class="fb-link" href="https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026">the pollster&#8217;s release &#8599;</a></p>
-      <p class="info-about-p"><time class="info-cl-date" datetime="2026-10-12">12 Oct 2026</time>
-        The change log starts here — the two-party preferred estimate is 52.3 (Labor v One Nation, implied flows). Primary votes: Labor 27.6, the Coalition 21.8, One Nation 26.3, the Greens 13.4, others 10.9. Leader ratings: Albanese's net approval −21.7, Albanese's net favourability −20.7, Taylor's net approval −6.9, Taylor's net favourability −4.7, Hanson's net approval −2.6, Hanson's net favourability −5.6. National direction: right track 24.0, wrong track 63.9 (net −39.9). Leading significantly as the best party: Labor on climate change; One Nation on crime; the Coalition on economic management; Labor on health; One Nation on immigration. Moving significantly over the past month: the share naming economic management a top-three issue (up); Labor's share as the best party on housing (down). From today, every movement in these figures and every statistical finding that comes or goes is recorded here.</p>
+      <section class="cl-term" aria-label="Change log entries, newest first">
+        <div class="cl-bar"><span class="cl-file"><b>data/</b>changelog</span><span class="cl-live"><i aria-hidden="true"></i>recording</span></div>
+        <div class="cl-body">
+          <p class="cl-cmt"># 6 entries since 2026-10-12</p>
+          <ol class="cl-log">
+        <li class="cl-e cl-k-poll"><time class="cl-date" datetime="2026-10-15">2026-10-15</time><span class="cl-tag">poll</span><p class="cl-text">YouGov (MRP) (fieldwork <span class="cl-n">10</span>–<span class="cl-n">29</span> Jul, n=<span class="cl-n">5,007</span>) added — the two-party preferred estimate held at <span class="cl-n">52.3</span> (Labor v the Coalition, implied flows). Primary votes held. Leader ratings: Albanese's net approval −<span class="cl-n">21.6</span> <span class="cl-ar">→</span> −<span class="cl-n">21.7</span>. House effect (Labor v the Coalition, implied flows; positive leans Labor): YouGov (MRP) held at −<span class="cl-n">0.2</span>. <a class="cl-src" href="https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf">release&nbsp;&#8599;</a></p></li>
+        <li class="cl-e cl-k-meta"><time class="cl-date" datetime="2026-10-13">2026-10-13</time><span class="cl-tag">headline</span><p class="cl-text">The headline pairing is now Labor v the Coalition (it was Labor v One Nation); the estimate reads <span class="cl-n">52.3</span> (implied flows).</p></li>
+        <li class="cl-e cl-k-poll"><time class="cl-date" datetime="2026-10-12">2026-10-12</time><span class="cl-tag">poll</span><p class="cl-text">DemosAU (MRP) (fieldwork <span class="cl-n">4</span> Aug–<span class="cl-n">19</span> Sep, n=<span class="cl-n">9,740</span>) added — the two-party preferred estimate held at <span class="cl-n">52.4</span> (Labor v One Nation, implied flows). Primary votes held. House effect (Labor v One Nation, implied flows; positive leans Labor): DemosAU (MRP) held at −<span class="cl-n">0.4</span>. <a class="cl-src" href="https://demosau.com/news/new-mega-poll-shows-one-nation-losing-ground/">release&nbsp;&#8599;</a></p></li>
+        <li class="cl-e cl-k-finding"><time class="cl-date cl-rep" datetime="2026-10-12">2026-10-12</time><span class="cl-tag">finding</span><p class="cl-text">NSW voters (by state) no longer break significantly toward others, relative to all voters.</p></li>
+        <li class="cl-e cl-k-poll"><time class="cl-date cl-rep" datetime="2026-10-12">2026-10-12</time><span class="cl-tag">poll</span><p class="cl-text">Roy Morgan (fieldwork <span class="cl-n">28</span> Sep–<span class="cl-n">11</span> Oct, n=<span class="cl-n">2,655</span>) added — the two-party preferred estimate moved <span class="cl-n">52.3</span> <span class="cl-ar">→</span> <span class="cl-n">52.4</span> (Labor v One Nation, implied flows). Primary votes: Labor <span class="cl-n">27.6</span> <span class="cl-ar">→</span> <span class="cl-n">27.5</span>, the Coalition <span class="cl-n">21.8</span> <span class="cl-ar">→</span> <span class="cl-n">21.6</span>, One Nation <span class="cl-n">26.3</span> <span class="cl-ar">→</span> <span class="cl-n">26.1</span>, others <span class="cl-n">10.9</span> <span class="cl-ar">→</span> <span class="cl-n">11.4</span>. Leader ratings: Albanese's net approval −<span class="cl-n">21.7</span> <span class="cl-ar">→</span> −<span class="cl-n">21.6</span>. National direction: right track <span class="cl-n">24.0</span> <span class="cl-ar">→</span> <span class="cl-n">27.1</span>, wrong track <span class="cl-n">63.9</span> <span class="cl-ar">→</span> <span class="cl-n">62.2</span> (net −<span class="cl-n">39.9</span> <span class="cl-ar">→</span> −<span class="cl-n">35.1</span>). House effect (Labor v One Nation, implied flows; positive leans Labor): Roy Morgan held at +<span class="cl-n">0.8</span>. <a class="cl-src" href="https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026">release&nbsp;&#8599;</a></p></li>
+        <li class="cl-e cl-k-seed"><time class="cl-date cl-rep" datetime="2026-10-12">2026-10-12</time><span class="cl-tag">start</span><p class="cl-text">The change log starts here — the two-party preferred estimate is <span class="cl-n">52.3</span> (Labor v One Nation, implied flows). Primary votes: Labor <span class="cl-n">27.6</span>, the Coalition <span class="cl-n">21.8</span>, One Nation <span class="cl-n">26.3</span>, the Greens <span class="cl-n">13.4</span>, others <span class="cl-n">10.9</span>. Leader ratings: Albanese's net approval −<span class="cl-n">21.7</span>, Albanese's net favourability −<span class="cl-n">20.7</span>, Taylor's net approval −<span class="cl-n">6.9</span>, Taylor's net favourability −<span class="cl-n">4.7</span>, Hanson's net approval −<span class="cl-n">2.6</span>, Hanson's net favourability −<span class="cl-n">5.6</span>. National direction: right track <span class="cl-n">24.0</span>, wrong track <span class="cl-n">63.9</span> (net −<span class="cl-n">39.9</span>). Leading significantly as the best party: Labor on climate change; One Nation on crime; the Coalition on economic management; Labor on health; One Nation on immigration. Moving significantly over the past month: the share naming economic management a top-three issue (up); Labor's share as the best party on housing (down). From today, every movement in these figures and every statistical finding that comes or goes is recorded here.</p></li>
+          </ol>
+          <p class="cl-wait"><b aria-hidden="true">&#8250;</b>next entry when the next poll lands<span class="cl-cur" aria-hidden="true"></span></p>
+        </div>
+      </section>
+      <p class="ss-note">A poll landing is what writes most of these &#8211; the
+        <a class="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a
+        link to the pollster&#8217;s own release, and <a class="fb-link" href="/allpolls/">All polls</a>
+        is the interactive archive.</p>
 
   <h2>Sources</h2>
       <p>Roy Morgan, YouGov, Newspoll, RedBridge/Accent, Resolve, Essential, DemosAU, Newspoll (pooled), Freshwater, Spectre Strategy, DemosAU (MRP), Fox &amp; Hedgehog, YouGov (MRP), Wolf &amp; Smith, EMRS (Tas), RedBridge/Accent (MRP), Roy Morgan (SMS), Agenda C Synesis, Roy Morgan (pooled). Field dates and sample sizes are listed per poll in the archive.</p>
@@ -104387,26 +104495,84 @@ function MenuPageView({
     }
   }), id === "changelog" && React.createElement(ChangelogEntries, null));
 }
+const CL_KIND = {
+  poll: "poll",
+  flows: "flows",
+  finding: "finding",
+  meta: "headline",
+  seed: "start"
+};
+function clLit(s) {
+  const out = [];
+  const re = /(\d[\d,]*(?:\.\d+)?%?|→)/g;
+  let m,
+    at = 0,
+    k = 0;
+  while (m = re.exec(s)) {
+    if (m.index > at) out.push(s.slice(at, m.index));
+    out.push(React.createElement("span", {
+      key: "l" + k++,
+      className: m[0] === "→" ? "cl-ar" : "cl-n"
+    }, m[0]));
+    at = m.index + m[0].length;
+  }
+  if (at < s.length) out.push(s.slice(at));
+  return out;
+}
 function ChangelogEntries() {
   const {
     D
   } = window.AP;
-  return React.createElement("ul", {
-    className: "info-changelog"
-  }, [...(D.changelog || [])].reverse().map((e, i) => React.createElement("li", {
-    key: i
-  }, React.createElement("time", {
-    className: "info-cl-date",
-    dateTime: e.date
-  }, e.label), " ", e.text, e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
-    key: j
-  }, " ", React.createElement("a", {
-    className: "fb-link",
-    href: l.url
-  }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
-    className: "fb-link",
-    href: e.url
-  }, "the pollster\u2019s release \u2197")) : null)));
+  const newest = [...(D.changelog || [])].reverse();
+  const n = newest.length;
+  const since = n ? newest[n - 1].date : null;
+  return React.createElement("section", {
+    className: "cl-term",
+    "aria-label": "Change log entries, newest first"
+  }, React.createElement("div", {
+    className: "cl-bar"
+  }, React.createElement("span", {
+    className: "cl-file"
+  }, React.createElement("b", null, "data/"), "changelog"), React.createElement("span", {
+    className: "cl-live"
+  }, React.createElement("i", {
+    "aria-hidden": "true"
+  }), "recording")), React.createElement("div", {
+    className: "cl-body"
+  }, React.createElement("p", {
+    className: "cl-cmt"
+  }, "# ", n, " ", n === 1 ? "entry" : "entries", since ? " since " + since : ""), React.createElement("ol", {
+    className: "cl-log"
+  }, newest.map((e, i) => {
+    const kind = CL_KIND[e.kind] ? e.kind : "meta";
+    const rep = i > 0 && newest[i - 1].date === e.date;
+    return React.createElement("li", {
+      key: i,
+      className: "cl-e cl-k-" + kind
+    }, React.createElement("time", {
+      className: "cl-date" + (rep ? " cl-rep" : ""),
+      dateTime: e.date
+    }, e.date), React.createElement("span", {
+      className: "cl-tag"
+    }, CL_KIND[kind]), React.createElement("p", {
+      className: "cl-text"
+    }, clLit(e.text), e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
+      key: j
+    }, " ", React.createElement("a", {
+      className: "cl-src",
+      href: l.url
+    }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
+      className: "cl-src",
+      href: e.url
+    }, "release \u2197")) : null));
+  })), React.createElement("p", {
+    className: "cl-wait"
+  }, React.createElement("b", {
+    "aria-hidden": "true"
+  }, "\u203A"), "next entry when the next poll lands", React.createElement("span", {
+    className: "cl-cur",
+    "aria-hidden": "true"
+  }))));
 }
 function RdChangelog() {
   return React.createElement("section", {

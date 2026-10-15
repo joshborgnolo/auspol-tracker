@@ -89,6 +89,22 @@
   src: url("/assets/fonts/sourcesans3-latin.ac057a55.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexmono-400-latin.c36f509c.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexmono-600-latin.ad4580d8.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 </style>
   <style>
 :root {
@@ -1466,11 +1482,100 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-about { margin-bottom: 8px; }
-.info-changelog { list-style: none; margin: 0 0 12px; padding: 0;
-  font-size: 14px; line-height: 1.55; color: var(--ink-2); }
-.info-changelog li { margin: 0 0 7px; }
-.info-cl-date { display: inline-block; min-width: 86px; color: var(--ink-3);
-  font-variant-numeric: tabular-nums; }
+.cl-term {
+  --t-bg: var(--surface); --t-bar: var(--surface-2);
+  --t-edge: var(--line);   --t-line: var(--line-2);
+  --t-ink: var(--ink);     --t-ink-2: var(--ink-2);
+  --t-dim: var(--ink-3);   --t-faint: var(--ink-faint);
+  --k-poll:    var(--accent);
+  --k-flows:   oklch(0.50 0.085 295);
+  --k-finding: oklch(0.53 0.095 345);
+  margin: 28px 0 0; width: 100%; max-width: 880px;
+  background: var(--t-bg); color: var(--t-ink-2);
+  border: 1px solid var(--t-edge); border-radius: 14px;
+  font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13.5px; line-height: 1.62;
+  font-feature-settings: normal;
+  box-shadow: 0 1px 0 oklch(1 0 0 / 0.6) inset,
+              0 18px 40px -24px oklch(0.2 0.02 60 / 0.30);
+  overflow: hidden;
+}
+body.dark .cl-term {
+  --t-bg: oklch(0.165 0.009 62);   --t-bar: oklch(0.190 0.009 62);
+  --t-edge: oklch(0.330 0.010 64); --t-line: oklch(0.275 0.009 62);
+  --t-ink: oklch(0.945 0.008 80);  --t-ink-2: oklch(0.820 0.009 78);
+  --t-dim: oklch(0.640 0.009 70);  --t-faint: oklch(0.480 0.009 66);
+  --k-poll:    oklch(0.800 0.085 200);
+  --k-flows:   oklch(0.790 0.090 295);
+  --k-finding: oklch(0.800 0.095 345);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
+              0 18px 40px -24px oklch(0.2 0.02 60 / 0.55);
+}
+.cl-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 11px 20px; background: var(--t-bar);
+  border-bottom: 1px solid var(--t-line);
+  font-size: 12px; color: var(--t-dim);
+}
+.cl-file { color: var(--t-ink-2); }
+.cl-file b { font-weight: 400; color: var(--t-faint); }
+.cl-live { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.cl-live i {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--k-poll);
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 60%, transparent);
+  animation: cl-pulse 2.4s ease-out infinite;
+}
+@keyframes cl-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklch, var(--k-poll) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 7px color-mix(in oklch, var(--k-poll) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.cl-body { padding: 16px 20px 18px; }
+.cl-cmt { color: var(--t-faint); margin: 0 0 12px; }
+.cl-log { list-style: none; margin: 0; padding: 0; }
+.cl-e {
+  display: grid; grid-template-columns: 10ch 10ch minmax(0, 1fr); column-gap: 2ch;
+  padding: 7px 0; border-top: 1px dashed var(--t-line);
+}
+.cl-e:first-child { border-top: 0; }
+.cl-date { color: var(--t-dim); font-variant-numeric: tabular-nums; }
+.cl-date.cl-rep { color: var(--t-faint); }
+.cl-tag { color: var(--t-dim); }
+.cl-tag::before { content: "["; color: var(--t-faint); }
+.cl-tag::after  { content: "]"; color: var(--t-faint); }
+.cl-k-poll .cl-tag    { color: var(--k-poll); }
+.cl-k-flows .cl-tag   { color: var(--k-flows); }
+.cl-k-finding .cl-tag { color: var(--k-finding); }
+.cl-k-meta .cl-tag    { color: var(--t-ink); font-weight: 600; }
+.cl-text { margin: 0; text-wrap: pretty; }
+.cl-n  { color: var(--t-ink); }
+.cl-ar { color: var(--k-poll); }
+a.cl-src {
+  color: var(--k-poll); text-decoration: none; white-space: nowrap;
+  border-bottom: 1px solid color-mix(in oklch, var(--k-poll) 40%, transparent);
+}
+a.cl-src:hover, a.cl-src:focus-visible { border-bottom-color: currentColor; }
+a.cl-src:focus-visible { outline: 2px solid var(--k-poll); outline-offset: 2px; border-radius: 2px; }
+.cl-wait {
+  margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--t-line);
+  color: var(--t-dim);
+}
+.cl-wait b { font-weight: 400; color: var(--k-poll); margin-right: 1ch; }
+.cl-cur {
+  display: inline-block; width: 0.6em; height: 1.15em; margin-left: 0.5ch;
+  vertical-align: -0.2em; background: var(--t-ink-2);
+  animation: cl-blink 1.1s steps(1, end) infinite;
+}
+@keyframes cl-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .cl-live i, .cl-cur { animation: none; }
+}
+@media (max-width: 640px) {
+  .cl-term { margin-top: 24px; font-size: 12.5px; line-height: 1.58; border-radius: 12px; }
+  .cl-bar, .cl-body { padding-left: 14px; padding-right: 14px; }
+  .cl-e { grid-template-columns: auto minmax(0, 1fr); column-gap: 2ch; row-gap: 2px; padding: 9px 0; }
+  .cl-text { grid-column: 1 / -1; }
+}
 .info-group { font-family: var(--serif); font-size: 17px; font-weight: 600;
   color: var(--ink); margin: 26px 0 12px; break-after: avoid; }
 .info-group:first-of-type { margin-top: 4px; }
@@ -37467,26 +37572,84 @@ function MenuPageView({
     }
   }), id === "changelog" && React.createElement(ChangelogEntries, null));
 }
+const CL_KIND = {
+  poll: "poll",
+  flows: "flows",
+  finding: "finding",
+  meta: "headline",
+  seed: "start"
+};
+function clLit(s) {
+  const out = [];
+  const re = /(\d[\d,]*(?:\.\d+)?%?|→)/g;
+  let m,
+    at = 0,
+    k = 0;
+  while (m = re.exec(s)) {
+    if (m.index > at) out.push(s.slice(at, m.index));
+    out.push(React.createElement("span", {
+      key: "l" + k++,
+      className: m[0] === "→" ? "cl-ar" : "cl-n"
+    }, m[0]));
+    at = m.index + m[0].length;
+  }
+  if (at < s.length) out.push(s.slice(at));
+  return out;
+}
 function ChangelogEntries() {
   const {
     D
   } = window.AP;
-  return React.createElement("ul", {
-    className: "info-changelog"
-  }, [...(D.changelog || [])].reverse().map((e, i) => React.createElement("li", {
-    key: i
-  }, React.createElement("time", {
-    className: "info-cl-date",
-    dateTime: e.date
-  }, e.label), " ", e.text, e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
-    key: j
-  }, " ", React.createElement("a", {
-    className: "fb-link",
-    href: l.url
-  }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
-    className: "fb-link",
-    href: e.url
-  }, "the pollster\u2019s release \u2197")) : null)));
+  const newest = [...(D.changelog || [])].reverse();
+  const n = newest.length;
+  const since = n ? newest[n - 1].date : null;
+  return React.createElement("section", {
+    className: "cl-term",
+    "aria-label": "Change log entries, newest first"
+  }, React.createElement("div", {
+    className: "cl-bar"
+  }, React.createElement("span", {
+    className: "cl-file"
+  }, React.createElement("b", null, "data/"), "changelog"), React.createElement("span", {
+    className: "cl-live"
+  }, React.createElement("i", {
+    "aria-hidden": "true"
+  }), "recording")), React.createElement("div", {
+    className: "cl-body"
+  }, React.createElement("p", {
+    className: "cl-cmt"
+  }, "# ", n, " ", n === 1 ? "entry" : "entries", since ? " since " + since : ""), React.createElement("ol", {
+    className: "cl-log"
+  }, newest.map((e, i) => {
+    const kind = CL_KIND[e.kind] ? e.kind : "meta";
+    const rep = i > 0 && newest[i - 1].date === e.date;
+    return React.createElement("li", {
+      key: i,
+      className: "cl-e cl-k-" + kind
+    }, React.createElement("time", {
+      className: "cl-date" + (rep ? " cl-rep" : ""),
+      dateTime: e.date
+    }, e.date), React.createElement("span", {
+      className: "cl-tag"
+    }, CL_KIND[kind]), React.createElement("p", {
+      className: "cl-text"
+    }, clLit(e.text), e.links ? e.links.map((l, j) => React.createElement(React.Fragment, {
+      key: j
+    }, " ", React.createElement("a", {
+      className: "cl-src",
+      href: l.url
+    }, l.name, " \u2197"))) : e.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
+      className: "cl-src",
+      href: e.url
+    }, "release \u2197")) : null));
+  })), React.createElement("p", {
+    className: "cl-wait"
+  }, React.createElement("b", {
+    "aria-hidden": "true"
+  }, "\u203A"), "next entry when the next poll lands", React.createElement("span", {
+    className: "cl-cur",
+    "aria-hidden": "true"
+  }))));
 }
 function RdChangelog() {
   return React.createElement("section", {
@@ -53545,6 +53708,14 @@ function RdCsUnroll({
     style: style
   }, children);
 }
+const RD_CYC_CITES = [["https://kevinbonham.blogspot.com/2012/12/why-preferred-prime-ministerpremier.html", "Kevin Bonham: Why preferred prime minister/premier scores are rubbish"], ["https://www.theguardian.com/australia-news/2016/apr/07/personal-popularity-is-no-guarantee-of-poll-success-for-prime-ministers", "Ben Raue, the Guardian: Personal popularity is no guarantee of poll success for prime ministers"], ["https://web.archive.org/web/20211016043201/https://armariuminterreta.com/2021/08/23/approval-ratings-and-better-pm/", "Armarium Interreta: Approval ratings are rubbish, but they have value"]];
+const RD_CYC_CITE = (w, i) => RD_CYC_CITES[i][0] ? React.createElement("a", {
+  className: "rd-link rd-link-in",
+  href: RD_CYC_CITES[i][0],
+  target: "_blank",
+  rel: "noopener noreferrer",
+  title: RD_CYC_CITES[i][1]
+}, w) : w;
 function RdPastCycles(p) {
   const {
     cycles,
@@ -53863,7 +54034,7 @@ function RdPastCycles(p) {
     }[+cbHi[1]] : null;
     const combined = cb ? /^Highest/.test(cb.rank.main) ? "the highest" : cbOrdW ? cbOrdW + " highest" : cb.v >= cb.peers.q3 ? "among the highest" : cb.v > cb.peers.q1 ? "in the middle half" : "among the lowest" : null;
     const moved = r => r.v < 0 ? "fallen further" : "risen less";
-    const found = c2 ? gLow && oLow ? g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term" : "Both major parties have done worse since the election than any before them at this point in a term" : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term" : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election" : null : gLow && oLow ? "Both major parties are at record lows for this point in a term" : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term" : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
+    const found = c2 ? gLow && oLow ? g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term" : "Both major parties have done worse since the election than any before them at this point in a term" : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term" : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election" : null : gLow && oLow ? "Both major parties’ primary votes are at record lows for this point in a term" : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term" : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
     const head = found || "Every term since " + cycles[0].year + ", lined up on its election day";
     let dek = monthsWord + " after the " + cur.year + " election, ";
     const bits = [];
@@ -53873,15 +54044,17 @@ function RdPastCycles(p) {
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
     } else {
       if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point" + snc);
-      if (oLow && !combined) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
+      if (oLow) bits.push(gLow ? "and " + oppIn + "’s is the lowest of any opposition" : oppIn + "’s primary vote is the lowest of any opposition at the same point" + snc);
     }
     const rankWords = r => (/^Middle/.test(r.rank.main) ? "in the " : "the ") + r.rank.main.toLowerCase().replace(/ of (\d+)$/, " of $1 governments");
     dek += bits.length ? bits.join(", ") + "." : g.v == null || !g.rank ? govName + "’s primary vote has no reading to set against past governments yet." : c2 ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were " + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now." : govName + "’s primary vote is " + rankWords(g) + " at this point.";
+    const cbHigh = combined && /highest/.test(combined);
+    if (!c2 && oLow && combined) dek += cbHigh ? " Add One Nation’s vote to " + oppIn + "’s, though, and the total is " + (/^(the|among) /.test(combined) ? "" : "the ") + combined + " on record at this stage." : " Even with One Nation’s vote added, " + oppIn + "’s total is " + (/middle/.test(combined) ? "only " : "") + combined + " of past terms.";
     if (t.peers && t.v != null && !c2) {
-      const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments" : t.v > t.peers.q3 ? "is above three in four of past governments" : "is below three in four of past governments";
-      dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
+      const lowT = t.v < t.peers.q1;
+      const where = !lowT && t.v <= t.peers.q3 ? "sits in the middle half of past governments at this point" : t.v > t.peers.q3 ? "is higher than three in four past governments managed at this point" : "is lower than three in four past governments managed at this point";
+      dek += " " + (gLow && !lowT ? "Even so, after preferences " : "After preferences, ") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
-    if (!c2 && oLow && combined) dek += " But while " + oppIn + "’s primary vote is also the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
     return {
       head,
       dek
@@ -54860,7 +55033,7 @@ function RdPastCycles(p) {
     className: "rd-foot"
   }, React.createElement("span", {
     className: "rd-foot-text"
-  }, "Each term is lined up on its own election day, so month ", m, " is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office."), React.createElement("span", {
+  }, "Each term is lined up on its own election day, so month ", m, " is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings add ", RD_CYC_CITE("little", 2), " or ", RD_CYC_CITE("no", 0), " ", RD_CYC_CITE("predictive", 1), " value on top of voting-intention data."), React.createElement("span", {
     className: "rd-grow"
   }), React.createElement("button", {
     type: "button",

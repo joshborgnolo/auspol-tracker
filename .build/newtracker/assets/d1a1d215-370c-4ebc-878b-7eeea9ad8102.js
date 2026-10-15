@@ -6546,30 +6546,72 @@ function MenuPageView({ id, tppBasis }) {
           still renders (the .ex-* styles are page-level, not rd-gated), just
           without the rd head */}
       {id === "flows-explained" && <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />}
-      {/* the change log predates the redesign split: dated entries in quiet
-          site type, the same list the Info about block used to show three of */}
+      {/* the change log's console predates the redesign split: the same
+          console marks up both designs (the .cl-* styles are page-level in
+          template.html, not rd-gated); the redesign adds its own head above */}
       {id === "changelog" && <ChangelogEntries />}
     </div>
   );
 }
 
-/* The change log's entries: every movement of the aggregate's two-party
-   figure and every finding's arrival or departure, kept entry by entry as
-   polls land (data/changelog.json → D.changelog, newest last there; the
-   page lists newest first). It was the Info about block's list until
-   2026-10-15, when it became the ☰ menu's fifth page. The redesign above
-   and the classic design both render THIS list – the redesign adds only
-   its own head around it. */
+/* The change log's console: every movement of the aggregate's two-party
+   figure and every finding's arrival or departure, entry by entry as polls
+   land (data/changelog.json → D.changelog, newest last there; the page lists
+   newest first). The design is the one the retired /changelog/ satellite
+   page introduced 2026-10-12 – IBM Plex Mono, one grid line per entry: ISO
+   date, [kind] tag, text with the figures lit like syntax, a recording bar
+   up top and a waiting cursor at the tail. The list was the Info about
+   block's until 2026-10-15, when it became the ☰ menu's fifth page; the
+   tab's first render restated it as a quiet prose list and the user called
+   for the console back the same day ("keep the old changelog design … that
+   code-like chunk that logged all the changes"). Static-article twin:
+   ssChangelogBlock in build.mjs – keep the two in step. The redesign and
+   the classic design both render THIS console. */
+const CL_KIND = { poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start" };
+/* figures and arrows lit like syntax: split on the same two patterns the
+   build-side lit() wraps after escaping (React escapes the text nodes
+   itself, so a split/map is the equivalent move here) */
+function clLit(s) {
+  const out = [];
+  const re = /(\d[\d,]*(?:\.\d+)?%?|→)/g;
+  let m, at = 0, k = 0;
+  while ((m = re.exec(s))) {
+    if (m.index > at) out.push(s.slice(at, m.index));
+    out.push(<span key={"l" + k++} className={m[0] === "→" ? "cl-ar" : "cl-n"}>{m[0]}</span>);
+    at = m.index + m[0].length;
+  }
+  if (at < s.length) out.push(s.slice(at));
+  return out;
+}
 function ChangelogEntries() {
   const { D } = window.AP;
+  const newest = [...(D.changelog || [])].reverse();
+  const n = newest.length;
+  const since = n ? newest[n - 1].date : null;
   return (
-    <ul className="info-changelog">
-      {[...(D.changelog || [])].reverse().map((e, i) => (
-        <li key={i}><time className="info-cl-date" dateTime={e.date}>{e.label}</time> {e.text}
-        {e.links ? e.links.map((l, j) => <React.Fragment key={j}> <a className="fb-link" href={l.url}>{l.name} ↗</a></React.Fragment>)
-          : e.url ? <> <a className="fb-link" href={e.url}>the pollster’s release ↗</a></> : null}</li>
-      ))}
-    </ul>
+    <section className="cl-term" aria-label="Change log entries, newest first">
+      <div className="cl-bar"><span className="cl-file"><b>data/</b>changelog</span><span className="cl-live"><i aria-hidden="true"></i>recording</span></div>
+      <div className="cl-body">
+        <p className="cl-cmt"># {n} {n === 1 ? "entry" : "entries"}{since ? " since " + since : ""}</p>
+        <ol className="cl-log">
+          {newest.map((e, i) => {
+            const kind = CL_KIND[e.kind] ? e.kind : "meta";
+            const rep = i > 0 && newest[i - 1].date === e.date;
+            return (
+              <li key={i} className={"cl-e cl-k-" + kind}>
+                <time className={"cl-date" + (rep ? " cl-rep" : "")} dateTime={e.date}>{e.date}</time>
+                <span className="cl-tag">{CL_KIND[kind]}</span>
+                <p className="cl-text">{clLit(e.text)}
+                  {e.links ? e.links.map((l, j) => <React.Fragment key={j}> <a className="cl-src" href={l.url}>{l.name} ↗</a></React.Fragment>)
+                    : e.url ? <> <a className="cl-src" href={e.url}>release ↗</a></> : null}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="cl-wait"><b aria-hidden="true">›</b>next entry when the next poll lands<span className="cl-cur" aria-hidden="true"></span></p>
+      </div>
+    </section>
   );
 }
 

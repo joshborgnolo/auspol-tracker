@@ -184,13 +184,23 @@ assert.ok(/<link rel="canonical" href="https:\/\/auspoltracker\.com\/changelog\/
 assert.ok(clPage.includes("<h1>Changelog</h1>"), "changelog page: the h1");
 assert.ok(!/shell:(?:head|header|footer)/.test(clPage), "changelog page: a main-build tab page, not a shell satellite");
 assert.ok(clPage.includes('window.AP_INITIAL_TAB="changelog";'), "changelog page: opens straight into the changelog tab");
-// the static article lists every entry, newest first, in the Info date-smallcaps style –
-// a no-JS reader or crawler gets the whole run
-const clTimes = [...clPage.matchAll(/<time class="info-cl-date" datetime="([^"]+)">([^<]+)<\/time>/g)];
-assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, hesc(e.label)]),
-  "changelog page lists every entry of data/changelog.json, newest first");
+// the static article lists every entry, newest first, as the retired satellite
+// page's console (ISO dates, [kind] tags, figures lit like syntax) – restored
+// 2026-10-15 after the tab-page conversion had restated them as quiet prose
+// (user: keep the old code-like chunk). A no-JS reader or crawler gets the
+// whole run; the live tab renders the same console from D.changelog.
+const clTimes = [...clPage.matchAll(/<time class="cl-date(?: cl-rep)?" datetime="([^"]+)">([^<]+)<\/time>/g)];
+assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map((e) => [e.date, e.date]),
+  "changelog page lists every entry of data/changelog.json as ISO-date console rows, newest first");
 for (const e of clEntries) assert.ok(clPage.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
-assert.ok(!clPage.includes("IBM Plex Mono"), "the console satellite's mono face is retired");
+const clTags = [...clPage.matchAll(/<span class="cl-tag">([^<]+)<\/span>/g)].map((m) => m[1]);
+assert.deepEqual(clTags, [...clEntries].reverse().map((e) =>
+  ({ poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start" })[e.kind] || "headline"),
+  "every console row carries its kind tag");
+assert.ok(clPage.includes('class="cl-term"') && clPage.includes('class="cl-log"'),
+  "the static article renders the console block");
+assert.ok(clPage.includes("body.dark .cl-term"), "the console carries its dark-terminal palette");
+assert.ok(clPage.includes("IBM Plex Mono"), "IBM Plex Mono is registered for the console");
 // a refresh commit carries it (2026-10-12: joined SITE_FILES with data/changelog.json)
 const siteFiles = (fs.readFileSync(path.join(ROOT, ".build", "git-push-main.sh"), "utf8").match(/SITE_FILES=\(([\s\S]*?)\)/) || [])[1] || "";
 assert.ok(/(^|\s)changelog\/index\.html(\s|$)/.test(siteFiles), "SITE_FILES commits changelog/index.html");
