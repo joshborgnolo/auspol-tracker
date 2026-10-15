@@ -164,9 +164,8 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
     if (!m) miss(what, where);
     return unesc(m[1]);
   };
-  /* the federal wordmark splits "auspol" around its easter-egg anchor
-     (the "o" links /changelog/): lift the span's whole inner source and
-     reduce it back to the word the satellites bake */
+  /* the federal wordmark is plain text in the span: lift the span's whole
+     inner source and reduce it back to the word the satellites bake */
   const word = one(/className="wm-name"[^>]*>([\s\S]*?)<\/span>/, "wordmark name")
     .replace(/<[^>]+>/g, "").replace(/\s+/g, "");
   const track = one(/className="wm-track"[^>]*>([^<]+)</, "wordmark track");

@@ -416,16 +416,10 @@ function Header({ isDark, onToggleTheme, rd }) {
         <div className="lockup">
           <h1 className="wordmark stacked">
             <span className="wm-textcol">
-              {/* The lockup's one easter egg: the "o" of "auspol" is a link
-                  to the change log. The word must stay contiguous for site-
-                  shell's wordmark lift (parseChrome) and the squares-itself
-                  measure just above, so the anchor wraps the letter with NO
-                  whitespace around it. Redesign only - the archived old
-                  design (rd === false) and /vic/'s wordmark stay plain text,
-                  Vic having no change log of its own. */}
-              {!J ? (rd !== false
-                    ? <span className="wm-name" ref={wmName}>ausp<a className="wm-o" href="/changelog/" title="The change log" aria-describedby="wm-o-where">o</a>l</span>
-                    : <span className={"wm-name"} ref={wmName}>auspol</span>)
+              {/* The word must stay contiguous for site-shell's wordmark
+                  lift (parseChrome) and the squares-itself measure just
+                  above. */}
+              {!J ? <span className="wm-name" ref={wmName}>auspol</span>
                   : <span className={"wm-name"} ref={wmName}>{J.brand}</span>}
               <span className="sr-only"> </span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
@@ -451,7 +445,6 @@ function Header({ isDark, onToggleTheme, rd }) {
             <GlyphDial className="wm-dial" svgRef={glyphRef} width="57" height="39.7" />
           </button>
           <span id="wm-action" hidden>Replays the term on the masthead dial</span>
-          <span id="wm-o-where" hidden>Opens the change log</span>
         </div>
         {/* plain text: the design flip this sentence used to carry moved
             off the page 2026-10-03; the old design is viewable at
