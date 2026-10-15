@@ -5670,8 +5670,8 @@ function RdExplained() {
         <h2 className="rd-title" id="rd-ex-t">Preference flows explained</h2>
         <span className="rd-meta">How preferences decide the two-party figure</span>
       </div>
-      <RdHed head="Every two-party figure here exists twice"
-        dek="Published as each pollster computes it, and implied from first preferences by one counted preference-flow table, the same table for every pollster. Below: what each reading is, why the implied figure is the default, and where its numbers come from." />
+      <RdHed head="There are two ways to get a two-party figure from a poll"
+        dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
     </section>
   );

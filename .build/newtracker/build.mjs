@@ -1311,10 +1311,7 @@ ${ssTail(esc, sources)}
     const body = fs.readFileSync(path.join(HERE, "explained-article.html"), "utf8");
     return `<article class="static-summary">
       <h1>Preference flows explained</h1>
-      <p class="ss-sub">Every two-party figure here exists twice &#8211; the figure each
-        pollster publishes, and the figure implied from the poll&#8217;s first preferences by one
-        counted preference-flow table, the same table for every pollster. What each reading is,
-        why the implied figure is the default, and where its numbers come from.</p>
+      <p class="ss-sub">There are two ways to get a two-party figure from a poll. The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll&#8217;s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster&#8217;s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table&#8217;s numbers come from.</p>
 
       <div class="ex-body">
 ${body.trim()}
