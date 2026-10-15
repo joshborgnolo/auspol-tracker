@@ -432,12 +432,13 @@ function RdCsUnroll({ className, style, children }) {
 /* ---- the tab --------------------------------------------------------------- */
 /* The section foot's caveat links each word of "no predictive value" to
    a source (the owner's 2026-10-15 ask): Bonham on preferred-PM scores,
-   the Guardian, and Armarium Interreta's test, which found approval
+   Ben Raue in the Guardian (satisfaction ratings have "limited predictive
+   value"), and Armarium Interreta's test, which found approval
    ratings add "little, if any, predictive value" to a polling average -
    hence "little or no", not "no". A null url leaves its word plain. */
 const RD_CYC_CITES = [
   ["https://kevinbonham.blogspot.com/2012/12/why-preferred-prime-ministerpremier.html", "Kevin Bonham: Why preferred prime minister/premier scores are rubbish"],
-  [null, "The Guardian: Personal popularity is no guarantee of poll success"],
+  ["https://www.theguardian.com/australia-news/2016/apr/07/personal-popularity-is-no-guarantee-of-poll-success-for-prime-ministers", "Ben Raue, the Guardian: Personal popularity is no guarantee of poll success for prime ministers"],
   ["https://web.archive.org/web/20211016043201/https://armariuminterreta.com/2021/08/23/approval-ratings-and-better-pm/", "Armarium Interreta: Approval ratings are rubbish, but they have value"],
 ];
 const RD_CYC_CITE = (w, i) => (RD_CYC_CITES[i][0]
