@@ -54477,7 +54477,33 @@ function RdPastCycles(p) {
       return [el, enter, leave];
     };
     const pairs = meas ? [on(sec, sumHover), on(meas, measHover)] : [on(sec, sumHover)];
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(sec);
     const key = e => {
+      if (e.key === " ") {
+        if (!inView.current || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+        const sel = window.getSelection && window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+        const fcs = document.activeElement;
+        let step = null;
+        if (fcs && fcs.tagName !== "BODY" && fcs.tagName !== "HTML") {
+          const grp = fcs.closest && fcs.closest(".rd-cc-tabs");
+          if (!grp || !sec.contains(grp) || fcs.getAttribute("aria-pressed") !== "true") return;
+          step = grp === measEl.current ? cmpSwipeLive.current : modeSwipeLive.current;
+        } else {
+          const mo = measEl.current;
+          step = (measHover.current || sumHover.current && Date.now() - measWalk.current < 800) && mo && mo.isConnected && mo.getClientRects().length ? cmpSwipeLive.current : modeSwipeLive.current;
+        }
+        if (!step) return;
+        e.preventDefault();
+        if (!e.repeat) step(1);
+        return;
+      }
       if (!sumHover.current && !measHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
@@ -54498,6 +54524,7 @@ function RdPastCycles(p) {
     };
     document.addEventListener("keydown", key, true);
     return () => {
+      io.disconnect();
       pairs.forEach(([el, enter, leave]) => {
         el.removeEventListener("pointerenter", enter);
         el.removeEventListener("pointerleave", leave);
@@ -62977,8 +63004,8 @@ function RdExplained() {
   }, "Preference flows explained"), React.createElement("span", {
     className: "rd-meta"
   }, "How preferences decide the two-party figure")), React.createElement(RdHed, {
-    head: "Every two-party figure here exists twice",
-    dek: "Published as each pollster computes it, and implied from first preferences by one counted preference-flow table, the same table for every pollster. Below: what each reading is, why the implied figure is the default, and where its numbers come from."
+    head: "There are two ways to get a two-party figure from a poll",
+    dek: "The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll\u2019s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster\u2019s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table\u2019s numbers come from."
   }), React.createElement("div", {
     className: "ex-body",
     dangerouslySetInnerHTML: {
@@ -64844,7 +64871,7 @@ const KBD_ROWS = [{
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
-  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu"
+  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu"
 }, {
   keys: ["P"],
   what: "In the all-polls two-party table, published figures only"

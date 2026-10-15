@@ -1166,6 +1166,12 @@ function RdPastCycles(p) {
       return [el, enter, leave];
     };
     const pairs = meas ? [on(sec, sumHover), on(meas, measHover)] : [on(sec, sumHover)];
+    /* Space rides VIEWPORT visibility (auspol-spacebar-viewport-claim), not
+       the arrows' pointer hover */
+    const inView = { current: false };
+    const io = new IntersectionObserver(
+      (es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
     /* each mode step rewrites the head/dek ABOVE the rows, and near the top
        of the page the row slides out from under a parked pointer (the pin
        scroll can't hold it - the page can't scroll past the ceiling). A
@@ -1173,6 +1179,36 @@ function RdPastCycles(p) {
        claim mid-gesture, so while the section is still hovered the walk's
        own step keeps measure claimed for a beat instead. */
     const key = (e) => {
+      if (e.key === " ") {
+        /* Space is the viewport-claim complement to arrows' pointer claim:
+           it steps whichever menu bar is NOT selected, and keeps stepping
+           that same one press after press (user 2026-10-15, "cycle through
+           whichever menu bar is not selected"). "Selected" here: a PRESSED
+           .rd-cc-tabs tab holding focus (click focus persists on the tab, so
+           the All-polls selected-tab admission applies or Space dead-fires
+           a re-pick of the same tab); otherwise the menu bar the pointer's
+           arrow claim is NOT holding. Every other focused control, incl. an
+           unselected tab, keeps its native Space. */
+        if (!inView.current || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+        const sel = window.getSelection && window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+        const fcs = document.activeElement;
+        let step = null;
+        if (fcs && fcs.tagName !== "BODY" && fcs.tagName !== "HTML") {
+          const grp = fcs.closest && fcs.closest(".rd-cc-tabs");
+          if (!grp || !sec.contains(grp) || fcs.getAttribute("aria-pressed") !== "true") return;
+          step = (grp === measEl.current) ? cmpSwipeLive.current : modeSwipeLive.current;
+        } else {
+          const mo = measEl.current;
+          step = (measHover.current || (sumHover.current && Date.now() - measWalk.current < 800))
+                 && mo && mo.isConnected && mo.getClientRects().length
+                 ? cmpSwipeLive.current : modeSwipeLive.current;
+        }
+        if (!step) return;
+        e.preventDefault();
+        if (!e.repeat) step(1);
+        return;
+      }
       if ((!sumHover.current && !measHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
@@ -1196,6 +1232,7 @@ function RdPastCycles(p) {
     };
     document.addEventListener("keydown", key, true);
     return () => {
+      io.disconnect();
       pairs.forEach(([el, enter, leave]) => { el.removeEventListener("pointerenter", enter); el.removeEventListener("pointerleave", leave); });
       document.removeEventListener("keydown", key, true);
     };
