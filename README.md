@@ -124,17 +124,22 @@ new and worth looking at.
   Blueprint Institute wave, the only one that offered an Independent
   option); a multi-select, so the shares sum past 100 and carry no base
   discipline. Four sources: YouGov's News24/serious waves, Essential's
-  consideration module (the "definitely + open" sum), YouGov (MRP)'s
-  Climate Council and Blueprint Institute waves, and RedBridge/Accent's
-  April 2026 0–10 propensity battery ("how likely are you to vote for each
-  party", asked only of non-voters of that party). The RedBridge row is
-  the one sanctioned derivation in this field: its `consideration` is the
-  share rating 7–10 of 10 (the serious end), and it carries two extra tier
-  maps — `considerationLoose` (4 or more of 10) and `considerationNever`
-  (0 of 10) — every share rebased to all voters as
-  `primary + (100 − primary) × share_among_asked`. Every row also carries
+  consideration module, YouGov (MRP)'s Climate Council and Blueprint
+  Institute waves, and RedBridge/Accent's April 2026 0–10 propensity
+  battery ("how likely are you to vote for each party", asked only of
+  non-voters of that party). Two houses file banded questions tiered, the
+  sanctioned derivations in this field: the RedBridge row's
+  `consideration` is the share rating 7–10 of 10 (the serious end), with
+  two extra tier maps — `considerationLoose` (4 or more of 10) and
+  `considerationNever` (0 of 10) — every share rebased to all voters as
+  `primary + (100 − primary) × share_among_asked`; Essential's Feb and
+  June 2026 waves banded every voter definitely/open-to/never, so their
+  `consideration` is the "would definitely vote" band, `considerationLoose`
+  the definitely + open sum and `considerationNever` the "would never
+  vote" band (already over all voters, no rebase). Every row also carries
   `consBasis`, the short basis label printed under the figures
-  ("consider", "seriously consider", the RedBridge tiers' range brackets).
+  ("consider", "seriously consider", "definitely vote", the RedBridge
+  tiers' range brackets).
   The Blueprint wave published consideration only — no voting intention —
   so its row's primary fields are null. Absent, not zero: a wave that
   asked no consideration question omits it. The All polls table's Primary

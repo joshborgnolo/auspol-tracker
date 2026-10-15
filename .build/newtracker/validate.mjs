@@ -150,10 +150,12 @@ export function validate(D) {
     }
     // 2b1ca. consideration – "which parties would you consider voting for"
     //      (multi-select, so no sum discipline). YouGov's News24/serious
-    //      waves, Essential's consideration module, YouGov (MRP)'s Climate
-    //      Council and Blueprint Institute waves, and RedBridge/Accent's
-    //      April 2026 0–10 propensity battery (filed as three all-voter
-    //      tiers – below). Party keys from alp/lnp/grn/onp/ind/oth/none
+    //      waves, Essential's consideration module (its Feb and June 2026
+    //      waves band it definitely/open/never – tiered below), YouGov
+    //      (MRP)'s Climate Council and Blueprint Institute waves, and
+    //      RedBridge/Accent's April 2026 0–10 propensity battery (filed as
+    //      three all-voter tiers – below). Party keys from
+    //      alp/lnp/grn/onp/ind/oth/none
     //      (only the Blueprint wave offered an Independent option, so ind
     //      rides it alone), at least one, each a percentage or a
     //      hand-entered .5 multiple. consBasis is the row's short basis
@@ -176,15 +178,17 @@ export function validate(D) {
         fail("cons-basis", `consideration without consBasis on ${p.pollster} ${p.date}`);
       else if (p.consBasis.length > 40)
         fail("cons-basis", `consBasis too long on ${p.pollster} ${p.date}: ${p.consBasis}`);
-      // 2b1cb. the extra tiers of a 0–10 propensity battery: loose = 4–10
-      //      of 10, never = 0 of 10 (the canonical map sits in the middle
-      //      at 7+). RedBridge/Accent's April 2026 wave only so far. Tiers
-      //      ride the canonical vocabulary, need the canonical map beside
-      //      them, and loose must never dip below the canonical share on a
-      //      shared key.
+      // 2b1cb. the extra tiers around the canonical firm-intent map:
+      //      RedBridge/Accent's April 2026 0–10 propensity battery (loose
+      //      = 4–10 of 10, canonical = 7+ of 10, never = 0 of 10) and
+      //      Essential's Feb/June 2026 banding (canonical = "definitely
+      //      vote", loose = definitely + open, never = "would never
+      //      vote"). Tiers ride the canonical vocabulary, need the
+      //      canonical map beside them, and loose must never dip below
+      //      the canonical share on a shared key.
       for (const f of ["considerationLoose", "considerationNever"]) {
         if (p[f] == null) continue;
-        if (p.pollster !== "RedBridge/Accent")
+        if (!["RedBridge/Accent", "Essential"].includes(p.pollster))
           fail("cons-tier-pollster", `${f} on a row for ${p.pollster}`);
         for (const k of Object.keys(p[f]))
           if (!["alp", "lnp", "grn", "onp", "ind", "oth", "none"].includes(k))

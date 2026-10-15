@@ -1969,21 +1969,23 @@ function rdLgLines(p, { onM, demSplit }) {
       {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(p.cons[k])}</b></> : pty(k, rdApNum(p.cons[k]))}</U>)}
       <U soft>{p.consBasis || "parties the voter would consider"}</U>
     </> });
-    /* a 0–10 propensity battery's extra tiers (RedBridge/Accent's April
-       2026 wave): the shares rating 4–10 and rating 0, rebased over
-       everyone (the pollster asked only non-voters of each party) */
+    /* a banded consideration question's extra tiers — RedBridge/Accent's
+       April 2026 0–10 battery and Essential's Feb/June 2026
+       definitely/open/never banding — labelled per house by rdApConsTier */
     if (p.consLoose) {
+      const tier = rdApConsTier(p, "loose");
       const ks2 = ORDER.filter((k) => p.consLoose[k] != null);
-      out.push({ id: "consloose", lab: "Consider (4+ of 10)", body: <>
+      out.push({ id: "consloose", lab: tier.led, body: <>
         {ks2.map((k) => <U key={k}>{pty(k, rdApNum(p.consLoose[k]))}</U>)}
-        <U soft>rated 4 or more of 10, rebased over everyone</U>
+        <U soft>{tier.note}</U>
       </> });
     }
     if (p.consNever) {
+      const tier = rdApConsTier(p, "never");
       const ks3 = ORDER.filter((k) => p.consNever[k] != null);
-      out.push({ id: "consnever", lab: "Would never vote (0 of 10)", body: <>
+      out.push({ id: "consnever", lab: tier.led, body: <>
         {ks3.map((k) => <U key={k}>{pty(k, rdApNum(p.consNever[k]))}</U>)}
-        <U soft>rated 0 of 10, rebased over everyone</U>
+        <U soft>{tier.note}</U>
       </> });
     }
   }
@@ -2492,10 +2494,31 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
 }
 
 /* ---------------------------------------------------------------- the table */
+/* the two banded consideration questions, named per house. tab = the
+   row's range-cycler label (sentence case, sits under the figures); led
+   = the ledger line label; note = the ledger's soft explainer.
+   RedBridge/Accent's April 2026 wave asked a 0–10 propensity of each
+   party's non-voters and the filed shares are rebased over everyone;
+   Essential's Feb and June 2026 waves banded every voter
+   definitely/open-to/never (the loose tier is the definitely + open
+   sums). */
+const RD_AP_CONS_TIER = {
+  "RedBridge/Accent": {
+    loose: { tab: "consider (4+ of 10)", led: "Consider (4+ of 10)", note: "rated 4 or more of 10, rebased over everyone" },
+    never: { tab: "would never vote (0 of 10)", led: "Would never vote (0 of 10)", note: "rated 0 of 10, rebased over everyone" },
+  },
+  Essential: {
+    loose: { tab: "would consider (definitely or open)", led: "Would consider (definitely or open)", note: "the ‘definitely’ and ‘open to’ bands, summed" },
+    never: { tab: "would never vote", led: "Would never vote", note: "the ‘would never vote for them’ band" },
+  },
+};
+const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIER["RedBridge/Accent"])[tier];
+
 /* a consideration row's RANGE cycler (user call 2026-10-15: "why not just
    add a switch/cycle button through the different ranges, right where it
    denotes the basis"). A wave whose consideration question came in more
-   than one range - RedBridge/Accent's April 2026 0-10 battery files the
+   than one range - RedBridge/Accent's April 2026 0-10 battery, or
+   Essential's Feb/June 2026 definitely/open/never banding, file the
    three tiers of tiers[] - shows ONE range at a time, canonical first,
    and the basis label under its figures is a button stepping through
    them, figures and strip moving together. The state is per row and
@@ -3287,13 +3310,14 @@ function RdAllPolls(P) {
       const pr = (consM && p.cons) || p.p || {};
       /* under consM every row names its consideration basis under the
          figures (user call 2026-10-15, mirroring the demographics facet's
-         "18–34 v 55+, in points" sub). A wave carrying the extra 0–10
-         ranges (RedBridge/Accent's April 2026 battery) lists them behind
-         the canonical tier for RdApConsCyc to step through */
+         "18–34 v 55+, in points" sub). A wave carrying the extra ranges
+         (RedBridge/Accent's April 2026 0–10 battery; Essential's Feb and
+         June 2026 definitely/open/never banding) lists them behind the
+         canonical tier for RdApConsCyc to step through */
       const tiers = !(consM && p.cons) ? null
         : [{ m: p.cons, lab: p.consBasis || "consider" }]
-          .concat(p.consLoose ? [{ m: p.consLoose, lab: "consider (4+ of 10)" }] : [])
-          .concat(p.consNever ? [{ m: p.consNever, lab: "would never vote (0 of 10)" }] : []);
+          .concat(p.consLoose ? [{ m: p.consLoose, lab: rdApConsTier(p, "loose").tab }] : [])
+          .concat(p.consNever ? [{ m: p.consNever, lab: rdApConsTier(p, "never").tab }] : []);
       const primNums = (m) => <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>)}</span>;
       const primStrip = (m, ariaPre) => {
         const cols = prims.filter((k) => m[k.id] != null), tops = rdApDodge(cols.map((k) => pdx(m[k.id])));

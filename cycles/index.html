@@ -59971,9 +59971,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "sampleEff": 786,
     "published": "2026-02-25T01:00",
     "cons": {
+      "onp": 25
+    },
+    "consBasis": "definitely vote",
+    "consLoose": {
       "onp": 58
     },
-    "consBasis": "consider",
+    "consNever": {
+      "onp": 28
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -73243,13 +73249,27 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "undecided": 6,
     "undecidedBasis": "tpp",
     "cons": {
+      "alp": 27,
+      "lnp": 18,
+      "grn": 13,
+      "onp": 29,
+      "oth": 9
+    },
+    "consBasis": "definitely vote",
+    "consLoose": {
       "alp": 50,
       "lnp": 50,
       "grn": 40,
       "onp": 52,
       "oth": 56
     },
-    "consBasis": "consider",
+    "consNever": {
+      "alp": 37,
+      "lnp": 35,
+      "grn": 45,
+      "onp": 35,
+      "oth": 25
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -123984,27 +124004,29 @@ function rdLgLines(p, {
       }, p.consBasis || "parties the voter would consider"))
     });
     if (p.consLoose) {
+      const tier = rdApConsTier(p, "loose");
       const ks2 = ORDER.filter(k => p.consLoose[k] != null);
       out.push({
         id: "consloose",
-        lab: "Consider (4+ of 10)",
+        lab: tier.led,
         body: React.createElement(React.Fragment, null, ks2.map(k => React.createElement(U, {
           key: k
         }, pty(k, rdApNum(p.consLoose[k])))), React.createElement(U, {
           soft: true
-        }, "rated 4 or more of 10, rebased over everyone"))
+        }, tier.note))
       });
     }
     if (p.consNever) {
+      const tier = rdApConsTier(p, "never");
       const ks3 = ORDER.filter(k => p.consNever[k] != null);
       out.push({
         id: "consnever",
-        lab: "Would never vote (0 of 10)",
+        lab: tier.led,
         body: React.createElement(React.Fragment, null, ks3.map(k => React.createElement(U, {
           key: k
         }, pty(k, rdApNum(p.consNever[k])))), React.createElement(U, {
           soft: true
-        }, "rated 0 of 10, rebased over everyone"))
+        }, tier.note))
       });
     }
   }
@@ -124660,6 +124682,33 @@ function RdApSheet({
     onClick: onClose
   }, "Show ", count, " ", count === 1 ? noun1 : noun)));
 }
+const RD_AP_CONS_TIER = {
+  "RedBridge/Accent": {
+    loose: {
+      tab: "consider (4+ of 10)",
+      led: "Consider (4+ of 10)",
+      note: "rated 4 or more of 10, rebased over everyone"
+    },
+    never: {
+      tab: "would never vote (0 of 10)",
+      led: "Would never vote (0 of 10)",
+      note: "rated 0 of 10, rebased over everyone"
+    }
+  },
+  Essential: {
+    loose: {
+      tab: "would consider (definitely or open)",
+      led: "Would consider (definitely or open)",
+      note: "the ‘definitely’ and ‘open to’ bands, summed"
+    },
+    never: {
+      tab: "would never vote",
+      led: "Would never vote",
+      note: "the ‘would never vote for them’ band"
+    }
+  }
+};
+const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIER["RedBridge/Accent"])[tier];
 function RdApConsCyc({
   tiers,
   phone,
@@ -125516,10 +125565,10 @@ function RdAllPolls(P) {
         lab: p.consBasis || "consider"
       }].concat(p.consLoose ? [{
         m: p.consLoose,
-        lab: "consider (4+ of 10)"
+        lab: rdApConsTier(p, "loose").tab
       }] : []).concat(p.consNever ? [{
         m: p.consNever,
-        lab: "would never vote (0 of 10)"
+        lab: rdApConsTier(p, "never").tab
       }] : []);
       const primNums = m => React.createElement("span", {
         className: "rd-ap-pnums"

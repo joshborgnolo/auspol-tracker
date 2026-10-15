@@ -3015,9 +3015,15 @@
       "tpp_alp": 49.5,
       "tpp_lnp": 50.5,
       "consideration": {
+        "onp": 25
+      },
+      "considerationLoose": {
         "onp": 58
       },
-      "consBasis": "consider",
+      "considerationNever": {
+        "onp": 28
+      },
+      "consBasis": "definitely vote",
       "url": "https://essentialreport.com.au/reports/federal-political-insights",
       "releaseUrl": "https://essentialreport.com.au/reports/25-february-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/02/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf"
@@ -4696,13 +4702,27 @@
       "tpp_alp": 46,
       "tpp_lnp": 48,
       "consideration": {
+        "alp": 27,
+        "lnp": 18,
+        "grn": 13,
+        "onp": 29,
+        "oth": 9
+      },
+      "considerationLoose": {
         "alp": 50,
         "lnp": 50,
         "grn": 40,
         "onp": 52,
         "oth": 56
       },
-      "consBasis": "consider",
+      "considerationNever": {
+        "alp": 37,
+        "lnp": 35,
+        "grn": 45,
+        "onp": 35,
+        "oth": 25
+      },
+      "consBasis": "definitely vote",
       "url": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
       "releaseUrl": "https://essentialreport.com.au/reports/30-june-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf"
