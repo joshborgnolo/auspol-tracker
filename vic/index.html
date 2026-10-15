@@ -42546,6 +42546,27 @@ function useHoverClaim(secId, ready, keys, step, deps) {
     };
   }, deps);
 }
+const RD_SPACE_CLAIMS = [];
+function rdSpaceClaimOn(id) {
+  if (!RD_SPACE_CLAIMS.includes(id)) RD_SPACE_CLAIMS.push(id);
+}
+function rdSpaceClaimOff(id) {
+  const i = RD_SPACE_CLAIMS.indexOf(id);
+  if (i >= 0) RD_SPACE_CLAIMS.splice(i, 1);
+}
+function rdSpaceDominant(id) {
+  const vh = window.innerHeight;
+  let mine = -1,
+    best = -1;
+  for (const sid of RD_SPACE_CLAIMS) {
+    const el = document.getElementById(sid);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    const vis = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    if (sid === id) mine = vis;else if (vis > best) best = vis;
+  }
+  return mine >= 0 && mine >= best;
+}
 const RdTabW = ({
   t
 }) => React.createElement("span", {
@@ -42881,6 +42902,9 @@ Object.assign(window, {
   rdTabFocus,
   rdDigitKey,
   useHoverClaim,
+  rdSpaceClaimOn,
+  rdSpaceClaimOff,
+  rdSpaceDominant,
   rdNumWord,
   rdCap,
   rdFraction,
@@ -47303,6 +47327,7 @@ function RdDemographics({
   React.useEffect(() => {
     const sec = document.getElementById("who-votes");
     if (!sec) return undefined;
+    window.rdSpaceClaimOn("who-votes");
     const inView = {
       current: false
     };
@@ -47312,6 +47337,7 @@ function RdDemographics({
     io.observe(sec);
     const key = e => {
       if (!inView.current || e.key !== " ") return;
+      if (!window.rdSpaceDominant("who-votes")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
@@ -47323,6 +47349,7 @@ function RdDemographics({
     };
     document.addEventListener("keydown", key, true);
     return () => {
+      window.rdSpaceClaimOff("who-votes");
       io.disconnect();
       document.removeEventListener("keydown", key, true);
     };
@@ -48150,6 +48177,7 @@ function RdSwitching({
   React.useEffect(() => {
     const sec = document.getElementById("switching");
     if (!sec) return undefined;
+    window.rdSpaceClaimOn("switching");
     const inView = {
       current: false
     };
@@ -48161,6 +48189,7 @@ function RdSwitching({
     io.observe(sec);
     const key = e => {
       if (!inView.current || e.key !== " ") return;
+      if (!window.rdSpaceDominant("switching")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
@@ -48172,6 +48201,7 @@ function RdSwitching({
     };
     document.addEventListener("keydown", key, true);
     return () => {
+      window.rdSpaceClaimOff("switching");
       io.disconnect();
       document.removeEventListener("keydown", key, true);
     };
@@ -58253,7 +58283,7 @@ function rdApConsStory(upd) {
     return d + " " + D.monthNameFull(m) + (y !== new Date(upd).getUTCFullYear() ? " " + y : "");
   };
   const top = ["alp", "lnp"].filter(id => newest.cons[id] != null).sort((a, b) => newest.cons[b] - newest.cons[a])[0];
-  const head = "In the newest poll (" + newest.pollster + ", " + day(newest.released) + "), " + pct(newest.cons.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
+  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
   const series = waves.filter(p => p.pollster === newest.pollster && basis(p) === basis(newest));
   const [lo, hi] = [Math.min(...series.map(p => p.cons.onp)), Math.max(...series.map(p => p.cons.onp))];
   const askers = new Set(waves.map(p => p.pollster + "|" + basis(p))).size;

@@ -1,6 +1,6 @@
 ---
 name: auspol-spacebar-viewport-claim
-description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). EIGHT claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2677 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload), and the voter-switching panel's title cycler `#switching` (2026-10-15, rd-panels.jsx ~:3236 — GO_NEXT onp→lnp→alp modulo wrap over the came-from/going views, ref nulled when the vote-switching payload is absent so /vic/ keeps the scroll day job). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
+description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). EIGHT claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2699 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload), and the voter-switching panel's title cycler `#switching` (2026-10-15, rd-panels.jsx ~:3263 — GO_NEXT onp→lnp→alp modulo wrap over the came-from/going views, ref nulled when the vote-switching payload is absent so /vic/ keeps the scroll day job). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Boundary band ownership: the who-votes/switching pair registers with rdSpaceClaimOn/Off and gates on rdSpaceDominant (rd.jsx; 2026-10-15) — where the two share the screen the BIGGER viewport share owns the key, fixing registration order vetoing the lower panel. Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
 source: auto-skill
 extracted_at: '2026-10-08T12:24:30.482Z'
 ---
@@ -86,7 +86,21 @@ Load-bearing details, in order of subtlety:
    action, so a double-fire there is harmless by construction — when
    adding a new claim, either make the actions identical/idempotent or
    ensure only one can be live (the comment on the house-lean block
-   documents this explicitly).
+   documents this explicitly). **Registered pairs arbitrate by viewport
+   share instead** (2026-10-15, rd.jsx `rdSpaceClaimOn` /
+   `rdSpaceClaimOff` / `rdSpaceDominant`, exported on window): a claim
+   that registers its section id adds `if
+   (!window.rdSpaceDominant("<id>")) return;` after the in-view check —
+   in the boundary band where two registered sections are both
+   part-visible, the section occupying the BIGGER share of the viewport
+   owns the key, measured at key time off live rects (`>=` keeps a
+   literal 50/50 with the earlier listener, which fires first anyway).
+   Before the rule, registration order alone settled the band: the
+   who-votes chips' last 1px vetoed the whole voter-switching panel
+   beneath it (user report 2026-10-15). who-votes and switching are the
+   registered pair; unregistered claims keep registration order. Both
+   handover directions are pinned in sw-space-cycle.mjs's boundary
+   block.
 
 ## The eight claim sites
 
@@ -136,7 +150,7 @@ Load-bearing details, in order of subtlety:
   check is "scrolled clear above → Space leaves the menu untouched",
   not "scrolled below" (impossible). Pinned in the desktop block of
   `.matilda/probe/flows-ledger.mjs`.
-- **Who-votes party chips** (2026-10-15) — rd-panels.jsx ~:2677-2709
+- **Who-votes party chips** (2026-10-15) — rd-panels.jsx ~:2699-2735
   in `RdDemographics`, section `#who-votes`: `spaceParty.current`
   steps the party chips in DEMO_PARTIES order — onp One Nation → alp
   Labor → lnp Coalition → grn Greens → oth Others → wrap to onp, the
@@ -145,19 +159,23 @@ Load-bearing details, in order of subtlety:
   `DEMO_PARTIES[(findIndex(party) + 1) % 5]`. Ref nulled when
   `!T || !T.tabs || !T.tabs.length` — the panel never mounts without
   the demographics payload (/vic/), so Space keeps its scroll day job
-  there. Same canonical IO block and guards (incl. shift). Probe:
+  there. Same canonical IO block and guards (incl. shift), PLUS the
+  registered-pair arbitration: the effect's `rdSpaceClaimOn` /
+  `rdSpaceDominant` gate shares the key with `#switching` by bigger
+  viewport share (see rule 5). Probe:
   `.matilda/probe/wv-space-party.mjs` (port 9023, 12 checks) — parks
   the page where ONLY `#who-votes` of {two-party, latest-polls,
-  primary-vote, who-votes} claims, walks five steps asserting the
-  wrap, asserts scrollY never moved, pins that a FOCUSED chip natively
-  activates (pressed becomes THAT chip, not the next), and finds the
-  negative spot by scanning below the panel for a y that is both
-  claim-free AND ≥60px above `scrollHeight - innerHeight` (the page
-  bottom itself has no scroll left, so the negative check fails
+  primary-vote, who-votes, switching} claims, walks five steps
+  asserting the wrap, asserts scrollY never moved, pins that a
+  FOCUSED chip natively activates (pressed becomes THAT chip, not the
+  next), and finds the negative spot by scanning below the panel —
+  INCLUDING `#switching`, the flush section beneath — for a y that is
+  both claim-free AND ≥60px above `scrollHeight - innerHeight` (the
+  page bottom itself has no scroll left, so the negative check fails
   spuriously if parked there). Keysheet copy rides the shared `Space`
   row of KBD_ROWS.
 - **Voter-switching title cycler** (2026-10-15) — rd-panels.jsx
-  ~:3236-3265 in `RdSwitching`, section `#switching`: `spaceCyc.current`
+  ~:3263-3297 in `RdSwitching`, section `#switching`: `spaceCyc.current`
   cycles the panel's three title-cycler views via hoisted
   `GO_NEXT = {onp:"lnp",lnp:"alp",alp:"onp"}` — Where One Nation's
   voters came from → where the Coalition's voters are going → where
@@ -172,9 +190,20 @@ Load-bearing details, in order of subtlety:
   own title BUTTON taps do the same cycle by click; a FOCUSED title
   button therefore natively taps itself exactly once on Space — the
   claim stands aside per the BODY/HTML guard, so pin "taps exactly
-  once", not "does nothing". Probe: `.matilda/probe/sw-space-cycle.mjs`
-  (port 9024, 14 checks). Keysheet copy rides the shared `Space` row of
-  KBD_ROWS.
+  once", not "does nothing". Same registered-pair arbitration as
+  who-votes above (`rdSpaceClaimOn("switching")` + the
+  `rdSpaceDominant` gate). Probe: `.matilda/probe/sw-space-cycle.mjs`
+  (port 9024, 23 checks) — including the boundary-band block: with
+  `#who-votes`'s tail and `#switching`'s head sharing the screen, the
+  bigger viewport share owns Space, pinned in BOTH directions (came-from
+  stays put while the chips walk; chips stay put while the views
+  cycle). Two probe gotchas of its own: a going view renders as
+  `.rd-go-wrap` at ANY width (de385e6 made the desktop draw the mosaic
+  svg, the phone draw the ladder rows — the post-mosaic probe looked
+  for `.rd-go-rows`, desktop-only false); and the "restore the load
+  view" tail must re-park off the claim band before closing, or the
+  final assertions read the mid-walk state. Keysheet copy rides the
+  shared `Space` row of KBD_ROWS.
 
 ## Probe gotchas (first two cost a cycle in hl-space-flip; pv-group-select and wv-space-party paid for the rest)
 

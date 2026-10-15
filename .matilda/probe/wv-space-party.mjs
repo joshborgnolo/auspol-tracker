@@ -7,10 +7,13 @@
    Space; off the viewport Space keeps its scroll day job.
 
    Neighbour claims on the Now tab: #two-party (hero matchup flip),
-   #latest-polls (two-party facet only) and #primary-vote (the group
-   menu) hold the same key on their own sections, so the positive checks
+   #latest-polls (two-party facet only), #primary-vote (the group
+   menu) and #switching (the title cycler, flush below this panel)
+   hold the same key on their own sections, so the positive checks
    park the page where #who-votes is the ONLY claiming section on
-   screen. */
+   screen. Where #who-votes and #switching do share the screen, the
+   bigger viewport share owns the key (rdSpaceDominant); both
+   directions of that handover are pinned in sw-space-cycle.mjs. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -42,7 +45,7 @@ const ok = (name, pass, detail) => {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const CLAIMANTS = ["two-party", "latest-polls", "primary-vote", "who-votes"];
+const CLAIMANTS = ["two-party", "latest-polls", "primary-vote", "who-votes", "switching"];
 const page = await browser.newPage();
 await page.setViewport({ width: 1280, height: 900 });
 await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded" });
@@ -85,7 +88,7 @@ const parked = await page.evaluate(() => {
 });
 {
   const rs = await rects();
-  const others = ["two-party", "latest-polls", "primary-vote"].filter((id) => {
+  const others = CLAIMANTS.filter((id) => id !== "who-votes").filter((id) => {
     const r = rs[id];
     return r && r.bottom > 0 && r.top < rs.vh;
   });
@@ -135,7 +138,7 @@ ok("claim resumes once the chip blurs (Coalition -> Greens)", (await chipState()
    park below the panel where NO claiming section intersects, with room
    to scroll further (the page bottom itself can't scroll) */
 const spot = await page.evaluate(() => {
-  const ids = ["two-party", "latest-polls", "primary-vote", "who-votes"];
+  const ids = ["two-party", "latest-polls", "primary-vote", "who-votes", "switching"];
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const wv = document.getElementById("who-votes");
   for (let y = wv.offsetTop + wv.offsetHeight + 80; ; y += 300) {

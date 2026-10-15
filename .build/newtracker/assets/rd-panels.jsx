@@ -2700,9 +2700,12 @@ function RdDemographics({ rangeId = "all" }) {
      viewport claim, not the pointer (the primary panel's group menu, the
      latest card's flip and the house-lean flip are the same claim on
      their own sections): the chips' left-to-right order the digits 1..5
-     number, One Nation round again after Others. With no demographics
-     payload (/vic/) the panel never mounts and Space keeps its scroll
-     day job. */
+     number, One Nation round again after Others. In the boundary band
+     where this panel and the voter-switching one are both part-visible,
+     the section with the bigger share of the viewport owns the key
+     (rdSpaceDominant - the claims' shared owner rule). With no
+     demographics payload (/vic/) the panel never mounts and Space keeps
+     its scroll day job. */
   const spaceParty = React.useRef(null);
   spaceParty.current = T && T.tabs && T.tabs.length ? () => {
     const i = DEMO_PARTIES.findIndex((x) => x.id === party);
@@ -2711,12 +2714,14 @@ function RdDemographics({ rangeId = "all" }) {
   React.useEffect(() => {
     const sec = document.getElementById("who-votes");
     if (!sec) return undefined;
+    window.rdSpaceClaimOn("who-votes");
     const inView = { current: false };
     const io = new IntersectionObserver(
       (es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
     io.observe(sec);
     const key = (e) => {
       if (!inView.current || e.key !== " ") return;
+      if (!window.rdSpaceDominant("who-votes")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
@@ -2727,7 +2732,7 @@ function RdDemographics({ rangeId = "all" }) {
       if (!e.repeat) spaceParty.current();
     };
     document.addEventListener("keydown", key, true);
-    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+    return () => { window.rdSpaceClaimOff("who-votes"); io.disconnect(); document.removeEventListener("keydown", key, true); };
   }, []);
   /* each party's charts, built once per grouping and range: a switch
      re-renders every frame, and rebuilding both parties' lines and poll
@@ -3258,7 +3263,11 @@ function RdSwitching({ rangeId }) {
   /* Space walks the same onp -> lnp -> alp cycle the title button taps
      through, claimed while the section is on screen (the viewport-claim
      convention); /vic/ carries no vote-switching payload, so the ref is
-     null there and Space keeps its scroll day job */
+     null there and Space keeps its scroll day job. In the boundary band
+     where the who-votes panel above is part-visible too, the section
+     with the bigger share of the viewport owns the key (rdSpaceDominant
+     - the claims' shared owner rule); before the rule the who-votes
+     claim, registered first, vetoed every press here. */
   const spaceCyc = React.useRef(null);
   spaceCyc.current = S && S.series.length && S.series.every((sr) => sr.rate)
     ? () => setView((v) => GO_NEXT[v !== "onp" && !(S.going || []).some((g) => g.id === v) ? "onp" : v])
@@ -3266,6 +3275,7 @@ function RdSwitching({ rangeId }) {
   React.useEffect(() => {
     const sec = document.getElementById("switching");
     if (!sec) return undefined;
+    window.rdSpaceClaimOn("switching");
     const inView = { current: false };
     const io = new IntersectionObserver((es) => {
       es.forEach((en) => { inView.current = en.isIntersecting; });
@@ -3273,6 +3283,7 @@ function RdSwitching({ rangeId }) {
     io.observe(sec);
     const key = (e) => {
       if (!inView.current || e.key !== " ") return;
+      if (!window.rdSpaceDominant("switching")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
@@ -3283,7 +3294,7 @@ function RdSwitching({ rangeId }) {
       if (!e.repeat) spaceCyc.current();
     };
     document.addEventListener("keydown", key, true);
-    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+    return () => { window.rdSpaceClaimOff("switching"); io.disconnect(); document.removeEventListener("keydown", key, true); };
   }, []);
   if (!S || !S.series.length || !S.series.every((sr) => sr.rate)) return null;
   const Wt = S.weights || {};

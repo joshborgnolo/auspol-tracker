@@ -845,6 +845,40 @@ function useHoverClaim(secId, ready, keys, step, deps) {
     };
   }, deps);
 }
+/* The Space viewport-claims - each claiming section registers here from its
+   own effect (the who-votes chips, the voter-switching title cycler) -
+   share one page, and two neighbouring sections can be part-visible at
+   once: an ~900px band around every shared boundary where the upper's last
+   pixels sit over the lower's first. In that band the key belongs to the
+   section occupying the biggest share of the viewport; before the rule,
+   registration order alone settled every press, so an upper neighbour's
+   1px sliver vetoed the panel the reader was actually looking at - Space
+   over the voter-switching panel walked the who-votes chips above it and
+   the page never cycled the views (user report 2026-10-15). rdSpaceDominant
+   measures at key time, not on the observer, so no further bookkeeping
+   follows resizes or scrolls; `>=` keeps a literal 50/50 with the pair's
+   earlier listener, which fires first anyway. */
+const RD_SPACE_CLAIMS = [];
+function rdSpaceClaimOn(id) {
+  if (!RD_SPACE_CLAIMS.includes(id)) RD_SPACE_CLAIMS.push(id);
+}
+function rdSpaceClaimOff(id) {
+  const i = RD_SPACE_CLAIMS.indexOf(id);
+  if (i >= 0) RD_SPACE_CLAIMS.splice(i, 1);
+}
+function rdSpaceDominant(id) {
+  const vh = window.innerHeight;
+  let mine = -1, best = -1;
+  for (const sid of RD_SPACE_CLAIMS) {
+    const el = document.getElementById(sid);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    const vis = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    if (sid === id) mine = vis;
+    else if (vis > best) best = vis;
+  }
+  return mine >= 0 && mine >= best;
+}
 /* A label that holds its bold width: a pressed tab (or chip, or picked word)
    goes 600, so a plain label would widen it and nudge its neighbours on every
    switch. The hidden bold twin sizes the box; the visible text centres inside
@@ -1148,6 +1182,7 @@ function rdEventReveal(id) {
 
 Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade,
                         rdTabsKey, rdTabFocus, rdDigitKey, useHoverClaim,
+                        rdSpaceClaimOn, rdSpaceClaimOff, rdSpaceDominant,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
                         rdEventBadges, rdChartEvents, RdEventList, rdEventReveal, RdCheck, RdSwitch, RdTerm, RdQPop });
