@@ -301,6 +301,84 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   const [heroGone, setHeroGone] = React.useState(false);
   const sentRef = React.useRef(null);
   const btnRefs = React.useRef({});
+  /* The bar carries the tabs; TABS' menu pages ride the ☰ beside them. A
+     menu page has no tab of its own, so while one is up no tab is selected
+     and the menu button wears the active underline instead. */
+  const barTabs = tabs.filter((t) => !t.menu);
+  const menuTabs = tabs.filter((t) => t.menu);
+  const barActive = barTabs.some((t) => t.id === active);
+  const menuActive = menuTabs.find((t) => t.id === active) || null;
+  const pinHideTab = barTabs.find((t) => t.pinHide);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [menuAt, setMenuAt] = React.useState(null);   // { top, left } in the nav's box
+  const navRef = React.useRef(null);
+  const menuBtn = React.useRef(null);
+  const menuRef = React.useRef(null);
+  const menuWrap = React.useRef(null);
+  menuWrap.current = { contains: (n) => !!((menuRef.current && menuRef.current.contains(n)) || (menuBtn.current && menuBtn.current.contains(n))) };
+  window.useDismissOutside(menuWrap, menuOpen, () => setMenuOpen(false));
+  /* the visible items, in order - Info is in the DOM at every width but
+     shown only where the bar has hidden its tab (CSS: .tab-menu-info) */
+  const menuItems = () => menuRef.current
+    ? [...menuRef.current.querySelectorAll('[role="menuitem"]')].filter((el) => el.offsetParent !== null) : [];
+  const placeMenu = () => {
+    const b = menuBtn.current, n = navRef.current;
+    if (!b || !n) return;
+    /* its right edge under the button's, kept 8px inside the screen: on a
+       phone the button sits left of the menu's own width */
+    const br = b.getBoundingClientRect(), nr = n.getBoundingClientRect();
+    const w = Math.min(280, window.innerWidth - 24);
+    const x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
+    setMenuAt({ top: Math.round(br.bottom - nr.top), left: Math.round(x - nr.left) });
+  };
+  const openMenu = (focusAt) => {
+    placeMenu();
+    setMenuOpen(true);
+    if (focusAt != null) requestAnimationFrame(() => {
+      const els = menuItems();
+      const el = focusAt < 0 ? els[els.length - 1] : els[focusAt];
+      if (el) el.focus();
+    });
+  };
+  const closeMenu = (refocus) => {
+    setMenuOpen(false);
+    if (refocus && menuBtn.current) menuBtn.current.focus();
+  };
+  /* the menu hangs off the button: a scroll that pins or unpins the bar (it
+     condenses) or a resize re-seats it rather than leave it floating */
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const re = () => placeMenu();
+    window.addEventListener("resize", re);
+    window.addEventListener("scroll", re, { passive: true });
+    return () => { window.removeEventListener("resize", re); window.removeEventListener("scroll", re); };
+  }, [menuOpen]);
+  const onMenuBtnKey = (e) => {
+    if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); openMenu(0); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); openMenu(-1); }
+    else if (e.key === "Escape" && menuOpen) { e.preventDefault(); closeMenu(true); }
+  };
+  const onMenuKey = (e) => {
+    const els = menuItems();
+    const i = els.indexOf(document.activeElement);
+    let to = null;
+    if (e.key === "ArrowDown") to = els[(i + 1) % els.length];
+    else if (e.key === "ArrowUp") to = els[(i - 1 + els.length) % els.length];
+    else if (e.key === "Home") to = els[0];
+    else if (e.key === "End") to = els[els.length - 1];
+    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closeMenu(true); return; }
+    else if (e.key === "Tab") { setMenuOpen(false); return; }
+    else if (e.key === " " || e.key === "Spacebar") { e.preventDefault(); if (document.activeElement) document.activeElement.click(); return; }
+    if (to) { e.preventDefault(); to.focus(); }
+  };
+  /* a menu page swaps in place like a tab; a modified click opens its document */
+  const menuPick = (id) => (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    setMenuOpen(false);
+    onChange(id);
+    if (!e.detail && menuBtn.current) menuBtn.current.focus();
+  };
 
   /* Arrow-key navigation. Without it the role="tab" markup was a promise the
      widget didn't keep: a screen reader announced "tab, 1 of 3" and then the
@@ -308,13 +386,13 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
      nothing. Selection follows focus, which is the right call here because
      switching views is instant and has no side effects. */
   const onTabKeyDown = (e) => {
-    const ids = tabs.map((t) => t.id);
+    const ids = barTabs.map((t) => t.id);
     const i = ids.indexOf(active);
     /* Space: the tabs became real links (they are also each a page), and a
        link activates on Enter natively but not on Space the way the buttons
        they replaced did – keep the key the pattern promises. */
     if (e.key === " " || e.key === "Spacebar") {
-      const hit = tabs.find((t) => btnRefs.current[t.id] === e.target);
+      const hit = barTabs.find((t) => btnRefs.current[t.id] === e.target);
       if (hit) { e.preventDefault(); onChange(hit.id); }
       return;
     }
@@ -382,12 +460,12 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
           ownership the pattern requires and overwrote the nav's landmark. */}
       <nav className={"tabs sticky" + (pinned ? " pinned" : "")
                       + (pinned && heroGone ? " show-score" : "")}
-           aria-label="Views">
+           aria-label="Views" ref={navRef}>
         <div className="tabs-inner">
           <div className="tabs-set">
           <div className="tabs-list" role="tablist" aria-label="Views"
                onKeyDown={onTabKeyDown}>
-            {tabs.map((t) => (
+            {barTabs.map((t, ti) => (
               /* Each tab is also a page of its own (build.mjs emits them), so
                  the tab IS its link: a plain press swaps the view in place,
                  a modified one opens the real document. The path map lives in
@@ -401,7 +479,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       title={t.tip}
                       /* roving tabindex: the tab strip is ONE tab stop and the
                          arrow keys move within it, per the ARIA tabs pattern */
-                      tabIndex={active === t.id ? 0 : -1}
+                      tabIndex={active === t.id || (!barActive && ti === 0) ? 0 : -1}
                       ref={(el) => { btnRefs.current[t.id] = el; }}
                       className={"tab" + (active === t.id ? " active" : "")
                                  + (t.pinHide ? " tab-pinhide" : "")}
@@ -424,6 +502,28 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
               </a>
             ))}
           </div>
+          {menuTabs.length > 0 && (
+            /* the ☰: the menu pages, and Info wherever the bar has had to
+               drop its tab. It is the bar's last item, so it rides the
+               pinned condense with the tabs. On a menu page it carries the
+               active underline, and from a tablet up it names the page. */
+            <button type="button" ref={menuBtn}
+                    className={"tab tab-menu" + (menuActive ? " active" : "") + (menuOpen ? " open" : "")}
+                    aria-haspopup="menu" aria-expanded={menuOpen} aria-controls="tab-menu-pop"
+                    aria-label={menuActive ? "More pages – on " + menuActive.label : "More pages"}
+                    title="More pages"
+                    onKeyDown={onMenuBtnKey}
+                    onClick={(e) => {
+                      /* a pointer close leaves no focus behind (the tabs' rule) */
+                      if (menuOpen) { closeMenu(false); if (e.detail) e.currentTarget.blur(); }
+                      else openMenu(e.detail ? null : 0);
+                    }}>
+              <svg className="tab-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+                <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" fill="none"></path>
+              </svg>
+              {menuActive && <span className="tab-label tab-menu-lab">{menuActive.label}</span>}
+            </button>
+          )}
           </div>
           {/* the ticker's fit budget is keyed to the SEAT, and the seat is
               show-score's (score docked => centred), not the pin's - a bare
@@ -438,6 +538,37 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
           <GlyphDial className="tab-glyph" width="34" height="23.8" />
           <TabScore onGoHero={goHero} matchup={tppMatchup} tppBasis={tppBasis} />
         </div>
+        {menuOpen && (
+          /* outside .tabs-inner, which clips to the bar's height */
+          <div className="tab-menu-pop" id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
+               style={menuAt ? { top: menuAt.top + "px", left: menuAt.left + "px", right: "auto" } : null}
+               onKeyDown={onMenuKey}>
+            {pinHideTab && (
+              <a role="menuitem" tabIndex={-1} className={"tab-menu-item tab-menu-info" + (active === pinHideTab.id ? " on" : "")}
+                 href={window.AP.tabToPath ? window.AP.tabToPath(pinHideTab.id) : "#" + pinHideTab.id}
+                 aria-current={active === pinHideTab.id ? "page" : undefined}
+                 onClick={menuPick(pinHideTab.id)}>{pinHideTab.label}</a>
+            )}
+            {menuTabs.map((t) => (
+              <a key={t.id} role="menuitem" tabIndex={-1} className={"tab-menu-item" + (active === t.id ? " on" : "")}
+                 href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}
+                 aria-current={active === t.id ? "page" : undefined}
+                 onClick={menuPick(t.id)}>
+                <span className="tab-menu-t">{t.label}</span>
+                {t.tip && <span className="tab-menu-d">{t.tip}</span>}
+              </a>
+            ))}
+            {/* the explainer is a page of the federal site's own, not a view */}
+            {!window.JUR && <>
+              <span className="tab-menu-sep" role="separator"></span>
+              <a role="menuitem" tabIndex={-1} className="tab-menu-item" href="/preference-flows/"
+                 onClick={() => setMenuOpen(false)}>
+                <span className="tab-menu-t">Preference flow explainer</span>
+                <span className="tab-menu-d">How preferences decide the two-party figure</span>
+              </a>
+            </>}
+          </div>
+        )}
       </nav>
     </React.Fragment>
   );
@@ -4352,8 +4483,7 @@ function VariancePanel({ facet, rangeId }) {
           <p className="card-sub">
             How far apart the polls sit, against the spread sampling error alone would produce.
             The shading is that chance floor – a line inside it means the houses are running tighter
-            than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
-            above don’t narrow it.
+            than random sampling permits. Measured across all {D.individualPolls.length} polls.
             {view === "twopp" && <>{" "}Each two-party contest is drawn on both bases. The
             {" "}<em>as published</em> line (dashed) spreads the figure each house prints – its own
             allocation, which is where herding lives – and so covers only the waves that publish a pair;
@@ -5525,36 +5655,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     if (f !== "twopp") { setLead("all"); setMeasure(DEFAULT_MEASURE); }
   };
 
-  const jumpTo = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-  /* house lean mounts on the voting facets (2PP and Primary) – from a
-     leadership/direction view the jump switches facets first, and the
-     scroll has to wait on the remount */
-  const leanJump = useRef(false);
-  React.useEffect(() => {
-    if (!leanJump.current || (facet !== "twopp" && facet !== "primary")) return;
-    leanJump.current = false;
-    jumpTo("house-lean");
-  }, [facet]);
-  const jumpToLean = () => {
-    if (facet === "twopp" || facet === "primary") jumpTo("house-lean");
-    else { leanJump.current = true; onFacet("twopp"); }
-  };
-  /* flow drift mounts on 2PP alone – same wait-on-remount dance as the lean
-     jump, but the target facet is always twopp */
-  const flowJump = useRef(false);
-  React.useEffect(() => {
-    if (!flowJump.current || facet !== "twopp") return;
-    flowJump.current = false;
-    jumpTo("flow-drift");
-  }, [facet]);
-  const jumpToFlow = () => {
-    if (facet === "twopp") jumpTo("flow-drift");
-    else { flowJump.current = true; onFacet("twopp"); }
-  };
-
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const toggleHouse = (h) => React.startTransition(() => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; }));
 
@@ -5963,7 +6063,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
     [CSV_COLS.map((c) => c[0]), ...sorted.map((p) => CSV_COLS.map((c) => c[1](p)))]);
 
-  /* The redesign draws the table and its three sections itself (rd-allpolls);
+  /* The redesign draws the table itself (rd-allpolls);
      everything above - the filters, their counts, the address bar, the sort,
      the open row, the export - is shared with it. */
   if (window.AP.rd) return (
@@ -5977,9 +6077,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
         ofTotal={totalAll} ofHouses={housesAll.length} demSplit={demSplit} setDemSplit={setDemSplit} />
-      <RdDisagree />
-      <RdHouseLean measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} />
-      <RdFlows measure={measure} />
     </div>
   );
 
@@ -6018,34 +6115,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         </div>
       </div>
 
-      {/* phone (≤560px) turns this block into a two-column grid: the pills sit
-          side by side on the top line and the facet pair lands beneath them;
-          wider screens keep the originals in .ap-head-side and hide these copies */}
+      {/* phone (≤560px) only: the facet pair and the count, copies of
+          .ap-head-side's; the jump pills to the three diagnostic panels left
+          with the panels themselves (now pages of their own, 2026-10-15) */}
       <div className="ap-jumps">
-        <button className="ap-jump" onClick={() => jumpTo("poll-disagreement")}
-                title="Scroll down to the poll disagreement panel">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
-          </svg>
-          Jump to poll disagreement
-        </button>
-        <button className="ap-jump" onClick={jumpToLean}
-                title="Scroll down to the house lean chart">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
-          </svg>
-          Jump to house lean
-        </button>
-        <button className="ap-jump" onClick={jumpToFlow}
-                title="Scroll down to the preference-flow drift chart">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
-          </svg>
-          Jump to flow drift
-        </button>
         <TextToggle value={facet} onChange={onFacet} options={FACETS}
           ariaLabel="Archive table view" caps className="ap-facet" />
         <span className="ap-jumps-count">
@@ -6448,21 +6521,34 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means
         unpublished, not unknown.</>,
       ]} />
+    </div>
+  );
+}
 
-      <VariancePanel key={facet} facet={facet} rangeId={range} />
-
-      {/* house lean rides the voting facets: the panel's own toggle moves it
-          between the 2PP and the ALP / L/NP / ON primary measures, so it
-          mounts wherever those measures run the tab */}
-      {(facet === "twopp" || facet === "primary") && <HouseLeanPanel rangeId={range} />}
-
-      {/* flow drift is a 2PP-only diagnostic — it publishes on the canonical
-          pair alone, so it mounts on the 2PP facet right after the lean panel */}
-      {/* Same ranking as the hero: the drift panel for the contest Labor is
-          doing worst in comes first. */}
-      {facet === "twopp" && ((D.latest && D.latest.rivalLead) === "alp_on"
-        ? <><FlowDriftOnPanel rangeId={range} /><FlowDriftPanel rangeId={range} /></>
-        : <><FlowDriftPanel rangeId={range} /><FlowDriftOnPanel rangeId={range} /></>)}
+/* The menu's three pages (the ☰ in the tab bar, TABS' menu entries): the
+   archive-wide diagnostics that sat under the All polls table until
+   2026-10-15, each now a page of its own. Off the table they hold their
+   own two-party contest - Labor's main rival by the hero's ruling, as the
+   table defaults to - and the flows page opens on that contest too. The
+   design they replaced draws its own panels, on the 2PP facet and the whole
+   term, which is where they used to mount by default. */
+function MenuPageView({ id, tppBasis }) {
+  const { D } = window.AP;
+  const [measure, setMeasure] = useState(() => window.AP.measureOfMatchup((D.latest || {}).rivalLead));
+  if (window.AP.rd) return (
+    <div className={"view view-" + id}>
+      {id === "disagreement" && <RdDisagree />}
+      {id === "leans" && <RdHouseLean measure={measure} onMeasure={setMeasure} tppBasis={tppBasis} />}
+      {id === "flows" && <RdFlows measure={measure} />}
+    </div>
+  );
+  return (
+    <div className={"view view-" + id}>
+      {id === "disagreement" && <VariancePanel facet="twopp" rangeId="all" />}
+      {id === "leans" && <HouseLeanPanel rangeId="all" />}
+      {id === "flows" && ((D.latest && D.latest.rivalLead) === "alp_on"
+        ? <><FlowDriftOnPanel rangeId="all" /><FlowDriftPanel rangeId="all" /></>
+        : <><FlowDriftPanel rangeId="all" /><FlowDriftOnPanel rangeId="all" /></>)}
     </div>
   );
 }
@@ -7091,7 +7177,7 @@ function infoTerms(D) {
       predicts each new poll from the polls before it. Each figure gets its own lean, since a
       pollster that leans to Labor on the two-party figure need not on a primary vote. The
       aggregate subtracts the lean as it stood at the time of each figure.
-      {" "}{xref("house-lean", "house effect", "House lean")} in All polls shows each pollster’s.
+      {" "}The Pollster leans page, in the ☰ menu, shows each pollster’s {xref("house-lean", "house effect", "house lean")}.
       {working(<span className="info-p">A pollster’s lean is Σvⱼgⱼ ÷ (Σvⱼ + {shrinkK}) over its
         polls, where gⱼ is a poll’s gap to the sample-weighted average of other pollsters’ polls
         within 28 days of it (at least three of them), and vⱼ = 2^(−a/90), with a the poll’s age
@@ -7246,7 +7332,7 @@ function infoTerms(D) {
           uses its own {xref("fp-flows", "preference flows", "Labor v One Nation flows")}, estimated
           because no election has counted that pairing.
           <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-          panel in All polls checks two ways, one contest at a time. It sets what each party’s voters
+          page, in the ☰ menu, checks two ways, one contest at a time. It sets what each party’s voters
           tell pollsters, when asked to choose between the final two, beside the flows the site
           assumes. And it watches the pollsters’ own two-party figures, which come largely from where
           their respondents say their preferences would go: if those drift from where the pollster’s
@@ -7965,7 +8051,7 @@ function infoTerms(D) {
         lean alongside the line, from all its polls, and takes it out; the leans average zero
         across the polls. A lean measured from few polls is shrunk toward zero. Each line gets its
         own leans, since a pollster that leans to Labor on the two-party figure need not on a
-        primary vote. {xref("house-lean", "house effect", "House lean")} in All polls traces each
+        primary vote. The Pollster leans page, in the ☰ menu, traces each
         pollster’s lean month by month, measured the federal page’s way.</>) },
       method.find((m) => m.id === "monthly-average"),
       { id: "interval", term: "95% interval", body: (
@@ -8101,7 +8187,7 @@ function infoTerms(D) {
             One Nation won 0.3% in {eY}, too little to measure, so its flow is the 2025 federal
             election’s: {pct(FL.onp)} to Labor.
             <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-            panel in All polls checks. The pollsters’ own two-party figures come largely from where
+            page, in the ☰ menu, checks. The pollsters’ own two-party figures come largely from where
             their respondents say their preferences would go, so if those drift from where the
             pollster’s primary votes and the {eY} flows put them, voters may be sending preferences
             differently. The check corrects no other figure.</span></>) },
@@ -8453,7 +8539,7 @@ function TermPop({ id, onClose, onMore }) {
     </div>, document.body);
 }
 
-Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView, TermPop,
+Object.assign(window, { Tabs, PastCyclesView, AllPollsView, MenuPageView, InfoView, TermPop,
   // shared cell renderers reused by the latest-polls table
   ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo,
   // issues facet readouts, shared with the redesign's table

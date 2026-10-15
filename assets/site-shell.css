@@ -328,7 +328,35 @@ body { height: auto; }
 }
 @media (max-width: 380px) {
   .sh-tabs.pinned .sh-tab-pinhide { display: none; }
+  .sh-tabs.pinned .sh-menu-info { display: flex; }
 }
+/* the ☰ and its menu (the main page's .tab-menu / .tab-menu-pop) */
+.sh-menu-btn { all: unset; position: relative; box-sizing: border-box; cursor: pointer; align-self: stretch; display: inline-flex; align-items: center;
+  padding: 12px 2px 13px; color: var(--ink-2); transition: color .15s ease; }
+.sh-menu-btn:hover, .sh-menu-btn[aria-expanded="true"] { color: var(--ink); }
+.sh-menu-btn:not(.active):hover::after { transform: scaleX(0); }
+.sh-menu-btn:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: -4px; border-radius: 4px; }
+.sh-menu-ic { display: block; }
+.sh-menu {
+  position: absolute; z-index: 2; top: 100%; right: 0;
+  display: flex; flex-direction: column;
+  width: 280px; max-width: calc(100vw - 24px); box-sizing: border-box; padding: 6px;
+  background: var(--surface, var(--bg)); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 8px 28px -8px rgba(40, 30, 20, 0.28), 0 1px 3px rgba(40, 30, 20, 0.08);
+  font-family: var(--sans);
+}
+.sh-menu[hidden] { display: none; }
+.sh-menu-item {
+  display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 6px;
+  color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;
+}
+.sh-menu-item:hover { background: var(--surface-2, var(--line)); }
+.sh-menu-item:focus { outline: none; }
+.sh-menu-item:focus-visible { background: var(--surface-2, var(--line)); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
+.sh-menu-item.on .sh-menu-t { font-weight: 600; }
+.sh-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
+.sh-menu-sep { height: 1px; background: var(--line); margin: 6px; }
+.sh-menu-info { display: none; }
 
 /* the docked 2PP score (.tab-score): absolutely seated on the underline at
    the row's right end, so its arrival relayouts nothing */
@@ -455,6 +483,7 @@ nav.tabs[aria-label="Poll archives"] {
   /* the set spreads across the whole row as the main page's phone tabs
      do; pinned it closes up at the left so the score can dock right of it */
   .sh-tabs-set { gap: 0; width: 100%; justify-content: space-between; }
+  .sh-menu-btn { padding: 11px 6px 12px; }
   .sh-tabs.pinned .sh-tabs-set { width: auto; justify-content: flex-start; }
   .sh-tab { padding: 11px 6px 12px; font-size: 15px; line-height: 19px; }
   .sh-eyebrow { display: none; }

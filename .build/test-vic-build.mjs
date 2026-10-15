@@ -19,7 +19,8 @@ const FED = ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "assets/favi
              "assets/site-shell.css", "assets/site-shell.js",
              // the federal per-tab pages (real-URL tabs since 2026-10-10) are
              // the federal build's alone
-             "cycles/index.html", "allpolls/index.html", "info/index.html"];
+             "cycles/index.html", "allpolls/index.html", "info/index.html",
+             "disagreement/index.html", "leans/index.html", "flows/index.html"];
 const before = FED.map((f) => [f, fs.existsSync(path.join(ROOT, f)) ? fs.readFileSync(path.join(ROOT, f)) : null]);
 execFileSync(process.execPath, [path.join(ROOT, ".build/newtracker/build.mjs")],
   { cwd: ROOT, env: { ...process.env, BUILD_JUR: "vic", BUILD_OUT: OUT }, stdio: "pipe" });
@@ -48,7 +49,8 @@ assert.ok(!html.includes("window.AP_INITIAL_TAB="), "the Now document carries no
 // real-URL tabs (2026-10-10): Vic gets All polls and Info pages of its own,
 // written beside BUILD_OUT, and a Past cycles page only once a term closes –
 // Victoria has none yet, so cycles/ must NOT exist in the scratch dir
-for (const [id, label] of [["allpolls", "All polls"], ["info", "Info"]]) {
+for (const [id, label] of [["allpolls", "All polls"], ["disagreement", "Poll disagreement"],
+                           ["leans", "Pollster leans"], ["flows", "Preference flows"], ["info", "Info"]]) {
   const t = fs.readFileSync(path.join(SCRATCH, id, "index.html"), "utf8");
   assert.match(t, new RegExp(`<title>vicpol tracker – ${label}</title>`), `vic/${id}/ has its own title`);
   assert.ok(t.includes(`<link rel="canonical" href="https://auspoltracker.com/vic/${id}/">`), `vic/${id}/ has its own canonical`);

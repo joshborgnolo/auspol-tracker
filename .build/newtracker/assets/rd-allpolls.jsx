@@ -2920,7 +2920,6 @@ function RdAllPolls(P) {
     check();
     return () => { window.removeEventListener("scroll", on); window.removeEventListener("resize", onResize); if (raf) cancelAnimationFrame(raf); };
   }, [phone]);
-  const jump = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
   const toSearch = () => {
     const el = searchRef.current;
     if (!el) return;
@@ -3673,9 +3672,6 @@ function RdAllPolls(P) {
       {facet === "confidence" && <span className="rd-ap-hpic">{confScale(true)}</span>}
     </div>
   );
-  /* the pinned bar's section links are the short names at every width - the
-     full titles stay in the eyebrow's "On this page" list */
-  const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   /* The head and dek render on EVERY facet (not just twopp): it is a
      where-things-stand line, not a facet label, and keeping the slot's
      height constant means a laptop facet walk moves nothing above the bar
@@ -3859,26 +3855,29 @@ function RdAllPolls(P) {
      where Confidence does, not on /vic/) — and the live count right-aligns
      inside it. Pinned by .matilda/probe/ap-pin-steady.mjs */
   const pinnWNoun = FACETS.some((f) => f.id === "confidence") ? "releases" : "polls";
+  const pinCount = <span className="rd-ap-pinn"><span className="rd-ap-pinnw" aria-hidden="true">{total} of {total} {pinnWNoun}</span><span className="rd-ap-pinnl"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span></span>;
   const pinBar = (
     <div className={"rd-ap-pinbar" + (pinned ? " on" : "")} aria-hidden={!pinned}>
-      <nav className="rd-ap-pinnav" aria-label="On this page">
-        {NAV.map(([id, lab], i) => <button key={id} type="button" className={"rd-ap-pinl" + (i === 0 ? " on" : "")} tabIndex={pinned ? 0 : -1} onClick={() => jump(id)}>{lab}</button>)}
-      </nav>
-      {phone ? (
+      {/* the section links (Disagree, Lean, Flows) left with their
+          sections for the ☰ menu's pages, 2026-10-15 */}
+      {phone ? (<>
+        {pinCount}
+        <span className="rd-grow" aria-hidden="true"></span>
         <button type="button" className="rd-ap-pinf" tabIndex={pinned ? 0 : -1} onClick={() => setSheet(true)}>
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
           Filters{nFilters ? ", " + nFilters : ""}
         </button>
-      ) : <>
+      </>) : <>
         <span className="rd-ap-pintabs" role="group" aria-label="Figures"
               onKeyDown={rdTabsKey(FACETS, facetPick)} onClick={rdTabFocus}>
           {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => facetPick(f.id)}><RdTabW t={f.label} /></button>)}
         </span>
+        <span className="rd-grow" aria-hidden="true"></span>
         <span className="rd-ap-pinsep" aria-hidden="true"></span>
         <button type="button" className="rd-ap-pins" aria-label="Search the polls" tabIndex={pinned ? 0 : -1} onClick={toSearch}>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
         </button>
-        <span className="rd-ap-pinn"><span className="rd-ap-pinnw" aria-hidden="true">{total} of {total} {pinnWNoun}</span><span className="rd-ap-pinnl"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span></span>
+        {pinCount}
       </>}
     </div>
   );
@@ -3916,13 +3915,6 @@ function RdAllPolls(P) {
     <span className="rd-meta">{conf
       ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election"
       : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
-    {!phone && (
-      <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
-        <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
-        <button type="button" onClick={() => jump("house-lean")}>How each pollster leans</button>
-        <button type="button" onClick={() => jump("flow-drift")}>and Preference flows</button>
-      </nav>
-    )}
   </>);
   return (
     <section className="rd-sec rd-first rd-ap" id="rd-ap-top" aria-labelledby="rd-ap-t" data-facet={facet}>
@@ -4376,7 +4368,7 @@ function RdDisagree() {
           : "The implied figures read every poll through the same flows, so their spread is the pollsters disagreeing about primary votes; the published figures add each pollster’s own way of allocating preferences."}</>,
       ]} /></RdGlide>
       <RdFoot how={{ term: "poll-disagreement", from: "How much the polls disagree" }}>
-        Spread is how far each poll typically sits from the trend through the polls around it, with recent polls counting more; weighting by sample size would mute the small polls whose divergence is being measured. Sampling error is what each poll’s own sample predicts, with a design effect of {rdApDeff()}{view === "twopp" ? ", and for the implied figures from the spread of each respondent’s flow to Labor rather than a simple share" : ""}. Measured across all {D.individualPolls.length} polls; the table’s filters don’t narrow it.
+        Spread is how far each poll typically sits from the trend through the polls around it, with recent polls counting more; weighting by sample size would mute the small polls whose divergence is being measured. Sampling error is what each poll’s own sample predicts, with a design effect of {rdApDeff()}{view === "twopp" ? ", and for the implied figures from the spread of each respondent’s flow to Labor rather than a simple share" : ""}. Measured across all {D.individualPolls.length} polls.
       </RdFoot>
     </section>
   );

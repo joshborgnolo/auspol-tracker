@@ -1968,6 +1968,17 @@ const TABS = [
   { id: "now", label: "Now" },
   { id: "cycles", label: "Past cycles" },
   { id: "allpolls", label: "All polls" },
+  /* menu: a page of its own (a path, a document, a stop on the page turn)
+     reached from the bar's menu button rather than a tab of its own. The
+     three left All polls on 2026-10-15 (user call): they read the archive
+     as a whole, not the table, and sat a long scroll under it. They walk
+     straight after All polls, where they came from. */
+  { id: "disagreement", label: "Poll disagreement", menu: true,
+    tip: "How much the polls disagree with one another" },
+  { id: "leans", label: "Pollster leans", menu: true,
+    tip: "How each pollster leans against the others" },
+  { id: "flows", label: "Preference flows", menu: true,
+    tip: "Where minor-party preferences are flowing now, against the last election" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins AND the hero 2PP has scrolled off (.show-score), and on a phone
      there is not room for both. The glossary is the one tab a reader is
@@ -1983,6 +1994,7 @@ const TABS = [
    terms' polls are gathered) has no Past cycles tab */
 if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1);
 const TAB_IDS = TABS.map((t) => t.id);
+const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu).map((t) => [t.id, t]));
 
 /* Every tab is also a path of its own: Now is the site root (/vic/ for that
    jurisdiction's page), the others one segment under it, and build.mjs emits
@@ -2002,7 +2014,8 @@ const pathToTab = () => {
 /* Links from the hash era (and from before Now was Now, #snapshot) keep
    landing on the right tab: the hash is honoured first at boot, then
    normalised away to the path. */
-const TAB_HASH = { snapshot: "now", now: "now", cycles: "cycles", allpolls: "allpolls", info: "info" };
+const TAB_HASH = { snapshot: "now", now: "now", cycles: "cycles", allpolls: "allpolls", info: "info",
+  disagreement: "disagreement", leans: "leans", flows: "flows" };
 const readLocation = () => {
   const h = (window.location.hash || "").replace(/^#/, "");
   if (h && TAB_IDS.includes(TAB_HASH[h])) return TAB_HASH[h];
@@ -2145,7 +2158,7 @@ class RootBoundary extends React.Component {
    keyboards, said once beside the one shortcut that needs it. */
 const KBD_ROWS = [
   /* /vic/ has no Past cycles (TABS above) and no demographics view */
-  { keys: ["←", "→"], what: window.JUR ? "Turn between Now, All polls and Info" : "Turn between Now, All polls, Past cycles and Info" },
+  { keys: ["←", "→"], what: "Turn the pages, the ☰ menu’s included" },
   { keys: ["⌥", "D"], what: "Dark mode, on or off — ⌥ is Alt on a PC" },
   { keys: ["C"], what: "Copy the chart or poll breakdown under the pointer as an image" },
   { keys: ["←", "→"], what: "Walk a card's tabs or chips while the pointer is over it" },
@@ -2464,7 +2477,7 @@ function App() {
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       const a = document.activeElement;
       if (a && a !== document.body && a !== document.documentElement) return;
-      if (document.querySelector(".rd-qpanel, .term-pop, .rd-keysheet")) return;
+      if (document.querySelector(".rd-qpanel, .term-pop, .rd-keysheet, .tab-menu-pop")) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const { tab: cur, goTab: go } = swipeRef.current;
@@ -2782,7 +2795,9 @@ function App() {
             a drag's catch keeps its park while the selection lives — keystrokes
             are vetoed under a live selection anyway). */}
         <div className={panelKey === loadPanel.current ? "content" : "view-enter content"} key={panelKey}
-             role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
+             role="tabpanel" id={"panel-" + tab}
+             /* a menu page has no tab in the bar to be labelled by */
+             {...(TAB_MENU[tab] ? { "aria-label": TAB_MENU[tab].label } : { "aria-labelledby": "tab-" + tab })}
              tabIndex={0}
              onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}
              onPointerUpCapture={(e) => {
@@ -2810,6 +2825,7 @@ function App() {
               tppBasis={tppBasis} setTppBasis={setTppBasis} />}
             {termPop && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
               onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
+            {TAB_MENU[tab] && <MenuPageView id={tab} tppBasis={tppBasis} />}
             {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
               onBack={focusTerm ? backFromTerm : null}
               backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}

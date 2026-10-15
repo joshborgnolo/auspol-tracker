@@ -1300,6 +1300,35 @@ ${ssTail(esc, sources)}
 ${ssTail(esc, sources)}
     </article>`;
   }
+  /* the ☰ menu's pages: what each measures, in words; the figures are the
+     live page's charts */
+  const MENU_SS = {
+    disagreement: ["Poll disagreement",
+      `How far the polls sit from the trend through them, month by month, set against the spread
+        sampling error alone would leave. Polls that scatter more widely than that disagree for
+        reasons beyond chance &#8211; method, timing or a real shift; polls that sit closer than it
+        may be leaning on one another. The live page charts the two-party and primary-vote measures.`],
+    leans: ["Pollster leans",
+      `How each pollster leans: its polls against the other houses polling within weeks of them,
+        pooled with recent polls counting for more, and shrunk toward zero while a house has published
+        few. The aggregate subtracts each lean as it stood at the time. The live page charts every
+        house's lean month by month, on the two-party figure and on each party's primary vote.`],
+    flows: ["Preference flows",
+      `Where minor-party preferences are flowing now. The two-party figures read every poll's
+        primaries through the flows counted at the last election; this page checks whether voters
+        are still sending their preferences that way &#8211; what they tell pollsters when asked to
+        choose between the final two, and what the pollsters' own two-party figures imply &#8211; one
+        contest at a time.`],
+  };
+  if (MENU_SS[id]) {
+    const [h1, sub] = MENU_SS[id];
+    return `<article class="static-summary">
+      <h1>${h1}</h1>
+      <p class="ss-sub">${sub} The latest figures are on the <a href="${PAGE_URL}">front page</a>.</p>
+
+${ssTail(esc, sources)}
+    </article>`;
+  }
   /* info */
   return `<article class="static-summary">
       <h1>About ${VIC ? JV.brand : "auspol"} tracker</h1>
@@ -1689,6 +1718,13 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       desc: `${VIC ? "Victorian" : "Australian federal"} elections poll by poll – every campaign cycle in the tracker's record charted against its result, with each pollster's final-poll record.` }] : []),
     { id: "allpolls", label: "All polls",
       desc: `Every published ${VIC ? JV.adj : "Australian federal"} opinion poll since the ${VIC ? `${DATA.elections[JV.baseline].date.slice(0, 4)} Victorian` : "May 2025 federal"} election – primary votes, two-party preferred and leadership ratings, with fieldwork dates and samples, month by month.` },
+    /* the ☰ menu's pages (TABS' menu entries), out of All polls 2026-10-15 */
+    { id: "disagreement", label: "Poll disagreement",
+      desc: `How much the ${VIC ? JV.adj : "Australian federal"} polls disagree – how far they sit from the trend through them, month by month, against the spread sampling error alone would leave.` },
+    { id: "leans", label: "Pollster leans",
+      desc: `How each ${VIC ? JV.adj : "Australian federal"} pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.` },
+    { id: "flows", label: "Preference flows",
+      desc: `Where ${VIC ? JV.adj : "Australian federal"} preferences are flowing now – what voters tell pollsters, and what the pollsters' own two-party figures imply, set against the flows of the last election.` },
     { id: "info", label: "Info",
       desc: `How ${BRAND} tracker works – the aggregate's weighting and house-lean method, the pollsters it tracks, and a glossary of the terms the site uses.` },
   ];
@@ -1952,12 +1988,13 @@ const VIC_STAMP = (() => {
    elections object, which is why this reads the schema map rather than the
    file) – the same rule build 5a emits the page by. */
 const VIC_TAB_IDS = await (async () => {
-  if (!VIC_RAW) return ["allpolls", "info"];
+  const MENU = ["disagreement", "leans", "flows"];
+  if (!VIC_RAW) return ["allpolls", ...MENU, "info"];
   try {
     const vd = (await import("../vic/to-main-schema.mjs")).vicToMain(VIC_RAW);
     return Object.keys(vd.elections || {}).some((k) => k !== vd.jurisdiction.baseline)
-      ? ["cycles", "allpolls", "info"] : ["allpolls", "info"];
-  } catch { return ["allpolls", "info"]; }
+      ? ["cycles", "allpolls", ...MENU, "info"] : ["allpolls", ...MENU, "info"];
+  } catch { return ["allpolls", ...MENU, "info"]; }
 })();
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -1975,6 +2012,18 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
   <url>
     <loc>${SITE_URL}info/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}disagreement/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}leans/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}flows/</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
   <url>

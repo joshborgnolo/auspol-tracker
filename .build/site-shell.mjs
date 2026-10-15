@@ -81,7 +81,7 @@ export const ROOT = path.resolve(HERE, "..");
    redirect before paint and carry nothing. */
 export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
-  { file: "preference-flows/index.html" },
+  { file: "preference-flows/index.html", menu: "explainer" },   // the ☰ menu's explainer item
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "changelog/index.html" },                         // written by .build/newtracker/build.mjs (federal pass)
   { file: "atlas/index.html" },
@@ -124,6 +124,8 @@ const mainTabs = (() => {
     const tabs = [...body[1].matchAll(/\{ id: "([^"]+)", label: "([^"]+)"([\s\S]*?)\}/g)]
       .map((m) => ({ id: m[1], label: m[2], href: m[1] === "now" ? "/" : "/" + m[1] + "/",
                      ...(/pinHide:\s*true/.test(m[3]) ? { pinHide: true } : {}),
+                     ...(/menu:\s*true/.test(m[3]) ? { menu: true } : {}),
+                     ...((m[3].match(/tip: "([^"]+)"/) || [])[1] && /menu:\s*true/.test(m[3]) ? { tip: m[3].match(/tip: "([^"]+)"/)[1] } : {}),
                      ...SHELL_TAB_EXTRAS[m[1]] }));
     if (!tabs.length || tabs[0].id !== "now") {
       throw new Error("site-shell: TABS parse in " + file + " produced no now tab");
@@ -211,7 +213,7 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
   const archM = headSrc.match(/className="colo-arch">\s*([\s\S]*?)\{" "\}\s*<a className="colo-link" href="([^"]+)">([\s\S]*?)<\/a>\{" "\}\s*([\s\S]*?)\s*<\/p>/);
   if (!archM) miss("colophon archives line", "the header asset");
   return {
-    tabs: tabs.map(({ id, label, pinHide }) => ({ id, label, ...(pinHide ? { pinHide: true } : {}) })),
+    tabs: tabs.map(({ id, label, pinHide, menu }) => ({ id, label, ...(pinHide ? { pinHide: true } : {}), ...(menu ? { menu: true } : {}) })),
     skip: one(/className="skip-link"[\s\S]*?>\s*([^{}<>]+?)\s*<\/a>/, "skip link"),
     wm: { name: word, track, sr },
     tagline: { a: tagA, b: tagB },
@@ -274,8 +276,25 @@ const CHROME = () => (CHROME_CACHE ||= mainChrome());
 const SHELL_V = () => createHash("sha256").update(shellCss() + "\n//\n" + shellJs()).digest("hex").slice(0, 10);
 
 // ---- the markup written into each page ---------------------------------------------
-export function shellHeader({ tab } = {}) {
-  const tabs = TABS.map((t) => `<a class="sh-tab${t.pinHide ? " sh-tab-pinhide" : ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
+/* The ☰ menu, as the main page's (Tabs, d1a1d215…js): the TABS entries
+   marked menu (pages of the main site reached from the menu, not the bar),
+   the flows explainer, and Info where the pinned phone bar drops its tab.
+   `menu` names the satellite the menu itself holds (the explainer). */
+const SHELL_MENU_ICON = '<svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg>';
+function shellMenu(menu) {
+  const info = TABS.find((t) => t.pinHide && !t.menu);
+  const item = (cls, href, cur, t, d, id) => `<a role="menuitem" tabindex="-1" class="sh-menu-item${cls}${cur ? " on" : ""}" href="${href}"`
+    + (id ? ` data-id="${id}"` : "") + (cur ? ' aria-current="page"' : "") + `><span class="sh-menu-t">${t}</span>`
+    + (d ? `<span class="sh-menu-d">${d}</span>` : "") + `</a>`;
+  return `<div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden>`
+    + (info ? item(" sh-menu-info", info.href, false, info.label, "", info.id) : "")
+    + TABS.filter((t) => t.menu).map((t) => item("", t.href, false, t.label, t.tip, t.id)).join("")
+    + `<span class="sh-menu-sep" role="separator"></span>`
+    + item("", "/preference-flows/", menu === "explainer", "Preference flow explainer", "How preferences decide the two-party figure")
+    + `</div>`;
+}
+export function shellHeader({ tab, menu } = {}) {
+  const tabs = TABS.filter((t) => !t.menu).map((t) => `<a class="sh-tab${t.pinHide ? " sh-tab-pinhide" : ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
     + `${t.id === tab ? ' aria-current="page"' : ""}>`
     + (t.short ? `<span class="sh-tab-long">${t.label}</span><span class="sh-tab-short" aria-hidden="true">${t.short}</span>` : t.label)
     + `</a>`).join("\n        ");
@@ -336,11 +355,13 @@ export function shellHeader({ tab } = {}) {
     <div class="sh-tabs-inner">
       <div class="sh-tabs-set">
         ${tabs}
+        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages">${SHELL_MENU_ICON}</button>
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
+  ${shellMenu(menu)}
 </nav>`;
 }
 
@@ -712,7 +733,35 @@ body { height: auto; }
 }
 @media (max-width: 380px) {
   .sh-tabs.pinned .sh-tab-pinhide { display: none; }
+  .sh-tabs.pinned .sh-menu-info { display: flex; }
 }
+/* the ☰ and its menu (the main page's .tab-menu / .tab-menu-pop) */
+.sh-menu-btn { all: unset; position: relative; box-sizing: border-box; cursor: pointer; align-self: stretch; display: inline-flex; align-items: center;
+  padding: 12px 2px 13px; color: var(--ink-2); transition: color .15s ease; }
+.sh-menu-btn:hover, .sh-menu-btn[aria-expanded="true"] { color: var(--ink); }
+.sh-menu-btn:not(.active):hover::after { transform: scaleX(0); }
+.sh-menu-btn:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: -4px; border-radius: 4px; }
+.sh-menu-ic { display: block; }
+.sh-menu {
+  position: absolute; z-index: 2; top: 100%; right: 0;
+  display: flex; flex-direction: column;
+  width: 280px; max-width: calc(100vw - 24px); box-sizing: border-box; padding: 6px;
+  background: var(--surface, var(--bg)); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 8px 28px -8px rgba(40, 30, 20, 0.28), 0 1px 3px rgba(40, 30, 20, 0.08);
+  font-family: var(--sans);
+}
+.sh-menu[hidden] { display: none; }
+.sh-menu-item {
+  display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 6px;
+  color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;
+}
+.sh-menu-item:hover { background: var(--surface-2, var(--line)); }
+.sh-menu-item:focus { outline: none; }
+.sh-menu-item:focus-visible { background: var(--surface-2, var(--line)); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
+.sh-menu-item.on .sh-menu-t { font-weight: 600; }
+.sh-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
+.sh-menu-sep { height: 1px; background: var(--line); margin: 6px; }
+.sh-menu-info { display: none; }
 
 /* the docked 2PP score (.tab-score): absolutely seated on the underline at
    the row's right end, so its arrival relayouts nothing */
@@ -839,6 +888,7 @@ nav.tabs[aria-label="Poll archives"] {
   /* the set spreads across the whole row as the main page's phone tabs
      do; pinned it closes up at the left so the score can dock right of it */
   .sh-tabs-set { gap: 0; width: 100%; justify-content: space-between; }
+  .sh-menu-btn { padding: 11px 6px 12px; }
   .sh-tabs.pinned .sh-tabs-set { width: auto; justify-content: flex-start; }
   .sh-tab { padding: 11px 6px 12px; font-size: 15px; line-height: 19px; }
   .sh-eyebrow { display: none; }
@@ -960,6 +1010,58 @@ ${npProjectSrc()}
       fitNext(); setTimeout(fitNext, 420);
     }, { threshold: 0 }).observe(sent);
   }
+  /* ---- the ☰ menu (the main page's Tabs menu): hangs off the button,
+     arrow keys walk it, Escape or a press outside closes it ------------- */
+  var mBtn = document.querySelector(".sh-menu-btn"), mPop = document.getElementById("sh-menu");
+  if (nav && mBtn && mPop) {
+    var mItems = function () {
+      var all = mPop.querySelectorAll('[role="menuitem"]'), out = [];
+      for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
+      return out;
+    };
+    var mPlace = function () {
+      var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect();
+      var w = Math.min(280, window.innerWidth - 24);
+      var x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
+      mPop.style.top = Math.round(br.bottom - nr.top) + "px";
+      mPop.style.left = Math.round(x - nr.left) + "px";
+      mPop.style.right = "auto";
+    };
+    var mOpen = function (at) {
+      mPlace(); mPop.hidden = false; mBtn.setAttribute("aria-expanded", "true");
+      if (at != null) { var its = mItems(), el = at < 0 ? its[its.length - 1] : its[at]; if (el) el.focus(); }
+    };
+    var mClose = function (refocus) {
+      if (mPop.hidden) return;
+      mPop.hidden = true; mBtn.setAttribute("aria-expanded", "false");
+      if (refocus) mBtn.focus();
+    };
+    mBtn.addEventListener("click", function (e) {
+      if (mPop.hidden) mOpen(e.detail ? null : 0);
+      else { mClose(false); if (e.detail) mBtn.blur(); }
+    });
+    mBtn.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); mOpen(0); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); mOpen(-1); }
+      else if (e.key === "Escape") mClose(true);
+    });
+    mPop.addEventListener("keydown", function (e) {
+      var its = mItems(), i = its.indexOf(document.activeElement), to = null;
+      if (e.key === "ArrowDown") to = its[(i + 1) % its.length];
+      else if (e.key === "ArrowUp") to = its[(i - 1 + its.length) % its.length];
+      else if (e.key === "Home") to = its[0];
+      else if (e.key === "End") to = its[its.length - 1];
+      else if (e.key === "Escape") { e.preventDefault(); mClose(true); return; }
+      else if (e.key === "Tab") { mClose(false); return; }
+      else if (e.key === " ") { e.preventDefault(); if (document.activeElement) document.activeElement.click(); return; }
+      if (to) { e.preventDefault(); to.focus(); }
+    });
+    document.addEventListener("pointerdown", function (e) {
+      if (!mPop.hidden && !mPop.contains(e.target) && !mBtn.contains(e.target)) mClose(false);
+    }, true);
+    window.addEventListener("resize", function () { if (!mPop.hidden) mPlace(); });
+    window.addEventListener("scroll", function () { if (!mPop.hidden) mPlace(); }, { passive: true });
+  }
   /* the pinned set's END scale, off a parked pinned bar, so the countdown's
      room is measured against where the glide is heading and the scale in
      the CSS stays the one source (pinnedSetScale on the main page) */
@@ -1065,9 +1167,16 @@ ${npProjectSrc()}
     if (set && cp.tabs && cp.tabs.length) {
       var act = null, as = set.querySelectorAll("a.sh-tab");
       for (var ai = 0; ai < as.length; ai++) if (as[ai].getAttribute("aria-current")) act = as[ai].getAttribute("href");
+      var mbtn = set.querySelector(".sh-menu-btn");
       while (set.firstChild) set.removeChild(set.firstChild);
       for (var ti = 0; ti < cp.tabs.length; ti++) {
         var t = cp.tabs[ti], a = document.createElement("a");
+        /* a menu page rides the ☰, not the bar: its label is refreshed there */
+        if (t.menu) {
+          var mi = document.querySelector('.sh-menu-item[data-id="' + t.id + '"] .sh-menu-t');
+          if (mi) mi.textContent = t.label;
+          continue;
+        }
         var h = t.id === "now" ? "/" : "/" + t.id + "/";
         a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
         a.setAttribute("href", h);
@@ -1079,7 +1188,12 @@ ${npProjectSrc()}
           a.appendChild(l2); a.appendChild(s2);
         } else a.textContent = t.label;
         set.appendChild(a);
+        if (t.pinHide) {
+          var mInfo = document.querySelector('.sh-menu-info .sh-menu-t');
+          if (mInfo) mInfo.textContent = t.label;
+        }
       }
+      if (mbtn) set.appendChild(mbtn);
     }
     /* the wordmark: name, track and the screen-reader suffix, then squared
        off again off the new words */

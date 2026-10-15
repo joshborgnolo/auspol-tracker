@@ -28,7 +28,18 @@ assert.ok(!/href="\/feedback\/"/.test(shellFooter({ page: "feedback" })), "the f
 assert.ok(/href="\/feedback\/"/.test(shellFooter({})), "every other page does");
 assert.ok(!/stored <a href="\/archives\/">here<\/a>/.test(shellFooter({ page: "archives" })), "an archive page doesn't point at the archives");
 assert.ok(/estimates only\./.test(shellFooter({})), "the disclaimer rides the colophon");
-assert.equal((shellHeader({}).match(/class="sh-tab[" ]/g) || []).length, 4, "the four views, and nothing else");
+assert.equal((shellHeader({}).match(/<a class="sh-tab[" ]/g) || []).length, 4, "the four views on the bar, and nothing else");
+// the ☰ menu (2026-10-15): the main page's menu pages, Info for the pinned phone bar, the explainer
+{
+  const h = shellHeader({});
+  assert.ok(h.includes('class="sh-tab sh-menu-btn" aria-haspopup="menu"'), "the bar ends in the ☰ button");
+  for (const href of ["/disagreement/", "/leans/", "/flows/", "/preference-flows/", "/info/"])
+    assert.ok(new RegExp(`<a role="menuitem"[^>]*href="${href}"`).test(h), `the menu links ${href}`);
+  assert.ok(/class="sh-menu-item sh-menu-info"/.test(h), "Info rides the menu for the pinned phone bar");
+  const ex = shellHeader({ menu: "explainer" });
+  assert.ok(ex.includes('class="sh-tab sh-menu-btn active"') && /href="\/preference-flows\/" aria-current="page"/.test(ex),
+    "the explainer page marks the ☰ and its own item current");
+}
 
 // ---- the unlisted pages stay unlisted ----------------------------------------------------
 // a link a reader can follow: an <a href> in a page, an href: prop in the main page's
@@ -187,7 +198,9 @@ assert.ok(/<loc>https:\/\/auspoltracker\.com\/changelog\/<\/loc>/.test(fs.readFi
 // ---- the feed link is absolute everywhere (the relative href="feed.xml" 404'd from /info/) --
 assert.ok(clPage.includes('href="/feed.xml"'), "the changelog page points at the feed");
 const rootDocs = ["index.html", "cycles/index.html", "allpolls/index.html", "info/index.html",
-  "vic/index.html", "vic/allpolls/index.html", "vic/info/index.html"];
+  "disagreement/index.html", "leans/index.html", "flows/index.html",
+  "vic/index.html", "vic/allpolls/index.html", "vic/info/index.html",
+  "vic/disagreement/index.html", "vic/leans/index.html", "vic/flows/index.html"];
 for (const f of rootDocs) {
   const doc = fs.readFileSync(path.join(ROOT, f), "utf8");
   assert.ok(!/href[:=]\s*"feed\.xml"/.test(doc), `${f}: no relative feed.xml link`);

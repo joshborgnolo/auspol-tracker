@@ -560,7 +560,8 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .rd-head-compact .fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; }
   body.rd .tabs { margin: 0 -4px 0; }
   body.rd .tabs-set { gap: 0; width: 100%; }
-  body.rd .tabs-list { width: 100%; justify-content: space-between; }
+  /* the list spreads over what the ☰ leaves it */
+  body.rd .tabs-list { flex: 1 1 auto; justify-content: space-between; }
   body.rd .tab { padding: 11px 6px 12px; }
   body.rd .tab-label, body.rd.editorial .tab-label { font-size: 15px; line-height: 19px; }
   /* Pinned, the tabs close up at the left, so the 2PP score can dock at the
@@ -568,16 +569,13 @@ body.rd .ts-sep { background: var(--line); }
      "All polls" and pushed Info off the bar. The switch rides the pin, when
      the bar is already moving; the bar's height never changes. */
   body.rd .tabs.pinned .tabs-set, body.rd .tabs.pinned .tabs-list { width: auto; }
-  body.rd .tabs.pinned .tabs-list { justify-content: flex-start; }
+  body.rd .tabs.pinned .tabs-list { flex: none; justify-content: flex-start; }
   body.rd .ts-num { font-size: 15px; }
   body.rd .tab-score { gap: 6px; }
 }
-/* the narrowest phones: Info leaves the docked bar from 380px, as in the old
-   design (template.html's .tab-pinhide rule), and below 340px the score drops
-   its party letters - the figures keep their party colours */
-@media (max-width: 340px) {
-  body.rd .tabs.show-score .ts-abbr { display: none; }
-}
+/* the narrowest phones: Info leaves the docked bar for the ☰ menu from
+   420px and the score drops its party letters from 380px, in both designs
+   (template.html's .tab-pinhide rules) */
 /* short-screenscape phones (landscape, ~320-480px tall): everything unpins.
    The tab bar plus the All-polls head and pinbar were ~150px of chrome stuck
    to the top of a 390px-tall viewport - nearly half the screen owned by
@@ -2290,13 +2288,10 @@ body.rd {
   --rd-rowbg: var(--bg);
 }
 body.rd.dark { --rd-whisker: #5C5751; --rd-avgline: #6E6964; }
-body.rd .rd-ap-nav button,
 body.rd .rd-snap-nav button {
   all: unset; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
 }
-body.rd .rd-ap-nav button:hover,
 body.rd .rd-snap-nav button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-body.rd .rd-ap-nav button:focus-visible,
 body.rd .rd-snap-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 /* the snapshot's index rides a row whose left side (title + poll-count
    meta) is its own, so it carries the eyebrow's 16px rhythm rather than
@@ -2317,22 +2312,6 @@ body.rd .rd-ap-tabs { margin-top: 28px; }
    2px (the 44px control row against a line more of dek). */
 body.rd .rd-ap .rd-hed { line-height: 51px; }
 body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
-/* the eyebrow's section links share the title's row while it holds them
-   and drop under it once it doesn't - which happened below ~1200px on
-   Confidence (its meta is the longer) but only below ~850 on the other
-   facets, so a switch in between added or dropped a 21.39px row above the
-   table (measured 2026-10-08 with the webfonts). Under 1240 they take
-   their own row on every facet, right-aligned as the wrap put them */
-@media (min-width: 761px) and (max-width: 1239px) {
-  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav, body.rd .rd-ap-ebvar > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
-}
-/* the longer Confidence meta ("…(business and consumer)…", 2026-10-08)
-   pushed its eyebrow sum ~3px past the 1152 content cap, so the nav
-   wrapped ONLY on Confidence at >=1240 and the pin walk read a 2.6px
-   jolt (conf-headline "table held through the walk" at 1280). Shaving
-   the tools gap inside rd-ap buys ~12px; every facet's eyebrow stays
-   one line above the band, so the per-facet geometry matches */
-body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav, body.rd .rd-ap-ebvar > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
 @media (max-width: 640px) {
   body.rd .rd-ap .rd-hed { line-height: 33px; }
   body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }
@@ -2424,31 +2403,16 @@ body.rd .rd-ap-pinbar::before, body.rd .rd-ap-headwrap.pinned::before {
   background: var(--bg); z-index: -1;
 }
 body.rd .rd-ap-pinbar::before { top: -8px; }   /* the seal, above */
-/* The section links take whatever the figures' tabs, search and count leave,
-   and scroll under a fade when that is too little. Sized to their words, they
-   ran on under the tabs at every width from a tablet's 761px to 1024px. The
-   1px of padding keeps the chosen link's underline inside the scroller. */
-body.rd .rd-ap-pinnav {
-  display: flex; align-items: stretch; gap: 22px; flex: 1 1 auto; min-width: 0;
-  padding-bottom: 1px; margin-bottom: -1px;
-  overflow-x: auto; scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
-}
-body.rd .rd-ap-pinnav::-webkit-scrollbar { display: none; }
-body.rd .rd-ap-pinbar > :not(.rd-ap-pinnav) { flex-shrink: 0; }
-body.rd .rd-ap-pinl, body.rd .rd-ap-pint {
+body.rd .rd-ap-pinbar > * { flex-shrink: 0; }
+body.rd .rd-ap-pint {
   all: unset; cursor: pointer; box-sizing: border-box; display: inline-flex; align-items: center;
   border-bottom: 2px solid transparent; margin-bottom: -1px; font-size: 14px; color: var(--ink-3); white-space: nowrap;
 }
-body.rd .rd-ap-pinl.on, body.rd .rd-ap-pint[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
-body.rd .rd-ap-pinl:hover, body.rd .rd-ap-pint:hover { color: var(--ink); }
-body.rd .rd-ap-pinl:focus-visible, body.rd .rd-ap-pint:focus-visible, body.rd .rd-ap-pins:focus-visible, body.rd .rd-ap-pinf:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+body.rd .rd-ap-pint[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+body.rd .rd-ap-pint:hover { color: var(--ink); }
+body.rd .rd-ap-pint:focus-visible, body.rd .rd-ap-pins:focus-visible, body.rd .rd-ap-pinf:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 body.rd .rd-ap-pintabs { display: flex; align-items: stretch; gap: 16px; }
-/* the section links and the figure tabs share the row and its active
-   style, so they share a size too: at 12px beside 13px the links read as a
-   slip, not a rank (user 2026-10-13). Their roles part by placement */
-body.rd .rd-ap-pint, body.rd .rd-ap-pinl { font-size: 13px; }
+body.rd .rd-ap-pint { font-size: 13px; }
 body.rd .rd-ap-pint { padding: 0 2px; }
 body.rd .rd-ap-pinsep { align-self: center; width: 1px; height: 18px; background: var(--line); }
 body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
@@ -2861,7 +2825,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
 /* the phone: cards under a pinned scale */
 @media (max-width: 760px) {
   body.rd { --rd-pin: 45px; }
-  body.rd .rd-ap-nav { display: none; }
   body.rd .rd-ap-tabs { margin-top: 20px; }
   /* the seven facet tabs share the row out while they fit and scroll
      sideways once they don't (2026-10-08: Confidence had dropped off
@@ -2901,7 +2864,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-table { margin-top: 14px; }
   body.rd .rd-ap-headwrap { top: calc(var(--rd-pin) + 44px); }
   body.rd .rd-ap-pinbar { height: 44px; gap: 10px; }
-  body.rd .rd-ap-pinnav { gap: 16px; }
   body.rd .rd-ap-phead { padding: 8px 0 6px; border-bottom: 1px solid var(--ink-faint); }
   body.rd .rd-ap-phead .rd-ap-hpic { min-height: 38px; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }

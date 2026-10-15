@@ -176,7 +176,7 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site-shell.css?v=e3c6bca766">
+<link rel="stylesheet" href="/assets/site-shell.css?v=7d0d095a68">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
@@ -230,11 +230,13 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
         <a class="sh-tab" href="/cycles/"><span class="sh-tab-long">Past cycles</span><span class="sh-tab-short" aria-hidden="true">Cycles</span></a>
         <a class="sh-tab" href="/allpolls/">All polls</a>
         <a class="sh-tab sh-tab-pinhide" href="/info/">Info</a>
+        <button type="button" class="sh-tab sh-menu-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages"><svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg></button>
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to Now"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
+  <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-t">Info</span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-t">Preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></a><span class="sh-menu-sep" role="separator"></span><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/preference-flows/"><span class="sh-menu-t">Preference flow explainer</span><span class="sh-menu-d">How preferences decide the two-party figure</span></a></div>
 </nav>
 <!--/shell:header-->
 <nav class="tabs" aria-label="Poll archives">
@@ -2276,7 +2278,7 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js?v=e3c6bca766" defer></script>
+<script src="/assets/site-shell.js?v=7d0d095a68" defer></script>
 <!--/shell:footer-->
 </body>
 </html>

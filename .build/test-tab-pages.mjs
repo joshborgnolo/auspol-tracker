@@ -26,6 +26,9 @@ const read = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const TABS = [
   { id: "cycles", label: "Past cycles", h1: "Past election cycles", descFrag: "campaign cycle in the tracker's record" },
   { id: "allpolls", label: "All polls", h1: "All polls", descFrag: "Every published Australian federal opinion poll" },
+  { id: "disagreement", label: "Poll disagreement", h1: "Poll disagreement", descFrag: "How much the Australian federal polls disagree" },
+  { id: "leans", label: "Pollster leans", h1: "Pollster leans", descFrag: "How each Australian federal pollster leans" },
+  { id: "flows", label: "Preference flows", h1: "Preference flows", descFrag: "Where Australian federal preferences are flowing now" },
   { id: "info", label: "Info", h1: "About auspol tracker", descFrag: "How auspol tracker works" },
 ];
 const rootHtml = read("index.html");
@@ -52,18 +55,21 @@ for (const t of TABS) {
     `${t.id}/ didn't take a sibling tab's title`);
 }
 assert.ok(!fs.existsSync(path.join(ROOT, "vic", "cycles")), "Vic has no Past cycles page while no term has closed");
-for (const id of ["allpolls", "info"])
+for (const id of ["allpolls", "disagreement", "leans", "flows", "info"])
   assert.ok(fs.existsSync(path.join(ROOT, "vic", id, "index.html")), `vic/${id}/x exists beside vic/index.html`);
 assert.ok(!read("vic/index.html").includes("window.AP_INITIAL_TAB="), "Vic's Now document carries no initial-tab constant");
 
 // ---- the sitemap and the push list -------------------------------------------------------
 const sm = read("sitemap.xml");
-for (const u of ["cycles/", "allpolls/", "info/", "vic/allpolls/", "vic/info/"])
+for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "info/",
+                 "vic/allpolls/", "vic/disagreement/", "vic/leans/", "vic/flows/", "vic/info/"])
   assert.ok(sm.includes(`<loc>https://auspoltracker.com/${u}</loc>`), `the sitemap carries /${u}`);
 assert.ok(!sm.includes("vic/cycles/"), "the sitemap does not foretell /vic/cycles/");
 const push = read(path.join(".build", "git-push-main.sh"));
 for (const f of ["cycles/index.html", "allpolls/index.html", "info/index.html",
-                 "vic/allpolls/index.html", "vic/info/index.html"])
+                 "disagreement/index.html", "leans/index.html", "flows/index.html",
+                 "vic/allpolls/index.html", "vic/info/index.html",
+                 "vic/disagreement/index.html", "vic/leans/index.html", "vic/flows/index.html"])
   assert.ok(push.includes(f), `SITE_FILES commits ${f} (a data refresh regenerates it)`);
 // vic/cycles/index.html can't be a plain SITE_FILES member until a Vic term closes (the
 // build only emits it then, and `git add` errors on a missing path) — it joins conditionally
@@ -89,7 +95,7 @@ assert.ok(hdr.includes("if (!p.startsWith(TAB_BASE)) return null;")
   && hdr.includes('if (seg === "") return "now";')
   && hdr.includes("return TAB_IDS.includes(seg) ? seg : null;"),
   "pathToTab answers only on a tab path: root = Now, unknown = null (the address bar is left alone)");
-assert.ok(hdr.includes('const TAB_HASH = { snapshot: "now", now: "now", cycles: "cycles", allpolls: "allpolls", info: "info" };'),
+assert.ok(hdr.includes('const TAB_HASH = { snapshot: "now", now: "now", cycles: "cycles", allpolls: "allpolls", info: "info",\n  disagreement: "disagreement", leans: "leans", flows: "flows" };'),
   "the hash-era links keep landing: #snapshot included");
 /* readLocation precedence: a known hash, then the path, then the page's own
    stamp, else Now. Pinned in source order so the precedence can't drift */
@@ -149,6 +155,20 @@ assert.ok(hdr.includes('TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1)
 const views = read(path.join(".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"));
 assert.ok(views.includes('href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}'),
   "each tab renders as its own page's link");
+// ---- the ☰ menu's pages ------------------------------------------------------------------
+for (const [id, label] of [["disagreement", "Poll disagreement"], ["leans", "Pollster leans"], ["flows", "Preference flows"]])
+  assert.ok(hdr.includes(`{ id: "${id}", label: "${label}", menu: true,`), `${id} is a menu page in TABS`);
+assert.ok(views.includes("const barTabs = tabs.filter((t) => !t.menu);") && views.includes("{barTabs.map((t, ti) => ("),
+  "the bar renders only the non-menu tabs");
+assert.ok(views.includes('aria-haspopup="menu"') && views.includes('role="menu"') && views.includes("tab-menu-info"),
+  "the ☰ opens a menu, which carries Info where the bar hides its tab");
+assert.ok(views.includes('href="/preference-flows/"') && views.includes("Preference flow explainer"),
+  "the menu links the flows explainer");
+const tpl = read(path.join(".build", "newtracker", "template.html"));
+assert.ok(/\.tabs\.show-score \.tab-pinhide \{ display: none; \}\s*\.tabs\.show-score \.tab-menu-info \{ display: flex; \}/.test(tpl),
+  "Info joins the menu under the same gate that drops its tab from the bar");
+assert.ok(!/<RdDisagree \/>\s*<RdHouseLean measure=\{measure\} onMeasure=\{onMeasure\}/.test(views),
+  "the three sections no longer mount under the All polls table");
 assert.ok(views.includes("if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;")
   && views.includes("e.preventDefault();"),
   "a modified click opens the real document, a plain one swaps the view in place");
@@ -157,4 +177,4 @@ assert.ok(views.includes("if (e.detail) e.currentTarget.blur();"),
 assert.ok(views.includes('if (e.key === " " || e.key === "Spacebar")'),
   "Space activates a tab like a native link's");
 
-console.log(`PASS: tab pages – ${TABS.length + 1} federal documents, Vic's pair, sitemap + SITE_FILES, path routing, hash aliases, search carried`);
+console.log(`PASS: tab pages – ${TABS.length + 1} federal documents, Vic's set, the ☰ menu, sitemap + SITE_FILES, path routing, hash aliases, search carried`);

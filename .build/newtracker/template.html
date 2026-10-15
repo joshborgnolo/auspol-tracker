@@ -3588,12 +3588,53 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
    "51.2 | 48.8" alone said nothing about whose. (Oct 2026: "Snapshot"
    became "Now", which freed enough of the docked bar that every tab keeps
    its full label at every width.) */
-@media (max-width: 380px) {
+/* Oct 2026: the ☰ took the bar's last seat, and with Info beside it the
+   docked score overlapped the pinned row up to ~415px (measured: 390px ran
+   the ☰ 17px into the score) - so Info yields to the menu from 420px down. */
+@media (max-width: 420px) {
   .tabs.show-score .tab-pinhide { display: none; }
+  .tabs.show-score .tab-menu-info { display: flex; }
+}
+/* ...and from 380px down the docked score drops its party letters (the
+   figures keep their party colours): the ☰ still ran 12px into the score
+   at 360px, and 36px into the archived design's at 320 */
+@media (max-width: 380px) {
+  .tabs.show-score .ts-abbr { display: none; }
 }
 /* The views' tablist is a flex row inside the set, spaced as the set spaces
    its items. */
 .tabs-list { display: flex; gap: inherit; align-items: flex-end; }
+/* ---- the ☰ menu (2026-10-15) ----------------------------------------------
+   The bar's last item: the pages that left All polls (Poll disagreement,
+   Pollster leans, Preference flows), the flows explainer, and Info wherever
+   the bar has dropped its tab (.tab-pinhide's own gate, above - the two
+   rules must move together). The button is a .tab, so it shares the row's
+   colours, padding and underline; on a menu page the underline is its. */
+.tab.tab-menu { align-self: stretch; align-items: center; gap: 7px; }
+.tab.tab-menu:hover, .tab.tab-menu.open { color: var(--ink); }
+.tab.tab-menu:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: -4px; border-radius: 4px; }
+.tab-menu-ic { display: block; flex: none; }
+.tab-menu-lab { display: none; }
+@media (min-width: 641px) { .tab.tab-menu.active .tab-menu-lab { display: inline; } }
+.tab-menu-pop {
+  position: absolute; z-index: 2; top: 100%; right: 0;
+  display: flex; flex-direction: column;
+  width: 280px; max-width: calc(100vw - 24px); box-sizing: border-box; padding: 6px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 8px 28px -8px rgba(40, 30, 20, 0.28), 0 1px 3px rgba(40, 30, 20, 0.08);
+  font-family: var(--sans);
+}
+.tab-menu-item {
+  display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 6px;
+  color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;
+}
+.tab-menu-item:hover { background: var(--surface-2); }
+.tab-menu-item:focus { outline: none; }
+.tab-menu-item:focus-visible { background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
+.tab-menu-item.on .tab-menu-t, .tab-menu-item.on.tab-menu-info { font-weight: 600; }
+.tab-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
+.tab-menu-sep { height: 1px; background: var(--line); margin: 6px 6px; }
+.tab-menu-info { display: none; }
 /* ---- the next-poll countdown in the tab bar ------------------------------
    Wide screens only. The countdown is absolutely seated in BOTH bar states
    so it can GLIDE between them: it docks to the right end (left:100% +
@@ -4271,6 +4312,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    can pair up under the two pills; wider screens keep the originals in
    .ap-head-side and never see these copies */
 .ap-jumps > .ap-facet, .ap-jumps > .ap-jumps-count { display: none; }
+@media (min-width: 561px) { .ap-jumps { display: none; } }
 @media (max-width: 560px) {
   .ap-jumps { justify-content: space-between; column-gap: 10px; row-gap: 10px; }
   /* ~45% basis keeps the pair filling the top line at any phone width and

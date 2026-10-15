@@ -753,6 +753,58 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       fitNext(); setTimeout(fitNext, 420);
     }, { threshold: 0 }).observe(sent);
   }
+  /* ---- the ☰ menu (the main page's Tabs menu): hangs off the button,
+     arrow keys walk it, Escape or a press outside closes it ------------- */
+  var mBtn = document.querySelector(".sh-menu-btn"), mPop = document.getElementById("sh-menu");
+  if (nav && mBtn && mPop) {
+    var mItems = function () {
+      var all = mPop.querySelectorAll('[role="menuitem"]'), out = [];
+      for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
+      return out;
+    };
+    var mPlace = function () {
+      var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect();
+      var w = Math.min(280, window.innerWidth - 24);
+      var x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
+      mPop.style.top = Math.round(br.bottom - nr.top) + "px";
+      mPop.style.left = Math.round(x - nr.left) + "px";
+      mPop.style.right = "auto";
+    };
+    var mOpen = function (at) {
+      mPlace(); mPop.hidden = false; mBtn.setAttribute("aria-expanded", "true");
+      if (at != null) { var its = mItems(), el = at < 0 ? its[its.length - 1] : its[at]; if (el) el.focus(); }
+    };
+    var mClose = function (refocus) {
+      if (mPop.hidden) return;
+      mPop.hidden = true; mBtn.setAttribute("aria-expanded", "false");
+      if (refocus) mBtn.focus();
+    };
+    mBtn.addEventListener("click", function (e) {
+      if (mPop.hidden) mOpen(e.detail ? null : 0);
+      else { mClose(false); if (e.detail) mBtn.blur(); }
+    });
+    mBtn.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); mOpen(0); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); mOpen(-1); }
+      else if (e.key === "Escape") mClose(true);
+    });
+    mPop.addEventListener("keydown", function (e) {
+      var its = mItems(), i = its.indexOf(document.activeElement), to = null;
+      if (e.key === "ArrowDown") to = its[(i + 1) % its.length];
+      else if (e.key === "ArrowUp") to = its[(i - 1 + its.length) % its.length];
+      else if (e.key === "Home") to = its[0];
+      else if (e.key === "End") to = its[its.length - 1];
+      else if (e.key === "Escape") { e.preventDefault(); mClose(true); return; }
+      else if (e.key === "Tab") { mClose(false); return; }
+      else if (e.key === " ") { e.preventDefault(); if (document.activeElement) document.activeElement.click(); return; }
+      if (to) { e.preventDefault(); to.focus(); }
+    });
+    document.addEventListener("pointerdown", function (e) {
+      if (!mPop.hidden && !mPop.contains(e.target) && !mBtn.contains(e.target)) mClose(false);
+    }, true);
+    window.addEventListener("resize", function () { if (!mPop.hidden) mPlace(); });
+    window.addEventListener("scroll", function () { if (!mPop.hidden) mPlace(); }, { passive: true });
+  }
   /* the pinned set's END scale, off a parked pinned bar, so the countdown's
      room is measured against where the glide is heading and the scale in
      the CSS stays the one source (pinnedSetScale on the main page) */
@@ -858,9 +910,16 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     if (set && cp.tabs && cp.tabs.length) {
       var act = null, as = set.querySelectorAll("a.sh-tab");
       for (var ai = 0; ai < as.length; ai++) if (as[ai].getAttribute("aria-current")) act = as[ai].getAttribute("href");
+      var mbtn = set.querySelector(".sh-menu-btn");
       while (set.firstChild) set.removeChild(set.firstChild);
       for (var ti = 0; ti < cp.tabs.length; ti++) {
         var t = cp.tabs[ti], a = document.createElement("a");
+        /* a menu page rides the ☰, not the bar: its label is refreshed there */
+        if (t.menu) {
+          var mi = document.querySelector('.sh-menu-item[data-id="' + t.id + '"] .sh-menu-t');
+          if (mi) mi.textContent = t.label;
+          continue;
+        }
         var h = t.id === "now" ? "/" : "/" + t.id + "/";
         a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
         a.setAttribute("href", h);
@@ -872,7 +931,12 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
           a.appendChild(l2); a.appendChild(s2);
         } else a.textContent = t.label;
         set.appendChild(a);
+        if (t.pinHide) {
+          var mInfo = document.querySelector('.sh-menu-info .sh-menu-t');
+          if (mInfo) mInfo.textContent = t.label;
+        }
       }
+      if (mbtn) set.appendChild(mbtn);
     }
     /* the wordmark: name, track and the screen-reader suffix, then squared
        off again off the new words */

@@ -296,7 +296,9 @@ freshness_sync() {
 # quiet refresh writes the same bytes).
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
+  disagreement/index.html leans/index.html flows/index.html
   vic/allpolls/index.html vic/info/index.html
+  vic/disagreement/index.html vic/leans/index.html vic/flows/index.html
   changelog/index.html
   data/changelog.json
   assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
