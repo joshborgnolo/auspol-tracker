@@ -544,7 +544,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       if (!isPub && e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || (!isPub && e.shiftKey)) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the facet menu's selected tab owns Space too, giving the same
+         flip it gives the page itself; any other control - or an
+         inactive tab - keeps the key's day job. */
+      const onTab = !isPub && a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true"
+        && !!(a.closest && a.closest('.rd-pl-tabs [role="group"]'));
+      if (!onTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const act = isPub ? pubFlip.current : spaceFlip.current;

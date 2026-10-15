@@ -18,7 +18,7 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".sass": "text/cs
 const server = createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end(); }
@@ -101,33 +101,54 @@ const space = async (page) => { await page.keyboard.press("Space"); await sleep(
   await page.keyboard.down("Shift"); await space(page); await page.keyboard.up("Shift");
   check((await flipText(page, "#latest-polls")) === t5, "A5 shift+space leaves the contest alone", { t5, t: await flipText(page, "#latest-polls") });
   check((await scrollY(page)) < ys, "A5 shift+space keeps its page-up day job", { ys, y: await scrollY(page) });
-  /* clicking a facet tab focuses it (rdTabFocus): with the tab focused,
-     space is the tab's own native activation, and the claim stands aside */
+  /* clicking a facet tab focuses it (rdTabFocus): with an INACTIVE tab
+     focused, space is still the tab's own native activation - the claim
+     only takes Space on the tab row when the focused tab is the selected
+     one (where native activation would be a no-op). */
   await toCentre(page, "#latest-polls");
   check(await clickFacet(page, "#latest-polls", "Primary"), "A6 primary tab clicked");
   await sleep(350);
   check(await page.evaluate(() => document.activeElement && !!document.activeElement.closest(".rd-tab")), "A6 clicked tab holds focus");
+  /* ...but the PRIMARY facet's tab is now the selected one, and on the
+     twopp-only card primary has no flip, so Space there only makes sense
+     as native tab re-activation: contest untouched, facet stays. */
   const tfac = await flipText(page, "#latest-polls");
-  await space(page);                                             // re-activates the focused tab by native button rules
-  check((await facetOf(page, "#latest-polls")) === "primary", "A6 focused tab: space activates the tab, facet stays Primary");
-  check((await flipText(page, "#latest-polls")) === tfac, "A6 focused tab: contest untouched", { tfac });
+  await space(page);
+  check((await facetOf(page, "#latest-polls")) === "primary", "A6 focused selected primary tab Space: facet stays Primary (no flip exists)");
+  check((await flipText(page, "#latest-polls")) === tfac, "A6 primary facet: contest untouched", { tfac });
+  /* back on 2PP, which is the facet whose claim lives: clicking the 2PP
+     tab focuses the SELECTED tab, and Space there flips the contest —
+     the Selected-tab-owns-Space contract (user call 2026-10-15) */
+  check(await clickFacet(page, "#latest-polls", "2PP"), "A6b back to 2PP");
+  await sleep(350);
+  await toCentre(page, "#latest-polls");
+  const tsel = await flipText(page, "#latest-polls");
+  const ysel = await scrollY(page);
+  await space(page);
+  check((await flipText(page, "#latest-polls")) !== tsel, "A6b selected 2PP tab owns Space: contest flips", { tsel, t: await flipText(page, "#latest-polls") });
+  check((await scrollY(page)) === ysel, "A6b selected-tab Space never scrolls", { ysel, y: await scrollY(page) });
   await page.evaluate(() => document.activeElement.blur());
   await sleep(150);
-  const tp = await flipText(page, "#latest-polls");
-  const yp = await scrollY(page);
-  await space(page);
-  check(await scrollY(page) > yp, "A6 primary facet: space scrolls again", { yp, y: await scrollY(page) });
-  check((await flipText(page, "#latest-polls")) === tp, "A6 primary facet: contest untouched");
-  /* out of view hands the key back too */
-  check(await clickFacet(page, "#latest-polls", "2PP"), "A7 back to 2PP");
-  await sleep(300);
-  await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
-  await page.evaluate(() => window.scrollTo(0, 0)); await sleep(400);
+  /* out of view, the table's own claim releases. The snapshot page's
+     claims are stacked back-to-back (the hero matchup card claims Space
+     while it intersects), so bare "space scrolls" never fires at the page
+     top - the assertion is EXACTLY ONE flip per keypress: were the
+     off-screen table's claim still live alongside the hero's, the
+     matchup would flip twice and land back on the original text. */
   const toff = await flipText(page, "#latest-polls");
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(500);
   check(await scrollY(page) === 0, "A7 parked at page top");
+  check(await page.evaluate(() => {
+    const r = document.getElementById("latest-polls").getBoundingClientRect();
+    return r.bottom <= 0 || r.top >= innerHeight;
+  }), "A7 table fully out of view at page top");
+  const ytop = await scrollY(page);
   await space(page);
-  check(await scrollY(page) > 0, "A7 off-screen table: space scrolls", { y: await scrollY(page) });
-  check((await flipText(page, "#latest-polls")) === toff, "A7 off-screen table: contest untouched");
+  check((await scrollY(page)) === ytop, "A7 stacked page-top claims still never scroll", { ytop, y: await scrollY(page) });
+  check((await flipText(page, "#latest-polls")) !== toff, "A7 exactly one flip: off-screen table's claim released its turn", { toff, t: await flipText(page, "#latest-polls") });
+  await space(page);
+  check((await flipText(page, "#latest-polls")) === toff, "A7 second space flips back once");
   await page.close();
 }
 
@@ -161,19 +182,40 @@ const space = async (page) => { await page.keyboard.press("Space"); await sleep(
   check((await scrollY(page)) === y0, "C1 claimed space never scrolls", { y0, y: await scrollY(page) });
   await space(page);
   check((await flipText(page, "#rd-ap-top")) === t0, "C2 second space flips back");
-  /* a non-2PP facet hands the key back (blur the clicked tab first — a real
-     mouse click leaves focus on it, and the claim rightly stands aside) */
-  check(await clickFacet(page, "#rd-ap-top", "Primary"), "C3 primary tab clicked");
+  /* a facet with nothing to step hands the key back (blur the clicked tab
+     first — a real mouse click leaves focus on it) */
+  check(await clickFacet(page, "#rd-ap-top", "Leadership"), "C3 leadership tab clicked");
   await sleep(400);
   await blurActive(page);
   await toCentre(page, "#rd-ap-top .rd-ap-table");
   const yp = await scrollY(page);
   await space(page);
-  check(await scrollY(page) > yp, "C3 primary facet: space scrolls", { yp, y: await scrollY(page) });
-  /* scrolled past the table, the claim releases */
-  check(await clickFacet(page, "#rd-ap-top", "2PP"), "C4 back to 2PP");
-  await sleep(300);
+  check(await scrollY(page) > yp, "C3 no-step facet: space scrolls", { yp, y: await scrollY(page) });
+  /* the PRIMARY facet's selected tab owns Space too — intention ⇄
+     consideration, the user's "same for Vote:" half of the contract.
+     (Re-centre first: the claim is viewport-gated, and facet clicks don't
+     scroll.) */
+  check(await clickFacet(page, "#rd-ap-top", "Primary"), "C3b primary tab clicked (focused, selected)");
+  await sleep(400);
+  await toCentre(page, "#rd-ap-top .rd-ap-table");
+  const tc0 = await flipText(page, "#rd-ap-top");
+  const yc = await scrollY(page);
+  await space(page);
+  const tc1 = await flipText(page, "#rd-ap-top");
+  check(!!tc1 && tc1 !== tc0, "C3b selected primary tab owns Space: intention ⇄ consideration flips", { tc0, tc1 });
+  check((await scrollY(page)) === yc, "C3b claimed space never scrolls", { yc, y: await scrollY(page) });
   await blurActive(page);
+  /* the selected 2PP tab owns Space in All polls too */
+  check(await clickFacet(page, "#rd-ap-top", "2PP"), "C3c 2PP tab clicked (focused, selected)");
+  await sleep(400);
+  await toCentre(page, "#rd-ap-top .rd-ap-table");
+  const tz0 = await flipText(page, "#rd-ap-top");
+  const yz = await scrollY(page);
+  await space(page);
+  check((await flipText(page, "#rd-ap-top")) !== tz0, "C3c selected 2PP tab owns Space: contest flips", { tz0, t: await flipText(page, "#rd-ap-top") });
+  check((await scrollY(page)) === yz, "C3c claimed space never scrolls", { yz, y: await scrollY(page) });
+  await blurActive(page);
+  /* scrolled past the table, the claim releases */
   await page.evaluate(() => {
     const sec = document.getElementById("rd-ap-top");
     window.scrollTo(0, Math.round(sec.offsetTop + sec.offsetHeight + 120));   /* 120px past the table, page still scrollable */
@@ -181,11 +223,18 @@ const space = async (page) => { await page.keyboard.press("Space"); await sleep(
   await sleep(600);
   const below = await page.evaluate(() => document.getElementById("rd-ap-top").getBoundingClientRect().bottom < 0);
   check(below, "C4 table fully above the viewport");
+  /* 120px below the table sits inside the stacked claims that follow it
+     (poll-disagreement, house-lean): house-lean's own Space claim is live
+     there, so the assertion is EXACTLY ONE flip per keypress - were the
+     off-screen table's claim still live too, the matchup would flip
+     twice and land back on the original text. */
   const toff = await flipText(page, "#rd-ap-top");
   const yoff = await scrollY(page);
   await space(page);
-  check(await scrollY(page) > yoff, "C4 off-screen table: space scrolls", { yoff, y: await scrollY(page) });
-  check((await flipText(page, "#rd-ap-top")) === toff, "C4 off-screen table: contest untouched");
+  check((await scrollY(page)) === yoff, "C4 stacked claims below the table never scroll", { yoff, y: await scrollY(page) });
+  check((await flipText(page, "#rd-ap-top")) !== toff, "C4 exactly one flip: off-screen table's claim released its turn", { toff, t: await flipText(page, "#rd-ap-top") });
+  await space(page);
+  check((await flipText(page, "#rd-ap-top")) === toff, "C4 second space flips back once");
   await page.close();
 }
 

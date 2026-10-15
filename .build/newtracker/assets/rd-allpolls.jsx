@@ -3833,7 +3833,14 @@ function RdAllPolls(P) {
       if (!isPub && !isSpace && dig < 0) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || (isSpace && e.shiftKey)) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the facet menu's SELECTED tab owns Space too: picking a facet
+         left DOM focus on its tab, where Space would natively just
+         re-fire that facet pick. Space there steps the facet's ⇄ flip,
+         exactly as it does with the page itself focused; any other
+         control, or an inactive tab, keeps the key's day job. */
+      const onTab = isSpace && a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true"
+        && !!(a.closest && a.closest('.rd-ap-tabs [role="group"], .rd-ap-pintabs'));
+      if (!onTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const act = isPub ? pubFlip.current : isSpace ? (splitWalk.current || spaceFlip.current) : splitAt.current;

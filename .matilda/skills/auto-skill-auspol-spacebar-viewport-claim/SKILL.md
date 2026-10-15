@@ -68,7 +68,15 @@ Load-bearing details, in order of subtlety:
 4. **Five guards, in order:** defaultPrevented/modifiers (incl. shift)
    · focus BODY/HTML · selection collapsed · in-view claim live · ref
    non-null. Note the hover-claims guard set omits shiftKey; the Space
-   claims include it.
+   claims include it. EXCEPTION (user call 2026-10-15): in the All-polls
+   and Latest facet tables the focus guard admits ONE focused element —
+   the facet menu's SELECTED tab
+   (`a.getAttribute("aria-pressed") === "true"` inside
+   `.rd-ap-tabs [role="group"], .rd-ap-pintabs` resp.
+   `.rd-pl-tabs [role="group"]`) — because rdTabFocus puts the click
+   focus there and Space would otherwise dead-fire the same facet pick.
+   Inactive tabs and every other control keep the key's day job; the
+   act-null-before-preventDefault rule still decides.
 5. **Listener priority between overlapping claims:** all claims are
    document-level capture listeners; when two sections intersect
    (house-lean sits inside the all-polls view where the table's own

@@ -118766,7 +118766,8 @@ function RdPolls({
       if (!isPub && e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || !isPub && e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const onTab = !isPub && a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true" && !!(a.closest && a.closest('.rd-pl-tabs [role="group"]'));
+      if (!onTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const act = isPub ? pubFlip.current : spaceFlip.current;
@@ -126339,7 +126340,8 @@ function RdAllPolls(P) {
       if (!isPub && !isSpace && dig < 0) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || isSpace && e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const onTab = isSpace && a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true" && !!(a.closest && a.closest('.rd-ap-tabs [role="group"], .rd-ap-pintabs'));
+      if (!onTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const act = isPub ? pubFlip.current : isSpace ? splitWalk.current || spaceFlip.current : splitAt.current;
