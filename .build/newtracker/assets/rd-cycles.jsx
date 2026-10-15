@@ -430,12 +430,13 @@ function RdCsUnroll({ className, style, children }) {
 }
 
 /* ---- the tab --------------------------------------------------------------- */
-/* The section foot's caveat links each word of "no predictive value" to
-   a source (the owner's 2026-10-15 ask): Bonham on preferred-PM scores,
+/* The section foot's caveat links "little", "no" and "predictive" each to
+   the source that backs that word (the owner's 2026-10-15 ask): Bonham on
+   preferred-PM scores (no evidence they predict anything better) on "no",
    Ben Raue in the Guardian (satisfaction ratings have "limited predictive
    value"), and Armarium Interreta's test, which found approval
-   ratings add "little, if any, predictive value" to a polling average -
-   hence "little or no", not "no". A null url leaves its word plain. */
+   ratings add "little, if any, predictive value" to a polling average, on
+   "little" - hence "little or no", not "no". A null url leaves its word plain. */
 const RD_CYC_CITES = [
   ["https://kevinbonham.blogspot.com/2012/12/why-preferred-prime-ministerpremier.html", "Kevin Bonham: Why preferred prime minister/premier scores are rubbish"],
   ["https://www.theguardian.com/australia-news/2016/apr/07/personal-popularity-is-no-guarantee-of-poll-success-for-prime-ministers", "Ben Raue, the Guardian: Personal popularity is no guarantee of poll success for prime ministers"],
@@ -1401,7 +1402,7 @@ function RdPastCycles(p) {
         {controls}
         {summary}
         <div className="rd-foot">
-          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings add little or {RD_CYC_CITE("no", 0)} {RD_CYC_CITE("predictive", 1)} {RD_CYC_CITE("value", 2)} on top of voting-intention data.</span>
+          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings add {RD_CYC_CITE("little", 2)} or {RD_CYC_CITE("no", 0)} {RD_CYC_CITE("predictive", 1)} value on top of voting-intention data.</span>
           <span className="rd-grow"></span>
           <button type="button" className="rd-how rd-cyc-csv" onClick={exportSource}><DownloadIcon /> Source polls, CSV</button>
           <RdHow term="past-cycles" from="Past cycles" />
