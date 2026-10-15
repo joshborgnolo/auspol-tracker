@@ -8503,8 +8503,8 @@ function InfoView({ focus, onBack, backLabel }) {
         <span className="rd-meta">How the site works</span>
       </div>
       <RdHed level={2}
-        head="Every figure on the site, explained"
-        dek="What a figure means, how it is built, how to read it and its limits – one explainer per section, with the worked tables, formulas and exact question wordings folded under each entry." />
+        head="Answers to questions you may have"
+        dek="What things mean, how things are built, how to read them, and their limitations. Each section has its own explainer, and where applicable, the formulas and working are shown for transparency." />
       <div className="info-toc">
         <button type="button" className="info-toc-btn" aria-expanded={tocOpen}
           aria-controls="info-toc-list" onClick={() => setToc((o) => !o)}>
