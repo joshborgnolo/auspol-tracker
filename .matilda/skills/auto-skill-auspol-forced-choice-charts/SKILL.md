@@ -1,6 +1,6 @@
 ---
 name: auspol-forced-choice-charts
-description: auspol-tracker — the All-polls "Preference flows / forced choice" section (RdForced in rd-allpolls.jsx, fed by gen-data §7db). Shipped across six 2026-10-13 lands (02f35a9 third-chart+region-menu, 5cf9a4b four-mark-kinds rework, 9a187d2 follow-up trio: Farrer crosses REMOVED + the Labor-v-Coalition chart's RedBridge dots region-gated like its twin + a "Flows table" RdTsig fold, effa245 the co chart's DemosAU triangles region-gated too — pref_flows.onp_alp_lnp is national-only, no regional carrier —, da186e0 sibling un-fold of the Flows tables, c95cb65 the 2025 election rings' per-seat-class TPP REPLAY rekey): THREE charts (RedBridge Labor-v-One-Nation, RedBridge Labor-v-Coalition, DemosAU-MRP Coalition-v-One-Nation) drawing FOUR mark kinds — RedBridge wave dots and DemosAU MRP triangles BOTH join the per-cohort monotone lines (inLine = wave||mrp; user call "the MRP readings behave like the Redbridge dots, just differently shaped" → triangles, not diamonds), election rings sit outside every line with dotted lead-ins, 2026 count crosses sit on their election DAYS and join no line. Region menu (All voters/Inner/Outer/Regional) EMPTIES the RedBridge waves (BOTH charts — "Redbridge/accent data is only all voters' data… it should not be in any view other than the All Voters view") and the co chart's DemosAU triangles and crosses on named regions (the standing rule: national-only data appears in NO view but All Voters), rekeys MRP cells via rekeyMrp where a regional carrier exists (demosOn, lnpOn), and swaps election rings to per-AEC-seat-class counted flows (elec2025r), plus the ledger's "…% of the vote" sub-lines to per-seat-class 2025 first-preference shares (elec2025p, 2026-10-15); bys is TWO crosses (SA 2026 + Secret Harbour — Farrer's pair was dropped the same day, those counts measured an independent contest). The "Flows table" fold (a second RdTsig, summary!="Trend-significance table") tabulates the four electorate views per contest from all+regions data and DELIBERATELY ignores the region select. Data payload, rekey contract, mark geometry, prose-copy commitments, test (test-flow-splits.mjs) + headless probe (.matilda/probe/rd-forced-charts.mjs) conventions incl. monotoneXY segment-end parsing, oklch consumer-compare, the Set-precedence trap and the match-folds-by-summary trap.
+description: auspol-tracker — the All-polls "Preference flows / forced choice" section (RdForced in rd-allpolls.jsx, fed by gen-data §7db). Shipped across six 2026-10-13 lands (02f35a9 third-chart+region-menu, 5cf9a4b four-mark-kinds rework, 9a187d2 follow-up trio: Farrer crosses REMOVED + the Labor-v-Coalition chart's RedBridge dots region-gated like its twin + a "Flows table" RdTsig fold, effa245 the co chart's DemosAU triangles region-gated too — pref_flows.onp_alp_lnp is national-only, no regional carrier —, da186e0 sibling un-fold of the Flows tables, c95cb65 the 2025 election rings' per-seat-class TPP REPLAY rekey): THREE charts (RedBridge Labor-v-One-Nation, RedBridge Labor-v-Coalition, DemosAU-MRP Coalition-v-One-Nation) drawing FOUR mark kinds — RedBridge wave dots and DemosAU MRP triangles BOTH join the per-cohort monotone lines (inLine = wave||mrp; user call "the MRP readings behave like the Redbridge dots, just differently shaped" → triangles, not diamonds), election rings sit outside every line with dotted lead-ins, 2026 count crosses sit on their election DAYS and join no line. Region menu (All voters/Inner/Outer/Regional) EMPTIES the RedBridge waves (BOTH charts — "Redbridge/accent data is only all voters' data… it should not be in any view other than the All Voters view") and the co chart's DemosAU triangles and crosses on named regions (the standing rule: national-only data appears in NO view but All Voters), rekeys MRP cells via rekeyMrp where a regional carrier exists (demosOn, lnpOn), and swaps election rings to per-AEC-seat-class counted flows (elec2025r); bys is TWO crosses (SA 2026 + Secret Harbour — Farrer's pair was dropped the same day, those counts measured an independent contest). The "Flows table" fold (a second RdTsig, summary!="Trend-significance table") tabulates the four electorate views per contest from all+regions data and DELIBERATELY ignores the region select. Data payload, rekey contract, mark geometry, prose-copy commitments, test (test-flow-splits.mjs) + headless probe (.matilda/probe/rd-forced-charts.mjs) conventions incl. monotoneXY segment-end parsing, oklch consumer-compare, the Set-precedence trap and the match-folds-by-summary trap.
 source: auto-skill
 extracted_at: '2026-10-13T04:40:33.960Z'
 ---
@@ -46,21 +46,6 @@ against `allpolls/index.html`).
   national carrier stands unflagged, the named regions carry
   `der/scopeTtl/scopeNote`. `FF.elec2025` (the old single carrier) is
   GONE — test pins `!FF.elec2025`.
-- `FF.elec2025p` — the ledger's "…% of the vote" figures on a named region:
-  the 2025 election's first-preference share of each seat class's vote
-  (null on /vic/ builds where AEC_CLASS is absent). Not a polling figure —
-  polling never cuts the vote by region, so the region menus rekey to the
-  AEC count. Derivation lives in gen-data (an IIFE after the elec2025r
-  replay): every seat sums every candidate's votes (the replay's
-  classic-only cut does NOT apply — first preferences are complete in all
-  150 seats), lumped alp / lnp (= lp+np+clp+lnp) / grn / onp (from `on`) /
-  oth (everything else incl. the `member:*` named independents), buckets
-  inner / outer / regional (= provincial + rural) by
-  `data/aec-2025-division-class.json`, shares rounded 2dp. Pins:
-  `all {alp:34.56, lnp:31.82, grn:12.2, onp:6.4, oth:15.01}` (the AEC's
-  published national first prefs exactly), `inner {38.35/27.98/16.5/3.49/
-  13.68}`, `outer {39.18/30.13/11.84/6.16/12.69}`,
-  `regional {28.64/35.68/9.51/8.58/17.6}`; every row sums to 100 ± 0.05;
 - `FF.bys` — TWO `{key,date,xm,coal?,grn?,oth?,label,win,sub,lbl}` crosses:
   `sa2026` 2026-03-21 (33.9/84.8/55.9; `lbl.coal:"Liberal"` — Bonham's
   estimates), `harbour` 29.8/90.0 on 2026-08-29 (Secret Harbour
@@ -100,17 +85,6 @@ state `ffReg` rides an `rd-pv-sel`-style select beside the section hed
   (national counts).
 - `elec={FF.elec2025r[ffReg||"all"]}` — rings swap to the region's counted
   flows.
-- Ledger "…% of the vote" sub-lines rekey too (2026-10-15, user: the
-  ledger's vote percents "should reflect the view currently selected"):
-  `pvOf(pid) = ffReg && PVI[ffReg] ? PVI[ffReg][pid] : PR[pid]` — All
-  voters keeps `D.latest.primary` (the national nowcast), a named region
-  reads `FF.elec2025p[ffReg][pid]`. The stake line swaps its copy with
-  the source ("…X% of the vote in the seats classed inner metro at the
-  2025 election, so each 10 points of their preferences moves the
-  contest there by Y points.") and ledgerNote gains a footnote clause
-  ("* Each group's share of the vote is the 2025 election's over the
-  seats classed … — polling never measures a region's vote."). Pinned in
-  flows-ledger.mjs's regional + inner blocks.
 - MRP extras rekey per `rekeyMrp(ws, reg)`: named region = printed cells;
   All voters = our enrolment-and-vote weighting of the three regions
   (`wt: true` stamped; arias/tips say "all-regions weighting"; the named

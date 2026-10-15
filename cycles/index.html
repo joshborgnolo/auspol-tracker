@@ -13997,36 +13997,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "oth": 49.01
       }
     },
-    "elec2025p": {
-      "all": {
-        "oth": 15.01,
-        "onp": 6.4,
-        "grn": 12.2,
-        "alp": 34.56,
-        "lnp": 31.82
-      },
-      "inner": {
-        "oth": 13.68,
-        "onp": 3.49,
-        "grn": 16.5,
-        "alp": 38.35,
-        "lnp": 27.98
-      },
-      "outer": {
-        "grn": 11.84,
-        "onp": 6.16,
-        "alp": 39.18,
-        "oth": 12.69,
-        "lnp": 30.13
-      },
-      "regional": {
-        "onp": 8.58,
-        "oth": 17.6,
-        "grn": 9.51,
-        "alp": 28.64,
-        "lnp": 35.68
-      }
-    },
     "bys": [{
       "key": "sa2026",
       "date": "2026-03-21",
@@ -128661,12 +128631,6 @@ function RdFlows({
   const nC = FD.now,
     nO = FO.now;
   const PR = D.latest && D.latest.primary || {};
-  const PVI = {
-    inner: FF && FF.elec2025p ? FF.elec2025p.inner : null,
-    outer: FF && FF.elec2025p ? FF.elec2025p.outer : null,
-    regional: FF && FF.elec2025p ? FF.elec2025p.regional : null
-  };
-  const pvOf = pid => (ffReg && PVI[ffReg] ? PVI[ffReg][pid] : null) ?? PR[pid];
   const regName = ffReg ? (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] : "";
   const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
   const rekeyMrp = ws => (ws || []).map(w => {
@@ -128948,9 +128912,9 @@ function RdFlows({
   const openPoll = k => {
     if (window.AP.openPoll) window.AP.openPoll(k, "twopp", "the preference-flows ledger");
   };
-  const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (pvOf(FF_COHORTS[b].share) || 0) - (pvOf(FF_COHORTS[a].share) || 0))[0] : null;
-  const stake = big && pvOf(FF_COHORTS[big].share) != null ? FF_COHORTS[big].name + " voters are " + pvOf(FF_COHORTS[big].share).toFixed(1) + "% of the vote" + (ffReg && PVI[ffReg] ? " in the seats classed " + FF_REG_OF[ffReg] + " at the " + rdElecYear + " election, so each 10 points of their preferences moves the contest there by " + (pvOf(FF_COHORTS[big].share) / 10).toFixed(1) + " points." : ", so each 10 points of their preferences moves " + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation") + " by " + (pvOf(FF_COHORTS[big].share) / 10).toFixed(1) + " points.") : "";
-  const ledgerNote = (q === "co" ? ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC counts this cut nationally only. No poll asks this contest by region. " : "The " + rdElecYear + " count is the flow every Labor v Coalition figure on this site uses. " : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range" + (ffReg ? ", and it is national on every view. " : ". ") : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ") + stake + (ffReg && PVI[ffReg] ? "* Each group’s share of the vote is the " + rdElecYear + " election’s over the seats classed " + FF_REG_OF[ffReg] + " — polling never measures a region’s vote. " : "") + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
+  const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (PR[FF_COHORTS[b].share] || 0) - (PR[FF_COHORTS[a].share] || 0))[0] : null;
+  const stake = big && PR[FF_COHORTS[big].share] != null ? FF_COHORTS[big].name + " voters are " + PR[FF_COHORTS[big].share].toFixed(1) + "% of the vote, so each 10 points of their preferences moves " + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation") + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points." : "";
+  const ledgerNote = (q === "co" ? ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC counts this cut nationally only. No poll asks this contest by region. " : "The " + rdElecYear + " count is the flow every Labor v Coalition figure on this site uses. " : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range" + (ffReg ? ", and it is national on every view. " : ". ") : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ") + stake + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
   const flMonths = rdApMonths(RD_AP_TERM1);
   const flSetRows = fd => {
     const hs = fd.houses || {};
@@ -129093,7 +129057,7 @@ function RdFlows({
       ...m,
       ck
     }));
-    const share = pvOf(f.share);
+    const share = PR[f.share];
     return React.createElement("div", {
       key: ck,
       className: "rd-fx-row",

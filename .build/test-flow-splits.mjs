@@ -12,11 +12,7 @@
    replay of the classic seats' counts, the constants typed from
    .build/aec-2025-region-tpp-flows.mjs's output, user call 2026-10-13: "the
    2025 election flows are based on seat classification, which she worked
-   out already"), the 2025 election's per-seat-class vote shares are
-   elec2025p (first preferences summed over every seat of each class from
-   the vendored DoP + AEC division classes — what the ledger's "…% of the
-   vote" subs rekey to on a named region), and the 2026 state and by-election
-   counts (bys: SA2026
+   out already"), and the 2026 state and by-election counts (bys: SA2026
    Bonham estimates, Secret Harbour — on the days of the elections; Farrer's
    pair dropped 2026-10-13, those counts measured independent contests, not
    One Nation voters' choices).
@@ -126,36 +122,6 @@ for (const [rk, want] of Object.entries(REPLAY)) {
   const all = FF.elec2025r.all;
   assert.ok(Math.abs(r.grn - all.grn) > 0.5 || Math.abs(r.onp - all.onp) > 0.5 || Math.abs(r.oth - all.oth) > 0.5,
     `the ${rk} replay visibly differs from the national count — a rekey that shows`);
-}
-
-/* elec2025p: the "…% of the vote" figures beside each ledger row on a named
-   region (All voters keeps the headline primary) — the 2025 election's
-   first-preference share of each seat class's vote, summed straight from
-   the vendored DoP over EVERY seat of the class and grouped by the AEC's
-   own division classes (Regional = provincial + rural). From
-   data/aec-2025-seat-flows.json + data/aec-2025-division-class.json —
-   edit either and these pins move */
-assert.ok(FF.elec2025p && FF.elec2025p.inner && FF.elec2025p.outer && FF.elec2025p.regional,
-  "elec2025p carries the vote-share carrier per seat class");
-const PV = { inner: { alp: 38.35, lnp: 27.98, grn: 16.5, onp: 3.49, oth: 13.68 },
-             outer: { alp: 39.18, lnp: 30.13, grn: 11.84, onp: 6.16, oth: 12.69 },
-             regional: { alp: 28.64, lnp: 35.68, grn: 9.51, onp: 8.58, oth: 17.6 } };
-for (const [rk, want] of Object.entries(PV)) {
-  const got = FF.elec2025p[rk];
-  assert.deepEqual(Object.fromEntries(["alp", "lnp", "grn", "onp", "oth"].map((k) => [k, got[k]])),
-    Object.fromEntries(["alp", "lnp", "grn", "onp", "oth"].map((k) => [k, want[k]])),
-    `the ${rk} class's 2025 vote shares are the DoP's own sums (${JSON.stringify(want)})`);
-  const tot = ["alp", "lnp", "grn", "onp", "oth"].reduce((a, k) => a + got[k], 0);
-  assert.ok(Math.abs(tot - 100) < 0.05, `the ${rk} class's shares sum to 100 (${tot})`);
-}
-assert.deepEqual(
-  Object.fromEntries(["alp", "lnp", "grn", "onp", "oth"].map((k) => [k, FF.elec2025p.all[k]])),
-  Object.fromEntries(["alp", "lnp", "grn", "onp", "oth"].map((k) => [k, { alp: 34.56, lnp: 31.82, grn: 12.2, onp: 6.4, oth: 15.01 }[k]])),
-  "the national row of the same sums as a sanity anchor (the AEC's published national totals)");
-for (const rk of ["inner", "outer", "regional"]) {
-  const all = FF.elec2025p.all, r = FF.elec2025p[rk];
-  assert.ok(["alp", "lnp", "grn", "onp", "oth"].some((k) => Math.abs(r[k] - all[k]) > 0.5),
-    `the ${rk} class's vote shares visibly differ from the national row — a rekey that shows`);
 }
 
 /* the crosses (user 2026-10-13): the 2026 counts that measured the Labor-v-

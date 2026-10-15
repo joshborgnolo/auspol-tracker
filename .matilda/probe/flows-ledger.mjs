@@ -19,9 +19,7 @@
      - the region menu: a named region empties RedBridge/Accent's column
        and marks (national only), drops the 2026 counts, rekeys DemosAU's
        cells and, on Labor v Coalition, the count column to the class's
-       seat replay, and rekeys each group's "…% of the vote" to the
-       class's 2025 count (elec2025p) — All voters keeps the headline
-       primary;
+       seat replay;
      - tooltips: every ledger mark and the drift chart's first, middle and
        last dots open a tip inside the screen at 390/360/320 by touch (the
        bug the user reported: DemosAU tips 371-410px on a 390px phone), the
@@ -101,11 +99,6 @@ const expect = (page) => page.evaluate(() => {
     demosOn: (FF.demosOn || []).length,
     bys: { coal: (FF.bys || []).filter((d) => d.coal != null).length, grn: (FF.bys || []).filter((d) => d.grn != null).length, oth: (FF.bys || []).filter((d) => d.oth != null).length },
     share: { grn: PR.grn, onp: PR.onp, oth: PR.oth, coal: PR.lnp, alp: PR.alp },
-    /* the named-region shares are the 2025 election's over that seat
-       class (elec2025p): coal rides the lnp key */
-    shareReg: { inner: Object.fromEntries(Object.entries(FF.elec2025p.inner).map(([k, v]) => [k === "lnp" ? "coal" : k, v])),
-                outer: Object.fromEntries(Object.entries(FF.elec2025p.outer).map(([k, v]) => [k === "lnp" ? "coal" : k, v])),
-                regional: Object.fromEntries(Object.entries(FF.elec2025p.regional).map(([k, v]) => [k === "lnp" ? "coal" : k, v])) },
   };
 });
 const fig = (v, dp) => (v == null ? "–" : dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
@@ -143,8 +136,6 @@ for (const w of [1440, 390]) {
   s = await read(page);
   check(s.rows.every((r) => r.cells[1] === "–" && r.waves === 0 && r.crosses === 0), `${w}: a named region drops RedBridge/Accent and the 2026 counts`);
   check(s.rows.map((r) => r.cells[2]).join() === ["coal", "grn", "oth"].map((ck) => fig(E.onReg[ck])).join(), `${w}: Regional rekeys DemosAU to its printed regional cells (${s.rows.map((r) => r.cells[2])})`);
-  check(s.rows.every((r, i) => r.share === E.shareReg.regional[["coal", "grn", "oth"][i]].toFixed(1) + "% of the vote"),
-    `${w}: a named region rekeys the groups' vote shares to the class's 2025 count (${s.rows.map((r) => r.share)})`);
   await region(page, "");
 
   await tab(page, 2);
@@ -157,8 +148,6 @@ for (const w of [1440, 390]) {
   await region(page, "inner");
   s = await read(page);
   check(s.rows.map((r) => r.cells[0]).join() === ["grn", "onp", "oth"].map((ck) => fig(E.coInner[ck], 1)).join(), `${w}: Inner metro rekeys the count column to the class's seat replay (${s.rows.map((r) => r.cells[0])})`);
-  check(s.rows.every((r, i) => r.share === E.shareReg.inner[["grn", "onp", "oth"][i]].toFixed(1) + "% of the vote"),
-    `${w}: Inner metro rekeys the groups' vote shares to the class's 2025 count (${s.rows.map((r) => r.share)})`);
   check(s.rows.every((r) => r.waves === 0 && r.tris === 0 && r.empty), `${w}: Labor v Coalition by region: no poll marks, the row says why`);
   await region(page, "");
 

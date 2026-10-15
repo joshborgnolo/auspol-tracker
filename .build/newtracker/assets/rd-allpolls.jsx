@@ -5237,12 +5237,6 @@ function RdFlows({ measure }) {
   if (!FD || !FO || !FD.now || !FO.now) return null;
   const nC = FD.now, nO = FO.now;
   const PR = (D.latest && D.latest.primary) || {};
-  /* the "…% of the vote" figures: the headline primary under All voters;
-     on a named region the 2025 election's share of that seat class's vote
-     (the ledger note names the swap — polling never cuts the vote
-     regional, so the count is the only regional answer) */
-  const PVI = { inner: FF && FF.elec2025p ? FF.elec2025p.inner : null, outer: FF && FF.elec2025p ? FF.elec2025p.outer : null, regional: FF && FF.elec2025p ? FF.elec2025p.regional : null };
-  const pvOf = (pid) => ((ffReg && PVI[ffReg] ? PVI[ffReg][pid] : null) ?? PR[pid]);
   const regName = ffReg ? (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] : "";
   const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
 
@@ -5433,14 +5427,11 @@ function RdFlows({ measure }) {
   /* what a flow is worth: the contest's biggest group's share of the vote,
      so each 10 points of its preferences moves the figure by a tenth of it.
      Coalition v One Nation carries no site figure, so no stake line */
-  const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (pvOf(FF_COHORTS[b].share) || 0) - (pvOf(FF_COHORTS[a].share) || 0))[0] : null;
-  const stake = big && pvOf(FF_COHORTS[big].share) != null
-    ? FF_COHORTS[big].name + " voters are " + pvOf(FF_COHORTS[big].share).toFixed(1) + "% of the vote"
-      + (ffReg && PVI[ffReg] ? " in the seats classed " + FF_REG_OF[ffReg] + " at the " + rdElecYear + " election, so each 10 points of their preferences moves the contest there by "
-        + (pvOf(FF_COHORTS[big].share) / 10).toFixed(1) + " points."
-        : ", so each 10 points of their preferences moves "
-        + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation")
-        + " by " + (pvOf(FF_COHORTS[big].share) / 10).toFixed(1) + " points.")
+  const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (PR[FF_COHORTS[b].share] || 0) - (PR[FF_COHORTS[a].share] || 0))[0] : null;
+  const stake = big && PR[FF_COHORTS[big].share] != null
+    ? FF_COHORTS[big].name + " voters are " + PR[FF_COHORTS[big].share].toFixed(1) + "% of the vote, so each 10 points of their preferences moves "
+      + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation")
+      + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points."
     : "";
   const ledgerNote = (q === "co"
     ? (ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC counts this cut nationally only. No poll asks this contest by region. "
@@ -5449,7 +5440,6 @@ function RdFlows({ measure }) {
       + (ffReg ? ", and it is national on every view. " : ". ")
     : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ")
     + stake
-    + (ffReg && PVI[ffReg] ? "* Each group’s share of the vote is the " + rdElecYear + " election’s over the seats classed " + FF_REG_OF[ffReg] + " — polling never measures a region’s vote. " : "")
     + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
 
   /* ---- the drift battery: has each pollster's gap DRIFTED, not just sat
@@ -5536,7 +5526,7 @@ function RdFlows({ measure }) {
                 const dmW = [...c.dm].reverse().find((w) => w[ck] != null);
                 const mv = !ffReg ? movedOf(q, ck) : null;
                 const marks = marksOf(ck).map((m) => ({ ...m, ck }));
-                const share = pvOf(f.share);
+                const share = PR[f.share];
                 return (
                   <div key={ck} className="rd-fx-row" role="row" style={grid}>
                     <span className="rd-fx-who" role="rowheader"><b><i className={"rd-fx-swatch " + f.cls} aria-hidden="true"></i>{f.name}{narrow ? "" : " voters"}</b>{share != null && <span className="rd-ap-sub">{share.toFixed(1)}% of the vote</span>}</span>
