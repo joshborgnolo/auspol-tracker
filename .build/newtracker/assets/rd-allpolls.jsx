@@ -2162,7 +2162,7 @@ const RD_AP_DEM_NOUN = {
   "South Africa": "voters born in South Africa", "United Kingdom": "voters born in the UK",
 };
 const rdApDemNoun = (g) => RD_AP_DEM_NOUN[g] || "the " + g + " group";
-function rdApFacetStory(facet, upd, demSplit) {
+function rdApFacetStory(facet, upd, demSplit, confBw) {
   const D = window.AUSPOL;
   const J = window.JUR;
   /* the polls the facets' rows hold; direction adds the waves that asked
@@ -2354,17 +2354,21 @@ function rdApFacetStory(facet, upd, demSplit) {
 
   if (facet === "confidence") {
     const M = D.confidence || {};
-    const G = [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100],
-               ["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]]
+    /* the lane flip's story follows the row set: consumer (the default)
+       reads the two household gauges, business the business pair */
+    const G = (confBw
+      ? [["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]]
+      : [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100]])
       .filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null)
       .map(([k, name, neut]) => ({ k, name, neut, lat: M[k].latest }));
     if (!G.length) return null;
     const fig = (g, v) => (g.neut === 0 ? rdSigned(v, Number.isInteger(v) ? 0 : 1).replace(/^\+/, "") : v.toFixed(1));
     const nG = G.length, under = G.filter((g) => g.lat.v < g.neut).length;
+    const laneNoun = confBw ? "business" : "consumer";
     const all = nG === 2 ? "Both" : "All " + rdNumWord(nG);
-    const head = under === nG ? all + " confidence gauges sit below neutral"
-      : under === 0 ? all + " confidence gauges sit above neutral"
-      : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " confidence gauges sit below neutral";
+    const head = under === nG ? all + " " + laneNoun + " gauges sit below neutral"
+      : under === 0 ? all + " " + laneNoun + " gauges sit above neutral"
+      : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " " + laneNoun + " gauges sit below neutral";
     const moved = G.filter((g) => g.lat.chg != null);
     const fell = moved.filter((g) => g.lat.chg < 0).length;
     const fellTxt = !moved.length ? "" : (fell === moved.length ? (moved.length === 2 ? "Both" : "All " + rdNumWord(moved.length)) + " fell in their latest release. "
@@ -2377,7 +2381,7 @@ function rdApFacetStory(facet, upd, demSplit) {
     const latest = G.filter((g) => g.lat.released === newest);
     const dek = fellTxt + "The newest release" + (latest.length > 1 ? "s" : "") + ", on " + dd + " " + D.monthNameFull(mo) + ", put"
       + (latest.length > 1 ? "" : "s") + " " + rdList(latest.map(at)) + ". "
-      + "Below is every release of the four indices since the " + rdElecYear + " election, newest first, each linked to its source.";
+      + "Below is every release of the " + laneNoun + " indices since the " + rdElecYear + " election, newest first, each linked to its source.";
     return { head, dek };
   }
   return null;
@@ -2591,15 +2595,19 @@ function RdApConsCyc({ tiers, phone, primNums, primStrip, primCardNums, cardHead
 
 function RdAllPolls(P) {
   const { rows, sorted, total, houses, houseRank, houseN, tagN, shownTags, rangeN, RANGE_LAB,
-          facet, onFacet, measure, onMeasure, tppBasis, setTppBasis, consM, setConsM,
+          facet, onFacet, measure, onMeasure, tppBasis, setTppBasis, consM, setConsM, confBus, setConfBus,
           q, setQ, sel, setSel, toggleHouse, range, setRange, tagSel, setTagSel, toggleTag,
           pills, clearAll, sort, onSort, open, setOpen, focus, onBack, backLabel, exportCsv, bodyRef,
           ofTotal, ofHouses, demSplit, setDemSplit } = P;
   const D = window.AUSPOL;
   /* the direction-only waves sit outside every other facet's rows; ofTotal
      is the archive's full extent so an unfiltered count can acknowledge them
-     ("163 of 173 polls") instead of implying the facet's rows are everything */
-  const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
+     ("163 of 173 polls") instead of implying the facet's rows are everything.
+     The confidence facet's rows are never polls at all, so its unfiltered
+     extent is the release file - a lane read joins that ("91 of 124
+     releases"), not the poll archive's total */
+  const ofT = facet === "confidence" ? ((D.confidenceOnlyPolls || []).length !== total ? (D.confidenceOnlyPolls || []).length : null)
+    : (ofTotal != null && ofTotal !== total ? ofTotal : null);
   const ofTxt = ofT ? " of " + ofT : "";
   /* releases, not polls: the confidence facet's rows never count toward
      a poll total, so its count lines say what they number */
@@ -2707,6 +2715,11 @@ function RdAllPolls(P) {
         for (const m of ["lnp", "onp"]) for (const b of ["imp", "resp"]) add("twopp|" + m + "|" + b, rdApTppStory(m === "onp", b === "resp", upd));
       } else if (id === "demographics") {
         for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
+      } else if (id === "confidence") {
+        /* both confidence lanes stand in the floor stack, so a consumer ⇄
+           business hop rewrites words only (the twopp pattern above) */
+        add("confidence", rdApFacetStory(id, upd, null, false));
+        add("confidence|bus", rdApFacetStory(id, upd, null, true));
       } else add(id, rdApFacetStory(id, upd));
       if (id === "primary") add("primary|cons", rdApConsStory(upd));
     }
@@ -2714,6 +2727,7 @@ function RdAllPolls(P) {
   }, [upd]);
   const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp")
     : facet === "primary" && consM ? "primary|cons"
+    : facet === "confidence" && confBus ? "confidence|bus"
     : facet === "demographics" ? "demographics|" + demSplit : facet;
   const live = stories.find((st) => st.key === liveKey);
   const head = live ? live.head : null, dek = live ? live.dek : null;
@@ -3823,6 +3837,10 @@ function RdAllPolls(P) {
   /* the primary facet's consideration flip – its own state (consM), not a
      matchup: it swaps which published figures the party columns print */
   const consFlipPick = () => { pinAp(); setConsM(!consM); };
+  /* the confidence facet's lane flip: consumer (household) gauges ⇄ the
+     business pair, its own state (confBus) – same shape as the
+     consideration flip, one layer above the row set */
+  const confLanePick = () => { pinAp(); setConfBus(!confBus); };
   /* the demographics facet's split: the Who votes for whom panel's own
      group names, picked like a facet - the table holds its spot through the
      reflow, and the arrow keys walk the words the way they walk the tabs */
@@ -3850,8 +3868,9 @@ function RdAllPolls(P) {
      page, the keys keep their day jobs (space scrolls, digits type). */
   const spaceFlip = React.useRef(null);
   /* on the primary facet Space steps the figures the way it steps the 2PP
-     facet's contest: intention ⇄ consideration */
-  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : null;
+     facet's contest (intention ⇄ consideration), and on the confidence
+     facet it steps the lane (consumer ⇄ business) */
+  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : facet === "confidence" ? confLanePick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
   const splitWalk = React.useRef(null);
@@ -3948,6 +3967,13 @@ function RdAllPolls(P) {
             title={consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)"}
             onClick={consFlipPick}>{consM ? "Voting consideration" : "Voting intention"} <span aria-hidden="true">⇄</span></button>
   );
+  const confLaneFlip = (
+    /* the label names the ACTIVE lane, the consideration flip's contract;
+       the title announces where a press goes */
+    <button type="button" className="rd-pl-flip" aria-pressed={confBus}
+            title={confBus ? "Switch to the consumer confidence gauges" : "Switch to the business confidence gauges"}
+            onClick={confLanePick}>{confBus ? "Business" : "Consumer"} confidence <span aria-hidden="true">⇄</span></button>
+  );
   const consQpop = !consM ? null : (
     <RdQPop label="What voting consideration figures are, and which waves collected them" align="left">
       <p>Voting consideration is the share of voters who name a party as one they <i>would consider</i> supporting — a looser yardstick than voting intention, the party the voter does intend. YouGov and Essential have asked it; every other wave stays on intention, and on a wave without consideration figures the intention figure stands.</p>
@@ -3990,6 +4016,9 @@ function RdAllPolls(P) {
         {facet === "primary" && !ctlNarrow && (
           <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Vote:</span>{consFlip}{consQpop}</span>
         )}
+        {facet === "confidence" && !ctlNarrow && (
+          <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Confidence:</span>{confLaneFlip}</span>
+        )}
       </RdTabs>
       {ctlNarrow && (
         <>
@@ -3999,6 +4028,7 @@ function RdAllPolls(P) {
             )}
             {facet === "demographics" && <div className="rd-ap-pctl">{splitPicker}</div>}
             {facet === "primary" && <div className="rd-ap-pctl">{consFlip}<span className="rd-grow"></span>{consQpop}</div>}
+            {facet === "confidence" && <div className="rd-ap-pctl">{confLaneFlip}</div>}
           </div>
           <div className="rd-ap-ctlvar" ref={ctlVarRef} aria-hidden="true">
             <div className="rd-ap-pctl">
@@ -4009,6 +4039,9 @@ function RdAllPolls(P) {
             <div className="rd-ap-pctl">
               <button type="button" className="rd-pl-flip">Voting consideration <span aria-hidden="true">⇄</span></button>
               <span className="rd-grow"></span>{consQpop}
+            </div>
+            <div className="rd-ap-pctl">
+              <button type="button" className="rd-pl-flip">Business confidence <span aria-hidden="true">⇄</span></button>
             </div>
           </div>
         </>
