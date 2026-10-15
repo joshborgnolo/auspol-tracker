@@ -2513,7 +2513,7 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
 const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
     loose: { tab: "Would consider (≥4/10)", led: "Would consider (≥4/10)", note: "rated ≥4/10, rebased over everyone" },
-    not: { tab: "Would not vote (≤3/10)", led: "Would not vote (≤3/10)", note: "rated ≤3/10, rebased over everyone" },
+    not: { tab: "Would not consider (≤3/10)", led: "Would not consider (≤3/10)", note: "rated ≤3/10, rebased over everyone" },
     never: { tab: "Would never vote (0/10)", led: "Would never vote (0/10)", note: "rated 0/10, rebased over everyone" },
   },
   Essential: {

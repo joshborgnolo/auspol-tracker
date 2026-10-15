@@ -131,7 +131,7 @@ new and worth looking at.
   sanctioned derivations in this field: the RedBridge row's
   `consideration` is the share rating 7–10 of 10 (the serious end), with
   three extra tier maps — `considerationLoose` (4 or more of 10),
-  `considerationNot` (3 or fewer of 10, the would-not-vote end) and
+  `considerationNot` (3 or fewer of 10, the would-not-consider end) and
   `considerationNever` (0 of 10) — every share rebased to all voters as
   `primary + (100 − primary) × share_among_asked`; Essential's Feb and
   June 2026 waves banded every voter definitely/open-to/never, so their

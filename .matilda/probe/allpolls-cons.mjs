@@ -16,7 +16,7 @@
    THREE rows carry banded consideration and show ONE range at a time with
    the basis label as a cycle button (".rd-ap-conscyc"): RedBridge/Accent's
    April 2026 0-10 battery (canonical "Would seriously consider (≥7/10)"
-   -> "Would consider (≥4/10)" -> "Would not vote (≤3/10)" -> "Would never
+   -> "Would consider (≥4/10)" -> "Would not consider (≤3/10)" -> "Would never
    vote (0/10)") and
    Essential's June + Feb 2026 definitely/open/never waves (canonical
    "Would definitely vote" -> "Would consider (definitely or open)" ->
@@ -75,7 +75,7 @@ const CYCS = {
     canonNums: ["45", "37", "36", "24"],
     ranges: [
       { lab: "Would consider (≥4/10)", nums: ["62", "59", "53", "45"], aria: "Voting consideration, Would consider (≥4/10): " },
-      { lab: "Would not vote (≤3/10)", nums: ["63", "55", "62", "69"], aria: "Voting consideration, Would not vote (≤3/10): " },
+      { lab: "Would not consider (≤3/10)", nums: ["63", "55", "62", "69"], aria: "Voting consideration, Would not consider (≤3/10): " },
       { lab: "Would never vote (0/10)", nums: ["21", "30", "16", "32"], aria: "Voting consideration, Would never vote (0/10): " },
       { lab: "Would seriously consider (≥7/10)", nums: ["45", "37", "36", "24"], aria: "Voting consideration, Would seriously consider (≥7/10): " },
     ],
@@ -363,10 +363,10 @@ const runPhone = async () => {
   ok(await clickCyc(page, NEEDLES.rb), "phone RedBridge second cycler press landed");
   await sleep(300);
   const on2b = await cstate();
-  ok(on2b.rb && on2b.rb.lab.startsWith("Would not vote (≤3/10)"), `phone press two swaps the RedBridge label to the would-not range ("${on2b.rb && on2b.rb.lab}")`);
-  ok(on2b.rb && on2b.rb.headLab.startsWith("Would not vote (≤3/10)"), "the head label reads the would-not range");
+  ok(on2b.rb && on2b.rb.lab.startsWith("Would not consider (≤3/10)"), `phone press two swaps the RedBridge label to the would-not range ("${on2b.rb && on2b.rb.lab}")`);
+  ok(on2b.rb && on2b.rb.headLab.startsWith("Would not consider (≤3/10)"), "the head label reads the would-not range");
   ok(on2b.rb && ["63", "55", "62", "69"].every((n) => on2b.rb.nums.includes(n)), `phone press two swaps the RedBridge figures (${JSON.stringify(on2b.rb && on2b.rb.nums)})`);
-  ok(on2b.rb && on2b.rb.aria.startsWith("Voting consideration, Would not vote (≤3/10): "), "phone press two swaps the RedBridge strip's aria");
+  ok(on2b.rb && on2b.rb.aria.startsWith("Voting consideration, Would not consider (≤3/10): "), "phone press two swaps the RedBridge strip's aria");
   ok(await clickCyc(page, NEEDLES.essJun), "phone Essential June cycler press landed");
   await sleep(300);
   const on3 = await cstate();
