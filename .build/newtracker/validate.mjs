@@ -201,6 +201,19 @@ export function validate(D) {
             fail("cons-tier-order", `${f}.${k} = ${v} below canonical ${p.consideration[k]}`);
         }
       }
+      //      the rebase is ASYMMETRIC: a consider-end figure counts the
+      //      party's own voters (primary + (100 − primary) × share among the
+      //      asked), a not/never-end figure does not (just
+      //      (100 − primary) × share) — so loose + not ≤ 100 per key and
+      //      never ≤ not (the 0/10 band nests inside 0–3).
+      if (p.considerationNot != null && p.considerationLoose != null)
+        for (const k of Object.keys(p.considerationNot).filter((k) => p.considerationNot[k] != null && p.considerationLoose[k] != null))
+          if (p.considerationLoose[k] + p.considerationNot[k] > 100)
+            fail("cons-tier-sum", `considerationLoose.${k} + considerationNot.${k} = ${p.considerationLoose[k] + p.considerationNot[k]} over 100`);
+      if (p.considerationNot != null && p.considerationNever != null)
+        for (const k of Object.keys(p.considerationNever).filter((k) => p.considerationNever[k] != null && p.considerationNot[k] != null))
+          if (p.considerationNever[k] > p.considerationNot[k])
+            fail("cons-tier-nest", `considerationNever.${k} = ${p.considerationNever[k]} above considerationNot.${k} ${p.considerationNot[k]}`);
     } else if (p.consBasis != null || p.considerationLoose != null || p.considerationNot != null || p.considerationNever != null)
       fail("cons-basis", `consBasis/tier fields without consideration on ${p.pollster} ${p.date}`);
     // 2b1d. softAge – Resolve's "not firm" share by age band, the three

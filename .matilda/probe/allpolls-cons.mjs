@@ -75,7 +75,7 @@ const CYCS = {
     canonNums: ["45", "37", "36", "24"],
     ranges: [
       { lab: "Would consider (≥4/10)", nums: ["62", "59", "53", "45"], aria: "Voting consideration, Would consider (≥4/10): " },
-      { lab: "Would not consider (≤3/10)", nums: ["63", "55", "62", "69"], aria: "Voting consideration, Would not consider (≤3/10): " },
+      { lab: "Would not consider (≤3/10)", nums: ["32", "33", "49", "42"], aria: "Voting consideration, Would not consider (≤3/10): " },
       { lab: "Would never vote (0/10)", nums: ["21", "30", "16", "32"], aria: "Voting consideration, Would never vote (0/10): " },
       { lab: "Would seriously consider (≥7/10)", nums: ["45", "37", "36", "24"], aria: "Voting consideration, Would seriously consider (≥7/10): " },
     ],
@@ -365,7 +365,7 @@ const runPhone = async () => {
   const on2b = await cstate();
   ok(on2b.rb && on2b.rb.lab.startsWith("Would not consider (≤3/10)"), `phone press two swaps the RedBridge label to the would-not range ("${on2b.rb && on2b.rb.lab}")`);
   ok(on2b.rb && on2b.rb.headLab.startsWith("Would not consider (≤3/10)"), "the head label reads the would-not range");
-  ok(on2b.rb && ["63", "55", "62", "69"].every((n) => on2b.rb.nums.includes(n)), `phone press two swaps the RedBridge figures (${JSON.stringify(on2b.rb && on2b.rb.nums)})`);
+  ok(on2b.rb && ["32", "33", "49", "42"].every((n) => on2b.rb.nums.includes(n)), `phone press two swaps the RedBridge figures (${JSON.stringify(on2b.rb && on2b.rb.nums)})`);
   ok(on2b.rb && on2b.rb.aria.startsWith("Voting consideration, Would not consider (≤3/10): "), "phone press two swaps the RedBridge strip's aria");
   ok(await clickCyc(page, NEEDLES.essJun), "phone Essential June cycler press landed");
   await sleep(300);
