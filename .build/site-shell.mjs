@@ -744,6 +744,11 @@ body { height: auto; }
 @media (max-width: 380px) {
   .sh-tabs.pinned .sh-abbr { display: none; }
 }
+/* the tightest rung trims the ☰'s pinned lead-in so the docked score keeps
+   its clearance (mirrors rd.css's ≤345 rule) */
+@media (max-width: 345px) {
+  .sh-tabs.pinned .sh-menu-btn { margin-left: 5px; padding-right: 3px; }
+}
 /* the ☰ and its menu (the main page's .tab-menu / .tab-menu-pop) */
 .sh-menu-btn { all: unset; position: relative; box-sizing: border-box; cursor: pointer; align-self: stretch; display: inline-flex; align-items: center;
   padding: 12px 2px 13px; color: var(--ink-2); transition: color .15s ease; }
@@ -898,6 +903,9 @@ nav.tabs[aria-label="Poll archives"] {
   .sh-tabs-set { gap: 0; width: 100%; justify-content: space-between; }
   .sh-menu-btn { padding: 11px 6px 12px; }
   .sh-tabs.pinned .sh-tabs-set { width: auto; justify-content: flex-start; }
+  /* mirrors the main bar's pinned ☰ lead-in (rd.css): closed up, every gap
+     collapsed to the padding's ~10px and the ☰ read as the last tab */
+  .sh-tabs.pinned .sh-menu-btn { margin-left: 16px; }
   .sh-tab { padding: 11px 6px 12px; font-size: 15px; line-height: 19px; }
   .sh-eyebrow { display: none; }
   .sh-score { gap: 6px; }

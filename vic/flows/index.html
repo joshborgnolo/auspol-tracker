@@ -1490,7 +1490,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --k-poll:    var(--accent);
   --k-flows:   oklch(0.50 0.085 295);
   --k-finding: oklch(0.53 0.095 345);
-  margin: 28px 0 0; width: 100%; max-width: 880px;
+  margin: 28px 0 0; width: min(1180px, calc(100vw - 32px));
+  position: relative; left: 50%; transform: translateX(-50%);
   background: var(--t-bg); color: var(--t-ink-2);
   border: 1px solid var(--t-edge); border-radius: 14px;
   font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -3499,6 +3500,7 @@ body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
 body.rd .rd-cal-w a { color: inherit; text-decoration: none; }
 body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
+body.rd .rd-cal-t { font-weight: 400; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
 body.rd .rd-cal-track { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--ink-3); }
@@ -3683,8 +3685,12 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .tab { padding: 11px 6px 12px; }
   body.rd .tab-label, body.rd.editorial .tab-label { font-size: 15px; line-height: 19px; }
   body.rd .tabs.pinned .tabs-set { width: auto; justify-content: flex-start; }
+  body.rd .tabs.pinned .tab-menu { margin-left: 16px; }
   body.rd .ts-num { font-size: 15px; }
   body.rd .tab-score { gap: 6px; }
+}
+@media (max-width: 345px) {
+  body.rd .tabs.pinned .tab-menu { margin-left: 5px; padding-right: 3px; }
 }
 @media (orientation: landscape) and (max-height: 480px) {
   body.rd .tabs.sticky { position: relative; top: auto; }
@@ -36587,7 +36593,7 @@ function AllPollsView({
         hay: hay + " " + hay.replace(/–/g, "-")
       };
     });
-  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll]);
+  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll, confBus]);
   const housesV = facet === "issues" ? housesIss : facet === "confidence" && confOnlyAll.length ? housesConf : facet === "direction" && dirOnlyAll.length ? housesDir : houses;
   const availableTags = new Set();
   rows.forEach(r => r.tags.forEach(tg => availableTags.add(tg)));
@@ -36725,7 +36731,7 @@ function AllPollsView({
   const [limit, setLimit] = useState(PAGE);
   React.useEffect(() => {
     setLimit(PAGE);
-  }, [ql, sel, lead, range, tagSel, scope, facet, consM, sort.key, sort.dir, measure]);
+  }, [ql, sel, lead, range, tagSel, scope, facet, consM, confBus, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex(p => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
   const fmtConfFig = (v, signed) => (v < 0 ? "−" : signed && v > 0 ? "+" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -36821,7 +36827,7 @@ function AllPollsView({
     onp: "o"
   };
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "b", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach(k => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -36832,6 +36838,7 @@ function AllPollsView({
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
     if (consM) p.set("k", "1");
+    if (confBus && facet === "confidence") p.set("b", "1");
     if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
     if (!scope && (FACET_SCOPE[facet] || consM)) p.set("s", "0");
     const qs = p.toString();
@@ -36886,6 +36893,8 @@ function AllPollsView({
     setTppBasis: setTppBasis,
     consM: consM,
     setConsM: setConsM,
+    confBus: confBus,
+    setConfBus: setConfBus,
     q: q,
     setQ: setQ,
     sel: sel,
@@ -37626,7 +37635,7 @@ function RdChangelog() {
   }, "Changelog"), React.createElement("span", {
     className: "rd-meta"
   }, "What\u2019s moved numbers when")), React.createElement(RdHed, {
-    head: "Site updates and their effect",
+    head: "Latest changelog entries",
     dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away \u2013 recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
       className: "fb-link",
       href: "/feed.xml"
@@ -52759,7 +52768,10 @@ function RdPolls({
         calDays.set(iso, e);
         calItems.push(e);
       }
-      e.who.push(me);
+      e.who.push({
+        ...me,
+        hr: hourWords(r)
+      });
     }
   });
   calOver.sort((a, b) => a.release - b.release);
@@ -52797,7 +52809,9 @@ function RdPolls({
   }, w.name, React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
-  }, "\u2197")) : w.name, w.tracked && RD_CAL_TRACK[w.tracked] ? React.createElement("span", {
+  }, "\u2197")) : w.name, w.hr ? React.createElement("span", {
+    className: "rd-cal-t"
+  }, ", ", w.hr) : null, w.tracked && RD_CAL_TRACK[w.tracked] ? React.createElement("span", {
     className: "rd-cal-track"
   }, RD_CAL_TRACK[w.tracked]) : null);
   return React.createElement(RdSec, {
@@ -58217,7 +58231,7 @@ const RD_AP_DEM_NOUN = {
   "United Kingdom": "voters born in the UK"
 };
 const rdApDemNoun = g => RD_AP_DEM_NOUN[g] || "the " + g + " group";
-function rdApFacetStory(facet, upd, demSplit) {
+function rdApFacetStory(facet, upd, demSplit, confBw) {
   const D = window.AUSPOL;
   const J = window.JUR;
   const polls = D.individualPolls || [];
@@ -58405,7 +58419,7 @@ function rdApFacetStory(facet, upd, demSplit) {
   }
   if (facet === "confidence") {
     const M = D.confidence || {};
-    const G = [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100], ["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]].filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null).map(([k, name, neut]) => ({
+    const G = (confBw ? [["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]] : [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100]]).filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null).map(([k, name, neut]) => ({
       k,
       name,
       neut,
@@ -58415,8 +58429,9 @@ function rdApFacetStory(facet, upd, demSplit) {
     const fig = (g, v) => g.neut === 0 ? rdSigned(v, Number.isInteger(v) ? 0 : 1).replace(/^\+/, "") : v.toFixed(1);
     const nG = G.length,
       under = G.filter(g => g.lat.v < g.neut).length;
+    const laneNoun = confBw ? "business" : "consumer";
     const all = nG === 2 ? "Both" : "All " + rdNumWord(nG);
-    const head = under === nG ? all + " confidence gauges sit below neutral" : under === 0 ? all + " confidence gauges sit above neutral" : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " confidence gauges sit below neutral";
+    const head = under === nG ? all + " " + laneNoun + " gauges sit below neutral" : under === 0 ? all + " " + laneNoun + " gauges sit above neutral" : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " " + laneNoun + " gauges sit below neutral";
     const moved = G.filter(g => g.lat.chg != null);
     const fell = moved.filter(g => g.lat.chg < 0).length;
     const fellTxt = !moved.length ? "" : fell === moved.length ? (moved.length === 2 ? "Both" : "All " + rdNumWord(moved.length)) + " fell in their latest release. " : fell === 0 ? "None fell in its latest release. " : rdCap(rdNumWord(fell)) + " of the " + rdNumWord(moved.length) + " fell in their latest release. ";
@@ -58424,7 +58439,7 @@ function rdApFacetStory(facet, upd, demSplit) {
     const [, mo, dd] = newest.split("-").map(Number);
     const at = g => g.name + " at " + fig(g, g.lat.v) + (g.lat.chg == null ? "" : Math.abs(g.lat.chg) < 0.05 ? " (unchanged)" : (g.lat.chg < 0 ? " (down " : " (up ") + rdApNum(Math.abs(g.lat.chg)) + ")");
     const latest = G.filter(g => g.lat.released === newest);
-    const dek = fellTxt + "The newest release" + (latest.length > 1 ? "s" : "") + ", on " + dd + " " + D.monthNameFull(mo) + ", put" + (latest.length > 1 ? "" : "s") + " " + rdList(latest.map(at)) + ". " + "Below is every release of the four indices since the " + rdElecYear + " election, newest first, each linked to its source.";
+    const dek = fellTxt + "The newest release" + (latest.length > 1 ? "s" : "") + ", on " + dd + " " + D.monthNameFull(mo) + ", put" + (latest.length > 1 ? "" : "s") + " " + rdList(latest.map(at)) + ". " + "Below is every release of the " + laneNoun + " indices since the " + rdElecYear + " election, newest first, each linked to its source.";
     return {
       head,
       dek
@@ -58700,6 +58715,8 @@ function RdAllPolls(P) {
     setTppBasis,
     consM,
     setConsM,
+    confBus,
+    setConfBus,
     q,
     setQ,
     sel,
@@ -58727,7 +58744,7 @@ function RdAllPolls(P) {
     setDemSplit
   } = P;
   const D = window.AUSPOL;
-  const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
+  const ofT = facet === "confidence" ? (D.confidenceOnlyPolls || []).length !== total ? (D.confidenceOnlyPolls || []).length : null : ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const noun1 = facet === "confidence" ? "release" : "poll";
   const noun = noun1 + "s";
@@ -58775,12 +58792,15 @@ function RdAllPolls(P) {
         for (const m of ["lnp", "onp"]) for (const b of ["imp", "resp"]) add("twopp|" + m + "|" + b, rdApTppStory(m === "onp", b === "resp", upd));
       } else if (id === "demographics") {
         for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
+      } else if (id === "confidence") {
+        add("confidence", rdApFacetStory(id, upd, null, false));
+        add("confidence|bus", rdApFacetStory(id, upd, null, true));
       } else add(id, rdApFacetStory(id, upd));
       if (id === "primary") add("primary|cons", rdApConsStory(upd));
     }
     return out;
   }, [upd]);
-  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp") : facet === "primary" && consM ? "primary|cons" : facet === "demographics" ? "demographics|" + demSplit : facet;
+  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp") : facet === "primary" && consM ? "primary|cons" : facet === "confidence" && confBus ? "confidence|bus" : facet === "demographics" ? "demographics|" + demSplit : facet;
   const live = stories.find(st => st.key === liveKey);
   const head = live ? live.head : null,
     dek = live ? live.dek : null;
@@ -60265,6 +60285,10 @@ function RdAllPolls(P) {
     pinAp();
     setConsM(!consM);
   };
+  const confLanePick = () => {
+    pinAp();
+    setConfBus(!confBus);
+  };
   const splitPick = id => {
     pinAp();
     setDemSplit(id);
@@ -60294,7 +60318,7 @@ function RdAllPolls(P) {
     setTppBasis(pub ? "imp" : "resp");
   };
   const spaceFlip = React.useRef(null);
-  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : null;
+  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : facet === "confidence" ? confLanePick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
   const splitWalk = React.useRef(null);
@@ -60437,6 +60461,15 @@ function RdAllPolls(P) {
   }, consM ? "Voting consideration" : "Voting intention", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
+  const confLaneFlip = React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": confBus,
+    title: confBus ? "Switch to the consumer confidence gauges" : "Switch to the business confidence gauges",
+    onClick: confLanePick
+  }, confBus ? "Business" : "Consumer", " confidence ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"));
   const consQpop = !consM ? null : React.createElement(RdQPop, {
     label: "What voting consideration figures are, and which waves collected them",
     align: "left"
@@ -60502,7 +60535,11 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, "Vote:"), consFlip, consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
+  }, "Vote:"), consFlip, consQpop), facet === "confidence" && !ctlNarrow && React.createElement("span", {
+    className: "rd-pl-ctl"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Confidence:"), confLaneFlip)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-ap-ctlslot",
     style: ctlFloor ? {
       minHeight: ctlFloor + "px"
@@ -60519,7 +60556,9 @@ function RdAllPolls(P) {
     className: "rd-ap-pctl"
   }, consFlip, React.createElement("span", {
     className: "rd-grow"
-  }), consQpop)), React.createElement("div", {
+  }), consQpop), facet === "confidence" && React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, confLaneFlip)), React.createElement("div", {
     className: "rd-ap-ctlvar",
     ref: ctlVarRef,
     "aria-hidden": "true"
@@ -60545,7 +60584,14 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, "\u21C4")), React.createElement("span", {
     className: "rd-grow"
-  }), consQpop))), React.createElement("div", {
+  }), consQpop), React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip"
+  }, "Business confidence ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"))))), React.createElement("div", {
     className: "rd-ap-bar"
   }, React.createElement("label", {
     className: "rd-ap-search"

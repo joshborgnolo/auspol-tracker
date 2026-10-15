@@ -3,11 +3,13 @@
    2026-10-15). Before it, the boxed .tabs-list spread its own four tabs and
    the ☰ sat glued to Info at gap 0 beside the tabs' ~26px, most visible on
    a phone. Asserts (a) the main page's resting bar spaces ALL FIVE bar
-   items evenly, (b) that rhythm matches the preference-flows satellite's
+   items evenly, (b) that rhythm matches the /prediction/ satellite's
    flat .sh-tabs-set row, (c) the ☰ menu dropdown lands at the same
-   geometry on both pages, and (d) the docked-score state still closes the
-   tabs up at the left with the score owning the right end. Sibling of
-   phone-nav-diff.mjs measurements (the scratch diff table). */
+   geometry on both pages, and (d) the docked-score state closes the
+   tabs up at the left with the score owning the right end — and since
+   the pinned lead-in fix, the ☰ stands a real gap apart from the tab
+   cluster instead of reading as its last member. Sibling of
+   menu-space-scratch.mjs measurements (the scratch glyph-gap table). */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
 import fs from "node:fs";
@@ -52,6 +54,13 @@ const menuGeom = (popSel) => {
 };
 const even = (g) => g.count === 5 && g.gaps.length === 4 &&
   g.gaps.every((x) => Math.abs(x - g.gaps[0]) < 0.11);
+/* the docked bar: the TABS close up at gap 0 and the ☰ stands a lead-in
+   margin apart (16px before the score's clearance trim at ≤345 – the
+   gaps land rendered, at the pinned 0.85 scale) */
+const dockedOk = (g, W) => g.gaps.length >= 3 &&
+  g.gaps.slice(0, -1).every((x) => Math.abs(x) < 0.11) &&
+  g.gaps[g.gaps.length - 1] > (W <= 345 ? 3 : 10);
+const dockedLead = (g) => g.gaps[g.gaps.length - 1];
 
 for (const W of [390, 320]) {
   const page = await browser.newPage();
@@ -73,14 +82,16 @@ for (const W of [390, 320]) {
   });
   console.log(`main ${W} score`, JSON.stringify(score), "scoreL", scoreBox);
   ok(scoreBox !== null, `main ${W}: the 2PP score docks`);
-  ok(score.gaps.length >= 3 && score.gaps.every((x) => Math.abs(x) < 0.11),
-     `main ${W}: docked bar closes the tabs up left (gaps ${score.gaps.join("/")})`);
+  ok(dockedOk(score, W),
+     `main ${W}: docked bar closes the tabs up left, the ☰ stands apart (${score.gaps.join("/")})`);
   ok(scoreBox !== null && score.last <= scoreBox + 1,
-     `main ${W}: no tab slides under the docked score (last tab ends ${score.last}, score at ${scoreBox})`);
+     `main ${W}: no tab slides under the docked score (☰ ends ${score.last}, score at ${scoreBox})`);
+  ok(dockedLead(score) >= 2.5 && score.last <= scoreBox - 1,
+     `main ${W}: the ☰ keeps the score's clearance too (lead-in ${dockedLead(score)}, gap ${+(scoreBox - score.last).toFixed(1)})`);
 
   const sat = await browser.newPage();
   await sat.setViewport({ width: W, height: 844 });
-  await sat.goto(base + "/preference-flows/", { waitUntil: "load" }); await wait(1400);
+  await sat.goto(base + "/prediction/", { waitUntil: "load" }); await wait(1400);
   const satRest = await sat.evaluate(gapsOf, ".sh-tabs-set .sh-tab");
   console.log(`shell ${W} rest`, JSON.stringify(satRest));
   ok(even(satRest), `shell ${W}: the satellite row spaces all five evenly (${satRest.gaps.join("/")})`);
@@ -104,14 +115,14 @@ for (const W of [390, 320]) {
   });
   console.log(`shell ${W} score`, JSON.stringify(satScore), "scoreL", satScoreL);
   ok(satScoreL !== null, `shell ${W}: the 2PP score docks`);
-  ok(satScore.gaps.length >= 3 && satScore.gaps.every((x) => Math.abs(x) < 0.11),
-     `shell ${W}: docked bar closes the tabs up left (gaps ${satScore.gaps.join("/")})`);
-  ok(satScoreL !== null && satScore.last <= satScoreL + 1,
+  ok(dockedOk(satScore, W),
+     `shell ${W}: docked bar closes the tabs up left, the ☰ stands apart (${satScore.gaps.join("/")})`);
+  ok(satScoreL !== null && satScore.last <= satScoreL - 1,
      `shell ${W}: the ☰ stays clear of the docked score (last ends ${satScore.last}, score at ${satScoreL})`);
   await sat.click(".sh-menu-btn"); await wait(250);
   const satPinned = await sat.evaluate(() => ({
     open: !document.getElementById("sh-menu").hidden, path: location.pathname }));
-  ok(satPinned.open && satPinned.path === "/preference-flows/",
+  ok(satPinned.open && satPinned.path === "/prediction/",
      `shell ${W}: the pinned ☰ opens the menu (no stray navigation to "${satPinned.path}")`);
   await sat.close();
   console.log(`menu ${W}`, JSON.stringify({ main: mainMenu, sat: satMenu }));
