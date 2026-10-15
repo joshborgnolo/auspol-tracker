@@ -6648,7 +6648,7 @@ function RdChangelog() {
         <h2 className="rd-title" id="rd-clog-t">Changelog</h2>
         <span className="rd-meta">What’s moved numbers when</span>
       </div>
-      <RdHed head="Site updates and their effect"
+      <RdHed head="Latest changelog entries"
         dek={<>What has moved the aggregate’s two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing – the <a className="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the pollster’s own release.</>} />
       <ChangelogEntries />
     </section>
