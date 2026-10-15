@@ -83,7 +83,15 @@ Load-bearing details, in order of subtlety:
    group (rd-cycles.jsx ~:1158, the Space branch atop the effect's
    key handler) — native Space there would dead-fire a re-pick of the
    tab already picked, so the claim turns the admission into the
-   complement step; an UNPRESSED tab keeps native Space.
+   complement step; an UNPRESSED tab keeps native Space. The who-votes
+   panel (2026-10-16, user report: Space dead-fired after a click)
+   admits TWO of its own rows: the pressed party chip
+   (`#who-votes .rd-chips .rd-chip`) and the pressed group-menu tab
+   (`#who-votes .rd-wv-tabs .rd-tab`). Both walk the PARTY chips; on a
+   chip the walk hands DOM focus along with the pick (rdTabsKey's
+   arrow-walk move, `focus({preventScroll:true})`) so consecutive
+   presses keep walking, on the menu tab the grouping and focus stay
+   put. Unpressed members of either row keep native Space.
 5. **Listener priority between overlapping claims:** all claims are
    document-level capture listeners; when two sections intersect
    (house-lean sits inside the all-polls view where the table's own
@@ -170,12 +178,17 @@ Load-bearing details, in order of subtlety:
   registered-pair arbitration: the effect's `rdSpaceClaimOn` /
   `rdSpaceDominant` gate shares the key with `#switching` by bigger
   viewport share (see rule 5). Probe:
-  `.matilda/probe/wv-space-party.mjs` (port 9023, 12 checks) — parks
+  `.matilda/probe/wv-space-party.mjs` (port 9023, 20 checks) — parks
   the page where ONLY `#who-votes` of {two-party, latest-polls,
   primary-vote, who-votes, switching} claims, walks five steps
-  asserting the wrap, asserts scrollY never moved, pins that a
-  FOCUSED chip natively activates (pressed becomes THAT chip, not the
-  next), and finds the negative spot by scanning below the panel —
+  asserting the wrap, asserts scrollY never moved, pins the
+  selected-controls admission (2026-10-16): a FOCUSED pressed chip
+  walks the cycle with the DOM focus riding to each newly pressed
+  chip, a FOCUSED pressed group-menu tab walks the chips while its
+  own pick and focus stay put, and UNPRESSED members of both rows
+  keep native Space (an unpressed chip activates to itself, an
+  unpressed menu tab switches the grouping), then finds the
+  negative spot by scanning below the panel —
   INCLUDING `#switching`, the flush section beneath — for a y that is
   both claim-free AND ≥60px above `scrollHeight - innerHeight` (the
   page bottom itself has no scroll left, so the negative check fails
@@ -268,8 +281,10 @@ Load-bearing details, in order of subtlety:
    `scrollY < scrollHeight - innerHeight - 60` before pressing (the
    wv-space-party probe found 7900 that way).
 8. **Native Space ACTIVATES a focused button.** The claim stands
-   aside for any focused control — so a focused chip/tab gets
-   natively pressed (`aria-pressed`/`aria-selected` flips to THAT
-   control, not the next in the walk). Pin the focused-case
-   expectation accordingly ("focused control owns Space"), then blur
+   aside for any focused control except the rule-4 admissions — so a
+   focused chip/tab gets natively pressed (`aria-pressed`/
+   `aria-selected` flips to THAT control, not the next in the walk),
+   while a SELECTED chip/tab in an admitting row walks (and, on the
+   who-votes party chips, hands the DOM focus along with the pick).
+   Pin the focused-case expectation per claim accordingly, then blur
    and assert the claim resumes its walk from there.

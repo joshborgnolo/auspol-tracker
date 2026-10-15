@@ -2724,12 +2724,31 @@ function RdDemographics({ rangeId = "all" }) {
       if (!window.rdSpaceDominant("who-votes")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the panel's own SELECTED controls own Space too: picking a party
+         chip or a group-menu tab leaves DOM focus on it (rdTabFocus),
+         where native Space would dead-fire a re-pick of the pick already
+         made. Space there walks the party chips exactly as with the page
+         focused; on a chip it also hands DOM focus along with the pick,
+         so consecutive Spaces keep walking (rdTabsKey's arrow walks do the
+         same). The menu tab keeps focus and its own pick - Space never
+         touches the grouping. An UNPRESSED chip or tab keeps the key's
+         day job, as in the all-polls facet menu. */
+      const pressed = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true";
+      const onChip = pressed && a.matches('#who-votes .rd-chips .rd-chip');
+      const onMenu = !onChip && pressed && a.matches('#who-votes .rd-wv-tabs .rd-tab');
+      if (!onChip && !onMenu && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceParty.current) return;
       e.preventDefault();
-      if (!e.repeat) spaceParty.current();
+      if (!e.repeat) {
+        spaceParty.current();
+        if (onChip) {
+          const btns = [...a.parentElement.querySelectorAll("button.rd-chip")];
+          const next = btns[(btns.indexOf(a) + 1) % btns.length];
+          if (next) next.focus({ preventScroll: true });
+        }
+      }
     };
     document.addEventListener("keydown", key, true);
     return () => { window.rdSpaceClaimOff("who-votes"); io.disconnect(); document.removeEventListener("keydown", key, true); };

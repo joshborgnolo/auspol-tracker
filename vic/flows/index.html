@@ -47485,12 +47485,24 @@ function RdDemographics({
       if (!window.rdSpaceDominant("who-votes")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const pressed = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true";
+      const onChip = pressed && a.matches('#who-votes .rd-chips .rd-chip');
+      const onMenu = !onChip && pressed && a.matches('#who-votes .rd-wv-tabs .rd-tab');
+      if (!onChip && !onMenu && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceParty.current) return;
       e.preventDefault();
-      if (!e.repeat) spaceParty.current();
+      if (!e.repeat) {
+        spaceParty.current();
+        if (onChip) {
+          const btns = [...a.parentElement.querySelectorAll("button.rd-chip")];
+          const next = btns[(btns.indexOf(a) + 1) % btns.length];
+          if (next) next.focus({
+            preventScroll: true
+          });
+        }
+      }
     };
     document.addEventListener("keydown", key, true);
     return () => {

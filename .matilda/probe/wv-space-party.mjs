@@ -3,8 +3,14 @@
    left-to-right / DEMO_PARTIES order — One Nation -> Labor -> Coalition
    -> Greens -> Others — the order the 1..5 digit keys number, and wraps
    Others round to One Nation. The panel pins its scroll spot through the
-   head/dek rewrite each step kicks off; a FOCUSED chip keeps its native
-   Space; off the viewport Space keeps its scroll day job.
+   head/dek rewrite each step kicks off. The panel's own SELECTED
+   controls own Space the walk's way (user report 2026-10-16): the
+   pressed party chip — a click's focus home, where native Space would
+   dead-fire a re-pick — walks the cycle and the DOM focus rides along
+   to the newly pressed chip; the pressed group-menu tab walks the chips
+   while keeping the menu's own pick and focus. An UNPRESSED chip or
+   menu tab keeps the key's day job (native Space activates it); off the
+   viewport Space keeps its scroll day job.
 
    Neighbour claims on the Now tab: #two-party (hero matchup flip),
    #latest-polls (two-party facet only), #primary-vote (the group
@@ -118,21 +124,87 @@ ok("each Space steps to the next chip, Others wraps to One Nation",
 ok("page never scrolled while the claim held", (await page.evaluate(() => window.scrollY)) === yClaim,
    "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yClaim);
 
-/* a FOCUSED chip keeps its own Space (the claim stands aside by the
-   BODY/HTML guard; native Space activates the focused button, picking
-   THAT chip - not the next in the cycle) */
-await page.evaluate(() => document.querySelectorAll("#who-votes .rd-chip")[2].focus());
+/* a FOCUSED pressed chip owns Space the walk's way: native Space there
+   would dead-fire a re-pick of the pick already made, so the claim
+   walks the cycle instead and hands the DOM focus along with the pick
+   (rdTabsKey's arrow walks do the same) - consecutive Spaces keep
+   walking without ever needing a blur (user report 2026-10-16). Chips
+   sit at One Nation after the wrap above. */
+console.log("== Space on the panel's own selected controls ==");
+await page.evaluate(() => document.querySelectorAll("#who-votes .rd-chip")[0].focus());
+await sleep(100);
+const focusedChip = () => page.evaluate(() =>
+  [...document.querySelectorAll("#who-votes .rd-chip")].indexOf(document.activeElement));
+for (let i = 1; i <= 3; i++) {
+  await page.keyboard.press("Space");
+  await sleep(200);
+  const pr = (await chipState()).pressed, fi = await focusedChip();
+  ok("Space " + i + " from the pressed chip walks the cycle and focus follows",
+     pr === i && fi === i, "pressed " + pr + ", focus " + fi);
+}
+
+/* an UNPRESSED chip keeps the key's day job: native Space activates
+   THAT chip - here Others, with the walk sitting on Greens */
+await page.evaluate(() => document.querySelectorAll("#who-votes .rd-chip")[4].focus());
 await sleep(100);
 await page.keyboard.press("Space");
 await sleep(200);
-ok("focused chip owns Space (it activates, not steps)", (await chipState()).pressed === 2,
+ok("unpressed chip keeps native Space (activates to Others)", (await chipState()).pressed === 4,
    "pressed index " + (await chipState()).pressed);
+
+/* the SELECTED group-menu tab owns Space the same way: the party chips
+   walk (Others wraps to One Nation) while the menu's own pick and the
+   tab's DOM focus stay put - and a second Space walks on (to Labor),
+   the tab never losing its pick or focus in between */
+{
+  const menu = await page.evaluate(() => {
+    const tabs = [...document.querySelectorAll("#who-votes .rd-wv-tabs .rd-tab")];
+    const at = tabs.findIndex((b) => b.getAttribute("aria-pressed") === "true");
+    tabs[at].focus();
+    return { at, count: tabs.length };
+  });
+  await sleep(100);
+  await page.keyboard.press("Space");
+  await sleep(200);
+  {
+    const m = await page.evaluate(() => {
+      const tabs = [...document.querySelectorAll("#who-votes .rd-wv-tabs .rd-tab")];
+      return { at: tabs.findIndex((b) => b.getAttribute("aria-pressed") === "true"),
+               focusIsTab: !!(document.activeElement && document.activeElement.classList
+                 && document.activeElement.classList.contains("rd-tab")) };
+    });
+    ok("Space on the selected menu tab walks the chips (Others -> One Nation)",
+       (await chipState()).pressed === 0, "pressed index " + (await chipState()).pressed);
+    ok("the menu's pick and the tab's focus survive the walk",
+       m.at === menu.at && m.focusIsTab, "tab " + m.at + " vs " + menu.at + ", focusIsTab " + m.focusIsTab);
+  }
+  await page.keyboard.press("Space");
+  await sleep(200);
+  ok("a second Space from the same menu tab walks on (-> Labor)", (await chipState()).pressed === 1,
+     "pressed index " + (await chipState()).pressed);
+  /* an UNPRESSED menu tab keeps its day job too: native Space switches
+     the grouping to it, the chips untouched */
+  const nxt = (menu.at + 1) % menu.count;
+  await page.evaluate((j) => document.querySelectorAll("#who-votes .rd-wv-tabs .rd-tab")[j].focus(), nxt);
+  await sleep(100);
+  await page.keyboard.press("Space");
+  await sleep(300);
+  const at2 = await page.evaluate(() =>
+    [...document.querySelectorAll("#who-votes .rd-wv-tabs .rd-tab")]
+      .findIndex((b) => b.getAttribute("aria-pressed") === "true"));
+  ok("unpressed menu tab keeps native Space (the grouping switches to it)",
+     at2 === nxt && at2 !== menu.at, "tab " + at2 + " vs next " + nxt);
+  ok("the chips did not walk while the grouping switched", (await chipState()).pressed === 1,
+     "pressed index " + (await chipState()).pressed);
+}
+/* blur hands the key back to the viewport claim: the chips walk on */
 await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); });
 await sleep(100);
 await page.keyboard.press("Space");
 await sleep(200);
-ok("claim resumes once the chip blurs (Coalition -> Greens)", (await chipState()).pressed === 3,
+ok("claim resumes once the menu tab blurs (Labor -> Coalition)", (await chipState()).pressed === 2,
    "pressed index " + (await chipState()).pressed);
+const kept = (await chipState()).pressed;
 
 /* off the viewport Space keeps its scroll day job and leaves the chips;
    park below the panel where NO claiming section intersects, with room
@@ -164,7 +236,7 @@ await page.keyboard.press("Space");
 await sleep(400);
 ok("off-claim Space scrolls (day job)", (await page.evaluate(() => window.scrollY)) > yOff0,
    "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yOff0);
-ok("off-claim Space leaves the chips alone", (await chipState()).pressed === 3,
+ok("off-claim Space leaves the chips alone", (await chipState()).pressed === kept,
    "pressed index " + (await chipState()).pressed);
 await page.close();
 
