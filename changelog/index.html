@@ -115686,7 +115686,7 @@ function RdSwitching({
     if (gd2 && named.includes(gd2) && !goApart(gd1, gd2)) return "Similar shares have moved to " + gd1.noun + " (" + goPc(gd1) + ") and " + gd2.noun + " (" + goPc(gd2) + ")." + (named[2] ? " Another " + goPc(named[2]) + " have gone to " + named[2].noun + "." : "");
     const w1 = goBig(gd1.now.v),
       most = goLeft && gd1.now.v / goLeft >= 0.6;
-    const s1 = w1 + goVerb(w1) + " moved to " + gd1.noun + (most ? ", " + rdFraction(100 * gd1.now.v / goLeft) + " of those who left" : "") + ".";
+    const s1 = w1 + goVerb(w1) + " moved to " + gd1.noun + (most ? ", " + rdFraction(100 * gd1.now.v / goLeft) + " of those who have left" : "") + ".";
     const next = named.slice(1, 3);
     if (!next.length) return s1 + (goRest.length > 1 ? " The rest are scattered." : "");
     const only = next[0].now.v < gd1.now.v / 4 ? "Only " : "Another ";
