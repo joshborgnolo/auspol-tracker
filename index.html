@@ -125283,7 +125283,7 @@ function rdApConsStory(upd) {
     return d + " " + D.monthNameFull(m) + (y !== new Date(upd).getUTCFullYear() ? " " + y : "");
   };
   const top = ["alp", "lnp"].filter(id => newest.cons[id] != null).sort((a, b) => newest.cons[b] - newest.cons[a])[0];
-  const head = "In the newest poll (" + newest.pollster + ", " + day(newest.released) + "), " + pct(newest.cons.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
+  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
   const series = waves.filter(p => p.pollster === newest.pollster && basis(p) === basis(newest));
   const [lo, hi] = [Math.min(...series.map(p => p.cons.onp)), Math.max(...series.map(p => p.cons.onp))];
   const askers = new Set(waves.map(p => p.pollster + "|" + basis(p))).size;

@@ -2396,7 +2396,8 @@ const rdApLeanFor = (p, onM, pub) => {
 /* the Primary facet's consideration variant (consM). Each pollster asks its
    own question ("would seriously consider", "would definitely vote for",
    "would ever support"), so no figure pools across pollsters: the head
-   quotes the newest poll in its own question's words against the larger
+   quotes the last poll to ask ("when last asked", never "newest": these
+   polls are months apart, and the date says how old) in its own question's words against the larger
    major party's figure in the same poll; the dek says to compare within a
    pollster, gives the newest poll's own series, and tallies One Nation v
    Labor over the polls that asked about every party. "Above"/"below" only
@@ -2415,7 +2416,7 @@ function rdApConsStory(upd) {
   const day = (iso) => { const [y, m, d] = iso.split("-").map(Number);
     return d + " " + D.monthNameFull(m) + (y !== new Date(upd).getUTCFullYear() ? " " + y : ""); };
   const top = ["alp", "lnp"].filter((id) => newest.cons[id] != null).sort((a, b) => newest.cons[b] - newest.cons[a])[0];
-  const head = "In the newest poll (" + newest.pollster + ", " + day(newest.released) + "), " + pct(newest.cons.onp) + " "
+  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " "
     + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation"
     + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
   /* the newest poll's own series: same pollster, same question */
