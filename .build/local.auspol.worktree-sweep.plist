@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>local.auspol.worktree-sweep</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/worktree-sweep.sh</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/bin:/bin:/usr/local/bin</string>
+	</dict>
+	<key>StartCalendarInterval</key>
+	<array>
+		<!-- Weekly, Sunday 04:45: past the release windows, before the week
+		     starts. Unlike every other job this one does NOT go through
+		     run.sh and the runner clone: the sweep's whole job is pruning
+		     the MAIN checkout's worktree registrations, which the clone's
+		     own git dir knows nothing about — so the shim execs the
+		     wrapper at the main-checkout path the installer baked in.
+		     It needs no node, no writers lock, and a clean/dirty main
+		     tree never gates it (that's the point of the job). -->
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>4</integer><key>Minute</key><integer>45</integer></dict>
+	</array>
+	<key>StandardOutPath</key>
+	<string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-worktree-sweep-stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-worktree-sweep-stderr.log</string>
+</dict>
+</plist>

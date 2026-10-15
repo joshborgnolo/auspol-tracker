@@ -122,14 +122,27 @@ for p in "$SRC"/.build/local.auspol.*.plist; do
   label="$(basename "$p" .plist)"
   job="${label#local.auspol.}"
   shim="$AGENTS/$job.sh"
-  want_shim="$(printf '%s\n' '#!/bin/bash' '# Thin per-job launcher; see run.sh for why these live outside the repo.' \
-    "exec bash \"$AGENTS/run.sh\" \"$job-updater.sh\"")"
+  # worktree-sweep is the one job that must not run through run.sh: it prunes
+  # THIS checkout's worktree registrations, which the runner clone can't see.
+  # Its shim execs the wrapper here directly; every other job gets run.sh.
+  if [ "$job" = "worktree-sweep" ]; then
+    want_shim="$(printf '%s\n' '#!/bin/bash' '# Thin per-job launcher; see run.sh for why these live outside the repo.' \
+      "# This job sweeps the main checkout's worktrees, so it runs here, not in the clone." \
+      "exec bash \"$SRC/.build/worktree-sweep.sh\" --apply")"
+  else
+    want_shim="$(printf '%s\n' '#!/bin/bash' '# Thin per-job launcher; see run.sh for why these live outside the repo.' \
+      "exec bash \"$AGENTS/run.sh\" \"$job-updater.sh\"")"
+  fi
   if [ "$(cat "$shim" 2>/dev/null)" != "$want_shim" ]; then
     if $CHECK; then bad "$job.sh shim missing or different"
     else printf '%s\n' "$want_shim" > "$shim"; chmod 755 "$shim"; did "wrote $job.sh"
     fi
   fi
-  [ -f "$SRC/.build/$job-updater.sh" ] || bad "$label runs $job-updater.sh, which the repo does not have"
+  if [ "$job" = "worktree-sweep" ]; then
+    [ -f "$SRC/.build/worktree-sweep.sh" ] || bad "$label runs worktree-sweep.sh, which the repo does not have"
+  else
+    [ -f "$SRC/.build/$job-updater.sh" ] || bad "$label runs $job-updater.sh, which the repo does not have"
+  fi
 
   installed="$LA/$label.plist"
   if [ "$(canon "$p")" != "$(canon "$installed")" ]; then

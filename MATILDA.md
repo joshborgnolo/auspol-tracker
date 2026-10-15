@@ -11,7 +11,11 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     `<!--SCRIPTS-->` markers)
   - `gen-data.mjs` — data pipeline: aggregation estimator lives inline
     (~lines 100–300)
-  - `build.mjs` — builder; rebuild with `node .build/newtracker/build.mjs`
+  - `build.mjs` — builder; rebuild with `node .build/newtracker/build.mjs`.
+    Its `.transpile-cache/` (babel transform cache, gitignored) is pruned at
+    init by age (14d) AND by a 64 MiB byte cap (LRU) — added 2026-10-15 after
+    ~60MB/day churn took it to 307MB in five days; steady state is the cap
+    plus a single build's fresh writes (test-transpile-cache-cap.mjs)
   - `validate.mjs` — validation: `node .build/newtracker/validate.mjs`
     (errors are repeated after the documented-exceptions block — CI keeps
     log tails, where ~270 exception lines had pushed ERRORS out of view)
@@ -133,7 +137,13 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
     updates the clone, run.sh (tracked as `.build/launchd/run.sh`), the
     shims and the plists; `--check` reports drift. run.sh runs the Node
     major `.nvmrc` pins, as CI does (Homebrew's keg-only `node@<major>`;
-    `--check` flags it when that isn't installed).
+    `--check` flags it when that isn't installed). The ONE exception is
+    `worktree-sweep` (`.build/worktree-sweep.sh`, Sundays 04:45 via the
+    installer): it deliberately runs in THIS checkout, not the clone — it
+    removes abandoned worktrees (clean + fully merged into origin/main +
+    idle ≥2d + not detached) and merged `worktree-*` branch husks, 1.16GB
+    of which had accumulated in five days of Oct 2026 before anyone swept
+    (dry-run default, `--apply` to act; test-worktree-sweep.mjs).
 - `.build/extract-pollbludger.mjs` + `pollbludger-updater.sh` +
   `pollbludger-fallback.yml` — the LAST-RESORT poll agent. Reads
   BludgerTrack's poll-data feed (pollbludger.net …/xml/current.xml) four

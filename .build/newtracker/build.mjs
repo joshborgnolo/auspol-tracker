@@ -135,8 +135,18 @@ const BABEL_OUT = { compact: false, babelrc: false, configFile: false,
    builds barely any of those modules change. The output is cached under a
    hash of all three inputs; a miss costs exactly what it always did, a hit
    is a read. Initialised lazily on first call so the hash helper below can
-   live under it, and pruned of fortnight-old entries then. The cache dir is
-   gitignored scratch – deleting it just makes the next build recompute. */
+   live under it. Two prunes, both in tcInit:
+     - a fortnight age prune  (a stale line never leaves);
+     - a byte cap             (sessions churn the cache ~60MB/day via unique
+                               source hashes; 307MB accumulated in five days
+                               of October 2026 before anyone pruned it).
+   The cap is enforced at init, before this build writes its fresh entries,
+   so the steady state is CAP + one build's writes — bounded at ~66MB, never
+   the unbounded growth of Oct 2026 (live-verified 2026-10-15: 78MB seeded,
+   one build leaves ≤ CAP + this run's ~2.8MB).
+   The cache dir is gitignored scratch – deleting it just makes the next
+   build recompute. */
+const TC_CAP_BYTES = 64 * 1024 * 1024;
 let tcInit = null;
 const babelCached = (mode, code, name, extra) => {
   if (!tcInit) {
@@ -145,9 +155,24 @@ const babelCached = (mode, code, name, extra) => {
       key: hash8(fs.readFileSync(path.join(HERE, "vendor", "babel-standalone.js"))),
     };
     fs.mkdirSync(tcInit.dir, { recursive: true });
-    for (const old of fs.readdirSync(tcInit.dir)) {
-      if (Date.now() - fs.statSync(path.join(tcInit.dir, old)).mtimeMs > 14 * 864e5)
-        fs.unlinkSync(path.join(tcInit.dir, old));
+    const now = Date.now();
+    let bytes = 0;
+    const entries = [];
+    for (const f of fs.readdirSync(tcInit.dir)) {
+      const p = path.join(tcInit.dir, f);
+      const st = fs.statSync(p);
+      if (now - st.mtimeMs > 14 * 864e5) { fs.unlinkSync(p); continue; }
+      bytes += st.size;
+      entries.push({ p, mtimeMs: st.mtimeMs, size: st.size });
+    }
+    if (bytes > TC_CAP_BYTES) {
+      // oldest-first eviction; a fresh entry never gets evicted by this pass
+      entries.sort((a, b) => a.mtimeMs - b.mtimeMs);
+      for (const e of entries) {
+        if (bytes <= TC_CAP_BYTES) break;
+        fs.unlinkSync(e.p);
+        bytes -= e.size;
+      }
     }
   }
   const opts = JSON.stringify({ ...BABEL_OUT, shouldPrintComment: String(BABEL_OUT.shouldPrintComment), ...extra });
