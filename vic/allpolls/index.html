@@ -3500,12 +3500,11 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .rd-head-compact b { font-weight: 600; color: var(--ink); }
   body.rd .rd-head-compact .fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; }
   body.rd .tabs { margin: 0 -4px 0; }
-  body.rd .tabs-set { gap: 0; width: 100%; }
-  body.rd .tabs-list { flex: 1 1 auto; justify-content: space-between; }
+  body.rd .tabs-set { gap: 0; width: 100%; justify-content: space-between; }
+  body.rd .tabs-list { display: contents; }
   body.rd .tab { padding: 11px 6px 12px; }
   body.rd .tab-label, body.rd.editorial .tab-label { font-size: 15px; line-height: 19px; }
-  body.rd .tabs.pinned .tabs-set, body.rd .tabs.pinned .tabs-list { width: auto; }
-  body.rd .tabs.pinned .tabs-list { flex: none; justify-content: flex-start; }
+  body.rd .tabs.pinned .tabs-set { width: auto; justify-content: flex-start; }
   body.rd .ts-num { font-size: 15px; }
   body.rd .tab-score { gap: 6px; }
 }

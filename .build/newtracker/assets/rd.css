@@ -559,17 +559,19 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .rd-head-compact b { font-weight: 600; color: var(--ink); }
   body.rd .rd-head-compact .fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; }
   body.rd .tabs { margin: 0 -4px 0; }
-  body.rd .tabs-set { gap: 0; width: 100%; }
-  /* the list spreads over what the ☰ leaves it */
-  body.rd .tabs-list { flex: 1 1 auto; justify-content: space-between; }
+  /* the set spaces all five items even - the list unboxes so the ☰ shares
+     the row's spread with the tabs, as the satellites' flat sh-tabs-set
+     row has it (a boxed list spread its own four and left the ☰ glued to
+     Info, gap 0 beside the tabs' 26px) */
+  body.rd .tabs-set { gap: 0; width: 100%; justify-content: space-between; }
+  body.rd .tabs-list { display: contents; }
   body.rd .tab { padding: 11px 6px 12px; }
   body.rd .tab-label, body.rd.editorial .tab-label { font-size: 15px; line-height: 19px; }
   /* Pinned, the tabs close up at the left, so the 2PP score can dock at the
      right. Spread across the whole row, they sat under it: the score covered
      "All polls" and pushed Info off the bar. The switch rides the pin, when
      the bar is already moving; the bar's height never changes. */
-  body.rd .tabs.pinned .tabs-set, body.rd .tabs.pinned .tabs-list { width: auto; }
-  body.rd .tabs.pinned .tabs-list { flex: none; justify-content: flex-start; }
+  body.rd .tabs.pinned .tabs-set { width: auto; justify-content: flex-start; }
   body.rd .ts-num { font-size: 15px; }
   body.rd .tab-score { gap: 6px; }
 }

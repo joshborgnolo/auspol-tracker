@@ -272,12 +272,17 @@ ok(/^Latest poll .+?, (today|yesterday|\d+ (days|weeks|months) ago), \d+ polls$/
    `compact names the newest poll as the main page's does (${satPhone.compactText})`);
 await sat.setViewport({ width: 1280, height: 900 });
 
-const satTabs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set .sh-tab")].map((t) => t.innerText.trim()));
+/* the ☰ menu button (2026-10-15) shares the tab classes but is no tab:
+   the label/href parity checks read only the LINK tabs */
+const satMenuBtn = await sat.evaluate(() => document.querySelectorAll(".sh-tabs-set .sh-menu-btn").length);
+const mainMenuBtn = await page.evaluate(() => document.querySelectorAll(".tabs-set .tab-menu").length);
+ok(satMenuBtn === 1 && mainMenuBtn === 1, "both bars carry exactly one ☰ menu button");
+const satTabs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set a.sh-tab")].map((t) => t.innerText.trim()));
 ok(satTabs.length === 4 && !/archives/i.test(satTabs.join("|")), "satellite tab bar: " + satTabs.join(" | "));
 /* the tab bar is LIFTED from the main page's TABS (site-shell.mjs mainTabs):
    a rename on the main page (Snapshot → Now, 2026-10-03) must land here
    verbatim with one apply, and this check is what fails if it didn't */
-const mainTabs = await page.evaluate(() => [...document.querySelectorAll(".tabs-set .tab")].map((t) => t.innerText.trim()));
+const mainTabs = await page.evaluate(() => [...document.querySelectorAll(".tabs-set a.tab")].map((t) => t.innerText.trim()));
 ok(JSON.stringify(satTabs) === JSON.stringify(mainTabs),
    `tab labels match the main page's (main ${mainTabs.join(" | ")}, sat ${satTabs.join(" | ")})`);
 /* …and the tabs must NAVIGATE: the fillCopy rebuild derives each href from
@@ -287,11 +292,17 @@ ok(JSON.stringify(satTabs) === JSON.stringify(mainTabs),
    (2026-10-11; mainTabs/fillCopy derive them the same way). The scrape runs
    after the page's own fetch, so this is the REBUILT set, not the bake */
 const chrome = mainChrome();
-const satTabHrefs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set .sh-tab")].map((t) => t.getAttribute("href")));
-const expectHrefs = chrome.tabs.map((t) => (t.id === "now" ? "/" : "/" + t.id + "/"));
+const satTabHrefs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set a.sh-tab")].map((t) => t.getAttribute("href")));
+/* the bar shows the non-menu tabs; the ☰ menu holds the rest (its own
+   hrefs checked just below) */
+const expectHrefs = chrome.tabs.filter((t) => !t.menu).map((t) => (t.id === "now" ? "/" : "/" + t.id + "/"));
 ok(!satTabHrefs.some((h) => h === null || /undefined|^#|^$/.test(h)), "no satellite tab href is undefined/empty");
 ok(JSON.stringify(satTabHrefs) === JSON.stringify(expectHrefs),
    `satellite tabs navigate to the main page's views (${satTabHrefs.join(" ")})`);
+const satMenuHrefs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs a.sh-menu-item")].map((t) => t.getAttribute("href")));
+const expectMenu = chrome.tabs.filter((t) => t.menu).map((t) => "/" + t.id + "/");
+ok(expectMenu.every((h) => satMenuHrefs.includes(h)),
+   `the ☰ menu links the menu pages (${expectMenu.join(" ")} in ${satMenuHrefs.join(" ")})`);
 const tabType = await sat.evaluate(() => ({
   fam: getComputedStyle(document.querySelector(".sh-tabs .sh-tab")).fontFamily.slice(0, 40),
   size: getComputedStyle(document.querySelector(".sh-tabs .sh-tab")).fontSize }));
