@@ -1725,6 +1725,27 @@ function rdList(arr) {
   if (arr.length === 1) return arr[0];
   return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
 }
+/* The trend line over a set of small multiples. Each series that moved (its
+   within-pollster slope clears the Holm-gated test) is named with its
+   direction and, where the rounded figures agree with that direction, its
+   first monthly average against the current reading. The rest are said to
+   show "no clear change" - never "held", which a failed test can't claim.
+   items: [{ first, later, b, from, to }] in display order; `first` names the
+   series in full, `later` once the cohort is named. */
+function rdTrendLine(items, sinceM, none, rest) {
+  if (!items.length) return none + " since " + sinceM + ".";
+  const said = items.map((it, i) => {
+    const up = it.b > 0, f = Math.round(it.from), t = Math.round(it.to);
+    const fig = it.from != null && it.to != null && (up ? t > f : t < f) ? " from " + f + "% to " + t + "%" : "";
+    return (i ? it.later : it.first) + " has " + (up ? "risen" : "fallen") + fig;
+  });
+  return "Since " + sinceM + ", " + (said.length === 2 ? said.join(", and ") : rdList(said)) + "." + (rest ? " " + rest : "");
+}
+/* how many polls a month's average rests on, as words */
+function rdPollsPerMonth(lo, hi) {
+  return "Each month’s average rests on " + (lo === hi ? rdNumWord(lo) : rdNumWord(lo) + " to " + rdNumWord(hi))
+    + (hi === 1 ? " poll" : " polls") + ", so a move that stays inside the shading can’t be told from noise.";
+}
 
 /* ======================================================================
    Who votes for whom
@@ -3330,14 +3351,16 @@ function RdSwitching({ rangeId }) {
   const firstYm = cols[0].sr.rate.monthly[0].ym;
   const sinceM = D.monthNameFull(Number(firstYm.slice(5)));
   /* the rates that moved, tested within each pollster, the rest said to hold */
-  const subHead = !sig.length ? "The rates have held since " + sinceM
-    : sig.length === cols.length ? "Every party’s rate has " + (sig.every((f) => f.fit.b > 0) ? "risen" : sig.every((f) => f.fit.b < 0) ? "fallen" : "moved") + " since " + sinceM
-    : "The rates have held since " + sinceM + ", except for " + rdList(sig.map((f) => NAME[f.c.id])) + " voters, whose "
-      + (sig.length > 1 ? "rates have" : "rate has") + " " + (sig.every((f) => f.fit.b < 0) ? "fallen" : sig.every((f) => f.fit.b > 0) ? "risen" : "moved");
+  const VOTERS = { lnp: "Coalition voters", alp: "Labor voters", grn: "Greens voters", oth: "minor-party and independent voters" };
+  const subHead = rdTrendLine(cols.filter((c) => sig.some((f) => f.c === c)).map((c) => ({
+    first: "the share of 2025 " + VOTERS[c.id] + " backing One Nation", later: "the share of " + VOTERS[c.id],
+    b: sig.find((f) => f.c === c).fit.b, from: c.sr.rate.monthly[0].v, to: c.rate })),
+    sinceM, "No party’s rate has clearly changed",
+    sig.length < cols.length ? "Among " + rdList(cols.filter((c) => !sig.some((f) => f.c === c)).map((c) => c.id === "oth" ? "minor-party" : VOTERS[c.id].replace(/ voters$/, ""))) + " voters, there’s no clear change." : "");
   const ks = cols.flatMap((c) => c.sr.rate.monthly.map((m) => m.k)).filter((k) => k != null);
   const kLo = Math.min(...ks), kHi = Math.max(...ks);
-  const subDek = "Share of each party’s 2025 voters now backing One Nation: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. "
-    + "A month rests on " + (kLo === kHi ? rdNumWord(kLo) : rdNumWord(kLo) + " to " + rdNumWord(kHi)) + " polls, so a move that stays inside the band is noise.";
+  const subDek = "Each chart tracks the share of one party’s 2025 voters now backing One Nation. Each dot is one poll; each line is a monthly average, with its 95% interval shaded. "
+    + rdPollsPerMonth(kLo, kHi);
   const monthsIn = D.MONTHS.filter((ym) => D.mx(ym) >= x0 && D.mx(ym) <= x1 + 0.01);
   const smTicks = monthsIn.length ? [monthsIn[0], monthsIn[Math.floor((monthsIn.length - 1) / 2)], monthsIn[monthsIn.length - 1]]
     .filter((v, i, a) => a.indexOf(v) === i).map((ym) => ({ x: D.mx(ym), label: D.monthName(Number(ym.slice(5))) })) : [];
@@ -3417,15 +3440,22 @@ function RdSwitching({ rangeId }) {
   const goSinceM = goRows.length && goRows[0].monthly.length ? D.monthNameFull(Number(goRows[0].monthly[0].ym.slice(5))) : "";
   /* the shares that moved, tested within each pollster, the rest said to
      hold - the same construction as the gain rates' own head */
-  const goSubHead = !goSig.length ? "The shares have held since " + goSinceM
-    : goSig.length === goRows.length ? "Every share has " + (goSig.every((f) => f.fit.b > 0) ? "risen" : goSig.every((f) => f.fit.b < 0) ? "fallen" : "moved") + " since " + goSinceM
-    : "The shares have held since " + goSinceM + ", except for " + rdList(goSig.map((f) => f.r.sd)) + ", which "
-      + (goSig.length > 1 ? "have" : "has") + " " + (goSig.every((f) => f.fit.b < 0) ? "fallen" : goSig.every((f) => f.fit.b > 0) ? "risen" : "moved");
+  const goWhere = (r) => r.id === "kept" ? "staying with " + GO_OWN[V] : "moving to " + r.noun;
+  const goSigOf = (r) => goSig.find((f) => f.r === r);
+  const goSubHead = rdTrendLine(goRows.filter(goSigOf).map((r) => ({
+    first: "the share of " + GO_COHORT_W[V] + " " + goWhere(r), later: "the share " + goWhere(r),
+    b: goSigOf(r).fit.b, from: r.monthly.length ? r.monthly[0].v : null, to: r.now.v })),
+    goSinceM, "No share has clearly changed",
+    goSig.length && goSig.length < goRows.length ? "No other share has clearly changed." : "");
   const goKs = goRows.flatMap((r) => r.monthly.map((m) => m.k)).filter((k) => k != null);
   const gkLo = goKs.length ? Math.min(...goKs) : 0, gkHi = goKs.length ? Math.max(...goKs) : 0;
-  const goSubDek = "Where " + GO_COHORT_W[V] + " have landed: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. "
-    + (gkLo ? "A month rests on " + (gkLo === gkHi ? rdNumWord(gkLo) : rdNumWord(gkLo) + " to " + rdNumWord(gkHi)) + " polls, so a move that stays inside the band is noise. " : "")
-    + "Each chart sets its own scale: the kept share dwarfs every destination.";
+  /* the scales differ because the kept share is so much bigger - said only
+     while it is at least twice the largest destination */
+  const goScale = goKept && gd1 && goKept.now.v >= 2 * gd1.now.v
+    ? "Each chart has its own scale, because far more stay with " + GO_OWN[V] + " than go anywhere else."
+    : "Each chart has its own scale.";
+  const goSubDek = "Each dot is one poll; each line is a monthly average, with its 95% interval shaded. "
+    + (gkLo ? rdPollsPerMonth(gkLo, gkHi) + " " : "") + goScale;
   /* the destinations drawn the came-from view's way: on a laptop the five
      are full-height columns sized by their share of the cohort, wearing the
      mosaic's garment (name/size lines above, the figure and its 95% rows
