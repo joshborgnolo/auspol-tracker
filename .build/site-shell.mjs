@@ -735,6 +735,13 @@ body { height: auto; }
   .sh-tabs.pinned .sh-tab-pinhide { display: none; }
   .sh-tabs.pinned .sh-menu-info { display: flex; }
 }
+/* ...and the docked score's party letters yield from 380px down too (the
+   main page's ≤380 .ts-abbr rung, template.html): without it the ☰ sat
+   under the score's left end – ~1px at 340px wide, 21px at 320px – and
+   its taps followed the score link instead of opening the menu */
+@media (max-width: 380px) {
+  .sh-tabs.pinned .sh-abbr { display: none; }
+}
 /* the ☰ and its menu (the main page's .tab-menu / .tab-menu-pop) */
 .sh-menu-btn { all: unset; position: relative; box-sizing: border-box; cursor: pointer; align-self: stretch; display: inline-flex; align-items: center;
   padding: 12px 2px 13px; color: var(--ink-2); transition: color .15s ease; }

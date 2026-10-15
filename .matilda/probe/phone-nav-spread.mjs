@@ -90,6 +90,29 @@ for (const W of [390, 320]) {
      `main v shell ${W}: the row runs the same edges (${rest.first}…${rest.last})`);
   await sat.click(".sh-menu-btn"); await wait(250);
   const satMenu = await sat.evaluate(menuGeom, ".sh-menu");
+  /* docked score on the satellite: the main page's same contract – the
+     tabs close up left and NOTHING slides under the score. Asserts the
+     2026-10-15 repair: at ≤380 the shell's score kept its party letters
+     and painted over the ☰ (1px at 340px wide, 21px at 320px), so the
+     pinned ☰'s taps opened the score's link to "/" instead of the menu */
+  await sat.evaluate(() => document.querySelector(".sh-menu-btn").click()); await wait(200);
+  await sat.evaluate(() => window.scrollTo(0, 1600)); await wait(900);
+  const satScore = await sat.evaluate(gapsOf, ".sh-tabs-set .sh-tab");
+  const satScoreL = await sat.evaluate(() => {
+    const s = document.querySelector(".sh-score");
+    return s && getComputedStyle(s).opacity === "1" ? s.getBoundingClientRect().left : null;
+  });
+  console.log(`shell ${W} score`, JSON.stringify(satScore), "scoreL", satScoreL);
+  ok(satScoreL !== null, `shell ${W}: the 2PP score docks`);
+  ok(satScore.gaps.length >= 3 && satScore.gaps.every((x) => Math.abs(x) < 0.11),
+     `shell ${W}: docked bar closes the tabs up left (gaps ${satScore.gaps.join("/")})`);
+  ok(satScoreL !== null && satScore.last <= satScoreL + 1,
+     `shell ${W}: the ☰ stays clear of the docked score (last ends ${satScore.last}, score at ${satScoreL})`);
+  await sat.click(".sh-menu-btn"); await wait(250);
+  const satPinned = await sat.evaluate(() => ({
+    open: !document.getElementById("sh-menu").hidden, path: location.pathname }));
+  ok(satPinned.open && satPinned.path === "/preference-flows/",
+     `shell ${W}: the pinned ☰ opens the menu (no stray navigation to "${satPinned.path}")`);
   await sat.close();
   console.log(`menu ${W}`, JSON.stringify({ main: mainMenu, sat: satMenu }));
   ok(mainMenu && satMenu, `menu ${W}: both dropdowns open`);
