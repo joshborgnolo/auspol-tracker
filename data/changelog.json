@@ -35,6 +35,7 @@
       "2025-07-17|Newspoll",
       "2025-07-18|Resolve",
       "2025-07-27|Roy Morgan",
+      "2025-07-29|YouGov (MRP)",
       "2025-07-30|Wolf & Smith",
       "2025-08-14|Newspoll",
       "2025-08-16|Resolve",
@@ -334,7 +335,7 @@
     },
     "leaders": {
       "alb_fav": -20.7,
-      "alb_net": -21.6,
+      "alb_net": -21.7,
       "hanson_fav": -5.6,
       "hanson_net": -2.6,
       "taylor_fav": -4.7,
@@ -426,6 +427,13 @@
       "label": "13 Oct 2026",
       "kind": "meta",
       "text": "The headline pairing is now Labor v the Coalition (it was Labor v One Nation); the estimate reads 52.3 (implied flows)."
+    },
+    {
+      "date": "2026-10-15",
+      "label": "15 Oct 2026",
+      "kind": "poll",
+      "text": "YouGov (MRP) (fieldwork 10–29 Jul, n=5,007) added — the two-party preferred estimate held at 52.3 (Labor v the Coalition, implied flows). Primary votes held. Leader ratings: Albanese's net approval −21.6 → −21.7. House effect (Labor v the Coalition, implied flows; positive leans Labor): YouGov (MRP) held at −0.2.",
+      "url": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf"
     }
   ]
 }

@@ -4851,8 +4851,7 @@ body.rd .rd-ap-th:hover { color: var(--ink); }
 body.rd .rd-ap-th:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body.rd .rd-ap-arr { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 body.rd .rd-ap-th.on .rd-ap-arr { color: var(--ink); }
-body.rd .rd-ap-hfp { line-height: 16px; white-space: nowrap; }
-body.rd .rd-ap-hfsep { font-size: 10px; line-height: 16px; color: var(--ink-faint); }
+body.rd .rd-ap-hfp { display: flex; flex-direction: column; align-items: flex-start; line-height: 16px; white-space: nowrap; }
 body.rd .rd-ap-hpic { position: relative; align-self: stretch; display: block; min-height: 38px; }
 body.rd .rd-ap-scale { position: absolute; inset: 0; }
 body.rd .rd-ap-in { position: absolute; top: 0; bottom: 0; left: 14px; right: 14px; }
@@ -4937,7 +4936,7 @@ body.rd .rd-ap-clip.l { left: -7px; border-right: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-clip.r { right: -7px; border-left: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-dot {
   top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
+  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), top .32s var(--morph-ease), background-color .32s ease;
 }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip, body.rd .rd-ap-he { transition: none; }
@@ -4979,6 +4978,10 @@ body.rd .rd-ap-ibar { display: flex; height: 6px; width: 100%; border-radius: 3p
 body.rd .rd-ap-ibar > i { display: block; height: 100%; flex: none; }
 body.rd .rd-ap-dgap { gap: 2px; }
 body.rd .rd-ap-dgap .rd-ap-pnums > b { font-variant-numeric: tabular-nums; }
+body.rd .rd-ap-conscyc { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; min-height: 28px; font-size: 12px; line-height: 1.35; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-ap-conscyc span { color: var(--ink-3); }
+body.rd .rd-ap-conscyc:hover { text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
+body.rd .rd-ap-conscyc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 body.rd .rd-ap-dpick { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-tabs > .rd-ap-dpick { margin-bottom: -1px; }
 body.rd .rd-ap-dpick > [role="radiogroup"] { display: inline-flex; align-items: center; gap: 2px; }
@@ -5186,6 +5189,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 1px; }
   body.rd .rd-ap-cnets { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
+  body.rd .rd-ap-ctier { margin-top: 2px; }
+  body.rd .rd-ap-ctier .rd-ap-conscyc { font-size: 13px; }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -23269,8 +23274,8 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       let to = null;
       const lead = /^(?:Conducted on (.*?) )?[Ff]rom $/.exec(from);
       if (lead) to = house + " (" + (lead[1] ? "fieldwork " + lead[1] + ", " : "");else if (from === "Conducted on dates ") to = house + " (fieldwork dates ";else if (from === " from " && head.querySelector(".rd-tbc")) to = ", ";else if (from === "a sample of ") to = "n = ";else if (from === "an unpublished sample") to = "sample not published";else {
-        const by = /^, published by (.*) on (.*)$/.exec(from) || /^, published by (.*)()$/.exec(from);
-        if (by) to = ", " + (by[1] === house ? "self-published" : "published by " + by[1]) + (by[2] ? ", " + by[2] : "") + ")";
+        const by = /^, (published|commissioned) by (.*) on (.*)$/.exec(from) || /^, (published|commissioned) by (.*)()$/.exec(from);
+        if (by) to = ", " + (by[1] === "published" && by[2] === house ? "self-published" : by[1] + " by " + by[2]) + (by[3] ? ", " + by[3] : "") + ")";
       }
       if (to != null && to !== from) edits.push([n, from, to]);
     }
@@ -36040,7 +36045,7 @@ function AllPollsView({
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
-    key: "date",
+    key: "pub",
     dir: -1
   });
   const [facet, setFacet] = useState(urlInit.facet);
@@ -36133,7 +36138,7 @@ function AllPollsView({
   const onFacet = f => {
     setFacet(f);
     setSort({
-      key: "date",
+      key: "pub",
       dir: -1
     });
     setPop(null);
@@ -54464,13 +54469,21 @@ const RD_AP_BARE_CLIENTS = {
   Amplify: 1
 };
 const rdApThe = name => /^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? name : "the " + name;
+const RD_AP_COMMISSIONED = {
+  "Blueprint Institute": 1,
+  "Climate Council": 1,
+  "Australia Inst.": 1,
+  Amplify: 1
+};
 function rdPollHead(p) {
   const tbc = rdEffTbc(p);
   const n = p.sample != null ? React.createElement(React.Fragment, null, "a sample of ", React.createElement("span", {
     className: "rd-nocaps"
   }, p.sample.toLocaleString(), p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? React.createElement(React.Fragment, null, " (", rdEffTbcNote(p), ")") : "")) : "an unpublished sample";
   const out = rdApOut(p.published);
-  const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
+  const selfBy = p.conf || !(p.client && !/^self/i.test(p.client));
+  const commissioned = !selfBy && RD_AP_COMMISSIONED[p.client];
+  const by = (commissioned ? "commissioned by " : "published by ") + (selfBy ? p.pollster : rdApThe(p.client));
   const field = p.field || p.dateLabel;
   if (p.fieldPending) return React.createElement(React.Fragment, null, "Conducted on dates ", rdFieldTbc(p), " from ", n, ", " + by + (out ? " on " + out : ""));
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));
@@ -54495,6 +54508,11 @@ const RD_AP_PRIM_META = {
     lab: "ON",
     ink: "var(--onp-text)",
     dot: "var(--onp)"
+  },
+  ind: {
+    lab: "IND",
+    ink: "var(--ink-2)",
+    dot: "var(--oth)"
   },
   oth: {
     lab: "OTH",
@@ -57075,7 +57093,7 @@ function rdLgLines(p, {
     });
   }
   if (p.cons) {
-    const ORDER = ["alp", "lnp", "grn", "onp", "oth", "none"];
+    const ORDER = ["alp", "lnp", "grn", "onp", "ind", "oth", "none"];
     const ks = ORDER.filter(k => p.cons[k] != null);
     out.push({
       id: "cons",
@@ -57084,8 +57102,32 @@ function rdLgLines(p, {
         key: k
       }, k === "none" ? React.createElement(React.Fragment, null, "none ", React.createElement("b", null, rdApNum(p.cons[k]))) : pty(k, rdApNum(p.cons[k])))), React.createElement(U, {
         soft: true
-      }, "parties the voter would consider, not votes"))
+      }, p.consBasis ? p.consBasis + ", not votes" : "parties the voter would consider, not votes"))
     });
+    if (p.consLoose) {
+      const ks2 = ORDER.filter(k => p.consLoose[k] != null);
+      out.push({
+        id: "consloose",
+        lab: "Consider (4+ of 10)",
+        body: React.createElement(React.Fragment, null, ks2.map(k => React.createElement(U, {
+          key: k
+        }, pty(k, rdApNum(p.consLoose[k])))), React.createElement(U, {
+          soft: true
+        }, "rated 4 or more of 10, rebased over everyone"))
+      });
+    }
+    if (p.consNever) {
+      const ks3 = ORDER.filter(k => p.consNever[k] != null);
+      out.push({
+        id: "consnever",
+        lab: "Would never vote (0 of 10)",
+        body: React.createElement(React.Fragment, null, ks3.map(k => React.createElement(U, {
+          key: k
+        }, pty(k, rdApNum(p.consNever[k])))), React.createElement(U, {
+          soft: true
+        }, "rated 0 of 10, rebased over everyone"))
+      });
+    }
   }
   return out;
 }
@@ -57739,6 +57781,47 @@ function RdApSheet({
     onClick: onClose
   }, "Show ", count, " ", count === 1 ? noun1 : noun)));
 }
+function RdApConsCyc({
+  tiers,
+  phone,
+  primNums,
+  primStrip,
+  primCardNums
+}) {
+  const [ti, setTi] = useState(0);
+  const many = tiers.length > 1;
+  const t = tiers[Math.min(ti, tiers.length - 1)];
+  const next = tiers[(ti + 1) % tiers.length];
+  const basis = many ? React.createElement("button", {
+    type: "button",
+    className: "rd-ap-conscyc",
+    title: "Switch to " + next.lab,
+    "aria-label": "Consideration range: " + t.lab + ". Switch to " + next.lab,
+    onClick: e => {
+      e.stopPropagation();
+      setTi((ti + 1) % tiers.length);
+    }
+  }, t.lab, " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")) : phone ? React.createElement("span", {
+    className: "rd-ap-csub"
+  }, t.lab) : React.createElement("span", {
+    className: "rd-ap-sub"
+  }, t.lab);
+  const ariaPre = "Voting consideration" + (many ? ", " + t.lab : "") + ": ";
+  const live = many ? {
+    "aria-live": "polite"
+  } : null;
+  if (phone) return React.createElement(React.Fragment, null, React.createElement("div", _extends({
+    className: "rd-ap-ctier"
+  }, live), primCardNums(t.m), basis), React.createElement("div", {
+    className: "rd-ap-cpic"
+  }, primStrip(t.m, ariaPre)));
+  return React.createElement(React.Fragment, null, React.createElement("span", _extends({
+    role: "cell",
+    className: "rd-ap-fig"
+  }, live), primNums(t.m), basis), primStrip(t.m, ariaPre));
+}
 function RdAllPolls(P) {
   const {
     rows,
@@ -58135,10 +58218,26 @@ function RdAllPolls(P) {
   const ldx = v => (v - LD.lo) / (LD.hi - LD.lo) * 100;
   const ldTicks = [];
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
-  const PMAX = facet === "primary" && consM ? 60 : 45;
-  const PTKS = [0, 10, 20, 30, 40].concat(PMAX === 60 ? [50] : []);
+  const PMAX = facet === "primary" && consM ? 70 : 45;
+  const PTKS = [];
+  for (let v = 0; v < PMAX; v += 10) PTKS.push(v);
   const PLAST = PTKS[PTKS.length - 1];
   const pdx = v => Math.max(0, Math.min(PMAX, v)) / PMAX * 100;
+  const rdApDodge = xs => {
+    const R = 3.2;
+    const tops = new Array(xs.length).fill(0);
+    const ord = xs.map((_, i) => i).sort((a, b) => xs[a] - xs[b]);
+    for (let i = 0; i < ord.length;) {
+      let j = i;
+      while (j + 1 < ord.length && xs[ord[j + 1]] - xs[ord[j]] < R) j++;
+      if (j > i) {
+        const k = j - i + 1;
+        for (let n = 0; n < k; n++) tops[ord[i + n]] = (n - (k - 1) / 2) * (12 / (k - 1));
+      }
+      i = j + 1;
+    }
+    return tops;
+  };
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
@@ -58266,13 +58365,10 @@ function RdAllPolls(P) {
     className: "rd-ap-hc1"
   }, th("Pollster", "pollster")), React.createElement("span", {
     className: "rd-ap-hfp"
-  }, th("Fieldwork", "date", {
-    title: "Sort by fieldwork, newest first"
-  }), React.createElement("span", {
-    className: "rd-ap-hfsep",
-    "aria-hidden": "true"
-  }, "/"), th("Pub", "pub", {
+  }, th("Published", "pub", {
     title: "Sort by the day the poll came out, newest first"
+  }), th("Fieldwork", "date", {
+    title: "Sort by fieldwork, newest first"
   })), th("Sample", "sample", {
     right: true
   }), React.createElement("span", null), facet === "twopp" && React.createElement(React.Fragment, null, th("Labor v " + (onM ? "One Nation" : "Coalition"), "alp", {
@@ -58536,36 +58632,52 @@ function RdAllPolls(P) {
       }, rdApSigned(hl))));
     } else if (facet === "primary") {
       const pr = consM && p.cons || p.p || {};
-      figs = React.createElement("span", {
-        role: "cell",
+      const tiers = !(consM && p.cons) ? null : [{
+        m: p.cons,
+        lab: p.consBasis || "consider"
+      }].concat(p.consLoose ? [{
+        m: p.consLoose,
+        lab: "consider (4+ of 10)"
+      }] : []).concat(p.consNever ? [{
+        m: p.consNever,
+        lab: "would never vote (0 of 10)"
+      }] : []);
+      const primNums = m => React.createElement("span", {
         className: "rd-ap-pnums"
       }, prims.map(k => React.createElement("b", {
         key: k.id,
         style: {
           color: k.ink
         }
-      }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")));
-      pic = React.createElement("span", {
-        className: "rd-ap-pic",
-        role: "img",
-        "aria-label": (consM && p.cons ? "Voting consideration: " : "Primary vote: ") + prims.filter(k => pr[k.id] != null).map(k => k.lab + " " + rdApNum(pr[k.id])).join(", ")
-      }, React.createElement("span", {
-        className: "rd-ap-in"
-      }, PTKS.map(v => React.createElement("i", {
-        key: v,
-        className: "rd-ap-gl",
-        style: {
-          left: pdx(v) + "%"
-        }
-      })), prims.filter(k => pr[k.id] != null).map(k => React.createElement("i", {
-        key: k.id,
-        className: "rd-ap-dot",
-        style: {
-          left: pdx(pr[k.id]) + "%",
-          background: k.dot
-        }
-      }))));
-      body = React.createElement(React.Fragment, null, React.createElement("div", {
+      }, m[k.id] != null ? rdApPrimFig(m[k.id]) : "—")));
+      const primStrip = (m, ariaPre) => {
+        const cols = prims.filter(k => m[k.id] != null),
+          tops = rdApDodge(cols.map(k => pdx(m[k.id])));
+        return React.createElement("span", {
+          className: "rd-ap-pic",
+          role: "img",
+          "aria-label": ariaPre + cols.map(k => k.lab + " " + rdApNum(m[k.id])).join(", ")
+        }, React.createElement("span", {
+          className: "rd-ap-in"
+        }, PTKS.map(v => React.createElement("i", {
+          key: v,
+          className: "rd-ap-gl",
+          style: {
+            left: pdx(v) + "%"
+          }
+        })), cols.map((k, di) => React.createElement("i", {
+          key: k.id,
+          className: "rd-ap-dot",
+          style: {
+            left: pdx(m[k.id]) + "%",
+            background: k.dot,
+            ...(tops[di] ? {
+              top: "calc(50% + " + tops[di] + "px)"
+            } : null)
+          }
+        }))));
+      };
+      const primCardNums = m => React.createElement("div", {
         className: "rd-ap-cprim"
       }, prims.map(k => React.createElement("span", {
         key: k.id
@@ -58573,9 +58685,34 @@ function RdAllPolls(P) {
         style: {
           color: k.ink
         }
-      }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")))), React.createElement("div", {
-        className: "rd-ap-cpic"
-      }, pic));
+      }, m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"))));
+      if (tiers) {
+        const cyc = React.createElement(RdApConsCyc, {
+          tiers: tiers,
+          phone: phone,
+          primNums: primNums,
+          primStrip: primStrip,
+          primCardNums: primCardNums
+        });
+        if (phone) body = cyc;else {
+          figs = cyc;
+          pic = null;
+        }
+      } else {
+        figs = React.createElement("span", {
+          role: "cell",
+          className: "rd-ap-pnums"
+        }, prims.map(k => React.createElement("b", {
+          key: k.id,
+          style: {
+            color: k.ink
+          }
+        }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")));
+        pic = primStrip(pr, "Primary vote: ");
+        body = React.createElement(React.Fragment, null, primCardNums(pr), React.createElement("div", {
+          className: "rd-ap-cpic"
+        }, pic));
+      }
     } else if (facet === "leadership") {
       const sets = window.ppmContests(p);
       const opp = sets.find(s => (s.taylor != null || s.ley != null) && s.hanson == null);
@@ -58638,6 +58775,8 @@ function RdAllPolls(P) {
       }, sub));
       const a = p.appr || {};
       const mb = a.metricBy || {};
+      const ldCols = [["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null);
+      const ldTops = rdApDodge(ldCols.map(([k]) => ldx(a[k])));
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         "aria-hidden": "true"
@@ -58654,12 +58793,15 @@ function RdAllPolls(P) {
         style: {
           left: ldx(0) + "%"
         }
-      }), [["hansonNet", "var(--onp)"], ["taylorNet", "var(--lnp)"], ["albNet", "var(--alp)"]].filter(([k]) => a[k] != null).map(([k, col]) => React.createElement("i", {
+      }), ldCols.map(([k, col], di) => React.createElement("i", {
         key: k,
         className: "rd-ap-dot",
         style: {
           left: ldx(a[k]) + "%",
-          background: col
+          background: col,
+          ...(ldTops[di] ? {
+            top: "calc(50% + " + ldTops[di] + "px)"
+          } : null)
         }
       }))));
       const fav = ["alb", "taylor", "hanson"].some(k => mb[k] === "fav" && a[k + "Net"] != null);
@@ -58838,10 +58980,12 @@ function RdAllPolls(P) {
       }, pr ? gapTxt(pr.gap[k.id]) : "—"))), React.createElement("span", {
         className: "rd-ap-sub"
       }, pr ? pr.lab + ", in points" : "no " + spl.label.toLowerCase() + " breakdown"));
+      const demCols = pr ? prims.filter(k => pr.gap[k.id] != null) : [];
+      const demTops = rdApDodge(demCols.map(k => gx(pr.gap[k.id])));
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": pr ? pr.lab + ": " + prims.filter(k => pr.gap[k.id] != null).map(k => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"
+        "aria-label": pr ? pr.lab + ": " + demCols.map(k => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"
       }, React.createElement("span", {
         className: "rd-ap-in"
       }, [-30, -20, -10, 10, 20, 30].map(v => React.createElement("i", {
@@ -58855,12 +58999,15 @@ function RdAllPolls(P) {
         style: {
           left: gx(0) + "%"
         }
-      }), pr && prims.filter(k => pr.gap[k.id] != null).map(k => React.createElement("i", {
+      }), demCols.map((k, di) => React.createElement("i", {
         key: k.id,
         className: "rd-ap-dot",
         style: {
           left: gx(pr.gap[k.id]) + "%",
-          background: k.dot
+          background: k.dot,
+          ...(demTops[di] ? {
+            top: "calc(50% + " + demTops[di] + "px)"
+          } : null)
         }
       }))));
       right1 = pr ? React.createElement("span", {
@@ -59422,14 +59569,13 @@ function RdAllPolls(P) {
   }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
-  const consRows = rows.filter(r => r.cons);
   const consFlip = React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": consM,
     title: consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)",
     onClick: consFlipPick
-  }, consM ? "Voting intention" : "Voting consideration", " ", React.createElement("span", {
+  }, consM ? "Voting consideration" : "Voting intention", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
   const consQpop = !consM ? null : React.createElement(RdQPop, {
@@ -59509,9 +59655,7 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, "Vote:"), consFlip, React.createElement("span", {
-    className: "rd-pl-ctl-l"
-  }, consM ? " — consider," : " — intend,", " on " + (consRows.length + " of " + rows.length), " waves"), consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
+  }, "Vote:"), consFlip, consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-ap-ctlslot",
     style: ctlFloor ? {
       minHeight: ctlFloor + "px"
@@ -59792,7 +59936,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Fieldwork/Pub heading sorts the table two ways \u2013 by fieldwork dates (the default) or, on its Pub half, by the day each poll came out, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Published/Fieldwork heading sorts the table two ways \u2013 by the day each poll came out (the default) or, on its Fieldwork half, by fieldwork dates, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
