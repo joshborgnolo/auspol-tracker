@@ -115169,48 +115169,237 @@ function RdSwitching({
   const gkLo = goKs.length ? Math.min(...goKs) : 0,
     gkHi = goKs.length ? Math.max(...goKs) : 0;
   const goSubDek = "Where " + GO_COHORT_W[V] + " have landed: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. " + (gkLo ? "A month rests on " + (gkLo === gkHi ? rdNumWord(gkLo) : rdNumWord(gkLo) + " to " + rdNumWord(gkHi)) + " polls, so a move that stays inside the band is noise. " : "") + "Each chart sets its own scale: the kept share dwarfs every destination.";
+  const gof = v => v.toFixed(1);
+  const GO_GAP = 4,
+    GO_H = 240;
+  const goNmOpts = r => r.id === "kept" ? [r.nm + ", kept", r.nm] : r.id === "onp" ? ["One Nation", "ON"] : r.id === "grn" ? ["The Greens", "Greens", ""] : r.id === "oth" ? ["Minors & independents", "Minors", "Others", ""] : r.id === "cross" && V === "alp" ? ["The Coalition", "Coalition", ""] : r.id === "cross" ? ["Labor", ""] : [r.nm];
+  const goGeo = (() => {
+    const tot = goRows.reduce((s, r) => s + r.now.v, 0) || 100;
+    const usable = W - GO_GAP * (goRows.length - 1);
+    let x = 0;
+    return goRows.map((r, i) => {
+      const cw = r.now.v / tot * usable,
+        g = {
+          r,
+          i,
+          x,
+          cw
+        };
+      x += cw + GO_GAP;
+      return g;
+    });
+  })();
+  const goLabOpts = goGeo.map((g, i) => {
+    const v = g.r.now.v,
+      pc = gof(v) + "%";
+    return {
+      nm: goNmOpts(g.r),
+      sz: i === 0 ? [pc + " of " + GO_COHORT_W[V], goShareWords(v), ""] : [goShareWords(v), ""],
+      pts: [pc],
+      sh: [Math.round(v) + "% ±" + gof(g.r.now.ci95), Math.round(v) + "%", ""]
+    };
+  });
+  const goLab = {};
+  [["nm", 15, 600], ["sz", 12, 400]].forEach(([key, size, wt]) => {
+    const k = goGeo.map(() => 0);
+    const ext = i => {
+      const w = textWidth(goLabOpts[i][key][k[i]], size, wt);
+      const last = i === goGeo.length - 1;
+      const x = last ? goGeo[i].x + goGeo[i].cw : goGeo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let i = 0; i < goGeo.length - 1; i++) {
+      for (let guard = 0; guard < 6 && ext(i)[1] + 10 > ext(i + 1)[0]; guard++) {
+        if (k[i] < goLabOpts[i][key].length - 1) k[i]++;else if (k[i + 1] < goLabOpts[i + 1][key].length - 1) k[i + 1]++;else break;
+      }
+    }
+    goLab[key] = k.map((j, i) => goLabOpts[i][key][j]);
+  });
+  const goFigs = goGeo.map(g => gof(g.r.now.v) + "%");
+  const goPtsTier = (() => {
+    const rights = [];
+    return goGeo.map((g, i) => {
+      const w = textWidth(goFigs[i], 15, 600);
+      const x = i === goGeo.length - 1 ? g.x + g.cw : g.x;
+      const L = i === goGeo.length - 1 ? x - w : x,
+        R = i === goGeo.length - 1 ? x : x + w;
+      let t = 0;
+      while (rights[t] != null && rights[t] + 2 > L) t++;
+      rights[t] = R;
+      return t;
+    });
+  })();
+  const goTierMax = goPtsTier.reduce((m, t) => Math.max(m, t), 0);
+  const goShTier = Array.from({
+    length: goTierMax + 1
+  }, (_, tier) => {
+    const which = goGeo.map((g, i) => goPtsTier[i] === tier ? i : -1).filter(i => i >= 0);
+    const k = goGeo.map(() => 0);
+    const ext = (i, sh) => {
+      const w = textWidth(goLabOpts[i].sh[sh], 12, 400);
+      const last = i === goGeo.length - 1;
+      const x = last ? goGeo[i].x + goGeo[i].cw : goGeo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let a = 0; a < which.length - 1; a++) {
+      const i = which[a],
+        j = which[a + 1];
+      for (let guard = 0; guard < 6 && ext(i, k[i])[1] + 2 > ext(j, k[j])[0]; guard++) {
+        if (k[i] < goLabOpts[i].sh.length - 1) k[i]++;else if (k[j] < goLabOpts[j].sh.length - 1) k[j]++;else break;
+      }
+    }
+    return k;
+  });
+  goLab.sh = goGeo.map((g, i) => goLabOpts[i].sh[goShTier[goPtsTier[i]][i]]);
+  const goSvgH = GO_H + 110 + goTierMax * 46;
+  const goMosaic = React.createElement("svg", {
+    className: "rd-go",
+    width: W,
+    height: goSvgH,
+    viewBox: `0 0 ${W} ${goSvgH}`,
+    role: "img",
+    "aria-label": "Where " + GO_COHORT_W[V] + " landed, each destination a column sized by its share of the cohort: " + goRows.map(r => r.nm + " " + gof(r.now.v) + "%").join(", ") + "."
+  }, goGeo.map((g, i) => {
+    const r = g.r,
+      last = i === goGeo.length - 1;
+    const tx = last ? g.x + g.cw : g.x,
+      anchor = last ? "end" : "start";
+    const fig = goFigs[i];
+    const fz = r.id === "kept" ? 22 : 15;
+    const fit = g.cw >= textWidth(fig, fz, 600) + 20;
+    const tierY = 48 + GO_H + 28 + goPtsTier[i] * 46;
+    return React.createElement("g", {
+      key: r.id
+    }, React.createElement("text", {
+      className: "rd-go-nm",
+      x: tx,
+      y: 16,
+      textAnchor: anchor,
+      style: {
+        fill: inkOf(r.color)
+      }
+    }, goLab.nm[i]), React.createElement("text", {
+      className: "rd-go-sz",
+      x: tx,
+      y: 35,
+      textAnchor: anchor
+    }, goLab.sz[i]), React.createElement("rect", {
+      className: "rd-go-colfill",
+      x: g.x,
+      y: 48,
+      width: g.cw,
+      height: GO_H,
+      style: {
+        fill: r.color
+      }
+    }), fit && (r.id === "kept" ? React.createElement(React.Fragment, null, React.createElement("text", {
+      className: "rd-go-big",
+      x: g.x + 10,
+      y: 48 + 32,
+      textAnchor: "start",
+      style: {
+        fill: r.fill
+      }
+    }, fig), React.createElement("text", {
+      className: "rd-go-sz",
+      x: g.x + 10,
+      y: 48 + 50,
+      textAnchor: "start",
+      style: {
+        fill: r.fill
+      }
+    }, "kept")) : React.createElement("text", {
+      className: "rd-go-rates",
+      x: g.x + 10,
+      y: 48 + 26,
+      textAnchor: "start",
+      style: {
+        fill: r.fill
+      }
+    }, fig)), React.createElement("text", {
+      className: "rd-go-pts",
+      x: tx,
+      y: tierY,
+      textAnchor: anchor
+    }, goFigs[i]), React.createElement("text", {
+      className: "rd-go-sh",
+      x: tx,
+      y: tierY + 19,
+      textAnchor: anchor
+    }, goLab.sh[i]));
+  }), React.createElement("line", {
+    x1: "0",
+    x2: W,
+    y1: 48 + GO_H,
+    y2: 48 + GO_H,
+    className: "rd-go-base"
+  }));
+  const goRowsPhone = React.createElement("div", {
+    className: "rd-go-rows"
+  }, goRows.map((r, i) => React.createElement("div", {
+    key: r.id,
+    className: "rd-go-row"
+  }, React.createElement("div", {
+    className: "rd-go-rtop"
+  }, React.createElement("b", {
+    style: {
+      color: inkOf(r.color)
+    }
+  }, r.nm, r.id === "kept" ? ", kept" : ""), React.createElement("b", null, i <= 1 ? gof(r.now.v) + "% of " + GO_HALF[V] + " voters" : gof(r.now.v) + "%")), React.createElement("div", {
+    className: "rd-go-rsub"
+  }, React.createElement("span", null, goShareWords(r.now.v)), React.createElement("span", null, Math.round(r.now.v), "% \xB1", gof(r.now.ci95))), React.createElement("div", {
+    className: "rd-go-rbar",
+    style: {
+      height: Math.max(16, r.now.v * 2.6),
+      background: r.tint
+    }
+  }, React.createElement("span", {
+    style: {
+      width: r.now.v + "%",
+      background: r.color
+    }
+  }), r.id === "kept" ? React.createElement("em", {
+    className: "rd-go-first",
+    style: {
+      left: "calc(" + r.now.v + "% + 8px)",
+      color: inkOf(r.color)
+    }
+  }, React.createElement("span", {
+    className: "rd-go-big"
+  }, gof(r.now.v), "%"), React.createElement("span", {
+    className: "rd-go-nb"
+  }, "kept")) : React.createElement("em", {
+    style: {
+      left: "calc(" + r.now.v + "% + 8px)",
+      color: inkOf(r.color)
+    }
+  }, gof(r.now.v), "%"), r.id === "kept" && React.createElement("i", {
+    className: "rd-go-else",
+    style: {
+      color: inkOf(r.color)
+    }
+  }, "Went elsewhere")))));
   const goSec = V === "onp" ? null : React.createElement(React.Fragment, null, goHead && React.createElement(RdHed, {
     head: goHead,
     dek: goDek
   }), React.createElement("div", {
-    className: "card rd-card rd-go-wrap"
-  }, React.createElement("div", {
-    className: "rd-go-rows"
-  }, goRows.map(r => {
-    const inBar = r.now.v >= 18;
-    return React.createElement("div", {
-      key: r.id,
-      className: "rd-go-row"
-    }, React.createElement("div", {
-      className: "rd-go-rtop"
-    }, React.createElement("b", {
-      style: {
-        color: inkOf(r.color)
-      }
-    }, r.nm, r.id === "kept" ? ", kept" : ""), React.createElement("b", null, r.now.v.toFixed(1), "%")), React.createElement("div", {
-      className: "rd-go-rsub"
-    }, React.createElement("span", null, goShareWords(r.now.v)), React.createElement("span", null, "95% interval \xB1", r.now.ci95.toFixed(1))), React.createElement("div", {
-      className: "rd-go-rbar",
-      style: {
-        background: r.tint
-      }
-    }, React.createElement("span", {
-      style: {
-        width: r.now.v + "%",
-        background: r.color
-      }
-    }), React.createElement("em", {
-      style: inBar ? {
-        left: 12,
-        color: r.fill
-      } : {
-        left: "calc(" + r.now.v + "% + 8px)",
-        color: "var(--ink)"
-      }
-    }, r.now.v.toFixed(1), "%")));
-  })), React.createElement("p", {
+    className: "card rd-card rd-go-wrap",
+    ref: boxRef
+  }, narrow ? goRowsPhone : goMosaic, React.createElement("p", {
     className: "rd-note rd-go-note"
-  }, "Shares of all ", GO_COHORT_W[V], "; the five destinations sum to the cohort.")), React.createElement(RdSub, {
+  }, "Shares of all ", GO_COHORT_W[V], "; the five destinations sum to the cohort."), React.createElement("div", {
+    className: "rd-key rd-go-key"
+  }, goRows.map(r => React.createElement("span", {
+    key: r.id,
+    className: "rd-key-item"
+  }, React.createElement(RdSwatch, {
+    kind: "square",
+    color: r.color
+  }), r.nm, r.id === "kept" ? ", kept" : "")), !narrow && React.createElement("span", {
+    className: "rd-key-item rd-go-howread"
+  }, "Column width: share of ", GO_COHORT_W[V], ", the five columns summing to the cohort")), narrow && React.createElement("p", {
+    className: "rd-note"
+  }, "Bar height: that destination\u2019s share of ", GO_COHORT_W[V], ". Fill: its exact share, written beside the fill.")), React.createElement(RdSub, {
     head: goSubHead,
     dek: goSubDek
   }), React.createElement("div", {

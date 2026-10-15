@@ -3426,26 +3426,172 @@ function RdSwitching({ rangeId }) {
   const goSubDek = "Where " + GO_COHORT_W[V] + " have landed: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. "
     + (gkLo ? "A month rests on " + (gkLo === gkHi ? rdNumWord(gkLo) : rdNumWord(gkLo) + " to " + rdNumWord(gkHi)) + " polls, so a move that stays inside the band is noise. " : "")
     + "Each chart sets its own scale: the kept share dwarfs every destination.";
+  /* the destinations drawn the came-from view's way: on a laptop the five
+     are full-height columns sized by their share of the cohort, wearing the
+     mosaic's garment (name/size lines above, the figure and its 95% rows
+     beneath, the kept column's figure bigger like One Nation's kept one);
+     on a phone they are the mosaic's variable-height rows */
+  const gof = (v) => v.toFixed(1);
+  const GO_GAP = 4, GO_H = 240;
+  const goNmOpts = (r) => r.id === "kept" ? [r.nm + ", kept", r.nm]
+    : r.id === "onp" ? ["One Nation", "ON"]
+    : r.id === "grn" ? ["The Greens", "Greens", ""]
+    : r.id === "oth" ? ["Minors & independents", "Minors", "Others", ""]
+    : r.id === "cross" && V === "alp" ? ["The Coalition", "Coalition", ""]
+    : r.id === "cross" ? ["Labor", ""]
+    : [r.nm];
+  const goGeo = (() => {
+    const tot = goRows.reduce((s, r) => s + r.now.v, 0) || 100;
+    const usable = W - GO_GAP * (goRows.length - 1);
+    let x = 0;
+    return goRows.map((r, i) => { const cw = (r.now.v / tot) * usable, g = { r, i, x, cw }; x += cw + GO_GAP; return g; });
+  })();
+  /* the same neighbour-clearing label ladder the came-from mosaic runs:
+     every column takes the longest wording that clears its neighbour */
+  const goLabOpts = goGeo.map((g, i) => {
+    const v = g.r.now.v, pc = gof(v) + "%";
+    return {
+      nm: goNmOpts(g.r),
+      sz: i === 0 ? [pc + " of " + GO_COHORT_W[V], goShareWords(v), ""] : [goShareWords(v), ""],
+      /* the figure row never blanks: like the mosaic's own pts row, every
+         column keeps its number (a tiny column's text sits in its lane and
+         leans on its neighbours', as the came-from mosaic's do) */
+      pts: [pc],
+      sh: [Math.round(v) + "% ±" + gof(g.r.now.ci95), Math.round(v) + "%", ""],
+    };
+  });
+  const goLab = {};
+  /* the mosaic's own ladder runs its labels 10px clear of the next column,
+     over the nm and sz rows */
+  [["nm", 15, 600], ["sz", 12, 400]].forEach(([key, size, wt]) => {
+    const k = goGeo.map(() => 0);
+    const ext = (i) => {
+      const w = textWidth(goLabOpts[i][key][k[i]], size, wt);
+      const last = i === goGeo.length - 1;
+      const x = last ? goGeo[i].x + goGeo[i].cw : goGeo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let i = 0; i < goGeo.length - 1; i++) {
+      for (let guard = 0; guard < 6 && ext(i)[1] + 10 > ext(i + 1)[0]; guard++) {
+        if (k[i] < goLabOpts[i][key].length - 1) k[i]++;
+        else if (k[i + 1] < goLabOpts[i + 1][key].length - 1) k[i + 1]++;
+        else break;
+      }
+    }
+    goLab[key] = k.map((j, i) => goLabOpts[i][key][j]);
+  });
+  /* the figure rows (the column's share, then its rounded share and 95%
+     interval) can face destination columns far narrower than the mosaic's
+     ever are - a 2% column against a wide "1.7%" figure - so instead of
+     shortening toward nothing they dodge into tiers the way the chart
+     engine's cluster-centred end labels do: a figure that can't clear its
+     predecessor's right edge by 2px drops one tier; the interval row rides
+     its own figure's tier */
+  const goFigs = goGeo.map((g) => gof(g.r.now.v) + "%");
+  const goPtsTier = (() => {
+    const rights = [];
+    return goGeo.map((g, i) => {
+      const w = textWidth(goFigs[i], 15, 600);
+      const x = i === goGeo.length - 1 ? g.x + g.cw : g.x;
+      const L = i === goGeo.length - 1 ? x - w : x, R = i === goGeo.length - 1 ? x : x + w;
+      let t = 0;
+      while (rights[t] != null && rights[t] + 2 > L) t++;
+      rights[t] = R;
+      return t;
+    });
+  })();
+  const goTierMax = goPtsTier.reduce((m, t) => Math.max(m, t), 0);
+  const goShTier = Array.from({ length: goTierMax + 1 }, (_, tier) => {
+    const which = goGeo.map((g, i) => goPtsTier[i] === tier ? i : -1).filter((i) => i >= 0);
+    const k = goGeo.map(() => 0);
+    const ext = (i, sh) => {
+      const w = textWidth(goLabOpts[i].sh[sh], 12, 400);
+      const last = i === goGeo.length - 1;
+      const x = last ? goGeo[i].x + goGeo[i].cw : goGeo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let a = 0; a < which.length - 1; a++) {
+      const i = which[a], j = which[a + 1];
+      for (let guard = 0; guard < 6 && ext(i, k[i])[1] + 2 > ext(j, k[j])[0]; guard++) {
+        if (k[i] < goLabOpts[i].sh.length - 1) k[i]++;
+        else if (k[j] < goLabOpts[j].sh.length - 1) k[j]++;
+        else break;
+      }
+    }
+    return k;
+  });
+  goLab.sh = goGeo.map((g, i) => goLabOpts[i].sh[goShTier[goPtsTier[i]][i]]);
+  const goSvgH = GO_H + 110 + goTierMax * 46;
+  const goMosaic = (
+    <svg className="rd-go" width={W} height={goSvgH} viewBox={`0 0 ${W} ${goSvgH}`} role="img"
+         aria-label={"Where " + GO_COHORT_W[V] + " landed, each destination a column sized by its share of the cohort: "
+           + goRows.map((r) => r.nm + " " + gof(r.now.v) + "%").join(", ") + "."}>
+      {goGeo.map((g, i) => {
+        const r = g.r, last = i === goGeo.length - 1;
+        const tx = last ? g.x + g.cw : g.x, anchor = last ? "end" : "start";
+        const fig = goFigs[i];
+        /* the kept figure is the big one, like One Nation's kept column, and
+           like that column it stays on its bar only while it fits; a column
+           too narrow for its figure leaves the figure to the dodge row off
+           the baseline, as the mosaic's tiny columns do */
+        const fz = r.id === "kept" ? 22 : 15;
+        const fit = g.cw >= textWidth(fig, fz, 600) + 20;
+        const tierY = 48 + GO_H + 28 + goPtsTier[i] * 46;
+        return (
+          <g key={r.id}>
+            <text className="rd-go-nm" x={tx} y={16} textAnchor={anchor} style={{ fill: inkOf(r.color) }}>{goLab.nm[i]}</text>
+            <text className="rd-go-sz" x={tx} y={35} textAnchor={anchor}>{goLab.sz[i]}</text>
+            <rect className="rd-go-colfill" x={g.x} y={48} width={g.cw} height={GO_H} style={{ fill: r.color }} />
+            {fit && (r.id === "kept" ? (
+              <>
+                <text className="rd-go-big" x={g.x + 10} y={48 + 32} textAnchor="start" style={{ fill: r.fill }}>{fig}</text>
+                <text className="rd-go-sz" x={g.x + 10} y={48 + 50} textAnchor="start" style={{ fill: r.fill }}>kept</text>
+              </>
+            ) : (
+              <text className="rd-go-rates" x={g.x + 10} y={48 + 26} textAnchor="start" style={{ fill: r.fill }}>{fig}</text>
+            ))}
+            <text className="rd-go-pts" x={tx} y={tierY} textAnchor={anchor}>{goFigs[i]}</text>
+            <text className="rd-go-sh" x={tx} y={tierY + 19} textAnchor={anchor}>{goLab.sh[i]}</text>
+          </g>
+        );
+      })}
+      <line x1="0" x2={W} y1={48 + GO_H} y2={48 + GO_H} className="rd-go-base" />
+    </svg>
+  );
+  /* the phone mirror of the mosaic's own phone rows: variable-height bars,
+     the kept row spelling out what its two parts are as the mosaic's first
+     bar does, the party named as the canvas named it */
+  const goRowsPhone = (
+    <div className="rd-go-rows">
+      {goRows.map((r, i) => (
+        <div key={r.id} className="rd-go-row">
+          <div className="rd-go-rtop"><b style={{ color: inkOf(r.color) }}>{r.nm}{r.id === "kept" ? ", kept" : ""}</b><b>{i <= 1 ? gof(r.now.v) + "% of " + GO_HALF[V] + " voters" : gof(r.now.v) + "%"}</b></div>
+          <div className="rd-go-rsub"><span>{goShareWords(r.now.v)}</span><span>{Math.round(r.now.v)}% ±{gof(r.now.ci95)}</span></div>
+          <div className="rd-go-rbar" style={{ height: Math.max(16, r.now.v * 2.6), background: r.tint }}>
+            <span style={{ width: r.now.v + "%", background: r.color }}></span>
+            {r.id === "kept" ? (
+              <em className="rd-go-first" style={{ left: "calc(" + r.now.v + "% + 8px)", color: inkOf(r.color) }}>
+                <span className="rd-go-big">{gof(r.now.v)}%</span><span className="rd-go-nb">kept</span></em>
+            ) : <em style={{ left: "calc(" + r.now.v + "% + 8px)", color: inkOf(r.color) }}>{gof(r.now.v)}%</em>}
+            {r.id === "kept" && <i className="rd-go-else" style={{ color: inkOf(r.color) }}>Went elsewhere</i>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
   const goSec = V === "onp" ? null : (
     <>
       {goHead && <RdHed head={goHead} dek={goDek} />}
-      <div className="card rd-card rd-go-wrap">
-        <div className="rd-go-rows">
-          {goRows.map((r) => {
-            const inBar = r.now.v >= 18;
-            return (
-              <div key={r.id} className="rd-go-row">
-                <div className="rd-go-rtop"><b style={{ color: inkOf(r.color) }}>{r.nm}{r.id === "kept" ? ", kept" : ""}</b><b>{r.now.v.toFixed(1)}%</b></div>
-                <div className="rd-go-rsub"><span>{goShareWords(r.now.v)}</span><span>95% interval ±{r.now.ci95.toFixed(1)}</span></div>
-                <div className="rd-go-rbar" style={{ background: r.tint }}>
-                  <span style={{ width: r.now.v + "%", background: r.color }}></span>
-                  <em style={inBar ? { left: 12, color: r.fill } : { left: "calc(" + r.now.v + "% + 8px)", color: "var(--ink)" }}>{r.now.v.toFixed(1)}%</em>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <div className="card rd-card rd-go-wrap" ref={boxRef}>
+        {narrow ? goRowsPhone : goMosaic}
         <p className="rd-note rd-go-note">Shares of all {GO_COHORT_W[V]}; the five destinations sum to the cohort.</p>
+        <div className="rd-key rd-go-key">
+          {goRows.map((r) => (
+            <span key={r.id} className="rd-key-item"><RdSwatch kind="square" color={r.color} />{r.nm}{r.id === "kept" ? ", kept" : ""}</span>
+          ))}
+          {!narrow && <span className="rd-key-item rd-go-howread">Column width: share of {GO_COHORT_W[V]}, the five columns summing to the cohort</span>}
+        </div>
+        {narrow && <p className="rd-note">Bar height: that destination’s share of {GO_COHORT_W[V]}. Fill: its exact share, written beside the fill.</p>}
       </div>
       <RdSub head={goSubHead} dek={goSubDek} />
       <div className="rd-sm-grid">
