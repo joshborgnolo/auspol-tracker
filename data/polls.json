@@ -2180,6 +2180,13 @@
       "oth": 5,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "consideration": {
+        "alp": 40,
+        "lnp": 30,
+        "grn": 17,
+        "onp": 21,
+        "oth": 16
+      },
       "url": "https://www.climatecouncil.org.au/wp-content/uploads/2025/11/ClimateCouncil_EPA_MRP_Report_201125_national.pdf"
     },
     {
@@ -2980,6 +2987,9 @@
       "oth": null,
       "tpp_alp": 49.5,
       "tpp_lnp": 50.5,
+      "consideration": {
+        "onp": 58
+      },
       "url": "https://essentialreport.com.au/reports/federal-political-insights",
       "releaseUrl": "https://essentialreport.com.au/reports/25-february-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/02/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf"
@@ -3000,6 +3010,9 @@
       "oth": 6,
       "tpp_alp": 53,
       "tpp_lnp": 47,
+      "consideration": {
+        "onp": 48
+      },
       "lnpSplit": {
         "Lib": 15,
         "LNP": 5,
@@ -4328,6 +4341,13 @@
       "oth": 6,
       "tpp_alp": 51.5,
       "tpp_lnp": 48.5,
+      "consideration": {
+        "alp": 34,
+        "lnp": 30,
+        "grn": 23,
+        "onp": 39,
+        "none": 8
+      },
       "url": "https://www.news24.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_02_06_26_APC_Methodology_Statement.pdf"
     },
@@ -4434,6 +4454,13 @@
       "oth": 6,
       "tpp_alp": 52,
       "tpp_lnp": 48,
+      "consideration": {
+        "alp": 38,
+        "lnp": 31,
+        "grn": 23,
+        "onp": 38,
+        "none": 6
+      },
       "url": "https://www.news24.com.au/australia-news/politics/one-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll/news-story/0943b53d79d1e4fb27860c4020be7642",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_16_06_26_APC_Methodology_Statement.pdf"
     },
@@ -4618,6 +4645,13 @@
       "oth": null,
       "tpp_alp": 46,
       "tpp_lnp": 48,
+      "consideration": {
+        "alp": 50,
+        "lnp": 50,
+        "grn": 40,
+        "onp": 52,
+        "oth": 56
+      },
       "url": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
       "releaseUrl": "https://essentialreport.com.au/reports/30-june-2026",
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf"
@@ -4638,6 +4672,13 @@
       "oth": 5,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "consideration": {
+        "alp": 41,
+        "lnp": 30,
+        "grn": 23,
+        "onp": 39,
+        "none": 7
+      },
       "url": "https://www.news24.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
       "releaseUrl": "https://yougov.com/articles/55081-labor-on-track-for-decisive-election-victory-as-coalition-support-hits-record-low",
       "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Yougov_SkyPulse_02_07_26_APC_Methodology_Statement.pdf"

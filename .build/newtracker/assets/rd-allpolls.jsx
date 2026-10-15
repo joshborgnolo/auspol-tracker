@@ -1950,6 +1950,14 @@ function rdLgLines(p, { onM, demSplit }) {
       {w.onp != null && <U>{pty("onp", rdApNum(w.onp))} <span className="rd-ldg-lisoft">kept</span></U>}
     </> });
   }
+  if (p.cons) {
+    const ORDER = ["alp", "lnp", "grn", "onp", "oth", "none"];
+    const ks = ORDER.filter((k) => p.cons[k] != null);
+    out.push({ id: "cons", lab: "Consideration", body: <>
+      {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(p.cons[k])}</b></> : pty(k, rdApNum(p.cons[k]))}</U>)}
+      <U soft>parties the voter would consider, not votes</U>
+    </> });
+  }
   return out;
 }
 
@@ -2346,6 +2354,33 @@ const rdApLeanFor = (p, onM, pub) => {
   const x = pub ? (onM ? (p.tppAlt ? p.tppAlt.alp : null) : p.alpN) : (onM ? p.alpOnImp : p.alpImp);
   return x != null && y && y.v != null ? +(x - Math.round(y.v * 10) / 10).toFixed(1) : null;
 };
+/* the Primary facet's consideration variant (consM): One Nation's read is
+   the only one every wave carries, so it leads the head; the dek compares
+   One Nation to Labor on the waves that read every party, and flags that
+   each figure is a separate ask (no wave's figures ever add to 100) */
+function rdApConsStory(upd) {
+  const D = window.AUSPOL;
+  const waves = (D.individualPolls || []).filter((p) => p.cons && p.cons.onp != null && rdApDays(p.released) <= upd);
+  if (!waves.length) return null;
+  const range = (vals) => [Math.min(...vals), Math.max(...vals)];
+  const newest = waves.slice().sort((a, b) => rdApDays(b.released) - rdApDays(a.released))[0];
+  const [lo, hi] = range(waves.map((p) => p.cons.onp));
+  const n = waves.length;
+  const head = (rdPartyStart("onp") + " consideration of " + rdApNum(newest.cons.onp) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
+    + (n === 1 ? "" : lo === hi ? ", which all read " + rdApNum(lo) : ", which range from " + rdApNum(lo) + " to " + rdApNum(hi)));
+  const full = waves.filter((p) => p.cons.alp != null && p.cons.onp != null);
+  const k = full.filter((p) => p.cons.onp >= p.cons.alp).length;
+  const paired = full.length >= 2
+    ? (k === full.length ? (full.length === 2 ? "Both have " : "All " + rdNumWord(full.length) + " have ")
+        : k === 0 ? "None of the " + rdNumWord(full.length) + " has "
+        : rdCap(rdNumWord(k)) + " of the " + rdNumWord(full.length) + " " + (k === 1 ? "has " : "have "))
+      + "One Nation consideration matching or topping Labor’s where every party was asked. "
+    : "";
+  const dek = paired
+    + "Each pollster asks its own version. Every figure is a separate ask, so a wave’s consideration numbers never add to 100. "
+    + "Below is every " + RD_AP_POLLS + " poll with consideration figures since the " + rdElecYear + " election, newest first, each linked to its source.";
+  return { head, dek };
+}
 /* the 2PP facet's head and dek on one contest (onM: Labor v One Nation)
    and basis (pub: as published): today's figure, the polls in its window
    and how far apart they run, how many have Labor ahead, and how many sit
@@ -2430,7 +2465,7 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
 /* ---------------------------------------------------------------- the table */
 function RdAllPolls(P) {
   const { rows, sorted, total, houses, houseRank, houseN, tagN, shownTags, rangeN, RANGE_LAB,
-          facet, onFacet, measure, onMeasure, tppBasis, setTppBasis,
+          facet, onFacet, measure, onMeasure, tppBasis, setTppBasis, consM, setConsM,
           q, setQ, sel, setSel, toggleHouse, range, setRange, tagSel, setTagSel, toggleTag,
           pills, clearAll, sort, onSort, open, setOpen, focus, onBack, backLabel, exportCsv, bodyRef,
           ofTotal, ofHouses, demSplit, setDemSplit } = P;
@@ -2547,10 +2582,12 @@ function RdAllPolls(P) {
       } else if (id === "demographics") {
         for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
       } else add(id, rdApFacetStory(id, upd));
+      if (id === "primary") add("primary|cons", rdApConsStory(upd));
     }
     return out;
   }, [upd]);
   const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp")
+    : facet === "primary" && consM ? "primary|cons"
     : facet === "demographics" ? "demographics|" + demSplit : facet;
   const live = stories.find((st) => st.key === liveKey);
   const head = live ? live.head : null, dek = live ? live.dek : null;
@@ -2834,7 +2871,11 @@ function RdAllPolls(P) {
   const ldx = (v) => ((v - LD.lo) / (LD.hi - LD.lo)) * 100;
   const ldTicks = [];
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
-  const PMAX = 45;
+  /* the primary strip's scale: consideration figures run to ~60 (Essential's
+     consideration-outright question), intention tops out near 40 */
+  const PMAX = (facet === "primary" && consM) ? 60 : 45;
+  const PTKS = [0, 10, 20, 30, 40].concat(PMAX === 60 ? [50] : []);
+  const PLAST = PTKS[PTKS.length - 1];
   const pdx = (v) => (Math.max(0, Math.min(PMAX, v)) / PMAX) * 100;
   /* primary columns rank by the site aggregate like every other party
      listing - user call 2026-10-03: a fixed Labor, Coalition, Greens, One
@@ -3011,8 +3052,8 @@ function RdAllPolls(P) {
       {facet === "primary" && <>
         <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "p." + k.id, { color: k.ink })}</React.Fragment>)}</span>
         <span className="rd-ap-hpic" aria-hidden="true">
-          <span className="rd-ap-cap">Primary vote</span>
-          <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
+          <span className="rd-ap-cap">{consM ? "Voting consideration" : "Primary vote"}</span>
+          <span className="rd-ap-in">{PTKS.map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === PLAST ? "%" : ""}</span>)}</span>
         </span>
         <span></span>
       </>}
@@ -3146,12 +3187,12 @@ function RdAllPolls(P) {
         {hl != null && <span className="rd-ap-cvalsub">House lean <span style={{ color: rdApLeanInk(hl, onM) }}>{rdApSigned(hl)}</span></span>}
       </div>;
     } else if (facet === "primary") {
-      const pr = p.p || {};
+      const pr = (consM && p.cons) || p.p || {};
       figs = <span role="cell" className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
       pic = (
-        <span className="rd-ap-pic" role="img" aria-label={"Primary vote: " + prims.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
+        <span className="rd-ap-pic" role="img" aria-label={((consM && p.cons) ? "Voting consideration: " : "Primary vote: ") + prims.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
           <span className="rd-ap-in">
-            {[0, 10, 20, 30, 40].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
+            {PTKS.map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
             {prims.filter((k) => pr[k.id] != null).map((k) => (
               <i key={k.id} className="rd-ap-dot" style={{ left: pdx(pr[k.id]) + "%", background: k.dot }}></i>
             ))}
@@ -3404,11 +3445,15 @@ function RdAllPolls(P) {
     }
     if (facet === "primary") {
       const A = (D.aggPrimary || []).find((x) => x.ym === g.ym);
+      /* the ring average is the month's INTENTION aggregate - nothing
+         averages consideration yet, so under consM the rings and their
+         numbers would draw a figure the rows are not showing */
+      const rings = A && !phone && !consM;
       return (
         <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
-          <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{A && !phone ? RD_AP_AVG + ", drawn as rings" : count}</span></span>
-          {A && !phone && <span className="rd-ap-pnums rd-ap-mpn">{prims.map((k) => <span key={k.id}>{A[k.id] != null ? A[k.id].toFixed(1) : "—"}</span>)}</span>}
-          {A && !phone && (
+          <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{rings ? RD_AP_AVG + ", drawn as rings" : count}</span></span>
+          {rings && <span className="rd-ap-pnums rd-ap-mpn">{prims.map((k) => <span key={k.id}>{A[k.id] != null ? A[k.id].toFixed(1) : "—"}</span>)}</span>}
+          {rings && (
             <span className="rd-ap-pic rd-ap-mpic" aria-hidden="true"><span className="rd-ap-in">
               {prims.filter((k) => A[k.id] != null).map((k) => <i key={k.id} className="rd-ap-ring" style={{ left: pdx(A[k.id]) + "%", borderColor: k.dot }}></i>)}
             </span></span>
@@ -3472,7 +3517,7 @@ function RdAllPolls(P) {
   const phoneHead = (
     <div className={"rd-ap-phead " + cls}>
       {facet === "twopp" && <span className="rd-ap-hpic"><RdApScale onM={onM} phone /></span>}
-      {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
+      {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">{consM ? "Voting consideration" : "Primary vote"}</span><span className="rd-ap-in">{PTKS.map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === PLAST ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (v === LD.lo ? " start" : "") + (v === LD.hi ? " end" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
       {facet === "issues" && <span className="rd-ap-hpic rd-ap-imaph">{IMAP.map((id) => <span key={id}>{issHyph(id)}</span>)}</span>}
@@ -3584,6 +3629,9 @@ function RdAllPolls(P) {
     };
   }, [facet]);
   const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };
+  /* the primary facet's consideration flip – its own state (consM), not a
+     matchup: it swaps which published figures the party columns print */
+  const consFlipPick = () => { pinAp(); setConsM(!consM); };
   /* the demographics facet's split: the Who votes for whom panel's own
      group names, picked like a facet - the table holds its spot through the
      reflow, and the arrow keys walk the words the way they walk the tabs */
@@ -3610,7 +3658,9 @@ function RdAllPolls(P) {
      away from the owning facet, or while real focus is anywhere but the
      page, the keys keep their day jobs (space scrolls, digits type). */
   const spaceFlip = React.useRef(null);
-  spaceFlip.current = facet === "twopp" ? flipPick : null;
+  /* on the primary facet Space steps the figures the way it steps the 2PP
+     facet's contest: intention ⇄ consideration */
+  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
   const splitWalk = React.useRef(null);
@@ -3689,6 +3739,17 @@ function RdAllPolls(P) {
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
             onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
   );
+  const consRows = rows.filter((r) => r.cons);
+  const consFlip = (
+    <button type="button" className="rd-pl-flip" aria-pressed={consM}
+            title={consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)"}
+            onClick={consFlipPick}>{consM ? "Voting intention" : "Voting consideration"} <span aria-hidden="true">⇄</span></button>
+  );
+  const consQpop = !consM ? null : (
+    <RdQPop label="What voting consideration figures are, and which waves collected them" align="left">
+      <p>Voting consideration is the share of voters who name a party as one they <i>would consider</i> supporting — a looser yardstick than voting intention, the party the voter does intend. YouGov and Essential have asked it; every other wave stays on intention, and on a wave without consideration figures the intention figure stands.</p>
+    </RdQPop>
+  );
 
   /* the eyebrow's copy by facet pair, written once so .rd-ap-ebvar can
      lay both states out invisibly for the eyebrow floor above. keyId
@@ -3730,6 +3791,9 @@ function RdAllPolls(P) {
           </span>
         )}
         {facet === "demographics" && !ctlNarrow && splitPicker}
+        {facet === "primary" && !ctlNarrow && (
+          <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Vote:</span>{consFlip}<span className="rd-pl-ctl-l">{consM ? " — consider," : " — intend,"}{" on " + (consRows.length + " of " + rows.length)} waves</span>{consQpop}</span>
+        )}
       </RdTabs>
       {ctlNarrow && (
         <>
@@ -3738,6 +3802,7 @@ function RdAllPolls(P) {
               <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
             )}
             {facet === "demographics" && <div className="rd-ap-pctl">{splitPicker}</div>}
+            {facet === "primary" && <div className="rd-ap-pctl">{consFlip}<span className="rd-grow"></span>{consQpop}</div>}
           </div>
           <div className="rd-ap-ctlvar" ref={ctlVarRef} aria-hidden="true">
             <div className="rd-ap-pctl">
@@ -3745,6 +3810,10 @@ function RdAllPolls(P) {
               <span className="rd-pl-ctl-l">, implied flows</span><span className="rd-grow"></span>{qpop}
             </div>
             <div className="rd-ap-pctl">{splitPicker}</div>
+            <div className="rd-ap-pctl">
+              <button type="button" className="rd-pl-flip">Voting consideration <span aria-hidden="true">⇄</span></button>
+              <span className="rd-grow"></span>{consQpop}
+            </div>
           </div>
         </>
       )}

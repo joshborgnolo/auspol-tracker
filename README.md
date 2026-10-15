@@ -118,6 +118,16 @@ new and worth looking at.
   no statement on the index (2025-07-06, Jan/Feb/Jul-08 2026, and the
   Jul 2026 MRP — never filed). The polls tables render it beside
   the pollster name as "APC methodology".
+- **Voting consideration** travels per poll as `consideration` — a wave's
+  "which parties would you consider voting for" figures, keyed
+  `alp`/`lnp`/`grn`/`onp`/`oth`/`none` (a multi-select, so the shares sum
+  past 100 and carry no base discipline). Three sources: YouGov's
+  News24/serious waves, Essential's consideration module (the
+  "definitely + open" sum), and YouGov (MRP)'s Climate Council wave.
+  Absent, not zero: a wave that asked no consideration question omits it.
+  The All polls table's Primary facet can switch into it, and the
+  expanded poll lists it under "Also in this poll"; the aggregate never
+  sees any of it.
 
 ## Layout
 

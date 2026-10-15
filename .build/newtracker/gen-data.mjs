@@ -3437,6 +3437,11 @@ const individualPolls = POLLS.map((p) => {
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    // voting CONSIDERATION (multi-select "which parties would you consider
+    // voting for" shares; YouGov News24/serious waves, Essential's
+    // consideration module, and the Climate Council MRP) – absent where a
+    // wave asked no consideration question; display-only
+    ...(p.consideration ? { cons: p.consideration } : {}),
     /* RedBridge/Accent's cohort forced-choice figures (absent-not-zero):
        the Labor share when Coalition voters are pressed into Labor-v-One
        Nation (tpp_split_on.lnp) and when One Nation voters are pressed
@@ -3706,6 +3711,8 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // RedBridge/Accent's vote-softness triple, same as the archive emitter
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    // voting consideration, same as the archive emitter above
+    ...(p.consideration ? { cons: p.consideration } : {}),
     // RedBridge/Accent's cohort forced-choice figures, same as the archive
     // emitter above (Latest-detail opens read this row set)
     ...(p.tpp_split_on && p.tpp_split_on.lnp != null

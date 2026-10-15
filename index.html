@@ -52824,6 +52824,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "fmid": "2025-11-14",
     "client": "Climate Council",
     "published": "2025-11-20T19:47",
+    "cons": {
+      "alp": 40,
+      "lnp": 30,
+      "grn": 17,
+      "onp": 21,
+      "oth": 16
+    },
     "eff": {
       "imp": {
         "lo": 52.3,
@@ -59909,6 +59916,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "client": "The Guardian",
     "sampleEff": 786,
     "published": "2026-02-25T01:00",
+    "cons": {
+      "onp": 58
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -60108,6 +60118,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "client": "News24",
     "sampleEff": 980,
     "published": "2026-02-25T05:00",
+    "cons": {
+      "onp": 48
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -70574,6 +70587,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "client": "News24",
     "sampleEff": 964,
     "published": "2026-06-03T06:00",
+    "cons": {
+      "alp": 34,
+      "lnp": 30,
+      "grn": 23,
+      "onp": 39,
+      "none": 8
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -71651,6 +71671,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "client": "News24",
     "sampleEff": 969,
     "published": "2026-06-17T05:00",
+    "cons": {
+      "alp": 38,
+      "lnp": 31,
+      "grn": 23,
+      "onp": 38,
+      "none": 6
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -73138,6 +73165,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "published": "2026-07-01T04:36",
     "undecided": 6,
     "undecidedBasis": "tpp",
+    "cons": {
+      "alp": 50,
+      "lnp": 50,
+      "grn": 40,
+      "onp": 52,
+      "oth": 56
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -73364,6 +73398,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "client": "News24",
     "sampleEff": 1025,
     "published": "2026-07-01T05:00",
+    "cons": {
+      "alp": 41,
+      "lnp": 30,
+      "grn": 23,
+      "onp": 39,
+      "none": 7
+    },
     "eff": {
       "lnp": {
         "lo": 51,
@@ -102640,7 +102681,11 @@ function AllPollsView({
       label: "With a 3-cornered figure"
     }
   };
-  const defaultScopeFor = (f, m) => !FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true;
+  const CONS_SCOPE = {
+    has: p => !!p.cons,
+    label: "With consideration figures"
+  };
+  const defaultScopeFor = (f, m, cons) => f === "primary" && cons ? true : !FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true;
   const confNarrow = useNarrow("(max-width: 600px)");
   const confWide = !confNarrow || !!(window.AP && window.AP.rd);
   const FACETS = [{
@@ -102757,6 +102802,7 @@ function AllPollsView({
     const view = FACET_BY_URL[get("f", "view")] || "twopp";
     const sExplicit = get("s", "scope") != null;
     const meas = MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE;
+    const consIn = view === "primary" && get("k") === "1";
     return {
       q: get("q") || "",
       who: (() => {
@@ -102772,10 +102818,11 @@ function AllPollsView({
       })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
       measure: meas,
+      cons: consIn,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       split: DEM_BY_URL[get("g")] || "age",
-      scope: sExplicit ? get("s") !== "0" && get("s", "scope") !== "off" : defaultScopeFor(view, meas),
+      scope: sExplicit ? get("s") !== "0" && get("s", "scope") !== "off" : defaultScopeFor(view, meas, consIn),
       scopeExplicit: sExplicit
     };
   })();
@@ -102788,6 +102835,7 @@ function AllPollsView({
   const [sel, setSel] = useState(new Set(urlInit.who));
   const [lead, setLead] = useState(urlInit.lead);
   const [measure, setMeasure] = useState(urlInit.measure);
+  const [consM, setConsM] = useState(urlInit.cons);
   const [range, setRange] = useState(urlInit.range);
   const [tagSel, setTagSel] = useState(new Set(urlInit.has));
   const [sort, setSort] = useState({
@@ -102800,8 +102848,8 @@ function AllPollsView({
   const [pop, setPop] = useState(null);
   const [scope, setScope] = useState(urlInit.scope);
   React.useEffect(() => {
-    if (!scopeSet) setScope(defaultScopeFor(facet, measure));
-  }, [pubBasis, facet, measure, scopeSet]);
+    if (!scopeSet) setScope(defaultScopeFor(facet, measure, consM));
+  }, [pubBasis, facet, measure, consM, scopeSet]);
   React.useEffect(() => {
     if (!focus) return;
     setScope(false);
@@ -102809,6 +102857,7 @@ function AllPollsView({
     setSel(new Set());
     setLead("all");
     setMeasure(DEFAULT_MEASURE);
+    setConsM(false);
     setRange("all");
     setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
@@ -102887,8 +102936,9 @@ function AllPollsView({
       dir: -1
     });
     setPop(null);
+    if (f !== "primary" && consM) setConsM(false);
     setScopeSet(false);
-    setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE));
+    setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE, f === "primary" && consM));
     if (f !== "twopp") {
       setLead("all");
       setMeasure(DEFAULT_MEASURE);
@@ -103023,7 +103073,7 @@ function AllPollsView({
     sorted
   } = React.useMemo(() => {
     const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
-    const scoping = scope && (facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
+    const scoping = scope && (facet === "primary" && consM ? CONS_SCOPE : facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
     const TESTS = [["who", p => !sel.size || sel.has(baseHouse(p.pollster))], ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
       if (lead === "all") return true;
       const li = archLeadInfo(p, measure, tppBasis);
@@ -103066,15 +103116,15 @@ function AllPollsView({
         case "hfx":
           return p.hfx ? p.hfx.v : -Infinity;
         case "p.alp":
-          return p.p.alp;
+          return consM ? p.cons && p.cons.alp != null ? p.cons.alp : -Infinity : p.p.alp;
         case "p.lnp":
-          return p.p.lnp;
+          return consM ? p.cons && p.cons.lnp != null ? p.cons.lnp : -Infinity : p.p.lnp;
         case "p.grn":
-          return p.p.grn;
+          return consM ? p.cons && p.cons.grn != null ? p.cons.grn : -Infinity : p.p.grn;
         case "p.onp":
-          return p.p.onp;
+          return consM ? p.cons && p.cons.onp != null ? p.cons.onp : -Infinity : p.p.onp;
         case "p.oth":
-          return p.p.oth;
+          return consM ? p.cons && p.cons.oth != null ? p.cons.oth : -Infinity : p.p.oth;
         case "appr.albNet":
           return p.appr.albNet != null ? p.appr.albNet : -Infinity;
         case "appr.taylorNet":
@@ -103138,12 +103188,12 @@ function AllPollsView({
       houseRank,
       sorted
     };
-  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, pubBasis, sort, demSplit, housesV]);
+  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, consM, pubBasis, sort, demSplit, housesV]);
   const PAGE = 40;
   const [limit, setLimit] = useState(PAGE);
   React.useEffect(() => {
     setLimit(PAGE);
-  }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
+  }, [ql, sel, lead, range, tagSel, scope, facet, consM, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex(p => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
   const fmtConfFig = (v, signed) => (v < 0 ? "−" : signed && v > 0 ? "+" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -103159,6 +103209,7 @@ function AllPollsView({
       setTagSel(new Set());
       setScope(false);
       setPop(null);
+      setConsM(false);
     });
   };
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
@@ -103238,7 +103289,7 @@ function AllPollsView({
     onp: "o"
   };
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach(k => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -103248,8 +103299,9 @@ function AllPollsView({
     if (measure !== DEFAULT_MEASURE) p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
+    if (consM) p.set("k", "1");
     if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
-    if (!scope && FACET_SCOPE[facet]) p.set("s", "0");
+    if (!scope && (FACET_SCOPE[facet] || consM)) p.set("s", "0");
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
@@ -103300,6 +103352,8 @@ function AllPollsView({
     onMeasure: onMeasure,
     tppBasis: tppBasis,
     setTppBasis: setTppBasis,
+    consM: consM,
+    setConsM: setConsM,
     q: q,
     setQ: setQ,
     sel: sel,
@@ -123819,6 +123873,19 @@ function rdLgLines(p, {
       }, "kept")))
     });
   }
+  if (p.cons) {
+    const ORDER = ["alp", "lnp", "grn", "onp", "oth", "none"];
+    const ks = ORDER.filter(k => p.cons[k] != null);
+    out.push({
+      id: "cons",
+      lab: "Consideration",
+      body: React.createElement(React.Fragment, null, ks.map(k => React.createElement(U, {
+        key: k
+      }, k === "none" ? React.createElement(React.Fragment, null, "none ", React.createElement("b", null, rdApNum(p.cons[k]))) : pty(k, rdApNum(p.cons[k])))), React.createElement(U, {
+        soft: true
+      }, "parties the voter would consider, not votes"))
+    });
+  }
   return out;
 }
 function RdLedger({
@@ -124321,6 +124388,24 @@ const rdApLeanFor = (p, onM, pub) => {
   const x = pub ? onM ? p.tppAlt ? p.tppAlt.alp : null : p.alpN : onM ? p.alpOnImp : p.alpImp;
   return x != null && y && y.v != null ? +(x - Math.round(y.v * 10) / 10).toFixed(1) : null;
 };
+function rdApConsStory(upd) {
+  const D = window.AUSPOL;
+  const waves = (D.individualPolls || []).filter(p => p.cons && p.cons.onp != null && rdApDays(p.released) <= upd);
+  if (!waves.length) return null;
+  const range = vals => [Math.min(...vals), Math.max(...vals)];
+  const newest = waves.slice().sort((a, b) => rdApDays(b.released) - rdApDays(a.released))[0];
+  const [lo, hi] = range(waves.map(p => p.cons.onp));
+  const n = waves.length;
+  const head = rdPartyStart("onp") + " consideration of " + rdApNum(newest.cons.onp) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all read " + rdApNum(lo) : ", which range from " + rdApNum(lo) + " to " + rdApNum(hi));
+  const full = waves.filter(p => p.cons.alp != null && p.cons.onp != null);
+  const k = full.filter(p => p.cons.onp >= p.cons.alp).length;
+  const paired = full.length >= 2 ? (k === full.length ? full.length === 2 ? "Both have " : "All " + rdNumWord(full.length) + " have " : k === 0 ? "None of the " + rdNumWord(full.length) + " has " : rdCap(rdNumWord(k)) + " of the " + rdNumWord(full.length) + " " + (k === 1 ? "has " : "have ")) + "One Nation consideration matching or topping Labor’s where every party was asked. " : "";
+  const dek = paired + "Each pollster asks its own version. Every figure is a separate ask, so a wave’s consideration numbers never add to 100. " + "Below is every " + RD_AP_POLLS + " poll with consideration figures since the " + rdElecYear + " election, newest first, each linked to its source.";
+  return {
+    head,
+    dek
+  };
+}
 function rdApTppStory(onM, pub, upd) {
   const D = window.AUSPOL;
   const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
@@ -124471,6 +124556,8 @@ function RdAllPolls(P) {
     onMeasure,
     tppBasis,
     setTppBasis,
+    consM,
+    setConsM,
     q,
     setQ,
     sel,
@@ -124547,10 +124634,11 @@ function RdAllPolls(P) {
       } else if (id === "demographics") {
         for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
       } else add(id, rdApFacetStory(id, upd));
+      if (id === "primary") add("primary|cons", rdApConsStory(upd));
     }
     return out;
   }, [upd]);
-  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp") : facet === "demographics" ? "demographics|" + demSplit : facet;
+  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp") : facet === "primary" && consM ? "primary|cons" : facet === "demographics" ? "demographics|" + demSplit : facet;
   const live = stories.find(st => st.key === liveKey);
   const head = live ? live.head : null,
     dek = live ? live.dek : null;
@@ -124846,7 +124934,9 @@ function RdAllPolls(P) {
   const ldx = v => (v - LD.lo) / (LD.hi - LD.lo) * 100;
   const ldTicks = [];
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
-  const PMAX = 45;
+  const PMAX = facet === "primary" && consM ? 60 : 45;
+  const PTKS = [0, 10, 20, 30, 40].concat(PMAX === 60 ? [50] : []);
+  const PLAST = PTKS[PTKS.length - 1];
   const pdx = v => Math.max(0, Math.min(PMAX, v)) / PMAX * 100;
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const SPLITS = window.DEM_SPLITS || [];
@@ -125011,15 +125101,15 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Primary vote"), React.createElement("span", {
+  }, consM ? "Voting consideration" : "Primary vote"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+  }, PTKS.map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 40 ? "%" : "")))), React.createElement("span", null)), facet === "leadership" && React.createElement(React.Fragment, null, th(window.JUR ? "Better " + window.JUR.office.alb : "Better PM", "ppm.alb"), React.createElement("span", {
+  }, v, v === PLAST ? "%" : "")))), React.createElement("span", null)), facet === "leadership" && React.createElement(React.Fragment, null, th(window.JUR ? "Better " + window.JUR.office.alb : "Better PM", "ppm.alb"), React.createElement("span", {
     className: "rd-ap-hpic",
     "aria-hidden": "true"
   }, React.createElement("span", {
@@ -125244,7 +125334,7 @@ function RdAllPolls(P) {
         }
       }, rdApSigned(hl))));
     } else if (facet === "primary") {
-      const pr = p.p || {};
+      const pr = consM && p.cons || p.p || {};
       figs = React.createElement("span", {
         role: "cell",
         className: "rd-ap-pnums"
@@ -125257,10 +125347,10 @@ function RdAllPolls(P) {
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": "Primary vote: " + prims.filter(k => pr[k.id] != null).map(k => k.lab + " " + rdApNum(pr[k.id])).join(", ")
+        "aria-label": (consM && p.cons ? "Voting consideration: " : "Primary vote: ") + prims.filter(k => pr[k.id] != null).map(k => k.lab + " " + rdApNum(pr[k.id])).join(", ")
       }, React.createElement("span", {
         className: "rd-ap-in"
-      }, [0, 10, 20, 30, 40].map(v => React.createElement("i", {
+      }, PTKS.map(v => React.createElement("i", {
         key: v,
         className: "rd-ap-gl",
         style: {
@@ -125732,6 +125822,7 @@ function RdAllPolls(P) {
     }
     if (facet === "primary") {
       const A = (D.aggPrimary || []).find(x => x.ym === g.ym);
+      const rings = A && !phone && !consM;
       return React.createElement("div", {
         className: "rd-ap-mrow " + cls,
         role: "row",
@@ -125739,11 +125830,11 @@ function RdAllPolls(P) {
       }, React.createElement("span", {
         className: "rd-ap-mlab",
         role: "rowheader"
-      }, React.createElement("b", null, lab), React.createElement("span", null, A && !phone ? RD_AP_AVG + ", drawn as rings" : count)), A && !phone && React.createElement("span", {
+      }, React.createElement("b", null, lab), React.createElement("span", null, rings ? RD_AP_AVG + ", drawn as rings" : count)), rings && React.createElement("span", {
         className: "rd-ap-pnums rd-ap-mpn"
       }, prims.map(k => React.createElement("span", {
         key: k.id
-      }, A[k.id] != null ? A[k.id].toFixed(1) : "—"))), A && !phone && React.createElement("span", {
+      }, A[k.id] != null ? A[k.id].toFixed(1) : "—"))), rings && React.createElement("span", {
         className: "rd-ap-pic rd-ap-mpic",
         "aria-hidden": "true"
       }, React.createElement("span", {
@@ -125846,15 +125937,15 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Primary vote"), React.createElement("span", {
+  }, consM ? "Voting consideration" : "Primary vote"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+  }, PTKS.map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 40 ? "%" : "")))), facet === "leadership" && React.createElement("span", {
+  }, v, v === PLAST ? "%" : "")))), facet === "leadership" && React.createElement("span", {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
@@ -125962,6 +126053,10 @@ function RdAllPolls(P) {
     pinAp();
     onMeasure(onM ? "lnp" : "onp");
   };
+  const consFlipPick = () => {
+    pinAp();
+    setConsM(!consM);
+  };
   const splitPick = id => {
     pinAp();
     setDemSplit(id);
@@ -125991,7 +126086,7 @@ function RdAllPolls(P) {
     setTppBasis(pub ? "imp" : "resp");
   };
   const spaceFlip = React.useRef(null);
-  spaceFlip.current = facet === "twopp" ? flipPick : null;
+  spaceFlip.current = facet === "twopp" ? flipPick : facet === "primary" ? consFlipPick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
   const splitWalk = React.useRef(null);
@@ -126126,6 +126221,20 @@ function RdAllPolls(P) {
   }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
+  const consRows = rows.filter(r => r.cons);
+  const consFlip = React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": consM,
+    title: consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)",
+    onClick: consFlipPick
+  }, consM ? "Voting intention" : "Voting consideration", " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"));
+  const consQpop = !consM ? null : React.createElement(RdQPop, {
+    label: "What voting consideration figures are, and which waves collected them",
+    align: "left"
+  }, React.createElement("p", null, "Voting consideration is the share of voters who name a party as one they ", React.createElement("i", null, "would consider"), " supporting \u2014 a looser yardstick than voting intention, the party the voter does intend. YouGov and Essential have asked it; every other wave stays on intention, and on a wave without consideration figures the intention figure stands."));
   const eyebrowCopy = (conf, keyId) => React.createElement(React.Fragment, null, React.createElement("h2", _extends({
     className: "rd-title"
   }, keyId ? {
@@ -126195,7 +126304,13 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl-l"
   }, "Two-party:"), flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, ", ", pub ? "as published" : "implied flows"), qpop), facet === "demographics" && !ctlNarrow && splitPicker), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
+  }, ", ", pub ? "as published" : "implied flows"), qpop), facet === "demographics" && !ctlNarrow && splitPicker, facet === "primary" && !ctlNarrow && React.createElement("span", {
+    className: "rd-pl-ctl"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Vote:"), consFlip, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, consM ? " — consider," : " — intend,", " on " + (consRows.length + " of " + rows.length), " waves"), consQpop)), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-ap-ctlslot",
     style: ctlFloor ? {
       minHeight: ctlFloor + "px"
@@ -126208,7 +126323,11 @@ function RdAllPolls(P) {
     className: "rd-grow"
   }), qpop), facet === "demographics" && React.createElement("div", {
     className: "rd-ap-pctl"
-  }, splitPicker)), React.createElement("div", {
+  }, splitPicker), facet === "primary" && React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, consFlip, React.createElement("span", {
+    className: "rd-grow"
+  }), consQpop)), React.createElement("div", {
     className: "rd-ap-ctlvar",
     ref: ctlVarRef,
     "aria-hidden": "true"
@@ -126225,7 +126344,16 @@ function RdAllPolls(P) {
     className: "rd-grow"
   }), qpop), React.createElement("div", {
     className: "rd-ap-pctl"
-  }, splitPicker))), React.createElement("div", {
+  }, splitPicker), React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip"
+  }, "Voting consideration ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")), React.createElement("span", {
+    className: "rd-grow"
+  }), consQpop))), React.createElement("div", {
     className: "rd-ap-bar"
   }, React.createElement("label", {
     className: "rd-ap-search"

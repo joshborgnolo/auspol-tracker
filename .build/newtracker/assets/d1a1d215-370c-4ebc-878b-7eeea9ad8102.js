@@ -5237,12 +5237,21 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     lnponp: { has: (p) => !!p.tppAlt2, label: "With an L/NP v ON 2PP" },
     "3cp": { has: (p) => !!p.tpp3, label: "With a 3-cornered figure" },
   };
+  /* The primary facet's CONSIDERATION mode (consM – the table's party
+     columns read a wave's "would consider voting for X" shares instead of
+     its first preferences) is measured by a handful of waves, exactly the
+     published-only-matchup case above: unscoped it would line up the whole
+     archive around seven rows. So the mode carries its own scope, armed by
+     the same default and removed by the same auto-pill. */
+  const CONS_SCOPE = { has: (p) => !!p.cons, label: "With consideration figures" };
   /* The scope a facet ARMS ITSELF with. Facets with nothing to scope get
      false; the 2PP facet follows the basis (see the note on twopp above)
      unless the matchup is a published-only one, which always self-arms;
-     everything else keeps the long-standing "on". */
-  const defaultScopeFor = (f, m) =>
-    (!FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true);
+     the primary facet arms while its consideration mode is on; everything
+     else keeps the long-standing "on". */
+  const defaultScopeFor = (f, m, cons) =>
+    (f === "primary" && cons ? true :
+     !FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true);
 
   /* this design's six-tab menu fits from ~610px up (measured 2026-10-07
      on the 320–820px sweep); below that Confidence drops out of it. The
@@ -5318,6 +5327,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     /* the matchup is lifted out ahead of the literal so the scope seed can
        see it – a published-only matchup self-arms its contest scope */
     const meas = MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE;
+    /* the primary facet's consideration mode – k=1. Restored only on the
+       primary facet; anywhere else the letter normalises away on the first
+       URL write (the mode's figures read nowhere else, and an invisible
+       flag would keep writing itself into unrelated links) */
+    const consIn = view === "primary" && get("k") === "1";
     return {
       q: get("q") || "",
       who: (() => {
@@ -5337,6 +5351,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
       measure: meas,
+      cons: consIn,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       split: DEM_BY_URL[get("g")] || "age",
@@ -5345,7 +5360,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
          the basis moves. */
       scope: sExplicit
         ? (get("s") !== "0" && get("s", "scope") !== "off")
-        : defaultScopeFor(view, meas),
+        : defaultScopeFor(view, meas, consIn),
       scopeExplicit: sExplicit,
     };
   })();
@@ -5360,6 +5375,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const [sel, setSel] = useState(new Set(urlInit.who)); // pollster filter; empty = all
   const [lead, setLead] = useState(urlInit.lead);        // all | alp | lnp/onp (per matchup)
   const [measure, setMeasure] = useState(urlInit.measure); // lead matchup: lnp = ALP v L/NP, onp = ALP v ON
+  /* the primary facet's consideration mode (its own flag, not a matchup –
+     it swaps which published numbers the party columns print, not which
+     contest the table is keyed on). Only ever true while the primary facet
+     is up: onFacet clears it everywhere else. */
+  const [consM, setConsM] = useState(urlInit.cons);
   const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
   /* the archive's default sort is FIELDWORK day, newest first: publication
@@ -5380,8 +5400,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      itself – as a visible, removable pill, not a hidden default. */
   const [scope, setScope] = useState(urlInit.scope);
   React.useEffect(() => {
-    if (!scopeSet) setScope(defaultScopeFor(facet, measure));
-  }, [pubBasis, facet, measure, scopeSet]);
+    if (!scopeSet) setScope(defaultScopeFor(facet, measure, consM));
+  }, [pubBasis, facet, measure, consM, scopeSet]);
 
   /* Arriving from a dot on a chart. The filters ride in the URL now, so they
      survive the remount this trip causes - and any of them could hide the
@@ -5391,6 +5411,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   React.useEffect(() => {
     if (!focus) return;
     setScope(false); setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE);
+    setConsM(false);
     setRange("all"); setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
     /* a Who votes for whom dot names its tab's split; where the poll can't
@@ -5486,10 +5507,14 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const onMeasure = React.useCallback((mv) => { setMeasure(mv); setLead("all"); }, []);
   const onFacet = (f) => {
     setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
+    /* the consideration mode is the primary facet's; landing on the facet
+       keeps it, leaving drops it (and drops its scope with it, via the
+       seed below) */
+    if (f !== "primary" && consM) setConsM(false);
     // the matchup survives the hop only if the 2PP facet is where we land –
     // every other facet resets it below – so seed the scope from the
     // matchup that will actually be in force
-    setScopeSet(false); setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE));
+    setScopeSet(false); setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE, f === "primary" && consM));
     // the expanded row STAYS expanded: `open` keys the poll itself, and the
     // detail panel shows every measure whatever the facet. If the new facet's
     // scope hides that poll it simply isn't rendered, and it resurfaces –
@@ -5674,7 +5699,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      L/NP v ON 2PP" rather than the everything-but-nothing "With a 2PP". */
   const { scoping, without, houseN, tagN, rangeN, houseRank, sorted } = React.useMemo(() => {
     const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
-    const scoping = scope && ((facet === "twopp" && CONTEST_SCOPE[measure]) || FACET_SCOPE[facet]);
+    /* the primary facet's consideration mode carries its own scope
+       (CONS_SCOPE, beside the twopp matchup scopes) – the facet itself
+       scopes nothing, so under the mode it is the only scope in play */
+    const scoping = scope && (facet === "primary" && consM ? CONS_SCOPE :
+                              (facet === "twopp" && CONTEST_SCOPE[measure]) || FACET_SCOPE[facet]);
     const TESTS = [
       ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
       // a row must contain EVERY selected data type (AND)
@@ -5725,11 +5754,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         }
         case "lean": return p.lean ?? -Infinity;
         case "hfx": return p.hfx ? p.hfx.v : -Infinity;
-        case "p.alp": return p.p.alp;
-        case "p.lnp": return p.p.lnp;
-        case "p.grn": return p.p.grn;
-        case "p.onp": return p.p.onp;
-        case "p.oth": return p.p.oth;
+        /* the party columns sort on what they SHOW: first preferences
+           ordinarily, the consideration share while the primary facet's
+           consideration mode is on (a wave that printed none of that party
+           sinks, exactly like a null elsewhere) */
+        case "p.alp": return consM ? (p.cons && p.cons.alp != null ? p.cons.alp : -Infinity) : p.p.alp;
+        case "p.lnp": return consM ? (p.cons && p.cons.lnp != null ? p.cons.lnp : -Infinity) : p.p.lnp;
+        case "p.grn": return consM ? (p.cons && p.cons.grn != null ? p.cons.grn : -Infinity) : p.p.grn;
+        case "p.onp": return consM ? (p.cons && p.cons.onp != null ? p.cons.onp : -Infinity) : p.p.onp;
+        case "p.oth": return consM ? (p.cons && p.cons.oth != null ? p.cons.oth : -Infinity) : p.p.oth;
         case "appr.albNet": return p.appr.albNet != null ? p.appr.albNet : -Infinity;
         case "appr.taylorNet": return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
         case "appr.hansonNet": return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
@@ -5766,7 +5799,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     });
     const sorted = keyed.map((kv) => kv[1]);
     return { scoping, without, houseN, tagN, rangeN, houseRank, sorted };
-  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, pubBasis, sort, demSplit, housesV]);
+  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, consM, pubBasis, sort, demSplit, housesV]);
 
   /* The table shows a page at a time. At ~90px a row, all 163 made a
      19,600px page and buried the diagnostics under it. Any change to what is
@@ -5774,7 +5807,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      (a chart dot, an open breakdown) always makes the cut. */
   const PAGE = 40;
   const [limit, setLimit] = useState(PAGE);
-  React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
+  React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, consM, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex((p) => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
 
@@ -5795,7 +5828,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     setQ("");
     React.startTransition(() => {
       setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
-      setTagSel(new Set()); setScope(false); setPop(null);
+      setTagSel(new Set()); setScope(false); setPop(null); setConsM(false);
     });
   };
   // Boolean(): the chain ends on a Set size, so with no filters this was the
@@ -5834,7 +5867,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "k", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach((k) => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -5844,9 +5877,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     if (measure !== DEFAULT_MEASURE) p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
+    // like the split below, the consideration mode only means something on
+    // its own facet – and consM can only stand there (onFacet, urlInit)
+    if (consM) p.set("k", "1");
     // the split only means something on its own facet, so only there is it written
     if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
-    if (!scope && FACET_SCOPE[facet]) p.set("s", "0");
+    /* consider-mode's scope is its own (FACET_SCOPE.primary stays null), so
+       its removal must join this writing list too or a link copied after
+       removing the pill would restore with the pill back */
+    if (!scope && (FACET_SCOPE[facet] || consM)) p.set("s", "0");
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
@@ -5931,6 +5970,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       <RdAllPolls rows={rows} sorted={sorted} total={total} houses={housesV} houseRank={houseRank} houseN={houseN}
         tagN={tagN} shownTags={shownTags} rangeN={rangeN} RANGE_LAB={RANGE_LAB}
         facet={facet} onFacet={onFacet} measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} setTppBasis={setTppBasis}
+        consM={consM} setConsM={setConsM}
         q={q} setQ={setQ} sel={sel} setSel={setSelT} toggleHouse={toggleHouse} range={range} setRange={setRangeT}
         tagSel={tagSel} setTagSel={setTagSelT} toggleTag={toggleTag}
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
