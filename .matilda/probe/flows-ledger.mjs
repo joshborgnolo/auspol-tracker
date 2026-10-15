@@ -1,6 +1,14 @@
-/* headless probe of the All-polls Preference flows section as rebuilt
+/* headless probe of the Preference flows section as rebuilt
    2026-10-13 (design B of that day's mockups, the user's pick after "an
-   ill-conceived and disordered hodgepodge - especially on small screens").
+   ill-conceived and disordered hodgepodge - especially on small screens"),
+   running against its own /flows/ tab page since 0f7eb4bd (2026-10-15)
+   moved disagreement/leans/flows off All polls. The section IS the page
+   (~1550px tall at 1440 > any desktop viewport), so the Space/hover
+   claims stay hot to the document's end - the old "scroll the section
+   off-screen" release checks are structural pins now. Clicking a poll
+   mark swaps the view to All polls inside the same document; the probe
+   reloads PAGE afterwards to get back (the ☰ menu items are plain
+   anchors, useless on file://).
    Replaces rd-forced-charts.mjs (the retired three-chart probe). Checks,
    at 1440 and 390, with tooltip bounds also at 360 and 320:
      - anatomy: three contest tabs (Labor v Coalition pressed by default -
@@ -28,9 +36,11 @@
      - keys: with the pointer over the section <-/-> walks and wraps the
        contest row both ways; while the section is on screen Space cycles
        the region menu (All, inner, outer, regional) - claims released
-       off-screen and off-pointer;
-     - the page's two-party flip (the house-lean section's switch) carries
-       the tab to Labor v One Nation and back.
+       on its own page: the claims hold to the document's end and yield
+       only off-pointer, to the <-/-> page walk (right turns to the
+       Preference-flows explainer, left to Pollster leans);
+     - a click on a poll mark swaps the view to All polls with its ledger
+       open; the probe reloads PAGE to get back.
    Run against a built tree: node .matilda/probe/flows-ledger.mjs
    (PAGE=http://... to run over http, which loads the fonts) */
 import puppeteer from "puppeteer-core";
@@ -40,7 +50,7 @@ import { fileURLToPath } from "url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const PAGE = process.env.PAGE || "file://" + path.join(ROOT, "allpolls", "index.html");
+const PAGE = process.env.PAGE || "file://" + path.join(ROOT, "flows", "index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -151,15 +161,9 @@ for (const w of [1440, 390]) {
   check(s.rows.every((r) => r.waves === 0 && r.tris === 0 && r.empty), `${w}: Labor v Coalition by region: no poll marks, the row says why`);
   await region(page, "");
 
-  /* the page's two-party flip carries the tab */
-  const flipped = await page.evaluate(() => { const b = document.querySelector("#house-lean .rd-pl-flip"); if (!b) return false; b.click(); return true; });
-  await wait(400);
-  s = await read(page);
-  check(flipped && s.tabs[1].on, `${w}: the page's flip to Labor v One Nation carries the tab (${s.tabs.map((t) => (t.on ? "[" + t.t + "]" : t.t)).join(" ")})`);
-  await page.evaluate(() => document.querySelector("#house-lean .rd-pl-flip").click());
-  await wait(400);
-  s = await read(page);
-  check(s.tabs[0].on, `${w}: and back to Labor v Coalition`);
+  /* (the two-party flip used to ride this probe when house-lean shared
+     the All-polls page; 0f7eb4bd gave each section its own page, so the
+     flip-carry check now lives entirely on the /leans/ probe) */
 
   if (!phone) {
     /* a mouse click on a RedBridge mark opens that poll in the table */
@@ -176,6 +180,11 @@ for (const w of [1440, 390]) {
     await page.mouse.click(pt.x, pt.y); await wait(900);
     const opened = await page.evaluate(() => document.querySelectorAll(".rd-ldg").length);
     check(opened === 1, `${w}: clicking the mark opens its poll in the table (${pt.label.slice(0, 40)}…)`);
+    /* back to the flows view: the ☰/tab chrome is plain anchors, useless
+       on file:// - reload PAGE (the mark-click swap was client-side) */
+    await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
+    await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
+    await wait(400);
 
     /* the hover claim hands the arrow keys to the contest row, wrapping
        through the three matchups; blur first in case an earlier pick left
@@ -193,11 +202,9 @@ for (const w of [1440, 390]) {
     for (const want of [2, 1, 0]) { await page.keyboard.press("ArrowLeft"); await wait(160); cur = onIx(await read(page)); if (cur !== want) walkOk = false; }
     check(walkOk, `${w}: the hover arrow walk steps the contests left and wraps back`);
 
-    /* Space cycles the region menu while the section is on screen, and
-       keeps its scroll day job once the whole section is off it. Park
-       deep enough into the section that the earlier Space claimants
-       (the table, house-lean) no longer intersect - they would win the
-       key (listeners fire in registration order) */
+    /* Space cycles the region menu while the section is on screen. On
+       its own page it's the only Space claimant - park deep into the
+       section and confirm it's the view the claim sees */
     const regVal = () => page.$eval('#flow-drift select[aria-label="Region"]', (el) => el.value);
     let regsOk = (await regVal()) === "";
     await page.evaluate(() => {
@@ -205,33 +212,66 @@ for (const w of [1440, 390]) {
       window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY + Math.min(260, Math.max(0, el.offsetHeight - innerHeight - 100)));
     });
     await wait(350);
-    const neighboursOut = await page.evaluate(() => ["rd-ap-top", "house-lean"].every((id) => { const r = document.getElementById(id).getBoundingClientRect(); return r.bottom <= 0 || r.top >= innerHeight; }));
-    check(neighboursOut, `${w}: parked inside the flows section with the table and house-lean off-screen`);
+    const sectInView = await page.evaluate(() => { const r = document.getElementById("flow-drift").getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+    check(sectInView, `${w}: parked with the flows section in view (its own page's only Space claim)`);
     for (const want of ["inner", "outer", "regional", ""]) { await page.keyboard.press("Space"); await wait(160); if ((await regVal()) !== want) regsOk = false; }
     check(regsOk, `${w}: Space cycles the regions All → Inner metro → Outer metro → Regional → All`);
-    /* off-screen the flows claim releases. The section is the view's
-       last, so it can't be scrolled out below; parked just above it
-       (where house-lean legitimately owns Space) the menu is untouched */
-    await page.evaluate(() => { const el = document.getElementById("flow-drift"); window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - innerHeight - 100); });
+    /* the SELECTED contest tab owns Space the roll's way: a click's focus
+       sits on it (rdTabFocus), where native Space would only re-pick the
+       same contest, so the roll claims the key and the tab's pick and focus
+       stay put (user report 2026-10-16). An unpressed tab keeps the key's
+       day job - it activates natively */
+    await page.evaluate(() => document.querySelector("#flow-drift .rd-fl-tabs .rd-tab[aria-pressed='true']").focus());
+    await wait(150);
+    let tabRollOk = (await regVal()) === "";
+    for (const want of ["inner", "outer"]) { await page.keyboard.press("Space"); await wait(160); if ((await regVal()) !== want) tabRollOk = false; }
+    check(tabRollOk, `${w}: Space from the selected contest tab still rolls the region menu`);
+    const contestKept = await page.evaluate(() => {
+      const a = document.activeElement;
+      return !!(a && a.matches && a.matches("#flow-drift .rd-fl-tabs .rd-tab") && a.getAttribute("aria-pressed") === "true" && a.textContent.indexOf("Labor v Coalition") === 0);
+    });
+    check(contestKept, `${w}: the roll leaves the contest tab pressed and focused`);
+    await page.evaluate(() => document.querySelectorAll("#flow-drift .rd-fl-tabs .rd-tab")[1].focus());
+    await wait(120);
+    await page.keyboard.press("Space"); await wait(250);
+    check((await read(page)).tabs[1].on, `${w}: an unpressed contest tab keeps Space's day job (activates it)`);
+    check((await regVal()) === "outer", `${w}: the unpressed tab's Space leaves the region menu be`);
+    /* restore: contest Labor v Coalition, region All voters, focus off the row */
+    await page.evaluate(() => document.querySelectorAll("#flow-drift .rd-fl-tabs .rd-tab")[0].click());
+    await region(page, "");
+    await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+    await wait(200);
+    /* the section IS the /flows/ page post-split (≈1550px tall > the
+       900px desktop viewport), so like /leans/ it can never leave the
+       viewport: the Space claim stays hot to the document's end. Pin the
+       structure and the consequence - Space still rolls at the very
+       bottom. A layout that makes the section exitable breaks the
+       structure check - rewrite this phase as a release test then. */
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await wait(350);
-    const fullyOut = await page.evaluate(() => { const r = document.getElementById("flow-drift").getBoundingClientRect(); return r.bottom <= 0 || r.top >= innerHeight; });
-    check(fullyOut, `${w}: scrolled clear of the flows section`);
+    const stillIn = await page.evaluate(() => { const r = document.getElementById("flow-drift").getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+    check(stillIn, `${w}: the flows section still intersects at the document's end (full-page panel)`);
     const regRest = await regVal();
-    await page.keyboard.press("Space"); await wait(400);
-    check((await regVal()) === regRest, `${w}: off-screen, Space leaves the flows menu be`);
+    await page.keyboard.press("Space"); await wait(250);
+    check((await regVal()) !== regRest, `${w}: Space at the document's end still rolls the region menu`);
+    await region(page, "");
 
     /* pointer off the section: the claim is gone and the page-level walk
        resumes (page-turn check goes last - it unmounts the section). The
-       parked spot must itself be claim-free - the table, the disagreement
-       panel and house-lean all claim the arrows - so the tile band at the
-       document's end is the spot */
+       tile band at the document's end is the claim-free spot - post-split
+       the other arrow claimants (table, disagreement, house-lean) all
+       live on pages of their own. Blur first: the region restore leaves
+       the <select> focused, where ArrowRight never reaches the page */
+    await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+    await wait(100);
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await wait(300);
     await page.mouse.move(720, 870); await wait(150);
     const spotFree = await page.evaluate(() => { const el = document.elementFromPoint(720, innerHeight - 30); return el ? !el.closest("#flow-drift, #rd-ap-top, #house-lean, #poll-disagreement") : true; });
     check(spotFree, `${w}: pointer parked on a claim-free spot`);
     await page.keyboard.press("ArrowRight"); await wait(700);
-    check(await page.evaluate(() => !document.getElementById("flow-drift")), `${w}: pointer off the section, the claim yields to the page walk`);
+    check(await page.evaluate(() => !document.getElementById("flow-drift") && !!document.querySelector(".view-flows-explained")),
+      `${w}: pointer off the section, the claim yields to the page walk (turns to the explainer)`);
   }
   check(errs.length === 0, `${w}: no page errors${errs.length ? " (" + errs[0].slice(0, 160) + ")" : ""}`);
   await page.close();

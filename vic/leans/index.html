@@ -49461,7 +49461,8 @@ function RdIssues({
       if (!isHover.current && !iwHover.current && !trHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const onViewTab = (e.key === "ArrowDown" || e.key === "ArrowUp") && a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true" && a.matches('#issues .rd-is-tabs .rd-tab');
+      if (!onViewTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -61720,7 +61721,8 @@ function RdHouseLean({
       if (!inView.current || e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const onMeasureTab = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true" && a.matches('#house-lean .rd-hl-tabs .rd-tab');
+      if (!onMeasureTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceFlip.current) return;
@@ -62573,7 +62575,8 @@ function RdFlows({
       if (!inView.current || e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const onContestTab = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true" && a.matches('#flow-drift .rd-fl-tabs .rd-tab');
+      if (!onContestTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceReg.current) return;

@@ -4013,7 +4013,16 @@ function RdIssues({ rangeId = "all" }) {
       if ((!isHover.current && !iwHover.current && !trHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "ArrowDown" && e.key !== "ArrowUp")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the panel's own SELECTED view tab owns ↑/↓ too: a click leaves the
+         focus on it (rdTabFocus), where a vertical arrow would only jiggle
+         the page, so the hover claim walks the trust rows with the tab's
+         pick and focus staying put (who-votes' chips/menu admission's
+         shape). ←/→ stay the tab row's own (rdTabsKey walks them natively),
+         and every other focused element keeps the keys */
+      const onViewTab = (e.key === "ArrowDown" || e.key === "ArrowUp")
+        && a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true"
+        && a.matches('#issues .rd-is-tabs .rd-tab');
+      if (!onViewTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {

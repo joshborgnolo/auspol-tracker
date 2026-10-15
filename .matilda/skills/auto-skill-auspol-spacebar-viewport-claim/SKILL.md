@@ -1,6 +1,6 @@
 ---
 name: auspol-spacebar-viewport-claim
-description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). NINE claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2699 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload), and the voter-switching panel's title cycler `#switching` (2026-10-15, rd-panels.jsx ~:3263 — GO_NEXT onp→lnp→alp modulo wrap over the came-from/going views, ref nulled when the vote-switching payload is absent so /vic/ keeps the scroll day job). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Boundary band ownership: the who-votes/switching pair registers with rdSpaceClaimOn/Off and gates on rdSpaceDominant (rd.jsx; 2026-10-15) — where the two share the screen the BIGGER viewport share owns the key, fixing registration order vetoing the lower panel. Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; flow-drift is the all-polls LAST section, so it can only be scrolled out ABOVE — but scrolling above puts rd-ap-top/house-lean's OWN Space claims on screen, so they must be parked off first or they (earlier registration) win. Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
+description: auspol-tracker — the SPACEBAR viewport-claim convention (IntersectionObserver visibility claim, NOT pointer hover like auspol-hover-claims-arrows). NINE claim sites share the one block: All-polls table `#rd-ap-top` (a1c620d), Latest card `#latest-polls`, House-lean `#house-lean` (056c205), the hero `#two-party` matchup step (rd-hero.jsx ~:590-618, gated orderedMatchups.length>1), the Primary-vote group-menu WALK `#primary-vote` (743ac44, rd-panels.jsx ~:368 — a native <select> stepped in DOM option order with modulo wrap, null ref on /vic/ where no demographics payload exists so Space keeps its scroll day job), the Preference-flows region roll `#flow-drift` (2026-10-15, rd-allpolls.jsx ~:5196 — cycles the ledger's FF_REGIONS menu All voters → Inner metro → Outer metro → Regional → wrap, live ref nulled when FF is falsy so Vic keeps the scroll day job; the same section's contest tabs take the HOVER arrow claim instead), the Who-votes party chips `#who-votes` (2026-10-15, rd-panels.jsx ~:2699 — cycles DEMO_PARTIES onp→alp→lnp→grn→oth modulo wrap, ref nulled without the demographics payload), and the voter-switching panel's title cycler `#switching` (2026-10-15, rd-panels.jsx ~:3263 — GO_NEXT onp→lnp→alp modulo wrap over the came-from/going views, ref nulled when the vote-switching payload is absent so /vic/ keeps the scroll day job). The five canonical guards + bail-before-preventDefault + `!e.repeat` split + live-ref pattern (reassign every render, []-deps effect). Boundary band ownership: the who-votes/switching pair registers with rdSpaceClaimOn/Off and gates on rdSpaceDominant (rd.jsx; 2026-10-15) — where the two share the screen the BIGGER viewport share owns the key, fixing registration order vetoing the lower panel. Probe gotchas: blur after any click; scroll past the WHOLE section; and with ADJACENT claiming sections (snapshot page: hero ends where #primary-vote begins, #latest-polls starts there) park positive checks in the window where ONLY the target claims and run the negative scroll-through somewhere claim-free — for #primary-vote the negative site is BELOW #latest-polls, not offsetTop+height+200; since the 0f7eb4bd tab-page split #house-lean and #flow-drift ARE their own pages (/leans/ 1178px, /flows/ ~1547px — neither can leave a desktop viewport), so hl-space-flip P5 (LIST runs against /leans/) and flows-ledger pin structure + consequence at the document END instead of a scrolled-clear release test; and on /flows/ the <-/-> page walk goes RIGHT into /flows-explained/ (LEFT to /leans/), while a poll-mark click VIEW-SWAPS to allpolls in the SAME document (the probe returns by reloading PAGE, not by tab clicks). Every new claim also extends the single shared `Space` row in KBD_ROWS (73de0c58 ~:2077).
 source: auto-skill
 extracted_at: '2026-10-08T12:24:30.482Z'
 ---
@@ -92,6 +92,18 @@ Load-bearing details, in order of subtlety:
    arrow-walk move, `focus({preventScroll:true})`) so consecutive
    presses keep walking, on the menu tab the grouping and focus stay
    put. Unpressed members of either row keep native Space.
+   The 2026-10-16 V2 family (user: "same as … from the focused
+   selected tab") extends the same admission to the two other Space
+   claims that sit beside a tab row: `#house-lean .rd-hl-tabs .rd-tab`
+   pressed → Space flips the two-party contest (onMeasureTab,
+   rd-allpolls.jsx ~:4751; hl-space-flip P6/P7), and
+   `#flow-drift .rd-fl-tabs .rd-tab` pressed → Space rolls the region
+   menu (onContestTab, rd-allpolls.jsx ~:5298; flows-ledger). Shape is
+   identical everywhere: the guard is `a.matches(selector) &&
+   aria-pressed === "true"` inside the affected section, only the
+   PRESSED tab passes, everything downstream (ref-null check,
+   bail-before-preventDefault) is unchanged, and an unpressed tab
+   natively activates per its day job.
 5. **Listener priority between overlapping claims:** all claims are
    document-level capture listeners; when two sections intersect
    (house-lean sits inside the all-polls view where the table's own
@@ -128,7 +140,14 @@ Load-bearing details, in order of subtlety:
 - **House lean** (056c205, 2026-10-06) — rd-allpolls.jsx ~:3090 in
   `RdHouseLean`, `#house-lean`: Space proxies the panel's own
   "Two-party: Labor v Coalition ⇄" flip button, gated `view==="tpp"`.
-  Probe: `.matilda/probe/hl-space-flip.mjs` (port 9007, 14 checks).
+  Since 0f7eb4bd the section IS the /leans/ tab page (its whole
+  payload, 1178px tall — it can never leave a desktop viewport), so
+  probe `.matilda/probe/hl-space-flip.mjs` (port 9007, P1–P7, runs
+  against /leans/) pins structure + consequence at the document's end
+  (P5), and the SELECTED measure tab's V2 admission
+  (`#house-lean .rd-hl-tabs .rd-tab`, 2026-10-16: Space flips with the
+  pick and focus staying put; an unpressed tab natively activates) in
+  P6/P7.
 - **Hero matchup step** — rd-hero.jsx ~:590-618, `#two-party` body
   card: `spaceStep.current = orderedMatchups.length > 1 ? () =>
   swipeLive.current(1) : null` (Space walks the "Switch 2PP" matchup
@@ -156,15 +175,19 @@ Load-bearing details, in order of subtlety:
   nulled when `FF` is falsy so /vic/ — no forced-choice payload —
   keeps Space's scroll day job. Same canonical IO block; the section's
   contest TAB walk is a HOVER claim instead (see
-  auspol-hover-claims-arrows). Probe gotcha specific to this section:
-  `#flow-drift` is the all-polls view's LAST section, so it can only
-  ever be scrolled out ABOVE — but scrolling above puts the rd-ap-top /
-  house-lean Space claims on screen, and THEY win (registered
-  earlier). Positive checks must first park inside `#flow-drift` with
-  `#rd-ap-top` and `#house-lean` asserted off-screen; the negative
-  check is "scrolled clear above → Space leaves the menu untouched",
-  not "scrolled below" (impossible). Pinned in the desktop block of
-  `.matilda/probe/flows-ledger.mjs`.
+  auspol-hover-claims-arrows), and since the V2 family (2026-10-16)
+  the SELECTED contest tab (`#flow-drift .rd-fl-tabs .rd-tab`, pressed)
+  joins the Space claim's focus guard (onContestTab, ~:5298) — an
+  unpressed tab and the region menu itself keep native Space. Since
+  0f7eb4bd the section IS the /flows/ tab page (~1547px — it can
+  never leave a desktop viewport), so probe
+  `.matilda/probe/flows-ledger.mjs` (defaults to flows/index.html)
+  pins structure + consequence at the document's END (the claims hold
+  to the bottom) instead of a scrolled-clear release test; with the
+  pointer off the section <-/-> is the PAGE walk (right →
+  /flows-explained/, left → /leans/), and a poll-mark click
+  VIEW-SWAPS to allpolls in the same document with the mark's ledger
+  open (the probe returns by reloading PAGE — tab clicks cannot).
 - **Who-votes party chips** (2026-10-15) — rd-panels.jsx ~:2699-2735
   in `RdDemographics`, section `#who-votes`: `spaceParty.current`
   steps the party chips in DEMO_PARTIES order — onp One Nation → alp

@@ -4742,7 +4742,15 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
       if (!inView.current || e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the panel's own SELECTED measure tab owns Space too: a click leaves
+         the focus on it (rdTabFocus), where the key would only dead-fire
+         the same pick, so the claim flips the contest with the tab's pick
+         and focus staying put (the all-polls facet tabs' admission's
+         shape). An unpressed tab, the flip button and every other control
+         keep the key's day job */
+      const onMeasureTab = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true"
+        && a.matches('#house-lean .rd-hl-tabs .rd-tab');
+      if (!onMeasureTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceFlip.current) return;
@@ -5281,7 +5289,15 @@ function RdFlows({ measure }) {
       if (!inView.current || e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the contest row's SELECTED tab owns Space the roll's way: a click
+         leaves the focus on it, where the key would only dead-fire the
+         same contest pick, so the claim rolls the region menu with the
+         tab's pick and focus staying put. An unpressed tab and the region
+         menu itself keep the key's day job (its native pick; the menu's
+         native open) */
+      const onContestTab = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true"
+        && a.matches('#flow-drift .rd-fl-tabs .rd-tab');
+      if (!onContestTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceReg.current) return;

@@ -1,6 +1,8 @@
 // House-lean Space-flip probe: Space behaves like the "Labor v X ⇄" flip
 // while #house-lean is on screen on its Two-party view; elsewhere it keeps
 // its scroll day job. Modelled on the .matilda hover-claim probes.
+// Runs against the /leans/ page - 0f7eb4bd (2026-10-15) moved the section
+// off All polls into its own tab page.
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -28,7 +30,7 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 960 });
-await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "domcontentloaded" });
+await page.goto(`http://127.0.0.1:${PORT}/leans/`, { waitUntil: "domcontentloaded" });
 await page.waitForSelector("#house-lean .rd-pl-flip", { timeout: 20000 });
 const fails = [];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -105,25 +107,59 @@ expect(sideOf(f2) === sideOf(f0), "P4: focused Space flips exactly once (" + JSO
 expect((await page.evaluate(() => window.scrollY)) === (await page.evaluate(() => window.scrollY)), "P4: no scroll from focused Space");
 await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
 
-// P5: panel off the viewport - Space does not flip
-// (scroll past the section's whole height, not a fixed amount)
-await page.evaluate(() => {
-  const el = document.getElementById("house-lean");
-  window.scrollTo(0, el.offsetTop + el.offsetHeight + 200);
+// P6: focus on the SELECTED measure tab (where a click leaves it) - Space
+// still flips the contest, the tab's pick and focus staying put
+await showLean();
+const h0 = await label();
+await page.$eval('.rd-hl-tabs [aria-pressed="true"]', (el) => el.focus());
+await sleep(150);
+expect((await activeTag()) === "BUTTON", "P6: focus lands on the selected measure tab");
+await pressSpaceForChange(h0);
+const h1 = await label();
+expect(sideOf(h1) !== "?" && sideOf(h1) !== sideOf(h0), "P6: Space from the selected tab flips " + sideOf(h0) + " -> " + sideOf(h1));
+await pressSpaceForChange(h1);
+expect(sideOf(await label()) === sideOf(h0), "P6: Space again flips back");
+const tabKept = await page.evaluate(() => {
+  const a = document.activeElement;
+  const b = a && a.closest ? a.closest(".rd-hl-tabs [aria-pressed]") : null;
+  return !!(b && b.getAttribute("aria-pressed") === "true" && b.textContent.trim() === "Two-party");
 });
+expect(tabKept, "P6: the Two-party tab stays pressed and keeps the focus");
+
+// P7: an UNPRESSED measure tab keeps Space's day job (native activation)
+const target = await page.$eval('.rd-hl-tabs [aria-pressed="false"]', (el) => el.textContent.trim());
+await page.$eval('.rd-hl-tabs [aria-pressed="false"]', (el) => el.focus());
+await sleep(150);
+await page.keyboard.press("Space");
+await sleep(400);
+const picked = await page.evaluate(() => {
+  const b = [...document.querySelectorAll(".rd-hl-tabs [aria-pressed]")].find((x) => x.getAttribute("aria-pressed") === "true");
+  return b ? b.textContent.trim() : "";
+});
+expect(picked === target && target !== "Two-party", "P7: unpressed tab's native Space activates it (pick now " + JSON.stringify(picked) + ")");
+await clickHlTab("Two-party");
+await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+await sleep(150);
+
+// P5: since 0f7eb4bd the section IS the /leans/ page (1178px tall > any
+// desktop viewport), so it can never leave the viewport and the viewport
+// claim stays hot to the document's end. Pin the structure and the
+// consequence: at the very bottom Space still flips. A future layout that
+// makes the section exitable breaks the structure check - rewrite this
+// phase as a release test then.
+await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
 await sleep(400);
 const inView = await page.evaluate(() => {
   const r = document.getElementById("house-lean").getBoundingClientRect();
   return r.bottom > 0 && r.top < window.innerHeight;
 });
-expect(!inView, "P5: house-lean section is fully off-screen");
+expect(inView, "P5: house-lean still intersects at the document's end (full-page panel)");
 const g0 = await label();
-await page.keyboard.press("Space");
-await sleep(400);
+await pressSpaceForChange(g0);
 const g1 = await label();
-expect(sideOf(g1) === sideOf(g0), "P5: off-viewport Space leaves the contest alone");
+expect(sideOf(g1) !== "?" && sideOf(g1) !== sideOf(g0), "P5: Space at the document's end still flips (" + JSON.stringify(g1) + ")");
 
-expect(new URL(page.url()).pathname === "/allpolls/", "page stayed on allpolls throughout");
+expect(new URL(page.url()).pathname === "/leans/", "page stayed on leans throughout");
 
 console.log(fails.length ? "RESULT: FAIL (" + fails.join(" | ") + ")" : "RESULT: OK");
 await browser.close();

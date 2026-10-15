@@ -401,6 +401,22 @@ auspol-headless-geometry-verify. Selection-guard phases must drive
     `if ((!isHover.current && !iwHover.current && !trHover.current)
     || (e.key !== …all four arrows)) return;` — every extra family
     widens BOTH halves together.
+  - **SELECTED view tab passes the focus guard** (V2B, 2026-10-16;
+    user: "same problem with down/up arrows in The issues / Who's
+    trusted"). Clicking a view tab leaves Chrome's implicit focus on
+    the PRESSED tab (rdTabFocus), which the focus-BODY/HTML guard
+    then vetoed — hovered arrows fell through to the page. The guard
+    now ALSO admits the panel's own pressed tab (rd-panels.jsx
+    ~:4035 `onViewTab`: `a.matches('#issues .rd-is-tabs .rd-tab') &&
+    a.getAttribute('aria-pressed') === 'true'`); everything
+    downstream is unchanged — the trHover/isHover/iwHover gates, the
+    trust-row walk, the ←/→ view swap all still apply (the admission
+    is the guard, not a bypass of the claims). ←/→ while FOCUSED on
+    the tab row stay rdTabsKey's native walk; an unpressed tab and
+    every other control keep the keys. Probe: phase V2B of
+    `.matilda/probe-hover-issues-vert.mjs` (port 9003) pins ↓/↑ from
+    the focused pressed tab. Same admission family as the Space
+    selected-tab claims (see auspol-spacebar-viewport-claim).
   - Probes: `.matilda/probe-hover-issues-vert.mjs` (port 9003) —
     rows-column wrap walk both ways (claimed keys never scroll),
     chart-card hover, focused-row priority AND the focused walk's own
