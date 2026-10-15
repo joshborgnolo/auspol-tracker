@@ -1316,8 +1316,9 @@ body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3);
 body.rd .rd-wv-sethead b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
 /* the income tab's per-house bracket pill: quieter than the houses list,
-   one wrap-happy line */
-body.rd .rd-wv-bands { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--ink-3); }
+   one wrap-happy line, floated off its neighbours so the wrapped bands
+   never crowd the houses line above or the dot rows below */
+body.rd .rd-wv-bands { display: block; margin-top: 6px; margin-bottom: 8px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
 body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
 body.rd .rd-wv-band + .rd-wv-band::before { content: "·"; color: var(--ink-4); }
