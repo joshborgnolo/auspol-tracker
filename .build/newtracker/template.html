@@ -1275,7 +1275,7 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
   transition: color .15s ease, border-color .15s ease; }
 .hb-toggle:hover .hb-what { color: var(--ink); border-bottom-color: var(--ink); }
 /* the "?" trailing the basis sentence: a circled question mark linking the
-   /preference-flows/ explainer page. Wayfinding, not part of the toggle's
+   /flows-explained/ explainer page. Wayfinding, not part of the toggle's
    sentence – plain face, quiet ring, the author's own colour rule. */
 .hb-q { margin-left: 8px; align-self: center;
   width: 17px; height: 17px; border-radius: 999px;
@@ -3647,7 +3647,6 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 .tab-menu-item:focus-visible { background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
 .tab-menu-item.on .tab-menu-t, .tab-menu-item.on.tab-menu-info { font-weight: 600; }
 .tab-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
-.tab-menu-sep { height: 1px; background: var(--line); margin: 6px 6px; }
 .tab-menu-info { display: none; }
 /* ---- the next-poll countdown in the tab bar ------------------------------
    Wide screens only. The countdown is absolutely seated in BOTH bar states
@@ -5245,6 +5244,86 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   }
 }
 @page { margin: 14mm 12mm; }
+
+/* ---------- the preference-flows explainer's article (.ex-*) ----------
+   One fragment (explained-article.html) renders twice on the flows-explained
+   menu page – as the static summary and, after hydration, inside the live
+   RdExplained view – so its rules live at page level, not in rd.css. Ported
+   from the standalone /preference-flows/ page's pred-* block (October 2026),
+   which was itself tuned against this template's tokens, so the variables are
+   the same names. The head above it (kicker, Crimson hed, dek) is the shared
+   RdHed/static-summary machinery, not these rules. */
+.ex-body { max-width: 66ch; }
+.ex-body h2 {
+  margin: 44px 0 10px; padding-top: 12px;
+  border-top: 2px solid var(--ink);
+  font-family: var(--sans); font-size: 22px; font-weight: 600;
+  line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+  scroll-margin-top: 56px;
+}
+.ex-body h2 > span[id] { display: block; height: 0; scroll-margin-top: 56px; }
+.ex-body p { margin: 0 0 14px; font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty; }
+.ex-body p.ss-note { margin: 22px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); text-wrap: wrap; }
+.ex-body strong { color: var(--ink); font-weight: 600; }
+/* links in running prose: the site's tinted-underline idiom, ink on hover —
+   never the browser's blue (the content-link rule) */
+.ex-body p a, .ex-body li a, .ex-body td a, .ex-body caption a {
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+}
+.ex-body p a:hover, .ex-body li a:hover, .ex-body td a:hover, .ex-body caption a:hover,
+.ex-body p a:focus-visible, .ex-body li a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* the headline figures + their honesty bands */
+.ex-fig { margin: 32px 0 6px; }
+.ex-fam { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; }
+.ex-num { font-family: var(--sans); font-weight: 500; font-size: 54px; line-height: 1; letter-spacing: -0.03em; }
+.ex-cap { margin-top: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
+.ex-band { position: relative; height: 6px; margin-top: 20px; border-radius: 3px; background: var(--line-2); }
+.ex-ci { position: absolute; top: -2px; bottom: -2px; border-radius: 5px; background: var(--accent); opacity: 0.32; }
+.ex-med { position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 1px; background: var(--ink); }
+.ex-scale { display: flex; justify-content: space-between; margin-top: 7px; font-size: 10.5px; color: var(--ink-faint); }
+.ex-note { margin: 12px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+
+/* numbered construction steps */
+.ex-feats { list-style: none; margin: 2px 0 14px; padding: 0; }
+.ex-feats li { padding: 10px 0; border-top: 1px solid var(--line-2); font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty; }
+.ex-feats li:first-child { border-top: 0; }
+.ex-feats strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+
+/* tables: the poll-table idiom (small tabular cells, hairline rows) */
+.ex-twrap { overflow-x: auto; margin: 8px 0 10px; }
+.ex-table { width: 100%; min-width: 520px; border-collapse: collapse; }
+.ex-table caption { text-align: left; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); padding: 0 0 8px; caption-side: top; }
+.ex-table th, .ex-table td { padding: 6px 8px; border-bottom: 1px solid var(--line-2); font-variant-numeric: tabular-nums; }
+.ex-table thead th {
+  font-size: 13px; font-weight: 600; color: var(--ink-3); text-align: right;
+  border-bottom: 1px solid var(--line); white-space: nowrap; letter-spacing: 0.02em;
+}
+.ex-table td { font-size: 13.5px; text-align: right; white-space: nowrap; }
+.ex-table .ex-l { text-align: left; }
+.ex-table .ex-c { text-align: center; }
+.ex-table td.ex-sum { font-weight: 600; color: var(--ink); }
+.ex-table tr.ex-sum td { font-weight: 600; color: var(--ink); border-top: 1px solid var(--line); }
+.ex-table.ex-tight { min-width: 0; }
+.ex-tnote { margin: 0 0 14px; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+
+/* footer sources: quiet ink, visible underlines — a citation nobody can see
+   is the problem the list sets out to fix */
+.ex-src { margin: 8px 0 0; padding: 0 0 0 18px; list-style: disc; }
+.ex-src li { margin: 0 0 5px; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.ex-src strong { color: var(--ink-2); font-weight: 600; }
+.ex-body .ex-src a {
+  color: var(--ink-2); border-bottom: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+  text-decoration-color: color-mix(in oklch, var(--ink-2) 45%, transparent);
+}
+.ex-body .ex-src a:hover, .ex-body .ex-src a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
+
+@media (max-width: 640px) {
+  .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
+  .ex-num { font-size: 44px; }
+}
 
 </style>
   <style>/* The redesign – rules in .build/newtracker/assets/rd.css, spliced in by build.mjs. */

@@ -2129,7 +2129,6 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 .tab-menu-item:focus-visible { background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
 .tab-menu-item.on .tab-menu-t, .tab-menu-item.on.tab-menu-info { font-weight: 600; }
 .tab-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
-.tab-menu-sep { height: 1px; background: var(--line); margin: 6px 6px; }
 .tab-menu-info { display: none; }
 .tab-next { display: none; }
 @media (min-width: 1100px) {
@@ -3079,6 +3078,65 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   }
 }
 @page { margin: 14mm 12mm; }
+.ex-body { max-width: 66ch; }
+.ex-body h2 {
+  margin: 44px 0 10px; padding-top: 12px;
+  border-top: 2px solid var(--ink);
+  font-family: var(--sans); font-size: 22px; font-weight: 600;
+  line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+  scroll-margin-top: 56px;
+}
+.ex-body h2 > span[id] { display: block; height: 0; scroll-margin-top: 56px; }
+.ex-body p { margin: 0 0 14px; font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty; }
+.ex-body p.ss-note { margin: 22px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); text-wrap: wrap; }
+.ex-body strong { color: var(--ink); font-weight: 600; }
+.ex-body p a, .ex-body li a, .ex-body td a, .ex-body caption a {
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+}
+.ex-body p a:hover, .ex-body li a:hover, .ex-body td a:hover, .ex-body caption a:hover,
+.ex-body p a:focus-visible, .ex-body li a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.ex-fig { margin: 32px 0 6px; }
+.ex-fam { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; }
+.ex-num { font-family: var(--sans); font-weight: 500; font-size: 54px; line-height: 1; letter-spacing: -0.03em; }
+.ex-cap { margin-top: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
+.ex-band { position: relative; height: 6px; margin-top: 20px; border-radius: 3px; background: var(--line-2); }
+.ex-ci { position: absolute; top: -2px; bottom: -2px; border-radius: 5px; background: var(--accent); opacity: 0.32; }
+.ex-med { position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 1px; background: var(--ink); }
+.ex-scale { display: flex; justify-content: space-between; margin-top: 7px; font-size: 10.5px; color: var(--ink-faint); }
+.ex-note { margin: 12px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+.ex-feats { list-style: none; margin: 2px 0 14px; padding: 0; }
+.ex-feats li { padding: 10px 0; border-top: 1px solid var(--line-2); font-size: 15px; line-height: 1.62; color: var(--ink-2); text-wrap: pretty; }
+.ex-feats li:first-child { border-top: 0; }
+.ex-feats strong { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+.ex-twrap { overflow-x: auto; margin: 8px 0 10px; }
+.ex-table { width: 100%; min-width: 520px; border-collapse: collapse; }
+.ex-table caption { text-align: left; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); padding: 0 0 8px; caption-side: top; }
+.ex-table th, .ex-table td { padding: 6px 8px; border-bottom: 1px solid var(--line-2); font-variant-numeric: tabular-nums; }
+.ex-table thead th {
+  font-size: 13px; font-weight: 600; color: var(--ink-3); text-align: right;
+  border-bottom: 1px solid var(--line); white-space: nowrap; letter-spacing: 0.02em;
+}
+.ex-table td { font-size: 13.5px; text-align: right; white-space: nowrap; }
+.ex-table .ex-l { text-align: left; }
+.ex-table .ex-c { text-align: center; }
+.ex-table td.ex-sum { font-weight: 600; color: var(--ink); }
+.ex-table tr.ex-sum td { font-weight: 600; color: var(--ink); border-top: 1px solid var(--line); }
+.ex-table.ex-tight { min-width: 0; }
+.ex-tnote { margin: 0 0 14px; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.ex-src { margin: 8px 0 0; padding: 0 0 0 18px; list-style: disc; }
+.ex-src li { margin: 0 0 5px; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.ex-src strong { color: var(--ink-2); font-weight: 600; }
+.ex-body .ex-src a {
+  color: var(--ink-2); border-bottom: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+  text-decoration-color: color-mix(in oklch, var(--ink-2) 45%, transparent);
+}
+.ex-body .ex-src a:hover, .ex-body .ex-src a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
+@media (max-width: 640px) {
+  .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
+  .ex-num { font-size: 44px; }
+}
 </style>
   <style>
 body.rd {
@@ -3560,8 +3618,11 @@ body.rd .rd-tpp-legend { margin: 0 0 4px; }
 body.rd .rd-tpp-cmp { display: flex; align-items: center; flex-wrap: nowrap; gap: 14px; }
 body.rd .rd-tpp-cmp-l { font-size: 13px; color: var(--ink-3); }
 @media (max-width: 640px) {
-  body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 0 16px; margin-top: 12px; }
-  body.rd .rd-tpp-cmp .rd-check { font-size: 13px; }
+  body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; }
+  body.rd .rd-tpp-cmp .rd-check { font-size: 13px; gap: 8px; }
+}
+@media (max-width: 359.98px) {
+  body.rd .rd-tpp-cmp { min-height: 96px; }
 }
 @media (min-width: 641px) and (max-width: 700px) {
   body.rd .rd-tpp-chart .rd-tabs { flex-wrap: wrap; }
@@ -31510,20 +31571,7 @@ function Tabs({
     className: "tab-menu-t"
   }, t.label), t.tip && React.createElement("span", {
     className: "tab-menu-d"
-  }, t.tip))), !window.JUR && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "tab-menu-sep",
-    role: "separator"
-  }), React.createElement("a", {
-    role: "menuitem",
-    tabIndex: -1,
-    className: "tab-menu-item",
-    href: "/preference-flows/",
-    onClick: () => setMenuOpen(false)
-  }, React.createElement("span", {
-    className: "tab-menu-t"
-  }, "Preference flow explainer"), React.createElement("span", {
-    className: "tab-menu-d"
-  }, "How preferences decide the two-party figure"))))));
+  }, t.tip))))));
 }
 const fmtSigned1 = v => {
   const r = +v.toFixed(1);
@@ -37407,7 +37455,7 @@ function MenuPageView({
     tppBasis: tppBasis
   }), id === "flows" && React.createElement(RdFlows, {
     measure: measure
-  }));
+  }), id === "flows-explained" && React.createElement(RdExplained, null));
   return React.createElement("div", {
     className: "view view-" + id
   }, id === "disagreement" && React.createElement(VariancePanel, {
@@ -37423,7 +37471,12 @@ function MenuPageView({
     rangeId: "all"
   }), React.createElement(FlowDriftOnPanel, {
     rangeId: "all"
-  }))));
+  }))), id === "flows-explained" && React.createElement("div", {
+    className: "ex-body",
+    dangerouslySetInnerHTML: {
+      __html: window.EXPLAINED_ARTICLE || ""
+    }
+  }));
 }
 function FlowChart() {
   const narrow = useNarrow();
@@ -37935,7 +37988,7 @@ function infoTerms(D) {
       }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "Labor v One Nation flows"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", onM.toFixed(1), " once doubt about that table", " ", "is added to the polls\u2019 own margin.") : null, React.createElement("span", {
         className: "info-p"
       }, "Past cycles reads each earlier term through the flows of the election that opened it (see", " ", xref("last-election-flows", "implied 2PP", "Last-election flows"), "). Both tables, and the case for reading every poll through a fixed table, are set out in the", " ", React.createElement("a", {
-        href: "/preference-flows/"
+        href: "/flows-explained/"
       }, "preference flows explainer"), "."))
     }, {
       id: "preference-flows",
@@ -37957,7 +38010,7 @@ function infoTerms(D) {
       }, "On today\u2019s primaries: Labor\u2019s ", prim.alp.toFixed(1), ", plus", " ", fpc(FT.lnp), " of the Coalition\u2019s ", prim.lnp.toFixed(1), ", ", fpc(FT.grn), " of the Greens\u2019", " ", prim.grn.toFixed(1), " and ", fpc(FT.oth), " of the others\u2019 ", prim.oth.toFixed(1), ", gives", " ", L.onImp.a.toFixed(1), " to Labor and ", L.onImp.b.toFixed(1), " to One Nation. The table\u2019s own range, \xB1", L.onImp.band.toFixed(1), ", adds up the three settings\u2019 ranges. It measures doubt about the table, not sampling chance, so the hero adds it to the polls\u2019", " ", "own margin", L.onImp.cs != null ? React.createElement(React.Fragment, null, " (\xB1", L.onImp.cs.toFixed(1), ")") : null, " as a separate", " ", "error: \xB1", onM.toFixed(1), " in all, \xB1", (2 * onM).toFixed(1), " on the lead.") : null, React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Where the numbers come from."), " The ballots that do exist. The AEC\u2019s 2025 Senate ballot data records how every Coalition, Greens and other voter ranked Labor against One Nation. The 2026 lower-house contests where One Nation made the final two, the SA state election and the Secret Harbour by-election, show how that ranking carries into a House count, though both are estimates from partial data. The settings also allow for voters those contests left out, such as Nationals voters, and the Coalition setting sits partway between the site\u2019s reading and Kevin Bonham\u2019s independent estimate. The table stays fixed between such evidence and is never fitted to current polls. The pollsters\u2019 own Labor v One Nation figures rest on what respondents say, without the how-to-vote card close to half of Coalition voters copy, so they stay on the chart as a cross-check. The working is in the", " ", React.createElement("a", {
-        href: "/preference-flows/"
+        href: "/flows-explained/"
       }, "preference flows explainer"), "."))
     }]
   }, {
@@ -43072,7 +43125,7 @@ function RdHero(p) {
   })), React.createElement("p", {
     className: "rd-qnote"
   }, onImp ? "Their own head-to-heads, from where respondents say their preferences would go." + (otherSays ? " Against " + (m.b.name === "Coalition" ? "the Coalition" : m.b.name) + " they have " + otherSays + "." : "") : "The default reads every poll’s primary votes through fixed flows." + (otherSays ? " On those it has " + otherSays + "." : ""))), React.createElement("a", {
-    href: "/preference-flows/"
+    href: "/flows-explained/"
   }, "Read the full explainer \u2192"));
   const laborIds = orderedMatchups.filter(id => M[id].vsLabor);
   const otherOf = id => M[id] && M[id].vsLabor ? laborIds.find(x => x !== id) || null : null;
@@ -43122,7 +43175,7 @@ function RdHero(p) {
   const cmpData = !cmpAvail ? null : matchup === "alp_on" ? onImp ? M.alp_on.data : D.synthOn : onImp ? D.agg2pp : D.synth2pp;
   const cmpOn = showSynth && cmpAvail && !morph && cmpData && cmpData.length > 1;
   const cmpName = onImp ? "As published" : "Implied";
-  const cmpBox = onImp ? "Compare published 2PP" : "Compare implied 2PP";
+  const cmpBox = onImp ? "Published 2PP" : "Implied 2PP";
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
   const sensLabel = "Range if One Nation preferences flowed as " + (window.JUR ? "at the 2022 federal election" : "in 2022");
   const EXT_KB = "#7e52a8",
@@ -43136,7 +43189,20 @@ function RdHero(p) {
     isOn = shown === "alp_on";
   const extAvail = isCoal && !!(extBt || extKb) || isOn && !!extSh;
   const extOn = showExt && extAvail && !morph;
-  const extBox = "Compare outside estimates";
+  const extBox = "Outside estimates";
+  const cmpCtl = cmpAvail || extAvail ? React.createElement("div", {
+    className: "rd-tpp-cmp",
+    role: "group",
+    "aria-label": "Compare"
+  }, React.createElement("span", {
+    className: "rd-tpp-cmp-l"
+  }, "Compare"), cmpAvail ? React.createElement(RdCheck, {
+    checked: showSynth,
+    onChange: setShowSynth
+  }, cmpBox) : null, extAvail ? React.createElement(RdCheck, {
+    checked: showExt,
+    onChange: setShowExt
+  }, extBox) : null) : null;
   const extFig = pts => pts && pts.length ? " (" + pts[pts.length - 1].y.toFixed(1) + "%)" : "";
   const extBtHref = "https://" + (ext && ext.bt && ext.bt.feed ? ext.bt.feed : "");
   const extKbHref = "https://" + (ext && ext.bonham && ext.bonham.site ? ext.bonham.site : "");
@@ -43426,21 +43492,21 @@ function RdHero(p) {
     kind: "line",
     color: otherCol,
     label: labelOther + ", " + lineWord(otherOf(shown), b0)
-  } : null, cmpOn ? {
+  } : null, cmpOn && !narrow ? {
     kind: "dash",
     color: mainCol,
     label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp")
-  } : null, extOn && isCoal && extBt ? {
+  } : null, extOn && !narrow && isCoal && extBt ? {
     kind: "line",
     color: EXT_BT,
     label: lblExtBt,
     href: extBtHref
-  } : null, extOn && isCoal && extKb ? {
+  } : null, extOn && !narrow && isCoal && extKb ? {
     kind: "line",
     color: EXT_KB,
     label: lblExtKb,
     href: extKbHref
-  } : null, extOn && isOn && extSh ? {
+  } : null, extOn && !narrow && isOn && extSh ? {
     kind: "line",
     color: EXT_KB,
     label: lblExtSh,
@@ -43741,13 +43807,7 @@ function RdHero(p) {
     className: "rd-tabs-sm",
     swipeSelf: true,
     pin: true
-  }, !narrow && cmpAvail && React.createElement(RdCheck, {
-    checked: showSynth,
-    onChange: setShowSynth
-  }, cmpBox), !narrow && extAvail && React.createElement(RdCheck, {
-    checked: showExt,
-    onChange: setShowExt
-  }, extBox)), React.createElement("div", {
+  }, !narrow && cmpCtl), narrow && cmpCtl, React.createElement("div", {
     className: "rd-chead"
   }, React.createElement("span", {
     className: "rd-chead-t"
@@ -43854,18 +43914,12 @@ function RdHero(p) {
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: keyItems
-  }), narrow && cmpAvail && React.createElement(RdCheck, {
-    checked: showSynth,
-    onChange: setShowSynth
-  }, cmpBox), narrow && extAvail && React.createElement(RdCheck, {
-    checked: showExt,
-    onChange: setShowExt
-  }, extBox)), React.createElement(RdFoot, {
+  })), React.createElement(RdFoot, {
     how: KAL ? {
       term: "weighted-aggregate",
       from: "Two-party preferred"
     } : {
-      href: "/preference-flows/"
+      href: "/flows-explained/"
     }
   }, KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago. The chart follows the matchup chosen above." : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.", extOn && isCoal && React.createElement(React.Fragment, null, " BludgerTrack\u2019s line is its published trend. Bonham\u2019s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025."), extOn && isOn && React.createElement(React.Fragment, null, " Bonham\u2019s line is his published shadow-2PP, averaged by month like ours. He converts each poll\u2019s primary votes with his own estimates of 2025 preferences and averages the latest ten polls, at most two from each pollster. Our flows differ, so the two lines need not agree.")));
 }
@@ -48343,48 +48397,237 @@ function RdSwitching({
   const gkLo = goKs.length ? Math.min(...goKs) : 0,
     gkHi = goKs.length ? Math.max(...goKs) : 0;
   const goSubDek = "Where " + GO_COHORT_W[V] + " have landed: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. " + (gkLo ? "A month rests on " + (gkLo === gkHi ? rdNumWord(gkLo) : rdNumWord(gkLo) + " to " + rdNumWord(gkHi)) + " polls, so a move that stays inside the band is noise. " : "") + "Each chart sets its own scale: the kept share dwarfs every destination.";
+  const gof = v => v.toFixed(1);
+  const GO_GAP = 4,
+    GO_H = 240;
+  const goNmOpts = r => r.id === "kept" ? [r.nm + ", kept", r.nm] : r.id === "onp" ? ["One Nation", "ON"] : r.id === "grn" ? ["The Greens", "Greens", ""] : r.id === "oth" ? ["Minors & independents", "Minors", "Others", ""] : r.id === "cross" && V === "alp" ? ["The Coalition", "Coalition", ""] : r.id === "cross" ? ["Labor", ""] : [r.nm];
+  const goGeo = (() => {
+    const tot = goRows.reduce((s, r) => s + r.now.v, 0) || 100;
+    const usable = W - GO_GAP * (goRows.length - 1);
+    let x = 0;
+    return goRows.map((r, i) => {
+      const cw = r.now.v / tot * usable,
+        g = {
+          r,
+          i,
+          x,
+          cw
+        };
+      x += cw + GO_GAP;
+      return g;
+    });
+  })();
+  const goLabOpts = goGeo.map((g, i) => {
+    const v = g.r.now.v,
+      pc = gof(v) + "%";
+    return {
+      nm: goNmOpts(g.r),
+      sz: i === 0 ? [pc + " of " + GO_COHORT_W[V], goShareWords(v), ""] : [goShareWords(v), ""],
+      pts: [pc],
+      sh: [Math.round(v) + "% ±" + gof(g.r.now.ci95), Math.round(v) + "%", ""]
+    };
+  });
+  const goLab = {};
+  [["nm", 15, 600], ["sz", 12, 400]].forEach(([key, size, wt]) => {
+    const k = goGeo.map(() => 0);
+    const ext = i => {
+      const w = textWidth(goLabOpts[i][key][k[i]], size, wt);
+      const last = i === goGeo.length - 1;
+      const x = last ? goGeo[i].x + goGeo[i].cw : goGeo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let i = 0; i < goGeo.length - 1; i++) {
+      for (let guard = 0; guard < 6 && ext(i)[1] + 10 > ext(i + 1)[0]; guard++) {
+        if (k[i] < goLabOpts[i][key].length - 1) k[i]++;else if (k[i + 1] < goLabOpts[i + 1][key].length - 1) k[i + 1]++;else break;
+      }
+    }
+    goLab[key] = k.map((j, i) => goLabOpts[i][key][j]);
+  });
+  const goFigs = goGeo.map(g => gof(g.r.now.v) + "%");
+  const goPtsTier = (() => {
+    const rights = [];
+    return goGeo.map((g, i) => {
+      const w = textWidth(goFigs[i], 15, 600);
+      const x = i === goGeo.length - 1 ? g.x + g.cw : g.x;
+      const L = i === goGeo.length - 1 ? x - w : x,
+        R = i === goGeo.length - 1 ? x : x + w;
+      let t = 0;
+      while (rights[t] != null && rights[t] + 2 > L) t++;
+      rights[t] = R;
+      return t;
+    });
+  })();
+  const goTierMax = goPtsTier.reduce((m, t) => Math.max(m, t), 0);
+  const goShTier = Array.from({
+    length: goTierMax + 1
+  }, (_, tier) => {
+    const which = goGeo.map((g, i) => goPtsTier[i] === tier ? i : -1).filter(i => i >= 0);
+    const k = goGeo.map(() => 0);
+    const ext = (i, sh) => {
+      const w = textWidth(goLabOpts[i].sh[sh], 12, 400);
+      const last = i === goGeo.length - 1;
+      const x = last ? goGeo[i].x + goGeo[i].cw : goGeo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let a = 0; a < which.length - 1; a++) {
+      const i = which[a],
+        j = which[a + 1];
+      for (let guard = 0; guard < 6 && ext(i, k[i])[1] + 2 > ext(j, k[j])[0]; guard++) {
+        if (k[i] < goLabOpts[i].sh.length - 1) k[i]++;else if (k[j] < goLabOpts[j].sh.length - 1) k[j]++;else break;
+      }
+    }
+    return k;
+  });
+  goLab.sh = goGeo.map((g, i) => goLabOpts[i].sh[goShTier[goPtsTier[i]][i]]);
+  const goSvgH = GO_H + 110 + goTierMax * 46;
+  const goMosaic = React.createElement("svg", {
+    className: "rd-go",
+    width: W,
+    height: goSvgH,
+    viewBox: `0 0 ${W} ${goSvgH}`,
+    role: "img",
+    "aria-label": "Where " + GO_COHORT_W[V] + " landed, each destination a column sized by its share of the cohort: " + goRows.map(r => r.nm + " " + gof(r.now.v) + "%").join(", ") + "."
+  }, goGeo.map((g, i) => {
+    const r = g.r,
+      last = i === goGeo.length - 1;
+    const tx = last ? g.x + g.cw : g.x,
+      anchor = last ? "end" : "start";
+    const fig = goFigs[i];
+    const fz = r.id === "kept" ? 22 : 15;
+    const fit = g.cw >= textWidth(fig, fz, 600) + 20;
+    const tierY = 48 + GO_H + 28 + goPtsTier[i] * 46;
+    return React.createElement("g", {
+      key: r.id
+    }, React.createElement("text", {
+      className: "rd-go-nm",
+      x: tx,
+      y: 16,
+      textAnchor: anchor,
+      style: {
+        fill: inkOf(r.color)
+      }
+    }, goLab.nm[i]), React.createElement("text", {
+      className: "rd-go-sz",
+      x: tx,
+      y: 35,
+      textAnchor: anchor
+    }, goLab.sz[i]), React.createElement("rect", {
+      className: "rd-go-colfill",
+      x: g.x,
+      y: 48,
+      width: g.cw,
+      height: GO_H,
+      style: {
+        fill: r.color
+      }
+    }), fit && (r.id === "kept" ? React.createElement(React.Fragment, null, React.createElement("text", {
+      className: "rd-go-big",
+      x: g.x + 10,
+      y: 48 + 32,
+      textAnchor: "start",
+      style: {
+        fill: r.fill
+      }
+    }, fig), React.createElement("text", {
+      className: "rd-go-sz",
+      x: g.x + 10,
+      y: 48 + 50,
+      textAnchor: "start",
+      style: {
+        fill: r.fill
+      }
+    }, "kept")) : React.createElement("text", {
+      className: "rd-go-rates",
+      x: g.x + 10,
+      y: 48 + 26,
+      textAnchor: "start",
+      style: {
+        fill: r.fill
+      }
+    }, fig)), React.createElement("text", {
+      className: "rd-go-pts",
+      x: tx,
+      y: tierY,
+      textAnchor: anchor
+    }, goFigs[i]), React.createElement("text", {
+      className: "rd-go-sh",
+      x: tx,
+      y: tierY + 19,
+      textAnchor: anchor
+    }, goLab.sh[i]));
+  }), React.createElement("line", {
+    x1: "0",
+    x2: W,
+    y1: 48 + GO_H,
+    y2: 48 + GO_H,
+    className: "rd-go-base"
+  }));
+  const goRowsPhone = React.createElement("div", {
+    className: "rd-go-rows"
+  }, goRows.map((r, i) => React.createElement("div", {
+    key: r.id,
+    className: "rd-go-row"
+  }, React.createElement("div", {
+    className: "rd-go-rtop"
+  }, React.createElement("b", {
+    style: {
+      color: inkOf(r.color)
+    }
+  }, r.nm, r.id === "kept" ? ", kept" : ""), React.createElement("b", null, i <= 1 ? gof(r.now.v) + "% of " + GO_HALF[V] + " voters" : gof(r.now.v) + "%")), React.createElement("div", {
+    className: "rd-go-rsub"
+  }, React.createElement("span", null, goShareWords(r.now.v)), React.createElement("span", null, Math.round(r.now.v), "% \xB1", gof(r.now.ci95))), React.createElement("div", {
+    className: "rd-go-rbar",
+    style: {
+      height: Math.max(16, r.now.v * 2.6),
+      background: r.tint
+    }
+  }, React.createElement("span", {
+    style: {
+      width: r.now.v + "%",
+      background: r.color
+    }
+  }), r.id === "kept" ? React.createElement("em", {
+    className: "rd-go-first",
+    style: {
+      left: "calc(" + r.now.v + "% + 8px)",
+      color: inkOf(r.color)
+    }
+  }, React.createElement("span", {
+    className: "rd-go-big"
+  }, gof(r.now.v), "%"), React.createElement("span", {
+    className: "rd-go-nb"
+  }, "kept")) : React.createElement("em", {
+    style: {
+      left: "calc(" + r.now.v + "% + 8px)",
+      color: inkOf(r.color)
+    }
+  }, gof(r.now.v), "%"), r.id === "kept" && React.createElement("i", {
+    className: "rd-go-else",
+    style: {
+      color: inkOf(r.color)
+    }
+  }, "Went elsewhere")))));
   const goSec = V === "onp" ? null : React.createElement(React.Fragment, null, goHead && React.createElement(RdHed, {
     head: goHead,
     dek: goDek
   }), React.createElement("div", {
-    className: "card rd-card rd-go-wrap"
-  }, React.createElement("div", {
-    className: "rd-go-rows"
-  }, goRows.map(r => {
-    const inBar = r.now.v >= 18;
-    return React.createElement("div", {
-      key: r.id,
-      className: "rd-go-row"
-    }, React.createElement("div", {
-      className: "rd-go-rtop"
-    }, React.createElement("b", {
-      style: {
-        color: inkOf(r.color)
-      }
-    }, r.nm, r.id === "kept" ? ", kept" : ""), React.createElement("b", null, r.now.v.toFixed(1), "%")), React.createElement("div", {
-      className: "rd-go-rsub"
-    }, React.createElement("span", null, goShareWords(r.now.v)), React.createElement("span", null, "95% interval \xB1", r.now.ci95.toFixed(1))), React.createElement("div", {
-      className: "rd-go-rbar",
-      style: {
-        background: r.tint
-      }
-    }, React.createElement("span", {
-      style: {
-        width: r.now.v + "%",
-        background: r.color
-      }
-    }), React.createElement("em", {
-      style: inBar ? {
-        left: 12,
-        color: r.fill
-      } : {
-        left: "calc(" + r.now.v + "% + 8px)",
-        color: "var(--ink)"
-      }
-    }, r.now.v.toFixed(1), "%")));
-  })), React.createElement("p", {
+    className: "card rd-card rd-go-wrap",
+    ref: boxRef
+  }, narrow ? goRowsPhone : goMosaic, React.createElement("p", {
     className: "rd-note rd-go-note"
-  }, "Shares of all ", GO_COHORT_W[V], "; the five destinations sum to the cohort.")), React.createElement(RdSub, {
+  }, "Shares of all ", GO_COHORT_W[V], "; the five destinations sum to the cohort."), React.createElement("div", {
+    className: "rd-key rd-go-key"
+  }, goRows.map(r => React.createElement("span", {
+    key: r.id,
+    className: "rd-key-item"
+  }, React.createElement(RdSwatch, {
+    kind: "square",
+    color: r.color
+  }), r.nm, r.id === "kept" ? ", kept" : "")), !narrow && React.createElement("span", {
+    className: "rd-key-item rd-go-howread"
+  }, "Column width: share of ", GO_COHORT_W[V], ", the five columns summing to the cohort")), narrow && React.createElement("p", {
+    className: "rd-note"
+  }, "Bar height: that destination\u2019s share of ", GO_COHORT_W[V], ". Fill: its exact share, written beside the fill.")), React.createElement(RdSub, {
     head: goSubHead,
     dek: goSubDek
   }), React.createElement("div", {
@@ -62628,9 +62871,32 @@ function RdFlows({
     }
   }, FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is the AEC’s national two-party-preferred flow; on a named region it is our replay of the seats classed to it. This check corrects no other figure on the page." : "This check corrects no other figure on the page."));
 }
+function RdExplained() {
+  return React.createElement("section", {
+    className: "rd-sec rd-explained",
+    id: "flows-explained",
+    "aria-labelledby": "rd-ex-t"
+  }, React.createElement("div", {
+    className: "rd-eyebrow"
+  }, React.createElement("h2", {
+    className: "rd-title",
+    id: "rd-ex-t"
+  }, "Preference flows explained"), React.createElement("span", {
+    className: "rd-meta"
+  }, "How preferences decide the two-party figure")), React.createElement(RdHed, {
+    head: "Every two-party figure here exists twice",
+    dek: "Published as each pollster computes it, and implied from first preferences by one counted preference-flow table, the same table for every pollster. Below: what each reading is, why the implied figure is the default, and where its numbers come from."
+  }), React.createElement("div", {
+    className: "ex-body",
+    dangerouslySetInnerHTML: {
+      __html: window.EXPLAINED_ARTICLE || ""
+    }
+  }));
+}
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
 const RdFlowsM = React.memo(RdFlows);
+const RdExplainedM = React.memo(RdExplained);
 Object.assign(window, {
   RdLedger,
   RdAllPolls,
@@ -62639,7 +62905,8 @@ Object.assign(window, {
   rdPollMargin,
   RdDisagree: RdDisagreeM,
   RdHouseLean: RdHouseLeanM,
-  RdFlows: RdFlowsM
+  RdFlows: RdFlowsM,
+  RdExplained: RdExplainedM
 });</script>
   <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 const SETTLE_MS = 220;
@@ -63997,7 +64264,7 @@ function Hero({
     className: "hb-what"
   }, (basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only"), (basis || "imp") === "imp" ? " (default)" : ""), React.createElement("a", {
     className: "hb-q",
-    href: "/preference-flows/",
+    href: "/flows-explained/",
     "aria-label": "How the two bases work \u2013 read the full explainer",
     title: "How the two bases work \u2013 the full explainer"
   }, "?")), React.createElement("div", {
@@ -64318,12 +64585,18 @@ const TABS = [{
   menu: true,
   tip: "Where minor-party preferences are flowing now, against the last election"
 }, {
+  id: "flows-explained",
+  label: "Preference flows explained",
+  menu: true,
+  tip: "How preferences decide the two-party figure"
+}, {
   id: "info",
   label: "Info",
   pinHide: true,
   tip: "About this site – how it works, what it tracks, and the terms it uses"
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));
 const TAB_BASE = window.JUR ? "/vic/" : "/";

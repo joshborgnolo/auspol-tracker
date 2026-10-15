@@ -77,11 +77,12 @@ export const ROOT = path.resolve(HERE, "..");
    the satellites each being a page of their own in the colophon), `page`
    for the colophon's two self-references (the feedback page doesn't invite
    feedback on itself; an archive page doesn't point at the archives). The
-   two redirect stubs (archives/index.html, newspoll-archive/index.html)
-   redirect before paint and carry nothing. */
+   three redirect stubs (archives/index.html, newspoll-archive/index.html,
+   preference-flows/index.html) redirect before paint and carry nothing –
+   the last became one on 2026-10-15 when the preference-flows explainer
+   moved into the main build as the /flows-explained/ tab page. */
 export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
-  { file: "preference-flows/index.html", menu: "explainer" },   // the ☰ menu's explainer item
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "changelog/index.html" },                         // written by .build/newtracker/build.mjs (federal pass)
   { file: "atlas/index.html" },
@@ -278,8 +279,11 @@ const SHELL_V = () => createHash("sha256").update(shellCss() + "\n//\n" + shellJ
 // ---- the markup written into each page ---------------------------------------------
 /* The ☰ menu, as the main page's (Tabs, d1a1d215…js): the TABS entries
    marked menu (pages of the main site reached from the menu, not the bar),
-   the flows explainer, and Info where the pinned phone bar drops its tab.
-   `menu` names the satellite the menu itself holds (the explainer). */
+   and Info where the pinned phone bar drops its tab. The flows explainer
+   joined the main-page set on 2026-10-15 as the flows-explained tab page
+   (a TABS menu entry like the others), so no satellite supplements remain.
+   `menu` still flips the ☰ button's active styling when a satellite IS a
+   menu page (none today). */
 const SHELL_MENU_ICON = '<svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg>';
 function shellMenu(menu) {
   const info = TABS.find((t) => t.pinHide && !t.menu);
@@ -289,8 +293,6 @@ function shellMenu(menu) {
   return `<div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden>`
     + (info ? item(" sh-menu-info", info.href, false, info.label, "", info.id) : "")
     + TABS.filter((t) => t.menu).map((t) => item("", t.href, false, t.label, t.tip, t.id)).join("")
-    + `<span class="sh-menu-sep" role="separator"></span>`
-    + item("", "/preference-flows/", menu === "explainer", "Preference flow explainer", "How preferences decide the two-party figure")
     + `</div>`;
 }
 export function shellHeader({ tab, menu } = {}) {
@@ -767,7 +769,6 @@ body { height: auto; }
 .sh-menu-item:focus-visible { background: var(--surface-2, var(--line)); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
 .sh-menu-item.on .sh-menu-t { font-weight: 600; }
 .sh-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
-.sh-menu-sep { height: 1px; background: var(--line); margin: 6px; }
 .sh-menu-info { display: none; }
 
 /* the docked 2PP score (.tab-score): absolutely seated on the underline at

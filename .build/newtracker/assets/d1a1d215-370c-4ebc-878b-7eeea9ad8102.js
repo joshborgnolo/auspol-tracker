@@ -558,15 +558,6 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                 {t.tip && <span className="tab-menu-d">{t.tip}</span>}
               </a>
             ))}
-            {/* the explainer is a page of the federal site's own, not a view */}
-            {!window.JUR && <>
-              <span className="tab-menu-sep" role="separator"></span>
-              <a role="menuitem" tabIndex={-1} className="tab-menu-item" href="/preference-flows/"
-                 onClick={() => setMenuOpen(false)}>
-                <span className="tab-menu-t">Preference flow explainer</span>
-                <span className="tab-menu-d">How preferences decide the two-party figure</span>
-              </a>
-            </>}
           </div>
         )}
       </nav>
@@ -6540,6 +6531,7 @@ function MenuPageView({ id, tppBasis }) {
       {id === "disagreement" && <RdDisagree />}
       {id === "leans" && <RdHouseLean measure={measure} onMeasure={setMeasure} tppBasis={tppBasis} />}
       {id === "flows" && <RdFlows measure={measure} />}
+      {id === "flows-explained" && <RdExplained />}
     </div>
   );
   return (
@@ -6549,6 +6541,10 @@ function MenuPageView({ id, tppBasis }) {
       {id === "flows" && ((D.latest && D.latest.rivalLead) === "alp_on"
         ? <><FlowDriftOnPanel rangeId="all" /><FlowDriftPanel rangeId="all" /></>
         : <><FlowDriftPanel rangeId="all" /><FlowDriftOnPanel rangeId="all" /></>)}
+      {/* the explainer is a redesign page; under design=old its article body
+          still renders (the .ex-* styles are page-level, not rd-gated), just
+          without the rd head */}
+      {id === "flows-explained" && <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />}
     </div>
   );
 }
@@ -7320,7 +7316,7 @@ function infoTerms(D) {
           election that opened it (see
           {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}). Both tables, and
           the case for reading every poll through a fixed table, are set out in the
-          {" "}<a href="/preference-flows/">preference flows explainer</a>.</span></>) },
+          {" "}<a href="/flows-explained/">preference flows explainer</a>.</span></>) },
         { id: "preference-flows", term: "Preference flows", body: (
           <>How minor-party votes split between the final two candidates once preferences are
           distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} against the
@@ -7371,7 +7367,7 @@ function infoTerms(D) {
           pollsters’ own Labor v One Nation figures rest on what respondents say, without the
           how-to-vote card close to half of Coalition voters copy, so they stay on the chart as a
           cross-check. The working is in the{" "}
-          <a href="/preference-flows/">preference flows explainer</a>.</span></>) },
+          <a href="/flows-explained/">preference flows explainer</a>.</span></>) },
       ] },
     { id: "s-primary", title: "Primary vote", nav: "Primary vote",
       lead: { id: "primary-vote", body: (

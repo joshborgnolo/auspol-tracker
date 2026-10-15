@@ -1,6 +1,8 @@
 /* test-flow-splits.mjs – pins the preference-flows data and its renderer in
    the All-polls Preference flows section (the forced-choice answers moved
-   2026-10-10 from the /preference-flows/ satellite's #forced section).
+   2026-10-10 from the old /preference-flows/ satellite's #forced section –
+   which itself retired 2026-10-15 to a redirect stub when the explainer
+   joined the main build as /flows-explained/).
    The data: gen-data's D.flowForced (§7db) carries RedBridge/Accent's waves
    read straight off polls.json's tpp_split/tpp_split_on rows verbatim, the
    June-2026 Coalition est derivation rides exactly one cohort of one wave,
@@ -260,13 +262,20 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
   && ap.indexOf('className={"rd-fl-dblock"') > ap.indexOf('className="rd-fl-lhead"'),
   "reading order: tabs, then the ledger, then the drift chart");
 
-// ---- the satellite stays stripped -------------------------------------------------------
+// ---- the retired satellite is a redirect stub --------------------------------------------
+/* preference-flows/index.html retired 2026-10-15 to a hash-preserving
+   redirect: the explainer's content lives in the main build's
+   /flows-explained/ tab page (build.mjs 5a + explained-article.html). */
 const page = fs.readFileSync(path.join(ROOT, "preference-flows", "index.html"), "utf8");
 for (const dead of ['id="forced"', '<a href="#forced"', "flow-splits.json", 'id="fsq-', ".fsq ", "--fs-alp",
-                    'draw("fsq-'])
-  assert.ok(!page.includes(dead), `the satellite keeps no trace of: ${dead}`);
-assert.ok(page.includes('respondent-allocated two-party answers by first preference &mdash; charted under Preference flows in the <a href="/#allpolls">'),
-  "the source bullet redirects the splits reader to the main page's All polls tab");
+                    'draw("fsq-', "<!--shell:", "sh-menu"])
+  assert.ok(!page.includes(dead), `the stub keeps no trace of: ${dead}`);
+assert.ok(page.includes('<meta http-equiv="refresh" content="0; url=/flows-explained/">'),
+  "the stub's meta refresh points at /flows-explained/");
+assert.ok(page.includes('location.replace("/flows-explained/" + location.hash)'),
+  "the script redirect preserves the hash (the old page's section anchors survive as ids)");
+assert.ok(page.includes('<link rel="canonical" href="https://auspoltracker.com/flows-explained/">'),
+  "the stub cedes the canonical to the new page");
 assert.ok(!fs.existsSync(path.join(ROOT, "assets", "flow-splits.json")),
   "the retired flow-splits.json asset is gone");
 console.log("test-flow-splits: ok");

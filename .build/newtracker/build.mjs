@@ -705,10 +705,10 @@ function ssChangelogBlock(esc) {
    /prediction/). Written on every federal build – a quiet refresh writes the
    same bytes, so the unattended slots see a clean tree; the Vic pass exits
    long before here, so a Vic dataset never gets the page.
-   The head is /preference-flows/'s, which is the main page's (rd.css): a
-   kicker in the .rd-title cut over a Crimson 700 .rd-hed, then the dek, on
-   the shell's own .sh-frame so the column's edge is the masthead's. The
-   entries sit in a console set in IBM Plex Mono (user, 2026-10-12: "a
+   The head is the main page's (rd.css): a kicker in the .rd-title cut over
+   a Crimson 700 .rd-hed, then the dek, on the shell's own .sh-frame so the
+   column's edge is the masthead's. The entries sit in a console set in IBM
+   Plex Mono (user, 2026-10-12: "a
    monospace font … a bit of a cool environment") – one line per entry,
    ISO date, kind tag, text, the figures lit like syntax. */
 const CL_KIND = {
@@ -843,7 +843,7 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- frame + head: /preference-flows/'s, which is rd.css's -------
+/* ------- frame + head: rd.css's, via the old /preference-flows/ page -------
    the shell's .sh-frame box (the masthead's edge), the long-form 66ch
    measure, the .rd-title kicker over the .rd-hed headline and .rd-dek */
 main.sh-frame {
@@ -1300,6 +1300,27 @@ ${ssTail(esc, sources)}
 ${ssTail(esc, sources)}
     </article>`;
   }
+  /* flows-explained (the ☰ menu's fourth page, 2026-10-15): the explainer
+     itself. Its static article IS the article, head and sub included – every
+     other tab's static slot is a proxy for live charts, but this page's
+     content is prose, and a crawler or no-JS reader gets the whole of it.
+     The body is explained-article.html verbatim: the same string the client
+     renders as window.EXPLAINED_ARTICLE – one file, two consumers. The
+     dated corrections folded into the prose live in that file's comment. */
+  if (id === "flows-explained") {
+    const body = fs.readFileSync(path.join(HERE, "explained-article.html"), "utf8");
+    return `<article class="static-summary">
+      <h1>Preference flows explained</h1>
+      <p class="ss-sub">Every two-party figure here exists twice &#8211; the figure each
+        pollster publishes, and the figure implied from the poll&#8217;s first preferences by one
+        counted preference-flow table, the same table for every pollster. What each reading is,
+        why the implied figure is the default, and where its numbers come from.</p>
+
+      <div class="ex-body">
+${body.trim()}
+      </div>
+    </article>`;
+  }
   /* the ☰ menu's pages: what each measures, in words; the figures are the
      live page's charts */
   const MENU_SS = {
@@ -1677,6 +1698,12 @@ writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
    document, and the browser resolves the cycle-source fetch against the
    page's own URL. */
 parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
+/* The explainer's article, shipped to every federal document so the ☰ menu's
+   flows-explained tab renders on an instant client-side swap like its
+   siblings (tab clicks never fetch). One source: the string here and the
+   static article of the /flows-explained/ document (buildTabSummary) are the
+   same file. /vic/ has no explainer tab and ships no copy. */
+if (!VIC) parts.push(`<script>window.EXPLAINED_ARTICLE=${inlineJs(JSON.stringify(fs.readFileSync(path.join(HERE, "explained-article.html"), "utf8")))};<\/script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
 for (const f of PLAIN)
@@ -1725,6 +1752,12 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       desc: `How each ${VIC ? JV.adj : "Australian federal"} pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.` },
     { id: "flows", label: "Preference flows",
       desc: `Where ${VIC ? JV.adj : "Australian federal"} preferences are flowing now – what voters tell pollsters, and what the pollsters' own two-party figures imply, set against the flows of the last election.` },
+    /* the ☰ menu's fourth page, straight under Preference flows (the user's
+       2026-10-15 call: the explainer was a dressed satellite at
+       /preference-flows/, moved here as a page of the build – a federal
+       page only, /vic/'s menu never holds it) */
+    ...(VIC ? [] : [{ id: "flows-explained", label: "Preference flows explained",
+      desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     { id: "info", label: "Info",
       desc: `How ${BRAND} tracker works – the aggregate's weighting and house-lean method, the pollsters it tracks, and a glossary of the terms the site uses.` },
   ];
@@ -2027,6 +2060,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <lastmod>${dataStamp}</lastmod>
   </url>
   <url>
+    <loc>${SITE_URL}flows-explained/</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
     <loc>${SITE_URL}changelog/</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
@@ -2060,10 +2097,6 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
   <url>
     <loc>${SITE_URL}feedback/</loc>
-    <lastmod>${ARCHIVE_STAMP}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}preference-flows/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>

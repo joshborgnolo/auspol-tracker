@@ -195,7 +195,7 @@ function RdHero(p) {
             : "The default reads every poll’s primary votes through fixed flows." + (otherSays ? " On those it has " + otherSays + "." : "")}</p>
         </>
       )}
-      <a href="/preference-flows/">Read the full explainer →</a>
+      <a href="/flows-explained/">Read the full explainer →</a>
     </RdQPop>
   );
 
@@ -237,7 +237,7 @@ function RdHero(p) {
     : (onImp ? D.agg2pp : D.synth2pp);
   const cmpOn = showSynth && cmpAvail && !morph && cmpData && cmpData.length > 1;
   const cmpName = onImp ? "As published" : "Implied";
-  const cmpBox = onImp ? "Compare published 2PP" : "Compare implied 2PP";
+  const cmpBox = onImp ? "Published 2PP" : "Implied 2PP";
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
   /* the band re-prices One Nation's flow at the 2022 FEDERAL table's; /vic/'s
      own 2022 election is a different count, so it says which */
@@ -260,7 +260,17 @@ function RdHero(p) {
   const isCoal = shown === "alp_lnp", isOn = shown === "alp_on";
   const extAvail = (isCoal && !!(extBt || extKb)) || (isOn && !!extSh);
   const extOn = showExt && extAvail && !morph;
-  const extBox = "Compare outside estimates";
+  const extBox = "Outside estimates";
+  /* the pair, one group under a "Compare" lead-in: rides the range-tabs row
+     on a laptop, opens its own row above the chart (next to the legend it
+     changes) on a phone. The lead-in carries the "Compare" word once */
+  const cmpCtl = (cmpAvail || extAvail) ? (
+    <div className="rd-tpp-cmp" role="group" aria-label="Compare">
+      <span className="rd-tpp-cmp-l">Compare</span>
+      {cmpAvail ? <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck> : null}
+      {extAvail ? <RdCheck checked={showExt} onChange={setShowExt}>{extBox}</RdCheck> : null}
+    </div>
+  ) : null;
   /* the key entries name the publisher, carry his CURRENT figure as HE
      publishes it - each line's last point, which is his latest figure, not
      a monthly average - and link out to where he publishes (RdKey grows an
@@ -480,10 +490,13 @@ function RdHero(p) {
     (adjusted || morph) ? { kind: bandPts.length >= 2 ? "lineband" : "line", color: mainCol,
       label: (lineWord(shown, b0) === "trend" ? "Trend" : narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", margin incl. flows" : " and its margin, polls and flows") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
     (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", " + lineWord(otherOf(shown), b0) } : null,
-    cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp") } : null,
-    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
-    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
-    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
+    /* on a phone the extras live in the legend above the chart; the key
+       below names them only where that legend never renders (laptop), so
+       a ticked phone view stops listing them twice */
+    cmpOn && !narrow ? { kind: "dash", color: mainCol, label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp") } : null,
+    extOn && !narrow && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
+    extOn && !narrow && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
+    extOn && !narrow && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
     sensOn ? { kind: "band", color: "var(--lnp)", label: sensLabel } : null,
     ringOn ? { kind: "ring", label: narrow ? rdElecYear + " election" : rdElecYear + " election result" } : null,
   ];
@@ -699,9 +712,9 @@ function RdHero(p) {
 
       <div className="card rd-card rd-tpp-chart" ref={chartMark} data-rd-swipe-exact="">
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin>
-          {!narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
-          {!narrow && extAvail && <RdCheck checked={showExt} onChange={setShowExt}>{extBox}</RdCheck>}
+          {!narrow && cmpCtl}
         </RdTabs>
+        {narrow && cmpCtl}
         <div className="rd-chead"><span className="rd-chead-t">{chartTitle}</span></div>
         {narrow && (
           <RdKey className="rd-tpp-legend" items={[
@@ -745,10 +758,8 @@ function RdHero(p) {
         />
         {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} onPick={pickEv} openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}
         <RdKey className="rd-ckey" items={keyItems} />
-        {narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
-        {narrow && extAvail && <RdCheck checked={showExt} onChange={setShowExt}>{extBox}</RdCheck>}
       </div>
-      <RdFoot how={KAL ? { term: "weighted-aggregate", from: "Two-party preferred" } : { href: "/preference-flows/" }}>
+      <RdFoot how={KAL ? { term: "weighted-aggregate", from: "Two-party preferred" } : { href: "/flows-explained/" }}>
         {KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago. The chart follows the matchup chosen above."
           : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above."}
         {extOn && isCoal && <> BludgerTrack’s line is its published trend. Bonham’s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025.</>}

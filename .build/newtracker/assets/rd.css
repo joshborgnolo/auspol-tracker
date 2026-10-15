@@ -652,9 +652,22 @@ body.rd .rd-tpp-legend { margin: 0 0 4px; }
    alone, so the lead-in and the first item always stay together. */
 body.rd .rd-tpp-cmp { display: flex; align-items: center; flex-wrap: nowrap; gap: 14px; }
 body.rd .rd-tpp-cmp-l { font-size: 13px; color: var(--ink-3); }
+/* the phone row: the whole card's content is 40px narrower than the screen,
+   and at 360px the group must hold all three pieces on one line - 16px gaps
+   plus the labels' own 10px insets run 327px into 320, so the phone rung
+   pulls the gaps in to 14/8 (the margins the desktop row's gap already
+   sits between). From there a 320px card fits the lead-in and the first
+   item, and only the second item wraps. */
 @media (max-width: 640px) {
-  body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 0 16px; margin-top: 12px; }
-  body.rd .rd-tpp-cmp .rd-check { font-size: 13px; }
+  body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; }
+  body.rd .rd-tpp-cmp .rd-check { font-size: 13px; gap: 8px; }
+}
+/* below 360 the second item wraps to its own line (44+8+44): reserve both
+   lines so the Labor v One Nation contest - whose basis checkbox the data
+   doesn't offer - renders its one line at the same row height and flipping
+   contests never moves the card. */
+@media (max-width: 359.98px) {
+  body.rd .rd-tpp-cmp { min-height: 96px; }
 }
 /* just above the phone rung the desktop row (range tabs plus the group)
    can outrun the card: wrap the tabs row and the group drops whole onto a

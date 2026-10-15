@@ -28,7 +28,7 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
    final pairing has ever run nationally, so unlike FLOW this table is built,
    not counted. Revised 2026-10-11 from .315/.89/.53 (bands .025/.03/.03);
    the Coalition cell then to .30 the same day, towards Bonham's .29;
-   the working, with sources, is on /preference-flows/.
+   the working, with sources, is on /flows-explained/.
 
      Coalition .30 ± .03. 2025 Senate ballots put One Nation ahead of Labor
        on 74.7% of Coalition ballots (75.5 without the ACT, where it ran no

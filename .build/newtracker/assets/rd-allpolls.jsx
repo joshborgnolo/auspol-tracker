@@ -5633,6 +5633,30 @@ function RdFlows({ measure }) {
   );
 }
 
+// ====================================================================
+// PREFERENCE FLOWS, EXPLAINED – the fourth menu page
+// ====================================================================
+/* Its body is the one hand-maintained fragment
+   .build/newtracker/explained-article.html, which build.mjs ships twice:
+   as this tab document's static article (no-JS, crawlers, Safari Reader)
+   and as window.EXPLAINED_ARTICLE for the instant client swap. The fragment
+   stays HTML - some three hundred lines of tables and flow-band figures
+   have no JSX port - and it is a trusted sibling of the sources, so the
+   inner-HTML mount carries no escaping risk. */
+function RdExplained() {
+  return (
+    <section className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
+      <div className="rd-eyebrow">
+        <h2 className="rd-title" id="rd-ex-t">Preference flows explained</h2>
+        <span className="rd-meta">How preferences decide the two-party figure</span>
+      </div>
+      <RdHed head="Every two-party figure here exists twice"
+        dek="Published as each pollster computes it, and implied from first preferences by one counted preference-flow table, the same table for every pollster. Below: what each reading is, why the implied figure is the default, and where its numbers come from." />
+      <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
+    </section>
+  );
+}
+
 /* The three sections render below the table but depend on none of its filter
    state (RdDisagree takes no props; RdHouseLean's and RdFlows' props are
    stable strings/callbacks - RdFlows reads the page's two-party contest).
@@ -5641,5 +5665,6 @@ function RdFlows({ measure }) {
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);
 const RdFlowsM = React.memo(RdFlows);
+const RdExplainedM = React.memo(RdExplained);
 
-Object.assign(window, { RdLedger, RdAllPolls, RdApDetail, RdApSheet, rdPollMargin, RdDisagree: RdDisagreeM, RdHouseLean: RdHouseLeanM, RdFlows: RdFlowsM });
+Object.assign(window, { RdLedger, RdAllPolls, RdApDetail, RdApSheet, rdPollMargin, RdDisagree: RdDisagreeM, RdHouseLean: RdHouseLeanM, RdFlows: RdFlowsM, RdExplained: RdExplainedM });

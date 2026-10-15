@@ -1559,10 +1559,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
               {(basis || "imp") === "imp" ? " (default)" : ""}
             </button>
             {/* The "?" after the sentence is the way OUT to the whole story:
-                a plain link to the /preference-flows/ explainer page, so the
+                a plain link to the /flows-explained/ explainer page, so the
                 toggle keeps its one sentence and the deeper case keeps its
                 own address (and tab). */}
-            <a className="hb-q" href="/preference-flows/"
+            <a className="hb-q" href="/flows-explained/"
                aria-label="How the two bases work – read the full explainer"
                title="How the two bases work – the full explainer">?</a>
           </div>
@@ -1979,6 +1979,8 @@ const TABS = [
     tip: "How each pollster leans against the others" },
   { id: "flows", label: "Preference flows", menu: true,
     tip: "Where minor-party preferences are flowing now, against the last election" },
+  { id: "flows-explained", label: "Preference flows explained", menu: true,
+    tip: "How preferences decide the two-party figure" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins AND the hero 2PP has scrolled off (.show-score), and on a phone
      there is not room for both. The glossary is the one tab a reader is
@@ -1993,6 +1995,10 @@ const TABS = [
 /* a page with no past terms in its cycle data (/vic/, until its earlier
    terms' polls are gathered) has no Past cycles tab */
 if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1);
+/* the preference-flows explainer is federal-only: build.mjs emits no
+   vic/flows-explained/ document for it to open (the Vic build's flow
+   settings and contests differ) */
+if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);
 const TAB_IDS = TABS.map((t) => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu).map((t) => [t.id, t]));
 
