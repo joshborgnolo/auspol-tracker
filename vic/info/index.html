@@ -47914,6 +47914,42 @@ function RdSwitching({
   const boxRef = React.useRef(null);
   const W = useRdWidth(boxRef, 1152);
   const [view, setView] = useState("onp");
+  const GO_NEXT = {
+    onp: "lnp",
+    lnp: "alp",
+    alp: "onp"
+  };
+  const spaceCyc = React.useRef(null);
+  spaceCyc.current = S && S.series.length && S.series.every(sr => sr.rate) ? () => setView(v => GO_NEXT[v !== "onp" && !(S.going || []).some(g => g.id === v) ? "onp" : v]) : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("switching");
+    if (!sec) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => {
+      es.forEach(en => {
+        inView.current = en.isIntersecting;
+      });
+    });
+    io.observe(sec);
+    const key = e => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceCyc.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceCyc.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   if (!S || !S.series.length || !S.series.every(sr => sr.rate)) return null;
   const Wt = S.weights || {};
   const byId = {};
@@ -48026,11 +48062,6 @@ function RdSwitching({
   const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap(c => pollRate(c.id).map(d => d.y).concat(c.sr.rate.monthly.map(m => m.v + (m.ci95 || 0))))) / 25) * 25);
   const goRow = view !== "onp" ? (S.going || []).find(g => g.id === view) : null;
   const V = goRow ? view : "onp";
-  const GO_NEXT = {
-    onp: "lnp",
-    lnp: "alp",
-    alp: "onp"
-  };
   const GO_COHORT_W = {
     lnp: "2025 Coalition voters",
     alp: "2025 Labor voters"
@@ -57882,14 +57913,14 @@ function RdApSheet({
 const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
     loose: {
-      tab: "consider (4+ of 10)",
-      led: "Consider (4+ of 10)",
-      note: "rated 4 or more of 10, rebased over everyone"
+      tab: "Would consider (4+/10)",
+      led: "Would consider (4+/10)",
+      note: "rated 4+/10, rebased over everyone"
     },
     never: {
-      tab: "would never vote (0 of 10)",
-      led: "Would never vote (0 of 10)",
-      note: "rated 0 of 10, rebased over everyone"
+      tab: "Would never vote (0/10)",
+      led: "Would never vote (0/10)",
+      note: "rated 0/10, rebased over everyone"
     }
   },
   Essential: {
@@ -57899,7 +57930,7 @@ const RD_AP_CONS_TIER = {
       note: "the ‘definitely’ and ‘open to’ bands, summed"
     },
     never: {
-      tab: "would never vote",
+      tab: "Would never vote",
       led: "Would never vote",
       note: "the ‘would never vote for them’ band"
     }
@@ -64283,7 +64314,7 @@ const KBD_ROWS = [{
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
-  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; step the all-polls demographics split and the preference-flows region menu"
+  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu"
 }, {
   keys: ["P"],
   what: "In the all-polls two-party table, published figures only"

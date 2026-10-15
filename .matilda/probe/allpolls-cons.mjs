@@ -15,11 +15,11 @@
    ?f=p&k=1 deep-lands in the mode.
    THREE rows carry banded consideration and show ONE range at a time with
    the basis label as a cycle button (".rd-ap-conscyc"): RedBridge/Accent's
-   April 2026 0-10 battery (canonical "Would seriously consider (7+ of 10)"
-   -> "consider (4+ of 10)" -> "would never vote (0 of 10)") and
+   April 2026 0-10 battery (canonical "Would seriously consider (7+/10)"
+   -> "Would consider (4+/10)" -> "Would never vote (0/10)") and
    Essential's June + Feb 2026 definitely/open/never waves (canonical
    "Would definitely vote" -> "Would consider (definitely or open)" ->
-   "would never vote"). Each press swaps the figures AND the strip to the
+   "Would never vote"). Each press swaps the figures AND the strip to the
    next range WITHOUT opening the row; the full breakdown stays in the
    expanded poll's ledger. Rows carry no pollster attribute, so the probe
    picks them out by their basis labels (the canonical labels are unique
@@ -70,12 +70,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const NEEDLES = { rb: "24-30 Apr", essJun: "24-29 Jun", essFeb: "18-23 Feb" };
 const CYCS = {
   rb: {
-    canon: "Would seriously consider (7+ of 10)",
+    canon: "Would seriously consider (7+/10)",
     canonNums: ["45", "37", "36", "24"],
     ranges: [
-      { lab: "consider (4+ of 10)", nums: ["62", "59", "53", "45"], aria: "Voting consideration, consider (4+ of 10): " },
-      { lab: "would never vote (0 of 10)", nums: ["21", "30", "16", "32"], aria: "Voting consideration, would never vote (0 of 10): " },
-      { lab: "Would seriously consider (7+ of 10)", nums: ["45", "37", "36", "24"], aria: "Voting consideration, Would seriously consider (7+ of 10): " },
+      { lab: "Would consider (4+/10)", nums: ["62", "59", "53", "45"], aria: "Voting consideration, Would consider (4+/10): " },
+      { lab: "Would never vote (0/10)", nums: ["21", "30", "16", "32"], aria: "Voting consideration, Would never vote (0/10): " },
+      { lab: "Would seriously consider (7+/10)", nums: ["45", "37", "36", "24"], aria: "Voting consideration, Would seriously consider (7+/10): " },
     ],
   },
   essJun: {
@@ -83,7 +83,7 @@ const CYCS = {
     canonNums: ["27", "29", "18", "9", "13"],
     ranges: [
       { lab: "Would consider (definitely or open)", nums: ["50", "52", "40", "56"], aria: "Voting consideration, Would consider (definitely or open): " },
-      { lab: "would never vote", nums: ["37", "35", "45", "35", "25"], aria: "Voting consideration, would never vote: " },
+      { lab: "Would never vote", nums: ["37", "35", "45", "35", "25"], aria: "Voting consideration, Would never vote: " },
       { lab: "Would definitely vote", nums: ["27", "29", "18", "13", "9"], aria: "Voting consideration, Would definitely vote: " },
     ],
   },
@@ -92,7 +92,7 @@ const CYCS = {
     canonNums: ["25"],
     ranges: [
       { lab: "Would consider (definitely or open)", nums: ["58"], aria: "Voting consideration, Would consider (definitely or open): " },
-      { lab: "would never vote", nums: ["28"], aria: "Voting consideration, would never vote: " },
+      { lab: "Would never vote", nums: ["28"], aria: "Voting consideration, Would never vote: " },
       { lab: "Would definitely vote", nums: ["25"], aria: "Voting consideration, Would definitely vote: " },
     ],
   },
@@ -250,7 +250,7 @@ const runDesktop = async () => {
   ok(landed.cap === "Voting consideration", "?f=p&k=1 lands in consideration mode");
   ok(landed.flips.length === 1 && landed.flips[0].pressed === "true", "?f=p&k=1 presses the flip");
   ok(landed.nRows === 9, "?f=p&k=1 scopes the table");
-  ok(landed.rb && landed.rb.lab.startsWith("Would seriously consider (7+ of 10)"), "a fresh land opens the RedBridge row on its canonical range");
+  ok(landed.rb && landed.rb.lab.startsWith("Would seriously consider (7+/10)"), "a fresh land opens the RedBridge row on its canonical range");
   ok(landed.essJun && landed.essJun.lab.startsWith("Would definitely vote"), "a fresh land opens the Essential June row on its canonical range");
   ok(/consider/i.test(landed.hed + " " + landed.dek), "the story speaks consideration off a fresh land");
 
@@ -339,11 +339,11 @@ const runPhone = async () => {
   ok(on.heights.every((h) => Math.abs(h - 122) < 0.51), `every cons card rides the shared 122px rung (${JSON.stringify([...new Set(on.heights)])})`);
   ok(on.nCyc === 3, `three phone cards carry the range cycler (saw ${on.nCyc})`);
   ok(on.rb && on.rb.nTiers === 1, `the phone RedBridge card shows a single figure line (saw ${on.rb && on.rb.nTiers} tiers)`);
-  ok(on.rb && on.rb.lab.startsWith("Would seriously consider (7+ of 10)"), `the phone RedBridge card opens on the canonical serious range ("${on.rb && on.rb.lab}")`);
-  ok(on.rb && on.rb.headLab.startsWith("Would seriously consider (7+ of 10)"), "the RedBridge label rides the head row");
+  ok(on.rb && on.rb.lab.startsWith("Would seriously consider (7+/10)"), `the phone RedBridge card opens on the canonical serious range ("${on.rb && on.rb.lab}")`);
+  ok(on.rb && on.rb.headLab.startsWith("Would seriously consider (7+/10)"), "the RedBridge label rides the head row");
   ok(on.rb && on.rb.nums.includes("45") && on.rb.nums.includes("37"), "the phone RedBridge card prints the canonical figures");
   ok(on.rb && on.rb.strips === 1, "the phone RedBridge card draws one strip");
-  ok(on.rb && on.rb.aria.startsWith("Voting consideration, Would seriously consider (7+ of 10): "),
+  ok(on.rb && on.rb.aria.startsWith("Voting consideration, Would seriously consider (7+/10): "),
     `the phone RedBridge strip's aria names the range (${on.rb && on.rb.aria.slice(0, 70)}…)`);
   ok(on.essJun && on.essJun.lab.startsWith("Would definitely vote"), `the phone June Essential card opens on "Would definitely vote" ("${on.essJun && on.essJun.lab}")`);
   ok(on.essJun && on.essJun.nums.includes("27") && on.essJun.nums.includes("29"), `the phone June Essential card prints its band figures (${JSON.stringify(on.essJun && on.essJun.nums)})`);
@@ -353,10 +353,10 @@ const runPhone = async () => {
   ok(await clickCyc(page, NEEDLES.rb), "phone RedBridge cycler press landed");
   await sleep(300);
   const on2 = await cstate();
-  ok(on2.rb && on2.rb.lab.startsWith("consider (4+ of 10)"), `phone press swaps the RedBridge label to the loose range ("${on2.rb && on2.rb.lab}")`);
-  ok(on2.rb && on2.rb.headLab.startsWith("consider (4+ of 10)"), "the head label swings with the range");
+  ok(on2.rb && on2.rb.lab.startsWith("Would consider (4+/10)"), `phone press swaps the RedBridge label to the loose range ("${on2.rb && on2.rb.lab}")`);
+  ok(on2.rb && on2.rb.headLab.startsWith("Would consider (4+/10)"), "the head label swings with the range");
   ok(on2.rb && on2.rb.nums.includes("62") && on2.rb.nums.includes("59"), `phone press swaps the RedBridge figures (${JSON.stringify(on2.rb && on2.rb.nums)})`);
-  ok(on2.rb && on2.rb.aria.startsWith("Voting consideration, consider (4+ of 10): "), "phone press swaps the RedBridge strip's aria");
+  ok(on2.rb && on2.rb.aria.startsWith("Voting consideration, Would consider (4+/10): "), "phone press swaps the RedBridge strip's aria");
   ok(await clickCyc(page, NEEDLES.essJun), "phone Essential June cycler press landed");
   await sleep(300);
   const on3 = await cstate();

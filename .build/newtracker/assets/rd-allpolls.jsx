@@ -2504,12 +2504,12 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
    sums). */
 const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
-    loose: { tab: "consider (4+ of 10)", led: "Consider (4+ of 10)", note: "rated 4 or more of 10, rebased over everyone" },
-    never: { tab: "would never vote (0 of 10)", led: "Would never vote (0 of 10)", note: "rated 0 of 10, rebased over everyone" },
+    loose: { tab: "Would consider (4+/10)", led: "Would consider (4+/10)", note: "rated 4+/10, rebased over everyone" },
+    never: { tab: "Would never vote (0/10)", led: "Would never vote (0/10)", note: "rated 0/10, rebased over everyone" },
   },
   Essential: {
     loose: { tab: "Would consider (definitely or open)", led: "Would consider (definitely or open)", note: "the ‘definitely’ and ‘open to’ bands, summed" },
-    never: { tab: "would never vote", led: "Would never vote", note: "the ‘would never vote for them’ band" },
+    never: { tab: "Would never vote", led: "Would never vote", note: "the ‘would never vote for them’ band" },
   },
 };
 const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIER["RedBridge/Accent"])[tier];
