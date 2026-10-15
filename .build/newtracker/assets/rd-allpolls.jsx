@@ -2508,7 +2508,7 @@ const RD_AP_CONS_TIER = {
     never: { tab: "would never vote (0 of 10)", led: "Would never vote (0 of 10)", note: "rated 0 of 10, rebased over everyone" },
   },
   Essential: {
-    loose: { tab: "would consider (definitely or open)", led: "Would consider (definitely or open)", note: "the ‘definitely’ and ‘open to’ bands, summed" },
+    loose: { tab: "Would consider (definitely or open)", led: "Would consider (definitely or open)", note: "the ‘definitely’ and ‘open to’ bands, summed" },
     never: { tab: "would never vote", led: "Would never vote", note: "the ‘would never vote for them’ band" },
   },
 };
@@ -2520,11 +2520,11 @@ const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIE
    than one range - RedBridge/Accent's April 2026 0-10 battery, or
    Essential's Feb/June 2026 definitely/open/never banding, file the
    three tiers of tiers[] - shows ONE range at a time, canonical first,
-   and the basis label under its figures is a button stepping through
-   them, figures and strip moving together. The state is per row and
-   ephemeral: the sort, the story, the ledger (which lists every range)
-   and the header scale all read the canonical range regardless. */
-function RdApConsCyc({ tiers, phone, primNums, primStrip, primCardNums }) {
+   and the basis label is a button stepping through them, figures and
+   strip moving together. The state is per row and ephemeral: the sort,
+   the story, the ledger (which lists every range) and the header scale
+   all read the canonical range regardless. */
+function RdApConsCyc({ tiers, phone, primNums, primStrip, primCardNums, cardHead }) {
   const [ti, setTi] = useState(0);
   const many = tiers.length > 1;
   const t = tiers[Math.min(ti, tiers.length - 1)];
@@ -2539,9 +2539,16 @@ function RdApConsCyc({ tiers, phone, primNums, primStrip, primCardNums }) {
   ) : (phone ? <span className="rd-ap-csub">{t.lab}</span> : <span className="rd-ap-sub">{t.lab}</span>);
   const ariaPre = "Voting consideration" + (many ? ", " + t.lab : "") + ": ";
   const live = many ? { "aria-live": "polite" } : null;
+  /* phone: the basis label (or its cycle button) rides the card head's
+     right edge via cardHead - the slot the demographics facet names its
+     pair in (user call 2026-10-15: same position as "Women v Men") - so
+     this component renders the card ENTIRELY past the chevron, head and
+     all; the label keeps its own aria-live wrapper because its element
+     now lives outside the figures block */
   if (phone) return (
     <>
-      <div className="rd-ap-ctier" {...live}>{primCardNums(t.m)}{basis}</div>
+      {cardHead(many ? <span style={{ display: "contents" }} {...live}>{basis}</span> : basis)}
+      <div className="rd-ap-ctier" {...live}>{primCardNums(t.m)}</div>
       <div className="rd-ap-cpic">{primStrip(t.m, ariaPre)}</div>
     </>
   );
@@ -3255,7 +3262,7 @@ function RdAllPolls(P) {
     const isOpen = open === id;
     const arrived = !!focus && focus.key === id;
     const toggle = () => setOpen(isOpen ? null : id);
-    let figs, pic, val = <span></span>, right1 = null, right2 = null, body = null, hlCell = null;
+    let figs, pic, val = <span></span>, right1 = null, right2 = null, body = null, hlCell = null, consEdge = null;
     /* the house's lean AS OF THIS POLL on the table's basis and matchup
        (rdApHe, gen-data §3c) - ONE derivation for the desktop twopp table's
        last column (user call 2026-10-03: "add a 'house lean' column to the
@@ -3307,14 +3314,16 @@ function RdAllPolls(P) {
       </div>;
     } else if (facet === "primary") {
       const pr = (consM && p.cons) || p.p || {};
-      /* under consM every row names its consideration basis under the
-         figures (user call 2026-10-15, mirroring the demographics facet's
-         "18–34 v 55+, in points" sub). A wave carrying the extra ranges
-         (RedBridge/Accent's April 2026 0–10 battery; Essential's Feb and
-         June 2026 definitely/open/never banding) lists them behind the
-         canonical tier for RdApConsCyc to step through */
+      /* under consM every row names its consideration basis - on the
+         desktop under the figures, on a phone card at the head's right
+         edge where the demographics facet's pair names sit (user call
+         2026-10-15, mirroring "18–34 v 55+, in points"). A wave carrying
+         the extra ranges (RedBridge/Accent's April 2026 0–10 battery;
+         Essential's Feb and June 2026 definitely/open/never banding)
+         lists them behind the canonical tier for RdApConsCyc to step
+         through */
       const tiers = !(consM && p.cons) ? null
-        : [{ m: p.cons, lab: p.consBasis || "consider" }]
+        : [{ m: p.cons, lab: p.consBasis || "Would consider" }]
           .concat(p.consLoose ? [{ m: p.consLoose, lab: rdApConsTier(p, "loose").tab }] : [])
           .concat(p.consNever ? [{ m: p.consNever, lab: rdApConsTier(p, "never").tab }] : []);
       const primNums = (m) => <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>)}</span>;
@@ -3333,11 +3342,12 @@ function RdAllPolls(P) {
       };
       const primCardNums = (m) => <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b></span>)}</div>;
       if (tiers) {
-        /* the cycler's fragment is BOTH cells (figures cell then strip),
-           so it parks at the figs slot and pic stays empty */
-        const cyc = <RdApConsCyc tiers={tiers} phone={phone} primNums={primNums} primStrip={primStrip} primCardNums={primCardNums} />;
-        if (phone) body = cyc;
-        else { figs = cyc; pic = null; }
+        /* the cycler's fragment is BOTH cells (figures cell then strip) on
+           the desktop, so it parks at the figs slot and pic stays empty;
+           on the phone it owns the whole card past the chevron - its
+           label rides the card head wrapper the phone return hands down */
+        if (phone) consEdge = (cardHead) => <RdApConsCyc tiers={tiers} phone primNums={primNums} primStrip={primStrip} primCardNums={primCardNums} cardHead={cardHead} />;
+        else { figs = <RdApConsCyc tiers={tiers} primNums={primNums} primStrip={primStrip} primCardNums={primCardNums} />; pic = null; }
       } else {
         figs = <span role="cell" className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
         pic = primStrip(pr, "Primary vote: ");
@@ -3546,15 +3556,22 @@ function RdAllPolls(P) {
     );
     if (phone) {
       const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
+      /* the two head rows as ONE renderer so a facet whose feature line
+         sits at the head's right edge can hand the slot to a stateful
+         component (the consideration range cycler: its basis label rides
+         here, where the demographics facet's pair names sit - user call
+         2026-10-15) without forking the head markup */
+      const cardHead = (edge) => (<>
+        <div className="rd-ap-c1">
+          <span className="rd-ap-firm">{rdPollNameLink(p, "rd-ap-ext")}</span>
+          <span className="rd-grow"></span>{edge}
+        </div>
+        <div className="rd-ap-c2"><span className="rd-ap-sub">{sub}</span><span className="rd-grow"></span>{right2}</div>
+      </>);
       return (
         <React.Fragment key={id}>
           <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p, demFam)}>
-            <div className="rd-ap-c1">
-              <span className="rd-ap-firm">{rdPollNameLink(p, "rd-ap-ext")}</span>
-              <span className="rd-grow"></span>{right1}
-            </div>
-            <div className="rd-ap-c2"><span className="rd-ap-sub">{sub}</span><span className="rd-grow"></span>{right2}</div>
-            {body}
+            {consEdge ? consEdge(cardHead) : (<>{cardHead(right1)}{body}</>)}
           </div>
           {detail}
         </React.Fragment>

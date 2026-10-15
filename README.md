@@ -137,9 +137,10 @@ new and worth looking at.
   `consideration` is the "would definitely vote" band, `considerationLoose`
   the definitely + open sum and `considerationNever` the "would never
   vote" band (already over all voters, no rebase). Every row also carries
-  `consBasis`, the short basis label printed under the figures
-  ("consider", "seriously consider", "definitely vote", the RedBridge
-  tiers' range brackets).
+  `consBasis`, the short basis label printed by the figures (under them
+  on a wide screen, at the phone card's top right): "Would consider",
+  "Would seriously consider", "Would definitely vote", "Would ever
+  support", the RedBridge tiers' range brackets.
   The Blueprint wave published consideration only — no voting intention —
   so its row's primary fields are null. Absent, not zero: a wave that
   asked no consideration question omits it. The All polls table's Primary

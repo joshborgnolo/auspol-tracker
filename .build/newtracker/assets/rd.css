@@ -2944,10 +2944,16 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   /* a sentence, not a row of cells: as a flex line its 8px gaps cut every
      comma loose from its figure ("Right 25 , wrong 60") */
   body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
-  /* the consideration basis line on a phone card: the range cycler reads
-     at the .rd-ap-csub scale rather than the desktop 12px */
-  body.rd .rd-ap-ctier { margin-top: 2px; }
-  body.rd .rd-ap-ctier .rd-ap-conscyc { font-size: 13px; }
+  /* the consideration basis label on a phone card: parked at the head's
+     right edge alongside the firm name, the slot the demographics facet
+     names its pair in (user call 2026-10-15), so it reads at that slot's
+     .rd-ap-dpair scale rather than the desktop 12px; the cycle button
+     keeps a ~26px touch box via equal padding/margin so the head row
+     keeps its shared 21.75px rung, and the tier block loses the 2px
+     spacer it only owed to the label that used to sit under the figures
+     - without it the card content comes in under the shared 122px phone
+     floor (ap-phcard-heights.mjs) */
+  body.rd .rd-ap-c1 .rd-ap-conscyc { align-self: baseline; min-height: 0; padding: 4px 0; margin: -4px 0; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }

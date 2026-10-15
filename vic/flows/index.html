@@ -5199,8 +5199,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 1px; }
   body.rd .rd-ap-cnets { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-csub { font-size: 13px; color: var(--ink-2); }
-  body.rd .rd-ap-ctier { margin-top: 2px; }
-  body.rd .rd-ap-ctier .rd-ap-conscyc { font-size: 13px; }
+  body.rd .rd-ap-c1 .rd-ap-conscyc { align-self: baseline; min-height: 0; padding: 4px 0; margin: -4px 0; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -57884,7 +57883,7 @@ const RD_AP_CONS_TIER = {
   },
   Essential: {
     loose: {
-      tab: "would consider (definitely or open)",
+      tab: "Would consider (definitely or open)",
       led: "Would consider (definitely or open)",
       note: "the ‘definitely’ and ‘open to’ bands, summed"
     },
@@ -57901,7 +57900,8 @@ function RdApConsCyc({
   phone,
   primNums,
   primStrip,
-  primCardNums
+  primCardNums,
+  cardHead
 }) {
   const [ti, setTi] = useState(0);
   const many = tiers.length > 1;
@@ -57927,9 +57927,13 @@ function RdApConsCyc({
   const live = many ? {
     "aria-live": "polite"
   } : null;
-  if (phone) return React.createElement(React.Fragment, null, React.createElement("div", _extends({
+  if (phone) return React.createElement(React.Fragment, null, cardHead(many ? React.createElement("span", _extends({
+    style: {
+      display: "contents"
+    }
+  }, live), basis) : basis), React.createElement("div", _extends({
     className: "rd-ap-ctier"
-  }, live), primCardNums(t.m), basis), React.createElement("div", {
+  }, live), primCardNums(t.m)), React.createElement("div", {
     className: "rd-ap-cpic"
   }, primStrip(t.m, ariaPre)));
   return React.createElement(React.Fragment, null, React.createElement("span", _extends({
@@ -58658,7 +58662,8 @@ function RdAllPolls(P) {
       right1 = null,
       right2 = null,
       body = null,
-      hlCell = null;
+      hlCell = null,
+      consEdge = null;
     const hl = facet === "twopp" ? rdApHe(p, onM, pub) : null;
     if (facet === "twopp") {
       const f = figOf(p);
@@ -58742,7 +58747,7 @@ function RdAllPolls(P) {
       const pr = consM && p.cons || p.p || {};
       const tiers = !(consM && p.cons) ? null : [{
         m: p.cons,
-        lab: p.consBasis || "consider"
+        lab: p.consBasis || "Would consider"
       }].concat(p.consLoose ? [{
         m: p.consLoose,
         lab: rdApConsTier(p, "loose").tab
@@ -58795,15 +58800,20 @@ function RdAllPolls(P) {
         }
       }, m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"))));
       if (tiers) {
-        const cyc = React.createElement(RdApConsCyc, {
+        if (phone) consEdge = cardHead => React.createElement(RdApConsCyc, {
           tiers: tiers,
-          phone: phone,
+          phone: true,
           primNums: primNums,
           primStrip: primStrip,
-          primCardNums: primCardNums
-        });
-        if (phone) body = cyc;else {
-          figs = cyc;
+          primCardNums: primCardNums,
+          cardHead: cardHead
+        });else {
+          figs = React.createElement(RdApConsCyc, {
+            tiers: tiers,
+            primNums: primNums,
+            primStrip: primStrip,
+            primCardNums: primCardNums
+          });
           pic = null;
         }
       } else {
@@ -59205,6 +59215,19 @@ function RdAllPolls(P) {
     }));
     if (phone) {
       const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
+      const cardHead = edge => React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "rd-ap-c1"
+      }, React.createElement("span", {
+        className: "rd-ap-firm"
+      }, rdPollNameLink(p, "rd-ap-ext")), React.createElement("span", {
+        className: "rd-grow"
+      }), edge), React.createElement("div", {
+        className: "rd-ap-c2"
+      }, React.createElement("span", {
+        className: "rd-ap-sub"
+      }, sub), React.createElement("span", {
+        className: "rd-grow"
+      }), right2));
       return React.createElement(React.Fragment, {
         key: id
       }, React.createElement("div", {
@@ -59214,19 +59237,7 @@ function RdAllPolls(P) {
         onClick: toggle,
         tabIndex: 0,
         onKeyDown: e => rowNav(e, p, demFam)
-      }, React.createElement("div", {
-        className: "rd-ap-c1"
-      }, React.createElement("span", {
-        className: "rd-ap-firm"
-      }, rdPollNameLink(p, "rd-ap-ext")), React.createElement("span", {
-        className: "rd-grow"
-      }), right1), React.createElement("div", {
-        className: "rd-ap-c2"
-      }, React.createElement("span", {
-        className: "rd-ap-sub"
-      }, sub), React.createElement("span", {
-        className: "rd-grow"
-      }), right2), body), detail);
+      }, consEdge ? consEdge(cardHead) : React.createElement(React.Fragment, null, cardHead(right1), body)), detail);
     }
     return React.createElement(React.Fragment, {
       key: id

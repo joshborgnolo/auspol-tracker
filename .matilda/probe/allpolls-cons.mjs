@@ -6,20 +6,25 @@
    RedBridge/Accent's looser 0-10 tier tops 60), the URL gains k=1, the
    table scopes to the consideration waves ("9 of N polls") with every
    row's aria announcing Voting consideration, EVERY row names its basis
-   under the figures (".rd-ap-sub": consider / seriously consider /
-   definitely vote), the month rows shed the intention aggregate rings, the
-   facet story speaks consideration, and pressing back restores the
-   unscoped intention table; ?f=p&k=1 deep-lands in the mode.
+   (desktop: under the figures, ".rd-ap-fig .rd-ap-sub"; phone: at the card
+   head's RIGHT EDGE beside the firm name, user call 2026-10-15, the slot
+   the demographics facet names its pair in), the labels reading "Would
+   consider" / "Would seriously consider" / "Would definitely vote", the
+   month rows shed the intention aggregate rings, the facet story speaks
+   consideration, and pressing back restores the unscoped intention table;
+   ?f=p&k=1 deep-lands in the mode.
    THREE rows carry banded consideration and show ONE range at a time with
    the basis label as a cycle button (".rd-ap-conscyc"): RedBridge/Accent's
-   April 2026 0-10 battery (canonical "seriously consider (7+ of 10)" ->
-   "consider (4+ of 10)" -> "would never vote (0 of 10)") and Essential's
-   June + Feb 2026 definitely/open/never waves (canonical "definitely vote"
-   -> "would consider (definitely or open)" -> "would never vote"). Each
-   press swaps the figures AND the strip to the next range WITHOUT opening
-   the row; the full breakdown stays in the expanded poll's ledger. Rows
-   carry no pollster attribute, so the probe picks them out by their basis
-   labels (the three canonical labels are unique among the scoped rows).
+   April 2026 0-10 battery (canonical "Would seriously consider (7+ of 10)"
+   -> "consider (4+ of 10)" -> "would never vote (0 of 10)") and
+   Essential's June + Feb 2026 definitely/open/never waves (canonical
+   "Would definitely vote" -> "Would consider (definitely or open)" ->
+   "would never vote"). Each press swaps the figures AND the strip to the
+   next range WITHOUT opening the row; the full breakdown stays in the
+   expanded poll's ledger. Rows carry no pollster attribute, so the probe
+   picks them out by their basis labels (the canonical labels are unique
+   among the scoped rows, though Essential's two rows are identical -
+   their FIELDWORK dates tell them apart, per NEEDLES).
    By design the rd view shows no "With consideration figures" auto-pill
    (rd-allpolls hides auto pills - the toggle itself and the scoped tally
    carry the state), and the probe pins that absence rather than hunting
@@ -65,30 +70,30 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const NEEDLES = { rb: "24-30 Apr", essJun: "24-29 Jun", essFeb: "18-23 Feb" };
 const CYCS = {
   rb: {
-    canon: "seriously consider (7+ of 10)",
+    canon: "Would seriously consider (7+ of 10)",
     canonNums: ["45", "37", "36", "24"],
     ranges: [
       { lab: "consider (4+ of 10)", nums: ["62", "59", "53", "45"], aria: "Voting consideration, consider (4+ of 10): " },
       { lab: "would never vote (0 of 10)", nums: ["21", "30", "16", "32"], aria: "Voting consideration, would never vote (0 of 10): " },
-      { lab: "seriously consider (7+ of 10)", nums: ["45", "37", "36", "24"], aria: "Voting consideration, seriously consider (7+ of 10): " },
+      { lab: "Would seriously consider (7+ of 10)", nums: ["45", "37", "36", "24"], aria: "Voting consideration, Would seriously consider (7+ of 10): " },
     ],
   },
   essJun: {
-    canon: "definitely vote",
+    canon: "Would definitely vote",
     canonNums: ["27", "29", "18", "9", "13"],
     ranges: [
-      { lab: "would consider (definitely or open)", nums: ["50", "52", "40", "56"], aria: "Voting consideration, would consider (definitely or open): " },
+      { lab: "Would consider (definitely or open)", nums: ["50", "52", "40", "56"], aria: "Voting consideration, Would consider (definitely or open): " },
       { lab: "would never vote", nums: ["37", "35", "45", "35", "25"], aria: "Voting consideration, would never vote: " },
-      { lab: "definitely vote", nums: ["27", "29", "18", "13", "9"], aria: "Voting consideration, definitely vote: " },
+      { lab: "Would definitely vote", nums: ["27", "29", "18", "13", "9"], aria: "Voting consideration, Would definitely vote: " },
     ],
   },
   essFeb: {
-    canon: "definitely vote",
+    canon: "Would definitely vote",
     canonNums: ["25"],
     ranges: [
-      { lab: "would consider (definitely or open)", nums: ["58"], aria: "Voting consideration, would consider (definitely or open): " },
+      { lab: "Would consider (definitely or open)", nums: ["58"], aria: "Voting consideration, Would consider (definitely or open): " },
       { lab: "would never vote", nums: ["28"], aria: "Voting consideration, would never vote: " },
-      { lab: "definitely vote", nums: ["25"], aria: "Voting consideration, definitely vote: " },
+      { lab: "Would definitely vote", nums: ["25"], aria: "Voting consideration, Would definitely vote: " },
     ],
   },
 };
@@ -191,8 +196,8 @@ const runDesktop = async () => {
   ok(cons.ariasCons, "every scoped row's aria announces Voting consideration");
   ok(cons.firstAria.includes("ALP 41") && cons.firstAria.includes("ON 39"), "top row is the 30 June News24 wave's consideration read (ALP 41, ON 39)");
   ok(cons.firstNums.includes("41") && cons.firstNums.includes("39"), "top row's printed figures are the consideration shares");
-  ok(cons.subsAll, "every scoped row names its basis under the figures");
-  ok(cons.firstSub === "seriously consider", `top row's basis reads "seriously consider" (saw "${cons.firstSub}")`);
+  ok(cons.subsAll, "every scoped row names its basis against the figures");
+  ok(cons.firstSub === "Would seriously consider", `top row's basis reads "Would seriously consider" (saw "${cons.firstSub}")`);
   ok(cons.nCyc === 3, `three rows carry the range cycler (saw ${cons.nCyc})`);
   for (const [id, spec] of Object.entries(CYCS)) {
     if (!ok(cons[id] && cons[id].lab.startsWith(spec.canon), `the ${id} row opens on its canonical range "${spec.canon}" (saw ${cons[id] && cons[id].lab})`)) continue;
@@ -245,8 +250,8 @@ const runDesktop = async () => {
   ok(landed.cap === "Voting consideration", "?f=p&k=1 lands in consideration mode");
   ok(landed.flips.length === 1 && landed.flips[0].pressed === "true", "?f=p&k=1 presses the flip");
   ok(landed.nRows === 9, "?f=p&k=1 scopes the table");
-  ok(landed.rb && landed.rb.lab.startsWith("seriously consider (7+ of 10)"), "a fresh land opens the RedBridge row on its canonical range");
-  ok(landed.essJun && landed.essJun.lab.startsWith("definitely vote"), "a fresh land opens the Essential June row on its canonical range");
+  ok(landed.rb && landed.rb.lab.startsWith("Would seriously consider (7+ of 10)"), "a fresh land opens the RedBridge row on its canonical range");
+  ok(landed.essJun && landed.essJun.lab.startsWith("Would definitely vote"), "a fresh land opens the Essential June row on its canonical range");
   ok(/consider/i.test(landed.hed + " " + landed.dek), "the story speaks consideration off a fresh land");
 
   // 6. the 2PP facet carries no consideration flip
@@ -281,11 +286,16 @@ const runPhone = async () => {
     const cards = [...document.querySelectorAll(".rd-ap-card")];
     const nums = cards.length ? [...cards[0].querySelectorAll(".rd-ap-cprim b")].map((b) => b.textContent) : [];
     const norm = (s) => String(s).replace(/[–—]/g, "-");
+    /* the basis label parks at the card head's right edge (the ".rd-ap-c1"
+       row's last slot), wrapped in the aria-live span for range-cycling
+       rows; single-range rows are a bare ".rd-ap-csub" there */
+    const labOf = (c) => c.querySelector(".rd-ap-c1 .rd-ap-conscyc, .rd-ap-c1 > .rd-ap-csub");
     const cycOf = (needle) => {
       const c = cards.filter((x) => x.querySelector(".rd-ap-conscyc") && norm(x.textContent).includes(norm(needle)))[0] || null;
       return c ? {
         nTiers: c.querySelectorAll(".rd-ap-ctier").length,
         lab: c.querySelector(".rd-ap-conscyc").textContent.trim(),
+        headLab: (labOf(c) || {}).textContent ? labOf(c).textContent.trim() : "",
         nums: [...c.querySelectorAll(".rd-ap-cprim b")].map((b) => b.textContent),
         strips: c.querySelectorAll(".rd-ap-cpic .rd-ap-pic").length,
         aria: c.querySelector(".rd-ap-cpic .rd-ap-pic") ? c.querySelector(".rd-ap-cpic .rd-ap-pic").getAttribute("aria-label") || "" : "",
@@ -296,11 +306,24 @@ const runPhone = async () => {
       nCards: cards.length,
       count: (document.querySelector(".rd-ap-count") || {}).textContent || "",
       nums,
+      /* every card names its basis at the head's right edge, lifted clear
+         of the figures - and NOTHING basis-like remains in the figures
+         block (the 2026-10-15 move out of ".rd-ap-ctier") */
       subsAll: cards.length > 0 && cards.every((c) => {
-        const s = c.querySelector(".rd-ap-ctier .rd-ap-csub, .rd-ap-ctier .rd-ap-conscyc");
-        return !!s && s.textContent.trim().length > 0;
+        const s = labOf(c);
+        return !!s && s.textContent.trim().length > 0 &&
+          !c.querySelector(".rd-ap-ctier .rd-ap-csub, .rd-ap-ctier .rd-ap-conscyc");
+      }),
+      geom: cards.length > 0 && cards.every((c) => {
+        const s = labOf(c);
+        if (!s) return false;
+        const r = s.getBoundingClientRect(), cr = c.getBoundingClientRect();
+        const tier = c.querySelector(".rd-ap-ctier, .rd-ap-cprim");
+        const above = tier ? r.top < tier.getBoundingClientRect().top : true;
+        return above && r.right > cr.right - 30 && r.right <= cr.right + 2 && r.width > 0;
       }),
       nCyc: cards.filter((c) => c.querySelector(".rd-ap-conscyc")).length,
+      heights: cards.map((c) => +c.getBoundingClientRect().height.toFixed(2)),
       rb: cycOf("24-30 Apr"),
       essJun: cycOf("24-29 Jun"),
       essFeb: cycOf("18-23 Feb"),
@@ -311,29 +334,33 @@ const runPhone = async () => {
   ok(on.nCards === 9, `the phone scopes to the nine waves (saw ${on.nCards} cards)`);
   ok(/\b9 of \d+ polls/.test(on.count.replace(/\s+/g, " ")), `phone tally reads the scoped count ("${on.count}")`);
   ok(on.nums.includes("41") && on.nums.includes("39"), "the top card prints the consideration figures");
-  ok(on.subsAll, "every phone card names its basis under the figures");
+  ok(on.subsAll, "every phone card names its basis at the head's right edge, none left under the figures");
+  ok(on.geom, "every basis label sits in the head row's right half, above the figures");
+  ok(on.heights.every((h) => Math.abs(h - 122) < 0.51), `every cons card rides the shared 122px rung (${JSON.stringify([...new Set(on.heights)])})`);
   ok(on.nCyc === 3, `three phone cards carry the range cycler (saw ${on.nCyc})`);
   ok(on.rb && on.rb.nTiers === 1, `the phone RedBridge card shows a single figure line (saw ${on.rb && on.rb.nTiers} tiers)`);
-  ok(on.rb && on.rb.lab.startsWith("seriously consider (7+ of 10)"), `the phone RedBridge card opens on the canonical serious range ("${on.rb && on.rb.lab}")`);
+  ok(on.rb && on.rb.lab.startsWith("Would seriously consider (7+ of 10)"), `the phone RedBridge card opens on the canonical serious range ("${on.rb && on.rb.lab}")`);
+  ok(on.rb && on.rb.headLab.startsWith("Would seriously consider (7+ of 10)"), "the RedBridge label rides the head row");
   ok(on.rb && on.rb.nums.includes("45") && on.rb.nums.includes("37"), "the phone RedBridge card prints the canonical figures");
   ok(on.rb && on.rb.strips === 1, "the phone RedBridge card draws one strip");
-  ok(on.rb && on.rb.aria.startsWith("Voting consideration, seriously consider (7+ of 10): "),
+  ok(on.rb && on.rb.aria.startsWith("Voting consideration, Would seriously consider (7+ of 10): "),
     `the phone RedBridge strip's aria names the range (${on.rb && on.rb.aria.slice(0, 70)}…)`);
-  ok(on.essJun && on.essJun.lab.startsWith("definitely vote"), `the phone June Essential card opens on "definitely vote" ("${on.essJun && on.essJun.lab}")`);
+  ok(on.essJun && on.essJun.lab.startsWith("Would definitely vote"), `the phone June Essential card opens on "Would definitely vote" ("${on.essJun && on.essJun.lab}")`);
   ok(on.essJun && on.essJun.nums.includes("27") && on.essJun.nums.includes("29"), `the phone June Essential card prints its band figures (${JSON.stringify(on.essJun && on.essJun.nums)})`);
   ok(on.essFeb && on.essFeb.nums.includes("25"), "the phone Feb Essential card prints the One Nation 25");
 
-  // the phone cycler also swaps figures and strip (RedBridge + Essential)
+  // the phone cycler also swaps figures, head label and strip (RedBridge + Essential)
   ok(await clickCyc(page, NEEDLES.rb), "phone RedBridge cycler press landed");
   await sleep(300);
   const on2 = await cstate();
   ok(on2.rb && on2.rb.lab.startsWith("consider (4+ of 10)"), `phone press swaps the RedBridge label to the loose range ("${on2.rb && on2.rb.lab}")`);
+  ok(on2.rb && on2.rb.headLab.startsWith("consider (4+ of 10)"), "the head label swings with the range");
   ok(on2.rb && on2.rb.nums.includes("62") && on2.rb.nums.includes("59"), `phone press swaps the RedBridge figures (${JSON.stringify(on2.rb && on2.rb.nums)})`);
   ok(on2.rb && on2.rb.aria.startsWith("Voting consideration, consider (4+ of 10): "), "phone press swaps the RedBridge strip's aria");
   ok(await clickCyc(page, NEEDLES.essJun), "phone Essential June cycler press landed");
   await sleep(300);
   const on3 = await cstate();
-  ok(on3.essJun && on3.essJun.lab.startsWith("would consider (definitely or open)"), `phone press swaps the June Essential label to the loose band ("${on3.essJun && on3.essJun.lab}")`);
+  ok(on3.essJun && on3.essJun.lab.startsWith("Would consider (definitely or open)"), `phone press swaps the June Essential label to the loose band ("${on3.essJun && on3.essJun.lab}")`);
   ok(on3.essJun && on3.essJun.nums.includes("50") && on3.essJun.nums.includes("52"), `phone press swaps the June Essential figures (${JSON.stringify(on3.essJun && on3.essJun.nums)})`);
   await page.close();
 };
