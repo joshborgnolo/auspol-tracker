@@ -3439,8 +3439,9 @@ const individualPolls = POLLS.map((p) => {
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     // voting CONSIDERATION (multi-select "which parties would you consider
     // voting for" shares; YouGov News24/serious waves, Essential's
-    // consideration module, and the Climate Council MRP) – absent where a
-    // wave asked no consideration question; display-only
+    // consideration module, and YouGov (MRP)'s Climate Council and
+    // Blueprint Institute waves) – absent where a wave asked no
+    // consideration question; display-only
     ...(p.consideration ? { cons: p.consideration } : {}),
     /* RedBridge/Accent's cohort forced-choice figures (absent-not-zero):
        the Labor share when Coalition voters are pressed into Labor-v-One

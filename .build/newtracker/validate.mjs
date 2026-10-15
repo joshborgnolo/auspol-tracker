@@ -151,15 +151,17 @@ export function validate(D) {
     // 2b1ca. consideration – "which parties would you consider voting for"
     //      (multi-select, so no sum discipline). YouGov's News24/serious
     //      waves, Essential's consideration module, and YouGov (MRP)'s
-    //      Climate Council wave. Party keys from alp/lnp/grn/onp/oth/none,
-    //      at least one, each a percentage or a hand-entered .5 multiple.
+    //      Climate Council and Blueprint Institute waves. Party keys from
+    //      alp/lnp/grn/onp/ind/oth/none (only the Blueprint wave offered an
+    //      Independent option, so ind rides it alone), at least one, each a
+    //      percentage or a hand-entered .5 multiple.
     if (p.consideration != null) {
       if (!["YouGov", "YouGov (MRP)", "Essential"].includes(p.pollster))
         fail("cons-pollster", `consideration on a row for ${p.pollster}`);
       const keys = Object.keys(p.consideration).filter((k) => p.consideration[k] != null);
       if (!keys.length) fail("cons-shape", "consideration carries no figures");
       for (const k of Object.keys(p.consideration))
-        if (!["alp", "lnp", "grn", "onp", "oth", "none"].includes(k))
+        if (!["alp", "lnp", "grn", "onp", "ind", "oth", "none"].includes(k))
           fail("cons-key", `consideration.${k} is not a party key`);
       for (const k of keys) {
         const v = p.consideration[k];

@@ -120,14 +120,17 @@ new and worth looking at.
   the pollster name as "APC methodology".
 - **Voting consideration** travels per poll as `consideration` — a wave's
   "which parties would you consider voting for" figures, keyed
-  `alp`/`lnp`/`grn`/`onp`/`oth`/`none` (a multi-select, so the shares sum
-  past 100 and carry no base discipline). Three sources: YouGov's
-  News24/serious waves, Essential's consideration module (the
-  "definitely + open" sum), and YouGov (MRP)'s Climate Council wave.
-  Absent, not zero: a wave that asked no consideration question omits it.
-  The All polls table's Primary facet can switch into it, and the
-  expanded poll lists it under "Also in this poll"; the aggregate never
-  sees any of it.
+  `alp`/`lnp`/`grn`/`onp`/`oth`/`none` (plus `ind` on YouGov (MRP)'s
+  Blueprint Institute wave, the only one that offered an Independent
+  option); a multi-select, so the shares sum past 100 and carry no base
+  discipline. Three sources: YouGov's News24/serious waves, Essential's
+  consideration module (the "definitely + open" sum), and YouGov (MRP)'s
+  Climate Council and Blueprint Institute waves. The Blueprint wave
+  published consideration only — no voting intention — so its row's
+  primary fields are null. Absent, not zero: a wave that asked no
+  consideration question omits it. The All polls table's Primary facet
+  can switch into it, and the expanded poll lists it under "Also in this
+  poll"; the aggregate never sees any of it.
 
 ## Layout
 

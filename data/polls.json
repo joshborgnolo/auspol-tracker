@@ -1563,6 +1563,31 @@
       "url": "https://www.roymorgan.com/findings/9932-federal-voting-intention-july-27-2025"
     },
     {
+      "date": "2025-07-29",
+      "published": "2025-09-02T03:13",
+      "dateStart": "2025-07-10",
+      "pollster": "YouGov (MRP)",
+      "client": "Blueprint Institute",
+      "sample": 5007,
+      "alp": null,
+      "lnp": null,
+      "grn": null,
+      "onp": null,
+      "ind": null,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "consideration": {
+        "alp": 42,
+        "lnp": 33,
+        "grn": 17,
+        "onp": 12,
+        "ind": 14,
+        "oth": 4
+      },
+      "url": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf"
+    },
+    {
       "date": "2025-07-30",
       "published": "2025-08-05T17:39",
       "dateStart": "2025-07-18",

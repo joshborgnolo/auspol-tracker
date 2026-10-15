@@ -212,6 +212,10 @@ const RD_AP_PRIM_META = {
   lnp: { lab: "L/NP", ink: "var(--lnp-text)", dot: "var(--lnp)" },
   grn: { lab: "GRN", ink: "var(--grn-text)", dot: "var(--grn)" },
   onp: { lab: "ON", ink: "var(--onp-text)", dot: "var(--onp)" },
+  /* ind is a lookup-only entry (the Blueprint wave's consideration asked
+     about Independents) - rdApPrimList still drives every party LADDER,
+     whose id comes from latest.primaryOrder and stays five-key */
+  ind: { lab: "IND", ink: "var(--ink-2)", dot: "var(--oth)" },
   oth: { lab: "OTH", ink: "var(--ink-2)", dot: "var(--oth)" },
 };
 const RD_AP_PRIM_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
@@ -1951,7 +1955,7 @@ function rdLgLines(p, { onM, demSplit }) {
     </> });
   }
   if (p.cons) {
-    const ORDER = ["alp", "lnp", "grn", "onp", "oth", "none"];
+    const ORDER = ["alp", "lnp", "grn", "onp", "ind", "oth", "none"];
     const ks = ORDER.filter((k) => p.cons[k] != null);
     out.push({ id: "cons", lab: "Consideration", body: <>
       {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(p.cons[k])}</b></> : pty(k, rdApNum(p.cons[k]))}</U>)}
