@@ -2433,7 +2433,8 @@ function rdApConsStory(upd) {
     : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation "
       + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
   const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "")
-    + tallied;
+    + tallied
+    + "Below is every national poll with consideration figures since the 2025 election, newest first, each linked to its source.";
   return { head, dek };
 }
 /* the 2PP facet's head and dek on one contest (onM: Labor v One Nation)

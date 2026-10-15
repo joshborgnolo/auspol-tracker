@@ -58476,7 +58476,7 @@ function rdApConsStory(upd) {
   const cnt = [1, 0, -1].map(r => full.filter(p => rel(p, "alp") === r).length);
   const parts = ["outscored", "came close to", "trailed"].map((v, i) => cnt[i] ? [v, cnt[i]] : null).filter(Boolean);
   const tallied = full.length < 2 ? "" : parts.length === 1 ? "In all " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + parts[0][0] + " Labor. " : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
-  const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "") + tallied;
+  const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "") + tallied + "Below is every national poll with consideration figures since the 2025 election, newest first, each linked to its source.";
   return {
     head,
     dek
