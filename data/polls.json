@@ -692,6 +692,14 @@
       "unsure": 15.5
     },
     {
+      "date": "2025-06-30",
+      "dateStart": "2025-06-19",
+      "pollster": "RedBridge/Accent",
+      "right": 36,
+      "wrong": 43,
+      "unsure": 21
+    },
+    {
       "date": "2025-07-01",
       "dateStart": "2025-06-27",
       "pollster": "Spectre Strategy",
@@ -817,6 +825,14 @@
       "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
       "published": "2025-11-10T17:24",
       "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf"
+    },
+    {
+      "date": "2025-11-13",
+      "dateStart": "2025-11-07",
+      "pollster": "RedBridge/Accent",
+      "right": 34,
+      "wrong": 49,
+      "unsure": 17
     },
     {
       "date": "2025-11-16",
