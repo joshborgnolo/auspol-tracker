@@ -7608,11 +7608,13 @@ function infoTerms(D) {
         voters. Measuring each poll against its own total removes its pollster’s lean. The charts
         follow each group month by month, built the same way, as a percentage above or below all
         voters. Groups pool only where pollsters cut the population the same way; the working
-        lists which count where. Income is the exception: no two pollsters draw the same bracket,
-        so the Income tab fits each poll a line across the income scale – its brackets mapped
-        onto the census income distribution, each weighted by how many voters it holds – and
-        reads every poll at the same two bands of the electorate, the bottom half and the
-        top 15% plus. The note by the chart names each house’s own end brackets.</span>
+        lists which count where. Income is treated differently. Because no two pollsters draw
+        the same income brackets, the Income tab places each bracket where it sits in the
+        electorate – an under-$50k cut is roughly the poorest quarter, from the census income
+        distribution – and fits each poll a line through its brackets, each weighted by how
+        many voters it holds. Every poll is read at the same two bands, the bottom half and
+        the top 15% plus, and those reads become gaps against its own total, like any other
+        group’s. The note by the chart names each house’s own end brackets.</span>
         <span className="info-p"><b>Reading a gap.</b> Each figure carries its
         {" "}{xref("interval", "who votes for whom", "95% margin")}, usually 2 to 5 points, with each
         poll’s sample for a group estimated from the group’s share of adults (18–34s are about
