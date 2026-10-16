@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
+import { THEMES as ONEOFF_THEMES, themeOf as oneOffThemeOf } from "./adhoc-themes.mjs";
 import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
@@ -87,10 +88,11 @@ const _mutelog = console.log, _mutewarn = console.warn;
 console.log = console.warn = () => {};
 try { await import("./gen-data.mjs"); }
 finally { console.log = _mutelog; console.warn = _mutewarn; }
-/* gen-data's whole job is these two files. Everything downstream of this
+/* gen-data's whole job is these files. Everything downstream of this
    line reads them by name, so if either is missing or empty the diagnosis
    belongs here, not in a readFileSync ENOENT two hundred lines later. */
-for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json"]) {
+for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json",
+                   ...(VIC ? [] : ["oneoffs-source.json"])]) {
   const exists = fs.existsSync(DA(rel));
   if (!exists || fs.statSync(DA(rel)).size === 0) {
     console.error(`\n.build/newtracker/${"assets/" + rel} is ${exists ? "empty" : "missing"} after gen-data – build stopped`);
@@ -118,6 +120,7 @@ const JSX = [
   "rd-polls.jsx",                             // the redesign's latest-and-next polls table
   "rd-cycles.jsx",                            // the redesign's Past cycles tab
   "rd-allpolls.jsx",                          // the redesign's All polls tab
+  "rd-adhocs.jsx",                            // the ☰ menu's Ad hocs catalogue page
   "73de0c58-f11f-4793-9f90-77e583ab051b.js",  // header, hero, mount
 ];
 
@@ -754,6 +757,96 @@ function ssChangelogBlock(esc) {
         is the interactive archive.</p>`;
 }
 
+/* The Ad-hocs tab page's static article: the topical one-off questions from
+   the two committed one-off stores (data/news24-one-offs.json's one_offs +
+   data/redbridge-one-offs.json's entries), grouped by adhoc-themes.mjs into
+   the SAME theme order the live page renders, so a no-JS reader or crawler
+   sees the live page's figures as text. The grouping itself is one source on
+   purpose – themeOf throws on an id it doesn't know, so landing a new wave of
+   either store without mapping its ids fails the build loudly.
+   Shape: each theme is an h2 + dek, then each question is an h3 card intro,
+   each wave a labelled paragraph of "Option answer%" spans (the first
+   all-voters table only – depth is the live page's folds). No colour here;
+   the .ao-ss styles are template.html's. Caller supplies its esc. */
+const AO_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function ssAdhocsBlock(esc) {
+  const read = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8"));
+  let news24 = null, redbridge = null;
+  try { news24 = read("news24-one-offs.json").one_offs || []; } catch { /* absent */ }
+  try { redbridge = read("redbridge-one-offs.json").entries || []; } catch { /* absent */ }
+  if (!news24 && !redbridge) return "";
+  const entries = [];
+  for (const e of news24 || []) {
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
+      dateEnd: e.fieldwork ? e.fieldwork.end : null,
+      house: "news24", url: e.articleUrl || null,
+      rows: ((e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows) || [])
+        .filter((r) => r.length >= 2).map((r) => [r[0], r[1]]),
+      proseOnly: !((e.data && e.data.tables || []).length),
+    });
+  }
+  for (const e of redbridge || []) {
+    const t = (e.tables || [])[0] || {};
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      house: "redbridge", url: e.url || null,
+      rows: (t.entities || []).slice(0, 12).map((en) => [en.name, ((en.values || [])[0] ?? null)]),
+      proseOnly: false,
+    });
+  }
+  if (!entries.length) return "";
+  const fmt = (v) => {
+    if (v == null || v === "" || v === "--") return "&#8211;";
+    const n = Number(v);
+    return Number.isFinite(n) ? `${n}%` : esc(String(v));
+  };
+  const dateLabel = (b) => {
+    const d = b.dateEnd || b.waveDate;
+    const [y, m, dd] = String(d || "").split("-");
+    return `${+dd} ${AO_MON[+m - 1]} ${y}`;
+  };
+  /* group by theme in the shared order; newest wave first within a question */
+  const cards = new Map(); // themeId -> Map(question -> [waves])
+  for (const b of entries) {
+    if (!cards.has(b.theme)) cards.set(b.theme, new Map());
+    const q = cards.get(b.theme);
+    if (!q.has(b.question)) q.set(b.question, []);
+    q.get(b.question).push(b);
+  }
+  const sections = ONEOFF_THEMES.map((th) => {
+    const qs = cards.get(th.id);
+    if (!qs) return "";
+    const blocks = [...qs.entries()].map(([q, waves]) => {
+      const houseN = new Set(waves.map((w) => w.house));
+      const tag = houseN.size > 1 ? "both houses"
+        : waves[0].house === "news24" ? "YouGov &#8211; News24 Pulse" : "RedBridge/Accent (via the AFR)";
+      const reads = [...waves].sort((a, b) => String(b.waveDate).localeCompare(String(a.waveDate)))
+        .map((b) => `
+        <div class="ao-ss-wave"><span class="ao-ss-date">${dateLabel(b)}</span>
+          ${b.rows.length ? `<p class="ao-ss-figs">${b.rows.map(([n, v]) => `<span class="ao-ss-fig"><b>${esc(String(n))}</b> ${fmt(v)}</span>`).join(" ")}</p>`
+          : `<p class="ao-ss-note">Asked, but this wave&#8217;s figures are image-only or prose-reported; the live page links the source.</p>`}
+        </div>`).join("");
+      return `
+      <div class="ao-ss-card">
+        <h3>${esc(q)}</h3>
+        <p class="ao-ss-meta">${tag} &#183; ${waves.length} ${waves.length === 1 ? "wave" : "waves"}</p>
+${reads}
+      </div>`;
+    }).join("");
+    return `
+      <h2>${esc(th.title)}</h2>
+      <p class="ao-ss-dek">${esc(th.dek)}</p>
+${blocks}`;
+  }).join("");
+  return `
+
+      <section class="ao-ss" aria-label="Ad hoc topical and issue questions by theme">${sections}
+      </section>`;
+}
+
 function buildStaticSummary() {
   const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
@@ -1089,6 +1182,25 @@ ${ssTail(esc, sources)}
 ${body.trim()}
       </div>
     </article>`;
+  }
+  /* the ☰ menu's fifth page: the ad hoc topical and issue questions the two
+     one-off stores hold, grouped by theme into a static catalogue
+     (ssAdhocsBlock); the live tab renders the same grouping with the
+     crosstabs and folds (RdAdhocs, rd-adhocs.jsx). Federal only – /vic/'s
+     menu never holds it */
+  if (id === "ad-hocs") {
+    return `<article class="static-summary">
+  <h1>Ad hoc topical and issue questions</h1>
+  <p class="ss-sub">Beyond the standing battery &#8211; voting intention, leader ratings,
+    preferred prime minister &#8211; pollsters ask questions once: about the issue of the
+    moment, or a topic they never visit again. This page collects those one-off and
+    occasional questions from RedBridge/Accent (via the AFR) and YouGov&#8217;s News24
+    Pulse, grouped by theme, with every figure each wave published.</p>
+
+${ssAdhocsBlock(esc)}
+
+  ${ssTail(esc, sources)}
+</article>`;
   }
   /* the ☰ menu's pages: what each measures, in words; the figures are the
      live page's charts */
@@ -1491,6 +1603,20 @@ writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
    document, and the browser resolves the cycle-source fetch against the
    page's own URL. */
 parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
+/* The one-offs catalogue behind the ☰ menu's Ad hocs page gets the same
+   treatment as the cycle-source rows: a hashed sidecar fetched only when the
+   tab opens (~60KB nobody but that page's reader needs), gen-data's
+   oneoffs-source.json shipped to /assets/ under its own content hash. */
+const oneOffsJson = !VIC && fs.readFileSync(DA("oneoffs-source.json"), "utf8");
+if (!VIC) {
+  const name = `oneoffs-source.${hash8(Buffer.from(oneOffsJson))}.json`;
+  for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
+    if (/^oneoffs-source\..*\.json$/.test(old) && old !== name)
+      fs.unlinkSync(path.join(ROOT, "assets", old));
+  }
+  writeAtomic(path.join(ROOT, "assets", name), oneOffsJson);
+  parts.push(`<script>window.AP_ONEOFF_SRC=${JSON.stringify("/assets/" + name)};<\/script>`);
+} else parts.push(`<script>window.AP_ONEOFF_SRC=null;<\/script>`);
 /* The explainer's article, shipped to every federal document so the ☰ menu's
    flows-explained tab renders on an instant client-side swap like its
    siblings (tab clicks never fetch). One source: the string here and the
@@ -1552,6 +1678,12 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
     ...(VIC ? [] : [{ id: "flows-explained", label: "Preference flows explained",
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     /* the ☰ menu's fifth page, straight under the explainer (the user's
+       2026-10-17 call: the topical one-off questions the pollsters ask
+       beyond the standing battery, from the two committed one-off stores –
+       federal only, /vic/'s menu never holds it) */
+    ...(VIC ? [] : [{ id: "ad-hocs", label: "Ad hoc topical/issue questions",
+      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent and YouGov News24 Pulse one-offs, grouped by theme with every figure and source." }]),
+    /* the ☰ menu's sixth page, straight under Ad hocs (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
        Info about-block's tail, then a console satellite at /changelog/;
        now a page of the build – federal only, /vic/ has no change log) */
@@ -1795,7 +1927,7 @@ const PREDICTION_STAMP = "2026-10-16";
    VIC_STAMP pattern below). Bump yours when a new tab page ships. */
 const TAB_STAMP = { cycles: "2026-10-11", allpolls: "2026-10-11", info: "2026-10-11",
   disagreement: "2026-10-15", leans: "2026-10-15", flows: "2026-10-15",
-  "flows-explained": "2026-10-15", changelog: "2026-10-12" };
+  "flows-explained": "2026-10-15", "ad-hocs": "2026-10-17", changelog: "2026-10-12" };
 const tabLastmod = (id) => (TAB_STAMP[id] || "") > dataStamp ? TAB_STAMP[id] : dataStamp;
 /* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
    dated as this page is, by its data – the newest Victorian poll's
@@ -1832,7 +1964,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <loc>${SITE_URL}</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
-${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "changelog"].map((id) => `  <url>
+${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "ad-hocs", "changelog"].map((id) => `  <url>
     <loc>${SITE_URL}${id}/</loc>
     <lastmod>${tabLastmod(id)}</lastmod>
   </url>`).join("\n")}

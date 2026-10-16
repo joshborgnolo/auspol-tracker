@@ -3244,6 +3244,68 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
 }
+.ao { margin-top: 8px; }
+.ao-legend { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 16px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.ao-legend span + span::before { content: "\00b7"; margin: 0 10px; color: var(--ink-faint); }
+.ao-theme { margin-top: 40px; padding-top: 14px; border-top: 2px solid var(--ink); }
+.ao-t-t { margin: 0; font-family: var(--sans); font-size: 20px; font-weight: 600; line-height: 1.25; letter-spacing: -0.005em; color: var(--ink); }
+.ao-t-dek { margin: 6px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
+.ao-qs { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px; }
+@media (min-width: 940px) { .ao-qs { grid-template-columns: 1fr 1fr; gap: 16px; } }
+.ao-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 12px; background: var(--surface); }
+.ao-q { margin: 0; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
+.ao-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ao-chip {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+}
+.ao-chip-news24, .ao-chip-redbridge { color: var(--ink-2); }
+.ao-wave { margin-top: 12px; }
+.ao-wmeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-size: 12.5px; color: var(--ink-3); }
+.ao-whouse { color: var(--ink-2); font-weight: 600; }
+.ao a.ao-src {
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+}
+.ao a.ao-src:hover, .ao a.ao-src:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.ao-figs { display: grid; gap: 5px; margin-top: 8px; }
+.ao-fig { display: grid; grid-template-columns: minmax(0, 1fr) 41% 3.2em; align-items: center; gap: 10px; }
+.ao-fl { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+.ao-fb { height: 7px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
+.ao-fb i { display: block; height: 100%; border-radius: 4px; background: var(--accent); opacity: 0.85; }
+.ao-fv { font-size: 12.5px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.ao-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
+.ao-only { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+.ao-retry {
+  font: inherit; color: var(--accent); background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.ao-fold { margin-top: 10px; border-top: 1px solid var(--line-2); padding-top: 8px; }
+.ao-fold summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.ao-fold summary:hover { color: var(--ink); }
+.ao-prior .ao-wave + .ao-wave { border-top: 1px solid var(--line-2); padding-top: 12px; }
+.ao-table-b { margin-top: 10px; }
+.ao-table-t { margin: 0 0 6px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.ao-twrap { overflow-x: auto; }
+.ao-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ao-table th, .ao-table td { padding: 4px 8px 4px 0; font-size: 12px; text-align: right; white-space: nowrap; }
+.ao-table thead th { font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.ao-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.ao-table .ao-l { text-align: left; }
+.ao-ss h2 { scroll-margin-top: 56px; }
+.ao-ss-dek, .ao-ss-meta { color: var(--ink-3); }
+.ao-ss-card { margin-top: 22px; }
+.ao-ss-wave { margin: 10px 0; }
+.ao-ss-date { display: block; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.ao-ss-figs { margin: 2px 0 0; font-size: 13.5px; line-height: 1.75; }
+.ao-ss-fig { white-space: nowrap; }
+.ao-ss-fig b { font-weight: 600; }
+.ao-ss-note { font-size: 13px; color: var(--ink-3); }
+@media (max-width: 640px) {
+  .ao-theme { margin-top: 32px; }
+  .ao-t-t { font-size: 18px; }
+  .ao-fig { grid-template-columns: minmax(0, 1fr) 34% 3em; gap: 8px; }
+}
 </style>
   <style>
 body.rd {
@@ -6076,6 +6138,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
        rely on; it is not expressed here. -->
   <script>window.AP_INITIAL_TAB="leans";</script>
   <script>window.AP_CYCLE_SRC=null;</script>
+  <script>window.AP_ONEOFF_SRC=null;</script>
   <script>/**
  * @license React
  * react.production.min.js
@@ -20334,6 +20397,24 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }
     return _cyclePromise;
   };
+  let _oneOffs = null;
+  let _oneOffsPromise = null;
+  const loadOneOffs = () => {
+    if (_oneOffs) return Promise.resolve(_oneOffs);
+    if (!_oneOffsPromise) {
+      const url = window.AP_ONEOFF_SRC;
+      const attempt = () => url ? fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error("one-offs source HTTP " + r.status))) : Promise.resolve({});
+      _oneOffsPromise = attempt().catch(() => new Promise((res, rej) => setTimeout(() => attempt().then(res, rej), 1200))).then(j => {
+        _oneOffs = j;
+        return j;
+      }).catch(e => {
+        console.error("one-offs source failed to load", e);
+        _oneOffsPromise = null;
+        return {};
+      });
+    }
+    return _oneOffsPromise;
+  };
   const pollCadence = [{
     "pollster": "RedBridge/Accent",
     "last": "2026-09-14",
@@ -20753,6 +20834,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       return _cycleSource || {};
     },
     loadCycleSource,
+    get oneOffs() {
+      return _oneOffs || {};
+    },
+    loadOneOffs,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,
@@ -37338,7 +37423,7 @@ function MenuPageView({
     tppBasis: tppBasis
   }), id === "flows" && React.createElement(RdFlows, {
     measure: measure
-  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "changelog" && React.createElement(RdChangelog, null));
+  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "ad-hocs" && React.createElement(RdAdhocs, null), id === "changelog" && React.createElement(RdChangelog, null));
   return React.createElement("div", {
     className: "view view-" + id
   }, id === "disagreement" && React.createElement(VariancePanel, {
@@ -37359,7 +37444,7 @@ function MenuPageView({
     dangerouslySetInnerHTML: {
       __html: window.EXPLAINED_ARTICLE || ""
     }
-  }), id === "changelog" && React.createElement(ChangelogEntries, null));
+  }), id === "ad-hocs" && React.createElement(RdAoEntries, null), id === "changelog" && React.createElement(ChangelogEntries, null));
 }
 const CL_KIND = {
   poll: "poll",
@@ -63184,6 +63269,271 @@ Object.assign(window, {
   RdFlows: RdFlowsM,
   RdExplained: RdExplainedM
 });</script>
+  <script>const {
+  useState: aoUseState,
+  useEffect: aoUseEffect,
+  useMemo: aoUseMemo
+} = React;
+const AO_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const AO_HOUSES = {
+  news24: {
+    short: "News24 Pulse",
+    full: "YouGov – News24 Pulse"
+  },
+  redbridge: {
+    short: "RedBridge/Accent",
+    full: "RedBridge/Accent – AFR"
+  }
+};
+const aoDay = iso => {
+  if (!iso) return null;
+  const [y, m, d] = iso.split("-").map(Number);
+  return d + " " + AO_MONTHS[m - 1] + " " + y;
+};
+const aoSpan = w => {
+  if (w.dateStart && w.dateEnd && w.dateStart !== w.dateEnd) {
+    const [sy, sm] = w.dateStart.split("-").map(Number);
+    const [ey, em] = w.dateEnd.split("-").map(Number);
+    if (sy === ey && sm === em) {
+      return w.dateStart.slice(8) + "–" + Number(w.dateEnd.slice(8)) + " " + AO_MONTHS[sm - 1] + " " + sy;
+    }
+    return aoDay(w.dateStart) + " – " + aoDay(w.dateEnd);
+  }
+  return aoDay(w.dateEnd || w.dateStart || w.waveDate);
+};
+const aoPct = v => {
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : null;
+};
+function aoGroup(src) {
+  const byTheme = new Map();
+  for (const e of src.entries || []) {
+    if (!byTheme.has(e.theme)) byTheme.set(e.theme, []);
+    byTheme.get(e.theme).push(e);
+  }
+  return (src.themes || []).map(t => {
+    const byQ = new Map();
+    for (const e of byTheme.get(t.id) || []) {
+      if (!byQ.has(e.id)) byQ.set(e.id, []);
+      byQ.get(e.id).push(e);
+    }
+    const questions = [...byQ.entries()].map(([id, waves]) => {
+      waves.sort((a, b) => a.waveDate < b.waveDate ? 1 : a.waveDate > b.waveDate ? -1 : 0);
+      return {
+        id,
+        question: waves[0].question,
+        houses: [...new Set(waves.map(w => w.house))].sort(),
+        waves
+      };
+    }).sort((a, b) => {
+      if (a.waves.length !== b.waves.length) return b.waves.length - a.waves.length;
+      const ad = a.waves[0].waveDate,
+        bd = b.waves[0].waveDate;
+      return ad < bd ? 1 : ad > bd ? -1 : a.question.localeCompare(b.question);
+    });
+    return {
+      ...t,
+      questions
+    };
+  }).filter(t => t.questions.length);
+}
+function AoFigs({
+  rows
+}) {
+  return React.createElement("div", {
+    className: "ao-figs"
+  }, rows.map((r, i) => {
+    const n = aoPct(r[1]);
+    return React.createElement("div", {
+      className: "ao-fig",
+      key: i
+    }, React.createElement("span", {
+      className: "ao-fl"
+    }, r[0]), React.createElement("span", {
+      className: "ao-fb"
+    }, React.createElement("i", {
+      style: {
+        width: (n === null ? 0 : Math.min(100, Math.max(0, n))) + "%"
+      }
+    })), React.createElement("span", {
+      className: "ao-fv"
+    }, n === null ? "–" : n + "%"));
+  }));
+}
+function AoTable({
+  t
+}) {
+  const rows = t.rows || [];
+  const asFigs = rows.length > 0 && rows.every(r => r.length === 2) && !t.headers;
+  return React.createElement("div", {
+    className: "ao-table-b"
+  }, t.title ? React.createElement("div", {
+    className: "ao-table-t"
+  }, t.title) : null, asFigs ? React.createElement(AoFigs, {
+    rows: rows
+  }) : React.createElement("div", {
+    className: "ao-twrap"
+  }, React.createElement("table", {
+    className: "ao-table"
+  }, t.headers && t.headers.length ? React.createElement("thead", null, React.createElement("tr", null, t.headers.map((h, hi) => React.createElement("th", {
+    key: hi,
+    className: hi ? "" : "ao-l"
+  }, h)))) : null, React.createElement("tbody", null, rows.map((r, ri) => React.createElement("tr", {
+    key: ri
+  }, r.map((c, ci) => {
+    const n = aoPct(c);
+    return React.createElement("td", {
+      key: ci,
+      className: ci ? "" : "ao-l"
+    }, ci === 0 ? c : n === null ? c || "–" : n + "%");
+  })))))));
+}
+function AoWave({
+  w,
+  multiHouse
+}) {
+  const all = w.tables || [];
+  const figs = all.length && all[0].rows ? all[0].rows : [];
+  const rest = all.slice(1).filter(t => (t.rows || []).length);
+  return React.createElement("div", {
+    className: "ao-wave"
+  }, React.createElement("div", {
+    className: "ao-wmeta"
+  }, multiHouse ? React.createElement("span", {
+    className: "ao-whouse"
+  }, AO_HOUSES[w.house].full) : null, React.createElement("span", null, aoSpan(w)), w.sample ? React.createElement("span", null, "n ", w.sample.toLocaleString("en-AU")) : null, w.sampleEff ? React.createElement("span", null, "effective n ", w.sampleEff.toLocaleString("en-AU")) : null, w.url ? React.createElement("a", {
+    className: "ao-src",
+    href: w.url,
+    target: "_blank",
+    rel: "noopener"
+  }, "Source \u2197") : null), w.proseOnly || !figs.length ? React.createElement("p", {
+    className: "ao-only"
+  }, w.proseOnly ? "Asked, but this wave's figures are image-only or reported in prose; the source has them." : "No all-voters figures on file for this wave; the source has them.") : React.createElement(AoFigs, {
+    rows: figs
+  }), w.note ? React.createElement("p", {
+    className: "ao-note"
+  }, w.note) : null, rest.length ? React.createElement("details", {
+    className: "ao-fold"
+  }, React.createElement("summary", null, rest.length === 1 ? "Breakdown table" : "Breakdown tables · " + rest.length), rest.map((t, ti) => React.createElement(AoTable, {
+    key: ti,
+    t: t
+  }))) : null);
+}
+function RdAoEntries() {
+  const {
+    D
+  } = window.AP;
+  const [src, setSrc] = aoUseState(null);
+  const [failed, setFailed] = aoUseState(false);
+  const [tries, setTries] = aoUseState(0);
+  aoUseEffect(() => {
+    let live = true;
+    D.loadOneOffs().then(j => {
+      if (!live) return;
+      if (j && Array.isArray(j.entries)) {
+        setSrc(j);
+        setFailed(false);
+      } else {
+        setFailed(true);
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, [tries]);
+  const themes = aoUseMemo(() => src ? aoGroup(src) : [], [src]);
+  if (failed) {
+    return React.createElement("section", {
+      className: "ao",
+      id: "ad-hocs"
+    }, React.createElement("p", {
+      className: "ao-note"
+    }, "The catalogue could not be loaded.", " ", React.createElement("button", {
+      type: "button",
+      className: "ao-retry",
+      onClick: () => setTries(n => n + 1)
+    }, "Try again")));
+  }
+  if (!src) {
+    return React.createElement("section", {
+      className: "ao",
+      id: "ad-hocs"
+    }, React.createElement("p", {
+      className: "ao-note"
+    }, "Loading the catalogue\u2026"));
+  }
+  const qCount = themes.reduce((n, t) => n + t.questions.length, 0);
+  if (!qCount) {
+    return React.createElement("section", {
+      className: "ao",
+      id: "ad-hocs"
+    }, React.createElement("p", {
+      className: "ao-note"
+    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse and RedBridge/Accent polls publish their first ad hoc questions, they will appear here grouped by theme."));
+  }
+  const wCount = (src.entries || []).length;
+  return React.createElement("section", {
+    className: "ao",
+    id: "ad-hocs"
+  }, React.createElement("div", {
+    className: "ao-legend"
+  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse and RedBridge/Accent (via the AFR)")), themes.map(t => React.createElement("div", {
+    className: "ao-theme",
+    key: t.id
+  }, React.createElement("h3", {
+    className: "ao-t-t"
+  }, t.title), React.createElement("p", {
+    className: "ao-t-dek"
+  }, t.dek), React.createElement("div", {
+    className: "ao-qs"
+  }, t.questions.map(q => React.createElement("div", {
+    className: "ao-card",
+    key: q.id
+  }, React.createElement("div", {
+    className: "ao-chead"
+  }, React.createElement("h4", {
+    className: "ao-q"
+  }, q.question), React.createElement("div", {
+    className: "ao-chips"
+  }, q.houses.map(h => React.createElement("span", {
+    key: h,
+    className: "ao-chip ao-chip-" + h
+  }, AO_HOUSES[h].short)), React.createElement("span", {
+    className: "ao-chip"
+  }, q.waves.length > 1 ? q.waves.length + " waves" : "one wave"))), React.createElement(AoWave, {
+    w: q.waves[0],
+    multiHouse: q.houses.length > 1
+  }), q.waves.length > 1 ? React.createElement("details", {
+    className: "ao-fold ao-prior"
+  }, React.createElement("summary", null, q.waves.length - 1 === 1 ? "Earlier wave" : "Earlier waves · " + (q.waves.length - 1)), q.waves.slice(1).map(w => React.createElement(AoWave, {
+    key: w.house + w.waveDate,
+    w: w,
+    multiHouse: q.houses.length > 1
+  }))) : null))))));
+}
+function RdAdhocs() {
+  return React.createElement("section", {
+    className: "rd-sec rd-adhocs",
+    id: "ad-hocs",
+    "aria-labelledby": "rd-ao-t"
+  }, React.createElement("div", {
+    className: "rd-eyebrow"
+  }, React.createElement("h2", {
+    className: "rd-title",
+    id: "rd-ao-t"
+  }, "Ad hoc topical and issue questions"), React.createElement("span", {
+    className: "rd-meta"
+  }, "The one-offs beyond the standing battery")), React.createElement(RdHed, {
+    head: "Asked once, about the issue of the moment",
+    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse and RedBridge/Accent (published in the Australian Financial Review), grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
+  }), React.createElement(RdAoEntries, null));
+}
+const RdAdhocsM = React.memo(RdAdhocs);
+const RdAoEntriesM = React.memo(RdAoEntries);
+Object.assign(window, {
+  RdAdhocs: RdAdhocsM,
+  RdAoEntries: RdAoEntriesM
+});</script>
   <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 const SETTLE_MS = 220;
 const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -64855,6 +65205,11 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
+  id: "ad-hocs",
+  label: "Ad hoc topical/issue questions",
+  menu: true,
+  tip: "The one-off questions pollsters ask beyond the standing battery, grouped by theme"
+}, {
   id: "changelog",
   label: "Changelog",
   menu: true,
@@ -64867,6 +65222,7 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "ad-hocs"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));

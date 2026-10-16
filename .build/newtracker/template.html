@@ -3175,7 +3175,7 @@ body.dark .demo-verdict mark {
 .npd-foot, .ap-var-note { max-width: 64ch; }
 
 /* ---------- how the final polls did (past cycles) ---------- */
-/* A row per election on one shared scale, so eighteen elections' worth of error can
+/* A row per election on one shared scale, so nineteen elections' worth of error can
    be compared by eye. The track is centred on the RESULT, not on zero polling
    error, because the result is the thing every dot is being measured against. */
 /* The row's geometry, defined once. The scale is only a scale while its
@@ -5441,6 +5441,77 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
+}
+
+/* ---------- the ad hocs catalogue (.ao-* and its SSR twin .ao-ss-*) ----------
+   The fifth menu page renders twice, the explainer pattern: the live
+   RdAdhocs view (rd-adhocs.jsx, fed by the oneoffs-source sidecar) and the
+   static-summary article build.mjs's ssAdhocsBlock emits. Both rule sets
+   live at page level, so the archived classic design mounts the same
+   catalogue. Figures draw as labelled bars on a shared 0-100 track, so a
+   recurring question's waves read against each other. */
+.ao { margin-top: 8px; }
+.ao-legend { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 16px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.ao-legend span + span::before { content: "\00b7"; margin: 0 10px; color: var(--ink-faint); }
+.ao-theme { margin-top: 40px; padding-top: 14px; border-top: 2px solid var(--ink); }
+.ao-t-t { margin: 0; font-family: var(--sans); font-size: 20px; font-weight: 600; line-height: 1.25; letter-spacing: -0.005em; color: var(--ink); }
+.ao-t-dek { margin: 6px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
+.ao-qs { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px; }
+@media (min-width: 940px) { .ao-qs { grid-template-columns: 1fr 1fr; gap: 16px; } }
+.ao-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 12px; background: var(--surface); }
+.ao-q { margin: 0; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
+.ao-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ao-chip {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+}
+.ao-chip-news24, .ao-chip-redbridge { color: var(--ink-2); }
+.ao-wave { margin-top: 12px; }
+.ao-wmeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-size: 12.5px; color: var(--ink-3); }
+.ao-whouse { color: var(--ink-2); font-weight: 600; }
+.ao a.ao-src {
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+}
+.ao a.ao-src:hover, .ao a.ao-src:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.ao-figs { display: grid; gap: 5px; margin-top: 8px; }
+.ao-fig { display: grid; grid-template-columns: minmax(0, 1fr) 41% 3.2em; align-items: center; gap: 10px; }
+.ao-fl { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+.ao-fb { height: 7px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
+.ao-fb i { display: block; height: 100%; border-radius: 4px; background: var(--accent); opacity: 0.85; }
+.ao-fv { font-size: 12.5px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.ao-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
+.ao-only { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+.ao-retry {
+  font: inherit; color: var(--accent); background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.ao-fold { margin-top: 10px; border-top: 1px solid var(--line-2); padding-top: 8px; }
+.ao-fold summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.ao-fold summary:hover { color: var(--ink); }
+.ao-prior .ao-wave + .ao-wave { border-top: 1px solid var(--line-2); padding-top: 12px; }
+.ao-table-b { margin-top: 10px; }
+.ao-table-t { margin: 0 0 6px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.ao-twrap { overflow-x: auto; }
+.ao-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ao-table th, .ao-table td { padding: 4px 8px 4px 0; font-size: 12px; text-align: right; white-space: nowrap; }
+.ao-table thead th { font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.ao-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.ao-table .ao-l { text-align: left; }
+/* the static-summary twin (ssAdhocsBlock in build.mjs) */
+.ao-ss h2 { scroll-margin-top: 56px; }
+.ao-ss-dek, .ao-ss-meta { color: var(--ink-3); }
+.ao-ss-card { margin-top: 22px; }
+.ao-ss-wave { margin: 10px 0; }
+.ao-ss-date { display: block; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.ao-ss-figs { margin: 2px 0 0; font-size: 13.5px; line-height: 1.75; }
+.ao-ss-fig { white-space: nowrap; }
+.ao-ss-fig b { font-weight: 600; }
+.ao-ss-note { font-size: 13px; color: var(--ink-3); }
+@media (max-width: 640px) {
+  .ao-theme { margin-top: 32px; }
+  .ao-t-t { font-size: 18px; }
+  .ao-fig { grid-template-columns: minmax(0, 1fr) 34% 3em; gap: 8px; }
 }
 
 </style>

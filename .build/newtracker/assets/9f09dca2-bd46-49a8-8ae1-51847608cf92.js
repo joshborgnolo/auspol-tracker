@@ -260,6 +260,25 @@ window.AUSPOL = (function () {
     }
     return _cyclePromise;
   };
+  /* The ad-hoc one-offs behind the /ad-hocs/ page – the same lazily fetched
+     sidecar contract as cycle-source above, for the same reason: read by
+     nothing outside that one tab's page. */
+  let _oneOffs = null;
+  let _oneOffsPromise = null;
+  const loadOneOffs = () => {
+    if (_oneOffs) return Promise.resolve(_oneOffs);
+    if (!_oneOffsPromise) {
+      const url = window.AP_ONEOFF_SRC;
+      const attempt = () => url
+        ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("one-offs source HTTP " + r.status))))
+        : Promise.resolve({});
+      _oneOffsPromise = attempt()
+        .catch(() => new Promise((res, rej) => setTimeout(() => attempt().then(res, rej), 1200)))
+        .then((j) => { _oneOffs = j; return j; })
+        .catch((e) => { console.error("one-offs source failed to load", e); _oneOffsPromise = null; return {}; });
+    }
+    return _oneOffsPromise;
+  };
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
@@ -304,6 +323,9 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
+    // the /ad-hocs/ page's one-offs, on the same contract
+    get oneOffs() { return _oneOffs || {}; },
+    loadOneOffs,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };

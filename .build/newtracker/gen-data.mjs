@@ -18,6 +18,7 @@ import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED,
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
+import { THEMES as ONEOFF_THEMES, themeOf as oneOffThemeOf } from "./adhoc-themes.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -79,6 +80,7 @@ for (const [from, to] of Object.entries(HOUSE_RENAMES)) {
 const OUT_DIR = process.env.GEN_DATA_OUT || path.join(HERE, "assets");
 const DATA_ASSET = path.join(OUT_DIR, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
 const CYCLE_SOURCE_ASSET = path.join(OUT_DIR, "cycle-source.json");
+const ONEOFFS_ASSET = path.join(OUT_DIR, "oneoffs-source.json");
 
 /* ---- canonical dataset ------------------------------------------------
    data/polls.json is the single source of truth. It used to be scraped out of
@@ -5919,7 +5921,7 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: eighteen past elections, each with a result to check the final
+   visible: nineteen past elections, each with a result to check the final
    polls against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST
@@ -7057,6 +7059,56 @@ const changelog = JUR ? null : (() => {
   return committed.entries || [];
 })();
 
+/* ---- §8e the ad hoc topical and issue questions ---------------------------
+   The /ad-hocs/ page (the ☰ menu's sixth page, 2026-10-17): every one-off
+   and rotating question the two catalogued houses have asked outside the
+   standing battery, grouped on adhoc-themes.mjs's shared map. The stores are
+   hand-curated research products (data/news24-one-offs.json,
+   data/redbridge-one-offs.json); this block re-shapes them into the page's
+   fetch payload, trimming whatever the page never reads (RedBridge's
+   quotedFigure/snippetHaystack verification artefacts, News24's embed ids
+   and text-leaf echoes). oneOffThemeOf THROWS on a store id with no theme,
+   so a wave carrying a question the map doesn't know fails the build before
+   it can land silently ungrouped. No re-phrasing happens here: questions,
+   options, notes and rows travel verbatim. */
+const oneOffsSource = JUR ? null : (() => {
+  /* The stores are curated on their own pipelines and land on their own
+     commits; an absent store (a fresh clone ahead of its first landing)
+     must not kill the whole build – the page renders an empty catalogue
+     until the store's owner commits it. Present-but-broken still throws. */
+  const read = (f, pick) => {
+    const p = path.join(ROOT, "data", f);
+    if (!fs.existsSync(p)) { console.log("  note: data/" + f + " absent – its one-offs ride the next landing"); return []; }
+    return pick(JSON.parse(fs.readFileSync(p, "utf8")));
+  };
+  const entries = [];
+  for (const e of read("news24-one-offs.json", (j) => j.one_offs || [])) {
+    const tables = (e.data && e.data.tables || []).map((t) => ({ headers: t.headers, rows: t.rows }));
+    entries.push({
+      house: "news24", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: e.responseOptions || null, note: e.note || null,
+      proseOnly: !tables.length, wordingSource: e.questionWordingSource || null,
+      url: e.articleUrl || null, tables, prose: (e.data && e.data.prose) || [],
+    });
+  }
+  for (const e of read("redbridge-one-offs.json", (j) => j.entries || [])) {
+    entries.push({
+      house: "redbridge", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: null, note: e.notes || null,
+      proseOnly: false, wordingSource: null,
+      url: e.url || null,
+      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
+        rows: (t.entities || []).map((en) => [en.name, ...(en.values || [])]) })),
+      prose: [],
+    });
+  }
+  return { generated: "ad-hocs", themes: ONEOFF_THEMES, entries };
+})();
+
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
    Generated from ${JUR ? "data/vic-polls.json (via .build/vic/to-main-schema.mjs)" : "data/polls.json"} by .build/newtracker/gen-data.mjs – do
@@ -7341,6 +7393,25 @@ window.AUSPOL = (function () {
     }
     return _cyclePromise;
   };
+  /* The ad-hoc one-offs behind the /ad-hocs/ page – the same lazily fetched
+     sidecar contract as cycle-source above, for the same reason: read by
+     nothing outside that one tab's page. */
+  let _oneOffs = null;
+  let _oneOffsPromise = null;
+  const loadOneOffs = () => {
+    if (_oneOffs) return Promise.resolve(_oneOffs);
+    if (!_oneOffsPromise) {
+      const url = window.AP_ONEOFF_SRC;
+      const attempt = () => url
+        ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("one-offs source HTTP " + r.status))))
+        : Promise.resolve({});
+      _oneOffsPromise = attempt()
+        .catch(() => new Promise((res, rej) => setTimeout(() => attempt().then(res, rej), 1200)))
+        .then((j) => { _oneOffs = j; return j; })
+        .catch((e) => { console.error("one-offs source failed to load", e); _oneOffsPromise = null; return {}; });
+    }
+    return _oneOffsPromise;
+  };
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
@@ -7385,6 +7456,9 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
+    // the /ad-hocs/ page's one-offs, on the same contract
+    get oneOffs() { return _oneOffs || {}; },
+    loadOneOffs,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)
@@ -7396,6 +7470,9 @@ writeAtomic(DATA_ASSET, out);
 /* Sidecar, inlined by build.mjs as an application/json block. Kept out of the
    JS module on purpose – see the note beside loadCycleSource above. */
 writeAtomic(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
+/* The /ad-hocs/ page's sidecar (§8e); federal-only – the Vic build's client
+   never mounts the page, and its AP_ONEOFF_SRC is null. */
+if (!JUR) writeAtomic(ONEOFFS_ASSET, JSON.stringify(oneOffsSource));
 
 /* ---- sanity summary ---------------------------------------------------- */
 console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {

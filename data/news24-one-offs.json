@@ -1,0 +1,4086 @@
+{
+ "generated": "2026-10-15",
+ "series": "YouGov — Sky News Pulse / News24 Pulse (federal)",
+ "scope": "Rotating one-off questions across all 21 waves (2026-01-27 … 2026-10-06 articles; the 2025-12-02 and 2025-12-23 waves' articles were overwritten in place by the 27 Jan story and cannot be audited). The standing battery asked every wave — primary voting intention, preferred PM (Albanese vs Ley→Taylor; Albanese vs Hanson from 21 Apr), leader satisfaction (both leaders), two 2PPs (Labor v Coalition, Labor v One Nation) — is excluded. Recurring rotating items appear once per fieldwork.",
+ "sources": "Every wave's article HTML re-fetched past the News24 cookie wall plus every Infogram embed re-downloaded (kit: .matilda/n24-questions/). Tables are the embeds' chart rows verbatim (all disclosed demographic columns); prose entries quote News24's own paragraphs verbatim.",
+ "one_offs": [
+  {
+   "id": "immigration-levels",
+   "waveDate": "2026-01-27",
+   "fieldwork": {
+    "start": "2026-01-20",
+    "end": "2026-01-27"
+   },
+   "sample": 1500,
+   "published": "2026-01-27T21:00",
+   "question": "Thinking about overall immigration to Australia, including total number of people leaving and arriving, do you think we need…",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "A big decrease",
+    "A small decrease",
+    "About right/no change",
+    "A small increase",
+    "A big increase",
+    "Do not know"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-could-form-opposition-if-an-election-were-held-today-sky-news-pulse-reveals/news-story/43b93b2bc0936232a70553f2cea09a83",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "A big increase in immigration",
+        "3"
+       ],
+       [
+        "A small increase in immigration",
+        "5"
+       ],
+       [
+        "Immigration levels to stay about the same",
+        "28"
+       ],
+       [
+        "A small decrease in immigration",
+        "21"
+       ],
+       [
+        "A big decrease in immigration",
+        "43"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Their message on immigration being too high appears to be paying dividends, with only 8 per cent of voting age Australians saying immigration should be higher and 28 per cent that it is about right, compared to 64 per cent saying our immigration are levels are too high. Forty three per cent want a big decrease in immigration.",
+     "Only 8 per cent of voters think Australia&rsquo;s immigration levels need to be higher, compared to 64% who want a decrease. Tellingly, 43 per cent want a big decrease."
+    ],
+    "embedTextLeaves": [
+     "Immigration views",
+     "Question: 'Thinking about overall immigration to Australia, including total number of people leaving and arriving, do you think we need...",
+     "The majority of voters want a big decrease in the level of immigration."
+    ]
+   },
+   "embed": {
+    "id": "_/6kboeIvN3OzEEh0OFt2O",
+    "title": "Sky News Pulse immigration views 27/01/26"
+   }
+  },
+  {
+   "id": "social-media-ban-under16",
+   "waveDate": "2026-01-27",
+   "fieldwork": {
+    "start": "2026-01-20",
+    "end": "2026-01-27"
+   },
+   "sample": 1500,
+   "published": "2026-01-27T21:00",
+   "question": "Do you support the government's social media ban for under-16s? (tracked pre/post implementation)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Strongly support",
+    "Somewhat support",
+    "Somewhat oppose",
+    "Strongly oppose"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-could-form-opposition-if-an-election-were-held-today-sky-news-pulse-reveals/news-story/43b93b2bc0936232a70553f2cea09a83",
+   "data": {
+    "tables": [],
+    "prose": [
+     "There was strong support however for the government&rsquo;s social media ban on under 16s.",
+     "Sky News asked voters whether they supported the ban before its implementation and after, and the support has only strengthened, with strongly support at 40 per cent (up 3 per cent) and somewhat support 29 per cent (steady) combining to show 69 per cent of voters support the ban, compared to only 16 per cent who don&rsquo;t support it."
+    ]
+   }
+  },
+  {
+   "id": "bondi-attack-response-rating",
+   "waveDate": "2026-01-27",
+   "fieldwork": {
+    "start": "2026-01-20",
+    "end": "2026-01-27"
+   },
+   "sample": 1500,
+   "published": "2026-01-27T21:00",
+   "question": "How well has Prime Minister Anthony Albanese responded to the Bondi terror attack?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Very well",
+    "As well as can be expected given the circumstances",
+    "Very badly"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-could-form-opposition-if-an-election-were-held-today-sky-news-pulse-reveals/news-story/43b93b2bc0936232a70553f2cea09a83",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The Prime Minister had his own reality check, with only 5 per cent of voters saying he responded very well to the Bondi terror attack, compared to 28 per cent who said he has done very badly.",
+     "He can take some comfort in 38 per cent of respondents saying he did as well as can be expected given in the circumstances."
+    ]
+   }
+  },
+  {
+   "id": "liberal-vote-shift-since-2025",
+   "waveDate": "2026-01-27",
+   "fieldwork": {
+    "start": "2026-01-20",
+    "end": "2026-01-27"
+   },
+   "sample": 1500,
+   "published": "2026-01-27T21:00",
+   "question": "Current voting intention of 2025 Liberal voters (2025 vote recall × current VI)",
+   "questionWordingSource": "infogram-derived-chart",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-could-form-opposition-if-an-election-were-held-today-sky-news-pulse-reveals/news-story/43b93b2bc0936232a70553f2cea09a83",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Liberals",
+       "Liberals ㅤ",
+       "63%"
+      ],
+      "rows": [
+       [
+        "Liberals",
+        "Labor",
+        "4%"
+       ],
+       [
+        "Liberals",
+        "Nationals",
+        "1%"
+       ],
+       [
+        "Liberals",
+        "One Nation",
+        "30%"
+       ],
+       [
+        "Liberals",
+        "Independent",
+        "1%"
+       ],
+       [
+        "Liberals",
+        "Other",
+        "1%"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "The Liberals and Nationals were down across the board compared to 2025, with primary vote for the Liberals at 14 per cent (-6.7 per cent), LNP at 4 per cent (-3.1 per cent) and Nationals at 2 per cent (-1.8 per cent).",
+     "It&rsquo;s no surprise where One Nation would pick up seats, with the party outpolling the combined Liberals and Nationals in outer metropolitan seats 27 per cent to 20 per cent, and in rural seats 35 per cent to 21 per cent."
+    ]
+   },
+   "embed": {
+    "id": "_/srcEDANHS1zZSiwnP0CF",
+    "title": "SNP Liberal vote shift 270126"
+   }
+  },
+  {
+   "id": "best-liberal-leader",
+   "waveDate": "2026-02-10",
+   "fieldwork": {
+    "start": "2026-02-03",
+    "end": "2026-02-10"
+   },
+   "sample": 1561,
+   "published": "2026-02-11T05:00",
+   "question": "Thinking about the next election, who do you think the best person would be to lead the Liberal party to give it the best chance of forming government?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Sussan Ley",
+    "Angus Taylor",
+    "Andrew Hastie",
+    "Tim Wilson",
+    "Ted O'Brien",
+    "Melissa Mcintosh",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-secures-34-per-cent-primary-vote-among-workingclass-voters-above-both-labor-and-coalition-in-sky-news-pulse/news-story/62b6a2606bfeb7c099e3d7a5d570576b",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total",
+       "Labor",
+       "Coalition",
+       "Greens",
+       "One Nation",
+       "Independent",
+       "Other"
+      ],
+      "rows": [
+       [
+        "Sussan Ley",
+        "10",
+        "14",
+        "12",
+        "6",
+        "1",
+        "9",
+        "6"
+       ],
+       [
+        "Angus Taylor",
+        "8",
+        "7",
+        "11",
+        "7",
+        "8",
+        "8",
+        "4"
+       ],
+       [
+        "Andrew Hastie",
+        "15",
+        "9",
+        "25",
+        "3",
+        "30",
+        "11",
+        "16"
+       ],
+       [
+        "Tim Wilson",
+        "3",
+        "3",
+        "2",
+        "3",
+        "1",
+        "5",
+        "5"
+       ],
+       [
+        "Ted O’Brien",
+        "2",
+        "2",
+        "3",
+        "3",
+        "1",
+        "1",
+        "0"
+       ],
+       [
+        "Melissa Mcintosh",
+        "2",
+        "2",
+        "2",
+        "2",
+        "1",
+        "2",
+        "1"
+       ],
+       [
+        "Don’t know",
+        "60",
+        "63",
+        "45",
+        "76",
+        "58",
+        "64",
+        "68"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/nMzPSxok7vknDW2VULM7",
+    "title": "Best Liberal leader barchart SNP 10022026"
+   }
+  },
+  {
+   "id": "rate-hike-government-responsibility",
+   "waveDate": "2026-02-10",
+   "fieldwork": {
+    "start": "2026-02-03",
+    "end": "2026-02-10"
+   },
+   "sample": 1561,
+   "published": "2026-02-11T05:00",
+   "question": "Is the government responsible for the February 2026 interest-rate rise? (partly/wholly vs not)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-secures-34-per-cent-primary-vote-among-workingclass-voters-above-both-labor-and-coalition-in-sky-news-pulse/news-story/62b6a2606bfeb7c099e3d7a5d570576b",
+   "data": {
+    "tables": [],
+    "prose": [
+     "And two-thirds of voters think Labor is either partly or wholly responsible for last week&rsquo;s rate hike."
+    ]
+   }
+  },
+  {
+   "id": "ever-support-one-nation",
+   "waveDate": "2026-02-24",
+   "fieldwork": {
+    "start": "2026-02-17",
+    "end": "2026-02-24"
+   },
+   "sample": 1500,
+   "published": "2026-02-25T05:00",
+   "question": "Would you ever support One Nation?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "data": {
+    "tables": [],
+    "prose": [
+     "It&rsquo;s tempting to say One Nation&rsquo;s vote could have peaked given it is down from 28 per cent to 24 per cent, but the party certainly has a higher ceiling; we asked voters if they would ever support the minor party, and 48 per cent said yes."
+    ]
+   }
+  },
+  {
+   "id": "reason-considering-one-nation",
+   "waveDate": "2026-02-24",
+   "fieldwork": {
+    "start": "2026-02-17",
+    "end": "2026-02-24"
+   },
+   "sample": 1500,
+   "published": "2026-02-25T05:00",
+   "question": "What reason is most important to you in considering voting One Nation?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "No confidence in major parties",
+       "One Nation's policy",
+       "Pauline Hanson's leadership",
+       "Addition of Barnaby Joyce"
+      ],
+      "rows": [
+       [
+        "One Nation voters",
+        "42%",
+        "33%",
+        "21%",
+        "4%"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/4dcWHFTjTStelkKjFS2S",
+    "title": "Why are you considering One Nation? SNP 24022026"
+   }
+  },
+  {
+   "id": "best-party-placement-4-issues",
+   "waveDate": "2026-02-24",
+   "fieldwork": {
+    "start": "2026-02-17",
+    "end": "2026-02-24"
+   },
+   "sample": 1500,
+   "published": "2026-02-25T05:00",
+   "question": "Which party is best placed to handle… (cost of living, immigration, housing, healthcare, climate change, economy/debt, inequality, jobs, security and defence, pensions, education, international affairs)",
+   "questionWordingSource": "infogram-headline",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Cost of living",
+       "Immigration",
+       "Housing",
+       "Healthcare",
+       "Climate change",
+       "Managing the economy and government debt",
+       "The growing gap between the very rich and poorest Australians",
+       "Good paying, secure jobs and rights at work",
+       "Security and defence",
+       "Pensions and caring for older Australians",
+       "Education and childcare",
+       "International affairs and trade"
+      ],
+      "rows": [
+       [
+        "Labor",
+        "25",
+        "20",
+        "22",
+        "31",
+        "20",
+        "24",
+        "24",
+        "33",
+        "25",
+        "31",
+        "32",
+        "27"
+       ],
+       [
+        "Coalition",
+        "22",
+        "19",
+        "18",
+        "20",
+        "11",
+        "31",
+        "14",
+        "19",
+        "27",
+        "16",
+        "19",
+        "25"
+       ],
+       [
+        "One Nation",
+        "13",
+        "29",
+        "15",
+        "12",
+        "12",
+        "12",
+        "15",
+        "13",
+        "13",
+        "14",
+        "11",
+        "13"
+       ],
+       [
+        "The Greens",
+        "9",
+        "8",
+        "10",
+        "9",
+        "28",
+        "6",
+        "12",
+        "8",
+        "4",
+        "7",
+        "8",
+        "5"
+       ],
+       [
+        "Unsure",
+        "31",
+        "24",
+        "35",
+        "28",
+        "29",
+        "27",
+        "35",
+        "27",
+        "31",
+        "32",
+        "30",
+        "30"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Sky News will be regularly checking in on the main issues for voters &ndash; and our first analysis has cost of living way out in front at 41 per cent, with the next highest being immigration and housing affordability at 10 per cent each.",
+     "Labor has a slim lead as the best party to handle cost of living on 25 per cent, the Coalition next best on 22 per cent, and One Nation lagging on 13 per cent, but more rate rises could shift that dial significantly."
+    ]
+   },
+   "embed": {
+    "id": "_/PRIwIulL9llfREvxrK8v",
+    "title": "Which party is best placed to handle... SNP 24022026"
+   }
+  },
+  {
+   "id": "most-important-issue",
+   "waveDate": "2026-02-24",
+   "fieldwork": {
+    "start": "2026-02-17",
+    "end": "2026-02-24"
+   },
+   "sample": 1500,
+   "published": "2026-02-25T05:00",
+   "question": "Which issue is the main issue for you? (importance ranking; first read of the recurring battery)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Sky News will be regularly checking in on the main issues for voters &ndash; and our first analysis has cost of living way out in front at 41 per cent, with the next highest being immigration and housing affordability at 10 per cent each."
+    ]
+   }
+  },
+  {
+   "id": "immigration-terror-controlled-regions",
+   "waveDate": "2026-02-24",
+   "fieldwork": {
+    "start": "2026-02-17",
+    "end": "2026-02-24"
+   },
+   "sample": 1500,
+   "published": "2026-02-25T05:00",
+   "question": "Should the government restrict immigration from regions controlled by terrorist organisations? (leaked Coalition proposal)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Agree the idea should be implemented",
+    "Disagree"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Immigration will be the next big reveal from the Coalition, and we asked voters if they agreed with the idea, leaked from within the Liberal Party, of restricting immigration from terror-controlled regions. 40 per cent said yes compared to 60 per cent saying no."
+    ]
+   },
+   "note": "Reported as 40% said yes, 60% no."
+  },
+  {
+   "id": "financial-situation-3m",
+   "waveDate": "2026-03-10",
+   "fieldwork": {
+    "start": "2026-03-03",
+    "end": "2026-03-10"
+   },
+   "sample": 1425,
+   "published": "2026-03-11T05:00",
+   "question": "Compared to three months ago, how has your household's financial situation changed?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Worse",
+    "No change",
+    "Better",
+    "Unsure"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "View of Jim Chalmers' economic management",
+       "ㅤ"
+      ],
+      "rows": [
+       [
+        "Worse",
+        "42",
+        "58"
+       ],
+       [
+        "No change",
+        "49",
+        "51"
+       ],
+       [
+        "Better",
+        "7",
+        "93"
+       ],
+       [
+        "Unsure",
+        "2",
+        "98"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "A massive 57 per cent of those same working-class households are feeling worse off financially during the past three months &ndash; and that&rsquo;s before any impacts of the Iran War."
+    ]
+   },
+   "note": "Dump table carries an unlabelled extra column from the infographic; stored raw. Repeat asks: 2026-05-05, 2026-06-30.",
+   "embed": {
+    "id": "_/iWNRacOfHvmppdxez3FG",
+    "title": "Australians' financial situation not improved SNP 10032026"
+   }
+  },
+  {
+   "id": "chalmers-cost-of-living-verdict",
+   "waveDate": "2026-03-10",
+   "fieldwork": {
+    "start": "2026-03-03",
+    "end": "2026-03-10"
+   },
+   "sample": 1425,
+   "published": "2026-03-11T05:00",
+   "question": "How would you describe how Federal Treasurer Jim Chalmers policies have dealt with the cost of living?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Very well",
+    "Reasonably well",
+    "Neither well nor not well",
+    "Not very well",
+    "Very badly"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "How would you describe how Federal Treasurer Jim Chalmers policies have dealt with the cost of living?",
+       "Total",
+       "Male",
+       "Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50 - 64",
+       "Age 65+",
+       "Labor voter 2025",
+       "Coalition voter 2025",
+       "Greens voter 2025",
+       "One Nation voter 2025",
+       "Independent voter 2025",
+       "Voted other 2025",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner Metropolitan",
+       "Outer Metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "Neither parent or guardian",
+       "Income $<50k",
+       "Income $50-99k",
+       "Income $100-149k",
+       "Income $150k+",
+       "Home owner",
+       "Mortgage holder",
+       "Renter",
+       "Well off",
+       "Middle Class",
+       "Working Class"
+      ],
+      "rows": [
+       [
+        "Very well",
+        "2",
+        "3",
+        "2",
+        "2",
+        "3",
+        "3",
+        "3",
+        "6",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "2",
+        "3",
+        "3",
+        "2",
+        "0",
+        "4",
+        "2",
+        "3",
+        "3",
+        "3",
+        "4",
+        "3",
+        "1",
+        "3",
+        "1",
+        "3",
+        "4",
+        "4",
+        "3",
+        "2",
+        "4",
+        "3",
+        "2"
+       ],
+       [
+        "Reasonably well",
+        "14",
+        "16",
+        "11",
+        "13",
+        "15",
+        "8",
+        "19",
+        "27",
+        "5",
+        "13",
+        "6",
+        "9",
+        "7",
+        "15",
+        "12",
+        "12",
+        "15",
+        "16",
+        "12",
+        "19",
+        "12",
+        "14",
+        "8",
+        "14",
+        "14",
+        "14",
+        "12",
+        "14",
+        "15",
+        "13",
+        "18",
+        "12",
+        "13",
+        "17",
+        "19",
+        "8"
+       ],
+       [
+        "Neither well nor not well",
+        "31",
+        "28",
+        "35",
+        "42",
+        "30",
+        "24",
+        "27",
+        "37",
+        "23",
+        "38",
+        "13",
+        "22",
+        "35",
+        "33",
+        "30",
+        "31",
+        "30",
+        "28",
+        "28",
+        "36",
+        "33",
+        "26",
+        "26",
+        "28",
+        "26",
+        "37",
+        "33",
+        "30",
+        "29",
+        "26",
+        "25",
+        "26",
+        "34",
+        "21",
+        "32",
+        "31"
+       ],
+       [
+        "Not very well",
+        "28",
+        "23",
+        "31",
+        "31",
+        "25",
+        "30",
+        "24",
+        "21",
+        "33",
+        "30",
+        "26",
+        "42",
+        "22",
+        "27",
+        "27",
+        "29",
+        "24",
+        "27",
+        "40",
+        "24",
+        "26",
+        "31",
+        "32",
+        "27",
+        "26",
+        "30",
+        "27",
+        "26",
+        "26",
+        "32",
+        "27",
+        "30",
+        "26",
+        "30",
+        "27",
+        "28"
+       ],
+       [
+        "Very badly",
+        "25",
+        "30",
+        "21",
+        "12",
+        "27",
+        "35",
+        "27",
+        "9",
+        "38",
+        "18",
+        "55",
+        "27",
+        "36",
+        "23",
+        "28",
+        "25",
+        "29",
+        "29",
+        "16",
+        "19",
+        "26",
+        "26",
+        "31",
+        "27",
+        "31",
+        "18",
+        "25",
+        "29",
+        "27",
+        "25",
+        "26",
+        "29",
+        "25",
+        "28",
+        "19",
+        "31"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Embed is titled 'Copy: Voter concerns ranked top 12, Sky News Pulse 24022026' but its table is the Chalmers verdict.",
+   "embed": {
+    "id": "_/JYUYPiKlYzIF3Gy9husx",
+    "title": "Copy: Voter concerns ranked top 12, Sky News Pulse 24022026"
+   }
+  },
+  {
+   "id": "national-security-feeling",
+   "waveDate": "2026-03-10",
+   "fieldwork": {
+    "start": "2026-03-03",
+    "end": "2026-03-10"
+   },
+   "sample": 1425,
+   "published": "2026-03-11T05:00",
+   "question": "Which best describes how secure you feel Australia is from external threats?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Secure from threats",
+    "Fairly secure but concerned",
+    "Not secure, need urgent action"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Total",
+       "Well off",
+       "Middle class",
+       "Working class"
+      ],
+      "rows": [
+       [
+        "Fairly secure but concerned",
+        "57",
+        "62",
+        "66",
+        "48"
+       ],
+       [
+        "Not secure, need urgent action",
+        "32",
+        "16",
+        "23",
+        "41"
+       ],
+       [
+        "Secure from threats",
+        "11",
+        "22",
+        "11",
+        "11"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/vyigrzBrXzBsVPESpCi6",
+    "title": "Most Australians feel concerned for future of national security SNP 10032026"
+   }
+  },
+  {
+   "id": "iran-war-biggest-concern",
+   "waveDate": "2026-03-10",
+   "fieldwork": {
+    "start": "2026-03-03",
+    "end": "2026-03-10"
+   },
+   "sample": 1425,
+   "published": "2026-03-11T05:00",
+   "question": "What's your biggest concern about the Iran War?",
+   "questionWordingSource": "infogram-display-headline",
+   "responseOptions": [
+    "Increase fuel prices and inflation",
+    "Major destabilisation in the region",
+    "Terror attacks in Australia",
+    "Disrupt travel plans",
+    "Not worried",
+    "Prefer not to say"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Increase fuel prices and inflation",
+       "Major destabilisation in the region",
+       "Terror attacks in Australia",
+       "Disrupt travel plans",
+       "Not worried",
+       "Prefer not to say"
+      ],
+      "rows": [
+       [
+        "Total",
+        "33",
+        "32",
+        "21",
+        "5",
+        "5",
+        "4"
+       ],
+       [
+        "Age 18-34",
+        "23",
+        "37",
+        "24",
+        "7",
+        "5",
+        "4"
+       ],
+       [
+        "Age 35 - 49",
+        "42",
+        "27",
+        "17",
+        "4",
+        "5",
+        "5"
+       ],
+       [
+        "Age 50 - 64",
+        "45",
+        "28",
+        "18",
+        "3",
+        "3",
+        "3"
+       ],
+       [
+        "Age 65+",
+        "22",
+        "36",
+        "27",
+        "3",
+        "8",
+        "4"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Embed caption erroneously reused the VI question text; headline/title confirm the subject.",
+   "embed": {
+    "id": "_/XDqOGmTCvBh4KEeWRYhR",
+    "title": "Voter concerns Iran War SNP 10032026"
+   }
+  },
+  {
+   "id": "energy-prices-next-12-months",
+   "waveDate": "2026-04-07",
+   "fieldwork": {
+    "start": "2026-03-31",
+    "end": "2026-04-07"
+   },
+   "sample": 1502,
+   "published": "2026-04-07T21:00",
+   "question": "What do you expect energy prices to do over the next 12 months?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Thirty-nine per cent expect them to &ldquo;increase a lot&rdquo; and a further 38 per cent expect them to &ldquo;increase somewhat&rdquo;.",
+     "The data showed 63 per cent of the public believed joblessness would increase further, while one in five believed unemployment would &ldquo;increase a lot&rdquo;.",
+     "Just six per cent expected the cost of energy to decrease.",
+     "&ldquo;Working class&rdquo; respondents held the bleakest views, with 45 per cent expecting fuel to increase &ldquo;a lot&rdquo;."
+    ]
+   }
+  },
+  {
+   "id": "fuel-consumption-action",
+   "waveDate": "2026-04-07",
+   "fieldwork": {
+    "start": "2026-03-31",
+    "end": "2026-04-07"
+   },
+   "sample": 1502,
+   "published": "2026-04-07T21:00",
+   "question": "Have you taken action to reduce your fuel consumption?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Just under half of those polled said they had taken action to reduce fuel consumption as a result of widespread price jumps in Australia."
+    ]
+   }
+  },
+  {
+   "id": "unemployment-next-12-months",
+   "waveDate": "2026-04-07",
+   "fieldwork": {
+    "start": "2026-03-31",
+    "end": "2026-04-07"
+   },
+   "sample": 1502,
+   "published": "2026-04-07T21:00",
+   "question": "What do you expect unemployment to do over the next year?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The data showed 63 per cent of the public believed joblessness would increase further, while one in five believed unemployment would &ldquo;increase a lot&rdquo;.",
+     "Just six per cent believed unemployment could fall."
+    ]
+   }
+  },
+  {
+   "id": "trump-iran-war-handling",
+   "waveDate": "2026-04-07",
+   "fieldwork": {
+    "start": "2026-03-31",
+    "end": "2026-04-07"
+   },
+   "sample": 1502,
+   "published": "2026-04-07T21:00",
+   "question": "How do you rate Donald Trump's handling of the war in Iran?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Very badly",
+    "Badly",
+    "Well/Don't know"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+   "data": {
+    "tables": [],
+    "prose": [
+     "More than half of all voters thought Mr Trump was handling his war in Iran &ldquo;very badly&rdquo;, as a total of 71 per cent of respondents thought he was doing poorly.",
+     "Sixty-six per cent said Mr Trump was handling the conflict badly."
+    ]
+   }
+  },
+  {
+   "id": "fuel-reserve-20bn",
+   "waveDate": "2026-04-21",
+   "fieldwork": {
+    "start": "2026-04-14",
+    "end": "2026-04-21"
+   },
+   "sample": 1501,
+   "published": "2026-04-22T06:00",
+   "question": "Would you support the Australia Government spending $20 billion over four years to meet the International Energy Agency's requirement for a 90-day fuel supply reserve?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Strongly support",
+    "Support",
+    "Oppose",
+    "Strongly oppose",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history/news-story/cbc88f47eac6ff1b3b8aa563dfe305e2",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Books"
+      ],
+      "rows": [
+       [
+        "Strongly support",
+        "27"
+       ],
+       [
+        "Support",
+        "36"
+       ],
+       [
+        "Oppose",
+        "8"
+       ],
+       [
+        "Strongly oppose",
+        "5"
+       ],
+       [
+        "Don't know",
+        "24"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/AVedFABx5CZQZrKIt5ey",
+    "title": "SNP poll on boosting fuel reserves 21042026"
+   }
+  },
+  {
+   "id": "oil-gas-exploration-vs-net-zero",
+   "waveDate": "2026-04-21",
+   "fieldwork": {
+    "start": "2026-04-14",
+    "end": "2026-04-21"
+   },
+   "sample": 1501,
+   "published": "2026-04-22T06:00",
+   "question": "Would you support Australia increasing gas and oil exploration and production domestically, even if it undermined legislated 2050 net zero emissions commitments?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history/news-story/cbc88f47eac6ff1b3b8aa563dfe305e2",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Total",
+       "Federal Voting Intention: Labor",
+       "Federal Voting Intention: Coalition",
+       "Federal Voting Intention: Greens",
+       "Federal Voting Intention: One Nation",
+       "Federal Voting Intention: Independent"
+      ],
+      "rows": [
+       [
+        "Yes, I would support more gas and oil exploration",
+        "57%",
+        "47",
+        "79",
+        "19",
+        "79",
+        "47"
+       ],
+       [
+        "No, I would not support increasing gas or oil exploration",
+        "21%",
+        "27",
+        "8",
+        "56",
+        "6",
+        "33"
+       ],
+       [
+        "Unsure",
+        "22%",
+        "26%",
+        "13%",
+        "25%",
+        "15%",
+        "20%"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/hzqugfrwfSGkTDAh8fOX",
+    "title": "SNP poll on oil and gass exploration 21042026"
+   }
+  },
+  {
+   "id": "healthcare-affordability-working-class",
+   "waveDate": "2026-04-21",
+   "fieldwork": {
+    "start": "2026-04-14",
+    "end": "2026-04-21"
+   },
+   "sample": 1501,
+   "published": "2026-04-22T06:00",
+   "question": "Have you struggled to pay for, or delayed, healthcare due to the cost of living? (working-class sub-sample reported)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history/news-story/cbc88f47eac6ff1b3b8aa563dfe305e2",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The poll found 63 per cent of working-class respondents had struggled to pay for or delayed healthcare due to the cost of living."
+    ]
+   }
+  },
+  {
+   "id": "budget-priorities",
+   "waveDate": "2026-05-05",
+   "fieldwork": {
+    "start": "2026-04-28",
+    "end": "2026-05-05"
+   },
+   "sample": 1500,
+   "published": "2026-05-06T08:45",
+   "question": "What do you believe the government should prioritise in the Federal Budget?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Budget savings to avoid inflation",
+    "Income tax cuts",
+    "Energy subsidies or fuel excise cut",
+    "More social services and welfare"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-languishing-behind-one-nation-and-labor-for-eight-consecutive-polls-sky-news-pulse-reveals/news-story/136b0b32b0a647328a35440659262b73",
+   "data": {
+    "tables": [],
+    "prose": [
+     "At the same time, about 1 in 3 voters called on the Albanese government to cut spending in the upcoming budget, pay down public debt and avoid further inflation.",
+     "This was overwhelmingly preferred to the roughly 1 in 10 voters who said they would prefer income tax cuts in the federal budget on May 12."
+    ],
+    "embedTextLeaves": [
+     "Energy subsidies or fuel excise cut",
+     "Income tax cuts",
+     "What should Labor prioritise in the federal budget?",
+     "Budget savings to avoid inflation",
+     "More social services and welfare",
+     "Question: 'What do you believe the government should prioritise in the Federal Budget?"
+    ]
+   },
+   "embed": {
+    "id": "_/CGn9fMbnJbvjtf3pr73y",
+    "title": "What should govt do in budget SNP 0502026 "
+   }
+  },
+  {
+   "id": "financial-situation-3m",
+   "waveDate": "2026-05-05",
+   "fieldwork": {
+    "start": "2026-04-28",
+    "end": "2026-05-05"
+   },
+   "sample": 1500,
+   "published": "2026-05-06T08:45",
+   "question": "Compared to three months ago, how has your household's financial situation changed?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Worse",
+    "No change",
+    "Better",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/coalition-languishing-behind-one-nation-and-labor-for-eight-consecutive-polls-sky-news-pulse-reveals/news-story/136b0b32b0a647328a35440659262b73",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Total",
+       "Employment: Retired",
+       "Employment: Full time",
+       "Employment: Part time",
+       "Gender: Male",
+       "Gender: Female",
+       "Voting intention: Labor",
+       "Voting intention: Coalition",
+       "Voting intention: Greens",
+       "Voting intention: One Nation",
+       "Voting intention: Independent",
+       "Voting intention: Other",
+       "Generation: GenZ",
+       "Generation: Millenial",
+       "Generation: GenX",
+       "Generation: Boomer",
+       "Generation: Silent",
+       "Region: Inner Metropolitan",
+       "Region: Outer Metropolitan",
+       "Region: Provincial",
+       "Region: Rural",
+       "Parental status: Yes, children <18",
+       "Parental status: Yes, children 18+",
+       "Parental status: No, I am neither a parent or guardian",
+       "Class: Well off",
+       "Class: Middle Class",
+       "Class: Working Class"
+      ],
+      "rows": [
+       [
+        "Worse",
+        "47",
+        "50",
+        "45",
+        "46",
+        "42",
+        "52",
+        "35",
+        "52",
+        "49",
+        "59",
+        "47",
+        "37",
+        "38",
+        "49",
+        "53",
+        "47",
+        "41",
+        "45",
+        "48",
+        "52",
+        "47",
+        "47",
+        "51",
+        "46",
+        "18",
+        "33",
+        "63"
+       ],
+       [
+        "No change",
+        "43",
+        "49",
+        "41",
+        "44",
+        "45",
+        "41",
+        "54",
+        "37",
+        "34",
+        "38",
+        "49",
+        "57",
+        "41",
+        "35",
+        "41",
+        "52",
+        "59",
+        "39",
+        "45",
+        "45",
+        "44",
+        "40",
+        "47",
+        "42",
+        "52",
+        "55",
+        "31"
+       ],
+       [
+        "Better",
+        "7",
+        "0",
+        "12",
+        "6",
+        "10",
+        "4",
+        "10",
+        "8",
+        "10",
+        "2",
+        "2",
+        "4",
+        "11",
+        "12",
+        "5",
+        "0",
+        "0",
+        "9",
+        "5",
+        "3",
+        "7",
+        "11",
+        "2",
+        "8",
+        "30",
+        "9",
+        "2"
+       ],
+       [
+        "Don't know",
+        "3",
+        "1",
+        "2",
+        "4",
+        "3",
+        "3",
+        "1",
+        "3",
+        "7",
+        "1",
+        "2",
+        "2",
+        "10",
+        "4",
+        "1",
+        "1",
+        "0",
+        "7",
+        "2",
+        "0",
+        "2",
+        "2",
+        "0",
+        "4",
+        "0",
+        "3",
+        "4"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/KAD10j069IyGDHsPdRen",
+    "title": "May 5: SkyNewsPulse financial situation change 05052026"
+   }
+  },
+  {
+   "id": "budget-better-or-worse-off",
+   "waveDate": "2026-05-19",
+   "fieldwork": {
+    "start": "2026-05-12",
+    "end": "2026-05-19"
+   },
+   "sample": 1504,
+   "published": "2026-05-20T05:00",
+   "question": "From what you know about the recent Federal budget do you think it will make your household better or worse off?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Much better off",
+    "A bit better off",
+    "About the same",
+    "A bit worse off",
+    "Much worse off"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Reacting to the changes, 44 per cent of people believe they will be worse off, while only 9 per cent expect things to get better.",
+     "Only 1 per cent of voters said they thought the federal budget would leave them &ldquo;much better off&rdquo;, compared to 18 per cent who said they would be &ldquo;much worse off&rdquo;."
+    ],
+    "embedTextLeaves": [
+     "A bit better off",
+     "About the same",
+     "Will the 2026 federal budget make you better or worse off?",
+     "Much worse off",
+     "Much better off",
+     "A bit worse off",
+     "Question: From what you know about the recent Federal budget do you think it will it make your househould..."
+    ]
+   },
+   "embed": {
+    "id": "_/GkMkQvJZBZXTyyjxEaI0",
+    "title": "FEDERAL BUDGET VERDICT SNP 19052026"
+   }
+  },
+  {
+   "id": "cgt-negative-gearing-housing-verdict",
+   "waveDate": "2026-05-19",
+   "fieldwork": {
+    "start": "2026-05-12",
+    "end": "2026-05-19"
+   },
+   "sample": 1504,
+   "published": "2026-05-20T05:00",
+   "question": "In the budget there are changes proposed to capital gains tax and negative gearing with the stated aim of making it easier for first homebuyers to buy houses. Which is closest to your view?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "These changes will make housing more accessible and affordable",
+    "These changes will make housing less accessible and affordable",
+    "No view/Don't know"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Total",
+       "Gender: Male",
+       "Gender: Female",
+       "Age: 18-34",
+       "Age: 35 - 49",
+       "Age: 50+",
+       "2025 voted: Labor",
+       "2025 voted: Coalition",
+       "2025 voted: Greens",
+       "2025 voted: One Nation",
+       "2025 voted: Independent",
+       "2025 voted: Other",
+       "Region: Inner metro",
+       "Region: Outer metro",
+       "Region:  Provincial",
+       "Region: Rural",
+       "Household income: <100k",
+       "Household income: >100k",
+       "Parental Status: Yes, children <18",
+       "Parental Status: Yes, children 18+",
+       "Parental Status: No, I am neither a parent or guardian",
+       "Housing: Own outright",
+       "Housing: Mortgage-holder",
+       "Housing: Renter"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "31",
+        "36",
+        "26",
+        "45",
+        "33",
+        "22",
+        "41",
+        "16",
+        "47",
+        "25",
+        "34",
+        "29",
+        "31",
+        "29",
+        "29",
+        "35",
+        "33",
+        "34",
+        "36",
+        "21",
+        "36",
+        "25",
+        "31",
+        "37"
+       ],
+       [
+        "Unsure",
+        "31",
+        "24",
+        "38",
+        "25",
+        "30",
+        "36",
+        "36",
+        "22",
+        "29",
+        "26",
+        "32",
+        "34",
+        "33",
+        "33",
+        "24",
+        "31",
+        "34",
+        "24",
+        "26",
+        "35",
+        "31",
+        "31",
+        "28",
+        "33"
+       ],
+       [
+        "No",
+        "38",
+        "40",
+        "36",
+        "30",
+        "37",
+        "42",
+        "23",
+        "62",
+        "24",
+        "49",
+        "34",
+        "37",
+        "36",
+        "38",
+        "47",
+        "34",
+        "33",
+        "42",
+        "38",
+        "44",
+        "33",
+        "44",
+        "41",
+        "30"
+       ]
+      ]
+     }
+    ],
+    "prose": [],
+    "embedTextLeaves": [
+     "Will Labor's broken promises ease the housing crisis for first homebuyers?",
+     "Question:'In the budget there are changes proposed to capital gains tax and negative gearing with the stated aim of making it easier for first homebuyers to buy houses... Which is closest to your view?",
+     "A) 'These changes will make housing more accessible and affordable",
+     "B) 'These changes will make housing less accessible and affordable",
+     "C) 'No view/ Don't know"
+    ]
+   },
+   "embed": {
+    "id": "_/y1HzGPblAMjcg007bwY9",
+    "title": "Labors broken promises verdict SNP 19052026"
+   }
+  },
+  {
+   "id": "immigration-levels",
+   "waveDate": "2026-05-19",
+   "fieldwork": {
+    "start": "2026-05-12",
+    "end": "2026-05-19"
+   },
+   "sample": 1504,
+   "published": "2026-05-20T05:00",
+   "question": "Thinking about overall immigration to Australia, including total number of people leaving and arriving, do you think we need…",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Net increase (big increase + small increase)",
+       "Net decrease (small decrease + big decrease)"
+      ],
+      "rows": [
+       [
+        "Total",
+        "10",
+        "62"
+       ],
+       [
+        "Voted Labor 2025",
+        "11",
+        "53"
+       ],
+       [
+        "Voted Coalition 2025",
+        "5",
+        "79"
+       ],
+       [
+        "Voted One Nation 2025",
+        "2",
+        "93"
+       ],
+       [
+        "Voted Greens 2025",
+        "19",
+        "38"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Immigration has emerged as one of the most significant issues for voters, with the poll finding 62 per cent of respondents want a net decrease in overseas arrivals."
+    ]
+   },
+   "embed": {
+    "id": "_/EG3Oqx82Yind2IH1nzgC",
+    "title": "SNP immigration views 19052026"
+   }
+  },
+  {
+   "id": "best-party-economy-security",
+   "waveDate": "2026-05-19",
+   "fieldwork": {
+    "start": "2026-05-12",
+    "end": "2026-05-19"
+   },
+   "sample": 1504,
+   "published": "2026-05-20T05:00",
+   "question": "Which party is best equipped to handle the economy and government debt / security and defence / immigration (battery repeat)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The Coalition was seen as better at handling the economy and government debt (31 per cent) and security and defence (28 per cent).",
+     "One Nation dominated on immigration, with 36 per cent of voters rating it the party best equipped to handle the issue."
+    ]
+   }
+  },
+  {
+   "id": "coalition-one-nation-cooperation",
+   "waveDate": "2026-06-02",
+   "fieldwork": {
+    "start": "2026-05-26",
+    "end": "2026-06-02"
+   },
+   "sample": 1471,
+   "published": "2026-06-03T06:00",
+   "question": "Do you think the Liberal National Coalition and One Nation should team up to try form government?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Forty-six per cent of all voters said the Liberal-National Coalition and One Nation should team up to form government.",
+     "Fifty-three per cent of people intending to vote One Nation wanted cooperation, as well as 45 per cent Coalition voters, yet only 20 per cent of Labor voters supported the move."
+    ],
+    "embedTextLeaves": [
+     "NO",
+     "UNSURE",
+     "UNSURE",
+     "YES",
+     "YES",
+     "UNSURE",
+     "YES",
+     "Do you support the Coalition and One Nation working together to form govt?",
+     "NO",
+     "NO",
+     "One Nation voters",
+     "All voters",
+     "Question: 'Do you think the Liberal National Coalition and One Nation should team up to try form government?",
+     "Coalition voters"
+    ]
+   },
+   "embed": {
+    "id": "_/xOO8fcnLov6ZjJTT5ns4",
+    "title": "One Nation and COalition cooperation SNP 02062026"
+   }
+  },
+  {
+   "id": "serious-consideration",
+   "waveDate": "2026-06-02",
+   "fieldwork": {
+    "start": "2026-05-26",
+    "end": "2026-06-02"
+   },
+   "sample": 1471,
+   "published": "2026-06-03T06:00",
+   "question": "Regardless of who you said you would vote for, which of the following would you seriously consider voting for in a Federal election?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Party",
+       "Total",
+       "Gender: Male",
+       "Gender: Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50+",
+       "Voting intention: Labor",
+       "Voting intention: Coalition",
+       "Voting intention: Greens",
+       "Voting intention: One Nation",
+       "Voting intention: Independent",
+       "Voting intention: Other",
+       "Vote Labor in 2025",
+       "Voted Coalition in 2025",
+       "Voted Greens in 2025",
+       "Voted One Nation in 2025",
+       "Voted independent in 2025",
+       "Voted other in 2025",
+       "GenZ",
+       "Millennials",
+       "GenX",
+       "Boomer",
+       "Silent generation",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner Metropolitan",
+       "Outer Metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "No, I am neither a parent or guardian",
+       "Full time employed",
+       "Part time employed",
+       "Retired",
+       "Earning less than $100k",
+       "Earning more than $100k",
+       "Up to Year 12",
+       "TAFE/College",
+       "Tertiary Education",
+       "Other language spoken at home",
+       "Only English spoken at home",
+       "Own home outright",
+       "Mortgaging home",
+       "Renting home",
+       "Well off",
+       "Middle Class",
+       "Working Class"
+      ],
+      "rows": [
+       [
+        "Liberal National Coalition",
+        "30",
+        "36",
+        "24",
+        "17",
+        "27",
+        "38",
+        "13",
+        "86",
+        "1",
+        "27",
+        "28",
+        "25",
+        "14",
+        "66",
+        "3",
+        "18",
+        "19",
+        "27",
+        "15",
+        "25",
+        "34",
+        "39",
+        "52",
+        "27",
+        "36",
+        "32",
+        "19",
+        "30",
+        "22",
+        "31",
+        "32",
+        "23",
+        "29",
+        "27",
+        "38",
+        "24",
+        "31",
+        "24",
+        "41",
+        "23",
+        "35",
+        "26",
+        "28",
+        "36",
+        "29",
+        "30",
+        "40",
+        "33",
+        "19",
+        "26",
+        "36",
+        "24"
+       ],
+       [
+        "Pauline Hanson's One Nation",
+        "39",
+        "37",
+        "42",
+        "23",
+        "40",
+        "48",
+        "9",
+        "30",
+        "5",
+        "99",
+        "20",
+        "44",
+        "22",
+        "60",
+        "12",
+        "89",
+        "26",
+        "59",
+        "19",
+        "34",
+        "52",
+        "45",
+        "45",
+        "36",
+        "41",
+        "44",
+        "39",
+        "37",
+        "46",
+        "31",
+        "42",
+        "39",
+        "48",
+        "45",
+        "49",
+        "28",
+        "37",
+        "42",
+        "44",
+        "40",
+        "42",
+        "44",
+        "45",
+        "28",
+        "34",
+        "40",
+        "42",
+        "44",
+        "42",
+        "22",
+        "36",
+        "44"
+       ],
+       [
+        "Labor",
+        "34",
+        "39",
+        "29",
+        "41",
+        "36",
+        "29",
+        "94",
+        "9",
+        "32",
+        "3",
+        "40",
+        "17",
+        "72",
+        "5",
+        "30",
+        "5",
+        "44",
+        "11",
+        "44",
+        "36",
+        "29",
+        "30",
+        "31",
+        "37",
+        "31",
+        "32",
+        "35",
+        "32",
+        "37",
+        "40",
+        "34",
+        "42",
+        "21",
+        "35",
+        "28",
+        "38",
+        "40",
+        "33",
+        "29",
+        "32",
+        "35",
+        "27",
+        "30",
+        "47",
+        "40",
+        "33",
+        "31",
+        "34",
+        "34",
+        "50",
+        "39",
+        "29"
+       ],
+       [
+        "The Greens",
+        "23",
+        "21",
+        "24",
+        "43",
+        "21",
+        "13",
+        "23",
+        "8",
+        "93",
+        "2",
+        "38",
+        "16",
+        "21",
+        "4",
+        "85",
+        "4",
+        "28",
+        "9",
+        "47",
+        "27",
+        "13",
+        "13",
+        "16",
+        "25",
+        "17",
+        "23",
+        "27",
+        "21",
+        "30",
+        "26",
+        "19",
+        "29",
+        "20",
+        "19",
+        "13",
+        "36",
+        "25",
+        "28",
+        "12",
+        "25",
+        "23",
+        "20",
+        "24",
+        "26",
+        "23",
+        "23",
+        "15",
+        "19",
+        "25",
+        "29",
+        "22",
+        "23"
+       ],
+       [
+        "I would not seriously consider voting for any of the above parties",
+        "8",
+        "6",
+        "10",
+        "6",
+        "11",
+        "8",
+        "1",
+        "5",
+        "0",
+        "0",
+        "17",
+        "23",
+        "6",
+        "5",
+        "3",
+        "4",
+        "15",
+        "16",
+        "7",
+        "9",
+        "8",
+        "8",
+        "0",
+        "7",
+        "9",
+        "7",
+        "6",
+        "11",
+        "5",
+        "7",
+        "9",
+        "8",
+        "8",
+        "6",
+        "8",
+        "9",
+        "4",
+        "7",
+        "10",
+        "10",
+        "4",
+        "12",
+        "4",
+        "6",
+        "8",
+        "8",
+        "7",
+        "7",
+        "9",
+        "3",
+        "6",
+        "10"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "First ask of the consideration battery; also asked 2026-06-16 and 2026-06-30.",
+   "embed": {
+    "id": "_/2FVaqWLs0M1YjJX3VUaH",
+    "title": "voter considerations snp 02062025"
+   }
+  },
+  {
+   "id": "vote-regret-2025",
+   "waveDate": "2026-06-02",
+   "fieldwork": {
+    "start": "2026-05-26",
+    "end": "2026-06-02"
+   },
+   "sample": 1471,
+   "published": "2026-06-03T06:00",
+   "question": "Do you regret the way you voted at the 2025 federal election?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Amid the dramatic shift in voting intention, about one million voters said they regretted voting for Labor at the 2025 federal election.",
+     "Sixteen per cent of Labor voters regretted their 2025 ballot paper, compared to nine per cent of Coalition and nine per cent of One Nation voters."
+    ]
+   }
+  },
+  {
+   "id": "one-nation-readiness-to-govern",
+   "waveDate": "2026-06-16",
+   "fieldwork": {
+    "start": "2026-06-09",
+    "end": "2026-06-16"
+   },
+   "sample": 1492,
+   "published": "2026-06-17T05:00",
+   "question": "How would you describe One Nation's ability to govern?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Ready to govern well now",
+    "Will be ready by the next election",
+    "Won't be ready by next election",
+    "Will never be ready to govern",
+    "Unsure"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll/news-story/0943b53d79d1e4fb27860c4020be7642",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Polling showed 50 per cent of voters open to One Nation believe the party would be ready to govern today, and a further 33 per cent saying the party will be ready by the 2028 election."
+    ],
+    "embedTextLeaves": [
+     "Will never be ready to govern",
+     "If considering voting One Nation",
+     "Unsure",
+     "Is One Nation ready to govern?",
+     "Ready to govern well now",
+     "Will be ready by the next election",
+     "Question: 'How would you describe One Nation's ability to govern?",
+     "Won't be ready by next election"
+    ]
+   },
+   "note": "Editor's note appended by News24: 80% 'ready' figures are of voters considering One Nation, not all voters. Base of the recalled figures: voters considering One Nation.",
+   "embed": {
+    "id": "_/g8NkFyyXbKkwgRrybIJS",
+    "title": "Is One Nation ready to govern? SNP 19052026"
+   }
+  },
+  {
+   "id": "serious-consideration",
+   "waveDate": "2026-06-16",
+   "fieldwork": {
+    "start": "2026-06-09",
+    "end": "2026-06-16"
+   },
+   "sample": 1492,
+   "published": "2026-06-17T05:00",
+   "question": "Regardless of who you said you would vote for, which of the following would you seriously consider voting for in a Federal election?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll/news-story/0943b53d79d1e4fb27860c4020be7642",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Party",
+       "Total",
+       "Gender: Male",
+       "Gender: Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50+",
+       "Voting intention: Labor",
+       "Voting intention: Coalition",
+       "Voting intention: Greens",
+       "Voting intention: One Nation",
+       "Voting intention: Independent",
+       "Voting intention: Other",
+       "Voted Labor in 2025",
+       "Voted Coalition in 2025",
+       "Voted Greens in 2025",
+       "Voted One Nation in 2025",
+       "Voted independent in 2025",
+       "Voted other in 2025",
+       "GenZ",
+       "Millennials",
+       "GenX",
+       "Boomer",
+       "Silent generation",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner metropolitan",
+       "Outer metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "No, I am neither a parent or guardian",
+       "Full time employed",
+       "Part time employed",
+       "Retired",
+       "Earning less than $100k",
+       "Earning more than $100k",
+       "Up to Year 12",
+       "TAFE/College",
+       "Tertiary Education",
+       "Other language spoken at home",
+       "Only English spoken at home",
+       "Own home outright",
+       "Mortgaging home",
+       "Renting home",
+       "Well off",
+       "Middle Class",
+       "Working Class"
+      ],
+      "rows": [
+       [
+        "Coalition",
+        "31",
+        "35",
+        "28",
+        "19",
+        "30",
+        "38",
+        "12",
+        "84",
+        "7",
+        "26",
+        "35",
+        "17",
+        "12",
+        "70",
+        "9",
+        "11",
+        "34",
+        "22",
+        "17",
+        "30",
+        "30",
+        "42",
+        "49",
+        "34",
+        "31",
+        "29",
+        "32",
+        "29",
+        "24",
+        "30",
+        "28",
+        "25",
+        "41",
+        "31",
+        "39",
+        "24",
+        "30",
+        "27",
+        "40",
+        "25",
+        "35",
+        "30",
+        "34",
+        "29",
+        "32",
+        "31",
+        "44",
+        "30",
+        "15",
+        "35",
+        "35",
+        "27"
+       ],
+       [
+        "One Nation",
+        "38",
+        "37",
+        "40",
+        "23",
+        "39",
+        "46",
+        "6",
+        "33",
+        "8",
+        "98",
+        "12",
+        "30",
+        "22",
+        "55",
+        "8",
+        "95",
+        "21",
+        "61",
+        "19",
+        "36",
+        "43",
+        "48",
+        "45",
+        "39",
+        "35",
+        "42",
+        "40",
+        "39",
+        "29",
+        "31",
+        "40",
+        "42",
+        "41",
+        "39",
+        "49",
+        "31",
+        "36",
+        "33",
+        "48",
+        "41",
+        "36",
+        "43",
+        "46",
+        "23",
+        "22",
+        "41",
+        "47",
+        "40",
+        "34",
+        "51",
+        "33",
+        "42"
+       ],
+       [
+        "Labor",
+        "38",
+        "43",
+        "34",
+        "41",
+        "45",
+        "33",
+        "94",
+        "14",
+        "50",
+        "4",
+        "46",
+        "18",
+        "73",
+        "8",
+        "50",
+        "2",
+        "40",
+        "23",
+        "44",
+        "41",
+        "38",
+        "33",
+        "26",
+        "38",
+        "38",
+        "35",
+        "39",
+        "45",
+        "44",
+        "43",
+        "41",
+        "36",
+        "29",
+        "38",
+        "31",
+        "44",
+        "45",
+        "34",
+        "34",
+        "32",
+        "43",
+        "33",
+        "31",
+        "54",
+        "44",
+        "37",
+        "32",
+        "39",
+        "45",
+        "50",
+        "41",
+        "35"
+       ],
+       [
+        "Greens",
+        "23",
+        "23",
+        "22",
+        "38",
+        "27",
+        "13",
+        "23",
+        "6",
+        "94",
+        "2",
+        "41",
+        "18",
+        "24",
+        "4",
+        "84",
+        "2",
+        "30",
+        "9",
+        "40",
+        "28",
+        "22",
+        "9",
+        "18",
+        "26",
+        "24",
+        "21",
+        "16",
+        "20",
+        "27",
+        "27",
+        "21",
+        "22",
+        "21",
+        "21",
+        "13",
+        "32",
+        "25",
+        "30",
+        "12",
+        "23",
+        "25",
+        "20",
+        "17",
+        "34",
+        "27",
+        "23",
+        "14",
+        "21",
+        "31",
+        "30",
+        "24",
+        "22"
+       ],
+       [
+        "None of the above",
+        "6",
+        "5",
+        "7",
+        "10",
+        "5",
+        "4",
+        "1",
+        "5",
+        "1",
+        "1",
+        "9",
+        "28",
+        "5",
+        "2",
+        "4",
+        "3",
+        "16",
+        "15",
+        "12",
+        "5",
+        "4",
+        "5",
+        "7",
+        "5",
+        "7",
+        "4",
+        "6",
+        "8",
+        "12",
+        "9",
+        "6",
+        "3",
+        "5",
+        "6",
+        "4",
+        "7",
+        "5",
+        "7",
+        "6",
+        "9",
+        "3",
+        "7",
+        "6",
+        "5",
+        "9",
+        "6",
+        "5",
+        "5",
+        "8",
+        "0",
+        "6",
+        "6"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/svDiPV7ZnqdXDGsub8Dw",
+    "title": "Copy: voter considerations snp 02062025"
+   }
+  },
+  {
+   "id": "financial-situation-3m",
+   "waveDate": "2026-06-30",
+   "fieldwork": {
+    "start": "2026-06-23",
+    "end": "2026-06-30"
+   },
+   "sample": 1502,
+   "published": "2026-07-01T05:00",
+   "question": "Compared to three months ago, how has your household's financial situation changed?",
+   "questionWordingSource": "infogram-headline",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Party",
+       "Total",
+       "Male",
+       "Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50+",
+       "Voted Labor in 2025",
+       "Voted Coalition in 2025",
+       "Voted Greens in 2025",
+       "Voted One Nation in 2025",
+       "Voted independent in 2025",
+       "Voted other in 2025",
+       "Generation: GenZ",
+       "Generation: Millennials",
+       "Generation: GenX",
+       "Generation: Boomer",
+       "Generation: Silent",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner Metropolitan",
+       "Outer Metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "No, I am neither a parent or guardian",
+       "Full time employed",
+       "Part time employed",
+       "Retired",
+       "Income less than $100k",
+       "Income  more than $100k",
+       "Up to Year 12 education",
+       "TAFE/College education",
+       "Tertiary Education",
+       "Other language spoken at home",
+       "Only English spoken at home",
+       "Own home outright",
+       "Mortgaging home",
+       "Renting home",
+       "Class: Well off",
+       "Class: Middle class",
+       "Class: Working class"
+      ],
+      "rows": [
+       [
+        "Worse",
+        "39",
+        "38",
+        "40",
+        "29",
+        "44",
+        "42",
+        "27",
+        "45",
+        "35",
+        "52",
+        "39",
+        "39",
+        "29",
+        "36",
+        "47",
+        "41",
+        "40",
+        "41",
+        "38",
+        "42",
+        "38",
+        "34",
+        "32",
+        "37",
+        "37",
+        "44",
+        "42",
+        "46",
+        "43",
+        "34",
+        "38",
+        "39",
+        "38",
+        "41",
+        "39",
+        "39",
+        "41",
+        "37",
+        "39",
+        "39",
+        "36",
+        "45",
+        "41",
+        "20",
+        "25",
+        "54"
+       ],
+       [
+        "No change",
+        "49",
+        "50",
+        "49",
+        "47",
+        "46",
+        "52",
+        "58",
+        "46",
+        "54",
+        "42",
+        "51",
+        "46",
+        "46",
+        "48",
+        "46",
+        "54",
+        "60",
+        "48",
+        "48",
+        "45",
+        "49",
+        "59",
+        "64",
+        "48",
+        "52",
+        "45",
+        "49",
+        "41",
+        "52",
+        "51",
+        "50",
+        "46",
+        "59",
+        "49",
+        "48",
+        "52",
+        "45",
+        "50",
+        "46",
+        "50",
+        "57",
+        "45",
+        "44",
+        "46",
+        "61",
+        "37"
+       ],
+       [
+        "Better",
+        "9",
+        "10",
+        "7",
+        "18",
+        "7",
+        "4",
+        "12",
+        "9",
+        "8",
+        "5",
+        "10",
+        "13",
+        "19",
+        "12",
+        "6",
+        "3",
+        "0",
+        "9",
+        "9",
+        "9",
+        "7",
+        "7",
+        "3",
+        "12",
+        "6",
+        "9",
+        "8",
+        "12",
+        "3",
+        "10",
+        "11",
+        "11",
+        "2",
+        "7",
+        "11",
+        "5",
+        "9",
+        "12",
+        "9",
+        "8",
+        "5",
+        "9",
+        "10",
+        "32",
+        "11",
+        "5"
+       ],
+       [
+        "Don't know",
+        "3",
+        "2",
+        "4",
+        "6",
+        "3",
+        "2",
+        "3",
+        "0",
+        "3",
+        "1",
+        "0",
+        "2",
+        "6",
+        "4",
+        "1",
+        "2",
+        "0",
+        "2",
+        "5",
+        "4",
+        "6",
+        "0",
+        "1",
+        "3",
+        "5",
+        "2",
+        "1",
+        "1",
+        "2",
+        "5",
+        "1",
+        "4",
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "1",
+        "6",
+        "3",
+        "2",
+        "1",
+        "5",
+        "2",
+        "3",
+        "4"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/tfd3lWlRGUbthiXdB4gm",
+    "title": "JUNE30/26: Financial situation SkyNewsPulse 30062026"
+   }
+  },
+  {
+   "id": "serious-consideration",
+   "waveDate": "2026-06-30",
+   "fieldwork": {
+    "start": "2026-06-23",
+    "end": "2026-06-30"
+   },
+   "sample": 1502,
+   "published": "2026-07-01T05:00",
+   "question": "Regardless of who you said you would vote for, which of the following would you seriously consider voting for in a Federal election?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Party",
+       "Total",
+       "Gender: Male",
+       "Gender: Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50+",
+       "Voting intention: Labor",
+       "Voting intention: Coalition",
+       "Voting intention: Greens",
+       "Voting intention: One Nation",
+       "Voting intention: Independent",
+       "Voting intention: Other",
+       "Voted Labor in 2025",
+       "Voted Coalition in 2025",
+       "Voted Greens in 2025",
+       "Voted One Nation in 2025",
+       "Voted independent in 2025",
+       "Voted other in 2025",
+       "GenZ",
+       "Millennials",
+       "GenX",
+       "Boomer",
+       "Silent generation",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner metropolitan",
+       "Outer metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "No, I am neither a parent or guardian",
+       "Full time employed",
+       "Part time employed",
+       "Retired",
+       "Earning less than $100k",
+       "Earning more than $100k",
+       "Up to Year 12",
+       "TAFE/College",
+       "Tertiary Education",
+       "Other language spoken at home",
+       "Only English spoken at home",
+       "Own home outright",
+       "Mortgaging home",
+       "Renting home",
+       "Well off",
+       "Middle Class",
+       "Working Class"
+      ],
+      "rows": [
+       [
+        "Coalition",
+        "30",
+        "34",
+        "26",
+        "21",
+        "29",
+        "34",
+        "16",
+        "91",
+        "6",
+        "24",
+        "19",
+        "19",
+        "20",
+        "61",
+        "7",
+        "14",
+        "12",
+        "15",
+        "18",
+        "26",
+        "33",
+        "36",
+        "45",
+        "29",
+        "30",
+        "30",
+        "22",
+        "29",
+        "40",
+        "30",
+        "28",
+        "29",
+        "31",
+        "28",
+        "37",
+        "26",
+        "30",
+        "30",
+        "34",
+        "27",
+        "33",
+        "30",
+        "26",
+        "33",
+        "24",
+        "30",
+        "34",
+        "34",
+        "21",
+        "38",
+        "33",
+        "26"
+       ],
+       [
+        "One Nation",
+        "39",
+        "40",
+        "38",
+        "24",
+        "37",
+        "48",
+        "8",
+        "32",
+        "5",
+        "98",
+        "13",
+        "29",
+        "21",
+        "62",
+        "8",
+        "96",
+        "26",
+        "45",
+        "16",
+        "34",
+        "47",
+        "47",
+        "53",
+        "38",
+        "36",
+        "41",
+        "45",
+        "37",
+        "37",
+        "29",
+        "41",
+        "39",
+        "49",
+        "38",
+        "50",
+        "31",
+        "39",
+        "32",
+        "48",
+        "42",
+        "37",
+        "46",
+        "42",
+        "25",
+        "26",
+        "40",
+        "48",
+        "40",
+        "34",
+        "26",
+        "35",
+        "43"
+       ],
+       [
+        "Labor",
+        "41",
+        "42",
+        "39",
+        "50",
+        "44",
+        "34",
+        "96",
+        "15",
+        "49",
+        "7",
+        "45",
+        "21",
+        "80",
+        "9",
+        "45",
+        "3",
+        "50",
+        "20",
+        "51",
+        "43",
+        "39",
+        "33",
+        "39",
+        "42",
+        "36",
+        "38",
+        "49",
+        "48",
+        "46",
+        "46",
+        "44",
+        "42",
+        "28",
+        "43",
+        "33",
+        "45",
+        "44",
+        "41",
+        "37",
+        "36",
+        "44",
+        "37",
+        "35",
+        "52",
+        "42",
+        "41",
+        "38",
+        "44",
+        "40",
+        "49",
+        "45",
+        "36"
+       ],
+       [
+        "Greens",
+        "23",
+        "19",
+        "26",
+        "36",
+        "24",
+        "15",
+        "25",
+        "6",
+        "94",
+        "2",
+        "25",
+        "17",
+        "23",
+        "4",
+        "87",
+        "1",
+        "25",
+        "10",
+        "43",
+        "28",
+        "13",
+        "16",
+        "15",
+        "24",
+        "23",
+        "23",
+        "22",
+        "16",
+        "34",
+        "29",
+        "21",
+        "24",
+        "17",
+        "23",
+        "12",
+        "30",
+        "21",
+        "31",
+        "15",
+        "20",
+        "24",
+        "20",
+        "19",
+        "31",
+        "22",
+        "23",
+        "16",
+        "20",
+        "26",
+        "32",
+        "23",
+        "22"
+       ],
+       [
+        "None of the above",
+        "7",
+        "6",
+        "8",
+        "5",
+        "8",
+        "7",
+        "2",
+        "2",
+        "0",
+        "2",
+        "27",
+        "26",
+        "2",
+        "4",
+        "3",
+        "2",
+        "18",
+        "25",
+        "6",
+        "8",
+        "7",
+        "7",
+        "1",
+        "5",
+        "10",
+        "8",
+        "4",
+        "8",
+        "1",
+        "5",
+        "8",
+        "6",
+        "8",
+        "5",
+        "6",
+        "8",
+        "6",
+        "7",
+        "7",
+        "9",
+        "5",
+        "8",
+        "9",
+        "4",
+        "9",
+        "7",
+        "5",
+        "5",
+        "10",
+        "3",
+        "5",
+        "9"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/tHSfDnFQJXvBQu9FCkpB",
+    "title": "Voter considerations SNP 30062026"
+   }
+  },
+  {
+   "id": "australia-stronger-or-weaker",
+   "waveDate": "2026-07-14",
+   "fieldwork": {
+    "start": "2026-07-07",
+    "end": "2026-07-14"
+   },
+   "sample": 1468,
+   "published": "2026-07-15T05:00",
+   "question": "Thinking back over the from where Australia was 12 months ago, which of the following statements is closest to your view?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Australia is a stronger and most prosperous country",
+    "Australia has not changed",
+    "Australia is a weaker and poorer country"
+   ],
+   "articleUrl": "https://www.news24.com.au/australia-news/politics/pauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse/news-story/ff02004ef7e9634e18b54b227fba984b",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total",
+       "Male",
+       "Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50+",
+       "Labor",
+       "Coalition",
+       "Greens",
+       "One Nation",
+       "Independent",
+       "GenZ",
+       "Millennials",
+       "GenX",
+       "Boomer",
+       "Silent generation",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner metropolitan",
+       "Outer metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "No, I am neither a parent or guardian",
+       "Household income <$100k",
+       "Household income >$100k",
+       "Up to Year 12 education",
+       "TAFE/college education",
+       "Tertiary education",
+       "Other language spoken at home",
+       "Only English spoken at home",
+       "Well off",
+       "Middle class",
+       "Working class"
+      ],
+      "rows": [
+       [
+        "Australia is a stronger and most prosperous country",
+        "15",
+        "18",
+        "12",
+        "26",
+        "13",
+        "9",
+        "29",
+        "10",
+        "11",
+        "5",
+        "22",
+        "28",
+        "17",
+        "9",
+        "11",
+        "3",
+        "16",
+        "16",
+        "15",
+        "10",
+        "12",
+        "7",
+        "19",
+        "14",
+        "13",
+        "10",
+        "16",
+        "9",
+        "18",
+        "13",
+        "16",
+        "14",
+        "10",
+        "20",
+        "24",
+        "13",
+        "34",
+        "17",
+        "11"
+       ],
+       [
+        "Australia has not changed",
+        "34",
+        "32",
+        "36",
+        "36",
+        "36",
+        "32",
+        "50",
+        "28",
+        "46",
+        "13",
+        "29",
+        "40",
+        "31",
+        "34",
+        "32",
+        "39",
+        "35",
+        "31",
+        "30",
+        "42",
+        "35",
+        "51",
+        "39",
+        "34",
+        "32",
+        "30",
+        "29",
+        "33",
+        "39",
+        "33",
+        "34",
+        "33",
+        "34",
+        "36",
+        "33",
+        "34",
+        "28",
+        "38",
+        "31"
+       ],
+       [
+        "Australia is a weaker and poorer country",
+        "51",
+        "50",
+        "52",
+        "38",
+        "51",
+        "59",
+        "21",
+        "62",
+        "43",
+        "82",
+        "49",
+        "32",
+        "52",
+        "57",
+        "57",
+        "58",
+        "49",
+        "53",
+        "55",
+        "48",
+        "53",
+        "42",
+        "42",
+        "52",
+        "55",
+        "60",
+        "55",
+        "58",
+        "43",
+        "54",
+        "50",
+        "53",
+        "56",
+        "44",
+        "43",
+        "53",
+        "38",
+        "45",
+        "58"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/XJvkS9MbLckMJynPUF8P",
+    "title": "Aus prosperity SNP 14072026"
+   }
+  },
+  {
+   "id": "multiculturalism",
+   "waveDate": "2026-07-28",
+   "fieldwork": {
+    "start": "2026-07-21",
+    "end": "2026-07-28"
+   },
+   "sample": 1519,
+   "published": "2026-07-29T05:00",
+   "question": "Which of the following statements best reflects your view on multiculturalism: 1) It has been good for Australia, and continues to serve the country well. 2) It has been good for Australia in the past, but it is becoming problematic for social cohesion. 3) It has not served Australia well. 4) Don't know",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total",
+       "Male",
+       "Female",
+       "Age 18-34",
+       "Age 35 - 49",
+       "Age 50+",
+       "Labor",
+       "Coalition",
+       "Greens",
+       "One Nation",
+       "Independent",
+       "GenZ",
+       "Millennials",
+       "GenX",
+       "Boomer",
+       "Silent generation",
+       "NSW",
+       "VIC",
+       "QLD",
+       "SA",
+       "WA",
+       "ACT/NT/TAS",
+       "Inner metropolitan",
+       "Outer metropolitan",
+       "Provincial",
+       "Rural",
+       "Yes, children <18",
+       "Yes, children 18+",
+       "No, I am neither a parent or guardian",
+       "Household income <$100k",
+       "Household income >$100k",
+       "Up to Year 12 education",
+       "TAFE/college education",
+       "Tertiary education",
+       "Other language spoken at home",
+       "Only English spoken at home",
+       "Well off",
+       "Middle class",
+       "Working class"
+      ],
+      "rows": [
+       [
+        "Good for Australia, and continues to be",
+        "37",
+        "36",
+        "36",
+        "49",
+        "43",
+        "26",
+        "49",
+        "14",
+        "79",
+        "3",
+        "53",
+        "51",
+        "43",
+        "35",
+        "23",
+        "18",
+        "39",
+        "41",
+        "31",
+        "35",
+        "24",
+        "44",
+        "45",
+        "36",
+        "35",
+        "26",
+        "39",
+        "24",
+        "46",
+        "32",
+        "39",
+        "29",
+        "30",
+        "53",
+        "53",
+        "33",
+        "36",
+        "42",
+        "31"
+       ],
+       [
+        "Good for Australia, becoming a problem",
+        "46",
+        "50",
+        "44",
+        "29",
+        "43",
+        "57",
+        "42",
+        "67",
+        "9",
+        "48",
+        "33",
+        "27",
+        "39",
+        "51",
+        "60",
+        "72",
+        "47",
+        "44",
+        "41",
+        "51",
+        "59",
+        "43",
+        "44",
+        "46",
+        "44",
+        "52",
+        "44",
+        "60",
+        "36",
+        "46",
+        "49",
+        "49",
+        "53",
+        "36",
+        "37",
+        "48",
+        "39",
+        "44",
+        "49"
+       ],
+       [
+        "Not served Australia well",
+        "10",
+        "11",
+        "9",
+        "10",
+        "7",
+        "12",
+        "4",
+        "12",
+        "4",
+        "37",
+        "7",
+        "10",
+        "9",
+        "8",
+        "13",
+        "10",
+        "8",
+        "8",
+        "17",
+        "5",
+        "11",
+        "10",
+        "5",
+        "11",
+        "14",
+        "13",
+        "10",
+        "10",
+        "10",
+        "15",
+        "7",
+        "12",
+        "10",
+        "7",
+        "3",
+        "12",
+        "22",
+        "7",
+        "12"
+       ],
+       [
+        "Undecided",
+        "7",
+        "3",
+        "11",
+        "12",
+        "7",
+        "5",
+        "5",
+        "7",
+        "8",
+        "12",
+        "7",
+        "12",
+        "9",
+        "6",
+        "4",
+        "0",
+        "6",
+        "7",
+        "11",
+        "9",
+        "6",
+        "3",
+        "6",
+        "7",
+        "7",
+        "9",
+        "7",
+        "6",
+        "8",
+        "7",
+        "5",
+        "10",
+        "7",
+        "4",
+        "7",
+        "7",
+        "3",
+        "7",
+        "8"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/NYsZZ6udNLxvyulWvmJ3",
+    "title": "JUL18 Multiculturalism N24P 28072026"
+   }
+  },
+  {
+   "id": "best-party-immigration-policies",
+   "waveDate": "2026-08-10",
+   "fieldwork": {
+    "start": "2026-08-04",
+    "end": "2026-08-10"
+   },
+   "sample": 1511,
+   "published": "2026-08-12T05:00",
+   "question": "Which party is best at managing immigration? (with each party's published policy below)",
+   "questionWordingSource": "infogram-display-headline",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Labor",
+       "Coalition",
+       "One Nation",
+       "The Greens",
+       "Don't know"
+      ],
+      "rows": [
+       [
+        "Immigration",
+        "18%",
+        "18%",
+        "36%",
+        "7%",
+        "21%"
+       ]
+      ]
+     }
+    ],
+    "prose": [],
+    "embedTextLeaves": [
+     "Which party is best at managing the immigration? (May 2026)",
+     "One Nation",
+     "Net negative overseas migration for three years before 130,000 annuall cap.",
+     "Coalition",
+     "Immigration",
+     "Cap net overseas migration at new homes built, roughly 150-170,000 per year.",
+     "Maintain migration at about 230,000 annually.",
+     "Labor"
+    ]
+   },
+   "note": "Chart re-published from the May reporting; total-only figures.",
+   "embed": {
+    "id": "_/S35yUFnaiop6DAuLzJfN",
+    "title": "immigration policies 29072026"
+   }
+  },
+  {
+   "id": "best-party-climate-and-energy",
+   "waveDate": "2026-08-10",
+   "fieldwork": {
+    "start": "2026-08-04",
+    "end": "2026-08-10"
+   },
+   "sample": 1511,
+   "published": "2026-08-12T05:00",
+   "question": "Which party is best at managing climate change? (with each party's energy policy below)",
+   "questionWordingSource": "infogram-display-headline",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Labor",
+       "Coalition",
+       "One Nation",
+       "The Greens",
+       "Don't know"
+      ],
+      "rows": [
+       [
+        "Climate Change",
+        "17%",
+        "13%",
+        "17%",
+        "26%",
+        "27%"
+       ]
+      ]
+     }
+    ],
+    "prose": [],
+    "embedTextLeaves": [
+     "Which party is best at managing climate change? (May 2026)",
+     "One Nation",
+     "Coalition",
+     "One Nation",
+     "No emissions target. Will scrap climate change department.",
+     "Cut greenhouse gas emissions by 62-70 per cent by 2035.",
+     "Labor",
+     "Abandon Paris Agreement, expand coal and gas, support nuclear, oppose large renewable rollout",
+     "Coalition",
+     "Energy",
+     "Support coal, gas, oil, nuclear, hydro, batteries and renewables. Remains in Paris Agreement.",
+     "Net zero by 2050, renewables-led transition, batteries, transmission.",
+     "Labor",
+     "No emissions reductions target by 2035."
+    ]
+   },
+   "note": "Chart re-published from the May reporting; total-only figures.",
+   "embed": {
+    "id": "_/RUrK4eWYCgScfuW1zSRo",
+    "title": "energy policies 0726"
+   }
+  },
+  {
+   "id": "coalition-vote-flows",
+   "waveDate": "2026-08-10",
+   "fieldwork": {
+    "start": "2026-08-04",
+    "end": "2026-08-10"
+   },
+   "sample": 1511,
+   "published": "2026-08-12T05:00",
+   "question": "Current voting intention of 2025 Coalition voters (2025 vote recall × current VI)",
+   "questionWordingSource": "infogram-derived-chart",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Voting intentions of people who voted Coalition 2025",
+       "%"
+      ],
+      "rows": [
+       [
+        "Labor",
+        "4"
+       ],
+       [
+        "Coalition",
+        "57"
+       ],
+       [
+        "One Nation",
+        "36"
+       ],
+       [
+        "The Greens",
+        "0"
+       ],
+       [
+        "Independent",
+        "1"
+       ],
+       [
+        "Other",
+        "2"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Voted Coalition 2025",
+       "Intends to vote Labor",
+       "4"
+      ],
+      "rows": [
+       [
+        "Voted Coalition 2025",
+        "Intends to vote Coalition",
+        "57"
+       ],
+       [
+        "Voted Coalition 2025",
+        "Intends to vote One Nation",
+        "36"
+       ],
+       [
+        "Voted Coalition 2025",
+        "Intends to vote Greens",
+        "0"
+       ],
+       [
+        "Voted Coalition 2025",
+        "Intends to vote independent",
+        "1"
+       ],
+       [
+        "Voted Coalition 2025",
+        "Intends to vote other",
+        "2"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Mr Taylor has since clawed back a significant portion of those disaffected voters, with now just 36 per cent of people who voted Coalition in 2025 turning to One Nation."
+    ]
+   },
+   "embed": {
+    "id": "_/sX2wZUw0XKBeP0XqOYsK",
+    "title": "Coalition vote flows N24P 11082026"
+   }
+  },
+  {
+   "id": "best-party-placement-12-issues",
+   "waveDate": "2026-08-24",
+   "fieldwork": {
+    "start": "2026-08-18",
+    "end": "2026-08-24"
+   },
+   "sample": 1510,
+   "published": "2026-08-26T05:00",
+   "question": "Which party is best at handling… (12-issue battery: cost of living, immigration, housing affordability, economy and debt, climate change, healthcare, inequality, jobs and working rights, pensions and older Australians, security and defence, international affairs and trade, education and childcare)",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Total",
+       "Labor",
+       "Coalition",
+       "One Nation",
+       "The Greens",
+       "Don't know"
+      ],
+      "rows": [
+       [
+        "Cost of Living",
+        "24",
+        "20",
+        "22",
+        "9",
+        "25"
+       ],
+       [
+        "Immigration",
+        "22",
+        "14",
+        "37",
+        "8",
+        "19"
+       ],
+       [
+        "Housing Affordability",
+        "23",
+        "18",
+        "21",
+        "11",
+        "27"
+       ],
+       [
+        "Managing the Economy and Debt",
+        "25",
+        "28",
+        "17",
+        "7",
+        "23"
+       ],
+       [
+        "Climate Change",
+        "17",
+        "11",
+        "16",
+        "28",
+        "28"
+       ],
+       [
+        "Healthcare",
+        "29",
+        "18",
+        "18",
+        "10",
+        "24"
+       ],
+       [
+        "Growing Inequality",
+        "22",
+        "14",
+        "22",
+        "14",
+        "29"
+       ],
+       [
+        "Decent Jobs and Working Rights",
+        "31",
+        "18",
+        "20",
+        "8",
+        "23"
+       ],
+       [
+        "Pensions and Older Australians",
+        "29",
+        "16",
+        "21",
+        "9",
+        "25"
+       ],
+       [
+        "Security and Defence",
+        "26",
+        "24",
+        "21",
+        "4",
+        "24"
+       ],
+       [
+        "International Affairs and Trade",
+        "29",
+        "24",
+        "18",
+        "5",
+        "23"
+       ],
+       [
+        "Education and Childcare",
+        "31",
+        "19",
+        "17",
+        "9",
+        "24"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "embed": {
+    "id": "_/TBlBtAE3k0f4YBE6MIpF",
+    "title": "N24P voter issues 24082026"
+   }
+  },
+  {
+   "id": "immigration-levels",
+   "waveDate": "2026-09-08",
+   "fieldwork": {
+    "start": "2026-09-01",
+    "end": "2026-09-08"
+   },
+   "sample": 1504,
+   "published": "2026-09-09T05:00",
+   "question": "Thinking about overall immigration to Australia, including total number of people leaving and arriving, do you think we need…",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Net increase (big increase + small increase)",
+       "Net decrease (small decrease + big decrease)"
+      ],
+      "rows": [
+       [
+        "Total",
+        "7",
+        "66"
+       ],
+       [
+        "Voted Labor 2025",
+        "10",
+        "55"
+       ],
+       [
+        "Voted Coalition 2025",
+        "4",
+        "84"
+       ],
+       [
+        "Voted One Nation 2025",
+        "1",
+        "97"
+       ],
+       [
+        "Voted Greens 2025",
+        "12",
+        "36"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Sixty-six per cent of voters said they wanted either a small or big reduction in migration figures.",
+     "That figure comprises of 42 per cent of people who want a &ldquo;big reduction&rdquo; and 24 per cent who want a &ldquo;small reduction&rdquo;."
+    ]
+   },
+   "embed": {
+    "id": "_/2uuEmz9Frirmdp7kioDC",
+    "title": "N24P immigration views 08092026"
+   }
+  },
+  {
+   "id": "rate-hike-blame",
+   "waveDate": "2026-09-21",
+   "fieldwork": {
+    "start": "2026-09-15",
+    "end": "2026-09-21"
+   },
+   "sample": 1500,
+   "published": "2026-09-23T05:00",
+   "question": "Who is to blame for the September 2026 interest-rate rise — the government, the RBA, or both?",
+   "questionWordingSource": "later-article-reference",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "governmentOrRbaOrBoth"
+      ],
+      "rows": [
+       64
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Not present in the 21 Sep article body; the 2026-10-06 Pulse article reports 'the previous News24 Pulse found 64 per cent of voters blame either the government or the RBA, or both'. Likely a companion story."
+  },
+  {
+   "id": "chalmers-middle-east-rate-rise",
+   "waveDate": "2026-10-06",
+   "fieldwork": {
+    "start": "2026-09-29",
+    "end": "2026-10-06"
+   },
+   "sample": 1505,
+   "published": "2026-10-07T05:00",
+   "question": "The RBA has increased interest rates. Treasurer Jim Chalmers has said that the interest rate rise is primarily the result of conflict in the Middle East. Do you agree or disagree?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Agree",
+    "Disagree"
+   ],
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "All voters",
+       "Agree",
+       "Disagree"
+      ],
+      "rows": [
+       [
+        "",
+        "37",
+        "63"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "However, voters were unconvinced by his economic messaging, as just 36 per cent of people agreed that the rate rise was primarily due to the Middle East conflict.",
+     "Sixty-three per cent of people disagreed with Mr Chalmers, after the previous News24 Pulse found 64 per cent of voters blame either the government or the RBA, or both ."
+    ]
+   },
+   "embed": {
+    "id": "_/UYH7EJcGvPKMVgKyglNB",
+    "title": "Voters on Jim Chalmers' Middle East excuse N24P 06102026"
+   }
+  }
+ ]
+}

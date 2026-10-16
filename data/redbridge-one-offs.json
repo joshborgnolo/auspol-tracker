@@ -1,0 +1,554 @@
+{
+ "_about": "RedBridge Group/Accent Research (AFR) one-off and recurring survey questions that do NOT channel into the auspol-tracker data model (voting intention, 2PPs, PPM, leader favourability, vote softness, best-party/election-issues batteries, national direction). Compiled by reading every cached monthly tracker PDF text (glossary chapters at the end of each poll report) and the project's committed sidecars. Wave coverage: Nov 2025 through Sep/Oct 2026 fieldwork (10 cached PDFs). The March 2026 tracker wave (2026-03-27) has no published PDF page, the big March 2026 survey (N=5,563) lives only inside the cumulative 'Shifts in vote intention since June 2025' doc, and the Oct 2025 snapshot, May 2026 MRP and Australia Institute waves are separate products or non-cached — none are covered here.",
+ "generated": "2026-10-15",
+ "_readme": "Exit conditions confirmed before filing: the standing battery (federal vote intention + vote softness, leader figure favourability, institution/party favourability, issue salience, preferred PM, best-party battery) IS channelled into polls.json demographics/approval/ppm and data/issues.json. The May 2026 national-direction read (right 25/wrong 63) IS recorded in polls.json direction[]; the Nov 2025 and Jan 2026 reads of the same question are NOT, and are filed below. The April 2026 likelihood-of-voting battery (0-10 scale) IS recorded as the consideration map on the 2026-04-30 polls.json row — NOT filed below. Standing-but-unchannelled modules also NOT filed as one-offs: 'Favourability ratings of institutions/parties' (Labor/Liberal/National/One Nation/Greens — plus one-off guests: Advance Dec 2025, RBA Apr 2026, ABC May 2026 & Sep 2026, Medicare Aug 2026, NDIS Jul 2026) — every wave, so a series, not a wave one-off.",
+ "entries": [
+  {
+   "id": "australia-right-direction",
+   "waveDate": "2025-11-13",
+   "dateStart": "2025-11-07",
+   "dateEnd": "2025-11-13",
+   "published": "2025-11-16T20:00",
+   "sample": 1011,
+   "sampleEff": null,
+   "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
+   "question": "Would you say that things in Australia are… Generally headed in the right direction / wrong direction / Not sure",
+   "notes": "First read of the recurring right/wrong-direction question (report figures plot change since February 2024, but the series table is an image). Recorded in polls.json direction[] 2026-10-15 (this 34/49/17 read and the June 2025 series point 36/43/21, keyed to the matching VI waves). One Nation voters: 4% right, 91% wrong; Labor 62/19. Gen-Z 48% right vs Baby Boomers 32%.",
+   "tables": [
+    {
+     "title": "Table 47: The share of voters who say Australia is headed in the right or wrong direction, by vote intention, vote softness, household income, home ownership and financial stress",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll (PDF pp. 111-112; by-wave chart is Figure 53, image-only)",
+     "entities": [
+      {"name": "Generally headed in the right direction", "ordinal": 1, "values": [34]},
+      {"name": "Generally headed in the wrong direction", "ordinal": 2, "values": [49]},
+      {"name": "Not sure", "ordinal": 3, "values": [17]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "life-decision-delays",
+   "waveDate": "2025-11-13",
+   "dateStart": "2025-11-07",
+   "dateEnd": "2025-11-13",
+   "published": "2025-11-16T20:00",
+   "sample": 1011,
+   "sampleEff": null,
+   "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
+   "question": "Thinking about your personal financial situation, have economic conditions caused you to delay any of the following? (retire, buy a home, buy a vehicle, big household items, medical treatment, get married, have children)",
+   "notes": "7-item battery; base excludes 'not relevant' answers (per-item n printed only in Figure 56, image-only). Biggest one-off pocket of economic-pain evidence in the corpus: 79% of renters delayed buying a home; 86% of 'great deal of stress' delayed retirement; Greens (68%) and One Nation (65%) voters delay home-buying at twice Coalition voters' rate (42%).",
+   "tables": [
+    {
+     "title": "Tables 49-60: The share of voters that report delaying each life decision/purchase due to economic conditions (of those for whom the item is relevant)",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll (PDF pp. 117-142; trend figures 56-57 only go back to May 2024 and are image-only)",
+     "entities": [
+      {"name": "When you plan to retire — delayed", "ordinal": 1, "values": [49]},
+      {"name": "Buying a home — delayed", "ordinal": 2, "values": [54]},
+      {"name": "Buying a vehicle (car, truck, motorbike) — delayed", "ordinal": 3, "values": [51]},
+      {"name": "Big household items (furniture/appliances) — delayed", "ordinal": 4, "values": [53]},
+      {"name": "Receiving medical treatment — delayed", "ordinal": 5, "values": [39]},
+      {"name": "Getting married — delayed", "ordinal": 6, "values": [26]},
+      {"name": "Having children — delayed", "ordinal": 7, "values": [30]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "deficit-seriousness",
+   "waveDate": "2025-12-12",
+   "dateStart": "2025-12-05",
+   "dateEnd": "2025-12-12",
+   "published": "2025-12-14T20:00",
+   "sample": 1012,
+   "sampleEff": 776,
+   "url": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
+   "question": "Which of the following is closest to your view about the Federal budget? (serious problem that must be addressed immediately / minor problem, reduce gradually / not a problem — other countries have bigger deficits / none / not sure)",
+   "notes": "Asked in the month the government was under expenses-scandal pressure. One Nation voters most alarmist: 67% 'serious problem, address immediately' vs Labor 24%.",
+   "tables": [
+    {
+     "title": "Table 25: Australians' attitudes towards the seriousness of the budget deficit, by demographic characteristics, 5-12 December 2025",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll (PDF pp. 89-90)",
+     "entities": [
+      {"name": "Serious problem that must be addressed immediately", "ordinal": 1, "values": [39]},
+      {"name": "Minor problem, can be reduced gradually", "ordinal": 2, "values": [40]},
+      {"name": "Not a problem — other countries have bigger deficits", "ordinal": 3, "values": [6]},
+      {"name": "None of these", "ordinal": 4, "values": [2]},
+      {"name": "Not sure", "ordinal": 5, "values": [13]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "deficit-response-preferences",
+   "waveDate": "2025-12-12",
+   "dateStart": "2025-12-05",
+   "dateEnd": "2025-12-12",
+   "published": "2025-12-14T20:00",
+   "sample": 1012,
+   "sampleEff": 776,
+   "url": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
+   "question": "Do you support or oppose… (1) The Federal government increasing taxes on high-income Australians to reduce the deficit and debt; (2) Spending cuts across all Federal government departments to reduce the deficit and debt; (3) A larger Federal budget deficit to avoid spending cuts",
+   "notes": "Grid of three deficit-fix proposals. Both austerity-style options carry solid net support (cuts +39, tax-the-rich +37); more borrowing is the only unpopular option. One Nation voters are the strongest on cuts (net +68) but weakest on taxing high incomes (+5); Greens voters the reverse (+68 tax, 0 cuts).",
+   "tables": [
+    {
+     "title": "Tables 26-28: Support for, or opposition to, various policies aimed at managing the federal budget, 5-12 December 2025",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll (PDF pp. 95-101)",
+     "entities": [
+      {"name": "Taxes on high-income Australians — net support", "ordinal": 1, "values": [37], "quotedFigure": {"value": 37, "xc": 0, "caption": "30 strongly support / 33 somewhat / 14 somewhat oppose / 12 strongly oppose / 11 not sure", "snippetHaystack": "All voters 30 33 14 12 11 37"}},
+      {"name": "Spending cuts across all departments — net support", "ordinal": 2, "values": [39], "quotedFigure": {"value": 39, "xc": 0, "caption": "26/36/16/7/15", "snippetHaystack": "All voters 26 36 16 7 15 39"}},
+      {"name": "Larger deficit to avoid spending cuts — net support", "ordinal": 3, "values": [-6], "quotedFigure": {"value": -6, "xc": 0, "caption": "8/26/24/16/26", "snippetHaystack": "All voters 8 26 24 16 26 -6"}}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "wealthy-income-threshold",
+   "waveDate": "2025-12-12",
+   "dateStart": "2025-12-05",
+   "dateEnd": "2025-12-12",
+   "published": "2025-12-14T20:00",
+   "sample": 1012,
+   "sampleEff": 776,
+   "url": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
+   "question": "In your opinion, what is the minimum income a household needs to earn in a year to be considered wealthy in Australia? (slider $0–$500,000)",
+   "notes": "Slider question; the wealth line clusters at $150-350k. One Nation voters nominate the $350k-plus bands most (32%), Gen-Z the lower bands most (29% say under $150k).",
+   "tables": [
+    {
+     "title": "Table 29: What is the minimum income a household needs to earn in a year to be considered wealthy in Australia, by demographic characteristics, 5-12 December 2025",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll (PDF pp. 103-104)",
+     "entities": [
+      {"name": "Less than $150,000", "ordinal": 1, "values": [18]},
+      {"name": "Between $150,000 to $249,999", "ordinal": 2, "values": [32]},
+      {"name": "Between $250,000 to $349,999", "ordinal": 3, "values": [27]},
+      {"name": "Between $350,000 to $499,999", "ordinal": 4, "values": [13]},
+      {"name": "$500,000 or more", "ordinal": 5, "values": [10]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "vote-change-reasons",
+   "waveDate": "2026-01-29",
+   "dateStart": "2026-01-22",
+   "dateEnd": "2026-01-29",
+   "published": "2026-02-01T18:00",
+   "sample": 1003,
+   "sampleEff": 782,
+   "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
+   "question": "You say that you plan to vote for a different party or candidate now than you did at the federal election in May 2025. What is the main reason you have changed your vote?",
+   "notes": "Free-text, coded by a supervised large language model; percentages are the share of ALL voters (vote-unchanged in the denominator). Figures 6-8 are IMAGE-only — no live-text table in the PDF. Values not recoverable from the committed cache without OCR.",
+   "tables": [
+    {
+     "title": "Figures 6-8: The main reasons given by voters for changing their vote (overall; by 2025 vote recall; by current vote intention)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 13-15, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Asked of voters whose current first preference differs from their recalled 2025 vote; answers free-text, LLM-coded. Percentages share of all voters, and broken by party of 2025 vote and of current intention."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "news-story-week",
+   "waveDate": "2026-01-29",
+   "dateStart": "2026-01-22",
+   "dateEnd": "2026-01-29",
+   "published": "2026-02-01T18:00",
+   "sample": 1003,
+   "sampleEff": 782,
+   "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
+   "question": "What single news story have you heard about the most over the past week?",
+   "notes": "Free-text, LLM-coded, topics grouped with sub-story shares in parentheses. First of four 2026 asks (Jan/Feb/Apr/Jun). Figures 9-11 image-only.",
+   "tables": [
+    {
+     "title": "Figures 9-11: The single news story voters report hearing about the most (overall; by current vote intention; by generational cohort)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 17-19, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read: stories grouped as topics, sub-story shares annotated in the legend."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "australia-right-direction",
+   "waveDate": "2026-01-29",
+   "dateStart": "2026-01-22",
+   "dateEnd": "2026-01-29",
+   "published": "2026-02-01T18:00",
+   "sample": 1003,
+   "sampleEff": 782,
+   "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
+   "question": "Would you say that things in Australia are… Generally headed in the right direction / wrong direction / Not sure",
+   "notes": "Second read of the direction question (recorded in polls.json direction[] 2026-10-15, 29/55/16). Wrong-track sentiment deepened on Nov 2025 (49→55 wrong, 34→29 right). One Nation voters 6% right / 88% wrong; CLP/LNP/Nat voters 11/79; Labor 62/19.",
+   "tables": [
+    {
+     "title": "Table 27: The share of voters who say Australia is headed in the right or wrong direction, by demographic characteristics, 22-29 January",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 102-104; series Figure 41 image-only)",
+     "entities": [
+      {"name": "Generally headed in the right direction", "ordinal": 1, "values": [29]},
+      {"name": "Generally headed in the wrong direction", "ordinal": 2, "values": [55]},
+      {"name": "Not sure", "ordinal": 3, "values": [16]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "state-of-politics-system",
+   "waveDate": "2026-01-29",
+   "dateStart": "2026-01-22",
+   "dateEnd": "2026-01-29",
+   "published": "2026-02-01T18:00",
+   "sample": 1003,
+   "sampleEff": 782,
+   "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
+   "question": "Which of the following statements best describes your personal view about Australian federal politics right now: (fine as it is / minor changes / major changes / burned down so we can start over / not sure)",
+   "notes": "The 'burn it down' system-legitimacy battery. Only 5% of all voters say the system is fine as it is; 15% want it burned down entirely. One Nation voters: 35% burn-it-down (vs 3% emulate that among Labor voters) and 49% major changes — the radical-restlessness split behind the surge.",
+   "tables": [
+    {
+     "title": "Table 28: Voters' views on the current state of Australian federal politics, by demographic characteristics, 22-29 January",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 106-108)",
+     "entities": [
+      {"name": "The system is fine as it is and doesn't need any change", "ordinal": 1, "values": [5]},
+      {"name": "The system needs minor changes", "ordinal": 2, "values": [29]},
+      {"name": "The system needs major changes", "ordinal": 3, "values": [44]},
+      {"name": "The system needs to be burned down so we can start over", "ordinal": 4, "values": [15]},
+      {"name": "Not sure", "ordinal": 5, "values": [7]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "reasons-for-voting-one-nation",
+   "waveDate": "2026-02-27",
+   "dateStart": "2026-02-23",
+   "dateEnd": "2026-02-27",
+   "published": "2026-03-01T20:00",
+   "sample": 1006,
+   "sampleEff": 762,
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
+   "question": "What is the main reason you would vote for One Nation if an election were held now?",
+   "notes": "Asked only of current One Nation first-preference voters (N=254). Free-text, LLM-coded; percentages share of One Nation voters. Figures 6-7 image-only (the second cuts by 2025 vote recall). Values not recoverable from the committed cache without OCR.",
+   "tables": [
+    {
+     "title": "Figures 6-7: The main reasons given by One Nation voters for supporting the party (all ON voters; by 2025 vote recall)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 13-14, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["N=254 One Nation voters; percentages exclude non-ON voters."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "news-story-week",
+   "waveDate": "2026-02-27",
+   "dateStart": "2026-02-23",
+   "dateEnd": "2026-02-27",
+   "published": "2026-03-01T20:00",
+   "sample": 1006,
+   "sampleEff": 762,
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
+   "question": "What single news story have you heard about the most over the past week?",
+   "notes": "Second 2026 read of the weekly-salience question (of four). Free-text, LLM-coded; Figures 8-9 image-only.",
+   "tables": [
+    {
+     "title": "Figures 8-9: The single news story voters report hearing about the most (overall; by current vote intention)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 16-17, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read; topics grouped with sub-story shares."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "feelings-way-things-going",
+   "waveDate": "2026-02-27",
+   "dateStart": "2026-02-23",
+   "dateEnd": "2026-02-27",
+   "published": "2026-03-01T20:00",
+   "sample": 1006,
+   "sampleEff": 762,
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
+   "question": "How do you feel about the way things are going in Australia? (free text)",
+   "notes": "Free-text mood read, LLM-coded; one-off analog to the direction question. Figures 41-42 image-only (second cut by current vote intention). Values not recoverable from the committed cache without OCR.",
+   "tables": [
+    {
+     "title": "Figures 41-42: How voters say they feel about the way things are going in Australia (overall; by current vote intention)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 105-106, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Emotion/mood categories coded from free text."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "party-messaging-battery",
+   "waveDate": "2026-02-27",
+   "dateStart": "2026-02-23",
+   "dateEnd": "2026-02-27",
+   "published": "2026-03-01T20:00",
+   "sample": 1006,
+   "sampleEff": 762,
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
+   "question": "Do you agree or disagree with the following statements? (8 party-messaging statements: 2 Taylor/Coalition frames, 2 Albanese/Labor frames, 1 Barnaby Joyce/One Nation, 2 One Nation surge frames, 1 immigration)",
+   "notes": "THE value in the Feb wave: the immigration frame ('numbers too high, standards too low') is the most-endorsed line in the battery (net +50; 43% strongly agree) and the ON surge explainer ('governments lost sight of everyday issues') nets +43 — while every Angus Taylor and Albanese message is under water. Joyce's defection is a NEGATIVE for all voters overall (-19) but +41 among ON supporters.",
+   "tables": [
+    {
+     "title": "Tables 30-37: The share of voters that agree or disagree with different party messaging statements, by demographic characteristics, 23-27 February",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 108-131)",
+     "entities": [
+      {"name": "A Federal Coalition Government led by Angus Taylor will protect Australians' way of life and lift their standard of living — net agree", "ordinal": 1, "values": [-3], "quotedFigure": {"value": -3, "xc": 0, "caption": "6/20/27/11/18/18", "snippetHaystack": "All voters 6 20 27 11 18 18 -3"}},
+      {"name": "Anthony Albanese and Labor are building Australia's future — net agree", "ordinal": 2, "values": [-15], "quotedFigure": {"value": -15, "xc": 0, "caption": "9/22/16/16/30/7", "snippetHaystack": "All voters 9 22 16 16 30 7 -15"}},
+      {"name": "Albanese/Labor focused on cost-of-living while the Liberal Party are focused on themselves — net agree", "ordinal": 3, "values": [-8], "quotedFigure": {"value": -8, "xc": 0, "caption": "12/20/19/14/26/9", "snippetHaystack": "All voters 12 20 19 14 26 9 -8"}},
+      {"name": "I am more likely to vote for One Nation now that Barnaby Joyce has joined their team — net agree", "ordinal": 4, "values": [-19], "quotedFigure": {"value": -19, "xc": 0, "caption": "9/14/26/10/32/9 (ON voters +41)", "snippetHaystack": "All voters 9 14 26 10 32 9 -19"}},
+      {"name": "Australians are turning to One Nation because governments have lost sight of everyday issues — net agree", "ordinal": 5, "values": [43], "quotedFigure": {"value": 43, "xc": 0, "caption": "32/29/13/9/9/8", "snippetHaystack": "All voters 32 29 13 9 9 8 43"}},
+      {"name": "I am more likely to vote for the Liberal Party with Angus Taylor as leader — net agree", "ordinal": 6, "values": [-9], "quotedFigure": {"value": -9, "xc": 0, "caption": "9/18/25/13/23/12", "snippetHaystack": "All voters 9 18 25 13 23 12 -9"}},
+      {"name": "Angus Taylor and the Liberal Party will fight for people like me — net agree", "ordinal": 7, "values": [-11], "quotedFigure": {"value": -11, "xc": 0, "caption": "8/17/23/14/22/16", "snippetHaystack": "All voters 8 17 23 14 22 16 -11"}},
+      {"name": "Immigration numbers have been too high, immigration standards have been too low, and both need to change — net agree", "ordinal": 8, "values": [50], "quotedFigure": {"value": 50, "xc": 0, "caption": "43/21/16/7/7/6", "snippetHaystack": "All voters 43 21 16 7 7 6 50"}}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "news-story-week",
+   "waveDate": "2026-04-30",
+   "dateStart": "2026-04-24",
+   "dateEnd": "2026-04-30",
+   "published": "2026-05-03T18:00",
+   "sample": 1014,
+   "sampleEff": 774,
+   "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
+   "question": "What single news story have you heard about the most over the past week?",
+   "notes": "Third 2026 read of the weekly-salience question (of four). Free-text, LLM-coded; figures image-only.",
+   "tables": [
+    {
+     "title": "Figures (pp. 13-16): The single news story voters report hearing about the most (overall; by current vote intention)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF pp. 13-16, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read during the 'PM arrests popularity decline' wave."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "one-nation-message-experiment",
+   "waveDate": "2026-04-30",
+   "dateStart": "2026-04-24",
+   "dateEnd": "2026-04-30",
+   "published": "2026-05-03T18:00",
+   "sample": 1014,
+   "sampleEff": 774,
+   "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
+   "question": "Here are some things that have been said and written about Pauline Hanson and One Nation. For each one, how much would it affect your willingness to vote for One Nation? (14 statements, two randomised batteries — 7 positive-ish, 7 cautionary — much more willing … much less willing)",
+   "notes": "Message-testing experiment. Strongest ON-growth levers: 'stands up for ordinary Australians on cost of living' (+27), 'will put Australia first' (+26), 'will reduce immigration' (+23), 'speaks her mind' (+23). Most damaging: the Iran-war link ('called for Australia to help Trump stamp out evil') -39, Trump admirer -38, penalty-rates vote -38, and no governing/budget experience -37. Pre-treatment willingness cuts are figures 49-50 (image-only).",
+   "tables": [
+    {
+     "title": "Tables 45-58: Impact of hearing each statement on willingness to vote for One Nation, by demographic characteristics, 24-30 April (figures are net MORE willing to vote ON after the message)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF pp. 137-183)",
+     "entities": [
+      {"name": "One Nation stands up for ordinary Australians struggling with the cost of living — net more willing", "ordinal": 1, "values": [27]},
+      {"name": "One Nation will put Australia first — net more willing", "ordinal": 2, "values": [26]},
+      {"name": "Pauline Hanson and One Nation will reduce the level of immigration — net more willing", "ordinal": 3, "values": [23], "quotedFigure": {"value": 23, "xc": 0, "caption": "32/16/22/7/18/5", "snippetHaystack": "All voters 32 16 22 7 18 5 23"}},
+      {"name": "Pauline Hanson speaks her mind and says what other politicians won't — net more willing", "ordinal": 4, "values": [23]},
+      {"name": "Voting for One Nation sends a message to Labor and the Coalition that voters want change — net more willing", "ordinal": 5, "values": [20]},
+      {"name": "Hanson/One Nation share the values of ordinary Australians while the major parties only represent the elites — net more willing", "ordinal": 6, "values": [18]},
+      {"name": "The major parties aren't up to the job anymore, time to give One Nation a chance — net more willing", "ordinal": 7, "values": [6]},
+      {"name": "A vote for One Nation is a wasted vote, because they cannot form government — net more willing", "ordinal": 8, "values": [-18]},
+      {"name": "Some of the people Pauline Hanson associates with have expressed extreme or controversial views — net more willing", "ordinal": 9, "values": [-26]},
+      {"name": "If One Nation held the balance of power, it could create economic uncertainty and risk — net more willing", "ordinal": 10, "values": [-30]},
+      {"name": "Pauline Hanson and One Nation have no experience governing or managing a federal budget — net more willing", "ordinal": 11, "values": [-37]},
+      {"name": "Pauline Hanson is a strong supporter and admirer of Donald Trump — net more willing", "ordinal": 12, "values": [-38], "quotedFigure": {"value": -38, "xc": 0, "caption": "9/6/24/9/44/8", "snippetHaystack": "All voters 9 6 24 9 44 8 -38"}},
+      {"name": "Pauline Hanson has voted in parliament to cut penalty rates and weaken protections for workers — net more willing", "ordinal": 13, "values": [-38]},
+      {"name": "Pauline Hanson has called for Australia to help Trump 'stamp out evil' by entering the conflict in Iran — net more willing", "ordinal": 14, "values": [-39]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "one-nation-most-hesitant",
+   "waveDate": "2026-04-30",
+   "dateStart": "2026-04-24",
+   "dateEnd": "2026-04-30",
+   "published": "2026-05-03T18:00",
+   "sample": 1014,
+   "sampleEff": 774,
+   "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
+   "question": "Thinking about this some more… Which of the following statements, if any, makes you most hesitant about voting for One Nation? (Trump admirer / never delivered a budget / said Australia should enter the Iran conflict / minority government means economic risk / a vote for One Nation is wasted / none / would never vote ON / other / unsure)",
+   "notes": "Follow-up to the message experiment, forced single-pick of the most potent hesitation. The Trump associations are the largest lump (Trump admirer 21 + Iran 18 = 39 combined) ahead of competence ('never delivered a budget' 6 + economic risk 7). 'I would never vote for One Nation' 19; 'no hesitations' 15 — One Nation voters themselves: 47% name no hesitation.",
+   "tables": [
+    {
+     "title": "Table 59: Which of these messages makes voters most hesitant about voting for One Nation, by demographic characteristics, 24-30 April",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF pp. 187-189)",
+     "entities": [
+      {"name": "Pauline Hanson is a strong supporter and admirer of President Donald Trump", "ordinal": 1, "values": [21]},
+      {"name": "Pauline Hanson has said Australia should support Donald Trump and enter the conflict in Iran", "ordinal": 2, "values": [18]},
+      {"name": "Pauline Hanson and One Nation have never delivered a budget", "ordinal": 3, "values": [6]},
+      {"name": "A One Nation minority government means economic uncertainty and risk", "ordinal": 4, "values": [7]},
+      {"name": "A vote for One Nation is a wasted vote", "ordinal": 5, "values": [5]},
+      {"name": "I don't have any hesitations about voting for One Nation", "ordinal": 6, "values": [15]},
+      {"name": "I would never vote for One Nation", "ordinal": 7, "values": [19]},
+      {"name": "Other", "ordinal": 8, "values": [3]},
+      {"name": "Unsure", "ordinal": 9, "values": [6]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-awareness-and-perceptions",
+   "waveDate": "2026-05-28",
+   "dateStart": "2026-05-25",
+   "dateEnd": "2026-05-28",
+   "published": "2026-05-31T18:00",
+   "sample": 1005,
+   "sampleEff": 815,
+   "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
+   "question": "On Tuesday, 12 May 2026 the Australian Federal Government handed down the 2026–27 Federal Budget. How much, if anything, have you seen, read or heard about this? (great deal / fair amount / not very much / nothing at all); then of those who had heard anything: Overall, how good or bad do you think the budget will be… for the country as a whole / for you personally (very good → very bad, not sure)",
+   "notes": "First read of the budget module, three weeks after the 12 May budget — the 'budget flops' wave (ON surges ahead of Labor in the same report). Awareness was high (net +30) and intensely NEGATIVE: net -30 for the country, -37 personally (May N=950 perceptions base). National-direction in the same wave fell to 25/63 — that read IS recorded in polls.json direction[].",
+   "tables": [
+    {
+     "title": "How much voters have seen, read or heard about the Federal Budget (25-28 May)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll (PDF pp. 120-123)",
+     "entities": [
+      {"name": "A great deal", "ordinal": 1, "values": [21]},
+      {"name": "A fair amount", "ordinal": 2, "values": [44]},
+      {"name": "Not very much", "ordinal": 3, "values": [29]},
+      {"name": "Nothing at all", "ordinal": 4, "values": [6]},
+      {"name": "Net awareness (deal+amount − notmuch+nothing)", "ordinal": 5, "values": [30]}
+     ]
+    },
+    {
+     "title": "How voters rate the impact of the federal budget — for the country / for you personally (asked of those who had heard anything, N=950)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll (PDF pp. 124-134)",
+     "entities": [
+      {"name": "For the country as a whole — net good", "ordinal": 1, "values": [-30], "quotedFigure": {"value": -30, "xc": 0, "caption": "3/20/10/31/22/14", "snippetHaystack": "All voters 3 20 10 31 22 14 -30"}},
+      {"name": "For you personally — net good", "ordinal": 2, "values": [-37], "quotedFigure": {"value": -37, "xc": 0, "caption": "1/10/31/32/16/10", "snippetHaystack": "All voters 1 10 31 32 16 10 -37"}}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "news-story-week",
+   "waveDate": "2026-06-26",
+   "dateStart": "2026-06-22",
+   "dateEnd": "2026-06-26",
+   "published": "2026-06-28T18:00",
+   "sample": 1006,
+   "sampleEff": 764,
+   "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
+   "question": "What single news story have you heard about the most over the past week?",
+   "notes": "Fourth and (as of Oct 2026) final read of the weekly-salience question. Free-text, LLM-coded; figures image-only.",
+   "tables": [
+    {
+     "title": "Figures (pp. 13-14): The single news story voters report hearing about the most (overall; by current vote intention)",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll (PDF pp. 13-14, embedded images)",
+     "entities": [
+      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read for the 'Hanson takes a hit' wave."]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "next-generation-outlook",
+   "waveDate": "2026-06-26",
+   "dateStart": "2026-06-22",
+   "dateEnd": "2026-06-26",
+   "published": "2026-06-28T18:00",
+   "sample": 1006,
+   "sampleEff": 764,
+   "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
+   "question": "Which of the following comes closest to your views: The next generation will have a better life than my parents' generation / about the same quality of life / a worse life than my parents' generation",
+   "notes": "Intergenerational-prosperity read: only 19% believe the next generation will do better than their parents; 62% say worse. Most pessimistic cohorts: One Nation voters (75% worse), Gen-Z (67%) and Millennials (66%) — i.e. the youngest see it most.",
+   "tables": [
+    {
+     "title": "Table 38: Voters' outlook for the next generation, by demographic characteristics, 22-26 June",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll (PDF pp. 117-119)",
+     "entities": [
+      {"name": "The next generation will have a better life than my parents' generation", "ordinal": 1, "values": [19]},
+      {"name": "The next generation will have about the same quality of life as my parents' generation", "ordinal": 2, "values": [19]},
+      {"name": "The next generation will have a worse life than my parents' generation", "ordinal": 3, "values": [62]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pride-and-superannuation",
+   "waveDate": "2026-07-30",
+   "dateStart": "2026-07-27",
+   "dateEnd": "2026-07-30",
+   "published": "2026-08-02T18:00",
+   "sample": 1001,
+   "sampleEff": 857,
+   "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
+   "question": "Do you agree or disagree with the following statements? A) I am proud of Australia; B) Superannuation is a national asset for Australia (strongly → strongly disagree, not sure)",
+   "notes": "Pair asked as one carousel. National pride is near-universal (net +76, and 68% even among One Nation voters — patriotism is not the surge's griece). Super-as-national-asset nets +47 overall but fractures hard by party: Labor +60, CLP/LNP/Nat +25, One Nation +24 — the super wars constituency is real but partisan.",
+   "tables": [
+    {
+     "title": "Tables 41-42: Voters' attitudes towards Australia and superannuation as a national asset, by demographic characteristics, 27-30 July",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll (PDF pp. 125-133)",
+     "entities": [
+      {"name": "I am proud of Australia — net agree", "ordinal": 1, "values": [76], "quotedFigure": {"value": 76, "xc": 0, "caption": "49/38/8/3/2", "snippetHaystack": "All voters 49 38 8 3 2 76"}},
+      {"name": "Superannuation is a national asset for Australia — net agree", "ordinal": 2, "values": [47], "quotedFigure": {"value": 47, "xc": 0, "caption": "33/35/8/13/11", "snippetHaystack": "All voters 33 35 8 13 11 47"}}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-rent-effect",
+   "waveDate": "2026-08-28",
+   "dateStart": "2026-08-24",
+   "dateEnd": "2026-08-28",
+   "published": "2026-08-30T18:00",
+   "sample": 1006,
+   "sampleEff": 808,
+   "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
+   "question": "The May Federal Budget includes changes to negative gearing on investment properties, capital gains taxes, and extended the ban on foreign buyers purchasing established homes. Do you think these changes will increase or reduce rents? (significantly increase → significantly reduce, not sure)",
+   "notes": "Public verdict on the housing-tax package's rent effect: 48% expect rents to INCREASE vs 12% who expect a fall (net +36). Coalition politicians' attack line works on their base (net increase 55-67 among LNP cohorts) but Labor voters believe their own policy (+13). Renters themselves: net +22 expect increases.",
+   "tables": [
+    {
+     "title": "Table 37: Voters' views on whether the Federal Budget changes will increase or reduce rents, by demographic characteristics, 24-28 August",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll (PDF pp. 113-115)",
+     "entities": [
+      {"name": "Significantly increase rents", "ordinal": 1, "values": [21]},
+      {"name": "Somewhat increase rents", "ordinal": 2, "values": [27]},
+      {"name": "Neither increase nor decrease rents", "ordinal": 3, "values": [23]},
+      {"name": "Somewhat reduce rents", "ordinal": 4, "values": [10]},
+      {"name": "Significantly reduce rents", "ordinal": 5, "values": [2]},
+      {"name": "Not sure", "ordinal": 6, "values": [17]},
+      {"name": "Net expect increase (increase − reduce)", "ordinal": 7, "values": [36]}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-awareness-and-perceptions",
+   "waveDate": "2026-10-02",
+   "dateStart": "2026-09-28",
+   "dateEnd": "2026-10-02",
+   "published": "2026-10-04T18:00",
+   "sample": 1000,
+   "sampleEff": 809,
+   "url": "https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5",
+   "question": "On Tuesday, 12 May 2026 the Australian Federal Government handed down the 2026–27 Federal Budget. How much, if anything, have you seen, read or heard about this?; then of those who had heard anything: Overall, how good or bad do you think the budget will be… for the country as a whole / for you personally",
+   "notes": "Second read of the budget module, five months on. Awareness faded (net +30 → -10) but the verdict hardened: those still paying attention are the most hostile (attention-level table: net good -69 among 'a great deal'). Among One Nation voters the country rating is net -78. September N=868 perceptions base.",
+   "tables": [
+    {
+     "title": "Table 40: How much voters have seen, read or heard about the Federal Budget, by demographic characteristics, 28 September - 2 October",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF pp. 121-124)",
+     "entities": [
+      {"name": "A great deal", "ordinal": 1, "values": [10]},
+      {"name": "A fair amount", "ordinal": 2, "values": [35]},
+      {"name": "Not very much", "ordinal": 3, "values": [40]},
+      {"name": "Nothing at all", "ordinal": 4, "values": [15]},
+      {"name": "Net awareness", "ordinal": 5, "values": [-10]}
+     ]
+    },
+    {
+     "title": "Tables 41-43: How voters rate the impact of the federal budget (asked of those who had heard anything, N=868)",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF pp. 125-135)",
+     "entities": [
+      {"name": "For the country as a whole — net good", "ordinal": 1, "values": [-34], "quotedFigure": {"value": -34, "xc": 0, "caption": "2/17/13/33/20/15", "snippetHaystack": "All voters 2 17 13 33 20 15 -34"}},
+      {"name": "For you personally — net good", "ordinal": 2, "values": [-39], "quotedFigure": {"value": -39, "xc": 0, "caption": "1/9/30/34/15/11", "snippetHaystack": "All voters 1 9 30 34 15 11 -39"}}
+     ]
+    }
+   ]
+  }
+ ]
+}
