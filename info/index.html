@@ -39,7 +39,7 @@
   <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 11 October 2026, Labor leads the Coalition 52.3–47.7 two-party preferred on implied preference flows (±1.3), from 181 polls by 13 pollsters. Primary votes, every poll, and the last twenty elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 12 October 2026, Labor leads the Coalition 52.3–47.7 two-party preferred on implied preference flows (±1.3), from 181 polls by 13 pollsters. Primary votes, every poll, and the last twenty elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
 @font-face {
   font-family: 'Crimson Text';
@@ -236,6 +236,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   line-height: 1.45;
+  overflow-wrap: break-word;
   color-scheme: light;
 }
 body.dark { color-scheme: dark; }
@@ -2131,7 +2132,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   .head-meta { flex-wrap: wrap; row-gap: 6px; }
   .meta-divide { display: none; }
 }
-@media (max-width: 640px) {
+@media (max-width: 640.98px) {
   .head-meta { display: none; }
   .head-meta-compact {
     display: flex; align-items: center; gap: 8px;
@@ -2657,7 +2658,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-basis-narrow { display: block; margin: 0 0 12px; }
 .ap-head-side { display: inline-flex; align-items: center; gap: 14px; }
 .ap-head-side .ap-count { display: none; }
-@media (max-width: 560px) {
+@media (max-width: 560.98px) {
   .ap-head-side { width: 100%; }                 
   .ap-head-side .ap-count { display: inline; margin-left: auto; }
   .ap-bar-end .ap-count { display: none; }
@@ -2665,7 +2666,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-jumps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
 .ap-jumps > .ap-facet, .ap-jumps > .ap-jumps-count { display: none; }
 @media (min-width: 561px) { .ap-jumps { display: none; } }
-@media (max-width: 560px) {
+@media (max-width: 560.98px) {
   .ap-jumps { justify-content: space-between; column-gap: 10px; row-gap: 10px; }
   .ap-jumps > .ap-jump { flex: 1 1 45%; justify-content: center; flex-wrap: wrap; font-size: 11px; padding: 4px 8px; gap: 5px; white-space: normal; text-align: center; line-height: 1.25; }
   .ap-jumps > .ap-jump svg { width: 12px; height: 12px; flex: none; }
@@ -3170,7 +3171,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
   html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
-  body.js #root { min-height: calc(100vh - 198px); }
+  body.js #root { min-height: calc(100vh - 198px); min-height: calc(100dvh - 198px); }
 }
 @media print {
   .tabs, .head-right, .chart-copy-btn, .rd-keysheet, .rd-keysheet-scrim,
@@ -3737,7 +3738,7 @@ body.rd .rd-tabs-sm .rd-tab { font-size: 14px; padding: 0 10px; }
 body.rd .rd-tpp-legend { margin: 0 0 4px; }
 body.rd .rd-tpp-cmp { display: flex; align-items: center; flex-wrap: nowrap; gap: 14px; }
 body.rd .rd-tpp-cmp-l { font-size: 13px; color: var(--ink-3); }
-@media (max-width: 640px) {
+@media (max-width: 640.98px) {
   body.rd .rd-tpp-cmp { flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; }
   body.rd .rd-tpp-cmp .rd-check { font-size: 13px; gap: 8px; }
 }
@@ -3889,14 +3890,14 @@ body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
 body.rd .rd-pl-prim .rd-pl-frac { font-size: 11px; }
-@media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-frac { font-size: 10px; } }
+@media (max-width: 900.98px) { body.rd .rd-pl-prim .rd-pl-frac { font-size: 10px; } }
 body.rd .rd-pl-prim .rd-pl-halfwrap { position: relative; display: inline-block; }
 body.rd .rd-pl-prim .rd-pl-half {
   position: absolute; left: 100%; bottom: 0.85em;
   padding-left: 1.5px; line-height: 1; white-space: nowrap;
   font-size: 9.5px;
 }
-@media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-half { font-size: 8.5px; padding-left: 1px; } }
+@media (max-width: 900.98px) { body.rd .rd-pl-prim .rd-pl-half { font-size: 8.5px; padding-left: 1px; } }
 body.rd .rd-pl-item { border-bottom: 1px solid var(--line); }
 body.rd .rd-pl-row { padding: 0 8px; min-height: 64px; cursor: pointer; }
 body.rd .rd-pl-row:hover { background: var(--surface-2); }
@@ -4115,7 +4116,7 @@ body.rd .rd-dp-chg.sig { font-weight: 700; color: var(--ink); }
 body.rd .rd-dp.both .rd-dp-chg { font-size: 15px; color: var(--ink-2); }
 body.rd .rd-dp-foot { min-height: 20px; }
 body.rd .rd-dp-key { margin-top: 10px; }
-@media (max-width: 1000px) {
+@media (max-width: 1000.98px) {
   body.rd .rd-ld-grid { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-ld-panel .rd-subdek { min-height: 0; }
   body.rd .rd-ld-note { min-height: 0; }
@@ -4487,7 +4488,7 @@ body.rd .rd-iw-k:first-child { margin-top: 0; }
 @media (max-width: 400px) and (min-width: 341px) {
   body.rd .rd-iw-tabs .rd-tab { padding: 0 4px; }
 }
-@media (max-width: 340px) {
+@media (max-width: 340.98px) {
   body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
 }
 body.rd .rd-iw-chips {
@@ -4534,7 +4535,7 @@ body.rd .rd-iw-keybar i { position: absolute; right: -3px; top: -3px; bottom: -3
 @media (max-width: 1100px) {
   body.rd .rd-is-grid { grid-template-columns: minmax(0, 1fr); row-gap: 36px; }
 }
-@media (max-width: 900px) {
+@media (max-width: 900.98px) {
   body.rd .rd-is-head, body.rd .rd-is-row, body.rd .rd-is-axis { grid-template-columns: 120px 96px minmax(0, 1fr) 88px 104px; column-gap: 10px; }
   body.rd .rd-is-bar { flex-basis: 40px; }
   body.rd .rd-is-leg { gap: 8px; }
@@ -4997,7 +4998,7 @@ body.rd .rd-ap-search {
   display: inline-flex; align-items: center; gap: 8px; flex-shrink: 1; min-width: 0;
   border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink-3);
 }
-body.rd .rd-ap-search:focus-within { border-color: var(--ink-3); }
+body.rd .rd-ap-search:focus-within { border-color: var(--ink-3); outline: 2px solid var(--accent); outline-offset: 2px; }
 body.rd .rd-ap-search input { all: unset; flex: 1; align-self: stretch; min-width: 0; font-size: 14px; color: var(--ink); }
 body.rd .rd-ap-search input::placeholder { color: var(--ink-3); opacity: 1; }
 body.rd .rd-ap-search input::-webkit-search-cancel-button { display: none; }
@@ -5794,7 +5795,7 @@ body.rd .info-index button.info-toc-g:hover, body.rd .info-toc-list button.info-
   body.rd .info-index button::after { content: none; }
   body.rd .info [id] { scroll-margin-top: 64px; }
 }
-@media screen and (max-width: 1099px) {
+@media screen and (max-width: 1099.98px) {
   body.rd .info-toc { display: block; position: sticky; top: 46px; z-index: 3;
     margin: 12px 0 18px; background: var(--bg); box-shadow: 0 1px 0 var(--line-2); }
   body.rd .info-index { display: none; }
@@ -5991,6 +5992,12 @@ body.rd .rd-ldg-grp.rd-ldg-grpw { column-gap: 14px; }
 body.rd .rd-ldg-pgrp .rd-ldg-li.lbl { display: inline-block; min-width: 13ch; }
 body.rd .rd-ldg-pgrp .rd-ldg-li em { display: inline-block; min-width: 4ch; }
 body.rd .rd-ldg-pgrp .rd-ldg-li b { display: inline-block; min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }
+body.rd button:focus-visible,
+body.rd input:focus-visible,
+body.rd summary:focus-visible,
+body.rd [role="tab"]:focus-visible,
+body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.rd .rd-ap-search input:focus-visible { outline: none; }
 </style>
 </head>
 <body>
@@ -23174,336 +23181,336 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-108-0"
       }, {
-        "x": 2020.035616438356,
+        "x": 2020.035519125683,
         "ym": "2020-01",
         "released": "2020-01-14",
         "v": 107.3,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-bounces-to-107-3"
       }, {
-        "x": 2020.054794520548,
+        "x": 2020.0546448087432,
         "ym": "2020-01",
         "released": "2020-01-21",
         "v": 108.3,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-rises-to-108-3"
       }, {
-        "x": 2020.0767123287671,
+        "x": 2020.0765027322404,
         "ym": "2020-01",
         "released": "2020-01-29",
         "v": 108,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-0"
       }, {
-        "x": 2020.1123287671232,
+        "x": 2020.1120218579235,
         "ym": "2020-02",
         "released": "2020-02-11",
         "v": 107.8,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-107-8"
       }, {
-        "x": 2020.131506849315,
+        "x": 2020.1311475409836,
         "ym": "2020-02",
         "released": "2020-02-18",
         "v": 109.1,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-to-109-1"
       }, {
-        "x": 2020.150684931507,
+        "x": 2020.1502732240438,
         "ym": "2020-02",
         "released": "2020-02-25",
         "v": 108.3,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-decreases-to-108-3"
       }, {
-        "x": 2020.1698630136987,
+        "x": 2020.1693989071039,
         "ym": "2020-03",
         "released": "2020-03-03",
         "v": 104.8,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-tumbles-to-104-8"
       }, {
-        "x": 2020.1890410958904,
+        "x": 2020.188524590164,
         "ym": "2020-03",
         "released": "2020-03-10",
         "v": 100.4,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-falls-sharply-to-100-4"
       }, {
-        "x": 2020.2082191780821,
+        "x": 2020.207650273224,
         "ym": "2020-03",
         "released": "2020-03-17",
         "v": 100,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-hits-decade-low-at-100-0"
       }, {
-        "x": 2020.227397260274,
+        "x": 2020.2267759562842,
         "ym": "2020-03",
         "released": "2020-03-24",
         "v": 72.2,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-plunges-to-30-year-low-at-72-2"
       }, {
-        "x": 2020.2465753424658,
+        "x": 2020.2459016393443,
         "ym": "2020-03",
         "released": "2020-03-31",
         "v": 65.3,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-plunges-to-lowest-historical-record-at-65-3"
       }, {
-        "x": 2020.2657534246575,
+        "x": 2020.2650273224044,
         "ym": "2020-04",
         "released": "2020-04-07",
         "v": 71.9,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-bounces-from-historical-low-to-71-9"
       }, {
-        "x": 2020.2876712328766,
+        "x": 2020.2868852459017,
         "ym": "2020-04",
         "released": "2020-04-15",
         "v": 78.2,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-lifts-to-78-2"
       }, {
-        "x": 2020.304109589041,
+        "x": 2020.3032786885246,
         "ym": "2020-04",
         "released": "2020-04-21",
         "v": 84.2,
         "chg": 6,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-third-straight-week-up-6pts-to-84-2"
       }, {
-        "x": 2020.323287671233,
+        "x": 2020.3224043715848,
         "ym": "2020-04",
         "released": "2020-04-28",
         "v": 85,
         "chg": 0.8,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fourth-straight-week-up-0-8pts-to-85-0"
       }, {
-        "x": 2020.3424657534247,
+        "x": 2020.3415300546449,
         "ym": "2020-05",
         "released": "2020-05-05",
         "v": 89.5,
         "chg": 4.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fifth-straight-week-up-4-5pts-to-89-5"
       }, {
-        "x": 2020.3616438356164,
+        "x": 2020.360655737705,
         "ym": "2020-05",
         "released": "2020-05-12",
         "v": 90.3,
         "chg": 0.8,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-sixth-straight-week-up-0-8pts-to-90-3"
       }, {
-        "x": 2020.3808219178081,
+        "x": 2020.379781420765,
         "ym": "2020-05",
         "released": "2020-05-19",
         "v": 92.3,
         "chg": 2,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-seventh-straight-week-up-2-0pts-to-92-3"
       }, {
-        "x": 2020.4,
+        "x": 2020.3989071038252,
         "ym": "2020-05",
         "released": "2020-05-26",
         "v": 92.7,
         "chg": 0.4,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-eighth-straight-week-up-0-4pts-to-92-7"
       }, {
-        "x": 2020.4191780821918,
+        "x": 2020.4180327868853,
         "ym": "2020-06",
         "released": "2020-06-02",
         "v": 98.3,
         "chg": 5.6,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-ninth-straight-week-up-5-6pts-to-98-3"
       }, {
-        "x": 2020.441095890411,
+        "x": 2020.4398907103825,
         "ym": "2020-06",
         "released": "2020-06-10",
         "v": 97,
         "chg": -1.3,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-ends-record-nine-week-run-down-1-3pts-to-97-0"
       }, {
-        "x": 2020.4575342465753,
+        "x": 2020.4562841530055,
         "ym": "2020-06",
         "released": "2020-06-16",
         "v": 97.5,
         "chg": 0.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-5pts-to-97-5"
       }, {
-        "x": 2020.4767123287672,
+        "x": 2020.4754098360656,
         "ym": "2020-06",
         "released": "2020-06-23",
         "v": 97.5,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-unchanged-at-97-5"
       }, {
-        "x": 2020.4931506849316,
+        "x": 2020.4918032786886,
         "ym": "2020-06",
         "released": "2020-06-29",
         "v": 93,
         "chg": -4.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-4-5-pts-to-93-0-after-covid-19-cases-surge-in-melbourne"
       }, {
-        "x": 2020.5150684931507,
+        "x": 2020.5136612021859,
         "ym": "2020-07",
         "released": "2020-07-07",
         "v": 92.1,
         "chg": -0.9,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-0-9-pts-to-92-1-after-covid-19-cases-surge-in-melbourne-forcing-melbourne-back-into-lockdown-for-six-weeks-starting-midnight-tomorrow-wednesday-july-8"
       }, {
-        "x": 2020.5342465753424,
+        "x": 2020.532786885246,
         "ym": "2020-07",
         "released": "2020-07-14",
         "v": 91.6,
         "chg": -0.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-0-5-pts-to-91-6-after-melbourne-forced-back-into-lockdown-after-surge-of-covid-19-cases"
       }, {
-        "x": 2020.5534246575342,
+        "x": 2020.551912568306,
         "ym": "2020-07",
         "released": "2020-07-21",
         "v": 90.7,
         "chg": -0.9,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-0-9-pts-to-90-7-but-down-2-6pts-to-84-8-in-melbourne-as-covid-19-cases-surge"
       }, {
-        "x": 2020.572602739726,
+        "x": 2020.5710382513662,
         "ym": "2020-07",
         "released": "2020-07-28",
         "v": 89,
         "chg": -1.7,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-1-7-pts-to-89-0-driven-by-falls-in-melbourne-and-sydney"
       }, {
-        "x": 2020.5917808219178,
+        "x": 2020.5901639344263,
         "ym": "2020-08",
         "released": "2020-08-04",
         "v": 88.6,
         "chg": -0.4,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-0-4-pts-to-88-6-before-melbourne-enters-stage-4-restrictions-on-sunday-night"
       }, {
-        "x": 2020.6109589041096,
+        "x": 2020.6092896174864,
         "ym": "2020-08",
         "released": "2020-08-11",
         "v": 86.5,
         "chg": -2.1,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-2-1pts-to-86-5-driven-down-by-consumer-confidence-in-melbourne-plunging-4-1pts-to-81-in-first-week-of-stage-4-lockdown"
       }, {
-        "x": 2020.6301369863013,
+        "x": 2020.6284153005465,
         "ym": "2020-08",
         "released": "2020-08-18",
         "v": 88.6,
         "chg": 2.1,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-2-1pts-to-88-6-as-new-cases-of-covid-19-in-victoria-continue-decline-from-august-5-peak"
       }, {
-        "x": 2020.6493150684933,
+        "x": 2020.6475409836066,
         "ym": "2020-08",
         "released": "2020-08-25",
         "v": 92.7,
         "chg": 4.1,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-4-1pts-to-92-7-as-new-cases-of-covid-19-in-victoria-plunge-to-lowest-since-early-july"
       }, {
-        "x": 2020.668493150685,
+        "x": 2020.6666666666667,
         "ym": "2020-09",
         "released": "2020-09-01",
         "v": 90.2,
         "chg": -2.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-2-5pts-to-90-2-as-new-outbreaks-of-covid-19-continue-in-nsw-queensland"
       }, {
-        "x": 2020.6876712328767,
+        "x": 2020.6857923497269,
         "ym": "2020-09",
         "released": "2020-09-08",
         "v": 91.1,
         "chg": 0.9,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-9pts-to-91-1-before-premier-daniel-andrews-confirmed-extension-of-victorian-lockdown"
       }, {
-        "x": 2020.7068493150684,
+        "x": 2020.704918032787,
         "ym": "2020-09",
         "released": "2020-09-15",
         "v": 92.4,
         "chg": 1.3,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-3pts-to-92-4-as-new-cases-of-covid-19-in-victoria-continued-declining"
       }, {
-        "x": 2020.7260273972602,
+        "x": 2020.724043715847,
         "ym": "2020-09",
         "released": "2020-09-22",
         "v": 93.5,
         "chg": 1.1,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-1pts-to-93-5-as-new-cases-of-covid-19-continue-decline-and-restrictions-ease-in-country-victoria"
       }, {
-        "x": 2020.7452054794521,
+        "x": 2020.7431693989072,
         "ym": "2020-09",
         "released": "2020-09-29",
         "v": 95,
         "chg": 1.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fourth-straight-week-up-1-5pts-to-95-0-driven-by-increases-in-sydney-perth-but-down-4-8-points-in-melbourne-to-86-9"
       }, {
-        "x": 2020.7643835616439,
+        "x": 2020.7622950819673,
         "ym": "2020-10",
         "released": "2020-10-06",
         "v": 95.7,
         "chg": 0.7,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fifth-straight-week-up-0-7pts-to-95-7-driven-by-increases-in-melbourne-adelaide"
       }, {
-        "x": 2020.7835616438356,
+        "x": 2020.7814207650274,
         "ym": "2020-10",
         "released": "2020-10-13",
         "v": 97.7,
         "chg": 2,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-sixth-straight-week-up-2pts-to-97-7-up-in-melbourne-brisbane-perth"
       }, {
-        "x": 2020.8027397260273,
+        "x": 2020.8005464480875,
         "ym": "2020-10",
         "released": "2020-10-20",
         "v": 98.1,
         "chg": 0.4,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-seventh-straight-week-up-0-4pts-to-98-1-up-in-brisbane-sydney-down-in-melbourne"
       }, {
-        "x": 2020.8219178082193,
+        "x": 2020.8196721311476,
         "ym": "2020-10",
         "released": "2020-10-27",
         "v": 99.7,
         "chg": 1.6,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-eighth-straight-week-up-1-6pts-to-99-7-up-in-sydney-melbourne-perth"
       }, {
-        "x": 2020.841095890411,
+        "x": 2020.8387978142077,
         "ym": "2020-11",
         "released": "2020-11-03",
         "v": 99.9,
         "chg": 0.2,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-ninth-straight-week-up-0-2pts-to-99-9-up-in-melbourne-as-16-week-lockdown-ends"
       }, {
-        "x": 2020.8602739726027,
+        "x": 2020.8579234972678,
         "ym": "2020-11",
         "released": "2020-11-10",
         "v": 103.1,
         "chg": 3.2,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-tenth-straight-week-up-3-2pts-to-103-1-first-time-above-100-since-early-march"
       }, {
-        "x": 2020.8794520547945,
+        "x": 2020.877049180328,
         "ym": "2020-11",
         "released": "2020-11-17",
         "v": 106.6,
         "chg": 3.5,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-eleventh-straight-week-up-3-5pts-to-106-6-highest-since-late-february"
       }, {
-        "x": 2020.8986301369864,
+        "x": 2020.896174863388,
         "ym": "2020-11",
         "released": "2020-11-24",
         "v": 104.5,
         "chg": -2.1,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-2-1pts-to-104-5-ending-record-streak-of-eleven-consecutive-weekly-increases"
       }, {
-        "x": 2020.9178082191781,
+        "x": 2020.9153005464482,
         "ym": "2020-12",
         "released": "2020-12-01",
         "v": 107.5,
         "chg": 3,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-3pts-to-107-5-as-confidence-grows-about-australias-economic-performance-over-the-next-year"
       }, {
-        "x": 2020.9561643835616,
+        "x": 2020.9535519125684,
         "ym": "2020-12",
         "released": "2020-12-15",
         "v": 111.2,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-9pts-to-111-2-as-australians-become-more-confident-about-their-personal-finances"
       }, {
-        "x": 2020.9753424657533,
+        "x": 2020.9726775956285,
         "ym": "2020-12",
         "released": "2020-12-22",
         "v": 109,
@@ -24497,350 +24504,350 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "chg": 1,
         "url": "https://www.roymorgan.com/findings/9385-anz-roy-morgan-consumer-confidence-december-19"
       }, {
-        "x": 2024.021917808219,
+        "x": 2024.0218579234972,
         "ym": "2024-01",
         "released": "2024-01-09",
         "v": 84.8,
         "chg": 3,
         "url": "https://www.roymorgan.com/findings/9390-anz-roy-morgan-consumer-confidence-january-9"
       }, {
-        "x": 2024.041095890411,
+        "x": 2024.0409836065573,
         "ym": "2024-01",
         "released": "2024-01-16",
         "v": 84.4,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9395-anz-roy-morgan-consumer-confidence-january-16"
       }, {
-        "x": 2024.0602739726028,
+        "x": 2024.0601092896175,
         "ym": "2024-01",
         "released": "2024-01-23",
         "v": 84.4,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9400-anz-roy-morgan-consumer-confidence-january-23"
       }, {
-        "x": 2024.0794520547945,
+        "x": 2024.0792349726776,
         "ym": "2024-01",
         "released": "2024-01-30",
         "v": 82.5,
         "chg": -1.9,
         "url": "https://www.roymorgan.com/findings/9405-anz-roy-morgan-consumer-confidence-january-30"
       }, {
-        "x": 2024.0986301369862,
+        "x": 2024.0983606557377,
         "ym": "2024-02",
         "released": "2024-02-06",
         "v": 83.8,
         "chg": 1.3,
         "url": "https://www.roymorgan.com/findings/9410-anz-roy-morgan-consumer-confidence-febuary-6"
       }, {
-        "x": 2024.1178082191782,
+        "x": 2024.1174863387978,
         "ym": "2024-02",
         "released": "2024-02-13",
         "v": 82.6,
         "chg": -1.2,
         "url": "https://www.roymorgan.com/findings/9415-anz-roy-morgan-consumer-confidence-february-13"
       }, {
-        "x": 2024.13698630137,
+        "x": 2024.136612021858,
         "ym": "2024-02",
         "released": "2024-02-20",
         "v": 82.8,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9420-anz-roy-morgan-consumer-confidence-february-20"
       }, {
-        "x": 2024.1561643835616,
+        "x": 2024.155737704918,
         "ym": "2024-02",
         "released": "2024-02-27",
         "v": 83.2,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9425-anz-roy-morgan-consumer-confidence-february-27"
       }, {
-        "x": 2024.1753424657534,
+        "x": 2024.1748633879781,
         "ym": "2024-03",
         "released": "2024-03-05",
         "v": 81,
         "chg": -2.2,
         "url": "https://www.roymorgan.com/findings/9430-anz-roy-morgan-consumer-confidence-march-5"
       }, {
-        "x": 2024.194520547945,
+        "x": 2024.1939890710382,
         "ym": "2024-03",
         "released": "2024-03-12",
         "v": 82.2,
         "chg": 1.2,
         "url": "https://www.roymorgan.com/findings/9435-anz-roy-morgan-consumer-confidence-march-12"
       }, {
-        "x": 2024.213698630137,
+        "x": 2024.2131147540983,
         "ym": "2024-03",
         "released": "2024-03-19",
         "v": 81.7,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9440-anz-roy-morgan-consumer-confidence-march-19"
       }, {
-        "x": 2024.2328767123288,
+        "x": 2024.2322404371585,
         "ym": "2024-03",
         "released": "2024-03-26",
         "v": 83.1,
         "chg": 1.4,
         "url": "https://www.roymorgan.com/findings/9445-anz-roy-morgan-consumer-confidence-march-26"
       }, {
-        "x": 2024.2547945205479,
+        "x": 2024.2540983606557,
         "ym": "2024-04",
         "released": "2024-04-03",
         "v": 82.8,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9450-anz-roy-morgan-consumer-confidence-april-3"
       }, {
-        "x": 2024.2712328767122,
+        "x": 2024.2704918032787,
         "ym": "2024-04",
         "released": "2024-04-09",
         "v": 81.9,
         "chg": -0.9,
         "url": "https://www.roymorgan.com/findings/9455-anz-roy-morgan-consumer-confidence-april-9"
       }, {
-        "x": 2024.2904109589042,
+        "x": 2024.2896174863388,
         "ym": "2024-04",
         "released": "2024-04-16",
         "v": 83.5,
         "chg": 1.6,
         "url": "https://www.roymorgan.com/findings/9460-anz-roy-morgan-consumer-confidence-april-16"
       }, {
-        "x": 2024.309589041096,
+        "x": 2024.308743169399,
         "ym": "2024-04",
         "released": "2024-04-23",
         "v": 80.3,
         "chg": -3.2,
         "url": "https://www.roymorgan.com/findings/9465-anz-roy-morgan-consumer-confidence-april-23"
       }, {
-        "x": 2024.3287671232877,
+        "x": 2024.327868852459,
         "ym": "2024-04",
         "released": "2024-04-30",
         "v": 81.1,
         "chg": 0.8,
         "url": "https://www.roymorgan.com/findings/9470-anz-roy-morgan-consumer-confidence-april-30"
       }, {
-        "x": 2024.3479452054794,
+        "x": 2024.3469945355191,
         "ym": "2024-05",
         "released": "2024-05-07",
         "v": 80.5,
         "chg": -0.6,
         "url": "https://www.roymorgan.com/findings/9475-anz-roy-morgan-consumer-confidence-may-7"
       }, {
-        "x": 2024.3671232876711,
+        "x": 2024.3661202185792,
         "ym": "2024-05",
         "released": "2024-05-14",
         "v": 80.2,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9480-anz-roy-morgan-consumer-confidence-may-14"
       }, {
-        "x": 2024.386301369863,
+        "x": 2024.3852459016393,
         "ym": "2024-05",
         "released": "2024-05-21",
         "v": 82,
         "chg": 1.8,
         "url": "https://www.roymorgan.com/findings/9485-anz-roy-morgan-consumer-confidence-may-21"
       }, {
-        "x": 2024.4054794520548,
+        "x": 2024.4043715846994,
         "ym": "2024-05",
         "released": "2024-05-28",
         "v": 80.2,
         "chg": -1.8,
         "url": "https://www.roymorgan.com/findings/9490-anz-roy-morgan-consumer-confidence-may-28"
       }, {
-        "x": 2024.4246575342465,
+        "x": 2024.4234972677596,
         "ym": "2024-06",
         "released": "2024-06-04",
         "v": 80.5,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9495-anz-roy-morgan-consumer-confidence-june-4"
       }, {
-        "x": 2024.4465753424658,
+        "x": 2024.4453551912568,
         "ym": "2024-06",
         "released": "2024-06-12",
         "v": 77,
         "chg": -3.5,
         "url": "https://www.roymorgan.com/findings/9500-anz-roy-morgan-consumer-confidence-june-12"
       }, {
-        "x": 2024.4630136986302,
+        "x": 2024.4617486338798,
         "ym": "2024-06",
         "released": "2024-06-18",
         "v": 80.3,
         "chg": 3.3,
         "url": "https://www.roymorgan.com/findings/9505-anz-roy-morgan-consumer-confidence-june-18"
       }, {
-        "x": 2024.482191780822,
+        "x": 2024.48087431694,
         "ym": "2024-06",
         "released": "2024-06-25",
         "v": 80.4,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9510-anz-roy-morgan-consumer-confidence-june-25"
       }, {
-        "x": 2024.5013698630137,
+        "x": 2024.5,
         "ym": "2024-07",
         "released": "2024-07-02",
         "v": 81.3,
         "chg": 0.9,
         "url": "https://www.roymorgan.com/findings/9515-anz-roy-morgan-consumer-confidence-july-2"
       }, {
-        "x": 2024.5205479452054,
+        "x": 2024.51912568306,
         "ym": "2024-07",
         "released": "2024-07-09",
         "v": 79,
         "chg": -2.3,
         "url": "https://www.roymorgan.com/findings/9520-anz-roy-morgan-consumer-confidence-july-9"
       }, {
-        "x": 2024.5397260273974,
+        "x": 2024.5382513661202,
         "ym": "2024-07",
         "released": "2024-07-16",
         "v": 78.5,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9525-anz-roy-morgan-consumer-confidence-july-16"
       }, {
-        "x": 2024.558904109589,
+        "x": 2024.5573770491803,
         "ym": "2024-07",
         "released": "2024-07-23",
         "v": 84.4,
         "chg": 5.9,
         "url": "https://www.roymorgan.com/findings/9530-anz-roy-morgan-consumer-confidence-july-23"
       }, {
-        "x": 2024.5780821917808,
+        "x": 2024.5765027322404,
         "ym": "2024-07",
         "released": "2024-07-30",
         "v": 83.1,
         "chg": -1.3,
         "url": "https://www.roymorgan.com/findings/9535-anz-roy-morgan-consumer-confidence-july-30"
       }, {
-        "x": 2024.5972602739726,
+        "x": 2024.5956284153006,
         "ym": "2024-08",
         "released": "2024-08-06",
         "v": 81.3,
         "chg": -1.8,
         "url": "https://www.roymorgan.com/findings/9540-anz-roy-morgan-consumer-confidence-august-6"
       }, {
-        "x": 2024.6164383561643,
+        "x": 2024.6147540983607,
         "ym": "2024-08",
         "released": "2024-08-13",
         "v": 83.9,
         "chg": 2.6,
         "url": "https://www.roymorgan.com/findings/9545-anz-roy-morgan-consumer-confidence-august-13"
       }, {
-        "x": 2024.6356164383562,
+        "x": 2024.6338797814208,
         "ym": "2024-08",
         "released": "2024-08-20",
         "v": 83,
         "chg": -0.9,
         "url": "https://www.roymorgan.com/findings/9550-anz-roy-morgan-consumer-confidence-august-20"
       }, {
-        "x": 2024.654794520548,
+        "x": 2024.6530054644809,
         "ym": "2024-08",
         "released": "2024-08-27",
         "v": 82.6,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9555-anz-roy-morgan-consumer-confidence-august-27"
       }, {
-        "x": 2024.6739726027397,
+        "x": 2024.672131147541,
         "ym": "2024-09",
         "released": "2024-09-03",
         "v": 83.1,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9560-anz-roy-morgan-consumer-confidence-september-3"
       }, {
-        "x": 2024.6931506849314,
+        "x": 2024.691256830601,
         "ym": "2024-09",
         "released": "2024-09-10",
         "v": 82.3,
         "chg": -0.8,
         "url": "https://www.roymorgan.com/findings/9565-anz-roy-morgan-consumer-confidence-september-10"
       }, {
-        "x": 2024.7123287671234,
+        "x": 2024.7103825136612,
         "ym": "2024-09",
         "released": "2024-09-17",
         "v": 84.1,
         "chg": 1.8,
         "url": "https://www.roymorgan.com/findings/9570-anz-roy-morgan-consumer-confidence-september-17"
       }, {
-        "x": 2024.731506849315,
+        "x": 2024.7295081967213,
         "ym": "2024-09",
         "released": "2024-09-24",
         "v": 84.9,
         "chg": 0.8,
         "url": "https://www.roymorgan.com/findings/9575-anz-roy-morgan-consumer-confidence-september-24"
       }, {
-        "x": 2024.7506849315068,
+        "x": 2024.7486338797814,
         "ym": "2024-10",
         "released": "2024-10-01",
         "v": 82,
         "chg": -2.9,
         "url": "https://www.roymorgan.com/findings/9580-anz-roy-morgan-consumer-confidence-october-1"
       }, {
-        "x": 2024.7698630136986,
+        "x": 2024.7677595628415,
         "ym": "2024-10",
         "released": "2024-10-08",
         "v": 83.5,
         "chg": 1.5,
         "url": "https://www.roymorgan.com/findings/9585-anz-roy-morgan-consumer-confidence-october-8"
       }, {
-        "x": 2024.7890410958903,
+        "x": 2024.7868852459017,
         "ym": "2024-10",
         "released": "2024-10-15",
         "v": 83.4,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9590-anz-roy-morgan-consumer-confidence-october-15"
       }, {
-        "x": 2024.8082191780823,
+        "x": 2024.8060109289618,
         "ym": "2024-10",
         "released": "2024-10-22",
         "v": 87.5,
         "chg": 4.1,
         "url": "https://www.roymorgan.com/findings/9595-anz-roy-morgan-consumer-confidence-october-22"
       }, {
-        "x": 2024.827397260274,
+        "x": 2024.8251366120219,
         "ym": "2024-10",
         "released": "2024-10-29",
         "v": 86.4,
         "chg": -1.1,
         "url": "https://www.roymorgan.com/findings/9600-anz-roy-morgan-consumer-confidence-october-29"
       }, {
-        "x": 2024.8465753424657,
+        "x": 2024.844262295082,
         "ym": "2024-11",
         "released": "2024-11-05",
         "v": 86.5,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9605-anz-roy-morgan-consumer-confidence-november-5"
       }, {
-        "x": 2024.8657534246574,
+        "x": 2024.863387978142,
         "ym": "2024-11",
         "released": "2024-11-12",
         "v": 86.7,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9610-anz-roy-morgan-consumer-confidence-november-12"
       }, {
-        "x": 2024.8849315068494,
+        "x": 2024.8825136612022,
         "ym": "2024-11",
         "released": "2024-11-19",
         "v": 86.8,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/9615-anz-roy-morgan-consumer-confidence-november-19"
       }, {
-        "x": 2024.9041095890411,
+        "x": 2024.9016393442623,
         "ym": "2024-11",
         "released": "2024-11-26",
         "v": 85.7,
         "chg": -1.1,
         "url": "https://www.roymorgan.com/findings/9620-anz-roy-morgan-consumer-confidence-november-26"
       }, {
-        "x": 2024.9232876712329,
+        "x": 2024.9207650273224,
         "ym": "2024-12",
         "released": "2024-12-03",
         "v": 88.4,
         "chg": 2.7,
         "url": "https://www.roymorgan.com/findings/9625-anz-roy-morgan-consumer-confidence-december-3"
       }, {
-        "x": 2024.9424657534246,
+        "x": 2024.9398907103825,
         "ym": "2024-12",
         "released": "2024-12-10",
         "v": 85.5,
         "chg": -2.9,
         "url": "https://www.roymorgan.com/findings/9630-anz-roy-morgan-consumer-confidence-december-10"
       }, {
-        "x": 2024.9616438356165,
+        "x": 2024.9590163934427,
         "ym": "2024-12",
         "released": "2024-12-17",
         "v": 83.9,
@@ -25621,84 +25628,84 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "chg": 2.2,
         "url": "https://www.westpaciq.com.au/economics/2023/12/consumer-sentiment-december-2023/"
       }, {
-        "x": 2024.041095890411,
+        "x": 2024.0409836065573,
         "ym": "2024-01",
         "released": "2024-01-16",
         "v": 81,
         "chg": -1.1,
         "url": "https://www.westpaciq.com.au/economics/2024/01/consumer-sentiment-january-2024/"
       }, {
-        "x": 2024.1178082191782,
+        "x": 2024.1174863387978,
         "ym": "2024-02",
         "released": "2024-02-13",
         "v": 86,
         "chg": 5,
         "url": "https://www.westpaciq.com.au/economics/2024/02/consumer-sentiment-february-2024/"
       }, {
-        "x": 2024.2328767123288,
+        "x": 2024.2322404371585,
         "ym": "2024-03",
         "released": "2024-03-26",
         "v": 84.4,
         "chg": -1.6,
         "url": "https://www.westpaciq.com.au/economics/2024/03/consumer-sentiment-march-2024/"
       }, {
-        "x": 2024.2712328767122,
+        "x": 2024.2704918032787,
         "ym": "2024-04",
         "released": "2024-04-09",
         "v": 82.4,
         "chg": -2,
         "url": "https://www.westpaciq.com.au/economics/2024/04/consumer-sentiment-april-2024/"
       }, {
-        "x": 2024.386301369863,
+        "x": 2024.3852459016393,
         "ym": "2024-05",
         "released": "2024-05-21",
         "v": 82.2,
         "chg": -0.2,
         "url": "https://www.westpaciq.com.au/economics/2024/05/consumer-sentiment-may-2024/"
       }, {
-        "x": 2024.482191780822,
+        "x": 2024.48087431694,
         "ym": "2024-06",
         "released": "2024-06-25",
         "v": 83.6,
         "chg": 1.4,
         "url": "https://www.westpaciq.com.au/economics/2024/06/consumer-sentiment-june-2024/"
       }, {
-        "x": 2024.5205479452054,
+        "x": 2024.51912568306,
         "ym": "2024-07",
         "released": "2024-07-09",
         "v": 82.7,
         "chg": -0.9,
         "url": "https://www.westpaciq.com.au/economics/2024/07/consumer-sentiment-july-2024/"
       }, {
-        "x": 2024.6164383561643,
+        "x": 2024.6147540983607,
         "ym": "2024-08",
         "released": "2024-08-13",
         "v": 85,
         "chg": 2.3,
         "url": "https://www.westpaciq.com.au/economics/2024/08/consumer-sentiment-august-2024/"
       }, {
-        "x": 2024.6931506849314,
+        "x": 2024.691256830601,
         "ym": "2024-09",
         "released": "2024-09-10",
         "v": 84.6,
         "chg": -0.4,
         "url": "https://www.westpaciq.com.au/economics/2024/09/consumer-sentiment-september-2024/"
       }, {
-        "x": 2024.7698630136986,
+        "x": 2024.7677595628415,
         "ym": "2024-10",
         "released": "2024-10-08",
         "v": 89.8,
         "chg": 5.2,
         "url": "https://www.westpaciq.com.au/economics/2024/10/consumer-sentiment-october-2024/"
       }, {
-        "x": 2024.8657534246574,
+        "x": 2024.863387978142,
         "ym": "2024-11",
         "released": "2024-11-12",
         "v": 94.6,
         "chg": 4.8,
         "url": "https://www.westpaciq.com.au/economics/2024/11/consumer-sentiment-november-2024/"
       }, {
-        "x": 2024.9616438356165,
+        "x": 2024.9590163934427,
         "ym": "2024-12",
         "released": "2024-12-17",
         "v": 92.8,
@@ -25898,84 +25905,84 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "chg": 2.4,
         "url": "https://www.roymorgan.com/findings/business-confidence-improves-up-2-4pts-to-108-4-in-november"
       }, {
-        "x": 2020.0520547945205,
+        "x": 2020.051912568306,
         "ym": "2020-01",
         "released": "2020-01-20",
         "v": 104.5,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/business-confidence-ended-2019-at-8-month-low-of-104-5"
       }, {
-        "x": 2020.0904109589042,
+        "x": 2020.0901639344263,
         "ym": "2020-02",
         "released": "2020-02-03",
         "v": 101.6,
         "chg": null,
         "url": "https://www.roymorgan.com/findings/business-confidence-drops-to-9-year-low-of-101-6-in-january"
       }, {
-        "x": 2020.1890410958904,
+        "x": 2020.188524590164,
         "ym": "2020-03",
         "released": "2020-03-10",
         "v": 104.6,
         "chg": 3,
         "url": "https://www.roymorgan.com/findings/february-business-confidence-rebounded-with-bushfires-out-and-covid-19-yet-to-have-full-economic-impact"
       }, {
-        "x": 2020.2630136986302,
+        "x": 2020.2622950819673,
         "ym": "2020-04",
         "released": "2020-04-06",
         "v": 95.1,
         "chg": -9.5,
         "url": "https://www.roymorgan.com/findings/business-confidence-hits-a-record-low-of-95-1-in-march-declines-accelerated-throughout-the-month"
       }, {
-        "x": 2020.3506849315067,
+        "x": 2020.3497267759562,
         "ym": "2020-05",
         "released": "2020-05-08",
         "v": 76.9,
         "chg": -18.2,
         "url": "https://www.roymorgan.com/findings/business-confidence-plunged-to-record-low-of-76-9-in-april"
       }, {
-        "x": 2020.427397260274,
+        "x": 2020.4262295081967,
         "ym": "2020-06",
         "released": "2020-06-05",
         "v": 89.9,
         "chg": 13,
         "url": "https://www.roymorgan.com/findings/business-confidence-jumps-in-may-up-13pts-to-89-9-highest-in-western-australia-south-australia"
       }, {
-        "x": 2020.504109589041,
+        "x": 2020.5027322404371,
         "ym": "2020-07",
         "released": "2020-07-03",
         "v": 95,
         "chg": 5.1,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-5-1pts-to-95-0-in-june-highest-in-western-australia-110-5-new-south-wales-100-7"
       }, {
-        "x": 2020.5890410958905,
+        "x": 2020.5874316939892,
         "ym": "2020-08",
         "released": "2020-08-03",
         "v": 84.3,
         "chg": -10.7,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunged-10-7pts-to-84-3-in-july-before-victoria-introduced-stage-4-restrictions-to-stop-covid-19-confidence-lowest-in-victoria-73-9-queensland-83-0-and-so"
       }, {
-        "x": 2020.6876712328767,
+        "x": 2020.6857923497269,
         "ym": "2020-09",
         "released": "2020-09-08",
         "v": 83.1,
         "chg": -1.2,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-1-2pts-to-83-1-in-august-confidence-lowest-in-victoria-76-1-and-queensland-77-0"
       }, {
-        "x": 2020.7643835616439,
+        "x": 2020.7622950819673,
         "ym": "2020-10",
         "released": "2020-10-06",
         "v": 85.6,
         "chg": 2.5,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-2-5pts-to-85-6-in-september-confidence-lowest-in-victoria-77-0-south-australia-75-0-and-queensland-71-6"
       }, {
-        "x": 2020.8602739726027,
+        "x": 2020.8579234972678,
         "ym": "2020-11",
         "released": "2020-11-10",
         "v": 98.7,
         "chg": 13.1,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-13-1pts-to-98-7-in-october-confidence-highest-in-new-south-wales-105-4-and-western-australia-108-4"
       }, {
-        "x": 2020.9041095890411,
+        "x": 2020.9016393442623,
         "ym": "2020-11",
         "released": "2020-11-26",
         "v": 109.1,
@@ -26234,77 +26241,77 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "chg": -4.6,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-november-2023"
       }, {
-        "x": 2024.0602739726028,
+        "x": 2024.0601092896175,
         "ym": "2024-01",
         "released": "2024-01-23",
         "v": 91.1,
         "chg": 5.3,
         "url": "https://www.roymorgan.com/findings/9423-roy-morgan-business-confidence-december-2023"
       }, {
-        "x": 2024.13698630137,
+        "x": 2024.136612021858,
         "ym": "2024-02",
         "released": "2024-02-20",
         "v": 93.2,
         "chg": 2.1,
         "url": "https://www.roymorgan.com/findings/9463-roy-morgan-business-confidence-january-2024"
       }, {
-        "x": 2024.2027397260274,
+        "x": 2024.2021857923498,
         "ym": "2024-03",
         "released": "2024-03-15",
         "v": 101.5,
         "chg": 8.3,
         "url": "https://www.roymorgan.com/findings/9493-roy-morgan-business-confidence-february-2024"
       }, {
-        "x": 2024.2904109589042,
+        "x": 2024.2896174863388,
         "ym": "2024-04",
         "released": "2024-04-16",
         "v": 98,
         "chg": -3.5,
         "url": "https://www.roymorgan.com/findings/9513-roy-morgan-business-confidence-march-2024"
       }, {
-        "x": 2024.3479452054794,
+        "x": 2024.3469945355191,
         "ym": "2024-05",
         "released": "2024-05-07",
         "v": 99.3,
         "chg": 1.3,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-april-2024"
       }, {
-        "x": 2024.4630136986302,
+        "x": 2024.4617486338798,
         "ym": "2024-06",
         "released": "2024-06-18",
         "v": 97,
         "chg": -2.3,
         "url": "https://www.roymorgan.com/findings/9613-roy-morgan-business-confidence-may-2024"
       }, {
-        "x": 2024.5205479452054,
+        "x": 2024.51912568306,
         "ym": "2024-07",
         "released": "2024-07-09",
         "v": 91.5,
         "chg": -5.5,
         "url": "https://www.roymorgan.com/findings/9633-roy-morgan-business-confidence-june-2024"
       }, {
-        "x": 2024.6164383561643,
+        "x": 2024.6147540983607,
         "ym": "2024-08",
         "released": "2024-08-13",
         "v": 95.1,
         "chg": 3.6,
         "url": "https://www.roymorgan.com/findings/9653-roy-morgan-business-confidence-july-2024"
       }, {
-        "x": 2024.6931506849314,
+        "x": 2024.691256830601,
         "ym": "2024-09",
         "released": "2024-09-10",
         "v": 101.3,
         "chg": 6.2,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumps-6-2pts-to-101-3-due-to-increased-confidence-about-the-economy"
       }, {
-        "x": 2024.7698630136986,
+        "x": 2024.7677595628415,
         "ym": "2024-10",
         "released": "2024-10-08",
         "v": 94.3,
         "chg": -7,
         "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-slumps-7pts-to-94-3-in-september-with-rising-concerns-about-the-next-12-months"
       }, {
-        "x": 2024.8657534246574,
+        "x": 2024.863387978142,
         "ym": "2024-11",
         "released": "2024-11-12",
         "v": 106.7,

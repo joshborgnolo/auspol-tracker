@@ -195,7 +195,7 @@ function renderPage(sections, fetchedIso) {
   </section>`).join("\n");
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

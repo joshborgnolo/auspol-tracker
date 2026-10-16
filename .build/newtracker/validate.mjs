@@ -20,6 +20,16 @@ const ROOT = path.resolve(HERE, "..", "..");
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const ISO_PUBLISHED = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
+/* A day key is not real until it round-trips through Date: "2025-02-31"
+   fits ISO_DAY but parses silently onto 2 March, and gen-data's dx() then
+   draws the row under a date that never happened. Every day-precision
+   date below routes through this; the day+minute `published` stamps keep
+   their pattern (the time part is optional) but validate their day part. */
+const validISO = (s) => {
+  if (typeof s !== "string" || !ISO_DAY.test(s)) return false;
+  const t = Date.parse(s);
+  return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === s;
+};
 // ~1 day of grace: an 8pm UTC build should not fail a poll dated the
 // Australian morning that follows its UTC day.
 const TOMORROW = new Date(Date.now() + 24 * 3600e3).toISOString().slice(0, 10);
@@ -73,6 +83,14 @@ export function validate(D) {
       const v = p[k];
       if (v != null && (v < lo || v > hi)) fail("range", `${k} = ${v} (bounds ${lo}–${hi})`);
     }
+    // 0c. the undecided and not-firm shares are shares too — with no cap,
+    //     a decimal slip (65 for 6.5) sails into the Decidedness panel.
+    //     Roy Morgan's record undecided wave ran 9.5; Resolve's not-firm
+    //     share has never left the 17–39 lane.
+    if (p.undecided != null && !(p.undecided >= 0 && p.undecided <= 30))
+      fail("undecided-range", `undecided = ${p.undecided} (bounds 0–30)`);
+    if (p.soft != null && !(p.soft >= 0 && p.soft <= 60))
+      fail("soft-range", `soft = ${p.soft} (bounds 0–60)`);
 
     // 1. full primary sets total ~100 (majors-only polls are partial by design)
     if (CORE.every((k) => p[k] != null)) {
@@ -286,10 +304,10 @@ export function validate(D) {
     //     pollsterRules / gen-data's NO_AGG_HOUSES).
     if (p.noAgg != null && !["shifts"].includes(p.noAgg))
       fail("no-agg", `noAgg token "${p.noAgg}": gen-data has no NO_AGG_ROW_NOTE for it`);
-    // 3. dates are ISO YYYY-MM-DD, not in the future, run oldest→newest, and
-    //    fieldwork starts before it ends
-    if (!ISO_DAY.test(p.date)) fail("date-format", `date "${p.date}" is not YYYY-MM-DD`);
-    if (p.dateStart != null && !ISO_DAY.test(p.dateStart)) fail("date-format", `dateStart "${p.dateStart}" is not YYYY-MM-DD`);
+    // 3. dates are real ISO YYYY-MM-DD days, not in the future, run
+    //    oldest→newest, and fieldwork starts before it ends
+    if (!validISO(p.date)) fail("date-format", `date "${p.date}" is not a real YYYY-MM-DD day`);
+    if (p.dateStart != null && !validISO(p.dateStart)) fail("date-format", `dateStart "${p.dateStart}" is not a real YYYY-MM-DD day`);
     if (p.date > TOMORROW) fail("future-date", `date ${p.date} is after today`);
     const ts = Date.parse(p.date);
     if (isNaN(ts)) fail("bad-date", `unparseable date "${p.date}"`);
@@ -302,6 +320,11 @@ export function validate(D) {
       if (isNaN(ds)) fail("bad-date", `unparseable dateStart "${p.dateStart}"`);
       else if (!isNaN(ts) && ds > ts) fail("date-range", `dateStart ${p.dateStart} is after date ${p.date}`);
     }
+    // 3b. an (MRP)-labelled row must carry its fieldwork window: gen-data's
+    //     reusesWaves anchors an MRP wave on dateStart+date, and without the
+    //     window the MRP row would leak into the aggregates it reuses.
+    if (/\(MRP\)/.test(String(p.pollster)) && p.dateStart == null)
+      fail("mrp-datestart", "(MRP) row without dateStart – gen-data reusesWaves anchors on the window");
     // 4. duplicate date+pollster – usually an accidental paste. Keyed on the
     //    CANONICAL name: a pre/post-rebrand spelling pair ("Redbridge" beside
     //    "RedBridge/Accent") doesn't collide here unless this gate uses the
@@ -450,17 +473,24 @@ export function validate(D) {
   });
 
   // 6. direction rows are a proportion split; a `published` stamp on one
-  // follows the same rules as the poll rows' (format, order, future)
+  // follows the same rules as the poll rows' (format, order, future). Two
+  // rows sharing date + pollster are one wave filed twice, the same bug
+  // check 4 catches for polls[].
+  const dirSeen = new Set();
   (D.direction || []).forEach((d, i) => {
-    if (d.date != null && !ISO_DAY.test(d.date))
-      errors.push({ type: "date-format", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `date "${d.date}" is not YYYY-MM-DD` });
+    const dkey = d.date + "|" + d.pollster;
+    if (dirSeen.has(dkey))
+      errors.push({ type: "duplicate", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: "same date + pollster already present" });
+    dirSeen.add(dkey);
+    if (d.date != null && !validISO(d.date))
+      errors.push({ type: "date-format", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `date "${d.date}" is not a real YYYY-MM-DD day` });
     if (d.published != null) {
       if (typeof d.published !== "string" || !ISO_PUBLISHED.test(d.published))
         errors.push({ type: "published-format", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `published = ${JSON.stringify(d.published)}` });
       else {
         if (d.published.slice(0, 10) > TOMORROW)
           errors.push({ type: "future-date", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `published ${d.published} is after today` });
-        if (ISO_DAY.test(d.date) && d.published.slice(0, 10) < d.date)
+        if (validISO(d.date) && d.published.slice(0, 10) < d.date)
           errors.push({ type: "published-order", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `published ${d.published} precedes fieldwork-end ${d.date}` });
       }
     }
@@ -651,11 +681,18 @@ export function validate(D) {
   //    is a leadership-only wave – flagged as info, since a drifted date looks
   //    exactly like one (the Essential Dec-2025 / Mar-2026 bug). Dates on
   //    leadership rows are ISO-checked here too since check 3 only walks
-  //    polls[].
-  for (const [rows, label] of [[D.ppm, "ppm"], [D.approval, "approval"]]) {
+  //    polls[]; the same real-day gate now covers the h2h/altTpp series (Δ§9a),
+  //    which gen-data dx()s just the same. Duplicates are rejected per series,
+  //    keyed date + firm like check 8's cycle rows.
+  for (const [rows, label] of [[D.ppm, "ppm"], [D.approval, "approval"], [D.ppmHeadToHead, "ppmHeadToHead"], [D.altTpp, "altTpp"]]) {
+    const seenHere = new Set();
     (rows || []).forEach((r, i) => {
-      if (!ISO_DAY.test(r.date))
-        errors.push({ type: "date-format", poll: `${label} #${i} ${r.date} · ${r.firm}`, detail: `date "${r.date}" is not YYYY-MM-DD` });
+      if (!validISO(r.date))
+        errors.push({ type: "date-format", poll: `${label} #${i} ${r.date} · ${r.firm}`, detail: `date "${r.date}" is not a real YYYY-MM-DD day` });
+      const key = r.date + "|" + r.firm;
+      if (seenHere.has(key))
+        errors.push({ type: "duplicate", poll: `${label} #${i} ${r.date} · ${r.firm}`, detail: "same date + firm already present in this series" });
+      seenHere.add(key);
     });
   }
   const pollKeys = new Set(D.polls.map((p) => p.date + "|" + p.pollster));
@@ -680,7 +717,7 @@ export function validate(D) {
     const where = `fallbackPolls #${i} ${p.date} · ${p.pollster}`;
     const fail = (t, d) => errors.push({ type: t, poll: where, detail: d });
     if (!KNOWN_POLLSTERS.has(p.pollster)) fail("pollster", `unknown pollster label ${JSON.stringify(p.pollster)}`);
-    for (const k of ["date", "dateStart"]) if (!ISO_DAY.test(p[k] || "")) fail("date-format", `${k} "${p[k]}" is not YYYY-MM-DD`);
+    for (const k of ["date", "dateStart"]) if (!validISO(p[k] || "")) fail("date-format", `${k} "${p[k]}" is not a real YYYY-MM-DD day`);
     if (p.dateStart > p.date) fail("date-order", `dateStart ${p.dateStart} after date ${p.date}`);
     if (prevFb && p.date < prevFb) fail("date-order", `precedes previous entry (${prevFb})`);
     prevFb = p.date;
@@ -706,7 +743,7 @@ export function validate(D) {
     const where = `fallbackApproval #${i} ${r.date} · ${r.firm}`;
     const fail = (t, d) => errors.push({ type: t, poll: where, detail: d });
     if (!KNOWN_POLLSTERS.has(r.firm)) fail("pollster", `unknown firm label ${JSON.stringify(r.firm)}`);
-    if (!ISO_DAY.test(r.date || "")) fail("date-format", `date "${r.date}" is not YYYY-MM-DD`);
+    if (!validISO(r.date || "")) fail("date-format", `date "${r.date}" is not a real YYYY-MM-DD day`);
     for (const k of ["alb", "opp"]) {
       const sp = r.detail?.[k];
       if (r[k] == null && !sp) continue;
@@ -718,6 +755,27 @@ export function validate(D) {
     if (r.opp != null && !r.oppName) fail("approval-split", "opp net without oppName");
     if (r.provisional?.source !== "Poll Bludger" || !r.provisional?.feedId) fail("provenance", "missing provisional {source, feedId} stamp");
   });
+
+  /* 14. events[] are real past facts rendered as chart annotations. gen-data
+     both dx()s e.date (so a pattern-only-invalid day would slide out of
+     position) and keys a lookup by it (sxByDate), so duplicates and
+     non-ISO days are bugs here, and the visible copy (short + label) is
+     required rather than empty-stringed past. */
+  let prevEv = null;
+  for (const e of D.events || []) {
+    if (!validISO(e.date))
+      errors.push({ type: "date-format", poll: `events ${e.date} · ${e.label ?? ""}`, detail: `date "${e.date}" is not a real YYYY-MM-DD day` });
+    else if (e.date > TOMORROW)
+      errors.push({ type: "future-date", poll: `events ${e.date} · ${e.label ?? ""}`, detail: `date ${e.date} is after today` });
+    for (const k of ["short", "label"])
+      if (typeof e[k] !== "string" || !e[k].trim())
+        errors.push({ type: "event-shape", poll: `events ${e.date ?? ""}`, detail: `${k} is missing or empty` });
+    if (prevEv === e.date)
+      errors.push({ type: "duplicate", poll: `events ${e.date} · ${e.label ?? ""}`, detail: "another event already has this date" });
+    else if (prevEv && e.date < prevEv)
+      errors.push({ type: "date-order", poll: `events ${e.date} · ${e.label ?? ""}`, detail: `precedes previous event (${prevEv})` });
+    prevEv = e.date;
+  }
 
   return { errors, exempted, orphans: [...new Set(orphans)] };
 }
@@ -819,7 +877,9 @@ export function validatePewSentiment() {
   return errors;
 }
 
-if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+// argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
+// gate must skip the CLI block there, not throw on path.resolve().
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const { errors, exempted, orphans } = validate(D);
   errors.push(...validateChangelog());

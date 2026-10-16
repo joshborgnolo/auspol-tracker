@@ -268,6 +268,11 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   line-height: 1.45;
+  /* the page-wide net below every per-component clamp: a stray unbreakable
+     token (a URL pasted into copy, a concatenated field) wraps rather than
+     widening the document past the viewport. break-word fires only when the
+     token cannot fit whole, so it never changes a layout that already fits */
+  overflow-wrap: break-word;
   /* native controls answer to the resolved color-scheme, not to our CSS
      vars - and the meta tag offers the device both, so a light page on a
      dark-mode phone still drew its checkboxes black. Pin body's subtree to
@@ -3501,7 +3506,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
    padded page from ~636px up, so in a 561-636px band the head used to
    overflow the document's right edge. The rest of the phone design still
    flips at 560. */
-@media (max-width: 640px) {
+@media (max-width: 640.98px) {
   /* tagline now carries the election context, so drop the whole meta block
      (incl. the Next election anchor) on small screens */
   .head-meta { display: none; }
@@ -4421,7 +4426,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-basis-narrow { display: block; margin: 0 0 12px; }
 .ap-head-side { display: inline-flex; align-items: center; gap: 14px; }
 .ap-head-side .ap-count { display: none; }
-@media (max-width: 560px) {
+@media (max-width: 560.98px) {
   .ap-head-side { width: 100%; }                 /* fill its line, so the tally can park at the far edge */
   .ap-head-side .ap-count { display: inline; margin-left: auto; }
   .ap-bar-end .ap-count { display: none; }
@@ -4436,7 +4441,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    .ap-head-side and never see these copies */
 .ap-jumps > .ap-facet, .ap-jumps > .ap-jumps-count { display: none; }
 @media (min-width: 561px) { .ap-jumps { display: none; } }
-@media (max-width: 560px) {
+@media (max-width: 560.98px) {
   .ap-jumps { justify-content: space-between; column-gap: 10px; row-gap: 10px; }
   /* ~45% basis keeps the pair filling the top line at any phone width and
      pushes the facet pair onto the next line; nowrap drops away so a long
@@ -5317,8 +5322,9 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
   html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
-  /* the floor follows the shorter band: 190+8 here, 240+12 above */
-  body.js #root { min-height: calc(100vh - 198px); }
+  /* the floor follows the shorter band: 190+8 here, 240+12 above. dvh twin:
+     iOS's dynamic toolbar leaves dead scroll slack under 100vh */
+  body.js #root { min-height: calc(100vh - 198px); min-height: calc(100dvh - 198px); }
 }
 
 /* ------------------------------------------------------------------------

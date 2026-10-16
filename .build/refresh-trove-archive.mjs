@@ -195,7 +195,7 @@ ${rows}
 const firstYm = Object.keys(monthly).sort()[0];
 const lastYm = Object.keys(monthly).sort().at(-1);
 const page = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

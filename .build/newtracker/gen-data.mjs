@@ -257,7 +257,10 @@ const mx = (ym) => { const [y, m] = ym.split("-").map(Number); return y + (m - 1
 const dx = (iso) => {
   const [y, m, d] = iso.split("-").map(Number);
   const doy = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000;
-  return y + doy / 365;
+  // a leap year is 366 days long: with a flat /365 its 31 Dec lands on the
+  // next year's 1 Jan (both x = Y + 1), collapsing the two to one pixel
+  const yrLen = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0) ? 366 : 365;
+  return y + doy / yrLen;
 };
 const ymOf = (d) => d.slice(0, 7);
 const dayOf = (d) => Number(d.slice(8, 10));
@@ -877,26 +880,33 @@ if (KF) {
    the current ~27%). Both edges are COUNTED tables, so this is a
    sensitivity read, not an interval: it brackets the last two elections and
    claims nothing about the next one. */
+/* The 2022-flow edge below IS the federal §1c read: 0.3570 is the federal
+   count, and a jurisdiction build has swapped FLOW to its own 2022 flows
+   (FLOW at the top), so the pair would bracket a foreign constant against
+   the local one. On a JUR build flowSens is null instead, and the client –
+   which guards on D.flowSens's length – draws no band. */
 const ONP_FLOW_2022 = 0.3570;
-const tppRowsSynth22 = tppRowsSynth.map((r) => ({ ...r, x: r.x + (ONP_FLOW_2022 - FLOW.onp) * r.onp }));
-const synth22Effect = houseEffectsFor(tppRowsSynth22);
-const agg2ppSynth22 = MONTHS.map((ym) => {
-  const r = monthWithSe(tppRowsSynth22, synth22Effect, ym);
-  if (!r) return null;
-  return { ym, x: mx(ym), alp: r1(r.v), lnp: r1(100 - r.v), ci95: r1(1.96 * r.se), k: r.n };
-}).filter(Boolean);
-const sensElec22 = impliedAlp2pp(ELECTION) + (ONP_FLOW_2022 - FLOW.onp) * ELECTION.onp;
-agg2ppSynth22.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(sensElec22), lnp: r1(100 - sensElec22), ci95: 0, k: 0, election: true });
-if (KF) {                                   // the sensitivity edge, built as the line it brackets
-  const kf = kfSeries(tppRowsSynth22, "imp", sensElec22);
-  if (kf) agg2ppSynth22.splice(1, Infinity, ...kfMonths(kf).map((m) => ({ ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k })));
-}
-// lo/hi per month; the 2022 share sends ONP further ALP-side, so 22 ≥ 25
-// month for month and min/max only guards a rounding tie
-const synthBand = agg2ppSynth.map((m) => {
-  const alt = agg2ppSynth22.find((a) => a.ym === m.ym);
-  return alt ? { ym: m.ym, x: m.x, lo: Math.min(m.alp, alt.alp), hi: Math.max(m.alp, alt.alp) } : null;
-}).filter(Boolean);
+const synthBand = JUR ? null : (() => {
+  const tppRowsSynth22 = tppRowsSynth.map((r) => ({ ...r, x: r.x + (ONP_FLOW_2022 - FLOW.onp) * r.onp }));
+  const synth22Effect = houseEffectsFor(tppRowsSynth22);
+  const agg2ppSynth22 = MONTHS.map((ym) => {
+    const r = monthWithSe(tppRowsSynth22, synth22Effect, ym);
+    if (!r) return null;
+    return { ym, x: mx(ym), alp: r1(r.v), lnp: r1(100 - r.v), ci95: r1(1.96 * r.se), k: r.n };
+  }).filter(Boolean);
+  const sensElec22 = impliedAlp2pp(ELECTION) + (ONP_FLOW_2022 - FLOW.onp) * ELECTION.onp;
+  agg2ppSynth22.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(sensElec22), lnp: r1(100 - sensElec22), ci95: 0, k: 0, election: true });
+  if (KF) {                                 // the sensitivity edge, built as the line it brackets
+    const kf = kfSeries(tppRowsSynth22, "imp", sensElec22);
+    if (kf) agg2ppSynth22.splice(1, Infinity, ...kfMonths(kf).map((m) => ({ ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k })));
+  }
+  // lo/hi per month; the 2022 share sends ONP further ALP-side, so 22 ≥ 25
+  // month for month and min/max only guards a rounding tie
+  return agg2ppSynth.map((m) => {
+    const alt = agg2ppSynth22.find((a) => a.ym === m.ym);
+    return alt ? { ym: m.ym, x: m.x, lo: Math.min(m.alp, alt.alp), hi: Math.max(m.alp, alt.alp) } : null;
+  }).filter(Boolean);
+})();
 
 /* ---- 1d. monthly implied ALP–ON (same estimator, the ALP-v-ON table) ----
    §1b's machinery once more, on tppRowsSynthOn and its own house effects –
@@ -2561,6 +2571,7 @@ const softAgeWaves = POLLS.filter((p) => p.softAge).sort((a, b) => (a.date < b.d
 const softAgePooled = (ws) => Object.fromEntries(Object.keys(AGE_SHARE).map((k) => {
   let sn = 0, snv = 0;
   for (const w of ws) { sn += w.n[k]; snv += w.n[k] * w.soft[k]; }
+  if (!sn) return [k, { v: null, ci95: null, n: 0 }];
   const v = snv / sn, q = v / 100;
   return [k, { v: r1(v), ci95: r1(196 * Math.sqrt(q * (1 - q) / sn)), n: Math.round(sn) }];
 }));
@@ -5463,7 +5474,10 @@ const primaryOrder = (() => {
    that join no aggregate. On 12 Oct 2026 DemosAU's quarterly MRP,
    published that morning, set the stamp to "today" while the name stayed
    on the Newspoll from the night before. */
-const NEWEST_PUB = POLLS.reduce((b, p) => ((p.published || p.date) > (b ? b.published || b.date : "") ? p : b), null);
+/* The >= tie-break keeps the LAST same-day row (POLLS walks oldest first),
+   not the first: two houses publishing together, the masthead names the
+   one with the fresher fieldwork rather than an arbitrary earlier entry. */
+const NEWEST_PUB = POLLS.reduce((b, p) => ((p.published || p.date) >= (b ? b.published || b.date : "") ? p : b), null);
 
 const latest = {
   alp2pp: hlNow.alp, lnp2pp: r1(100 - hlNow.alp),
@@ -7403,7 +7417,9 @@ console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSyn
 console.log("synthOn:", agg2ppSynthOn.length, "pts | no anchor (no ALP–ON count exists) | last:", agg2ppSynthOn[agg2ppSynthOn.length - 1]);
 if (KF) console.log("kalman trend (smoothness per series; a refit is a hand call):\n  " + kfLog.join("\n  "));
 console.log("synthLatest:", synthNow ? `ALP ${synthNow.alp} (n=${synthNow.n}, se=${synthNow.se.toFixed(2)}) vs published ${hlNow.alp} → Δ${r1(synthNow.alp - hlNow.alp)}` : "none (window empty)");
-console.log("flowSens:", synthBand.length, "pts | bracket at election:", synthBand[0].lo + "–" + synthBand[0].hi, "| last month:", (synthBand[synthBand.length - 1].lo) + "–" + (synthBand[synthBand.length - 1].hi), `(width ${r1(synthBand[synthBand.length - 1].hi - synthBand[synthBand.length - 1].lo)}pt)`);
+console.log("flowSens:", synthBand
+  ? `${synthBand.length} pts | bracket at election: ${synthBand[0].lo}–${synthBand[0].hi} | last month: ${synthBand[synthBand.length - 1].lo}–${synthBand[synthBand.length - 1].hi} (width ${r1(synthBand[synthBand.length - 1].hi - synthBand[synthBand.length - 1].lo)}pt)`
+  : "null (federal-only sensitivity; jurisdiction build)");
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);
 console.log("primaryNow:", primaryNow ? PRIMARY_KEYS.map((k) => `${k} ${primaryNow[k]}`).join(" ") : "null (empty window)", primaryNow ? `| n=${primaryNow.n}${primaryNow.rescaled ? ", rescaled" : ""}` : "");
 console.log("onImp: ALP v ON first-principles implied:", onImp ? `${onImp.a}–${onImp.b} ± ${onImp.ci95} (sampling ${onImp.cs ?? "–"}, flows ${onImp.band}; n=${onImp.n})` : "null (empty window)");

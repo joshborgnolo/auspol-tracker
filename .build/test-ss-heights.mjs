@@ -52,13 +52,13 @@ const tpl = read(path.join(".build", "newtracker", "template.html"));
 {
   assert.ok(tpl.includes("body.js #root { min-height: calc(100vh - 252px); }"),
     "the document never drops below the window (240+12 band)");
-  assert.ok(tpl.includes("body.js #root { min-height: calc(100vh - 198px); }"),
-    "the 640px rung follows the shorter band (190+8)");
+  assert.ok(tpl.includes("body.js #root { min-height: calc(100vh - 198px); min-height: calc(100dvh - 198px); }"),
+    "the 640px rung follows the shorter band (190+8, vh + dvh twin)");
   {
     // the 198px companion must sit INSIDE a @media (max-width: 640px) block:
     // walking from the block's own open brace to the rule, every other rule
     // is balanced, leaving exactly the media block's brace unclosed
-    const rule = tpl.indexOf("body.js #root { min-height: calc(100vh - 198px); }");
+    const rule = tpl.indexOf("body.js #root { min-height: calc(100vh - 198px); min-height: calc(100dvh - 198px); }");
     const media = tpl.lastIndexOf("@media (max-width: 640px) {", rule);
     assert.ok(media >= 0, "a 640px media block opens before the 198px rule");
     const inside = tpl.slice(tpl.indexOf("{", media) + 1, rule);

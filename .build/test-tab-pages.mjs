@@ -196,4 +196,15 @@ assert.ok(views.includes("if (e.detail) e.currentTarget.blur();"),
 assert.ok(views.includes('if (e.key === " " || e.key === "Spacebar")'),
   "Space activates a tab like a native link's");
 
+/* the satellites' own history writes follow the same rule: /prediction/'s
+   archived-read deep link writes a hash through history.replaceState, and
+   an unwrapped write throws SecurityError under file:// in Safari. Strip
+   the allowed try/catch-wrapped calls, then any bare one left is a bug. */
+{
+  const predSrc = read(path.join(".build", "refresh-prediction.mjs"));
+  const unwrapped = predSrc.replace(/try\s*\{\s*history\.(?:pushState|replaceState)\(/g, "");
+  assert.ok(!/history\.(?:pushState|replaceState)\(/.test(unwrapped),
+    "refresh-prediction.mjs: every history write rides a try/catch");
+}
+
 console.log(`PASS: tab pages – ${TABS.length + 1} federal documents, Vic's set, the ☰ menu, sitemap + SITE_FILES, path routing, hash aliases, search carried`);

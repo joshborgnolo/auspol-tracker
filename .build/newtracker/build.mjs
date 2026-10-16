@@ -458,15 +458,23 @@ function buildFavicon() {
    (synthLatest) where it exists - the pollsters' own respondent-allocated
    figures ride along in .pub for the static article's own pair (its ss-lead
    states both, labelled). */
-const headlineView = (L, S) => (S && S.alp != null)
-  ? { ...L,
-      alp2pp: S.alp, lnp2pp: S.lnp, alp2ppCi95: S.ci95, alp2ppNEff: S.nEff,
-      alp2ppPrev: S.prev != null ? S.prev : L.alp2ppPrev, changeSig: S.changeSig,
-      method: { ...L.method, nPolls: S.n },
-      basis: "imp",
-      pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } }
-  : { ...L, basis: "pub",
-      pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } };
+const headlineView = (L, S) => {
+  const v = (S && S.alp != null)
+    ? { ...L,
+        alp2pp: S.alp, lnp2pp: S.lnp, alp2ppCi95: S.ci95, alp2ppNEff: S.nEff,
+        alp2ppPrev: S.prev != null ? S.prev : L.alp2ppPrev, changeSig: S.changeSig,
+        method: { ...L.method, nPolls: S.n },
+        basis: "imp",
+        pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } }
+    : { ...L, basis: "pub",
+        pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } };
+  /* Fail closed on a missing interval: downstream interpolations print it
+     raw ("±null" into the meta description) or crash mid-template
+     (toFixed on null), and only some of them do the noisier thing. */
+  if (v.alp2ppCi95 == null)
+    throw new Error("headline interval missing: alp2ppCi95 is null (basis " + v.basis + ")");
+  return v;
+};
 
 function grabLatest() {
   const src = fs.readFileSync(DA(DATASET), "utf8");
@@ -1334,12 +1342,16 @@ const cardAlt = cardStamp && cardStamp !== dataStamp && cardFigsDrawn
    quoting the leading contest (the cardAlt above follows the card). */
 const hl = grabLatest();
 const JV = VIC ? DATA.jurisdiction : null;
+/* "As of" is the newest poll's PUBLICATION day (the same date make-card
+   prints and cardAlt quotes), not the fieldwork end the hero shows: an
+   embed that showed the fieldwork end beside the card would read a day
+   stale. */
 const metaDesc = VIC
   ? `${JV.brand} tracker averages every published ${JV.adj} state opinion poll. `
-    + `As of ${hl.updated}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
+    + `As of ${hl.published}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
     + `from ${hl.pollsTracked} polls by ${hl.housesTracked} pollsters. Election day: ${hl.nextElectionDue}.`
   : `auspol tracker averages every published Australian federal opinion poll. `
-  + `As of ${hl.updated}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
+  + `As of ${hl.published}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
   + `from ${hl.pollsTracked} polls by ${hl.housesTracked} pollsters. `
   + `Primary votes, every poll, and the last ${pastCycleWord()} elections for comparison.`;
 
@@ -1370,14 +1382,16 @@ const websiteJsonLd = `<script type="application/ld+json">${
 /* /vic/ is a document of THIS site, with its own brand name: a WebPage node
    whose isPartOf names the federal WebSite, so crawlers file Vicpol under
    auspol tracker rather than inventing a second site. Reuses JV (defined
-   beside metaDesc) so the words can't drift. */
-const vicPageJsonLd = VIC ? `<script type="application/ld+json">${
+   beside metaDesc) so the words can't drift. A GENERATOR, not one block:
+   every tab document swaps its own name/url/desc in beside its canonical,
+   or all six pages would claim the root page's identity. */
+const vicPageJsonLdFor = (name, url, desc) => `<script type="application/ld+json">${
   JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `${JV.brand} tracker – ${JV.electionWords} election polling`,
-    url: PAGE_URL,
-    description: metaDesc,
+    name,
+    url,
+    description: desc,
     inLanguage: "en-AU",
     isPartOf: { "@type": "WebSite", name: "auspol tracker", url: SITE_URL },
     publisher: {
@@ -1386,7 +1400,9 @@ const vicPageJsonLd = VIC ? `<script type="application/ld+json">${
       url: SITE_URL,
     },
   }).replace(/</g, "\\u003c")
-}</script>` : "";
+}</script>`;
+const vicPageJsonLd = VIC
+  ? vicPageJsonLdFor(`${JV.brand} tracker – ${JV.electionWords} election polling`, PAGE_URL, metaDesc) : "";
 
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any
    title candidate whose text equals og:site_name when og:title exists (its
@@ -1554,6 +1570,10 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       .replace(`<link rel="canonical" href="${PAGE_URL}">`, `<link rel="canonical" href="${url}">`)
       .replace(/<article class="static-summary">[\s\S]*?<\/article>/, () => buildTabSummary(t.id))
       .replace("<script>window.AP_CYCLE_SRC=", `<script>window.AP_INITIAL_TAB=${JSON.stringify(t.id)};<\/script>\n  <script>window.AP_CYCLE_SRC=`);
+    /* the WebPage JSON-LD must name THIS document, not the root page */
+    if (VIC) doc = doc.replace(
+      /<script type="application\/ld\+json">\{"@context":"https:\/\/schema\.org","@type":"WebPage"[\s\S]*?<\/script>/,
+      () => vicPageJsonLdFor(`${BRAND} tracker – ${t.label}`, url, t.desc));
     if (!VIC) doc = doc.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/');
     fs.mkdirSync(path.join(BASE_DIR, t.id), { recursive: true });
     writeAtomic(path.join(BASE_DIR, t.id, "index.html"), doc);
@@ -1755,11 +1775,9 @@ writeAtomic(path.join(ROOT, "feed.xml"), feed);
    A single-page site is trivially mappable, but a crawler still has to learn
    the page exists and when it last changed. The sitemap carries the one
    canonical URL with the data date as lastmod; robots.txt points crawlers at
-   it. auspol-polling.html belongs in neither: its noindex meta is the honest
-   signal, and a Disallow would hide that meta from the crawler. Both files
-   key off SITE_URL, so a future CNAME moves them for free – and robots.txt
-   is inert at a github.io project path (only the host-root file is honoured)
-   precisely until one exists. */
+   it. Both files key off SITE_URL, so a future CNAME moves them for free –
+   and robots.txt is inert at a github.io project path (only the host-root
+   file is honoured) precisely until one exists. */
 /* The hand-maintained poll archives were first added by editing this OUTPUT
    file, so every rebuild dropped them again; they live here now. Their
    lastmod is a fixed date — the build can't know when those pages last
@@ -1771,6 +1789,14 @@ const ARCHIVE_STAMP = "2026-10-11";
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
 const PREDICTION_STAMP = "2026-10-16";
+/* Tab pages are born the day the build first emits them; a page younger
+   than the data it carries must not be dated before it existed, so their
+   lastmod is the later of the go-live stamp and the data stamp (the
+   VIC_STAMP pattern below). Bump yours when a new tab page ships. */
+const TAB_STAMP = { cycles: "2026-10-11", allpolls: "2026-10-11", info: "2026-10-11",
+  disagreement: "2026-10-15", leans: "2026-10-15", flows: "2026-10-15",
+  "flows-explained": "2026-10-15", changelog: "2026-10-12" };
+const tabLastmod = (id) => (TAB_STAMP[id] || "") > dataStamp ? TAB_STAMP[id] : dataStamp;
 /* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
    dated as this page is, by its data – the newest Victorian poll's
    fieldwork end – or by the rebuild onto this page's code, 2026-10-05,
@@ -1806,38 +1832,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <loc>${SITE_URL}</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
-  <url>
-    <loc>${SITE_URL}cycles/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}allpolls/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}info/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}disagreement/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}leans/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}flows/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}flows-explained/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
-  <url>
-    <loc>${SITE_URL}changelog/</loc>
-    <lastmod>${dataStamp}</lastmod>
-  </url>
+${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "changelog"].map((id) => `  <url>
+    <loc>${SITE_URL}${id}/</loc>
+    <lastmod>${tabLastmod(id)}</lastmod>
+  </url>`).join("\n")}
   <url>
     <loc>${SITE_URL}archives/newspoll/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>

@@ -308,7 +308,7 @@ const PRED_DATA = ${embedJson};
       if (rec.asOf !== latest.asOf) { stale.hidden = false; stale.textContent = "Archived read — the latest (" + latest.sl + ") puts re-election at " + latest.s.fig + "%."; }
       else stale.hidden = true;
     }
-    if (window.history && history.replaceState) history.replaceState(null, "", "#" + rec.asOf);
+    if (window.history && history.replaceState) try { history.replaceState(null, "", "#" + rec.asOf); } catch (e) { /* hash-only deep link is a nicety – file:// Safari throws SecurityError, and the URL must never veto the state */ }
   }
   sel.addEventListener("change", function () { var r = find(sel.value); if (r) apply(r); });
   if (location.hash.length > 5) { var r = find(location.hash.slice(1)); if (r) { sel.value = r.asOf; apply(r); } }
@@ -316,7 +316,7 @@ const PRED_DATA = ${embedJson};
 </script>`;
 
 const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

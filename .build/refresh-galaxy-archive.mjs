@@ -91,7 +91,7 @@ ${rows.map((r) => `    <li><a href="${esc(r.wayback_url)}">${esc(r.slug)}</a><sp
 }).filter(Boolean).join("\n\n");
 
 const page = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

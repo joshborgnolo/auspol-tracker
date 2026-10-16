@@ -117,7 +117,7 @@ const firmRows = [...byFirm.entries()].sort((a, b) => b[1].n - a[1].n)
 const decadeLinks = decades.map((d) => `<a href="#d${d.slice(0, 4)}">${d}</a>`).join(", ");
 
 const page = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
