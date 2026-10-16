@@ -4173,12 +4173,17 @@ body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wr
 body.rd .rd-chips-row { margin-top: 12px; }
 body.rd .rd-wv-dots { margin-top: 20px; font-variant-numeric: tabular-nums; }
 body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis {
-  display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; align-items: center;
+  display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 70px; column-gap: 16px; align-items: center;
 }
 body.rd .rd-wv-set + .rd-wv-set { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-wv-sethead b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
+body.rd .rd-wv-bands { display: block; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
+body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
+body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
+body.rd .rd-wv-band:not(:last-child)::after { content: ";"; color: var(--ink-4); }
+body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
@@ -4186,11 +4191,22 @@ body.rd .rd-wv-row { min-height: 40px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
+body.rd .rd-wv-born.cuts { white-space: normal; line-height: 1.55; text-align: left; }
+body.rd .rd-wv-born .rd-wv-cin { white-space: nowrap; }
+body.rd .rd-wv-born .rd-wv-hh { display: none; }
+@media (max-width: 640px) {
+  body.rd .rd-wv-born .rd-wv-bf { display: none; }
+  body.rd .rd-wv-born .rd-wv-hh { display: inline; }
+  body.rd .rd-wv-born.cuts.on { margin-left: 0; }
+}
+@media (max-width: 560px) {
+  body.rd .rd-wv-born .rd-wv-iw { display: none; }
+}
 body.rd .rd-wv-track { position: relative; height: 36px; }
 body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
 body.rd .rd-wv-plot { position: relative; }
-body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
+body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
 body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
 body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; transform: translateX(calc(var(--x) * 1cqw - 0.75px)); z-index: 1;
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }
@@ -4245,6 +4261,11 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
 @media (max-width: 359px) { body.rd .rd-wv-tabs .rd-tab { padding: 0 4px !important; } }
 @media (max-width: 640px) {
   body.rd .rd-wv-tabs .rd-tab { padding: 0 8px; font-size: 14px; }
+  body.rd .rd-wv-tabs > div[role="group"] {
+    min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none; padding-bottom: 1px; margin-bottom: -1px;
+  }
+  body.rd .rd-wv-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
   body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
   body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
   body.rd .rd-wv-vs { grid-column: 3; grid-row: 1; }
@@ -11984,6 +12005,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   };
   const directionNow = null;
   const demographics = null;
+  const demoIncome = null;
   const demoTrend = null;
   const demoStateElection = {
     "x": 2025.375,
@@ -12009,7 +12031,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }
   };
   const issues = null;
-  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired"];
+  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired", "Lower earners (bottom 50%)", "Higher earners (top 15%)"];
   const accuracy = null;
   const extAgg = {
     "bt": null,
@@ -20971,6 +20993,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     onSources,
     switchFlows,
     demographics,
+    demoIncome,
     demoTrend,
     demoStateElection,
     demoLocElection,
@@ -28212,7 +28235,9 @@ const DEMO_WHO = {
   "Other language": "voters who speak another language at home",
   "Full time": "full-time workers",
   "Part time": "part-time workers",
-  Retired: "retirees"
+  Retired: "retirees",
+  "Lower earners (bottom 50%)": "lower earners",
+  "Higher earners (top 15%)": "higher earners"
 };
 const DEMO_SET_WORDS = {
   age: {
@@ -28266,6 +28291,12 @@ const DEMO_SET_WORDS = {
     others: "voters of other work statuses",
     step: null,
     one: "work-status group"
+  },
+  income: {
+    all: "earner bands",
+    others: "higher earners",
+    step: null,
+    one: "earner band"
   }
 };
 const DEMO_VOTE_FOR = {
@@ -37935,7 +37966,8 @@ function infoTerms(D) {
     location: "location",
     housing: "housing",
     language: "language at home",
-    working: "work status"
+    working: "work status",
+    income: "income"
   };
   const demoSets = ids => {
     const n = ids.map(id => DEMO_SET_NAME[id] || id);
@@ -37954,7 +37986,9 @@ function infoTerms(D) {
     className: "info-work info-work-list"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Groups"), React.createElement("th", null, "Pollsters"))), React.createElement("tbody", null, DEMO.roster.flatMap(r => r.lines.map((l, i) => React.createElement("tr", {
     key: r.id + i
-  }, React.createElement("td", null, r.lines.length > 1 ? r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase()) + ": " + l.groups.join(", ") : r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase())), React.createElement("td", null, l.houses.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))))))), React.createElement("p", {
+  }, React.createElement("td", null, r.lines.length > 1 ? r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase()) + ": " + l.groups.join(", ") : r.label.replace(/^By /, "").replace(/^./, c => c.toUpperCase())), React.createElement("td", null, l.houses.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))))), D.demoIncome ? React.createElement("tr", {
+    key: "income"
+  }, React.createElement("td", null, "Income"), React.createElement("td", null, D.demoIncome.roster.map(h => DEMO_ROSTER_NAME[h] || h).join(", "))) : null)), React.createElement("p", {
     className: "info-work-note"
   }, "Every pollster whose polls have counted for each group this term, most polls first.")) : null;
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? React.createElement("div", {
@@ -38311,9 +38345,9 @@ function infoTerms(D) {
     nav: "Who votes",
     lead: {
       id: "vote-by-group",
-      body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, the language they speak at home, and whether they work full time, part time or are retired.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How each group says it will vote, from the tables pollsters publish with their polls: men and women, age groups, generations, education levels, states, where people live, whether they own or rent, the language they speak at home, whether they work full time, part time or are retired, and how much they earn.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where."), React.createElement("span", {
+      }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls and added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean. The charts follow each group month by month, built the same way, as a percentage above or below all voters. Groups pool only where pollsters cut the population the same way; the working lists which count where. Income is treated differently. Because no two pollsters draw the same income brackets, the Income tab places each bracket where it sits in the electorate \u2013 an under-$50k cut is roughly the poorest quarter, from the census income distribution \u2013 and fits each poll a line through its brackets, each weighted by how many voters it holds. Every poll is read at the same two bands, the bottom half and the top 15% plus, and those reads become gaps against its own total, like any other group\u2019s. The note by the chart names each house\u2019s own end brackets."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Reading a gap."), " Each figure carries its", " ", xref("interval", "who votes for whom", "95% margin"), ", usually 2 to 5 points, with each poll\u2019s sample for a group estimated from the group\u2019s share of adults (18\u201334s are about 28%). The sentences call a difference ", xref("significance", "who votes for whom", "significant"), " ", "only when it passes that test, with the bar raised when three or more groups are compared. They report what passes: a steady rise or fall across ordered groups such as age (only when every step passes), one group apart from the others, or failing those, the largest gap that passes. If no two groups differ, they name any group that sits clear of all voters by more than its margin, and only if none does, no difference."), React.createElement("span", {
         className: "info-p"
@@ -44207,7 +44241,10 @@ function RdPrimary({
   const xDomain = rangeDomain(rangeId);
   const narrow = useNarrow(MQ_PHONE);
   const [hidden, setHidden] = useState({});
-  const T = D.demographics;
+  const T = D.demographics && D.demoIncome ? {
+    ...D.demographics,
+    tabs: [...D.demographics.tabs, D.demoIncome]
+  } : D.demographics;
   const [grpId, setGrpId] = useState("");
   const sel = (() => {
     if (!grpId || !T || !T.tabs) return null;
@@ -44717,7 +44754,7 @@ function RdPrimary({
     copy: {
       title: "First-preference vote for each party" + (G ? ", " + sel.who : ""),
       sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
-      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "") + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
@@ -44736,7 +44773,7 @@ function RdPrimary({
     openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
   })), G && React.createElement("p", {
     className: "rd-note"
-  }, "Each dot is one poll\u2019s reading of ", sel.who, " less that poll\u2019s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll\u2019s in All polls\u2019 Demographics view."), React.createElement(RdKey, {
+  }, "Each dot is one poll\u2019s reading of ", sel.who, " less that poll\u2019s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll\u2019s in All polls\u2019 Demographics view.", sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : ""), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "dot",
@@ -46475,7 +46512,9 @@ const RD_DEMO_SHORT = {
   "Other language": "voters who speak another language at home",
   "Full time": "full-time workers",
   "Part time": "part-time workers",
-  Retired: "retirees"
+  Retired: "retirees",
+  "Lower earners (bottom 50%)": "lower earners (bottom 50%)",
+  "Higher earners (top 15%)": "higher earners (top 15%)"
 };
 const RD_DEMO_SUBJ = {
   onp: "One Nation voters",
@@ -46776,6 +46815,10 @@ function rdDemoDek(T, tab, party) {
       out.push(rdCap(pVote) + " is much the same across " + (words.all || "these groups") + ".", rdCap(rdFraction(all)) + (pair2 ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + ".");
     }
   });
+  if (tab.id === "income") {
+    const nt = tab.sets[0] && tab.sets[0].note;
+    if (nt) out.push(rdCap(nt) + ".");
+  }
   if (tab.id === "age") {
     const gs = tab.sets.flatMap(s => s.groups);
     for (const [gen, band] of Object.entries(RD_DEMO_IN_BAND)) {
@@ -46817,6 +46860,38 @@ function RdGenBorn({
     },
     onClick: () => setTapped(v => !v)
   }, "(", asYears ? born[0] + "–" + born[1] : "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]), ")");
+}
+const RD_INCOME_REST = ["top 15%", "bottom 50%"];
+const RD_INCOME_OP = ["≥", "≤"];
+function RdIncomeCut({
+  pct,
+  cuts
+}) {
+  const [hover, setHover] = useState(false);
+  const [tapped, setTapped] = useState(false);
+  const asCuts = hover || tapped;
+  return React.createElement("button", {
+    type: "button",
+    className: "rd-wv-born cuts" + (asCuts ? " on" : ""),
+    "aria-pressed": asCuts,
+    "aria-label": "the " + RD_INCOME_REST[pct] + " of the electorate, shows the income cut-offs",
+    onPointerEnter: e => {
+      if (e.pointerType === "mouse") setHover(true);
+    },
+    onPointerLeave: e => {
+      if (e.pointerType === "mouse") setHover(false);
+    },
+    onClick: () => setTapped(v => !v)
+  }, "(", asCuts ? cuts.flatMap((c, i) => (i ? ["; "] : []).concat([React.createElement("span", {
+    className: "rd-wv-cin",
+    key: c.basis
+  }, React.createElement("span", {
+    className: "rd-wv-bf"
+  }, c.basis), React.createElement("span", {
+    className: "rd-wv-hh"
+  }, c.basis === "household" ? "HH" : c.basis), React.createElement("span", {
+    className: "rd-wv-iw"
+  }, " income"), " ", RD_INCOME_OP[pct], " ", "$" + c.ots + ",000")])) : RD_INCOME_REST[pct], ")");
 }
 const RUG_PICK_MOUSE = 11,
   RUG_PICK_TOUCH = 22;
@@ -47453,7 +47528,11 @@ function RdDemographics({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const T = D.demographics;
+  const Tdemo = D.demographics;
+  const T = Tdemo && D.demoIncome ? {
+    ...Tdemo,
+    tabs: [...Tdemo.tabs, D.demoIncome]
+  } : Tdemo;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
   const [partyMorph, chooseParty] = window.AP.useMorph(party, v => setParty(v), (a, b) => a !== b);
@@ -47567,10 +47646,10 @@ function RdDemographics({
   const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const story = {
-    head: rdDemoHead(T, party).head,
+    head: rdDemoHead(Tdemo, party).head,
     dek: rdDemoDek(T, tab, party)
   };
-  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], T, party);
+  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
   const sgn1 = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
   const sigSets = (() => {
     const dt = D.demoTrend && D.demoTrend[party];
@@ -47631,9 +47710,12 @@ function RdDemographics({
       role: "cell",
       className: "rd-wv-lab",
       title: rowTitle
-    }, g.label, React.createElement(RdGenBorn, {
+    }, g.bare || g.label, React.createElement(RdGenBorn, {
       label: g.label
-    })), React.createElement("span", {
+    }), g.cuts && g.cuts.length ? React.createElement(RdIncomeCut, {
+      pct: g.pct,
+      cuts: g.cuts
+    }) : null), React.createElement("span", {
       className: "rd-wv-track"
     }, React.createElement("span", {
       className: "rd-wv-all",
@@ -48238,7 +48320,15 @@ function RdDemographics({
     }]
   }, React.createElement("span", {
     className: "rd-key-item rd-wv-keytxt"
-  }, "Right-hand column: difference from all voters, in points"))), shift && React.createElement(RdSub, {
+  }, "Right-hand column: difference from all voters, in points")), tab.sets.some(st => st.bands) ? React.createElement("div", {
+    className: "rd-wv-bands"
+  }, tab.sets.flatMap(st => st.bands ? st.houses.filter(h => st.bands[h]).map(h => ({
+    h,
+    b: st.bands[h]
+  })) : []).map(x => React.createElement("span", {
+    className: "rd-wv-band",
+    key: x.h
+  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true
