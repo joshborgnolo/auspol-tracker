@@ -248,6 +248,9 @@ ok("the bands pill lists every in-window house",
   ok("DemosAU's pill stipulates personal income",
      pill.some((t) => t.includes("DemosAU") && /\((personal) income\)/.test(t)) || !wantHouses.includes("DemosAU"),
      pill.join(" ‖ "));
+  ok("each pill is a colon-led clause of compact < / ≥ brackets, never spelled out",
+     pill.every((t) => /\((?:household|personal) income\): </.test(t) && t.includes("· ≥") && !/\bUnder\b|or more|\+/.test(t)),
+     pill.join(" ‖ "));
   ok("the pill's bracket lists separate with a middot, never a semicolon",
      pill.every((t) => !t.includes(";") && t.includes("·")), pill.join(" ‖ "));
 }

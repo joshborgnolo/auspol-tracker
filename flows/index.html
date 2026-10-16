@@ -41096,18 +41096,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "note": "each house's own brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
       "bands": {
         "YouGov": {
-          "low": ["Under $100k"],
-          "high": ["$100k or more"],
+          "low": ["< $100k"],
+          "high": ["≥ $100k"],
           "basis": "household"
         },
         "Newspoll (pooled)": {
-          "low": ["Under $50k"],
-          "high": ["$150k+"],
+          "low": ["< $50k"],
+          "high": ["≥ $150k"],
           "basis": "household"
         },
         "DemosAU": {
-          "low": ["Under $45k"],
-          "high": ["$125k+"],
+          "low": ["< $45k"],
+          "high": ["≥ $125k"],
           "basis": "personal"
         }
       },
@@ -115583,7 +115583,7 @@ function RdDemographics({
   })) : []).map(x => React.createElement("span", {
     className: "rd-wv-band",
     key: x.h
-  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
+  }, React.createElement("em", null, demoHouse(x.h)), x.b.basis ? " (" + x.b.basis + " income)" : null, ": ", x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true

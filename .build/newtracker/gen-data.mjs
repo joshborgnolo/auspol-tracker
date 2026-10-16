@@ -4710,6 +4710,16 @@ const { demo: demographics, income: demoIncome } = (() => {
      or /vic/, whose DEMOGRAPHICS load already nulls). The roster's a
      one-line entry under the panel's own working. */
   let income = null;
+  /* a bracket label in the pill's compact clause form, never the house's
+     spelled-out grid key: "Under $100k" → "< $100k", "$150k+"/"$3,000+
+     a week"/"$100k or more" → "≥ $150k"/"≥ $3,000 a week"/"≥ $100k" */
+  const bandLabel = (s) => {
+    const m = String(s);
+    if (/^Under\s+/i.test(m)) return "< " + m.replace(/^Under\s+/i, "");
+    if (/\s+or more$/i.test(m)) return "≥ " + m.replace(/\s+or more$/i, "");
+    if (/^(\$[\d,]+k?)\+(\s|$)/.test(m)) return "≥ " + m.replace(/^(\$[\d,]+k?)\+/, "$1");
+    return m;
+  };
   {
     const iSets = demoBuild(iRows, iRowsM, [{ id: "income", label: null, groups: INCOME_STD_BANDS.map((b) => b.group) }], allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
     if (iSets.length) {
@@ -4726,12 +4736,14 @@ const { demo: demographics, income: demoIncome } = (() => {
           note: "each house's own brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
           /* each house's own end brackets as its newest in-window wave
              printed them (incInWindow rides newest-first), so a switch of
-             layout era never shows the stale era's brackets – with the
-             house's income basis beside them, since a personal-income
-             bracket and a household one are not the same money */
+             layout era never shows the stale era's brackets – compacted
+             for the clause form the pill renders (bandLabel: "Under $X"
+             → "< $X", "$X+"/"$X or more" → "≥ $X"), with the house's
+             income basis beside them, since a personal-income bracket
+             and a household one are not the same money */
           bands: Object.fromEntries(incInWindow.filter((e) => e.band)
             .filter((e, i, a) => a.findIndex((x) => x.w.pollster === e.w.pollster) === i)
-            .map((e) => [e.w.pollster, { low: [e.band[0]], high: [e.band[1]], basis: INCOME_GRIDS[e.w.pollster].basis }])),
+            .map((e) => [e.w.pollster, { low: [bandLabel(e.band[0])], high: [bandLabel(e.band[1])], basis: INCOME_GRIDS[e.w.pollster].basis }])),
           groups: iSets[0].groups.map((g, gi) => {
             const band = INCOME_STD_BANDS[gi];
             /* the income cut-offs behind the row label's parenthetical
