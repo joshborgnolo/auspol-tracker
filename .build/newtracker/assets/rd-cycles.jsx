@@ -430,13 +430,15 @@ function RdCsUnroll({ className, style, children }) {
 }
 
 /* ---- the tab --------------------------------------------------------------- */
-/* The section foot's caveat links "little", "no" and "predictive" each to
-   the source that backs that word (the owner's 2026-10-15 ask): Bonham on
-   preferred-PM scores (no evidence they predict anything better) on "no",
-   Ben Raue in the Guardian (satisfaction ratings have "limited predictive
-   value"), and Armarium Interreta's test, which found approval
-   ratings add "little, if any, predictive value" to a polling average, on
-   "little" - hence "little or no", not "no". A null url leaves its word plain. */
+/* The section foot's caveat links "add", "little" and "no" each to
+   the source that backs that word (the owner's 2026-10-15 ask, the word
+   carrying the Guardian link moved from "predictive" to "add" 2026-10-17):
+   Bonham on preferred-PM scores (no evidence they predict anything better)
+   on "no", Ben Raue in the Guardian (satisfaction ratings have "limited
+   predictive value") on "add", and Armarium Interreta's test, which found
+   approval ratings add "little, if any, predictive value" to a polling
+   average, on "little" - hence "little or no", not "no". A null url leaves
+   its word plain. */
 const RD_CYC_CITES = [
   ["https://kevinbonham.blogspot.com/2012/12/why-preferred-prime-ministerpremier.html", "Kevin Bonham: Why preferred prime minister/premier scores are rubbish"],
   ["https://www.theguardian.com/australia-news/2016/apr/07/personal-popularity-is-no-guarantee-of-poll-success-for-prime-ministers", "Ben Raue, the Guardian: Personal popularity is no guarantee of poll success for prime ministers"],
@@ -662,10 +664,10 @@ function RdPastCycles(p) {
        own plus One Nation's. ink-2 like the combined overlay line - no one
        party owns a sum of two */
     { key: "comb", name: "L/NP + ON combined primary vote", sub: "The Coalition and One Nation, together", group: "votes", color: "var(--ink-2)" },
-    { key: "ppmm", name: "Preferred PM, lead", sub: pm + " over " + oppL, group: "leaders", color: cur.color },
+    { key: "ppmm", name: "Preferred PM vs " + oppL + ", lead", sub: pm + " over " + oppL, group: "leaders", color: cur.color },
     /* the same row stated against Hanson, asked as its own pair this term:
        sits straight under the main preferred-PM row (user call 2026-10-04) */
-    { key: "ppmh", name: "Preferred PM, lead", sub: pm + " over Hanson", group: "leaders", color: cur.color },
+    { key: "ppmh", name: "Preferred PM vs Hanson, lead", sub: pm + " over Hanson", group: "leaders", color: cur.color },
     { key: "net", name: "Prime minister’s net approval", sub: pm, group: "leaders", color: cur.color },
     { key: "oppnet", name: "Opposition leader’s net approval", sub: oppL, group: "leaders", color: D.PARTIES[cur.opp].color },
     { key: "han", name: "Hanson’s net approval", sub: "Pauline Hanson", group: "leaders", color: D.PARTIES.onp.color },
@@ -1402,7 +1404,7 @@ function RdPastCycles(p) {
         {controls}
         {summary}
         <div className="rd-foot">
-          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings add {RD_CYC_CITE("little", 2)} or {RD_CYC_CITE("no", 0)} {RD_CYC_CITE("predictive", 1)} value on top of voting-intention data.</span>
+          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings {RD_CYC_CITE("add", 1)} {RD_CYC_CITE("little", 2)} or {RD_CYC_CITE("no", 0)} predictive value on top of voting-intention data.</span>
           <span className="rd-grow"></span>
           <button type="button" className="rd-how rd-cyc-csv" onClick={exportSource}><DownloadIcon /> Source polls, CSV</button>
           <RdHow term="past-cycles" from="Past cycles" />

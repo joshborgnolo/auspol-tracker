@@ -38184,7 +38184,7 @@ function infoTerms(D) {
     }]
   }, {
     id: "s-switching",
-    title: "Where One Nation’s voters came from",
+    title: "Where One Nation’s voters are coming from",
     nav: "Vote switching",
     lead: {
       id: "vote-switching",
@@ -48277,7 +48277,8 @@ function RdSwitching({
   const GO_NEXT = {
     onp: "lnp",
     lnp: "alp",
-    alp: "onp"
+    alp: "grn",
+    grn: "onp"
   };
   const spaceCyc = React.useRef(null);
   spaceCyc.current = S && S.series.length && S.series.every(sr => sr.rate) ? () => setView(v => GO_NEXT[v !== "onp" && !(S.going || []).some(g => g.id === v) ? "onp" : v]) : null;
@@ -48447,25 +48448,25 @@ function RdSwitching({
   const V = goRow ? view : "onp";
   const GO_COHORT_W = {
     lnp: "2025 Coalition voters",
-    alp: "2025 Labor voters"
+    alp: "2025 Labor voters",
+    grn: "2025 Greens voters"
   };
   const GO_OWN = {
     lnp: "the Coalition",
-    alp: "Labor"
-  };
-  const GO_OTHER = {
-    lnp: "alp",
-    alp: "lnp"
+    alp: "Labor",
+    grn: "the Greens"
   };
   const GO_HALF = {
     lnp: "Coalition",
-    alp: "Labor"
+    alp: "Labor",
+    grn: "Greens"
   };
   const cyc = () => setView(GO_NEXT[V]);
   const GO_HINT = {
     onp: "Tap: where 2025 Coalition voters are going",
     lnp: "Tap: where 2025 Labor voters are going",
-    alp: "Tap: where One Nation's voters came from"
+    alp: "Tap: where 2025 Greens voters are going",
+    grn: "Tap: where One Nation's voters are coming from"
   };
   const cycTitle = (() => {
     const btn = w => React.createElement("button", {
@@ -48477,13 +48478,13 @@ function RdSwitching({
     }, w);
     if (V === "lnp") return React.createElement(React.Fragment, null, "Where ", btn("the Coalition"), "\u2019s voters are going");
     if (V === "alp") return React.createElement(React.Fragment, null, "Where ", btn("Labor"), "\u2019s voters are going");
-    return React.createElement(React.Fragment, null, "Where ", btn("One Nation"), "\u2019s voters came from");
+    if (V === "grn") return React.createElement(React.Fragment, null, "Where ", btn("the Greens"), "\u2019 voters are going");
+    return React.createElement(React.Fragment, null, "Where ", btn("One Nation"), "\u2019s voters are coming from");
   })();
   const goWords = id => {
-    const other = GO_OTHER[V];
     const M = {
       kept: {
-        nm: V === "lnp" ? "The Coalition" : "Labor",
+        nm: V === "lnp" ? "The Coalition" : V === "alp" ? "Labor" : "The Greens",
         noun: GO_OWN[V],
         sd: "the share staying with " + GO_OWN[V],
         color: "var(--" + V + ")",
@@ -48498,13 +48499,21 @@ function RdSwitching({
         tint: "var(--tint-onp)",
         fill: "var(--on-fill-onp)"
       },
-      cross: {
-        nm: V === "lnp" ? "Labor" : "The Coalition",
-        noun: V === "lnp" ? "Labor" : "the Coalition",
-        sd: "the move to " + (V === "lnp" ? "Labor" : "the Coalition"),
-        color: "var(--" + other + ")",
-        tint: "var(--tint-" + other + ")",
-        fill: "var(--on-fill-" + other + ")"
+      alp: {
+        nm: "Labor",
+        noun: "Labor",
+        sd: "the move to Labor",
+        color: "var(--alp)",
+        tint: "var(--tint-alp)",
+        fill: "var(--on-fill-alp)"
+      },
+      lnp: {
+        nm: "The Coalition",
+        noun: "the Coalition",
+        sd: "the move to the Coalition",
+        color: "var(--lnp)",
+        tint: "var(--tint-lnp)",
+        fill: "var(--on-fill-lnp)"
       },
       grn: {
         nm: "The Greens",
@@ -48515,9 +48524,9 @@ function RdSwitching({
         fill: "var(--on-fill-grn)"
       },
       oth: {
-        nm: "Minors & independents",
-        noun: "minor parties or independents",
-        sd: "the move to minors or independents",
+        nm: "Others & independents",
+        noun: "others & independents",
+        sd: "the move to others & independents",
         color: "var(--oth)",
         tint: "var(--tint-oth)",
         fill: "var(--on-fill-oth)"
@@ -48602,7 +48611,7 @@ function RdSwitching({
   const gof = v => v.toFixed(1);
   const GO_GAP = 4,
     GO_H = 240;
-  const goNmOpts = r => r.id === "kept" ? [r.nm + ", kept", r.nm] : r.id === "onp" ? ["One Nation", "ON"] : r.id === "grn" ? ["The Greens", "Greens", ""] : r.id === "oth" ? ["Minors & independents", "Minors", "Others", ""] : r.id === "cross" && V === "alp" ? ["The Coalition", "Coalition", ""] : r.id === "cross" ? ["Labor", ""] : [r.nm];
+  const goNmOpts = r => r.id === "kept" ? [r.nm + ", kept", r.nm] : r.id === "onp" ? ["One Nation", "ON"] : r.id === "grn" ? ["The Greens", "Greens", ""] : r.id === "oth" ? ["Others & independents", "Others", ""] : r.id === "lnp" ? ["The Coalition", "Coalition", ""] : r.id === "alp" ? ["Labor", ""] : [r.nm];
   const goGeo = (() => {
     const tot = goRows.reduce((s, r) => s + r.now.v, 0) || 100;
     const usable = W - GO_GAP * (goRows.length - 1);
@@ -48788,7 +48797,7 @@ function RdSwitching({
       width: r.now.v + "%",
       background: r.color
     }
-  }), r.id === "kept" ? React.createElement("em", {
+  }), r.id === "kept" ? (W * r.now.v / 100 + 8 + textWidth(gof(r.now.v) + "%", 22, 600) + 4 <= W ? React.createElement("em", {
     className: "rd-go-first",
     style: {
       left: "calc(" + r.now.v + "% + 8px)",
@@ -48799,6 +48808,16 @@ function RdSwitching({
   }, gof(r.now.v), "%"), React.createElement("span", {
     className: "rd-go-nb"
   }, "kept")) : React.createElement("em", {
+    className: "rd-go-first",
+    style: {
+      right: "calc(" + (100 - r.now.v) + "% + 8px)",
+      color: r.fill
+    }
+  }, React.createElement("span", {
+    className: "rd-go-big"
+  }, gof(r.now.v), "%"), React.createElement("span", {
+    className: "rd-go-nb"
+  }, "kept"))) : React.createElement("em", {
     style: {
       left: "calc(" + r.now.v + "% + 8px)",
       color: inkOf(r.color)
@@ -48958,7 +48977,11 @@ function RdSwitching({
   }), React.createElement(RdFoot, {
     how: {
       term: "vote-switching",
-      from: V === "lnp" ? "Where the Coalition’s voters are going" : "Where Labor’s voters are going"
+      from: {
+        lnp: "Where the Coalition’s voters are going",
+        alp: "Where Labor’s voters are going",
+        grn: "Where the Greens’ voters are going"
+      }[V]
     }
   }, "2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. Where a house prints an undecided cell for a cohort the row is re-scaled to its decided shares."));
   const GAP = 4,
@@ -49311,7 +49334,7 @@ function RdSwitching({
   }), React.createElement(RdFoot, {
     how: {
       term: "vote-switching",
-      from: "Where One Nation’s voters came from"
+      from: "Where One Nation’s voters are coming from"
     }
   }, "2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. ", narrow ? "Bar heights" : "Column widths", " use the AEC 2025 first-preference result.")) : goSec);
 }
@@ -53867,13 +53890,13 @@ function RdPastCycles(p) {
     color: "var(--ink-2)"
   }, {
     key: "ppmm",
-    name: "Preferred PM, lead",
+    name: "Preferred PM vs " + oppL + ", lead",
     sub: pm + " over " + oppL,
     group: "leaders",
     color: cur.color
   }, {
     key: "ppmh",
-    name: "Preferred PM, lead",
+    name: "Preferred PM vs Hanson, lead",
     sub: pm + " over Hanson",
     group: "leaders",
     color: cur.color
@@ -54973,7 +54996,7 @@ function RdPastCycles(p) {
     className: "rd-foot"
   }, React.createElement("span", {
     className: "rd-foot-text"
-  }, "Each term is lined up on its own election day, so month ", m, " is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings add ", RD_CYC_CITE("little", 2), " or ", RD_CYC_CITE("no", 0), " ", RD_CYC_CITE("predictive", 1), " value on top of voting-intention data."), React.createElement("span", {
+  }, "Each term is lined up on its own election day, so month ", m, " is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings ", RD_CYC_CITE("add", 1), " ", RD_CYC_CITE("little", 2), " or ", RD_CYC_CITE("no", 0), " predictive value on top of voting-intention data."), React.createElement("span", {
     className: "rd-grow"
   }), React.createElement("button", {
     type: "button",
