@@ -4193,7 +4193,7 @@ body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
 body.rd .rd-wv-band:not(:last-child) .rd-wv-band-r::after { content: ";"; color: var(--ink-4); }
 body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
 @media (max-width: 640px) {
-  body.rd .rd-wv-bands { display: grid; grid-template-columns: max-content auto; row-gap: 8px; }
+  body.rd .rd-wv-bands { display: grid; grid-template-columns: max-content auto; row-gap: 8px; column-gap: 8px; }
   body.rd .rd-wv-band { display: contents; }
 }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
@@ -4203,7 +4203,8 @@ body.rd .rd-wv-row { min-height: 40px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
-body.rd .rd-wv-born.cuts { white-space: normal; line-height: 1.55; text-align: left; }
+body.rd .rd-wv-born.cuts { position: relative; white-space: normal; line-height: 1.55; text-align: left; }
+body.rd .rd-wv-born.cuts.on::before { content: ""; position: absolute; top: -24px; right: 0; bottom: 0; left: 0; }
 body.rd .rd-wv-born .rd-wv-cin { white-space: nowrap; }
 body.rd .rd-wv-born .rd-wv-hh { display: none; }
 @media (max-width: 640px) {

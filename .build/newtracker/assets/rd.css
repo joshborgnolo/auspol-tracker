@@ -1338,7 +1338,7 @@ body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
    flush on one shared x - the inline splice used to wrap mid-clause,
    straddling two lines */
 @media (max-width: 640px) {
-  body.rd .rd-wv-bands { display: grid; grid-template-columns: max-content auto; row-gap: 8px; }
+  body.rd .rd-wv-bands { display: grid; grid-template-columns: max-content auto; row-gap: 8px; column-gap: 8px; }
   body.rd .rd-wv-band { display: contents; }
 }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
@@ -1361,7 +1361,13 @@ body.rd .rd-wv-born.on { color: var(--ink); }
 /* a button's UA text-align is center: with the parenthetical on its own
    line or two on a phone, wrapped clauses otherwise centre at their own
    ragged offsets instead of holding the label's left edge */
-body.rd .rd-wv-born.cuts { white-space: normal; line-height: 1.55; text-align: left; }
+body.rd .rd-wv-born.cuts { position: relative; white-space: normal; line-height: 1.55; text-align: left; }
+/* the expanded cut-offs re-wrap entirely onto the label's next lines, so
+   the button's box lands a label-line below the rest text: a finger still
+   standing where "(bottom 50%)" sat would fall off the button, giving a
+   leave → collapse → re-enter bounce. While expanded the hit area reaches
+   one label line (24px) back up over the rest text's space */
+body.rd .rd-wv-born.cuts.on::before { content: ""; position: absolute; top: -24px; right: 0; bottom: 0; left: 0; }
 body.rd .rd-wv-born .rd-wv-cin { white-space: nowrap; }
 body.rd .rd-wv-born .rd-wv-hh { display: none; }
 @media (max-width: 640px) {
