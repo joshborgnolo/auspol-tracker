@@ -53532,8 +53532,16 @@ const combSeries = c => {
     return c.opp === "lnp" && c.raw.oppr[i] != null && on != null ? +(c.raw.oppr[i] + on).toFixed(2) : null;
   });
 };
-const seriesOf = (c, key) => key === "comb" ? combSeries(c) : c.raw[key] || [];
-const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key);
+const rdHanRead = c => (c.raw.han || []).some(v => v != null);
+const pmleadSeries = c => {
+  const han = c.raw.han || [];
+  return c.raw.months.map((_, i) => {
+    const rival = Math.max(c.raw.oppnet[i] != null ? c.raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
+    return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival).toFixed(2) : null;
+  });
+};
+const seriesOf = (c, key) => key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : c.raw[key] || [];
+const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : key === "pmlead" ? cycBase(c, "net") - (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet")) : cycBase(c, key);
 function rdCycPeers(M, cycles, hidden, chg, m) {
   const hasData = c => seriesOf(c, M.key).some(v => v != null);
   const vals = [];
@@ -53817,7 +53825,15 @@ function RdPastCycles(p) {
     leader: "pm",
     unit: ""
   };
-  const endOfKey = (c, key) => key === "comb" ? c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : c.end[key];
+  Mby.pmlead = {
+    key: "pmlead",
+    leader: "pm",
+    unit: ""
+  };
+  const endOfKey = (c, key) => key === "comb" ? c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : key === "pmlead" ? (() => {
+    const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
+    return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival).toFixed(1) : null;
+  })() : c.end[key];
   const curOfS = (key, c2) => {
     const v = endOfKey(cur, key);
     return v == null ? null : c2 ? v - cycBaseOf(cur, key) : v;
@@ -53833,6 +53849,7 @@ function RdPastCycles(p) {
     oppIn = cur.opp === "lnp" ? "the Coalition" : oppName;
   const pm = sitting(cur.pm),
     oppL = sitting(cur.oppLead);
+  const pmRival = cur.end.han != null && (cur.end.oppnet == null || cur.end.han > cur.end.oppnet) ? "Hanson" : oppL;
   const tppEraNow = cur.raw.tppEras ? cur.raw.tppEras[cur.raw.tppEras.length - 1] : null;
   const rivalWord = tppEraNow && tppEraNow.rival === "alp_on" ? "One Nation" : oppName === "Coalition" ? "the Coalition" : oppName;
   const monthsWord = rdCap(rdNumWord(m)) + " months";
@@ -53918,6 +53935,12 @@ function RdPastCycles(p) {
     sub: "Pauline Hanson",
     group: "leaders",
     color: D.PARTIES.onp.color
+  }, {
+    key: "pmlead",
+    name: "PM net approval, lead",
+    sub: pm + " over " + pmRival,
+    group: "leaders",
+    color: cur.color
   }];
   const rowsForHidden = (hid, c2) => ROW_DEFS.map(r => {
     const peers = peersOfS(r.key, hid, c2);
@@ -54127,7 +54150,8 @@ function RdPastCycles(p) {
     ppmh: "cyc-leaders",
     net: "cyc-leaders",
     oppnet: "cyc-leaders",
-    han: "cyc-leaders"
+    han: "cyc-leaders",
+    pmlead: "cyc-leaders"
   };
   const toggleRow = (key, el) => {
     if (el) rdPinScroll(el, true);

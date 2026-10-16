@@ -311,8 +311,24 @@ const combSeries = (c) => {
     return c.opp === "lnp" && c.raw.oppr[i] != null && on != null ? +(c.raw.oppr[i] + on).toFixed(2) : null;
   });
 };
-const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : (c.raw[key] || []));
-const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key));
+/* The PM's net approval lead over his strongest rival is a summary-table-only
+   measure, derived like the combined primary above it: net approval less the
+   higher of the opposition leader's and Hanson's net at that month. No past
+   term rated Hanson (raw.han null-pads), so every past month is against the
+   opposition leader alone - and her change anchor only joins the max for a
+   term whose sparse series ever read her. */
+const rdHanRead = (c) => (c.raw.han || []).some((v) => v != null);
+const pmleadSeries = (c) => {
+  const han = c.raw.han || [];
+  return c.raw.months.map((_, i) => {
+    const rival = Math.max(c.raw.oppnet[i] != null ? c.raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
+    return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival).toFixed(2) : null;
+  });
+};
+const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : (c.raw[key] || []));
+const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp")
+  : key === "pmlead" ? cycBase(c, "net") - (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet"))
+  : cycBase(c, key));
 /* the past terms at one month for one measure: the same pooled set the band
    draws, with who each value belongs to */
 function rdCycPeers(M, cycles, hidden, chg, m) {
@@ -614,10 +630,20 @@ function RdPastCycles(p) {
      "ppmh" so the now-figure and its change anchor come from the H2H
      series; leader:"pm" keeps the PM named on each past term. */
   Mby.ppmh = { key: "ppmm", leader: "pm", unit: "" };
+  /* the PM's net approval lead over his strongest rival (user call
+     2026-10-17): net less the higher of the opposition leader's and Hanson's
+     net - Hanson only ever figures in the sitting term, derived month by
+     month (pmleadSeries above), so past terms' rival is always the
+     opposition leader. leader:"pm" keeps the PM named on each past term. */
+  Mby.pmlead = { key: "pmlead", leader: "pm", unit: "" };
   /* a half-measured month never becomes a half-total: the combined now
      figure renders a dash when either party's is missing */
   const endOfKey = (c, key) => (key === "comb"
     ? (c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null)
+    : key === "pmlead" ? (() => {
+        const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
+        return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival).toFixed(1) : null;
+      })()
     : c.end[key]);
   const curOfS = (key, c2) => { const v = endOfKey(cur, key); return v == null ? null : (c2 ? v - cycBaseOf(cur, key) : v); };
   const peersOfS = (key, hid, c2) => rdCycPeers(Mby[key], cycles, hid, c2, m);
@@ -628,6 +654,8 @@ function RdPastCycles(p) {
   const govName = D.PARTIES[cur.gov].name, oppName = D.PARTIES[cur.opp].name;
   const govIn = cur.gov === "lnp" ? "the Coalition" : govName, oppIn = cur.opp === "lnp" ? "the Coalition" : oppName;
   const pm = sitting(cur.pm), oppL = sitting(cur.oppLead);
+  /* the stronger rival on the latest readings is who the PM-lead row names */
+  const pmRival = cur.end.han != null && (cur.end.oppnet == null || cur.end.han > cur.end.oppnet) ? "Hanson" : oppL;
   const tppEraNow = cur.raw.tppEras ? cur.raw.tppEras[cur.raw.tppEras.length - 1] : null;
   const rivalWord = tppEraNow && tppEraNow.rival === "alp_on" ? "One Nation" : oppName === "Coalition" ? "the Coalition" : oppName;
   const monthsWord = rdCap(rdNumWord(m)) + " months";
@@ -671,6 +699,10 @@ function RdPastCycles(p) {
     { key: "net", name: "Prime minister’s net approval", sub: pm, group: "leaders", color: cur.color },
     { key: "oppnet", name: "Opposition leader’s net approval", sub: oppL, group: "leaders", color: D.PARTIES[cur.opp].color },
     { key: "han", name: "Hanson’s net approval", sub: "Pauline Hanson", group: "leaders", color: D.PARTIES.onp.color },
+    /* the PM's net approval over his strongest rival - Hanson when she
+       out-rates the opposition leader (user call 2026-10-17: under "Hanson's
+       net approval", "that his net approval over strongest rival") */
+    { key: "pmlead", name: "PM net approval, lead", sub: pm + " over " + pmRival, group: "leaders", color: cur.color },
   ];
   const rowsForHidden = (hid, c2) => ROW_DEFS.map((r) => {
     const peers = peersOfS(r.key, hid, c2);
@@ -887,7 +919,7 @@ function RdPastCycles(p) {
   const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
   /* One Nation and the combined row belong to the primary section: its
      opposition chart draws these very series when its boxes are ticked */
-  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", ppmh: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders" };
+  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", ppmh: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders", pmlead: "cyc-leaders" };
 
   /* ---- a row opened ---------------------------------------------------------------- */
   /* A row opens to every term on its strip, by name and ranked at this
