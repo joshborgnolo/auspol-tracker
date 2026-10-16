@@ -4190,8 +4190,12 @@ body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1
 body.rd .rd-wv-bands { display: block; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
 body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
-body.rd .rd-wv-band:not(:last-child)::after { content: ";"; color: var(--ink-4); }
+body.rd .rd-wv-band:not(:last-child) .rd-wv-band-r::after { content: ";"; color: var(--ink-4); }
 body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
+@media (max-width: 640px) {
+  body.rd .rd-wv-bands { display: grid; grid-template-columns: max-content auto; row-gap: 8px; }
+  body.rd .rd-wv-band { display: contents; }
+}
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
@@ -41892,6 +41896,42 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "a1": 26.37,
         "rel": 0.94,
         "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Lower earners (bottom 50%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": -1.89,
+        "tLR": -2.09,
+        "thin": false,
+        "months": 12,
+        "g0": 35.12,
+        "g1": 25.2,
+        "a0": 35.02,
+        "a1": 26.36,
+        "rel": -1.26,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Higher earners (top 15%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": 1,
+        "tAbs": 0.34,
+        "tLR": 0.78,
+        "thin": false,
+        "months": 12,
+        "g0": 36.81,
+        "g1": 28.48,
+        "a0": 35.03,
+        "a1": 26.32,
+        "rel": 0.38,
+        "sig": false
       }]
     },
     "lnp": {
@@ -42567,6 +42607,42 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "a1": 19.27,
         "rel": 0.66,
         "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Lower earners (bottom 50%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": 0.74,
+        "tLR": -0.1,
+        "thin": false,
+        "months": 12,
+        "g0": 26.08,
+        "g1": 18.3,
+        "a0": 28.08,
+        "a1": 19.75,
+        "rel": 0.55,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Higher earners (top 15%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": 1,
+        "tAbs": -0.16,
+        "tLR": 0.25,
+        "thin": false,
+        "months": 12,
+        "g0": 30.84,
+        "g1": 22.53,
+        "a0": 27.95,
+        "a1": 19.89,
+        "rel": -0.25,
+        "sig": false
       }]
     },
     "onp": {
@@ -43129,6 +43205,42 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "a0": 10.66,
         "a1": 32.79,
         "rel": 2.87,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Lower earners (bottom 50%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": 0.97,
+        "tLR": -2.77,
+        "thin": false,
+        "months": 12,
+        "g0": 13.27,
+        "g1": 35.18,
+        "a0": 11.43,
+        "a1": 32.59,
+        "rel": 0.75,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Higher earners (top 15%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": 1,
+        "tAbs": 0.2,
+        "tLR": 3.23,
+        "thin": false,
+        "months": 12,
+        "g0": 7.16,
+        "g1": 27.85,
+        "a0": 10.82,
+        "a1": 31.23,
+        "rel": 0.28,
         "sig": false
       }]
     },
@@ -43740,6 +43852,42 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "a0": 11.4,
         "a1": 12.79,
         "rel": -2.07,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Lower earners (bottom 50%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": -0.5,
+        "tLR": -0.49,
+        "thin": false,
+        "months": 12,
+        "g0": 11.34,
+        "g1": 12.17,
+        "a0": 11.6,
+        "a1": 12.84,
+        "rel": -0.41,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Higher earners (top 15%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": -0.81,
+        "tLR": -0.89,
+        "thin": false,
+        "months": 12,
+        "g0": 12.22,
+        "g1": 12.29,
+        "a0": 11.63,
+        "a1": 12.86,
+        "rel": -1.16,
         "sig": false
       }]
     },
@@ -44384,6 +44532,42 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "a1": 10.22,
         "rel": -2.83,
         "sig": true
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Lower earners (bottom 50%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": -0.3,
+        "tLR": -0.23,
+        "thin": false,
+        "months": 12,
+        "g0": 13.77,
+        "g1": 10.25,
+        "a0": 13.4,
+        "a1": 10.03,
+        "rel": -0.15,
+        "sig": false
+      }, {
+        "tab": "income",
+        "set": "income",
+        "setLabel": "By income",
+        "group": "Higher earners (top 15%)",
+        "from": "2025-08",
+        "to": "2026-10",
+        "dir": -1,
+        "tAbs": 0.03,
+        "tLR": -0.33,
+        "thin": false,
+        "months": 12,
+        "g0": 11.81,
+        "g1": 8.65,
+        "a0": 13.34,
+        "a1": 10.15,
+        "rel": 0.03,
+        "sig": false
       }]
     }
   };
@@ -113811,7 +113995,9 @@ const RD_DEMO_PH = {
   "Mortgage|Renting": ["paying off a mortgage or renting", "pay off a mortgage or rent"],
   "Full time": ["working full time", "work full time"],
   "Part time": ["working part time", "work part time"],
-  Retired: ["retired", "be retired"]
+  Retired: ["retired", "be retired"],
+  "Lower earners (bottom 50%)": ["on lower incomes", "be on lower incomes"],
+  "Higher earners (top 15%)": ["on higher incomes", "be on higher incomes"]
 };
 const RD_DEMO_PLACE = {
   NSW: "NSW",
@@ -113836,14 +114022,15 @@ const RD_DEMO_SCALE = {
   generation: ["Gen Z", "Millennials", "Gen X", "Boomers"],
   education: ["Year 12 or less", "TAFE or trade", "University"],
   location: ["Inner metro", "Outer metro", "Provincial", "Rural"],
-  housing: ["Own outright", "Mortgage", "Renting"]
+  housing: ["Own outright", "Mortgage", "Renting"],
+  income: ["Lower earners (bottom 50%)", "Higher earners (top 15%)"]
 };
 const RD_DEMO_MAP = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
 const RD_DEMO_IN_BAND = {
   "Gen Z": "18–34",
   Boomers: "55+"
 };
-const RD_DEMO_TRAITS = ["age", "gender", "education", "area", "state", "home", "language", "work"];
+const RD_DEMO_TRAITS = ["age", "gender", "education", "area", "state", "home", "income", "language", "work"];
 const rdSerial = (xs, conj) => xs.length < 2 ? xs[0] || "" : xs.length === 2 ? xs[0] + " " + conj + " " + xs[1] : xs.slice(0, -1).join(", ") + ", " + conj + " " + xs[xs.length - 1];
 function rdDemoStand(T, party) {
   const A = T.all[party],
@@ -113952,6 +114139,7 @@ function rdDemoHead(T, party) {
     if (ps.length) add("state", dir, ps.map(s => s.g.label).join("|"), ps, ps.map(s => s.g.label));
   }
   scale("home", "housing");
+  scale("income", "income");
   const lo = G["Other language"],
     le = G["English only"];
   const ldir = lo && lo.sig ? lo.dir : le && le.sig ? -le.dir : 0;
@@ -114600,7 +114788,9 @@ const RD_TREND_GROUP = {
   Renting: "renters",
   "Full time": "full-time workers",
   "Part time": "part-time workers",
-  Retired: "retirees"
+  Retired: "retirees",
+  "Lower earners (bottom 50%)": "lower earners",
+  "Higher earners (top 15%)": "higher earners"
 };
 function rdDemoShift(dt, T, party) {
   if (!dt || !dt.windowYm) return null;
@@ -114900,7 +115090,7 @@ function RdDemographics({
   const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const story = {
-    head: rdDemoHead(Tdemo, party).head,
+    head: rdDemoHead(T, party).head,
     dek: rdDemoDek(T, tab, party)
   };
   const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
@@ -115582,7 +115772,11 @@ function RdDemographics({
   })) : []).map(x => React.createElement("span", {
     className: "rd-wv-band",
     key: x.h
-  }, React.createElement("em", null, demoHouse(x.h)), x.b.basis ? " (" + x.b.basis + " income)" : null, ": ", x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
+  }, React.createElement("span", {
+    className: "rd-wv-band-h"
+  }, React.createElement("em", null, demoHouse(x.h)), x.b.basis ? " (" + x.b.basis + " income)" : null, ": "), React.createElement("span", {
+    className: "rd-wv-band-r"
+  }, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", "))))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true

@@ -41,21 +41,23 @@ if (!ready) { await browser.close(); process.exit(1); }
 
 /* ---- 1. the live pool -------------------------------------------------- */
 console.log("\n1. live pool");
-const live = await page.evaluate(() => {
-  const T = window.AUSPOL.demographics;
+/* every T below joins the income tab beside demographics exactly as the
+   page does (rd-panels.jsx RdDemographics: tabs: [...Tdemo.tabs,
+   D.demoIncome]) - the generators the page calls now see income bands */
+const demoT = "const _d = window.AUSPOL.demographics, _i = window.AUSPOL.demoIncome; const T = _d && _i ? { ..._d, tabs: [..._d.tabs, _i] } : _d;";
+const live = await page.evaluate(new Function(demoT + `
   return ["onp", "alp", "lnp", "grn", "oth"].map((p) => {
     const r = rdDemoHead(T, p), G = rdDemoStand(T, p);
     return { p, head: r.head, kept: r.kept, bad: r.kept.flatMap((c) => (c.trait === "gender" || c.trait === "language") ? []
       : c.labels.filter((l) => !(G[l] && G[l].sig && G[l].dir === c.dir))) };
-  });
-});
+  });`));
 for (const l of live) {
   console.log("     " + l.p + ": " + l.head);
   check(l.bad.length === 0, l.p + ": every named group's dot is filled, leaning the claimed way", l.bad);
 }
 // the rendered page shows exactly the generators' output (default chip and tab, then a chip/tab walk)
 const shown = await page.evaluate(() => ({ head: document.querySelector("#who-votes .rd-hed").textContent, dek: document.querySelector("#who-votes .rd-dek").textContent }));
-const want = await page.evaluate(() => { const T = window.AUSPOL.demographics; return { head: rdDemoHead(T, "onp").head, dek: rdDemoDek(T, T.tabs[0], "onp") }; });
+const want = await page.evaluate(new Function(demoT + `return { head: rdDemoHead(T, "onp").head, dek: rdDemoDek(T, T.tabs[0], "onp") };`));
 check(shown.head === want.head, "rendered head = rdDemoHead (One Nation)", shown.head);
 check(shown.dek === want.dek, "rendered dek = rdDemoDek (One Nation, Age)", shown.dek);
 const chips = ["onp", "alp", "lnp", "grn", "oth"];
@@ -67,7 +69,8 @@ for (let c = 0; c < chips.length; c++) {
     await page.evaluate((t) => document.querySelectorAll("#who-votes .rd-wv-tabs .rd-tab")[t].click(), t);
     await new Promise((r) => setTimeout(r, 120));
     const got = await page.evaluate((p, t) => {
-      const T = window.AUSPOL.demographics;
+      const _d = window.AUSPOL.demographics, _i = window.AUSPOL.demoIncome;
+      const T = _d && _i ? { ..._d, tabs: [..._d.tabs, _i] } : _d;
       return { head: document.querySelector("#who-votes .rd-hed").textContent, dek: document.querySelector("#who-votes .rd-dek").textContent,
                wHead: rdDemoHead(T, p).head, wDek: rdDemoDek(T, T.tabs[t], p) };
     }, chips[c], t);
@@ -79,7 +82,8 @@ check(true, "chip x tab walk: rendered copy = generators everywhere it was check
 /* ---- 2. scripted scenarios --------------------------------------------- */
 console.log("\n2. scenarios (flat payload: every group level with all voters, ±3)");
 const scen = await page.evaluate(() => {
-  const base = window.AUSPOL.demographics;
+  const _d = window.AUSPOL.demographics, _i = window.AUSPOL.demoIncome;
+  const base = _d && _i ? { ..._d, tabs: [..._d.tabs, _i] } : _d;
   const flat = () => {
     const T = JSON.parse(JSON.stringify(base));
     for (const tab of T.tabs) for (const st of tab.sets) for (const g of st.groups)
@@ -128,6 +132,11 @@ const scen = await page.evaluate(() => {
   out.noDegree = run([["Year 12 or less", 5, 2], ["TAFE or trade", 3, 2], ["University", -10, 2]]).head;
   // only negatives
   out.onlyNeg = run([["Rural", -7, 2], ["Own outright", -4, 2]]).head;
+  // income (2026-10-16): the two standard bands tilt like any ordered trait
+  out.incTilt = run([["Lower earners (bottom 50%)", 6, 2], ["Higher earners (top 15%)", -6, 2]]).head;
+  out.incLow = run([["Lower earners (bottom 50%)", 6, 2]]).head;
+  out.incHigh = run([["Higher earners (top 15%)", 6, 2]]).head;
+  out.incLess = run([["Lower earners (bottom 50%)", -6, 2]]).head;
   // room: a crowded pool keeps five claims, four up, three down at most
   const crowd = run([["55+", 6, 2], ["Women", 3, 1], ["University", 6, 2], ["Rural", 7, 2], ["Qld", 6, 2], ["Renting", 5, 2],
     ["Other language", -8, 2], ["Vic", -4, 2], ["Part time", -5, 2], ["Full time", 4, 2]]);
@@ -166,6 +175,11 @@ check(/regional/.test(scen.regional) && !/inner metro/.test(scen.regional), "pro
 check(/less likely to live in an inner metro/.test(scen.notInner) && !/outer-metro|provincial|rural/.test(scen.notInner), "three of four areas up, no name for them -> said from the one left", scen.notInner);
 check(/without a degree/.test(scen.noDegree) && !/university/.test(scen.noDegree), "Year 12 or less + TAFE up, university down -> 'without a degree'", scen.noDegree);
 check(/^One Nation voters are less likely to /.test(scen.onlyNeg) && !/more likely/.test(scen.onlyNeg), "only negatives -> a 'less likely' head", scen.onlyNeg);
+console.log("     income " + scen.incTilt + "\n            " + scen.incHigh + "\n            " + scen.incLess);
+check(/be on lower incomes/.test(scen.incTilt) && !/higher incomes/.test(scen.incTilt), "income: lower up, higher down = one tilt, named from the lower end", scen.incTilt);
+check(/be on lower incomes/.test(scen.incLow), "income: lower earners alone", scen.incLow);
+check(/be on higher incomes/.test(scen.incHigh), "income: higher earners alone", scen.incHigh);
+check(/less likely to be on lower incomes/.test(scen.incLess), "income: lower earners below the average", scen.incLess);
 check(scen.crowd.n === 5 && scen.crowd.up <= 4 && scen.crowd.down <= 3, "a crowded pool: five claims, at most four up, three down", scen.crowd);
 console.log("     crowd: " + scen.crowd.head);
 check(/University graduates \(\d+\.\d%\) are more likely than voters overall/.test(scen.markDek) && !/much the same/.test(scen.markDek), "a filled dot with no pair difference -> named with its figure, never 'much the same'", scen.markDek);
@@ -174,7 +188,8 @@ check(/\d+\.\d% of men/.test(scen.gapDek), "a gap the fractions would double pri
 /* ---- 3. randomised payloads: invariants -------------------------------- */
 console.log("\n3. 300 randomised pools");
 const rnd = await page.evaluate(() => {
-  const base = window.AUSPOL.demographics;
+  const _d = window.AUSPOL.demographics, _i = window.AUSPOL.demoIncome;
+  const base = _d && _i ? { ..._d, tabs: [..._d.tabs, _i] } : _d;
   let seed = 20261011;
   const rand = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
   const SCALES = RD_DEMO_SCALE;
@@ -197,7 +212,7 @@ const rnd = await page.evaluate(() => {
       const seen = new Set();
       for (const c of r.kept) { const k = c.trait + c.dir; if (seen.has(k)) say("two claims " + k); seen.add(k); }
       // an ordered trait never carries both ends of one tilt
-      for (const [trait, set] of [["education", "education"], ["area", "location"], ["home", "housing"]]) {
+      for (const [trait, set] of [["education", "education"], ["area", "location"], ["home", "housing"], ["income", "income"]]) {
         const up = r.kept.find((c) => c.trait === trait && c.dir > 0), dn = r.kept.find((c) => c.trait === trait && c.dir < 0);
         if (up && dn) {
           const ord = SCALES[set], pi = up.labels.map((l) => ord.indexOf(l)), ni = dn.labels.map((l) => ord.indexOf(l));
@@ -232,7 +247,8 @@ check(rnd.length === 0, "300 random pools x 5 parties: no invariant broken (" + 
 /* ---- 4. the composition trend ------------------------------------------ */
 console.log("\n4. composition trend");
 const tr = await page.evaluate(() => {
-  const T = window.AUSPOL.demographics, DT = window.AUSPOL.demoTrend;
+  const _d = window.AUSPOL.demographics, _i = window.AUSPOL.demoIncome, DT = window.AUSPOL.demoTrend;
+  const T = _d && _i ? { ..._d, tabs: [..._d.tabs, _i] } : _d;
   const mv = (o) => ({ tab: "place", set: "state", setLabel: "By state", dir: 1, tAbs: 3, tLR: 3, thin: false, months: 12, g0: 30, g1: 30, a0: 30, a1: 25, ...o });
   const mk = (moves) => ({ windowYm: "2025-07", moves, rows: [] });
   const out = {};

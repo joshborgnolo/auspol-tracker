@@ -1775,12 +1775,13 @@ const RD_DEMO_SHORT = {
    still named a trait the pool no longer supported.)
    1. Only a group clear of all voters by more than its own 95% margin - the
       dot plot's filled dot - can be named.
-   2. Each trait (age, gender, education, area, state, home, language, work)
-      makes at most one "more likely" and one "less likely" claim.
-   3. On an ordered trait (age, education, area, home) the two ends leaning
-      opposite ways are ONE tilt - older, less educated, more regional -
-      named once, from the over-represented end. A gap that stops short of
-      the far end (the Coalition's outer suburbs beside its inner-metro
+   2. Each trait (age, gender, education, area, state, home, income,
+      language, work) makes at most one "more likely" and one "less likely"
+      claim.
+   3. On an ordered trait (age, education, area, home, income) the two ends
+      leaning opposite ways are ONE tilt - older, less educated, more
+      regional - named once, from the over-represented end. A gap that stops
+      short of the far end (the Coalition's outer suburbs beside its inner-metro
       lead) is a fact of its own and keeps its own clause. Unordered traits
       (states, work) name each direction: Queensland above and Victoria
       below are two facts.
@@ -1823,6 +1824,7 @@ const RD_DEMO_PH = {
   "Own outright": ["outright homeowners", "own their home outright"], Mortgage: ["mortgage holders", "have a mortgage"], Renting: ["renting", "rent"],
   "Own outright|Mortgage": ["homeowners", "own their home"], "Mortgage|Renting": ["paying off a mortgage or renting", "pay off a mortgage or rent"],
   "Full time": ["working full time", "work full time"], "Part time": ["working part time", "work part time"], Retired: ["retired", "be retired"],
+  "Lower earners (bottom 50%)": ["on lower incomes", "be on lower incomes"], "Higher earners (top 15%)": ["on higher incomes", "be on higher incomes"],
 };
 /* the states after "live in", and as "more likely to be ..." */
 const RD_DEMO_PLACE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia",
@@ -1832,11 +1834,11 @@ const RD_DEMO_PLACE_BE = { NSW: "from NSW", Vic: "Victorian", Qld: "Queenslander
 /* the ordered traits' groups in order; the states in map order */
 const RD_DEMO_SCALE = { age: ["18–34", "35–54", "55+"], generation: ["Gen Z", "Millennials", "Gen X", "Boomers"],
   education: ["Year 12 or less", "TAFE or trade", "University"], location: ["Inner metro", "Outer metro", "Provincial", "Rural"],
-  housing: ["Own outright", "Mortgage", "Renting"] };
+  housing: ["Own outright", "Mortgage", "Renting"], income: ["Lower earners (bottom 50%)", "Higher earners (top 15%)"] };
 const RD_DEMO_MAP = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
 /* a generation wholly inside an age band */
 const RD_DEMO_IN_BAND = { "Gen Z": "18–34", Boomers: "55+" };
-const RD_DEMO_TRAITS = ["age", "gender", "education", "area", "state", "home", "language", "work"];
+const RD_DEMO_TRAITS = ["age", "gender", "education", "area", "state", "home", "income", "language", "work"];
 const rdSerial = (xs, conj) => (xs.length < 2 ? xs[0] || "" : xs.length === 2 ? xs[0] + " " + conj + " " + xs[1]
   : xs.slice(0, -1).join(", ") + ", " + conj + " " + xs[xs.length - 1]);
 /* every group against all voters, by label: its gap, whether its dot is
@@ -1924,6 +1926,10 @@ function rdDemoHead(T, party) {
     if (ps.length) add("state", dir, ps.map((s) => s.g.label).join("|"), ps, ps.map((s) => s.g.label));
   }
   scale("home", "housing");
+  /* income: the two standard bands read off every house's own brackets
+     (gen-data §7g-income); a lower-up/higher-down tilt is one claim from
+     the over-represented end, like any other two-group ordered trait */
+  scale("income", "income");
   /* language: a pair, said of the minority language either way */
   const lo = G["Other language"], le = G["English only"];
   const ldir = lo && lo.sig ? lo.dir : le && le.sig ? -le.dir : 0;
@@ -2464,6 +2470,7 @@ const RD_TREND_GROUP = {
   University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "voters with Year 12 or less",
   "Own outright": "outright homeowners", Mortgage: "mortgage holders", Renting: "renters",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
+  "Lower earners (bottom 50%)": "lower earners", "Higher earners (top 15%)": "higher earners",
 };
 /* ---- the composition trend: which groups have moved out of proportion ----
    Titled and deked from D.demoTrend (gen-data's two-stage test, §7gb), on
@@ -2676,9 +2683,10 @@ function RdDemographics({ rangeId = "all" }) {
   const Tdemo = D.demographics;
   /* the income tab rides beside demographics, never inside it (repo rule 5):
      spliced on here, one home, id last so it lands after Home. The party
-     headline and trend (all-voters anatomy claims) stay on Tdemo's own
-     tabs - an income-wave quirk must never rewrite "who Labor's voters
-     are" */
+     headline reads it on equal terms with every other tab (user call
+     2026-10-16: income belongs in the dynamic prose once the feature
+     shipped); an income claim still has to clear the same filled-dot gate
+     and outrank four heavier claims to be named */
   const T = Tdemo && D.demoIncome ? { ...Tdemo, tabs: [...Tdemo.tabs, D.demoIncome] } : Tdemo;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
@@ -2822,11 +2830,11 @@ function RdDemographics({ rangeId = "all" }) {
   const all = T.all[party];
 
   /* ---- the finding: the party's headline (rdDemoHead, constant across the
-     grouping tabs) over the tab's dek (rdDemoDek) ---------------------------- */
-  const story = { head: rdDemoHead(Tdemo, party).head, dek: rdDemoDek(T, tab, party) };
+     grouping tabs, income tab included) over the tab's dek (rdDemoDek) ------ */
+  const story = { head: rdDemoHead(T, party).head, dek: rdDemoDek(T, tab, party) };
 
   /* ---- the composition trend: which groups have moved out of proportion
-     (rdDemoShift, from gen-data §7gb's demoTrend, which is income-free) ----- */
+     (rdDemoShift, from gen-data §7gb's demoTrend, income bands included) --- */
   const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
 
   /* the full significance battery behind the dek: every tested group, pass
@@ -3214,7 +3222,7 @@ function RdDemographics({ rangeId = "all" }) {
         {tab.sets.some((st) => st.bands) ? (
           <div className="rd-wv-bands">
             {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (
-              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em>{x.b.basis ? " (" + x.b.basis + " income)" : null}: {x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span>
+              <span className="rd-wv-band" key={x.h}><span className="rd-wv-band-h"><em>{demoHouse(x.h)}</em>{x.b.basis ? " (" + x.b.basis + " income)" : null}{": "}</span><span className="rd-wv-band-r">{x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span></span>
             ))}
           </div>
         ) : null}

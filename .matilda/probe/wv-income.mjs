@@ -255,11 +255,14 @@ ok("the bands pill lists every in-window house",
      pill.every((t) => !t.includes(";") && t.includes("·")), pill.join(" ‖ "));
 }
 /* between clauses the separator is a semicolon riding the clause it closes
-   (::after, clamped glyph-tight; a next-clause ::before used to hang it in
-   the middle of the gutter) */
+   (::after on the ranges span, clamped glyph-tight; a next-clause ::before
+   used to hang it in the middle of the gutter, and the ranges span hosts
+   it because a band-level pseudo never draws once the band goes
+   display:contents on phone) */
 {
   const sep = await page.evaluate(() => {
-    const els = [...document.querySelectorAll("#who-votes .rd-wv-bands .rd-wv-band")];
+    const els = [...document.querySelectorAll("#who-votes .rd-wv-bands .rd-wv-band")]
+      .map((s) => s.querySelector(".rd-wv-band-r"));
     const last = els[els.length - 1];
     /* each clause's text ends inside the ::after's glyph: element right
        edge less the semicolon's own width lands within ~6px of the text */
@@ -385,6 +388,22 @@ ok("phone dek carries the standardised-reads note", DEK_NOTE.test(await dekText(
   const got = await rows(mob);
   ok("phone figures match the payload's One Nation tilts", figures("onp", got),
      got.map((r) => r.label + " " + r.fig).join(", "));
+}
+/* on phone every house clause is its own grid row (the inline splice used
+   to wrap mid-clause), and the leads sit in a max-content column so every
+   house's income ranges start on one shared vertical line */
+{
+  const bandRows = await mob.evaluate(() =>
+    [...document.querySelectorAll("#who-votes .rd-wv-bands .rd-wv-band")].map((s) => {
+      const rr = s.querySelector(".rd-wv-band-r").getBoundingClientRect();
+      return { top: Math.round(rr.top), x: +rr.left.toFixed(1) };
+    }));
+  ok("phone gives every house clause its own row (no clause straddles a wrap)",
+     bandRows.every((r, i) => i === 0 || r.top > bandRows[i - 1].top),
+     bandRows.map((r) => r.top).join(" / "));
+  ok("phone lines up every house's income ranges on one vertical line",
+     bandRows.every((r) => Math.abs(r.x - bandRows[0].x) <= 1),
+     bandRows.map((r) => r.x).join(" / "));
 }
 /* at 390px the cut state should read "HH" and drop the word income
    (the ≤640px and ≤560px rungs): "(HH ≤ $X; personal ≤ $Y)" */

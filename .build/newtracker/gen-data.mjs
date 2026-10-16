@@ -4574,8 +4574,9 @@ const { demo: demographics, income: demoIncome } = (() => {
   const rows = {};                                // "set|group|party" -> nowcast rows
   const rowsM = {};                               // … -> monthly rows, anchored on each month's primaries
   const rowsT = {};                               // … -> the same for §7gb's trend test (a pooled release once)
-  // the income tab's rows: "income|<Lower|Higher> earners|<party>" under its own stores
-  const iRows = {}, iRowsM = {};
+  // the income tab's rows: "income|<Lower|Higher> earners|<party>" under its
+  // own stores; iRowsT is §7gb's trend-test variant (a pooled release ONCE)
+  const iRows = {}, iRowsM = {}, iRowsT = {};
   const inWindow = [];                            // the waves the window holds, for the credits
   const incInWindow = [];                         // the income tab's own, keeping the shares apart
   for (const w of waves) {
@@ -4642,6 +4643,16 @@ const { demo: demographics, income: demoIncome } = (() => {
             if (M) (iRowsM["income|" + grp + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[grp], firm: w.pollster });
           }
         }
+        /* the trend test's income rows: as rowsT above, a pooled release
+           ONCE in its midpoint's month with its parts' samples summed –
+           Newspoll's quarterly income table spread over its parts would
+           read as three or four months that happen to agree */
+        const one = parts ? { mid: midMs(r0), ym: ymOf(new Date(midMs(r0)).toISOString()), n: reads.reduce((a, r) => a + r.n, 0) } : reads[0];
+        const MT = allByYm.get(one.ym);
+        if (MT) for (const k of DEMO_KEYS) {
+          if (g[k] == null || tot[k] == null) continue;
+          (iRowsT["income|" + grp + "|" + k] ||= []).push({ ym: one.ym, mid: one.mid, x: MT[k] + (g[k] - tot[k]), n: one.n * DEMO_SHARE[grp], firm: w.pollster });
+        }
       }
     }
     // in the window when any part is; ranked by its newest
@@ -4650,17 +4661,23 @@ const { demo: demographics, income: demoIncome } = (() => {
     if (iUsed && ds.length) incInWindow.push({ w, p, d: Math.min(...ds), band: inc ? inc.band : null });
   }
   const sets = demoBuild(rows, rowsM, DEMO_SETS.map((s) => ({ tab: s.tab, id: s.id, label: s.label, groups: s.groups })), allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
+  // the trend test's months (rowsT for the harmonised sets, iRowsT for the
+  // income bands), kept off the page
+  const testMonthly = (rowsTg) => MONTHS.map((ym) => {
+    const m = DEMO_KEYS.map((k) => monthWithSe(rowsTg[k] || [], null, ym));
+    if (m.some((e) => !e)) return null;
+    const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
+    const anchor = allByYm.get(ym) || {};
+    const T = DEMO_KEYS.reduce((a, k) => a + (anchor[k] || 0), 0);
+    return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
+  }).filter(Boolean);
   for (const set of DEMO_SETS) for (const group of set.groups) {
-    // the trend test's months (rowsT), kept off the page
     const rowsTg = Object.fromEntries(DEMO_KEYS.map((k) => [k, rowsT[set.id + "|" + group + "|" + k] || []]));
-    DEMO_TEST_MONTHLY.set(set.id + "|" + group, MONTHS.map((ym) => {
-      const m = DEMO_KEYS.map((k) => monthWithSe(rowsTg[k] || [], null, ym));
-      if (m.some((e) => !e)) return null;
-      const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
-      const anchor = allByYm.get(ym) || {};
-      const T = DEMO_KEYS.reduce((a, k) => a + (anchor[k] || 0), 0);
-      return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
-    }).filter(Boolean));
+    DEMO_TEST_MONTHLY.set(set.id + "|" + group, testMonthly(rowsTg));
+  }
+  for (const { group: grp } of INCOME_STD_BANDS) {
+    const rowsTg = Object.fromEntries(DEMO_KEYS.map((k) => [k, iRowsT["income|" + grp + "|" + k] || []]));
+    DEMO_TEST_MONTHLY.set("income|" + grp, testMonthly(rowsTg));
   }
   const tabs = DEMO_TABS.map((t) => ({ ...t, sets: sets.filter((s) => s.tab === t.id).map(({ tab, ...s }) => s) }))
     .filter((t) => t.sets.length);
@@ -4831,6 +4848,15 @@ const demoTrend = (() => {
   };
   const rr = (v) => Math.round(v * 100) / 100;
   const out = {};
+  /* the income tab's two standard bands run the same two-stage test from
+     their own iRowsT months (a pooled release counted once, as every set
+     here). Appended as a tab of the loop's own shape, so an earnings
+     proportionality break takes its place beside the harmonised groups' –
+     in the moves, and in the significance table's rows under "By income" */
+  const trendTabs = !demoIncome ? demographics.tabs : demographics.tabs.concat([{
+    id: "income", label: "Income",
+    sets: [{ id: "income", label: "By income", groups: demoIncome.sets[0].groups }],
+  }]);
   for (let pid = 0; pid < KEYS.length; pid++) {
     const party = KEYS[pid];
     const moves = [];
@@ -4839,7 +4865,7 @@ const demoTrend = (() => {
     // `moves` above it stays the dek's significant-only list, unchanged
     const rows = [];
     let windowYm = null;
-    for (const tab of demographics.tabs) {
+    for (const tab of trendTabs) {
       for (const st of tab.sets) {
         for (const g of st.groups) {
           const xs = [], gs = [], as = [], ws = [];
