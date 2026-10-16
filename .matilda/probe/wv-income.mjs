@@ -248,8 +248,34 @@ ok("the bands pill lists every in-window house",
   ok("DemosAU's pill stipulates personal income",
      pill.some((t) => t.includes("DemosAU") && /\((personal) income\)/.test(t)) || !wantHouses.includes("DemosAU"),
      pill.join(" ‖ "));
-  ok("the pill's bracket lists separate with a semicolon, never a middot",
-     pill.every((t) => !t.includes("·") && /; /.test(t)), pill.join(" ‖ "));
+  ok("the pill's bracket lists separate with a middot, never a semicolon",
+     pill.every((t) => !t.includes(";") && t.includes("·")), pill.join(" ‖ "));
+}
+/* between clauses the separator is a semicolon riding the clause it closes
+   (::after, clamped glyph-tight; a next-clause ::before used to hang it in
+   the middle of the gutter) */
+{
+  const sep = await page.evaluate(() => {
+    const els = [...document.querySelectorAll("#who-votes .rd-wv-bands .rd-wv-band")];
+    const last = els[els.length - 1];
+    /* each clause's text ends inside the ::after's glyph: element right
+       edge less the semicolon's own width lands within ~6px of the text */
+    const text = (el) => {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      return r.getBoundingClientRect();
+    };
+    return {
+      after: els.slice(0, -1).map((el) => getComputedStyle(el, "::after").content),
+      lastAfter: getComputedStyle(last, "::after").content,
+      hugPx: els.slice(0, -1).map((el) => +(el.getBoundingClientRect().right - text(el).right).toFixed(1)),
+    };
+  });
+  ok("the between-clause semicolon lines only the closed clauses' ::after (none on the last, no ::before at all)",
+     sep.after.length >= 2 && sep.after.every((c) => c === '";"') && (sep.lastAfter === "none" || sep.lastAfter === "") ,
+     JSON.stringify(sep.after) + " / last " + sep.lastAfter);
+  ok("each semicolon hugs its clause (glyph extends <7px past the clause's own text)",
+     sep.hugPx.every((d) => d >= 0 && d < 7), sep.hugPx.join(" / ") + " px");
 }
 
 /* figures track the live payload for the picked party */

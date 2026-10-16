@@ -3214,7 +3214,7 @@ function RdDemographics({ rangeId = "all" }) {
         {tab.sets.some((st) => st.bands) ? (
           <div className="rd-wv-bands">
             {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (
-              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.basis ? "(" + x.b.basis + " income) " : null}{x.b.low.join(", ")}<i>;</i> {x.b.high.join(", ")}</span>
+              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.basis ? "(" + x.b.basis + " income) " : null}{x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span>
             ))}
           </div>
         ) : null}

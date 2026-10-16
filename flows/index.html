@@ -4190,7 +4190,7 @@ body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1
 body.rd .rd-wv-bands { display: block; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
 body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
-body.rd .rd-wv-band + .rd-wv-band::before { content: "; "; color: var(--ink-4); }
+body.rd .rd-wv-band:not(:last-child)::after { content: ";"; color: var(--ink-4); }
 body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
@@ -115583,7 +115583,7 @@ function RdDemographics({
   })) : []).map(x => React.createElement("span", {
     className: "rd-wv-band",
     key: x.h
-  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), React.createElement("i", null, ";"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
+  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true
