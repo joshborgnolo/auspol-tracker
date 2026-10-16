@@ -9,9 +9,13 @@
           on phones
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Retired /
-          Rural / ACT/NT/Tas / Non-NSW/Vic/Qld) drive figures, bracket,
+          Rural / ACT/NT/Tas / Non-NSW/Vic/Qld / Lower earners / Higher
+          earners) drive figures, bracket,
           head/dek/meta, y-domain,
           election sub-lines — figures asserted against window.AUSPOL itself.
+          The earners bands are the income tab's standardised reads,
+          spliced onto the menu last (never into D.demographics); their
+          note and copy caption carry the set's own standardisation note.
           Every selection's x axis carries the Election landmark (2026-10-08:
           was "May 2025" for groups with no own election row); a cut group
           whose poll lines open after the election joins its ring marks with
@@ -130,12 +134,25 @@ const expectedFor = (groupLabel) => (async () => {
     const D = window.AUSPOL;
     const mk = (V, C) => ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({ id, v: V[id], ci: C[id] || 0 }))
       .sort((a, b) => b.v - a.v);
-    const levelK = (parts) => {
-      let k = 1, top = parts[0];
-      while (k < parts.length && top.v - parts[k].v < Math.sqrt(top.ci * top.ci + parts[k].ci * parts[k].ci)) k++;
-      return k;
+    /* the renderer's level test verbatim (rd-panels.jsx levelRuns): a party
+       joins the run above while the gap to that run's first member stays
+       inside the two margins combined; a bracket/box is drawn for EVERY
+       run of two or more, so a tie below the leaders shades too - pinning
+       only the top run's size under-expected the cells once below-leader
+       ties appeared in the live data */
+    const levelRuns = (ps) => {
+      const rs = [];
+      ps.forEach((p) => {
+        const r = rs[rs.length - 1];
+        if (r && r[0].v - p.v < Math.sqrt(r[0].ci * r[0].ci + p.ci * p.ci)) r.push(p);
+        else rs.push([p]);
+      });
+      return rs;
     };
-    const T = D.demographics;
+    const levelK = (parts) => levelRuns(parts)[0].length;
+    /* the panel's own view of the payload: demographics, with the income
+       tab's standardised bands spliced on last, as RdPrimary joins them */
+    const T = D.demographics && D.demoIncome ? { ...D.demographics, tabs: [...D.demographics.tabs, D.demoIncome] } : D.demographics;
     const lm = D.aggPrimary[D.aggPrimary.length - 1];
     const all = { parts: mk(D.latest.primary, lm.ci || {}) };
     all.k = levelK(all.parts);
@@ -145,9 +162,10 @@ const expectedFor = (groupLabel) => (async () => {
       let g = null; outer: for (const t of T.tabs) for (const s of t.sets) { const f = s.groups.find((x) => x.label === label); if (f) { g = f; break outer; } }
       if (g) {
         const parts = mk(g.v, g.ci);
+        const runs = levelRuns(parts);
         const elec = !!((D.demoStateElection && D.demoStateElection.groups && D.demoStateElection.groups[label]) ||
           (D.demoLocElection && D.demoLocElection.groups && D.demoLocElection.groups[label]));
-        res.group = { parts, k: levelK(parts), houses: g.houses, window: T.window,
+        res.group = { parts, k: runs[0].length, tie: runs.some((r) => r.length >= 2), houses: g.houses, window: T.window,
           elec, monthly0: g.monthly && g.monthly.length > 1 ? g.monthly[0][0] : null };
       }
     }
@@ -185,8 +203,9 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
   ok("select exists", !!s.sel);
   if (!s.sel) continue;
   ok(`selected text is "All voters"`, s.sel.text === "All voters", s.sel.text);
-  ok("32 options (All voters + 31 groups)", s.sel.optCount === 32, s.sel.optCount);
-  ok("9 optgroups", s.sel.groupCount === 9, s.sel.groupLabels.join(" | "));
+  ok("34 options (All voters + 31 groups + 2 income bands)", s.sel.optCount === 34, s.sel.optCount);
+  ok("10 optgroups (income spliced last)", s.sel.groupCount === 10, s.sel.groupLabels.join(" | "));
+  ok("the income optgroup rides last", s.sel.groupLabels[9] === "By income", s.sel.groupLabels[9]);
   const g = s.geom;
   if (W > 640) {
     ok("at the right edge (within 2px of the stat strip's right)", g.selRect && g.statsRect && Math.abs(g.selRect.right - g.statsRect.right) <= 2,
@@ -229,10 +248,12 @@ const SHORT = {
   Retired: "retirees", NSW: "NSW voters", Rural: "rural voters",
   "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians",
+  "Lower earners": "lower earners", "Higher earners": "higher earners",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
                            ["NSW", { chg: true }], ["University", {}], ["Retired", { level: true }], ["Rural", { tallTicks: true, chg: true }],
-                           ["ACT/NT/Tas", { chg: true }], ["Non-NSW/Vic/Qld", { chg: true }]]) {
+                           ["ACT/NT/Tas", { chg: true }], ["Non-NSW/Vic/Qld", { chg: true }],
+                           ["Lower earners", {}], ["Higher earners", {}]]) {
   const exp = await expectedFor(label);
   const s = await collect(1280, 900, label);
   console.log(`--- ${label}`);
@@ -250,10 +271,14 @@ for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}]
     ok("dek quotes the gap", s.dek && (wantGap === "0.0" ? s.dek.includes("dead level") : s.dek.includes(wantGap + " points")),
       s.dek && s.dek.split(". ").slice(0, 2).join(". "));
     ok("dek contrasts all voters", s.dek && s.dek.includes("Among all voters"), s.dek);
-    ok("meta carries the pooled houses", s.meta && s.meta.includes("Pooled from the last " + g.window) && g.houses.every((h) => s.meta.includes(h.replace("RedBridge/Accent", "RedBridge"))), s.meta);
-    const expectBracket = g.k >= 2;
+    /* the meta prints the panel's own display names (demoHouse in the
+       a11e1559 asset): "Newspoll (pooled)" → "Newspoll",
+       "RedBridge/Accent" → "RedBridge" */
+    const demoName = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h.replace(/ \(pooled\)$/, ""));
+    ok("meta carries the pooled houses", s.meta && s.meta.includes("Pooled from the last " + g.window) && g.houses.every((h) => s.meta.includes(demoName(h))), s.meta);
+    const expectBracket = g.tie;
     const hasBracket = !!s.bracket || !!s.groupBox;
-    ok(`margin-of-uncertainty cells ${expectBracket ? "shaded (k=" + g.k + ")" : "absent (k=1)"}`, hasBracket === expectBracket,
+    ok(`margin-of-uncertainty cells ${expectBracket ? "shaded" : "absent"} (top run k=${g.k})`, hasBracket === expectBracket,
       `${String(s.bracket)} / ${String(s.groupBox)}`);
     const wantChg = !!ev.chg;
     const gotChg = s.stats.some((x) => x.chg && /since the election/.test(x.chg));
@@ -333,6 +358,7 @@ const clickDot = async (selValue) => {
 console.log("== dot clicks open All polls on the matching facet ==");
 for (const { view, wantFacet, wantSplit } of [{ view: "Gen Z", wantFacet: "Demographics", wantSplit: "Age" },
                                               { view: "Renting", wantFacet: "Demographics", wantSplit: "Home" },
+                                              { view: "Lower earners", wantFacet: "Demographics", wantSplit: "Income" },
                                               { view: null, wantFacet: "Primary", wantSplit: null }]) {
   const name = view || "All voters";
   const { dot, landed } = await clickDot(view);
@@ -411,7 +437,10 @@ const hoverTip = async (selValue, groupLabel) => {
   return { dot, got };
 };
 console.log("== group dots tip the printed figure, and the lift is disclosed ==");
-for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renting", group: "Renting" }, { view: null, group: null }]) {
+/* the income bands' own case: the "printed" figure of record is the
+   standardised read (the set's own note must disclose it, page and card) */
+for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renting", group: "Renting" },
+                               { view: "Higher earners", group: "Higher earners" }, { view: null, group: null }]) {
   const name = view || "All voters";
   const { dot, got } = await hoverTip(view, group);
   console.log(`--- ${name} dot tooltip`);
@@ -427,6 +456,11 @@ for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renti
     ok(`${name}: lift note under the chart`, !!got && !!got.noteText && got.noteText.includes("own all-voters figure") && got.noteText.includes("Demographics"),
       got && String(got.noteText).slice(0, 80));
     ok(`${name}: copy caption discloses the lift`, !!got && !!got.caption && got.caption.includes("less its own all-voters figure"), got && got.caption);
+    if (/earners$/.test(group)) {
+      const BANDS = "read at the same two bands of the electorate";
+      ok(`${name}: note discloses the standardised income read`, !!got && !!got.noteText && got.noteText.includes(BANDS), got && got.noteText);
+      ok(`${name}: caption discloses it too`, !!got && !!got.caption && got.caption.includes(BANDS), got && got.caption);
+    }
   } else {
     ok(`${name}: no lift note in the all-voters view`, !!got && got.noteText === null, got && String(got.noteText).slice(0, 60));
     ok(`${name}: copy caption is the all-voters one`, !!got && got.caption === "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
@@ -453,7 +487,7 @@ console.log("== Space walks the group menu ==");
   const curVal = () => page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").value);
   const order = await page.evaluate(() =>
     [...document.querySelectorAll("#primary-vote select.rd-pv-sel option")].map((o) => o.value));
-  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 32,
+  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 34,
      order.slice(0, 4).join("|") + " | n=" + order.length);
 
   /* park where #primary-vote alone holds the key: below the hero's whole
@@ -484,7 +518,7 @@ console.log("== Space walks the group menu ==");
     seen.push(await curVal());
     if (seen[i] !== order[i] && firstGap < 0) firstGap = i;
   }
-  ok("each Space steps to the menu's next option (all 31 groups)", JSON.stringify(seen) === JSON.stringify(order),
+  ok("each Space steps to the menu's next option (all 33 groups)", JSON.stringify(seen) === JSON.stringify(order),
      firstGap >= 0 ? `press ${firstGap}: got ${JSON.stringify(seen[firstGap])}, want ${JSON.stringify(order[firstGap])}` : seen.slice(0, 4).join(" -> "));
   await page.keyboard.press("Space");
   await sleep(150);

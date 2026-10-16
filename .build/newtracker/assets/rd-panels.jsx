@@ -66,8 +66,10 @@ function RdPrimary({ rangeId, setRangeId }) {
   /* The group dropdown: any Who-votes-for-whom group, drawn from the §7g
      payload the Who-votes panel itself pools (never re-derived here).
      grpId === "" is the all-voters view; /vic/ has no demographics payload,
-     so the control never appears there. */
-  const T = D.demographics;
+     so the control never appears there. The income tab's two standardised
+     bands ride the same menu, spliced on last exactly as the Who-votes
+     panel joins them (never into the shared payload itself). */
+  const T = D.demographics && D.demoIncome ? { ...D.demographics, tabs: [...D.demographics.tabs, D.demoIncome] } : D.demographics;
   const [grpId, setGrpId] = useState("");
   const sel = (() => {
     if (!grpId || !T || !T.tabs) return null;
@@ -572,6 +574,9 @@ function RdPrimary({ rangeId, setRangeId }) {
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
                     : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals."
+                      /* the income bands' own caveat, from the payload's one
+                         copy of it (the Who-votes dek's note is the same) */
+                      + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "")
                       + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "")
                     : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
@@ -596,7 +601,7 @@ function RdPrimary({ rangeId, setRangeId }) {
             group views" paragraph is the deep version; a dot's tooltip
             tips the printed figure and the Demographics facet lists them */}
         {G && (
-          <p className="rd-note">Each dot is one poll’s reading of {sel.who} less that poll’s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll’s in All polls’ Demographics view.</p>
+          <p className="rd-note">Each dot is one poll’s reading of {sel.who} less that poll’s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll’s in All polls’ Demographics view.{sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : ""}</p>
         )}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },

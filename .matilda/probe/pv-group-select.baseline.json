@@ -1,0 +1,319 @@
+{
+ "390": {
+  "hed": "Labor and One Nation are level",
+  "dek": "Labor, on 27.5%, and One Nation, on 26.1%, are too close to separate. The Coalition, on 21.6%, has lost about a third of its election-night vote.",
+  "meta": "181 national polls, latest fieldwork 11 Oct",
+  "xTexts": [
+   "",
+   "Election",
+   "Sep",
+   "Jan ’26",
+   "May",
+   "Sep",
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "6",
+   "7",
+   "8",
+   "OTH",
+   "GRN",
+   "L/NP",
+   "ON",
+   "ALP"
+  ],
+  "dashes": [
+   "6 4",
+   "none",
+   "none",
+   "none",
+   "none"
+  ],
+  "stats": [
+   {
+    "name": "Labor",
+    "val": "27.5%",
+    "chg": "▼ 7.1 since the election"
+   },
+   {
+    "name": "One Nation",
+    "val": "26.1%",
+    "chg": "▲ 19.7 since the election"
+   },
+   {
+    "name": "Coalition",
+    "val": "21.6%",
+    "chg": "▼ 10.2 since the election"
+   },
+   {
+    "name": "Greens",
+    "val": "13.5%",
+    "chg": "▲ 1.3 since the election"
+   },
+   {
+    "name": "Others & independents",
+    "val": "11.3%",
+    "chg": "▼ 3.7 since the election"
+   }
+  ],
+  "bracket": null,
+  "groupBox": "Within the margin of uncertainty",
+  "yTicks": [
+   "10%",
+   "20%",
+   "30%",
+   "40%"
+  ],
+  "bodyOverflow": true,
+  "geom": {
+   "dek": {
+    "x": 20,
+    "y": 2143.8,
+    "w": 350,
+    "h": 63,
+    "right": 370,
+    "bottom": 2206.8
+   },
+   "selRect": {
+    "x": 20,
+    "y": 2218.8,
+    "w": 182,
+    "h": 36.8,
+    "right": 202,
+    "bottom": 2255.6
+   },
+   "statsRect": {
+    "x": 20,
+    "y": 2279.6,
+    "w": 350,
+    "h": 374.7,
+    "right": 370,
+    "bottom": 2654.3
+   },
+   "secRect": {
+    "x": 20,
+    "y": 1963.6,
+    "w": 350,
+    "h": 1269.9,
+    "right": 370,
+    "bottom": 3233.6
+   }
+  },
+  "sel": {
+   "text": "All voters",
+   "value": "",
+   "optCount": 34,
+   "groupCount": 10,
+   "groupLabels": [
+    "By age",
+    "By generation",
+    "By gender",
+    "By education",
+    "By state",
+    "By location",
+    "By housing",
+    "By language at home",
+    "By work status",
+    "By income"
+   ],
+   "options": [
+    "All voters",
+    "18–34",
+    "35–54",
+    "55+",
+    "Gen Z",
+    "Millennials",
+    "Gen X",
+    "Boomers",
+    "Men",
+    "Women",
+    "Year 12 or less",
+    "TAFE or trade",
+    "University",
+    "NSW",
+    "Vic",
+    "Qld",
+    "SA",
+    "WA",
+    "ACT/NT/Tas",
+    "Non-NSW/Vic/Qld",
+    "Inner metro",
+    "Outer metro",
+    "Provincial",
+    "Rural",
+    "Own outright",
+    "Mortgage",
+    "Renting",
+    "English only",
+    "Other language",
+    "Full time",
+    "Part time",
+    "Retired",
+    "Lower earners",
+    "Higher earners"
+   ]
+  }
+ },
+ "1280": {
+  "hed": "Labor and One Nation are level",
+  "dek": "Labor, on 27.5%, and One Nation, on 26.1%, are too close to separate. The Coalition, on 21.6%, has lost about a third of its election-night vote.",
+  "meta": "181 national polls since the 3 May 2025 election, latest fieldwork 11 Oct 2026",
+  "xTexts": [
+   "",
+   "Election",
+   "Jul",
+   "Sep",
+   "Nov",
+   "Jan 2026",
+   "Mar",
+   "May",
+   "Jul",
+   "Sep",
+   "1st Coalition split",
+   "Joyce → ONP",
+   "Bondi shooting",
+   "2nd Coalition split",
+   "Taylor leads Libs",
+   "Hormuz crisis",
+   "2026 Budget",
+   "Others",
+   "Greens",
+   "Coalition",
+   "One Nation",
+   "Labor"
+  ],
+  "dashes": [
+   "6 4",
+   "none",
+   "none",
+   "none",
+   "none"
+  ],
+  "stats": [
+   {
+    "name": "Labor",
+    "val": "27.5%",
+    "chg": "▼ 7.1 since the election"
+   },
+   {
+    "name": "One Nation",
+    "val": "26.1%",
+    "chg": "▲ 19.7 since the election"
+   },
+   {
+    "name": "Coalition",
+    "val": "21.6%",
+    "chg": "▼ 10.2 since the election"
+   },
+   {
+    "name": "Greens",
+    "val": "13.5%",
+    "chg": "▲ 1.3 since the election"
+   },
+   {
+    "name": "Others & independentsOthers",
+    "val": "11.3%",
+    "chg": "▼ 3.7 since the election"
+   }
+  ],
+  "bracket": "Within the margin of uncertainty |span 1 / span 2",
+  "groupBox": null,
+  "yTicks": [
+   "10%",
+   "20%",
+   "30%",
+   "40%"
+  ],
+  "bodyOverflow": true,
+  "geom": {
+   "dek": {
+    "x": 64,
+    "y": 1715.1,
+    "w": 860,
+    "h": 54,
+    "right": 924,
+    "bottom": 1769.1
+   },
+   "selRect": {
+    "x": 1034,
+    "y": 1732.3,
+    "w": 182,
+    "h": 36.8,
+    "right": 1216,
+    "bottom": 1769.1
+   },
+   "statsRect": {
+    "x": 64,
+    "y": 1801.1,
+    "w": 1152,
+    "h": 129.1,
+    "right": 1216,
+    "bottom": 1930.3
+   },
+   "secRect": {
+    "x": 64,
+    "y": 1540.6,
+    "w": 1152,
+    "h": 1020.6,
+    "right": 1216,
+    "bottom": 2561.3
+   }
+  },
+  "sel": {
+   "text": "All voters",
+   "value": "",
+   "optCount": 34,
+   "groupCount": 10,
+   "groupLabels": [
+    "By age",
+    "By generation",
+    "By gender",
+    "By education",
+    "By state",
+    "By location",
+    "By housing",
+    "By language at home",
+    "By work status",
+    "By income"
+   ],
+   "options": [
+    "All voters",
+    "18–34",
+    "35–54",
+    "55+",
+    "Gen Z",
+    "Millennials",
+    "Gen X",
+    "Boomers",
+    "Men",
+    "Women",
+    "Year 12 or less",
+    "TAFE or trade",
+    "University",
+    "NSW",
+    "Vic",
+    "Qld",
+    "SA",
+    "WA",
+    "ACT/NT/Tas",
+    "Non-NSW/Vic/Qld",
+    "Inner metro",
+    "Outer metro",
+    "Provincial",
+    "Rural",
+    "Own outright",
+    "Mortgage",
+    "Renting",
+    "English only",
+    "Other language",
+    "Full time",
+    "Part time",
+    "Retired",
+    "Lower earners",
+    "Higher earners"
+   ]
+  }
+ }
+}

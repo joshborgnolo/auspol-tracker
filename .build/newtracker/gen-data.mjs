@@ -3121,7 +3121,11 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
    the All-polls demographics facet: its rows compare two of these groups
    (YouGov's 65+ and DemosAU's regional-or-rural voters join no common
    group, so `v` alone can't serve them) and an opened poll shows the lot. */
-const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
+const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups)
+  /* the two standardised income bands close the list – appended LAST so
+     every common group's slot keeps its place: the primary chart's group
+     views (and the CSV export) find a wave's income reads by this index */
+  .concat(INCOME_STD_BANDS.map((b) => b.group));
 const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "income", "working", "occupation", "country", "state", "location", "housing", "language", "religion", "children", "class", "stress", "electorate"];
 const DEMO_BY_POLL = new Map();
 
@@ -3173,8 +3177,17 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
      group, so it carries none – no group-view dot, no export columns – and
      `x` tells the facet why; its printed table still shows (d) */
   const reuse = reusesWaves(p);
+  /* the wave's standardised income reads fill the two band slots at v's
+     tail. No house prints those bands, so the slot IS §7g's pooled figure
+     for the wave (the fitted line's read, normalised the pool's way) – a
+     group-view dot or CSV cell then matches exactly what the pools saw */
+  const inc = reuse ? null : incomeStandardise(w.pollster, w.dims && w.dims.income);
   const v = DEMO_GROUPS.map((g) => {
     if (reuse) return null;
+    if (INCOME_STD_BANDS.some((b) => b.group === g)) {
+      const sh = inc && inc.shares[g] && demoNorm(inc.shares[g]);
+      return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => (sh[k] == null ? null : r1(sh[k]))) : null;
+    }
     const st = DEMO_SETS.find((x) => x.groups.includes(g));
     const sh = h[st.id] && h[st.id][g];
     return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => (sh[k] == null ? null : r1(sh[k]))) : null;

@@ -1467,6 +1467,19 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
    track had a third of the column and the intervals were a few pixels long. */
 @media (max-width: 640px) {
   body.rd .rd-wv-tabs .rd-tab { padding: 0 8px; font-size: 14px; }
+  /* the seven group tabs no longer fit the phone lane (Income was the
+     seventh; the row's min-content ran 27px over a 390px viewport and the
+     page panned sideways): the strip scrolls its inner track like the
+     all-polls tabs, keeping the pads. overflow-y needs the explicit lock
+     (a bare overflow-x:auto computes it to auto and the strip wobbles),
+     and the 1px bottom pad keeps the chosen tab's underline inside the
+     clip. No edge fades here - the strip's own swipe walk steps the views,
+     so an off-screen tab never reads as lost */
+  body.rd .rd-wv-tabs > div[role="group"] {
+    min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none; padding-bottom: 1px; margin-bottom: -1px;
+  }
+  body.rd .rd-wv-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
   body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
   body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
   body.rd .rd-wv-vs { grid-column: 3; grid-row: 1; }
