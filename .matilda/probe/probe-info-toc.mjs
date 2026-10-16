@@ -87,7 +87,7 @@ async function open(width, height) {
 }
 
 const PANEL_TITLES = ["Two-party preferred", "Primary vote", "Latest and next polls", "Leadership",
-  "National direction", "Who votes for whom", "Where One Nation’s voters came from", "The issues",
+  "National direction", "Who votes for whom", "Where One Nation’s voters are coming from", "The issues",
   "Decidedness", "Economic sentiment", "Past cycles", "All polls"];
 
 /* --------------------------- head + heads --------------------------- */
@@ -249,7 +249,21 @@ const jumped = await page.evaluate(() => {
   const btns = [...document.querySelectorAll(".info-toc-list button")];
   const b = btns.find((x) => x.textContent.trim() === "Decidedness");
   b.click();
-  return new Promise((r) => setTimeout(() => r({ y: window.scrollY, open: !!document.querySelector(".info-toc-list") }), 1500));
+  // the pick glides ~19k px down the page; a fixed 1.5s wait samples the
+  // spy mid-glide (lights whatever section is passing) once the page grows
+  // past what that budget can cover – poll for the scroll to settle
+  return new Promise((r) => {
+    let last = -1, still = 0;
+    const t0 = Date.now();
+    const tick = () => {
+      const y = window.scrollY;
+      still = y === last ? still + 1 : 0;
+      last = y;
+      if (still >= 2 || Date.now() - t0 > 5000) return r({ y, open: !!document.querySelector(".info-toc-list") });
+      setTimeout(tick, 120);
+    };
+    tick();
+  });
 });
 check(jumped.y > 500, `a sheet pick jumps the page (scrollY ${jumped.y.toFixed(0)})`);
 check(!jumped.open, "the pick shuts the sheet");

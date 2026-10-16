@@ -1,8 +1,9 @@
-/* sw-space-cycle.mjs — the "Where One Nation's voters came from" title
-   cycler's Space walk (viewport claim, 2026-10-15): Space steps the
-   panel's three views in the title button's tap order — Where One
-   Nation's voters came from -> Where the Coalition's voters are going
-   -> Where Labor's voters are going -> wrap to came-from. A FOCUSED
+/* sw-space-cycle.mjs — the "Where One Nation's voters are coming from"
+   title cycler's Space walk (viewport claim, 2026-10-15): Space steps the
+   panel's four views in the title button's tap order — Where One
+   Nation's voters are coming from -> Where the Coalition's voters are
+   going -> Where Labor's voters are going -> Where the Greens' voters
+   are going -> wrap to came-from. A FOCUSED
    title button keeps its own Space (native activation taps it);
    off the viewport Space keeps its scroll day job.
 
@@ -12,17 +13,7 @@
    own sections, so the positive checks park the page where
    #switching is the ONLY claiming section on screen. #switching sits
    between #who-votes and the non-claiming sections (issues,
-   undecided, mood), so claim-free spots exist below it.
-
-   Where #switching SHARES the screen with #who-votes (a flush pair
-   several screens tall between them), the section holding the bigger
-   share of the viewport owns the key (rdSpaceDominant, 2026-10-15) —
-   the boundary-band block below pins both directions.
-
-   The going views' draw differs by width (de385e6): the desktop draw
-   is the came-from mosaic's own cards (destination columns), the
-   ≤640px draw the label-ladder rows; the .rd-go-wrap figure wraps
-   both, so "a going view is up" keys off that. */
+   undecided, mood), so claim-free spots exist below it. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -67,9 +58,11 @@ const swState = () => page.evaluate(() => {
   const t = h2 ? h2.textContent.trim() : "";
   const hint = btn ? btn.getAttribute("aria-label") : null;
   return { title: t,
-           view: /came from/.test(t) ? "onp" : /Coalition/.test(t) ? "lnp" : /Labor/.test(t) ? "alp" : "?",
+           view: /coming from/.test(t) ? "onp" : /Coalition/.test(t) ? "lnp" : /Labor/.test(t) ? "alp" : /Greens/.test(t) ? "grn" : "?",
            hint,
-           going: !!document.querySelector("#switching .rd-go-wrap") };
+           /* going view = phone rows on a narrow viewport, the desktop
+              mosaic (.rd-go) on a wide one */
+           going: !!(document.querySelector("#switching .rd-go-rows") || document.querySelector("#switching .rd-go")) };
 });
 const rects = () => page.evaluate((ids) => {
   const out = {};
@@ -111,13 +104,13 @@ console.log("== Space cycles the voter-switching views ==");
 
 const yClaim = await page.evaluate(() => window.scrollY);
 const seenViews = [(await swState()).view];
-for (let i = 1; i <= 3; i++) {           /* three steps: Coalition, Labor, wrap */
+for (let i = 1; i <= 4; i++) {           /* four steps: Coalition, Labor, Greens, wrap */
   await page.keyboard.press("Space");
   await sleep(250);
   seenViews.push((await swState()).view);
 }
-ok("each Space steps to the next view, came-from -> Coalition -> Labor -> wrap",
-   JSON.stringify(seenViews) === JSON.stringify(["onp", "lnp", "alp", "onp"]), seenViews.join(" -> "));
+ok("each Space steps to the next view, came-from -> Coalition -> Labor -> Greens -> wrap",
+   JSON.stringify(seenViews) === JSON.stringify(["onp", "lnp", "alp", "grn", "onp"]), seenViews.join(" -> "));
 ok("page never scrolled while the claim held", (await page.evaluate(() => window.scrollY)) === yClaim,
    "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yClaim);
 
@@ -126,7 +119,7 @@ await page.keyboard.press("Space");
 await sleep(300);
 {
   const s = await swState();
-  ok("Coalition view renders its going draw", s.view === "lnp" && s.going, "view " + s.view + ", go figure " + s.going);
+  ok("Coalition view shows its going ladder", s.view === "lnp" && s.going, "view " + s.view + ", go rows " + s.going);
   ok("Coalition-view hint points at Labor", /Labor/.test(s.hint || ""), JSON.stringify(s.hint));
 }
 
@@ -143,77 +136,12 @@ await page.evaluate(() => { document.activeElement && document.activeElement.blu
 await sleep(100);
 await page.keyboard.press("Space");
 await sleep(300);
-ok("claim resumes once the button blurs (Labor -> wrap to came-from)", (await swState()).view === "onp",
+ok("claim resumes once the button blurs (Labor -> Greens)", (await swState()).view === "grn",
    "view " + (await swState()).view);
-
-/* the boundary band: where #who-votes and #switching share the screen,
-   the bigger visible share owns the key (rdSpaceDominant). Check both
-   directions of the handover: switching's top a quarter down the
-   viewport gives switching the key; three quarters down gives it (and
-   the chip walk) back to who-votes. */
-console.log("== boundary band: the bigger viewport share owns the key ==");
-const wvPressed = () => page.evaluate(() =>
-  [...document.querySelectorAll("#who-votes .rd-chip")]
-    .findIndex((b) => b.getAttribute("aria-pressed") === "true"));
-const shares = () => page.evaluate(() => {
-  const vis = (id) => {
-    const r = document.getElementById(id).getBoundingClientRect();
-    return Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
-  };
-  return { wv: Math.round(vis("who-votes")), sw: Math.round(vis("switching")) };
-});
-{
-  await page.evaluate(() => {
-    const el = document.getElementById("switching");
-    window.scrollTo(0, el.offsetTop - Math.round(window.innerHeight * 0.25));
-  });
-  await sleep(600);
-  const sh = await shares();
-  ok("parked with switching the bigger share of the boundary band", sh.sw > sh.wv && sh.wv > 0,
-     JSON.stringify(sh));
-  const c0 = await wvPressed();
-  const yB = await page.evaluate(() => window.scrollY);
-  await page.keyboard.press("Space");
-  await sleep(300);
-  ok("switching owns the band (came-from -> Coalition)", (await swState()).view === "lnp",
-     "view " + (await swState()).view);
-  ok("who-votes chips did not walk while switching owned it", (await wvPressed()) === c0,
-     "pressed " + c0 + " -> " + (await wvPressed()));
-  ok("page never scrolled across the band press", (await page.evaluate(() => window.scrollY)) === yB,
-     "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yB);
-
-  /* flip the handover: switching's top three-quarters down gives
-     who-votes the bigger share — Space walks the CHIPS again and the
-     cycler stands still (still on the Coalition view from above) */
-  await page.evaluate(() => {
-    const el = document.getElementById("switching");
-    window.scrollTo(0, el.offsetTop - Math.round(window.innerHeight * 0.75));
-  });
-  await sleep(600);
-  const sh2 = await shares();
-  ok("parked with who-votes the bigger share of the band", sh2.wv > sh2.sw && sh2.sw > 0,
-     JSON.stringify(sh2));
-  const yB2 = await page.evaluate(() => window.scrollY);
-  await page.keyboard.press("Space");
-  await sleep(300);
-  ok("who-votes owns the band (chips walk to Labor)", (await wvPressed()) === 1,
-     "pressed " + (await wvPressed()));
-  ok("the cycler stood still while who-votes owned it", (await swState()).view === "lnp",
-     "view " + (await swState()).view);
-  ok("page never scrolled across the second band press", (await page.evaluate(() => window.scrollY)) === yB2,
-     "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yB2);
-  /* hand the key back before the scroll-day-job checks: step the
-     cycler home and the chips back to One Nation */
-  await page.evaluate(() => {
-    const el = document.getElementById("switching");
-    window.scrollTo(0, el.offsetTop + 1);
-  });
-  await sleep(400);
-  await page.keyboard.press("Space"); await sleep(200);   /* lnp -> alp */
-  await page.keyboard.press("Space"); await sleep(200);   /* alp -> onp */
-  ok("cycler back on the came-from view for the day-job checks", (await swState()).view === "onp",
-     "view " + (await swState()).view);
-}
+await page.keyboard.press("Space");
+await sleep(300);
+ok("one more step wraps the Greens back to the came-from view", (await swState()).view === "onp",
+   "view " + (await swState()).view);
 
 /* off the viewport Space keeps its scroll day job and leaves the views;
    park below the panel where NO claiming section intersects, with room

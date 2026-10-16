@@ -3342,13 +3342,14 @@ function RdSwitching({ rangeId }) {
   const S = D.onSources;
   const boxRef = React.useRef(null);
   const W = useRdWidth(boxRef, 1152);
-  /* the panel's three views: where One Nation's new voters came from (the
-     default, and the one the probes gate on), and the reverse read of the
-     same waves - where each major 2025 cohort's voters have gone */
+  /* the panel's four views: where One Nation's new voters are coming from
+     (the default, and the one the probes gate on), and the reverse read of
+     the same waves - where each 2025 cohort's voters are going (Coalition,
+     Labor, Greens) */
   const [view, setView] = useState("onp");
-  const GO_NEXT = { onp: "lnp", lnp: "alp", alp: "onp" };
-  /* Space walks the same onp -> lnp -> alp cycle the title button taps
-     through, claimed while the section is on screen (the viewport-claim
+  const GO_NEXT = { onp: "lnp", lnp: "alp", alp: "grn", grn: "onp" };
+  /* Space walks the same onp -> lnp -> alp -> grn cycle the title button
+     taps through, claimed while the section is on screen (the viewport-claim
      convention); /vic/ carries no vote-switching payload, so the ref is
      null there and Space keeps its scroll day job. In the boundary band
      where the who-votes panel above is part-visible too, the section
@@ -3472,44 +3473,44 @@ function RdSwitching({ rangeId }) {
   const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap((c) => pollRate(c.id).map((d) => d.y)
     .concat(c.sr.rate.monthly.map((m) => m.v + (m.ci95 || 0))))) / 25) * 25);
 
-  /* ---- where the majors' 2025 voters are going (the cycle views) -------------
+  /* ---- where each cohort's 2025 voters are going (the cycle views) -------------
      The same waves read cohort-row-first: kept, gone to One Nation, gone to
-     the other major, gone to the Greens, gone to the minors - a full row
+     the other major, gone to the Greens, gone to the others - a full row
      summing to the cohort, so no 2025-weight re-scaling is needed. */
   const goRow = view !== "onp" ? (S.going || []).find((g) => g.id === view) : null;
   const V = goRow ? view : "onp";
-  const GO_COHORT_W = { lnp: "2025 Coalition voters", alp: "2025 Labor voters" };
-  const GO_OWN = { lnp: "the Coalition", alp: "Labor" };
-  const GO_OTHER = { lnp: "alp", alp: "lnp" };
-  const GO_HALF = { lnp: "Coalition", alp: "Labor" };
+  const GO_COHORT_W = { lnp: "2025 Coalition voters", alp: "2025 Labor voters", grn: "2025 Greens voters" };
+  const GO_OWN = { lnp: "the Coalition", alp: "Labor", grn: "the Greens" };
+  const GO_HALF = { lnp: "Coalition", alp: "Labor", grn: "Greens" };
   const cyc = () => setView(GO_NEXT[V]);
   const GO_HINT = { onp: "Tap: where 2025 Coalition voters are going",
                     lnp: "Tap: where 2025 Labor voters are going",
-                    alp: "Tap: where One Nation's voters came from" };
+                    alp: "Tap: where 2025 Greens voters are going",
+                    grn: "Tap: where One Nation's voters are coming from" };
   const cycTitle = (() => {
     const btn = (w) => <button type="button" className="rd-sw-cycle" title={GO_HINT[V]} aria-label={GO_HINT[V]} onClick={cyc}>{w}</button>;
     if (V === "lnp") return <>Where {btn("the Coalition")}’s voters are going</>;
     if (V === "alp") return <>Where {btn("Labor")}’s voters are going</>;
-    return <>Where {btn("One Nation")}’s voters came from</>;
+    if (V === "grn") return <>Where {btn("the Greens")}’ voters are going</>;
+    return <>Where {btn("One Nation")}’s voters are coming from</>;
   })();
   /* a destination's words in the copy, by id: its display name, the noun in
      a sentence, and the "the move to One Nation" form the trend line names */
   const goWords = (id) => {
-    const other = GO_OTHER[V];
     const M = {
-      kept: { nm: V === "lnp" ? "The Coalition" : "Labor",
+      kept: { nm: V === "lnp" ? "The Coalition" : V === "alp" ? "Labor" : "The Greens",
               noun: GO_OWN[V], sd: "the share staying with " + GO_OWN[V],
               color: "var(--" + V + ")", tint: "var(--tint-" + V + ")", fill: "var(--on-fill-" + V + ")" },
       onp: { nm: "One Nation", noun: "One Nation", sd: "the move to One Nation",
              color: "var(--onp)", tint: "var(--tint-onp)", fill: "var(--on-fill-onp)" },
-      cross: { nm: V === "lnp" ? "Labor" : "The Coalition",
-               noun: V === "lnp" ? "Labor" : "the Coalition",
-               sd: "the move to " + (V === "lnp" ? "Labor" : "the Coalition"),
-               color: "var(--" + other + ")", tint: "var(--tint-" + other + ")", fill: "var(--on-fill-" + other + ")" },
+      alp: { nm: "Labor", noun: "Labor", sd: "the move to Labor",
+             color: "var(--alp)", tint: "var(--tint-alp)", fill: "var(--on-fill-alp)" },
+      lnp: { nm: "The Coalition", noun: "the Coalition", sd: "the move to the Coalition",
+             color: "var(--lnp)", tint: "var(--tint-lnp)", fill: "var(--on-fill-lnp)" },
       grn: { nm: "The Greens", noun: "the Greens", sd: "the move to the Greens",
              color: "var(--grn)", tint: "var(--tint-grn)", fill: "var(--on-fill-grn)" },
-      oth: { nm: "Minors & independents", noun: "minor parties or independents",
-             sd: "the move to minors or independents",
+      oth: { nm: "Others & independents", noun: "others & independents",
+             sd: "the move to others & independents",
              color: "var(--oth)", tint: "var(--tint-oth)", fill: "var(--on-fill-oth)" },
     };
     return M[id];
@@ -3594,9 +3595,9 @@ function RdSwitching({ rangeId }) {
   const goNmOpts = (r) => r.id === "kept" ? [r.nm + ", kept", r.nm]
     : r.id === "onp" ? ["One Nation", "ON"]
     : r.id === "grn" ? ["The Greens", "Greens", ""]
-    : r.id === "oth" ? ["Minors & independents", "Minors", "Others", ""]
-    : r.id === "cross" && V === "alp" ? ["The Coalition", "Coalition", ""]
-    : r.id === "cross" ? ["Labor", ""]
+    : r.id === "oth" ? ["Others & independents", "Others", ""]
+    : r.id === "lnp" ? ["The Coalition", "Coalition", ""]
+    : r.id === "alp" ? ["Labor", ""]
     : [r.nm];
   const goGeo = (() => {
     const tot = goRows.reduce((s, r) => s + r.now.v, 0) || 100;
@@ -3728,8 +3729,17 @@ function RdSwitching({ rangeId }) {
           <div className="rd-go-rbar" style={{ height: Math.max(16, r.now.v * 2.6), background: r.tint }}>
             <span style={{ width: r.now.v + "%", background: r.color }}></span>
             {r.id === "kept" ? (
+              /* the kept figure sits after the bar while it fits there, as
+                 the mosaic's kept column does; a kept share whose bar nearly
+                 fills the row takes the mosaic's own dodge - inside the
+                 fill, in the on-colour ink */
+              W * r.now.v / 100 + 8 + textWidth(gof(r.now.v) + "%", 22, 600) + 4 <= W ? (
               <em className="rd-go-first" style={{ left: "calc(" + r.now.v + "% + 8px)", color: inkOf(r.color) }}>
                 <span className="rd-go-big">{gof(r.now.v)}%</span><span className="rd-go-nb">kept</span></em>
+              ) : (
+              <em className="rd-go-first" style={{ right: "calc(" + (100 - r.now.v) + "% + 8px)", color: r.fill }}>
+                <span className="rd-go-big">{gof(r.now.v)}%</span><span className="rd-go-nb">kept</span></em>
+              )
             ) : <em style={{ left: "calc(" + r.now.v + "% + 8px)", color: inkOf(r.color) }}>{gof(r.now.v)}%</em>}
             {r.id === "kept" && <i className="rd-go-else" style={{ color: inkOf(r.color) }}>Went elsewhere</i>}
           </div>
@@ -3796,7 +3806,7 @@ function RdSwitching({ rangeId }) {
         }) }]}
         note={"Shares are pooled across pollsters; a destination’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample and the cohort’s share of it), Holm’s correction applied across the five destinations, so Yes means the slope clears 95% — the test behind the “since " + goSinceM + "” line above."}
       />
-      <RdFoot how={{ term: "vote-switching", from: V === "lnp" ? "Where the Coalition’s voters are going" : "Where Labor’s voters are going" }}>
+      <RdFoot how={{ term: "vote-switching", from: { lnp: "Where the Coalition’s voters are going", alp: "Where Labor’s voters are going", grn: "Where the Greens’ voters are going" }[V] }}>
         2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. Where a house prints an undecided cell for a cohort the row is re-scaled to its decided shares.
       </RdFoot>
     </>
@@ -3974,7 +3984,7 @@ function RdSwitching({ rangeId }) {
         }) }]}
         note={"Rates are pooled across pollsters; a party’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the four parties, so Yes means the slope clears 95% — the test behind the “since " + sinceM + "” line above."}
       />
-      <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters came from" }}>
+      <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters are coming from" }}>
         2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
       </RdFoot>
         </>

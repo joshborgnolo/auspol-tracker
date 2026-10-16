@@ -1557,7 +1557,7 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-chips-row .rd-chip { padding: 0 5px; gap: 4px; font-size: 12px; }
 }
 
-/* ---------- where One Nation's voters came from ------------------------------ */
+/* ---------- where One Nation's voters are coming from ------------------------ */
 body.rd .rd-mo-wrap { margin-top: 36px; }
 body.rd .rd-mo { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
 body.rd .rd-mo text { font-family: var(--sans); }

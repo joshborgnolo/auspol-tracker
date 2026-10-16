@@ -1,13 +1,14 @@
-/* Probe: the Switching panel's title cycler and the two "going" views
+/* Probe: the Switching panel's title cycler and the "going" views
    (rd-panels.jsx RdSwitching, data D.onSources.going).
-   Contract (user, 2026-10-13: clicking "One Nation" in the title shows
-   "Where the Coalition's voters are going", then "Where Labor's voters
-   are going", then back; the going views were assimilated to the
-   came-from view's presentation on 2026-10-15):
+   Contract (user, 2026-10-16: clicking cycles "Where One Nation's voters
+   are coming from" -> "Where the Coalition's voters are going" -> Labor
+   -> the Greens -> back; the going views were assimilated to the
+   came-from view's presentation on 2026-10-15, the Greens view added
+   2026-10-16):
    - the panel loads on the One Nation view at every width (the other
      probes gate on that); the title's party word is a .rd-sw-cycle button;
-   - clicking cycles onp -> lnp -> alp -> onp, the title and the view
-     swapping together;
+   - clicking cycles onp -> lnp -> alp -> grn -> onp, the title and the
+     view swapping together;
    - a going view presents like the came-from view: an svg.rd-go column
      mosaic at >=641px (one column per destination, widths summing to the
      strip, figures matching the pooled nows, the kept column senior),
@@ -99,9 +100,10 @@ async function readGoing() {
 }
 
 const expectTitle = {
-  onp: /Where One Nation.{1,2}s voters came from/,
+  onp: /Where One Nation.{1,2}s voters are coming from/,
   lnp: /Where the Coalition.{1,2}s voters are going/,
   alp: /Where Labor.{1,2}s voters are going/,
+  grn: /Where the Greens.{1,2} voters are going/,
 };
 
 async function probe(width) {
@@ -115,7 +117,7 @@ async function probe(width) {
   check(!s.rows.length && !s.svgGo, "no destination rows or columns on the came-from view");
   check(s.docOverflow <= 1, `no horizontal overflow on load (${s.docOverflow}px)`);
 
-  for (const step of ["lnp", "alp", "onp"]) {
+  for (const step of ["lnp", "alp", "grn", "onp"]) {
     await page.evaluate(() => document.querySelector("#switching .rd-sw-cycle").click());
     await new Promise((r) => setTimeout(r, 350)); // intentional-sleep: view mount + glide settle
     s = await state();

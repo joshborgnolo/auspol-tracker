@@ -2788,28 +2788,23 @@ const ON_SOURCE_GROUPS = [
 ];
 /* The reverse read of the same recall tables (the "where they're going"
    views of §5b): a wave's 2025-cohort row as five DESTINATION shares of
-   that cohort – kept (the cohort's own party), onp, cross (the other
-   major), grn, and oth, which folds the independents and YouGov's
-   community-strong cell in, as the gain shares' oth branch already does.
-   RedBridge's printed `und` residue cell (no other house prints one) is
-   renormalised out so a row still sums to its decided cohort; absent cells
-   read as zero, the gain rates' own convention (a chart read rounds small
-   cells away). */
-const GO_COHORTS = ["lnp", "alp"];
-const GO_DESTS = ["kept", "onp", "cross", "grn", "oth"];
+   that cohort – kept (the cohort's own party), then the other parties
+   present in the recall table, and oth, which folds the independents and
+   YouGov's community-strong cell in, as the gain shares' oth branch
+   already does. RedBridge's printed `und` residue cell (no other house
+   prints one) is renormalised out so a row still sums to its decided
+   cohort; absent cells read as zero, the gain rates' own convention (a
+   chart read rounds small cells away). */
+const GO_COHORTS = ["lnp", "alp", "grn"];
+const GO_DESTS = { lnp: ["kept", "onp", "alp", "grn", "oth"],
+                   alp: ["kept", "onp", "lnp", "grn", "oth"],
+                   grn: ["kept", "onp", "alp", "lnp", "oth"] };
 const goDestRow = (row, cohort) => {
   if (!row) return null;
   const und = Math.min(99, row.und ?? 0), k = 100 / (100 - und);
   const cell = (name) => (row[name] ?? 0) * k;
   const cs = (row["community-strong"] ?? row["community-strong-australia"] ?? 0) * k;
-  const out = {
-    kept: cell(cohort),
-    onp: cell("onp"),
-    cross: cell(cohort === "lnp" ? "alp" : "lnp"),
-    grn: cell("grn"),
-    oth: cell("oth") + cell("ind") + cs,
-  };
-  return Object.fromEntries(GO_DESTS.map((d) => [d, r1(out[d])]));
+  return Object.fromEntries(GO_DESTS[cohort].map((d) => [d, r1(d === "kept" ? cell(cohort) : d === "oth" ? cell("oth") + cell("ind") + cs : cell(d))]));
 };
 const onSourceWaves = (() => {
   if (!Array.isArray(VOTE_SWITCHING?.waves) || !VOTE_SWITCHING.weights2025) return [];
@@ -2839,8 +2834,8 @@ const onSourceWaves = (() => {
       // other parties folded at their own 2025 weights, to match DemosAU)
       toOn: { lnp: toOn("lnp"), alp: toOn("alp"), grn: toOn("grn"),
               oth: w.rows.ind ? r1((W.ind * toOn("ind") + W.oth * toOn("oth")) / (W.ind + W.oth)) : toOn("oth") },
-      // the Coalition and Labor rows as destination shares (goDestRow)
-      dest: { lnp: goDestRow(w.rows.lnp, "lnp"), alp: goDestRow(w.rows.alp, "alp") },
+      // the Coalition, Labor and Greens rows as destination shares (goDestRow)
+      dest: { lnp: goDestRow(w.rows.lnp, "lnp"), alp: goDestRow(w.rows.alp, "alp"), grn: goDestRow(w.rows.grn, "grn") },
       // what the table itself adds up to (gains + kept; DemosAU's non-recall
       // group excluded) beside the wave's published One Nation primary
       implied: r1(drawn + kept), onp: w.onp,
@@ -2885,7 +2880,7 @@ const onRateRows = (() => {
    2025 result – a cohort's destination row is already conditional on it. */
 const goRateRows = (() => {
   const out = {};
-  for (const c of GO_COHORTS) out[c] = Object.fromEntries(GO_DESTS.map((d) => [d, []]));
+  for (const c of GO_COHORTS) out[c] = Object.fromEntries(GO_DESTS[c].map((d) => [d, []]));
   if (!onSourceWaves.length) return out;
   const W = VOTE_SWITCHING.weights2025;
   for (const w of onSourceWaves) {
@@ -2893,7 +2888,7 @@ const goRateRows = (() => {
     const n = rowN(p || { sample: w.sample }), mid = midMs(p || { dateStart: w.dateStart, date: w.date });
     for (const c of GO_COHORTS) {
       if (!w.dest?.[c]) continue;
-      for (const d of GO_DESTS) out[c][d].push({ ym: w.ym, mid, x: w.dest[c][d], n: n * W[c] / 100, firm: w.pollster });
+      for (const d of GO_DESTS[c]) out[c][d].push({ ym: w.ym, mid, x: w.dest[c][d], n: n * W[c] / 100, firm: w.pollster });
     }
   }
   return out;
@@ -2901,7 +2896,7 @@ const goRateRows = (() => {
 const going = !onSourceWaves.length ? [] : GO_COHORTS.map((c) => ({
   id: c,
   weight: VOTE_SWITCHING.weights2025[c],
-  dests: GO_DESTS.map((d) => ({
+  dests: GO_DESTS[c].map((d) => ({
     id: d,
     now: currentReading(goRateRows[c][d], null, SPARSE_K),
     monthly: MONTHS.map((ym) => {

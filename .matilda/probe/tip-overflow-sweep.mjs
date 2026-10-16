@@ -7,7 +7,7 @@
    or widens the page. The first sweep found four more: Who votes for
    whom's and Leadership's month readouts (a "95% intervals" row that never
    wrapped: 457px over a 320px plot), and the small multiples of Where One
-   Nation's voters came from and How much the polls disagree (a readout
+   Nation's voters are coming from and How much the polls disagree (a readout
    wider than its 150px panel clamped to the panel's centre, 14px off the
    screen). TrendChart, RdDisagree and the Preference flows tips now clamp
    to the screen and cap their width at it.

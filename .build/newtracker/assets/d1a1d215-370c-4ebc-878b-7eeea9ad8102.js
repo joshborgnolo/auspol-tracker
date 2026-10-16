@@ -7709,7 +7709,7 @@ function infoTerms(D) {
           before 1946, which the site leaves out. RedBridge reports none, so its Boomers take in
           everyone born before 1965. Either way, they are a small share of the sample.</span></>) },
       ] },
-    { id: "s-switching", title: "Where One Nation’s voters came from", nav: "Vote switching",
+    { id: "s-switching", title: "Where One Nation’s voters are coming from", nav: "Vote switching",
       lead: { id: "vote-switching", body: (
         <>How people who voted for each party in 2025 say they would vote now, from the tables
         DemosAU and YouGov publish with a row for each 2025 vote.

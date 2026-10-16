@@ -4,7 +4,13 @@
    B. TITLE/DEK SWAPPED: head = "{frac} 2025 {A} voters now back One Nation"
       from the higher lnp/alp switch rate; dek = flocked-ratio sentence then
       the old gain-share head sentence. All figures recomputed from the LIVE
-      data bundle (9f09dca2 asset evaluated in Node).
+      data bundle (9f09dca2 asset evaluated in Node). The 5cd7388a dek
+      rewrite (2026-10-15) says the ratio in WORDS to the nearest half
+      ("about three times", timesWords) and the gain share as plain
+      fractions that name the top TWO sizeable sources ("about three in
+      five voted for the Coalition in 2025 and about one in five for
+      Labor.") - the pins below were re-pointed from the old digit forms
+      (quarter-rounded ratio, one source named) on 2026-10-16.
    C. POINTS-ROW SUFFIXES: the first two columns (lnp, alp) name what they
       count - "≈ N points of One Nation's gain" where it fits, "≈ N points
       of ON's gain" short, phone rows fixed at the short form; later columns
@@ -38,8 +44,25 @@ for (const e of S.series) now[e.id] = { rate: e.rate.now.v, gain: e.now.v };
 const hi = now.lnp.rate >= now.alp.rate ? "lnp" : "alp";
 const lo = hi === "lnp" ? "alp" : "lnp";
 const P = { lnp: "Coalition", alp: "Labor" };
-const RATIO = Math.round((now[hi].rate / now[lo].rate) * 4) / 4;
-console.log(`live data: lnp rate=${now.lnp.rate.toFixed(1)} gain=${now.lnp.gain.toFixed(1)} · alp rate=${now.alp.rate.toFixed(1)} gain=${now.alp.gain.toFixed(1)} · ratio=${RATIO}`);
+/* 5cd7388a: the dek says the ratio in words to the nearest half
+   (timesWords) and the gain share as plain fractions (rdFraction) */
+const NUMW = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const timesW = (r) => {
+  const h = Math.round(r * 2) / 2;
+  if (h >= 11) return "about " + Math.round(r) + " times";
+  if (h === 2) return "about twice";
+  return "about " + NUMW[Math.floor(h)] + (h % 1 ? " and a half" : "") + " times";
+};
+const fracW = (p) => {
+  const cands = [[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 6], [1, 7], [1, 8],
+                 [1, 9], [1, 10], [3, 10], [7, 10], [9, 10], [1, 12], [1, 15], [1, 20]];
+  let best = null;
+  for (const [a, b] of cands) { const err = Math.abs(p / 100 - a / b); if (!best || err < best.err) best = { a, b, err }; }
+  return (best.err < 0.012 ? "" : "about ") + NUMW[best.a] + " in " + NUMW[best.b];
+};
+const RATIO = now[hi].rate / now[lo].rate;
+const RATIO_WORDS = timesW(RATIO);
+console.log(`live data: lnp rate=${now.lnp.rate.toFixed(1)} gain=${now.lnp.gain.toFixed(1)} · alp rate=${now.alp.rate.toFixed(1)} gain=${now.alp.gain.toFixed(1)} · ratio=${RATIO.toFixed(2)} ("${RATIO_WORDS}")`);
 
 /* ---- serve the repo ---------------------------------------------------- */
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
@@ -88,8 +111,16 @@ const readPanel = async (width) => {
   else {
     ok("head swaps to the rate sentence", new RegExp(`^(?:Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
     ok("head names the HIGHER-rate party", p.head.includes(P[hi]) && !p.head.includes(P[hi] === "Coalition" ? "Labor" : "Coalition"), P[hi] + " rate " + now[hi].rate.toFixed(1));
-    ok("dek carries the flocked-ratio sentence", new RegExp(`${P[hi]} voters have flocked to One Nation at about ${String(RATIO).replace(".", "\\.")} times the rate of ${P[lo]} voters`).test(p.dek), p.dek.slice(0, 140));
-    ok("dek carries the old head’s gain-share sentence", /of One Nation.{1,3}new voters (?:voted for|backed) (the )?(Coalition|Labor|Greens|another party) in 2025\./.test(p.dek), p.dek.slice(0, 260));
+    ok("dek carries the flocked-ratio sentence", p.dek.includes(`${P[hi]} voters have flocked to One Nation at ${RATIO_WORDS} the rate of ${P[lo]} voters`), p.dek.slice(0, 140));
+    /* the old head's gain-share sentence, computed exactly: the top source
+       as a fraction, the second while it clears 15% of the cohort, party
+       names as the dek renders them */
+    const PARTY_OF = { lnp: "the Coalition", alp: "Labor", grn: "the Greens", oth: "another party" };
+    const byGain = [...Object.entries(now)].sort((a, b) => b[1].gain - a[1].gain);
+    const topSrc = byGain[0][0], src2 = byGain[1] && byGain[1][1].gain >= 15 ? byGain[1][0] : null;
+    const gainSent = "Of One Nation’s new voters, " + fracW(byGain[0][1].gain) + " voted for " + PARTY_OF[topSrc] + " in 2025"
+      + (src2 ? " and " + fracW(byGain[1][1].gain) + " for " + PARTY_OF[src2] : "") + ".";
+    ok("dek carries the old head’s gain-share sentence", p.dek.includes(gainSent), p.dek.slice(0, 260) + " vs expected " + gainSent);
     ok("old dek tail gone", !/now say they.{1,3}d vote for One Nation/i.test(p.dek));
     ok("mosaic aria back to rate-fills (revert of 742df1e)", /filled by the share now backing One Nation/.test(p.aria));
     const sorted = [...Object.entries(now)].sort((a, b) => b[1].gain - a[1].gain);
@@ -113,7 +144,7 @@ const readPanel = async (width) => {
     ok("phone head swaps to the rate sentence", new RegExp(`^(?:Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
     ok("phone rows render ≈ pts labels", p.moRows.length >= 4 && p.moRows.every((t) => t.startsWith("≈")), JSON.stringify(p.moRows));
     ok("phone rows 1 and 2 both say “of ON's gain”", p.moRows.slice(0, 2).every((t) => /points of ON.s gain/.test(t)), JSON.stringify(p.moRows.slice(0, 3)));
-    ok("phone dek carries the flocked-ratio sentence", p.dek.includes(P[hi]) && p.dek.includes(`${RATIO}`), p.dek.slice(0, 120));
+    ok("phone dek carries the flocked-ratio sentence", p.dek.includes(P[hi]) && p.dek.includes(RATIO_WORDS), p.dek.slice(0, 120));
   }
 }
 
