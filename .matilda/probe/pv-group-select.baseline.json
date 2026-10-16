@@ -79,9 +79,9 @@
    "selRect": {
     "x": 20,
     "y": 2218.8,
-    "w": 182,
+    "w": 249,
     "h": 36.8,
-    "right": 202,
+    "right": 269,
     "bottom": 2255.6
    },
    "statsRect": {
@@ -151,8 +151,8 @@
     "Full time",
     "Part time",
     "Retired",
-    "Lower earners",
-    "Higher earners"
+    "Lower earners (bottom 50%)",
+    "Higher earners (top 15%)"
    ]
   }
  },
@@ -237,9 +237,9 @@
     "bottom": 1769.1
    },
    "selRect": {
-    "x": 1034,
+    "x": 967,
     "y": 1732.3,
-    "w": 182,
+    "w": 249,
     "h": 36.8,
     "right": 1216,
     "bottom": 1769.1
@@ -311,8 +311,8 @@
     "Full time",
     "Part time",
     "Retired",
-    "Lower earners",
-    "Higher earners"
+    "Lower earners (bottom 50%)",
+    "Higher earners (top 15%)"
    ]
   }
  }

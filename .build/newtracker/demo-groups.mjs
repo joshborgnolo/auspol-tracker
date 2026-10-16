@@ -125,14 +125,14 @@ export const DEMO_SHARE = {
      bottom half of the income scale and the top 15%+. These size only
      the sampling-error floor and cancel out of the pooled figure – the
      values equal INCOME_STD_BANDS' widths, and the probe pins that. */
-  "Lower earners": 0.5, "Higher earners": 0.15,
+  "Lower earners (bottom 50%)": 0.5, "Higher earners (top 15%)": 0.15,
 };
 
 /* The income tab's standard bands on the income-quantile axis: the
    pooled line is read at each band's midpoint. */
 export const INCOME_STD_BANDS = [
-  { group: "Lower earners", lo: 0, hi: 0.5 },
-  { group: "Higher earners", lo: 0.85, hi: 1 },
+  { group: "Lower earners (bottom 50%)", lo: 0, hi: 0.5 },
+  { group: "Higher earners (top 15%)", lo: 0.85, hi: 1 },
 ];
 
 /* Each income-printing house's bracket layout, exactly as demographics.json

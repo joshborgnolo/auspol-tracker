@@ -1765,8 +1765,8 @@ const RD_DEMO_SHORT = {
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
-  // the income tab's two standard bands: the electorate's bottom half and its top 15%+
-  "Lower earners": "lower earners", "Higher earners": "higher earners",
+  // the income tab's two standard bands
+  "Lower earners (bottom 50%)": "lower earners (bottom 50%)", "Higher earners (top 15%)": "higher earners (top 15%)",
 };
 /* ---- the headline: who each party's voters are ----------------------------
    One line per party, constant across the grouping tabs, written from the
@@ -3186,7 +3186,7 @@ function RdDemographics({ rangeId = "all" }) {
         {tab.sets.some((st) => st.bands) ? (
           <div className="rd-wv-bands">
             {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (
-              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span>
+              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.basis ? "(" + x.b.basis + " income) " : null}{x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span>
             ))}
           </div>
         ) : null}

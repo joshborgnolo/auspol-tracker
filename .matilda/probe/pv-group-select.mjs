@@ -9,8 +9,8 @@
           on phones
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Retired /
-          Rural / ACT/NT/Tas / Non-NSW/Vic/Qld / Lower earners / Higher
-          earners) drive figures, bracket,
+          Rural / ACT/NT/Tas / Non-NSW/Vic/Qld / Lower earners (bottom 50%)
+          / Higher earners (top 15%)) drive figures, bracket,
           head/dek/meta, y-domain,
           election sub-lines — figures asserted against window.AUSPOL itself.
           The earners bands are the income tab's standardised reads,
@@ -248,12 +248,12 @@ const SHORT = {
   Retired: "retirees", NSW: "NSW voters", Rural: "rural voters",
   "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "ACT/NT/Tas": "Tasmanians, Canberrans and Territorians",
-  "Lower earners": "lower earners", "Higher earners": "higher earners",
+  "Lower earners (bottom 50%)": "lower earners (bottom 50%)", "Higher earners (top 15%)": "higher earners (top 15%)",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
                            ["NSW", { chg: true }], ["University", {}], ["Retired", { level: true }], ["Rural", { tallTicks: true, chg: true }],
                            ["ACT/NT/Tas", { chg: true }], ["Non-NSW/Vic/Qld", { chg: true }],
-                           ["Lower earners", {}], ["Higher earners", {}]]) {
+                           ["Lower earners (bottom 50%)", {}], ["Higher earners (top 15%)", {}]]) {
   const exp = await expectedFor(label);
   const s = await collect(1280, 900, label);
   console.log(`--- ${label}`);
@@ -358,7 +358,7 @@ const clickDot = async (selValue) => {
 console.log("== dot clicks open All polls on the matching facet ==");
 for (const { view, wantFacet, wantSplit } of [{ view: "Gen Z", wantFacet: "Demographics", wantSplit: "Age" },
                                               { view: "Renting", wantFacet: "Demographics", wantSplit: "Home" },
-                                              { view: "Lower earners", wantFacet: "Demographics", wantSplit: "Income" },
+                                              { view: "Lower earners (bottom 50%)", wantFacet: "Demographics", wantSplit: "Income" },
                                               { view: null, wantFacet: "Primary", wantSplit: null }]) {
   const name = view || "All voters";
   const { dot, landed } = await clickDot(view);
@@ -440,7 +440,7 @@ console.log("== group dots tip the printed figure, and the lift is disclosed =="
 /* the income bands' own case: the "printed" figure of record is the
    standardised read (the set's own note must disclose it, page and card) */
 for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renting", group: "Renting" },
-                               { view: "Higher earners", group: "Higher earners" }, { view: null, group: null }]) {
+                               { view: "Higher earners (top 15%)", group: "Higher earners (top 15%)" }, { view: null, group: null }]) {
   const name = view || "All voters";
   const { dot, got } = await hoverTip(view, group);
   console.log(`--- ${name} dot tooltip`);
@@ -456,7 +456,7 @@ for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renti
     ok(`${name}: lift note under the chart`, !!got && !!got.noteText && got.noteText.includes("own all-voters figure") && got.noteText.includes("Demographics"),
       got && String(got.noteText).slice(0, 80));
     ok(`${name}: copy caption discloses the lift`, !!got && !!got.caption && got.caption.includes("less its own all-voters figure"), got && got.caption);
-    if (/earners$/.test(group)) {
+    if (/earners/.test(group)) {
       const BANDS = "read at the same two bands of the electorate";
       ok(`${name}: note discloses the standardised income read`, !!got && !!got.noteText && got.noteText.includes(BANDS), got && got.noteText);
       ok(`${name}: caption discloses it too`, !!got && !!got.caption && got.caption.includes(BANDS), got && got.caption);

@@ -2235,7 +2235,7 @@ const DEMO_WHO = {
   "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
   "English only": "voters who speak only English at home", "Other language": "voters who speak another language at home",
   "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
-  "Lower earners": "lower earners", "Higher earners": "higher earners",
+  "Lower earners (bottom 50%)": "lower earners", "Higher earners (top 15%)": "higher earners",
 };
 /* Per set: `all` names the groups together, `others` the rest of them beside
    one group, `step` the trend phrase for an ordered set (null where the

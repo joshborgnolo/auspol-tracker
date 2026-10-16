@@ -1308,8 +1308,11 @@ body.rd .rd-wv-tabs { margin-top: 28px; }
 body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 body.rd .rd-chips-row { margin-top: 12px; }
 body.rd .rd-wv-dots { margin-top: 20px; font-variant-numeric: tabular-nums; }
+/* the label column prices off the income tab's longest row label
+   ("Lower earners (bottom 50%)" measures 194px at 15px): at 180px it -
+   and it alone within the panel - wrapped to a second line */
 body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis {
-  display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; align-items: center;
+  display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 70px; column-gap: 16px; align-items: center;
 }
 body.rd .rd-wv-set + .rd-wv-set { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3); }
@@ -1346,7 +1349,7 @@ body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; backgr
 /* The all-voters line is the board's stroke: 1.5px, 4 on and 3 off. A CSS
    dashed border can't set its dash, and Chrome draws it as specks. */
 body.rd .rd-wv-plot { position: relative; }
-body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
+body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
 body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
 body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; transform: translateX(calc(var(--x) * 1cqw - 0.75px)); z-index: 1;
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }

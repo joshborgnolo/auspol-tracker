@@ -4181,7 +4181,7 @@ body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wr
 body.rd .rd-chips-row { margin-top: 12px; }
 body.rd .rd-wv-dots { margin-top: 20px; font-variant-numeric: tabular-nums; }
 body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis {
-  display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; align-items: center;
+  display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 70px; column-gap: 16px; align-items: center;
 }
 body.rd .rd-wv-set + .rd-wv-set { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3); }
@@ -4203,7 +4203,7 @@ body.rd .rd-wv-track { position: relative; height: 36px; }
 body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
 body.rd .rd-wv-plot { position: relative; }
-body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
+body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
 body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
 body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; transform: translateX(calc(var(--x) * 1cqw - 0.75px)); z-index: 1;
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }
@@ -41146,19 +41146,22 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "bands": {
         "YouGov": {
           "low": ["Under $100k"],
-          "high": ["$100k or more"]
+          "high": ["$100k or more"],
+          "basis": "household"
         },
         "Newspoll (pooled)": {
           "low": ["Under $50k"],
-          "high": ["$150k+"]
+          "high": ["$150k+"],
+          "basis": "household"
         },
         "DemosAU": {
           "low": ["Under $45k"],
-          "high": ["$125k+"]
+          "high": ["$125k+"],
+          "basis": "personal"
         }
       },
       "groups": [{
-        "label": "Lower earners",
+        "label": "Lower earners (bottom 50%)",
         "v": {
           "alp": 26.4,
           "lnp": 21.1,
@@ -41211,7 +41214,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         },
         "share": 0.5
       }, {
-        "label": "Higher earners",
+        "label": "Higher earners (top 15%)",
         "v": {
           "alp": 30.5,
           "lnp": 22.7,
@@ -45948,7 +45951,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "window": "six weeks"
     }
   };
-  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired", "Lower earners", "Higher earners"];
+  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired", "Lower earners (bottom 50%)", "Higher earners (top 15%)"];
   const accuracy = {
     "windowDays": 14,
     "cycles": [{
@@ -95519,8 +95522,8 @@ const DEMO_WHO = {
   "Full time": "full-time workers",
   "Part time": "part-time workers",
   Retired: "retirees",
-  "Lower earners": "lower earners",
-  "Higher earners": "higher earners"
+  "Lower earners (bottom 50%)": "lower earners",
+  "Higher earners (top 15%)": "higher earners"
 };
 const DEMO_SET_WORDS = {
   age: {
@@ -113796,8 +113799,8 @@ const RD_DEMO_SHORT = {
   "Full time": "full-time workers",
   "Part time": "part-time workers",
   Retired: "retirees",
-  "Lower earners": "lower earners",
-  "Higher earners": "higher earners"
+  "Lower earners (bottom 50%)": "lower earners (bottom 50%)",
+  "Higher earners (top 15%)": "higher earners (top 15%)"
 };
 const RD_DEMO_SUBJ = {
   onp: "One Nation voters",
@@ -115576,7 +115579,7 @@ function RdDemographics({
   })) : []).map(x => React.createElement("span", {
     className: "rd-wv-band",
     key: x.h
-  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
+  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true

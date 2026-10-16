@@ -4711,7 +4711,7 @@ const { demo: demographics, income: demoIncome } = (() => {
      one-line entry under the panel's own working. */
   let income = null;
   {
-    const iSets = demoBuild(iRows, iRowsM, [{ id: "income", label: null, groups: ["Lower earners", "Higher earners"] }], allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
+    const iSets = demoBuild(iRows, iRowsM, [{ id: "income", label: null, groups: INCOME_STD_BANDS.map((b) => b.group) }], allByYm, ALL, ALL_T, SPARSE_K, DEMO_SHARE);
     if (iSets.length) {
       const iHouses = creditHouses(incInWindow, (r) => r.w.pollster, (r) => Date.parse(r.w.date));
       income = {
@@ -4726,10 +4726,12 @@ const { demo: demographics, income: demoIncome } = (() => {
           note: "each house's own brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
           /* each house's own end brackets as its newest in-window wave
              printed them (incInWindow rides newest-first), so a switch of
-             layout era never shows the stale era's brackets */
+             layout era never shows the stale era's brackets – with the
+             house's income basis beside them, since a personal-income
+             bracket and a household one are not the same money */
           bands: Object.fromEntries(incInWindow.filter((e) => e.band)
             .filter((e, i, a) => a.findIndex((x) => x.w.pollster === e.w.pollster) === i)
-            .map((e) => [e.w.pollster, { low: [e.band[0]], high: [e.band[1]] }])),
+            .map((e) => [e.w.pollster, { low: [e.band[0]], high: [e.band[1]], basis: INCOME_GRIDS[e.w.pollster].basis }])),
           groups: iSets[0].groups,
           houses: iSets[0].houses,
         }],

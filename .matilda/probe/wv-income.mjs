@@ -96,11 +96,15 @@ const dist = JSON.parse(await readFile(join(ROOT, "data", "income-dist.json"), "
 }
 {
   ok("DEMO_SHARE widths equal the standard bands' widths",
-     near(DEMO_SHARE["Lower earners"], INCOME_STD_BANDS[0].hi - INCOME_STD_BANDS[0].lo)
-       && near(DEMO_SHARE["Higher earners"], INCOME_STD_BANDS[1].hi - INCOME_STD_BANDS[1].lo),
-     `${DEMO_SHARE["Lower earners"]} / ${DEMO_SHARE["Higher earners"]}`);
+     near(DEMO_SHARE[INCOME_STD_BANDS[0].group], INCOME_STD_BANDS[0].hi - INCOME_STD_BANDS[0].lo)
+       && near(DEMO_SHARE[INCOME_STD_BANDS[1].group], INCOME_STD_BANDS[1].hi - INCOME_STD_BANDS[1].lo),
+     `${DEMO_SHARE[INCOME_STD_BANDS[0].group]} / ${DEMO_SHARE[INCOME_STD_BANDS[1].group]}`);
   ok("the standard bands ARE bottom half + top 15%+ of the quantile axis",
      INCOME_STD_BANDS.length === 2 && near(INCOME_STD_BANDS[0].hi, 0.5) && near(INCOME_STD_BANDS[1].lo, 0.85));
+  ok("the band labels carry their electorate ranges in the name",
+     INCOME_STD_BANDS[0].group === "Lower earners (bottom 50%)"
+       && INCOME_STD_BANDS[1].group === "Higher earners (top 15%)",
+     INCOME_STD_BANDS[0].group + " / " + INCOME_STD_BANDS[1].group);
 }
 
 const PORT = 9027;
@@ -157,7 +161,7 @@ ok("D.demographics stays byte-free of the earners rows",
    !/Lower earners|Higher earners/.test(P.demoPure));
 ok("demoIncome is a single income set of the two earners tilts",
    P.income && P.income.sets.length === 1 &&
-   JSON.stringify(P.income.sets[0].groups.map((g) => g.label)) === JSON.stringify(["Lower earners", "Higher earners"]),
+   JSON.stringify(P.income.sets[0].groups.map((g) => g.label)) === JSON.stringify(INCOME_STD_BANDS.map((b) => b.group)),
    P.income && P.income.sets[0].groups.map((g) => g.label).join(" / "));
 {
   ok("the window's income set is exactly five polls of YouGov / DemosAU / Newspoll (pooled)",
@@ -200,6 +204,11 @@ ok("the bands pill lists every in-window house",
   }
   ok("each pill spells its house's own low and high end brackets", misses.length === 0,
      misses.length ? "missing: " + misses.join(", ") : pill.join(" ‖ "));
+  ok("each pill names its income basis (personal vs household)",
+     pill.every((t) => /\((household|personal) income\)/.test(t)), pill.join(" ‖ "));
+  ok("DemosAU's pill stipulates personal income",
+     pill.some((t) => t.includes("DemosAU") && /\((personal) income\)/.test(t)) || !wantHouses.includes("DemosAU"),
+     pill.join(" ‖ "));
 }
 
 /* figures track the live payload for the picked party */
@@ -210,8 +219,8 @@ const figures = (pty, got) =>
   });
 {
   const got = await rows(page);
-  ok("both earners rows render in order",
-     JSON.stringify(got.map((r) => r.label)) === JSON.stringify(["Lower earners", "Higher earners"]));
+  ok("both earners rows render in order, ranges parenthesised",
+     JSON.stringify(got.map((r) => r.label)) === JSON.stringify(INCOME_STD_BANDS.map((b) => b.group)));
   ok("figures match the payload's One Nation tilts", figures("onp", got),
      got.map((r) => r.label + " " + r.fig).join(", ") + " vs " +
      P.income.sets[0].groups.map((g) => "onp " + g.v.onp).join(", "));
