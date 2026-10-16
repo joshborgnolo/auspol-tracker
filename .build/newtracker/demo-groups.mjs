@@ -199,6 +199,27 @@ export function incomeQuantiles(house, dist) {
   }));
 }
 
+/* incomeEdge(basis, share, dist): the annual-$k edge carrying the given
+   cumulative share of the electorate on one basis axis – the inverse of
+   incomeQuantiles' qOf, interpolated inside the histogram band it lands
+   in and rounded to the nearest $1k. Null where the share falls into the
+   open top band (an unbounded edge prices nothing). gen-data reads the two
+   standard bands' outer edges through it for the earner rows' income-cut
+   bracket (rd-panels' RdIncomeCut). */
+export function incomeEdge(basis, share, dist) {
+  const ax = basis && dist && dist.axes && dist.axes[basis];
+  if (!ax) return null;
+  const target = share * ax.total;
+  let cum = 0;
+  for (const b of ax.bands) {
+    if (cum + b.n < target) { cum += b.n; continue; }
+    if (b.hi == null) return null;
+    const w = b.lo + (target - cum) * (b.hi - b.lo + 1) / b.n;
+    return Math.round(w * dist.weeksPerYear * dist.aweRatio / 1000);
+  }
+  return null;
+}
+
 /* incomeFit(cells, dim): the weighted-least-squares vote-share line over
    quantile space for one wave's income dim – one {alpha, beta} per party
    key present in the printed cells, each cell a point at its mid-quantile

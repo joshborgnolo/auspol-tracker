@@ -2101,6 +2101,34 @@ function RdGenBorn({ label }) {
     </button>
   );
 }
+/* the earner rows' parenthetical, RdGenBorn's twin in behaviour and dress
+   (user dictate, 2026-10-16): at rest the electorate share, on a mouse
+   hover or a tap the band's outer edge priced in each printing basis'
+   dollars - one clause per basis, household first. pct selects by index:
+   gen-data maps the open-ended higher band (hi===1) to 0, the lower one
+   to 1. A phone shortens the words through rd.css's ≤640px/≤560px rungs
+   (.rd-wv-bf/.rd-wv-hh swap, then .rd-wv-iw drops) */
+const RD_INCOME_REST = ["top 15%", "bottom 50%"];
+const RD_INCOME_OP = ["≥", "≤"];
+function RdIncomeCut({ pct, cuts }) {
+  const [hover, setHover] = useState(false);
+  const [tapped, setTapped] = useState(false);
+  const asCuts = hover || tapped;
+  return (
+    <button type="button" className={"rd-wv-born cuts" + (asCuts ? " on" : "")}
+            aria-pressed={asCuts}
+            aria-label={"the " + RD_INCOME_REST[pct] + " of the electorate, shows the income cut-offs"}
+            onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(true); }}
+            onPointerLeave={(e) => { if (e.pointerType === "mouse") setHover(false); }}
+            onClick={() => setTapped((v) => !v)}>
+      ({asCuts ? cuts.flatMap((c, i) => (i ? ["; "] : []).concat([
+          <span className="rd-wv-cin" key={c.basis}>
+            <span className="rd-wv-bf">{c.basis}</span><span className="rd-wv-hh">{c.basis === "household" ? "HH" : c.basis}</span><span className="rd-wv-iw"> income</span> {RD_INCOME_OP[pct]} {"$" + c.ots + ",000"}
+          </span>]))
+        : RD_INCOME_REST[pct]})
+    </button>
+  );
+}
 /* rug dots pick the chart engine's way: the corridor, not the dots, decides
    which dot a pointer meant. Each 6px dot wears an 18x16px ::before hit
    strip and the lane dodge separates only the discs, so dots 6-12px apart
@@ -2842,7 +2870,7 @@ function RdDemographics({ rangeId = "all" }) {
         const rowTitle = "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading";
         return (
           <div key={"r" + gi} className="rd-wv-row" role="row">
-            <span role="cell" className="rd-wv-lab" title={rowTitle}>{g.label}<RdGenBorn label={g.label} /></span>
+            <span role="cell" className="rd-wv-lab" title={rowTitle}>{g.bare || g.label}<RdGenBorn label={g.label} />{g.cuts && g.cuts.length ? <RdIncomeCut pct={g.pct} cuts={g.cuts} /> : null}</span>
             <span className="rd-wv-track">
               {/* positions go to CSS as --x/--lo/--hi (percent of the track)
                   and are drawn with transforms, so a switch glides them on
@@ -3186,7 +3214,7 @@ function RdDemographics({ rangeId = "all" }) {
         {tab.sets.some((st) => st.bands) ? (
           <div className="rd-wv-bands">
             {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (
-              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.basis ? "(" + x.b.basis + " income) " : null}{x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span>
+              <span className="rd-wv-band" key={x.h}><em>{demoHouse(x.h)}</em> {x.b.basis ? "(" + x.b.basis + " income) " : null}{x.b.low.join(", ")}<i>;</i> {x.b.high.join(", ")}</span>
             ))}
           </div>
         ) : null}

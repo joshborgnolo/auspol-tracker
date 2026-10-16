@@ -28,7 +28,7 @@ import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
-import { incomeQuantiles, incomeFit, INCOME_STD_BANDS, INCOME_GRIDS, DEMO_SHARE }
+import { incomeQuantiles, incomeFit, incomeEdge, INCOME_STD_BANDS, INCOME_GRIDS, DEMO_SHARE }
   from "../../.build/newtracker/demo-groups.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -106,6 +106,31 @@ const dist = JSON.parse(await readFile(join(ROOT, "data", "income-dist.json"), "
        && INCOME_STD_BANDS[1].group === "Higher earners (top 15%)",
      INCOME_STD_BANDS[0].group + " / " + INCOME_STD_BANDS[1].group);
 }
+console.log("== unit: incomeEdge inverts the quantile map ==");
+{
+  const bases = [...new Set(Object.values(INCOME_GRIDS).map((g) => g.basis))];
+  ok("every printing basis is priced at both band edges (household, personal)",
+     JSON.stringify(bases) === JSON.stringify(["household", "personal"])
+       && bases.every((b) => incomeEdge(b, 0.5, dist) != null && incomeEdge(b, 0.85, dist) != null),
+     bases.join(", ") + ": " + bases.map((b) =>
+       b + " " + incomeEdge(b, 0.5, dist) + "k / " + incomeEdge(b, 0.85, dist) + "k").join(", "));
+  ok("an edge maps back to its own share (round-trip to the nearest $1k ≈ ±1.5pt)",
+     bases.every((b) => [0.5, 0.85].every((q) => {
+        const ax = dist.axes[b], w = incomeEdge(b, q, dist) * 1000 / dist.weeksPerYear / dist.aweRatio;
+        let cum = 0;
+        for (const band of ax.bands) {
+          if (band.hi != null && w > band.hi) { cum += band.n; continue; }
+          if (w <= band.lo) return Math.abs(cum / ax.total - q) <= 0.015;
+          return Math.abs((cum + band.n * (w - band.lo) / (band.hi - band.lo + 1)) / ax.total - q) <= 0.015;
+        }
+        return false;
+      })),
+     bases.map((b) => b + " ok").join(", "));
+  ok("the median edge sits between the top edge and the 0.85 edge on both bases",
+     bases.every((b) => incomeEdge(b, 0.5, dist) < incomeEdge(b, 0.85, dist) && incomeEdge(b, 0, dist) === 0));
+  ok("the open top band prices no edge (a share there has no finite $)",
+     bases.every((b) => incomeEdge(b, 1, dist) === null));
+}
 
 const PORT = 9027;
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json",
@@ -140,9 +165,11 @@ const clickTab = async (page, label) => {
   }, label);
 };
 const dekText = (page) => page.$eval("#who-votes .rd-dek", (el) => el.textContent);
-/* the dot-plot's group rows as {label, figure} pairs */
+/* the dot-plot's group rows as {label, figure} pairs; the label text has no
+   real space before its clickable parenthetical (a CSS margin makes the
+   visual gap, as RdGenBorn's does), so one is inserted for comparison */
 const rows = (page) => page.$$eval("#who-votes .rd-wv-set .rd-wv-row", (rs) => rs.map((r) => ({
-  label: r.querySelector(".rd-wv-lab").textContent.trim(),
+  label: r.querySelector(".rd-wv-lab").textContent.trim().replace(/(\S)\(/, "$1 ("),
   fig: parseFloat(r.querySelector(".rd-wv-v b").textContent),
 })));
 
@@ -163,6 +190,18 @@ ok("demoIncome is a single income set of the two earners tilts",
    P.income && P.income.sets.length === 1 &&
    JSON.stringify(P.income.sets[0].groups.map((g) => g.label)) === JSON.stringify(INCOME_STD_BANDS.map((b) => b.group)),
    P.income && P.income.sets[0].groups.map((g) => g.label).join(" / "));
+ok("each earners row carries bare / pct / a per-basis cut priced to the $1k",
+   P.income.sets[0].groups.every((g, gi) =>
+     g.bare === INCOME_STD_BANDS[gi].group.replace(/\s*\(.*\)$/, "")
+       && g.pct === (gi === 0 ? 1 : 0)
+       && Array.isArray(g.cuts) && g.cuts.length === 2
+       && JSON.stringify(g.cuts.map((c) => c.basis)) === JSON.stringify(["household", "personal"])
+       && g.cuts.every((c) => Number.isInteger(c.ots) && c.ots > 0)),
+   P.income.sets[0].groups.map((g) => JSON.stringify(g.cuts)).join(" / "));
+ok("the cuts ARE incomeEdge at each band's outer edge, on each basis",
+   P.income.sets[0].groups.every((g, gi) =>
+     g.cuts.every((c) => c.ots === incomeEdge(c.basis, gi === 0 ? 0.5 : 0.85, dist))),
+   P.income.sets[0].groups.map((g) => g.cuts.map((c) => c.basis + " $" + c.ots + "k")).join(" / "));
 {
   ok("the window's income set is exactly five polls of YouGov / DemosAU / Newspoll (pooled)",
      P.income.sets[0].groups.every((g) => g.n === 5)
@@ -209,6 +248,8 @@ ok("the bands pill lists every in-window house",
   ok("DemosAU's pill stipulates personal income",
      pill.some((t) => t.includes("DemosAU") && /\((personal) income\)/.test(t)) || !wantHouses.includes("DemosAU"),
      pill.join(" ‖ "));
+  ok("the pill's bracket lists separate with a semicolon, never a middot",
+     pill.every((t) => !t.includes("·") && /; /.test(t)), pill.join(" ‖ "));
 }
 
 /* figures track the live payload for the picked party */
@@ -219,13 +260,67 @@ const figures = (pty, got) =>
   });
 {
   const got = await rows(page);
-  ok("both earners rows render in order, ranges parenthesised",
-     JSON.stringify(got.map((r) => r.label)) === JSON.stringify(INCOME_STD_BANDS.map((b) => b.group)));
+  ok("both earners rows render at rest as bare + share parenthetical",
+     JSON.stringify(got.map((r) => r.label)) === JSON.stringify(INCOME_STD_BANDS.map((b) => b.group)),
+     got.map((r) => r.label).join(" / "));
+  const born = await page.$$eval("#who-votes .rd-wv-lab .rd-wv-born", (bs) =>
+    bs.map((b) => ({ txt: b.textContent.trim(), fs: getComputedStyle(b).fontSize })));
+  ok("a small (13px) clickable parenthetical rides each earners row",
+     born.length === 2 && born.every((b) => b.fs === "13px"),
+     born.length + " at " + born.map((b) => b.fs).join(","));
+  ok("the parentheticals read (bottom 50%) and (top 15%) at rest",
+     born.map((b) => b.txt).join(" ") === "(bottom 50%) (top 15%)", born.map((b) => b.txt).join(" | "));
   ok("figures match the payload's One Nation tilts", figures("onp", got),
      got.map((r) => r.label + " " + r.fig).join(", ") + " vs " +
      P.income.sets[0].groups.map((g) => "onp " + g.v.onp).join(", "));
   const rug = await page.$$eval("#who-votes .rd-wv-rug", (els) => els.length);
   ok("per-wave rug dots render on the income rows", rug > 0, rug + " rug spans");
+}
+
+/* the parenthetical switches to the income cut-offs on hover, and stays
+   switched on tap — RdGenBorn's contract (user dictate, 2026-10-16) */
+{
+  const cutText = (g) => {
+    const cl = g.cuts.map((c) => c.basis + " income " + (g.pct === 0 ? "≥" : "≤") + " $" + c.ots + ",000");
+    return cl.length === 2 ? cl.join("; ") : null;
+  };
+  const want = P.income.sets[0].groups.map(cutText);
+  ok("every earners row's cut-off text prices both bases",
+     want.every((t, gi) => P.income.sets[0].groups[gi].pct === 0
+       ? /^household income ≥ \$\d+,\d{3}; personal income ≥ \$/.test(t)
+       : /≤ \$/.test(t)), want.join(" | "));
+  ok("the income tab has no other clickables before the probe (its own two)",
+     await page.evaluate(() =>
+       document.querySelectorAll("#who-votes .rd-wv-lab .rd-wv-born").length === 2));
+  await page.hover("#who-votes .rd-wv-lab .rd-wv-born");
+  await sleep(300);
+  const hov = await page.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
+  ok("hover on the lower row's parenthetical shows the cut-offs",
+     hov === "(" + want[0] + ")" && /\$/.test(hov), hov);
+  await page.mouse.move(640, 900);
+  await sleep(300);
+  const rest2 = await page.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
+  ok("leaving restores the share", rest2 === "(bottom 50%)", rest2);
+  await page.click("#who-votes .rd-wv-lab .rd-wv-born");
+  await sleep(300);
+  await page.mouse.move(640, 900);
+  await sleep(300);
+  const hold = await page.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
+  ok("a click pins the cut-offs even once the pointer is gone (stays on tap)",
+     hold === "(" + want[0] + ")", hold);
+  const onCls = await page.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").className);
+  ok("the switched state carries the on class (ink-dark like RdGenBorn)", onCls.includes("on"), onCls);
+  await page.click("#who-votes .rd-wv-lab .rd-wv-born");
+  await sleep(300);
+  await page.mouse.move(640, 900);
+  await sleep(300);
+  const off = await page.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
+  ok("a second click restores the share", off === "(bottom 50%)", off);
 }
 
 /* switch party: the same rows re-read against the payload's ALP tilts */
@@ -261,6 +356,23 @@ ok("phone dek carries the standardised-reads note", DEK_NOTE.test(await dekText(
   const got = await rows(mob);
   ok("phone figures match the payload's One Nation tilts", figures("onp", got),
      got.map((r) => r.label + " " + r.fig).join(", "));
+}
+/* at 390px the cut state should read "HH" and drop the word income
+   (the ≤640px and ≤560px rungs): "(HH ≤ $X; personal ≤ $Y)" */
+{
+  const want = P.income.sets[0].groups.map((g) =>
+    g.cuts.map((c) => (c.basis === "household" ? "HH" : "personal") + " ≤ $" + c.ots + ",000").join("; "));
+  await mob.tap("#who-votes .rd-wv-lab .rd-wv-born");
+  await sleep(400);
+  const cutTxt = await mob.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
+  ok("a phone tap pares the cut-offs to HH + no income word",
+     cutTxt === "(" + want[0] + ")", cutTxt);
+  await mob.tap("#who-votes .rd-wv-lab .rd-wv-born");
+  await sleep(400);
+  const restTxt = await mob.evaluate(() =>
+    document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
+  ok("a second phone tap restores the share", restTxt === "(bottom 50%)", restTxt);
 }
 await mob.close();
 

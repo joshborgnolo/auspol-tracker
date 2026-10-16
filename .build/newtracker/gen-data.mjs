@@ -61,7 +61,7 @@ const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : F
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
 import { fieldTbcUrl } from "./field-tbc.mjs";
-import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, incomeQuantiles, incomeFit } from "./demo-groups.mjs";
+import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;
@@ -4732,7 +4732,25 @@ const { demo: demographics, income: demoIncome } = (() => {
           bands: Object.fromEntries(incInWindow.filter((e) => e.band)
             .filter((e, i, a) => a.findIndex((x) => x.w.pollster === e.w.pollster) === i)
             .map((e) => [e.w.pollster, { low: [e.band[0]], high: [e.band[1]], basis: INCOME_GRIDS[e.w.pollster].basis }])),
-          groups: iSets[0].groups,
+          groups: iSets[0].groups.map((g, gi) => {
+            const band = INCOME_STD_BANDS[gi];
+            /* the income cut-offs behind the row label's parenthetical
+               (rd-panels' RdIncomeCut): the band's outer quantile edge
+               priced in each printing basis' dollars, one clause per
+               basis, household first as INCOME_GRIDS orders them */
+            const share = band.hi === 1 ? band.lo : band.hi;
+            const cuts = [];
+            for (const house of Object.keys(INCOME_GRIDS)) {
+              const basis = INCOME_GRIDS[house].basis;
+              if (cuts.some((c) => c.basis === basis)) continue;
+              const ots = incomeEdge(basis, share, INCOME_DIST);
+              if (ots != null) cuts.push({ basis, ots });
+            }
+            return { ...g,
+              bare: band.group.replace(/\s*\(.*\)$/, ""),
+              pct: band.hi === 1 ? 0 : 1,
+              cuts: cuts.length ? cuts : null };
+          }),
           houses: iSets[0].houses,
         }],
         polls: incInWindow.map(({ w, p }) => ({

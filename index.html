@@ -4190,7 +4190,7 @@ body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1
 body.rd .rd-wv-bands { display: block; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.8; color: var(--ink-3); }
 body.rd .rd-wv-band em { font-style: normal; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-wv-band i { font-style: normal; color: var(--ink-4); }
-body.rd .rd-wv-band + .rd-wv-band::before { content: "·"; color: var(--ink-4); }
+body.rd .rd-wv-band + .rd-wv-band::before { content: "; "; color: var(--ink-4); }
 body.rd .rd-wv-band + .rd-wv-band { margin-left: 12px; }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
@@ -4199,6 +4199,16 @@ body.rd .rd-wv-row { min-height: 40px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
+body.rd .rd-wv-born.cuts { white-space: normal; line-height: 1.55; }
+body.rd .rd-wv-born .rd-wv-cin { white-space: nowrap; }
+body.rd .rd-wv-born .rd-wv-hh { display: none; }
+@media (max-width: 640px) {
+  body.rd .rd-wv-born .rd-wv-bf { display: none; }
+  body.rd .rd-wv-born .rd-wv-hh { display: inline; }
+}
+@media (max-width: 560px) {
+  body.rd .rd-wv-born .rd-wv-iw { display: none; }
+}
 body.rd .rd-wv-track { position: relative; height: 36px; }
 body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
@@ -41295,7 +41305,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "grn": [12.6, 12.9, 12.8, 11.6, 10.6],
           "oth": [7.5, 14.8, 12.7, 8.4, 10.3]
         },
-        "share": 0.5
+        "share": 0.5,
+        "bare": "Lower earners",
+        "pct": 1,
+        "cuts": [{
+          "basis": "household",
+          "ots": 109
+        }, {
+          "basis": "personal",
+          "ots": 50
+        }]
       }, {
         "label": "Higher earners (top 15%)",
         "v": {
@@ -41348,7 +41367,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "grn": [14, 13.6, 14.9, 14.1, 14.9],
           "oth": [13, 5.2, 9.8, 13.6, 11.8]
         },
-        "share": 0.15
+        "share": 0.15,
+        "bare": "Higher earners",
+        "pct": 0,
+        "cuts": [{
+          "basis": "household",
+          "ots": 238
+        }, {
+          "basis": "personal",
+          "ots": 120
+        }]
       }],
       "houses": ["YouGov", "DemosAU", "Newspoll (pooled)"]
     }],
@@ -114230,6 +114258,38 @@ function RdGenBorn({
     onClick: () => setTapped(v => !v)
   }, "(", asYears ? born[0] + "–" + born[1] : "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]), ")");
 }
+const RD_INCOME_REST = ["top 15%", "bottom 50%"];
+const RD_INCOME_OP = ["≥", "≤"];
+function RdIncomeCut({
+  pct,
+  cuts
+}) {
+  const [hover, setHover] = useState(false);
+  const [tapped, setTapped] = useState(false);
+  const asCuts = hover || tapped;
+  return React.createElement("button", {
+    type: "button",
+    className: "rd-wv-born cuts" + (asCuts ? " on" : ""),
+    "aria-pressed": asCuts,
+    "aria-label": "the " + RD_INCOME_REST[pct] + " of the electorate, shows the income cut-offs",
+    onPointerEnter: e => {
+      if (e.pointerType === "mouse") setHover(true);
+    },
+    onPointerLeave: e => {
+      if (e.pointerType === "mouse") setHover(false);
+    },
+    onClick: () => setTapped(v => !v)
+  }, "(", asCuts ? cuts.flatMap((c, i) => (i ? ["; "] : []).concat([React.createElement("span", {
+    className: "rd-wv-cin",
+    key: c.basis
+  }, React.createElement("span", {
+    className: "rd-wv-bf"
+  }, c.basis), React.createElement("span", {
+    className: "rd-wv-hh"
+  }, c.basis === "household" ? "HH" : c.basis), React.createElement("span", {
+    className: "rd-wv-iw"
+  }, " income"), " ", RD_INCOME_OP[pct], " ", "$" + c.ots + ",000")])) : RD_INCOME_REST[pct], ")");
+}
 const RUG_PICK_MOUSE = 11,
   RUG_PICK_TOUCH = 22;
 function nearestRugIdx(rugEl, xs, lanes, clientX, clientY, rPx) {
@@ -115047,9 +115107,12 @@ function RdDemographics({
       role: "cell",
       className: "rd-wv-lab",
       title: rowTitle
-    }, g.label, React.createElement(RdGenBorn, {
+    }, g.bare || g.label, React.createElement(RdGenBorn, {
       label: g.label
-    })), React.createElement("span", {
+    }), g.cuts && g.cuts.length ? React.createElement(RdIncomeCut, {
+      pct: g.pct,
+      cuts: g.cuts
+    }) : null), React.createElement("span", {
       className: "rd-wv-track"
     }, React.createElement("span", {
       className: "rd-wv-all",
@@ -115662,7 +115725,7 @@ function RdDemographics({
   })) : []).map(x => React.createElement("span", {
     className: "rd-wv-band",
     key: x.h
-  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
+  }, React.createElement("em", null, demoHouse(x.h)), " ", x.b.basis ? "(" + x.b.basis + " income) " : null, x.b.low.join(", "), React.createElement("i", null, ";"), " ", x.b.high.join(", ")))) : null), shift && React.createElement(RdSub, {
     head: shift.head,
     dek: shift.dek,
     glide: true
