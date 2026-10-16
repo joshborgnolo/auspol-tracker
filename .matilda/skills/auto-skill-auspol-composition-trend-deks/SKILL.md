@@ -1,6 +1,6 @@
 ---
 name: auspol-composition-trend-deks
-description: auspol-tracker — the "composition trend" head+dek generator (the RdSub under "Who votes for whom", rd-panels.jsx `const shift` IIFE ~:1340-1500, fed by D.demoTrend = gen-data §7gb). User-dictated sentence SHAPES with live computed figures: stateDek ("…shifted away from X (−x points relative to all …), and towards Y (+y points)"), locDek ("…increased by +x points relative to the overall decrease, rising even as …"), one merged "It has also shifted …" group sentence (sole gender move → "Its relative position among men has shrunk" — the "also" was dropped in the second 2026-09-30 dictate batch, alongside "overall decrease" and the skew tail's "no stronger or weaker"). Dictates arrive as before/after sentences with +X placeholders — change the TEMPLATES, never freeze the figures, and update the block comments that quote the current form in the same edit.
+description: auspol-tracker — the "composition trend" head+dek generator (the RdSub under "Who votes for whom", rd-panels.jsx `const shift` IIFE ~:1340-1500, fed by D.demoTrend = gen-data §7gb). User-dictated sentence SHAPES with live computed figures: stateDek ("…shifted away from X (−x points relative to all …), and towards Y (+y points)"), locDek ("…increased by +x points relative to the overall decrease, rising even as …"), one merged "It has also shifted …" group sentence (sole gender move → "Its relative position among men has shrunk" — the "also" was dropped in the second 2026-09-30 dictate batch, alongside "overall decrease" and the skew tail's "no stronger or weaker"). Dictates arrive as before/after sentences with +X placeholders — change the TEMPLATES, never freeze the figures, and update the block comments that quote the current form in the same edit. The INCOME tab runs the same §7gb battery since 2026-10-16 (trendTabs append ~:4856 fed by iRowsT months; RD_TREND_GROUP gains "lower earners"/"higher earners"; no income move significant at ship, so no income sentence yet).
 source: auto-skill
 extracted_at: '2026-09-30T13:00:00.000Z'
 ---
@@ -36,6 +36,20 @@ the earlier lead/deficit forms).
   rel, sig). g0/g1 fitted group support at window ends, a0/a1 the
   party's national ends, `thin` = seven or fewer monthly points
   (optimistic t on shared samples).
+- INCOME runs the same battery since 2026-10-16 (user dictate "weave
+  income into the dynamic prose"; landed inside 7af94ae8): §7gb's
+  `trendTabs` block (~:4856) appends the demoIncome tab
+  (`{id:"income", label:"Income", sets:[{id:"income", label:"By income",
+  groups: demoIncome.sets[0].groups}]}`) AFTER the harmonised tabs, fed
+  by the income tab's own `iRowsT` months (a pooled release counted once,
+  as every set here). Same two-stage test, same moves/rows emitters —
+  earnings rows appear in the significance table's "By income" set, and
+  a significant move joins the dek named via `RD_TREND_GROUP`'s new
+  "lower earners"/"higher earners" entries. At ship NO income move
+  passes: ALP lower-earner tAbs −1.89 (just short of 1.96) with
+  tLR −2.09, ONP lower's signs clash (+0.97/−2.77) — so no income
+  sentence reaches the dek yet; `trend-deks.mjs` is the regression check
+  when one does.
 
 ## Emission gates (§7gb) — who gets a move at all
 

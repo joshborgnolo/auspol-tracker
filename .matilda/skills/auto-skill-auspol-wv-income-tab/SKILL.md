@@ -1,6 +1,6 @@
 ---
 name: auspol-wv-income-tab
-description: auspol-tracker — the Who-votes Income tab end-to-end in its CURRENT latent-curve form (5e043b7f, 2026-10-16, replacing 8acacb93's naive extreme-band tilts shipped earlier the same day; style fixes 5c97fbaf and ff968095 still stand; naming pass 4c724259 same day): per wave and party, a census-share-weighted least-squares vote-share line over the electorate's income-QUANTILE axis (brackets mapped through data/income-dist.json), read at two standard bands (bottom half, top 15%+) — INCOME_GRIDS/incomeQuantiles/incomeFit/INCOME_STD_BANDS in demo-groups.mjs, incomeStandardise + JUR-gated INCOME_DIST in gen-data §7g-income, the support no-extrapolation gate, the separate demoIncome payload (rule 5), copy homes, roster-vs-window triage, the cross-house discrepancy audit (tilts + findings), the bands in dollars, why top 15%, the naming contract after 4c724259 (canonical group IS "Lower earners (bottom 50%)"/"Higher earners (top 15%)"; the pill names each house's household/personal income basis; the .rd-wv label column is 200px priced off the longest label; the probes price themselves off INCOME_STD_BANDS), and the earner rows' cut-off parenthetical (aedd5ae8: incomeEdge + bare/pct/cuts emit + rd-panels' RdIncomeCut - RdGenBorn's twin, hover switches, tap stays, phone HH/income-drop rungs - phone alignment 67e4cac0), and the bands pill's final clause typography (f7592cff/90958cd7: middot in-clause, between-clause ";" as :not(:last-child)::after, colon-led clauses with compact < / >= brackets - gen-data bandLabel compacts "Under $X" and "$X+"/"or more").
+description: auspol-tracker — the Who-votes Income tab end-to-end in its CURRENT latent-curve form (5e043b7f, 2026-10-16, replacing 8acacb93's naive extreme-band tilts shipped earlier the same day; style fixes 5c97fbaf and ff968095 still stand; naming pass 4c724259 same day): per wave and party, a census-share-weighted least-squares vote-share line over the electorate's income-QUANTILE axis (brackets mapped through data/income-dist.json), read at two standard bands (bottom half, top 15%+) — INCOME_GRIDS/incomeQuantiles/incomeFit/INCOME_STD_BANDS in demo-groups.mjs, incomeStandardise + JUR-gated INCOME_DIST in gen-data §7g-income, the support no-extrapolation gate, the separate demoIncome payload (rule 5), copy homes, roster-vs-window triage, the cross-house discrepancy audit (tilts + findings), the bands in dollars, why top 15%, the naming contract after 4c724259 (canonical group IS "Lower earners (bottom 50%)"/"Higher earners (top 15%)"; the pill names each house's household/personal income basis; the .rd-wv label column is 200px priced off the longest label; the probes price themselves off INCOME_STD_BANDS), and the earner rows' cut-off parenthetical (landed on main as 7af94ae8 - worktree-lane prototype hashes aedd5ae8/67e4cac0 never reached main: incomeEdge + bare/pct/cuts emit + rd-panels' RdIncomeCut - RdGenBorn's twin, hover switches, tap stays, phone HH/income-drop rungs + the tapped-cut alignment fix, all in the one landing commit), and the bands pill's final clause typography (f7592cff/90958cd7: middot in-clause, between-clause ";" as :not(:last-child)::after, colon-led clauses with compact < / >= brackets - gen-data bandLabel compacts "Under $X" and "$X+"/"or more"). SINCE 7af94ae8 the tab ALSO feeds the dynamic prose (contract reversed from income-free): rdDemoHead claims via RD_DEMO_TRAITS["…home","income","language…"] + scale("income","income") + RD_DEMO_PH "on lower/higher incomes", and §7gb demoTrend via the income trendTabs entry (iRowsT months; RD_TREND_GROUP lower/higher earners) - wiring in the vote-by-group-headlines and composition-trend-deks skills.
 source: auto-skill
 extracted_at: '2026-10-16T00:00:00.000Z'
 updated_at: '2026-10-16'
@@ -13,10 +13,15 @@ after a mathematical-design critique of the naive pooling). Same-day
 lineage: `8acacb93` shipped the tab on naive extreme-bracket tilts,
 `5c97fbaf`/`ff968095` fixed and moved the sethead pill, then `5e043b7f`
 replaced the pooling maths; only the maths moved, the shell survived.
-Later same-day: `aedd5ae8` (earner cut-off parenthetical + RdIncomeCut),
-`67e4cac0` (tapped-cut phone alignment — UA `text-align: center` on
-buttons was centring wrapped cut clauses), `f7592cff`/`90958cd7` (the
-bands pill's final typography below).
+Later same-day: the earner cut-off parenthetical + RdIncomeCut and the
+tapped-cut phone alignment (UA `text-align: center` on buttons was
+centring wrapped cut clauses) landed together on main as `7af94ae8` —
+the worktree-lane hashes `aedd5ae8`/`67e4cac0` never reached main as
+commits, so `git show` on them won't find the feature there. Main's own
+order is `90958cd7` (bands-pill typography) → `7af94ae8` (parenthetical
++ alignment + the incomeEdge machinery + probes + this skill), even
+though the pill typography was prototyped in the worktree after the
+parenthetical.
 
 ## Why income can't be a harmonised tab
 
@@ -109,11 +114,21 @@ All pure machinery lives at the end of `.build/newtracker/demo-groups.mjs`:
 - Emitted as a **separate `D.demoIncome` payload beside `D.demographics`**
   (own houses/polls/window/roster) so the classic data-driven panel never
   sees it — classic payload byte-identical, probe-verified.
-- Renderer splice happens ONLY inside `RdDemographics` (rd-panels.jsx
-  ~:2647): `T = Tdemo && D.demoIncome ? { ...Tdemo, tabs: [...Tdemo.tabs,
-  D.demoIncome] } : Tdemo`. Headline (`rdDemoHead`) and composition trend
-  (`rdDemoShift`/`D.demoTrend`) still run off `Tdemo` — income-free by
-  contract, so an income-wave quirk can't rewrite "who Labor's voters are".
+- Renderer splice lives at TWO sites (rd-panels.jsx :2690 inside
+  `RdDemographics`, :72 for the snapshot view): `T = Tdemo &&
+  D.demoIncome ? { ...Tdemo, tabs: [...Tdemo.tabs, D.demoIncome] } :
+  Tdemo`. CONTRACT REVERSED 2026-10-16 (user: "weave income into the
+  dynamic prose and headlines"; landed inside the earner-rows commit
+  7af94ae8): the headline (`rdDemoHead`, fed the spliced T at :2834) and
+  the trend deks (`rdDemoShift`, via gen-data §7gb's new income trendTab,
+  fed by iRowsT months) now READ income — each claim/move still under the
+  generators' own filled-dot and two-stage t-test gates. Wiring details in
+  auto-skill-auspol-vote-by-group-headlines and
+  auto-skill-auspol-composition-trend-deks. `Tdemo` itself stays
+  income-FREE — the classic panel never sees the tab (rule 5); only the
+  rd renderers splice it in. The em-dash comment above the :2690 splice
+  in rd-panels.jsx (:2684-2688) was updated the same commit; trust it
+  over any skill sentence predating 2026-10-16.
 - Disclosure: the dek appends "Each house counts at its own lowest and
   highest bands." (`tab.sets[0].note`), and the per-house bracket pill
   (`.rd-wv-bands`, from `st.bands`; `b.low.slice(0,2)` — max two keys shown

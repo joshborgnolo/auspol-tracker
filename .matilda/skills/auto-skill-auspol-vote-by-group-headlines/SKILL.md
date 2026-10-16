@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-headlines
-description: auspol-tracker — the "Who votes for whom" panel's headline, dek and composition-trend copy. SINCE 2026-10-11 THE HEADLINE IS GENERATED (rdDemoHead in rd-panels.jsx), not the hand-curated RD_DEMO_HOME constants it replaced (user: "are the dynamic headers and deks … robustly dynamic and robustly responsive to changes in statistically significant differences … is every scenario covered? are rules handled clearly and on a principled basis?" — the audit found four of five curated lines naming a trait the pool no longer supported, e.g. oth "Gen Z" at −0.5±5.6). Eight written rules (filled-dot evidence; one claim per trait and direction; an ordered scale's two ends = one tilt, named from the over-represented end, but a gap short of the far end keeps its clause; unordered states name both ways; neighbours merge under one name; age's two rulers — bands lead, a nested generation stands in only when its gap beats the band's by more than the band's margin, opposite-leaning nested pair = age left out; the non-eastern-mainland bucket speaks for SA/WA/ACT-NT-Tas unless one breaks; retired-repeating-age dropped; weight = share × (v/all − 1), five heaviest, ≤4 up ≤3 down). The dek is rdDemoDek (per set: demoFinding's Holm pair tests → filled-dot vs-all-voters sentence → 'much the same' only when nothing is filled; rdFracPair prints percentages when fractions would misstate a gap; the Age tab says outright when the two rulers disagree), the trend block rdDemoShift (gen-data §7gb now requires the gap and ratio t-tests to AGREE IN SIGN; nested-state complements; verbs read against the party's national line). Pinned by the tracked .matilda/probe/wv-copy-rules.mjs (live pool + scripted scenarios incl. the user's three overlap questions + 300 random pools + trend cases). The history below the first section is the curation era, kept for its reasoning.
+description: auspol-tracker — the "Who votes for whom" panel's headline, dek and composition-trend copy. SINCE 2026-10-11 THE HEADLINE IS GENERATED (rdDemoHead in rd-panels.jsx), not the hand-curated RD_DEMO_HOME constants it replaced (user: "are the dynamic headers and deks … robustly dynamic and robustly responsive to changes in statistically significant differences … is every scenario covered? are rules handled clearly and on a principled basis?" — the audit found four of five curated lines naming a trait the pool no longer supported, e.g. oth "Gen Z" at −0.5±5.6). Eight written rules (filled-dot evidence; one claim per trait and direction; an ordered scale's two ends = one tilt, named from the over-represented end, but a gap short of the far end keeps its clause; unordered states name both ways; neighbours merge under one name; age's two rulers — bands lead, a nested generation stands in only when its gap beats the band's by more than the band's margin, opposite-leaning nested pair = age left out; the non-eastern-mainland bucket speaks for SA/WA/ACT-NT-Tas unless one breaks; retired-repeating-age dropped; weight = share × (v/all − 1), five heaviest, ≤4 up ≤3 down). The dek is rdDemoDek (per set: demoFinding's Holm pair tests → filled-dot vs-all-voters sentence → 'much the same' only when nothing is filled; rdFracPair prints percentages when fractions would misstate a gap; the Age tab says outright when the two rulers disagree), the trend block rdDemoShift (gen-data §7gb now requires the gap and ratio t-tests to AGREE IN SIGN; nested-state complements; verbs read against the party's national line). Pinned by the tracked .matilda/probe/wv-copy-rules.mjs (live pool + scripted scenarios incl. the user's three overlap questions + 300 random pools + trend cases). Income joined the traits 2026-10-16 (RD_DEMO_TRAITS "…home","income","language…"; scale + RD_DEMO_PH "on lower/higher incomes"; reaches the generators via the rd-panels T splices :2690/:72, Tdemo itself stays income-free). The history below the first section is the curation era, kept for its reasoning.
 source: auto-skill
 extracted_at: '2026-09-28T07:14:51.777Z'
 updated_at: '2026-10-11'
@@ -75,6 +75,23 @@ compiled page exposes them and probes can drive them with any payload:
   trailers only when no solid set was left out for room; later sentences
   open "It has also…", an opening group sentence names its subject.
 - gen-data §7gb: `sig` now also requires Math.sign(f1.t) === Math.sign(f2.t).
+- INCOME joined the claim machinery 2026-10-16 (user dictate; phrasing
+  "on lower/higher incomes"; landed inside 7af94ae8): `RD_DEMO_TRAITS`
+  gains `"income"` between `home` and `language`; `RD_DEMO_SCALE.income`
+  = the two standard bands; `RD_DEMO_PH` "on lower incomes" / "be on
+  lower incomes"; `scale("income", "income")` (~:1932) runs the
+  ordered-tilt rule, so a lower-up/higher-down tilt is ONE claim named
+  from the over-represented end. The income tab reaches rdDemoHead only
+  through the T splice (rd-panels.jsx :2690/:72 — appended BESIDE the
+  demographics tabs, never inside `Tdemo`, so the classic panel stays
+  income-free). Gates unchanged: filled dot, five-heaviest cap, ≤4/≤3
+  direction caps. Day-one live effect: onp's headline gains "…regional,
+  and on lower incomes" (working-part-time displaced), grn gains "…less
+  likely to be on lower incomes"; alp/lnp/oth income tilts don't rank.
+  The probe's evaluates wrap a `demoT` preamble mirroring the :2690
+  splice, and the scenario battery pins the income forms (lower-end
+  tilt → "be on lower incomes", each band alone at ±6, the less-likely
+  form) plus an ordered-tilt invariant in the 300 random pools.
 
 Pins: `.matilda/probe/wv-copy-rules.mjs` (TRACKED, force-added; BASE=<checkout>):
 the live pool (every named group filled and leaning the claimed way;
