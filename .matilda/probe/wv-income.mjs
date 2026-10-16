@@ -374,6 +374,32 @@ ok("phone dek carries the standardised-reads note", DEK_NOTE.test(await dekText(
     document.querySelector("#who-votes .rd-wv-lab .rd-wv-born").innerText.trim());
   ok("a second phone tap restores the share", restTxt === "(bottom 50%)", restTxt);
 }
+/* the tapped cut-offs hold the label's left edge exactly: a button's UA
+   text-align is centre, so the wrapped clauses used to centre themselves
+   at their own ragged offsets on the higher-earners row */
+{
+  await mob.evaluate(() =>
+    document.querySelectorAll("#who-votes .rd-wv-lab .rd-wv-born")[1].click());
+  await sleep(400);
+  const align = await mob.evaluate(() => {
+    const lab = [...document.querySelectorAll("#who-votes .rd-wv-lab")][1];
+    const btn = lab.querySelector(".rd-wv-born");
+    const bare = [...lab.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim());
+    const br = document.createRange(); br.selectNodeContents(bare);
+    const bareX = br.getClientRects()[0].x;
+    const r = document.createRange(); r.selectNodeContents(btn);
+    const parts = [...r.getClientRects()].filter((x) => x.width > 0.5 || x.height > 0.5);
+    const tops = [...new Set(parts.map((x) => Math.round(x.top)))];
+    return { bareX: +bareX.toFixed(1),
+             leftByLine: tops.map((t) =>
+               +Math.min(...parts.filter((x) => Math.round(x.top) === t).map((x) => x.x)).toFixed(1)) };
+  });
+  ok("the tapped cut-offs actually wrap to a second line at 390px",
+     align.leftByLine.length >= 2, align.leftByLine.join(" / "));
+  ok("every wrapped line of the tapped cut-offs holds the label's left edge",
+     align.leftByLine.every((x) => Math.abs(x - align.bareX) <= 1),
+     "label " + align.bareX + " vs lines " + align.leftByLine.join(" / "));
+}
 await mob.close();
 
 console.log("== ?design=old: the frozen classic panel never sees it ==");
