@@ -5686,7 +5686,12 @@ const CYC_META = JUR ? jurCycles() : [
      series is the IMPLIED last-election-flows figure (FLOW_ERAS in flows.mjs,
      tppEra-tagged rows), not anything Morgan itself published — the method
      note lives in cyclePollBases. ePrim/eTpp are the governing side's
-     official result, filled in from the elections table below the array. */
+     official result, filled in from the elections table below the array.
+     The 1969 row is the trial extension of that pattern past 1972; its
+     approval bucket stays empty (no Gallup-audited PM ratings this far
+     back), which the approval consumers tolerate. */
+  { year: 1969, gov: "lnp", opp: "alp", pm: "Gorton → McMahon", lead: "Gorton", oppLead: "Whitlam", eDate: "1969-10-25", src: 1972, appr: 1969,
+    pmSpl: { iso: "1971-03-10", names: ["Gorton", "McMahon"] } },
   { year: 1972, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "McMahon → Snedden", eDate: "1972-12-02", src: 1974, appr: 1972,
     oppSpl: { iso: "1972-12-20", names: ["McMahon", "Snedden"] } },
   /* The dismissal: Fraser was caretaker PM from 11 Nov 1975 to the 13 Dec

@@ -116,7 +116,7 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
 };
 
 /* FLOW_ERAS – the pre-1987 counterpart of FLOW. F2F Morgan Gallup waves of
-   the 1972–87 era (the aeforecasts mirror import) publish NO 2PP – Morgan
+   the 1969–87 era (the aeforecasts mirror import) publish NO 2PP – Morgan
    did not publish a national two-party figure then – so the rows carry an
    IMPLIED 2PP (tppEra key → constants), derived by last-election flows the
    way Kevin Bonham's Wonk Central piece
@@ -127,8 +127,9 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
       at the election that OPENED the cycle (LEF: constants of election E
       serve the polls of the E→E+1 cycle, never E's own).
    2. The constants were calibrated per election against that election's
-      OFFICIAL national 2PP (AEC/published: 1972 52.7, 1974 51.7, 1975 44.3,
-      1977 45.4, 1980 49.6, 1983 53.23, 1984 51.77, 1987 50.83, ALP share)
+      OFFICIAL national 2PP (AEC/published: 1969 50.2, 1972 52.7, 1974
+      51.7, 1975 44.3, 1977 45.4, 1980 49.6, 1983 53.23, 1984 51.77, 1987
+      50.83, ALP share)
       using national primaries from the pappubahry election-statistics
       dataset: f_oth pinned at 0.45 (the stable solved value for the
       genuine minor/independent remainder in the DLP-era fit), the era's
@@ -149,6 +150,7 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
    and validate.mjs inverts era rows against THESE constants instead of the
    2025 set. */
 export const FLOW_ERAS = Object.freeze({
+  1969: { dlp: 0.2633, oth: 0.45, bt: -0.07 },
   1972: { dlp: 0.2765, oth: 0.45, bt: -0.04 },
   1974: { dlp: 0.3032, oth: 0.45, bt: 0.2 },
   1975: { dlp: 0.1551, dem: 0.5, oth: 0.45, bt: -0.2 },
@@ -176,7 +178,7 @@ export const impliedEraAlp2pp = (era, p) => {
    election that OPENED the term (last-election flows – the only table an
    observer inside the term could have used, and the method Kevin Bonham's
    Wonk Central track record audits). The 2025 table is FLOW above; the
-   1972–84 terms keep FLOW_ERAS. Derived by .build/aec-flow-history.py from
+   1969–84 terms keep FLOW_ERAS. Derived by .build/aec-flow-history.py from
    the AEC's own counts, cached in .build/aec-flow-src/:
      2004–2022  AEC two-party-preferred flow by state by party – every formal
                 ballot in every seat redistributed ALP v Coalition (the TPP

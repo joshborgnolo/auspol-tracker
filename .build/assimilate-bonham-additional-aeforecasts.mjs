@@ -143,9 +143,10 @@ const firmFor = (remote, bucketYear) => {
 const endYears = Object.keys(D.cyclePolls).map(Number).sort((a, b) => a - b);
 const electionDate = (y) => D.elections["e" + y].date;
 // boundary for insertion is the OLDEST bucket's opening election, hard-keyed
-// (endYears[0] − 3 no longer resolves — the 1974 bucket opens at e1972, and
-// e1971 does not exist); pre-1972 mirror rows stay CSV-only by adjudication
-const OLDEST_ELECTION = D.elections.e1972.date;
+// (endYears[0] − 3 no longer resolves — the 1972 bucket opens at e1969, and
+// e1968 does not exist); pre-1969-election mirror rows stay CSV-only (the
+// 1966 term's two 1960-02 transcriptions conflict and await adjudication)
+const OLDEST_ELECTION = D.elections.e1969.date;
 const bucketFor = (date) => {
   for (const y of endYears) if (date <= electionDate(y)) return String(y);
   return null; // after the last closed election -> current term
@@ -164,7 +165,7 @@ const VI_NULL_CHECK = (r) => r.alp == null && r.lnp == null; // no VI at all
 // era buckets (pre-1987 rollout) and the FLOW_ERAS set each row is implied
 // through, keyed by the election that opened the cycle (flows.mjs)
 const TPP_ERA_BY_BUCKET = {
-  1974: "1972", 1975: "1974", 1977: "1975", 1980: "1977",
+  1972: "1969", 1974: "1972", 1975: "1974", 1977: "1975", 1980: "1977",
   1983: "1980", 1984: "1983", 1987: "1984",
 };
 const candidates = [];
