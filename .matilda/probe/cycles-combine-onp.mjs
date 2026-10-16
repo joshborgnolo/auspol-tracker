@@ -12,10 +12,13 @@
    her - raw.han null-pads), its figure the sitting term's own Hanson reading.
    The two preferred-PM rows are named "Preferred PM vs Taylor, lead" and
    "Preferred PM vs Hanson, lead" (2026-10-17 rename of the once-identical
-   pair; the rows select by NAME now, not occurrence index). And last,
+   pair; the rows select by NAME now, not occurrence index). Then
    "PM net approval, lead": the PM's net less his strongest rival's at the
    latest reading (Hanson over Taylor where she out-rates him; past terms'
-   rival is always the opposition leader, who no term ever rated her). */
+   rival is always the opposition leader, who no term ever rated her). And
+   "PM net approval margin (rival ×½)": the same with the rival at half
+   weight - the armariuminterreta/Bonham "approval margin" regression weight
+   (PM netsat counts about twice the opponent's against the final 2pp). */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -76,17 +79,20 @@ const check = (name, ok, detail = "") => {
         const ppmhEnd = cur.end.ppmh;
         const ppmhBase = (cur.base.ppmh != null ? cur.base.ppmh : (cur.raw.ppmh || []).find((v) => v != null)) || 0;
         /* the PM-lead row reads net less the strongest rival at the latest
-           reading; its change anchor pairs the bases the same way (Hanson's
-           base joins the max only where her series ever read) */
+           reading; the margin row halves the rival. Each row's change anchor
+           pairs the bases the same way (Hanson's base joins the max only
+           where her series ever read) */
         const cycbase = (k) => (cur.base[k] != null ? cur.base[k] : (cur.raw[k] || []).find((v) => v != null)) || 0;
         const hanRead = (cur.raw.han || []).some((v) => v != null);
         const rivalEnd = Math.max(cur.end.oppnet != null ? cur.end.oppnet : -Infinity, cur.end.han != null ? cur.end.han : -Infinity);
         const rivalBase = hanRead ? Math.max(cycbase("oppnet"), cycbase("han")) : cycbase("oppnet");
         const leadLvl = +(cur.end.net - rivalEnd).toFixed(1);
+        const margLvl = +(cur.end.net - rivalEnd / 2).toFixed(1);
         return { comb: lvl(["oppr", "onp"], cur.base.oppr + cur.base.onp), onpV: lvl(["onp"], cur.base.onp),
                  han: { lvl: signed(+hanEnd.toFixed(1)), chg: signed(+(hanEnd - hanBase).toFixed(1)) },
                  ppmh: { lvl: signed(+ppmhEnd.toFixed(1)), chg: signed(+(ppmhEnd - ppmhBase).toFixed(1)) },
-                 pmlead: { lvl: signed(leadLvl), chg: signed(+(leadLvl - (cycbase("net") - rivalBase)).toFixed(1)) } };
+                 pmlead: { lvl: signed(leadLvl), chg: signed(+(leadLvl - (cycbase("net") - rivalBase)).toFixed(1)) },
+                 pmmargin: { lvl: signed(margLvl), chg: signed(+(margLvl - (cycbase("net") - rivalBase / 2)).toFixed(1)) } };
       });
 
       /* the summary table's rows: names in order, the Now/Change cell, and
@@ -100,7 +106,7 @@ const check = (name, ok, detail = "") => {
       const EXPECTED_NAMES = ["Two-party preferred", "Government’s primary vote", "Opposition’s primary vote",
         "One Nation’s primary vote", "L/NP + ON combined primary vote", "Preferred PM vs Taylor, lead",
         "Preferred PM vs Hanson, lead", "Prime minister’s net approval", "Opposition leader’s net approval",
-        "Hanson’s net approval", "PM net approval, lead"];
+        "Hanson’s net approval", "PM net approval, lead", "PM net approval margin (rival ×½)"];
 
       const snap = () => page.evaluate(() => {
         const charts = [...document.querySelectorAll("#cyc-primary .rd-cyc-chart")];
@@ -188,6 +194,15 @@ const check = (name, ok, detail = "") => {
       check(`[${vw}] its rank joins past PMs’ net leads`,
         !!pmleadRow && /(Highest|Lowest|Middle) of \d+|(highest|lowest) of \d+/.test(pmleadRow.rank),
         pmleadRow ? pmleadRow.rank : "(no row)");
+      /* the margin row: the lead with the rival halved */
+      const pmmarginRow = rows.find((r) => r.name === "PM net approval margin (rival ×½)");
+      check(`[${vw}] level: margin row reads net less half the rival ` + expected.pmmargin.lvl,
+        pmmarginRow && pmmarginRow.now === expected.pmmargin.lvl, pmmarginRow ? pmmarginRow.now : "(no row)");
+      check(`[${vw}] its strip carries past-term dots`,
+        !!pmmarginRow && pmmarginRow.dots > 0, pmmarginRow ? pmmarginRow.dots + " dots" : "(no row)");
+      check(`[${vw}] its rank joins past PMs’ net margins`,
+        !!pmmarginRow && /(Highest|Lowest|Middle) of \d+|(highest|lowest) of \d+/.test(pmmarginRow.rank),
+        pmmarginRow ? pmmarginRow.rank : "(no row)");
 
       // --- One Nation this term (all boxes start off, so these ticks are on→)
       await tick(1, "One Nation this term");
@@ -256,6 +271,10 @@ const check = (name, ok, detail = "") => {
       check(`[${vw}] change: PM-lead row carries its change`,
         pmleadRowC && pmleadRowC.now === expected.pmlead.chg,
         (pmleadRowC ? pmleadRowC.now : "(no row)") + " want " + expected.pmlead.chg);
+      const pmmarginRowC = rows.find((r) => r.name === "PM net approval margin (rival ×½)");
+      check(`[${vw}] change: margin row carries its change`,
+        pmmarginRowC && pmmarginRowC.now === expected.pmmargin.chg,
+        (pmmarginRowC ? pmmarginRowC.now : "(no row)") + " want " + expected.pmmargin.chg);
 
       // spelling guard: One Nation must render as words on the live chart
       check(`[${vw}] no bare "ON " note or "1N" typo on the chart`,

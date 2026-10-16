@@ -122923,15 +122923,19 @@ const combSeries = c => {
   });
 };
 const rdHanRead = c => (c.raw.han || []).some(v => v != null);
-const pmleadSeries = c => {
-  const han = c.raw.han || [];
-  return c.raw.months.map((_, i) => {
-    const rival = Math.max(c.raw.oppnet[i] != null ? c.raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
-    return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival).toFixed(2) : null;
-  });
+const cycRivalNet = (raw, i) => {
+  const han = raw.han || [];
+  return Math.max(raw.oppnet[i] != null ? raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
 };
-const seriesOf = (c, key) => key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : c.raw[key] || [];
-const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : key === "pmlead" ? cycBase(c, "net") - (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet")) : cycBase(c, key);
+const cycRivalBase = c => rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet");
+const pmleadSeriesOf = (c, half) => c.raw.months.map((_, i) => {
+  const rival = cycRivalNet(c.raw, i);
+  return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival / (half ? 2 : 1)).toFixed(2) : null;
+});
+const pmleadSeries = c => pmleadSeriesOf(c, false);
+const pmmarginSeries = c => pmleadSeriesOf(c, true);
+const seriesOf = (c, key) => key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : key === "pmmargin" ? pmmarginSeries(c) : c.raw[key] || [];
+const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : key === "pmlead" ? cycBase(c, "net") - cycRivalBase(c) : key === "pmmargin" ? cycBase(c, "net") - cycRivalBase(c) / 2 : cycBase(c, key);
 function rdCycPeers(M, cycles, hidden, chg, m) {
   const hasData = c => seriesOf(c, M.key).some(v => v != null);
   const vals = [];
@@ -123220,9 +123224,17 @@ function RdPastCycles(p) {
     leader: "pm",
     unit: ""
   };
+  Mby.pmmargin = {
+    key: "pmmargin",
+    leader: "pm",
+    unit: ""
+  };
   const endOfKey = (c, key) => key === "comb" ? c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : key === "pmlead" ? (() => {
     const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
     return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival).toFixed(1) : null;
+  })() : key === "pmmargin" ? (() => {
+    const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
+    return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival / 2).toFixed(1) : null;
   })() : c.end[key];
   const curOfS = (key, c2) => {
     const v = endOfKey(cur, key);
@@ -123329,6 +123341,12 @@ function RdPastCycles(p) {
     key: "pmlead",
     name: "PM net approval, lead",
     sub: pm + " over " + pmRival,
+    group: "leaders",
+    color: cur.color
+  }, {
+    key: "pmmargin",
+    name: "PM net approval margin (rival ×½)",
+    sub: pm + " less half of " + pmRival + "’s net",
     group: "leaders",
     color: cur.color
   }];
@@ -123541,7 +123559,8 @@ function RdPastCycles(p) {
     net: "cyc-leaders",
     oppnet: "cyc-leaders",
     han: "cyc-leaders",
-    pmlead: "cyc-leaders"
+    pmlead: "cyc-leaders",
+    pmmargin: "cyc-leaders"
   };
   const toggleRow = (key, el) => {
     if (el) rdPinScroll(el, true);
