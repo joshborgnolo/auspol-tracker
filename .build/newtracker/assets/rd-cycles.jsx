@@ -318,29 +318,16 @@ const combSeries = (c) => {
    opposition leader alone - and her change anchor only joins the max for a
    term whose sparse series ever read her. */
 const rdHanRead = (c) => (c.raw.han || []).some((v) => v != null);
-const cycRivalNet = (raw, i) => {
-  const han = raw.han || [];
-  return Math.max(raw.oppnet[i] != null ? raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
+const pmleadSeries = (c) => {
+  const han = c.raw.han || [];
+  return c.raw.months.map((_, i) => {
+    const rival = Math.max(c.raw.oppnet[i] != null ? c.raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
+    return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival).toFixed(2) : null;
+  });
 };
-const cycRivalBase = (c) => (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet"));
-const pmleadSeriesOf = (c, half) => c.raw.months.map((_, i) => {
-  const rival = cycRivalNet(c.raw, i);
-  return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival / (half ? 2 : 1)).toFixed(2) : null;
-});
-const pmleadSeries = (c) => pmleadSeriesOf(c, false);
-/* the weighted sibling (user call 2026-10-17): the PM's net less HALF his
-   strongest rival's, after armariuminterreta's "approval margin" - a
-   PM/OL netsat regression found the PM's rating counts about twice the
-   opposition leader's against election-day 2pp (PM netsat - OL netsat / 2,
-   tracking Bonham's Newspoll coefficients 0.086 to -0.043). Hanson never
-   figured in that fit and has no series outside this term; half-weight still
-   rides the strongest rival, so every past month is the opposition leader
-   halved. */
-const pmmarginSeries = (c) => pmleadSeriesOf(c, true);
-const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : key === "pmmargin" ? pmmarginSeries(c) : (c.raw[key] || []));
+const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : (c.raw[key] || []));
 const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp")
-  : key === "pmlead" ? cycBase(c, "net") - cycRivalBase(c)
-  : key === "pmmargin" ? cycBase(c, "net") - cycRivalBase(c) / 2
+  : key === "pmlead" ? cycBase(c, "net") - (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet"))
   : cycBase(c, key));
 /* the past terms at one month for one measure: the same pooled set the band
    draws, with who each value belongs to */
@@ -649,10 +636,6 @@ function RdPastCycles(p) {
      month (pmleadSeries above), so past terms' rival is always the
      opposition leader. leader:"pm" keeps the PM named on each past term. */
   Mby.pmlead = { key: "pmlead", leader: "pm", unit: "" };
-  /* the PM's net less half his strongest rival's - the weighted "approval
-     margin" sibling of pmlead (user call 2026-10-17). Its own derived series
-     has genuine past-term data, so no peer alias */
-  Mby.pmmargin = { key: "pmmargin", leader: "pm", unit: "" };
   /* a half-measured month never becomes a half-total: the combined now
      figure renders a dash when either party's is missing */
   const endOfKey = (c, key) => (key === "comb"
@@ -660,10 +643,6 @@ function RdPastCycles(p) {
     : key === "pmlead" ? (() => {
         const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
         return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival).toFixed(1) : null;
-      })()
-    : key === "pmmargin" ? (() => {
-        const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
-        return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival / 2).toFixed(1) : null;
       })()
     : c.end[key]);
   const curOfS = (key, c2) => { const v = endOfKey(cur, key); return v == null ? null : (c2 ? v - cycBaseOf(cur, key) : v); };
@@ -724,10 +703,6 @@ function RdPastCycles(p) {
        out-rates the opposition leader (user call 2026-10-17: under "Hanson's
        net approval", "that his net approval over strongest rival") */
     { key: "pmlead", name: "PM net approval, lead", sub: pm + " over " + pmRival, group: "leaders", color: cur.color },
-    /* the lead with the rival at half weight - the "approval margin": a
-       PM/OL netsat regression found the PM's rating counts about twice his
-       opponent's against the final 2pp (user call 2026-10-17) */
-    { key: "pmmargin", name: "PM net approval margin (rival ×½)", sub: pm + " less half of " + pmRival + "’s net", group: "leaders", color: cur.color },
   ];
   const rowsForHidden = (hid, c2) => ROW_DEFS.map((r) => {
     const peers = peersOfS(r.key, hid, c2);
@@ -944,7 +919,7 @@ function RdPastCycles(p) {
   const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
   /* One Nation and the combined row belong to the primary section: its
      opposition chart draws these very series when its boxes are ticked */
-  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", ppmh: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders", pmlead: "cyc-leaders", pmmargin: "cyc-leaders" };
+  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", ppmh: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders", pmlead: "cyc-leaders" };
 
   /* ---- a row opened ---------------------------------------------------------------- */
   /* A row opens to every term on its strip, by name and ranked at this
