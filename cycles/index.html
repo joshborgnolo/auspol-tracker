@@ -131792,24 +131792,54 @@ function RdHouseLean({
     ...r,
     n: nOf(r.h)
   })).sort((a, b) => b.v - a.v || b.n - a.n);
-  const tr = rowsOf(tppKey).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
-  const sp = rowsOf("split").sort((a, b) => b.v - a.v);
-  const LP = D.latest && D.latest.primary || {};
-  let splitLine = "";
-  if (tr.length && sp.length > 1 && LP.onp != null && LP.lnp != null && sp[0].v >= 0.5 && sp[sp.length - 1].v <= -0.5 && Math.max(sp[0].v, -sp[sp.length - 1].v) >= Math.abs(tr[0].v) + 0.5) {
-    const onLeads = LP.onp >= LP.lnp;
-    const [a, b] = onLeads ? [sp[0], sp[sp.length - 1]] : [sp[sp.length - 1], sp[0]];
-    splitLine = ` They part further on how the right’s vote splits: ${a.h} finds ${onLeads ? "One Nation’s lead over the Coalition" : "the Coalition’s lead over One Nation"} ${Math.abs(a.v).toFixed(1)} points wider than the others do, ${b.h} ${Math.abs(b.v).toFixed(1)} points narrower.`;
-  }
+  const hlWords = id => {
+    if (id === "tpp") {
+      const rival = onM ? "One Nation" : "the Coalition";
+      return {
+        hi: pl => `lean${pl ? "" : "s"} furthest to Labor`,
+        lo: pl => `lean${pl ? "" : "s"} furthest to ${rival}`
+      };
+    }
+    if (id === "split") return {
+      hi: pl => `read${pl ? "" : "s"} One Nation widest against the Coalition`,
+      lo: pl => `read${pl ? "" : "s"} One Nation narrowest against the Coalition`
+    };
+    const whose = {
+      alp: "Labor’s",
+      lnp: "the Coalition’s",
+      onp: "One Nation’s",
+      grn: "the Greens’",
+      oth: "the others’"
+    }[id];
+    return {
+      hi: pl => `read${pl ? "" : "s"} ${whose} vote highest`,
+      lo: pl => `read${pl ? "" : "s"} ${whose} vote lowest`
+    };
+  };
+  const hlJoin = ns => ns.length > 2 ? ns.slice(0, -1).join(", ") + " and " + ns[ns.length - 1] : ns.join(" and ");
   let head = null,
     dek = null;
-  if (tr.length > 1) {
-    const top = tr[0],
-      rest = Math.max(...tr.slice(1).map(r => Math.abs(r.v)));
-    const way = top.v > 0 ? "Labor’s" : onM ? "One Nation’s" : "the Coalition’s";
-    const pts = Math.abs(top.v).toFixed(1);
-    head = Math.abs(top.v) < 0.05 ? "No pollster leans away from the pack" : `${top.h} leans furthest from the pack, and ${Math.abs(top.v) <= 1 ? "only " : ""}by ${pts} point${pts === "1.0" ? "" : "s"}`;
-    dek = Math.abs(top.v) < 0.05 ? "Every pollster’s polls sit level with the pollsters polling alongside it." + splitLine : `Its polls run ${pts} point${pts === "1.0" ? "" : "s"} more ${way} way than the pollsters polling alongside it, and no other pollster is more than ${rest.toFixed(1)} points off.${splitLine} The averages take each lean out before the polls are combined.`;
+  const hsr = rowsOf(key).sort((a, b) => Math.abs(b.v) - Math.abs(a.v)).filter(r => Math.abs(r.v) >= 0.05);
+  if (hsr.length) {
+    const words = hlWords(view === "tpp" ? "tpp" : view);
+    const tail = " The averages take each lean out before the polls are combined.";
+    const fmtPt = v => `${v.toFixed(1)} point${v.toFixed(1) === "1.0" ? "" : "s"}`;
+    const sgn = hsr[0].v > 0;
+    const tied = hsr.filter(r => r.v > 0 === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.05);
+    const next = hsr.filter(r => !tied.includes(r));
+    const pl = tied.length > 1,
+      topV = Math.abs(hsr[0].v);
+    head = `${hlJoin(tied.map(r => r.h))} ${(sgn ? words.hi : words.lo)(pl)}, and ${topV <= 1 ? "only " : ""}by ${fmtPt(topV)}`;
+    if (!next.length) {
+      dek = "No other pollster leans measurably either way." + tail;
+    } else {
+      const nextMax = Math.abs(next[0].v);
+      const nextTied = next.filter(r => Math.abs(r.v) >= nextMax - 0.05);
+      dek = `${hlJoin(nextTied.map(r => r.h))} ${nextTied.length > 1 ? "are" : "is"} next, ${fmtPt(nextMax)} off` + (next.length > nextTied.length ? "; no other pollster is further out" : "") + `.${topV >= 1 && nextMax <= topV / 2 ? ` ${pl ? "They are" : "It is"} well clear of the pack.` : ""}${tail}`;
+    }
+  } else if (rowsOf(key).length) {
+    head = "No pollster leans away from the pack here";
+    dek = "Every pollster sits level with the pollsters polling beside it. The averages take out any lean that builds up.";
   }
   const maxAbs = Math.max(0, ...rows.map(r => Math.abs(r.v)));
   const BM = maxAbs <= 1.1 ? 1.2 : Math.ceil((maxAbs + 0.1) * 2) / 2;
