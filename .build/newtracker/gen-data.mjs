@@ -5688,9 +5688,27 @@ const CYC_META = JUR ? jurCycles() : [
      note lives in cyclePollBases. ePrim/eTpp are the governing side's
      official result, filled in from the elections table below the array.
      The 1969 row was the trial extension of that pattern past 1972; the
-     1961, 1963 and 1966 rows are the batch extension past it. Approval
+     1961, 1963 and 1966 rows are the batch extension past it, and the
+     1943–1958 rows the wartime-and-Menzies extension past that (the
+     aeforecasts mirror's first federal row is 1943-06-01). Approval
      buckets stay empty this far back (no Gallup-audited PM ratings),
      which the approval consumers tolerate. */
+  /* Curtin died in office 5 Jul 1945; Forde's eight-day caretaker stint is
+     folded into the handover the way no other row itemises a week-long
+     commission. Fadden led the Coalition into the 1943 election and stood
+     down after it; Menzies resumed on 22 Sep 1943 (APH shadow-ministry
+     register) and led the opposition until 1949. */
+  { year: 1943, gov: "alp", opp: "lnp", pm: "Curtin → Chifley", lead: "Curtin", oppLead: "Fadden → Menzies", eDate: "1943-08-21", src: 1946, appr: 1943,
+    pmSpl: { iso: "1945-07-05", names: ["Curtin", "Chifley"] },
+    oppSpl: { iso: "1943-09-22", names: ["Fadden", "Menzies"] } },
+  { year: 1946, gov: "alp", opp: "lnp", pm: "Chifley", lead: "Chifley", oppLead: "Menzies", eDate: "1946-09-28", src: 1949, appr: 1946 },
+  { year: 1949, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Chifley → Evatt", eDate: "1949-12-10", src: 1951, appr: 1949,
+    oppSpl: { iso: "1951-06-20", names: ["Chifley", "Evatt"] } },
+  { year: 1951, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt", eDate: "1951-04-28", src: 1954, appr: 1951 },
+  { year: 1954, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt", eDate: "1954-05-29", src: 1955, appr: 1954 },
+  { year: 1955, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt", eDate: "1955-12-10", src: 1958, appr: 1955 },
+  { year: 1958, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt → Calwell", eDate: "1958-11-22", src: 1961, appr: 1958,
+    oppSpl: { iso: "1960-03-07", names: ["Evatt", "Calwell"] } },
   { year: 1961, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Calwell", eDate: "1961-12-09", src: 1963, appr: 1961 },
   { year: 1963, gov: "lnp", opp: "alp", pm: "Menzies → Holt", lead: "Menzies", oppLead: "Calwell", eDate: "1963-11-30", src: 1966, appr: 1963,
     pmSpl: { iso: "1966-01-26", names: ["Menzies", "Holt"] } },
@@ -5933,7 +5951,7 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: twenty-one past elections, each with a result to check the final
+   visible: twenty-two past elections, each with a result to check the final
    polls against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST

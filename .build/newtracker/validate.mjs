@@ -650,7 +650,7 @@ export function validate(D) {
      eras publish one consistent basis, so repeating a note per row would be
      copy-paste noise. The declared bases, all adjudicated against the source
      tables:
-       – 1961…1987 Morgan (tppEra rows): F2F Morgan Gallup pre-1987, the era
+       – 1946…1987 Morgan (tppEra rows): F2F Morgan Gallup pre-1987, the era
          where minors ride dem/dlp on the row rather than inside oth. Σ over
          {"alp","lnp"}+{"dem","dlp"}+{"oth"} (grn/onp did not exist as
          published columns).

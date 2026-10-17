@@ -144,10 +144,14 @@ const firmFor = (remote, bucketYear) => {
 const endYears = Object.keys(D.cyclePolls).map(Number).sort((a, b) => a - b);
 const electionDate = (y) => D.elections["e" + y].date;
 // boundary for insertion is the OLDEST bucket's opening election, hard-keyed
-// (endYears[0] − 3 no longer resolves — the 1963 bucket opens at e1961, and
-// e1960 does not exist); pre-1961-election mirror rows stay CSV-only (the
-// 1961 term's two 1960-02 transcriptions conflict and await adjudication)
-const OLDEST_ELECTION = D.elections.e1961.date;
+// (endYears[0] − 3 no longer resolves — the 1946 bucket opens at e1943, and
+// e1942 does not exist); pre-1943-election mirror rows stay CSV-only
+const OLDEST_ELECTION = D.elections.e1943.date;
+// The 1961 term's two 1960-02-15 transcriptions conflict (49/46 v 45/48, one
+// tagged #Transcribed) and nothing in the repo adjudicates them — the Trove
+// corpus has no 1960 waves — so BOTH rows stay CSV-only until a primary
+// source settles the pair
+const EXCLUDE_DATES = new Set(["1960-02-15"]);
 const bucketFor = (date) => {
   for (const y of endYears) if (date <= electionDate(y)) return String(y);
   return null; // after the last closed election -> current term
@@ -166,6 +170,8 @@ const VI_NULL_CHECK = (r) => r.alp == null && r.lnp == null; // no VI at all
 // era buckets (pre-1987 rollout) and the FLOW_ERAS set each row is implied
 // through, keyed by the election that opened the cycle (flows.mjs)
 const TPP_ERA_BY_BUCKET = {
+  1946: "1943", 1949: "1946", 1951: "1949", 1954: "1951", 1955: "1954",
+  1958: "1955", 1961: "1958",
   1963: "1961", 1966: "1963", 1969: "1966",
   1972: "1969", 1974: "1972", 1975: "1974", 1977: "1975", 1980: "1977",
   1983: "1980", 1984: "1983", 1987: "1984",
@@ -250,6 +256,7 @@ for (const c of candidates) {
   }
   const bucket = bucketFor(c.date);
   if (c.date <= OLDEST_ELECTION) { report.csvOnly++; continue; }
+  if (EXCLUDE_DATES.has(c.date)) { report.csvOnly++; continue; }
   const firm = firmFor(c.remote, bucket === null ? null : Number(bucket));
   if (!firm) { note(c.remote, 1); continue; }
   if (bucket === null) {

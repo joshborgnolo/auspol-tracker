@@ -531,7 +531,7 @@ function TrendChart(props) {
   const tipRef = useRef(null);
   const [tipW, setTipW] = useState(0);
   /* A guide readout lists every line drawn, and Past cycles can draw
-     twenty-one: taller than the whole plot on a phone, so it ran on over the
+     thirty-two: taller than the whole plot on a phone, so it ran on over the
      next card, where its see-through glass left both its rows and the text
      under them unreadable. Two answers, measured rather than guessed, since
      the rows and the room both vary:

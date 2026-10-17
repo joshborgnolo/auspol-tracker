@@ -2426,7 +2426,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
 }
 
 /* ---- the board ---------------------------------------------------------
-   Twenty-one federal terms, three states each, and until now twenty-one pills
+   Thirty-two federal terms, three states each, and until now thirty-two pills
    standing open on the page: four rows deep in a desktop column and eleven on
    a phone. Half a screen of chrome whose usual job was to say "all of them
    are on" - and at that size the one thing it could not do at a glance was
@@ -2464,7 +2464,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
     ? lifted.size + (cur && !hidden.has(cur.year) ? 1 : 0)
     : onBoard;
   /* The button has to earn the room the pills were spending, so at rest it
-     carries the sweep they showed simply by existing - "21 terms since 1972"
+     carries the sweep they showed simply by existing - "32 terms since 1943"
      is a row of years in one line. The moment the reader has cut the board or
      drawn a line it says THAT instead: the flourish is the first thing to go,
      because a control that is doing something should say what. */
@@ -2472,7 +2472,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
                    : lifted.size ? total + " terms"
                    : (() => {
                        /* terms that hold this measure: preferred PM starts in
-                          1984, and "21 terms since 1972" above a subtitle
+                          1984, and "32 terms since 1943" above a subtitle
                           saying "since 1984" contradicted it */
                        const withData = hasData ? cycles.filter((c) => c.current || hasData(c)) : cycles;
                        return withData.length + " terms since " + withData[0].year;
@@ -2481,7 +2481,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
 
   /* The board cut by what each government did at its own election - the
      comparison the tab exists for, and one nobody can assemble by eye from
-     twenty-one rows. It used to be one button offering the set you were NOT
+     thirty-two rows. It used to be one button offering the set you were NOT
      looking at, so the two cuts could never be compared as choices and the
      way back to everything was a second control that only existed once you
      had used the first. Four shortcuts instead, and which one is in effect is
@@ -2715,7 +2715,7 @@ function cycleSourceRows(cycles, D) {
 
 /* ---- How the final polls did ------------------------------------------
    Everywhere else the page can only describe how far the polls disagree with
-   EACH OTHER. Twenty-one past elections are the one place a poll can be checked
+   EACH OTHER. Twenty-two past elections are the one place a poll can be checked
    against the thing it was estimating, so this is the only honest answer to
    "should I believe the number at the top of this page".
    Pre-1993 rows score Morgan's implied last-election-flows 2PP (FLOW_ERAS),
@@ -4315,7 +4315,7 @@ function pollTagIds(p) {
    close, and focus goes back to the button that opened it. */
 /* `on` is the lit state - "something is applied here". It normally follows
    the summary, because in the filter bar a summary IS what is applied. The
-   past-cycles board carries a summary at rest too ("21 terms since 1972" is
+   past-cycles board carries a summary at rest too ("32 terms since 1943" is
    the roll its chips used to show by existing), so it says outright whether
    the reader has actually done anything; a button that looked pressed in
    from the first paint would be saying the same word for both. */

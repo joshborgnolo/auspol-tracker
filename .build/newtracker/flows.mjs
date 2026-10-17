@@ -116,7 +116,7 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
 };
 
 /* FLOW_ERAS – the pre-1987 counterpart of FLOW. F2F Morgan Gallup waves of
-   the 1961–87 era (the aeforecasts mirror import) publish NO 2PP – Morgan
+   the 1943–87 era (the aeforecasts mirror import) publish NO 2PP – Morgan
    did not publish a national two-party figure then – so the rows carry an
    IMPLIED 2PP (tppEra key → constants), derived by last-election flows the
    way Kevin Bonham's Wonk Central piece
@@ -127,29 +127,47 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
       at the election that OPENED the cycle (LEF: constants of election E
       serve the polls of the E→E+1 cycle, never E's own).
    2. The constants were calibrated per election against that election's
-      OFFICIAL national 2PP (AEC/published: 1961 50.5, 1963 47.4, 1966
-      43.1, 1969 50.2, 1972 52.7, 1974 51.7, 1975 44.3, 1977 45.4, 1980
-      49.6, 1983 53.23, 1984 51.77, 1987 50.83, ALP share)
+      OFFICIAL national 2PP (AEC/published: 1943 58.2†, 1946 54.1†, 1949
+      49.0, 1951 49.3, 1954 50.7, 1955 45.8, 1958 45.9, 1961 50.5, 1963
+      47.4, 1966 43.1, 1969 50.2, 1972 52.7, 1974 51.7, 1975 44.3, 1977
+      45.4, 1980 49.6, 1983 53.23, 1984 51.77, 1987 50.83, ALP share)
       using national primaries from the pappubahry election-statistics
-      dataset: f_oth pinned at 0.45 (the stable solved value for the
-      genuine minor/independent remainder in the DLP-era fit), the era's
-      headline minor party (DLP to 1975, Democrats from 1977) solved per
-      election, DLP pinned at 0.27 in the Democrat era (its vote was ≤1.4%
-      and collapsing – the pooled DLP-era estimate).
+      dataset (the 1943–58 additions from the election articles' results
+      tables, Psephos-derived, UAP/Country folded into the Coalition the
+      way Liberal/Country already were): f_oth pinned at 0.45 (the stable
+      solved value for the genuine minor/independent remainder in the
+      DLP-era fit), the era's headline minor party (DLP to 1975, Democrats
+      from 1977) solved per election, DLP pinned at 0.27 in the Democrat
+      era (its vote was ≤1.4% and collapsing – the pooled DLP-era
+      estimate).
+      † The AEC's own TPP series starts in 1949; the two earlier figures
+        are the published Mackerras-estimate 2PPs carried by the election
+        articles of record, and carry wider tolerance with them.
    3. The 1977 Democrat debut is a structural break (Bonham's "completely
       obvious at the time" case): no prior Democrat flow exists, so the
       1975 set carries dem=0.50 as an explicit debut assumption.
 
    The bt field is the right-edge backtest (same convention as FLOW_LEF):
    the set's constants applied to the CLOSING election's actual primaries
-   vs that election's official 2PP, in ALP points. Every cycle lands inside
-   Bonham's measured pre-1983 LEF error budget (±0.6) and the broader
-   post-1983 one (±0.3–1.1); the piece's own normalised-error numbers are
-   the figure the cyclePollBases notes quote. The implied figure is tagged
-   per row with `tppEra` (the opening election year, i.e. the key below),
-   and validate.mjs inverts era rows against THESE constants instead of the
-   2025 set. */
+   vs that election's official 2PP, in ALP points. Every 1961+ cycle lands
+   inside Bonham's measured pre-1983 LEF error budget (±0.6) and the
+   broader post-1983 one (±0.3–1.1); the pre-1961 sets do not all make
+   that budget – the 1940s residual "others" carried the big
+   Non-Communist/Services/independent splinters and 1943's 12% independent
+   vote, and DLP preferences realigned hard after the 1955 split year –
+   and the bt field records each miss as it stands; the cyclePollBases
+   notes quote it to the reader instead of the budget line. The implied
+   figure is tagged per row with `tppEra` (the opening election year, i.e.
+   the key below), and validate.mjs inverts era rows against THESE
+   constants instead of the 2025 set. */
 export const FLOW_ERAS = Object.freeze({
+  1943: { oth: 0.45, bt: -1.4 },
+  1946: { oth: 0.45, bt: -1.33 },
+  1949: { oth: 0.45, bt: -0.76 },
+  1951: { oth: 0.45, bt: 0.43 },
+  1954: { oth: 0.45, bt: -0.01 },
+  1955: { dlp: 0.0022, oth: 0.45, bt: -2.52 },
+  1958: { dlp: 0.2698, oth: 0.45, bt: 0.33 },
   1961: { dlp: 0.2319, oth: 0.45, bt: 0.27 },
   1963: { dlp: 0.1952, oth: 0.45, bt: -0.47 },
   1966: { dlp: 0.2594, oth: 0.45, bt: -0.02 },

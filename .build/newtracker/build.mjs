@@ -508,11 +508,14 @@ const basisClause = (v) => v.basis === "imp" ? " on implied preference flows" : 
 /* "Set against the last N" in the tagline / meta copy is the count of PAST
    federal terms the tracker has cycles for, derived from the cycle-source
    rows (one key per past term; the Now term is never among them) so a new
-   Past-cycles term renumbers the sentence on its own. Spelled out to twenty
-   – at ~3-yearly elections the digit fallback is decades away. */
+   Past-cycles term renumbers the sentence on its own. Spelled out to
+   thirty-one – the 1943-58 batch extension already sits the count there,
+   and the digit fallback covers whatever comes after. */
 const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
                            "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
-                           "eighteen","nineteen","twenty"];
+                           "eighteen","nineteen","twenty","twenty-one","twenty-two","twenty-three",
+                           "twenty-four","twenty-five","twenty-six","twenty-seven","twenty-eight",
+                           "twenty-nine","thirty","thirty-one"];
 /* Called from the tagline, the meta description and the summary table –
    ~240KB of JSON parsed once, not per call. cycle-source.json is gen-data's
    last word for the whole build, so the count cannot move mid-run. */
