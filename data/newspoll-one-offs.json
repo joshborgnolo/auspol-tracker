@@ -1,0 +1,2046 @@
+{
+ "generated": "2026-10-17",
+ "series": "Newspoll / Pyxis Polling & Insights — The Australian (federal)",
+ "scope": "Special and one-off questions across the 19 Newspoll VI waves of the 2025–26 term (2025-07-17 … 2026-10-08) plus the midweek one-off stories found on the paper's Newspoll topic page (one recovered: the 2026-09-17 wave's immigration special). The standing battery asked every wave is excluded: primary voting intention ('If a federal election for the House of Representatives was held today, which one of the following would you vote for? …'), PM and opposition-leader satisfaction ('Are you satisfied or dissatisfied with the way … is doing his/her job?'), better PM ('Who do you think would make the better Prime Minister?'), and its 2026 extensions — Hanson's own satisfaction series ('… the way Pauline Hanson is doing her job as Leader of One Nation'), the three-way ranked preferred-PM ('Please rank the following three people … highest preference to lowest preference') and the forced Albanese-v-Hanson 'distributed between top two leaders' pairing. Those are already channelled into polls.json (polls[] primaries, approval[19], ppm[19], ppmHeadToHead[3] carries the distributed pairing for three waves). The 2026-02-08 wave's Liberals-15/Nationals-3 split is a reporting detail of the standing VI row (recorded as an 18 Coalition primary), not a separate question. Historical waves before this term are out of scope.",
+ "sources": "Every wave's story re-fetched from its canonical polls.json url through the user's logged-in Chrome (.build/chrome-article.mjs) plus every per-story Infogram embed re-downloaded; the Newspoll topic page was swept once for unmatched stories (kit: .matilda/np-questions/, per-wave cached dumps; three waves file through secondary coverage — 2025-08-14 thenewdaily.com.au, 2025-09-11 thenightly.com.au, 2026-02-26 pollbludger.net — all battery-only). Tables are the embeds' chart rows verbatim — table 2 of each entry in the traits entries is a live-updated project where noted — and prose entries quote The Australian's own paragraphs verbatim (its copy spells some numbers as words). Question wordings are article-prose paraphrase unless marked infogram-*; The Australian does not print verbatim questionnaires. The 2026-09-17 'PM popularity slides' embed (TAD-2641) is editorial context charting, not survey data, and is excluded.",
+ "one_offs": [
+  {
+   "id": "preferred-coalition-leader",
+   "waveDate": "2025-11-20",
+   "fieldwork": {
+    "start": "2025-11-17",
+    "end": "2025-11-20"
+   },
+   "sample": 1245,
+   "published": "2025-11-23T19:00",
+   "question": "Who should lead the Coalition (from a named list: Ley, Hastie, Taylor, Wilson, O'Brien)?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Sussan Ley",
+    "Andrew Hastie",
+    "Angus Taylor",
+    "Tim Wilson",
+    "Ted O'Brien",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-andrew-hastie-firms-as-liberal-alternative-to-sussan-ley/news-story/ae7d5d377e1f1d49da95f681615eb7db",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The Newspoll, which included a question asking 1245 voters who should lead the Coalition from a list featuring Ms Ley, Mr Hastie , opposition defence spokesman Angus Taylor, Deputy Opposition Leader Ted O’Brien and opposition industrial relations spokesman Tim Wilson, showed 46 per cent of Australians didn’t know who they would prefer.",
+     "Amid the speculation about Ms Ley’s long-term future, Newspoll found 21 per cent of voters preferred her as Liberal leader ahead of Mr Hastie (15 per cent), Mr Taylor (9 per cent), Mr Wilson (6 per cent) and Mr O’Brien (3 per cent).",
+     "The poll, conducted between Monday and Thursday last week as Ms Ley engaged in almost 40 media interviews and daily press conferences, revealed 28 per cent of Coalition voters preferred the Opposition Leader ahead of Mr Hastie (20 per cent) and Mr Taylor (12 per cent).",
+     "Mr Hastie, who conservative backers believe would stoke support in the Coalition’s disillusioned base, was the preferred leader among Australians aged over 65, One Nation voters and those who support minor parties and independents.",
+     "The West Australian Liberal backbencher – who resigned from the shadow cabinet last month – was backed by 26 per cent of One Nation voters and older Australians, compared with 12 per cent and 19 per cent who supported Ms Ley.",
+     "Mr Taylor, a member of the same conservative faction as Mr Hastie, was endorsed by 9 per cent of One Nation voters, 6 per cent of minor party or independent voters and 17 per cent of voters aged above 65.",
+     "Ms Ley, who won the most support from younger Australians, is not expected to face a leadership spill when Liberal MPs meet on Tuesday."
+    ]
+   },
+   "note": "First public field read of the pre-spill Liberal contest: Ley 21, Hastie 15, Taylor 9, Wilson 6, O'Brien 3, don't know 46. Coalition voters: Ley 28, Hastie 20, Taylor 12."
+  },
+  {
+   "id": "leader-traits-matchup",
+   "waveDate": "2026-01-16",
+   "fieldwork": {
+    "start": "2026-01-12",
+    "end": "2026-01-16"
+   },
+   "sample": 1224,
+   "published": "2026-01-19T07:11",
+   "question": "Leaders' attributes match-up: does each attribute describe Anthony Albanese / Sussan Ley? (agree / disagree / don't know per attribute)",
+   "questionWordingSource": "infogram-derived-chart",
+   "responseOptions": [
+    "Agree",
+    "Disagree",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-ahead-of-the-coalition-on-primary-votes-for-the-first-time/news-story/4e41476c9a605ada111c0c1f7064db1d",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Agree",
+       "Disagree",
+       "Don't know"
+      ],
+      "rows": [
+       [
+        "Experienced",
+        "69",
+        "25",
+        "6"
+       ],
+       [
+        "Decisive and strong",
+        "45",
+        "48",
+        "7"
+       ],
+       [
+        "Has a vision for Australia",
+        "55",
+        "37",
+        "8"
+       ],
+       [
+        "Understands the major issues",
+        "53",
+        "41",
+        "6"
+       ],
+       [
+        "Cares for people",
+        "55",
+        "37",
+        "8"
+       ],
+       [
+        "Arrogant",
+        "48",
+        "43",
+        "9"
+       ],
+       [
+        "Likeable",
+        "53",
+        "41",
+        "6"
+       ],
+       [
+        "In touch with voters",
+        "44",
+        "49",
+        "7"
+       ],
+       [
+        "Trustworthy",
+        "48",
+        "44",
+        "8"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "",
+       "Agree",
+       "Disagree",
+       "Don't know"
+      ],
+      "rows": [
+       [
+        "Experienced",
+        "44",
+        "32",
+        "24"
+       ],
+       [
+        "Decisive and strong",
+        "37",
+        "39",
+        "24"
+       ],
+       [
+        "Has a vision for Australia",
+        "43",
+        "33",
+        "24"
+       ],
+       [
+        "Understands the major issues",
+        "45",
+        "35",
+        "20"
+       ],
+       [
+        "Cares for people",
+        "45",
+        "30",
+        "25"
+       ],
+       [
+        "Arrogant",
+        "40",
+        "33",
+        "27"
+       ],
+       [
+        "Likeable",
+        "40",
+        "38",
+        "22"
+       ],
+       [
+        "In touch with voters",
+        "35",
+        "43",
+        "22"
+       ],
+       [
+        "Trustworthy",
+        "37",
+        "36",
+        "27"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "In addition to the headline Newspoll results, The Australian also commissioned a special survey testing voter sentiment in relation to the leaders’ attributes.",
+     "Mr Albanese leads Ms Ley by 69 per cent to 44 per cent on ­experience, 45 per cent to 37 per cent on being decisive and strong, 55 per cent to 43 per cent on having a vision for Australia, 53 per cent to 45 per cent on understanding the major issues, 55 per cent to 45 per cent on caring for people, 53 per cent to 40 per cent on being likeable, and 44 per cent to 35 per cent on being in touch with voters.",
+     "Ms Ley is considered less arrogant than Mr Albanese, with 48 per cent of voters agreeing the Prime Minister is arrogant compared with 40 per cent who agreed that the Opposition Leader was ­arrogant. Eight months after replacing Mr Dutton as Liberal ­leader, voter ratings of Ms Ley’s leadership attributes are well behind those of her predecessor on several measures.",
+     "Fewer voters consider Ms Ley as trustworthy (37 per cent) compared to any prime minister or ­opposition leader since the question was first asked in 2008, including Mr Dutton, Bill Shorten and Tony Abbott. In contrast, 48 per cent of voters agreed that Mr Albanese was trustworthy."
+    ]
+   },
+   "note": "Table 1 is Albanese, table 2 Ley (builder asserts Jan-2026 Experienced agree 69/44 before naming). First leaders'-traits match-up of the Ley era; Ley's 37% trustworthy is the lowest for either role since the question began in 2008.",
+   "embed": {
+    "id": "ab441d18-facc-4961-9215-a0fa4444f08b",
+    "title": "NED-11042-Newspoll-Word-association"
+   }
+  },
+  {
+   "id": "leader-traits-history",
+   "waveDate": "2026-01-16",
+   "fieldwork": {
+    "start": "2026-01-12",
+    "end": "2026-01-16"
+   },
+   "sample": 1224,
+   "published": "2026-01-19T07:11",
+   "question": "Historical Newspoll leaders'-traits series (agree % by PM–opposition-leader pairing, 2008→2026, one chart per attribute)",
+   "questionWordingSource": "infogram-derived-chart",
+   "responseOptions": [
+    "Agree",
+    "Disagree",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-ahead-of-the-coalition-on-primary-votes-for-the-first-time/news-story/4e41476c9a605ada111c0c1f7064db1d",
+   "data": {
+    "tables": [
+     {
+      "name": "Experienced",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "70",
+        "65"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "72",
+        "80"
+       ],
+       [
+        "13-15 April 2012",
+        "63",
+        "75"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "79",
+        "75"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "72",
+        "66"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "77",
+        "57"
+       ],
+       [
+        "19-22 May 2016",
+        "74",
+        "62"
+       ],
+       [
+        "25-28 May 2017",
+        "73",
+        "61"
+       ],
+       [
+        "5-8 April 2018",
+        "77",
+        "63"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "71",
+        "70"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "68",
+        "64"
+       ],
+       [
+        "26-29 August 2020",
+        "79",
+        "63"
+       ],
+       [
+        "21-24 April 2021",
+        "79",
+        "64"
+       ],
+       [
+        "10-13 November 2021",
+        "69",
+        "60"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "66",
+        "70"
+       ],
+       [
+        "3-7 June 2024",
+        "66",
+        "70"
+       ],
+       [
+        "2-6 December 2024",
+        "68",
+        "70"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "71",
+        "68"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "69",
+        "44"
+       ]
+      ]
+     },
+     {
+      "name": "Decisive and strong",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "73",
+        "74"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "30 April - 2 May 2010",
+        "63",
+        "69"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "81",
+        "72"
+       ],
+       [
+        "13-15 April 2012",
+        "67",
+        "67"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "62",
+        "69"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "57",
+        "56"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "66",
+        "43"
+       ],
+       [
+        "19-22 May 2016",
+        "63",
+        "52"
+       ],
+       [
+        "25-28 May 2017",
+        "55",
+        "48"
+       ],
+       [
+        "30 November - 3 December 2017",
+        "52",
+        "50"
+       ],
+       [
+        "5-8 April 2018",
+        "53",
+        "49"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "59",
+        "51"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "60",
+        "51"
+       ],
+       [
+        "26-29 August 2020",
+        "70",
+        "47"
+       ],
+       [
+        "21-24 April 2021",
+        "65",
+        "45"
+       ],
+       [
+        "10-13 November 2021",
+        "54",
+        "43"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "48",
+        "58"
+       ],
+       [
+        "3-7 June 2024",
+        "49",
+        "60"
+       ],
+       [
+        "2-6 December 2024",
+        "44",
+        "Ms Ley"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "48",
+        "62"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "45",
+        "37"
+       ]
+      ]
+     },
+     {
+      "name": "Has a vision for Australia",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "80",
+        "68"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "79",
+        "74"
+       ],
+       [
+        "13-15 April 2012",
+        "64",
+        "65"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "69",
+        "72"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "61",
+        "61"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "66",
+        "53"
+       ],
+       [
+        "19-22 May 2016",
+        "67",
+        "59"
+       ],
+       [
+        "25-28 May 2017",
+        "59",
+        "56"
+       ],
+       [
+        "30 November - 3 December 2017",
+        "56",
+        "54"
+       ],
+       [
+        "5-8 April 2018",
+        "59",
+        "58"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "58",
+        "57"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "60",
+        "54"
+       ],
+       [
+        "26-29 August 2020",
+        "72",
+        "52"
+       ],
+       [
+        "21-24 April 2021",
+        "70",
+        "54"
+       ],
+       [
+        "10-13 November 2021",
+        "57",
+        "53"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "59",
+        "55"
+       ],
+       [
+        "3-7 June 2024",
+        "58",
+        "59"
+       ],
+       [
+        "2-6 December 2024",
+        "56",
+        "61"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "60",
+        "61"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "55",
+        "43"
+       ]
+      ]
+     },
+     {
+      "name": "Likeable",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "80",
+        "61"
+       ],
+       [
+        "26-28 June 2009",
+        "77",
+        "54"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "77",
+        "63"
+       ],
+       [
+        "13-15 April 2012",
+        "55",
+        "57"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "64",
+        "55"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "40",
+        "64"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "71",
+        "48"
+       ],
+       [
+        "19-22 May 2016",
+        "68",
+        "57"
+       ],
+       [
+        "25-28 May 2017",
+        "55",
+        "49"
+       ],
+       [
+        "30 November - 3 December 2017",
+        "58",
+        "47"
+       ],
+       [
+        "5-8 April 2018",
+        "59",
+        "49"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "59",
+        "44"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "56",
+        "56"
+       ],
+       [
+        "26-29 August 2020",
+        "64",
+        "53"
+       ],
+       [
+        "21-24 April 2021",
+        "63",
+        "52"
+       ],
+       [
+        "10-13 November 2021",
+        "47",
+        "50"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "57",
+        "39"
+       ],
+       [
+        "3-7 June 2024",
+        "58",
+        "41"
+       ],
+       [
+        "2-6 December 2024",
+        "55",
+        "40"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "57",
+        "39"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "53",
+        "40"
+       ]
+      ]
+     },
+     {
+      "name": "In touch with voters",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "69",
+        "53"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "72",
+        "63"
+       ],
+       [
+        "13-15 April 2012",
+        "44",
+        "60"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "62",
+        "61"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "33",
+        "63"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "54",
+        "48"
+       ],
+       [
+        "19-22 May 2016",
+        "51",
+        "60"
+       ],
+       [
+        "25-28 May 2017",
+        "49",
+        "51"
+       ],
+       [
+        "30 November - 3 December 2017",
+        "42",
+        "51"
+       ],
+       [
+        "5-8 April 2018",
+        "42",
+        "52"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "50",
+        "52"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "49",
+        "50"
+       ],
+       [
+        "26-29 August 2020",
+        "59",
+        "48"
+       ],
+       [
+        "21-24 April 2021",
+        "54",
+        "47"
+       ],
+       [
+        "10-13 November 2021",
+        "41",
+        "46"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "46",
+        "41"
+       ],
+       [
+        "3-7 June 2024",
+        "48",
+        "43"
+       ],
+       [
+        "2-6 December 2024",
+        "43",
+        "43"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "49",
+        "43"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "44",
+        "35"
+       ]
+      ]
+     },
+     {
+      "name": "Trustworthy",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "70",
+        "55"
+       ],
+       [
+        "26-28 June 2009",
+        "70",
+        "47"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "61",
+        "58"
+       ],
+       [
+        "13-15 April 2012",
+        "44",
+        "54"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "50",
+        "57"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "43",
+        "59"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "59",
+        "44"
+       ],
+       [
+        "19-22 May 2016",
+        "56",
+        "49"
+       ],
+       [
+        "25-28 May 2017",
+        "50",
+        "44"
+       ],
+       [
+        "5-8 April 2018",
+        "49",
+        "43"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "50",
+        "43"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "48",
+        "49"
+       ],
+       [
+        "26-29 August 2020",
+        "59",
+        "48"
+       ],
+       [
+        "21-24 April 2021",
+        "57",
+        "48"
+       ],
+       [
+        "10-13 November 2021",
+        "42",
+        "44"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "49",
+        "41"
+       ],
+       [
+        "3-7 June 2024",
+        "49",
+        "41"
+       ],
+       [
+        "2-6 December 2024",
+        "46",
+        "41"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "52",
+        "40"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January",
+        "48",
+        "37"
+       ]
+      ]
+     },
+     {
+      "name": "Understands the major issues",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "76",
+        "71"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "30 April - 2 May 2010",
+        "69",
+        "66"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "77",
+        "73"
+       ],
+       [
+        "13-15 April 2012",
+        "60",
+        "66"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "67",
+        "69"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "52",
+        "68"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "64",
+        "54"
+       ],
+       [
+        "19-22 May 2016",
+        "63",
+        "61"
+       ],
+       [
+        "25-28 May 2017",
+        "57",
+        "57"
+       ],
+       [
+        "5-8 April 2018",
+        "57",
+        "56"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "57",
+        "56"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "56",
+        "57"
+       ],
+       [
+        "26-29 August 2020",
+        "75",
+        "61"
+       ],
+       [
+        "21-24 April 2021",
+        "65",
+        "57"
+       ],
+       [
+        "10-13 November 2021",
+        "52",
+        "54"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "54",
+        "57"
+       ],
+       [
+        "3-7 June 2024",
+        "54",
+        "58"
+       ],
+       [
+        "2-6 December 2024",
+        "54",
+        "58"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "58",
+        "57"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "53",
+        "45"
+       ]
+      ]
+     },
+     {
+      "name": "Cares for people",
+      "headers": [
+       "",
+       "Total agree",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "79",
+        "60"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "77",
+        "75"
+       ],
+       [
+        "13-15 April 2012",
+        "66",
+        "68"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "70",
+        "71"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "55",
+        "71"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "60",
+        "60"
+       ],
+       [
+        "19-22 May 2016",
+        "57",
+        "65"
+       ],
+       [
+        "25-28 May 2017",
+        "50",
+        "59"
+       ],
+       [
+        "30 November - 3 December 2017",
+        "53",
+        "55"
+       ],
+       [
+        "5-8 April 2018",
+        "54",
+        "57"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "55",
+        "53"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "55",
+        "60"
+       ],
+       [
+        "26-29 August 2020",
+        "68",
+        "60"
+       ],
+       [
+        "21-24 April 2021",
+        "63",
+        "59"
+       ],
+       [
+        "10-13 November 2021",
+        "50",
+        "56"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "61",
+        "45"
+       ],
+       [
+        "3-7 June 2024",
+        "62",
+        "47"
+       ],
+       [
+        "2-6 December 2024",
+        "57",
+        "45"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "62",
+        "45"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "55",
+        "45"
+       ]
+      ]
+     },
+     {
+      "name": "Arrogant",
+      "headers": [
+       "",
+       "Total agree (%)",
+       ""
+      ],
+      "rows": [
+       [
+        "",
+        "Mr Rudd",
+        "Mr Turnbull"
+       ],
+       [
+        "19-21 September 2008",
+        "47",
+        "61"
+       ],
+       [
+        "26-28 June 2009",
+        "51",
+        "68"
+       ],
+       [
+        "",
+        "Ms Gillard",
+        "Mr Abbott"
+       ],
+       [
+        "30 July - 1 August 2010",
+        "45",
+        "64"
+       ],
+       [
+        "13-15 April 2012",
+        "54",
+        "67"
+       ],
+       [
+        "",
+        "Mr Rudd",
+        "Mr Abbott"
+       ],
+       [
+        "16-18 August 2013",
+        "71",
+        "63"
+       ],
+       [
+        "",
+        "Mr Abbott",
+        "Mr Shorten"
+       ],
+       [
+        "20-22 February 2015",
+        "77",
+        "46"
+       ],
+       [
+        "",
+        "Mr Turnbull",
+        "Mr Shorten"
+       ],
+       [
+        "18-21 February 2016",
+        "55",
+        "49"
+       ],
+       [
+        "19-22 May 2016",
+        "60",
+        "47"
+       ],
+       [
+        "25-28 May 2017",
+        "64",
+        "50"
+       ],
+       [
+        "30 November - 3 December 2017",
+        "61",
+        "53"
+       ],
+       [
+        "5-8 April 2018",
+        "61",
+        "59"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Shorten"
+       ],
+       [
+        "6-9 September 2018",
+        "51",
+        "54"
+       ],
+       [
+        "",
+        "Mr Morrison",
+        "Mr Albanese"
+       ],
+       [
+        "4-8 December 2019",
+        "58",
+        "40"
+       ],
+       [
+        "26-29 August 2020",
+        "46",
+        "37"
+       ],
+       [
+        "21-24 April 2021",
+        "52",
+        "40"
+       ],
+       [
+        "10-13 November 2021",
+        "60",
+        "38"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Mr Dutton"
+       ],
+       [
+        "11-15 December 2023",
+        "45",
+        "57"
+       ],
+       [
+        "3-7 June 2024",
+        "46",
+        "56"
+       ],
+       [
+        "2-6 December 2024",
+        "47",
+        "58"
+       ],
+       [
+        "31 March - 3 April 2025",
+        "45",
+        "63"
+       ],
+       [
+        "",
+        "Mr Albanese",
+        "Ms Ley"
+       ],
+       [
+        "12-15 January 2026",
+        "48",
+        "40"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "One table per attribute (builder labels each chart from its Jan-2026 final row against the matchup totals). Source anomaly kept raw: the Decisive-and-strong series' 2–6 Dec 2024 row carries 'Ms Ley' in its third cell (an Infogram transcription error in The Australian's own chart). Albanese v Ley joins only at the final read (12–15 Jan 2026)."
+  },
+  {
+   "id": "iran-us-military-action",
+   "waveDate": "2026-03-26",
+   "fieldwork": {
+    "start": "2026-03-23",
+    "end": "2026-03-26"
+   },
+   "sample": 1232,
+   "published": "2026-03-29T20:30",
+   "question": "Do you approve or disapprove of US military action against Iran?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Strongly approve",
+    "Approve",
+    "Disapprove",
+    "Strongly disapprove",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Asked whether they approved or disapproved of US military action against Iran, 72 per cent of voters said they disapproved (including 50 per cent who strongly disapproved) compared with 23 per cent who approved and 5 per cent who said they didn’t know.",
+     "The Newspoll showed that more than two-thirds of every age group disapproved of the US military action in Iran. One Nation voters were more likely to support the war in Iran, ahead of Liberal, Labor and Greens voters. Men are twice as likely to approve of the military action (30 per cent) as women (16 per cent)."
+    ]
+   },
+   "note": "72% disapprove (50% strongly) vs 23% approve, 5% don't know. One Nation voters likeliest to approve; men 30% vs women 16%."
+  },
+  {
+   "id": "hormuz-naval-deployment",
+   "waveDate": "2026-03-26",
+   "fieldwork": {
+    "start": "2026-03-23",
+    "end": "2026-03-26"
+   },
+   "sample": 1232,
+   "published": "2026-03-29T20:30",
+   "question": "Should Australia join allied nations in supporting the US to keep the Strait of Hormuz open for international shipping (sending naval vessels)?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Support",
+    "Oppose",
+    "Don't know"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
+   "data": {
+    "tables": [],
+    "prose": [
+     "On the question of whether Australia should join allied nations in supporting the US to keep the Strait of Hormuz open for international shipping, 63 per cent of voters opposed sending naval vessels, while 30 per cent supported it, and 7 per cent didn’t know."
+    ]
+   },
+   "note": "63% opposed sending naval vessels, 30% support, 7% don't know."
+  },
+  {
+   "id": "budget-revenue-options",
+   "waveDate": "2026-04-16",
+   "fieldwork": {
+    "start": "2026-04-13",
+    "end": "2026-04-16"
+   },
+   "sample": 1235,
+   "published": "2026-04-19T20:00",
+   "question": "Which of these 10 options to increase revenue in the budget do you endorse? (multiple allowed)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Increase petroleum resource rent tax",
+    "Reduce property-investor tax concessions",
+    "Lower family-trust tax concessions",
+    "Tax inheritances over $1m",
+    "Increase business taxes",
+    "Increase bank levy",
+    "Remove GST exemptions",
+    "Lift GST rate",
+    "Reduce superannuation concessions",
+    "Increase personal income taxes"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-support-falls-as-voters-resist-new-revenue-measures/news-story/ba583310b812fd590a07d4c5e6812838",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Amid the ongoing fuel crisis , fears of a global recession and immigration policy clashes, support for the Albanese government and Coalition remained static at 31 per cent and 21 per cent respectively. Mr Albanese holds a nine-point margin over Angus Taylor on who voters think would make the better prime minister . The Newspoll, conducted between Monday and Thursday last week, included a question asking 1235 voters whether they endorsed 10 options Jim Chalmers may pursue to increase revenue streams in the budget. None of the options attracted an absolute majority, despite only one in six voters rejecting all suggestions .",
+     "Increasing the petroleum resource rent tax was deemed the most acceptable option, with 42 per cent of voters supporting the reform, ahead of 35 per cent who supported reducing tax concessions for property investors, 29 per cent who backed lower tax concessions for family trusts, and 27 per cent who favoured taxing inheritances of more than $1m.",
+     "Read the detailed breakdown of the latest Newspoll here",
+     "The PRRT overhaul and crackdown on property investor tax concessions were more widely supported by Labor and Greens voters. Reducing tax concessions for property investors is not any more acceptable for renters than those who own their homes; however, those who own an investment property are less likely to find this option acceptable.",
+     "There was considerably weaker support for increasing taxes on businesses, increasing the bank levy, removing GST exemptions, lifting the GST rate, reducing tax concessions for superannuation and increasing personal income taxes.",
+     "The results show younger voters aged 18-34, who are often cited by the Treasurer in his push for intergenerational equity, are more resistant to most revenue-raising options than other age groups. One Nation voters are the most likely to find all of the revenue proposals unacceptable, with 26 per cent rejecting all options."
+    ]
+   },
+   "note": "Top four options printed with figures (PRRT 42, property investors 35, family trusts 29, inheritance >$1m 27; one in six reject all). The remaining six are described only as 'considerably weaker' — their exact margins are not in the article text; the option list here is reconstructed from the article's option mentions. The full table lives in The Australian's linked breakdown, outside this corpus."
+  },
+  {
+   "id": "post-budget-economy-verdict",
+   "waveDate": "2026-05-17",
+   "fieldwork": {
+    "start": "2026-05-14",
+    "end": "2026-05-17"
+   },
+   "sample": 1252,
+   "published": "2026-05-17T21:00",
+   "question": "Do you believe the budget will be good or bad for the Australian economy? (post-budget Newspoll core question, asked over decades)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Good",
+    "Bad"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The Newspoll, conducted ­between Thursday and Sunday, found 47 per cent of voters ­believe the budget will be bad for the Australian economy compared with 22 per cent who said it would be good.",
+     "The minus 25 net approval rating for Dr Chalmers’ fifth budget compares with the minus nine rating that was recorded following the Abbott government’s controversial austerity budget (39 per cent good versus 48 per cent bad) in 2014.",
+     "That Labor budget, prepared by then-treasurer John Dawkins, received a record minus 42 ranking, with 62 per cent saying it would be bad for the economy compared with 20 per cent who said it would be good. Newspoll, which included a sample size of 1252 voters, revealed there was no cohort across all demographics, including among Labor voters, where more people expected to be better off than worse off in the wake of Dr Chalmers’ budget."
+    ]
+   },
+   "note": "47 bad vs 22 good, net -25 — the worst budget-economy verdict since the 1993 Dawkins budget's record -42 (62 bad/20 good); worse than the 2014 Hockey budget (-9, 39 good/48 bad)."
+  },
+  {
+   "id": "post-budget-personal-impact",
+   "waveDate": "2026-05-17",
+   "fieldwork": {
+    "start": "2026-05-14",
+    "end": "2026-05-17"
+   },
+   "sample": 1252,
+   "published": "2026-05-17T21:00",
+   "question": "Do you expect to be personally better or worse off as a result of the budget?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Better off",
+    "Worse off",
+    "Neither"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
+   "data": {
+    "tables": [],
+    "prose": [
+     "More than half of Australians (52 per cent) expect to be personally worse off as a result of the budget, while just 11 per cent ­expect to be better off and 37 per cent expect to be neither better nor worse off. Despite the Prime Minister supporting blanket grandfathering across tax changes, 67 per cent of people who own investment properties said they would be worse off.",
+     "In a concerning trend for the government, only 10 per cent of renters expect to be better off compared with 44 per cent who believe they will be worse off and 46 per cent who think the budget will make no difference.",
+     "That Labor budget, prepared by then-treasurer John Dawkins, received a record minus 42 ranking, with 62 per cent saying it would be bad for the economy compared with 20 per cent who said it would be good. Newspoll, which included a sample size of 1252 voters, revealed there was no cohort across all demographics, including among Labor voters, where more people expected to be better off than worse off in the wake of Dr Chalmers’ budget."
+    ]
+   },
+   "note": "52% worse, 11% better, 37% neither; no cohort — including Labor voters — nets positive. Investment-property owners 67% worse off; renters 44% worse / 10% better / 46% no difference."
+  },
+  {
+   "id": "post-budget-coalition-budget",
+   "waveDate": "2026-05-17",
+   "fieldwork": {
+    "start": "2026-05-14",
+    "end": "2026-05-17"
+   },
+   "sample": 1252,
+   "published": "2026-05-17T21:00",
+   "question": "Would the Coalition have delivered a better budget?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Yes",
+    "No"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
+   "data": {
+    "tables": [],
+    "prose": [
+     "After Angus Taylor used his budget-in-reply speech on Thursday to set up a war between the Coalition and Labor over tax cuts, the Newspoll found 39 per cent of voters believed the Coalition would have delivered a better budget compared with 47 per cent who said it wouldn’t, which is almost identical to the result recorded by Peter Dutton’s opposition following last year’s pre-election budget."
+    ]
+   },
+   "note": "39% yes vs 47% no — almost identical to the verdict on Peter Dutton's opposition after the 2025 pre-election budget."
+  },
+  {
+   "id": "post-budget-inflation-verdict",
+   "waveDate": "2026-05-17",
+   "fieldwork": {
+    "start": "2026-05-14",
+    "end": "2026-05-17"
+   },
+   "sample": 1252,
+   "published": "2026-05-17T21:00",
+   "question": "Will the budget make inflation better or worse?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Better",
+    "Worse",
+    "No difference"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
+   "data": {
+    "tables": [],
+    "prose": [
+     "More women believe the budget is driving a wedge between younger and older generations and that it will make inflation worse, won’t be good for the economy and make them worse off.",
+     "Amid fears over more rate hikes and ongoing cost-of-living pressures, almost one in two voters believe the budget will make inflation worse, compared to only 9 per cent who say it will make it better and 32 per cent who say it will make no difference. Coalition, One Nation and independent voters were more likely to say the budget would fuel inflation. The government’s big sell on its $47bn housing program and crackdowns on negative gearing and CGT appears to have a long way to go, with just 27 per cent of voters saying the budget was a step in the right ­direction. In contrast, 38 per cent said the budget was a step in the wrong direction and 22 per cent said it would make no difference."
+    ]
+   },
+   "note": "Almost one in two say worse; 9% better, 32% no difference. Coalition, One Nation and independent voters likeliest to say the budget would fuel inflation."
+  },
+  {
+   "id": "post-budget-housing-verdict",
+   "waveDate": "2026-05-17",
+   "fieldwork": {
+    "start": "2026-05-14",
+    "end": "2026-05-17"
+   },
+   "sample": 1252,
+   "published": "2026-05-17T21:00",
+   "question": "Are Labor's housing measures a step in the right or wrong direction, or will they make no difference? (plus 'is the budget driving a wedge between younger and older generations?')",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
+   "data": {
+    "tables": [],
+    "prose": [
+     "As the Prime Minister and the Treasurer sell the budget as the nation’s best opportunity to solve the housing crisis, News­poll reveals 47 per cent of Australians believe the “ budget is driving a wedge between younger and older generations ”, and 60 per cent think Labor’s housing measures are “a step in the wrong direction” or “will make no difference”.",
+     "Amid fears over more rate hikes and ongoing cost-of-living pressures, almost one in two voters believe the budget will make inflation worse, compared to only 9 per cent who say it will make it better and 32 per cent who say it will make no difference. Coalition, One Nation and independent voters were more likely to say the budget would fuel inflation. The government’s big sell on its $47bn housing program and crackdowns on negative gearing and CGT appears to have a long way to go, with just 27 per cent of voters saying the budget was a step in the right ­direction. In contrast, 38 per cent said the budget was a step in the wrong direction and 22 per cent said it would make no difference.",
+     "While conservative voters were more likely to declare that the budget was a step in the wrong direction on housing, just 27 per cent of renters said it was a step in the right direction. Almost 40 per cent of voters, including those who own shares and investment properties, said Labor’s budget meant they would pay more tax overall, compared with 41 per cent who said it would make no difference, and only 7 per cent who believed they would pay less tax overall.",
+     "More women believe the budget is driving a wedge between younger and older generations and that it will make inflation worse, won’t be good for the economy and make them worse off.",
+     "Just 26 per cent of voters agreed that the budget is rebalancing the playing field to make things fairer, well behind the 47 per cent of voters (including 21 per cent of Labor voters and 37 per cent of Greens voters) who believe the budget is driving a wedge between younger and older generations."
+    ]
+   },
+   "note": "60% say the housing measures are a step in the wrong direction or will make no difference; 47% believe the budget drives a wedge between younger and older generations. Women lead the negative reads on wedge and inflation."
+  },
+  {
+   "id": "politics-overdue-shakeup",
+   "waveDate": "2026-06-04",
+   "fieldwork": {
+    "start": "2026-06-01",
+    "end": "2026-06-04"
+   },
+   "sample": 1240,
+   "published": "2026-06-07T20:00",
+   "question": "Which view is closer: 'the people who built this mess aren't going to fix it — Australian politics is overdue for a big shake-up', or 'the system looks broken until you consider the alternative — steady government has delivered prosperity'?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Core support for Pauline Hanson’s One Nation has surged ahead of Labor for the first time in Newspoll history, as Anthony Albanese’s popularity hit record lows and an overwhelming majority of voters ­declare Australian politics is overdue for a big shake-up.",
+     "Amid the rise of One Nation, which claimed just 6.4 per cent of the primary vote at last year’s May election, a special Newspoll question showed a majority of all voting demographics – except for Labor voters – endorsed a dramatic change in the political status quo. Almost 70 per cent of voters agreed “the people who built this mess aren’t going to fix it” and that “Australian politics is overdue for a big shake-up”.",
+     "That compares to 32 per cent of Australians who believe the system “looks broken until you consider the alternative” and that decades of steady government have delivered “prosperity that more chaotic political systems can only envy”.",
+     "While 66 per cent of Labor voters supported a steady government rather than the alternative (34 per cent), an overwhelming majority of Coalition (77 per cent), Greens (68 per cent), One Nation (93 per cent) and Other (70 per cent) voters backed a major shake-up of Australian politics.",
+     "There was strong support for change away from the traditional political orthodoxy across all age groups, genders, education backgrounds, housing, location and property investor demographics."
+    ]
+   },
+   "note": "Almost 70% endorse the shake-up framing vs 32% the steady-state framing. Party splits: One Nation 93, Coalition 77, Other 70, Greens 68, Labor 34 (66% of Labor voters pick steady government). Support for shake-up leads every demographic cut except Labor voters."
+  },
+  {
+   "id": "vote-driver-most-important",
+   "waveDate": "2026-06-25",
+   "fieldwork": {
+    "start": "2026-06-22",
+    "end": "2026-06-25"
+   },
+   "sample": 1235,
+   "published": "2026-06-28T20:00",
+   "question": "What is the most important thing when deciding who to vote for? ('clear and realistic policies' vs 'they understand people like me' vs 'the leader's character and values') — the 'mind of One Nation supporters' special",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Clear and realistic policies",
+    "They understand people like me",
+    "The leader's character and values"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337",
+   "data": {
+    "tables": [],
+    "prose": [
+     "While a majority of Labor and Coalition voters want ‘clear and realistic policies’, One Nation supporters endorse a more personal connection.",
+     "The surge in support for One Nation is led by rising sentiment in the electorate that Senator Hanson’s right-wing party “understands people like me” rather than voters being fixated on One ­Nation having “clear and realistic policies” or “the leader’s character and values”.",
+     "While 61 per cent of Labor voters and 63 per cent of Coalition voters say the most important thing when deciding who to vote for is “clear and realistic policies”, only 42 per cent of One Nation voters say this. This compares to 38 per cent of One Nation supporters who say the most important thing is whether “they understand people like me”, ahead of 14 per cent of Labor voters and 13 per cent voters of ­Coalition supporters.",
+     "A series of special questions in the Newspoll focused on what was driving Australians away from the major parties."
+    ]
+   },
+   "note": "Labor voters 61% and Coalition voters 63% say policies matter most, but only 42% of One Nation voters do; 38% of One Nation supporters put 'understands people like me' first (Labor 14, Coalition 13)."
+  },
+  {
+   "id": "house-prices-direction",
+   "waveDate": "2026-08-28",
+   "fieldwork": {
+    "start": "2026-08-24",
+    "end": "2026-08-28"
+   },
+   "sample": 1243,
+   "published": "2026-08-30T20:00",
+   "question": "Do you support house prices staying the same or increasing, or decreasing?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Stay the same or increase",
+    "Decrease"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
+   "data": {
+    "tables": [],
+    "prose": [
+     "As the Prime Minister and Jim Chalmers used speeches at the Queensland ALP conference on Sunday to rally supporters against One Nation and defend Labor’s housing taxes, a special Newspoll question revealed 62 per cent of voters support house prices staying the same or increasing ­compared with 32 per cent who support property values decreasing.",
+     "While 48 per cent of voters aged between 18-34 backed lower house prices, 70 per cent of voters aged 35-49 wanted prices to stay the same or increase. Among those renting, 56 per cent supported lower prices compared with 74 per cent of mortgage-holders who wanted prices to stay flat or increase."
+    ]
+   },
+   "note": "62% want prices steady or up vs 32% down. Renters 56% for lower; mortgage-holders 74% for flat-or-up; 18–34s split (48% lower), 35–49s 70% flat-or-up."
+  },
+  {
+   "id": "vote-recall-2025-flows",
+   "waveDate": "2026-09-17",
+   "fieldwork": {
+    "start": "2026-09-14",
+    "end": "2026-09-17"
+   },
+   "sample": 1244,
+   "published": "2026-09-20T21:00",
+   "question": "2025-election vote recall × current voting intention (party retention and switch destinations)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
+   "data": {
+    "tables": [],
+    "prose": [
+     "Based on voter recollections of who they supported at the last election and who they support now, the ALP has retained a little under two-thirds of its vote since the 2025 poll. Of those lost, about 15 per cent have gone to One ­Nation, 9 per cent to the Coalition, 6 per cent to the Greens and 5 per cent to others.",
+     "The Coalition, which suffered its worst result at last year’s election, has retained about 53 per cent of its low vote, with 39 per cent switching to One Nation.",
+     "“However, while Labor’s votes have gone in several directions, proportionally the One Nation phenomenon is still coming predominantly from the Coalition.”"
+    ]
+   },
+   "note": "Not channelled into data/vote-switching.json (YouGov/DemosAU/RedBridge only). Newspoll's read: Labor retains under two-thirds of its 2025 vote; of the losses 15% to One Nation, 9% Coalition, 6% Greens, 5% others. Coalition retains ~53%; 39% of its 2025 vote switched to One Nation."
+  },
+  {
+   "id": "inflation-response-priorities",
+   "waveDate": "2026-10-08",
+   "fieldwork": {
+    "start": "2026-10-05",
+    "end": "2026-10-08"
+   },
+   "sample": 1241,
+   "published": "2026-10-11T21:25",
+   "question": "What should be the government's highest and second-highest priorities in responding to high inflation and cost-of-living pressures? (combined top-2 endorsements)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Lower government spending",
+    "Subsidise essentials such as energy and fuel",
+    "Cut income taxes",
+    "Reduce regulation and costs for business",
+    "One-off payments"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The poll, which included interviews with 1241 voters ahead of MPs returning to Canberra for parliament this week, featured a special question testing voter priorities in terms of how the government should respond to high inflation and cost-of-living pressures.",
+     "After combining the highest priority and second-highest priority for voters, lowering government spending (55 per cent) topped the list of actions followed by subsidising essentials such as energy and fuel (51 per cent), cutting income taxes (31 per cent), reducing regulation and costs for business (27 per cent), and offering one-off payments (11 per cent).",
+     "When assessing the top two voter priorities for the federal government in response to high inflation and cost-of-living pressures, a majority of Coalition (68 per cent) and One Nation (66 per cent) supporters endorsed lower government spending, ahead of Labor (38 per cent) and the Greens (48 per cent) voters.",
+     "More Labor (55 per cent) and Greens (68 per cent) voters, women (60 per cent) and Australians aged under 49 want the government to subsidise essentials such as energy and fuel.",
+     "A greater proportion of conservative voters support measures that reduce regulation and costs for business. Few voters support a one-off payment to deal with inflationary pressures."
+    ]
+   },
+   "note": "Combined top-two: cut spending 55, subsidise essentials 51, cut income taxes 31, reduce business regulation 27, one-off payments 11. Spending-cut endorsement: Coalition 68, One Nation 66, Greens 48, Labor 38; subsidise-essentials: Greens 68, women 60, Labor 55, under-49s."
+  },
+  {
+   "id": "immigration-levels",
+   "waveDate": "2026-09-17",
+   "fieldwork": {
+    "start": "2026-09-14",
+    "end": "2026-09-17"
+   },
+   "sample": 1244,
+   "published": "2026-09-20T21:00",
+   "question": "Should the number of immigrants allowed into Australia be a lot fewer, fewer, about the same, more, or a lot more than now?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "A lot fewer",
+    "Fewer",
+    "About the same",
+    "More",
+    "A lot more"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-reveals-twothirds-of-voters-support-slashing-australian-immigration-numbers/news-story/f0cdd659809e04b5c313fca661f0a5c0",
+   "data": {
+    "tables": [],
+    "prose": [
+     "The Newspoll survey of 1244 voters , conducted by Pyxis Polling & Insights between Monday and Thursday last week, found 37 per cent of voters wanted a lot fewer immigrants than now and 29 per cent wanted fewer immigrants than now .",
+     "While two-thirds of voters wanted less migration , 4 per cent wanted more immigrants than now and 2 per cent wanted a lot more immigrants than now.",
+     "Amid the heightened focus on immigration as Labor and ­Coalition voters abandon the major parties and switch to One Nation, minor parties and independents , the poll showed 28 per cent of Australians supported maintaining the current number of immigrants allowed into Australia.",
+     "In a sign that voter concerns about record post-pandemic immigration levels are baked in, the Newspoll reflected similar results to a survey conducted in October last year. The 2025 Newspoll immigration questions showed 64 per cent of voters wanted fewer immigrants, 10 per cent wanted more, and 26 per cent wanted the same number of immigrants.",
+     "Among voters who wanted either fewer or a lot fewer immigrants than now, 95 per cent of One Nation supporters endorsed a reduced inflow of migrants ahead of 76 per cent of Coalition supporters, 60 per cent of minor party and independent supporters, 44 per cent of Labor supporters, and 29 per cent of Greens supporters.",
+     "A total of 47 per cent of Labor voters and 56 per cent of Greens voters supported maintaining the same number of immigrants, compared with 20 per cent of Coalition voters, 2 per cent of One Nation supporters and 34 per cent of Australians who supported minor parties and independents."
+    ]
+   },
+   "note": "Reported in a midweek follow-up story to the 2026-09-17 wave (same 1244-voter sample), not the wave's weekend story. 37 a lot fewer + 29 fewer (66% total), 28 same, 4 more, 2 a lot more. Fewer-endorsement by party: One Nation 95, Coalition 76, minor/independent 60, Labor 44, Greens 29; 'keep the same': Labor 47, Greens 56, Coalition 20, One Nation 2. The prior Newspoll read (Oct 2025: 64 fewer/10 more/26 same) is quoted from this story; its own article is no longer on the topic page and is outside this corpus."
+  },
+  {
+   "id": "immigration-impact",
+   "waveDate": "2026-09-17",
+   "fieldwork": {
+    "start": "2026-09-14",
+    "end": "2026-09-17"
+   },
+   "sample": 1244,
+   "published": "2026-09-20T21:00",
+   "question": "Does immigration bring mainly benefit, mainly harm, or a mix of benefit and harm for most Australians?",
+   "questionWordingSource": "article-prose",
+   "responseOptions": null,
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-reveals-twothirds-of-voters-support-slashing-australian-immigration-numbers/news-story/f0cdd659809e04b5c313fca661f0a5c0",
+   "data": {
+    "tables": [],
+    "prose": [
+     "As Anthony Albanese, Angus Taylor and Pauline Hanson clash over competing migration policies, the Newspoll showed 52 per cent of voters considered the impact of immigration to include a “mix of benefit and harm for most Australians”.",
+     "In contrast to 51 per cent of Greens supporters and 42 per cent of Labor voters who said migration was beneficial for most Australians, only 20 per cent of Coalition voters and 3 per cent of One Nation supporters agreed."
+    ]
+   },
+   "note": "52% say a mix of benefit and harm overall. 'Beneficial for most Australians' by party: Greens 51, Labor 42, Coalition 20, One Nation 3."
+  }
+ ]
+}
