@@ -276,7 +276,7 @@ function BtvTracker({ c, houses }) {
             <div className="btv-panel" key={p.house}>
               <div className="btv-ptop"><span>{btvHouse(p, houses)}</span><b>{fmt(last.v)}</b></div>
               <div className="btv-plab">{p.label}<span> · {p.points.length === 1 ? "one reading" : p.points.length + " readings"}</span></div>
-              <TrendChart key={"btv-" + c.id + "-" + p.house} heightPx={narrow ? 118 : 138} padPx={{ l: 30, r: 8, t: 10, b: 22 }}
+              <TrendChart key={"btv-" + c.id + "-" + p.house} heightPx={narrow ? 128 : 148} padPx={{ l: 30, r: 8, t: 20, b: 22 }}
                 xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={yt} yTickFmt={() => ""} xTicks={ticks} baseline
                 notes={yt.map((v) => ({ x: "left", y: v, dy: -3, text: c.measure === "net" ? btvSigned(v) : v + (v === hi ? "%" : ""), size: 10.5, cls: "btv-ylab" }))}
                 refLines={c.ref != null ? [{ y: c.ref, label: "", color: "var(--ink-faint)" }] : []}
