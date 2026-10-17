@@ -3265,7 +3265,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
 }
-.ao-chip-news24, .ao-chip-redbridge, .ao-chip-secnewgate, .ao-chip-essential { color: var(--ink-2); }
+.ao-chip-news24, .ao-chip-redbridge, .ao-chip-secnewgate, .ao-chip-essential, .ao-chip-resolve, .ao-chip-freshwater { color: var(--ink-2); }
 .ao-wave { margin-top: 12px; }
 .ao-wmeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-size: 12.5px; color: var(--ink-3); }
 .ao-whouse { color: var(--ink-2); font-weight: 600; }
@@ -20391,6 +20391,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "oppnet": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -5, -3.8, -2.6, -1.4, -0.2, 1, 1.9, 2.8, 3.6, 4.5, 5.4, 6.3, 7.1, 8, 18, 18],
     "oppr": [34.5, 33.6, 32.7, 31.8, 31.3, 30.7, 29.7, 29.4, 30, 31.2, 32.7, 33.4, 33.8, 34.5, 35.2, 36, 36.6, 37.1, 37.6, 37.9, 38.4, 39.1, 39.2, 39.7, 40.5, 40.9, 41.3, 40.6, 39.9, 39.4, 38.2, 37, 36.2, 35.7, 36, 35.8, 36.3, 35.7, 32.1, 28.8, 28.8, 28.6, 27.7, 26.7, 26.7, 29, 28.8],
     "ppmm": [null, null, null, 24, 22.5, 21, 28, 16.5, 5, 9, 14, 19, 12, 11.3, 10.5, 9.8, 9, 7, 5, 4, 3, 1, 0, -1, -3.7, -6.3, -9, -11, -13, -10.3, -7.7, -5, -5, -5, -6, -7, -14.6, -13.7, -12.9, -12, -16, -14.3, -24, -19, -15.8, -15.8, -15.8],
+    "pmlead": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -26, -29.4, -32.8, -36.2, -39.6, -43, -44.4, -45.8, -47.1, -48.5, -49.9, -51.3, -52.6, -54, -22, -22],
     "onp": [0.3, 0.8, 1.3, 1.8, 2.3, 2.8, 3.3, 3.8, 4.3, 4.9, 5.4, 5.9, 6.4, 6.9, 7.4, 7.9, 8.4, 8.9, 9.4, 9.9, 10.4, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17.1, 17.6, 18.1, 18.6, 19.1, 19.6, 20.1, 21.1, 22.4, 23.7, 24.3, 23.5, 22.7, 22.1],
     "obs": {
       "primary": [true, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
@@ -20399,7 +20400,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "oppnet": [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, true, false, false, false, false, false, false, false, true, true, false],
       "oppr": [true, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
       "onp": [true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true],
-      "ppmm": [false, false, false, true, false, true, true, false, true, true, false, true, true, false, false, false, true, false, true, false, true, true, false, true, false, false, true, false, true, false, false, true, false, true, false, true, true, false, false, true, true, true, true, true, true, false, false]
+      "ppmm": [false, false, false, true, false, true, true, false, true, true, false, true, true, false, false, false, true, false, true, false, true, true, false, true, false, false, true, false, true, false, false, true, false, true, false, true, true, false, false, true, true, true, true, true, true, false, false],
+      "pmlead": [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, true, false, false, false, false, false, false, false, true, true, false]
     },
     "han": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
     "ppmh": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
@@ -20461,7 +20463,27 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "vals": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -13],
       "obs": [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true]
     }],
-    "ppmPair": "Andrews v Pesutto"
+    "ppmPair": "Andrews v Pesutto",
+    "pmleadEras": [{
+      "name": "Allan v Battin",
+      "from": "2024-12-27",
+      "months": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+      "vals": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -26],
+      "obs": [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true]
+    }, {
+      "name": "Allan v Wilson",
+      "from": "2025-11-18",
+      "months": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44],
+      "vals": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -43, -44.4, -45.7, -47.1, -48.5, -49.9, -51.2, -52.6, -54],
+      "obs": [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true]
+    }, {
+      "name": "Carroll v Wilson",
+      "from": "2026-07-28",
+      "months": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
+      "vals": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -22],
+      "obs": [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true]
+    }],
+    "pmleadPair": "Allan v Battin"
   }];
   let _cycleSource = null;
   let _cyclePromise = null;
@@ -20767,7 +20789,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       oppr: c.oppr[0],
       onp: c.onp[0],
       ppmm: c.ppmm[0],
-      ppmh: c.ppmh[0]
+      ppmh: c.ppmh[0],
+      pmlead: c.pmlead[0]
     },
     end: {
       tpp: c.tpp[c.tpp.length - 1],
@@ -20778,7 +20801,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       oppr: c.oppr[c.oppr.length - 1],
       onp: [...c.onp].reverse().find(v => v != null) ?? null,
       ppmm: [...c.ppmm].reverse().find(v => v != null) ?? null,
-      ppmh: [...c.ppmh].reverse().find(v => v != null) ?? null
+      ppmh: [...c.ppmh].reverse().find(v => v != null) ?? null,
+      pmlead: [...c.pmlead].reverse().find(v => v != null) ?? null
     },
     points: {
       tpp: c.months.map((m, i) => ({
@@ -20816,6 +20840,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       ppmh: c.months.map((m, i) => ({
         x: m,
         y: c.ppmh[i]
+      })),
+      pmlead: c.months.map((m, i) => ({
+        x: m,
+        y: c.pmlead[i]
       }))
     },
     raw: {
@@ -20830,6 +20858,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       onp: c.onp,
       ppmm: c.ppmm,
       ppmh: c.ppmh,
+      pmlead: c.pmlead,
       ...(c.netEras ? {
         netEras: c.netEras
       } : {}),
@@ -20841,6 +20870,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       } : {}),
       ...(c.ppmPair ? {
         ppmPair: c.ppmPair
+      } : {}),
+      ...(c.pmleadEras ? {
+        pmleadEras: c.pmleadEras
+      } : {}),
+      ...(c.pmleadPair ? {
+        pmleadPair: c.pmleadPair
       } : {}),
       ...(c.tppEras ? {
         tppEras: c.tppEras
@@ -32290,7 +32325,12 @@ function cycleReadings(c, M, D) {
         const on = rivalOfMonth(D, p.ym) === "alp_on";
         const a = on ? p.alpOnImp : p.alpImp;
         y = a == null ? null : c.gov === "alp" ? a : +(100 - a).toFixed(1);
-      } else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : p.appr ? p.appr.albNet : null;else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : p.appr ? p.appr.taylorNet : null;else if (key === "ppmm") {
+      } else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : p.appr ? p.appr.albNet : null;else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : p.appr ? p.appr.taylorNet : null;else if (key === "pmlead") {
+        if ((mb.alb || "approval") === "fav" || (mb.taylor || "approval") === "fav") continue;
+        if (!p.appr || p.appr.albNet == null || p.appr.taylorNet == null) continue;
+        const hn = (mb.hanson || "approval") !== "fav" ? p.appr.hansonNet : null;
+        y = +(p.appr.albNet - Math.max(p.appr.taylorNet, hn != null ? hn : -Infinity)).toFixed(2);
+      } else if (key === "ppmm") {
         const s = p.ppmSets ? p.ppmSets[0] : p.ppm;
         const ok = s && Object.keys(s).find(k => !["alb", "unc", "hanson"].includes(k));
         if (ok == null || s[ok] == null || s.alb == null) continue;
@@ -32334,6 +32374,19 @@ function cycleReadings(c, M, D) {
       out.push({
         x: r.m,
         y: r.pmPpm - r.oppPpm,
+        iso: r.date,
+        meta: {
+          pollster: r.firm,
+          dateLabel: cycDotDate(r.date)
+        }
+      });
+    }
+  } else if (key === "pmlead") {
+    for (const r of src.approval) {
+      if (r.pmNet == null || r.oppNet == null || r.metric === "fav" || !inCycleRange(r.m)) continue;
+      out.push({
+        x: r.m,
+        y: +(r.pmNet - r.oppNet).toFixed(2),
         iso: r.date,
         meta: {
           pollster: r.firm,
@@ -32527,7 +32580,7 @@ function CycleChart({
     x: cycEventMonth(e.date, eventCycle.eDate)
   })).concat(contestEvents) : [];
   const cardSub = (() => {
-    const fanned = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" || M.key === "primary" || M.key === "tpp" || M.key === "oppr";
+    const fanned = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" || M.key === "primary" || M.key === "tpp" || M.key === "oppr" || M.key === "pmlead";
     if (!fanned || !banded) return M.sub;
     const lead = M.key === "net" || M.key === "oppnet" ? "Approval minus disapproval" : M.sub;
     const firstYear = Math.min(...pastShown.map(c => c.year));
@@ -32540,7 +32593,7 @@ function CycleChart({
   const ringTerms = M.key === "tpp" || M.key === "primary" || M.key === "oppr" ? [] : null;
   const built = drawnCycles.flatMap(c => {
     const base = cycBase(c, M.key);
-    const eras = M.key === "net" && c.raw.netEras || M.key === "oppnet" && c.raw.oppEras || M.key === "ppmm" && c.raw.ppmEras || M.key === "tpp" && c.raw.tppEras || null;
+    const eras = M.key === "net" && c.raw.netEras || M.key === "oppnet" && c.raw.oppEras || M.key === "ppmm" && c.raw.ppmEras || M.key === "tpp" && c.raw.tppEras || M.key === "pmlead" && c.raw.pmleadEras || null;
     const seriesIn = eras ? eras.map(e => ({
       name: e.name,
       months: e.months,
@@ -32585,7 +32638,7 @@ function CycleChart({
         x: p.x,
         y: chg ? +(p.y - base).toFixed(2) : p.y
       }));
-      const leadName = s.name || (M.key === "ppmm" ? c.raw.ppmPair : isOpp ? c.oppLead : c.lead);
+      const leadName = s.name || (M.key === "ppmm" ? c.raw.ppmPair : M.key === "pmlead" ? c.raw.pmleadPair : isOpp ? c.oppLead : c.lead);
       const label = solo ? leadName : c.year + ", " + leadName;
       const flags = s.obs;
       const observed = m => {
@@ -32757,9 +32810,9 @@ function CycleChart({
   const srcTerms = Object.keys(D.cycleSource || {}).length;
   const scatter = React.useMemo(() => !dotsOn ? [] : shown.flatMap(c => {
     const base = cycBase(c, M.key);
-    const leadName = M.key === "ppmm" ? c.raw.ppmPair : isOpp ? c.oppLead : c.lead;
+    const leadName = M.key === "ppmm" ? c.raw.ppmPair : M.key === "pmlead" ? c.raw.pmleadPair : isOpp ? c.oppLead : c.lead;
     const label = solo ? leadName : c.year + ", " + leadName;
-    const eras = M.key === "net" && c.raw.netEras || M.key === "oppnet" && c.raw.oppEras || M.key === "ppmm" && c.raw.ppmEras || M.key === "tpp" && c.raw.tppEras || null;
+    const eras = M.key === "net" && c.raw.netEras || M.key === "oppnet" && c.raw.oppEras || M.key === "ppmm" && c.raw.ppmEras || M.key === "tpp" && c.raw.tppEras || M.key === "pmlead" && c.raw.pmleadEras || null;
     const nameAt = iso => {
       if (!eras || !iso) return null;
       let n = eras[0].name;
@@ -53154,6 +53207,7 @@ Object.assign(window, {
   primary: "Government’s primary vote, %",
   oppr: "Opposition’s primary vote, %",
   net: "Prime minister’s net approval: approve minus disapprove, points",
+  pmlead: "Prime minister’s net approval lead: approval minus the strongest rival’s, points",
   ppmm: "PM’s lead, points",
   oppnet: "Net approval, points"
 };
@@ -53162,12 +53216,14 @@ const RD_CYC_COPY = {
   primary: "Government’s primary vote",
   oppr: "Opposition’s primary vote",
   net: "Prime minister’s net approval",
+  pmlead: "Prime minister’s net approval lead",
   ppmm: "Prime minister’s lead as preferred PM",
   oppnet: "Opposition leader’s net approval"
 };
 const RD_CYC_UNIT = {
   net: "Points, approve minus disapprove.",
   oppnet: "Points, approve minus disapprove.",
+  pmlead: "Points, the prime minister’s net approval minus the higher of the opposition leader’s and Pauline Hanson’s.",
   ppmm: "Points, the prime minister’s share minus the rival’s."
 };
 const RD_CYC_TITLE_CHG = {
@@ -53175,6 +53231,7 @@ const RD_CYC_TITLE_CHG = {
   primary: "Government’s primary vote, change since the election",
   oppr: "Opposition’s primary vote, change since the election",
   net: "Prime minister’s net approval, change since the first reading",
+  pmlead: "Prime minister’s net approval lead, change since the first reading",
   ppmm: "PM’s lead, change since the first reading",
   oppnet: "Opposition leader’s net approval, change since the first reading"
 };
@@ -53260,7 +53317,7 @@ function RdCycleChart({
   const curVal = nowM != null ? chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key] : null;
   const nonDefault = (liftedN || 0) > 0 || (cur ? hidden.has(cur.year) : false);
   const peer = nowM != null ? bandRows.find(r => r.m === nowM) : null;
-  const subj = M.key === "net" || M.key === "ppmm" ? sitting(cur ? cur.pm : "") : M.key === "oppnet" ? sitting(cur ? cur.oppLead : "") : cur ? isOpp ? D.PARTIES[cur.opp].name : D.PARTIES[cur.gov].name : "";
+  const subj = M.key === "net" || M.key === "ppmm" || M.key === "pmlead" ? sitting(cur ? cur.pm : "") : M.key === "oppnet" ? sitting(cur ? cur.oppLead : "") : cur ? isOpp ? D.PARTIES[cur.opp].name : D.PARTIES[cur.gov].name : "";
   const subjColor = cur ? isOpp ? D.PARTIES[cur.opp].color : cur.color : "var(--ink)";
   const fmt = v => M.unit === "%" && !chg ? v.toFixed(1) : rdSgn(v, false);
   const series = built.map(s => {
@@ -53650,16 +53707,8 @@ const combSeries = c => {
     return c.opp === "lnp" && c.raw.oppr[i] != null && on != null ? +(c.raw.oppr[i] + on).toFixed(2) : null;
   });
 };
-const rdHanRead = c => (c.raw.han || []).some(v => v != null);
-const pmleadSeries = c => {
-  const han = c.raw.han || [];
-  return c.raw.months.map((_, i) => {
-    const rival = Math.max(c.raw.oppnet[i] != null ? c.raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
-    return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival).toFixed(2) : null;
-  });
-};
-const seriesOf = (c, key) => key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : c.raw[key] || [];
-const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : key === "pmlead" ? cycBase(c, "net") - (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet")) : cycBase(c, key);
+const seriesOf = (c, key) => key === "comb" ? combSeries(c) : c.raw[key] || [];
+const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key);
 function rdCycPeers(M, cycles, hidden, chg, m) {
   const hasData = c => seriesOf(c, M.key).some(v => v != null);
   const vals = [];
@@ -53949,12 +53998,13 @@ function RdPastCycles(p) {
   Mby.pmlead = {
     key: "pmlead",
     leader: "pm",
-    unit: ""
+    unit: "",
+    step: 10,
+    refAbs: 0,
+    refAbsLabel: "even",
+    sub: "The prime minister’s net approval less his strongest rival’s"
   };
-  const endOfKey = (c, key) => key === "comb" ? c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : key === "pmlead" ? (() => {
-    const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
-    return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival).toFixed(1) : null;
-  })() : c.end[key];
+  const endOfKey = (c, key) => key === "comb" ? c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : c.end[key];
   const curOfS = (key, c2) => {
     const v = endOfKey(cur, key);
     return v == null ? null : c2 ? v - cycBaseOf(cur, key) : v;
@@ -55244,6 +55294,8 @@ function RdPastCycles(p) {
   }), React.createElement("div", {
     className: "rd-cyc-one"
   }, chart("net", false)), React.createElement("div", {
+    className: "rd-cyc-one"
+  }, chart("pmlead", false)), React.createElement("div", {
     className: "rd-cyc-two rd-cyc-subs"
   }, React.createElement("div", null, React.createElement(RdSub, {
     head: "Preferred prime minister",
@@ -55261,7 +55313,7 @@ function RdPastCycles(p) {
       term: "approval",
       from: "Past cycles"
     }
-  }, "Where a term changed leader its line follows whoever held the office. The earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.")), accuracy);
+  }, "Where a term changed leader its line follows whoever held the office. The earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out. The prime minister\u2019s lead rates him against the stronger of the opposition leader and Pauline Hanson at each reading - Hanson only from this term\u2019s polls, so every earlier term\u2019s rival is the opposition leader.")), accuracy);
 }
 Object.assign(window, {
   RdCycleChart,
@@ -63361,6 +63413,14 @@ const AO_HOUSES = {
   essential: {
     short: "Essential Report",
     full: "Essential Report"
+  },
+  resolve: {
+    short: "Resolve",
+    full: "Resolve Political Monitor"
+  },
+  freshwater: {
+    short: "Freshwater",
+    full: "Freshwater Strategy – News Corp"
   }
 };
 const aoDay = iso => {
@@ -63547,7 +63607,7 @@ function RdAoEntries() {
       id: "ad-hocs"
     }, React.createElement("p", {
       className: "ao-note"
-    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse, RedBridge/Accent, SEC Newgate and Essential Report polls publish their first ad hoc questions, they will appear here grouped by theme."));
+    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor and Freshwater Strategy polls publish their first ad hoc questions, they will appear here grouped by theme."));
   }
   const wCount = (src.entries || []).length;
   return React.createElement("section", {
@@ -63555,7 +63615,7 @@ function RdAoEntries() {
     id: "ad-hocs"
   }, React.createElement("div", {
     className: "ao-legend"
-  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation and the Essential Report")), themes.map(t => React.createElement("div", {
+  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy's News Corp polls")), themes.map(t => React.createElement("div", {
     className: "ao-theme",
     key: t.id
   }, React.createElement("h3", {
@@ -63603,7 +63663,7 @@ function RdAdhocs() {
     className: "rd-meta"
   }, "The one-offs beyond the standing battery")), React.createElement(RdHed, {
     head: "Asked once, about the issue of the moment",
-    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate\u2019s Mood of the Nation and the fortnightly Essential Report, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
+    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate\u2019s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy\u2019s polls in News Corp\u2019s mastheads, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
   }), React.createElement(RdAoEntries, null));
 }
 const RdAdhocsM = React.memo(RdAdhocs);

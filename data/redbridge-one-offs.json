@@ -1,7 +1,7 @@
 {
  "_about": "RedBridge Group/Accent Research (AFR) one-off and recurring survey questions that do NOT channel into the auspol-tracker data model (voting intention, 2PPs, PPM, leader favourability, vote softness, best-party/election-issues batteries, national direction). Compiled by reading every cached monthly tracker PDF text (glossary chapters at the end of each poll report) and the project's committed sidecars. Wave coverage: Nov 2025 through Sep/Oct 2026 fieldwork (10 cached PDFs). The March 2026 tracker wave (2026-03-27) has no published PDF page, the big March 2026 survey (N=5,563) lives only inside the cumulative 'Shifts in vote intention since June 2025' doc, and the Oct 2025 snapshot, May 2026 MRP and Australia Institute waves are separate products or non-cached — none are covered here.",
- "generated": "2026-10-15",
- "_readme": "Exit conditions confirmed before filing: the standing battery (federal vote intention + vote softness, leader figure favourability, institution/party favourability, issue salience, preferred PM, best-party battery) IS channelled into polls.json demographics/approval/ppm and data/issues.json. The May 2026 national-direction read (right 25/wrong 63) IS recorded in polls.json direction[]; the Nov 2025 and Jan 2026 reads of the same question are NOT, and are filed below. The April 2026 likelihood-of-voting battery (0-10 scale) IS recorded as the consideration map on the 2026-04-30 polls.json row — NOT filed below. Standing-but-unchannelled modules also NOT filed as one-offs: 'Favourability ratings of institutions/parties' (Labor/Liberal/National/One Nation/Greens — plus one-off guests: Advance Dec 2025, RBA Apr 2026, ABC May 2026 & Sep 2026, Medicare Aug 2026, NDIS Jul 2026) — every wave, so a series, not a wave one-off.",
+ "generated": "2026-10-17",
+ "_readme": "Exit conditions confirmed before filing: the standing battery (federal vote intention + vote softness, leader figure favourability, institution/party favourability, issue salience, preferred PM, best-party battery) IS channelled into polls.json demographics/approval/ppm and data/issues.json. The May 2026 national-direction read (right 25/wrong 63) IS recorded in polls.json direction[]; the Nov 2025 and Jan 2026 reads of the same question are NOT, and are filed below. The April 2026 likelihood-of-voting battery (0-10 scale) IS recorded as the consideration map on the 2026-04-30 polls.json row — NOT filed below. Standing-but-unchannelled modules also NOT filed as one-offs: 'Favourability ratings of institutions/parties' (Labor/Liberal/National/One Nation/Greens — plus one-off guests: Advance Dec 2025, RBA Apr 2026, ABC May 2026 & Sep 2026, Medicare Aug 2026, NDIS Jul 2026) — every wave, so a series, not a wave one-off. The rotating per-figure favourability+name-recognition double (Figure/Table N pairs after the institution grid) is filed for Donald Trump alone (Jan, Apr and Sep–Oct 2026 waves): a recurring rotating module, filed at user request on 2026-10-17 as part of the cross-house Trump favourability series on /ad-hocs/; other figures' doubles stay unfiled. For Trump all eight net-column sections of the printed table are filed as per-section single-value tables.",
  "entries": [
   {
    "id": "australia-right-direction",
@@ -19,9 +19,27 @@
      "title": "Table 47: The share of voters who say Australia is headed in the right or wrong direction, by vote intention, vote softness, household income, home ownership and financial stress",
      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll (PDF pp. 111-112; by-wave chart is Figure 53, image-only)",
      "entities": [
-      {"name": "Generally headed in the right direction", "ordinal": 1, "values": [34]},
-      {"name": "Generally headed in the wrong direction", "ordinal": 2, "values": [49]},
-      {"name": "Not sure", "ordinal": 3, "values": [17]}
+      {
+       "name": "Generally headed in the right direction",
+       "ordinal": 1,
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "Generally headed in the wrong direction",
+       "ordinal": 2,
+       "values": [
+        49
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 3,
+       "values": [
+        17
+       ]
+      }
      ]
     }
    ]
@@ -42,13 +60,55 @@
      "title": "Tables 49-60: The share of voters that report delaying each life decision/purchase due to economic conditions (of those for whom the item is relevant)",
      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll (PDF pp. 117-142; trend figures 56-57 only go back to May 2024 and are image-only)",
      "entities": [
-      {"name": "When you plan to retire — delayed", "ordinal": 1, "values": [49]},
-      {"name": "Buying a home — delayed", "ordinal": 2, "values": [54]},
-      {"name": "Buying a vehicle (car, truck, motorbike) — delayed", "ordinal": 3, "values": [51]},
-      {"name": "Big household items (furniture/appliances) — delayed", "ordinal": 4, "values": [53]},
-      {"name": "Receiving medical treatment — delayed", "ordinal": 5, "values": [39]},
-      {"name": "Getting married — delayed", "ordinal": 6, "values": [26]},
-      {"name": "Having children — delayed", "ordinal": 7, "values": [30]}
+      {
+       "name": "When you plan to retire — delayed",
+       "ordinal": 1,
+       "values": [
+        49
+       ]
+      },
+      {
+       "name": "Buying a home — delayed",
+       "ordinal": 2,
+       "values": [
+        54
+       ]
+      },
+      {
+       "name": "Buying a vehicle (car, truck, motorbike) — delayed",
+       "ordinal": 3,
+       "values": [
+        51
+       ]
+      },
+      {
+       "name": "Big household items (furniture/appliances) — delayed",
+       "ordinal": 4,
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "Receiving medical treatment — delayed",
+       "ordinal": 5,
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "Getting married — delayed",
+       "ordinal": 6,
+       "values": [
+        26
+       ]
+      },
+      {
+       "name": "Having children — delayed",
+       "ordinal": 7,
+       "values": [
+        30
+       ]
+      }
      ]
     }
    ]
@@ -69,11 +129,41 @@
      "title": "Table 25: Australians' attitudes towards the seriousness of the budget deficit, by demographic characteristics, 5-12 December 2025",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll (PDF pp. 89-90)",
      "entities": [
-      {"name": "Serious problem that must be addressed immediately", "ordinal": 1, "values": [39]},
-      {"name": "Minor problem, can be reduced gradually", "ordinal": 2, "values": [40]},
-      {"name": "Not a problem — other countries have bigger deficits", "ordinal": 3, "values": [6]},
-      {"name": "None of these", "ordinal": 4, "values": [2]},
-      {"name": "Not sure", "ordinal": 5, "values": [13]}
+      {
+       "name": "Serious problem that must be addressed immediately",
+       "ordinal": 1,
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "Minor problem, can be reduced gradually",
+       "ordinal": 2,
+       "values": [
+        40
+       ]
+      },
+      {
+       "name": "Not a problem — other countries have bigger deficits",
+       "ordinal": 3,
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "None of these",
+       "ordinal": 4,
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 5,
+       "values": [
+        13
+       ]
+      }
      ]
     }
    ]
@@ -94,9 +184,45 @@
      "title": "Tables 26-28: Support for, or opposition to, various policies aimed at managing the federal budget, 5-12 December 2025",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll (PDF pp. 95-101)",
      "entities": [
-      {"name": "Taxes on high-income Australians — net support", "ordinal": 1, "values": [37], "quotedFigure": {"value": 37, "xc": 0, "caption": "30 strongly support / 33 somewhat / 14 somewhat oppose / 12 strongly oppose / 11 not sure", "snippetHaystack": "All voters 30 33 14 12 11 37"}},
-      {"name": "Spending cuts across all departments — net support", "ordinal": 2, "values": [39], "quotedFigure": {"value": 39, "xc": 0, "caption": "26/36/16/7/15", "snippetHaystack": "All voters 26 36 16 7 15 39"}},
-      {"name": "Larger deficit to avoid spending cuts — net support", "ordinal": 3, "values": [-6], "quotedFigure": {"value": -6, "xc": 0, "caption": "8/26/24/16/26", "snippetHaystack": "All voters 8 26 24 16 26 -6"}}
+      {
+       "name": "Taxes on high-income Australians — net support",
+       "ordinal": 1,
+       "values": [
+        37
+       ],
+       "quotedFigure": {
+        "value": 37,
+        "xc": 0,
+        "caption": "30 strongly support / 33 somewhat / 14 somewhat oppose / 12 strongly oppose / 11 not sure",
+        "snippetHaystack": "All voters 30 33 14 12 11 37"
+       }
+      },
+      {
+       "name": "Spending cuts across all departments — net support",
+       "ordinal": 2,
+       "values": [
+        39
+       ],
+       "quotedFigure": {
+        "value": 39,
+        "xc": 0,
+        "caption": "26/36/16/7/15",
+        "snippetHaystack": "All voters 26 36 16 7 15 39"
+       }
+      },
+      {
+       "name": "Larger deficit to avoid spending cuts — net support",
+       "ordinal": 3,
+       "values": [
+        -6
+       ],
+       "quotedFigure": {
+        "value": -6,
+        "xc": 0,
+        "caption": "8/26/24/16/26",
+        "snippetHaystack": "All voters 8 26 24 16 26 -6"
+       }
+      }
      ]
     }
    ]
@@ -117,11 +243,41 @@
      "title": "Table 29: What is the minimum income a household needs to earn in a year to be considered wealthy in Australia, by demographic characteristics, 5-12 December 2025",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll (PDF pp. 103-104)",
      "entities": [
-      {"name": "Less than $150,000", "ordinal": 1, "values": [18]},
-      {"name": "Between $150,000 to $249,999", "ordinal": 2, "values": [32]},
-      {"name": "Between $250,000 to $349,999", "ordinal": 3, "values": [27]},
-      {"name": "Between $350,000 to $499,999", "ordinal": 4, "values": [13]},
-      {"name": "$500,000 or more", "ordinal": 5, "values": [10]}
+      {
+       "name": "Less than $150,000",
+       "ordinal": 1,
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Between $150,000 to $249,999",
+       "ordinal": 2,
+       "values": [
+        32
+       ]
+      },
+      {
+       "name": "Between $250,000 to $349,999",
+       "ordinal": 3,
+       "values": [
+        27
+       ]
+      },
+      {
+       "name": "Between $350,000 to $499,999",
+       "ordinal": 4,
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "$500,000 or more",
+       "ordinal": 5,
+       "values": [
+        10
+       ]
+      }
      ]
     }
    ]
@@ -142,7 +298,13 @@
      "title": "Figures 6-8: The main reasons given by voters for changing their vote (overall; by 2025 vote recall; by current vote intention)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 13-15, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Asked of voters whose current first preference differs from their recalled 2025 vote; answers free-text, LLM-coded. Percentages share of all voters, and broken by party of 2025 vote and of current intention."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "Asked of voters whose current first preference differs from their recalled 2025 vote; answers free-text, LLM-coded. Percentages share of all voters, and broken by party of 2025 vote and of current intention."
+       ]
+      }
      ]
     }
    ]
@@ -163,7 +325,13 @@
      "title": "Figures 9-11: The single news story voters report hearing about the most (overall; by current vote intention; by generational cohort)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 17-19, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read: stories grouped as topics, sub-story shares annotated in the legend."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "Topical-salience read: stories grouped as topics, sub-story shares annotated in the legend."
+       ]
+      }
      ]
     }
    ]
@@ -184,9 +352,27 @@
      "title": "Table 27: The share of voters who say Australia is headed in the right or wrong direction, by demographic characteristics, 22-29 January",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 102-104; series Figure 41 image-only)",
      "entities": [
-      {"name": "Generally headed in the right direction", "ordinal": 1, "values": [29]},
-      {"name": "Generally headed in the wrong direction", "ordinal": 2, "values": [55]},
-      {"name": "Not sure", "ordinal": 3, "values": [16]}
+      {
+       "name": "Generally headed in the right direction",
+       "ordinal": 1,
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "Generally headed in the wrong direction",
+       "ordinal": 2,
+       "values": [
+        55
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 3,
+       "values": [
+        16
+       ]
+      }
      ]
     }
    ]
@@ -207,11 +393,41 @@
      "title": "Table 28: Voters' views on the current state of Australian federal politics, by demographic characteristics, 22-29 January",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 106-108)",
      "entities": [
-      {"name": "The system is fine as it is and doesn't need any change", "ordinal": 1, "values": [5]},
-      {"name": "The system needs minor changes", "ordinal": 2, "values": [29]},
-      {"name": "The system needs major changes", "ordinal": 3, "values": [44]},
-      {"name": "The system needs to be burned down so we can start over", "ordinal": 4, "values": [15]},
-      {"name": "Not sure", "ordinal": 5, "values": [7]}
+      {
+       "name": "The system is fine as it is and doesn't need any change",
+       "ordinal": 1,
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "The system needs minor changes",
+       "ordinal": 2,
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "The system needs major changes",
+       "ordinal": 3,
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "The system needs to be burned down so we can start over",
+       "ordinal": 4,
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 5,
+       "values": [
+        7
+       ]
+      }
      ]
     }
    ]
@@ -232,7 +448,13 @@
      "title": "Figures 6-7: The main reasons given by One Nation voters for supporting the party (all ON voters; by 2025 vote recall)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 13-14, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["N=254 One Nation voters; percentages exclude non-ON voters."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "N=254 One Nation voters; percentages exclude non-ON voters."
+       ]
+      }
      ]
     }
    ]
@@ -253,7 +475,13 @@
      "title": "Figures 8-9: The single news story voters report hearing about the most (overall; by current vote intention)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 16-17, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read; topics grouped with sub-story shares."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "Topical-salience read; topics grouped with sub-story shares."
+       ]
+      }
      ]
     }
    ]
@@ -274,7 +502,13 @@
      "title": "Figures 41-42: How voters say they feel about the way things are going in Australia (overall; by current vote intention)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 105-106, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Emotion/mood categories coded from free text."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "Emotion/mood categories coded from free text."
+       ]
+      }
      ]
     }
    ]
@@ -295,14 +529,110 @@
      "title": "Tables 30-37: The share of voters that agree or disagree with different party messaging statements, by demographic characteristics, 23-27 February",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll (PDF pp. 108-131)",
      "entities": [
-      {"name": "A Federal Coalition Government led by Angus Taylor will protect Australians' way of life and lift their standard of living — net agree", "ordinal": 1, "values": [-3], "quotedFigure": {"value": -3, "xc": 0, "caption": "6/20/27/11/18/18", "snippetHaystack": "All voters 6 20 27 11 18 18 -3"}},
-      {"name": "Anthony Albanese and Labor are building Australia's future — net agree", "ordinal": 2, "values": [-15], "quotedFigure": {"value": -15, "xc": 0, "caption": "9/22/16/16/30/7", "snippetHaystack": "All voters 9 22 16 16 30 7 -15"}},
-      {"name": "Albanese/Labor focused on cost-of-living while the Liberal Party are focused on themselves — net agree", "ordinal": 3, "values": [-8], "quotedFigure": {"value": -8, "xc": 0, "caption": "12/20/19/14/26/9", "snippetHaystack": "All voters 12 20 19 14 26 9 -8"}},
-      {"name": "I am more likely to vote for One Nation now that Barnaby Joyce has joined their team — net agree", "ordinal": 4, "values": [-19], "quotedFigure": {"value": -19, "xc": 0, "caption": "9/14/26/10/32/9 (ON voters +41)", "snippetHaystack": "All voters 9 14 26 10 32 9 -19"}},
-      {"name": "Australians are turning to One Nation because governments have lost sight of everyday issues — net agree", "ordinal": 5, "values": [43], "quotedFigure": {"value": 43, "xc": 0, "caption": "32/29/13/9/9/8", "snippetHaystack": "All voters 32 29 13 9 9 8 43"}},
-      {"name": "I am more likely to vote for the Liberal Party with Angus Taylor as leader — net agree", "ordinal": 6, "values": [-9], "quotedFigure": {"value": -9, "xc": 0, "caption": "9/18/25/13/23/12", "snippetHaystack": "All voters 9 18 25 13 23 12 -9"}},
-      {"name": "Angus Taylor and the Liberal Party will fight for people like me — net agree", "ordinal": 7, "values": [-11], "quotedFigure": {"value": -11, "xc": 0, "caption": "8/17/23/14/22/16", "snippetHaystack": "All voters 8 17 23 14 22 16 -11"}},
-      {"name": "Immigration numbers have been too high, immigration standards have been too low, and both need to change — net agree", "ordinal": 8, "values": [50], "quotedFigure": {"value": 50, "xc": 0, "caption": "43/21/16/7/7/6", "snippetHaystack": "All voters 43 21 16 7 7 6 50"}}
+      {
+       "name": "A Federal Coalition Government led by Angus Taylor will protect Australians' way of life and lift their standard of living — net agree",
+       "ordinal": 1,
+       "values": [
+        -3
+       ],
+       "quotedFigure": {
+        "value": -3,
+        "xc": 0,
+        "caption": "6/20/27/11/18/18",
+        "snippetHaystack": "All voters 6 20 27 11 18 18 -3"
+       }
+      },
+      {
+       "name": "Anthony Albanese and Labor are building Australia's future — net agree",
+       "ordinal": 2,
+       "values": [
+        -15
+       ],
+       "quotedFigure": {
+        "value": -15,
+        "xc": 0,
+        "caption": "9/22/16/16/30/7",
+        "snippetHaystack": "All voters 9 22 16 16 30 7 -15"
+       }
+      },
+      {
+       "name": "Albanese/Labor focused on cost-of-living while the Liberal Party are focused on themselves — net agree",
+       "ordinal": 3,
+       "values": [
+        -8
+       ],
+       "quotedFigure": {
+        "value": -8,
+        "xc": 0,
+        "caption": "12/20/19/14/26/9",
+        "snippetHaystack": "All voters 12 20 19 14 26 9 -8"
+       }
+      },
+      {
+       "name": "I am more likely to vote for One Nation now that Barnaby Joyce has joined their team — net agree",
+       "ordinal": 4,
+       "values": [
+        -19
+       ],
+       "quotedFigure": {
+        "value": -19,
+        "xc": 0,
+        "caption": "9/14/26/10/32/9 (ON voters +41)",
+        "snippetHaystack": "All voters 9 14 26 10 32 9 -19"
+       }
+      },
+      {
+       "name": "Australians are turning to One Nation because governments have lost sight of everyday issues — net agree",
+       "ordinal": 5,
+       "values": [
+        43
+       ],
+       "quotedFigure": {
+        "value": 43,
+        "xc": 0,
+        "caption": "32/29/13/9/9/8",
+        "snippetHaystack": "All voters 32 29 13 9 9 8 43"
+       }
+      },
+      {
+       "name": "I am more likely to vote for the Liberal Party with Angus Taylor as leader — net agree",
+       "ordinal": 6,
+       "values": [
+        -9
+       ],
+       "quotedFigure": {
+        "value": -9,
+        "xc": 0,
+        "caption": "9/18/25/13/23/12",
+        "snippetHaystack": "All voters 9 18 25 13 23 12 -9"
+       }
+      },
+      {
+       "name": "Angus Taylor and the Liberal Party will fight for people like me — net agree",
+       "ordinal": 7,
+       "values": [
+        -11
+       ],
+       "quotedFigure": {
+        "value": -11,
+        "xc": 0,
+        "caption": "8/17/23/14/22/16",
+        "snippetHaystack": "All voters 8 17 23 14 22 16 -11"
+       }
+      },
+      {
+       "name": "Immigration numbers have been too high, immigration standards have been too low, and both need to change — net agree",
+       "ordinal": 8,
+       "values": [
+        50
+       ],
+       "quotedFigure": {
+        "value": 50,
+        "xc": 0,
+        "caption": "43/21/16/7/7/6",
+        "snippetHaystack": "All voters 43 21 16 7 7 6 50"
+       }
+      }
      ]
     }
    ]
@@ -323,7 +653,13 @@
      "title": "Figures (pp. 13-16): The single news story voters report hearing about the most (overall; by current vote intention)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF pp. 13-16, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read during the 'PM arrests popularity decline' wave."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "Topical-salience read during the 'PM arrests popularity decline' wave."
+       ]
+      }
      ]
     }
    ]
@@ -344,20 +680,116 @@
      "title": "Tables 45-58: Impact of hearing each statement on willingness to vote for One Nation, by demographic characteristics, 24-30 April (figures are net MORE willing to vote ON after the message)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF pp. 137-183)",
      "entities": [
-      {"name": "One Nation stands up for ordinary Australians struggling with the cost of living — net more willing", "ordinal": 1, "values": [27]},
-      {"name": "One Nation will put Australia first — net more willing", "ordinal": 2, "values": [26]},
-      {"name": "Pauline Hanson and One Nation will reduce the level of immigration — net more willing", "ordinal": 3, "values": [23], "quotedFigure": {"value": 23, "xc": 0, "caption": "32/16/22/7/18/5", "snippetHaystack": "All voters 32 16 22 7 18 5 23"}},
-      {"name": "Pauline Hanson speaks her mind and says what other politicians won't — net more willing", "ordinal": 4, "values": [23]},
-      {"name": "Voting for One Nation sends a message to Labor and the Coalition that voters want change — net more willing", "ordinal": 5, "values": [20]},
-      {"name": "Hanson/One Nation share the values of ordinary Australians while the major parties only represent the elites — net more willing", "ordinal": 6, "values": [18]},
-      {"name": "The major parties aren't up to the job anymore, time to give One Nation a chance — net more willing", "ordinal": 7, "values": [6]},
-      {"name": "A vote for One Nation is a wasted vote, because they cannot form government — net more willing", "ordinal": 8, "values": [-18]},
-      {"name": "Some of the people Pauline Hanson associates with have expressed extreme or controversial views — net more willing", "ordinal": 9, "values": [-26]},
-      {"name": "If One Nation held the balance of power, it could create economic uncertainty and risk — net more willing", "ordinal": 10, "values": [-30]},
-      {"name": "Pauline Hanson and One Nation have no experience governing or managing a federal budget — net more willing", "ordinal": 11, "values": [-37]},
-      {"name": "Pauline Hanson is a strong supporter and admirer of Donald Trump — net more willing", "ordinal": 12, "values": [-38], "quotedFigure": {"value": -38, "xc": 0, "caption": "9/6/24/9/44/8", "snippetHaystack": "All voters 9 6 24 9 44 8 -38"}},
-      {"name": "Pauline Hanson has voted in parliament to cut penalty rates and weaken protections for workers — net more willing", "ordinal": 13, "values": [-38]},
-      {"name": "Pauline Hanson has called for Australia to help Trump 'stamp out evil' by entering the conflict in Iran — net more willing", "ordinal": 14, "values": [-39]}
+      {
+       "name": "One Nation stands up for ordinary Australians struggling with the cost of living — net more willing",
+       "ordinal": 1,
+       "values": [
+        27
+       ]
+      },
+      {
+       "name": "One Nation will put Australia first — net more willing",
+       "ordinal": 2,
+       "values": [
+        26
+       ]
+      },
+      {
+       "name": "Pauline Hanson and One Nation will reduce the level of immigration — net more willing",
+       "ordinal": 3,
+       "values": [
+        23
+       ],
+       "quotedFigure": {
+        "value": 23,
+        "xc": 0,
+        "caption": "32/16/22/7/18/5",
+        "snippetHaystack": "All voters 32 16 22 7 18 5 23"
+       }
+      },
+      {
+       "name": "Pauline Hanson speaks her mind and says what other politicians won't — net more willing",
+       "ordinal": 4,
+       "values": [
+        23
+       ]
+      },
+      {
+       "name": "Voting for One Nation sends a message to Labor and the Coalition that voters want change — net more willing",
+       "ordinal": 5,
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Hanson/One Nation share the values of ordinary Australians while the major parties only represent the elites — net more willing",
+       "ordinal": 6,
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "The major parties aren't up to the job anymore, time to give One Nation a chance — net more willing",
+       "ordinal": 7,
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "A vote for One Nation is a wasted vote, because they cannot form government — net more willing",
+       "ordinal": 8,
+       "values": [
+        -18
+       ]
+      },
+      {
+       "name": "Some of the people Pauline Hanson associates with have expressed extreme or controversial views — net more willing",
+       "ordinal": 9,
+       "values": [
+        -26
+       ]
+      },
+      {
+       "name": "If One Nation held the balance of power, it could create economic uncertainty and risk — net more willing",
+       "ordinal": 10,
+       "values": [
+        -30
+       ]
+      },
+      {
+       "name": "Pauline Hanson and One Nation have no experience governing or managing a federal budget — net more willing",
+       "ordinal": 11,
+       "values": [
+        -37
+       ]
+      },
+      {
+       "name": "Pauline Hanson is a strong supporter and admirer of Donald Trump — net more willing",
+       "ordinal": 12,
+       "values": [
+        -38
+       ],
+       "quotedFigure": {
+        "value": -38,
+        "xc": 0,
+        "caption": "9/6/24/9/44/8",
+        "snippetHaystack": "All voters 9 6 24 9 44 8 -38"
+       }
+      },
+      {
+       "name": "Pauline Hanson has voted in parliament to cut penalty rates and weaken protections for workers — net more willing",
+       "ordinal": 13,
+       "values": [
+        -38
+       ]
+      },
+      {
+       "name": "Pauline Hanson has called for Australia to help Trump 'stamp out evil' by entering the conflict in Iran — net more willing",
+       "ordinal": 14,
+       "values": [
+        -39
+       ]
+      }
      ]
     }
    ]
@@ -378,15 +810,69 @@
      "title": "Table 59: Which of these messages makes voters most hesitant about voting for One Nation, by demographic characteristics, 24-30 April",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF pp. 187-189)",
      "entities": [
-      {"name": "Pauline Hanson is a strong supporter and admirer of President Donald Trump", "ordinal": 1, "values": [21]},
-      {"name": "Pauline Hanson has said Australia should support Donald Trump and enter the conflict in Iran", "ordinal": 2, "values": [18]},
-      {"name": "Pauline Hanson and One Nation have never delivered a budget", "ordinal": 3, "values": [6]},
-      {"name": "A One Nation minority government means economic uncertainty and risk", "ordinal": 4, "values": [7]},
-      {"name": "A vote for One Nation is a wasted vote", "ordinal": 5, "values": [5]},
-      {"name": "I don't have any hesitations about voting for One Nation", "ordinal": 6, "values": [15]},
-      {"name": "I would never vote for One Nation", "ordinal": 7, "values": [19]},
-      {"name": "Other", "ordinal": 8, "values": [3]},
-      {"name": "Unsure", "ordinal": 9, "values": [6]}
+      {
+       "name": "Pauline Hanson is a strong supporter and admirer of President Donald Trump",
+       "ordinal": 1,
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "Pauline Hanson has said Australia should support Donald Trump and enter the conflict in Iran",
+       "ordinal": 2,
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Pauline Hanson and One Nation have never delivered a budget",
+       "ordinal": 3,
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "A One Nation minority government means economic uncertainty and risk",
+       "ordinal": 4,
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "A vote for One Nation is a wasted vote",
+       "ordinal": 5,
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "I don't have any hesitations about voting for One Nation",
+       "ordinal": 6,
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "I would never vote for One Nation",
+       "ordinal": 7,
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "Other",
+       "ordinal": 8,
+       "values": [
+        3
+       ]
+      },
+      {
+       "name": "Unsure",
+       "ordinal": 9,
+       "values": [
+        6
+       ]
+      }
      ]
     }
    ]
@@ -407,19 +893,73 @@
      "title": "How much voters have seen, read or heard about the Federal Budget (25-28 May)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll (PDF pp. 120-123)",
      "entities": [
-      {"name": "A great deal", "ordinal": 1, "values": [21]},
-      {"name": "A fair amount", "ordinal": 2, "values": [44]},
-      {"name": "Not very much", "ordinal": 3, "values": [29]},
-      {"name": "Nothing at all", "ordinal": 4, "values": [6]},
-      {"name": "Net awareness (deal+amount − notmuch+nothing)", "ordinal": 5, "values": [30]}
+      {
+       "name": "A great deal",
+       "ordinal": 1,
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "A fair amount",
+       "ordinal": 2,
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "Not very much",
+       "ordinal": 3,
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "Nothing at all",
+       "ordinal": 4,
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Net awareness (deal+amount − notmuch+nothing)",
+       "ordinal": 5,
+       "values": [
+        30
+       ]
+      }
      ]
     },
     {
      "title": "How voters rate the impact of the federal budget — for the country / for you personally (asked of those who had heard anything, N=950)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll (PDF pp. 124-134)",
      "entities": [
-      {"name": "For the country as a whole — net good", "ordinal": 1, "values": [-30], "quotedFigure": {"value": -30, "xc": 0, "caption": "3/20/10/31/22/14", "snippetHaystack": "All voters 3 20 10 31 22 14 -30"}},
-      {"name": "For you personally — net good", "ordinal": 2, "values": [-37], "quotedFigure": {"value": -37, "xc": 0, "caption": "1/10/31/32/16/10", "snippetHaystack": "All voters 1 10 31 32 16 10 -37"}}
+      {
+       "name": "For the country as a whole — net good",
+       "ordinal": 1,
+       "values": [
+        -30
+       ],
+       "quotedFigure": {
+        "value": -30,
+        "xc": 0,
+        "caption": "3/20/10/31/22/14",
+        "snippetHaystack": "All voters 3 20 10 31 22 14 -30"
+       }
+      },
+      {
+       "name": "For you personally — net good",
+       "ordinal": 2,
+       "values": [
+        -37
+       ],
+       "quotedFigure": {
+        "value": -37,
+        "xc": 0,
+        "caption": "1/10/31/32/16/10",
+        "snippetHaystack": "All voters 1 10 31 32 16 10 -37"
+       }
+      }
      ]
     }
    ]
@@ -440,7 +980,13 @@
      "title": "Figures (pp. 13-14): The single news story voters report hearing about the most (overall; by current vote intention)",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll (PDF pp. 13-14, embedded images)",
      "entities": [
-      {"name": "Embedded chart image only — no pdftotext-visible figures", "ordinal": 1, "values": ["Topical-salience read for the 'Hanson takes a hit' wave."]}
+      {
+       "name": "Embedded chart image only — no pdftotext-visible figures",
+       "ordinal": 1,
+       "values": [
+        "Topical-salience read for the 'Hanson takes a hit' wave."
+       ]
+      }
      ]
     }
    ]
@@ -461,9 +1007,27 @@
      "title": "Table 38: Voters' outlook for the next generation, by demographic characteristics, 22-26 June",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll (PDF pp. 117-119)",
      "entities": [
-      {"name": "The next generation will have a better life than my parents' generation", "ordinal": 1, "values": [19]},
-      {"name": "The next generation will have about the same quality of life as my parents' generation", "ordinal": 2, "values": [19]},
-      {"name": "The next generation will have a worse life than my parents' generation", "ordinal": 3, "values": [62]}
+      {
+       "name": "The next generation will have a better life than my parents' generation",
+       "ordinal": 1,
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "The next generation will have about the same quality of life as my parents' generation",
+       "ordinal": 2,
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "The next generation will have a worse life than my parents' generation",
+       "ordinal": 3,
+       "values": [
+        62
+       ]
+      }
      ]
     }
    ]
@@ -484,8 +1048,32 @@
      "title": "Tables 41-42: Voters' attitudes towards Australia and superannuation as a national asset, by demographic characteristics, 27-30 July",
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll (PDF pp. 125-133)",
      "entities": [
-      {"name": "I am proud of Australia — net agree", "ordinal": 1, "values": [76], "quotedFigure": {"value": 76, "xc": 0, "caption": "49/38/8/3/2", "snippetHaystack": "All voters 49 38 8 3 2 76"}},
-      {"name": "Superannuation is a national asset for Australia — net agree", "ordinal": 2, "values": [47], "quotedFigure": {"value": 47, "xc": 0, "caption": "33/35/8/13/11", "snippetHaystack": "All voters 33 35 8 13 11 47"}}
+      {
+       "name": "I am proud of Australia — net agree",
+       "ordinal": 1,
+       "values": [
+        76
+       ],
+       "quotedFigure": {
+        "value": 76,
+        "xc": 0,
+        "caption": "49/38/8/3/2",
+        "snippetHaystack": "All voters 49 38 8 3 2 76"
+       }
+      },
+      {
+       "name": "Superannuation is a national asset for Australia — net agree",
+       "ordinal": 2,
+       "values": [
+        47
+       ],
+       "quotedFigure": {
+        "value": 47,
+        "xc": 0,
+        "caption": "33/35/8/13/11",
+        "snippetHaystack": "All voters 33 35 8 13 11 47"
+       }
+      }
      ]
     }
    ]
@@ -506,13 +1094,55 @@
      "title": "Table 37: Voters' views on whether the Federal Budget changes will increase or reduce rents, by demographic characteristics, 24-28 August",
      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll (PDF pp. 113-115)",
      "entities": [
-      {"name": "Significantly increase rents", "ordinal": 1, "values": [21]},
-      {"name": "Somewhat increase rents", "ordinal": 2, "values": [27]},
-      {"name": "Neither increase nor decrease rents", "ordinal": 3, "values": [23]},
-      {"name": "Somewhat reduce rents", "ordinal": 4, "values": [10]},
-      {"name": "Significantly reduce rents", "ordinal": 5, "values": [2]},
-      {"name": "Not sure", "ordinal": 6, "values": [17]},
-      {"name": "Net expect increase (increase − reduce)", "ordinal": 7, "values": [36]}
+      {
+       "name": "Significantly increase rents",
+       "ordinal": 1,
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "Somewhat increase rents",
+       "ordinal": 2,
+       "values": [
+        27
+       ]
+      },
+      {
+       "name": "Neither increase nor decrease rents",
+       "ordinal": 3,
+       "values": [
+        23
+       ]
+      },
+      {
+       "name": "Somewhat reduce rents",
+       "ordinal": 4,
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "Significantly reduce rents",
+       "ordinal": 5,
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 6,
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Net expect increase (increase − reduce)",
+       "ordinal": 7,
+       "values": [
+        36
+       ]
+      }
      ]
     }
    ]
@@ -533,19 +1163,973 @@
      "title": "Table 40: How much voters have seen, read or heard about the Federal Budget, by demographic characteristics, 28 September - 2 October",
      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF pp. 121-124)",
      "entities": [
-      {"name": "A great deal", "ordinal": 1, "values": [10]},
-      {"name": "A fair amount", "ordinal": 2, "values": [35]},
-      {"name": "Not very much", "ordinal": 3, "values": [40]},
-      {"name": "Nothing at all", "ordinal": 4, "values": [15]},
-      {"name": "Net awareness", "ordinal": 5, "values": [-10]}
+      {
+       "name": "A great deal",
+       "ordinal": 1,
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "A fair amount",
+       "ordinal": 2,
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "Not very much",
+       "ordinal": 3,
+       "values": [
+        40
+       ]
+      },
+      {
+       "name": "Nothing at all",
+       "ordinal": 4,
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Net awareness",
+       "ordinal": 5,
+       "values": [
+        -10
+       ]
+      }
      ]
     },
     {
      "title": "Tables 41-43: How voters rate the impact of the federal budget (asked of those who had heard anything, N=868)",
      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF pp. 125-135)",
      "entities": [
-      {"name": "For the country as a whole — net good", "ordinal": 1, "values": [-34], "quotedFigure": {"value": -34, "xc": 0, "caption": "2/17/13/33/20/15", "snippetHaystack": "All voters 2 17 13 33 20 15 -34"}},
-      {"name": "For you personally — net good", "ordinal": 2, "values": [-39], "quotedFigure": {"value": -39, "xc": 0, "caption": "1/9/30/34/15/11", "snippetHaystack": "All voters 1 9 30 34 15 11 -39"}}
+      {
+       "name": "For the country as a whole — net good",
+       "ordinal": 1,
+       "values": [
+        -34
+       ],
+       "quotedFigure": {
+        "value": -34,
+        "xc": 0,
+        "caption": "2/17/13/33/20/15",
+        "snippetHaystack": "All voters 2 17 13 33 20 15 -34"
+       }
+      },
+      {
+       "name": "For you personally — net good",
+       "ordinal": 2,
+       "values": [
+        -39
+       ],
+       "quotedFigure": {
+        "value": -39,
+        "xc": 0,
+        "caption": "1/9/30/34/15/11",
+        "snippetHaystack": "All voters 1 9 30 34 15 11 -39"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-01-29",
+   "dateStart": "2026-01-22",
+   "dateEnd": "2026-01-29",
+   "published": "2026-02-01T18:00",
+   "sample": 1003,
+   "sampleEff": 782,
+   "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
+   "question": "Donald Trump favourability",
+   "notes": "First of three 2026 favourability low-points for Trump in the AFR tracker. All voters: net −51 (16% favourable — 5% very, 11% mostly — vs 67% unfavourable); 14% neither, 2% not sure, 1% have not heard of him. One Nation voters are by far his kindest cohort (net −7; 36% favourable), Greens voters the harshest (−89); men net −36 vs women −62. Part of the standing rotating figure-favourability double (Figure/Table 9), filed at user request for the cross-house Trump series.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Very favourable",
+       "ordinal": 1,
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Mostly favourable",
+       "ordinal": 2,
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Neither favourable nor unfavourable",
+       "ordinal": 3,
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Mostly unfavourable",
+       "ordinal": 4,
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Very unfavourable",
+       "ordinal": 5,
+       "values": [
+        56
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 6,
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "I have not heard of them",
+       "ordinal": 7,
+       "values": [
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by federal vote intention — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Labor",
+       "ordinal": 1,
+       "values": [
+        -78
+       ]
+      },
+      {
+       "name": "Liberal",
+       "ordinal": 2,
+       "values": [
+        -44
+       ]
+      },
+      {
+       "name": "CLP/LNP/Nat",
+       "ordinal": 3,
+       "values": [
+        -15
+       ]
+      },
+      {
+       "name": "One Nation",
+       "ordinal": 4,
+       "values": [
+        -7
+       ]
+      },
+      {
+       "name": "Greens",
+       "ordinal": 5,
+       "values": [
+        -89
+       ]
+      },
+      {
+       "name": "Other parties and candidates",
+       "ordinal": 6,
+       "values": [
+        -62
+       ]
+      },
+      {
+       "name": "Undecided / will not vote",
+       "ordinal": 7,
+       "values": [
+        -50
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by vote softness — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Solid",
+       "ordinal": 1,
+       "values": [
+        -41
+       ]
+      },
+      {
+       "name": "Soft",
+       "ordinal": 2,
+       "values": [
+        -57
+       ]
+      },
+      {
+       "name": "Very soft",
+       "ordinal": 3,
+       "values": [
+        -69
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by generation — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Gen-Z",
+       "ordinal": 1,
+       "values": [
+        -55
+       ]
+      },
+      {
+       "name": "Millennials",
+       "ordinal": 2,
+       "values": [
+        -46
+       ]
+      },
+      {
+       "name": "Gen-X",
+       "ordinal": 3,
+       "values": [
+        -55
+       ]
+      },
+      {
+       "name": "Baby Boomers",
+       "ordinal": 4,
+       "values": [
+        -48
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by gender — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Women",
+       "ordinal": 1,
+       "values": [
+        -62
+       ]
+      },
+      {
+       "name": "Men",
+       "ordinal": 2,
+       "values": [
+        -36
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by location — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Inner Metropolitan",
+       "ordinal": 1,
+       "values": [
+        -62
+       ]
+      },
+      {
+       "name": "Outer Metropolitan",
+       "ordinal": 2,
+       "values": [
+        -36
+       ]
+      },
+      {
+       "name": "Provincial",
+       "ordinal": 3,
+       "values": [
+        -52
+       ]
+      },
+      {
+       "name": "Rural",
+       "ordinal": 4,
+       "values": [
+        -51
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by education — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Less than year 12",
+       "ordinal": 1,
+       "values": [
+        -54
+       ]
+      },
+      {
+       "name": "Year 12 or equivalent",
+       "ordinal": 2,
+       "values": [
+        -42
+       ]
+      },
+      {
+       "name": "TAFE, trade or vocational",
+       "ordinal": 3,
+       "values": [
+        -44
+       ]
+      },
+      {
+       "name": "University degree",
+       "ordinal": 4,
+       "values": [
+        -64
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by home ownership — printed net column of Table 9",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 46-47)",
+     "entities": [
+      {
+       "name": "Owned outright",
+       "ordinal": 1,
+       "values": [
+        -50
+       ]
+      },
+      {
+       "name": "Owned with a mortgage",
+       "ordinal": 2,
+       "values": [
+        -46
+       ]
+      },
+      {
+       "name": "Renting and other",
+       "ordinal": 3,
+       "values": [
+        -55
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-04-30",
+   "dateStart": "2026-04-24",
+   "dateEnd": "2026-04-30",
+   "published": "2026-05-03T18:00",
+   "sample": 1014,
+   "sampleEff": 774,
+   "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
+   "question": "Donald Trump favourability",
+   "notes": "Trump slips to net −58 (14% favourable vs 72% unfavourable; 11% neither). One Nation voters again his strongest cohort (net −18; 29% favourable), Greens voters the harshest (−95); women −69 vs men −46, and the softest vote-softness band reaches −86.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Very favourable",
+       "ordinal": 1,
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Mostly favourable",
+       "ordinal": 2,
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Neither favourable nor unfavourable",
+       "ordinal": 3,
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Mostly unfavourable",
+       "ordinal": 4,
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Very unfavourable",
+       "ordinal": 5,
+       "values": [
+        61
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 6,
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "I have not heard of them",
+       "ordinal": 7,
+       "values": [
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by federal vote intention — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Labor",
+       "ordinal": 1,
+       "values": [
+        -74
+       ]
+      },
+      {
+       "name": "Liberal",
+       "ordinal": 2,
+       "values": [
+        -50
+       ]
+      },
+      {
+       "name": "CLP/LNP/Nat",
+       "ordinal": 3,
+       "values": [
+        -46
+       ]
+      },
+      {
+       "name": "One Nation",
+       "ordinal": 4,
+       "values": [
+        -18
+       ]
+      },
+      {
+       "name": "Greens",
+       "ordinal": 5,
+       "values": [
+        -95
+       ]
+      },
+      {
+       "name": "Other parties and candidates",
+       "ordinal": 6,
+       "values": [
+        -70
+       ]
+      },
+      {
+       "name": "Undecided / will not vote",
+       "ordinal": 7,
+       "values": [
+        -75
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by vote softness — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Solid",
+       "ordinal": 1,
+       "values": [
+        -46
+       ]
+      },
+      {
+       "name": "Soft",
+       "ordinal": 2,
+       "values": [
+        -63
+       ]
+      },
+      {
+       "name": "Very soft",
+       "ordinal": 3,
+       "values": [
+        -86
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by generation — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Gen-Z",
+       "ordinal": 1,
+       "values": [
+        -57
+       ]
+      },
+      {
+       "name": "Millennials",
+       "ordinal": 2,
+       "values": [
+        -54
+       ]
+      },
+      {
+       "name": "Gen-X",
+       "ordinal": 3,
+       "values": [
+        -58
+       ]
+      },
+      {
+       "name": "Baby Boomers",
+       "ordinal": 4,
+       "values": [
+        -61
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by gender — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Women",
+       "ordinal": 1,
+       "values": [
+        -69
+       ]
+      },
+      {
+       "name": "Men",
+       "ordinal": 2,
+       "values": [
+        -46
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by location — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Inner Metropolitan",
+       "ordinal": 1,
+       "values": [
+        -55
+       ]
+      },
+      {
+       "name": "Outer Metropolitan",
+       "ordinal": 2,
+       "values": [
+        -61
+       ]
+      },
+      {
+       "name": "Provincial",
+       "ordinal": 3,
+       "values": [
+        -54
+       ]
+      },
+      {
+       "name": "Rural",
+       "ordinal": 4,
+       "values": [
+        -55
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by education — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Less than year 12",
+       "ordinal": 1,
+       "values": [
+        -45
+       ]
+      },
+      {
+       "name": "Year 12 or equivalent",
+       "ordinal": 2,
+       "values": [
+        -51
+       ]
+      },
+      {
+       "name": "TAFE, trade or vocational",
+       "ordinal": 3,
+       "values": [
+        -59
+       ]
+      },
+      {
+       "name": "University degree",
+       "ordinal": 4,
+       "values": [
+        -63
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by home ownership — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Owned outright",
+       "ordinal": 1,
+       "values": [
+        -61
+       ]
+      },
+      {
+       "name": "Owned with a mortgage",
+       "ordinal": 2,
+       "values": [
+        -56
+       ]
+      },
+      {
+       "name": "Renting and other",
+       "ordinal": 3,
+       "values": [
+        -57
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-10-02",
+   "dateStart": "2026-09-28",
+   "dateEnd": "2026-10-02",
+   "published": "2026-10-04T18:00",
+   "sample": 1000,
+   "sampleEff": 809,
+   "url": "https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5",
+   "question": "Donald Trump favourability",
+   "notes": "Latest read: net −59 (14% favourable vs 73% unfavourable; 12% neither). One Nation voters still his least-hostile cohort (net −20) while every generation now sits between −54 and −67; women −71 vs men −48. The −40 for the less-than-year-12 cell reads against year-12's −68.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Very favourable",
+       "ordinal": 1,
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Mostly favourable",
+       "ordinal": 2,
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Neither favourable nor unfavourable",
+       "ordinal": 3,
+       "values": [
+        12
+       ]
+      },
+      {
+       "name": "Mostly unfavourable",
+       "ordinal": 4,
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Very unfavourable",
+       "ordinal": 5,
+       "values": [
+        62
+       ]
+      },
+      {
+       "name": "Not sure",
+       "ordinal": 6,
+       "values": [
+        1
+       ]
+      },
+      {
+       "name": "I have not heard of them",
+       "ordinal": 7,
+       "values": [
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by federal vote intention — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Labor",
+       "ordinal": 1,
+       "values": [
+        -80
+       ]
+      },
+      {
+       "name": "Liberal",
+       "ordinal": 2,
+       "values": [
+        -56
+       ]
+      },
+      {
+       "name": "CLP/LNP/Nat",
+       "ordinal": 3,
+       "values": [
+        -81
+       ]
+      },
+      {
+       "name": "One Nation",
+       "ordinal": 4,
+       "values": [
+        -20
+       ]
+      },
+      {
+       "name": "Greens",
+       "ordinal": 5,
+       "values": [
+        -91
+       ]
+      },
+      {
+       "name": "Other parties and candidates",
+       "ordinal": 6,
+       "values": [
+        -68
+       ]
+      },
+      {
+       "name": "Undecided / will not vote",
+       "ordinal": 7,
+       "values": [
+        -79
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by vote softness — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Solid",
+       "ordinal": 1,
+       "values": [
+        -51
+       ]
+      },
+      {
+       "name": "Soft",
+       "ordinal": 2,
+       "values": [
+        -60
+       ]
+      },
+      {
+       "name": "Very soft",
+       "ordinal": 3,
+       "values": [
+        -78
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by generation — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Gen-Z",
+       "ordinal": 1,
+       "values": [
+        -58
+       ]
+      },
+      {
+       "name": "Millennials",
+       "ordinal": 2,
+       "values": [
+        -57
+       ]
+      },
+      {
+       "name": "Gen-X",
+       "ordinal": 3,
+       "values": [
+        -54
+       ]
+      },
+      {
+       "name": "Baby Boomers",
+       "ordinal": 4,
+       "values": [
+        -67
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by gender — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Women",
+       "ordinal": 1,
+       "values": [
+        -71
+       ]
+      },
+      {
+       "name": "Men",
+       "ordinal": 2,
+       "values": [
+        -48
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by location — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Inner Metropolitan",
+       "ordinal": 1,
+       "values": [
+        -65
+       ]
+      },
+      {
+       "name": "Outer Metropolitan",
+       "ordinal": 2,
+       "values": [
+        -57
+       ]
+      },
+      {
+       "name": "Provincial",
+       "ordinal": 3,
+       "values": [
+        -62
+       ]
+      },
+      {
+       "name": "Rural",
+       "ordinal": 4,
+       "values": [
+        -59
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by education — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Less than year 12",
+       "ordinal": 1,
+       "values": [
+        -40
+       ]
+      },
+      {
+       "name": "Year 12 or equivalent",
+       "ordinal": 2,
+       "values": [
+        -68
+       ]
+      },
+      {
+       "name": "TAFE, trade or vocational",
+       "ordinal": 3,
+       "values": [
+        -64
+       ]
+      },
+      {
+       "name": "University degree",
+       "ordinal": 4,
+       "values": [
+        -58
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Net favourability by home ownership — printed net column of Table 11",
+     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF p. 37)",
+     "entities": [
+      {
+       "name": "Owned outright",
+       "ordinal": 1,
+       "values": [
+        -59
+       ]
+      },
+      {
+       "name": "Owned with a mortgage",
+       "ordinal": 2,
+       "values": [
+        -59
+       ]
+      },
+      {
+       "name": "Renting and other",
+       "ordinal": 3,
+       "values": [
+        -64
+       ]
+      }
      ]
     }
    ]

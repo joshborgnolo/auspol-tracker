@@ -1,7 +1,7 @@
 {
  "_about": "SEC Newgate 'Mood of the Nation' one-off and rotating survey questions that do NOT channel into the auspol-tracker data model (voting intention/leader trackers are not SEC Newgate products; national direction IS channelled via polls.json direction[] and is excluded, as are the committed mood/priority pipelines). Compiled by reading the seven committed report text dumps in .build/secnewgate-src/ (Jul 2025 through Sep 2026, waves 21-27); waves before 21 are unaudited and stay out.",
  "generated": "2026-10-17",
- "_readme": "Two-store convention: a question gets ONE id; every wave that asked it files a dated reading under it (identical ids across waves are the series, e.g. immigration-level in waves 24/26/27). Entry metadata (waveDate/sample/published/url/methodUrl) comes from the matching polls.json direction[] row for the wave. Every figure in every table was token-verified present in the report text dump at filing time; notes cite value orders inline. Rendering contract (read before editing): tables[0] is always width-1 (one value per entity) so the /ad-hocs/ headline strip renders it as labelled bars; multi-value tables carry 'columns' parallel to 'values'; gen-data.mjs maps columns->headers and entities->rows like the News24 store. Width-1 tables may omit 'columns'. width-1 headline tables whose rows were derived from a wider printed row mark the derivation in their title.",
+ "_readme": "Two-store convention: a question gets ONE id; every wave that asked it files a dated reading under it (identical ids across waves are the series, e.g. immigration-level in waves 24/26/27). Entry metadata (waveDate/sample/published/url/methodUrl) comes from the matching polls.json direction[] row for the wave. Every figure in every table was token-verified present in the report text dump at filing time; notes cite value orders inline. Rendering contract (read before editing): tables[0] is always width-1 (one value per entity) so the /ad-hocs/ headline strip renders it as labelled bars; multi-value tables carry 'columns' parallel to 'values'; gen-data.mjs maps columns->headers and entities->rows like the News24 store. Width-1 tables may omit 'columns'. width-1 headline tables whose rows were derived from a wider printed row mark the derivation in their title. trump-sentiment (filed 2026-10-17 at user request for the cross-house Trump series): the standing sentiment module (old N22 renumbered N24 then N30) printed as a chart strip only in each report; all seven waves' totals and scale rows are printed in the reports' 'Level of positivity or negativity' trend strips and token-verified. Total columns are the report's own printed TOTAL POSITIVE/NEGATIVE (July 2025's printed totals 15/70 are rounded before its scale rows). No demographic table is printed for this module; highlights quoted in notes come from each report's section prose.",
  "entries": [
   {
    "id": "fed-govt-priorities",
@@ -5735,6 +5735,468 @@
        "name": "Oppose (total)",
        "values": [
         28
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2025-07-16",
+   "dateStart": "2025-07-08",
+   "dateEnd": "2025-07-16",
+   "published": "2025-07-29T16:58",
+   "sample": 1855,
+   "sampleEff": 1187,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf",
+   "codes": [
+    "N22"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "First read of the series, nine months into Trump's second term: most Australians (70%) feel negative towards him, over half (55%) very negative; only 15% positive. Positivity somewhat higher among people in regional areas, men and Coalition supporters (report prose). Asked as N22 (\"Overall, do you feel positive or negative towards US President Donald Trump?\").",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        70
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        55
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2025-09-15",
+   "dateStart": "2025-09-09",
+   "dateEnd": "2025-09-15",
+   "published": "2025-09-24T11:16",
+   "sample": 1212,
+   "sampleEff": 970,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/SEC-Newgate-Mood-of-the-Nation-Report-September-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf",
+   "codes": [
+    "N22"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "Negativity eases to 65% (from 70% in July); 17% positive, 18% neither. Positivity higher among Coalition supporters (24%), men (20%) and regional Australians (20%).",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        65
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        52
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "His best read of the series: 21% positive (8% very, 13% somewhat), 60% negative (18% somewhat, 41% very), 19% neither.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        60
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        8
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        41
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N30"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "Back down to 16% positive / 67% negative in the February 2026 wave (now asked as N30, \"Overall, how do you feel towards the US President Donald Trump?\").",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        67
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        53
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "N30"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "14% positive / 71% negative; 56% very negative.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        71
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        56
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N30"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "Series-worst tie: 14% positive / 72% negative; just 4% very positive.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        72
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        56
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N30"
+   ],
+   "question": "Overall, how do you feel towards the US President Donald Trump?",
+   "notes": "Australians again feel overwhelmingly negative (69%; 54% very negative); 16% positive. Four in ten One Nation supporters (41%) feel positive towards him, as do 20% of men.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF pp. 30-31 (chart strip)",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        69
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        54
        ]
       }
      ]

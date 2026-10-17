@@ -288,6 +288,7 @@ export const THEME_OF = {
   "relationships-with-countries": "security-world",
   "trump-favourability": "security-world",
   "trump-presidency-impact": "security-world",
+  "trump-sentiment": "security-world",
   "us-alignment": "security-world",
   "us-tariff-pressures": "security-world",
   "us-tariffs-response": "security-world",

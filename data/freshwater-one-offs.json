@@ -1,0 +1,608 @@
+{
+ "_about": "Freshwater Strategy (News Corp federal polling) one-off and rotating survey questions that do NOT channel into the auspol-tracker data model (voting intention and 2PP are channelled onto the five Freshwater polls.json rows Oct 2025-May 2026). Compiled by reading the five published data-table workbooks (xlsx) linked from freshwaterstrategy.com's polling-data posts, Oct 2025 through May 2026; the /ad-hocs/ Trump favourability series is currently the store's only series, filed at user request 2026-10-17.",
+ "generated": "2026-10-17",
+ "_readme": "Verification: every grid share and every net-score cell was read programmatically from the published xlsx files (weighted columns) and the five wave totals reconcile Favourable minus Unfavourable = printed NET Total to the first decimal. The question stem, verbatim: 'Below are a list of figures in Australian politics and culture. For each can you say whether you have heard of them, and if so, whether you have a favourable, unfavourable or neutral view of them?' - Trump is one row of that standing heard-of grid, which is why row shares sit in tables[0] with the workbook's own column labels and one decimal place. The NET-by-group table is the workbook's printed 'NET: ... by CROSSBREAKS' row for Trump (a printed Freshwater artefact, not a tracker derivation); crossbreak sets differ by wave (the Oct 2025 wave's age bands are 18-35/36-53/54+, later waves 18-34/35-54/55+; vote intention columns are 2025 recalled vote in Oct 2025/Jan 2026 and current vote intention from Mar 2026). Entry metadata (waveDate/dateStart/published/sample/url) comes from the matching federal polls.json row; the client article named in each note is the polls.json url while the figures live in Freshwater's own data-tables post (tables' source). Inter-wave comparison is legitimate for the headline four rows only - crossbreak definitions shift. The single standing-news-cycle favourability grid means no other Freshwater question is filed here yet.",
+ "entries": [
+  {
+   "id": "trump-favourability",
+   "waveDate": "2025-10-20",
+   "dateStart": "2025-10-15",
+   "dateEnd": "2025-10-20",
+   "published": "2025-11-01T05:00",
+   "sample": 1530,
+   "url": "https://www.dailytelegraph.com.au/news/national/immigration-fears-surge-among-aussies-as-one-nation-doubles-support-in-new-poll/news-story/710198b07f75a61a6e0168d1afca4c22",
+   "question": "Donald Trump favourability",
+   "notes": "Nine months into Trump's second term: 24.9% favourable vs 60.9% unfavourable (net -36.0), 13.6% neutral or unsure, and 0.6% have never heard of him. Warmest cohorts are 2025 Coalition voters (net -5.0) and One Nation voters (exactly even, 0.0); coldest are 2025 Greens voters (-68.9) and the residual-state 'Other' group (-57.7). Figures carry the tables' one decimal; the net column is the xlsx's printed NET row.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://freshwaterstrategy.com/2025/11/10/daily-telegraph-freshwater-strategy-october-polling-data/",
+     "rows": [
+      [
+       "Favourable",
+       24.9
+      ],
+      [
+       "Neutral / Unsure",
+       13.6
+      ],
+      [
+       "Unfavourable",
+       60.9
+      ],
+      [
+       "Never heard of",
+       0.6
+      ]
+     ]
+    },
+    {
+     "title": "Net favourability (favourable share minus unfavourable share), by group",
+     "source": "https://freshwaterstrategy.com/2025/11/10/daily-telegraph-freshwater-strategy-october-polling-data/",
+     "rows": [
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-01-18",
+   "dateStart": "2026-01-16",
+   "dateEnd": "2026-01-18",
+   "published": "2026-01-21T05:00",
+   "sample": 1050,
+   "url": "https://www.heraldsun.com.au/news/national/one-nation-support-surges-as-new-poll-reveals-voter-fears-over-immigration-and-crime/news-story/6fcdf878561d6d3b09afa88e2b60e267",
+   "question": "Donald Trump favourability",
+   "notes": "20.8% favourable vs 65.3% unfavourable (net -44.5). 2025 One Nation voters are the only cohort in the series net positive on him (+12.0); women net -58.5 vs men -29.9; 55+ voters -52.1 vs 35-54s -38.4.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://freshwaterstrategy.com/2026/02/02/news-australia-freshwater-strategy-january-polling-data/",
+     "rows": [
+      [
+       "Favourable",
+       20.8
+      ],
+      [
+       "Neutral / Unsure",
+       13.3
+      ],
+      [
+       "Unfavourable",
+       65.3
+      ],
+      [
+       "Never heard of",
+       0.7
+      ]
+     ]
+    },
+    {
+     "title": "Net favourability (favourable share minus unfavourable share), by group",
+     "source": "https://freshwaterstrategy.com/2026/02/02/news-australia-freshwater-strategy-january-polling-data/",
+     "rows": [
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-03-29",
+   "dateStart": "2026-03-27",
+   "dateEnd": "2026-03-29",
+   "published": "2026-04-15",
+   "sample": 1050,
+   "url": "https://freshwaterstrategy.com/2026/04/15/news-australia-freshwater-strategy-march-polling-data/",
+   "question": "Donald Trump favourability",
+   "notes": "20.0% favourable vs 65.5% unfavourable (net -45.5); 'never heard of him' ticks to 1.1%. One Nation voters again his warmest (net -16.9), current Greens voters the coldest (-69.9); women net -64.2 vs men -25.8. From this wave the vote crossbreaks read current vote intention rather than 2025 vote.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://freshwaterstrategy.com/2026/04/15/news-australia-freshwater-strategy-march-polling-data/",
+     "rows": [
+      [
+       "Favourable",
+       20.0
+      ],
+      [
+       "Neutral / Unsure",
+       13.5
+      ],
+      [
+       "Unfavourable",
+       65.5
+      ],
+      [
+       "Never heard of",
+       1.1
+      ]
+     ]
+    },
+    {
+     "title": "Net favourability (favourable share minus unfavourable share), by group",
+     "source": "https://freshwaterstrategy.com/2026/04/15/news-australia-freshwater-strategy-march-polling-data/",
+     "rows": [
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-04-30",
+   "dateStart": "2026-04-28",
+   "dateEnd": "2026-04-30",
+   "published": "2026-05-03T00:00",
+   "sample": 1046,
+   "url": "https://www.couriermail.com.au/news/queensland/voters-turn-on-albanese-government-over-key-crises-new-poll-reveals/news-story/23eb5a933e38dc96d1b4d53db8cc7bc6",
+   "question": "Donald Trump favourability",
+   "notes": "His series low: 17.9% favourable vs 68.9% unfavourable (net -51.0). One Nation voters net -16.4; Greens voters -81.0; women -58.9 vs men -42.6. This wave's tables carry no income crossbreaks.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://freshwaterstrategy.com/2026/05/07/news-australia-freshwater-strategy-april-polling-data/",
+     "rows": [
+      [
+       "Favourable",
+       17.9
+      ],
+      [
+       "Neutral / Unsure",
+       12.7
+      ],
+      [
+       "Unfavourable",
+       68.9
+      ],
+      [
+       "Never heard of",
+       0.6
+      ]
+     ]
+    },
+    {
+     "title": "Net favourability (favourable share minus unfavourable share), by group",
+     "source": "https://freshwaterstrategy.com/2026/05/07/news-australia-freshwater-strategy-april-polling-data/",
+     "rows": [
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-favourability",
+   "waveDate": "2026-05-15",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-15",
+   "published": "2026-05-17T04:00",
+   "sample": 1384,
+   "url": "https://www.thechronicle.com.au/business/economy/australian-economy/albaneses-budget-a-lead-balloon-as-voter-trust-in-government-collapses/news-story/b0272a6f164f3904c0064360f5bb148d",
+   "question": "Donald Trump favourability",
+   "notes": "20.0% favourable vs 67.1% unfavourable (net -47.1). One Nation voters net -21.4, Liberal-National voters -31.0, Labor -59.5; investment-property owners noticeably warmer (-27.2) than non-owners (-50.9).",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://freshwaterstrategy.com/2026/05/22/news-australia-freshwater-strategy-may-polling-data/",
+     "rows": [
+      [
+       "Favourable",
+       20.0
+      ],
+      [
+       "Neutral / Unsure",
+       12.3
+      ],
+      [
+       "Unfavourable",
+       67.1
+      ],
+      [
+       "Never heard of",
+       0.6
+      ]
+     ]
+    },
+    {
+     "title": "Net favourability (favourable share minus unfavourable share), by group",
+     "source": "https://freshwaterstrategy.com/2026/05/22/news-australia-freshwater-strategy-may-polling-data/",
+     "rows": [
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ],
+      [
+       "name",
+       "values"
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

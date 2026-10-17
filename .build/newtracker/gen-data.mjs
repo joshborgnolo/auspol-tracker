@@ -7131,11 +7131,12 @@ const changelog = JUR ? null : (() => {
 
 /* ---- §8e the ad hoc topical and issue questions ---------------------------
    The /ad-hocs/ page (the ☰ menu's sixth page, 2026-10-17): every one-off
-   and rotating question the five catalogued houses have asked outside the
+   and rotating question the six catalogued houses have asked outside the
    standing battery, grouped on adhoc-themes.mjs's shared map. The stores are
    hand-curated research products (data/news24-one-offs.json,
    data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
-   data/essential-one-offs.json, data/resolve-one-offs.json); this block
+   data/essential-one-offs.json, data/resolve-one-offs.json,
+   data/freshwater-one-offs.json); this block
    re-shapes them into the page's
    fetch payload, trimming whatever the page never reads (RedBridge's
    quotedFigure/snippetHaystack verification artefacts, News24's embed ids
@@ -7219,6 +7220,21 @@ const oneOffsSource = JUR ? null : (() => {
   for (const e of read("resolve-one-offs.json", (j) => j.entries || [])) {
     entries.push({
       house: "resolve", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: null, note: e.notes || null,
+      proseOnly: false, wordingSource: null,
+      url: e.url || null,
+      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
+        headers: t.headers || null, rows: t.rows || [] })),
+      prose: [],
+    });
+  }
+  /* Freshwater Strategy (News Corp): hand-curated from the news reports'
+     printed figures, same pass-through shape as Essential/Resolve. */
+  for (const e of read("freshwater-one-offs.json", (j) => j.entries || [])) {
+    entries.push({
+      house: "freshwater", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
       dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
       question: e.question, options: null, note: e.notes || null,

@@ -1,12 +1,13 @@
 // ====================================================================
 // AD HOC TOPICAL & ISSUE QUESTIONS – the fifth menu page
 // ====================================================================
-/* The catalogue of one-off and occasional reads: every question the five
+/* The catalogue of one-off and occasional reads: every question the six
    covered houses asked outside the standing battery (voting intention,
    leader ratings, preferred prime minister). The payload is the
    oneoffs-source sidecar gen-data emits from data/news24-one-offs.json,
    data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
-   data/essential-one-offs.json and data/resolve-one-offs.json – fetched
+   data/essential-one-offs.json, data/resolve-one-offs.json and
+   data/freshwater-one-offs.json – fetched
    lazily like the cycle source, since nobody but this page reads it. Themes arrive ordered in the
    payload (adhoc-themes.mjs is the single source of truth, and gen-data
    fails the build on a question it cannot place), so the page trusts the
@@ -23,6 +24,7 @@ const AO_HOUSES = {
   secnewgate: { short: "SEC Newgate", full: "SEC Newgate – Mood of the Nation" },
   essential: { short: "Essential Report", full: "Essential Report" },
   resolve: { short: "Resolve", full: "Resolve Political Monitor" },
+  freshwater: { short: "Freshwater", full: "Freshwater Strategy – News Corp" },
 };
 
 const aoDay = (iso) => {
@@ -199,7 +201,7 @@ function RdAoEntries() {
   if (!qCount) {
     return (
       <section className="ao" id="ad-hocs">
-        <p className="ao-note">No one-off questions are on file yet. As YouGov – News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report and Resolve Political Monitor polls publish their first ad hoc questions, they will appear here grouped by theme.</p>
+        <p className="ao-note">No one-off questions are on file yet. As YouGov – News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor and Freshwater Strategy polls publish their first ad hoc questions, they will appear here grouped by theme.</p>
       </section>
     );
   }
@@ -210,7 +212,7 @@ function RdAoEntries() {
         <span>{themes.length + " themes"}</span>
         <span>{qCount + " questions"}</span>
         <span>{wCount + " waves"}</span>
-        <span>{"YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report and the Resolve Political Monitor in The Sydney Morning Herald and The Age"}</span>
+        <span>{"YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy's News Corp polls"}</span>
       </div>
       {themes.map((t) => (
         <div className="ao-theme" key={t.id}>
@@ -250,7 +252,7 @@ function RdAdhocs() {
         <span className="rd-meta">The one-offs beyond the standing battery</span>
       </div>
       <RdHed head="Asked once, about the issue of the moment"
-        dek="Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov’s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate’s Mood of the Nation, the fortnightly Essential Report and the Resolve Political Monitor in The Sydney Morning Herald and The Age, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs." />
+        dek="Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov’s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate’s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy’s polls in News Corp’s mastheads, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs." />
       <RdAoEntries />
     </section>
   );
