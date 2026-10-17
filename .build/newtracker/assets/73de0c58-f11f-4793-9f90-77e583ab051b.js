@@ -1974,14 +1974,15 @@ const TABS = [
     tip: "Where minor-party preferences are flowing now, against the last election" },
   { id: "flows-explained", label: "Preference flows explained", menu: true,
     tip: "How preferences decide the two-party figure" },
-  /* the /ad-hocs/ catalogue (one-off topical and issue questions) was the
-     fifth page for a day, hidden 2026-10-17 (user call) – not deleted: its
-     machinery (rd-adhocs.jsx, the one-offs sidecar, the MenuPageView mounts
-     and the build's ssAdhocsBlock) stays in the tree, and re-showing the
-     page is the revert of the hide commit */
-  /* the change log as the ☰ menu's fifth page (2026-10-15): it used to sit
+  /* the ad hoc topical and issue questions as the ☰ menu's fifth page
+     (2026-10-17): the one-off and occasional questions pollsters ask beyond
+     the standing battery, from the four committed one-off stores, grouped by
+     theme – hidden for part of its first day and re-shown (user calls) */
+  { id: "ad-hocs", label: "Ad hoc topical/issue questions", menu: true,
+    tip: "The one-off questions pollsters ask beyond the standing battery, grouped by theme" },
+  /* the change log as the ☰ menu's sixth page (2026-10-15): it used to sit
      inside the Info tab as the about-block list; now it is a page of
-     TABS like the four above */
+     TABS like the five above */
   { id: "changelog", label: "Changelog", menu: true,
     tip: "What has moved the aggregate and each finding, entry by entry" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
@@ -1998,10 +1999,12 @@ const TABS = [
 /* a page with no past terms in its cycle data (/vic/, until its earlier
    terms' polls are gathered) has no Past cycles tab */
 if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1);
-/* the preference-flows explainer and the change log are federal-only:
-   build.mjs emits no vic/ document for either to open (the Vic build's flow
-   settings and contests differ, and Vic never writes data/changelog.json) */
+/* the preference-flows explainer, the ad hocs catalogue and the change log
+   are federal-only: build.mjs emits no vic/ document for any of them to
+   open (the Vic build's flow settings and contests differ, vic has no
+   one-off stores, and Vic never writes data/changelog.json) */
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "ad-hocs"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map((t) => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu).map((t) => [t.id, t]));

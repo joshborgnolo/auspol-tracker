@@ -3259,7 +3259,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
 }
-.ao-chip-news24, .ao-chip-redbridge { color: var(--ink-2); }
+.ao-chip-news24, .ao-chip-redbridge, .ao-chip-secnewgate, .ao-chip-essential { color: var(--ink-2); }
 .ao-wave { margin-top: 12px; }
 .ao-wmeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-size: 12.5px; color: var(--ink-3); }
 .ao-whouse { color: var(--ink-2); font-weight: 600; }
@@ -63397,6 +63397,14 @@ const AO_HOUSES = {
   redbridge: {
     short: "RedBridge/Accent",
     full: "RedBridge/Accent – AFR"
+  },
+  secnewgate: {
+    short: "SEC Newgate",
+    full: "SEC Newgate – Mood of the Nation"
+  },
+  essential: {
+    short: "Essential Report",
+    full: "Essential Report"
   }
 };
 const aoDay = iso => {
@@ -63583,7 +63591,7 @@ function RdAoEntries() {
       id: "ad-hocs"
     }, React.createElement("p", {
       className: "ao-note"
-    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse and RedBridge/Accent polls publish their first ad hoc questions, they will appear here grouped by theme."));
+    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse, RedBridge/Accent, SEC Newgate and Essential Report polls publish their first ad hoc questions, they will appear here grouped by theme."));
   }
   const wCount = (src.entries || []).length;
   return React.createElement("section", {
@@ -63591,7 +63599,7 @@ function RdAoEntries() {
     id: "ad-hocs"
   }, React.createElement("div", {
     className: "ao-legend"
-  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse and RedBridge/Accent (via the AFR)")), themes.map(t => React.createElement("div", {
+  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation and the Essential Report")), themes.map(t => React.createElement("div", {
     className: "ao-theme",
     key: t.id
   }, React.createElement("h3", {
@@ -63639,7 +63647,7 @@ function RdAdhocs() {
     className: "rd-meta"
   }, "The one-offs beyond the standing battery")), React.createElement(RdHed, {
     head: "Asked once, about the issue of the moment",
-    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse and RedBridge/Accent (published in the Australian Financial Review), grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
+    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate\u2019s Mood of the Nation and the fortnightly Essential Report, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
   }), React.createElement(RdAoEntries, null));
 }
 const RdAdhocsM = React.memo(RdAdhocs);
@@ -65319,6 +65327,11 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
+  id: "ad-hocs",
+  label: "Ad hoc topical/issue questions",
+  menu: true,
+  tip: "The one-off questions pollsters ask beyond the standing battery, grouped by theme"
+}, {
   id: "changelog",
   label: "Changelog",
   menu: true,
@@ -65331,6 +65344,7 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "ad-hocs"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));

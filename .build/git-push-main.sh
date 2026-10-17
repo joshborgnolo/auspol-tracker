@@ -300,14 +300,14 @@ freshness_sync() {
 # data/income-dist.json joined 2026-10-16 with the Who-votes Income tab's
 # standardised pooling: gen-data reads it every build, so a data commit
 # must carry it alongside the other generated files or a fresh clone's
-# build emits the roster without the income tab. The ad-hocs catalogue's
-# document joined 2026-10-17 with the ☰ menu's Ad hocs page and left the
-# list the same day, when the page was hidden (user call); it rejoins on
-# the re-show.
+# build emits the roster without the income tab. ad-hocs/index.html joined
+# 2026-10-17 with the ☰ menu's Ad hocs catalogue page; hidden for part of
+# its first day (user call), it rejoined when the page was re-shown.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   disagreement/index.html leans/index.html flows/index.html
   flows-explained/index.html preference-flows/index.html
+  ad-hocs/index.html
   vic/allpolls/index.html vic/info/index.html
   vic/disagreement/index.html vic/leans/index.html vic/flows/index.html
   changelog/index.html
