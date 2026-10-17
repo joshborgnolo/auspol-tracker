@@ -506,7 +506,10 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
             /* the ☰: the menu pages, and Info wherever the bar has had to
                drop its tab. It is the bar's last item, so it rides the
                pinned condense with the tabs. On a menu page it carries the
-               active underline, and from a tablet up it names the page. */
+               active underline. Where the bar has room (≥641px, CSS) the
+               icon gives way to the word "More" and a chevron that flips
+               while the menu is open; on a menu page the word names the
+               page instead. */
             <button type="button" ref={menuBtn}
                     className={"tab tab-menu" + (menuActive ? " active" : "") + (menuOpen ? " open" : "")}
                     aria-haspopup="menu" aria-expanded={menuOpen} aria-controls="tab-menu-pop"
@@ -521,7 +524,10 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
               <svg className="tab-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
                 <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" fill="none"></path>
               </svg>
-              {menuActive && <span className="tab-label tab-menu-lab">{menuActive.label}</span>}
+              <span className="tab-label tab-menu-lab">{menuActive ? menuActive.label : "More"}</span>
+              <svg className="tab-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true">
+                <path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
+              </svg>
             </button>
           )}
           </div>
@@ -7315,7 +7321,7 @@ function infoTerms(D) {
       predicts each new poll from the polls before it. Each figure gets its own lean, since a
       pollster that leans to Labor on the two-party figure need not on a primary vote. The
       aggregate subtracts the lean as it stood at the time of each figure.
-      {" "}The Pollster leans page, in the ☰ menu, shows each pollster’s {xref("house-lean", "house effect", "house lean")}.
+      {" "}The Pollster leans page, in the More menu, shows each pollster’s {xref("house-lean", "house effect", "house lean")}.
       {working(<span className="info-p">A pollster’s lean is Σvⱼgⱼ ÷ (Σvⱼ + {shrinkK}) over its
         polls, where gⱼ is a poll’s gap to the sample-weighted average of other pollsters’ polls
         within 28 days of it (at least three of them), and vⱼ = 2^(−a/90), with a the poll’s age
@@ -7470,7 +7476,7 @@ function infoTerms(D) {
           uses its own {xref("fp-flows", "preference flows", "Labor v One Nation flows")}, estimated
           because no election has counted that pairing.
           <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-          page, in the ☰ menu, checks two ways, one contest at a time. It sets what each party’s voters
+          page, in the More menu, checks two ways, one contest at a time. It sets what each party’s voters
           tell pollsters, when asked to choose between the final two, beside the flows the site
           assumes. And it watches the pollsters’ own two-party figures, which come largely from where
           their respondents say their preferences would go: if those drift from where the pollster’s
@@ -8184,7 +8190,7 @@ function infoTerms(D) {
         lean alongside the line, from all its polls, and takes it out; the leans average zero
         across the polls. A lean measured from few polls is shrunk toward zero. Each line gets its
         own leans, since a pollster that leans to Labor on the two-party figure need not on a
-        primary vote. The Pollster leans page, in the ☰ menu, traces each
+        primary vote. The Pollster leans page, in the More menu, traces each
         pollster’s lean month by month, measured the federal page’s way.</>) },
       method.find((m) => m.id === "monthly-average"),
       { id: "interval", term: "95% interval", body: (
@@ -8320,7 +8326,7 @@ function infoTerms(D) {
             One Nation won 0.3% in {eY}, too little to measure, so its flow is the 2025 federal
             election’s: {pct(FL.onp)} to Labor.
             <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-            page, in the ☰ menu, checks. The pollsters’ own two-party figures come largely from where
+            page, in the More menu, checks. The pollsters’ own two-party figures come largely from where
             their respondents say their preferences would go, so if those drift from where the
             pollster’s primary votes and the {eY} flows put them, voters may be sending preferences
             differently. The check corrects no other figure.</span></>) },

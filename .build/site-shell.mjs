@@ -285,6 +285,9 @@ const SHELL_V = () => createHash("sha256").update(shellCss() + "\n//\n" + shellJ
    `menu` still flips the ☰ button's active styling when a satellite IS a
    menu page (none today). */
 const SHELL_MENU_ICON = '<svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"></path></svg>';
+/* ≥641px the icon steps aside for the word "More" and a chevron (the main
+   bar's rule, template.html's .tab.tab-menu gate) */
+const SHELL_MENU_CHEV = '<svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
 function shellMenu(menu) {
   const info = TABS.find((t) => t.pinHide && !t.menu);
   const item = (cls, href, cur, t, d, id) => `<a role="menuitem" tabindex="-1" class="sh-menu-item${cls}${cur ? " on" : ""}" href="${href}"`
@@ -357,7 +360,7 @@ export function shellHeader({ tab, menu } = {}) {
     <div class="sh-tabs-inner">
       <div class="sh-tabs-set">
         ${tabs}
-        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages">${SHELL_MENU_ICON}</button>
+        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages">${SHELL_MENU_ICON}<span class="sh-menu-lab">More</span>${SHELL_MENU_CHEV}</button>
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
@@ -756,6 +759,16 @@ body { height: auto; }
 .sh-menu-btn:not(.active):hover::after { transform: scaleX(0); }
 .sh-menu-btn:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: -4px; border-radius: 4px; }
 .sh-menu-ic { display: block; }
+/* ≥641px the word and chevron replace the icon (the main page's .tab.tab-menu
+   gate) */
+.sh-menu-lab, .sh-menu-chev { display: none; }
+@media (min-width: 641px) {
+  .sh-menu-btn .sh-menu-ic { display: none; }
+  .sh-menu-btn .sh-menu-lab { display: inline; }
+  .sh-menu-btn .sh-menu-chev { display: block; margin-left: 4px; opacity: 0.55; }
+}
+.sh-menu-chev { transition: transform 0.18s ease; }
+.sh-menu-btn[aria-expanded="true"] .sh-menu-chev { transform: rotate(180deg); }
 .sh-menu {
   position: absolute; z-index: 2; top: 100%; right: 0;
   display: flex; flex-direction: column;

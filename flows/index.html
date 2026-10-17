@@ -2225,7 +2225,13 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 .tab.tab-menu:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: -4px; border-radius: 4px; }
 .tab-menu-ic { display: block; flex: none; }
 .tab-menu-lab { display: none; }
-@media (min-width: 641px) { .tab.tab-menu.active .tab-menu-lab { display: inline; } }
+.tab-menu-chev { display: none; flex: none; margin-left: -3px; opacity: 0.55; transition: transform 0.18s ease; }
+.tab.tab-menu.open .tab-menu-chev { transform: rotate(180deg); }
+@media (min-width: 641px) {
+  .tab.tab-menu .tab-menu-ic { display: none; }
+  .tab.tab-menu .tab-menu-lab { display: inline; }
+  .tab.tab-menu .tab-menu-chev { display: block; }
+}
 .tab-menu-pop {
   position: absolute; z-index: 2; top: 100%; right: 0;
   display: flex; flex-direction: column;
@@ -101566,9 +101572,22 @@ function Tabs({
     strokeWidth: "1.7",
     strokeLinecap: "round",
     fill: "none"
-  })), menuActive && React.createElement("span", {
+  })), React.createElement("span", {
     className: "tab-label tab-menu-lab"
-  }, menuActive.label))), React.createElement(NextPollTicker, {
+  }, menuActive ? menuActive.label : "More"), React.createElement("svg", {
+    className: "tab-menu-chev",
+    viewBox: "0 0 10 6",
+    width: "9",
+    height: "6",
+    "aria-hidden": "true"
+  }, React.createElement("path", {
+    d: "M1.4 1.3l3.6 3.4 3.6-3.4",
+    stroke: "currentColor",
+    strokeWidth: "1.5",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    fill: "none"
+  })))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
   }), React.createElement(GlyphDial, {
     className: "tab-glyph",
@@ -108089,7 +108108,7 @@ function infoTerms(D) {
   }, {
     id: "house-effect",
     term: "House effect",
-    body: React.createElement(React.Fragment, null, "A pollster\u2019s consistent lean relative to the others. Each of its polls is compared with other pollsters\u2019 polls taken around the same time, and the gaps are pooled with a 90-day half-life, so the lean tracks the pollster\u2019s current methods. A lean measured from few polls is shrunk toward zero, as if joined by ", shrinkWord, " more polls sitting exactly on the others: a pollster with one recent poll keeps ", shrinkKeep(1), "% of its measured lean, one with four keeps ", shrinkKeep(4), "%, and one with ten keeps ", shrinkKeep(10), "%. That setting best predicts each new poll from the polls before it. Each figure gets its own lean, since a pollster that leans to Labor on the two-party figure need not on a primary vote. The aggregate subtracts the lean as it stood at the time of each figure.", " ", "The Pollster leans page, in the \u2630 menu, shows each pollster\u2019s ", xref("house-lean", "house effect", "house lean"), ".", working(React.createElement("span", {
+    body: React.createElement(React.Fragment, null, "A pollster\u2019s consistent lean relative to the others. Each of its polls is compared with other pollsters\u2019 polls taken around the same time, and the gaps are pooled with a 90-day half-life, so the lean tracks the pollster\u2019s current methods. A lean measured from few polls is shrunk toward zero, as if joined by ", shrinkWord, " more polls sitting exactly on the others: a pollster with one recent poll keeps ", shrinkKeep(1), "% of its measured lean, one with four keeps ", shrinkKeep(4), "%, and one with ten keeps ", shrinkKeep(10), "%. That setting best predicts each new poll from the polls before it. Each figure gets its own lean, since a pollster that leans to Labor on the two-party figure need not on a primary vote. The aggregate subtracts the lean as it stood at the time of each figure.", " ", "The Pollster leans page, in the More menu, shows each pollster\u2019s ", xref("house-lean", "house effect", "house lean"), ".", working(React.createElement("span", {
       className: "info-p"
     }, "A pollster\u2019s lean is \u03A3v\u2C7Cg\u2C7C \xF7 (\u03A3v\u2C7C + ", shrinkK, ") over its polls, where g\u2C7C is a poll\u2019s gap to the sample-weighted average of other pollsters\u2019 polls within 28 days of it (at least three of them), and v\u2C7C = 2^(\u2212a/90), with a the poll\u2019s age in days when the lean is read.")))
   }, {
@@ -108170,7 +108189,7 @@ function infoTerms(D) {
         className: "info-chart"
       }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows page, in the \u2630 menu, checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
+      }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows page, in the More menu, checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
     }, {
       id: "fp-flows",
       term: "Labor v One Nation flows",
@@ -108556,7 +108575,7 @@ function infoTerms(D) {
     }, {
       id: "house-effect",
       term: "House effect",
-      body: React.createElement(React.Fragment, null, "A pollster\u2019s consistent lean relative to the others. The trend estimates each pollster\u2019s lean alongside the line, from all its polls, and takes it out; the leans average zero across the polls. A lean measured from few polls is shrunk toward zero. Each line gets its own leans, since a pollster that leans to Labor on the two-party figure need not on a primary vote. The Pollster leans page, in the \u2630 menu, traces each pollster\u2019s lean month by month, measured the federal page\u2019s way.")
+      body: React.createElement(React.Fragment, null, "A pollster\u2019s consistent lean relative to the others. The trend estimates each pollster\u2019s lean alongside the line, from all its polls, and takes it out; the leans average zero across the polls. A lean measured from few polls is shrunk toward zero. Each line gets its own leans, since a pollster that leans to Labor on the two-party figure need not on a primary vote. The Pollster leans page, in the More menu, traces each pollster\u2019s lean month by month, measured the federal page\u2019s way.")
     }, method.find(m => m.id === "monthly-average"), {
       id: "interval",
       term: "95% interval",
@@ -108627,7 +108646,7 @@ function infoTerms(D) {
         term: "Preference flows",
         body: React.createElement(React.Fragment, null, "How minor-party votes split between the final two candidates once preferences are distributed. The ", xref("implied-2pp", "preference flows", "implied 2PP"), " against the Coalition uses the flows of the ", eY, " Victorian election: Greens ", pct(FL.grn), " and all others ", pct(FL.oth), " to Labor. The Victorian Electoral Commission publishes each district\u2019s count but no statewide flow by party, so the site measured them: the Greens\u2019 from the districts where Labor and the Coalition were the final two, and the others\u2019 set so that the official ", eY, " primary votes give the official 55.0\u201345.0 result. One Nation won 0.3% in ", eY, ", too little to measure, so its flow is the 2025 federal election\u2019s: ", pct(FL.onp), " to Labor.", React.createElement("span", {
           className: "info-p"
-        }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows page, in the \u2630 menu, checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the ", eY, " flows put them, voters may be sending preferences differently. The check corrects no other figure."))
+        }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows page, in the More menu, checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the ", eY, " flows put them, voters may be sending preferences differently. The check corrects no other figure."))
       }, {
         id: "fp-flows",
         term: "Labor v One Nation flows",
@@ -135450,7 +135469,7 @@ class RootBoundary extends React.Component {
 }
 const KBD_ROWS = [{
   keys: ["←", "→"],
-  what: "Turn the pages, the ☰ menu’s included"
+  what: "Turn the pages, the More menu’s included"
 }, {
   keys: ["⌥", "D"],
   what: "Dark mode, on or off — ⌥ is Alt on a PC"

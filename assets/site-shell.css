@@ -349,6 +349,16 @@ body { height: auto; }
 .sh-menu-btn:not(.active):hover::after { transform: scaleX(0); }
 .sh-menu-btn:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: -4px; border-radius: 4px; }
 .sh-menu-ic { display: block; }
+/* ≥641px the word and chevron replace the icon (the main page's .tab.tab-menu
+   gate) */
+.sh-menu-lab, .sh-menu-chev { display: none; }
+@media (min-width: 641px) {
+  .sh-menu-btn .sh-menu-ic { display: none; }
+  .sh-menu-btn .sh-menu-lab { display: inline; }
+  .sh-menu-btn .sh-menu-chev { display: block; margin-left: 4px; opacity: 0.55; }
+}
+.sh-menu-chev { transition: transform 0.18s ease; }
+.sh-menu-btn[aria-expanded="true"] .sh-menu-chev { transform: rotate(180deg); }
 .sh-menu {
   position: absolute; z-index: 2; top: 100%; right: 0;
   display: flex; flex-direction: column;

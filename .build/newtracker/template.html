@@ -3744,7 +3744,13 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 .tab.tab-menu:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: -4px; border-radius: 4px; }
 .tab-menu-ic { display: block; flex: none; }
 .tab-menu-lab { display: none; }
-@media (min-width: 641px) { .tab.tab-menu.active .tab-menu-lab { display: inline; } }
+.tab-menu-chev { display: none; flex: none; margin-left: -3px; opacity: 0.55; transition: transform 0.18s ease; }
+.tab.tab-menu.open .tab-menu-chev { transform: rotate(180deg); }
+@media (min-width: 641px) {
+  .tab.tab-menu .tab-menu-ic { display: none; }
+  .tab.tab-menu .tab-menu-lab { display: inline; }
+  .tab.tab-menu .tab-menu-chev { display: block; }
+}
 .tab-menu-pop {
   position: absolute; z-index: 2; top: 100%; right: 0;
   display: flex; flex-direction: column;

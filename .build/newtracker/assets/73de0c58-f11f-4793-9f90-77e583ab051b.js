@@ -2171,7 +2171,7 @@ class RootBoundary extends React.Component {
    keyboards, said once beside the one shortcut that needs it. */
 const KBD_ROWS = [
   /* /vic/ has no Past cycles (TABS above) and no demographics view */
-  { keys: ["←", "→"], what: "Turn the pages, the ☰ menu’s included" },
+  { keys: ["←", "→"], what: "Turn the pages, the More menu’s included" },
   { keys: ["⌥", "D"], what: "Dark mode, on or off — ⌥ is Alt on a PC" },
   { keys: ["C"], what: "Copy the chart or poll breakdown under the pointer as an image" },
   { keys: ["←", "→"], what: "Walk a card's tabs or chips while the pointer is over it" },
