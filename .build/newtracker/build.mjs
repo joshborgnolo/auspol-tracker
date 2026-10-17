@@ -917,7 +917,7 @@ function ssAdhocsBlock(esc) {
       const reads = [...waves].sort((a, b) => String(b.waveDate).localeCompare(String(a.waveDate)))
         .map((b) => `
         <div class="ao-ss-wave"><span class="ao-ss-date">${dateLabel(b)}</span>
-          ${b.rows.length ? `<p class="ao-ss-figs">${b.rows.map(([n, v]) => `<span class="ao-ss-fig"><b>${esc(String(n))}</b> ${fmt(v)}</span>`).join(" ")}</p>`
+          ${b.rows.length ? `<p class="ao-ss-figs">${b.rows.map(([n, v]) => `<span class="ao-ss-fig"><b>${esc(String(n))}</b>&#160;${fmt(v)}</span>`).join(" ")}</p>`
           : `<p class="ao-ss-note">Asked, but this wave&#8217;s figures are image-only or prose-reported; the live page links the source.</p>`}
         </div>`).join("");
       return `

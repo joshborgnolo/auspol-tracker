@@ -3256,8 +3256,8 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ao-theme { margin-top: 40px; padding-top: 14px; border-top: 2px solid var(--ink); }
 .ao-t-t { margin: 0; font-family: var(--sans); font-size: 20px; font-weight: 600; line-height: 1.25; letter-spacing: -0.005em; color: var(--ink); }
 .ao-t-dek { margin: 6px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
-.ao-qs { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px; }
-@media (min-width: 940px) { .ao-qs { grid-template-columns: 1fr 1fr; gap: 16px; } }
+.ao-qs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 16px; }
+@media (min-width: 940px) { .ao-qs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; } }
 .ao-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 12px; background: var(--surface); }
 .ao-q { margin: 0; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
 .ao-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -3304,7 +3304,6 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ao-ss-wave { margin: 10px 0; }
 .ao-ss-date { display: block; font-size: 12px; font-weight: 600; color: var(--ink-3); }
 .ao-ss-figs { margin: 2px 0 0; font-size: 13.5px; line-height: 1.75; }
-.ao-ss-fig { white-space: nowrap; }
 .ao-ss-fig b { font-weight: 600; }
 .ao-ss-note { font-size: 13px; color: var(--ink-3); }
 @media (max-width: 640px) {
