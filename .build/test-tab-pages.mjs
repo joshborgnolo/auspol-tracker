@@ -30,7 +30,9 @@ const TABS = [
   { id: "leans", label: "Pollster leans", h1: "Pollster leans", descFrag: "How each Australian federal pollster leans" },
   { id: "flows", label: "Preference flows", h1: "Preference flows", descFrag: "Where Australian federal preferences are flowing now" },
   { id: "flows-explained", label: "Preference flows explained", h1: "Preference flows explained", descFrag: "How preferences decide the Australian federal two-party figure" },
-  { id: "ad-hocs", label: "Ad hoc topical/issue questions", h1: "Ad hoc topical and issue questions", descFrag: "one-offs, grouped by theme with every figure and source" },
+  /* /ad-hocs/ (the one-off topical questions catalogue) is HIDDEN 2026-10-17
+     (user call) – it emits no document and rides no list below; the rd-adhocs.jsx
+     machinery asserts further down still stand for its re-show */
   { id: "changelog", label: "Changelog", h1: "Changelog", descFrag: "recorded entry by entry as new polls land" },
   { id: "info", label: "Info", h1: "About auspol tracker", descFrag: "How auspol tracker works" },
 ];
@@ -64,22 +66,24 @@ assert.ok(!read("vic/index.html").includes("window.AP_INITIAL_TAB="), "Vic's Now
 
 // ---- the sitemap and the push list -------------------------------------------------------
 const sm = read("sitemap.xml");
-for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "flows-explained/", "ad-hocs/", "changelog/", "info/",
+for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "flows-explained/", "changelog/", "info/",
                  "vic/allpolls/", "vic/disagreement/", "vic/leans/", "vic/flows/", "vic/info/"])
   assert.ok(sm.includes(`<loc>https://auspoltracker.com/${u}</loc>`), `the sitemap carries /${u}`);
 assert.ok(!sm.includes("preference-flows/"), "the retired explainer satellite left the sitemap (its stub redirects)");
 assert.ok(!sm.includes("vic/flows-explained/"), "the explainer is federal-only");
-assert.ok(!sm.includes("vic/ad-hocs/"), "the ad-hocs catalogue is federal-only");
+assert.ok(!sm.includes("ad-hocs/"), "the ad-hocs catalogue is hidden for now (2026-10-17) – no sitemap entry while it is");
 assert.ok(!sm.includes("vic/changelog/"), "the change log is federal-only (Vic never writes data/changelog.json)");
 assert.ok(!sm.includes("vic/cycles/"), "the sitemap does not foretell /vic/cycles/");
 const push = read(path.join(".build", "git-push-main.sh"));
 for (const f of ["cycles/index.html", "allpolls/index.html", "info/index.html",
                  "disagreement/index.html", "leans/index.html", "flows/index.html",
                  "flows-explained/index.html", "preference-flows/index.html",
-                 "ad-hocs/index.html", "changelog/index.html",
+                 "changelog/index.html",
                  "vic/allpolls/index.html", "vic/info/index.html",
                  "vic/disagreement/index.html", "vic/leans/index.html", "vic/flows/index.html"])
   assert.ok(push.includes(f), `SITE_FILES commits ${f} (a data refresh regenerates it)`);
+assert.ok(!push.includes("ad-hocs/index.html"),
+  "SITE_FILES stays clear of the hidden ad-hocs document (a `git add` there would error)");
 // vic/cycles/index.html can't be a plain SITE_FILES member until a Vic term closes (the
 // build only emits it then, and `git add` errors on a missing path) — it joins conditionally
 assert.ok(push.includes('if [[ -f vic/cycles/index.html ]]; then')
@@ -171,15 +175,18 @@ assert.ok(views.includes('href={window.AP.tabToPath ? window.AP.tabToPath(t.id) 
   "each tab renders as its own page's link");
 // ---- the ☰ menu's pages ------------------------------------------------------------------
 for (const [id, label] of [["disagreement", "Poll disagreement"], ["leans", "Pollster leans"], ["flows", "Preference flows"],
-                           ["flows-explained", "Preference flows explained"], ["ad-hocs", "Ad hoc topical/issue questions"],
+                           ["flows-explained", "Preference flows explained"],
                            ["changelog", "Changelog"]])
   assert.ok(hdr.includes(`{ id: "${id}", label: "${label}", menu: true,`), `${id} is a menu page in TABS`);
 // the explainer is federal-only: the Vic client splices its entry out of TABS
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);'),
   "the Vic client drops the flows-explained tab");
-// the ad-hocs catalogue is federal-only too (the one-off stores are federal)
-assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "ad-hocs"), 1);'),
-  "the Vic client drops the ad-hocs tab");
+// the ad-hocs catalogue is HIDDEN (2026-10-17): no TABS row anywhere, so no
+// Vic splice either (a splice of an absent id would cut the LAST tab)
+assert.ok(!hdr.includes('{ id: "ad-hocs"'),
+  "TABS holds no ad-hocs row while the page is hidden");
+assert.ok(!hdr.includes('TABS.splice(TABS.findIndex((t) => t.id === "ad-hocs")'),
+  "no ad-hocs JUR splice (with the row absent its findIndex is -1)");
 // the change log is federal-only too (Vic never writes data/changelog.json)
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);'),
   "the Vic client drops the changelog tab");

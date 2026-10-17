@@ -1183,25 +1183,9 @@ ${body.trim()}
       </div>
     </article>`;
   }
-  /* the ☰ menu's fifth page: the ad hoc topical and issue questions the two
-     one-off stores hold, grouped by theme into a static catalogue
-     (ssAdhocsBlock); the live tab renders the same grouping with the
-     crosstabs and folds (RdAdhocs, rd-adhocs.jsx). Federal only – /vic/'s
-     menu never holds it */
-  if (id === "ad-hocs") {
-    return `<article class="static-summary">
-  <h1>Ad hoc topical and issue questions</h1>
-  <p class="ss-sub">Beyond the standing battery &#8211; voting intention, leader ratings,
-    preferred prime minister &#8211; pollsters ask questions once: about the issue of the
-    moment, or a topic they never visit again. This page collects those one-off and
-    occasional questions from RedBridge/Accent (via the AFR) and YouGov&#8217;s News24
-    Pulse, grouped by theme, with every figure each wave published.</p>
-
-${ssAdhocsBlock(esc)}
-
-  ${ssTail(esc, sources)}
-</article>`;
-  }
+  /* the /ad-hocs/ page is hidden (2026-10-17): no document is emitted for
+     it, so it has no static branch here – ssAdhocsBlock stays in this file,
+     ready for the page's re-show (the revert of the hide commit) */
   /* the ☰ menu's pages: what each measures, in words; the figures are the
      live page's charts */
   const MENU_SS = {
@@ -1678,12 +1662,6 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
     ...(VIC ? [] : [{ id: "flows-explained", label: "Preference flows explained",
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     /* the ☰ menu's fifth page, straight under the explainer (the user's
-       2026-10-17 call: the topical one-off questions the pollsters ask
-       beyond the standing battery, from the two committed one-off stores –
-       federal only, /vic/'s menu never holds it) */
-    ...(VIC ? [] : [{ id: "ad-hocs", label: "Ad hoc topical/issue questions",
-      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent and YouGov News24 Pulse one-offs, grouped by theme with every figure and source." }]),
-    /* the ☰ menu's sixth page, straight under Ad hocs (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
        Info about-block's tail, then a console satellite at /changelog/;
        now a page of the build – federal only, /vic/ has no change log) */
@@ -1927,7 +1905,7 @@ const PREDICTION_STAMP = "2026-10-16";
    VIC_STAMP pattern below). Bump yours when a new tab page ships. */
 const TAB_STAMP = { cycles: "2026-10-11", allpolls: "2026-10-11", info: "2026-10-11",
   disagreement: "2026-10-15", leans: "2026-10-15", flows: "2026-10-15",
-  "flows-explained": "2026-10-15", "ad-hocs": "2026-10-17", changelog: "2026-10-12" };
+  "flows-explained": "2026-10-15", changelog: "2026-10-12" };
 const tabLastmod = (id) => (TAB_STAMP[id] || "") > dataStamp ? TAB_STAMP[id] : dataStamp;
 /* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
    dated as this page is, by its data – the newest Victorian poll's
@@ -1964,7 +1942,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <loc>${SITE_URL}</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
-${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "ad-hocs", "changelog"].map((id) => `  <url>
+${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "changelog"].map((id) => `  <url>
     <loc>${SITE_URL}${id}/</loc>
     <lastmod>${tabLastmod(id)}</lastmod>
   </url>`).join("\n")}

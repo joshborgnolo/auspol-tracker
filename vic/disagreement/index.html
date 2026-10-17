@@ -8028,6 +8028,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "why": "2pp"
   }];
   const lefTables = [{
+    "year": 1969,
+    "era": true,
+    "dlp": 0.2633,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -0.07
+  }, {
     "year": 1972,
     "era": true,
     "dlp": 0.2765,
@@ -65205,11 +65212,6 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
-  id: "ad-hocs",
-  label: "Ad hoc topical/issue questions",
-  menu: true,
-  tip: "The one-off questions pollsters ask beyond the standing battery, grouped by theme"
-}, {
   id: "changelog",
   label: "Changelog",
   menu: true,
@@ -65222,7 +65224,6 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
-if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "ad-hocs"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));
