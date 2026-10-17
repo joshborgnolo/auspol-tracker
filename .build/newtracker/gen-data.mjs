@@ -62,7 +62,7 @@ const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : F
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
 import { fieldTbcUrl } from "./field-tbc.mjs";
-import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
+import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, INCOME_POOL_BASIS, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;
@@ -3189,7 +3189,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
      tail. No house prints those bands, so the slot IS §7g's pooled figure
      for the wave (the fitted line's read, normalised the pool's way) – a
      group-view dot or CSV cell then matches exactly what the pools saw */
-  const inc = reuse ? null : incomeStandardise(w.pollster, w.dims && w.dims.income);
+  const inc = reuse ? null : incomeStandardise(w.pollster, w.dims && w.dims.income, midMs(p));
   const v = DEMO_GROUPS.map((g) => {
     if (reuse) return null;
     if (INCOME_STD_BANDS.some((b) => b.group === g)) {
@@ -4484,11 +4484,16 @@ const DEMO_TEST_MONTHLY = new Map();
    group of people, and the pooled bias drifted with the window's house
    mix. Here every house's brackets meet on the quantile axis instead,
    and every wave reads at the SAME two bands of the electorate.
-   Standard for one wave and group, or null (no grid variant the wave
-   printed at least two cells of, or no census distribution loaded). */
-function incomeStandardise(house, dim) {
-  if (!dim || !INCOME_DIST) return null;
-  const variants = incomeQuantiles(house, INCOME_DIST);
+   Each wave's dollars deflate to census dollars at the wage level of its
+   own fieldwork midpoint (ms). Only INCOME_POOL_BASIS houses standardise
+   (household income, user call 2026-10-18): a personal-income wave returns
+   null, so it joins no pool, fills no group-view slot and leaves the
+   roster – its printed table still shows in the Demographics view.
+   Standard for one wave and group, or null (another basis, no grid variant
+   the wave printed at least two cells of, or no census distribution). */
+function incomeStandardise(house, dim, ms) {
+  if (!dim || !INCOME_DIST || !INCOME_GRIDS[house] || INCOME_GRIDS[house].basis !== INCOME_POOL_BASIS) return null;
+  const variants = incomeQuantiles(house, INCOME_DIST, ms);
   if (!variants) return null;
   /* the era's own layout: the variant the wave printed the most cells
      of – eras never share keys, so the match is unambiguous */
@@ -4636,7 +4641,7 @@ const { demo: demographics, income: demoIncome } = (() => {
        income tab). incomeStandardise fits the wave's printed brackets
        and reads them at the standard bands; a wave whose layout fits
        nothing (single-cell partials, no grid variant) joins nothing. */
-    const inc = incomeStandardise(w.pollster, w.dims && w.dims.income);
+    const inc = incomeStandardise(w.pollster, w.dims && w.dims.income, midMs(r0));
     let iUsed = false;
     if (inc) {
       for (const { group: grp } of INCOME_STD_BANDS) {
@@ -4758,7 +4763,7 @@ const { demo: demographics, income: demoIncome } = (() => {
              its own brackets and READ at the same two bands of the
              electorate – the dek says so up front, the pill spells each
              house's own end brackets */
-          note: "each house's own brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
+          note: "each house's own household-income brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
           /* each house's own end brackets as its newest in-window wave
              printed them (incInWindow rides newest-first), so a switch of
              layout era never shows the stale era's brackets – compacted
@@ -4771,18 +4776,14 @@ const { demo: demographics, income: demoIncome } = (() => {
             .map((e) => [e.w.pollster, { low: [bandLabel(e.band[0])], high: [bandLabel(e.band[1])], basis: INCOME_GRIDS[e.w.pollster].basis }])),
           groups: iSets[0].groups.map((g, gi) => {
             const band = INCOME_STD_BANDS[gi];
-            /* the income cut-offs behind the row label's parenthetical
+            /* the income cut-off behind the row label's parenthetical
                (rd-panels' RdIncomeCut): the band's outer quantile edge
-               priced in each printing basis' dollars, one clause per
-               basis, household first as INCOME_GRIDS orders them */
+               priced in the pooled basis' dollars at the build's
+               reference date – one clause, household income, since only
+               that basis pools (INCOME_POOL_BASIS) */
             const share = band.hi === 1 ? band.lo : band.hi;
-            const cuts = [];
-            for (const house of Object.keys(INCOME_GRIDS)) {
-              const basis = INCOME_GRIDS[house].basis;
-              if (cuts.some((c) => c.basis === basis)) continue;
-              const ots = incomeEdge(basis, share, INCOME_DIST);
-              if (ots != null) cuts.push({ basis, ots });
-            }
+            const ots = incomeEdge(INCOME_POOL_BASIS, share, INCOME_DIST, refNow);
+            const cuts = ots != null ? [{ basis: INCOME_POOL_BASIS, ots }] : [];
             return { ...g,
               bare: band.group.replace(/\s*\(.*\)$/, ""),
               pct: band.hi === 1 ? 0 : 1,
@@ -4801,8 +4802,10 @@ const { demo: demographics, income: demoIncome } = (() => {
            reader counts – the roster lists each house that HAS an income
            wave the build read, so a house's lone Oct-2025 read still shows) */
         roster: Object.keys(INCOME_GRIDS).filter((house) =>
-          (DEMOGRAPHICS?.waves || []).some((w) => w.pollster === house && incomeStandardise(house, w.dims && w.dims.income))),
+          (DEMOGRAPHICS?.waves || []).some((w) => w.pollster === house && incomeStandardise(house, w.dims && w.dims.income, midMs(demoPollOf(w) || w)))),
         window: SPARSE_K.label,
+        // the moment the earner rows' cut-offs are priced at (incomeEdge's ms)
+        cutsAt: new Date(refNow).toISOString(),
       };
     }
   }

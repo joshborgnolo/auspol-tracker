@@ -3216,13 +3216,14 @@ function RdDemographics({ rangeId = "all" }) {
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
         {/* the house's own end brackets each tilt was read from, spelled
            out by house since no two houses' brackets agree (the dek says
-           why up front) - just below the dot-plot's legend: inside the
+           why up front; it also names the basis, so a house's own basis
+           shows only when the pill mixes two) - just below the dot-plot's legend: inside the
            sethead it grew the caption row and pushed the all-voters cap
            onto the vertical line */}
         {tab.sets.some((st) => st.bands) ? (
           <div className="rd-wv-bands">
-            {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x) => (
-              <span className="rd-wv-band" key={x.h}><span className="rd-wv-band-h"><em>{demoHouse(x.h)}</em>{x.b.basis ? " (" + x.b.basis + " income)" : null}{": "}</span><span className="rd-wv-band-r">{x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span></span>
+            {tab.sets.flatMap((st) => (st.bands ? st.houses.filter((h) => st.bands[h]).map((h) => ({ h, b: st.bands[h] })) : [])).map((x, _, all) => (
+              <span className="rd-wv-band" key={x.h}><span className="rd-wv-band-h"><em>{demoHouse(x.h)}</em>{x.b.basis && new Set(all.map((y) => y.b.basis)).size > 1 ? " (" + x.b.basis + " income)" : null}{": "}</span><span className="rd-wv-band-r">{x.b.low.join(", ")} <i>·</i> {x.b.high.join(", ")}</span></span>
             ))}
           </div>
         ) : null}

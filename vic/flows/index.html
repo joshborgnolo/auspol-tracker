@@ -48407,12 +48407,12 @@ function RdDemographics({
   }, tab.sets.flatMap(st => st.bands ? st.houses.filter(h => st.bands[h]).map(h => ({
     h,
     b: st.bands[h]
-  })) : []).map(x => React.createElement("span", {
+  })) : []).map((x, _, all) => React.createElement("span", {
     className: "rd-wv-band",
     key: x.h
   }, React.createElement("span", {
     className: "rd-wv-band-h"
-  }, React.createElement("em", null, demoHouse(x.h)), x.b.basis ? " (" + x.b.basis + " income)" : null, ": "), React.createElement("span", {
+  }, React.createElement("em", null, demoHouse(x.h)), x.b.basis && new Set(all.map(y => y.b.basis)).size > 1 ? " (" + x.b.basis + " income)" : null, ": "), React.createElement("span", {
     className: "rd-wv-band-r"
   }, x.b.low.join(", "), " ", React.createElement("i", null, "\xB7"), " ", x.b.high.join(", "))))) : null), shift && React.createElement(RdSub, {
     head: shift.head,

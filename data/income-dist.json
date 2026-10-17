@@ -1,169 +1,244 @@
 {
- "aweRatio": 1.1991,
  "weeksPerYear": 52.17857,
+ "awe": {
+  "census": {
+   "date": "2021-08-10",
+   "value": 1742.44
+  },
+  "series": [
+   [
+    "2021-05-15",
+    1737.1
+   ],
+   [
+    "2021-11-15",
+    1748.4
+   ],
+   [
+    "2022-05-15",
+    1769.8
+   ],
+   [
+    "2022-11-15",
+    1807.7
+   ],
+   [
+    "2023-05-15",
+    1838.1
+   ],
+   [
+    "2023-11-15",
+    1888.8
+   ],
+   [
+    "2024-05-15",
+    1923.4
+   ],
+   [
+    "2024-11-15",
+    1975.8
+   ],
+   [
+    "2025-05-15",
+    2010
+   ],
+   [
+    "2025-11-15",
+    2051.1
+   ],
+   [
+    "2026-05-15",
+    2083.7
+   ]
+  ],
+  "source": "ABS data API, 2026-10-17"
+ },
  "axes": {
   "household": {
-   "base": "occupied private dwellings, weekly household income ($2021)",
+   "base": "adults 18+ in occupied private dwellings, by weekly household income ($2021)",
    "bands": [
     {
      "lo": 0,
      "hi": 149,
-     "n": 226299
+     "n": 353392,
+     "households": 226305
     },
     {
      "lo": 150,
      "hi": 299,
-     "n": 112028
+     "n": 155163,
+     "households": 111998
     },
     {
      "lo": 300,
      "hi": 399,
-     "n": 202370
+     "n": 261302,
+     "households": 202396
     },
     {
      "lo": 400,
      "hi": 499,
-     "n": 510377
+     "n": 684581,
+     "households": 510381
     },
     {
      "lo": 500,
      "hi": 649,
-     "n": 377629
+     "n": 530067,
+     "households": 377716
     },
     {
      "lo": 650,
      "hi": 799,
-     "n": 535291
+     "n": 942825,
+     "households": 535286
     },
     {
      "lo": 800,
      "hi": 999,
-     "n": 549428
+     "n": 925614,
+     "households": 549433
     },
     {
      "lo": 1000,
      "hi": 1249,
-     "n": 636539
+     "n": 1108249,
+     "households": 636574
     },
     {
      "lo": 1250,
      "hi": 1499,
-     "n": 656179
+     "n": 1223451,
+     "households": 656193
     },
     {
      "lo": 1500,
      "hi": 1749,
-     "n": 517131
+     "n": 965866,
+     "households": 517219
     },
     {
      "lo": 1750,
      "hi": 1999,
-     "n": 505350
+     "n": 986710,
+     "households": 505418
     },
     {
      "lo": 2000,
      "hi": 2499,
-     "n": 1043667
+     "n": 2122695,
+     "households": 1043731
     },
     {
      "lo": 2500,
      "hi": 2999,
-     "n": 662269
+     "n": 1502993,
+     "households": 662287
     },
     {
      "lo": 3000,
      "hi": 3499,
-     "n": 582378
+     "n": 1304101,
+     "households": 582310
     },
     {
      "lo": 3500,
      "hi": 3999,
-     "n": 363735
+     "n": 850497,
+     "households": 363701
     },
     {
      "lo": 4000,
      "hi": null,
-     "n": 1152598
+     "n": 2662604,
+     "households": 1152613
     }
    ],
-   "total": 8633268
+   "total": 16580110,
+   "adultsPer": {
+    "coupleNoChildren": 2.121,
+    "coupleWithChildren": 2.572,
+    "oneParent": 1.572,
+    "otherFamily": 2.121,
+    "nonFamily": 1.178
+   }
   },
   "personal": {
-   "base": "persons 15+, weekly personal income ($2021)",
+   "base": "adults 18+, by weekly personal income ($2021)",
    "bands": [
     {
      "lo": 0,
      "hi": 149,
-     "n": 2496157
+     "n": 1946221
     },
     {
      "lo": 150,
      "hi": 299,
-     "n": 1005054
+     "n": 899352
     },
     {
      "lo": 300,
      "hi": 399,
-     "n": 1573592
+     "n": 1530714
     },
     {
      "lo": 400,
      "hi": 499,
-     "n": 1581589
+     "n": 1546022
     },
     {
      "lo": 500,
      "hi": 649,
-     "n": 1511142
+     "n": 1470491
     },
     {
      "lo": 650,
      "hi": 799,
-     "n": 1438961
+     "n": 1413154
     },
     {
      "lo": 800,
      "hi": 999,
-     "n": 1680604
+     "n": 1664425
     },
     {
      "lo": 1000,
      "hi": 1249,
-     "n": 1866790
+     "n": 1858946
     },
     {
      "lo": 1250,
      "hi": 1499,
-     "n": 1402840
+     "n": 1400289
     },
     {
      "lo": 1500,
      "hi": 1749,
-     "n": 1229032
+     "n": 1227794
     },
     {
      "lo": 1750,
      "hi": 1999,
-     "n": 908580
+     "n": 908043
     },
     {
      "lo": 2000,
      "hi": 2999,
-     "n": 1575049
+     "n": 1574571
     },
     {
      "lo": 3000,
      "hi": 3499,
-     "n": 366351
+     "n": 366210
     },
     {
      "lo": 3500,
      "hi": null,
-     "n": 662725
+     "n": 662230
     }
    ],
-   "total": 19298466
+   "total": 18468462
   }
  },
- "_about": "National weekly-income histograms for the Who-votes Income tab's standardised pooling (gen-data §7g-income): 2021 Census GCP commonwealth-electoral-division sums (household G33, personal G17B+G17C; not-stated dropped, Negative/Nil folded into $0–149), $ axis wage-indexed 2021→2026 by aweRatio = AWE(ABS 6302.0 s.a. full-time adult ordinary time) May 2026 $2,083.00 / May 2021 $1,737.10 (the household axis rides the same ratio — one indexed constant, honestly labelled, rather than two fake-precise ones). Poll brackets map in by edge×1000/weeksPerYear/aweRatio with uniform interpolation inside histogram bands; above the open top band an edge saturates to quantile 1. Built by .build/extract-income-dist.mjs; refresh with --fetch on a new census datapack (2026 census ~June 2027) and re-verify aweRatio."
+ "_about": "National weekly-income histograms of voting-age adults for the Who-votes Income tab's standardised pooling (gen-data §7g-income), from the 2021 Census GCP commonwealth-electoral-division tables. household: G33 households by income re-weighted to adults – each band's family households carry that band's G32 family mix at G27-derived adults per family type, non-family households the national adults per non-family household (adultsPer); band.households keeps the raw count. personal: G17B+G17C persons 15+ less the 15–17s (G04 single years, spread over the 15–19 band's incomes). Not-stated dropped; Negative/Nil folded into $0–149; citizenship not applied. Poll brackets map in by edge×1000/weeksPerYear ÷ (AWE at the wave's fieldwork midpoint ÷ awe.census.value), awe.series being ABS 6302.0 FT-adult ordinary-time earnings, seasonally adjusted, extrapolated past its last point at the trailing year's growth; uniform inside bands, Pareto inside the open top band. Built by .build/extract-income-dist.mjs: rerun on each AWE release; the 2026 census datapack (~June 2027) needs new band columns there."
 }

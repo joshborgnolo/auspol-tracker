@@ -73,11 +73,13 @@
    tilt-vs-all-voters machinery as every group below. INCOME_GRIDS
    defines each house's printed brackets as annual-$k edges plus its
    income basis, and incomeQuantiles maps them onto quantiles through
-   the national census histogram (data/income-dist.json, built by
-   .build/extract-income-dist.mjs – household G33 for the household-
-   income houses, personal G17 for DemosAU's personal-income tables).
-   RedBridge's "Prefer not to say" cell never joins a grid. Resolve and
-   Morgan print no income cut at all. */
+   the national census histogram of adults (data/income-dist.json, built
+   by .build/extract-income-dist.mjs – adults by household income for the
+   household-income houses, adults by personal income for DemosAU's
+   tables), each wave's dollars deflated to census dollars by the wage
+   index at its own fieldwork. Only household-income waves pool
+   (INCOME_POOL_BASIS). RedBridge's "Prefer not to say" cell never joins
+   a grid. Resolve and Morgan print no income cut at all. */
 
 export const DEMO_TABS = [
   { id: "age", label: "Age" },
@@ -135,15 +137,30 @@ export const INCOME_STD_BANDS = [
   { group: "Higher earners (top 15%)", lo: 0.85, hi: 1 },
 ];
 
+/* The income basis the tab pools (user call 2026-10-18): household income
+   only. A personal-income bracket sorts people by their own pay – a high
+   earner's non-working spouse lands among the "lower earners" – so its
+   bottom half and top 15% are different people from the household axis's,
+   and pooling the two let the window's house mix move the pooled read
+   (DemosAU alone lifted the top band's Coalition tilt by ~0.9 points in the
+   Oct 2026 window). The personal-income houses keep their grids – their
+   printed tables still show in All polls' Demographics view – but join no
+   pool. */
+export const INCOME_POOL_BASIS = "household";
+
+/* $k a year per $1,000 a week, the census's own 365.25-day year – the one
+   income-dist.json's weeksPerYear carries, so a weekly bracket edge lands
+   back on its own census-weekly dollars */
+const WK = 365.25 / 7;
+
 /* Each income-printing house's bracket layout, exactly as demographics.json
    stores it, as ordered [storedKey, lowerEdgeInAnnual$k] cells over whose
    basis (household or personal income) the wave was asked. RedBridge's
-   weekly brackets convert at 52.1429 weeks per year; its "Prefer not to
-   say" cell joins no grid. The closing edge of a cell is the next cell's
-   lower edge; the last cell is open. A house that changed its brackets
-   gets a variant per layout (YouGov's four brackets went binary in April
-   2026) – a wave matches a variant only on that variant's own keys, so
-   eras never mix. */
+   weekly brackets convert at WK; its "Prefer not to say" cell joins no
+   grid. The closing edge of a cell is the next cell's lower edge; the last
+   cell is open. A house that changed its brackets gets a variant per layout
+   (YouGov's four brackets went binary in April 2026) – a wave matches a
+   variant only on that variant's own keys, so eras never mix. */
 export const INCOME_GRIDS = {
   "YouGov": { basis: "household", variants: [
     { cells: [["Under $100k", 0], ["$100k or more", 100]] },
@@ -159,36 +176,73 @@ export const INCOME_GRIDS = {
     { cells: [["Under $45k", 0], ["$45–75k", 45], ["$75–125k", 75], ["$125–200k", 125], ["$200k+", 200]] },
   ] },
   "RedBridge/Accent": { basis: "household", variants: [
-    { cells: [["Under $1,000 a week", 0], ["$1,000–1,999 a week", 52.1429],
-      ["$2,000–2,999 a week", 104.2857], ["$3,000+ a week", 156.4286]] },
+    { cells: [["Under $1,000 a week", 0], ["$1,000–1,999 a week", WK],
+      ["$2,000–2,999 a week", 2 * WK], ["$3,000+ a week", 3 * WK]] },
   ] },
   "Freshwater": { basis: "household", variants: [
     { cells: [["Under $75k", 0], ["$75–150k", 75], ["$150k or more", 150]] },
   ] },
 };
 
-/* incomeQuantiles(house, dist): each of the house's grid variants with
+/* incomeIndex(dist, ms): how far wages had moved from census night to the
+   moment ms – AWE (income-dist.json's awe.series, ABS 6302.0 full-time
+   adult ordinary-time earnings, May and November) at ms over AWE at the
+   census. Linear between survey points; past the last point it compounds
+   at the trailing year's growth, until the next release is extracted; before
+   the first it holds the first. Null without a series. A poll's dollar
+   edges divide by it to land on the census's 2021 dollars, so a Sept-2025
+   wave and an Oct-2026 one each deflate by their own wage level. */
+export function incomeIndex(dist, ms) {
+  const a = dist && dist.awe;
+  if (!a || !Array.isArray(a.series) || !a.series.length || !(a.census && a.census.value > 0)) return null;
+  const s = a.series.map(([d, v]) => [Date.parse(d), v]);
+  const t = Number.isFinite(ms) ? ms : s[s.length - 1][0];
+  const [tl, vl] = s[s.length - 1];
+  let v;
+  if (t <= s[0][0]) v = s[0][1];
+  else if (t >= tl) {
+    const prev = s[Math.max(0, s.length - 3)];        // a year back (half-yearly series)
+    v = prev[0] < tl ? vl * Math.exp(Math.log(vl / prev[1]) * (t - tl) / (tl - prev[0])) : vl;
+  } else {
+    const i = s.findIndex(([d]) => d >= t);
+    v = s[i - 1][1] + (s[i][1] - s[i - 1][1]) * (t - s[i - 1][0]) / (s[i][0] - s[i - 1][0]);
+  }
+  return v / a.census.value;
+}
+
+/* the open top band's Pareto tail: the adults above the open band's floor
+   and above the band below it fix alpha, so the mass above w inside the
+   open band is top.n × (w / top.lo)^−alpha (household ≈ 2.1, personal
+   ≈ 2.9 on the 2021 census) */
+function openTail(bands) {
+  const top = bands[bands.length - 1], below = bands[bands.length - 2];
+  return { lo: top.lo, n: top.n, alpha: Math.log((top.n + below.n) / top.n) / Math.log(top.lo / below.lo) };
+}
+
+/* incomeQuantiles(house, dist, ms): each of the house's grid variants with
    every cell's quantile interval [{key, qLo, qHi, qMid, sh}] through the
-   national histogram (data/income-dist.json: {aweRatio, weeksPerYear,
-   axes:{household|personal:{bands,total}}}). An edge's quantile is the
-   histogram mass below it, interpolating uniformly inside the band it
-   falls in; an edge in or beyond the open top band saturates to 1. */
-export function incomeQuantiles(house, dist) {
+   national histogram of adults (data/income-dist.json: {weeksPerYear, awe,
+   axes:{household|personal:{bands,total}}}), the dollar edges deflated by
+   incomeIndex at ms (the wave's fieldwork midpoint). An edge's quantile is
+   the histogram mass below it, interpolating uniformly inside the band it
+   falls in and along the Pareto tail inside the open top band. */
+export function incomeQuantiles(house, dist, ms) {
   const g = INCOME_GRIDS[house];
   const ax = g && dist && dist.axes && dist.axes[g.basis];
-  if (!ax) return null;
-  const { bands, total } = ax;
+  const r = incomeIndex(dist, ms);
+  if (!ax || !r) return null;
+  const { bands, total } = ax, tail = openTail(bands);
   const qOf = (edgeK) => {
     if (!(edgeK > 0)) return 0;
-    const w = edgeK * 1000 / dist.weeksPerYear / dist.aweRatio;
+    const w = edgeK * 1000 / dist.weeksPerYear / r;
     let cum = 0;
     for (const b of bands) {
       if (b.hi != null && w > b.hi) { cum += b.n; continue; }
       if (w <= b.lo) return cum / total;
-      if (b.hi == null) return 1;                      // inside the open top
+      if (b.hi == null) return (total - tail.n * (w / tail.lo) ** -tail.alpha) / total;
       return (cum + b.n * (w - b.lo) / (b.hi - b.lo + 1)) / total;
     }
-    return 1;                                          // past the open top
+    return 1;
   };
   return g.variants.map((v) => ({
     basis: g.basis,
@@ -199,23 +253,26 @@ export function incomeQuantiles(house, dist) {
   }));
 }
 
-/* incomeEdge(basis, share, dist): the annual-$k edge carrying the given
-   cumulative share of the electorate on one basis axis – the inverse of
-   incomeQuantiles' qOf, interpolated inside the histogram band it lands
-   in and rounded to the nearest $1k. Null where the share falls into the
-   open top band (an unbounded edge prices nothing). gen-data reads the two
-   standard bands' outer edges through it for the earner rows' income-cut
-   bracket (rd-panels' RdIncomeCut). */
-export function incomeEdge(basis, share, dist) {
+/* incomeEdge(basis, share, dist, ms): the annual-$k edge carrying the given
+   cumulative share of the electorate on one basis axis, in dollars of the
+   moment ms – the inverse of incomeQuantiles' qOf, interpolated inside the
+   histogram band it lands in (along the Pareto tail in the open top band)
+   and rounded to the nearest $1k. gen-data reads the two standard bands'
+   outer edges through it at the build's reference date for the earner
+   rows' income-cut bracket (rd-panels' RdIncomeCut). */
+export function incomeEdge(basis, share, dist, ms) {
   const ax = basis && dist && dist.axes && dist.axes[basis];
-  if (!ax) return null;
+  const r = incomeIndex(dist, ms);
+  if (!ax || !r || !(share >= 0 && share < 1)) return null;
   const target = share * ax.total;
   let cum = 0;
   for (const b of ax.bands) {
     if (cum + b.n < target) { cum += b.n; continue; }
-    if (b.hi == null) return null;
-    const w = b.lo + (target - cum) * (b.hi - b.lo + 1) / b.n;
-    return Math.round(w * dist.weeksPerYear * dist.aweRatio / 1000);
+    const tail = openTail(ax.bands);
+    const w = b.hi == null
+      ? tail.lo * (tail.n / ((1 - share) * ax.total)) ** (1 / tail.alpha)
+      : b.lo + (target - cum) * (b.hi - b.lo + 1) / b.n;
+    return Math.round(w * dist.weeksPerYear * r / 1000);
   }
   return null;
 }

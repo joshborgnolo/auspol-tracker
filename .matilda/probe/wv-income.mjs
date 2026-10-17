@@ -7,11 +7,18 @@
    share — and reads the line at two standard bands of the electorate, the
    bottom half and the top 15%+ (INCOME_STD_BANDS in demo-groups.mjs). The
    standardised shares pool through the same tilt machinery as every group.
+   Since 2026-10-18 the axis counts ADULTS (households re-weighted by their
+   adults; persons 15+ less the 15–17s), each wave's dollars deflate by the
+   wage index at its own fieldwork (incomeIndex), the open top band follows
+   a Pareto tail, and only household-income houses pool (INCOME_POOL_BASIS):
+   DemosAU's personal-income waves leave the window, the roster, the pill
+   and the cut-offs.
 
    unit — the quantile map (incomeQuantiles against data/income-dist.json),
      the fit identities (2-band exact fit, 4-band independent per-party fit,
      <2-cell wave fits nothing, support never extrapolates), and the
-     DEMO_SHARE widths matching the standard bands.
+     DEMO_SHARE widths matching the standard bands; the wage index; the
+     pooled basis.
    desktop — the tab sits last in the group row, straight after Home; the
      live D.demographics.tabs carries no "income"; the dek gains the
      standardised-reads note ONLY on the income tab; the sethead pill names
@@ -28,7 +35,7 @@ import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
-import { incomeQuantiles, incomeFit, incomeEdge, INCOME_STD_BANDS, INCOME_GRIDS, DEMO_SHARE }
+import { incomeQuantiles, incomeFit, incomeEdge, incomeIndex, INCOME_STD_BANDS, INCOME_GRIDS, INCOME_POOL_BASIS, DEMO_SHARE }
   from "../../.build/newtracker/demo-groups.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -40,7 +47,7 @@ const ok = (name, pass, detail) => {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const near = (a, b, eps = 1e-9) => Math.abs(a - b) <= eps;
 const DEK_NOTE =
-  /Each house's own brackets, read at the same two bands of the electorate \(bottom half, top 15%\+\)\./;
+  /Each house's own household-income brackets, read at the same two bands of the electorate \(bottom half, top 15%\+\)\./;
 
 console.log("== unit: the quantile map and the fit ==");
 const dist = JSON.parse(await readFile(join(ROOT, "data", "income-dist.json"), "utf8"));
@@ -48,12 +55,14 @@ const dist = JSON.parse(await readFile(join(ROOT, "data", "income-dist.json"), "
   const yg = incomeQuantiles("YouGov", dist);
   ok("YouGov's two grid eras map as two variants, binary first",
      yg && yg.length === INCOME_GRIDS.YouGov.variants.length && yg[0].cells.length === 2 && yg[1].cells.length === 4);
-  ok("YouGov's binary split lands at q ≈ 0.46 ( median household income near its $100k cut )",
-     yg && yg[0].cells[0].qLo === 0 && near(yg[0].cells[0].qHi, 0.464, 0.003) && yg[0].cells[1].qHi === 1,
+  /* adults, not households: larger households earn more, so $100k sits
+     well below the adults' median (it was q 0.464 counting households) */
+  ok("YouGov's binary split lands at q ≈ 0.40 of adults (May-2026 wages)",
+     yg && yg[0].cells[0].qLo === 0 && near(yg[0].cells[0].qHi, 0.397, 0.003) && yg[0].cells[1].qHi === 1,
      yg && "cut at " + yg[0].cells[0].qHi.toFixed(3));
   const np = incomeQuantiles("Newspoll (pooled)", dist)[0].cells;
-  ok("Newspoll's four cells split near q = 0.227 / 0.464 / 0.655",
-     near(np[0].qHi, 0.227, 0.003) && near(np[1].qHi, 0.464, 0.003) && near(np[2].qHi, 0.655, 0.003),
+  ok("Newspoll's four cells split near q = 0.177 / 0.397 / 0.594",
+     near(np[0].qHi, 0.177, 0.003) && near(np[1].qHi, 0.397, 0.003) && near(np[2].qHi, 0.594, 0.003),
      np.map((c) => c.qHi.toFixed(3)).join(" / "));
   ok("cell shares sum to 1 on every variant",
      Object.keys(INCOME_GRIDS).every((h) => incomeQuantiles(h, dist)
@@ -106,6 +115,22 @@ const dist = JSON.parse(await readFile(join(ROOT, "data", "income-dist.json"), "
        && INCOME_STD_BANDS[1].group === "Higher earners (top 15%)",
      INCOME_STD_BANDS[0].group + " / " + INCOME_STD_BANDS[1].group);
 }
+console.log("== unit: the wage index and the pooled basis ==");
+{
+  const c = Date.parse(dist.awe.census.date), s = dist.awe.series.map(([d, v]) => [Date.parse(d), v]);
+  ok("the index is 1 on census night (census AWE stored to the cent)", near(incomeIndex(dist, c), 1, 1e-5), incomeIndex(dist, c));
+  ok("the index hits each AWE survey point exactly",
+     s.every(([t, v]) => near(incomeIndex(dist, t), v / dist.awe.census.value, 1e-9)));
+  const last = s[s.length - 1][0], yr = 365.25 * 86400000;
+  ok("past the last survey point it keeps compounding at the trailing year's growth",
+     incomeIndex(dist, last + yr / 2) > incomeIndex(dist, last)
+       && near(incomeIndex(dist, last + yr) / incomeIndex(dist, last), s[s.length - 1][1] / s[s.length - 3][1], 1e-4),
+     (incomeIndex(dist, last + yr) / incomeIndex(dist, last)).toFixed(4));
+  ok("an older wave's $100k edge sits higher on the axis than a newer one's (its dollars were worth more)",
+     incomeQuantiles("YouGov", dist, Date.parse("2025-09-01"))[0].cells[0].qHi
+       > incomeQuantiles("YouGov", dist, Date.parse("2026-10-01"))[0].cells[0].qHi);
+  ok("household income is the pooled basis", INCOME_POOL_BASIS === "household");
+}
 console.log("== unit: incomeEdge inverts the quantile map ==");
 {
   const bases = [...new Set(Object.values(INCOME_GRIDS).map((g) => g.basis))];
@@ -116,11 +141,14 @@ console.log("== unit: incomeEdge inverts the quantile map ==");
        b + " " + incomeEdge(b, 0.5, dist) + "k / " + incomeEdge(b, 0.85, dist) + "k").join(", "));
   ok("an edge maps back to its own share (round-trip to the nearest $1k ≈ ±1.5pt)",
      bases.every((b) => [0.5, 0.85].every((q) => {
-        const ax = dist.axes[b], w = incomeEdge(b, q, dist) * 1000 / dist.weeksPerYear / dist.aweRatio;
+        const ax = dist.axes[b], w = incomeEdge(b, q, dist) * 1000 / dist.weeksPerYear / incomeIndex(dist);
+        const top = ax.bands[ax.bands.length - 1], below = ax.bands[ax.bands.length - 2];
+        const alpha = Math.log((top.n + below.n) / top.n) / Math.log(top.lo / below.lo);
         let cum = 0;
         for (const band of ax.bands) {
           if (band.hi != null && w > band.hi) { cum += band.n; continue; }
           if (w <= band.lo) return Math.abs(cum / ax.total - q) <= 0.015;
+          if (band.hi == null) return Math.abs(1 - top.n * (w / top.lo) ** -alpha / ax.total - q) <= 0.015;
           return Math.abs((cum + band.n * (w - band.lo) / (band.hi - band.lo + 1)) / ax.total - q) <= 0.015;
         }
         return false;
@@ -128,8 +156,13 @@ console.log("== unit: incomeEdge inverts the quantile map ==");
      bases.map((b) => b + " ok").join(", "));
   ok("the median edge sits between the top edge and the 0.85 edge on both bases",
      bases.every((b) => incomeEdge(b, 0.5, dist) < incomeEdge(b, 0.85, dist) && incomeEdge(b, 0, dist) === 0));
-  ok("the open top band prices no edge (a share there has no finite $)",
+  ok("the very top (share 1) prices no edge",
      bases.every((b) => incomeEdge(b, 1, dist) === null));
+  {
+    const ax = dist.axes.household, floorK = ax.bands[ax.bands.length - 1].lo * dist.weeksPerYear * incomeIndex(dist) / 1000;
+    ok("the adults' top-15% household edge lies inside the open band, priced along its Pareto tail",
+       incomeEdge("household", 0.85, dist) > floorK, incomeEdge("household", 0.85, dist) + "k vs floor " + floorK.toFixed(0) + "k");
+  }
 }
 
 const PORT = 9027;
@@ -190,27 +223,27 @@ ok("demoIncome is a single income set of the two earners tilts",
    P.income && P.income.sets.length === 1 &&
    JSON.stringify(P.income.sets[0].groups.map((g) => g.label)) === JSON.stringify(INCOME_STD_BANDS.map((b) => b.group)),
    P.income && P.income.sets[0].groups.map((g) => g.label).join(" / "));
-ok("each earners row carries bare / pct / a per-basis cut priced to the $1k",
+ok("each earners row carries bare / pct / one household-income cut priced to the $1k",
    P.income.sets[0].groups.every((g, gi) =>
      g.bare === INCOME_STD_BANDS[gi].group.replace(/\s*\(.*\)$/, "")
        && g.pct === (gi === 0 ? 1 : 0)
-       && Array.isArray(g.cuts) && g.cuts.length === 2
-       && JSON.stringify(g.cuts.map((c) => c.basis)) === JSON.stringify(["household", "personal"])
+       && Array.isArray(g.cuts) && g.cuts.length === 1
+       && g.cuts[0].basis === "household"
        && g.cuts.every((c) => Number.isInteger(c.ots) && c.ots > 0)),
    P.income.sets[0].groups.map((g) => JSON.stringify(g.cuts)).join(" / "));
-ok("the cuts ARE incomeEdge at each band's outer edge, on each basis",
+ok("the cuts ARE incomeEdge at each band's outer edge, priced at the payload's cutsAt",
    P.income.sets[0].groups.every((g, gi) =>
-     g.cuts.every((c) => c.ots === incomeEdge(c.basis, gi === 0 ? 0.5 : 0.85, dist))),
+     g.cuts.every((c) => c.ots === incomeEdge(c.basis, gi === 0 ? 0.5 : 0.85, dist, Date.parse(P.income.cutsAt)))),
    P.income.sets[0].groups.map((g) => g.cuts.map((c) => c.basis + " $" + c.ots + "k")).join(" / "));
 {
-  ok("the window's income set is exactly five polls of YouGov / DemosAU / Newspoll (pooled)",
-     P.income.sets[0].groups.every((g) => g.n === 5)
-       && JSON.stringify([...P.income.sets[0].groups[0].houses].sort())
-            === JSON.stringify(["DemosAU", "Newspoll (pooled)", "YouGov"].sort()),
-     P.income.sets[0].groups[0].houses.join(", "));
-  ok("the roster lists every income-printing house, windowed or not",
+  ok("the window's income set counts its polls, every one of a household-income house",
+     P.income.sets[0].groups.every((g) => g.n === P.income.polls.length)
+       && P.income.sets[0].groups[0].houses.every((h) => INCOME_GRIDS[h].basis === "household")
+       && !P.income.polls.some((p) => p.pollster === "DemosAU"),
+     P.income.polls.length + " polls of " + P.income.sets[0].groups[0].houses.join(", "));
+  ok("the roster lists every household-income printing house, windowed or not – no personal-income house",
      JSON.stringify([...P.income.roster].sort()) ===
-       JSON.stringify([...Object.keys(INCOME_GRIDS)].sort()),
+       JSON.stringify(Object.keys(INCOME_GRIDS).filter((h) => INCOME_GRIDS[h].basis === "household").sort()),
      P.income.roster.join(", "));
 }
 
@@ -243,13 +276,13 @@ ok("the bands pill lists every in-window house",
   }
   ok("each pill spells its house's own low and high end brackets", misses.length === 0,
      misses.length ? "missing: " + misses.join(", ") : pill.join(" ‖ "));
-  ok("each pill names its income basis (personal vs household)",
-     pill.every((t) => /\((household|personal) income\)/.test(t)), pill.join(" ‖ "));
-  ok("DemosAU's pill stipulates personal income",
-     pill.some((t) => t.includes("DemosAU") && /\((personal) income\)/.test(t)) || !wantHouses.includes("DemosAU"),
-     pill.join(" ‖ "));
+  /* one basis in the pill, and the dek's note names it: no house repeats it */
+  ok("a single-basis pill names no per-house basis",
+     pill.every((t) => !/\((household|personal) income\)/.test(t)), pill.join(" ‖ "));
+  ok("no DemosAU pill (personal income pools nowhere)",
+     !pill.some((t) => t.includes("DemosAU")), pill.join(" ‖ "));
   ok("each pill is a colon-led clause of compact < / ≥ brackets, never spelled out",
-     pill.every((t) => /\((?:household|personal) income\): </.test(t) && t.includes("· ≥") && !/\bUnder\b|or more|\+/.test(t)),
+     pill.every((t) => /: </.test(t) && t.includes("· ≥") && !/\bUnder\b|or more|\+/.test(t)),
      pill.join(" ‖ "));
   ok("the pill's bracket lists separate with a middot, never a semicolon",
      pill.every((t) => !t.includes(";") && t.includes("·")), pill.join(" ‖ "));
@@ -278,7 +311,7 @@ ok("the bands pill lists every in-window house",
     };
   });
   ok("the between-clause semicolon lines only the closed clauses' ::after (none on the last, no ::before at all)",
-     sep.after.length >= 2 && sep.after.every((c) => c === '";"') && (sep.lastAfter === "none" || sep.lastAfter === "") ,
+     sep.after.length >= 1 && sep.after.every((c) => c === '";"') && (sep.lastAfter === "none" || sep.lastAfter === "") ,
      JSON.stringify(sep.after) + " / last " + sep.lastAfter);
   ok("each semicolon hugs its clause (glyph extends <7px past the clause's own text)",
      sep.hugPx.every((d) => d >= 0 && d < 7), sep.hugPx.join(" / ") + " px");
@@ -314,13 +347,13 @@ const figures = (pty, got) =>
 {
   const cutText = (g) => {
     const cl = g.cuts.map((c) => c.basis + " income " + (g.pct === 0 ? "≥" : "≤") + " $" + c.ots + ",000");
-    return cl.length === 2 ? cl.join("; ") : null;
+    return cl.length === 1 ? cl[0] : null;
   };
   const want = P.income.sets[0].groups.map(cutText);
-  ok("every earners row's cut-off text prices both bases",
+  ok("every earners row's cut-off text prices household income alone",
      want.every((t, gi) => P.income.sets[0].groups[gi].pct === 0
-       ? /^household income ≥ \$\d+,\d{3}; personal income ≥ \$/.test(t)
-       : /≤ \$/.test(t)), want.join(" | "));
+       ? /^household income ≥ \$\d+,\d{3}$/.test(t)
+       : /^household income ≤ \$\d+,\d{3}$/.test(t)), want.join(" | "));
   ok("the income tab has no other clickables before the probe (its own two)",
      await page.evaluate(() =>
        document.querySelectorAll("#who-votes .rd-wv-lab .rd-wv-born").length === 2));
@@ -406,7 +439,7 @@ ok("phone dek carries the standardised-reads note", DEK_NOTE.test(await dekText(
      bandRows.map((r) => r.x).join(" / "));
 }
 /* at 390px the cut state should read "HH" and drop the word income
-   (the ≤640px and ≤560px rungs): "(HH ≤ $X; personal ≤ $Y)" */
+   (the ≤640px and ≤560px rungs): "(HH ≤ $X)" */
 {
   const want = P.income.sets[0].groups.map((g) =>
     g.cuts.map((c) => (c.basis === "household" ? "HH" : "personal") + " ≤ $" + c.ots + ",000").join("; "));
@@ -442,10 +475,11 @@ ok("phone dek carries the standardised-reads note", DEK_NOTE.test(await dekText(
              leftByLine: tops.map((t) =>
                +Math.min(...parts.filter((x) => Math.round(x.top) === t).map((x) => x.x)).toFixed(1)) };
   });
-  ok("the tapped cut-offs actually wrap to a second line at 390px",
-     align.leftByLine.length >= 2, align.leftByLine.join(" / "));
-  ok("every wrapped line of the tapped cut-offs holds the label's left edge",
-     align.leftByLine.every((x) => Math.abs(x - align.bareX) <= 1),
+  /* one household clause since 2026-10-18 ("(HH ≥ $X,000)") fits beside
+     the label at 390px; a wrap, wherever one happens, must still hold the
+     label's left edge on every wrapped line */
+  ok("the tapped cut-off at 390px stays on the label's line, or every wrapped line holds the label's left edge",
+     align.leftByLine.length === 1 || align.leftByLine.every((x) => Math.abs(x - align.bareX) <= 1),
      "label " + align.bareX + " vs lines " + align.leftByLine.join(" / "));
 }
 await mob.close();
