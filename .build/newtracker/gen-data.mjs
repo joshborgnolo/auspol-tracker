@@ -7131,11 +7131,11 @@ const changelog = JUR ? null : (() => {
 
 /* ---- §8e the ad hoc topical and issue questions ---------------------------
    The /ad-hocs/ page (the ☰ menu's sixth page, 2026-10-17): every one-off
-   and rotating question the four catalogued houses have asked outside the
+   and rotating question the five catalogued houses have asked outside the
    standing battery, grouped on adhoc-themes.mjs's shared map. The stores are
    hand-curated research products (data/news24-one-offs.json,
    data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
-   data/essential-one-offs.json); this block
+   data/essential-one-offs.json, data/resolve-one-offs.json); this block
    re-shapes them into the page's
    fetch payload, trimming whatever the page never reads (RedBridge's
    quotedFigure/snippetHaystack verification artefacts, News24's embed ids
@@ -7202,6 +7202,23 @@ const oneOffsSource = JUR ? null : (() => {
   for (const e of read("essential-one-offs.json", (j) => j.entries || [])) {
     entries.push({
       house: "essential", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: null, note: e.notes || null,
+      proseOnly: false, wordingSource: null,
+      url: e.url || null,
+      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
+        headers: t.headers || null, rows: t.rows || [] })),
+      prose: [],
+    });
+  }
+  /* Resolve Political Monitor (SMH/The Age): hand-curated (no machine feed
+     exists – the topical questions live only in the weekly article prose),
+     in the same pass-through shape as Essential. .build/resolve-oneoffs.mjs
+     is its curation-time guard. */
+  for (const e of read("resolve-one-offs.json", (j) => j.entries || [])) {
+    entries.push({
+      house: "resolve", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
       dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
       question: e.question, options: null, note: e.notes || null,

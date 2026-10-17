@@ -294,6 +294,58 @@ export const THEME_OF = {
   "us-vs-middle-powers": "security-world",
   "views-on-countries": "security-world",
 
+  /* One Nation & the party system — Resolve */
+  "joyce-one-nation-effect": "one-nation",
+  "taylor-awareness": "one-nation",
+  "hanson-young-workers-lazy": "one-nation",
+  "hanson-ndis-priorities": "one-nation",
+  "hanson-poverty-serious": "one-nation",
+  "easier-to-sack-workers": "one-nation",
+
+  /* Cost of living & the economy — Resolve */
+  "cost-of-living-blame": "cost-of-living",
+  "unexpected-expense-struggle": "cost-of-living",
+  "christmas-spending-cutback": "cost-of-living",
+  "fuel-price-driving-changes": "cost-of-living",
+
+  /* The budget, tax & housing — Resolve */
+  "labor-broken-promises-view": "budget-tax",
+  "cgt-discount-removal": "budget-tax",
+  "negative-gearing-restriction": "budget-tax",
+  "ndis-cuts-support": "budget-tax",
+  "trust-tax-increase": "budget-tax",
+  "budget-good-for-household": "budget-tax",
+  "lower-house-prices": "budget-tax",
+  "federal-debt-concern": "budget-tax",
+  "state-debt-concern": "budget-tax",
+  "debt-deficit-remedy": "budget-tax",
+  "albanese-trust-broken-promises": "budget-tax",
+  "budget-broken-promises-labor-vote": "budget-tax",
+
+  /* Immigration & multiculturalism — Resolve */
+  "immigration-reduction-support": "immigration",
+  "immigration-pause-housing": "immigration",
+  "migration-skills-restriction": "immigration",
+  "immigration-screening-extremism": "immigration",
+  "hanson-immigration-settings": "immigration",
+  "australia-monoculture": "immigration",
+  "immigration-program-handling": "immigration",
+  "racism-rise-since-gaza": "immigration",
+  "racism-driver": "immigration",
+
+  /* The national mood — Resolve */
+  "social-cohesion-rating": "national-mood",
+
+  /* Security, energy & the wider world — Resolve */
+  "bondi-response-strength": "security-world",
+  "bondi-response-leaders": "security-world",
+  "antisemitism-royal-commission": "security-world",
+
+  /* Issues, leaders & policy — Resolve */
+  "greens-leader-awareness": "issues-leaders",
+  "greens-leadership-vote-impact": "issues-leaders",
+  "greens-leaders-familiarity": "issues-leaders",
+
   /* Issues, leaders & policy — Essential */
   "abortion-access-20-weeks": "issues-leaders",
   "abortion-care": "issues-leaders",

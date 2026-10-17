@@ -1976,7 +1976,7 @@ const TABS = [
     tip: "How preferences decide the two-party figure" },
   /* the ad hoc topical and issue questions as the ☰ menu's fifth page
      (2026-10-17): the one-off and occasional questions pollsters ask beyond
-     the standing battery, from the four committed one-off stores, grouped by
+     the standing battery, from the five committed one-off stores, grouped by
      theme – hidden for part of its first day and re-shown (user calls) */
   { id: "ad-hocs", label: "Ad hoc topical/issue questions", menu: true,
     tip: "The one-off questions pollsters ask beyond the standing battery, grouped by theme" },

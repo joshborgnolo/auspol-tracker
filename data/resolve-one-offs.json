@@ -1,0 +1,2093 @@
+{
+  "_about": "Resolve Political Monitor (Resolve Strategic, for The Sydney Morning Herald and The Age) one-off and occasional survey questions that do NOT channel into the auspol-tracker data model (voting intention, leader performance ratings, preferred prime minister, who-will-win expectations, party attributes and descriptors – the standing battery sits in polls.json and data/resolve-political-monitor.csv). Scope: the 48th parliament – waves of 2025-07-18 onward, the 17 Resolve waves on file in polls.json (latest: 2026-10-10; the 2025-08-16 and 2025-09-13 articles carried no topical questions). The Monitor publishes no questionnaire and no machine-readable one-off feed, so every wave's SMH/Age article (the url on the polls.json row) is the source: figures are the article's printed numbers verbatim (verbal figures like 'two in three' are noted in the entry's notes, never converted to numerals), question texts are our concise labels, and earlier readings cited only as trend references ride the notes rather than becoming entries of their own. Hand-curated like data/newspoll-one-offs.json; checked by .build/resolve-oneoffs.mjs – hand-edit the entries, never the generated field or key order.",
+  "generated": "2026-10-10",
+  "_readme": "Emission rules:\n- Scope: topical/occasional questions only. Excluded standing battery (channeled elsewhere): primary vote (incl. leadership-scenario primaries), leaders' good/poor performance, net likeability, preferred PM (two- and three-way), who-will-win, party attributes/descriptors, personal well-being index, vote firmness.\n- One entry per question per wave. A question asked in several waves shares one id and becomes a series (most-important-issue, cgt-discount-removal, negative-gearing-restriction, trust-tax-increase, lower-house-prices, cost-of-living-blame, immigration-level, preferred-coalition-leader).\n- Six ids are shared with the other houses' stores where the construct is the same question: immigration-level (SEC Newgate), gender-quotas-coalition, liberal-direction, economy-outlook-6m, preferred-coalition-leader (Essential), most-important-issue (News24).\n- All figures are all-voters percentages printed in the wave's article; cells a wave never printed are null – never inferred from complements or trend sentences. Verbal-only figures ('two in three', 'almost a third', 'the third opposed', 'one in five') are covered by notes; the bar stays blank unless a numeral was also printed.\n- Trend history printed in a later article (e.g. 'up from 48 per cent in December') lives in the entry's notes as printed context, not as a new wave entry.\n- tables: the page's row shape – [label, ...values] with optional headers on crosstabbed reads; the first table is always the all-voters headline read. source repeats the wave article url for provenance.",
+  "entries": [
+    {
+      "id": "gender-quotas-coalition",
+      "waveDate": "2025-07-18",
+      "dateStart": "2025-07-13",
+      "dateEnd": "2025-07-18",
+      "published": "2025-07-20T18:00",
+      "sample": 2311,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/the-long-climb-disaster-for-coalition-in-new-opinion-poll-as-albanese-builds-on-record-win-20250718-p5mg0x.html",
+      "question": "Should the Liberal Party use quotas to lift female representation?",
+      "notes": "The all-voters oppose share was printed only as 'the third opposed', recorded here as its plain-number rendering 33. Asked as new opposition leader Sussan Ley signalled openness to quotas.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/the-long-climb-disaster-for-coalition-in-new-opinion-poll-as-albanese-builds-on-record-win-20250718-p5mg0x.html",
+          "headers": [
+            "",
+            "All voters",
+            "Coalition voters",
+            "Women",
+            "Men"
+          ],
+          "rows": [
+            [
+              "Support quotas",
+              32,
+              27,
+              30,
+              34
+            ],
+            [
+              "Oppose",
+              33,
+              44,
+              27,
+              39
+            ],
+            [
+              "Unsure",
+              36,
+              null,
+              null,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immigration-reduction-support",
+      "waveDate": "2025-10-12",
+      "dateStart": "2025-10-07",
+      "dateEnd": "2025-10-12",
+      "published": "2025-10-12T17:55",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/ley-s-approval-ratings-tank-after-month-of-liberal-chaos-and-disunity-20251011-p5n1sh.html",
+      "question": "Do you support or oppose a significant reduction in Australia's immigration numbers?",
+      "notes": "Respondents were first told net migration was 316,000, the permanent intake 185,000 people a year, and that the Coalition wanted a cut – the figures were part of the question's framing.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/ley-s-approval-ratings-tank-after-month-of-liberal-chaos-and-disunity-20251011-p5n1sh.html",
+          "headers": [
+            "",
+            "All voters",
+            "Labor",
+            "Coalition",
+            "Greens",
+            "One Nation",
+            "Independent"
+          ],
+          "rows": [
+            [
+              "Support a reduction",
+              58,
+              57,
+              65,
+              35,
+              77,
+              50
+            ],
+            [
+              "Oppose",
+              15,
+              null,
+              null,
+              32,
+              null,
+              null
+            ],
+            [
+              "Unsure",
+              27,
+              null,
+              null,
+              33,
+              null,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "liberal-direction",
+      "waveDate": "2025-10-12",
+      "dateStart": "2025-10-07",
+      "dateEnd": "2025-10-12",
+      "published": "2025-10-12T17:55",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/ley-s-approval-ratings-tank-after-month-of-liberal-chaos-and-disunity-20251011-p5n1sh.html",
+      "question": "Should the Coalition tack further right, move to the political centre, or stay as it is?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/ley-s-approval-ratings-tank-after-month-of-liberal-chaos-and-disunity-20251011-p5n1sh.html",
+          "headers": [
+            "",
+            "All voters",
+            "Coalition voters"
+          ],
+          "rows": [
+            [
+              "Move to the political centre ground",
+              32,
+              33
+            ],
+            [
+              "Tack further right",
+              25,
+              32
+            ],
+            [
+              "No change",
+              11,
+              12
+            ],
+            [
+              "Unsure",
+              32,
+              23
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2025-11-08",
+      "dateStart": "2025-11-04",
+      "dateEnd": "2025-11-08",
+      "published": "2025-11-09T18:06",
+      "sample": 1804,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": "Respondents could nominate several important issues, so those shares stand alone. Cost-of-living importance was 92 per cent going into the 2025 election; no other single policy reached double figures as the top priority.",
+      "tables": [
+        {
+          "title": "Nominated as an important issue",
+          "source": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              91
+            ],
+            [
+              "Health and aged care",
+              86
+            ]
+          ]
+        },
+        {
+          "title": "Single most important policy",
+          "source": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              42
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cost-of-living-blame",
+      "waveDate": "2025-11-08",
+      "dateStart": "2025-11-04",
+      "dateEnd": "2025-11-08",
+      "published": "2025-11-09T18:06",
+      "sample": 1804,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+      "question": "Who is most responsible for rising living costs?",
+      "notes": "Federal-government blame was up from 36 per cent in October 2024.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+          "headers": null,
+          "rows": [
+            [
+              "The federal government",
+              42
+            ],
+            [
+              "Global factors",
+              16
+            ],
+            [
+              "State governments",
+              11
+            ],
+            [
+              "Businesses",
+              7
+            ],
+            [
+              "The Reserve Bank",
+              7
+            ],
+            [
+              "Unsure",
+              14
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unexpected-expense-struggle",
+      "waveDate": "2025-11-08",
+      "dateStart": "2025-11-04",
+      "dateEnd": "2025-11-08",
+      "published": "2025-11-09T18:06",
+      "sample": 1804,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+      "question": "Would you struggle to pay an unexpected major expense of a few thousand dollars?",
+      "notes": "Agreement was 50 per cent and disagreement 36 per cent when last asked in December 2024.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+          "headers": null,
+          "rows": [
+            [
+              "Agree or strongly agree",
+              61
+            ],
+            [
+              "Disagree",
+              24
+            ],
+            [
+              "Unsure",
+              15
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "christmas-spending-cutback",
+      "waveDate": "2025-11-08",
+      "dateStart": "2025-11-04",
+      "dateEnd": "2025-11-08",
+      "published": "2025-11-09T18:06",
+      "sample": 1804,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+      "question": "Cost-of-living cutback intentions this Christmas (agree shares)",
+      "notes": "Only the agree shares were published for each item.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+          "headers": null,
+          "rows": [
+            [
+              "Will spend less on Christmas this year",
+              70
+            ],
+            [
+              "Will buy fewer or cheaper presents",
+              71
+            ],
+            [
+              "Finding it harder to make ends meet than a year ago",
+              63
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "economy-outlook-6m",
+      "waveDate": "2025-11-08",
+      "dateStart": "2025-11-04",
+      "dateEnd": "2025-11-08",
+      "published": "2025-11-09T18:06",
+      "sample": 1804,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+      "question": "Will Australia's economic outlook improve or get worse?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
+          "headers": [
+            "",
+            "Next six months",
+            "Next 12 months"
+          ],
+          "rows": [
+            [
+              "Will improve",
+              20,
+              25
+            ],
+            [
+              "Will stay the same",
+              29,
+              null
+            ],
+            [
+              "Will get worse",
+              42,
+              42
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immigration-pause-housing",
+      "waveDate": "2025-12-07",
+      "dateStart": "2025-12-02",
+      "dateEnd": "2025-12-07",
+      "published": "2025-12-07T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+      "question": "Should all immigration be paused until housing supply catches up with demand?",
+      "notes": "Support was printed only as 'two in three voters' with no numeral, so the bar here is blank rather than a conversion.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support a pause",
+              null
+            ],
+            [
+              "Oppose",
+              13
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "migration-skills-restriction",
+      "waveDate": "2025-12-07",
+      "dateStart": "2025-12-02",
+      "dateEnd": "2025-12-07",
+      "published": "2025-12-07T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+      "question": "Restrict permanent migration to people with skills the country needs?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support or strongly support",
+              61
+            ],
+            [
+              "Oppose",
+              17
+            ],
+            [
+              "Undecided",
+              23
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immigration-level",
+      "waveDate": "2025-12-07",
+      "dateStart": "2025-12-02",
+      "dateEnd": "2025-12-07",
+      "published": "2025-12-07T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+      "question": "Is the current level of immigration too high, too low or about right?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+          "headers": null,
+          "rows": [
+            [
+              "Too high",
+              53
+            ],
+            [
+              "About right",
+              27
+            ],
+            [
+              "Too low",
+              4
+            ],
+            [
+              "Undecided",
+              18
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "joyce-one-nation-effect",
+      "waveDate": "2025-12-07",
+      "dateStart": "2025-12-02",
+      "dateEnd": "2025-12-07",
+      "published": "2025-12-07T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+      "question": "Would you be more or less likely to vote One Nation if Barnaby Joyce joined the party?",
+      "notes": "The party-vote breakdown asked about Joyce joining and becoming leader.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+          "headers": [
+            "",
+            "More likely",
+            "Less likely"
+          ],
+          "rows": [
+            [
+              "All voters",
+              29,
+              19
+            ],
+            [
+              "Coalition voters",
+              39,
+              11
+            ],
+            [
+              "One Nation voters",
+              49,
+              8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2025-12-07",
+      "dateStart": "2025-12-02",
+      "dateEnd": "2025-12-07",
+      "published": "2025-12-07T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": "The house prices and rents row is a component of the cost-of-living figure, not an additional response.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              42
+            ],
+            [
+              "— of which house prices and rents",
+              9
+            ],
+            [
+              "Health and aged care",
+              10
+            ],
+            [
+              "Crime and anti-social behaviour",
+              9
+            ],
+            [
+              "National security",
+              6
+            ],
+            [
+              "Climate change",
+              6
+            ],
+            [
+              "Immigration",
+              5
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social-cohesion-rating",
+      "waveDate": "2025-12-20",
+      "dateStart": "2025-12-17",
+      "dateEnd": "2025-12-20",
+      "published": "2025-12-22T05:02",
+      "sample": 1010,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+      "question": "How would you rate the overall level of social cohesion in Australia?",
+      "notes": "Polled the weekend after the Bondi terror attack; the 'good' share was printed as about 38 per cent. One Nation voters were reported as holding the dimmest view, without group figures.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+          "headers": null,
+          "rows": [
+            [
+              "Good",
+              38
+            ],
+            [
+              "Poor",
+              30
+            ],
+            [
+              "Unsure",
+              32
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bondi-response-strength",
+      "waveDate": "2025-12-20",
+      "dateStart": "2025-12-17",
+      "dateEnd": "2025-12-20",
+      "published": "2025-12-22T05:02",
+      "sample": 1010,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+      "question": "How would you rate the federal government's response to the Bondi terror attack?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+          "headers": null,
+          "rows": [
+            [
+              "Very strong",
+              10
+            ],
+            [
+              "Strong",
+              19
+            ],
+            [
+              "Weak",
+              20
+            ],
+            [
+              "Very weak",
+              26
+            ],
+            [
+              "Undecided",
+              25
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "racism-rise-since-gaza",
+      "waveDate": "2025-12-20",
+      "dateStart": "2025-12-17",
+      "dateEnd": "2025-12-20",
+      "published": "2025-12-22T05:02",
+      "sample": 1010,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+      "question": "Have racism and religious intolerance risen since the Gaza conflict began in October 2023?",
+      "notes": "Agreement was 69 per cent in January 2025 and 57 per cent in March 2025.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+          "headers": null,
+          "rows": [
+            [
+              "Agree",
+              72
+            ],
+            [
+              "Disagree",
+              9
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "racism-driver",
+      "waveDate": "2025-12-20",
+      "dateStart": "2025-12-17",
+      "dateEnd": "2025-12-20",
+      "published": "2025-12-22T05:02",
+      "sample": 1010,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+      "question": "What is driving the rise in racism?",
+      "notes": "Asked of those who think racism has worsened. The antisemitism share was 54 per cent in January 2025 and 33 per cent in March 2025; Islamophobia was up 4 points on January 2025.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+          "headers": null,
+          "rows": [
+            [
+              "An increase in antisemitism",
+              55
+            ],
+            [
+              "An increase in Islamophobia",
+              13
+            ],
+            [
+              "Unsure what is driving it",
+              32
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immigration-screening-extremism",
+      "waveDate": "2025-12-20",
+      "dateStart": "2025-12-17",
+      "dateEnd": "2025-12-20",
+      "published": "2025-12-22T05:02",
+      "sample": 1010,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+      "question": "Should there be tougher immigration screening to identify antisemitic or extremist views?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              76
+            ],
+            [
+              "Oppose",
+              7
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "antisemitism-royal-commission",
+      "waveDate": "2026-01-16",
+      "dateStart": "2026-01-12",
+      "dateEnd": "2026-01-16",
+      "published": "2026-01-18T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/support-for-albanese-plummets-after-muddled-response-to-bondi-attack-20260118-p5nuv8.html",
+      "question": "Should there be a royal commission into rising antisemitism?",
+      "notes": "Support was 48 per cent in the December post-attack poll, as cited by this article (the December article itself printed no figure). Published days after the government dropped its resistance to a national inquiry.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/support-for-albanese-plummets-after-muddled-response-to-bondi-attack-20260118-p5nuv8.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              61
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bondi-response-leaders",
+      "waveDate": "2026-01-16",
+      "dateStart": "2026-01-12",
+      "dateEnd": "2026-01-16",
+      "published": "2026-01-18T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/support-for-albanese-plummets-after-muddled-response-to-bondi-attack-20260118-p5nuv8.html",
+      "question": "How would you rate each leader's response to the Bondi attack?",
+      "notes": "Ley's undecided share was not published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/support-for-albanese-plummets-after-muddled-response-to-bondi-attack-20260118-p5nuv8.html",
+          "headers": [
+            "",
+            "Good",
+            "Poor",
+            "Undecided"
+          ],
+          "rows": [
+            [
+              "Anthony Albanese",
+              32,
+              56,
+              13
+            ],
+            [
+              "Sussan Ley",
+              53,
+              29,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2026-02-14",
+      "dateStart": "2026-02-08",
+      "dateEnd": "2026-02-14",
+      "published": "2026-02-15T17:59",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": "No other issue reached double figures as the No.1 concern.",
+      "tables": [
+        {
+          "title": "Issue would affect their vote",
+          "source": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              92
+            ]
+          ]
+        },
+        {
+          "title": "No.1 policy concern",
+          "source": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              45
+            ],
+            [
+              "Immigration and refugees",
+              10
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "preferred-coalition-leader",
+      "waveDate": "2026-02-14",
+      "dateStart": "2026-02-08",
+      "dateEnd": "2026-02-14",
+      "published": "2026-02-15T17:59",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+      "question": "Who would you prefer as Liberal leader?",
+      "notes": "Fieldwork straddled Sussan Ley's last days and Angus Taylor's first as leader; five names were offered.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+          "headers": [
+            "",
+            "All voters",
+            "One Nation voters"
+          ],
+          "rows": [
+            [
+              "Sussan Ley",
+              19,
+              10
+            ],
+            [
+              "Andrew Hastie",
+              13,
+              26
+            ],
+            [
+              "Angus Taylor",
+              10,
+              15
+            ],
+            [
+              "Tim Wilson",
+              4,
+              null
+            ],
+            [
+              "Ted O'Brien",
+              3,
+              null
+            ],
+            [
+              "Unsure or no preference",
+              52,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "taylor-awareness",
+      "waveDate": "2026-02-14",
+      "dateStart": "2026-02-08",
+      "dateEnd": "2026-02-14",
+      "published": "2026-02-15T17:59",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+      "question": "Had you heard of Angus Taylor, the new opposition leader?",
+      "notes": "Of those who had heard of Taylor, 32 per cent held a neutral view of him; he had spent 13 years as an MP.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+          "headers": null,
+          "rows": [
+            [
+              "Had heard of him",
+              61
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2026-03-14",
+      "dateStart": "2026-03-09",
+      "dateEnd": "2026-03-14",
+      "published": "2026-03-15T18:00",
+      "sample": 1803,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/one-nation-now-wrenching-votes-from-labor-as-it-overtakes-coalition-20260315-p5oakr.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": "11 per cent within the cost-of-living group specifically nominated house and rental prices and availability; no other topic reached double figures.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/one-nation-now-wrenching-votes-from-labor-as-it-overtakes-coalition-20260315-p5oakr.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              43
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fuel-price-driving-changes",
+      "waveDate": "2026-04-18",
+      "dateStart": "2026-04-13",
+      "dateEnd": "2026-04-18",
+      "published": "2026-04-19T18:00",
+      "sample": 1807,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-return-to-major-parties-as-one-nation-support-dips-20260417-p5zox0.html",
+      "question": "What have you changed because of the war-driven petrol price surge?",
+      "notes": "Taken during the Iran war as oil neared US$120 a barrel. Respondents could report more than one change, so the rows are not a partition; the skipped-trip figure was printed as 'one in five'.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-return-to-major-parties-as-one-nation-support-dips-20260417-p5zox0.html",
+          "headers": [
+            "",
+            "All voters",
+            "Low-income earners",
+            "Retirees",
+            "Rural or regional",
+            "High-income earners"
+          ],
+          "rows": [
+            [
+              "Changed their driving habits",
+              79,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "Driving less",
+              58,
+              67,
+              64,
+              64,
+              null
+            ],
+            [
+              "Skipped an Easter-holiday trip",
+              20,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "Using public transport, walking or cycling to work",
+              19,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "Reduced other purchases",
+              27,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "No change",
+              21,
+              null,
+              null,
+              null,
+              25
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2026-04-18",
+      "dateStart": "2026-04-13",
+      "dateEnd": "2026-04-18",
+      "published": "2026-04-19T18:00",
+      "sample": 1807,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-return-to-major-parties-as-one-nation-support-dips-20260417-p5zox0.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-return-to-major-parties-as-one-nation-support-dips-20260417-p5zox0.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              42
+            ],
+            [
+              "Housing",
+              8
+            ],
+            [
+              "Healthcare",
+              7
+            ],
+            [
+              "Immigration",
+              6
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "labor-broken-promises-view",
+      "waveDate": "2026-05-16",
+      "dateStart": "2026-05-13",
+      "dateEnd": "2026-05-16",
+      "published": "2026-05-17T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "question": "Has Labor breaking its tax promises changed your view of the party?",
+      "notes": "The group figures were printed as 'about 40 per cent' in each; younger Australians and renters were reported as less hostile, without figures.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "View damaged",
+              36
+            ],
+            [
+              "View unchanged",
+              31
+            ],
+            [
+              "View improved",
+              14
+            ],
+            [
+              "Undecided",
+              18
+            ]
+          ]
+        },
+        {
+          "title": "View damaged, by group",
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "Older Australians",
+              40
+            ],
+            [
+              "Property investors",
+              40
+            ],
+            [
+              "Property owners",
+              40
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cgt-discount-removal",
+      "waveDate": "2026-05-16",
+      "dateStart": "2026-05-13",
+      "dateEnd": "2026-05-16",
+      "published": "2026-05-17T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "question": "Do you support or oppose removing the 50 per cent capital gains tax discount?",
+      "notes": "Announced in the May 2026 budget, breaking an election promise.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              36
+            ],
+            [
+              "Oppose",
+              21
+            ],
+            [
+              "Undecided",
+              42
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "negative-gearing-restriction",
+      "waveDate": "2026-05-16",
+      "dateStart": "2026-05-13",
+      "dateEnd": "2026-05-16",
+      "published": "2026-05-17T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "question": "Do you support or oppose restricting negative gearing?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              35
+            ],
+            [
+              "Oppose",
+              21
+            ],
+            [
+              "Undecided",
+              44
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ndis-cuts-support",
+      "waveDate": "2026-05-16",
+      "dateStart": "2026-05-13",
+      "dateEnd": "2026-05-16",
+      "published": "2026-05-17T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "question": "Do you support or oppose cutting the NDIS to save $36 billion over four years?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              39
+            ],
+            [
+              "Oppose",
+              24
+            ],
+            [
+              "Undecided",
+              37
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trust-tax-increase",
+      "waveDate": "2026-05-16",
+      "dateStart": "2026-05-13",
+      "dateEnd": "2026-05-16",
+      "published": "2026-05-17T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "question": "Do you support or oppose increasing tax rates on trusts?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              34
+            ],
+            [
+              "Oppose",
+              23
+            ],
+            [
+              "Undecided",
+              43
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "budget-good-for-household",
+      "waveDate": "2026-05-16",
+      "dateStart": "2026-05-13",
+      "dateEnd": "2026-05-16",
+      "published": "2026-05-17T18:00",
+      "sample": 1800,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "question": "Will this budget be good or bad for your household?",
+      "notes": "The 24 per cent 'good' is the lowest the Resolve monitor has recorded on this measure.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+          "headers": null,
+          "rows": [
+            [
+              "Good",
+              24
+            ],
+            [
+              "Bad",
+              35
+            ],
+            [
+              "Undecided",
+              41
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cgt-discount-removal",
+      "waveDate": "2026-06-13",
+      "dateStart": "2026-06-08",
+      "dateEnd": "2026-06-13",
+      "published": "2026-06-14T18:00",
+      "sample": 1801,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+      "question": "Do you support or oppose removing the 50 per cent capital gains tax discount?",
+      "notes": "Framed as ending the discount from July 2027; support fell 5 points and opposition rose 10 points in the month.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              31
+            ],
+            [
+              "Oppose",
+              31
+            ],
+            [
+              "Undecided",
+              38
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "negative-gearing-restriction",
+      "waveDate": "2026-06-13",
+      "dateStart": "2026-06-08",
+      "dateEnd": "2026-06-13",
+      "published": "2026-06-14T18:00",
+      "sample": 1801,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+      "question": "Do you support or oppose restricting negative gearing?",
+      "notes": "Framed as restricting negative gearing to new properties only.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              33
+            ],
+            [
+              "Oppose",
+              26
+            ],
+            [
+              "Undecided",
+              41
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trust-tax-increase",
+      "waveDate": "2026-06-13",
+      "dateStart": "2026-06-08",
+      "dateEnd": "2026-06-13",
+      "published": "2026-06-14T18:00",
+      "sample": 1801,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+      "question": "Do you support or oppose increasing tax rates on trusts?",
+      "notes": "Framed as a minimum 30 per cent tax rate on trusts; opposition rose 11 points in the month.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              29
+            ],
+            [
+              "Oppose",
+              34
+            ],
+            [
+              "Undecided",
+              36
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2026-06-13",
+      "dateStart": "2026-06-08",
+      "dateEnd": "2026-06-13",
+      "published": "2026-06-14T18:00",
+      "sample": 1801,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": "Up 3 points on the month; no other issue reached double figures.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              47
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hanson-young-workers-lazy",
+      "waveDate": "2026-07-11",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-11",
+      "published": "2026-07-12T17:50",
+      "sample": 2252,
+      "sampleEff": null,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "question": "Do you agree with Pauline Hanson that many young workers are lazy?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+          "headers": null,
+          "rows": [
+            [
+              "Agree",
+              50
+            ],
+            [
+              "Disagree",
+              23
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hanson-immigration-settings",
+      "waveDate": "2026-07-11",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-11",
+      "published": "2026-07-12T17:50",
+      "sample": 2252,
+      "sampleEff": null,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "question": "Do you agree with Hanson's claim that Australia's immigration settings are wrong?",
+      "notes": "Only the agreement share was published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+          "headers": null,
+          "rows": [
+            [
+              "Agree",
+              53
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hanson-ndis-priorities",
+      "waveDate": "2026-07-11",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-11",
+      "published": "2026-07-12T17:50",
+      "sample": 2252,
+      "sampleEff": null,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "question": "Do you share Hanson's concerns about the priorities of the NDIS?",
+      "notes": "Only the agreement share was published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+          "headers": null,
+          "rows": [
+            [
+              "Agree",
+              72
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hanson-poverty-serious",
+      "waveDate": "2026-07-11",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-11",
+      "published": "2026-07-12T17:50",
+      "sample": 2252,
+      "sampleEff": null,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "question": "Do you agree poverty is a serious problem the government needs to address?",
+      "notes": "Only the agreement share was published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+          "headers": null,
+          "rows": [
+            [
+              "Agree",
+              73
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "australia-monoculture",
+      "waveDate": "2026-07-11",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-11",
+      "published": "2026-07-12T17:50",
+      "sample": 2252,
+      "sampleEff": null,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "question": "Would Australia be better off if it were 'monocultural'?",
+      "notes": "Hanson's attacks on the SBS, the ABC and the United Nations were backed by only a minority of respondents (no figures published).",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              33
+            ],
+            [
+              "Disagree",
+              39
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "easier-to-sack-workers",
+      "waveDate": "2026-07-11",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-11",
+      "published": "2026-07-12T17:50",
+      "sample": 2252,
+      "sampleEff": null,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "question": "Should it be easier to sack people?",
+      "notes": "Put as Pauline Hanson's argument that it should be easier to dismiss workers.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              32
+            ],
+            [
+              "Oppose",
+              36
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immigration-program-handling",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Is the government handling the immigration program in a carefully planned and managed way, or an unplanned and unmanaged way?",
+      "notes": "Strong majorities of Coalition, One Nation and even Greens voters marked down the government's handling, without group figures.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Unplanned and unmanaged",
+              54
+            ],
+            [
+              "Carefully planned and managed",
+              26
+            ],
+            [
+              "Undecided",
+              20
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immigration-level",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Is the current level of immigration too high, too low or about right?",
+      "notes": "The too-high reading was up 8 points since September 2025.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Too high",
+              57
+            ],
+            [
+              "About right",
+              28
+            ],
+            [
+              "Too low",
+              4
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cgt-discount-removal",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Do you support or oppose removing the 50 per cent capital gains tax discount?",
+      "notes": "The undecided group was described as undecided or neutral.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              35
+            ],
+            [
+              "Oppose",
+              21
+            ],
+            [
+              "Undecided",
+              44
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "negative-gearing-restriction",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Do you support or oppose restricting negative gearing?",
+      "notes": "Framed as restricting negative gearing to new properties only.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              35
+            ],
+            [
+              "Oppose",
+              20
+            ],
+            [
+              "Undecided",
+              45
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lower-house-prices",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Do you support or oppose lower house prices?",
+      "notes": "'Almost a third' were undecided or neutral; no numeral was published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              60
+            ],
+            [
+              "Oppose",
+              10
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "most-important-issue",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Which issue matters most to you? (top policy priority)",
+      "notes": "The lowest cost-of-living reading since February 2023. The article cites 45 per cent for the previous month, though the June article itself printed 47 per cent.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Keeping the cost of living low",
+              36
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "preferred-coalition-leader",
+      "waveDate": "2026-08-15",
+      "dateStart": "2026-08-09",
+      "dateEnd": "2026-08-15",
+      "published": "2026-08-16T17:59",
+      "sample": 2256,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "question": "Who would you prefer as Liberal leader?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+          "headers": null,
+          "rows": [
+            [
+              "Angus Taylor",
+              30
+            ],
+            [
+              "Andrew Hastie",
+              10
+            ],
+            [
+              "Tim Wilson",
+              5
+            ],
+            [
+              "Undecided",
+              56
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "federal-debt-concern",
+      "waveDate": "2026-09-12",
+      "dateStart": "2026-09-06",
+      "dateEnd": "2026-09-12",
+      "published": "2026-09-13T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "question": "Are you concerned about the federal government debt?",
+      "notes": "Only the concerned share was published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+          "headers": null,
+          "rows": [
+            [
+              "Concerned",
+              74
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "state-debt-concern",
+      "waveDate": "2026-09-12",
+      "dateStart": "2026-09-06",
+      "dateEnd": "2026-09-12",
+      "published": "2026-09-13T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "question": "Are you concerned about your state government's debt?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+          "headers": [
+            "",
+            "All voters",
+            "Victoria",
+            "NSW",
+            "Queensland"
+          ],
+          "rows": [
+            [
+              "Concerned",
+              69,
+              72,
+              67,
+              63
+            ],
+            [
+              "Unconcerned",
+              11,
+              null,
+              null,
+              null
+            ],
+            [
+              "Undecided",
+              20,
+              null,
+              null,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "debt-deficit-remedy",
+      "waveDate": "2026-09-12",
+      "dateStart": "2026-09-06",
+      "dateEnd": "2026-09-12",
+      "published": "2026-09-13T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "question": "How should the government deal with debt and deficit?",
+      "notes": "The options collapse leaners ('mostly' and 'only' combined).",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+          "headers": null,
+          "rows": [
+            [
+              "Mostly or only spending cuts",
+              48
+            ],
+            [
+              "Solely or mostly tax rises",
+              10
+            ],
+            [
+              "An equal balance of both",
+              42
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "albanese-trust-broken-promises",
+      "waveDate": "2026-09-12",
+      "dateStart": "2026-09-06",
+      "dateEnd": "2026-09-12",
+      "published": "2026-09-13T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "question": "Has the budget's broken promises changed your trust in Anthony Albanese?",
+      "notes": "The remaining share was not published.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+          "headers": null,
+          "rows": [
+            [
+              "Lost trust because of the broken promises",
+              23
+            ],
+            [
+              "Did not trust him before the promises",
+              34
+            ],
+            [
+              "Still trust him",
+              26
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "budget-broken-promises-labor-vote",
+      "waveDate": "2026-09-12",
+      "dateStart": "2026-09-06",
+      "dateEnd": "2026-09-12",
+      "published": "2026-09-13T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "question": "Do the May budget's broken promises make you more or less likely to vote Labor?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+          "headers": null,
+          "rows": [
+            [
+              "More likely",
+              20
+            ],
+            [
+              "Less likely",
+              41
+            ],
+            [
+              "No impact or unsure",
+              39
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lower-house-prices",
+      "waveDate": "2026-09-12",
+      "dateStart": "2026-09-06",
+      "dateEnd": "2026-09-12",
+      "published": "2026-09-13T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "question": "Do you support or oppose lower house prices?",
+      "notes": "The article says the figures had barely shifted since the May budget.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+          "headers": null,
+          "rows": [
+            [
+              "Support",
+              59
+            ],
+            [
+              "Oppose",
+              9
+            ],
+            [
+              "Neutral or undecided",
+              30
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cost-of-living-blame",
+      "waveDate": "2026-10-10",
+      "dateStart": "2026-10-06",
+      "dateEnd": "2026-10-10",
+      "published": "2026-10-11T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+      "question": "Who is primarily responsible for the cost-of-living crunch?",
+      "notes": "Federal-Labor blame rose 6 points and global-factors blame rose 9 points since March 2026; the other response groups were not republished this wave (the November 2025 read is the full six-way breakdown).",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+          "headers": null,
+          "rows": [
+            [
+              "Federal Labor",
+              46
+            ],
+            [
+              "Global factors",
+              26
+            ],
+            [
+              "The Reserve Bank",
+              4
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "greens-leader-awareness",
+      "waveDate": "2026-10-10",
+      "dateStart": "2026-10-06",
+      "dateEnd": "2026-10-10",
+      "published": "2026-10-11T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+      "question": "Were you aware the Greens had chosen David Shoebridge as their new leader?",
+      "notes": "The One Nation and Coalition shares were printed as a single 44 per cent covering both groups; the poll found a majority were unaware.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+          "headers": [
+            "",
+            "All voters",
+            "Greens",
+            "Labor",
+            "One Nation",
+            "Coalition"
+          ],
+          "rows": [
+            [
+              "Aware of the change of leader",
+              40,
+              36,
+              42,
+              44,
+              44
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "greens-leadership-vote-impact",
+      "waveDate": "2026-10-10",
+      "dateStart": "2026-10-06",
+      "dateEnd": "2026-10-10",
+      "published": "2026-10-11T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+      "question": "Does the Greens' change of leader make you more or less likely to vote for them?",
+      "notes": null,
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+          "headers": null,
+          "rows": [
+            [
+              "No difference",
+              70
+            ],
+            [
+              "More likely",
+              13
+            ],
+            [
+              "Less likely",
+              17
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "greens-leaders-familiarity",
+      "waveDate": "2026-10-10",
+      "dateStart": "2026-10-06",
+      "dateEnd": "2026-10-10",
+      "published": "2026-10-11T18:00",
+      "sample": 2250,
+      "sampleEff": null,
+      "url": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+      "question": "How familiar are the Greens' leaders?",
+      "notes": "Waters' familiar share was not published; the likeability nets in the same sentence ride the standing battery and live elsewhere on the site.",
+      "tables": [
+        {
+          "title": null,
+          "source": "https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html",
+          "headers": [
+            "",
+            "Familiar",
+            "Unfamiliar"
+          ],
+          "rows": [
+            [
+              "David Shoebridge",
+              55,
+              45
+            ],
+            [
+              "Larissa Waters",
+              null,
+              50
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

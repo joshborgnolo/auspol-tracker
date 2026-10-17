@@ -761,9 +761,10 @@ function ssChangelogBlock(esc) {
 }
 
 /* The Ad-hocs tab page's static article: the topical one-off questions from
-   the four committed one-off stores (data/news24-one-offs.json's one_offs +
-   the entries of data/redbridge-one-offs.json, data/secnewgate-one-offs.json
-   and data/essential-one-offs.json), grouped by adhoc-themes.mjs into
+   the five committed one-off stores (data/news24-one-offs.json's one_offs +
+   the entries of data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
+   data/essential-one-offs.json and data/resolve-one-offs.json), grouped
+   by adhoc-themes.mjs into
    the SAME theme order the live page renders, so a no-JS reader or crawler
    sees the live page's figures as text. The grouping itself is one source on
    purpose – themeOf throws on an id it doesn't know, so landing a new wave of
@@ -775,12 +776,13 @@ function ssChangelogBlock(esc) {
 const AO_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function ssAdhocsBlock(esc) {
   const read = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8"));
-  let news24 = null, redbridge = null, secnewgate = null, essential = null;
+  let news24 = null, redbridge = null, secnewgate = null, essential = null, resolve = null;
   try { news24 = read("news24-one-offs.json").one_offs || []; } catch { /* absent */ }
   try { redbridge = read("redbridge-one-offs.json").entries || []; } catch { /* absent */ }
   try { secnewgate = read("secnewgate-one-offs.json").entries || []; } catch { /* absent */ }
   try { essential = read("essential-one-offs.json").entries || []; } catch { /* absent */ }
-  if (!news24 && !redbridge && !secnewgate && !essential) return "";
+  try { resolve = read("resolve-one-offs.json").entries || []; } catch { /* absent */ }
+  if (!news24 && !redbridge && !secnewgate && !essential && !resolve) return "";
   const entries = [];
   for (const e of news24 || []) {
     entries.push({
@@ -823,6 +825,16 @@ function ssAdhocsBlock(esc) {
       proseOnly: !((e.tables || []).length),
     });
   }
+  for (const e of resolve || []) {
+    const t = (e.tables || [])[0] || {};
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      house: "resolve", url: e.url || null,
+      rows: (t.rows || []).slice(0, 12).map((r) => [r[0], r[1] ?? null]),
+      proseOnly: !((e.tables || []).length),
+    });
+  }
   if (!entries.length) return "";
   const fmt = (v) => {
     if (v == null || v === "" || v === "--") return "&#8211;";
@@ -847,10 +859,12 @@ function ssAdhocsBlock(esc) {
     if (!qs) return "";
     const blocks = [...qs.entries()].map(([q, waves]) => {
       const houseN = new Set(waves.map((w) => w.house));
-      const tag = houseN.size > 1 ? (houseN.size === 4 ? "all four houses" : houseN.size === 3 ? "all three houses" : "both houses")
+      const tag = houseN.size > 1 ? (houseN.size === 5 ? "all five houses" : houseN.size === 4 ? "all four houses" : houseN.size === 3 ? "all three houses" : "both houses")
         : waves[0].house === "news24" ? "YouGov &#8211; News24 Pulse"
         : waves[0].house === "secnewgate" ? "SEC Newgate Mood of the Nation"
-        : waves[0].house === "essential" ? "Essential Report" : "RedBridge/Accent (via the AFR)";
+        : waves[0].house === "essential" ? "Essential Report"
+        : waves[0].house === "resolve" ? "Resolve Political Monitor"
+        : "RedBridge/Accent (via the AFR)";
       const reads = [...waves].sort((a, b) => String(b.waveDate).localeCompare(String(a.waveDate)))
         .map((b) => `
         <div class="ao-ss-wave"><span class="ao-ss-date">${dateLabel(b)}</span>
@@ -1708,10 +1722,10 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     /* the ☰ menu's fifth page, straight under the explainer (the user's
        2026-10-17 call: the topical one-off questions the pollsters ask
-       beyond the standing battery, from the four committed one-off stores –
+       beyond the standing battery, from the five committed one-off stores –
        federal only, /vic/'s menu never holds it) */
     ...(VIC ? [] : [{ id: "ad-hocs", label: "Ad hoc topical/issue questions",
-      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent, YouGov News24 Pulse, Essential Report and SEC Newgate one-offs, grouped by theme with every figure and source." }]),
+      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent, YouGov News24 Pulse, Essential Report, SEC Newgate and Resolve Political Monitor one-offs, grouped by theme with every figure and source." }]),
     /* the ☰ menu's sixth page, straight under Ad hocs (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
        Info about-block's tail, then a console satellite at /changelog/;
