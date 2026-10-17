@@ -46656,7 +46656,104 @@
     "1961": [],
     "1963": [],
     "1966": [],
-    "1969": [],
+    "1969": [
+      {
+        "date": "1971-04-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 47,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1971-08-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1971-11-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -2,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-02-12",
+        "firm": "Morgan Gallup",
+        "pmNet": -21,
+        "oppNet": -4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-04-08",
+        "firm": "Morgan Gallup",
+        "pmNet": -32,
+        "oppNet": -2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-04-29",
+        "firm": "Morgan Gallup",
+        "pmNet": -28,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-06-10",
+        "firm": "Morgan Gallup",
+        "pmNet": -17,
+        "oppNet": 1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-07-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -23,
+        "oppNet": 2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-08-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -23,
+        "oppNet": 0,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-09-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-10-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1972-11-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
     "1972": [
       {
         "date": "1973-06-15",
