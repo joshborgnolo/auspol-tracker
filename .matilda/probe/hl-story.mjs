@@ -1,9 +1,12 @@
 /* House-lean story: the head/dek follows the OPEN measure tab (2026-10-17).
    Was: one two-party finding whichever tab was open (plus a conditional
    split clause). Now: one finding per measure in the measure's own terms,
-   with same-way ties named together and the runner-up placed in the dek.
-   This probe pins the wiring: a distinct head per measure tab whose names
-   agree with the table's own top lean, and sanity wording per family.
+   with same-way leans within 0.1pt BOTH named in the headline (2026-10-18:
+   widened from 0.05 — a pollster level with the leader at the displayed
+   precision no longer drops silently to the dek) and the runner-up placed
+   in the dek. This probe pins the wiring: a distinct head per measure tab
+   whose names agree with the table's own top lean, and sanity wording per
+   family.
    Run from the repo root: node .matilda/probe/hl-story.mjs
    Rebuild first — this probes the BUILT index.html artifact. */
 import { createServer } from "node:http";
@@ -49,9 +52,15 @@ const readStory = () => page.evaluate(() => ({
     h: r.querySelector(".rd-hl-who b").textContent,
     v: parseFloat(r.querySelector(".rd-hl-now").textContent.replace("−", "-")) || 0 })),
 }));
-const topLean = (l) => [...l].sort((a, b) => Math.abs(b.v) - Math.abs(a.v))
-  .filter((r) => Math.abs(r.v) >= 0.05 && Math.abs(r.v) >= Math.abs([...l].sort((a, b) => Math.abs(b.v) - Math.abs(a.v))[0].v) - 0.05)
-  .map((r) => r.h);
+/* mirror of the generator's tie group: the strongest lean's OWN way, plus
+   every lean the same way within one displayed tenth (0.1pt) of it — the
+   headline must name ALL of them */
+const topLean = (l) => {
+  const s = [...l].sort((a, b) => Math.abs(b.v) - Math.abs(a.v)).filter((r) => Math.abs(r.v) >= 0.05);
+  if (!s.length) return [];
+  const sgn = s[0].v > 0, top = Math.abs(s[0].v);
+  return s.filter((r) => (r.v > 0) === sgn && Math.abs(r.v) >= top - 0.1).map((r) => r.h);
+};
 
 const TABS = [
   ["Two-party", /lean(s)? furthest to (Labor|the Coalition|One Nation)/],

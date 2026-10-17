@@ -47,15 +47,15 @@ const story = (key, onM) => {
     const tail = " The averages take each lean out before the polls are combined.";
     const fmtPt = (v) => `${v.toFixed(1)} point${v.toFixed(1) === "1.0" ? "" : "s"}`;
     const sgn = hsr[0].v > 0;
-    const tied = hsr.filter((r) => (r.v > 0) === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.05);
+    const tied = hsr.filter((r) => (r.v > 0) === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.1);
     const next = hsr.filter((r) => !tied.includes(r));
-    const pl = tied.length > 1, topV = Math.abs(hsr[0].v);
+    const pl = tied.length > 1, topV = Math.min(...tied.map((r) => Math.abs(r.v)));
     head = `${hlJoin(tied.map((r) => r.h))} ${(sgn ? words.hi : words.lo)(pl)}, and ${topV <= 1 ? "only " : ""}by ${fmtPt(topV)}`;
     if (!next.length) {
       dek = "No other pollster leans measurably either way." + tail;
     } else {
       const nextMax = Math.abs(next[0].v);
-      const nextTied = next.filter((r) => Math.abs(r.v) >= nextMax - 0.05);
+      const nextTied = next.filter((r) => Math.abs(r.v) >= nextMax - 0.1);
       dek = `${hlJoin(nextTied.map((r) => r.h))} ${nextTied.length > 1 ? "are" : "is"} next, ${fmtPt(nextMax)} off`
         + (next.length > nextTied.length ? "; no other pollster is further out" : "")
         + `.${topV >= 1 && nextMax <= topV / 2 ? ` ${pl ? "They are" : "It is"} well clear of the pack.` : ""}${tail}`;
@@ -85,6 +85,8 @@ for (const k of ["tpp", "split", "alp", "lnp", "onp", "grn", "oth"]) {
   }
 }
 synth("tie at top, same way", { A: 1.2, B: 1.2, C: 0.4, D: -0.3 });
+synth("tie at top, a tenth apart", { A: 1.3, B: 1.2, C: 0.4, D: -0.3 });
+synth("leader + pair inside a tenth, second pair tied below", { A: 1.3, B: 1.2, C: 0.8, D: 0.8, E: -0.9 });
 synth("tie at top, THREE", { A: 0.9, B: 0.9, C: 0.9, D: 0.2, E: -0.8 });
 synth("equal-opposite outliers", { A: 1.4, B: -1.4, C: 0.2 });
 synth("well clear", { A: 2.6, B: 0.5, C: -0.4, D: 0.1 });

@@ -4581,17 +4581,21 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     const tail = " The averages take each lean out before the polls are combined.";
     const fmtPt = (v) => `${v.toFixed(1)} point${v.toFixed(1) === "1.0" ? "" : "s"}`;
     /* a shared lean needs the leader's way as well as its distance: a -1.2
-       beside a +1.2 is the OUTLIER on the other side, not a fellow traveller */
+       beside a +1.2 is the OUTLIER on the other side, not a fellow traveller.
+       "About the same" = within one displayed tenth (0.1pt) of the leader,
+       so two pollsters level at the top are BOTH named in the headline */
     const sgn = hsr[0].v > 0;
-    const tied = hsr.filter((r) => (r.v > 0) === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.05);
+    const tied = hsr.filter((r) => (r.v > 0) === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.1);
     const next = hsr.filter((r) => !tied.includes(r));
-    const pl = tied.length > 1, topV = Math.abs(hsr[0].v);
+    /* the head's figure is the tied group's FLOOR, so "A and B lean
+       furthest, and by 1.2 points" stays true of every house named */
+    const pl = tied.length > 1, topV = Math.min(...tied.map((r) => Math.abs(r.v)));
     head = `${hlJoin(tied.map((r) => r.h))} ${(sgn ? words.hi : words.lo)(pl)}, and ${topV <= 1 ? "only " : ""}by ${fmtPt(topV)}`;
     if (!next.length) {
       dek = "No other pollster leans measurably either way." + tail;
     } else {
       const nextMax = Math.abs(next[0].v);
-      const nextTied = next.filter((r) => Math.abs(r.v) >= nextMax - 0.05);
+      const nextTied = next.filter((r) => Math.abs(r.v) >= nextMax - 0.1);
       dek = `${hlJoin(nextTied.map((r) => r.h))} ${nextTied.length > 1 ? "are" : "is"} next, ${fmtPt(nextMax)} off`
         + (next.length > nextTied.length ? "; no other pollster is further out" : "")
         + `.${topV >= 1 && nextMax <= topV / 2 ? ` ${pl ? "They are" : "It is"} well clear of the pack.` : ""}${tail}`;
