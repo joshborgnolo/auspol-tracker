@@ -22,7 +22,6 @@ import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
-import { THEMES as ONEOFF_THEMES, themeOf as oneOffThemeOf } from "./adhoc-themes.mjs";
 import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
@@ -120,7 +119,7 @@ const JSX = [
   "rd-polls.jsx",                             // the redesign's latest-and-next polls table
   "rd-cycles.jsx",                            // the redesign's Past cycles tab
   "rd-allpolls.jsx",                          // the redesign's All polls tab
-  "rd-adhocs.jsx",                            // the ☰ menu's Ad hocs catalogue page
+  "rd-beyond.jsx",                            // the ☰ menu's Beyond the vote page
   "73de0c58-f11f-4793-9f90-77e583ab051b.js",  // header, hero, mount
 ];
 
@@ -760,181 +759,61 @@ function ssChangelogBlock(esc) {
         is the interactive archive.</p>`;
 }
 
-/* The Ad-hocs tab page's static article: the topical one-off questions from
-   the six committed one-off stores (data/news24-one-offs.json's one_offs +
-   the entries of data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
-   data/essential-one-offs.json, data/resolve-one-offs.json and
-   data/freshwater-one-offs.json), grouped
-   by adhoc-themes.mjs into
-   the SAME theme order the live page renders, so a no-JS reader or crawler
-   sees the live page's figures as text. The grouping itself is one source on
-   purpose – themeOf throws on an id it doesn't know, so landing a new wave of
-   any store without mapping its ids fails the build loudly.
-   Shape: each theme is an h2 + dek, then each question is an h3 card intro,
-   each wave a labelled paragraph of "Option answer%" spans (the first
-   all-voters table only – depth is the live page's folds). No colour here;
-   the .ao-ss styles are template.html's. Caller supplies its esc. */
-const AO_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-function ssAdhocsBlock(esc) {
-  const read = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8"));
-  let news24 = null, redbridge = null, secnewgate = null, essential = null, resolve = null, freshwater = null, newspoll = null, demosau = null;
-  try { news24 = read("news24-one-offs.json").one_offs || []; } catch { /* absent */ }
-  try { redbridge = read("redbridge-one-offs.json").entries || []; } catch { /* absent */ }
-  try { secnewgate = read("secnewgate-one-offs.json").entries || []; } catch { /* absent */ }
-  try { essential = read("essential-one-offs.json").entries || []; } catch { /* absent */ }
-  try { resolve = read("resolve-one-offs.json").entries || []; } catch { /* absent */ }
-  try { freshwater = read("freshwater-one-offs.json").entries || []; } catch { /* absent */ }
-  try { newspoll = read("newspoll-one-offs.json").one_offs || []; } catch { /* absent */ }
-  try { demosau = read("demosau-one-offs.json").one_offs || []; } catch { /* absent */ }
-  if (!news24 && !redbridge && !secnewgate && !essential && !resolve && !freshwater && !newspoll && !demosau) return "";
-  const entries = [];
-  /* Mirrors rd-adhocs.jsx AoWave's headline-slot rule: the static fig line
-     holds label+value pairs; a first table whose rows run wider belongs to
-     the live page's table slot, so it emits the note, never a crushed
-     column of the second cell. */
-  const headPairs = (raw) => {
-    const rows = raw || [];
-    return rows.length && rows.every((r) => Array.isArray(r) && r.length === 2)
-      ? rows.slice(0, 12).map((r) => [r[0], r[1] ?? null])
-      : [];
-  };
-  for (const e of news24 || []) {
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
-      dateEnd: e.fieldwork ? e.fieldwork.end : null,
-      house: "news24", url: e.articleUrl || null,
-      rows: headPairs(e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows),
-      proseOnly: !((e.data && e.data.tables || []).length),
-    });
-  }
-  for (const e of redbridge || []) {
-    const t = (e.tables || [])[0] || {};
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      house: "redbridge", url: e.url || null,
-      rows: headPairs((t.entities || []).map((en) => [en.name, (en.values || [])[0]])),
-      proseOnly: false,
-    });
-  }
-  for (const e of secnewgate || []) {
-    const t = (e.tables || [])[0] || {};
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      house: "secnewgate", url: e.url || null,
-      rows: headPairs((t.entities || []).map((en) => [en.name, (en.values || [])[0]])),
-      proseOnly: false,
-    });
-  }
-  for (const e of essential || []) {
-    const t = (e.tables || [])[0] || {};
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      house: "essential", url: e.url || null,
-      rows: headPairs(t.rows),
-      proseOnly: !((e.tables || []).length),
-    });
-  }
-  for (const e of resolve || []) {
-    const t = (e.tables || [])[0] || {};
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      house: "resolve", url: e.url || null,
-      rows: headPairs(t.rows),
-      proseOnly: !((e.tables || []).length),
-    });
-  }
-  for (const e of freshwater || []) {
-    const t = (e.tables || [])[0] || {};
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      house: "freshwater", url: e.url || null,
-      rows: headPairs(t.rows),
-      proseOnly: !((e.tables || []).length),
-    });
-  }
-  /* Newspoll (The Australian) and DemosAU: hand-curated stores in News24's
-     shape (one_offs array, figures under data.tables, prose-reported waves
-     carrying data.prose instead). */
-  for (const e of newspoll || []) {
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
-      dateEnd: e.fieldwork ? e.fieldwork.end : null,
-      house: "newspoll", url: e.articleUrl || null,
-      rows: headPairs(e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows),
-      proseOnly: !((e.data && e.data.tables || []).length),
-    });
-  }
-  for (const e of demosau || []) {
-    entries.push({
-      theme: oneOffThemeOf(e.id), question: e.question,
-      waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
-      dateEnd: e.fieldwork ? e.fieldwork.end : null,
-      house: "demosau", url: e.articleUrl || null,
-      rows: headPairs(e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows),
-      proseOnly: !((e.data && e.data.tables || []).length),
-    });
-  }
-  if (!entries.length) return "";
-  const fmt = (v) => {
-    if (v == null || v === "" || v === "--") return "&#8211;";
-    const n = Number(v);
-    return Number.isFinite(n) ? `${n}%` : esc(String(v));
-  };
-  const dateLabel = (b) => {
-    const d = b.dateEnd || b.waveDate;
-    const [y, m, dd] = String(d || "").split("-");
-    return `${+dd} ${AO_MON[+m - 1]} ${y}`;
-  };
-  /* group by theme in the shared order; newest wave first within a question */
-  const cards = new Map(); // themeId -> Map(question -> [waves])
-  for (const b of entries) {
-    if (!cards.has(b.theme)) cards.set(b.theme, new Map());
-    const q = cards.get(b.theme);
-    if (!q.has(b.question)) q.set(b.question, []);
-    q.get(b.question).push(b);
-  }
-  const sections = ONEOFF_THEMES.map((th) => {
-    const qs = cards.get(th.id);
-    if (!qs) return "";
-    const blocks = [...qs.entries()].map(([q, waves]) => {
-      const houseN = new Set(waves.map((w) => w.house));
-      const tag = houseN.size > 1 ? (houseN.size === 8 ? "all eight houses" : houseN.size === 7 ? "all seven houses" : houseN.size === 6 ? "all six houses" : houseN.size === 5 ? "all five houses" : houseN.size === 4 ? "all four houses" : houseN.size === 3 ? "all three houses" : "both houses")
-        : waves[0].house === "news24" ? "YouGov &#8211; News24 Pulse"
-        : waves[0].house === "secnewgate" ? "SEC Newgate Mood of the Nation"
-        : waves[0].house === "essential" ? "Essential Report"
-        : waves[0].house === "resolve" ? "Resolve Political Monitor"
-        : waves[0].house === "freshwater" ? "Freshwater Strategy (via News Corp)"
-        : waves[0].house === "newspoll" ? "Newspoll (via The Australian)"
-        : waves[0].house === "demosau" ? "DemosAU"
-        : "RedBridge/Accent (via the AFR)";
-      const reads = [...waves].sort((a, b) => String(b.waveDate).localeCompare(String(a.waveDate)))
-        .map((b) => `
-        <div class="ao-ss-wave"><span class="ao-ss-date">${dateLabel(b)}</span>
-          ${b.rows.length ? `<p class="ao-ss-figs">${b.rows.map(([n, v]) => `<span class="ao-ss-fig"><b>${esc(String(n))}</b>&#160;${fmt(v)}</span>`).join(" ")}</p>`
-          : `<p class="ao-ss-note">Asked, but this wave&#8217;s figures are image-only or prose-reported; the live page links the source.</p>`}
-        </div>`).join("");
+/* The Beyond the vote page's static article: the payload the live page draws
+   (gen-data's oneoffs-source.json, which beyond-the-vote.mjs builds from the
+   one-off stores), set as text in the same topic order, so a no-JS reader or
+   a crawler gets the page's findings and figures: each topic an h2 and its
+   dek; each tracker its head, dek and every pollster's latest reading; each
+   card its question, figures and pollster; each topic's further questions
+   as a list of titles. One source, so the two can never disagree. No
+   colour here; the .btv-ss styles are template.html's. Caller supplies its
+   esc. */
+const BTV_SS_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function ssBeyondBlock(esc) {
+  let src = null;
+  try { src = JSON.parse(fs.readFileSync(DA("oneoffs-source.json"), "utf8")); } catch { return ""; }
+  if (!src || !Array.isArray(src.topics)) return "";
+  const H = src.houses || {};
+  const house = (h, full) => esc((H[h] || {})[full ? "full" : "short"] || h);
+  const month = (iso) => BTV_SS_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+  const n = (v) => (Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1));
+  const pct = (v) => n(v) + "%";
+  const signed = (v) => (v > 0 ? "+" : v < 0 ? "&#8722;" : "") + n(Math.abs(v));
+  const by = (s) => `${house(s.house, true)}, ${month(s.field.end)}`;
+  const pair = (r, names) => `${pct(r.a)} ${esc(names[0])}, ${pct(r.b)} ${esc(names[1])}${r.sig === false ? " (level)" : ""}`;
+  const block = (c) => {
+    if (c.kind === "tracker") {
+      const latest = c.panels.map((p) => {
+        const q = p.points[p.points.length - 1];
+        return `<li>${house(p.house, true)}, ${month(q.field.end)}: ${c.measure === "net" ? "net " + signed(q.v) + " (" + pct(q.a) + " " + esc(c.names[0]) + ", " + pct(q.b) + " " + esc(c.names[1]) + ")" : pct(q.v) + " " + esc(c.names[0])}</li>`;
+      }).join("");
       return `
-      <div class="ao-ss-card">
-        <h3>${esc(q)}</h3>
-        <p class="ao-ss-meta">${tag} &#183; ${waves.length} ${waves.length === 1 ? "wave" : "waves"}</p>
-${reads}
-      </div>`;
-    }).join("");
-    return `
-      <h2>${esc(th.title)}</h2>
-      <p class="ao-ss-dek">${esc(th.dek)}</p>
-${blocks}`;
-  }).join("");
+        <h3>${esc(c.head)}</h3>
+        <p>${esc(c.dek)}</p>
+        <ul class="btv-ss-list">${latest}</ul>`;
+    }
+    if (c.kind === "split") return `
+        <h3>${esc(c.title)}</h3>
+        <p>${pair(c, c.names)}. <span class="btv-ss-by">${by(c.src)}</span></p>`;
+    if (c.kind === "stack") return `
+        <h3>${esc(c.title)}</h3>
+        <ul class="btv-ss-list">${c.rows.map((r) => `<li>${r.label ? esc(r.label) : house(r.src.house) + ", " + month(r.src.field.end)}${r.wording ? " (" + esc(r.wording) + ")" : ""}: ${pair(r, c.names)}</li>`).join("")}</ul>${c.summary ? `
+        <p>${esc(c.summary)}</p>` : ""}`;
+    if (c.kind === "rank" || c.kind === "nets") return `
+        <h3>${esc(c.title)}</h3>
+        <ul class="btv-ss-list">${c.rows.map((r) => `<li>${esc(r.label)}: ${c.kind === "nets" ? signed(r.v) : pct(r.v)}</li>`).join("")}</ul>
+        <p><span class="btv-ss-by">${esc(c.base || c.unit || "")}${c.base || c.unit ? ". " : ""}${by(c.src)}</span></p>`;
+    return "";
+  };
+  const sections = src.topics.filter((t) => t.blocks.length || t.more.length).map((t) => `
+      <h2>${esc(t.title)}</h2>
+      <p class="btv-ss-dek">${esc(t.dek)}</p>
+${t.blocks.map(block).join("")}${t.more.length ? `
+        <h3>More questions on ${esc(t.short.charAt(0).toLowerCase() + t.short.slice(1))}</h3>
+        <ul class="btv-ss-list">${t.more.map((q) => `<li>${esc(q.title)} <span class="btv-ss-by">(${house(q.house)}, ${month(q.last)})</span></li>`).join("")}</ul>` : ""}`).join("");
   return `
 
-      <section class="ao-ss" aria-label="Ad hoc topical and issue questions by theme">${sections}
+      <section class="btv-ss" aria-label="Beyond the vote: the questions by topic">${sections}
       </section>`;
 }
 
@@ -1274,24 +1153,20 @@ ${body.trim()}
       </div>
     </article>`;
   }
-  /* the ☰ menu's fifth page: the ad hoc topical and issue questions the eight
-     one-off stores hold, grouped by theme into a static catalogue
-     (ssAdhocsBlock); the live tab renders the same grouping with the
-     crosstabs and folds (RdAdhocs, rd-adhocs.jsx). Federal only – /vic/'s
-     menu never holds it */
-  if (id === "ad-hocs") {
+  /* the ☰ menu's fifth page, Beyond the vote: the questions the pollsters
+     ask beyond voting intention, by topic (ssBeyondBlock); the live tab draws
+     the same payload as charts and cards (RdBeyond, rd-beyond.jsx). Federal
+     only – /vic/'s menu never holds it */
+  if (id === "beyond-the-vote") {
     return `<article class="static-summary">
-  <h1>Ad hoc topical and issue questions</h1>
-  <p class="ss-sub">Beyond the standing battery &#8211; voting intention, leader ratings,
-    preferred prime minister &#8211; pollsters ask questions once: about the issue of the
-    moment, or a topic they never visit again. This page collects those one-off and
-    occasional questions from RedBridge/Accent (via the AFR), YouGov&#8217;s News24
-    Pulse, Essential Report, SEC Newgate&#8217;s Mood of the Nation, the Resolve
-    Political Monitor, Freshwater Strategy (via News Corp), Newspoll in The
-    Australian and DemosAU, grouped by theme, with every figure each wave
-    published.</p>
+  <h1>Beyond the vote</h1>
+  <p class="ss-sub">Voting intention is only part of what the pollsters ask. This page
+    gathers the rest of this term&#8217;s questions worth knowing, from Donald Trump and
+    immigration to the budget, the Iran war and the Bondi attack, in ten topics. Where
+    several pollsters asked the same thing, their answers sit side by side; every
+    figure names its pollster and links to its source.</p>
 
-${ssAdhocsBlock(esc)}
+${ssBeyondBlock(esc)}
 
   ${ssTail(esc, sources)}
 </article>`;
@@ -1697,9 +1572,9 @@ writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
    document, and the browser resolves the cycle-source fetch against the
    page's own URL. */
 parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
-/* The one-offs catalogue behind the ☰ menu's Ad hocs page gets the same
+/* The questions behind the ☰ menu's Beyond the vote page get the same
    treatment as the cycle-source rows: a hashed sidecar fetched only when the
-   tab opens (~60KB nobody but that page's reader needs), gen-data's
+   tab opens (nobody but that page's reader needs it), gen-data's
    oneoffs-source.json shipped to /assets/ under its own content hash. */
 const oneOffsJson = !VIC && fs.readFileSync(DA("oneoffs-source.json"), "utf8");
 if (!VIC) {
@@ -1771,13 +1646,13 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
        page only, /vic/'s menu never holds it) */
     ...(VIC ? [] : [{ id: "flows-explained", label: "Preference flows explained",
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
-    /* the ☰ menu's fifth page, straight under the explainer (the user's
-       2026-10-17 call: the topical one-off questions the pollsters ask
-       beyond the standing battery, from the committed one-off stores –
-       federal only, /vic/'s menu never holds it) */
-    ...(VIC ? [] : [{ id: "ad-hocs", label: "Ad hoc topical/issue questions",
-      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent, YouGov News24 Pulse, Essential Report, SEC Newgate, Resolve Political Monitor, Freshwater Strategy, Newspoll and DemosAU one-offs, grouped by theme with every figure and source." }]),
-    /* the ☰ menu's sixth page, straight under Ad hocs (the user's
+    /* the ☰ menu's fifth page, straight under the explainer: what the
+       pollsters ask beyond voting intention, by topic (the 2026-10-17
+       catalogue at /ad-hocs/, curated and renamed 2026-10-18 – the old path
+       is a hand-kept redirect stub). Federal only, /vic/'s menu never holds it */
+    ...(VIC ? [] : [{ id: "beyond-the-vote", label: "Beyond the vote",
+      desc: "What Australians tell the pollsters beyond their vote – Donald Trump, immigration, One Nation, the budget and housing tax, the cost of living, the Iran war, Bondi, climate and more – charted across pollsters, with every figure and source." }]),
+    /* the ☰ menu's sixth page, straight under Beyond the vote (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
        Info about-block's tail, then a console satellite at /changelog/;
        now a page of the build – federal only, /vic/ has no change log) */
@@ -2021,7 +1896,7 @@ const PREDICTION_STAMP = "2026-10-17";
    VIC_STAMP pattern below). Bump yours when a new tab page ships. */
 const TAB_STAMP = { cycles: "2026-10-11", allpolls: "2026-10-11", info: "2026-10-11",
   disagreement: "2026-10-15", leans: "2026-10-15", flows: "2026-10-15",
-  "flows-explained": "2026-10-15", "ad-hocs": "2026-10-17", changelog: "2026-10-12" };
+  "flows-explained": "2026-10-15", "beyond-the-vote": "2026-10-18", changelog: "2026-10-12" };
 const tabLastmod = (id) => (TAB_STAMP[id] || "") > dataStamp ? TAB_STAMP[id] : dataStamp;
 /* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
    dated as this page is, by its data – the newest Victorian poll's
@@ -2058,7 +1933,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <loc>${SITE_URL}</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
-${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "ad-hocs", "changelog"].map((id) => `  <url>
+${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "beyond-the-vote", "changelog"].map((id) => `  <url>
     <loc>${SITE_URL}${id}/</loc>
     <lastmod>${tabLastmod(id)}</lastmod>
   </url>`).join("\n")}

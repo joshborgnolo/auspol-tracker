@@ -6584,7 +6584,7 @@ function MenuPageView({ id, tppBasis }) {
       {id === "leans" && <RdHouseLean measure={measure} onMeasure={setMeasure} tppBasis={tppBasis} />}
       {id === "flows" && <RdFlows measure={measure} />}
       {id === "flows-explained" && <RdExplained />}
-      {id === "ad-hocs" && <RdAdhocs />}
+      {id === "beyond-the-vote" && <RdBeyond />}
       {id === "changelog" && <RdChangelog />}
     </div>
   );
@@ -6599,10 +6599,10 @@ function MenuPageView({ id, tppBasis }) {
           still renders (the .ex-* styles are page-level, not rd-gated), just
           without the rd head */}
       {id === "flows-explained" && <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />}
-      {/* the ad hocs catalogue has no classic-design twin: its body alone
-          mounts here (the .ao-* styles are page-level, like the explainer's),
-          lazily fetching the one-offs sidecar; the rd head lives in RdAdhocs */}
-      {id === "ad-hocs" && <RdAoEntries />}
+      {/* Beyond the vote has no classic-design twin: its body alone mounts
+          here (the .btv-* styles are page-level, like the explainer's),
+          lazily fetching its sidecar; the rd head lives in RdBeyond */}
+      {id === "beyond-the-vote" && <BtvBody />}
       {/* the change log's console predates the redesign split: the same
           console marks up both designs (the .cl-* styles are page-level in
           template.html, not rd-gated); the redesign adds its own head above */}

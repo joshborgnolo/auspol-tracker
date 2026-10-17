@@ -79,10 +79,11 @@ export const ROOT = path.resolve(HERE, "..");
    the satellites each being a page of their own in the colophon), `page`
    for the colophon's two self-references (the feedback page doesn't invite
    feedback on itself; an archive page doesn't point at the archives). The
-   three redirect stubs (archives/index.html, newspoll-archive/index.html,
-   preference-flows/index.html) redirect before paint and carry nothing –
-   the last became one on 2026-10-15 when the preference-flows explainer
-   moved into the main build as the /flows-explained/ tab page. */
+   four redirect stubs (archives/index.html, newspoll-archive/index.html,
+   preference-flows/index.html, ad-hocs/index.html) redirect before paint
+   and carry nothing – preference-flows became one on 2026-10-15 when the
+   explainer moved into the main build as the /flows-explained/ tab page,
+   ad-hocs on 2026-10-18 when its catalogue became /beyond-the-vote/. */
 export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs

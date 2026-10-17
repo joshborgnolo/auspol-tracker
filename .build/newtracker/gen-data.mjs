@@ -18,7 +18,7 @@ import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED,
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
-import { THEMES as ONEOFF_THEMES, themeOf as oneOffThemeOf } from "./adhoc-themes.mjs";
+import { readStores as readOneOffStores, buildBeyond } from "./beyond-the-vote.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -7129,153 +7129,17 @@ const changelog = JUR ? null : (() => {
   return committed.entries || [];
 })();
 
-/* ---- §8e the ad hoc topical and issue questions ---------------------------
-   The /ad-hocs/ page (the ☰ menu's sixth page, 2026-10-17): every one-off
-   and rotating question the catalogued houses have asked outside the
-   standing battery, grouped on adhoc-themes.mjs's shared map. The stores are
-   hand-curated research products (data/news24-one-offs.json,
-   data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
-   data/essential-one-offs.json, data/resolve-one-offs.json,
-   data/freshwater-one-offs.json, data/newspoll-one-offs.json,
-   data/demosau-one-offs.json); this block
-   re-shapes them into the page's
-   fetch payload, trimming whatever the page never reads (RedBridge's
-   quotedFigure/snippetHaystack verification artefacts, News24's embed ids
-   and text-leaf echoes). oneOffThemeOf THROWS on a store id with no theme,
-   so a wave carrying a question the map doesn't know fails the build before
-   it can land silently ungrouped. No re-phrasing happens here: questions,
-   options, notes and rows travel verbatim. */
-const oneOffsSource = JUR ? null : (() => {
-  /* The stores are curated on their own pipelines and land on their own
-     commits; an absent store (a fresh clone ahead of its first landing)
-     must not kill the whole build – the page renders an empty catalogue
-     until the store's owner commits it. Present-but-broken still throws. */
-  const read = (f, pick) => {
-    const p = path.join(ROOT, "data", f);
-    if (!fs.existsSync(p)) { console.log("  note: data/" + f + " absent – its one-offs ride the next landing"); return []; }
-    return pick(JSON.parse(fs.readFileSync(p, "utf8")));
-  };
-  const entries = [];
-  for (const e of read("news24-one-offs.json", (j) => j.one_offs || [])) {
-    const tables = (e.data && e.data.tables || []).map((t) => ({ headers: t.headers, rows: t.rows }));
-    entries.push({
-      house: "news24", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: e.responseOptions || null, note: e.note || null,
-      proseOnly: !tables.length, wordingSource: e.questionWordingSource || null,
-      url: e.articleUrl || null, tables, prose: (e.data && e.data.prose) || [],
-    });
-  }
-  for (const e of read("redbridge-one-offs.json", (j) => j.entries || [])) {
-    entries.push({
-      house: "redbridge", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: null, note: e.notes || null,
-      proseOnly: false, wordingSource: null,
-      url: e.url || null,
-      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
-        rows: (t.entities || []).map((en) => [en.name, ...(en.values || [])]) })),
-      prose: [],
-    });
-  }
-  /* SEC Newgate Mood-of-the-Nation: same shape as RedBridge, except wide
-     tables carry a store-side "columns" array that becomes the table's
-     headers, and the first table is always a width-1 headline strip (the
-     store's _readme documents the contract). */
-  for (const e of read("secnewgate-one-offs.json", (j) => j.entries || [])) {
-    entries.push({
-      house: "secnewgate", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: null, note: e.notes || null,
-      proseOnly: false, wordingSource: null,
-      url: e.url || null,
-      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
-        headers: t.columns || null,
-        rows: (t.entities || []).map((en) => [en.name, ...(en.values || [])]) })),
-      prose: [],
-    });
-  }
-  /* Essential Report: the store already carries the page's row shape
-     ([label, ...values] per row, optional headers on the wide folds), so
-     this is the shallowest reader of the four – pass the tables through. */
-  for (const e of read("essential-one-offs.json", (j) => j.entries || [])) {
-    entries.push({
-      house: "essential", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: null, note: e.notes || null,
-      proseOnly: false, wordingSource: null,
-      url: e.url || null,
-      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
-        headers: t.headers || null, rows: t.rows || [] })),
-      prose: [],
-    });
-  }
-  /* Resolve Political Monitor (SMH/The Age): hand-curated (no machine feed
-     exists – the topical questions live only in the weekly article prose),
-     in the same pass-through shape as Essential. .build/resolve-oneoffs.mjs
-     is its curation-time guard. */
-  for (const e of read("resolve-one-offs.json", (j) => j.entries || [])) {
-    entries.push({
-      house: "resolve", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: null, note: e.notes || null,
-      proseOnly: false, wordingSource: null,
-      url: e.url || null,
-      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
-        headers: t.headers || null, rows: t.rows || [] })),
-      prose: [],
-    });
-  }
-  /* Freshwater Strategy (News Corp): hand-curated from the news reports'
-     printed figures, same pass-through shape as Essential/Resolve. */
-  for (const e of read("freshwater-one-offs.json", (j) => j.entries || [])) {
-    entries.push({
-      house: "freshwater", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: null, note: e.notes || null,
-      proseOnly: false, wordingSource: null,
-      url: e.url || null,
-      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
-        headers: t.headers || null, rows: t.rows || [] })),
-      prose: [],
-    });
-  }
-  /* Newspoll (The Australian): hand-curated across the paper's coverage
-     (see .matilda/skills/auto-skill-auspol-newspoll-one-offs), in News24's
-     store shape (.one_offs, data.tables/data.prose, fieldwork{} +
-     articleUrl keys). */
-  for (const e of read("newspoll-one-offs.json", (j) => j.one_offs || [])) {
-    const tables = (e.data && e.data.tables || []).map((t) => ({ headers: t.headers, rows: t.rows }));
-    entries.push({
-      house: "newspoll", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: e.responseOptions || null, note: e.note || null,
-      proseOnly: !tables.length, wordingSource: e.questionWordingSource || null,
-      url: e.articleUrl || null, tables, prose: (e.data && e.data.prose) || [],
-    });
-  }
-  /* DemosAU (Capital Brief / demosau.com): hand-curated from the survey
-     reports and Capital Brief write-ups, same store shape again. */
-  for (const e of read("demosau-one-offs.json", (j) => j.one_offs || [])) {
-    const tables = (e.data && e.data.tables || []).map((t) => ({ headers: t.headers, rows: t.rows }));
-    entries.push({
-      house: "demosau", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
-      dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
-      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-      question: e.question, options: e.responseOptions || null, note: e.note || null,
-      proseOnly: !tables.length, wordingSource: e.questionWordingSource || null,
-      url: e.articleUrl || null, tables, prose: (e.data && e.data.prose) || [],
-    });
-  }
-  return { generated: "ad-hocs", themes: ONEOFF_THEMES, entries };
-})();
+/* ---- §8e Beyond the vote --------------------------------------------------
+   The /beyond-the-vote/ page (the ☰ menu page that was the /ad-hocs/
+   catalogue): what the pollsters ask beyond voting intention, by topic.
+   beyond-the-vote.mjs reads the eight hand-curated one-off stores
+   (data/*-one-offs.json), files every question on adhoc-themes.mjs's topic
+   map (an unmapped id throws, so a new wave fails the build rather than
+   landing unsorted), and builds the page's trackers and cards with their
+   figures and margin rules – the same design effect as the aggregate's, so a
+   "level" on that page means what it means here. The static article in
+   build.mjs reads this same payload. Federal only. */
+const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: HL_DEFF });
 
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
@@ -7561,9 +7425,9 @@ window.AUSPOL = (function () {
     }
     return _cyclePromise;
   };
-  /* The ad-hoc one-offs behind the /ad-hocs/ page – the same lazily fetched
-     sidecar contract as cycle-source above, for the same reason: read by
-     nothing outside that one tab's page. */
+  /* The questions behind the /beyond-the-vote/ page – the same lazily
+     fetched sidecar contract as cycle-source above, for the same reason: read
+     by nothing outside that one tab's page. */
   let _oneOffs = null;
   let _oneOffsPromise = null;
   const loadOneOffs = () => {
@@ -7629,7 +7493,7 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
-    // the /ad-hocs/ page's one-offs, on the same contract
+    // the /beyond-the-vote/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs,
     pollCadence,
@@ -7643,8 +7507,8 @@ writeAtomic(DATA_ASSET, out);
 /* Sidecar, inlined by build.mjs as an application/json block. Kept out of the
    JS module on purpose – see the note beside loadCycleSource above. */
 writeAtomic(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
-/* The /ad-hocs/ page's sidecar (§8e); federal-only – the Vic build's client
-   never mounts the page, and its AP_ONEOFF_SRC is null. */
+/* The /beyond-the-vote/ page's sidecar (§8e); federal-only – the Vic build's
+   client never mounts the page, and its AP_ONEOFF_SRC is null. */
 if (!JUR) writeAtomic(ONEOFFS_ASSET, JSON.stringify(oneOffsSource));
 
 /* ---- sanity summary ---------------------------------------------------- */

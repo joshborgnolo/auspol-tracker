@@ -3258,66 +3258,168 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
 }
-.ao { margin-top: 8px; }
-.ao-legend { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 16px 0 0; font-size: 12.5px; color: var(--ink-3); }
-.ao-legend span + span::before { content: "\00b7"; margin: 0 10px; color: var(--ink-faint); }
-.ao-theme { margin-top: 40px; padding-top: 14px; border-top: 2px solid var(--ink); }
-.ao-t-t { margin: 0; font-family: var(--sans); font-size: 20px; font-weight: 600; line-height: 1.25; letter-spacing: -0.005em; color: var(--ink); }
-.ao-t-dek { margin: 6px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
-.ao-qs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 16px; }
-@media (min-width: 940px) { .ao-qs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; } }
-.ao-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 12px; background: var(--surface); }
-.ao-q { margin: 0; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
-.ao-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.ao-chip {
-  font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+.btv {
+  --btv-a2: var(--mood-pos);
+  --btv-a1: color-mix(in oklab, var(--mood-pos) 50%, var(--surface));
+  --btv-b2: var(--mood-neg);
+  --btv-b1: color-mix(in oklab, var(--mood-neg) 48%, var(--surface));
+  --btv-m0: color-mix(in oklab, var(--ink-3) 24%, var(--surface));
+  --btv-track: var(--line-2);
+  --btv-rank: color-mix(in oklab, var(--ink-2) 58%, var(--surface));
+  margin-top: 6px;
 }
-.ao-chip-news24, .ao-chip-redbridge, .ao-chip-secnewgate, .ao-chip-essential, .ao-chip-resolve, .ao-chip-freshwater, .ao-chip-newspoll, .ao-chip-demosau { color: var(--ink-2); }
-.ao-wave { margin-top: 12px; }
-.ao-wmeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-size: 12.5px; color: var(--ink-3); }
-.ao-whouse { color: var(--ink-2); font-weight: 600; }
-.ao a.ao-src {
-  color: var(--ink-2); text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
+.btv-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
+.btv-nav a {
+  font-size: 13px; line-height: 1; color: var(--ink-2); text-decoration: none;
+  padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
 }
-.ao a.ao-src:hover, .ao a.ao-src:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
-.ao-figs { display: grid; gap: 5px; margin-top: 8px; }
-.ao-fig { display: grid; grid-template-columns: minmax(0, 1fr) 41% 3.2em; align-items: center; gap: 10px; }
-.ao-fl { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
-.ao-fb { height: 7px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
-.ao-fb i { display: block; height: 100%; border-radius: 4px; background: var(--accent); opacity: 0.85; }
-.ao-fv { font-size: 12.5px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
-.ao-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
-.ao-only { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
-.ao-retry {
+.btv-nav a:hover, .btv-nav a:focus-visible { color: var(--ink); border-color: var(--ink-3); }
+.btv-scope { margin: 14px 0 0; max-width: 76ch; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.btv-topic { margin-top: 48px; padding-top: 14px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
+.btv-tt { margin: 0; font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--ink); }
+.btv-tdk { margin: 6px 0 0; max-width: 72ch; font-size: 14.5px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
+.btv-tracker { margin-top: 24px; }
+.btv-th { margin: 0; max-width: 40ch; font-family: var(--serif); font-size: 27px; font-weight: 600; line-height: 1.15; color: var(--ink); text-wrap: balance; }
+.btv-tdek { margin: 8px 0 0; max-width: 70ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.btv-tlab { margin: 18px 0 0; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.btv-pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 22px; margin-top: 10px; }
+.btv-pg5 { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px 18px; }
+.btv-pg3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.btv-panel { min-width: 0; border-top: 1px solid var(--line); padding-top: 8px; }
+.btv-ptop { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.btv-ptop b { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.btv-plab { margin-top: 1px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+.btv-plab span { color: var(--ink-faint); }
+.btv-panel .chart:has(> .chart-copy-btn) { padding-bottom: 0; }
+.btv-panel .chart-copy-btn { display: none; }
+.btv-ylab { fill: var(--ink-3); }
+.btv-tkey { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.btv-tkey span { display: inline-flex; align-items: center; gap: 7px; }
+.btv-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.btv-ln { display: inline-block; width: 18px; height: 0; border-top: 1.6px solid var(--ink-2); }
+.btv-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px solid var(--ink-faint); }
+.btv-ledger { margin-top: 12px; }
+.btv-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 24px; align-items: start; }
+@media (min-width: 900px) {
+  .btv-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: row dense; gap: 18px; }
+  .btv-wide { grid-column: 1 / -1; }
+  .btv-wide .btv-row { grid-template-columns: minmax(0, 34%) 2.2em minmax(0, 1fr) 2.2em 2.6em; }
+}
+.btv-card {
+  display: flex; flex-direction: column; min-width: 0;
+  border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px 12px; background: var(--surface);
+}
+.btv-q { margin: 0 0 14px; font-family: var(--sans); font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
+.btv-bar { position: relative; display: flex; height: 12px; border-radius: 3px; overflow: hidden; background: var(--btv-track); }
+.btv-bar-t { height: 18px; border-radius: 4px; }
+.btv-seg { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
+.btv-gap { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
+.btv-a2 { background: var(--btv-a2); }
+.btv-a1 { background: var(--btv-a1); }
+.btv-b2 { background: var(--btv-b2); }
+.btv-b1 { background: var(--btv-b1); }
+.btv-m0 { background: var(--btv-m0); }
+.btv-x0 { background: repeating-linear-gradient(135deg, var(--btv-m0) 0 2px, transparent 2px 5px); }
+.btv-sw { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; }
+.btv-ends { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 7px; font-size: 13.5px; line-height: 1.3; color: var(--ink-2); }
+.btv-end { display: inline-flex; align-items: baseline; gap: 6px; }
+.btv-end-b { text-align: right; }
+.btv-end b { font-size: 22px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-end .btv-sw { align-self: center; }
+.btv-mids { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; margin: 7px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-3); text-align: center; }
+.btv-mids:empty { display: none; }
+.btv-level { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.btv-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.3; color: var(--ink-3); }
+.btv-key span { display: inline-flex; align-items: center; gap: 6px; }
+.btv-key .btv-key-n { color: var(--ink-faint); }
+.btv-rows { display: grid; gap: 9px; }
+.btv-row { display: grid; grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em 2.6em; align-items: center; column-gap: 7px; }
+.btv-rl { display: flex; flex-direction: column; font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+.btv-rh { color: var(--ink); font-weight: 600; }
+.btv-rd { font-weight: 400; color: var(--ink-3); }
+.btv-rw { font-size: 12px; color: var(--ink-3); }
+.btv-va, .btv-vb { font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-va { text-align: right; }
+.btv-net { font-size: 11.5px; color: var(--ink-3); text-align: right; white-space: nowrap; }
+.btv-sum { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.btv-all {
+  justify-self: start; margin-top: 10px; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+  background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.btv-all:hover { color: var(--ink); }
+.btv-rank { display: grid; gap: 8px; }
+.btv-rk { display: grid; grid-template-columns: minmax(0, 1fr) 38% 3em; align-items: center; gap: 10px; }
+.btv-rkl { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+.btv-rkb { height: 10px; border-radius: 3px; background: var(--btv-track); overflow: hidden; }
+.btv-rkb i { display: block; height: 100%; border-radius: 3px; background: var(--btv-rank); }
+.btv-rkv { font-size: 13px; font-weight: 600; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-base { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.btv-nets { display: grid; gap: 10px; }
+.btv-ntl { display: block; font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+.btv-ntb { position: relative; display: block; height: 12px; margin-top: 4px; }
+.btv-ntb::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; border-left: 1px solid var(--ink-3); }
+.btv-ntb i { position: absolute; top: 0; height: 100%; border-radius: 2px; }
+.btv-ntb b { position: absolute; top: -2px; font-size: 12px; font-weight: 600; line-height: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.btv-src { margin-top: auto; padding-top: 12px; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.btv-src-l { display: flex; flex-wrap: wrap; gap: 2px 12px; padding-top: 10px; border-top: 1px solid var(--line-2); }
+.btv-src-l b { font-weight: 600; color: var(--ink-2); }
+.btv-srcs { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; }
+.btv a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent); }
+.btv a:hover, .btv a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.btv .btv-nav a { border-bottom: 1px solid var(--line); }
+.btv-wd { margin-top: 6px; }
+.btv-wd summary, .btv-ledger summary, .btv-mi summary { cursor: pointer; }
+.btv-wd summary { font-size: 12.5px; color: var(--ink-2); }
+.btv-wd > p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.btv-ledger summary { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.btv-tb { margin-top: 10px; }
+.btv-tbt { margin: 0 0 6px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.btv-twrap { overflow-x: auto; }
+.btv-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.btv-table th, .btv-table td { padding: 4px 10px 4px 0; font-size: 12px; text-align: right; white-space: nowrap; }
+.btv-table thead th { font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.btv-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.btv-table .btv-l { text-align: left; white-space: normal; min-width: 7em; }
+.btv-table td b { color: var(--ink); font-weight: 600; }
+.btv-more { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
+.btv-more > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.btv-more > summary span { font-weight: 400; color: var(--ink-3); }
+.btv-more > summary:hover { color: var(--ink); }
+.btv-ml { list-style: none; margin: 10px 0 0; padding: 0; }
+.btv-ml > li { border-bottom: 1px solid var(--line-2); }
+.btv-mi > summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 14px; padding: 9px 0; font-size: 13.5px; line-height: 1.4; }
+.btv-mq { color: var(--ink); flex: 1 1 30ch; }
+.btv-mm { color: var(--ink-3); font-size: 12.5px; white-space: nowrap; }
+.btv-mw { padding: 0 0 12px; }
+.btv-mwd { margin: 8px 0 0; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.btv-mw .btv-src { margin-top: 0; }
+.btv-how { margin-top: 44px; padding-top: 12px; border-top: 1px solid var(--line); max-width: 78ch; }
+.btv-how p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
+.btv-how b { font-weight: 600; color: var(--ink-2); }
+.btv-retry {
   font: inherit; color: var(--accent); background: none; border: 0; padding: 0;
   cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
 }
-.ao-fold { margin-top: 10px; border-top: 1px solid var(--line-2); padding-top: 8px; }
-.ao-fold summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
-.ao-fold summary:hover { color: var(--ink); }
-.ao-prior .ao-wave + .ao-wave { border-top: 1px solid var(--line-2); padding-top: 12px; }
-.ao-table-b { margin-top: 10px; }
-.ao-table-t { margin: 0 0 6px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
-.ao-twrap { overflow-x: auto; }
-.ao-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.ao-table th, .ao-table td { padding: 4px 8px 4px 0; font-size: 12px; text-align: right; white-space: nowrap; }
-.ao-table thead th { font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
-.ao-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
-.ao-table .ao-l { text-align: left; }
-.ao-ss h2 { scroll-margin-top: 56px; }
-.ao-ss-dek, .ao-ss-meta { color: var(--ink-3); }
-.ao-ss-card { margin-top: 22px; }
-.ao-ss-wave { margin: 10px 0; }
-.ao-ss-date { display: block; font-size: 12px; font-weight: 600; color: var(--ink-3); }
-.ao-ss-figs { margin: 2px 0 0; font-size: 13.5px; line-height: 1.75; }
-.ao-ss-fig b { font-weight: 600; }
-.ao-ss-note { font-size: 13px; color: var(--ink-3); }
+.btv-ss h2 { scroll-margin-top: 56px; }
+.btv-ss-dek, .btv-ss-by { color: var(--ink-3); }
+.btv-ss-list { margin: 6px 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
+@media (max-width: 1100px) { .btv-pg5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .btv-pgrid, .btv-pg5, .btv-pg3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
-  .ao-theme { margin-top: 32px; }
-  .ao-t-t { font-size: 18px; }
-  .ao-fig { grid-template-columns: minmax(0, 1fr) 34% 3em; gap: 8px; }
+  .btv-topic { margin-top: 40px; }
+  .btv-tt { font-size: 19px; }
+  .btv-th { font-size: 23px; }
+  .btv-tdek { font-size: 14.5px; }
+  .btv-pgrid, .btv-pg5, .btv-pg3 { gap: 18px 14px; }
+  .btv-card { padding: 14px 14px 10px; }
+  .btv-q { font-size: 15px; }
+  .btv-end b { font-size: 20px; }
+  .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em 2.6em; row-gap: 3px; }
+  .btv-rl { grid-column: 1 / -1; }
+  .btv-rk { grid-template-columns: minmax(0, 1fr) 3em; row-gap: 3px; }
+  .btv-rkl { grid-column: 1 / -1; }
+  .btv-rkb { grid-column: 1; }
 }
 </style>
   <style>
@@ -6154,7 +6256,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
        rely on; it is not expressed here. -->
   <script>window.AP_INITIAL_TAB="leans";</script>
   <script>window.AP_CYCLE_SRC="/assets/cycle-source.8a9cff3d.json";</script>
-  <script>window.AP_ONEOFF_SRC="/assets/oneoffs-source.8ef1b263.json";</script>
+  <script>window.AP_ONEOFF_SRC="/assets/oneoffs-source.d705229e.json";</script>
   <script>window.EXPLAINED_ARTICLE="<!-- explained-article.html – the Preference-flows explainer's ARTICLE BODY,\n     the one source of the page's prose: build.mjs wraps it into the\n     /flows-explained/ document's static article (buildTabSummary), and ships\n     it to the client as window.EXPLAINED_ARTICLE, where MenuPageView's\n     RdExplained view renders the same bytes. The page's furniture lives\n     beside those two homes, not here: the headline+dek pair sit in\n     build.mjs's MENU_SS branch (static) and rd-allpolls.jsx's RdExplained\n     (live), and the section h2s' styling in template.html's .ex-* block.\n     It began life as the hand-maintained /preference-flows/ satellite and\n     became a page of the main build on 2026-10-15 (/preference-flows/ is now\n     a redirect stub).\n\n     The numbers quoted are the site's SHIPPED constants as at 11 October\n     2026: the classic pairing runs flows.mjs's AEC-2025 TPP cut (GRN 0.8819\n     · ONP 0.2550 · OTH 0.5455 to ALP); the Labor–One Nation pairing runs\n     flows.mjs's FP_ON (LNP 0.30 · GRN 0.91 · OTH 0.55 to ALP, bands\n     ±3/±2.5/±4). The Coalition cell was recalibrated c3ec7be, 11 Sep, from\n     the Downloads-side analysis page's superseded 72% Coalition→ON read;\n     Greens and others moved 11 Oct from 0.89/0.53 on the like-for-like\n     evidence, in the same review that corrected the description of the 2026\n     SA and Secret Harbour readings as \"counts\" (they are Bonham's estimates\n     from distributions and Green's early-voting-centre sample). If flows.mjs\n     or FP_ON changes, this file must be re-synced by hand. The old section\n     ids (why, why-implied, counts-2026, back-cast, estimator) survive as\n     spans so outside links keep landing. Every count the page rests on is an\n     outbound link (see .ex-src at the foot); re-check those URLs on any\n     re-sync. -->\n<h2 id=\"two-ways\"><span id=\"why\"></span><span id=\"why-implied\"></span>Ask or assume</h2>\n<p>When a candidate is excluded from the count, each of their ballots passes to the voter&rsquo;s next choice, and the count goes on until two candidates remain. The two-party preferred figure, or 2PP, runs that arithmetic for the whole country. A poll measures the first step, the primary vote: who people put first. It can&rsquo;t measure where the minor-party and independent votes end up. At the 2025 election a third of voters put someone other than Labor or the Coalition first; in 2026 polls more than half do. So the preferences largely decide the two-party figure, and there are two ways to estimate them.</p>\n<p><strong>Ask.</strong> The pollster asks respondents which of the two finalists they would rank higher, and publishes the result. Roy Morgan does this every week, and every pollster publishing a Labor v One Nation figure builds it this way. Other pollsters lean on how preferences flowed at the last election: this term Newspoll&rsquo;s Labor v Coalition figures have matched the 2025 flows to within rounding. The toggle calls all of these &ldquo;respondent-allocated&rdquo;; here they are the published figure.</p>\n<p><strong>Assume.</strong> Take the flows a real count measured and apply them, unchanged, to every poll&rsquo;s primary votes. At the 2025 election, for example, 88.2% of Greens preferences ended with Labor, so every Greens voter in every poll counts as 0.882 of a vote for Labor. The table is the same for every pollster and open to inspection, so the result moves only when primary votes move. That is the implied figure, and every poll whose primary votes add up joins it.</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table ex-tight\">\n    <caption>The two bases at a glance.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">&nbsp;</th>\n        <th scope=\"col\">Published (respondent-allocated)</th>\n        <th scope=\"col\">Implied from a fixed flow table</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">What it reads</td><td>Each pollster&rsquo;s own published two-party figure</td><td>Every poll&rsquo;s primaries, through one fixed table</td></tr>\n      <tr><td class=\"ex-l\">Polls it uses</td><td>Only polls that publish a 2PP</td><td>Every poll with a full set of primaries: more polls</td></tr>\n      <tr><td class=\"ex-l\">What moves it</td><td>Voters&rsquo; intentions <em>and</em> the changing mix of pollster methods</td><td>Voters&rsquo; intentions alone: the table can&rsquo;t drift</td></tr>\n      <tr><td class=\"ex-l\">What&rsquo;s the same for every pollster</td><td>Nothing: allocation methods differ and change</td><td>The table, one real election&rsquo;s counted behaviour</td></tr>\n      <tr><td class=\"ex-l\">What it can see that the other can&rsquo;t</td><td>A real change in preferences, as soon as pollsters measure it</td><td>A level free of allocation-method noise</td></tr>\n    </tbody>\n  </table>\n</div>\n<p>The implied figure has been the default since 18 September 2026, for four reasons.</p>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>Its movements are real</strong>\n    A trend in published figures mixes two things: changes in how people intend to vote, and changes in how pollsters allocate preferences as they arrive, revise their assumptions or switch methods. The implied figure has only the first. When it moves, the primary votes moved.\n  </li>\n  <li>\n    <strong>It has the better record</strong>\n    <a href=\"https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham has tested last-election flows</a> at every federal election since 1983. Applied to the final polls, they missed the two-party result by 0.3 points on average, and by a point or more only in 1990 and 2013. Asking has done worse. In 2004 pollsters expected 69&ndash;74% of minor-party preferences to reach Labor; 61% did, and polls showing 50&ndash;50 became a 52.7 Coalition win.\n  </li>\n  <li>\n    <strong>More polls feed it</strong>\n    Every poll publishes primary votes. Not every poll publishes a two-party figure.\n  </li>\n  <li>\n    <strong>Respondents don&rsquo;t carry how-to-vote cards</strong>\n    Many voters copy their party&rsquo;s card on the day, and a counted flow includes them. A respondent answers a survey with no card in hand. The difference matters most for Labor v One Nation, below.\n  </li>\n</ul>\n<p>The published figure keeps one advantage: if a party&rsquo;s voters really did start sending their preferences elsewhere, pollsters who ask would see it first. So the published series stays complete beside the implied one, one click away, and the drift chart on the <a href=\"/flows/\">Preference flows</a> page tracks the gap between them.</p>\n\n<h2 id=\"classic\">Labor v Coalition: a counted table</h2>\n<p>For this contest the table needs no estimates. The Electoral Commission&rsquo;s <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">2025 two-party release</a> distributed every formal ballot in all 150 seats between Labor and the Coalition, and three of its rows supply the table:</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>Counted preferences at the 2025 election, two-party cut (AEC event 31496): the share of each group&rsquo;s votes that ended with Labor, and the ballots behind it.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">Voters</th>\n        <th scope=\"col\">Flow to Labor</th>\n        <th scope=\"col\">Flow to Coalition</th>\n        <th scope=\"col\">Ballots</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">Greens</td><td>88.2%</td><td class=\"ex-c\">11.8%</td><td>1,666,851 v 223,126</td></tr>\n      <tr><td class=\"ex-l\">One Nation</td><td>25.5%</td><td class=\"ex-c\">74.5%</td><td>252,917 v 738,897</td></tr>\n      <tr><td class=\"ex-l\">All others</td><td>54.5%</td><td class=\"ex-c\">45.5%</td><td>1,268,209 v 1,056,696</td></tr>\n    </tbody>\n  </table>\n</div>\n<p>One small term goes on top. Where both Coalition parties stand in a seat, one is excluded first, and a few of its preferences reach Labor: 11,117 ballots in 2025, or 0.07 points of the national figure. The site adds that back as a constant, as Bonham does. For any poll, then, the implied figure is Labor&rsquo;s primary vote, plus each other group&rsquo;s primary vote times its flow, plus that constant:</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>Worked example: Roy Morgan, 24 August 2025. The same respondents produced both figures: Morgan published 56.5, and the table implies 55.1. The difference is allocation alone.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">Voters</th>\n        <th scope=\"col\">Poll&rsquo;s primary</th>\n        <th scope=\"col\">&times; flow to Labor</th>\n        <th scope=\"col\">Points to Labor</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">Labor</td><td>34.0</td><td class=\"ex-c\">1.000</td><td>34.0</td></tr>\n      <tr><td class=\"ex-l\">Greens</td><td>12.0</td><td class=\"ex-c\">0.8819</td><td>10.6</td></tr>\n      <tr><td class=\"ex-l\">One Nation</td><td>9.0</td><td class=\"ex-c\">0.2550</td><td>2.3</td></tr>\n      <tr><td class=\"ex-l\">All others</td><td>15.0</td><td class=\"ex-c\">0.5455</td><td>8.2</td></tr>\n      <tr><td class=\"ex-l\">Coalition</td><td>30.0</td><td class=\"ex-c\">&mdash;</td><td>0.0</td></tr>\n      <tr><td class=\"ex-l\">Three-cornered contests</td><td>&mdash;</td><td class=\"ex-c\">&mdash;</td><td>+0.07</td></tr>\n      <tr class=\"ex-sum\"><td class=\"ex-l\">Implied two-party</td><td></td><td class=\"ex-c\"></td><td class=\"ex-sum\">55.1</td></tr>\n    </tbody>\n  </table>\n</div>\n<p class=\"ex-tnote\">The Commission publishes the same flows two other ways: a web table that counts ballots ending with third parties, and a <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">two-candidate file</a> (86.8 / 27.1 / 48.5). The site uses the two-party cut because it measures what the site simulates, every ballot ending with Labor or the Coalition, and because it tracks Roy Morgan&rsquo;s own 2025-flows figure most closely.</p>\n<p>The weakest cell is One Nation&rsquo;s. With One Nation near 27% of the primary vote, each point of its flow moves the two-party figure by about a quarter of a point. The chart&rsquo;s shaded bracket recomputes the figure with the 2022 election&rsquo;s One Nation flow, 35.7% to Labor. The bracket is about three points wide and runs only towards Labor, while the evidence of change points the other way: many of One Nation&rsquo;s voters used to vote for the Coalition, and RedBridge&rsquo;s respondents have sent fewer of their preferences to Labor as 2026 went on. So the bracket shows what the assumption is worth, not how wrong it is likely to be.</p>\n\n<h2 id=\"one-nation\">Labor v One Nation: a built table</h2>\n<p>No count has ever measured this contest nationally. In 2025 One Nation reached the final two in two seats of 150, Hunter against Labor and Maranoa against the LNP. The five pollsters publishing a Labor v One Nation figure all ask their respondents, and here asking has a known weakness. Close to half of Coalition voters copy their party&rsquo;s how-to-vote card, and in 2025 those cards put One Nation above Labor almost everywhere. A respondent answering without the card is more likely to name Labor; Kevin Bonham puts the effect at about two points. So the site builds its own table from the ballots that do exist, and reads every poll through it:</p>\n\n<figure class=\"ex-fig\" role=\"img\" aria-label=\"Site estimate of Coalition preferences flowing to One Nation against Labor: 70 per cent, inside a band of 67 to 73 per cent.\">\n  <div class=\"ex-fam\">Coalition voters</div>\n  <div class=\"ex-num\">70%</div>\n  <div class=\"ex-cap\">of Coalition preferences would go to One Nation</div>\n  <div class=\"ex-band\" aria-hidden=\"true\">\n    <div class=\"ex-ci\" style=\"left:67.0%;width:6.0%\"></div>\n    <div class=\"ex-med\" style=\"left:70.0%\"></div>\n  </div>\n  <div class=\"ex-scale\" aria-hidden=\"true\">\n    <span>0 &middot; every ballot to Labor</span>\n    <span>50</span>\n    <span>100 &middot; every ballot to One Nation</span>\n  </div>\n  <figcaption class=\"ex-note\">Two 2026 contests put Liberal voters at about 66% and in the high 60s, and Nationals voters lean further. Kevin Bonham, building the same table independently, puts it at 71%. The setting meets him partway.</figcaption>\n</figure>\n\n<figure class=\"ex-fig\" role=\"img\" aria-label=\"Site estimate of Greens preferences flowing to One Nation against Labor: 9 per cent, inside a band of 6.5 to 11.5 per cent.\">\n  <div class=\"ex-fam\">Greens voters</div>\n  <div class=\"ex-num\">9%</div>\n  <div class=\"ex-cap\">of Greens preferences would go to One Nation</div>\n  <div class=\"ex-band\" aria-hidden=\"true\">\n    <div class=\"ex-ci\" style=\"left:6.5%;width:5.0%\"></div>\n    <div class=\"ex-med\" style=\"left:9.0%\"></div>\n  </div>\n  <div class=\"ex-scale\" aria-hidden=\"true\">\n    <span>0 &middot; every ballot to Labor</span>\n    <span>50</span>\n    <span>100 &middot; every ballot to One Nation</span>\n  </div>\n  <figcaption class=\"ex-note\">Against the Coalition, 88% of Greens preferences reached Labor in 2025. Against One Nation, every like-for-like comparison has Greens voters favouring Labor a little more.</figcaption>\n</figure>\n\n<figure class=\"ex-fig\" role=\"img\" aria-label=\"Site estimate of other voters&rsquo; preferences flowing to One Nation against Labor: 45 per cent, inside a band of 41 to 49 per cent.\">\n  <div class=\"ex-fam\">All other voters</div>\n  <div class=\"ex-num\">45%</div>\n  <div class=\"ex-cap\">of everyone else&rsquo;s preferences would go to One Nation</div>\n  <div class=\"ex-band\" aria-hidden=\"true\">\n    <div class=\"ex-ci\" style=\"left:41.0%;width:8.0%\"></div>\n    <div class=\"ex-med\" style=\"left:45.0%\"></div>\n  </div>\n  <div class=\"ex-scale\" aria-hidden=\"true\">\n    <span>0 &middot; every ballot to Labor</span>\n    <span>50</span>\n    <span>100 &middot; every ballot to One Nation</span>\n  </div>\n  <figcaption class=\"ex-note\">The least settled of the three. Independents&rsquo; voters favour Labor more against One Nation than against the Coalition; voters for right-wing minor parties lean the other way.</figcaption>\n</figure>\n\n<p>The bands are judgements, not sampling intervals. With One Nation near a quarter of the vote they move the two-party figure by about 1.4 points either way, and the headline adds that doubt to the polls&rsquo; own sampling error (<a href=\"/info/\">Info</a> sets out how).</p>\n\n<h2 id=\"how-found\"><span id=\"counts-2026\"></span>Where the Labor v One Nation settings come from</h2>\n<p>Each setting starts from Senate ballots, is checked against the 2026 lower-house contests, and is adjusted for the voters those contests missed.</p>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>Senate ballots</strong>\n    Every 2025 Senate ballot records whether the voter ranked Labor or One Nation higher. Counted in the Commission&rsquo;s <a href=\"https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm\" target=\"_blank\" rel=\"noopener noreferrer\">formal-preferences release</a>, 74.7% of Coalition ballots put One Nation first, as did 4.4% of Greens ballots and 50.9% of all others. These are counts, but of a different chamber: voters rank party lists instead of local candidates, and the minor parties differ. So the Senate is where the table starts.\n  </li>\n  <li>\n    <strong>The 2026 contests</strong>\n    In South Australia&rsquo;s March election Labor and One Nation made the final two in 25 of 47 seats, and in August One Nation won the <a href=\"https://www.elections.wa.gov.au/2026-secret-harbour-election-results\" target=\"_blank\" rel=\"noopener noreferrer\">Secret Harbour by-election</a> in Western Australia. Both ran under how-to-vote cards like the 2025 federal ones. Unfortunately, neither produced a clean count of how each party&rsquo;s voters ranked Labor against One Nation. South Australia&rsquo;s electoral commission ran no statewide Labor v One Nation count, and its flows by first preference are due in late 2026; the figures below are <a href=\"https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s estimates</a> from the published distributions of preferences. Secret Harbour&rsquo;s 70.2% comes from <a href=\"https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s count of the early voting centre</a>, 47% of the votes; on the full distribution Green and Bonham both put Liberal voters in the high 60s.\n  </li>\n</ul>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>The 2026 readings: share of each group&rsquo;s preferences reaching Labor against One Nation, per cent. Estimates, not full counts.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">Contest</th>\n        <th scope=\"col\">Liberal &rarr; Labor</th>\n        <th scope=\"col\">Greens &rarr; Labor</th>\n        <th scope=\"col\">Independents &rarr; Labor</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">South Australia, Mar 2026 (Bonham&rsquo;s estimate)</td><td>33.9</td><td>84.8</td><td>55.9</td></tr>\n      <tr><td class=\"ex-l\">Secret Harbour, Aug 2026 (early voting centre)</td><td>29.8</td><td>90.0</td><td>&mdash;</td></tr>\n    </tbody>\n  </table>\n</div>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>Coalition voters: 70% to One Nation</strong>\n    Both contests read Liberal voters lower than the same state&rsquo;s Senate ballots did: South Australia about 66% against 70.6%, Secret Harbour in the high 60s against 73.5%. A national figure also needs the voters the contests missed. Nationals voters lean further to One Nation: at the Farrer by-election 69% of Nationals preferences went to One Nation against 59% of Liberal ones, and Hunter&rsquo;s 82.9% was a Nationals flow. Coalition voters in New South Wales and Queensland lean further than those in South Australia and Western Australia. Pulling the other way, both contests were fought where One Nation was strong, and neither included city seats like the seven where the Coalition put Labor above One Nation in 2025. On that reading the national figure is 68&ndash;69%. Bonham, weighing the same evidence, gives 71%. The evidence can&rsquo;t choose between them, so the setting is 70%.\n  </li>\n  <li>\n    <strong>Greens voters: 9% to One Nation</strong>\n    In 2025, 88.2% of Greens preferences reached Labor against the Coalition. Against One Nation, every like-for-like comparison has Greens voters favouring Labor more: by 4.6 points on the Senate ballots, and by 2.5 points on the same South Australian ballots in <a href=\"http://www.antonygreen.com.au/docs/sa/SA2026_DraftResults.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s three-way tables</a>. At Secret Harbour, an outer-suburban seat One Nation won, 90% went to Labor. South Australia&rsquo;s overall 15% to One Nation comes mostly from Labor heartland seats, where Greens preferences run softer against any opponent.\n  </li>\n  <li>\n    <strong>All other voters: 45% to One Nation</strong>\n    In 2025, 54.5% of these preferences reached Labor against the Coalition. Nearly half of this group vote for independents, whose voters favour Labor more against One Nation: RedBridge&rsquo;s respondents in the group give Labor about seven points more against One Nation than against the Coalition. Voters for right-wing minor parties lean the other way. Bonham treats the two as cancelling, at 54.7% to Labor, and South Australia&rsquo;s independents gave Labor 55.9%.\n  </li>\n  <li>\n    <strong>Checks, never inputs</strong>\n    Hunter&rsquo;s <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">2025 count</a> (82.9 &middot; 12.6 &middot; 59.8% to One Nation) is the only federal seat where voters made this choice, but it was One Nation&rsquo;s strongest seat, so every number from it is heartland. Maranoa shows the same effect: even Greens voters sent 35% to One Nation there. Respondent splits check the table without setting it. RedBridge&rsquo;s Coalition voters have given Labor between 31% and 44% each month, a median of 32%, and Newspoll&rsquo;s February question, with a &ldquo;don&rsquo;t know or follow the card&rdquo; option, implies 28&ndash;32%. Those samples are small, about 200 Coalition voters a month, and they miss card-following.\n  </li>\n</ul>\n\n<h2 id=\"by-state\">State by state</h2>\n<p>The site&rsquo;s settings are national. Anyone applying them to one state should start from that state&rsquo;s Senate ballots:</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>Share of each group&rsquo;s 2025 Senate ballots ranking One Nation ahead of Labor, per cent (of ballots that ranked either party; a ballot naming only one counts for it).</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">State</th>\n        <th scope=\"col\">Coalition</th>\n        <th scope=\"col\">Greens</th>\n        <th scope=\"col\">Others</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">NSW</td><td>78.2</td><td>4.5</td><td>59.4</td></tr>\n      <tr><td class=\"ex-l\">Victoria</td><td>74.0</td><td>2.8</td><td>44.0</td></tr>\n      <tr><td class=\"ex-l\">Queensland</td><td>77.2</td><td>5.4</td><td>59.0</td></tr>\n      <tr><td class=\"ex-l\">Western Australia</td><td>73.5</td><td>5.1</td><td>51.0</td></tr>\n      <tr><td class=\"ex-l\">South Australia</td><td>70.6</td><td>5.6</td><td>50.5</td></tr>\n      <tr><td class=\"ex-l\">Tasmania</td><td>63.2</td><td>6.3</td><td>50.4</td></tr>\n      <tr><td class=\"ex-l\">Northern Territory</td><td>70.6</td><td>11.3</td><td>34.3</td></tr>\n      <tr class=\"ex-sum\"><td class=\"ex-l\">Australia</td><td>74.7</td><td>4.4</td><td>50.9</td></tr>\n    </tbody>\n  </table>\n</div>\n<p class=\"ex-tnote\">The ACT had no One Nation Senate group in 2025. Tasmania&rsquo;s Coalition voters leaned least to One Nation (63.2%, against 78.2% in New South Wales).</p>\n\n<h2 id=\"wrong\"><span id=\"back-cast\"></span>What could prove the tables wrong</h2>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>The implied figure learns nothing about preferences</strong>\n    Same primary votes, same table, same answer. It can&rsquo;t discover that One Nation&rsquo;s voters have changed their second choices; it can only assume they haven&rsquo;t. Election night is the final test. The drift chart on the <a href=\"/flows/\">Preference flows</a> page is the early warning: it compares each pollster&rsquo;s published figure with what its primary votes imply, so a widening gap would show the table going stale.\n  </li>\n  <li>\n    <strong>The Labor v One Nation evidence is thin</strong>\n    Two state contests, both read from partial data, and one heartland federal seat are the whole lower-house record, and none is a national election. The next tests are South Australia&rsquo;s flows by first preference, due late in 2026, and Victoria&rsquo;s election in November.\n  </li>\n  <li>\n    <strong>Everything rests on today&rsquo;s how-to-vote cards</strong>\n    About 40&ndash;45% of Coalition voters follow their card. If the Liberals put Labor above One Nation, the Coalition setting could move by 15 points or more, and the two-party figure by 3 points or more towards Labor.\n  </li>\n  <li>\n    <strong>The published figure is no pure reading either</strong>\n    Pollsters change methods mid-term, and some apply last-election flows themselves, which is the implied method used privately. Read the implied figure for movement, and keep the published one in view.\n  </li>\n</ul>\n\n<h2 id=\"lead\"><span id=\"estimator\"></span>Which contest leads</h2>\n<p>The page leads with Labor&rsquo;s main rival, judged on the implied figures. A rival that runs Labor clearly closer after preferences, by more than the gap&rsquo;s own margin, leads. When the two contests are too close to call, the rival clearly ahead on first preferences leads instead, because it would face Labor in more seats. Since February 2026 that has been One Nation: after preferences the two contests have stayed within about a point of each other, while One Nation has led the Coalition on first preferences by 2 to 10 points. How polls become the headline figure, with its weighting, pollster corrections and margins, is set out in <a href=\"/info/\">Info</a>.</p>\n\n<p class=\"ss-note\">Site settings as at 11 October 2026. Every source is linked below, because the case for the implied figure is that its one assumption can be traced to real ballots.</p>\n<ul class=\"ex-src\">\n  <li><strong>Classic table</strong> &mdash; <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">AEC 2025 TPP flow of preferences by party</a> (<a href=\"https://results.aec.gov.au/31496/Website/Default.htm\" target=\"_blank\" rel=\"noopener noreferrer\">event 31496</a>), every formal ballot in 150 divisions distributed between Labor and the Coalition. The alternative cut named above: <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">TCP flow by party</a>.</li>\n  <li><strong>Labor&ndash;One Nation starting point</strong> &mdash; <a href=\"https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm\" target=\"_blank\" rel=\"noopener noreferrer\">AEC 2025 Senate formal-preferences release</a> (7.43 million above-the-line ballots ranking Labor or One Nation).</li>\n  <li><strong>The 2026 contests</strong> &mdash; South Australia: <a href=\"https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s estimates from the published distributions</a> and <a href=\"http://www.antonygreen.com.au/docs/sa/SA2026_DraftResults.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s draft results and preference tables</a>. Secret Harbour: <a href=\"https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s count of the early voting centre</a>, <a href=\"https://kevinbonham.blogspot.com/2026/09/the-flat-field-another-polls-are-wrong.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s reading of the full distribution</a> and the <a href=\"https://www.elections.wa.gov.au/2026-secret-harbour-election-results\" target=\"_blank\" rel=\"noopener noreferrer\">WAEC result</a>.</li>\n  <li><strong>Cross-checks, never inputs</strong> &mdash; <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">AEC TCP flow by division</a> (Hunter, Maranoa), the Farrer by-election flow release, <a href=\"https://www.tallyroom.com.au/64676\" target=\"_blank\" rel=\"noopener noreferrer\">Ben Raue&rsquo;s seat-by-seat tabulation of South Australia&rsquo;s raw distributions</a>, and <a href=\"https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s January 2026 reconstruction</a>.</li>\n  <li><strong>Monthly respondent splits</strong> &mdash; the <a href=\"https://www.accent-research.com/projects\" target=\"_blank\" rel=\"noopener noreferrer\">AFR / RedBridge Group / Accent Research federal poll</a>, each wave since February 2026 printing respondent-allocated two-party answers by first preference &mdash; charted on the <a href=\"/flows/\">Preference flows</a> page.</li>\n  <li><strong>Newspoll&rsquo;s preference question</strong> &mdash; February 2026, as reported by <a href=\"https://www.pollbludger.net/2026/02/08/newspoll-labor-33-one-nation-27-coalition-18-greens-12-open-thread/\" target=\"_blank\" rel=\"noopener noreferrer\">The Poll Bludger</a>.</li>\n  <li><strong>How-to-vote cards and respondent preferences</strong> &mdash; <a href=\"https://kevinbonham.blogspot.com/2026/09/the-flat-field-another-polls-are-wrong.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham, <em>The Flat Field</em></a> (September 2026), on card-following and why respondent figures probably overstate Labor against One Nation.</li>\n  <li><strong>Track record of last-election flows</strong> &mdash; <a href=\"https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham, <em>Wonk Central: The Track Record Of Last-Election Preferences</em></a> (September 2015, updated through 2022), the election-by-election record cited under &ldquo;Ask or assume&rdquo;.</li>\n</ul>\n<p class=\"ss-note\">Companion to the &ldquo;?&rdquo; beside the two-party basis switch.</p>\n";</script>
   <script>/**
  * @license React
@@ -107539,7 +107641,7 @@ function MenuPageView({
     tppBasis: tppBasis
   }), id === "flows" && React.createElement(RdFlows, {
     measure: measure
-  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "ad-hocs" && React.createElement(RdAdhocs, null), id === "changelog" && React.createElement(RdChangelog, null));
+  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "beyond-the-vote" && React.createElement(RdBeyond, null), id === "changelog" && React.createElement(RdChangelog, null));
   return React.createElement("div", {
     className: "view view-" + id
   }, id === "disagreement" && React.createElement(VariancePanel, {
@@ -107560,7 +107662,7 @@ function MenuPageView({
     dangerouslySetInnerHTML: {
       __html: window.EXPLAINED_ARTICLE || ""
     }
-  }), id === "ad-hocs" && React.createElement(RdAoEntries, null), id === "changelog" && React.createElement(ChangelogEntries, null));
+  }), id === "beyond-the-vote" && React.createElement(BtvBody, null), id === "changelog" && React.createElement(ChangelogEntries, null));
 }
 const CL_KIND = {
   poll: "poll",
@@ -133388,297 +133490,611 @@ Object.assign(window, {
   RdExplained: RdExplainedM
 });</script>
   <script>const {
-  useState: aoUseState,
-  useEffect: aoUseEffect,
-  useMemo: aoUseMemo
+  useState: btvUseState,
+  useEffect: btvUseEffect,
+  useMemo: btvUseMemo
 } = React;
-const AO_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const AO_HOUSES = {
-  news24: {
-    short: "News24 Pulse",
-    full: "YouGov – News24 Pulse"
-  },
-  redbridge: {
-    short: "RedBridge/Accent",
-    full: "RedBridge/Accent – AFR"
-  },
-  secnewgate: {
-    short: "SEC Newgate",
-    full: "SEC Newgate – Mood of the Nation"
-  },
-  essential: {
-    short: "Essential Report",
-    full: "Essential Report"
-  },
-  resolve: {
-    short: "Resolve",
-    full: "Resolve Political Monitor"
-  },
-  freshwater: {
-    short: "Freshwater",
-    full: "Freshwater Strategy – News Corp"
-  },
-  newspoll: {
-    short: "Newspoll",
-    full: "Newspoll – The Australian"
-  },
-  demosau: {
-    short: "DemosAU",
-    full: "DemosAU"
-  }
+const BTV_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const btvDay = iso => Number(iso.slice(8, 10)) + " " + BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+const btvMonth = iso => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+const btvSpan = f => {
+  if (!f || !f.end) return "";
+  if (!f.start || f.start === f.end) return btvDay(f.end);
+  if (f.start.slice(0, 7) === f.end.slice(0, 7)) return Number(f.start.slice(8)) + "–" + btvDay(f.end);
+  if (f.start.slice(0, 4) === f.end.slice(0, 4)) return Number(f.start.slice(8)) + " " + BTV_MON[+f.start.slice(5, 7) - 1] + " – " + btvDay(f.end);
+  return btvDay(f.start) + " – " + btvDay(f.end);
 };
-const aoDay = iso => {
-  if (!iso) return null;
-  const [y, m, d] = iso.split("-").map(Number);
-  return d + " " + AO_MONTHS[m - 1] + " " + y;
-};
-const aoSpan = w => {
-  if (w.dateStart && w.dateEnd && w.dateStart !== w.dateEnd) {
-    const [sy, sm] = w.dateStart.split("-").map(Number);
-    const [ey, em] = w.dateEnd.split("-").map(Number);
-    if (sy === ey && sm === em) {
-      return w.dateStart.slice(8) + "–" + Number(w.dateEnd.slice(8)) + " " + AO_MONTHS[sm - 1] + " " + sy;
-    }
-    return aoDay(w.dateStart) + " – " + aoDay(w.dateEnd);
-  }
-  return aoDay(w.dateEnd || w.dateStart || w.waveDate);
-};
-const aoPct = v => {
-  const n = parseFloat(v);
-  return Number.isFinite(n) ? n : null;
-};
-function aoGroup(src) {
-  const byTheme = new Map();
-  for (const e of src.entries || []) {
-    if (!byTheme.has(e.theme)) byTheme.set(e.theme, []);
-    byTheme.get(e.theme).push(e);
-  }
-  return (src.themes || []).map(t => {
-    const byQ = new Map();
-    for (const e of byTheme.get(t.id) || []) {
-      if (!byQ.has(e.id)) byQ.set(e.id, []);
-      byQ.get(e.id).push(e);
-    }
-    const questions = [...byQ.entries()].map(([id, waves]) => {
-      waves.sort((a, b) => a.waveDate < b.waveDate ? 1 : a.waveDate > b.waveDate ? -1 : 0);
-      return {
-        id,
-        question: waves[0].question,
-        houses: [...new Set(waves.map(w => w.house))].sort(),
-        waves
-      };
-    }).sort((a, b) => {
-      if (a.waves.length !== b.waves.length) return b.waves.length - a.waves.length;
-      const ad = a.waves[0].waveDate,
-        bd = b.waves[0].waveDate;
-      return ad < bd ? 1 : ad > bd ? -1 : a.question.localeCompare(b.question);
-    });
-    return {
-      ...t,
-      questions
-    };
-  }).filter(t => t.questions.length);
-}
-function AoFigs({
-  rows
+const btvN = v => Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1);
+const btvPct = v => btvN(v) + "%";
+const btvSigned = v => (v > 0 ? "+" : v < 0 ? "−" : "") + btvN(Math.abs(v));
+const btvHouse = (src, houses, full) => houses[src.house] ? houses[src.house][full ? "full" : "short"] : src.house;
+const btvCap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+const btvWord = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
+const btvLow = s => !s || /^(?:Australia|Australian|Labor|Liberal|Coalition|One Nation|Greens|Trump|Albanese|Hanson|I\b)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
+const btvWide = c => c.kind === "nets" || c.kind === "stack" && (c.rows.length >= 7 || c.rows.length * (c.rows.reduce((t, r) => t + (r.label || r.wording || "").length, 0) / c.rows.length) > 220);
+function BtvBar({
+  segs,
+  tall
 }) {
-  return React.createElement("div", {
-    className: "ao-figs"
-  }, rows.map((row, i) => {
-    const r = Array.isArray(row) ? row : [row];
-    const n = aoPct(r[1]);
-    return React.createElement("div", {
-      className: "ao-fig",
-      key: i
-    }, React.createElement("span", {
-      className: "ao-fl"
-    }, r[0]), React.createElement("span", {
-      className: "ao-fb"
-    }, React.createElement("i", {
-      style: {
-        width: (n === null ? 0 : Math.min(100, Math.max(0, n))) + "%"
-      }
-    })), React.createElement("span", {
-      className: "ao-fv"
-    }, n === null ? "–" : n + "%"));
-  }));
+  const shown = segs.filter(s => s.v > 0);
+  const rest = Math.max(0, 100 - shown.reduce((t, s) => t + s.v, 0));
+  const firstB = shown.findIndex(s => s.side === "b");
+  const at = firstB < 0 ? shown.length : firstB;
+  const seq = rest >= 0.5 ? [...shown.slice(0, at), {
+    side: "gap",
+    v: rest
+  }, ...shown.slice(at)] : shown;
+  return React.createElement("span", {
+    className: "btv-bar" + (tall ? " btv-bar-t" : ""),
+    role: "img",
+    "aria-label": shown.map(s => btvPct(s.v) + " " + s.label).join(", ")
+  }, seq.map((s, i) => s.side === "gap" ? React.createElement("i", {
+    key: i,
+    className: "btv-gap",
+    style: {
+      width: s.v + "%"
+    }
+  }) : React.createElement("i", {
+    key: i,
+    className: "btv-seg btv-" + s.side + s.tone,
+    style: {
+      width: s.v + "%"
+    },
+    title: btvPct(s.v) + " " + s.label
+  })));
 }
-function AoTable({
+function BtvSwatch({
+  side,
+  tone
+}) {
+  return React.createElement("i", {
+    className: "btv-sw btv-" + side + tone,
+    "aria-hidden": "true"
+  });
+}
+function BtvSplit({
+  c
+}) {
+  const mids = c.segs.filter(s => s.side === "m" && s.v > 0);
+  const rest = Math.round(100 - c.a - c.b - c.m - (c.x || 0));
+  return React.createElement("div", {
+    className: "btv-split"
+  }, React.createElement("div", {
+    className: "btv-ends"
+  }, React.createElement("span", {
+    className: "btv-end"
+  }, React.createElement(BtvSwatch, {
+    side: "a",
+    tone: 2
+  }), React.createElement("b", null, btvPct(c.a)), " ", c.names[0]), React.createElement("span", {
+    className: "btv-end btv-end-b"
+  }, React.createElement("b", null, btvPct(c.b)), " ", c.names[1], React.createElement(BtvSwatch, {
+    side: "b",
+    tone: 2
+  }))), React.createElement(BtvBar, {
+    segs: c.segs,
+    tall: true
+  }), React.createElement("p", {
+    className: "btv-mids"
+  }, mids.map((s, i) => React.createElement("span", {
+    key: i
+  }, btvPct(s.v), " ", btvLow(s.label))), c.x >= 1 ? React.createElement("span", null, btvPct(c.x), " ", btvLow(c.xLabel || "")) : null, rest >= 3 ? React.createElement("span", null, rest, "% not published") : null), c.sig === false ? React.createElement("p", {
+    className: "btv-level"
+  }, "Level: the gap is inside the margin of error.") : null);
+}
+function BtvStack({
+  c,
+  houses
+}) {
+  const [all, setAll] = btvUseState(false);
+  const rows = c.show && !all ? c.rows.slice(0, c.show) : c.rows;
+  return React.createElement("div", {
+    className: "btv-stack"
+  }, React.createElement("div", {
+    className: "btv-key"
+  }, c.legend.map((l, i) => React.createElement("span", {
+    key: i
+  }, React.createElement(BtvSwatch, {
+    side: l.side,
+    tone: l.tone
+  }), l.label)), c.shades ? React.createElement("span", {
+    className: "btv-key-n"
+  }, "Stronger answers in full colour, milder ones faded") : null), React.createElement("div", {
+    className: "btv-rows"
+  }, rows.map((r, i) => React.createElement("div", {
+    className: "btv-row",
+    key: i
+  }, React.createElement("div", {
+    className: "btv-rl"
+  }, c.mode === "battery" ? React.createElement("span", null, r.label) : React.createElement(React.Fragment, null, React.createElement("span", {
+    className: c.mode === "waves" ? "" : "btv-rh"
+  }, r.label || (c.mode === "waves" ? btvMonth(r.when || r.src.field.end) : btvHouse(r.src, houses)), c.mode === "compare" && !r.label ? React.createElement("span", {
+    className: "btv-rd"
+  }, " \xB7 ", btvMonth(r.src.field.end)) : null), r.wording ? React.createElement("span", {
+    className: "btv-rw"
+  }, r.wording) : null)), React.createElement("span", {
+    className: "btv-va"
+  }, btvN(r.a)), React.createElement(BtvBar, {
+    segs: r.segs
+  }), React.createElement("span", {
+    className: "btv-vb"
+  }, btvN(r.b)), React.createElement("span", {
+    className: "btv-net",
+    title: r.sig === false ? "The gap is inside the margin of error" : ""
+  }, r.sig === false ? "level" : "")))), c.show && c.rows.length > c.show ? React.createElement("button", {
+    type: "button",
+    className: "btv-all",
+    onClick: () => setAll(!all)
+  }, all ? "Show fewer" : "Show all " + c.rows.length) : null, c.summary ? React.createElement("p", {
+    className: "btv-sum"
+  }, c.summary) : null);
+}
+function BtvRank({
+  c
+}) {
+  const [all, setAll] = btvUseState(false);
+  const top = Math.max(...c.rows.map(r => r.v), 1);
+  const rows = !all ? c.rows.slice(0, c.show) : c.rows;
+  const tenths = c.rows.some(r => Math.abs(r.v - Math.round(r.v)) >= 0.05);
+  return React.createElement("div", {
+    className: "btv-rank"
+  }, rows.map((r, i) => React.createElement("div", {
+    className: "btv-rk",
+    key: i
+  }, React.createElement("span", {
+    className: "btv-rkl"
+  }, r.label), React.createElement("span", {
+    className: "btv-rkb"
+  }, React.createElement("i", {
+    style: {
+      width: r.v / Math.max(top, 50) * 100 + "%"
+    }
+  })), React.createElement("span", {
+    className: "btv-rkv"
+  }, tenths ? r.v.toFixed(1) + "%" : btvPct(r.v)))), c.rows.length > c.show ? React.createElement("button", {
+    type: "button",
+    className: "btv-all",
+    onClick: () => setAll(!all)
+  }, all ? "Show fewer" : "Show all " + c.rows.length) : null, c.base ? React.createElement("p", {
+    className: "btv-base"
+  }, c.base) : null);
+}
+function BtvNets({
+  c
+}) {
+  const span = Math.max(...c.rows.map(r => Math.abs(r.v)), 10);
+  return React.createElement("div", {
+    className: "btv-nets"
+  }, c.rows.map((r, i) => React.createElement("div", {
+    className: "btv-nt",
+    key: i
+  }, React.createElement("span", {
+    className: "btv-ntl"
+  }, r.label), React.createElement("span", {
+    className: "btv-ntb"
+  }, React.createElement("i", {
+    className: r.v >= 0 ? "btv-a2" : "btv-b2",
+    style: r.v >= 0 ? {
+      left: "50%",
+      width: r.v / span * 50 + "%"
+    } : {
+      right: "50%",
+      width: -r.v / span * 50 + "%"
+    }
+  }), React.createElement("b", {
+    style: r.v >= 0 ? {
+      left: "calc(50% + " + r.v / span * 50 + "% + 6px)"
+    } : {
+      right: "calc(50% + " + -r.v / span * 50 + "% + 6px)"
+    }
+  }, btvSigned(r.v))))), c.unit ? React.createElement("p", {
+    className: "btv-base"
+  }, btvCap(c.unit)) : null);
+}
+function BtvTable({
   t
 }) {
-  const rows = (t.rows || []).map(r => Array.isArray(r) ? r : [r]);
-  const asFigs = rows.length > 0 && rows.every(r => r.length === 2) && !t.headers;
+  const rows = t.rows || [];
+  const wide = t.headers && t.headers.length > 2 || rows.some(r => r.length > 2);
   return React.createElement("div", {
-    className: "ao-table-b"
-  }, t.title ? React.createElement("div", {
-    className: "ao-table-t"
-  }, t.title) : null, asFigs ? React.createElement(AoFigs, {
-    rows: rows
-  }) : React.createElement("div", {
-    className: "ao-twrap"
+    className: "btv-tb"
+  }, t.title ? React.createElement("p", {
+    className: "btv-tbt"
+  }, t.title) : null, React.createElement("div", {
+    className: "btv-twrap"
   }, React.createElement("table", {
-    className: "ao-table"
-  }, t.headers && t.headers.length ? React.createElement("thead", null, React.createElement("tr", null, t.headers.map((h, hi) => React.createElement("th", {
-    key: hi,
-    className: hi ? "" : "ao-l"
+    className: "btv-table"
+  }, t.headers && t.headers.length ? React.createElement("thead", null, React.createElement("tr", null, t.headers.map((h, i) => React.createElement("th", {
+    key: i,
+    className: i ? "" : "btv-l"
   }, h)))) : null, React.createElement("tbody", null, rows.map((r, ri) => React.createElement("tr", {
     key: ri
-  }, r.map((c, ci) => {
-    const n = aoPct(c);
+  }, r.map((v, ci) => {
+    const n = typeof v === "number" ? v : parseFloat(v);
     return React.createElement("td", {
       key: ci,
-      className: ci ? "" : "ao-l"
-    }, ci === 0 ? c : n === null ? c || "–" : n + "%");
+      className: ci ? "" : "btv-l"
+    }, ci === 0 ? v : v == null || v === "" ? "–" : Number.isFinite(n) && !/[a-z]/i.test(String(v)) ? btvN(n) + (wide ? "" : "%") : v);
   })))))));
 }
-function AoWave({
-  w,
-  multiHouse
+function BtvSource({
+  src,
+  houses,
+  question,
+  extra
 }) {
-  const all = w.tables || [];
-  const firstRows = all.length && all[0].rows ? all[0].rows : [];
-  const pairs = firstRows.length > 0 && firstRows.every(r => Array.isArray(r) && r.length === 2);
-  const rest = all.slice(1).filter(t => (t.rows || []).length);
   return React.createElement("div", {
-    className: "ao-wave"
-  }, React.createElement("div", {
-    className: "ao-wmeta"
-  }, multiHouse ? React.createElement("span", {
-    className: "ao-whouse"
-  }, AO_HOUSES[w.house].full) : null, React.createElement("span", null, aoSpan(w)), w.sample ? React.createElement("span", null, "n ", w.sample.toLocaleString("en-AU")) : null, w.sampleEff ? React.createElement("span", null, "effective n ", w.sampleEff.toLocaleString("en-AU")) : null, w.url ? React.createElement("a", {
-    className: "ao-src",
-    href: w.url,
+    className: "btv-src"
+  }, React.createElement("span", {
+    className: "btv-src-l"
+  }, React.createElement("b", null, btvHouse(src, houses, true)), React.createElement("span", null, btvSpan(src.field)), src.n ? React.createElement("span", null, src.n.toLocaleString("en-AU"), " people") : null, src.url ? React.createElement("a", {
+    href: src.url,
     target: "_blank",
     rel: "noopener"
-  }, "Source \u2197") : null), w.proseOnly || !firstRows.length ? React.createElement("p", {
-    className: "ao-only"
-  }, w.proseOnly ? "Asked, but this wave's figures are image-only or reported in prose; the source has them." : "No all-voters figures on file for this wave; the source has them.") : pairs ? React.createElement(AoFigs, {
-    rows: firstRows
-  }) : React.createElement(AoTable, {
-    t: all[0]
-  }), w.note ? React.createElement("p", {
-    className: "ao-note"
-  }, w.note) : null, rest.length ? React.createElement("details", {
-    className: "ao-fold"
-  }, React.createElement("summary", null, rest.length === 1 ? "Breakdown table" : "Breakdown tables · " + rest.length), rest.map((t, ti) => React.createElement(AoTable, {
-    key: ti,
-    t: t
-  }))) : null);
+  }, "Source \u2197") : null), question ? React.createElement("details", {
+    className: "btv-wd"
+  }, React.createElement("summary", null, "The question as asked"), React.createElement("p", null, question), extra) : null);
 }
-function RdAoEntries() {
+function BtvCard({
+  c,
+  houses
+}) {
+  const body = c.kind === "split" ? React.createElement(BtvSplit, {
+    c: c
+  }) : c.kind === "stack" ? React.createElement(BtvStack, {
+    c: c,
+    houses: houses
+  }) : c.kind === "rank" ? React.createElement(BtvRank, {
+    c: c
+  }) : c.kind === "nets" ? React.createElement(BtvNets, {
+    c: c
+  }) : null;
+  const folds = (c.folds || []).filter(t => (t.rows || []).length);
+  return React.createElement("article", {
+    className: "btv-card btv-k-" + c.kind + (btvWide(c) ? " btv-wide" : "")
+  }, React.createElement("h4", {
+    className: "btv-q"
+  }, c.title), body, c.note ? React.createElement("p", {
+    className: "btv-note"
+  }, c.note) : null, c.src && c.src.field ? React.createElement(BtvSource, {
+    src: c.src,
+    houses: houses,
+    question: c.question,
+    extra: folds.length ? folds.map((t, i) => React.createElement(BtvTable, {
+      key: i,
+      t: t
+    })) : null
+  }) : React.createElement("div", {
+    className: "btv-src"
+  }, React.createElement("span", {
+    className: "btv-src-l"
+  }, c.mode === "waves" ? React.createElement("b", null, btvHouse(c.src || c.rows[0].src, houses, true)) : null, (() => {
+    const seen = new Set();
+    const links = (c.rows || []).filter(r => r.src && r.src.url && !seen.has(r.src.url) && seen.add(r.src.url));
+    return links.length ? React.createElement("span", {
+      className: "btv-srcs"
+    }, "Sources: ", links.map((r, i) => React.createElement("a", {
+      key: i,
+      href: r.src.url,
+      target: "_blank",
+      rel: "noopener"
+    }, c.mode === "waves" ? btvMonth(r.src.field.end) : btvHouse(r.src, houses) + " " + btvMonth(r.src.field.end), " \u2197"))) : null;
+  })())));
+}
+function BtvTracker({
+  c,
+  houses
+}) {
+  const narrow = useNarrow(MQ_PHONE);
+  const x0 = Math.min(...c.panels.flatMap(p => p.points.map(q => q.x))) - 0.06;
+  const x1 = Math.max(...c.panels.flatMap(p => p.points.map(q => q.x))) + 0.06;
+  const [lo, hi] = c.yDomain;
+  const step = hi - lo > 50 ? 25 : 10;
+  const ticks = [];
+  for (let y = Math.floor(x0); y <= Math.ceil(x1); y++) {
+    for (const m of [0, 6]) {
+      const x = y + m / 12;
+      if (x >= x0 && x <= x1) ticks.push({
+        x,
+        label: BTV_MON[m] + " " + String(y).slice(2)
+      });
+    }
+  }
+  const fmt = v => c.measure === "net" ? btvSigned(v) : btvPct(v);
+  const yt = [];
+  for (let v = lo + step; v <= hi + 1e-9; v += step) yt.push(v);
+  const rows = c.panels.flatMap(p => p.points.map(q => ({
+    ...q,
+    house: p.house
+  }))).sort((p, q) => q.x - p.x);
+  return React.createElement("div", {
+    className: "btv-tracker"
+  }, React.createElement("h4", {
+    className: "btv-th"
+  }, c.head), React.createElement("p", {
+    className: "btv-tdek"
+  }, c.dek), React.createElement("p", {
+    className: "btv-tlab"
+  }, c.title), React.createElement("div", {
+    className: "btv-pgrid btv-pg" + c.panels.length
+  }, c.panels.map(p => {
+    const pts = p.points.map(q => ({
+      x: q.x,
+      y: q.v
+    }));
+    const last = p.points[p.points.length - 1];
+    return React.createElement("div", {
+      className: "btv-panel",
+      key: p.house
+    }, React.createElement("div", {
+      className: "btv-ptop"
+    }, React.createElement("span", null, btvHouse(p, houses)), React.createElement("b", null, fmt(last.v))), React.createElement("div", {
+      className: "btv-plab"
+    }, p.label, React.createElement("span", null, " \xB7 ", p.points.length === 1 ? "one reading" : p.points.length + " readings")), React.createElement(TrendChart, {
+      key: "btv-" + c.id + "-" + p.house,
+      heightPx: narrow ? 118 : 138,
+      padPx: {
+        l: 30,
+        r: 8,
+        t: 10,
+        b: 22
+      },
+      xDomain: [x0, x1],
+      yDomain: [lo, hi],
+      yTicks: yt,
+      yTickFmt: () => "",
+      xTicks: ticks,
+      baseline: true,
+      notes: yt.map(v => ({
+        x: "left",
+        y: v,
+        dy: -3,
+        text: c.measure === "net" ? btvSigned(v) : v + (v === hi ? "%" : ""),
+        size: 10.5,
+        cls: "btv-ylab"
+      })),
+      refLines: c.ref != null ? [{
+        y: c.ref,
+        label: "",
+        color: "var(--ink-faint)"
+      }] : [],
+      series: [{
+        id: p.house,
+        label: btvHouse(p, houses),
+        color: "var(--ink-2)",
+        rdWidth: 1.6,
+        endCap: false,
+        smooth: false,
+        points: pts
+      }],
+      spine: pts,
+      scatter: p.points.map(q => ({
+        x: q.x,
+        y: q.v,
+        color: "var(--ink)",
+        label: c.measure === "net" ? "Net" : btvCap(c.names[0]),
+        meta: {
+          pollster: btvHouse(p, houses, true),
+          dateLabel: btvSpan(q.field),
+          sample: q.n
+        }
+      })),
+      tooltipTitle: i => p.points[i] ? btvSpan(p.points[i].field) : "",
+      extraRows: i => {
+        const q = p.points[i];
+        return q ? [{
+          label: btvCap(c.names[0]),
+          value: btvPct(q.a)
+        }, {
+          label: btvCap(c.names[1]),
+          value: btvPct(q.b)
+        }] : [];
+      },
+      fmt: fmt,
+      copy: {
+        title: c.title.replace(/, by pollster$/, "") + ": " + btvHouse(p, houses, true),
+        sub: c.head + ". " + p.label,
+        legend: []
+      }
+    }));
+  })), React.createElement("p", {
+    className: "btv-tkey"
+  }, React.createElement("span", null, React.createElement("i", {
+    className: "btv-dot",
+    "aria-hidden": "true"
+  }), "One poll"), React.createElement("span", null, React.createElement("i", {
+    className: "btv-ln",
+    "aria-hidden": "true"
+  }), "The line joins one pollster\u2019s own readings"), c.ref != null ? React.createElement("span", null, React.createElement("i", {
+    className: "btv-rl0",
+    "aria-hidden": "true"
+  }), c.refLabel) : null), c.note ? React.createElement("p", {
+    className: "btv-note"
+  }, c.note) : null, React.createElement("details", {
+    className: "btv-ledger"
+  }, React.createElement("summary", null, "All ", rows.length, " readings"), React.createElement("div", {
+    className: "btv-twrap"
+  }, React.createElement("table", {
+    className: "btv-table"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+    className: "btv-l"
+  }, "Pollster"), React.createElement("th", {
+    className: "btv-l"
+  }, "Fieldwork"), React.createElement("th", null, "Sample"), React.createElement("th", null, c.cols[0]), React.createElement("th", null, c.cols[1]), React.createElement("th", null, c.cols[2]), c.measure === "net" ? React.createElement("th", null, "Net") : null, React.createElement("th", null))), React.createElement("tbody", null, rows.map((q, i) => React.createElement("tr", {
+    key: i
+  }, React.createElement("td", {
+    className: "btv-l"
+  }, btvHouse(q, houses)), React.createElement("td", {
+    className: "btv-l"
+  }, btvSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, btvN(q.a)), React.createElement("td", null, btvN(q.m)), React.createElement("td", null, btvN(q.b)), c.measure === "net" ? React.createElement("td", null, React.createElement("b", null, btvSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
+    href: q.url,
+    target: "_blank",
+    rel: "noopener"
+  }, "Source \u2197") : null))))))));
+}
+function BtvMore({
+  t,
+  houses
+}) {
+  return React.createElement("details", {
+    className: "btv-more"
+  }, React.createElement("summary", null, "More questions on ", t.about || t.title, React.createElement("span", null, " \xB7 ", t.more.length)), React.createElement("ul", {
+    className: "btv-ml"
+  }, t.more.map(q => React.createElement("li", {
+    key: q.id + q.house
+  }, React.createElement("details", {
+    className: "btv-mi"
+  }, React.createElement("summary", null, React.createElement("span", {
+    className: "btv-mq"
+  }, q.title), React.createElement("span", {
+    className: "btv-mm"
+  }, btvHouse(q, houses), " \xB7 ", btvMonth(q.last), q.waves.length > 1 ? " · " + q.waves.length + " readings" : "")), q.waves.map((w, i) => React.createElement("div", {
+    className: "btv-mw",
+    key: i
+  }, q.waves.length > 1 ? React.createElement("p", {
+    className: "btv-mwd"
+  }, btvSpan(w.field)) : null, w.tables.length ? w.tables.map((tb, ti) => React.createElement(BtvTable, {
+    key: ti,
+    t: tb
+  })) : React.createElement("p", {
+    className: "btv-note"
+  }, w.prose.length ? w.prose.join(" ").replace(/&rsquo;/g, "’").replace(/&lsquo;/g, "‘").replace(/&ldquo;/g, "“").replace(/&rdquo;/g, "”").replace(/&ndash;/g, "–").replace(/&mdash;/g, "—") : "The figures are in the source."), React.createElement(BtvSource, {
+    src: w,
+    houses: houses,
+    question: w.question
+  }))))))));
+}
+function BtvTopic({
+  t,
+  houses
+}) {
+  const trackers = t.blocks.filter(b => b.kind === "tracker");
+  const cards = t.blocks.filter(b => b.kind !== "tracker");
+  return React.createElement("section", {
+    className: "btv-topic",
+    id: "btv-" + t.id,
+    "aria-labelledby": "btv-h-" + t.id
+  }, React.createElement("h3", {
+    className: "btv-tt",
+    id: "btv-h-" + t.id
+  }, t.title), React.createElement("p", {
+    className: "btv-tdk"
+  }, t.dek), trackers.map(c => React.createElement(BtvTracker, {
+    key: c.id,
+    c: c,
+    houses: houses
+  })), cards.length ? React.createElement("div", {
+    className: "btv-grid"
+  }, cards.map((c, i) => React.createElement(BtvCard, {
+    key: (c.id || "") + i,
+    c: c,
+    houses: houses
+  }))) : null, t.more.length ? React.createElement(BtvMore, {
+    t: t,
+    houses: houses
+  }) : null);
+}
+function BtvBody() {
   const {
     D
   } = window.AP;
-  const [src, setSrc] = aoUseState(null);
-  const [failed, setFailed] = aoUseState(false);
-  const [tries, setTries] = aoUseState(0);
-  aoUseEffect(() => {
+  const [src, setSrc] = btvUseState(null);
+  const [failed, setFailed] = btvUseState(false);
+  const [tries, setTries] = btvUseState(0);
+  btvUseEffect(() => {
     let live = true;
     D.loadOneOffs().then(j => {
       if (!live) return;
-      if (j && Array.isArray(j.entries)) {
+      if (j && Array.isArray(j.topics)) {
         setSrc(j);
         setFailed(false);
-      } else {
-        setFailed(true);
-      }
+      } else setFailed(true);
     });
     return () => {
       live = false;
     };
   }, [tries]);
-  const themes = aoUseMemo(() => src ? aoGroup(src) : [], [src]);
+  btvUseEffect(() => {
+    if (!src) return;
+    const h = (window.location.hash || "").replace(/^#/, "");
+    if (!/^btv-/.test(h)) return;
+    let raf = requestAnimationFrame(() => {
+      raf = requestAnimationFrame(() => {
+        const el = document.getElementById(h);
+        if (!el) return;
+        const pad = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+        window.scrollTo({
+          top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - pad),
+          behavior: "instant"
+        });
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [src]);
+  const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
   if (failed) {
-    return React.createElement("section", {
-      className: "ao",
-      id: "ad-hocs"
+    return React.createElement("div", {
+      className: "btv"
     }, React.createElement("p", {
-      className: "ao-note"
-    }, "The catalogue could not be loaded.", " ", React.createElement("button", {
+      className: "btv-note"
+    }, "The questions could not be loaded.", " ", React.createElement("button", {
       type: "button",
-      className: "ao-retry",
+      className: "btv-retry",
       onClick: () => setTries(n => n + 1)
     }, "Try again")));
   }
-  if (!src) {
-    return React.createElement("section", {
-      className: "ao",
-      id: "ad-hocs"
-    }, React.createElement("p", {
-      className: "ao-note"
-    }, "Loading the catalogue\u2026"));
-  }
-  const qCount = themes.reduce((n, t) => n + t.questions.length, 0);
-  if (!qCount) {
-    return React.createElement("section", {
-      className: "ao",
-      id: "ad-hocs"
-    }, React.createElement("p", {
-      className: "ao-note"
-    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor, Freshwater Strategy, Newspoll and DemosAU polls publish their first ad hoc questions, they will appear here grouped by theme."));
-  }
-  const wCount = (src.entries || []).length;
-  return React.createElement("section", {
-    className: "ao",
-    id: "ad-hocs"
-  }, React.createElement("div", {
-    className: "ao-legend"
-  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, Freshwater Strategy's News Corp polls, Newspoll in The Australian and DemosAU's surveys")), themes.map(t => React.createElement("div", {
-    className: "ao-theme",
-    key: t.id
-  }, React.createElement("h3", {
-    className: "ao-t-t"
-  }, t.title), React.createElement("p", {
-    className: "ao-t-dek"
-  }, t.dek), React.createElement("div", {
-    className: "ao-qs"
-  }, t.questions.map(q => React.createElement("div", {
-    className: "ao-card",
-    key: q.id
-  }, React.createElement("div", {
-    className: "ao-chead"
-  }, React.createElement("h4", {
-    className: "ao-q"
-  }, q.question), React.createElement("div", {
-    className: "ao-chips"
-  }, q.houses.map(h => React.createElement("span", {
-    key: h,
-    className: "ao-chip ao-chip-" + h
-  }, AO_HOUSES[h].short)), React.createElement("span", {
-    className: "ao-chip"
-  }, q.waves.length > 1 ? q.waves.length + " waves" : "one wave"))), React.createElement(AoWave, {
-    w: q.waves[0],
-    multiHouse: q.houses.length > 1
-  }), q.waves.length > 1 ? React.createElement("details", {
-    className: "ao-fold ao-prior"
-  }, React.createElement("summary", null, q.waves.length - 1 === 1 ? "Earlier wave" : "Earlier waves · " + (q.waves.length - 1)), q.waves.slice(1).map(w => React.createElement(AoWave, {
-    key: w.house + w.waveDate,
-    w: w,
-    multiHouse: q.houses.length > 1
-  }))) : null))))));
+  if (!src) return React.createElement("div", {
+    className: "btv"
+  }, React.createElement("p", {
+    className: "btv-note"
+  }, "Loading the questions\u2026"));
+  if (!topics.length) return React.createElement("div", {
+    className: "btv"
+  }, React.createElement("p", {
+    className: "btv-note"
+  }, "No questions are on file yet."));
+  const houses = src.houses || {};
+  const more = topics.reduce((n, t) => n + t.more.length, 0);
+  return React.createElement("div", {
+    className: "btv"
+  }, React.createElement("nav", {
+    className: "btv-nav",
+    "aria-label": "Topics"
+  }, topics.map(t => React.createElement("a", {
+    key: t.id,
+    href: "#btv-" + t.id
+  }, t.short))), React.createElement("p", {
+    className: "btv-scope"
+  }, src.counts.featured, " questions in charts and cards, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), topics.map(t => React.createElement(BtvTopic, {
+    key: t.id,
+    t: t,
+    houses: houses
+  })), React.createElement("div", {
+    className: "btv-how"
+  }, React.createElement("p", null, React.createElement("b", null, "How to read the cards."), " Each bar is one poll\u2019s answers on a scale of 0 to 100, as the pollster printed them, with the agreeing side on the left and the disagreeing side on the right; stronger answers are in full colour, milder ones faded. Where the two sides are within the poll\u2019s 95% margin of error, the card says \u201Clevel\u201D rather than naming a winner. Pollsters word their questions differently, so compare a pollster with itself before comparing it with another."), React.createElement("p", null, React.createElement("b", null, "What is left out."), " Questions about sport, holidays and personal habits, state politics, surveys run before this term, and questions the main page already tracks, such as whether the country is heading in the right direction.")));
 }
-function RdAdhocs() {
+function RdBeyond() {
   return React.createElement("section", {
-    className: "rd-sec rd-adhocs",
-    id: "ad-hocs",
-    "aria-labelledby": "rd-ao-t"
+    className: "rd-sec rd-btv",
+    id: "beyond-the-vote",
+    "aria-labelledby": "rd-btv-t"
   }, React.createElement("div", {
     className: "rd-eyebrow"
   }, React.createElement("h2", {
     className: "rd-title",
-    id: "rd-ao-t"
-  }, "Ad hoc topical and issue questions"), React.createElement("span", {
+    id: "rd-btv-t"
+  }, "Beyond the vote"), React.createElement("span", {
     className: "rd-meta"
-  }, "The one-offs beyond the standing battery")), React.createElement(RdHed, {
-    head: "Asked once, about the issue of the moment",
-    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate\u2019s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, Freshwater Strategy\u2019s polls in News Corp\u2019s mastheads, Newspoll in The Australian and DemosAU\u2019s surveys, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
-  }), React.createElement(RdAoEntries, null));
+  }, "What else Australians tell the pollsters")), React.createElement(RdHed, {
+    head: "What Australians think about the issues",
+    dek: "Voting intention is only part of what the pollsters ask. This page gathers the rest of this term\u2019s questions worth knowing, from Donald Trump and immigration to the budget, the Iran war and the Bondi attack, in ten topics. Where several pollsters asked the same thing, their answers sit side by side."
+  }), React.createElement(BtvBody, null));
 }
-const RdAdhocsM = React.memo(RdAdhocs);
-const RdAoEntriesM = React.memo(RdAoEntries);
+const RdBeyondM = React.memo(RdBeyond);
+const BtvBodyM = React.memo(BtvBody);
 Object.assign(window, {
-  RdAdhocs: RdAdhocsM,
-  RdAoEntries: RdAoEntriesM
+  RdBeyond: RdBeyondM,
+  BtvBody: BtvBodyM
 });</script>
   <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 const SETTLE_MS = 220;
@@ -135351,10 +135767,10 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
-  id: "ad-hocs",
-  label: "Ad hoc topical/issue questions",
+  id: "beyond-the-vote",
+  label: "Beyond the vote",
   menu: true,
-  tip: "The one-off questions pollsters ask beyond the standing battery, grouped by theme"
+  tip: "What Australians tell the pollsters beyond their vote, by topic"
 }, {
   id: "changelog",
   label: "Changelog",
@@ -135368,7 +135784,7 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
-if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "ad-hocs"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "beyond-the-vote"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));

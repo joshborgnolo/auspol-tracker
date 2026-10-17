@@ -35,7 +35,7 @@ assert.equal((shellHeader({}).match(/<a class="sh-tab[" ]/g) || []).length, 4, "
 {
   const h = shellHeader({});
   assert.ok(h.includes('class="sh-tab sh-menu-btn" aria-haspopup="menu"'), "the bar ends in the ☰ button");
-  for (const href of ["/disagreement/", "/leans/", "/flows/", "/flows-explained/", "/changelog/", "/info/"])
+  for (const href of ["/disagreement/", "/leans/", "/flows/", "/flows-explained/", "/beyond-the-vote/", "/changelog/", "/info/"])
     assert.ok(new RegExp(`<a role="menuitem"[^>]*href="${href}"`).test(h), `the menu links ${href}`);
   assert.ok(!/sh-menu-sep/.test(h + shellCss()), "the menu's explainer separator is retired");
   assert.ok(/class="sh-menu-item sh-menu-info"/.test(h), "Info rides the menu for the pinned phone bar");

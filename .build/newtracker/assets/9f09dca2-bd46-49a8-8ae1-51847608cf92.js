@@ -260,9 +260,9 @@ window.AUSPOL = (function () {
     }
     return _cyclePromise;
   };
-  /* The ad-hoc one-offs behind the /ad-hocs/ page – the same lazily fetched
-     sidecar contract as cycle-source above, for the same reason: read by
-     nothing outside that one tab's page. */
+  /* The questions behind the /beyond-the-vote/ page – the same lazily
+     fetched sidecar contract as cycle-source above, for the same reason: read
+     by nothing outside that one tab's page. */
   let _oneOffs = null;
   let _oneOffsPromise = null;
   const loadOneOffs = () => {
@@ -328,7 +328,7 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
-    // the /ad-hocs/ page's one-offs, on the same contract
+    // the /beyond-the-vote/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs,
     pollCadence,

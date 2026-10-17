@@ -1658,7 +1658,24 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "Approve",
+        23
+       ],
+       [
+        "Disapprove",
+        72
+       ],
+       [
+        "Don't know",
+        5
+       ]
+      ]
+     }
+    ],
     "prose": [
      "Asked whether they approved or disapproved of US military action against Iran, 72 per cent of voters said they disapproved (including 50 per cent who strongly disapproved) compared with 23 per cent who approved and 5 per cent who said they didn’t know.",
      "The Newspoll showed that more than two-thirds of every age group disapproved of the US military action in Iran. One Nation voters were more likely to support the war in Iran, ahead of Liberal, Labor and Greens voters. Men are twice as likely to approve of the military action (30 per cent) as women (16 per cent)."
@@ -1684,7 +1701,24 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "Support",
+        30
+       ],
+       [
+        "Oppose",
+        63
+       ],
+       [
+        "Don't know",
+        7
+       ]
+      ]
+     }
+    ],
     "prose": [
      "On the question of whether Australia should join allied nations in supporting the US to keep the Strait of Hormuz open for international shipping, 63 per cent of voters opposed sending naval vessels, while 30 per cent supported it, and 7 per cent didn’t know."
     ]
@@ -1745,7 +1779,20 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "Good",
+        22
+       ],
+       [
+        "Bad",
+        47
+       ]
+      ]
+     }
+    ],
     "prose": [
      "The Newspoll, conducted ­between Thursday and Sunday, found 47 per cent of voters ­believe the budget will be bad for the Australian economy compared with 22 per cent who said it would be good.",
      "The minus 25 net approval rating for Dr Chalmers’ fifth budget compares with the minus nine rating that was recorded following the Abbott government’s controversial austerity budget (39 per cent good versus 48 per cent bad) in 2014.",
@@ -1772,7 +1819,24 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "Better off",
+        11
+       ],
+       [
+        "Worse off",
+        52
+       ],
+       [
+        "Neither",
+        37
+       ]
+      ]
+     }
+    ],
     "prose": [
      "More than half of Australians (52 per cent) expect to be personally worse off as a result of the budget, while just 11 per cent ­expect to be better off and 37 per cent expect to be neither better nor worse off. Despite the Prime Minister supporting blanket grandfathering across tax changes, 67 per cent of people who own investment properties said they would be worse off.",
      "In a concerning trend for the government, only 10 per cent of renters expect to be better off compared with 44 per cent who believe they will be worse off and 46 per cent who think the budget will make no difference.",
@@ -1926,7 +1990,20 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "Stay the same or increase",
+        62
+       ],
+       [
+        "Decrease",
+        32
+       ]
+      ]
+     }
+    ],
     "prose": [
      "As the Prime Minister and Jim Chalmers used speeches at the Queensland ALP conference on Sunday to rally supporters against One Nation and defend Labor’s housing taxes, a special Newspoll question revealed 62 per cent of voters support house prices staying the same or increasing ­compared with 32 per cent who support property values decreasing.",
      "While 48 per cent of voters aged between 18-34 backed lower house prices, 70 per cent of voters aged 35-49 wanted prices to stay the same or increase. Among those renting, 56 per cent supported lower prices compared with 74 per cent of mortgage-holders who wanted prices to stay flat or increase."
@@ -1977,7 +2054,32 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "Lower government spending",
+        55
+       ],
+       [
+        "Subsidise essentials such as energy and fuel",
+        51
+       ],
+       [
+        "Cut income taxes",
+        31
+       ],
+       [
+        "Reduce regulation and costs for business",
+        27
+       ],
+       [
+        "One-off payments",
+        11
+       ]
+      ]
+     }
+    ],
     "prose": [
      "The poll, which included interviews with 1241 voters ahead of MPs returning to Canberra for parliament this week, featured a special question testing voter priorities in terms of how the government should respond to high inflation and cost-of-living pressures.",
      "After combining the highest priority and second-highest priority for voters, lowering government spending (55 per cent) topped the list of actions followed by subsidising essentials such as energy and fuel (51 per cent), cutting income taxes (31 per cent), reducing regulation and costs for business (27 per cent), and offering one-off payments (11 per cent).",
@@ -2008,7 +2110,32 @@
    ],
    "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-reveals-twothirds-of-voters-support-slashing-australian-immigration-numbers/news-story/f0cdd659809e04b5c313fca661f0a5c0",
    "data": {
-    "tables": [],
+    "tables": [
+     {
+      "rows": [
+       [
+        "A lot fewer",
+        37
+       ],
+       [
+        "Fewer",
+        29
+       ],
+       [
+        "About the same",
+        28
+       ],
+       [
+        "More",
+        4
+       ],
+       [
+        "A lot more",
+        2
+       ]
+      ]
+     }
+    ],
     "prose": [
      "The Newspoll survey of 1244 voters , conducted by Pyxis Polling & Insights between Monday and Thursday last week, found 37 per cent of voters wanted a lot fewer immigrants than now and 29 per cent wanted fewer immigrants than now .",
      "While two-thirds of voters wanted less migration , 4 per cent wanted more immigrants than now and 2 per cent wanted a lot more immigrants than now.",

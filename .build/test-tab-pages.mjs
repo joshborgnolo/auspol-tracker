@@ -30,7 +30,7 @@ const TABS = [
   { id: "leans", label: "Pollster leans", h1: "Pollster leans", descFrag: "How each Australian federal pollster leans" },
   { id: "flows", label: "Preference flows", h1: "Preference flows", descFrag: "Where Australian federal preferences are flowing now" },
   { id: "flows-explained", label: "Preference flows explained", h1: "Preference flows explained", descFrag: "How preferences decide the Australian federal two-party figure" },
-  { id: "ad-hocs", label: "Ad hoc topical/issue questions", h1: "Ad hoc topical and issue questions", descFrag: "one-offs, grouped by theme with every figure and source" }, /* hidden 2026-10-17 and re-shown the same day (user calls) */
+  { id: "beyond-the-vote", label: "Beyond the vote", h1: "Beyond the vote", descFrag: "charted across pollsters, with every figure and source" }, /* the 2026-10-17 /ad-hocs/ catalogue, curated and renamed 2026-10-18 */
   { id: "changelog", label: "Changelog", h1: "Changelog", descFrag: "recorded entry by entry as new polls land" },
   { id: "info", label: "Info", h1: "About auspol tracker", descFrag: "How auspol tracker works" },
 ];
@@ -64,19 +64,26 @@ assert.ok(!read("vic/index.html").includes("window.AP_INITIAL_TAB="), "Vic's Now
 
 // ---- the sitemap and the push list -------------------------------------------------------
 const sm = read("sitemap.xml");
-for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "flows-explained/", "ad-hocs/", "changelog/", "info/",
+for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "flows-explained/", "beyond-the-vote/", "changelog/", "info/",
                  "vic/allpolls/", "vic/disagreement/", "vic/leans/", "vic/flows/", "vic/info/"])
   assert.ok(sm.includes(`<loc>https://auspoltracker.com/${u}</loc>`), `the sitemap carries /${u}`);
 assert.ok(!sm.includes("preference-flows/"), "the retired explainer satellite left the sitemap (its stub redirects)");
 assert.ok(!sm.includes("vic/flows-explained/"), "the explainer is federal-only");
-assert.ok(!sm.includes("vic/ad-hocs/"), "the ad-hocs catalogue is federal-only");
+assert.ok(!sm.includes("vic/beyond-the-vote/"), "Beyond the vote is federal-only");
+assert.ok(!sm.includes("/ad-hocs/"), "the retired /ad-hocs/ path left the sitemap (its stub redirects)");
+{
+  const stub = read("ad-hocs/index.html");
+  assert.ok(stub.includes('location.replace("/beyond-the-vote/" + location.hash)') && stub.includes('url=/beyond-the-vote/')
+    && stub.includes('<link rel="canonical" href="https://auspoltracker.com/beyond-the-vote/">'),
+    "the /ad-hocs/ stub redirects to /beyond-the-vote/, topic anchors and all");
+}
 assert.ok(!sm.includes("vic/changelog/"), "the change log is federal-only (Vic never writes data/changelog.json)");
 assert.ok(!sm.includes("vic/cycles/"), "the sitemap does not foretell /vic/cycles/");
 const push = read(path.join(".build", "git-push-main.sh"));
 for (const f of ["cycles/index.html", "allpolls/index.html", "info/index.html",
                  "disagreement/index.html", "leans/index.html", "flows/index.html",
                  "flows-explained/index.html", "preference-flows/index.html",
-                 "ad-hocs/index.html", "changelog/index.html",
+                 "beyond-the-vote/index.html", "ad-hocs/index.html", "changelog/index.html",
                  "vic/allpolls/index.html", "vic/info/index.html",
                  "vic/disagreement/index.html", "vic/leans/index.html", "vic/flows/index.html"])
   assert.ok(push.includes(f), `SITE_FILES commits ${f} (a data refresh regenerates it)`);
@@ -93,11 +100,11 @@ assert.ok(/pastTab = !VIC \|\|/.test(build)
   "the Vic cycles page is gated on a term closing, not hand-listed");
 assert.ok(build.includes("window.AP_INITIAL_TAB="), "build.mjs stamps the per-tab constant");
 assert.ok(build.includes("one document per tab"), "the emission pass logs its outputs");
-assert.ok(build.includes("rd-adhocs.jsx") && build.includes("oneoffs-source.json"),
-  "the ad-hocs page's view layer and its data sidecar ride the build");
+assert.ok(build.includes("rd-beyond.jsx") && build.includes("oneoffs-source.json"),
+  "the Beyond the vote page's view layer and its data sidecar ride the build");
 const genData = read(path.join(".build", "newtracker", "gen-data.mjs"));
-assert.ok(genData.includes("oneoffs-source.json") && genData.includes("loadOneOffs"),
-  "gen-data emits the one-offs sidecar and its lazy loader");
+assert.ok(genData.includes("oneoffs-source.json") && genData.includes("loadOneOffs") && genData.includes("buildBeyond(readOneOffStores(ROOT)"),
+  "gen-data emits the Beyond the vote sidecar (beyond-the-vote.mjs) and its lazy loader");
 
 // ---- the client routes by path -----------------------------------------------------------
 const hdr = read(path.join(".build", "newtracker", "assets", "73de0c58-f11f-4793-9f90-77e583ab051b.js"));
@@ -171,15 +178,15 @@ assert.ok(views.includes('href={window.AP.tabToPath ? window.AP.tabToPath(t.id) 
   "each tab renders as its own page's link");
 // ---- the ☰ menu's pages ------------------------------------------------------------------
 for (const [id, label] of [["disagreement", "Poll disagreement"], ["leans", "Pollster leans"], ["flows", "Preference flows"],
-                           ["flows-explained", "Preference flows explained"], ["ad-hocs", "Ad hoc topical/issue questions"],
+                           ["flows-explained", "Preference flows explained"], ["beyond-the-vote", "Beyond the vote"],
                            ["changelog", "Changelog"]])
   assert.ok(hdr.includes(`{ id: "${id}", label: "${label}", menu: true,`), `${id} is a menu page in TABS`);
 // the explainer is federal-only: the Vic client splices its entry out of TABS
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);'),
   "the Vic client drops the flows-explained tab");
-// the ad-hocs catalogue is federal-only too (the one-off stores are federal)
-assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "ad-hocs"), 1);'),
-  "the Vic client drops the ad-hocs tab");
+// Beyond the vote is federal-only too (the one-off stores are federal)
+assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "beyond-the-vote"), 1);'),
+  "the Vic client drops the Beyond the vote tab");
 // the change log is federal-only too (Vic never writes data/changelog.json)
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);'),
   "the Vic client drops the changelog tab");
@@ -193,15 +200,16 @@ assert.ok(views.includes('<MenuPageView id="flows-explained"') || views.includes
   "the menu-page view knows the explainer");
 assert.ok(views.includes('id === "changelog"') && views.includes("function RdChangelog("),
   "the menu-page view knows the change log and renders it as a page of the site");
-assert.ok(views.includes('{id === "ad-hocs" && <RdAdhocs />}') && views.includes('{id === "ad-hocs" && <RdAoEntries />}'),
-  "the menu-page view knows the ad-hocs catalogue in both designs");
+assert.ok(views.includes('{id === "beyond-the-vote" && <RdBeyond />}') && views.includes('{id === "beyond-the-vote" && <BtvBody />}'),
+  "the menu-page view knows Beyond the vote in both designs");
 {
-  const adhocs = read(path.join(".build", "newtracker", "assets", "rd-adhocs.jsx"));
-  assert.ok(adhocs.includes("function RdAdhocs(") && adhocs.includes("function RdAoEntries(")
-    && adhocs.includes("Object.assign(window, { RdAdhocs: RdAdhocsM, RdAoEntries: RdAoEntriesM })"),
-    "rd-adhocs.jsx renders the catalogue and exports both mount points");
-  assert.ok(adhocs.includes("D.loadOneOffs()"),
-    "the catalogue lazily fetches the one-offs sidecar, like the cycle source");
+  const btv = read(path.join(".build", "newtracker", "assets", "rd-beyond.jsx"));
+  assert.ok(btv.includes("function RdBeyond(") && btv.includes("function BtvBody(")
+    && btv.includes("Object.assign(window, { RdBeyond: RdBeyondM, BtvBody: BtvBodyM })"),
+    "rd-beyond.jsx renders the page and exports both mount points");
+  assert.ok(btv.includes("D.loadOneOffs()"),
+    "the page lazily fetches its sidecar, like the cycle source");
+  assert.ok(!fs.existsSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-adhocs.jsx")), "the retired catalogue component is gone");
 }
 const tpl = read(path.join(".build", "newtracker", "template.html"));
 assert.ok(!/\btab-menu-sep\b/.test(tpl), "the menu's explainer separator rule is retired from the template");
