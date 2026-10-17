@@ -4028,10 +4028,14 @@
     "tables": [
      {
       "headers": [
-       "governmentOrRbaOrBoth"
+       "All voters",
+       "Blame government or RBA or both"
       ],
       "rows": [
-       64
+       [
+        "",
+        "64"
+       ]
       ]
      }
     ],

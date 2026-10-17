@@ -1,13 +1,14 @@
 // ====================================================================
 // AD HOC TOPICAL & ISSUE QUESTIONS – the fifth menu page
 // ====================================================================
-/* The catalogue of one-off and occasional reads: every question the six
+/* The catalogue of one-off and occasional reads: every question the eight
    covered houses asked outside the standing battery (voting intention,
    leader ratings, preferred prime minister). The payload is the
    oneoffs-source sidecar gen-data emits from data/news24-one-offs.json,
    data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
-   data/essential-one-offs.json, data/resolve-one-offs.json and
-   data/freshwater-one-offs.json – fetched
+   data/essential-one-offs.json, data/resolve-one-offs.json,
+   data/freshwater-one-offs.json, data/newspoll-one-offs.json and
+   data/demosau-one-offs.json – fetched
    lazily like the cycle source, since nobody but this page reads it. Themes arrive ordered in the
    payload (adhoc-themes.mjs is the single source of truth, and gen-data
    fails the build on a question it cannot place), so the page trusts the
@@ -25,6 +26,8 @@ const AO_HOUSES = {
   essential: { short: "Essential Report", full: "Essential Report" },
   resolve: { short: "Resolve", full: "Resolve Political Monitor" },
   freshwater: { short: "Freshwater", full: "Freshwater Strategy – News Corp" },
+  newspoll: { short: "Newspoll", full: "Newspoll – The Australian" },
+  demosau: { short: "DemosAU", full: "DemosAU" },
 };
 
 const aoDay = (iso) => {
@@ -87,7 +90,8 @@ function aoGroup(src) {
 function AoFigs({ rows }) {
   return (
     <div className="ao-figs">
-      {rows.map((r, i) => {
+      {rows.map((row, i) => {
+        const r = Array.isArray(row) ? row : [row];
         const n = aoPct(r[1]);
         return (
           <div className="ao-fig" key={i}>
@@ -104,7 +108,11 @@ function AoFigs({ rows }) {
 /* A folded table (News24 demographic crosstabs; RedBridge's per-table
    follow-ups). Two-cell rows render as figures, wider rows as a table. */
 function AoTable({ t }) {
-  const rows = t.rows || [];
+  /* One malformed store row (a bare number, never an array) must not take
+     the whole view down: such a row renders as its single value rather
+     than throwing inside the cell map. The store gets fixed; the page
+     lives to tell the tale. */
+  const rows = (t.rows || []).map((r) => (Array.isArray(r) ? r : [r]));
   const asFigs = rows.length > 0 && rows.every((r) => r.length === 2) && !t.headers;
   return (
     <div className="ao-table-b">
@@ -134,7 +142,12 @@ function AoTable({ t }) {
 
 function AoWave({ w, multiHouse }) {
   const all = (w.tables || []);
-  const figs = all.length && all[0].rows ? all[0].rows : [];
+  const firstRows = all.length && all[0].rows ? all[0].rows : [];
+  /* The headline slot holds figure pairs (label, one value) or, when the
+     first table's rows run wider than label+value, the table itself –
+     crushing a wide grid into figs of its second cell loses every column
+     after the first. */
+  const pairs = firstRows.length > 0 && firstRows.every((r) => Array.isArray(r) && r.length === 2);
   const rest = all.slice(1).filter((t) => (t.rows || []).length);
   return (
     <div className="ao-wave">
@@ -145,14 +158,16 @@ function AoWave({ w, multiHouse }) {
         {w.sampleEff ? <span>effective n {w.sampleEff.toLocaleString("en-AU")}</span> : null}
         {w.url ? <a className="ao-src" href={w.url} target="_blank" rel="noopener">Source ↗</a> : null}
       </div>
-      {w.proseOnly || !figs.length ? (
+      {w.proseOnly || !firstRows.length ? (
         <p className="ao-only">
           {w.proseOnly
             ? "Asked, but this wave's figures are image-only or reported in prose; the source has them."
             : "No all-voters figures on file for this wave; the source has them."}
         </p>
+      ) : pairs ? (
+        <AoFigs rows={firstRows} />
       ) : (
-        <AoFigs rows={figs} />
+        <AoTable t={all[0]} />
       )}
       {w.note ? <p className="ao-note">{w.note}</p> : null}
       {rest.length ? (
@@ -201,7 +216,7 @@ function RdAoEntries() {
   if (!qCount) {
     return (
       <section className="ao" id="ad-hocs">
-        <p className="ao-note">No one-off questions are on file yet. As YouGov – News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor and Freshwater Strategy polls publish their first ad hoc questions, they will appear here grouped by theme.</p>
+        <p className="ao-note">No one-off questions are on file yet. As YouGov – News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor, Freshwater Strategy, Newspoll and DemosAU polls publish their first ad hoc questions, they will appear here grouped by theme.</p>
       </section>
     );
   }
@@ -212,7 +227,7 @@ function RdAoEntries() {
         <span>{themes.length + " themes"}</span>
         <span>{qCount + " questions"}</span>
         <span>{wCount + " waves"}</span>
-        <span>{"YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy's News Corp polls"}</span>
+        <span>{"YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, Freshwater Strategy's News Corp polls, Newspoll in The Australian and DemosAU's surveys"}</span>
       </div>
       {themes.map((t) => (
         <div className="ao-theme" key={t.id}>
@@ -252,7 +267,7 @@ function RdAdhocs() {
         <span className="rd-meta">The one-offs beyond the standing battery</span>
       </div>
       <RdHed head="Asked once, about the issue of the moment"
-        dek="Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov’s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate’s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy’s polls in News Corp’s mastheads, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs." />
+        dek="Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov’s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate’s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, Freshwater Strategy’s polls in News Corp’s mastheads, Newspoll in The Australian and DemosAU’s surveys, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs." />
       <RdAoEntries />
     </section>
   );

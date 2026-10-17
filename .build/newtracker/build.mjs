@@ -777,23 +777,34 @@ function ssChangelogBlock(esc) {
 const AO_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function ssAdhocsBlock(esc) {
   const read = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8"));
-  let news24 = null, redbridge = null, secnewgate = null, essential = null, resolve = null, freshwater = null;
+  let news24 = null, redbridge = null, secnewgate = null, essential = null, resolve = null, freshwater = null, newspoll = null, demosau = null;
   try { news24 = read("news24-one-offs.json").one_offs || []; } catch { /* absent */ }
   try { redbridge = read("redbridge-one-offs.json").entries || []; } catch { /* absent */ }
   try { secnewgate = read("secnewgate-one-offs.json").entries || []; } catch { /* absent */ }
   try { essential = read("essential-one-offs.json").entries || []; } catch { /* absent */ }
   try { resolve = read("resolve-one-offs.json").entries || []; } catch { /* absent */ }
   try { freshwater = read("freshwater-one-offs.json").entries || []; } catch { /* absent */ }
-  if (!news24 && !redbridge && !secnewgate && !essential && !resolve && !freshwater) return "";
+  try { newspoll = read("newspoll-one-offs.json").one_offs || []; } catch { /* absent */ }
+  try { demosau = read("demosau-one-offs.json").one_offs || []; } catch { /* absent */ }
+  if (!news24 && !redbridge && !secnewgate && !essential && !resolve && !freshwater && !newspoll && !demosau) return "";
   const entries = [];
+  /* Mirrors rd-adhocs.jsx AoWave's headline-slot rule: the static fig line
+     holds label+value pairs; a first table whose rows run wider belongs to
+     the live page's table slot, so it emits the note, never a crushed
+     column of the second cell. */
+  const headPairs = (raw) => {
+    const rows = raw || [];
+    return rows.length && rows.every((r) => Array.isArray(r) && r.length === 2)
+      ? rows.slice(0, 12).map((r) => [r[0], r[1] ?? null])
+      : [];
+  };
   for (const e of news24 || []) {
     entries.push({
       theme: oneOffThemeOf(e.id), question: e.question,
       waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
       dateEnd: e.fieldwork ? e.fieldwork.end : null,
       house: "news24", url: e.articleUrl || null,
-      rows: ((e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows) || [])
-        .filter((r) => r.length >= 2).map((r) => [r[0], r[1]]),
+      rows: headPairs(e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows),
       proseOnly: !((e.data && e.data.tables || []).length),
     });
   }
@@ -803,7 +814,7 @@ function ssAdhocsBlock(esc) {
       theme: oneOffThemeOf(e.id), question: e.question,
       waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       house: "redbridge", url: e.url || null,
-      rows: (t.entities || []).slice(0, 12).map((en) => [en.name, ((en.values || [])[0] ?? null)]),
+      rows: headPairs((t.entities || []).map((en) => [en.name, (en.values || [])[0]])),
       proseOnly: false,
     });
   }
@@ -813,7 +824,7 @@ function ssAdhocsBlock(esc) {
       theme: oneOffThemeOf(e.id), question: e.question,
       waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       house: "secnewgate", url: e.url || null,
-      rows: (t.entities || []).slice(0, 12).map((en) => [en.name, ((en.values || [])[0] ?? null)]),
+      rows: headPairs((t.entities || []).map((en) => [en.name, (en.values || [])[0]])),
       proseOnly: false,
     });
   }
@@ -823,7 +834,7 @@ function ssAdhocsBlock(esc) {
       theme: oneOffThemeOf(e.id), question: e.question,
       waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       house: "essential", url: e.url || null,
-      rows: (t.rows || []).slice(0, 12).map((r) => [r[0], r[1] ?? null]),
+      rows: headPairs(t.rows),
       proseOnly: !((e.tables || []).length),
     });
   }
@@ -833,7 +844,7 @@ function ssAdhocsBlock(esc) {
       theme: oneOffThemeOf(e.id), question: e.question,
       waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       house: "resolve", url: e.url || null,
-      rows: (t.rows || []).slice(0, 12).map((r) => [r[0], r[1] ?? null]),
+      rows: headPairs(t.rows),
       proseOnly: !((e.tables || []).length),
     });
   }
@@ -843,8 +854,31 @@ function ssAdhocsBlock(esc) {
       theme: oneOffThemeOf(e.id), question: e.question,
       waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
       house: "freshwater", url: e.url || null,
-      rows: (t.rows || []).slice(0, 12).map((r) => [r[0], r[1] ?? null]),
+      rows: headPairs(t.rows),
       proseOnly: !((e.tables || []).length),
+    });
+  }
+  /* Newspoll (The Australian) and DemosAU: hand-curated stores in News24's
+     shape (one_offs array, figures under data.tables, prose-reported waves
+     carrying data.prose instead). */
+  for (const e of newspoll || []) {
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
+      dateEnd: e.fieldwork ? e.fieldwork.end : null,
+      house: "newspoll", url: e.articleUrl || null,
+      rows: headPairs(e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows),
+      proseOnly: !((e.data && e.data.tables || []).length),
+    });
+  }
+  for (const e of demosau || []) {
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.fieldwork ? e.fieldwork.start : null,
+      dateEnd: e.fieldwork ? e.fieldwork.end : null,
+      house: "demosau", url: e.articleUrl || null,
+      rows: headPairs(e.data && e.data.tables && e.data.tables[0] && e.data.tables[0].rows),
+      proseOnly: !((e.data && e.data.tables || []).length),
     });
   }
   if (!entries.length) return "";
@@ -871,12 +905,14 @@ function ssAdhocsBlock(esc) {
     if (!qs) return "";
     const blocks = [...qs.entries()].map(([q, waves]) => {
       const houseN = new Set(waves.map((w) => w.house));
-      const tag = houseN.size > 1 ? (houseN.size === 6 ? "all six houses" : houseN.size === 5 ? "all five houses" : houseN.size === 4 ? "all four houses" : houseN.size === 3 ? "all three houses" : "both houses")
+      const tag = houseN.size > 1 ? (houseN.size === 8 ? "all eight houses" : houseN.size === 7 ? "all seven houses" : houseN.size === 6 ? "all six houses" : houseN.size === 5 ? "all five houses" : houseN.size === 4 ? "all four houses" : houseN.size === 3 ? "all three houses" : "both houses")
         : waves[0].house === "news24" ? "YouGov &#8211; News24 Pulse"
         : waves[0].house === "secnewgate" ? "SEC Newgate Mood of the Nation"
         : waves[0].house === "essential" ? "Essential Report"
         : waves[0].house === "resolve" ? "Resolve Political Monitor"
         : waves[0].house === "freshwater" ? "Freshwater Strategy (via News Corp)"
+        : waves[0].house === "newspoll" ? "Newspoll (via The Australian)"
+        : waves[0].house === "demosau" ? "DemosAU"
         : "RedBridge/Accent (via the AFR)";
       const reads = [...waves].sort((a, b) => String(b.waveDate).localeCompare(String(a.waveDate)))
         .map((b) => `
@@ -1238,7 +1274,7 @@ ${body.trim()}
       </div>
     </article>`;
   }
-  /* the ☰ menu's fifth page: the ad hoc topical and issue questions the four
+  /* the ☰ menu's fifth page: the ad hoc topical and issue questions the eight
      one-off stores hold, grouped by theme into a static catalogue
      (ssAdhocsBlock); the live tab renders the same grouping with the
      crosstabs and folds (RdAdhocs, rd-adhocs.jsx). Federal only – /vic/'s
@@ -1251,8 +1287,9 @@ ${body.trim()}
     moment, or a topic they never visit again. This page collects those one-off and
     occasional questions from RedBridge/Accent (via the AFR), YouGov&#8217;s News24
     Pulse, Essential Report, SEC Newgate&#8217;s Mood of the Nation, the Resolve
-    Political Monitor and Freshwater Strategy (via News Corp), grouped by
-    theme, with every figure each wave published.</p>
+    Political Monitor, Freshwater Strategy (via News Corp), Newspoll in The
+    Australian and DemosAU, grouped by theme, with every figure each wave
+    published.</p>
 
 ${ssAdhocsBlock(esc)}
 
@@ -1736,10 +1773,10 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     /* the ☰ menu's fifth page, straight under the explainer (the user's
        2026-10-17 call: the topical one-off questions the pollsters ask
-       beyond the standing battery, from the six committed one-off stores –
+       beyond the standing battery, from the committed one-off stores –
        federal only, /vic/'s menu never holds it) */
     ...(VIC ? [] : [{ id: "ad-hocs", label: "Ad hoc topical/issue questions",
-      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent, YouGov News24 Pulse, Essential Report, SEC Newgate, Resolve Political Monitor and Freshwater Strategy one-offs, grouped by theme with every figure and source." }]),
+      desc: "The ad hoc topical and issue questions pollsters ask beyond the standing battery – RedBridge/Accent, YouGov News24 Pulse, Essential Report, SEC Newgate, Resolve Political Monitor, Freshwater Strategy, Newspoll and DemosAU one-offs, grouped by theme with every figure and source." }]),
     /* the ☰ menu's sixth page, straight under Ad hocs (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
        Info about-block's tail, then a console satellite at /changelog/;

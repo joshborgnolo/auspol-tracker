@@ -7131,12 +7131,13 @@ const changelog = JUR ? null : (() => {
 
 /* ---- §8e the ad hoc topical and issue questions ---------------------------
    The /ad-hocs/ page (the ☰ menu's sixth page, 2026-10-17): every one-off
-   and rotating question the six catalogued houses have asked outside the
+   and rotating question the catalogued houses have asked outside the
    standing battery, grouped on adhoc-themes.mjs's shared map. The stores are
    hand-curated research products (data/news24-one-offs.json,
    data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
    data/essential-one-offs.json, data/resolve-one-offs.json,
-   data/freshwater-one-offs.json); this block
+   data/freshwater-one-offs.json, data/newspoll-one-offs.json,
+   data/demosau-one-offs.json); this block
    re-shapes them into the page's
    fetch payload, trimming whatever the page never reads (RedBridge's
    quotedFigure/snippetHaystack verification artefacts, News24's embed ids
@@ -7243,6 +7244,34 @@ const oneOffsSource = JUR ? null : (() => {
       tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
         headers: t.headers || null, rows: t.rows || [] })),
       prose: [],
+    });
+  }
+  /* Newspoll (The Australian): hand-curated across the paper's coverage
+     (see .matilda/skills/auto-skill-auspol-newspoll-one-offs), in News24's
+     store shape (.one_offs, data.tables/data.prose, fieldwork{} +
+     articleUrl keys). */
+  for (const e of read("newspoll-one-offs.json", (j) => j.one_offs || [])) {
+    const tables = (e.data && e.data.tables || []).map((t) => ({ headers: t.headers, rows: t.rows }));
+    entries.push({
+      house: "newspoll", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: e.responseOptions || null, note: e.note || null,
+      proseOnly: !tables.length, wordingSource: e.questionWordingSource || null,
+      url: e.articleUrl || null, tables, prose: (e.data && e.data.prose) || [],
+    });
+  }
+  /* DemosAU (Capital Brief / demosau.com): hand-curated from the survey
+     reports and Capital Brief write-ups, same store shape again. */
+  for (const e of read("demosau-one-offs.json", (j) => j.one_offs || [])) {
+    const tables = (e.data && e.data.tables || []).map((t) => ({ headers: t.headers, rows: t.rows }));
+    entries.push({
+      house: "demosau", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: e.responseOptions || null, note: e.note || null,
+      proseOnly: !tables.length, wordingSource: e.questionWordingSource || null,
+      url: e.articleUrl || null, tables, prose: (e.data && e.data.prose) || [],
     });
   }
   return { generated: "ad-hocs", themes: ONEOFF_THEMES, entries };

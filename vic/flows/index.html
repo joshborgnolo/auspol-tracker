@@ -3265,7 +3265,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
 }
-.ao-chip-news24, .ao-chip-redbridge, .ao-chip-secnewgate, .ao-chip-essential, .ao-chip-resolve, .ao-chip-freshwater { color: var(--ink-2); }
+.ao-chip-news24, .ao-chip-redbridge, .ao-chip-secnewgate, .ao-chip-essential, .ao-chip-resolve, .ao-chip-freshwater, .ao-chip-newspoll, .ao-chip-demosau { color: var(--ink-2); }
 .ao-wave { margin-top: 12px; }
 .ao-wmeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; font-size: 12.5px; color: var(--ink-3); }
 .ao-whouse { color: var(--ink-2); font-weight: 600; }
@@ -63421,6 +63421,14 @@ const AO_HOUSES = {
   freshwater: {
     short: "Freshwater",
     full: "Freshwater Strategy – News Corp"
+  },
+  newspoll: {
+    short: "Newspoll",
+    full: "Newspoll – The Australian"
+  },
+  demosau: {
+    short: "DemosAU",
+    full: "DemosAU"
   }
 };
 const aoDay = iso => {
@@ -63480,7 +63488,8 @@ function AoFigs({
 }) {
   return React.createElement("div", {
     className: "ao-figs"
-  }, rows.map((r, i) => {
+  }, rows.map((row, i) => {
+    const r = Array.isArray(row) ? row : [row];
     const n = aoPct(r[1]);
     return React.createElement("div", {
       className: "ao-fig",
@@ -63501,7 +63510,7 @@ function AoFigs({
 function AoTable({
   t
 }) {
-  const rows = t.rows || [];
+  const rows = (t.rows || []).map(r => Array.isArray(r) ? r : [r]);
   const asFigs = rows.length > 0 && rows.every(r => r.length === 2) && !t.headers;
   return React.createElement("div", {
     className: "ao-table-b"
@@ -63531,7 +63540,8 @@ function AoWave({
   multiHouse
 }) {
   const all = w.tables || [];
-  const figs = all.length && all[0].rows ? all[0].rows : [];
+  const firstRows = all.length && all[0].rows ? all[0].rows : [];
+  const pairs = firstRows.length > 0 && firstRows.every(r => Array.isArray(r) && r.length === 2);
   const rest = all.slice(1).filter(t => (t.rows || []).length);
   return React.createElement("div", {
     className: "ao-wave"
@@ -63544,10 +63554,12 @@ function AoWave({
     href: w.url,
     target: "_blank",
     rel: "noopener"
-  }, "Source \u2197") : null), w.proseOnly || !figs.length ? React.createElement("p", {
+  }, "Source \u2197") : null), w.proseOnly || !firstRows.length ? React.createElement("p", {
     className: "ao-only"
-  }, w.proseOnly ? "Asked, but this wave's figures are image-only or reported in prose; the source has them." : "No all-voters figures on file for this wave; the source has them.") : React.createElement(AoFigs, {
-    rows: figs
+  }, w.proseOnly ? "Asked, but this wave's figures are image-only or reported in prose; the source has them." : "No all-voters figures on file for this wave; the source has them.") : pairs ? React.createElement(AoFigs, {
+    rows: firstRows
+  }) : React.createElement(AoTable, {
+    t: all[0]
   }), w.note ? React.createElement("p", {
     className: "ao-note"
   }, w.note) : null, rest.length ? React.createElement("details", {
@@ -63607,7 +63619,7 @@ function RdAoEntries() {
       id: "ad-hocs"
     }, React.createElement("p", {
       className: "ao-note"
-    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor and Freshwater Strategy polls publish their first ad hoc questions, they will appear here grouped by theme."));
+    }, "No one-off questions are on file yet. As YouGov \u2013 News24 Pulse, RedBridge/Accent, SEC Newgate, Essential Report, Resolve Political Monitor, Freshwater Strategy, Newspoll and DemosAU polls publish their first ad hoc questions, they will appear here grouped by theme."));
   }
   const wCount = (src.entries || []).length;
   return React.createElement("section", {
@@ -63615,7 +63627,7 @@ function RdAoEntries() {
     id: "ad-hocs"
   }, React.createElement("div", {
     className: "ao-legend"
-  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy's News Corp polls")), themes.map(t => React.createElement("div", {
+  }, React.createElement("span", null, themes.length + " themes"), React.createElement("span", null, qCount + " questions"), React.createElement("span", null, wCount + " waves"), React.createElement("span", null, "YouGov – News24 Pulse, RedBridge/Accent (via the AFR), SEC Newgate's Mood of the Nation, the Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, Freshwater Strategy's News Corp polls, Newspoll in The Australian and DemosAU's surveys")), themes.map(t => React.createElement("div", {
     className: "ao-theme",
     key: t.id
   }, React.createElement("h3", {
@@ -63663,7 +63675,7 @@ function RdAdhocs() {
     className: "rd-meta"
   }, "The one-offs beyond the standing battery")), React.createElement(RdHed, {
     head: "Asked once, about the issue of the moment",
-    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate\u2019s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, and Freshwater Strategy\u2019s polls in News Corp\u2019s mastheads, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
+    dek: "Voting intention, leader ratings and the preferred-prime-minister contest come around every wave; these questions did not. Below is every one-off and occasional topical read on file from YouGov\u2019s News24 Pulse, RedBridge/Accent (published in the Australian Financial Review), SEC Newgate\u2019s Mood of the Nation, the fortnightly Essential Report, the Resolve Political Monitor in The Sydney Morning Herald and The Age, Freshwater Strategy\u2019s polls in News Corp\u2019s mastheads, Newspoll in The Australian and DemosAU\u2019s surveys, grouped by theme, with every figure each wave published. A question asked more than once collapses into its series; demographic breakdowns sit behind the fold-outs."
   }), React.createElement(RdAoEntries, null));
 }
 const RdAdhocsM = React.memo(RdAdhocs);
