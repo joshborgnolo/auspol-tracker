@@ -1,0 +1,6573 @@
+{
+ "generated": "2026-10-17",
+ "series": "DemosAU (federal)",
+ "scope": "Special and one-off questions asked on DemosAU's monthly federal waves (from the house's first federal poll, fieldwork 5 July 2025, through the September 2026 wave) and in its self-generated/self-commissioned special reports (childcare-sector attitudes, Australian values, the AI gap, TrustWatch on democracy and count fairness, Palestine and the Gaza war, the YouTube under-16s ban, superannuation changes, state sport barriers, the former-prime-minister special, the cigarette-tax special, the data-centre special, the Admired Sportspeople special and the inaugural Australian Wellbeing Index). The standing battery asked on every monthly wave is excluded: primary voting intention ('If a Federal Election was held today, which one of the following would you vote for?'), the undecided leaner, preferred PM ('Who is your preferred Prime Minister'), leader satisfaction ('What is your opinion on the following people?'), the best-party-per-issue battery, demographic crosstabs of those measures and seat projections. Those channel into polls.json (polls[] primaries and the approval/ppm series). The quarterly MRP models ask only the standing VI/leaner questions and project seats (all five committed MRP reports checked — Feb-March, May-July and Aug-Sept models, the May-July and Oct-Nov reports — plus the 28 Jan - 1 Feb 2025 methodology statement and the Jan 5-6 2026 poll, all battery-only, so nothing added). Hypothetical-VI counterfactuals (a Hanson-retirement or Abbott-led Coalition) DO land here: they are extra questions on a monthly wave, not the standing series.",
+ "sources": "Every wave's cached report-PDF text dump (.matilda/demosau-questions/txt/ for the special reports and pre-agent waves, plus the .build/demosau-src/*.txt methodology statements the poll agent keeps) and DemosAU's own news posts (posts/*.json — snapshot of demosau.com news articles as fetched). Tables are the printed chart rows verbatim; percents keep one decimal place wherever the report prints one. The PDF text layer occasionally drops a figure cell — those cells stay blank ('') and are never reconstructed from row residues; whole page blocks whose labels mis-align with their values file nothing at all unless a DemosAU news post independently states the figure (provenance recorded in the entry's note). Question wordings come from each report's own question/wording pages where printed (pdf-question-wording-page or report-question-block), else from the paired DemosAU post (post-prose). Multi-select batteries print shares that total over 100 by design and are never sum-checked.",
+ "one_offs": [
+  {
+   "id": "childcare-sector-statements",
+   "waveDate": "2025-07-06",
+   "fieldwork": {
+    "start": "2025-07-05",
+    "end": "2025-07-06"
+   },
+   "sample": 1199,
+   "published": "2025-07-10T01:55",
+   "question": "Thinking about Australia's childcare sector, please indicate whether you agree or disagree with the following statements",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Agree",
+    "Disagree",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/majority-oppose-ban-on-male-childcare-workers/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Agree %",
+       "Disagree %",
+       "Don't know %"
+      ],
+      "rows": [
+       [
+        "Australia's childcare sector is generally safe for kids",
+        "58",
+        "17",
+        "25"
+       ],
+       [
+        "Childcare centres should be run by governments or community/not for profit groups, not by for profit operators",
+        "54",
+        "13",
+        "33"
+       ],
+       [
+        "Childcare centres with all female staff are safer for kids than ones with both male and female educators",
+        "30",
+        "41",
+        "29"
+       ],
+       [
+        "CCTV should be mandatory in all childcare centres",
+        "86",
+        "3",
+        "11"
+       ],
+       [
+        "The childcare sector needs both male and female educators",
+        "72",
+        "11",
+        "17"
+       ],
+       [
+        "If a childcare centre has male educators, parents should be able to request they do not change their child's nappy",
+        "56",
+        "19",
+        "25"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Attitudes towards safety of Australian childcare centres special report (DemosAU, self-generated, published 07 Jul 2025). The report also carries open-ended verbatim responses and full demographic breakdowns (gender, age, parents of under-5s, location, state)."
+  },
+  {
+   "id": "male-childcare-worker-ban",
+   "waveDate": "2025-07-06",
+   "fieldwork": {
+    "start": "2025-07-05",
+    "end": "2025-07-06"
+   },
+   "sample": 1199,
+   "published": "2025-07-10T01:55",
+   "question": "There have been calls for male educators to be banned from working in childcare centres for the safety of children. Would you support such a ban?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/majority-oppose-ban-on-male-childcare-workers/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "24"
+       ],
+       [
+        "No",
+        "56"
+       ],
+       [
+        "Don't know",
+        "20"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "A majority of Australians oppose banning male childcare educators (56%) but parents with a child under five are more likely to support the ban, according to a new DemosAU poll of 1,199 Australians. Only 24% of Australians agreed males should be banned as childcare educators, but that jumps to 41% for parents with a child under five (42% disagreed)."
+    ]
+   },
+   "note": "Report tables for the same survey's six childcare-sector statements file in childcare-sector-statements. Support for the ban is 41% among parents of children under five (42% opposed) — DemosAU post, 10 Jul 2025."
+  },
+  {
+   "id": "australian-values",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-01-25T21:28",
+   "question": "What do you think are Australian values? (open-ended, responses categorised by DemosAU with AI assistance)",
+   "questionWordingSource": "post-prose",
+   "responseOptions": [
+    "(open-ended, multi-coded)"
+   ],
+   "articleUrl": "https://demosau.com/news/what-are-australian-values-in-2026/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Value category",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Respect & kindness",
+        "25"
+       ],
+       [
+        "Egalitarianism",
+        "23"
+       ],
+       [
+        "Community",
+        "17"
+       ],
+       [
+        "Mateship and friendship",
+        "14"
+       ],
+       [
+        "Peaceful coexistence",
+        "13"
+       ],
+       [
+        "Freedom",
+        "10"
+       ],
+       [
+        "Multiculturalism and diversity",
+        "8"
+       ],
+       [
+        "Australian values have disappeared",
+        "5"
+       ],
+       [
+        "Christian values",
+        "1"
+       ],
+       [
+        "Don't know",
+        "11"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Respondents were asked an open-ended poll that allowed them to describe what they thought were Australian values. The responses were categorised by the DemosAU team with the assistance of AI. Percentage totals may exceed 100% as answers may be assigned multiple categories. Younger Australians were more likely to name respect and kindness (32% vs 20% of 55+); mateship and friendship registered only 8% among 18-34 year olds (16% for both older cohorts); older Australians reported egalitarianism most (26% vs 17% of 18-34s)."
+    ]
+   },
+   "note": "No figure-bearing report was published for this poll — figures come from DemosAU's 25 Jan 2026 post; its Australian Values Poll methodology statement (demosau.com, 2026/01 upload) confirms the survey: n=1,027, fielded 5-6 January 2026 — the same survey as the Jan-5/6 federal VI wave."
+  },
+  {
+   "id": "ai-usage-frequency",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-02-24T22:45",
+   "question": "How often do you use AI?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Daily",
+    "Weekly",
+    "Monthly",
+    "Rarely",
+    "Never"
+   ],
+   "articleUrl": "https://demosau.com/news/beware-the-ai-gap/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Daily",
+       "Weekly",
+       "Monthly",
+       "Rarely",
+       "Never"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "14",
+        "22",
+        "6",
+        "22",
+        "36"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Only 14% of Australians use AI daily while 36% say they never use it. A majority of people aged 55+ never use AI (54%). Regional/rural Australia is behind the curve — 42% of people in these areas say they never use AI. High-income Australians are more than four times more likely to be daily AI users than low-income Australians (35% vs 8%)."
+    ]
+   },
+   "note": "The AI Gap special report (published 24 Feb 2026), fielded on the 5-6 January 2026 omnibus (n=1,027; its own methodology statement, page 21, was not published with voting intention). Gender/age/education/income/location splits are in the report's findings pages (males 18/22/6/21/33, females 10/21/7/24/38; 18-34 19/37/12/16/16; 55+ 7/11/3/25/54; <$45k 8/17/5/22/48; $125k+ 35/35/6/14/10)."
+  },
+  {
+   "id": "ai-usage-purposes",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-02-24T22:45",
+   "question": "Please list the most frequent ways you use AI",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "(open-ended, multi-coded)"
+   ],
+   "articleUrl": "https://demosau.com/news/beware-the-ai-gap/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Use category",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Online searches/research and information management",
+        "40"
+       ],
+       [
+        "AI chatbots",
+        "11"
+       ],
+       [
+        "Professional correspondence",
+        "6"
+       ],
+       [
+        "Online shopping research",
+        "6"
+       ],
+       [
+        "Content creation and editing",
+        "6"
+       ],
+       [
+        "Professional document creation",
+        "6"
+       ],
+       [
+        "Idea summarisation",
+        "5"
+       ],
+       [
+        "Art and design",
+        "4"
+       ],
+       [
+        "Seeking expert advice",
+        "3"
+       ],
+       [
+        "Online learning and tutoring",
+        "3"
+       ],
+       [
+        "Work productivity",
+        "3"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Open-ended, n=660 respondents who at least rarely use AI; answers may be assigned multiple categories, so shares top 100%. Demographic splits are on page 16 of the AI Gap report."
+  },
+  {
+   "id": "ai-concerns",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-02-24T22:45",
+   "question": "Do you have any concerns about AI?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No"
+   ],
+   "articleUrl": "https://demosau.com/news/beware-the-ai-gap/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "71"
+       ],
+       [
+        "No",
+        "29"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "71% of Australians said they had concerns about AI. Familiarity reduces fear: 57% of monthly-or-better users are concerned, against 82% of those who never or rarely use it. Concern rises with age (60% of 18-34s vs 84% of 55+) and is higher on lower incomes (78% of <$45k vs 61% of $125k+)."
+    ]
+   },
+   "note": "Report page 19 carries gender, age, education, residential, income and location splits (women 76% vs men 67%; 55+ 84%; school-educated 72%)."
+  },
+  {
+   "id": "ai-concern-types",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-02-24T22:45",
+   "question": "Please describe your concerns about AI",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "(open-ended, multi-coded)"
+   ],
+   "articleUrl": "https://demosau.com/news/beware-the-ai-gap/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Concern category",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Job displacement",
+        "27"
+       ],
+       [
+        "Data privacy and security",
+        "20"
+       ],
+       [
+        "Misinformation",
+        "12"
+       ],
+       [
+        "Trust",
+        "9"
+       ],
+       [
+        "Regulation and control",
+        "9"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "The vast majority of Australians (71%) said they had concerns about AI, with job displacement (27%) & data privacy and security (20%) the most cited."
+    ]
+   },
+   "note": "Open-ended, n=734 respondents who indicated concerns; answers may be assigned multiple categories. Only the five categories whose printed column values survive the PDF text layer are tabled."
+  },
+  {
+   "id": "ai-employment-impact",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-02-24T22:45",
+   "question": "Which of the following is closest to your view about AI and your future employment or business?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "AI will replace my job or business and put me out of work",
+    "AI will make my job or business more easier and more productive",
+    "Unsure"
+   ],
+   "articleUrl": "https://demosau.com/news/beware-the-ai-gap/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "AI will replace my job or business and put me out of work",
+        "27"
+       ],
+       [
+        "AI will make my job or business more easier and more productive",
+        "34"
+       ],
+       [
+        "Unsure",
+        "39"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "More Australians are positive about AI making their job easier and more productive (34%) than they are about AI replacing their job (27%). Men are much more likely to think it will make their job easier/more productive (43%) compared to only 26% for women. School-educated Australians (34%) are more concerned about AI replacing them compared to 21% for those with a TAFE education and 23% of university-educated people."
+    ]
+   },
+   "note": "Asked of the n=723 employed or job-seeking subsample; the report's typo 'more easier' is kept verbatim in the response option label."
+  },
+  {
+   "id": "ai-training-plans",
+   "waveDate": "2026-01-06",
+   "fieldwork": {
+    "start": "2026-01-05",
+    "end": "2026-01-06"
+   },
+   "sample": 1027,
+   "published": "2026-02-24T22:45",
+   "question": "In the next 12 months are you planning to do any training or courses to learn more about AI tools?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No",
+    "Unsure"
+   ],
+   "articleUrl": "https://demosau.com/news/beware-the-ai-gap/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "13"
+       ],
+       [
+        "No",
+        "21"
+       ],
+       [
+        "Unsure",
+        "66"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Most Australians — 66% — say they're not planning any AI-related training in the next 12 months (report key findings; in the findings table that intent reads Yes 13 / No 21 / Unsure 66)."
+    ]
+   },
+   "note": "DemosAU's key-findings summary phrases '66% not planning' loosely; the full-results table (Yes 13 / No 21 / Unsure 66) is the filing here."
+  },
+  {
+   "id": "leader-attributes",
+   "waveDate": "2026-04-14",
+   "fieldwork": {
+    "start": "2026-04-09",
+    "end": "2026-04-14"
+   },
+   "sample": 1439,
+   "published": "2026-04-17T07:26",
+   "question": "Considering the following attributes, please indicate which you believe apply to <person tested>",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Yes",
+    "Don't know",
+    "No"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-under-pressure-as-primary-vote-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Albanese attribute",
+       "Yes %",
+       "Don't know %",
+       "No %"
+      ],
+      "rows": [
+       [
+        "Arrogant",
+        "37",
+        "22",
+        "41"
+       ],
+       [
+        "Likeable",
+        "34",
+        "20",
+        "46"
+       ],
+       [
+        "Trustworthy",
+        "30",
+        "24",
+        "46"
+       ],
+       [
+        "In touch with ordinary Australians",
+        "29",
+        "17",
+        "54"
+       ],
+       [
+        "Competent",
+        "34",
+        "23",
+        "43"
+       ],
+       [
+        "Has a vision for Australia",
+        "34",
+        "23",
+        "43"
+       ],
+       [
+        "Decisive and strong",
+        "26",
+        "21",
+        "53"
+       ],
+       [
+        "In control of their party",
+        "44",
+        "25",
+        "31"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Taylor attribute",
+       "Yes %",
+       "Don't know %",
+       "No %"
+      ],
+      "rows": [
+       [
+        "Arrogant",
+        "25",
+        "42",
+        "33"
+       ],
+       [
+        "Likeable",
+        "32",
+        "40",
+        "28"
+       ],
+       [
+        "Trustworthy",
+        "24",
+        "48",
+        "28"
+       ],
+       [
+        "In touch with ordinary Australians",
+        "27",
+        "41",
+        "32"
+       ],
+       [
+        "Competent",
+        "31",
+        "46",
+        "23"
+       ],
+       [
+        "Has a vision for Australia",
+        "36",
+        "41",
+        "23"
+       ],
+       [
+        "Decisive and strong",
+        "33",
+        "43",
+        "24"
+       ],
+       [
+        "In control of their party",
+        "30",
+        "45",
+        "25"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Hanson attribute",
+       "Yes %",
+       "Don't know %",
+       "No %"
+      ],
+      "rows": [
+       [
+        "Arrogant",
+        "42",
+        "19",
+        "39"
+       ],
+       [
+        "Likeable",
+        "41",
+        "18",
+        "41"
+       ],
+       [
+        "Trustworthy",
+        "37",
+        "26",
+        "37"
+       ],
+       [
+        "In touch with ordinary Australians",
+        "49",
+        "18",
+        "33"
+       ],
+       [
+        "Competent",
+        "39",
+        "26",
+        "35"
+       ],
+       [
+        "Has a vision for Australia",
+        "59",
+        "16",
+        "25"
+       ],
+       [
+        "Decisive and strong",
+        "58",
+        "17",
+        "25"
+       ],
+       [
+        "In control of their party",
+        "55",
+        "23",
+        "22"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "April wave PDF pages 4-6; the report's net-positive comparison chart (yes minus no) reconciles with every figure above (Albanese -25 to +13, Taylor -8 to +13, Hanson 0 to +34). The eight traits were the full tested list."
+  },
+  {
+   "id": "us-reliable-military-ally",
+   "waveDate": "2026-04-14",
+   "fieldwork": {
+    "start": "2026-04-09",
+    "end": "2026-04-14"
+   },
+   "sample": 1439,
+   "published": "2026-04-17T07:26",
+   "question": "Do you agree with the following statement: The United States is a reliable military ally for Australia",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-under-pressure-as-primary-vote-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "25"
+       ],
+       [
+        "No",
+        "28"
+       ],
+       [
+        "Don't know",
+        "47"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "April wave PDF page 12; the same page also prints a Federal voting-intention breakdown of this question (ALP/ONP/LNP/GRN/Oth/Undecided) — tabled in the PDF, not replicated here."
+  },
+  {
+   "id": "government-relationship-with-trump",
+   "waveDate": "2026-04-14",
+   "fieldwork": {
+    "start": "2026-04-09",
+    "end": "2026-04-14"
+   },
+   "sample": 1439,
+   "published": "2026-04-17T07:26",
+   "question": "Which of the below is closest to your view regarding the Australian Government's relationship with US President Donald Trump",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "The Australian Government should closely support President Trump",
+    "The Australian Government should distance itself from President Trump",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-under-pressure-as-primary-vote-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Wave",
+       "Closely support %",
+       "Distance itself %",
+       "Don't know %"
+      ],
+      "rows": [
+       [
+        "Nov 2024",
+        "37",
+        "23",
+        "40"
+       ],
+       [
+        "Jan 2025",
+        "36",
+        "45",
+        "19"
+       ],
+       [
+        "April 2026",
+        "22",
+        "59",
+        "19"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "April 2026 wave fielded 9-14 Apr; the April wave PDF prints the Nov-24 and Jan-25 trend rows (earlier DemosAU surveys) with the current wave."
+  },
+  {
+   "id": "pm-like-trump",
+   "waveDate": "2026-04-14",
+   "fieldwork": {
+    "start": "2026-04-09",
+    "end": "2026-04-14"
+   },
+   "sample": 1439,
+   "published": "2026-04-17T07:26",
+   "question": "Please indicate whether you agree or disagree with the following statements: Australia needs a Prime Minister like Donald Trump",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Agree",
+    "Disagree",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-under-pressure-as-primary-vote-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Wave",
+       "Agree %",
+       "Disagree %",
+       "Don't know %"
+      ],
+      "rows": [
+       [
+        "Jan 2025",
+        "27",
+        "59",
+        "14"
+       ],
+       [
+        "April 2026",
+        "19",
+        "69",
+        "12"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "First asked January 2025. Re-asked in the July 2026 wave (16% agree, 12% don't know, 72% disagree) — see trump-democracy-statements-2026-07."
+  },
+  {
+   "id": "housing-shortage-blame",
+   "waveDate": "2026-04-14",
+   "fieldwork": {
+    "start": "2026-04-09",
+    "end": "2026-04-14"
+   },
+   "sample": 1439,
+   "published": "2026-04-17T07:26",
+   "question": "Out of the following issues, which do you believe is more to blame for the shortage of affordable housing in Australia?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "The level of immigration",
+    "Negative gearing and Capital Gains Tax discounts for investors",
+    "Unsure"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-under-pressure-as-primary-vote-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Blame",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "The level of immigration",
+        "51"
+       ],
+       [
+        "Unsure",
+        "20"
+       ],
+       [
+        "Negative gearing and Capital Gains Tax discounts for investors",
+        "29"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Fed VI",
+       "Immigration %",
+       "Unsure %",
+       "Neg gearing/CGT %"
+      ],
+      "rows": [
+       [
+        "Labor 2026 VI",
+        "43",
+        "22",
+        "35"
+       ],
+       [
+        "One Nation 2026 VI",
+        "73",
+        "6",
+        "21"
+       ],
+       [
+        "L/NP 2026 VI",
+        "72",
+        "13",
+        "15"
+       ],
+       [
+        "Greens 2026 VI",
+        "26",
+        "8",
+        "66"
+       ],
+       [
+        "Other 2026 VI",
+        "52",
+        "27",
+        "21"
+       ],
+       [
+        "Undecided 2026 VI",
+        "27",
+        "51",
+        "22"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "April wave PDF page 16 with the wave's Federal-VI breakdown printed beneath (page 17). Only these three offered causes were tested."
+  },
+  {
+   "id": "trustwatch-institutions",
+   "waveDate": "2026-04-14",
+   "fieldwork": {
+    "start": "2026-04-09",
+    "end": "2026-04-14"
+   },
+   "sample": 1439,
+   "published": "2026-05-03T21:35",
+   "question": "Please indicate whether you trust or distrust the following institutions",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Trust",
+    "Don't know",
+    "Distrust"
+   ],
+   "articleUrl": "https://demosau.com/news/trust-in-australias-national-institutions-is-declining/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Institution",
+       "Trust %",
+       "Don't know %",
+       "Distrust %",
+       "Net trust %",
+       "Net change since Jan 2025 %"
+      ],
+      "rows": [
+       [
+        "Australian Broadcasting Commission",
+        "42",
+        "33",
+        "25",
+        "17",
+        "-7"
+       ],
+       [
+        "ACCC",
+        "48",
+        "34",
+        "18",
+        "30",
+        "-5"
+       ],
+       [
+        "Australian Electoral Commission",
+        "55",
+        "29",
+        "16",
+        "39",
+        "-3"
+       ],
+       [
+        "Australian Energy Market Operator",
+        "23",
+        "45",
+        "32",
+        "-9",
+        "-1"
+       ],
+       [
+        "Bureau of Meteorology",
+        "58",
+        "24",
+        "18",
+        "40",
+        "-13"
+       ],
+       [
+        "CSIRO",
+        "54",
+        "34",
+        "12",
+        "42",
+        "-5"
+       ],
+       [
+        "House of Representatives",
+        "29",
+        "41",
+        "30",
+        "-1",
+        "-9"
+       ],
+       [
+        "Reserve Bank of Australia",
+        "43",
+        "29",
+        "28",
+        "15",
+        "3"
+       ],
+       [
+        "The Australian Senate",
+        "30",
+        "41",
+        "29",
+        "1",
+        "-4"
+       ],
+       [
+        "The criminal justice system",
+        "32",
+        "27",
+        "41",
+        "-9",
+        "1"
+       ],
+       [
+        "The High Court",
+        "45",
+        "32",
+        "23",
+        "22",
+        "-5"
+       ],
+       [
+        "Therapeutic Goods Administration",
+        "41",
+        "46",
+        "13",
+        "28",
+        "-4"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Overall: do you trust the national institutions that exist in Australia?",
+       "Yes %",
+       "Don't know %",
+       "No %"
+      ],
+      "rows": [
+       [
+        "Australia (April 2026)",
+        "48",
+        "24",
+        "28"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch April 2026 special report (self-initiated). DemosAU's post notes the overall 48% is down from 55% in January 2025; the report carries a Jan-25-vs-Apr-26 net-trust comparison chart and separate trust/distrust change columns. The report's own spelling 'Theraputic' appears on its summary page; filing row uses the corrected spelling 'Therapeutic'."
+  },
+  {
+   "id": "trustwatch-democracy-statements",
+   "waveDate": "2025-06-14",
+   "fieldwork": {
+    "start": "2025-06-13",
+    "end": "2025-06-14"
+   },
+   "sample": 1000,
+   "published": "2025-07-22T00:48",
+   "question": "Please indicate whether you agree or disagree with the following statements",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Agree",
+    "Disagree",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/does-federal-parliament-need-more-mps/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Agree %",
+       "Disagree %",
+       "Don't know %"
+      ],
+      "rows": [
+       [
+        "Australian Democracy is something to be proud of",
+        "69",
+        "12",
+        "19"
+       ],
+       [
+        "Democracy is the best political system available to us",
+        "72",
+        "8",
+        "20"
+       ],
+       [
+        "Australia needs a Prime Minister like Donald Trump",
+        "19",
+        "71",
+        "10"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch Issue 2 (Attitudes towards Australia's Democracy and Voting System), self-generated special report published 14 Jul 2025; no voting intention was asked on this survey. The Trump primeminister statement was first asked January 2025 and re-asked on later federal waves — see the pm-like-trump entries."
+  },
+  {
+   "id": "aec-statements",
+   "waveDate": "2025-06-14",
+   "fieldwork": {
+    "start": "2025-06-13",
+    "end": "2025-06-14"
+   },
+   "sample": 1000,
+   "published": "2025-07-22T00:48",
+   "question": "The Australian Electoral Commission is the authority that runs federal elections. Please indicate whether you agree or disagree with the following statements",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Agree",
+    "Disagree",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/does-federal-parliament-need-more-mps/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Agree %",
+       "Disagree %",
+       "Don't know %"
+      ],
+      "rows": [
+       [
+        "The Australian Electoral Commission is independent and impartial",
+        "64",
+        "11",
+        "25"
+       ],
+       [
+        "When I voted at this year's federal election I found the process difficult",
+        "14",
+        "78",
+        "8"
+       ],
+       [
+        "I trust the Australian Electoral Commission",
+        "67",
+        "15",
+        "18"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch Issue 2, page 5."
+  },
+  {
+   "id": "vote-counted-fairly",
+   "waveDate": "2025-06-14",
+   "fieldwork": {
+    "start": "2025-06-13",
+    "end": "2025-06-14"
+   },
+   "sample": 1000,
+   "published": "2025-07-22T00:48",
+   "question": "At this year's federal election do you trust your vote was counted fairly?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/does-federal-parliament-need-more-mps/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "75"
+       ],
+       [
+        "No",
+        "13"
+       ],
+       [
+        "Don't know",
+        "12"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch Issue 2, page 6."
+  },
+  {
+   "id": "how-to-vote-cards",
+   "waveDate": "2025-06-14",
+   "fieldwork": {
+    "start": "2025-06-13",
+    "end": "2025-06-14"
+   },
+   "sample": 1000,
+   "published": "2025-07-22T00:48",
+   "question": "Outside polling booths volunteers for candidates hand out How-to-Vote cards to people entering to vote. Which is closest to your view?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "This should continue to be allowed",
+    "This should be banned",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/does-federal-parliament-need-more-mps/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "This should continue to be allowed",
+        "56"
+       ],
+       [
+        "This should be banned",
+        "27"
+       ],
+       [
+        "Don't know",
+        "17"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch Issue 2, page 6."
+  },
+  {
+   "id": "more-mps",
+   "waveDate": "2025-06-14",
+   "fieldwork": {
+    "start": "2025-06-13",
+    "end": "2025-06-14"
+   },
+   "sample": 1000,
+   "published": "2025-07-22T00:48",
+   "question": "Currently in Australia, every Member of the House of Representatives on average represents 120,000 voters. Which is closest to your view?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "The number of MPs should not be increased",
+    "The number of voters an MP represents is too high, the number of MPs should be increased to bring this down",
+    "Don't Know"
+   ],
+   "articleUrl": "https://demosau.com/news/does-federal-parliament-need-more-mps/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "The number of MPs should not be increased",
+        "53"
+       ],
+       [
+        "The number of MPs should be increased",
+        "23"
+       ],
+       [
+        "Don't know",
+        "24"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "A poll of 1000 respondents conducted as part of DemosAU's TrustWatch series from June 13 to 14 revealed 53% of Australians would not support increasing the number of MPs, compared to 24% who would support an increase — DemosAU's post."
+    ]
+   },
+   "note": "TrustWatch Issue 2, page 7. The post's copy rounds the support figure to 24%; the report's table prints 23% (53+23+24=100) and is the filing here."
+  },
+  {
+   "id": "voting-systems",
+   "waveDate": "2025-06-14",
+   "fieldwork": {
+    "start": "2025-06-13",
+    "end": "2025-06-14"
+   },
+   "sample": 1000,
+   "published": "2025-07-22T00:48",
+   "question": "The current Voting System for the House of Representatives is Compulsory Preferential Voting. Please rank below the following voting systems for the House of Representatives from most preferred (1st) to least preferred (4th).",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Compulsory Preferential Voting (CPV)",
+    "First Past the Post (FPTP)",
+    "Optional Preferential Voting (OPV)",
+    "Proportional Representation (PR)"
+   ],
+   "articleUrl": "https://demosau.com/news/does-federal-parliament-need-more-mps/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Voting system",
+       "First preferences %"
+      ],
+      "rows": [
+       [
+        "Compulsory Preferential Voting (CPV)",
+        "36"
+       ],
+       [
+        "First Past the Post (FPTP)",
+        "27"
+       ],
+       [
+        "Optional Preferential Voting (OPV)",
+        "25"
+       ],
+       [
+        "Proportional Representation (PR)",
+        "12"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Pairwise matchup",
+       "A %",
+       "B %"
+      ],
+      "rows": [
+       [
+        "CPV v FPTP",
+        "53",
+        "47"
+       ],
+       [
+        "CPV v OPV",
+        "54",
+        "46"
+       ],
+       [
+        "CPV v PR",
+        "60",
+        "40"
+       ],
+       [
+        "FPTP v OPV",
+        "47",
+        "53"
+       ],
+       [
+        "FPTP v PR",
+        "54",
+        "46"
+       ],
+       [
+        "OPV v PR",
+        "59",
+        "41"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch Issue 2, page 7. Ranked-choice question: first-preference shares for the four systems (one printed figure per system — single-column plain rows; the four shares total 100 exactly), plus the six pairwise matchups DemosAU derived from the full rankings."
+  },
+  {
+   "id": "palestine-recognition",
+   "waveDate": "2025-07-31",
+   "fieldwork": {
+    "start": "2025-07-31",
+    "end": "2025-07-31"
+   },
+   "sample": 1079,
+   "published": "2025-08-10T22:39",
+   "question": "The recognition of a Palestinian state is a topic of international debate. Some countries have formally recognised a Palestinian state as a step toward supporting a two-state solution to the Israeli-Palestinian conflict. Others believe such recognition should only occur as part of a negotiated peace agreement between the parties. Would you support or oppose Australia formally recognising a Palestinian state in the present circumstances?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Support",
+    "Oppose",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/support-for-recognition-of-palestine/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Support",
+        "45"
+       ],
+       [
+        "Don't know",
+        "32"
+       ],
+       [
+        "Oppose",
+        "23"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "The national poll of 1,079 Australians conducted on 31 July 2025 showed more Australians supported Palestinian statehood (45%) than opposed (23%), whilst 32% selected don't know. This compares to a May 2024 DemosAU poll which showed 35% believed the Australian Government should recognise a Palestinian state, with 22% disagreeing, and 43% selecting don't know — DemosAU post."
+    ]
+   },
+   "note": "Australians' Attitudes Towards Recognition of Palestinian Statehood special report (DemosAU, self-generated, report methodology page dates publication 4 Aug 2025; DemosAU post 10 Aug 2025). The 2025 wording asks about recognition \"in the present circumstances\" after a context preamble; the May-2024 trend comparator uses the bare statement \"The Australian Government should recognise a Palestinian State\" (35 agree / 43 don't know / 22 disagree, the Gaza report's printed order) — see the gaza-war-2024 entries."
+  },
+  {
+   "id": "youtube-ban-u16s",
+   "waveDate": "2025-07-31",
+   "fieldwork": {
+    "start": "2025-07-31",
+    "end": "2025-07-31"
+   },
+   "sample": 1079,
+   "published": "2025-08-19T23:13",
+   "question": "Do you support the Federal Government's proposal to ban access to YouTube for children under 16 as part of a broader social media restriction?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Support",
+    "Oppose",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/youtube-ban-for-u16s-poll/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Support",
+        "56"
+       ],
+       [
+        "Don't know",
+        "15"
+       ],
+       [
+        "Oppose",
+        "29"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Response",
+       "Parents of children under 16 (n=331), column %"
+      ],
+      "rows": [
+       [
+        "Support",
+        "59"
+       ],
+       [
+        "Don't know",
+        "7"
+       ],
+       [
+        "Oppose",
+        "34"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "DemosAU's poll of 1,079 Australians found 56% of people support the inclusion of YouTube in the social media ban for under-16s, while 29% opposed and 15% answered don't know. Among parents of children aged 16 and under, 59% supported the ban, with 34% opposed, while 7% answered \"don't know\" — DemosAU post."
+    ]
+   },
+   "note": "Australians' Attitudes Towards the YouTube Ban for Under 16s special report (DemosAU, self-generated, published 20 Aug 2025). Report columns print Don't know second (Yes/Don't Know/No); reordered here to match the responseOptions. The parents block (n=331 subsample, conversational-AI qualitative element) is the second table."
+  },
+  {
+   "id": "youtube-ban-circumvent",
+   "waveDate": "2025-07-31",
+   "fieldwork": {
+    "start": "2025-07-31",
+    "end": "2025-07-31"
+   },
+   "sample": 1079,
+   "published": "2025-08-19T23:13",
+   "question": "As a parent, would you help your child to circumvent the ban, for instance by giving them access to your account or creating a new adult one for them?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/youtube-ban-for-u16s-poll/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "32"
+       ],
+       [
+        "Don't know",
+        "13"
+       ],
+       [
+        "No",
+        "55"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Second question of the YouTube U16s special (31 Jul 2025 wave). Report columns print Don't know second (Yes/Don't Know/No); the figures above reorder to match the responseOptions."
+  },
+  {
+   "id": "super-3m-tax-support",
+   "waveDate": "2025-07-31",
+   "fieldwork": {
+    "start": "2025-07-31",
+    "end": "2025-07-31"
+   },
+   "sample": 1079,
+   "published": "2025-09-03T04:04",
+   "question": "Do you support the Australian Government's proposal to increase the tax rate on superannuation earnings for balances over $3 million?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "No",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/superannuation-tax-changes/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "45"
+       ],
+       [
+        "Don't know",
+        "22"
+       ],
+       [
+        "No",
+        "33"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "The research found that 45% of respondents support the proposed changes, while 33% are opposed and 22% remain undecided — DemosAU post (wording: \"45% of respondents support the proposed changes\"). \"Under the plan, earnings on the portion of superannuation balances exceeding $3 million would be taxed at 30%, double the current 15% applied during the accumulation phase. Balances below $3 million would remain taxed at the existing lower rates.\""
+    ]
+   },
+   "note": "Public Attitudes Towards Proposed Superannuation Changes special report (DemosAU, self-generated, published 29 Aug 2025; fieldwork 31 Jul 2025, the same wave as the Palestine and YouTube-ban specials). Report columns print Yes/I don't know/No; the figures above reorder to match the responseOptions. A companion question asked whether the changes would lead respondents to personally pay more tax (Yes 22 / No 57 / Don't know 21)."
+  },
+  {
+   "id": "gaza-war-priority-2024",
+   "waveDate": "2024-05-10",
+   "fieldwork": {
+    "start": "2024-05-03",
+    "end": "2024-05-10"
+   },
+   "sample": 1500,
+   "published": "2024-05-17",
+   "question": "Which should be the Australian Government's priority in the current war in Gaza?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "End the war in Gaza",
+    "Israeli security",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/wp-content/uploads/2025/08/DemosAU-Report-Australians-Attitudes-to-the-War-in-Gaza-1.pdf",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "End the war in Gaza",
+        "55"
+       ],
+       [
+        "Israeli security",
+        "17"
+       ],
+       [
+        "Don't know",
+        "28"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Australians' Attitudes to the War in Gaza special report (DemosAU, self-initiated, published 17 May 2024; predates DemosAU's post archive — URL is the WP media upload). Net end-the-war lead printed in the report: +38."
+  },
+  {
+   "id": "gaza-recognise-palestinian-state-2024",
+   "waveDate": "2024-05-10",
+   "fieldwork": {
+    "start": "2024-05-03",
+    "end": "2024-05-10"
+   },
+   "sample": 1500,
+   "published": "2024-05-17",
+   "question": "Please indicate whether you agree or disagree with the following statement: The Australian Government should recognise a Palestinian State",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Neutral",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/wp-content/uploads/2025/08/DemosAU-Report-Australians-Attitudes-to-the-War-in-Gaza-1.pdf",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Agree",
+        "35"
+       ],
+       [
+        "Neutral / don't know",
+        "43"
+       ],
+       [
+        "Disagree",
+        "22"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Gaza-war report statement 1: net agreement +13. The wording page's middle answer is \"Neutral\"; the result tables label the middle column \"Don't Know\" — filed here as \"Neutral / don't know\". Re-used as the May-2024 trend comparator in the 2025 palestine-recognition report (35/43/22), which re-worded the question for the Jul-2025 wave."
+  },
+  {
+   "id": "gaza-war-terrorism-vital-2024",
+   "waveDate": "2024-05-10",
+   "fieldwork": {
+    "start": "2024-05-03",
+    "end": "2024-05-10"
+   },
+   "sample": 1500,
+   "published": "2024-05-17",
+   "question": "Please indicate whether you agree or disagree with the following statement: Stopping terrorism against Israel is a vital security concern for Australia",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Neutral",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/wp-content/uploads/2025/08/DemosAU-Report-Australians-Attitudes-to-the-War-in-Gaza-1.pdf",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Agree",
+        "47"
+       ],
+       [
+        "Neutral / don't know",
+        "35"
+       ],
+       [
+        "Disagree",
+        "18"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Gaza-war report statement 2: net agreement +29."
+  },
+  {
+   "id": "gaza-war-australia-israel-allies-2024",
+   "waveDate": "2024-05-10",
+   "fieldwork": {
+    "start": "2024-05-03",
+    "end": "2024-05-10"
+   },
+   "sample": 1500,
+   "published": "2024-05-17",
+   "question": "Please indicate whether you agree or disagree with the following statement: Australia and Israel should be allies",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Neutral",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/wp-content/uploads/2025/08/DemosAU-Report-Australians-Attitudes-to-the-War-in-Gaza-1.pdf",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Agree",
+        "36"
+       ],
+       [
+        "Neutral / don't know",
+        "44"
+       ],
+       [
+        "Disagree",
+        "20"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Gaza-war report statement 3: net agreement +16."
+  },
+  {
+   "id": "gaza-war-stop-immediately-2024",
+   "waveDate": "2024-05-10",
+   "fieldwork": {
+    "start": "2024-05-03",
+    "end": "2024-05-10"
+   },
+   "sample": 1500,
+   "published": "2024-05-17",
+   "question": "Please indicate whether you agree or disagree with the following statement: Ordinary people in Gaza are suffering and the war should stop immediately",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Neutral",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/wp-content/uploads/2025/08/DemosAU-Report-Australians-Attitudes-to-the-War-in-Gaza-1.pdf",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Agree",
+        "81"
+       ],
+       [
+        "Neutral / don't know",
+        "13"
+       ],
+       [
+        "Disagree",
+        "6"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Gaza-war report statement 4: net agreement +75."
+  },
+  {
+   "id": "gaza-war-too-much-attention-2024",
+   "waveDate": "2024-05-10",
+   "fieldwork": {
+    "start": "2024-05-03",
+    "end": "2024-05-10"
+   },
+   "sample": 1500,
+   "published": "2024-05-17",
+   "question": "Please indicate whether you agree or disagree with the following statement: Australian politicians pay too much attention to the war in Gaza at the expense of matters at home",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Neutral",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/wp-content/uploads/2025/08/DemosAU-Report-Australians-Attitudes-to-the-War-in-Gaza-1.pdf",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Agree",
+        "47"
+       ],
+       [
+        "Neutral / don't know",
+        "28"
+       ],
+       [
+        "Disagree",
+        "25"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Gaza-war report statement 5: net agreement +22."
+  },
+  {
+   "id": "party-trust-issues",
+   "waveDate": "2026-02-20",
+   "fieldwork": {
+    "start": "2026-02-16",
+    "end": "2026-02-20"
+   },
+   "sample": 1551,
+   "published": "2026-02-23T16:30",
+   "question": "Which political party do you trust more to handle the following issues?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "The Greens",
+    "Labor",
+    "Liberal National Coalition",
+    "One Nation",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-within-striking-distance-of-labor-as-most-popular-party-new-poll/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Issue",
+       "The Greens %",
+       "Labor %",
+       "Don't know %",
+       "Liberal National Coalition %",
+       "One Nation %"
+      ],
+      "rows": [
+       [
+        "Aged Care",
+        "10",
+        "25",
+        "27",
+        "19",
+        "19"
+       ],
+       [
+        "Climate Change",
+        "25",
+        "18",
+        "27",
+        "13",
+        "17"
+       ],
+       [
+        "Cost of living",
+        "9",
+        "23",
+        "24",
+        "23",
+        "21"
+       ],
+       [
+        "Economic management",
+        "6",
+        "24",
+        "24",
+        "29",
+        "17"
+       ],
+       [
+        "Energy policy",
+        "16",
+        "21",
+        "24",
+        "21",
+        "18"
+       ],
+       [
+        "Foreign Relations",
+        "6",
+        "26",
+        "24",
+        "22",
+        "22"
+       ],
+       [
+        "Housing",
+        "10",
+        "22",
+        "27",
+        "20",
+        "21"
+       ],
+       [
+        "Immigration",
+        "7",
+        "19",
+        "21",
+        "20",
+        "33"
+       ],
+       [
+        "Inflation",
+        "7",
+        "22",
+        "27",
+        "26",
+        "18"
+       ],
+       [
+        "Medicare",
+        "10",
+        "31",
+        "22",
+        "20",
+        "17"
+       ],
+       [
+        "National Security",
+        "6",
+        "24",
+        "23",
+        "26",
+        "21"
+       ],
+       [
+        "Tax policy",
+        "7",
+        "25",
+        "24",
+        "26",
+        "18"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Feb-2026 wave report, 'Party Trusted To Address Issues' table (report column order Greens/Labor/Don't Know/L-NP/One Nation kept). Report wording page: 'Issues and answer order (except DK) randomly listed'. One Nation leads only on immigration (33%); the Coalition leads economic management (29%) and tax policy (26%); Labor leads the other nine issues. Question wording page capitalisation ('Foreign Relations', 'Climate Change') kept as printed."
+  },
+  {
+   "id": "hanson-retirement-hypothetical-vi",
+   "waveDate": "2026-05-20",
+   "fieldwork": {
+    "start": "2026-05-15",
+    "end": "2026-05-20"
+   },
+   "sample": 1502,
+   "published": "2026-05-22T02:15",
+   "question": "Assume for the following question that Pauline Hanson at the age of 71 announced her retirement from politics. If a Federal Election was held today, which one of the following would you vote for?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Labor (with Anthony Albanese as Leader)",
+    "Liberal National Coalition (with Angus Taylor as Leader)",
+    "The Greens (with Larissa Waters as Leader)",
+    "One Nation (with Barnaby Joyce as Leader)",
+    "Any Other Candidate",
+    "Don't Know"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-leads-alp-and-coalition-as-voters-sour-on-budget/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Primary vote % (excl. 6% undecided)",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Labor (Albanese)",
+        "28"
+       ],
+       [
+        "Liberal National Coalition (Taylor)",
+        "27"
+       ],
+       [
+        "One Nation (Joyce)",
+        "21"
+       ],
+       [
+        "The Greens (Waters)",
+        "14"
+       ],
+       [
+        "Any Other Candidate",
+        "10"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Figures exclude the 6% undecided (report prints 'Excludeds 6% of respondents who were undecided' [sic] beneath the chart). Undecideds got a leaner follow-up ('Being undecided, which of the following would you have even a slight leaning towards?'); leaner figures not printed. The report also prints a seat-projection range for this hypothetical (Labor 74-83, Coalition 36-52, One Nation 15-24, Greens 1-5, Others 3-7) — seat projections are out of scope for this store. Wording-page row order (Labor, Coalition, Greens, One Nation, Other) kept; the chart reorders them."
+  },
+  {
+   "id": "budget-2026-tax-statements",
+   "waveDate": "2026-05-20",
+   "fieldwork": {
+    "start": "2026-05-15",
+    "end": "2026-05-20"
+   },
+   "sample": 1502,
+   "published": "2026-05-22T02:15",
+   "question": "Please indicate whether you agree with the following statements regarding the tax changes included in the budget",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Don't know",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-leads-alp-and-coalition-as-voters-sour-on-budget/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Agree %",
+       "Don't know %",
+       "Disagree %",
+       "Net agree %"
+      ],
+      "rows": [
+       [
+        "They will make Australia a fairer place",
+        "27",
+        "37",
+        "36",
+        "-9"
+       ],
+       [
+        "They will help make housing more affordable in the long term",
+        "28",
+        "33",
+        "39",
+        "-11"
+       ],
+       [
+        "They will hurt the economy",
+        "44",
+        "39",
+        "17",
+        "27"
+       ],
+       [
+        "They will make it harder for the average Australian",
+        "53",
+        "31",
+        "16",
+        "37"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Findings from the budget-wave report. Re-asked in the June 2026 wave — see tax-measures-tracker-2026-06 for the measure-approval tracker. The report's PDF text extraction interleaves the hurt-the-economy row's cells; the Don't-know/Disagree split (39/17) is fixed by the printed net of +27 (44−17). Net column is agree−disagree on printed cells."
+  },
+  {
+   "id": "budget-2026-overall-opinion",
+   "waveDate": "2026-05-20",
+   "fieldwork": {
+    "start": "2026-05-15",
+    "end": "2026-05-20"
+   },
+   "sample": 1502,
+   "published": "2026-05-22T02:15",
+   "question": "What is your overall opinion of the 2026 Federal Budget?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Generally good",
+    "Unsure",
+    "Generally bad"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-leads-alp-and-coalition-as-voters-sour-on-budget/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Overall opinion",
+       "Total %"
+      ],
+      "rows": [
+       [
+        "Generally good",
+        "23"
+       ],
+       [
+        "Unsure",
+        "34"
+       ],
+       [
+        "Generally bad",
+        "43"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "The results page prints the diverging bar bad-first (Generally bad 43 / Unsure 34 / Generally good 23); wording page answer list (Generally good / Unsure / Generally bad, 'answer order randomly flipped') is followed here."
+  },
+  {
+   "id": "budget-2026-tax-measures",
+   "waveDate": "2026-05-20",
+   "fieldwork": {
+    "start": "2026-05-15",
+    "end": "2026-05-20"
+   },
+   "sample": 1502,
+   "published": "2026-05-22T02:15",
+   "question": "Below are some of the major tax changes announced in the budget. Please indicate whether you approve or disapprove of each.",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Approve",
+    "Don't know",
+    "Disapprove"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-leads-alp-and-coalition-as-voters-sour-on-budget/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Tax change",
+       "Approve %",
+       "Don't know %",
+       "Disapprove %"
+      ],
+      "rows": [
+       [
+        "Ending negative gearing for existing homes purchased after May 12 2026",
+        "34",
+        "37",
+        "29"
+       ],
+       [
+        "Scrapping the 50% capital gains tax discount for investments in favour of inflation-linked indexation",
+        "28",
+        "43",
+        "29"
+       ],
+       [
+        "A minimum 30% tax rate on family trusts",
+        "27",
+        "39",
+        "34"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "First ask of the tax-measure tracker; re-asked in June 2026 (see tax-measures-tracker-2026-06). The negative-gearing Approve/Disapprove split (34/29, net approve +5) is pinned by the June-2026 report's printed 'Change % since May poll' column: the June net of +1 with a printed change of -4 reconciles only with a May net of +5; the CGT and family-trust rows reconcile exactly as filed (nets -1 and -7, changes -3 and -10)."
+  },
+  {
+   "id": "investment-income-tax-preference",
+   "waveDate": "2026-05-20",
+   "fieldwork": {
+    "start": "2026-05-15",
+    "end": "2026-05-20"
+   },
+   "sample": 1502,
+   "published": "2026-05-22T02:15",
+   "question": "Out of these two options, which is your preferred approach to tax on investments?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Income from investments should be taxed at a lower rate than income from work to provide greater opportunities for people to build wealth",
+    "Income from investments should be taxed similarly to work income to ensure a fair system",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-leads-alp-and-coalition-as-voters-sour-on-budget/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Preferred approach (short option text)",
+       "Total %"
+      ],
+      "rows": [
+       [
+        "Taxed at a lower rate than income from work",
+        "20"
+       ],
+       [
+        "Taxed similarly to work income",
+        "42"
+       ],
+       [
+        "Don't know",
+        "38"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Report p9 prints the shortened options with a '*Full wording' footnote giving the full option texts above; wording page confirms 'answer order randomly listed with Don't Know kept last'."
+  },
+  {
+   "id": "abbott-led-coalition-hypothetical-vi",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-06-16",
+    "end": "2026-06-18"
+   },
+   "sample": 1497,
+   "published": "2026-06-22T00:52",
+   "question": "If a Federal Election was held today, and you had the following choices, which one of the following would you vote for?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Labor (with Anthony Albanese as Leader)",
+    "Liberal National Coalition (with Tony Abbott as Leader)",
+    "The Greens (with Larissa Waters as Leader)",
+    "One Nation (with Pauline Hanson as Leader)",
+    "Any Other Candidate",
+    "Don't Know"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Primary vote % (Abbott-led Coalition scenario)",
+       "Total"
+      ],
+      "rows": [
+       [
+        "One Nation (Hanson)",
+        "31"
+       ],
+       [
+        "Labor (Albanese)",
+        "26"
+       ],
+       [
+        "Liberal National Coalition (Abbott)",
+        "18"
+       ],
+       [
+        "The Greens (Waters)",
+        "13"
+       ],
+       [
+        "Any Other Candidate",
+        "12"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Report headed 'Hypothetical Voting Intention — Scenario: If Tony Abbott lead the Coalition [sic]'. The chart prints only the five naming options (summing to 100); the Don't Know option and its leaner follow-up exist on the wording page but the DK share is not printed. Option parentheticals match the wording-page list ('…(with Tony Abbott as Leader)')."
+  },
+  {
+   "id": "tax-measures-tracker-2026-06",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-06-16",
+    "end": "2026-06-18"
+   },
+   "sample": 1497,
+   "published": "2026-06-22T00:52",
+   "question": "Below are some of the major tax changes announced in the budget. Please indicate whether you approve or disapprove of each.",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Approve",
+    "Don't know",
+    "Disapprove"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Tax change",
+       "Approve %",
+       "Don't know %",
+       "Disapprove %",
+       "Net approve %",
+       "Change since May 2026 poll %"
+      ],
+      "rows": [
+       [
+        "Ending negative gearing for existing homes purchased after May 12 2026",
+        "32",
+        "37",
+        "31",
+        "1",
+        "-4"
+       ],
+       [
+        "Scrapping the 50% capital gains tax discount for investments in favour of inflation-linked indexation",
+        "29",
+        "38",
+        "33",
+        "-4",
+        "-3"
+       ],
+       [
+        "A minimum 30% tax rate on family trusts",
+        "24",
+        "35",
+        "41",
+        "-17",
+        "-10"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Second ask of the tax-measure tracker (first ask May 2026 — see budget-2026-tax-measures). The report's Change column is change in net approve since May, footnoted '*Change since May poll'; change labels as printed. Report chart shortens measure 2 to 'Scrapping the CGT discount' — full wording from the wording page used here. The Change column back-pins May's negative-gearing split (34/29, net +5): +5 → +1 is the printed -4."
+  },
+  {
+   "id": "billionaire-ratings",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-06-16",
+    "end": "2026-06-18"
+   },
+   "sample": 1497,
+   "published": "2026-10-02T02:16",
+   "question": "What is your opinion of the following business figures?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Positive",
+    "Unsure",
+    "Negative"
+   ],
+   "articleUrl": "https://demosau.com/news/what-do-australians-think-of-billionaires-like-gina-rinehart-mark-zuckerberg-and-elon-musk/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Business figure",
+       "Positive %",
+       "Unsure %",
+       "Negative %",
+       "Net positive %",
+       "Change since Jan 2025 poll %"
+      ],
+      "rows": [
+       [
+        "Warren Buffett",
+        "26",
+        "60",
+        "14",
+        "12",
+        "3"
+       ],
+       [
+        "Andrew 'Twiggy' Forrest",
+        "24",
+        "59",
+        "17",
+        "7",
+        "-6"
+       ],
+       [
+        "Gina Rinehart",
+        "33",
+        "39",
+        "28",
+        "5",
+        "3"
+       ],
+       [
+        "Bill Gates",
+        "33",
+        "35",
+        "32",
+        "1",
+        "-18"
+       ],
+       [
+        "Kerry Stokes",
+        "17",
+        "65",
+        "18",
+        "-1",
+        "-1"
+       ],
+       [
+        "Mike Cannon-Brookes",
+        "9",
+        "78",
+        "13",
+        "-4",
+        "2"
+       ],
+       [
+        "Scott Farquhar",
+        "6",
+        "81",
+        "13",
+        "-7",
+        "-"
+       ],
+       [
+        "Jeff Bezos",
+        "18",
+        "47",
+        "35",
+        "-17",
+        "-9"
+       ],
+       [
+        "Rupert Murdoch",
+        "18",
+        "42",
+        "40",
+        "-22",
+        "4"
+       ],
+       [
+        "Elon Musk",
+        "26",
+        "25",
+        "49",
+        "-23",
+        "3"
+       ],
+       [
+        "Mark Zuckerberg",
+        "20",
+        "35",
+        "45",
+        "-25",
+        "-4"
+       ],
+       [
+        "Clive Palmer",
+        "14",
+        "37",
+        "49",
+        "-35",
+        "-"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Overview table from the standalone billionaires report (its extract carries no methodology page — wave provenance from the DemosAU post: poll of 1,497 conducted 16-18 June 2026, the same wave as the June monthly report). Report prints 'Warren Buffet' [sic] and 'Andrew \"Twiggy\" Forrest\"' [sic — stray closing quote] and 'Change since Last Poll*' footnoted '*Last poll conducted in January 2025'; names corrected here ('Warren Buffet' → 'Buffett'). Farquhar and Palmer print '-' in the change column (no Jan-2025 baseline). Rinehart by 2026 vote (post prose): One Nation +41, Coalition +38, Labor -20, Greens -40."
+  },
+  {
+   "id": "trump-democracy-statements-2026-07",
+   "waveDate": "2026-07-08",
+   "fieldwork": {
+    "start": "2026-07-03",
+    "end": "2026-07-08"
+   },
+   "sample": 2694,
+   "published": "2026-07-13T00:03",
+   "question": "Please indicate whether you agree or disagree with the below statements",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Don't know",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-down-slightly-as-hansons-personal-rating-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Agree %",
+       "Don't know %",
+       "Disagree %",
+       "Net agree %"
+      ],
+      "rows": [
+       [
+        "Australia needs a Prime Minister like Donald Trump",
+        "16",
+        "12",
+        "72",
+        "-56"
+       ],
+       [
+        "Australian democracy is something to be proud of",
+        "63",
+        "23",
+        "14",
+        "49"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Post headline: support for a Trump-like PM 'dropped to its lowest ever level' (net -56). The democracy-pride statement is the TrustWatch democracy battery's headline item re-asked (earlier trustwatch waves are their own entries)."
+  },
+  {
+   "id": "hanson-statements",
+   "waveDate": "2026-07-08",
+   "fieldwork": {
+    "start": "2026-07-03",
+    "end": "2026-07-08"
+   },
+   "sample": 2694,
+   "published": "2026-07-13T00:03",
+   "question": "Please indicate whether you agree or disagree with the below statements",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Don't know",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-down-slightly-as-hansons-personal-rating-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Agree %",
+       "Don't know %",
+       "Disagree %",
+       "Net agree %"
+      ],
+      "rows": [
+       [
+        "Immigration to Australia should be substantially reduced",
+        "61",
+        "18",
+        "21",
+        "40"
+       ],
+       [
+        "Australia should build nuclear power plants",
+        "37",
+        "25",
+        "38",
+        "-1"
+       ],
+       [
+        "Employers should have more flexibility to dismiss workers",
+        "32",
+        "25",
+        "43",
+        "-11"
+       ],
+       [
+        "Australia should be a monocultural country rather than a multicultural country",
+        "25",
+        "24",
+        "51",
+        "-26"
+       ],
+       [
+        "Early childhood educators should not need a degree to work in a childcare centre",
+        "26",
+        "22",
+        "52",
+        "-26"
+       ],
+       [
+        "The ABC should become a subscription-based service in metropolitan areas, while remaining publicly funded in regional, rural and remote areas",
+        "21",
+        "25",
+        "54",
+        "-33"
+       ],
+       [
+        "SBS should be abolished",
+        "12",
+        "30",
+        "58",
+        "-46"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "The report's results page for this battery is a rasterised image (no extractable cells), so figures are filed from the DemosAU post's verbatim table (every row cross-checked: cells sum to 100 and net = agree−disagree as printed); question wordings verified against the report's wording page. Seven statements framed around themes from Pauline Hanson's National Press Club address that week."
+  },
+  {
+   "id": "better-pm-for-cohorts",
+   "waveDate": "2026-07-08",
+   "fieldwork": {
+    "start": "2026-07-03",
+    "end": "2026-07-08"
+   },
+   "sample": 2694,
+   "published": "2026-07-13T00:03",
+   "question": "Who do you think would be a better PM for the following groups?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Anthony Albanese (Labor)",
+    "Don't Know",
+    "Pauline Hanson (One Nation)"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-down-slightly-as-hansons-personal-rating-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Group",
+       "Anthony Albanese (Labor) %",
+       "Don't know %",
+       "Pauline Hanson (One Nation) %"
+      ],
+      "rows": [
+       [
+        "Women",
+        "37",
+        "25",
+        "38"
+       ],
+       [
+        "Men",
+        "41",
+        "28",
+        "31"
+       ],
+       [
+        "Families",
+        "40",
+        "24",
+        "36"
+       ],
+       [
+        "Employees and Workers",
+        "42",
+        "25",
+        "33"
+       ],
+       [
+        "Business Owners",
+        "35",
+        "30",
+        "35"
+       ],
+       [
+        "Large Corporations",
+        "34",
+        "32",
+        "34"
+       ],
+       [
+        "Capital City residents",
+        "41",
+        "29",
+        "30"
+       ],
+       [
+        "Country residents",
+        "33",
+        "26",
+        "41"
+       ],
+       [
+        "Low income earners",
+        "40",
+        "26",
+        "34"
+       ],
+       [
+        "High income earners",
+        "33",
+        "34",
+        "33"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "A forced two-person contest (Albanese v Hanson) per cohort — not a group-level PPM read. Angus Taylor is not an option. Hanson leads only for country residents and, by a point, for 'women'; note the gender-crosstab in the post's prose (Albanese leads among women voters 37-37, Hanson leads among men 39-37) is about voter groups, not these cohort ratings."
+  },
+  {
+   "id": "politician-ratings-2026-07",
+   "waveDate": "2026-07-08",
+   "fieldwork": {
+    "start": "2026-07-03",
+    "end": "2026-07-08"
+   },
+   "sample": 2694,
+   "published": "2026-07-13T00:03",
+   "question": "Please indicate whether you have a positive or negative view of the following political figures",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Positive",
+    "Neutral",
+    "Negative",
+    "I haven't heard of them"
+   ],
+   "articleUrl": "https://demosau.com/news/one-nation-down-slightly-as-hansons-personal-rating-slides/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Political figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "Jacqui Lambie",
+        "28",
+        "31",
+        "23",
+        "18",
+        "5"
+       ],
+       [
+        "Chris Minns",
+        "27",
+        "32",
+        "22",
+        "19",
+        "5"
+       ],
+       [
+        "David Crisafulli",
+        "24",
+        "28",
+        "19",
+        "29",
+        "5"
+       ],
+       [
+        "David Pocock",
+        "17",
+        "32",
+        "15",
+        "36",
+        "2"
+       ],
+       [
+        "Jane Hume",
+        "20",
+        "30",
+        "19",
+        "31",
+        "1"
+       ],
+       [
+        "Bridget McKenzie",
+        "16",
+        "28",
+        "15",
+        "41",
+        "1"
+       ],
+       [
+        "Peter Malinauskas",
+        "21",
+        "29",
+        "21",
+        "29",
+        "0"
+       ],
+       [
+        "Matthew Canavan",
+        "20",
+        "32",
+        "22",
+        "26",
+        "-2"
+       ],
+       [
+        "Angus Taylor",
+        "24",
+        "43",
+        "26",
+        "7",
+        "-2"
+       ],
+       [
+        "Andrew Hastie",
+        "21",
+        "32",
+        "24",
+        "23",
+        "-3"
+       ],
+       [
+        "Zali Steggall",
+        "15",
+        "31",
+        "18",
+        "36",
+        "-3"
+       ],
+       [
+        "Pauline Hanson",
+        "34",
+        "23",
+        "42",
+        "",
+        "-8"
+       ],
+       [
+        "Malcolm Turnbull",
+        "27",
+        "33",
+        "35",
+        "5",
+        "-8"
+       ],
+       [
+        "Penny Wong",
+        "31",
+        "23",
+        "39",
+        "7",
+        "-8"
+       ],
+       [
+        "Tony Abbott",
+        "29",
+        "29",
+        "38",
+        "4",
+        "-9"
+       ],
+       [
+        "Mark Butler",
+        "18",
+        "27",
+        "27",
+        "28",
+        "-9"
+       ],
+       [
+        "Kevin Rudd",
+        "29",
+        "28",
+        "39",
+        "4",
+        "-10"
+       ],
+       [
+        "Richard Marles",
+        "17",
+        "27",
+        "29",
+        "27",
+        "-12"
+       ],
+       [
+        "Barnaby Joyce",
+        "27",
+        "26",
+        "40",
+        "7",
+        "-13"
+       ],
+       [
+        "Tanya Plibersek",
+        "20",
+        "28",
+        "33",
+        "19",
+        "-13"
+       ],
+       [
+        "Larissa Waters",
+        "20",
+        "28",
+        "33",
+        "19",
+        "-13"
+       ],
+       [
+        "Jim Chalmers",
+        "19",
+        "30",
+        "38",
+        "13",
+        "-19"
+       ],
+       [
+        "Anthony Albanese",
+        "25",
+        "27",
+        "47",
+        "",
+        "-22"
+       ],
+       [
+        "Scott Morrison",
+        "23",
+        "29",
+        "45",
+        "",
+        "-22"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Battery across report pp 8-10 (continued page re-prints the stem and headers). The report's wording page mislabels this battery's question (it repeats the better-PM-for-groups wording) but lists its four-point answers and 'People Tested: Listed at pages 9 & 10' — question text filed from the results-page heading. 'I haven't heard of them' cells are omitted in the PDF for Hanson (34/23/42), Albanese (25/27/47) and Morrison (23/29/45); filed as blank, never reconstructed. Report prints 'Peter Malinauskus' [sic] — corrected here. Post prose reports the same battery a point differently for Hanson (34 pos/43 neg, net -9) and Albanese (25/48, net -23); the report tables as printed are filed."
+  },
+  {
+   "id": "social-media-duty-of-care",
+   "waveDate": "2026-09-14",
+   "fieldwork": {
+    "start": "2026-09-10",
+    "end": "2026-09-14"
+   },
+   "sample": 1583,
+   "published": "2026-09-17T01:25",
+   "question": "Which of the following comes closest to your view about social media companies?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "They should be legally required to reduce foreseeable risks to users, even if this means placing more restrictions on how their platforms operate",
+    "They should generally be free to decide how their platforms operate, even if this means users may face greater risks of harm",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-records-highest-primary-vote-since-february/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "They should be legally required to reduce foreseeable risks to users, even if this means placing more restrictions on how their platforms operate",
+        "65"
+       ],
+       [
+        "They should generally be free to decide how their platforms operate, even if this means users may face greater risks of harm",
+        "22"
+       ],
+       [
+        "Don't know",
+        "13"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "National sample only — the report prints no crosstabs for this question (its Social Media Reforms section gives the national split 65/22/13; the report chart draws the Don't-know bar between the two options, rows filed here in wording-page option order). Full option wordings from the page's printed short labels ('You should be legally required to reduce risks*' → full wordings at the page foot, as shown in the rows). First of the two Social Media Reforms questions — paired with algorithm-opt-out. Sum of printed shares: 100."
+  },
+  {
+   "id": "algorithm-opt-out",
+   "waveDate": "2026-09-14",
+   "fieldwork": {
+    "start": "2026-09-10",
+    "end": "2026-09-14"
+   },
+   "sample": 1583,
+   "published": "2026-09-17T01:25",
+   "question": "Social media companies use algorithms to decide what content is shown to users. The federal government has proposed giving users the choice to opt out of the algorithm and only be shown content from people and accounts they choose to follow. Do you support or oppose this policy?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Support",
+    "Oppose",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/labor-records-highest-primary-vote-since-february/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Group",
+       "Support %",
+       "Don't know %",
+       "Oppose %",
+       "Net support %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "66",
+        "21",
+        "13",
+        "53"
+       ],
+       [
+        "Males",
+        "67",
+        "17",
+        "16",
+        "51"
+       ],
+       [
+        "Females",
+        "65",
+        "24",
+        "11",
+        "54"
+       ],
+       [
+        "18-34",
+        "60",
+        "23",
+        "17",
+        "43"
+       ],
+       [
+        "35-54",
+        "68",
+        "20",
+        "12",
+        "56"
+       ],
+       [
+        "55+",
+        "68",
+        "19",
+        "13",
+        "55"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Crosstabs as printed in the report's Social Media Reforms section (gender and age only — no education/location/income/tenure/VI splits for this question). Net support = Support − Oppose as printed. The report's Social Media Reforms pair: this and social-media-duty-of-care. Wording page: 'Answers randomly listed except Don't Know kept last', answer order Support / Oppose / Don't know."
+  },
+  {
+   "id": "cigarette-tax-black-market",
+   "waveDate": "2026-09-14",
+   "fieldwork": {
+    "start": "2026-09-10",
+    "end": "2026-09-14"
+   },
+   "sample": 1583,
+   "published": "2026-09-18T06:26",
+   "question": "Recently in Australia, there has been a growing black market in illegal untaxed cigarette sales. Which is closest to your view about what the Federal Government should do to eliminate the black market?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Cut cigarette taxes significantly",
+    "Unsure",
+    "Increase law enforcement"
+   ],
+   "articleUrl": "https://demosau.com/news/australians-favour-cigarette-tax-cuts/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Group",
+       "Cut cigarette taxes significantly %",
+       "Unsure %",
+       "Increase law enforcement %",
+       "Net Support “Cut Taxes” %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "47.0",
+        "16.0",
+        "37.0",
+        "10"
+       ],
+       [
+        "Males",
+        "50.0",
+        "12.0",
+        "38.0",
+        "12"
+       ],
+       [
+        "Females",
+        "45.0",
+        "20.0",
+        "35.0",
+        "10"
+       ],
+       [
+        "18-34",
+        "36.0",
+        "21.0",
+        "43.0",
+        "-7"
+       ],
+       [
+        "35-54",
+        "51.0",
+        "17.0",
+        "32.0",
+        "19"
+       ],
+       [
+        "55+",
+        "51.0",
+        "12.0",
+        "37.0",
+        "14"
+       ],
+       [
+        "School education",
+        "52.0",
+        "18.0",
+        "30.0",
+        "22"
+       ],
+       [
+        "TAFE education",
+        "53.0",
+        "16.0",
+        "31.0",
+        "22"
+       ],
+       [
+        "University education",
+        "36.0",
+        "12.0",
+        "52.0",
+        "-16"
+       ],
+       [
+        "Renter",
+        "54.0",
+        "19.0",
+        "27.0",
+        "27"
+       ],
+       [
+        "Mortgage holder",
+        "44.0",
+        "16.0",
+        "40.0",
+        "4"
+       ],
+       [
+        "Own home outright",
+        "45.0",
+        "13.0",
+        "42.0",
+        "3"
+       ],
+       [
+        "<$45K",
+        "50.0",
+        "18.0",
+        "32.0",
+        "18"
+       ],
+       [
+        "$45-125K",
+        "47.0",
+        "15.0",
+        "38.0",
+        "9"
+       ],
+       [
+        "$125K+",
+        "39.0",
+        "8.0",
+        "53.0",
+        "-14"
+       ],
+       [
+        "Inner Metro",
+        "43.0",
+        "14.0",
+        "43.0",
+        "0"
+       ],
+       [
+        "Outer Metro",
+        "46.0",
+        "17.0",
+        "37.0",
+        "9"
+       ],
+       [
+        "Regional/Rural",
+        "55.0",
+        "17.0",
+        "28.0",
+        "27"
+       ],
+       [
+        "ALP",
+        "36.0",
+        "19.0",
+        "45.0",
+        "-9"
+       ],
+       [
+        "ONP",
+        "69.0",
+        "11.0",
+        "20.0",
+        "49"
+       ],
+       [
+        "L/NP",
+        "45.0",
+        "11.0",
+        "44.0",
+        "1"
+       ],
+       [
+        "GRN",
+        "43.0",
+        "17.0",
+        "40.0",
+        "3"
+       ],
+       [
+        "OTH",
+        "48.0",
+        "11.0",
+        "41.0",
+        "7"
+       ],
+       [
+        "DK",
+        "20.0",
+        "58.0",
+        "22.0",
+        "-2"
+       ],
+       [
+        "English only",
+        "50.0",
+        "17.0",
+        "33.0",
+        "17"
+       ],
+       [
+        "Other language at home",
+        "37.0",
+        "12.0",
+        "51.0",
+        "-14"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Standalone single-question special report on the September wave (Attitudes Towards Cigarette Taxes, n=1,583, fieldwork 10-14 Sep 2026 — same wave as the September monthly poll; own DemosAU post). Figures print with one decimal in the report and are filed as printed; the Net column prints whole. 'Net Support “Cut Taxes”' = cut-taxes share minus increase-enforcement share. Methodology page reports the effective n of 869 (±3.3%) alongside the raw n; the report's answers line is the one oddity — 'Answers randomised except for don’t know kept last' — though no Don't-know option is printed (the middle option is 'Unsure'). The post's demographic prose matches every crosstab row here. Client: Capital Brief (methodology statement)."
+  },
+  {
+   "id": "super-access-statements",
+   "waveDate": "2026-09-14",
+   "fieldwork": {
+    "start": "2026-09-10",
+    "end": "2026-09-14"
+   },
+   "sample": 1583,
+   "published": "2026-10-02T02:25",
+   "question": "Thinking about Australia's superannuation system, please indicate whether you agree or disagree with the following statements",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Agree",
+    "Don't know",
+    "Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/majority-of-australians-support-withdrawing-super-for-house-deposit/",
+   "data": {
+    "tables": [
+     {
+      "name": "1. Superannuation exists to fund retirement — people should not be able to access it before age 60",
+      "headers": [
+       "Group",
+       "Agree %",
+       "Unsure / Don't know %",
+       "Disagree %",
+       "Net agree %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "44",
+        "29",
+        "27",
+        "17"
+       ],
+       [
+        "Males",
+        "48",
+        "28",
+        "24",
+        "24"
+       ],
+       [
+        "Females",
+        "41",
+        "30",
+        "29",
+        "12"
+       ],
+       [
+        "18-34",
+        "39",
+        "40",
+        "21",
+        "18"
+       ],
+       [
+        "35-54",
+        "43",
+        "26",
+        "31",
+        "12"
+       ],
+       [
+        "55+",
+        "49",
+        "24",
+        "27",
+        "22"
+       ],
+       [
+        "School education",
+        "39",
+        "33",
+        "27",
+        "12"
+       ],
+       [
+        "TAFE education",
+        "41",
+        "27",
+        "32",
+        "9"
+       ],
+       [
+        "University education",
+        "55",
+        "24",
+        "21",
+        "34"
+       ],
+       [
+        "Inner Metro",
+        "55",
+        "28",
+        "17",
+        "38"
+       ],
+       [
+        "Outer Metro",
+        "44",
+        "28",
+        "28",
+        "16"
+       ],
+       [
+        "Regional/Rural",
+        "34",
+        "32",
+        "34",
+        "0"
+       ],
+       [
+        "Renter",
+        "39",
+        "31",
+        "30",
+        "9"
+       ],
+       [
+        "Mortgage holder",
+        "43",
+        "30",
+        "27",
+        "16"
+       ],
+       [
+        "Own home outright",
+        "52",
+        "25",
+        "23",
+        "29"
+       ],
+       [
+        "<$45K",
+        "39",
+        "32",
+        "29",
+        "10"
+       ],
+       [
+        "$45-125K",
+        "48",
+        "26",
+        "26",
+        "22"
+       ],
+       [
+        "$125K+",
+        "56",
+        "23",
+        "21",
+        "35"
+       ],
+       [
+        "ALP",
+        "49",
+        "31",
+        "20",
+        "29"
+       ],
+       [
+        "ONP",
+        "38",
+        "20",
+        "42",
+        "-4"
+       ],
+       [
+        "L/NP",
+        "48",
+        "26",
+        "26",
+        "22"
+       ],
+       [
+        "GRN",
+        "50",
+        "28",
+        "22",
+        "28"
+       ],
+       [
+        "OTH",
+        "45",
+        "37",
+        "18",
+        "27"
+       ],
+       [
+        "DK",
+        "17",
+        "65",
+        "18",
+        "-1"
+       ]
+      ]
+     },
+     {
+      "name": "2. People should be able to reduce their super contributions to increase their take-home pay",
+      "headers": [
+       "Group",
+       "Agree %",
+       "Unsure / Don't know %",
+       "Disagree %",
+       "Net agree %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "41",
+        "31",
+        "28",
+        "13"
+       ],
+       [
+        "Males",
+        "41",
+        "28",
+        "31",
+        "10"
+       ],
+       [
+        "Females",
+        "41",
+        "33",
+        "26",
+        "15"
+       ],
+       [
+        "18-34",
+        "50",
+        "33",
+        "17",
+        "33"
+       ],
+       [
+        "35-54",
+        "46",
+        "30",
+        "24",
+        "22"
+       ],
+       [
+        "55+",
+        "32",
+        "29",
+        "39",
+        "-7"
+       ],
+       [
+        "School education",
+        "43",
+        "35",
+        "22",
+        "21"
+       ],
+       [
+        "TAFE education",
+        "39",
+        "31",
+        "30",
+        "9"
+       ],
+       [
+        "University education",
+        "41",
+        "24",
+        "35",
+        "6"
+       ],
+       [
+        "Inner Metro",
+        "44",
+        "26",
+        "30",
+        "14"
+       ],
+       [
+        "Outer Metro",
+        "43",
+        "31",
+        "26",
+        "17"
+       ],
+       [
+        "Regional/Rural",
+        "36",
+        "34",
+        "30",
+        "6"
+       ],
+       [
+        "Renter",
+        "46",
+        "30",
+        "24",
+        "22"
+       ],
+       [
+        "Mortgage holder",
+        "42",
+        "31",
+        "27",
+        "15"
+       ],
+       [
+        "Own home outright",
+        "36",
+        "30",
+        "34",
+        "2"
+       ],
+       [
+        "<$45K",
+        "36",
+        "36",
+        "28",
+        "8"
+       ],
+       [
+        "$45-125K",
+        "46",
+        "26",
+        "28",
+        "18"
+       ],
+       [
+        "$125K+",
+        "47",
+        "23",
+        "30",
+        "17"
+       ],
+       [
+        "ALP",
+        "47",
+        "24",
+        "29",
+        "18"
+       ],
+       [
+        "ONP",
+        "50",
+        "28",
+        "22",
+        "28"
+       ],
+       [
+        "L/NP",
+        "41",
+        "30",
+        "29",
+        "12"
+       ],
+       [
+        "GRN",
+        "40",
+        "33",
+        "27",
+        "13"
+       ],
+       [
+        "OTH",
+        "23",
+        "39",
+        "38",
+        "-15"
+       ],
+       [
+        "DK",
+        "17",
+        "63",
+        "20",
+        "-3"
+       ]
+      ]
+     },
+     {
+      "name": "3. People should be able to withdraw some of their super to fund a major purchase such as a housing deposit",
+      "headers": [
+       "Group",
+       "Agree %",
+       "Unsure / Don't know %",
+       "Disagree %",
+       "Net agree %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "60",
+        "23",
+        "17",
+        "43"
+       ],
+       [
+        "Males",
+        "58",
+        "22",
+        "20",
+        "38"
+       ],
+       [
+        "Females",
+        "61",
+        "25",
+        "14",
+        "47"
+       ],
+       [
+        "18-34",
+        "55",
+        "29",
+        "16",
+        "39"
+       ],
+       [
+        "35-54",
+        "63",
+        "23",
+        "14",
+        "49"
+       ],
+       [
+        "55+",
+        "60",
+        "21",
+        "19",
+        "41"
+       ],
+       [
+        "School education",
+        "59",
+        "26",
+        "15",
+        "44"
+       ],
+       [
+        "TAFE education",
+        "62",
+        "22",
+        "16",
+        "46"
+       ],
+       [
+        "University education",
+        "57",
+        "23",
+        "20",
+        "37"
+       ],
+       [
+        "Renter",
+        "65",
+        "21",
+        "14",
+        "51"
+       ],
+       [
+        "Mortgage holder",
+        "62",
+        "22",
+        "16",
+        "46"
+       ],
+       [
+        "Own home outright",
+        "51",
+        "28",
+        "21",
+        "30"
+       ],
+       [
+        "<$45K",
+        "59",
+        "26",
+        "15",
+        "44"
+       ],
+       [
+        "$45-125K",
+        "60",
+        "23",
+        "17",
+        "43"
+       ],
+       [
+        "$125K+",
+        "61",
+        "16",
+        "23",
+        "38"
+       ],
+       [
+        "ALP",
+        "55",
+        "25",
+        "20",
+        "35"
+       ],
+       [
+        "ONP",
+        "76",
+        "15",
+        "9",
+        "67"
+       ],
+       [
+        "L/NP",
+        "59",
+        "23",
+        "18",
+        "41"
+       ],
+       [
+        "GRN",
+        "50",
+        "27",
+        "23",
+        "27"
+       ],
+       [
+        "OTH",
+        "56",
+        "27",
+        "17",
+        "39"
+       ],
+       [
+        "DK",
+        "32",
+        "55",
+        "13",
+        "19"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Standalone three-statement special report on the September wave (Australians' Attitudes Towards Superannuation — Contributions & Access, n=1,583, fieldwork 10-14 Sep 2026, tables pp 4-15; its own DemosAU post; client Capital Brief). The post's prose restates the PDF's figures without conflict (prose orders disagree-then-unsure, e.g. statement 3 '60% agree ... 17% disagreed and 23% were unsure' = the PDF's 60/23/17). Middle option prints 'Unsure / Don't know' in the table headers, 'Don't know' in the wording-page scale. Nets = agree − disagree. TWO DEFECTS FILED AROUND, NOT THROUGH: (a) statement 1's School education row prints 39/33/27 — 99%, a rounding residue in the PDF; filed as printed, left un-summed. (b) Statement 3's Education + Location page prints its three Location rows with cells that contradict their own printed Net columns — Inner Metro 57/21/22 against printed net 44 (57−22=35), Outer Metro 62/25/13 against 43 (=49), Regional/Rural 57/26/17 against 38 (=40): the three Location rows are dropped rather than filed as contested; the statement's three education rows reconcile net-included and stand."
+  },
+  {
+   "id": "data-centres-good-bad",
+   "waveDate": "2026-08-20",
+   "fieldwork": {
+    "start": "2026-08-18",
+    "end": "2026-08-20"
+   },
+   "sample": 1562,
+   "published": "2026-09-07T03:40",
+   "question": "Overall, do you think the development of more data centres in Australia will be good or bad for Australians?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Very good",
+    "Somewhat good",
+    "Neutral/Don't know",
+    "Somewhat bad",
+    "Very bad"
+   ],
+   "articleUrl": "https://demosau.com/news/australians-wary-of-data-centres-as-power-price-concerns-dominate/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Group",
+       "Very good %",
+       "Somewhat good %",
+       "Neutral/Don't know %",
+       "Somewhat bad %",
+       "Very bad %",
+       "Net good %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "7",
+        "23",
+        "38",
+        "18",
+        "14",
+        "-2"
+       ],
+       [
+        "Males",
+        "9",
+        "26",
+        "34",
+        "16",
+        "15",
+        "4"
+       ],
+       [
+        "Females",
+        "5",
+        "20",
+        "42",
+        "20",
+        "13",
+        "-8"
+       ],
+       [
+        "18-34",
+        "8",
+        "25",
+        "36",
+        "18",
+        "13",
+        "2"
+       ],
+       [
+        "35-54",
+        "6",
+        "25",
+        "38",
+        "17",
+        "14",
+        "0"
+       ],
+       [
+        "55+",
+        "6",
+        "21",
+        "39",
+        "20",
+        "14",
+        "-7"
+       ],
+       [
+        "School education",
+        "6",
+        "20",
+        "45",
+        "18",
+        "11",
+        "-3"
+       ],
+       [
+        "TAFE education",
+        "5",
+        "21",
+        "39",
+        "18",
+        "17",
+        "-9"
+       ],
+       [
+        "University education",
+        "9",
+        "31",
+        "27",
+        "19",
+        "14",
+        "7"
+       ],
+       [
+        "Renter",
+        "7",
+        "20",
+        "38",
+        "18",
+        "17",
+        "-8"
+       ],
+       [
+        "Mortgage holder",
+        "7",
+        "29",
+        "35",
+        "16",
+        "13",
+        "7"
+       ],
+       [
+        "Own home outright",
+        "6",
+        "20",
+        "41",
+        "21",
+        "12",
+        "-7"
+       ],
+       [
+        "<$45K",
+        "5",
+        "20",
+        "39",
+        "21",
+        "15",
+        "-11"
+       ],
+       [
+        "$45-125K",
+        "8",
+        "26",
+        "38",
+        "16",
+        "12",
+        "6"
+       ],
+       [
+        "$125K+",
+        "13",
+        "30",
+        "30",
+        "15",
+        "12",
+        "16"
+       ],
+       [
+        "Inner Metro",
+        "9",
+        "25",
+        "40",
+        "15",
+        "11",
+        "8"
+       ],
+       [
+        "Outer Metro",
+        "7",
+        "25",
+        "36",
+        "17",
+        "15",
+        "0"
+       ],
+       [
+        "Regional/Rural",
+        "5",
+        "18",
+        "39",
+        "24",
+        "14",
+        "-15"
+       ],
+       [
+        "English",
+        "6",
+        "22",
+        "38",
+        "19",
+        "15",
+        "-6"
+       ],
+       [
+        "LOTE",
+        "11",
+        "30",
+        "36",
+        "12",
+        "11",
+        "18"
+       ],
+       [
+        "ALP Fed VI",
+        "8",
+        "28",
+        "40",
+        "17",
+        "7",
+        "12"
+       ],
+       [
+        "L/NP Fed VI",
+        "12",
+        "31",
+        "39",
+        "14",
+        "4",
+        "25"
+       ],
+       [
+        "Grn Fed VI",
+        "",
+        "26",
+        "25",
+        "22",
+        "24",
+        "-17"
+       ],
+       [
+        "ONP Fed VI",
+        "4",
+        "18",
+        "40",
+        "17",
+        "21",
+        "-16"
+       ],
+       [
+        "Oth Fed VI",
+        "10",
+        "",
+        "32",
+        "27",
+        "29",
+        "-44"
+       ],
+       [
+        "Don't Know Fed VI",
+        "8",
+        "14",
+        "59",
+        "13",
+        "6",
+        "3"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Standalone data-centres report (Australians' Attitudes Towards Data Centres, n=1,562, fw 18-20 Aug 2026; own DemosAU post; client Capital Brief). Good-side/bad-side shares read through the post: 30% good vs 32% bad nationally. Net good = good pair minus bad pair. Language rows are short labels in this report ('English' / 'LOTE'). Voting-intention labels printed 'ALP Fed VI' etc.; the undecided row's label clipped to 'on't Know Fed VI' in the text layer — filed as 'Don't Know Fed VI'. TWO CELLS DROPPED BY THE PDF TEXT EXTRACTION, FILED AS BLANK: the Greens row's Very-good cell (the other four cells print; residue arithmetic would imply 3 but a reconstructed cell is never filed) and the Others row's Somewhat-good cell (implies 2). The post's crosstab prose ($125K+ +16; uni +7; under-$45K -11; Inner Metro +8; outer metro even; regional -15; L/NP +25; ALP +12; Grn -17; ONP -16) matches the printed nets here."
+  },
+  {
+   "id": "in-your-area-new-builds",
+   "waveDate": "2026-08-20",
+   "fieldwork": {
+    "start": "2026-08-18",
+    "end": "2026-08-20"
+   },
+   "sample": 1562,
+   "published": "2026-09-07T03:40",
+   "question": "Would you support or oppose the following being built in your area?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Support",
+    "Unsure",
+    "Oppose"
+   ],
+   "articleUrl": "https://demosau.com/news/australians-wary-of-data-centres-as-power-price-concerns-dominate/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Project",
+       "Support %",
+       "Unsure %",
+       "Oppose %",
+       "Net support %"
+      ],
+      "rows": [
+       [
+        "New apartment blocks",
+        "49",
+        "26",
+        "25",
+        "24"
+       ],
+       [
+        "A data centre",
+        "23",
+        "33",
+        "44",
+        "-21"
+       ],
+       [
+        "A nuclear power plant",
+        "20",
+        "25",
+        "55",
+        "-35"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "National sample only (no crosstabs printed for this question). Project list from the wording page ('Projects tested: New apartment blocks / A data centre / A nuclear power plant; project order randomly listed'); rows in the report chart's printed order. The NIMBY battery anchors the post's story: a local data centre nets -21 while new apartments net +24."
+  },
+  {
+   "id": "data-centre-local-effects",
+   "waveDate": "2026-08-20",
+   "fieldwork": {
+    "start": "2026-08-18",
+    "end": "2026-08-20"
+   },
+   "sample": 1562,
+   "published": "2026-09-07T03:40",
+   "question": "In your opinion, if a data centre is built in your area, would it increase or decrease the following?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Significantly increase",
+    "Somewhat increase",
+    "No effect",
+    "Somewhat decrease",
+    "Significantly decrease"
+   ],
+   "articleUrl": "https://demosau.com/news/australians-wary-of-data-centres-as-power-price-concerns-dominate/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Issue",
+       "Significantly increase %",
+       "Somewhat increase %",
+       "No effect %",
+       "Somewhat decrease %",
+       "Significantly decrease %",
+       "Net increase %"
+      ],
+      "rows": [
+       [
+        "Electricity prices",
+        "30",
+        "38",
+        "",
+        "",
+        "",
+        "62"
+       ],
+       [
+        "Pollution",
+        "22",
+        "38",
+        "32",
+        "",
+        "",
+        "52"
+       ],
+       [
+        "Long-term jobs",
+        "9",
+        "39",
+        "33",
+        "11",
+        "8",
+        "29"
+       ],
+       [
+        "Economic growth",
+        "8",
+        "39",
+        "35",
+        "10",
+        "8",
+        "29"
+       ],
+       [
+        "Quality of life in your community",
+        "5",
+        "15",
+        "36",
+        "26",
+        "18",
+        "-24"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Stacked-bar battery, national only. The PDF text extraction drops cells on two rows, filed as blank never reconstructed: electricity prices prints only its increase pair 30/38 (the post independently gives the increase total 68% 'including 30% ... significantly'; the printed 26% cannot be attributed to its column from the extraction — it sits across the No-effect/decrease side — and the row's unprinted residue is 6 point(s)); pollution prints 22/38/32 through 'No effect', and its decrease pair shows a lone 5% beside the row whose column cannot be verified (residue 3; printed net 52 = 60 − 8 on any consistent split). Wording page calls the issues 'Long term jobs' and 'Quality of Life'; rows file the results chart's labels. Post prose corroborates each verified figure (electricity 68%, pollution 'six in ten', jobs 48%, growth 47%, quality of life 20 vs 44)."
+  },
+  {
+   "id": "former-pm-ratings",
+   "waveDate": "2026-08-20",
+   "fieldwork": {
+    "start": "2026-08-18",
+    "end": "2026-08-20"
+   },
+   "sample": 1562,
+   "published": "2026-09-11T03:53",
+   "question": "Please indicate whether you have a positive or negative view of the following past political figures",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Positive",
+    "Neutral",
+    "Negative",
+    "I haven't heard of them"
+   ],
+   "articleUrl": "https://demosau.com/news/bob-hawke-named-australias-most-admired-former-prime-minister/",
+   "data": {
+    "tables": [
+     {
+      "name": "All Respondents",
+      "headers": [
+       "Figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "Bob Hawke",
+        "46",
+        "30",
+        "15",
+        "9",
+        "31"
+       ],
+       [
+        "John Howard",
+        "47",
+        "26",
+        "23",
+        "4",
+        "24"
+       ],
+       [
+        "Robert Menzies",
+        "27",
+        "40",
+        "10",
+        "23",
+        "17"
+       ],
+       [
+        "Ben Chifley",
+        "18",
+        "41",
+        "7",
+        "34",
+        "11"
+       ],
+       [
+        "John Curtin",
+        "18",
+        "42",
+        "7",
+        "33",
+        "11"
+       ],
+       [
+        "Malcolm Fraser",
+        "25",
+        "45",
+        "18",
+        "12",
+        "7"
+       ],
+       [
+        "Harold Holt",
+        "18",
+        "48",
+        "11",
+        "23",
+        "7"
+       ],
+       [
+        "John Gorton",
+        "16",
+        "37",
+        "11",
+        "36",
+        "5"
+       ],
+       [
+        "Gough Whitlam",
+        "25",
+        "39",
+        "21",
+        "15",
+        "4"
+       ],
+       [
+        "William McMahon",
+        "15",
+        "40",
+        "13",
+        "32",
+        "2"
+       ],
+       [
+        "Paul Keating",
+        "27",
+        "40",
+        "26",
+        "7",
+        "1"
+       ],
+       [
+        "Julia Gillard",
+        "30",
+        "34",
+        "32",
+        "4",
+        "-2"
+       ],
+       [
+        "Kevin Rudd",
+        "30",
+        "32",
+        "35",
+        "",
+        "-5"
+       ],
+       [
+        "Tony Abbott",
+        "30",
+        "32",
+        "36",
+        "",
+        "-6"
+       ],
+       [
+        "Malcolm Turnbull",
+        "23",
+        "41",
+        "32",
+        "4",
+        "-9"
+       ],
+       [
+        "Scott Morrison",
+        "25",
+        "32",
+        "41",
+        "",
+        "-16"
+       ]
+      ]
+     },
+     {
+      "name": "Male respondents",
+      "headers": [
+       "Figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "Bob Hawke",
+        "49",
+        "29",
+        "16",
+        "6",
+        "33"
+       ],
+       [
+        "John Howard",
+        "51",
+        "18",
+        "28",
+        "",
+        "23"
+       ],
+       [
+        "Robert Menzies",
+        "32",
+        "35",
+        "14",
+        "19",
+        "18"
+       ],
+       [
+        "John Curtin",
+        "21",
+        "42",
+        "9",
+        "28",
+        "12"
+       ],
+       [
+        "Ben Chifley",
+        "19",
+        "42",
+        "10",
+        "29",
+        "9"
+       ],
+       [
+        "Malcolm Fraser",
+        "28",
+        "41",
+        "22",
+        "9",
+        "6"
+       ],
+       [
+        "John Gorton",
+        "19",
+        "37",
+        "14",
+        "30",
+        "5"
+       ],
+       [
+        "Harold Holt",
+        "20",
+        "45",
+        "16",
+        "19",
+        "4"
+       ],
+       [
+        "Gough Whitlam",
+        "25",
+        "37",
+        "26",
+        "12",
+        "-1"
+       ],
+       [
+        "William McMahon",
+        "15",
+        "42",
+        "16",
+        "27",
+        "-1"
+       ],
+       [
+        "Paul Keating",
+        "28",
+        "36",
+        "30",
+        "6",
+        "-2"
+       ],
+       [
+        "Tony Abbott",
+        "36",
+        "25",
+        "38",
+        "",
+        "-2"
+       ],
+       [
+        "Malcolm Turnbull",
+        "28",
+        "34",
+        "36",
+        "",
+        "-8"
+       ],
+       [
+        "Kevin Rudd",
+        "31",
+        "27",
+        "40",
+        "",
+        "-9"
+       ],
+       [
+        "Julia Gillard",
+        "28",
+        "28",
+        "41",
+        "",
+        "-13"
+       ],
+       [
+        "Scott Morrison",
+        "27",
+        "28",
+        "44",
+        "",
+        "-17"
+       ]
+      ]
+     },
+     {
+      "name": "Female respondents",
+      "headers": [
+       "Figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "Bob Hawke",
+        "43",
+        "32",
+        "13",
+        "12",
+        "30"
+       ],
+       [
+        "John Howard",
+        "43",
+        "34",
+        "19",
+        "4",
+        "24"
+       ],
+       [
+        "Robert Menzies",
+        "23",
+        "44",
+        "7",
+        "26",
+        "16"
+       ],
+       [
+        "Gough Whitlam",
+        "26",
+        "42",
+        "15",
+        "17",
+        "11"
+       ],
+       [
+        "Ben Chifley",
+        "16",
+        "40",
+        "5",
+        "39",
+        "11"
+       ],
+       [
+        "John Curtin",
+        "16",
+        "42",
+        "5",
+        "37",
+        "11"
+       ],
+       [
+        "Julia Gillard",
+        "33",
+        "40",
+        "23",
+        "4",
+        "10"
+       ],
+       [
+        "Harold Holt",
+        "16",
+        "50",
+        "7",
+        "27",
+        "9"
+       ],
+       [
+        "Malcolm Fraser",
+        "22",
+        "48",
+        "14",
+        "16",
+        "8"
+       ],
+       [
+        "William McMahon",
+        "16",
+        "38",
+        "9",
+        "37",
+        "7"
+       ],
+       [
+        "John Gorton",
+        "14",
+        "36",
+        "8",
+        "42",
+        "6"
+       ],
+       [
+        "Paul Keating",
+        "25",
+        "44",
+        "22",
+        "9",
+        "3"
+       ],
+       [
+        "Kevin Rudd",
+        "29",
+        "36",
+        "30",
+        "5",
+        "-1"
+       ],
+       [
+        "Malcolm Turnbull",
+        "19",
+        "47",
+        "29",
+        "5",
+        "-10"
+       ],
+       [
+        "Tony Abbott",
+        "23",
+        "39",
+        "35",
+        "",
+        "-12"
+       ],
+       [
+        "Scott Morrison",
+        "23",
+        "36",
+        "37",
+        "4",
+        "-14"
+       ]
+      ]
+     },
+     {
+      "name": "18-34 year old respondents",
+      "headers": [
+       "Figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "John Howard",
+        "36",
+        "33",
+        "21",
+        "10",
+        "15"
+       ],
+       [
+        "Kevin Rudd",
+        "33",
+        "38",
+        "20",
+        "9",
+        "13"
+       ],
+       [
+        "Bob Hawke",
+        "23",
+        "45",
+        "10",
+        "22",
+        "13"
+       ],
+       [
+        "Julia Gillard",
+        "27",
+        "40",
+        "23",
+        "10",
+        "4"
+       ],
+       [
+        "Paul Keating",
+        "17",
+        "49",
+        "14",
+        "20",
+        "3"
+       ],
+       [
+        "Robert Menzies",
+        "15",
+        "33",
+        "13",
+        "39",
+        "2"
+       ],
+       [
+        "John Curtin",
+        "12",
+        "30",
+        "10",
+        "48",
+        "2"
+       ],
+       [
+        "Gough Whitlam",
+        "15",
+        "37",
+        "14",
+        "34",
+        "1"
+       ],
+       [
+        "Harold Holt",
+        "12",
+        "43",
+        "12",
+        "33",
+        "0"
+       ],
+       [
+        "Malcolm Fraser",
+        "13",
+        "42",
+        "15",
+        "30",
+        "-2"
+       ],
+       [
+        "John Gorton",
+        "11",
+        "29",
+        "13",
+        "47",
+        "-2"
+       ],
+       [
+        "Tony Abbott",
+        "29",
+        "34",
+        "31",
+        "6",
+        "-2"
+       ],
+       [
+        "Ben Chifley",
+        "8",
+        "34",
+        "11",
+        "47",
+        "-3"
+       ],
+       [
+        "William McMahon",
+        "9",
+        "32",
+        "13",
+        "46",
+        "-4"
+       ],
+       [
+        "Malcolm Turnbull",
+        "19",
+        "45",
+        "26",
+        "10",
+        "-7"
+       ],
+       [
+        "Scott Morrison",
+        "23",
+        "39",
+        "34",
+        "4",
+        "-11"
+       ]
+      ]
+     },
+     {
+      "name": "35-54 year old respondents",
+      "headers": [
+       "Figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "Bob Hawke",
+        "44",
+        "32",
+        "14",
+        "10",
+        "30"
+       ],
+       [
+        "John Howard",
+        "42",
+        "31",
+        "23",
+        "4",
+        "19"
+       ],
+       [
+        "Gough Whitlam",
+        "22",
+        "48",
+        "14",
+        "16",
+        "8"
+       ],
+       [
+        "Robert Menzies",
+        "15",
+        "48",
+        "8",
+        "29",
+        "7"
+       ],
+       [
+        "Paul Keating",
+        "27",
+        "45",
+        "21",
+        "7",
+        "6"
+       ],
+       [
+        "Kevin Rudd",
+        "34",
+        "33",
+        "29",
+        "4",
+        "5"
+       ],
+       [
+        "Malcolm Fraser",
+        "18",
+        "56",
+        "14",
+        "12",
+        "4"
+       ],
+       [
+        "John Curtin",
+        "8",
+        "44",
+        "5",
+        "43",
+        "3"
+       ],
+       [
+        "Harold Holt",
+        "12",
+        "48",
+        "10",
+        "30",
+        "2"
+       ],
+       [
+        "Julia Gillard",
+        "30",
+        "38",
+        "29",
+        "",
+        "1"
+       ],
+       [
+        "Ben Chifley",
+        "8",
+        "40",
+        "7",
+        "45",
+        "1"
+       ],
+       [
+        "William McMahon",
+        "7",
+        "44",
+        "8",
+        "41",
+        "-1"
+       ],
+       [
+        "John Gorton",
+        "5",
+        "35",
+        "8",
+        "52",
+        "-3"
+       ],
+       [
+        "Malcolm Turnbull",
+        "24",
+        "44",
+        "29",
+        "",
+        "-5"
+       ],
+       [
+        "Tony Abbott",
+        "24",
+        "39",
+        "35",
+        "",
+        "-11"
+       ],
+       [
+        "Scott Morrison",
+        "22",
+        "37",
+        "39",
+        "",
+        "-17"
+       ]
+      ]
+     },
+     {
+      "name": "55+ year old respondents",
+      "headers": [
+       "Figure",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "I haven't heard of them %",
+       "Net positive %"
+      ],
+      "rows": [
+       [
+        "Bob Hawke",
+        "61",
+        "20",
+        "19",
+        "",
+        "42"
+       ],
+       [
+        "Robert Menzies",
+        "46",
+        "36",
+        "11",
+        "7",
+        "35"
+       ],
+       [
+        "John Howard",
+        "57",
+        "18",
+        "25",
+        "",
+        "32"
+       ],
+       [
+        "Ben Chifley",
+        "33",
+        "45",
+        "6",
+        "16",
+        "27"
+       ],
+       [
+        "John Curtin",
+        "31",
+        "48",
+        "6",
+        "15",
+        "25"
+       ],
+       [
+        "John Gorton",
+        "30",
+        "43",
+        "12",
+        "15",
+        "18"
+       ],
+       [
+        "Malcolm Fraser",
+        "39",
+        "36",
+        "24",
+        "",
+        "15"
+       ],
+       [
+        "Harold Holt",
+        "28",
+        "50",
+        "13",
+        "9",
+        "15"
+       ],
+       [
+        "William McMahon",
+        "26",
+        "43",
+        "16",
+        "15",
+        "10"
+       ],
+       [
+        "Gough Whitlam",
+        "34",
+        "33",
+        "31",
+        "",
+        "3"
+       ],
+       [
+        "Paul Keating",
+        "33",
+        "30",
+        "37",
+        "",
+        "-4"
+       ],
+       [
+        "Julia Gillard",
+        "33",
+        "27",
+        "39",
+        "",
+        "-6"
+       ],
+       [
+        "Tony Abbott",
+        "34",
+        "25",
+        "41",
+        "",
+        "-7"
+       ],
+       [
+        "Malcolm Turnbull",
+        "26",
+        "35",
+        "39",
+        "",
+        "-13"
+       ],
+       [
+        "Scott Morrison",
+        "29",
+        "24",
+        "46",
+        "",
+        "-17"
+       ],
+       [
+        "Kevin Rudd",
+        "24",
+        "27",
+        "49",
+        "",
+        "-25"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Most admired former PMs special (16 past prime ministers rated; n=1,562, fw 18-20 Aug 2026 — the August wave; own DemosAU post naming Hawke most-admired). No question-wording page in this report — stem from the results-page heading; 16 PMs from Chifley and Curtin to Morrison (post: '16 former Australian prime ministers'). Tables are the report's six 'Full List' pages in printed net-descending order; the per-group 'Top 5 (Net)' pages are net-sorted subsets of these same rows and are NOT re-filed. Blank cells are small 'I haven't heard of them' shares the PDF text layer drops (the cell is drawn without a label on the stacked bar); a blank is never reconstructed, even where the residue pins it. Post corroborates the headline nets (+31 Hawke, +24 Howard, +17 Menzies, +11 Chifley and Curtin, -16 Morrison) and its generational prose matches the 55+ and 18-34 tables."
+  },
+  {
+   "id": "admired-sportspersons",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-08-05T23:02",
+   "question": "Who is an Australian sportsperson you admire? You can name up to 3.",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [],
+   "articleUrl": "https://demosau.com/news/australias-most-admired-sporting-figures/",
+   "data": {
+    "tables": [
+     {
+      "name": "Australia",
+      "headers": [
+       "Sportsperson",
+       "% naming"
+      ],
+      "rows": [
+       [
+        "Cathy Freeman",
+        "10"
+       ],
+       [
+        "Ash Barty",
+        "9"
+       ],
+       [
+        "Sam Kerr",
+        "9"
+       ],
+       [
+        "Pat Cummins",
+        "6"
+       ],
+       [
+        "Oscar Piastri",
+        "5"
+       ]
+      ]
+     },
+     {
+      "name": "NSW Respondents",
+      "headers": [
+       "Sportsperson",
+       "% naming"
+      ],
+      "rows": [
+       [
+        "Cathy Freeman",
+        "13"
+       ],
+       [
+        "Nathan Cleary",
+        "10"
+       ],
+       [
+        "Ash Barty",
+        "8"
+       ],
+       [
+        "Sam Kerr",
+        "7"
+       ],
+       [
+        "Steve Smith",
+        "6"
+       ]
+      ]
+     },
+     {
+      "name": "Victorian Respondents",
+      "headers": [
+       "Sportsperson",
+       "% naming"
+      ],
+      "rows": [
+       [
+        "Ash Barty",
+        "10"
+       ],
+       [
+        "Neale Daniher",
+        "9"
+       ],
+       [
+        "Sam Kerr",
+        "9"
+       ],
+       [
+        "Cathy Freeman",
+        "8"
+       ],
+       [
+        "Oscar Piastri",
+        "7"
+       ]
+      ]
+     },
+     {
+      "name": "Queensland Respondents",
+      "headers": [
+       "Sportsperson",
+       "% naming"
+      ],
+      "rows": [
+       [
+        "Ash Barty",
+        "10"
+       ],
+       [
+        "Cathy Freeman",
+        "8"
+       ],
+       [
+        "Johnathan Thurston",
+        "8"
+       ],
+       [
+        "Sam Kerr",
+        "6"
+       ],
+       [
+        "Reece Walsh",
+        "6"
+       ]
+      ]
+     },
+     {
+      "name": "Western Australian Respondents",
+      "headers": [
+       "Sportsperson",
+       "% naming"
+      ],
+      "rows": [
+       [
+        "Sam Kerr",
+        "12"
+       ],
+       [
+        "Ash Barty",
+        "9"
+       ],
+       [
+        "Cathy Freeman",
+        "6"
+       ],
+       [
+        "Shane Warne",
+        "6"
+       ],
+       [
+        "Oscar Piastri",
+        "6"
+       ]
+      ]
+     },
+     {
+      "name": "South Australian Respondents",
+      "headers": [
+       "Sportsperson",
+       "% naming"
+      ],
+      "rows": [
+       [
+        "Taylor Walker",
+        "11"
+       ],
+       [
+        "Cathy Freeman",
+        "9"
+       ],
+       [
+        "Sam Kerr",
+        "8"
+       ],
+       [
+        "Travis Head",
+        "8"
+       ],
+       [
+        "Pat Cummins",
+        "7"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Open-ended name-up-to-3 question (shares are of all respondents, mentions total; no response list — respondents nominated freely). DemosAU self-commissioned special, pooled n=5,361 over 27 May – 18 Jun 2026 (effective n 3,326, ±1.7%); client field prints 'Self-comissioned' [sic], and the weighting line carries '(QTU Member survey)' variables from another statement's boilerplate. Printed ties: Daniher and Kerr level on 9 in Victoria; Freeman, Warne and Piastri level on 6 in WA; Kerr and Walsh level on 6 in Queensland (post wording 'tied', 'level'). The post corroborates all thirty printed name/share pairs. Deceased names print as respondents recollected them: Shane Warne (d. 2022) appears in his home state's WA top five as printed — left untouched; Taylor Walker (not deceased) leads the SA top five on 11."
+  },
+  {
+   "id": "sport-participation-adults",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-09-23T04:46",
+   "question": "In the past 12 months, have you personally participated in any sport or organised physical activity?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes, regularly (at least monthly)",
+    "Yes, occasionally (less than monthly)",
+    "No, but I used to",
+    "No, I have never participated"
+   ],
+   "articleUrl": "https://demosau.com/news/barriers-to-sporting-participation-in-australia/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Group",
+       "Yes, regularly (at least monthly) %",
+       "Yes, occasionally (less than monthly) %",
+       "No, but I used to %",
+       "No, I have never participated %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "23",
+        "17",
+        "29",
+        "31"
+       ],
+       [
+        "<$45K",
+        "16",
+        "12",
+        "32",
+        "40"
+       ],
+       [
+        "$45-125K",
+        "28",
+        "21",
+        "26",
+        "25"
+       ],
+       [
+        "$125K+",
+        "37",
+        "25",
+        "20",
+        "18"
+       ],
+       [
+        "Renter",
+        "18",
+        "18",
+        "31",
+        "33"
+       ],
+       [
+        "Mortgage Holder",
+        "27",
+        "22",
+        "26",
+        "25"
+       ],
+       [
+        "Own Home Outright*",
+        "25",
+        "11",
+        "29",
+        "35"
+       ],
+       [
+        "School education",
+        "18",
+        "13",
+        "31",
+        "38"
+       ],
+       [
+        "TAFE education",
+        "22",
+        "16",
+        "32",
+        "30"
+       ],
+       [
+        "University education",
+        "33",
+        "23",
+        "21",
+        "23"
+       ],
+       [
+        "Inner Metro",
+        "27",
+        "19",
+        "27",
+        "27"
+       ],
+       [
+        "Outer Metro",
+        "24",
+        "17",
+        "26",
+        "33"
+       ],
+       [
+        "Regional/Rural",
+        "18",
+        "15",
+        "35",
+        "32"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Q1 of the Barriers to Sporting Participation special (same pooled 5,361). Crosstabs printed by income, housing tenure, education and location only. Tenure labels are this report's own ('Mortgage Holder'); 'Own Home Outright*' carries the printed footnote '*This cohort skews towards respondents 55 and over' — asterisk filed with the label. Post reads the 'used to + never participated' pair as non-participation: 60% nationally, 72% under $45K, 38% over $125K — all consistent as printed."
+  },
+  {
+   "id": "sport-participation-desire",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-09-23T04:46",
+   "question": "Is there a sport or physical activity you would like to participate in — or participate in more often — but currently don't?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "Not sure",
+    "No"
+   ],
+   "articleUrl": "https://demosau.com/news/barriers-to-sporting-participation-in-australia/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "40"
+       ],
+       [
+        "Not sure",
+        "12"
+       ],
+       [
+        "No",
+        "48"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Q2 of the sport-barriers special (national only — no crosstabs printed for this question). The 'Yes' to Q2 sets the base for the Q3 barriers battery."
+  },
+  {
+   "id": "sport-participation-barriers",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-09-23T04:46",
+   "question": "What are the main reasons you are not participating, or not participating as often as you would like? (please select any that apply)",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [],
+   "articleUrl": "https://demosau.com/news/barriers-to-sporting-participation-in-australia/",
+   "data": {
+    "tables": [
+     {
+      "name": "Adults (answered Yes to Q2)",
+      "headers": [
+       "Reason",
+       "% selecting"
+      ],
+      "rows": [
+       [
+        "Cost of registration or membership fees",
+        "42"
+       ],
+       [
+        "Injury, disability or health condition",
+        "30"
+       ],
+       [
+        "Work or study commitments",
+        "28"
+       ],
+       [
+        "Family or caring responsibilities",
+        "28"
+       ],
+       [
+        "Cost of travel or transport",
+        "24"
+       ],
+       [
+        "Cost of equipment or uniforms",
+        "23"
+       ],
+       [
+        "No one to participate with",
+        "15"
+       ],
+       [
+        "No suitable facilities or programs nearby",
+        "15"
+       ],
+       [
+        "Feeling unwelcome or not represented",
+        "7"
+       ],
+       [
+        "Other reason",
+        "7"
+       ]
+      ]
+     },
+     {
+      "name": "Income over $125K (answered Yes to Q2)",
+      "headers": [
+       "Reason",
+       "% selecting"
+      ],
+      "rows": [
+       [
+        "Work or study commitments",
+        "45"
+       ],
+       [
+        "Family or caring responsibilities",
+        "43"
+       ],
+       [
+        "Cost of registration or membership fees",
+        "37"
+       ],
+       [
+        "Cost of equipment or uniforms",
+        "26"
+       ],
+       [
+        "Cost of travel or transport",
+        "24"
+       ],
+       [
+        "Injury, disability or health condition",
+        "15"
+       ],
+       [
+        "No suitable facilities or programs nearby",
+        "13"
+       ],
+       [
+        "No one to participate with",
+        "12"
+       ],
+       [
+        "Feeling unwelcome or not represented",
+        "4"
+       ],
+       [
+        "Other reason",
+        "4"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Q3 barriers battery, multi-select (shares total over 100 by design — never sum-checked). Base: respondents who answered Yes to Q2 ('Asked of respondents who answered Yes to Q2'). Income breakdowns for under-$45K and $45-125K do not extract reliably: the PDF text layer mis-aligns labels and values on those pages (stray percentages land beside the wrong labels), so those blocks file NOTHING here per the blank-not-guess rule; the over-$125K block extracts cleanly and is filed. No post corroboration exists for the by-income adults table."
+  },
+  {
+   "id": "child-sport-participation",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-09-23T04:46",
+   "question": "In the past 12 months, have your children participated in any sport or organised physical activity outside of school PE classes?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes, regularly (at least monthly)",
+    "Yes, occasionally (less than monthly)",
+    "No"
+   ],
+   "articleUrl": "https://demosau.com/news/barriers-to-sporting-participation-in-australia/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Group",
+       "Yes, regularly (at least monthly) %",
+       "Yes, occasionally (less than monthly) %",
+       "No %"
+      ],
+      "rows": [
+       [
+        "Australia",
+        "56",
+        "17",
+        "27"
+       ],
+       [
+        "<$45K",
+        "44",
+        "20",
+        "36"
+       ],
+       [
+        "$45-125K",
+        "58",
+        "15",
+        "27"
+       ],
+       [
+        "$125K+",
+        "68",
+        "17",
+        "15"
+       ],
+       [
+        "Rented",
+        "43",
+        "16",
+        "41"
+       ],
+       [
+        "Mortgage",
+        "61",
+        "19",
+        "20"
+       ],
+       [
+        "Owned",
+        "64",
+        "12",
+        "24"
+       ],
+       [
+        "School education",
+        "42",
+        "20",
+        "38"
+       ],
+       [
+        "TAFE education",
+        "53",
+        "17",
+        "30"
+       ],
+       [
+        "University education",
+        "69",
+        "14",
+        "17"
+       ],
+       [
+        "Inner Metro",
+        "62",
+        "13",
+        "25"
+       ],
+       [
+        "Outer Metro",
+        "54",
+        "20",
+        "26"
+       ],
+       [
+        "Regional/Rural",
+        "53",
+        "15",
+        "32"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Q4 of the sport-barriers special, asked of parents of school-aged children (methodology: 'Parents of school aged children: 1,580'; the topline denominates children-table pages 'Asked of respondents who indicated they had school aged children'). Housing rows use this table's own short labels ('Rented'/'Mortgage'/'Owned'). Post corroborates: 73% played anything (56+17), 85% played over $125K vs 64% under $45K, renters 41% not participating vs mortgage 20%. n stays the full-sample 5,361 as filed on the topline methodology page; the 1,580 parents base is carried in this note only."
+  },
+  {
+   "id": "child-sport-desire",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-09-23T04:46",
+   "question": "Is there a sport or physical activity that any of your children would like to do — or do more of — but are currently unable to?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Yes",
+    "Not sure",
+    "No"
+   ],
+   "articleUrl": "https://demosau.com/news/barriers-to-sporting-participation-in-australia/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Yes",
+        "42"
+       ],
+       [
+        "Not sure",
+        "13"
+       ],
+       [
+        "No",
+        "45"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Q5 of the sport-barriers special (national only, parents base as Q4). The 'Yes' to Q5 sets the base for the Q6 children-barriers battery; post headline figure ('42% of parents said their children would like to participate in more sport') matches the printed Yes."
+  },
+  {
+   "id": "child-sport-barriers",
+   "waveDate": "2026-06-18",
+   "fieldwork": {
+    "start": "2026-05-27",
+    "end": "2026-06-18"
+   },
+   "sample": 5361,
+   "published": "2026-09-23T04:46",
+   "question": "What are the main reasons your child or children are not able to participate, or participate as often as they would like? (please select any that apply)",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [],
+   "articleUrl": "https://demosau.com/news/barriers-to-sporting-participation-in-australia/",
+   "data": {
+    "tables": [
+     {
+      "name": "Parents (answered Yes to Q5)",
+      "headers": [
+       "Reason",
+       "% selecting"
+      ],
+      "rows": [
+       [
+        "Cost of registration or club fees",
+        "55"
+       ],
+       [
+        "Cost of equipment, uniforms or gear",
+        "48"
+       ],
+       [
+        "Cost of travel to training or games",
+        "39"
+       ],
+       [
+        "Time demands on parents to facilitate",
+        "35"
+       ],
+       [
+        "Scheduling conflicts with school or other activities",
+        "22"
+       ],
+       [
+        "No suitable programs or clubs in our area",
+        "16"
+       ],
+       [
+        "Child lacks confidence or interest",
+        "16"
+       ],
+       [
+        "Child's injury, disability or health condition",
+        "7"
+       ],
+       [
+        "Other reason",
+        "6"
+       ]
+      ]
+     },
+     {
+      "name": "Parental income $45-125K (answered Yes to Q5)",
+      "headers": [
+       "Reason",
+       "% selecting"
+      ],
+      "rows": [
+       [
+        "Cost of registration or club fees",
+        "52"
+       ],
+       [
+        "Cost of equipment, uniforms or gear",
+        "47"
+       ],
+       [
+        "Cost of travel to training or games",
+        "40"
+       ],
+       [
+        "Time demands on parents to facilitate",
+        "39"
+       ],
+       [
+        "Scheduling conflicts with school or other activities",
+        "24"
+       ],
+       [
+        "No suitable programs or clubs in our area",
+        "16"
+       ],
+       [
+        "Child lacks confidence or interest",
+        "16"
+       ],
+       [
+        "Child's injury, disability or health condition",
+        "8"
+       ],
+       [
+        "Other reason",
+        "6"
+       ]
+      ]
+     },
+     {
+      "name": "Parental income over $125K (answered Yes to Q5)",
+      "headers": [
+       "Reason",
+       "% selecting"
+      ],
+      "rows": [
+       [
+        "Cost of registration or club fees",
+        "49"
+       ],
+       [
+        "Cost of equipment, uniforms or gear",
+        "48"
+       ],
+       [
+        "Cost of travel to training or games",
+        "35"
+       ],
+       [
+        "Time demands on parents to facilitate",
+        "43"
+       ],
+       [
+        "Scheduling conflicts with school or other activities",
+        "29"
+       ],
+       [
+        "No suitable programs or clubs in our area",
+        "15"
+       ],
+       [
+        "Child lacks confidence or interest",
+        "16"
+       ],
+       [
+        "Child's injury, disability or health condition",
+        "6"
+       ],
+       [
+        "Other reason",
+        "4"
+       ]
+      ]
+     },
+     {
+      "name": "Parental income under $45K (answered Yes to Q5)",
+      "headers": [
+       "Reason",
+       "% selecting"
+      ],
+      "rows": [
+       [
+        "Cost of registration or club fees",
+        "66"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Q6 children-barriers battery, multi-select (no sum-checks by design), base Yes-to-Q5. The mid- and high-income blocks extract cleanly and are filed in full; the under-$45K block mangles in the text layer (labels and values mis-align) and files NOTHING from the report — its single row ('Cost of registration' 66%) is verified independently by the DemosAU post ('66% nominated cost of registration... under $45,000') and is the only figure filed from that block, per the post. Post also corroborates the national top three (registration 55, equipment 48, travel 39) and the mid/high registration figures (52, 49)."
+  },
+  {
+   "id": "trustwatch-media-trust",
+   "waveDate": "2026-05-20",
+   "fieldwork": {
+    "start": "2026-05-15",
+    "end": "2026-05-20"
+   },
+   "sample": 1502,
+   "published": "2026-07-08T05:23",
+   "question": "Please indicate how much you are likely to trust information provided by the following information sources?",
+   "questionWordingSource": "report-question-block",
+   "responseOptions": [
+    "Usually trust",
+    "Sometimes trust",
+    "Rarely trust",
+    "Never trust",
+    "Don't know"
+   ],
+   "articleUrl": "https://demosau.com/news/majority-of-aussies-trust-traditional-media-over-social-media/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Source",
+       "Usually trust %",
+       "Sometimes trust %",
+       "Rarely trust %",
+       "Never trust %",
+       "Don't know %",
+       "Usually + Sometimes %",
+       "Rarely + Never %"
+      ],
+      "rows": [
+       [
+        "Newspapers and news websites",
+        "15",
+        "44",
+        "18",
+        "8",
+        "15",
+        "59",
+        "26"
+       ],
+       [
+        "Commercial TV and Radio",
+        "14",
+        "44",
+        "20",
+        "7",
+        "15",
+        "58",
+        "27"
+       ],
+       [
+        "The ABC",
+        "27",
+        "33",
+        "11",
+        "12",
+        "17",
+        "60",
+        "23"
+       ],
+       [
+        "Accounts/Influencers I follow on social media",
+        "5",
+        "21",
+        "31",
+        "27",
+        "16",
+        "26",
+        "58"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "TrustWatch summary page of the DemosAU 'Trustwatch, Trust in Media, June 2026' report, riding the May 2026 wave (post: n=1,502, fieldwork 15-20 May 2026, effective MoE +/-3.6%). Derived Usually+Sometimes and Rarely+Never columns as printed. The PDF text layer drops the social-media row's 'Usually trust' cell (row prints 21/31/27/16 beneath its derived 26 + 58); the DemosAU post resolves it — '27% said they usually trust the ABC compared to newspapers/websites (15%), commercial tv and radio (14%) and social media (5%)' — so the full row files 5/21/31/27/16 with that provenance recorded here; no other cell comes from anywhere but the report. The post also states an age breakdown of social-media trust (18-34 at 40%, 35-54 at 32%, 55+ at 12%) that exists in no verified report table — noted here, not filed."
+  },
+  {
+   "id": "life-satisfaction",
+   "waveDate": "2025-11-24",
+   "fieldwork": {
+    "start": "2025-10-05",
+    "end": "2025-11-24"
+   },
+   "sample": 4263,
+   "published": "2026-05-05T04:45",
+   "question": "All things considered, how satisfied are you with your life?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Very satisfied",
+    "Satisfied",
+    "Neutral",
+    "Unsatisfied",
+    "Very unsatisfied"
+   ],
+   "articleUrl": "https://demosau.com/news/demosau-releases-its-inaugural-australian-wellbeing-index-measuring-life-satisfaction-and-wellbeing/",
+   "data": {
+    "tables": [
+     {
+      "name": "All Respondents",
+      "headers": [
+       "Response",
+       "Column %"
+      ],
+      "rows": [
+       [
+        "Very satisfied",
+        "12.5"
+       ],
+       [
+        "Satisfied",
+        "44.6"
+       ],
+       [
+        "Neutral",
+        "24.3"
+       ],
+       [
+        "Unsatisfied",
+        "13.6"
+       ],
+       [
+        "Very unsatisfied",
+        "5.0"
+       ]
+      ]
+     },
+     {
+      "name": "By Location",
+      "headers": [
+       "Group",
+       "Life Satisfaction Score"
+      ],
+      "rows": [
+       [
+        "Inner Metro",
+        "62.5"
+       ],
+       [
+        "Outer Metro",
+        "61.8"
+       ],
+       [
+        "Regional/Rural",
+        "59.7"
+       ]
+      ]
+     },
+     {
+      "name": "By Education",
+      "headers": [
+       "Group",
+       "Life Satisfaction Score"
+      ],
+      "rows": [
+       [
+        "Didn't Finish G12",
+        "59.7"
+       ],
+       [
+        "Grade 12",
+        "61.8"
+       ],
+       [
+        "TAFE",
+        "59.6"
+       ],
+       [
+        "Undergraduate",
+        "63.1"
+       ],
+       [
+        "Postgraduate",
+        "70"
+       ]
+      ]
+     },
+     {
+      "name": "By Income",
+      "headers": [
+       "Group",
+       "Life Satisfaction Score"
+      ],
+      "rows": [
+       [
+        "<$45K",
+        "58.6"
+       ],
+       [
+        "$45-75K",
+        "62.9"
+       ],
+       [
+        "$75-125K",
+        "63.2"
+       ],
+       [
+        "$125-200K",
+        "67.7"
+       ],
+       [
+        ">$200K",
+        "71.4"
+       ]
+      ]
+     },
+     {
+      "name": "Index scores",
+      "headers": [
+       "Index",
+       "Score (out of 100)"
+      ],
+      "rows": [
+       [
+        "Australian Wellbeing Index",
+        "57.8"
+       ],
+       [
+        "Life Satisfaction Score",
+        "61.5"
+       ],
+       [
+        "Economic",
+        "50.5"
+       ],
+       [
+        "Health",
+        "62.6"
+       ],
+       [
+        "Social",
+        "60.4"
+       ],
+       [
+        "Democracy",
+        "55.0"
+       ],
+       [
+        "Environment",
+        "60.8"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Inaugural DemosAU Australian Wellbeing Index fieldwork (5 Oct - 24 Nov 2025 per the methodology page, n=4,263), self-commissioned. Distribution rows sum to 100.0 as printed; 1-decimal cells throughout the report file as plain rows (never sumRow'd — strict float equality spuriously rejects decimal sums). The Life Satisfaction Score prints '61.5 out of 100'; the post rounds it to 61 and the AWI to 58. Cohort pages (Location / Education / Income as printed; income groups ascend in the chart's printed order, matching the post's 'rise sharply with income'); the Age+Gender chart on each demographics page prints no figure labels in the text layer and files nothing. The Index scores table carries the Sub-Indicies [sic] summary page as printed — Democracy prints 55 there but 55.0 on its own Index page's comparison chart, so 55.0 is filed — plus the companion 61.5. Economic is the weakest sub-index (report: economic security 'the primary constraint'), Health the strongest. The equivalent per-sub-index cohort pages are noted as existing but not filed in this pass."
+  },
+  {
+   "id": "economic-wellbeing-statements",
+   "waveDate": "2025-11-24",
+   "fieldwork": {
+    "start": "2025-10-05",
+    "end": "2025-11-24"
+   },
+   "sample": 4263,
+   "published": "2026-05-05T04:45",
+   "question": "How do you feel about….",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Very Positive",
+    "Positive",
+    "Neutral",
+    "Negative",
+    "Very Negative"
+   ],
+   "articleUrl": "https://demosau.com/news/demosau-releases-its-inaugural-australian-wellbeing-index-measuring-life-satisfaction-and-wellbeing/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Very Positive %",
+       "Positive %",
+       "Neutral %",
+       "Negative %",
+       "Very Negative %"
+      ],
+      "rows": [
+       [
+        "Your current and future employment",
+        "10.5",
+        "26.4",
+        "39.3",
+        "14.3",
+        "9.5"
+       ],
+       [
+        "Current household Income",
+        "7.3",
+        "28.7",
+        "30.0",
+        "23.5",
+        "10.5"
+       ],
+       [
+        "Ability to pay important bills such as groceries, energy bills, mortgage/rent",
+        "11.9",
+        "32.8",
+        "25.5",
+        "19.6",
+        "10.1"
+       ],
+       [
+        "Ability to pay for holidays and other entertainment",
+        "8.1",
+        "27.5",
+        "24.3",
+        "22.6",
+        "17.5"
+       ],
+       [
+        "Long term financial security",
+        "8.3",
+        "26.8",
+        "29.3",
+        "22.4",
+        "13.2"
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Economic Index battery of the AWI report ('Statements randomly listed, answer order randomly flipped' per the question-wording pages). Chart labels for statements 3 and 4 print shortened ('Ability to pay bills*', 'Ability to pay for holidays/entertainment**'); the report's own footnotes carry the full wordings filed here ('*Full wording: Ability to pay important bills such as groceries, energy bills, mortgage/rent', '** Full wording: Ability to pay for holidays and other entertainment'). The bills row prints cells summing to 99.9 (1-decimal rounding) — filed as printed, never adjusted; the other four rows print summing to 100.0."
+  },
+  {
+   "id": "health-wellbeing-statements",
+   "waveDate": "2025-11-24",
+   "fieldwork": {
+    "start": "2025-10-05",
+    "end": "2025-11-24"
+   },
+   "sample": 4263,
+   "published": "2026-05-05T04:45",
+   "question": "In general, how is your ….",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Very Good",
+    "Good",
+    "Average",
+    "Poor",
+    "Very Poor"
+   ],
+   "articleUrl": "https://demosau.com/news/demosau-releases-its-inaugural-australian-wellbeing-index-measuring-life-satisfaction-and-wellbeing/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Very Good %",
+       "Good %",
+       "Average %",
+       "Poor %",
+       "Very Poor %"
+      ],
+      "rows": [
+       [
+        "Physical health",
+        "11.2",
+        "36.9",
+        "32.1",
+        "15.6",
+        ""
+       ],
+       [
+        "Mental Health",
+        "18.9",
+        "33.6",
+        "28.7",
+        "13.0",
+        "5.8"
+       ],
+       [
+        "Family relationships",
+        "28.2",
+        "38.3",
+        "22.6",
+        "7.1",
+        ""
+       ],
+       [
+        "Ability to exercise",
+        "16.2",
+        "35.2",
+        "27.9",
+        "15.4",
+        "5.3"
+       ],
+       [
+        "The health of your diet",
+        "12.9",
+        "38.7",
+        "35.3",
+        "10.3",
+        ""
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Health Index battery of the AWI report. Bars print Very Good → Very Poor left to right; the text layer drops the trailing Very Poor cell on Physical health, Family relationships and The health of your diet (the two complete rows, Mental Health and Ability to exercise, extract all five cells and confirm the print order). The dropped cells file as '' — the implied remainder shares are never reconstructed from the row residues."
+  },
+  {
+   "id": "social-wellbeing-statements",
+   "waveDate": "2025-11-24",
+   "fieldwork": {
+    "start": "2025-10-05",
+    "end": "2025-11-24"
+   },
+   "sample": 4263,
+   "published": "2026-05-05T04:45",
+   "question": "Do you agree or disagree with the following statements?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Strongly Agree",
+    "Agree",
+    "Neutral",
+    "Disagree",
+    "Strongly Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/demosau-releases-its-inaugural-australian-wellbeing-index-measuring-life-satisfaction-and-wellbeing/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Strongly Agree %",
+       "Agree %",
+       "Neutral %",
+       "Disagree %",
+       "Strongly Disagree %"
+      ],
+      "rows": [
+       [
+        "I don’t feel safe in my community",
+        "15.4",
+        "25.8",
+        "37.5",
+        "14.8",
+        ""
+       ],
+       [
+        "I feel that I belong in my community",
+        "10.2",
+        "37.6",
+        "35.9",
+        "11.5",
+        ""
+       ],
+       [
+        "I often feel lonely",
+        "9.2",
+        "22.5",
+        "22.8",
+        "30.0",
+        "15.5"
+       ],
+       [
+        "I feel that I have enough space of my own where I live",
+        "21.9",
+        "49.6",
+        "16.2",
+        "8.7",
+        ""
+       ],
+       [
+        "In public I feel judged by strangers",
+        "18.2",
+        "27.1",
+        "33.0",
+        "16.0",
+        ""
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Social Index battery of the AWI report. Bars print Strongly Agree → Strongly Disagree; the text layer drops the trailing Strongly Disagree cell on four of five rows (verified against the complete 'I often feel lonely' row). Dropped cells file as '' — never reconstructed from the row residues."
+  },
+  {
+   "id": "democracy-wellbeing-statements",
+   "waveDate": "2025-11-24",
+   "fieldwork": {
+    "start": "2025-10-05",
+    "end": "2025-11-24"
+   },
+   "sample": 4263,
+   "published": "2026-05-05T04:45",
+   "question": "Do you agree or disagree with the following statements?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Strongly Agree",
+    "Agree",
+    "Neutral",
+    "Disagree",
+    "Strongly Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/demosau-releases-its-inaugural-australian-wellbeing-index-measuring-life-satisfaction-and-wellbeing/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Strongly Agree %",
+       "Agree %",
+       "Neutral %",
+       "Disagree %",
+       "Strongly Disagree %"
+      ],
+      "rows": [
+       [
+        "Australian Democracy is something to be proud of",
+        "19.6",
+        "36.5",
+        "33.3",
+        "",
+        ""
+       ],
+       [
+        "Decisions made by Government generally do not accord with my values",
+        "12.5",
+        "28.5",
+        "41.1",
+        "15.3",
+        ""
+       ],
+       [
+        "Democracy is the best political system for Australia",
+        "25.4",
+        "37.5",
+        "31.2",
+        "",
+        ""
+       ],
+       [
+        "Government in this country is unaccountable to everyday people",
+        "18.8",
+        "30.0",
+        "31.3",
+        "15.6",
+        ""
+       ],
+       [
+        "In general, I trust the democratic institutions in Australia",
+        "11.3",
+        "35.9",
+        "34.8",
+        "12.4",
+        ""
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Democracy Index battery of the AWI report. No row extracts all five cells: the three rows printing four cells lose the trailing Strongly Disagree cell per the social battery's pattern; '…something to be proud of' and '…best political system' print only three cells, and the split of the remaining share across Disagree and Strongly Disagree is not determinable from the text layer — both tail cells file as '' on those rows. Nothing is reconstructed."
+  },
+  {
+   "id": "environment-wellbeing-statements",
+   "waveDate": "2025-11-24",
+   "fieldwork": {
+    "start": "2025-10-05",
+    "end": "2025-11-24"
+   },
+   "sample": 4263,
+   "published": "2026-05-05T04:45",
+   "question": "Do you agree or disagree with the following statements?",
+   "questionWordingSource": "pdf-question-wording-page",
+   "responseOptions": [
+    "Strongly Agree",
+    "Agree",
+    "Neutral",
+    "Disagree",
+    "Strongly Disagree"
+   ],
+   "articleUrl": "https://demosau.com/news/demosau-releases-its-inaugural-australian-wellbeing-index-measuring-life-satisfaction-and-wellbeing/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Statement",
+       "Strongly Agree %",
+       "Agree %",
+       "Neutral %",
+       "Disagree %",
+       "Strongly Disagree %"
+      ],
+      "rows": [
+       [
+        "My community is prepared for natural disasters / climate change",
+        "29.8",
+        "45.6",
+        "15.3",
+        "",
+        ""
+       ],
+       [
+        "In my local area pollution is a problem",
+        "16.1",
+        "26.6",
+        "40.6",
+        "12.2",
+        ""
+       ],
+       [
+        "In my local area I enjoy spending time in the natural environment",
+        "18.7",
+        "48.3",
+        "25.5",
+        "",
+        ""
+       ],
+       [
+        "It is too noisy where I live",
+        "13.7",
+        "21.5",
+        "44.6",
+        "14.7",
+        ""
+       ]
+      ]
+     }
+    ],
+    "prose": []
+   },
+   "note": "Environmental Index battery of the AWI report (report chapter headed 'Enviroment' [sic] on its wording page). Tail-cell losses as per the democracy battery. The fifth printed statement, 'I am happy about the level of development in my community', prints cells 40.9 / 33.3 / 13.7 with 12.1 unaccounted for: which option columns those cells occupy is not determinable from the text layer and no post corroboration exists, so the row files NOTHING here per the blank-not-guess rule. Nothing is reconstructed."
+  }
+ ]
+}
