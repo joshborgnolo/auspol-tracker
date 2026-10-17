@@ -5935,7 +5935,7 @@ body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
 body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
 body.rd .rd-ldg-lines { display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
 body.rd .rd-ldg-line {
-  all: unset; box-sizing: border-box; display: grid; grid-template-columns: 96px minmax(0, 1fr) 14px; column-gap: 12px; align-items: baseline;
+  all: unset; box-sizing: border-box; display: grid; grid-template-columns: 110px minmax(0, 1fr) 14px; column-gap: 12px; align-items: baseline;
   padding: 5px 4px 5px 0; border-bottom: 1px solid var(--line-2); font-size: 13.5px; line-height: 1.45; color: var(--ink-2);
 }
 body.rd .rd-ldg-line.go { cursor: pointer; }
@@ -8040,6 +8040,76 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "why": "2pp"
   }];
   const lefTables = [{
+    "year": 1943,
+    "era": true,
+    "dlp": null,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -1.4
+  }, {
+    "year": 1946,
+    "era": true,
+    "dlp": null,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -1.33
+  }, {
+    "year": 1949,
+    "era": true,
+    "dlp": null,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -0.76
+  }, {
+    "year": 1951,
+    "era": true,
+    "dlp": null,
+    "dem": null,
+    "oth": 0.45,
+    "bt": 0.43
+  }, {
+    "year": 1954,
+    "era": true,
+    "dlp": null,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -0.01
+  }, {
+    "year": 1955,
+    "era": true,
+    "dlp": 0.0022,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -2.52
+  }, {
+    "year": 1958,
+    "era": true,
+    "dlp": 0.2698,
+    "dem": null,
+    "oth": 0.45,
+    "bt": 0.33
+  }, {
+    "year": 1961,
+    "era": true,
+    "dlp": 0.2319,
+    "dem": null,
+    "oth": 0.45,
+    "bt": 0.27
+  }, {
+    "year": 1963,
+    "era": true,
+    "dlp": 0.1952,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -0.47
+  }, {
+    "year": 1966,
+    "era": true,
+    "dlp": 0.2594,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -0.02
+  }, {
     "year": 1969,
     "era": true,
     "dlp": 0.2633,
@@ -36576,15 +36646,15 @@ function AllPollsView({
         case "hfx":
           return p.hfx ? p.hfx.v : -Infinity;
         case "p.alp":
-          return consM ? p.cons && p.cons.alp != null ? p.cons.alp : -Infinity : p.p.alp;
+          return consM ? p.cons && (p.consLoose || p.cons).alp != null ? (p.consLoose || p.cons).alp : -Infinity : p.p.alp;
         case "p.lnp":
-          return consM ? p.cons && p.cons.lnp != null ? p.cons.lnp : -Infinity : p.p.lnp;
+          return consM ? p.cons && (p.consLoose || p.cons).lnp != null ? (p.consLoose || p.cons).lnp : -Infinity : p.p.lnp;
         case "p.grn":
-          return consM ? p.cons && p.cons.grn != null ? p.cons.grn : -Infinity : p.p.grn;
+          return consM ? p.cons && (p.consLoose || p.cons).grn != null ? (p.consLoose || p.cons).grn : -Infinity : p.p.grn;
         case "p.onp":
-          return consM ? p.cons && p.cons.onp != null ? p.cons.onp : -Infinity : p.p.onp;
+          return consM ? p.cons && (p.consLoose || p.cons).onp != null ? (p.consLoose || p.cons).onp : -Infinity : p.p.onp;
         case "p.oth":
-          return consM ? p.cons && p.cons.oth != null ? p.cons.oth : -Infinity : p.p.oth;
+          return consM ? p.cons && (p.consLoose || p.cons).oth != null ? (p.consLoose || p.cons).oth : -Infinity : p.p.oth;
         case "appr.albNet":
           return p.appr.albNet != null ? p.appr.albNet : -Infinity;
         case "appr.taylorNet":
@@ -57950,55 +58020,17 @@ function rdLgLines(p, {
   }
   if (p.cons) {
     const ORDER = ["alp", "lnp", "grn", "onp", "ind", "oth", "none"];
-    const ks = ORDER.filter(k => p.cons[k] != null);
+    const def = rdApConsDef(p);
+    const ks = ORDER.filter(k => def.m[k] != null);
     out.push({
       id: "cons",
       lab: "Consideration",
       body: React.createElement(React.Fragment, null, ks.map(k => React.createElement(U, {
         key: k
-      }, k === "none" ? React.createElement(React.Fragment, null, "none ", React.createElement("b", null, rdApNum(p.cons[k]))) : pty(k, rdApNum(p.cons[k])))), React.createElement(U, {
+      }, k === "none" ? React.createElement(React.Fragment, null, "none ", React.createElement("b", null, rdApNum(def.m[k]))) : pty(k, rdApNum(def.m[k])))), React.createElement(U, {
         soft: true
-      }, p.consBasis || "parties the voter would consider"))
+      }, def.note))
     });
-    if (p.consLoose) {
-      const tier = rdApConsTier(p, "loose");
-      const ks2 = ORDER.filter(k => p.consLoose[k] != null);
-      out.push({
-        id: "consloose",
-        lab: tier.led,
-        body: React.createElement(React.Fragment, null, ks2.map(k => React.createElement(U, {
-          key: k
-        }, pty(k, rdApNum(p.consLoose[k])))), React.createElement(U, {
-          soft: true
-        }, tier.note))
-      });
-    }
-    if (p.consNot) {
-      const tier = rdApConsTier(p, "not");
-      const ks4 = ORDER.filter(k => p.consNot[k] != null);
-      out.push({
-        id: "consnot",
-        lab: tier.led,
-        body: React.createElement(React.Fragment, null, ks4.map(k => React.createElement(U, {
-          key: k
-        }, pty(k, rdApNum(p.consNot[k])))), React.createElement(U, {
-          soft: true
-        }, tier.note))
-      });
-    }
-    if (p.consNever) {
-      const tier = rdApConsTier(p, "never");
-      const ks3 = ORDER.filter(k => p.consNever[k] != null);
-      out.push({
-        id: "consnever",
-        lab: tier.led,
-        body: React.createElement(React.Fragment, null, ks3.map(k => React.createElement(U, {
-          key: k
-        }, pty(k, rdApNum(p.consNever[k])))), React.createElement(U, {
-          soft: true
-        }, tier.note))
-      });
-    }
   }
   return out;
 }
@@ -58507,13 +58539,17 @@ const rdApLeanFor = (p, onM, pub) => {
 };
 function rdApConsStory(upd) {
   const D = window.AUSPOL;
-  const waves = (D.individualPolls || []).filter(p => p.cons && p.cons.onp != null && rdApDays(p.released) <= upd).sort((a, b) => rdApDays(b.released) - rdApDays(a.released));
+  const waves = (D.individualPolls || []).filter(p => p.cons && rdApConsDef(p).m.onp != null && rdApDays(p.released) <= upd).sort((a, b) => rdApDays(b.released) - rdApDays(a.released));
   if (!waves.length) return null;
-  const newest = waves[0];
-  const basis = p => (p.consBasis || "Would consider").replace(/\s*\(.*\)\s*$/, "").toLowerCase();
+  const newest = waves[0],
+    nw = rdApConsDef(newest).m;
+  const basis = p => rdApConsDef(p).lab.replace(/\s*\(.*\)\s*$/, "").toLowerCase();
   const pct = v => rdApNum(v) + "%";
   const apart = (p, a, b) => Math.abs(a - b) > 1.96 * Math.sqrt((a * (100 - a) + b * (100 - b)) / (p.sample || 1000));
-  const rel = (p, id) => !apart(p, p.cons.onp, p.cons[id]) ? 0 : p.cons.onp > p.cons[id] ? 1 : -1;
+  const rel = (p, id) => {
+    const m = rdApConsDef(p).m;
+    return !apart(p, m.onp, m[id]) ? 0 : m.onp > m[id] ? 1 : -1;
+  };
   const MAJ = {
     alp: "Labor’s",
     lnp: "the Coalition’s"
@@ -58522,10 +58558,10 @@ function rdApConsStory(upd) {
     const [y, m, d] = iso.split("-").map(Number);
     return d + " " + D.monthNameFull(m) + (y !== new Date(upd).getUTCFullYear() ? " " + y : "");
   };
-  const top = ["alp", "lnp"].filter(id => newest.cons[id] != null).sort((a, b) => newest.cons[b] - newest.cons[a])[0];
-  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
+  const top = ["alp", "lnp"].filter(id => nw[id] != null).sort((a, b) => nw[b] - nw[a])[0];
+  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(nw.onp) + " " + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation" + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(nw[top]) : "");
   const askers = new Set(waves.map(p => p.pollster + "|" + basis(p))).size;
-  const full = waves.filter(p => p.cons.alp != null);
+  const full = waves.filter(p => rdApConsDef(p).m.alp != null);
   const cnt = [1, 0, -1].map(r => full.filter(p => rel(p, "alp") === r).length);
   const parts = ["outscored", "came close to", "trailed"].map((v, i) => cnt[i] ? [v, cnt[i]] : null).filter(Boolean);
   const tallied = full.length < 2 ? "" : parts.length === 1 ? "In all " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + parts[0][0] + " Labor. " : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
@@ -58671,34 +58707,35 @@ const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
     loose: {
       tab: "Would consider (≥4/10)",
-      led: "Would consider (≥4/10)",
       note: "rated ≥4/10, rebased over everyone"
     },
     not: {
-      tab: "Would not consider (≤3/10)",
-      led: "Would not consider (≤3/10)",
-      note: "rated ≤3/10, rebased over everyone"
+      tab: "Would not consider (≤3/10)"
     },
     never: {
-      tab: "Would never vote (0/10)",
-      led: "Would never vote (0/10)",
-      note: "rated 0/10, rebased over everyone"
+      tab: "Would never vote (0/10)"
     }
   },
   Essential: {
     loose: {
       tab: "Would consider (definitely or open)",
-      led: "Would consider (definitely or open)",
       note: "the ‘definitely’ and ‘open to’ bands, summed"
     },
     never: {
-      tab: "Would never vote",
-      led: "Would never vote",
-      note: "the ‘would never vote for them’ band"
+      tab: "Would never vote"
     }
   }
 };
 const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIER["RedBridge/Accent"])[tier];
+const rdApConsDef = p => p.consLoose ? {
+  m: p.consLoose,
+  lab: rdApConsTier(p, "loose").tab,
+  note: rdApConsTier(p, "loose").note
+} : {
+  m: p.cons,
+  lab: p.consBasis || "Would consider",
+  note: p.consBasis || "parties the voter would consider"
+};
 function RdApConsCyc({
   tiers,
   phone,
@@ -59554,13 +59591,13 @@ function RdAllPolls(P) {
       }, rdApSigned(hl))));
     } else if (facet === "primary") {
       const pr = consM && p.cons || p.p || {};
-      const tiers = !(consM && p.cons) ? null : [{
-        m: p.cons,
-        lab: p.consBasis || "Would consider"
-      }].concat(p.consLoose ? [{
+      const tiers = !(consM && p.cons) ? null : (p.consLoose ? [{
         m: p.consLoose,
         lab: rdApConsTier(p, "loose").tab
-      }] : []).concat(p.consNot ? [{
+      }] : []).concat([{
+        m: p.cons,
+        lab: p.consBasis || "Would consider"
+      }]).concat(p.consNot ? [{
         m: p.consNot,
         lab: rdApConsTier(p, "not").tab
       }] : []).concat(p.consNever ? [{

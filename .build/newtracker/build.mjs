@@ -1901,7 +1901,7 @@ const ARCHIVE_STAMP = "2026-10-11";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-10-16";
+const PREDICTION_STAMP = "2026-10-17";
 /* Tab pages are born the day the build first emits them; a page younger
    than the data it carries must not be dated before it existed, so their
    lastmod is the later of the go-live stamp and the data stamp (the
