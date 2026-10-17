@@ -1319,6 +1319,16 @@ function cycleReadings(c, M, D) {
       }
       else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : (p.appr ? p.appr.albNet : null);
       else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : (p.appr ? p.appr.taylorNet : null);
+      /* the lead is the pair's difference in the same wave - a wave that
+         measures either office only as favourability, or neither office,
+         has no lead dot. Hanson enters the max only where she herself is
+         rated on the same share-the-dissatisfied basis. */
+      else if (key === "pmlead") {
+        if ((mb.alb || "approval") === "fav" || (mb.taylor || "approval") === "fav") continue;
+        if (!p.appr || p.appr.albNet == null || p.appr.taylorNet == null) continue;
+        const hn = (mb.hanson || "approval") !== "fav" ? p.appr.hansonNet : null;
+        y = +(p.appr.albNet - Math.max(p.appr.taylorNet, hn != null ? hn : -Infinity)).toFixed(2);
+      }
       /* the ppm line's margin, from the wave's MAIN pairing (sets[0] is
          always the published main row; the Albanese-v-Hanson H2 is appended
          last). The opponent's key varies with the leader (ley, taylor…), so
@@ -1356,6 +1366,13 @@ function cycleReadings(c, M, D) {
     for (const r of src.approval) {
       if (r.pmPpm == null || r.oppPpm == null || !inCycleRange(r.m)) continue;
       out.push({ x: r.m, y: r.pmPpm - r.oppPpm, iso: r.date, meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
+    }
+  } else if (key === "pmlead") {
+    /* past terms rated nobody but the two offices, so the wave's strongest
+       rival is the opposition leader and the dot is the pair's difference */
+    for (const r of src.approval) {
+      if (r.pmNet == null || r.oppNet == null || r.metric === "fav" || !inCycleRange(r.m)) continue;
+      out.push({ x: r.m, y: +(r.pmNet - r.oppNet).toFixed(2), iso: r.date, meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
     }
   } else {
     const f = isOpp ? "oppNet" : "pmNet";
@@ -1658,7 +1675,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   const cardSub = (() => {
     const fanned = M.key === "net" || M.key === "oppnet"
       || M.key === "ppmm" || M.key === "primary" || M.key === "tpp"
-      || M.key === "oppr";
+      || M.key === "oppr" || M.key === "pmlead";
     if (!fanned || !banded) return M.sub;
     const lead = M.key === "net" || M.key === "oppnet"
       ? "Approval minus disapproval"
@@ -1695,7 +1712,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
        answers to its own name, so the handover month lists both readings
        rather than letting one office row average two people. The pooled
        series still carries terms that never changed leaders. */
-    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || null;
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || (M.key === "pmlead" && c.raw.pmleadEras) || null;
     const seriesIn = eras
       ? eras.map((e) => ({ name: e.name, months: e.months, vals: e.vals, obs: e.obs }))
       : [{ name: null, months: c.raw.months, vals: c.raw[M.key], obs: (c.raw.obs || {})[M.key] }];
@@ -1719,8 +1736,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       // does instead of running flat out of a value that was never measured
       const pts = monthly.filter((p) => p.y != null)
         .map((p) => ({ x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y }));
-      // an unsegmented ppm line names its single pairing, never a lone office
-      const leadName = s.name || (M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead));
+      // an unsegmented ppm line names its single pairing, never a lone office –
+      // the net-approval LEAD is the same kind of pairing measure
+      const leadName = s.name || (M.key === "ppmm" ? c.raw.ppmPair : M.key === "pmlead" ? c.raw.pmleadPair : (isOpp ? c.oppLead : c.lead));
       const label = solo ? leadName : c.year + ", " + leadName;
       /* Months are the x values, and `months` is 0..n, but look the index up
          rather than assume it: the flags have to describe the same month the
@@ -1949,11 +1967,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   const srcTerms = Object.keys(D.cycleSource || {}).length;
   const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
     const base = cycBase(c, M.key);
-    const leadName = M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead);
+    const leadName = M.key === "ppmm" ? c.raw.ppmPair : M.key === "pmlead" ? c.raw.pmleadPair : (isOpp ? c.oppLead : c.lead);
     const label = solo ? leadName : c.year + ", " + leadName;
     // a term that changed holders names the holder at the dot's own date,
     // matching the per-person runs drawn under it
-    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || null;
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || (M.key === "pmlead" && c.raw.pmleadEras) || null;
     const nameAt = (iso) => {
       if (!eras || !iso) return null;
       let n = eras[0].name;

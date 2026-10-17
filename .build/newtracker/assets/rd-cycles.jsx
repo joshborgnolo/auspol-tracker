@@ -11,6 +11,7 @@ const RD_CYC_TITLE = {
   primary: "Government’s primary vote, %",
   oppr: "Opposition’s primary vote, %",
   net: "Prime minister’s net approval: approve minus disapprove, points",
+  pmlead: "Prime minister’s net approval lead: approval minus the strongest rival’s, points",
   ppmm: "PM’s lead, points",
   oppnet: "Net approval, points",
 };
@@ -20,12 +21,14 @@ const RD_CYC_COPY = {
   primary: "Government’s primary vote",
   oppr: "Opposition’s primary vote",
   net: "Prime minister’s net approval",
+  pmlead: "Prime minister’s net approval lead",
   ppmm: "Prime minister’s lead as preferred PM",
   oppnet: "Opposition leader’s net approval",
 };
 const RD_CYC_UNIT = {
   net: "Points, approve minus disapprove.",
   oppnet: "Points, approve minus disapprove.",
+  pmlead: "Points, the prime minister’s net approval minus the higher of the opposition leader’s and Pauline Hanson’s.",
   ppmm: "Points, the prime minister’s share minus the rival’s.",
 };
 const RD_CYC_TITLE_CHG = {
@@ -33,6 +36,7 @@ const RD_CYC_TITLE_CHG = {
   primary: "Government’s primary vote, change since the election",
   oppr: "Opposition’s primary vote, change since the election",
   net: "Prime minister’s net approval, change since the first reading",
+  pmlead: "Prime minister’s net approval lead, change since the first reading",
   ppmm: "PM’s lead, change since the first reading",
   oppnet: "Opposition leader’s net approval, change since the first reading",
 };
@@ -83,7 +87,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
      read as a verdict on the contest, which a mixed view is not */
   const nonDefault = (liftedN || 0) > 0 || (cur ? hidden.has(cur.year) : false);
   const peer = nowM != null ? bandRows.find((r) => r.m === nowM) : null;
-  const subj = M.key === "net" || M.key === "ppmm" ? sitting(cur ? cur.pm : "")
+  const subj = M.key === "net" || M.key === "ppmm" || M.key === "pmlead" ? sitting(cur ? cur.pm : "")
     : M.key === "oppnet" ? sitting(cur ? cur.oppLead : "")
     : cur ? (isOpp ? D.PARTIES[cur.opp].name : D.PARTIES[cur.gov].name) : "";
   const subjColor = cur ? (isOpp ? D.PARTIES[cur.opp].color : cur.color) : "var(--ink)";
@@ -311,24 +315,13 @@ const combSeries = (c) => {
     return c.opp === "lnp" && c.raw.oppr[i] != null && on != null ? +(c.raw.oppr[i] + on).toFixed(2) : null;
   });
 };
-/* The PM's net approval lead over his strongest rival is a summary-table-only
-   measure, derived like the combined primary above it: net approval less the
-   higher of the opposition leader's and Hanson's net at that month. No past
-   term rated Hanson (raw.han null-pads), so every past month is against the
-   opposition leader alone - and her change anchor only joins the max for a
-   term whose sparse series ever read her. */
-const rdHanRead = (c) => (c.raw.han || []).some((v) => v != null);
-const pmleadSeries = (c) => {
-  const han = c.raw.han || [];
-  return c.raw.months.map((_, i) => {
-    const rival = Math.max(c.raw.oppnet[i] != null ? c.raw.oppnet[i] : -Infinity, han[i] != null ? han[i] : -Infinity);
-    return c.raw.net[i] != null && rival !== -Infinity ? +(c.raw.net[i] - rival).toFixed(2) : null;
-  });
-};
-const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : key === "pmlead" ? pmleadSeries(c) : (c.raw[key] || []));
-const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp")
-  : key === "pmlead" ? cycBase(c, "net") - (rdHanRead(c) ? Math.max(cycBase(c, "oppnet"), cycBase(c, "han")) : cycBase(c, "oppnet"))
-  : cycBase(c, key));
+/* The PM's net approval lead over his strongest rival SHIPS from gen-data
+   as the pmlead grid - net approval less the higher of the opposition
+   leader's and Hanson's net at each aligned month, so the chart line and
+   every summary cell here are the one arithmetic (no past term rated
+   Hanson, so every past month is against the opposition leader alone). */
+const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : (c.raw[key] || []));
+const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key));
 /* the past terms at one month for one measure: the same pooled set the band
    draws, with who each value belongs to */
 function rdCycPeers(M, cycles, hidden, chg, m) {
@@ -637,18 +630,19 @@ function RdPastCycles(p) {
   Mby.ppmh = { key: "ppmm", leader: "pm", unit: "" };
   /* the PM's net approval lead over his strongest rival (user call
      2026-10-17): net less the higher of the opposition leader's and Hanson's
-     net - Hanson only ever figures in the sitting term, derived month by
-     month (pmleadSeries above), so past terms' rival is always the
-     opposition leader. leader:"pm" keeps the PM named on each past term. */
-  Mby.pmlead = { key: "pmlead", leader: "pm", unit: "" };
+     net - Hanson only ever figures in the sitting term. gen-data emits it as
+     the pmlead grid (its own full-width chart under the PM net card, slotting
+     into the summary table by the same key), so the card's line and this
+     row's cells are the one arithmetic and past terms' rival is always the
+     opposition leader. leader:"pm" keeps the PM named on each past term. The
+     extra fields are the chart's: the zero reference says even, the window
+     fits in tens. */
+  Mby.pmlead = { key: "pmlead", leader: "pm", unit: "", step: 10, refAbs: 0, refAbsLabel: "even",
+                 sub: "The prime minister’s net approval less his strongest rival’s" };
   /* a half-measured month never becomes a half-total: the combined now
      figure renders a dash when either party's is missing */
   const endOfKey = (c, key) => (key === "comb"
     ? (c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null)
-    : key === "pmlead" ? (() => {
-        const rival = Math.max(c.end.oppnet != null ? c.end.oppnet : -Infinity, c.end.han != null ? c.end.han : -Infinity);
-        return c.end.net != null && rival !== -Infinity ? +(c.end.net - rival).toFixed(1) : null;
-      })()
     : c.end[key]);
   const curOfS = (key, c2) => { const v = endOfKey(cur, key); return v == null ? null : (c2 ? v - cycBaseOf(cur, key) : v); };
   const peersOfS = (key, hid, c2) => rdCycPeers(Mby[key], cycles, hid, c2, m);
@@ -1502,6 +1496,7 @@ function RdPastCycles(p) {
              tools={chipBand(2)}>
         {leadStory && <RdHed head={leadStory.head} dek={leadStory.dek} />}
         <div className="rd-cyc-one">{chart("net", false)}</div>
+        <div className="rd-cyc-one">{chart("pmlead", false)}</div>
         <div className="rd-cyc-two rd-cyc-subs">
           <div><RdSub head="Preferred prime minister" dek="The prime minister’s lead over the opposition leader on the question of who would make the better PM. Asked since 1984." />{chart("ppmm", true, "leaders")}</div>
           <div><RdSub head="Opposition leader’s net approval" dek="Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972." />{chart("oppnet", true, "leaders")}</div>
@@ -1509,7 +1504,7 @@ function RdPastCycles(p) {
         <RdEventList list={PAIRS.leaders.list} inline onPick={pickEvOf.leaders} openKey={openKeyOf(["ppmm", "oppnet"])} />
         {bandKey("leaders")}
         <RdFoot how={{ term: "approval", from: "Past cycles" }}>
-          Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.
+          Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out. The prime minister’s lead rates him against the stronger of the opposition leader and Pauline Hanson at each reading - Hanson only from this term’s polls, so every earlier term’s rival is the opposition leader.
         </RdFoot>
       </RdSec>
       {accuracy}

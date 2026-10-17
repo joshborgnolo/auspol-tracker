@@ -6208,6 +6208,35 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     const i = s.months.indexOf(m);
     return i >= 0 ? s.obs[i] : false;
   });
+  /* The PM's net approval LEAD over his strongest rival, as a series in
+     its own right - the summary table's "PM net approval, lead" measure
+     promoted to a Past-cycles line (user call 2026-10-17): per month,
+     net approval less the higher of the opposition leader's and Hanson's
+     net, computed ON the aligned month grids so the card's line and
+     every summary cell are the same arithmetic everywhere on the page.
+     Hanson joins where her sparse series read her; no past term rated
+     her, so every past term's rival is its opposition leader alone. A
+     held leg (a month the leader went unrated) still pairs, exactly as
+     the other aligned grids hold their values. The per-wave dots beside
+     the line are one wave's own pair difference and can sit off it in a
+     mixed-house month - the usual dots-vs-line split, not a bug. */
+  const netA = align(net), oppA = align(opp), hanA = sparseSeries(hanPts, months, cap);
+  const leadGrid = months.map((m, i) => {
+    const n = netA[i], o = oppA[i], h = hanA[i];
+    const rival = Math.max(o != null ? o : -Infinity, h != null ? h : -Infinity);
+    return n != null && rival !== -Infinity ? +(n - rival).toFixed(2) : null;
+  });
+  /* a lead month was polled when both legs were - where either flag is
+     missing the "measured" gate fails. The pairing eras and single-pair
+     name ride one pseudo point per measured month (ppmErasFor buckets
+     points by month and eras splice on the union of both offices'
+     handover dates, like preferred PM's), and its iso need only invert
+     monthsSince - a boundary month's pairing is whoever held office on
+     the month's nominal date. */
+  const leadObs = alignObs(net).map((b, i) => b && alignObs(opp)[i]);
+  const monthIso = (m) => new Date(Date.parse(c.eDate) + m * MS_MONTH * 86400000).toISOString().slice(0, 10);
+  const leadPts = months.map((m, i) =>
+    leadGrid[i] != null && leadObs[i] ? { m, v: leadGrid[i], iso: monthIso(m), n: 1, obs: true } : null).filter(Boolean);
   return {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: !!c.current,
     eDate: c.eDate,
@@ -6215,12 +6244,13 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
     oppr: oppr.vals,
     ppmm: align(ppmm),
+    pmlead: leadGrid,
     // the null-padded form align() can't produce alone: with no ONP readings
     // on record (2010/13), s.months is empty and align has nothing to index
     onp: onp.months.length ? align(onp) : months.map(() => null),
     obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp),
-           oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm) },
-    han: sparseSeries(hanPts, months, cap),
+           oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm), pmlead: leadObs },
+    han: hanA,
     // like Hanson's: this-term-only readings, sparse over the month grid
     ppmh: sparseSeries(ppmhPts, months, cap),
     netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
@@ -6229,6 +6259,10 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // pairing name for the single-line legend when the pairing never
     // changed inside the measured window (e.g. "Albanese v Dutton")
     ppmPair: ppmPts.length ? ppmPairName(c, ppmPts[0].iso) : null,
+    // the lead's own pairing splice and name, on the same union-of-splices
+    // grid as preferred PM's (the pairing changes when EITHER office does)
+    pmleadEras: ppmErasFor(c, leadPts, cap),
+    pmleadPair: leadPts.length ? ppmPairName(c, leadPts[0].iso) : null,
   };
 });
 
@@ -6251,6 +6285,11 @@ const CYCLE_DEFS = CYC_META.map((c) => {
       net: leaderNow.alb_net ? leaderNow.alb_net.v : null, oppnet: leaderNow.taylor_net ? leaderNow.taylor_net.v : null,
       han: leaderNow.hanson_net ? leaderNow.hanson_net.v : null, ppmm: ppmMarginNow ? ppmMarginNow.v : null,
       ppmh: ppmHMarginNow ? ppmHMarginNow.v : null,
+      /* the figure its chart opens on - the live pools' lead over the
+         stronger of the leader of the opposition and Hanson */
+      pmlead: leaderNow.alb_net && leaderNow.taylor_net
+        ? r1(leaderNow.alb_net.v - Math.max(leaderNow.taylor_net.v, leaderNow.hanson_net ? leaderNow.hanson_net.v : -Infinity))
+        : null,
     };
     /* Era runs are bucketed poll by poll, so a reading from the last days of
        a month can land one month past the term's latest (months since the
@@ -6278,6 +6317,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     endRuns("oppEras", now.oppnet);
     endRuns("netEras", now.net);
     endRuns("ppmEras", now.ppmm);
+    endRuns("pmleadEras", now.pmlead);
   }
 }
 
@@ -7488,13 +7528,16 @@ window.AUSPOL = (function () {
     ...(c.endRes ? { endRes: c.endRes } : {}),
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
     base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0], han: c.han[0],
-            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0], ppmh: c.ppmh[0] },
+            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0], ppmh: c.ppmh[0], pmlead: c.pmlead[0] },
     // han is sparse, so "end" is its last READING, not its last slot;
     // onp, ppmm and ppmh follow it — all grid as all-null on some cycles
     end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1], han: [...c.han].reverse().find((v) => v != null) ?? null,
            oppr: c.oppr[c.oppr.length - 1], onp: [...c.onp].reverse().find((v) => v != null) ?? null,
            ppmm: [...c.ppmm].reverse().find((v) => v != null) ?? null,
-           ppmh: [...c.ppmh].reverse().find((v) => v != null) ?? null },
+           ppmh: [...c.ppmh].reverse().find((v) => v != null) ?? null,
+           // grid-aligned like net, not held: the reverse-find is the cycle's
+           // last measured month, not a slot beyond it */
+           pmlead: [...c.pmlead].reverse().find((v) => v != null) ?? null },
     points: {
       tpp: c.months.map((m, i) => ({ x: m, y: c.tpp[i] })),
       primary: c.months.map((m, i) => ({ x: m, y: c.primary[i] })),
@@ -7505,11 +7548,13 @@ window.AUSPOL = (function () {
       onp: c.months.map((m, i) => ({ x: m, y: c.onp[i] })),
       ppmm: c.months.map((m, i) => ({ x: m, y: c.ppmm[i] })),
       ppmh: c.months.map((m, i) => ({ x: m, y: c.ppmh[i] })),
+      pmlead: c.months.map((m, i) => ({ x: m, y: c.pmlead[i] })),
     },
     raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs,
-           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm, ppmh: c.ppmh,
+           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm, ppmh: c.ppmh, pmlead: c.pmlead,
            ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}),
            ...(c.ppmEras ? { ppmEras: c.ppmEras } : {}), ...(c.ppmPair ? { ppmPair: c.ppmPair } : {}),
+           ...(c.pmleadEras ? { pmleadEras: c.pmleadEras } : {}), ...(c.pmleadPair ? { pmleadPair: c.pmleadPair } : {}),
            ...(c.tppEras ? { tppEras: c.tppEras } : {}) },
   }));
 
