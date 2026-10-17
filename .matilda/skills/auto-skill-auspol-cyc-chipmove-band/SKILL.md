@@ -1,6 +1,6 @@
 ---
 name: auspol-cyc-chipmove-band
-description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"; chips ~80% + cancellable sitting-term × 2026-10-02 after user: "reduce the size of the cycles chips by 20% and add an x for Albanese 2025"; ~80% cut REVERSED same-day — type now tracks 70% of the section's `.rd-title` (22px→15.4px desktop / 19px→13.3px ≤640) on restored shared chrome (36px chip/44px tap, 34px ring-to-ring pills) after user: "you know that draw term size decrease you made? reverse it - align it to the size : 70% of the heading / eyebrow text"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the CANCELLABLE .rd-cc-cur sitting-term pill (its × is toggle(cur.year): term, line and figure off the board; the board's eye puts it back) and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures the wrapped band and GROWS --cyc-chip-pad + padding-top INLINE on #cyc-tpp when the stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the Summary foot). Probe .matilda/probe-cyc-chipmove.mjs.
+description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the vote-and-leadership sections' eyebrow dividers, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"; chips ~80% + cancellable sitting-term × 2026-10-02 after user: "reduce the size of the cycles chips by 20% and add an x for Albanese 2025"; ~80% cut REVERSED same-day — type now tracks 70% of the section's `.rd-title` (22px→15.4px desktop / 19px→13.3px ≤640) on restored shared chrome (36px chip/44px tap, 34px ring-to-ring pills) after user: "you know that draw term size decrease you made? reverse it - align it to the size : 70% of the heading / eyebrow text"; THREE-BAND RUNG 2026-10-17 — the same door rides the Primary vote and Leadership dividers beside Two-party's, user call: "add a 'Draw a past term' button above the 'Primary vote' header line, and the 'Leadership' header line, just like there already exists for the 2pp line" — one `chipBand(i)` renderer mounts on all three RdSecs, the ≤640px 60px floor selector triples to all three ids, and the refit iterates per-band refs): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the CANCELLABLE .rd-cc-cur sitting-term pill (its × is toggle(cur.year): term, line and figure off the board; the board's eye puts it back) and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures each wrapped band and GROWS --cyc-chip-pad + padding-top INLINE per section when its stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the previous section's foot). Probe .matilda/probe-cyc-chipmove.mjs.
 source: auto-skill
 extracted_at: '2026-10-01T13:50:56.926Z'
 ---
@@ -29,9 +29,9 @@ min-height/::after tap-cheat fall back to the SHARED base `.rd-chip` rule.
 | Piece | Where |
 |---|---|
 | CSS anchor recipe | `rd.css` ~:1590-1600 (`body.rd .rd-cyc-chipmove`, comment block above it) |
-| ≤640px headroom floor + label hide | `rd.css` :98-116 (`body.rd #cyc-tpp` + `.rd-cc-drawn .rd-cc-l` in the 640 block) — a FLOOR now, not the whole story |
-| JS headroom refit | `rd-cycles.jsx` `chipmoveRef` + `useLayoutEffect(fit)` right after the story-floor effect inside `RdPastCycles` (~:341-376); ref hung on the `<span className="rd-cyc-chipmove" ref={chipmoveRef}>` in the tools JSX |
-| Tools JSX (band contents) | `rd-cycles.jsx` ~:953 — `tools={…}` on `<RdSec id="cyc-tpp" …>` |
+| ≤640px headroom floor + label hide | `rd.css` :88-100 (`body.rd #cyc-tpp, body.rd #cyc-primary, body.rd #cyc-leaders` + `.rd-cc-drawn .rd-cc-l` in the 640 block — the floor selector TRIPLED 2026-10-17 for the three-band rung, NOT a `:has()` rule, which would bleed onto Summary's nav tools) — a FLOOR now, not the whole story |
+| JS headroom refit | `rd-cycles.jsx` `chipmoveEls`/`chipmoveRef(i)` + `useLayoutEffect(fit)` right after the story-floor effect inside `RdPastCycles` (~:509-541); `fitBand(band)` runs per band — since 2026-10-17 one ref per band (`chipmoveEls.current[0..2]`), each hung on its `<span className="rd-cyc-chipmove" ref={chipmoveRef(i)}>`; the refit clears/reads/grows each banded section's OWN inline pair |
+| Tools JSX (band contents) | `rd-cycles.jsx` `chipBand(i)` helper (~:1419, extracted 2026-10-17 from the once-inline cyc-tpp tools JSX) → `tools={chipBand(0/1/2)}` on `<RdSec id="cyc-tpp" | "cyc-primary" | "cyc-leaders" …>`; all three bands render from the SAME shared (`board`, `lifted`, `hidden`) state, so one chip toggles the one board and a lift mirrors identical pills into all three bands |
 | Drawn-row styling | `rd.css` (.rd-cc-drawn no longer has `margin-top: 12px`; row gap 8px) |
 | Band type anchor (70% of `.rd-title`) | `rd.css`: `.rd-cyc-chipmove .rd-chip` carries ONLY `font-size: 15.4px` (22px title × 0.7); `.rd-cc-pill` 34px/15.4px/×-26px/gap-8/radius-17/pad 12·4 restored; both flip to `13.3px` (19px × 0.7) in the ≤640px block (the shared base `.rd-chip` 36px/44px-tap chrome returns untouched — never shrink it at source) — REVERSES the e3fd388 ~80% cut |
 | Sitting-term × / restore | Tools JSX cur pill button (`toggle(cur.year)`); board eye gate `{!c.current && …}` REMOVED (~:880); board main `aria-pressed={drawn || (c.current && !off)}`; head count `… - (hidden.has(cur.year) ? 0 : 1)`; `setCompare` `curHidden` snapshot (~:479) |
@@ -158,7 +158,20 @@ sane — while one pill row stays ~78px and clears the Summary foot above
   growing UP out of the section's fixed headroom is exactly the bug the
   headroom refit below exists for.
 
-## The headroom refit (rd-cycles.jsx `chipmoveRef` + `fit()`)
+## The headroom refit (rd-cycles.jsx `chipmoveEls`/`fitBand()`)
+
+THREE-BAND RUNG (2026-10-17): the same machinery now runs once per banded
+section — user call "add a 'Draw a past term' button above the 'Primary
+vote' header line, and the 'Leadership' header line, just like there
+already exists for the 2pp line". `chipmoveEls` holds one ref per band
+(`chipmoveRef(i)`, i = mount order tpp/primary/leaders), the layout
+effect's `fit()` maps every live ref through `fitBand(band)`, and the
+ResizeObserver watches each — everything else about the fit below is
+per-section and unchanged (it always derived the section from
+`band.closest(".rd-sec")` and measured `prev` as that section's own
+`previousElementSibling`, so generalising was the refs, not the maths).
+The single tpp-era band's original write-up follows; read every
+"#cyc-tpp" as "each banded section".
 
 The band is absolutely positioned — OUT OF FLOW — so once enough terms are
 drawn that the pill row wraps (a phone hits it at ~4 pills, a desktop at
@@ -249,6 +262,19 @@ d1a1d215's own grid), and JSX props evaluate eagerly, so a missing `lifted`
 would crash the `<RdCycleChart>` branch via `lifted.size`.
 
 ## Probe contracts (.matilda/probe-cyc-chipmove.mjs; 1440×960 / 820×900 / 390×844-touch)
+
+THREE-BAND RUNG PROOF (2026-10-17): the initial geometry pass loops
+#cyc-primary and #cyc-leaders over the same contract as #cyc-tpp (chip in
+that section's `.rd-eyebrow-tools`, band `position: absolute`, bottom
+12px above its own rule, flush with its own eyebrow's left edge, 70% type
+ladder, ~36px chrome, label regex); the lift case then asserts the SAME
+drawn row mirrors into both other bands (label text, pill count equal to
+tpp's, exactly one sitting-term pill each); the many-drawn rung asserts
+each of the three sections grew its own `--cyc-chip-pad` against its own
+previous sibling's content bottom when its pills wrap to ≥2 rows; and the
+clear rung asserts the inline pair + padding returned to the CSS floor on
+ALL THREE sections. Everything below is the single-band contract from the
+tpp era — still run verbatim on #cyc-tpp.
 
 - Geometry: `wrap.b ≈ ruleY − 12` (±1.6px) checked against the WRAP — not the
   chip — so the same assertion holds with pills in the band (min-height 34px

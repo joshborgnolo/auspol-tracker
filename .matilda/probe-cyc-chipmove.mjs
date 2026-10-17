@@ -101,6 +101,39 @@ async function run(W, H, touch) {
   if (!/(above|below) average/.test(g.svg)) fails.push(tag + ": default tpp chart lost the above/below-average reading");
   if (!/Labor/.test(g.svg)) fails.push(tag + ": default tpp chart lost the sitting term's figure ('Labor …' not found in the svg)");
 
+  /* 2026-10-17 (user call): the same door rides the Primary vote and
+     Leadership dividers - each section carries a chip band that floats
+     12px above its own rule, flush with its own eyebrow's left edge */
+  for (const secId of ["cyc-primary", "cyc-leaders"]) {
+    const h = await page.evaluate((id) => {
+      const q = (s) => document.querySelector(s);
+      const chip = q("#" + id + " .rd-cyc-chipmove .rd-chip");
+      const wrap = q("#" + id + " .rd-cyc-chipmove");
+      const eb = q("#" + id + " .rd-eyebrow");
+      const tools = q("#" + id + " .rd-eyebrow-tools");
+      if (!chip || !wrap || !eb) return { missing: true };
+      const r = (el) => el.getBoundingClientRect();
+      const ebs = getComputedStyle(eb);
+      return {
+        chipInTools: !!(tools && chip.closest(".rd-eyebrow-tools") === tools),
+        gap: (r(eb).top + parseFloat(ebs.borderTopWidth) / 2) - r(wrap).bottom,
+        chipL: r(chip).left, ebL: r(eb).left,
+        pos: getComputedStyle(wrap).position,
+        fs: getComputedStyle(chip).fontSize,
+        chipH: r(chip).bottom - r(chip).top,
+        label: chip.textContent.replace(/\s+/g, " ").trim(),
+      };
+    }, secId);
+    if (h.missing) { fails.push(tag + ": " + secId + " has no chip band over its divider"); continue; }
+    if (!h.chipInTools) fails.push(tag + ": " + secId + " chip is not in its eyebrow tools slot");
+    if (Math.abs(h.gap - 12) > 1.6) fails.push(tag + ": " + secId + " band bottom sits " + h.gap.toFixed(1) + "px above its divider, not ~12px");
+    if (Math.abs(h.chipL - h.ebL) > 1.5) fails.push(tag + ": " + secId + " chip left edge " + h.chipL.toFixed(1) + " != eyebrow left edge " + h.ebL.toFixed(1));
+    if (h.pos !== "absolute") fails.push(tag + ": " + secId + " .rd-cyc-chipmove is not absolutely positioned");
+    if (h.fs !== wantFs) fails.push(tag + ": " + secId + " chip reads " + h.fs + ", not the 70%-of-title " + wantFs);
+    if (Math.abs(h.chipH - 36) > 1) fails.push(tag + ": " + secId + " chip is " + h.chipH.toFixed(1) + "px tall, not the shared ~36px");
+    if (!/^＋ Draw a( past)? term$/.test(h.label)) fails.push(tag + ": " + secId + " unexpected chip label '" + h.label + "'");
+  }
+
   /* toggle round-trip setup + the lift case: at <=900px the board is a
      FIXED bottom sheet hugging up to 75vh of the viewport (rd.css media
      block), so the chip/title must sit in the exposed top band: anchor the
@@ -144,6 +177,18 @@ async function run(W, H, touch) {
       cur: p.classList.contains("rd-cc-cur"),
       btn: !!p.querySelector("button"),
     })) : [];
+    /* the band now sits on all three vote-and-leadership sections
+       (2026-10-17 user call): a lift must raise the SAME drawn row in
+       Primary vote's and Leadership's bands too */
+    const mirror = {};
+    for (const id of ["cyc-primary", "cyc-leaders"]) {
+      const d = q("#" + id + " .rd-cyc-chipmove .rd-cc-drawn");
+      mirror[id] = d ? {
+        text: d.textContent.replace(/\s+/g, " ").trim(),
+        pills: d.querySelectorAll(".rd-cc-pill").length,
+        cur: d.querySelectorAll(".rd-cc-pill.rd-cc-cur").length,
+      } : null;
+    }
     const firstPill = drawn ? drawn.querySelector(".rd-cc-pill") : null;
     return {
       drawn: !!drawn,
@@ -160,6 +205,7 @@ async function run(W, H, touch) {
       ebLeft: r(eb).left,
       wrapT: r(wrap).top,
       footB: (() => { const f = q("#cyc-summary .rd-foot"); return f ? r(f).bottom : null; })(),
+      mirror,
     };
   });
   if (!afterLift.drawn) fails.push(tag + ": lifting " + picked + " did not raise the drawn-over-the-band row up with the chip");
@@ -188,6 +234,15 @@ async function run(W, H, touch) {
       if (!cur[0].btn) fails.push(tag + ": the sitting-term pill carries no cancel cross - the reader asked for one ('add an x for Albanese 2025')");
     }
     if (Math.abs(afterLift.gap - 12) > 1.6) fails.push(tag + ": with pills up, band bottom sits " + afterLift.gap.toFixed(1) + "px above the divider, not ~12px");
+  }
+  /* the lift mirrors into the other two vote-and-leadership bands: same
+     drawn row, same pills, its one sitting-term pill */
+  for (const id of ["cyc-primary", "cyc-leaders"]) {
+    const m = afterLift.mirror[id];
+    if (!m) { fails.push(tag + ": " + id + " raised no drawn row of its own when " + picked + " was lifted"); continue; }
+    if (!/Drawn over the band/.test(m.text)) fails.push(tag + ": " + id + " drawn row lost its 'Drawn over the band' label");
+    if (m.pills !== afterLift.pills.length) fails.push(tag + ": " + id + " carries " + m.pills + " pills vs the " + afterLift.pills.length + " in Two-party's band");
+    if (m.cur !== 1) fails.push(tag + ": " + id + " carries " + m.cur + " sitting-term pills, not exactly one");
   }
   if (/Government ahead|Opposition ahead/.test(afterLift.svg)) fails.push(tag + ": the ahead pair survived a term being drawn over the band");
   if (/(above|below) average/.test(afterLift.svg)) fails.push(tag + ": the above/below-average reading survived a term being drawn over the band");
@@ -240,6 +295,23 @@ async function run(W, H, touch) {
     const ebs = getComputedStyle(eb);
     const r = (el) => el.getBoundingClientRect();
     const rows = drawn ? (() => { const tops = new Set(); drawn.querySelectorAll(".rd-cc-pill").forEach((p) => tops.add(Math.round(p.getBoundingClientRect().top))); return tops.size; })() : 0;
+    /* the same six lifted terms stack in the OTHER two bands too - grow
+       each section's headroom against its own previous sibling (tpp's
+       tail for Primary vote, Primary's tail for Leadership), measured
+       the way the refit reads it (prev rect bottom less its padding) */
+    const others = {};
+    for (const [id, prevId] of [["cyc-primary", "cyc-tpp"], ["cyc-leaders", "cyc-primary"]]) {
+      const s = q("#" + id);
+      const w = q("#" + id + " .rd-cyc-chipmove");
+      const p = q("#" + prevId);
+      const d = q("#" + id + " .rd-cc-drawn");
+      others[id] = {
+        varPad: s.style.getPropertyValue("--cyc-chip-pad"),
+        wrapT: w ? r(w).top : null,
+        prevB: p ? r(p).bottom - (parseFloat(getComputedStyle(p).paddingBottom) || 0) : null,
+        rows: d ? (() => { const tops = new Set(); d.querySelectorAll(".rd-cc-pill").forEach((x) => tops.add(Math.round(x.getBoundingClientRect().top))); return tops.size; })() : 0,
+      };
+    }
     return {
       rows,
       padTop: parseFloat(getComputedStyle(sec).paddingTop),
@@ -248,6 +320,7 @@ async function run(W, H, touch) {
       wrapB: r(wrap).bottom,
       ruleY: r(eb).top + parseFloat(ebs.borderTopWidth) / 2,
       footB: foot ? r(foot).bottom : null,
+      others,
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
@@ -255,6 +328,12 @@ async function run(W, H, touch) {
   if (afterMany.wrapT < (afterMany.footB == null ? -Infinity : afterMany.footB - 0.6)) fails.push(tag + ": with six terms drawn, band top " + afterMany.wrapT.toFixed(1) + " climbs over the Summary foot (bottom " + (afterMany.footB == null ? "n/a" : afterMany.footB.toFixed(1)) + ")");
   if (afterMany.rows >= 2 && !afterMany.varPad) fails.push(tag + ": the drawn pills wrapped to " + afterMany.rows + " rows but --cyc-chip-pad was never raised inline");
   if (Math.abs(afterMany.ruleY - afterMany.wrapB - 12) > 1.6) fails.push(tag + ": with six terms drawn, band bottom sits " + (afterMany.ruleY - afterMany.wrapB).toFixed(1) + "px above the divider, not ~12px");
+  for (const id of ["cyc-primary", "cyc-leaders"]) {
+    const o = afterMany.others[id];
+    if (o.wrapT == null) { fails.push(tag + ": " + id + " lost its chip band in the many-drawn case"); continue; }
+    if (o.prevB != null && o.wrapT < o.prevB - 0.6) fails.push(tag + ": " + id + " band top " + o.wrapT.toFixed(1) + " climbs over its previous section's content (bottom " + o.prevB.toFixed(1) + ") with six terms drawn");
+    if (o.rows >= 2 && !o.varPad) fails.push(tag + ": " + id + " pills wrapped to " + o.rows + " rows but its --cyc-chip-pad was never raised inline");
+  }
   if (afterMany.overflow > 0) fails.push(tag + ": six drawn terms caused horizontal page overflow (" + afterMany.overflow + "px)");
   /* and the fit lets go again when the board is cleared */
   await page.evaluate(() => {
@@ -263,16 +342,25 @@ async function run(W, H, touch) {
   });
   await sleep(400);
   const afterClear = await page.evaluate(() => {
-    const sec = document.querySelector("#cyc-tpp");
-    return {
-      drawn: !!document.querySelector("#cyc-tpp .rd-cc-drawn"),
-      varPad: sec.style.getPropertyValue("--cyc-chip-pad"),
-      padTop: parseFloat(getComputedStyle(sec).paddingTop),
-    };
+    const secs = {};
+    for (const id of ["cyc-tpp", "cyc-primary", "cyc-leaders"]) {
+      const sec = document.querySelector("#" + id);
+      secs[id] = {
+        drawn: !!document.querySelector("#" + id + " .rd-cc-drawn"),
+        varPad: sec.style.getPropertyValue("--cyc-chip-pad"),
+        padTop: parseFloat(getComputedStyle(sec).paddingTop),
+      };
+    }
+    secs["cyc-tpp"].drawnAny = !!document.querySelector(".rd-cc-drawn");
+    return secs;
   });
-  if (afterClear.drawn) fails.push(tag + ": unlifting every pill did not drop the drawn row");
-  if (afterClear.varPad) fails.push(tag + ": --cyc-chip-pad still pinned at " + afterClear.varPad + " after every drawn term returned");
-  if (afterClear.padTop > 60.5) fails.push(tag + ": #cyc-tpp padding stayed grown at " + afterClear.padTop + "px after every drawn term returned");
+  if (afterClear["cyc-tpp"].drawnAny) fails.push(tag + ": unlifting every pill did not drop the drawn row");
+  for (const id of ["cyc-tpp", "cyc-primary", "cyc-leaders"]) {
+    const s = afterClear[id];
+    if (s.drawn) fails.push(tag + ": " + id + " kept its drawn row after every term returned");
+    if (s.varPad) fails.push(tag + ": " + id + " --cyc-chip-pad still pinned at " + s.varPad + " after every drawn term returned");
+    if (s.padTop > 60.5) fails.push(tag + ": " + id + " padding stayed grown at " + s.padTop + "px after every drawn term returned");
+  }
 
   /* the sitting term's pill carries its own cross now (reader: "add an x
      for Albanese 2025 - currently it's not cancellable"): clicking it takes

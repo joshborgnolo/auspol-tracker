@@ -3390,7 +3390,7 @@ body.rd.dark {
 }
 @media (max-width: 640px) {
   body.rd { --rd-sec-pad: 36px; }
-  body.rd #cyc-tpp { --cyc-chip-pad: 60px; padding-top: 60px; }
+  body.rd #cyc-tpp, body.rd #cyc-primary, body.rd #cyc-leaders { --cyc-chip-pad: 60px; padding-top: 60px; }
   body.rd .rd-cyc-chipmove .rd-cc-drawn .rd-cc-l { display: none; }
 }
 body.rd .page {
@@ -123534,11 +123534,13 @@ function RdPastCycles(p) {
     if (box) [...box.children].forEach(c => ro.observe(c));
     return () => ro.disconnect();
   });
-  const chipmoveRef = React.useRef(null);
+  const chipmoveEls = React.useRef([]);
+  const chipmoveRef = i => el => {
+    if (el) chipmoveEls.current[i] = el;
+  };
   React.useLayoutEffect(() => {
-    const fit = () => {
-      const band = chipmoveRef.current;
-      const sec = band && band.closest(".rd-sec");
+    const fitBand = band => {
+      const sec = band.closest(".rd-sec");
       const prev = sec && sec.previousElementSibling;
       if (!sec || !prev) return;
       sec.style.removeProperty("--cyc-chip-pad");
@@ -123552,11 +123554,12 @@ function RdPastCycles(p) {
         sec.style.paddingTop = need + "px";
       }
     };
+    const fit = () => chipmoveEls.current.filter(Boolean).forEach(fitBand);
     fit();
     window.addEventListener("resize", fit);
-    if (typeof ResizeObserver === "undefined" || !chipmoveRef.current) return () => window.removeEventListener("resize", fit);
+    if (typeof ResizeObserver === "undefined") return () => window.removeEventListener("resize", fit);
     const ro = new ResizeObserver(fit);
-    ro.observe(chipmoveRef.current);
+    chipmoveEls.current.filter(Boolean).forEach(el => ro.observe(el));
     return () => {
       window.removeEventListener("resize", fit);
       ro.disconnect();
@@ -124757,6 +124760,54 @@ function RdPastCycles(p) {
     kind: "ring"
   }), "Each term\u2019s election results"));
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
+  const chipBand = i => React.createElement("span", {
+    className: "rd-cyc-chipmove",
+    ref: chipmoveRef(i)
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-chip",
+    "aria-expanded": board.open,
+    onClick: () => setBoard(b => b.open ? {
+      open: false,
+      sheet: null
+    } : {
+      open: true,
+      sheet: null
+    })
+  }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"), liftedList.length > 0 && React.createElement("span", {
+    className: "rd-cc-drawn"
+  }, React.createElement("span", {
+    className: "rd-cc-l"
+  }, "Drawn over the band"), liftedList.map(c => React.createElement("span", {
+    key: c.year,
+    className: "rd-cc-pill",
+    style: {
+      borderColor: c.color
+    }
+  }, React.createElement("span", {
+    className: "rd-cc-rule",
+    style: {
+      background: c.color
+    }
+  }), c.year, " ", pmNames(c), React.createElement("button", {
+    type: "button",
+    "aria-label": "Return " + c.year + " to the band",
+    onClick: () => unlift(c.year)
+  }, "\xD7"))), !hidden.has(cur.year) && React.createElement("span", {
+    className: "rd-cc-pill rd-cc-cur",
+    style: {
+      borderColor: cur.color
+    }
+  }, React.createElement("span", {
+    className: "rd-cc-rule",
+    style: {
+      background: cur.color
+    }
+  }), cur.year, " ", pmNames(cur), React.createElement("button", {
+    type: "button",
+    "aria-label": "Take the " + cur.year + " term off the board",
+    onClick: () => toggle(cur.year)
+  }, "\xD7"))));
   const accuracy = React.useMemo(() => React.createElement(AccuracyPanel, null), []);
   return React.createElement("div", {
     className: "view view-cycles rd-cycles"
@@ -124820,54 +124871,7 @@ function RdPastCycles(p) {
     id: "cyc-tpp",
     title: "Two-party preferred",
     meta: "Implied from each poll\u2019s primary votes, on the flows counted at the election that opened its term",
-    tools: React.createElement("span", {
-      className: "rd-cyc-chipmove",
-      ref: chipmoveRef
-    }, React.createElement("button", {
-      type: "button",
-      className: "rd-chip",
-      "aria-expanded": board.open,
-      onClick: () => setBoard(b => b.open ? {
-        open: false,
-        sheet: null
-      } : {
-        open: true,
-        sheet: null
-      })
-    }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"), liftedList.length > 0 && React.createElement("span", {
-      className: "rd-cc-drawn"
-    }, React.createElement("span", {
-      className: "rd-cc-l"
-    }, "Drawn over the band"), liftedList.map(c => React.createElement("span", {
-      key: c.year,
-      className: "rd-cc-pill",
-      style: {
-        borderColor: c.color
-      }
-    }, React.createElement("span", {
-      className: "rd-cc-rule",
-      style: {
-        background: c.color
-      }
-    }), c.year, " ", pmNames(c), React.createElement("button", {
-      type: "button",
-      "aria-label": "Return " + c.year + " to the band",
-      onClick: () => unlift(c.year)
-    }, "\xD7"))), !hidden.has(cur.year) && React.createElement("span", {
-      className: "rd-cc-pill rd-cc-cur",
-      style: {
-        borderColor: cur.color
-      }
-    }, React.createElement("span", {
-      className: "rd-cc-rule",
-      style: {
-        background: cur.color
-      }
-    }), cur.year, " ", pmNames(cur), React.createElement("button", {
-      type: "button",
-      "aria-label": "Take the " + cur.year + " term off the board",
-      onClick: () => toggle(cur.year)
-    }, "\xD7"))))
+    tools: chipBand(0)
   }, tppStory && React.createElement(RdHed, {
     head: tppStory.head,
     dek: tppStory.dek
@@ -124881,7 +124885,8 @@ function RdPastCycles(p) {
   }, "Every line is the implied two-party figure: each poll\u2019s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The ", cur.year, " term follows ", govIn, "\u2019s main rival, as the headline does: the Coalition, unless One Nation runs ", govIn, " clearly closer after preferences. Each line\u2019s dotted start runs from the election\u2019s counted result to the term\u2019s first poll, and a past line\u2019s dotted end runs from its final poll to the closing election\u2019s count.")), React.createElement(RdSec, {
     id: "cyc-primary",
     title: "Primary vote",
-    meta: "First preferences for the governing party and the main opposition party"
+    meta: "First preferences for the governing party and the main opposition party",
+    tools: chipBand(1)
   }, primStory && React.createElement(RdHed, {
     head: primStory.head,
     dek: primStory.dek
@@ -124900,7 +124905,8 @@ function RdPastCycles(p) {
   }, "Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election\u2019s counted result to the term\u2019s first poll; the dotted end of a past line runs from its final poll to the closing election\u2019s count.")), React.createElement(RdSec, {
     id: "cyc-leaders",
     title: "Leadership",
-    meta: "Net approval since 1972 and preferred PM since 1984, for whoever held the office"
+    meta: "Net approval since 1972 and preferred PM since 1984, for whoever held the office",
+    tools: chipBand(2)
   }, leadStory && React.createElement(RdHed, {
     head: leadStory.head,
     dek: leadStory.dek

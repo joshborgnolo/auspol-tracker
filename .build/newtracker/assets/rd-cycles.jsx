@@ -504,20 +504,24 @@ function RdPastCycles(p) {
     if (box) [...box.children].forEach((c) => ro.observe(c));
     return () => ro.disconnect();
   });
-  /* The Draw-a-term band floats absolutely, out of flow - left alone a
-     tall stack of drawn pills grows up over the previous section's foot
-     instead of lengthening the page. Keep #cyc-tpp's headroom at least as
-     tall as the band, its 12px of air above the rule and an 8px spare
-     under whatever ends the section above: the fit clears its inline
-     work, reads the CSS floor (56/60px media-block default) back as the
-     base, and re-applies only when the measured band needs more. The
-     observer catches the pill rows wrapping and unwrapping; the resize
-     listener catches the 640px floor swap. */
-  const chipmoveRef = React.useRef(null);
+  /* The Draw-a-term bands float absolutely, out of flow - left alone a
+     tall stack of drawn pills grows up over its section's predecessor
+     instead of lengthening the page. One band now floats over each
+     vote-and-leadership section's divider (Two-party's since the band's
+     first day; Primary vote's and Leadership's joined 2026-10-17, the
+     user asking for the same door above those two header lines), so the
+     refit takes each band in turn: keep every banded section's headroom
+     at least as tall as its band, its 12px of air above the rule and an
+     8px spare under whatever ends the section above - each fit clears its
+     own inline work, reads the CSS floor (56/60px media-block default)
+     back as the base, and re-applies only when the measured band needs
+     more. The observer catches the pill rows wrapping and unwrapping; the
+     resize listener catches the 640px floor swap. */
+  const chipmoveEls = React.useRef([]);
+  const chipmoveRef = (i) => (el) => { if (el) chipmoveEls.current[i] = el; };
   React.useLayoutEffect(() => {
-    const fit = () => {
-      const band = chipmoveRef.current;
-      const sec = band && band.closest(".rd-sec");
+    const fitBand = (band) => {
+      const sec = band.closest(".rd-sec");
       const prev = sec && sec.previousElementSibling;
       if (!sec || !prev) return;
       sec.style.removeProperty("--cyc-chip-pad");
@@ -531,11 +535,12 @@ function RdPastCycles(p) {
         sec.style.paddingTop = need + "px";
       }
     };
+    const fit = () => chipmoveEls.current.filter(Boolean).forEach(fitBand);
     fit();
     window.addEventListener("resize", fit);
-    if (typeof ResizeObserver === "undefined" || !chipmoveRef.current) return () => window.removeEventListener("resize", fit);
+    if (typeof ResizeObserver === "undefined") return () => window.removeEventListener("resize", fit);
     const ro = new ResizeObserver(fit);
-    ro.observe(chipmoveRef.current);
+    chipmoveEls.current.filter(Boolean).forEach((el) => ro.observe(el));
     return () => { window.removeEventListener("resize", fit); ro.disconnect(); };
   }, []);
   const boardRef = React.useRef(null);
@@ -1412,6 +1417,38 @@ function RdPastCycles(p) {
   );
   /* the list reads as one sentence, "and" before the last and no commas */
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
+  /* The Draw-a-term chip and its drawn-over-the-band pills hang over each
+     vote-and-leadership section's divider (user call 2026-10-17: the same
+     door above the Primary vote and Leadership header lines as Two-party's).
+     One board serves all three chips; the i-th band's own ref feeds the
+     chipmove headroom refit above. */
+  const chipBand = (i) => (
+    <span className="rd-cyc-chipmove" ref={chipmoveRef(i)}>
+      <button type="button" className="rd-chip" aria-expanded={board.open} onClick={() => setBoard((b) => (b.open ? { open: false, sheet: null } : { open: true, sheet: null }))}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
+      {liftedList.length > 0 && (
+        <span className="rd-cc-drawn">
+          <span className="rd-cc-l">Drawn over the band</span>
+          {liftedList.map((c) => (
+            <span key={c.year} className="rd-cc-pill" style={{ borderColor: c.color }}>
+              <span className="rd-cc-rule" style={{ background: c.color }}></span>{c.year} {pmNames(c)}
+              <button type="button" aria-label={"Return " + c.year + " to the band"} onClick={() => unlift(c.year)}>×</button>
+            </span>
+          ))}
+          {/* the sitting term draws over the band too (it was never IN the
+              band to lift out of) - it says so as an unliftable pill; only
+              not at all on the board when the reader has hidden its term.
+              Its cross takes the term off the board like any other's
+              (it comes back from the board's own eye) */}
+          {!hidden.has(cur.year) && (
+            <span className="rd-cc-pill rd-cc-cur" style={{ borderColor: cur.color }}>
+              <span className="rd-cc-rule" style={{ background: cur.color }}></span>{cur.year} {pmNames(cur)}
+              <button type="button" aria-label={"Take the " + cur.year + " term off the board"} onClick={() => toggle(cur.year)}>×</button>
+            </span>
+          )}
+        </span>
+      )}
+    </span>
+  );
   /* the final polls' record answers to none of the controls above it, so it
      is made once and handed back unchanged: React skips an element it has
      already drawn, and a Level/Change press stops redrawing the whole panel */
@@ -1443,31 +1480,7 @@ function RdPastCycles(p) {
         </div>
       </section>
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"
-             tools={<span className="rd-cyc-chipmove" ref={chipmoveRef}>
-               <button type="button" className="rd-chip" aria-expanded={board.open} onClick={() => setBoard((b) => (b.open ? { open: false, sheet: null } : { open: true, sheet: null }))}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
-               {liftedList.length > 0 && (
-                 <span className="rd-cc-drawn">
-                   <span className="rd-cc-l">Drawn over the band</span>
-                   {liftedList.map((c) => (
-                     <span key={c.year} className="rd-cc-pill" style={{ borderColor: c.color }}>
-                       <span className="rd-cc-rule" style={{ background: c.color }}></span>{c.year} {pmNames(c)}
-                       <button type="button" aria-label={"Return " + c.year + " to the band"} onClick={() => unlift(c.year)}>×</button>
-                     </span>
-                   ))}
-                   {/* the sitting term draws over the band too (it was never IN the
-                       band to lift out of) - it says so as an unliftable pill; only
-                       not at all on the board when the reader has hidden its term.
-                       Its cross takes the term off the board like any other's
-                       (it comes back from the board's own eye) */}
-                   {!hidden.has(cur.year) && (
-                     <span className="rd-cc-pill rd-cc-cur" style={{ borderColor: cur.color }}>
-                       <span className="rd-cc-rule" style={{ background: cur.color }}></span>{cur.year} {pmNames(cur)}
-                       <button type="button" aria-label={"Take the " + cur.year + " term off the board"} onClick={() => toggle(cur.year)}>×</button>
-                     </span>
-                   )}
-                 </span>
-               )}
-             </span>}>
+             tools={chipBand(0)}>
         {tppStory && <RdHed head={tppStory.head} dek={tppStory.dek} />}
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
         {bandKey("tpp")}
@@ -1475,7 +1488,8 @@ function RdPastCycles(p) {
           Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows {govIn}’s main rival, as the headline does: the Coalition, unless One Nation runs {govIn} clearly closer after preferences. Each line’s dotted start runs from the election’s counted result to the term’s first poll, and a past line’s dotted end runs from its final poll to the closing election’s count.
         </RdFoot>
       </RdSec>
-      <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party">
+      <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party"
+             tools={chipBand(1)}>
         {primStory && <RdHed head={primStory.head} dek={primStory.dek} />}
         <div className="rd-cyc-two">{chart("primary", true, "primary")}{chart("oppr", true, "primary")}</div>
         <RdEventList list={PAIRS.primary.list} inline onPick={pickEvOf.primary} openKey={openKeyOf(["primary", "oppr"])} />
@@ -1484,7 +1498,8 @@ function RdPastCycles(p) {
           Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election’s counted result to the term’s first poll; the dotted end of a past line runs from its final poll to the closing election’s count.
         </RdFoot>
       </RdSec>
-      <RdSec id="cyc-leaders" title="Leadership" meta="Net approval since 1972 and preferred PM since 1984, for whoever held the office">
+      <RdSec id="cyc-leaders" title="Leadership" meta="Net approval since 1972 and preferred PM since 1984, for whoever held the office"
+             tools={chipBand(2)}>
         {leadStory && <RdHed head={leadStory.head} dek={leadStory.dek} />}
         <div className="rd-cyc-one">{chart("net", false)}</div>
         <div className="rd-cyc-two rd-cyc-subs">
