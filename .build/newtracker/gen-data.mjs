@@ -5687,9 +5687,16 @@ const CYC_META = JUR ? jurCycles() : [
      tppEra-tagged rows), not anything Morgan itself published — the method
      note lives in cyclePollBases. ePrim/eTpp are the governing side's
      official result, filled in from the elections table below the array.
-     The 1969 row is the trial extension of that pattern past 1972; its
-     approval bucket stays empty (no Gallup-audited PM ratings this far
-     back), which the approval consumers tolerate. */
+     The 1969 row was the trial extension of that pattern past 1972; the
+     1961, 1963 and 1966 rows are the batch extension past it. Approval
+     buckets stay empty this far back (no Gallup-audited PM ratings),
+     which the approval consumers tolerate. */
+  { year: 1961, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Calwell", eDate: "1961-12-09", src: 1963, appr: 1961 },
+  { year: 1963, gov: "lnp", opp: "alp", pm: "Menzies → Holt", lead: "Menzies", oppLead: "Calwell", eDate: "1963-11-30", src: 1966, appr: 1963,
+    pmSpl: { iso: "1966-01-26", names: ["Menzies", "Holt"] } },
+  { year: 1966, gov: "lnp", opp: "alp", pm: "Holt → McEwen → Gorton", lead: "Holt", oppLead: "Calwell → Whitlam", eDate: "1966-11-26", src: 1969, appr: 1966,
+    pmSpl: { isos: ["1967-12-19", "1968-01-10"], names: ["Holt", "McEwen", "Gorton"] },
+    oppSpl: { iso: "1967-02-08", names: ["Calwell", "Whitlam"] } },
   { year: 1969, gov: "lnp", opp: "alp", pm: "Gorton → McMahon", lead: "Gorton", oppLead: "Whitlam", eDate: "1969-10-25", src: 1972, appr: 1969,
     pmSpl: { iso: "1971-03-10", names: ["Gorton", "McMahon"] } },
   { year: 1972, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "McMahon → Snedden", eDate: "1972-12-02", src: 1974, appr: 1972,
@@ -5926,7 +5933,7 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: nineteen past elections, each with a result to check the final
+   visible: twenty-one past elections, each with a result to check the final
    polls against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST

@@ -1,327 +1,565 @@
 {
-  "generatedAt": "2026-10-16T23:23:16.324Z",
+  "generatedAt": "2026-10-17T00:20:32.783Z",
   "inserted": [
     {
-      "where": "1972 1969-12-15 · Morgan",
+      "where": "1963 1962-02-15 · Morgan",
       "row": {
-        "date": "1969-12-15",
+        "date": "1962-02-15",
         "firm": "Morgan",
-        "lnp": 47,
-        "alp": 44,
+        "lnp": 44,
+        "alp": 52,
         "grn": null,
         "onp": null,
         "dem": null,
-        "dlp": 6,
-        "oth": 3,
-        "tpp_lnp": 53.1,
-        "tpp_alp": 46.9,
-        "tppEra": "1969"
+        "dlp": 4,
+        "oth": 0,
+        "tpp_lnp": 47.1,
+        "tpp_alp": 52.9,
+        "tppEra": "1961"
       }
     },
     {
-      "where": "1972 1970-02-15 · Morgan",
+      "where": "1963 1962-06-15 · Morgan",
       "row": {
-        "date": "1970-02-15",
-        "firm": "Morgan",
-        "lnp": 48,
-        "alp": 44,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 6,
-        "oth": 2,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1970-06-15 · Morgan",
-      "row": {
-        "date": "1970-06-15",
-        "firm": "Morgan",
-        "lnp": 47,
-        "alp": 45,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 6,
-        "oth": 2,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1970-08-31 · Morgan",
-      "row": {
-        "date": "1970-08-31",
-        "firm": "Morgan",
-        "lnp": 45,
-        "alp": 46,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 6,
-        "oth": 3,
-        "tpp_lnp": 51.1,
-        "tpp_alp": 48.9,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1971-03-10 · Morgan",
-      "row": {
-        "date": "1971-03-10",
+        "date": "1962-06-15",
         "firm": "Morgan",
         "lnp": 43,
-        "alp": 44,
+        "alp": 52,
         "grn": null,
         "onp": null,
         "dem": null,
-        "dlp": 10,
-        "oth": 3,
-        "tpp_lnp": 52,
-        "tpp_alp": 48,
-        "tppEra": "1969"
+        "dlp": 4,
+        "oth": 1,
+        "tpp_lnp": 46.6,
+        "tpp_alp": 53.4,
+        "tppEra": "1961"
       }
     },
     {
-      "where": "1972 1971-03-20 · Morgan",
+      "where": "1963 1962-08-15 · Morgan",
       "row": {
-        "date": "1971-03-20",
-        "firm": "Morgan",
-        "lnp": 47,
-        "alp": 43,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 6,
-        "oth": 4,
-        "tpp_lnp": 53.6,
-        "tpp_alp": 46.4,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1971-06-15 · Morgan",
-      "row": {
-        "date": "1971-06-15",
-        "firm": "Morgan",
-        "lnp": 45,
-        "alp": 44,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 8,
-        "oth": 3,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1971-08-10 · Morgan",
-      "row": {
-        "date": "1971-08-10",
-        "firm": "Morgan",
-        "lnp": 46,
-        "alp": 41,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 8,
-        "oth": 5,
-        "tpp_lnp": 54.6,
-        "tpp_alp": 45.4,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1971-08-20 · Morgan",
-      "row": {
-        "date": "1971-08-20",
+        "date": "1962-08-15",
         "firm": "Morgan",
         "lnp": 42,
-        "alp": 45,
+        "alp": 52,
         "grn": null,
         "onp": null,
         "dem": null,
-        "dlp": 10,
-        "oth": 3,
-        "tpp_lnp": 51,
-        "tpp_alp": 49,
-        "tppEra": "1969"
+        "dlp": 5,
+        "oth": 1,
+        "tpp_lnp": 46.4,
+        "tpp_alp": 53.6,
+        "tppEra": "1961"
       }
     },
     {
-      "where": "1972 1971-09-15 · Morgan",
+      "where": "1963 1962-11-15 · Morgan",
       "row": {
-        "date": "1971-09-15",
+        "date": "1962-11-15",
         "firm": "Morgan",
-        "lnp": 45,
-        "alp": 46,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 7,
-        "oth": 2,
-        "tpp_lnp": 51.3,
-        "tpp_alp": 48.7,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1971-11-15 · Morgan",
-      "row": {
-        "date": "1971-11-15",
-        "firm": "Morgan",
-        "lnp": 45,
-        "alp": 45,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 7,
-        "oth": 3,
-        "tpp_lnp": 51.8,
-        "tpp_alp": 48.2,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1972-02-15 · Morgan",
-      "row": {
-        "date": "1972-02-15",
-        "firm": "Morgan",
-        "lnp": 40,
-        "alp": 49,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 7,
-        "oth": 4,
-        "tpp_lnp": 47.4,
-        "tpp_alp": 52.6,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1972-04-10 · Morgan",
-      "row": {
-        "date": "1972-04-10",
-        "firm": "Morgan",
-        "lnp": 37,
+        "lnp": 44,
         "alp": 50,
         "grn": null,
         "onp": null,
         "dem": null,
-        "dlp": 7,
-        "oth": 6,
-        "tpp_lnp": 45.5,
-        "tpp_alp": 54.5,
-        "tppEra": "1969"
+        "dlp": 5,
+        "oth": 1,
+        "tpp_lnp": 48.4,
+        "tpp_alp": 51.6,
+        "tppEra": "1961"
       }
     },
     {
-      "where": "1972 1972-04-20 · Morgan",
+      "where": "1963 1963-02-15 · Morgan",
       "row": {
-        "date": "1972-04-20",
+        "date": "1963-02-15",
         "firm": "Morgan",
-        "lnp": 40,
-        "alp": 48,
+        "lnp": 44,
+        "alp": 50,
         "grn": null,
         "onp": null,
         "dem": null,
-        "dlp": 7,
-        "oth": 5,
-        "tpp_lnp": 47.9,
-        "tpp_alp": 52.1,
-        "tppEra": "1969"
+        "dlp": 5,
+        "oth": 1,
+        "tpp_lnp": 48.4,
+        "tpp_alp": 51.6,
+        "tppEra": "1961"
       }
     },
     {
-      "where": "1972 1972-06-15 · Morgan",
+      "where": "1963 1963-03-15 · Morgan",
       "row": {
-        "date": "1972-06-15",
+        "date": "1963-03-15",
         "firm": "Morgan",
-        "lnp": 42,
-        "alp": 46,
+        "lnp": 45,
+        "alp": 49,
         "grn": null,
         "onp": null,
         "dem": null,
-        "dlp": 7,
-        "oth": 5,
-        "tpp_lnp": 49.9,
-        "tpp_alp": 50.1,
-        "tppEra": "1969"
+        "dlp": 5,
+        "oth": 1,
+        "tpp_lnp": 49.4,
+        "tpp_alp": 50.6,
+        "tppEra": "1961"
       }
     },
     {
-      "where": "1972 1972-07-15 · Morgan",
+      "where": "1963 1963-04-15 · Morgan",
       "row": {
-        "date": "1972-07-15",
+        "date": "1963-04-15",
         "firm": "Morgan",
         "lnp": 47,
-        "alp": 42,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 5,
-        "oth": 6,
-        "tpp_lnp": 54,
-        "tpp_alp": 46,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1972-08-15 · Morgan",
-      "row": {
-        "date": "1972-08-15",
-        "firm": "Morgan",
-        "lnp": 46,
-        "alp": 43,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 6,
-        "oth": 5,
-        "tpp_lnp": 53.2,
-        "tpp_alp": 46.8,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1972-09-15 · Morgan",
-      "row": {
-        "date": "1972-09-15",
-        "firm": "Morgan",
-        "lnp": 46,
-        "alp": 45,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": 5,
-        "oth": 4,
-        "tpp_lnp": 51.9,
-        "tpp_alp": 48.1,
-        "tppEra": "1969"
-      }
-    },
-    {
-      "where": "1972 1972-10-15 · Morgan",
-      "row": {
-        "date": "1972-10-15",
-        "firm": "Morgan",
-        "lnp": 42,
         "alp": 47,
         "grn": null,
         "onp": null,
         "dem": null,
         "dlp": 5,
-        "oth": 6,
-        "tpp_lnp": 49,
-        "tpp_alp": 51,
-        "tppEra": "1969"
+        "oth": 1,
+        "tpp_lnp": 51.4,
+        "tpp_alp": 48.6,
+        "tppEra": "1961"
+      }
+    },
+    {
+      "where": "1963 1963-06-15 · Morgan",
+      "row": {
+        "date": "1963-06-15",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 46,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 1,
+        "tpp_lnp": 52.2,
+        "tpp_alp": 47.8,
+        "tppEra": "1961"
+      }
+    },
+    {
+      "where": "1963 1963-08-15 · Morgan",
+      "row": {
+        "date": "1963-08-15",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 4,
+        "oth": 1,
+        "tpp_lnp": 51.6,
+        "tpp_alp": 48.4,
+        "tppEra": "1961"
+      }
+    },
+    {
+      "where": "1963 1963-10-15 · Morgan",
+      "row": {
+        "date": "1963-10-15",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 50,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 1,
+        "tpp_lnp": 48.2,
+        "tpp_alp": 51.8,
+        "tppEra": "1961"
+      }
+    },
+    {
+      "where": "1966 1964-06-15 · Morgan",
+      "row": {
+        "date": "1964-06-15",
+        "firm": "Morgan",
+        "lnp": 51,
+        "alp": 43,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 0,
+        "tpp_lnp": 55.8,
+        "tpp_alp": 44.2,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1964-10-15 · Morgan",
+      "row": {
+        "date": "1964-10-15",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 2,
+        "tpp_lnp": 53.7,
+        "tpp_alp": 46.3,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1965-07-15 · Morgan",
+      "row": {
+        "date": "1965-07-15",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 8,
+        "oth": 1,
+        "tpp_lnp": 54,
+        "tpp_alp": 46,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1965-09-15 · Morgan",
+      "row": {
+        "date": "1965-09-15",
+        "firm": "Morgan",
+        "lnp": 52,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 1,
+        "tpp_lnp": 57.4,
+        "tpp_alp": 42.6,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1966-02-15 · Morgan",
+      "row": {
+        "date": "1966-02-15",
+        "firm": "Morgan",
+        "lnp": 55,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 5,
+        "oth": 1,
+        "tpp_lnp": 59.6,
+        "tpp_alp": 40.4,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1966-04-15 · Morgan",
+      "row": {
+        "date": "1966-04-15",
+        "firm": "Morgan",
+        "lnp": 52,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 1,
+        "tpp_lnp": 58.2,
+        "tpp_alp": 41.8,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1966-09-15 · Morgan",
+      "row": {
+        "date": "1966-09-15",
+        "firm": "Morgan",
+        "lnp": 52,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 2,
+        "tpp_lnp": 57.9,
+        "tpp_alp": 42.1,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1966 1966-11-15 · Morgan",
+      "row": {
+        "date": "1966-11-15",
+        "firm": "Morgan",
+        "lnp": 53,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 8,
+        "oth": 2,
+        "tpp_lnp": 60.5,
+        "tpp_alp": 39.5,
+        "tppEra": "1963"
+      }
+    },
+    {
+      "where": "1969 1967-02-15 · Morgan",
+      "row": {
+        "date": "1967-02-15",
+        "firm": "Morgan",
+        "lnp": 54,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 1,
+        "tpp_lnp": 59.7,
+        "tpp_alp": 40.3,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1967-05-15 · Morgan",
+      "row": {
+        "date": "1967-05-15",
+        "firm": "Morgan",
+        "lnp": 51,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 2,
+        "tpp_lnp": 56.5,
+        "tpp_alp": 43.5,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1967-07-15 · Morgan",
+      "row": {
+        "date": "1967-07-15",
+        "firm": "Morgan",
+        "lnp": 49,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 3,
+        "oth": 1,
+        "tpp_lnp": 51.8,
+        "tpp_alp": 48.2,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1967-09-15 · Morgan",
+      "row": {
+        "date": "1967-09-15",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 6,
+        "oth": 2,
+        "tpp_lnp": 52.5,
+        "tpp_alp": 47.5,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1967-11-15 · Morgan",
+      "row": {
+        "date": "1967-11-15",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 10,
+        "oth": 2,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1967-12-15 · Morgan",
+      "row": {
+        "date": "1967-12-15",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 5,
+        "oth": 1,
+        "tpp_lnp": 54.3,
+        "tpp_alp": 45.7,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1968-02-15 · Morgan",
+      "row": {
+        "date": "1968-02-15",
+        "firm": "Morgan",
+        "lnp": 53,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 1,
+        "tpp_lnp": 58.7,
+        "tpp_alp": 41.3,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1968-06-15 · Morgan",
+      "row": {
+        "date": "1968-06-15",
+        "firm": "Morgan",
+        "lnp": 51,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 1,
+        "tpp_lnp": 56.7,
+        "tpp_alp": 43.3,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1968-08-15 · Morgan",
+      "row": {
+        "date": "1968-08-15",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 2,
+        "tpp_lnp": 56.3,
+        "tpp_alp": 43.7,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1968-10-15 · Morgan",
+      "row": {
+        "date": "1968-10-15",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 8,
+        "oth": 2,
+        "tpp_lnp": 55,
+        "tpp_alp": 45,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1969-02-15 · Morgan",
+      "row": {
+        "date": "1969-02-15",
+        "firm": "Morgan",
+        "lnp": 51,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 8,
+        "oth": 2,
+        "tpp_lnp": 58,
+        "tpp_alp": 42,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1969-04-15 · Morgan",
+      "row": {
+        "date": "1969-04-15",
+        "firm": "Morgan",
+        "lnp": 52,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 1,
+        "tpp_lnp": 57.7,
+        "tpp_alp": 42.3,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1969-06-15 · Morgan",
+      "row": {
+        "date": "1969-06-15",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 3,
+        "tpp_lnp": 56.8,
+        "tpp_alp": 43.2,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1969-08-15 · Morgan",
+      "row": {
+        "date": "1969-08-15",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 43,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 7,
+        "oth": 2,
+        "tpp_lnp": 54.3,
+        "tpp_alp": 45.7,
+        "tppEra": "1966"
+      }
+    },
+    {
+      "where": "1969 1969-10-15 · Morgan",
+      "row": {
+        "date": "1969-10-15",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": 8,
+        "oth": 2,
+        "tpp_lnp": 55,
+        "tpp_alp": 45,
+        "tppEra": "1966"
       }
     }
   ],
@@ -6439,7 +6677,7 @@
       }
     }
   ],
-  "csvOnly": 102,
+  "csvOnly": 67,
   "morganCurrent": 47,
-  "rekey": 1310
+  "rekey": 1331
 }

@@ -14,17 +14,18 @@
    What lands where:
    - cycle VI rows  -> cyclePolls[term-END year]  (row shape matches the
      curated cycle rows exactly: date,firm,lnp,alp,grn,onp,oth,tpp_lnp,
-     tpp_alp). Readings on/before the 1972-12-02 election stay CSV-only
-     (no earlier cycle buckets exist). Readings between e1972 and e1987
+     tpp_alp). Readings on/before the 1961-12-09 election stay CSV-only
+     (no earlier cycle buckets exist). Readings between e1961 and e1987
      are F2F Morgan Gallup waves with NO published national 2PP and land
-     in the 1974–1987 buckets as ERA rows: their tpp is the implied
+     in the 1963–1987 buckets as ERA rows: their tpp is the implied
      last-election-flows figure (FLOW_ERAS in .build/newtracker/flows.mjs,
      row field tppEra names the constant set), their Democrats/DLP primaries
      ride separate dem/dlp row fields, and their oth stays the printed OTH
      column (the era's changing minor-party print conventions make the
      generic fold unreliable). The full method, backtest, and error budget
      are documented in flows.mjs and the cyclePollBases notes
-     ("1974|Morgan"…"1987|Morgan", seeded by .build/bootstrap-pre1987-cycles.mjs).
+     ("1963|Morgan"…"1987|Morgan", seeded by .build/bootstrap-pre1987-cycles.mjs,
+     bootstrap-1969-cycle.mjs and bootstrap-1961-66-cycles.mjs).
    - current-term VI -> polls[] as `assimilated` rows (sample:null — Hirst's
      tables carry no per-wave n). Only Morning Consult's rows are expected to
      get here; any OTHER house reaching the current term is REFUSED and logged,
@@ -143,10 +144,10 @@ const firmFor = (remote, bucketYear) => {
 const endYears = Object.keys(D.cyclePolls).map(Number).sort((a, b) => a - b);
 const electionDate = (y) => D.elections["e" + y].date;
 // boundary for insertion is the OLDEST bucket's opening election, hard-keyed
-// (endYears[0] − 3 no longer resolves — the 1972 bucket opens at e1969, and
-// e1968 does not exist); pre-1969-election mirror rows stay CSV-only (the
-// 1966 term's two 1960-02 transcriptions conflict and await adjudication)
-const OLDEST_ELECTION = D.elections.e1969.date;
+// (endYears[0] − 3 no longer resolves — the 1963 bucket opens at e1961, and
+// e1960 does not exist); pre-1961-election mirror rows stay CSV-only (the
+// 1961 term's two 1960-02 transcriptions conflict and await adjudication)
+const OLDEST_ELECTION = D.elections.e1961.date;
 const bucketFor = (date) => {
   for (const y of endYears) if (date <= electionDate(y)) return String(y);
   return null; // after the last closed election -> current term
@@ -165,6 +166,7 @@ const VI_NULL_CHECK = (r) => r.alp == null && r.lnp == null; // no VI at all
 // era buckets (pre-1987 rollout) and the FLOW_ERAS set each row is implied
 // through, keyed by the election that opened the cycle (flows.mjs)
 const TPP_ERA_BY_BUCKET = {
+  1963: "1961", 1966: "1963", 1969: "1966",
   1972: "1969", 1974: "1972", 1975: "1974", 1977: "1975", 1980: "1977",
   1983: "1980", 1984: "1983", 1987: "1984",
 };
