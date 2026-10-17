@@ -105,11 +105,13 @@ const TARGETS = [
   { name: "Decidedness: view tabs", sec: "undecided", btn: "#undecided .rd-un-tabs button", watch: ["#undecided .rd-un-tabs"] },
   { name: "Primary: range tabs", sec: "primary-vote", btn: "#primary-vote [aria-label='Time range'] button", watch: ["#primary-vote [aria-label='Time range']"] },
   { name: "2PP: range tabs", sec: "two-party", btn: "#two-party [aria-label='Time range'] button", watch: ["#two-party [aria-label='Time range']"] },
-  /* these two hold the table (or All polls' bars) rather than the tab row on
-     purpose (rd-polls.jsx pinPl, rd-allpolls.jsx pinAp), so the tab row is
-     only reported, not judged */
+  /* this one holds the table rather than the tab row on purpose
+     (rd-polls.jsx pinPl), so the tab row is only reported, not judged */
   { name: "Latest polls: facets", sec: "latest-polls", btn: "#latest-polls [aria-label='Poll table view'] button", watch: ["#latest-polls .rd-pl", "#latest-polls .rd-pl-tabs"] },
-  { name: "All polls: facets", sec: "rd-ap-top", btn: "#rd-ap-top .rd-ap-tabs [role=group] button", watch: ["#rd-ap-top .rd-ap-bar", "#rd-ap-top .rd-ap-tabs"] },
+  /* All polls' head and dek sit under its tab row (2026-10-18), so with the
+     tab row on screen the pin holds the tab row and the bar glides with the
+     story by design - reported, not judged */
+  { name: "All polls: facets", sec: "rd-ap-top", btn: "#rd-ap-top .rd-ap-tabs [role=group] button", watch: ["#rd-ap-top .rd-ap-tabs", "#rd-ap-top .rd-ap-bar"] },
   { name: "House lean: matchup flip", sec: "house-lean", btn: "#house-lean .rd-pl-flip", flip: true, watch: ["#house-lean .rd-hl-tabs"] },
   { name: "Cycles: compare", sec: "cyc-summary", btn: "#cyc-summary [aria-label='Compare with'] button", watch: ["#cyc-summary .rd-cc"] },
   { name: "Cycles: measure", sec: "cyc-summary", btn: "#cyc-summary [aria-label='Measure'] button", watch: ["#cyc-summary .rd-cc"] },

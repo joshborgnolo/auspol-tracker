@@ -2675,98 +2675,41 @@ function RdAllPolls(P) {
      2PP figure - the window stays poll-based there, so an opened release's
      detail counts the same polls the other facets do */
   const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
-  /* ---- the head and dek, and the walk floor --------------------------------
+  /* ---- the head and dek, and the hold ---------------------------------------
      Each facet heads the table with its own head and dek (user call
      2026-10-08): the 2PP's from rdApTppStory, the rest from rdApFacetStory.
-     Their words run to different lengths, and a hop that changes the height
-     of anything above the table makes the pin scroll the difference back -
-     which Safari.app's scroller lands ~±2css off and never lets it correct,
-     so an arrow walk crept the table down the screen (user report, same
-     day; the round-13 lesson of the rdpinscroll skill: delete the reflow,
-     never chase the correction). So the slot stands at the tallest of
-     every state a walk can reach - each facet, the Split-by picker's six
-     splits and the 2PP's four contest and basis pairs - written invisibly
-     in .rd-ap-storyvar and measured by the floor effect below: a hop
-     rewrites the words inside a box whose height never changes, and the
-     pin has nothing to scroll (the past-cycles walk floor, 6f25cf4) */
-  const stories = React.useMemo(() => {
-    const out = [];
-    const add = (key, st) => { if (st && st.head) out.push({ key, head: st.head, dek: st.dek }); };
-    for (const id of FACET_IDS) {
-      if (id === "twopp") {
-        for (const m of ["lnp", "onp"]) for (const b of ["imp", "resp"]) add("twopp|" + m + "|" + b, rdApTppStory(m === "onp", b === "resp", upd));
-      } else if (id === "demographics") {
-        for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
-      } else if (id === "confidence") {
-        /* both confidence lanes stand in the floor stack, so a consumer ⇄
-           business hop rewrites words only (the twopp pattern above) */
-        add("confidence", rdApFacetStory(id, upd, null, false));
-        add("confidence|bus", rdApFacetStory(id, upd, null, true));
-      } else add(id, rdApFacetStory(id, upd));
-      if (id === "primary") add("primary|cons", rdApConsStory(upd));
-    }
-    return out;
-  }, [upd]);
-  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp")
-    : facet === "primary" && consM ? "primary|cons"
-    : facet === "confidence" && confBus ? "confidence|bus"
-    : facet === "demographics" ? "demographics|" + demSplit : facet;
-  const live = stories.find((st) => st.key === liveKey);
+     Their words run to different lengths. The slot sits BELOW the tab row
+     (2026-10-18): a hop with the tab row on screen pins the tab row, so the
+     story takes its own height and the table rides with it - nothing above
+     the pin moves and there is nothing to correct. Until then the slot sat
+     above the tabs at the tallest of every walkable story (the 6f25cf4
+     walk floor), and a short story left lines of empty space over the
+     table (user report 2026-10-18). A hop made deep in the table, with the
+     tab row scrolled away, pins the bar instead, and there the slot holds
+     its height (hedHold, set by pinAp) so a shorter story reflows nothing
+     above the pin: Safari.app lands a scroll correction ~±2css off and
+     never lets it settle, so a walk that corrected every hop crept the
+     table down the screen (the round-13 lesson of the rdpinscroll skill:
+     delete the reflow, never chase the correction). Only a deep hop to a
+     taller story than the box grows it, once per new height; the next hop
+     made with the tab row in view lets the slot go */
+  const live = React.useMemo(() => {
+    const st = facet === "twopp" ? rdApTppStory(onM, pub, upd)
+      : facet === "primary" && consM ? rdApConsStory(upd)
+      : facet === "confidence" ? rdApFacetStory(facet, upd, null, confBus)
+      : facet === "demographics" ? rdApFacetStory(facet, upd, demSplit)
+      : rdApFacetStory(facet, upd);
+    return st && st.head ? st : null;
+  }, [facet, onM, pub, consM, confBus, demSplit, upd]);
   const head = live ? live.head : null, dek = live ? live.dek : null;
-  /* the floor: the tallest written state, re-measured if any of them
-     re-wraps (a resize, a font arriving). Every state is in the stack,
-     the live one too, so a hop never moves the floor */
-  const hedVarRef = useRef(null);
-  const [hedFloor, setHedFloor] = useState(0);
-  const storiesKey = stories.map((st) => st.key + "\u0000" + st.head + "\u0000" + st.dek).join("\u0001");
-  React.useLayoutEffect(() => {
-    const box = hedVarRef.current;
-    if (!box) return undefined;
-    const measure = () => {
-      let h = 0;
-      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
-      h = Math.ceil(h - 0.01);
-      setHedFloor((f) => (f === h ? f : h));
-    };
-    measure();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const ro = new ResizeObserver(measure);
-    [...box.children].forEach((c) => ro.observe(c));
-    return () => ro.disconnect();
-  }, [storiesKey]);
-  /* the narrow control row walks the same floor: under 1220px the 2PP
-     and Demographics facets keep their controls in a row of their own
-     beneath the tabs, which mounted and unmounted as the facet changed
-     (the .rd-ap-pctl lesson Latest polls' pinPl comment calls "the live
-     height change" - a 45px reflow the pin answered with a scroll
-     correction, and Safari lands those ~±2css off and never lets it
-     correct, so the table crawled, user report 2026-10-08). The slot
-     stands at the tallest of the two rows, measured invisibly in
-     .rd-ap-ctlvar: the split picker as-is, and the 2PP row with its
-     longest labels ("One Nation" out-lists "Coalition", "implied flows"
-     out-lists "as published"), so no facet hop, split pick or basis
-     flip reflows it either */
-  const ctlVarRef = useRef(null);
-  const [ctlFloor, setCtlFloor] = useState(0);
-  React.useLayoutEffect(() => {
-    const box = ctlVarRef.current;
-    if (!box) return undefined;
-    const measure = () => {
-      let h = 0;
-      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
-      h = Math.ceil(h - 0.01);
-      setCtlFloor((f) => (f === h ? f : h));
-    };
-    measure();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const ro = new ResizeObserver(measure);
-    [...box.children].forEach((c) => ro.observe(c));
-    return () => ro.disconnect();
-  }, [ctlNarrow]);
-  /* and the eyebrow itself walks the same floor: Confidence's title and
-     meta are both the longer pair, and past the phone wrap widths its
-     meta alone went to a second line and lifted the whole section-head
-     row 18px over the walk (same user report). The two states measure
+  const [hedHold, setHedHold] = useState(0);
+  const hedW0 = rdWords(head), hedW1 = rdWords(dek);
+  const ctlRow = ctlNarrow && (facet === "twopp" || facet === "demographics" || facet === "primary" || facet === "confidence");
+  /* the eyebrow sits above the tab row, the pin's anchor, so it walks a
+     floor (the 6f25cf4 walk floor): Confidence's title and meta are both
+     the longer pair, and past the phone wrap widths its meta alone went
+     to a second line and lifted the whole section-head row 18px over the
+     walk (user report 2026-10-08). The two states measure
      invisibly in .rd-ap-ebvar so only the words swap, never a height */
   const ebVarRef = useRef(null);
   const [ebFloor, setEbFloor] = useState(0);
@@ -3735,7 +3678,9 @@ function RdAllPolls(P) {
      Deeper scrolls fall back through the tab row to the first data row.
      Unlike every other pinned section, this one asks for the pin on fine
      pointers too (rdPinScroll's second arg) - the user wants the laptop's
-     facet walk to hold the table the way a phone's does, 2026-09-30 */
+     facet walk to hold the table the way a phone's does, 2026-09-30.
+     Since 2026-10-18 the head and dek sit under the tab row, which takes
+     the pin whenever it is on screen - see the hold's note at hedHold */
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return;
@@ -3748,11 +3693,25 @@ function RdAllPolls(P) {
        round-3 laptop crawl). The table element survives every hop and
        holding ITS top still compensates the hed swap while the reshuffled
        rows ride with the document, one rigid body: a full facet lap nets
-       exactly zero scroll. Bars first when the scroll is shallow, the
-       table as the deep-scroll anchor - all three persist across hops. */
+       exactly zero scroll. All three persist across hops.
+       With the tab row on screen it takes the pin and the head and dek
+       below it reflow freely, so the slot lets go of any hold. Scrolled
+       past it, the bar (or the table, deeper) takes the pin with the slot
+       above it, so the slot holds the height it has now (the hold's note
+       at hedHold). The reserve is rdPinScroll's own on-screen test */
+    const tabs = sec.querySelector(".rd-ap-tabs"), slot = sec.querySelector(".rd-ap-hedslot");
+    const sb = document.querySelector(".tabs.sticky"), sr = sb && sb.getBoundingClientRect();
+    const reserve = sr ? Math.min(sr.bottom, sr.height) : 0;
+    const tr = tabs && tabs.getBoundingClientRect();
+    if (tr && tr.bottom >= reserve && tr.top <= window.innerHeight) {
+      setHedHold(0);
+      rdPinScroll([tabs], true);
+      return;
+    }
+    if (slot) setHedHold(slot.getBoundingClientRect().height);
     rdPinScroll([
       sec.querySelector(".rd-ap-bar"),
-      sec.querySelector(".rd-ap-tabs"),
+      tabs,
       sec.querySelector(".rd-ap-table"),
     ], true);
   };
@@ -3981,13 +3940,6 @@ function RdAllPolls(P) {
         <div className="rd-eyebrow">{eyebrowCopy(false, false)}</div>
         <div className="rd-eyebrow">{eyebrowCopy(true, false)}</div>
       </div>
-      <div className="rd-ap-hedslot" style={hedFloor ? { minHeight: hedFloor + "px" } : null}>
-        {head && <RdHed head={head} dek={dek} level={2} />}
-      </div>
-      <div className="rd-ap-storyvar" ref={hedVarRef} aria-hidden="true">
-        {stories.map((st) => <div key={st.key}><h2 className="rd-hed">{st.head}</h2><p className="rd-dek">{st.dek}</p></div>)}
-      </div>
-
       <RdTabs swipe value={facet} onChange={facetPick} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
         {facet === "twopp" && !ctlNarrow && (
           <span className="rd-pl-ctl">
@@ -4003,32 +3955,28 @@ function RdAllPolls(P) {
           <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Confidence:</span>{confLaneFlip}</span>
         )}
       </RdTabs>
-      {ctlNarrow && (
-        <>
-          <div className="rd-ap-ctlslot" style={ctlFloor ? { minHeight: ctlFloor + "px" } : null}>
-            {facet === "twopp" && (
-              <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
-            )}
-            {facet === "demographics" && <div className="rd-ap-pctl">{splitPicker}</div>}
-            {facet === "primary" && <div className="rd-ap-pctl">{consFlip}<span className="rd-grow"></span>{consQpop}</div>}
-            {facet === "confidence" && <div className="rd-ap-pctl">{confLaneFlip}</div>}
-          </div>
-          <div className="rd-ap-ctlvar" ref={ctlVarRef} aria-hidden="true">
-            <div className="rd-ap-pctl">
-              <button type="button" className="rd-pl-flip">Labor v One Nation <span aria-hidden="true">⇄</span></button>
-              <span className="rd-pl-ctl-l">, implied flows</span><span className="rd-grow"></span>{qpop}
+      {/* under 1220px the 2PP, Primary, Demographics and Confidence
+          facets keep their controls in a row of their own beneath the
+          tabs, inside the slot: it comes and goes with the facet, so it
+          glides with the head and dek in one block (a row that snapped
+          out while the words glided jerked the table up and back), and
+          the hold (hedHold) covers all three on a deep hop */}
+      <div className="rd-ap-hedslot" style={hedHold ? { minHeight: hedHold + "px" } : null}>
+        <RdGlide watch={hedW0 !== undefined && hedW1 !== undefined ? (ctlRow ? facet : "") + "\u0000" + hedW0 + "\u0000" + hedW1 : undefined}>
+          {ctlRow && (
+            <div className="rd-ap-ctlslot">
+              {facet === "twopp" && (
+                <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
+              )}
+              {facet === "demographics" && <div className="rd-ap-pctl">{splitPicker}</div>}
+              {facet === "primary" && <div className="rd-ap-pctl">{consFlip}<span className="rd-grow"></span>{consQpop}</div>}
+              {facet === "confidence" && <div className="rd-ap-pctl">{confLaneFlip}</div>}
             </div>
-            <div className="rd-ap-pctl">{splitPicker}</div>
-            <div className="rd-ap-pctl">
-              <button type="button" className="rd-pl-flip">Voting consideration <span aria-hidden="true">⇄</span></button>
-              <span className="rd-grow"></span>{consQpop}
-            </div>
-            <div className="rd-ap-pctl">
-              <button type="button" className="rd-pl-flip">Business confidence <span aria-hidden="true">⇄</span></button>
-            </div>
-          </div>
-        </>
-      )}
+          )}
+          {head ? <h2 className="rd-hed">{head}</h2> : null}
+          {dek ? <p className="rd-dek">{dek}</p> : null}
+        </RdGlide>
+      </div>
 
       <div className="rd-ap-bar">
         <label className="rd-ap-search">

@@ -468,35 +468,17 @@ function RdPastCycles(p) {
      and the term a pointer is on in that list, lit on the strip above */
   const [openRow, setOpenRow] = useState(null);
   const [lit, setLit] = useState(null);
-  /* the walk floor: the finding's slot stands at the tallest of every
-     measure state the walk can reach (the finding no longer answers to
-     the Compare-with pick), so a hop rewrites the words inside a box that
-     never moves - nothing above the pinned row reflows and no scroll
-     correction is ever issued (the All-polls hed-on-every-facet bargain,
-     2026-10-01). The walkable states render invisibly in .rd-cyc-storyvar
-     and the slot re-floors if any of them re-wraps (a resize, a font
-     arriving); the live block joins the max so any live re-count counts
-     too */
-  const storySlotRef = React.useRef(null), storyVarRef = React.useRef(null);
-  const [storyFloor, setStoryFloor] = useState(0);
-  React.useLayoutEffect(() => {
-    const measure = () => {
-      let h = 0;
-      const live = storySlotRef.current && storySlotRef.current.querySelector(".rd-glide-in");
-      if (live) h = live.scrollHeight;
-      const box = storyVarRef.current;
-      if (box) for (const c of box.children) h = Math.max(h, c.scrollHeight);
-      setStoryFloor((f) => (Math.abs(f - h) > 1 ? h : f));
-    };
-    measure();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const ro = new ResizeObserver(measure);
-    const live = storySlotRef.current && storySlotRef.current.querySelector(".rd-glide-in");
-    const box = storyVarRef.current;
-    if (live) ro.observe(live);
-    if (box) [...box.children].forEach((c) => ro.observe(c));
-    return () => ro.disconnect();
-  });
+  /* the finding sits under the Compare-with/Measure row (2026-10-18), so a
+     measure hop with the row on screen pins the row and the finding takes
+     its own height below it - nothing above the pin moves. Until then it
+     sat above the row at the taller of its two measure states (the
+     6f25cf4 walk floor), which left empty lines over the summary under
+     the shorter one (user report 2026-10-18, on the All-polls twin).
+     Deeper in the summary the strip below takes the pin with the finding
+     above it, so the slot holds its height there (storyHold, set by
+     pinView) and only grows: Safari.app lands a scroll correction ~2css
+     off, and the walk must not issue one per hop */
+  const [storyHold, setStoryHold] = useState(0);
   /* The Draw-a-term bands float absolutely, out of flow - left alone a
      tall stack of drawn pills grows up over its section's predecessor
      instead of lengthening the page. One band now floats over each
@@ -562,14 +544,13 @@ function RdPastCycles(p) {
      tap or the hook would dismiss and the click would re-open - a toggle
      that can only open, never close */
   window.useDismissOutside(boardRef, board.open, () => setBoard(false), ".rd-cyc-chipmove");
-  /* Walking the measure rewrites the finding above this row (the
-     Compare-with walk leaves it standing), and its height swings state
-     to state. The walk floor (the
-     storyFloor machinery below) holds the finding's slot at the tallest
-     walkable state, so the rewrite moves nothing above the row and the
-     pin has nothing to correct - the All-polls hed-on-every-facet
-     bargain, taken a step further because this finding cannot keep one
-     line count across states. (The floor came in after the ed293ff
+  /* Walking the measure rewrites the finding (the Compare-with walk
+     leaves it standing), and its height swings state to state. The
+     finding sits under this row, so with the row on screen the row takes
+     the pin and the finding reflows below it; scrolled past it, the
+     finding's slot holds its height (storyHold above), so the rewrite
+     moves nothing above the pinned strip and the pin has nothing to
+     correct - the All-polls bargain. (The walk floor came in after the ed293ff
      fine-pointer opt-in tried to let rdPinScroll's corrections carry
      the live glide on a laptop: every hop re-wrote the finding above
      the row and the pin chased each glide frame with an integer
@@ -585,10 +566,20 @@ function RdPastCycles(p) {
      the page by the finding's height swing. Like the All-polls table,
      this walk opts into the pin on fine pointers too (the second arg):
      a laptop's compare/measure click or arrow-key step holds the board
-     and summary exactly as a phone swipe's does - with the floor, the
+     and summary exactly as a phone swipe's does - with the hold, the
      pin measures zero drift and issues zero corrections */
   const pinView = () => {
     const sec = document.getElementById("cyc-summary");
+    const row = boardRef.current, slot = sec && sec.querySelector(".rd-cyc-storyslot");
+    const sb = document.querySelector(".tabs.sticky"), sr = sb && sb.getBoundingClientRect();
+    const reserve = sr ? Math.min(sr.bottom, sr.height) : 0;
+    const rr = row && row.getBoundingClientRect();
+    if (rr && rr.bottom >= reserve && rr.top <= window.innerHeight) {
+      setStoryHold(0);
+      rdPinScroll([row], true);
+      return;
+    }
+    if (slot) setStoryHold(slot.getBoundingClientRect().height);
     const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find((el) => {
       const r = el.getBoundingClientRect();
       return r.bottom >= 0 && r.top <= window.innerHeight;
@@ -827,8 +818,6 @@ function RdPastCycles(p) {
     return { head, dek };
   };
   const pageStory = storyFor(chg);
-  /* both measure states the walk can land this section in */
-  const storyVariants = [false, true].map((c2) => ({ key: c2 ? "chg" : "abs", story: storyFor(c2) }));
   /* the 2PP against the governments that were re-elected and ousted */
   const outcomePeers = (which) => {
     const keep = new Set(cycles.filter((c, i) => outcomeOf(i) === which).map((c) => c.year));
@@ -1455,16 +1444,11 @@ function RdPastCycles(p) {
           <span className="rd-meta">Every term since {cycles[0].year}, lined up on its own election day</span>
           {!narrow && <nav className="rd-eyebrow-tools rd-cyc-nav" aria-label="On this page">{navs.map(([id, lab], i) => <button key={id} type="button" onClick={() => goTo(id)}>{(i === navs.length - 1 ? "and " : "") + lab}</button>)}</nav>}
         </div>
-        <div ref={storySlotRef} style={storyFloor ? { minHeight: storyFloor + "px" } : null}>
+        {controls}
+        <div className="rd-cyc-storyslot" style={storyHold ? { minHeight: storyHold + "px" } : null}>
           <RdHed head={pageStory.head} dek={pageStory.dek} level={2} />
         </div>
-        <div className="rd-cyc-storyvar" ref={storyVarRef} aria-hidden="true">
-          {storyVariants.map((v) => (
-            <div key={v.key}><h2 className="rd-hed">{v.story.head}</h2><p className="rd-dek">{v.story.dek}</p></div>
-          ))}
-        </div>
         {srcFailed && <p className="rd-note">The individual polls behind the past terms didn’t load; the monthly lines are unaffected. <button type="button" className="rd-link rd-link-in" onClick={retrySource}>Try again</button></p>}
-        {controls}
         {summary}
         <div className="rd-foot">
           <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings {RD_CYC_CITE("add", 1)} {RD_CYC_CITE("little", 2)} or {RD_CYC_CITE("no", 0)} predictive value on top of voting-intention data.</span>

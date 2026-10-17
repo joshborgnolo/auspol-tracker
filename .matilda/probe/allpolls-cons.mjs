@@ -321,7 +321,6 @@ const runPhone = async () => {
 
   const pre = await page.evaluate(() => ({
     flip: [...document.querySelectorAll(".rd-ap-ctlslot .rd-pl-flip")].map((b) => b.textContent.trim()),
-    hidden: document.querySelectorAll(".rd-ap-ctlvar .rd-pl-flip").length,
     cap: (document.querySelector(".rd-ap-phead .rd-ap-cap") || {}).textContent || "",
   }));
   ok(pre.flip.length === 1 && /Voting intention/.test(pre.flip[0] || ""), `the phone control row's flip reads its live intention mode (${JSON.stringify(pre.flip)})`);

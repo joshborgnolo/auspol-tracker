@@ -2032,15 +2032,15 @@ body.rd .rd-cyc-nav button { all: unset; cursor: pointer; font-size: 12px; font-
 body.rd .rd-cyc-nav button:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* the comparison controls */
 body.rd .rd-cc { position: relative; margin-top: 32px; }
-/* the walk floor's measurement stack: every walkable finding state laid out
-   invisibly so the live slot can stand at the tallest (rd-cycles.jsx) */
-body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
-/* the All-polls slots walk the same floor: the hed (every facet, split
-   and contest or basis state) and the narrow control row (the 2PP's
-   contest row, Demographics' split picker) stand at their tallest
-   state so a hop changes no height above the table - the measurement
-   stacks stay laid out for their heights but never paint */
-body.rd .rd-ap-storyvar, body.rd .rd-ap-ctlvar, body.rd .rd-ap-ebvar { height: 0; overflow: hidden; visibility: hidden; }
+/* the finding under the comparison controls holds its height on a deep
+   measure hop (rd-cycles' storyHold), so its margins stay inside it - the
+   All-polls slot's rule below */
+body.rd .rd-cyc-storyslot, body.rd .rd-cyc-storyslot .rd-glide-in { display: flow-root; }
+/* the All-polls eyebrow walks a floor (the 6f25cf4 walk floor): it sits
+   above the tab row the pin holds, so it stands at its taller state and a
+   hop changes no height above the pin - the measurement stack stays laid
+   out for its height but never paints */
+body.rd .rd-ap-ebvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 /* the Draw-a-term chips and their drawn-over-the-band pills, moved off
    the controls row onto the vote-and-leadership sections' dividers -
@@ -2463,6 +2463,13 @@ body.rd .rd-ap-tabs { margin-top: 28px; }
    nudged the table 0.3-0.4px per switch, and issues -> 2PP at 390px netted
    2px (the 44px control row against a line more of dek). */
 body.rd .rd-ap .rd-hed { line-height: 51px; }
+/* the head/dek slot under the tab row holds its height on a deep hop
+   (rd-allpolls' hedHold), so every margin inside it must stay inside it:
+   with no control row above it the hed's top margin collapsed out
+   through the slot's top edge, and with one it didn't, so the held box
+   was 16px short on some hops and the pin had to correct. The glide
+   inside measures its inner box, so that keeps its margins too */
+body.rd .rd-ap-hedslot, body.rd .rd-ap-hedslot .rd-glide-in { display: flow-root; }
 body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
 @media (max-width: 640px) {
   body.rd .rd-ap .rd-hed { line-height: 33px; }
