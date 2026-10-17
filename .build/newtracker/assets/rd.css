@@ -3662,7 +3662,9 @@ body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
 body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
 body.rd .rd-ldg-lines { display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
 body.rd .rd-ldg-line {
-  all: unset; box-sizing: border-box; display: grid; grid-template-columns: 96px minmax(0, 1fr) 14px; column-gap: 12px; align-items: baseline;
+  /* 110px: the longest eyebrow label (CONSIDERATION) measures 98px wrapped;
+     96 broke its last letter onto a second line (went red 2026-10-17) */
+  all: unset; box-sizing: border-box; display: grid; grid-template-columns: 110px minmax(0, 1fr) 14px; column-gap: 12px; align-items: baseline;
   padding: 5px 4px 5px 0; border-bottom: 1px solid var(--line-2); font-size: 13.5px; line-height: 1.45; color: var(--ink-2);
 }
 body.rd .rd-ldg-line.go { cursor: pointer; }

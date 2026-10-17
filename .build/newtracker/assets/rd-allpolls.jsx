@@ -1964,38 +1964,16 @@ function rdLgLines(p, { onM, demSplit }) {
   }
   if (p.cons) {
     const ORDER = ["alp", "lnp", "grn", "onp", "ind", "oth", "none"];
-    const ks = ORDER.filter((k) => p.cons[k] != null);
+    /* ONE Consideration line, on the default "would consider" range (user
+       call 2026-10-17): a banded wave's loose tier, else its only figures
+       — the bands' other ranges ride the primary facet's range cycler,
+       never this ledger */
+    const def = rdApConsDef(p);
+    const ks = ORDER.filter((k) => def.m[k] != null);
     out.push({ id: "cons", lab: "Consideration", body: <>
-      {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(p.cons[k])}</b></> : pty(k, rdApNum(p.cons[k]))}</U>)}
-      <U soft>{p.consBasis || "parties the voter would consider"}</U>
+      {ks.map((k) => <U key={k}>{k === "none" ? <>none <b>{rdApNum(def.m[k])}</b></> : pty(k, rdApNum(def.m[k]))}</U>)}
+      <U soft>{def.note}</U>
     </> });
-    /* a banded consideration question's extra tiers — RedBridge/Accent's
-       April 2026 0–10 battery and Essential's Feb/June 2026
-       definitely/open/never banding — labelled per house by rdApConsTier */
-    if (p.consLoose) {
-      const tier = rdApConsTier(p, "loose");
-      const ks2 = ORDER.filter((k) => p.consLoose[k] != null);
-      out.push({ id: "consloose", lab: tier.led, body: <>
-        {ks2.map((k) => <U key={k}>{pty(k, rdApNum(p.consLoose[k]))}</U>)}
-        <U soft>{tier.note}</U>
-      </> });
-    }
-    if (p.consNot) {
-      const tier = rdApConsTier(p, "not");
-      const ks4 = ORDER.filter((k) => p.consNot[k] != null);
-      out.push({ id: "consnot", lab: tier.led, body: <>
-        {ks4.map((k) => <U key={k}>{pty(k, rdApNum(p.consNot[k]))}</U>)}
-        <U soft>{tier.note}</U>
-      </> });
-    }
-    if (p.consNever) {
-      const tier = rdApConsTier(p, "never");
-      const ks3 = ORDER.filter((k) => p.consNever[k] != null);
-      out.push({ id: "consnever", lab: tier.led, body: <>
-        {ks3.map((k) => <U key={k}>{pty(k, rdApNum(p.consNever[k]))}</U>)}
-        <U soft>{tier.note}</U>
-      </> });
-    }
   }
   return out;
 }
@@ -2409,24 +2387,26 @@ const rdApLeanFor = (p, onM, pub) => {
    past the two shares' combined 95% margin in that poll's sample. */
 function rdApConsStory(upd) {
   const D = window.AUSPOL;
-  const waves = (D.individualPolls || []).filter((p) => p.cons && p.cons.onp != null && rdApDays(p.released) <= upd)
+  const waves = (D.individualPolls || []).filter((p) => p.cons && rdApConsDef(p).m.onp != null && rdApDays(p.released) <= upd)
     .sort((a, b) => rdApDays(b.released) - rdApDays(a.released));
   if (!waves.length) return null;
-  const newest = waves[0];
-  const basis = (p) => (p.consBasis || "Would consider").replace(/\s*\(.*\)\s*$/, "").toLowerCase();
+  const newest = waves[0], nw = rdApConsDef(newest).m;
+  /* every figure rides the default "would consider" range (rdApConsDef):
+     a banded wave's loose tier, not the filed canonical figures */
+  const basis = (p) => rdApConsDef(p).lab.replace(/\s*\(.*\)\s*$/, "").toLowerCase();
   const pct = (v) => rdApNum(v) + "%";
   const apart = (p, a, b) => Math.abs(a - b) > 1.96 * Math.sqrt((a * (100 - a) + b * (100 - b)) / (p.sample || 1000));
-  const rel = (p, id) => (!apart(p, p.cons.onp, p.cons[id]) ? 0 : p.cons.onp > p.cons[id] ? 1 : -1);
+  const rel = (p, id) => { const m = rdApConsDef(p).m; return !apart(p, m.onp, m[id]) ? 0 : m.onp > m[id] ? 1 : -1; };
   const MAJ = { alp: "Labor’s", lnp: "the Coalition’s" };
   const day = (iso) => { const [y, m, d] = iso.split("-").map(Number);
     return d + " " + D.monthNameFull(m) + (y !== new Date(upd).getUTCFullYear() ? " " + y : ""); };
-  const top = ["alp", "lnp"].filter((id) => newest.cons[id] != null).sort((a, b) => newest.cons[b] - newest.cons[a])[0];
-  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(newest.cons.onp) + " "
+  const top = ["alp", "lnp"].filter((id) => nw[id] != null).sort((a, b) => nw[b] - nw[a])[0];
+  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(nw.onp) + " "
     + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation"
-    + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(newest.cons[top]) : "");
+    + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(nw[top]) : "");
   const askers = new Set(waves.map((p) => p.pollster + "|" + basis(p))).size;
   /* One Nation v Labor where every party was asked */
-  const full = waves.filter((p) => p.cons.alp != null);
+  const full = waves.filter((p) => rdApConsDef(p).m.alp != null);
   const cnt = [1, 0, -1].map((r) => full.filter((p) => rel(p, "alp") === r).length);
   const parts = ["outscored", "came close to", "trailed"].map((v, i) => (cnt[i] ? [v, cnt[i]] : null)).filter(Boolean);
   const tallied = full.length < 2 ? ""
@@ -2521,8 +2501,9 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
 
 /* ---------------------------------------------------------------- the table */
 /* the two banded consideration questions, named per house. tab = the
-   row's range-cycler label (sentence case, sits under the figures); led
-   = the ledger line label; note = the ledger's soft explainer.
+   row's range-cycler label (sentence case, sits under the desktop figures,
+   rides the phone card head's right edge); note = the ledger Consideration
+   line's soft explainer, only ever read off the default (loose) range.
    RedBridge/Accent's April 2026 wave asked a 0–10 propensity of each
    party's non-voters and the filed shares are rebased over everyone;
    Essential's Feb and June 2026 waves banded every voter
@@ -2530,27 +2511,34 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
    sums). */
 const RD_AP_CONS_TIER = {
   "RedBridge/Accent": {
-    loose: { tab: "Would consider (≥4/10)", led: "Would consider (≥4/10)", note: "rated ≥4/10, rebased over everyone" },
-    not: { tab: "Would not consider (≤3/10)", led: "Would not consider (≤3/10)", note: "rated ≤3/10, rebased over everyone" },
-    never: { tab: "Would never vote (0/10)", led: "Would never vote (0/10)", note: "rated 0/10, rebased over everyone" },
+    loose: { tab: "Would consider (≥4/10)", note: "rated ≥4/10, rebased over everyone" },
+    not: { tab: "Would not consider (≤3/10)" },
+    never: { tab: "Would never vote (0/10)" },
   },
   Essential: {
-    loose: { tab: "Would consider (definitely or open)", led: "Would consider (definitely or open)", note: "the ‘definitely’ and ‘open to’ bands, summed" },
-    never: { tab: "Would never vote", led: "Would never vote", note: "the ‘would never vote for them’ band" },
+    loose: { tab: "Would consider (definitely or open)", note: "the ‘definitely’ and ‘open to’ bands, summed" },
+    never: { tab: "Would never vote" },
   },
 };
 const rdApConsTier = (p, tier) => (RD_AP_CONS_TIER[p.pollster] || RD_AP_CONS_TIER["RedBridge/Accent"])[tier];
+/* the DEFAULT consideration range ("would consider") carries every surface
+   that shows one range — the ledger's single Consideration line, the story,
+   the sort, and where the cycler opens (user call 2026-10-17): a banded
+   wave's loose tier, else its only figures with their basis */
+const rdApConsDef = (p) => p.consLoose
+  ? { m: p.consLoose, lab: rdApConsTier(p, "loose").tab, note: rdApConsTier(p, "loose").note }
+  : { m: p.cons, lab: p.consBasis || "Would consider", note: p.consBasis || "parties the voter would consider" };
 
 /* a consideration row's RANGE cycler (user call 2026-10-15: "why not just
    add a switch/cycle button through the different ranges, right where it
    denotes the basis"). A wave whose consideration question came in more
    than one range - RedBridge/Accent's April 2026 0-10 battery, or
    Essential's Feb/June 2026 definitely/open/never banding, file as
-   tiers of tiers[] - shows ONE range at a time, canonical first, and
-   the basis label is a button stepping through them, figures and
+   tiers of tiers[] - shows ONE range at a time, opening on the default
+   "would consider" range (2026-10-17 user call: it was canonical first),
+   and the basis label is a button stepping on through them, figures and
    strip moving together. The state is per row and ephemeral: the sort,
-   the story, the ledger (which lists every range) and the header scale
-   all read the canonical range regardless. */
+   the story and the ledger all read the same default range with it. */
 function RdApConsCyc({ tiers, phone, primNums, primStrip, primCardNums, cardHead }) {
   const [ti, setTi] = useState(0);
   const many = tiers.length > 1;
@@ -3357,11 +3345,12 @@ function RdAllPolls(P) {
          2026-10-15, mirroring "18–34 v 55+, in points"). A wave carrying
          the extra ranges (RedBridge/Accent's April 2026 0–10 battery;
          Essential's Feb and June 2026 definitely/open/never banding)
-         lists them behind the canonical tier for RdApConsCyc to step
-         through */
+         opens on the default "would consider" (loose) range, the firmer
+         and never bands a press away on the same figures
+         (rdApConsDef) */
       const tiers = !(consM && p.cons) ? null
-        : [{ m: p.cons, lab: p.consBasis || "Would consider" }]
-          .concat(p.consLoose ? [{ m: p.consLoose, lab: rdApConsTier(p, "loose").tab }] : [])
+        : (p.consLoose ? [{ m: p.consLoose, lab: rdApConsTier(p, "loose").tab }] : [])
+          .concat([{ m: p.cons, lab: p.consBasis || "Would consider" }])
           .concat(p.consNot ? [{ m: p.consNot, lab: rdApConsTier(p, "not").tab }] : [])
           .concat(p.consNever ? [{ m: p.consNever, lab: rdApConsTier(p, "never").tab }] : []);
       const primNums = (m) => <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>)}</span>;

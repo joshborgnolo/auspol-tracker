@@ -5872,13 +5872,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         case "hfx": return p.hfx ? p.hfx.v : -Infinity;
         /* the party columns sort on what they SHOW: first preferences
            ordinarily, the consideration share while the primary facet's
-           consideration mode is on (a wave that printed none of that party
-           sinks, exactly like a null elsewhere) */
-        case "p.alp": return consM ? (p.cons && p.cons.alp != null ? p.cons.alp : -Infinity) : p.p.alp;
-        case "p.lnp": return consM ? (p.cons && p.cons.lnp != null ? p.cons.lnp : -Infinity) : p.p.lnp;
-        case "p.grn": return consM ? (p.cons && p.cons.grn != null ? p.cons.grn : -Infinity) : p.p.grn;
-        case "p.onp": return consM ? (p.cons && p.cons.onp != null ? p.cons.onp : -Infinity) : p.p.onp;
-        case "p.oth": return consM ? (p.cons && p.cons.oth != null ? p.cons.oth : -Infinity) : p.p.oth;
+           consideration mode is on — on the default "would consider" range
+           where the wave filed more than one (p.consLoose over p.cons,
+           2026-10-17; a wave that printed none of that party sinks,
+           exactly like a null elsewhere) */
+        case "p.alp": return consM ? (p.cons && ((p.consLoose || p.cons).alp != null) ? (p.consLoose || p.cons).alp : -Infinity) : p.p.alp;
+        case "p.lnp": return consM ? (p.cons && ((p.consLoose || p.cons).lnp != null) ? (p.consLoose || p.cons).lnp : -Infinity) : p.p.lnp;
+        case "p.grn": return consM ? (p.cons && ((p.consLoose || p.cons).grn != null) ? (p.consLoose || p.cons).grn : -Infinity) : p.p.grn;
+        case "p.onp": return consM ? (p.cons && ((p.consLoose || p.cons).onp != null) ? (p.consLoose || p.cons).onp : -Infinity) : p.p.onp;
+        case "p.oth": return consM ? (p.cons && ((p.consLoose || p.cons).oth != null) ? (p.consLoose || p.cons).oth : -Infinity) : p.p.oth;
         case "appr.albNet": return p.appr.albNet != null ? p.appr.albNet : -Infinity;
         case "appr.taylorNet": return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
         case "appr.hansonNet": return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
