@@ -5705,9 +5705,12 @@ const CYC_META = JUR ? jurCycles() : [
     pmSpl: { iso: "1945-07-05", names: ["Curtin", "Chifley"] },
     oppSpl: { iso: "1943-09-22", names: ["Fadden", "Menzies"] } },
   { year: 1946, gov: "alp", opp: "lnp", pm: "Chifley", lead: "Chifley", oppLead: "Menzies", eDate: "1946-09-28", src: 1949, appr: 1946 },
-  { year: 1949, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Chifley → Evatt", eDate: "1949-12-10", src: 1951, appr: 1949,
+  /* Chifley led Labor into the 1951 election and died on 13 Jun 1951;
+     Evatt succeeded him on 20 Jun, so the handover belongs to the 1951
+     term, not the 1949 one. */
+  { year: 1949, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Chifley", eDate: "1949-12-10", src: 1951, appr: 1949 },
+  { year: 1951, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Chifley → Evatt", eDate: "1951-04-28", src: 1954, appr: 1951,
     oppSpl: { iso: "1951-06-20", names: ["Chifley", "Evatt"] } },
-  { year: 1951, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt", eDate: "1951-04-28", src: 1954, appr: 1951 },
   { year: 1954, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt", eDate: "1954-05-29", src: 1955, appr: 1954 },
   { year: 1955, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt", eDate: "1955-12-10", src: 1958, appr: 1955 },
   { year: 1958, gov: "lnp", opp: "alp", pm: "Menzies", lead: "Menzies", oppLead: "Evatt → Calwell", eDate: "1958-11-22", src: 1961, appr: 1958,
@@ -5954,8 +5957,8 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: twenty-two past elections, each with a result to check the final
-   polls against, and the honest answer of how far out they were.
+   visible: every past election with a dated final poll, each with a result
+   to check that poll against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST
    poll with a 2PP in the 14 days before polling day, one per house, equally
@@ -5986,6 +5989,9 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
   const inWindow = (cyclePolls[c.src] || []).filter((p) => {
     if (p.firm === "Election" || /exit/i.test(p.firm)) return false;
     if (p.tpp_alp == null) return false;
+    // a mirror date that only names the month (dateApprox) can't be placed
+    // inside a 14-day window: "May 1954" may have been fielded on the 2nd
+    if (p.dateApprox) return false;
     const d = ddays(eMs, new Date(p.date).getTime());
     return d >= 0 && d <= ACC_WINDOW_DAYS;
   });
@@ -6979,7 +6985,7 @@ for (const c of CYC_META) {
   cycleSource[c.year] = {
     ...(troveByTerm && troveByTerm[c.year] ? { trove: troveByTerm[c.year] } : {}),
     polls: (cyclePolls[c.src] || []).map((p) => ({
-      date: p.date, firm: p.firm, m: mo(p.date),
+      date: p.date, ...(p.dateApprox ? { dateApprox: p.dateApprox } : {}), firm: p.firm, m: mo(p.date),
       alp: p.alp ?? null, lnp: p.lnp ?? null, grn: p.grn ?? null,
       onp: p.onp ?? null, oth: p.oth ?? null,
       tpp_alp: p.tpp_alp ?? null, tpp_lnp: p.tpp_lnp ?? null,

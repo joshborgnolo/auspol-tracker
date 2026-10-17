@@ -1292,9 +1292,11 @@ const MS_MONTH_C = 365.25 / 12;
    being true later. */
 const inCycleRange = (m) => { const k = Math.round(m); return k >= 0 && k <= 36; };
 
-function cycDotDate(iso) {
+// approx "month": the archive dates the wave only to its month (the 15th
+// is a placeholder), so the label names the month alone
+function cycDotDate(iso, approx) {
   const [y, m, d] = iso.split("-").map(Number);
-  return d + " " + window.AP.D.monthName(m) + " " + y;
+  return (approx === "month" ? "" : d + " ") + window.AP.D.monthName(m) + " " + y;
 }
 
 /* Which rival the sitting term's 2PP is read against in a given month – the
@@ -1363,7 +1365,7 @@ function cycleReadings(c, M, D) {
     for (const p of src.polls) {
       if (p[f] == null || p.firm === "Election" || !inCycleRange(p.m)) continue;
       const y = key === "tpp" && c.gov !== "alp" ? +(100 - p[f]).toFixed(1) : p[f];
-      out.push({ x: p.m, y, iso: p.date, meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
+      out.push({ x: p.m, y, iso: p.date, meta: { pollster: p.firm, dateLabel: cycDotDate(p.date, p.dateApprox) } });
     }
   } else if (key === "ppmm") {
     // margin per wave, PM minus opponent. Pairing-neutral, so the

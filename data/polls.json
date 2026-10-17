@@ -277,8 +277,8 @@
       "grn": 0,
       "onp": 0,
       "oth": 2.03,
-      "tpp_lnp": 49.3,
-      "tpp_alp": 50.7
+      "tpp_lnp": 50.7,
+      "tpp_alp": 49.3
     },
     "e1954": {
       "date": "1954-05-29",
@@ -287,8 +287,8 @@
       "grn": 0,
       "onp": 0,
       "oth": 2.36,
-      "tpp_lnp": 50.7,
-      "tpp_alp": 49.3
+      "tpp_lnp": 49.3,
+      "tpp_alp": 50.7
     },
     "e1955": {
       "date": "1955-12-10",
@@ -9318,9 +9318,10 @@
         "dem": null,
         "dlp": null,
         "oth": 5,
-        "tpp_lnp": 45.7,
-        "tpp_alp": 54.3,
-        "tppEra": "1943"
+        "tpp_lnp": 45.9,
+        "tpp_alp": 54.1,
+        "tppEra": "1943",
+        "dateApprox": "month"
       },
       {
         "date": "1946-03-15",
@@ -9332,9 +9333,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 45.2,
-        "tpp_alp": 54.8,
-        "tppEra": "1943"
+        "tpp_lnp": 45.3,
+        "tpp_alp": 54.7,
+        "tppEra": "1943",
+        "dateApprox": "month"
       },
       {
         "date": "1946-04-15",
@@ -9346,9 +9348,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 45.2,
-        "tpp_alp": 54.8,
-        "tppEra": "1943"
+        "tpp_lnp": 45.3,
+        "tpp_alp": 54.7,
+        "tppEra": "1943",
+        "dateApprox": "month"
       },
       {
         "date": "1946-05-15",
@@ -9360,9 +9363,10 @@
         "dem": null,
         "dlp": null,
         "oth": 5,
-        "tpp_lnp": 44.7,
-        "tpp_alp": 55.3,
-        "tppEra": "1943"
+        "tpp_lnp": 44.9,
+        "tpp_alp": 55.1,
+        "tppEra": "1943",
+        "dateApprox": "month"
       },
       {
         "date": "1946-06-15",
@@ -9374,9 +9378,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 44.2,
-        "tpp_alp": 55.8,
-        "tppEra": "1943"
+        "tpp_lnp": 44.3,
+        "tpp_alp": 55.7,
+        "tppEra": "1943",
+        "dateApprox": "month"
       },
       {
         "date": "1946-07-15",
@@ -9388,9 +9393,10 @@
         "dem": null,
         "dlp": null,
         "oth": 5,
-        "tpp_lnp": 42.7,
-        "tpp_alp": 57.3,
-        "tppEra": "1943"
+        "tpp_lnp": 42.9,
+        "tpp_alp": 57.1,
+        "tppEra": "1943",
+        "dateApprox": "month"
       },
       {
         "date": "1946-09-28",
@@ -9415,9 +9421,10 @@
         "dem": null,
         "dlp": null,
         "oth": 3,
-        "tpp_lnp": 47.6,
-        "tpp_alp": 52.4,
-        "tppEra": "1946"
+        "tpp_lnp": 47,
+        "tpp_alp": 53,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1947-10-15",
@@ -9429,9 +9436,10 @@
         "dem": null,
         "dlp": null,
         "oth": 3,
-        "tpp_lnp": 49.6,
-        "tpp_alp": 50.4,
-        "tppEra": "1946"
+        "tpp_lnp": 49,
+        "tpp_alp": 51,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1947-11-15",
@@ -9443,9 +9451,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 52.2,
-        "tpp_alp": 47.8,
-        "tppEra": "1946"
+        "tpp_lnp": 51.4,
+        "tpp_alp": 48.6,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1947-12-15",
@@ -9457,9 +9466,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 52.2,
-        "tpp_alp": 47.8,
-        "tppEra": "1946"
+        "tpp_lnp": 51.4,
+        "tpp_alp": 48.6,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1948-02-15",
@@ -9471,9 +9481,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 52.2,
-        "tpp_alp": 47.8,
-        "tppEra": "1946"
+        "tpp_lnp": 51.4,
+        "tpp_alp": 48.6,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1948-05-15",
@@ -9485,9 +9496,10 @@
         "dem": null,
         "dlp": null,
         "oth": 4,
-        "tpp_lnp": 51.2,
-        "tpp_alp": 48.8,
-        "tppEra": "1946"
+        "tpp_lnp": 50.4,
+        "tpp_alp": 49.6,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1949-02-15",
@@ -9499,9 +9511,10 @@
         "dem": null,
         "dlp": null,
         "oth": 3,
-        "tpp_lnp": 48.6,
-        "tpp_alp": 51.4,
-        "tppEra": "1946"
+        "tpp_lnp": 48,
+        "tpp_alp": 52,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1949-03-15",
@@ -9513,9 +9526,10 @@
         "dem": null,
         "dlp": null,
         "oth": 3,
-        "tpp_lnp": 48.6,
-        "tpp_alp": 51.4,
-        "tppEra": "1946"
+        "tpp_lnp": 48,
+        "tpp_alp": 52,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1949-05-15",
@@ -9527,9 +9541,10 @@
         "dem": null,
         "dlp": null,
         "oth": 3,
-        "tpp_lnp": 47.6,
-        "tpp_alp": 52.4,
-        "tppEra": "1946"
+        "tpp_lnp": 47,
+        "tpp_alp": 53,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1949-06-15",
@@ -9541,9 +9556,10 @@
         "dem": null,
         "dlp": null,
         "oth": 2,
-        "tpp_lnp": 49.1,
-        "tpp_alp": 50.9,
-        "tppEra": "1946"
+        "tpp_lnp": 48.7,
+        "tpp_alp": 51.3,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1949-07-15",
@@ -9555,9 +9571,10 @@
         "dem": null,
         "dlp": null,
         "oth": 2,
-        "tpp_lnp": 51.1,
-        "tpp_alp": 48.9,
-        "tppEra": "1946"
+        "tpp_lnp": 50.7,
+        "tpp_alp": 49.3,
+        "tppEra": "1946",
+        "dateApprox": "month"
       },
       {
         "date": "1949-09-15",
@@ -9569,8 +9586,23 @@
         "dem": null,
         "dlp": null,
         "oth": 2,
-        "tpp_lnp": 51.1,
-        "tpp_alp": 48.9,
+        "tpp_lnp": 50.7,
+        "tpp_alp": 49.3,
+        "tppEra": "1946",
+        "dateApprox": "month"
+      },
+      {
+        "date": "1949-12-03",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 48,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": null,
+        "oth": 2,
+        "tpp_lnp": 50.7,
+        "tpp_alp": 49.3,
         "tppEra": "1946"
       },
       {
@@ -9587,20 +9619,6 @@
     ],
     "1951": [
       {
-        "date": "1949-12-15",
-        "firm": "Morgan",
-        "lnp": 50,
-        "alp": 48,
-        "grn": null,
-        "onp": null,
-        "dem": null,
-        "dlp": null,
-        "oth": 2,
-        "tpp_lnp": 51.1,
-        "tpp_alp": 48.9,
-        "tppEra": "1949"
-      },
-      {
         "date": "1950-02-15",
         "firm": "Morgan",
         "lnp": 56,
@@ -9612,7 +9630,8 @@
         "oth": 0,
         "tpp_lnp": 56,
         "tpp_alp": 44,
-        "tppEra": "1949"
+        "tppEra": "1949",
+        "dateApprox": "month"
       },
       {
         "date": "1950-04-01",
@@ -9626,7 +9645,8 @@
         "oth": 0,
         "tpp_lnp": 54,
         "tpp_alp": 46,
-        "tppEra": "1949"
+        "tppEra": "1949",
+        "dateApprox": "month"
       },
       {
         "date": "1950-05-15",
@@ -9638,9 +9658,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 54.5,
-        "tpp_alp": 45.5,
-        "tppEra": "1949"
+        "tpp_lnp": 54.2,
+        "tpp_alp": 45.8,
+        "tppEra": "1949",
+        "dateApprox": "month"
       },
       {
         "date": "1950-08-15",
@@ -9652,9 +9673,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 57.5,
-        "tpp_alp": 42.5,
-        "tppEra": "1949"
+        "tpp_lnp": 57.2,
+        "tpp_alp": 42.8,
+        "tppEra": "1949",
+        "dateApprox": "month"
       },
       {
         "date": "1950-11-15",
@@ -9666,9 +9688,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5,
-        "tppEra": "1949"
+        "tpp_lnp": 50.2,
+        "tpp_alp": 49.8,
+        "tppEra": "1949",
+        "dateApprox": "month"
       },
       {
         "date": "1950-12-15",
@@ -9680,9 +9703,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5,
-        "tppEra": "1949"
+        "tpp_lnp": 52.2,
+        "tpp_alp": 47.8,
+        "tppEra": "1949",
+        "dateApprox": "month"
       },
       {
         "date": "1951-04-28",
@@ -9692,8 +9716,8 @@
         "grn": 0,
         "onp": 0,
         "oth": 2.03,
-        "tpp_lnp": 49.3,
-        "tpp_alp": 50.7
+        "tpp_lnp": 50.7,
+        "tpp_alp": 49.3
       }
     ],
     "1954": [
@@ -9707,9 +9731,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5,
-        "tppEra": "1951"
+        "tpp_lnp": 49.2,
+        "tpp_alp": 50.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1951-11-15",
@@ -9721,9 +9746,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 45.5,
-        "tpp_alp": 54.5,
-        "tppEra": "1951"
+        "tpp_lnp": 45.2,
+        "tpp_alp": 54.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1952-02-15",
@@ -9735,9 +9761,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 47.5,
-        "tpp_alp": 52.5,
-        "tppEra": "1951"
+        "tpp_lnp": 47.2,
+        "tpp_alp": 52.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1952-05-15",
@@ -9749,9 +9776,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 43.5,
-        "tpp_alp": 56.5,
-        "tppEra": "1951"
+        "tpp_lnp": 43.2,
+        "tpp_alp": 56.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1952-10-15",
@@ -9763,9 +9791,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 40.5,
-        "tpp_alp": 59.5,
-        "tppEra": "1951"
+        "tpp_lnp": 40.2,
+        "tpp_alp": 59.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1953-02-15",
@@ -9777,9 +9806,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 39.5,
-        "tpp_alp": 60.5,
-        "tppEra": "1951"
+        "tpp_lnp": 39.2,
+        "tpp_alp": 60.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1953-06-15",
@@ -9791,9 +9821,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 45.5,
-        "tpp_alp": 54.5,
-        "tppEra": "1951"
+        "tpp_lnp": 45.2,
+        "tpp_alp": 54.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1953-09-15",
@@ -9805,9 +9836,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 45.5,
-        "tpp_alp": 54.5,
-        "tppEra": "1951"
+        "tpp_lnp": 45.2,
+        "tpp_alp": 54.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1953-12-15",
@@ -9819,9 +9851,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5,
-        "tppEra": "1951"
+        "tpp_lnp": 48.2,
+        "tpp_alp": 51.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1954-02-15",
@@ -9833,9 +9866,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 47.5,
-        "tpp_alp": 52.5,
-        "tppEra": "1951"
+        "tpp_lnp": 47.2,
+        "tpp_alp": 52.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1954-03-15",
@@ -9847,9 +9881,10 @@
         "dem": null,
         "dlp": null,
         "oth": 2,
-        "tpp_lnp": 50.1,
-        "tpp_alp": 49.9,
-        "tppEra": "1951"
+        "tpp_lnp": 49.4,
+        "tpp_alp": 50.6,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1954-05-15",
@@ -9861,9 +9896,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5,
-        "tppEra": "1951"
+        "tpp_lnp": 51.2,
+        "tpp_alp": 48.8,
+        "tppEra": "1951",
+        "dateApprox": "month"
       },
       {
         "date": "1954-05-29",
@@ -9873,8 +9909,8 @@
         "grn": 0,
         "onp": 0,
         "oth": 2.36,
-        "tpp_lnp": 50.7,
-        "tpp_alp": 49.3
+        "tpp_lnp": 49.3,
+        "tpp_alp": 50.7
       }
     ],
     "1955": [
@@ -9890,7 +9926,8 @@
         "oth": 0,
         "tpp_lnp": 52,
         "tpp_alp": 48,
-        "tppEra": "1954"
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1954-10-15",
@@ -9904,7 +9941,8 @@
         "oth": 0,
         "tpp_lnp": 53,
         "tpp_alp": 47,
-        "tppEra": "1954"
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1954-12-15",
@@ -9916,9 +9954,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5,
-        "tppEra": "1954"
+        "tpp_lnp": 53.7,
+        "tpp_alp": 46.3,
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1955-04-15",
@@ -9932,7 +9971,8 @@
         "oth": 0,
         "tpp_lnp": 52,
         "tpp_alp": 48,
-        "tppEra": "1954"
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1955-05-15",
@@ -9944,9 +9984,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 56.5,
-        "tpp_alp": 43.5,
-        "tppEra": "1954"
+        "tpp_lnp": 56.7,
+        "tpp_alp": 43.3,
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1955-07-15",
@@ -9958,9 +9999,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 57.5,
-        "tpp_alp": 42.5,
-        "tppEra": "1954"
+        "tpp_lnp": 57.7,
+        "tpp_alp": 42.3,
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1955-08-15",
@@ -9972,9 +10014,10 @@
         "dem": null,
         "dlp": null,
         "oth": 1,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5,
-        "tppEra": "1954"
+        "tpp_lnp": 52.7,
+        "tpp_alp": 47.3,
+        "tppEra": "1954",
+        "dateApprox": "month"
       },
       {
         "date": "1955-12-10",
@@ -10001,7 +10044,8 @@
         "oth": 5,
         "tpp_lnp": 52.7,
         "tpp_alp": 47.3,
-        "tppEra": "1955"
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1956-02-15",
@@ -10015,7 +10059,8 @@
         "oth": 1,
         "tpp_lnp": 52.5,
         "tpp_alp": 47.5,
-        "tppEra": "1955"
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1956-03-15",
@@ -10029,7 +10074,8 @@
         "oth": 0,
         "tpp_lnp": 53,
         "tpp_alp": 47,
-        "tppEra": "1955"
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1956-07-15",
@@ -10043,7 +10089,8 @@
         "oth": 1,
         "tpp_lnp": 51.5,
         "tpp_alp": 48.5,
-        "tppEra": "1955"
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1956-12-15",
@@ -10057,7 +10104,8 @@
         "oth": 1,
         "tpp_lnp": 49.5,
         "tpp_alp": 50.5,
-        "tppEra": "1955"
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1957-04-15",
@@ -10071,7 +10119,8 @@
         "oth": 5,
         "tpp_lnp": 52.7,
         "tpp_alp": 47.3,
-        "tppEra": "1955"
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1957-09-15",
@@ -10083,9 +10132,10 @@
         "dem": null,
         "dlp": 11,
         "oth": 1,
-        "tpp_lnp": 58.5,
-        "tpp_alp": 41.5,
-        "tppEra": "1955"
+        "tpp_lnp": 55.6,
+        "tpp_alp": 44.4,
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1958-02-15",
@@ -10097,9 +10147,10 @@
         "dem": null,
         "dlp": 8,
         "oth": 1,
-        "tpp_lnp": 57.5,
-        "tpp_alp": 42.5,
-        "tppEra": "1955"
+        "tpp_lnp": 55.4,
+        "tpp_alp": 44.6,
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1958-04-15",
@@ -10111,9 +10162,10 @@
         "dem": null,
         "dlp": 6,
         "oth": 1,
-        "tpp_lnp": 56.5,
-        "tpp_alp": 43.5,
-        "tppEra": "1955"
+        "tpp_lnp": 54.9,
+        "tpp_alp": 45.1,
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1958-08-15",
@@ -10125,9 +10177,10 @@
         "dem": null,
         "dlp": 9,
         "oth": 1,
-        "tpp_lnp": 59.5,
-        "tpp_alp": 40.5,
-        "tppEra": "1955"
+        "tpp_lnp": 57.1,
+        "tpp_alp": 42.9,
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1958-09-15",
@@ -10139,9 +10192,10 @@
         "dem": null,
         "dlp": 8,
         "oth": 1,
-        "tpp_lnp": 55.5,
-        "tpp_alp": 44.5,
-        "tppEra": "1955"
+        "tpp_lnp": 53.4,
+        "tpp_alp": 46.6,
+        "tppEra": "1955",
+        "dateApprox": "month"
       },
       {
         "date": "1958-11-22",
@@ -10168,7 +10222,8 @@
         "oth": 1,
         "tpp_lnp": 52.9,
         "tpp_alp": 47.1,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1959-08-15",
@@ -10182,7 +10237,8 @@
         "oth": 1,
         "tpp_lnp": 54.2,
         "tpp_alp": 45.8,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1959-10-15",
@@ -10196,7 +10252,8 @@
         "oth": 1,
         "tpp_lnp": 54.5,
         "tpp_alp": 45.5,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1960-04-15",
@@ -10210,7 +10267,8 @@
         "oth": 1,
         "tpp_lnp": 50.5,
         "tpp_alp": 49.5,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1960-06-15",
@@ -10224,7 +10282,8 @@
         "oth": 1,
         "tpp_lnp": 50.2,
         "tpp_alp": 49.8,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1960-12-15",
@@ -10238,7 +10297,8 @@
         "oth": 1,
         "tpp_lnp": 48.9,
         "tpp_alp": 51.1,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1961-06-15",
@@ -10252,7 +10312,8 @@
         "oth": 1,
         "tpp_lnp": 49.2,
         "tpp_alp": 50.8,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1961-08-15",
@@ -10266,7 +10327,8 @@
         "oth": 1,
         "tpp_lnp": 54.5,
         "tpp_alp": 45.5,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1961-10-15",
@@ -10280,7 +10342,8 @@
         "oth": 1,
         "tpp_lnp": 52.2,
         "tpp_alp": 47.8,
-        "tppEra": "1958"
+        "tppEra": "1958",
+        "dateApprox": "month"
       },
       {
         "date": "1961-12-09",
@@ -10307,7 +10370,8 @@
         "oth": 0,
         "tpp_lnp": 47.1,
         "tpp_alp": 52.9,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1962-06-15",
@@ -10321,7 +10385,8 @@
         "oth": 1,
         "tpp_lnp": 46.6,
         "tpp_alp": 53.4,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1962-08-15",
@@ -10335,7 +10400,8 @@
         "oth": 1,
         "tpp_lnp": 46.4,
         "tpp_alp": 53.6,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1962-11-15",
@@ -10349,7 +10415,8 @@
         "oth": 1,
         "tpp_lnp": 48.4,
         "tpp_alp": 51.6,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-02-15",
@@ -10363,7 +10430,8 @@
         "oth": 1,
         "tpp_lnp": 48.4,
         "tpp_alp": 51.6,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-03-15",
@@ -10377,7 +10445,8 @@
         "oth": 1,
         "tpp_lnp": 49.4,
         "tpp_alp": 50.6,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-04-15",
@@ -10391,7 +10460,8 @@
         "oth": 1,
         "tpp_lnp": 51.4,
         "tpp_alp": 48.6,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-06-15",
@@ -10405,7 +10475,8 @@
         "oth": 1,
         "tpp_lnp": 52.2,
         "tpp_alp": 47.8,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-08-15",
@@ -10419,7 +10490,8 @@
         "oth": 1,
         "tpp_lnp": 51.6,
         "tpp_alp": 48.4,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-10-15",
@@ -10433,7 +10505,8 @@
         "oth": 1,
         "tpp_lnp": 48.2,
         "tpp_alp": 51.8,
-        "tppEra": "1961"
+        "tppEra": "1961",
+        "dateApprox": "month"
       },
       {
         "date": "1963-11-30",
@@ -10460,7 +10533,8 @@
         "oth": 0,
         "tpp_lnp": 55.8,
         "tpp_alp": 44.2,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1964-10-15",
@@ -10474,7 +10548,8 @@
         "oth": 2,
         "tpp_lnp": 53.7,
         "tpp_alp": 46.3,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1964-11-21",
@@ -10516,7 +10591,8 @@
         "oth": 1,
         "tpp_lnp": 54,
         "tpp_alp": 46,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1965-09-15",
@@ -10530,7 +10606,8 @@
         "oth": 1,
         "tpp_lnp": 57.4,
         "tpp_alp": 42.6,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1966-02-15",
@@ -10544,7 +10621,8 @@
         "oth": 1,
         "tpp_lnp": 59.6,
         "tpp_alp": 40.4,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1966-04-15",
@@ -10558,7 +10636,8 @@
         "oth": 1,
         "tpp_lnp": 58.2,
         "tpp_alp": 41.8,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1966-09-15",
@@ -10572,7 +10651,8 @@
         "oth": 2,
         "tpp_lnp": 57.9,
         "tpp_alp": 42.1,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1966-11-15",
@@ -10586,7 +10666,8 @@
         "oth": 2,
         "tpp_lnp": 60.5,
         "tpp_alp": 39.5,
-        "tppEra": "1963"
+        "tppEra": "1963",
+        "dateApprox": "month"
       },
       {
         "date": "1966-11-26",
@@ -10613,7 +10694,8 @@
         "oth": 1,
         "tpp_lnp": 59.7,
         "tpp_alp": 40.3,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1967-05-15",
@@ -10627,7 +10709,8 @@
         "oth": 2,
         "tpp_lnp": 56.5,
         "tpp_alp": 43.5,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1967-07-15",
@@ -10641,7 +10724,8 @@
         "oth": 1,
         "tpp_lnp": 51.8,
         "tpp_alp": 48.2,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1967-09-15",
@@ -10655,7 +10739,8 @@
         "oth": 2,
         "tpp_lnp": 52.5,
         "tpp_alp": 47.5,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1967-11-15",
@@ -10669,7 +10754,8 @@
         "oth": 2,
         "tpp_lnp": 51.5,
         "tpp_alp": 48.5,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1967-12-15",
@@ -10683,7 +10769,8 @@
         "oth": 1,
         "tpp_lnp": 54.3,
         "tpp_alp": 45.7,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1968-02-15",
@@ -10697,7 +10784,8 @@
         "oth": 1,
         "tpp_lnp": 58.7,
         "tpp_alp": 41.3,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1968-06-15",
@@ -10711,7 +10799,8 @@
         "oth": 1,
         "tpp_lnp": 56.7,
         "tpp_alp": 43.3,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1968-08-15",
@@ -10725,7 +10814,8 @@
         "oth": 2,
         "tpp_lnp": 56.3,
         "tpp_alp": 43.7,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1968-10-15",
@@ -10739,7 +10829,8 @@
         "oth": 2,
         "tpp_lnp": 55,
         "tpp_alp": 45,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1969-02-15",
@@ -10753,7 +10844,8 @@
         "oth": 2,
         "tpp_lnp": 58,
         "tpp_alp": 42,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1969-04-15",
@@ -10767,7 +10859,8 @@
         "oth": 1,
         "tpp_lnp": 57.7,
         "tpp_alp": 42.3,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1969-06-15",
@@ -10781,7 +10874,8 @@
         "oth": 3,
         "tpp_lnp": 56.8,
         "tpp_alp": 43.2,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1969-08-15",
@@ -10795,7 +10889,8 @@
         "oth": 2,
         "tpp_lnp": 54.3,
         "tpp_alp": 45.7,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1969-10-15",
@@ -10809,7 +10904,8 @@
         "oth": 2,
         "tpp_lnp": 55,
         "tpp_alp": 45,
-        "tppEra": "1966"
+        "tppEra": "1966",
+        "dateApprox": "month"
       },
       {
         "date": "1969-10-25",
@@ -10836,7 +10932,8 @@
         "oth": 3,
         "tpp_lnp": 53.1,
         "tpp_alp": 46.9,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1970-02-15",
@@ -10850,7 +10947,8 @@
         "oth": 2,
         "tpp_lnp": 53.5,
         "tpp_alp": 46.5,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1970-06-15",
@@ -10864,7 +10962,8 @@
         "oth": 2,
         "tpp_lnp": 52.5,
         "tpp_alp": 47.5,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1970-08-31",
@@ -10920,7 +11019,8 @@
         "oth": 3,
         "tpp_lnp": 52.5,
         "tpp_alp": 47.5,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1971-08-10",
@@ -10962,7 +11062,8 @@
         "oth": 2,
         "tpp_lnp": 51.3,
         "tpp_alp": 48.7,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1971-11-15",
@@ -10976,7 +11077,8 @@
         "oth": 3,
         "tpp_lnp": 51.8,
         "tpp_alp": 48.2,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-02-15",
@@ -10990,7 +11092,8 @@
         "oth": 4,
         "tpp_lnp": 47.4,
         "tpp_alp": 52.6,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-04-10",
@@ -11032,7 +11135,8 @@
         "oth": 5,
         "tpp_lnp": 49.9,
         "tpp_alp": 50.1,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-07-15",
@@ -11046,7 +11150,8 @@
         "oth": 6,
         "tpp_lnp": 54,
         "tpp_alp": 46,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-08-15",
@@ -11060,7 +11165,8 @@
         "oth": 5,
         "tpp_lnp": 53.2,
         "tpp_alp": 46.8,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-09-15",
@@ -11074,7 +11180,8 @@
         "oth": 4,
         "tpp_lnp": 51.9,
         "tpp_alp": 48.1,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-10-15",
@@ -11088,7 +11195,8 @@
         "oth": 6,
         "tpp_lnp": 49,
         "tpp_alp": 51,
-        "tppEra": "1969"
+        "tppEra": "1969",
+        "dateApprox": "month"
       },
       {
         "date": "1972-11-15",
@@ -11143,7 +11251,8 @@
         "oth": 5,
         "tpp_lnp": 45.6,
         "tpp_alp": 54.4,
-        "tppEra": "1972"
+        "tppEra": "1972",
+        "dateApprox": "month"
       },
       {
         "date": "1973-03-08",
@@ -11199,7 +11308,8 @@
         "oth": 8,
         "tpp_lnp": 51.3,
         "tpp_alp": 48.7,
-        "tppEra": "1972"
+        "tppEra": "1972",
+        "dateApprox": "month"
       },
       {
         "date": "1973-06-05",
@@ -11227,7 +11337,8 @@
         "oth": 6,
         "tpp_lnp": 52.2,
         "tpp_alp": 47.8,
-        "tppEra": "1972"
+        "tppEra": "1972",
+        "dateApprox": "month"
       },
       {
         "date": "1973-08-15",
@@ -11241,7 +11352,8 @@
         "oth": 5,
         "tpp_lnp": 53.9,
         "tpp_alp": 46.1,
-        "tppEra": "1972"
+        "tppEra": "1972",
+        "dateApprox": "month"
       },
       {
         "date": "1973-09-05",
@@ -11339,7 +11451,8 @@
         "oth": 4,
         "tpp_lnp": 54.4,
         "tpp_alp": 45.6,
-        "tppEra": "1972"
+        "tppEra": "1972",
+        "dateApprox": "month"
       },
       {
         "date": "1974-02-15",
@@ -11353,7 +11466,8 @@
         "oth": 7,
         "tpp_lnp": 53.7,
         "tpp_alp": 46.3,
-        "tppEra": "1972"
+        "tppEra": "1972",
+        "dateApprox": "month"
       },
       {
         "date": "1974-03-08",
@@ -11436,7 +11550,8 @@
         "oth": 1,
         "tpp_lnp": 51.6,
         "tpp_alp": 48.4,
-        "tppEra": "1974"
+        "tppEra": "1974",
+        "dateApprox": "month"
       },
       {
         "date": "1974-07-15",
@@ -11450,7 +11565,8 @@
         "oth": 2,
         "tpp_lnp": 55.2,
         "tpp_alp": 44.8,
-        "tppEra": "1974"
+        "tppEra": "1974",
+        "dateApprox": "month"
       },
       {
         "date": "1974-08-15",
@@ -11464,7 +11580,8 @@
         "oth": 2,
         "tpp_lnp": 56.2,
         "tpp_alp": 43.8,
-        "tppEra": "1974"
+        "tppEra": "1974",
+        "dateApprox": "month"
       },
       {
         "date": "1974-09-14",
@@ -11534,7 +11651,8 @@
         "oth": 2,
         "tpp_lnp": 60.2,
         "tpp_alp": 39.8,
-        "tppEra": "1974"
+        "tppEra": "1974",
+        "dateApprox": "month"
       },
       {
         "date": "1975-01-15",
@@ -11548,7 +11666,8 @@
         "oth": 2,
         "tpp_lnp": 58.2,
         "tpp_alp": 41.8,
-        "tppEra": "1974"
+        "tppEra": "1974",
+        "dateApprox": "month"
       },
       {
         "date": "1975-02-19",
@@ -61675,12 +61794,12 @@
     "1963|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1961 election's calibrated constants (FLOW_ERAS[1961] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.27 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
     "1966|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1963 election's calibrated constants (FLOW_ERAS[1963] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.47 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
     "1969|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1966 election's calibrated constants (FLOW_ERAS[1966] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.02 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1946|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1943 election's calibrated constants (FLOW_ERAS[1943] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −1.4 vs the closing election's estimated 2PP, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece against an estimated close itself). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1949|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1946 election's calibrated constants (FLOW_ERAS[1946] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −1.33 vs official, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1951|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1949 election's calibrated constants (FLOW_ERAS[1949] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.76 vs official, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1954|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1951 election's calibrated constants (FLOW_ERAS[1951] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.43 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1955|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1954 election's calibrated constants (FLOW_ERAS[1954] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.01 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1958|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1955 election's calibrated constants (FLOW_ERAS[1955] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −2.52 vs official – the DLP's post-split realignment, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
+    "1946|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1943 election's calibrated constants (FLOW_ERAS[1943] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −1.59 vs the closing election's estimated 2PP, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece against an estimated close itself). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1949|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1946 election's calibrated constants (FLOW_ERAS[1946] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −0.53 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1951|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1949 election's calibrated constants (FLOW_ERAS[1949] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.04 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1954|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1951 election's calibrated constants (FLOW_ERAS[1951] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +1.31 vs official, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1955|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1954 election's calibrated constants (FLOW_ERAS[1954] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.48 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1958|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1955 election's calibrated constants (FLOW_ERAS[1955] in flows.mjs, anchored to that election's official 2PP, except the new Anti-Communist Labor/DLP flow, which carries the pooled DLP-era 0.27 – solved against 1955 alone it is 0.002, which puts the 1957–58 waves 2–3 points too low for Labor – the Kevin Bonham Wonk Central method; right-edge backtest 0.00 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
     "1961|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1958 election's calibrated constants (FLOW_ERAS[1958] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.33 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used."
   }
 }

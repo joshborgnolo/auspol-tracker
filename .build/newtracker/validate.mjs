@@ -582,6 +582,27 @@ export function validate(D) {
         detail: `2PP averages ${m > 0 ? "+" : ""}${m.toFixed(1)} vs what its own primaries imply `
               + `over ${ds.length} rows – the ALP/L-NP pair is probably swapped` });
   };
+  /* An election's own pair has a hard bound the polls' don't: Labor's 2PP
+     is its primary plus some share of everyone else's, so it sits between
+     its primary and 100 minus the Coalition's. A swapped pair breaks it
+     whenever the primaries aren't level – e1951/e1954 shipped swapped from
+     the 1943–58 bootstrap's literal and nothing caught them. 0.15 of slack
+     for two-decimal primaries against a one-decimal 2PP. */
+  for (const [k, e] of Object.entries(D.elections || {})) {
+    if (e.alp == null || e.lnp == null || e.tpp_alp == null) continue;
+    if (e.tpp_alp < e.alp - 0.15 || e.tpp_alp > 100 - e.lnp + 0.15 || Math.abs(e.tpp_alp + e.tpp_lnp - 100) > 0.15)
+      errors.push({ type: "2pp-flip", poll: `elections.${k}`,
+        detail: `ALP 2PP ${e.tpp_alp} lies outside ALP primary ${e.alp} … 100 − L/NP primary ${e.lnp}`
+              + ` (or the pair doesn't sum to 100) – the ALP/L-NP pair is probably swapped` });
+  }
+  /* dateApprox marks a mirror date that only names the month (the
+     accuracy window skips it, the dots print the month alone) – an era-row
+     property, set by .build/fix-1943-58-cycles.mjs and the assimilator. */
+  for (const [cycle, rows] of Object.entries(D.cyclePolls || {}))
+    for (const p of rows)
+      if (p.dateApprox != null && (p.dateApprox !== "month" || p.tppEra == null))
+        errors.push({ type: "date-approx", poll: `cyclePolls.${cycle} ${p.date} ${p.firm}`,
+          detail: `dateApprox ${JSON.stringify(p.dateApprox)} – only "month", and only on a tppEra row` });
   orientation(D.polls.filter((p) => !p.isElection), "polls[] (current term)", "alp", "tpp_alp");
   for (const [cycle, rows] of Object.entries(D.cyclePolls || {}))
     orientation(rows.filter((p) => p.firm !== "Election"), `cyclePolls.${cycle}`, "alp", "tpp_alp");

@@ -690,8 +690,7 @@ function ssAboutBlock(L, prim, acc) {
         interval is marked as such.</p>${acc ? `
       <p>That caveat is not idle. Across the ${acc.cycles.length} elections from
         ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year} the final polls missed
-        the two-party result by ${acc.meanAbs} points on average &#8211; at ${acc.worstCycle.year} by
-        ${Math.abs(acc.worstCycle.err)}, every house on the same side of it.
+        the two-party result by ${acc.meanAbs} points on average &#8211; at ${accWorst(acc)}.
         Past cycles carries the full record, house by house.</p>` : ""}
 
       <h2>Reading the charts</h2>
@@ -1016,6 +1015,16 @@ function buildStaticSummaryVic() {
     </article>`;
 }
 
+/* The worst final-polls miss, as the static copy quotes it. "Every house on
+   the same side" only when two or more houses polled and all missed one way
+   (gen-data's sameSide); a lone house is named instead, since one poll
+   always misses one way. */
+function accWorst(acc) {
+  const w = acc.worstCycle, by = `${w.year} by ${Math.abs(w.err)}`;
+  if (w.n === 1) return `${by}, when ${w.houses[0].firm} was the only pollster`;
+  return w.sameSide ? `${by}, with every house on the same side of it` : by;
+}
+
 /* ---- the tab pages' static articles ------------------------------------
    Each tab is also its own URL (Now is the root document; the rest one
    segment under it), and a crawler or no-JS reader landing on one should
@@ -1044,7 +1053,7 @@ function tabSummaryFacts() {
           <td>${r.alpImp != null ? r.alpImp.toFixed(1) + "%" : "&#8211;"}</td>
           <td>${r.alpImp != null ? (100 - r.alpImp).toFixed(1) + "%" : "&#8211;"}</td>
         </tr>`).join("");
-  return { esc, L, prim: L.primary, polls, acc, sources, latestRows };
+  return { esc, L, prim: L.primary, polls, acc, sources, latestRows, grab };
 }
 
 /* The closing pair every static article ends with: the Sources block and
@@ -1067,13 +1076,18 @@ function ssTail(esc, sources) {
 }
 
 function buildTabSummary(id) {
-  const { esc, L, prim, acc, sources, latestRows } = tabSummaryFacts();
+  const { esc, L, prim, acc, sources, latestRows, grab } = tabSummaryFacts();
   if (id === "cycles") {
     const els = Object.values(DATA.elections).sort((a, b) => a.date.localeCompare(b.date));
+    /* "Won by" is the side that formed government – the term the election
+       opened – not the 2PP majority: 1954, 1961, 1969, 1990 and 1998 went
+       to the side that lost the two-party vote. The 2PP stands as the
+       fallback only for an election no cycle row covers. */
+    const govOf = new Map(grab("CYCLE_DEFS").map((c) => [String(c.year), c.gov]));
     const eRows = els.map((E) => `
         <tr>
           <th scope="row">${E.date.slice(0, 4)}</th>
-          <td>${E.tpp_alp >= 50 ? "Labor" : "Coalition"}</td>
+          <td>${(govOf.get(E.date.slice(0, 4)) ?? (E.tpp_alp >= 50 ? "alp" : "lnp")) === "alp" ? "Labor" : "Coalition"}</td>
           <td>${E.tpp_alp.toFixed(1)}%</td>
           <td>${E.tpp_lnp.toFixed(1)}%</td>
         </tr>`).join("");
@@ -1097,10 +1111,9 @@ function buildTabSummary(id) {
 ${acc ? `
       <h2>How the final polls did</h2>
       <p>Measured against the ${acc.cycles.length} elections from ${acc.cycles[0].year} to
-        ${acc.cycles[acc.cycles.length - 1].year}, the final published polls missed the two-party result by
-        ${acc.meanAbs} points on average &#8211; at ${acc.worstCycle.year} by ${Math.abs(acc.worstCycle.err)},
-        with every house on the same side of it. The full record, house by house and cycle by cycle, is
-        tabled on the live page.</p>
+        ${acc.cycles[acc.cycles.length - 1].year}, the final polls missed the two-party result by
+        ${acc.meanAbs} points on average &#8211; at ${accWorst(acc)}. The full record, house by house and
+        cycle by cycle, is tabled on the live page.</p>
 ` : ""}
 ${ssTail(esc, sources)}
     </article>`;

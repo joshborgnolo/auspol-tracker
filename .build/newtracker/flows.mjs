@@ -127,7 +127,7 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
       at the election that OPENED the cycle (LEF: constants of election E
       serve the polls of the E→E+1 cycle, never E's own).
    2. The constants were calibrated per election against that election's
-      OFFICIAL national 2PP (AEC/published: 1943 58.2†, 1946 54.1†, 1949
+      published national 2PP† (AEC/published: 1943 58.2, 1946 54.1, 1949
       49.0, 1951 49.3, 1954 50.7, 1955 45.8, 1958 45.9, 1961 50.5, 1963
       47.4, 1966 43.1, 1969 50.2, 1972 52.7, 1974 51.7, 1975 44.3, 1977
       45.4, 1980 49.6, 1983 53.23, 1984 51.77, 1987 50.83, ALP share)
@@ -139,34 +139,45 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
       DLP-era fit), the era's headline minor party (DLP to 1975, Democrats
       from 1977) solved per election, DLP pinned at 0.27 in the Democrat
       era (its vote was ≤1.4% and collapsing – the pooled DLP-era
-      estimate).
-      † The AEC's own TPP series starts in 1949; the two earlier figures
-        are the published Mackerras-estimate 2PPs carried by the election
-        articles of record, and carry wider tolerance with them.
-   3. The 1977 Democrat debut is a structural break (Bonham's "completely
-      obvious at the time" case): no prior Democrat flow exists, so the
-      1975 set carries dem=0.50 as an explicit debut assumption.
+      estimate). Before the DLP there is no headline minor to solve, so
+      the 1943–1954 sets solve f_oth itself, the one free constant, so
+      each set reproduces its own election exactly. The solved values
+      swing (0.27 to 0.82) because "others" was 2–7% of the vote and a
+      0.1-point rounding in the 2PP moves the flow by up to 0.05.
+      † The AEC did no full distribution of preferences before 1984, so
+        every pre-1984 figure here is an estimate (the 1949–1980 series is
+        the Parliamentary Library's); the AEC lists none before 1949, and
+        the 1943/1946 figures are the published Mackerras estimates,
+        which carry wider tolerance with them.
+   3. Two structural breaks get explicit assumptions instead of a solved
+      flow. The 1977 Democrat debut (Bonham's "completely obvious at the
+      time" case): no prior Democrat flow exists, so the 1975 set carries
+      dem=0.50. And the 1955 Labor split: solved against 1955 itself, the
+      new Anti-Communist Labor/DLP flow comes out at 0.002 (all but every
+      preference to the Coalition), a flow that put the 1957–58 waves,
+      where the DLP polls 6–11%, 2–3 points too low for Labor. The 1955 set
+      therefore carries the pooled DLP-era 0.27 (the Democrat-era pin);
+      it misses 1955 itself by +1.38 but lands 1958 exactly.
 
    The bt field is the right-edge backtest (same convention as FLOW_LEF):
    the set's constants applied to the CLOSING election's actual primaries
-   vs that election's official 2PP, in ALP points. Every 1961+ cycle lands
+   vs that election's official 2PP, in ALP points. Every set but two lands
    inside Bonham's measured pre-1983 LEF error budget (±0.6) and the
-   broader post-1983 one (±0.3–1.1); the pre-1961 sets do not all make
-   that budget – the 1940s residual "others" carried the big
-   Non-Communist/Services/independent splinters and 1943's 12% independent
-   vote, and DLP preferences realigned hard after the 1955 split year –
-   and the bt field records each miss as it stands; the cyclePollBases
-   notes quote it to the reader instead of the budget line. The implied
+   broader post-1983 one (±0.3–1.1); the two that miss it – 1943's
+   others were a 12% independent vote plus splinter Labor, which broke
+   nothing like 1946's, and 1951's 0.82 overshoots 1954 – and the bt
+   field records each miss as it stands; the cyclePollBases notes quote
+   it to the reader instead of the budget line. The implied
    figure is tagged per row with `tppEra` (the opening election year, i.e.
    the key below), and validate.mjs inverts era rows against THESE
    constants instead of the 2025 set. */
 export const FLOW_ERAS = Object.freeze({
-  1943: { oth: 0.45, bt: -1.4 },
-  1946: { oth: 0.45, bt: -1.33 },
-  1949: { oth: 0.45, bt: -0.76 },
-  1951: { oth: 0.45, bt: 0.43 },
-  1954: { oth: 0.45, bt: -0.01 },
-  1955: { dlp: 0.0022, oth: 0.45, bt: -2.52 },
+  1943: { oth: 0.4213, bt: -1.59 },
+  1946: { oth: 0.6611, bt: -0.53 },
+  1949: { oth: 0.8032, bt: -0.04 },
+  1951: { oth: 0.8227, bt: 1.31 },
+  1954: { oth: 0.2669, bt: -0.48 },
+  1955: { dlp: 0.27, oth: 0.45, bt: 0 },
   1958: { dlp: 0.2698, oth: 0.45, bt: 0.33 },
   1961: { dlp: 0.2319, oth: 0.45, bt: 0.27 },
   1963: { dlp: 0.1952, oth: 0.45, bt: -0.47 },

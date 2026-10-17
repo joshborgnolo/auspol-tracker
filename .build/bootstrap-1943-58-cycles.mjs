@@ -53,8 +53,10 @@ const NEW = {
   e1943: { date: "1943-08-21", lnp: 30.44, alp: 49.93, grn: 0, onp: 0, oth: 19.6, tpp_lnp: 41.8, tpp_alp: 58.2 },
   e1946: { date: "1946-09-28", lnp: 43.65, alp: 49.71, grn: 0, onp: 0, oth: 6.64, tpp_lnp: 45.9, tpp_alp: 54.1 },
   e1949: { date: "1949-12-10", lnp: 50.26, alp: 45.98, grn: 0, onp: 0, oth: 3.76, tpp_lnp: 51.0, tpp_alp: 49.0 },
-  e1951: { date: "1951-04-28", lnp: 50.34, alp: 47.63, grn: 0, onp: 0, oth: 2.03, tpp_lnp: 49.3, tpp_alp: 50.7 },
-  e1954: { date: "1954-05-29", lnp: 47.57, alp: 50.07, grn: 0, onp: 0, oth: 2.36, tpp_lnp: 50.7, tpp_alp: 49.3 },
+  // e1951/e1954 shipped with the two-party pair swapped here; corrected
+  // 2026-10-18 (polls.json by .build/fix-1943-58-cycles.mjs)
+  e1951: { date: "1951-04-28", lnp: 50.34, alp: 47.63, grn: 0, onp: 0, oth: 2.03, tpp_lnp: 50.7, tpp_alp: 49.3 },
+  e1954: { date: "1954-05-29", lnp: 47.57, alp: 50.07, grn: 0, onp: 0, oth: 2.36, tpp_lnp: 49.3, tpp_alp: 50.7 },
   e1955: { date: "1955-12-10", lnp: 47.67, alp: 44.65, grn: 0, onp: 0, oth: 7.68, tpp_lnp: 54.2, tpp_alp: 45.8 },
   e1958: { date: "1958-11-22", lnp: 46.55, alp: 42.81, grn: 0, onp: 0, oth: 10.64, tpp_lnp: 54.1, tpp_alp: 45.9 },
 };

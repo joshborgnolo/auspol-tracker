@@ -151,7 +151,10 @@ const OLDEST_ELECTION = D.elections.e1943.date;
 // tagged #Transcribed) and nothing in the repo adjudicates them — the Trove
 // corpus has no 1960 waves — so BOTH rows stay CSV-only until a primary
 // source settles the pair
-const EXCLUDE_DATES = new Set(["1960-02-15"]);
+// 1949-12-15 is Gallup's final 1949 pre-election estimate under a
+// mid-month placeholder; polls.json files it as 1949-12-03 in the 1949
+// bucket (.build/fix-1943-58-cycles.mjs, Trove article 230739836)
+const EXCLUDE_DATES = new Set(["1960-02-15", "1949-12-15"]);
 const bucketFor = (date) => {
   for (const y of endYears) if (date <= electionDate(y)) return String(y);
   return null; // after the last closed election -> current term
@@ -177,6 +180,17 @@ const TPP_ERA_BY_BUCKET = {
   1983: "1980", 1984: "1983", 1987: "1984",
 };
 const candidates = [];
+// F2F Morgan rows per calendar month: a sole wave dated the 15th (or 1st)
+// is a month placeholder, not a fieldwork day – the row gets dateApprox
+// "month" (same rule as .build/fix-1943-58-cycles.mjs, validate-checked)
+const morganPerMonth = new Map();
+for (const l of lines)
+  if (l[col.Firm] === "F2F Morgan")
+    morganPerMonth.set(l[col.MidDate].slice(0, 7), (morganPerMonth.get(l[col.MidDate].slice(0, 7)) || 0) + 1);
+const monthPlaceholder = (l) => l[col.Firm] === "F2F Morgan"
+  && /-(15|01)$/.test(l[col.MidDate])
+  && morganPerMonth.get(l[col.MidDate].slice(0, 7)) === 1
+  && !/#Exact date/i.test(l[col.Comments] || "");
 for (const l of lines) {
   const tpp = num(l[col["@TPP"]]);
   const alp = num(l[col["ALP FP"]]), lnp = num(l[col["LNP FP"]]);
@@ -199,6 +213,7 @@ for (const l of lines) {
   candidates.push({
     remote: l[col.Firm],
     date: l[col.MidDate],
+    dateApprox: monthPlaceholder(l),
     alp, lnp, grn, onp,
     oth,
     rawDem: minor[2], rawDlp: minor[3], rawOth: othRaw,
@@ -302,6 +317,7 @@ for (const c of candidates) {
       tpp_lnp: tA == null ? null : Math.round((100 - tA) * 10) / 10,
       tpp_alp: tA,
       tppEra: eraKey,
+      ...(c.dateApprox ? { dateApprox: "month" } : {}),
     };
   } else {
     row = {
