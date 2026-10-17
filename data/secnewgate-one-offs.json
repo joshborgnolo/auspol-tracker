@@ -1,0 +1,5745 @@
+{
+ "_about": "SEC Newgate 'Mood of the Nation' one-off and rotating survey questions that do NOT channel into the auspol-tracker data model (voting intention/leader trackers are not SEC Newgate products; national direction IS channelled via polls.json direction[] and is excluded, as are the committed mood/priority pipelines). Compiled by reading the seven committed report text dumps in .build/secnewgate-src/ (Jul 2025 through Sep 2026, waves 21-27); waves before 21 are unaudited and stay out.",
+ "generated": "2026-10-17",
+ "_readme": "Two-store convention: a question gets ONE id; every wave that asked it files a dated reading under it (identical ids across waves are the series, e.g. immigration-level in waves 24/26/27). Entry metadata (waveDate/sample/published/url/methodUrl) comes from the matching polls.json direction[] row for the wave. Every figure in every table was token-verified present in the report text dump at filing time; notes cite value orders inline. Rendering contract (read before editing): tables[0] is always width-1 (one value per entity) so the /ad-hocs/ headline strip renders it as labelled bars; multi-value tables carry 'columns' parallel to 'values'; gen-data.mjs maps columns->headers and entities->rows like the News24 store. Width-1 tables may omit 'columns'. width-1 headline tables whose rows were derived from a wider printed row mark the derivation in their title.",
+ "entries": [
+  {
+   "id": "fed-govt-priorities",
+   "waveDate": "2025-07-16",
+   "dateStart": "2025-07-08",
+   "dateEnd": "2025-07-16",
+   "published": "2025-07-29T16:58",
+   "sample": 1855,
+   "sampleEff": 1187,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf",
+   "codes": [
+    "N12"
+   ],
+   "question": "Which do you think should be the top 3 priorities for the Federal Government over the next 3 years?",
+   "notes": "Participants were given a list of 8 options. Investment in the health system (61%) and affordable housing (59%) lead, with tax reform third (43%); disaster preparedness (18%) and apprenticeships (16%) rank last. Among 18–34s affordable housing tops the list at 72% (48% of 65+), while 37% of 65+ select national defence vs 11% of 18–34s; men pick tax reform 48% vs women 39%. Values are % selected as top 3 priority.",
+   "tables": [
+    {
+     "title": "Top investment and reform priorities for the Federal Government",
+     "source": "PDF pp. 16, 35",
+     "columns": [
+      "Priority",
+      "% ranking in their top three"
+     ],
+     "entities": [
+      {
+       "name": "Investment in the health system",
+       "values": [
+        61
+       ]
+      },
+      {
+       "name": "Investment in affordable housing",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Reforming the taxation system to improve economic productivity, budget sustainability and fairness to taxpayers",
+       "values": [
+        43
+       ]
+      },
+      {
+       "name": "Reforming Medicare and the NDIS to make them more effective and sustainable",
+       "values": [
+        40
+       ]
+      },
+      {
+       "name": "Investment in renewable energy",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "Investment in national defence",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Investing in preparedness for natural disasters, such as floods and bushfires",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Investment in apprenticeships and vocational training programs",
+       "values": [
+        16
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "iran-military-action-support",
+   "waveDate": "2025-07-16",
+   "dateStart": "2025-07-08",
+   "dateEnd": "2025-07-16",
+   "published": "2025-07-29T16:58",
+   "sample": 1855,
+   "sampleEff": 1187,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "Do you support or oppose the following things?",
+   "notes": "The battery covers military action against Iran: only 26% support (50% oppose) the US targeted airstrikes on Iran’s nuclear facilities, and 20% support (51% oppose) Israel’s military action against Iran. Support for the US strikes is 50% among Coalition supporters vs 5% among Greens, and 47% among those 65+ vs 14% of 18–34s. Values are total support % then total oppose %.",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 33",
+     "entities": [
+      {
+       "name": "The United States launching targeted airstrikes on Iran's nuclear facilities",
+       "values": [
+        26
+       ]
+      },
+      {
+       "name": "Israel's military action against Iran",
+       "values": [
+        20
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Support for military action in Iran — Support for action",
+     "source": "PDF p. 33",
+     "columns": [
+      "Action",
+      "Support",
+      "Oppose"
+     ],
+     "entities": [
+      {
+       "name": "The United States launching targeted airstrikes on Iran's nuclear facilities",
+       "values": [
+        26,
+        50
+       ]
+      },
+      {
+       "name": "Israel's military action against Iran",
+       "values": [
+        20,
+        51
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "large-company-behaviour",
+   "waveDate": "2025-07-16",
+   "dateStart": "2025-07-08",
+   "dateEnd": "2025-07-16",
+   "published": "2025-07-29T16:58",
+   "sample": 1855,
+   "sampleEff": 1187,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf",
+   "codes": [
+    "F35"
+   ],
+   "question": "Overall, do you agree or disagree with the following statements about the current behaviour of large companies operating in Australia (i.e. Australia’s “corporate sector”)?",
+   "notes": "Only 22% agree and 39% disagree that corporates are behaving ethically and doing the right thing, but agreement is at its strongest level recorded (16% in November 2024, 20% in April 2025). Men agree at twice the rate of women (30% vs 15%); disagreement peaks among 35–49s at 48% (vs 28% of 65+). Values are total agree % then total disagree % for July 2025.",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 19",
+     "entities": [
+      {
+       "name": "Agree",
+       "values": [
+        22
+       ]
+      },
+      {
+       "name": "Disagree",
+       "values": [
+        39
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Behaviour of large companies operating in Australia — Belief that corporates are behaving ethically and doing the right thing",
+     "source": "PDF p. 19",
+     "columns": [
+      "Statement",
+      "Agree",
+      "Disagree"
+     ],
+     "entities": [
+      {
+       "name": "Corporates are behaving ethically and doing the right thing",
+       "values": [
+        22,
+        39
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tax-reforms",
+   "waveDate": "2025-07-16",
+   "dateStart": "2025-07-08",
+   "dateEnd": "2025-07-16",
+   "published": "2025-07-29T16:58",
+   "sample": 1855,
+   "sampleEff": 1187,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf",
+   "codes": [
+    "N13"
+   ],
+   "question": "In principle, do you support or oppose the following potential tax reforms for Australia?",
+   "notes": "65% support (14% oppose) rebalancing income tax cuts with new taxes based on overall wealth, and 64% support higher property taxes on multiple investment properties; reducing company taxes is opposed 48% to 25%, the least supported measure. No demographic crosstab for this battery is printed in the report. Values are total support % then total oppose %.",
+   "tables": [
+    {
+     "title": "Support for specific tax reforms (%)",
+     "source": "PDF p. 17",
+     "entities": [
+      {
+       "name": "Reducing personal income taxes for workers and balancing this with new taxes based on people’s overall wealth — support",
+       "values": [
+        65
+       ]
+      },
+      {
+       "name": "Increasing property taxes for people who own multiple investment properties — support",
+       "values": [
+        64
+       ]
+      },
+      {
+       "name": "Increasing tax rates on superannuation earnings for individuals with balances over $3 million — support",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Reducing personal income taxes for workers and balancing this with increases to the GST — support",
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "Replacing stamp duty (an upfront tax when buying property) with an annual land tax based on the value of the land — support",
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "Reducing company taxes — support",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "Reducing personal income taxes for workers and balancing this with new taxes based on people’s overall wealth — oppose",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Increasing property taxes for people who own multiple investment properties — oppose",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Increasing tax rates on superannuation earnings for individuals with balances over $3 million — oppose",
+       "values": [
+        22
+       ]
+      },
+      {
+       "name": "Reducing personal income taxes for workers and balancing this with increases to the GST — oppose",
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "Replacing stamp duty (an upfront tax when buying property) with an annual land tax based on the value of the land — oppose",
+       "values": [
+        32
+       ]
+      },
+      {
+       "name": "Reducing company taxes — oppose",
+       "values": [
+        48
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Support for specific tax reforms",
+     "source": "PDF p. 17",
+     "columns": [
+      "Reform",
+      "Support",
+      "Oppose"
+     ],
+     "entities": [
+      {
+       "name": "Reducing personal income taxes for workers and balancing this with new taxes based on people’s overall wealth",
+       "values": [
+        65,
+        14
+       ]
+      },
+      {
+       "name": "Increasing property taxes for people who own multiple investment properties",
+       "values": [
+        64,
+        20
+       ]
+      },
+      {
+       "name": "Increasing tax rates on superannuation earnings for individuals with balances over $3 million",
+       "values": [
+        59,
+        22
+       ]
+      },
+      {
+       "name": "Reducing personal income taxes for workers and balancing this with increases to the GST",
+       "values": [
+        44,
+        29
+       ]
+      },
+      {
+       "name": "Replacing stamp duty (an upfront tax when buying property) with an annual land tax based on the value of the land",
+       "values": [
+        35,
+        32
+       ]
+      },
+      {
+       "name": "Reducing company taxes",
+       "values": [
+        25,
+        48
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-presidency-effects",
+   "waveDate": "2025-07-16",
+   "dateStart": "2025-07-08",
+   "dateEnd": "2025-07-16",
+   "published": "2025-07-29T16:58",
+   "sample": 1855,
+   "sampleEff": 1187,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf",
+   "codes": [
+    "N23"
+   ],
+   "question": "Do you think the Donald Trump presidency will be positive or negative for the following things?",
+   "notes": "Australians are most negative on global peace and security (68% total negative, up from 67% in April and 59% in Nov 2024), the cost of living (66%), the Australian economy and the global response to climate change (both 65%), and Australia’s relationship with the USA (64%). No demographic crosstab for this battery is printed. Values are July 2025 total negative %.",
+   "tables": [
+    {
+     "title": "Predicted impact of Donald Trump’s presidency — Impact of Donald Trump Presidency on specific aspects",
+     "source": "PDF p. 32",
+     "columns": [
+      "Aspect",
+      "% expecting a negative impact"
+     ],
+     "entities": [
+      {
+       "name": "Global peace and security",
+       "values": [
+        68
+       ]
+      },
+      {
+       "name": "The cost of living in Australia",
+       "values": [
+        66
+       ]
+      },
+      {
+       "name": "The Australian economy",
+       "values": [
+        65
+       ]
+      },
+      {
+       "name": "The global response to climate change",
+       "values": [
+        65
+       ]
+      },
+      {
+       "name": "Australia’s relationship with the USA",
+       "values": [
+        64
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-affordability-contributors",
+   "waveDate": "2025-09-15",
+   "dateStart": "2025-09-09",
+   "dateEnd": "2025-09-15",
+   "published": "2025-09-24T11:16",
+   "sample": 1212,
+   "sampleEff": 970,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/SEC-Newgate-Mood-of-the-Nation-Report-September-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf",
+   "codes": [
+    "N35"
+   ],
+   "question": "To what extent do you think the following is contributing to the issue of housing affordability and availability in Australia?",
+   "notes": "Twelve tested contributors, all rated a small-or-large contribution by 72-91%: the rising price of construction and building materials (91%), not enough new properties being built (86%) and labour and skills shortages (84%) lead, while environmental regulations for new housing (72%) and negative gearing/other investor tax concessions (74%) rank lowest. The immigration level sits mid-pack at 79%, up 1pt on Nov 2024. No demographic crosstab printed for this battery — the page carries the item trend totals back to April 2024 (six items are NA in one or both of the Apr/Nov 2024 columns).",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 22",
+     "entities": [
+      {
+       "name": "Rising price of construction and building materials",
+       "values": [
+        91
+       ]
+      },
+      {
+       "name": "Not enough new properties being built",
+       "values": [
+        86
+       ]
+      },
+      {
+       "name": "Labour and skills shortages",
+       "values": [
+        84
+       ]
+      },
+      {
+       "name": "Stamp duty tax which makes people reluctant to downsize their property",
+       "values": [
+        82
+       ]
+      },
+      {
+       "name": "Housing being used for short-term holiday rentals",
+       "values": [
+        80
+       ]
+      },
+      {
+       "name": "Local Governments not approving developments quickly enough",
+       "values": [
+        80
+       ]
+      },
+      {
+       "name": "The level of immigration",
+       "values": [
+        79
+       ]
+      },
+      {
+       "name": "Community opposition to higher density development (i.e. apartments) in their local area",
+       "values": [
+        77
+       ]
+      },
+      {
+       "name": "Other regulatory requirements that must be met when building new housing",
+       "values": [
+        76
+       ]
+      },
+      {
+       "name": "Governments not releasing enough land",
+       "values": [
+        75
+       ]
+      },
+      {
+       "name": "Negative gearing and other tax concessions that encourage property investment",
+       "values": [
+        74
+       ]
+      },
+      {
+       "name": "Environmental regulations that must be met when building new housing",
+       "values": [
+        72
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of contribution to housing affordability and availability in Australia (%) — Sept 2025 national; value order: a large contribution / a small contribution / does not contribute / don’t know / TOTAL small+large contribution Apr ’24 / Nov ’24 / Sep ’25",
+     "source": "PDF p. 22",
+     "columns": [
+      "Contributor",
+      "A large contribution",
+      "A small contribution",
+      "Does not contribute",
+      "Don't know",
+      "TOTAL contributing Apr '24",
+      "TOTAL contributing Nov '24",
+      "TOTAL contributing Sep '25"
+     ],
+     "entities": [
+      {
+       "name": "Rising price of construction and building materials",
+       "values": [
+        66,
+        25,
+        5,
+        4,
+        90,
+        90,
+        91
+       ]
+      },
+      {
+       "name": "Not enough new properties being built",
+       "values": [
+        54,
+        33,
+        7,
+        6,
+        83,
+        82,
+        86
+       ]
+      },
+      {
+       "name": "Labour and skills shortages",
+       "values": [
+        44,
+        40,
+        9,
+        7,
+        83,
+        81,
+        84
+       ]
+      },
+      {
+       "name": "Stamp duty tax which makes people reluctant to downsize their property",
+       "values": [
+        50,
+        32,
+        7,
+        10,
+        78,
+        81,
+        82
+       ]
+      },
+      {
+       "name": "Housing being used for short-term holiday rentals",
+       "values": [
+        37,
+        43,
+        14,
+        6,
+        79,
+        78,
+        80
+       ]
+      },
+      {
+       "name": "Local Governments not approving developments quickly enough",
+       "values": [
+        40,
+        40,
+        10,
+        11,
+        null,
+        76,
+        80
+       ]
+      },
+      {
+       "name": "The level of immigration",
+       "values": [
+        45,
+        33,
+        15,
+        6,
+        80,
+        78,
+        79
+       ]
+      },
+      {
+       "name": "Community opposition to higher density development (i.e. apartments) in their local area",
+       "values": [
+        25,
+        52,
+        13,
+        10,
+        null,
+        76,
+        77
+       ]
+      },
+      {
+       "name": "Other regulatory requirements that must be met when building new housing",
+       "values": [
+        31,
+        45,
+        12,
+        12,
+        null,
+        null,
+        76
+       ]
+      },
+      {
+       "name": "Governments not releasing enough land",
+       "values": [
+        32,
+        43,
+        12,
+        13,
+        73,
+        71,
+        75
+       ]
+      },
+      {
+       "name": "Negative gearing and other tax concessions that encourage property investment",
+       "values": [
+        38,
+        37,
+        11,
+        15,
+        68,
+        67,
+        74
+       ]
+      },
+      {
+       "name": "Environmental regulations that must be met when building new housing",
+       "values": [
+        27,
+        46,
+        17,
+        11,
+        null,
+        null,
+        72
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "large-company-behaviour",
+   "waveDate": "2025-09-15",
+   "dateStart": "2025-09-09",
+   "dateEnd": "2025-09-15",
+   "published": "2025-09-24T11:16",
+   "sample": 1212,
+   "sampleEff": 970,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/SEC-Newgate-Mood-of-the-Nation-Report-September-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf",
+   "codes": [
+    "F35"
+   ],
+   "question": "Overall, do you agree or disagree with the following statements about the current behaviour of large companies operating in Australia (i.e. Australia’s “corporate sector”)?",
+   "notes": "Only one statement printed this wave: 18% agree corporates are “behaving ethically and doing the right thing” (1% strongly, 17% somewhat) and 42% disagree (25% somewhat, 17% strongly), down a little on July 2025’s 22%/39% and in line with the long-term average (trend back to April 2023 printed). The printed crosstab carries Agree/Disagree only: men agree 23% vs women 14%, and both 18-34s (20%) and 65+ (23%) sit above 50-64s (14%), while 35-49s disagree most (48%).",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 16",
+     "entities": [
+      {
+       "name": "Agree",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Disagree",
+       "values": [
+        42
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Belief that corporates are behaving ethically and doing the right thing (%) — Sept 2025 national; value order: strongly agree / somewhat agree / neither / somewhat disagree / strongly disagree / TOTAL agree / TOTAL disagree",
+     "source": "PDF p. 16",
+     "columns": [
+      "Response",
+      "Strongly agree",
+      "Somewhat agree",
+      "Neither",
+      "Somewhat disagree",
+      "Strongly disagree",
+      "TOTAL agree",
+      "TOTAL disagree"
+     ],
+     "entities": [
+      {
+       "name": "Corporates are “behaving ethically and doing the right thing”",
+       "values": [
+        1,
+        17,
+        40,
+        25,
+        17,
+        18,
+        42
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "renewables-bills-impact",
+   "waveDate": "2025-09-15",
+   "dateStart": "2025-09-09",
+   "dateEnd": "2025-09-15",
+   "published": "2025-09-24T11:16",
+   "sample": 1212,
+   "sampleEff": 970,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/SEC-Newgate-Mood-of-the-Nation-Report-September-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf",
+   "codes": [
+    "N11"
+   ],
+   "question": "What impact do you think the transition to renewable energy will have on electricity bills over the following time periods?",
+   "notes": "47% think the renewables transition will put upward pressure on electricity bills over the next 1-4 years (36% downward pressure or no impact), easing to 38% over 5-9 years and 31% over 10-20 years (45% downward or none). The crosstab split is generational and partisan: 58% of 65+ see upward pressure in the next 1-4 years vs 31% of 18-34s, and Coalition voters (56%) dwarfs Greens (32%) and Labor (41%).",
+   "tables": [
+    {
+     "title": "Share expecting upward pressure on electricity bills from the renewables transition (%)",
+     "source": "PDF p. 27",
+     "entities": [
+      {
+       "name": "Over the next 1-4 years",
+       "values": [
+        47
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years",
+       "values": [
+        38
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years",
+       "values": [
+        31
+       ]
+      }
+     ]
+    },
+    {
+     "title": "The impact the transition to renewable energy will have on electricity bills over time (%) — Sept 2025 national; value order: will put upward pressure on bills / won’t have any impact / will put downward pressure on bills / don’t know / TOTAL upward pressure / TOTAL downward pressure or no impact",
+     "source": "PDF p. 27",
+     "columns": [
+      "Horizon",
+      "Upward pressure",
+      "Won't have any impact",
+      "Downward pressure",
+      "Don't know",
+      "TOTAL upward pressure",
+      "TOTAL downward pressure or no impact"
+     ],
+     "entities": [
+      {
+       "name": "Over the next 1-4 years",
+       "values": [
+        47,
+        23,
+        13,
+        18,
+        47,
+        36
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years",
+       "values": [
+        38,
+        21,
+        21,
+        20,
+        38,
+        42
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years",
+       "values": [
+        31,
+        14,
+        31,
+        23,
+        31,
+        45
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "renewables-reliability-impact",
+   "waveDate": "2025-09-15",
+   "dateStart": "2025-09-09",
+   "dateEnd": "2025-09-15",
+   "published": "2025-09-24T11:16",
+   "sample": 1212,
+   "sampleEff": 970,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/SEC-Newgate-Mood-of-the-Nation-Report-September-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf",
+   "codes": [
+    "N12"
+   ],
+   "question": "What impact do you think the transition to renewable energy will have on the reliability of the electricity network over the following time periods?",
+   "notes": "Near-term pessimism flips to long-term optimism: over the next 1-4 years 15% say more reliable, 43% no difference, 26% less reliable (total more reliable or no difference 58%); by 10-20 years more reliable rises to 33% and less reliable falls to 15% (63% combined). On 10-20 year reliability Greens (47%) and Labor (41%) well outrank Coalition voters (27%), and 18-34s (41%) outrank 50-64s (28%) and 65+ (30%).",
+   "tables": [
+    {
+     "title": "Share expecting the renewables transition to make the network more reliable or make no difference (%)",
+     "source": "PDF p. 28",
+     "entities": [
+      {
+       "name": "Over the next 1-4 years",
+       "values": [
+        58
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years",
+       "values": [
+        62
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years",
+       "values": [
+        63
+       ]
+      }
+     ]
+    },
+    {
+     "title": "The impact the transition to renewable energy will have on network reliability over time (%) — Sept 2025 national; value order: it will make it more reliable / won’t make any difference to reliability / it will make it less reliable / don’t know / TOTAL more reliable or no difference",
+     "source": "PDF p. 28",
+     "columns": [
+      "Horizon",
+      "More reliable",
+      "No difference",
+      "Less reliable",
+      "Don't know",
+      "TOTAL more reliable or no difference"
+     ],
+     "entities": [
+      {
+       "name": "Over the next 1-4 years",
+       "values": [
+        15,
+        43,
+        26,
+        16,
+        58
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years",
+       "values": [
+        25,
+        37,
+        20,
+        18,
+        62
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years",
+       "values": [
+        33,
+        29,
+        15,
+        22,
+        63
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-security",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N20"
+   ],
+   "question": "Australia, the United States and the United Kingdom have formed a long-term security partnership known as AUKUS. The agreement aims to strengthen defence and security cooperation in the Indo-Pacific region, including helping Australia acquire nuclear-powered submarines and access advanced defence technologies. Do you support or oppose Australia's involvement in the AUKUS partnership?",
+   "notes": "59% support Australia's AUKUS involvement (one in four, 25%, strongly), 23% neutral, 17% opposed. The partisan gap is 39 points: Coalition 74% vs Greens 35% support, and Greens are 34% opposed vs 8% of Coalition supporters; 65+ at 71% support vs 52% of 18-34s.",
+   "tables": [
+    {
+     "title": "Level of support (%) — Support for AUKUS partnership",
+     "source": "PDF p. 36",
+     "entities": [
+      {
+       "name": "Total support",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Neither support nor oppose",
+       "values": [
+        23
+       ]
+      },
+      {
+       "name": "Total oppose",
+       "values": [
+        17
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "country-relations",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N19"
+   ],
+   "question": "How do you rate the current relationship between Australia and the following countries?",
+   "notes": "New Zealand (88% good+) and the United Kingdom (80%) rate best; China (34%) and Russia (10%) worst. The US is the big mover, up to 53% good+ from 38% in April 2025, while most others slipped a few points (UK 85→80, Canada 77→71, Germany 63→59, France 62→58).",
+   "tables": [
+    {
+     "title": "Rating of Australia's relationship with specific country (%) — Excellent / very good / good, Nov '25",
+     "source": "PDF p. 33",
+     "entities": [
+      {
+       "name": "New Zealand",
+       "values": [
+        88
+       ]
+      },
+      {
+       "name": "United Kingdom",
+       "values": [
+        80
+       ]
+      },
+      {
+       "name": "Japan",
+       "values": [
+        72
+       ]
+      },
+      {
+       "name": "Canada",
+       "values": [
+        71
+       ]
+      },
+      {
+       "name": "Germany",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Indonesia",
+       "values": [
+        58
+       ]
+      },
+      {
+       "name": "France",
+       "values": [
+        58
+       ]
+      },
+      {
+       "name": "India",
+       "values": [
+        55
+       ]
+      },
+      {
+       "name": "South Korea",
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "United States",
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "China",
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "Russia",
+       "values": [
+        10
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "disaster-response-confidence",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N25"
+   ],
+   "question": "Overall, how confident are you in the ability of governments to respond and assist if a natural disaster (such as a hail storm, cyclone, flood or bushfire) was to occur in your local area?",
+   "notes": "71% are confident governments would respond to a local natural disaster, but only 12% are 'very' confident (59% somewhat); 29% not confident. 65+ (76%) and WA (76%) are the most confident, 35-49s the least (66%), and regional Australia is less confident than metro (32% vs 28% not confident).",
+   "tables": [
+    {
+     "title": "Level of confidence (%) — Confidence in government response to natural disaster in local area",
+     "source": "PDF p. 39",
+     "entities": [
+      {
+       "name": "Very confident",
+       "values": [
+        12
+       ]
+      },
+      {
+       "name": "Somewhat confident",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Not very confident",
+       "values": [
+        24
+       ]
+      },
+      {
+       "name": "Not at all confident",
+       "values": [
+        5
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "government-financial-assistance",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N18"
+   ],
+   "question": "Do you personally support or oppose governments providing this type of significant financial assistance?",
+   "notes": "On significant financial assistance to keep large industrial facilities — aluminium smelters, steelworks, or refineries — operating under external financial pressure: 49% support, 30% neutral, 20% opposed. Support climbs with age (65+ and 50-64 both 54% vs 44% of 35-49s); Greens are the least supportive partisan group at 37% vs Coalition 54% and Labor 52%.",
+   "tables": [
+    {
+     "title": "Level of support (%) — Support for governments providing financial assistance to industries",
+     "source": "PDF p. 35",
+     "entities": [
+      {
+       "name": "Total support",
+       "values": [
+        49
+       ]
+      },
+      {
+       "name": "Neither support nor oppose",
+       "values": [
+        30
+       ]
+      },
+      {
+       "name": "Total oppose",
+       "values": [
+        20
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "protest-support",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N23"
+   ],
+   "question": "Do you support or oppose large scale protests occurring in each of the following places, as a way to express political or social views?",
+   "notes": "Support collapses as disruption rises: 58% back protests at minimal-disruption locations (21% opposed), falling to 33% for CBD locations and key landmarks (48% opposed) and 25% along major streets, roads or highways (58% opposed). Age is the sharpest divide on CBD protests — 41% of 18-34s support vs 18% of 65+; SA is most permissive of minimal-disruption protests (70% vs 53% in WA).",
+   "tables": [
+    {
+     "title": "Level of support for large scale protests in specific area (%) — Support for large scale protests in specific areas",
+     "source": "PDF p. 38",
+     "entities": [
+      {
+       "name": "At locations where there is minimal disruption to local residents or traffic — support",
+       "values": [
+        58
+       ]
+      },
+      {
+       "name": "At locations where there is minimal disruption to local residents or traffic — oppose",
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "In CBD locations and key landmarks — support",
+       "values": [
+        33
+       ]
+      },
+      {
+       "name": "In CBD locations and key landmarks — oppose",
+       "values": [
+        48
+       ]
+      },
+      {
+       "name": "Along major streets, roads or highways — support",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "Along major streets, roads or highways — oppose",
+       "values": [
+        58
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "renewable-approvals-reform",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N14",
+    "N15"
+   ],
+   "question": "The Federal Government is considering reforms to speed up approvals for renewable energy projects and other energy projects, including gas. In principle, to what extent would you support or oppose such reforms? / Some people are concerned that faster approvals for renewable energy projects and other energy projects could reduce environmental protections, including impacts on biodiversity such as wildlife and natural habitats. Would you be concerned or not concerned about faster approvals?",
+   "notes": "Half (53%) support reforms to speed up approvals for energy projects, with only 16% opposed and 31% neutral — Labor 70% and Greens 68% vs Coalition 40%. Yet 74% would be concerned about the reduced environmental protections that could follow (women 80% vs men 67%; Greens 82%). The printed base line mislabels this page as 'Wave 21 (n=1,208)'; the wave is 23.",
+   "tables": [
+    {
+     "title": "Level of support for speeding up approvals (%) — Support and concerns for reforms to speed up energy projects",
+     "source": "PDF p. 30",
+     "entities": [
+      {
+       "name": "Total support",
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "Neither support nor oppose",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "Total oppose",
+       "values": [
+        16
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of concern about reduced environmental protections (%)",
+     "source": "PDF p. 30",
+     "entities": [
+      {
+       "name": "Total concerned",
+       "values": [
+        74
+       ]
+      },
+      {
+       "name": "Total not concerned",
+       "values": [
+        26
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "renewables-bills-impact",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N11"
+   ],
+   "question": "What impact do you think the transition to renewable energy will have on electricity bills over the following time periods?",
+   "notes": "Half (50%) expect renewables to put upward pressure on bills over the next 1-4 years vs 13% downward — but the long view flips: over 10-20 years, 46% expect downward pressure or no impact. Age and partisanship divide hard: 62% of 65+ fear upward pressure in the next 1-4 years vs 36% of 18-34s, and Coalition voters 63% vs Greens 33%.",
+   "tables": [
+    {
+     "title": "The impact the transition to renewable energy will have on electricity bills over time (%) — Nov '25 national",
+     "source": "PDF p. 27",
+     "entities": [
+      {
+       "name": "Over the next 1-4 years — upward pressure",
+       "values": [
+        50
+       ]
+      },
+      {
+       "name": "Over the next 1-4 years — won't have any impact",
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "Over the next 1-4 years — downward pressure",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "Over the next 1-4 years — don't know",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — upward pressure",
+       "values": [
+        42
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — won't have any impact",
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — downward pressure",
+       "values": [
+        24
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — don't know",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — upward pressure",
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — won't have any impact",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — downward pressure",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — don't know",
+       "values": [
+        19
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "renewables-reliability-impact",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N12"
+   ],
+   "question": "What impact do you think the transition to renewable energy will have on the reliability of the electricity network over the following time periods?",
+   "notes": "29% expect renewables to make the network less reliable over the next 1-4 years, falling to 20% over 10-20 years — where a plurality (34%) expect reliability to improve. 18-34s are the optimists (37% expect improvement in 5-9 years), 65+ the pessimists (8% at 1-4 years); Labor 24% vs Coalition 9% see improvement in the near term.",
+   "tables": [
+    {
+     "title": "The impact the transition to renewable energy will have on network reliability over time (%) — Nov '25 national",
+     "source": "PDF p. 28",
+     "entities": [
+      {
+       "name": "Over the next 1-4 years — more reliable",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Over the next 1-4 years — won't make any difference",
+       "values": [
+        36
+       ]
+      },
+      {
+       "name": "Over the next 1-4 years — less reliable",
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "Over the next 1-4 years — don't know",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — more reliable",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — won't make any difference",
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — less reliable",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "Over the next 5-9 years — don't know",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — more reliable",
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — won't make any difference",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — less reliable",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Over the next 10-20 years — don't know",
+       "values": [
+        21
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "social-cohesion-outlook",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "F36b"
+   ],
+   "question": "And how do you think social cohesion will change over the following time frames?",
+   "notes": "Most expect stasis: 56% say social cohesion will stay the same over the next 12 months (36% worse, 8% better); over 3 years pessimism grows, 41% worse vs 21% better. 50-64s are gloomiest (43% worse in 12m, 47% in 3y) vs 18-34s (28%/34%, and 27% better in 3y vs 16% of 65+); Queenslanders the most pessimistic state at 49% worse over 3 years.",
+   "tables": [
+    {
+     "title": "Expected future changes in social cohesion — Changes to social cohesion over time (%)",
+     "source": "PDF p. 18",
+     "entities": [
+      {
+       "name": "In 12 months — it will get worse",
+       "values": [
+        36
+       ]
+      },
+      {
+       "name": "In 12 months — it will stay the same",
+       "values": [
+        56
+       ]
+      },
+      {
+       "name": "In 12 months — it will get better",
+       "values": [
+        8
+       ]
+      },
+      {
+       "name": "In 3 years — it will get worse",
+       "values": [
+        41
+       ]
+      },
+      {
+       "name": "In 3 years — it will stay the same",
+       "values": [
+        38
+       ]
+      },
+      {
+       "name": "In 3 years — it will get better",
+       "values": [
+        21
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "working-from-home",
+   "waveDate": "2025-11-03",
+   "dateStart": "2025-10-29",
+   "dateEnd": "2025-11-03",
+   "published": "2025-11-10T17:24",
+   "sample": 1208,
+   "sampleEff": 954,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf",
+   "codes": [
+    "N22"
+   ],
+   "question": "Thinking about working from home. Some employees want the option to work from home, while some employers prefer staff to spend more time in the office. Who do you think should have the main responsibility for making decisions regarding flexible work arrangements?",
+   "notes": "65% say employees and employers should negotiate flexible-work arrangements between them; 18% would leave it to employers and just 12% to governments (5% don't know). Under-50s back government-set rules at 17% vs 4% of 65+, while 25% of 65+ would leave it to employers vs 13% of 18-34s.",
+   "tables": [
+    {
+     "title": "Who should have the main responsibility for making decisions on flexible work arrangements (%) — Responsibility for flexible working arrangements",
+     "source": "PDF p. 37",
+     "entities": [
+      {
+       "name": "Employers should set rules for flexible work arrangements",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Employees and employers should negotiate arrangements",
+       "values": [
+        65
+       ]
+      },
+      {
+       "name": "Governments should set rules for flexible work arrangements",
+       "values": [
+        12
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        5
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "col-coping-actions",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "F31"
+   ],
+   "question": "Have you experienced any of the following things in the last two months as a response to the rising cost of living?",
+   "notes": "Cutting entertainment spending (52%), holiday cutbacks (39%) and feeling more anxious or worried (39%) lead the 16-item battery — all three down slightly on February 2025 (56%, 44%, 43%). Severe financial-stress markers are steady: 7% could not pay rent on time, 5% received charity assistance, 3% missed a mortgage payment.",
+   "tables": [
+    {
+     "title": "Impacts of the rising cost of living (%) — February 2026",
+     "source": "PDF p. 24",
+     "entities": [
+      {
+       "name": "Reduced your usual spending on entertainment",
+       "values": [
+        52
+       ]
+      },
+      {
+       "name": "Cut back or stopped spending on holidays",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "Felt more anxious or worried than usual",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "Used less heating or cooling in your home than usual",
+       "values": [
+        33
+       ]
+      },
+      {
+       "name": "Been unable to buy your usual groceries",
+       "values": [
+        26
+       ]
+      },
+      {
+       "name": "Been unable to pay a bill on time",
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "Relied on family or friends to help you financially",
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "Experienced more arguments or tension at home than usual",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Bought necessities using a buy now pay later service",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Been unable to pay for needed medical expenses",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "Been unable to pay rent on time",
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "Been unable to meet the minimum payments on your credit card",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Been unable to pay for education-related expenses",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Received assistance from a charity",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Contacted your bank / financial counsellor due to financial difficulties",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Been unable to make a mortgage payment in part or full",
+       "values": [
+        3
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "immigration-level",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "Do you personally think that the current level of immigration in Australia is…?",
+   "notes": "57% say the current level is too high, 31% about right, only 3% too low (8% don't know). The too-high view peaks among 65+ (70%) and 50-64s (67%) versus 43% of 18-34s, and runs 63% in regional areas against 54% metro.",
+   "tables": [
+    {
+     "title": "Current level of immigration in Australia (%)",
+     "source": "PDF p. 15",
+     "entities": [
+      {
+       "name": "Too high",
+       "values": [
+        57
+       ]
+      },
+      {
+       "name": "About right",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "Too low",
+       "values": [
+        3
+       ]
+      },
+      {
+       "name": "Don’t know",
+       "values": [
+        8
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "information-trust",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N54"
+   ],
+   "question": "How much trust do you have in the following to provide accurate and balanced information?",
+   "notes": "56% hold a fair or large amount of trust in mainstream news media (57% in September 2025), against just 32% for social media platforms — though social trust is up from 27% in September. Trust in mainstream media peaks among 65+ (62%); 18-34s trust social media 51% versus 16% of 65+.",
+   "tables": [
+    {
+     "title": "Trust in the following platforms providing accurate information (%) — February 2026",
+     "source": "PDF p. 37",
+     "entities": [
+      {
+       "name": "Mainstream news media in Australia — a large amount of trust",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Mainstream news media in Australia — a fair amount of trust",
+       "values": [
+        50
+       ]
+      },
+      {
+       "name": "Mainstream news media in Australia — not much trust",
+       "values": [
+        33
+       ]
+      },
+      {
+       "name": "Mainstream news media in Australia — no trust at all",
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Mainstream news media in Australia — total large/fair trust",
+       "values": [
+        56
+       ]
+      },
+      {
+       "name": "Social media platforms — a large amount of trust",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Social media platforms — a fair amount of trust",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "Social media platforms — not much trust",
+       "values": [
+        48
+       ]
+      },
+      {
+       "name": "Social media platforms — no trust at all",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Social media platforms — total large/fair trust",
+       "values": [
+        32
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "interest-rate-expectations",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N23"
+   ],
+   "question": "Looking ahead to the end of 2026, do you think interest rates will be…",
+   "notes": "69% expect interest rates to be higher at the end of 2026, 20% about the same, and only 4% lower. Expectation of higher rates peaks among 65+ (77%) versus 60% of 18-34s, and runs 72% regional against 67% metro.",
+   "tables": [
+    {
+     "title": "Changes to interest rates over 2026 (%)",
+     "source": "PDF p. 27",
+     "entities": [
+      {
+       "name": "Higher than they are now",
+       "values": [
+        69
+       ]
+      },
+      {
+       "name": "About the same as they are now",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Lower than they are now",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Don’t know",
+       "values": [
+        8
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "job-security",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N22"
+   ],
+   "question": "Thinking about job security in your current employment. How confident are you in your job security and that you won’t be made redundant over the next 12 months?",
+   "notes": "80% of workers are confident they won’t be made redundant over the next 12 months; 20% are not confident, rising across those aged 35-49 (26%). Donut slices print as 37/44/16/4, which rounds a point off the printed 80% confident total.",
+   "tables": [
+    {
+     "title": "Level of confidence in not being made redundant over the next 12 months (% among those currently employed; base: workers, n=1,321)",
+     "source": "PDF p. 26",
+     "entities": [
+      {
+       "name": "Very confident",
+       "values": [
+        37
+       ]
+      },
+      {
+       "name": "Somewhat confident",
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "Not very confident",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "Not at all confident",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Total confident",
+       "values": [
+        80
+       ]
+      },
+      {
+       "name": "Total not confident",
+       "values": [
+        20
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "misinformation-confidence",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N55",
+    "N56"
+   ],
+   "question": "How confident are you in your ability to detect misinformation or “fake news” in general? / Do you think it will get harder or easier to detect misinformation or “fake news” in the next few years?",
+   "notes": "81% feel confident detecting misinformation (steady on September 2025’s 81%) — men 85% versus women 78%, 18-34s 86% versus 65+ 75%. Yet 77% expect detection to get harder in coming years (up from 72%), with women (82%) well ahead of men (72%) on that view.",
+   "tables": [
+    {
+     "title": "Confidence in ability to detect misinformation in general (%) — February 2026",
+     "source": "PDF p. 38",
+     "entities": [
+      {
+       "name": "Very confident",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Somewhat confident",
+       "values": [
+        67
+       ]
+      },
+      {
+       "name": "Not very confident",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Not at all confident",
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "Total confident",
+       "values": [
+        81
+       ]
+      },
+      {
+       "name": "Total not confident",
+       "values": [
+        19
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Will get harder or easier to detect misinformation (%) — February 2026",
+     "source": "PDF p. 39",
+     "entities": [
+      {
+       "name": "It will get harder",
+       "values": [
+        77
+       ]
+      },
+      {
+       "name": "It will remain the same as now",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "It will get easier",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Don’t know",
+       "values": [
+        2
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "news-consumption",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N52",
+    "N53"
+   ],
+   "question": "Which specific brands, platforms or apps do you specifically use to get information on news and current affairs? / Which of these types of social media accounts do you follow to get information on news and current affairs?",
+   "notes": "Television (59%), social media (52%) and online news websites/apps (45%) are the most-used news sources, with Facebook (35%) the top social platform. The age skew is stark: 71% of 18-34s get news via social media and 44% follow influencers, versus 30% and 7% of 65+, who instead watch TV at 85%.",
+   "tables": [
+    {
+     "title": "Specific brands, platforms or apps used to get information on news and current affairs (%)",
+     "source": "PDF p. 35 (demographic splits re-printed on PDF pp. 49-50)",
+     "entities": [
+      {
+       "name": "Watch TV (either broadcast or online)",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Commercial TV network (e.g. channel 7,9,10)",
+       "values": [
+        46
+       ]
+      },
+      {
+       "name": "Public TV broadcaster (e.g. ABC, SBS)",
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "Pay TV (e.g. Sky)",
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "Use social media",
+       "values": [
+        52
+       ]
+      },
+      {
+       "name": "Facebook",
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "Instagram",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "YouTube",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "TikTok",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "X (formerly Twitter)",
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "Reddit",
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "LinkedIn",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Snapchat",
+       "values": [
+        3
+       ]
+      },
+      {
+       "name": "Other social media platform",
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "Read or watch online news websites directly (i.e. by going to their URL or via their app)",
+       "values": [
+        45
+       ]
+      },
+      {
+       "name": "Listen to radio",
+       "values": [
+        36
+       ]
+      },
+      {
+       "name": "FM Radio",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "AM Radio",
+       "values": [
+        12
+       ]
+      },
+      {
+       "name": "Digital or online streaming radio",
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "Listen to podcasts",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Read print newspapers / magazines",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "State newspaper (state relevant examples given)",
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Local or regional newspaper",
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "National newspaper (e.g. Australian Financial Review, The Australian)",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Magazine",
+       "values": [
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Types of social media accounts followed to get information on news and current affairs (%)",
+     "source": "PDF p. 36 (demographic splits re-printed on PDF p. 51, base there printed as n=1,145)",
+     "entities": [
+      {
+       "name": "TV broadcasters (e.g. ABC, SBS, Channel 7, 9, 10, Sky)",
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "Other online only news publishers (e.g. news.com.au, Guardian, Crikey, The Conversation)",
+       "values": [
+        27
+       ]
+      },
+      {
+       "name": "Individual journalists or commentators",
+       "values": [
+        26
+       ]
+      },
+      {
+       "name": "Social media influencers",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "Radio broadcasters (AM, FM or digital/streaming)",
+       "values": [
+        22
+       ]
+      },
+      {
+       "name": "Print newspaper/magazine publishers",
+       "values": [
+        20
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "one-nation-appeal",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "G3"
+   ],
+   "question": "Can you please share the reasons why Pauline Hanson’s One Nation Party appeals to you?",
+   "notes": "Among One Nation supporters, rejection of the major parties and desire for an alternative dominates (36%), ahead of border control/reduced immigration (17%) and standing up for Australia’s best interests (17%). The page prints verbatim supporter quotes beside each coded theme; no demographic split is shown.",
+   "tables": [
+    {
+     "title": "Reasons why One Nation appeals to supporters (% of One Nation Party supporters)",
+     "source": "PDF p. 41",
+     "entities": [
+      {
+       "name": "Rejection of other major parties and the desire for an alternative",
+       "values": [
+        36
+       ]
+      },
+      {
+       "name": "Support for stronger border control / reduced immigration and alignment with One Nation’s immigration policies",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Belief that One Nation is standing up for Australia’s best interests",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "General mentions of support for One Nation policies",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Honesty and “saying it how it is”, having a common-sense approach",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Upholding Australian identity, values and traditions",
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Understanding of everyday economic pressures (cost of living concerns, housing affordability and supply)",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Representation of “ordinary” Australians, seen as relatable or “one of us”",
+       "values": [
+        4
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "personal-standard-of-living",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N20"
+   ],
+   "question": "Thinking about your own personal standard of living. To what extent do you believe your own personal standard of living will improve, stay the same or worsen during 2026?",
+   "notes": "37% expect their standard of living to worsen during 2026 against 23% expecting improvement — far more pessimistic than February 2025 (30% worsen / 28% improve). 18-34s are the most optimistic (39% improve); 65+ the least (12% improve, 43% worsen).",
+   "tables": [
+    {
+     "title": "Change in standard of living in 2026 (%)",
+     "source": "PDF p. 25",
+     "entities": [
+      {
+       "name": "Improve a lot",
+       "values": [
+        3
+       ]
+      },
+      {
+       "name": "Improve a little",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Stay the same",
+       "values": [
+        40
+       ]
+      },
+      {
+       "name": "Worsen a little",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "Worsen a lot",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Total improve",
+       "values": [
+        23
+       ]
+      },
+      {
+       "name": "Total worsen",
+       "values": [
+        37
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "social-cohesion-improvement",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "F36c"
+   ],
+   "question": "What, if anything, do you think could be done to improve social cohesion in Australia?",
+   "notes": "Asked open-answered and coded by SEC Newgate. Unifying initiatives lead the desired solutions (44%): community engagement activities (10%), positive awareness campaigns (10%), better understanding of Australia's culture, values and laws (2%), and expectations of leaders (8%) and media (7%) to drive cohesion. A control-oriented cluster sits at 15% (tightened background checks for migration 9%, discouraging large protests 6%, penalties for hate speech 4%), with 14% nominating immigration-policy themes and 9% easing cost-of-living pressures.",
+   "tables": [
+    {
+     "title": "What can be done to improve social cohesion in Australia? — coded open responses grouping (%)",
+     "source": "PDF p. 20",
+     "entities": [
+      {
+       "name": "Initiatives that focus on unification",
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "Desire for assurance of tightened control at a systems level",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Desire for sustainable immigration policy and supports",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Reducing cost-of-living pressures could reduce tension",
+       "values": [
+        9
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "social-cohesion-outlook",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "F36b"
+   ],
+   "question": "And how do you think social cohesion will change over the following time frames?",
+   "notes": "55% expect social cohesion to hold steady over the next 12 months (37% worse, 9% better); over 3 years the optimists grow to 22% but pessimists still lead 39%. Western Australians are gloomiest — 45% expect worsening in 3 years vs 22% nationally better. Little change on November 2025 (worse 36→37 at 12 months; 41→39 at 3 years).",
+   "tables": [
+    {
+     "title": "Changes to social cohesion over time (%) — Feb '26 national",
+     "source": "PDF p. 19",
+     "entities": [
+      {
+       "name": "In 12 months — it will get worse",
+       "values": [
+        37
+       ]
+      },
+      {
+       "name": "In 12 months — it will stay the same",
+       "values": [
+        55
+       ]
+      },
+      {
+       "name": "In 12 months — it will get better",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "In 3 years — it will get worse",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "In 3 years — it will stay the same",
+       "values": [
+        38
+       ]
+      },
+      {
+       "name": "In 3 years — it will get better",
+       "values": [
+        22
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-description",
+   "waveDate": "2026-02-09",
+   "dateStart": "2026-02-02",
+   "dateEnd": "2026-02-09",
+   "published": "2026-02-17T16:51",
+   "sample": 2166,
+   "sampleEff": 1170,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf",
+   "codes": [
+    "N31"
+   ],
+   "question": "Do you personally think US President Donald Trump is…?",
+   "notes": "64% think Trump is making the world less safe, with 14% saying more safe and 14% no difference. The partisan split is stark: Labor (81%) and Greens (86%) voters say less safe versus 55% of Coalition voters; men are twice as likely as women to say more safe (18% vs 10%).",
+   "tables": [
+    {
+     "title": "Impact of Donald Trump (%)",
+     "source": "PDF p. 43",
+     "entities": [
+      {
+       "name": "Making the world a more safe place",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Making the world a less safe place",
+       "values": [
+        64
+       ]
+      },
+      {
+       "name": "Making no difference to how safe the world is",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Don’t know",
+       "values": [
+        8
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-security",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T31"
+   ],
+   "question": "Australia, the United States and the United Kingdom have formed a long-term security partnership known as AUKUS. The agreement aims to strengthen defence and security cooperation in the Indo-Pacific region, including helping Australia acquire nuclear-powered submarines and access advanced defence technologies. Do you support or oppose Australia's involvement in the AUKUS partnership?",
+   "notes": "Support for AUKUS has slipped 6 points since November 2025 to 53% (24% strongly, 28% somewhat), with 19% opposed and 29% neutral. The age and vote splits are wide: 68% of 65+ support vs 44% of 35-49s, and Coalition voters back it 67% vs Greens 30% (Greens oppose 42%). Values are [Strongly support, Somewhat support, Neither support nor oppose, Somewhat oppose, Strongly oppose, Total support, Total oppose].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 49",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        19
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of support toward AUKUS partnership (%)",
+     "source": "PDF p. 49",
+     "columns": [
+      "Wave",
+      "Strongly support",
+      "Somewhat support",
+      "Neither",
+      "Somewhat oppose",
+      "Strongly oppose",
+      "TOTAL support",
+      "TOTAL oppose"
+     ],
+     "entities": [
+      {
+       "name": "May 2026 (November 2025 total support: 59)",
+       "values": [
+        24,
+        28,
+        29,
+        10,
+        8,
+        53,
+        19
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-2026-impact",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "N20a",
+    "N20b"
+   ],
+   "question": "Thinking now about the Federal Budget that was handed down recently on Tuesday 12th May. Based on what you may have seen or heard about it, overall what type of impact do you think it will have on you and your immediate family? / overall what impact do you think it will have on Australia?",
+   "notes": "The May 2026 budget landed cold: 42% expect a negative impact on Australia against 24% positive, and 39% negative for their own family vs 14% positive. The aged are the most negative cohort nationally (65+ 56% negative vs 18-34 30%); partisanship splits — Labor voters net positive on Australia (47 pos/14 neg) while Coalition (17/57) and Greens (28/28) sit at the other end. Values per target: [Very positive, Somewhat positive, Neither, Somewhat negative, Very negative, Don't know, Total positive, Total negative].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 32",
+     "entities": [
+      {
+       "name": "On Australia — negative",
+       "values": [
+        42
+       ]
+      },
+      {
+       "name": "On Australia — positive",
+       "values": [
+        24
+       ]
+      },
+      {
+       "name": "On you and your family — negative",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "On you and your family — positive",
+       "values": [
+        14
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Perceived impact of the Federal budget (%) — May '26 national totals",
+     "source": "PDF p. 32",
+     "columns": [
+      "Target",
+      "Very positive",
+      "Somewhat positive",
+      "Neither",
+      "Somewhat negative",
+      "Very negative",
+      "Don't know",
+      "TOTAL positive",
+      "TOTAL negative"
+     ],
+     "entities": [
+      {
+       "name": "On Australia",
+       "values": [
+        4,
+        21,
+        23,
+        25,
+        17,
+        11,
+        24,
+        42
+       ]
+      },
+      {
+       "name": "On you and your immediate family",
+       "values": [
+        2,
+        12,
+        35,
+        24,
+        15,
+        12,
+        14,
+        39
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-2026-measures",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "N22",
+    "N23"
+   ],
+   "question": "Do you support or oppose this change? (N22: announced changes to the capital gains tax (CGT) discount on assets held for more than a year — the 50% discount replaced with inflation-indexing plus a 30% minimum tax rate, applying to gains from 1 July 2027. N23: announced changes to negative gearing — rental losses offsettable against other income only for newly built homes, existing properties unaffected.)",
+   "notes": "Both housing-tax reforms split the public evenly, and each table prints only Support/Oppose totals (the donut's segment floats are not unambiguously attributable in the layout dump). CGT changes: 33% support vs 32% oppose, with support running 49% among Labor and 51% among Greens voters vs 25% Coalition, and investment-property holders opposed 57% vs 27% of non-holders. Negative gearing changes: 37% support vs 31% oppose — Labor 60% support vs Coalition 30%, and property holders 51% opposed vs 27% support.",
+   "tables": [
+    {
+     "title": "Support for changes to capital gains tax (%)",
+     "source": "PDF p. 33",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        33
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        32
+       ]
+      },
+      {
+       "name": "Neutral (per report intro)",
+       "values": [
+        25
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Support for changes to negative gearing (%)",
+     "source": "PDF p. 34",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        37
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "Neutral (per report intro)",
+       "values": [
+        23
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-2026-trust",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "As a result of this Federal Budget, has your trust in the Federal Government…?",
+   "notes": "The budget eroded trust far more than it built it: 37% decreased trust vs 9% increased, with 49% unchanged. The age gradient is the sharpest printed split — 55% of 65+ decreased trust vs 23% of 18-34 — and 53% of Coalition voters lost trust while 64% of Labor voters were unmoved. Values are [Increased, Stayed the same, Decreased, Don't know].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 35",
+     "entities": [
+      {
+       "name": "Trust decreased",
+       "values": [
+        37
+       ]
+      },
+      {
+       "name": "Trust increased",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Trust unchanged",
+       "values": [
+        49
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Trust in Federal Government after the Federal Budget announcement (%)",
+     "source": "PDF p. 35",
+     "columns": [
+      "Wave",
+      "Trust increased",
+      "Trust stayed the same",
+      "Trust decreased",
+      "Don't know"
+     ],
+     "entities": [
+      {
+       "name": "May 2026",
+       "values": [
+        9,
+        49,
+        37,
+        5
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "car-purchase-intentions",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "N11",
+    "N12"
+   ],
+   "question": "N11 — How likely or unlikely are you to purchase a car or passenger vehicle in the next 2 years? N12 — When you next purchase a car or passenger vehicle, how likely or unlikely are you to consider each of these?",
+   "notes": "Intent to buy within two years splits 44% likely / 40% unlikely, peaking at 55% among 35-49s and weakest among 65+ (33% likely, 53% unlikely); the donut prints segments 27/17 (the likely pair), 18 (neither) and 23/16 (the unlikely pair) but the layout dump does not unambiguously order the within-pair segments, so only the table totals are filed. Among likely buyers, petrol/diesel remains most considered (71%) ahead of non-plugin hybrids (65%), PHEVs (51%) and full EVs (42%); EV consideration is 52% at 35-49 vs 32% at 65+, and SA leads hybrid consideration at 77%. N12 values are [Very likely, Somewhat likely, Total likely to consider]; N12 base: those likely to purchase (n=542).",
+   "tables": [
+    {
+     "title": "Likelihood to purchase a vehicle in the next 2 years (%)",
+     "source": "PDF p. 43",
+     "entities": [
+      {
+       "name": "Likely (total)",
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "Unlikely (total)",
+       "values": [
+        40
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Consideration of different vehicle types when making a purchase (% among those likely to purchase a vehicle in the next two years)",
+     "source": "PDF p. 44",
+     "columns": [
+      "Vehicle type",
+      "Very likely to consider",
+      "Somewhat likely",
+      "TOTAL likely to consider"
+     ],
+     "entities": [
+      {
+       "name": "Petrol or diesel powered vehicle",
+       "values": [
+        43,
+        28,
+        71
+       ]
+      },
+      {
+       "name": "Non-plugin hybrid vehicle (that is both petrol powered and electric powered)",
+       "values": [
+        25,
+        40,
+        65
+       ]
+      },
+      {
+       "name": "Plugin hybrid vehicle (PHEV - that can be plugged in to an external power source for charging)",
+       "values": [
+        20,
+        31,
+        51
+       ]
+      },
+      {
+       "name": "A fully electric vehicle",
+       "values": [
+        24,
+        18,
+        42
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "country-relations",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T30"
+   ],
+   "question": "How do you rate the current relationship between Australia and the following countries?",
+   "notes": "Values are the May 2026 national 'excellent/very good/good' total per country. New Zealand (87%), the UK (78%), Canada (74%) and Japan (73%) top the list; the United States has slumped to 36%, down from 53% in November 2025 (its April 2025 read was 38%), while China has improved from 34% (Nov '25) to 39%. Russia sits last at 12%.",
+   "tables": [
+    {
+     "title": "Rating of Australia's relationship with specific country (%)",
+     "source": "PDF p. 48",
+     "entities": [
+      {
+       "name": "New Zealand (Apr '25/Nov '25: 89/88)",
+       "values": [
+        87
+       ]
+      },
+      {
+       "name": "United Kingdom (Apr '25/Nov '25: 85/80)",
+       "values": [
+        78
+       ]
+      },
+      {
+       "name": "Canada (Apr '25/Nov '25: 77/71)",
+       "values": [
+        74
+       ]
+      },
+      {
+       "name": "Japan (Apr '25/Nov '25: 74/72)",
+       "values": [
+        73
+       ]
+      },
+      {
+       "name": "Germany (Apr '25/Nov '25: 63/59)",
+       "values": [
+        60
+       ]
+      },
+      {
+       "name": "Indonesia (Apr '25/Nov '25: 61/58)",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "France (Apr '25/Nov '25: 62/58)",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "India (Apr '25/Nov '25: 59/55)",
+       "values": [
+        58
+       ]
+      },
+      {
+       "name": "South Korea (Apr '25/Nov '25: 52/53)",
+       "values": [
+        54
+       ]
+      },
+      {
+       "name": "China (Apr '25/Nov '25: 37/34)",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "United States (Apr '25/Nov '25: 38/53)",
+       "values": [
+        36
+       ]
+      },
+      {
+       "name": "Russia (Apr '25/Nov '25: 12/10)",
+       "values": [
+        12
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "direction-reasons",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "B3a",
+    "B3b"
+   ],
+   "question": "For what reasons do you think Australia is heading in the right direction? (B3a) / For what reasons do you think Australia is heading in the wrong direction? (B3b)",
+   "notes": "Follow-on coded-reasons question to the standing direction read; themes are printed in descending order of mentions (no percentages). Right direction (n=405): government performance and leadership, fairness and equality, global positioning, strength of the economy and jobs, budget and tax reform, cost-of-living management, quality of life and safety, climate action. Wrong direction (n=805): cost of living, government performance, immigration levels, government spending and debt, housing affordability, crime, energy and climate policy, healthcare access.",
+   "tables": [
+    {
+     "title": "Top 8 reasons Australia is seen as heading in the right/wrong direction (thematically coded, in descending order of mentions)",
+     "source": "PDF p. 8",
+     "entities": [
+      {
+       "name": "Right direction — 8 themes (government performance; fairness and equality; global positioning; economy and jobs; budget and tax reform; cost-of-living management; quality of life and safety; climate action)",
+       "values": []
+      },
+      {
+       "name": "Wrong direction — 8 themes (cost of living; government performance; immigration levels; spending, debt and taxation; housing; crime; energy and climate policy; healthcare)",
+       "values": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fuel-impact-expectations",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T7b"
+   ],
+   "question": "How much of an impact do you think fuel availability will have on each of the following over the next couple of months?",
+   "notes": "Almost all (94%) expect fuel availability to hit the economy (70% expect a LARGE impact); expectations of cost flow-ons run air travel 93% (77% large) and food and groceries 96% (74% large), then electricity 87% and housing 82%. Values per target: [Large impact, Small impact, No impact, Don't know, Total impact].",
+   "tables": [
+    {
+     "title": "Share expecting fuel availability to have an impact over the next couple of months (%)",
+     "source": "PDF p. 41",
+     "entities": [
+      {
+       "name": "The Australian economy",
+       "values": [
+        94
+       ]
+      },
+      {
+       "name": "The cost of food and groceries",
+       "values": [
+        96
+       ]
+      },
+      {
+       "name": "The cost of air travel",
+       "values": [
+        93
+       ]
+      },
+      {
+       "name": "The cost of electricity",
+       "values": [
+        87
+       ]
+      },
+      {
+       "name": "The cost of housing",
+       "values": [
+        82
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Perceived impact of fuel availability over the next couple of months (%) — May '26 national",
+     "source": "PDF p. 41",
+     "columns": [
+      "Target",
+      "Large impact",
+      "Small impact",
+      "No impact",
+      "Don't know",
+      "TOTAL impact"
+     ],
+     "entities": [
+      {
+       "name": "The Australian economy",
+       "values": [
+        70,
+        24,
+        2,
+        4,
+        94
+       ]
+      },
+      {
+       "name": "The cost of food and groceries",
+       "values": [
+        74,
+        22,
+        2,
+        2,
+        96
+       ]
+      },
+      {
+       "name": "The cost of air travel",
+       "values": [
+        77,
+        17,
+        3,
+        4,
+        93
+       ]
+      },
+      {
+       "name": "The cost of electricity",
+       "values": [
+        51,
+        36,
+        6,
+        7,
+        87
+       ]
+      },
+      {
+       "name": "The cost of housing",
+       "values": [
+        46,
+        36,
+        11,
+        7,
+        82
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fuel-rationing-support",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T7a"
+   ],
+   "question": "Fuel rationing involves limiting how much petrol or diesel households and businesses can buy, to manage supply shortages. Overall, which one of the following best reflects your view?",
+   "notes": "Support for rationing has fallen from the April-crisis peak: 20% would back rationing now (down from 28%), while 59% support it only if supply worsens and 15% would never support it. Younger Australians are readiest — 24% of 18-34s would support it now vs 11% of 65+, though the 65+ pivot most strongly to 'only if worse' (69%).",
+   "tables": [
+    {
+     "title": "Views on fuel rationing measures (%) — May '26 national",
+     "source": "PDF p. 40",
+     "entities": [
+      {
+       "name": "Support rationing being introduced now",
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "Support rationing only if supply issues become worse",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Don't support fuel rationing at any time",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        7
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fuel-security-module",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T3",
+    "T4",
+    "T6",
+    "T10"
+   ],
+   "question": "Fuel security module: T3 — Thinking now about the availability of fuel for households and businesses in Australia… How much of a problem, if at all, do you think fuel availability is or will be… T4 — Do you think the Federal Government is currently doing too much, about the right amount or too little to manage the availability of fuel in Australia? T6 — Would you support or oppose the following things in Australia to reduce the reliance on imports of fuel? T10 — Which of the following, if any, have you personally done specifically in response to recent rises in fuel prices?",
+   "notes": "Concern has eased sharply from the April peak but stays pervasive: 81% see fuel availability as a problem now and in a month's time (April: 93% and 92%), falling to 65% for 12 months out. Government handling verdicts split 45% right amount / 42% too little (April: 60% too little); 65+ are the most critical cohort (51% too little) and regional voters lean 'too little' 49% vs 39% metro. All three import-reliance remedies carry majority support — bio-fuels 75%, more refineries 70%, more oil and gas drilling 60% — with refineries polarising by age (18-34: 54% vs 50-64: 83%). Behaviourally, 57% drove less and the metro/regional gap on public transport use is 36% vs 16%, on working from home 14% vs 7%.",
+   "tables": [
+    {
+     "title": "Share calling fuel availability a problem (%)",
+     "source": "PDF p. 37",
+     "entities": [
+      {
+       "name": "A problem now",
+       "values": [
+        81
+       ]
+      },
+      {
+       "name": "A problem in a month",
+       "values": [
+        81
+       ]
+      },
+      {
+       "name": "A problem in 12 months",
+       "values": [
+        65
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Extent that fuel availability is a problem (%)",
+     "source": "PDF p. 37",
+     "columns": [
+      "Timeframe",
+      "Major problem",
+      "Minor problem",
+      "Not a problem",
+      "Don't know",
+      "TOTAL problem"
+     ],
+     "entities": [
+      {
+       "name": "At the current point in time — [Major problem, Minor problem, Not a problem, Don't know, Total problem] (April 2026 total problem: 93)",
+       "values": [
+        34,
+        47,
+        17,
+        2,
+        81
+       ]
+      },
+      {
+       "name": "1 month from now — [Major problem, Minor problem, Not a problem, Don't know, Total problem] (April 2026 total problem: 92)",
+       "values": [
+        33,
+        47,
+        13,
+        6,
+        81
+       ]
+      },
+      {
+       "name": "12 months from now — [Major problem, Minor problem, Not a problem, Don't know, Total problem] (April 2026 total problem: 68)",
+       "values": [
+        32,
+        33,
+        20,
+        15,
+        65
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Amount done to manage fuel availability (%)",
+     "source": "PDF p. 38",
+     "entities": [
+      {
+       "name": "Too much",
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "About the right amount",
+       "values": [
+        45
+       ]
+      },
+      {
+       "name": "Too little",
+       "values": [
+        42
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        11
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Support for initiatives (%)",
+     "source": "PDF p. 39",
+     "columns": [
+      "Initiative",
+      "Strongly support",
+      "Somewhat support",
+      "TOTAL support"
+     ],
+     "entities": [
+      {
+       "name": "Developing bio-fuels using locally grown agricultural materials (such as Canola) — [Strongly support, Somewhat support, Total support] (April 2026 total: 76)",
+       "values": [
+        35,
+        40,
+        75
+       ]
+      },
+      {
+       "name": "Developing more fuel refineries, which turn raw or crude oil into fuels — [Strongly support, Somewhat support, Total support] (April 2026 total: 73)",
+       "values": [
+        39,
+        31,
+        70
+       ]
+      },
+      {
+       "name": "Allowing more oil and gas drilling to produce more fuel — [Strongly support, Somewhat support, Total support] (April 2026 total: 65)",
+       "values": [
+        33,
+        27,
+        60
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Actions taken in response to fuel increase (%)",
+     "source": "PDF p. 42",
+     "entities": [
+      {
+       "name": "Driven less or combined multiple destinations into one trip (April 2026: 54)",
+       "values": [
+        57
+       ]
+      },
+      {
+       "name": "Shopped around for cheaper fuel more often than you otherwise would (April 2026: 38)",
+       "values": [
+        43
+       ]
+      },
+      {
+       "name": "Used public transport more often than you otherwise would (April 2026: 26)",
+       "values": [
+        29
+       ]
+      },
+      {
+       "name": "Changed holiday travel plans (April 2026: 17)",
+       "values": [
+        19
+       ]
+      },
+      {
+       "name": "Cancelled holiday travel plans (April 2026: 14)",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Worked from home more often (April 2026: 9)",
+       "values": [
+        12
+       ]
+      },
+      {
+       "name": "Changed vehicle use (e.g. used a more fuel efficient car) (April 2026: 11)",
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Carpooled with a colleague or friend (April 2026: 9)",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Changed or cancelled work travel plans (April 2026: 5)",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "None of the above (April 2026: 19)",
+       "values": [
+        17
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "job-security",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T2"
+   ],
+   "question": "Thinking about job security in your current employment. How secure or insecure do you feel about your own job at the current point in time?",
+   "notes": "73% of employed Australians feel very (26%) or somewhat (47%) secure in their jobs, steady on April 2026 (71% secure). Victoria is the weak state at 68% secure vs 78% in both SA and WA; 65+ workers are the most secure age band (79%) and the least insecure (21%). Values are [Very secure, Somewhat secure, Somewhat insecure, Very insecure, Don't know, Total secure, Total insecure]; base is those currently employed (n=790).",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 25",
+     "entities": [
+      {
+       "name": "Confident (total)",
+       "values": [
+        73
+       ]
+      },
+      {
+       "name": "Not confident (total)",
+       "values": [
+        26
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of confidence in job security (% among those currently employed)",
+     "source": "PDF p. 25",
+     "columns": [
+      "Wave",
+      "Very confident",
+      "Somewhat confident",
+      "Not very confident",
+      "Not at all confident",
+      "Don't know",
+      "TOTAL confident",
+      "TOTAL not confident"
+     ],
+     "entities": [
+      {
+       "name": "May 2026",
+       "values": [
+        26,
+        47,
+        17,
+        9,
+        1,
+        73,
+        26
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "national-security-priorities",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "T32"
+   ],
+   "question": "Which one of the following do you think should be the main priority for the Federal Government when it comes to national security?",
+   "notes": "71% say the priority should be strengthening alliances with countries other than the United States, versus 16% for the US alliance (April 2025 printed trend: 17 USA / 66 other / 17 don't know). 86% of Greens voters prefer other alliances, and the 65+ cohort leans most away from the USA (78%). Values are [Strengthening our alliance with the USA, Strengthening our alliance with other countries, Don't know].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 50",
+     "entities": [
+      {
+       "name": "Alliances other than the USA",
+       "values": [
+        71
+       ]
+      },
+      {
+       "name": "The US alliance",
+       "values": [
+        16
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Main priority for the Federal Government when it comes to national security (%)",
+     "source": "PDF p. 50",
+     "columns": [
+      "Wave",
+      "Strengthening our alliance with the USA",
+      "Strengthening alliances with other countries",
+      "Don't know"
+     ],
+     "entities": [
+      {
+       "name": "May 2026 (April 2025: [17, 66, 17])",
+       "values": [
+        16,
+        71,
+        13
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "social-cohesion-outlook",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "F36b"
+   ],
+   "question": "And how do you think social cohesion will change over the following time frames?",
+   "notes": "Over the next 12 months, 59% expect social cohesion to stay the same, 36% expect it to get worse and only 5% expect it to get better; over 3 years opinion splits 40% worse / 42% same / 18% better. Sharpest printed split is Victoria on the 3-year horizon: 48% expect worsening vs 35% in SA and WA, and just 2% of 65+ expect improvement within 12 months (vs 8% of 18-34). Values per horizon are [It will get worse, It will stay the same, It will get better].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 19",
+     "entities": [
+      {
+       "name": "In 12 months — get worse",
+       "values": [
+        36
+       ]
+      },
+      {
+       "name": "In 12 months — get better",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "In 3 years — get worse",
+       "values": [
+        40
+       ]
+      },
+      {
+       "name": "In 3 years — get better",
+       "values": [
+        18
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Changes to social cohesion over time (%)",
+     "source": "PDF p. 19",
+     "columns": [
+      "Horizon",
+      "Get worse",
+      "Stay the same",
+      "Get better"
+     ],
+     "entities": [
+      {
+       "name": "In 12 months",
+       "values": [
+        36,
+        59,
+        5
+       ]
+      },
+      {
+       "name": "In 3 years",
+       "values": [
+        40,
+        42,
+        18
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "social-cohesion-roles",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "F37"
+   ],
+   "question": "To what extent do you think each of these has a role in improving social cohesion in Australia?",
+   "notes": "Everyday people (90%), governments (89%) and the media (86%) are all seen by a large majority as having a major or moderate role in improving social cohesion; cultural and faith leaders (76%) and businesses (65%) follow. Governments draw the most intense response (61% 'major role'), while businesses are the only group most people cast as merely 'moderate role' (45%). Values per group are [Major role, Moderate role, Minor role, No role, Total major/moderate role]; no crosstab table is printed for this question.",
+   "tables": [
+    {
+     "title": "Share saying each group has a major or moderate role in improving social cohesion (%)",
+     "source": "PDF p. 20",
+     "entities": [
+      {
+       "name": "Everyday people",
+       "values": [
+        90
+       ]
+      },
+      {
+       "name": "Governments",
+       "values": [
+        89
+       ]
+      },
+      {
+       "name": "The media",
+       "values": [
+        86
+       ]
+      },
+      {
+       "name": "Cultural and faith leaders",
+       "values": [
+        76
+       ]
+      },
+      {
+       "name": "Businesses",
+       "values": [
+        65
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Perceived role of key groups in improving social cohesion in Australia (%)",
+     "source": "PDF p. 20",
+     "columns": [
+      "Group",
+      "A major role",
+      "A moderate role",
+      "A minor role",
+      "No role",
+      "TOTAL major+moderate"
+     ],
+     "entities": [
+      {
+       "name": "Everyday people",
+       "values": [
+        58,
+        31,
+        9,
+        1,
+        90
+       ]
+      },
+      {
+       "name": "Governments",
+       "values": [
+        61,
+        28,
+        8,
+        2,
+        89
+       ]
+      },
+      {
+       "name": "The media",
+       "values": [
+        57,
+        29,
+        11,
+        3,
+        86
+       ]
+      },
+      {
+       "name": "Cultural and faith leaders",
+       "values": [
+        42,
+        35,
+        18,
+        6,
+        76
+       ]
+      },
+      {
+       "name": "Businesses",
+       "values": [
+        20,
+        45,
+        30,
+        5,
+        65
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-description",
+   "waveDate": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-18",
+   "published": "2026-05-27T13:03",
+   "sample": 1210,
+   "sampleEff": 653,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf",
+   "codes": [
+    "N31"
+   ],
+   "question": "Do you personally think US President Donald Trump is…?",
+   "notes": "72% believe Donald Trump is making the world a less safe place (up from 64% in February 2026) against 12% saying more safe and 11% no difference. Greens voters are unanimous at 0% 'more safe' (92% less safe); even Coalition voters break only 14% more safe vs 70% less safe. Values are [Making the world a more safe place, Making the world a less safe place, Making no difference to how safe the world is, Don't know].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 47",
+     "entities": [
+      {
+       "name": "Less safe",
+       "values": [
+        72
+       ]
+      },
+      {
+       "name": "More safe",
+       "values": [
+        12
+       ]
+      },
+      {
+       "name": "No difference",
+       "values": [
+        11
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Impact of Donald Trump (%)",
+     "source": "PDF p. 47",
+     "columns": [
+      "Wave",
+      "More safe",
+      "Less safe",
+      "No difference",
+      "Don't know"
+     ],
+     "entities": [
+      {
+       "name": "May 2026 (February 2026: [14, 64, 14, 8])",
+       "values": [
+        12,
+        72,
+        11,
+        6
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ai-impact",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N15"
+   ],
+   "question": "Thinking now about Artificial Intelligence (AI). Overall, how positive or negative do you think the impact of AI will be on each of these?",
+   "notes": "Australians are cautiously positive about AI for themselves (41% positive vs 28% negative) but net negative about its impact on society (30% positive vs 49% negative). 65+ are the coolest cohort on personal impact (25% positive, half the 18-34 rate of 49%), and men are more positive than women on both targets. The crosstab's header labels its total rows 'TOTAL BAD THING' but prints the positive totals — a report typo; the bar totals are authoritative. Values per target: [Very positive, Somewhat positive, Neither, Somewhat negative, Very negative, Don't know, Total positive, Total negative].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 25",
+     "entities": [
+      {
+       "name": "On you personally — positive",
+       "values": [
+        41
+       ]
+      },
+      {
+       "name": "On you personally — negative",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "On society — positive",
+       "values": [
+        30
+       ]
+      },
+      {
+       "name": "On society — negative",
+       "values": [
+        49
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Feelings toward AI for the following (%)",
+     "source": "PDF p. 25",
+     "columns": [
+      "Target",
+      "Very positive",
+      "Somewhat positive",
+      "Neither",
+      "Somewhat negative",
+      "Very negative",
+      "Don't know",
+      "TOTAL positive",
+      "TOTAL negative"
+     ],
+     "entities": [
+      {
+       "name": "On you personally",
+       "values": [
+        10,
+        30,
+        28,
+        16,
+        12,
+        3,
+        41,
+        28
+       ]
+      },
+      {
+       "name": "On society",
+       "values": [
+        5,
+        25,
+        19,
+        25,
+        24,
+        2,
+        30,
+        49
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-security",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "T31"
+   ],
+   "question": "Australia, the United States and the United Kingdom have formed a long-term security partnership known as AUKUS. The agreement aims to strengthen defence and security cooperation in the Indo-Pacific region, including helping Australia acquire nuclear-powered submarines and access advanced defence technologies. Do you support or oppose Australia's involvement in the AUKUS partnership?",
+   "notes": "Support is little changed at 52% (20% strongly, 32% somewhat) with 19% opposed and 29% neutral — the gentle slide from November 2025's 59% continues (May 2026: 53%). Coalition voters support 71% vs Greens 33% (Greens oppose 35%); 65+ support 61% vs 48% of 18-34s. Values: [Strongly support, Somewhat support, Neither, Somewhat oppose, Strongly oppose, Total support, Total oppose].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 39",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        52
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        19
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of support toward AUKUS partnership (%)",
+     "source": "PDF p. 39",
+     "columns": [
+      "Wave",
+      "Strongly support",
+      "Somewhat support",
+      "Neither",
+      "Somewhat oppose",
+      "Strongly oppose",
+      "TOTAL support",
+      "TOTAL oppose"
+     ],
+     "entities": [
+      {
+       "name": "July 2026 (May 2026 total support: 53; November 2025: 59)",
+       "values": [
+        20,
+        32,
+        29,
+        11,
+        9,
+        52,
+        19
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-2026-impact",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N20a",
+    "N20b"
+   ],
+   "question": "Thinking now about the Federal Budget that was handed down recently on Tuesday 12th May. Based on what you may have seen or heard about it, overall what type of impact do you think it will have on you and your immediate family? / overall what impact do you think it will have on Australia?",
+   "notes": "Two months on from the May budget, pessimism has deepened a little further: 45% expect a negative impact on Australia (was 42% in May) and 41% a negative impact on their own family (was 39%), with positives unmoved at 24% and 14%. One Nation voters are the most negative cohort (76% negative on Australia) and 65+ the most negative age group (54%); Labor voters alone stay net positive on Australia (49% positive vs 22% negative). Values per target: [Very positive, Somewhat positive, Neither, Somewhat negative, Very negative, Don't know, Total positive, Total negative].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 16",
+     "entities": [
+      {
+       "name": "On Australia — negative",
+       "values": [
+        45
+       ]
+      },
+      {
+       "name": "On Australia — positive",
+       "values": [
+        24
+       ]
+      },
+      {
+       "name": "On you and your family — negative",
+       "values": [
+        41
+       ]
+      },
+      {
+       "name": "On you and your family — positive",
+       "values": [
+        14
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Perceived impact of the Federal budget (%) — Jul '26 national totals (May '26 trend totals in entity names)",
+     "source": "PDF p. 16",
+     "columns": [
+      "Target",
+      "Very positive",
+      "Somewhat positive",
+      "Neither",
+      "Somewhat negative",
+      "Very negative",
+      "Don't know",
+      "TOTAL positive",
+      "TOTAL negative"
+     ],
+     "entities": [
+      {
+       "name": "On Australia (May '26 total negative: 42)",
+       "values": [
+        4,
+        20,
+        20,
+        26,
+        20,
+        11,
+        24,
+        45
+       ]
+      },
+      {
+       "name": "On you and your immediate family (May '26 total negative: 39)",
+       "values": [
+        2,
+        12,
+        36,
+        25,
+        15,
+        9,
+        14,
+        41
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "car-purchase-intentions",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N12"
+   ],
+   "question": "When you next purchase a car or passenger vehicle, how likely or unlikely are you to consider each of these?",
+   "notes": "Among those likely to purchase a vehicle in the next two years (n=895), petrol/diesel remains most considered (73%, up from 71% in May), ahead of non-plugin hybrids (64%), PHEVs (47%, down 4 points) and full EVs (42%, steady). EV consideration peaks at 52% among 35-49s and falls to 24% at 65+; men are 11 points more likely than women to consider an EV (48% vs 37%). Values per type: [Very likely to consider, Somewhat likely, Neither, Somewhat unlikely, Very unlikely, Total likely to consider May '26, Total likely to consider Jul '26].",
+   "tables": [
+    {
+     "title": "Total likely to consider each vehicle type (%) — Jul '26",
+     "source": "PDF p. 26",
+     "entities": [
+      {
+       "name": "Petrol or diesel powered vehicle",
+       "values": [
+        73
+       ]
+      },
+      {
+       "name": "Non-plugin hybrid vehicle (that is both petrol powered and electric powered)",
+       "values": [
+        64
+       ]
+      },
+      {
+       "name": "Plugin hybrid vehicle (PHEV - that can be plugged in to an external power source for charging)",
+       "values": [
+        47
+       ]
+      },
+      {
+       "name": "A fully electric vehicle",
+       "values": [
+        42
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Consideration of different vehicle types when making a purchase (% among those likely to purchase a vehicle in the next two years)",
+     "source": "PDF p. 26",
+     "columns": [
+      "Vehicle type",
+      "Very likely",
+      "Somewhat likely",
+      "Neither",
+      "Somewhat unlikely",
+      "Very unlikely",
+      "TOTAL likely May '26",
+      "TOTAL likely Jul '26"
+     ],
+     "entities": [
+      {
+       "name": "Petrol or diesel powered vehicle",
+       "values": [
+        45,
+        28,
+        9,
+        11,
+        8,
+        71,
+        73
+       ]
+      },
+      {
+       "name": "Non-plugin hybrid vehicle (that is both petrol powered and electric powered)",
+       "values": [
+        29,
+        34,
+        13,
+        9,
+        14,
+        65,
+        64
+       ]
+      },
+      {
+       "name": "Plugin hybrid vehicle (PHEV - that can be plugged in to an external power source for charging)",
+       "values": [
+        18,
+        28,
+        19,
+        14,
+        20,
+        51,
+        47
+       ]
+      },
+      {
+       "name": "A fully electric vehicle",
+       "values": [
+        22,
+        21,
+        12,
+        16,
+        30,
+        42,
+        42
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cgt-changes-impact",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N23"
+   ],
+   "question": "Thinking about these proposed changes to capital gains tax, which of the following comes closest to your view?",
+   "notes": "41% believe the changes will make it harder for people to get ahead financially, 25% that they will make no real difference, and just 11% that they will make it easier (23% don't know). Property holders are the most convinced of harm (61% harder), as are One Nation voters (62%); Labor voters lean the other way (36% no real difference, 18% easier).",
+   "tables": [
+    {
+     "title": "Perceived impact of the capital gains tax changes (%)",
+     "source": "PDF p. 18",
+     "entities": [
+      {
+       "name": "They would make it harder for people to get ahead financially",
+       "values": [
+        41
+       ]
+      },
+      {
+       "name": "They would make no real difference to peoples' ability to get ahead",
+       "values": [
+        25
+       ]
+      },
+      {
+       "name": "They would make it easier for people to get ahead financially",
+       "values": [
+        11
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        23
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cgt-changes-support",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N22"
+   ],
+   "question": "In the Federal Budget handed down in May, the Federal Government announced changes to the capital gains tax (CGT) discount on assets (such as investment properties, shares, or small business assets) held for more than a year. The current rule – where only 50% of any profit is taxed – will be replaced. Under the new system, when an asset is sold, the profit will first be reduced to account for inflation over the time it was held, and the remaining gain will then be taxed, with a minimum tax rate of 30%. These changes will apply to gains made from 1 July 2027 onwards, with existing gains remaining under the current rules. Do you support or oppose this change?",
+   "notes": "Support remains very soft two months on: 28% support vs 37% oppose. A similar question asked in the days after the budget (wave 25's N22) recorded 33% total support. The report prints only Support/Oppose totals in its crosstab (the donut's segment floats are not unambiguously attributable in the layout dump). Splits: Labor voters support 48% and Greens 42%, against Coalition 18% and One Nation 9% (61% of ON voters oppose); investment-property holders oppose 61% (20% support) vs non-holders 34% oppose / 29% support; 18-34s are the softest opponents (23% oppose, 33% support).",
+   "tables": [
+    {
+     "title": "Support for changes to capital gains tax (%)",
+     "source": "PDF p. 17",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        37
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-values-fall",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N26"
+   ],
+   "question": "Do you think a fall in housing property values would be a good thing or a bad thing for each of the following?",
+   "notes": "54% think a fall in housing values would be good for Australia (22% bad) while only 39% think it would be good for them personally (30% bad). Non-home-owners are far more positive: 67% of those who don't own their home say it would be good for them personally and 65% good for the country. Values per target: [Very good thing, Somewhat good thing, Neither, Somewhat bad thing, Very bad thing, Don't know, Total good, Total bad].",
+   "tables": [
+    {
+     "title": "View on a fall in housing property values (%)",
+     "source": "PDF p. 23",
+     "entities": [
+      {
+       "name": "For Australia — good thing",
+       "values": [
+        54
+       ]
+      },
+      {
+       "name": "For Australia — bad thing",
+       "values": [
+        22
+       ]
+      },
+      {
+       "name": "For you personally — good thing",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "For you personally — bad thing",
+       "values": [
+        30
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Impact of falling property values (%)",
+     "source": "PDF p. 23",
+     "columns": [
+      "Target",
+      "Very good thing",
+      "Somewhat good thing",
+      "Neither",
+      "Somewhat bad thing",
+      "Very bad thing",
+      "Don't know",
+      "TOTAL good",
+      "TOTAL bad"
+     ],
+     "entities": [
+      {
+       "name": "For you personally",
+       "values": [
+        22,
+        17,
+        27,
+        15,
+        16,
+        4,
+        39,
+        30
+       ]
+      },
+      {
+       "name": "For Australia",
+       "values": [
+        21,
+        33,
+        19,
+        14,
+        8,
+        5,
+        54,
+        22
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "immigration-level",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "Do you personally think that the current level of immigration in Australia is…?",
+   "notes": "62% believe the current level of immigration is too high, up from 57% in February 2026; 28% say about right and 3% too low. The vote splits are the widest: 94% of One Nation supporters say too high against 35% of Greens voters (50% of whom say about right); 73% of 65+ say too high vs 52% of 18-34s. Values are [July 2026, February 2026].",
+   "tables": [
+    {
+     "title": "Current level of immigration in Australia (%) — Jul '26",
+     "source": "PDF p. 22",
+     "entities": [
+      {
+       "name": "Too high",
+       "values": [
+        62
+       ]
+      },
+      {
+       "name": "About right",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "Too low",
+       "values": [
+        3
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        7
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Current level of immigration in Australia (%)",
+     "source": "PDF p. 22",
+     "columns": [
+      "Response",
+      "Jul '26",
+      "Feb '26"
+     ],
+     "entities": [
+      {
+       "name": "Too high",
+       "values": [
+        62,
+        57
+       ]
+      },
+      {
+       "name": "About right",
+       "values": [
+        28,
+        31
+       ]
+      },
+      {
+       "name": "Too low",
+       "values": [
+        3,
+        3
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        7,
+        8
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "large-company-behaviour",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "F35a"
+   ],
+   "question": "Overall, do you agree or disagree with the following statements about the current behaviour of large companies operating in Australia (i.e. Australia's \"corporate sector\")?",
+   "notes": "Only one statement printed this wave: 21% agree corporates are \"behaving ethically and doing the right thing\" (2% strongly, 20% somewhat) while 39% disagree (24% somewhat, 15% strongly) — agree up a touch on May's 19%/44% but in line with the long-term trend (printed back to September 2024; the trend table's agree total has printed 18-22% since).",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 24",
+     "entities": [
+      {
+       "name": "Agree",
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "Disagree",
+       "values": [
+        39
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Belief that corporates are behaving ethically and doing the right thing (%) — Jul 2026 national; value order: strongly agree / somewhat agree / neither / somewhat disagree / strongly disagree / TOTAL agree / TOTAL disagree",
+     "source": "PDF p. 24",
+     "columns": [
+      "Response",
+      "Strongly agree",
+      "Somewhat agree",
+      "Neither",
+      "Somewhat disagree",
+      "Strongly disagree",
+      "TOTAL agree",
+      "TOTAL disagree"
+     ],
+     "entities": [
+      {
+       "name": "Corporates are \"behaving ethically and doing the right thing\"",
+       "values": [
+        2,
+        20,
+        40,
+        24,
+        15,
+        21,
+        39
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "one-nation-rise-impact",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "G5"
+   ],
+   "question": "Recent polling has shown an increase in support for One Nation. Some see this as a sign that more Australians are looking for alternatives to the traditional major parties, while others see it as a sign of growing division or dissatisfaction in the community. Overall, do you think rising support for One Nation is a good thing or a bad thing for Australia?",
+   "notes": "Australians are evenly split: 42% think the rise of One Nation is a good thing for Australia and 41% a bad thing. The don't-know/neither remainder is 17% (the donut's six segment floats — 5, 24, 31, 18, 11, 12 — are not unambiguously attributable in the layout dump, so only the printed Good/Bad totals are filed). The gap is partisan: 90% of One Nation voters say good thing vs 72% of Labor and 77% of Greens voters saying bad thing; regional Australians lean good (49% vs 34% bad), 50-64s lean good (51%), and 18-34s lean bad (45%).",
+   "tables": [
+    {
+     "title": "View on whether increasing support for One Nation is a good or bad thing for Australia (%)",
+     "source": "PDF p. 21",
+     "entities": [
+      {
+       "name": "Good thing (total)",
+       "values": [
+        42
+       ]
+      },
+      {
+       "name": "Bad thing (total)",
+       "values": [
+        41
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "standard-of-living-parents",
+   "waveDate": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "dateEnd": "2026-07-13",
+   "published": "2026-07-21T16:50",
+   "sample": 1975,
+   "sampleEff": 1244,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf",
+   "codes": [
+    "N19"
+   ],
+   "question": "Thinking about your standard of living overall, how do you think this compares to your parents' at a similar stage of life?",
+   "notes": "47% believe their standard of living is worse than their parents' at a similar age (22% a little worse, 25% a lot worse) against 33% better off (14% much, 19% a little better) and 18% about the same. The intergenerational gradient is steep: 35-49s are the most negative (56% worse) while 65+ split the other way (46% better vs 32% worse); renters are far more negative than outright owners (58% vs 29% worse). Values: [Much better off, A little better off, About the same, A little worse off, A lot worse off, Don't know, Total better off, Total worse off].",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 31",
+     "entities": [
+      {
+       "name": "Worse off than parents (total)",
+       "values": [
+        47
+       ]
+      },
+      {
+       "name": "Better off than parents (total)",
+       "values": [
+        33
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Standard of living compared with parents at a similar age (%)",
+     "source": "PDF p. 31",
+     "columns": [
+      "Response",
+      "A lot better off",
+      "A little better off",
+      "No different",
+      "A little worse off",
+      "A lot worse off",
+      "Don't know",
+      "TOTAL better off",
+      "TOTAL worse off"
+     ],
+     "entities": [
+      {
+       "name": "Compared with parents at a similar age",
+       "values": [
+        14,
+        19,
+        18,
+        22,
+        25,
+        2,
+        33,
+        47
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-security",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "T31"
+   ],
+   "question": "Australia, the United States and the United Kingdom have formed a long-term security partnership known as AUKUS. The agreement aims to strengthen defence and security cooperation in the Indo-Pacific region, including helping Australia acquire nuclear-powered submarines and access advanced defence technologies. Do you support or oppose Australia's involvement in the AUKUS partnership?",
+   "notes": "Support for AUKUS is little changed at 55% (17% opposed), steady since May (53%) and off the November 2025 peak of 59%. Coalition (68%) and One Nation (66%) supporters and 65+ voters (66%) are the most supportive; Greens voters are the only printed group with opposition (33%) exceeding support (31%).",
+   "tables": [
+    {
+     "title": "Support for Australia's involvement in AUKUS (%)",
+     "source": "PDF p. 40",
+     "entities": [
+      {
+       "name": "Sep '26 — support",
+       "values": [
+        55
+       ]
+      },
+      {
+       "name": "Sep '26 — oppose",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Jul '26 — support",
+       "values": [
+        52
+       ]
+      },
+      {
+       "name": "May '26 — support",
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "Nov '25 — support",
+       "values": [
+        59
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of support toward AUKUS partnership (%) — values: strongly support, somewhat support, neither support nor oppose, somewhat oppose, strongly oppose, total support, total oppose",
+     "source": "PDF p. 40",
+     "columns": [
+      "Wave",
+      "Strongly support",
+      "Somewhat support",
+      "Neither",
+      "Somewhat oppose",
+      "Strongly oppose",
+      "TOTAL support",
+      "TOTAL oppose"
+     ],
+     "entities": [
+      {
+       "name": "September 2026",
+       "values": [
+        20,
+        34,
+        28,
+        10,
+        7,
+        55,
+        17
+       ]
+      },
+      {
+       "name": "July 2026",
+       "values": [
+        20,
+        32,
+        29,
+        11,
+        9,
+        52,
+        19
+       ]
+      },
+      {
+       "name": "May 2026",
+       "values": [
+        24,
+        28,
+        29,
+        10,
+        8,
+        53,
+        19
+       ]
+      },
+      {
+       "name": "November 2025",
+       "values": [
+        25,
+        35,
+        23,
+        11,
+        6,
+        59,
+        17
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "china-economic-relationship",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N50"
+   ],
+   "question": "Which one of the following best describes your view in relation to Australia's economic relationship with China?",
+   "notes": "48% think Australia should maintain its economic relationship with China, 21% strengthen it and 18% reduce it (13% don't know). Reducing ties peaks among One Nation supporters (35%) and 65+ voters (28%); Labor voters are the least reductionist (11%).",
+   "tables": [
+    {
+     "title": "Preferred direction of Australia's economic relationship with China (%)",
+     "source": "PDF p. 42",
+     "entities": [
+      {
+       "name": "Australia should strengthen its economic relationship with China",
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "Australia should maintain its economic relationship with China",
+       "values": [
+        48
+       ]
+      },
+      {
+       "name": "Australia should reduce its economic relationship with China",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        13
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "economy-important-country",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N38"
+   ],
+   "question": "Which one of the following countries do you think will be the most important to Australia's economy over the next ten years?",
+   "notes": "China dominates: 47% name it as the country most important to Australia's economy over the next ten years, well ahead of the United States (17%), India (8%) and Japan (4%); 21% don't know. One Nation supporters are the most China-naming (57%) and the most US-naming (26%), while Labor voters split 53% China to 13% US.",
+   "tables": [
+    {
+     "title": "Country most important to Australia's economy over the next 10 years (%)",
+     "source": "PDF p. 41",
+     "entities": [
+      {
+       "name": "China",
+       "values": [
+        47
+       ]
+      },
+      {
+       "name": "United States",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "India",
+       "values": [
+        8
+       ]
+      },
+      {
+       "name": "Japan",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Indonesia",
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "South Korea",
+       "values": [
+        1
+       ]
+      },
+      {
+       "name": "Another country",
+       "values": [
+        1
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        21
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-affordability-contributors",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N33"
+   ],
+   "question": "To what extent do you think the following is contributing to the issue of housing affordability and availability in Australia?",
+   "notes": "The rising price of construction and building materials (91% total contribution), not enough new properties being built (84%) and stamp duty discouraging downsizing (82%) top the list, with immigration sixth (77%, down from 80% in Apr '24). Two items are new this wave (tax concessions 75%) or carried no Apr '24 read (local-government approvals, community opposition to density — printed NA).",
+   "tables": [
+    {
+     "title": "Headline (%)",
+     "source": "PDF p. 23",
+     "entities": [
+      {
+       "name": "Rising price of construction and building materials",
+       "values": [
+        91
+       ]
+      },
+      {
+       "name": "Not enough new properties being built",
+       "values": [
+        84
+       ]
+      },
+      {
+       "name": "Stamp duty tax which makes people reluctant to downsize their property",
+       "values": [
+        82
+       ]
+      },
+      {
+       "name": "Labour and skills shortages",
+       "values": [
+        79
+       ]
+      },
+      {
+       "name": "Housing being used for short-term holiday rentals",
+       "values": [
+        78
+       ]
+      },
+      {
+       "name": "The level of immigration",
+       "values": [
+        77
+       ]
+      },
+      {
+       "name": "Tax concessions that encourage property investment",
+       "values": [
+        75
+       ]
+      },
+      {
+       "name": "Local Governments not approving developments quickly enough",
+       "values": [
+        75
+       ]
+      },
+      {
+       "name": "Community opposition to higher density development (i.e. apartments) in their local area",
+       "values": [
+        74
+       ]
+      },
+      {
+       "name": "Governments not releasing enough land",
+       "values": [
+        70
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of contribution to housing affordability and availability in Australia (%) — values: a large contribution, a small contribution, does not contribute, don't know, total large/small Sep '26, total Apr '24, total Nov '24",
+     "source": "PDF p. 23",
+     "columns": [
+      "Contributor",
+      "A large contribution",
+      "A small contribution",
+      "Does not contribute",
+      "Don't know",
+      "TOTAL contributing Sep '26",
+      "TOTAL contributing Apr '24",
+      "TOTAL contributing Nov '24"
+     ],
+     "entities": [
+      {
+       "name": "Rising price of construction and building materials",
+       "values": [
+        65,
+        26,
+        5,
+        4,
+        91,
+        90,
+        90
+       ]
+      },
+      {
+       "name": "Not enough new properties being built",
+       "values": [
+        48,
+        36,
+        10,
+        6,
+        84,
+        83,
+        82
+       ]
+      },
+      {
+       "name": "Stamp duty tax which makes people reluctant to downsize their property",
+       "values": [
+        47,
+        35,
+        6,
+        12,
+        82,
+        78,
+        81
+       ]
+      },
+      {
+       "name": "Labour and skills shortages",
+       "values": [
+        41,
+        37,
+        14,
+        8,
+        79,
+        83,
+        81
+       ]
+      },
+      {
+       "name": "Housing being used for short-term holiday rentals",
+       "values": [
+        34,
+        43,
+        13,
+        10,
+        78,
+        79,
+        78
+       ]
+      },
+      {
+       "name": "The level of immigration",
+       "values": [
+        47,
+        30,
+        16,
+        7,
+        77,
+        80,
+        78
+       ]
+      },
+      {
+       "name": "Tax concessions that encourage property investment",
+       "values": [
+        39,
+        36,
+        10,
+        15,
+        75,
+        null,
+        null
+       ]
+      },
+      {
+       "name": "Local Governments not approving developments quickly enough",
+       "values": [
+        35,
+        40,
+        13,
+        12,
+        75,
+        null,
+        76
+       ]
+      },
+      {
+       "name": "Community opposition to higher density development (i.e. apartments) in their local area",
+       "values": [
+        24,
+        50,
+        13,
+        13,
+        74,
+        null,
+        76
+       ]
+      },
+      {
+       "name": "Governments not releasing enough land",
+       "values": [
+        31,
+        40,
+        14,
+        15,
+        70,
+        73,
+        71
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-market-timing",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N29a",
+    "N29b"
+   ],
+   "question": "Do you think it is a good time or a bad time to do each of the following at the current point in time? (N29a) / in 12 months from now? (N29b)",
+   "notes": "More than half (56%) say it is currently a bad time to rent a home, with around four in ten saying bad time to buy an investment property (45%), sell (44%) or buy a home to live in (37%). Expectations soften over 12 months: a good time to rent stays at 10% while 'bad' falls to 41%, and a good time to buy to live in rises from 29% to 32%. Values per action and horizon: [Good time, Neither good nor bad, Bad time, Don't know].",
+   "tables": [
+    {
+     "title": "Share saying now is a bad time to… (%)",
+     "source": "PDF p. 20",
+     "entities": [
+      {
+       "name": "Rent a home — bad time",
+       "values": [
+        56
+       ]
+      },
+      {
+       "name": "Buy a home — bad time",
+       "values": [
+        37
+       ]
+      },
+      {
+       "name": "Sell a property — bad time",
+       "values": [
+        44
+       ]
+      },
+      {
+       "name": "Buy an investment property — bad time",
+       "values": [
+        45
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Good or bad time to do the following currently (%) — Sep '26 national",
+     "source": "PDF p. 20",
+     "columns": [
+      "Action",
+      "Good time",
+      "Neither",
+      "Bad time",
+      "Don't know"
+     ],
+     "entities": [
+      {
+       "name": "Rent a home to live in",
+       "values": [
+        10,
+        30,
+        56,
+        5
+       ]
+      },
+      {
+       "name": "Buy a home to live in",
+       "values": [
+        29,
+        30,
+        37,
+        4
+       ]
+      },
+      {
+       "name": "Sell a property",
+       "values": [
+        24,
+        26,
+        44,
+        6
+       ]
+      },
+      {
+       "name": "Buy an investment property",
+       "values": [
+        18,
+        30,
+        45,
+        7
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Good or bad time to do the following 12 months from now (%) — Sep '26 national",
+     "source": "PDF p. 20",
+     "columns": [
+      "Action",
+      "Good time",
+      "Neither",
+      "Bad time",
+      "Don't know"
+     ],
+     "entities": [
+      {
+       "name": "Rent a home to live in",
+       "values": [
+        10,
+        36,
+        41,
+        13
+       ]
+      },
+      {
+       "name": "Buy a home to live in",
+       "values": [
+        32,
+        32,
+        22,
+        14
+       ]
+      },
+      {
+       "name": "Sell a property",
+       "values": [
+        19,
+        32,
+        32,
+        16
+       ]
+      },
+      {
+       "name": "Buy an investment property",
+       "values": [
+        20,
+        32,
+        32,
+        16
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-value-expectations",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N31"
+   ],
+   "question": "Compared to the current point in time, do you think that Australian housing property values 12 months from now will be…?",
+   "notes": "Expectations are evenly split: 34% think values will be higher in 12 months, 38% lower and 21% about the same (don't know 6%). Sharpest split is by tenure and age: renters lean higher (43% higher vs 34% lower) while outright owners lean strongly lower (46% lower vs 26% higher), and 48% of 18-34s say higher against 24% of 65+. Donut scale points printed only as slices (8/26 higher-side, 31/7 lower-side, same 21, don't know 6); segment labels assigned from printed totals.",
+   "tables": [
+    {
+     "title": "Expectation for Australian housing property values over the next 12 months (%)",
+     "source": "PDF p. 21",
+     "entities": [
+      {
+       "name": "A lot higher than they are now",
+       "values": [
+        8
+       ]
+      },
+      {
+       "name": "A little higher than they are now",
+       "values": [
+        26
+       ]
+      },
+      {
+       "name": "About the same as they are now",
+       "values": [
+        21
+       ]
+      },
+      {
+       "name": "A little lower than they are now",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "A lot lower than they are now",
+       "values": [
+        7
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        6
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Total expectation, national TOTAL column (%)",
+     "source": "PDF p. 21",
+     "entities": [
+      {
+       "name": "Higher (total)",
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "Lower (total)",
+       "values": [
+        38
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-values-fall",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N26"
+   ],
+   "question": "Do you think a fall in housing property values would be a good thing or a bad thing for each of the following?",
+   "notes": "57% think a fall in housing values would be good for Australia (21% bad) but only 38% think it would be good for them personally (29% bad). The tenure divide is stark: 64% of renters say good for them personally and 63% good for the country, against 16% and 54% of outright owners.",
+   "tables": [
+    {
+     "title": "View on a fall in housing property values (%) — Sep '26 totals",
+     "source": "PDF p. 22",
+     "entities": [
+      {
+       "name": "For Australia — good thing (Sep '26)",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "For Australia — bad thing (Sep '26)",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "For you — good thing (Sep '26)",
+       "values": [
+        28
+       ]
+      },
+      {
+       "name": "For you — bad thing (Sep '26)",
+       "values": [
+        17
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Impact of falling property values (%) — values: very good thing, somewhat good thing, neither good nor bad, somewhat bad thing, very bad thing, don't know",
+     "source": "PDF p. 22",
+     "columns": [
+      "Target",
+      "Very good thing",
+      "Somewhat good thing",
+      "Neither good nor bad",
+      "Somewhat bad thing",
+      "Very bad thing",
+      "Don't know"
+     ],
+     "entities": [
+      {
+       "name": "For you personally",
+       "values": [
+        22,
+        16,
+        28,
+        17,
+        12,
+        5
+       ]
+      },
+      {
+       "name": "For Australia",
+       "values": [
+        22,
+        36,
+        17,
+        14,
+        7,
+        4
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Total good/bad thing, Jul '26 and Sep '26 (%) — values: Jul '26 good, Jul '26 bad, Sep '26 good, Sep '26 bad",
+     "source": "PDF p. 22",
+     "columns": [
+      "Target",
+      "Jul '26 good",
+      "Jul '26 bad",
+      "Sep '26 good",
+      "Sep '26 bad"
+     ],
+     "entities": [
+      {
+       "name": "For you personally",
+       "values": [
+        39,
+        30,
+        38,
+        29
+       ]
+      },
+      {
+       "name": "For Australia",
+       "values": [
+        54,
+        22,
+        57,
+        21
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "immigration-level",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "Do you personally think that the current level of immigration in Australia is…?",
+   "notes": "57% say the current level of immigration is too high, down 5 points from 62% in July 2026; 32% say about right and 4% too low. The divide is starkest by vote: 91% of One Nation supporters say too high against 39% of Labor voters, and 68% of 65+ say too high vs 43% of 18-34s.",
+   "tables": [
+    {
+     "title": "Current level of immigration in Australia (%) — Sep '26",
+     "source": "PDF p. 33",
+     "entities": [
+      {
+       "name": "Too high",
+       "values": [
+        57
+       ]
+      },
+      {
+       "name": "About right",
+       "values": [
+        32
+       ]
+      },
+      {
+       "name": "Too low",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        7
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Current level of immigration in Australia (%) — values: September 2026, July 2026, February 2026",
+     "source": "PDF p. 33",
+     "columns": [
+      "Response",
+      "Sep '26",
+      "Jul '26",
+      "Feb '26"
+     ],
+     "entities": [
+      {
+       "name": "Too high",
+       "values": [
+        57,
+        62,
+        57
+       ]
+      },
+      {
+       "name": "About right",
+       "values": [
+        32,
+        28,
+        31
+       ]
+      },
+      {
+       "name": "Too low",
+       "values": [
+        4,
+        3,
+        3
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        7,
+        7,
+        8
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "one-nation-motivations",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "G6",
+    "G7"
+   ],
+   "question": "G6: Which one of the following would you say is the main reason you would vote for / lean towards Pauline Hanson's One Nation Party? G7: How appealing are each of these in relation to Pauline Hanson's One Nation Party?",
+   "notes": "Among One Nation supporters (n=409), 56% say the main reason is support for the party and its policies while 40% are driven by dislike of other parties. The party's policies (93% appealing) and Pauline Hanson's leadership (91%) are near-universally appealing, but softness shows at the top box: only 43% find the policies and 46% the leadership very appealing.",
+   "tables": [
+    {
+     "title": "Share of One Nation supporters finding each aspect appealing (total, %)",
+     "source": "PDF p. 35",
+     "entities": [
+      {
+       "name": "Pauline Hanson's leadership — appealing",
+       "values": [
+        91
+       ]
+      },
+      {
+       "name": "The party's policies — appealing",
+       "values": [
+        93
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Primary motivator for supporting One Nation (% among One Nation supporters)",
+     "source": "PDF p. 35",
+     "entities": [
+      {
+       "name": "Your support for the party and its policies",
+       "values": [
+        56
+       ]
+      },
+      {
+       "name": "Your dislike of other parties and their policies",
+       "values": [
+        40
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        4
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Level of appeal (% among One Nation supporters) — values: very appealing, somewhat appealing, somewhat unappealing, very unappealing, don't know, total appealing, total unappealing",
+     "source": "PDF p. 36",
+     "columns": [
+      "Aspect",
+      "Very appealing",
+      "Somewhat appealing",
+      "Somewhat unappealing",
+      "Very unappealing",
+      "Don't know",
+      "TOTAL appealing",
+      "TOTAL unappealing"
+     ],
+     "entities": [
+      {
+       "name": "The policies of the party",
+       "values": [
+        43,
+        50,
+        4,
+        1,
+        3,
+        93,
+        5
+       ]
+      },
+      {
+       "name": "Pauline Hanson's leadership",
+       "values": [
+        46,
+        45,
+        6,
+        1,
+        2,
+        91,
+        7
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "one-nation-super-policy",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N59"
+   ],
+   "question": "Pauline Hanson's One Nation Party has proposed a policy that would allow people who pay rent or a mortgage to access one quarter of their future employer superannuation contributions as additional take-home pay for up to three years. To what extent would you support or oppose such a policy?",
+   "notes": "The policy divides: 38% support, 39% oppose and 23% are neutral. One Nation supporters back it 70% (with 12% opposed) while Labor (55% oppose) and Greens (54%) voters lead the opposition; men support 43% vs women 33%.",
+   "tables": [
+    {
+     "title": "Level of support (%) — accessing One Nation's take-home superannuation policy",
+     "source": "PDF p. 31",
+     "entities": [
+      {
+       "name": "Strongly support",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "Somewhat support",
+       "values": [
+        22
+       ]
+      },
+      {
+       "name": "Neither support nor oppose",
+       "values": [
+        23
+       ]
+      },
+      {
+       "name": "Somewhat oppose",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Strongly oppose",
+       "values": [
+        24
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Total support/oppose, national TOTAL column (%)",
+     "source": "PDF p. 31",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        38
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        39
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "regulation-attitudes",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N58"
+   ],
+   "question": "Thinking now about regulation – by that we mean laws and rules that governments place on businesses and individuals. Overall, do you think Australia...",
+   "notes": "39% think Australia has the right amount of regulation while 35% think there is too much; 13% say too little and 13% don't know. One Nation supporters (54% too much) and men (42% vs women 28%) are the most deregulatory groups printed.",
+   "tables": [
+    {
+     "title": "Perceptions of the level of government regulation in Australia (%)",
+     "source": "PDF p. 37",
+     "entities": [
+      {
+       "name": "Has too much regulation",
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "Has the right amount of regulation",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "Has too little regulation",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        13
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "super-for-housing",
+   "waveDate": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "dateEnd": "2026-09-14",
+   "published": "2026-09-22T15:29",
+   "sample": 1659,
+   "sampleEff": 1095,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
+   "methodUrl": "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf",
+   "codes": [
+    "N32"
+   ],
+   "question": "In principle, would you support or oppose allowing people to access their superannuation to help purchase a home to live in?",
+   "notes": "Majority support: 55% support allowing super access to buy a home to live in, 28% oppose and 17% are neutral. Support is highest among renters (66%) and 18-34s (60%), and flips among outright owners (43% support vs 42% oppose).",
+   "tables": [
+    {
+     "title": "Support for allowing people to access their superannuation to help purchase a home (%)",
+     "source": "PDF p. 24",
+     "entities": [
+      {
+       "name": "Strongly support",
+       "values": [
+        24
+       ]
+      },
+      {
+       "name": "Somewhat support",
+       "values": [
+        30
+       ]
+      },
+      {
+       "name": "Neither support nor oppose",
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "Somewhat oppose",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Strongly oppose",
+       "values": [
+        13
+       ]
+      }
+     ]
+    },
+    {
+     "title": "Total support/oppose, national TOTAL column (%)",
+     "source": "PDF p. 24",
+     "entities": [
+      {
+       "name": "Support (total)",
+       "values": [
+        55
+       ]
+      },
+      {
+       "name": "Oppose (total)",
+       "values": [
+        28
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

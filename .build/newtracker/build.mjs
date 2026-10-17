@@ -761,12 +761,13 @@ function ssChangelogBlock(esc) {
 }
 
 /* The Ad-hocs tab page's static article: the topical one-off questions from
-   the two committed one-off stores (data/news24-one-offs.json's one_offs +
-   data/redbridge-one-offs.json's entries), grouped by adhoc-themes.mjs into
+   the four committed one-off stores (data/news24-one-offs.json's one_offs +
+   the entries of data/redbridge-one-offs.json, data/secnewgate-one-offs.json
+   and data/essential-one-offs.json), grouped by adhoc-themes.mjs into
    the SAME theme order the live page renders, so a no-JS reader or crawler
    sees the live page's figures as text. The grouping itself is one source on
    purpose – themeOf throws on an id it doesn't know, so landing a new wave of
-   either store without mapping its ids fails the build loudly.
+   any store without mapping its ids fails the build loudly.
    Shape: each theme is an h2 + dek, then each question is an h3 card intro,
    each wave a labelled paragraph of "Option answer%" spans (the first
    all-voters table only – depth is the live page's folds). No colour here;
@@ -774,10 +775,12 @@ function ssChangelogBlock(esc) {
 const AO_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function ssAdhocsBlock(esc) {
   const read = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8"));
-  let news24 = null, redbridge = null;
+  let news24 = null, redbridge = null, secnewgate = null, essential = null;
   try { news24 = read("news24-one-offs.json").one_offs || []; } catch { /* absent */ }
   try { redbridge = read("redbridge-one-offs.json").entries || []; } catch { /* absent */ }
-  if (!news24 && !redbridge) return "";
+  try { secnewgate = read("secnewgate-one-offs.json").entries || []; } catch { /* absent */ }
+  try { essential = read("essential-one-offs.json").entries || []; } catch { /* absent */ }
+  if (!news24 && !redbridge && !secnewgate && !essential) return "";
   const entries = [];
   for (const e of news24 || []) {
     entries.push({
@@ -798,6 +801,26 @@ function ssAdhocsBlock(esc) {
       house: "redbridge", url: e.url || null,
       rows: (t.entities || []).slice(0, 12).map((en) => [en.name, ((en.values || [])[0] ?? null)]),
       proseOnly: false,
+    });
+  }
+  for (const e of secnewgate || []) {
+    const t = (e.tables || [])[0] || {};
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      house: "secnewgate", url: e.url || null,
+      rows: (t.entities || []).slice(0, 12).map((en) => [en.name, ((en.values || [])[0] ?? null)]),
+      proseOnly: false,
+    });
+  }
+  for (const e of essential || []) {
+    const t = (e.tables || [])[0] || {};
+    entries.push({
+      theme: oneOffThemeOf(e.id), question: e.question,
+      waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      house: "essential", url: e.url || null,
+      rows: (t.rows || []).slice(0, 12).map((r) => [r[0], r[1] ?? null]),
+      proseOnly: !((e.tables || []).length),
     });
   }
   if (!entries.length) return "";
@@ -824,8 +847,10 @@ function ssAdhocsBlock(esc) {
     if (!qs) return "";
     const blocks = [...qs.entries()].map(([q, waves]) => {
       const houseN = new Set(waves.map((w) => w.house));
-      const tag = houseN.size > 1 ? "both houses"
-        : waves[0].house === "news24" ? "YouGov &#8211; News24 Pulse" : "RedBridge/Accent (via the AFR)";
+      const tag = houseN.size > 1 ? (houseN.size === 4 ? "all four houses" : houseN.size === 3 ? "all three houses" : "both houses")
+        : waves[0].house === "news24" ? "YouGov &#8211; News24 Pulse"
+        : waves[0].house === "secnewgate" ? "SEC Newgate Mood of the Nation"
+        : waves[0].house === "essential" ? "Essential Report" : "RedBridge/Accent (via the AFR)";
       const reads = [...waves].sort((a, b) => String(b.waveDate).localeCompare(String(a.waveDate)))
         .map((b) => `
         <div class="ao-ss-wave"><span class="ao-ss-date">${dateLabel(b)}</span>

@@ -7091,10 +7091,12 @@ const changelog = JUR ? null : (() => {
 
 /* ---- §8e the ad hoc topical and issue questions ---------------------------
    The /ad-hocs/ page (the ☰ menu's sixth page, 2026-10-17): every one-off
-   and rotating question the two catalogued houses have asked outside the
+   and rotating question the four catalogued houses have asked outside the
    standing battery, grouped on adhoc-themes.mjs's shared map. The stores are
    hand-curated research products (data/news24-one-offs.json,
-   data/redbridge-one-offs.json); this block re-shapes them into the page's
+   data/redbridge-one-offs.json, data/secnewgate-one-offs.json,
+   data/essential-one-offs.json); this block
+   re-shapes them into the page's
    fetch payload, trimming whatever the page never reads (RedBridge's
    quotedFigure/snippetHaystack verification artefacts, News24's embed ids
    and text-leaf echoes). oneOffThemeOf THROWS on a store id with no theme,
@@ -7133,6 +7135,40 @@ const oneOffsSource = JUR ? null : (() => {
       url: e.url || null,
       tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
         rows: (t.entities || []).map((en) => [en.name, ...(en.values || [])]) })),
+      prose: [],
+    });
+  }
+  /* SEC Newgate Mood-of-the-Nation: same shape as RedBridge, except wide
+     tables carry a store-side "columns" array that becomes the table's
+     headers, and the first table is always a width-1 headline strip (the
+     store's _readme documents the contract). */
+  for (const e of read("secnewgate-one-offs.json", (j) => j.entries || [])) {
+    entries.push({
+      house: "secnewgate", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: null, note: e.notes || null,
+      proseOnly: false, wordingSource: null,
+      url: e.url || null,
+      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
+        headers: t.columns || null,
+        rows: (t.entities || []).map((en) => [en.name, ...(en.values || [])]) })),
+      prose: [],
+    });
+  }
+  /* Essential Report: the store already carries the page's row shape
+     ([label, ...values] per row, optional headers on the wide folds), so
+     this is the shallowest reader of the four – pass the tables through. */
+  for (const e of read("essential-one-offs.json", (j) => j.entries || [])) {
+    entries.push({
+      house: "essential", id: e.id, theme: oneOffThemeOf(e.id), waveDate: e.waveDate,
+      dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
+      sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
+      question: e.question, options: null, note: e.notes || null,
+      proseOnly: false, wordingSource: null,
+      url: e.url || null,
+      tables: (e.tables || []).map((t) => ({ title: t.title || null, source: t.source || null,
+        headers: t.headers || null, rows: t.rows || [] })),
       prose: [],
     });
   }
