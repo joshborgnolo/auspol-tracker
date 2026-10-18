@@ -34,7 +34,7 @@ const fresh = (mutate) => {
     return AP.disStory();
   };
   let s = run({ p_onp: 1.5, p_lnp: 1.1, rd_right: 1.0, p_alp: 1.0, p_grn: 1.0 });
-  assert.equal(s.head, "The polls disagree on how the right’s vote splits, not on its size");
+  assert.equal(s.head, "Pollsters agree on the size of the right’s vote but disagree on its split");
   assert.deepEqual(J(s.fig), { v: "1.5×", cap: "One Nation v chance", tone: "onp" }, "the split: the right's party beyond chance");
   s = run({ p_onp: 1.3, p_lnp: 1.9, rd_right: 1.1, p_alp: 2.4, p_grn: 1.0 });
   assert.deepEqual(J(s.fig), { v: "1.9×", cap: "Coalition v chance", tone: "lnp" }, "the split names the right only: Labor's 2.4 isn't its figure");
