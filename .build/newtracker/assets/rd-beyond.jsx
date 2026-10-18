@@ -528,8 +528,8 @@ function RdBeyond() {
         <h2 className="rd-title" id="rd-btv-t">Beyond the vote</h2>
         <span className="rd-meta">What else Australians tell the pollsters</span>
       </div>
-      <RdHed head="What Australians think about the issues"
-        dek="Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in ten topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side." />
+      <RdHed head={window.AP.PAGE_HEAD["beyond-the-vote"]}
+        dek={"Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in " + rdNumWord(window.AUSPOL.beyondTopics) + " topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side."} />
       <BtvBody />
     </section>
   );

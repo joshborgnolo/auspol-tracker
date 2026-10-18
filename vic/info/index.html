@@ -135,6 +135,8 @@
   --mood-neg: oklch(0.44 0.045 50);
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
+  --btv-w0: oklch(0.50 0.105 305);
+  --btv-w1: oklch(0.60 0.115 83);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -187,6 +189,8 @@ body.dark {
   --mood-neg: oklch(0.68 0.05 45);
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
+  --btv-w0: oklch(0.66 0.110 305);
+  --btv-w1: oklch(0.67 0.115 83);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -3260,48 +3264,70 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   --btv-rank: color-mix(in oklab, var(--ink-2) 58%, var(--surface));
   margin-top: 6px;
 }
-.btv-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
-.btv-nav a {
-  font-size: 13px; line-height: 1; color: var(--ink-2); text-decoration: none;
-  padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+.btv-scope { margin: 16px 0 0; max-width: 76ch; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
+.btv a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent); }
+.btv a:hover, .btv a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.btv-finds { margin-top: 28px; }
+.btv-fh { margin: 0 0 4px; font-family: var(--sans); font-size: 11.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.btv-fl { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); column-gap: 44px; margin: 0; padding: 0; list-style: none; }
+.btv-fl > li { min-width: 0; border-top: 1px solid var(--line); }
+.btv .btv-f { display: flex; gap: 12px; padding: 13px 0 15px; color: var(--ink); border-bottom: 0; }
+.btv-fn { flex: none; width: 1.5em; font-family: var(--serif); font-size: 22px; line-height: 1.1; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.btv-fb { display: flex; flex-direction: column; min-width: 0; }
+.btv-fk { font-size: 11px; font-weight: 600; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.btv-ft { margin-top: 3px; font-family: var(--serif); font-size: 20px; line-height: 1.22; color: var(--ink); text-wrap: pretty; }
+.btv-fm { margin-top: 5px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
+.btv .btv-f:hover .btv-ft, .btv .btv-f:focus-visible .btv-ft {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in oklch, var(--ink) 45%, transparent);
 }
-.btv-nav a:hover, .btv-nav a:focus-visible { color: var(--ink); border-color: var(--ink-3); }
-.btv-scope { margin: 14px 0 0; max-width: 76ch; font-size: 13px; line-height: 1.55; color: var(--ink-3); }
-.btv-topic { margin-top: 48px; padding-top: 14px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
-.btv-tt { margin: 0; font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--ink); }
-.btv-tdk { margin: 6px 0 0; max-width: 72ch; font-size: 14.5px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
-.btv-tracker { margin-top: 24px; }
-.btv-th { margin: 0; max-width: 40ch; font-family: var(--serif); font-size: 27px; font-weight: 600; line-height: 1.15; color: var(--ink); text-wrap: balance; }
-.btv-tdek { margin: 8px 0 0; max-width: 70ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
-.btv-tlab { margin: 18px 0 0; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
-.btv-pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 22px; margin-top: 10px; }
-.btv-pg5 { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px 18px; }
-.btv-pg3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.btv-panel { min-width: 0; border-top: 1px solid var(--line); padding-top: 8px; }
-.btv-ptop { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
-.btv-ptop b { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.btv-plab { margin-top: 1px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
-.btv-plab span { color: var(--ink-faint); }
-.btv-panel .chart:has(> .chart-copy-btn) { padding-bottom: 0; }
-.btv-panel .chart-copy-btn { display: none; }
+.btv-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
+.btv-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.btv-tt { margin: 0; font-family: var(--sans); font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
+.btv-tn { color: var(--ink-3); }
+.btv-tn::after { content: "·"; margin: 0 0.6em; color: var(--ink-faint); }
+.btv-tc { font-size: 12.5px; color: var(--ink-3); }
+.btv-hl { margin: 10px 0 0; max-width: 42ch; font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; color: var(--ink); text-wrap: balance; }
+.btv-tdk { margin: 8px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
+.btv-tracker { margin-top: 28px; }
+.btv-tlab { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.btv-tdek { margin: 6px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.btv-fams { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 12px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+.btv-fams span { display: inline-flex; align-items: center; gap: 7px; }
+.btv-wsw { display: inline-block; flex: none; width: 18px; height: 3px; border-radius: 2px; }
+.btv-w0 { background: var(--btv-w0); }
+.btv-w1 { background: var(--btv-w1); }
+.btv-tbody { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 28px; margin-top: 4px; }
+.btv-tchart { min-width: 0; }
+.btv .btv-chart { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; transition: none; }
 .btv-ylab { fill: var(--ink-3); }
-.btv-tkey { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; font-size: 12.5px; color: var(--ink-3); }
-.btv-tkey span { display: inline-flex; align-items: center; gap: 7px; }
-.btv-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
-.btv-ln { display: inline-block; width: 18px; height: 0; border-top: 1.6px solid var(--ink-2); }
-.btv-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px solid var(--ink-faint); }
-.btv-ledger { margin-top: 12px; }
-.btv-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 24px; align-items: start; }
+.btv-latest { min-width: 0; }
+.btv-lh { margin: 0 0 2px; font-size: 11.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.btv-ll { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); column-gap: 28px; margin: 0; padding: 0; list-style: none; }
+.btv-ll > li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-2); }
+.btv-lp { display: flex; flex-direction: column; min-width: 0; }
+.btv-lnm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 7px; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.btv-ld { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+.btv-ldot { display: inline-block; flex: none; width: 9px; height: 9px; border-radius: 50%; }
+.btv-lq { margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-3); }
+.btv-lv { flex: none; font-family: var(--serif); font-size: 28px; font-weight: 600; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 @media (min-width: 900px) {
-  .btv-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: row dense; gap: 18px; }
-  .btv-wide { grid-column: 1 / -1; }
-  .btv-wide .btv-row { grid-template-columns: minmax(0, 34%) 2.2em minmax(0, 1fr) 2.2em 2.6em; }
+  .btv-tbody { grid-template-columns: minmax(0, 1fr) minmax(220px, 290px); }
+  .btv-latest { border-left: 1px solid var(--line); padding-left: 24px; }
+  .btv-ll { grid-template-columns: minmax(0, 1fr); }
 }
-.btv-card {
-  display: flex; flex-direction: column; min-width: 0;
-  border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px 12px; background: var(--surface);
-}
-.btv-q { margin: 0 0 14px; font-family: var(--sans); font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
+.btv-tkey { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 8px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.btv-tkey span { display: inline-flex; align-items: center; gap: 7px; }
+.btv-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
+.btv-ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink-3); }
+.btv-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px dashed var(--ink-3); }
+.btv-ledger { margin-top: 14px; }
+.btv-items { margin-top: 30px; }
+.btv-item { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 22px 0 24px; border-top: 1px solid var(--line); }
+.btv-il { flex: 1 1 260px; min-width: 0; }
+.btv-ir { flex: 1.7 1 360px; min-width: 0; }
+.btv-q { margin: 0; font-family: var(--sans); font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
+.btv-sum { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
 .btv-bar { position: relative; display: flex; height: 12px; border-radius: 3px; overflow: hidden; background: var(--btv-track); }
 .btv-bar-t { height: 18px; border-radius: 4px; }
 .btv-seg { display: block; flex: none; height: 100%; box-sizing: border-box; border-right: 2px solid var(--surface); }
@@ -3316,11 +3342,11 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-ends { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 7px; font-size: 13.5px; line-height: 1.3; color: var(--ink-2); }
 .btv-end { display: inline-flex; align-items: baseline; gap: 6px; }
 .btv-end-b { text-align: right; }
-.btv-end b { font-size: 22px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-end b { font-size: 24px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .btv-end .btv-sw { align-self: center; }
 .btv-mids { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; margin: 7px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-3); text-align: center; }
 .btv-mids:empty { display: none; }
-.btv-level { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.btv-level { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); text-align: center; }
 .btv-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.3; color: var(--ink-3); }
 .btv-key span { display: inline-flex; align-items: center; gap: 6px; }
 .btv-key .btv-key-n { color: var(--ink-faint); }
@@ -3333,7 +3359,6 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-va, .btv-vb { font-size: 13px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .btv-va { text-align: right; }
 .btv-net { font-size: 11.5px; color: var(--ink-3); text-align: right; white-space: nowrap; }
-.btv-sum { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .btv-all {
   justify-self: start; margin-top: 10px; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-2);
   background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
@@ -3352,14 +3377,11 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-ntb::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; border-left: 1px solid var(--ink-3); }
 .btv-ntb i { position: absolute; top: 0; height: 100%; border-radius: 2px; }
 .btv-ntb b { position: absolute; top: -2px; font-size: 12px; font-weight: 600; line-height: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
-.btv-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
-.btv-src { margin-top: auto; padding-top: 12px; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
-.btv-src-l { display: flex; flex-wrap: wrap; gap: 2px 12px; padding-top: 10px; border-top: 1px solid var(--line-2); }
+.btv-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.btv-src { margin-top: 10px; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.btv-src-l { display: flex; flex-wrap: wrap; gap: 2px 12px; }
 .btv-src-l b { font-weight: 600; color: var(--ink-2); }
 .btv-srcs { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; }
-.btv a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent); }
-.btv a:hover, .btv a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
-.btv .btv-nav a { border-bottom: 1px solid var(--line); }
 .btv-wd { margin-top: 6px; }
 .btv-wd summary, .btv-ledger summary, .btv-mi summary { cursor: pointer; }
 .btv-wd summary { font-size: 12.5px; color: var(--ink-2); }
@@ -3374,19 +3396,20 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
 .btv-table .btv-l { text-align: left; white-space: normal; min-width: 7em; }
 .btv-table td b { color: var(--ink); font-weight: 600; }
-.btv-more { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
+.btv-more { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 14px; }
+.btv-items + .btv-more { margin-top: 0; }
 .btv-more > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-2); }
 .btv-more > summary span { font-weight: 400; color: var(--ink-3); }
 .btv-more > summary:hover { color: var(--ink); }
-.btv-ml { list-style: none; margin: 10px 0 0; padding: 0; }
-.btv-ml > li { border-bottom: 1px solid var(--line-2); }
-.btv-mi > summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 14px; padding: 9px 0; font-size: 13.5px; line-height: 1.4; }
-.btv-mq { color: var(--ink); flex: 1 1 30ch; }
-.btv-mm { color: var(--ink-3); font-size: 12.5px; white-space: nowrap; }
+.btv-ml { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); column-gap: 48px; align-items: start; margin: 10px 0 0; padding: 0; list-style: none; }
+.btv-ml > li { min-width: 0; border-bottom: 1px solid var(--line-2); }
+.btv-mi > summary { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; font-size: 14px; line-height: 1.4; }
+.btv-mq { color: var(--ink); }
+.btv-mm { color: var(--ink-3); font-size: 12px; }
 .btv-mw { padding: 0 0 12px; }
 .btv-mwd { margin: 8px 0 0; font-size: 12px; font-weight: 600; color: var(--ink-3); }
-.btv-mw .btv-src { margin-top: 0; }
-.btv-how { margin-top: 44px; padding-top: 12px; border-top: 1px solid var(--line); max-width: 78ch; }
+.btv-mw .btv-src { margin-top: 6px; }
+.btv-how { margin-top: 56px; padding-top: 12px; border-top: 1px solid var(--line); max-width: 78ch; }
 .btv-how p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
 .btv-how b { font-weight: 600; color: var(--ink-2); }
 .btv-retry {
@@ -3396,17 +3419,16 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-ss h2 { scroll-margin-top: 56px; }
 .btv-ss-dek, .btv-ss-by { color: var(--ink-3); }
 .btv-ss-list { margin: 6px 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
-@media (max-width: 1100px) { .btv-pg5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 900px) { .btv-pgrid, .btv-pg5, .btv-pg3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
-  .btv-topic { margin-top: 40px; }
-  .btv-tt { font-size: 19px; }
-  .btv-th { font-size: 23px; }
-  .btv-tdek { font-size: 14.5px; }
-  .btv-pgrid, .btv-pg5, .btv-pg3 { gap: 18px 14px; }
-  .btv-card { padding: 14px 14px 10px; }
+  .btv-topic { margin-top: 48px; }
+  .btv-hl { font-size: 23px; }
+  .btv-fn { font-size: 19px; }
+  .btv-ft { font-size: 18px; }
+  .btv-tdk, .btv-tdek { font-size: 14.5px; }
+  .btv-item { gap: 12px; padding: 18px 0 20px; }
   .btv-q { font-size: 15px; }
-  .btv-end b { font-size: 20px; }
+  .btv-end b { font-size: 21px; }
+  .btv-lv { font-size: 24px; }
   .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em 2.6em; row-gap: 3px; }
   .btv-rl { grid-column: 1 / -1; }
   .btv-rk { grid-template-columns: minmax(0, 1fr) 3em; row-gap: 3px; }
@@ -3862,6 +3884,98 @@ body.rd .ts-sep { background: var(--line); }
 }
 @media (max-width: 345px) {
   body.rd .tabs.pinned .tab-menu { margin-left: 5px; padding-right: 3px; }
+}
+body.rd .tabs {
+  --tm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .2 0 0 0 1.1 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --tm-sheet-1: color-mix(in oklab, var(--surface-2) 80%, var(--bg));
+  --tm-sheet-2: color-mix(in oklab, var(--surface-2) 45%, var(--bg));
+}
+body.rd .tab.tab-menu { z-index: 0; }
+body.rd .tab-menu-paper {
+  position: absolute; z-index: -1; top: 0; bottom: 0; left: -14px; right: -14px;
+  box-sizing: border-box; visibility: hidden; pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--line); border-bottom: 0; border-top: 2px solid var(--ink);
+  border-radius: 7px 7px 0 0;
+}
+body.rd .tab-menu-paper::before, body.rd .tab-menu-pop::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background-image: var(--tm-grain); background-size: 180px 180px;
+  opacity: 0.5; mix-blend-mode: multiply;
+}
+body.rd.dark .tab-menu-paper::before, body.rd.dark .tab-menu-pop::before { mix-blend-mode: screen; opacity: 0.16; }
+body.rd .tab-menu-pop::before { top: -1px; }
+body.rd .tab.tab-menu.open .tab-menu-paper { visibility: visible; }
+body.rd .tab.tab-menu.open::after { opacity: 0; }
+body.rd .tab-menu-pop {
+  display: block; max-width: none; padding: 0;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-top-color: transparent; border-radius: 8px;
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -26px oklch(0.3 0.03 55 / 0.42), 0 10px 18px -10px oklch(0.3 0.03 55 / 0.16);
+}
+body.rd.dark .tab-menu-pop {
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
+}
+body.rd .tab-menu-pop::after {
+  content: ""; position: absolute; inset: -1px; pointer-events: none;
+  border-top: 1px solid var(--line); border-radius: inherit;
+  -webkit-mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
+  mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
+}
+body.rd .tab-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+body.rd .tab-menu-item {
+  position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr) 92px; align-items: start; column-gap: 4px;
+  padding: 13px 20px 14px 0; border-radius: 0;
+  color: var(--ink); text-decoration: none;
+}
+body.rd .tab-menu-item + .tab-menu-item { border-top: 3px double var(--line); }
+body.rd .tab-menu-n {
+  justify-self: center; padding-top: 1px;
+  font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 19px; line-height: 20px;
+  font-variant-numeric: tabular-nums oldstyle-nums; color: var(--ink-3);
+}
+body.rd .tab-menu-txt { display: block; min-width: 0; }
+body.rd .tab-menu-t { display: block; font-size: 15px; font-weight: 600; line-height: 20px; }
+body.rd .tab-menu-d { display: block; margin-top: 3px; max-width: 290px; font-size: 13px; line-height: 1.38; color: var(--ink-2); text-wrap: pretty; }
+body.rd .tab-menu-f { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+body.rd .tab-menu-v {
+  font-size: 21px; font-weight: 600; line-height: 22px; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
+}
+body.rd .tab-menu-v.tm-alp { color: var(--alp-text); }
+body.rd .tab-menu-v.tm-lnp { color: var(--lnp-text); }
+body.rd .tab-menu-v.tm-onp { color: var(--onp-text); }
+body.rd .tab-menu-v.tm-grn { color: var(--grn-text); }
+body.rd .tab-menu-v.tm-oth { color: var(--oth-text); }
+body.rd .tab-menu-c {
+  margin-top: 4px; font-size: 9.5px; font-weight: 600; line-height: 12px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--ink-3); text-wrap: balance;
+}
+body.rd .tab-menu-chip {
+  margin-top: 2px; padding: 2px 6px 3px; border: 1px solid var(--line); border-radius: 3px;
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
+}
+body.rd .tab-menu-item:hover, body.rd .tab-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
+body.rd .tab-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
+body.rd .tab-menu-item:hover .tab-menu-n, body.rd .tab-menu-item:focus-visible .tab-menu-n, body.rd .tab-menu-item.on .tab-menu-n { color: var(--ink); }
+body.rd .tab-menu-item:hover .tab-menu-t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+body.rd .tab-menu-item.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+body.rd .tab-menu-item.on .tab-menu-t, body.rd .tab-menu-item.on.tab-menu-info { font-weight: 600; }
+body.rd .tab-menu-item.tab-menu-info { display: none; }
+@media (max-width: 420px) {
+  body.rd .tabs.show-score .tab-menu-item.tab-menu-info { display: grid; }
+}
+@media (max-width: 640px) {
+  body.rd .tab-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  body.rd .tab-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
+  body.rd .tab-menu-n { font-size: 17px; }
+  body.rd .tab-menu-t { font-size: 14.5px; }
+  body.rd .tab-menu-d { font-size: 12.5px; max-width: none; }
+  body.rd .tab-menu-v { font-size: 18px; }
 }
 @media (orientation: landscape) and (max-height: 480px) {
   body.rd .tabs.sticky { position: relative; top: auto; }
@@ -20879,6 +20993,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }],
     "gapsUsed": 6
   }];
+  const beyondTopics = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,
     gov: c.gov,
@@ -21070,6 +21185,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       return _oneOffs || {};
     },
     loadOneOffs,
+    beyondTopics,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,
@@ -22176,7 +22292,66 @@ window.AP = function () {
     DISCORD_MEASURES,
     DISC
   };
-}();</script>
+}();
+const rdSigned = (v, dp = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(dp);
+function rdList(arr) {
+  if (!arr.length) return "";
+  if (arr.length === 1) return arr[0];
+  return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
+}
+const rdElecYear = (() => {
+  const c = (window.AUSPOL.cycles || []).find(x => x.current);
+  return c && c.eDate ? c.eDate.slice(0, 4) : "2025";
+})();
+function rdMonthYear(ym) {
+  const [y, m] = ym.split("-").map(Number);
+  return window.AUSPOL.monthNameFull(m) + " " + y;
+}
+function tTail(t, df) {
+  const th = Math.atan(Math.abs(t) / Math.sqrt(df)),
+    c2 = Math.cos(th) ** 2;
+  let term = 1,
+    sum = 1;
+  if (df % 2) {
+    for (let k = 1; k <= (df - 3) / 2; k++) sum += term *= 2 * k / (2 * k + 1) * c2;
+    return 1 - 2 / Math.PI * (th + (df > 1 ? Math.sin(th) * Math.cos(th) * sum : 0));
+  }
+  for (let k = 1; k <= (df - 2) / 2; k++) sum += term *= (2 * k - 1) / (2 * k) * c2;
+  return 1 - Math.sin(th) * sum;
+}
+function withinHouseSlope(pts) {
+  const byHouse = new Map();
+  for (const p of pts) (byHouse.get(p.h) || byHouse.set(p.h, []).get(p.h)).push(p);
+  const dm = [];
+  let houses = 0;
+  for (const ps of byHouse.values()) {
+    if (ps.length < 2) continue;
+    houses++;
+    const W = ps.reduce((a, p) => a + p.w, 0);
+    const tb = ps.reduce((a, p) => a + p.w * p.t, 0) / W,
+      yb = ps.reduce((a, p) => a + p.w * p.y, 0) / W;
+    for (const p of ps) dm.push({
+      w: p.w,
+      dt: p.t - tb,
+      dy: p.y - yb
+    });
+  }
+  const df = dm.length - houses - 1;
+  const sxx = dm.reduce((a, p) => a + p.w * p.dt * p.dt, 0);
+  if (df < 3 || !(sxx > 0)) return null;
+  const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
+  const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
+  return {
+    b,
+    t: se > 0 ? b / se : 0,
+    p: se > 0 ? tTail(b / se, df) : 1
+  };
+}
+window.AP.measureOfMatchup = id => ({
+  alp_lnp: "lnp",
+  alp_on: "onp",
+  lnp_on: "lnponp"
+})[id] || "lnp";</script>
   <script>const DAY_MS = 86400000;
 const NP_HORIZON_DAYS = 28;
 const NP_ASSUME_SKIP_DAYS = 2;
@@ -22498,6 +22673,366 @@ function npTickerItems(proj) {
 }
 window.AP.nextPollItems = npTickerItems;
 window.AP.npMonthEndSlot = npMonthEndSlot;</script>
+  <script>const FF_COHORTS = {
+  coal: {
+    name: "Coalition",
+    prose: "Coalition",
+    cls: "lnp",
+    share: "lnp"
+  },
+  grn: {
+    name: "Greens",
+    prose: "Greens",
+    cls: "grn",
+    share: "grn"
+  },
+  onp: {
+    name: "One Nation",
+    prose: "One Nation",
+    cls: "onp",
+    share: "onp"
+  },
+  oth: {
+    name: "Other",
+    prose: "other",
+    cls: "oth",
+    share: "oth"
+  },
+  alp: {
+    name: "Labor",
+    prose: "Labor",
+    cls: "alp",
+    share: "alp"
+  }
+};
+const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1);
+(function () {
+  const AP = window.AP;
+  const D = window.AUSPOL;
+  const DIS_PARTY = {
+    p_onp: ["One Nation", "onp"],
+    p_lnp: ["Coalition", "lnp"],
+    p_alp: ["Labor", "alp"],
+    p_grn: ["Greens", "grn"]
+  };
+  AP.disStory = function disStory() {
+    const lastOf = id => {
+      const s = AP.discord(id).filter(d => d.sigma != null);
+      return s.length ? s[s.length - 1] : null;
+    };
+    const on = lastOf("p_onp"),
+      co = lastOf("p_lnp"),
+      right = lastOf("rd_right"),
+      alp = lastOf("p_alp"),
+      grn = lastOf("p_grn");
+    const beyond = d => d && d.R >= 1.2;
+    const figOf = ids => {
+      const top = ids.map(id => [id, lastOf(id)]).filter(([, d]) => d && d.R != null).sort((a, b) => b[1].R - a[1].R)[0];
+      return top ? {
+        v: top[1].R.toFixed(1) + "×",
+        cap: DIS_PARTY[top[0]][0] + " v chance",
+        tone: DIS_PARTY[top[0]][1]
+      } : null;
+    };
+    let head, dek, fig;
+    if (on && co && right && (beyond(on) || beyond(co)) && !beyond(right)) {
+      const r = (on.R + co.R) / 2;
+      const how = r < 1.3 ? "a little further than" : r < 1.75 ? "about half as much again as" : r < 2.25 ? "about twice as far as" : "more than twice as far as";
+      head = "The polls disagree on how the right’s vote splits, not on its size";
+      dek = `Polls of One Nation’s vote typically sit ${on.sigma.toFixed(1)} points from the trend through them, and polls of the Coalition’s ${co.sigma.toFixed(1)}: ${how} sampling error alone would put them. ` + `Add the two parties together, though, and their combined vote varies only as much as chance allows${alp && !beyond(alp) ? ", as Labor’s does" : ""}.`;
+      fig = figOf(["p_onp", "p_lnp"].filter(id => beyond(id === "p_onp" ? on : co)));
+    } else {
+      const all = [["One Nation’s", on, "p_onp"], ["the Coalition’s", co, "p_lnp"], ["Labor’s", alp, "p_alp"], ["the Greens’", grn, "p_grn"]].filter(([, d]) => d);
+      const wide = all.filter(([, d]) => beyond(d));
+      if (!wide.length) {
+        head = "The polls agree about as closely as sampling error allows";
+        dek = "Polls of every party’s vote sit about as far from the trend through them as their samples alone would put them" + (all.some(([, d]) => d.R < 0.8) ? ", and some sit closer than chance allows, which can mean pollsters steering towards each other." : ".");
+        fig = figOf(all.map(([,, id]) => id));
+      } else {
+        head = "The polls disagree on " + rdList(wide.map(([n]) => n)) + " vote";
+        dek = wide.map(([n, d]) => `Polls of ${n} vote typically sit ${d.sigma.toFixed(1)} points from the trend through them, against ${d.floor.toFixed(1)} from sampling error alone.`).join(" ");
+        fig = figOf(wide.map(([,, id]) => id));
+      }
+    }
+    return {
+      head,
+      dek,
+      fig
+    };
+  };
+  let leanCache = null;
+  AP.leanSeries = function leanSeries() {
+    const HL0 = D.houseLean || {};
+    if (leanCache && leanCache.src === HL0) return leanCache.HL;
+    const HL = {
+      ...HL0,
+      split: Object.fromEntries(Object.keys(HL0.onp || {}).filter(h => (HL0.lnp || {})[h]).map(h => {
+        const co = Object.fromEntries(HL0.lnp[h].map(d => [d.ym, d.v]));
+        return [h, HL0.onp[h].filter(d => co[d.ym] != null).map(d => ({
+          ym: d.ym,
+          v: Math.round((d.v - co[d.ym]) * 10) / 10,
+          on: d.v,
+          co: co[d.ym]
+        }))];
+      }))
+    };
+    leanCache = {
+      src: HL0,
+      HL
+    };
+    return HL;
+  };
+  AP.leanKey = (view, onM, pub) => view === "tpp" ? pub ? onM ? "onpub" : "tpp" : onM ? "onimp" : "imp" : view;
+  AP.leanRows = key => {
+    const HL = AP.leanSeries();
+    return Object.keys(HL[key] || {}).map(h => {
+      const s = HL[key][h] || [];
+      return {
+        h,
+        s,
+        v: s.length ? s[s.length - 1].v : 0
+      };
+    }).filter(r => r.s.length);
+  };
+  AP.leanStory = function leanStory(view, onM, pub) {
+    const rowsOf = AP.leanRows;
+    const key = AP.leanKey(view, onM, pub);
+    const hlWords = id => {
+      if (id === "tpp") {
+        const rival = onM ? "One Nation" : "the Coalition";
+        return {
+          hi: pl => `lean${pl ? "" : "s"} furthest to Labor`,
+          lo: pl => `lean${pl ? "" : "s"} furthest to ${rival}`
+        };
+      }
+      if (id === "split") return {
+        hi: pl => `read${pl ? "" : "s"} One Nation widest against the Coalition`,
+        lo: pl => `read${pl ? "" : "s"} One Nation narrowest against the Coalition`
+      };
+      const whose = {
+        alp: "Labor’s",
+        lnp: "the Coalition’s",
+        onp: "One Nation’s",
+        grn: "the Greens’",
+        oth: "the others’"
+      }[id];
+      return {
+        hi: pl => `read${pl ? "" : "s"} ${whose} vote highest`,
+        lo: pl => `read${pl ? "" : "s"} ${whose} vote lowest`
+      };
+    };
+    const hlJoin = ns => ns.length > 2 ? ns.slice(0, -1).join(", ") + " and " + ns[ns.length - 1] : ns.join(" and ");
+    let head = null,
+      dek = null,
+      fig = null;
+    const hsr = rowsOf(key).sort((a, b) => Math.abs(b.v) - Math.abs(a.v)).filter(r => Math.abs(r.v) >= 0.05);
+    if (hsr.length) {
+      const words = hlWords(view === "tpp" ? "tpp" : view);
+      const tail = " The averages take each lean out before the polls are combined.";
+      const fmtPt = v => `${v.toFixed(1)} point${v.toFixed(1) === "1.0" ? "" : "s"}`;
+      const sgn = hsr[0].v > 0;
+      const tied = hsr.filter(r => r.v > 0 === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.1);
+      const next = hsr.filter(r => !tied.includes(r));
+      const pl = tied.length > 1,
+        topV = Math.min(...tied.map(r => Math.abs(r.v)));
+      head = `${hlJoin(tied.map(r => r.h))} ${(sgn ? words.hi : words.lo)(pl)}, and ${topV <= 1 ? "only " : ""}by ${fmtPt(topV)}`;
+      if (!next.length) {
+        dek = "No other pollster leans measurably either way." + tail;
+      } else {
+        const nextMax = Math.abs(next[0].v);
+        const nextTied = next.filter(r => Math.abs(r.v) >= nextMax - 0.1);
+        dek = `${hlJoin(nextTied.map(r => r.h))} ${nextTied.length > 1 ? "are" : "is"} next, ${fmtPt(nextMax)} off` + (next.length > nextTied.length ? "; no other pollster is further out" : "") + `.${topV >= 1 && nextMax <= topV / 2 ? ` ${pl ? "They are" : "It is"} well clear of the pack.` : ""}${tail}`;
+      }
+      const tone = view === "tpp" ? sgn ? "alp" : onM ? "onp" : "lnp" : view === "split" ? sgn ? "onp" : "lnp" : view;
+      fig = {
+        v: rdSigned(sgn ? topV : -topV, 1),
+        cap: pl ? tied.length + " pollsters" : tied[0].h,
+        tone
+      };
+    } else if (rowsOf(key).length) {
+      head = "No pollster leans away from the pack here";
+      dek = "Every pollster sits level with the pollsters polling beside it. The averages take out any lean that builds up.";
+    }
+    return {
+      head,
+      dek,
+      fig
+    };
+  };
+  AP.flowStory = function flowStory() {
+    const FD = D.flowDrift,
+      FO = D.flowDriftOn;
+    const FF = D.flowForced,
+      FT = D.flowTables;
+    if (!FD || !FO || !FD.now || !FO.now) return null;
+    const nC = FD.now,
+      nO = FO.now;
+    const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
+    const E = FF && FF.elec2025r;
+    const allMrp = ws => (ws || []).map(w => w.all ? {
+      ...w,
+      ...w.all
+    } : w);
+    const ff = FF ? [["on", FF.vsOn, ["grn", "coal", "oth"]], ["co", FF.vsCoal, ["grn", "onp", "oth"]], ["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]]].flatMap(([cq, waves, cks]) => cks.map(ck => {
+      const s = waves.filter(w => w[ck] != null);
+      return {
+        key: cq + ck,
+        ck,
+        q: cq,
+        waves: s,
+        fit: withinHouseSlope(s.map(w => ({
+          h: cq + ck,
+          t: (w.xm ?? mi(w.ym)) / 12,
+          w: 1,
+          y: w[ck]
+        })))
+      };
+    })) : [];
+    {
+      const tested = ff.filter(r => r.fit),
+        sigK = [];
+      for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+        if (r.fit.p >= 0.05 / (tested.length - i)) break;
+        sigK.push(r.key);
+      }
+      for (const r of ff) r.sig = sigK.includes(r.key);
+    }
+    const movedOf = (cq, ck) => {
+      const r = ff.find(x => x.key === cq + ck);
+      if (!r || !r.sig) return null;
+      const f = r.waves[0][ck],
+        la = r.waves[r.waves.length - 1][ck];
+      return f === la ? null : {
+        from: f,
+        to: la,
+        ym: r.waves[0].ym,
+        up: la > f
+      };
+    };
+    const s1 = v => Math.abs(v).toFixed(1);
+    const phr = (v, who) => Math.abs(v) < 0.05 ? "level against " + who : s1(v) + " points kinder to " + (v > 0 ? "Labor against " + who : who);
+    const ci = Math.max(nC.ci95, nO.ci95);
+    const worst = Math.max(Math.abs(nC.v), Math.abs(nO.v));
+    const outC = Math.abs(nC.v) > nC.ci95,
+      outO = Math.abs(nO.v) > nO.ci95;
+    const moves = ff.filter(r => movedOf(r.q, r.ck)).map(r => ({
+      ...r,
+      m: movedOf(r.q, r.ck)
+    }));
+    const anchorOf = cq => cq === "ln" ? "the Coalition" : "Labor";
+    const rivalOf = cq => cq === "co" ? "the Coalition" : "One Nation";
+    const voiceMove = moves.length === 1 ? moves[0] : null;
+    const head = outC || outO ? outC && outO ? "Preferences have moved since the election, in both contests" : "Preferences " + (outO ? "against One Nation" : "against the Coalition") + " have moved " + ((outO ? nO.v : nC.v) > 0 ? "towards Labor" : "away from Labor") + " since the election" : voiceMove ? FF_COHORTS[voiceMove.ck].name + " voters say they’d now send " + anchorOf(voiceMove.q) + " " + (voiceMove.m.up ? "more" : "fewer") + " preferences" : moves.length > 1 ? "Voters say their preferences have shifted since " + rdMonthYear(moves[0].m.ym).split(" ")[0] : "Preferences are still flowing much as they did at the election";
+    const dekA = "This site’s two-party figures assume fixed preference flows: the " + rdElecYear + " count against the Coalition, and a table built from " + rdElecYear + "’s ballots against One Nation.";
+    const dekB = voiceMove ? (() => {
+      const r = voiceMove,
+        m = r.m;
+      const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the " + rdElecYear + " count sent " + anchorOf(r.q) + "’s way" : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
+      return " Asked to choose, " + m.to + "% of " + FF_COHORTS[r.ck].prose + " voters now pick " + anchorOf(r.q) + " over " + rivalOf(r.q) + " in " + (r.q === "ln" ? "DemosAU’s MRP" : "RedBridge/Accent’s poll") + ", " + (m.up ? "up" : "down") + " from " + m.from + "% in " + rdMonthYear(m.ym).split(" ")[0] + refTxt + ".";
+    })() : moves.length > 1 ? " Asked to choose, " + moves.map(r => FF_COHORTS[r.ck].prose + " voters " + (r.m.up ? "up" : "down") + " from " + r.m.from + "% to " + r.m.to + "%").join("; ") + "." : " Voters’ own answers to pollsters haven’t clearly moved since February either.";
+    const dekC = " The pollsters’ own two-party figures " + (outC || outO ? "have moved: they sit " : voiceMove || moves.length ? "don’t show it yet: they sit " : "sit where their primary votes and the flows put them: ") + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ".";
+    const dek = FF ? dekA + (voiceMove || moves.length ? dekB : "") + dekC : "The pollsters’ own two-party figures sit where their primary votes and the " + rdElecYear + " flows put them: " + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ". A shift in where voters send their preferences would show here first.";
+    let fig = null;
+    if (outC || outO) {
+      const onWay = outO && (!outC || Math.abs(nO.v) >= Math.abs(nC.v));
+      const v = onWay ? nO.v : nC.v;
+      fig = {
+        v: rdSigned(v, 1),
+        cap: "Pts v " + (onWay ? "One Nation" : "Coalition"),
+        tone: v > 0 ? "alp" : onWay ? "onp" : "lnp"
+      };
+    } else if (voiceMove) {
+      fig = {
+        v: voiceMove.m.to + "%",
+        cap: (voiceMove.ck === "oth" ? "Others" : FF_COHORTS[voiceMove.ck].name) + " to " + anchorOf(voiceMove.q).replace(/^the /, ""),
+        tone: FF_COHORTS[voiceMove.ck].cls
+      };
+    }
+    return {
+      head,
+      dek,
+      fig,
+      ff,
+      movedOf
+    };
+  };
+  AP.PAGE_HEAD = {
+    "flows-explained": "There are two ways to get a two-party figure from a poll",
+    "beyond-the-vote": "What Australians think about the issues",
+    info: "Answers to questions you may have"
+  };
+  AP.changelogGist = text => {
+    const m = String(text || "").match(/^.*?\.(?=\s|$)/);
+    return (m ? m[0] : String(text || "")).replace(/ \(fieldwork [^)]*\)/g, "").replace(/ \((?:Labor v [^,)]+, )?(?:implied flows|published figures)\)/g, "").replace(/\.$/, "");
+  };
+  AP.menuLines = function menuLines({
+    onM,
+    pub = false
+  } = {}) {
+    const L = D.latest || {};
+    const onM0 = onM != null ? onM : AP.measureOfMatchup(L.rivalLead) !== "lnp";
+    const out = {};
+    const put = (id, f) => {
+      try {
+        const v = f();
+        if (v && v.head) out[id] = v;
+      } catch (e) {
+        if (typeof console !== "undefined") console.error("menu line " + id + " failed", e);
+      }
+    };
+    put("disagreement", () => {
+      const s = AP.disStory();
+      return {
+        head: s.head,
+        fig: s.fig
+      };
+    });
+    put("leans", () => {
+      const s = AP.leanStory("tpp", onM0, pub);
+      return {
+        head: s.head,
+        fig: s.fig
+      };
+    });
+    put("flows", () => {
+      const s = AP.flowStory();
+      return s && {
+        head: s.head,
+        fig: s.fig
+      };
+    });
+    put("flows-explained", () => ({
+      head: AP.PAGE_HEAD["flows-explained"],
+      fig: null,
+      chip: "Explainer"
+    }));
+    put("beyond-the-vote", () => ({
+      head: AP.PAGE_HEAD["beyond-the-vote"],
+      fig: D.beyondTopics ? {
+        v: String(D.beyondTopics),
+        cap: "Topics"
+      } : null
+    }));
+    put("changelog", () => {
+      const log = D.changelog || [];
+      const e = log[log.length - 1];
+      if (!e) return null;
+      const [, mo, dd] = e.date.split("-").map(Number);
+      return {
+        head: AP.changelogGist(e.text),
+        fig: {
+          v: dd + " " + D.monthName(mo),
+          cap: "Latest entry"
+        }
+      };
+    });
+    put("info", () => ({
+      head: AP.PAGE_HEAD.info,
+      fig: null
+    }));
+    return out;
+  };
+})();</script>
   <script>(() => {
   "use strict";
 
@@ -23017,9 +23552,9 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     const yrs = legend.map(l => l.year).filter(y => y && y < 9000).sort((a, b) => a - b);
     const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map(n => txt(n)).filter(Boolean);
     const datey = t => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
-    let span = "",
+    let span = own && typeof own.span === "string" ? own.span : "",
       cycSpan = false;
-    if (cycs.length) {
+    if (!span && cycs.length) {
       const runs = [];
       cycs.forEach((c, i) => {
         if (c.off) return;
@@ -28463,46 +28998,6 @@ function demoVerdict(st, party) {
 const demoSaid = t => t && React.createElement("p", {
   className: "demo-verdict"
 }, /significant/.test(t) && !/\bno\b|n’t/.test(t) ? React.createElement("mark", null, t) : t);
-function tTail(t, df) {
-  const th = Math.atan(Math.abs(t) / Math.sqrt(df)),
-    c2 = Math.cos(th) ** 2;
-  let term = 1,
-    sum = 1;
-  if (df % 2) {
-    for (let k = 1; k <= (df - 3) / 2; k++) sum += term *= 2 * k / (2 * k + 1) * c2;
-    return 1 - 2 / Math.PI * (th + (df > 1 ? Math.sin(th) * Math.cos(th) * sum : 0));
-  }
-  for (let k = 1; k <= (df - 2) / 2; k++) sum += term *= (2 * k - 1) / (2 * k) * c2;
-  return 1 - Math.sin(th) * sum;
-}
-function withinHouseSlope(pts) {
-  const byHouse = new Map();
-  for (const p of pts) (byHouse.get(p.h) || byHouse.set(p.h, []).get(p.h)).push(p);
-  const dm = [];
-  let houses = 0;
-  for (const ps of byHouse.values()) {
-    if (ps.length < 2) continue;
-    houses++;
-    const W = ps.reduce((a, p) => a + p.w, 0);
-    const tb = ps.reduce((a, p) => a + p.w * p.t, 0) / W,
-      yb = ps.reduce((a, p) => a + p.w * p.y, 0) / W;
-    for (const p of ps) dm.push({
-      w: p.w,
-      dt: p.t - tb,
-      dy: p.y - yb
-    });
-  }
-  const df = dm.length - houses - 1;
-  const sxx = dm.reduce((a, p) => a + p.w * p.dt * p.dt, 0);
-  if (df < 3 || !(sxx > 0)) return null;
-  const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
-  const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
-  return {
-    b,
-    t: se > 0 ? b / se : 0,
-    p: se > 0 ? tTail(b / se, df) : 1
-  };
-}
 function demoTrendVerdict(D, st, party, inX) {
   const gpi = DEMO_GRP_PARTY.indexOf(party);
   const words = DEMO_SET_WORDS[st.id] || {};
@@ -30866,11 +31361,6 @@ function NextPollsPanel() {
     }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.monthEnd ? "" : r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && !r.monthEnd && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.monthEnd && ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${houseList(r.declared, Infinity)} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`, r.summer && ` That puts the next one in the summer break. No federal poll has been published between 23 December and 8 January, and last summer the pollsters came back anywhere from 9 January to 1 February, so that range is the window.`)));
   })));
 }
-window.AP.measureOfMatchup = id => ({
-  alp_lnp: "lnp",
-  alp_on: "onp",
-  lnp_on: "lnponp"
-})[id] || "lnp";
 const LEAD_LABEL = {
   lnp: "ALP v L/NP",
   onp: "ALP v ON",
@@ -31517,11 +32007,32 @@ function Tabs({
     if (!b || !n) return;
     const br = b.getBoundingClientRect(),
       nr = n.getBoundingClientRect();
-    const w = Math.min(280, window.innerWidth - 24);
-    const x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
+    const vw = window.innerWidth;
+    if (!window.AP.rd) {
+      const w = Math.min(280, vw - 24);
+      const x = Math.min(Math.max(br.right - w, 8), vw - 8 - w);
+      setMenuAt({
+        top: Math.round(br.bottom - nr.top),
+        left: Math.round(x - nr.left)
+      });
+      return;
+    }
+    const pp = b.querySelector(".tab-menu-paper");
+    const pr = pp ? pp.getBoundingClientRect() : br;
+    const w0 = Math.min(492, vw - 16);
+    let L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)),
+      R = L + w0;
+    if (pr.left - L < 16) L = Math.round(pr.left);
+    if (R - pr.right < 16) R = Math.round(pr.right);
+    const w = R - L;
+    const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
     setMenuAt({
       top: Math.round(br.bottom - nr.top),
-      left: Math.round(x - nr.left)
+      left: L - Math.round(nr.left),
+      width: w,
+      gapA: Math.max(0, pr.left - L + 1),
+      gapB: Math.min(w, pr.right - L - 1),
+      maxH: stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) : null
     });
   };
   const openMenu = focusAt => {
@@ -31583,6 +32094,10 @@ function Tabs({
       to.focus();
     }
   };
+  const rdMenu = !!window.AP.rd;
+  const menuLines = React.useMemo(() => menuOpen && rdMenu && window.AP.menuLines ? window.AP.menuLines({
+    pub: tppBasis === "resp"
+  }) : null, [menuOpen, rdMenu, tppBasis]);
   const menuPick = id => e => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
@@ -31705,7 +32220,10 @@ function Tabs({
         if (e.detail) e.currentTarget.blur();
       } else openMenu(e.detail ? null : 0);
     }
-  }, React.createElement("svg", {
+  }, rdMenu && React.createElement("span", {
+    className: "tab-menu-paper",
+    "aria-hidden": "true"
+  }), React.createElement("svg", {
     className: "tab-menu-ic",
     viewBox: "0 0 20 20",
     width: "18",
@@ -31742,7 +32260,58 @@ function Tabs({
     onGoHero: goHero,
     matchup: tppMatchup,
     tppBasis: tppBasis
-  })), menuOpen && React.createElement("div", {
+  })), menuOpen && (rdMenu ? React.createElement("div", {
+    className: "tab-menu-pop",
+    id: "tab-menu-pop",
+    role: "menu",
+    "aria-label": "More pages",
+    ref: menuRef,
+    style: menuAt ? {
+      top: menuAt.top + "px",
+      left: menuAt.left + "px",
+      right: "auto",
+      width: menuAt.width + "px",
+      "--gap-a": menuAt.gapA + "px",
+      "--gap-b": menuAt.gapB + "px",
+      borderTopLeftRadius: menuAt.gapA <= 1.5 ? 0 : undefined,
+      borderTopRightRadius: menuAt.gapB >= menuAt.width - 1.5 ? 0 : undefined
+    } : null,
+    onKeyDown: onMenuKey
+  }, React.createElement("div", {
+    className: "tab-menu-list",
+    style: menuAt && menuAt.maxH ? {
+      maxHeight: menuAt.maxH + "px"
+    } : null
+  }, [...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
+    const ln = menuLines && menuLines[t.id];
+    const fig = ln && ln.fig;
+    return React.createElement("a", {
+      key: t.id,
+      role: "menuitem",
+      tabIndex: -1,
+      className: "tab-menu-item" + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : ""),
+      href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
+      "aria-current": active === t.id ? "page" : undefined,
+      onClick: menuPick(t.id)
+    }, React.createElement("span", {
+      className: "tab-menu-n",
+      "aria-hidden": "true"
+    }, i + 1), React.createElement("span", {
+      className: "tab-menu-txt"
+    }, React.createElement("span", {
+      className: "tab-menu-t"
+    }, t.label), (ln ? ln.head : t.tip) && React.createElement("span", {
+      className: "tab-menu-d"
+    }, ln ? ln.head : t.tip)), React.createElement("span", {
+      className: "tab-menu-f"
+    }, ln && ln.chip ? React.createElement("span", {
+      className: "tab-menu-chip"
+    }, ln.chip) : fig ? React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "tab-menu-v" + (fig.tone ? " tm-" + fig.tone : "")
+    }, fig.v), React.createElement("span", {
+      className: "tab-menu-c"
+    }, fig.cap.replace("/", "/\u200b"))) : null));
+  }))) : React.createElement("div", {
     className: "tab-menu-pop",
     id: "tab-menu-pop",
     role: "menu",
@@ -31773,7 +32342,7 @@ function Tabs({
     className: "tab-menu-t"
   }, t.label), t.tip && React.createElement("span", {
     className: "tab-menu-d"
-  }, t.tip))))));
+  }, t.tip)))))));
 }
 const fmtSigned1 = v => {
   const r = +v.toFixed(1);
@@ -38225,6 +38794,10 @@ function infoTerms(D) {
     id: "newest-poll-not-headline",
     q: "Why doesn’t the newest poll match the headline?",
     a: React.createElement(React.Fragment, null, "Usually neither is wrong. A poll is one pollster\u2019s reading of one week, and chance alone can put it off by its ", xref("margin-of-error", "newest poll", "margin of error"), ", so two honest polls of an unchanged electorate will differ too. The headline pools every recent poll after removing each pollster\u2019s", " ", xref("house-effect", "newest poll", "house effect"), ", its habit of leaning one way. One poll moves it by its weight, not its news value: its", " ", xref("aggregate-effect", "newest poll", "aggregate effect"), " shows how much.", " ", xref("poll-disagreement", "newest poll", "Poll disagreement"), " tests whether the polls differ by more than chance allows.")
+  }, {
+    id: "more-menu-figures",
+    q: "What are the figures in the More menu?",
+    a: React.createElement(React.Fragment, null, "Each page there is listed under the headline it opens with, and beside it the number that headline rests on, as the page prints it. For", " ", xref("poll-disagreement", "more menu", "Poll disagreement"), ", how widely the polls of the party they disagree on most are spread, as a multiple of what chance alone would produce. For Pollster leans, the ", xref("house-lean", "more menu", "lean"), " the headline names, in points, with + towards Labor. For Preference flows, the move the headline reports. A headline that reports no single number has none beside it.")
   }];
   const method = [{
     id: "weighted-aggregate",
@@ -38696,7 +39269,7 @@ function infoTerms(D) {
       id: "newest-poll-not-headline",
       q: "Why doesn’t the newest poll match the headline?",
       a: React.createElement(React.Fragment, null, "Usually neither is wrong. A poll is one pollster\u2019s reading of one week, and chance alone can put it off by its ", xref("margin-of-error", "newest poll", "margin of error"), ", so two honest polls of an unchanged electorate will differ too. The headline is a trend through every poll after removing each pollster\u2019s", " ", xref("house-effect", "newest poll", "house effect"), ", its habit of leaning one way. One poll moves it by its weight, not its news value: its", " ", xref("aggregate-effect", "newest poll", "aggregate effect"), " shows how much.", " ", xref("poll-disagreement", "newest poll", "Poll disagreement"), " tests whether the polls differ by more than chance allows.")
-    } : faqs.find(f => f.id === "newest-poll-not-headline")].filter(Boolean);
+    } : faqs.find(f => f.id === "newest-poll-not-headline"), faqs.find(f => f.id === "more-menu-figures")].filter(Boolean);
     const vMethod = KAL ? [{
       id: "weighted-aggregate",
       term: "Smoothed trend",
@@ -39066,7 +39639,7 @@ function InfoView({
     className: "rd-meta"
   }, "How the site works")), React.createElement(RdHed, {
     level: 2,
-    head: "Answers to questions you may have",
+    head: window.AP.PAGE_HEAD.info,
     dek: "What things mean, how things are built, how to read them, and their limitations. Each section has its own explainer, and where applicable, the formulas and working are shown for transparency."
   }), React.createElement("div", {
     className: "info-toc"
@@ -42963,20 +43536,11 @@ function rdFraction(p) {
   const exact = best.err < 0.012;
   return (exact ? "" : "about ") + rdNumWord(best.a) + " in " + rdNumWord(best.b);
 }
-const rdSigned = (v, dp = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(dp);
 const rdArrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "→";
-const rdElecYear = (() => {
-  const c = (window.AUSPOL.cycles || []).find(x => x.current);
-  return c && c.eDate ? c.eDate.slice(0, 4) : "2025";
-})();
 function rdDate(iso, withYear) {
   const t = new Date(Date.parse(iso));
   const D = window.AUSPOL;
   return t.getUTCDate() + " " + D.monthName(t.getUTCMonth() + 1) + (withYear ? " " + t.getUTCFullYear() : "");
-}
-function rdMonthYear(ym) {
-  const [y, m] = ym.split("-").map(Number);
-  return window.AUSPOL.monthNameFull(m) + " " + y;
 }
 function rdPointsPhrase(g) {
   if (g <= 0.5) return "half a point";
@@ -46549,11 +47113,6 @@ function RdDirection({
       from: "National direction"
     }
   }, foot));
-}
-function rdList(arr) {
-  if (!arr.length) return "";
-  if (arr.length === 1) return arr[0];
-  return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
 }
 function rdTrendLine(items, sinceM, none, rest) {
   if (!items.length) return none + " since " + sinceM + ".";
@@ -61306,37 +61865,14 @@ function RdDisagree() {
   }, [view]);
   const panels = RD_DIS_PANELS[view];
   const ms = rdApMonths(RD_AP_TERM0);
-  const lastOf = id => {
-    const s = AP.discord(id).filter(d => d.sigma != null);
-    return s.length ? s[s.length - 1] : null;
-  };
   let yMax = 3;
   panels.forEach(p => AP.discord(p.id).forEach(d => {
     if (d.sigma != null) yMax = Math.max(yMax, Math.ceil(d.sigma), Math.ceil(d.floor));
   }));
-  const on = lastOf("p_onp"),
-    co = lastOf("p_lnp"),
-    right = lastOf("rd_right"),
-    alp = lastOf("p_alp"),
-    grn = lastOf("p_grn");
-  const beyond = d => d && d.R >= 1.2;
-  let head, dek;
-  if (on && co && right && (beyond(on) || beyond(co)) && !beyond(right)) {
-    const r = (on.R + co.R) / 2;
-    const how = r < 1.3 ? "a little further than" : r < 1.75 ? "about half as much again as" : r < 2.25 ? "about twice as far as" : "more than twice as far as";
-    head = "The polls disagree on how the right’s vote splits, not on its size";
-    dek = `Polls of One Nation’s vote typically sit ${on.sigma.toFixed(1)} points from the trend through them, and polls of the Coalition’s ${co.sigma.toFixed(1)}: ${how} sampling error alone would put them. ` + `Add the two parties together, though, and their combined vote varies only as much as chance allows${alp && !beyond(alp) ? ", as Labor’s does" : ""}.`;
-  } else {
-    const all = [["One Nation’s", on], ["the Coalition’s", co], ["Labor’s", alp], ["the Greens’", grn]].filter(([, d]) => d);
-    const wide = all.filter(([, d]) => beyond(d));
-    if (!wide.length) {
-      head = "The polls agree about as closely as sampling error allows";
-      dek = "Polls of every party’s vote sit about as far from the trend through them as their samples alone would put them" + (all.some(([, d]) => d.R < 0.8) ? ", and some sit closer than chance allows, which can mean pollsters steering towards each other." : ".");
-    } else {
-      head = "The polls disagree on " + rdList(wide.map(([n]) => n)) + " vote";
-      dek = wide.map(([n, d]) => `Polls of ${n} vote typically sit ${d.sigma.toFixed(1)} points from the trend through them, against ${d.floor.toFixed(1)} from sampling error alone.`).join(" ");
-    }
-  }
+  const {
+    head,
+    dek
+  } = AP.disStory();
   const cols = phone ? 2 : 5;
   const gap = phone ? 20 : 24;
   const pw = Math.max(120, Math.floor((Wall - gap * (cols - 1)) / cols));
@@ -61574,22 +62110,8 @@ function RdHouseLean({
       behavior: SM
     });
   }, [view]);
-  const HL0 = D.houseLean || {};
-  const HL = {
-    ...HL0,
-    split: Object.fromEntries(Object.keys(HL0.onp || {}).filter(h => (HL0.lnp || {})[h]).map(h => {
-      const co = Object.fromEntries(HL0.lnp[h].map(d => [d.ym, d.v]));
-      return [h, HL0.onp[h].filter(d => co[d.ym] != null).map(d => ({
-        ym: d.ym,
-        v: Math.round((d.v - co[d.ym]) * 10) / 10,
-        on: d.v,
-        co: co[d.ym]
-      }))];
-    }))
-  };
   const HE = D.houseEffects || {};
-  const tppKey = pub ? onM ? "onpub" : "tpp" : onM ? "onimp" : "imp";
-  const key = view === "tpp" ? tppKey : view;
+  const key = window.AP.leanKey(view, onM, pub);
   const heKey = {
     onimp: "synthOn",
     imp: "synth",
@@ -61613,67 +62135,14 @@ function RdHouseLean({
     if (he && he.n) return he.n;
     return D.individualPolls.filter(p => p.pollster === h && valOf(p) != null).length;
   };
-  const rowsOf = k => Object.keys(HL[k] || {}).map(h => {
-    const s = HL[k][h] || [];
-    return {
-      h,
-      s,
-      v: s.length ? s[s.length - 1].v : 0
-    };
-  }).filter(r => r.s.length);
-  const rows = rowsOf(key).map(r => ({
+  const rows = window.AP.leanRows(key).map(r => ({
     ...r,
     n: nOf(r.h)
   })).sort((a, b) => b.v - a.v || b.n - a.n);
-  const hlWords = id => {
-    if (id === "tpp") {
-      const rival = onM ? "One Nation" : "the Coalition";
-      return {
-        hi: pl => `lean${pl ? "" : "s"} furthest to Labor`,
-        lo: pl => `lean${pl ? "" : "s"} furthest to ${rival}`
-      };
-    }
-    if (id === "split") return {
-      hi: pl => `read${pl ? "" : "s"} One Nation widest against the Coalition`,
-      lo: pl => `read${pl ? "" : "s"} One Nation narrowest against the Coalition`
-    };
-    const whose = {
-      alp: "Labor’s",
-      lnp: "the Coalition’s",
-      onp: "One Nation’s",
-      grn: "the Greens’",
-      oth: "the others’"
-    }[id];
-    return {
-      hi: pl => `read${pl ? "" : "s"} ${whose} vote highest`,
-      lo: pl => `read${pl ? "" : "s"} ${whose} vote lowest`
-    };
-  };
-  const hlJoin = ns => ns.length > 2 ? ns.slice(0, -1).join(", ") + " and " + ns[ns.length - 1] : ns.join(" and ");
-  let head = null,
-    dek = null;
-  const hsr = rowsOf(key).sort((a, b) => Math.abs(b.v) - Math.abs(a.v)).filter(r => Math.abs(r.v) >= 0.05);
-  if (hsr.length) {
-    const words = hlWords(view === "tpp" ? "tpp" : view);
-    const tail = " The averages take each lean out before the polls are combined.";
-    const fmtPt = v => `${v.toFixed(1)} point${v.toFixed(1) === "1.0" ? "" : "s"}`;
-    const sgn = hsr[0].v > 0;
-    const tied = hsr.filter(r => r.v > 0 === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.1);
-    const next = hsr.filter(r => !tied.includes(r));
-    const pl = tied.length > 1,
-      topV = Math.min(...tied.map(r => Math.abs(r.v)));
-    head = `${hlJoin(tied.map(r => r.h))} ${(sgn ? words.hi : words.lo)(pl)}, and ${topV <= 1 ? "only " : ""}by ${fmtPt(topV)}`;
-    if (!next.length) {
-      dek = "No other pollster leans measurably either way." + tail;
-    } else {
-      const nextMax = Math.abs(next[0].v);
-      const nextTied = next.filter(r => Math.abs(r.v) >= nextMax - 0.1);
-      dek = `${hlJoin(nextTied.map(r => r.h))} ${nextTied.length > 1 ? "are" : "is"} next, ${fmtPt(nextMax)} off` + (next.length > nextTied.length ? "; no other pollster is further out" : "") + `.${topV >= 1 && nextMax <= topV / 2 ? ` ${pl ? "They are" : "It is"} well clear of the pack.` : ""}${tail}`;
-    }
-  } else if (rowsOf(key).length) {
-    head = "No pollster leans away from the pack here";
-    dek = "Every pollster sits level with the pollsters polling beside it. The averages take out any lean that builds up.";
-  }
+  const {
+    head,
+    dek
+  } = window.AP.leanStory(view, onM, pub);
   const maxAbs = Math.max(0, ...rows.map(r => Math.abs(r.v)));
   const BM = maxAbs <= 1.1 ? 1.2 : Math.ceil((maxAbs + 0.1) * 2) / 2;
   const bStep = BM <= 1.5 ? 0.5 : BM <= 3 ? 1 : 2;
@@ -62448,38 +62917,6 @@ function RdFlowChart({
     }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"));
   })());
 }
-const FF_COHORTS = {
-  coal: {
-    name: "Coalition",
-    prose: "Coalition",
-    cls: "lnp",
-    share: "lnp"
-  },
-  grn: {
-    name: "Greens",
-    prose: "Greens",
-    cls: "grn",
-    share: "grn"
-  },
-  onp: {
-    name: "One Nation",
-    prose: "One Nation",
-    cls: "onp",
-    share: "onp"
-  },
-  oth: {
-    name: "Other",
-    prose: "other",
-    cls: "oth",
-    share: "oth"
-  },
-  alp: {
-    name: "Labor",
-    prose: "Labor",
-    cls: "alp",
-    share: "alp"
-  }
-};
 const FF_MRP_HOUSE = "DemosAU (MRP)";
 const FF_REGIONS = [["", "All voters"], ["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"]];
 const FF_REG_OF = {
@@ -62501,7 +62938,6 @@ const flWinMonths = win => {
   const m = String(win || "").match(/[A-Z][a-z]{2}/g) || [];
   return !m.length ? "" : m[0] === m[m.length - 1] ? m[0] : m[0] + "–" + m[m.length - 1];
 };
-const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1);
 function RdFlowSpark({
   ck,
   marks,
@@ -62786,8 +63222,6 @@ function RdFlows({
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
   if (!FD || !FO || !FD.now || !FO.now) return null;
-  const nC = FD.now,
-    nO = FO.now;
   const PR = D.latest && D.latest.primary || {};
   const regName = ffReg ? (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] : "";
   const mi = ym => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
@@ -62894,69 +63328,13 @@ function RdFlows({
     }
   };
   const tabs = FF ? FL_TABS : FL_TABS.filter(t => t.id !== "ln");
-  const allMrp = ws => (ws || []).map(w => w.all ? {
-    ...w,
-    ...w.all
-  } : w);
-  const ff = FF ? [["on", FF.vsOn, ["grn", "coal", "oth"]], ["co", FF.vsCoal, ["grn", "onp", "oth"]], ["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]]].flatMap(([cq, waves, cks]) => cks.map(ck => {
-    const s = waves.filter(w => w[ck] != null);
-    return {
-      key: cq + ck,
-      ck,
-      q: cq,
-      waves: s,
-      fit: withinHouseSlope(s.map(w => ({
-        h: cq + ck,
-        t: (w.xm ?? mi(w.ym)) / 12,
-        w: 1,
-        y: w[ck]
-      })))
-    };
-  })) : [];
-  {
-    const tested = ff.filter(r => r.fit),
-      sigK = [];
-    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
-      if (r.fit.p >= 0.05 / (tested.length - i)) break;
-      sigK.push(r.key);
-    }
-    for (const r of ff) r.sig = sigK.includes(r.key);
-  }
-  const movedOf = (cq, ck) => {
-    const r = ff.find(x => x.key === cq + ck);
-    if (!r || !r.sig) return null;
-    const f = r.waves[0][ck],
-      la = r.waves[r.waves.length - 1][ck];
-    return f === la ? null : {
-      from: f,
-      to: la,
-      ym: r.waves[0].ym,
-      up: la > f
-    };
-  };
+  const {
+    head,
+    dek,
+    ff,
+    movedOf
+  } = window.AP.flowStory();
   const s1 = v => Math.abs(v).toFixed(1);
-  const phr = (v, who) => Math.abs(v) < 0.05 ? "level against " + who : s1(v) + " points kinder to " + (v > 0 ? "Labor against " + who : who);
-  const ci = Math.max(nC.ci95, nO.ci95);
-  const worst = Math.max(Math.abs(nC.v), Math.abs(nO.v));
-  const outC = Math.abs(nC.v) > nC.ci95,
-    outO = Math.abs(nO.v) > nO.ci95;
-  const moves = ff.filter(r => movedOf(r.q, r.ck)).map(r => ({
-    ...r,
-    m: movedOf(r.q, r.ck)
-  }));
-  const anchorOf = cq => cq === "ln" ? "the Coalition" : "Labor";
-  const rivalOf = cq => cq === "co" ? "the Coalition" : "One Nation";
-  const voiceMove = moves.length === 1 ? moves[0] : null;
-  const head = outC || outO ? outC && outO ? "Preferences have moved since the election, in both contests" : "Preferences " + (outO ? "against One Nation" : "against the Coalition") + " have moved " + ((outO ? nO.v : nC.v) > 0 ? "towards Labor" : "away from Labor") + " since the election" : voiceMove ? FF_COHORTS[voiceMove.ck].name + " voters say they’d now send " + anchorOf(voiceMove.q) + " " + (voiceMove.m.up ? "more" : "fewer") + " preferences" : moves.length > 1 ? "Voters say their preferences have shifted since " + rdMonthYear(moves[0].m.ym).split(" ")[0] : "Preferences are still flowing much as they did at the election";
-  const dekA = "This site’s two-party figures assume fixed preference flows: the " + rdElecYear + " count against the Coalition, and a table built from " + rdElecYear + "’s ballots against One Nation.";
-  const dekB = voiceMove ? (() => {
-    const r = voiceMove,
-      m = r.m;
-    const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the " + rdElecYear + " count sent " + anchorOf(r.q) + "’s way" : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
-    return " Asked to choose, " + m.to + "% of " + FF_COHORTS[r.ck].prose + " voters now pick " + anchorOf(r.q) + " over " + rivalOf(r.q) + " in " + (r.q === "ln" ? "DemosAU’s MRP" : "RedBridge/Accent’s poll") + ", " + (m.up ? "up" : "down") + " from " + m.from + "% in " + rdMonthYear(m.ym).split(" ")[0] + refTxt + ".";
-  })() : moves.length > 1 ? " Asked to choose, " + moves.map(r => FF_COHORTS[r.ck].prose + " voters " + (r.m.up ? "up" : "down") + " from " + r.m.from + "% to " + r.m.to + "%").join("; ") + "." : " Voters’ own answers to pollsters haven’t clearly moved since February either.";
-  const dekC = " The pollsters’ own two-party figures " + (outC || outO ? "have moved: they sit " : voiceMove || moves.length ? "don’t show it yet: they sit " : "sit where their primary votes and the flows put them: ") + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ".";
-  const dek = FF ? dekA + (voiceMove || moves.length ? dekB : "") + dekC : "The pollsters’ own two-party figures sit where their primary votes and the " + rdElecYear + " flows put them: " + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ". A shift in where voters send their preferences would show here first.";
   const c = C[q] || C.co;
   const allXm = FF ? [...FF.vsCoal, ...FF.vsOn, ...(FF.demos || []), ...(FF.demosOn || []), ...(FF.lnpOn || []), ...(FF.bys || [])].map(d => d.xm != null ? d.xm : d.ym ? mi(d.ym) : null).filter(v => v != null) : [];
   const dom = allXm.length ? [Math.floor(Math.min(...allXm)), Math.ceil(Math.max(...allXm))] : [0, 1];
@@ -63405,7 +63783,7 @@ function RdExplained() {
   }, "Preference flows explained"), React.createElement("span", {
     className: "rd-meta"
   }, "How preferences decide the two-party figure")), React.createElement(RdHed, {
-    head: "There are two ways to get a two-party figure from a poll",
+    head: window.AP.PAGE_HEAD["flows-explained"],
     dek: "The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll\u2019s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster\u2019s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table\u2019s numbers come from."
   }), React.createElement("div", {
     className: "ex-body",
@@ -63437,6 +63815,7 @@ Object.assign(window, {
 const BTV_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const btvDay = iso => Number(iso.slice(8, 10)) + " " + BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
 const btvMonth = iso => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+const btvMonYY = iso => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(2, 4);
 const btvSpan = f => {
   if (!f || !f.end) return "";
   if (!f.start || f.start === f.end) return btvDay(f.end);
@@ -63450,8 +63829,8 @@ const btvSigned = v => (v > 0 ? "+" : v < 0 ? "−" : "") + btvN(Math.abs(v));
 const btvHouse = (src, houses, full) => houses[src.house] ? houses[src.house][full ? "full" : "short"] : src.house;
 const btvCap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 const btvWord = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
+const btvNo = i => String(i + 1).padStart(2, "0");
 const btvLow = s => !s || /^(?:Australia|Australian|Labor|Liberal|Coalition|One Nation|Greens|Trump|Albanese|Hanson|I\b)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
-const btvWide = c => c.kind === "nets" || c.kind === "stack" && (c.rows.length >= 7 || c.rows.length * (c.rows.reduce((t, r) => t + (r.label || r.wording || "").length, 0) / c.rows.length) > 220);
 function BtvBar({
   segs,
   tall
@@ -63565,9 +63944,7 @@ function BtvStack({
     type: "button",
     className: "btv-all",
     onClick: () => setAll(!all)
-  }, all ? "Show fewer" : "Show all " + c.rows.length) : null, c.summary ? React.createElement("p", {
-    className: "btv-sum"
-  }, c.summary) : null);
+  }, all ? "Show fewer" : "Show all " + c.rows.length) : null);
 }
 function BtvRank({
   c
@@ -63675,7 +64052,26 @@ function BtvSource({
     className: "btv-wd"
   }, React.createElement("summary", null, "The question as asked"), React.createElement("p", null, question), extra) : null);
 }
-function BtvCard({
+function BtvSources({
+  c,
+  houses
+}) {
+  const seen = new Set();
+  const links = (c.rows || []).filter(r => r.src && r.src.url && !seen.has(r.src.url) && seen.add(r.src.url));
+  return React.createElement("div", {
+    className: "btv-src"
+  }, React.createElement("span", {
+    className: "btv-src-l"
+  }, c.mode === "waves" ? React.createElement("b", null, btvHouse(c.src || c.rows[0].src, houses, true)) : null, links.length ? React.createElement("span", {
+    className: "btv-srcs"
+  }, "Sources: ", links.map((r, i) => React.createElement("a", {
+    key: i,
+    href: r.src.url,
+    target: "_blank",
+    rel: "noopener"
+  }, c.mode === "waves" ? btvMonth(r.src.field.end) : btvHouse(r.src, houses) + " " + btvMonth(r.src.field.end), " \u2197"))) : null));
+}
+function BtvItem({
   c,
   houses
 }) {
@@ -63691,10 +64087,14 @@ function BtvCard({
   }) : null;
   const folds = (c.folds || []).filter(t => (t.rows || []).length);
   return React.createElement("article", {
-    className: "btv-card btv-k-" + c.kind + (btvWide(c) ? " btv-wide" : "")
+    className: "btv-item btv-k-" + c.kind
+  }, React.createElement("div", {
+    className: "btv-il"
   }, React.createElement("h4", {
     className: "btv-q"
-  }, c.title), body, c.note ? React.createElement("p", {
+  }, c.title), c.summary ? React.createElement("p", {
+    className: "btv-sum"
+  }, c.summary) : null, c.note ? React.createElement("p", {
     className: "btv-note"
   }, c.note) : null, c.src && c.src.field ? React.createElement(BtvSource, {
     src: c.src,
@@ -63704,32 +64104,28 @@ function BtvCard({
       key: i,
       t: t
     })) : null
-  }) : React.createElement("div", {
-    className: "btv-src"
-  }, React.createElement("span", {
-    className: "btv-src-l"
-  }, c.mode === "waves" ? React.createElement("b", null, btvHouse(c.src || c.rows[0].src, houses, true)) : null, (() => {
-    const seen = new Set();
-    const links = (c.rows || []).filter(r => r.src && r.src.url && !seen.has(r.src.url) && seen.add(r.src.url));
-    return links.length ? React.createElement("span", {
-      className: "btv-srcs"
-    }, "Sources: ", links.map((r, i) => React.createElement("a", {
-      key: i,
-      href: r.src.url,
-      target: "_blank",
-      rel: "noopener"
-    }, c.mode === "waves" ? btvMonth(r.src.field.end) : btvHouse(r.src, houses) + " " + btvMonth(r.src.field.end), " \u2197"))) : null;
-  })())));
+  }) : React.createElement(BtvSources, {
+    c: c,
+    houses: houses
+  })), React.createElement("div", {
+    className: "btv-ir"
+  }, body));
 }
 function BtvTracker({
   c,
   houses
 }) {
   const narrow = useNarrow(MQ_PHONE);
-  const x0 = Math.min(...c.panels.flatMap(p => p.points.map(q => q.x))) - 0.06;
-  const x1 = Math.max(...c.panels.flatMap(p => p.points.map(q => q.x))) + 0.06;
+  const net = c.measure === "net";
+  const pts = c.panels.flatMap(p => p.points.map(q => ({
+    ...q,
+    house: p.house,
+    fam: p.fam
+  })));
+  const x0 = Math.min(...pts.map(q => q.x)) - 0.06;
+  const x1 = Math.max(...pts.map(q => q.x)) + 0.06;
   const [lo, hi] = c.yDomain;
-  const step = hi - lo > 50 ? 25 : 10;
+  const step = c.yStep || (hi - lo > 50 ? 25 : 10);
   const ticks = [];
   for (let y = Math.floor(x0); y <= Math.ceil(x1); y++) {
     for (const m of [0, 6]) {
@@ -63740,117 +64136,170 @@ function BtvTracker({
       });
     }
   }
-  const fmt = v => c.measure === "net" ? btvSigned(v) : btvPct(v);
+  const fmt = v => net ? btvSigned(v) : btvPct(v);
   const yt = [];
   for (let v = lo + step; v <= hi + 1e-9; v += step) yt.push(v);
-  const rows = c.panels.flatMap(p => p.points.map(q => ({
-    ...q,
-    house: p.house
-  }))).sort((p, q) => q.x - p.x);
+  const ink = f => "var(--btv-w" + f + ")";
+  const fams = c.families.map((label, i) => ({
+    label,
+    i
+  })).filter(f => c.panels.some(p => p.fam === f.i));
+  const spine = [...new Set(pts.map(q => q.x))].sort((p, q) => p - q).map(x => ({
+    x,
+    y: pts.find(q => q.x === x).v
+  }));
+  const at = i => spine[i] ? pts.filter(q => q.x === spine[i].x) : [];
+  const latest = c.panels.map(p => ({
+    p,
+    q: p.points[p.points.length - 1]
+  })).sort((a, b) => b.q.x - a.q.x);
+  const rows = pts.slice().sort((p, q) => q.x - p.x);
   return React.createElement("div", {
     className: "btv-tracker"
-  }, React.createElement("h4", {
-    className: "btv-th"
-  }, c.head), React.createElement("p", {
+  }, React.createElement("p", {
+    className: "btv-tlab"
+  }, c.title), React.createElement("p", {
     className: "btv-tdek"
   }, c.dek), React.createElement("p", {
-    className: "btv-tlab"
-  }, c.title), React.createElement("div", {
-    className: "btv-pgrid btv-pg" + c.panels.length
-  }, c.panels.map(p => {
-    const pts = p.points.map(q => ({
-      x: q.x,
-      y: q.v
-    }));
-    const last = p.points[p.points.length - 1];
-    return React.createElement("div", {
-      className: "btv-panel",
-      key: p.house
-    }, React.createElement("div", {
-      className: "btv-ptop"
-    }, React.createElement("span", null, btvHouse(p, houses)), React.createElement("b", null, fmt(last.v))), React.createElement("div", {
-      className: "btv-plab"
-    }, p.label, React.createElement("span", null, " \xB7 ", p.points.length === 1 ? "one reading" : p.points.length + " readings")), React.createElement(TrendChart, {
-      key: "btv-" + c.id + "-" + p.house,
-      heightPx: narrow ? 128 : 148,
-      padPx: {
-        l: 30,
-        r: 8,
-        t: 20,
-        b: 22
-      },
-      xDomain: [x0, x1],
-      yDomain: [lo, hi],
-      yTicks: yt,
-      yTickFmt: () => "",
-      xTicks: ticks,
-      baseline: true,
-      notes: yt.map(v => ({
-        x: "left",
-        y: v,
-        dy: -3,
-        text: c.measure === "net" ? btvSigned(v) : v + (v === hi ? "%" : ""),
-        size: 10.5,
-        cls: "btv-ylab"
-      })),
-      refLines: c.ref != null ? [{
-        y: c.ref,
-        label: "",
-        color: "var(--ink-faint)"
-      }] : [],
-      series: [{
-        id: p.house,
-        label: btvHouse(p, houses),
-        color: "var(--ink-2)",
-        rdWidth: 1.6,
-        endCap: false,
-        smooth: false,
-        points: pts
-      }],
-      spine: pts,
-      scatter: p.points.map(q => ({
+    className: "btv-fams"
+  }, fams.map(f => React.createElement("span", {
+    key: f.i
+  }, React.createElement("i", {
+    className: "btv-wsw btv-w" + f.i,
+    "aria-hidden": "true"
+  }), f.label))), React.createElement("div", {
+    className: "btv-tbody"
+  }, React.createElement("div", {
+    className: "btv-tchart"
+  }, React.createElement("div", {
+    className: "card rd-card btv-chart"
+  }, React.createElement(TrendChart, {
+    key: "btv-" + c.id,
+    heightPx: narrow ? 250 : 320,
+    padPx: {
+      l: 34,
+      r: 8,
+      t: 20,
+      b: 22
+    },
+    xDomain: [x0, x1],
+    yDomain: [lo, hi],
+    yTicks: yt,
+    yTickFmt: () => "",
+    xTicks: ticks,
+    baseline: true,
+    notes: yt.map(v => ({
+      x: "left",
+      y: v,
+      dy: -3,
+      text: net ? v === 0 ? "Even" : btvSigned(v) : v + (v === hi ? "%" : ""),
+      size: 10.5,
+      cls: "btv-ylab"
+    })),
+    refLines: c.ref != null ? [{
+      y: c.ref,
+      label: "",
+      color: "var(--ink-faint)"
+    }] : [],
+    series: c.panels.map(p => ({
+      id: p.house,
+      label: btvHouse(p, houses),
+      color: ink(p.fam),
+      rdWidth: 2,
+      smooth: false,
+      endLabel: btvHouse(p, houses),
+      points: p.points.map(q => ({
         x: q.x,
-        y: q.v,
-        color: "var(--ink)",
-        label: c.measure === "net" ? "Net" : btvCap(c.names[0]),
-        meta: {
-          pollster: btvHouse(p, houses, true),
-          dateLabel: btvSpan(q.field),
-          sample: q.n
-        }
-      })),
-      tooltipTitle: i => p.points[i] ? btvSpan(p.points[i].field) : "",
-      extraRows: i => {
-        const q = p.points[i];
-        return q ? [{
-          label: btvCap(c.names[0]),
+        y: q.v
+      }))
+    })),
+    spine: spine,
+    scatter: pts.map(q => ({
+      x: q.x,
+      y: q.v,
+      color: ink(q.fam),
+      label: net ? "Net" : btvCap(c.names[0]),
+      meta: {
+        pollster: btvHouse(q, houses, true),
+        dateLabel: btvSpan(q.field),
+        sample: q.n
+      }
+    })),
+    tooltipTitle: i => {
+      const qs = at(i);
+      return qs.length === 1 ? btvSpan(qs[0].field) : qs.length ? btvDay(qs[0].field.end) : "";
+    },
+    extraRows: i => {
+      const qs = at(i);
+      return qs.flatMap(q => {
+        const pre = qs.length > 1 ? btvHouse(q, houses) + ": " : "";
+        return net ? [{
+          label: pre + btvCap(c.names[0]),
           value: btvPct(q.a)
         }, {
-          label: btvCap(c.names[1]),
+          label: pre + btvCap(c.names[1]),
           value: btvPct(q.b)
-        }] : [];
-      },
-      fmt: fmt,
-      copy: {
-        title: c.title.replace(/, by pollster$/, "") + ": " + btvHouse(p, houses, true),
-        sub: c.head + ". " + p.label,
-        legend: []
-      }
-    }));
-  })), React.createElement("p", {
-    className: "btv-tkey"
+        }] : [{
+          label: pre + btvCap(c.names[1]),
+          value: btvPct(q.b)
+        }];
+      });
+    },
+    fmt: fmt,
+    copy: {
+      title: c.title,
+      sub: c.head + "." + (c.note ? " " + c.note : ""),
+      span: btvMonYY(c.first) + " – " + btvMonYY(c.last),
+      caption: "Each dot is one poll; a line joins one pollster’s own readings, coloured by how it asked.",
+      legend: fams.map(f => ({
+        label: f.label,
+        color: ink(f.i),
+        kind: "line"
+      })).concat(c.ref != null ? [{
+        label: c.refLabel,
+        color: "var(--ink-faint)",
+        kind: "dashed"
+      }] : [])
+    }
+  }), React.createElement("p", {
+    className: "rd-ckey btv-tkey"
   }, React.createElement("span", null, React.createElement("i", {
     className: "btv-dot",
     "aria-hidden": "true"
   }), "One poll"), React.createElement("span", null, React.createElement("i", {
     className: "btv-ln",
     "aria-hidden": "true"
-  }), "The line joins one pollster\u2019s own readings"), c.ref != null ? React.createElement("span", null, React.createElement("i", {
+  }), "One pollster\u2019s readings, joined"), c.ref != null ? React.createElement("span", null, React.createElement("i", {
     className: "btv-rl0",
     "aria-hidden": "true"
-  }), c.refLabel) : null), c.note ? React.createElement("p", {
+  }), c.refLabel) : null)), c.note ? React.createElement("p", {
     className: "btv-note"
-  }, c.note) : null, React.createElement("details", {
+  }, c.note) : null), React.createElement("aside", {
+    className: "btv-latest",
+    "aria-label": "Latest from each pollster"
+  }, React.createElement("p", {
+    className: "btv-lh"
+  }, "Latest from each pollster"), React.createElement("ul", {
+    className: "btv-ll"
+  }, latest.map(({
+    p,
+    q
+  }) => React.createElement("li", {
+    key: p.house
+  }, React.createElement("span", {
+    className: "btv-lp"
+  }, React.createElement("span", {
+    className: "btv-lnm"
+  }, React.createElement("i", {
+    className: "btv-ldot btv-w" + p.fam,
+    "aria-hidden": "true"
+  }), btvHouse(p, houses), React.createElement("span", {
+    className: "btv-ld"
+  }, btvDay(q.field.end))), React.createElement("span", {
+    className: "btv-lq"
+  }, p.label)), React.createElement("b", {
+    className: "btv-lv"
+  }, fmt(q.v))))))), React.createElement("details", {
     className: "btv-ledger"
   }, React.createElement("summary", null, "All ", rows.length, " readings"), React.createElement("div", {
     className: "btv-twrap"
@@ -63860,13 +64309,13 @@ function BtvTracker({
     className: "btv-l"
   }, "Pollster"), React.createElement("th", {
     className: "btv-l"
-  }, "Fieldwork"), React.createElement("th", null, "Sample"), React.createElement("th", null, c.cols[0]), React.createElement("th", null, c.cols[1]), React.createElement("th", null, c.cols[2]), c.measure === "net" ? React.createElement("th", null, "Net") : null, React.createElement("th", null))), React.createElement("tbody", null, rows.map((q, i) => React.createElement("tr", {
+  }, "Fieldwork"), React.createElement("th", null, "Sample"), React.createElement("th", null, c.cols[0]), React.createElement("th", null, c.cols[1]), React.createElement("th", null, c.cols[2]), net ? React.createElement("th", null, "Net") : null, React.createElement("th", null))), React.createElement("tbody", null, rows.map((q, i) => React.createElement("tr", {
     key: i
   }, React.createElement("td", {
     className: "btv-l"
   }, btvHouse(q, houses)), React.createElement("td", {
     className: "btv-l"
-  }, btvSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, btvN(q.a)), React.createElement("td", null, btvN(q.m)), React.createElement("td", null, btvN(q.b)), c.measure === "net" ? React.createElement("td", null, React.createElement("b", null, btvSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
+  }, btvSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, btvN(q.a)), React.createElement("td", null, btvN(q.m)), React.createElement("td", null, btvN(q.b)), net ? React.createElement("td", null, React.createElement("b", null, btvSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
     href: q.url,
     target: "_blank",
     rel: "noopener"
@@ -63906,26 +64355,36 @@ function BtvMore({
 }
 function BtvTopic({
   t,
+  n,
   houses
 }) {
   const trackers = t.blocks.filter(b => b.kind === "tracker");
-  const cards = t.blocks.filter(b => b.kind !== "tracker");
+  const items = t.blocks.filter(b => b.kind !== "tracker");
+  const count = [trackers.length ? trackers.length === 1 ? "One chart" : btvCap(btvWord(trackers.length)) + " charts" : null, items.length ? items.length + (items.length === 1 ? " question" : " questions") : null, t.more.length ? t.more.length + " more" : null].filter(Boolean).join(" · ");
   return React.createElement("section", {
     className: "btv-topic",
     id: "btv-" + t.id,
     "aria-labelledby": "btv-h-" + t.id
+  }, React.createElement("div", {
+    className: "btv-tk"
   }, React.createElement("h3", {
     className: "btv-tt",
     id: "btv-h-" + t.id
-  }, t.title), React.createElement("p", {
+  }, React.createElement("span", {
+    className: "btv-tn"
+  }, n), t.title), React.createElement("span", {
+    className: "btv-tc"
+  }, count)), t.finding ? React.createElement("p", {
+    className: "btv-hl"
+  }, t.finding.text) : null, React.createElement("p", {
     className: "btv-tdk"
   }, t.dek), trackers.map(c => React.createElement(BtvTracker, {
     key: c.id,
     c: c,
     houses: houses
-  })), cards.length ? React.createElement("div", {
-    className: "btv-grid"
-  }, cards.map((c, i) => React.createElement(BtvCard, {
+  })), items.length ? React.createElement("div", {
+    className: "btv-items"
+  }, items.map((c, i) => React.createElement(BtvItem, {
     key: (c.id || "") + i,
     c: c,
     houses: houses
@@ -63933,6 +64392,36 @@ function BtvTopic({
     t: t,
     houses: houses
   }) : null);
+}
+function BtvFindings({
+  topics
+}) {
+  return React.createElement("section", {
+    className: "btv-finds",
+    "aria-labelledby": "btv-finds-h"
+  }, React.createElement("h3", {
+    className: "btv-fh",
+    id: "btv-finds-h"
+  }, "The findings"), React.createElement("ol", {
+    className: "btv-fl",
+    role: "list"
+  }, topics.map((t, i) => t.finding ? React.createElement("li", {
+    key: t.id
+  }, React.createElement("a", {
+    className: "btv-f",
+    href: "#btv-" + t.id
+  }, React.createElement("span", {
+    className: "btv-fn",
+    "aria-hidden": "true"
+  }, btvNo(i)), React.createElement("span", {
+    className: "btv-fb"
+  }, React.createElement("span", {
+    className: "btv-fk"
+  }, t.short), React.createElement("span", {
+    className: "btv-ft"
+  }, t.finding.text), React.createElement("span", {
+    className: "btv-fm"
+  }, t.finding.meta)))) : null)));
 }
 function BtvBody() {
   const {
@@ -63997,21 +64486,18 @@ function BtvBody() {
   const more = topics.reduce((n, t) => n + t.more.length, 0);
   return React.createElement("div", {
     className: "btv"
-  }, React.createElement("nav", {
-    className: "btv-nav",
-    "aria-label": "Topics"
-  }, topics.map(t => React.createElement("a", {
-    key: t.id,
-    href: "#btv-" + t.id
-  }, t.short))), React.createElement("p", {
+  }, React.createElement(BtvFindings, {
+    topics: topics
+  }), React.createElement("p", {
     className: "btv-scope"
-  }, src.counts.featured, " questions in charts and cards, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), topics.map(t => React.createElement(BtvTopic, {
+  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), topics.map((t, i) => React.createElement(BtvTopic, {
     key: t.id,
     t: t,
+    n: btvNo(i),
     houses: houses
   })), React.createElement("div", {
     className: "btv-how"
-  }, React.createElement("p", null, React.createElement("b", null, "How to read the cards."), " Each bar is one poll\u2019s answers on a scale of 0 to 100, as the pollster printed them, with the agreeing side on the left and the disagreeing side on the right; stronger answers are in full colour, milder ones faded. Where the two sides are within the poll\u2019s 95% margin of error, the card says \u201Clevel\u201D rather than naming a winner. Pollsters word their questions differently, so compare a pollster with itself before comparing it with another."), React.createElement("p", null, React.createElement("b", null, "What is left out."), " Questions about sport, holidays and personal habits, state politics, surveys run before this term, and questions the main page already tracks, such as whether the country is heading in the right direction.")));
+  }, React.createElement("p", null, React.createElement("b", null, "How the findings are called."), " Each topic opens with what its first chart or question found. A side is said to lead only where the gap clears the poll\u2019s 95% margin of error, and to be a majority only where its share clears half by its own margin; inside the margin, the answer is \u201Clevel\u201D and the voters \u201Cdivided\u201D."), React.createElement("p", null, React.createElement("b", null, "How to read the answers."), " Each bar is one poll\u2019s answers on a scale of 0 to 100, as the pollster printed them, with the agreeing side on the left and the disagreeing side on the right; stronger answers are in full colour, milder ones faded. In the charts, each line joins one pollster\u2019s own readings and is coloured by how that pollster asked. Pollsters word their questions differently, so compare a pollster with itself before comparing it with another."), React.createElement("p", null, React.createElement("b", null, "What is left out."), " Questions about sport, holidays and personal habits, state politics, surveys run before this term, and questions the main page already tracks, such as whether the country is heading in the right direction.")));
 }
 function RdBeyond() {
   return React.createElement("section", {
@@ -64026,8 +64512,8 @@ function RdBeyond() {
   }, "Beyond the vote"), React.createElement("span", {
     className: "rd-meta"
   }, "What else Australians tell the pollsters")), React.createElement(RdHed, {
-    head: "What Australians think about the issues",
-    dek: "Voting intention is only part of what the pollsters ask. This page gathers the rest of this term\u2019s questions worth knowing, from Donald Trump and immigration to the budget, the Iran war and the Bondi attack, in ten topics. Where several pollsters asked the same thing, their answers sit side by side."
+    head: window.AP.PAGE_HEAD["beyond-the-vote"],
+    dek: "Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in " + rdNumWord(window.AUSPOL.beyondTopics) + " topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side."
   }), React.createElement(BtvBody, null));
 }
 const RdBeyondM = React.memo(RdBeyond);

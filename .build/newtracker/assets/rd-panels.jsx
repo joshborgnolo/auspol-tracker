@@ -1725,11 +1725,6 @@ function RdDirection({ rangeId }) {
     </RdSec>
   );
 }
-function rdList(arr) {
-  if (!arr.length) return "";
-  if (arr.length === 1) return arr[0];
-  return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
-}
 /* The trend line over a set of small multiples. Each series that moved (its
    within-pollster slope clears the Holm-gated test) is named with its
    direction and, where the rounded figures agree with that direction, its

@@ -611,6 +611,128 @@ body.rd .ts-sep { background: var(--line); }
 /* the narrowest phones: Info leaves the docked bar for the ☰ menu from
    420px and the score drops its party letters from 380px, in both designs
    (template.html's .tab-pinhide rules) */
+
+/* ---------- the More menu: a folder (2026-10-18) --------------------------
+   The user asked for the menu "more textured, substantial", and chose the
+   folder of the mockups' five. The open button becomes a paper tab, and the
+   sheet hangs from the bar's rule under it with its top edge left open
+   where the tab meets it, so the two read as one piece of paper: grain on
+   both, two more sheets showing under the bottom edge. Inside, a numbered
+   ledger: each page under its own headline (menu-lines.js, the finding the
+   page heads itself with), the figure that headline stands on in a column
+   of its own, and double rules between. Tabs.placeMenu seats the sheet and
+   says where the tab meets it (--gap-a, --gap-b). The archived design keeps
+   template.html's plain list. */
+body.rd .tabs {
+  --tm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .2 0 0 0 1.1 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --tm-sheet-1: color-mix(in oklab, var(--surface-2) 80%, var(--bg));
+  --tm-sheet-2: color-mix(in oklab, var(--surface-2) 45%, var(--bg));
+}
+/* the tab: a paper behind the button's own label, so it scales with the
+   pinned bar and the label never has a twin. The button stacks its own
+   content, which puts the paper behind the label and above the bar */
+body.rd .tab.tab-menu { z-index: 0; }
+body.rd .tab-menu-paper {
+  position: absolute; z-index: -1; top: 0; bottom: 0; left: -14px; right: -14px;
+  box-sizing: border-box; visibility: hidden; pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--line); border-bottom: 0; border-top: 2px solid var(--ink);
+  border-radius: 7px 7px 0 0;
+}
+body.rd .tab-menu-paper::before, body.rd .tab-menu-pop::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background-image: var(--tm-grain); background-size: 180px 180px;
+  opacity: 0.5; mix-blend-mode: multiply;
+}
+body.rd.dark .tab-menu-paper::before, body.rd.dark .tab-menu-pop::before { mix-blend-mode: screen; opacity: 0.16; }
+/* the sheet's grain reaches into its clear top border, so the paper runs
+   on unbroken from the tab */
+body.rd .tab-menu-pop::before { top: -1px; }
+body.rd .tab.tab-menu.open .tab-menu-paper { visibility: visible; }
+/* open, the tab is the button's mark, so a menu page's underline steps aside */
+body.rd .tab.tab-menu.open::after { opacity: 0; }
+
+/* the sheet */
+body.rd .tab-menu-pop {
+  display: block; max-width: none; padding: 0;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-top-color: transparent; border-radius: 8px;
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -26px oklch(0.3 0.03 55 / 0.42), 0 10px 18px -10px oklch(0.3 0.03 55 / 0.16);
+}
+body.rd.dark .tab-menu-pop {
+  box-shadow: 0 6px 0 -3px var(--tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--tm-sheet-2), 0 12px 0 -6px var(--line),
+    0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
+}
+/* its top edge, open under the tab: the sheet's own top border is clear
+   (its paper covers the bar's rule there), and this draws the edge back
+   everywhere but between the tab's sides */
+body.rd .tab-menu-pop::after {
+  content: ""; position: absolute; inset: -1px; pointer-events: none;
+  border-top: 1px solid var(--line); border-radius: inherit;
+  -webkit-mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
+  mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
+}
+/* the rows scroll inside the sheet where the screen is short */
+body.rd .tab-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+
+/* the ledger's rows: numeral, page and headline, figure */
+body.rd .tab-menu-item {
+  position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr) 92px; align-items: start; column-gap: 4px;
+  padding: 13px 20px 14px 0; border-radius: 0;
+  color: var(--ink); text-decoration: none;
+}
+body.rd .tab-menu-item + .tab-menu-item { border-top: 3px double var(--line); }
+body.rd .tab-menu-n {
+  justify-self: center; padding-top: 1px;
+  font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 19px; line-height: 20px;
+  font-variant-numeric: tabular-nums oldstyle-nums; color: var(--ink-3);
+}
+body.rd .tab-menu-txt { display: block; min-width: 0; }
+body.rd .tab-menu-t { display: block; font-size: 15px; font-weight: 600; line-height: 20px; }
+body.rd .tab-menu-d { display: block; margin-top: 3px; max-width: 290px; font-size: 13px; line-height: 1.38; color: var(--ink-2); text-wrap: pretty; }
+body.rd .tab-menu-f { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+body.rd .tab-menu-v {
+  font-size: 21px; font-weight: 600; line-height: 22px; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
+}
+body.rd .tab-menu-v.tm-alp { color: var(--alp-text); }
+body.rd .tab-menu-v.tm-lnp { color: var(--lnp-text); }
+body.rd .tab-menu-v.tm-onp { color: var(--onp-text); }
+body.rd .tab-menu-v.tm-grn { color: var(--grn-text); }
+body.rd .tab-menu-v.tm-oth { color: var(--oth-text); }
+body.rd .tab-menu-c {
+  margin-top: 4px; font-size: 9.5px; font-weight: 600; line-height: 12px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--ink-3); text-wrap: balance;
+}
+body.rd .tab-menu-chip {
+  margin-top: 2px; padding: 2px 6px 3px; border: 1px solid var(--line); border-radius: 3px;
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
+}
+/* hover and focus: the row darkens a shade, its numeral inks in and its
+   name underlines; the page you're on carries a mark down its left edge */
+body.rd .tab-menu-item:hover, body.rd .tab-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
+body.rd .tab-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
+body.rd .tab-menu-item:hover .tab-menu-n, body.rd .tab-menu-item:focus-visible .tab-menu-n, body.rd .tab-menu-item.on .tab-menu-n { color: var(--ink); }
+body.rd .tab-menu-item:hover .tab-menu-t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+body.rd .tab-menu-item.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+body.rd .tab-menu-item.on .tab-menu-t, body.rd .tab-menu-item.on.tab-menu-info { font-weight: 600; }
+/* Info only where the phone bar has dropped its tab (template.html's
+   .tab-pinhide gate, which this rule follows) */
+body.rd .tab-menu-item.tab-menu-info { display: none; }
+@media (max-width: 420px) {
+  body.rd .tabs.show-score .tab-menu-item.tab-menu-info { display: grid; }
+}
+@media (max-width: 640px) {
+  body.rd .tab-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  body.rd .tab-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
+  body.rd .tab-menu-n { font-size: 17px; }
+  body.rd .tab-menu-t { font-size: 14.5px; }
+  body.rd .tab-menu-d { font-size: 12.5px; max-width: none; }
+  body.rd .tab-menu-v { font-size: 18px; }
+}
 /* short-screenscape phones (landscape, ~320-480px tall): everything unpins.
    The tab bar plus the All-polls head and pinbar were ~150px of chrome stuck
    to the top of a 390px-tall viewport - nearly half the screen owned by

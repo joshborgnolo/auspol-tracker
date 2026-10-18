@@ -18,6 +18,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import zlibVic from "node:zlib";
@@ -105,6 +106,7 @@ const PLAIN = [
   "9f09dca2-bd46-49a8-8ae1-51847608cf92.js",
   "ed2260de-5b11-4bd5-8a8d-a391156c05ee.js",
   "np-project.js", // the next-polls projection (needs window.AP; the sim evals this same file)
+  "menu-lines.js", // the menu pages' findings: their heads, the More menu's lines (build.mjs runs it in node too)
   "copy-chart.js", // per-chart copy-as-image button
   "copy-poll.js",  // copy-as-image button for the expanded poll breakdown
 ];
@@ -588,7 +590,27 @@ catch (e) {
   console.warn(`  site shell: chrome parse missed (${e.message}) – auspol-now.json keeps the previous copy block`);
   try { shellChrome = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-now.json"), "utf8")).copy || null; } catch {}
 }
-writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow, ...(shellChrome ? { copy: shellChrome } : {}) }) + "\n");
+/* …and the More menu's lines (2026-10-18): each menu page's headline and the
+   figure it stands on, as the main page's menu shows them on load (implied
+   basis, Pollster leans on Labor's main rival), so the satellites' menu
+   says what the pages say. The findings are the page's own menu-lines.js,
+   run here in node after the dataset and the engine exactly as the page
+   runs them - one context, so the three scripts share one global scope as
+   classic scripts do. A miss is a warning like the chrome's: the
+   satellites' menu keeps each page's tip. */
+let shellMenu = null;
+try {
+  const win = {};
+  const ctx = vm.createContext({ window: win, React: {}, console });
+  win.window = win;
+  for (const f of [DA(DATASET), A("ed2260de-5b11-4bd5-8a8d-a391156c05ee.js"), A("menu-lines.js")]) {
+    vm.runInContext(fs.readFileSync(f, "utf8"), ctx, { filename: path.basename(f) });
+  }
+  shellMenu = win.AP.menuLines();
+} catch (e) {
+  console.warn(`  site shell: menu lines missed (${e.message}) – the satellites' menu keeps each page's tip`);
+}
+writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow, ...(shellChrome ? { copy: shellChrome } : {}), ...(shellMenu ? { menu: shellMenu } : {}) }) + "\n");
 for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
   const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
   if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");
@@ -1178,10 +1200,14 @@ ${body.trim()}
      the same payload as findings, charts and rows (RdBeyond, rd-beyond.jsx). Federal
      only – /vic/'s menu never holds it */
   if (id === "beyond-the-vote") {
+    /* the topic count the live dek states (gen-data's beyondTopics, counted
+       the way the page's own topic list counts) */
+    let topics = null;
+    try { topics = JSON.parse(fs.readFileSync(DA("oneoffs-source.json"), "utf8")).topics.filter((t) => t.blocks.length || t.more.length).length; } catch {}
     return `<article class="static-summary">
   <h1>Beyond the vote</h1>
   <p class="ss-sub">Voting intention is only part of what the pollsters ask. This page
-    gathers the rest of this term&#8217;s questions worth knowing, in ten topics from
+    gathers the rest of this term&#8217;s questions worth knowing${topics ? ", in " + (CYCLE_COUNT_WORDS[topics] || topics) + " topics" : ","} from
     Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each
     opens with what the polls found; where several pollsters asked the same thing, their
     answers sit side by side, and every figure names its pollster and links to its source.</p>

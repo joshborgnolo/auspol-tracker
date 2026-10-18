@@ -55,8 +55,8 @@
   --lnp: oklch(0.50 0.095 250);  /* Coalition blue */
   --grn: oklch(0.60 0.120 150);  /* Greens       */
   --onp: oklch(0.66 0.130 58);   /* One Nation orange */
-  /* /shell-copy */
   --oth: oklch(0.64 0.018 70);   /* Others grey  */
+  /* /shell-copy */
   /* past-cycles band fills: halfway Labor→Coalition in oklch – one definition
      serves both themes because var() resolves --alp/--lnp at the use site,
      which in dark mode means the lifted values below */
@@ -67,12 +67,15 @@
      type and Greens lands at 3.5:1 and One Nation at 3.0:1 on paper. These are
      the same hues held to the text threshold, and every party colour that
      paints a GLYPH uses them (see inkOf() in the shared helpers). Labor and the
-     Coalition are already dark enough, so they alias and nothing shifts. */
+     Coalition are already dark enough, so they alias and nothing shifts.
+     The satellites get them too (the More menu's figures are glyphs). */
+  /* shell-copy:tokens */
   --alp-text: var(--alp);
   --lnp-text: var(--lnp);
   --grn-text: oklch(0.52 0.120 150);
   --onp-text: oklch(0.52 0.130 58);
   --oth-text: oklch(0.52 0.018 70);
+  /* /shell-copy */
 
   --accent: oklch(0.50 0.070 205);
 
@@ -184,17 +187,19 @@ body.dark {
   --lnp: oklch(0.680 0.130 252);
   --grn: oklch(0.720 0.135 152);
   --onp: oklch(0.760 0.135 64);
-  /* /shell-copy */
   --oth: oklch(0.700 0.018 72);
+  /* /shell-copy */
 
   /* On dark the marks are already lifted well past the text threshold, so the
      text variants alias straight through – the split still has to EXIST here
      or inkOf() would resolve to nothing in dark mode. */
+  /* shell-copy:tokens-dark */
   --alp-text: var(--alp);
   --lnp-text: var(--lnp);
   --grn-text: var(--grn);
   --onp-text: var(--onp);
   --oth-text: var(--oth);
+  /* /shell-copy */
 
   --accent: oklch(0.70 0.080 205);
 

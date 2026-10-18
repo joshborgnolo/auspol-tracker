@@ -289,15 +289,22 @@ const SHELL_MENU_ICON = '<svg class="sh-menu-ic" viewBox="0 0 20 20" width="18" 
 /* ≥641px the icon steps aside for the word "More" and a chevron (the main
    bar's rule, template.html's .tab.tab-menu gate) */
 const SHELL_MENU_CHEV = '<svg class="sh-menu-chev" viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1.4 1.3l3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path></svg>';
+/* Since 2026-10-18 it is the main page's folder too: a numbered ledger,
+   each page over its headline with the figure that headline stands on,
+   Info last. The baked page carries each page's tip under its name (the
+   no-JS read); site-shell.js swaps in the headline and the figure from
+   auspol-now.json's menu block, which build.mjs writes from the main
+   page's own findings (menu-lines.js), so they follow every build. */
 function shellMenu(menu) {
   const info = TABS.find((t) => t.pinHide && !t.menu);
-  const item = (cls, href, cur, t, d, id) => `<a role="menuitem" tabindex="-1" class="sh-menu-item${cls}${cur ? " on" : ""}" href="${href}"`
-    + (id ? ` data-id="${id}"` : "") + (cur ? ' aria-current="page"' : "") + `><span class="sh-menu-t">${t}</span>`
-    + (d ? `<span class="sh-menu-d">${d}</span>` : "") + `</a>`;
-  return `<div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden>`
-    + (info ? item(" sh-menu-info", info.href, false, info.label, "", info.id) : "")
-    + TABS.filter((t) => t.menu).map((t) => item("", t.href, false, t.label, t.tip, t.id)).join("")
-    + `</div>`;
+  const pages = [...TABS.filter((t) => t.menu), ...(info ? [info] : [])];
+  const item = (t, i) => `<a role="menuitem" tabindex="-1" class="sh-menu-item${t === info ? " sh-menu-info" : ""}" href="${t.href}" data-id="${t.id}">`
+    + `<span class="sh-menu-n" aria-hidden="true">${i + 1}</span>`
+    + `<span class="sh-menu-txt"><span class="sh-menu-t">${t.label}</span>${t.tip ? `<span class="sh-menu-d">${t.tip}</span>` : ""}</span>`
+    + `<span class="sh-menu-f"></span></a>`;
+  return `<div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list">`
+    + pages.map(item).join("")
+    + `</div></div>`;
 }
 export function shellHeader({ tab, menu } = {}) {
   const tabs = TABS.filter((t) => !t.menu).map((t) => `<a class="sh-tab${t.pinHide ? " sh-tab-pinhide" : ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
@@ -361,7 +368,7 @@ export function shellHeader({ tab, menu } = {}) {
     <div class="sh-tabs-inner">
       <div class="sh-tabs-set">
         ${tabs}
-        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages">${SHELL_MENU_ICON}<span class="sh-menu-lab">More</span>${SHELL_MENU_CHEV}</button>
+        <button type="button" class="sh-tab sh-menu-btn${menu ? " active" : ""}" aria-haspopup="menu" aria-expanded="false" aria-controls="sh-menu" aria-label="More pages" title="More pages"><span class="sh-menu-paper" aria-hidden="true"></span>${SHELL_MENU_ICON}<span class="sh-menu-lab">More</span>${SHELL_MENU_CHEV}</button>
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house's next plausible date"><span class="sh-tn-lab">Next</span></div>
       <a class="sh-score" href="/" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
@@ -510,9 +517,10 @@ export const shellCopy = (name) => {
    colours and the switch's plate – is defined here, in both themes. */
 export function shellCss() {
   const ss3 = fontUrl("sourcesans3-");
+  const crimsonIt = fontUrl("crimsontext-italic-700-");
   const TOKENS = shellCopy("tokens"), TOKENS_DARK = shellCopy("tokens-dark");
   const DARK_TOKENS = `${TOKENS_DARK.replace(/^/gm, "  ")}
-  --sh-surface: oklch(0.252 0.011 66);
+  --sh-surface: oklch(0.252 0.011 66); --sh-surface-2: oklch(0.292 0.012 66);
   --sh-sw-plate: color-mix(in oklch, black 22%, var(--sh-surface)); --sh-sw-cap: color-mix(in oklch, white 7%, var(--sh-surface));
   --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
   --sh-btn-lit: color-mix(in oklch, white 9%, transparent); --sh-btn-shade: oklch(0 0 0 / 0.44);
@@ -526,11 +534,17 @@ ${ss3 ? `@font-face {
   font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap;
   src: url("${ss3}") format("woff2");
 }
+` : ""}${crimsonIt ? `/* the menu ledger's numerals (the main page's .tab-menu-n): Crimson's italic,
+   fetched only when the menu first opens */
+@font-face {
+  font-family: "Crimson Text"; font-style: italic; font-weight: 700; font-display: swap;
+  src: url("${crimsonIt}") format("woff2");
+}
 ` : ""}:root {
   /* the main page's party tokens, lifted verbatim from its template
      (shell-copy:tokens), so this page's dial uses the site's own colours */
   ${TOKENS}
-  --sh-surface: oklch(0.992 0.004 85);
+  --sh-surface: oklch(0.992 0.004 85); --sh-surface-2: oklch(0.980 0.006 80);
   --sh-sw-plate: color-mix(in oklch, var(--ink) 5%, var(--sh-surface)); --sh-sw-cap: var(--sh-surface);
   --sh-sw-well: color-mix(in oklch, var(--ink) 13%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
   --sh-btn-lit: color-mix(in oklch, white 85%, transparent); --sh-btn-shade: oklch(0.4 0.02 60 / 0.16);
@@ -545,9 +559,9 @@ ${ss3 ? `@font-face {
   ${DARK_TOKENS}
 }
 /* the main page's cool accent (tweaks.accent): the paper and rules go blue-grey */
-:root.sh-cool { --bg: oklch(0.972 0.006 235); --sh-surface: oklch(0.993 0.003 235); --line: oklch(0.892 0.009 235); --line-2: oklch(0.934 0.006 235); }
-@media (prefers-color-scheme: dark) { :root.sh-cool:not(.sh-light) { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); } }
-:root.sh-cool.sh-dark { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); }
+:root.sh-cool { --bg: oklch(0.972 0.006 235); --sh-surface: oklch(0.993 0.003 235); --sh-surface-2: oklch(0.982 0.005 235); --line: oklch(0.892 0.009 235); --line-2: oklch(0.934 0.006 235); }
+@media (prefers-color-scheme: dark) { :root.sh-cool:not(.sh-light) { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --sh-surface-2: oklch(0.288 0.014 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); } }
+:root.sh-cool.sh-dark { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --sh-surface-2: oklch(0.288 0.014 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); }
 
 /* the main page's .page box: the header, tab bar and footer line up with its
    margins. Gutter and column are its --rd-gutter/--rd-maxw verbatim (assets/
@@ -739,7 +753,7 @@ body { height: auto; }
 }
 @media (max-width: 380px) {
   .sh-tabs.pinned .sh-tab-pinhide { display: none; }
-  .sh-tabs.pinned .sh-menu-info { display: flex; }
+  .sh-tabs.pinned .sh-menu-item.sh-menu-info { display: grid; }
 }
 /* ...and the docked score's party letters yield from 380px down too (the
    main page's ≤380 .ts-abbr rung, template.html): without it the ☰ sat
@@ -770,25 +784,94 @@ body { height: auto; }
 }
 .sh-menu-chev { transition: transform 0.18s ease; }
 .sh-menu-btn[aria-expanded="true"] .sh-menu-chev { transform: rotate(180deg); }
+/* the main page's folder (rd.css's More-menu block, mirrored): the open
+   button is a paper tab, the sheet hangs from the bar's rule with its top
+   edge open under it, grain on both and two sheets under the bottom edge;
+   inside, the numbered ledger. mPlace seats it as Tabs.placeMenu does */
+.sh-tabs {
+  --sh-tm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .2 0 0 0 1.1 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --sh-tm-sheet-1: color-mix(in oklab, var(--sh-surface-2) 80%, var(--bg));
+  --sh-tm-sheet-2: color-mix(in oklab, var(--sh-surface-2) 45%, var(--bg));
+  --sh-tm-blend: multiply; --sh-tm-grain-o: 0.5;
+  --sh-tm-shadow: 0 34px 60px -26px oklch(0.3 0.03 55 / 0.42), 0 10px 18px -10px oklch(0.3 0.03 55 / 0.16);
+}
+@media (prefers-color-scheme: dark) { :root:not(.sh-light) .sh-tabs {
+  --sh-tm-blend: screen; --sh-tm-grain-o: 0.16;
+  --sh-tm-shadow: 0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
+} }
+:root.sh-dark .sh-tabs {
+  --sh-tm-blend: screen; --sh-tm-grain-o: 0.16;
+  --sh-tm-shadow: 0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
+}
+.sh-menu-btn { z-index: 0; }
+.sh-menu-paper {
+  position: absolute; z-index: -1; top: 0; bottom: 0; left: -14px; right: -14px;
+  box-sizing: border-box; visibility: hidden; pointer-events: none;
+  background: var(--sh-surface);
+  border: 1px solid var(--line); border-bottom: 0; border-top: 2px solid var(--ink);
+  border-radius: 7px 7px 0 0;
+}
+.sh-menu-paper::before, .sh-menu::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background-image: var(--sh-tm-grain); background-size: 180px 180px;
+  opacity: var(--sh-tm-grain-o); mix-blend-mode: var(--sh-tm-blend);
+}
+.sh-menu::before { top: -1px; }
+.sh-menu-btn[aria-expanded="true"] .sh-menu-paper { visibility: visible; }
+.sh-menu-btn[aria-expanded="true"]::after { opacity: 0; }
 .sh-menu {
   position: absolute; z-index: 2; top: 100%; right: 0;
-  display: flex; flex-direction: column;
-  width: 280px; max-width: calc(100vw - 24px); box-sizing: border-box; padding: 6px;
-  background: var(--surface, var(--bg)); border: 1px solid var(--line); border-radius: 10px;
-  box-shadow: 0 8px 28px -8px rgba(40, 30, 20, 0.28), 0 1px 3px rgba(40, 30, 20, 0.08);
+  display: block; width: 280px; box-sizing: border-box; padding: 0;
+  background: var(--sh-surface); color: var(--ink);
+  border: 1px solid var(--line); border-top-color: transparent; border-radius: 8px;
+  box-shadow: 0 6px 0 -3px var(--sh-tm-sheet-1), 0 6px 0 -2px var(--line),
+    0 12px 0 -7px var(--sh-tm-sheet-2), 0 12px 0 -6px var(--line), var(--sh-tm-shadow);
   font-family: var(--sans);
 }
 .sh-menu[hidden] { display: none; }
-.sh-menu-item {
-  display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; border-radius: 6px;
-  color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;
+.sh-menu::after {
+  content: ""; position: absolute; inset: -1px; pointer-events: none;
+  border-top: 1px solid var(--line); border-radius: inherit;
+  -webkit-mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
+  mask: linear-gradient(90deg, #000 var(--gap-a, 0px), transparent var(--gap-a, 0px) var(--gap-b, 0px), #000 var(--gap-b, 0px));
 }
-.sh-menu-item:hover { background: var(--surface-2, var(--line)); }
+.sh-menu-list { position: relative; padding: 6px 0; overflow-y: auto; overscroll-behavior: contain; }
+.sh-menu-item {
+  position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr) 92px; align-items: start; column-gap: 4px;
+  padding: 13px 20px 14px 0; color: var(--ink); text-decoration: none; font-size: 15px; line-height: 1.3;
+}
+.sh-menu-item + .sh-menu-item { border-top: 3px double var(--line); }
+.sh-menu-n {
+  justify-self: center; padding-top: 1px;
+  font-family: "Crimson Text", var(--serif); font-style: italic; font-weight: 700; font-size: 19px; line-height: 20px;
+  font-variant-numeric: tabular-nums oldstyle-nums; color: var(--ink-3);
+}
+.sh-menu-txt { display: block; min-width: 0; }
+.sh-menu-t { display: block; font-size: 15px; font-weight: 600; line-height: 20px; }
+.sh-menu-d { display: block; margin-top: 3px; max-width: 290px; font-size: 13px; line-height: 1.38; color: var(--ink-2); text-wrap: pretty; }
+.sh-menu-f { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.sh-menu-v { font-size: 21px; font-weight: 600; line-height: 22px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
+.sh-menu-v.tm-alp { color: var(--alp-text); }
+.sh-menu-v.tm-lnp { color: var(--lnp-text); }
+.sh-menu-v.tm-onp { color: var(--onp-text); }
+.sh-menu-v.tm-grn { color: var(--grn-text); }
+.sh-menu-v.tm-oth { color: var(--oth-text); }
+.sh-menu-c { margin-top: 4px; font-size: 9.5px; font-weight: 600; line-height: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); text-wrap: balance; }
+.sh-menu-chip { margin-top: 2px; padding: 2px 6px 3px; border: 1px solid var(--line); border-radius: 3px; font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.sh-menu-item:hover, .sh-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
 .sh-menu-item:focus { outline: none; }
-.sh-menu-item:focus-visible { background: var(--surface-2, var(--line)); box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
-.sh-menu-item.on .sh-menu-t { font-weight: 600; }
-.sh-menu-d { font-size: 13px; line-height: 1.35; color: var(--ink-3); }
-.sh-menu-info { display: none; }
+.sh-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
+.sh-menu-item:hover .sh-menu-n, .sh-menu-item:focus-visible .sh-menu-n { color: var(--ink); }
+.sh-menu-item:hover .sh-menu-t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.sh-menu-item.sh-menu-info { display: none; }
+@media (max-width: 640px) {
+  .sh-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
+  .sh-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
+  .sh-menu-n { font-size: 17px; }
+  .sh-menu-t { font-size: 14.5px; }
+  .sh-menu-d { font-size: 12.5px; max-width: none; }
+  .sh-menu-v { font-size: 18px; }
+}
 
 /* the docked 2PP score (.tab-score): absolutely seated on the underline at
    the row's right end, so its arrival relayouts nothing */
@@ -1053,13 +1136,29 @@ ${npProjectSrc()}
       for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
       return out;
     };
+    /* the main page's placeMenu: the sheet from the tab's left edge, 8px
+       inside the screen, ending with the tab where it comes within a
+       corner's reach of it; its top edge open between the tab's sides;
+       the rows scrolling inside the screen only while the bar is stuck */
     var mPlace = function () {
-      var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect();
-      var w = Math.min(280, window.innerWidth - 24);
-      var x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
+      var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect(), vw = window.innerWidth;
+      var pp = mBtn.querySelector(".sh-menu-paper"), pr = pp ? pp.getBoundingClientRect() : br;
+      var w0 = Math.min(492, vw - 16);
+      var L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)), R = L + w0;
+      if (pr.left - L < 16) L = Math.round(pr.left);
+      if (R - pr.right < 16) R = Math.round(pr.right);
+      var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);
+      var stuck = nav.classList.contains("pinned") && getComputedStyle(nav).position === "sticky";
       mPop.style.top = Math.round(br.bottom - nr.top) + "px";
-      mPop.style.left = Math.round(x - nr.left) + "px";
+      mPop.style.left = (L - Math.round(nr.left)) + "px";
       mPop.style.right = "auto";
+      mPop.style.width = w + "px";
+      mPop.style.setProperty("--gap-a", gA + "px");
+      mPop.style.setProperty("--gap-b", gB + "px");
+      mPop.style.borderTopLeftRadius = gA <= 1.5 ? "0" : "";
+      mPop.style.borderTopRightRadius = gB >= w - 1.5 ? "0" : "";
+      var list = mPop.querySelector(".sh-menu-list");
+      if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
     };
     var mOpen = function (at) {
       mPlace(); mPop.hidden = false; mBtn.setAttribute("aria-expanded", "true");
@@ -1298,6 +1397,28 @@ ${npProjectSrc()}
       if (arch) arch.innerHTML = esc(F.archLead) + '<a href="' + F.archHref + '">' + esc(F.archWord) + "</a>" + esc(F.archTail);
     }
   };
+  /* the menu's lines: each page's headline and the figure it stands on,
+     from the main page's own findings as of this build (menu-lines.js,
+     written into auspol-now.json by build.mjs); a page without one keeps
+     its baked tip */
+  var fillMenu = function (lines) {
+    var its = document.querySelectorAll(".sh-menu-item[data-id]");
+    for (var i = 0; i < its.length; i++) {
+      var ln = lines[its[i].getAttribute("data-id")];
+      if (!ln || !ln.head) continue;
+      var txt = its[i].querySelector(".sh-menu-txt"), d = its[i].querySelector(".sh-menu-d"), f = its[i].querySelector(".sh-menu-f");
+      if (!txt || !f) continue;
+      if (!d) { d = mk("span", "sh-menu-d"); txt.appendChild(d); }
+      d.textContent = ln.head;
+      f.textContent = "";
+      if (ln.chip) f.appendChild(mk("span", "sh-menu-chip", ln.chip));
+      else if (ln.fig) {
+        f.appendChild(mk("span", "sh-menu-v" + (ln.fig.tone ? " tm-" + ln.fig.tone : ""), ln.fig.v));
+        // "RedBridge/Accent" may break after its slash
+        f.appendChild(mk("span", "sh-menu-c", String(ln.fig.cap).replace("/", "/\u200b")));
+      }
+    }
+  };
   var fillHead = function (n) {
     var W = (n.copy && n.copy.meta) || {};
     var wPolls = W.polls || "polls", wPollsters = W.pollsters || "pollsters", wMonths = W.monthsAtMost || "months at most";
@@ -1366,6 +1487,7 @@ ${npProjectSrc()}
     /* the main page's own words, lifted into the JSON by build.mjs – a
        rename there lands here with the next build, no page commit */
     if (n.copy) fillCopy(n.copy);
+    if (n.menu) fillMenu(n.menu);
     if (score && n.a != null && n.b != null) {
       var snapLab = "${NOW_LABEL}";
       if (n.copy && n.copy.tabs) for (var sl = 0; sl < n.copy.tabs.length; sl++) {

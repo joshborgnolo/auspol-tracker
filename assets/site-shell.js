@@ -762,13 +762,29 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       for (var mi = 0; mi < all.length; mi++) if (all[mi].offsetParent !== null) out.push(all[mi]);
       return out;
     };
+    /* the main page's placeMenu: the sheet from the tab's left edge, 8px
+       inside the screen, ending with the tab where it comes within a
+       corner's reach of it; its top edge open between the tab's sides;
+       the rows scrolling inside the screen only while the bar is stuck */
     var mPlace = function () {
-      var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect();
-      var w = Math.min(280, window.innerWidth - 24);
-      var x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
+      var br = mBtn.getBoundingClientRect(), nr = nav.getBoundingClientRect(), vw = window.innerWidth;
+      var pp = mBtn.querySelector(".sh-menu-paper"), pr = pp ? pp.getBoundingClientRect() : br;
+      var w0 = Math.min(492, vw - 16);
+      var L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)), R = L + w0;
+      if (pr.left - L < 16) L = Math.round(pr.left);
+      if (R - pr.right < 16) R = Math.round(pr.right);
+      var w = R - L, gA = Math.max(0, pr.left - L + 1), gB = Math.min(w, pr.right - L - 1);
+      var stuck = nav.classList.contains("pinned") && getComputedStyle(nav).position === "sticky";
       mPop.style.top = Math.round(br.bottom - nr.top) + "px";
-      mPop.style.left = Math.round(x - nr.left) + "px";
+      mPop.style.left = (L - Math.round(nr.left)) + "px";
       mPop.style.right = "auto";
+      mPop.style.width = w + "px";
+      mPop.style.setProperty("--gap-a", gA + "px");
+      mPop.style.setProperty("--gap-b", gB + "px");
+      mPop.style.borderTopLeftRadius = gA <= 1.5 ? "0" : "";
+      mPop.style.borderTopRightRadius = gB >= w - 1.5 ? "0" : "";
+      var list = mPop.querySelector(".sh-menu-list");
+      if (list) list.style.maxHeight = stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) + "px" : "";
     };
     var mOpen = function (at) {
       mPlace(); mPop.hidden = false; mBtn.setAttribute("aria-expanded", "true");
@@ -1007,6 +1023,28 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       if (arch) arch.innerHTML = esc(F.archLead) + '<a href="' + F.archHref + '">' + esc(F.archWord) + "</a>" + esc(F.archTail);
     }
   };
+  /* the menu's lines: each page's headline and the figure it stands on,
+     from the main page's own findings as of this build (menu-lines.js,
+     written into auspol-now.json by build.mjs); a page without one keeps
+     its baked tip */
+  var fillMenu = function (lines) {
+    var its = document.querySelectorAll(".sh-menu-item[data-id]");
+    for (var i = 0; i < its.length; i++) {
+      var ln = lines[its[i].getAttribute("data-id")];
+      if (!ln || !ln.head) continue;
+      var txt = its[i].querySelector(".sh-menu-txt"), d = its[i].querySelector(".sh-menu-d"), f = its[i].querySelector(".sh-menu-f");
+      if (!txt || !f) continue;
+      if (!d) { d = mk("span", "sh-menu-d"); txt.appendChild(d); }
+      d.textContent = ln.head;
+      f.textContent = "";
+      if (ln.chip) f.appendChild(mk("span", "sh-menu-chip", ln.chip));
+      else if (ln.fig) {
+        f.appendChild(mk("span", "sh-menu-v" + (ln.fig.tone ? " tm-" + ln.fig.tone : ""), ln.fig.v));
+        // "RedBridge/Accent" may break after its slash
+        f.appendChild(mk("span", "sh-menu-c", String(ln.fig.cap).replace("/", "/​")));
+      }
+    }
+  };
   var fillHead = function (n) {
     var W = (n.copy && n.copy.meta) || {};
     var wPolls = W.polls || "polls", wPollsters = W.pollsters || "pollsters", wMonths = W.monthsAtMost || "months at most";
@@ -1075,6 +1113,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     /* the main page's own words, lifted into the JSON by build.mjs – a
        rename there lands here with the next build, no page commit */
     if (n.copy) fillCopy(n.copy);
+    if (n.menu) fillMenu(n.menu);
     if (score && n.a != null && n.b != null) {
       var snapLab = "Now";
       if (n.copy && n.copy.tabs) for (var sl = 0; sl < n.copy.tabs.length; sl++) {

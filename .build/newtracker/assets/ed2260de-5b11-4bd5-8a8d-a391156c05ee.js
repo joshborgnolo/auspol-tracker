@@ -857,3 +857,66 @@ window.AP = (function () {
            blendRows, crossClouds, mixC, blendDomain,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
+
+/* ---- helpers the plain layer shares with the components ------------------
+   Moved here from the component layer (2026-10-18) when the menu pages'
+   findings went into menu-lines.js, which build.mjs also runs in node for
+   the satellites' menu: a script there can call only what the plain layer
+   defines. They are classic-script globals, so every component still calls
+   them by the same bare names. */
+/* "+1.2", "−0.8", "0.0": signed as the site prints a lean or a net */
+const rdSigned = (v, dp = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(dp);
+/* "A, B and C" */
+function rdList(arr) {
+  if (!arr.length) return "";
+  if (arr.length === 1) return arr[0];
+  return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
+}
+/* the last election, as the copy names it ("since the 2025 election"): the
+   current term's own, so /vic/ reads 2022 */
+const rdElecYear = (() => {
+  const c = (window.AUSPOL.cycles || []).find((x) => x.current);
+  return c && c.eDate ? c.eDate.slice(0, 4) : "2025";
+})();
+/* "June 2025" for a month key */
+function rdMonthYear(ym) {
+  const [y, m] = ym.split("-").map(Number);
+  return window.AUSPOL.monthNameFull(m) + " " + y;
+}
+// P(|T| > t) for Student's t on whole degrees of freedom, exact (Abramowitz & Stegun 26.7.3–4)
+function tTail(t, df) {
+  const th = Math.atan(Math.abs(t) / Math.sqrt(df)), c2 = Math.cos(th) ** 2;
+  let term = 1, sum = 1;
+  if (df % 2) {
+    for (let k = 1; k <= (df - 3) / 2; k++) sum += (term *= (2 * k) / (2 * k + 1) * c2);
+    return 1 - (2 / Math.PI) * (th + (df > 1 ? Math.sin(th) * Math.cos(th) * sum : 0));
+  }
+  for (let k = 1; k <= (df - 2) / 2; k++) sum += (term *= (2 * k - 1) / (2 * k) * c2);
+  return 1 - Math.sin(th) * sum;
+}
+// the slope (per year) through points { h: pollster, t, y, w }, each pollster its own level
+function withinHouseSlope(pts) {
+  const byHouse = new Map();
+  for (const p of pts) (byHouse.get(p.h) || byHouse.set(p.h, []).get(p.h)).push(p);
+  const dm = [];
+  let houses = 0;
+  for (const ps of byHouse.values()) {
+    if (ps.length < 2) continue;                  // one poll says nothing about its house's trend
+    houses++;
+    const W = ps.reduce((a, p) => a + p.w, 0);
+    const tb = ps.reduce((a, p) => a + p.w * p.t, 0) / W, yb = ps.reduce((a, p) => a + p.w * p.y, 0) / W;
+    for (const p of ps) dm.push({ w: p.w, dt: p.t - tb, dy: p.y - yb });
+  }
+  const df = dm.length - houses - 1;
+  const sxx = dm.reduce((a, p) => a + p.w * p.dt * p.dt, 0);
+  if (df < 3 || !(sxx > 0)) return null;
+  const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
+  const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
+  return { b, t: se > 0 ? b / se : 0, p: se > 0 ? tTail(b / se, df) : 1 };
+}
+/* The hero's matchup ids and the tables' lead measures name the same
+   contests; this is the one bridge between the two vocabularies, so the
+   Latest table (a11e1559) and the archive (d1a1d215) can both follow the
+   page's matchup – and both open on latest.rivalLead, the rival Labor is
+   doing worst against. Unknown or missing → the classic pair. */
+window.AP.measureOfMatchup = (id) => ({ alp_lnp: "lnp", alp_on: "onp", lnp_on: "lnponp" })[id] || "lnp";

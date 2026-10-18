@@ -324,12 +324,39 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   const placeMenu = () => {
     const b = menuBtn.current, n = navRef.current;
     if (!b || !n) return;
-    /* its right edge under the button's, kept 8px inside the screen: on a
-       phone the button sits left of the menu's own width */
     const br = b.getBoundingClientRect(), nr = n.getBoundingClientRect();
-    const w = Math.min(280, window.innerWidth - 24);
-    const x = Math.min(Math.max(br.right - w, 8), window.innerWidth - 8 - w);
-    setMenuAt({ top: Math.round(br.bottom - nr.top), left: Math.round(x - nr.left) });
+    const vw = window.innerWidth;
+    if (!window.AP.rd) {
+      /* its right edge under the button's, kept 8px inside the screen: on a
+         phone the button sits left of the menu's own width */
+      const w = Math.min(280, vw - 24);
+      const x = Math.min(Math.max(br.right - w, 8), vw - 8 - w);
+      setMenuAt({ top: Math.round(br.bottom - nr.top), left: Math.round(x - nr.left) });
+      return;
+    }
+    /* The redesign's folder (2026-10-18): the open button becomes a paper
+       tab - its own .tab-menu-paper, which rides the bar's pinned condense
+       with the label - and the sheet hangs from the bar's rule, its top edge
+       left open under the tab so the two read as one piece of paper. The
+       sheet starts at the tab's left edge, kept 8px inside the screen, and
+       takes the screen less 8px a side where its own width doesn't fit. A
+       sheet that would end within a corner's reach of the tab's edge (16px)
+       ends with the tab instead, square there: a rounded corner just past
+       the tab's side read as a jog in the paper. gapA/gapB are where the tab
+       meets the sheet's top edge (inside the tab's side borders). On a bar
+       stuck to the top of the screen the rows scroll inside what the screen
+       has room for (maxH); an unpinned bar's sheet scrolls with the page */
+    const pp = b.querySelector(".tab-menu-paper");
+    const pr = pp ? pp.getBoundingClientRect() : br;
+    const w0 = Math.min(492, vw - 16);
+    let L = Math.round(Math.min(Math.max(pr.left, 8), vw - 8 - w0)), R = L + w0;
+    if (pr.left - L < 16) L = Math.round(pr.left);
+    if (R - pr.right < 16) R = Math.round(pr.right);
+    const w = R - L;
+    const stuck = n.classList.contains("pinned") && getComputedStyle(n).position === "sticky";
+    setMenuAt({ top: Math.round(br.bottom - nr.top), left: L - Math.round(nr.left), width: w,
+                gapA: Math.max(0, pr.left - L + 1), gapB: Math.min(w, pr.right - L - 1),
+                maxH: stuck ? Math.max(160, Math.floor(window.innerHeight - br.bottom - 12)) : null });
   };
   const openMenu = (focusAt) => {
     placeMenu();
@@ -371,6 +398,15 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     else if (e.key === " " || e.key === "Spacebar") { e.preventDefault(); if (document.activeElement) document.activeElement.click(); return; }
     if (to) { e.preventDefault(); to.focus(); }
   };
+  /* The redesign's menu lists each page under its own headline and the
+     figure that headline stands on (menu-lines.js, the same findings the
+     pages head themselves with), on the state each page opens in: Pollster
+     leans on its two-party tab, on the reader's basis. Worked out only
+     while the menu is open; a page whose finding can't be read keeps its
+     tip */
+  const rdMenu = !!window.AP.rd;
+  const menuLines = React.useMemo(() => (menuOpen && rdMenu && window.AP.menuLines
+    ? window.AP.menuLines({ pub: tppBasis === "resp" }) : null), [menuOpen, rdMenu, tppBasis]);
   /* a menu page swaps in place like a tab; a modified click opens its document */
   const menuPick = (id) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
@@ -521,6 +557,9 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       if (menuOpen) { closeMenu(false); if (e.detail) e.currentTarget.blur(); }
                       else openMenu(e.detail ? null : 0);
                     }}>
+              {/* the folder's tab (redesign): laid out always, shown while
+                  the menu is open, so placeMenu can measure it first */}
+              {rdMenu && <span className="tab-menu-paper" aria-hidden="true"></span>}
               <svg className="tab-menu-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
                 <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" fill="none"></path>
               </svg>
@@ -546,6 +585,47 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
         </div>
         {menuOpen && (
           /* outside .tabs-inner, which clips to the bar's height */
+          rdMenu ? (
+          /* the redesign's folder: a numbered ledger, each page under its
+             headline with the figure the headline stands on (or its kind,
+             for the explainer), Info last where the phone bar has dropped
+             its tab. The rows scroll inside the sheet on a short screen,
+             so the sheet's own edges - the open top under the tab - stay put */
+          <div className="tab-menu-pop" id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
+               style={menuAt ? { top: menuAt.top + "px", left: menuAt.left + "px", right: "auto", width: menuAt.width + "px",
+                                 "--gap-a": menuAt.gapA + "px", "--gap-b": menuAt.gapB + "px",
+                                 borderTopLeftRadius: menuAt.gapA <= 1.5 ? 0 : undefined,
+                                 borderTopRightRadius: menuAt.gapB >= menuAt.width - 1.5 ? 0 : undefined } : null}
+               onKeyDown={onMenuKey}>
+            <div className="tab-menu-list" style={menuAt && menuAt.maxH ? { maxHeight: menuAt.maxH + "px" } : null}>
+              {[...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
+                const ln = menuLines && menuLines[t.id];
+                const fig = ln && ln.fig;
+                return (
+                  <a key={t.id} role="menuitem" tabIndex={-1}
+                     className={"tab-menu-item" + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : "")}
+                     href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}
+                     aria-current={active === t.id ? "page" : undefined}
+                     onClick={menuPick(t.id)}>
+                    <span className="tab-menu-n" aria-hidden="true">{i + 1}</span>
+                    <span className="tab-menu-txt">
+                      <span className="tab-menu-t">{t.label}</span>
+                      {(ln ? ln.head : t.tip) && <span className="tab-menu-d">{ln ? ln.head : t.tip}</span>}
+                    </span>
+                    <span className="tab-menu-f">
+                      {ln && ln.chip ? <span className="tab-menu-chip">{ln.chip}</span>
+                        : fig ? <>
+                          <span className={"tab-menu-v" + (fig.tone ? " tm-" + fig.tone : "")}>{fig.v}</span>
+                          {/* "RedBridge/Accent" may break after its slash */}
+                          <span className="tab-menu-c">{fig.cap.replace("/", "/\u200b")}</span>
+                        </> : null}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+          ) : (
           <div className="tab-menu-pop" id="tab-menu-pop" role="menu" aria-label="More pages" ref={menuRef}
                style={menuAt ? { top: menuAt.top + "px", left: menuAt.left + "px", right: "auto" } : null}
                onKeyDown={onMenuKey}>
@@ -565,6 +645,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
               </a>
             ))}
           </div>
+          )
         )}
       </nav>
     </React.Fragment>
@@ -7258,6 +7339,16 @@ function infoTerms(D) {
       {" "}{xref("aggregate-effect", "newest poll", "aggregate effect")} shows how much.
       {" "}{xref("poll-disagreement", "newest poll", "Poll disagreement")} tests whether the polls
       differ by more than chance allows.</>) },
+    /* the More menu's figure column (2026-10-18): its rules, in words -
+       menu-lines.js writes them out in full */
+    { id: "more-menu-figures", q: "What are the figures in the More menu?", a: (
+      <>Each page there is listed under the headline it opens with, and beside it the number that
+      headline rests on, as the page prints it. For
+      {" "}{xref("poll-disagreement", "more menu", "Poll disagreement")}, how widely the polls
+      of the party they disagree on most are spread, as a multiple of what chance alone would
+      produce. For Pollster leans, the {xref("house-lean", "more menu", "lean")} the headline
+      names, in points, with + towards Labor. For Preference flows, the move the headline
+      reports. A headline that reports no single number has none beside it.</>) },
   ];
 
   /* The method every section shares, written once. */
@@ -8147,6 +8238,7 @@ function infoTerms(D) {
         {" "}{xref("aggregate-effect", "newest poll", "aggregate effect")} shows how much.
         {" "}{xref("poll-disagreement", "newest poll", "Poll disagreement")} tests whether the polls
         differ by more than chance allows.</>) } : faqs.find((f) => f.id === "newest-poll-not-headline"),
+      faqs.find((f) => f.id === "more-menu-figures"),
     ].filter(Boolean);
     const vMethod = KAL ? [
       { id: "weighted-aggregate", term: "Smoothed trend", body: (
@@ -8647,7 +8739,7 @@ function InfoView({ focus, onBack, backLabel }) {
         <span className="rd-meta">How the site works</span>
       </div>
       <RdHed level={2}
-        head="Answers to questions you may have"
+        head={window.AP.PAGE_HEAD.info}
         dek="What things mean, how things are built, how to read them, and their limitations. Each section has its own explainer, and where applicable, the formulas and working are shown for transparency." />
       <div className="info-toc">
         <button type="button" className="info-toc-btn" aria-expanded={tocOpen}

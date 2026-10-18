@@ -4284,32 +4284,12 @@ function RdDisagree() {
   }, [view]);
   const panels = RD_DIS_PANELS[view];
   const ms = rdApMonths(RD_AP_TERM0);
-  const lastOf = (id) => { const s = AP.discord(id).filter((d) => d.sigma != null); return s.length ? s[s.length - 1] : null; };
   let yMax = 3;
   panels.forEach((p) => AP.discord(p.id).forEach((d) => { if (d.sigma != null) yMax = Math.max(yMax, Math.ceil(d.sigma), Math.ceil(d.floor)); }));
 
-  /* the finding, from the primaries whichever tab is open */
-  const on = lastOf("p_onp"), co = lastOf("p_lnp"), right = lastOf("rd_right"), alp = lastOf("p_alp"), grn = lastOf("p_grn");
-  const beyond = (d) => d && d.R >= 1.2;
-  let head, dek;
-  if (on && co && right && (beyond(on) || beyond(co)) && !beyond(right)) {
-    const r = (on.R + co.R) / 2;
-    const how = r < 1.3 ? "a little further than" : r < 1.75 ? "about half as much again as" : r < 2.25 ? "about twice as far as" : "more than twice as far as";
-    head = "The polls disagree on how the right’s vote splits, not on its size";
-    dek = `Polls of One Nation’s vote typically sit ${on.sigma.toFixed(1)} points from the trend through them, and polls of the Coalition’s ${co.sigma.toFixed(1)}: ${how} sampling error alone would put them. `
-      + `Add the two parties together, though, and their combined vote varies only as much as chance allows${alp && !beyond(alp) ? ", as Labor’s does" : ""}.`;
-  } else {
-    const all = [["One Nation’s", on], ["the Coalition’s", co], ["Labor’s", alp], ["the Greens’", grn]].filter(([, d]) => d);
-    const wide = all.filter(([, d]) => beyond(d));
-    if (!wide.length) {
-      head = "The polls agree about as closely as sampling error allows";
-      dek = "Polls of every party’s vote sit about as far from the trend through them as their samples alone would put them"
-        + (all.some(([, d]) => d.R < 0.8) ? ", and some sit closer than chance allows, which can mean pollsters steering towards each other." : ".");
-    } else {
-      head = "The polls disagree on " + rdList(wide.map(([n]) => n)) + " vote";
-      dek = wide.map(([n, d]) => `Polls of ${n} vote typically sit ${d.sigma.toFixed(1)} points from the trend through them, against ${d.floor.toFixed(1)} from sampling error alone.`).join(" ");
-    }
-  }
+  /* the finding, from the primaries whichever tab is open - written in
+     menu-lines.js, which the More menu quotes */
+  const { head, dek } = AP.disStory();
   const cols = phone ? 2 : 5;
   const gap = phone ? 20 : 24;
   const pw = Math.max(120, Math.floor((Wall - gap * (cols - 1)) / cols));
@@ -4476,20 +4456,11 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     if (r.left < s.left) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: SM });
     else if (r.right > s.right) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: SM });
   }, [view]);
-  const HL0 = D.houseLean || {};
-  /* One Nation against the Coalition: each pollster's lean on the gap
-     between the two primaries. The estimator is linear and all but one poll
-     files both, so that lean is its One Nation lean less its Coalition lean;
-     taken from the two series the tabs beside it draw, it always agrees
-     with them to the decimal. */
-  const HL = { ...HL0, split: Object.fromEntries(Object.keys(HL0.onp || {}).filter((h) => (HL0.lnp || {})[h]).map((h) => {
-    const co = Object.fromEntries(HL0.lnp[h].map((d) => [d.ym, d.v]));
-    return [h, HL0.onp[h].filter((d) => co[d.ym] != null)
-      .map((d) => ({ ym: d.ym, v: Math.round((d.v - co[d.ym]) * 10) / 10, on: d.v, co: co[d.ym] }))];
-  })) };
   const HE = D.houseEffects || {};
-  const tppKey = pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp");
-  const key = view === "tpp" ? tppKey : view;
+  /* the series the open tab reads (menu-lines.js keeps each pollster's lean
+     per tab, the split pairing among them: One Nation's lean less the
+     Coalition's) */
+  const key = window.AP.leanKey(view, onM, pub);
   const heKey = { onimp: "synthOn", imp: "synth", onpub: "alp_on", tpp: "tpp" }[key];
   const valOf = { onimp: (p) => p.alpOnImp, imp: (p) => p.alpImp, onpub: (p) => (p.tppAlt ? p.tppAlt.alp : null), tpp: (p) => p.alpN,
                   alp: (p) => p.p && p.p.alp, lnp: (p) => p.p && p.p.lnp, onp: (p) => p.p && p.p.onp,
@@ -4502,56 +4473,11 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     if (he && he.n) return he.n;
     return D.individualPolls.filter((p) => p.pollster === h && valOf(p) != null).length;
   };
-  const rowsOf = (k) => Object.keys(HL[k] || {}).map((h) => {
-    const s = HL[k][h] || [];
-    return { h, s, v: s.length ? s[s.length - 1].v : 0 };
-  }).filter((r) => r.s.length);
-  const rows = rowsOf(key).map((r) => ({ ...r, n: nOf(r.h) })).sort((a, b) => b.v - a.v || b.n - a.n);
+  const rows = window.AP.leanRows(key).map((r) => ({ ...r, n: nOf(r.h) })).sort((a, b) => b.v - a.v || b.n - a.n);
   /* one finding per measure tab, worded in the open measure's own terms:
-     who leans furthest on it, by how much, and who comes next */
-  const hlWords = (id) => {
-    if (id === "tpp") {
-      const rival = onM ? "One Nation" : "the Coalition";
-      return { hi: (pl) => `lean${pl ? "" : "s"} furthest to Labor`,
-        lo: (pl) => `lean${pl ? "" : "s"} furthest to ${rival}` };
-    }
-    if (id === "split") return { hi: (pl) => `read${pl ? "" : "s"} One Nation widest against the Coalition`,
-      lo: (pl) => `read${pl ? "" : "s"} One Nation narrowest against the Coalition` };
-    const whose = { alp: "Labor’s", lnp: "the Coalition’s", onp: "One Nation’s", grn: "the Greens’", oth: "the others’" }[id];
-    return { hi: (pl) => `read${pl ? "" : "s"} ${whose} vote highest`,
-      lo: (pl) => `read${pl ? "" : "s"} ${whose} vote lowest` };
-  };
-  const hlJoin = (ns) => ns.length > 2 ? ns.slice(0, -1).join(", ") + " and " + ns[ns.length - 1] : ns.join(" and ");
-  let head = null, dek = null;
-  const hsr = rowsOf(key).sort((a, b) => Math.abs(b.v) - Math.abs(a.v)).filter((r) => Math.abs(r.v) >= 0.05);
-  if (hsr.length) {
-    const words = hlWords(view === "tpp" ? "tpp" : view);
-    const tail = " The averages take each lean out before the polls are combined.";
-    const fmtPt = (v) => `${v.toFixed(1)} point${v.toFixed(1) === "1.0" ? "" : "s"}`;
-    /* a shared lean needs the leader's way as well as its distance: a -1.2
-       beside a +1.2 is the OUTLIER on the other side, not a fellow traveller.
-       "About the same" = within one displayed tenth (0.1pt) of the leader,
-       so two pollsters level at the top are BOTH named in the headline */
-    const sgn = hsr[0].v > 0;
-    const tied = hsr.filter((r) => (r.v > 0) === sgn && Math.abs(r.v) >= Math.abs(hsr[0].v) - 0.1);
-    const next = hsr.filter((r) => !tied.includes(r));
-    /* the head's figure is the tied group's FLOOR, so "A and B lean
-       furthest, and by 1.2 points" stays true of every house named */
-    const pl = tied.length > 1, topV = Math.min(...tied.map((r) => Math.abs(r.v)));
-    head = `${hlJoin(tied.map((r) => r.h))} ${(sgn ? words.hi : words.lo)(pl)}, and ${topV <= 1 ? "only " : ""}by ${fmtPt(topV)}`;
-    if (!next.length) {
-      dek = "No other pollster leans measurably either way." + tail;
-    } else {
-      const nextMax = Math.abs(next[0].v);
-      const nextTied = next.filter((r) => Math.abs(r.v) >= nextMax - 0.1);
-      dek = `${hlJoin(nextTied.map((r) => r.h))} ${nextTied.length > 1 ? "are" : "is"} next, ${fmtPt(nextMax)} off`
-        + (next.length > nextTied.length ? "; no other pollster is further out" : "")
-        + `.${topV >= 1 && nextMax <= topV / 2 ? ` ${pl ? "They are" : "It is"} well clear of the pack.` : ""}${tail}`;
-    }
-  } else if (rowsOf(key).length) {
-    head = "No pollster leans away from the pack here";
-    dek = "Every pollster sits level with the pollsters polling beside it. The averages take out any lean that builds up.";
-  }
+     who leans furthest on it, by how much, and who comes next - written in
+     menu-lines.js, which the More menu quotes for the two-party tab */
+  const { head, dek } = window.AP.leanStory(view, onM, pub);
   /* the bar's scale: 1.2 points either way, wider only if a lean needs it */
   const maxAbs = Math.max(0, ...rows.map((r) => Math.abs(r.v)));
   const BM = maxAbs <= 1.1 ? 1.2 : Math.ceil((maxAbs + 0.1) * 2) / 2;
@@ -5062,13 +4988,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
    houses' readings made a gap between the houses read as a monthly swing.
    Each menu sits on the part it steers: the region menu on the ledger,
    the highlight menu on the chart. */
-const FF_COHORTS = {
-  coal: { name: "Coalition", prose: "Coalition", cls: "lnp", share: "lnp" },
-  grn:  { name: "Greens", prose: "Greens", cls: "grn", share: "grn" },
-  onp:  { name: "One Nation", prose: "One Nation", cls: "onp", share: "onp" },
-  oth:  { name: "Other", prose: "other", cls: "oth", share: "oth" },
-  alp:  { name: "Labor", prose: "Labor", cls: "alp", share: "alp" },
-};
+/* FF_COHORTS, the groups themselves, live in menu-lines.js with the page's finding */
 const FF_MRP_HOUSE = "DemosAU (MRP)";
 /* the region menu over the ledger: "" (All voters) is our enrolment-and-
    vote weighting of the MRP's printed regional tables; the rest are the
@@ -5081,10 +5001,7 @@ const flWinMonths = (win) => {
   const m = String(win || "").match(/[A-Z][a-z]{2}/g) || [];
   return !m.length ? "" : m[0] === m[m.length - 1] ? m[0] : m[0] + "–" + m[m.length - 1];
 };
-/* a figure at its source's precision: a fixed-precision column (the counts,
-   dp 1) prints it on every row, the rest print as their source does - the
-   waves whole numbers, DemosAU's 21.5 with its half */
-const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
+/* flFig, a figure at its source's precision, lives in menu-lines.js too */
 
 /* one voter group's answers over the year: RedBridge/Accent's monthly
    line, DemosAU's MRP triangles standing apart from it, the 2026 state
@@ -5283,7 +5200,6 @@ function RdFlows({ measure }) {
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
   if (!FD || !FO || !FD.now || !FO.now) return null;
-  const nC = FD.now, nO = FO.now;
   const PR = (D.latest && D.latest.primary) || {};
   const regName = ffReg ? (FF_REGIONS.find(([k]) => k === ffReg) || [])[1] : "";
   const mi = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7)) - 1;
@@ -5324,77 +5240,12 @@ function RdFlows({ measure }) {
   };
   const tabs = FF ? FL_TABS : FL_TABS.filter((t) => t.id !== "ln");
 
-  /* ---- the pressed-choice battery: one straight line per voter group
-     through RedBridge's monthly answers (DemosAU's three quarterlies for
-     the Coalition v One Nation contest - too few to fit), w=1 (every wave
-     is ~1,000), Holm's correction across the rows. Always the All-voters
-     series, so the head never moves with the region menu. A Yes is what
-     the ledger's "down from 23 in Feb" and the section head ride, so no
-     copy claims a move the battery won't stand behind */
-  const allMrp = (ws) => (ws || []).map((w) => (w.all ? { ...w, ...w.all } : w));
-  const ff = FF ? [
-    ["on", FF.vsOn, ["grn", "coal", "oth"]], ["co", FF.vsCoal, ["grn", "onp", "oth"]], ["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]],
-  ].flatMap(([cq, waves, cks]) => cks.map((ck) => {
-    const s = waves.filter((w) => w[ck] != null);
-    return { key: cq + ck, ck, q: cq, waves: s,
-      fit: withinHouseSlope(s.map((w) => ({ h: cq + ck, t: (w.xm ?? mi(w.ym)) / 12, w: 1, y: w[ck] }))) };
-  })) : [];
-  {
-    const tested = ff.filter((r) => r.fit), sigK = [];
-    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
-      if (r.fit.p >= 0.05 / (tested.length - i)) break;
-      sigK.push(r.key);
-    }
-    for (const r of ff) r.sig = sigK.includes(r.key);
-  }
-  const movedOf = (cq, ck) => {
-    const r = ff.find((x) => x.key === cq + ck);
-    if (!r || !r.sig) return null;
-    const f = r.waves[0][ck], la = r.waves[r.waves.length - 1][ck];
-    return f === la ? null : { from: f, to: la, ym: r.waves[0].ym, up: la > f };
-  };
-
-  /* ---- the head and dek, on written rules. A move in the pollsters' own
-     two-party figures (a drift clear of its margin) leads, as the strongest
-     evidence; else a clear move in what voters say (the battery's Yes
-     rows) leads; else preferences are still flowing as at the election.
-     Every clause clears its own test: the drift's ±ci95, the battery's
-     Holm-corrected slope */
+  /* ---- the pressed-choice battery (one straight line per voter group,
+     Holm's correction across the rows) and the section's head and dek, on
+     written rules: menu-lines.js, which the More menu quotes. The battery's
+     Yes rows ride the ledger's "down from" and the trend table here */
+  const { head, dek, ff, movedOf } = window.AP.flowStory();
   const s1 = (v) => Math.abs(v).toFixed(1);
-  const phr = (v, who) => (Math.abs(v) < 0.05 ? "level against " + who
-    : s1(v) + " points kinder to " + (v > 0 ? "Labor against " + who : who));
-  const ci = Math.max(nC.ci95, nO.ci95);
-  const worst = Math.max(Math.abs(nC.v), Math.abs(nO.v));
-  const outC = Math.abs(nC.v) > nC.ci95, outO = Math.abs(nO.v) > nO.ci95;
-  const moves = ff.filter((r) => movedOf(r.q, r.ck)).map((r) => ({ ...r, m: movedOf(r.q, r.ck) }));
-  const anchorOf = (cq) => (cq === "ln" ? "the Coalition" : "Labor");
-  const rivalOf = (cq) => (cq === "co" ? "the Coalition" : "One Nation");
-  const voiceMove = moves.length === 1 ? moves[0] : null;
-  const head = outC || outO
-    ? (outC && outO ? "Preferences have moved since the election, in both contests"
-      : "Preferences " + (outO ? "against One Nation" : "against the Coalition") + " have moved " + ((outO ? nO.v : nC.v) > 0 ? "towards Labor" : "away from Labor") + " since the election")
-    : voiceMove ? FF_COHORTS[voiceMove.ck].name + " voters say they’d now send " + anchorOf(voiceMove.q) + " " + (voiceMove.m.up ? "more" : "fewer") + " preferences"
-    : moves.length > 1 ? "Voters say their preferences have shifted since " + rdMonthYear(moves[0].m.ym).split(" ")[0]
-    : "Preferences are still flowing much as they did at the election";
-  const dekA = "This site’s two-party figures assume fixed preference flows: the " + rdElecYear + " count against the Coalition, and a table built from " + rdElecYear + "’s ballots against One Nation.";
-  const dekB = voiceMove
-    ? (() => {
-      const r = voiceMove, m = r.m;
-      /* the assumption the answer is set beside: two figures quoted, no
-         claim of a gap between them (the battery tests the move, not this) */
-      const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the " + rdElecYear + " count sent " + anchorOf(r.q) + "’s way"
-        : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
-      return " Asked to choose, " + m.to + "% of " + FF_COHORTS[r.ck].prose + " voters now pick " + anchorOf(r.q) + " over " + rivalOf(r.q)
-        + " in " + (r.q === "ln" ? "DemosAU’s MRP" : "RedBridge/Accent’s poll") + ", " + (m.up ? "up" : "down") + " from " + m.from + "% in " + rdMonthYear(m.ym).split(" ")[0] + refTxt + ".";
-    })()
-    : moves.length > 1 ? " Asked to choose, " + moves.map((r) => FF_COHORTS[r.ck].prose + " voters " + (r.m.up ? "up" : "down") + " from " + r.m.from + "% to " + r.m.to + "%").join("; ") + "."
-    : " Voters’ own answers to pollsters haven’t clearly moved since February either.";
-  const dekC = " The pollsters’ own two-party figures " + (outC || outO ? "have moved: they sit " : voiceMove || moves.length ? "don’t show it yet: they sit " : "sit where their primary votes and the flows put them: ")
-    + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", "
-    + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ".";
-  const dek = FF ? dekA + (voiceMove || moves.length ? dekB : "") + dekC
-    : "The pollsters’ own two-party figures sit where their primary votes and the " + rdElecYear + " flows put them: " + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", "
-      + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ". A shift in where voters send their preferences would show here first.";
 
   const c = C[q] || C.co;
   /* ---- one shared x domain for every row of every tab, whole months
@@ -5672,7 +5523,7 @@ function RdExplained() {
         <h2 className="rd-title" id="rd-ex-t">Preference flows explained</h2>
         <span className="rd-meta">How preferences decide the two-party figure</span>
       </div>
-      <RdHed head="There are two ways to get a two-party figure from a poll"
+      <RdHed head={window.AP.PAGE_HEAD["flows-explained"]}
         dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
     </section>

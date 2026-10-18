@@ -2339,37 +2339,7 @@ const demoSaid = (t) => t && <p className="demo-verdict">
    clears 95%. With three or four groups tested at once, Holm's correction
    keeps one of them from clearing it by chance. Two groups (men, women) are
    a single test: the gap between them. */
-// P(|T| > t) for Student's t on whole degrees of freedom, exact (Abramowitz & Stegun 26.7.3–4)
-function tTail(t, df) {
-  const th = Math.atan(Math.abs(t) / Math.sqrt(df)), c2 = Math.cos(th) ** 2;
-  let term = 1, sum = 1;
-  if (df % 2) {
-    for (let k = 1; k <= (df - 3) / 2; k++) sum += (term *= (2 * k) / (2 * k + 1) * c2);
-    return 1 - (2 / Math.PI) * (th + (df > 1 ? Math.sin(th) * Math.cos(th) * sum : 0));
-  }
-  for (let k = 1; k <= (df - 2) / 2; k++) sum += (term *= (2 * k - 1) / (2 * k) * c2);
-  return 1 - Math.sin(th) * sum;
-}
-// the slope (per year) through points { h: pollster, t, y, w }, each pollster its own level
-function withinHouseSlope(pts) {
-  const byHouse = new Map();
-  for (const p of pts) (byHouse.get(p.h) || byHouse.set(p.h, []).get(p.h)).push(p);
-  const dm = [];
-  let houses = 0;
-  for (const ps of byHouse.values()) {
-    if (ps.length < 2) continue;                  // one poll says nothing about its house's trend
-    houses++;
-    const W = ps.reduce((a, p) => a + p.w, 0);
-    const tb = ps.reduce((a, p) => a + p.w * p.t, 0) / W, yb = ps.reduce((a, p) => a + p.w * p.y, 0) / W;
-    for (const p of ps) dm.push({ w: p.w, dt: p.t - tb, dy: p.y - yb });
-  }
-  const df = dm.length - houses - 1;
-  const sxx = dm.reduce((a, p) => a + p.w * p.dt * p.dt, 0);
-  if (df < 3 || !(sxx > 0)) return null;
-  const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
-  const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
-  return { b, t: se > 0 ? b / se : 0, p: se > 0 ? tTail(b / se, df) : 1 };
-}
+// tTail and withinHouseSlope, the test itself, live in the plain layer (ed2260de)
 function demoTrendVerdict(D, st, party, inX) {
   const gpi = DEMO_GRP_PARTY.indexOf(party);
   const words = DEMO_SET_WORDS[st.id] || {};
@@ -4774,12 +4744,8 @@ function NextPollsPanel() {
   );
 }
 
-/* The hero's matchup ids and the tables' lead measures name the same
-   contests; this is the one bridge between the two vocabularies, so the
-   Latest table (here) and the archive (d1a1d215) can both follow the page's
-   matchup – and both open on latest.rivalLead, the rival Labor is doing
-   worst against. Unknown or missing → the classic pair. */
-window.AP.measureOfMatchup = (id) => ({ alp_lnp: "lnp", alp_on: "onp", lnp_on: "lnponp" })[id] || "lnp";
+/* window.AP.measureOfMatchup, the bridge from the hero's matchup ids to the
+   tables' lead measures, lives in the plain layer (ed2260de) */
 const LEAD_LABEL = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON" };
 
 function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {

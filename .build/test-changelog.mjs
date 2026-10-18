@@ -3,6 +3,8 @@
    diffChangelog can emit (poll/flows/finding/meta), plus the quiet-run
    idempotence the unattended writers rely on. Run: node .build/test-changelog.mjs */
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import vm from "node:vm";
 import { flowsOf, stateOf, initChangelog, diffChangelog, newPollKeys, isoLabel, isoLabelYear, isoLabelLong } from "./changelog.mjs";
 
 const FLOW0 = { grn: 0.882, onp: 0.255, oth: 0.546 };
@@ -367,4 +369,33 @@ assert.equal(diff(W(), W()).appended.length, 0);
   assert.equal(diff(iss("lnp", ""), iss("lnp", "", { crime: "onp" })).appended.length, 0);
 }
 
-console.log("test-changelog.mjs: OK (states, seed, poll/flows/finding/meta entries, idempotence, the widened figures and findings)");
+/* the More menu's line for the change log (menu-lines.js changelogGist): the
+   newest entry's first sentence, less a poll's fieldwork-and-sample aside and
+   the estimate's contest-and-basis aside - run on what diffChangelog itself
+   writes, so a template the cut no longer fits fails here, not on the page */
+{
+  const win = { AP: {}, AUSPOL: {} };
+  win.window = win;
+  vm.runInNewContext(fs.readFileSync(new URL("./newtracker/assets/menu-lines.js", import.meta.url), "utf8"), { window: win });
+  const gist = (prev, next, info) => diff(prev, next, info).appended.map((e) => win.AP.changelogGist(e.text));
+  assert.deepEqual(gist(S({ polls: ["2026-10-08|Newspoll"], lead: { pair: "alp_on", basis: "imp", alp: 52.2 } }), S(),
+    { "2026-10-10|Resolve": { name: "Resolve", fw: "8–10 Oct", sample: 1136, url: null } }),
+    ["Resolve added — the two-party preferred estimate moved 52.2 → 52.3"], "a poll: its fieldwork and the estimate's contest go");
+  assert.deepEqual(gist(S({ polls: [] }), S(), {
+    "2026-10-08|Newspoll": { name: "YouGov (MRP)", fw: "6–8 Oct", sample: 5007, url: null },
+    "2026-10-10|Resolve": { name: "Resolve", fw: "fieldwork dates TBC", sample: null, url: null } }),
+    ["2 polls added — YouGov (MRP); Resolve — the two-party preferred estimate held at 52.3"], "a house's own brackets stay; a TBC goes");
+  const k = "2026-10-12|Newspoll";
+  assert.deepEqual(gist(S(), S({ polls: [...S().polls, k], flows: flowsOf(FLOW0, { ...FP0, lnp: 0.33 }, null), lead: { pair: "alp_on", basis: "imp", alp: 52.6 }, on: 52.6 }),
+    { [k]: { name: "Newspoll", fw: "9–11 Oct", sample: 1250, url: null } }),
+    ["The preference-flow assumptions were updated: Coalition voters' preferences to Labor over One Nation 30.0% → 33.0%",
+     "Newspoll added — the two-party preferred estimate moved 52.3 → 52.6, with the preference-flow update the same day"]);
+  assert.deepEqual(gist(S({ lead: { pair: "alp_lnp", basis: "imp", alp: 56.4 } }), S()),
+    ["The headline pairing is now Labor v One Nation (it was Labor v the Coalition); the estimate reads 52.3"], "the meta entry keeps what it was");
+  assert.deepEqual(gist(S({ lead: { pair: "alp_on", basis: "pub", alp: 51.4 } }), S()),
+    ["The headline two-party figure is now on implied flows (it was on published figures); the estimate reads 52.3"]);
+  assert.deepEqual(gist(W(), W({ polls: [...S().polls, RM], prim: { ...PRIM0, onp: 26.4 } }), RM_INFO),
+    ["Roy Morgan added — the two-party preferred estimate held at 52.3"], "only the first sentence: the figures after it go");
+}
+
+console.log("test-changelog.mjs: OK (states, seed, poll/flows/finding/meta entries, idempotence, the widened figures and findings, the More menu's gist)");

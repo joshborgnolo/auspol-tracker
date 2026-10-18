@@ -169,6 +169,9 @@ assert.ok(Array.isArray(FF.lnpOn) && FF.lnpOn.length >= 2, "lnpOn carries the MR
 const ap = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
 const cssRd = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
 const app = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"), "utf8");
+/* the battery and the section's head and dek live in menu-lines.js since
+   2026-10-18 (the More menu quotes the same finding); RdFlows reads them */
+const ml = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "menu-lines.js"), "utf8");
 assert.ok(/function RdFlows\(\{ measure \}\)/.test(ap), "RdFlows takes the page's two-party contest");
 assert.ok(app.includes("<RdFlows measure={measure} />"), "the All-polls view hands RdFlows the page's contest");
 assert.ok(/function RdFlowSpark\(/.test(ap), "the ledger's per-group line component exists");
@@ -229,16 +232,17 @@ assert.ok(ap.includes('<path className="rd-fx-ref"') && ap.includes('<rect class
 
 /* the battery stands on the All-voters series, never the menu's view, so
    the head and the ledger's "down from" never move with the menu */
-assert.ok(ap.includes('["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]]'), "the battery reads DemosAU's All-voters series");
-assert.ok(ap.includes("withinHouseSlope(s.map((w) => ({ h: cq + ck, t: (w.xm ?? mi(w.ym)) / 12, w: 1, y: w[ck] })))"),
+assert.ok(ap.includes("const { head, dek, ff, movedOf } = window.AP.flowStory();"), "the page heads itself with the shared finding");
+assert.ok(ml.includes('["ln", allMrp(FF.lnpOn), ["alp", "grn", "oth"]]'), "the battery reads DemosAU's All-voters series");
+assert.ok(ml.includes("withinHouseSlope(s.map((w) => ({ h: cq + ck, t: (w.xm ?? mi(w.ym)) / 12, w: 1, y: w[ck] })))"),
   "one straight line per group, w=1, the year scale");
-assert.ok(ap.includes("if (r.fit.p >= 0.05 / (tested.length - i)) break;"), "Holm's correction across the battery");
+assert.ok(ml.includes("if (r.fit.p >= 0.05 / (tested.length - i)) break;"), "Holm's correction across the battery");
 assert.ok(ap.includes("const mv = !ffReg ? movedOf(q, ck) : null;"), "the ledger's change note rides the battery's Yes, on All voters only");
 
 /* the head's written rules: a drift clear of its margin leads; else a
    group the battery says moved; else still flowing as at the election */
-assert.ok(ap.includes("const head = outC || outO") && ap.includes("voiceMove ? FF_COHORTS[voiceMove.ck].name + \" voters say they’d now send \"")
-  && ap.includes("\"Preferences are still flowing much as they did at the election\""),
+assert.ok(ml.includes("const head = outC || outO") && ml.includes("voiceMove ? FF_COHORTS[voiceMove.ck].name + \" voters say they’d now send \"")
+  && ml.includes("\"Preferences are still flowing much as they did at the election\""),
   "the head's three branches are written in code");
 
 /* tooltips: never wider than their chart, sentences wrap (the bug the

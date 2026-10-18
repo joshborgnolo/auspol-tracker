@@ -7149,6 +7149,11 @@ const changelog = JUR ? null : (() => {
    "level" on that page means what it means here. The static article in
    build.mjs reads this same payload. Federal only. */
 const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: HL_DEFF });
+/* the page's count of topics, counted as its own topic list counts them
+   (a topic with neither cards nor a list is left off): the main bundle's
+   copy of it, for the page's dek and the More menu's line, which render
+   before the sidecar has loaded, or without it */
+const beyondTopics = oneOffsSource ? oneOffsSource.topics.filter((t) => t.blocks.length || t.more.length).length : null;
 
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
@@ -7457,6 +7462,8 @@ window.AUSPOL = (function () {
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
   const pollCadence = ${JSON.stringify(pollCadence)};
+  /* the /beyond-the-vote/ page's count of topics (§8e) - null off the federal page */
+  const beyondTopics = ${JSON.stringify(beyondTopics)};
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -7504,7 +7511,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /beyond-the-vote/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs,
+    loadOneOffs, beyondTopics,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)
