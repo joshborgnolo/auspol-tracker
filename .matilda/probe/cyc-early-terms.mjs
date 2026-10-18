@@ -5,8 +5,14 @@
    - every FLOW_ERAS set from 1943 to 1954 reproduces its own election
      (the one free constant solved), 1955 carries the pooled DLP 0.27 and
      lands 1958 exactly, and every era row's stored tpp is its set's figure;
-   - the accuracy record holds no dateApprox wave, 1954/1966/1969 drop out
-     (month-placeholder finals) and 1949 scores on its 1949-12-03 final;
+   - the Trove corpus' final waves put 1946, 1951 and 1954 back into the
+     accuracy record (.build/bootstrap-trove-final-waves.mjs: firm "Morgan",
+     tppEra-tagged, no dateApprox; 1966/1969 stay out on month-placeholder
+     finals) at err 1946 +0.7 / 1951 −1.5 / 1954 −1.9, and 1949 scores on
+     its 1949-12-03 final;
+   - the source-polls CSV export marks month-placeholder dates in a
+     date_approx column, fed by gen-data's dateApprox passthrough on the
+     cycle-source rows;
    - the static results table names the side that formed government
      (1954, 1961, 1969, 1990, 1998 went to the 2PP loser), and the worst-
      miss sentence names the lone house instead of "every house";
@@ -16,7 +22,7 @@
    BASE=<checkout> overrides the default repo root. */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { extname, join } from "node:path";
 import puppeteer from "puppeteer-core";
 
@@ -28,9 +34,14 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css
 let fails = 0;
 const ok = (c, m) => { if (c) console.log("  ok   " + m); else { fails++; console.log("  FAIL " + m); } };
 
+const pickAsset = (prefix, from = ".build/newtracker/assets") => {
+  const hits = readdirSync(join(ROOT, from)).filter((f) => f.startsWith(prefix) && f.endsWith(".js"));
+  if (hits.length !== 1) throw new Error(`${prefix}: ${hits.length} assets, expected 1`);
+  return join(ROOT, from, hits[0]);
+};
 const D = JSON.parse(readFileSync(join(ROOT, "data/polls.json"), "utf8"));
 const { FLOW_ERAS, impliedEraAlp2pp } = await import(join(ROOT, ".build/newtracker/flows.mjs"));
-const bundle = readFileSync(join(ROOT, ".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+const bundle = readFileSync(pickAsset("9f09dca2-"), "utf8");
 const grab = (name) => { const i = bundle.indexOf("const " + name + " = "); return JSON.parse(bundle.slice(i + name.length + 9, bundle.indexOf("\n", i)).replace(/;$/, "")); };
 
 console.log("data");
@@ -57,15 +68,43 @@ ok(drift === 0, `every era row's tpp is its set's figure (${drift} drifted)`);
 ok(!D.cyclePolls["1951"].some((p) => p.date === "1949-12-15"), "the mis-dated 1949-12-15 wave left the 1949–51 term");
 const fin = D.cyclePolls["1949"].find((p) => p.date === "1949-12-03");
 ok(fin && fin.tppEra === "1946" && !fin.dateApprox, "1949's final wave sits in its own term, dated 1949-12-03");
+/* The Trove finals (bootstrap-trove-final-waves.mjs): real publication weeks,
+   so no dateApprox; primaries and era tags pinned here, their implied tpp
+   covered by the drift loop above. */
+for (const [b, date, alp, lnp, oth, era] of [
+  ["1946", "1946-09-27", 54, 44, 2, "1943"],
+  ["1951", "1951-04-22", 47, 52, 1, "1949"],
+  ["1954", "1954-05-23", 48, 46, 1, "1951"],
+]) {
+  const r = D.cyclePolls[b].find((x) => x.date === date && x.firm === "Morgan");
+  ok(r && r.alp === alp && r.lnp === lnp && r.oth === oth && r.tppEra === era && !r.dateApprox,
+     `Trove final ${date}: ${alp}/${lnp}/${oth}, tppEra ${era}, no dateApprox`);
+}
 
 const acc = grab("accuracy"), defs = grab("CYCLE_DEFS");
 const years = acc.cycles.map((c) => c.year);
-ok(![1954, 1966, 1969].some((y) => years.includes(y)), "1954/1966/1969 month-placeholder finals are not scored");
+ok(acc.cycles.length === 23, `23 elections in the final-polls record (${acc.cycles.length})`);
+ok(![1966, 1969].some((y) => years.includes(y)), "1966/1969 month-placeholder finals are not scored");
+for (const [y, date, err] of [[1946, "1946-09-27", 0.7], [1951, "1951-04-22", -1.5], [1954, "1954-05-23", -1.9]]) {
+  const c = acc.cycles.find((x) => x.year === y);
+  ok(c && c.n === 1 && c.houses[0].firm === "Roy Morgan" && c.houses[0].date === date && c.houses[0].err === err,
+     `${y} scores the Trove ${date} final at err ${err}`);
+}
 ok(years.includes(1949) && acc.cycles.find((c) => c.year === 1949).houses[0].date === "1949-12-03", "1949 scores on its 1949-12-03 final");
 const datesScored = new Set(acc.cycles.flatMap((c) => c.houses.map((h) => c.year + "|" + h.date)));
 let approxScored = 0;
 for (const [b, rows] of Object.entries(D.cyclePolls)) for (const p of rows) if (p.dateApprox && datesScored.has(b + "|" + p.date)) approxScored++;
 ok(approxScored === 0, "no dateApprox wave in the accuracy record");
+
+const CS = JSON.parse(readFileSync(join(ROOT, ".build/newtracker/assets/cycle-source.json"), "utf8"));
+/* The sidecar keys terms by the OPENING election (CYC_META.year), not the
+   bucket year the poll buckets and accuracy record label by (c.src). */
+ok(CS["1946"].polls.some((p) => p.dateApprox === "month"), "sidecar marks the 1946-term mirror's month-placeholder rows");
+for (const [term, date] of [["1943", "1946-09-27"], ["1949", "1951-04-22"], ["1951", "1954-05-23"]]) {
+  const w = CS[term].polls.find((p) => p.date === date);
+  ok(w && !w.dateApprox, `sidecar ${term} term [${date}]: Trove final present, unflagged`);
+}
+ok(readFileSync(pickAsset("d1a1d215-"), "utf8").includes('"date_approx"'), "source-polls CSV export carries a date_approx column");
 const end = (y) => defs.find((c) => c.year === y).endRes.tpp;
 ok(end(1949) === 50.7 && end(1951) === 49.3, "1949–51 ends Menzies 50.7, 1951–54 ends Menzies 49.3");
 const c1951 = defs.find((c) => c.year === 1951), c1949 = defs.find((c) => c.year === 1949);

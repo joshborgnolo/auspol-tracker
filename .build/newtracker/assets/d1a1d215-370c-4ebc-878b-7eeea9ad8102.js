@@ -2735,8 +2735,12 @@ function apprMetricLabel(a) {
 }
 
 function cycleSourceRows(cycles, D) {
+  /* month-placeholder eras ride the file verbatim in `date_approx`: the
+     mirror dated those waves only to their month (the 15th is a placeholder,
+     never a fieldwork day), so "month" here says the day is conventional.
+     Rows dated for real carry nothing. */
   const rows = [[
-    "cycle", "series", "date", "months_since_election", "pollster",
+    "cycle", "series", "date", "date_approx", "months_since_election", "pollster",
     "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth",
     "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "hanson_net", "leader_metric",
     "pm_preferred", "opp_leader_preferred",
@@ -2762,18 +2766,18 @@ function cycleSourceRows(cycles, D) {
     const c = byYear.get(Number(year));
     if (!c) return;
     src.polls.forEach((p) => rows.push([
-      year, "voting_intention", p.date, p.m, p.firm,
+      year, "voting_intention", p.date, p.dateApprox ?? null, p.m, p.firm,
       p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null,
       null, null, p.imp_alp ?? null, p.imp_alp != null ? "ALP v L/NP" : null,
     ]));
     src.approval.forEach((a) => {
       if (a.pmNet != null || a.oppNet != null) rows.push([
-        year, "leader_rating", a.date, a.m, a.firm,
+        year, "leader_rating", a.date, null, a.m, a.firm,
         null, null, null, null, null, null, null, a.pmNet, a.oppNet, null,
         a.metric === "fav" ? "net favourability" : "net approval", null, null,
       ]);
       if (a.pmPpm != null || a.oppPpm != null) rows.push([
-        year, "preferred_pm", a.date, a.m, a.firm,
+        year, "preferred_pm", a.date, null, a.m, a.firm,
         null, null, null, null, null, null, null, null, null, null, null,
         a.pmPpm ?? null, a.oppPpm ?? null,
       ]);
@@ -2788,7 +2792,7 @@ function cycleSourceRows(cycles, D) {
     D.individualPolls.forEach((p) => {
       const onRival = rivalOfMonth(D, p.ym) === "alp_on";
       const imp = onRival ? p.alpOnImp : p.alpImp;
-      rows.push([cur.year, "voting_intention", p.released, mo(p.released), p.pollster,
+      rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster,
         p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null,
         null, null, imp ?? null, imp != null ? (onRival ? "ALP v ON" : "ALP v L/NP") : null]);
       /* The MAIN contest only. A wave may also publish a two-way where the
@@ -2796,12 +2800,12 @@ function cycleSourceRows(cycles, D) {
          nonsense stacked in one column - they stay in the payload for the
          charts that keep them apart. */
       const mp = mainPpm(p);
-      if (mp) rows.push([cur.year, "preferred_pm", p.released, mo(p.released), p.pollster,
+      if (mp) rows.push([cur.year, "preferred_pm", p.released, null, mo(p.released), p.pollster,
         null, null, null, null, null, null, null, null, null, null, null,
         mp.alb ?? null, ppmOpp(mp)]);
       const a = p.appr;
       if (a && (a.albNet != null || a.taylorNet != null || a.hansonNet != null))
-        rows.push([cur.year, "leader_rating", p.released, mo(p.released), p.pollster,
+        rows.push([cur.year, "leader_rating", p.released, null, mo(p.released), p.pollster,
           null, null, null, null, null, null, null, a.albNet, a.taylorNet, a.hansonNet ?? null,
           /* buildAppr reports a metric PER LEADER (metricBy), never a single
              row-level one – a house can ask approval about the PM and
@@ -2822,7 +2826,7 @@ function cycleSourceRows(cycles, D) {
 
 /* ---- How the final polls did ------------------------------------------
    Everywhere else the page can only describe how far the polls disagree with
-   EACH OTHER. Twenty-two past elections are the one place a poll can be checked
+   EACH OTHER. Twenty-three past elections are the one place a poll can be checked
    against the thing it was estimating, so this is the only honest answer to
    "should I believe the number at the top of this page".
    Pre-1993 rows score Morgan's implied last-election-flows 2PP (FLOW_ERAS),

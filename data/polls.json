@@ -9399,6 +9399,20 @@
         "dateApprox": "month"
       },
       {
+        "date": "1946-09-27",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 54,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": null,
+        "oth": 2,
+        "tpp_lnp": 45.2,
+        "tpp_alp": 54.8,
+        "tppEra": "1943"
+      },
+      {
         "date": "1946-09-28",
         "firm": "Election",
         "lnp": 43.65,
@@ -9709,6 +9723,20 @@
         "dateApprox": "month"
       },
       {
+        "date": "1951-04-22",
+        "firm": "Morgan",
+        "lnp": 52,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": null,
+        "oth": 1,
+        "tpp_lnp": 52.2,
+        "tpp_alp": 47.8,
+        "tppEra": "1949"
+      },
+      {
         "date": "1951-04-28",
         "firm": "Election",
         "lnp": 50.34,
@@ -9900,6 +9928,20 @@
         "tpp_alp": 48.8,
         "tppEra": "1951",
         "dateApprox": "month"
+      },
+      {
+        "date": "1954-05-23",
+        "firm": "Morgan",
+        "lnp": 46,
+        "alp": 48,
+        "grn": null,
+        "onp": null,
+        "dem": null,
+        "dlp": null,
+        "oth": 1,
+        "tpp_lnp": 51.2,
+        "tpp_alp": 48.8,
+        "tppEra": "1951"
       },
       {
         "date": "1954-05-29",
@@ -61794,10 +61836,10 @@
     "1963|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1961 election's calibrated constants (FLOW_ERAS[1961] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.27 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
     "1966|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1963 election's calibrated constants (FLOW_ERAS[1963] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.47 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
     "1969|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1966 election's calibrated constants (FLOW_ERAS[1966] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.02 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
-    "1946|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1943 election's calibrated constants (FLOW_ERAS[1943] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −1.59 vs the closing election's estimated 2PP, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece against an estimated close itself). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1946|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1943 election's calibrated constants (FLOW_ERAS[1943] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −1.59 vs the closing election's estimated 2PP, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece against an estimated close itself). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\". The election-eve wave of 1946-09-27 (decided voters only) files from the hand-curated Trove corpus (data/trove-primary-vote.csv, Trove article 78267350), not the mirror; the publication week is real, so no dateApprox.",
     "1949|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1946 election's calibrated constants (FLOW_ERAS[1946] in flows.mjs, anchored to that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949 – the Kevin Bonham Wonk Central method; right-edge backtest −0.53 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
-    "1951|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1949 election's calibrated constants (FLOW_ERAS[1949] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.04 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
-    "1954|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1951 election's calibrated constants (FLOW_ERAS[1951] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +1.31 vs official, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
+    "1951|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1949 election's calibrated constants (FLOW_ERAS[1949] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.04 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\". The weekend-before wave of 1951-04-22 files Gallup's allocated estimate (LCP 52, Lab 47, 1 independent; the raw 49/43 with 7 undecided stays in data/trove-primary-vote.csv), from the Trove corpus (Trove article 45695923); a real publication week, so no dateApprox.",
+    "1954|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1951 election's calibrated constants (FLOW_ERAS[1951] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +1.31 vs official, a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\". The weekend-before wave of 1954-05-23 is contested seats only (114 of them; 5 uncommitted, so its primaries sum 95, not ~100), from the Trove corpus (Trove article 230779504); a real publication week, so no dateApprox.",
     "1955|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1954 election's calibrated constants (FLOW_ERAS[1954] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.48 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
     "1958|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1955 election's calibrated constants (FLOW_ERAS[1955] in flows.mjs, anchored to that election's official 2PP, except the new Anti-Communist Labor/DLP flow, which carries the pooled DLP-era 0.27 – solved against 1955 alone it is 0.002, which puts the 1957–58 waves 2–3 points too low for Labor – the Kevin Bonham Wonk Central method; right-edge backtest 0.00 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
     "1961|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1958 election's calibrated constants (FLOW_ERAS[1958] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.33 vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used."
