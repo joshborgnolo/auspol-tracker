@@ -692,9 +692,14 @@ function TrendChart(props) {
      the tooltip away from the only input that needs it. A caller that passes
      pollFacet={null} (the mood chart under the facet menu's width cut) is
      saying there is nothing to open - meta still feeds the tooltip, but the
-     trip is neither offered by the hint nor taken by a click. */
+     trip is neither offered by the hint nor taken by a click. pollFacet may
+     answer a function of the dot's meta instead of a facet id (the Beyond
+     the vote trackers join per wave, so an Essential poll row and a
+     neighbouring direction-only wave sit on different archive facets) - the
+     dot is only openable while it answers a facet. */
   const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
-  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll && pollFacet);
+  const dotFacet = typeof pollFacet === "function" ? (rowKey && pollFacet(dot.meta)) : pollFacet;
+  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll && dotFacet);
   /* A touch tap is read entirely on pointerup below - and then the browser
      dispatches the tap's synthesized click, which would register the same
      tap a second time (reading every single tap as a double). Only a real
@@ -703,7 +708,7 @@ function TrendChart(props) {
   const touchTapAt = useRef(0);
   const handleClick = (e) => {
     if (performance.now() - touchTapAt.current < 400) return;
-    if (openable) { window.AP.openPoll(rowKey, pollFacet, undefined, pollSplit); return; }
+    if (openable) { window.AP.openPoll(rowKey, dotFacet, undefined, pollSplit); return; }
     dblEmpty(e, MOUSE_PICK_PX);
   };
 

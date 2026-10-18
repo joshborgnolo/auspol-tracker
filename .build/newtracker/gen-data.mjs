@@ -18,7 +18,7 @@ import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED,
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
-import { readStores as readOneOffStores, buildBeyond } from "./beyond-the-vote.mjs";
+import { readStores as readOneOffStores, buildBeyond, HOUSES as BTV_HOUSES } from "./beyond-the-vote.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -7146,7 +7146,43 @@ const changelog = JUR ? null : (() => {
    figures and margin rules – the same design effect as the aggregate's, so a
    "level" on that page means what it means here. The static article in
    build.mjs reads this same payload. Federal only. */
-const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: HL_DEFF });
+/* The /beyond-the-vote/ tracker dots open their wave's All-polls row when
+   the wave sits behind one of the four emitted row sets. BTV_HOUSES maps
+   each one-off store key to the pollster name its rows carry in the row
+   sets ("RedBridge/Accent" for the redbridge store, "YouGov" and
+   "SEC Newgate" for the news24 and secnewgate stores' short forms...), and
+   a wave pairs with a row on (store key, fieldwork end) or, when the
+   store's date is the release day beside the row's fieldwork end
+   (Essential's direction catalogue runs a day behind the store), (store
+   key, fieldwork start). Each key answers the row's exact client
+   pollRowKey string and the archive facet its set opens on; the poll facet
+   wins a wave two sets both hold */
+const btvRowKeys = new Map();
+if (!JUR) {
+  /* the emitted rows shed their source datum's dateStart, but Essential's
+     store waves sit a day AFTER their poll/direction row (its direction
+     catalogue runs a day behind the store), so the start-date key space
+     needs the raw datum beside each row. Only the poll and direction row
+     sets are readable this way – and only they can ever match a one-off
+     store, so no other source is spanned */
+  const btvSrcStart = new Map();
+  for (const src of [POLLS, DIR]) for (const p of src)
+    if (p.dateStart) { const k = p.pollster + "|" + p.date; if (!btvSrcStart.has(k)) btvSrcStart.set(k, p.dateStart); }
+  const rowSets = [[individualPolls, "twopp"], [directionOnlyPolls || [], "direction"], [issuesOnlyPolls || [], "issues"], [confidenceOnlyPolls || [], "confidence"]];
+  for (const [storeKey, def] of Object.entries(BTV_HOUSES)) {
+    for (const [rows, facet] of rowSets) {
+      for (const r of rows) {
+        if (r.pollster !== def.full && r.pollster !== def.short) continue;
+        const pay = { rk: r.pollster + "|" + r.released, fk: facet };
+        const ek = storeKey + "|e|" + r.released;
+        if (!btvRowKeys.has(ek)) btvRowKeys.set(ek, pay);
+        const ds0 = r.dateStart || btvSrcStart.get(pay.rk);
+        if (ds0) { const sk = storeKey + "|s|" + ds0; if (!btvRowKeys.has(sk)) btvRowKeys.set(sk, pay); }
+      }
+    }
+  }
+}
+const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: HL_DEFF, rowKeys: btvRowKeys });
 /* the page's count of topics, counted as its own topic list counts them
    (a topic with neither cards nor a list is left off): the main bundle's
    copy of it, for the page's dek and the More menu's line, which render

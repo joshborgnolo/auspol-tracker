@@ -216,8 +216,25 @@ function pairsOf(spec, e) {
 }
 const neffOf = (e, deff) => e.sampleEff || (e.sample ? e.sample / deff : null);
 const fieldOf = (e) => ({ start: e.dateStart || null, end: e.dateEnd || e.waveDate });
-const sourceOf = (e) => ({ house: e.house, wave: e.waveDate, field: fieldOf(e), n: e.sample ?? null,
-  neff: e.sampleEff ?? null, url: e.url || null });
+/* `ds` is the wave's fieldwork start, which no consumer prints until the
+   row-key match below needs it – a poll row and its wave share the pair
+   (pollster, fieldwork end) OR, where the fieldwork window is on both
+   sides, (pollster, fieldwork span). */
+const sourceOf = (e) => ({ house: e.house, wave: e.waveDate, field: fieldOf(e), ds: e.dateStart || (e.fieldwork && e.fieldwork.start) || null,
+  n: e.sample ?? null, neff: e.sampleEff ?? null, url: e.url || null });
+
+/* A wave's All-polls row, if it sits behind one of the row sets gen-data
+   emits: it hands down a map of (store-key, fieldwork end) and (store-key,
+   fieldwork start) pairs to { rk: the client's pollRowKey string, fk: the
+   archive facet the row opens on }. The end pair answers most waves, the
+   start pair the ones whose store date is the release day beside the row's
+   fieldwork end (Essential's direction catalogue is a day behind the
+   store's). A miss is silent - the dot just shows its reading. */
+const rkAttach = (rowKeys, src) => {
+  if (!rowKeys) return src;
+  const hit = rowKeys.get(src.house + "|e|" + src.wave) || (src.ds ? rowKeys.get(src.house + "|s|" + src.ds) : null);
+  return hit ? { ...src, rk: hit.rk, fk: hit.fk } : src;
+};
 
 /* ---- one question's split --------------------------------------------------
    [answer, share] pairs → the agreeing side's answers first (strongest
@@ -410,14 +427,14 @@ const cutsOf = (e) => figuresOf([e]).cuts;
    across pollsters), each line coloured by the family of wording it was
    asked in (`fam`, naming one of the spec's `families`), every reading
    listed beneath. */
-function buildTracker(spec, ix, deff) {
+function buildTracker(spec, ix, deff, rowKeys) {
   const panels = spec.series.map((sr) => {
     const pts = ix.waves(sr.id, sr.house).filter((e) => !(sr.skip || []).includes(e.waveDate)).map((e) => {
       const s = splitOf(sr.pick ? sr.pick(e) : pairsOf(sr, e), { sides: sr.sides || spec.sides, where: where(e) });
       const neff = neffOf(e, deff);
       const v = spec.measure === "net" ? r1(s.a - s.b) : s.a;
       const se = neff ? (spec.measure === "net" ? seNet(s.a, s.b, neff) : seShare(s.a, neff)) : null;
-      return { ...sourceOf(e), x: Math.round(dx(fieldOf(e).end) * 1e4) / 1e4, a: s.a, b: s.b, m: r1(s.m + s.x), v,
+      return { ...rkAttach(rowKeys, sourceOf(e)), x: Math.round(dx(fieldOf(e).end) * 1e4) / 1e4, a: s.a, b: s.b, m: r1(s.m + s.x), v,
         se: se != null ? r1(se) : null };
     }).sort((p, q) => p.x - q.x);
     if (!spec.families[sr.fam]) throw new Error("beyond-the-vote: " + spec.key + " / " + sr.house + " names no wording family");
@@ -1566,7 +1583,7 @@ function figuresOf(ws) {
 }
 
 /* ---- the payload ------------------------------------------------------------- */
-export function buildBeyond(entries, { deff }) {
+export function buildBeyond(entries, { deff, rowKeys }) {
   const shown = entries.filter((e) => themeOf(e.id) !== "cut");
   const ix = makeIndex(shown);
   /* a featured card takes its question-and-pollster pairs out of the topic's
@@ -1578,7 +1595,7 @@ export function buildBeyond(entries, { deff }) {
   const topics = THEMES.map((t) => {
     const specs = FEATURES[t.id] || [];
     const blocks = specs.map((spec) => {
-      const b = spec.kind === "tracker" ? buildTracker(spec, ix, deff)
+      const b = spec.kind === "tracker" ? buildTracker(spec, ix, deff, rowKeys)
         : spec.kind === "split" ? buildSplit(spec, ix, deff)
         : spec.kind === "stack" ? buildStack(spec, ix, deff)
         : spec.kind === "rank" ? buildRank(spec, ix)

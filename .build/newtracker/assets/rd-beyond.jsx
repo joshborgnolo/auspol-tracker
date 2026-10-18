@@ -517,8 +517,10 @@ function BtvTracker({ c, houses }) {
             series={c.panels.map((p) => ({ id: p.house, label: btvHouse(p, houses), color: ink(p.fam), rdWidth: 2, smooth: false,
               endLabel: btvHouse(p, houses), points: p.points.map((q) => ({ x: q.x, y: q.v })) }))}
             spine={spine}
+            pollFacet={(m) => m.facet || null}
             scatter={pts.map((q) => ({ x: q.x, y: q.v, color: ink(q.fam), label: net ? "Net" : btvCap(c.names[0]),
-              meta: { pollster: btvHouse(q, houses, true), dateLabel: btvSpan(q.field), sample: q.n } }))}
+              meta: q.rk ? { pollster: q.rk.split("|")[0], released: q.rk.split("|")[1], facet: q.fk, dateLabel: btvSpan(q.field), sample: q.n }
+                : { pollster: btvHouse(q, houses, true), dateLabel: btvSpan(q.field), sample: q.n } }))}
             tooltipTitle={(i) => { const qs = at(i); return qs.length === 1 ? btvSpan(qs[0].field) : qs.length ? btvDay(qs[0].field.end) : ""; }}
             extraRows={(i) => {
               const qs = at(i);
