@@ -2246,6 +2246,7 @@
       "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1011,
+      "sampleEff": 855,
       "alp": 38,
       "lnp": 24,
       "grn": 9,
@@ -2287,7 +2288,8 @@
         ]
       },
       "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
-      "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll"
+      "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
     },
     {
       "date": "2025-11-16",
