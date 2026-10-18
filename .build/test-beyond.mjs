@@ -15,7 +15,7 @@ import { THEMES, THEME_OF } from "./newtracker/adhoc-themes.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows,
-  splitFinding, tallyFinding, rankFinding, findingMeta } = __test;
+  splitFinding, tallyFinding, rankFinding, findingMeta, tidyTitle, tidyHead, unpack, groupOf, matchKey, figuresOf } = __test;
 
 // ---- an answer's side, from its wording --------------------------------------------
 for (const [label, side] of [
@@ -170,6 +170,93 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   }
 }
 
+// ---- the long tail: a question's tables as a reader reads them ---------------------------
+{
+  /* titles lose table numbers, units, value orders and dates; a base becomes its own line */
+  assert.deepEqual(tidyTitle("Table 40: How much voters have seen, read or heard about the Federal Budget, by demographic characteristics, 28 September - 2 October"),
+    { title: "How much voters have seen, read or heard about the Federal Budget", base: null, measure: null });
+  assert.deepEqual(tidyTitle("Tables 41-43: How voters rate the impact of the federal budget (asked of those who had heard anything, N=868)"),
+    { title: "How voters rate the impact of the federal budget", base: "Asked of those who had heard anything (868 people)", measure: null });
+  assert.deepEqual(tidyTitle("Level of appeal (% among One Nation supporters) — values: very appealing, somewhat appealing, don't know"),
+    { title: "Level of appeal", base: "Among One Nation supporters", measure: null });
+  assert.equal(tidyTitle("Good or bad time to do the following currently (%) — Sep '26 national").title, "Good or bad time to do the following currently");
+  assert.equal(tidyTitle("How much voters have seen, read or heard about the Federal Budget (25-28 May)").title, "How much voters have seen, read or heard about the Federal Budget");
+  assert.equal(tidyTitle("Rating of Australia's relationship with specific country (%) — Excellent / very good / good, Nov '25").measure, "Excellent, very good or good");
+  assert.equal(tidyTitle("Headline (%)").title, null, "a headline table is the figure, not its title");
+  assert.equal(tidyHead("TOTAL: Positive"), "Total positive");
+  assert.equal(tidyHead("Total contributing Sep '26"), "Total contributing Sep 2026");
+  /* earlier readings packed into a label become columns; a net's working goes */
+  assert.deepEqual(unpack("Driven less or combined multiple destinations into one trip (April 2026: 54)"),
+    { label: "Driven less or combined multiple destinations into one trip", then: [{ when: "Apr 2026", v: 54, of: null }], tag: null });
+  assert.deepEqual(unpack("New Zealand (Apr '25/Nov '25: 89/88)").then, [{ when: "Apr 2025", v: 89 }, { when: "Nov 2025", v: 88 }]);
+  assert.equal(unpack("At the current point in time — [Major problem, Minor problem] (April 2026 total problem: 93)").label, "At the current point in time");
+  assert.equal(unpack("Net awareness (deal+amount − notmuch+nothing)").label, "Net awareness");
+  assert.deepEqual(unpack("UK (Nov 23)"), { label: "UK", then: [], tag: "Nov 2023" });
+  /* the groups a crosstab breaks into, by banner */
+  for (const [h, g] of [["Gender: Male", "Gender Male"], ["Age 35 - 49", "Age 35–49"], ["Voted Labor in 2025", "2025 vote Labor"],
+    ["TOTAL: Coalition", "Vote Coalition"], ["L/NP", "Vote Coalition"], ["Household income: <100k", "Income <100k"], ["NSW Respondents", "State NSW"]]) {
+    const x = groupOf(h);
+    assert.equal(x && x.banner + " " + x.label, g, `"${h}" is ${g}`);
+  }
+  assert.ok(groupOf("Australia").all && groupOf("Total").all, "the all-voters column or row");
+  assert.equal(groupOf("Strongly agree"), null, "an answer is no group");
+  assert.equal(matchKey("Pauline Hanson's One Nation"), matchKey("One Nation"), "a party's long name matches its short one");
+
+  /* RedBridge's budget module, two waves: awareness as a list a wave a
+     column, the verdicts unflattened into a battery a statement a row
+     group, the bases merged, the table numbers and dates gone */
+  const flat = (g, xs) => xs.map(([a, v]) => [g + " — " + a, v]);
+  const budget = (end, start, n, aw, country, you, base) => ({ id: "budget", house: "redbridge", waveDate: end, dateStart: start, dateEnd: end, sample: n,
+    tables: [
+      { title: "Table 40: How much voters have seen, read or heard about the Federal Budget, by demographic characteristics, 28 September - 2 October", headers: null,
+        rows: [["A great deal", aw[0]], ["A fair amount", aw[1]], ["Not very much", aw[2]], ["Nothing at all", aw[3]], ["Net awareness", aw[0] + aw[1] - aw[2] - aw[3]]] },
+      { title: "Tables 41-43: How voters rate the impact of the federal budget (asked of those who had heard anything, N=" + base + ")", headers: null,
+        rows: [...flat("For the country as a whole", country), ...flat("For you personally", you)] },
+    ] });
+  const verdict = (vg, g, ni, b, vb, ns) => [["very good", vg], ["good", g], ["no impact", ni], ["bad", b], ["very bad", vb], ["not sure", ns], ["net good", vg + g - b - vb]];
+  const out = figuresOf([
+    budget("2026-10-02", "2026-09-28", 1000, [10, 35, 40, 15], verdict(2, 17, 13, 33, 20, 15), verdict(1, 9, 30, 34, 15, 11), 868),
+    budget("2026-05-28", "2026-05-25", 1005, [21, 44, 29, 6], verdict(3, 20, 10, 31, 22, 14), verdict(1, 10, 31, 32, 16, 10), 950),
+  ]);
+  const [aw, vd] = out.figs;
+  assert.equal(aw.kind, "list");
+  assert.equal(aw.title, "How much voters have seen, read or heard about the Federal Budget");
+  assert.deepEqual(aw.cols, ["Oct 2026", "May 2026"], "each wave a column, latest first");
+  assert.deepEqual(aw.rows.map((r) => r.v), [[10, 21], [35, 44], [40, 29], [15, 6]]);
+  assert.deepEqual(aw.sums, [{ label: "Net awareness", v: [-10, 30] }], "the net sits under its answers, never as a bar");
+  assert.equal(vd.kind, "split", "the verdicts take sides, so they split");
+  assert.deepEqual(vd.heads, ["Very good", "Good", "No impact", "Bad", "Very bad", "Not sure"]);
+  assert.deepEqual(vd.extraHeads, ["Net good"]);
+  assert.equal(vd.base, "Asked of those who had heard anything (868 people in Oct 2026, 950 in May 2026)");
+  assert.deepEqual(vd.rows.map((r) => r.label), ["For the country as a whole", "For you personally"]);
+  assert.deepEqual(vd.rows[0].waves.map((w) => [w.when, w.a, w.b, w.extra[0]]), [["Oct 2026", 19, 53, -34], ["May 2026", 23, 53, -30]]);
+  assert.ok(vd.legend.some((l) => l.side === "m" && l.label === "No impact or not sure"), "the merged middle is named for its answers");
+
+  /* a YouGov crosstab: the Total column is the figure, the groups a cut a
+     banner each; a table filed twice once */
+  const yg = figuresOf([{ id: "x", house: "news24", waveDate: "2026-06-30", dateEnd: "2026-06-30", tables: [
+    { title: null, headers: ["Party", "Total", "Gender: Male", "Gender: Female", "Age 18-34", "Voting intention: Labor"], rows: [["Labor", "41", "42", "39", "50", "96"], ["Greens", "23", "19", "26", "36", "25"]] },
+    { title: null, headers: ["Party", "%"], rows: [["Labor", "41"], ["Greens", "23"]] },
+  ] }]);
+  assert.equal(yg.figs.length, 1, "the re-filed list restates the Total column");
+  assert.deepEqual(yg.figs[0].rows.map((r) => [r.label, r.v[0]]), [["Labor", 41], ["Greens", 23]]);
+  assert.deepEqual(yg.cuts[0].banners, ["Gender", "Gender", "Age", "Vote"]);
+  assert.deepEqual(yg.cuts[0].heads, ["Male", "Female", "18–34", "Labor"]);
+
+  /* Essential: a one-answer slice is dropped; a battery's cut names its
+     measure where the groups average to it, and is dropped where not */
+  const grid = { title: "All voters", headers: ["", "Strongly support", "Somewhat support", "Neither", "Somewhat oppose", "Strongly oppose"],
+    rows: [["Item A", 20, 30, 25, 15, 10], ["Item B", 10, 20, 30, 25, 15]] };
+  const es = (cut) => figuresOf([{ id: "e", house: "essential", waveDate: "2026-05-01", dateEnd: "2026-05-01", tables: [
+    { title: "Strongly support", headers: null, rows: [["Item A", 20], ["Item B", 10]] }, grid,
+    { title: "By gender", headers: ["", "Male", "Female"], rows: cut }] }]);
+  const named = es([["Item A", 52, 48], ["Item B", 31, 29]]);
+  assert.equal(named.figs.length, 1, "the one-answer slice restates the grid");
+  assert.equal(named.figs[0].kind, "split");
+  assert.equal(named.cuts[0].title, "Total support", "men and women average to the all-voters support total");
+  assert.equal(es([["Item A", 70, 60], ["Item B", 5, 6]]).cuts.length, 0, "a cut no all-voters figure explains stays in the source");
+}
+
 // ---- the payload ------------------------------------------------------------------------------
 {
   const entries = readStores(ROOT);
@@ -201,7 +288,18 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   const trump = out.topics.find((t) => t.id === "trump-us").blocks.find((b) => b.kind === "tracker");
   const sec = trump.panels.find((p) => p.house === "secnewgate").points.find((q) => q.field.end === "2025-11-03");
   assert.equal(sec.v, -39, "SEC Newgate's November 2025 net quotes its printed 60% negative (21 - 60), not the parts' 59");
-  for (const t of out.topics) for (const q of t.more) assert.ok(q.title && q.waves.length, `${q.id} lists with its waves`);
+  for (const t of out.topics) for (const q of t.more) {
+    assert.ok(q.title && q.srcs.length, `${q.id} lists with its waves`);
+    assert.ok(q.figs.length || q.prose.length, `${q.id} (${q.house}) opens to figures or the article's words`);
+    for (const f of q.figs) {
+      const txt = [f.title, f.base, f.measure, ...(f.heads || []), ...(f.extraHeads || []), ...f.rows.map((r) => r.label), ...(f.sums || []).map((r) => r.label)].join(" | ");
+      assert.ok(!/\bTables? \d|\(%\)|values?:|value order|\[[A-Z]|\(April \d{4}|['’]\d{2}\b|\bTOTAL\b/.test(txt), `${q.id}: a store's own markings reach the reader: ${txt.slice(0, 160)}`);
+      const nums = f.kind === "list" || f.kind === "nets" ? f.rows.concat(f.sums || []).flatMap((r) => r.v) : f.rows.flatMap((r) => r.waves.flatMap((w) => [...w.cells, ...w.extra]));
+      assert.ok(nums.every((v) => v == null || Number.isFinite(v)), `${q.id}: every figure a number`);
+      if (f.kind === "list" || f.kind === "nets") assert.ok(f.rows.every((r) => r.v.length === f.cols.length), `${q.id}: a list row a value a column`);
+    }
+    for (const c of q.cuts) assert.ok(c.rows.every((r) => r.length === c.heads.length + 1), `${q.id}: a cut row a value a group`);
+  }
   for (const t of out.topics) {
     if (!t.blocks.length) { assert.equal(t.finding, null, `${t.id}: no blocks, no finding`); continue; }
     assert.ok(t.finding && t.finding.text && t.finding.meta, `${t.id} opens on a finding`);
@@ -209,4 +307,4 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     assert.ok(!/[{}]|undefined|NaN/.test(t.finding.text + t.finding.meta), `${t.id}'s finding is filled: "${t.finding.text}"`);
   }
 }
-console.log("PASS: beyond the vote – sides, printed totals, margins, tallies, wave summaries, tracker heads (mutated), findings (every branch), payload");
+console.log("PASS: beyond the vote – sides, printed totals, margins, tallies, wave summaries, tracker heads (mutated), findings (every branch), the long tail's tables (titles, packed readings, groups, waves, cuts), payload");

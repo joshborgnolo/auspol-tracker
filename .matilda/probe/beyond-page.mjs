@@ -5,7 +5,9 @@
    finding; the trackers (one chart each, a line per pollster, the latest
    list beside the chart from 900px and under it below, a copy button);
    the question rows (answers beside the question where they fit, under it
-   on a phone) and "More questions" lists all render from the payload, with
+   on a phone) and "More questions" lists all render from the payload (every
+   list item opening to its figures, no store marking showing, the page
+   holding its width with everything open), with
    no boxed card or per-pollster panel left; every "level" on the page is a
    lead the payload found inside its margin (and none is missing); every row
    names a source; no NaN or undefined reaches a reader; a list item opens
@@ -98,14 +100,24 @@ for (const design of ["new", "old"]) {
     if (m.nan) fail(`${at}: NaN/undefined in the text`);
     if (m.more !== topics.filter((t) => t.more.length).length) fail(`${at}: More lists ${m.more}`);
     if ((design === "new") !== m.rdHead) fail(`${at}: rd head ${m.rdHead} in the ${design} design`);
-    if (design === "new" && w === 1440) {
-      /* a list item opens to its figures */
-      const opened = await page.evaluate(() => {
-        const d = document.querySelector(".btv-more"); d.open = true;
-        const it = d.querySelector(".btv-mi"); it.open = true;
-        return it.querySelectorAll(".btv-table tr, .btv-note").length;
+    if (design === "new" && (w === 1440 || w === 390)) {
+      /* every list item opens to its figures (or the article's words), as
+         many as the payload holds, with no store marking in the text, and
+         the page still fits its width with every item and fold open */
+      const o = await page.evaluate(() => {
+        document.querySelectorAll(".btv-more, .btv-mi, .btv-cuts").forEach((d) => { d.open = true; });
+        const its = [...document.querySelectorAll(".btv-mi")];
+        return { n: its.length, empty: its.filter((it) => !it.querySelector(".btv-fig")).map((it) => it.querySelector(".btv-mq").textContent),
+          figs: document.querySelectorAll(".btv-mi .btv-fig").length, sw: document.documentElement.scrollWidth,
+          marks: [...document.querySelectorAll(".btv-mi .btv-fig")].map((f) => f.textContent).filter((t) => /\bTables? \d|\(%\)|values?:|value order|\(April \d{4}/.test(t)).length };
       });
-      if (!opened) fail("a More-questions item opened to nothing");
+      const moreN = topics.reduce((n, t) => n + t.more.length, 0);
+      const figN = topics.reduce((n, t) => n + t.more.reduce((k, q) => k + q.figs.length + q.prose.length, 0), 0);
+      if (o.n !== moreN) fail(`${at}: More items ${o.n}/${moreN}`);
+      if (o.empty.length) fail(`${at}: items opened to nothing: ${o.empty.slice(0, 3).join(" | ")}`);
+      if (o.figs !== figN) fail(`${at}: opened figures ${o.figs}/${figN}`);
+      if (o.marks) fail(`${at}: ${o.marks} figure(s) show a store's table numbers, units or packed readings`);
+      if (o.sw !== w) fail(`${at}: with every item open the page is ${o.sw}px wide`);
     }
     await page.close();
   }

@@ -49,11 +49,11 @@ export function readStores(root) {
     return pick(JSON.parse(fs.readFileSync(p, "utf8")));
   };
   const entries = [];
-  /* YouGov (News24), Newspoll, DemosAU: .one_offs, data.tables/data.prose,
-     fieldwork{start,end}, articleUrl */
+  /* YouGov (News24), Newspoll, DemosAU: .one_offs, data.tables/data.prose
+     (a table's title in its `name`), fieldwork{start,end}, articleUrl */
   for (const [house, file] of [["news24", "news24-one-offs.json"], ["newspoll", "newspoll-one-offs.json"], ["demosau", "demosau-one-offs.json"]]) {
     for (const e of read(file, (j) => j.one_offs || [])) {
-      const tables = (e.data && e.data.tables || []).map((t) => ({ title: t.title || null, headers: t.headers || null, rows: t.rows || [] }));
+      const tables = (e.data && e.data.tables || []).map((t) => ({ title: t.title || t.name || null, headers: t.headers || null, rows: t.rows || [] }));
       entries.push({ house, id: e.id, waveDate: e.waveDate,
         dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
         sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
@@ -284,7 +284,7 @@ function buildSplit(spec, ix, deff) {
   return { kind: "split", id: spec.key || spec.ref.id, title: spec.title, question: spec.question || e.question,
     note: spec.note || null, src: sourceOf(e), segs: s.segs, a: s.a, b: s.b, m: s.m, x: s.x, xLabel: s.xLabel,
     names: s.names, ...(spec.noLead ? { lead: null, moe: null, sig: null } : leadOf(s.a, s.b, neffOf(e, deff))),
-    folds: foldsOf(e, mainTable(e, spec.table)) };
+    cuts: cutsOf(e) };
 }
 
 /* rows of splits: a battery's statements (one poll), or one question across
@@ -387,7 +387,7 @@ function buildRank(spec, ix) {
   if (spec.sort !== false) rows.sort((p, q) => q.v - p.v);
   return { kind: "rank", id: spec.key || spec.ref.id, title: spec.title, question: spec.question || e.question,
     note: spec.note || null, src: sourceOf(e), base: spec.base || null, rows, show: spec.show || 6,
-    folds: foldsOf(e, mainTable(e, spec.table)) };
+    cuts: cutsOf(e) };
 }
 
 /* net scores from zero (a message test's "net more willing") */
@@ -399,19 +399,9 @@ function buildNets(spec, ix) {
     note: spec.note || null, src: sourceOf(e), unit: spec.unit, rows };
 }
 
-/* the breakdown tables a card keeps behind its fold: every table but the
-   one it draws, cleaned the same way, repeats dropped */
-function foldsOf(e, drawn) {
-  const seen = new Set();
-  return (e.tables || []).filter((t) => t !== drawn && (t.rows || []).length && !/^all voters$/i.test(t.title || ""))
-    .map((t) => ({ title: t.title || null, headers: t.headers || null, rows: tableRows(t) }))
-    .filter((t) => {
-      const k = JSON.stringify(t);
-      if (!t.rows.length || seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
-}
+/* the breakdowns a card keeps behind its fold: its wave's cuts, read the
+   way the topics' long lists read theirs (figuresOf below) */
+const cutsOf = (e) => figuresOf([e]).cuts;
 
 /* ---- trackers ---------------------------------------------------------------
    One question asked again and again, by several pollsters in their own
@@ -929,6 +919,652 @@ export const FEATURES = {
   ],
 };
 
+/* ---- a question's tables, as a reader reads them -----------------------------
+   The stores file each pollster's tables in its own house style: Essential's
+   all-voters grid with one-answer slices and crosstab blocks beside it,
+   YouGov's fifty-column banners, DemosAU's group rows, SEC Newgate's chart
+   titles with their value orders, RedBridge's table numbers and flattened
+   "group — answer" rows. figuresOf reads one question's waves into one shape
+   for every pollster:
+   - figures, the all-voters answers. A list of answers is drawn as bars
+     (nets either side of zero, scores on their own scale); a battery
+     (statements down, the same answers across) as the page's split bars
+     where every answer places on a side, else as a table. A printed TOTAL or
+     net sits under its answers and is never drawn, unless it is all the
+     pollster printed of its side. The same figure from several waves is set
+     side by side (a list's waves as columns, a battery's as rows under each
+     statement), and an earlier reading the store packed into a label
+     ("(April 2026: 54)") or a series table becomes one more column.
+   - cuts, the latest wave's breakdowns by group, one table a block with a
+     banner over each cut. A battery's breakdown names its measure only where
+     the all-voters figures pin it down; one they cannot stays in the source.
+   - nothing twice: a figure that restates another (Essential's one-answer
+     slices and summed headlines, SEC Newgate's headline shares, a crosstab
+     re-filed as a list, a table filed twice) is dropped.
+   Titles lose their table numbers, units, value orders and dates, and a base
+   ("asked of those who had heard anything, N=868") becomes a line under the
+   figure. Figures print as filed: nothing is rescaled, and a battery's bar
+   ends are its printed TOTALs, or the sum of its printed answers where no
+   TOTAL was printed (splitOf's rule). */
+const INVIS = /[­​-‏⁠﻿ㅤᅟᅠ]/g;
+const tidy = (s) => String(s ?? "").replace(INVIS, "").replace(/\s+/g, " ").trim();
+const MON3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MON_P = "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
+const DAYS_P = "\\d{1,2}(?:\\s+" + MON_P + ")?\\s*[-–]\\s*\\d{1,2}\\s+" + MON_P + "(?:\\s+\\d{4})?";
+const STAMP_P = MON_P + "\\.?\\s*(?:['’]\\d{2}|\\d{4})";
+/* a month as a column names it: "Apr '25", "April 2026", "Nov 23" → "Apr 2025" */
+function monthLabel(m, y) {
+  const i = MON3.findIndex((x) => x.toLowerCase() === String(m).slice(0, 3).toLowerCase());
+  const yy = String(y).replace(/^['’]/, "");
+  return i < 0 ? null : MON3[i] + " " + (yy.length === 2 ? "20" + yy : yy);
+}
+/* "Apr 2025" → 202504, to sort columns newest first */
+const monthKey = (m) => +m.slice(-4) * 100 + MON3.indexOf(m.slice(-8, -5)) + 1;
+/* the same words however a store typed them: quotes, a leading "the",
+   the parties' long and short names, the unsures */
+const matchKey = (s) => tidy(s).toLowerCase().replace(/[‘’'“”"]/g, "").replace(/^(?:the|it will|they will|they would)\s+/, "")
+  .replace(/^(?:liberal national coalition|l\/np|lnp)\b.*$/, "coalition").replace(/^pauline hanson.?s one nation\b.*$|^one nation\b.*$/, "one nation")
+  .replace(/^(?:undecided|unsure|not sure|don.?t know)(?: or no preference)?$/, "unsure").replace(/^none of the above$|^i would not .*any of the above.*$/, "none")
+  .replace(/\s+/g, " ").trim();
+
+/* ---- titles, heads and labels ---- */
+const T_RX = {
+  number: /^tables?\s+\d+(?:\s*[-–]\s*\d+)?\s*:\s*/i,
+  order: /\s*(?:;|[—–]|\s-)\s*(?:values?|value order)\s*:.*$/i,
+  demo: /,?\s*by demographic characteristics\b/i,
+  days: new RegExp(",?\\s*" + DAYS_P + "\\s*$", "i"),
+  stamp: new RegExp("\\s*[—–,-]\\s*" + STAMP_P + "(?:\\s+(?:national|totals?))?\\s*$", "i"),
+  daysOnly: new RegExp("^" + DAYS_P + "$", "i"),
+};
+/* the people a figure was asked of, from its title's parenthesis */
+function baseOf(s) {
+  const n = (s.match(/\bn\s*=\s*([\d,]+)/i) || [])[1];
+  const b = s.replace(/^%\s*/, "").replace(/[;,]?\s*base:.*$/i, "").replace(/[;,]?\s*n\s*=\s*[\d,]+/i, "").trim();
+  return capFirst(b) + (n ? " (" + Number(n.replace(/,/g, "")).toLocaleString("en-AU") + " people)" : "");
+}
+/* "Excellent / very good / good" → "Excellent, very good or good" */
+const orList = (xs) => (xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " or " + xs[xs.length - 1]);
+function tidyTitle(raw) {
+  let t = tidy(raw), base = null, measure = null;
+  t = t.replace(T_RX.number, "").replace(T_RX.order, "").replace(T_RX.demo, "");
+  t = t.replace(/\s*\(([^()]*)\)/g, (m, inner) => {
+    const s = inner.trim();
+    if (/^(?:total,\s*)?%$/i.test(s) || T_RX.daysOnly.test(s)) return "";
+    if (/^(?:%\s*)?among\b|^asked of\b|\bbase:/i.test(s)) { base = baseOf(s); return ""; }
+    return m;
+  });
+  for (let k = 0; k < 2; k++) t = t.replace(T_RX.days, "").replace(T_RX.stamp, "");
+  t = t.replace(new RegExp("(" + MON_P + ")\\s*['’](\\d{2})\\b", "gi"), (x, mo, y) => monthLabel(mo, y));
+  /* "a chart's title — its subtitle": the subtitle where the title only
+     names a measure ("Level of support"), else the title; a subtitle that
+     lists answers names the figure's measure */
+  const parts = t.split(/\s+[—–]\s+/);
+  if (parts.length === 2) {
+    if (/\s\/\s/.test(parts[1])) measure = capFirst(orList(parts[1].split(/\s*\/\s*/).map((x) => x.toLowerCase())));
+    t = /^(?:level of \w+|extent\b|share\b)/i.test(parts[0]) && parts[1].length > 12 && !measure ? capFirst(parts[1]) : parts[0];
+  }
+  t = t.replace(/[\s,;:—–-]+$/, "").trim();
+  if (/^(?:headline|all voters|all respondents|total|series|%|% selected)$/i.test(t)) t = "";
+  return { title: t || null, base, measure };
+}
+/* a column head: units off, a TOTAL in sentence case, a wave stamp spelt out */
+const tidyHead = (h) => tidy(h).replace(/\s*\(%\)$/, "").replace(/\s*%$/, "").replace(/^%\s*/, "").replace(/\s%\s\(/, " (")
+  .replace(/^TOTAL:?\s+/i, "Total ").replace(/^Total ([A-Z])(?=[a-z])/, (m, c) => "Total " + c.toLowerCase())
+  .replace(new RegExp("(" + MON_P + ")\\s*['’](\\d{2})\\b", "gi"), (m, mo, y) => monthLabel(mo, y)).trim();
+/* a label column's head that says what the rows are ("Albanese attribute",
+   "Primary vote % (excl. 6% undecided)"); the stores' generic ones say
+   nothing */
+const GENERIC_H = /^(?:|response|statement|group|figure|party|target|aspect|action|contributor|timeframe|initiative|index|business figure|column|total|all voters|preferred approach.*|.*\?)$/i;
+/* an earlier reading the store packed into a label, and its wave tag:
+   "Driven less (April 2026: 54)", "New Zealand (Apr '25/Nov '25: 89/88)",
+   "At the current point in time — [Major problem, …] (April 2026 total
+   problem: 93)", "UK (Nov 23)", "For you — good thing (Sep '26)" */
+const PACK_ONE = new RegExp("\\s*\\((" + MON_P + ")\\s+['’]?(\\d{2,4})(?:\\s+(total(?:\\s+[a-z][a-z ]*)?))?:\\s*(-?[\\d.]+)\\)\\s*$", "i");
+const PACK_TWO = new RegExp("\\s*\\((" + MON_P + ")\\s*['’]?(\\d{2,4})\\s*/\\s*(" + MON_P + ")\\s*['’]?(\\d{2,4}):\\s*(-?[\\d.]+)\\s*/\\s*(-?[\\d.]+)\\)\\s*$", "i");
+const TAG = new RegExp("\\s*\\((" + MON_P + ")\\s*['’]?(\\d{2,4})\\)\\s*$", "i");
+function unpack(raw) {
+  let label = tidy(raw).replace(/\s*[—–]\s*\[[^\]]*\]/g, "");
+  const then = [];
+  let m = label.match(PACK_TWO);
+  if (m) {
+    then.push({ when: monthLabel(m[1], m[2]), v: +m[5] }, { when: monthLabel(m[3], m[4]), v: +m[6] });
+    label = label.replace(PACK_TWO, "");
+  } else if ((m = label.match(PACK_ONE))) {
+    then.push({ when: monthLabel(m[1], m[2]), v: +m[4], of: m[3] ? capFirst(m[3].toLowerCase()) : null });
+    label = label.replace(PACK_ONE, "");
+  }
+  let tag = null;
+  if ((m = label.match(TAG))) { tag = monthLabel(m[1], m[2]); label = label.replace(TAG, ""); }
+  /* a net's working ("Net awareness (deal+amount − notmuch+nothing)") */
+  label = label.replace(/\s*\([^()]*[a-z]\s*[+−-]\s*[a-z][^()]*\)\s*$/i, "");
+  /* a TOTAL in sentence case ("TOTAL: Important" → "Total important") */
+  label = label.replace(/^TOTAL:?\s+(\S)/i, (x, c) => "Total " + c.toLowerCase());
+  return { label: label.trim(), then, tag };
+}
+
+/* ---- the groups a crosstab breaks its sample into ---- */
+const ALL_G = /^(?:total|all voters|all respondents|australia|national|column|all|adults)$/i;
+const GROUP_RX = [
+  ["Gender", /^(?:gender:\s*)?(males?|females?|men|women)$/i],
+  ["Age", /^(?:age:?\s*)?(\d{2}\s*[-–]\s*\d{2}|\d{2}\s*\+|under \d{2}|over \d{2}|\d{2} and over)(?:\s*year olds?)?$/i],
+  ["Generation", /^(gen ?z|millennials|gen ?x|boomers?|silent generation)$/i],
+  ["2025 vote", /^(?:2025 voted:\s*|voted\s+(?:in\s+2025:\s*)?)(.+?)(?:\s+in\s+2025|\s+2025)?$/i],
+  ["2025 vote", /^(.+?) voter 2025$/i],
+  ["Vote", /^(?:(?:federal )?voting intention:\s*|total:?\s*)?(labor|coalition|liberal|nationals?|liberal national coalition|l\/np|lnp|alp|greens|the greens|grn|one nation|onp|independents?|other|oth|dk|don.?t know|undecided|minor parties\/independents)(?:\s+voters|\s+fed vi)?$/i],
+  ["State", /^(nsw|vic|qld|sa|wa|tas|act|nt|act\/nt\/tas|victoria|queensland|new south wales|western australia|south australia|tasmania|victorian|western australian|south australian)$/i],
+  ["Region", /^(?:region:\s*)?(inner metro(?:politan)?|outer metro(?:politan)?|provincial|rural|regional(?:\/rural)?|capital cit(?:y|ies)|metro(?:politan)?)$/i],
+  ["Income", /^(?:household income:?\s*|parental income\s+|income\s+|earning\s+)?((?:[<>]\s*)?\$?[<>]?[\d.,]+k?(?:\s*[-–]\s*\$?[\d.,]+k?)?\s*\+?|(?:less|more) than \$[\d.,]+k?|(?:over|under) \$[\d.,]+k?)$/i],
+  ["Income", /^((?:low|high|middle)-income earners)$/i],
+  ["Children", /^(?:parental status:\s*)?(yes, children.*|no, i am neither.*|neither parent.*)$/i],
+  ["Work", /^(full time employed|part time employed|retired|unemployed)$/i],
+  ["Education", /^(up to year 12|tafe\/college|tafe|tertiary|university|school)(?: education)?$/i],
+  ["Language", /^(other language.*|only english.*|english(?: only)?|lote)$/i],
+  ["Work", /^(retirees)$/i],
+  ["Region", /^(rural or regional)$/i],
+  ["Housing", /^(?:housing:\s*)?(own (?:home )?outright|home owner|mortgag.*|renting home|renter|mortgage holder)$/i],
+  ["Class", /^(well off|middle class|working class)$/i],
+];
+const G_PRETTY = { "l/np": "Coalition", lnp: "Coalition", "liberal national coalition": "Coalition", alp: "Labor", onp: "One Nation",
+  grn: "Greens", "the greens": "Greens", oth: "Other", dk: "Undecided", males: "Male", females: "Female", men: "Male", women: "Female",
+  genz: "Gen Z", "gen z": "Gen Z", genx: "Gen X", "gen x": "Gen X", boomer: "Boomers", victorian: "Victoria",
+  "western australian": "WA", "south australian": "SA" };
+function groupOf(h) {
+  const s = tidyHead(h).replace(/\s+respondents$/i, "").replace(/\s+year old$/i, "");
+  if (ALL_G.test(s)) return { banner: null, label: "All voters", all: true };
+  for (const [banner, rx] of GROUP_RX) {
+    const m = s.match(rx);
+    if (m) {
+      const g = tidy(m[1] || s).replace(/\s*-\s*/g, "–").replace(/^yes, children (.+)$/i, "Children $1").replace(/^no, i am neither.*|^neither parent.*/i, "Not a parent")
+        .replace(/^other language.*$/i, "Other language").replace(/^only english.*$/i, "English only").replace(/^lote$/i, "Other language");
+      return { banner, label: G_PRETTY[g.toLowerCase()] || capFirst(g) };
+    }
+  }
+  return null;
+}
+/* an Essential crosstab block's cut, from its title */
+function cutOfTitle(raw) {
+  const m = tidy(raw).match(/^by (.+)$/i);
+  if (!m) return null;
+  const k = m[1].toLowerCase();
+  return k === "gender" ? "Gender" : k === "age" ? "Age" : k === "voting intention" ? "Vote"
+    : /^vote at the \d{4} election$/.test(k) ? k.replace(/^vote at the (\d{4}) election$/, "$1 vote") : capFirst(m[1].replace(/^[A-Z][a-z]/, (x) => x.toLowerCase()));
+}
+
+/* ---- one table, tidied ---- */
+const isNum = (v) => num(v) != null;
+/* a segment's heading row, carried through a table as a marked label */
+const SECT = "\u00a7 ";
+function normTable(t) {
+  const { title, base, measure: tm } = tidyTitle(t.title);
+  let headers = t.headers && t.headers.length ? t.headers.map((h) => tidy(h)) : null;
+  let rows = (t.rows || []).map((r) => (Array.isArray(r) ? r : [r]).map((c, i) => (i ? c : tidy(c))));
+  let measure = tm;
+  /* a "header" carrying a figure is a data row the extraction lifted */
+  if (headers && headers.slice(1).some((h) => /^-?\d+(?:\.\d+)?%?$/.test(h))) { rows.unshift(headers); headers = null; }
+  /* a table in segments, each opening on a row of names (Newspoll's traits
+     by PM v opposition leader): the names become the segment's heading,
+     the word over them the measure */
+  const named = (r) => !tidy(r[0]) && r.slice(1).every((c) => c != null && tidy(c) && !isNum(c));
+  if (headers && rows.filter(named).length >= 2) {
+    measure = tidyHead(headers.find((h, i) => i && h) || "") || measure;
+    const w = rows[0].length;
+    headers = ["", ...rows.find(named).slice(1).map((c) => tidy(c))];
+    rows = rows.map((r) => (named(r) ? [SECT + r.slice(1).map((c) => tidy(c)).join(" v "), ...Array(w - 1).fill(null)] : r));
+  }
+  /* a first row of names under a one-word header is the real header, the
+     word over it the measure ("Total agree (%)" over "Mr Rudd | Mr Turnbull") */
+  if (headers && rows.length > 1 && !rows[0][0] && rows[0].slice(1).every((c) => c != null && tidy(c) && !isNum(c))) {
+    measure = tidyHead(headers.find((h, i) => i && h) || "") || measure;
+    headers = ["", ...rows[0].slice(1).map((c) => tidy(c))];
+    rows = rows.slice(1);
+  }
+  /* a label column every row repeats says nothing ("Voted Coalition 2025 |
+     Intends to vote Labor | 4") */
+  if (rows.length > 1 && rows[0].length > 2 && rows.every((r) => r[0] === rows[0][0]) && rows.every((r) => !isNum(r[1]))) {
+    rows = rows.map((r) => [tidy(r[1]), ...r.slice(2)]);
+    headers = headers && headers.slice(1);
+  }
+  rows = tableRows({ headers, rows });
+  /* columns no row fills (Essential's item names filed as answers) */
+  if (headers) {
+    const keep = headers.map((h, i) => i === 0 || rows.some((r) => isNum(r[i])));
+    headers = headers.filter((_, i) => keep[i]);
+    rows = rows.map((r) => r.filter((_, i) => keep[i]));
+  }
+  headers = headers && headers.map(tidyHead);
+  /* what the rows are, where the label column's head says so */
+  const rowsAre = headers && !GENERIC_H.test(headers[0]) ? headers[0].replace(/\s+attributes?$/i, "") : null;
+  return { raw: tidy(t.title) || null, title: title || (rowsAre && rowsAre.split(" ").length <= 3 ? rowsAre : null), base,
+    measure: measure || (rowsAre && rowsAre.split(" ").length > 3 ? rowsAre : null), headers, rows };
+}
+/* "group — answer" rows, flattened by the extraction, back into a grid:
+   "For the country as a whole — very good" … "For you personally — net good" */
+function unflatten(t) {
+  if (t.headers && t.headers.length > 2) return null;
+  const parts = t.rows.map((r) => {
+    const u = unpack(r[0]);
+    const m = u.label.match(/^(.+?)\s+[—–]\s+(.+)$/);
+    return m ? { g: m[1], a: m[2], v: r[1] } : null;
+  });
+  if (parts.length < 4 || parts.some((p) => !p)) return null;
+  const groups = [...new Set(parts.map((p) => p.g))], answers = [...new Set(parts.map((p) => p.a))];
+  if (groups.length < 2 || answers.length < 2 || groups.length * answers.length > parts.length * 1.5) return null;
+  return { ...t, headers: ["", ...answers.map(capFirst)],
+    rows: groups.map((g) => [g, ...answers.map((a) => { const p = parts.find((x) => x.g === g && x.a === a); return p ? p.v : null; })]) };
+}
+
+/* ---- figures ---- */
+/* a column that sums up the answers beside it (a TOTAL, a net, a change, a
+   "Usually + Sometimes") or reads another wave ("TOTAL contributing Apr '24") */
+const SUM_H = /^(?:total|net)\b|\bnet (?:good|agree|support|positive|awareness|increase)\b|^change\b|\bchange since\b|\s\+\s/i;
+const DATED_H = new RegExp("\\b" + MON_P + "\\s+\\d{4}\\b|\\b(?:19|20)\\d{2}\\b", "i");
+const NET_L = /^net\b|\s[—–]\s+net\s+\w+$/i;
+/* a scale the pollster scores rather than shares out (Essential's 0–10
+   happiness, DemosAU's index out of 100) */
+function unitOf(t, vs) {
+  const h = (t.headers || []).join(" ") + " " + (t.title || "");
+  if (/out of 100|\bindex\b|\bscore\b/i.test(h)) return { unit: "score", max: 100 };
+  if (vs.length && vs.every((v) => v >= 0 && v <= 10) && vs.some((v) => v % 1 !== 0) && vs.reduce((s, v) => s + v, 0) < 60) return { unit: "score", max: 10 };
+  return { unit: "%", max: 100 };
+}
+function listFig(t, when) {
+  const rows = [], sums = [], seen = new Set();
+  let vh = t.headers && t.headers[1] && !/^(?:column|total|share|all voters)?$/i.test(t.headers[1]) ? t.headers[1] : null;
+  let base = t.base, named = false;
+  /* a value column headed by who was asked ("Parents of children under 16
+     (n=331), column %") is the figure's base */
+  const who = vh && vh.match(/^(.+?)\s*\(n\s*=\s*([\d,]+)\)(?:,\s*column)?$/i);
+  if (who) { base = base || "Among " + who[1].charAt(0).toLowerCase() + who[1].slice(1) + " (" + Number(who[2].replace(/,/g, "")).toLocaleString("en-AU") + " people)"; vh = null; }
+  for (const r of t.rows) {
+    const v = num(r[1]);
+    if (v == null) continue;
+    const u = unpack(r[0]);
+    if (!u.label) { u.label = vh || t.measure || "All voters"; named = true; }
+    const k = matchKey(u.label);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    (RX.summary.test(u.label) || NET_L.test(u.label) ? sums : rows).push({ label: u.label, v, then: u.then });
+  }
+  /* a TOTAL is all its side gets where the pollster printed none of the
+     side's answers ("Neither 30, Total support 49, Total oppose 20") */
+  for (const s of sums.slice()) {
+    if (NET_L.test(s.label)) continue;
+    const side = classify(s.label);
+    if (["a", "b"].includes(side) && !rows.some((r) => classify(r.label) === side)) { rows.push(s); sums.splice(sums.indexOf(s), 1); }
+  }
+  const { unit, max } = unitOf(t, rows.concat(sums).map((r) => r.v));
+  /* nets alone ("Taylor will fight for people like me — net agree") */
+  if (!rows.length && sums.length && sums.every((s) => NET_L.test(s.label))) {
+    const m = sums[0].label.match(/\s[—–]\s+(net\s+\w+)$/i);
+    return { kind: "nets", title: t.title, base, measure: m ? capFirst(m[1]) : t.measure || vh, when,
+      rows: sums.map((s) => ({ ...s, label: s.label.replace(/\s[—–]\s+net\s+\w+$/i, "") })), sums: [] };
+  }
+  return { kind: "list", title: t.title, base, measure: named ? null : t.measure || (unit === "%" ? vh : null), unit, max, when, rows, sums };
+}
+function gridFig(t, when) {
+  const cols = t.headers.slice(1).map((h, k) => ({ h, i: k + 1, sum: SUM_H.test(h) || DATED_H.test(h) }));
+  const ans = cols.filter((c) => !c.sum);
+  const sides = ans.map((c) => classify(c.h));
+  const split = ans.length >= 2 && sides.every((s) => s !== "o") && sides.includes("a") && sides.includes("b");
+  /* a battery of one statement reads as a list of its answers, unless it
+     splits (then it is one bar) */
+  if (t.rows.length === 1 && !split) {
+    const r = t.rows[0];
+    const g = groupOf(r[0]);
+    return listFig({ ...t, base: t.base || (g && !g.all ? "Among " + (g.banner === "Vote" ? g.label + " voters" : g.label.toLowerCase()) : null),
+      headers: ["", ""], rows: cols.map((c) => [c.h, r[c.i]]) }, when);
+  }
+  /* the middle answers, merged into one grey segment, named for what they
+     are ("No impact or not sure") */
+  const mids = ans.filter((c, k) => sides[k] === "m").map((c) => core(c.h));
+  const midName = mids.length > 1 ? capFirst(orList(mids.map((m, k) => (k ? lowFirst(m) : m)))) : undefined;
+  /* a side's printed TOTAL makes its bar end; the other summaries print
+     beside the bar */
+  const ends = split ? cols.filter((c) => c.sum && /^total\b/i.test(c.h) && !DATED_H.test(c.h) && ["a", "b"].includes(classify(c.h))) : [];
+  const extra = cols.filter((c) => c.sum && !ends.includes(c));
+  const rows = t.rows.map((r) => {
+    if (String(r[0]).startsWith(SECT)) return { label: String(r[0]).slice(SECT.length), sect: true, then: [], cells: [], extra: [] };
+    const u = unpack(r[0]);
+    const row = { label: u.label, then: u.then, cells: ans.map((c) => num(r[c.i])), extra: extra.map((c) => num(r[c.i])) };
+    if (split) {
+      const s = splitOf([...ans.map((c) => [c.h, r[c.i]]), ...ends.map((c) => [c.h, r[c.i]])], { strict: false, midName });
+      Object.assign(row, { segs: s.segs, a: s.a, b: s.b });
+    }
+    return row;
+  }).filter((r) => r.sect || r.cells.some((v) => v != null) || r.extra.some((v) => v != null));
+  return { kind: split ? "split" : "table", title: t.title, base: t.base, measure: t.measure, when, one: rows.length === 1,
+    heads: ans.map((c) => c.h), extraHeads: extra.map((c) => c.h),
+    legend: split ? legendOf(splitOf(ans.map((c) => [c.h, 1]), { strict: false, midName }).segs, {}) : null, rows };
+}
+/* a figure's columns, as value lists (a split's ends; Essential's
+   "Total support (strongly + somewhat)", the first two answers summed) */
+function columnsOf(f) {
+  if (f.kind === "list" || f.kind === "nets") return [f.rows.concat(f.sums).map((r) => r.v)];
+  const out = [...f.heads.map((_, k) => f.rows.map((r) => r.cells[k])), ...f.extraHeads.map((_, k) => f.rows.map((r) => r.extra[k]))];
+  if (f.kind === "split") out.push(f.rows.map((r) => r.a), f.rows.map((r) => r.b));
+  if (f.heads.length >= 2) out.push(f.rows.map((r) => (r.cells[0] ?? 0) + (r.cells[1] ?? 0)));
+  /* a one-statement figure's answers are a list of their own */
+  if (f.rows.length === 1) out.push([...f.rows[0].cells, ...f.rows[0].extra, ...(f.kind === "split" ? [f.rows[0].a, f.rows[0].b] : [])]);
+  return out;
+}
+const vals = (xs) => xs.filter((v) => v != null).map((v) => r1(v)).sort((a, b) => a - b);
+/* every value of xs among ys, as many times as it appears */
+function within(xs, ys) {
+  const pool = ys.slice();
+  return xs.every((x) => { const i = pool.indexOf(x); if (i < 0) return false; pool.splice(i, 1); return true; });
+}
+function restates(f, others) {
+  if (f.kind === "list" || f.kind === "nets") {
+    const v = vals(f.rows.concat(f.sums).map((r) => r.v));
+    return v.length >= 2 && others.some((g) => columnsOf(g).some((c) => { const w = vals(c); return v.length >= 3 ? within(v, w) : v.join() === w.join(); }));
+  }
+  /* a battery whose every column another battery of the same rows prints */
+  const mine = columnsOf(f).slice(0, f.heads.length + f.extraHeads.length).map((c) => vals(c).join());
+  return others.some((g) => g.kind !== "list" && g.kind !== "nets" && g.rows.length === f.rows.length
+    && g.rows.every((r, i) => matchKey(r.label) === matchKey(f.rows[i].label))
+    && mine.every((c) => columnsOf(g).some((d) => vals(d).join() === c)));
+}
+/* a battery's breakdown names no measure: the all-voters figure that the
+   cut's own groups average to (its men and women within 2.5 points, its
+   three age bands within 4), else no name and no table */
+function measureOfCut(cut, grid) {
+  const by = new Map(grid.rows.map((r) => [matchKey(r.label), r]));
+  const rows = cut.rows.filter((r) => by.has(matchKey(r[0])));
+  if (rows.length < Math.max(2, cut.rows.length * 0.6)) return null;
+  const sides = grid.heads.map((h) => classify(h));
+  const sum = (r, s) => r.cells.reduce((t, v, k) => t + (sides[k] === s ? v || 0 : 0), 0);
+  const stem = (s) => {
+    const xs = grid.heads.filter((_, k) => sides[k] === s).map((h) => core(h).toLowerCase().replace(new RegExp("^" + PRE, "i"), "").trim());
+    return xs.length > 1 && xs.every((x) => x === xs[0]) ? "Total " + xs[0] : null;
+  };
+  const cands = [
+    ...(sides.includes("a") ? [{ name: stem("a"), f: (r) => sum(r, "a") }] : []),
+    ...(sides.includes("b") ? [{ name: stem("b"), f: (r) => sum(r, "b") }] : []),
+    ...grid.heads.map((h, k) => ({ name: h, f: (r) => r.cells[k] })),
+  ];
+  const test = [["Gender", 2.5], ["Age", 4]].map(([b, tol]) => ({ ks: cut.banners.map((x, k) => (x === b ? k + 1 : -1)).filter((k) => k > 0), tol })).filter((x) => x.ks.length >= 2);
+  if (!test.length) return null;
+  const fits = cands.filter((c) => rows.every((r) => {
+    const av = c.f(by.get(matchKey(r[0])));
+    return av != null && test.every((x) => {
+      const gv = x.ks.map((k) => num(r[k])).filter((v) => v != null);
+      return gv.length === x.ks.length && Math.abs(gv.reduce((s, v) => s + v, 0) / gv.length - av) <= x.tol;
+    });
+  }));
+  /* the same figures under two names (one answer that is a whole side) count once */
+  const uniq = fits.filter((c, i) => fits.findIndex((d) => grid.rows.every((r) => d.f(r) === c.f(r))) === i);
+  return uniq.length === 1 && uniq[0].name ? uniq[0].name : null;
+}
+
+/* ---- one wave ---- */
+function waveFigures(e, when) {
+  const tabs = (e.tables || []).map(normTable).filter((t) => t.rows.length).map((t) => {
+    const hs = FIG_HEADS[e.id + "|" + e.house];
+    return hs && t.headers && t.headers.length === hs.length + 1 ? { ...t, headers: ["", ...hs] } : t;
+  });
+  const figs = [], series = [], cuts = [], oneRows = [];
+  /* a cut with its groups across: blocks of the same rows join one table,
+     banner by banner, their rows matched by label whatever their order */
+  const across = new Map();
+  const addAcross = (rows, groups, banners, title = null) => {
+    const k = (title || "") + "|" + rows.map((r) => matchKey(unpack(r[0]).label)).sort().join("|");
+    const c = across.get(k);
+    if (c) {
+      for (const r of rows) {
+        const x = c.rows.find((y) => matchKey(y[0]) === matchKey(unpack(r[0]).label));
+        x.push(...r.slice(1));
+      }
+      c.heads.push(...groups);
+      c.banners.push(...banners);
+      return;
+    }
+    const n = { down: false, title, heads: groups.slice(), banners: banners.slice(), rows: rows.map((r) => [unpack(r[0]).label, ...r.slice(1)]) };
+    across.set(k, n);
+    cuts.push(n);
+  };
+  for (const t0 of tabs) {
+    const t = unflatten(t0) || t0;
+    if (/^series$/i.test(t0.raw || "")) { series.push(t); continue; }
+    const titled = cutOfTitle(t0.raw || "");
+    const whole = t0.raw && !titled ? groupOf(t0.raw) : null;
+    if (titled) {
+      if (t.headers && t.headers.length > 2) {
+        const gs = t.headers.slice(1).map((h) => groupOf(h) || { label: h });
+        addAcross(t.rows, gs.map((g) => g.label), gs.map(() => titled));
+      } else {
+        /* one figure a group, the groups down (DemosAU's "By Income":
+           Life Satisfaction Score) */
+        cuts.push({ down: true, title: (t.headers && t.headers[1] ? t.headers[1] + ", by " : "By ") + titled.toLowerCase(),
+          heads: [t.headers && t.headers[1] ? t.headers[1] : ""], banners: null, rows: t.rows.map((r) => [unpack(r[0]).label, ...r.slice(1)]) });
+      }
+      continue;
+    }
+    /* a whole table that is one group's (DemosAU's "NSW Respondents") */
+    if (whole && !whole.all) {
+      if (!t.headers || t.headers.length <= 2) addAcross(t.rows, [whole.label], [whole.banner]);
+      else cuts.push({ down: false, title: whole.label, heads: t.headers.slice(1), banners: null, rows: t.rows.map((r) => [unpack(r[0]).label, ...r.slice(1)]) });
+      continue;
+    }
+    if (!t.headers || t.headers.length <= 2) { figs.push(listFig(t, when)); continue; }
+    /* a crosstab: the groups across, an all-voters column among them (its
+       other heads groups, or at least no answers) */
+    const colG = t.headers.slice(1).map(groupOf);
+    const allC = colG.findIndex((g) => g && g.all);
+    const others = colG.map((g, k) => ({ g, h: t.headers[k + 1] })).filter((x) => !(x.g && x.g.all));
+    if (allC >= 0 && others.length >= 1 && others.every((x) => x.g || (classify(x.h) === "o" && !SUM_H.test(x.h)))) {
+      figs.push(listFig({ ...t, headers: ["", t.headers[allC + 1]], rows: t.rows.map((r) => [r[0], r[allC + 1]]) }, when));
+      const keep = colG.map((g, k) => (k === allC ? -1 : k)).filter((k) => k >= 0);
+      addAcross(t.rows.map((r) => [r[0], ...keep.map((k) => r[k + 1])]), keep.map((k) => (colG[k] ? colG[k].label : t.headers[k + 1])),
+        keep.map((k) => (colG[k] ? colG[k].banner : null)));
+      continue;
+    }
+    /* the groups down, an all-voters row among them (DemosAU) */
+    const rowG = t.rows.map((r) => groupOf(r[0]));
+    const allR = rowG.findIndex((g) => g && g.all);
+    if (allR >= 0 && rowG.filter((g) => g && !g.all).length >= 2 && rowG.filter(Boolean).length >= rowG.length * 0.6) {
+      oneRows.push({ t, row: t.rows[allR] });
+      const rest = t.rows.map((r, k) => ({ r, g: rowG[k] })).filter((x, k) => k !== allR);
+      cuts.push({ down: true, title: t.title ? t.title.replace(/^\d+\.\s*/, "") : null, heads: t.headers.slice(1),
+        banners: rest.map((x) => (x.g ? x.g.banner : null)), rows: rest.map((x) => [x.g ? x.g.label : x.r[0], ...x.r.slice(1)]) });
+      continue;
+    }
+    figs.push(gridFig(t, when));
+  }
+  /* the all-voters rows of the group-down tables: one battery where they
+     share their answers (DemosAU's three super statements), else one each */
+  if (oneRows.length) {
+    const same = oneRows.length > 1 && oneRows.every((o) => o.t.headers.join("|") === oneRows[0].t.headers.join("|"));
+    const lab = (o, k) => (o.t.title ? o.t.title.replace(/^\d+\.\s*/, "") : oneRows.length > 1 ? "Statement " + (k + 1) : "All voters");
+    if (same) figs.push(gridFig({ title: null, base: null, headers: oneRows[0].t.headers, rows: oneRows.map((o, k) => [lab(o, k), ...o.row.slice(1)]) }, when));
+    else oneRows.forEach((o, k) => figs.push(gridFig({ title: null, base: o.t.base, measure: o.t.measure, headers: o.t.headers, rows: [[lab(o, k), ...o.row.slice(1)]] }, when)));
+  }
+  /* a series table: earlier readings of the rows it names, where its
+     reading for this wave is the row's own; with no list beside it, it is
+     this wave's list */
+  for (const s of series) {
+    const reads = s.rows.map((r) => ({ ...unpack(r[0]), v: num(r[1]) })).filter((x) => x.tag && x.v != null);
+    let main = figs.find((f) => f.kind === "list");
+    if (!main && !figs.length) {
+      const own = reads.filter((x) => x.tag === when);
+      if (!own.length) continue;
+      main = listFig({ title: null, base: null, headers: null, rows: own.map((x) => [x.label, x.v]) }, when);
+      figs.push(main);
+    }
+    if (!main) continue;
+    const own = reads.filter((x) => x.tag === when);
+    if (!own.length || !own.every((x) => { const row = main.rows.find((y) => matchKey(y.label) === matchKey(x.label)); return row && row.v === x.v; })) continue;
+    for (const x of reads) {
+      if (x.tag === when) continue;
+      const row = main.rows.find((y) => matchKey(y.label) === matchKey(x.label));
+      if (row && !row.then.some((p) => p.when === x.tag)) row.then.push({ when: x.tag, v: x.v });
+    }
+  }
+  /* a list of totals alone that follows a list sums it ("Higher (total)") */
+  const joined = [];
+  for (const f of figs) {
+    const prev = joined[joined.length - 1];
+    if (f.kind === "list" && prev && prev.kind === "list" && !f.title && f.rows.every((r) => RX.summary.test(r.label)) && !prev.sums.length) {
+      prev.sums.push(...f.rows);
+      continue;
+    }
+    joined.push(f);
+  }
+  /* repeats out: empty figures, a figure filed twice, and one restating
+     another (a list any figure prints; a battery an earlier one prints) */
+  const kept = [];
+  joined.forEach((f, i) => {
+    if (!f.rows.length) return;
+    const rest = joined.filter((g, j) => j !== i && g.rows.length && (g.kind !== "list" && g.kind !== "nets" ? true : j < i));
+    if (restates(f, f.kind === "list" || f.kind === "nets" ? rest : rest.filter((g) => joined.indexOf(g) < i))) return;
+    kept.push(f);
+  });
+  /* a battery's breakdowns, where their measure is pinned down */
+  const grid = kept.find((f) => f.kind === "split" || f.kind === "table");
+  for (const c of cuts) {
+    if (c.down || c.title || !grid) continue;
+    const labels = new Set(grid.rows.map((r) => matchKey(r.label)));
+    if (c.rows.filter((r) => labels.has(matchKey(r[0]))).length >= c.rows.length * 0.6) c.measure = measureOfCut(c, grid) || false;
+  }
+  return { figs: kept, cuts: cuts.filter((c) => c.measure !== false).map(({ measure, ...c }) => (measure ? { ...c, title: measure } : c)) };
+}
+
+/* ---- one question's waves ---- */
+const overlap = (xs, ys) => {
+  const a = new Set(xs.map(matchKey)), b = ys.map(matchKey);
+  return b.filter((y) => a.has(y)).length / Math.max(1, Math.min(a.size, b.length));
+};
+/* two waves' figures that read the same question the same way */
+function twins(f, g) {
+  if (f.kind !== g.kind || matchKey(f.title || "") !== matchKey(g.title || "") || (f.unit || "%") !== (g.unit || "%")) return false;
+  if (f.kind === "list" || f.kind === "nets") return overlap(f.rows.map((r) => r.label), g.rows.map((r) => r.label)) >= 0.75;
+  if (overlap(f.rows.map((r) => r.label), g.rows.map((r) => r.label)) < 0.5) return false;
+  if (f.kind === "split") return overlap(f.heads, g.heads) >= 0.7;
+  return f.heads.map(matchKey).join("|") === g.heads.map(matchKey).join("|") && f.extraHeads.map(matchKey).join("|") === g.extraHeads.map(matchKey).join("|");
+}
+/* bases that differ only in their counts read as one: "Asked of those who
+   had heard anything (868 people in Oct 2026, 950 in May 2026)" */
+function mergeBases(bs) {
+  const xs = bs.filter((b) => b.base);
+  if (!xs.length) return null;
+  const stem = (s) => s.replace(/\s*\(([\d,]+) people\)$/, "");
+  if (xs.every((x) => stem(x.base) === stem(xs[0].base))) {
+    const ns = xs.map((x) => ({ n: (x.base.match(/\(([\d,]+) people\)$/) || [])[1], when: x.when })).filter((x) => x.n);
+    if (ns.length < 2) return xs[0].base;
+    return stem(xs[0].base) + " (" + ns.map((x, i) => x.n + (i ? "" : " people") + " in " + x.when).join(", ") + ")";
+  }
+  return xs.map((x) => x.base + " (" + x.when + ")").join("; ");
+}
+/* a wave as a column names it: its month, or its last day where two waves
+   share a month */
+function waveNames(ws) {
+  const end = (e) => e.dateEnd || e.waveDate;
+  const mon = (e) => MON3[+end(e).slice(5, 7) - 1] + " " + end(e).slice(0, 4);
+  return ws.map((e) => (ws.filter((x) => mon(x) === mon(e)).length > 1 ? Number(end(e).slice(8, 10)) + " " + mon(e) : mon(e)));
+}
+function figuresOf(ws) {
+  const names = waveNames(ws);
+  const per = ws.map((e, i) => ({ e, when: names[i], ...waveFigures(e, names[i]) }));
+  const out = [];
+  for (const p of per) {
+    for (const f of p.figs) {
+      const twin = out.find((g) => !g.cols.includes(p.when) && twins(g, f));
+      if (!twin) {
+        const { when, one, ...rest } = f;
+        out.push({ ...rest, one, cols: [p.when], bases: [{ base: f.base, when: p.when }],
+          rows: f.rows.map((r) => (f.kind === "list" || f.kind === "nets" ? { label: r.label, v: [r.v], then: r.then || [] }
+            : r.sect ? { label: r.label, sect: true, then: [], waves: [] }
+            : { label: r.label, then: r.then, waves: [{ when: p.when, cells: r.cells, extra: r.extra, segs: r.segs, a: r.a, b: r.b }] })),
+          sums: f.sums ? f.sums.map((r) => ({ label: r.label, v: [r.v], then: r.then || [] })) : undefined });
+        continue;
+      }
+      twin.cols.push(p.when);
+      twin.bases.push({ base: f.base, when: p.when });
+      if (f.kind === "list" || f.kind === "nets") {
+        const k = twin.cols.length - 1;
+        for (const [into, from] of [[twin.rows, f.rows], [twin.sums, f.sums]]) {
+          for (const r of into) { const x = from.find((y) => matchKey(y.label) === matchKey(r.label)); r.v[k] = x ? x.v : null; }
+          for (const x of from) {
+            if (into.some((r) => matchKey(r.label) === matchKey(x.label))) continue;
+            const v = Array(k).fill(null);
+            v[k] = x.v;
+            into.push({ label: x.label, v, then: [] });
+          }
+        }
+      } else {
+        /* a split's waves may print different answers: the legend takes
+           every weight drawn, the extra columns every head printed */
+        if (f.kind === "split") {
+          for (const l of f.legend) if (!twin.legend.some((x) => x.side === l.side && x.tone === l.tone)) twin.legend.push(l);
+          for (const h of f.extraHeads) if (!twin.extraHeads.some((x) => matchKey(x) === matchKey(h))) {
+            twin.extraHeads.push(h);
+            for (const r of twin.rows) for (const w of r.waves) w.extra.push(null);
+          }
+        }
+        for (const x of f.rows) {
+          const extra = twin.extraHeads.map((h) => { const i = f.extraHeads.findIndex((y) => matchKey(y) === matchKey(h)); return i < 0 ? null : x.extra[i]; });
+          const w = { when: p.when, cells: x.cells, extra, segs: x.segs, a: x.a, b: x.b };
+          const r = twin.rows.find((y) => matchKey(y.label) === matchKey(x.label));
+          if (r) r.waves.push(w);
+          else twin.rows.push({ label: x.label, then: [], waves: [w] });
+        }
+        twin.one = false;
+      }
+    }
+  }
+  /* earlier readings packed into labels or series tables: a list's extra
+     columns, newest first; a battery's an extra column beside its latest */
+  for (const f of out) {
+    if (f.kind === "list" || f.kind === "nets") {
+      const more = [...new Set(f.rows.flatMap((r) => r.then.map((t) => t.when)))].filter((m) => m && !f.cols.includes(m)).sort((a, b) => monthKey(b) - monthKey(a));
+      for (const m of more) {
+        f.cols.push(m);
+        for (const r of f.rows.concat(f.sums)) { const t = (r.then || []).find((x) => x.when === m); r.v.push(t ? t.v : null); }
+      }
+      for (const r of f.rows.concat(f.sums)) delete r.then;
+    } else {
+      const packs = [...new Set(f.rows.flatMap((r) => (r.then || []).map((t) => (t.of ? t.of + ", " : "") + t.when)))];
+      for (const h of packs) {
+        f.extraHeads.push(h);
+        for (const r of f.rows) {
+          const t = (r.then || []).find((x) => (x.of ? x.of + ", " : "") + x.when === h);
+          r.waves.forEach((w, i) => w.extra.push(i === 0 && t ? t.v : null));
+        }
+      }
+      for (const r of f.rows) delete r.then;
+    }
+    f.base = mergeBases(f.bases);
+    delete f.bases;
+  }
+  /* the latest wave's cuts; a cut with many groups and short answers turns
+     its groups down the page */
+  const at = per.find((p) => p.cuts.length);
+  const cuts = (at ? at.cuts : []).flatMap((c0) => {
+    const c = { ...c0, rows: c0.rows.map((r) => [String(r[0]), ...r.slice(1).map(num)]) };
+    if (c.down || c.heads.length <= 9) return [c];
+    /* short answers: the groups run down the page, a row each */
+    if (c.rows.every((r) => r[0].length <= 32)) {
+      return [{ down: true, title: c.title, heads: c.rows.map((r) => r[0]), banners: c.banners,
+        rows: c.heads.map((h, k) => [h, ...c.rows.map((r) => r[k + 1])]) }];
+    }
+    /* long answers: the groups stay across, a table to each few banners */
+    const runs = [];
+    c.heads.forEach((h, k) => {
+      const run = runs[runs.length - 1];
+      if (run && run.banner === c.banners[k]) run.ks.push(k);
+      else runs.push({ banner: c.banners[k], ks: [k] });
+    });
+    const parts = [];
+    for (const run of runs) {
+      const last = parts[parts.length - 1];
+      if (last && last.length + run.ks.length <= 8) last.push(...run.ks);
+      else parts.push(run.ks.slice());
+    }
+    return parts.map((ks, i) => ({ down: false, title: i ? null : c.title, heads: ks.map((k) => c.heads[k]), banners: ks.map((k) => c.banners[k]),
+      rows: c.rows.map((r) => [r[0], ...ks.map((k) => r[k + 1])]) }));
+  });
+  return { figs: out, cuts, cutsWhen: at ? at.when : null };
+}
+
 /* ---- the payload ------------------------------------------------------------- */
 export function buildBeyond(entries, { deff }) {
   const shown = entries.filter((e) => themeOf(e.id) !== "cut");
@@ -963,16 +1599,17 @@ export function buildBeyond(entries, { deff }) {
       if (!more.has(k)) more.set(k, []);
       more.get(k).push(e);
     }
+    /* each a question as one pollster asked it: its waves' sources, its
+       figures and cuts read through figuresOf, and the words of a wave
+       that filed prose instead of a table */
     const moreList = [...more.values()].map((ws) => {
       ws.sort((a, b) => byDateDesc(a.waveDate, b.waveDate));
+      const { figs, cuts, cutsWhen } = figuresOf(ws.filter((e) => mainTable(e)));
       return {
         id: ws[0].id, house: ws[0].house, title: TITLES[ws[0].id + "|" + ws[0].house] || TITLES[ws[0].id] || cleanQuestion(ws[0]), last: ws[0].waveDate,
-        waves: ws.map((e) => {
-          const t0 = mainTable(e);
-          return { ...sourceOf(e), question: e.question, note: e.note || null,
-            prose: t0 ? [] : (e.prose || []).slice(0, 3),
-            tables: t0 ? [{ title: t0.title || null, headers: t0.headers || null, rows: tableRows(t0) }].concat(foldsOf(e, t0)) : [] };
-        }),
+        srcs: ws.map((e) => ({ ...sourceOf(e), question: e.question })),
+        figs, cuts, cutsWhen,
+        prose: ws.filter((e) => !mainTable(e) && (e.prose || []).length).map((e) => ({ when: waveNames([e])[0], text: e.prose.slice(0, 3) })),
       };
     }).sort((a, b) => byDateDesc(a.last, b.last) || a.title.localeCompare(b.title));
     return { id: t.id, title: t.title, short: t.short, about: t.about, dek: t.dek,
@@ -1001,6 +1638,12 @@ function cleanQuestion(e) {
   q = q.split(/\s+\/\s+[A-Z]\d*/)[0].split(/\s+[A-Z]\d+[a-z]?\s+—\s+/)[0];
   return q.trim();
 }
+
+/* column heads a store left generic, where the curation knows them:
+   Newspoll's traits series pairs each PM with the opposition leader */
+const FIG_HEADS = {
+  "leader-traits-history|newspoll": ["Prime minister", "Opposition leader"],
+};
 
 /* short titles for list entries whose store question runs long, opens on
    context, or names only a chart ("To what extent do you agree..."); keyed
@@ -1251,4 +1894,4 @@ const TITLES = {
 
 /* the rules, for .build/test-beyond.mjs to pin branch by branch */
 export const __test = { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows, pairsOf,
-  splitFinding, tallyFinding, rankFinding, findingMeta };
+  splitFinding, tallyFinding, rankFinding, findingMeta, tidyTitle, tidyHead, unpack, groupOf, matchKey, figuresOf };

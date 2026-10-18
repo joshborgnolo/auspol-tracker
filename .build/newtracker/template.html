@@ -5493,13 +5493,13 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 
 /* the findings: one numbered sentence a topic, each a link to its topic */
 .btv-finds { margin-top: 28px; }
-.btv-fh { margin: 0 0 4px; font-family: var(--sans); font-size: 11.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.btv-fh { margin: 0 0 8px; font-family: var(--sans); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); }
 .btv-fl { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); column-gap: 44px; margin: 0; padding: 0; list-style: none; }
 .btv-fl > li { min-width: 0; border-top: 1px solid var(--line); }
 .btv .btv-f { display: flex; gap: 12px; padding: 13px 0 15px; color: var(--ink); border-bottom: 0; }
 .btv-fn { flex: none; width: 1.5em; font-family: var(--serif); font-size: 22px; line-height: 1.1; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 .btv-fb { display: flex; flex-direction: column; min-width: 0; }
-.btv-fk { font-size: 11px; font-weight: 600; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.btv-fk { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
 .btv-ft { margin-top: 3px; font-family: var(--serif); font-size: 20px; line-height: 1.22; color: var(--ink); text-wrap: pretty; }
 .btv-fm { margin-top: 5px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
 .btv .btv-f:hover .btv-ft, .btv .btv-f:focus-visible .btv-ft {
@@ -5510,16 +5510,15 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 /* a topic: its number and name, its finding, what it covers */
 .btv-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
 .btv-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
-.btv-tt { margin: 0; font-family: var(--sans); font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
-.btv-tn { color: var(--ink-3); }
-.btv-tn::after { content: "·"; margin: 0 0.6em; color: var(--ink-faint); }
-.btv-tc { font-size: 12.5px; color: var(--ink-3); }
+.btv-tt { margin: 0; font-family: var(--sans); font-size: 19px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+.btv-tn { margin-right: 0.5em; font-weight: 400; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.btv-tc { font-size: 13px; color: var(--ink-3); }
 .btv-hl { margin: 10px 0 0; max-width: 42ch; font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; color: var(--ink); text-wrap: balance; }
 .btv-tdk { margin: 8px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty; }
 
 /* a tracker: every pollster on one chart, the latest readings beside it */
 .btv-tracker { margin-top: 28px; }
-.btv-tlab { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.btv-tlab { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.38; color: var(--ink); text-wrap: pretty; }
 .btv-tdek { margin: 6px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .btv-fams { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 12px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
 .btv-fams span { display: inline-flex; align-items: center; gap: 7px; }
@@ -5531,7 +5530,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv .btv-chart { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; transition: none; }
 .btv-ylab { fill: var(--ink-3); }
 .btv-latest { min-width: 0; }
-.btv-lh { margin: 0 0 2px; font-size: 11.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.btv-lh { margin: 0 0 2px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
 .btv-ll { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); column-gap: 28px; margin: 0; padding: 0; list-style: none; }
 .btv-ll > li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line-2); }
 .btv-lp { display: flex; flex-direction: column; min-width: 0; }
@@ -5635,15 +5634,27 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-ledger summary { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 
 /* tables of record (folds, the ledger, the More lists) */
-.btv-tb { margin-top: 10px; }
-.btv-tbt { margin: 0 0 6px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
 .btv-twrap { overflow-x: auto; }
 .btv-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.btv-table th, .btv-table td { padding: 4px 10px 4px 0; font-size: 12px; text-align: right; white-space: nowrap; }
-.btv-table thead th { font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.btv-table th, .btv-table td { padding: 5px 0 5px 10px; font-size: 13px; line-height: 1.35; text-align: right; white-space: nowrap; }
+.btv-table thead th { min-width: 3.4em; font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--ink-3); white-space: normal; vertical-align: bottom; border-bottom: 1px solid var(--line); }
 .btv-table td { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
-.btv-table .btv-l { text-align: left; white-space: normal; min-width: 7em; }
+.btv-table tbody th { font-weight: 400; color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.btv-table .btv-l { padding-left: 0; text-align: left; white-space: normal; min-width: 7em; }
 .btv-table td b { color: var(--ink); font-weight: 600; }
+/* the label column holds still while a wide table scrolls under it */
+.btv-twrap .btv-table .btv-l { position: sticky; left: 0; z-index: 1; background: var(--bg); }
+/* a segment's names (Newspoll's pairings), a statement over its waves, a
+   banner over its groups */
+.btv-table .btv-tsec th, .btv-table .btv-tgrp th { padding-top: 12px; font-weight: 600; color: var(--ink); border-bottom-color: var(--line); }
+.btv-table .btv-twv { padding-left: 12px; color: var(--ink-3); }
+.btv-twd { color: var(--ink-3); }
+.btv-table .btv-tban th { padding-bottom: 2px; text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-2); border-bottom: 0; }
+.btv-table .btv-tban th + th { padding-left: 10px; }
+.btv-table .btv-tb0, .btv-table .btv-tban th + th { box-shadow: inset 1px 0 0 var(--line-2); }
+.btv-table thead th.btv-nw { white-space: nowrap; }
+.btv-gt td { color: var(--ink); }
+.btv-gt td.btv-tc-x { color: var(--ink-3); }
 
 /* each topic's long tail: two columns of plain entries, each opening to its
    figures */
@@ -5652,14 +5663,66 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-more > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-2); }
 .btv-more > summary span { font-weight: 400; color: var(--ink-3); }
 .btv-more > summary:hover { color: var(--ink); }
-.btv-ml { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); column-gap: 48px; align-items: start; margin: 10px 0 0; padding: 0; list-style: none; }
+.btv-ml { margin: 10px 0 0; padding: 0; list-style: none; }
 .btv-ml > li { min-width: 0; border-bottom: 1px solid var(--line-2); }
-.btv-mi > summary { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; font-size: 14px; line-height: 1.4; }
-.btv-mq { color: var(--ink); }
-.btv-mm { color: var(--ink-3); font-size: 12px; }
-.btv-mw { padding: 0 0 12px; }
-.btv-mwd { margin: 8px 0 0; font-size: 12px; font-weight: 600; color: var(--ink-3); }
-.btv-mw .btv-src { margin-top: 6px; }
+.btv-mi > summary {
+  display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: baseline; column-gap: 4px;
+  padding: 10px 0; font-size: 14.5px; line-height: 1.4; list-style: none;
+}
+.btv-mi > summary::-webkit-details-marker { display: none; }
+.btv-mi > summary::before {
+  content: ""; justify-self: start; align-self: center; width: 6px; height: 6px; margin-left: 1px;
+  border-right: 1.5px solid var(--ink-3); border-bottom: 1.5px solid var(--ink-3); transform: rotate(-45deg); transition: transform 0.15s ease;
+}
+.btv-mi[open] > summary::before { transform: rotate(45deg); }
+.btv-mi > summary:hover .btv-mq { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in oklch, var(--ink) 40%, transparent); }
+.btv-mq { min-width: 0; color: var(--ink); text-wrap: pretty; }
+.btv-mm { padding-left: 16px; font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
+.btv-mb { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 4px 0 24px 22px; }
+.btv-mb .btv-src { margin-top: 0; }
+.btv-srch { display: block; font-weight: 600; color: var(--ink-2); }
+.btv-srcw { margin: 2px 0 0; padding: 0; list-style: none; }
+.btv-srcw > li { display: flex; flex-wrap: wrap; gap: 0 12px; }
+.btv-prose { margin: 0; padding-left: 12px; border-left: 2px solid var(--line); font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+
+/* a question's figures: a name and what they measure, then the answers */
+.btv-fig + .btv-fig { margin-top: 26px; }
+.btv-gh { margin-bottom: 9px; }
+.btv-ght { margin: 0; font-size: 13.5px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
+.btv-ghb { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.btv-gh .btv-ght + .btv-ghb { margin-top: 1px; }
+/* a list: answer, bar, share, and any other wave's share in a muted column */
+.btv-gl { display: grid; row-gap: 7px; }
+.btv-gr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(56px, 34%) 3.4em; align-items: center; column-gap: 10px; }
+.btv-gl-m .btv-gr { grid-template-columns: minmax(0, 1fr) minmax(56px, 28%) repeat(var(--btv-n), 4.2em); }
+.btv-gk { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+.btv-gbar { height: 10px; border-radius: 3px; background: var(--btv-track); overflow: hidden; }
+.btv-gbar i { display: block; height: 100%; border-radius: 3px; background: var(--btv-rank); }
+.btv-gv { font-size: 13px; font-weight: 600; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.btv-gv-o { font-weight: 400; color: var(--ink-3); }
+.btv-gr-h { align-items: end; }
+.btv-gr-h .btv-gk { color: transparent; user-select: none; }
+.btv-gr-h .btv-gv { font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--ink-3); white-space: normal; }
+.btv-gr-s .btv-gk { color: var(--ink-3); }
+.btv-gr-s1 { margin-top: 2px; padding-top: 7px; border-top: 1px solid var(--line-2); }
+/* a battery: the page's split rows, any printed summary in columns after */
+.btv-gs .btv-row { grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em; }
+.btv-gs-x .btv-row { grid-template-columns: minmax(0, 40%) 2.2em minmax(0, 1fr) 2.2em repeat(var(--btv-x), 3.6em); }
+.btv-gs .btv-row-1 { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em; }
+.btv-gs-x .btv-row-1 { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em repeat(var(--btv-x), 3.6em); }
+.btv-row-h { align-items: end; margin-bottom: 4px; }
+.btv-vx { font-size: 13px; color: var(--ink-3); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.btv-row-h .btv-vx { font-size: 12px; font-weight: 600; line-height: 1.25; white-space: normal; }
+.btv-sg { display: grid; row-gap: 5px; }
+.btv-sgl { margin: 2px 0 0; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.btv-sg .btv-rl { padding-left: 12px; color: var(--ink-3); }
+
+/* the breakdowns by group, behind their own fold */
+.btv-cuts { margin-top: 16px; }
+.btv-cuts > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
+.btv-cuts > summary span { color: var(--ink-3); }
+.btv-cut { margin-top: 12px; }
+.btv-cutt { margin: 0 0 4px; font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--ink-2); }
 
 .btv-how { margin-top: 56px; padding-top: 12px; border-top: 1px solid var(--line); max-width: 78ch; }
 .btv-how p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
@@ -5689,6 +5752,27 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .btv-rk { grid-template-columns: minmax(0, 1fr) 3em; row-gap: 3px; }
   .btv-rkl { grid-column: 1 / -1; }
   .btv-rkb { grid-column: 1; }
+  /* a split's ends: the share by its swatch, the answer under it */
+  .btv-ends { align-items: flex-start; }
+  .btv-end { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: 6px; row-gap: 3px; max-width: 49%; }
+  .btv-end .btv-endl { grid-column: 1 / -1; font-size: 13px; line-height: 1.3; }
+  .btv-end-b { justify-content: end; text-align: right; }
+  .btv-end-b b { grid-column: 1; grid-row: 1; }
+  .btv-end-b .btv-sw { grid-column: 2; grid-row: 1; }
+  /* the long tail: whose and when under the question; figures unindented */
+  .btv-mi > summary { grid-template-columns: 18px minmax(0, 1fr); }
+  .btv-mm { grid-column: 2; padding-left: 0; white-space: normal; }
+  .btv-mb { padding-left: 0; gap: 14px; }
+  .btv-gr, .btv-gl-m .btv-gr { grid-template-columns: minmax(0, 1fr) repeat(var(--btv-n, 1), 3.6em); row-gap: 3px; }
+  .btv-gk { grid-column: 1 / -1; }
+  .btv-gbar { grid-column: 1; }
+  .btv-gr-h .btv-gk, .btv-gr-s .btv-gk + span { display: none; }
+  .btv-gr-h > span:nth-child(2) { grid-column: 1; }
+  .btv-gr-s .btv-gk { grid-column: 1; }
+  .btv-gs .btv-row, .btv-gs-x .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em repeat(var(--btv-x, 0), 3.4em); }
+  .btv-gs:not(.btv-gs-x) .btv-row { grid-template-columns: 2.2em minmax(0, 1fr) 2.2em; }
+  .btv-gs .btv-rl { grid-column: 1 / -1; }
+  .btv-rlx { display: none; }
 }
 
 </style>

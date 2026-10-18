@@ -76,8 +76,8 @@ function BtvSplit({ c }) {
   return (
     <div className="btv-split">
       <div className="btv-ends">
-        <span className="btv-end"><BtvSwatch side="a" tone={2} /><b>{btvPct(c.a)}</b> {c.names[0]}</span>
-        <span className="btv-end btv-end-b"><b>{btvPct(c.b)}</b> {c.names[1]}<BtvSwatch side="b" tone={2} /></span>
+        <span className="btv-end"><BtvSwatch side="a" tone={2} /><b>{btvPct(c.a)}</b> <span className="btv-endl">{c.names[0]}</span></span>
+        <span className="btv-end btv-end-b"><b>{btvPct(c.b)}</b> <span className="btv-endl">{c.names[1]}</span><BtvSwatch side="b" tone={2} /></span>
       </div>
       <BtvBar segs={c.segs} tall />
       <p className="btv-mids">
@@ -153,7 +153,8 @@ function BtvRank({ c }) {
 
 /* ---- net scores either side of zero ----------------------------------------- */
 function BtvNets({ c }) {
-  const span = Math.max(...c.rows.map((r) => Math.abs(r.v)), 10);
+  /* the longest bar stops short of its edge, leaving its figure room */
+  const span = Math.max(...c.rows.map((r) => Math.abs(r.v)), 10) * 1.2;
   return (
     <div className="btv-nets">
       {c.rows.map((r, i) => (
@@ -171,33 +172,217 @@ function BtvNets({ c }) {
   );
 }
 
-/* ---- the pollster's table of record, behind a fold ------------------------- */
-function BtvTable({ t }) {
-  const rows = t.rows || [];
-  const wide = (t.headers && t.headers.length > 2) || rows.some((r) => r.length > 2);
+/* ---- a question's figures, as beyond-the-vote.mjs's figuresOf reads them ----
+   A list of answers as bars, nets either side of zero, a battery as split
+   bars (or, where its answers take no sides, as a table), the same figure's
+   earlier waves beside it: a list's as columns to the right of the drawn
+   one, a battery's as rows under each statement. A printed TOTAL or net
+   sits under its answers in figures, never as a bar. */
+const btvVal = (v, unit) => (v == null ? "–" : unit === "net" ? btvSigned(v) : unit === "score" ? btvN(v) : btvPct(v));
+/* waves named to the day ("30 Jun 2026") drop the year they share */
+const btvCols = (cols) => (cols.length > 1 && cols.every((c) => /^\d/.test(c) && c.slice(-4) === cols[0].slice(-4)) ? cols.map((c) => c.slice(0, -5)) : cols);
+/* a summary's unit by its name: a net or a change is signed, a TOTAL a share */
+const btvSumUnit = (label) => (/^net\b|\bnet\s|\bchange\b/i.test(label) ? "net" : "%");
+const BTV_ENT = { rsquo: "’", lsquo: "‘", ldquo: "“", rdquo: "”", ndash: "–", mdash: "—", amp: "&", nbsp: " " };
+const btvText = (s) => String(s || "").replace(/&(\w+);/g, (m, k) => BTV_ENT[k] || m);
+
+/* the figure's own name (only where its question has more than one), then
+   what its numbers measure and whom they were asked of */
+function BtvFigHead({ f, solo }) {
+  const t = solo ? null : f.title;
+  const line = [f.measure ? btvCap(f.measure) : null, f.base].filter(Boolean).join(" · ");
+  if (!t && !line) return null;
   return (
-    <div className="btv-tb">
-      {t.title ? <p className="btv-tbt">{t.title}</p> : null}
+    <div className="btv-gh">
+      {t ? <p className="btv-ght">{t}</p> : null}
+      {line ? <p className="btv-ghb">{line}</p> : null}
+    </div>
+  );
+}
+
+/* answers as bars, in the order the pollster printed them; a second wave's
+   (or an earlier reading's) figures as muted columns to the right */
+function BtvFigList({ f }) {
+  const multi = f.cols.length > 1;
+  const unit = f.unit === "score" ? "score" : "%";
+  const scale = unit === "score" ? f.max : Math.max(50, ...f.rows.map((r) => r.v[0] || 0));
+  const w = (v) => Math.max(0, Math.min(100, ((v || 0) / scale) * 100)) + "%";
+  return (
+    <div className={"btv-gl" + (multi ? " btv-gl-m" : "")} role="table" aria-label={f.title || "Answers"} style={{ "--btv-n": f.cols.length }}>
+      {multi ? (
+        <div className="btv-gr btv-gr-h" role="row">
+          <span role="columnheader" className="btv-gk">Answer</span><span aria-hidden="true" />
+          {btvCols(f.cols).map((c, i) => <span key={i} role="columnheader" className="btv-gv">{c}</span>)}
+        </div>
+      ) : null}
+      {f.rows.map((r, i) => (
+        <div className="btv-gr" role="row" key={i}>
+          <span role="rowheader" className="btv-gk">{r.label}</span>
+          <span className="btv-gbar" aria-hidden="true"><i style={{ width: w(r.v[0]) }} /></span>
+          {r.v.map((v, k) => <span key={k} role="cell" className={"btv-gv" + (k ? " btv-gv-o" : "")}>{btvVal(v, unit)}</span>)}
+        </div>
+      ))}
+      {f.sums.map((r, i) => (
+        <div className={"btv-gr btv-gr-s" + (i ? "" : " btv-gr-s1")} role="row" key={"s" + i}>
+          <span role="rowheader" className="btv-gk">{r.label}</span><span aria-hidden="true" />
+          {r.v.map((v, k) => <span key={k} role="cell" className={"btv-gv" + (k ? " btv-gv-o" : "")}>{btvVal(v, btvSumUnit(r.label))}</span>)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* nets either side of zero, the long-tail kin of BtvNets */
+function BtvFigNets({ f }) {
+  return <BtvNets c={{ rows: f.rows.map((r) => ({ label: r.label, v: r.v[0] })), unit: null }} />;
+}
+
+/* a battery's statements, each a split bar with its two sides' totals at
+   its ends; waves of one statement as rows under it */
+function BtvFigSplit({ f }) {
+  const multi = f.cols.length > 1;
+  const ex = f.extraHeads;
+  const row = (key, label, w) => (
+    <div className={"btv-row" + (label == null ? " btv-row-1" : "")} key={key} style={{ "--btv-x": ex.length }}>
+      {label != null ? <div className="btv-rl"><span>{label}</span></div> : null}
+      <span className="btv-va">{btvN(w.a)}</span>
+      <BtvBar segs={w.segs} />
+      <span className="btv-vb">{btvN(w.b)}</span>
+      {w.extra.map((v, k) => <span className="btv-vx" key={k}>{btvVal(v, btvSumUnit(ex[k]))}</span>)}
+    </div>
+  );
+  return (
+    <div className={"btv-stack btv-gs" + (ex.length ? " btv-gs-x" : "")}>
+      <div className="btv-key">
+        {f.legend.map((l, i) => <span key={i}><BtvSwatch side={l.side} tone={l.tone} />{btvCap(l.label)}</span>)}
+      </div>
+      {ex.length ? (
+        <div className={"btv-row btv-row-h" + (f.one ? " btv-row-1" : "")} style={{ "--btv-x": ex.length }} aria-hidden="true">
+          {f.one ? null : <span className="btv-rlx" />}<span /><span /><span />
+          {ex.map((h, k) => <span className="btv-vx" key={k}>{h}</span>)}
+        </div>
+      ) : null}
+      <div className="btv-rows">
+        {f.rows.map((r, i) => (multi && r.waves.length > 1 ? (
+          <div className="btv-sg" key={i}>
+            <p className="btv-sgl">{r.label}</p>
+            {r.waves.map((w, k) => row(k, w.when, w))}
+          </div>
+        ) : row(i, f.one ? null : r.label + (multi ? " · " + r.waves[0].when : ""), r.waves[0])))}
+      </div>
+    </div>
+  );
+}
+
+/* a battery whose answers take no sides, as the pollster tabled it */
+function BtvFigTable({ f }) {
+  const multi = f.cols.length > 1;
+  const heads = f.heads.concat(f.extraHeads);
+  const n = f.heads.length;
+  const cells = (w) => w.cells.concat(w.extra).map((v, k) => (
+    <td key={k} className={k < n ? "" : "btv-tc-x"}>{v == null ? "–" : k >= n && btvSumUnit(heads[k]) === "net" ? btvSigned(v) : btvN(v)}</td>
+  ));
+  return (
+    <div className="btv-twrap">
+      <table className="btv-table btv-gt">
+        <thead><tr><th className="btv-l" />{heads.map((h, i) => <th key={i} scope="col">{h}</th>)}</tr></thead>
+        <tbody>
+          {f.rows.flatMap((r, i) => (r.sect ? [<tr className="btv-tsec" key={i}><th colSpan={heads.length + 1} scope="colgroup" className="btv-l">{r.label}</th></tr>]
+            : multi && r.waves.length > 1 ? [
+              <tr className="btv-tgrp" key={i + "g"}><th colSpan={heads.length + 1} scope="colgroup" className="btv-l">{r.label}</th></tr>,
+              ...r.waves.map((w, k) => <tr key={i + "-" + k}><th scope="row" className="btv-l btv-twv">{w.when}</th>{cells(w)}</tr>)]
+            : [<tr key={i}><th scope="row" className="btv-l">{r.label}{multi ? <span className="btv-twd"> · {r.waves[0].when}</span> : null}</th>{cells(r.waves[0])}</tr>]))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function BtvFig({ f, solo }) {
+  const body = f.kind === "list" ? <BtvFigList f={f} />
+    : f.kind === "nets" ? <BtvFigNets f={f} />
+    : f.kind === "split" ? <BtvFigSplit f={f} />
+    : <BtvFigTable f={f} />;
+  return (
+    <div className={"btv-fig btv-fig-" + f.kind}>
+      <BtvFigHead f={f} solo={solo} />
+      {body}
+    </div>
+  );
+}
+
+/* ---- the breakdowns by group, behind their own fold --------------------------
+   One table a block: the groups across under a banner row (gender, age,
+   vote), or, where a cut runs to many groups with short answers, the groups
+   down the page under a heading a banner. A battery's cut names its measure
+   in its caption. */
+const btvCutsLabel = (cuts) => {
+  const bs = [...new Set(cuts.flatMap((c) => (c.banners || []).filter(Boolean)))];
+  if (!bs.length || bs.length > 4) return "By group";
+  const w = bs.map(btvLow);
+  return "By " + (w.length < 2 ? w[0] : w.slice(0, -1).join(", ") + " and " + w[w.length - 1]);
+};
+function BtvCut({ c }) {
+  const v = (x) => (x == null ? "–" : btvN(x));
+  if (c.down) {
+    const span = c.heads.length + 1;
+    return (
+      <div className="btv-cut">
+        {c.title ? <p className="btv-cutt">{c.title}</p> : null}
+        <div className="btv-twrap">
+          <table className="btv-table">
+            <thead><tr><th className="btv-l" />{c.heads.map((h, i) => <th key={i} scope="col">{h}</th>)}</tr></thead>
+            <tbody>
+              {c.rows.flatMap((r, i) => {
+                const b = c.banners && c.banners[i];
+                const head = b && (!i || c.banners[i - 1] !== b)
+                  ? [<tr className="btv-tsec" key={"b" + i}><th colSpan={span} scope="colgroup" className="btv-l">{b}</th></tr>] : [];
+                return head.concat(<tr key={i}><th scope="row" className="btv-l">{r[0]}</th>{r.slice(1).map((x, k) => <td key={k}>{v(x)}</td>)}</tr>);
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+  /* the banner row: one cell a run of the same banner */
+  const runs = [];
+  (c.banners || c.heads.map(() => null)).forEach((b, k) => {
+    const last = runs[runs.length - 1];
+    if (last && last.b === b) last.n++;
+    else runs.push({ b, n: 1, k });
+  });
+  const banner = runs.some((r) => r.b);
+  return (
+    <div className="btv-cut">
+      {c.title ? <p className="btv-cutt">{c.title}</p> : null}
       <div className="btv-twrap">
         <table className="btv-table">
-          {t.headers && t.headers.length ? <thead><tr>{t.headers.map((h, i) => <th key={i} className={i ? "" : "btv-l"}>{h}</th>)}</tr></thead> : null}
+          <thead>
+            {banner ? <tr className="btv-tban"><th className="btv-l" />{runs.map((r, i) => <th key={i} colSpan={r.n} scope="colgroup">{r.b || ""}</th>)}</tr> : null}
+            <tr><th className="btv-l" />{c.heads.map((h, i) => <th key={i} scope="col" className={(runs.some((r) => r.k === i && i) ? "btv-tb0" : "") + (h.length <= 7 ? " btv-nw" : "")}>{h}</th>)}</tr>
+          </thead>
           <tbody>
-            {rows.map((r, ri) => (
-              <tr key={ri}>{r.map((v, ci) => {
-                const n = typeof v === "number" ? v : parseFloat(v);
-                return <td key={ci} className={ci ? "" : "btv-l"}>{ci === 0 ? v : v == null || v === "" ? "–" : Number.isFinite(n) && !/[a-z]/i.test(String(v)) ? btvN(n) + (wide ? "" : "%") : v}</td>;
-              })}</tr>
-            ))}
+            {c.rows.map((r, i) => <tr key={i}><th scope="row" className="btv-l">{r[0]}</th>{r.slice(1).map((x, k) => <td key={k} className={runs.some((q) => q.k === k && k) ? "btv-tb0" : ""}>{v(x)}</td>)}</tr>)}
           </tbody>
         </table>
       </div>
     </div>
   );
 }
+function BtvCuts({ cuts, when }) {
+  if (!cuts || !cuts.length) return null;
+  return (
+    <details className="btv-cuts">
+      <summary>{btvCutsLabel(cuts)}{when ? <span> · {when}</span> : null}</summary>
+      {cuts.map((c, i) => <BtvCut key={i} c={c} />)}
+    </details>
+  );
+}
 
 /* who asked, when, how many, where it was published, and the exact wording
    a tap away */
-function BtvSource({ src, houses, question, extra }) {
+function BtvSource({ src, houses, question }) {
   return (
     <div className="btv-src">
       <span className="btv-src-l">
@@ -210,7 +395,6 @@ function BtvSource({ src, houses, question, extra }) {
         <details className="btv-wd">
           <summary>The question as asked</summary>
           <p>{question}</p>
-          {extra}
         </details>
       ) : null}
     </div>
@@ -231,6 +415,31 @@ function BtvSources({ c, houses }) {
     </span></div>
   );
 }
+/* a listed question's waves: the pollster once, then each wave's dates,
+   sample and link, and every wording it was asked in */
+function BtvWaves({ q, houses }) {
+  const asked = [...new Set(q.srcs.map((s) => s.question).filter(Boolean))];
+  return (
+    <div className="btv-src">
+      <b className="btv-srch">{btvHouse(q, houses, true)}</b>
+      <ul className="btv-srcw">
+        {q.srcs.map((s, i) => (
+          <li key={i}>
+            <span>{btvSpan(s.field)}</span>
+            {s.n ? <span>{s.n.toLocaleString("en-AU")} people</span> : null}
+            {s.url ? <a href={s.url} target="_blank" rel="noopener">Source ↗</a> : null}
+          </li>
+        ))}
+      </ul>
+      {asked.length ? (
+        <details className="btv-wd">
+          <summary>{asked.length > 1 ? "The questions as asked" : "The question as asked"}</summary>
+          {asked.map((x, i) => <p key={i}>{x}</p>)}
+        </details>
+      ) : null}
+    </div>
+  );
+}
 
 /* ---- one question as a row: what was asked and by whom on the left, the
    answers on the right (stacked on a phone) ---------------------------------- */
@@ -239,19 +448,18 @@ function BtvItem({ c, houses }) {
     : c.kind === "stack" ? <BtvStack c={c} houses={houses} />
     : c.kind === "rank" ? <BtvRank c={c} />
     : c.kind === "nets" ? <BtvNets c={c} /> : null;
-  const folds = (c.folds || []).filter((t) => (t.rows || []).length);
   return (
     <article className={"btv-item btv-k-" + c.kind}>
       <div className="btv-il">
         <h4 className="btv-q">{c.title}</h4>
         {c.summary ? <p className="btv-sum">{c.summary}</p> : null}
         {c.note ? <p className="btv-note">{c.note}</p> : null}
-        {c.src && c.src.field ? (
-          <BtvSource src={c.src} houses={houses} question={c.question}
-            extra={folds.length ? folds.map((t, i) => <BtvTable key={i} t={t} />) : null} />
-        ) : <BtvSources c={c} houses={houses} />}
+        {c.src && c.src.field ? <BtvSource src={c.src} houses={houses} question={c.question} /> : <BtvSources c={c} houses={houses} />}
       </div>
-      <div className="btv-ir">{body}</div>
+      <div className="btv-ir">
+        {body}
+        <BtvCuts cuts={c.cuts} when={null} />
+      </div>
     </article>
   );
 }
@@ -377,7 +585,11 @@ function BtvTracker({ c, houses }) {
   );
 }
 
-/* ---- the topic's long tail -------------------------------------------------- */
+/* ---- the topic's long tail --------------------------------------------------
+   One line a question, the question on the left and whose and when on the
+   right; a line opens across the full width to the same row as a featured
+   question: the pollster's waves and wording on the left, the figures on
+   the right, the breakdowns by group behind their own fold. */
 function BtvMore({ t, houses }) {
   return (
     <details className="btv-more">
@@ -386,16 +598,23 @@ function BtvMore({ t, houses }) {
         {t.more.map((q) => (
           <li key={q.id + q.house}>
             <details className="btv-mi">
-              <summary><span className="btv-mq">{q.title}</span>
-                <span className="btv-mm">{btvHouse(q, houses)} · {btvMonth(q.last)}{q.waves.length > 1 ? " · " + q.waves.length + " readings" : ""}</span></summary>
-              {q.waves.map((w, i) => (
-                <div className="btv-mw" key={i}>
-                  {q.waves.length > 1 ? <p className="btv-mwd">{btvSpan(w.field)}</p> : null}
-                  {w.tables.length ? w.tables.map((tb, ti) => <BtvTable key={ti} t={tb} />)
-                    : <p className="btv-note">{w.prose.length ? w.prose.join(" ").replace(/&rsquo;/g, "’").replace(/&lsquo;/g, "‘").replace(/&ldquo;/g, "“").replace(/&rdquo;/g, "”").replace(/&ndash;/g, "–").replace(/&mdash;/g, "—") : "The figures are in the source."}</p>}
-                  <BtvSource src={w} houses={houses} question={w.question} />
+              <summary>
+                <span className="btv-mq">{q.title}</span>
+                <span className="btv-mm">{btvHouse(q, houses)} · {btvMonth(q.last)}{q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : ""}</span>
+              </summary>
+              <div className="btv-mb">
+                <div className="btv-il"><BtvWaves q={q} houses={houses} /></div>
+                <div className="btv-ir">
+                  {q.figs.map((f, i) => <BtvFig key={i} f={f} solo={q.figs.length === 1} />)}
+                  {q.prose.map((p, i) => (
+                    <div className="btv-fig" key={"p" + i}>
+                      {q.prose.length > 1 || q.figs.length ? <p className="btv-ght">{p.when}</p> : null}
+                      <blockquote className="btv-prose">{btvText(p.text.join(" "))}</blockquote>
+                    </div>
+                  ))}
+                  <BtvCuts cuts={q.cuts} when={q.srcs.length > 1 ? q.cutsWhen : null} />
                 </div>
-              ))}
+              </div>
             </details>
           </li>
         ))}
