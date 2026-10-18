@@ -179,8 +179,7 @@ body {
   margin: 32px 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
 }
 .frame-wrap h3 {
-  font-family: var(--sans); font-size: 13px; font-weight: 600;
-  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
+  font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink-2);
   margin: 22px 0 2px;
 }
 h3 .count { color: var(--ink-faint); font-weight: 400; letter-spacing: 0; }

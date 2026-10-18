@@ -856,8 +856,8 @@ body { height: auto; }
 .sh-menu-v.tm-onp { color: var(--onp-text); }
 .sh-menu-v.tm-grn { color: var(--grn-text); }
 .sh-menu-v.tm-oth { color: var(--oth-text); }
-.sh-menu-c { margin-top: 4px; font-size: 9.5px; font-weight: 600; line-height: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); text-wrap: balance; }
-.sh-menu-chip { margin-top: 2px; padding: 2px 6px 3px; border: 1px solid var(--line); border-radius: 3px; font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.sh-menu-c { margin-top: 4px; font-size: 11.5px; font-weight: 500; line-height: 14px; color: var(--ink-3); text-wrap: balance; }
+.sh-menu-chip { margin-top: 2px; padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 3px; font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
 .sh-menu-item:hover, .sh-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
 .sh-menu-item:focus { outline: none; }
 .sh-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
@@ -884,9 +884,9 @@ body { height: auto; }
 }
 .sh-score[hidden] { display: none; }
 .sh-tabs.pinned .sh-score { opacity: 1; transform: none; pointer-events: auto; }
-.sh-eyebrow { font: 700 10.5px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px; }
+.sh-eyebrow { font: 700 11px var(--sans); color: var(--ink-3); margin-right: 2px; }
 .sh-party { display: inline-flex; align-items: baseline; gap: 5px; }
-.sh-abbr { font: 700 10.5px var(--sans); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.sh-abbr { font: 700 11px var(--sans); color: var(--ink-3); }
 .sh-num { font-family: var(--sans); font-weight: 600; font-size: 17px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 .sh-sep { width: 1.5px; height: 13px; background: var(--line); align-self: center; position: relative; top: 1px; }
 
@@ -989,7 +989,7 @@ nav.tabs[aria-label="Poll archives"] {
 
 /* a page's own column: the space under the new tab bar replaces its old top margin */
 .sh-kicker {
-  margin: 0 0 6px; font: 700 11px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0 0 6px; font: 600 13px var(--sans); color: var(--ink-3);
 }
 
 @media (max-width: 640px) {

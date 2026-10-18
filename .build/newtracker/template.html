@@ -510,8 +510,7 @@ body.js.ss-view #root { display: none; }
 }
 .wm-track {
   align-self: flex-end; margin-left: 9px; padding-bottom: 3px;
-  font-size: 12px; font-weight: 600; letter-spacing: 0.34em;
-  text-transform: uppercase; color: var(--ink-3);
+  font-size: 12px; font-weight: 600; color: var(--ink-3);
 }
 /* glyph = one dial: live primary-vote columns as radial graduations on a
    two-tone 2PP swing arc, needle from the shared pivot */
@@ -1840,12 +1839,12 @@ body.dark .sens-band { opacity: 0.10; }
   .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; }
 }
 .ts-eyebrow {
-  font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 11px; font-weight: 700;
   color: var(--ink-3); margin-right: 2px;
 }
 .ts-party { display: inline-flex; align-items: baseline; gap: 5px; }
 .ts-abbr {
-  font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  font-size: 11px; font-weight: 700;
   color: var(--ink-3);
 }
 /* --heads pairs the docked score with the bar's tab labels and, since the
@@ -2087,7 +2086,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 /* favourability marker – flags nets that are positive−negative, a different
    question from approval and not directly comparable */
 .fav-mark {
-  font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+  font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); vertical-align: super; margin-left: 3px; cursor: help;
 }
 /* change indicator vs the pollster's previous poll – neutral ink, direction by
@@ -2218,8 +2217,8 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
    as type by their TEXT, and light up solid ink only when their filter is on */
 .poll-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
 .ptag {
-  font-family: var(--sans); font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em;
-  text-transform: uppercase; padding: 1px 4px; border-radius: 3px; line-height: 1.5;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
+  padding: 1px 4px; border-radius: 3px; line-height: 1.5;
   background: var(--surface-2); color: var(--ink-3); white-space: nowrap;
   border: 1px solid var(--line-2);
   transition: background-color .15s ease, color .15s ease, border-color .15s ease;
@@ -2247,7 +2246,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    thing its heading promises. */
 .released-pill.est { font-weight: 500; color: var(--ink-3); border-bottom: 1px dashed var(--line-2); }
 /* a provisional (Poll Bludger-mirrored) wave – see releaseMetaRows */
-.provisional-tag { display: inline-block; margin-left: .35em; padding: 0 .4em; border: 1px dashed var(--ink-3); border-radius: 3px; color: var(--ink-3); font-size: .78em; letter-spacing: .02em; text-transform: uppercase; }
+.provisional-tag { display: inline-block; margin-left: .35em; padding: 0 .4em; border: 1px dashed var(--ink-3); border-radius: 3px; color: var(--ink-3); font-size: .85em; }
 .poll-table .muted { color: var(--ink-3); }
 .poll-table .num { font-weight: 600; font-variant-numeric: tabular-nums; }
 
@@ -2937,10 +2936,7 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    second label voice in the panel, distinct from the sentence-case labels of
    the provenance list above, so the two never read as one system. */
 .pd-k {
-  font-size: var(--pd-eyebrow); font-weight: 600;
-  /* smaller capitals need more air between them, not less, or the word
-     closes up into a block - the tracking rises as the size falls */
-  letter-spacing: 0.14em; text-transform: uppercase;
+  font-size: calc(var(--pd-eyebrow) + 1.5px); font-weight: 600;
   color: var(--pd-ink-2); margin: 0 0 11px;
 }
 /* A kicker that is itself a glossary word (the implied-2PP section's) is a
@@ -4295,8 +4291,8 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   margin: 0 0 12px;
 }
 .cyc-drawn-label {
-  font-family: var(--sans); font-size: 11px; font-weight: 600;
-  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-3); margin-right: 2px;
 }
 /* No nowrap: the preferred-PM chart names both sides of a pairing that changed
    hands on both, and "Rudd–Gillard v Nelson–Turnbull–Abbott" is wider than a
@@ -4871,8 +4867,8 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   width: 1px; height: 13px; background: var(--line);
 }
 .ap-ctl-lab {
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3);
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  color: var(--ink-3);
 }
 /* The ratio, not the spread, is the number that carries the verdict, so it is
    the one that takes colour – on a cool → neutral → warm ramp matching the
@@ -5416,7 +5412,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 
 /* the headline figures + their honesty bands */
 .ex-fig { margin: 32px 0 6px; }
-.ex-fam { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; }
+.ex-fam { font-size: 13px; font-weight: 600; color: var(--ink-3); }
 .ex-num { font-family: var(--sans); font-weight: 500; font-size: 54px; line-height: 1; letter-spacing: -0.03em; }
 .ex-cap { margin-top: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
 .ex-band { position: relative; height: 6px; margin-top: 20px; border-radius: 3px; background: var(--line-2); }

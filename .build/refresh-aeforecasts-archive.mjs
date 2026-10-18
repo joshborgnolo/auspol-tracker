@@ -187,7 +187,7 @@ body {
   margin: 0 auto; padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px)); }
 .frame-wrap h1 { font-family: var(--serif); font-size: 34px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }
 .frame-wrap h2 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin: 32px 0 8px; padding-top: 14px; border-top: 1px solid var(--line); }
-.frame-wrap h3 { font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); margin: 22px 0 2px; }
+.frame-wrap h3 { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink-2); margin: 22px 0 2px; }
 h3 .count { color: var(--ink-faint); font-weight: 400; letter-spacing: 0; text-transform: none; }
 .ss-sub, .body-copy { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); max-width: 680px; }
 .ss-sub { margin: 0 0 4px; } .body-copy { margin: 12px 0; } .body-copy + .body-copy { margin-top: 10px; }
