@@ -616,15 +616,15 @@ body.rd .ts-sep { background: var(--line); }
    The user asked for the menu "more textured, substantial", and chose the
    folder of the mockups' five. The open button becomes a paper tab, and the
    sheet hangs from the bar's rule under it with its top edge left open
-   where the tab meets it, so the two read as one piece of paper: grain on
-   both, two more sheets showing under the bottom edge. Inside, a numbered
+   where the tab meets it, so the two read as one piece of paper, two more
+   sheets showing under the bottom edge. Inside, a numbered
    ledger: each page under its own headline (menu-lines.js, the finding the
    page heads itself with), the figure that headline stands on in a column
    of its own, and double rules between. Tabs.placeMenu seats the sheet and
-   says where the tab meets it (--gap-a, --gap-b). The archived design keeps
-   template.html's plain list. */
+   says where the tab meets it (--gap-a, --gap-b). (The grain on the tab and
+   sheet shipped with the folder and went the same day - a user call.) The
+   archived design keeps template.html's plain list. */
 body.rd .tabs {
-  --tm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .2 0 0 0 1.1 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --tm-sheet-1: color-mix(in oklab, var(--surface-2) 80%, var(--bg));
   --tm-sheet-2: color-mix(in oklab, var(--surface-2) 45%, var(--bg));
 }
@@ -639,15 +639,6 @@ body.rd .tab-menu-paper {
   border: 1px solid var(--line); border-bottom: 0; border-top: 2px solid var(--ink);
   border-radius: 7px 7px 0 0;
 }
-body.rd .tab-menu-paper::before, body.rd .tab-menu-pop::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
-  background-image: var(--tm-grain); background-size: 180px 180px;
-  opacity: 0.5; mix-blend-mode: multiply;
-}
-body.rd.dark .tab-menu-paper::before, body.rd.dark .tab-menu-pop::before { mix-blend-mode: screen; opacity: 0.16; }
-/* the sheet's grain reaches into its clear top border, so the paper runs
-   on unbroken from the tab */
-body.rd .tab-menu-pop::before { top: -1px; }
 body.rd .tab.tab-menu.open .tab-menu-paper { visibility: visible; }
 /* open, the tab is the button's mark, so a menu page's underline steps aside */
 body.rd .tab.tab-menu.open::after { opacity: 0; }

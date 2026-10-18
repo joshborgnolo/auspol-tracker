@@ -786,21 +786,18 @@ body { height: auto; }
 .sh-menu-btn[aria-expanded="true"] .sh-menu-chev { transform: rotate(180deg); }
 /* the main page's folder (rd.css's More-menu block, mirrored): the open
    button is a paper tab, the sheet hangs from the bar's rule with its top
-   edge open under it, grain on both and two sheets under the bottom edge;
-   inside, the numbered ledger. mPlace seats it as Tabs.placeMenu does */
+   edge open under it, two sheets under the bottom edge (the folder's grain
+   went the day it shipped - a user call); inside, the numbered ledger.
+   mPlace seats it as Tabs.placeMenu does */
 .sh-tabs {
-  --sh-tm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .2 0 0 0 1.1 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --sh-tm-sheet-1: color-mix(in oklab, var(--sh-surface-2) 80%, var(--bg));
   --sh-tm-sheet-2: color-mix(in oklab, var(--sh-surface-2) 45%, var(--bg));
-  --sh-tm-blend: multiply; --sh-tm-grain-o: 0.5;
   --sh-tm-shadow: 0 34px 60px -26px oklch(0.3 0.03 55 / 0.42), 0 10px 18px -10px oklch(0.3 0.03 55 / 0.16);
 }
 @media (prefers-color-scheme: dark) { :root:not(.sh-light) .sh-tabs {
-  --sh-tm-blend: screen; --sh-tm-grain-o: 0.16;
   --sh-tm-shadow: 0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
 } }
 :root.sh-dark .sh-tabs {
-  --sh-tm-blend: screen; --sh-tm-grain-o: 0.16;
   --sh-tm-shadow: 0 34px 60px -22px oklch(0 0 0 / 0.75), 0 10px 18px -8px oklch(0 0 0 / 0.5);
 }
 .sh-menu-btn { z-index: 0; }
@@ -811,12 +808,6 @@ body { height: auto; }
   border: 1px solid var(--line); border-bottom: 0; border-top: 2px solid var(--ink);
   border-radius: 7px 7px 0 0;
 }
-.sh-menu-paper::before, .sh-menu::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
-  background-image: var(--sh-tm-grain); background-size: 180px 180px;
-  opacity: var(--sh-tm-grain-o); mix-blend-mode: var(--sh-tm-blend);
-}
-.sh-menu::before { top: -1px; }
 .sh-menu-btn[aria-expanded="true"] .sh-menu-paper { visibility: visible; }
 .sh-menu-btn[aria-expanded="true"]::after { opacity: 0; }
 .sh-menu {
