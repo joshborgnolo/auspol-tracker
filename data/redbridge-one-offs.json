@@ -1,49 +1,8 @@
 {
  "_about": "RedBridge Group/Accent Research (AFR) one-off and recurring survey questions that do NOT channel into the auspol-tracker data model (voting intention, 2PPs, PPM, leader favourability, vote softness, best-party/election-issues batteries, national direction). Compiled by reading every cached monthly tracker PDF text (glossary chapters at the end of each poll report) and the project's committed sidecars. Wave coverage: Nov 2025 through Sep/Oct 2026 fieldwork (10 cached PDFs). The March 2026 tracker wave (2026-03-27) has no published PDF page, the big March 2026 survey (N=5,563) lives only inside the cumulative 'Shifts in vote intention since June 2025' doc, and the Oct 2025 snapshot, May 2026 MRP and Australia Institute waves are separate products or non-cached — none are covered here.",
  "generated": "2026-10-17",
- "_readme": "Exit conditions confirmed before filing: the standing battery (federal vote intention + vote softness, leader figure favourability, institution/party favourability, issue salience, preferred PM, best-party battery) IS channelled into polls.json demographics/approval/ppm and data/issues.json. The May 2026 national-direction read (right 25/wrong 63) IS recorded in polls.json direction[]; the Nov 2025 and Jan 2026 reads of the same question are NOT, and are filed below. The April 2026 likelihood-of-voting battery (0-10 scale) IS recorded as the consideration map on the 2026-04-30 polls.json row — NOT filed below. Standing-but-unchannelled modules also NOT filed as one-offs: 'Favourability ratings of institutions/parties' (Labor/Liberal/National/One Nation/Greens — plus one-off guests: Advance Dec 2025, RBA Apr 2026, ABC May 2026 & Sep 2026, Medicare Aug 2026, NDIS Jul 2026) — every wave, so a series, not a wave one-off. The rotating per-figure favourability+name-recognition double (Figure/Table N pairs after the institution grid) is filed for Donald Trump alone (Jan, Apr and Sep–Oct 2026 waves): a recurring rotating module, filed at user request on 2026-10-17 as part of the cross-house Trump favourability series on /ad-hocs/; other figures' doubles stay unfiled. For Trump all eight net-column sections of the printed table are filed as per-section single-value tables.",
+ "_readme": "Exit conditions confirmed before filing: the standing battery (federal vote intention + vote softness, leader figure favourability, institution/party favourability, issue salience, preferred PM, best-party battery) IS channelled into polls.json demographics/approval/ppm and data/issues.json. All three national-direction reads (May 2026 right 25/wrong 63, plus Nov 2025's and Jan 2026's) ARE recorded in polls.json direction[]; the 2025-11-13 and 2026-01-29 one-off entries that duplicated them were removed from this store on 2026-10-18 (user call: repeats of main-site data are deleted from the stores, not filed here) - the question no longer appears below. The April 2026 likelihood-of-voting battery (0-10 scale) IS recorded as the consideration map on the 2026-04-30 polls.json row — NOT filed below. Standing-but-unchannelled modules also NOT filed as one-offs: 'Favourability ratings of institutions/parties' (Labor/Liberal/National/One Nation/Greens — plus one-off guests: Advance Dec 2025, RBA Apr 2026, ABC May 2026 & Sep 2026, Medicare Aug 2026, NDIS Jul 2026) — every wave, so a series, not a wave one-off. The rotating per-figure favourability+name-recognition double (Figure/Table N pairs after the institution grid) is filed for Donald Trump alone (Jan, Apr and Sep–Oct 2026 waves): a recurring rotating module, filed at user request on 2026-10-17 as part of the cross-house Trump favourability series on /ad-hocs/; other figures' doubles stay unfiled. For Trump all eight net-column sections of the printed table are filed as per-section single-value tables.",
  "entries": [
-  {
-   "id": "australia-right-direction",
-   "waveDate": "2025-11-13",
-   "dateStart": "2025-11-07",
-   "dateEnd": "2025-11-13",
-   "published": "2025-11-16T20:00",
-   "sample": 1011,
-   "sampleEff": null,
-   "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
-   "question": "Would you say that things in Australia are… Generally headed in the right direction / wrong direction / Not sure",
-   "notes": "First read of the recurring right/wrong-direction question (report figures plot change since February 2024, but the series table is an image). Recorded in polls.json direction[] 2026-10-15 (this 34/49/17 read and the June 2025 series point 36/43/21, keyed to the matching VI waves). One Nation voters: 4% right, 91% wrong; Labor 62/19. Gen-Z 48% right vs Baby Boomers 32%.",
-   "tables": [
-    {
-     "title": "Table 47: The share of voters who say Australia is headed in the right or wrong direction, by vote intention, vote softness, household income, home ownership and financial stress",
-     "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll (PDF pp. 111-112; by-wave chart is Figure 53, image-only)",
-     "entities": [
-      {
-       "name": "Generally headed in the right direction",
-       "ordinal": 1,
-       "values": [
-        34
-       ]
-      },
-      {
-       "name": "Generally headed in the wrong direction",
-       "ordinal": 2,
-       "values": [
-        49
-       ]
-      },
-      {
-       "name": "Not sure",
-       "ordinal": 3,
-       "values": [
-        17
-       ]
-      }
-     ]
-    }
-   ]
-  },
   {
    "id": "life-decision-delays",
    "waveDate": "2025-11-13",
@@ -330,47 +289,6 @@
        "ordinal": 1,
        "values": [
         "Topical-salience read: stories grouped as topics, sub-story shares annotated in the legend."
-       ]
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "australia-right-direction",
-   "waveDate": "2026-01-29",
-   "dateStart": "2026-01-22",
-   "dateEnd": "2026-01-29",
-   "published": "2026-02-01T18:00",
-   "sample": 1003,
-   "sampleEff": 782,
-   "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
-   "question": "Would you say that things in Australia are… Generally headed in the right direction / wrong direction / Not sure",
-   "notes": "Second read of the direction question (recorded in polls.json direction[] 2026-10-15, 29/55/16). Wrong-track sentiment deepened on Nov 2025 (49→55 wrong, 34→29 right). One Nation voters 6% right / 88% wrong; CLP/LNP/Nat voters 11/79; Labor 62/19.",
-   "tables": [
-    {
-     "title": "Table 27: The share of voters who say Australia is headed in the right or wrong direction, by demographic characteristics, 22-29 January",
-     "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll (PDF pp. 102-104; series Figure 41 image-only)",
-     "entities": [
-      {
-       "name": "Generally headed in the right direction",
-       "ordinal": 1,
-       "values": [
-        29
-       ]
-      },
-      {
-       "name": "Generally headed in the wrong direction",
-       "ordinal": 2,
-       "values": [
-        55
-       ]
-      },
-      {
-       "name": "Not sure",
-       "ordinal": 3,
-       "values": [
-        16
        ]
       }
      ]

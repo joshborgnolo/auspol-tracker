@@ -13,9 +13,12 @@
    this site (2026-10-18): lifestyle and trivia (the Melbourne Cup, Santa, sport
    participation, "Australians are kind"), state-politics questions on a federal
    page, the pre-term 2024 Gaza special, questions whose figures exist only as
-   images in the source (RedBridge's coded free-text charts), empty extractions,
-   and repeats of what the main page already tracks (right direction). The
-   stores keep them; the page does not show them. */
+   images in the source (RedBridge's coded free-text charts), and empty
+   extractions. Repeats of what the main page already tracks (right direction,
+   the best-party-on-issues batteries, consideration reads, recalled-vote
+   flows) are removed from the stores outright instead (2026-10-18, user
+   call), not theme-cut. The stores keep the cut ones; the page does not show
+   them. */
 
 /* The topics, in page order: the term's biggest stories first. `short` is the
    jump-nav label, `about` the topic as a phrase inside a sentence ("More
@@ -111,7 +114,6 @@ export const THEME_OF = {
   "abbott-led-coalition-hypothetical-vi": "one-nation",
   // essential
   "one-nation-consideration-reason": "one-nation",
-  "openness-one-nation": "one-nation",
   "hanson-approval": "one-nation",
   "one-nation-concern": "one-nation",
   "one-nation-vote-impacts": "one-nation",
@@ -127,11 +129,8 @@ export const THEME_OF = {
   // news24
   "coalition-one-nation-cooperation": "one-nation",
   "one-nation-readiness-to-govern": "one-nation",
-  "ever-support-one-nation": "one-nation",
   "reason-considering-one-nation": "one-nation",
-  "serious-consideration": "one-nation",
   "vote-regret-2025": "one-nation",
-  "coalition-vote-flows": "one-nation",
   "liberal-vote-shift-since-2025": "one-nation",
   // newspoll
   "vote-driver-most-important": "one-nation",
@@ -413,7 +412,6 @@ export const THEME_OF = {
   "how-to-vote-cards": "trust-democracy",
   "more-mps": "trust-democracy",
   "voting-systems": "trust-democracy",
-  "party-trust-issues": "trust-democracy",
   // essential
   "government-performance": "trust-democracy",
   "trust-institutions": "trust-democracy",
@@ -433,9 +431,6 @@ export const THEME_OF = {
   "labor-second-term-expectations": "trust-democracy",
   // news24
   "australia-stronger-or-weaker": "trust-democracy",
-  "best-party-placement-4-issues": "trust-democracy",
-  "best-party-placement-12-issues": "trust-democracy",
-  "best-party-economy-security": "trust-democracy",
   // news24+resolve
   "most-important-issue": "trust-democracy",
   // newspoll
@@ -515,7 +510,6 @@ export const THEME_OF = {
   "reasons-for-voting-one-nation": "cut",
   "news-story-week": "cut",
   "feelings-way-things-going": "cut",
-  "australia-right-direction": "cut",
   // secnewgate
   "car-purchase-intentions": "cut",
   "news-consumption": "cut",

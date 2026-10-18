@@ -55,7 +55,6 @@ const MANIFEST = [
   { id: "immigration-control-steps", ds: "support_opposition_on_steps_to_control_immigration", also: ["to_what_extent_do_you_support_or_oppose_each_of_the_following", "to_what_extent_do_you_support_or_oppose_each_of_the_following_by_gender", "to_what_extent_do_you_support_or_oppose_each_of_the_following_by_age", "to_what_extent_do_you_support_or_oppose_each_of_the_following_by_voting_intention"] },
 
   /* one nation & the party system */
-  { id: "openness-one-nation", ds: "openness_to_one_nation" },
   { id: "one-nation-vote-impacts", ds: "impacts_on_the_likelihood_of_voting_for_one_nation" },
   { id: "one-nation-concern", ds: "concern_about_the_ideas_and_values_of_pauline_hansons_one_nation_party" },
   { id: "one-nation-consideration-reason", ds: "reason_for_one_nation_consideration",
@@ -280,6 +279,7 @@ const EXCLUDE = {
   approval_of_angus_taylor: "standing battery – opposition-leader approval (Ley→Taylor) lives in polls.json",
   national_mood: "channelled – right/wrong direction reads land in polls.json direction[]",
   political_party_consideration: "channelled – the 2026-06-29 polls.json row carries it as the consideration map",
+  openness_to_one_nation: "channelled – its 'I would definitely vote for One Nation' cell is the consideration map on the 2026-02-25 polls.json row (cut 2026-10-18: the store entry duplicated the All-polls consideration view)",
 };
 
 /* ==================================================================== */
