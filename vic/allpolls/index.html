@@ -8187,43 +8187,43 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "era": true,
     "dlp": null,
     "dem": null,
-    "oth": 0.45,
-    "bt": -1.4
+    "oth": 0.4213,
+    "bt": -1.59
   }, {
     "year": 1946,
     "era": true,
     "dlp": null,
     "dem": null,
-    "oth": 0.45,
-    "bt": -1.33
+    "oth": 0.6611,
+    "bt": -0.53
   }, {
     "year": 1949,
     "era": true,
     "dlp": null,
     "dem": null,
-    "oth": 0.45,
-    "bt": -0.76
+    "oth": 0.8032,
+    "bt": -0.04
   }, {
     "year": 1951,
     "era": true,
     "dlp": null,
     "dem": null,
-    "oth": 0.45,
-    "bt": 0.43
+    "oth": 0.8227,
+    "bt": 1.31
   }, {
     "year": 1954,
     "era": true,
     "dlp": null,
     "dem": null,
-    "oth": 0.45,
-    "bt": -0.01
+    "oth": 0.2669,
+    "bt": -0.48
   }, {
     "year": 1955,
     "era": true,
-    "dlp": 0.0022,
+    "dlp": 0.27,
     "dem": null,
     "oth": 0.45,
-    "bt": -2.52
+    "bt": 0
   }, {
     "year": 1958,
     "era": true,
@@ -32448,9 +32448,9 @@ const inCycleRange = m => {
   const k = Math.round(m);
   return k >= 0 && k <= 36;
 };
-function cycDotDate(iso) {
+function cycDotDate(iso, approx) {
   const [y, m, d] = iso.split("-").map(Number);
-  return d + " " + window.AP.D.monthName(m) + " " + y;
+  return (approx === "month" ? "" : d + " ") + window.AP.D.monthName(m) + " " + y;
 }
 function rivalOfMonth(D, ym) {
   let who = "alp_lnp";
@@ -32512,7 +32512,7 @@ function cycleReadings(c, M, D) {
         iso: p.date,
         meta: {
           pollster: p.firm,
-          dateLabel: cycDotDate(p.date)
+          dateLabel: cycDotDate(p.date, p.dateApprox)
         }
       });
     }
