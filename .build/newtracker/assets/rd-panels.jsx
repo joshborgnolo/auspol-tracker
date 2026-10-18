@@ -2103,12 +2103,17 @@ function RdGenBorn({ label }) {
   );
 }
 /* the earner rows' parenthetical, RdGenBorn's twin in behaviour and dress
-   (user dictate, 2026-10-16): at rest the electorate share, on a mouse
-   hover or a tap the band's outer edge priced in each printing basis'
-   dollars - one clause per basis, household first. pct selects by index:
+   (user dictate, 2026-10-16): the electorate share rides the label inline
+   and lights on a mouse hover or a tap. The band's outer edge priced in
+   each pooled basis' dollars (household first) can't swap in place as the
+   birth years do - two clauses measure ~270px against the 200px label
+   column, so swapped in they re-wrapped the whole bracket onto two more
+   lines and moved the button out from under the pointer. Instead the share
+   stays put and the cut-offs open beneath the label, one basis a line in
+   the bands pill's own "$129k" form, each line inside the label column at
+   every width (the word "income" drops at ≤560px). pct selects by index:
    gen-data maps the open-ended higher band (hi===1) to 0, the lower one
-   to 1. A phone shortens the words through rd.css's ≤640px/≤560px rungs
-   (.rd-wv-bf/.rd-wv-hh swap, then .rd-wv-iw drops) */
+   to 1 */
 const RD_INCOME_REST = ["top 15%", "bottom 50%"];
 const RD_INCOME_OP = ["≥", "≤"];
 function RdIncomeCut({ pct, cuts }) {
@@ -2116,18 +2121,23 @@ function RdIncomeCut({ pct, cuts }) {
   const [tapped, setTapped] = useState(false);
   const asCuts = hover || tapped;
   return (
-    <button type="button" className={"rd-wv-born cuts" + (asCuts ? " on" : "")}
-            aria-pressed={asCuts}
-            aria-label={"the " + RD_INCOME_REST[pct] + " of the electorate, shows the income cut-offs"}
-            onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(true); }}
-            onPointerLeave={(e) => { if (e.pointerType === "mouse") setHover(false); }}
-            onClick={() => setTapped((v) => !v)}>
-      ({asCuts ? cuts.flatMap((c, i) => (i ? ["; "] : []).concat([
-          <span className="rd-wv-cin" key={c.basis}>
-            <span className="rd-wv-bf">{c.basis}</span><span className="rd-wv-hh">{c.basis === "household" ? "HH" : c.basis}</span><span className="rd-wv-iw"> income</span> {RD_INCOME_OP[pct]} {"$" + c.ots + ",000"}
-          </span>]))
-        : RD_INCOME_REST[pct]})
-    </button>
+    <>
+      <button type="button" className={"rd-wv-born cuts" + (asCuts ? " on" : "")}
+              aria-pressed={asCuts}
+              aria-label={"the " + RD_INCOME_REST[pct] + " of the electorate, shows the income cut-offs"}
+              onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(true); }}
+              onPointerLeave={(e) => { if (e.pointerType === "mouse") setHover(false); }}
+              onClick={() => setTapped((v) => !v)}>
+        ({RD_INCOME_REST[pct]})
+      </button>
+      {asCuts ? (
+        <span className="rd-wv-cuts">
+          {cuts.map((c) => (
+            <span className="rd-wv-cin" key={c.basis}>{c.basis}<span className="rd-wv-iw"> income</span> {RD_INCOME_OP[pct]} {"$" + c.ots + "k"}</span>
+          ))}
+        </span>
+      ) : null}
+    </>
   );
 }
 /* rug dots pick the chart engine's way: the corridor, not the dots, decides

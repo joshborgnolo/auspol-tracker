@@ -77,8 +77,7 @@
    by .build/extract-income-dist.mjs – adults by household income for the
    household-income houses, adults by personal income for DemosAU's
    tables), each wave's dollars deflated to census dollars by the wage
-   index at its own fieldwork. Only household-income waves pool
-   (INCOME_POOL_BASIS). RedBridge's "Prefer not to say" cell never joins
+   index at its own fieldwork. Both bases pool (INCOME_POOL_BASES). RedBridge's "Prefer not to say" cell never joins
    a grid. Resolve and Morgan print no income cut at all. */
 
 export const DEMO_TABS = [
@@ -137,16 +136,19 @@ export const INCOME_STD_BANDS = [
   { group: "Higher earners (top 15%)", lo: 0.85, hi: 1 },
 ];
 
-/* The income basis the tab pools (user call 2026-10-18): household income
-   only. A personal-income bracket sorts people by their own pay – a high
-   earner's non-working spouse lands among the "lower earners" – so its
-   bottom half and top 15% are different people from the household axis's,
-   and pooling the two let the window's house mix move the pooled read
-   (DemosAU alone lifted the top band's Coalition tilt by ~0.9 points in the
-   Oct 2026 window). The personal-income houses keep their grids – their
-   printed tables still show in All polls' Demographics view – but join no
-   pool. */
-export const INCOME_POOL_BASIS = "household";
+/* The income bases the tab pools, in the order the cut-offs print (user
+   call 2026-10-18, reversing the same day's household-only pool). A
+   personal-income bracket sorts people by their own pay – a high earner's
+   non-working spouse lands among the "lower earners" – so its bands are not
+   quite the household axis's people. But every household grid's top cell
+   opens at ~0.59 of adults, so without DemosAU the top-15% read is a line
+   carried from the 0.80 mid out to 0.925; DemosAU's $125k+ personal cell
+   spans 0.85-1.00 - the only house measuring that band directly. In the Oct
+   2026 window its bottom-half read matched the household houses' and its
+   top read sat inside the pair's combined interval, and a basis gap shows up
+   as house disagreement the pool's interval already widens for. Removing a
+   basis here drops its houses from the pools, slots, roster and cut-offs. */
+export const INCOME_POOL_BASES = ["household", "personal"];
 
 /* $k a year per $1,000 a week, the census's own 365.25-day year – the one
    income-dist.json's weeksPerYear carries, so a weekly bracket edge lands

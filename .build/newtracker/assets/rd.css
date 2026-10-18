@@ -1476,32 +1476,35 @@ body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
    as birth years (hover or tapped on) */
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
-/* the income rows' cut-off bracket (RdIncomeCut) dresses identically but
-   prices wider than the 200px label column: it may wrap - yet only between
-   its per-basis clauses, each clause one unbroken unit - and a phone
-   shortens the words rather than the figure: "household" reads "HH" at
-   ≤640px, and the word "income" drops at ≤560px */
-/* a button's UA text-align is center: with the parenthetical on its own
-   line or two on a phone, wrapped clauses otherwise centre at their own
-   ragged offsets instead of holding the label's left edge */
-body.rd .rd-wv-born.cuts { position: relative; white-space: normal; line-height: 1.55; text-align: left; }
-/* the expanded cut-offs re-wrap entirely onto the label's next lines, so
-   the button's box lands a label-line below the rest text: a finger still
-   standing where "(bottom 50%)" sat would fall off the button, giving a
-   leave → collapse → re-enter bounce. While expanded the hit area reaches
-   one label line (24px) back up over the rest text's space */
-body.rd .rd-wv-born.cuts.on::before { content: ""; position: absolute; top: -24px; right: 0; bottom: 0; left: 0; }
-body.rd .rd-wv-born .rd-wv-cin { white-space: nowrap; }
-body.rd .rd-wv-born .rd-wv-hh { display: none; }
+/* the income rows' share bracket (RdIncomeCut) is RdGenBorn to the pixel;
+   its priced cut-offs open beneath the label, one basis a line flush with
+   the label's left edge, in the bracket's own 13px dress lit to ink. Each
+   line ("household income ≥ $262k", ~190px) fits the 200px desktop label
+   column; at ≤560px, where the phone label line narrows toward 150px, the
+   word "income" drops ("household ≥ $262k", ~130px) */
+body.rd .rd-wv-cuts { display: block; font-size: 13px; line-height: 1.4; color: var(--ink); padding-bottom: 2px; }
+body.rd .rd-wv-cuts .rd-wv-cin { display: block; white-space: nowrap; }
+/* opening them moves nothing already drawn. Desktop: the lines hang from
+   the label's box (its bottom sits ~9px above the row's) into room the row
+   adds below its 40px content box - 18.2px a line, less that 9px, plus a
+   ~14px gap to the next label, the min-height growing by the same so the
+   content box stays 40px - so the label, its track and its figures
+   keep their centred places. Phone: the lines hang the same way, and the
+   track below steps down by their height (18.2px a line, plus the 2px
+   foot) - the label's cell keeps its height, so the figures stay centred
+   on it however the label wraps; the rows below step down with the track */
+body.rd .rd-wv-lab { position: relative; }
+body.rd .rd-wv-cuts { position: absolute; left: 0; top: 100%; }
+@media (min-width: 641px) {
+  body.rd .rd-wv-row:has(.rd-wv-cuts) { padding-bottom: 15px; min-height: 55px; }
+  body.rd .rd-wv-row:has(.rd-wv-cin + .rd-wv-cin) { padding-bottom: 33px; min-height: 73px; }
+}
 @media (max-width: 640px) {
-  body.rd .rd-wv-born .rd-wv-bf { display: none; }
-  body.rd .rd-wv-born .rd-wv-hh { display: inline; }
-  /* the 5px gap is the rest state's separator from the label text; on its
-     own phone line it's a hang - drop it so the cut-offs sit flush */
-  body.rd .rd-wv-born.cuts.on { margin-left: 0; }
+  body.rd .rd-wv-row:has(.rd-wv-cuts) > .rd-wv-track { margin-top: 20.2px; }
+  body.rd .rd-wv-row:has(.rd-wv-cin + .rd-wv-cin) > .rd-wv-track { margin-top: 38.4px; }
 }
 @media (max-width: 560px) {
-  body.rd .rd-wv-born .rd-wv-iw { display: none; }
+  body.rd .rd-wv-cuts .rd-wv-iw { display: none; }
 }
 body.rd .rd-wv-track { position: relative; height: 36px; }
 /* the dot plot's marks are placed by transform in units of these boxes'

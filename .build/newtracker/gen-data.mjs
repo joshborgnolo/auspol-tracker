@@ -62,7 +62,7 @@ const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : F
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
 import { fieldTbcUrl } from "./field-tbc.mjs";
-import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, INCOME_POOL_BASIS, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
+import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize, INCOME_GRIDS, INCOME_STD_BANDS, INCOME_POOL_BASES, incomeQuantiles, incomeEdge, incomeFit } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;
@@ -4485,14 +4485,13 @@ const DEMO_TEST_MONTHLY = new Map();
    mix. Here every house's brackets meet on the quantile axis instead,
    and every wave reads at the SAME two bands of the electorate.
    Each wave's dollars deflate to census dollars at the wage level of its
-   own fieldwork midpoint (ms). Only INCOME_POOL_BASIS houses standardise
-   (household income, user call 2026-10-18): a personal-income wave returns
-   null, so it joins no pool, fills no group-view slot and leaves the
-   roster – its printed table still shows in the Demographics view.
+   own fieldwork midpoint (ms). Only INCOME_POOL_BASES houses standardise
+   (both bases today): a wave of another basis returns null, so it joins no
+   pool, fills no group-view slot and leaves the roster.
    Standard for one wave and group, or null (another basis, no grid variant
    the wave printed at least two cells of, or no census distribution). */
 function incomeStandardise(house, dim, ms) {
-  if (!dim || !INCOME_DIST || !INCOME_GRIDS[house] || INCOME_GRIDS[house].basis !== INCOME_POOL_BASIS) return null;
+  if (!dim || !INCOME_DIST || !INCOME_GRIDS[house] || !INCOME_POOL_BASES.includes(INCOME_GRIDS[house].basis)) return null;
   const variants = incomeQuantiles(house, INCOME_DIST, ms);
   if (!variants) return null;
   /* the era's own layout: the variant the wave printed the most cells
@@ -4763,7 +4762,7 @@ const { demo: demographics, income: demoIncome } = (() => {
              its own brackets and READ at the same two bands of the
              electorate – the dek says so up front, the pill spells each
              house's own end brackets */
-          note: "each house's own household-income brackets, read at the same two bands of the electorate (bottom half, top 15%+)",
+          note: "each house's own brackets, household or personal income, read at the same two bands of the electorate (bottom half, top 15%+)",
           /* each house's own end brackets as its newest in-window wave
              printed them (incInWindow rides newest-first), so a switch of
              layout era never shows the stale era's brackets – compacted
@@ -4776,14 +4775,13 @@ const { demo: demographics, income: demoIncome } = (() => {
             .map((e) => [e.w.pollster, { low: [bandLabel(e.band[0])], high: [bandLabel(e.band[1])], basis: INCOME_GRIDS[e.w.pollster].basis }])),
           groups: iSets[0].groups.map((g, gi) => {
             const band = INCOME_STD_BANDS[gi];
-            /* the income cut-off behind the row label's parenthetical
+            /* the income cut-offs behind the row label's parenthetical
                (rd-panels' RdIncomeCut): the band's outer quantile edge
-               priced in the pooled basis' dollars at the build's
-               reference date – one clause, household income, since only
-               that basis pools (INCOME_POOL_BASIS) */
+               priced in each pooled basis' dollars at the build's
+               reference date – one clause per basis, household first
+               (INCOME_POOL_BASES' order) */
             const share = band.hi === 1 ? band.lo : band.hi;
-            const ots = incomeEdge(INCOME_POOL_BASIS, share, INCOME_DIST, refNow);
-            const cuts = ots != null ? [{ basis: INCOME_POOL_BASIS, ots }] : [];
+            const cuts = INCOME_POOL_BASES.map((basis) => ({ basis, ots: incomeEdge(basis, share, INCOME_DIST, refNow) })).filter((c) => c.ots != null);
             return { ...g,
               bare: band.group.replace(/\s*\(.*\)$/, ""),
               pct: band.hi === 1 ? 0 : 1,
