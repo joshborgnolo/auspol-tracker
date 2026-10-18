@@ -14,7 +14,8 @@ import { readStores, buildBeyond, FEATURES, __test } from "./newtracker/beyond-t
 import { THEMES, THEME_OF } from "./newtracker/adhoc-themes.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows } = __test;
+const { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows,
+  splitFinding, tallyFinding, rankFinding, findingMeta } = __test;
 
 // ---- an answer's side, from its wording --------------------------------------------
 for (const [label, side] of [
@@ -101,6 +102,74 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     "Pollsters differ on whether Australians want less immigration");
 }
 
+// ---- the findings: every branch, on mutated figures -------------------------------------
+{
+  /* one question: a lead only past its margin, a majority only where the
+     share clears half by its own margin */
+  const P = FEATURES["trust-democracy"][0].find;
+  const q = (a, b, n) => { const L = leadOf(a, b, n ? n / 1.6 : null); return { a, b, sig: L.sig, src: { n, neff: null } }; };
+  assert.equal(splitFinding(q(34, 56, 1062), P, 1.6), "56% say the Albanese government has fallen short of their expectations");
+  assert.equal(splitFinding(q(30, 48, 1062), P, 1.6),
+    "More say the Albanese government has fallen short of their expectations than met them, 48% to 30%", "48% is no majority");
+  assert.equal(splitFinding(q(60, 30, 1062), P, 1.6), "60% say the Albanese government has met or exceeded their expectations");
+  assert.equal(splitFinding(q(47, 33, 1062), P, 1.6),
+    "More say the Albanese government has met their expectations than fallen short, 47% to 33%");
+  assert.equal(splitFinding(q(44, 47, 1062), P, 1.6),
+    "Voters are divided on whether the Albanese government has lived up to their expectations, 44% to 47%", "inside the margin: divided");
+  assert.equal(splitFinding(q(34, 56, null), P, 1.6),
+    "56% say the Albanese government has fallen short of their expectations, and 34% that it has met them", "no sample: no verdict");
+  assert.equal(splitFinding(q(30, 52, 16000), P, 1.6), "52% say the Albanese government has fallen short of their expectations",
+    "52% on a big sample clears half by its margin");
+  assert.equal(splitFinding(q(30, 52, 1062), P, 1.6),
+    "More say the Albanese government has fallen short of their expectations than met them, 52% to 30%", "52% on 1,062 does not");
+  /* several polls: the tally in words */
+  const T = FEATURES["housing-budget"][0];
+  const rows = (...xs) => ({ rows: xs.map(([lead, sig]) => ({ lead, sig })) });
+  assert.equal(tallyFinding(rows([-9, true], [-20, true], [-4, true]), T.find, T.tally),
+    "Negative verdicts on the May budget outnumber positive ones in all three polls");
+  assert.equal(tallyFinding(rows([9, true], [20, true]), T.find, T.tally), "Positive verdicts on the May budget outnumber negative ones in both polls");
+  assert.equal(tallyFinding(rows([-9, true], [2, false], [-20, true], [3, null]), T.find, T.tally),
+    "Negative verdicts on the May budget outnumber positive ones in two of the four polls");
+  assert.equal(tallyFinding(rows([9, true], [2, false], [1, false]), T.find, T.tally),
+    "Positive verdicts on the May budget outnumber negative ones in one of the three polls");
+  assert.equal(tallyFinding(rows([9, true], [-12, true], [-8, true]), T.find, T.tally),
+    "Polls disagree on the May budget: positive verdicts lead in one, negative verdicts lead in two");
+  assert.equal(tallyFinding(rows([2, false], [1, null]), T.find, T.tally), "Neither poll finds a clear lead either way on the May budget");
+  assert.equal(tallyFinding(rows([2, false], [1, false], [0, false]), T.find, T.tally), "No poll finds a clear lead either way on the May budget");
+  assert.equal(tallyFinding(rows([-9, true]), T.find, T.tally), "Negative verdicts on the May budget outnumber positive ones in the one poll");
+  /* a ranked list: the top answer alone only past the margin over the next */
+  const K = FEATURES["cost-of-living"][0].find;
+  const rk = (n, ...xs) => ({ rows: xs.map(([label, v]) => ({ label, v })), src: { n, neff: null } });
+  assert.equal(rankFinding(rk(2250, ["Federal Labor", 46], ["Global factors", 26]), K, 1.6),
+    "46% hold federal Labor primarily responsible for the cost-of-living crunch");
+  assert.equal(rankFinding(rk(1000, ["Global factors", 30], ["Federal Labor", 28]), K, 1.6),
+    "Blame for the cost-of-living crunch splits between global factors, at 30%, and federal Labor, at 28%", "30 v 28 is inside the margin");
+  assert.equal(rankFinding(rk(null, ["The Reserve Bank", 40], ["Federal Labor", 20]), K, 1.6),
+    "40% hold the Reserve Bank primarily responsible for the cost-of-living crunch, and 20% federal Labor", "no sample: both, no verdict");
+  /* whose figures */
+  const pts = (k) => Array.from({ length: k }, () => ({}));
+  assert.equal(findingMeta({ kind: "tracker", panels: [{ points: pts(2) }, { points: pts(1) }], first: "2025-12-07" }),
+    "Two pollsters, three readings since December 2025");
+  assert.equal(findingMeta({ kind: "tracker", panels: [{ points: pts(9) }, { points: pts(7) }], first: "2025-07-16" }),
+    "Two pollsters, 16 readings since July 2025");
+  assert.equal(findingMeta({ kind: "stack", mode: "compare", rows: [{ src: { field: { end: "2026-05-20" } } }, { src: { field: { end: "2026-05-12" } } }] }),
+    "Two polls, May 2026");
+  assert.equal(findingMeta({ kind: "stack", mode: "compare", rows: [{ src: { field: { end: "2026-01-16" } } }, { src: { field: { end: "2025-12-20" } } }] }),
+    "Two polls, December 2025 to January 2026");
+  assert.equal(findingMeta({ kind: "split", src: { house: "essential", field: { end: "2026-05-24" } } }), "Essential, May 2026");
+  /* every topic's first block words every outcome its kind can reach, and
+     no later block carries a finding it would never be asked for */
+  const KEYS = { split: ["aMaj", "aMore", "bMaj", "bMore", "level", "none"], stack: ["a", "b", "topic"], rank: ["one", "tie", "none"] };
+  for (const [id, specs] of Object.entries(FEATURES)) {
+    const s0 = specs[0];
+    if (s0.kind !== "tracker") {
+      assert.ok(s0.find && (s0.kind !== "stack" || s0.mode === "compare"), `${id} leads with a block that words its finding`);
+      for (const k of KEYS[s0.kind]) assert.ok(typeof s0.find[k] === "string", `${id}'s finding words its "${k}" outcome`);
+    }
+    specs.slice(1).forEach((s) => assert.ok(!s.find, `${id}: only the first block's finding is read`));
+  }
+}
+
 // ---- the payload ------------------------------------------------------------------------------
 {
   const entries = readStores(ROOT);
@@ -123,6 +192,8 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
       for (const p of b.panels) for (const q of p.points)
         assert.ok(q.v >= b.yDomain[0] && q.v <= b.yDomain[1], `${b.title}: ${p.house} ${q.field.end} sits inside the chart`);
       assert.ok(b.head && b.dek, `${b.title} carries its head and dek`);
+      assert.ok(b.families.length >= 1 && b.families.length <= 2, `${b.title}: one or two wording families (the validated pair)`);
+      for (const p of b.panels) assert.ok(b.families[p.fam], `${b.title}: ${p.house} names its wording family`);
     } else if (b.kind === "rank" || b.kind === "nets") {
       assert.ok(b.rows.length >= 2 && b.rows.every((r) => Number.isFinite(r.v)), `${b.title} ranks numbers`);
     }
@@ -131,5 +202,11 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   const sec = trump.panels.find((p) => p.house === "secnewgate").points.find((q) => q.field.end === "2025-11-03");
   assert.equal(sec.v, -39, "SEC Newgate's November 2025 net quotes its printed 60% negative (21 - 60), not the parts' 59");
   for (const t of out.topics) for (const q of t.more) assert.ok(q.title && q.waves.length, `${q.id} lists with its waves`);
+  for (const t of out.topics) {
+    if (!t.blocks.length) { assert.equal(t.finding, null, `${t.id}: no blocks, no finding`); continue; }
+    assert.ok(t.finding && t.finding.text && t.finding.meta, `${t.id} opens on a finding`);
+    assert.equal(t.finding.of, t.blocks[0].id, `${t.id}'s finding reads its first block`);
+    assert.ok(!/[{}]|undefined|NaN/.test(t.finding.text + t.finding.meta), `${t.id}'s finding is filled: "${t.finding.text}"`);
+  }
 }
-console.log("PASS: beyond the vote – sides, printed totals, margins, tallies, wave summaries, tracker heads (mutated), payload");
+console.log("PASS: beyond the vote – sides, printed totals, margins, tallies, wave summaries, tracker heads (mutated), findings (every branch), payload");

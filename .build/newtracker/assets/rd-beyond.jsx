@@ -1,22 +1,29 @@
 // ====================================================================
 // BEYOND THE VOTE – the ☰ menu's issues page
 // ====================================================================
-/* What the pollsters ask beyond voting intention, by topic: the recurring
-   questions charted pollster by pollster, the questions worth a reader's time
-   as cards, and everything else filed under each topic's "More questions".
+/* What the pollsters ask beyond voting intention, by topic. The page opens
+   on an index of the topics' findings, one sentence each; each topic then
+   leads with its finding, charts its recurring question (one chart, a line
+   per pollster, coloured by how the pollster asked), runs its questions as
+   rows parted by hairlines (the question and its source on the left, the
+   answers on the right), and files everything else under "More questions".
+   No boxed cards and no chart per pollster: the 2026-10-18 redesign, the
+   canvas's findings index and coloured lines (B) with its rows (A).
    The payload is the sidecar gen-data builds with beyond-the-vote.mjs (the
    curation and every figure's rules live there: sides, printed totals, the
-   95% margin behind each "level"); this file only draws it, fetched lazily
-   like the cycle source since nothing else reads it. RdBeyond is the
-   redesign section (head + body); BtvBody is the body alone, which the
-   archived classic design mounts without the rd chrome (the .btv-* styles
-   are page-level, not rd-gated). Replaced the /ad-hocs/ catalogue
-   2026-10-18. */
+   95% margin behind each "level" and each finding); this file only draws
+   it, fetched lazily like the cycle source since nothing else reads it.
+   RdBeyond is the redesign section (head + body); BtvBody is the body
+   alone, which the archived classic design mounts without the rd chrome
+   (the .btv-* styles are page-level, not rd-gated). Replaced the /ad-hocs/
+   catalogue 2026-10-18. */
 const { useState: btvUseState, useEffect: btvUseEffect, useMemo: btvUseMemo } = React;
 
 const BTV_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const btvDay = (iso) => Number(iso.slice(8, 10)) + " " + BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
 const btvMonth = (iso) => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+/* a month as the chart's axis writes it ("Dec 25") */
+const btvMonYY = (iso) => BTV_MON[+iso.slice(5, 7) - 1] + " " + iso.slice(2, 4);
 /* a fieldwork span: one day, a range inside a month, or across months */
 const btvSpan = (f) => {
   if (!f || !f.end) return "";
@@ -33,12 +40,11 @@ const btvSigned = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + btvN(Math.abs(v));
 const btvHouse = (src, houses, full) => (houses[src.house] ? houses[src.house][full ? "full" : "short"] : src.house);
 const btvCap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 const btvWord = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
+/* a topic's number, shared by the findings index and the topic's own head */
+const btvNo = (i) => String(i + 1).padStart(2, "0");
 /* an answer set inside a sentence ("14% unsure"): lower-cased, unless it
    opens on a name */
 const btvLow = (s) => (!s || /^(?:Australia|Australian|Labor|Liberal|Coalition|One Nation|Greens|Trump|Albanese|Hanson|I\b)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
-/* a long card takes the row: many rows, or long statements */
-const btvWide = (c) => c.kind === "nets" || (c.kind === "stack" && (c.rows.length >= 7
-  || c.rows.length * (c.rows.reduce((t, r) => t + (r.label || r.wording || "").length, 0) / c.rows.length) > 220));
 
 /* ---- the bar: one question's answers on a 0–100 track ------------------- */
 /* The agreeing side runs from the left, the disagreeing side ends at the
@@ -118,7 +124,6 @@ function BtvStack({ c, houses }) {
           {all ? "Show fewer" : "Show all " + c.rows.length}
         </button>
       ) : null}
-      {c.summary ? <p className="btv-sum">{c.summary}</p> : null}
     </div>
   );
 }
@@ -190,8 +195,8 @@ function BtvTable({ t }) {
   );
 }
 
-/* the line under every card: who asked, when, how many, where it was published,
-   and the exact wording a tap away */
+/* who asked, when, how many, where it was published, and the exact wording
+   a tap away */
 function BtvSource({ src, houses, question, extra }) {
   return (
     <div className="btv-src">
@@ -211,46 +216,60 @@ function BtvSource({ src, houses, question, extra }) {
     </div>
   );
 }
+/* several polls' sources: one link a poll (or a wave) */
+function BtvSources({ c, houses }) {
+  const seen = new Set();
+  const links = (c.rows || []).filter((r) => r.src && r.src.url && !seen.has(r.src.url) && seen.add(r.src.url));
+  return (
+    <div className="btv-src"><span className="btv-src-l">
+      {c.mode === "waves" ? <b>{btvHouse(c.src || c.rows[0].src, houses, true)}</b> : null}
+      {links.length ? (
+        <span className="btv-srcs">Sources: {links.map((r, i) => (
+          <a key={i} href={r.src.url} target="_blank" rel="noopener">{c.mode === "waves" ? btvMonth(r.src.field.end) : btvHouse(r.src, houses) + " " + btvMonth(r.src.field.end)} ↗</a>
+        ))}</span>
+      ) : null}
+    </span></div>
+  );
+}
 
-function BtvCard({ c, houses }) {
+/* ---- one question as a row: what was asked and by whom on the left, the
+   answers on the right (stacked on a phone) ---------------------------------- */
+function BtvItem({ c, houses }) {
   const body = c.kind === "split" ? <BtvSplit c={c} />
     : c.kind === "stack" ? <BtvStack c={c} houses={houses} />
     : c.kind === "rank" ? <BtvRank c={c} />
     : c.kind === "nets" ? <BtvNets c={c} /> : null;
   const folds = (c.folds || []).filter((t) => (t.rows || []).length);
   return (
-    <article className={"btv-card btv-k-" + c.kind + (btvWide(c) ? " btv-wide" : "")}>
-      <h4 className="btv-q">{c.title}</h4>
-      {body}
-      {c.note ? <p className="btv-note">{c.note}</p> : null}
-      {c.src && c.src.field ? (
-        <BtvSource src={c.src} houses={houses} question={c.question}
-          extra={folds.length ? folds.map((t, i) => <BtvTable key={i} t={t} />) : null} />
-      ) : (
-        <div className="btv-src"><span className="btv-src-l">
-          {c.mode === "waves" ? <b>{btvHouse(c.src || c.rows[0].src, houses, true)}</b> : null}
-          {(() => {
-            const seen = new Set();
-            const links = (c.rows || []).filter((r) => r.src && r.src.url && !seen.has(r.src.url) && seen.add(r.src.url));
-            return links.length ? (
-              <span className="btv-srcs">Sources: {links.map((r, i) => (
-                <a key={i} href={r.src.url} target="_blank" rel="noopener">{c.mode === "waves" ? btvMonth(r.src.field.end) : btvHouse(r.src, houses) + " " + btvMonth(r.src.field.end)} ↗</a>
-              ))}</span>
-            ) : null;
-          })()}
-        </span></div>
-      )}
+    <article className={"btv-item btv-k-" + c.kind}>
+      <div className="btv-il">
+        <h4 className="btv-q">{c.title}</h4>
+        {c.summary ? <p className="btv-sum">{c.summary}</p> : null}
+        {c.note ? <p className="btv-note">{c.note}</p> : null}
+        {c.src && c.src.field ? (
+          <BtvSource src={c.src} houses={houses} question={c.question}
+            extra={folds.length ? folds.map((t, i) => <BtvTable key={i} t={t} />) : null} />
+        ) : <BtvSources c={c} houses={houses} />}
+      </div>
+      <div className="btv-ir">{body}</div>
     </article>
   );
 }
 
-/* ---- a tracker: one small chart per pollster -------------------------------- */
+/* ---- a tracker: every pollster on one chart --------------------------------
+   Each line joins one pollster's own readings and is never joined to
+   another's; its colour is the family of wording the pollster asked in
+   (levels differ with the wording), its name sits at its end, and the list
+   beside the chart gives each pollster's latest. A dot is one poll; the
+   readout follows the dates the polls ended. */
 function BtvTracker({ c, houses }) {
   const narrow = useNarrow(MQ_PHONE);
-  const x0 = Math.min(...c.panels.flatMap((p) => p.points.map((q) => q.x))) - 0.06;
-  const x1 = Math.max(...c.panels.flatMap((p) => p.points.map((q) => q.x))) + 0.06;
+  const net = c.measure === "net";
+  const pts = c.panels.flatMap((p) => p.points.map((q) => ({ ...q, house: p.house, fam: p.fam })));
+  const x0 = Math.min(...pts.map((q) => q.x)) - 0.06;
+  const x1 = Math.max(...pts.map((q) => q.x)) + 0.06;
   const [lo, hi] = c.yDomain;
-  const step = hi - lo > 50 ? 25 : 10;
+  const step = c.yStep || (hi - lo > 50 ? 25 : 10);
   /* the ticks: each January and July inside the window */
   const ticks = [];
   for (let y = Math.floor(x0); y <= Math.ceil(x1); y++) {
@@ -259,56 +278,86 @@ function BtvTracker({ c, houses }) {
       if (x >= x0 && x <= x1) ticks.push({ x, label: BTV_MON[m] + " " + String(y).slice(2) });
     }
   }
-  const fmt = (v) => (c.measure === "net" ? btvSigned(v) : btvPct(v));
+  const fmt = (v) => (net ? btvSigned(v) : btvPct(v));
   const yt = [];
   for (let v = lo + step; v <= hi + 1e-9; v += step) yt.push(v);
-  const rows = c.panels.flatMap((p) => p.points.map((q) => ({ ...q, house: p.house }))).sort((p, q) => q.x - p.x);
+  const ink = (f) => "var(--btv-w" + f + ")";
+  const fams = c.families.map((label, i) => ({ label, i })).filter((f) => c.panels.some((p) => p.fam === f.i));
+  /* the readout's spine: each date a poll ended, once */
+  const spine = [...new Set(pts.map((q) => q.x))].sort((p, q) => p - q).map((x) => ({ x, y: pts.find((q) => q.x === x).v }));
+  const at = (i) => (spine[i] ? pts.filter((q) => q.x === spine[i].x) : []);
+  const latest = c.panels.map((p) => ({ p, q: p.points[p.points.length - 1] })).sort((a, b) => b.q.x - a.q.x);
+  const rows = pts.slice().sort((p, q) => q.x - p.x);
   return (
     <div className="btv-tracker">
-      <h4 className="btv-th">{c.head}</h4>
-      <p className="btv-tdek">{c.dek}</p>
       <p className="btv-tlab">{c.title}</p>
-      <div className={"btv-pgrid btv-pg" + c.panels.length}>
-        {c.panels.map((p) => {
-          const pts = p.points.map((q) => ({ x: q.x, y: q.v }));
-          const last = p.points[p.points.length - 1];
-          return (
-            <div className="btv-panel" key={p.house}>
-              <div className="btv-ptop"><span>{btvHouse(p, houses)}</span><b>{fmt(last.v)}</b></div>
-              <div className="btv-plab">{p.label}<span> · {p.points.length === 1 ? "one reading" : p.points.length + " readings"}</span></div>
-              <TrendChart key={"btv-" + c.id + "-" + p.house} heightPx={narrow ? 128 : 148} padPx={{ l: 30, r: 8, t: 20, b: 22 }}
-                xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={yt} yTickFmt={() => ""} xTicks={ticks} baseline
-                notes={yt.map((v) => ({ x: "left", y: v, dy: -3, text: c.measure === "net" ? btvSigned(v) : v + (v === hi ? "%" : ""), size: 10.5, cls: "btv-ylab" }))}
-                refLines={c.ref != null ? [{ y: c.ref, label: "", color: "var(--ink-faint)" }] : []}
-                series={[{ id: p.house, label: btvHouse(p, houses), color: "var(--ink-2)", rdWidth: 1.6, endCap: false, smooth: false, points: pts }]}
-                spine={pts}
-                scatter={p.points.map((q) => ({ x: q.x, y: q.v, color: "var(--ink)", label: c.measure === "net" ? "Net" : btvCap(c.names[0]),
-                  meta: { pollster: btvHouse(p, houses, true), dateLabel: btvSpan(q.field), sample: q.n } }))}
-                tooltipTitle={(i) => (p.points[i] ? btvSpan(p.points[i].field) : "")}
-                extraRows={(i) => {
-                  const q = p.points[i];
-                  return q ? [{ label: btvCap(c.names[0]), value: btvPct(q.a) }, { label: btvCap(c.names[1]), value: btvPct(q.b) }] : [];
-                }}
-                fmt={fmt}
-                copy={{ title: c.title.replace(/, by pollster$/, "") + ": " + btvHouse(p, houses, true), sub: c.head + ". " + p.label, legend: [] }}
-              />
-            </div>
-          );
-        })}
-      </div>
-      <p className="btv-tkey">
-        <span><i className="btv-dot" aria-hidden="true" />One poll</span>
-        <span><i className="btv-ln" aria-hidden="true" />The line joins one pollster’s own readings</span>
-        {c.ref != null ? <span><i className="btv-rl0" aria-hidden="true" />{c.refLabel}</span> : null}
+      <p className="btv-tdek">{c.dek}</p>
+      <p className="btv-fams">
+        {fams.map((f) => <span key={f.i}><i className={"btv-wsw btv-w" + f.i} aria-hidden="true" />{f.label}</span>)}
       </p>
-      {c.note ? <p className="btv-note">{c.note}</p> : null}
+      <div className="btv-tbody">
+        <div className="btv-tchart">
+          {/* the .card class is the copy-as-image composer's cue to build the
+              image from the chart's own copy (title, sub, legend), not to
+              photograph the topic around it; .btv-chart takes off a card's
+              chrome in both designs */}
+          <div className="card rd-card btv-chart">
+          <TrendChart key={"btv-" + c.id} heightPx={narrow ? 250 : 320} padPx={{ l: 34, r: 8, t: 20, b: 22 }}
+            xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={yt} yTickFmt={() => ""} xTicks={ticks} baseline
+            notes={yt.map((v) => ({ x: "left", y: v, dy: -3, text: net ? (v === 0 ? "Even" : btvSigned(v)) : v + (v === hi ? "%" : ""), size: 10.5, cls: "btv-ylab" }))}
+            refLines={c.ref != null ? [{ y: c.ref, label: "", color: "var(--ink-faint)" }] : []}
+            series={c.panels.map((p) => ({ id: p.house, label: btvHouse(p, houses), color: ink(p.fam), rdWidth: 2, smooth: false,
+              endLabel: btvHouse(p, houses), points: p.points.map((q) => ({ x: q.x, y: q.v })) }))}
+            spine={spine}
+            scatter={pts.map((q) => ({ x: q.x, y: q.v, color: ink(q.fam), label: net ? "Net" : btvCap(c.names[0]),
+              meta: { pollster: btvHouse(q, houses, true), dateLabel: btvSpan(q.field), sample: q.n } }))}
+            tooltipTitle={(i) => { const qs = at(i); return qs.length === 1 ? btvSpan(qs[0].field) : qs.length ? btvDay(qs[0].field.end) : ""; }}
+            extraRows={(i) => {
+              const qs = at(i);
+              return qs.flatMap((q) => {
+                const pre = qs.length > 1 ? btvHouse(q, houses) + ": " : "";
+                return net ? [{ label: pre + btvCap(c.names[0]), value: btvPct(q.a) }, { label: pre + btvCap(c.names[1]), value: btvPct(q.b) }]
+                  : [{ label: pre + btvCap(c.names[1]), value: btvPct(q.b) }];
+              });
+            }}
+            fmt={fmt}
+            copy={{ title: c.title, sub: c.head + "." + (c.note ? " " + c.note : ""),
+              span: btvMonYY(c.first) + " – " + btvMonYY(c.last),
+              caption: "Each dot is one poll; a line joins one pollster’s own readings, coloured by how it asked.",
+              legend: fams.map((f) => ({ label: f.label, color: ink(f.i), kind: "line" }))
+                .concat(c.ref != null ? [{ label: c.refLabel, color: "var(--ink-faint)", kind: "dashed" }] : []) }}
+          />
+          <p className="rd-ckey btv-tkey">
+            <span><i className="btv-dot" aria-hidden="true" />One poll</span>
+            <span><i className="btv-ln" aria-hidden="true" />One pollster’s readings, joined</span>
+            {c.ref != null ? <span><i className="btv-rl0" aria-hidden="true" />{c.refLabel}</span> : null}
+          </p>
+          </div>
+          {c.note ? <p className="btv-note">{c.note}</p> : null}
+        </div>
+        <aside className="btv-latest" aria-label="Latest from each pollster">
+          <p className="btv-lh">Latest from each pollster</p>
+          <ul className="btv-ll">
+            {latest.map(({ p, q }) => (
+              <li key={p.house}>
+                <span className="btv-lp">
+                  <span className="btv-lnm"><i className={"btv-ldot btv-w" + p.fam} aria-hidden="true" />{btvHouse(p, houses)}
+                    <span className="btv-ld">{btvDay(q.field.end)}</span></span>
+                  <span className="btv-lq">{p.label}</span>
+                </span>
+                <b className="btv-lv">{fmt(q.v)}</b>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </div>
       <details className="btv-ledger">
         <summary>All {rows.length} readings</summary>
         <div className="btv-twrap">
           <table className="btv-table">
             <thead><tr>
               <th className="btv-l">Pollster</th><th className="btv-l">Fieldwork</th><th>Sample</th>
-              <th>{c.cols[0]}</th><th>{c.cols[1]}</th><th>{c.cols[2]}</th>{c.measure === "net" ? <th>Net</th> : null}<th />
+              <th>{c.cols[0]}</th><th>{c.cols[1]}</th><th>{c.cols[2]}</th>{net ? <th>Net</th> : null}<th />
             </tr></thead>
             <tbody>
               {rows.map((q, i) => (
@@ -316,7 +365,7 @@ function BtvTracker({ c, houses }) {
                   <td className="btv-l">{btvHouse(q, houses)}</td><td className="btv-l">{btvSpan(q.field)}</td>
                   <td>{q.n ? q.n.toLocaleString("en-AU") : "–"}</td>
                   <td>{btvN(q.a)}</td><td>{btvN(q.m)}</td><td>{btvN(q.b)}</td>
-                  {c.measure === "net" ? <td><b>{btvSigned(q.v)}</b></td> : null}
+                  {net ? <td><b>{btvSigned(q.v)}</b></td> : null}
                   <td>{q.url ? <a href={q.url} target="_blank" rel="noopener">Source ↗</a> : null}</td>
                 </tr>
               ))}
@@ -355,16 +404,49 @@ function BtvMore({ t, houses }) {
   );
 }
 
-function BtvTopic({ t, houses }) {
+/* ---- a topic: its number and name, its finding, then the evidence ---------- */
+function BtvTopic({ t, n, houses }) {
   const trackers = t.blocks.filter((b) => b.kind === "tracker");
-  const cards = t.blocks.filter((b) => b.kind !== "tracker");
+  const items = t.blocks.filter((b) => b.kind !== "tracker");
+  const count = [
+    trackers.length ? (trackers.length === 1 ? "One chart" : btvCap(btvWord(trackers.length)) + " charts") : null,
+    items.length ? items.length + (items.length === 1 ? " question" : " questions") : null,
+    t.more.length ? t.more.length + " more" : null,
+  ].filter(Boolean).join(" · ");
   return (
     <section className="btv-topic" id={"btv-" + t.id} aria-labelledby={"btv-h-" + t.id}>
-      <h3 className="btv-tt" id={"btv-h-" + t.id}>{t.title}</h3>
+      <div className="btv-tk">
+        <h3 className="btv-tt" id={"btv-h-" + t.id}><span className="btv-tn">{n}</span>{t.title}</h3>
+        <span className="btv-tc">{count}</span>
+      </div>
+      {t.finding ? <p className="btv-hl">{t.finding.text}</p> : null}
       <p className="btv-tdk">{t.dek}</p>
       {trackers.map((c) => <BtvTracker key={c.id} c={c} houses={houses} />)}
-      {cards.length ? <div className="btv-grid">{cards.map((c, i) => <BtvCard key={(c.id || "") + i} c={c} houses={houses} />)}</div> : null}
+      {items.length ? <div className="btv-items">{items.map((c, i) => <BtvItem key={(c.id || "") + i} c={c} houses={houses} />)}</div> : null}
       {t.more.length ? <BtvMore t={t} houses={houses} /> : null}
+    </section>
+  );
+}
+
+/* ---- the findings: one sentence a topic, each a link to its topic ---------- */
+function BtvFindings({ topics }) {
+  return (
+    <section className="btv-finds" aria-labelledby="btv-finds-h">
+      <h3 className="btv-fh" id="btv-finds-h">The findings</h3>
+      <ol className="btv-fl" role="list">
+        {topics.map((t, i) => (t.finding ? (
+          <li key={t.id}>
+            <a className="btv-f" href={"#btv-" + t.id}>
+              <span className="btv-fn" aria-hidden="true">{btvNo(i)}</span>
+              <span className="btv-fb">
+                <span className="btv-fk">{t.short}</span>
+                <span className="btv-ft">{t.finding.text}</span>
+                <span className="btv-fm">{t.finding.meta}</span>
+              </span>
+            </a>
+          </li>
+        ) : null))}
+      </ol>
     </section>
   );
 }
@@ -418,19 +500,20 @@ function BtvBody() {
   const more = topics.reduce((n, t) => n + t.more.length, 0);
   return (
     <div className="btv">
-      <nav className="btv-nav" aria-label="Topics">
-        {topics.map((t) => <a key={t.id} href={"#btv-" + t.id}>{t.short}</a>)}
-      </nav>
+      <BtvFindings topics={topics} />
       <p className="btv-scope">
-        {src.counts.featured} questions in charts and cards, and {more} more in the topics’ lists, from {btvWord(Object.keys(houses).length)} pollsters
+        {src.counts.featured} questions in charts and answers, and {more} more in the topics’ lists, from {btvWord(Object.keys(houses).length)} pollsters
         {" "}since {btvMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.
       </p>
-      {topics.map((t) => <BtvTopic key={t.id} t={t} houses={houses} />)}
+      {topics.map((t, i) => <BtvTopic key={t.id} t={t} n={btvNo(i)} houses={houses} />)}
       <div className="btv-how">
-        <p><b>How to read the cards.</b> Each bar is one poll’s answers on a scale of 0 to 100, as the pollster printed them, with
-          the agreeing side on the left and the disagreeing side on the right; stronger answers are in full colour, milder ones faded. Where
-          the two sides are within the poll’s 95% margin of error, the card says “level” rather than naming a winner.
-          Pollsters word their questions differently, so compare a pollster with itself before comparing it with another.</p>
+        <p><b>How the findings are called.</b> Each topic opens with what its first chart or question found. A side is said
+          to lead only where the gap clears the poll’s 95% margin of error, and to be a majority only where its share clears
+          half by its own margin; inside the margin, the answer is “level” and the voters “divided”.</p>
+        <p><b>How to read the answers.</b> Each bar is one poll’s answers on a scale of 0 to 100, as the pollster printed them, with
+          the agreeing side on the left and the disagreeing side on the right; stronger answers are in full colour, milder ones faded.
+          In the charts, each line joins one pollster’s own readings and is coloured by how that pollster asked. Pollsters word
+          their questions differently, so compare a pollster with itself before comparing it with another.</p>
         <p><b>What is left out.</b> Questions about sport, holidays and personal habits, state politics, surveys run before
           this term, and questions the main page already tracks, such as whether the country is heading in the right direction.</p>
       </div>
@@ -446,7 +529,7 @@ function RdBeyond() {
         <span className="rd-meta">What else Australians tell the pollsters</span>
       </div>
       <RdHed head="What Australians think about the issues"
-        dek="Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, from Donald Trump and immigration to the budget, the Iran war and the Bondi attack, in ten topics. Where several pollsters asked the same thing, their answers sit side by side." />
+        dek="Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in ten topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side." />
       <BtvBody />
     </section>
   );

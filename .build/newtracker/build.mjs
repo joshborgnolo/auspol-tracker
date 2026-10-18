@@ -761,10 +761,11 @@ function ssChangelogBlock(esc) {
 /* The Beyond the vote page's static article: the payload the live page draws
    (gen-data's oneoffs-source.json, which beyond-the-vote.mjs builds from the
    one-off stores), set as text in the same topic order, so a no-JS reader or
-   a crawler gets the page's findings and figures: each topic an h2 and its
-   dek; each tracker its head, dek and every pollster's latest reading; each
-   card its question, figures and pollster; each topic's further questions
-   as a list of titles. One source, so the two can never disagree. No
+   a crawler gets the page's findings and figures: the index of findings the
+   page opens on; each topic an h2, its finding and its dek; each tracker
+   its title, dek and every pollster's latest reading; each question its
+   figures and pollster; each topic's further questions as a list of
+   titles. One source, so the two can never disagree. No
    colour here; the .btv-ss styles are template.html's. Caller supplies its
    esc. */
 const BTV_SS_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -787,7 +788,7 @@ function ssBeyondBlock(esc) {
         return `<li>${house(p.house, true)}, ${month(q.field.end)}: ${c.measure === "net" ? "net " + signed(q.v) + " (" + pct(q.a) + " " + esc(c.names[0]) + ", " + pct(q.b) + " " + esc(c.names[1]) + ")" : pct(q.v) + " " + esc(c.names[0])}</li>`;
       }).join("");
       return `
-        <h3>${esc(c.head)}</h3>
+        <h3>${esc(c.title)}</h3>
         <p>${esc(c.dek)}</p>
         <ul class="btv-ss-list">${latest}</ul>`;
     }
@@ -804,15 +805,21 @@ function ssBeyondBlock(esc) {
         <p><span class="btv-ss-by">${esc(c.base || c.unit || "")}${c.base || c.unit ? ". " : ""}${by(c.src)}</span></p>`;
     return "";
   };
-  const sections = src.topics.filter((t) => t.blocks.length || t.more.length).map((t) => `
-      <h2>${esc(t.title)}</h2>
+  const shown = src.topics.filter((t) => t.blocks.length || t.more.length);
+  /* the index the live page opens on: each topic's finding, as text */
+  const findings = shown.filter((t) => t.finding).map((t) => `<li><b>${esc(t.short)}:</b> ${esc(t.finding.text)}. <span class="btv-ss-by">${esc(t.finding.meta)}</span></li>`).join("");
+  const sections = shown.map((t) => `
+      <h2>${esc(t.title)}</h2>${t.finding ? `
+      <p><b>${esc(t.finding.text)}.</b> <span class="btv-ss-by">${esc(t.finding.meta)}</span></p>` : ""}
       <p class="btv-ss-dek">${esc(t.dek)}</p>
 ${t.blocks.map(block).join("")}${t.more.length ? `
         <h3>More questions on ${esc(t.short.charAt(0).toLowerCase() + t.short.slice(1))}</h3>
         <ul class="btv-ss-list">${t.more.map((q) => `<li>${esc(q.title)} <span class="btv-ss-by">(${house(q.house)}, ${month(q.last)})</span></li>`).join("")}</ul>` : ""}`).join("");
   return `
 
-      <section class="btv-ss" aria-label="Beyond the vote: the questions by topic">${sections}
+      <section class="btv-ss" aria-label="Beyond the vote: the questions by topic">
+      <h2>The findings</h2>
+      <ol class="btv-ss-list">${findings}</ol>${sections}
       </section>`;
 }
 
@@ -1168,16 +1175,16 @@ ${body.trim()}
   }
   /* the ☰ menu's fifth page, Beyond the vote: the questions the pollsters
      ask beyond voting intention, by topic (ssBeyondBlock); the live tab draws
-     the same payload as charts and cards (RdBeyond, rd-beyond.jsx). Federal
+     the same payload as findings, charts and rows (RdBeyond, rd-beyond.jsx). Federal
      only – /vic/'s menu never holds it */
   if (id === "beyond-the-vote") {
     return `<article class="static-summary">
   <h1>Beyond the vote</h1>
   <p class="ss-sub">Voting intention is only part of what the pollsters ask. This page
-    gathers the rest of this term&#8217;s questions worth knowing, from Donald Trump and
-    immigration to the budget, the Iran war and the Bondi attack, in ten topics. Where
-    several pollsters asked the same thing, their answers sit side by side; every
-    figure names its pollster and links to its source.</p>
+    gathers the rest of this term&#8217;s questions worth knowing, in ten topics from
+    Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each
+    opens with what the polls found; where several pollsters asked the same thing, their
+    answers sit side by side, and every figure names its pollster and links to its source.</p>
 
 ${ssBeyondBlock(esc)}
 

@@ -808,8 +808,10 @@
     const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
     const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
     const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
-    let span = "", cycSpan = false;
-    if (cycs.length) {
+    /* a chart whose ticks stop short of its data's ends (Beyond the vote's
+       trackers tick only Januaries and Julys) states its own span */
+    let span = own && typeof own.span === "string" ? own.span : "", cycSpan = false;
+    if (!span && cycs.length) {
       const runs = [];
       cycs.forEach((c, i) => {
         if (c.off) return;

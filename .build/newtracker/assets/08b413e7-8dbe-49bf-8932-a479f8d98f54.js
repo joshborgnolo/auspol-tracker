@@ -177,14 +177,16 @@ function straightPath(pts, sx, sy) {
  *           window, which an interval belonging to ONE line needs for the same
  *           reason the line does.
  *  yTickFmt: (t) => string  a y-axis label (default: the tick, then `unit`)
- *  copy:    { title?, sub?, caption?, terms?,
+ *  copy:    { title?, sub?, caption?, terms?, span?,
  *             legend?: [{label, color, kind: "line"|"dashed"|"shade"|"dot"|"ring"}] }
  *           what the copy-as-image button (copy-chart.js) draws for THIS
  *           chart, for a panel with no legend chips of its own or with more
  *           than one chart in its card; rides on the host as data-copy. A
  *           legend given is the whole legend ([] for none, where the lines
  *           are named at their ends); `caption` sits under it; `terms` are
- *           the Past cycles terms the chart has data for
+ *           the Past cycles terms the chart has data for; `span` is the
+ *           title's date range where the x ticks stop short of the data's
+ *           ends (else the first and last tick labels make it)
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
  *           secondary value shown beside its own row

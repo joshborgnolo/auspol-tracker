@@ -415,9 +415,11 @@ function foldsOf(e, drawn) {
 
 /* ---- trackers ---------------------------------------------------------------
    One question asked again and again, by several pollsters in their own
-   words: a small chart per pollster on one shared scale (levels differ with
-   the wording, so readings are never pooled or joined across pollsters),
-   every reading listed beneath. */
+   words: one chart, a line per pollster joining only its own readings
+   (levels differ with the wording, so readings are never pooled or joined
+   across pollsters), each line coloured by the family of wording it was
+   asked in (`fam`, naming one of the spec's `families`), every reading
+   listed beneath. */
 function buildTracker(spec, ix, deff) {
   const panels = spec.series.map((sr) => {
     const pts = ix.waves(sr.id, sr.house).filter((e) => !(sr.skip || []).includes(e.waveDate)).map((e) => {
@@ -428,12 +430,14 @@ function buildTracker(spec, ix, deff) {
       return { ...sourceOf(e), x: Math.round(dx(fieldOf(e).end) * 1e4) / 1e4, a: s.a, b: s.b, m: r1(s.m + s.x), v,
         se: se != null ? r1(se) : null };
     }).sort((p, q) => p.x - q.x);
-    return { house: sr.house, label: sr.label, question: sr.question || ix.waves(sr.id, sr.house)[0].question, points: pts };
+    if (!spec.families[sr.fam]) throw new Error("beyond-the-vote: " + spec.key + " / " + sr.house + " names no wording family");
+    return { house: sr.house, label: sr.label, fam: sr.fam, question: sr.question || ix.waves(sr.id, sr.house)[0].question, points: pts };
   }).filter((p) => p.points.length);
   const all = panels.flatMap((p) => p.points);
   const copy = TRACKER_COPY[spec.copy](panels);
   return { kind: "tracker", id: spec.key, title: spec.title, measure: spec.measure, names: spec.names,
-    cols: spec.cols, yDomain: spec.yDomain, ref: spec.ref ?? null, refLabel: spec.refLabel || null, panels,
+    cols: spec.cols, yDomain: spec.yDomain, yStep: spec.yStep || null, ref: spec.ref ?? null, refLabel: spec.refLabel || null,
+    families: spec.families, panels,
     head: copy.head, dek: copy.dek, note: spec.note || null,
     first: all.reduce((m, p) => (p.field.end < m ? p.field.end : m), "9999"),
     last: all.reduce((m, p) => (p.field.end > m ? p.field.end : m), "0000") };
@@ -500,8 +504,84 @@ const TRACKER_COPY = {
   },
 };
 
+/* ---- the findings -------------------------------------------------------------
+   Each topic opens on one sentence, its first block read through the same
+   margin rules as the rest of the page, and the page's index lists the ten.
+   A tracker's finding is its head. Otherwise the block's spec words every
+   outcome (`find`), so new figures can change the sentence but never leave
+   it claiming what they no longer show:
+   - one question (split): a side "leads" only by more than the lead's
+     margin, and is a majority only where its share clears half by its own
+     margin (aMaj / aMore / bMaj / bMore), else the two are level (level);
+     with no sample on file, the shares are stated with no verdict (none);
+   - several polls (compare): the tally, in words – a side ahead in every
+     poll, in some with none the other way, the polls split both ways, or
+     none clear either way;
+   - a ranked list (single-answer questions only, whose shares come out of
+     one sample): the top answer alone only where it leads the next by more
+     than their margin (one), else the two together (tie). */
+const fmtPct = (v) => (Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : (Math.round(v * 10) / 10).toFixed(1)) + "%";
+const fill = (s, vals) => s.replace(/\{(\w+)\}/g, (_, k) => vals[k]);
+const capFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+/* an answer set inside a sentence: lower-cased, unless it opens on a name */
+const lowFirst = (s) => (/^(?:Australia|Labor|Liberal|Coalition|One Nation|Greens|Donald|Trump|Albanese|Hanson|I\b)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
+const numWord = (k) => (k <= 10 ? NUMW[k] : String(k));
+
+function splitFinding(b, P, deff) {
+  const neff = b.src.neff || (b.src.n ? b.src.n / deff : null);
+  const v = { a: fmtPct(b.a), b: fmtPct(b.b) };
+  if (b.sig == null || !neff) return fill(P.none, v);
+  if (!b.sig) return fill(P.level, v);
+  const k = b.a > b.b ? "a" : "b";
+  return fill(P[k + (b[k] - 1.96 * seShare(b[k], neff) > 50 ? "Maj" : "More")], v);
+}
+function tallyFinding(b, P, tally) {
+  const n = b.rows.length;
+  const aL = b.rows.filter((r) => r.sig === true && r.lead > 0).length, bL = b.rows.filter((r) => r.sig === true && r.lead < 0).length;
+  const all = n === 1 ? "in the one poll" : n === 2 ? "in both polls" : "in all " + numWord(n) + " polls";
+  if (aL === n) return P.a + " " + all;
+  if (bL === n) return P.b + " " + all;
+  if (aL && !bL) return P.a + " in " + numWord(aL) + " of the " + numWord(n) + " polls";
+  if (bL && !aL) return P.b + " in " + numWord(bL) + " of the " + numWord(n) + " polls";
+  if (aL && bL) return "Polls disagree on " + P.topic + ": " + tally[0] + " in " + numWord(aL) + ", " + tally[1] + " in " + numWord(bL);
+  return (n === 2 ? "Neither poll" : "No poll") + " finds a clear lead either way on " + P.topic;
+}
+function rankFinding(b, P, deff) {
+  const [r0, r1_] = b.rows;
+  const v = { v1: fmtPct(r0.v), l1: lowFirst(r0.label), v2: r1_ ? fmtPct(r1_.v) : "", l2: r1_ ? lowFirst(r1_.label) : "" };
+  if (!r1_) return fill(P.one, v);
+  const neff = b.src.neff || (b.src.n ? b.src.n / deff : null);
+  if (!neff) return fill(P.none, v);
+  return fill(leadOf(r0.v, r1_.v, neff).sig ? P.one : P.tie, v);
+}
+/* whose figures the finding reads: the pollsters and readings behind a
+   tracker, the polls behind a tally, else the one poll */
+function findingMeta(b) {
+  if (b.kind === "tracker") {
+    const m = b.panels.reduce((k, p) => k + p.points.length, 0);
+    return capFirst(numWord(b.panels.length)) + " pollsters, " + numWord(m) + " readings since " + monthYear(b.first);
+  }
+  if (b.kind === "stack" && b.mode === "compare") {
+    const ends = b.rows.map((r) => r.src.field.end).sort();
+    const f = monthYear(ends[0]), l = monthYear(ends[ends.length - 1]);
+    return capFirst(numWord(b.rows.length)) + " polls, " + (f === l ? f : f + " to " + l);
+  }
+  return HOUSES[b.src.house].short + ", " + monthYear(b.src.field.end);
+}
+function findingOf(spec, b, deff) {
+  const text = b.kind === "tracker" ? b.head
+    : !spec.find ? null
+    : b.kind === "split" ? splitFinding(b, spec.find, deff)
+    : b.kind === "stack" && b.mode === "compare" ? tallyFinding(b, spec.find, spec.tally)
+    : b.kind === "rank" ? rankFinding(b, spec.find, deff)
+    : null;
+  if (!text) throw new Error("beyond-the-vote: a topic's first block words no finding (" + (spec.key || spec.ref.id) + ")");
+  return { text, meta: findingMeta(b), of: b.id };
+}
+
 /* ---- the curation ------------------------------------------------------------
-   Per topic, in reading order. `title` is the card's plain question; the
+   Per topic, in reading order, led by the block the topic's finding reads
+   (see the findings above). `title` is the card's plain question; the
    pollster's own wording travels beside it. Sides are named where the
    wording rules would misplace an answer or the side's word reads badly. */
 const R = (id, house, wave) => ({ id, house, wave });
@@ -512,13 +592,14 @@ export const FEATURES = {
     { kind: "tracker", key: "immigration-less", copy: "immigration", measure: "share",
       title: "Share wanting less immigration, by pollster", names: ["want less", "want more"],
       cols: ["Want less", "Same or unsure", "Want more"],
-      yDomain: [40, 80], ref: 50, refLabel: "Half",
-      note: "Each pollster asks in its own words, so compare a pollster’s readings with each other rather than with another pollster’s. Resolve and SEC Newgate ask whether immigration is too high; YouGov and Newspoll whether arrivals should fall; Essential whether the yearly intake should.",
+      yDomain: [45, 70], yStep: 5, ref: 50, refLabel: "Half",
+      note: "Each pollster asks in its own words, so compare a pollster’s readings with each other rather than with another pollster’s.",
+      families: ["Asked if the level is too high", "Asked if numbers should fall"],
       sides: LESS,
       series: [
-        { house: "resolve", id: "immigration-level", label: "Is immigration too high?" },
-        { house: "secnewgate", id: "immigration-level", label: "Is immigration too high?" },
-        { house: "news24", id: "immigration-levels", label: "Should arrivals fall?",
+        { house: "resolve", id: "immigration-level", label: "Is immigration too high?", fam: 0 },
+        { house: "secnewgate", id: "immigration-level", label: "Is immigration too high?", fam: 0 },
+        { house: "news24", id: "immigration-levels", label: "Should arrivals fall?", fam: 1,
           /* May and September print only the crosstab of net change: its
              all-voters row, read across the header */
           pick: (e) => {
@@ -529,8 +610,8 @@ export const FEATURES = {
             }
             return tableRows(t).map((r) => [r[0], r[1]]);
           } },
-        { house: "newspoll", id: "immigration-levels", label: "Fewer immigrants?" },
-        { house: "essential", id: "immigration-intake", label: "Should the intake fall?" },
+        { house: "newspoll", id: "immigration-levels", label: "Fewer immigrants?", fam: 1 },
+        { house: "essential", id: "immigration-intake", label: "Should the intake fall?", fam: 1 },
       ] },
     { kind: "split", title: "Would people still want immigration cut if housing and services kept pace?", ref: R("immigration-if-services", "essential"),
       names: ["still want cuts", "would not"] },
@@ -555,12 +636,13 @@ export const FEATURES = {
       title: "Donald Trump’s net favourability, by pollster", names: ["favourable", "unfavourable"],
       cols: ["Favourable", "Neither or unsure", "Unfavourable"],
       yDomain: [-75, 0], ref: 0, refLabel: "Even",
-      note: "Net favourability is the favourable share less the unfavourable. Freshwater, RedBridge and Essential ask whether people view Trump favourably; SEC Newgate whether they feel positive or negative towards him. Essential offers no neutral answer, which lifts both sides of its reading.",
+      note: "Net favourability is the favourable share less the unfavourable. Essential offers no neutral answer, which lifts both sides of its reading.",
+      families: ["Asked if they view him favourably", "Asked how they feel towards him"],
       series: [
-        { house: "freshwater", id: "trump-favourability", label: "Favourable or unfavourable?" },
-        { house: "redbridge", id: "trump-favourability", label: "Favourable or unfavourable?" },
-        { house: "secnewgate", id: "trump-sentiment", label: "Positive or negative feelings?" },
-        { house: "essential", id: "trump-favourability", label: "Favourable or unfavourable?" },
+        { house: "freshwater", id: "trump-favourability", label: "Favourable or unfavourable?", fam: 0 },
+        { house: "redbridge", id: "trump-favourability", label: "Favourable or unfavourable?", fam: 0 },
+        { house: "secnewgate", id: "trump-sentiment", label: "Positive or negative feelings?", fam: 1 },
+        { house: "essential", id: "trump-favourability", label: "Favourable or unfavourable?", fam: 0 },
       ] },
     { kind: "stack", mode: "battery", key: "aukus", title: "Do Australians support AUKUS?",
       ref: R("aukus-security", "secnewgate", "2026-09-14"), table: 1, sort: false, names: ["support", "oppose"],
@@ -593,6 +675,15 @@ export const FEATURES = {
   ],
 
   "one-nation": [
+    { kind: "split", title: "Is the rise of One Nation good or bad for Australia?", ref: R("one-nation-rise-impact", "secnewgate"), names: ["good", "bad"],
+      find: {
+        aMaj: "{a} say rising support for One Nation is good for Australia",
+        aMore: "More say rising support for One Nation is good for Australia than bad, {a} to {b}",
+        bMaj: "{b} say rising support for One Nation is bad for Australia",
+        bMore: "More say rising support for One Nation is bad for Australia than good, {b} to {a}",
+        level: "Voters are divided on whether One Nation’s rise is good or bad for Australia, {a} to {b}",
+        none: "{a} say rising support for One Nation is good for Australia, and {b} bad",
+      } },
     { kind: "rank", title: "Why One Nation appeals to its supporters", ref: R("one-nation-appeal", "secnewgate"),
       base: "% of One Nation supporters giving each reason, in their own words" },
     { kind: "rank", title: "What draws voters open to One Nation?", ref: R("one-nation-consideration-reason", "essential"),
@@ -602,7 +693,6 @@ export const FEATURES = {
     { kind: "nets", title: "Which messages move voters towards or away from One Nation?", ref: R("one-nation-message-experiment", "redbridge"),
       unit: "Net more willing to vote One Nation: the share more willing after hearing each statement, less the share less willing",
       strip: /\s*[—–-]\s*net more willing\s*$/i },
-    { kind: "split", title: "Is the rise of One Nation good or bad for Australia?", ref: R("one-nation-rise-impact", "secnewgate"), names: ["good", "bad"] },
     { kind: "split", title: "Do voters approve of Pauline Hanson as leader?", ref: R("hanson-approval", "essential") },
     { kind: "split", title: "Should renters and mortgage holders get a quarter of their super as pay, as One Nation proposes?",
       ref: R("one-nation-super-policy", "secnewgate") },
@@ -614,6 +704,8 @@ export const FEATURES = {
   "housing-budget": [
     { kind: "stack", mode: "compare", key: "budget-verdicts", title: "How did voters judge the May 2026 budget?", names: ["positive", "negative"],
       tally: ["positive verdicts lead", "negative verdicts lead"],
+      find: { a: "Positive verdicts on the May budget outnumber negative ones", b: "Negative verdicts on the May budget outnumber positive ones",
+        topic: "the May budget" },
       items: [
         { ref: R("post-budget-economy-verdict", "newspoll"), wording: "Good or bad for the economy?" },
         { ref: R("post-budget-personal-impact", "newspoll"), wording: "Will you be better or worse off?" },
@@ -668,6 +760,9 @@ export const FEATURES = {
   "cost-of-living": [
     { kind: "rank", title: "Who is to blame for the cost-of-living crunch?", ref: R("cost-of-living-blame", "resolve", "2026-10-10"),
       base: "% naming each as primarily responsible",
+      find: { one: "{v1} hold {l1} primarily responsible for the cost-of-living crunch",
+        tie: "Blame for the cost-of-living crunch splits between {l1}, at {v1}, and {l2}, at {v2}",
+        none: "{v1} hold {l1} primarily responsible for the cost-of-living crunch, and {v2} {l2}" },
       note: "Resolve published only these three answers. In November 2025, 42% blamed the federal government, 16% global factors and 7% the Reserve Bank." },
     { kind: "split", title: "Was the latest rate rise mainly caused by the Middle East conflict, as the Treasurer says?",
       ref: R("chalmers-middle-east-rate-rise", "news24"), wideRow: 0, names: ["agree", "disagree"] },
@@ -690,13 +785,21 @@ export const FEATURES = {
   ],
 
   "war-security": [
+    { kind: "split", title: "Should Australia send ships to help keep the Strait of Hormuz open?", ref: R("hormuz-naval-deployment", "newspoll"),
+      find: {
+        aMaj: "{a} backed sending Australian naval ships to help keep the Strait of Hormuz open",
+        aMore: "More backed than opposed sending naval ships to help keep the Strait of Hormuz open, {a} to {b}",
+        bMaj: "{b} opposed sending Australian naval ships to help keep the Strait of Hormuz open",
+        bMore: "More opposed than backed sending naval ships to help keep the Strait of Hormuz open, {b} to {a}",
+        level: "Voters were divided on sending naval ships to help keep the Strait of Hormuz open, {a} to {b}",
+        none: "{a} backed sending naval ships to help keep the Strait of Hormuz open, and {b} opposed it",
+      } },
     { kind: "stack", mode: "compare", key: "iran-strikes", title: "Did voters back the US strikes on Iran?", names: ["approve", "disapprove"],
       tally: ["approval leads", "disapproval leads"],
       items: [
         { ref: R("iran-us-military-action", "newspoll"), wording: "US military action against Iran" },
         { ref: R("iran-strikes-approval", "essential"), wording: "The US and Israel’s decision to strike Iran" },
       ] },
-    { kind: "split", title: "Should Australia send ships to help keep the Strait of Hormuz open?", ref: R("hormuz-naval-deployment", "newspoll") },
     { kind: "stack", mode: "battery", key: "middle-east-role", title: "What role should Australia play in the Middle East war?",
       ref: R("middle-east-involvement", "essential"), names: ["support", "oppose"] },
     { kind: "rank", title: "The biggest worry about the Iran war", ref: R("iran-war-biggest-concern", "news24"), wideRow: "Total",
@@ -719,6 +822,9 @@ export const FEATURES = {
   "bondi-cohesion": [
     { kind: "stack", mode: "compare", key: "bondi-response", title: "How well did the government respond to the Bondi attack?", names: ["well", "badly"],
       tally: ["a good verdict leads", "a poor verdict leads"],
+      find: { a: "More voters rated the government’s response to the Bondi attack well than poorly",
+        b: "More voters rated the government’s response to the Bondi attack poorly than well",
+        topic: "the government’s response to the Bondi attack" },
       items: [
         { ref: R("bondi-albanese-handling", "essential"), wording: "Albanese’s handling of the issues since" },
         { ref: R("bondi-response-strength", "resolve"), wording: "The federal government’s response",
@@ -738,9 +844,17 @@ export const FEATURES = {
   ],
 
   "climate-energy": [
-    { kind: "split", title: "Do voters support net zero emissions by 2050?", ref: R("net-zero-2050", "essential") },
     { kind: "split", title: "Should Australia drill for more oil and gas, even if it undermines net zero?", ref: R("oil-gas-exploration-vs-net-zero", "news24"),
-      sides: { a: /^yes/i, b: /^no/i }, names: ["yes", "no"] },
+      sides: { a: /^yes/i, b: /^no/i }, names: ["yes", "no"],
+      find: {
+        aMaj: "{a} back more oil and gas exploration, even if it undermines net zero",
+        aMore: "More back than oppose more oil and gas exploration at the cost of net zero, {a} to {b}",
+        bMaj: "{b} oppose more oil and gas exploration if it undermines net zero",
+        bMore: "More oppose than back more oil and gas exploration at the cost of net zero, {b} to {a}",
+        level: "Voters are divided on more oil and gas exploration at the cost of net zero, {a} to {b}",
+        none: "{a} back more oil and gas exploration even if it undermines net zero, and {b} do not",
+      } },
+    { kind: "split", title: "Do voters support net zero emissions by 2050?", ref: R("net-zero-2050", "essential") },
     { kind: "split", title: "How fast should Australia move to renewable energy?", ref: R("energy-supply-attitudes", "essential"),
       sides: { a: /move as quickly|steady pace/i, b: /slow down|not shift away/i }, strong: /as quickly as possible|not shift away/i,
       names: ["move to renewables", "slow or stop the shift"],
@@ -756,6 +870,8 @@ export const FEATURES = {
   "tech-society": [
     { kind: "stack", mode: "compare", key: "social-ban", title: "Do voters back the under-16 social media ban?", names: ["support", "oppose"],
       tally: ["support leads", "opposition leads"],
+      find: { a: "Support for the under-16 social media ban outweighs opposition", b: "Opposition to the under-16 social media ban outweighs support",
+        topic: "the under-16 social media ban" },
       items: [
         { ref: R("social-media-ban-under16", "news24") },
         { ref: R("social-media-ban", "essential", "2025-12-10") },
@@ -786,7 +902,15 @@ export const FEATURES = {
 
   "trust-democracy": [
     { kind: "split", title: "Has the Albanese government lived up to expectations?", ref: R("government-performance", "essential"),
-      sides: { a: ["Exceeded expectations", "Met expectations"], b: ["Fallen short of expectations"] }, names: ["met or exceeded them", "fallen short"] },
+      sides: { a: ["Exceeded expectations", "Met expectations"], b: ["Fallen short of expectations"] }, names: ["met or exceeded them", "fallen short"],
+      find: {
+        aMaj: "{a} say the Albanese government has met or exceeded their expectations",
+        aMore: "More say the Albanese government has met their expectations than fallen short, {a} to {b}",
+        bMaj: "{b} say the Albanese government has fallen short of their expectations",
+        bMore: "More say the Albanese government has fallen short of their expectations than met them, {b} to {a}",
+        level: "Voters are divided on whether the Albanese government has lived up to their expectations, {a} to {b}",
+        none: "{b} say the Albanese government has fallen short of their expectations, and {a} that it has met them",
+      } },
     { kind: "rank", title: "How much does the political system need to change?", ref: R("state-of-politics-system", "redbridge"),
       base: "% choosing each", sort: false, relabel: {
         "The system is fine as it is and doesn't need any change": "It is fine as it is",
@@ -816,7 +940,8 @@ export function buildBeyond(entries, { deff }) {
   const refsOf = (spec) => (spec.kind === "tracker" ? spec.series.map((s) => ({ id: s.id, house: s.house }))
     : spec.mode === "compare" ? spec.items.map((it) => it.ref) : [spec.ref]);
   const topics = THEMES.map((t) => {
-    const blocks = (FEATURES[t.id] || []).map((spec) => {
+    const specs = FEATURES[t.id] || [];
+    const blocks = specs.map((spec) => {
       const b = spec.kind === "tracker" ? buildTracker(spec, ix, deff)
         : spec.kind === "split" ? buildSplit(spec, ix, deff)
         : spec.kind === "stack" ? buildStack(spec, ix, deff)
@@ -850,7 +975,8 @@ export function buildBeyond(entries, { deff }) {
         }),
       };
     }).sort((a, b) => byDateDesc(a.last, b.last) || a.title.localeCompare(b.title));
-    return { id: t.id, title: t.title, short: t.short, about: t.about, dek: t.dek, blocks, more: moreList };
+    return { id: t.id, title: t.title, short: t.short, about: t.about, dek: t.dek,
+      finding: blocks.length ? findingOf(specs[0], blocks[0], deff) : null, blocks, more: moreList };
   });
   const houses = new Set(shown.map((e) => e.house));
   return {
@@ -1124,4 +1250,5 @@ const TITLES = {
 };
 
 /* the rules, for .build/test-beyond.mjs to pin branch by branch */
-export const __test = { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows, pairsOf };
+export const __test = { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows, pairsOf,
+  splitFinding, tallyFinding, rankFinding, findingMeta };

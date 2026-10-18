@@ -1,12 +1,17 @@
 /* Probe: the /beyond-the-vote/ page (rd-beyond.jsx over the sidecar that
    beyond-the-vote.mjs builds), in both designs at four widths. Asserts no
-   errors and no sideways scroll; the topic nav, trackers (one chart per
-   pollster), cards and "More questions" lists all render from the payload;
-   every "level" on the page is a lead the payload found inside its margin
-   (and none is missing); every card names a source; no NaN or undefined
-   reaches a reader; a list item opens to its tables; the old /ad-hocs/ link
-   lands on the new page with its topic anchor; the static article carries
-   the topics as text. BASE=<worktree> serves another tree's build. */
+   errors and no sideways scroll; the findings index (one link a topic, each
+   landing on its topic, each sentence the payload's) and each topic's
+   finding; the trackers (one chart each, a line per pollster, the latest
+   list beside the chart from 900px and under it below, a copy button);
+   the question rows (answers beside the question where they fit, under it
+   on a phone) and "More questions" lists all render from the payload, with
+   no boxed card or per-pollster panel left; every "level" on the page is a
+   lead the payload found inside its margin (and none is missing); every row
+   names a source; no NaN or undefined reaches a reader; a list item opens
+   to its tables; the old /ad-hocs/ link lands on the new page with its
+   topic anchor; the static article carries the findings and topics as
+   text. BASE=<worktree> serves another tree's build. */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
 import fs from "node:fs";
@@ -35,6 +40,7 @@ const topics = src.topics.filter((t) => t.blocks.length || t.more.length);
 const trackers = topics.flatMap((t) => t.blocks.filter((b) => b.kind === "tracker"));
 const cards = topics.flatMap((t) => t.blocks.filter((b) => b.kind !== "tracker"));
 const panels = trackers.reduce((n, c) => n + c.panels.length, 0);
+const finds = topics.filter((t) => t.finding).map((t) => t.finding.text);
 /* the levels a reader sees: a single question's, and each stack row on show */
 const levels = cards.reduce((n, c) => n + (c.kind === "split" ? (c.sig === false ? 1 : 0)
   : c.kind === "stack" ? (c.show ? c.rows.slice(0, c.show) : c.rows).filter((r) => r.sig === false).length : 0), 0);
@@ -53,12 +59,20 @@ for (const design of ["new", "old"]) {
     const m = await page.evaluate(() => {
       const q = (s) => document.querySelectorAll(s);
       const txt = document.querySelector(".btv").innerText;
+      const box = (e) => e.getBoundingClientRect();
       return {
         sw: document.documentElement.scrollWidth, title: document.title,
-        nav: q(".btv-nav a").length, navOk: [...q(".btv-nav a")].every((a) => document.getElementById(a.getAttribute("href").slice(1))),
-        topics: q(".btv-topic").length, trackers: q(".btv-tracker").length, panels: [...q(".btv-panel")].filter((p) => p.querySelector(".chart svg")).length,
-        cards: q(".btv-card").length, levels: q(".btv-level").length + [...q(".btv-net")].filter((e) => e.textContent === "level").length,
-        unsourced: [...q(".btv-card")].filter((c) => !c.querySelector(".btv-src a[href]")).map((c) => c.querySelector(".btv-q").textContent),
+        finds: [...q(".btv-f")].map((a) => ({ ok: !!document.getElementById(a.getAttribute("href").slice(1)), text: a.querySelector(".btv-ft").textContent })),
+        heads: [...q(".btv-hl")].map((e) => e.textContent),
+        topics: q(".btv-topic").length, trackers: q(".btv-tracker").length,
+        charts: [...q(".btv-tracker")].map((t) => t.querySelectorAll(".chart svg.chart-svg").length),
+        lines: [...q(".btv-tracker")].map((t) => t.querySelectorAll("path.series-line").length),
+        copyBtns: [...q(".btv-tracker")].filter((t) => t.querySelector(".chart-copy-btn")).length,
+        beside: [...q(".btv-tracker")].map((t) => { const c = box(t.querySelector(".btv-tchart")), l = box(t.querySelector(".btv-latest")); return l.left >= c.right - 1 ? "beside" : l.top >= c.bottom - 1 ? "under" : "overlap"; }),
+        items: q(".btv-item").length, levels: q(".btv-level").length + [...q(".btv-net")].filter((e) => e.textContent === "level").length,
+        rowLay: [...q(".btv-item")].map((it) => { const l = box(it.querySelector(".btv-il")), r = box(it.querySelector(".btv-ir")); return r.left >= l.right - 1 ? "beside" : r.top >= l.bottom - 1 ? "under" : "overlap"; }),
+        boxes: q(".btv-card, .btv-panel, .btv-pgrid, .btv-grid").length,
+        unsourced: [...q(".btv-item")].filter((c) => !c.querySelector(".btv-src a[href]")).map((c) => c.querySelector(".btv-q").textContent),
         nan: /\bNaN\b|undefined|\[object/.test(txt), more: q(".btv-more").length,
         rdHead: !!document.querySelector(".rd-btv .rd-hed"),
       };
@@ -67,12 +81,20 @@ for (const design of ["new", "old"]) {
     if (errs.length) fail(`${at}: errors ${errs.slice(0, 3).join(" | ")}`);
     if (m.sw !== w) fail(`${at}: scrollWidth ${m.sw}`);
     if (m.title !== "auspol tracker – Beyond the vote") fail(`${at}: title "${m.title}"`);
-    if (m.nav !== topics.length || !m.navOk) fail(`${at}: nav ${m.nav}/${topics.length}, targets ${m.navOk}`);
+    if (m.finds.length !== finds.length || m.finds.some((f) => !f.ok)) fail(`${at}: findings index ${m.finds.length}/${finds.length}, every target ${m.finds.every((f) => f.ok)}`);
+    if (m.finds.some((f, i) => f.text !== finds[i])) fail(`${at}: an indexed finding is not the payload's`);
+    if (m.heads.join("|") !== finds.join("|")) fail(`${at}: the topics' headlines are not their findings`);
     if (m.topics !== topics.length) fail(`${at}: topics ${m.topics}/${topics.length}`);
-    if (m.trackers !== trackers.length || m.panels !== panels) fail(`${at}: trackers ${m.trackers}/${trackers.length}, panel charts ${m.panels}/${panels}`);
-    if (m.cards !== cards.length) fail(`${at}: cards ${m.cards}/${cards.length}`);
+    if (m.trackers !== trackers.length || m.charts.some((n) => n !== 1)) fail(`${at}: trackers ${m.trackers}/${trackers.length}, charts each ${m.charts}`);
+    if (m.lines.reduce((a, b) => a + b, 0) !== panels) fail(`${at}: tracker lines ${m.lines}, pollsters ${panels}`);
+    if (m.copyBtns !== trackers.length) fail(`${at}: copy buttons on ${m.copyBtns}/${trackers.length} trackers`);
+    if (m.beside.some((b) => b !== (w >= 900 ? "beside" : "under"))) fail(`${at}: latest list ${m.beside}`);
+    if (m.items !== cards.length) fail(`${at}: question rows ${m.items}/${cards.length}`);
+    if (w <= 640 && m.rowLay.some((r) => r !== "under")) fail(`${at}: a phone row is not stacked (${m.rowLay.join(",")})`);
+    if (w >= 1024 && m.rowLay.some((r) => r !== "beside")) fail(`${at}: a wide row is stacked (${m.rowLay.join(",")})`);
+    if (m.boxes) fail(`${at}: ${m.boxes} boxed card or panel element(s) left`);
     if (m.levels !== levels) fail(`${at}: levels shown ${m.levels}, payload ${levels}`);
-    if (m.unsourced.length) fail(`${at}: cards without a source link: ${m.unsourced.slice(0, 3).join(" | ")}`);
+    if (m.unsourced.length) fail(`${at}: rows without a source link: ${m.unsourced.slice(0, 3).join(" | ")}`);
     if (m.nan) fail(`${at}: NaN/undefined in the text`);
     if (m.more !== topics.filter((t) => t.more.length).length) fail(`${at}: More lists ${m.more}`);
     if ((design === "new") !== m.rdHead) fail(`${at}: rd head ${m.rdHead} in the ${design} design`);
@@ -111,9 +133,10 @@ for (const design of ["new", "old"]) {
   const h2 = (art.match(/<h2>/g) || []).length;
   if (h2 < topics.length) fail(`static article has ${h2} topic heads`);
   if (!art.includes(trackers[0].head.replace(/’/g, "’"))) fail("static article lacks the first tracker's head");
+  if (!art.includes("<h2>The findings</h2>") || finds.some((f) => !art.includes(f.replace(/&/g, "&amp;")))) fail("static article lacks the findings");
 }
 
 await browser.close();
 server.close();
-console.log(bad ? `${bad} failure(s)` : `PASS: beyond-the-vote page – ${topics.length} topics, ${trackers.length} trackers (${panels} charts), ${cards.length} cards, ${levels} levels, both designs at 390/640/1024/1440, /ad-hocs/ redirect, static article`);
+console.log(bad ? `${bad} failure(s)` : `PASS: beyond-the-vote page – ${finds.length} findings, ${topics.length} topics, ${trackers.length} trackers (${panels} lines), ${cards.length} rows, ${levels} levels, no boxes, both designs at 390/640/1024/1440, /ad-hocs/ redirect, static article`);
 process.exit(bad ? 1 : 0);
