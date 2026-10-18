@@ -935,8 +935,50 @@
      "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll (PDF pp. 124-134)",
      "entities": [
       {
-       "name": "For the country as a whole — net good",
+       "name": "For the country as a whole — very good",
        "ordinal": 1,
+       "values": [
+        3
+       ]
+      },
+      {
+       "name": "For the country as a whole — good",
+       "ordinal": 2,
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "For the country as a whole — no impact",
+       "ordinal": 3,
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "For the country as a whole — bad",
+       "ordinal": 4,
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "For the country as a whole — very bad",
+       "ordinal": 5,
+       "values": [
+        22
+       ]
+      },
+      {
+       "name": "For the country as a whole — not sure",
+       "ordinal": 6,
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "For the country as a whole — net good",
+       "ordinal": 7,
        "values": [
         -30
        ],
@@ -948,8 +990,50 @@
        }
       },
       {
+       "name": "For you personally — very good",
+       "ordinal": 8,
+       "values": [
+        1
+       ]
+      },
+      {
+       "name": "For you personally — good",
+       "ordinal": 9,
+       "values": [
+        10
+       ]
+      },
+      {
+       "name": "For you personally — no impact",
+       "ordinal": 10,
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "For you personally — bad",
+       "ordinal": 11,
+       "values": [
+        32
+       ]
+      },
+      {
+       "name": "For you personally — very bad",
+       "ordinal": 12,
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "For you personally — not sure",
+       "ordinal": 13,
+       "values": [
+        10
+       ]
+      },
+      {
        "name": "For you personally — net good",
-       "ordinal": 2,
+       "ordinal": 14,
        "values": [
         -37
        ],
@@ -1205,8 +1289,50 @@
      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll (PDF pp. 125-135)",
      "entities": [
       {
-       "name": "For the country as a whole — net good",
+       "name": "For the country as a whole — very good",
        "ordinal": 1,
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "For the country as a whole — good",
+       "ordinal": 2,
+       "values": [
+        17
+       ]
+      },
+      {
+       "name": "For the country as a whole — no impact",
+       "ordinal": 3,
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "For the country as a whole — bad",
+       "ordinal": 4,
+       "values": [
+        33
+       ]
+      },
+      {
+       "name": "For the country as a whole — very bad",
+       "ordinal": 5,
+       "values": [
+        20
+       ]
+      },
+      {
+       "name": "For the country as a whole — not sure",
+       "ordinal": 6,
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "For the country as a whole — net good",
+       "ordinal": 7,
        "values": [
         -34
        ],
@@ -1218,8 +1344,50 @@
        }
       },
       {
+       "name": "For you personally — very good",
+       "ordinal": 8,
+       "values": [
+        1
+       ]
+      },
+      {
+       "name": "For you personally — good",
+       "ordinal": 9,
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "For you personally — no impact",
+       "ordinal": 10,
+       "values": [
+        30
+       ]
+      },
+      {
+       "name": "For you personally — bad",
+       "ordinal": 11,
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "For you personally — very bad",
+       "ordinal": 12,
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "For you personally — not sure",
+       "ordinal": 13,
+       "values": [
+        11
+       ]
+      },
+      {
        "name": "For you personally — net good",
-       "ordinal": 2,
+       "ordinal": 14,
        "values": [
         -39
        ],
