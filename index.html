@@ -5927,6 +5927,8 @@ body.rd .rd-fx-n { text-align: right; font-size: 15px; font-weight: 600; color: 
 body.rd .rd-fx-n.ref { font-weight: 400; color: var(--ink-2); }
 body.rd .rd-fx-band { margin-left: 3px; font-size: 12px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-fx-nil { font-weight: 400; color: var(--ink-3); }
+body.rd .rd-fx-fig { font: inherit; font-weight: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
+body.rd .rd-fx-fig:hover, body.rd .rd-fx-fig:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
 body.rd .rd-fx-chg { display: block; font-size: 12px; font-weight: 400; line-height: 1.3; color: var(--ink-3); }
 body.rd .rd-fx-spark { position: relative; }
 body.rd .rd-fx-spark svg { display: block; overflow: visible; }
@@ -66082,8 +66084,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Telegraph report",
       "href": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fsupport-for-one-nation-stalls-as-albos-approval-drops-again%2Fnews-story%2Ff6a40ee078fb98772190ef8b8a8188d6",
       "title": "The published report this poll’s figures were read from",
-      "wb": "https://web.archive.org/web/2/https://www.dailytelegraph.com.au/news%2Fnsw%2Fsupport-for-one-nation-stalls-as-albos-approval-drops-again%2Fnews-story%2Ff6a40ee078fb98772190ef8b8a8188d6",
-      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
+      "wb": "https://web.archive.org/web/20260329/https://www.dailytelegraph.com.au/news%2Fnsw%2Fsupport-for-one-nation-stalls-as-albos-approval-drops-again%2Fnews-story%2Ff6a40ee078fb98772190ef8b8a8188d6",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the page as the Wayback Machine captured it on 29 March 2026."
     }],
     "grp": {
       "r": "published table",
@@ -72771,8 +72773,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "news.com.au report",
       "href": "https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699",
       "title": "The published report this poll’s figures were read from",
-      "wb": "https://web.archive.org/web/2/https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699",
-      "wbTitle": "The live link is paywalled or blocked on the live site. This is the latest capture the Wayback Machine holds, if it has one."
+      "wb": "https://web.archive.org/web/20260529/https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699",
+      "wbTitle": "The live link is paywalled or blocked on the live site. This is the page as the Wayback Machine captured it on 29 May 2026."
     }],
     "peff": {
       "w": 0,
@@ -133647,6 +133649,23 @@ function RdFlows({
   const openPoll = k => {
     if (window.AP.openPoll) window.AP.openPoll(k, "twopp", "the preference-flows ledger");
   };
+  const figBtn = (w, v, house, src) => {
+    if (!w) return React.createElement("span", {
+      className: "rd-fx-nil",
+      "aria-label": "not asked"
+    }, "\u2013");
+    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: house,
+      released: w.date
+    }) : null;
+    if (!k) return say(v);
+    return React.createElement("button", {
+      type: "button",
+      className: "rd-fx-fig",
+      "aria-label": src + ", " + w.win + " - open this poll in the All polls table",
+      onClick: () => openPoll(k)
+    }, say(v));
+  };
   const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (PR[FF_COHORTS[b].share] || 0) - (PR[FF_COHORTS[a].share] || 0))[0] : null;
   const stake = big && PR[FF_COHORTS[big].share] != null ? FF_COHORTS[big].name + " voters are " + PR[FF_COHORTS[big].share].toFixed(1) + "% of the vote, so each 10 points of their preferences moves " + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation") + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points." : "";
   const ledgerNote = (q === "co" ? ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC counts this cut nationally only. No poll asks this contest by region. " : "The " + rdElecYear + " count is the flow every Labor v Coalition figure on this site uses. " : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range" + (ffReg ? ", and it is national on every view. " : ". ") : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ") + stake + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
@@ -133817,18 +133836,12 @@ function RdFlows({
     }, "\u2013")), React.createElement("span", {
       className: "rd-fx-n",
       role: "cell"
-    }, rbW ? say(rbW[ck]) : React.createElement("span", {
-      className: "rd-fx-nil",
-      "aria-label": "not asked"
-    }, "\u2013"), mv && React.createElement("span", {
+    }, figBtn(rbW, rbW ? rbW[ck] : null, FF.house || "RedBridge/Accent", "RedBridge/Accent"), mv && React.createElement("span", {
       className: "rd-fx-chg"
     }, mv.up ? "up" : "down", " from ", say(mv.from), " in ", D.monthName(Number(mv.ym.slice(5))))), React.createElement("span", {
       className: "rd-fx-n",
       role: "cell"
-    }, dmW ? say(dmW[ck]) : React.createElement("span", {
-      className: "rd-fx-nil",
-      "aria-label": "not asked"
-    }, "\u2013")), !narrow && React.createElement("span", {
+    }, figBtn(dmW, dmW ? dmW[ck] : null, FF_MRP_HOUSE, "DemosAU MRP")), !narrow && React.createElement("span", {
       "aria-hidden": "true"
     }), React.createElement("span", {
       className: "rd-fx-sc",

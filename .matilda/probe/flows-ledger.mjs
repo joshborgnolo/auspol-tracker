@@ -28,6 +28,11 @@
        and marks (national only), drops the 2026 counts, rekeys DemosAU's
        cells and, on Labor v Coalition, the count column to the class's
        seat replay;
+     - the figures open their polls: every populated RedBridge/DemosAU
+       ledger cell is an open-poll button (each "-" is plain text), the
+       named-region DemosAU cells keep it; on a desktop a click on a
+       RedBridge figure and on DemosAU's MRP figure, and Enter on a
+       focused figure, open the poll's row in the table;
      - tooltips: every ledger mark and the drift chart's first, middle and
        last dots open a tip inside the screen at 390/360/320 by touch (the
        bug the user reported: DemosAU tips 371-410px on a 390px phone), the
@@ -78,6 +83,7 @@ const read = (page) => page.evaluate(() => {
       cells: [...r.querySelectorAll(".rd-fx-n")].map((c) => c.childNodes[0] ? c.childNodes[0].textContent.trim() : ""),
       band: (r.querySelector(".rd-fx-band") || {}).textContent || null,
       chg: (r.querySelector(".rd-fx-chg") || {}).textContent || null,
+      btns: r.querySelectorAll("button.rd-fx-fig").length,
       waves: r.querySelectorAll(".rd-fx-dot").length + r.querySelectorAll(".rd-fx-end").length,
       tris: r.querySelectorAll(".rd-fx-tr").length,
       crosses: r.querySelectorAll(".rd-fx-x").length,
@@ -125,6 +131,8 @@ for (const w of [1440, 390]) {
   check(s.rows.map((r) => r.cells.join(" ")).join(" / ") === coWant.join(" / "),
     `${w}: Labor v Coalition cells = the 2025 count, RedBridge's and DemosAU's latest (${s.rows.map((r) => r.cells.join(" ")).join(" / ")})`);
   check(s.rows.every((r, i) => r.share === E.share[["grn", "onp", "oth"][i]].toFixed(1) + "% of the vote"), `${w}: each group's share is the headline primary vote`);
+  check(s.rows.every((r) => r.btns === (r.cells[1] !== "–" ? 1 : 0) + (r.cells[2] !== "–" ? 1 : 0)),
+    `${w}: every populated RedBridge/DemosAU cell is an open-poll button, each "–" plain text (${s.rows.map((r) => r.btns)})`);
   check(s.rows.map((r) => r.waves).join() === [E.waves.co.grn, E.waves.co.onp, E.waves.co.oth].join(), `${w}: one dot per RedBridge wave on each row`);
   check(s.rows.every((r, i) => r.lineVerts === [E.waves.co.grn, E.waves.co.onp, E.waves.co.oth][i]),
     `${w}: each line runs through RedBridge's waves alone (vertices ${s.rows.map((r) => r.lineVerts)})`);
@@ -142,10 +150,13 @@ for (const w of [1440, 390]) {
   check(s.rows.every((r) => r.band && /^±/.test(r.band)), `${w}: the site's table carries its band`);
   check(s.rows.map((r) => r.crosses).join() === [E.bys.coal, E.bys.grn, E.bys.oth].join(), `${w}: the 2026 counts ride as crosses (${s.rows.map((r) => r.crosses)})`);
   check(s.rows.every((r) => r.tris === E.demosOn), `${w}: DemosAU's quarterlies stand apart as triangles`);
+  check(s.rows.every((r) => r.btns === (r.cells[1] !== "–" ? 1 : 0) + (r.cells[2] !== "–" ? 1 : 0)),
+    `${w}: Labor v One Nation: every populated house cell is a button (${s.rows.map((r) => r.btns)})`);
   await region(page, "regional");
   s = await read(page);
   check(s.rows.every((r) => r.cells[1] === "–" && r.waves === 0 && r.crosses === 0), `${w}: a named region drops RedBridge/Accent and the 2026 counts`);
   check(s.rows.map((r) => r.cells[2]).join() === ["coal", "grn", "oth"].map((ck) => fig(E.onReg[ck])).join(), `${w}: Regional rekeys DemosAU to its printed regional cells (${s.rows.map((r) => r.cells[2])})`);
+  check(s.rows.every((r) => r.btns === (r.cells[2] !== "–" ? 1 : 0)), `${w}: the rekeyed DemosAU cells still open their MRP poll (${s.rows.map((r) => r.btns)})`);
   await region(page, "");
 
   await tab(page, 2);
@@ -182,6 +193,39 @@ for (const w of [1440, 390]) {
     check(opened === 1, `${w}: clicking the mark opens its poll in the table (${pt.label.slice(0, 40)}…)`);
     /* back to the flows view: the ☰/tab chrome is plain anchors, useless
        on file:// - reload PAGE (the mark-click swap was client-side) */
+    await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
+    await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
+    await wait(400);
+
+    /* a ledger figure opens its poll the mark's way: RedBridge's wave
+       figure on row one, DemosAU's MRP figure on row two (the only tab's
+       DemosAU cell here) - click, keyboard Enter, and the aria label */
+    const figAt = async (rq) => page.evaluate((rq) => {
+      const rows = [...document.querySelectorAll("#flow-drift .rd-fx-row")];
+      let sel = rows[rq.r].querySelectorAll(".rd-fx-n button.rd-fx-fig")[rq.c];
+      sel.scrollIntoView({ block: "center", behavior: "instant" });
+      const b = sel.getBoundingClientRect();
+      return { x: b.x + b.width / 2, y: b.y + b.height / 2, label: sel.getAttribute("aria-label"), text: sel.textContent };
+    }, rq);
+    const clickFig = async (rq, tag) => {
+      const f = await figAt(rq);
+      check(/^(RedBridge\/Accent|DemosAU MRP), .+ - open this poll in the All polls table$/.test(f.label),
+        `${w}: the figure's aria label names its poll (${f.label.slice(0, 56)}…)`);
+      await page.mouse.click(f.x, f.y); await wait(900);
+      const opened = await page.evaluate(() => document.querySelectorAll(".rd-ldg").length);
+      check(opened === 1, `${w}: clicking the ${tag} figure opens its poll in the table (${f.text.trim()})`);
+      await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
+      await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
+      await wait(300);
+    };
+    await clickFig({ r: 0, c: 0 }, "RedBridge");
+    await clickFig({ r: 1, c: 1 }, "DemosAU MRP");
+    /* Enter on a focused figure opens it too; the figure reads its wave
+       window - the one the wave key is filed under */
+    await page.evaluate(() => document.querySelector("#flow-drift .rd-fx-row .rd-fx-n button.rd-fx-fig").focus());
+    await wait(120);
+    await page.keyboard.press("Enter"); await wait(900);
+    check(await page.evaluate(() => document.querySelectorAll(".rd-ldg").length) === 1, `${w}: Enter on a focused figure opens its poll`);
     await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
     await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
     await wait(400);

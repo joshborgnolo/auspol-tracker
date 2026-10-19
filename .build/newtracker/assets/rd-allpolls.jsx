@@ -5323,6 +5323,14 @@ function RdFlows({ measure }) {
     </>;
   };
   const openPoll = (k) => { if (window.AP.openPoll) window.AP.openPoll(k, "twopp", "the preference-flows ledger"); };
+  /* the wave's figure cell opens its poll in the All polls table, as the
+     line's marks do; the text stays plain when no matching row exists */
+  const figBtn = (w, v, house, src) => {
+    if (!w) return <span className="rd-fx-nil" aria-label="not asked">–</span>;
+    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null;
+    if (!k) return say(v);
+    return <button type="button" className="rd-fx-fig" aria-label={src + ", " + w.win + " - open this poll in the All polls table"} onClick={() => openPoll(k)}>{say(v)}</button>;
+  };
   /* what a flow is worth: the contest's biggest group's share of the vote,
      so each 10 points of its preferences moves the figure by a tenth of it.
      Coalition v One Nation carries no site figure, so no stake line */
@@ -5430,8 +5438,8 @@ function RdFlows({ measure }) {
                   <div key={ck} className="rd-fx-row" role="row" style={grid}>
                     <span className="rd-fx-who" role="rowheader"><b><i className={"rd-fx-swatch " + f.cls} aria-hidden="true"></i>{f.name}{narrow ? "" : " voters"}</b>{share != null && <span className="rd-ap-sub">{share.toFixed(1)}% of the vote</span>}</span>
                     <span className="rd-fx-n ref" role="cell">{c.ref ? <>{say(c.ref[ck], c.refDp)}{c.band ? <span className="rd-fx-band">±{say(c.band[ck])}</span> : null}</> : <span className="rd-fx-nil" aria-label="none">–</span>}</span>
-                    <span className="rd-fx-n" role="cell">{rbW ? say(rbW[ck]) : <span className="rd-fx-nil" aria-label="not asked">–</span>}{mv && <span className="rd-fx-chg">{mv.up ? "up" : "down"} from {say(mv.from)} in {D.monthName(Number(mv.ym.slice(5)))}</span>}</span>
-                    <span className="rd-fx-n" role="cell">{dmW ? say(dmW[ck]) : <span className="rd-fx-nil" aria-label="not asked">–</span>}</span>
+                    <span className="rd-fx-n" role="cell">{figBtn(rbW, rbW ? rbW[ck] : null, FF.house || "RedBridge/Accent", "RedBridge/Accent")}{mv && <span className="rd-fx-chg">{mv.up ? "up" : "down"} from {say(mv.from)} in {D.monthName(Number(mv.ym.slice(5)))}</span>}</span>
+                    <span className="rd-fx-n" role="cell">{figBtn(dmW, dmW ? dmW[ck] : null, FF_MRP_HOUSE, "DemosAU MRP")}</span>
                     {!narrow && <span aria-hidden="true"></span>}
                     <span className="rd-fx-sc" role="cell">
                       <RdFlowSpark ck={ck} marks={marks} refv={c.ref ? c.ref[ck] : null} band={c.band ? c.band[ck] : null}
