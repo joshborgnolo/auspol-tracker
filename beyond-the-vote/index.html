@@ -115664,6 +115664,23 @@ function RdPrimary({
       document.removeEventListener("keydown", key, true);
     };
   }, []);
+  const grpSelRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = grpSelRef.current;
+    if (!el) return;
+    const fit = () => {
+      const cs = getComputedStyle(el);
+      const cv = document.createElement("canvas").getContext("2d");
+      cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
+    };
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }, [grpId]);
+  const MENUSHORT = {
+    "Lower earners (bottom 50%)": "Lower earners",
+    "Higher earners (top 15%)": "Higher earners"
+  };
   return React.createElement(RdSec, {
     id: "primary-vote",
     title: "Primary vote",
@@ -115674,6 +115691,7 @@ function RdPrimary({
     head: story.head,
     dek: story.dek
   }), T && React.createElement("select", {
+    ref: grpSelRef,
     className: "rd-pv-sel",
     "aria-label": "The primary vote among",
     value: grpId,
@@ -115686,7 +115704,7 @@ function RdPrimary({
   }, s.groups.map(g => React.createElement("option", {
     key: g.label,
     value: g.label
-  }, g.label))))))), narrow ? React.createElement("div", {
+  }, MENUSHORT[g.label] || g.label))))))), narrow ? React.createElement("div", {
     className: "rd-pv-list"
   }, pvBlocks.map((b, i) => b.tied ? React.createElement("div", {
     key: "tg" + i,

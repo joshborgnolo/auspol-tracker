@@ -481,17 +481,48 @@ function RdPrimary({ rangeId, setRangeId }) {
     return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
   }, []);
 
+  /* a closed <select> still sizes itself to its WIDEST option, so "Lower
+     earners (bottom 50%)"'s 180px of text framed the three-letter "Men"
+     the day income's bands joined the menu. Hold the control to the label
+     it actually shows instead: measure that label in the control's own
+     font, add back its paddings and a 14px slack (the text-to-frame gap,
+     calibrated against the max-content width before this fix - 249px for
+     the 234px padding-plus-widest-label sum). Runs before paint on every
+     selection and again once the webfont lands - a fallback-font measure
+     would otherwise freeze the early render's width. */
+  const grpSelRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = grpSelRef.current;
+    if (!el) return;
+    const fit = () => {
+      const cs = getComputedStyle(el);
+      const cv = document.createElement("canvas").getContext("2d");
+      cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width
+        + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
+    };
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }, [grpId]);
+
+  /* the menu's longest options buy its width, so the two income bands
+     print their short names in the MENU text alone (user call 2026-10-19),
+     values untouched: the head's "Among lower earners (bottom 50%)", the
+     Who-votes tab, the lift note and the All-polls hand-off all keep the
+     full labelled names */
+  const MENUSHORT = { "Lower earners (bottom 50%)": "Lower earners", "Higher earners (top 15%)": "Higher earners" };
+
   return (
     <RdSec id="primary-vote" title="Primary vote" meta={meta}>
       <div className="rd-pv-head">
         <RdHed head={story.head} dek={story.dek} />
         {T && (
-          <select className="rd-pv-sel" aria-label="The primary vote among" value={grpId}
+          <select ref={grpSelRef} className="rd-pv-sel" aria-label="The primary vote among" value={grpId}
                   onChange={(e) => setGrpId(e.target.value)}>
             <option value="">All voters</option>
             {T.tabs.map((t) => t.sets.map((s) => (
               <optgroup key={s.id} label={s.label || "By " + t.label.toLowerCase()}>
-                {s.groups.map((g) => <option key={g.label} value={g.label}>{g.label}</option>)}
+                {s.groups.map((g) => <option key={g.label} value={g.label}>{MENUSHORT[g.label] || g.label}</option>)}
               </optgroup>
             )))}
           </select>

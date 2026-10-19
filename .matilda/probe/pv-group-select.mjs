@@ -6,7 +6,10 @@
      node .matilda/probe/pv-group-select.mjs              full verification:
        1. the dropdown exists, says "All voters", sits at the right edge in
           line with the dek's last line on big screens, stacked under the dek
-          on phones
+          on phones; its closed face hugs the shown label (canvas-measured
+          text + paddings + 14px slack, never clipped), and its menu text
+          shortens ONLY the two income bands (user call 2026-10-19 — values
+          and every other surface keep the full labelled names)
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Retired /
           Rural / ACT/NT/Tas / Non-NSW/Vic/Qld / Lower earners (bottom 50%)
@@ -64,6 +67,9 @@ const ok = (name, pass, detail) => {
   results.push([name, !!pass]);
   console.log((pass ? "  ✓ " : "  ✗ ") + name + (detail !== undefined ? "  — " + detail : ""));
 };
+/* the menu text alone shortens the two income bands (user call 2026-10-19);
+   option VALUES and every other surface keep the full names */
+const MENUSHORT = { "Lower earners (bottom 50%)": "Lower earners", "Higher earners (top 15%)": "Higher earners" };
 const BASELINE_MODE = process.argv.includes("--baseline");
 
 /* What the panel draws, in a comparable form. Runs after the snapshot tail
@@ -117,6 +123,17 @@ const collect = (VW, VH, selValue) => (async () => {
         groupCount: sel.querySelectorAll("optgroup").length,
         groupLabels: [...sel.querySelectorAll("optgroup")].map((o) => o.label),
         options: [...sel.querySelectorAll("option")].map((o) => o.textContent),
+        optionPairs: [...sel.querySelectorAll("option")].map((o) => [o.value, o.textContent]),
+        fit: (() => {
+          /* the width the effect in RdPrimary should have left: the shown
+             label in the control's font + its paddings + the 14px slack */
+          const cs = getComputedStyle(sel);
+          const cv = document.createElement("canvas").getContext("2d");
+          cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+          const tw = cv.measureText(sel.options[sel.selectedIndex].textContent).width;
+          return { tw: +tw.toFixed(1), padL: parseFloat(cs.paddingLeft), padR: parseFloat(cs.paddingRight),
+                   clientW: sel.clientWidth, need: Math.ceil(tw + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) };
+        })(),
       } : null,
     };
   });
@@ -206,7 +223,13 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
   ok("34 options (All voters + 31 groups + 2 income bands)", s.sel.optCount === 34, s.sel.optCount);
   ok("10 optgroups (income spliced last)", s.sel.groupCount === 10, s.sel.groupLabels.join(" | "));
   ok("the income optgroup rides last", s.sel.groupLabels[9] === "By income", s.sel.groupLabels[9]);
+  ok("the menu text alone shortens the two income bands", s.sel.optionPairs.every(([v, t]) =>
+      t === (MENUSHORT[v] || (v === "" ? "All voters" : v))),
+    s.sel.optionPairs.filter(([v, t]) => t !== v).map(([v, t]) => v + "→" + t).join(" | "));
   const g = s.geom;
+  ok("the closed menu hugs the label it shows", g.selRect && Math.abs(g.selRect.w - s.sel.fit.need) <= 2,
+    `w ${g.selRect && g.selRect.w} vs need ${s.sel.fit.need} (shares "${s.sel.text}" ${s.sel.fit.tw}px)`);
+  ok("the shown label is never clipped", s.sel.fit.clientW - s.sel.fit.padL - s.sel.fit.padR >= s.sel.fit.tw - 1);
   if (W > 640) {
     ok("at the right edge (within 2px of the stat strip's right)", g.selRect && g.statsRect && Math.abs(g.selRect.right - g.statsRect.right) <= 2,
       g.selRect && g.statsRect ? `sel right ${g.selRect.right} vs strip ${g.statsRect.right}` : "missing");
@@ -258,6 +281,9 @@ for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}]
   const s = await collect(1280, 900, label);
   console.log(`--- ${label}`);
   ok(`${label} applies`, s.sel && s.sel.value === label, s.sel && s.sel.value);
+  ok("shows the menu's short name, hugging it", s.sel && s.geom.selRect && Math.abs(s.geom.selRect.w - s.sel.fit.need) <= 2
+     && s.sel.fit.clientW - s.sel.fit.padL - s.sel.fit.padR >= s.sel.fit.tw - 1,
+    s.sel && s.geom.selRect ? `w ${s.geom.selRect.w} vs need ${s.sel.fit.need}, share shown "${s.sel.text}"` : "missing");
   ok("head names the group", s.hed && s.hed.includes(SHORT[label]), s.hed);
   const g = exp.group;
   if (g) {
