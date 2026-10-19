@@ -4129,48 +4129,51 @@ const flowForced = (() => {
       if (w.grn != null || w.onp != null || w.oth != null) vsCoal.push(w);
     }
   }
-  /* the 2025 election's OWN reading of the Labor-v-Coalition question. The
-     national carrier is the AEC's counted TPP flows to Labor
-     (HouseTppFlowByStateByParty-31496, every formal ballot redistributed
-     ALP v Coalition) — the very cut the estimate's implied-2PP anchor
-     reads, so `all` is TYPED FROM FLOW_FED and the two can never drift
-     (user 2026-10-13: the Flows table's election row must be this cut,
-     not the TCP majors-renormalised cut it first shipped as). The AEC
-     publishes that cut nationally and by state only — never per division
-     or division class — so the three region carriers are this site's
-     replay of the per-seat distributions of preferences, the constants
-     typed from `node .build/aec-2025-region-tpp-flows.mjs`'s output (the
-     vendored DoP replayed seat by seat with origin-tagged piles, the 35
-     non-classic seats excluded since their crossbencher/GRN terminal
-     piles have no counted majors split; inner 25/43 classic seats,
-     outer 40/45, regional+rural 50/62). The replay is an approximation —
-     its own all-seats check sits 3.5-7.7 points off the counted national
-     rows (cascaded piles mix origins; ballot-level redistributions are
-     never published), so every consumer scopes it as our derivation, not
-     the AEC's count — but it is the only seat-classification cut the
-     counted data supports, and a seat-class regional view is the
-     user's ask (2026-10-13: "the 2025 election flows are based on seat
-     classification, which she worked out already"). xm is the election
-     DAY on the waves' month-index scale (year·12 + month−1 + the day's
-     share of its month), derived from the date: a hand-typed 24314.0645
-     put the rings ten months late, in March 2026, beside the first
-     wave */
+  /* the 2025 election's OWN reading of the Labor-v-Coalition question. ALL
+     FOUR carriers are this site's replay of the per-seat distributions of
+     preferences, the constants typed from
+     `node .build/aec-2025-region-tpp-flows.mjs`'s output (the vendored DoP
+     replayed seat by seat with origin-tagged piles; the 35 non-classic
+     seats are excluded, their crossbencher/GRN terminal piles having no
+     counted majors split): the three region carriers cover each class's
+     CLASSIC seats (inner 25/43, outer 40/45, regional+rural 50/62) and
+     `all` covers the same 115 classic seats — so the four views are one
+     population on one cut and the parts ballot-weight to the whole
+     exactly (2026-10-19 reader report: the regions had been shown
+     against a national carrier typed from FLOW_FED — the AEC's TPP flow
+     product, a cut over all 150 seats — which grn 86.4/79.3/76.9 and on
+     33.8/35.3/31.5 could never average to: no weighting of parts reaches
+     a whole measured elsewhere). The AEC's official 88.19/25.50/54.55
+     (HouseTppFlowByStateByParty-31496) is a NOTIONAL count — every
+     ballot notionally thrown ALP v Coalition in all 150 seats, published
+     nationally and by state only, never per division class — so it stays
+     the estimator's constant set in flows.mjs (implied 2PP and flow
+     drift read it there), displayed nowhere in this section. The replay
+     is an approximation — its own all-seats row sits 3.5-7.7 points off
+     the official national rows (cascaded piles mix origins; ballot-level
+     redistributions are never published) — so every consumer scopes it
+     as our derivation, not the AEC's count; but it is the only
+     seat-classification cut the counted data supports, and a seat-class
+     regional view is the user's ask (2026-10-13: "the 2025 election
+     flows are based on seat classification, which she worked out
+     already"). xm is the election DAY on the waves' month-index scale
+     (year·12 + month−1 + the day's share of its month), derived from the
+     date: a hand-typed 24314.0645 put the rings ten months late, in
+     March 2026, beside the first wave */
   const elec2025r = (() => {
     const d = "2025-05-03", y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
     const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
     const xm = Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4;
-    const nat = { date: d, xm, win: "as counted",
-      grn: Math.round(FLOW_FED.grn * 1e4) / 100, onp: Math.round(FLOW_FED.onp * 1e4) / 100,
-      oth: Math.round(FLOW_FED.oth * 1e4) / 100 };
-    /* the replay's per-class prose: scopeTtl leads the tip's title, the
-       scopeNote names the class and its classic-seat coverage */
+    /* the replay's per-cut prose: scopeTtl leads the tip's title, the
+       scopeNote names the seats and their classic-seat coverage. All four
+       carriers ride the one replay, `all` the whole of it (115 of 150) */
     const replay = (ttl, of, cl, grn, onp, oth) => ({ date: d, xm, win: "as counted", der: true,
-      scopeTtl: ttl, scopeNote: "the seats classed " + of + " (their " + cl + " classic seats replayed — the AEC counts this cut nationally only)",
+      scopeTtl: ttl, scopeNote: of + " (their " + cl + " classic seats replayed — the AEC publishes its flows nationally and by state only)",
       grn, onp, oth });
-    return { all: nat,
-      inner: replay("Inner metro seats", "inner metro", "25 of 43", 86.41, 33.8, 55.68),
-      outer: replay("Outer metro seats", "outer metro", "40 of 45", 79.32, 35.34, 52.46),
-      regional: replay("Regional or rural seats", "regional or rural", "50 of 62", 76.9, 31.46, 49.01) };
+    return { all: replay("All classic seats", "every classic (Labor-v-Coalition) seat", "115 of 150", 80.45, 33.02, 51.04),
+      inner: replay("Inner metro seats", "the seats classed inner metro", "25 of 43", 86.41, 33.8, 55.68),
+      outer: replay("Outer metro seats", "the seats classed outer metro", "40 of 45", 79.32, 35.34, 52.46),
+      regional: replay("Regional or rural seats", "the seats classed regional or rural", "50 of 62", 76.9, 31.46, 49.01) };
   })();
   /* the 2026 state and by-election counts that MEASURED the Labor-v-One-
      Nation choice the second chart asks: crosses on the chart's own day,

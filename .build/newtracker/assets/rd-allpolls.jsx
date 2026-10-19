@@ -5224,8 +5224,8 @@ function RdFlows({ measure }) {
   const C = FF ? {
     co: { id: "co", a: "Labor", r: "the Coalition", cohorts: ["grn", "onp", "oth"],
           ref: E ? (ffReg && E[ffReg] ? E[ffReg] : E.all) : null, refDp: 1, band: null,
-          refHead: rdElecYear + " count", refSub: ffReg ? regName + "*" : "as counted",
-          refName: rdElecYear + " count" + (ffReg ? ", our replay" : ""),
+          refHead: rdElecYear + " count", refSub: (ffReg ? regName : "as counted") + "*",
+          refName: rdElecYear + " count, our replay",
           rb: ffReg ? [] : FF.vsCoal, dm: ffReg ? [] : (FF.demos || []), bys: [],
           drift: FD, flows: "the " + rdElecYear + " flows" },
     on: { id: "on", a: "Labor", r: "One Nation", cohorts: ["coal", "grn", "oth"],
@@ -5356,8 +5356,8 @@ function RdFlows({ measure }) {
       + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points."
     : "";
   const ledgerNote = (q === "co"
-    ? (ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC counts this cut nationally only. No poll asks this contest by region. "
-      : "The " + rdElecYear + " count is the flow every Labor v Coalition figure on this site uses. ")
+    ? (ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC publishes its flows nationally and by state only. No poll asks this contest by region. "
+      : "* Our replay of the " + rdElecYear + " count across the 115 classic (Labor-v-Coalition) seats, the same cut the region views replay — so the four views weigh up. The site’s figures use the AEC’s official national two-party-preferred flow. ")
     : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range"
       + (ffReg ? ", and it is national on every view. " : ". ")
     : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ")
@@ -5440,7 +5440,7 @@ function RdFlows({ measure }) {
             <div className={"rd-fx" + (narrow ? " narrow" : "")} role="table" aria-label={"Where each group’s preferences go, " + FL_TABS.find((t) => t.id === q).label + (ffReg ? ", " + regName + " seats" : "")}>
               <div className="rd-fx-hrow" role="row" style={grid}>
                 <span className="rd-ap-th" role="columnheader">Voters</span>
-                <span className="rd-ap-th r wrap" role="columnheader">{narrow ? (q === "co" ? rdElecYear : "Site") : c.refHead}<em>{narrow ? (q === "co" ? (ffReg ? "replay*" : "count") : q === "on" ? (ffReg ? "national" : "assumes") : "–") : c.refSub}</em></span>
+                <span className="rd-ap-th r wrap" role="columnheader">{narrow ? (q === "co" ? rdElecYear : "Site") : c.refHead}<em>{narrow ? (q === "co" ? "replay*" : q === "on" ? (ffReg ? "national" : "assumes") : "–") : c.refSub}</em></span>
                 <span className="rd-ap-th r wrap" role="columnheader">{colHead(FF.house || "RedBridge/Accent", rbLast, narrow ? "RedBr." : "RedBridge", c.rb.length ? (narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave") : ffReg && q !== "ln" ? "national only" : "doesn’t ask")}</span>
                 <span className="rd-ap-th r wrap" role="columnheader">{colHead(FF_MRP_HOUSE, dmLast, narrow ? "Demos" : "DemosAU", dmLast ? flWinMonths(dmLast.win) + (narrow ? "" : " MRP") + (q !== "co" && !ffReg ? "*" : "") : "national only")}</span>
                 {!narrow && <span aria-hidden="true"></span>}
@@ -5484,7 +5484,7 @@ function RdFlows({ measure }) {
               {c.rb.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyln" aria-hidden="true"><i></i></span>RedBridge/Accent, monthly</span>}
               {c.dm.length > 0 && <span className="rd-key-item"><span className="rd-fx-keydm" aria-hidden="true"></span>DemosAU MRP, quarterly</span>}
               {c.bys.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>2026 state and by-election counts</span>}
-              {c.ref && <span className="rd-key-item"><span className={"rd-fx-keyref" + (c.band ? " band" : "")} aria-hidden="true"></span>{q === "co" ? rdElecYear + " count" + (ffReg ? ", our replay" : "") : "Site’s assumption, with its range"}</span>}
+              {c.ref && <span className="rd-key-item"><span className={"rd-fx-keyref" + (c.band ? " band" : "")} aria-hidden="true"></span>{q === "co" ? rdElecYear + " count, our replay" : "Site’s assumption, with its range"}</span>}
               {c.ref && c.rb.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyarea" aria-hidden="true"></span>Gap to it</span>}
             </RdKey>
             <p className="rd-note rd-fx-note">{ledgerNote}</p>
@@ -5531,7 +5531,7 @@ function RdFlows({ measure }) {
         note={(c.drift ? "Published minus implied: one straight line per pollster through its own monthly gaps since the election, t-tested, Holm’s correction within the contest. Yes means a gap is drifting, not just sitting off zero today; pollsters with too few months show dashes. " : "")
           + (FF ? "What voters say: one straight line per voter group through " + (q === "ln" ? "DemosAU’s quarterly MRP readings" : "RedBridge/Accent’s monthly answers") + ", Holm’s correction across every group in all three contests. A Yes is what the ledger’s “down from” and the section’s headline stand on." : "")} />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
-        {FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is the AEC’s national two-party-preferred flow; on a named region it is our replay of the seats classed to it. This check corrects no other figure on the page."
+        {FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is our replay of the 115 classic (Labor-v-Coalition) contests, on one cut in every view; the AEC’s official national two-party-preferred flow remains the constant the site’s two-party figures use. This check corrects no other figure on the page."
           : "This check corrects no other figure on the page."}
       </RdFoot>
     </section>

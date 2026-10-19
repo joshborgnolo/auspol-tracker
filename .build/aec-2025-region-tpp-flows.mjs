@@ -1,31 +1,35 @@
 #!/usr/bin/env node
-/* aec-2025-region-tpp-flows.mjs — derive gen-data §7db's elec2025r regional
-   2025 election flow carriers (inner/outer/regional, ALP-v-Coalition TPP
-   basis) from the per-seat 2025 distribution of preferences.
+/* aec-2025-region-tpp-flows.mjs — derive gen-data §7db's elec2025r carriers
+   (all/inner/outer/regional, ALP-v-Coalition TPP basis) from the per-seat
+   2025 distribution of preferences.
 
-   Why: the forced-choice section's 2025 rings must ride the same cut the
-   site's 2PP estimate uses — the AEC's TPP flow product
+   Why: the forced-choice section's 2025 count views ride ONE cut so the
+   parts weigh up to the whole — the replay. The AEC's own TPP flow product
    (HouseTppFlowByStateByParty, all ballots redistributed to ALP v
-   Coalition) — not the TCP majors-renormalised cut, which these carriers
-   accidentally shipped as at first land. Problem: the AEC publishes TPP
-   flows by party NATIONALLY (HouseTppFlowByParty) and by STATE
-   (HouseTppFlowByStateByParty) but NOT per division, and House ballot-level
-   preferences are never published. So the national carrier stays the
-   official constants (flows.mjs: grn 88.19, onp 25.50, oth 54.55), and the
-   three region carriers are derived here from data/aec-2025-seat-flows.json
-   (the vendored DoP), replayed per seat with origin-tagged piles:
-   every count's excluded pile is split to receivers in proportion to the
-   recorded transfers. In a CLASSIC seat the count ends ALP v Coalition, so
-   each source party's ballots end exactly on a major pile. Source ballots
-   in the 35 NON-classic seats can end on crossbencher/GRN terminal piles —
-   those seats are EXCLUDED from the buckets (the AEC's notional TPP counts
-   in them exist only as seat outcomes, not flows). The proportional-hop
-   rule is exact for the dominant hop (grn/on/oth piles excluded while the
-   majors stand) and approximate only for the small minor→minor hops that
-   precede it. Coverage of each bucket is printed with the results.
+   Coalition) is published by party NATIONALLY (HouseTppFlowByParty) and by
+   STATE, never per division or division class, and House ballot-level
+   preferences are never published — so no official per-class cut exists to
+   display beside it, and the official constants (flows.mjs: grn 88.19,
+   onp 25.50, oth 54.55) stay the estimator's, shown nowhere in the
+   section. All four carriers are derived here from
+   data/aec-2025-seat-flows.json (the vendored DoP), replayed per seat with
+   origin-tagged piles: every count's excluded pile is split to receivers
+   in proportion to the recorded transfers. In a CLASSIC seat the count
+   ends ALP v Coalition, so each source party's ballots end exactly on a
+   major pile. Source ballots in the 35 NON-classic seats can end on
+   crossbencher/GRN terminal piles — those seats are EXCLUDED from the
+   buckets (the AEC's notional TPP counts in them exist only as seat
+   outcomes, not flows). `all` is the same 115 classic seats whole, so the
+   three regions ballot-weight to it exactly — the 2026-10-19 reader
+   report's parts-versus-whole complaint: the regions had been shown
+   against a national carrier read off the TPP product, which no weighting
+   of classic-seat-only parts can average to. The proportional-hop rule is
+   exact for the dominant hop (grn/on/oth piles excluded while the majors
+   stand) and approximate only for the small minor→minor hops that precede
+   it. Coverage of each bucket is printed with the results.
 
-   The printed national-over-classic-seats row beside the official constants
-   is the approximation check: same method, full-coverage comparison.
+   The printed official-constants delta beside the all-row is the
+   approximation check: replay vs notional, full-coverage comparison.
 
    Run from the repo root:  node .build/aec-2025-region-tpp-flows.mjs   */
 import { readFileSync } from "node:fs";
