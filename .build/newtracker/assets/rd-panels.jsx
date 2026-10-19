@@ -83,8 +83,37 @@ function RdPrimary({ rangeId, setRangeId }) {
     return null;
   })();
   const G = sel && sel.g;
-  const lastM = D.aggPrimary[D.aggPrimary.length - 1];
-  const allBase = D.aggPrimary.find((d) => d.election) || null;
+  /* The all-pollsters menu: the all-voters figures, re-run in the browser
+     as if only the ticked houses' polls existed (user ask 2026-10-19).
+     Federal-only (/vic/'s lines are a Kalman trend, not this estimator);
+     the menu hides in group mode, where the figures are §7g's pooled
+     reads and a pollster subset can't recompose them - the ticked set
+     stays, it just goes inert until the all-voters view returns. Empty
+     Set = every pollster. pvAgg mirrors gen-data §2 over the emitted
+     individualPolls, with the constants from D.aggSpec. */
+  const pvMenuOK = !window.JUR && !!(D.aggSpec && D.pvHouses && window.AP.pvAgg);
+  const [hvSel, setHvSel] = useState(() => new Set());
+  const hvKey = [...hvSel].sort().join("|");
+  const pvx = React.useMemo(
+    () => (pvMenuOK && hvSel.size && !G ? window.AP.pvAgg([...hvSel]) : null),
+    [hvKey, !!G]
+  );
+  /* the subset's meta-line figures: poll count and newest fieldwork of the
+     ticked houses (the server's all-houses figures otherwise). The count
+     and the date read the SAME rows the recompute does (pv-agg's rowsFor:
+     the noAgg and figure-less rows it skips can't move "N polls, latest
+     fieldwork ..." past what the lines were drawn from) */
+  const pvxMeta = React.useMemo(() => {
+    if (!pvx) return null;
+    const rows = D.individualPolls.filter((q) => hvSel.has(q.pollster) && !q.noAgg && q.p);
+    return { n: rows.length, latest: rows.reduce((m, q) => (q.released > m ? q.released : m), "") };
+  }, [hvKey, !!G]);
+  /* nothing in the three-week window under the subset: the headline quotes
+     nothing, the monthly chart still draws (story override below) */
+  const pvxDry = !!(pvx && !pvx.now);
+  const aggPrim = pvx ? [D.aggPrimary[0]].concat(pvx.months) : D.aggPrimary;
+  const lastM = aggPrim[aggPrim.length - 1];
+  const allBase = aggPrim.find((d) => d.election) || null;
   /* a group's election base exists only where the count itself was cut -
      the AEC's state and division-class sums. The ring and the dek's faller
      clause drop for every other group, rather than reaching for a figure
@@ -127,22 +156,44 @@ function RdPrimary({ rangeId, setRangeId }) {
     return rs;
   };
   const levelCount = (ps) => levelRuns(ps)[0].length;
-  const partsAll = mkParts(D.latest.primary, lastM.ci || {}, allBase);
-  const kAll = levelCount(partsAll);
+  /* when the subset holds nothing in the window (pvxDry), nowPrim is null
+     and every part-derived surface (the stat blocks, the run bands, the
+     level/late runs) collapses to emptiness rather than quoting the
+     server's all-houses figures as if they were the subset's - the story
+     and the monthly chart carry the state instead */
+  const nowPrim = pvx ? pvx.now : D.latest.primary;
+  const partsAll = nowPrim ? mkParts(nowPrim, lastM.ci || {}, allBase) : null;
+  const kAll = partsAll ? levelCount(partsAll) : 0;
   const parts = G ? mkParts(G.v, G.ci, base) : partsAll;
-  const top = parts[0];
+  /* a dry subset (pvxDry: no poll in the three-week window) has no `parts`
+     to quote, but its monthly lines still draw - the CHART's party list
+     then comes from the newest subset month that carries figures (the
+     ranking, line colours and end labels), while the stat blocks and the
+     level runs stay collapsed */
+  const partsDry = pvxDry
+    ? (() => {
+        const lastWithFig = aggPrim.slice().reverse().find((d) => !d.election && GRPV_KEYS.some((k) => d[k] != null));
+        return lastWithFig ? mkParts(lastWithFig, lastM.ci || {}, allBase) : null;
+      })()
+    : null;
+  const partsChart = parts || partsDry;
+  /* party hides are all-voters state: a hide made there never strands a
+     party invisible on a chart whose stat buttons are gone (pvxDry has
+     none), so the dry chart draws every party */
+  const hideC = parts ? hidden : {};
+  const top = parts ? parts[0] : null;
   const SHORT = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
   /* a phone's line ends carry the parties' letters, as the canvas drew them:
      the full names don't fit beside a 350px plot */
   const ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
-  const firstPolled = G ? {} : Object.fromEntries(parts.map((p) => [p.id, D.aggPrimary.find((d) => !d.election && d[p.id] != null)]));
-  const lateParties = !G && base ? parts.map((p) => p.id).filter((id) => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
+  const firstPolled = (G || !parts) ? {} : Object.fromEntries(parts.map((p) => [p.id, aggPrim.find((d) => !d.election && d[p.id] != null)]));
+  const lateParties = !G && base && parts ? parts.map((p) => p.id).filter((id) => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
   /* runs[0]: the parties the leader cannot be told apart from, the gap to
      each inside the two figures' 95% margins combined; every further run
      of two or more is a tie below the leaders of its own */
-  const runs = levelRuns(parts);
-  const k = runs[0].length;
-  const level = runs[0];
+  const runs = parts ? levelRuns(parts) : [];
+  const k = runs.length ? runs[0].length : 0;
+  const level = runs.length ? runs[0] : [];
   /* runs → the drawn bits: the big screen's bracket columns, and the
      phone's ordered blocks, where single parties between tied groups run
      together in one rest block so their hairlines never break */
@@ -163,6 +214,13 @@ function RdPrimary({ rangeId, setRangeId }) {
   }
 
   const story = (() => {
+    /* a pollster subset with nothing in the window: the headline says so
+       instead of quoting the all-houses figures, and the stat blocks below
+       render empty while the chart keeps its monthly lines */
+    if (pvxDry) return {
+      head: "No polls from the selected pollsters in the last three weeks",
+      dek: "The headline figures need at least one poll in the window; the chart still shows each month's average from the ticked pollsters.",
+    };
     const list = (arr) => arr.length === 2 ? arr.join(" and ") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
     const pc = (v) => v.toFixed(1) + "%";
     /* "Labor, on 28.4%, and One Nation, on 26.0%" - the leader sentence's
@@ -235,8 +293,8 @@ function RdPrimary({ rangeId, setRangeId }) {
       return o;
     });
   }, [T, G]);
-  const pts = filterPts(G && gMonths ? gMonths : D.aggPrimary, xDomain[0]);
-  const visible = parts.filter((p) => !hidden[p.id]);
+  const pts = filterPts(G && gMonths ? gMonths : aggPrim, xDomain[0]);
+  const visible = (partsChart || []).filter((p) => !hideC[p.id]);
   /* a monthly series drops the months that never carried the party's
      figure - the chart engine has no null-run guard (/vic/ has sparse ON
      months; federally every month carries the five, so this is a no-op) -
@@ -246,16 +304,16 @@ function RdPrimary({ rangeId, setRangeId }) {
     const L = pts.filter((d) => d[id] != null);
     return lateParties.includes(id) && L.length > 1 && L[0].election ? L.slice(1) : L;
   };
-  const chartSeries = parts.slice().reverse().map((p) => ({
+  const chartSeries = (partsChart || []).slice().reverse().map((p) => ({
     id: p.id, label: p.name, color: p.color, points: series(live(p.id), p.id),
     rdWidth: p.id === "oth" ? 2 : 2.5, dashed: p.id === "oth", dash: p.id === "oth" ? "6 4" : undefined,
-    opacity: hidden[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
+    opacity: hideC[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
   }));
   /* a party toggled off keeps its band, its dots and its election ring on
      the chart at nothing, so they fade out with its line (and back in),
      rather than vanishing the frame the line starts to fade */
-  const areas = parts.map((p) => ({
-    id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false, hidden: !!hidden[p.id],
+  const areas = (partsChart || []).map((p) => ({
+    id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false, hidden: !!hideC[p.id],
     points: pts.filter((d) => d.ci && d.ci[p.id] != null && d[p.id] != null)
       .map((d) => ({ x: d.x, y0: d[p.id] - d.ci[p.id], y1: d[p.id] + d.ci[p.id] })),
   })).filter((a) => a.points.length >= 2);
@@ -295,8 +353,14 @@ function RdPrimary({ rangeId, setRangeId }) {
     // a pooled release's parts (demoGrpAt) can sit inside the range its end doesn't
     .filter((q) => inDom(q.x) || (G && q.grp && q.grp.sp))
     .flatMap((q) => {
-      if (!G) return parts.filter((p) => q.p && q.p[p.id] != null)
-        .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }));
+      if (!G) {
+        /* a ticked pollster subset hides the unticked houses' dots too -
+           a wave from a house that doesn't count mustn't hang off the
+           recomputed lines as if it fed them */
+        if (pvx && !hvSel.has(q.pollster)) return [];
+        return (partsChart || []).filter((p) => q.p && q.p[p.id] != null)
+          .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }));
+      }
       const gv = q.grp && q.grp.v && q.grp.v[gi], tt = q.grp && q.grp.t;
       if (!gv || !tt) return inDom(q.x) ? soloDotsOf(q) : [];
       /* each place the group's figures count (demoGrpAt): the wave itself,
@@ -314,9 +378,9 @@ function RdPrimary({ rangeId, setRangeId }) {
                    sub: demoPartSub(q, s, q.grp.n && q.grp.n[gi]) };
         }).filter(Boolean);
       }).concat(inDom(q.x) ? soloDotsOf(q) : []);
-    }), [T, G, xDomain[0], xDomain[1]]);
-  const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
-  const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
+    }), [T, G, xDomain[0], xDomain[1], hvKey]);
+  const shownScatter = React.useMemo(() => scatter.map((d) => (hideC[d.party] ? { ...d, op: 0 } : d)), [scatter, hideC]);
+  const marks = base && partsChart ? partsChart.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hideC[p.id] })) : [];
   /* a group's lines open at the first month the houses polled the cut,
      sometimes nearly a year after the election, and the months between
      were never polled - so each ring joins its line with the who-votes
@@ -358,18 +422,25 @@ function RdPrimary({ rangeId, setRangeId }) {
   const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
   const meta = G
     ? "Pooled from the last " + T.window + " of " + rdList(G.houses.map(demoHouse)) + " polls"
-    : narrow
-      ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO)
-      : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
+    : pvx
+      ? pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, !narrow)
+      : narrow
+        ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO)
+        : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
   const toggle = (id) => setHidden((h) => {
     const next = { ...h, [id]: !h[id] };
-    return parts.every((p) => next[p.id]) ? {} : next;   // never an empty chart
+    return (parts || []).every((p) => next[p.id]) ? {} : next;   // never an empty chart
   });
   /* a group's monthly run can peak over the all-voters chart's fixed 40
      (rural One Nation reaches it): the axis then lifts to the next ten,
-     y-domain and ticks together. All voters keeps the fixed [0,40] frame */
-  const yTop = !G ? 40 : Math.max(40, Math.ceil(Math.max(...gMonths.flatMap((m) =>
-    GRPV_KEYS.map((kk) => m[kk] + m.ci[kk]))) * 1.0001 / 10) * 10);
+     y-domain and ticks together. A straight all-voters view keeps the
+     fixed [0,40] frame; a pollster subset's window is its own months', so
+     its frame lifts to the next five over the subset's peak instead */
+  const yTop = G ? Math.max(40, Math.ceil(Math.max(...gMonths.flatMap((m) =>
+    GRPV_KEYS.map((kk) => m[kk] + m.ci[kk]))) * 1.0001 / 10) * 10)
+    : pvx ? Math.max(40, Math.ceil(Math.max(...pvx.months.flatMap((m) =>
+      GRPV_KEYS.map((kk) => (m[kk] || 0) + ((m.ci && m.ci[kk]) || 0)))) * 1.0001 / 5) * 5)
+    : 40;
   const yTickSet = [0, 10, 20, 30, 40, 50, 60, 70].filter((t) => t <= yTop);
 
   /* A phone lists the five as the canvas drew them: the parties the leader
@@ -491,19 +562,22 @@ function RdPrimary({ rangeId, setRangeId }) {
      selection and again once the webfont lands - a fallback-font measure
      would otherwise freeze the early render's width. */
   const grpSelRef = React.useRef(null);
+  const pvSelRef = React.useRef(null);
   React.useLayoutEffect(() => {
-    const el = grpSelRef.current;
-    if (!el) return;
-    const fit = () => {
-      const cs = getComputedStyle(el);
-      const cv = document.createElement("canvas").getContext("2d");
-      cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
-      el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width
-        + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
-    };
-    fit();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  }, [grpId]);
+    [grpSelRef, pvSelRef].forEach((r0) => {
+      const el = r0.current;
+      if (!el) return;
+      const fit = () => {
+        const cs = getComputedStyle(el);
+        const cv = document.createElement("canvas").getContext("2d");
+        cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+        el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width
+          + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
+      };
+      fit();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    });
+  }, [grpId, hvKey]);
 
   /* the menu's longest options buy its width, so the two income bands
      print their short names in the MENU text alone (user call 2026-10-19),
@@ -527,6 +601,22 @@ function RdPrimary({ rangeId, setRangeId }) {
             )))}
           </select>
         )}
+        {pvMenuOK && !G && (
+          /* the ALL POLLSTERS menu (its figures live beside `hvSel` above):
+             the All-polls filter bar's tick-menu pattern - the select holds
+             no value, a pick ticks or unticks the house ("__clear" wipes the
+             set) and the label snaps back, to "N pollsters" while a subset
+             counts. Hidden in group mode: a group's figures are §7g's pooled
+             reads and a house subset can't recompose them, so no recomputed
+             view would sit behind whatever the menu said */
+          <select ref={pvSelRef} className="rd-pv-sel" aria-label="The primary vote counted from only some pollsters" value=""
+                  onChange={(e) => { const v = e.target.value; if (v === "__clear") setHvSel(new Set()); else if (v) setHvSel((s) => { const n = new Set(s); if (n.has(v)) n.delete(v); else n.add(v); return n; }); }}>
+            <option value="" disabled>{hvSel.size ? hvSel.size + (hvSel.size === 1 ? " pollster" : " pollsters") : "All pollsters"}</option>
+            {D.pvHouses.map((h) => <option key={h} value={h}>{(hvSel.has(h) ? "✓ " : "") + h}</option>)}
+            {hvSel.size > 0 && <hr />}
+            {hvSel.size > 0 && <option value="__clear">✕ Clear</option>}
+          </select>
+        )}
       </div>
       {narrow ? (
         <div className="rd-pv-list">
@@ -546,7 +636,7 @@ function RdPrimary({ rangeId, setRangeId }) {
               <span></span>Within the margin of uncertainty<span></span>
             </div>
           ))}
-          {parts.map(stat)}
+          {(parts || []).map(stat)}
         </div>
       )}
       <div className="card rd-card rd-pv-chart" ref={chartMark} data-rd-swipe-exact="">
@@ -601,7 +691,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
-          copy={{ title: "First-preference vote for each party" + (G ? ", " + sel.who : ""), sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
+          copy={{ title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""), sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : pvx ? ". Monthly averages of " + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
                     : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals."
@@ -609,7 +699,7 @@ function RdPrimary({ rangeId, setRangeId }) {
                          copy of it (the Who-votes dek's note is the same) */
                       + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "")
                       + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "")
-                    : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+                    : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
         {/* the 2PP card above already lists this window's events under its

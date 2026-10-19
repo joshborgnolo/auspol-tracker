@@ -938,10 +938,20 @@ body.rd .rd-pv-sel, body.rd .rd-confidence-sel, body.rd .rd-ap-sel {
 }
 body.rd .rd-pv-sel:hover, body.rd .rd-confidence-sel:hover, body.rd .rd-ap-sel:hover { border-color: var(--ink-faint); }
 body.rd .rd-pv-sel:focus-visible, body.rd .rd-confidence-sel:focus-visible, body.rd .rd-ap-sel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* the group and pollster menus belong to one figure family, so they stand
+   12px apart rather than the 32px the row gives its head-to-menu gaps (the
+   phone's stacked head never sees the flex gap and needs no offset) */
+@media (min-width: 641px) {
+  body.rd .rd-pv-head .rd-pv-sel + .rd-pv-sel { margin-left: -20px; }
+}
 @media (max-width: 640px) {
-  /* a phone stacks the menu under the dek, flush with its left edge */
+  /* a phone stacks the menus under the dek, flush with its left edge;
+     in the block head they flow inline on one line ("All voters" +
+     "All pollsters" fit even at 320px) and the second needs its own
+     gutter, since the desktop's separated-by-flex-gap rule doesn't run */
   body.rd .rd-pv-head { display: block; }
   body.rd .rd-pv-sel { margin-top: 12px; }
+  body.rd .rd-pv-head .rd-pv-sel + .rd-pv-sel { margin-left: 12px; }
 }
 /* a column too narrow for "Others & independents" says "Others", as the
    chart's own end label does, rather than cutting the name short */

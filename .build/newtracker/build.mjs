@@ -106,6 +106,7 @@ const PLAIN = [
   "9f09dca2-bd46-49a8-8ae1-51847608cf92.js",
   "ed2260de-5b11-4bd5-8a8d-a391156c05ee.js",
   "np-project.js", // the next-polls projection (needs window.AP; the sim evals this same file)
+  "pv-agg.js", // the Primary tab's pollster-subset recompute (needs window.AP; the parity test evals this same file)
   "menu-lines.js", // the menu pages' findings: their heads, the More menu's lines (build.mjs runs it in node too)
   "copy-chart.js", // per-chart copy-as-image button
   "copy-poll.js",  // copy-as-image button for the expanded poll breakdown

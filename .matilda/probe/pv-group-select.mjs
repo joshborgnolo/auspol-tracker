@@ -36,7 +36,19 @@
        6. Space walks the menu while the panel is on screen (the viewport
           claim, 2026-10-08): All voters -> 18–34 -> … -> wrap to All
           voters; off the viewport Space keeps its scroll day job, and a
-          FOCUSED menu keeps its own native Space */
+          FOCUSED menu keeps its own native Space
+       7. the ALL POLLSTERS menu (2026-10-19): a tick-menu select beside the
+          group menu, recomputing the panel as if only the ticked houses
+          existed. The closed face reads "All pollsters"/"N pollsters", a
+          pick ticks/unticks that house ("✓" prefix), a "✕ Clear" option
+          appears with the first tick, the meta line switches to the
+          subset's own poll count and latest fieldwork, and the set
+          survives - inert - a trip into the group menu (where no
+          recomputed view exists, so the menu hides). A subset with no
+          poll inside the 21-day headline window is the DRY state: the
+          headline says so, the stat blocks collapse, but the chart keeps
+          its monthly lines and dots from the ticked houses (the dek
+          promises them) */
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -113,6 +125,7 @@ const collect = (VW, VH, selValue) => (async () => {
       geom: {
         dek: rectOf(dek),
         selRect: rectOf(sel),
+        sels: [...sec.querySelectorAll("select.rd-pv-sel")].map(rectOf).filter(Boolean),
         statsRect: rectOf(sec.querySelector(".rd-pv-stats") || sec.querySelector(".rd-pv-list")),
         secRect: rectOf(sec),
       },
@@ -231,8 +244,11 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
     `w ${g.selRect && g.selRect.w} vs need ${s.sel.fit.need} (shares "${s.sel.text}" ${s.sel.fit.tw}px)`);
   ok("the shown label is never clipped", s.sel.fit.clientW - s.sel.fit.padL - s.sel.fit.padR >= s.sel.fit.tw - 1);
   if (W > 640) {
-    ok("at the right edge (within 2px of the stat strip's right)", g.selRect && g.statsRect && Math.abs(g.selRect.right - g.statsRect.right) <= 2,
-      g.selRect && g.statsRect ? `sel right ${g.selRect.right} vs strip ${g.statsRect.right}` : "missing");
+    const last = g.sels.length ? g.sels[g.sels.length - 1] : null;
+    ok("the pair's right edge is the strip's right (±2px)", last && g.statsRect && Math.abs(last.right - g.statsRect.right) <= 2,
+      last && g.statsRect ? `last sel right ${last.right} vs strip ${g.statsRect.right}` : "missing");
+    ok("the group menu rides left of the pollster menu", last && g.selRect && g.selRect.right <= last.x + 1,
+      last && g.selRect ? `group right ${g.selRect.right} vs last left ${last.x}` : "missing");
     ok("bottom-aligned with the dek's last line (±3px)", g.selRect && g.dek && Math.abs(g.selRect.bottom - g.dek.bottom) <= 3,
       g.selRect && g.dek ? `sel bottom ${g.selRect.bottom} vs dek bottom ${g.dek.bottom}` : "missing");
     ok("same row as the dek (tops overlap)", g.selRect && g.dek && g.selRect.y < g.dek.bottom && g.selRect.bottom > g.dek.y);
@@ -510,9 +526,12 @@ console.log("== Space walks the group menu ==");
   await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#primary-vote select.rd-pv-sel", { timeout: 20000 });
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  /* the SPACE walk claims the FIRST .rd-pv-sel in #primary-vote — the
+     group menu; the pollster menu (second) is not walkable and never
+     claims the key */
   const curVal = () => page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").value);
   const order = await page.evaluate(() =>
-    [...document.querySelectorAll("#primary-vote select.rd-pv-sel option")].map((o) => o.value));
+    [...document.querySelector("#primary-vote select.rd-pv-sel").querySelectorAll("option")].map((o) => o.value));
   ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 34,
      order.slice(0, 4).join("|") + " | n=" + order.length);
 
@@ -591,6 +610,134 @@ console.log("== Space walks the group menu ==");
   ok("off-claim Space scrolls (day job)", (await page.evaluate(() => window.scrollY)) > yOff0,
      "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yOff0);
   ok("off-claim Space leaves the menu alone", (await curVal()) === "18–34", await curVal());
+  await page.close();
+}
+
+/* ---- the ALL POLLSTERS menu (the Primary tab's pollster subset, head
+        comment's point 7): federal only, second select.rd-pv-sel inside
+        #primary-vote. Figures themselves are the parity test's
+        (.build/test-pv-recompute.mjs); here the MENU's contract. ---- */
+console.log("== pollster subset menu ==");
+{
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 900 });
+  await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#primary-vote select.rd-pv-sel", { timeout: 20000 });
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  await sleep(400);
+  const PV = "#primary-vote select.rd-pv-sel:nth-of-type(2)";
+  const grab = () => page.evaluate((PVSEL) => {
+    const sec = document.querySelector("#primary-vote");
+    const sels = [...sec.querySelectorAll("select.rd-pv-sel")];
+    const pv = sec.querySelector(PVSEL);
+    const xTexts = [...sec.querySelectorAll(".rd-pv-chart svg text")].map((n) => n.textContent.trim());
+    const D = (window.AP && window.AP.D) || {};
+    /* which houses any probe pick can rely on, straight from the payload */
+    const byHouse = {};
+    for (const q of D.individualPolls || []) {
+      if (q.noAgg || !q.p) continue;
+      (byHouse[q.pollster] = byHouse[q.pollster] || { n: 0, latest: "" });
+      byHouse[q.pollster].n++;
+      if (q.released > byHouse[q.pollster].latest) byHouse[q.pollster].latest = q.released;
+    }
+    return {
+      nSels: sels.length,
+      pv: pv ? {
+        aria: pv.getAttribute("aria-label"),
+        optCount: pv.querySelectorAll("option").length,
+        pairs: [...pv.querySelectorAll("option")].map((o) => [o.value, o.textContent, o.disabled]),
+        label: pv.options[pv.selectedIndex] ? pv.options[pv.selectedIndex].textContent : "",
+      } : null,
+      hed: sec.querySelector(".rd-hed") ? sec.querySelector(".rd-hed").textContent.trim() : null,
+      meta: sec.querySelector(".rd-meta") ? sec.querySelector(".rd-meta").textContent.trim() : null,
+      stats: sec.querySelectorAll(".rd-pv-stat").length,
+      partyLabels: ["Labor", "Coalition", "Greens", "One Nation", "Others"].filter((n) => xTexts.includes(n)).length,
+      dots: sec.querySelectorAll(".rd-pv-chart svg circle.scatter-dot").length,
+      overflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      byHouse,
+    };
+  }, PV);
+
+  /* 1 · baseline face beside the group menu */
+  const base = await grab();
+  ok("two selects ride the head row", base.nSels === 2, "n=" + base.nSels);
+  ok("pollster menu exists with its aria label", !!base.pv && base.pv.aria === "The primary vote counted from only some pollsters", base.pv && base.pv.aria);
+  if (base.pv) {
+    const first = base.pv.pairs[0] || [];
+    ok('closed face says "All pollsters" (disabled label option)', first[1] === "All pollsters" && first[2] === true, JSON.stringify(first));
+    ok("no tick or clear at rest", base.pv.pairs.slice(1).every(([v, t]) => v !== "__clear" && t === v) && base.pv.label === "All pollsters",
+      base.pv.pairs.filter(([v, t]) => t !== v).map(([v, t]) => v + "→" + t).join("|"));
+    const houses = base.pv.pairs.slice(1).map(([v]) => v);
+    ok("the houses the page aggregates are the options", houses.length >= 8 && houses.length <= 25 && houses.every((h) => base.byHouse[h]),
+      houses.length + " houses");
+    for (const h of ["Essential", "YouGov", "Roy Morgan", "Newspoll"])
+      ok("roster includes " + h, houses.includes(h), houses.join(" | "));
+  }
+  ok("the all-pollsters meta line is the server's", base.meta && !/selected pollsters/.test(base.meta), base.meta);
+
+  /* 2 · one tick: label, tick prefix, clear option, subset meta */
+  await page.select(PV, "Essential");
+  await sleep(600);
+  const one = await grab();
+  ok("one tick reads " + JSON.stringify("1 pollster"), !!one.pv && one.pv.label === "1 pollster", one.pv && one.pv.label);
+  ok("the ticked house wears its ✓ in the menu text", !!one.pv && one.pv.pairs.some(([v, t]) => v === "Essential" && t === "✓ Essential"),
+     one.pv && JSON.stringify(one.pv.pairs.find(([v]) => v === "Essential")));
+  ok("a ✕ Clear option appears", !!one.pv && one.pv.pairs.some(([v]) => v === "__clear"));
+  ok("meta counts the subset's own polls", !!one.meta && /polls from the selected pollsters, latest fieldwork /.test(one.meta), one.meta);
+  ok("meta's poll count matches the payload's eligible rows",
+     !!one.meta && one.meta.startsWith(String(one.byHouse["Essential"].n) + " "), one.meta + " vs n=" + one.byHouse["Essential"].n);
+  ok("no horizontal overflow with the subset active", one.overflow);
+
+  /* 3 · dry state, whenever today's data makes "Essential" dry: the dek's
+        promise is the pin - the chart keeps drawing the ticked houses'
+        months and dots while the headline and stats quote nothing */
+  const dryness = await page.evaluate(() => {
+    const out = window.AP.pvAgg(["Essential"]);
+    return { dry: !out.now, months: out.months.length };
+  });
+  if (dryness.dry) {
+    ok("dry state: the headline says so", one.hed === "No polls from the selected pollsters in the last three weeks", one.hed);
+    ok("dry state: stat blocks collapse", one.stats === 0, "stats=" + one.stats);
+    ok("dry state: the chart still draws the subset's lines (party end labels)", one.partyLabels >= 2, "labels=" + one.partyLabels);
+    ok("dry state: the ticked house's dots still plot", one.dots > 0, "dots=" + one.dots);
+  } else {
+    ok("wet subset: headline quotes figures (not the dry text)", !!one.hed && !one.hed.startsWith("No polls from the selected pollsters"), one.hed);
+    ok("wet subset: five stat blocks", one.stats === 5, "stats=" + one.stats);
+  }
+
+  /* 4 · toggle off by re-picking; then two ticks and ✕ Clear */
+  await page.select(PV, "Essential");
+  await sleep(400);
+  let cur = await grab();
+  ok("re-picking unticks: back to the server's meta line", !!cur.meta && cur.meta === base.meta && cur.pv.label === "All pollsters",
+     cur.meta);
+  await page.select(PV, "Essential");
+  await sleep(300);
+  await page.select(PV, "YouGov");
+  await sleep(500);
+  cur = await grab();
+  ok("two ticks read " + JSON.stringify("2 pollsters"), !!cur.pv && cur.pv.label === "2 pollsters", cur.pv && cur.pv.label);
+  await page.select(PV, "__clear");
+  await sleep(400);
+  cur = await grab();
+  ok("✕ Clear empties the set", !!cur.pv && cur.pv.label === "All pollsters" && cur.meta === base.meta, cur.meta);
+
+  /* 5 · a group excursion hides the menu and the set rides back inert */
+  await page.select(PV, "Essential");
+  await sleep(400);
+  await page.select("#primary-vote select.rd-pv-sel:nth-of-type(1)", "Men");
+  await sleep(500);
+  cur = await grab();
+  ok("the menu hides in group mode", cur.nSels === 1, "n=" + cur.nSels);
+  ok("group mode's pooled meta takes over", !!cur.meta && /^Pooled from the last /.test(cur.meta), cur.meta);
+  await page.select("#primary-vote select.rd-pv-sel:nth-of-type(1)", "");
+  await sleep(500);
+  cur = await grab();
+  ok("the menu returns with the set remembered", cur.nSels === 2 && !!cur.pv && cur.pv.label === "1 pollster", cur.pv && cur.pv.label);
+  await page.select(PV, "__clear");
+  await sleep(300);
+  cur = await grab();
+  ok("cleared again at the end", cur.meta === base.meta, cur.meta);
   await page.close();
 }
 

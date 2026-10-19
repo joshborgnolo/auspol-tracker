@@ -3439,8 +3439,14 @@ const individualPolls = POLLS.map((p) => {
     ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: fieldTbcUrl(p.pollster) } : {}),
     /* fieldwork mid-date ISO (see fmidIso) – the x basis every detail
        mini-chart draws the wave's own marker on; `released` is fieldwork's
-       last day, so a marker at it sits right of the window it claims */
-    ...(p.dateStart ? { fmid: fmidIso(p.dateStart, p.date) } : {}),
+       last day, so a marker at it sits right of the window it claims –
+       plus midMs's exact midpoint in ms: an odd-length window's mid lands
+       on a half-day and the estimator's day-clock arithmetic (lean
+       neighbours, window edges) reads it off, so the client-side primary
+       recompute (pv-agg.js) diverges by whole tenths if it only ever sees
+       the truncated fmid date. A row with no dateStart needs neither:
+       its mid IS its released day */
+    ...(p.dateStart ? { fmid: fmidIso(p.dateStart, p.date), mid: midMs(p) } : {}),
     // the commissioning publisher, exactly as the Latest-polls table shows
     // it – "Self-published" where the wave reported under no client
     client: p.client && p.client !== "—" ? p.client : "Self-published",
@@ -4327,6 +4333,18 @@ const primaryChg = KF ? null : Object.fromEntries(PRIMARY_KEYS.map((k) => {
   const seChg = Math.sqrt(nw.se ** 2 + pv.se ** 2);
   return [k, { chg: r1(nw.v - pv.v), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(nw.v - pv.v) > 1.96 * seChg }];
 }));
+
+/* The constants the Primary tab's ALL POLLSTERS menu recompute reads (the
+   client engine in pv-agg.js): one emission, exactly the DEFF comment's
+   rule, so the two engines can't drift apart. The client mirrors §2's
+   construction (weightedWithSe/nowcastPts/monthWithSe/houseEffectsFor)
+   over the emitted individualPolls - whose noAgg flag already bakes in
+   every eligibility decision made above - fed the same rows. */
+const aggSpec = { window: HL_WINDOW, half: HL_HALF, taper: HL_TAPER, deff: HL_DEFF,
+                  sampleCap: SAMPLE_CAP, heWindow: HE_WINDOW, heHalf: HE_HALF, shrinkK: SHRINK_K };
+/* the menu's ticks: every house that feeds the term's aggregates, in
+   first-appearance order (a stopped house stays - its months still count) */
+const pvHouses = [...new Set(POLLS.filter((p) => !noAggPoll(p)).map((p) => p.pollster))];
 
 /* ---- 7eb. each poll's footprint on the current primaries -----------------
    §3b's leave-one-out on the five-party nowcast, for the Primary tab's How it
@@ -7430,6 +7448,12 @@ window.AUSPOL = (function () {
   // link's targets; derived from PENDING_AT's method landings, gen-data-side)
   const effTbcUrls = ${JSON.stringify(effTbcUrls)};
   const latest = ${JSON.stringify(latest)};
+  /* the Primary tab's in-browser pollster-subset recompute (pv-agg.js):
+     the estimator constants it runs on (the source lines carry the drift
+     rule: change a constant there, it tracks here) and the canonical
+     house roster the menu lists (aggregable houses, first-seen order) */
+  const aggSpec = ${JSON.stringify(aggSpec)};
+  const pvHouses = ${JSON.stringify(pvHouses)};
   const showWorking = ${JSON.stringify(showWorking)};
   const events = ${JSON.stringify(events)};
   /* The Info tab's change log (gen-data §8d): poll additions, preference-
@@ -7538,7 +7562,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
-    individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog,
+    individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
