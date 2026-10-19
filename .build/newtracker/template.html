@@ -5713,6 +5713,22 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sgl { margin: 2px 0 0; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink); }
 .btv-sg .btv-rl { padding-left: 12px; color: var(--ink-3); }
 
+/* a trait series by leader pairing: one small chart a trait */
+.btv-trs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 14px 22px; margin-top: 10px; }
+.btv-tr { margin: 0; min-width: 0; }
+.btv-trt { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+.btv-tr svg { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+.btv-trg { stroke: var(--line-2); stroke-width: 1; }
+.btv-trax { font-size: 9.5px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.btv-trv { font-size: 10.5px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-trl { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.btv-trl-alp { stroke: var(--alp); fill: var(--alp); }
+.btv-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
+path.btv-trl-alp, path.btv-trl-lnp { fill: none; }
+.btv-trd { stroke: var(--bg); stroke-width: 1; }
+.btv-trs-alp { background: var(--alp); }
+.btv-trs-lnp { background: var(--lnp); }
+
 /* the breakdowns by group, behind their own fold */
 .btv-cuts { margin-top: 16px; }
 .btv-cuts > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }

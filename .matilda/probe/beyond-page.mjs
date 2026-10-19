@@ -109,13 +109,18 @@ for (const design of ["new", "old"]) {
         const its = [...document.querySelectorAll(".btv-mi")];
         return { n: its.length, empty: its.filter((it) => !it.querySelector(".btv-fig")).map((it) => it.querySelector(".btv-mq").textContent),
           figs: document.querySelectorAll(".btv-mi .btv-fig").length, sw: document.documentElement.scrollWidth,
+          trs: document.querySelectorAll(".btv-mi .btv-tr svg path.btv-trl").length,
           marks: [...document.querySelectorAll(".btv-mi .btv-fig")].map((f) => f.textContent).filter((t) => /\bTables? \d|\(%\)|values?:|value order|\(April \d{4}/.test(t)).length };
       });
       const moreN = topics.reduce((n, t) => n + t.more.length, 0);
-      const figN = topics.reduce((n, t) => n + t.more.reduce((k, q) => k + q.figs.length + q.prose.length, 0), 0);
+      /* a traits series (tables segmented by leader pairing) draws as one grid of small charts */
+      const traits = (q) => q.figs.length > 1 && q.figs.every((f) => f.kind === "table" && f.heads.length === 2 && f.rows.some((r) => r.sect));
+      const figN = topics.reduce((n, t) => n + t.more.reduce((k, q) => k + (traits(q) ? 1 : q.figs.length) + q.prose.length, 0), 0);
+      const trN = topics.reduce((n, t) => n + t.more.filter(traits).reduce((k, q) => k + q.figs.length, 0), 0);
       if (o.n !== moreN) fail(`${at}: More items ${o.n}/${moreN}`);
       if (o.empty.length) fail(`${at}: items opened to nothing: ${o.empty.slice(0, 3).join(" | ")}`);
       if (o.figs !== figN) fail(`${at}: opened figures ${o.figs}/${figN}`);
+      if (o.trs !== trN * 2) fail(`${at}: trait charts draw ${o.trs} lines, want two a trait (${trN * 2})`);
       if (o.marks) fail(`${at}: ${o.marks} figure(s) show a store's table numbers, units or packed readings`);
       if (o.sw !== w) fail(`${at}: with every item open the page is ${o.sw}px wide`);
     }

@@ -288,6 +288,22 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   const trump = out.topics.find((t) => t.id === "trump-us").blocks.find((b) => b.kind === "tracker");
   const sec = trump.panels.find((p) => p.house === "secnewgate").points.find((q) => q.field.end === "2025-11-03");
   assert.equal(sec.v, -39, "SEC Newgate's November 2025 net quotes its printed 60% negative (21 - 60), not the parts' 59");
+  /* the stores as filed: a trend chart's month point sits with the report
+     that asked the question (happiness was asked on 30 Sep 2026 only; the
+     Melbourne Cup on 29 Oct 2025), and no all-voters grid carries a column
+     no row fills */
+  const waves = (id, house) => entries.filter((e) => e.id === id && e.house === house).map((e) => e.waveDate).sort();
+  assert.deepEqual(waves("happiness-personal", "essential"), ["2026-09-29"], "happiness: one wave, the 30 Sep 2026 report's");
+  assert.deepEqual(entries.find((e) => e.id === "happiness-personal").tables[0].rows[0], ["My life overall", 6.4], "happiness: its chart's Sep'26 point is the wave's all-voters figure");
+  for (const id of ["melbourne-cup-attitudes", "melbourne-cup-betting", "melbourne-cup-interest"])
+    assert.deepEqual(waves(id, "essential"), ["2025-10-28"], `${id}: the 29 Oct 2025 report's alone`);
+  for (const e of entries) for (const t of e.tables) {
+    if (!t.headers || !t.rows.length) continue;
+    t.headers.forEach((h, i) => assert.ok(!i || t.rows.some((r) => r[i] != null), `${e.id} @ ${e.waveDate}: "${h}" is a column no row fills`));
+  }
+  const fall = entries.find((e) => e.id === "housing-values-fall" && e.waveDate === "2026-09-14").tables[0].rows;
+  assert.deepEqual(fall, [["For Australia — good thing (Sep '26)", 57], ["For Australia — bad thing (Sep '26)", 21],
+    ["For you personally — good thing (Sep '26)", 38], ["For you personally — bad thing (Sep '26)", 29]], "SEC Newgate's September totals as page 22 prints them");
   for (const t of out.topics) for (const q of t.more) {
     assert.ok(q.title && q.srcs.length, `${q.id} lists with its waves`);
     assert.ok(q.figs.length || q.prose.length, `${q.id} (${q.house}) opens to figures or the article's words`);

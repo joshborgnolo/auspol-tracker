@@ -3456,6 +3456,20 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sg { display: grid; row-gap: 5px; }
 .btv-sgl { margin: 2px 0 0; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink); }
 .btv-sg .btv-rl { padding-left: 12px; color: var(--ink-3); }
+.btv-trs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 14px 22px; margin-top: 10px; }
+.btv-tr { margin: 0; min-width: 0; }
+.btv-trt { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+.btv-tr svg { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+.btv-trg { stroke: var(--line-2); stroke-width: 1; }
+.btv-trax { font-size: 9.5px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.btv-trv { font-size: 10.5px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-trl { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.btv-trl-alp { stroke: var(--alp); fill: var(--alp); }
+.btv-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
+path.btv-trl-alp, path.btv-trl-lnp { fill: none; }
+.btv-trd { stroke: var(--bg); stroke-width: 1; }
+.btv-trs-alp { background: var(--alp); }
+.btv-trs-lnp { background: var(--lnp); }
 .btv-cuts { margin-top: 16px; }
 .btv-cuts > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
 .btv-cuts > summary span { color: var(--ink-3); }
@@ -64759,6 +64773,168 @@ function BtvFigTable({
     className: "btv-twd"
   }, " \xB7 ", r.waves[0].when) : null), cells(r.waves[0]))]))));
 }
+const BTV_LABOR = /\b(?:Rudd|Gillard|Shorten|Albanese)\b/,
+  BTV_COAL = /\b(?:Turnbull|Abbott|Morrison|Dutton|Ley|Nelson|Taylor)\b/;
+const btvYear = (label, prev) => {
+  const m = String(label).match(/(January|February|March|April|May|June|July|August|September|October|November|December)(?:\s+(\d{4}))?\s*$/);
+  if (!m) return null;
+  const mo = (BTV_MONF.indexOf(m[1]) + 0.5) / 12;
+  if (m[2]) return +m[2] + mo;
+  if (prev == null) return null;
+  const y = Math.floor(prev);
+  return y + mo > prev ? y + mo : y + 1 + mo;
+};
+const BTV_MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function btvTraitSeries(f) {
+  if (f.kind !== "table" || f.heads.length !== 2 || !f.rows.some(r => r.sect)) return null;
+  let pair = null;
+  const pts = [];
+  for (const r of f.rows) {
+    if (r.sect) {
+      const [a, b] = r.label.split(" v ");
+      const pa = BTV_LABOR.test(a) ? "alp" : BTV_COAL.test(a) ? "lnp" : null;
+      const pb = BTV_LABOR.test(b) ? "alp" : BTV_COAL.test(b) ? "lnp" : null;
+      if (!pa || !pb || pa === pb) return null;
+      pair = {
+        a: [pa, a.replace(/^(?:Mr|Ms|Mrs)\s+/, "")],
+        b: [pb, b.replace(/^(?:Mr|Ms|Mrs)\s+/, "")]
+      };
+      continue;
+    }
+    const x = btvYear(r.label, pts.length ? pts[pts.length - 1].x : null);
+    if (x == null || !pair) return null;
+    const c = r.waves[0].cells;
+    pts.push({
+      x,
+      when: r.label,
+      vals: {
+        [pair.a[0]]: [c[0], pair.a[1]],
+        [pair.b[0]]: [c[1], pair.b[1]]
+      }
+    });
+  }
+  return pts.length ? pts : null;
+}
+function BtvTraitChart({
+  title,
+  pts,
+  x0,
+  x1
+}) {
+  const W = 260,
+    H = 120,
+    L = 26,
+    R = 30,
+    T = 8,
+    B = 18;
+  const X = x => L + (x - x0) / (x1 - x0) * (W - L - R);
+  const Y = v => T + (1 - (v - 20) / 70) * (H - T - B);
+  const line = k => {
+    let d = "",
+      pen = false;
+    for (const p of pts) {
+      const v = p.vals[k][0];
+      if (v == null) {
+        pen = false;
+        continue;
+      }
+      d += (pen ? "L" : "M") + X(p.x).toFixed(1) + "," + Y(v).toFixed(1);
+      pen = true;
+    }
+    return d;
+  };
+  const last = k => [...pts].reverse().find(p => p.vals[k][0] != null);
+  return React.createElement("figure", {
+    className: "btv-tr"
+  }, React.createElement("figcaption", {
+    className: "btv-trt"
+  }, title), React.createElement("svg", {
+    viewBox: "0 0 " + W + " " + H,
+    role: "img",
+    "aria-label": title + ": agreement with the trait, Labor and Coalition leaders, " + Math.floor(x0) + " to " + Math.floor(x1)
+  }, [30, 50, 70, 90].map(v => React.createElement("g", {
+    key: v
+  }, React.createElement("line", {
+    x1: L,
+    x2: W - R,
+    y1: Y(v),
+    y2: Y(v),
+    className: "btv-trg"
+  }), React.createElement("text", {
+    x: L - 5,
+    y: Y(v) + 3.5,
+    className: "btv-trax",
+    textAnchor: "end"
+  }, v))), [2010, 2015, 2020, 2025].filter(y => y >= x0 && y <= x1).map(y => React.createElement("text", {
+    key: y,
+    x: X(y),
+    y: H - 4,
+    className: "btv-trax",
+    textAnchor: "middle"
+  }, y)), ["lnp", "alp"].map(k => React.createElement("path", {
+    key: k,
+    d: line(k),
+    className: "btv-trl btv-trl-" + k
+  })), ["lnp", "alp"].map(k => pts.map((p, i) => p.vals[k][0] == null ? null : React.createElement("circle", {
+    key: k + i,
+    cx: X(p.x),
+    cy: Y(p.vals[k][0]),
+    r: 2.2,
+    className: "btv-trd btv-trl-" + k
+  }, React.createElement("title", null, p.vals[k][1] + ", " + p.when + ": " + p.vals[k][0] + "%")))), ["alp", "lnp"].map(k => {
+    const p = last(k);
+    return p ? React.createElement("text", {
+      key: "e" + k,
+      x: X(p.x) + 5,
+      y: Y(p.vals[k][0]) + 3.5,
+      className: "btv-trv"
+    }, p.vals[k][0]) : null;
+  })));
+}
+function BtvTraits({
+  figs
+}) {
+  const all = figs.map(f => ({
+    f,
+    pts: btvTraitSeries(f)
+  }));
+  const xs = all.flatMap(a => a.pts.map(p => p.x));
+  const x0 = Math.min(...xs) - 0.3,
+    x1 = Math.max(...xs) + 0.3;
+  const measure = figs[0].measure;
+  return React.createElement("div", {
+    className: "btv-fig"
+  }, React.createElement("div", {
+    className: "btv-gh"
+  }, React.createElement("p", {
+    className: "btv-ghb"
+  }, (measure ? btvCap(measure) + ", %, " : "") + "for each trait"), React.createElement("p", {
+    className: "btv-fams"
+  }, React.createElement("span", null, React.createElement("i", {
+    className: "btv-wsw btv-trs-alp",
+    "aria-hidden": "true"
+  }), "Labor leader (Rudd, Gillard, Shorten, Albanese)"), React.createElement("span", null, React.createElement("i", {
+    className: "btv-wsw btv-trs-lnp",
+    "aria-hidden": "true"
+  }), "Coalition leader (Turnbull, Abbott, Morrison, Dutton, Ley)"))), React.createElement("div", {
+    className: "btv-trs"
+  }, all.map((a, i) => React.createElement(BtvTraitChart, {
+    key: i,
+    title: a.f.title,
+    pts: a.pts,
+    x0: x0,
+    x1: x1
+  }))), React.createElement("details", {
+    className: "btv-cuts"
+  }, React.createElement("summary", null, "The figures, poll by poll"), figs.map((f, i) => React.createElement("div", {
+    className: "btv-cut",
+    key: i
+  }, React.createElement("p", {
+    className: "btv-cutt"
+  }, f.title), React.createElement(BtvFigTable, {
+    f: f
+  })))));
+}
 function BtvFig({
   f,
   solo
@@ -65217,7 +65393,9 @@ function BtvMore({
     houses: houses
   })), React.createElement("div", {
     className: "btv-ir"
-  }, q.figs.map((f, i) => React.createElement(BtvFig, {
+  }, q.figs.length > 1 && q.figs.every(f => btvTraitSeries(f)) ? React.createElement(BtvTraits, {
+    figs: q.figs
+  }) : q.figs.map((f, i) => React.createElement(BtvFig, {
     key: i,
     f: f,
     solo: q.figs.length === 1

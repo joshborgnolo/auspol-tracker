@@ -298,6 +298,109 @@ function BtvFigTable({ f }) {
   );
 }
 
+/* ---- a trait series by leader pairing, as small multiples -------------------
+   Newspoll's leader traits since 2008 come as one table a trait, segmented
+   by PM v opposition leader. Each trait draws as a small chart with a line
+   for Labor's leader and one for the Coalition's (the leaders change along
+   the line, so a change of government swaps who holds office, not the
+   colours); the tables stay behind a fold. Used only where every figure is
+   such a table and every name places in a party. */
+const BTV_LABOR = /\b(?:Rudd|Gillard|Shorten|Albanese)\b/, BTV_COAL = /\b(?:Turnbull|Abbott|Morrison|Dutton|Ley|Nelson|Taylor)\b/;
+/* a fieldwork label's end, as a decimal year; one printed without its year
+   ("12-15 January") follows the row before it */
+const btvYear = (label, prev) => {
+  const m = String(label).match(/(January|February|March|April|May|June|July|August|September|October|November|December)(?:\s+(\d{4}))?\s*$/);
+  if (!m) return null;
+  const mo = (BTV_MONF.indexOf(m[1]) + 0.5) / 12;
+  if (m[2]) return +m[2] + mo;
+  if (prev == null) return null;
+  const y = Math.floor(prev);
+  return y + mo > prev ? y + mo : y + 1 + mo;
+};
+const BTV_MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function btvTraitSeries(f) {
+  if (f.kind !== "table" || f.heads.length !== 2 || !f.rows.some((r) => r.sect)) return null;
+  let pair = null;
+  const pts = [];
+  for (const r of f.rows) {
+    if (r.sect) {
+      const [a, b] = r.label.split(" v ");
+      const pa = BTV_LABOR.test(a) ? "alp" : BTV_COAL.test(a) ? "lnp" : null;
+      const pb = BTV_LABOR.test(b) ? "alp" : BTV_COAL.test(b) ? "lnp" : null;
+      if (!pa || !pb || pa === pb) return null;
+      pair = { a: [pa, a.replace(/^(?:Mr|Ms|Mrs)\s+/, "")], b: [pb, b.replace(/^(?:Mr|Ms|Mrs)\s+/, "")] };
+      continue;
+    }
+    const x = btvYear(r.label, pts.length ? pts[pts.length - 1].x : null);
+    if (x == null || !pair) return null;
+    const c = r.waves[0].cells;
+    pts.push({ x, when: r.label, vals: { [pair.a[0]]: [c[0], pair.a[1]], [pair.b[0]]: [c[1], pair.b[1]] } });
+  }
+  return pts.length ? pts : null;
+}
+function BtvTraitChart({ title, pts, x0, x1 }) {
+  const W = 260, H = 120, L = 26, R = 30, T = 8, B = 18;
+  const X = (x) => L + ((x - x0) / (x1 - x0)) * (W - L - R);
+  const Y = (v) => T + (1 - (v - 20) / 70) * (H - T - B);
+  const line = (k) => {
+    let d = "", pen = false;
+    for (const p of pts) {
+      const v = p.vals[k][0];
+      if (v == null) { pen = false; continue; }
+      d += (pen ? "L" : "M") + X(p.x).toFixed(1) + "," + Y(v).toFixed(1);
+      pen = true;
+    }
+    return d;
+  };
+  const last = (k) => [...pts].reverse().find((p) => p.vals[k][0] != null);
+  return (
+    <figure className="btv-tr">
+      <figcaption className="btv-trt">{title}</figcaption>
+      <svg viewBox={"0 0 " + W + " " + H} role="img" aria-label={title + ": agreement with the trait, Labor and Coalition leaders, " + Math.floor(x0) + " to " + Math.floor(x1)}>
+        {[30, 50, 70, 90].map((v) => (
+          <g key={v}>
+            <line x1={L} x2={W - R} y1={Y(v)} y2={Y(v)} className="btv-trg" />
+            <text x={L - 5} y={Y(v) + 3.5} className="btv-trax" textAnchor="end">{v}</text>
+          </g>
+        ))}
+        {[2010, 2015, 2020, 2025].filter((y) => y >= x0 && y <= x1).map((y) => (
+          <text key={y} x={X(y)} y={H - 4} className="btv-trax" textAnchor="middle">{y}</text>
+        ))}
+        {["lnp", "alp"].map((k) => <path key={k} d={line(k)} className={"btv-trl btv-trl-" + k} />)}
+        {["lnp", "alp"].map((k) => pts.map((p, i) => (p.vals[k][0] == null ? null : (
+          <circle key={k + i} cx={X(p.x)} cy={Y(p.vals[k][0])} r={2.2} className={"btv-trd btv-trl-" + k}>
+            <title>{p.vals[k][1] + ", " + p.when + ": " + p.vals[k][0] + "%"}</title>
+          </circle>
+        ))))}
+        {["alp", "lnp"].map((k) => { const p = last(k); return p ? (
+          <text key={"e" + k} x={X(p.x) + 5} y={Y(p.vals[k][0]) + 3.5} className="btv-trv">{p.vals[k][0]}</text>) : null; })}
+      </svg>
+    </figure>
+  );
+}
+function BtvTraits({ figs }) {
+  const all = figs.map((f) => ({ f, pts: btvTraitSeries(f) }));
+  const xs = all.flatMap((a) => a.pts.map((p) => p.x));
+  const x0 = Math.min(...xs) - 0.3, x1 = Math.max(...xs) + 0.3;
+  const measure = figs[0].measure;
+  return (
+    <div className="btv-fig">
+      <div className="btv-gh">
+        <p className="btv-ghb">{(measure ? btvCap(measure) + ", %, " : "") + "for each trait"}</p>
+        <p className="btv-fams">
+          <span><i className="btv-wsw btv-trs-alp" aria-hidden="true" />Labor leader (Rudd, Gillard, Shorten, Albanese)</span>
+          <span><i className="btv-wsw btv-trs-lnp" aria-hidden="true" />Coalition leader (Turnbull, Abbott, Morrison, Dutton, Ley)</span>
+        </p>
+      </div>
+      <div className="btv-trs">{all.map((a, i) => <BtvTraitChart key={i} title={a.f.title} pts={a.pts} x0={x0} x1={x1} />)}</div>
+      <details className="btv-cuts">
+        <summary>The figures, poll by poll</summary>
+        {figs.map((f, i) => <div className="btv-cut" key={i}><p className="btv-cutt">{f.title}</p><BtvFigTable f={f} /></div>)}
+      </details>
+    </div>
+  );
+}
+
 function BtvFig({ f, solo }) {
   const body = f.kind === "list" ? <BtvFigList f={f} />
     : f.kind === "nets" ? <BtvFigNets f={f} />
@@ -607,7 +710,8 @@ function BtvMore({ t, houses }) {
               <div className="btv-mb">
                 <div className="btv-il"><BtvWaves q={q} houses={houses} /></div>
                 <div className="btv-ir">
-                  {q.figs.map((f, i) => <BtvFig key={i} f={f} solo={q.figs.length === 1} />)}
+                  {q.figs.length > 1 && q.figs.every((f) => btvTraitSeries(f)) ? <BtvTraits figs={q.figs} />
+                    : q.figs.map((f, i) => <BtvFig key={i} f={f} solo={q.figs.length === 1} />)}
                   {q.prose.map((p, i) => (
                     <div className="btv-fig" key={"p" + i}>
                       {q.prose.length > 1 || q.figs.length ? <p className="btv-ght">{p.when}</p> : null}

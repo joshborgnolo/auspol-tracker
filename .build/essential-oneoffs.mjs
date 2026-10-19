@@ -337,6 +337,7 @@ const _trendSuffix = /_trend$/;
    They are not answer options – diverting them to a per-wave Series table
    keeps them out of the answer grid. */
 const MONTH_ANS = /^[a-z]{3} ?\d{2}$/;
+const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
 const prettyPeriod = (s) => {
   const m = norm(s).match(/^([a-z]{3}) ?(\d{2})$/);
   return m ? m[1][0].toUpperCase() + m[1].slice(1) + " " + m[2] : s;
@@ -658,6 +659,64 @@ for (const st of MANIFEST) {
   const ids = [st.ds, ...(st.also || [])];
   for (const id of ids) manifestDs.add(id);
   const rows = mergedRows(ids);
+  /* A trend chart's points are month buckets ("Sep'26" → 2026-09-01), and
+     Essential labels them by fieldwork, not by release, so the nearest
+     report is often the wrong one: the 1 Sep 2026 report never asked the
+     happiness battery its 30 Sep report charted, and gen-AI's "Apr'26"
+     point is the 27 May report's. A point belongs to the first wave within
+     two months that asked the question (one carrying the question's own,
+     non-trend reads). There it is the wave's all-voters figure if the wave
+     printed none of its own, and a restatement – skipped – if it did; it
+     never mints a wave the question was not asked in. A point with no such
+     wave keeps the nearest-wave rule. */
+  const trendRead = (r) => /trend/i.test(norm(r.vis)) || _trendSuffix.test(r.ds);
+  const foldish = (r) => FOLDISH_VIS.has(norm(r.vis)) || FOLDISH_DIM.has(norm(r.dim));
+  const own = rows.filter((r) => !trendRead(r));
+  const askedIn = [...new Set(own.map((r) => waveOfRead(r.date)).filter(Boolean))].sort();
+  /* each wave's own all-voters cells, answers, items and figures */
+  const wordsOf = (x) => new Set(norm(x).split(/[^a-z0-9]+/).filter(Boolean));
+  const ownAv = new Map();
+  for (const r of own) {
+    if (foldish(r)) continue;
+    const w = waveOfRead(r.date); if (!w) continue;
+    let o = ownAv.get(w); if (!o) ownAv.set(w, (o = { cells: new Set(), ans: new Set(), keys: new Set(), reads: [] }));
+    o.cells.add(norm(r.ans) + "~~" + norm(r.key)); o.ans.add(norm(r.ans)); if (norm(r.key)) o.keys.add(norm(r.key));
+    o.reads.push({ words: wordsOf(r.ans), val: Number(r.val) });
+  }
+  /* a trend point restates a wave's own figures when it is one of its
+     cells (with or without the "overall" key), the same figure under a
+     near-identical answer, the same answer under a nearby period tag
+     ("Currently a member - Aug 26"), a TOTAL of its answers, or a
+     per-item summary of a grid (a keyless point beside a battery, whose
+     own cells it cannot sit among: budget expectations' "Average working
+     people" is charted but not in the grid); a period far off ("- Nov
+     16") is a reading of its own and stays */
+  const PERIOD_TAG = /\s*[-–]\s*([a-z]{3})[a-z]*\.?\s*'?(\d{2})$/i;
+  const restates = (r, w) => {
+    const o = ownAv.get(w);
+    const a = norm(r.ans), k = norm(r.key);
+    if (o.cells.has(a + "~~" + k) || /^%?\s*total\b/.test(a) || (!k && (o.ans.has(a) || o.keys.size))) return true;
+    /* the same figure under a misspelt answer ("AI carries more opportunity
+       that risk"): equal values and most of the same words */
+    const ws = wordsOf(r.ans);
+    if (o.reads.some((x) => Math.abs(x.val - Number(r.val)) < 0.01
+      && [...ws].filter((t) => x.words.has(t)).length / new Set([...ws, ...x.words]).size >= 0.7)) return true;
+    const m = r.ans.match(PERIOD_TAG);
+    if (m && MONTHS[m[1].toLowerCase()]) {
+      const at = new Date(Date.UTC(2000 + +m[2], MONTHS[m[1].toLowerCase()] - 1, 1));
+      const near = Math.abs(new Date(w) - at) / 86400000 <= 62;
+      return near && o.ans.has(norm(r.ans.replace(PERIOD_TAG, "")));
+    }
+    return false;
+  };
+  const SKIP = "skip";
+  const waveOf = (r) => {
+    if (trendRead(r) && /-01$/.test(r.date)) {
+      const w = askedIn.find((x) => x >= r.date && (new Date(x) - new Date(r.date)) / 86400000 <= 62);
+      if (w) return ownAv.has(w) && restates(r, w) ? SKIP : w;
+    }
+    return waveOfRead(r.date);
+  };
   /* split av vs fold; map reads to waves. AV cells sit under a per-cell
      key: the trend month-grid read and the wave's own chart read of the
      same cell land in the same wave bucket (2026-04-01 vs 2026-04-28 for
@@ -686,7 +745,7 @@ for (const st of MANIFEST) {
   const blockRows = new Map(); // wave|vis|dim -> foldish rows of that block
   for (const r of rows) {
     if (!FOLDISH_VIS.has(norm(r.vis)) && !FOLDISH_DIM.has(norm(r.dim))) continue;
-    const w = waveOfRead(r.date); if (!w) continue;
+    const w = waveOf(r); if (!w || w === SKIP) continue;
     const bk = w + "|" + norm(r.vis) + "|" + norm(r.dim);
     let brs = blockRows.get(bk); if (!brs) blockRows.set(bk, (brs = []));
     brs.push(r);
@@ -709,7 +768,8 @@ for (const st of MANIFEST) {
   const notedBlocks = new Set();
 
   for (const r of rows) {
-    const w = waveOfRead(r.date);
+    const w = waveOf(r);
+    if (w === SKIP) continue;
     if (!w) { die(`unmapped read ${r.date} in ${ids.join("/")} ("${r.ans}")`); continue; }
     const bk = w + "|" + norm(r.vis) + "|" + norm(r.dim);
     if (skipBlocks.has(bk)) {

@@ -3464,6 +3464,20 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sg { display: grid; row-gap: 5px; }
 .btv-sgl { margin: 2px 0 0; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--ink); }
 .btv-sg .btv-rl { padding-left: 12px; color: var(--ink-3); }
+.btv-trs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 14px 22px; margin-top: 10px; }
+.btv-tr { margin: 0; min-width: 0; }
+.btv-trt { font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+.btv-tr svg { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+.btv-trg { stroke: var(--line-2); stroke-width: 1; }
+.btv-trax { font-size: 9.5px; fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.btv-trv { font-size: 10.5px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.btv-trl { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.btv-trl-alp { stroke: var(--alp); fill: var(--alp); }
+.btv-trl-lnp { stroke: var(--lnp); fill: var(--lnp); }
+path.btv-trl-alp, path.btv-trl-lnp { fill: none; }
+.btv-trd { stroke: var(--bg); stroke-width: 1; }
+.btv-trs-alp { background: var(--alp); }
+.btv-trs-lnp { background: var(--lnp); }
 .btv-cuts { margin-top: 16px; }
 .btv-cuts > summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
 .btv-cuts > summary span { color: var(--ink-3); }
@@ -6462,7 +6476,7 @@ body.rd .rd-ap-search input:focus-visible { outline: none; }
        rely on; it is not expressed here. -->
   <script>window.AP_INITIAL_TAB="disagreement";</script>
   <script>window.AP_CYCLE_SRC="/assets/cycle-source.7cebd0a7.json";</script>
-  <script>window.AP_ONEOFF_SRC="/assets/oneoffs-source.2ad94913.json";</script>
+  <script>window.AP_ONEOFF_SRC="/assets/oneoffs-source.e3aba177.json";</script>
   <script>window.EXPLAINED_ARTICLE="<!-- explained-article.html – the Preference-flows explainer's ARTICLE BODY,\n     the one source of the page's prose: build.mjs wraps it into the\n     /flows-explained/ document's static article (buildTabSummary), and ships\n     it to the client as window.EXPLAINED_ARTICLE, where MenuPageView's\n     RdExplained view renders the same bytes. The page's furniture lives\n     beside those two homes, not here: the headline+dek pair sit in\n     build.mjs's MENU_SS branch (static) and rd-allpolls.jsx's RdExplained\n     (live), and the section h2s' styling in template.html's .ex-* block.\n     It began life as the hand-maintained /preference-flows/ satellite and\n     became a page of the main build on 2026-10-15 (/preference-flows/ is now\n     a redirect stub).\n\n     The numbers quoted are the site's SHIPPED constants as at 11 October\n     2026: the classic pairing runs flows.mjs's AEC-2025 TPP cut (GRN 0.8819\n     · ONP 0.2550 · OTH 0.5455 to ALP); the Labor–One Nation pairing runs\n     flows.mjs's FP_ON (LNP 0.30 · GRN 0.91 · OTH 0.55 to ALP, bands\n     ±3/±2.5/±4). The Coalition cell was recalibrated c3ec7be, 11 Sep, from\n     the Downloads-side analysis page's superseded 72% Coalition→ON read;\n     Greens and others moved 11 Oct from 0.89/0.53 on the like-for-like\n     evidence, in the same review that corrected the description of the 2026\n     SA and Secret Harbour readings as \"counts\" (they are Bonham's estimates\n     from distributions and Green's early-voting-centre sample). If flows.mjs\n     or FP_ON changes, this file must be re-synced by hand. The old section\n     ids (why, why-implied, counts-2026, back-cast, estimator) survive as\n     spans so outside links keep landing. Every count the page rests on is an\n     outbound link (see .ex-src at the foot); re-check those URLs on any\n     re-sync. -->\n<h2 id=\"two-ways\"><span id=\"why\"></span><span id=\"why-implied\"></span>Ask or assume</h2>\n<p>When a candidate is excluded from the count, each of their ballots passes to the voter&rsquo;s next choice, and the count goes on until two candidates remain. The two-party preferred figure, or 2PP, runs that arithmetic for the whole country. A poll measures the first step, the primary vote: who people put first. It can&rsquo;t measure where the minor-party and independent votes end up. At the 2025 election a third of voters put someone other than Labor or the Coalition first; in 2026 polls more than half do. So the preferences largely decide the two-party figure, and there are two ways to estimate them.</p>\n<p><strong>Ask.</strong> The pollster asks respondents which of the two finalists they would rank higher, and publishes the result. Roy Morgan does this every week, and every pollster publishing a Labor v One Nation figure builds it this way. Other pollsters lean on how preferences flowed at the last election: this term Newspoll&rsquo;s Labor v Coalition figures have matched the 2025 flows to within rounding. The toggle calls all of these &ldquo;respondent-allocated&rdquo;; here they are the published figure.</p>\n<p><strong>Assume.</strong> Take the flows a real count measured and apply them, unchanged, to every poll&rsquo;s primary votes. At the 2025 election, for example, 88.2% of Greens preferences ended with Labor, so every Greens voter in every poll counts as 0.882 of a vote for Labor. The table is the same for every pollster and open to inspection, so the result moves only when primary votes move. That is the implied figure, and every poll whose primary votes add up joins it.</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table ex-tight\">\n    <caption>The two bases at a glance.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">&nbsp;</th>\n        <th scope=\"col\">Published (respondent-allocated)</th>\n        <th scope=\"col\">Implied from a fixed flow table</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">What it reads</td><td>Each pollster&rsquo;s own published two-party figure</td><td>Every poll&rsquo;s primaries, through one fixed table</td></tr>\n      <tr><td class=\"ex-l\">Polls it uses</td><td>Only polls that publish a 2PP</td><td>Every poll with a full set of primaries: more polls</td></tr>\n      <tr><td class=\"ex-l\">What moves it</td><td>Voters&rsquo; intentions <em>and</em> the changing mix of pollster methods</td><td>Voters&rsquo; intentions alone: the table can&rsquo;t drift</td></tr>\n      <tr><td class=\"ex-l\">What&rsquo;s the same for every pollster</td><td>Nothing: allocation methods differ and change</td><td>The table, one real election&rsquo;s counted behaviour</td></tr>\n      <tr><td class=\"ex-l\">What it can see that the other can&rsquo;t</td><td>A real change in preferences, as soon as pollsters measure it</td><td>A level free of allocation-method noise</td></tr>\n    </tbody>\n  </table>\n</div>\n<p>The implied figure has been the default since 18 September 2026, for four reasons.</p>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>Its movements are real</strong>\n    A trend in published figures mixes two things: changes in how people intend to vote, and changes in how pollsters allocate preferences as they arrive, revise their assumptions or switch methods. The implied figure has only the first. When it moves, the primary votes moved.\n  </li>\n  <li>\n    <strong>It has the better record</strong>\n    <a href=\"https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham has tested last-election flows</a> at every federal election since 1983. Applied to the final polls, they missed the two-party result by 0.3 points on average, and by a point or more only in 1990 and 2013. Asking has done worse. In 2004 pollsters expected 69&ndash;74% of minor-party preferences to reach Labor; 61% did, and polls showing 50&ndash;50 became a 52.7 Coalition win.\n  </li>\n  <li>\n    <strong>More polls feed it</strong>\n    Every poll publishes primary votes. Not every poll publishes a two-party figure.\n  </li>\n  <li>\n    <strong>Respondents don&rsquo;t carry how-to-vote cards</strong>\n    Many voters copy their party&rsquo;s card on the day, and a counted flow includes them. A respondent answers a survey with no card in hand. The difference matters most for Labor v One Nation, below.\n  </li>\n</ul>\n<p>The published figure keeps one advantage: if a party&rsquo;s voters really did start sending their preferences elsewhere, pollsters who ask would see it first. So the published series stays complete beside the implied one, one click away, and the drift chart on the <a href=\"/flows/\">Preference flows</a> page tracks the gap between them.</p>\n\n<h2 id=\"classic\">Labor v Coalition: a counted table</h2>\n<p>For this contest the table needs no estimates. The Electoral Commission&rsquo;s <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">2025 two-party release</a> distributed every formal ballot in all 150 seats between Labor and the Coalition, and three of its rows supply the table:</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>Counted preferences at the 2025 election, two-party cut (AEC event 31496): the share of each group&rsquo;s votes that ended with Labor, and the ballots behind it.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">Voters</th>\n        <th scope=\"col\">Flow to Labor</th>\n        <th scope=\"col\">Flow to Coalition</th>\n        <th scope=\"col\">Ballots</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">Greens</td><td>88.2%</td><td class=\"ex-c\">11.8%</td><td>1,666,851 v 223,126</td></tr>\n      <tr><td class=\"ex-l\">One Nation</td><td>25.5%</td><td class=\"ex-c\">74.5%</td><td>252,917 v 738,897</td></tr>\n      <tr><td class=\"ex-l\">All others</td><td>54.5%</td><td class=\"ex-c\">45.5%</td><td>1,268,209 v 1,056,696</td></tr>\n    </tbody>\n  </table>\n</div>\n<p>One small term goes on top. Where both Coalition parties stand in a seat, one is excluded first, and a few of its preferences reach Labor: 11,117 ballots in 2025, or 0.07 points of the national figure. The site adds that back as a constant, as Bonham does. For any poll, then, the implied figure is Labor&rsquo;s primary vote, plus each other group&rsquo;s primary vote times its flow, plus that constant:</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>Worked example: Roy Morgan, 24 August 2025. The same respondents produced both figures: Morgan published 56.5, and the table implies 55.1. The difference is allocation alone.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">Voters</th>\n        <th scope=\"col\">Poll&rsquo;s primary</th>\n        <th scope=\"col\">&times; flow to Labor</th>\n        <th scope=\"col\">Points to Labor</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">Labor</td><td>34.0</td><td class=\"ex-c\">1.000</td><td>34.0</td></tr>\n      <tr><td class=\"ex-l\">Greens</td><td>12.0</td><td class=\"ex-c\">0.8819</td><td>10.6</td></tr>\n      <tr><td class=\"ex-l\">One Nation</td><td>9.0</td><td class=\"ex-c\">0.2550</td><td>2.3</td></tr>\n      <tr><td class=\"ex-l\">All others</td><td>15.0</td><td class=\"ex-c\">0.5455</td><td>8.2</td></tr>\n      <tr><td class=\"ex-l\">Coalition</td><td>30.0</td><td class=\"ex-c\">&mdash;</td><td>0.0</td></tr>\n      <tr><td class=\"ex-l\">Three-cornered contests</td><td>&mdash;</td><td class=\"ex-c\">&mdash;</td><td>+0.07</td></tr>\n      <tr class=\"ex-sum\"><td class=\"ex-l\">Implied two-party</td><td></td><td class=\"ex-c\"></td><td class=\"ex-sum\">55.1</td></tr>\n    </tbody>\n  </table>\n</div>\n<p class=\"ex-tnote\">The Commission publishes the same flows two other ways: a web table that counts ballots ending with third parties, and a <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">two-candidate file</a> (86.8 / 27.1 / 48.5). The site uses the two-party cut because it measures what the site simulates, every ballot ending with Labor or the Coalition, and because it tracks Roy Morgan&rsquo;s own 2025-flows figure most closely.</p>\n<p>The weakest cell is One Nation&rsquo;s. With One Nation near 27% of the primary vote, each point of its flow moves the two-party figure by about a quarter of a point. The chart&rsquo;s shaded bracket recomputes the figure with the 2022 election&rsquo;s One Nation flow, 35.7% to Labor. The bracket is about three points wide and runs only towards Labor, while the evidence of change points the other way: many of One Nation&rsquo;s voters used to vote for the Coalition, and RedBridge&rsquo;s respondents have sent fewer of their preferences to Labor as 2026 went on. So the bracket shows what the assumption is worth, not how wrong it is likely to be.</p>\n\n<h2 id=\"one-nation\">Labor v One Nation: a built table</h2>\n<p>No count has ever measured this contest nationally. In 2025 One Nation reached the final two in two seats of 150, Hunter against Labor and Maranoa against the LNP. The five pollsters publishing a Labor v One Nation figure all ask their respondents, and here asking has a known weakness. Close to half of Coalition voters copy their party&rsquo;s how-to-vote card, and in 2025 those cards put One Nation above Labor almost everywhere. A respondent answering without the card is more likely to name Labor; Kevin Bonham puts the effect at about two points. So the site builds its own table from the ballots that do exist, and reads every poll through it:</p>\n\n<figure class=\"ex-fig\" role=\"img\" aria-label=\"Site estimate of Coalition preferences flowing to One Nation against Labor: 70 per cent, inside a band of 67 to 73 per cent.\">\n  <div class=\"ex-fam\">Coalition voters</div>\n  <div class=\"ex-num\">70%</div>\n  <div class=\"ex-cap\">of Coalition preferences would go to One Nation</div>\n  <div class=\"ex-band\" aria-hidden=\"true\">\n    <div class=\"ex-ci\" style=\"left:67.0%;width:6.0%\"></div>\n    <div class=\"ex-med\" style=\"left:70.0%\"></div>\n  </div>\n  <div class=\"ex-scale\" aria-hidden=\"true\">\n    <span>0 &middot; every ballot to Labor</span>\n    <span>50</span>\n    <span>100 &middot; every ballot to One Nation</span>\n  </div>\n  <figcaption class=\"ex-note\">Two 2026 contests put Liberal voters at about 66% and in the high 60s, and Nationals voters lean further. Kevin Bonham, building the same table independently, puts it at 71%. The setting meets him partway.</figcaption>\n</figure>\n\n<figure class=\"ex-fig\" role=\"img\" aria-label=\"Site estimate of Greens preferences flowing to One Nation against Labor: 9 per cent, inside a band of 6.5 to 11.5 per cent.\">\n  <div class=\"ex-fam\">Greens voters</div>\n  <div class=\"ex-num\">9%</div>\n  <div class=\"ex-cap\">of Greens preferences would go to One Nation</div>\n  <div class=\"ex-band\" aria-hidden=\"true\">\n    <div class=\"ex-ci\" style=\"left:6.5%;width:5.0%\"></div>\n    <div class=\"ex-med\" style=\"left:9.0%\"></div>\n  </div>\n  <div class=\"ex-scale\" aria-hidden=\"true\">\n    <span>0 &middot; every ballot to Labor</span>\n    <span>50</span>\n    <span>100 &middot; every ballot to One Nation</span>\n  </div>\n  <figcaption class=\"ex-note\">Against the Coalition, 88% of Greens preferences reached Labor in 2025. Against One Nation, every like-for-like comparison has Greens voters favouring Labor a little more.</figcaption>\n</figure>\n\n<figure class=\"ex-fig\" role=\"img\" aria-label=\"Site estimate of other voters&rsquo; preferences flowing to One Nation against Labor: 45 per cent, inside a band of 41 to 49 per cent.\">\n  <div class=\"ex-fam\">All other voters</div>\n  <div class=\"ex-num\">45%</div>\n  <div class=\"ex-cap\">of everyone else&rsquo;s preferences would go to One Nation</div>\n  <div class=\"ex-band\" aria-hidden=\"true\">\n    <div class=\"ex-ci\" style=\"left:41.0%;width:8.0%\"></div>\n    <div class=\"ex-med\" style=\"left:45.0%\"></div>\n  </div>\n  <div class=\"ex-scale\" aria-hidden=\"true\">\n    <span>0 &middot; every ballot to Labor</span>\n    <span>50</span>\n    <span>100 &middot; every ballot to One Nation</span>\n  </div>\n  <figcaption class=\"ex-note\">The least settled of the three. Independents&rsquo; voters favour Labor more against One Nation than against the Coalition; voters for right-wing minor parties lean the other way.</figcaption>\n</figure>\n\n<p>The bands are judgements, not sampling intervals. With One Nation near a quarter of the vote they move the two-party figure by about 1.4 points either way, and the headline adds that doubt to the polls&rsquo; own sampling error (<a href=\"/info/\">Info</a> sets out how).</p>\n\n<h2 id=\"how-found\"><span id=\"counts-2026\"></span>Where the Labor v One Nation settings come from</h2>\n<p>Each setting starts from Senate ballots, is checked against the 2026 lower-house contests, and is adjusted for the voters those contests missed.</p>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>Senate ballots</strong>\n    Every 2025 Senate ballot records whether the voter ranked Labor or One Nation higher. Counted in the Commission&rsquo;s <a href=\"https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm\" target=\"_blank\" rel=\"noopener noreferrer\">formal-preferences release</a>, 74.7% of Coalition ballots put One Nation first, as did 4.4% of Greens ballots and 50.9% of all others. These are counts, but of a different chamber: voters rank party lists instead of local candidates, and the minor parties differ. So the Senate is where the table starts.\n  </li>\n  <li>\n    <strong>The 2026 contests</strong>\n    In South Australia&rsquo;s March election Labor and One Nation made the final two in 25 of 47 seats, and in August One Nation won the <a href=\"https://www.elections.wa.gov.au/2026-secret-harbour-election-results\" target=\"_blank\" rel=\"noopener noreferrer\">Secret Harbour by-election</a> in Western Australia. Both ran under how-to-vote cards like the 2025 federal ones. Unfortunately, neither produced a clean count of how each party&rsquo;s voters ranked Labor against One Nation. South Australia&rsquo;s electoral commission ran no statewide Labor v One Nation count, and its flows by first preference are due in late 2026; the figures below are <a href=\"https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s estimates</a> from the published distributions of preferences. Secret Harbour&rsquo;s 70.2% comes from <a href=\"https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s count of the early voting centre</a>, 47% of the votes; on the full distribution Green and Bonham both put Liberal voters in the high 60s.\n  </li>\n</ul>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>The 2026 readings: share of each group&rsquo;s preferences reaching Labor against One Nation, per cent. Estimates, not full counts.</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">Contest</th>\n        <th scope=\"col\">Liberal &rarr; Labor</th>\n        <th scope=\"col\">Greens &rarr; Labor</th>\n        <th scope=\"col\">Independents &rarr; Labor</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">South Australia, Mar 2026 (Bonham&rsquo;s estimate)</td><td>33.9</td><td>84.8</td><td>55.9</td></tr>\n      <tr><td class=\"ex-l\">Secret Harbour, Aug 2026 (early voting centre)</td><td>29.8</td><td>90.0</td><td>&mdash;</td></tr>\n    </tbody>\n  </table>\n</div>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>Coalition voters: 70% to One Nation</strong>\n    Both contests read Liberal voters lower than the same state&rsquo;s Senate ballots did: South Australia about 66% against 70.6%, Secret Harbour in the high 60s against 73.5%. A national figure also needs the voters the contests missed. Nationals voters lean further to One Nation: at the Farrer by-election 69% of Nationals preferences went to One Nation against 59% of Liberal ones, and Hunter&rsquo;s 82.9% was a Nationals flow. Coalition voters in New South Wales and Queensland lean further than those in South Australia and Western Australia. Pulling the other way, both contests were fought where One Nation was strong, and neither included city seats like the seven where the Coalition put Labor above One Nation in 2025. On that reading the national figure is 68&ndash;69%. Bonham, weighing the same evidence, gives 71%. The evidence can&rsquo;t choose between them, so the setting is 70%.\n  </li>\n  <li>\n    <strong>Greens voters: 9% to One Nation</strong>\n    In 2025, 88.2% of Greens preferences reached Labor against the Coalition. Against One Nation, every like-for-like comparison has Greens voters favouring Labor more: by 4.6 points on the Senate ballots, and by 2.5 points on the same South Australian ballots in <a href=\"http://www.antonygreen.com.au/docs/sa/SA2026_DraftResults.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s three-way tables</a>. At Secret Harbour, an outer-suburban seat One Nation won, 90% went to Labor. South Australia&rsquo;s overall 15% to One Nation comes mostly from Labor heartland seats, where Greens preferences run softer against any opponent.\n  </li>\n  <li>\n    <strong>All other voters: 45% to One Nation</strong>\n    In 2025, 54.5% of these preferences reached Labor against the Coalition. Nearly half of this group vote for independents, whose voters favour Labor more against One Nation: RedBridge&rsquo;s respondents in the group give Labor about seven points more against One Nation than against the Coalition. Voters for right-wing minor parties lean the other way. Bonham treats the two as cancelling, at 54.7% to Labor, and South Australia&rsquo;s independents gave Labor 55.9%.\n  </li>\n  <li>\n    <strong>Checks, never inputs</strong>\n    Hunter&rsquo;s <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">2025 count</a> (82.9 &middot; 12.6 &middot; 59.8% to One Nation) is the only federal seat where voters made this choice, but it was One Nation&rsquo;s strongest seat, so every number from it is heartland. Maranoa shows the same effect: even Greens voters sent 35% to One Nation there. Respondent splits check the table without setting it. RedBridge&rsquo;s Coalition voters have given Labor between 31% and 44% each month, a median of 32%, and Newspoll&rsquo;s February question, with a &ldquo;don&rsquo;t know or follow the card&rdquo; option, implies 28&ndash;32%. Those samples are small, about 200 Coalition voters a month, and they miss card-following.\n  </li>\n</ul>\n\n<h2 id=\"by-state\">State by state</h2>\n<p>The site&rsquo;s settings are national. Anyone applying them to one state should start from that state&rsquo;s Senate ballots:</p>\n<div class=\"ex-twrap\">\n  <table class=\"ex-table\">\n    <caption>Share of each group&rsquo;s 2025 Senate ballots ranking One Nation ahead of Labor, per cent (of ballots that ranked either party; a ballot naming only one counts for it).</caption>\n    <thead>\n      <tr>\n        <th class=\"ex-l\" scope=\"col\">State</th>\n        <th scope=\"col\">Coalition</th>\n        <th scope=\"col\">Greens</th>\n        <th scope=\"col\">Others</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class=\"ex-l\">NSW</td><td>78.2</td><td>4.5</td><td>59.4</td></tr>\n      <tr><td class=\"ex-l\">Victoria</td><td>74.0</td><td>2.8</td><td>44.0</td></tr>\n      <tr><td class=\"ex-l\">Queensland</td><td>77.2</td><td>5.4</td><td>59.0</td></tr>\n      <tr><td class=\"ex-l\">Western Australia</td><td>73.5</td><td>5.1</td><td>51.0</td></tr>\n      <tr><td class=\"ex-l\">South Australia</td><td>70.6</td><td>5.6</td><td>50.5</td></tr>\n      <tr><td class=\"ex-l\">Tasmania</td><td>63.2</td><td>6.3</td><td>50.4</td></tr>\n      <tr><td class=\"ex-l\">Northern Territory</td><td>70.6</td><td>11.3</td><td>34.3</td></tr>\n      <tr class=\"ex-sum\"><td class=\"ex-l\">Australia</td><td>74.7</td><td>4.4</td><td>50.9</td></tr>\n    </tbody>\n  </table>\n</div>\n<p class=\"ex-tnote\">The ACT had no One Nation Senate group in 2025. Tasmania&rsquo;s Coalition voters leaned least to One Nation (63.2%, against 78.2% in New South Wales).</p>\n\n<h2 id=\"wrong\"><span id=\"back-cast\"></span>What could prove the tables wrong</h2>\n<ul class=\"ex-feats\">\n  <li>\n    <strong>The implied figure learns nothing about preferences</strong>\n    Same primary votes, same table, same answer. It can&rsquo;t discover that One Nation&rsquo;s voters have changed their second choices; it can only assume they haven&rsquo;t. Election night is the final test. The drift chart on the <a href=\"/flows/\">Preference flows</a> page is the early warning: it compares each pollster&rsquo;s published figure with what its primary votes imply, so a widening gap would show the table going stale.\n  </li>\n  <li>\n    <strong>The Labor v One Nation evidence is thin</strong>\n    Two state contests, both read from partial data, and one heartland federal seat are the whole lower-house record, and none is a national election. The next tests are South Australia&rsquo;s flows by first preference, due late in 2026, and Victoria&rsquo;s election in November.\n  </li>\n  <li>\n    <strong>Everything rests on today&rsquo;s how-to-vote cards</strong>\n    About 40&ndash;45% of Coalition voters follow their card. If the Liberals put Labor above One Nation, the Coalition setting could move by 15 points or more, and the two-party figure by 3 points or more towards Labor.\n  </li>\n  <li>\n    <strong>The published figure is no pure reading either</strong>\n    Pollsters change methods mid-term, and some apply last-election flows themselves, which is the implied method used privately. Read the implied figure for movement, and keep the published one in view.\n  </li>\n</ul>\n\n<h2 id=\"lead\"><span id=\"estimator\"></span>Which contest leads</h2>\n<p>The page leads with Labor&rsquo;s main rival, judged on the implied figures. A rival that runs Labor clearly closer after preferences, by more than the gap&rsquo;s own margin, leads. When the two contests are too close to call, the rival clearly ahead on first preferences leads instead, because it would face Labor in more seats. Since February 2026 that has been One Nation: after preferences the two contests have stayed within about a point of each other, while One Nation has led the Coalition on first preferences by 2 to 10 points. How polls become the headline figure, with its weighting, pollster corrections and margins, is set out in <a href=\"/info/\">Info</a>.</p>\n\n<p class=\"ss-note\">Site settings as at 11 October 2026. Every source is linked below, because the case for the implied figure is that its one assumption can be traced to real ballots.</p>\n<ul class=\"ex-src\">\n  <li><strong>Classic table</strong> &mdash; <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">AEC 2025 TPP flow of preferences by party</a> (<a href=\"https://results.aec.gov.au/31496/Website/Default.htm\" target=\"_blank\" rel=\"noopener noreferrer\">event 31496</a>), every formal ballot in 150 divisions distributed between Labor and the Coalition. The alternative cut named above: <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">TCP flow by party</a>.</li>\n  <li><strong>Labor&ndash;One Nation starting point</strong> &mdash; <a href=\"https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm\" target=\"_blank\" rel=\"noopener noreferrer\">AEC 2025 Senate formal-preferences release</a> (7.43 million above-the-line ballots ranking Labor or One Nation).</li>\n  <li><strong>The 2026 contests</strong> &mdash; South Australia: <a href=\"https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s estimates from the published distributions</a> and <a href=\"http://www.antonygreen.com.au/docs/sa/SA2026_DraftResults.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s draft results and preference tables</a>. Secret Harbour: <a href=\"https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/\" target=\"_blank\" rel=\"noopener noreferrer\">Antony Green&rsquo;s count of the early voting centre</a>, <a href=\"https://kevinbonham.blogspot.com/2026/09/the-flat-field-another-polls-are-wrong.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s reading of the full distribution</a> and the <a href=\"https://www.elections.wa.gov.au/2026-secret-harbour-election-results\" target=\"_blank\" rel=\"noopener noreferrer\">WAEC result</a>.</li>\n  <li><strong>Cross-checks, never inputs</strong> &mdash; <a href=\"https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv\" target=\"_blank\" rel=\"noopener noreferrer\">AEC TCP flow by division</a> (Hunter, Maranoa), the Farrer by-election flow release, <a href=\"https://www.tallyroom.com.au/64676\" target=\"_blank\" rel=\"noopener noreferrer\">Ben Raue&rsquo;s seat-by-seat tabulation of South Australia&rsquo;s raw distributions</a>, and <a href=\"https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham&rsquo;s January 2026 reconstruction</a>.</li>\n  <li><strong>Monthly respondent splits</strong> &mdash; the <a href=\"https://www.accent-research.com/projects\" target=\"_blank\" rel=\"noopener noreferrer\">AFR / RedBridge Group / Accent Research federal poll</a>, each wave since February 2026 printing respondent-allocated two-party answers by first preference &mdash; charted on the <a href=\"/flows/\">Preference flows</a> page.</li>\n  <li><strong>Newspoll&rsquo;s preference question</strong> &mdash; February 2026, as reported by <a href=\"https://www.pollbludger.net/2026/02/08/newspoll-labor-33-one-nation-27-coalition-18-greens-12-open-thread/\" target=\"_blank\" rel=\"noopener noreferrer\">The Poll Bludger</a>.</li>\n  <li><strong>How-to-vote cards and respondent preferences</strong> &mdash; <a href=\"https://kevinbonham.blogspot.com/2026/09/the-flat-field-another-polls-are-wrong.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham, <em>The Flat Field</em></a> (September 2026), on card-following and why respondent figures probably overstate Labor against One Nation.</li>\n  <li><strong>Track record of last-election flows</strong> &mdash; <a href=\"https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html\" target=\"_blank\" rel=\"noopener noreferrer\">Kevin Bonham, <em>Wonk Central: The Track Record Of Last-Election Preferences</em></a> (September 2015, updated through 2022), the election-by-election record cited under &ldquo;Ask or assume&rdquo;.</li>\n</ul>\n<p class=\"ss-note\">Companion to the &ldquo;?&rdquo; beside the two-party basis switch.</p>\n";</script>
   <script>/**
  * @license React
@@ -134851,6 +134865,168 @@ function BtvFigTable({
     className: "btv-twd"
   }, " \xB7 ", r.waves[0].when) : null), cells(r.waves[0]))]))));
 }
+const BTV_LABOR = /\b(?:Rudd|Gillard|Shorten|Albanese)\b/,
+  BTV_COAL = /\b(?:Turnbull|Abbott|Morrison|Dutton|Ley|Nelson|Taylor)\b/;
+const btvYear = (label, prev) => {
+  const m = String(label).match(/(January|February|March|April|May|June|July|August|September|October|November|December)(?:\s+(\d{4}))?\s*$/);
+  if (!m) return null;
+  const mo = (BTV_MONF.indexOf(m[1]) + 0.5) / 12;
+  if (m[2]) return +m[2] + mo;
+  if (prev == null) return null;
+  const y = Math.floor(prev);
+  return y + mo > prev ? y + mo : y + 1 + mo;
+};
+const BTV_MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function btvTraitSeries(f) {
+  if (f.kind !== "table" || f.heads.length !== 2 || !f.rows.some(r => r.sect)) return null;
+  let pair = null;
+  const pts = [];
+  for (const r of f.rows) {
+    if (r.sect) {
+      const [a, b] = r.label.split(" v ");
+      const pa = BTV_LABOR.test(a) ? "alp" : BTV_COAL.test(a) ? "lnp" : null;
+      const pb = BTV_LABOR.test(b) ? "alp" : BTV_COAL.test(b) ? "lnp" : null;
+      if (!pa || !pb || pa === pb) return null;
+      pair = {
+        a: [pa, a.replace(/^(?:Mr|Ms|Mrs)\s+/, "")],
+        b: [pb, b.replace(/^(?:Mr|Ms|Mrs)\s+/, "")]
+      };
+      continue;
+    }
+    const x = btvYear(r.label, pts.length ? pts[pts.length - 1].x : null);
+    if (x == null || !pair) return null;
+    const c = r.waves[0].cells;
+    pts.push({
+      x,
+      when: r.label,
+      vals: {
+        [pair.a[0]]: [c[0], pair.a[1]],
+        [pair.b[0]]: [c[1], pair.b[1]]
+      }
+    });
+  }
+  return pts.length ? pts : null;
+}
+function BtvTraitChart({
+  title,
+  pts,
+  x0,
+  x1
+}) {
+  const W = 260,
+    H = 120,
+    L = 26,
+    R = 30,
+    T = 8,
+    B = 18;
+  const X = x => L + (x - x0) / (x1 - x0) * (W - L - R);
+  const Y = v => T + (1 - (v - 20) / 70) * (H - T - B);
+  const line = k => {
+    let d = "",
+      pen = false;
+    for (const p of pts) {
+      const v = p.vals[k][0];
+      if (v == null) {
+        pen = false;
+        continue;
+      }
+      d += (pen ? "L" : "M") + X(p.x).toFixed(1) + "," + Y(v).toFixed(1);
+      pen = true;
+    }
+    return d;
+  };
+  const last = k => [...pts].reverse().find(p => p.vals[k][0] != null);
+  return React.createElement("figure", {
+    className: "btv-tr"
+  }, React.createElement("figcaption", {
+    className: "btv-trt"
+  }, title), React.createElement("svg", {
+    viewBox: "0 0 " + W + " " + H,
+    role: "img",
+    "aria-label": title + ": agreement with the trait, Labor and Coalition leaders, " + Math.floor(x0) + " to " + Math.floor(x1)
+  }, [30, 50, 70, 90].map(v => React.createElement("g", {
+    key: v
+  }, React.createElement("line", {
+    x1: L,
+    x2: W - R,
+    y1: Y(v),
+    y2: Y(v),
+    className: "btv-trg"
+  }), React.createElement("text", {
+    x: L - 5,
+    y: Y(v) + 3.5,
+    className: "btv-trax",
+    textAnchor: "end"
+  }, v))), [2010, 2015, 2020, 2025].filter(y => y >= x0 && y <= x1).map(y => React.createElement("text", {
+    key: y,
+    x: X(y),
+    y: H - 4,
+    className: "btv-trax",
+    textAnchor: "middle"
+  }, y)), ["lnp", "alp"].map(k => React.createElement("path", {
+    key: k,
+    d: line(k),
+    className: "btv-trl btv-trl-" + k
+  })), ["lnp", "alp"].map(k => pts.map((p, i) => p.vals[k][0] == null ? null : React.createElement("circle", {
+    key: k + i,
+    cx: X(p.x),
+    cy: Y(p.vals[k][0]),
+    r: 2.2,
+    className: "btv-trd btv-trl-" + k
+  }, React.createElement("title", null, p.vals[k][1] + ", " + p.when + ": " + p.vals[k][0] + "%")))), ["alp", "lnp"].map(k => {
+    const p = last(k);
+    return p ? React.createElement("text", {
+      key: "e" + k,
+      x: X(p.x) + 5,
+      y: Y(p.vals[k][0]) + 3.5,
+      className: "btv-trv"
+    }, p.vals[k][0]) : null;
+  })));
+}
+function BtvTraits({
+  figs
+}) {
+  const all = figs.map(f => ({
+    f,
+    pts: btvTraitSeries(f)
+  }));
+  const xs = all.flatMap(a => a.pts.map(p => p.x));
+  const x0 = Math.min(...xs) - 0.3,
+    x1 = Math.max(...xs) + 0.3;
+  const measure = figs[0].measure;
+  return React.createElement("div", {
+    className: "btv-fig"
+  }, React.createElement("div", {
+    className: "btv-gh"
+  }, React.createElement("p", {
+    className: "btv-ghb"
+  }, (measure ? btvCap(measure) + ", %, " : "") + "for each trait"), React.createElement("p", {
+    className: "btv-fams"
+  }, React.createElement("span", null, React.createElement("i", {
+    className: "btv-wsw btv-trs-alp",
+    "aria-hidden": "true"
+  }), "Labor leader (Rudd, Gillard, Shorten, Albanese)"), React.createElement("span", null, React.createElement("i", {
+    className: "btv-wsw btv-trs-lnp",
+    "aria-hidden": "true"
+  }), "Coalition leader (Turnbull, Abbott, Morrison, Dutton, Ley)"))), React.createElement("div", {
+    className: "btv-trs"
+  }, all.map((a, i) => React.createElement(BtvTraitChart, {
+    key: i,
+    title: a.f.title,
+    pts: a.pts,
+    x0: x0,
+    x1: x1
+  }))), React.createElement("details", {
+    className: "btv-cuts"
+  }, React.createElement("summary", null, "The figures, poll by poll"), figs.map((f, i) => React.createElement("div", {
+    className: "btv-cut",
+    key: i
+  }, React.createElement("p", {
+    className: "btv-cutt"
+  }, f.title), React.createElement(BtvFigTable, {
+    f: f
+  })))));
+}
 function BtvFig({
   f,
   solo
@@ -135309,7 +135485,9 @@ function BtvMore({
     houses: houses
   })), React.createElement("div", {
     className: "btv-ir"
-  }, q.figs.map((f, i) => React.createElement(BtvFig, {
+  }, q.figs.length > 1 && q.figs.every(f => btvTraitSeries(f)) ? React.createElement(BtvTraits, {
+    figs: q.figs
+  }) : q.figs.map((f, i) => React.createElement(BtvFig, {
     key: i,
     f: f,
     solo: q.figs.length === 1

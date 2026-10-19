@@ -2420,24 +2420,24 @@
    "qid": "E861",
    "tables": [
     {
-     "title": "Advancing Australia’s international economic trade interests",
+     "title": "Labor",
      "source": "https://essentialreport.com.au/reports/30-july-2025",
      "rows": [
       [
        "Advancing Australia’s international economic trade interests",
-       null
+       40
       ],
       [
        "Managing Australia’s relationship within the Asia-Pacific region",
-       null
+       39
       ],
       [
        "Dealing with complex global conflicts like Gaza and Ukraine",
-       null
+       36
       ],
       [
        "Protecting Australia’s borders and national security",
-       null
+       35
       ]
      ]
     },
@@ -2446,10 +2446,6 @@
      "source": "https://essentialreport.com.au/reports/30-july-2025",
      "headers": [
       "",
-      "Advancing Australia’s international economic trade interests",
-      "Managing Australia’s relationship within the Asia-Pacific region",
-      "Dealing with complex global conflicts like Gaza and Ukraine",
-      "Protecting Australia’s borders and national security",
       "Labor",
       "No difference",
       "Coalition"
@@ -2457,40 +2453,24 @@
      "rows": [
       [
        "Advancing Australia’s international economic trade interests",
-       null,
-       null,
-       null,
-       null,
        40,
        33,
        28
       ],
       [
        "Managing Australia’s relationship within the Asia-Pacific region",
-       null,
-       null,
-       null,
-       null,
        39,
        35,
        26
       ],
       [
        "Dealing with complex global conflicts like Gaza and Ukraine",
-       null,
-       null,
-       null,
-       null,
        36,
        41,
        23
       ],
       [
        "Protecting Australia’s borders and national security",
-       null,
-       null,
-       null,
-       null,
        35,
        34,
        31
@@ -4455,26 +4435,6 @@
       [
        "Strongly oppose",
        20
-      ],
-      [
-       "Strongly support",
-       18
-      ],
-      [
-       "Somewhat support",
-       16
-      ],
-      [
-       "Neither support, nor oppose",
-       37
-      ],
-      [
-       "Somewhat oppose",
-       10
-      ],
-      [
-       "Strongly oppose",
-       20
       ]
      ]
     },
@@ -6295,88 +6255,6 @@
    ]
   },
   {
-   "id": "generative-ai-use",
-   "waveDate": "2025-09-30",
-   "dateStart": "2025-09-24",
-   "dateEnd": "2025-09-29",
-   "published": "2025-09-30T16:35",
-   "sample": 1001,
-   "sampleEff": 822,
-   "url": "https://essentialreport.com.au/reports/30-september-2025",
-   "question": "Use of generative AI",
-   "notes": null,
-   "qid": "E1133",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/30-september-2025",
-     "rows": [
-      [
-       "To help in my work or study",
-       32
-      ],
-      [
-       "To help manage my time",
-       28
-      ],
-      [
-       "For personal or health advice",
-       26
-      ],
-      [
-       "To seek out information",
-       41
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "id": "happiness-personal",
-   "waveDate": "2025-09-30",
-   "dateStart": "2025-09-24",
-   "dateEnd": "2025-09-29",
-   "published": "2025-09-30T16:35",
-   "sample": 1001,
-   "sampleEff": 822,
-   "url": "https://essentialreport.com.au/reports/30-september-2025",
-   "question": "Happiness with personal situation",
-   "notes": null,
-   "qid": "E82",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/30-september-2025",
-     "rows": [
-      [
-       "My life overall",
-       6.4
-      ],
-      [
-       "My personal/family life",
-       6.8
-      ],
-      [
-       "My spiritual life",
-       6.2
-      ],
-      [
-       "My work life",
-       5.7
-      ],
-      [
-       "My social life",
-       6.1
-      ],
-      [
-       "My financial situation",
-       5.4
-      ]
-     ]
-    }
-   ]
-  },
-  {
    "id": "immigration-cap",
    "waveDate": "2025-09-30",
    "dateStart": "2025-09-24",
@@ -6393,18 +6271,6 @@
      "title": null,
      "source": "https://essentialreport.com.au/reports/30-september-2025",
      "rows": [
-      [
-       "Too high",
-       53
-      ],
-      [
-       "About right",
-       40
-      ],
-      [
-       "Too low",
-       7
-      ],
       [
        "Too high",
        53
@@ -6506,121 +6372,6 @@
        6,
        17,
        5
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "id": "melbourne-cup-attitudes",
-   "waveDate": "2025-09-30",
-   "dateStart": "2025-09-24",
-   "dateEnd": "2025-09-29",
-   "published": "2025-09-30T16:35",
-   "sample": 1001,
-   "sampleEff": 822,
-   "url": "https://essentialreport.com.au/reports/30-september-2025",
-   "question": "Attitudes to the Melbourne Cup",
-   "notes": null,
-   "qid": "E157",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/30-september-2025",
-     "rows": [
-      [
-       "The Melbourne Cup is a unique part of Australia’s national identity",
-       62
-      ],
-      [
-       "The Melbourne Cup promotes unhealthy gambling behaviour",
-       48
-      ],
-      [
-       "I am less interested in the Melbourne Cup than I used to be",
-       45
-      ],
-      [
-       "The Melbourne Cup normalises animal cruelty",
-       39
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "id": "melbourne-cup-betting",
-   "waveDate": "2025-09-30",
-   "dateStart": "2025-09-24",
-   "dateEnd": "2025-09-29",
-   "published": "2025-09-30T16:35",
-   "sample": 1001,
-   "sampleEff": 822,
-   "url": "https://essentialreport.com.au/reports/30-september-2025",
-   "question": "Betting activity and the Melbourne Cup",
-   "notes": null,
-   "qid": "E355",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/30-september-2025",
-     "rows": [
-      [
-       "I regularly bet on horse races and will place a bet on the Melbourne Cup",
-       18
-      ],
-      [
-       "I rarely bet on horse races but will watch the Melbourne Cup and place a bet",
-       24
-      ],
-      [
-       "I will watch the Melbourne Cup but will not place a bet",
-       18
-      ],
-      [
-       "I am not interested in the Melbourne Cup and will not place a bet",
-       40
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "id": "melbourne-cup-interest",
-   "waveDate": "2025-09-30",
-   "dateStart": "2025-09-24",
-   "dateEnd": "2025-09-29",
-   "published": "2025-09-30T16:35",
-   "sample": 1001,
-   "sampleEff": 822,
-   "url": "https://essentialreport.com.au/reports/30-september-2025",
-   "question": "Interest in the Melbourne Cup",
-   "notes": null,
-   "qid": "E156",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/30-september-2025",
-     "rows": [
-      [
-       "High interest",
-       16
-      ],
-      [
-       "Moderate interest",
-       26
-      ],
-      [
-       "Low interest",
-       25
-      ],
-      [
-       "No interest",
-       31
-      ],
-      [
-       "Don’t know",
-       3
       ]
      ]
     }
@@ -6837,11 +6588,6 @@
      "source": "https://essentialreport.com.au/reports/30-september-2025",
      "headers": [
       "",
-      "There is tension between people of different races and nationalities in Australia",
-      "People are scared to say what they really think because they don’t want to be labelled as racist",
-      "I think Australia is less racist than it has been in the past",
-      "A member of my family has experienced racism or racial discrimination",
-      "I have personally experienced racism or racial discrimination",
       "Strongly agree",
       "Somewhat agree",
       "Neither agree, nor disagree",
@@ -6852,11 +6598,6 @@
      "rows": [
       [
        "There is tension between people of different races and nationalities in Australia",
-       null,
-       null,
-       null,
-       null,
-       null,
        33,
        36,
        18,
@@ -6866,11 +6607,6 @@
       ],
       [
        "People are scared to say what they really think because they don’t want to be labelled as racist",
-       null,
-       null,
-       null,
-       null,
-       null,
        39,
        27,
        18,
@@ -6880,11 +6616,6 @@
       ],
       [
        "I think Australia is less racist than it has been in the past",
-       null,
-       null,
-       null,
-       null,
-       null,
        17,
        24,
        24,
@@ -6894,11 +6625,6 @@
       ],
       [
        "A member of my family has experienced racism or racial discrimination",
-       null,
-       null,
-       null,
-       null,
-       null,
        14,
        16,
        21,
@@ -6908,11 +6634,6 @@
       ],
       [
        "I have personally experienced racism or racial discrimination",
-       null,
-       null,
-       null,
-       null,
-       null,
        13,
        15,
        21,
@@ -7616,18 +7337,6 @@
      "title": null,
      "source": "https://essentialreport.com.au/reports/30-september-2025",
      "rows": [
-      [
-       "More united",
-       7
-      ],
-      [
-       "Staying about the same",
-       23
-      ],
-      [
-       "More divided",
-       70
-      ],
       [
        "More united",
        7
@@ -8751,7 +8460,24 @@
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/29-october-2025",
-     "rows": []
+     "rows": [
+      [
+       "The Melbourne Cup is a unique part of Australia’s national identity",
+       62
+      ],
+      [
+       "The Melbourne Cup promotes unhealthy gambling behaviour",
+       48
+      ],
+      [
+       "I am less interested in the Melbourne Cup than I used to be",
+       45
+      ],
+      [
+       "The Melbourne Cup normalises animal cruelty",
+       39
+      ]
+     ]
     },
     {
      "title": "By gender",
@@ -8879,7 +8605,24 @@
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/29-october-2025",
-     "rows": []
+     "rows": [
+      [
+       "I regularly bet on horse races and will place a bet on the Melbourne Cup",
+       18
+      ],
+      [
+       "I rarely bet on horse races but will watch the Melbourne Cup and place a bet",
+       24
+      ],
+      [
+       "I will watch the Melbourne Cup but will not place a bet",
+       18
+      ],
+      [
+       "I am not interested in the Melbourne Cup and will not place a bet",
+       40
+      ]
+     ]
     },
     {
      "title": "By gender",
@@ -9007,7 +8750,28 @@
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/29-october-2025",
-     "rows": []
+     "rows": [
+      [
+       "High interest",
+       16
+      ],
+      [
+       "Moderate interest",
+       26
+      ],
+      [
+       "Low interest",
+       25
+      ],
+      [
+       "No interest",
+       31
+      ],
+      [
+       "Don’t know",
+       3
+      ]
+     ]
     },
     {
      "title": "By gender",
@@ -9719,18 +9483,6 @@
        53
       ],
       [
-       "We are just witnessing a normal fluctuation in the earth’s climate",
-       31
-      ],
-      [
-       "Don’t know",
-       16
-      ],
-      [
-       "Climate change is happening and is caused by human activity",
-       53
-      ],
-      [
        "Don’t know",
        16
       ],
@@ -9849,22 +9601,6 @@
      "title": null,
      "source": "https://essentialreport.com.au/reports/26-november-2025",
      "rows": [
-      [
-       "Not doing enough",
-       36
-      ],
-      [
-       "Doing enough",
-       30
-      ],
-      [
-       "Doing too much",
-       20
-      ],
-      [
-       "Don’t know",
-       13
-      ],
       [
        "Not doing enough",
        36
@@ -10860,28 +10596,28 @@
    "qid": "E737",
    "tables": [
     {
-     "title": "Relieving cost of living pressures",
+     "title": "Not doing enough",
      "source": "https://essentialreport.com.au/reports/26-november-2025",
      "rows": [
       [
        "Relieving cost of living pressures",
-       null
+       70
       ],
       [
        "Ensuring affordable and secure rentals",
-       null
+       67
       ],
       [
        "Ensuring a fair income tax system for all Australians",
-       null
+       60
       ],
       [
        "Restricting gambling advertising",
-       null
+       52
       ],
       [
        "Providing welfare support for those not in paid employment",
-       null
+       47
       ]
      ]
     },
@@ -10890,11 +10626,6 @@
      "source": "https://essentialreport.com.au/reports/26-november-2025",
      "headers": [
       "",
-      "Relieving cost of living pressures",
-      "Ensuring affordable and secure rentals",
-      "Ensuring a fair income tax system for all Australians",
-      "Restricting gambling advertising",
-      "Providing welfare support for those not in paid employment",
       "Not doing enough",
       "Doing enough",
       "Doing too much"
@@ -10902,55 +10633,30 @@
      "rows": [
       [
        "Relieving cost of living pressures",
-       null,
-       null,
-       null,
-       null,
-       null,
        70,
        23,
        7
       ],
       [
        "Ensuring affordable and secure rentals",
-       null,
-       null,
-       null,
-       null,
-       null,
        67,
        26,
        7
       ],
       [
        "Ensuring a fair income tax system for all Australians",
-       null,
-       null,
-       null,
-       null,
-       null,
        60,
        33,
        7
       ],
       [
        "Restricting gambling advertising",
-       null,
-       null,
-       null,
-       null,
-       null,
        52,
        38,
        9
       ],
       [
        "Providing welfare support for those not in paid employment",
-       null,
-       null,
-       null,
-       null,
-       null,
        47,
        40,
        12
@@ -11096,39 +10802,39 @@
    "url": "https://essentialreport.com.au/reports/26-november-2025",
    "question": "Government action on environmental issues",
    "notes": null,
-   "qid": "E736",
+   "qid": "29544249",
    "tables": [
     {
-     "title": "Preserving native forests",
+     "title": "Not doing enough",
      "source": "https://essentialreport.com.au/reports/26-november-2025",
      "rows": [
       [
        "Preserving native forests",
-       null
+       53
       ],
       [
        "Preserving oceans and rivers",
-       null
+       52
       ],
       [
        "Preserving endangered species",
-       null
+       49
       ],
       [
        "Restricting offshore oil and gas development",
-       null
+       44
       ],
       [
        "Mitigating against the effects of climate change",
-       null
+       43
       ],
       [
        "Supporting the transition to renewable energy",
-       null
+       35
       ],
       [
        "Supporting the development of Electric Vehicles (EVs)",
-       null
+       27
       ]
      ]
     },
@@ -11137,13 +10843,6 @@
      "source": "https://essentialreport.com.au/reports/26-november-2025",
      "headers": [
       "",
-      "Preserving native forests",
-      "Preserving oceans and rivers",
-      "Preserving endangered species",
-      "Restricting offshore oil and gas development",
-      "Supporting the transition to renewable energy",
-      "Supporting the development of Electric Vehicles (EVs)",
-      "Mitigating against the effects of climate change",
       "Not doing enough",
       "Doing enough",
       "Doing too much"
@@ -11151,91 +10850,42 @@
      "rows": [
       [
        "Preserving native forests",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        53,
        39,
        9
       ],
       [
        "Preserving oceans and rivers",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        52,
        41,
        7
       ],
       [
        "Preserving endangered species",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        49,
        42,
        9
       ],
       [
        "Restricting offshore oil and gas development",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        44,
        39,
        17
       ],
       [
        "Mitigating against the effects of climate change",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        43,
        39,
        18
       ],
       [
        "Supporting the transition to renewable energy",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        35,
        42,
        22
       ],
       [
        "Supporting the development of Electric Vehicles (EVs)",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        27,
        46,
        27
@@ -13631,18 +13281,6 @@
       [
        "More divided",
        61
-      ],
-      [
-       "More united",
-       9
-      ],
-      [
-       "Staying about the same",
-       31
-      ],
-      [
-       "More divided",
-       61
       ]
      ]
     },
@@ -13719,28 +13357,12 @@
    "url": "https://essentialreport.com.au/reports/28th-january-2026",
    "question": "Changing views towards Australia Day",
    "notes": null,
-   "qid": "CE24",
+   "qid": "E24",
    "tables": [
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/28th-january-2026",
      "rows": [
-      [
-       "Doing something to celebrate Australia Day",
-       34
-      ],
-      [
-       "Just a public holiday",
-       48
-      ],
-      [
-       "Working – I don’t get the Australia Day holiday",
-       6
-      ],
-      [
-       "Don’t know",
-       12
-      ],
       [
        "Doing something to celebrate Australia Day",
        34
@@ -15259,28 +14881,12 @@
    "url": "https://essentialreport.com.au/reports/28th-january-2026",
    "question": "National day for Indigenous Australians",
    "notes": null,
-   "qid": "27400217",
+   "qid": "27400037",
    "tables": [
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/28th-january-2026",
      "rows": [
-      [
-       "Support a separate day and keep Australia Day",
-       23
-      ],
-      [
-       "Support a separate day to replace Australia Day",
-       20
-      ],
-      [
-       "Do not support a separate day",
-       44
-      ],
-      [
-       "Don’t know",
-       13
-      ],
       [
        "Support a separate day and keep Australia Day",
        23
@@ -19217,39 +18823,6 @@
    ]
   },
   {
-   "id": "ai-opportunities-risks",
-   "waveDate": "2026-04-28",
-   "dateStart": "2026-04-22",
-   "dateEnd": "2026-04-27",
-   "published": "2026-04-29T01:00",
-   "sample": 1067,
-   "sampleEff": 913,
-   "url": "https://essentialreport.com.au/reports/29-april-2026",
-   "question": "AI opportunities and risks",
-   "notes": null,
-   "qid": "E834",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/29-april-2026",
-     "rows": [
-      [
-       "AI carries more opportunity that risk",
-       22
-      ],
-      [
-       "The risk and opportunity are about the same",
-       41
-      ],
-      [
-       "AI carries more risk than opportunity",
-       36
-      ]
-     ]
-    }
-   ]
-  },
-  {
    "id": "attitudes-immigration",
    "waveDate": "2026-04-28",
    "dateStart": "2026-04-22",
@@ -19266,18 +18839,6 @@
      "title": null,
      "source": "https://essentialreport.com.au/reports/29-april-2026",
      "rows": [
-      [
-       "Generally positive",
-       41
-      ],
-      [
-       "Generally negative",
-       45
-      ],
-      [
-       "Unsure",
-       14
-      ],
       [
        "Generally positive",
        41
@@ -19662,22 +19223,14 @@
    "sample": 1067,
    "sampleEff": 913,
    "url": "https://essentialreport.com.au/reports/29-april-2026",
-   "question": "2026 Federal budget priorities",
+   "question": "Federal budget priority",
    "notes": null,
-   "qid": "28729289",
+   "qid": "28729125",
    "tables": [
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/29-april-2026",
      "rows": [
-      [
-       "The government should prioritise the delivery of services and supports, even if that means running the budget at a deficit",
-       64
-      ],
-      [
-       "The government should prioritise delivering a budget surplus, even if it means cutting jobs, services and supports",
-       36
-      ],
       [
        "The government should prioritise delivering a budget surplus, even if it means cutting jobs, services and supports",
        36
@@ -19782,18 +19335,6 @@
      "title": null,
      "source": "https://essentialreport.com.au/reports/29-april-2026",
      "rows": [
-      [
-       "The economy will improve in the next six months",
-       14
-      ],
-      [
-       "The economy will stay the same in the next six months",
-       31
-      ],
-      [
-       "The economy will get worse in the next six months",
-       55
-      ],
       [
        "The economy will improve in the next six months",
        14
@@ -20525,43 +20066,6 @@
    ]
   },
   {
-   "id": "generative-ai-use",
-   "waveDate": "2026-04-28",
-   "dateStart": "2026-04-22",
-   "dateEnd": "2026-04-27",
-   "published": "2026-04-29T01:00",
-   "sample": 1067,
-   "sampleEff": 913,
-   "url": "https://essentialreport.com.au/reports/29-april-2026",
-   "question": "Use of generative AI",
-   "notes": null,
-   "qid": "E1133",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/29-april-2026",
-     "rows": [
-      [
-       "To help in my work or study",
-       38
-      ],
-      [
-       "To help manage my time",
-       31
-      ],
-      [
-       "For personal or health advice",
-       32
-      ],
-      [
-       "To seek out information",
-       49
-      ]
-     ]
-    }
-   ]
-  },
-  {
    "id": "hanson-approval",
    "waveDate": "2026-04-28",
    "dateStart": "2026-04-22",
@@ -21243,26 +20747,6 @@
       [
        "No, it definitely won't",
        26
-      ],
-      [
-       "Yes, it definitely will",
-       10
-      ],
-      [
-       "Yes, it probably will",
-       19
-      ],
-      [
-       "Unsure",
-       13
-      ],
-      [
-       "No, it probably won't",
-       33
-      ],
-      [
-       "No, it definitely won't",
-       26
       ]
      ]
     },
@@ -21409,29 +20893,29 @@
    "sample": 1062,
    "sampleEff": 913,
    "url": "https://essentialreport.com.au/reports/27-may-2026",
-   "question": "Federal budget expectations",
+   "question": "Opinion about effect of federal budget on people, economy etc.",
    "notes": null,
-   "qid": "C305",
+   "qid": "E62",
    "tables": [
     {
-     "title": "People who are well-off",
+     "title": "Very good",
      "source": "https://essentialreport.com.au/reports/27-may-2026",
      "rows": [
       [
        "People who are well-off",
-       null
+       14
       ],
       [
        "The economy overall",
-       null
+       5
       ],
       [
        "People on lower incomes",
-       null
+       5
       ],
       [
        "You personally",
-       null
+       5
       ]
      ]
     },
@@ -21440,10 +20924,6 @@
      "source": "https://essentialreport.com.au/reports/27-may-2026",
      "headers": [
       "",
-      "People who are well-off",
-      "People on lower incomes",
-      "Average working people",
-      "You personally",
       "Very good",
       "Good",
       "Neither good nor bad",
@@ -21454,10 +20934,6 @@
      "rows": [
       [
        "People who are well-off",
-       null,
-       null,
-       null,
-       null,
        14,
        27,
        28,
@@ -21467,10 +20943,6 @@
       ],
       [
        "The economy overall",
-       null,
-       null,
-       null,
-       null,
        5,
        16,
        26,
@@ -21480,10 +20952,6 @@
       ],
       [
        "People on lower incomes",
-       null,
-       null,
-       null,
-       null,
        5,
        14,
        23,
@@ -21493,10 +20961,6 @@
       ],
       [
        "You personally",
-       null,
-       null,
-       null,
-       null,
        5,
        13,
        30,
@@ -23938,35 +23402,35 @@
    "url": "https://essentialreport.com.au/reports/30-june-2026",
    "question": "Government action on environmental issues",
    "notes": null,
-   "qid": "E736",
+   "qid": "29544249",
    "tables": [
     {
-     "title": "Preserving native forests",
+     "title": "Not doing enough",
      "source": "https://essentialreport.com.au/reports/30-june-2026",
      "rows": [
       [
        "Preserving native forests",
-       null
+       47
       ],
       [
        "Preserving oceans and rivers",
-       null
+       46
       ],
       [
        "Preserving endangered species",
-       null
+       47
       ],
       [
        "Restricting offshore oil and gas development",
-       null
+       40
       ],
       [
        "Supporting the transition to renewable energy",
-       null
+       33
       ],
       [
        "Supporting the development of Electric Vehicles (EVs)",
-       null
+       26
       ]
      ]
     },
@@ -23975,12 +23439,6 @@
      "source": "https://essentialreport.com.au/reports/30-june-2026",
      "headers": [
       "",
-      "Preserving native forests",
-      "Preserving oceans and rivers",
-      "Preserving endangered species",
-      "Restricting offshore oil and gas development",
-      "Supporting the transition to renewable energy",
-      "Supporting the development of Electric Vehicles (EVs)",
       "Not doing enough",
       "Doing enough",
       "Doing too much"
@@ -23988,72 +23446,36 @@
      "rows": [
       [
        "Preserving native forests",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        47,
        46,
        7
       ],
       [
        "Preserving oceans and rivers",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        46,
        46,
        7
       ],
       [
        "Preserving endangered species",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        47,
        45,
        8
       ],
       [
        "Restricting offshore oil and gas development",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        40,
        42,
        18
       ],
       [
        "Supporting the transition to renewable energy",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        33,
        47,
        20
       ],
       [
        "Supporting the development of Electric Vehicles (EVs)",
-       null,
-       null,
-       null,
-       null,
-       null,
-       null,
        26,
        50,
        24
@@ -25513,16 +24935,12 @@
    "url": "https://essentialreport.com.au/reports/30-june-2026",
    "question": "Donald Trump favourability",
    "notes": null,
-   "qid": "29564591",
+   "qid": "29564509",
    "tables": [
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/30-june-2026",
      "rows": [
-      [
-       "% TOTAL: Favourable",
-       28
-      ],
       [
        "Very favourable",
        10
@@ -28182,39 +27600,6 @@
    ]
   },
   {
-   "id": "attitudes-immigration",
-   "waveDate": "2026-09-01",
-   "dateStart": "2026-08-26",
-   "dateEnd": "2026-08-31",
-   "published": "2026-09-02T01:00",
-   "sample": 1017,
-   "sampleEff": 645,
-   "url": "https://essentialreport.com.au/reports/01-september-2026",
-   "question": "Attitudes to immigration",
-   "notes": "The long-running trend read (asked since 2019; in-term reads appear per wave).",
-   "qid": "E74",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/01-september-2026",
-     "rows": [
-      [
-       "Generally positive",
-       46
-      ],
-      [
-       "Generally negative",
-       39
-      ],
-      [
-       "Unsure",
-       15
-      ]
-     ]
-    }
-   ]
-  },
-  {
    "id": "group-membership",
    "waveDate": "2026-09-01",
    "dateStart": "2026-08-26",
@@ -28228,20 +27613,20 @@
    "qid": "30116987",
    "tables": [
     {
-     "title": "Currently a member - Aug 26",
+     "title": "Currently a member - Nov 16",
      "source": "https://essentialreport.com.au/reports/01-september-2026",
      "rows": [
       [
        "Local Sporting clubs",
-       15
+       14
       ],
       [
        "Other voluntary organisation",
-       11
+       14
       ],
       [
        "Active member of a Church",
-       10
+       12
       ],
       [
        "Professional sporting clubs (AFL, NRL, etc.)",
@@ -28249,27 +27634,27 @@
       ],
       [
        "Union",
-       9
+       12
       ],
       [
        "Local community organisation (Lions, Rotary, etc)",
-       6
+       5
       ],
       [
        "School council or parents group",
-       5
+       7
       ],
       [
        "Business/industry association",
-       5
+       6
       ],
       [
        "Political party",
-       4
+       2
       ],
       [
        "Environment group",
-       3
+       4
       ]
      ]
     },
@@ -28278,7 +27663,6 @@
      "source": "https://essentialreport.com.au/reports/01-september-2026",
      "headers": [
       "",
-      "Currently a member - Aug 26",
       "Currently a member - Nov 16",
       "Currently a member",
       "Previously a member",
@@ -28287,7 +27671,6 @@
      "rows": [
       [
        "Local Sporting clubs",
-       15,
        14,
        15,
        21,
@@ -28295,7 +27678,6 @@
       ],
       [
        "Other voluntary organisation",
-       11,
        14,
        11,
        16,
@@ -28303,7 +27685,6 @@
       ],
       [
        "Active member of a Church",
-       10,
        12,
        10,
        18,
@@ -28313,13 +27694,11 @@
        "Professional sporting clubs (AFL, NRL, etc.)",
        10,
        10,
-       10,
        11,
        80
       ],
       [
        "Union",
-       9,
        12,
        9,
        24,
@@ -28327,7 +27706,6 @@
       ],
       [
        "Local community organisation (Lions, Rotary, etc)",
-       6,
        5,
        6,
        8,
@@ -28335,7 +27713,6 @@
       ],
       [
        "School council or parents group",
-       5,
        7,
        5,
        16,
@@ -28343,7 +27720,6 @@
       ],
       [
        "Business/industry association",
-       5,
        6,
        5,
        8,
@@ -28351,7 +27727,6 @@
       ],
       [
        "Political party",
-       4,
        2,
        4,
        6,
@@ -28359,7 +27734,6 @@
       ],
       [
        "Environment group",
-       3,
        4,
        3,
        6,
@@ -28831,80 +28205,6 @@
        41,
        53,
        48
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "id": "happiness-personal",
-   "waveDate": "2026-09-01",
-   "dateStart": "2026-08-26",
-   "dateEnd": "2026-08-31",
-   "published": "2026-09-02T01:00",
-   "sample": 1017,
-   "sampleEff": 645,
-   "url": "https://essentialreport.com.au/reports/01-september-2026",
-   "question": "Happiness with personal situation",
-   "notes": null,
-   "qid": "E82",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/01-september-2026",
-     "rows": [
-      [
-       "My life overall",
-       6.4
-      ],
-      [
-       "My personal/family life",
-       6.8
-      ],
-      [
-       "My spiritual life",
-       6.2
-      ],
-      [
-       "My work life",
-       5.7
-      ],
-      [
-       "My social life",
-       6.1
-      ],
-      [
-       "My financial situation",
-       5.4
-      ]
-     ]
-    }
-   ]
-  },
-  {
-   "id": "immigration-intake",
-   "waveDate": "2026-09-01",
-   "dateStart": "2026-08-26",
-   "dateEnd": "2026-08-31",
-   "published": "2026-09-02T01:00",
-   "sample": 1017,
-   "sampleEff": 645,
-   "url": "https://essentialreport.com.au/reports/01-september-2026",
-   "question": "To what extent would you like to see Australia's yearly immigration intake increase, decrease or stay about the same?",
-   "notes": null,
-   "qid": "E1094",
-   "tables": [
-    {
-     "title": null,
-     "source": "https://essentialreport.com.au/reports/01-september-2026",
-     "rows": [
-      [
-       "TOTAL: Increase",
-       16
-      ],
-      [
-       "TOTAL: Decrease",
-       55
       ]
      ]
     }
@@ -29429,16 +28729,12 @@
    "url": "https://essentialreport.com.au/reports/01-september-2026",
    "question": "Overall, would workers be better off or worse off if unions in Australia were stronger",
    "notes": null,
-   "qid": "30117319",
+   "qid": "30117317",
    "tables": [
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/01-september-2026",
      "rows": [
-      [
-       "TOTAL: Better",
-       49
-      ],
       [
        "A lot better off",
        20
@@ -29821,16 +29117,12 @@
    "url": "https://essentialreport.com.au/reports/01-september-2026",
    "question": "How important are unions for Australian working people today?",
    "notes": null,
-   "qid": "30117216",
+   "qid": "30117073",
    "tables": [
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/01-september-2026",
      "rows": [
-      [
-       "TOTAL: Important",
-       60
-      ],
       [
        "Very important",
        22
@@ -31159,7 +30451,32 @@
     {
      "title": null,
      "source": "https://essentialreport.com.au/reports/30-september-2026",
-     "rows": []
+     "rows": [
+      [
+       "My life overall",
+       6.4
+      ],
+      [
+       "My personal/family life",
+       6.8
+      ],
+      [
+       "My spiritual life",
+       6.2
+      ],
+      [
+       "My work life",
+       5.7
+      ],
+      [
+       "My social life",
+       6.1
+      ],
+      [
+       "My financial situation",
+       5.4
+      ]
+     ]
     },
     {
      "title": "By gender",
