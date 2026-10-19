@@ -5549,7 +5549,98 @@ function RdFlows({ measure }) {
    stays HTML - some three hundred lines of tables and flow-band figures
    have no JSX port - and it is a trusted sibling of the sources, so the
    inner-HTML mount carries no escaping risk. */
+/* The preference-flow history chart inside the explainer's "Ask or assume"
+   section, with a chip per jurisdiction. The article body is static HTML
+   (explained-article.html, mounted via dangerouslySetInnerHTML), so the
+   chips + chart can't sit inside it as JSX; they render into this section's
+   own footer and the whole figure mounts into the article's #ex-fig-flow
+   slot on commit - chips and chart move as one node, or the picker would
+   stay stranded at the foot of the page. That covers BOTH parents that
+   mount the article - this redesign RdExplained and the classic
+   MenuPageView branch - through the one mechanism, so the slot is never
+   left empty while a duplicate chart shows at the foot. With JavaScript
+   off the slot is simply an empty div and the text flows on. The data is
+   window.AUSPOL.flowHistory (one home, gen-data): the federal FLOW_HISTORY
+   table plus each state's, aggregated from state-flows.csv, so a
+   jurisdiction's chip appears the build its rows land. */
+const FLOW_PARTIES = [
+  { id: "grn", name: "Greens",     color: "var(--grn)" },
+  { id: "onp", name: "One Nation", color: "var(--onp)" },
+  { id: "oth", name: "Others",     color: "var(--oth)" },
+];
+function ExplainedFlowChart({ jur }) {
+  const narrow = useNarrow(window.MQ_PHONE);
+  const FH = window.AUSPOL.flowHistory || {};
+  const S = FH[jur] || FH.fed;
+  if (!S) return null;
+  const YEARS = S.years;
+  const series = [];
+  FLOW_PARTIES.forEach((p) => {
+    const v = S[p.id] || [];
+    const runs = [];
+    let cur = [];
+    v.forEach((val, i) => {
+      /* a null is a gap, not a zero: One Nation barely contested (or the
+         party went unmeasured that year), and drawing a line across the hole
+         would invent flows for parliaments nobody counted. Split into runs. */
+      if (val == null) { if (cur.length) runs.push(cur); cur = []; }
+      else cur.push({ x: YEARS[i], y: val });
+    });
+    if (cur.length) runs.push(cur);
+    runs.forEach((points, i) => {
+      const tail = i === runs.length - 1;
+      series.push({
+        id: p.id + i, label: p.name, color: p.color, points,
+        smooth: false, width: 2.6, endCap: tail,
+        endLabel: tail && !narrow ? p.name : null,
+      });
+    });
+  });
+  const x0 = YEARS[0], x1 = YEARS[YEARS.length - 1];
+  return (
+    <div className="ex-chart">
+      <span className="fc-unit">share preferencing Labor, % · {S.label}</span>
+      <TrendChart
+        height={narrow ? 470 : 330}
+        xDomain={[x0, x1]} yDomain={[0, 100]}
+        yTicks={[25, 50, 75]}
+        xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
+        unit="%" fmt={(v) => v.toFixed(1)}
+        axisFont={narrow ? 28 : 15}
+        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
+        series={series} spine={YEARS.map((x) => ({ x }))}
+        refLines={[{ y: 50, label: "even split", color: "var(--ink-faint)", align: "left" }]}
+        tooltipTitle={(i) => YEARS[i] + " election · " + S.label}
+        ariaLabel={"Share of preferences flowing to Labor, by party, " + S.label + ", " + x0 + " to " + x1}
+      />
+      <span className="hero-legend fc-legend">
+        {FLOW_PARTIES.map((p) => (
+          <span className="hl-item" key={p.id}>
+            <span className="hl-line" style={{ background: p.color }}></span>{p.name}
+          </span>
+        ))}
+      </span>
+      <p className="ex-flow-cap">{S.srcAs
+        ? "Counted from " + S.srcAs + (S.asOf ? " (" + S.asOf + ")" : "") + ". The Nationals pile counts with the Liberals as the Coalition; the others line is the crossbench."
+        : "The AEC’s preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
+    </div>
+  );
+}
+
 function RdExplained() {
+  const ref = useRef(null);
+  const FH = window.AUSPOL.flowHistory || {};
+  const KEYS = Object.keys(FH);
+  const [jur, setJur] = useState("fed");
+  const active = FH[jur] ? jur : "fed";
+  React.useLayoutEffect(() => {
+    const slot = document.getElementById("ex-fig-flow");
+    const node = ref.current;
+    if (!slot || !node) return undefined;
+    slot.appendChild(node);
+    return () => { if (node.parentNode === slot) slot.removeChild(node); };
+  });
+  const multi = KEYS.length > 1;
   return (
     <section className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -5559,6 +5650,19 @@ function RdExplained() {
       <RdHed head={window.AP.PAGE_HEAD["flows-explained"]}
         dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
+      <div ref={ref}>
+        {multi && (
+          <div className="ex-flow-chips" role="tablist" aria-label="Jurisdiction">
+            {KEYS.map((k) => (
+              <button key={k} type="button" role="tab" aria-selected={k === active}
+                className={"ex-chip" + (k === active ? " on" : "")} onClick={() => setJur(k)}>
+                {FH[k].label}
+              </button>
+            ))}
+          </div>
+        )}
+        <ExplainedFlowChart jur={active} />
+      </div>
     </section>
   );
 }

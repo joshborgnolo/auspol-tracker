@@ -5456,9 +5456,30 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 }
 .ex-body .ex-src a:hover, .ex-body .ex-src a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
 
+/* the in-article preference-flow history figure (Ask or assume). The article
+   fragment ships an empty .ex-slot marker; RdExplained mounts its chips +
+   chart into it as one node on commit, so no-JS and the static article just
+   skip the figure, and a layout effect that replaces the article body never
+   strands the picker at the foot of the page. */
+.ex-slot:empty { display: none; }
+.ex-chart { margin: 12px 0 26px; }
+.ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
+.ex-chip {
+  font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
+  padding: 7px 13px; border-radius: 999px; cursor: pointer;
+  color: var(--ink-3); background: transparent;
+  border: 1px solid var(--line);
+}
+.ex-chip:hover { color: var(--ink); border-color: var(--ink-3); }
+.ex-chip.on { color: var(--surface); background: var(--ink); border-color: var(--ink); }
+.ex-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ex-flow-cap { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); max-width: 66ch; }
+
 @media (max-width: 640px) {
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
+  .ex-flow-chips { gap: 6px; }
+  .ex-chip { font-size: 12px; padding: 6px 11px; }
 }
 
 /* ---------- Beyond the vote (.btv-* and its static twin .btv-ss-*) ----------

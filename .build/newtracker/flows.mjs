@@ -282,3 +282,22 @@ export const impliedLefAlp2pp = (t, p) => {
   const fOth = w ? folded.reduce((s, b) => s + f(b) * t.share[b], 0) / w : t.oth;
   return alp + (grn != null ? f("grn") * grn : 0) + (onp != null ? f("onp") * onp : 0) + fOth * oth + anchor;
 };
+
+/* FLOW_HISTORY – the federal flow-by-party DISPLAY series, every election
+   1996–2025: the share of each bucket's ballots that ended with Labor at
+   that election, in per cent, from the AEC's full preference-distribution
+   tables by party (the classic cut 1996–2001, the TPP cut since 2004 –
+   same sources as FLOW_LEF, so single-cell differences from its cells
+   are the cut's, not rounding). This is the
+   series the Info glossary's flow chart and the /flows-explained/ in-article
+   chart both draw; it is display history, NOT an estimator input (FLOW_LEF
+   and FLOW are – changing them is an estimator change; changing this is
+   copy). null = the bucket went immeasurable that election (One Nation
+   barely contested, or a lumped table before 1996 – the display starts
+   1996, where the itemised cut begins). */
+export const FLOW_HISTORY = Object.freeze({
+  years: [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+  grn: [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2],
+  onp: [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5],
+  oth: [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6],
+});

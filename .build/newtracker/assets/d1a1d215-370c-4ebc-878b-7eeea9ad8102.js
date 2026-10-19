@@ -6831,14 +6831,18 @@ function RdChangelog() {
    legend under the plot names all three at any width. */
 function FlowChart() {
   const narrow = useNarrow();
-  const YEARS = [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+  // The canonical federal display series is FLOW_HISTORY (flows.mjs), emitted
+  // as window.AUSPOL.flowHistory.fed; the literals are the same figures, held
+  // only as the pre-hydration fallback.
+  const FSRC = (typeof window !== "undefined" && window.AUSPOL && window.AUSPOL.flowHistory && window.AUSPOL.flowHistory.fed) || null;
+  const YEARS = FSRC && FSRC.years ? FSRC.years : [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
   const PARTIES = [
     { id: "grn", name: "Greens",     color: "var(--grn)",
-      v: [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2] },
+      v: FSRC && FSRC.grn ? FSRC.grn : [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2] },
     { id: "onp", name: "One Nation", color: "var(--onp)",
-      v: [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5] },
+      v: FSRC && FSRC.onp ? FSRC.onp : [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5] },
     { id: "oth", name: "Others",     color: "var(--oth)",
-      v: [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6] },
+      v: FSRC && FSRC.oth ? FSRC.oth : [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6] },
   ];
 
   const series = [];

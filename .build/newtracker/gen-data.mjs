@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -4275,6 +4275,67 @@ function altNowcast(s) {
 }
 const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 
+/* flowHistory – the preference-flow history chart's per-jurisdiction series,
+   each the share of the bucket's ballots that ended with Labor at each
+   election, per cent. fed is the FLOW_HISTORY display table typed in
+   flows.mjs; each state aggregates from data/state-flows.csv (the state
+   parsers' one CSV) here, so the explainer's chart picks a jurisdiction up
+   the day its rows land, and the Info glossary chart reads the same home.
+   srcAs names the commission counted against. Where a state counts the
+   Liberal and National piles apart (Vic), the two are the Coalition majors –
+   NOT crossbench others – so the others line reads the CSV's oth bucket
+   alone (its alphas towards the Coalition sit in the lib/nat cells the chart
+   doesn't draw). Federal-only: the Vic build has no CSV and carries the
+   federal series alone. */
+const flowHistory = (() => {
+  const h = { fed: { label: "Federal", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
+  const JURIS = { vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences", asOf: "2006–2022" } };
+  if (!JUR) {
+    let csv = null;
+    try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8"); } catch { /* not yet written */ }
+    if (csv) {
+      const bag = {};
+      const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
+      // named columns: the majors leave flow_to_alp blank, shifting the
+      // numeric cells, so a fixed position cannot be trusted
+      const head = (lines.shift() || "").split(",");
+      const ci = Object.fromEntries(head.map((h, i) => [h, i]));
+      lines.forEach((ln) => {
+        const c = ln.split(",");
+        const jur = c[ci.jurisdiction], year = c[ci.year], bucket = c[ci.party];
+        if (!JURIS[jur]) return;
+        let av = +c[ci.flow_alp_votes], cv = +c[ci.flow_coal_votes];
+        if (!(av || cv)) {
+          // a row with only the split filled (no ballot counts)
+          const f = +c[ci.flow_to_alp];
+          if (f > 0 && f < 1) { av = f; cv = 1 - f; }
+        }
+        ((bag[jur] ||= {})[year] ||= {})[bucket] = { av, cv };
+      });
+      for (const [jk, meta] of Object.entries(JURIS)) {
+        const years = Object.keys(bag[jk] || {}).sort();
+        if (!years.length) continue;
+        // the CSV buckets land on the chart's three lines by name: grn/onp
+        // identically, and 'others' on the CSV's oth crossbench row (NOT the
+        // lib/nat majors, whose near-zero splits are the Coalition's own).
+        const val = (bkt, yr) => {
+          const cell = (bag[jk][yr] || {})[bkt];
+          if (!cell) return null;
+          const A = cell.av, C = cell.cv;
+          if (!A && !C) return null;
+          return Math.round((A / (A + C)) * 1000) / 10;
+        };
+        h[jk] = { label: meta.label, srcAs: meta.srcAs, asOf: meta.asOf,
+          years: years.map(Number),
+          grn: years.map((y) => val("grn", y)),
+          onp: years.map((y) => val("onp", y)),
+          oth: years.map((y) => val("oth", y)) };
+      }
+    }
+  }
+  return h;
+})();
+
 /* ---- 7e. current primary = the 21-day nowcast, per party -----------------
    The reader-facing "current primary" is the headline construction itself –
    trailing 21d, 7d half-life, per-party house effects, sqrt-wave deflation –
@@ -7309,6 +7370,15 @@ window.AUSPOL = (function () {
     onp: { alp: 1, lnp: FP_ON.lnp, grn: FP_ON.grn, onp: 0, oth: FP_ON.oth },
     onBand: FP_ON_BAND,
   })};
+  /* The preference-flow history chart's per-jurisdiction series: the share
+     of each bucket's ballots that ended with Labor at each election, per
+     cent. fed is the FLOW_HISTORY display table typed in flows.mjs; each
+     state is aggregated here from data/state-flows.csv (the state-election
+     parsers' one CSV) so the explainer's chart picks up a jurisdiction the
+     day its rows land, and the Info glossary chart reads the same home. srcAs
+     folds Nationals into others (a jurisdiction that counts them apart sets
+     it false and names the columns instead). */
+  const flowHistory = ${JSON.stringify(flowHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -7556,7 +7626,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

@@ -93,6 +93,15 @@ window.AUSPOL = (function () {
      All polls' implied sampling floors and Info's working read the numbers
      the estimator reads. */
   const flowTables = {"lnp":{"alp":1,"lnp":0,"grn":0.8819,"onp":0.255,"oth":0.5455},"onp":{"alp":1,"lnp":0.3,"grn":0.91,"onp":0,"oth":0.55},"onBand":{"lnp":0.03,"grn":0.025,"oth":0.04}};
+  /* The preference-flow history chart's per-jurisdiction series: the share
+     of each bucket's ballots that ended with Labor at each election, per
+     cent. fed is the FLOW_HISTORY display table typed in flows.mjs; each
+     state is aggregated here from data/state-flows.csv (the state-election
+     parsers' one CSV) so the explainer's chart picks up a jurisdiction the
+     day its rows land, and the Info glossary chart reads the same home. srcAs
+     folds Nationals into others (a jurisdiction that counts them apart sets
+     it false and names the columns instead). */
+  const flowHistory = {"fed":{"label":"Federal","years":[1996,1998,2001,2004,2007,2010,2013,2016,2019,2022,2025],"grn":[67.1,73.3,74.8,80.8,79.7,78.8,83,81.9,82.2,85.7,88.2],"onp":[null,46.3,44.1,43.3,null,null,null,49.5,34.8,35.7,25.5],"oth":[50.3,55.3,55.8,44.4,44.6,41.7,46.7,49.2,46.1,50,54.6]},"vic":{"label":"Victoria","srcAs":"the Victorian Electoral Commission’s distributions of preferences","asOf":"2006–2022","years":[2006,2010,2014,2018,2022],"grn":[73.7,75.1,79.7,79.7,78.8],"onp":[null,null,null,null,27.2],"oth":[42.8,51.7,55.7,54.9,49.1]}};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = {"tpp":true,"primary":true,"alp_on":true,"lnp_on":false,"ppm":false,"appr":true,"synth":true};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -329,7 +338,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
