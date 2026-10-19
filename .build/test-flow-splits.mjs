@@ -181,8 +181,10 @@ assert.ok(ap.includes('const FL_TABS = [{ id: "co", label: "Labor v Coalition" }
 assert.ok(ap.includes('<RdTabs swipe value={q}') && ap.includes('className="rd-fl-tabs" options={tabs}')
   && ap.includes('const tabs = FF ? FL_TABS : FL_TABS.filter((t) => t.id !== "ln");'),
   "the tabs ride RdTabs (swipeable, the house-lean idiom); a jurisdiction with no forced-choice answers (/vic/) walks the two drift charts alone");
-assert.ok(ap.includes("{FF && (\n          <div className=\"rd-fl-ledger\" ref={ledger}>"),
+assert.ok(ap.includes("{FF && (\n          <div className=\"rd-fl-ledger\" ref={ledger}"),
   "the ledger draws only where the forced-choice answers exist");
+assert.ok(ap.includes("if (ev.pointerType !== \"touch\") return;") && ap.includes("ev.target.closest(\".rd-fx-spark\")"),
+  "a touch tap anywhere in the ledger but off a spark puts the open tip away (user report 2026-10-19)");
 assert.ok(ap.includes("const tabOf = (m) => (m === \"onp\" ? \"on\" : \"co\");") && ap.includes("setQ(tabOf(measure));"),
   "the tab opens on the page's contest and follows its two-party flip");
 assert.ok(ap.includes("D.flowForced"), "the ledger reads the data asset, not a fetch");

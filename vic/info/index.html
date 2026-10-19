@@ -5935,8 +5935,11 @@ body.rd .rd-fx-n { text-align: right; font-size: 15px; font-weight: 600; color: 
 body.rd .rd-fx-n.ref { font-weight: 400; color: var(--ink-2); }
 body.rd .rd-fx-band { margin-left: 3px; font-size: 12px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-fx-nil { font-weight: 400; color: var(--ink-3); }
-body.rd .rd-fx-fig { font: inherit; font-weight: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
-body.rd .rd-fx-fig:hover, body.rd .rd-fx-fig:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
+body.rd .rd-fx-th { font: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; text-align: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
+body.rd .rd-fx-th em { text-decoration: inherit; }
+body.rd .rd-fx-th:hover, body.rd .rd-fx-th:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
+body.rd .rd-fx-mo { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
+body.rd .rd-fx-mo:hover, body.rd .rd-fx-mo:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
 body.rd .rd-fx-chg { display: block; font-size: 12px; font-weight: 400; line-height: 1.3; color: var(--ink-3); }
 body.rd .rd-fx-spark { position: relative; }
 body.rd .rd-fx-spark svg { display: block; overflow: visible; }
@@ -62715,6 +62718,14 @@ function RdFlowChart({
       if (ev.pointerType === "mouse") onMove(ev);
     },
     onMouseLeave: () => setHv(null),
+    onPointerDown: ev => {
+      ptr.current = ev.pointerType;
+    },
+    onClick: () => {
+      const p = ptr.current;
+      ptr.current = null;
+      if (p === "touch") setTip(null);
+    },
     "aria-label": `Published minus implied two-party figure against ${rival}, pooled across pollsters by month: now ${s1(nw.v)} points, 95% interval ±${nw.ci95.toFixed(1)}.`
   }, [-3, -2, -1, 1, 2, 3].map(v => React.createElement("path", {
     key: v,
@@ -63567,22 +63578,33 @@ function RdFlows({
   const openPoll = k => {
     if (window.AP.openPoll) window.AP.openPoll(k, "twopp", "the preference-flows ledger");
   };
-  const figBtn = (w, v, house, src) => {
-    if (!w) return React.createElement("span", {
-      className: "rd-fx-nil",
-      "aria-label": "not asked"
-    }, "\u2013");
-    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
-      pollster: house,
-      released: w.date
-    }) : null;
-    if (!k) return say(v);
+  const waveKey = (house, w) => w && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+    pollster: house,
+    released: w.date
+  }) : null;
+  const srcOf = house => house.replace(/\s*\(MRP\)/, " MRP");
+  const colHead = (house, w, name, em) => {
+    const k = waveKey(house, w);
+    const inner = React.createElement(React.Fragment, null, name, React.createElement("em", null, em));
+    if (!k) return inner;
     return React.createElement("button", {
       type: "button",
-      className: "rd-fx-fig",
-      "aria-label": src + ", " + w.win + " - open this poll in the All polls table",
+      className: "rd-fx-th",
+      "aria-label": srcOf(house) + ", " + w.win + " - open this poll in the All polls table",
       onClick: () => openPoll(k)
-    }, say(v));
+    }, inner);
+  };
+  const chgMonth = mv => {
+    const w = (q === "ln" ? c.dm : c.rb).find(x => x.ym === mv.ym);
+    const house = q === "ln" ? FF_MRP_HOUSE : FF.house || "RedBridge/Accent";
+    const mm = D.monthName(Number(mv.ym.slice(5)));
+    if (!waveKey(house, w)) return mm;
+    return React.createElement("button", {
+      type: "button",
+      className: "rd-fx-mo",
+      "aria-label": srcOf(house) + ", " + w.win + " - open this poll in the All polls table",
+      onClick: () => openPoll(waveKey(house, w))
+    }, mm);
   };
   const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (PR[FF_COHORTS[b].share] || 0) - (PR[FF_COHORTS[a].share] || 0))[0] : null;
   const stake = big && PR[FF_COHORTS[big].share] != null ? FF_COHORTS[big].name + " voters are " + PR[FF_COHORTS[big].share].toFixed(1) + "% of the vote, so each 10 points of their preferences moves " + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation") + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points." : "";
@@ -63669,7 +63691,12 @@ function RdFlows({
     options: tabs
   })), FF && React.createElement("div", {
     className: "rd-fl-ledger",
-    ref: ledger
+    ref: ledger,
+    onPointerDown: ev => {
+      if (ev.pointerType !== "touch") return;
+      if (ev.target && ev.target.closest && ev.target.closest(".rd-fx-spark")) return;
+      setTip(t => t && t.src === "touch" ? null : t);
+    }
   }, React.createElement("div", {
     className: "rd-fl-lhead"
   }, React.createElement("h4", {
@@ -63704,10 +63731,10 @@ function RdFlows({
   }, narrow ? q === "co" ? rdElecYear : "Site" : c.refHead, React.createElement("em", null, narrow ? q === "co" ? ffReg ? "replay*" : "count" : q === "on" ? ffReg ? "national" : "assumes" : "–" : c.refSub)), React.createElement("span", {
     className: "rd-ap-th r wrap",
     role: "columnheader"
-  }, narrow ? "RedBr." : "RedBridge", React.createElement("em", null, c.rb.length ? narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave" : ffReg && q !== "ln" ? "national only" : "doesn’t ask")), React.createElement("span", {
+  }, colHead(FF.house || "RedBridge/Accent", rbLast, narrow ? "RedBr." : "RedBridge", c.rb.length ? narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave" : ffReg && q !== "ln" ? "national only" : "doesn’t ask")), React.createElement("span", {
     className: "rd-ap-th r wrap",
     role: "columnheader"
-  }, narrow ? "Demos" : "DemosAU", React.createElement("em", null, dmLast ? flWinMonths(dmLast.win) + (narrow ? "" : " MRP") + (q !== "co" && !ffReg ? "*" : "") : "national only")), !narrow && React.createElement("span", {
+  }, colHead(FF_MRP_HOUSE, dmLast, narrow ? "Demos" : "DemosAU", dmLast ? flWinMonths(dmLast.win) + (narrow ? "" : " MRP") + (q !== "co" && !ffReg ? "*" : "") : "national only")), !narrow && React.createElement("span", {
     "aria-hidden": "true"
   }), !narrow && React.createElement("span", {
     className: "rd-fx-shead",
@@ -63754,12 +63781,18 @@ function RdFlows({
     }, "\u2013")), React.createElement("span", {
       className: "rd-fx-n",
       role: "cell"
-    }, figBtn(rbW, rbW ? rbW[ck] : null, FF.house || "RedBridge/Accent", "RedBridge/Accent"), mv && React.createElement("span", {
+    }, rbW ? say(rbW[ck]) : React.createElement("span", {
+      className: "rd-fx-nil",
+      "aria-label": "not asked"
+    }, "\u2013"), mv && React.createElement("span", {
       className: "rd-fx-chg"
-    }, mv.up ? "up" : "down", " from ", say(mv.from), " in ", D.monthName(Number(mv.ym.slice(5))))), React.createElement("span", {
+    }, mv.up ? "up" : "down", " from ", say(mv.from), " in ", chgMonth(mv))), React.createElement("span", {
       className: "rd-fx-n",
       role: "cell"
-    }, figBtn(dmW, dmW ? dmW[ck] : null, FF_MRP_HOUSE, "DemosAU MRP")), !narrow && React.createElement("span", {
+    }, dmW ? say(dmW[ck]) : React.createElement("span", {
+      className: "rd-fx-nil",
+      "aria-label": "not asked"
+    }, "\u2013")), !narrow && React.createElement("span", {
       "aria-hidden": "true"
     }), React.createElement("span", {
       className: "rd-fx-sc",

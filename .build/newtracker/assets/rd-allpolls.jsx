@@ -4816,6 +4816,11 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           closed (the "closes weirdly" report 2026-10-06). Gate on pointer
           type, same as the hit circles' pointerenter below. */}
       <svg width={W} height={H + 12} viewBox={`0 0 ${W} ${H + 12}`} role="img" onPointerMove={(ev) => { if (ev.pointerType === "mouse") onMove(ev); }} onMouseLeave={() => setHv(null)}
+           onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+           /* a touch tap on the blank chart puts an open tip away the
+              sparkline's way (its marks' clicks stop propagation, so
+              their toggles never reach here) */
+           onClick={() => { const p = ptr.current; ptr.current = null; if (p === "touch") setTip(null); }}
            aria-label={`Published minus implied two-party figure against ${rival}, pooled across pollsters by month: now ${s1(nw.v)} points, 95% interval ±${nw.ci95.toFixed(1)}.`}>
         {[-3, -2, -1, 1, 2, 3].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className="rd-dis-gl"></path>)}
         <path d={`M${x0} ${zero}H${x1}`} className="rd-fl-zero"></path>
@@ -5323,13 +5328,23 @@ function RdFlows({ measure }) {
     </>;
   };
   const openPoll = (k) => { if (window.AP.openPoll) window.AP.openPoll(k, "twopp", "the preference-flows ledger"); };
-  /* the wave's figure cell opens its poll in the All polls table, as the
-     line's marks do; the text stays plain when no matching row exists */
-  const figBtn = (w, v, house, src) => {
-    if (!w) return <span className="rd-fx-nil" aria-label="not asked">–</span>;
-    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null;
-    if (!k) return say(v);
-    return <button type="button" className="rd-fx-fig" aria-label={src + ", " + w.win + " - open this poll in the All polls table"} onClick={() => openPoll(k)}>{say(v)}</button>;
+  /* the poll columns' heads open the wave they headline in the All polls
+     table, as the lines' marks do; the change note's month opens the wave
+     it names. Plain text whenever the wave has no page row */
+  const waveKey = (house, w) => (w && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: house, released: w.date }) : null);
+  const srcOf = (house) => house.replace(/\s*\(MRP\)/, " MRP");
+  const colHead = (house, w, name, em) => {
+    const k = waveKey(house, w);
+    const inner = <>{name}<em>{em}</em></>;
+    if (!k) return inner;
+    return <button type="button" className="rd-fx-th" aria-label={srcOf(house) + ", " + w.win + " - open this poll in the All polls table"} onClick={() => openPoll(k)}>{inner}</button>;
+  };
+  const chgMonth = (mv) => {
+    const w = (q === "ln" ? c.dm : c.rb).find((x) => x.ym === mv.ym);
+    const house = q === "ln" ? FF_MRP_HOUSE : FF.house || "RedBridge/Accent";
+    const mm = D.monthName(Number(mv.ym.slice(5)));
+    if (!waveKey(house, w)) return mm;
+    return <button type="button" className="rd-fx-mo" aria-label={srcOf(house) + ", " + w.win + " - open this poll in the All polls table"} onClick={() => openPoll(waveKey(house, w))}>{mm}</button>;
   };
   /* what a flow is worth: the contest's biggest group's share of the vote,
      so each 10 points of its preferences moves the figure by a tenth of it.
@@ -5403,7 +5418,16 @@ function RdFlows({ measure }) {
           <RdTabs swipe value={q} onChange={(v) => { setQ(v); setTip(null); }} ariaLabel="Contest" className="rd-fl-tabs" options={tabs} />
         </div>
         {FF && (
-          <div className="rd-fl-ledger" ref={ledger}>
+          <div className="rd-fl-ledger" ref={ledger}
+            /* a touch tap anywhere in the ledger but off a spark puts the
+               open tip away too (a blank lane, the key row, the note);
+               the sparks' own clicks still manage their marks, outside-
+               the-ledger gestures ride the dismiss-outside hook */
+               onPointerDown={(ev) => {
+                 if (ev.pointerType !== "touch") return;
+                 if (ev.target && ev.target.closest && ev.target.closest(".rd-fx-spark")) return;
+                 setTip((t) => (t && t.src === "touch" ? null : t));
+               }}>
             <div className="rd-fl-lhead">
               <h4 className="rd-ap-ct">Share of each group’s voters whose preferences go to {c.a} rather than {c.r}, %</h4>
               <label className="rd-fl-reg">
@@ -5417,8 +5441,8 @@ function RdFlows({ measure }) {
               <div className="rd-fx-hrow" role="row" style={grid}>
                 <span className="rd-ap-th" role="columnheader">Voters</span>
                 <span className="rd-ap-th r wrap" role="columnheader">{narrow ? (q === "co" ? rdElecYear : "Site") : c.refHead}<em>{narrow ? (q === "co" ? (ffReg ? "replay*" : "count") : q === "on" ? (ffReg ? "national" : "assumes") : "–") : c.refSub}</em></span>
-                <span className="rd-ap-th r wrap" role="columnheader">{narrow ? "RedBr." : "RedBridge"}<em>{c.rb.length ? (narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave") : ffReg && q !== "ln" ? "national only" : "doesn’t ask"}</em></span>
-                <span className="rd-ap-th r wrap" role="columnheader">{narrow ? "Demos" : "DemosAU"}<em>{dmLast ? flWinMonths(dmLast.win) + (narrow ? "" : " MRP") + (q !== "co" && !ffReg ? "*" : "") : "national only"}</em></span>
+                <span className="rd-ap-th r wrap" role="columnheader">{colHead(FF.house || "RedBridge/Accent", rbLast, narrow ? "RedBr." : "RedBridge", c.rb.length ? (narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave") : ffReg && q !== "ln" ? "national only" : "doesn’t ask")}</span>
+                <span className="rd-ap-th r wrap" role="columnheader">{colHead(FF_MRP_HOUSE, dmLast, narrow ? "Demos" : "DemosAU", dmLast ? flWinMonths(dmLast.win) + (narrow ? "" : " MRP") + (q !== "co" && !ffReg ? "*" : "") : "national only")}</span>
                 {!narrow && <span aria-hidden="true"></span>}
                 {!narrow && (
                   <span className="rd-fx-shead" role="columnheader">
@@ -5438,8 +5462,8 @@ function RdFlows({ measure }) {
                   <div key={ck} className="rd-fx-row" role="row" style={grid}>
                     <span className="rd-fx-who" role="rowheader"><b><i className={"rd-fx-swatch " + f.cls} aria-hidden="true"></i>{f.name}{narrow ? "" : " voters"}</b>{share != null && <span className="rd-ap-sub">{share.toFixed(1)}% of the vote</span>}</span>
                     <span className="rd-fx-n ref" role="cell">{c.ref ? <>{say(c.ref[ck], c.refDp)}{c.band ? <span className="rd-fx-band">±{say(c.band[ck])}</span> : null}</> : <span className="rd-fx-nil" aria-label="none">–</span>}</span>
-                    <span className="rd-fx-n" role="cell">{figBtn(rbW, rbW ? rbW[ck] : null, FF.house || "RedBridge/Accent", "RedBridge/Accent")}{mv && <span className="rd-fx-chg">{mv.up ? "up" : "down"} from {say(mv.from)} in {D.monthName(Number(mv.ym.slice(5)))}</span>}</span>
-                    <span className="rd-fx-n" role="cell">{figBtn(dmW, dmW ? dmW[ck] : null, FF_MRP_HOUSE, "DemosAU MRP")}</span>
+                    <span className="rd-fx-n" role="cell">{rbW ? say(rbW[ck]) : <span className="rd-fx-nil" aria-label="not asked">–</span>}{mv && <span className="rd-fx-chg">{mv.up ? "up" : "down"} from {say(mv.from)} in {chgMonth(mv)}</span>}</span>
+                    <span className="rd-fx-n" role="cell">{dmW ? say(dmW[ck]) : <span className="rd-fx-nil" aria-label="not asked">–</span>}</span>
                     {!narrow && <span aria-hidden="true"></span>}
                     <span className="rd-fx-sc" role="cell">
                       <RdFlowSpark ck={ck} marks={marks} refv={c.ref ? c.ref[ck] : null} band={c.band ? c.band[ck] : null}

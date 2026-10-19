@@ -28,16 +28,21 @@
        and marks (national only), drops the 2026 counts, rekeys DemosAU's
        cells and, on Labor v Coalition, the count column to the class's
        seat replay;
-     - the figures open their polls: every populated RedBridge/DemosAU
-       ledger cell is an open-poll button (each "-" is plain text), the
-       named-region DemosAU cells keep it; on a desktop a click on a
-       RedBridge figure and on DemosAU's MRP figure, and Enter on a
-       focused figure, open the poll's row in the table;
+     - the poll columns' heads open their waves: the RedBridge and
+       DemosAU heads (house name + fieldwork months) ride the mark-click
+       chain's AP.pollRowKey -> AP.openPoll route, the figure cells
+       plain text; a change note's month opens the wave it names; a
+       named region drops the RedBridge head's button ("national only"
+       has no poll row); desktop clicks and Enter land the poll's row
+       in the table;
      - tooltips: every ledger mark and the drift chart's first, middle and
        last dots open a tip inside the screen at 390/360/320 by touch (the
        bug the user reported: DemosAU tips 371-410px on a 390px phone), the
-       page never widens; a tap outside puts a touch tip away; a desktop
-       mouse click on a RedBridge mark opens that poll in the table;
+       page never widens; a tap outside puts a touch tip away, and so do
+       the next-to-the-mark taps that used to swallow it - a row label,
+       the note, the drift chart's own blank (user report 2026-10-19); a
+       desktop mouse click on a RedBridge mark opens that poll in the
+       table;
      - keys: with the pointer over the section <-/-> walks and wraps the
        contest row both ways; while the section is on screen Space cycles
        the region menu (All, inner, outer, regional) - claims released
@@ -83,7 +88,8 @@ const read = (page) => page.evaluate(() => {
       cells: [...r.querySelectorAll(".rd-fx-n")].map((c) => c.childNodes[0] ? c.childNodes[0].textContent.trim() : ""),
       band: (r.querySelector(".rd-fx-band") || {}).textContent || null,
       chg: (r.querySelector(".rd-fx-chg") || {}).textContent || null,
-      btns: r.querySelectorAll("button.rd-fx-fig").length,
+      btns: r.querySelectorAll(".rd-fx-n > button").length,
+      moBtns: r.querySelectorAll("button.rd-fx-mo").length,
       waves: r.querySelectorAll(".rd-fx-dot").length + r.querySelectorAll(".rd-fx-end").length,
       tris: r.querySelectorAll(".rd-fx-tr").length,
       crosses: r.querySelectorAll(".rd-fx-x").length,
@@ -91,6 +97,7 @@ const read = (page) => page.evaluate(() => {
       lineVerts: (() => { const p = r.querySelector(".rd-fx-line"); return p ? (p.getAttribute("d").match(/[MC]/g) || []).length : 0; })(),
       empty: (r.querySelector(".rd-fl-empty") || {}).textContent || null,
     })),
+    heads: [...sec.querySelectorAll(".rd-fx-hrow .rd-ap-th")].map((th) => ({ t: th.textContent, btn: !!th.querySelector("button.rd-fx-th") })),
     drift: sec.querySelectorAll(".rd-fl-chart").length,
     regInLedger: !!sec.querySelector('.rd-fl-lhead select[aria-label="Region"]'),
     pickInDrift: !!sec.querySelector('.rd-fl-dhead select[aria-label="Highlight a pollster"]'),
@@ -131,8 +138,9 @@ for (const w of [1440, 390]) {
   check(s.rows.map((r) => r.cells.join(" ")).join(" / ") === coWant.join(" / "),
     `${w}: Labor v Coalition cells = the 2025 count, RedBridge's and DemosAU's latest (${s.rows.map((r) => r.cells.join(" ")).join(" / ")})`);
   check(s.rows.every((r, i) => r.share === E.share[["grn", "onp", "oth"][i]].toFixed(1) + "% of the vote"), `${w}: each group's share is the headline primary vote`);
-  check(s.rows.every((r) => r.btns === (r.cells[1] !== "–" ? 1 : 0) + (r.cells[2] !== "–" ? 1 : 0)),
-    `${w}: every populated RedBridge/DemosAU cell is an open-poll button, each "–" plain text (${s.rows.map((r) => r.btns)})`);
+  check(s.rows.every((r) => r.btns === 0), `${w}: the RedBridge and DemosAU figures are plain text - the open-poll links live on the column heads (${s.rows.map((r) => r.btns)})`);
+  check(s.heads[2].btn && s.heads[3].btn, `${w}: the RedBridge and DemosAU column heads are open-poll buttons (${s.heads.map((h) => h.t).join(" | ")})`);
+  check(s.rows.every((r) => r.moBtns === (r.chg ? 1 : 0)), `${w}: a change note's month opens the wave it names (${s.rows.map((r) => r.moBtns)})`);
   check(s.rows.map((r) => r.waves).join() === [E.waves.co.grn, E.waves.co.onp, E.waves.co.oth].join(), `${w}: one dot per RedBridge wave on each row`);
   check(s.rows.every((r, i) => r.lineVerts === [E.waves.co.grn, E.waves.co.onp, E.waves.co.oth][i]),
     `${w}: each line runs through RedBridge's waves alone (vertices ${s.rows.map((r) => r.lineVerts)})`);
@@ -150,13 +158,14 @@ for (const w of [1440, 390]) {
   check(s.rows.every((r) => r.band && /^±/.test(r.band)), `${w}: the site's table carries its band`);
   check(s.rows.map((r) => r.crosses).join() === [E.bys.coal, E.bys.grn, E.bys.oth].join(), `${w}: the 2026 counts ride as crosses (${s.rows.map((r) => r.crosses)})`);
   check(s.rows.every((r) => r.tris === E.demosOn), `${w}: DemosAU's quarterlies stand apart as triangles`);
-  check(s.rows.every((r) => r.btns === (r.cells[1] !== "–" ? 1 : 0) + (r.cells[2] !== "–" ? 1 : 0)),
-    `${w}: Labor v One Nation: every populated house cell is a button (${s.rows.map((r) => r.btns)})`);
+  check(s.rows.every((r) => r.btns === 0) && s.heads[2].btn && s.heads[3].btn,
+    `${w}: Labor v One Nation: house figures plain, both column heads the buttons`);
   await region(page, "regional");
   s = await read(page);
   check(s.rows.every((r) => r.cells[1] === "–" && r.waves === 0 && r.crosses === 0), `${w}: a named region drops RedBridge/Accent and the 2026 counts`);
   check(s.rows.map((r) => r.cells[2]).join() === ["coal", "grn", "oth"].map((ck) => fig(E.onReg[ck])).join(), `${w}: Regional rekeys DemosAU to its printed regional cells (${s.rows.map((r) => r.cells[2])})`);
-  check(s.rows.every((r) => r.btns === (r.cells[2] !== "–" ? 1 : 0)), `${w}: the rekeyed DemosAU cells still open their MRP poll (${s.rows.map((r) => r.btns)})`);
+  check(s.rows.every((r) => r.btns === 0) && !s.heads[2].btn && s.heads[3].btn,
+    `${w}: the rekeyed DemosAU head keeps its button, RedBridge's "national only" doesn't (${s.heads.slice(2).map((h) => h.t)})`);
   await region(page, "");
 
   await tab(page, 2);
@@ -164,6 +173,8 @@ for (const w of [1440, 390]) {
   check(s.rows.map((r) => r.who.replace(" voters", "")).join() === "Labor,Greens,Other" && s.drift === 0, `${w}: Coalition v One Nation lists Labor, Greens, Other and draws no drift chart`);
   check(s.rows.map((r) => r.cells[2]).join() === ["alp", "grn", "oth"].map((ck) => fig(E.ln[ck][2])).join() && s.rows.every((r) => r.cells[0] === "–" && r.cells[1] === "–"),
     `${w}: Coalition v One Nation: DemosAU alone, no assumption, no RedBridge`);
+  check(s.rows.every((r) => r.btns === 0) && !s.heads[2].btn && s.heads[3].btn,
+    `${w}: Coalition v One Nation: the DemosAU head alone is the button (${s.heads.slice(2).map((h) => h.t)})`);
 
   await tab(page, 0);
   await region(page, "inner");
@@ -197,37 +208,59 @@ for (const w of [1440, 390]) {
     await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
     await wait(400);
 
-    /* a ledger figure opens its poll the mark's way: RedBridge's wave
-       figure on row one, DemosAU's MRP figure on row two (the only tab's
-       DemosAU cell here) - click, keyboard Enter, and the aria label */
-    const figAt = async (rq) => page.evaluate((rq) => {
-      const rows = [...document.querySelectorAll("#flow-drift .rd-fx-row")];
-      let sel = rows[rq.r].querySelectorAll(".rd-fx-n button.rd-fx-fig")[rq.c];
-      sel.scrollIntoView({ block: "center", behavior: "instant" });
-      const b = sel.getBoundingClientRect();
-      return { x: b.x + b.width / 2, y: b.y + b.height / 2, label: sel.getAttribute("aria-label"), text: sel.textContent };
-    }, rq);
-    const clickFig = async (rq, tag) => {
-      const f = await figAt(rq);
-      check(/^(RedBridge\/Accent|DemosAU MRP), .+ - open this poll in the All polls table$/.test(f.label),
-        `${w}: the figure's aria label names its poll (${f.label.slice(0, 56)}…)`);
-      await page.mouse.click(f.x, f.y); await wait(900);
+    /* the poll columns' heads open the wave they headline: RedBridge's
+       head and DemosAU's MRP head - click, keyboard Enter, and the aria
+       label; PAGE reloads put the view back (the swaps are client-side) */
+    const reload = async () => { await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 }); await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 }); await wait(300); };
+    const headAt = async (i) => page.evaluate((i) => {
+      const b = [...document.querySelectorAll("#flow-drift .rd-fx-hrow .rd-ap-th button.rd-fx-th")][i];
+      b.scrollIntoView({ block: "center", behavior: "instant" });
+      const r = b.getBoundingClientRect();
+      return { x: r.x + r.width / 2, y: r.y + r.height / 2, label: b.getAttribute("aria-label"), text: b.textContent };
+    }, i);
+    const clickHead = async (i, tag) => {
+      const h = await headAt(i);
+      check(/^(RedBridge\/Accent|DemosAU MRP), .+ - open this poll in the All polls table$/.test(h.label),
+        `${w}: the ${tag} head's aria label names its poll (${h.label.slice(0, 56)}…)`);
+      await page.mouse.click(h.x, h.y); await wait(900);
       const opened = await page.evaluate(() => document.querySelectorAll(".rd-ldg").length);
-      check(opened === 1, `${w}: clicking the ${tag} figure opens its poll in the table (${f.text.trim()})`);
-      await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
-      await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
-      await wait(300);
+      check(opened === 1, `${w}: clicking the ${tag} column head opens its poll in the table (${h.text.slice(0, 26)}…)`);
+      await reload();
     };
-    await clickFig({ r: 0, c: 0 }, "RedBridge");
-    await clickFig({ r: 1, c: 1 }, "DemosAU MRP");
-    /* Enter on a focused figure opens it too; the figure reads its wave
-       window - the one the wave key is filed under */
-    await page.evaluate(() => document.querySelector("#flow-drift .rd-fx-row .rd-fx-n button.rd-fx-fig").focus());
+    await clickHead(0, "RedBridge");
+    await clickHead(1, "DemosAU MRP");
+    /* Enter on a focused head opens it too */
+    await page.evaluate(() => document.querySelector("#flow-drift .rd-fx-hrow button.rd-fx-th").focus());
     await wait(120);
     await page.keyboard.press("Enter"); await wait(900);
-    check(await page.evaluate(() => document.querySelectorAll(".rd-ldg").length) === 1, `${w}: Enter on a focused figure opens its poll`);
-    await page.goto(PAGE, { waitUntil: "networkidle0", timeout: 60000 });
-    await page.waitForSelector("#flow-drift .rd-fx-row", { timeout: 30000 });
+    check(await page.evaluate(() => document.querySelectorAll(".rd-ldg").length) === 1, `${w}: Enter on a focused column head opens its poll`);
+    await reload();
+
+    /* and a change note's month opens the wave it names (today's note:
+       "down from … in Feb", so February's RedBridge wave). None today =
+       the battery finds no move and nothing is wired */
+    let mo = null;
+    for (const ti of [0, 1, 2]) {
+      if (ti) await tab(page, ti);
+      mo = await page.evaluate(() => {
+        const b = document.querySelector("#flow-drift .rd-fx-chg button.rd-fx-mo");
+        if (!b) return null;
+        b.scrollIntoView({ block: "center", behavior: "instant" });
+        const r = b.getBoundingClientRect();
+        return { x: r.x + r.width / 2, y: r.y + r.height / 2, label: b.getAttribute("aria-label"), text: b.textContent };
+      });
+      if (mo) break;
+    }
+    if (mo) {
+      check(/^(RedBridge\/Accent|DemosAU MRP), .+ - open this poll in the All polls table$/.test(mo.label),
+        `${w}: the change note's month names its wave (${mo.label.slice(0, 56)}…)`);
+      await page.mouse.click(mo.x, mo.y); await wait(900);
+      check(await page.evaluate(() => document.querySelectorAll(".rd-ldg").length) === 1, `${w}: clicking the note's month (${mo.text}) opens that wave's poll`);
+      await reload();
+    } else {
+      check(true, `${w}: no change note today - no month button to click (re-pin when the battery next says a cohort moved)`);
+    }
+    await tab(page, 0);
     await wait(400);
 
     /* the hover claim hands the arrow keys to the contest row, wrapping
@@ -355,6 +388,56 @@ for (const w of [390, 360, 320]) {
     }
   }
   check(bad.length === 0, `${w}: all ${n} tips open inside the screen, never widen the page, carry no open-poll hint on touch, and put away on a tap outside${bad.length ? " - " + bad.slice(0, 3).join("; ") : ""}`);
+  if (w === 390) {
+    /* dismissal (user report 2026-10-19): a touch tip puts away from the
+       NEXT touch tap anywhere nearby - the ledger's own blanks (a row
+       label, the note) and the drift chart's blank all used to swallow
+       the tap and leave the tip standing */
+    await tab(page, 0);
+    const tapAt = async (fn) => { const p = await page.evaluate(fn); await page.touchscreen.tap(p.x, p.y); await wait(150); };
+    const fxHas = () => page.evaluate(() => !!document.querySelector("#flow-drift .rd-fx-tip"));
+    const drHas = () => page.evaluate(() => !!document.querySelector("#flow-drift .rd-fl-chart .rd-fl-tip"));
+    const markGeo = () => {
+      const sp = document.querySelectorAll("#flow-drift .rd-fx-spark")[1];
+      sp.scrollIntoView({ block: "center", behavior: "instant" });
+      const b = sp.querySelectorAll(".rd-fx-hit")[2].getBoundingClientRect();
+      return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+    };
+    let go = true;
+    await tapAt(markGeo);
+    go = go && (await fxHas());
+    await tapAt(() => { const el = document.querySelector("#flow-drift .rd-fx-note"); el.scrollIntoView({ block: "center", behavior: "instant" }); const b = el.getBoundingClientRect(); return { x: b.x + Math.min(40, b.width / 2), y: b.y + b.height / 2 }; });
+    go = go && !(await fxHas());
+    await tapAt(markGeo);
+    go = go && (await fxHas());
+    await tapAt(() => { const b = document.querySelectorAll("#flow-drift .rd-fx-row .rd-fx-who b")[1].getBoundingClientRect(); return { x: b.x + 10, y: b.y + b.height / 2 }; });
+    go = go && !(await fxHas());
+    check(go, `${w}: a ledger tip puts away from a tap on the note, and again on a row label`);
+    await tapAt(() => {
+      const ch = document.querySelector("#flow-drift .rd-fl-chart");
+      ch.scrollIntoView({ block: "center", behavior: "instant" });
+      const b = ch.querySelectorAll("circle.rd-apd-hit")[1].getBoundingClientRect();
+      return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+    });
+    go = await drHas();
+    const blank = await page.evaluate(() => {
+      const sv = document.querySelector("#flow-drift .rd-fl-chart svg");
+      const sb = sv.getBoundingClientRect();
+      const hits = [...sv.querySelectorAll(".rd-apd-hit")].map((c) => { const b = c.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; });
+      for (const fy of [5, 12, 20]) for (const fx of [3, 5, 7, 1.5, 8.5]) {
+        const x = sb.left + (sb.width * fx) / 10, y = sb.top + fy;
+        if (hits.every((h) => Math.hypot(h.x - x, h.y - y) > 12)) return { x, y };
+      }
+      return null;
+    });
+    if (blank) {
+      await page.touchscreen.tap(blank.x, blank.y); await wait(150);
+      go = go && !(await drHas());
+      check(go, `${w}: a drift tip puts away from a tap on its own chart's blank`);
+    } else {
+      check(true, `${w}: no clear blank on the drift chart today - its tuck-away tap stays unpinned this run`);
+    }
+  }
   check(errs.length === 0, `${w}: no page errors${errs.length ? " (" + errs[0].slice(0, 160) + ")" : ""}`);
   await page.close();
 }
