@@ -842,13 +842,24 @@ body { height: auto; }
 .sh-menu-d { display: block; margin-top: 3px; max-width: 290px; font-size: 13px; line-height: 1.38; color: var(--ink-2); text-wrap: pretty; }
 .sh-menu-f { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
 .sh-menu-v { font-size: 21px; font-weight: 600; line-height: 22px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
-.sh-menu-v.tm-alp { color: var(--alp-text); }
-.sh-menu-v.tm-lnp { color: var(--lnp-text); }
-.sh-menu-v.tm-onp { color: var(--onp-text); }
-.sh-menu-v.tm-grn { color: var(--grn-text); }
-.sh-menu-v.tm-oth { color: var(--oth-text); }
+/* a menu figure's tones, on the single figure (sh-menu-v) and the
+   explainer's trio cells (sh-menu-fv) alike - the main page's .tab-menu-f */
+.sh-menu-f .tm-alp { color: var(--alp-text); }
+.sh-menu-f .tm-lnp { color: var(--lnp-text); }
+.sh-menu-f .tm-onp { color: var(--onp-text); }
+.sh-menu-f .tm-grn { color: var(--grn-text); }
+.sh-menu-f .tm-oth { color: var(--oth-text); }
 .sh-menu-c { margin-top: 4px; font-size: 11.5px; font-weight: 500; line-height: 14px; color: var(--ink-3); text-wrap: balance; }
 .sh-menu-chip { margin-top: 2px; padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 3px; font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+/* the flows explainer's twin mini-rows (the main page's .tab-menu-fr/-fv/-fc):
+   a trio of bare shares per matchup over its caption; the figure column
+   widens past the single-figure rows' 92px so every caption holds one line */
+.sh-menu-item.sh-menu-wide { grid-template-columns: 50px minmax(0, 1fr) 128px; }
+.sh-menu-fr { display: block; }
+.sh-menu-fr + .sh-menu-fr { margin-top: 6px; }
+.sh-menu-fv { font-size: 16px; font-weight: 600; line-height: 19px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
+.sh-menu-fv > span + span { margin-left: 7px; }
+.sh-menu-fc { display: block; margin-top: 1px; font-size: 10.5px; font-weight: 500; line-height: 13px; color: var(--ink-3); }
 .sh-menu-item:hover, .sh-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
 .sh-menu-item:focus { outline: none; }
 .sh-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
@@ -858,10 +869,14 @@ body { height: auto; }
 @media (max-width: 640px) {
   .sh-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
   .sh-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
+  .sh-menu-item.sh-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   .sh-menu-n { font-size: 17px; }
   .sh-menu-t { font-size: 14.5px; }
   .sh-menu-d { font-size: 12.5px; max-width: none; }
   .sh-menu-v { font-size: 18px; }
+  .sh-menu-fv { font-size: 13.5px; line-height: 16px; }
+  .sh-menu-fv > span + span { margin-left: 5px; }
+  .sh-menu-fc { font-size: 9.5px; line-height: 12px; }
 }
 
 /* the docked 2PP score (.tab-score): absolutely seated on the underline at
@@ -1403,6 +1418,18 @@ ${npProjectSrc()}
       d.textContent = ln.head;
       f.textContent = "";
       if (ln.chip) f.appendChild(mk("span", "sh-menu-chip", ln.chip));
+      else if (ln.fig && ln.fig.rows) {
+        /* the flows explainer's twin mini-rows (menu-lines.js): a trio of
+           bare shares per matchup, and the item's widened figure column */
+        its[i].classList.add("sh-menu-wide");
+        for (var ri = 0; ri < ln.fig.rows.length; ri++) {
+          var rw = ln.fig.rows[ri], fr = mk("span", "sh-menu-fr"), fv = mk("span", "sh-menu-fv");
+          for (var ci = 0; ci < rw.cells.length; ci++) fv.appendChild(mk("span", "tm-" + rw.cells[ci].tone, rw.cells[ci].v));
+          fr.appendChild(fv);
+          fr.appendChild(mk("span", "sh-menu-fc", rw.cap));
+          f.appendChild(fr);
+        }
+      }
       else if (ln.fig) {
         f.appendChild(mk("span", "sh-menu-v" + (ln.fig.tone ? " tm-" + ln.fig.tone : ""), ln.fig.v));
         // "RedBridge/Accent" may break after its slash

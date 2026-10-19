@@ -39,6 +39,13 @@ assert.equal((shellHeader({}).match(/<a class="sh-tab[" ]/g) || []).length, 4, "
     assert.ok(new RegExp(`<a role="menuitem"[^>]*href="${href}"`).test(h), `the menu links ${href}`);
   assert.ok(!/sh-menu-sep/.test(h + shellCss()), "the menu's explainer separator is retired");
   assert.ok(/class="sh-menu-item sh-menu-info"/.test(h), "Info rides the menu for the pinned phone bar");
+  /* the explainer's twin-row flow-table figure (menu-lines.js's fig.rows):
+     the satellites' fillMenu must draw it, their CSS dress it - a satellite
+     menu rendered as the plain chip instead means this mirror drifted */
+  assert.ok(shellJs().includes("ln.fig.rows") && shellJs().includes("sh-menu-fr"), "fillMenu renders fig.rows");
+  for (const cls of [".sh-menu-item.sh-menu-wide", ".sh-menu-fr", ".sh-menu-fv", ".sh-menu-fc"])
+    assert.ok(shellCss().includes(cls), `shell CSS dresses ${cls}`);
+  assert.ok(shellCss().includes(".sh-menu-f .tm-grn") && shellCss().includes(".sh-menu-f .tm-oth"), "the trio's party tones live in the shell CSS");
 }
 
 // ---- the unlisted pages stay unlisted ----------------------------------------------------

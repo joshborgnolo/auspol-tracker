@@ -32,11 +32,15 @@
      Preference flows    the move the headline reports, where it reports
                          one: the pollsters' drift in points, or the share
                          of the voter group now picking the side it names
+     Flows explained     the two frozen flow tables the implied figures are
+                         read through, one mini-row per matchup: each voter
+                         group's share of preferences reaching Labor, a bare
+                         whole number in the group's tone
      Beyond the vote     its count of topics
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
    the pack", preferences "still flowing much as they did") gets no figure,
-   and the explainer and Info have none to give.
+   and Info has none to give.
    ==================================================================== */
 
 /* the flows page's voter groups (its ledger rows, the battery's cohorts) */
@@ -303,12 +307,42 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       .replace(/\.$/, "");
   };
 
+  /* ---------------------------------------------------------- the flows explainer
+     The one static-title page WITH a figure: the two frozen flow tables the
+     implied two-party figures are read through, drawn straight off
+     flowTables - the cells the estimator itself reads, so the menu can
+     never quote a table the page doesn't use. Per matchup, a trio of bare
+     whole-number shares reaching Labor, each in its voter group's tone,
+     over a "To Labor v <rival>" caption (spelled-out "versus" would not
+     fit the figure column; "v" is the menu's own idiom). The explainer
+     prints the same figures at its own precision (88.2/25.5/54.5 against
+     the Coalition, 91/30/55 against One Nation); the graphic rounds them
+     whole. Against the Coalition the trio is Greens / One Nation / Others -
+     the counted cut; against One Nation it is Greens / Coalition / Others,
+     the built one (a One-Nation-to-Labor cell cannot exist in a final two
+     of Labor v One Nation). Rows follow the headline matchup
+     (latest.rivalLead, the hero's rule). A missing cell or table gives way
+     to the "Explainer" chip, the shape it wore without a figure. */
+  AP.flowsExplainedFig = function flowsExplainedFig() {
+    const T = D.flowTables;
+    if (!T || !T.lnp || !T.onp) return null;
+    const row = (tab, keys, cap) => {
+      const cells = keys.map(([k, tone]) => (typeof tab[k] === "number" ? { v: String(Math.round(tab[k] * 100)), tone } : null));
+      return cells.every(Boolean) ? { cap, cells } : null;
+    };
+    const co = row(T.lnp, [["grn", "grn"], ["onp", "onp"], ["oth", "oth"]], "To Labor v Coalition");
+    const on = row(T.onp, [["grn", "grn"], ["lnp", "lnp"], ["oth", "oth"]], "To Labor v One Nation");
+    if (!co || !on) return null;
+    return { rows: ((D.latest || {}).rivalLead || "alp_lnp") === "alp_on" ? [on, co] : [co, on] };
+  };
+
   /* ---------------------------------------------------------- the menu's lines
-     { id: { head, fig: { v, cap, tone } | null, chip } } for every menu page
-     (and Info, which joins the phone's menu), each on the state its page
-     opens in: Pollster leans on the two-party tab of Labor's main rival (as
-     MenuPageView opens it) and the reader's basis (pub). A finding that
-     throws gives way to the page's tip rather than taking the menu down */
+     { id: { head, fig: { v, cap, tone } | { rows: [{ cap, cells }] } | null,
+     chip } } for every menu page (and Info, which joins the phone's menu),
+     each on the state its page opens in: Pollster leans on the two-party
+     tab of Labor's main rival (as MenuPageView opens it) and the reader's
+     basis (pub). A finding that throws gives way to the page's tip rather
+     than taking the menu down */
   AP.menuLines = function menuLines({ onM, pub = false } = {}) {
     const L = D.latest || {};
     const onM0 = onM != null ? onM : AP.measureOfMatchup(L.rivalLead) !== "lnp";
@@ -320,7 +354,10 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
     put("disagreement", () => { const s = AP.disStory(); return { head: s.head, fig: s.fig }; });
     put("leans", () => { const s = AP.leanStory("tpp", onM0, pub); return { head: s.head, fig: s.fig }; });
     put("flows", () => { const s = AP.flowStory(); return s && { head: s.head, fig: s.fig }; });
-    put("flows-explained", () => ({ head: AP.PAGE_HEAD["flows-explained"], fig: null, chip: "Explainer" }));
+    put("flows-explained", () => {
+      const fig = AP.flowsExplainedFig();
+      return { head: AP.PAGE_HEAD["flows-explained"], fig, ...(fig ? {} : { chip: "Explainer" }) };
+    });
     put("beyond-the-vote", () => ({ head: AP.PAGE_HEAD["beyond-the-vote"],
       fig: D.beyondTopics ? { v: String(D.beyondTopics), cap: "Topics" } : null }));
     put("changelog", () => {

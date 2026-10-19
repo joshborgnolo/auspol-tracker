@@ -601,9 +601,13 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
               {[...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
                 const ln = menuLines && menuLines[t.id];
                 const fig = ln && ln.fig;
+                /* the flows explainer's twin-row figure (menu-lines.js): a
+                   wider column than the single-figure rows, taken out of the
+                   text cell, so each trio's caption holds one line */
+                const rows = fig && fig.rows;
                 return (
                   <a key={t.id} role="menuitem" tabIndex={-1}
-                     className={"tab-menu-item" + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : "")}
+                     className={"tab-menu-item" + (rows ? " tab-menu-wide" : "") + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : "")}
                      href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}
                      aria-current={active === t.id ? "page" : undefined}
                      onClick={menuPick(t.id)}>
@@ -614,6 +618,14 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                     </span>
                     <span className="tab-menu-f">
                       {ln && ln.chip ? <span className="tab-menu-chip">{ln.chip}</span>
+                        : rows ? fig.rows.map((r, ri) => (
+                          <span className="tab-menu-fr" key={ri}>
+                            <span className="tab-menu-fv">
+                              {r.cells.map((c, ci) => <span key={ci} className={"tm-" + c.tone}>{c.v}</span>)}
+                            </span>
+                            <span className="tab-menu-fc">{r.cap}</span>
+                          </span>
+                        ))
                         : fig ? <>
                           <span className={"tab-menu-v" + (fig.tone ? " tm-" + fig.tone : "")}>{fig.v}</span>
                           {/* "RedBridge/Accent" may break after its slash */}

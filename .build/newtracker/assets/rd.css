@@ -689,11 +689,13 @@ body.rd .tab-menu-v {
   font-size: 21px; font-weight: 600; line-height: 22px; letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
 }
-body.rd .tab-menu-v.tm-alp { color: var(--alp-text); }
-body.rd .tab-menu-v.tm-lnp { color: var(--lnp-text); }
-body.rd .tab-menu-v.tm-onp { color: var(--onp-text); }
-body.rd .tab-menu-v.tm-grn { color: var(--grn-text); }
-body.rd .tab-menu-v.tm-oth { color: var(--oth-text); }
+/* a menu figure's tones, on the single figure (tab-menu-v) and the
+   explainer's trio cells (tab-menu-fv) alike */
+body.rd .tab-menu-f .tm-alp { color: var(--alp-text); }
+body.rd .tab-menu-f .tm-lnp { color: var(--lnp-text); }
+body.rd .tab-menu-f .tm-onp { color: var(--onp-text); }
+body.rd .tab-menu-f .tm-grn { color: var(--grn-text); }
+body.rd .tab-menu-f .tm-oth { color: var(--oth-text); }
 body.rd .tab-menu-c {
   margin-top: 4px; font-size: 11.5px; font-weight: 500; line-height: 14px;
   color: var(--ink-3); text-wrap: balance;
@@ -701,6 +703,23 @@ body.rd .tab-menu-c {
 body.rd .tab-menu-chip {
   margin-top: 2px; padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 3px;
   font-size: 11.5px; font-weight: 600; color: var(--ink-3);
+}
+/* the flows explainer's twin mini-rows (menu-lines.js flowsExplainedFig,
+   the two frozen flow tables): a trio of bare shares per matchup, each cell
+   in its voter group's tone, over the matchup's caption. Its column widens
+   past the single-figure rows' 92px, carved out of the text cell so every
+   caption holds one line */
+body.rd .tab-menu-item.tab-menu-wide { grid-template-columns: 50px minmax(0, 1fr) 128px; }
+body.rd .tab-menu-fr { display: block; }
+body.rd .tab-menu-fr + .tab-menu-fr { margin-top: 6px; }
+body.rd .tab-menu-fv {
+  font-size: 16px; font-weight: 600; line-height: 19px; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
+}
+body.rd .tab-menu-fv > span + span { margin-left: 7px; }
+body.rd .tab-menu-fc {
+  display: block; margin-top: 1px; font-size: 10.5px; font-weight: 500; line-height: 13px;
+  color: var(--ink-3);
 }
 /* hover and focus: the row darkens a shade, its numeral inks in and its
    name underlines; the page you're on carries a mark down its left edge */
@@ -719,10 +738,14 @@ body.rd .tab-menu-item.tab-menu-info { display: none; }
 @media (max-width: 640px) {
   body.rd .tab-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
   body.rd .tab-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
+  body.rd .tab-menu-item.tab-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   body.rd .tab-menu-n { font-size: 17px; }
   body.rd .tab-menu-t { font-size: 14.5px; }
   body.rd .tab-menu-d { font-size: 12.5px; max-width: none; }
   body.rd .tab-menu-v { font-size: 18px; }
+  body.rd .tab-menu-fv { font-size: 13.5px; line-height: 16px; }
+  body.rd .tab-menu-fv > span + span { margin-left: 5px; }
+  body.rd .tab-menu-fc { font-size: 9.5px; line-height: 12px; }
 }
 /* short-screenscape phones (landscape, ~320-480px tall): everything unpins.
    The tab bar plus the All-polls head and pinbar were ~150px of chrome stuck

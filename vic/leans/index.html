@@ -4009,11 +4009,11 @@ body.rd .tab-menu-v {
   font-size: 21px; font-weight: 600; line-height: 22px; letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
 }
-body.rd .tab-menu-v.tm-alp { color: var(--alp-text); }
-body.rd .tab-menu-v.tm-lnp { color: var(--lnp-text); }
-body.rd .tab-menu-v.tm-onp { color: var(--onp-text); }
-body.rd .tab-menu-v.tm-grn { color: var(--grn-text); }
-body.rd .tab-menu-v.tm-oth { color: var(--oth-text); }
+body.rd .tab-menu-f .tm-alp { color: var(--alp-text); }
+body.rd .tab-menu-f .tm-lnp { color: var(--lnp-text); }
+body.rd .tab-menu-f .tm-onp { color: var(--onp-text); }
+body.rd .tab-menu-f .tm-grn { color: var(--grn-text); }
+body.rd .tab-menu-f .tm-oth { color: var(--oth-text); }
 body.rd .tab-menu-c {
   margin-top: 4px; font-size: 11.5px; font-weight: 500; line-height: 14px;
   color: var(--ink-3); text-wrap: balance;
@@ -4021,6 +4021,18 @@ body.rd .tab-menu-c {
 body.rd .tab-menu-chip {
   margin-top: 2px; padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 3px;
   font-size: 11.5px; font-weight: 600; color: var(--ink-3);
+}
+body.rd .tab-menu-item.tab-menu-wide { grid-template-columns: 50px minmax(0, 1fr) 128px; }
+body.rd .tab-menu-fr { display: block; }
+body.rd .tab-menu-fr + .tab-menu-fr { margin-top: 6px; }
+body.rd .tab-menu-fv {
+  font-size: 16px; font-weight: 600; line-height: 19px; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink);
+}
+body.rd .tab-menu-fv > span + span { margin-left: 7px; }
+body.rd .tab-menu-fc {
+  display: block; margin-top: 1px; font-size: 10.5px; font-weight: 500; line-height: 13px;
+  color: var(--ink-3);
 }
 body.rd .tab-menu-item:hover, body.rd .tab-menu-item:focus-visible { background: color-mix(in oklab, var(--ink) 4.5%, transparent); }
 body.rd .tab-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, var(--ink-3)); }
@@ -4035,10 +4047,14 @@ body.rd .tab-menu-item.tab-menu-info { display: none; }
 @media (max-width: 640px) {
   body.rd .tab-menu-paper { left: -3px; right: -3px; border-radius: 6px 6px 0 0; }
   body.rd .tab-menu-item { grid-template-columns: 40px minmax(0, 1fr) 84px; padding: 11px 14px 12px 0; }
+  body.rd .tab-menu-item.tab-menu-wide { grid-template-columns: 40px minmax(0, 1fr) 112px; }
   body.rd .tab-menu-n { font-size: 17px; }
   body.rd .tab-menu-t { font-size: 14.5px; }
   body.rd .tab-menu-d { font-size: 12.5px; max-width: none; }
   body.rd .tab-menu-v { font-size: 18px; }
+  body.rd .tab-menu-fv { font-size: 13.5px; line-height: 16px; }
+  body.rd .tab-menu-fv > span + span { margin-left: 5px; }
+  body.rd .tab-menu-fc { font-size: 9.5px; line-height: 12px; }
 }
 @media (orientation: landscape) and (max-height: 480px) {
   body.rd .tabs.sticky { position: relative; top: auto; }
@@ -23021,6 +23037,26 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
     const m = String(text || "").match(/^.*?\.(?=\s|$)/);
     return (m ? m[0] : String(text || "")).replace(/ \(fieldwork [^)]*\)/g, "").replace(/ \((?:Labor v [^,)]+, )?(?:implied flows|published figures)\)/g, "").replace(/\.$/, "");
   };
+  AP.flowsExplainedFig = function flowsExplainedFig() {
+    const T = D.flowTables;
+    if (!T || !T.lnp || !T.onp) return null;
+    const row = (tab, keys, cap) => {
+      const cells = keys.map(([k, tone]) => typeof tab[k] === "number" ? {
+        v: String(Math.round(tab[k] * 100)),
+        tone
+      } : null);
+      return cells.every(Boolean) ? {
+        cap,
+        cells
+      } : null;
+    };
+    const co = row(T.lnp, [["grn", "grn"], ["onp", "onp"], ["oth", "oth"]], "To Labor v Coalition");
+    const on = row(T.onp, [["grn", "grn"], ["lnp", "lnp"], ["oth", "oth"]], "To Labor v One Nation");
+    if (!co || !on) return null;
+    return {
+      rows: ((D.latest || {}).rivalLead || "alp_lnp") === "alp_on" ? [on, co] : [co, on]
+    };
+  };
   AP.menuLines = function menuLines({
     onM,
     pub = false
@@ -23057,11 +23093,16 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
         fig: s.fig
       };
     });
-    put("flows-explained", () => ({
-      head: AP.PAGE_HEAD["flows-explained"],
-      fig: null,
-      chip: "Explainer"
-    }));
+    put("flows-explained", () => {
+      const fig = AP.flowsExplainedFig();
+      return {
+        head: AP.PAGE_HEAD["flows-explained"],
+        fig,
+        ...(fig ? {} : {
+          chip: "Explainer"
+        })
+      };
+    });
     put("beyond-the-vote", () => ({
       head: AP.PAGE_HEAD["beyond-the-vote"],
       fig: D.beyondTopics ? {
@@ -32342,11 +32383,12 @@ function Tabs({
   }, [...menuTabs, ...(pinHideTab ? [pinHideTab] : [])].map((t, i) => {
     const ln = menuLines && menuLines[t.id];
     const fig = ln && ln.fig;
+    const rows = fig && fig.rows;
     return React.createElement("a", {
       key: t.id,
       role: "menuitem",
       tabIndex: -1,
-      className: "tab-menu-item" + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : ""),
+      className: "tab-menu-item" + (rows ? " tab-menu-wide" : "") + (t === pinHideTab ? " tab-menu-info" : "") + (active === t.id ? " on" : ""),
       href: window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id,
       "aria-current": active === t.id ? "page" : undefined,
       onClick: menuPick(t.id)
@@ -32363,7 +32405,17 @@ function Tabs({
       className: "tab-menu-f"
     }, ln && ln.chip ? React.createElement("span", {
       className: "tab-menu-chip"
-    }, ln.chip) : fig ? React.createElement(React.Fragment, null, React.createElement("span", {
+    }, ln.chip) : rows ? fig.rows.map((r, ri) => React.createElement("span", {
+      className: "tab-menu-fr",
+      key: ri
+    }, React.createElement("span", {
+      className: "tab-menu-fv"
+    }, r.cells.map((c, ci) => React.createElement("span", {
+      key: ci,
+      className: "tm-" + c.tone
+    }, c.v))), React.createElement("span", {
+      className: "tab-menu-fc"
+    }, r.cap))) : fig ? React.createElement(React.Fragment, null, React.createElement("span", {
       className: "tab-menu-v" + (fig.tone ? " tm-" + fig.tone : "")
     }, fig.v), React.createElement("span", {
       className: "tab-menu-c"

@@ -106,12 +106,35 @@ const fresh = (mutate) => {
   assert.equal(fresh((D) => { D.flowDrift = null; }).flowStory(), null, "no drift, no finding");
 }
 
+/* ---- the flows explainer's figure: the two frozen flow tables, a coloured
+   trio per matchup, whole numbers (the graphic's own idiom) - plus its
+   rival-ordering swap and the no-table fallback */
+{
+  const rows = (m) => JSON.parse(JSON.stringify(m["flows-explained"].fig || {})).rows;
+  const coRow = { cap: "To Labor v Coalition", cells: [{ v: "88", tone: "grn" }, { v: "26", tone: "onp" }, { v: "55", tone: "oth" }] };
+  const onRow = { cap: "To Labor v One Nation", cells: [{ v: "91", tone: "grn" }, { v: "30", tone: "lnp" }, { v: "55", tone: "oth" }] };
+  const AP = fresh();
+  const L = AP.menuLines();
+  assert.deepEqual(rows(L), [coRow, onRow], "the Coalition row first while it is Labor's main rival");
+  assert.ok(!("chip" in L["flows-explained"]), "the figure replaces the Explainer tag");
+  assert.deepEqual(rows(fresh((D) => { D.latest.rivalLead = "alp_on"; }).menuLines()), [onRow, coRow],
+    "One Nation the main rival: the two rows swap to follow it");
+  /* the cells are the estimator's own tables - mutate flowTables and the
+     figure moves with it, so the menu can never quote a retired constant */
+  const moved = fresh((D) => { D.flowTables.lnp.grn = 0.75; }).menuLines();
+  assert.equal(JSON.parse(JSON.stringify(moved["flows-explained"].fig)).rows[0].cells[0].v, "75", "the figure reads flowTables, not a restated constant");
+  /* no table, no figure - the "Explainer" tag stands back (an empty tables
+     object, not null, which ed2260de's load-time flows read could not take) */
+  const flat = JSON.parse(JSON.stringify(fresh((D) => { D.flowTables = {}; }).menuLines()["flows-explained"]));
+  assert.equal(flat.chip, "Explainer", "a build without the tables keeps the tag");
+  assert.equal(flat.fig, null, "not half a figure");
+}
+
 /* ---- the menu's lines, and the satellites' copy of them */
 {
   const AP = fresh();
   const L = AP.menuLines();
   for (const id of ["disagreement", "leans", "flows", "flows-explained", "beyond-the-vote", "changelog", "info"]) assert.ok(L[id] && L[id].head, id + " has its line");
-  assert.equal(L["flows-explained"].chip, "Explainer");
   assert.equal(L["flows-explained"].head, AP.PAGE_HEAD["flows-explained"]);
   assert.match(L["beyond-the-vote"].fig.v, /^\d+$/);
   assert.match(L.changelog.fig.v, /^\d{1,2} [A-Z][a-z]{2}$/);

@@ -1038,6 +1038,18 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       d.textContent = ln.head;
       f.textContent = "";
       if (ln.chip) f.appendChild(mk("span", "sh-menu-chip", ln.chip));
+      else if (ln.fig && ln.fig.rows) {
+        /* the flows explainer's twin mini-rows (menu-lines.js): a trio of
+           bare shares per matchup, and the item's widened figure column */
+        its[i].classList.add("sh-menu-wide");
+        for (var ri = 0; ri < ln.fig.rows.length; ri++) {
+          var rw = ln.fig.rows[ri], fr = mk("span", "sh-menu-fr"), fv = mk("span", "sh-menu-fv");
+          for (var ci = 0; ci < rw.cells.length; ci++) fv.appendChild(mk("span", "tm-" + rw.cells[ci].tone, rw.cells[ci].v));
+          fr.appendChild(fv);
+          fr.appendChild(mk("span", "sh-menu-fc", rw.cap));
+          f.appendChild(fr);
+        }
+      }
       else if (ln.fig) {
         f.appendChild(mk("span", "sh-menu-v" + (ln.fig.tone ? " tm-" + ln.fig.tone : ""), ln.fig.v));
         // "RedBridge/Accent" may break after its slash
