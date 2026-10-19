@@ -1,35 +1,36 @@
 #!/usr/bin/env node
 /* aec-2025-region-tpp-flows.mjs — derive gen-data §7db's elec2025r carriers
-   (all/inner/outer/regional, ALP-v-Coalition TPP basis) from the per-seat
-   2025 distribution of preferences.
+   (all/inner/outer/regional, ALP-v-Coalition basis) from the AEC's own
+   per-seat flows.
 
-   Why: the forced-choice section's 2025 count views ride ONE cut so the
-   parts weigh up to the whole — the replay. The AEC's own TPP flow product
-   (HouseTppFlowByStateByParty, all ballots redistributed to ALP v
-   Coalition) is published by party NATIONALLY (HouseTppFlowByParty) and by
-   STATE, never per division or division class, and House ballot-level
-   preferences are never published — so no official per-class cut exists to
-   display beside it, and the official constants (flows.mjs: grn 88.19,
-   onp 25.50, oth 54.55) stay the estimator's, shown nowhere in the
-   section. All four carriers are derived here from
-   data/aec-2025-seat-flows.json (the vendored DoP), replayed per seat with
-   origin-tagged piles: every count's excluded pile is split to receivers
-   in proportion to the recorded transfers. In a CLASSIC seat the count
-   ends ALP v Coalition, so each source party's ballots end exactly on a
-   major pile. Source ballots in the 35 NON-classic seats can end on
-   crossbencher/GRN terminal piles — those seats are EXCLUDED from the
-   buckets (the AEC's notional TPP counts in them exist only as seat
-   outcomes, not flows). `all` is the same 115 classic seats whole, so the
-   three regions ballot-weight to it exactly — the 2026-10-19 reader
-   report's parts-versus-whole complaint: the regions had been shown
-   against a national carrier read off the TPP product, which no weighting
-   of classic-seat-only parts can average to. The proportional-hop rule is
-   exact for the dominant hop (grn/on/oth piles excluded while the majors
-   stand) and approximate only for the small minor→minor hops that precede
-   it. Coverage of each bucket is printed with the results.
+   Source: data/aec-2025-tcp-flow-by-division.csv, vendored unchanged from
+   results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv.
+   For every candidate who did not make the final two it gives where that
+   candidate's OWN first-preference ballots finished, split between the
+   final pair. In a CLASSIC seat (final pair Labor v Coalition) that IS the
+   two-party-preferred flow, counted, ballot by ballot — no replay needed.
 
-   The printed official-constants delta beside the all-row is the
-   approximation check: replay vs notional, full-coverage comparison.
+   Scope: the 115 classic seats. The AEC publishes TPP flows by party
+   nationally and by state only (HouseTppFlowByParty / ByStateByParty), not
+   per division, and in the 35 non-classic seats the TCP file's final pair
+   isn't Labor v Coalition, so those seats can't be split by seat class.
+   `all` is the same 115 seats, so the three regions ballot-weight to it
+   exactly. The AEC's all-150-seat figures (flows.mjs FLOW: grn 88.19,
+   on 25.50, oth 54.55) stay the estimator's constants; the comparison row
+   printed below shows what leaving out the non-classic seats does (small
+   for GRN and ON; Others drop ~6 points without the teal/independent seats).
+
+   History: until 2026-10-19 this script replayed the vendored distribution
+   of preferences (data/aec-2025-seat-flows.json) with origin-tagged piles,
+   splitting each excluded pile in its overall proportions. That blends
+   origins — GRN piles carry earlier minors' ballots, ON piles likewise — and
+   put GRN 7 points low and ON 7 points high (80.45/33.02/51.04 against this
+   file's 87.46/25.86/48.33 over the same ballots). Do not go back to it.
+
+   Checks (each throws): every from-row total equals the candidate's
+   first-preference votes in the vendored DoP roster; every classic seat's
+   ALP finish equals the DoP's final ALP pile to within 1 vote; the
+   classic-seat set equals the DoP's `classic` flag.
 
    Run from the repo root:  node .build/aec-2025-region-tpp-flows.mjs   */
 import { readFileSync } from "node:fs";
@@ -38,75 +39,86 @@ const seats = JSON.parse(readFileSync("data/aec-2025-seat-flows.json", "utf8")).
 const divisions = JSON.parse(readFileSync("data/aec-2025-division-class.json", "utf8")).divisions;
 const classOf = new Map(divisions.map((d) => [d.name, d.class]));
 
-const MAJORS = new Set(["alp", "lp", "np", "lnp", "clp"]);
+const MAJORS = new Set(["ALP", "LP", "NP", "LNP", "CLP"]);
 const CLASS_BUCKET = { inner: "inner", outer: "outer", provincial: "regional", rural: "regional" };
 const SOURCES = ["grn", "on", "oth"]; // oth = IND + all other minors (the official lump's "IND+OTH")
+const lumped = (ab) => (ab === "GRN" || ab === "GVIC" ? "grn" : ab === "ON" ? "on" : "oth");
 
-function replay(seat) {
-  const piles = new Map(); // candidate idx -> Map(origin -> votes)
-  seat.candidates.forEach((c, i) => piles.set(i, new Map([[c.group, c.votes]])));
-  for (const f of seat.flows) {
-    const pile = piles.get(f.excluded);
-    if (!pile) throw new Error(`${seat.name}: excluded ${f.excluded} has no pile`);
-    const tot = [...pile.values()].reduce((a, b) => a + b, 0);
-    if (Math.abs(tot - f.pile) > 1) throw new Error(`${seat.name} count ${f.count}: pile drift ${tot} vs ${f.pile}`);
-    const got = Object.values(f.to).reduce((a, b) => a + b, 0);
-    if (got !== f.pile) throw new Error(`${seat.name} count ${f.count}: transfers ${got} != pile ${f.pile}`);
-    for (const [idx, v] of Object.entries(f.to)) {
-      const recv = piles.get(Number(idx));
-      if (!recv) throw new Error(`${seat.name} count ${f.count}: receiver ${idx} not standing`);
-      for (const [o, n] of pile) recv.set(o, (recv.get(o) ?? 0) + (n * v) / tot);
-    }
-    piles.delete(f.excluded);
+/* the AEC quotes fields holding commas ("Shooters, Fishers and Farmers Party") */
+function splitCsv(line) {
+  const out = [];
+  let cur = "", q = false;
+  for (const ch of line) {
+    if (ch === '"') { q = !q; continue; }
+    if (ch === "," && !q) { out.push(cur); cur = ""; } else cur += ch;
   }
-  if (piles.size !== 2) throw new Error(`${seat.name}: ${piles.size} left standing`);
-  return [...piles.entries()].map(([idx, origins]) => ({ group: seat.candidates[idx].group, origins }));
+  out.push(cur.replace(/\r$/, ""));
+  return out;
 }
+const rows = readFileSync("data/aec-2025-tcp-flow-by-division.csv", "utf8").split("\n").slice(2)
+  .filter((l) => l.trim()).map(splitCsv)
+  .map((c) => ({ div: c[2], fromId: c[3], from: c[4], to: c[10], n: Number(c[15]) }));
 
-const lumped = (g) => (MAJORS.has(g) || g === "grn" || g === "on" ? g : "oth");
+/* per division: the final pair, each from-candidate's total, ALP's finish */
+const byDiv = new Map();
+for (const r of rows) {
+  const d = byDiv.get(r.div) ?? byDiv.set(r.div, { finals: new Set(), from: new Map(), alp: 0 }).get(r.div);
+  d.finals.add(r.to);
+  if (r.to === "ALP") d.alp += r.n;
+  if (r.fromId !== "0") d.from.set(r.fromId, (d.from.get(r.fromId) ?? 0) + r.n);
+}
+if (byDiv.size !== 150) throw new Error(`expected 150 divisions, got ${byDiv.size}`);
+const isClassic = (d) => d.finals.has("ALP") && [...d.finals].every((p) => MAJORS.has(p));
+
+let checked = 0;
+const seatOf = new Map(seats.map((s) => [s.name, s]));
+for (const [div, d] of byDiv) {
+  const seat = seatOf.get(div);
+  if (!seat) throw new Error(`${div}: not in the vendored DoP`);
+  if (isClassic(d) !== !!seat.classic) throw new Error(`${div}: classic flag disagrees with the DoP`);
+  for (const [id, n] of d.from) {
+    const c = seat.candidates.find((k) => k.id === id);
+    if (!c) throw new Error(`${div}: from-candidate ${id} not in the DoP roster`);
+    if (c.votes !== n) throw new Error(`${div} ${c.name}: from-row total ${n} != first preferences ${c.votes}`);
+    checked++;
+  }
+  if (isClassic(d)) {
+    const ai = seat.candidates.findIndex((k) => k.party === "ALP");
+    const final = seat.candidates[ai].votes + seat.flows.reduce((a, f) => a + (f.to[ai] ?? 0), 0);
+    if (Math.abs(final - d.alp) > 1) throw new Error(`${div}: ALP finish ${d.alp} != DoP final pile ${final}`);
+  }
+}
+console.log(`checked: ${checked} from-candidates' totals = their first preferences; classic seats' ALP finish = DoP final pile`);
+
 const buckets = { all: {}, inner: {}, outer: {}, regional: {} };
 const coverage = { inner: [0, 0], outer: [0, 0], regional: [0, 0] };
 let classic = 0;
-
-for (const seat of seats) {
-  const bucket = CLASS_BUCKET[classOf.get(seat.name)];
-  if (!bucket) throw new Error(`${seat.name}: no division class`);
+for (const [div, d] of byDiv) {
+  const bucket = CLASS_BUCKET[classOf.get(div)];
+  if (!bucket) throw new Error(`${div}: no division class`);
   coverage[bucket][1]++;
-  if (!seat.classic) continue;
+  if (!isClassic(d)) continue;
   classic++;
   coverage[bucket][0]++;
-  const terminal = replay(seat);
-  if (!terminal.every((t) => MAJORS.has(t.group)))
-    throw new Error(`${seat.name}: classic seat ends on ${terminal.map((t) => t.group)}`);
-  if (!terminal.some((t) => t.group === "alp"))
-    throw new Error(`${seat.name}: classic seat without an ALP terminal`);
-  for (const src of SOURCES) {
-    let alp = 0, maj = 0;
-    for (const t of terminal)
-      for (const [o, n] of t.origins) {
-        const l = lumped(o);
-        if (l !== src) continue;
-        maj += n;
-        if (t.group === "alp") alp += n;
-      }
+  for (const r of rows) {
+    if (r.div !== div || r.fromId === "0" || MAJORS.has(r.from)) continue;
     for (const key of ["all", bucket]) {
-      const b = (buckets[key][src] ??= { alp: 0, maj: 0 });
-      b.alp += alp;
-      b.maj += maj;
+      const b = (buckets[key][lumped(r.from)] ??= { alp: 0, maj: 0 });
+      b.maj += r.n;
+      if (r.to === "ALP") b.alp += r.n;
     }
   }
 }
 
-const official = { grn: 88.19, onp: 25.5, oth: 54.55 };
-console.log(`classic seats: ${classic}/150 — non-classic excluded (terminal crossbencher/GRN piles have no published majors split)`);
+const official = { grn: 88.19, on: 25.5, oth: 54.55 };
+console.log(`classic seats: ${classic}/150 — the AEC's counted flows; non-classic seats have no Labor-v-Coalition finish`);
 for (const key of ["all", "inner", "outer", "regional"]) {
   console.log(`\n${key}:`);
   for (const src of SOURCES) {
     const b = buckets[key][src];
     const share = (100 * b.alp) / b.maj;
-    const off = official[src];
-    const cmp = key === "all" ? `  (official TPP ${off}; delta ${(share - off).toFixed(2)})` : "";
-    console.log(`  ${src} ${share.toFixed(2)}% to ALP  (${Math.round(b.maj).toLocaleString("en-AU")} ballots)${cmp}`);
+    const cmp = key === "all" ? `  (AEC all-150-seat TPP ${official[src]}; delta ${(share - official[src]).toFixed(2)})` : "";
+    console.log(`  ${src} ${share.toFixed(2)}% to ALP  (${b.maj.toLocaleString("en-AU")} ballots)${cmp}`);
   }
 }
 console.log("\ncoverage (classic seats / total seats per region):");

@@ -27,7 +27,7 @@
      - the region menu: a named region empties RedBridge/Accent's column
        and marks (national only), drops the 2026 counts, rekeys DemosAU's
        cells and, on Labor v Coalition, the count column to the class's
-       seat replay;
+       seat count;
      - the poll columns' heads open their waves: the RedBridge and
        DemosAU heads (house name + fieldwork months) ride the mark-click
        chain's AP.pollRowKey -> AP.openPoll route, the figure cells
@@ -179,7 +179,7 @@ for (const w of [1440, 390]) {
   await tab(page, 0);
   await region(page, "inner");
   s = await read(page);
-  check(s.rows.map((r) => r.cells[0]).join() === ["grn", "onp", "oth"].map((ck) => fig(E.coInner[ck], 1)).join(), `${w}: Inner metro rekeys the count column to the class's seat replay (${s.rows.map((r) => r.cells[0])})`);
+  check(s.rows.map((r) => r.cells[0]).join() === ["grn", "onp", "oth"].map((ck) => fig(E.coInner[ck], 1)).join(), `${w}: Inner metro rekeys the count column to the class’s seat count (${s.rows.map((r) => r.cells[0])})`);
   check(s.rows.every((r) => r.waves === 0 && r.tris === 0 && r.empty), `${w}: Labor v Coalition by region: no poll marks, the row says why`);
   await region(page, "");
 

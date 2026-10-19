@@ -254,7 +254,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
         const r = voiceMove, m = r.m;
         /* the assumption the answer is set beside: two figures quoted, no
            claim of a gap between them (the battery tests the move, not this) */
-        const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the classic-seat counts sent " + anchorOf(r.q) + "’s way"
+        const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the " + rdElecYear + " count sent " + anchorOf(r.q) + "’s way"
           : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
         return " Asked to choose, " + m.to + "% of " + FF_COHORTS[r.ck].prose + " voters now pick " + anchorOf(r.q) + " over " + rivalOf(r.q)
           + " in " + (r.q === "ln" ? "DemosAU’s MRP" : "RedBridge/Accent’s poll") + ", " + (m.up ? "up" : "down") + " from " + m.from + "% in " + rdMonthYear(m.ym).split(" ")[0] + refTxt + ".";

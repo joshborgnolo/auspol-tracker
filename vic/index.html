@@ -23359,7 +23359,7 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
     const dekB = voiceMove ? (() => {
       const r = voiceMove,
         m = r.m;
-      const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the classic-seat counts sent " + anchorOf(r.q) + "’s way" : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
+      const refTxt = r.q === "co" && E ? ", against the " + flFig(E.all[r.ck], 1) + "% the " + rdElecYear + " count sent " + anchorOf(r.q) + "’s way" : r.q === "on" && FT ? ", against the " + flFig(FT.onp[r.ck === "coal" ? "lnp" : r.ck] * 100) + "% the site assumes" : "";
       return " Asked to choose, " + m.to + "% of " + FF_COHORTS[r.ck].prose + " voters now pick " + anchorOf(r.q) + " over " + rivalOf(r.q) + " in " + (r.q === "ln" ? "DemosAU’s MRP" : "RedBridge/Accent’s poll") + ", " + (m.up ? "up" : "down") + " from " + m.from + "% in " + rdMonthYear(m.ym).split(" ")[0] + refTxt + ".";
     })() : moves.length > 1 ? " Asked to choose, " + moves.map(r => FF_COHORTS[r.ck].prose + " voters " + (r.m.up ? "up" : "down") + " from " + r.m.from + "% to " + r.m.to + "%").join("; ") + "." : " Voters’ own answers to pollsters haven’t clearly moved since February either.";
     const dekC = " The pollsters’ own two-party figures " + (outC || outO ? "have moved: they sit " : voiceMove || moves.length ? "don’t show it yet: they sit " : "sit where their primary votes and the flows put them: ") + phr(nC.v, "the Coalition") + ", and " + phr(nO.v, "One Nation") + ", " + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1) + ".";
@@ -63795,7 +63795,7 @@ function RdFlows({
       band: null,
       refHead: rdElecYear + " count",
       refSub: (ffReg ? regName : "as counted") + "*",
-      refName: rdElecYear + " count, our replay",
+      refName: rdElecYear + " count*",
       rb: ffReg ? [] : FF.vsCoal,
       dm: ffReg ? [] : FF.demos || [],
       bys: [],
@@ -64023,7 +64023,7 @@ function RdFlows({
   };
   const big = c && q !== "ln" ? [...c.cohorts].sort((a, b) => (PR[FF_COHORTS[b].share] || 0) - (PR[FF_COHORTS[a].share] || 0))[0] : null;
   const stake = big && PR[FF_COHORTS[big].share] != null ? FF_COHORTS[big].name + " voters are " + PR[FF_COHORTS[big].share].toFixed(1) + "% of the vote, so each 10 points of their preferences moves " + (q === "co" ? "Labor’s two-party figure" : "Labor’s figure against One Nation") + " by " + (PR[FF_COHORTS[big].share] / 10).toFixed(1) + " points." : "";
-  const ledgerNote = (q === "co" ? ffReg ? "* Our replay of the " + rdElecYear + " count for the seats classed " + FF_REG_OF[ffReg] + ": the AEC publishes its flows nationally and by state only. No poll asks this contest by region. " : "* Our replay of the " + rdElecYear + " count across the 115 classic (Labor-v-Coalition) seats, the same cut the region views replay — so the four views weigh up. The site’s figures use the AEC’s official national two-party-preferred flow. " : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range" + (ffReg ? ", and it is national on every view. " : ". ") : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ") + stake + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
+  const ledgerNote = (q === "co" ? ffReg ? "* The AEC’s " + rdElecYear + " count in the seats classed " + FF_REG_OF[ffReg] + " that finished Labor v Coalition (" + (E && E[ffReg] ? E[ffReg].cov : "") + "). No poll asks this contest by region. " : "* The AEC’s " + rdElecYear + " count in the 115 seats that finished Labor v Coalition, so the three regions add up to it." + (E && E.all.nat ? " Across all 150 seats, " + c.cohorts.map(k => E.all.nat[k].toFixed(1) + "% of " + FF_COHORTS[k].prose).join(", ").replace(/, ([^,]*)$/, " and $1") + " voters’ preferences went to Labor; the site’s two-party figures use those. " : " ") : q === "on" ? "No count of this contest exists, so the site builds its flows from " + rdElecYear + "’s Senate ballots and the 2026 state contests; the band is that table’s own range" + (ffReg ? ", and it is national on every view. " : ". ") : "No count of this contest exists and the site estimates none, so DemosAU’s MRP stands alone. ") + stake + (q !== "co" && !ffReg ? " * DemosAU prints this contest by region only; All voters is our weighting of its three regions by enrolment and vote." : "");
   const flMonths = rdApMonths(RD_AP_TERM1);
   const flSetRows = fd => {
     const hs = fd.houses || {};
@@ -64143,7 +64143,7 @@ function RdFlows({
   }, "Voters"), React.createElement("span", {
     className: "rd-ap-th r wrap",
     role: "columnheader"
-  }, narrow ? q === "co" ? rdElecYear : "Site" : c.refHead, React.createElement("em", null, narrow ? q === "co" ? "replay*" : q === "on" ? ffReg ? "national" : "assumes" : "–" : c.refSub)), React.createElement("span", {
+  }, narrow ? q === "co" ? rdElecYear : "Site" : c.refHead, React.createElement("em", null, narrow ? q === "co" ? "count*" : q === "on" ? ffReg ? "national" : "assumes" : "–" : c.refSub)), React.createElement("span", {
     className: "rd-ap-th r wrap",
     role: "columnheader"
   }, colHead(FF.house || "RedBridge/Accent", rbLast, narrow ? "RedBr." : "RedBridge", c.rb.length ? narrow ? D.monthName(Number(rbLast.ym.slice(5))) : D.monthName(Number(rbLast.ym.slice(5))) + " wave" : ffReg && q !== "ln" ? "national only" : "doesn’t ask")), React.createElement("span", {
@@ -64260,7 +64260,7 @@ function RdFlows({
   }, React.createElement("span", {
     className: "rd-fx-keyref" + (c.band ? " band" : ""),
     "aria-hidden": "true"
-  }), q === "co" ? rdElecYear + " count, our replay" : "Site’s assumption, with its range"), c.ref && c.rb.length > 0 && React.createElement("span", {
+  }), q === "co" ? rdElecYear + " count*" : "Site’s assumption, with its range"), c.ref && c.rb.length > 0 && React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-fx-keyarea",
@@ -64346,7 +64346,7 @@ function RdFlows({
       term: "preference-flows",
       from: "Preference flows"
     }
-  }, FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is our replay of the 115 classic (Labor-v-Coalition) contests, on one cut in every view; the AEC’s official national two-party-preferred flow remains the constant the site’s two-party figures use. This check corrects no other figure on the page." : "This check corrects no other figure on the page."));
+  }, FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is the AEC’s, from the 115 seats that finished Labor v Coalition, so every view covers the same seats. The site’s two-party figures use the AEC’s flows across all 150 seats. This check corrects no other figure on the page." : "This check corrects no other figure on the page."));
 }
 function RdExplained() {
   return React.createElement("section", {

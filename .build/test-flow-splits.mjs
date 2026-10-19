@@ -8,15 +8,14 @@
    June-2026 Coalition est derivation rides exactly one cohort of one wave,
    DemosAU's MRP carriers (demos/demosOn/lnpOn) carry its printed figures
    (the One Nation contests by region), the 2025 election's counted flows
-   are elec2025r: ALL FOUR carriers this site's replay of the classic
-   seats' counts (inner/outer/regional the seat classes, `all` the same
-   115 classic seats whole — the constants typed from
-   .build/aec-2025-region-tpp-flows.mjs's output, user call 2026-10-13: "the
-   2025 election flows are based on seat classification, which she worked
-   out already"; the estimator's own TPP constants stay in flows.mjs, shown
-   nowhere in the section, after the 2026-10-19 report that the regions
-   could never average to a national carrier read off the AEC's TPP
-   product), and the 2026 state and by-election counts (bys: SA2026
+   are elec2025r: ALL FOUR carriers the AEC's counted flows in the 115
+   classic seats (inner/outer/regional the seat classes, `all` the same
+   115 seats whole — the constants typed from
+   .build/aec-2025-region-tpp-flows.mjs's output over the vendored
+   HouseTcpFlowByDivision file, user call 2026-10-13: "the 2025 election
+   flows are based on seat classification, which she worked out already";
+   the estimator's all-150-seat constants stay in flows.mjs and ride
+   `all.nat` for the footnote only), and the 2026 state and by-election counts (bys: SA2026
    Bonham estimates, Secret Harbour — on the days of the elections; Farrer's
    pair dropped 2026-10-13, those counts measured independent contests, not
    One Nation voters' choices).
@@ -28,7 +27,7 @@
    assumption, DemosAU's triangles apart from it), then the contest's drift
    chart. A named region drops every national mark (the user: "there should
    be no RedBridge/Accent polls" in a region's view) and rekeys the election
-   column to the class's seat replay.
+   column to the class's seat count.
    Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -87,43 +86,45 @@ assert.deepEqual(estMarks, [{ date: "2026-06-26", cohort: "coal" }],
 const jun = byDate.get("2026-06-26");
 assert.equal(jun.tpp_split_on.lnp, 36, "June's derived Coalition split is 36/64 on the row");
 
-/* the 2025 election rings: ALL FOUR carriers are this site's replay of
-   the per-seat distributions of preferences (the constants typed from
+/* the 2025 election rings: ALL FOUR carriers are the AEC's counted
+   flows in the seats that finished Labor v Coalition, summed from its
+   HouseTcpFlowByDivision file (the constants typed from
    .build/aec-2025-region-tpp-flows.mjs's output — rerun it to re-derive;
    the user, 2026-10-13: "the 2025 election flows are based on seat
    classification, which she worked out already") — `all` the same 115
-   classic seats as the three region views partition, so the parts
-   ballot-weight to the whole on one cut (2026-10-19 reader report: the
-   regions could never average to a national carrier read off the AEC's
-   all-150-seats TPP product). The estimator's own constants (flows.mjs's
-   FLOW, the AEC's notional TPP cut) stay OUT of this section — pinned
-   divergent below, so the two scales can never silently merge again.
-   Every carrier is flagged der and names its seat coverage so tips and
-   notes can never sell it as the AEC's own count */
+   seats as the three region views partition, so the parts ballot-weight
+   to the whole (2026-10-19 reader report). Until 2026-10-19 these were a
+   replay of the distribution of preferences that blended origins in
+   cascaded piles (GRN 80.45, ON 33.02); the closeness pins below keep it
+   from coming back. The estimator's all-150-seat constants (flows.mjs's
+   FLOW) ride `all.nat` for the footnote, never the cells */
 assert.ok(FF.elec2025r && FF.elec2025r.all, "elec2025r carries the national rings carrier");
 assert.deepEqual(Object.keys(FF.elec2025r).sort(), ["all", "inner", "outer", "regional"],
-  "elec2025r carries the whole-replay carrier plus the three seat-classification replays");
+  "elec2025r carries the all-seats carrier plus the three seat-classification carriers");
 assert.ok(!FF.elec2025, "the old single elec2025 carrier is gone — the rings ride elec2025r.all");
-const REPLAY = { all: { grn: 80.45, onp: 33.02, oth: 51.04, cl: "115 of 150", of: "classic (Labor-v-Coalition) seat" },
-                 inner: { grn: 86.41, onp: 33.8, oth: 55.68, cl: "25 of 43", of: "inner metro" },
-                 outer: { grn: 79.32, onp: 35.34, oth: 52.46, cl: "40 of 45", of: "outer metro" },
-                 regional: { grn: 76.9, onp: 31.46, oth: 49.01, cl: "50 of 62", of: "regional or rural" } };
+const COUNTED = { all: { grn: 87.46, onp: 25.86, oth: 48.33, cl: "115 of 150", of: "every seat that finished Labor v Coalition" },
+                  inner: { grn: 90.29, onp: 25.99, oth: 51.57, cl: "25 of 43", of: "inner metro" },
+                  outer: { grn: 86.95, onp: 27.65, oth: 48.88, cl: "40 of 45", of: "outer metro" },
+                  regional: { grn: 85.76, onp: 24.76, oth: 47.19, cl: "50 of 62", of: "regional or rural" } };
 assert.ok(Math.abs(FF.elec2025r.all.xm - (2025 * 12 + 4 + 2 / 31)) < 1e-3,
   `the carrier rides 3 May 2025 on the month-index scale (xm ${FF.elec2025r.all.xm})`);
-assert.ok(["grn", "onp", "oth"].some((k) => Math.abs(FF.elec2025r.all[k] - FLOW_PIN[k] * 100) > 3),
-  "the display replays sit off the estimator's TPP constants — never re-type `all` from FLOW (that mix of scales is the bug 2026-10-19's report caught)");
-for (const [rk, want] of Object.entries(REPLAY)) {
+assert.equal(JSON.stringify(FF.elec2025r.all.nat),
+  JSON.stringify(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, Math.round(FLOW_PIN[k] * 1e4) / 100]))),
+  "all.nat quotes the estimator's all-150-seat constants, to the hundredth");
+assert.ok(Math.abs(FF.elec2025r.all.grn - FF.elec2025r.all.nat.grn) < 1.5 && Math.abs(FF.elec2025r.all.onp - FF.elec2025r.all.nat.onp) < 1.5,
+  "the classic-seat GRN and ON flows sit within 1.5 points of the AEC's all-seat figures — the blended replay (80.45/33.02) missed by 7");
+for (const [rk, want] of Object.entries(COUNTED)) {
   const r = FF.elec2025r[rk];
   assert.deepEqual(Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, r[k]])),
     Object.fromEntries(["grn", "onp", "oth"].map((k) => [k, want[k]])),
-    `the ${rk} replay rides the script's own constants (${want.grn}/${want.onp}/${want.oth} — rerun .build/aec-2025-region-tpp-flows.mjs to re-derive)`);
-  assert.ok(r.der === true && r.scopeTtl && r.scopeNote.includes(want.of) && r.scopeNote.includes(want.cl),
-    `the ${rk} replay is flagged derived and names its class + classic-seat coverage`);
-  assert.ok(Math.abs(r.xm - FF.elec2025r.all.xm) < 1e-9, `the ${rk} replay rides the same election day`);
+    `the ${rk} carrier rides the script's own constants (${want.grn}/${want.onp}/${want.oth} — rerun .build/aec-2025-region-tpp-flows.mjs to re-derive)`);
+  assert.ok(r.der === true && r.cov === want.cl && r.scopeTtl && r.scopeNote.includes(want.of) && r.scopeNote.includes(want.cl),
+    `the ${rk} carrier is starred and names its seats + coverage`);
+  assert.ok(Math.abs(r.xm - FF.elec2025r.all.xm) < 1e-9, `the ${rk} carrier rides the same election day`);
   if (rk !== "all") {
     const all = FF.elec2025r.all;
     assert.ok(Math.abs(r.grn - all.grn) > 0.5 || Math.abs(r.onp - all.onp) > 0.5 || Math.abs(r.oth - all.oth) > 0.5,
-      `the ${rk} replay visibly differs from the all-seats replay — a rekey that shows`);
+      `the ${rk} carrier visibly differs from the all-seats one — a rekey that shows`);
   }
 }
 
@@ -207,16 +208,16 @@ assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner 
 /* the region contract (user 2026-10-13): a named region drops every
    national mark - RedBridge/Accent's waves, DemosAU's one national
    Labor-v-Coalition figure, the 2026 counts - and rekeys the election
-   column to the seat-classification replay; DemosAU's printed regional
+   column to the seat-classification count; DemosAU's printed regional
    cells ride the One Nation contests */
 assert.ok(ap.includes("rb: ffReg ? [] : FF.vsCoal") && ap.includes("rb: ffReg ? [] : FF.vsOn"),
   "on a named region RedBridge/Accent's waves drop out of both contests (\"there should be no RedBridge/Accent polls\")");
 assert.ok(ap.includes("dm: ffReg ? [] : (FF.demos || [])"), "DemosAU's national Labor-v-Coalition figure drops on a named region");
 assert.ok(ap.includes("bys: ffReg ? [] : (FF.bys || [])"), "the 2026 counts drop on a named region (national counts)");
 assert.ok(ap.includes("ref: E ? (ffReg && E[ffReg] ? E[ffReg] : E.all) : null"),
-  "the election column rekeys to the class's seat replay, All voters the whole replay");
+  "the election column rekeys to the class's seats, All voters the 115 seats whole");
 assert.ok(ap.includes('refSub: (ffReg ? regName : "as counted") + "*"'),
-  "every election view carries the derived star — all four are the one replay now");
+  "every election view carries the star — all four cover only the seats that finished Labor v Coalition");
 assert.ok(ap.includes("dm: rekeyMrp(FF.demosOn)") && ap.includes("dm: rekeyMrp(FF.lnpOn)"),
   "the One Nation contests' DemosAU cells ride the region menu");
 assert.ok(ap.includes("const rekeyMrp = (ws)") && ap.includes("...w, ...w.all, wt: true"),
