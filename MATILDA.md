@@ -466,7 +466,7 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
   One Nation an option from June 2026; `.build/extract-ipsos.mjs` caches
   the national reports and methodology statements as text in
   `.build/ipsos-src/`, fetched daily by `ipsos-update.yml`
-  (`.build/ipsos-updater.sh`) and again by the weekly crosstabs run. No
+  (`.build/ipsos-updater.sh`) and again by the daily crosstabs run. No
   voting intention, so deliberately not on Next expected polls).
   gen-data §7h pools ownership only as Labor/Coalition/One Nation shares
   of those naming one of the three (the one part every house's question
@@ -479,7 +479,7 @@ sibling `/vic/` (same build — see the THE SECOND JURISDICTION bullet below).
   and Spectre ask salience too but aren't pooled (Info cites them as
   checks). The RedBridge, Resolve and News24 updaters run issues.mjs
   (refresh_crosstabs), the daily Ipsos run does whenever it caches a new
-  file (failing, once, on a new report that doesn't read), and the weekly
+  file (failing, once, on a new report that doesn't read), and the daily
   crosstabs run fails on a stale wave, an unmapped label, or Ipsos quiet
   for 90 days. See the
   auspol-issues-panel skill.

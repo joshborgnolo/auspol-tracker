@@ -1,5 +1,5 @@
 #!/bin/bash
-# Weekly crosstabs catch-up: vote-switching.mjs + demographics.mjs + issues.mjs
+# Daily crosstabs catch-up: vote-switching.mjs + demographics.mjs + issues.mjs
 # + confidence.mjs (ANZ–Roy Morgan consumer confidence + Roy Morgan business
 # confidence, for the Snapshot's "Economic sentiment" panel)
 # -> if any file changed -> validate -> render-card -> build -> commit -> push.
@@ -7,7 +7,7 @@
 #
 # Every YouGov/News24, DemosAU, RedBridge and Resolve update already reads
 # its own wave's tables (refresh_crosstabs in git-push-main.sh), so most
-# weeks this is a no-op. It exists for what those runs leave pending: a
+# days this is a no-op. It exists for what those runs leave pending: a
 # chart id the laptop's Chrome run records after the CI run, a report PDF a
 # fetch didn't get, a table that didn't read cleanly. It also fetches Ipsos's
 # Issues Monitor again behind the daily Ipsos run (.build/ipsos-updater.sh),
@@ -63,7 +63,7 @@ UNKNOWN=""
 REMIND=""
 # Ipsos's Issues Monitor reports (which issues matter, and which party is
 # most capable on them) are fetched daily by .build/ipsos-updater.sh; this
-# weekly pass fetches them again, as the backstop, for issues.mjs to read.
+# daily pass fetches them again, as the backstop, for issues.mjs to read.
 # A page that won't load is a warning here – the cache stays, and issues.mjs
 # fails the run once Ipsos has been quiet too long. A newly cached file is
 # committed even when no figure moves, so the tree (the laptop clone's
@@ -71,7 +71,7 @@ REMIND=""
 IPS="$(node .build/extract-ipsos.mjs 2>&1)"
 log "$(echo "$IPS" | tail -1)"
 # SEC Newgate's bi-monthly Mood of the Nation (national direction) is
-# fetched daily by .build/secnewgate-updater.sh; this weekly pass runs the
+# fetched daily by .build/secnewgate-updater.sh; this daily pass runs the
 # extractor again, as the backstop, and is the alarm for the house gone
 # quiet (QUIET_DAYS), which the extractor lists as `stale` in its status
 # line. A page that won't load is a warning here – the cache stays.
@@ -88,7 +88,7 @@ case "$SECLAST" in
     ;;
 esac
 # EMRS (Tas)'s federal voting-intention reports are fetched daily by
-# .build/emrs-updater.sh; this weekly pass runs the extractor again, as the
+# .build/emrs-updater.sh; this daily pass runs the extractor again, as the
 # backstop, and is the alarm for the house gone quiet (QUIET_DAYS), which
 # the extractor lists as `stale` in its status line. A page or PDF that
 # won't load is a warning here – the cache stays.
@@ -97,8 +97,8 @@ EMRSLAST="$(echo "$EMRS" | tail -1)"
 log "$EMRSLAST"
 case "$EMRSLAST" in
   EMRS_STATUS*'"guard":true'*)
-    # a canon mismatch or guard-tripping wave: the daily run fails on it
-    # and agent-repair takes it; the weekly run records the same
+    # a canon mismatch or guard-tripping wave: the emrs-specific daily run
+    # fails on it and agent-repair takes it; this run records the same
     UNFINISHED="$UNFINISHED emrs"
     ;;
   EMRS_STATUS*)

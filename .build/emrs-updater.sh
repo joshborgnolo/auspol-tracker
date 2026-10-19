@@ -9,7 +9,7 @@
 # voting-intention battery in some waves: its reports appear on
 # emrs.com.au/latest-news-and-results days after fieldwork closes, on no
 # fixed weekday, in office hours, so those hours are combed; before this
-# workflow existed the waves were hand-entered. The weekly crosstabs run
+# workflow existed the waves were hand-entered. The daily crosstabs run
 # runs the extractor too, and stays the alarm for the house gone quiet
 # (QUIET_DAYS in extract-emrs.mjs — the observed federal cadence is
 # ~6-monthly, not the PDF's "quarterly").

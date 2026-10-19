@@ -11,10 +11,9 @@
 # issues panel alone. A report goes up about three weeks after its fieldwork
 # closes, on no fixed weekday and mostly in the afternoon, and the panel
 # counts Ipsos's newest poll for only part of each month – so it is combed
-# through the hours it uploads in. The weekly crosstabs run, the only fetcher before 2026-09-26, would
-# have picked 2026's reports up 2 to 7 days after they went up. That run
-# still fetches Ipsos too, and stays the alarm for a month left unread
-# (stale) and for Ipsos gone quiet (IP_QUIET_DAYS in issues.mjs).
+# through the hours it uploads in. The daily crosstabs run, the only fetcher
+# before 2026-09-26, fetches Ipsos too, and stays the alarm for a month left
+# unread (stale) and for Ipsos gone quiet (IP_QUIET_DAYS in issues.mjs).
 #
 # Nothing new cached: no rebuild, no commit – a no-op in seconds. A newly
 # cached file is committed even when no figure moves, so the next run doesn't

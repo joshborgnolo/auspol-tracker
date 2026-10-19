@@ -10,7 +10,7 @@
 # direction / wrong track) and feeds the National-direction panel alone –
 # no house row in "Next expected polls". A report goes up within days of
 # its fieldwork closing, on no fixed weekday, in office hours, so those
-# hours are combed; before this workflow existed there was no fetcher at all. The weekly crosstabs
+# hours are combed; before this workflow existed there was no fetcher at all. The daily crosstabs
 # run runs the extractor too, and stays the alarm for the house gone quiet
 # (QUIET_DAYS in extract-secnewgate.mjs).
 #

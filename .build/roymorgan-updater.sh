@@ -11,7 +11,7 @@
 # State / CITY-COUNTRY table images into data/roymorgan-demo.json, which
 # demographics.mjs merges. macOS-only (Vision OCR); the CI twin notes and
 # reports changed:false. Warn-only, never blocks the poll pipeline: a guard
-# trip is logged and demo-watch.mjs + the weekly crosstabs run are the
+# trip is logged and demo-watch.mjs + the daily crosstabs run are the
 # backstop. A move here is committed with the poll files when a wave also
 # landed, or alone (validate + rebuild) on a quiet fortnight.
 #
