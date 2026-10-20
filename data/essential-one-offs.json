@@ -20075,7 +20075,7 @@
    "sampleEff": 913,
    "url": "https://essentialreport.com.au/reports/29-april-2026",
    "question": "Approval of Pauline Hanson as One Nation Leader",
-   "notes": "A single read of Hanson as leader – unchannelled because the site's leadership model tracks the two main offices only.",
+   "notes": "A single read of Hanson as leader. The leadership model now tracks Hanson's approval too, but the Essential waves never file into approval[] (han:null on every Essential row), so this stays the read's sole home.",
    "qid": "28728546",
    "tables": [
     {

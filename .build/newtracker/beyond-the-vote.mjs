@@ -1672,7 +1672,6 @@ const TITLES = {
   "immigration-impact|essential": "The impact of immigration, area by area",
   "immigration-views": "Four views of immigration: which is closest to yours?",
   "immigration-terror-controlled-regions": "Should immigration from regions run by terrorist groups be restricted?",
-  "best-party-immigration-policies": "Which party is best at managing immigration?",
   "immigration-cap": "Is the immigration cap too high, too low or about right?",
   "hanson-immigration-settings": "Is Pauline Hanson right that immigration settings are wrong?",
   "migration-skills-restriction": "Should permanent migration be limited to needed skills?",
@@ -1814,7 +1813,6 @@ const TITLES = {
   "protest-support": "Where should large protests be allowed?",
   "antisemitism-policies": "Support for measures against antisemitism, before Bondi",
   /* climate and energy */
-  "best-party-climate-and-energy": "Which party is best at managing climate change?",
   "gov-action-environment": "Is the government doing enough on the environment?",
   "preventing-global-warming": "Will the world prevent dangerous global warming?",
   "cop31-hosting": "Should Australia host COP31?",

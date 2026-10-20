@@ -94,7 +94,6 @@ export const THEME_OF = {
   // news24
   "multiculturalism": "immigration",
   "immigration-terror-controlled-regions": "immigration",
-  "best-party-immigration-policies": "immigration",
   // news24+newspoll
   "immigration-levels": "immigration",
   // resolve
@@ -339,7 +338,6 @@ export const THEME_OF = {
   "gov-action-environment": "climate-energy",
   // news24
   "oil-gas-exploration-vs-net-zero": "climate-energy",
-  "best-party-climate-and-energy": "climate-energy",
   // secnewgate
   "renewables-bills-impact": "climate-energy",
   "renewables-reliability-impact": "climate-energy",

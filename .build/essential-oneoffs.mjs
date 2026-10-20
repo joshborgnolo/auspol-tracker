@@ -66,7 +66,7 @@ const MANIFEST = [
   { id: "gender-quotas-coalition", ds: "support_for_coalition_introducing_gender_quotas" },
   { id: "angus-taylor-impact", ds: "angus_taylor_impact" },
   { id: "hanson-approval", ds: "approval_of_pauline_hanson",
-    note: "A single read of Hanson as leader – unchannelled because the site's leadership model tracks the two main offices only." },
+    note: "A single read of Hanson as leader. The leadership model now tracks Hanson's approval too, but the Essential waves never file into approval[] (han:null on every Essential row), so this stays the read's sole home." },
   { id: "allan-approval", ds: "approval_of_jacinta_allan", note: "State-leadership ratings file as one-offs (unchannelled)." },
   { id: "battin-approval", ds: "approval_of_brad_battin", note: "State-leadership ratings file as one-offs (unchannelled)." },
   { id: "labor-mandate", ds: "labor_s_election_mandate" },
