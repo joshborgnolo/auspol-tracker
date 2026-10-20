@@ -4739,6 +4739,7 @@ body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
 body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
 body.rd .rd-sw-cycle { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--ink-3); text-underline-offset: 4px; }
 body.rd .rd-sw-cycle:hover, body.rd .rd-sw-cycle:focus-visible { color: var(--accent); text-decoration-color: var(--accent); text-decoration-style: solid; }
+body.rd #switching { touch-action: manipulation; }
 body.rd .rd-go-wrap { margin-top: 36px; }
 body.rd .rd-go { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
 body.rd .rd-go text { font-family: var(--sans); }
@@ -113686,7 +113687,8 @@ Object.assign(window, {
   gpShotAt,
   gpKnock
 });</script>
-  <script>function RdSec({
+  <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+function RdSec({
   id,
   cls,
   first,
@@ -113695,15 +113697,43 @@ Object.assign(window, {
   tools,
   children,
   labelledBy,
-  facet
+  facet,
+  dblCycle
 }) {
   const hid = React.useId();
-  return React.createElement("section", {
+  const tapRef = React.useRef(null);
+  const cycProps = !dblCycle ? null : {
+    onDoubleClick: e => {
+      if (e.target.closest("button, a, input, select, textarea, svg")) return;
+      const c = tapRef.current ? tapRef.current.c || 0 : 0;
+      if (c && e.timeStamp - c < 300) return;
+      tapRef.current = null;
+      dblCycle();
+    },
+    onPointerUp: e => {
+      if (e.pointerType === "mouse" || e.target.closest("button, a, input, select, textarea, svg")) return;
+      const p = tapRef.current,
+        now = e.timeStamp;
+      if (p && p.t && now - p.t < 350 && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 24) {
+        tapRef.current = {
+          c: now
+        };
+        dblCycle();
+        return;
+      }
+      tapRef.current = {
+        t: now,
+        x: e.clientX,
+        y: e.clientY
+      };
+    }
+  };
+  return React.createElement("section", _extends({
     className: "rd-sec" + (first ? " rd-first" : "") + (cls ? " " + cls : ""),
     id: id,
     "aria-labelledby": labelledBy || hid,
     "data-facet": facet
-  }, React.createElement("div", {
+  }, cycProps), React.createElement("div", {
     className: "rd-eyebrow"
   }, React.createElement("h2", {
     className: "rd-title",
@@ -121202,6 +121232,7 @@ function RdSwitching({
     id: "switching",
     cls: "rd-sw",
     title: cycTitle,
+    dblCycle: cyc,
     meta: "How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")
   }, V === "onp" ? React.createElement(React.Fragment, null, head && React.createElement(RdHed, {
     head: head,

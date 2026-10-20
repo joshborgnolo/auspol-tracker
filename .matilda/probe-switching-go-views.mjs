@@ -13,8 +13,16 @@
      mosaic at >=641px (one column per destination, widths summing to the
      strip, figures matching the pooled nows, the kept column senior),
      variable-height .rd-go-row rows on a phone (fill width = share, kept
-     row carries the big kept figure and the "Went elsewhere" caption);
-   - a trend chart per destination; nothing overflows at 320/390/900/1440. */
+     row carries the big kept figure and the "Went elsewhere" caption -
+     inline .rd-go-else while the residue holds it, .rd-go-elsebelow on
+     its own line once it no longer does, 06b9e791 user call 2026-10-20);
+   - a trend chart per destination; nothing overflows at 320/390/900/1440.
+   DOUBLE-CLICK/TAP CYCLING (user, 2026-10-20, RdSec's dblCycle): a
+   double-click anywhere in the section but on a control walks the cycle
+   one step; touch plays it as a double-tap (two taps within 350ms and
+   24px). Double-clicking the title BUTTON walks two steps - its two
+   clicks cycle one each and the section-level dblclick leaves controls
+   alone. An svg (mosaic/chart) tap area never cycles. */
 import puppeteer from "puppeteer-core";
 import fs from "fs";
 import path from "path";
@@ -48,13 +56,19 @@ const state = () => page.evaluate(() => {
     const bar = r.querySelector(".rd-go-rbar");
     const fill = r.querySelector(".rd-go-rbar span");
     const em = r.querySelector(".rd-go-rbar em");
+    /* the "Went elsewhere" caption has lived in two placements since
+       06b9e791 (user call 2026-10-20): inline .rd-go-else while the residue
+       holds it, .rd-go-elsebelow on its own line once it no longer does -
+       exactly one of the two must render */
+    const elseN = r.querySelectorAll(".rd-go-else, .rd-go-elsebelow").length;
     return {
       v,
       fillPct: bar && fill ? (fill.getBoundingClientRect().width / bar.getBoundingClientRect().width) * 100 : null,
       emOverflow: em && bar ? em.getBoundingClientRect().right - bar.getBoundingClientRect().right : null,
       heights: bar ? bar.getBoundingClientRect().height : null,
       keptBig: !!r.querySelector(".rd-go-first"),
-      elsewhere: !!r.querySelector(".rd-go-else"),
+      elsewhere: elseN === 1,
+      elseText: elseN ? r.querySelector(".rd-go-else, .rd-go-elsebelow").textContent : null,
       overflow: t ? t.scrollWidth - t.clientWidth : null,
     };
   });
@@ -144,7 +158,8 @@ async function probe(width) {
           check((r.overflow || 0) <= 1, `row ${i + 1} (${key}) head row fits (${r.overflow}px)`);
         });
         check(s.rows.length >= 2 && s.rows[0].v > s.rows[1].v, "kept is the senior row");
-        check(s.rows[0].keptBig && s.rows[0].elsewhere, "kept row carries the big figure and the “Went elsewhere” caption");
+        check(s.rows[0].keptBig && s.rows[0].elsewhere, "kept row carries the big figure and the “Went elsewhere” caption (either placement)");
+        check(s.rows[0].elseText === "Went elsewhere", `the kept caption reads “Went elsewhere” («${s.rows[0].elseText}»)`);
       } else {
         check(s.svgGo, "the laptop column mosaic renders");
         check(s.cols.length === keys.length, `${s.cols.length} destination columns render (data has ${keys.length})`);
@@ -174,6 +189,65 @@ async function probe(width) {
 }
 
 for (const w of [320, 390, 900, 1440]) await probe(w);
+
+/* ---- double-click/tap cycling (dblCycle on RdSec) ---- */
+const titleIs = async (wantKey) => {
+  const t = await page.evaluate(() => document.querySelector("#switching .rd-title").textContent);
+  const okT = expectTitle[wantKey].test(t);
+  check(okT, `view is ${wantKey} («${t}»)`);
+};
+const dblclick = (selector) => page.evaluate((sel) => {
+  const el = document.querySelector(sel);
+  if (!el) throw new Error("no element " + sel);
+  el.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, cancelable: true }));
+}, selector);
+const settle = (ms) => new Promise((r) => setTimeout(r, ms)); // intentional-sleep: view mount + glide settle
+
+console.log("mouse double-click cycling (1280):");
+await openAt(1280);
+await titleIs("onp");
+await dblclick("#switching .rd-dek"); await settle(400);
+await titleIs("lnp");
+for (const k of ["alp", "grn", "onp"]) { await dblclick("#switching .rd-dek"); await settle(400); await titleIs(k); }
+await page.evaluate(() => document.querySelector("#switching .rd-sw-cycle").click());
+await settle(150);
+await page.evaluate(() => document.querySelector("#switching .rd-sw-cycle").click());
+await settle(150);
+await page.evaluate(() => document.querySelector("#switching .rd-sw-cycle")
+  .dispatchEvent(new MouseEvent("dblclick", { bubbles: true, cancelable: true })));
+await settle(400);
+await titleIs("alp"); // two clicks walked onp -> lnp -> alp; the trailing dblclick adds no third step
+await dblclick("#switching svg"); await settle(300);
+await titleIs("alp");
+await dblclick("#switching .rd-dek"); await settle(400); await titleIs("grn");
+await dblclick("#switching .rd-dek"); await settle(400); await titleIs("onp");
+
+console.log("touch double-tap cycling (390):");
+await page.setViewport({ width: 390, height: 950, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+await page.goto("file://" + path.join(BASE, "index.html"), { waitUntil: "networkidle0", timeout: 60000 });
+await page.waitForSelector("#switching .rd-sw-cycle", { timeout: 30000 });
+await page.evaluate(() => document.querySelector("#switching").scrollIntoView());
+await settle(400);
+const spot = await page.evaluate(() => {
+  const r = document.querySelector("#switching .rd-title").getBoundingClientRect();
+  return { x: r.left + 8, y: r.top + 6 };
+});
+await titleIs("onp");
+await page.touchscreen.tap(spot.x, spot.y);
+await page.touchscreen.tap(spot.x, spot.y);
+await settle(400);
+await titleIs("lnp");
+await page.touchscreen.tap(spot.x, spot.y); await settle(500);
+await page.touchscreen.tap(spot.x, spot.y); await settle(400);
+await titleIs("lnp");
+await page.touchscreen.tap(spot.x, spot.y);
+await page.touchscreen.tap(spot.x + 30, spot.y);
+await settle(400);
+await titleIs("lnp");
+await page.touchscreen.tap(spot.x, spot.y);
+await page.touchscreen.tap(spot.x, spot.y);
+await settle(400);
+await titleIs("alp");
 
 await browser.close();
 if (fails.length) { console.error("\n" + fails.length + " FAILURES"); process.exit(1); }

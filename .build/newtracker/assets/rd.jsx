@@ -13,11 +13,42 @@
    A dark rule over a sentence-case section title, with the title's meta
    beside it; then the section's finding as a serif headline and its deck.
    `first` drops the rule: the first section sits under the masthead's. */
-function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet }) {
+function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet, dblCycle }) {
   const hid = React.useId();
+  const tapRef = React.useRef(null);
+  /* dblCycle: a double-click anywhere in the section but on a control walks
+     its view cycle one step (the switching panel's came-from/going views,
+     2026-10-20 user ask - single tap on the title's party word already
+     cycles, Space cycles, and now double-click/tap does). Touch fires no
+     dblclick, so a second tap within 350ms and 24px of the first plays the
+     double-click; a control's own targets are left to their own gestures
+     (the title button's two clicks simply walk the cycle twice). */
+  const cycProps = !dblCycle ? null : {
+    onDoubleClick: (e) => {
+      if (e.target.closest("button, a, input, select, textarea, svg")) return;
+      /* a touch double-tap is often reported twice: once by the pointerup
+         pair below, once by a compatibility dblclick (desktop Chrome does
+         this for emulated/Android touch) - within 300ms of the pair's own
+         cycle the dblclick is the same gesture, not a new one */
+      const c = tapRef.current ? tapRef.current.c || 0 : 0;
+      if (c && e.timeStamp - c < 300) return;
+      tapRef.current = null;
+      dblCycle();
+    },
+    onPointerUp: (e) => {
+      if (e.pointerType === "mouse" || e.target.closest("button, a, input, select, textarea, svg")) return;
+      const p = tapRef.current, now = e.timeStamp;
+      if (p && p.t && now - p.t < 350 && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 24) {
+        tapRef.current = { c: now };
+        dblCycle();
+        return;
+      }
+      tapRef.current = { t: now, x: e.clientX, y: e.clientY };
+    },
+  };
   return (
     <section className={"rd-sec" + (first ? " rd-first" : "") + (cls ? " " + cls : "")}
-             id={id} aria-labelledby={labelledBy || hid} data-facet={facet}>
+             id={id} aria-labelledby={labelledBy || hid} data-facet={facet} {...cycProps}>
       <div className="rd-eyebrow">
         <h2 className="rd-title" id={hid}>{title}</h2>
         {meta ? <span className="rd-meta">{meta}</span> : null}

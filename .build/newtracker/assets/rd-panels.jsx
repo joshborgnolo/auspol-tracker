@@ -4060,8 +4060,10 @@ function RdSwitching({ rangeId }) {
     </div>
   );
 
+  /* a double-click/tap anywhere in the section walks the same cycle the
+     title's party-word button and Space do (dblCycle is RdSec's) */
   return (
-    <RdSec id="switching" cls="rd-sw" title={cycTitle}
+    <RdSec id="switching" cls="rd-sw" title={cycTitle} dblCycle={cyc}
            meta={"How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
       {V === "onp" ? (
         <>
