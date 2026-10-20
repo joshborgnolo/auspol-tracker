@@ -3262,7 +3262,8 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ex-slot:empty { display: none; }
 .ex-chart { margin: 12px 0 26px; }
 .ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
-.ex-flow-chips + .ex-flow-chips { margin-top: 8px; }
+.ex-flow-flip { margin: 22px 0 0; }
+.ex-flow-chips + .ex-flow-flip { margin-top: 8px; }
 .ex-chip {
   font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
   padding: 7px 13px; border-radius: 999px; cursor: pointer;
@@ -134831,22 +134832,20 @@ function RdExplained() {
     className: "ex-chip" + (k === active ? " on" : ""),
     onClick: () => setJur(k)
   }, FH[k].label))), React.createElement("div", {
-    className: "ex-flow-chips",
-    role: "tablist",
-    "aria-label": "Direction"
-  }, React.createElement("button", {
+    className: "ex-flow-flip"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Direction:"), React.createElement("button", {
     type: "button",
-    role: "tab",
-    "aria-selected": !inv,
-    className: "ex-chip" + (inv ? "" : " on"),
-    onClick: () => setInv(false)
-  }, "Labor over Coalition"), React.createElement("button", {
-    type: "button",
-    role: "tab",
-    "aria-selected": inv,
-    className: "ex-chip" + (inv ? " on" : ""),
-    onClick: () => setInv(true)
-  }, "Coalition over Labor")), React.createElement(ExplainedFlowChart, {
+    className: "rd-pl-flip",
+    "aria-pressed": inv,
+    title: inv ? "Switch to shares preferencing Labor over the Coalition" : "Switch to shares preferencing the Coalition over Labor",
+    onClick: () => setInv(!inv)
+  }, inv ? "Coalition over Labor" : "Labor over Coalition", " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")))), React.createElement(ExplainedFlowChart, {
     jur: active,
     inv: inv
   })));

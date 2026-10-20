@@ -5697,9 +5697,18 @@ function RdExplained() {
             ))}
           </div>
         )}
-        <div className="ex-flow-chips" role="tablist" aria-label="Direction">
-          <button type="button" role="tab" aria-selected={!inv} className={"ex-chip" + (inv ? "" : " on")} onClick={() => setInv(false)}>Labor over Coalition</button>
-          <button type="button" role="tab" aria-selected={inv} className={"ex-chip" + (inv ? " on" : "")} onClick={() => setInv(true)}>Coalition over Labor</button>
+        {/* the flip idiom of the Latest section's Two-party control: the
+            label names the dimension, the button the ACTIVE direction; the
+            title announces where a press goes (user call 2026-10-20) */}
+        <div className="ex-flow-flip">
+          <span className="rd-pl-ctl">
+            <span className="rd-pl-ctl-l">Direction:</span>
+            <button type="button" className="rd-pl-flip" aria-pressed={inv}
+                    title={inv ? "Switch to shares preferencing Labor over the Coalition" : "Switch to shares preferencing the Coalition over Labor"}
+                    onClick={() => setInv(!inv)}>
+              {inv ? "Coalition over Labor" : "Labor over Coalition"} <span aria-hidden="true">⇄</span>
+            </button>
+          </span>
         </div>
         <ExplainedFlowChart jur={active} inv={inv} />
       </div>
