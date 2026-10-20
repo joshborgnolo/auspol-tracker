@@ -4263,8 +4263,8 @@ body.rd .rd-pl-ctl { display: inline-flex; align-items: center; gap: 6px; font-s
 body.rd .rd-tabs > .rd-pl-ctl { margin-bottom: -1px; }
 body.rd .rd-pl-ctl-l { color: var(--ink-3); }
 body.rd .rd-pl-flip { all: unset; cursor: pointer; font-weight: 600; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
-body.rd .rd-pl-flip span { color: var(--ink-3); font-weight: 400; }
-body.rd .rd-pl-flip:hover { text-decoration: underline; text-underline-offset: 3px; }
+body.rd .rd-pl-flip span[aria-hidden] { color: var(--ink-3); font-weight: 400; }
+body.rd .rd-pl-flip:hover .rd-pl-flip-t { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-pl-flip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 body.rd .rd-pl { margin-top: 8px; font-variant-numeric: tabular-nums; }
 body.rd .rd-pl-head, body.rd .rd-pl-row {
@@ -124396,7 +124396,9 @@ function RdPolls({
     className: "rd-pl-flip",
     onClick: flipPick,
     title: "Show Labor v " + (onMatch ? "the Coalition" : "One Nation") + " instead"
-  }, "Labor v ", rivalName, " ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, "Labor v ", rivalName), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")), React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -132164,7 +132166,9 @@ function RdAllPolls(P) {
     className: "rd-pl-flip",
     title: "Switch the page to Labor v " + (onM ? "Coalition" : "One Nation"),
     onClick: flipPick
-  }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, "Labor v ", onM ? "One Nation" : "Coalition"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
   const consFlip = React.createElement("button", {
@@ -132173,7 +132177,9 @@ function RdAllPolls(P) {
     "aria-pressed": consM,
     title: consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)",
     onClick: consFlipPick
-  }, consM ? "Voting consideration" : "Voting intention", " ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, consM ? "Voting consideration" : "Voting intention"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
   const confLaneFlip = React.createElement("button", {
@@ -132182,7 +132188,9 @@ function RdAllPolls(P) {
     "aria-pressed": confBus,
     title: confBus ? "Switch to the consumer confidence gauges" : "Switch to the business confidence gauges",
     onClick: confLanePick
-  }, confBus ? "Business" : "Consumer", " confidence ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, confBus ? "Business" : "Consumer", " confidence"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
   const consQpop = !consM ? null : React.createElement(RdQPop, {
@@ -133339,7 +133347,9 @@ function RdHouseLean({
     className: "rd-pl-flip",
     title: "Switch the page to Labor v " + (onM ? "Coalition" : "One Nation"),
     onClick: flipPick
-  }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, "Labor v ", onM ? "One Nation" : "Coalition"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
   return React.createElement("section", {
@@ -134964,7 +134974,9 @@ function RdExplained() {
     "aria-pressed": inv,
     title: inv ? "Switch to shares preferencing Labor over the Coalition" : "Switch to shares preferencing the Coalition over Labor",
     onClick: () => setInv(!inv)
-  }, inv ? "Coalition over Labor" : "Labor over Coalition", " ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, inv ? "Coalition over Labor" : "Labor over Coalition"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")))), React.createElement(ExplainedFlowChart, {
     jur: active,

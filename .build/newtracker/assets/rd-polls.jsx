@@ -476,7 +476,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       {!narrow && <span className="rd-pl-ctl-l">Two-party:</span>}
       <button type="button" className="rd-pl-flip" onClick={flipPick}
               title={"Show Labor v " + (onMatch ? "the Coalition" : "One Nation") + " instead"}>
-        Labor v {rivalName} <span aria-hidden="true">⇄</span></button>
+        <span className="rd-pl-flip-t">Labor v {rivalName}</span> <span aria-hidden="true">⇄</span></button>
       <span className="rd-pl-ctl-l">, {narrow ? (basis === "resp" ? "published" : "implied") : basisWord}</span>
       <RdQPop label="How the two-party figures are counted" align="left">
         <h4>How the two-party figures are counted</h4>

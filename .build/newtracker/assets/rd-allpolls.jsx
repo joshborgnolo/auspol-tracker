@@ -3891,7 +3891,7 @@ function RdAllPolls(P) {
   );
   const flip = (
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
-            onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
+            onClick={flipPick}><span className="rd-pl-flip-t">Labor v {onM ? "One Nation" : "Coalition"}</span> <span aria-hidden="true">⇄</span></button>
   );
   const consFlip = (
     /* label reads the ACTIVE mode, the same contract the 2PP matchup flip
@@ -3899,14 +3899,14 @@ function RdAllPolls(P) {
        still announces where a press goes (user call 2026-10-15) */
     <button type="button" className="rd-pl-flip" aria-pressed={consM}
             title={consM ? "Switch the figures back to voting intention" : "Switch the figures to voting consideration (the parties voters would consider supporting)"}
-            onClick={consFlipPick}>{consM ? "Voting consideration" : "Voting intention"} <span aria-hidden="true">⇄</span></button>
+            onClick={consFlipPick}><span className="rd-pl-flip-t">{consM ? "Voting consideration" : "Voting intention"}</span> <span aria-hidden="true">⇄</span></button>
   );
   const confLaneFlip = (
     /* the label names the ACTIVE lane, the consideration flip's contract;
        the title announces where a press goes */
     <button type="button" className="rd-pl-flip" aria-pressed={confBus}
             title={confBus ? "Switch to the consumer confidence gauges" : "Switch to the business confidence gauges"}
-            onClick={confLanePick}>{confBus ? "Business" : "Consumer"} confidence <span aria-hidden="true">⇄</span></button>
+            onClick={confLanePick}><span className="rd-pl-flip-t">{confBus ? "Business" : "Consumer"} confidence</span> <span aria-hidden="true">⇄</span></button>
   );
   const consQpop = !consM ? null : (
     <RdQPop label="What voting consideration figures are, and which waves collected them" align="left">
@@ -4639,7 +4639,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   }, []);
   const flip = (
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
-            onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
+            onClick={flipPick}><span className="rd-pl-flip-t">Labor v {onM ? "One Nation" : "Coalition"}</span> <span aria-hidden="true">⇄</span></button>
   );
   return (
     <section className="rd-sec rd-hl" id="house-lean" aria-labelledby="rd-hl-t">
@@ -5706,7 +5706,7 @@ function RdExplained() {
             <button type="button" className="rd-pl-flip" aria-pressed={inv}
                     title={inv ? "Switch to shares preferencing Labor over the Coalition" : "Switch to shares preferencing the Coalition over Labor"}
                     onClick={() => setInv(!inv)}>
-              {inv ? "Coalition over Labor" : "Labor over Coalition"} <span aria-hidden="true">⇄</span>
+              <span className="rd-pl-flip-t">{inv ? "Coalition over Labor" : "Labor over Coalition"}</span> <span aria-hidden="true">⇄</span>
             </button>
           </span>
         </div>
