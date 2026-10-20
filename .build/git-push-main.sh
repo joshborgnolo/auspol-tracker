@@ -179,7 +179,7 @@ acquire_slot_lock() {
       oldpid=""
       [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
       lock_age=999999
-      lock_mtime="$(stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null || stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null)"
+      lock_mtime="$(stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null || stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null)"
       [ -n "$lock_mtime" ] && lock_age=$(( $(date +%s) - lock_mtime ))
       # A holder mkdirs, then writes its pid: a pidless dir seconds old is
       # a live holder mid-acquire, not a stale lock to reap.
