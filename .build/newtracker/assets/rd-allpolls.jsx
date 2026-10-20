@@ -5699,7 +5699,7 @@ function RdExplained() {
             {KEYS.map((k) => (
               <button key={k} type="button" role="tab" aria-selected={k === active}
                 className={"ex-chip" + (k === active ? " on" : "")} onClick={() => setJur(k)}>
-                {FH[k].label}
+                {FH[k].short || FH[k].label}
               </button>
             ))}
           </div>

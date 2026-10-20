@@ -8265,6 +8265,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     },
     "vic": {
       "label": "Victoria",
+      "short": "Vic",
       "elections": "Victorian state elections",
       "srcAs": "the Victorian Electoral Commission’s distributions of preferences",
       "estimated": true,
@@ -8280,6 +8281,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     },
     "wa": {
       "label": "Western Australia",
+      "short": "WA",
       "elections": "Western Australian state elections",
       "srcAs": "the Western Australian Electoral Commission’s distributions of preferences",
       "estimated": true,
@@ -8295,6 +8297,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     },
     "sa": {
       "label": "South Australia",
+      "short": "SA",
       "elections": "South Australian state elections",
       "srcAs": "the Electoral Commission SA’s distributions of preferences",
       "estimated": true,
@@ -8310,6 +8313,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     },
     "qld": {
       "label": "Queensland",
+      "short": "Qld",
       "elections": "Queensland state elections",
       "srcAs": "the Electoral Commission of Queensland’s distributions of preferences",
       "estimated": true,
@@ -8325,6 +8329,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     },
     "nsw": {
       "label": "New South Wales",
+      "short": "NSW",
       "elections": "New South Wales state elections",
       "srcAs": "the NSW Electoral Commission’s ballot-level preference data",
       "estimated": false,
@@ -134994,7 +134999,7 @@ function RdExplained() {
     "aria-selected": k === active,
     className: "ex-chip" + (k === active ? " on" : ""),
     onClick: () => setJur(k)
-  }, FH[k].label))), React.createElement("div", {
+  }, FH[k].short || FH[k].label))), React.createElement("div", {
     className: "ex-flow-flip"
   }, React.createElement("span", {
     className: "rd-pl-ctl"

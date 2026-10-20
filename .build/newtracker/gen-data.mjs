@@ -4313,12 +4313,14 @@ const ONP_MIN_PRIM = 2;
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", elections: "Australian federal elections", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
   const JURIS = {
-    vic: { label: "Victoria", elections: "Victorian state elections", srcAs: "the Victorian Electoral Commission’s distributions of preferences" },
-    wa: { label: "Western Australia", elections: "Western Australian state elections", srcAs: "the Western Australian Electoral Commission’s distributions of preferences" },
-    sa: { label: "South Australia", elections: "South Australian state elections", srcAs: "the Electoral Commission SA’s distributions of preferences" },
-    qld: { label: "Queensland", elections: "Queensland state elections", srcAs: "the Electoral Commission of Queensland’s distributions of preferences" },
-    nt: { label: "Northern Territory", elections: "Northern Territory elections", srcAs: "the NT Electoral Commission’s distributions of preferences" },
-    nsw: { label: "New South Wales", elections: "New South Wales state elections", srcAs: "the NSW Electoral Commission’s ballot-level preference data" },
+    // short is the jurisdiction picker's chip face (user call 2026-10-20);
+    // label stays full for the chart's unit line, tooltip and aria text
+    vic: { label: "Victoria", short: "Vic", elections: "Victorian state elections", srcAs: "the Victorian Electoral Commission’s distributions of preferences" },
+    wa: { label: "Western Australia", short: "WA", elections: "Western Australian state elections", srcAs: "the Western Australian Electoral Commission’s distributions of preferences" },
+    sa: { label: "South Australia", short: "SA", elections: "South Australian state elections", srcAs: "the Electoral Commission SA’s distributions of preferences" },
+    qld: { label: "Queensland", short: "Qld", elections: "Queensland state elections", srcAs: "the Electoral Commission of Queensland’s distributions of preferences" },
+    nt: { label: "Northern Territory", short: "NT", elections: "Northern Territory elections", srcAs: "the NT Electoral Commission’s distributions of preferences" },
+    nsw: { label: "New South Wales", short: "NSW", elections: "New South Wales state elections", srcAs: "the NSW Electoral Commission’s ballot-level preference data" },
   };
   if (JUR) return h;
   let csv = null, bt = null;
@@ -4358,7 +4360,7 @@ const flowHistory = (() => {
     STATE_BUCKETS.forEach((b) => errs[b].push(...col(b, "e").filter((e) => e != null)));
     // counted (NSW) or estimated, never a mix within one jurisdiction
     const isCounted = years.every((y) => Object.values(bag[jk][y]).every((x) => x.counted));
-    h[jk] = { label: meta.label, elections: meta.elections, srcAs: meta.srcAs,
+    h[jk] = { label: meta.label, short: meta.short, elections: meta.elections, srcAs: meta.srcAs,
       estimated: !isCounted, counted: isCounted,
       asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
       years, grn: col("grn", "v"), onp: col("onp", "v"), oth: col("oth", "v"),
