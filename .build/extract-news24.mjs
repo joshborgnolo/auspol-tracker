@@ -1272,7 +1272,20 @@ try {
   // the authoritative record, and the embed has precedence over prose.
   // (The 2026-10-06 OL-net entry retired once n24Prefer took self-
   // contradicting prose as the embed's case; the set stays for the next.)
-  const N24_ADJUDICATED = new Set([]);
+  // 2026-10-20 caption drift: the ppm and unemployment-expectations
+  // projects carry a stale October 6 start caption (News24 re-saves
+  // projects under today's title — its documented habit). The wave's other
+  // three windowed embeds (crosstab, 2PP Labor v One Nation, approvals) all
+  // carry October 13-20, matching Wikipedia's row and the house's
+  // fortnightly seven-day cadence (Sep 29-Oct 6, then Oct 13-20). The ppm
+  // FIGURES are fresh — Taylor 41/20/39 and Hanson 50/8/42 against the
+  // 6 Oct wave's filed 40/19/39 and 50/-/40 — so this is a caption
+  // mis-stamp on two projects, not stale data or a real window dispute; the
+  // wave keeps Wikipedia's Oct 13-20 fieldwork window.
+  const N24_ADJUDICATED = new Set([
+    "2026-10-20|caption window drift: 2026-10-06 (_/eV94Fuhrp3iWc2qYhN6U) != 2026-10-13",
+    "2026-10-20|caption window drift: 2026-10-06 (_/yUQea8IIbSHL6pdQOURK) != 2026-10-13",
+  ]);
   // Fallback: waves YouGov never released on yougov.com. Wikipedia discovers
   // the wave and its canonical article URL; with NEWSIE_CHROME=1, News24 then
   // enriches that wave before Wikipedia fills the fields News24 omits.

@@ -135,6 +135,23 @@ eq("tpp pairs", parseN24Tpp(dataOf("_/jSJgw3l3groFHC28VREB")).tpp,
   eq("unrecognised chart stays unmodelled", unknown[0].kind, "unmodelled");
 }
 
+// ---- topical one-offs: the 20 Oct 2026 wave's unemployment-expectations
+// chart (committed fixture, live capture) classifies as "topical", not
+// "unmodelled"; a renamed variant falls back to "unmodelled"
+{
+  const FX20 = path.join(DIR, ".build/news24-src/ig-fixtures-2026-10-20");
+  const fx20 = (id) => readFileSync(path.join(FX20, `ig-${id.replace("_/", "")}.html`), "utf8");
+  const topical = await n24InfogramFetch(async (id) => fx20(id), ["_/eV94Fuhrp3iWc2qYhN6U"]);
+  eq("unemployment-expectations chart classified topical", topical[0].kind, "topical");
+  const renamed = async () => {
+    const d = infographicDataOf(fx20("_/eV94Fuhrp3iWc2qYhN6U"));
+    const html = JSON.stringify(d).replace("\"Unemployment expections N24P 20102026\"", "\"Wages outlook N24P 20102026\"");
+    return `<html><script>window.infographicData=${html}</script></html>`;
+  };
+  const wages = await n24InfogramFetch(renamed, ["_/eV94Fuhrp3iWc2qYhN6U"]);
+  eq("off-subject one-off stays unmodelled", wages[0].kind, "unmodelled");
+}
+
 // ---- horserace: corroboration-only, Σ-guarded
 {
   const hr = parseN24Horserace(dataOf("_/pWKd54huH0REqno4nuue"));

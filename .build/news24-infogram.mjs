@@ -276,6 +276,13 @@ export async function n24InfogramFetch(fetchEmbed, ids) {
     // has never seen — which the extractor pages on instead of dropping
     // silently (the 6 Oct 2026 2PP failure mode).
     else if (staticChartsOf(data).length && /issues/i.test(proj.title ?? "")) { proj.kind = "issues"; }
+    // Topical one-question charts News24 adds to some waves: the 20 Oct
+    // 2026 wave shipped an unemployment-expectations table ("Unemployment
+    // expections N24P 20102026", sic) beside the modelled kinds. Nothing
+    // reads it. Match the chart's SUBJECT only — never an open-ended family
+    // — so a new-shape chart carrying voting or leadership figures still
+    // pages as genuinely unmodelled (the 6 Oct 2026 2PP failure mode).
+    else if (staticChartsOf(data).length && /unemploy/i.test(proj.title ?? "")) { proj.kind = "topical"; }
     else if (staticChartsOf(data).length) { proj.kind = "unmodelled"; }
     else { proj.state = "note"; proj.why = [ct.why, ap.why, tppR.why, hr.why].filter(Boolean).join("; "); }
     projects.push(proj);
