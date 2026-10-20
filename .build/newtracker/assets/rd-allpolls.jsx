@@ -5633,7 +5633,7 @@ function ExplainedFlowChart({ jur, inv }) {
   const span = YEARS.length > 1 ? YEARS[0] + " to " + YEARS[YEARS.length - 1] : String(YEARS[0]);
   return (
     <div className="ex-chart">
-      <span className="fc-unit">{inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in "}{S.elections || S.label + " elections"}, %</span>
+      <span className="fc-unit">{inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in "}{S.elections || S.label + " elections"}</span>
       <TrendChart
         height={narrow ? 470 : 330}
         xDomain={[x0, x1]} yDomain={[0, 100]}

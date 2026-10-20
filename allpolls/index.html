@@ -109242,7 +109242,7 @@ function FlowChart() {
   });
   return React.createElement(React.Fragment, null, React.createElement("span", {
     className: "fc-unit"
-  }, "share preferencing Labor, %"), React.createElement(TrendChart, {
+  }, "share preferencing Labor"), React.createElement(TrendChart, {
     height: narrow ? 470 : 330,
     xDomain: [1996, 2025],
     yDomain: [20, 92],
@@ -120523,6 +120523,11 @@ function RdSwitching({
     y2: 48 + GO_H,
     className: "rd-go-base"
   }));
+  const ELSE_CHOICES = ["Went elsewhere", "Elsewhere"];
+  const elseCaption = v => {
+    const residue = W * (100 - v) / 100 - 16;
+    return ELSE_CHOICES.find(o => textWidth(o, 11, 400) <= residue) || null;
+  };
   const goRowsPhone = React.createElement("div", {
     className: "rd-go-rows"
   }, goRows.map((r, i) => React.createElement("div", {
@@ -120572,12 +120577,12 @@ function RdSwitching({
       left: "calc(" + r.now.v + "% + 8px)",
       color: inkOf(r.color)
     }
-  }, gof(r.now.v), "%"), r.id === "kept" && React.createElement("i", {
+  }, gof(r.now.v), "%"), r.id === "kept" && elseCaption(r.now.v) && React.createElement("i", {
     className: "rd-go-else",
     style: {
       color: inkOf(r.color)
     }
-  }, "Went elsewhere")))));
+  }, elseCaption(r.now.v))))));
   const goSec = V === "onp" ? null : React.createElement(React.Fragment, null, goHead && React.createElement(RdHed, {
     head: goHead,
     dek: goDek
@@ -134821,7 +134826,7 @@ function ExplainedFlowChart({
     className: "ex-chart"
   }, React.createElement("span", {
     className: "fc-unit"
-  }, inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in ", S.elections || S.label + " elections", ", %"), React.createElement(TrendChart, {
+  }, inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in ", S.elections || S.label + " elections"), React.createElement(TrendChart, {
     height: narrow ? 470 : 330,
     xDomain: [x0, x1],
     yDomain: [0, 100],

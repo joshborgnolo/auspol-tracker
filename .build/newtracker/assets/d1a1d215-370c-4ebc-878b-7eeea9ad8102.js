@@ -6934,7 +6934,7 @@ function FlowChart() {
     <>
       {/* the unit rides above the plot as text rather than as an SVG label:
           inside the viewBox it scaled with the chart and vanished on a phone */}
-      <span className="fc-unit">share preferencing Labor, %</span>
+      <span className="fc-unit">share preferencing Labor</span>
       <TrendChart
         height={narrow ? 470 : 330}
         xDomain={[1996, 2025]} yDomain={[20, 92]}

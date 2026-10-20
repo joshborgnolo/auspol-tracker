@@ -3847,6 +3847,16 @@ function RdSwitching({ rangeId }) {
   /* the phone mirror of the mosaic's own phone rows: variable-height bars,
      the kept row spelling out what its two parts are as the mosaic's first
      bar does, the party named as the canvas named it */
+  /* the tint caption must sit wholly on the tint: right-pinned it slid back
+     onto the kept fill in its own hue once the fill neared 80% (Greens 78.5
+     kept 21.5 - the residue held 60px of tint against an 80px label on a
+     320px phone). Ladder it like the mosaic's labels, drop it when the
+     residue holds neither form. */
+  const ELSE_CHOICES = ["Went elsewhere", "Elsewhere"];
+  const elseCaption = (v) => {
+    const residue = W * (100 - v) / 100 - 16;
+    return ELSE_CHOICES.find((o) => textWidth(o, 11, 400) <= residue) || null;
+  };
   const goRowsPhone = (
     <div className="rd-go-rows">
       {goRows.map((r, i) => (
@@ -3868,7 +3878,7 @@ function RdSwitching({ rangeId }) {
                 <span className="rd-go-big">{gof(r.now.v)}%</span><span className="rd-go-nb">kept</span></em>
               )
             ) : <em style={{ left: "calc(" + r.now.v + "% + 8px)", color: inkOf(r.color) }}>{gof(r.now.v)}%</em>}
-            {r.id === "kept" && <i className="rd-go-else" style={{ color: inkOf(r.color) }}>Went elsewhere</i>}
+            {r.id === "kept" && elseCaption(r.now.v) && <i className="rd-go-else" style={{ color: inkOf(r.color) }}>{elseCaption(r.now.v)}</i>}
           </div>
         </div>
       ))}
