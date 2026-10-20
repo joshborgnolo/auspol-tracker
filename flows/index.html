@@ -134606,12 +134606,14 @@ function ExplainedFlowChart({
 }
 function RdExplained() {
   const ref = useRef(null);
+  const secRef = useRef(null);
   const FH = window.AUSPOL.flowHistory || {};
   const KEYS = Object.keys(FH);
   const [jur, setJur] = useState("fed");
   const active = FH[jur] ? jur : "fed";
   React.useLayoutEffect(() => {
-    const slot = document.getElementById("ex-fig-flow");
+    const sec = secRef.current;
+    const slot = sec && sec.querySelector(".ex-body .ex-slot");
     const node = ref.current;
     if (!slot || !node) return undefined;
     slot.appendChild(node);
@@ -134621,6 +134623,7 @@ function RdExplained() {
   });
   const multi = KEYS.length > 1;
   return React.createElement("section", {
+    ref: secRef,
     className: "rd-sec rd-explained",
     id: "flows-explained",
     "aria-labelledby": "rd-ex-t"

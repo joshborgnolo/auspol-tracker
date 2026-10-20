@@ -5629,12 +5629,18 @@ function ExplainedFlowChart({ jur }) {
 
 function RdExplained() {
   const ref = useRef(null);
+  const secRef = useRef(null);
   const FH = window.AUSPOL.flowHistory || {};
   const KEYS = Object.keys(FH);
   const [jur, setJur] = useState("fed");
   const active = FH[jur] ? jur : "fed";
   React.useLayoutEffect(() => {
-    const slot = document.getElementById("ex-fig-flow");
+    /* the static-summary twin of this article carries the same #ex-fig-flow
+       slot and sits earlier in the document, hidden (opacity 0) once the app
+       boots - a document-wide getElementById mounts the figure into that
+       invisible copy and leaves this view's own slot empty and collapsed. */
+    const sec = secRef.current;
+    const slot = sec && sec.querySelector(".ex-body .ex-slot");
     const node = ref.current;
     if (!slot || !node) return undefined;
     slot.appendChild(node);
@@ -5642,7 +5648,7 @@ function RdExplained() {
   });
   const multi = KEYS.length > 1;
   return (
-    <section className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
+    <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-ex-t">Preference flows explained</h2>
         <span className="rd-meta">How preferences decide the two-party figure</span>
