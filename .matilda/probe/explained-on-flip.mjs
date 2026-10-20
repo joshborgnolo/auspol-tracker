@@ -12,7 +12,15 @@
    chart"): every reading draws as a cross (TrendChart marks' m.cross
    branch), one per cohort per contest, and the end-cap dots are gone.
    Geometry pins price the eight crosses off the month-index domain and the
-   0–100 share range; a tap flips pairing, direction, and back. */
+   0–100 share range; a tap flips pairing, direction, and back.
+   2026-10-21 (user calls): the jurisdiction chips moved INTO the chart's
+   one menu bar beside the flips; the Direction flip became "Share:" with
+   the button naming only the active side ("Labor ⇄" / the rival's name);
+   the Federal chip gained a state/territory sub-row (.ex-flow-sub) cutting
+   the same national counts per state (flowHistory.fed.states, the AEC's
+   two-party-preferred flow by state by party, 2004-2025 — counts, never
+   estimates); and the phone bottom pad deepened to 72px so the last x tick
+   no longer draws under the copy button's strip at 320-390px. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -53,6 +61,17 @@ const clickFlip = (page, frag) => page.evaluate((f) => {
   if (!b) throw new Error("no flip button mentions " + f);
   b.click();
 }, frag);
+const clickShare = (page) => page.evaluate(() => {
+  const b = document.querySelector("#flows-explained .ex-share .rd-pl-flip");
+  if (!b) throw new Error("no .ex-share flip button");
+  b.click();
+});
+const clickChip = (page, sel, txt) => page.evaluate((s, t) => {
+  const b = [...document.querySelectorAll("#flows-explained " + s + " .ex-chip")]
+    .find((x) => x.textContent.trim() === t);
+  if (!b) throw new Error("no chip " + t + " under " + s);
+  b.click();
+}, sel, txt);
 const unit = (page) => page.$eval("#flows-explained .fc-unit", (el) => el.textContent);
 const chipsText = (page) => page.$$eval("#flows-explained .ex-flow-chips .ex-chip", (bs) => bs.map((b) => b.textContent.trim()));
 const svgTexts = (page) => page.$$eval("#flows-explained .ex-chart svg text", (ts) => ts.map((t) => t.textContent.trim()));
@@ -101,15 +120,88 @@ await sleep(700);
 {
   const cs = await chipsText(page);
   ok("the jurisdiction chips render with the Coalition chart", cs.length > 1, cs.join(" / "));
+  ok("the chips sit INSIDE the chart's menu bar",
+     await page.evaluate(() => !!document.querySelector("#flows-explained .ex-flow-flip .ex-flow-chips")));
   const f = await flips(page);
-  ok("two flips sit beside one another: Two-party and Direction",
-     f.length === 2 && f[0].t === "Labor v Coalition ⇄" && f[1].t === "Labor over Coalition ⇄",
+  ok("two flips sit beside one another: Two-party and Share",
+     f.length === 2 && f[0].t === "Labor v Coalition ⇄" && f[1].t === "Labor ⇄",
      JSON.stringify(f));
   ok("each title announces the destination", f[0].title === "Switch the chart to Labor v One Nation"
      && f[1].title === "Switch to shares preferencing Coalition over Labor", JSON.stringify(f.map((x) => x.title)));
   ok("neither is pressed at rest", f[0].pressed === "false" && f[1].pressed === "false");
+  ok("the menu bar's labels read Two-party … Share",
+     await page.evaluate(() => {
+       const ls = [...document.querySelectorAll("#flows-explained .ex-flow-flip .rd-pl-ctl-l")].map((x) => x.textContent.trim());
+       return ls[0] === "Two-party:" && ls[ls.length - 1] === "Share:";
+     }));
+  ok("the Share control is the bar's last child, margin-left:auto",
+     await page.evaluate(() => {
+       const bar = document.querySelector("#flows-explained .ex-flow-flip");
+       const sh = bar.querySelector(".ex-share");
+       if (!sh || sh !== bar.lastElementChild) return false;
+       return parseFloat(getComputedStyle(sh).marginLeft) > 0; // auto resolved: room to spare at 1280px
+     }));
   ok("the unit line is the Coalition history's",
      (await unit(page)).startsWith("Share preferencing Labor over the Coalition in "), await unit(page));
+}
+
+console.log("== desktop: the Federal chip's state/territory sub-row ==");
+{
+  const sub = await page.$("#flows-explained .ex-flow-sub");
+  ok("the sub-row renders while Federal is the jurisdiction", !!sub);
+  const chips = sub ? await page.$$eval("#flows-explained .ex-flow-sub .ex-chip", (bs) => bs.map((b) => b.textContent.trim())) : [];
+  ok("nine chips: National + the eight states and territories, AEC order",
+     JSON.stringify(chips) === JSON.stringify(["National", "NSW", "Vic", "Qld", "WA", "SA", "Tas", "ACT", "NT"]),
+     chips.join(" / "));
+  ok("National is the selected chip at rest",
+     await page.evaluate(() => {
+       const b = document.querySelector("#flows-explained .ex-flow-sub .ex-chip.on");
+       return b && b.textContent.trim() === "National";
+     }));
+}
+await clickChip(page, ".ex-flow-sub", "SA");
+await sleep(500);
+{
+  ok("a state pick cuts the unit line to that state",
+     (await unit(page)) === "Share preferencing Labor over the Coalition in federal elections in South Australia",
+     await unit(page));
+  const cap = await page.$eval("#flows-explained .ex-flow-cap", (el) => el.textContent);
+  ok("a state is captioned as the AEC's per-state cut (counts, no estimates)",
+     cap.startsWith("Counted by the AEC: its two-party-preferred flow by state by party")
+       && cap.includes("its SA count never reached"), cap.slice(0, 100) + "…");
+  ok("the ticks stay the eight federal elections, through 2025",
+     await svgTexts(page).then((ts) => {
+       const ys = ts.filter((t) => /^\d{4}$/.test(t));
+       return ys.length === 8 && ys[ys.length - 1] === "2025";
+     }));
+}
+await clickChip(page, ".ex-flow-flip .ex-flow-chips", "Vic");
+await sleep(500);
+{
+  ok("a jurisdiction switch hides the sub-row",
+     (await page.$("#flows-explained .ex-flow-sub")) === null);
+  ok("…and cuts to the state estimate",
+     (await unit(page)) === "Share preferencing Labor over the Coalition in Victorian state elections",
+     await unit(page));
+}
+await clickChip(page, ".ex-flow-flip .ex-flow-chips", "Federal");
+await sleep(500);
+{
+  ok("back on Federal the state pick persisted (SA still on)",
+     await page.evaluate(() => {
+       const b = document.querySelector("#flows-explained .ex-flow-sub .ex-chip.on");
+       return b && b.textContent.trim() === "SA";
+     }));
+  ok("…so the chart is still South Australia's",
+     (await unit(page)) === "Share preferencing Labor over the Coalition in federal elections in South Australia",
+     await unit(page));
+}
+await clickChip(page, ".ex-flow-sub", "National");
+await sleep(500);
+{
+  ok("National restores the federal series",
+     (await unit(page)) === "Share preferencing Labor over the Coalition in Australian federal elections",
+     await unit(page));
 }
 
 console.log("== desktop: flip to Labor v One Nation — one view, no chips ==");
@@ -122,9 +214,10 @@ await sleep(500);
   ok("the Two-party button names the active pairing, pressed",
      f[0].t === "Labor v One Nation ⇄" && f[0].pressed === "true" && f[0].title === "Switch the chart to Labor v Coalition",
      JSON.stringify(f[0]));
-  ok("the Direction button follows the pairing",
-     f[1].t === "Labor over One Nation ⇄" && f[1].title === "Switch to shares preferencing One Nation over Labor",
+  ok("the Share button follows the pairing",
+     f[1].t === "Labor ⇄" && f[1].title === "Switch to shares preferencing One Nation over Labor",
      JSON.stringify(f[1]));
+  ok("the federal sub-row is gone too", (await page.$("#flows-explained .ex-flow-sub")) === null);
   ok("the unit line is per-contest", (await unit(page)) === "Share preferencing Labor over One Nation in each counted contest",
      await unit(page));
   const legendItems = await legend(page);
@@ -153,13 +246,13 @@ await sleep(500);
        && cap.endsWith("."),
      cap.slice(0, 120) + "…");
 }
-console.log("== desktop: the Direction flip inverts the same view ==");
-await clickFlip(page, "over");
+console.log("== desktop: the Share flip inverts the same view ==");
+await clickShare(page);
 await sleep(500);
 {
   const f = await flips(page);
-  ok("the Direction button now names One Nation over Labor, pressed",
-     f[1].t === "One Nation over Labor ⇄" && f[1].pressed === "true"
+  ok("the Share button now names One Nation, pressed",
+     f[1].t === "One Nation ⇄" && f[1].pressed === "true"
        && f[1].title === "Switch to shares preferencing Labor over One Nation", JSON.stringify(f[1]));
   ok("the unit line inverts", (await unit(page)) === "Share preferencing One Nation over Labor in each counted contest",
      await unit(page));
@@ -169,18 +262,20 @@ await sleep(500);
      xsv.length === 8 && wantInv.every((w, i) => near(xsv[i].cx, w.cx) && near(xsv[i].cy, w.cy)),
      wantInv.map((w, i) => `${w.tag}: got ${xsv[i] ? parseFloat(xsv[i].cy.toFixed(1)) : "—"} want ${parseFloat(w.cy.toFixed(1))}`).join(" · "));
 
-  await clickFlip(page, "over");
+  await clickShare(page);
   await sleep(500);
-  ok("a second Direction press restores Labor over One Nation",
-     (await unit(page)) === "Share preferencing Labor over One Nation in each counted contest");
+  ok("a second Share press restores Labor",
+     (await flips(page))[1].t === "Labor ⇄"
+     && (await unit(page)) === "Share preferencing Labor over One Nation in each counted contest");
 }
 
 console.log("== desktop: flip back to Labor v Coalition ==");
 await clickFlip(page, "Labor v");
 await sleep(500);
 {
-  const cs = await chipsText(page);
-  ok("the chips return with the Coalition chart", cs.length > 1, cs.join(" / "));
+  const cs = await page.$$eval("#flows-explained .ex-flow-flip .ex-flow-chips .ex-chip", (bs) => bs.map((b) => b.textContent.trim()));
+  ok("the chips return inside the bar with the Coalition chart", cs.length > 1 && cs[0] === "Federal", cs.join(" / "));
+  ok("the federal sub-row returns too", !!(await page.$("#flows-explained .ex-flow-sub")));
   ok("the unit line is the Coalition history's again",
      (await unit(page)).startsWith("Share preferencing Labor over the Coalition in "), await unit(page));
 }
@@ -248,6 +343,43 @@ await sleep(500);
      texts.filter((t) => /\d{4}/.test(t)).join(" / "));
   const overflow = await mob.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   ok("no horizontal overflow with the controller row wrapped", overflow <= 0, overflow + " px");
+}
+console.log("== phone 320px: the year ticks clear the copy button (user 2026-10-21: 2025 sat under it) ==");
+await mob.setViewport({ width: 320, height: 740, isMobile: true, hasTouch: true });
+await sleep(300);
+await clickFlip(mob, "Labor v"); // back to the Coalition chart
+await sleep(500);
+{
+  const overlap = () => mob.evaluate(() => {
+    const btn = document.querySelector("#flows-explained .chart-copy-btn");
+    if (!btn) return { err: "no copy button" };
+    const br = btn.getBoundingClientRect();
+    const hits = [...document.querySelectorAll("#flows-explained .ex-chart svg text")]
+      .filter((t) => /^\d{4}$/.test(t.textContent.trim()))
+      .filter((t) => {
+        const r = t.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && r.left < br.right && r.right > br.left && r.top < br.bottom && r.bottom > br.top;
+      })
+      .map((t) => t.textContent.trim());
+    return hits.length ? hits : null;
+  });
+  for (const pick of [["National", ".ex-flow-sub"], ["ACT", ".ex-flow-sub"]]) {
+    await clickChip(mob, pick[1], pick[0]);
+    await sleep(500);
+    const hits = await overlap();
+    ok(`no year tick under the copy button (${pick[0]} view${pick[0] === "ACT" ? " — its One Nation line is mostly gaps" : ""})`,
+       hits === null, hits ? hits.join(" / ") : "clear");
+  }
+  const last = await mob.evaluate(() => {
+    const t = [...document.querySelectorAll("#flows-explained .ex-chart svg text")]
+      .find((x) => x.textContent.trim() === "2025");
+    if (!t) return "no 2025 tick";
+    const svg = t.closest("svg").getBoundingClientRect(), r = t.getBoundingClientRect();
+    return Math.round(r.bottom - svg.bottom) <= 2; // inside the svg, not the button strip below
+  });
+  ok("the 2025 tick draws inside the svg, not the button's 30px strip", last === true, String(last));
+  const overflow = await mob.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  ok("no horizontal overflow at 320px with the sub-row", overflow <= 0, overflow + " px");
 }
 await mob.close();
 

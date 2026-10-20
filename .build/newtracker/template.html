@@ -5470,8 +5470,14 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ex-slot:empty { display: none; }
 .ex-chart { margin: 12px 0 26px; }
 .ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
-.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 22px; }
-.ex-flow-chips + .ex-flow-flip { margin-top: 8px; }
+/* the chart's one menu bar: pairing flip, jurisdiction chips, Share flip.
+   Flex-wrap lets the row pack compactly and break on the phone, the Share
+   flip's auto margin right-aligns it when it ends the line (user 2026-10-21:
+   same line as Two-party when it fits, right-aligned). */
+.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.ex-flow-flip .ex-flow-chips { margin: 0; flex: 0 1 auto; }
+.ex-share { margin-left: auto; }
+.ex-flow-sub { margin-top: 10px; }
 .ex-chip {
   font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
   padding: 7px 13px; border-radius: 999px; cursor: pointer;

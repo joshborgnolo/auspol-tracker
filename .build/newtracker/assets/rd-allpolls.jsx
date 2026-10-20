@@ -5546,7 +5546,7 @@ function RdFlows({ measure }) {
    (explained-article.html, mounted via dangerouslySetInnerHTML), so the
    chips + chart can't sit inside it as JSX; they render into this section's
    own footer and the whole figure mounts into the article's #ex-fig-flow
-   slot on commit - chips and chart move as one node, or the picker would
+   slot on commit - controls and chart move as one node, or the picker would
    stay stranded at the foot of the page. That covers BOTH parents that
    mount the article - this redesign RdExplained and the classic
    MenuPageView branch - through the one mechanism, so the slot is never
@@ -5559,16 +5559,28 @@ function RdFlows({ measure }) {
    (grnErr/onpErr/othErr), drawn as a bar at its election and quoted in the
    tooltip; its One Nation line appears only where One Nation stood widely
    enough ballots behind an estimate (gen-data's onp_min_ballots rule), so it
-   can break into lone points. */
+   can break into lone points.
+   Since 2026-10-21 (user calls) the controls sit in ONE menu bar above the
+   chart - the Labor v Labor-v-One-Nation pairing flip, the jurisdiction
+   chips and the Share (Labor v rival) flip - and the Federal chip gets a
+   state/territory sub-row (a generated fed.states payload,
+   data/fed-state-flows.json): counted by the AEC from the same
+   two-party-preferred flow-by-state tables, 2004-2025, so a state view
+   carries counts, never estimates. The resize-arranged phone shell gets a
+   deeper bottom pad (96px) because PX(20) plus glyph descent there pushes
+   the x tick labels past the svg box into the copy button's 30px strip (the
+   2025 tick vanished under it at 320-390px). */
 const FLOW_PARTIES = [
   { id: "grn", name: "Greens",     color: "var(--grn)" },
   { id: "onp", name: "One Nation", color: "var(--onp)" },
   { id: "oth", name: "Others",     color: "var(--oth)" },
 ];
-function ExplainedFlowChart({ jur, inv }) {
+function ExplainedFlowChart({ jur, inv, stateKey }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
-  const S = FH[jur] || FH.fed;
+  /* stateKey picks a per-state cut of the FEDERAL counts (the Federal chip's
+     sub-row; AEC per-state TPP tables, 2004–2025 — counts, no error bars) */
+  const S = (jur === "fed" && stateKey && ((FH.fed.states || {})[stateKey])) || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
@@ -5648,7 +5660,11 @@ function ExplainedFlowChart({ jur, inv }) {
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
         axisFont={narrow ? 28 : 15}
-        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
+        /* phone bottom pad must top the x labels' PX(20) drop (≈71 units at
+           320px) PLUS the glyph descent below the baseline, or a year label
+           hangs past the svg into the copy button's 30px strip — 2025 sat
+           under the button (user 2026-10-21) */
+        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: narrow ? 96 : 40 }}
         series={series} areas={areas} spine={YEARS.map((x) => ({ x }))}
         tooltipTitle={(i) => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : "")}
         ariaLabel={"Share of preferences flowing to " + (inv ? "the Coalition" : "Labor") + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
@@ -5666,7 +5682,9 @@ function ExplainedFlowChart({ jur, inv }) {
           : "")
         : cnt
           ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
-          : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
+          : S.fedState
+            ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table."
+            : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
       <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
     </div>
   );
@@ -5733,7 +5751,9 @@ function ExplainedOnChart({ inv }) {
         xTicks={ticks}
         unit="%" fmt={(v) => v.toFixed(1)}
         axisFont={narrow ? 28 : 15}
-        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
+        /* same phone bottom-pad rule as the jurisdiction chart: keep the
+           contest labels clear of the copy button's strip */
+        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: narrow ? 96 : 40 }}
         series={series} marks={marks} spine={BYS.map((b) => ({ x: b.xm }))}
         tooltipTitle={(i) => BYS[i].label + " · " + BYS[i].sub}
         ariaLabel={"Share of preferences flowing to " + (inv ? "One Nation" : "Labor") + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
@@ -5778,6 +5798,12 @@ function RdExplained() {
     return () => { if (node.parentNode === slot) slot.removeChild(node); };
   });
   const multi = KEYS.length > 1;
+  /* the Federal chip's own state/territory sub-row (user 2026-10-21): the
+     same national counts split by state (fed.states, gen-data), counted by
+     the AEC. The pick persists across pairing and jurisdiction flips - the
+     row just hides; null is the national series. */
+  const FED_STATES = (FH.fed && FH.fed.states) || null;
+  const [fedState, setFedState] = useState(null);
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -5788,19 +5814,11 @@ function RdExplained() {
         dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
-        {multi && pair === "co" && (
-          <div className="ex-flow-chips" role="tablist" aria-label="Jurisdiction">
-            {KEYS.map((k) => (
-              <button key={k} type="button" role="tab" aria-selected={k === active}
-                className={"ex-chip" + (k === active ? " on" : "")} onClick={() => setJur(k)}>
-                {FH[k].short || FH[k].label}
-              </button>
-            ))}
-          </div>
-        )}
-        {/* the flip idiom of the Latest section's Two-party control: the
-            label names the dimension, the button the ACTIVE setting; the
-            title announces where a press goes (user call 2026-10-20) */}
+        {/* the chart's menu bar (user 2026-10-21): the pairing flip, the
+            jurisdiction chips and the Share flip on one wrapping row, the
+            flips in the Latest section's idiom - the label names the
+            dimension, the button the ACTIVE setting, the title announces
+            where a press goes */}
         <div className="ex-flow-flip">
           <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Two-party:</span>
@@ -5810,16 +5828,40 @@ function RdExplained() {
               <span className="rd-pl-flip-t">{"Labor v " + rival}</span> <span aria-hidden="true">⇄</span>
             </button>
           </span>
-          <span className="rd-pl-ctl">
-            <span className="rd-pl-ctl-l">Direction:</span>
+          {multi && pair === "co" && (
+            <div className="ex-flow-chips" role="tablist" aria-label="Jurisdiction">
+              {KEYS.map((k) => (
+                <button key={k} type="button" role="tab" aria-selected={k === active}
+                  className={"ex-chip" + (k === active ? " on" : "")} onClick={() => setJur(k)}>
+                  {FH[k].short || FH[k].label}
+                </button>
+              ))}
+            </div>
+          )}
+          <span className="rd-pl-ctl ex-share">
+            <span className="rd-pl-ctl-l">Share:</span>
             <button type="button" className="rd-pl-flip" aria-pressed={inv}
                     title={inv ? ("Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition")) : ("Switch to shares preferencing " + rival + " over Labor")}
                     onClick={() => setInv(!inv)}>
-              <span className="rd-pl-flip-t">{inv ? rival + " over Labor" : "Labor over " + rival}</span> <span aria-hidden="true">⇄</span>
+              <span className="rd-pl-flip-t">{inv ? rival : "Labor"}</span> <span aria-hidden="true">⇄</span>
             </button>
           </span>
         </div>
-        {pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} inv={inv} />}
+        {pair === "co" && active === "fed" && FED_STATES && (
+          <div className="ex-flow-chips ex-flow-sub" role="tablist" aria-label="Federal flows by state or territory">
+            <button type="button" role="tab" aria-selected={fedState === null}
+              className={"ex-chip" + (fedState === null ? " on" : "")} onClick={() => setFedState(null)}>
+              National
+            </button>
+            {Object.keys(FED_STATES).map((k) => (
+              <button key={k} type="button" role="tab" aria-selected={k === fedState}
+                className={"ex-chip" + (k === fedState ? " on" : "")} onClick={() => setFedState(k)}>
+                {FED_STATES[k].short || FED_STATES[k].label}
+              </button>
+            ))}
+          </div>
+        )}
+        {pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} stateKey={active === "fed" ? fedState : null} inv={inv} />}
       </div>
     </section>
   );

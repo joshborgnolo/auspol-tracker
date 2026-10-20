@@ -3254,8 +3254,10 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ex-slot:empty { display: none; }
 .ex-chart { margin: 12px 0 26px; }
 .ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
-.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 22px; }
-.ex-flow-chips + .ex-flow-flip { margin-top: 8px; }
+.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.ex-flow-flip .ex-flow-chips { margin: 0; flex: 0 1 auto; }
+.ex-share { margin-left: auto; }
+.ex-flow-sub { margin-top: 10px; }
 .ex-chip {
   font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
   padding: 7px 13px; border-radius: 999px; cursor: pointer;
@@ -64447,11 +64449,12 @@ const FLOW_PARTIES = [{
 }];
 function ExplainedFlowChart({
   jur,
-  inv
+  inv,
+  stateKey
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
-  const S = FH[jur] || FH.fed;
+  const S = jur === "fed" && stateKey && (FH.fed.states || {})[stateKey] || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
@@ -64547,7 +64550,7 @@ function ExplainedFlowChart({
       l: 46,
       r: narrow ? 22 : 104,
       t: 16,
-      b: 40
+      b: narrow ? 96 : 40
     },
     series: series,
     areas: areas,
@@ -64568,7 +64571,7 @@ function ExplainedFlowChart({
     }
   }), p.name))), React.createElement("p", {
     className: "ex-flow-cap"
-  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
+  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
     className: "ex-flow-how"
   }, React.createElement(RdHow, {
     term: "flow-history",
@@ -64663,7 +64666,7 @@ function ExplainedOnChart({
       l: 46,
       r: narrow ? 22 : 104,
       t: 16,
-      b: 40
+      b: narrow ? 96 : 40
     },
     series: series,
     marks: marks,
@@ -64712,6 +64715,8 @@ function RdExplained() {
     };
   });
   const multi = KEYS.length > 1;
+  const FED_STATES = FH.fed && FH.fed.states || null;
+  const [fedState, setFedState] = useState(null);
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -64734,18 +64739,7 @@ function RdExplained() {
     }
   }), React.createElement("div", {
     ref: ref
-  }, multi && pair === "co" && React.createElement("div", {
-    className: "ex-flow-chips",
-    role: "tablist",
-    "aria-label": "Jurisdiction"
-  }, KEYS.map(k => React.createElement("button", {
-    key: k,
-    type: "button",
-    role: "tab",
-    "aria-selected": k === active,
-    className: "ex-chip" + (k === active ? " on" : ""),
-    onClick: () => setJur(k)
-  }, FH[k].short || FH[k].label))), React.createElement("div", {
+  }, React.createElement("div", {
     className: "ex-flow-flip"
   }, React.createElement("span", {
     className: "rd-pl-ctl"
@@ -64761,11 +64755,22 @@ function RdExplained() {
     className: "rd-pl-flip-t"
   }, "Labor v " + rival), " ", React.createElement("span", {
     "aria-hidden": "true"
-  }, "\u21C4"))), React.createElement("span", {
-    className: "rd-pl-ctl"
+  }, "\u21C4"))), multi && pair === "co" && React.createElement("div", {
+    className: "ex-flow-chips",
+    role: "tablist",
+    "aria-label": "Jurisdiction"
+  }, KEYS.map(k => React.createElement("button", {
+    key: k,
+    type: "button",
+    role: "tab",
+    "aria-selected": k === active,
+    className: "ex-chip" + (k === active ? " on" : ""),
+    onClick: () => setJur(k)
+  }, FH[k].short || FH[k].label))), React.createElement("span", {
+    className: "rd-pl-ctl ex-share"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, "Direction:"), React.createElement("button", {
+  }, "Share:"), React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": inv,
@@ -64773,12 +64778,30 @@ function RdExplained() {
     onClick: () => setInv(!inv)
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
-  }, inv ? rival + " over Labor" : "Labor over " + rival), " ", React.createElement("span", {
+  }, inv ? rival : "Labor"), " ", React.createElement("span", {
     "aria-hidden": "true"
-  }, "\u21C4")))), pair === "on" ? React.createElement(ExplainedOnChart, {
+  }, "\u21C4")))), pair === "co" && active === "fed" && FED_STATES && React.createElement("div", {
+    className: "ex-flow-chips ex-flow-sub",
+    role: "tablist",
+    "aria-label": "Federal flows by state or territory"
+  }, React.createElement("button", {
+    type: "button",
+    role: "tab",
+    "aria-selected": fedState === null,
+    className: "ex-chip" + (fedState === null ? " on" : ""),
+    onClick: () => setFedState(null)
+  }, "National"), Object.keys(FED_STATES).map(k => React.createElement("button", {
+    key: k,
+    type: "button",
+    role: "tab",
+    "aria-selected": k === fedState,
+    className: "ex-chip" + (k === fedState ? " on" : ""),
+    onClick: () => setFedState(k)
+  }, FED_STATES[k].short || FED_STATES[k].label))), pair === "on" ? React.createElement(ExplainedOnChart, {
     inv: inv
   }) : React.createElement(ExplainedFlowChart, {
     jur: active,
+    stateKey: active === "fed" ? fedState : null,
     inv: inv
   })));
 }

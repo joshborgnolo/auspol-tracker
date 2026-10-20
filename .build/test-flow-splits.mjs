@@ -288,15 +288,30 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
    jurisdiction chips; Labor v One Nation charts the measured flowForced.bys
    contests (no chips — "no extra views like state-by-state", ONE view, as
    the "one nation v labor" chart's crosses do on /flows/). The flip idiom:
-   the button names the ACTIVE pairing, its title announces the destination */
+   the button names the ACTIVE pairing, its title announces the destination.
+   2026-10-21 (further user calls): the controls sit in ONE menu bar —
+   label "Share:" (was Direction), its button the active side alone —
+   and the Federal chip carries its own National+state/territory sub-row
+   (fed.states, the AEC's counted per-state cuts). */
 assert.ok(ap.includes("function ExplainedOnChart({ inv })") && ap.includes("const ON_COHORTS = ["),
   "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
-assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} inv={inv} />}'),
-  "the flip swaps the Coalition history chart for the measured-contest chart");
+assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} stateKey={active === "fed" ? fedState : null} inv={inv} />}'),
+  "the flip swaps the Coalition history chart for the measured-contest chart; the state pick reaches the chart on the Federal chip alone");
 assert.ok(ap.includes('{"Labor v " + rival}') && ap.includes('aria-pressed={pair === "on"}'),
   "the Two-party button names the active pairing and exposes its state");
 assert.ok(ap.includes("multi && pair === \"co\" && ("),
   "the jurisdiction chips ride the Coalition view alone (no state-by-state counts for the One Nation pairing)");
+{
+  const iBar = ap.indexOf('className="ex-flow-flip"'), iPair = ap.indexOf('aria-pressed={pair === "on"}'),
+        iChips = ap.indexOf('aria-label="Jurisdiction"'), iShare = ap.indexOf('className="rd-pl-ctl ex-share"');
+  assert.ok(iBar > 0 && iPair > iBar && iChips > iPair && iShare > iChips,
+    "one menu bar (user 2026-10-21): the Two-party flip, then the jurisdiction chips, then the Share flip");
+}
+assert.ok(ap.includes('<span className="rd-pl-ctl-l">Share:</span>') && !ap.includes('>Direction:</span>'),
+  "the explainer's Share control names its active side (the Direction label gone)");
+assert.ok(ap.includes('className="ex-flow-chips ex-flow-sub" role="tablist" aria-label="Federal flows by state or territory"')
+    && ap.includes('const [fedState, setFedState] = useState(null);'),
+  "the Federal chip carries its National + state/territory sub-row, the pick defaulting to national");
 assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),
   "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");
 assert.ok(ap.includes('{"One reading per contest: " + cap + "."}'),

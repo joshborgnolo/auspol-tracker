@@ -4349,6 +4349,19 @@ const flowHistory = (() => {
     nsw: { label: "New South Wales", short: "NSW", elections: "New South Wales state elections", srcAs: "the NSW Electoral Commission’s ballot-level preference data" },
   };
   if (JUR) return h;
+  /* fed.states: the same counts split by state, for the explainer's
+     Federal sub-row (user 2026-10-21): data/fed-state-flows.json, written by
+     .build/fed-state-flows.py from the AEC's per-state TPP flow downloads
+     (2004–2025; 1996–2001 exists only as the national classic cut). AEC
+     counts like the national series — no error bars, a year One Nation
+     never counted in a state is null. Guarded: a missing file drops the
+     sub-row; federal-only (the Vic build returns above). */
+  try {
+    const fsf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-state-flows.json"), "utf8"));
+    h.fed.states = Object.fromEntries(Object.entries(fsf.states).map(([k, s]) => [k,
+      { label: s.label, short: s.short, elections: "federal elections in " + s.label, fedState: true,
+        years: [...fsf.years], grn: [...s.grn], onp: [...s.onp], oth: [...s.oth] }]));
+  } catch { /* not yet written */ }
   let csv = null, bt = null;
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }
   try { bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")); } catch { /* ditto */ }

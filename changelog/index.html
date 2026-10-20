@@ -3262,8 +3262,10 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ex-slot:empty { display: none; }
 .ex-chart { margin: 12px 0 26px; }
 .ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
-.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 22px; }
-.ex-flow-chips + .ex-flow-flip { margin-top: 8px; }
+.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.ex-flow-flip .ex-flow-chips { margin: 0; flex: 0 1 auto; }
+.ex-share { margin-left: auto; }
+.ex-flow-sub { margin-top: 10px; }
 .ex-chip {
   font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
   padding: 7px 13px; border-radius: 999px; cursor: pointer;
@@ -8139,6 +8141,88 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83, 81.9, 82.2, 85.7, 88.2],
       "onp": [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5],
       "oth": [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50, 54.6],
+      "states": {
+        "nsw": {
+          "label": "New South Wales",
+          "short": "NSW",
+          "elections": "federal elections in New South Wales",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [82.3, 80.8, 78.9, 82.7, 81.2, 82.2, 84.8, 87.3],
+          "onp": [46.6, 41.8, 45.4, 45.6, 57.2, 36.9, 35.7, 25.8],
+          "oth": [47.4, 42.7, 42.7, 44, 43.7, 46.2, 51.3, 54.7]
+        },
+        "vic": {
+          "label": "Victoria",
+          "short": "Vic",
+          "elections": "federal elections in Victoria",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [83.1, 82.9, 81.2, 85.8, 83.3, 84.3, 87.8, 89.7],
+          "onp": [42.8, 50.1, null, null, null, 35.6, 35.5, 25],
+          "oth": [43.6, 46.6, 45.6, 51.4, 53.5, 49.8, 51.4, 60.3]
+        },
+        "qld": {
+          "label": "Queensland",
+          "short": "Qld",
+          "elections": "federal elections in Queensland",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [74.9, 75.3, 75.8, 80.4, 80.1, 79.5, 83.3, 87.2],
+          "onp": [40.2, 45.1, 43.8, 39.7, 48.1, 32.8, 33.1, 25.1],
+          "oth": [37.7, 42.4, 36.9, 45, 45.6, 36.1, 42.1, 42.8]
+        },
+        "wa": {
+          "label": "Western Australia",
+          "short": "WA",
+          "elections": "federal elections in Western Australia",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [77.4, 75.8, 76.9, 79.4, 78.8, 79.7, 85.2, 87.1],
+          "onp": [42.7, 50.3, 34.7, null, null, 37.2, 40.2, 23.7],
+          "oth": [43.8, 41.8, 34.3, 41.9, 39.7, 39.3, 48.6, 56.9]
+        },
+        "sa": {
+          "label": "South Australia",
+          "short": "SA",
+          "elections": "federal elections in South Australia",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [79.2, 77.3, 78.9, 79.9, 84.4, 79.9, 84.8, 88.1],
+          "onp": [44.9, 55.6, 53.1, null, null, 41.7, 41.2, 29],
+          "oth": [47, 50.8, 42.1, 46.8, 57, 54.2, 53.6, 51.8]
+        },
+        "tas": {
+          "label": "Tasmania",
+          "short": "Tas",
+          "elections": "federal elections in Tasmania",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [80.9, 78.3, 79.2, 87, 87.5, 88.2, 88.7, 89.8],
+          "onp": [null, null, null, null, null, 45.4, 43.4, 32.7],
+          "oth": [45.5, 52, 59.5, 55.2, 64, 58.7, 61.7, 68]
+        },
+        "act": {
+          "label": "Australian Capital Territory",
+          "short": "ACT",
+          "elections": "federal elections in Australian Capital Territory",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [82.1, 82.1, 83.8, 88, 88.4, 89.8, 91.5, 93.4],
+          "onp": [null, null, null, null, null, null, 34.6, null],
+          "oth": [65.3, 59.6, 59, 57.4, 57.8, 50.2, 55.1, 67.1]
+        },
+        "nt": {
+          "label": "Northern Territory",
+          "short": "NT",
+          "elections": "federal elections in Northern Territory",
+          "fedState": true,
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "grn": [80, 75.8, 71.5, 80.5, 79.9, 80.2, 81.9, 81.2],
+          "onp": [null, null, 51.2, null, null, null, 27.2, 18.3],
+          "oth": [51.2, 50.8, 41, 45.3, 54.5, 37.7, 37.3, 64.2]
+        }
+      },
       "backtest": {
         "elections": 6,
         "minClassic": 40,
@@ -135438,11 +135522,12 @@ const FLOW_PARTIES = [{
 }];
 function ExplainedFlowChart({
   jur,
-  inv
+  inv,
+  stateKey
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
-  const S = FH[jur] || FH.fed;
+  const S = jur === "fed" && stateKey && (FH.fed.states || {})[stateKey] || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
@@ -135538,7 +135623,7 @@ function ExplainedFlowChart({
       l: 46,
       r: narrow ? 22 : 104,
       t: 16,
-      b: 40
+      b: narrow ? 96 : 40
     },
     series: series,
     areas: areas,
@@ -135559,7 +135644,7 @@ function ExplainedFlowChart({
     }
   }), p.name))), React.createElement("p", {
     className: "ex-flow-cap"
-  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
+  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
     className: "ex-flow-how"
   }, React.createElement(RdHow, {
     term: "flow-history",
@@ -135654,7 +135739,7 @@ function ExplainedOnChart({
       l: 46,
       r: narrow ? 22 : 104,
       t: 16,
-      b: 40
+      b: narrow ? 96 : 40
     },
     series: series,
     marks: marks,
@@ -135703,6 +135788,8 @@ function RdExplained() {
     };
   });
   const multi = KEYS.length > 1;
+  const FED_STATES = FH.fed && FH.fed.states || null;
+  const [fedState, setFedState] = useState(null);
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -135725,18 +135812,7 @@ function RdExplained() {
     }
   }), React.createElement("div", {
     ref: ref
-  }, multi && pair === "co" && React.createElement("div", {
-    className: "ex-flow-chips",
-    role: "tablist",
-    "aria-label": "Jurisdiction"
-  }, KEYS.map(k => React.createElement("button", {
-    key: k,
-    type: "button",
-    role: "tab",
-    "aria-selected": k === active,
-    className: "ex-chip" + (k === active ? " on" : ""),
-    onClick: () => setJur(k)
-  }, FH[k].short || FH[k].label))), React.createElement("div", {
+  }, React.createElement("div", {
     className: "ex-flow-flip"
   }, React.createElement("span", {
     className: "rd-pl-ctl"
@@ -135752,11 +135828,22 @@ function RdExplained() {
     className: "rd-pl-flip-t"
   }, "Labor v " + rival), " ", React.createElement("span", {
     "aria-hidden": "true"
-  }, "\u21C4"))), React.createElement("span", {
-    className: "rd-pl-ctl"
+  }, "\u21C4"))), multi && pair === "co" && React.createElement("div", {
+    className: "ex-flow-chips",
+    role: "tablist",
+    "aria-label": "Jurisdiction"
+  }, KEYS.map(k => React.createElement("button", {
+    key: k,
+    type: "button",
+    role: "tab",
+    "aria-selected": k === active,
+    className: "ex-chip" + (k === active ? " on" : ""),
+    onClick: () => setJur(k)
+  }, FH[k].short || FH[k].label))), React.createElement("span", {
+    className: "rd-pl-ctl ex-share"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, "Direction:"), React.createElement("button", {
+  }, "Share:"), React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": inv,
@@ -135764,12 +135851,30 @@ function RdExplained() {
     onClick: () => setInv(!inv)
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
-  }, inv ? rival + " over Labor" : "Labor over " + rival), " ", React.createElement("span", {
+  }, inv ? rival : "Labor"), " ", React.createElement("span", {
     "aria-hidden": "true"
-  }, "\u21C4")))), pair === "on" ? React.createElement(ExplainedOnChart, {
+  }, "\u21C4")))), pair === "co" && active === "fed" && FED_STATES && React.createElement("div", {
+    className: "ex-flow-chips ex-flow-sub",
+    role: "tablist",
+    "aria-label": "Federal flows by state or territory"
+  }, React.createElement("button", {
+    type: "button",
+    role: "tab",
+    "aria-selected": fedState === null,
+    className: "ex-chip" + (fedState === null ? " on" : ""),
+    onClick: () => setFedState(null)
+  }, "National"), Object.keys(FED_STATES).map(k => React.createElement("button", {
+    key: k,
+    type: "button",
+    role: "tab",
+    "aria-selected": k === fedState,
+    className: "ex-chip" + (k === fedState ? " on" : ""),
+    onClick: () => setFedState(k)
+  }, FED_STATES[k].short || FED_STATES[k].label))), pair === "on" ? React.createElement(ExplainedOnChart, {
     inv: inv
   }) : React.createElement(ExplainedFlowChart, {
     jur: active,
+    stateKey: active === "fed" ? fedState : null,
     inv: inv
   })));
 }
