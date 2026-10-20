@@ -4289,7 +4289,10 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    federal series alone. */
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
-  const JURIS = { vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences", asOf: "2006–2022" } };
+  const JURIS = {
+    vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences", asOf: "2006–2022" },
+    wa: { label: "Western Australia", srcAs: "the Western Australian Electoral Commission’s distributions of preferences", asOf: "2001–2025" },
+  };
   if (!JUR) {
     let csv = null;
     try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8"); } catch { /* not yet written */ }
