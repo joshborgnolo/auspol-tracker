@@ -39269,7 +39269,7 @@ function infoTerms(D) {
   }, {
     id: "more-menu-figures",
     q: "What are the figures in the More menu?",
-    a: React.createElement(React.Fragment, null, "Each page there is listed under the headline it opens with, and beside it the number that headline rests on, as the page prints it. For", " ", xref("poll-disagreement", "more menu", "Poll disagreement"), ", how widely the polls of the party they disagree on most are spread, as a multiple of what chance alone would produce. For Pollster leans, the ", xref("house-lean", "more menu", "lean"), " the headline names, in points, with + towards Labor. For Preference flows, the move the headline reports. A headline that reports no single number has none beside it.")
+    a: React.createElement(React.Fragment, null, "Each page there is listed under the headline it opens with, and beside it the number that headline rests on, as the page prints it. For", " ", xref("poll-disagreement", "more menu", "Poll disagreement"), ", how widely the polls of the party they disagree on most are spread, as a multiple of what chance alone would produce. For Pollster leans, the ", xref("house-lean", "more menu", "lean"), " the headline names, in points, with + towards Labor. For Respondent-allocated preference flows, the move the headline reports. A headline that reports no single number has none beside it.")
   }];
   const method = [{
     id: "weighted-aggregate",
@@ -39379,7 +39379,7 @@ function infoTerms(D) {
         className: "info-chart"
       }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows page, in the More menu, checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
+      }, React.createElement("b", null, "Are they still flowing that way?"), " The Respondent-allocated preference flows page, in the More menu, checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
     }, {
       id: "flow-history",
       term: "Counted and estimated flows",
@@ -39858,7 +39858,7 @@ function infoTerms(D) {
         term: "Preference flows",
         body: React.createElement(React.Fragment, null, "How minor-party votes split between the final two candidates once preferences are distributed. The ", xref("implied-2pp", "preference flows", "implied 2PP"), " against the Coalition uses the flows of the ", eY, " Victorian election: Greens ", pct(FL.grn), " and all others ", pct(FL.oth), " to Labor. The Victorian Electoral Commission publishes each district\u2019s count but no statewide flow by party, so the site measured them: the Greens\u2019 from the districts where Labor and the Coalition were the final two, and the others\u2019 set so that the official ", eY, " primary votes give the official 55.0\u201345.0 result. One Nation won 0.3% in ", eY, ", too little to measure, so its flow is the 2025 federal election\u2019s: ", pct(FL.onp), " to Labor.", React.createElement("span", {
           className: "info-p"
-        }, React.createElement("b", null, "Are they still flowing that way?"), " The Preference flows page, in the More menu, checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the ", eY, " flows put them, voters may be sending preferences differently. The check corrects no other figure."))
+        }, React.createElement("b", null, "Are they still flowing that way?"), " The Respondent-allocated preference flows page, in the More menu, checks. The pollsters\u2019 own two-party figures come largely from where their respondents say their preferences would go, so if those drift from where the pollster\u2019s primary votes and the ", eY, " flows put them, voters may be sending preferences differently. The check corrects no other figure."))
       }, {
         id: "fp-flows",
         term: "Labor v One Nation flows",
@@ -64120,7 +64120,7 @@ function RdFlows({
   }, React.createElement("h2", {
     className: "rd-title",
     id: "rd-fl-t"
-  }, "Preference flows"), React.createElement("span", {
+  }, "Respondent-allocated preference flows"), React.createElement("span", {
     className: "rd-meta"
   }, FF ? "Where other parties’ voters send their preferences, and whether that has changed since " + rdElecYear : "Whether preferences still flow the way they did at the " + rdElecYear + " election")), React.createElement(RdHed, {
     head: head,
@@ -64381,7 +64381,7 @@ function RdFlows({
   }), React.createElement(RdFoot, {
     how: {
       term: "preference-flows",
-      from: "Preference flows"
+      from: "Respondent-allocated preference flows"
     }
   }, FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is the AEC’s, from the 115 seats that finished Labor v Coalition, so every view covers the same seats. The site’s two-party figures use the AEC’s flows across all 150 seats. This check corrects no other figure on the page." : "This check corrects no other figure on the page."));
 }
@@ -65949,7 +65949,7 @@ function RdBeyond() {
   }, React.createElement("h2", {
     className: "rd-title",
     id: "rd-btv-t"
-  }, "Beyond the vote"), React.createElement("span", {
+  }, "Public opinion"), React.createElement("span", {
     className: "rd-meta"
   }, "What else Australians tell the pollsters")), React.createElement(RdHed, {
     head: window.AP.PAGE_HEAD["beyond-the-vote"],
@@ -67624,7 +67624,7 @@ const TABS = [{
   tip: "How each pollster leans against the others"
 }, {
   id: "flows",
-  label: "Preference flows",
+  label: "Respondent-allocated preference flows",
   menu: true,
   tip: "Where minor-party preferences are flowing now, against the last election"
 }, {
@@ -67634,7 +67634,7 @@ const TABS = [{
   tip: "How preferences decide the two-party figure"
 }, {
   id: "beyond-the-vote",
-  label: "Beyond the vote",
+  label: "Public opinion",
   menu: true,
   tip: "What Australians tell the pollsters beyond their vote, by topic"
 }, {
@@ -68419,7 +68419,17 @@ try {
   document.body.classList.add("rd");
 }
 const appRoot = ReactDOM.createRoot(document.getElementById("root"));
-ReactDOM.flushSync(() => appRoot.render(React.createElement(RootBoundary, null, React.createElement(App, null))));</script>
+ReactDOM.flushSync(() => appRoot.render(React.createElement(RootBoundary, null, React.createElement(App, null))));
+if (window.AP_ONEOFF_SRC && window.AUSPOL && typeof window.AUSPOL.loadOneOffs === "function") {
+  const prefetchOneOffs = () => {
+    try {
+      window.AUSPOL.loadOneOffs();
+    } catch (_) {}
+  };
+  if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(prefetchOneOffs, {
+    timeout: 3000
+  });else window.setTimeout(prefetchOneOffs, 1500);
+}</script>
 
 
 </body></html>

@@ -6759,7 +6759,7 @@ function MenuPageView({ id, tppBasis }) {
           still renders (the .ex-* styles are page-level, not rd-gated), just
           without the rd head */}
       {id === "flows-explained" && <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />}
-      {/* Beyond the vote has no classic-design twin: its body alone mounts
+      {/* Public opinion has no classic-design twin: its body alone mounts
           here (the .btv-* styles are page-level, like the explainer's),
           lazily fetching its sidecar; the rd head lives in RdBeyond */}
       {id === "beyond-the-vote" && <BtvBody />}
@@ -7433,7 +7433,7 @@ function infoTerms(D) {
       {" "}{xref("poll-disagreement", "more menu", "Poll disagreement")}, how widely the polls
       of the party they disagree on most are spread, as a multiple of what chance alone would
       produce. For Pollster leans, the {xref("house-lean", "more menu", "lean")} the headline
-      names, in points, with + towards Labor. For Preference flows, the move the headline
+      names, in points, with + towards Labor. For Respondent-allocated preference flows, the move the headline
       reports. A headline that reports no single number has none beside it.</>) },
   ];
 
@@ -7654,8 +7654,8 @@ function infoTerms(D) {
           published; One Nation’s line breaks where it barely stood candidates. Labor v One Nation
           uses its own {xref("fp-flows", "preference flows", "Labor v One Nation flows")}, estimated
           because no election has counted that pairing.
-          <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-          page, in the More menu, checks two ways, one contest at a time. It sets what each party’s voters
+          <span className="info-p"><b>Are they still flowing that way?</b> The Respondent-allocated
+          preference flows page, in the More menu, checks two ways, one contest at a time. It sets what each party’s voters
           tell pollsters, when asked to choose between the final two, beside the flows the site
           assumes. And it watches the pollsters’ own two-party figures, which come largely from where
           their respondents say their preferences would go: if those drift from where the pollster’s
@@ -8559,8 +8559,8 @@ function infoTerms(D) {
             others’ set so that the official {eY} primary votes give the official 55.0–45.0 result.
             One Nation won 0.3% in {eY}, too little to measure, so its flow is the 2025 federal
             election’s: {pct(FL.onp)} to Labor.
-            <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
-            page, in the More menu, checks. The pollsters’ own two-party figures come largely from where
+            <span className="info-p"><b>Are they still flowing that way?</b> The Respondent-allocated
+            preference flows page, in the More menu, checks. The pollsters’ own two-party figures come largely from where
             their respondents say their preferences would go, so if those drift from where the
             pollster’s primary votes and the {eY} flows put them, voters may be sending preferences
             differently. The check corrects no other figure.</span></>) },

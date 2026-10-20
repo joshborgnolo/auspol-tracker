@@ -103,7 +103,7 @@
      above - the lanes carry no good/bad valence. */
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
-  /* Beyond the vote's tracker lines: the family of wording a pollster asked
+  /* Public opinion's tracker lines: the family of wording a pollster asked
      in ("is it too high?" against "should it fall?"), the same no-valence
      pair as the confidence lanes in light. Here at root, not on .btv, so the
      copy-as-image legend resolves them outside the page's tree. */
@@ -3752,7 +3752,8 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 .tabs-list { display: flex; gap: inherit; align-items: flex-end; }
 /* ---- the ☰ menu (2026-10-15) ----------------------------------------------
    The bar's last item: the pages that left All polls (Poll disagreement,
-   Pollster leans, Preference flows), the flows explainer, and Info wherever
+   Pollster leans, Respondent-allocated preference flows), the flows
+   explainer, and Info wherever
    the bar has dropped its tab (.tab-pinhide's own gate, above - the two
    rules must move together). The button is a .tab, so it shares the row's
    colours, padding and underline; on a menu page the underline is its. */
@@ -5492,7 +5493,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .ex-chip { font-size: 12px; padding: 6px 11px; }
 }
 
-/* ---------- Beyond the vote (.btv-* and its static twin .btv-ss-*) ----------
+/* ---------- Public opinion (.btv-* and its static twin .btv-ss-*) ----------
    The ☰ menu's issues page renders twice, the explainer pattern: the live
    view (rd-beyond.jsx, drawing the oneoffs-source sidecar) and the static
    article build.mjs's ssBeyondBlock emits from the same payload. Both rule

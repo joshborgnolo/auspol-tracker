@@ -1,5 +1,5 @@
 /* test-flow-splits.mjs – pins the preference-flows data and its renderer in
-   the All-polls Preference flows section (the forced-choice answers moved
+   the All-polls Respondent-allocated preference flows section (the forced-choice answers moved
    2026-10-10 from the old /preference-flows/ satellite's #forced section –
    which itself retired 2026-10-15 to a redirect stub when the explainer
    joined the main build as /flows-explained/).

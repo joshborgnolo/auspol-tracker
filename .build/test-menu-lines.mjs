@@ -69,7 +69,7 @@ const fresh = (mutate) => {
   assert.equal(s.fig, null, "no lean, no figure");
 }
 
-/* ---- Preference flows: the move the head reports, or none */
+/* ---- Respondent-allocated preference flows: the move the head reports, or none */
 {
   let AP = fresh((D) => { D.flowDriftOn.now = { ...D.flowDriftOn.now, v: 2.6, ci95: 1.1 }; D.flowDrift.now = { ...D.flowDrift.now, v: 0.1, ci95: 1.0 }; });
   let s = AP.flowStory();

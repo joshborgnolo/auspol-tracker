@@ -1,6 +1,7 @@
-/* ---- Beyond the vote: the page's curation and its figures ------------------
+/* ---- Public opinion: the page's curation and its figures --------------------
    The /beyond-the-vote/ page (the ☰ menu page that replaced the /ad-hocs/
-   catalogue on 2026-10-18) shows what the pollsters ask beyond voting
+   catalogue on 2026-10-18; named Public opinion 2026-10-20) shows what the
+   pollsters ask beyond voting
    intention: the questions worth a reader's time, by topic, with the
    recurring ones charted. Three layers decide what a reader sees:
 

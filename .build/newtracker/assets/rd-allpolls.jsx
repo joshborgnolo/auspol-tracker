@@ -5402,7 +5402,7 @@ function RdFlows({ measure }) {
   return (
     <section className="rd-sec rd-fl" id="flow-drift" aria-labelledby="rd-fl-t">
       <div className="rd-eyebrow">
-        <h2 className="rd-title" id="rd-fl-t">Preference flows</h2>
+        <h2 className="rd-title" id="rd-fl-t">Respondent-allocated preference flows</h2>
         <span className="rd-meta">{FF ? "Where other parties’ voters send their preferences, and whether that has changed since " + rdElecYear : "Whether preferences still flow the way they did at the " + rdElecYear + " election"}</span>
       </div>
       <RdHed head={head} dek={dek} />
@@ -5523,7 +5523,7 @@ function RdFlows({ measure }) {
         sets={tsSets}
         note={(c.drift ? "Published minus implied: one straight line per pollster through its own monthly gaps since the election, t-tested, Holm’s correction within the contest. Yes means a gap is drifting, not just sitting off zero today; pollsters with too few months show dashes. " : "")
           + (FF ? "What voters say: one straight line per voter group through " + (q === "ln" ? "DemosAU’s quarterly MRP readings" : "RedBridge/Accent’s monthly answers") + ", Holm’s correction across every group in all three contests. A Yes is what the ledger’s “down from” and the section’s headline stand on." : "")} />
-      <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
+      <RdFoot how={{ term: "preference-flows", from: "Respondent-allocated preference flows" }}>
         {FF ? "RedBridge/Accent asks every month and nationally only, so a named region drops it. DemosAU’s MRP prints its One Nation contests by region; All voters is our weighting of its three regions by enrolment and vote. The " + rdElecYear + " count is the AEC’s, from the 115 seats that finished Labor v Coalition, so every view covers the same seats. The site’s two-party figures use the AEC’s flows across all 150 seats. This check corrects no other figure on the page."
           : "This check corrects no other figure on the page."}
       </RdFoot>

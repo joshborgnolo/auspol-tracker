@@ -1,4 +1,4 @@
-/* ---- Beyond the vote: the topic map ----------------------------------------
+/* ---- Public opinion: the topic map -----------------------------------------
    Where every question in the eight one-off stores lands on the /beyond-the-vote/
    page (the ☰ menu page that was /ad-hocs/ until 2026-10-18). TWO reads of
    this file must never diverge: gen-data.mjs files every entry under its topic

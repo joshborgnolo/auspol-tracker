@@ -4,8 +4,9 @@
    The More menu (Tabs, d1a1d215) lists every menu page under the page's
    own headline and the figure that headline stands on, so the menu can
    never say what the page doesn't. Three of those headlines are findings
-   with rules of their own (Poll disagreement, Pollster leans, Preference
-   flows); they used to be written inside their components, and now the
+   with rules of their own (Poll disagreement, Pollster leans,
+   Respondent-allocated preference flows); they used to be written inside
+   their components, and now the
    components and the menu both read them from here.
 
    Lives in the PLAIN layer for the reason np-project.js does: there is
@@ -29,14 +30,15 @@
      Pollster leans      the headline's own lean, signed as the table prints
                          it (+ towards Labor), on the two-party tab the page
                          opens on
-     Preference flows    the move the headline reports, where it reports
+     Respondent-allocated preference flows
+                         the move the headline reports, where it reports
                          one: the pollsters' drift in points, or the share
                          of the voter group now picking the side it names
      Flows explained     the two frozen flow tables the implied figures are
                          read through, one mini-row per matchup: each voter
                          group's share of preferences reaching Labor, a bare
                          whole number in the group's tone
-     Beyond the vote     its count of topics
+     Public opinion      its count of topics
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
    the pack", preferences "still flowing much as they did") gets no figure,
@@ -186,7 +188,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
     return { head, dek, fig };
   };
 
-  /* ---------------------------------------------------------- Preference flows
+  /* --------------------------------------- Respondent-allocated preference flows
      The head and dek, on written rules. A move in the pollsters' own
      two-party figures (a drift clear of its margin) leads, as the strongest
      evidence; else a clear move in what voters say (the battery's Yes

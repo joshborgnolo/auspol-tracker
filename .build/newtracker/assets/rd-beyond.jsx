@@ -850,7 +850,7 @@ function RdBeyond() {
   return (
     <section className="rd-sec rd-btv" id="beyond-the-vote" aria-labelledby="rd-btv-t">
       <div className="rd-eyebrow">
-        <h2 className="rd-title" id="rd-btv-t">Beyond the vote</h2>
+        <h2 className="rd-title" id="rd-btv-t">Public opinion</h2>
         <span className="rd-meta">What else Australians tell the pollsters</span>
       </div>
       <RdHed head={window.AP.PAGE_HEAD["beyond-the-vote"]}

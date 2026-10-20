@@ -28,9 +28,9 @@ const TABS = [
   { id: "allpolls", label: "All polls", h1: "All polls", descFrag: "Every published Australian federal opinion poll" },
   { id: "disagreement", label: "Poll disagreement", h1: "Poll disagreement", descFrag: "How much the Australian federal polls disagree" },
   { id: "leans", label: "Pollster leans", h1: "Pollster leans", descFrag: "How each Australian federal pollster leans" },
-  { id: "flows", label: "Preference flows", h1: "Preference flows", descFrag: "Where Australian federal preferences are flowing now" },
+  { id: "flows", label: "Respondent-allocated preference flows", h1: "Respondent-allocated preference flows", descFrag: "Where Australian federal preferences are flowing now" },
   { id: "flows-explained", label: "Preference flows explained", h1: "Preference flows explained", descFrag: "How preferences decide the Australian federal two-party figure" },
-  { id: "beyond-the-vote", label: "Beyond the vote", h1: "Beyond the vote", descFrag: "charted across pollsters, with every figure and source" }, /* the 2026-10-17 /ad-hocs/ catalogue, curated and renamed 2026-10-18 */
+  { id: "beyond-the-vote", label: "Public opinion", h1: "Public opinion", descFrag: "charted across pollsters, with every figure and source" }, /* the 2026-10-17 /ad-hocs/ catalogue, curated and renamed 2026-10-18 */
   { id: "changelog", label: "Changelog", h1: "Changelog", descFrag: "the economic-confidence gauges, recorded entry by entry" },
   { id: "info", label: "Info", h1: "About auspol tracker", descFrag: "How auspol tracker works" },
 ];
@@ -69,7 +69,7 @@ for (const u of ["cycles/", "allpolls/", "disagreement/", "leans/", "flows/", "f
   assert.ok(sm.includes(`<loc>https://auspoltracker.com/${u}</loc>`), `the sitemap carries /${u}`);
 assert.ok(!sm.includes("preference-flows/"), "the retired explainer satellite left the sitemap (its stub redirects)");
 assert.ok(!sm.includes("vic/flows-explained/"), "the explainer is federal-only");
-assert.ok(!sm.includes("vic/beyond-the-vote/"), "Beyond the vote is federal-only");
+assert.ok(!sm.includes("vic/beyond-the-vote/"), "Public opinion is federal-only");
 assert.ok(!sm.includes("/ad-hocs/"), "the retired /ad-hocs/ path left the sitemap (its stub redirects)");
 {
   const stub = read("ad-hocs/index.html");
@@ -101,10 +101,10 @@ assert.ok(/pastTab = !VIC \|\|/.test(build)
 assert.ok(build.includes("window.AP_INITIAL_TAB="), "build.mjs stamps the per-tab constant");
 assert.ok(build.includes("one document per tab"), "the emission pass logs its outputs");
 assert.ok(build.includes("rd-beyond.jsx") && build.includes("oneoffs-source.json"),
-  "the Beyond the vote page's view layer and its data sidecar ride the build");
+  "the Public opinion page's view layer and its data sidecar ride the build");
 const genData = read(path.join(".build", "newtracker", "gen-data.mjs"));
 assert.ok(genData.includes("oneoffs-source.json") && genData.includes("loadOneOffs") && genData.includes("buildBeyond(readOneOffStores(ROOT)"),
-  "gen-data emits the Beyond the vote sidecar (beyond-the-vote.mjs) and its lazy loader");
+  "gen-data emits the Public opinion sidecar (beyond-the-vote.mjs) and its lazy loader");
 
 // ---- the client routes by path -----------------------------------------------------------
 const hdr = read(path.join(".build", "newtracker", "assets", "73de0c58-f11f-4793-9f90-77e583ab051b.js"));
@@ -177,16 +177,16 @@ const views = read(path.join(".build", "newtracker", "assets", "d1a1d215-370c-4e
 assert.ok(views.includes('href={window.AP.tabToPath ? window.AP.tabToPath(t.id) : "#" + t.id}'),
   "each tab renders as its own page's link");
 // ---- the ☰ menu's pages ------------------------------------------------------------------
-for (const [id, label] of [["disagreement", "Poll disagreement"], ["leans", "Pollster leans"], ["flows", "Preference flows"],
-                           ["flows-explained", "Preference flows explained"], ["beyond-the-vote", "Beyond the vote"],
+for (const [id, label] of [["disagreement", "Poll disagreement"], ["leans", "Pollster leans"], ["flows", "Respondent-allocated preference flows"],
+                           ["flows-explained", "Preference flows explained"], ["beyond-the-vote", "Public opinion"],
                            ["changelog", "Changelog"]])
   assert.ok(hdr.includes(`{ id: "${id}", label: "${label}", menu: true,`), `${id} is a menu page in TABS`);
 // the explainer is federal-only: the Vic client splices its entry out of TABS
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);'),
   "the Vic client drops the flows-explained tab");
-// Beyond the vote is federal-only too (the one-off stores are federal)
+// Public opinion is federal-only too (the one-off stores are federal)
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "beyond-the-vote"), 1);'),
-  "the Vic client drops the Beyond the vote tab");
+  "the Vic client drops the Public opinion tab");
 // the change log is federal-only too (Vic never writes data/changelog.json)
 assert.ok(hdr.includes('if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);'),
   "the Vic client drops the changelog tab");
@@ -201,7 +201,7 @@ assert.ok(views.includes('<MenuPageView id="flows-explained"') || views.includes
 assert.ok(views.includes('id === "changelog"') && views.includes("function RdChangelog("),
   "the menu-page view knows the change log and renders it as a page of the site");
 assert.ok(views.includes('{id === "beyond-the-vote" && <RdBeyond />}') && views.includes('{id === "beyond-the-vote" && <BtvBody />}'),
-  "the menu-page view knows Beyond the vote in both designs");
+  "the menu-page view knows Public opinion in both designs");
 {
   const btv = read(path.join(".build", "newtracker", "assets", "rd-beyond.jsx"));
   assert.ok(btv.includes("function RdBeyond(") && btv.includes("function BtvBody(")

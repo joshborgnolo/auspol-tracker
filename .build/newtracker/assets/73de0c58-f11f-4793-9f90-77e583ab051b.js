@@ -1970,15 +1970,16 @@ const TABS = [
     tip: "How much the polls disagree with one another" },
   { id: "leans", label: "Pollster leans", menu: true,
     tip: "How each pollster leans against the others" },
-  { id: "flows", label: "Preference flows", menu: true,
+  { id: "flows", label: "Respondent-allocated preference flows", menu: true,
     tip: "Where minor-party preferences are flowing now, against the last election" },
   { id: "flows-explained", label: "Preference flows explained", menu: true,
     tip: "How preferences decide the two-party figure" },
-  /* Beyond the vote, the ☰ menu's fifth page: what the pollsters ask
+  /* Public opinion, the ☰ menu's fifth page: what the pollsters ask
      beyond voting intention, by topic, the recurring questions charted
      across pollsters. It was the /ad-hocs/ catalogue of every one-off
-     question (2026-10-17); curated and renamed 2026-10-18 */
-  { id: "beyond-the-vote", label: "Beyond the vote", menu: true,
+     question (2026-10-17); curated and renamed 2026-10-18; renamed
+     Public opinion 2026-10-20 */
+  { id: "beyond-the-vote", label: "Public opinion", menu: true,
     tip: "What Australians tell the pollsters beyond their vote, by topic" },
   /* the change log as the ☰ menu's sixth page (2026-10-15): it used to sit
      inside the Info tab as the about-block list; now it is a page of
@@ -1999,7 +2000,7 @@ const TABS = [
 /* a page with no past terms in its cycle data (/vic/, until its earlier
    terms' polls are gathered) has no Past cycles tab */
 if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1);
-/* the preference-flows explainer, Beyond the vote and the change log are
+/* the preference-flows explainer, Public opinion and the change log are
    federal-only: build.mjs emits no vic/ document for any of them to open
    (the Vic build's flow settings and contests differ, vic has no one-off
    stores, and Vic never writes data/changelog.json) */
@@ -2965,3 +2966,18 @@ const appRoot = ReactDOM.createRoot(document.getElementById("root"));
 ReactDOM.flushSync(() => appRoot.render(
   <RootBoundary><App /></RootBoundary>
 ));
+/* /beyond-the-vote/'s questions ride a lazily fetched sidecar (the
+   loadOneOffs contract in the data layer) - nobody outside the Public
+   opinion page needs them, so they are no part of the payload every visitor
+   pays for. But a reader heading into the ☰ menu should never meet the
+   page's loading line: once the app is on screen, fetch the file the moment
+   the browser goes idle, so the tab renders from loadOneOffs()'s cache when
+   it opens. A reader who beats the prefetch just waits out the same single
+   fetch; failure falls back to the page's own retry path. requestIdleCallback
+   has no Safari twin before 16.4, where the closest cheap eager is a short
+   timeout. */
+if (window.AP_ONEOFF_SRC && window.AUSPOL && typeof window.AUSPOL.loadOneOffs === "function") {
+  const prefetchOneOffs = () => { try { window.AUSPOL.loadOneOffs(); } catch (_) {} };
+  if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(prefetchOneOffs, { timeout: 3000 });
+  else window.setTimeout(prefetchOneOffs, 1500);
+}

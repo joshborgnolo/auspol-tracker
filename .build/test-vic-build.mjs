@@ -50,7 +50,7 @@ assert.ok(!html.includes("window.AP_INITIAL_TAB="), "the Now document carries no
 // written beside BUILD_OUT, and a Past cycles page only once a term closes –
 // Victoria has none yet, so cycles/ must NOT exist in the scratch dir
 for (const [id, label] of [["allpolls", "All polls"], ["disagreement", "Poll disagreement"],
-                           ["leans", "Pollster leans"], ["flows", "Preference flows"], ["info", "Info"]]) {
+                           ["leans", "Pollster leans"], ["flows", "Respondent-allocated preference flows"], ["info", "Info"]]) {
   const t = fs.readFileSync(path.join(SCRATCH, id, "index.html"), "utf8");
   assert.match(t, new RegExp(`<title>vicpol tracker – ${label}</title>`), `vic/${id}/ has its own title`);
   assert.ok(t.includes(`<link rel="canonical" href="https://auspoltracker.com/vic/${id}/">`), `vic/${id}/ has its own canonical`);

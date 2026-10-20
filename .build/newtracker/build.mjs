@@ -122,7 +122,7 @@ const JSX = [
   "rd-polls.jsx",                             // the redesign's latest-and-next polls table
   "rd-cycles.jsx",                            // the redesign's Past cycles tab
   "rd-allpolls.jsx",                          // the redesign's All polls tab
-  "rd-beyond.jsx",                            // the ☰ menu's Beyond the vote page
+  "rd-beyond.jsx",                            // the ☰ menu's Public opinion page
   "73de0c58-f11f-4793-9f90-77e583ab051b.js",  // header, hero, mount
 ];
 
@@ -781,7 +781,7 @@ function ssChangelogBlock(esc) {
         is the interactive archive.</p>`;
 }
 
-/* The Beyond the vote page's static article: the payload the live page draws
+/* The Public opinion page's static article: the payload the live page draws
    (gen-data's oneoffs-source.json, which beyond-the-vote.mjs builds from the
    one-off stores), set as text in the same topic order, so a no-JS reader or
    a crawler gets the page's findings and figures: the index of findings the
@@ -840,7 +840,7 @@ ${t.blocks.map(block).join("")}${t.more.length ? `
         <ul class="btv-ss-list">${t.more.map((q) => `<li>${esc(q.title)} <span class="btv-ss-by">(${house(q.house)}, ${month(q.last)})</span></li>`).join("")}</ul>` : ""}`).join("");
   return `
 
-      <section class="btv-ss" aria-label="Beyond the vote: the questions by topic">
+      <section class="btv-ss" aria-label="Public opinion: the questions by topic">
       <h2>The findings</h2>
       <ol class="btv-ss-list">${findings}</ol>${sections}
       </section>`;
@@ -1196,7 +1196,7 @@ ${body.trim()}
       </div>
     </article>`;
   }
-  /* the ☰ menu's fifth page, Beyond the vote: the questions the pollsters
+  /* the ☰ menu's fifth page, Public opinion: the questions the pollsters
      ask beyond voting intention, by topic (ssBeyondBlock); the live tab draws
      the same payload as findings, charts and rows (RdBeyond, rd-beyond.jsx). Federal
      only – /vic/'s menu never holds it */
@@ -1206,7 +1206,7 @@ ${body.trim()}
     let topics = null;
     try { topics = JSON.parse(fs.readFileSync(DA("oneoffs-source.json"), "utf8")).topics.filter((t) => t.blocks.length || t.more.length).length; } catch {}
     return `<article class="static-summary">
-  <h1>Beyond the vote</h1>
+  <h1>Public opinion</h1>
   <p class="ss-sub">Voting intention is only part of what the pollsters ask. This page
     gathers the rest of this term&#8217;s questions worth knowing${topics ? ", in " + (CYCLE_COUNT_WORDS[topics] || topics) + " topics" : ","} from
     Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each
@@ -1231,7 +1231,7 @@ ${ssBeyondBlock(esc)}
         pooled with recent polls counting for more, and shrunk toward zero while a house has published
         few. The aggregate subtracts each lean as it stood at the time. The live page charts every
         house's lean month by month, on the two-party figure and on each party's primary vote.`],
-    flows: ["Preference flows",
+    flows: ["Respondent-allocated preference flows",
       `Where minor-party preferences are flowing now. The two-party figures read every poll's
         primaries through the flows counted at the last election; this page checks whether voters
         are still sending their preferences that way &#8211; what they tell pollsters when asked to
@@ -1620,10 +1620,11 @@ writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
    document, and the browser resolves the cycle-source fetch against the
    page's own URL. */
 parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
-/* The questions behind the ☰ menu's Beyond the vote page get the same
-   treatment as the cycle-source rows: a hashed sidecar fetched only when the
-   tab opens (nobody but that page's reader needs it), gen-data's
-   oneoffs-source.json shipped to /assets/ under its own content hash. */
+/* The questions behind the ☰ menu's Public opinion page get the same
+   treatment as the cycle-source rows: a hashed sidecar outside the main
+   payload (nobody but that page's reader needs it), gen-data's
+   oneoffs-source.json shipped to /assets/ under its own content hash; the
+   client prefetches it at idle so the tab renders on the spot. */
 const oneOffsJson = !VIC && fs.readFileSync(DA("oneoffs-source.json"), "utf8");
 if (!VIC) {
   const name = `oneoffs-source.${hash8(Buffer.from(oneOffsJson))}.json`;
@@ -1686,21 +1687,22 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       desc: `How much the ${VIC ? JV.adj : "Australian federal"} polls disagree – how far they sit from the trend through them, month by month, against the spread sampling error alone would leave.` },
     { id: "leans", label: "Pollster leans",
       desc: `How each ${VIC ? JV.adj : "Australian federal"} pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.` },
-    { id: "flows", label: "Preference flows",
+    { id: "flows", label: "Respondent-allocated preference flows",
       desc: `Where ${VIC ? JV.adj : "Australian federal"} preferences are flowing now – what voters tell pollsters, and what the pollsters' own two-party figures imply, set against the flows of the last election.` },
-    /* the ☰ menu's fourth page, straight under Preference flows (the user's
-       2026-10-15 call: the explainer was a dressed satellite at
-       /preference-flows/, moved here as a page of the build – a federal
+    /* the ☰ menu's fourth page, straight under Respondent-allocated preference
+       flows (the user's 2026-10-15 call: the explainer was a dressed satellite
+       at /preference-flows/, moved here as a page of the build – a federal
        page only, /vic/'s menu never holds it) */
     ...(VIC ? [] : [{ id: "flows-explained", label: "Preference flows explained",
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     /* the ☰ menu's fifth page, straight under the explainer: what the
        pollsters ask beyond voting intention, by topic (the 2026-10-17
        catalogue at /ad-hocs/, curated and renamed 2026-10-18 – the old path
-       is a hand-kept redirect stub). Federal only, /vic/'s menu never holds it */
-    ...(VIC ? [] : [{ id: "beyond-the-vote", label: "Beyond the vote",
+       is a hand-kept redirect stub; renamed Public opinion 2026-10-20).
+       Federal only, /vic/'s menu never holds it */
+    ...(VIC ? [] : [{ id: "beyond-the-vote", label: "Public opinion",
       desc: "What Australians tell the pollsters beyond their vote – Donald Trump, immigration, One Nation, the budget and housing tax, the cost of living, the Iran war, Bondi, climate and more – charted across pollsters, with every figure and source." }]),
-    /* the ☰ menu's sixth page, straight under Beyond the vote (the user's
+    /* the ☰ menu's sixth page, straight under Public opinion (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
        Info about-block's tail, then a console satellite at /changelog/;
        now a page of the build – federal only, /vic/ has no change log) */

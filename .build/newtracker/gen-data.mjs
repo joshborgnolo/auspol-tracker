@@ -7334,7 +7334,7 @@ const changelog = JUR ? null : (() => {
   return committed.entries || [];
 })();
 
-/* ---- §8e Beyond the vote --------------------------------------------------
+/* ---- §8e Public opinion (/beyond-the-vote/) --------------------------------
    The /beyond-the-vote/ page (the ☰ menu page that was the /ad-hocs/
    catalogue): what the pollsters ask beyond voting intention, by topic.
    beyond-the-vote.mjs reads the eight hand-curated one-off stores
@@ -7688,7 +7688,9 @@ window.AUSPOL = (function () {
   };
   /* The questions behind the /beyond-the-vote/ page – the same lazily
      fetched sidecar contract as cycle-source above, for the same reason: read
-     by nothing outside that one tab's page. */
+     by nothing outside that one tab's page. The app asset kicks this loader
+     once the browser turns idle, so the page opens on a warm cache rather
+     than its loading line; the promise is the one keeper either way. */
   let _oneOffs = null;
   let _oneOffsPromise = null;
   const loadOneOffs = () => {
