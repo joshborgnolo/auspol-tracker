@@ -7685,8 +7685,10 @@ function infoTerms(D) {
             2015 Queensland voters could stop numbering, as New South Wales voters still can. Its
             distributions record the ballots that ran out at each exclusion, so the estimates for
             2004 to 2015 follow those too: each share is of the ballots that reached Labor or the
-            Coalition, and the tooltip gives the estimated share that reached neither. The New South
-            Wales check below tests the method on that kind of count.</span>
+            Coalition, and the tooltip gives the estimated share that reached neither.
+            {FHB.nsw && FHB.nsw.exh != null ? <> Run on New South Wales&rsquo;s distributions, where
+            the count is known, those exhausted shares came within {FHB.nsw.exh.toFixed(1)} points, so
+            read them as approximate.</> : null}</span>
             <span className="info-p"><b>New South Wales: counted.</b> Its electoral commission
             publishes every ballot&rsquo;s preferences, so its lines are counts, like the federal ones.
             NSW voters may stop numbering before they reach Labor or the Coalition, so each share is

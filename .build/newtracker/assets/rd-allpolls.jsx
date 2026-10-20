@@ -5593,9 +5593,10 @@ function ExplainedFlowChart({ jur, inv }) {
       if (val == null) { if (cur.length) runs.push(cur); cur = []; }
       else {
         // an estimate's 90% miss, then (optional preferential years) the
-        // share of the pile that reached neither Labor nor the Coalition
+        // share of the pile that reached neither Labor nor the Coalition -
+        // "about" on an estimate: it missed NSW's counted shares by up to 3
         const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null,
-          exh[i] != null ? exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+          exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({ x: YEARS[i], y: T(val), ...(note ? { note } : null) });
       }
     });

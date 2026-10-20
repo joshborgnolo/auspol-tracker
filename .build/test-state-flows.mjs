@@ -42,9 +42,10 @@ for (const r of rows) {
     assert.ok(+r.err90 > 0 && +r.err90 < 15, `${r.jurisdiction} ${r.year} ${r.party}: an error figure (${r.err90})`);
   }
   // an estimate's exhausted share comes only from optional-preferential
-  // counts: Queensland to 2015, the Northern Territory from 2016
+  // counts: Queensland to 2015, the Northern Territory in 2016 (full
+  // preferential again from 2020)
   if (r.method === "model" && r.exhausted_share !== "") {
-    const opv = (r.jurisdiction === "qld" && +r.year <= 2015) || (r.jurisdiction === "nt" && +r.year >= 2016);
+    const opv = (r.jurisdiction === "qld" && +r.year <= 2015) || (r.jurisdiction === "nt" && +r.year === 2016);
     assert.ok(opv, `${r.jurisdiction} ${r.year} ${r.party}: an exhausted share only under optional numbering`);
     assert.ok(+r.exhausted_share > 0 && +r.exhausted_share < 1, `${r.jurisdiction} ${r.year} ${r.party}: an exhausted share`);
   }
@@ -106,6 +107,9 @@ assert.ok(B && B.elections === 6, "the federal back-test rides fed.backtest");
 assert.ok(B.grn.model < B.grn.replay && B.oth.model < B.oth.replay,
   "the model still beats the replay it replaced, Greens and others alike");
 assert.ok(B.grn.model <= 1.5, `the Greens estimate stays within 1.5 points of the federal counts on average (${B.grn.model})`);
+// the optional-preferential estimates' exhausted shares, tested on NSW's
+// counts; the tooltip says "about" and the Info entry quotes this miss
+assert.ok(B.nsw && B.nsw.exh != null && B.nsw.exh > 0 && B.nsw.exh <= 5, `NSW exhausted shares within 5 points (${B.nsw && B.nsw.exh})`);
 assert.ok(B.qld != null && B.qld <= 2, `Queensland's counted flows within 2 points (${B.qld})`);
 
 // ---- the renderer and the Info entry ---------------------------------------

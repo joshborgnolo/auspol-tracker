@@ -8395,7 +8395,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "qldSource": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/",
         "nsw": {
           "grn": 0.5,
-          "oth": 2.8
+          "oth": 2.8,
+          "exh": 3.1
         }
       }
     },
@@ -110029,7 +110030,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "States: estimated."), " No state commission publishes that count. Each publishes its distributions of preferences, which show where an excluded candidate\u2019s whole pile went, including ballots it had inherited from candidates excluded earlier. So each pile holds two groups of known size: the candidate\u2019s own voters and the ballots it inherited. The estimate works out how each group split from the way the piles split across every seat, then follows both to the final two. It covers only the seats where Labor and the Coalition were the final two."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Queensland to 2015: optional numbering."), " From 1992 to 2015 Queensland voters could stop numbering, as New South Wales voters still can. Its distributions record the ballots that ran out at each exclusion, so the estimates for 2004 to 2015 follow those too: each share is of the ballots that reached Labor or the Coalition, and the tooltip gives the estimated share that reached neither. The New South Wales check below tests the method on that kind of count."), React.createElement("span", {
+      }, React.createElement("b", null, "Queensland to 2015: optional numbering."), " From 1992 to 2015 Queensland voters could stop numbering, as New South Wales voters still can. Its distributions record the ballots that ran out at each exclusion, so the estimates for 2004 to 2015 follow those too: each share is of the ballots that reached Labor or the Coalition, and the tooltip gives the estimated share that reached neither.", FHB.nsw && FHB.nsw.exh != null ? React.createElement(React.Fragment, null, " Run on New South Wales\u2019s distributions, where the count is known, those exhausted shares came within ", FHB.nsw.exh.toFixed(1), " points, so read them as approximate.") : null), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "New South Wales: counted."), " Its electoral commission publishes every ballot\u2019s preferences, so its lines are counts, like the federal ones. NSW voters may stop numbering before they reach Labor or the Coalition, so each share is of the ballots that reached one of them, and the tooltip gives how many reached neither."), React.createElement("span", {
         className: "info-p"
@@ -135091,7 +135092,7 @@ function ExplainedFlowChart({
         if (cur.length) runs.push(cur);
         cur = [];
       } else {
-        const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null, exh[i] != null ? exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null, exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({
           x: YEARS[i],
           y: T(val),

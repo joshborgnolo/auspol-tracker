@@ -1978,34 +1978,46 @@
    "grn": {
     "counted": 86.65,
     "model": 87.12,
-    "replay": 84.75
+    "replay": 84.75,
+    "exh_counted": 40.5,
+    "exh_model": 37.37
    },
    "onp": {
     "counted": 37.88,
     "model": 38.56,
-    "replay": 40.09
+    "replay": 40.09,
+    "exh_counted": 69.97,
+    "exh_model": 66.91
    },
    "oth": {
     "counted": 54.19,
     "model": 51.39,
-    "replay": 55.34
+    "replay": 55.34,
+    "exh_counted": 58.46,
+    "exh_model": 61.44
    }
   },
   "2023": {
    "grn": {
     "counted": 88.12,
     "model": 87.98,
-    "replay": 85.77
+    "replay": 85.77,
+    "exh_counted": 34.51,
+    "exh_model": 32.17
    },
    "onp": {
     "counted": 32.09,
     "model": 34.24,
-    "replay": 36.79
+    "replay": 36.79,
+    "exh_counted": 61.32,
+    "exh_model": 58.39
    },
    "oth": {
     "counted": 53.32,
     "model": 51.87,
-    "replay": 55.29
+    "replay": 55.29,
+    "exh_counted": 55.27,
+    "exh_model": 57.65
    }
   }
  },

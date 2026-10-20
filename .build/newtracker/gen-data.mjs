@@ -4385,6 +4385,13 @@ const flowHistory = (() => {
     const v = Object.values(bt.nsw_check || {}).filter((d) => d[b]).map((d) => Math.abs(d[b].model - d[b].counted));
     return v.length ? Math.round(Math.max(...v) * 10) / 10 : null;
   };
+  // ... and its exhausted share against the counted one, every group: the
+  // test of the optional-preferential estimates (Qld to 2015)
+  const nswExh = () => {
+    const v = Object.values(bt.nsw_check || {}).flatMap((d) => Object.values(d))
+      .filter((x) => x.exh_model != null).map((x) => Math.abs(x.exh_model - x.exh_counted));
+    return v.length ? Math.round(Math.max(...v) * 10) / 10 : null;
+  };
   const span = (v) => (v.length ? [Math.min(...v), Math.max(...v)] : null);
   h.fed.backtest = {
     elections: Object.keys(bt.federal || {}).length, minClassic: STATE_MIN_CLASSIC,
@@ -4393,7 +4400,7 @@ const flowHistory = (() => {
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
     err90: { grn: span(errs.grn), onp: span(errs.onp), oth: span(errs.oth) }, onpMinBallots: bt.onp_min_ballots || null,
     qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null,
-    nsw: bt.nsw_check ? { grn: nswMax("grn"), oth: nswMax("oth") } : null };
+    nsw: bt.nsw_check ? { grn: nswMax("grn"), oth: nswMax("oth"), exh: nswExh() } : null };
   return h;
 })();
 

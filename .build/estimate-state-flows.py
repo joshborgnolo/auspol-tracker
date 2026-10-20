@@ -44,7 +44,7 @@ and data/aec-2025-tcp-flow-by-division.csv).
 Outputs: data/state-flows-est.csv (jurisdiction, year, party, method,
 est_alp_votes, est_coal_votes, est_flow_to_alp, err90, exhausted_share,
 n_classic; exhausted_share only where voters could stop numbering – NSW,
-Queensland to 2015, the NT from 2016 – since WA's and the others' few
+Queensland to 2015, the NT in 2016 – since WA's and the others' few
 savings-provision exhausts are dropped from the shares unreported; method
 "counted" for NSW, whose ballot-level data gives exact
 flows – the model's NSW reading is scored against them in nsw_check) and
@@ -84,8 +84,9 @@ BUCKETS = ("grn", "onp", "oth")
 
 def opv(jur, y):
     """optional preferential voting: a ballot may stop numbering short of
-    the final two (Queensland 1992-2015, the NT from 2016, NSW throughout)"""
-    return (jur == "qld" and y <= 2015) or (jur == "nt" and y >= 2016) or jur == "nsw"
+    the final two (Queensland 1992-2015, the NT in 2016 alone - full
+    preferential again from 2020 - and NSW throughout)"""
+    return (jur == "qld" and y <= 2015) or (jur == "nt" and y == 2016) or jur == "nsw"
 K = 6
 TYPES5 = ("alp", "grn", "onp", "oth", "exh")
 
@@ -745,8 +746,12 @@ def main():
         n_cl = sum(1 for s in seats.values() if classic(s))
         if jur == "nsw" and y in counted:
             # NSW is drawn from its counts; the model's reading is the check
+            # (and its exhausted share against the counted one: the test of
+            # the optional-preferential estimates, Qld to 2015)
             nsw_check[str(y)] = {b: {"counted": round(pct(counted[y][b][:2]), 2), "model": round(pct(est[b]), 2),
-                                     "replay": round(pct(flows(seats)[b]), 2)}
+                                     "replay": round(pct(flows(seats)[b]), 2),
+                                     "exh_counted": round(100 * counted[y][b][2] / sum(counted[y][b]), 2),
+                                     "exh_model": round(100 * est[b][2] / sum(est[b]), 2)}
                                  for b in BUCKETS if pct(counted[y][b][:2]) is not None and pct(est[b]) is not None}
             for b in BUCKETS:
                 v = counted[y][b]
