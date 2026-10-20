@@ -1,7 +1,8 @@
 /* Pins .build/changelog.mjs, the refresh change log behind the Info tab's
    "Change log" section: the canonical state, and every entry kind
-   diffChangelog can emit (poll/flows/finding/meta), plus the quiet-run
-   idempotence the unattended writers rely on. Run: node .build/test-changelog.mjs */
+   diffChangelog can emit (poll/conf/flows/finding/meta), the confidence
+   gauges' moves and widen seed, plus the quiet-run idempotence the
+   unattended writers rely on. Run: node .build/test-changelog.mjs */
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
@@ -398,4 +399,58 @@ assert.equal(diff(W(), W()).appended.length, 0);
     ["Roy Morgan added — the two-party preferred estimate held at 52.3"], "only the first sentence: the figures after it go");
 }
 
-console.log("test-changelog.mjs: OK (states, seed, poll/flows/finding/meta entries, idempotence, the widened figures and findings, the More menu's gist)");
+/* ---- the confidence gauges (2026-10-20): the four published sentiment
+   gauges join the state, and a release that moves one logs one "conf"
+   entry a refresh */
+const CONF0 = { consumer: 88.6, westpacConsumer: 80.4, business: 76.5, nabBusiness: -13 };
+
+/* the state canonicalises: key order irrelevant, one-decimal rounding,
+   a null lane dropped, absent altogether → null */
+{
+  const a = stateOf({ conf: { consumer: 88.64, nabBusiness: -13.02, business: 76.5 } });
+  assert.deepEqual(a.conf, { business: 76.5, consumer: 88.6, nabBusiness: -13 });
+  assert.deepEqual(stateOf({ conf: { nabBusiness: -13.02, business: 76.5, consumer: 88.64 } }), a);
+  assert.equal(stateOf({ conf: { consumer: 88.6, westpac: null } }).conf.westpac, undefined, "a null lane drops out");
+  assert.equal(S().conf, null, "no conf in the raw state → null");
+}
+
+/* migration: the first refresh carrying the gauges says so once, with where
+   each stands – no per-lane moves against figures never logged */
+{
+  const { appended } = diff(W(), W({ conf: CONF0 }));
+  assert.deepEqual(appended.map((e) => e.kind), ["seed"]);
+  assert.equal(appended[0].text,
+    "From today the log also records the four published economic-confidence gauges as each new release moves them: " +
+    "ANZ–Roy Morgan consumer confidence 88.6; Westpac–MI consumer sentiment 80.4; Roy Morgan business confidence 76.5; NAB business confidence −13.");
+  assert.equal(diff(W({ conf: CONF0 }), W({ conf: CONF0 })).appended.length, 0, "quiet afterwards");
+}
+
+/* a fresh log on a conf state opens with where the gauges stand */
+assert.match(initChangelog(W({ conf: CONF0 }), "2029-01-18").entries[0].text,
+  /Economic sentiment: ANZ–Roy Morgan consumer confidence 88\.6; Westpac–MI consumer sentiment 80\.4; Roy Morgan business confidence 76\.5; NAB business confidence −13\. From today/);
+
+/* a release moves some lanes: one entry names them, the held lanes stay out;
+   NAB prints whole negative net balances */
+{
+  const { appended } = diff(W({ conf: CONF0 }), W({ conf: { ...CONF0, consumer: 89.2, nabBusiness: -9 } }));
+  assert.equal(appended.length, 1);
+  assert.equal(appended[0].kind, "conf");
+  assert.equal(appended[0].text, "Economic sentiment: ANZ–Roy Morgan consumer confidence 88.6 → 89.2; NAB business confidence −13 → −9.");
+}
+
+/* a lane new to the log reads as a level, a lapsed lane says nothing */
+{
+  const t = diff(W({ conf: { consumer: 88.6 } }), W({ conf: { consumer: 88.6, nabBusiness: -13 } })).appended;
+  assert.equal(t.length, 1);
+  assert.equal(t[0].text, "Economic sentiment: NAB business confidence −13.");
+  assert.equal(diff(W({ conf: CONF0 }), W({ conf: { consumer: 88.6 } })).appended.length, 0);
+}
+
+/* a poll and a sentiment move on one day: the conf entry follows the poll */
+{
+  const a = diff(W({ conf: CONF0 }), W({ conf: { ...CONF0, business: 78.0 }, polls: [...S().polls, RM] }), RM_INFO).appended;
+  assert.deepEqual(a.map((e) => e.kind), ["poll", "conf"]);
+  assert.equal(a[1].text, "Economic sentiment: Roy Morgan business confidence 76.5 → 78.0.", "an index lane keeps its one decimal");
+}
+
+console.log("test-changelog.mjs: OK (states, seed, poll/conf/flows/finding/meta entries, idempotence, the widened figures and findings, the confidence gauges, the More menu's gist)");

@@ -7262,6 +7262,13 @@ const changelog = JUR ? null : (() => {
     leaders, lean, sig, sigMeta,
     dir: directionNow ? { right: directionNow.right, wrong: directionNow.wrong, net: directionNow.net } : null,
     issLead, issLabel,
+    /* the four confidence gauges' latest printed readings (§5j): null when
+       the file or a lane is absent – the log compares the field only when
+       both sides carry it, so a state written before 2026-10-20 migrates
+       with one widen entry */
+    conf: confidence
+      ? Object.fromEntries(CONF_LANES.map(([k]) => [k, confidence[k] && confidence[k].latest ? confidence[k].latest.v : null]))
+      : null,
   });
   if (process.env.AUSPOL_SITE_REFRESH) {
     const iso = new Date().toLocaleDateString("sv-SE", { timeZone: "Australia/Sydney" });

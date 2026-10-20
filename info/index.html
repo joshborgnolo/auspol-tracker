@@ -1500,6 +1500,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --t-ink: var(--ink);     --t-ink-2: var(--ink-2);
   --t-dim: var(--ink-3);   --t-faint: var(--ink-faint);
   --k-poll:    var(--accent);
+  --k-conf:    oklch(0.53 0.085 95);
   --k-flows:   oklch(0.50 0.085 295);
   --k-finding: oklch(0.53 0.095 345);
   margin: 28px 0 0; width: min(1180px, calc(100vw - 32px));
@@ -1519,6 +1520,7 @@ body.dark .cl-term {
   --t-ink: oklch(0.945 0.008 80);  --t-ink-2: oklch(0.820 0.009 78);
   --t-dim: oklch(0.640 0.009 70);  --t-faint: oklch(0.480 0.009 66);
   --k-poll:    oklch(0.800 0.085 200);
+  --k-conf:    oklch(0.740 0.090 95);
   --k-flows:   oklch(0.790 0.090 295);
   --k-finding: oklch(0.800 0.095 345);
   box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
@@ -1557,6 +1559,7 @@ body.dark .cl-term {
 .cl-tag::before { content: "["; color: var(--t-faint); }
 .cl-tag::after  { content: "]"; color: var(--t-faint); }
 .cl-k-poll .cl-tag    { color: var(--k-poll); }
+.cl-k-conf .cl-tag    { color: var(--k-conf); }
 .cl-k-flows .cl-tag   { color: var(--k-flows); }
 .cl-k-finding .cl-tag { color: var(--k-finding); }
 .cl-k-meta .cl-tag    { color: var(--t-ink); font-weight: 600; }
@@ -88807,6 +88810,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "kind": "poll",
     "text": "YouGov (MRP) (fieldwork 10–29 Jul, n=5,007) added — the two-party preferred estimate held at 52.3 (Labor v the Coalition, implied flows). Primary votes held. Leader ratings: Albanese's net approval −21.6 → −21.7. House effect (Labor v the Coalition, implied flows; positive leans Labor): YouGov (MRP) held at −0.2.",
     "url": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf"
+  }, {
+    "date": "2026-10-20",
+    "label": "20 Oct 2026",
+    "kind": "seed",
+    "text": "From today the log also records the four published economic-confidence gauges as each new release moves them: ANZ–Roy Morgan consumer confidence 68.0; Westpac–MI consumer sentiment 80.4; Roy Morgan business confidence 76.5; NAB business confidence −13."
   }];
   const CYCLE_DEFS = [{
     "year": 1943,
@@ -109027,6 +109035,7 @@ function MenuPageView({
 }
 const CL_KIND = {
   poll: "poll",
+  conf: "conf",
   flows: "flows",
   finding: "finding",
   meta: "headline",
@@ -109099,7 +109108,7 @@ function ChangelogEntries() {
     className: "cl-wait"
   }, React.createElement("b", {
     "aria-hidden": "true"
-  }, "\u203A"), "next entry when the next poll lands", React.createElement("span", {
+  }, "\u203A"), "next entry when the next poll or confidence release lands", React.createElement("span", {
     className: "cl-cur",
     "aria-hidden": "true"
   }))));
@@ -109118,7 +109127,7 @@ function RdChangelog() {
     className: "rd-meta"
   }, "What\u2019s moved numbers when")), React.createElement(RdHed, {
     head: "Latest changelog entries",
-    dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away \u2013 recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
+    dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away, as well as the four economic-confidence gauges \u2013 recorded entry by entry as new readings land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
       className: "fb-link",
       href: "/feed.xml"
     }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.")
@@ -109982,7 +109991,7 @@ function infoTerms(D) {
   }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.", !window.JUR ? React.createElement(React.Fragment, null, " The ", React.createElement("a", {
     className: "fb-link",
     href: "/changelog/"
-  }, "change log"), " records what has moved the two-party preferred estimate and each statistical finding, entry by entry.") : null), React.createElement("p", {
+  }, "change log"), " records what has moved the two-party preferred estimate, each statistical finding and the economic-confidence gauges, entry by entry.") : null), React.createElement("p", {
     className: "info-about-p"
   }, React.createElement("b", null, "Feedback."), " Spot a wrong number or have any other feedback?", " ", React.createElement("a", {
     className: "fb-link",
@@ -137745,7 +137754,7 @@ const TABS = [{
   id: "changelog",
   label: "Changelog",
   menu: true,
-  tip: "What has moved the aggregate and each finding, entry by entry"
+  tip: "What has moved the aggregate, each finding and the confidence gauges, entry by entry"
 }, {
   id: "info",
   label: "Info",

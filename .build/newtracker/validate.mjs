@@ -815,7 +815,7 @@ export function validateChangelog() {
     fail("changelog.json", "changelog-shape", "entries is not an array");
     return errors;
   }
-  const KINDS = new Set(["seed", "meta", "flows", "poll", "finding"]);
+  const KINDS = new Set(["seed", "meta", "flows", "poll", "finding", "conf"]);
   let prev = null;
   C.entries.forEach((e, i) => {
     const where = `changelog #${i} (${e && e.kind})`;

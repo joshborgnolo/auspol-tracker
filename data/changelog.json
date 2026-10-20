@@ -346,7 +346,7 @@
       "v": {
         "Agenda C Synesis": 0.8,
         "DemosAU": -0.6,
-        "DemosAU (MRP)": 0.3,
+        "DemosAU (MRP)": 0.2,
         "Essential": -1,
         "Fox & Hedgehog": -1,
         "Freshwater": -0.6,
@@ -393,6 +393,12 @@
     "sigMeta": {
       "iss|economy|imp": "the share naming economic management a top-three issue",
       "iss|housing|alp": "Labor's share as the best party on housing"
+    },
+    "conf": {
+      "business": 76.5,
+      "consumer": 68,
+      "nabBusiness": -13,
+      "westpacConsumer": 80.4
     }
   },
   "entries": [
@@ -434,6 +440,12 @@
       "kind": "poll",
       "text": "YouGov (MRP) (fieldwork 10–29 Jul, n=5,007) added — the two-party preferred estimate held at 52.3 (Labor v the Coalition, implied flows). Primary votes held. Leader ratings: Albanese's net approval −21.6 → −21.7. House effect (Labor v the Coalition, implied flows; positive leans Labor): YouGov (MRP) held at −0.2.",
       "url": "https://blueprintinstitute.s3.ap-southeast-2.amazonaws.com/Final_YouGov_Blueprint_MRP_report_compressed.pdf"
+    },
+    {
+      "date": "2026-10-20",
+      "label": "20 Oct 2026",
+      "kind": "seed",
+      "text": "From today the log also records the four published economic-confidence gauges as each new release moves them: ANZ–Roy Morgan consumer confidence 68.0; Westpac–MI consumer sentiment 80.4; Roy Morgan business confidence 76.5; NAB business confidence −13."
     }
   ]
 }

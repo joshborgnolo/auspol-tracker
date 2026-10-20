@@ -745,7 +745,7 @@ function ssAboutBlock(L, prim, acc) {
    from D.changelog (ChangelogEntries, d1a1d215 asset – keep the two in
    step), and the .cl-* styles live in template.html. Federal only – a VIC
    build never has the file. Caller supplies its esc. */
-const CL_KIND = { poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start" };
+const CL_KIND = { poll: "poll", conf: "conf", flows: "flows", finding: "finding", meta: "headline", seed: "start" };
 function ssChangelogBlock(esc) {
   let C = null;
   try { C = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "changelog.json"), "utf8")); } catch { /* absent on first build */ }
@@ -772,7 +772,7 @@ function ssChangelogBlock(esc) {
           <p class="cl-cmt"># ${n} ${n === 1 ? "entry" : "entries"} since ${esc(C.entries[0].date)}</p>
           <ol class="cl-log">${rows}
           </ol>
-          <p class="cl-wait"><b aria-hidden="true">&#8250;</b>next entry when the next poll lands<span class="cl-cur" aria-hidden="true"></span></p>
+          <p class="cl-wait"><b aria-hidden="true">&#8250;</b>next entry when the next poll or confidence release lands<span class="cl-cur" aria-hidden="true"></span></p>
         </div>
       </section>
       <p class="ss-note">A poll landing is what writes most of these &#8211; the
@@ -1246,7 +1246,8 @@ ${ssBeyondBlock(esc)}
     return `<article class="static-summary">
   <h1>Changelog</h1>
   <p class="ss-sub">What has moved the aggregate&#8217;s two-party preferred estimate, and when each
-    statistical finding appeared or fell away &#8211; recorded entry by entry as new polls land.</p>
+    statistical finding appeared or fell away, as well as the four economic-confidence gauges
+    &#8211; recorded entry by entry as new readings land.</p>
 
 ${ssChangelogBlock(esc)}
 
@@ -1704,7 +1705,7 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
        Info about-block's tail, then a console satellite at /changelog/;
        now a page of the build – federal only, /vic/ has no change log) */
     ...(VIC ? [] : [{ id: "changelog", label: "Changelog",
-      desc: "The auspol tracker change log – what has moved the aggregate's two-party preferred estimate, and when each statistical finding appeared or fell away, recorded entry by entry as new polls land." }]),
+      desc: "The auspol tracker change log – what has moved the aggregate's two-party preferred estimate, and when each statistical finding appeared or fell away, as well as the economic-confidence gauges, recorded entry by entry as new readings land." }]),
     { id: "info", label: "Info",
       desc: `How ${BRAND} tracker works – the aggregate's weighting and house-lean method, the pollsters it tracks, and a glossary of the terms the site uses.` },
   ];

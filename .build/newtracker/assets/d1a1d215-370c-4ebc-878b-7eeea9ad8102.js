@@ -6784,7 +6784,7 @@ function MenuPageView({ id, tppBasis }) {
    code-like chunk that logged all the changes"). Static-article twin:
    ssChangelogBlock in build.mjs – keep the two in step. The redesign and
    the classic design both render THIS console. */
-const CL_KIND = { poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start" };
+const CL_KIND = { poll: "poll", conf: "conf", flows: "flows", finding: "finding", meta: "headline", seed: "start" };
 /* figures and arrows lit like syntax: split on the same two patterns the
    build-side lit() wraps after escaping (React escapes the text nodes
    itself, so a split/map is the equivalent move here) */
@@ -6826,7 +6826,7 @@ function ChangelogEntries() {
             );
           })}
         </ol>
-        <p className="cl-wait"><b aria-hidden="true">›</b>next entry when the next poll lands<span className="cl-cur" aria-hidden="true"></span></p>
+        <p className="cl-wait"><b aria-hidden="true">›</b>next entry when the next poll or confidence release lands<span className="cl-cur" aria-hidden="true"></span></p>
       </div>
     </section>
   );
@@ -6840,7 +6840,7 @@ function RdChangelog() {
         <span className="rd-meta">What’s moved numbers when</span>
       </div>
       <RdHed head="Latest changelog entries"
-        dek={<>What has moved the aggregate’s two-party preferred estimate, and when each statistical finding appeared or fell away – recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing – the <a className="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the pollster’s own release.</>} />
+        dek={<>What has moved the aggregate’s two-party preferred estimate, and when each statistical finding appeared or fell away, as well as the four economic-confidence gauges – recorded entry by entry as new readings land, newest first. Most entries are written by a poll landing – the <a className="fb-link" href="/feed.xml">RSS feed</a> lists each new poll as it is added, with a link to the pollster’s own release.</>} />
       <ChangelogEntries />
     </section>
   );
@@ -8277,8 +8277,8 @@ function infoTerms(D) {
       <p className="info-about-p"><b>Following along.</b> The <a className="fb-link" href="/feed.xml">RSS feed</a> lists
       each new poll as it is added, with a link to the pollster’s own release.
       {!window.JUR ? <> The <a className="fb-link" href="/changelog/">change log</a> records
-      what has moved the two-party preferred estimate and each statistical finding,
-      entry by entry.</> : null}</p>
+      what has moved the two-party preferred estimate, each statistical finding and
+      the economic-confidence gauges, entry by entry.</> : null}</p>
       <p className="info-about-p"><b>Feedback.</b> Spot a wrong number or have any other feedback?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept

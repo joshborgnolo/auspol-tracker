@@ -31,7 +31,7 @@ const TABS = [
   { id: "flows", label: "Preference flows", h1: "Preference flows", descFrag: "Where Australian federal preferences are flowing now" },
   { id: "flows-explained", label: "Preference flows explained", h1: "Preference flows explained", descFrag: "How preferences decide the Australian federal two-party figure" },
   { id: "beyond-the-vote", label: "Beyond the vote", h1: "Beyond the vote", descFrag: "charted across pollsters, with every figure and source" }, /* the 2026-10-17 /ad-hocs/ catalogue, curated and renamed 2026-10-18 */
-  { id: "changelog", label: "Changelog", h1: "Changelog", descFrag: "recorded entry by entry as new polls land" },
+  { id: "changelog", label: "Changelog", h1: "Changelog", descFrag: "the economic-confidence gauges, recorded entry by entry" },
   { id: "info", label: "Info", h1: "About auspol tracker", descFrag: "How auspol tracker works" },
 ];
 const rootHtml = read("index.html");

@@ -4,6 +4,9 @@
    .build/git-push-main.sh's refresh_site) diffs it against the committed
    data/changelog.json and appends entries when something moved:
      - poll      — new waves landed, and what the 2PP estimate did
+     - conf      — an economic-confidence gauge moved with a new release
+                   (2026-10-20): the ANZ–Roy Morgan and Westpac–MI consumer
+                   reads, Roy Morgan's and NAB's business confidence
      - flows     — the flows.mjs preference-flow assumptions changed
      - finding   — a statistical finding appeared or fell away (the Who
                    votes for whom proportionality breaks; the 2PP's own
@@ -86,7 +89,12 @@ export function stateOf(raw) {
                    party on each issue ("" where no one does: the Who's
                    trusted verdict), issLabel its name
          sig     — {measure: ±1} for each measure whose month-on-month move
-                   is significant (its sign the move's), sigMeta its label */
+                   is significant (its sign the move's), sigMeta its label
+       Since 2026-10-20:
+         conf    — the four confidence gauges' latest printed readings
+                   {consumer, westpacConsumer, business, nabBusiness}, each
+                   lane's published level (NAB stays its printed net balance,
+                   not the panel's +100 shift) */
     prim: raw.prim ? sortObj(raw.prim, r1) : null,
     leaders: raw.leaders ? sortObj(raw.leaders, r1) : null,
     lean: raw.lean ? { key: raw.lean.key, v: sortObj(raw.lean.v, r1) } : null,
@@ -95,6 +103,7 @@ export function stateOf(raw) {
     issLabel: raw.issLead ? sortObj(raw.issLabel || {}, (x) => x) : null,
     sig: raw.sig ? sortObj(raw.sig, (d) => (d > 0 ? 1 : -1)) : null,
     sigMeta: raw.sig ? sortObj(raw.sigMeta || {}, (x) => x) : null,
+    conf: raw.conf ? sortObj(raw.conf, r1) : null,
   };
 }
 function sortObj(o, f) {
@@ -152,6 +161,22 @@ export function initChangelog(nextState, iso) {
   };
 }
 
+/* The confidence gauges (2026-10-20): display names in the lanes' panel
+   order, and each lane's level as the house prints it – the three indexes
+   to one decimal, NAB's net balance whole. Negatives take the log's minus
+   sign, as a net leader rating does. */
+const CONF_ORDER = ["consumer", "westpacConsumer", "business", "nabBusiness"];
+const CONF_NAME = {
+  consumer: "ANZ–Roy Morgan consumer confidence",
+  westpacConsumer: "Westpac–MI consumer sentiment",
+  business: "Roy Morgan business confidence",
+  nabBusiness: "NAB business confidence",
+};
+const confFmt = (k, v) =>
+  (v < 0 ? "−" : "") + (k === "nabBusiness" ? String(Math.round(Math.abs(v))) : f1(Math.abs(v)));
+const confStanding = (conf) =>
+  CONF_ORDER.filter((k) => conf[k] != null).map((k) => `${CONF_NAME[k]} ${confFmt(k, conf[k])}`).join("; ");
+
 /* where everything the widened log follows stands (2026-10-12): the seed's
    opening reading, and the one-off entry a state written before the
    widening migrates with. "" for a state with none of it. */
@@ -168,7 +193,8 @@ function standingText(st) {
     (lead ? ` Leader ratings: ${lead}.` : "") +
     (D ? ` National direction: right track ${f1(D.right)}, wrong track ${f1(D.wrong)} (net ${sgn(D.net, f1)}).` : "") +
     (st.issLead ? (leads.length ? ` Leading significantly as the best party: ${leads.join("; ")}.` : " No party leads significantly as the best party on any issue.") : "") +
-    (sig.length ? ` Moving significantly over the past month: ${sig.join("; ")}.` : " No measure is moving significantly over the past month.");
+    (sig.length ? ` Moving significantly over the past month: ${sig.join("; ")}.` : " No measure is moving significantly over the past month.") +
+    (st.conf ? ` Economic sentiment: ${confStanding(st.conf)}.` : "");
 }
 
 /* "moved 52.2 → 52.3", or "held at 52.3", or null when either side is
@@ -253,6 +279,14 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
       standingText(nextState)));
   }
 
+  /* the first refresh after the confidence gauges joined (2026-10-20):
+     likewise one entry with where each gauge stands */
+  if (!prevState.conf && nextState.conf) {
+    appended.push(entry(iso, "seed",
+      "From today the log also records the four published economic-confidence gauges as each new release moves them: " +
+      confStanding(nextState.conf) + "."));
+  }
+
   /* the headline pairing or its basis switched */
   if (prevState.lead && nextState.lead &&
       (prevState.lead.pair !== nextState.lead.pair || prevState.lead.basis !== nextState.lead.basis)) {
@@ -326,6 +360,21 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
       figs.map((t) => ` ${t}`).join("");
     if (ps.length === 1) appended.push(entry(iso, "poll", text, ps[0].url || null));
     else appended.push(entry(iso, "poll", text, null, ps.filter((p) => p.url).map((p) => ({ name: p.name, url: p.url }))));
+  }
+
+  /* a confidence gauge moved (2026-10-20): one entry a refresh naming every
+     lane that moved, each a → b since the last logged reading. A lane that
+     prints its previous level again is no entry; a lane arriving later
+     (absent from the old state) reads as a level, not a move. */
+  if (prevState.conf && nextState.conf) {
+    const A = prevState.conf, B = nextState.conf;
+    const bits = CONF_ORDER.map((k) => {
+      const a = A[k], b = B[k];
+      if (b == null) return null;                                  // the lane lapsed: say nothing
+      if (a == null) return `${CONF_NAME[k]} ${confFmt(k, b)}`;    // a lane new to the log
+      return f1(a) === f1(b) ? null : `${CONF_NAME[k]} ${confFmt(k, a)} → ${confFmt(k, b)}`;
+    }).filter(Boolean);
+    if (bits.length) appended.push(entry(iso, "conf", `Economic sentiment: ${bits.join("; ")}.`));
   }
 
   /* the two-party's month-on-month significance flipped */

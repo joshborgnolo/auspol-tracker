@@ -2413,8 +2413,11 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --t-ink: var(--ink);     --t-ink-2: var(--ink-2);
   --t-dim: var(--ink-3);   --t-faint: var(--ink-faint);
   /* kind colours keep clear of the party hues: the site's teal, a violet,
-     a rose – held to the text-contrast threshold on their own ground */
+     a rose – held to the text-contrast threshold on their own ground
+     (conf's amber 95 sits clear of teal 200, the violet 295, ONP's ~58 and
+     the greens around 150) */
   --k-poll:    var(--accent);
+  --k-conf:    oklch(0.53 0.085 95);
   --k-flows:   oklch(0.50 0.085 295);
   --k-finding: oklch(0.53 0.095 345);
   margin: 28px 0 0; width: min(1180px, calc(100vw - 32px));
@@ -2434,6 +2437,7 @@ body.dark .cl-term {
   --t-ink: oklch(0.945 0.008 80);  --t-ink-2: oklch(0.820 0.009 78);
   --t-dim: oklch(0.640 0.009 70);  --t-faint: oklch(0.480 0.009 66);
   --k-poll:    oklch(0.800 0.085 200);
+  --k-conf:    oklch(0.740 0.090 95);
   --k-flows:   oklch(0.790 0.090 295);
   --k-finding: oklch(0.800 0.095 345);
   box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
@@ -2475,6 +2479,7 @@ body.dark .cl-term {
 .cl-tag::before { content: "["; color: var(--t-faint); }
 .cl-tag::after  { content: "]"; color: var(--t-faint); }
 .cl-k-poll .cl-tag    { color: var(--k-poll); }
+.cl-k-conf .cl-tag    { color: var(--k-conf); }
 .cl-k-flows .cl-tag   { color: var(--k-flows); }
 .cl-k-finding .cl-tag { color: var(--k-finding); }
 .cl-k-meta .cl-tag    { color: var(--t-ink); font-weight: 600; }

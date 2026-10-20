@@ -1984,7 +1984,7 @@ const TABS = [
      inside the Info tab as the about-block list; now it is a page of
      TABS like the five above */
   { id: "changelog", label: "Changelog", menu: true,
-    tip: "What has moved the aggregate and each finding, entry by entry" },
+    tip: "What has moved the aggregate, each finding and the confidence gauges, entry by entry" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins AND the hero 2PP has scrolled off (.show-score), and on a phone
      there is not room for both. The glossary is the one tab a reader is
