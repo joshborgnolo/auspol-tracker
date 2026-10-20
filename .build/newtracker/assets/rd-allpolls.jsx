@@ -5564,13 +5564,16 @@ const FLOW_PARTIES = [
   { id: "onp", name: "One Nation", color: "var(--onp)" },
   { id: "oth", name: "Others",     color: "var(--oth)" },
 ];
-function ExplainedFlowChart({ jur }) {
+function ExplainedFlowChart({ jur, inv }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
   const S = FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
+  /* the basis toggle's inverse view draws 100 - x; the ± error bars are
+     symmetric, so they ride the same transform */
+  const T = (v) => (inv ? 100 - v : v);
   const parties = FLOW_PARTIES.filter((p) => (S[p.id] || []).some((v) => v != null));
   const series = [];
   parties.forEach((p) => {
@@ -5583,7 +5586,7 @@ function ExplainedFlowChart({ jur }) {
          party went unmeasured that year), and drawing a line across the hole
          would invent flows for parliaments nobody counted. Split into runs. */
       if (val == null) { if (cur.length) runs.push(cur); cur = []; }
-      else cur.push({ x: YEARS[i], y: val, ...(est && err[i] != null ? { note: "±" + err[i].toFixed(1) } : null) });
+      else cur.push({ x: YEARS[i], y: T(val), ...(est && err[i] != null ? { note: "±" + err[i].toFixed(1) } : null) });
     });
     if (cur.length) runs.push(cur);
     runs.forEach((points, i) => {
@@ -5615,7 +5618,8 @@ function ExplainedFlowChart({ jur }) {
       const err = S[p.id + "Err"] || [];
       (S[p.id] || []).forEach((v, i) => {
         if (v == null || err[i] == null) return;
-        const y0 = Math.max(0, v - err[i]), y1 = Math.min(100, v + err[i]);
+        const y = T(v);
+        const y0 = Math.max(0, y - err[i]), y1 = Math.min(100, y + err[i]);
         areas.push({ id: p.id + "-err" + i, color: p.color, opacity: 0.55, edge: false,
           points: [{ x: YEARS[i] - half, y0, y1 }, { x: YEARS[i] + half, y0, y1 }] });
       });
@@ -5624,7 +5628,7 @@ function ExplainedFlowChart({ jur }) {
   const span = YEARS.length > 1 ? YEARS[0] + " to " + YEARS[YEARS.length - 1] : String(YEARS[0]);
   return (
     <div className="ex-chart">
-      <span className="fc-unit">Share preferencing Labor over the Coalition in {S.elections || S.label + " elections"}, %</span>
+      <span className="fc-unit">{inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in "}{S.elections || S.label + " elections"}, %</span>
       <TrendChart
         height={narrow ? 470 : 330}
         xDomain={[x0, x1]} yDomain={[0, 100]}
@@ -5635,7 +5639,7 @@ function ExplainedFlowChart({ jur }) {
         pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
         series={series} areas={areas} spine={YEARS.map((x) => ({ x }))}
         tooltipTitle={(i) => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : "")}
-        ariaLabel={"Share of preferences flowing to Labor, by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
+        ariaLabel={"Share of preferences flowing to " + (inv ? "the Coalition" : "Labor") + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
       />
       <span className="hero-legend fc-legend">
         {parties.map((p) => (
@@ -5659,6 +5663,7 @@ function RdExplained() {
   const KEYS = Object.keys(FH);
   const [jur, setJur] = useState("fed");
   const active = FH[jur] ? jur : "fed";
+  const [inv, setInv] = useState(false);
   React.useLayoutEffect(() => {
     /* the static-summary twin of this article carries the same #ex-fig-flow
        slot and sits earlier in the document, hidden (opacity 0) once the app
@@ -5692,7 +5697,11 @@ function RdExplained() {
             ))}
           </div>
         )}
-        <ExplainedFlowChart jur={active} />
+        <div className="ex-flow-chips" role="tablist" aria-label="Direction">
+          <button type="button" role="tab" aria-selected={!inv} className={"ex-chip" + (inv ? "" : " on")} onClick={() => setInv(false)}>Labor over Coalition</button>
+          <button type="button" role="tab" aria-selected={inv} className={"ex-chip" + (inv ? " on" : "")} onClick={() => setInv(true)}>Coalition over Labor</button>
+        </div>
+        <ExplainedFlowChart jur={active} inv={inv} />
       </div>
     </section>
   );

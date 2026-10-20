@@ -3262,6 +3262,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ex-slot:empty { display: none; }
 .ex-chart { margin: 12px 0 26px; }
 .ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
+.ex-flow-chips + .ex-flow-chips { margin-top: 8px; }
 .ex-chip {
   font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
   padding: 7px 13px; border-radius: 999px; cursor: pointer;
@@ -134692,7 +134693,8 @@ const FLOW_PARTIES = [{
   color: "var(--oth)"
 }];
 function ExplainedFlowChart({
-  jur
+  jur,
+  inv
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
@@ -134700,6 +134702,7 @@ function ExplainedFlowChart({
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
+  const T = v => inv ? 100 - v : v;
   const parties = FLOW_PARTIES.filter(p => (S[p.id] || []).some(v => v != null));
   const series = [];
   parties.forEach(p => {
@@ -134713,7 +134716,7 @@ function ExplainedFlowChart({
         cur = [];
       } else cur.push({
         x: YEARS[i],
-        y: val,
+        y: T(val),
         ...(est && err[i] != null ? {
           note: "±" + err[i].toFixed(1)
         } : null)
@@ -134744,8 +134747,9 @@ function ExplainedFlowChart({
       const err = S[p.id + "Err"] || [];
       (S[p.id] || []).forEach((v, i) => {
         if (v == null || err[i] == null) return;
-        const y0 = Math.max(0, v - err[i]),
-          y1 = Math.min(100, v + err[i]);
+        const y = T(v);
+        const y0 = Math.max(0, y - err[i]),
+          y1 = Math.min(100, y + err[i]);
         areas.push({
           id: p.id + "-err" + i,
           color: p.color,
@@ -134769,7 +134773,7 @@ function ExplainedFlowChart({
     className: "ex-chart"
   }, React.createElement("span", {
     className: "fc-unit"
-  }, "Share preferencing Labor over the Coalition in ", S.elections || S.label + " elections", ", %"), React.createElement(TrendChart, {
+  }, inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in ", S.elections || S.label + " elections", ", %"), React.createElement(TrendChart, {
     height: narrow ? 470 : 330,
     xDomain: [x0, x1],
     yDomain: [0, 100],
@@ -134793,7 +134797,7 @@ function ExplainedFlowChart({
       x
     })),
     tooltipTitle: i => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : ""),
-    ariaLabel: "Share of preferences flowing to Labor, by party, " + S.label + (est ? ", estimated" : "") + ", " + span
+    ariaLabel: "Share of preferences flowing to " + (inv ? "the Coalition" : "Labor") + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span
   }), React.createElement("span", {
     className: "hero-legend fc-legend"
   }, parties.map(p => React.createElement("span", {
@@ -134820,6 +134824,7 @@ function RdExplained() {
   const KEYS = Object.keys(FH);
   const [jur, setJur] = useState("fed");
   const active = FH[jur] ? jur : "fed";
+  const [inv, setInv] = useState(false);
   React.useLayoutEffect(() => {
     const sec = secRef.current;
     const slot = sec && sec.querySelector(".ex-body .ex-slot");
@@ -134864,8 +134869,25 @@ function RdExplained() {
     "aria-selected": k === active,
     className: "ex-chip" + (k === active ? " on" : ""),
     onClick: () => setJur(k)
-  }, FH[k].label))), React.createElement(ExplainedFlowChart, {
-    jur: active
+  }, FH[k].label))), React.createElement("div", {
+    className: "ex-flow-chips",
+    role: "tablist",
+    "aria-label": "Direction"
+  }, React.createElement("button", {
+    type: "button",
+    role: "tab",
+    "aria-selected": !inv,
+    className: "ex-chip" + (inv ? "" : " on"),
+    onClick: () => setInv(false)
+  }, "Labor over Coalition"), React.createElement("button", {
+    type: "button",
+    role: "tab",
+    "aria-selected": inv,
+    className: "ex-chip" + (inv ? " on" : ""),
+    onClick: () => setInv(true)
+  }, "Coalition over Labor")), React.createElement(ExplainedFlowChart, {
+    jur: active,
+    inv: inv
   })));
 }
 const RdDisagreeM = React.memo(RdDisagree);
