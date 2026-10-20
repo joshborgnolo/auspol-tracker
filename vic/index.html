@@ -3254,7 +3254,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .ex-slot:empty { display: none; }
 .ex-chart { margin: 12px 0 26px; }
 .ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
-.ex-flow-flip { margin: 22px 0 0; }
+.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 22px; }
 .ex-flow-chips + .ex-flow-flip { margin-top: 8px; }
 .ex-chip {
   font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
@@ -64337,7 +64337,7 @@ function RdFlows({
   }, React.createElement("span", {
     className: "rd-fx-keyx",
     "aria-hidden": "true"
-  }), "2026 state and by-election counts"), c.ref && React.createElement("span", {
+  }), "Election and by-election counts"), c.ref && React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-fx-keyref" + (c.band ? " band" : ""),
@@ -64572,6 +64572,112 @@ function ExplainedFlowChart({
     from: "Preference flows explained"
   })));
 }
+const ON_COHORTS = [{
+  id: "coal",
+  name: "Coalition",
+  color: "var(--lnp)"
+}, {
+  id: "grn",
+  name: "Greens",
+  color: "var(--grn)"
+}, {
+  id: "oth",
+  name: "Others",
+  color: "var(--oth)"
+}];
+function ExplainedOnChart({
+  inv
+}) {
+  const narrow = useNarrow(window.MQ_PHONE);
+  const BYS = ((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm);
+  if (!BYS.length) return null;
+  const T = v => inv ? 100 - v : v;
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parties = ON_COHORTS.filter(p => BYS.some(b => b[p.id] != null));
+  const series = [];
+  parties.forEach(p => {
+    const runs = [];
+    let cur = [];
+    BYS.forEach(b => {
+      const v = b[p.id];
+      if (v == null) {
+        if (cur.length) runs.push(cur);
+        cur = [];
+      } else cur.push({
+        x: b.xm,
+        y: T(v),
+        ...((b.lbl || {})[p.id] ? {
+          note: (b.lbl || {})[p.id]
+        } : null)
+      });
+    });
+    if (cur.length) runs.push(cur);
+    runs.forEach((points, i) => {
+      const tail = i === runs.length - 1;
+      series.push({
+        id: p.id + i,
+        label: p.name,
+        color: p.color,
+        points,
+        smooth: false,
+        width: 2.6,
+        endCap: tail || points.length === 1,
+        endLabel: tail && !narrow ? p.name : null
+      });
+    });
+  });
+  const x0 = BYS[0].xm - 0.9,
+    x1 = BYS[BYS.length - 1].xm + 0.9;
+  const ticks = BYS.map(b => ({
+    x: b.xm,
+    label: MON[+b.date.slice(5, 7) - 1] + " " + b.date.slice(0, 4)
+  }));
+  const low = s => s.replace(/^The /i, m => m.toLowerCase());
+  const cap = BYS.map(b => b.label + " — " + low(b.sub)).join("; ");
+  return React.createElement("div", {
+    className: "ex-chart"
+  }, React.createElement("span", {
+    className: "fc-unit"
+  }, inv ? "Share preferencing One Nation over Labor in each counted contest" : "Share preferencing Labor over One Nation in each counted contest"), React.createElement(TrendChart, {
+    height: narrow ? 470 : 330,
+    xDomain: [x0, x1],
+    yDomain: [0, 100],
+    yTicks: [25, 50, 75],
+    xTicks: ticks,
+    unit: "%",
+    fmt: v => v.toFixed(1),
+    axisFont: narrow ? 28 : 15,
+    pad: {
+      l: 46,
+      r: narrow ? 22 : 104,
+      t: 16,
+      b: 40
+    },
+    series: series,
+    spine: BYS.map(b => ({
+      x: b.xm
+    })),
+    tooltipTitle: i => BYS[i].label + " · " + BYS[i].sub,
+    ariaLabel: "Share of preferences flowing to " + (inv ? "One Nation" : "Labor") + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label
+  }), React.createElement("span", {
+    className: "hero-legend fc-legend"
+  }, parties.map(p => React.createElement("span", {
+    className: "hl-item",
+    key: p.id
+  }, React.createElement("span", {
+    className: "hl-line",
+    style: {
+      background: p.color
+    }
+  }), p.name))), React.createElement("p", {
+    className: "ex-flow-cap"
+  }, "One reading per contest: " + cap + "."), React.createElement("div", {
+    className: "ex-flow-how"
+  }, React.createElement(RdHow, {
+    term: "flow-history",
+    from: "Preference flows explained"
+  })));
+}
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
@@ -64580,6 +64686,8 @@ function RdExplained() {
   const [jur, setJur] = useState("fed");
   const active = FH[jur] ? jur : "fed";
   const [inv, setInv] = useState(false);
+  const [pair, setPair] = useState("co");
+  const rival = pair === "on" ? "One Nation" : "Coalition";
   React.useLayoutEffect(() => {
     const sec = secRef.current;
     const slot = sec && sec.querySelector(".ex-body .ex-slot");
@@ -64613,7 +64721,7 @@ function RdExplained() {
     }
   }), React.createElement("div", {
     ref: ref
-  }, multi && React.createElement("div", {
+  }, multi && pair === "co" && React.createElement("div", {
     className: "ex-flow-chips",
     role: "tablist",
     "aria-label": "Jurisdiction"
@@ -64630,17 +64738,33 @@ function RdExplained() {
     className: "rd-pl-ctl"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
+  }, "Two-party:"), React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": pair === "on",
+    title: pair === "on" ? "Switch the chart to Labor v Coalition" : "Switch the chart to Labor v One Nation",
+    onClick: () => setPair(pair === "on" ? "co" : "on")
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, "Labor v " + rival), " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"))), React.createElement("span", {
+    className: "rd-pl-ctl"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
   }, "Direction:"), React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": inv,
-    title: inv ? "Switch to shares preferencing Labor over the Coalition" : "Switch to shares preferencing the Coalition over Labor",
+    title: inv ? "Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition") : "Switch to shares preferencing " + rival + " over Labor",
     onClick: () => setInv(!inv)
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
-  }, inv ? "Coalition over Labor" : "Labor over Coalition"), " ", React.createElement("span", {
+  }, inv ? rival + " over Labor" : "Labor over " + rival), " ", React.createElement("span", {
     "aria-hidden": "true"
-  }, "\u21C4")))), React.createElement(ExplainedFlowChart, {
+  }, "\u21C4")))), pair === "on" ? React.createElement(ExplainedOnChart, {
+    inv: inv
+  }) : React.createElement(ExplainedFlowChart, {
     jur: active,
     inv: inv
   })));
