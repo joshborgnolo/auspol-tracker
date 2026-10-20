@@ -147,7 +147,9 @@ jobs:
       # contents:write and MATILDA_API_KEY (same rationale as poll-agent.yml).
       - name: Install Matilda CLI
         if: steps.breaker.outputs.allowed == 'true'
-        run: npm i -g @maincode-ai/matilda-code@0.21.4
+        run: |
+          npm i -g @maincode-ai/matilda-code@0.21.4
+          bash .build/matilda-ci-settings.sh # the model's 1M window, not the 131k default
 
       # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       - name: Run the missing-wave filing agent

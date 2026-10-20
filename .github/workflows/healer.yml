@@ -199,7 +199,9 @@ jobs:
       # poll-agent.yml, agent-repair.yml and newspoll-watch.yml).
       - name: Install Matilda CLI
         if: steps.evidence.outcome == 'success'
-        run: npm i -g @maincode-ai/matilda-code@0.21.4
+        run: |
+          npm i -g @maincode-ai/matilda-code@0.21.4
+          bash .build/matilda-ci-settings.sh # the model's 1M window, not the 131k default
 
       # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       # The session runs in the adjudicator's exact posture (adjudicate.mjs):

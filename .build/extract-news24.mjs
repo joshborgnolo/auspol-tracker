@@ -423,7 +423,7 @@ async function infogramEnrichNews24(html, wave, prose, prevOf = null) {
     vi: fig.vi, tpp: fig.tpp, altTpp: fig.altTpp,
     approval: fig.approval, ppm: fig.ppm.length ? fig.ppm : null,
   };
-  return { ig, problems, notes };
+  return { ig, problems, notes, warnings };
 }
 
 // ------------------------------------------------------------ text helpers
@@ -1459,6 +1459,10 @@ try {
   } catch (e) {
     console.error(`N24_NOTE wiki fallback skipped: ${e.message}`);
     status.fallback.error = String(e?.message || e);
+    // A throw here abandons every wave after it, so it pages like a wave not
+    // filed: 20 Oct 2026's YouGov wave sat behind "enriched.warnings is not
+    // iterable" for a fortnight of green runs.
+    status.warnings.push(`wiki/News24 fallback threw: ${status.fallback.error}`);
   }
   // Every wave that hit the fallback and did not file is page-worthy: the
   // run's output is green otherwise and these vanish into the log tail.

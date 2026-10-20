@@ -191,7 +191,9 @@ jobs:
       # (compromised or accidental) changes the code that runs with
       # MATILDA_API_KEY (same rationale as poll-agent.yml).
       - name: Install Matilda CLI
-        run: npm i -g @maincode-ai/matilda-code@0.21.4
+        run: |
+          npm i -g @maincode-ai/matilda-code@0.21.4
+          bash .build/matilda-ci-settings.sh # the model's 1M window, not the 131k default
 
       # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       - name: Run the first-contact import agent

@@ -258,7 +258,9 @@ jobs:
       # MATILDA_API_KEY. Bump deliberately after verifying the new release
       # (other pin site: newspoll-watch.yml — grep `matilda-code@`).
       - name: Install Matilda CLI
-        run: npm i -g @maincode-ai/matilda-code@0.21.4
+        run: |
+          npm i -g @maincode-ai/matilda-code@0.21.4
+          bash .build/matilda-ci-settings.sh # the model's 1M window, not the 131k default
 
       - name: Assemble the repair prompt
         env:

@@ -636,8 +636,16 @@ for (const [k, band] of [["consumer", SERIES.consumer.band], ["business", SERIES
   const seen = new Set(dates);
   assert.equal(seen.size, dates.length, k + " has no duplicate dates");
 }
-assert.equal(live.consumer.rows.at(-1).v, 67.7);
-assert.equal(live.business.rows.at(-1).v, 76.5);
+// The newest wave, when its release printed a change, reconciles with the
+// wave before it. These were exact-value pins (consumer 68, business 79.1,
+// ...), which turned the suite red on every release until someone re-pinned
+// them by hand (19-20 Oct 2026: 30 red runs). This checks the filing without
+// naming a value.
+for (const k of ["consumer", "business"]) {
+  const [prev, last] = live[k].rows.slice(-2);
+  if (last.chg != null) assert.ok(Math.abs(Math.round((last.v - prev.v) * 10) / 10 - last.chg) < 0.05,
+    `${k} newest wave ${last.date}: ${prev.v} -> ${last.v} reconciles with printed change ${last.chg}`);
+}
 assert.equal(live.consumer.base, "ANZ-Roy Morgan, index, 100 = neutral");
 // westpacConsumer + nabBusiness — own band and URL rules (the roymorgan.com
 // rule above deliberately does NOT reach these lanes)

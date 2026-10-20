@@ -123,7 +123,10 @@ for (const f of fs.existsSync(rbDir) ? fs.readdirSync(rbDir) : []) {
   reports.push({ date: j.date, s: rbSalienceSummary(t), o: rbOwnershipSummary(t), g: rbGroupTables(t) });
 }
 reports.sort((a, b) => (a.date < b.date ? -1 : 1));
-const rbRows = polls.filter((p) => p.pollster === RB && p.date >= FIRST_RB && !/MRP/.test(p.pollster));
+// noAgg rows (the 19 Mar shifts super-poll, filed 9 Oct) carry no issues
+// tables and would make March two RedBridge rows, breaking rbByMonth's
+// one-row-per-month reprint attribution for the real 27 Mar wave.
+const rbRows = polls.filter((p) => p.pollster === RB && p.date >= FIRST_RB && !/MRP/.test(p.pollster) && !p.noAgg);
 const rbByMonth = (ym) => rbRows.filter((p) => p.date.slice(0, 7) === ym);
 
 /* Every RedBridge figure, from every place it is printed, keyed by wave date:
