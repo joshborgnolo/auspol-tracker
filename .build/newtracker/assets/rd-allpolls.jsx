@@ -53,6 +53,11 @@ function rdMarginBasis(p) {
     + (rdEffTbc(p) ? ", until its effective sample is out" : ", as " + p.pollster + " published no effective sample for this poll");
 }
 
+/* a poll's effective-sample tag: false, "tbc" (statement still to come) or
+   "missing" (21 days' grace is up and it never came). The reading against
+   the APC code of conduct is the user's 2026-10-20 call: filing-house waves
+   say "eff. missing" forever rather than going silent after three weeks. */
+
 /* a published figure as the pollster printed it: 55, 54.5 */
 const rdApNum = (v) => (v == null ? "—" : String(+(+v).toFixed(1)));
 /* the same figure cast the Latest table's way (its primFig): a half prints
@@ -124,7 +129,7 @@ function rdApOut(stamp) {
    past unfiled waves, since a statement lag can outrun the wave cadence, as
    YouGov's did in Sept-Oct 2026; the previous-poll version went dark for
    both unfiled waves once one statement lagged) and this wave is inside
-   three weeks of release (older gaps are left unsaid). The 90-day bound
+   three weeks of release. The 90-day bound
    retires the promise for a house that stops filing, rather than marking
    every new wave TBC indefinitely. Ipsos's whole catalogue lives apart as
    issuesOnlyPolls, so the habit look-back scans it too. One rule for the
@@ -141,17 +146,47 @@ function rdEffTbc(p) {
   return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
     && q.released < p.released && Date.parse(q.released) >= since);
 }
-/* "TBC" links to the page where THE HOUSE will file this wave's APC
-   statement - per house from gen-data's effTbcUrls (user call 2026-10-12:
+/* the same wave once its three weeks' grace is up, under the Australian
+   Polling Council code it should have filed by now: "eff. missing"
+   forever, never silent (user call 2026-10-20). Widened past TBC's
+   look-back only: the house filed for a poll within 120 days EITHER side
+   (a house can hole a whole quarter - RedBridge filed no Jun-2025
+   statement, its next being Sep-Oct's, 99 days on) and goes no wider,
+   so waves from an era the house never filed say nothing at all -
+   verified 2026-10-20: this gates exactly RedBridge's five, YouGov's
+   three (incl. the Australia Institute client poll of Oct 2025) and
+   DemosAU's one statement-less wave of the time (was six RB waves at
+   first verify; 7-13 Nov 2025's statement backfiled as sampleEff 855
+   hours later, and the gate let it go). One of the five wears
+   "Redbridge" in polls.json and only gets its habit match because
+   gen-data unifies it into individualPolls as "RedBridge/Accent" - scanning
+   the raw file for this gate's result misses it. MRP rows sit under
+   "(MRP)" pollster names, so the exact-match habit never tags them
+   (their statements print "n/a for MRP" - sampleCell says so instead). */
+function rdEffMissing(p) {
+  if (p.conf || p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
+  const rel = Date.parse(p.released);
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
+    && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
+}
+/* the tag word links to the page where THE HOUSE will file (TBC) or should
+   have filed (missing) this wave's APC statement - per house from
+   gen-data's effTbcUrls (user call 2026-10-12:
    YouGov's belongs at yougov.com's own APC page; one shared register at
    pyxispolling.com/apc sent YouGov's readers to Newspoll's host). A wave
    from a house with no entry named gets the bare titled span. */
-function rdEffTbcNote(p) {
-  const note = "The pollster publishes an effective sample, but not yet for this poll";
+function rdEffNote(p) {
+  const missing = rdEffMissing(p);
+  const note = missing
+    ? "The pollster publishes an effective sample, but none for this poll"
+    : "The pollster publishes an effective sample, but not yet for this poll";
+  const word = missing ? "missing" : "TBC";
   const url = (window.AUSPOL.effTbcUrls || {})[String(p.pollster || "").replace(/\s*\(.*\)$/, "")];
   return <>eff. {url
-    ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
-    : <span title={note}>TBC</span>}</>;
+    ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>{word}</a>
+    : <span title={note}>{word}</span>}</>;
 }
 /* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
    article before the methodology PDF; a Resolve wave filed from the monitor
@@ -187,12 +222,12 @@ const rdApThe = (name) => (/^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? nam
    (user calls 2026-10-15; the rest of the client list are mastheads) */
 const RD_AP_COMMISSIONED = { "Blueprint Institute": 1, "Climate Council": 1, "Australia Inst.": 1, Amplify: 1 };
 function rdPollHead(p) {
-  const tbc = rdEffTbc(p);
+  const effTag = rdEffTbc(p) || rdEffMissing(p);
   // the figure cluster stays glued so it never splits mid-figure; the
   // "a sample of" lead-in wraps freely or the whole run would jump to the
   // next line as one block and strand a wide gap after "from"
   const n = p.sample != null
-    ? <>a sample of <span className="rd-nocaps">{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</span></>
+    ? <>a sample of <span className="rd-nocaps">{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : effTag ? <> ({rdEffNote(p)})</> : ""}</span></>
     : "an unpublished sample";
   const out = rdApOut(p.published);
   // a filed-under-client wave credits its client; a self-published poll is
@@ -3202,7 +3237,7 @@ function RdAllPolls(P) {
   );
   const sampleCell = (p) => (
     <span role="cell" className="rd-ap-n"><span>{p.sample != null ? p.sample.toLocaleString() : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
-      : rdEffTbc(p) ? <span className="rd-ap-sub">{rdEffTbcNote(p)}</span>
+      : rdEffTbc(p) || rdEffMissing(p) ? <span className="rd-ap-sub">{rdEffNote(p)}</span>
       /* an MRP files no effective sample (its APC statement prints "n/a for
          MRP"), so say so rather than leave the sub-line empty */
       : / \(MRP\)$/.test(p.pollster || "") ? <span className="rd-ap-sub">eff. n/a</span> : null}</span>

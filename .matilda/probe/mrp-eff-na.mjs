@@ -1,6 +1,7 @@
 /* Pins the All-polls Sample column's "eff." sub-line per row class:
      - a row stamped with sampleEff shows "eff. <n>" (the house's figure)
      - a filing house's brand-new unstamped wave shows "eff. TBC"
+     - that same wave past 21 days with no statement shows "eff. missing"
      - an MRP row (pollster ends " (MRP)") shows "eff. n/a" — MRPs file no
        effective sample; their APC statements print "n/a for MRP"
      - everything else shows no eff sub-line at all.
@@ -38,7 +39,7 @@ await new Promise((r) => setTimeout(r, 800));
 
 const got = await page.evaluate(() => {
   const rows = [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")];
-  const out = { mrp: [], naLeak: [], effFig: 0, tbc: 0, named: 0, window: "" };
+  const out = { mrp: [], naLeak: [], missing: [], effFig: 0, tbc: 0, named: 0, window: "" };
   const head = document.querySelector(".rd-ap-hrow");
   if (head) out.window = head.textContent.slice(0, 80);
   for (const row of rows) {
@@ -53,6 +54,8 @@ const got = await page.evaluate(() => {
     } else {
       if (subs.some((s) => /^eff\. [\d,]+$/.test(s))) out.effFig++;
       if (subs.some((s) => /^eff\. TBC$/.test(s))) out.tbc++;
+      if (subs.some((s) => /^eff\. missing$/.test(s)))
+        out.missing.push({ name, when: (row.querySelector(".rd-ap-when") || {}).textContent || "" });
     }
   }
   out.dataMrp = (window.AUSPOL.individualPolls || []).filter((p) => /\s*\(MRP\)$/.test(p.pollster)).length;
@@ -69,6 +72,60 @@ for (const m of got.mrp)
 ok(got.naLeak.length === 0, "no non-MRP row shows 'eff. n/a'" + (got.naLeak.length ? " — " + JSON.stringify(got.naLeak.slice(0, 3)) : ""));
 ok(got.effFig > 20, "stamped rows keep their 'eff. <n>' figure (" + got.effFig + " rows)");
 console.log("info: " + got.tbc + " row(s) show 'eff. TBC'");
+
+/* the "eff. missing" registry: the nine unstamped waves of filing houses
+   past the 21-day APC grace, verified against the statements on file
+   2026-10-20 (a house backfiling a statement legitimately shrinks this —
+   update the pin then, not the gate; it shrank ten → nine within hours of
+   first pin, when RedBridge 7–13 Nov 2025's statement landed as
+   sampleEff 855). The 6–12 Feb 2026 RedBridge wave rides gen-data's
+   house-name unification: its polls.json row is branded
+   "Redbridge", so a raw-data scan misses it, but the live gate matches on
+   the unified individualPolls name and tags it correctly */
+const EXPECTED_MISSING = [
+  ["RedBridge/Accent", "19–30 Jun"],
+  ["RedBridge/Accent", "19 Aug–8 Sep"],
+  ["YouGov", "23–30 Oct"],
+  ["RedBridge/Accent", "7–26 Nov"],
+  ["DemosAU", "5–6 Jan"],
+  ["RedBridge/Accent", "6–12 Feb"],
+  ["YouGov", "12–19 Mar"],
+  ["RedBridge/Accent", "23–27 Mar"],
+  ["YouGov", "15–21 Sep"],
+];
+const missKey = (m) => m.name + "|" + m.when.trim();
+ok(got.missing.length === EXPECTED_MISSING.length,
+  "exactly " + EXPECTED_MISSING.length + " rows show 'eff. missing' (got " + got.missing.length + (got.missing.length ? ": " + got.missing.map(missKey).join("; ") : "") + ")");
+for (const [n, w] of EXPECTED_MISSING)
+  ok(got.missing.some((m) => m.name.startsWith(n) && m.when.includes(w)),
+    "missing row present: " + n + " " + w);
+
+/* the detail head joins the tag in words: "(eff. missing)" on the
+   "in a sample of N …" line, linked like TBC */
+if (got.missing.length) {
+  await page.evaluate(() => {
+    const row = [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")]
+      .find((r) => (((r.querySelector(".rd-ap-who b") || {}).textContent || "")).startsWith("YouGov")
+        && ((r.querySelector(".rd-ap-when") || {}).textContent || "").includes("15–21 Sep")
+        && [...r.querySelectorAll(".rd-ap-n .rd-ap-sub")].some((s) => s.textContent.trim() === "eff. missing"));
+    if (row) row.click();
+  });
+  await page.waitForFunction(
+    () => {
+      const h = document.querySelector(".rd-ap-open .rd-apd-h");
+      return h && h.textContent.length > 10;
+    },
+    { timeout: 10000 }).catch(() => {});
+  const head = await page.evaluate(() => {
+    const h = document.querySelector(".rd-ap-open .rd-apd-h");
+    const link = h && h.querySelector("a.rd-tbc");
+    return { text: h ? h.textContent.trim() : "", href: link ? link.href : null, word: link ? link.textContent.trim() : null,
+             expected: (window.AUSPOL.effTbcUrls || {}).YouGov || null };
+  });
+  ok(head.text.includes("(eff. missing)"), "detail head names the missing tag — " + JSON.stringify(head.text.slice(0, 120)));
+  ok(head.word === "missing" && head.href != null && head.href === head.expected,
+    "the missing word is the same APC link as TBC (" + head.href + ")");
+}
 
 await browser.close();
 server.close();

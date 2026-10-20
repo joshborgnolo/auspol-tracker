@@ -26,8 +26,8 @@ const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!o
 const LANES = [
   { match: (t) => t.includes("ANZ–Roy Morgan"), house: "ANZ–Roy Morgan" },
   { match: (t) => t.includes("Westpac–MI"), house: "Westpac–MI" },
-  { match: (t) => t.includes("Business confidence") && t.includes("Roy Morgan") && !t.includes("ANZ–Roy"), house: "Roy Morgan" },
-  { match: (t) => t.includes("NAB"), house: "NAB" },
+  { match: (t) => t.includes("Business confidence") && t.includes("Roy Morgan") && !t.includes("ANZ–Roy"), house: "Roy Morgan", view: "biz" },
+  { match: (t) => t.includes("NAB"), house: "NAB", view: "biz" },
 ];
 const TIME_TAIL = /, \d{1,2} (am|pm)$/;
 
@@ -43,6 +43,15 @@ await page.waitForFunction(
     return a && a.textContent.trim() === "Confidence" && document.querySelectorAll(".rd-ap .rd-ap-row").length > 0;
   },
   { timeout: 30000 });
+/* the first page is only the newest 30 rows, and the weekly consumer lanes
+   crowd the monthly business ones out of it (Roy Morgan business and NAB
+   never appear until expansion, live-site verified 2026-10-20): expand
+   before the lane walk */
+await page.evaluate(() => {
+  const b = [...document.querySelectorAll("button")].find((x) => /^Show all \d+$/.test(x.textContent.trim()));
+  if (b) b.click();
+});
+await new Promise((r) => setTimeout(r, 800));
 
 /* the row-cell "released X" sub renders (every confidence row now carries
    published; the first visible page alone should be well over a dozen) */
@@ -54,8 +63,20 @@ check(cellSubs.every((t) => /^released \d{1,2} \S{3} /.test(t) || /^released \d{
   `every visible released-sub is a bare date (${JSON.stringify(cellSubs.slice(0, 2))})`);
 
 /* one row per lane: the header sentence ends " on <lane's latest published>",
-   date-only (no hour tail), and never gains an eff-sample badge */
+   date-only (no hour tail), and never gains an eff-sample badge. The facet's
+   consumer/business flip means the Roy Morgan and NAB rows only exist after
+   the view is switched (the 91-vs-125 row gap is the two business lanes) */
+let flipped = false;
 for (const lane of LANES) {
+  if (lane.view === "biz" && !flipped) {
+    await page.evaluate(() => {
+      [...document.querySelectorAll(".rd-ap button")].find((b) => /Consumer confidence/.test(b.textContent))?.click();
+    });
+    await page.waitForFunction(
+      () => [...document.querySelectorAll(".rd-ap .rd-ap-row")].some((r) => r.textContent.includes("NAB")),
+      { timeout: 15000 }).catch(() => check(false, "business view opened after the consumer/business flip"));
+    flipped = true;
+  }
   const idx = await page.evaluate((src) => {
     const f = new Function("t", "return (" + src + ")(t)");
     const rows = [...document.querySelectorAll(".rd-ap .rd-ap-row")];
@@ -88,7 +109,8 @@ for (const lane of LANES) {
     `sentence ends " on ${got.expected.slice(4)}" (${JSON.stringify(got.head.slice(Math.max(0, got.head.indexOf("published by") - 1), got.head.length))})`);
   check(got.head.includes("published by " + lane.house + " on "), "byline kept the house and gained the date");
   check(!TIME_TAIL.test(got.head), "date-only tail — no hour (the extractor stamps no clock time)");
-  check(!got.head.includes("eff. TBC"), "no eff-sample badge on a confidence release");
+  check(!got.head.includes("eff. TBC") && !got.head.includes("eff. missing"),
+    "no eff-sample badge (tbc or missing) on a confidence release");
 }
 
 /* regression guard: a real poll's dated tail / eff badge path is untouched */

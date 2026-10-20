@@ -126768,8 +126768,17 @@ function rdEffTbc(p) {
   const A = window.AUSPOL;
   return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
 }
-function rdEffTbcNote(p) {
-  const note = "The pollster publishes an effective sample, but not yet for this poll";
+function rdEffMissing(p) {
+  if (p.conf || p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
+  const rel = Date.parse(p.released);
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
+}
+function rdEffNote(p) {
+  const missing = rdEffMissing(p);
+  const note = missing ? "The pollster publishes an effective sample, but none for this poll" : "The pollster publishes an effective sample, but not yet for this poll";
+  const word = missing ? "missing" : "TBC";
   const url = (window.AUSPOL.effTbcUrls || {})[String(p.pollster || "").replace(/\s*\(.*\)$/, "")];
   return React.createElement(React.Fragment, null, "eff. ", url ? React.createElement("a", {
     className: "rd-tbc",
@@ -126778,9 +126787,9 @@ function rdEffTbcNote(p) {
     rel: "noopener noreferrer",
     title: note,
     onClick: e => e.stopPropagation()
-  }, "TBC") : React.createElement("span", {
+  }, word) : React.createElement("span", {
     title: note
-  }, "TBC"));
+  }, word));
 }
 const rdFieldTxt = q => q && q.fieldPending ? "TBC" : q && (q.field || q.dateLabel) || "";
 function rdFieldTbc(p, tabIndex) {
@@ -126812,10 +126821,10 @@ const RD_AP_COMMISSIONED = {
   Amplify: 1
 };
 function rdPollHead(p) {
-  const tbc = rdEffTbc(p);
+  const effTag = rdEffTbc(p) || rdEffMissing(p);
   const n = p.sample != null ? React.createElement(React.Fragment, null, "a sample of ", React.createElement("span", {
     className: "rd-nocaps"
-  }, p.sample.toLocaleString(), p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? React.createElement(React.Fragment, null, " (", rdEffTbcNote(p), ")") : "")) : "an unpublished sample";
+  }, p.sample.toLocaleString(), p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : effTag ? React.createElement(React.Fragment, null, " (", rdEffNote(p), ")") : "")) : "an unpublished sample";
   const out = rdApOut(p.published);
   const selfBy = p.conf || !(p.client && !/^self/i.test(p.client));
   const commissioned = !selfBy && RD_AP_COMMISSIONED[p.client];
@@ -130803,9 +130812,9 @@ function RdAllPolls(P) {
     className: "rd-ap-n"
   }, React.createElement("span", null, p.sample != null ? p.sample.toLocaleString() : "—"), p.sampleEff != null ? React.createElement("span", {
     className: "rd-ap-sub"
-  }, "eff. ", p.sampleEff.toLocaleString()) : rdEffTbc(p) ? React.createElement("span", {
+  }, "eff. ", p.sampleEff.toLocaleString()) : rdEffTbc(p) || rdEffMissing(p) ? React.createElement("span", {
     className: "rd-ap-sub"
-  }, rdEffTbcNote(p)) : / \(MRP\)$/.test(p.pollster || "") ? React.createElement("span", {
+  }, rdEffNote(p)) : / \(MRP\)$/.test(p.pollster || "") ? React.createElement("span", {
     className: "rd-ap-sub"
   }, "eff. n/a") : null);
   const tipCard = (p, f, m) => {
