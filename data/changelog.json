@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 52.3
+      "alp": 51.6
     },
-    "imp": 52.3,
-    "pub": 51,
-    "on": 52.5,
+    "imp": 51.6,
+    "pub": 50.4,
+    "on": 52,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -206,7 +206,8 @@
       "2026-10-06|YouGov",
       "2026-10-08|Newspoll",
       "2026-10-10|Resolve",
-      "2026-10-11|Roy Morgan"
+      "2026-10-11|Roy Morgan",
+      "2026-10-20|YouGov"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
@@ -327,19 +328,19 @@
       }
     },
     "prim": {
-      "alp": 27.5,
-      "grn": 13.5,
-      "lnp": 21.6,
-      "onp": 26.1,
-      "oth": 11.3
+      "alp": 26.8,
+      "grn": 13.6,
+      "lnp": 22.3,
+      "onp": 26,
+      "oth": 11.2
     },
     "leaders": {
-      "alb_fav": -20.7,
-      "alb_net": -21.7,
-      "hanson_fav": -5.6,
-      "hanson_net": -2.6,
-      "taylor_fav": -4.7,
-      "taylor_net": -6.9
+      "alb_fav": -21.7,
+      "alb_net": -22.1,
+      "hanson_fav": -6,
+      "hanson_net": -2.9,
+      "taylor_fav": -4.8,
+      "taylor_net": -6.5
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -357,20 +358,20 @@
         "Roy Morgan": 0,
         "Spectre Strategy": -0.8,
         "Wolf & Smith": 0,
-        "YouGov": 0.2,
+        "YouGov": 0.1,
         "YouGov (MRP)": -0.2
       }
     },
     "dir": {
-      "right": 27.1,
-      "wrong": 62.2,
-      "net": -35.1
+      "right": 28.1,
+      "wrong": 61.6,
+      "net": -33.5
     },
     "issLead": {
       "climate": "alp",
       "col": "",
       "crime": "onp",
-      "economy": "lnp",
+      "economy": "",
       "health": "alp",
       "housing": "",
       "immigration": "onp",
@@ -387,11 +388,9 @@
       "security": "National security"
     },
     "sig": {
-      "iss|economy|imp": 1,
       "iss|housing|alp": -1
     },
     "sigMeta": {
-      "iss|economy|imp": "the share naming economic management a top-three issue",
       "iss|housing|alp": "Labor's share as the best party on housing"
     },
     "conf": {
@@ -452,6 +451,25 @@
       "label": "20 Oct 2026",
       "kind": "conf",
       "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 68.0 → 67.7."
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "poll",
+      "text": "YouGov (fieldwork 13–20 Oct, n=1,500) added — the two-party preferred estimate moved 52.3 → 51.6 (Labor v the Coalition, implied flows). Primary votes: Labor 27.5 → 26.8, the Coalition 21.6 → 22.3, One Nation 26.1 → 26.0, the Greens 13.5 → 13.6, others 11.3 → 11.2. Leader ratings: Albanese's net approval −21.7 → −22.1, Albanese's net favourability −20.7 → −21.7, Taylor's net approval −6.9 → −6.5, Taylor's net favourability −4.7 → −4.8, Hanson's net approval −2.6 → −2.9, Hanson's net favourability −5.6 → −6.0. National direction: right track 27.1 → 28.1, wrong track 62.2 → 61.6 (net −35.1 → −33.5). House effect (Labor v the Coalition, implied flows; positive leans Labor): YouGov +0.2 → +0.1.",
+      "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae"
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "finding",
+      "text": "The month-on-month rise in the share naming economic management a top-three issue is no longer statistically significant."
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "finding",
+      "text": "No party leads significantly as the best party on economic management any more (the Coalition did)."
     }
   ]
 }

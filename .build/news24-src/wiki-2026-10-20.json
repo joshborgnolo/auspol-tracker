@@ -1,0 +1,25 @@
+{
+  "source": "wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
+  "published": "2026-10-21T05:20",
+  "fieldwork": {
+    "date": "2026-10-20",
+    "dateStart": "2026-10-13",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 24,
+    "lnp": 23,
+    "grn": 14,
+    "onp": 27,
+    "ind": 5,
+    "oth": 7,
+    "tpp_alp": 50,
+    "tpp_lnp": 50
+  },
+  "satisfaction": null,
+  "ppm": null,
+  "altTpp": null,
+  "infogram": null
+}

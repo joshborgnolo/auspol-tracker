@@ -6135,6 +6135,23 @@
         "Nat": 3
       },
       "url": "https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026"
+    },
+    {
+      "date": "2026-10-20",
+      "dateStart": "2026-10-13",
+      "pollster": "YouGov",
+      "client": "News24",
+      "sample": 1500,
+      "alp": 24,
+      "lnp": 23,
+      "grn": 14,
+      "onp": 27,
+      "ind": 5,
+      "oth": 7,
+      "tpp_alp": 50,
+      "tpp_lnp": 50,
+      "published": "2026-10-21T05:20",
+      "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae"
     }
   ],
   "ppm": [
