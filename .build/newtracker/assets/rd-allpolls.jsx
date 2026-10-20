@@ -5476,7 +5476,7 @@ function RdFlows({ measure }) {
             <RdKey className="rd-ckey rd-fx-key" items={[]}>
               {c.rb.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyln" aria-hidden="true"><i></i></span>RedBridge/Accent, monthly</span>}
               {c.dm.length > 0 && <span className="rd-key-item"><span className="rd-fx-keydm" aria-hidden="true"></span>DemosAU MRP, quarterly</span>}
-              {c.bys.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>2026 state and by-election counts</span>}
+              {c.bys.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>Election and by-election counts</span>}
               {c.ref && <span className="rd-key-item"><span className={"rd-fx-keyref" + (c.band ? " band" : "")} aria-hidden="true"></span>{q === "co" ? rdElecYear + " count*" : "Site’s assumption, with its range"}</span>}
               {c.ref && c.rb.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyarea" aria-hidden="true"></span>Gap to it</span>}
             </RdKey>
@@ -5663,6 +5663,79 @@ function ExplainedFlowChart({ jur, inv }) {
   );
 }
 
+/* the explainer's Labor-v-One-Nation view (user 2026-10-20: "no state-by-
+   state, just the elections and by-elections that have shown results", as
+   the "one nation v labor" chart's crosses do on /flows/). No jurisdiction
+   chips — no count or close estimate exists by jurisdiction for this pair —
+   one cross per voter group per contest, from the same flowForced.bys
+   crosses the /flows/ One Nation chart plots. Hunter is the AEC's counted
+   flow-by-division; South Australia and Secret Harbour are estimates. */
+const ON_COHORTS = [
+  { id: "coal", name: "Coalition", color: "var(--lnp)" },
+  { id: "grn",  name: "Greens",    color: "var(--grn)" },
+  { id: "oth",  name: "Others",    color: "var(--oth)" },
+];
+function ExplainedOnChart({ inv }) {
+  const narrow = useNarrow(window.MQ_PHONE);
+  const BYS = ((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm);
+  if (!BYS.length) return null;
+  /* the basis toggle's inverse view draws 100 - x, as in ExplainedFlowChart */
+  const T = (v) => (inv ? 100 - v : v);
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parties = ON_COHORTS.filter((p) => BYS.some((b) => b[p.id] != null));
+  const series = [];
+  parties.forEach((p) => {
+    const runs = [];
+    let cur = [];
+    BYS.forEach((b) => {
+      const v = b[p.id];
+      /* a null is a gap, not a zero (no Others count ran at Secret
+         Harbour); a run of one contest keeps its dot, never a lone line */
+      if (v == null) { if (cur.length) runs.push(cur); cur = []; }
+      else cur.push({ x: b.xm, y: T(v), ...((b.lbl || {})[p.id] ? { note: (b.lbl || {})[p.id] } : null) });
+    });
+    if (cur.length) runs.push(cur);
+    runs.forEach((points, i) => {
+      const tail = i === runs.length - 1;
+      series.push({ id: p.id + i, label: p.name, color: p.color, points,
+        smooth: false, width: 2.6, endCap: tail || points.length === 1,
+        endLabel: tail && !narrow ? p.name : null });
+    });
+  });
+  const x0 = BYS[0].xm - 0.9, x1 = BYS[BYS.length - 1].xm + 0.9;
+  const ticks = BYS.map((b) => ({ x: b.xm, label: MON[+b.date.slice(5, 7) - 1] + " " + b.date.slice(0, 4) }));
+  /* a capitalised article ("The AEC's…") is the only lead a fallible
+     lowercase rewrite would break, so guard it */
+  const low = (s) => s.replace(/^The /i, (m) => m.toLowerCase());
+  const cap = BYS.map((b) => b.label + " — " + low(b.sub)).join("; ");
+  return (
+    <div className="ex-chart">
+      <span className="fc-unit">{inv ? "Share preferencing One Nation over Labor in each counted contest" : "Share preferencing Labor over One Nation in each counted contest"}</span>
+      <TrendChart
+        height={narrow ? 470 : 330}
+        xDomain={[x0, x1]} yDomain={[0, 100]}
+        yTicks={[25, 50, 75]}
+        xTicks={ticks}
+        unit="%" fmt={(v) => v.toFixed(1)}
+        axisFont={narrow ? 28 : 15}
+        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
+        series={series} spine={BYS.map((b) => ({ x: b.xm }))}
+        tooltipTitle={(i) => BYS[i].label + " · " + BYS[i].sub}
+        ariaLabel={"Share of preferences flowing to " + (inv ? "One Nation" : "Labor") + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
+      />
+      <span className="hero-legend fc-legend">
+        {parties.map((p) => (
+          <span className="hl-item" key={p.id}>
+            <span className="hl-line" style={{ background: p.color }}></span>{p.name}
+          </span>
+        ))}
+      </span>
+      <p className="ex-flow-cap">{"One reading per contest: " + cap + "."}</p>
+      <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
+    </div>
+  );
+}
+
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
@@ -5671,6 +5744,12 @@ function RdExplained() {
   const [jur, setJur] = useState("fed");
   const active = FH[jur] ? jur : "fed";
   const [inv, setInv] = useState(false);
+  /* the two-party pairing flips Labor v Coalition (the flowHistory election
+     histories) to Labor v One Nation (the measured flowForced.bys contests;
+     user 2026-10-20). Jurisdiction chips belong to the Coalition history
+     alone — no state-by-state counts exist for the One Nation pairing. */
+  const [pair, setPair] = useState("co");
+  const rival = pair === "on" ? "One Nation" : "Coalition";
   React.useLayoutEffect(() => {
     /* the static-summary twin of this article carries the same #ex-fig-flow
        slot and sits earlier in the document, hidden (opacity 0) once the app
@@ -5694,7 +5773,7 @@ function RdExplained() {
         dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
-        {multi && (
+        {multi && pair === "co" && (
           <div className="ex-flow-chips" role="tablist" aria-label="Jurisdiction">
             {KEYS.map((k) => (
               <button key={k} type="button" role="tab" aria-selected={k === active}
@@ -5705,19 +5784,27 @@ function RdExplained() {
           </div>
         )}
         {/* the flip idiom of the Latest section's Two-party control: the
-            label names the dimension, the button the ACTIVE direction; the
+            label names the dimension, the button the ACTIVE setting; the
             title announces where a press goes (user call 2026-10-20) */}
         <div className="ex-flow-flip">
           <span className="rd-pl-ctl">
+            <span className="rd-pl-ctl-l">Two-party:</span>
+            <button type="button" className="rd-pl-flip" aria-pressed={pair === "on"}
+                    title={pair === "on" ? "Switch the chart to Labor v Coalition" : "Switch the chart to Labor v One Nation"}
+                    onClick={() => setPair(pair === "on" ? "co" : "on")}>
+              <span className="rd-pl-flip-t">{"Labor v " + rival}</span> <span aria-hidden="true">⇄</span>
+            </button>
+          </span>
+          <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Direction:</span>
             <button type="button" className="rd-pl-flip" aria-pressed={inv}
-                    title={inv ? "Switch to shares preferencing Labor over the Coalition" : "Switch to shares preferencing the Coalition over Labor"}
+                    title={inv ? ("Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition")) : ("Switch to shares preferencing " + rival + " over Labor")}
                     onClick={() => setInv(!inv)}>
-              <span className="rd-pl-flip-t">{inv ? "Coalition over Labor" : "Labor over Coalition"}</span> <span aria-hidden="true">⇄</span>
+              <span className="rd-pl-flip-t">{inv ? rival + " over Labor" : "Labor over " + rival}</span> <span aria-hidden="true">⇄</span>
             </button>
           </span>
         </div>
-        <ExplainedFlowChart jur={active} inv={inv} />
+        {pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} inv={inv} />}
       </div>
     </section>
   );

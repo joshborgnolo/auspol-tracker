@@ -4168,22 +4168,31 @@ const flowForced = (() => {
       outer: counted("Outer metro seats", "the seats classed outer metro", "40 of 45", 86.95, 27.65, 48.88),
       regional: counted("Regional or rural seats", "the seats classed regional or rural", "50 of 62", 85.76, 24.76, 47.19) };
   })();
-  /* the 2026 state and by-election counts that MEASURED the Labor-v-One-
-     Nation choice the second chart asks: crosses on the chart's own day,
-     joined to no line (user 2026-10-13; Farrer's four Coalition reads
-     were removed the same day — its runners were Liberal-v-Nationals and
-     Liberal/One Nation INDEPENDENT contests, and an independent-national
-     count can't speak to One Nation voters' choices). Figures and labels
-     as the preference-flows page's "2026 readings" table — SA is Bonham's
-     estimate from the published distributions (the state commission's
-     own flows are due late 2026); Secret Harbour is Green's count of the
-     early voting centre. */
+  /* the counts that MEASURED the Labor-v-One-Nation choice the second
+     chart asks: crosses on the chart's own day, joined to no line (user
+     2026-10-13; Farrer's four Coalition reads were removed the same day —
+     its runners were Liberal-v-Nationals and Liberal/One Nation
+     INDEPENDENT contests, and an independent-national count can't speak
+     to One Nation voters' choices). Figures and labels as the
+     preference-flows explainer's readings table — Hunter is the AEC's own
+     count in the one 2025 seat One Nation ran Labor to the final pair,
+     typed from the vendored TCP flow-by-division file
+     (data/aec-2025-tcp-flow-by-division.csv: Nationals 3,461 of 20,290
+     to Labor; Greens 7,241 of 8,286; the five minor-party piles — Legalise
+     Cannabis, Animal Justice, Family First, Shooters, Trumpet of Patriots —
+     6,642 of 16,503; no Liberal stood, so its Coalition cell is Nationals-
+     only). SA is Bonham's estimate from the published distributions (the
+     state commission's own flows are due late 2026); Secret Harbour is
+     Green's count of the early voting centre. */
   const byX = (d) => {
     const y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
     const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
     return Math.round((y * 12 + mo - 1 + (dy - 1) / dim) * 1e4) / 1e4;
   };
   const bys = [
+    { key: "hunter", date: "2025-05-03", xm: byX("2025-05-03"), label: "Hunter 2025", win: "3 May 2025",
+      coal: 17.06, grn: 87.39, oth: 40.25, lbl: { coal: "Nationals", oth: "Others" },
+      sub: "The AEC’s count of the full distribution of preferences" },
     { key: "sa2026", date: "2026-03-21", xm: byX("2026-03-21"), label: "South Australia 2026", win: "21 Mar 2026",
       coal: 33.9, grn: 84.8, oth: 55.9, lbl: { coal: "Liberal", oth: "Independent" },
       sub: "Bonham’s estimates from the published distributions" },

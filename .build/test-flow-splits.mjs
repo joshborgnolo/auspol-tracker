@@ -15,10 +15,13 @@
    HouseTcpFlowByDivision file, user call 2026-10-13: "the 2025 election
    flows are based on seat classification, which she worked out already";
    the estimator's all-150-seat constants stay in flows.mjs and ride
-   `all.nat` for the footnote only), and the 2026 state and by-election counts (bys: SA2026
-   Bonham estimates, Secret Harbour — on the days of the elections; Farrer's
-   pair dropped 2026-10-13, those counts measured independent contests, not
-   One Nation voters' choices).
+   `all.nat` for the footnote only), and the counts where the Labor-v-One-
+   Nation choice was measured directly (bys: Hunter 2025 — the AEC's
+   HouseTcpFlowByDivision read over its one ALP-v-ON classic seat, added
+   2026-10-20 when the explainer's election chart gained the pairing flip;
+   SA2026 Bonham estimates, Secret Harbour — on the days of the elections;
+   Farrer's pair dropped 2026-10-13, those counts measured independent
+   contests, not One Nation voters' choices).
    The renderer was REBUILT 2026-10-13 (evening; the user: "an ill-conceived
    and disordered hodgepodge - especially on small screens"): the three
    charts and the flows tables gave way to design B - contest tabs over a
@@ -128,16 +131,23 @@ for (const [rk, want] of Object.entries(COUNTED)) {
   }
 }
 
-/* the crosses (user 2026-10-13): the 2026 counts that measured the Labor-v-
-   One-Nation choice — SA 2026 (Bonham's estimates) and Secret Harbour's
-   early-voting-centre count. Each on its election DAY, none joined to any
-   line. Farrer's pair is GONE (the same day): its counts measured a
-   Liberal-v-Nationals contest and One-Nation-independent races, nothing to
-   do with One Nation voters' preferences */
-assert.ok(Array.isArray(FF.bys) && FF.bys.length === 2, "bys carries the two 2026-count crosses");
-assert.deepEqual([...FF.bys.map((d) => d.key)].sort(), ["harbour", "sa2026"],
-  "the surviving crosses are SA 2026 and Secret Harbour — no Farrer reading survives (its counts were an independent national contest's)");
+/* the crosses (user 2026-10-13; Hunter 2025 joined them 2026-10-20 with
+   the explainer chart's Labor-v-One-Nation pairing flip): the counts that
+   measured the Labor-v-One-Nation choice directly — Hunter (the AEC's
+   count of the full distribution in its one ALP-v-ON classic seat),
+   SA 2026 (Bonham's estimates) and Secret Harbour's early-voting-centre
+   count. Each on its election DAY, none joined to any line. Farrer's pair
+   is GONE (2026-10-13): its counts measured a Liberal-v-Nationals contest
+   and One-Nation-independent races, nothing to do with One Nation voters'
+   preferences */
+assert.ok(Array.isArray(FF.bys) && FF.bys.length === 3, "bys carries the three measured-contest crosses");
+assert.deepEqual([...FF.bys.map((d) => d.key)].sort(), ["harbour", "hunter", "sa2026"],
+  "the crosses are Hunter 2025, SA 2026 and Secret Harbour — no Farrer reading survives (its counts were an independent national contest's)");
 const byKey = new Map((FF.bys || []).map((d) => [d.key, d]));
+assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, byKey.get("hunter")[k]])), { coal: 17.06, grn: 87.39, oth: 40.25 },
+  "Hunter 2025: the AEC's counted flows (Nationals 17.06 / Greens 87.39 / five minor parties 40.25 to Labor)");
+assert.equal(byKey.get("hunter").date, "2025-05-03", "Hunter rides its election day");
+assert.equal(byKey.get("hunter").lbl.coal, "Nationals", "Hunter's Coalition cohort names the partner — no Liberal stood");
 assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, byKey.get("sa2026")[k]])), { coal: 33.9, grn: 84.8, oth: 55.9 },
   "SA 2026: Bonham's estimates (Liberal 33.9 / Greens 84.8 / Independent 55.9 to Labor)");
 assert.equal(byKey.get("sa2026").date, "2026-03-21", "SA 2026 rides its election day");
@@ -207,13 +217,13 @@ assert.ok(ap.includes('const FF_REGIONS = [["", "All voters"], ["inner", "Inner 
 
 /* the region contract (user 2026-10-13): a named region drops every
    national mark - RedBridge/Accent's waves, DemosAU's one national
-   Labor-v-Coalition figure, the 2026 counts - and rekeys the election
+   Labor-v-Coalition figure, the counted contests - and rekeys the election
    column to the seat-classification count; DemosAU's printed regional
    cells ride the One Nation contests */
 assert.ok(ap.includes("rb: ffReg ? [] : FF.vsCoal") && ap.includes("rb: ffReg ? [] : FF.vsOn"),
   "on a named region RedBridge/Accent's waves drop out of both contests (\"there should be no RedBridge/Accent polls\")");
 assert.ok(ap.includes("dm: ffReg ? [] : (FF.demos || [])"), "DemosAU's national Labor-v-Coalition figure drops on a named region");
-assert.ok(ap.includes("bys: ffReg ? [] : (FF.bys || [])"), "the 2026 counts drop on a named region (national counts)");
+assert.ok(ap.includes("bys: ffReg ? [] : (FF.bys || [])"), "the measured-contest crosses drop on a named region (national counts)");
 assert.ok(ap.includes("ref: E ? (ffReg && E[ffReg] ? E[ffReg] : E.all) : null"),
   "the election column rekeys to the class's seats, All voters the 115 seats whole");
 assert.ok(ap.includes('refSub: (ffReg ? regName : "as counted") + "*"'),
@@ -271,6 +281,28 @@ assert.ok(ap.includes('summary="Trend-significance table"') && ap.indexOf('summa
 assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-lhead"') > ap.indexOf("className=\"rd-fl-tabs\"")
   && ap.indexOf('className={"rd-fl-dblock"') > ap.indexOf('className="rd-fl-lhead"'),
   "reading order: tabs, then the ledger, then the drift chart");
+
+/* the explainer's pairing flip (user 2026-10-20): /flows-explained/'s
+   election chart gained a "Two-party:" control beside "Direction:" —
+   Labor v Coalition rides the flowHistory election histories with the
+   jurisdiction chips; Labor v One Nation charts the measured flowForced.bys
+   contests (no chips — "no extra views like state-by-state", ONE view, as
+   the "one nation v labor" chart's crosses do on /flows/). The flip idiom:
+   the button names the ACTIVE pairing, its title announces the destination */
+assert.ok(ap.includes("function ExplainedOnChart({ inv })") && ap.includes("const ON_COHORTS = ["),
+  "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
+assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} inv={inv} />}'),
+  "the flip swaps the Coalition history chart for the measured-contest chart");
+assert.ok(ap.includes('{"Labor v " + rival}') && ap.includes('aria-pressed={pair === "on"}'),
+  "the Two-party button names the active pairing and exposes its state");
+assert.ok(ap.includes("multi && pair === \"co\" && ("),
+  "the jurisdiction chips ride the Coalition view alone (no state-by-state counts for the One Nation pairing)");
+assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),
+  "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");
+assert.ok(ap.includes('{"One reading per contest: " + cap + "."}'),
+  "the One Nation chart's caption lists one reading per contest from the crosses' own sub lines");
+assert.ok(ap.includes('<span className="rd-fx-keyx" aria-hidden="true"></span>Election and by-election counts</span>'),
+  "the /flows/ key reads across 2025 and 2026 counts now Hunter has joined");
 
 // ---- the retired satellite is a redirect stub --------------------------------------------
 /* preference-flows/index.html retired 2026-10-15 to a hash-preserving
