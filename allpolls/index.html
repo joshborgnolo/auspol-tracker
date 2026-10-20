@@ -8173,7 +8173,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "onp": [3.4, 3.8],
           "oth": [2.8, 3]
         },
-        "onpMinPrim": 2,
+        "onpMinBallots": 39264,
         "qld": 0.7,
         "qldSource": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/",
         "nsw": {
@@ -8224,10 +8224,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "asOf": "2022",
       "years": [2022],
       "grn": [82.4],
-      "onp": [48.4],
+      "onp": [null],
       "oth": [50],
       "grnErr": [1.9],
-      "onpErr": [3.7],
+      "onpErr": [null],
       "othErr": [2.8]
     },
     "qld": {
@@ -8256,13 +8256,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "asOf": "2019–2023",
       "years": [2019, 2023],
       "grn": [86.7, 88.1],
-      "onp": [null, null],
+      "onp": [37.9, 32.1],
       "oth": [54.2, 53.3],
       "grnErr": [null, null],
       "onpErr": [null, null],
       "othErr": [null, null],
       "grnExh": [40.5, 34.5],
-      "onpExh": [null, null],
+      "onpExh": [70, 61.3],
       "othExh": [58.5, 55.3]
     }
   };
@@ -109761,7 +109761,7 @@ function infoTerms(D) {
         rel: "noopener noreferrer"
       }, "Antony Green tabulated"), " the electoral commission\u2019s own counts in 2020 and 2024, the estimates came within ", FHB.qld.toFixed(1), " points.") : null, FHB.nsw && FHB.nsw.grn != null ? React.createElement(React.Fragment, null, " Run on New South Wales\u2019s distributions and checked against its counts, they came within ", FHB.nsw.grn.toFixed(1), " points for the Greens and ", FHB.nsw.oth.toFixed(1), " for everyone else.") : null), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "What\u2019s left out."), " One Nation\u2019s estimates miss by more (", FHB.onp.model.toFixed(1), " points on average federally since 2016), so its bars run wider, and its line shows only where it won at least ", FHB.onpMinPrim, "% of the primary vote. The chart also leaves out counts that reached a Labor v Coalition final in fewer than ", FHB.minClassic, " seats: the Northern Territory\u2019s; Victoria\u2019s before 2022, which stopped once a candidate passed half the vote; and South Australia\u2019s in 2026, when One Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the explainer\u2019s Labor v One Nation section instead.")) : null)
+      }, React.createElement("b", null, "What\u2019s left out."), " One Nation\u2019s estimates miss by more (", FHB.onp.model.toFixed(1), " points on average federally since 2016), so its bars run wider. An estimate also needs enough One Nation ballots behind it: at least", " ", FHB.onpMinBallots ? (Math.round(FHB.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000", ",", " ", "the smallest base the method was tested on, because on about 20,000 it missed federal counts by 4\u20135 points. New South Wales\u2019s One Nation lines are counts, so they need no such floor. The chart also leaves out counts that reached a Labor v Coalition final in fewer than ", FHB.minClassic, " seats: the Northern Territory\u2019s; Victoria\u2019s before 2022, which stopped once a candidate passed half the vote; and South Australia\u2019s in 2026, when One Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the explainer\u2019s Labor v One Nation section instead.")) : null)
     }, {
       id: "fp-flows",
       term: "Labor v One Nation flows",
@@ -134880,7 +134880,7 @@ function ExplainedFlowChart({
     }
   }), p.name))), React.createElement("p", {
     className: "ex-flow-cap"
-  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where it won at least " + (FH.fed && FH.fed.backtest ? FH.fed.backtest.onpMinPrim : 2) + "% of the vote." : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither. One Nation’s line shows only where it won at least " + (FH.fed && FH.fed.backtest ? FH.fed.backtest.onpMinPrim : 2) + "% of the vote." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
+  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
     className: "ex-flow-how"
   }, React.createElement(RdHow, {
     term: "flow-history",

@@ -74,8 +74,9 @@ for (const [k, S] of Object.entries(FH)) {
   assert.deepEqual([...S.years], [...shown[k]].sort((a, b) => a - b), `${k}: the years the rule allows`);
   S.years.forEach((y, i) => {
     const row = rows.find((r) => r.jurisdiction === k && +r.year === y && r.party === "onp");
-    const want = (prim[k + y] || 0) >= 2 && row && row.est_flow_to_alp !== "";
-    assert.equal(S.onp[i] != null, !!want, `${k} ${y}: One Nation drawn only at 2%+ of the primary vote (${prim[k + y]})`);
+    const base = row ? +row.est_alp_votes + +row.est_coal_votes : 0;
+    const want = row && row.est_flow_to_alp !== "" && (row.method === "counted" || base >= bt.onp_min_ballots);
+    assert.equal(S.onp[i] != null, !!want, `${k} ${y}: One Nation drawn if counted or on ${bt.onp_min_ballots}+ ballots (${base})`);
   });
   for (const b of ["grn", "onp", "oth"]) {
     S[b].forEach((v, i) => {

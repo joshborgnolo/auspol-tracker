@@ -7702,8 +7702,11 @@ function infoTerms(D) {
             and {FHB.nsw.oth.toFixed(1)} for everyone else.</> : null}</span>
             <span className="info-p"><b>What’s left out.</b> One Nation’s estimates miss by more
             ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so its bars run
-            wider, and its line shows only where it won at least {FHB.onpMinPrim}% of the primary
-            vote. The chart also leaves out counts that reached a Labor v Coalition final in fewer
+            wider. An estimate also needs enough One Nation ballots behind it: at least
+            {" "}{FHB.onpMinBallots ? (Math.round(FHB.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000"},
+            {" "}the smallest base the method was tested on, because on about 20,000 it missed federal
+            counts by 4&ndash;5 points. New South Wales&rsquo;s One Nation lines are counts, so they
+            need no such floor. The chart also leaves out counts that reached a Labor v Coalition final in fewer
             than {FHB.minClassic} seats: the Northern Territory’s; Victoria’s before 2022, which
             stopped once a candidate passed half the vote; and South Australia’s in 2026, when One
             Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the

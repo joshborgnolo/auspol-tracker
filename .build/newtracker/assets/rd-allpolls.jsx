@@ -5558,7 +5558,8 @@ function RdFlows({ measure }) {
    its estimates land. A state carries `estimated` and each point's 90% error
    (grnErr/onpErr/othErr), drawn as a bar at its election and quoted in the
    tooltip; its One Nation line appears only where One Nation stood widely
-   enough (gen-data's ONP_MIN_PRIM), so it can break into lone points. */
+   enough ballots behind an estimate (gen-data's onp_min_ballots rule), so it
+   can break into lone points. */
 const FLOW_PARTIES = [
   { id: "grn", name: "Greens",     color: "var(--grn)" },
   { id: "onp", name: "One Nation", color: "var(--onp)" },
@@ -5654,9 +5655,9 @@ function ExplainedFlowChart({ jur, inv }) {
         ))}
       </span>
       <p className="ex-flow-cap">{est
-        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where it won at least " + (FH.fed && FH.fed.backtest ? FH.fed.backtest.onpMinPrim : 2) + "% of the vote."
+        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on."
         : cnt
-          ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither. One Nation’s line shows only where it won at least " + (FH.fed && FH.fed.backtest ? FH.fed.backtest.onpMinPrim : 2) + "% of the vote."
+          ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
           : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
       <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
     </div>

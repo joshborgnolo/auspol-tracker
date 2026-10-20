@@ -646,6 +646,27 @@ def calibrate():
     return table, rows
 
 
+def onp_min_ballots(fed):
+    """The smallest One Nation ballot base the calibration's error figures
+    stand on: the 5th percentile of One Nation ballots (reaching Labor or
+    the Coalition, classic seats) behind its draws, over the elections One
+    Nation contested widely (2016-2025). An estimated One Nation point on
+    fewer ballots quotes an error never tested at its size – the federal
+    back-test's ~20,000-ballot elections (2010, 2013) missed by 4-5 points,
+    outside the drawn bar – so gen-data draws it only above this line."""
+    bases = []
+    for y in FED_YEARS:
+        if y < 2016:
+            continue
+        seats, truth = fed[y]
+        for N in CAL_N:
+            for rep in range(CAL_REPS):
+                keys = random.Random(911 * N + 17 * rep + y).sample(sorted(seats), N)
+                bases.append(sum(sum(truth.get(k, {}).get("onp", [0, 0])) for k in keys if classic(seats[k])))
+    bases.sort()
+    return round(bases[int(0.05 * (len(bases) - 1))]) if bases else None
+
+
 def err90(table, b, n):
     """the calibration's 90th-percentile error at n classic seats (linear
     between the grid points, held flat above the largest). Below the
@@ -747,6 +768,7 @@ def main():
                                 "cal_n": list(CAL_N), "cal_reps": CAL_REPS},
                    "federal": federal, "calibration": table, "calibration_rows": cal_rows,
                    "qld_check": qld_check, "nsw_check": nsw_check, "contests": contests,
+                   "onp_min_ballots": onp_min_ballots(fed),
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},
                   f, indent=1)
         f.write("\n")

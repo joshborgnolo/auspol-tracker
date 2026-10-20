@@ -4308,17 +4308,18 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    errors run wider: the Northern Territory's, Victoria's to 2018 (stopped
    once a candidate passed half the vote) and South Australia's 2026 (13
    Labor v Liberal finals among 25 Labor v One Nation ones). One Nation's
-   line joins where it won at least ONP_MIN_PRIM per cent of the primary
-   vote (data/state-flows.csv's prim_share): its estimates miss by more, so
-   its bars run wider, and where it barely stood a few thousand ballots
-   can't carry a point. A state
+   line (user call 2026-10-20): a COUNT is always drawn (NSW: every ballot
+   counted, whatever One Nation's share); an ESTIMATE only where at least
+   the backtest's onp_min_ballots One Nation ballots stand behind it – the
+   smallest base the calibration tested (its draws' 5th percentile, ~39,000).
+   Below it the federal back-test missed by 4-5 points, outside the bar. A
+   vote-share cut (2%, 1.5%) tracked the wrong thing. A state
    counting Liberal and National piles apart has both as the Coalition, so
    the others line is the crossbench alone. fed.backtest carries the test's
    headline figures for the Info entry. Federal-only: the Vic build reads
    neither file and carries the federal series alone. */
 const STATE_MIN_CLASSIC = 40;
 const STATE_BUCKETS = ["grn", "onp", "oth"];
-const ONP_MIN_PRIM = 2;
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", elections: "Australian federal elections", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
   const JURIS = {
@@ -4336,14 +4337,7 @@ const flowHistory = (() => {
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }
   try { bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")); } catch { /* ditto */ }
   if (!csv || !bt) return h;
-  // One Nation's primary share per state election, off the parsers' CSV
-  const onpPrim = {};
-  try {
-    const pl = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8").split(/\r?\n/).filter((ln) => ln.trim());
-    const ph = pl.shift().split(",");
-    const pi = Object.fromEntries(ph.map((x, i) => [x, i]));
-    pl.forEach((ln) => { const c = ln.split(","); if (c[pi.party] === "onp") onpPrim[c[pi.jurisdiction] + c[pi.year]] = +c[pi.prim_share]; });
-  } catch { /* no primaries: no One Nation line */ }
+  const onpMin = bt.onp_min_ballots || Infinity;
   const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
   const head = (lines.shift() || "").split(",");
   const ci = Object.fromEntries(head.map((x, i) => [x, i]));
@@ -4356,7 +4350,7 @@ const flowHistory = (() => {
     // no error; every estimate must carry its calibrated one
     const counted = c[ci.method] === "counted";
     if (c[ci.est_flow_to_alp] === "" || (!counted && c[ci.err90] === "")) return;
-    if (b === "onp" && !((onpPrim[jur + year] || 0) >= ONP_MIN_PRIM)) return;
+    if (b === "onp" && !counted && +c[ci.est_alp_votes] + +c[ci.est_coal_votes] < onpMin) return;
     ((bag[jur] ||= {})[year] ||= {})[b] = { v: Math.round(+c[ci.est_flow_to_alp] * 1000) / 10,
       e: counted ? null : Math.round(+c[ci.err90] * 10) / 10, counted,
       x: counted && c[ci.exhausted_share] !== "" ? Math.round(+c[ci.exhausted_share] * 1000) / 10 : null };
@@ -4394,7 +4388,7 @@ const flowHistory = (() => {
     grn: { model: mae("grn", "model"), replay: mae("grn", "replay") },
     oth: { model: mae("oth", "model"), replay: mae("oth", "replay") },
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
-    err90: { grn: span(errs.grn), onp: span(errs.onp), oth: span(errs.oth) }, onpMinPrim: ONP_MIN_PRIM,
+    err90: { grn: span(errs.grn), onp: span(errs.onp), oth: span(errs.oth) }, onpMinBallots: bt.onp_min_ballots || null,
     qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null,
     nsw: bt.nsw_check ? { grn: nswMax("grn"), oth: nswMax("oth") } : null };
   return h;
