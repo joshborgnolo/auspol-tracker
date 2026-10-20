@@ -4292,6 +4292,7 @@ const flowHistory = (() => {
   const JURIS = {
     vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences", asOf: "2006–2022" },
     wa: { label: "Western Australia", srcAs: "the Western Australian Electoral Commission’s distributions of preferences", asOf: "2001–2025" },
+    sa: { label: "South Australia", srcAs: "the Electoral Commission SA’s distributions of preferences", asOf: "2022" },
     qld: { label: "Queensland", srcAs: "the Electoral Commission of Queensland’s distributions of preferences", asOf: "2020–2024" },
   };
   if (!JUR) {
