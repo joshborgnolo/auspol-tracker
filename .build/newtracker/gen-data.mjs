@@ -4301,13 +4301,13 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 const STATE_MIN_CLASSIC = 40;
 const STATE_BUCKETS = ["grn", "oth"];
 const flowHistory = (() => {
-  const h = { fed: { label: "Federal", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
+  const h = { fed: { label: "Federal", elections: "Australian federal elections", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
   const JURIS = {
-    vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences" },
-    wa: { label: "Western Australia", srcAs: "the Western Australian Electoral Commission’s distributions of preferences" },
-    sa: { label: "South Australia", srcAs: "the Electoral Commission SA’s distributions of preferences" },
-    qld: { label: "Queensland", srcAs: "the Electoral Commission of Queensland’s distributions of preferences" },
-    nt: { label: "Northern Territory", srcAs: "the NT Electoral Commission’s distributions of preferences" },
+    vic: { label: "Victoria", elections: "Victorian state elections", srcAs: "the Victorian Electoral Commission’s distributions of preferences" },
+    wa: { label: "Western Australia", elections: "Western Australian state elections", srcAs: "the Western Australian Electoral Commission’s distributions of preferences" },
+    sa: { label: "South Australia", elections: "South Australian state elections", srcAs: "the Electoral Commission SA’s distributions of preferences" },
+    qld: { label: "Queensland", elections: "Queensland state elections", srcAs: "the Electoral Commission of Queensland’s distributions of preferences" },
+    nt: { label: "Northern Territory", elections: "Northern Territory elections", srcAs: "the NT Electoral Commission’s distributions of preferences" },
   };
   if (JUR) return h;
   let csv = null, bt = null;
@@ -4331,7 +4331,7 @@ const flowHistory = (() => {
     if (!years.length) continue;
     const col = (b, k) => years.map((y) => (bag[jk][y][b] ? bag[jk][y][b][k] : null));
     STATE_BUCKETS.forEach((b) => errs[b].push(...col(b, "e").filter((e) => e != null)));
-    h[jk] = { label: meta.label, srcAs: meta.srcAs, estimated: true,
+    h[jk] = { label: meta.label, elections: meta.elections, srcAs: meta.srcAs, estimated: true,
       asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
       years, grn: col("grn", "v"), onp: years.map(() => null), oth: col("oth", "v"),
       grnErr: col("grn", "e"), othErr: col("oth", "e") };

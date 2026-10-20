@@ -5621,7 +5621,7 @@ function ExplainedFlowChart({ jur }) {
   const span = YEARS.length > 1 ? YEARS[0] + " to " + YEARS[YEARS.length - 1] : String(YEARS[0]);
   return (
     <div className="ex-chart">
-      <span className="fc-unit">share preferencing Labor, % · {S.label}{est ? ", estimated" : ""}</span>
+      <span className="fc-unit">Share preferencing Labor over the Coalition in {S.elections || S.label + " elections"}, %</span>
       <TrendChart
         height={narrow ? 470 : 330}
         xDomain={[x0, x1]} yDomain={[0, 100]}
@@ -5631,7 +5631,6 @@ function ExplainedFlowChart({ jur }) {
         axisFont={narrow ? 28 : 15}
         pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
         series={series} areas={areas} spine={YEARS.map((x) => ({ x }))}
-        refLines={[{ y: 50, label: "even split", color: "var(--ink-faint)", align: "left" }]}
         tooltipTitle={(i) => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : "")}
         ariaLabel={"Share of preferences flowing to Labor, by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
       />
