@@ -212,9 +212,9 @@
     "moves": {
       "alp|education|TAFE or trade": -1,
       "alp|education|University": 1,
-      "alp|language|English only": -1,
       "alp|state|Non-NSW/Vic/Qld": 1,
       "grn|education|TAFE or trade": 1,
+      "grn|education|Year 12 or less": -1,
       "grn|language|English only": -1,
       "grn|working|Full time": -1,
       "lnp|housing|Renting": -1,
@@ -224,7 +224,6 @@
       "lnp|location|Rural": -1,
       "lnp|state|Qld": -1,
       "lnp|state|Vic": 1,
-      "oth|language|English only": 1,
       "oth|location|Rural": 1,
       "oth|state|Non-NSW/Vic/Qld": -1,
       "oth|state|WA": 1,
@@ -241,11 +240,6 @@
         "group": "University",
         "setLabel": "Education"
       },
-      "alp|language|English only": {
-        "party": "alp",
-        "group": "English only",
-        "setLabel": "By language at home"
-      },
       "alp|state|Non-NSW/Vic/Qld": {
         "party": "alp",
         "group": "Non-NSW/Vic/Qld",
@@ -254,6 +248,11 @@
       "grn|education|TAFE or trade": {
         "party": "grn",
         "group": "TAFE or trade",
+        "setLabel": "Education"
+      },
+      "grn|education|Year 12 or less": {
+        "party": "grn",
+        "group": "Year 12 or less",
         "setLabel": "Education"
       },
       "grn|language|English only": {
@@ -301,11 +300,6 @@
         "group": "Vic",
         "setLabel": "By state"
       },
-      "oth|language|English only": {
-        "party": "oth",
-        "group": "English only",
-        "setLabel": "By language at home"
-      },
       "oth|location|Rural": {
         "party": "oth",
         "group": "Rural",
@@ -335,12 +329,12 @@
       "oth": 11.2
     },
     "leaders": {
-      "alb_fav": -21.7,
-      "alb_net": -22.1,
+      "alb_fav": -21.8,
+      "alb_net": -23.7,
       "hanson_fav": -6,
       "hanson_net": -2.9,
       "taylor_fav": -4.8,
-      "taylor_net": -6.5
+      "taylor_net": -6.6
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -470,6 +464,24 @@
       "label": "21 Oct 2026",
       "kind": "finding",
       "text": "No party leads significantly as the best party on economic management any more (the Coalition did)."
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "finding",
+      "text": "Year 12 or less voters (by education) now break significantly away from the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "finding",
+      "text": "English only voters (by language at home) no longer break significantly away from Labor, relative to all voters."
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "finding",
+      "text": "English only voters (by language at home) no longer break significantly toward others, relative to all voters."
     }
   ]
 }

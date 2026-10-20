@@ -14296,6 +14296,322 @@
     "grn": 15,
     "oth": 13.5
    }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-10-20",
+   "dateStart": "2026-10-13",
+   "dateEnd": "2026-10-20",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
+   "source": "https://e.infogram.com/_/71v3hcr729lKnlQ7499f",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 24,
+      "lnp": 25,
+      "onp": 29,
+      "grn": 12,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 25,
+      "lnp": 22,
+      "onp": 25,
+      "grn": 15,
+      "oth": 12
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 26,
+      "lnp": 15,
+      "onp": 14,
+      "grn": 34,
+      "oth": 11
+     },
+     "35–49": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 12,
+      "oth": 14
+     },
+     "50+": {
+      "alp": 23,
+      "lnp": 30,
+      "onp": 34,
+      "grn": 4,
+      "oth": 9
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 29,
+      "lnp": 10,
+      "onp": 12,
+      "grn": 38,
+      "oth": 11
+     },
+     "Millennials": {
+      "alp": 25,
+      "lnp": 20,
+      "onp": 25,
+      "grn": 18,
+      "oth": 12
+     },
+     "Gen X": {
+      "alp": 21,
+      "lnp": 28,
+      "onp": 31,
+      "grn": 7,
+      "oth": 13
+     },
+     "Boomers": {
+      "alp": 26,
+      "lnp": 28,
+      "onp": 34,
+      "grn": 2,
+      "oth": 10
+     },
+     "Silent": {
+      "alp": 14,
+      "lnp": 53,
+      "onp": 33,
+      "grn": 0,
+      "oth": 0
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 15,
+      "oth": 12
+     },
+     "Vic": {
+      "alp": 19,
+      "lnp": 27,
+      "onp": 25,
+      "grn": 16,
+      "oth": 12
+     },
+     "Qld": {
+      "alp": 24,
+      "lnp": 22,
+      "onp": 35,
+      "grn": 10,
+      "oth": 9
+     },
+     "SA": {
+      "alp": 23,
+      "lnp": 24,
+      "onp": 34,
+      "grn": 14,
+      "oth": 5
+     },
+     "WA": {
+      "alp": 29,
+      "lnp": 26,
+      "onp": 23,
+      "grn": 11,
+      "oth": 11
+     },
+     "ACT/NT/Tas": {
+      "alp": 35,
+      "lnp": 26,
+      "onp": 7,
+      "grn": 17,
+      "oth": 15
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 26,
+      "lnp": 29,
+      "onp": 17,
+      "grn": 17,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 25,
+      "lnp": 20,
+      "onp": 31,
+      "grn": 13,
+      "oth": 11
+     },
+     "Provincial": {
+      "alp": 29,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 13,
+      "oth": 11
+     },
+     "Rural": {
+      "alp": 19,
+      "lnp": 24,
+      "onp": 34,
+      "grn": 10,
+      "oth": 13
+     }
+    },
+    "children": {
+     "Children under 18": {
+      "alp": 26,
+      "lnp": 23,
+      "onp": 26,
+      "grn": 11,
+      "oth": 14
+     },
+     "Children 18+": {
+      "alp": 20,
+      "lnp": 32,
+      "onp": 35,
+      "grn": 3,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 27,
+      "lnp": 16,
+      "onp": 21,
+      "grn": 25,
+      "oth": 11
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 27,
+      "lnp": 25,
+      "onp": 26,
+      "grn": 11,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 18,
+      "grn": 25,
+      "oth": 14
+     },
+     "Retired": {
+      "alp": 25,
+      "lnp": 32,
+      "onp": 34,
+      "grn": 1,
+      "oth": 8
+     }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 24,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 15,
+      "oth": 12
+     },
+     "$100k or more": {
+      "alp": 25,
+      "lnp": 25,
+      "onp": 26,
+      "grn": 13,
+      "oth": 11
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 25,
+      "lnp": 27,
+      "onp": 30,
+      "grn": 13,
+      "oth": 6
+     },
+     "TAFE or college": {
+      "alp": 21,
+      "lnp": 20,
+      "onp": 32,
+      "grn": 12,
+      "oth": 15
+     },
+     "University": {
+      "alp": 28,
+      "lnp": 22,
+      "onp": 19,
+      "grn": 17,
+      "oth": 14
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 18,
+      "grn": 20,
+      "oth": 13
+     },
+     "English only": {
+      "alp": 24,
+      "lnp": 24,
+      "onp": 28,
+      "grn": 13,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 24,
+      "lnp": 31,
+      "onp": 34,
+      "grn": 3,
+      "oth": 8
+     },
+     "Mortgage": {
+      "alp": 24,
+      "lnp": 25,
+      "onp": 30,
+      "grn": 10,
+      "oth": 10
+     },
+     "Renting": {
+      "alp": 24,
+      "lnp": 11,
+      "onp": 21,
+      "grn": 26,
+      "oth": 17
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 29,
+      "lnp": 26,
+      "onp": 22,
+      "grn": 16,
+      "oth": 8
+     },
+     "Middle class": {
+      "alp": 28,
+      "lnp": 28,
+      "onp": 23,
+      "grn": 11,
+      "oth": 10
+     },
+     "Working class": {
+      "alp": 20,
+      "lnp": 19,
+      "onp": 32,
+      "grn": 17,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 24,
+    "lnp": 23,
+    "onp": 27,
+    "grn": 14,
+    "oth": 12
+   }
   }
  ],
  "skipped": [

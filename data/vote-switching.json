@@ -1783,6 +1783,81 @@
     "ind": 5,
     "oth": 5
    }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-10-20",
+   "dateStart": "2026-10-13",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
+   "onp": 27,
+   "source": "https://e.infogram.com/_/71v3hcr729lKnlQ7499f",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 64,
+     "lnp": 10,
+     "onp": 14,
+     "grn": 7,
+     "community-strong-australia": 2,
+     "ind": 2,
+     "oth": 1
+    },
+    "lnp": {
+     "alp": 3,
+     "lnp": 59,
+     "onp": 36,
+     "grn": 0,
+     "community-strong-australia": 0,
+     "ind": 1,
+     "oth": 1
+    },
+    "grn": {
+     "alp": 6,
+     "lnp": 1,
+     "onp": 3,
+     "grn": 86,
+     "community-strong-australia": 2,
+     "ind": 1,
+     "oth": 1
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 3,
+     "onp": 92,
+     "grn": 2,
+     "community-strong-australia": 0,
+     "ind": 0,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 11,
+     "lnp": 6,
+     "onp": 15,
+     "grn": 4,
+     "community-strong-australia": 8,
+     "ind": 49,
+     "oth": 7
+    },
+    "oth": {
+     "alp": 2,
+     "lnp": 3,
+     "onp": 41,
+     "grn": 5,
+     "community-strong-australia": 2,
+     "ind": 0,
+     "oth": 47
+    }
+   },
+   "total": {
+    "alp": 24,
+    "lnp": 23,
+    "onp": 27,
+    "grn": 14,
+    "community-strong-australia": 2,
+    "ind": 5,
+    "oth": 5
+   }
   }
  ],
  "skipped": [

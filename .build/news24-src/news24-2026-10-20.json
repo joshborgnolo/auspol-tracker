@@ -1,0 +1,104 @@
+{
+  "source": "news24+wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
+  "published": "2026-10-21T05:20",
+  "fieldwork": {
+    "date": "2026-10-20",
+    "dateStart": "2026-10-13",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 24,
+    "lnp": 23,
+    "grn": 14,
+    "onp": 27,
+    "ind": 5,
+    "oth": 7,
+    "tpp_alp": 50,
+    "tpp_lnp": 50
+  },
+  "satisfaction": {
+    "pmApp": 32,
+    "pmDis": 62,
+    "pmNet": -30,
+    "oppApp": 35,
+    "oppDis": 49,
+    "oppNet": -14
+  },
+  "ppm": {
+    "alb": 41,
+    "opp": 39,
+    "albVsHanson": 50,
+    "hanson": 42
+  },
+  "altTpp": {
+    "alpVsOnp_alp": 50,
+    "alpVsOnp_onp": 50
+  },
+  "infogram": {
+    "via": "anon",
+    "ids": [
+      "_/LX5nXsEu4PiniSV81sIC",
+      "_/s3F7VuNQ9SUX138WiM5S",
+      "_/71v3hcr729lKnlQ7499f",
+      "_/eV94Fuhrp3iWc2qYhN6U",
+      "_/yUQea8IIbSHL6pdQOURK",
+      "_/LuXas5RdTue6T9Txu3aa"
+    ],
+    "kinds": [
+      "tpp",
+      "horserace",
+      "crosstab",
+      "topical",
+      "ppm",
+      "approvals"
+    ],
+    "window": {
+      "start": "2026-10-13",
+      "end": "2026-10-20"
+    },
+    "vi": {
+      "alp": 24,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 14,
+      "ind": 5,
+      "oth": 7
+    },
+    "tpp": null,
+    "altTpp": {
+      "alpVsOnp_alp": 50,
+      "alpVsOnp_onp": 50
+    },
+    "approval": {
+      "alb": {
+        "app": 32,
+        "dis": 62,
+        "unc": 6
+      },
+      "opp": {
+        "app": 35,
+        "dis": 49,
+        "unc": 16
+      },
+      "oppName": "taylor"
+    },
+    "ppm": [
+      {
+        "alb": 50,
+        "dk": 8,
+        "opp": 42,
+        "oppRaw": "Pauline Hanson",
+        "table": "ppm"
+      },
+      {
+        "alb": 41,
+        "dk": 20,
+        "opp": 39,
+        "oppRaw": "Angus Taylor",
+        "table": "ppm"
+      }
+    ]
+  }
+}
