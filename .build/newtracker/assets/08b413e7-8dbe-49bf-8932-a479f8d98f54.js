@@ -1764,18 +1764,30 @@ function TrendChart(props) {
                          fill={s.color} style={op < 1 || s.opacity != null ? { opacity: op } : null}
                          mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined} />;
         })}
-        {/* rings: a point that is a count, not a poll (the election result) */}
-        {marks.map((m, i) => (m.x < win[0] || m.x > win[1]) ? null : (
+        {/* rings: a point that is a count, not a poll (the election result).
+            m.cross draws the same mark as an X instead - the counted-contest
+            cross idiom of the /flows/ forced-choice ledger, reused for the
+            explainer's Labor-v-One-Nation readings */}
+        {marks.map((m, i) => {
+          if (m.x < win[0] || m.x > win[1]) return null;
+          const x = sx(m.x), y = sy(m.y), h = PX(m.r != null ? m.r : 4.2);
+          return (
           <g key={"mk" + i} className={"rd-mark" + (m.hidden != null ? " fade-mark" : "")} style={m.hidden ? { opacity: 0 } : m.opacity != null ? { opacity: m.opacity } : null}>
-            <circle cx={sx(m.x)} cy={sy(m.y)} r={PX(m.r || 5)} className="rd-ring"
-                    style={m.color ? { stroke: m.color } : null} />
+            {m.cross ? (
+              <path className="rd-cross" style={m.color ? { stroke: m.color } : null}
+                    d={`M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`} />
+            ) : (
+              <circle cx={x} cy={y} r={PX(m.r || 5)} className="rd-ring"
+                      style={m.color ? { stroke: m.color } : null} />
+            )}
             {m.label && (
-              <text x={sx(m.x) + PX(m.labelDx != null ? m.labelDx : 10)} y={sy(m.y) + PX(m.labelDy != null ? m.labelDy : 22)}
+              <text x={x + PX(m.labelDx != null ? m.labelDx : 10)} y={y + PX(m.labelDy != null ? m.labelDy : 22)}
                     className="rd-note-text" textAnchor={m.anchor || "start"}
                     style={{ fontSize: PX(12), strokeWidth: PX(4) }}>{m.label}</text>
             )}
           </g>
-        ))}
+          );
+        })}
         {/* direct end-of-line labels (series with an endLabel – e.g. cycle
             years) so lines are identifiable at rest, without hover; labels
             that finish at similar values are nudged apart */}

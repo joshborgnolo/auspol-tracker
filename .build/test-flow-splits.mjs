@@ -301,6 +301,12 @@ assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort
   "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");
 assert.ok(ap.includes('{"One reading per contest: " + cap + "."}'),
   "the One Nation chart's caption lists one reading per contest from the crosses' own sub lines");
+assert.ok(ap.includes("const marks = [];") && ap.includes("cross: true") && ap.includes("endCap: false,")
+    && ap.includes("series={series} marks={marks} spine="),
+  "the explainer's One Nation readings draw as the /flows/ ledger's crosses (marks channel), never dots");
+assert.ok(cssRd.includes(".rd-cross { fill: none; stroke-width: 2; stroke-linecap: round; }")
+    && cssRd.includes(".chart-svg .rd-cross,"),
+  "the cross mark keeps the ledger's stroke-only look and the chart's non-scaling stroke");
 assert.ok(ap.includes('<span className="rd-fx-keyx" aria-hidden="true"></span>Election and by-election counts</span>'),
   "the /flows/ key reads across 2025 and 2026 counts now Hunter has joined");
 

@@ -5692,21 +5692,27 @@ function ExplainedOnChart({ inv }) {
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const parties = ON_COHORTS.filter((p) => BYS.some((b) => b[p.id] != null));
   const series = [];
+  /* every reading draws as a cross - the /flows/ One Nation ledger's mark
+     (user 2026-10-20), one per cohort per contest it was counted in */
+  const marks = [];
   parties.forEach((p) => {
     const runs = [];
     let cur = [];
     BYS.forEach((b) => {
       const v = b[p.id];
       /* a null is a gap, not a zero (no Others count ran at Secret
-         Harbour); a run of one contest keeps its dot, never a lone line */
+         Harbour); a run of one contest keeps its cross, never a lone line */
       if (v == null) { if (cur.length) runs.push(cur); cur = []; }
-      else cur.push({ x: b.xm, y: T(v), ...((b.lbl || {})[p.id] ? { note: (b.lbl || {})[p.id] } : null) });
+      else {
+        cur.push({ x: b.xm, y: T(v), ...((b.lbl || {})[p.id] ? { note: (b.lbl || {})[p.id] } : null) });
+        marks.push({ x: b.xm, y: T(v), color: p.color, cross: true });
+      }
     });
     if (cur.length) runs.push(cur);
     runs.forEach((points, i) => {
       const tail = i === runs.length - 1;
       series.push({ id: p.id + i, label: p.name, color: p.color, points,
-        smooth: false, width: 2.6, endCap: tail || points.length === 1,
+        smooth: false, width: 2.6, endCap: false,
         endLabel: tail && !narrow ? p.name : null });
     });
   });
@@ -5727,7 +5733,7 @@ function ExplainedOnChart({ inv }) {
         unit="%" fmt={(v) => v.toFixed(1)}
         axisFont={narrow ? 28 : 15}
         pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
-        series={series} spine={BYS.map((b) => ({ x: b.xm }))}
+        series={series} marks={marks} spine={BYS.map((b) => ({ x: b.xm }))}
         tooltipTitle={(i) => BYS[i].label + " · " + BYS[i].sub}
         ariaLabel={"Share of preferences flowing to " + (inv ? "One Nation" : "Labor") + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
       />

@@ -3752,6 +3752,7 @@ body.rd .chart-svg .evt-line,
 body.rd .chart-svg .evt-conn,
 body.rd .chart-svg .rd-base,
 body.rd .chart-svg .rd-ring,
+body.rd .chart-svg .rd-cross,
 body.rd .chart-svg .guide,
 body.rd .chart-svg .hover-marker { vector-effect: non-scaling-stroke; }
 body.rd .grid { stroke: var(--line-2); stroke-width: 1; }
@@ -3765,6 +3766,7 @@ body.rd .evt-label { font-weight: 500; fill: var(--ink-2); }
 body.rd .evt:hover .evt-label, body.rd .evt.on .evt-label { fill: var(--ink); }
 body.rd .end-label { font-weight: 600; }
 body.rd .rd-ring { fill: var(--chart-bg); stroke: var(--ink); stroke-width: 1.75; }
+body.rd .rd-cross { fill: none; stroke-width: 2; stroke-linecap: round; }
 body.rd .rd-note-text {
   font-family: var(--sans); fill: var(--ink-2);
   paint-order: stroke; stroke: var(--chart-bg); stroke-linejoin: round;
@@ -97177,32 +97179,44 @@ function TrendChart(props) {
       } : null,
       mask: s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined
     });
-  }), marks.map((m, i) => m.x < win[0] || m.x > win[1] ? null : React.createElement("g", {
-    key: "mk" + i,
-    className: "rd-mark" + (m.hidden != null ? " fade-mark" : ""),
-    style: m.hidden ? {
-      opacity: 0
-    } : m.opacity != null ? {
-      opacity: m.opacity
-    } : null
-  }, React.createElement("circle", {
-    cx: sx(m.x),
-    cy: sy(m.y),
-    r: PX(m.r || 5),
-    className: "rd-ring",
-    style: m.color ? {
-      stroke: m.color
-    } : null
-  }), m.label && React.createElement("text", {
-    x: sx(m.x) + PX(m.labelDx != null ? m.labelDx : 10),
-    y: sy(m.y) + PX(m.labelDy != null ? m.labelDy : 22),
-    className: "rd-note-text",
-    textAnchor: m.anchor || "start",
-    style: {
-      fontSize: PX(12),
-      strokeWidth: PX(4)
-    }
-  }, m.label))), (() => {
+  }), marks.map((m, i) => {
+    if (m.x < win[0] || m.x > win[1]) return null;
+    const x = sx(m.x),
+      y = sy(m.y),
+      h = PX(m.r != null ? m.r : 4.2);
+    return React.createElement("g", {
+      key: "mk" + i,
+      className: "rd-mark" + (m.hidden != null ? " fade-mark" : ""),
+      style: m.hidden ? {
+        opacity: 0
+      } : m.opacity != null ? {
+        opacity: m.opacity
+      } : null
+    }, m.cross ? React.createElement("path", {
+      className: "rd-cross",
+      style: m.color ? {
+        stroke: m.color
+      } : null,
+      d: `M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`
+    }) : React.createElement("circle", {
+      cx: x,
+      cy: y,
+      r: PX(m.r || 5),
+      className: "rd-ring",
+      style: m.color ? {
+        stroke: m.color
+      } : null
+    }), m.label && React.createElement("text", {
+      x: x + PX(m.labelDx != null ? m.labelDx : 10),
+      y: y + PX(m.labelDy != null ? m.labelDy : 22),
+      className: "rd-note-text",
+      textAnchor: m.anchor || "start",
+      style: {
+        fontSize: PX(12),
+        strokeWidth: PX(4)
+      }
+    }, m.label));
+  }), (() => {
     const labs = series.filter(s => s.endLabel && s.points.length && s.opacity !== 0).map(s => {
       const last = visEnd(s);
       return {
@@ -135103,6 +135117,7 @@ function ExplainedOnChart({
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const parties = ON_COHORTS.filter(p => BYS.some(b => b[p.id] != null));
   const series = [];
+  const marks = [];
   parties.forEach(p => {
     const runs = [];
     let cur = [];
@@ -135111,13 +135126,21 @@ function ExplainedOnChart({
       if (v == null) {
         if (cur.length) runs.push(cur);
         cur = [];
-      } else cur.push({
-        x: b.xm,
-        y: T(v),
-        ...((b.lbl || {})[p.id] ? {
-          note: (b.lbl || {})[p.id]
-        } : null)
-      });
+      } else {
+        cur.push({
+          x: b.xm,
+          y: T(v),
+          ...((b.lbl || {})[p.id] ? {
+            note: (b.lbl || {})[p.id]
+          } : null)
+        });
+        marks.push({
+          x: b.xm,
+          y: T(v),
+          color: p.color,
+          cross: true
+        });
+      }
     });
     if (cur.length) runs.push(cur);
     runs.forEach((points, i) => {
@@ -135129,7 +135152,7 @@ function ExplainedOnChart({
         points,
         smooth: false,
         width: 2.6,
-        endCap: tail || points.length === 1,
+        endCap: false,
         endLabel: tail && !narrow ? p.name : null
       });
     });
@@ -135162,6 +135185,7 @@ function ExplainedOnChart({
       b: 40
     },
     series: series,
+    marks: marks,
     spine: BYS.map(b => ({
       x: b.xm
     })),

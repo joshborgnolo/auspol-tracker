@@ -7,9 +7,12 @@
    2026, Secret Harbour by-election), as the /flows/ One Nation chart's
    crosses. Hunter joined bys with this change, so the /flows/ One Nation
    tab's key generalised to "Election and by-election counts" and the
-   explainer's readings table gained the Hunter row.
-   Geometry pins price the three end-cap circles off the month-index domain
-   and the 0–100 share range; a tap flips pairing, direction, and back. */
+   explainer's readings table gained the Hunter row. Same-day follow-up
+   (user: "the points should be X's, like in the /flows/ labor v one nation
+   chart"): every reading draws as a cross (TrendChart marks' m.cross
+   branch), one per cohort per contest, and the end-cap dots are gone.
+   Geometry pins price the eight crosses off the month-index domain and the
+   0–100 share range; a tap flips pairing, direction, and back. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -53,8 +56,17 @@ const clickFlip = (page, frag) => page.evaluate((f) => {
 const unit = (page) => page.$eval("#flows-explained .fc-unit", (el) => el.textContent);
 const chipsText = (page) => page.$$eval("#flows-explained .ex-flow-chips .ex-chip", (bs) => bs.map((b) => b.textContent.trim()));
 const svgTexts = (page) => page.$$eval("#flows-explained .ex-chart svg text", (ts) => ts.map((t) => t.textContent.trim()));
-const endCaps = (page) => page.$$eval("#flows-explained .ex-chart svg circle.end-cap",
-  (cs) => cs.map((c) => ({ cx: +c.getAttribute("cx"), cy: +c.getAttribute("cy") })).sort((a, b) => a.cy - b.cy));
+/* the crosses: centre and span from each path's four diagonal points */
+const crosses = (page) => page.$$eval("#flows-explained .ex-chart svg path.rd-cross",
+  (ps) => ps.map((p) => {
+    const n = (p.getAttribute("d").match(/-?[\d.]+/g) || []).map(Number);
+    const xs = [n[0], n[2], n[4], n[6]], ys = [n[1], n[3], n[5], n[7]];
+    return { cx: (Math.min(...xs) + Math.max(...xs)) / 2,
+             cy: (Math.min(...ys) + Math.max(...ys)) / 2,
+             spanX: Math.max(...xs) - Math.min(...xs),
+             spanY: Math.max(...ys) - Math.min(...ys) };
+  }).sort((a, b) => a.cx - b.cx || a.cy - b.cy));
+const capCount = (page) => page.$$eval("#flows-explained .ex-chart svg circle.end-cap", (cs) => cs.length);
 const legend = (page) => page.$$eval("#flows-explained .fc-legend .hl-item", (ls) => ls.map((l) => l.textContent.trim()));
 
 /* TrendChart viewBox 0 0 1000 330, pad {l:46,r:104,t:16,b:40}, y 0–100 share */
@@ -70,6 +82,14 @@ const byXm = (d) => {
 };
 const XH = byXm("2025-05-03"), XS = byXm("2026-03-21"), XW = byXm("2026-08-29");
 const cxOf = (xm) => 46 + ((xm - (XH - 0.9)) / (XW - XH + 1.8)) * 850;
+/* one cross per cohort per counted contest, share-descending per contest
+   (no Others count ran at Secret Harbour) */
+const READS = [ { xm: XH, v: [[87.39, "Hunter Greens"], [40.25, "Hunter Others"], [17.06, "Hunter Coalition"]] },
+                { xm: XS, v: [[84.8, "SA Greens"], [55.9, "SA Others"], [33.9, "SA Coalition"]] },
+                { xm: XW, v: [[90, "Harbour Greens"], [29.8, "Harbour Coalition"]] } ];
+const expectedCrosses = (flip) => READS.flatMap((r) => r.v.map(([v, tag]) =>
+  ({ cx: cxOf(r.xm), cy: cyOf(flip ? 100 - v : v, false), tag: tag + " " + v })))
+  .sort((a, b) => a.cx - b.cx || a.cy - b.cy);
 
 console.log("== desktop: the Coalition view is the landing ==");
 const page = await browser.newPage();
@@ -116,16 +136,16 @@ await sleep(500);
      texts.filter((t) => /\d{4}/.test(t)).join(" / "));
   ok("no stray tick text rides the axis", texts.filter((t) => /\d{4}/.test(t)).length === 3,
      texts.filter((t) => /\d{4}/.test(t)).join(" / "));
-  const caps = await endCaps(page);
-  ok("three end-cap circles = one per cohort tail", caps.length === 3, JSON.stringify(caps));
-  const want = [
-    { x: cxOf(XW), y: cyOf(90.0, false), tag: "Greens out of Secret Harbour" },
-    { x: cxOf(XS), y: cyOf(55.9, false), tag: "Others tail at SA 2026 (no Others count ran at Secret Harbour)" },
-    { x: cxOf(XW), y: cyOf(29.8, false), tag: "Coalition out of Secret Harbour" },
-  ];
-  ok("the end caps sit at the counted values (harbour Greens 90.0, SA others 55.9, harbour Coalition 29.8)",
-     want.every((w, i) => near(caps[i].cx, w.x) && near(caps[i].cy, w.y)),
-     caps.map((c, i) => `${parseFloat(c.cx.toFixed(1))},${parseFloat(c.cy.toFixed(1))} want ${parseFloat(want[i].x.toFixed(1))},${parseFloat(want[i].y.toFixed(1))}`).join(" · "));
+  const xs = await crosses(page);
+  ok("eight crosses = one per counted reading (3 Hunter + 3 SA + 2 Secret Harbour): the /flows/ ledger's mark",
+     xs.length === 8, xs.map((c) => `${parseFloat(c.cx.toFixed(1))},${parseFloat(c.cy.toFixed(1))}`).join(" · "));
+  ok("no dot marks the readings any more", (await capCount(page)) === 0, (await capCount(page)) + " end-caps");
+  ok("each cross is a square X (spanX = spanY)", xs.every((c) => near(c.spanX, c.spanY, 0.05)),
+     JSON.stringify(xs.slice(0, 2).map((c) => [+c.spanX.toFixed(2), +c.spanY.toFixed(2)])));
+  const want = expectedCrosses(false);
+  ok("the crosses sit at the eight counted readings",
+     want.every((w, i) => near(xs[i].cx, w.cx) && near(xs[i].cy, w.cy)),
+     want.map((w, i) => `${w.tag}: got ${parseFloat(xs[i].cx.toFixed(1))},${parseFloat(xs[i].cy.toFixed(1))} want ${parseFloat(w.cx.toFixed(1))},${parseFloat(w.cy.toFixed(1))}`).join(" · "));
   const cap = await page.$eval("#flows-explained .ex-flow-cap", (el) => el.textContent);
   ok("the caption lists one reading per contest, Hunter first",
      cap.startsWith("One reading per contest: Hunter 2025 — the AEC’s count of the full distribution of preferences; ")
@@ -143,10 +163,11 @@ await sleep(500);
        && f[1].title === "Switch to shares preferencing Labor over One Nation", JSON.stringify(f[1]));
   ok("the unit line inverts", (await unit(page)) === "Share preferencing One Nation over Labor in each counted contest",
      await unit(page));
-  const caps = await endCaps(page);
-  ok("the inversions are 100 − x (Coalition reads 70.2, Others 44.1, Greens 10.0)",
-     near(caps[0].cy, cyOf(70.2, false)) && near(caps[1].cy, cyOf(44.1, false)) && near(caps[2].cy, cyOf(10.0, false)),
-     JSON.stringify(caps.map((c) => +c.cy.toFixed(1))));
+  const xsv = await crosses(page);
+  const wantInv = expectedCrosses(true);
+  ok("every cross inverts to 100 − its reading",
+     xsv.length === 8 && wantInv.every((w, i) => near(xsv[i].cx, w.cx) && near(xsv[i].cy, w.cy)),
+     wantInv.map((w, i) => `${w.tag}: got ${xsv[i] ? parseFloat(xsv[i].cy.toFixed(1)) : "—"} want ${parseFloat(w.cy.toFixed(1))}`).join(" · "));
 
   await clickFlip(page, "over");
   await sleep(500);

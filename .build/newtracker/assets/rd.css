@@ -247,6 +247,7 @@ body.rd .chart-svg .evt-line,
 body.rd .chart-svg .evt-conn,
 body.rd .chart-svg .rd-base,
 body.rd .chart-svg .rd-ring,
+body.rd .chart-svg .rd-cross,
 body.rd .chart-svg .guide,
 body.rd .chart-svg .hover-marker { vector-effect: non-scaling-stroke; }
 body.rd .grid { stroke: var(--line-2); stroke-width: 1; }
@@ -260,6 +261,9 @@ body.rd .evt-label { font-weight: 500; fill: var(--ink-2); }
 body.rd .evt:hover .evt-label, body.rd .evt.on .evt-label { fill: var(--ink); }
 body.rd .end-label { font-weight: 600; }
 body.rd .rd-ring { fill: var(--chart-bg); stroke: var(--ink); stroke-width: 1.75; }
+/* the counted-contest cross sibling of the ring (same mark idiom as the
+   /flows/ ledger's .rd-fx-x); colour arrives inline from the mark */
+body.rd .rd-cross { fill: none; stroke-width: 2; stroke-linecap: round; }
 body.rd .rd-note-text {
   font-family: var(--sans); fill: var(--ink-2);
   paint-order: stroke; stroke: var(--chart-bg); stroke-linejoin: round;
