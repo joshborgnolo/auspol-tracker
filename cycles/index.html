@@ -4761,6 +4761,7 @@ body.rd .rd-go-rbar > em { position: absolute; top: 50%; transform: translateY(-
 body.rd .rd-go-rbar > em.rd-go-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
 body.rd .rd-go-nb { font-size: 12px; font-weight: 400; }
 body.rd .rd-go-rbar > i.rd-go-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
+body.rd .rd-go-elsebelow { margin-top: 2px; text-align: right; font-size: 11px; }
 @media (max-width: 640px) { body.rd .rd-go-wrap { margin-top: 28px; } }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
@@ -120684,11 +120685,8 @@ function RdSwitching({
     y2: 48 + GO_H,
     className: "rd-go-base"
   }));
-  const ELSE_CHOICES = ["Went elsewhere", "Elsewhere"];
-  const elseCaption = v => {
-    const residue = W * (100 - v) / 100 - 16;
-    return ELSE_CHOICES.find(o => textWidth(o, 11, 400) <= residue) || null;
-  };
+  const ELSE_CAPTION = "Went elsewhere";
+  const elseFitsInline = v => textWidth(ELSE_CAPTION, 11, 400) <= W * (100 - v) / 100 - 16;
   const goRowsPhone = React.createElement("div", {
     className: "rd-go-rows"
   }, goRows.map((r, i) => React.createElement("div", {
@@ -120738,12 +120736,17 @@ function RdSwitching({
       left: "calc(" + r.now.v + "% + 8px)",
       color: inkOf(r.color)
     }
-  }, gof(r.now.v), "%"), r.id === "kept" && elseCaption(r.now.v) && React.createElement("i", {
+  }, gof(r.now.v), "%"), r.id === "kept" && elseFitsInline(r.now.v) && React.createElement("i", {
     className: "rd-go-else",
     style: {
       color: inkOf(r.color)
     }
-  }, elseCaption(r.now.v))))));
+  }, ELSE_CAPTION)), r.id === "kept" && !elseFitsInline(r.now.v) && React.createElement("div", {
+    className: "rd-go-elsebelow",
+    style: {
+      color: inkOf(r.color)
+    }
+  }, ELSE_CAPTION))));
   const goSec = V === "onp" ? null : React.createElement(React.Fragment, null, goHead && React.createElement(RdHed, {
     head: goHead,
     dek: goDek

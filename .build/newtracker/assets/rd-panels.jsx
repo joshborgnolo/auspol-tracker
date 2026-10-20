@@ -3850,13 +3850,11 @@ function RdSwitching({ rangeId }) {
   /* the tint caption must sit wholly on the tint: right-pinned it slid back
      onto the kept fill in its own hue once the fill neared 80% (Greens 78.5
      kept 21.5 - the residue held 60px of tint against an 80px label on a
-     320px phone). Ladder it like the mosaic's labels, drop it when the
-     residue holds neither form. */
-  const ELSE_CHOICES = ["Went elsewhere", "Elsewhere"];
-  const elseCaption = (v) => {
-    const residue = W * (100 - v) / 100 - 16;
-    return ELSE_CHOICES.find((o) => textWidth(o, 11, 400) <= residue) || null;
-  };
+     320px phone). One form, "Went elsewhere": on the tint while the residue
+     holds it, on its own line under the bar once it no longer does (user
+     call 2026-10-20 - a wrap beats shortening the wording). */
+  const ELSE_CAPTION = "Went elsewhere";
+  const elseFitsInline = (v) => textWidth(ELSE_CAPTION, 11, 400) <= W * (100 - v) / 100 - 16;
   const goRowsPhone = (
     <div className="rd-go-rows">
       {goRows.map((r, i) => (
@@ -3878,8 +3876,9 @@ function RdSwitching({ rangeId }) {
                 <span className="rd-go-big">{gof(r.now.v)}%</span><span className="rd-go-nb">kept</span></em>
               )
             ) : <em style={{ left: "calc(" + r.now.v + "% + 8px)", color: inkOf(r.color) }}>{gof(r.now.v)}%</em>}
-            {r.id === "kept" && elseCaption(r.now.v) && <i className="rd-go-else" style={{ color: inkOf(r.color) }}>{elseCaption(r.now.v)}</i>}
+            {r.id === "kept" && elseFitsInline(r.now.v) && <i className="rd-go-else" style={{ color: inkOf(r.color) }}>{ELSE_CAPTION}</i>}
           </div>
+          {r.id === "kept" && !elseFitsInline(r.now.v) && <div className="rd-go-elsebelow" style={{ color: inkOf(r.color) }}>{ELSE_CAPTION}</div>}
         </div>
       ))}
     </div>
