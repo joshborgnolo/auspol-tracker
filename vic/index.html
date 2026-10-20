@@ -37367,6 +37367,20 @@ function FlowDriftOnPanel({
     paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own first waves \u2013 the classic pairing on the panel above can be read at the election, but no count of this pairing exists, so the chart speaks only about drift since each house began."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. Each dot is one published wave\u2019s own gap, in its house\u2019s colour \u2013 hover it to read the wave. A wave that publishes no head-to-head carries no gap."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
   }));
 }
+function rdEffTbc(p) {
+  if (p.conf || p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
+  const since = Date.parse(p.released) - 90 * 86400000;
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
+}
+function rdEffMissing(p) {
+  if (p.conf || p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
+  const rel = Date.parse(p.released);
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
+}
 function AllPollsView({
   focus,
   onBack,
@@ -37803,6 +37817,7 @@ function AllPollsView({
         hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
         if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
       }
+      if (p.sampleEff != null) hayParts.push("eff effective sample", String(p.sampleEff));else if (rdEffMissing(p)) hayParts.push("eff effective sample missing no statement");else if (rdEffTbc(p)) hayParts.push("eff effective sample tbc pending");
       hayParts.push(...tags);
       const hay = hayParts.join(" ").toLowerCase();
       return {
@@ -56629,20 +56644,6 @@ function rdApOut(stamp) {
     s += ", " + (hr % 12 || 12) + (hr < 12 ? " am" : " pm");
   }
   return s;
-}
-function rdEffTbc(p) {
-  if (p.conf || p.sampleEff != null || !p.published) return false;
-  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
-  const since = Date.parse(p.released) - 90 * 86400000;
-  const A = window.AUSPOL;
-  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
-}
-function rdEffMissing(p) {
-  if (p.conf || p.sampleEff != null || !p.published) return false;
-  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
-  const rel = Date.parse(p.released);
-  const A = window.AUSPOL;
-  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
 }
 function rdEffNote(p) {
   const missing = rdEffMissing(p);

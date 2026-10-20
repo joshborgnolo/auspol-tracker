@@ -12,7 +12,9 @@
    "on <Wkd d Mon>" tail matches that lane's latest published date from the
    dataset; asserts the row-cell "released X" subs render; opens a 2PP-facet
    row as the poll-side regression guard; ends with SOURCE pins on the
-   emitter key and the rdEffTbc guard. */
+   emitter key and the rdEffTbc guard (which lives in the d1a1d215 asset
+   since 2026-10-20 - the eff gates moved there so the search haystack can
+   match on them). */
 import puppeteer from "puppeteer-core";
 import path from "path";
 import process from "process";
@@ -133,7 +135,7 @@ check(/published by .+ on (Sun|Mon|Tue|Wed|Thu|Fri|Sat) \d{1,2} \w{3}/.test(poll
 const src = (await import("fs")).default;
 check(src.readFileSync(path.resolve(process.cwd(), ".build/newtracker/gen-data.mjs"), "utf8").includes("published: r.date,"),
   "gen-data emits published on confidence rows");
-check(src.readFileSync(path.resolve(process.cwd(), ".build/newtracker/assets/rd-allpolls.jsx"), "utf8")
+check(src.readFileSync(path.resolve(process.cwd(), ".build/newtracker/assets/d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"), "utf8")
   .includes("if (p.conf || p.sampleEff != null || !p.published) return false;"),
   "rdEffTbc bails before the habit look-back on confidence rows");
 

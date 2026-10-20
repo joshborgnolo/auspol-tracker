@@ -127,6 +127,67 @@ if (got.missing.length) {
     "the missing word is the same APC link as TBC (" + head.href + ")");
 }
 
+/* the search box matches the eff tags and the house figure (the haystack
+   tokens ride the same rdEffTbc/rdEffMissing gates, hoisted into the
+   d1a1d215 asset 2026-10-20): "missing" — and its "miss" substring —
+   surfaces exactly the registry, "eff"/"effective sample" everything the
+   Sample column badges, and MRP rows stay out (their "eff. n/a" draws no
+   token) */
+const typeSearch = async (text) => {
+  const x = await page.$(".rd-ap-x");
+  if (x) { await x.click(); await new Promise((r) => setTimeout(r, 250)); }
+  await page.click(".rd-ap-search input");
+  await page.type(".rd-ap-search input", text);
+  await new Promise((r) => setTimeout(r, 600));
+  /* the table virtualises (minShown 30): a query matching more than 30
+     rows renders only the window's head plus a "Show all n" button in
+     .rd-ap-more - reveal the whole answer set before counting */
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll(".rd-ap-more button")].find((x) => /^Show all \d+$/.test(x.textContent.trim()));
+    if (b) b.click();
+  });
+  await new Promise((r) => setTimeout(r, 600));
+};
+const visibleRows = () => page.evaluate(() =>
+  [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")]
+    .filter((r) => r.getBoundingClientRect().height > 0)
+    .map((r) => ({ name: ((r.querySelector(".rd-ap-who b") || {}).textContent || "").trim(),
+                   when: ((r.querySelector(".rd-ap-when") || {}).textContent || "").trim(),
+                   subs: [...r.querySelectorAll(".rd-ap-n .rd-ap-sub")].map((s) => s.textContent.trim()) })));
+
+await typeSearch("missing");
+await page.waitForFunction((n) =>
+  [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")].filter((r) => r.getBoundingClientRect().height > 0).length === n,
+  { timeout: 10000 }, EXPECTED_MISSING.length).catch(() => {});
+let hits = await visibleRows();
+ok(hits.length === EXPECTED_MISSING.length, 'search "missing" shows exactly the registry (got ' + hits.length + ")");
+for (const [n, w] of EXPECTED_MISSING)
+  ok(hits.some((m) => m.name.startsWith(n) && m.when.includes(w)), 'search "missing" finds: ' + n + " " + w);
+ok(hits.length > 0 && hits.every((m) => m.subs.includes("eff. missing")), 'every "missing" hit carries the eff. missing badge');
+
+await typeSearch("miss");
+await page.waitForFunction((n) =>
+  [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")].filter((r) => r.getBoundingClientRect().height > 0).length === n,
+  { timeout: 10000 }, EXPECTED_MISSING.length).catch(() => {});
+hits = await visibleRows();
+ok(hits.length === EXPECTED_MISSING.length, 'substring "miss" shows the same nine (got ' + hits.length + ")");
+
+const effTotal = got.effFig + got.tbc + EXPECTED_MISSING.length;
+await typeSearch("eff");
+await page.waitForFunction((n) =>
+  [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")].filter((r) => r.getBoundingClientRect().height > 0).length === n,
+  { timeout: 10000 }, effTotal).catch(() => {});
+hits = await visibleRows();
+ok(hits.length === effTotal, 'search "eff" shows every eff-badged row (got ' + hits.length + ", want " + effTotal + ")");
+ok(hits.length > 0 && hits.every((m) => m.subs.some((s) => /^eff\. /.test(s) && s !== "eff. n/a")), "every \"eff\" hit is a real eff badge, no n/a leak");
+
+await typeSearch("effective sample");
+await page.waitForFunction((n) =>
+  [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")].filter((r) => r.getBoundingClientRect().height > 0).length === n,
+  { timeout: 10000 }, effTotal).catch(() => {});
+hits = await visibleRows();
+ok(hits.length === effTotal, 'two-token "effective sample" shows the same eff set (got ' + hits.length + ")");
+
 await browser.close();
 server.close();
 process.exit(fails ? 1 : 0);

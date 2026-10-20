@@ -8301,6 +8301,42 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grn": [73.7, 75.1, 79.7, 79.7, 78.8],
       "onp": [null, null, null, null, 27.2],
       "oth": [42.8, 51.7, 55.7, 54.9, 49.1]
+    },
+    "wa": {
+      "label": "Western Australia",
+      "srcAs": "the Western Australian Electoral Commission’s distributions of preferences",
+      "asOf": "2001–2025",
+      "years": [2001, 2005, 2008, 2013, 2017, 2021, 2025],
+      "grn": [66.3, 68.9, 68.8, 69.6, 77.8, 79.8, 76],
+      "onp": [52, 48.5, null, null, 41, 48.3, 34.2],
+      "oth": [52.7, 44.5, 39, 46.9, 48.2, 47, 46.6]
+    },
+    "sa": {
+      "label": "South Australia",
+      "srcAs": "the Electoral Commission SA’s distributions of preferences",
+      "asOf": "2022",
+      "years": [2022],
+      "grn": [77.9],
+      "onp": [51.6],
+      "oth": [54.7]
+    },
+    "qld": {
+      "label": "Queensland",
+      "srcAs": "the Electoral Commission of Queensland’s distributions of preferences",
+      "asOf": "2020–2024",
+      "years": [2020, 2024],
+      "grn": [75, 75.8],
+      "onp": [37.3, 31.6],
+      "oth": [48.5, 46.2]
+    },
+    "nt": {
+      "label": "Northern Territory",
+      "srcAs": "the NT Electoral Commission’s distributions of preferences",
+      "asOf": "2016–2024",
+      "years": [2016, 2020, 2024],
+      "grn": [79.7, 74.6, 66.7],
+      "onp": [null, null, null],
+      "oth": [61.3, 47.1, 52.4]
     }
   };
   const adjusted = {
@@ -107705,6 +107741,20 @@ function FlowDriftOnPanel({
     paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own first waves \u2013 the classic pairing on the panel above can be read at the election, but no count of this pairing exists, so the chart speaks only about drift since each house began."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. Each dot is one published wave\u2019s own gap, in its house\u2019s colour \u2013 hover it to read the wave. A wave that publishes no head-to-head carries no gap."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
   }));
 }
+function rdEffTbc(p) {
+  if (p.conf || p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
+  const since = Date.parse(p.released) - 90 * 86400000;
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
+}
+function rdEffMissing(p) {
+  if (p.conf || p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
+  const rel = Date.parse(p.released);
+  const A = window.AUSPOL;
+  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
+}
 function AllPollsView({
   focus,
   onBack,
@@ -108141,6 +108191,7 @@ function AllPollsView({
         hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
         if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
       }
+      if (p.sampleEff != null) hayParts.push("eff effective sample", String(p.sampleEff));else if (rdEffMissing(p)) hayParts.push("eff effective sample missing no statement");else if (rdEffTbc(p)) hayParts.push("eff effective sample tbc pending");
       hayParts.push(...tags);
       const hay = hayParts.join(" ").toLowerCase();
       return {
@@ -126967,20 +127018,6 @@ function rdApOut(stamp) {
     s += ", " + (hr % 12 || 12) + (hr < 12 ? " am" : " pm");
   }
   return s;
-}
-function rdEffTbc(p) {
-  if (p.conf || p.sampleEff != null || !p.published) return false;
-  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
-  const since = Date.parse(p.released) - 90 * 86400000;
-  const A = window.AUSPOL;
-  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
-}
-function rdEffMissing(p) {
-  if (p.conf || p.sampleEff != null || !p.published) return false;
-  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
-  const rel = Date.parse(p.released);
-  const A = window.AUSPOL;
-  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
 }
 function rdEffNote(p) {
   const missing = rdEffMissing(p);

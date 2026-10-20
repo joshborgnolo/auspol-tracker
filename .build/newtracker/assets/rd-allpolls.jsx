@@ -124,53 +124,10 @@ function rdApOut(stamp) {
   return s;
 }
 
-/* the effective sample is still to come: the house filed one for a poll
-   released in the 90 days before this one (its filing habit — looked for
-   past unfiled waves, since a statement lag can outrun the wave cadence, as
-   YouGov's did in Sept-Oct 2026; the previous-poll version went dark for
-   both unfiled waves once one statement lagged) and this wave is inside
-   three weeks of release. The 90-day bound
-   retires the promise for a house that stops filing, rather than marking
-   every new wave TBC indefinitely. Ipsos's whole catalogue lives apart as
-   issuesOnlyPolls, so the habit look-back scans it too. One rule for the
-   header and the table's Sample column, so they agree. */
-function rdEffTbc(p) {
-  // confidence releases print their sample ON the release; an effective
-  // sample isn't a confidence concept, and the habit look-back scans the
-  // POLL houses ('Roy Morgan' the confidence lane borrowing Roy Morgan
-  // the poll house's filing habit shows why p.conf must bail first)
-  if (p.conf || p.sampleEff != null || !p.published) return false;
-  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
-  const since = Date.parse(p.released) - 90 * 86400000;
-  const A = window.AUSPOL;
-  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
-    && q.released < p.released && Date.parse(q.released) >= since);
-}
-/* the same wave once its three weeks' grace is up, under the Australian
-   Polling Council code it should have filed by now: "eff. missing"
-   forever, never silent (user call 2026-10-20). Widened past TBC's
-   look-back only: the house filed for a poll within 120 days EITHER side
-   (a house can hole a whole quarter - RedBridge filed no Jun-2025
-   statement, its next being Sep-Oct's, 99 days on) and goes no wider,
-   so waves from an era the house never filed say nothing at all -
-   verified 2026-10-20: this gates exactly RedBridge's five, YouGov's
-   three (incl. the Australia Institute client poll of Oct 2025) and
-   DemosAU's one statement-less wave of the time (was six RB waves at
-   first verify; 7-13 Nov 2025's statement backfiled as sampleEff 855
-   hours later, and the gate let it go). One of the five wears
-   "Redbridge" in polls.json and only gets its habit match because
-   gen-data unifies it into individualPolls as "RedBridge/Accent" - scanning
-   the raw file for this gate's result misses it. MRP rows sit under
-   "(MRP)" pollster names, so the exact-match habit never tags them
-   (their statements print "n/a for MRP" - sampleCell says so instead). */
-function rdEffMissing(p) {
-  if (p.conf || p.sampleEff != null || !p.published) return false;
-  if (Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000) return false;
-  const rel = Date.parse(p.released);
-  const A = window.AUSPOL;
-  return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some((q) => q.pollster === p.pollster && q.sampleEff != null
-    && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
-}
+/* the eff-tag gates rdEffTbc/rdEffMissing live in the d1a1d215 asset
+   (their ONE home since 2026-10-20: that layer loads earlier in
+   build.mjs's JSX list, and its search haystack matches on the same gates
+   this file draws) - this file's callers see them as window globals. */
 /* the tag word links to the page where THE HOUSE will file (TBC) or should
    have filed (missing) this wave's APC statement - per house from
    gen-data's effTbcUrls (user call 2026-10-12:
