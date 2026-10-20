@@ -1,8 +1,23 @@
 """parse-sa-state-flows.py - extend the per-election preference-flow table
-to South Australia (2022 State Election; House of Assembly) from the
-47 per-district "Final Distribution of Preferences" CSVs in
-.build/state-flow-src/sa/2022/x/2022SE HA Final distribution csv/
-(committed mirror; see harvest-sa-state-flows.py for harvesting and scope).
+to South Australia (House of Assembly; committed mirrors, see
+harvest-sa-state-flows.py for harvesting and scope):
+  * 2022 from the 47 per-district "Final Distribution of Preferences" CSVs
+    in .build/state-flow-src/sa/2022/x/2022SE HA Final distribution csv/;
+  * 2026 from the ECSA results API's HAChange finalDistribution rounds
+    (.build/state-flow-src/sa/2026/change.json), parties from HAStatic
+    (static.json). Round 0 is the first preferences, each ExclusionRoundN
+    gives every candidate's voteChange (negative on the excluded) and
+    progressiveTotal; the last round's progressive totals are the final
+    pair's and the verification target. The distribution names candidates
+    "Given SURNAME" against HAStatic's "SURNAME, Given" under different ids,
+    so the two join on the name's sorted lower-case words (the results app's
+    own match).
+districts_of(year) is the one reader both formats go through – this file's
+first-pass replay and .build/estimate-state-flows.py alike.
+
+2026 caveat: One Nation made the final two in 31 of 47 districts (25 against
+Labor), so only 13 finished Labor v Liberal – a classic-seat flow for 2026
+covers those 13, seats where the Liberals out-polled One Nation.
 
 Same estimand as the QLD/WA/VIC parsers: in every district whose final
 two surviving candidates were one Australian Labor Party candidate and
@@ -39,21 +54,22 @@ Schema notes (verified against the committed mirror 2026-10-20):
     totals; "FINAL %" row: their shares; "ELECTION RESULT" row:
     "ELECTED" cell beneath the elected candidate.
 
-Appends to (never rewrites) data/state-flows.csv: rows for jurisdiction
-"sa" replace only their own block.
+Appends to (never rewrites) data/state-flows.csv: rows for the "sa" years
+parsed replace only their own block. Usage: parse-sa-state-flows.py [year...]
 """
 import csv
+import json
 import os
 import re
 import sys
 
-ROOT = os.path.join(".build", "state-flow-src", "sa", "2022", "x",
-                    "2022SE HA Final distribution csv")
+SRC = os.path.join(".build", "state-flow-src", "sa")
+CSV_2022 = os.path.join("2022", "x", "2022SE HA Final distribution csv")
 OUT = "data/state-flows.csv"
 COLS = ["jurisdiction", "year", "party", "prim_votes", "prim_share",
         "flow_alp_votes", "flow_coal_votes", "flow_to_alp",
         "n_seats", "n_dop", "n_classic", "formal_votes"]
-YEAR = 2022
+YEARS = (2022, 2026)
 BUCKETS = ("alp", "lib", "nat", "grn", "onp", "oth")
 EMIT = ("grn", "onp", "oth", "lib", "nat", "alp")
 
@@ -267,31 +283,72 @@ def verify_seat(p):
     return bad
 
 
+def _nkey(name):
+    return " ".join(sorted(name.lower().replace(",", " ").split()))
+
+
+def parse_district_2026(dist, static_cands):
+    """One HAChange district -> the same shape parse_district gives a 2022
+    CSV: names, affils, fpv, chain [{order, label, neg, pos}], final."""
+    rounds = sorted(dist.get("finalDistribution") or [], key=lambda r: int(r["roundNumber"]))
+    if not rounds or rounds[0].get("roundType") != "FirstPreference":
+        return None
+    party = {_nkey(c["candidateName"]): c.get("partyId") for c in static_cands}
+    names = [c["candidateName"] for c in rounds[0]["candidateResults"]]
+    if any(_nkey(n) not in party for n in names):
+        return None
+    affils = {n: bucket_for(party[_nkey(n)]) for n in names}
+    fpv = {c["candidateName"]: float(c["voteChange"]) for c in rounds[0]["candidateResults"]}
+    chain = []
+    for r in rounds[1:]:
+        neg = [(c["candidateName"], -float(c["voteChange"])) for c in r["candidateResults"] if c["voteChange"] < 0]
+        pos = {c["candidateName"]: float(c["voteChange"]) for c in r["candidateResults"] if c["voteChange"] > 0}
+        chain.append({"order": int(r["roundNumber"]), "label": r.get("roundType", ""), "neg": neg, "pos": pos})
+    final = {c["candidateName"]: float(c["progressiveTotal"]) for c in rounds[-1]["candidateResults"]
+             if not c.get("isExcluded") and c.get("progressiveTotal") is not None}
+    return {"names": names, "affils": affils, "fpv": fpv, "chain": chain, "final": final,
+            "formal": sum(fpv.values()), "total_col": None}
+
+
+def districts_of(year):
+    """[(district, parsed or None)] for one election, whichever its format."""
+    if year == 2022:
+        root = os.path.join(SRC, CSV_2022)
+        out = []
+        for n in sorted(os.listdir(root)):
+            if not n.lower().endswith(".csv"):
+                continue
+            m = re.match(r"^2022SE\s+(.+?)\s*(?:final distribution|$)", n)
+            out.append((m.group(1) if m else n, parse_district(os.path.join(root, n))))
+        return out
+    if year == 2026:
+        root = os.path.join(SRC, "2026")
+        static = {d["districtName"]: d["candidates"] for d in json.load(open(os.path.join(root, "static.json")))["districts"]}
+        change = json.load(open(os.path.join(root, "change.json")))
+        return [(d["districtId"], parse_district_2026(d, static.get(d["districtId"], [])))
+                for d in sorted(change["districts"], key=lambda d: d["districtId"])]
+    raise ValueError(f"no SA reader for {year}")
+
+
 def main():
-    years = [YEAR]
+    years = [int(a) for a in sys.argv[1:]] or list(YEARS)
     keep = []
     if os.path.exists(OUT):
         with open(OUT) as f:
             keep = [r for r in csv.DictReader(f)
-                    if r.get("jurisdiction") != "sa"]
+                    if not (r.get("jurisdiction") == "sa" and int(r["year"]) in years)]
     all_rows = list(keep)
     failures = []
     for year in years:
-        files = sorted(
-            os.path.join(ROOT, n) for n in os.listdir(ROOT)
-            if n.lower().endswith(".csv"))
         prim = {b: 0.0 for b in BUCKETS}
         flows = {b: {"alp": 0.0, "coal": 0.0} for b in BUCKETS}
         n_seat = n_dop = n_classic = 0
         nonclassic = []
         bad_verify = []
-        for fpath in files:
-            seat = os.path.basename(fpath)
-            m = re.match(r"^2022SE\s+(.+?)\s*(?:final distribution|$)", seat)
-            seat_short = m.group(1) if m else seat
-            p = parse_district(fpath)
+        for seat_short, p in districts_of(year):
             if not p:
                 print(f"  !! {year} {seat_short}: unparsed")
+                failures.append((year, seat_short, "unparsed"))
                 continue
             n_seat += 1
             if not p["chain"]:
@@ -332,7 +389,7 @@ def main():
             print(f"   FINAL-TOTAL-mismatch {bad_verify}")
             failures += bad_verify
         else:
-            print("   all final piles matched FINAL DISTRICT TOTALS (±1)")
+            print("   all final piles matched the commission's final totals (±1)")
         for r in all_rows[-6:]:
             f2 = f"{100*float(r['flow_to_alp']):5.1f}%" if r["flow_to_alp"] != "" else "    - "
             print(f"    {r['party']:<4} prim {r['prim_share']:>6}%  flow->ALP {f2}")
@@ -340,7 +397,7 @@ def main():
             print(f"    pooled classic ALP-vs-Coal: {100*tot_a/(tot_a+tot_c):.2f}% of "
                   f"{round(tot_a+tot_c):,} ballots")
     if failures:
-        sys.exit(f"{len(failures)} chain(s) miss FINAL DISTRICT TOTALS – {OUT} left as it was")
+        sys.exit(f"{len(failures)} district(s) unparsed or missing the commission's final totals – {OUT} left as it was")
     all_rows.sort(key=lambda r: (r["jurisdiction"], int(r["year"]),
                                  EMIT.index(r["party"])))
     with open(OUT, "w", newline="") as f:

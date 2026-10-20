@@ -174,18 +174,18 @@ def qld_elections():
 
 def sa_elections():
     ps = _load("ps", "parse-sa-state-flows.py")
-    ps.ROOT = os.path.join(ROOT, ps.ROOT)
-    seats = {}
-    for name in sorted(os.listdir(ps.ROOT)):
-        if not name.lower().endswith(".csv"):
-            continue
-        p = ps.parse_district(os.path.join(ps.ROOT, name))
-        if not p:
-            continue
-        cands = {n: (coal(p["affils"][n]), float(p["fpv"][n])) for n in p["names"]}
-        steps = [([n for n, _ in st["neg"]], dict(st["pos"]), 0.0) for st in p["chain"]]
-        seats[name] = seat(cands, steps)
-    return {("sa", ps.YEAR): seats}
+    ps.SRC = os.path.join(BUILD, "state-flow-src", "sa")
+    out = {}
+    for y in ps.YEARS:
+        seats = {}
+        for name, p in ps.districts_of(y):
+            if not p:
+                continue
+            cands = {n: (coal(p["affils"][n]), float(p["fpv"][n])) for n in p["names"]}
+            steps = [([n for n, _ in st["neg"]], dict(st["pos"]), 0.0) for st in p["chain"]]
+            seats[name] = seat(cands, steps)
+        out[("sa", y)] = seats
+    return out
 
 
 def nt_elections():
@@ -566,9 +566,12 @@ def calibrate():
 
 def err90(table, b, n):
     """the calibration's 90th-percentile error at n classic seats (linear
-    between the grid points, held flat beyond them)."""
+    between the grid points, held flat above the largest). Below the
+    smallest it is None: an error the calibration never measured would
+    understate a small count's (13 seats is not 40), so such an estimate
+    carries no err90 and gen-data never draws it."""
     pts = sorted((int(N), t[b]["p90"]) for N, t in table.items() if b in t)
-    if not pts:
+    if not pts or n < pts[0][0]:
         return None
     if n <= pts[0][0]:
         return pts[0][1]
@@ -621,10 +624,11 @@ def main():
         n_cl = sum(1 for s in seats.values() if classic(s))
         for b in BUCKETS:
             f = pct(est[b])
+            e = err90(table, b, n_cl) if f is not None else None
             rows.append({"jurisdiction": jur, "year": y, "party": b,
                          "est_alp_votes": round(est[b][0]), "est_coal_votes": round(est[b][1]),
                          "est_flow_to_alp": round(f / 100, 6) if f is not None else "",
-                         "err90": err90(table, b, n_cl) if f is not None else "",
+                         "err90": e if e is not None else "",
                          "n_classic": n_cl})
         if jur == "qld" and y in QLD_GREEN:
             qld_check[str(y)] = {b: {"counted": v, "model": round(pct(est[b]), 2),

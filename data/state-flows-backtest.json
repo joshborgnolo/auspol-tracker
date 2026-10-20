@@ -10,6 +10,7 @@
    "qld-2020",
    "qld-2024",
    "sa-2022",
+   "sa-2026",
    "vic-2006",
    "vic-2010",
    "vic-2014",
@@ -40,13 +41,13 @@
   "2010": {
    "grn": {
     "counted": 79.19,
-    "model": 80.37,
+    "model": 80.36,
     "replay": 77.07,
     "ballots": 1080811
    },
    "onp": {
     "counted": 46.52,
-    "model": 42.46,
+    "model": 42.45,
     "replay": 50.55,
     "ballots": 21058
    },
@@ -60,13 +61,13 @@
   "2013": {
    "grn": {
     "counted": 82.67,
-    "model": 82.97,
+    "model": 82.96,
     "replay": 77.41,
     "ballots": 980988
    },
    "onp": {
     "counted": 45.24,
-    "model": 50.1,
+    "model": 50.07,
     "replay": 49.09,
     "ballots": 17250
    },
@@ -80,13 +81,13 @@
   "2016": {
    "grn": {
     "counted": 81.41,
-    "model": 82.54,
+    "model": 82.53,
     "replay": 77.49,
     "ballots": 1178464
    },
    "onp": {
     "counted": 50.29,
-    "model": 46.69,
+    "model": 46.68,
     "replay": 50.92,
     "ballots": 158973
    },
@@ -100,19 +101,19 @@
   "2019": {
    "grn": {
     "counted": 81.62,
-    "model": 82.5,
+    "model": 82.49,
     "replay": 76.82,
     "ballots": 1291638
    },
    "onp": {
     "counted": 35.02,
-    "model": 31.7,
+    "model": 31.68,
     "replay": 37.52,
     "ballots": 425023
    },
    "oth": {
     "counted": 42.5,
-    "model": 42.76,
+    "model": 42.75,
     "replay": 46.03,
     "ballots": 1281720
    }
@@ -126,13 +127,13 @@
    },
    "onp": {
     "counted": 36.38,
-    "model": 35.69,
+    "model": 35.67,
     "replay": 41.92,
     "ballots": 644939
    },
    "oth": {
     "counted": 45.03,
-    "model": 45.66,
+    "model": 45.67,
     "replay": 48.52,
     "ballots": 1416900
    }
@@ -140,13 +141,13 @@
   "2025": {
    "grn": {
     "counted": 87.46,
-    "model": 86.12,
+    "model": 86.11,
     "replay": 80.45,
     "ballots": 1409652
    },
    "onp": {
     "counted": 25.86,
-    "model": 26.29,
+    "model": 26.27,
     "replay": 33.02,
     "ballots": 823821
    },
@@ -1942,12 +1943,12 @@
   "2020": {
    "grn": {
     "counted": 80.1,
-    "model": 80.16,
+    "model": 80.15,
     "replay": 75.01
    },
    "onp": {
     "counted": 33.8,
-    "model": 33.03,
+    "model": 33.02,
     "replay": 37.32
    }
   },
@@ -1959,7 +1960,7 @@
    },
    "onp": {
     "counted": 26.2,
-    "model": 26.81,
+    "model": 26.8,
     "replay": 31.58
    }
   }

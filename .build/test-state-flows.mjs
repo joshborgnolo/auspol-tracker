@@ -23,12 +23,19 @@ const head = csv.shift().split(",");
 assert.deepEqual(head, ["jurisdiction", "year", "party", "est_alp_votes", "est_coal_votes", "est_flow_to_alp", "err90", "n_classic"],
   "state-flows-est.csv keeps its column contract");
 const rows = csv.map((ln) => Object.fromEntries(ln.split(",").map((v, i) => [head[i], v])));
+const bt0 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8"));
 for (const r of rows) {
   assert.ok(["grn", "onp", "oth"].includes(r.party), `only crossbench buckets are estimated (${r.party})`);
   if (r.est_flow_to_alp === "") continue;
   const f = +r.est_flow_to_alp;
   assert.ok(f >= 0 && f <= 1, `${r.jurisdiction} ${r.year} ${r.party}: a share (${f})`);
-  assert.ok(+r.err90 > 0 && +r.err90 < 15, `${r.jurisdiction} ${r.year} ${r.party}: an error figure (${r.err90})`);
+  // below the calibration's smallest seat count the error was never measured:
+  // such an estimate carries none (and gen-data never draws it)
+  if (+r.n_classic < Math.min(...bt0.settings.cal_n)) {
+    assert.equal(r.err90, "", `${r.jurisdiction} ${r.year} ${r.party}: no untested error figure at ${r.n_classic} seats`);
+  } else {
+    assert.ok(+r.err90 > 0 && +r.err90 < 15, `${r.jurisdiction} ${r.year} ${r.party}: an error figure (${r.err90})`);
+  }
 }
 const bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8"));
 assert.equal(Object.keys(bt.federal).length, 6, "the back-test covers the six federal elections 2010-2025");

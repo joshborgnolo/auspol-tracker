@@ -1,9 +1,7 @@
-"""Mirror the ECSA 2022 State Election House of Assembly Final Distribution
-of Preferences archive into .build/state-flow-src/sa/2022/src.zip +
-x/2022SE HA Final distribution csv/*.csv (47 per-district CSVs).
+"""Mirror the ECSA House of Assembly final distributions of preferences.
 
-Source
-------
+2022 – .build/state-flow-src/sa/2022/src.zip + x/2022SE HA Final distribution
+csv/*.csv (47 per-district CSVs).
 https://www.ecsa.sa.gov.au/elections/past-elections lists past-elections
 articles. The 2022 statistics article (article id=636) carries a Joomla
 edocman download link to id=244 which serves the 47-district CSV bundle.
@@ -12,18 +10,34 @@ payload was always a zip; the fetch here probes the payload with the
 ``file`` utility and renames it before extraction so the committed mirror
 is the real zip.
 
+2026 – .build/state-flow-src/sa/2026/{static,change}.json, verbatim from the
+API behind the ECSA results site (result.ecsa.sa.gov.au, an Angular app
+whose main bundle names the base URL): HAStatic/2026-03-21 carries each
+district's candidates with their party ids, HAChange/2026-03-21/0 the final
+results, every district's finalDistribution among them (round 0 the first
+preferences, then one ExclusionRoundN per exclusion: each candidate's
+voteChange and progressiveTotal). The HAChange id names the distribution's
+candidates differently from HAStatic, so the parser joins them by name. The
+API's 2022 HAChange carries no finalDistribution, hence the CSVs for 2022.
+
 Probes performed on 2026-10-20 confirmed the 2014 and 2018 elections are
 NOT mechanically mirrored on this site: the Joomla walk across doc ids
 100-700 returned only single-page PDF info sheets and the 2014/2018
 statistics articles themselves link per-district first-preferences-only
-pages. Scope is therefore 2022 alone.
+pages.
 
-Only downloads when src.zip is missing; idempotent.
+Only downloads what is missing; idempotent. 2026 refuses a payload that is
+not electionStatus "final" or lacks a district's distribution.
 """
+import json
 import os
 import subprocess
 import sys
 import zipfile
+
+ROOT26 = ".build/state-flow-src/sa/2026"
+API = "https://apim-ecsa-production.azure-api.net/results-display/"
+API_HEADERS = ["-H", "Origin: https://result.ecsa.sa.gov.au", "-A", "Mozilla/5.0"]
 
 ROOT = ".build/state-flow-src/sa/2022"
 # Article id=636 ("2022 State Election - final distribution of preferences")
@@ -44,7 +58,38 @@ def is_zip(path):
     return "zip" in out or "archive" in out
 
 
+def harvest_2026():
+    os.makedirs(ROOT26, exist_ok=True)
+    want = {"static.json": "HAStatic/2026-03-21", "change.json": "HAChange/2026-03-21/0"}
+    for name, path in want.items():
+        dest = os.path.join(ROOT26, name)
+        if os.path.exists(dest):
+            continue
+        tmp = dest + ".part"
+        r = run(["curl", "-sf", "--max-time", "300", *API_HEADERS, "-o", tmp, API + path])
+        if r.returncode != 0:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+            print(f"2026: FAIL curl {r.returncode} {API + path}")
+            return 1
+        os.replace(tmp, dest)
+    change = json.load(open(os.path.join(ROOT26, "change.json")))
+    static = json.load(open(os.path.join(ROOT26, "static.json")))
+    nd = [d for d in change.get("districts", []) if d.get("finalDistribution")]
+    if change.get("electionStatus") != "final" or len(nd) != len(static.get("districts", [])) or not nd:
+        print(f"2026: payload not final or incomplete (status {change.get('electionStatus')}, "
+              f"{len(nd)} distributions for {len(static.get('districts', []))} districts)")
+        return 1
+    print(f"2026: mirrored HAStatic + HAChange (dataVersion {change.get('dataVersion')}, "
+          f"{len(nd)} district distributions)")
+    return 0
+
+
 def main():
+    return harvest_2022() or harvest_2026()
+
+
+def harvest_2022():
     out_root = ROOT
     zpath = os.path.join(out_root, "src.zip")
     xml_dir = os.path.join(out_root, XDIR)
