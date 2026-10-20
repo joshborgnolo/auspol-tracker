@@ -4278,78 +4278,79 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 /* flowHistory – the preference-flow history chart's per-jurisdiction series,
    each the share of the bucket's ballots that ended with Labor at each
    election, per cent. fed is the FLOW_HISTORY display table typed in
-   flows.mjs; each state aggregates from data/state-flows.csv (the state
-   parsers' one CSV) here, so the explainer's chart picks a jurisdiction up
-   the day its rows land, and the Info glossary chart reads the same home.
-   srcAs names the commission counted against. Where a state counts the
-   Liberal and National piles apart (Vic), the two are the Coalition majors –
-   NOT crossbench others – so the others line reads the CSV's oth bucket
-   alone (its alphas towards the Coalition sit in the lib/nat cells the chart
-   doesn't draw). Federal-only: the Vic build has no CSV and carries the
-   federal series alone.
-   STATE_FLOWS_SHOWN holds the states back (user call 2026-10-20): every
-   state parser splits an excluded candidate's whole pile, inherited ballots
-   included, in the pile's overall proportions – the origin-blending replay
-   .build/aec-2025-region-tpp-flows.mjs retired. Scored on six federal
-   elections against the AEC's counted per-party flows over the same classic
-   seats, that rule put the Greens 2–7 points too low and One Nation and
-   others up to 7 too high; Queensland's counted 2020/2024 figures (Antony
-   Green's tabulation of the ECQ counts) show the same ~5-point gap. The
-   chart says "counted", so the states stay off it until an estimator passes
-   that back-test; the CSV and the JURIS map stay for that work. */
-const STATE_FLOWS_SHOWN = false;
+   flows.mjs: the AEC's own counts. The states are ESTIMATES – no state
+   commission publishes where each party's voters ended up – read from
+   data/state-flows-est.csv, which .build/estimate-state-flows.py writes from
+   the distributions of preferences with the two-class pile model (each
+   excluded pile split into its own first preferences and the ballots it
+   inherited). Every figure carries err90, the 90th-percentile error the
+   model showed at that election's classic-seat count when run on federal
+   elections whose counts are known (data/state-flows-backtest.json). The
+   parsers' own flow_* columns in data/state-flows.csv blend a pile's
+   inherited ballots into its party's split – the Greens 2–7 points low on
+   the same test – and are never drawn.
+   Shown (user call 2026-10-20): elections whose counts reached a Labor v
+   Coalition final in at least STATE_MIN_CLASSIC seats, and only the Greens
+   and others lines. Smaller counts' errors run wider – the Northern
+   Territory's, and Victoria's to 2018, which stopped once a candidate passed
+   half the vote – and One Nation's state estimates miss by more. A state
+   counting Liberal and National piles apart has both as the Coalition, so
+   the others line is the crossbench alone. fed.backtest carries the test's
+   headline figures for the Info entry. Federal-only: the Vic build reads
+   neither file and carries the federal series alone. */
+const STATE_MIN_CLASSIC = 40;
+const STATE_BUCKETS = ["grn", "oth"];
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
   const JURIS = {
-    vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences", asOf: "2006–2022" },
-    wa: { label: "Western Australia", srcAs: "the Western Australian Electoral Commission’s distributions of preferences", asOf: "2001–2025" },
-    sa: { label: "South Australia", srcAs: "the Electoral Commission SA’s distributions of preferences", asOf: "2022" },
-    qld: { label: "Queensland", srcAs: "the Electoral Commission of Queensland’s distributions of preferences", asOf: "2020–2024" },
-    nt: { label: "Northern Territory", srcAs: "the NT Electoral Commission’s distributions of preferences", asOf: "2016–2024" },
+    vic: { label: "Victoria", srcAs: "the Victorian Electoral Commission’s distributions of preferences" },
+    wa: { label: "Western Australia", srcAs: "the Western Australian Electoral Commission’s distributions of preferences" },
+    sa: { label: "South Australia", srcAs: "the Electoral Commission SA’s distributions of preferences" },
+    qld: { label: "Queensland", srcAs: "the Electoral Commission of Queensland’s distributions of preferences" },
+    nt: { label: "Northern Territory", srcAs: "the NT Electoral Commission’s distributions of preferences" },
   };
-  if (!JUR && STATE_FLOWS_SHOWN) {
-    let csv = null;
-    try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8"); } catch { /* not yet written */ }
-    if (csv) {
-      const bag = {};
-      const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
-      // named columns: the majors leave flow_to_alp blank, shifting the
-      // numeric cells, so a fixed position cannot be trusted
-      const head = (lines.shift() || "").split(",");
-      const ci = Object.fromEntries(head.map((h, i) => [h, i]));
-      lines.forEach((ln) => {
-        const c = ln.split(",");
-        const jur = c[ci.jurisdiction], year = c[ci.year], bucket = c[ci.party];
-        if (!JURIS[jur]) return;
-        let av = +c[ci.flow_alp_votes], cv = +c[ci.flow_coal_votes];
-        if (!(av || cv)) {
-          // a row with only the split filled (no ballot counts)
-          const f = +c[ci.flow_to_alp];
-          if (f > 0 && f < 1) { av = f; cv = 1 - f; }
-        }
-        ((bag[jur] ||= {})[year] ||= {})[bucket] = { av, cv };
-      });
-      for (const [jk, meta] of Object.entries(JURIS)) {
-        const years = Object.keys(bag[jk] || {}).sort();
-        if (!years.length) continue;
-        // the CSV buckets land on the chart's three lines by name: grn/onp
-        // identically, and 'others' on the CSV's oth crossbench row (NOT the
-        // lib/nat majors, whose near-zero splits are the Coalition's own).
-        const val = (bkt, yr) => {
-          const cell = (bag[jk][yr] || {})[bkt];
-          if (!cell) return null;
-          const A = cell.av, C = cell.cv;
-          if (!A && !C) return null;
-          return Math.round((A / (A + C)) * 1000) / 10;
-        };
-        h[jk] = { label: meta.label, srcAs: meta.srcAs, asOf: meta.asOf,
-          years: years.map(Number),
-          grn: years.map((y) => val("grn", y)),
-          onp: years.map((y) => val("onp", y)),
-          oth: years.map((y) => val("oth", y)) };
-      }
-    }
+  if (JUR) return h;
+  let csv = null, bt = null;
+  try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }
+  try { bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")); } catch { /* ditto */ }
+  if (!csv || !bt) return h;
+  const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
+  const head = (lines.shift() || "").split(",");
+  const ci = Object.fromEntries(head.map((x, i) => [x, i]));
+  const bag = {};
+  lines.forEach((ln) => {
+    const c = ln.split(",");
+    const jur = c[ci.jurisdiction], year = +c[ci.year], b = c[ci.party];
+    if (!JURIS[jur] || +c[ci.n_classic] < STATE_MIN_CLASSIC || !STATE_BUCKETS.includes(b)) return;
+    if (c[ci.est_flow_to_alp] === "" || c[ci.err90] === "") return;
+    ((bag[jur] ||= {})[year] ||= {})[b] = { v: Math.round(+c[ci.est_flow_to_alp] * 1000) / 10, e: Math.round(+c[ci.err90] * 10) / 10 };
+  });
+  const errs = { grn: [], oth: [] };
+  for (const [jk, meta] of Object.entries(JURIS)) {
+    const years = Object.keys(bag[jk] || {}).map(Number).sort((a, b) => a - b);
+    if (!years.length) continue;
+    const col = (b, k) => years.map((y) => (bag[jk][y][b] ? bag[jk][y][b][k] : null));
+    STATE_BUCKETS.forEach((b) => errs[b].push(...col(b, "e").filter((e) => e != null)));
+    h[jk] = { label: meta.label, srcAs: meta.srcAs, estimated: true,
+      asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
+      years, grn: col("grn", "v"), onp: years.map(() => null), oth: col("oth", "v"),
+      grnErr: col("grn", "e"), othErr: col("oth", "e") };
   }
+  // the back-test's headline figures: mean miss against the AEC's counts over
+  // the federal elections (One Nation's from 2016, its first wide field)
+  const mae = (b, k, from = 0) => {
+    const v = Object.entries(bt.federal || {}).filter(([y, d]) => +y >= from && d[b]).map(([, d]) => Math.abs(d[b][k] - d[b].counted));
+    return v.length ? Math.round((v.reduce((s, x) => s + x, 0) / v.length) * 10) / 10 : null;
+  };
+  const qld = Object.values(bt.qld_check || {}).flatMap((d) => Object.values(d).map((x) => Math.abs(x.model - x.counted)));
+  const span = (v) => (v.length ? [Math.min(...v), Math.max(...v)] : null);
+  h.fed.backtest = {
+    elections: Object.keys(bt.federal || {}).length, minClassic: STATE_MIN_CLASSIC,
+    grn: { model: mae("grn", "model"), replay: mae("grn", "replay") },
+    oth: { model: mae("oth", "model"), replay: mae("oth", "replay") },
+    onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
+    err90: { grn: span(errs.grn), oth: span(errs.oth) },
+    qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null };
   return h;
 })();
 

@@ -6970,6 +6970,11 @@ function infoTerms(D) {
      flowTables), so these entries can never quote a stale setting */
   const FT = D.flowTables.onp, FB = D.flowTables.onBand;
   const fpc = (v) => +(100 * v).toFixed(1) + "%", fpt = (v) => String(+(100 * v).toFixed(1));
+  /* the state flow estimates' federal back-test (gen-data flowHistory), so the
+     counted-and-estimated entry quotes the test the chart was built on */
+  const FHB = D.flowHistory && D.flowHistory.fed && D.flowHistory.fed.backtest;
+  const fhRange = (r) => (r ? (r[0] === r[1] ? r[0].toFixed(1) : r[0].toFixed(1) + "–" + r[1].toFixed(1)) : "");
+  const fhWord = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n);
   const onM = L.onImp && L.onImp.ci95 != null ? L.onImp.ci95 : (L.onImp ? L.onImp.band : null);
   const counts = {};
   D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
@@ -7659,6 +7664,39 @@ function infoTerms(D) {
           election, or its first polls if it started later. With no counted Labor v One Nation
           flows, that chart shows drift since each pollster’s first head-to-heads. The check
           corrects no other figure.</span></>) },
+        { id: "flow-history", term: "Counted and estimated flows", body: (
+          <>The chart in the <a href="/flows-explained/">preference flows explainer</a> tracks the
+          share of each group’s ballots that ended with Labor rather than the Coalition, election by
+          election.
+          <span className="info-p"><b>Federal: counted.</b> The Australian Electoral Commission
+          follows every ballot to the final two and publishes where each party’s voters ended up.
+          From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final
+          two, about nine seats in ten. Since 2004 it covers every seat: the Commission sorts every
+          ballot between Labor and the Coalition, even where someone else made the final two.</span>
+          {FHB ? (<>
+            <span className="info-p"><b>States: estimated.</b> No state commission publishes that
+            count. Each publishes its distributions of preferences, which show where an excluded
+            candidate’s whole pile went, including ballots it had inherited from candidates excluded
+            earlier. So each pile holds two groups of known size: the candidate’s own voters and
+            the ballots it inherited. The estimate works out how each group split from the way the
+            piles split across every seat, then follows both to the final two. It covers only the
+            seats where Labor and the Coalition were the final two.</span>
+            <span className="info-p"><b>How close it gets.</b> Tried on the last {fhWord(FHB.elections)} federal
+            elections, where the counted answer is known, it came within {FHB.grn.model.toFixed(1)} points
+            of the Greens’ counted flow on average, and within {FHB.oth.model.toFixed(1)} for everyone
+            else. Reading each pile as one block misses by {FHB.grn.replay.toFixed(1)} and
+            {" "}{FHB.oth.replay.toFixed(1)}. At a state’s size it missed by no more than
+            {" "}{fhRange(FHB.err90.grn)} points for the Greens nine times in ten, and
+            {" "}{fhRange(FHB.err90.oth)} for everyone else; the bars on the chart show that range.
+            {FHB.qld != null ? <> In Queensland, where <a href={FHB.qldSource} target="_blank"
+            rel="noopener noreferrer">Antony Green tabulated</a> the electoral commission’s own counts
+            in 2020 and 2024, the estimates came within {FHB.qld.toFixed(1)} points.</> : null}</span>
+            <span className="info-p"><b>What’s left out.</b> One Nation’s state estimates miss by
+            more ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so the chart
+            leaves them out. It also leaves out counts that reached a Labor v Coalition final in
+            fewer than {FHB.minClassic} seats: the Northern Territory’s, and Victoria’s before 2022,
+            which stopped once a candidate passed half the vote.</span>
+          </>) : null}</>) },
         { id: "fp-flows", term: "Labor v One Nation flows", body: (
           <>The preference table behind the Labor v One Nation figure. No election has ever counted
           that contest, so the site estimates the table from the ballots that do exist. Three

@@ -5553,8 +5553,11 @@ function RdFlows({ measure }) {
    left empty while a duplicate chart shows at the foot. With JavaScript
    off the slot is simply an empty div and the text flows on. The data is
    window.AUSPOL.flowHistory (one home, gen-data): the federal FLOW_HISTORY
-   table plus each state's, aggregated from state-flows.csv, so a
-   jurisdiction's chip appears the build its rows land. */
+   counts, and each state's ESTIMATES (the two-class pile model,
+   .build/estimate-state-flows.py), so a jurisdiction's chip appears the build
+   its estimates land. A state carries `estimated` and each point's 90% error
+   (grnErr/othErr), drawn as a bar at its election and quoted in the tooltip;
+   its One Nation line is absent, too uncertain to draw. */
 const FLOW_PARTIES = [
   { id: "grn", name: "Greens",     color: "var(--grn)" },
   { id: "onp", name: "One Nation", color: "var(--onp)" },
@@ -5566,9 +5569,12 @@ function ExplainedFlowChart({ jur }) {
   const S = FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
+  const est = !!S.estimated;
+  const parties = FLOW_PARTIES.filter((p) => (S[p.id] || []).some((v) => v != null));
   const series = [];
-  FLOW_PARTIES.forEach((p) => {
+  parties.forEach((p) => {
     const v = S[p.id] || [];
+    const err = S[p.id + "Err"] || [];
     const runs = [];
     let cur = [];
     v.forEach((val, i) => {
@@ -5576,7 +5582,7 @@ function ExplainedFlowChart({ jur }) {
          party went unmeasured that year), and drawing a line across the hole
          would invent flows for parliaments nobody counted. Split into runs. */
       if (val == null) { if (cur.length) runs.push(cur); cur = []; }
-      else cur.push({ x: YEARS[i], y: val });
+      else cur.push({ x: YEARS[i], y: val, ...(est && err[i] != null ? { note: "±" + err[i].toFixed(1) } : null) });
     });
     if (cur.length) runs.push(cur);
     runs.forEach((points, i) => {
@@ -5592,10 +5598,30 @@ function ExplainedFlowChart({ jur }) {
      0/0 in its x scale, NaN in every coordinate – so pad it a year either
      side and let the lone readings draw as their end dots */
   const pad1 = YEARS.length > 1 ? 0 : 1;
-  const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
+  /* each estimate's 90% error as a bar at its election: a narrow area,
+     since areas stay out of the tooltip and the hover markers (a two-point
+     vertical series would grow a marker at its foot), its half-width a
+     fixed share of the x span so it draws ~8px wide on a 24-year axis and a
+     one-election one alike; the domain widens by that half-width so the
+     first and last elections' bars draw whole */
+  const half = est ? (YEARS[YEARS.length - 1] - YEARS[0] + 2 * pad1) * 0.008 : 0;
+  const x0 = YEARS[0] - pad1 - half, x1 = YEARS[YEARS.length - 1] + pad1 + half;
+  const areas = [];
+  if (est) {
+    parties.forEach((p) => {
+      const err = S[p.id + "Err"] || [];
+      (S[p.id] || []).forEach((v, i) => {
+        if (v == null || err[i] == null) return;
+        const y0 = Math.max(0, v - err[i]), y1 = Math.min(100, v + err[i]);
+        areas.push({ id: p.id + "-err" + i, color: p.color, opacity: 0.55, edge: false,
+          points: [{ x: YEARS[i] - half, y0, y1 }, { x: YEARS[i] + half, y0, y1 }] });
+      });
+    });
+  }
+  const span = YEARS.length > 1 ? YEARS[0] + " to " + YEARS[YEARS.length - 1] : String(YEARS[0]);
   return (
     <div className="ex-chart">
-      <span className="fc-unit">share preferencing Labor, % · {S.label}</span>
+      <span className="fc-unit">share preferencing Labor, % · {S.label}{est ? ", estimated" : ""}</span>
       <TrendChart
         height={narrow ? 470 : 330}
         xDomain={[x0, x1]} yDomain={[0, 100]}
@@ -5604,21 +5630,22 @@ function ExplainedFlowChart({ jur }) {
         unit="%" fmt={(v) => v.toFixed(1)}
         axisFont={narrow ? 28 : 15}
         pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
-        series={series} spine={YEARS.map((x) => ({ x }))}
+        series={series} areas={areas} spine={YEARS.map((x) => ({ x }))}
         refLines={[{ y: 50, label: "even split", color: "var(--ink-faint)", align: "left" }]}
-        tooltipTitle={(i) => YEARS[i] + " election · " + S.label}
-        ariaLabel={"Share of preferences flowing to Labor, by party, " + S.label + ", " + x0 + " to " + x1}
+        tooltipTitle={(i) => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : "")}
+        ariaLabel={"Share of preferences flowing to Labor, by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
       />
       <span className="hero-legend fc-legend">
-        {FLOW_PARTIES.map((p) => (
+        {parties.map((p) => (
           <span className="hl-item" key={p.id}>
             <span className="hl-line" style={{ background: p.color }}></span>{p.name}
           </span>
         ))}
       </span>
-      <p className="ex-flow-cap">{S.srcAs
-        ? "Counted from " + S.srcAs + (S.asOf ? " (" + S.asOf + ")" : "") + ". The Nationals pile counts with the Liberals as the Coalition; the others line is the crossbench."
-        : "The AEC’s preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
+      <p className="ex-flow-cap">{est
+        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections. One Nation’s state estimates miss by too much to draw."
+        : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
+      <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
     </div>
   );
 }
