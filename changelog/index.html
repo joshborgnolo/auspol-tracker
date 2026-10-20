@@ -90643,7 +90643,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "cadence": 7,
     "loose": false,
     "spread": 1,
-    "spreadEarly": 0,
+    "spreadEarly": 1,
     "spreadLate": 1,
     "basis": "published",
     "lag": 0,
@@ -90697,7 +90697,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "since": "2026-09-29",
       "gap": 13
     }],
-    "gapsUsed": 8
+    "gapsUsed": 8,
+    "slotsSkipped": 1
   }, {
     "pollster": "ANZ–Roy Morgan Consumer Confidence",
     "tracked": "confidence",
@@ -124084,7 +124085,7 @@ function RdPolls({
       onClick: ev => ev.stopPropagation()
     }, WDs(Date.parse(x.pub)) + " " + isoD(x.pub)) : WDs(Date.parse(x.pub)) + " " + isoD(x.pub) : "—"), React.createElement("td", null, x.gap != null ? x.gap + " days" : ""))))), React.createElement("p", {
       className: "rd-pld-foot"
-    }, pj.calMonth ? React.createElement(React.Fragment, null, "One release a month, on no set day: between the ", pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end", " so far. ", React.createElement("b", null, "Next: ", nx.date, ".")) : irregular(pj) ? React.createElement(React.Fragment, null, "Median ", Math.round(pj.cadence), " days between releases across the last ", pj.gapsUsed, " gaps, give or take ", Math.round(pj.spread), ". ", React.createElement("b", null, "Next: ", nx.date.replace(/^About/, "about"), ".")) : React.createElement(React.Fragment, null, "Median ", pj.cadence, " days between ", pj.basis === "published" ? "publications" : "fieldwork ends", " across the last ", pj.gapsUsed, " gaps.", " ", React.createElement("b", null, "Next: ", nx.date, hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""), ", at the earliest", then ? "; then " + wdm(then.release) : "", ".")), e.next && e.next.site && React.createElement("a", {
+    }, pj.calMonth ? React.createElement(React.Fragment, null, "One release a month, on no set day: between the ", pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end", " so far. ", React.createElement("b", null, "Next: ", nx.date, ".")) : irregular(pj) ? React.createElement(React.Fragment, null, "Median ", Math.round(pj.cadence), " days between releases across the last ", pj.gapsUsed, " gaps, give or take ", Math.round(pj.spread), ". ", React.createElement("b", null, "Next: ", nx.date.replace(/^About/, "about"), ".")) : React.createElement(React.Fragment, null, pj.rhythmFrom ? React.createElement(React.Fragment, null, "Every ", Math.round(pj.cadence), " days since ", isoD(pj.rhythmSince), ", when it moved from every ", Math.round(pj.rhythmFrom), ".") : React.createElement(React.Fragment, null, "Median ", pj.cadence, " days between ", pj.basis === "published" ? "publications" : "fieldwork ends", " across the last ", pj.gapsUsed, " gaps", pj.slotsSkipped ? React.createElement(React.Fragment, null, ", with ", pj.slotsSkipped === 1 ? "one release" : pj.slotsSkipped + " releases", " it skipped counted as skipped rather than as longer gaps") : "", "."), " ", React.createElement("b", null, "Next: ", nx.date, hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""), ", at the earliest", then ? "; then " + wdm(then.release) : "", ".")), e.next && e.next.site && React.createElement("a", {
       className: "rd-link rd-link-ext rd-pld-site",
       href: e.next.site,
       target: "_blank",

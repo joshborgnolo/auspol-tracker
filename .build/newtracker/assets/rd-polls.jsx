@@ -418,7 +418,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             ? <>One release a month, on no set day: between the {pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end"} so far. <b>Next: {nx.date}.</b></>
             : irregular(pj)
               ? <>Median {Math.round(pj.cadence)} days between releases across the last {pj.gapsUsed} gaps, give or take {Math.round(pj.spread)}. <b>Next: {nx.date.replace(/^About/, "about")}.</b></>
-              : <>Median {pj.cadence} days between {pj.basis === "published" ? "publications" : "fieldwork ends"} across the last {pj.gapsUsed} gaps.{" "}
+              : <>{pj.rhythmFrom
+                  ? <>Every {Math.round(pj.cadence)} days since {isoD(pj.rhythmSince)}, when it moved from every {Math.round(pj.rhythmFrom)}.</>
+                  : <>Median {pj.cadence} days between {pj.basis === "published" ? "publications" : "fieldwork ends"} across the last {pj.gapsUsed} gaps{pj.slotsSkipped ? <>, with {pj.slotsSkipped === 1 ? "one release" : pj.slotsSkipped + " releases"} it skipped counted as skipped rather than as longer gaps</> : ""}.</>}{" "}
                 <b>Next: {nx.date}{hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""}</b>, at the earliest{then ? "; then " + wdm(then.release) : ""}.</>}
         </p>
         {/* the house's "where it lands first" page (pollsterRules.site) belongs

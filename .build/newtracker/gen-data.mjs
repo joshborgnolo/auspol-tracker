@@ -6523,6 +6523,44 @@ const CAD_TRIM_FREAK = 0.5;    // an end is spared only this far (x cadence) off
    cycles", which is not worth a reader's attention. Between the two, a house
    gets a window instead of a day. */
 const CAD_LOOSE_MAX_REL_SPREAD = 0.75;
+/* A house that keeps a weekday publishes in SLOTS, so a gap of two slots is
+   a release it skipped, not a slow one. Roy Morgan missed the week of 5 Oct
+   2026 (29 Sep -> 12 Oct, 13 days) and then 19 Oct: measured raw, the second
+   long gap alone took its spread to 3 on a 7-day interval, demoting a
+   house with eleven Mondays in its last twelve releases to a window that
+   reached a Thursday - and every further fortnight dragged the median
+   through 7.5 and 10.5, intervals it never once kept. So for a weekday
+   house a gap within CAD_SLOT_TOL of a whole number of intervals counts as
+   that many slots, the last of them a normal one (13 -> 6, 14 -> 7), and
+   the panel says how many releases that sets aside.
+
+   But a skipped slot repeated is a new rhythm. When the newest
+   CAD_RHYTHM_RUN gaps or more agree with each other and sit at a multiple
+   of the interval before them (or it at a multiple of theirs), the house
+   has changed schedule: the run alone is its interval and its spread, from
+   the first gap of it - no blend of the old and the new. Two fortnights in
+   a row is still a house that skipped twice; the third makes it
+   fortnightly. */
+const CAD_SLOT_TOL = 2;        // days a gap may sit off a whole number of slots
+const CAD_RHYTHM_RUN = 3;      // like gaps in a row before a new interval is believed
+const slotMultiple = (gap, unit) => {
+  const k = Math.round(gap / unit);
+  return k >= 2 && Math.abs(gap - k * unit) <= CAD_SLOT_TOL ? k : 0;
+};
+function slotRhythm(gaps, rawCadence) {
+  const newest = gaps[gaps.length - 1];
+  let n = 0;
+  while (n < gaps.length && Math.abs(gaps[gaps.length - 1 - n] - newest) <= CAD_SLOT_TOL) n++;
+  const run = gaps.slice(gaps.length - n);
+  const before = gaps.slice(0, gaps.length - n).slice(-8);
+  const m = medianOf(run.slice(-8)), u = before.length ? medianOf(before) : null;
+  if (u && (slotMultiple(m, u) || slotMultiple(u, m))) {
+    if (n >= CAD_RHYTHM_RUN) return { cadence: m, gaps: run, rhythmFrom: u, runLen: n };
+    // a short run of long gaps: skipped slots on the old interval
+    if (slotMultiple(m, u)) return { cadence: u, gaps };
+  }
+  return { cadence: rawCadence, gaps };
+}
 const MONTH_NAMES_L = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
                         july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
 function pubDateFromUrl(url) {
@@ -6716,8 +6754,28 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   // the sequence the interval is measured along, and the date it is projected from
   const seq = pubDates || dates;
   const gaps = seq.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(seq[i])) / 86400000));
-  const cadence = medianOf(gaps.slice(-8));
-  if (!cadence || cadence <= 0) continue;
+  const rawCadence = medianOf(gaps.slice(-8));
+  if (!rawCadence || rawCadence <= 0) continue;
+  /* Some houses keep a weekday, not just an interval. Newspoll and Resolve
+     have published on a Sunday evening every one of the nine times each has
+     been dated, Essential and YouGov on a Wednesday. So this is recorded where
+     it is a habit rather than a tendency: a weekday that has taken at least
+     four fifths of the house's recent dated releases, over at least five of
+     them. A house that fails it is projected from its interval alone, which is
+     right - DemosAU has published on a Monday, a Friday and a Tuesday, and no
+     weekday it keeps is a thing that exists to be found. */
+  const ds = (dowSamples[firm] || []).slice(-CAD_RECENT);
+  const dowTally = {};
+  ds.forEach((v) => (dowTally[v] = (dowTally[v] || 0) + 1));
+  const dowTop = Object.entries(dowTally).sort((a, b) => b[1] - a[1])[0];
+  const dowHabit = ds.length >= CAD_DOW_MIN && dowTop && dowTop[1] / ds.length >= CAD_DOW_SHARE
+    ? Number(dowTop[0]) : null;
+  const decl = (D.pollsterRules?.[firm] || {}).release || null;
+  /* slots, for a house on a weekday interval - see CAD_SLOT_TOL. The
+     month-end and calendar-month rhythms measure their own misses below. */
+  const slotted = (decl && decl.dow != null ? decl.dow : dowHabit) != null && !decl?.monthEnd && !decl?.month;
+  const rhythm = slotted ? slotRhythm(gaps, rawCadence) : { cadence: rawCadence, gaps };
+  const cadence = rhythm.cadence;
   /* A release INSIDE a slot does not move the rhythm: a client-commissioned
      one-off beside the regular tracker (Redbridge's Australia Institute
      extra, 18 Feb 2026, published 17 and 11 days from the monthly waves
@@ -6733,14 +6791,21 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      itself keeps the raw-measured median - the fusion repairs the miss
      measurement, not the rhythm. */
   const fused = [];
-  for (let i = 0; i < gaps.length; i++) {
-    if (i + 1 < gaps.length && gaps[i] < cadence && gaps[i + 1] < cadence &&
-        Math.abs(gaps[i] + gaps[i + 1] - cadence) <= 2) {
-      fused.push(gaps[i] + gaps[i + 1]);
+  const rg = rhythm.gaps;
+  for (let i = 0; i < rg.length; i++) {
+    if (i + 1 < rg.length && rg[i] < cadence && rg[i + 1] < cadence &&
+        Math.abs(rg[i] + rg[i + 1] - cadence) <= 2) {
+      fused.push(rg[i] + rg[i + 1]);
       i++;
-    } else fused.push(gaps[i]);
+    } else fused.push(rg[i]);
   }
-  const slotGaps = fused.slice(-8);
+  // a skipped slot is the slots it spans, the last of them a normal one
+  let slotsSkipped = 0;
+  const slotGaps = fused.slice(-8).map((g) => {
+    const k = slotted ? slotMultiple(g, cadence) : 0;
+    slotsSkipped += k ? k - 1 : 0;
+    return k ? g - (k - 1) * cadence : g;
+  });
   let last = seq[seq.length - 1];
   /* a provisional wave newer than the record anchors the next slot: on the
      published basis at its fieldwork end plus the house's measured lag (its
@@ -6759,20 +6824,6 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      CAD_MAX_REL_SPREAD above). */
   if ((D.pollsterRules?.[firm] || {}).stopped) continue;
   const ts = (timeSamples[firm] || []).slice(-CAD_RECENT);
-  /* Some houses keep a weekday, not just an interval. Newspoll and Resolve
-     have published on a Sunday evening every one of the nine times each has
-     been dated, Essential and YouGov on a Wednesday. So this is recorded where
-     it is a habit rather than a tendency: a weekday that has taken at least
-     four fifths of the house's recent dated releases, over at least five of
-     them. A house that fails it is projected from its interval alone, which is
-     right - DemosAU has published on a Monday, a Friday and a Tuesday, and no
-     weekday it keeps is a thing that exists to be found. */
-  const ds = (dowSamples[firm] || []).slice(-CAD_RECENT);
-  const dowTally = {};
-  ds.forEach((v) => (dowTally[v] = (dowTally[v] || 0) + 1));
-  const dowTop = Object.entries(dowTally).sort((a, b) => b[1] - a[1])[0];
-  const dowHabit = ds.length >= CAD_DOW_MIN && dowTop && dowTop[1] / ds.length >= CAD_DOW_SHARE
-    ? Number(dowTop[0]) : null;
   /* Half the range of the recent slot gaps, a freak least or greatest set
      aside - see CAD_SPREAD_TRIM. Floored at a day: even Roy Morgan's perfect
      7-day cadence still moves a day either side on publication. */
@@ -6805,7 +6856,6 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      data actually supports - which is a real forecast, just a wider one. Past
      LOOSE_MAX there is no rhythm left to state and the house is dropped, which
      is where "we don't know" is the honest answer. */
-  const decl = (D.pollsterRules?.[firm] || {}).release || null;
   /* A CALENDAR-MONTH rhythm (DemosAU): one wave each month on no pattern of
      day, so the window is the month itself - measured as an interval, the
      median's ± always spills past the month's ends, which the rhythm rules
@@ -7009,6 +7059,11 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     // how many intervals the median and the spread were actually taken over,
     // which is more than the panel shows and should not be implied otherwise
     gapsUsed: slotGaps.length,
+    // releases the slot count set aside inside those gaps (CAD_SLOT_TOL)
+    ...(slotsSkipped ? { slotsSkipped } : {}),
+    /* a schedule change believed on a run of CAD_RHYTHM_RUN: the interval it
+       left and the release the new one is measured from */
+    ...(rhythm.rhythmFrom ? { rhythmFrom: rhythm.rhythmFrom, rhythmSince: seq[seq.length - 1 - rhythm.runLen] } : {}),
   });
 }
 pollCadence.sort((a, b) => a.cadence - b.cadence);
