@@ -41,8 +41,10 @@ against the commission's final totals); the AEC House distributions of
 preferences and two-candidate-preferred flows by division,
 .build/aec-flow-src/{dop,tcpflow}-<year>.csv.gz (2025: atlas/data/aec-2025/
 and data/aec-2025-tcp-flow-by-division.csv).
-Outputs: data/state-flows-est.csv (jurisdiction, year, party, est_alp_votes,
-est_coal_votes, est_flow_to_alp, err90, n_classic) and
+Outputs: data/state-flows-est.csv (jurisdiction, year, party, method,
+est_alp_votes, est_coal_votes, est_flow_to_alp, err90, exhausted_share,
+n_classic; method "counted" for NSW, whose ballot-level data gives exact
+flows – the model's NSW reading is scored against them in nsw_check) and
 data/state-flows-backtest.json.
 
 Usage (repo root):
@@ -158,16 +160,14 @@ def qld_elections():
     pq.ROOT = os.path.join(BUILD, "state-flow-src", "qld")
     out = {}
     for y in pq.YEARS:
-        el = pq.parse_election(y)
         seats = {}
-        for d in el.find("districts").findall("district"):
-            p = pq.parse_district(d)
+        for name, p in pq.districts_of(y):
             if not p or not p["chain"]:
                 continue
             cands = {bo: (coal(p["party"][bo]), float(p["fpv"].get(bo, 0))) for bo in p["order"]}
             steps = [([ex], {r: float(v) for r, v in moved.items() if v > 0 and r != ex}, float(exh))
                      for ex, exh, moved in p["chain"]]
-            seats[d.get("districtName")] = seat(cands, steps)
+            seats[name] = seat(cands, steps)
         out[("qld", y)] = seats
     return out
 
@@ -187,6 +187,51 @@ def sa_elections():
             if p.get("party_ids"):
                 seats[name]["ids"] = dict(p["party_ids"])
         out[("sa", y)] = seats
+    return out
+
+
+def nsw_elections():
+    """NSW's full chains to the final two, re-counted from the ballots
+    (parse-nsw-state-flows.py's committed chains.csv). NSW is optional-
+    preferential, so each exclusion's exhausted ballots ride as a recipient.
+    The model runs on NSW like any state, but the site draws NSW's COUNTS;
+    the model's NSW reading is scored against them (nsw_check)."""
+    pn = _load("pn", "parse-nsw-state-flows.py")
+    pn.ROOT = os.path.join(BUILD, "state-flow-src", "nsw")
+    out = {}
+    for y in pn.YEARS:
+        seats = {d: {"cands": {c: (coal(b), fp) for c, (b, fp) in p["cands"].items()},
+                     "steps": p["steps"], "final": p["final"]} for d, p in pn.districts_of(y)}
+        if seats:
+            out[("nsw", y)] = seats
+    return out
+
+
+def nsw_counted():
+    """{year: {bucket: [to Labor, to Coalition, exhausted]}} over NSW's
+    classic districts, straight from the ballot counts (counts.csv)."""
+    pn = _load("pn", "parse-nsw-state-flows.py")
+    out = {}
+    for y in pn.YEARS:
+        path = os.path.join(BUILD, "state-flow-src", "nsw", str(y), "counts.csv")
+        if not os.path.exists(path):
+            continue
+        rows = list(csv.DictReader(open(path)))
+        party = {(r["district"], r["candidate"]): coal(pn.bucket_for(r["party"])) for r in rows}
+        agg = {b: [0.0, 0.0, 0.0] for b in BUCKETS}
+        for r in rows:
+            f1, f2 = party[(r["district"], r["final1"])], party[(r["district"], r["final2"])]
+            if {f1, f2} != {"alp", "coal"}:
+                continue
+            b = party[(r["district"], r["candidate"])]
+            if b not in agg:
+                continue
+            a = 0 if f1 == "alp" else 1
+            v = [float(r["to_final1"]), float(r["to_final2"])]
+            agg[b][0] += v[a]
+            agg[b][1] += v[1 - a]
+            agg[b][2] += float(r["exhausted"])
+        out[y] = agg
     return out
 
 
@@ -622,7 +667,7 @@ def err90(table, b, n):
 def main():
     redo_cal = "--calibrate" in sys.argv
     states = {}
-    for f in (vic_elections, wa_elections, qld_elections, sa_elections, nt_elections):
+    for f in (vic_elections, wa_elections, qld_elections, sa_elections, nt_elections, nsw_elections):
         states.update(f())
     fed = {y: fed_election(y) for y in FED_YEARS}
     fed_evs = {y: events(fed[y][0]) for y in FED_YEARS}
@@ -655,10 +700,24 @@ def main():
     else:
         table, cal_rows = old["calibration"], old.get("calibration_rows", [])
 
-    rows, qld_check = [], {}
+    rows, qld_check, nsw_check = [], {}, {}
+    counted = nsw_counted()
     for (jur, y), seats in sorted(states.items()):
         est = flows(seats, evs[(jur, y)], params[(jur, y)])
         n_cl = sum(1 for s in seats.values() if classic(s))
+        if jur == "nsw" and y in counted:
+            # NSW is drawn from its counts; the model's reading is the check
+            nsw_check[str(y)] = {b: {"counted": round(pct(counted[y][b][:2]), 2), "model": round(pct(est[b]), 2),
+                                     "replay": round(pct(flows(seats)[b]), 2)}
+                                 for b in BUCKETS if pct(counted[y][b][:2]) is not None and pct(est[b]) is not None}
+            for b in BUCKETS:
+                v = counted[y][b]
+                f = pct(v[:2])
+                rows.append({"jurisdiction": jur, "year": y, "party": b, "method": "counted",
+                             "est_alp_votes": round(v[0]), "est_coal_votes": round(v[1]),
+                             "est_flow_to_alp": round(f / 100, 6) if f is not None else "", "err90": "",
+                             "exhausted_share": round(v[2] / sum(v), 4) if sum(v) else "", "n_classic": n_cl})
+            continue
         for b in BUCKETS:
             f = pct(est[b])
             e = err90(table, b, n_cl) if f is not None else None
@@ -666,7 +725,7 @@ def main():
                          "est_alp_votes": round(est[b][0]), "est_coal_votes": round(est[b][1]),
                          "est_flow_to_alp": round(f / 100, 6) if f is not None else "",
                          "err90": e if e is not None else "",
-                         "n_classic": n_cl})
+                         "method": "model", "exhausted_share": "", "n_classic": n_cl})
         if jur == "qld" and y in QLD_GREEN:
             qld_check[str(y)] = {b: {"counted": v, "model": round(pct(est[b]), 2),
                                      "replay": round(pct(flows(seats)[b]), 2)} for b, v in QLD_GREEN[y].items()}
@@ -678,8 +737,8 @@ def main():
         contests["sa-2026-alp-onp"] = contest_flows(states[("sa", 2026)], evs[("sa", 2026)], params[("sa", 2026)])
 
     with open(OUT_CSV, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["jurisdiction", "year", "party", "est_alp_votes", "est_coal_votes",
-                                          "est_flow_to_alp", "err90", "n_classic"])
+        w = csv.DictWriter(f, fieldnames=["jurisdiction", "year", "party", "method", "est_alp_votes", "est_coal_votes",
+                                          "est_flow_to_alp", "err90", "exhausted_share", "n_classic"])
         w.writeheader()
         w.writerows(rows)
     with open(OUT_JSON, "w") as f:
@@ -687,7 +746,7 @@ def main():
                                 "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in FED_YEARS],
                                 "cal_n": list(CAL_N), "cal_reps": CAL_REPS},
                    "federal": federal, "calibration": table, "calibration_rows": cal_rows,
-                   "qld_check": qld_check, "contests": contests,
+                   "qld_check": qld_check, "nsw_check": nsw_check, "contests": contests,
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},
                   f, indent=1)
         f.write("\n")

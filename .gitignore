@@ -37,3 +37,7 @@ node_modules/
 
 # ABS census datapack cache for the W1 census-frame extractor (re-fetch with --fetch)
 .build/analysis/seat-model/cache/
+
+# NSW ballot-level preference zips (~40MB an election): a local cache that
+# parse-nsw-state-flows.py reduces to the committed counts.csv (sha256s kept)
+.build/state-flow-src/nsw/*/zip/

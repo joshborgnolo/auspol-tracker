@@ -4289,6 +4289,11 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    parsers' own flow_* columns in data/state-flows.csv blend a pile's
    inherited ballots into its party's split – the Greens 2–7 points low on
    the same test – and are never drawn.
+   New South Wales is COUNTED, not estimated: its commission publishes every
+   ballot's preferences, so parse-nsw-state-flows.py counts each party's
+   voters exactly and the estimator passes them through (method "counted",
+   no error bar; its exhausted share rides along, NSW being optional
+   preferential).
    Shown (user calls 2026-10-20): elections whose counts reached a Labor v
    Coalition final in at least STATE_MIN_CLASSIC seats – smaller counts'
    errors run wider: the Northern Territory's, Victoria's to 2018 (stopped
@@ -4313,6 +4318,7 @@ const flowHistory = (() => {
     sa: { label: "South Australia", elections: "South Australian state elections", srcAs: "the Electoral Commission SA’s distributions of preferences" },
     qld: { label: "Queensland", elections: "Queensland state elections", srcAs: "the Electoral Commission of Queensland’s distributions of preferences" },
     nt: { label: "Northern Territory", elections: "Northern Territory elections", srcAs: "the NT Electoral Commission’s distributions of preferences" },
+    nsw: { label: "New South Wales", elections: "New South Wales state elections", srcAs: "the NSW Electoral Commission’s ballot-level preference data" },
   };
   if (JUR) return h;
   let csv = null, bt = null;
@@ -4335,9 +4341,14 @@ const flowHistory = (() => {
     const c = ln.split(",");
     const jur = c[ci.jurisdiction], year = +c[ci.year], b = c[ci.party];
     if (!JURIS[jur] || +c[ci.n_classic] < STATE_MIN_CLASSIC || !STATE_BUCKETS.includes(b)) return;
-    if (c[ci.est_flow_to_alp] === "" || c[ci.err90] === "") return;
+    // NSW's rows are COUNTS (method "counted": ballot-level data) and carry
+    // no error; every estimate must carry its calibrated one
+    const counted = c[ci.method] === "counted";
+    if (c[ci.est_flow_to_alp] === "" || (!counted && c[ci.err90] === "")) return;
     if (b === "onp" && !((onpPrim[jur + year] || 0) >= ONP_MIN_PRIM)) return;
-    ((bag[jur] ||= {})[year] ||= {})[b] = { v: Math.round(+c[ci.est_flow_to_alp] * 1000) / 10, e: Math.round(+c[ci.err90] * 10) / 10 };
+    ((bag[jur] ||= {})[year] ||= {})[b] = { v: Math.round(+c[ci.est_flow_to_alp] * 1000) / 10,
+      e: counted ? null : Math.round(+c[ci.err90] * 10) / 10, counted,
+      x: counted && c[ci.exhausted_share] !== "" ? Math.round(+c[ci.exhausted_share] * 1000) / 10 : null };
   });
   const errs = { grn: [], onp: [], oth: [] };
   for (const [jk, meta] of Object.entries(JURIS)) {
@@ -4345,10 +4356,14 @@ const flowHistory = (() => {
     if (!years.length) continue;
     const col = (b, k) => years.map((y) => (bag[jk][y][b] ? bag[jk][y][b][k] : null));
     STATE_BUCKETS.forEach((b) => errs[b].push(...col(b, "e").filter((e) => e != null)));
-    h[jk] = { label: meta.label, elections: meta.elections, srcAs: meta.srcAs, estimated: true,
+    // counted (NSW) or estimated, never a mix within one jurisdiction
+    const isCounted = years.every((y) => Object.values(bag[jk][y]).every((x) => x.counted));
+    h[jk] = { label: meta.label, elections: meta.elections, srcAs: meta.srcAs,
+      estimated: !isCounted, counted: isCounted,
       asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
       years, grn: col("grn", "v"), onp: col("onp", "v"), oth: col("oth", "v"),
-      grnErr: col("grn", "e"), onpErr: col("onp", "e"), othErr: col("oth", "e") };
+      grnErr: col("grn", "e"), onpErr: col("onp", "e"), othErr: col("oth", "e"),
+      ...(isCounted ? { grnExh: col("grn", "x"), onpExh: col("onp", "x"), othExh: col("oth", "x") } : null) };
   }
   // the back-test's headline figures: mean miss against the AEC's counts over
   // the federal elections (One Nation's from 2016, its first wide field)
@@ -4357,6 +4372,11 @@ const flowHistory = (() => {
     return v.length ? Math.round((v.reduce((s, x) => s + x, 0) / v.length) * 10) / 10 : null;
   };
   const qld = Object.values(bt.qld_check || {}).flatMap((d) => Object.values(d).map((x) => Math.abs(x.model - x.counted)));
+  // NSW, where the ballots are counted: the model's reading against the count
+  const nswMax = (b) => {
+    const v = Object.values(bt.nsw_check || {}).filter((d) => d[b]).map((d) => Math.abs(d[b].model - d[b].counted));
+    return v.length ? Math.round(Math.max(...v) * 10) / 10 : null;
+  };
   const span = (v) => (v.length ? [Math.min(...v), Math.max(...v)] : null);
   h.fed.backtest = {
     elections: Object.keys(bt.federal || {}).length, minClassic: STATE_MIN_CLASSIC,
@@ -4364,7 +4384,8 @@ const flowHistory = (() => {
     oth: { model: mae("oth", "model"), replay: mae("oth", "replay") },
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
     err90: { grn: span(errs.grn), onp: span(errs.onp), oth: span(errs.oth) }, onpMinPrim: ONP_MIN_PRIM,
-    qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null };
+    qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null,
+    nsw: bt.nsw_check ? { grn: nswMax("grn"), oth: nswMax("oth") } : null };
   return h;
 })();
 

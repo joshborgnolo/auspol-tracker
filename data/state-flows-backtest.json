@@ -4,9 +4,12 @@
   "fed_seat": 104000.0,
   "em_iters": 200,
   "pool": [
+   "nsw-2019",
+   "nsw-2023",
    "nt-2016",
    "nt-2020",
    "nt-2024",
+   "qld-2017",
    "qld-2020",
    "qld-2024",
    "sa-2022",
@@ -41,19 +44,19 @@
   "2010": {
    "grn": {
     "counted": 79.19,
-    "model": 80.36,
+    "model": 80.29,
     "replay": 77.07,
     "ballots": 1080811
    },
    "onp": {
     "counted": 46.52,
-    "model": 42.45,
+    "model": 42.68,
     "replay": 50.55,
     "ballots": 21058
    },
    "oth": {
     "counted": 43.54,
-    "model": 40.9,
+    "model": 41.06,
     "replay": 48.21,
     "ballots": 432174
    }
@@ -61,19 +64,19 @@
   "2013": {
    "grn": {
     "counted": 82.67,
-    "model": 82.96,
+    "model": 82.89,
     "replay": 77.41,
     "ballots": 980988
    },
    "onp": {
     "counted": 45.24,
-    "model": 50.07,
+    "model": 50.34,
     "replay": 49.09,
     "ballots": 17250
    },
    "oth": {
     "counted": 46.41,
-    "model": 46.17,
+    "model": 46.21,
     "replay": 50.02,
     "ballots": 1351052
    }
@@ -81,19 +84,19 @@
   "2016": {
    "grn": {
     "counted": 81.41,
-    "model": 82.53,
+    "model": 82.46,
     "replay": 77.49,
     "ballots": 1178464
    },
    "onp": {
     "counted": 50.29,
-    "model": 46.68,
+    "model": 46.73,
     "replay": 50.92,
     "ballots": 158973
    },
    "oth": {
     "counted": 46.34,
-    "model": 45.81,
+    "model": 45.87,
     "replay": 49.76,
     "ballots": 1203582
    }
@@ -101,19 +104,19 @@
   "2019": {
    "grn": {
     "counted": 81.62,
-    "model": 82.49,
+    "model": 82.4,
     "replay": 76.82,
     "ballots": 1291638
    },
    "onp": {
     "counted": 35.02,
-    "model": 31.68,
+    "model": 31.75,
     "replay": 37.52,
     "ballots": 425023
    },
    "oth": {
     "counted": 42.5,
-    "model": 42.75,
+    "model": 42.82,
     "replay": 46.03,
     "ballots": 1281720
    }
@@ -121,19 +124,19 @@
   "2022": {
    "grn": {
     "counted": 84.8,
-    "model": 84.47,
+    "model": 84.37,
     "replay": 78.63,
     "ballots": 1407297
    },
    "onp": {
     "counted": 36.38,
-    "model": 35.67,
+    "model": 35.81,
     "replay": 41.92,
     "ballots": 644939
    },
    "oth": {
     "counted": 45.03,
-    "model": 45.67,
+    "model": 45.7,
     "replay": 48.52,
     "ballots": 1416900
    }
@@ -141,19 +144,19 @@
   "2025": {
    "grn": {
     "counted": 87.46,
-    "model": 86.11,
+    "model": 86.02,
     "replay": 80.45,
     "ballots": 1409652
    },
    "onp": {
     "counted": 25.86,
-    "model": 26.27,
+    "model": 26.35,
     "replay": 33.02,
     "ballots": 823821
    },
    "oth": {
     "counted": 48.33,
-    "model": 49.59,
+    "model": 49.63,
     "replay": 51.04,
     "ballots": 1349526
    }
@@ -1943,25 +1946,61 @@
   "2020": {
    "grn": {
     "counted": 80.1,
-    "model": 80.15,
+    "model": 80.08,
     "replay": 75.01
    },
    "onp": {
     "counted": 33.8,
-    "model": 33.02,
+    "model": 33.11,
     "replay": 37.32
    }
   },
   "2024": {
    "grn": {
     "counted": 80.7,
-    "model": 81.12,
+    "model": 81.05,
     "replay": 75.82
    },
    "onp": {
     "counted": 26.2,
-    "model": 26.8,
+    "model": 26.88,
     "replay": 31.58
+   }
+  }
+ },
+ "nsw_check": {
+  "2019": {
+   "grn": {
+    "counted": 86.65,
+    "model": 86.96,
+    "replay": 84.75
+   },
+   "onp": {
+    "counted": 37.88,
+    "model": 38.51,
+    "replay": 40.09
+   },
+   "oth": {
+    "counted": 54.19,
+    "model": 51.07,
+    "replay": 55.34
+   }
+  },
+  "2023": {
+   "grn": {
+    "counted": 88.12,
+    "model": 87.85,
+    "replay": 85.77
+   },
+   "onp": {
+    "counted": 32.09,
+    "model": 34.26,
+    "replay": 36.79
+   },
+   "oth": {
+    "counted": 53.32,
+    "model": 51.61,
+    "replay": 55.29
    }
   }
  },
@@ -1969,11 +2008,11 @@
   "sa-2026-alp-onp": {
    "seats": 25,
    "model": {
-    "lib": 35.21,
-    "grn": 86.32,
-    "ind": 54.52,
-    "minor": 47.99,
-    "oth": 49.82
+    "lib": 34.52,
+    "grn": 86.43,
+    "ind": 55.19,
+    "minor": 48.95,
+    "oth": 50.69
    },
    "replay": {
     "lib": 37.27,

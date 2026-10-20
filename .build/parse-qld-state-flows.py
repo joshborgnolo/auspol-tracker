@@ -11,6 +11,10 @@ decomposed by party of first-preference origin and read off where each
 bucket's ballots sat at the final count. Non-classic finals contribute
 primaries but no flows.
 
+2017 (parse_booth_2017): the ECQ's older results site, one gzipped booth
+page per district (see harvest-qld-state-flows.py); every chain is checked
+against its District Total row the same way.
+
 Schema notes (verified against the committed mirror 2026-10-20):
   * each election's districts sit under an <election> element with
     eventType="State General" (the archives also bundle a council
@@ -38,12 +42,15 @@ Appends to (never rewrites) data/state-flows.csv: rows for jurisdiction
 "qld" replace only their own block.
 """
 import csv
+import gzip
+import html
 import os
+import re
 import sys
 import xml.etree.ElementTree as ET
 
 ROOT = os.path.join(".build", "state-flow-src", "qld")
-YEARS = (2020, 2024)
+YEARS = (2017, 2020, 2024)
 OUT = "data/state-flows.csv"
 COLS = ["jurisdiction", "year", "party", "prim_votes", "prim_share",
         "flow_alp_votes", "flow_coal_votes", "flow_to_alp",
@@ -138,6 +145,82 @@ def parse_district(d):
             "chain": dop, "tcp": tcp}
 
 
+def _cells(r):
+    return [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", c))).strip()
+            for c in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", r, re.S)]
+
+
+def _num(x):
+    x = (x or "").replace(",", "").strip()
+    return float(x) if re.fullmatch(r"-?\d+(\.\d+)?", x) else None
+
+
+def parse_booth_2017(doc):
+    """One 2017 booth page's "Summary of Distribution of Preferences" table
+    -> parse_district's shape, candidates keyed by name. The header names
+    each candidate "SURNAME, Given PARTY" (no code for an independent); each
+    "X Excluded" row gives every continuing candidate's transfer and the
+    exhausted count; the "Total" row after it is the running pile. The
+    excluded candidate is whoever drops out of the next total (not the
+    row's label, which names a surname only)."""
+    i = doc.find("Votes Remaining in Count")
+    if i < 0:
+        return None
+    m = re.search(r"2017 State General Election - (.*?)\s*-?\s*Booth Details", doc)
+    rows = [_cells(r) for r in re.findall(r"<tr.*?</tr>", doc[doc.rfind("<table", 0, i):doc.find("</table>", i)], re.S)]
+    head = next((r for r in rows if r and r[0] == "Preference Distribution"), None)
+    if not head:
+        return None
+    order, party = [], {}
+    for c in head[1:head.index("Votes Remaining in Count")]:
+        mm = re.match(r"^(.*?)\s+([A-Z][A-Z0-9]{1,6})$", c)
+        nm, code = (mm.group(1), mm.group(2)) if mm and "," in mm.group(1) else (c, "IND")
+        order.append(nm)
+        party[nm] = bucket_for(code)
+    k = len(order)
+
+    def vals(r):
+        return {n: _num(r[1 + 2 * j]) for j, n in enumerate(order) if 1 + 2 * j < len(r)}, \
+            _num(r[2 + 2 * k]) if len(r) > 2 + 2 * k else None
+    fp = next((r for r in rows if r and r[0] == "First Preference Votes"), None)
+    if not fp:
+        return None
+    fpv = {n: v or 0.0 for n, v in vals(fp)[0].items()}
+    chain, prev, tcp = [], {n: v for n, v in fpv.items()}, {}
+    pending = None
+    for r in rows:
+        if r and r[0].endswith("Excluded"):
+            v, exh = vals(r)
+            pending = ({n: x for n, x in v.items() if x}, exh or 0.0)
+        elif r and r[0] in ("Total", "District Total") and pending:
+            cur = {n: x for n, x in vals(r)[0].items() if x is not None}
+            gone = [n for n in prev if n not in cur]
+            if len(gone) != 1:
+                return None
+            chain.append((gone[0], pending[1], pending[0]))
+            prev, pending = cur, None
+            if r[0] == "District Total":
+                tcp = cur
+    return {"district": m.group(1) if m else "?", "order": order, "party": party,
+            "fpv": fpv, "chain": chain, "tcp": tcp}
+
+
+def districts_of(year):
+    """[(district, parsed or None)] for one election, whichever its format."""
+    if year == 2017:
+        d17 = os.path.join(ROOT, "2017")
+        out = []
+        for n in range(1, 94):
+            f = os.path.join(d17, f"booth{n}.html.gz")
+            p = parse_booth_2017(gzip.open(f).read().decode("utf-8", "replace")) if os.path.exists(f) else None
+            out.append((p["district"] if p else f"booth{n}", p))
+        return out
+    el = parse_election(year)
+    if el is None:
+        return []
+    return [(d.get("districtName") or "?", parse_district(d)) for d in el.find("districts").findall("district")]
+
+
 def seat_flow(p):
     bo_order, party = p["order"], p["party"]
     piles = {bo: {party[bo]: float(p["fpv"].get(bo, 0.0))} for bo in bo_order}
@@ -200,8 +283,8 @@ def main():
     all_rows = list(keep)
     failures = []
     for year in years:
-        el = parse_election(year)
-        if el is None:
+        districts = districts_of(year)
+        if not districts:
             print(f"{year}: no State General election block, skipped")
             continue
         prim = {b: 0.0 for b in BUCKETS}
@@ -209,11 +292,10 @@ def main():
         n_seat = n_dop = n_classic = 0
         nonclassic = []
         bad_verify = []
-        for d in el.find("districts").findall("district"):
-            seat = d.get("districtName") or "?"
-            p = parse_district(d)
+        for seat, p in districts:
             if not p:
                 print(f"  !! {year} {seat}: unparsed")
+                failures.append((year, seat, "unparsed"))
                 continue
             n_seat += 1
             if not p["chain"]:

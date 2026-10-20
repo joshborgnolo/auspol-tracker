@@ -10,10 +10,16 @@ SGE, bundled with an Ipswich council by-election). Each zip holds a single
 Preferences chain. Plain unauthenticated GET; the zip URL is reused
 verbatim from elections.json, never handcrafted.
 
-Earlier elections are not in this feed (2004–2015 is the optional-
-preferential era, 2017's count is TCP-only) so the years are fixed below.
+2017 is not in that feed. Its distributions live on the ECQ's older results
+site: each district's booth page (results.ecq.qld.gov.au/elections/state/
+State2017/results/booth<N>.html, N = 1..93) closes with a "Summary of
+Distribution of Preferences" table – first preferences, then one row per
+exclusion. They are mirrored verbatim but gzipped
+(.build/state-flow-src/qld/2017/booth<N>.html.gz; ~400KB each raw). The
+2004–2015 elections used optional preferential voting and are left out.
 Only downloads files missing locally; idempotent re-runs.
 """
+import gzip
 import json
 import os
 import subprocess
@@ -51,7 +57,34 @@ def fetch(url, dest):
     return None
 
 
+BOOTH_2017 = "https://results.ecq.qld.gov.au/elections/state/State2017/results/booth{}.html"
+
+
+def harvest_2017():
+    outdir = os.path.join(ROOT, "2017")
+    os.makedirs(outdir, exist_ok=True)
+    got = bad = 0
+    for n in range(1, 94):
+        dest = os.path.join(outdir, f"booth{n}.html.gz")
+        if os.path.exists(dest):
+            got += 1
+            continue
+        r = subprocess.run(["curl", "-sf", "--max-time", "120", "-A", "Mozilla/5.0", BOOTH_2017.format(n)],
+                           capture_output=True)
+        if r.returncode != 0 or b"Summary of Distribution of Preferences" not in r.stdout:
+            print(f"2017: booth{n} FAIL ({r.returncode})")
+            bad += 1
+            continue
+        with open(dest + ".part", "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as f:
+            f.write(r.stdout)
+        os.replace(dest + ".part", dest)
+        got += 1
+    print(f"2017: {got} of 93 district booth pages mirrored")
+    return bad
+
+
 def main():
+    bad = harvest_2017()
     cat = get_json(ELECTIONS_JSON)
     if not cat:
         sys.exit("could not read the ECQ elections catalogue")
@@ -62,7 +95,6 @@ def main():
             urls.setdefault(2020, u)
         elif "SGE2024" in u:
             urls.setdefault(2024, u)
-    bad = 0
     for year in YEARS:
         u = urls.get(year)
         if not u:

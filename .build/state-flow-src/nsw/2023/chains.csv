@@ -1,0 +1,1783 @@
+district,step,excluded,recipient,votes
+albury,1,HAMILTON Ross,CLANCY Justin,103
+albury,1,HAMILTON Ross,DAVERN Eli,108
+albury,1,HAMILTON Ross,FERNANDO Asanki,88
+albury,1,HAMILTON Ross,ROBERTSON Geoffrey,38
+albury,1,HAMILTON Ross,ROWLAND Marcus,100
+albury,1,HAMILTON Ross,SINCLAIR Peter,110
+albury,1,HAMILTON Ross,__exh,624
+albury,2,ROBERTSON Geoffrey,CLANCY Justin,249
+albury,2,ROBERTSON Geoffrey,DAVERN Eli,30
+albury,2,ROBERTSON Geoffrey,FERNANDO Asanki,17
+albury,2,ROBERTSON Geoffrey,ROWLAND Marcus,23
+albury,2,ROBERTSON Geoffrey,SINCLAIR Peter,482
+albury,2,ROBERTSON Geoffrey,__exh,461
+albury,3,FERNANDO Asanki,CLANCY Justin,100
+albury,3,FERNANDO Asanki,DAVERN Eli,277
+albury,3,FERNANDO Asanki,ROWLAND Marcus,123
+albury,3,FERNANDO Asanki,SINCLAIR Peter,143
+albury,3,FERNANDO Asanki,__exh,725
+albury,4,SINCLAIR Peter,CLANCY Justin,1364
+albury,4,SINCLAIR Peter,DAVERN Eli,264
+albury,4,SINCLAIR Peter,ROWLAND Marcus,487
+albury,4,SINCLAIR Peter,__exh,2629
+albury,5,DAVERN Eli,CLANCY Justin,627
+albury,5,DAVERN Eli,ROWLAND Marcus,2812
+albury,5,DAVERN Eli,__exh,1912
+auburn,1,GOED Shelley,ASGARI Masoomeh,149
+auburn,1,GOED Shelley,DAOUD Jamal,53
+auburn,1,GOED Shelley,MORKOS DOUAIHY Julie,63
+auburn,1,GOED Shelley,VOLTZ Lynda,147
+auburn,1,GOED Shelley,ZAMAN Mohammed (Haseen),84
+auburn,1,GOED Shelley,__exh,731
+auburn,2,DAOUD Jamal,ASGARI Masoomeh,177
+auburn,2,DAOUD Jamal,MORKOS DOUAIHY Julie,99
+auburn,2,DAOUD Jamal,VOLTZ Lynda,182
+auburn,2,DAOUD Jamal,ZAMAN Mohammed (Haseen),223
+auburn,2,DAOUD Jamal,__exh,1105
+auburn,3,MORKOS DOUAIHY Julie,ASGARI Masoomeh,166
+auburn,3,MORKOS DOUAIHY Julie,VOLTZ Lynda,344
+auburn,3,MORKOS DOUAIHY Julie,ZAMAN Mohammed (Haseen),877
+auburn,3,MORKOS DOUAIHY Julie,__exh,1937
+auburn,4,ASGARI Masoomeh,VOLTZ Lynda,1861
+auburn,4,ASGARI Masoomeh,ZAMAN Mohammed (Haseen),282
+auburn,4,ASGARI Masoomeh,__exh,1586
+badgerys-creek,1,COOPER Peter,BEST Nick,173
+badgerys-creek,1,COOPER Peter,DAVIES Tanya,109
+badgerys-creek,1,COOPER Peter,GREEN Benjamin,153
+badgerys-creek,1,COOPER Peter,THAIN Garion,182
+badgerys-creek,1,COOPER Peter,__exh,704
+badgerys-creek,2,BEST Nick,DAVIES Tanya,258
+badgerys-creek,2,BEST Nick,GREEN Benjamin,234
+badgerys-creek,2,BEST Nick,THAIN Garion,1280
+badgerys-creek,2,BEST Nick,__exh,1152
+badgerys-creek,3,GREEN Benjamin,DAVIES Tanya,1529
+badgerys-creek,3,GREEN Benjamin,THAIN Garion,638
+badgerys-creek,3,GREEN Benjamin,__exh,2488
+ballina,1,JENKINS Peter,BOOYENS Josh,116
+ballina,1,JENKINS Peter,BROADLEY Andrew,190
+ballina,1,JENKINS Peter,LOUGHREY Kevin,262
+ballina,1,JENKINS Peter,SMITH Tamara,384
+ballina,1,JENKINS Peter,__exh,870
+ballina,2,LOUGHREY Kevin,BOOYENS Josh,1577
+ballina,2,LOUGHREY Kevin,BROADLEY Andrew,377
+ballina,2,LOUGHREY Kevin,SMITH Tamara,580
+ballina,2,LOUGHREY Kevin,__exh,1438
+ballina,3,BROADLEY Andrew,BOOYENS Josh,1278
+ballina,3,BROADLEY Andrew,SMITH Tamara,6141
+ballina,3,BROADLEY Andrew,__exh,4028
+balmain,1,STELZER Glen,BISGROVE Stephen,72
+balmain,1,STELZER Glen,LEACH Freya,37
+balmain,1,STELZER Glen,SCOTT Philippa,65
+balmain,1,STELZER Glen,SHETTY Kobi,95
+balmain,1,STELZER Glen,__exh,178
+balmain,2,BISGROVE Stephen,LEACH Freya,148
+balmain,2,BISGROVE Stephen,SCOTT Philippa,292
+balmain,2,BISGROVE Stephen,SHETTY Kobi,277
+balmain,2,BISGROVE Stephen,__exh,544
+balmain,3,LEACH Freya,SCOTT Philippa,1668
+balmain,3,LEACH Freya,SHETTY Kobi,1506
+balmain,3,LEACH Freya,__exh,6577
+bankstown,1,GLINKA Marianne,ABOU-HAIDAR Dorlene,12
+bankstown,1,GLINKA Marianne,ALYATEEM Yosra,42
+bankstown,1,GLINKA Marianne,BODDY Max,23
+bankstown,1,GLINKA Marianne,DIB Jihad,56
+bankstown,1,GLINKA Marianne,HABIB Luke,36
+bankstown,1,GLINKA Marianne,NASEDRA Isaac,29
+bankstown,1,GLINKA Marianne,TALEB Nathan,23
+bankstown,1,GLINKA Marianne,__exh,458
+bankstown,2,HABIB Luke,ABOU-HAIDAR Dorlene,93
+bankstown,2,HABIB Luke,ALYATEEM Yosra,35
+bankstown,2,HABIB Luke,BODDY Max,24
+bankstown,2,HABIB Luke,DIB Jihad,69
+bankstown,2,HABIB Luke,NASEDRA Isaac,30
+bankstown,2,HABIB Luke,TALEB Nathan,60
+bankstown,2,HABIB Luke,__exh,450
+bankstown,3,ABOU-HAIDAR Dorlene,ALYATEEM Yosra,61
+bankstown,3,ABOU-HAIDAR Dorlene,BODDY Max,30
+bankstown,3,ABOU-HAIDAR Dorlene,DIB Jihad,128
+bankstown,3,ABOU-HAIDAR Dorlene,NASEDRA Isaac,124
+bankstown,3,ABOU-HAIDAR Dorlene,TALEB Nathan,74
+bankstown,3,ABOU-HAIDAR Dorlene,__exh,581
+bankstown,4,BODDY Max,ALYATEEM Yosra,75
+bankstown,4,BODDY Max,DIB Jihad,54
+bankstown,4,BODDY Max,NASEDRA Isaac,272
+bankstown,4,BODDY Max,TALEB Nathan,50
+bankstown,4,BODDY Max,__exh,849
+bankstown,5,ALYATEEM Yosra,DIB Jihad,195
+bankstown,5,ALYATEEM Yosra,NASEDRA Isaac,154
+bankstown,5,ALYATEEM Yosra,TALEB Nathan,471
+bankstown,5,ALYATEEM Yosra,__exh,699
+bankstown,6,NASEDRA Isaac,DIB Jihad,1461
+bankstown,6,NASEDRA Isaac,TALEB Nathan,265
+bankstown,6,NASEDRA Isaac,__exh,1319
+barwon,1,MCBRIDE Thomas,BRITTON Paul,18
+barwon,1,MCBRIDE Thomas,BUTLER Roy,25
+barwon,1,MCBRIDE Thomas,HARTLEY Ben,15
+barwon,1,MCBRIDE Thomas,HOWE Stuart,17
+barwon,1,MCBRIDE Thomas,ROBERTS-GARNSEY Joshua,28
+barwon,1,MCBRIDE Thomas,SCHULTZ Pat,14
+barwon,1,MCBRIDE Thomas,TURNER Annette,15
+barwon,1,MCBRIDE Thomas,__exh,186
+barwon,2,HOWE Stuart,BRITTON Paul,30
+barwon,2,HOWE Stuart,BUTLER Roy,159
+barwon,2,HOWE Stuart,HARTLEY Ben,28
+barwon,2,HOWE Stuart,ROBERTS-GARNSEY Joshua,19
+barwon,2,HOWE Stuart,SCHULTZ Pat,14
+barwon,2,HOWE Stuart,TURNER Annette,21
+barwon,2,HOWE Stuart,__exh,206
+barwon,3,SCHULTZ Pat,BRITTON Paul,35
+barwon,3,SCHULTZ Pat,BUTLER Roy,101
+barwon,3,SCHULTZ Pat,HARTLEY Ben,135
+barwon,3,SCHULTZ Pat,ROBERTS-GARNSEY Joshua,222
+barwon,3,SCHULTZ Pat,TURNER Annette,27
+barwon,3,SCHULTZ Pat,__exh,389
+barwon,4,HARTLEY Ben,BRITTON Paul,316
+barwon,4,HARTLEY Ben,BUTLER Roy,228
+barwon,4,HARTLEY Ben,ROBERTS-GARNSEY Joshua,213
+barwon,4,HARTLEY Ben,TURNER Annette,81
+barwon,4,HARTLEY Ben,__exh,931
+barwon,5,BRITTON Paul,BUTLER Roy,660
+barwon,5,BRITTON Paul,ROBERTS-GARNSEY Joshua,252
+barwon,5,BRITTON Paul,TURNER Annette,395
+barwon,5,BRITTON Paul,__exh,2075
+barwon,6,ROBERTS-GARNSEY Joshua,BUTLER Roy,3065
+barwon,6,ROBERTS-GARNSEY Joshua,TURNER Annette,602
+barwon,6,ROBERTS-GARNSEY Joshua,__exh,3883
+bathurst,1,BEGG Michael,NANKERVIS Kay,68
+bathurst,1,BEGG Michael,SHAW Cameron,47
+bathurst,1,BEGG Michael,SINCLAIR Craig,47
+bathurst,1,BEGG Michael,TICEHURST Martin,47
+bathurst,1,BEGG Michael,TOOLE Paul,61
+bathurst,1,BEGG Michael,WILSON Burchell,22
+bathurst,1,BEGG Michael,ZBIK Antony,47
+bathurst,1,BEGG Michael,__exh,287
+bathurst,2,WILSON Burchell,NANKERVIS Kay,28
+bathurst,2,WILSON Burchell,SHAW Cameron,30
+bathurst,2,WILSON Burchell,SINCLAIR Craig,316
+bathurst,2,WILSON Burchell,TICEHURST Martin,60
+bathurst,2,WILSON Burchell,TOOLE Paul,157
+bathurst,2,WILSON Burchell,ZBIK Antony,38
+bathurst,2,WILSON Burchell,__exh,485
+bathurst,3,ZBIK Antony,NANKERVIS Kay,211
+bathurst,3,ZBIK Antony,SHAW Cameron,121
+bathurst,3,ZBIK Antony,SINCLAIR Craig,248
+bathurst,3,ZBIK Antony,TICEHURST Martin,81
+bathurst,3,ZBIK Antony,TOOLE Paul,147
+bathurst,3,ZBIK Antony,__exh,749
+bathurst,4,TICEHURST Martin,NANKERVIS Kay,150
+bathurst,4,TICEHURST Martin,SHAW Cameron,393
+bathurst,4,TICEHURST Martin,SINCLAIR Craig,361
+bathurst,4,TICEHURST Martin,TOOLE Paul,560
+bathurst,4,TICEHURST Martin,__exh,2173
+bathurst,5,NANKERVIS Kay,SHAW Cameron,1911
+bathurst,5,NANKERVIS Kay,SINCLAIR Craig,286
+bathurst,5,NANKERVIS Kay,TOOLE Paul,382
+bathurst,5,NANKERVIS Kay,__exh,1473
+bathurst,6,SINCLAIR Craig,SHAW Cameron,857
+bathurst,6,SINCLAIR Craig,TOOLE Paul,1670
+bathurst,6,SINCLAIR Craig,__exh,2581
+bega,1,GEISELHART Karin,ABBOTT Debra,80
+bega,1,GEISELHART Karin,FITZPATRICK Russell,37
+bega,1,GEISELHART Karin,GRIFF Cathy,121
+bega,1,GEISELHART Karin,HAWKINS Jeffrey,78
+bega,1,GEISELHART Karin,HOLLAND Michael,68
+bega,1,GEISELHART Karin,WHITE Greg,77
+bega,1,GEISELHART Karin,__exh,295
+bega,2,HAWKINS Jeffrey,ABBOTT Debra,321
+bega,2,HAWKINS Jeffrey,FITZPATRICK Russell,123
+bega,2,HAWKINS Jeffrey,GRIFF Cathy,63
+bega,2,HAWKINS Jeffrey,HOLLAND Michael,87
+bega,2,HAWKINS Jeffrey,WHITE Greg,106
+bega,2,HAWKINS Jeffrey,__exh,577
+bega,3,WHITE Greg,ABBOTT Debra,472
+bega,3,WHITE Greg,FITZPATRICK Russell,112
+bega,3,WHITE Greg,GRIFF Cathy,368
+bega,3,WHITE Greg,HOLLAND Michael,285
+bega,3,WHITE Greg,__exh,989
+bega,4,ABBOTT Debra,FITZPATRICK Russell,1164
+bega,4,ABBOTT Debra,GRIFF Cathy,508
+bega,4,ABBOTT Debra,HOLLAND Michael,657
+bega,4,ABBOTT Debra,__exh,2346
+bega,5,GRIFF Cathy,FITZPATRICK Russell,544
+bega,5,GRIFF Cathy,HOLLAND Michael,3444
+bega,5,GRIFF Cathy,__exh,1394
+blacktown,1,MURPHY Patrick,BALI Stephen,92
+blacktown,1,MURPHY Patrick,FOSTER Peter,104
+blacktown,1,MURPHY Patrick,GREEN Allan,67
+blacktown,1,MURPHY Patrick,HOBBS Leonard,60
+blacktown,1,MURPHY Patrick,KERIN Emma,119
+blacktown,1,MURPHY Patrick,MISHALOW Alexander,37
+blacktown,1,MURPHY Patrick,__exh,543
+blacktown,2,MISHALOW Alexander,BALI Stephen,194
+blacktown,2,MISHALOW Alexander,FOSTER Peter,89
+blacktown,2,MISHALOW Alexander,GREEN Allan,452
+blacktown,2,MISHALOW Alexander,HOBBS Leonard,47
+blacktown,2,MISHALOW Alexander,KERIN Emma,52
+blacktown,2,MISHALOW Alexander,__exh,762
+blacktown,3,KERIN Emma,BALI Stephen,279
+blacktown,3,KERIN Emma,FOSTER Peter,591
+blacktown,3,KERIN Emma,GREEN Allan,177
+blacktown,3,KERIN Emma,HOBBS Leonard,255
+blacktown,3,KERIN Emma,__exh,1226
+blacktown,4,HOBBS Leonard,BALI Stephen,1292
+blacktown,4,HOBBS Leonard,FOSTER Peter,406
+blacktown,4,HOBBS Leonard,GREEN Allan,207
+blacktown,4,HOBBS Leonard,__exh,978
+blacktown,5,FOSTER Peter,BALI Stephen,1106
+blacktown,5,FOSTER Peter,GREEN Allan,902
+blacktown,5,FOSTER Peter,__exh,1706
+blue-mountains,1,MARSCHALL Richard,BRUCE Sophie-Anne,70
+blue-mountains,1,MARSCHALL Richard,CONDIE Jenna,125
+blue-mountains,1,MARSCHALL Richard,DOYLE Trish,136
+blue-mountains,1,MARSCHALL Richard,KEIGHTLEY Greg,131
+blue-mountains,1,MARSCHALL Richard,PALMER Michelle,108
+blue-mountains,1,MARSCHALL Richard,__exh,378
+blue-mountains,2,PALMER Michelle,BRUCE Sophie-Anne,538
+blue-mountains,2,PALMER Michelle,CONDIE Jenna,82
+blue-mountains,2,PALMER Michelle,DOYLE Trish,146
+blue-mountains,2,PALMER Michelle,KEIGHTLEY Greg,310
+blue-mountains,2,PALMER Michelle,__exh,933
+blue-mountains,3,KEIGHTLEY Greg,BRUCE Sophie-Anne,272
+blue-mountains,3,KEIGHTLEY Greg,CONDIE Jenna,1000
+blue-mountains,3,KEIGHTLEY Greg,DOYLE Trish,636
+blue-mountains,3,KEIGHTLEY Greg,__exh,818
+blue-mountains,4,CONDIE Jenna,BRUCE Sophie-Anne,373
+blue-mountains,4,CONDIE Jenna,DOYLE Trish,6005
+blue-mountains,4,CONDIE Jenna,__exh,1498
+cabramatta,1,MOUSSA Randa,CHIA DAVIS Roz,269
+cabramatta,1,MOUSSA Randa,HOANG Kate,181
+cabramatta,1,MOUSSA Randa,NGUYEN Courtney,87
+cabramatta,1,MOUSSA Randa,SMALING Mark,133
+cabramatta,1,MOUSSA Randa,VO Tri,256
+cabramatta,1,MOUSSA Randa,__exh,1373
+cabramatta,2,CHIA DAVIS Roz,HOANG Kate,384
+cabramatta,2,CHIA DAVIS Roz,NGUYEN Courtney,134
+cabramatta,2,CHIA DAVIS Roz,SMALING Mark,203
+cabramatta,2,CHIA DAVIS Roz,VO Tri,901
+cabramatta,2,CHIA DAVIS Roz,__exh,1292
+cabramatta,3,SMALING Mark,HOANG Kate,893
+cabramatta,3,SMALING Mark,NGUYEN Courtney,1075
+cabramatta,3,SMALING Mark,VO Tri,229
+cabramatta,3,SMALING Mark,__exh,3185
+cabramatta,4,HOANG Kate,NGUYEN Courtney,2217
+cabramatta,4,HOANG Kate,VO Tri,1861
+cabramatta,4,HOANG Kate,__exh,5902
+camden,1,BIJOK Jessie,DOLLIN Garry,337
+camden,1,BIJOK Jessie,QUINNELL Sally,205
+camden,1,BIJOK Jessie,RIVERA Emily,286
+camden,1,BIJOK Jessie,SIDGREAVES Peter,128
+camden,1,BIJOK Jessie,__exh,912
+camden,2,RIVERA Emily,DOLLIN Garry,265
+camden,2,RIVERA Emily,QUINNELL Sally,1587
+camden,2,RIVERA Emily,SIDGREAVES Peter,220
+camden,2,RIVERA Emily,__exh,1350
+camden,3,DOLLIN Garry,QUINNELL Sally,1323
+camden,3,DOLLIN Garry,SIDGREAVES Peter,2188
+camden,3,DOLLIN Garry,__exh,4528
+campbelltown,1,GALIELL Tofick,JONES Howard,24
+campbelltown,1,GALIELL Tofick,PAUDEL Gypshouna,18
+campbelltown,1,GALIELL Tofick,RIVERA Jayden,22
+campbelltown,1,GALIELL Tofick,SICARI Rosa (Rosetta),12
+campbelltown,1,GALIELL Tofick,TWADDELL Matt,19
+campbelltown,1,GALIELL Tofick,WARREN Greg,59
+campbelltown,1,GALIELL Tofick,ZAHRA Adam,62
+campbelltown,1,GALIELL Tofick,__exh,333
+campbelltown,2,JONES Howard,PAUDEL Gypshouna,31
+campbelltown,2,JONES Howard,RIVERA Jayden,69
+campbelltown,2,JONES Howard,SICARI Rosa (Rosetta),35
+campbelltown,2,JONES Howard,TWADDELL Matt,106
+campbelltown,2,JONES Howard,WARREN Greg,101
+campbelltown,2,JONES Howard,ZAHRA Adam,68
+campbelltown,2,JONES Howard,__exh,481
+campbelltown,3,TWADDELL Matt,PAUDEL Gypshouna,84
+campbelltown,3,TWADDELL Matt,RIVERA Jayden,404
+campbelltown,3,TWADDELL Matt,SICARI Rosa (Rosetta),85
+campbelltown,3,TWADDELL Matt,WARREN Greg,268
+campbelltown,3,TWADDELL Matt,ZAHRA Adam,138
+campbelltown,3,TWADDELL Matt,__exh,1012
+campbelltown,4,SICARI Rosa (Rosetta),PAUDEL Gypshouna,674
+campbelltown,4,SICARI Rosa (Rosetta),RIVERA Jayden,97
+campbelltown,4,SICARI Rosa (Rosetta),WARREN Greg,145
+campbelltown,4,SICARI Rosa (Rosetta),ZAHRA Adam,311
+campbelltown,4,SICARI Rosa (Rosetta),__exh,1244
+campbelltown,5,RIVERA Jayden,PAUDEL Gypshouna,251
+campbelltown,5,RIVERA Jayden,WARREN Greg,1564
+campbelltown,5,RIVERA Jayden,ZAHRA Adam,215
+campbelltown,5,RIVERA Jayden,__exh,1438
+campbelltown,6,ZAHRA Adam,PAUDEL Gypshouna,1319
+campbelltown,6,ZAHRA Adam,WARREN Greg,998
+campbelltown,6,ZAHRA Adam,__exh,3975
+canterbury,1,KING Kacey,BOUMANSOUR Nemr,44
+canterbury,1,KING Kacey,COTSIS Sophie,157
+canterbury,1,KING Kacey,HADCHITI Vanessa,39
+canterbury,1,KING Kacey,SCHOTT Bradley,250
+canterbury,1,KING Kacey,SINACORI Joe,178
+canterbury,1,KING Kacey,__exh,708
+canterbury,2,SINACORI Joe,BOUMANSOUR Nemr,78
+canterbury,2,SINACORI Joe,COTSIS Sophie,290
+canterbury,2,SINACORI Joe,HADCHITI Vanessa,112
+canterbury,2,SINACORI Joe,SCHOTT Bradley,296
+canterbury,2,SINACORI Joe,__exh,781
+canterbury,3,HADCHITI Vanessa,BOUMANSOUR Nemr,1669
+canterbury,3,HADCHITI Vanessa,COTSIS Sophie,376
+canterbury,3,HADCHITI Vanessa,SCHOTT Bradley,135
+canterbury,3,HADCHITI Vanessa,__exh,1912
+canterbury,4,SCHOTT Bradley,BOUMANSOUR Nemr,362
+canterbury,4,SCHOTT Bradley,COTSIS Sophie,3114
+canterbury,4,SCHOTT Bradley,__exh,1559
+castle-hill,1,ORGAN Nathan,CARTWRIGHT Tina,143
+castle-hill,1,ORGAN Nathan,CLAUS Eric,161
+castle-hill,1,ORGAN Nathan,HODGES Mark,146
+castle-hill,1,ORGAN Nathan,KORDROSTAMI Tina,117
+castle-hill,1,ORGAN Nathan,TRINH My,98
+castle-hill,1,ORGAN Nathan,__exh,687
+castle-hill,2,CLAUS Eric,CARTWRIGHT Tina,196
+castle-hill,2,CLAUS Eric,HODGES Mark,164
+castle-hill,2,CLAUS Eric,KORDROSTAMI Tina,316
+castle-hill,2,CLAUS Eric,TRINH My,128
+castle-hill,2,CLAUS Eric,__exh,760
+castle-hill,3,TRINH My,CARTWRIGHT Tina,470
+castle-hill,3,TRINH My,HODGES Mark,1285
+castle-hill,3,TRINH My,KORDROSTAMI Tina,174
+castle-hill,3,TRINH My,__exh,1939
+castle-hill,4,KORDROSTAMI Tina,CARTWRIGHT Tina,2792
+castle-hill,4,KORDROSTAMI Tina,HODGES Mark,543
+castle-hill,4,KORDROSTAMI Tina,__exh,2058
+cessnock,1,JONES Graham,BARNHAM Ash,67
+cessnock,1,JONES Graham,BARR Clayton,83
+cessnock,1,JONES Graham,DAVIES Victoria,103
+cessnock,1,JONES Graham,FENWICK Andrew,110
+cessnock,1,JONES Graham,KING Quintin,87
+cessnock,1,JONES Graham,NAIRN Llynda,96
+cessnock,1,JONES Graham,__exh,669
+cessnock,2,DAVIES Victoria,BARNHAM Ash,78
+cessnock,2,DAVIES Victoria,BARR Clayton,214
+cessnock,2,DAVIES Victoria,FENWICK Andrew,316
+cessnock,2,DAVIES Victoria,KING Quintin,87
+cessnock,2,DAVIES Victoria,NAIRN Llynda,332
+cessnock,2,DAVIES Victoria,__exh,1217
+cessnock,3,NAIRN Llynda,BARNHAM Ash,119
+cessnock,3,NAIRN Llynda,BARR Clayton,1538
+cessnock,3,NAIRN Llynda,FENWICK Andrew,663
+cessnock,3,NAIRN Llynda,KING Quintin,115
+cessnock,3,NAIRN Llynda,__exh,1469
+cessnock,4,BARNHAM Ash,BARR Clayton,512
+cessnock,4,BARNHAM Ash,FENWICK Andrew,436
+cessnock,4,BARNHAM Ash,KING Quintin,935
+cessnock,4,BARNHAM Ash,__exh,4258
+cessnock,5,FENWICK Andrew,BARR Clayton,1898
+cessnock,5,FENWICK Andrew,KING Quintin,1582
+cessnock,5,FENWICK Andrew,__exh,4339
+charlestown,1,ROLFE Marie,ANTCLIFF Jack,507
+charlestown,1,ROLFE Marie,HARRISON Jodie,380
+charlestown,1,ROLFE Marie,WATKINSON Greg,517
+charlestown,1,ROLFE Marie,__exh,1189
+charlestown,2,WATKINSON Greg,ANTCLIFF Jack,673
+charlestown,2,WATKINSON Greg,HARRISON Jodie,4488
+charlestown,2,WATKINSON Greg,__exh,2134
+clarence,1,DUROUX Brett,ANKERSMIT Leon,59
+clarence,1,DUROUX Brett,CLANCY Greg,40
+clarence,1,DUROUX Brett,KELLER George,15
+clarence,1,DUROUX Brett,LEVI Nicki,58
+clarence,1,DUROUX Brett,NOVAK Debrah,55
+clarence,1,DUROUX Brett,RAYNER Mark,46
+clarence,1,DUROUX Brett,WILLIAMSON Richie,60
+clarence,1,DUROUX Brett,__exh,392
+clarence,2,KELLER George,ANKERSMIT Leon,57
+clarence,2,KELLER George,CLANCY Greg,65
+clarence,2,KELLER George,LEVI Nicki,105
+clarence,2,KELLER George,NOVAK Debrah,54
+clarence,2,KELLER George,RAYNER Mark,132
+clarence,2,KELLER George,WILLIAMSON Richie,54
+clarence,2,KELLER George,__exh,609
+clarence,3,LEVI Nicki,ANKERSMIT Leon,117
+clarence,3,LEVI Nicki,CLANCY Greg,65
+clarence,3,LEVI Nicki,NOVAK Debrah,580
+clarence,3,LEVI Nicki,RAYNER Mark,74
+clarence,3,LEVI Nicki,WILLIAMSON Richie,98
+clarence,3,LEVI Nicki,__exh,549
+clarence,4,CLANCY Greg,ANKERSMIT Leon,1354
+clarence,4,CLANCY Greg,NOVAK Debrah,490
+clarence,4,CLANCY Greg,RAYNER Mark,456
+clarence,4,CLANCY Greg,WILLIAMSON Richie,194
+clarence,4,CLANCY Greg,__exh,1415
+clarence,5,RAYNER Mark,ANKERSMIT Leon,727
+clarence,5,RAYNER Mark,NOVAK Debrah,884
+clarence,5,RAYNER Mark,WILLIAMSON Richie,396
+clarence,5,RAYNER Mark,__exh,2409
+clarence,6,NOVAK Debrah,ANKERSMIT Leon,1717
+clarence,6,NOVAK Debrah,WILLIAMSON Richie,1426
+clarence,6,NOVAK Debrah,__exh,2353
+coffs-harbour,1,CULLY Ruth,ELLISTON Tihema,146
+coffs-harbour,1,CULLY Ruth,JUDGE Tony,48
+coffs-harbour,1,CULLY Ruth,NOTT Tim,39
+coffs-harbour,1,CULLY Ruth,PEARCE Kellie,65
+coffs-harbour,1,CULLY Ruth,SINGH Gurmesh,74
+coffs-harbour,1,CULLY Ruth,TOWNLEY Sally,117
+coffs-harbour,1,CULLY Ruth,__exh,353
+coffs-harbour,2,PEARCE Kellie,ELLISTON Tihema,168
+coffs-harbour,2,PEARCE Kellie,JUDGE Tony,121
+coffs-harbour,2,PEARCE Kellie,NOTT Tim,149
+coffs-harbour,2,PEARCE Kellie,SINGH Gurmesh,101
+coffs-harbour,2,PEARCE Kellie,TOWNLEY Sally,141
+coffs-harbour,2,PEARCE Kellie,__exh,481
+coffs-harbour,3,NOTT Tim,ELLISTON Tihema,316
+coffs-harbour,3,NOTT Tim,JUDGE Tony,746
+coffs-harbour,3,NOTT Tim,SINGH Gurmesh,167
+coffs-harbour,3,NOTT Tim,TOWNLEY Sally,868
+coffs-harbour,3,NOTT Tim,__exh,905
+coffs-harbour,4,ELLISTON Tihema,JUDGE Tony,477
+coffs-harbour,4,ELLISTON Tihema,SINGH Gurmesh,464
+coffs-harbour,4,ELLISTON Tihema,TOWNLEY Sally,838
+coffs-harbour,4,ELLISTON Tihema,__exh,1768
+coffs-harbour,5,TOWNLEY Sally,JUDGE Tony,4303
+coffs-harbour,5,TOWNLEY Sally,SINGH Gurmesh,1333
+coffs-harbour,5,TOWNLEY Sally,__exh,2306
+coogee,1,GARROD Simon,MOSQUERA Alicia,41
+coogee,1,GARROD Simon,MURRAY Lluisa,79
+coogee,1,GARROD Simon,O'NEILL Marjorie,72
+coogee,1,GARROD Simon,PANDOLFINI Rafaela,250
+coogee,1,GARROD Simon,VON MUENSTER Kylie,38
+coogee,1,GARROD Simon,__exh,341
+coogee,2,MOSQUERA Alicia,MURRAY Lluisa,177
+coogee,2,MOSQUERA Alicia,O'NEILL Marjorie,75
+coogee,2,MOSQUERA Alicia,PANDOLFINI Rafaela,65
+coogee,2,MOSQUERA Alicia,VON MUENSTER Kylie,269
+coogee,2,MOSQUERA Alicia,__exh,379
+coogee,3,MURRAY Lluisa,O'NEILL Marjorie,230
+coogee,3,MURRAY Lluisa,PANDOLFINI Rafaela,281
+coogee,3,MURRAY Lluisa,VON MUENSTER Kylie,270
+coogee,3,MURRAY Lluisa,__exh,533
+coogee,4,PANDOLFINI Rafaela,O'NEILL Marjorie,5910
+coogee,4,PANDOLFINI Rafaela,VON MUENSTER Kylie,523
+coogee,4,PANDOLFINI Rafaela,__exh,2090
+cootamundra,1,O'ROURKE Chris,COOKE Steph,56
+cootamundra,1,O'ROURKE Chris,CULLEN Jake,71
+cootamundra,1,O'ROURKE Chris,DAHLITZ Chris,43
+cootamundra,1,O'ROURKE Chris,FISHER Brian,21
+cootamundra,1,O'ROURKE Chris,PASSLOW Jeffrey,41
+cootamundra,1,O'ROURKE Chris,YOUNG Robert,48
+cootamundra,1,O'ROURKE Chris,__exh,338
+cootamundra,2,FISHER Brian,COOKE Steph,72
+cootamundra,2,FISHER Brian,CULLEN Jake,55
+cootamundra,2,FISHER Brian,DAHLITZ Chris,29
+cootamundra,2,FISHER Brian,PASSLOW Jeffrey,38
+cootamundra,2,FISHER Brian,YOUNG Robert,150
+cootamundra,2,FISHER Brian,__exh,351
+cootamundra,3,PASSLOW Jeffrey,COOKE Steph,140
+cootamundra,3,PASSLOW Jeffrey,CULLEN Jake,96
+cootamundra,3,PASSLOW Jeffrey,DAHLITZ Chris,428
+cootamundra,3,PASSLOW Jeffrey,YOUNG Robert,159
+cootamundra,3,PASSLOW Jeffrey,__exh,454
+cootamundra,4,YOUNG Robert,COOKE Steph,330
+cootamundra,4,YOUNG Robert,CULLEN Jake,190
+cootamundra,4,YOUNG Robert,DAHLITZ Chris,261
+cootamundra,4,YOUNG Robert,__exh,689
+cootamundra,5,CULLEN Jake,COOKE Steph,1378
+cootamundra,5,CULLEN Jake,DAHLITZ Chris,632
+cootamundra,5,CULLEN Jake,__exh,2611
+cronulla,1,GIANNAKIS Domna,CONSTANCE Paul,36
+cronulla,1,GIANNAKIS Domna,DYSON Catherine,28
+cronulla,1,GIANNAKIS Domna,IBBOTSON Craig,294
+cronulla,1,GIANNAKIS Domna,MORAN Richard,83
+cronulla,1,GIANNAKIS Domna,SPEAKMAN Mark,43
+cronulla,1,GIANNAKIS Domna,__exh,361
+cronulla,2,MORAN Richard,CONSTANCE Paul,125
+cronulla,2,MORAN Richard,DYSON Catherine,212
+cronulla,2,MORAN Richard,IBBOTSON Craig,144
+cronulla,2,MORAN Richard,SPEAKMAN Mark,114
+cronulla,2,MORAN Richard,__exh,500
+cronulla,3,IBBOTSON Craig,CONSTANCE Paul,215
+cronulla,3,IBBOTSON Craig,DYSON Catherine,183
+cronulla,3,IBBOTSON Craig,SPEAKMAN Mark,1211
+cronulla,3,IBBOTSON Craig,__exh,2026
+cronulla,4,DYSON Catherine,CONSTANCE Paul,2419
+cronulla,4,DYSON Catherine,SPEAKMAN Mark,534
+cronulla,4,DYSON Catherine,__exh,2055
+davidson,1,WILLS Andrew,ATKINSON Caroline,200
+davidson,1,WILLS Andrew,CROSS Matt,163
+davidson,1,WILLS Andrew,EDELSTEIN Karyn,164
+davidson,1,WILLS Andrew,KITSON Janine,281
+davidson,1,WILLS Andrew,__exh,589
+davidson,2,ATKINSON Caroline,CROSS Matt,397
+davidson,2,ATKINSON Caroline,EDELSTEIN Karyn,2476
+davidson,2,ATKINSON Caroline,KITSON Janine,1375
+davidson,2,ATKINSON Caroline,__exh,2012
+davidson,3,KITSON Janine,CROSS Matt,1396
+davidson,3,KITSON Janine,EDELSTEIN Karyn,3836
+davidson,3,KITSON Janine,__exh,2504
+drummoyne,1,CONAGHAN Patrick,DI PASQUA Stephanie,315
+drummoyne,1,CONAGHAN Patrick,JAGO Charles,313
+drummoyne,1,CONAGHAN Patrick,LITTLE Julia,364
+drummoyne,1,CONAGHAN Patrick,__exh,790
+drummoyne,2,JAGO Charles,DI PASQUA Stephanie,467
+drummoyne,2,JAGO Charles,LITTLE Julia,3477
+drummoyne,2,JAGO Charles,__exh,1518
+dubbo,1,NUGENT Anthony,BLACK Josh,74
+dubbo,1,NUGENT Anthony,LITTLEJOHN Mark,113
+dubbo,1,NUGENT Anthony,RICHARDSON Kate,97
+dubbo,1,NUGENT Anthony,SAUNDERS Dugald,68
+dubbo,1,NUGENT Anthony,THOMAS Robyn,66
+dubbo,1,NUGENT Anthony,__exh,367
+dubbo,2,THOMAS Robyn,BLACK Josh,698
+dubbo,2,THOMAS Robyn,LITTLEJOHN Mark,244
+dubbo,2,THOMAS Robyn,RICHARDSON Kate,118
+dubbo,2,THOMAS Robyn,SAUNDERS Dugald,134
+dubbo,2,THOMAS Robyn,__exh,633
+dubbo,3,LITTLEJOHN Mark,BLACK Josh,408
+dubbo,3,LITTLEJOHN Mark,RICHARDSON Kate,581
+dubbo,3,LITTLEJOHN Mark,SAUNDERS Dugald,310
+dubbo,3,LITTLEJOHN Mark,__exh,1255
+dubbo,4,RICHARDSON Kate,BLACK Josh,1476
+dubbo,4,RICHARDSON Kate,SAUNDERS Dugald,2060
+dubbo,4,RICHARDSON Kate,__exh,4295
+east-hills,1,BROGAN Chris,HANNA Natalie,347
+east-hills,1,BROGAN Chris,LINDSAY Wendy,531
+east-hills,1,BROGAN Chris,WILKINSON Kylie,435
+east-hills,1,BROGAN Chris,__exh,1366
+east-hills,2,HANNA Natalie,LINDSAY Wendy,486
+east-hills,2,HANNA Natalie,WILKINSON Kylie,2102
+east-hills,2,HANNA Natalie,__exh,1337
+epping,1,MOLLOY Bradley,BRADLEY Phil,122
+epping,1,MOLLOY Bradley,MASCARENHAS Alan,135
+epping,1,MOLLOY Bradley,PERROTTET Dominic,110
+epping,1,MOLLOY Bradley,TERCEIRO Carmen,124
+epping,1,MOLLOY Bradley,WATERSON Victor,111
+epping,1,MOLLOY Bradley,__exh,443
+epping,2,TERCEIRO Carmen,BRADLEY Phil,325
+epping,2,TERCEIRO Carmen,MASCARENHAS Alan,163
+epping,2,TERCEIRO Carmen,PERROTTET Dominic,103
+epping,2,TERCEIRO Carmen,WATERSON Victor,117
+epping,2,TERCEIRO Carmen,__exh,507
+epping,3,WATERSON Victor,BRADLEY Phil,219
+epping,3,WATERSON Victor,MASCARENHAS Alan,240
+epping,3,WATERSON Victor,PERROTTET Dominic,432
+epping,3,WATERSON Victor,__exh,659
+epping,4,BRADLEY Phil,MASCARENHAS Alan,3876
+epping,4,BRADLEY Phil,PERROTTET Dominic,564
+epping,4,BRADLEY Phil,__exh,1715
+fairfield,1,LEGGATT Robyn,BALL Monika,78
+fairfield,1,LEGGATT Robyn,LOVERO Severino,42
+fairfield,1,LEGGATT Robyn,ODESH Hikmat,22
+fairfield,1,LEGGATT Robyn,PILLAI Aaryen,90
+fairfield,1,LEGGATT Robyn,POTKONYAK Jacob,58
+fairfield,1,LEGGATT Robyn,SALIBA David,104
+fairfield,1,LEGGATT Robyn,__exh,623
+fairfield,2,POTKONYAK Jacob,BALL Monika,256
+fairfield,2,POTKONYAK Jacob,LOVERO Severino,96
+fairfield,2,POTKONYAK Jacob,ODESH Hikmat,77
+fairfield,2,POTKONYAK Jacob,PILLAI Aaryen,102
+fairfield,2,POTKONYAK Jacob,SALIBA David,292
+fairfield,2,POTKONYAK Jacob,__exh,1076
+fairfield,3,BALL Monika,LOVERO Severino,140
+fairfield,3,BALL Monika,ODESH Hikmat,94
+fairfield,3,BALL Monika,PILLAI Aaryen,199
+fairfield,3,BALL Monika,SALIBA David,1028
+fairfield,3,BALL Monika,__exh,1488
+fairfield,4,LOVERO Severino,ODESH Hikmat,896
+fairfield,4,LOVERO Severino,PILLAI Aaryen,108
+fairfield,4,LOVERO Severino,SALIBA David,346
+fairfield,4,LOVERO Severino,__exh,2147
+fairfield,5,ODESH Hikmat,PILLAI Aaryen,1240
+fairfield,5,ODESH Hikmat,SALIBA David,1682
+fairfield,5,ODESH Hikmat,__exh,3058
+gosford,1,SOETENS Ineka,BELLAMY Lisa,93
+gosford,1,SOETENS Ineka,BOCKING Dee,45
+gosford,1,SOETENS Ineka,FREEMAN Larry,61
+gosford,1,SOETENS Ineka,MCCALLUM Emily,101
+gosford,1,SOETENS Ineka,TESCH Liesl,103
+gosford,1,SOETENS Ineka,VAN HAREN Hilary,83
+gosford,1,SOETENS Ineka,__exh,320
+gosford,2,MCCALLUM Emily,BELLAMY Lisa,161
+gosford,2,MCCALLUM Emily,BOCKING Dee,64
+gosford,2,MCCALLUM Emily,FREEMAN Larry,156
+gosford,2,MCCALLUM Emily,TESCH Liesl,158
+gosford,2,MCCALLUM Emily,VAN HAREN Hilary,243
+gosford,2,MCCALLUM Emily,__exh,655
+gosford,3,BELLAMY Lisa,BOCKING Dee,164
+gosford,3,BELLAMY Lisa,FREEMAN Larry,267
+gosford,3,BELLAMY Lisa,TESCH Liesl,286
+gosford,3,BELLAMY Lisa,VAN HAREN Hilary,261
+gosford,3,BELLAMY Lisa,__exh,944
+gosford,4,FREEMAN Larry,BOCKING Dee,590
+gosford,4,FREEMAN Larry,TESCH Liesl,448
+gosford,4,FREEMAN Larry,VAN HAREN Hilary,289
+gosford,4,FREEMAN Larry,__exh,1228
+gosford,5,VAN HAREN Hilary,BOCKING Dee,620
+gosford,5,VAN HAREN Hilary,TESCH Liesl,3325
+gosford,5,VAN HAREN Hilary,__exh,1484
+goulburn,1,LOGAN Margaret,OLSEN Gregory John,232
+goulburn,1,LOGAN Margaret,PILBROW Michael,237
+goulburn,1,LOGAN Margaret,TUCKERMAN Wendy,152
+goulburn,1,LOGAN Margaret,WOOD Andrew,233
+goulburn,1,LOGAN Margaret,__exh,678
+goulburn,2,OLSEN Gregory John,PILBROW Michael,2244
+goulburn,2,OLSEN Gregory John,TUCKERMAN Wendy,234
+goulburn,2,OLSEN Gregory John,WOOD Andrew,338
+goulburn,2,OLSEN Gregory John,__exh,1003
+goulburn,3,WOOD Andrew,PILBROW Michael,1506
+goulburn,3,WOOD Andrew,TUCKERMAN Wendy,2062
+goulburn,3,WOOD Andrew,__exh,3894
+granville,1,LAXMANALAL Rohan,CASTLE Janet,247
+granville,1,LAXMANALAL Rohan,FINN Julia,204
+granville,1,LAXMANALAL Rohan,HADCHITI John,62
+granville,1,LAXMANALAL Rohan,MASUM Anm,81
+granville,1,LAXMANALAL Rohan,SAAD Charbel,81
+granville,1,LAXMANALAL Rohan,__exh,629
+granville,2,CASTLE Janet,FINN Julia,1492
+granville,2,CASTLE Janet,HADCHITI John,65
+granville,2,CASTLE Janet,MASUM Anm,99
+granville,2,CASTLE Janet,SAAD Charbel,299
+granville,2,CASTLE Janet,__exh,1047
+granville,3,HADCHITI John,FINN Julia,278
+granville,3,HADCHITI John,MASUM Anm,1305
+granville,3,HADCHITI John,SAAD Charbel,478
+granville,3,HADCHITI John,__exh,1858
+granville,4,SAAD Charbel,FINN Julia,1276
+granville,4,SAAD Charbel,MASUM Anm,872
+granville,4,SAAD Charbel,__exh,2617
+hawkesbury,1,CARREY Elissa,DOGRAMACI Eddie,86
+hawkesbury,1,CARREY Elissa,KOTLASH Amanda,73
+hawkesbury,1,CARREY Elissa,MAGUIRE Angela,50
+hawkesbury,1,CARREY Elissa,PETTITT Tony,38
+hawkesbury,1,CARREY Elissa,POPOVSKI Susane,70
+hawkesbury,1,CARREY Elissa,PRESTON Robyn,59
+hawkesbury,1,CARREY Elissa,WHEELER Danielle,120
+hawkesbury,1,CARREY Elissa,__exh,629
+hawkesbury,2,PETTITT Tony,DOGRAMACI Eddie,190
+hawkesbury,2,PETTITT Tony,KOTLASH Amanda,63
+hawkesbury,2,PETTITT Tony,MAGUIRE Angela,138
+hawkesbury,2,PETTITT Tony,POPOVSKI Susane,305
+hawkesbury,2,PETTITT Tony,PRESTON Robyn,150
+hawkesbury,2,PETTITT Tony,WHEELER Danielle,45
+hawkesbury,2,PETTITT Tony,__exh,633
+hawkesbury,3,DOGRAMACI Eddie,KOTLASH Amanda,136
+hawkesbury,3,DOGRAMACI Eddie,MAGUIRE Angela,162
+hawkesbury,3,DOGRAMACI Eddie,POPOVSKI Susane,204
+hawkesbury,3,DOGRAMACI Eddie,PRESTON Robyn,230
+hawkesbury,3,DOGRAMACI Eddie,WHEELER Danielle,110
+hawkesbury,3,DOGRAMACI Eddie,__exh,1459
+hawkesbury,4,MAGUIRE Angela,KOTLASH Amanda,339
+hawkesbury,4,MAGUIRE Angela,POPOVSKI Susane,292
+hawkesbury,4,MAGUIRE Angela,PRESTON Robyn,253
+hawkesbury,4,MAGUIRE Angela,WHEELER Danielle,336
+hawkesbury,4,MAGUIRE Angela,__exh,1405
+hawkesbury,5,WHEELER Danielle,KOTLASH Amanda,2107
+hawkesbury,5,WHEELER Danielle,POPOVSKI Susane,240
+hawkesbury,5,WHEELER Danielle,PRESTON Robyn,340
+hawkesbury,5,WHEELER Danielle,__exh,1901
+hawkesbury,6,POPOVSKI Susane,KOTLASH Amanda,1210
+hawkesbury,6,POPOVSKI Susane,PRESTON Robyn,1689
+hawkesbury,6,POPOVSKI Susane,__exh,3688
+heathcote,1,BRAGG Matthew,AMBROSE Sean,179
+heathcote,1,BRAGG Matthew,EVANS Lee,132
+heathcote,1,BRAGG Matthew,PERKETT Arielle,144
+heathcote,1,BRAGG Matthew,RIACH Cooper,146
+heathcote,1,BRAGG Matthew,STUART Maryanne,167
+heathcote,1,BRAGG Matthew,__exh,601
+heathcote,2,PERKETT Arielle,AMBROSE Sean,188
+heathcote,2,PERKETT Arielle,EVANS Lee,90
+heathcote,2,PERKETT Arielle,RIACH Cooper,361
+heathcote,2,PERKETT Arielle,STUART Maryanne,294
+heathcote,2,PERKETT Arielle,__exh,645
+heathcote,3,AMBROSE Sean,EVANS Lee,503
+heathcote,3,AMBROSE Sean,RIACH Cooper,261
+heathcote,3,AMBROSE Sean,STUART Maryanne,495
+heathcote,3,AMBROSE Sean,__exh,1034
+heathcote,4,RIACH Cooper,EVANS Lee,561
+heathcote,4,RIACH Cooper,STUART Maryanne,4793
+heathcote,4,RIACH Cooper,__exh,1985
+heffron,1,EVANS Rachel,DEVINE Francis,36
+heffron,1,EVANS Rachel,GODFREY Ann,33
+heffron,1,EVANS Rachel,HOENIG Ron,75
+heffron,1,EVANS Rachel,KILHAM Sarina,58
+heffron,1,EVANS Rachel,PAULL Linda,156
+heffron,1,EVANS Rachel,VEITCH Philipa,235
+heffron,1,EVANS Rachel,__exh,285
+heffron,2,GODFREY Ann,DEVINE Francis,162
+heffron,2,GODFREY Ann,HOENIG Ron,125
+heffron,2,GODFREY Ann,KILHAM Sarina,78
+heffron,2,GODFREY Ann,PAULL Linda,113
+heffron,2,GODFREY Ann,VEITCH Philipa,89
+heffron,2,GODFREY Ann,__exh,355
+heffron,3,PAULL Linda,DEVINE Francis,208
+heffron,3,PAULL Linda,HOENIG Ron,186
+heffron,3,PAULL Linda,KILHAM Sarina,193
+heffron,3,PAULL Linda,VEITCH Philipa,358
+heffron,3,PAULL Linda,__exh,576
+heffron,4,KILHAM Sarina,DEVINE Francis,247
+heffron,4,KILHAM Sarina,HOENIG Ron,345
+heffron,4,KILHAM Sarina,VEITCH Philipa,623
+heffron,4,KILHAM Sarina,__exh,652
+heffron,5,VEITCH Philipa,DEVINE Francis,597
+heffron,5,VEITCH Philipa,HOENIG Ron,6568
+heffron,5,VEITCH Philipa,__exh,2699
+holsworthy,1,SWINBOURN Deborah,AYYAD Tina,259
+holsworthy,1,SWINBOURN Deborah,INGARFILL James,280
+holsworthy,1,SWINBOURN Deborah,KERLE Chris,207
+holsworthy,1,SWINBOURN Deborah,MARONEY Mick,310
+holsworthy,1,SWINBOURN Deborah,__exh,1118
+holsworthy,2,KERLE Chris,AYYAD Tina,275
+holsworthy,2,KERLE Chris,INGARFILL James,238
+holsworthy,2,KERLE Chris,MARONEY Mick,1426
+holsworthy,2,KERLE Chris,__exh,987
+holsworthy,3,INGARFILL James,AYYAD Tina,1376
+holsworthy,3,INGARFILL James,MARONEY Mick,1008
+holsworthy,3,INGARFILL James,__exh,2299
+hornsby,1,DIGNAM Adrian,BUSCH Steve,54
+hornsby,1,DIGNAM Adrian,CASWELL Benjamin,121
+hornsby,1,DIGNAM Adrian,GRIMSHAW Jeffrey,77
+hornsby,1,DIGNAM Adrian,HOILE Melissa,40
+hornsby,1,DIGNAM Adrian,KEAN Matt,45
+hornsby,1,DIGNAM Adrian,SALITRA Tania,34
+hornsby,1,DIGNAM Adrian,THOMAS Justin,17
+hornsby,1,DIGNAM Adrian,__exh,273
+hornsby,2,THOMAS Justin,BUSCH Steve,46
+hornsby,2,THOMAS Justin,CASWELL Benjamin,111
+hornsby,2,THOMAS Justin,GRIMSHAW Jeffrey,19
+hornsby,2,THOMAS Justin,HOILE Melissa,85
+hornsby,2,THOMAS Justin,KEAN Matt,61
+hornsby,2,THOMAS Justin,SALITRA Tania,184
+hornsby,2,THOMAS Justin,__exh,429
+hornsby,3,CASWELL Benjamin,BUSCH Steve,144
+hornsby,3,CASWELL Benjamin,GRIMSHAW Jeffrey,79
+hornsby,3,CASWELL Benjamin,HOILE Melissa,298
+hornsby,3,CASWELL Benjamin,KEAN Matt,217
+hornsby,3,CASWELL Benjamin,SALITRA Tania,288
+hornsby,3,CASWELL Benjamin,__exh,763
+hornsby,4,GRIMSHAW Jeffrey,BUSCH Steve,671
+hornsby,4,GRIMSHAW Jeffrey,HOILE Melissa,99
+hornsby,4,GRIMSHAW Jeffrey,KEAN Matt,421
+hornsby,4,GRIMSHAW Jeffrey,SALITRA Tania,112
+hornsby,4,GRIMSHAW Jeffrey,__exh,997
+hornsby,5,BUSCH Steve,HOILE Melissa,561
+hornsby,5,BUSCH Steve,KEAN Matt,1155
+hornsby,5,BUSCH Steve,SALITRA Tania,320
+hornsby,5,BUSCH Steve,__exh,3177
+hornsby,6,SALITRA Tania,HOILE Melissa,4662
+hornsby,6,SALITRA Tania,KEAN Matt,1156
+hornsby,6,SALITRA Tania,__exh,2858
+keira,1,ANTHONY Andrew,DOCKER Kit,446
+keira,1,ANTHONY Andrew,PARK Ryan,527
+keira,1,ANTHONY Andrew,SHIPP Noah,597
+keira,1,ANTHONY Andrew,__exh,1297
+keira,2,DOCKER Kit,PARK Ryan,5127
+keira,2,DOCKER Kit,SHIPP Noah,538
+keira,2,DOCKER Kit,__exh,2078
+kellyville,1,AKKARI Ingrid,BOYD Heather,209
+kellyville,1,AKKARI Ingrid,GHAYYEM Thelma,295
+kellyville,1,AKKARI Ingrid,KARKI Alex,164
+kellyville,1,AKKARI Ingrid,WILLIAMS Ray,137
+kellyville,1,AKKARI Ingrid,__exh,563
+kellyville,2,BOYD Heather,GHAYYEM Thelma,294
+kellyville,2,BOYD Heather,KARKI Alex,389
+kellyville,2,BOYD Heather,WILLIAMS Ray,356
+kellyville,2,BOYD Heather,__exh,739
+kellyville,3,GHAYYEM Thelma,KARKI Alex,2529
+kellyville,3,GHAYYEM Thelma,WILLIAMS Ray,739
+kellyville,3,GHAYYEM Thelma,__exh,1556
+kiama,1,GILL John,GIBBONS Melanie,219
+kiama,1,GILL John,GRAY Tonia,298
+kiama,1,GILL John,McINERNEY Katelin,195
+kiama,1,GILL John,WARD Gareth,242
+kiama,1,GILL John,__exh,957
+kiama,2,GRAY Tonia,GIBBONS Melanie,370
+kiama,2,GRAY Tonia,McINERNEY Katelin,3258
+kiama,2,GRAY Tonia,WARD Gareth,612
+kiama,2,GRAY Tonia,__exh,1891
+kiama,3,GIBBONS Melanie,McINERNEY Katelin,866
+kiama,3,GIBBONS Melanie,WARD Gareth,1848
+kiama,3,GIBBONS Melanie,__exh,4176
+kogarah,1,STOLZ Troy,CHUNG Craig,643
+kogarah,1,STOLZ Troy,MINNS Chris,306
+kogarah,1,STOLZ Troy,YUEN Tracy,355
+kogarah,1,STOLZ Troy,__exh,882
+kogarah,2,YUEN Tracy,CHUNG Craig,500
+kogarah,2,YUEN Tracy,MINNS Chris,2171
+kogarah,2,YUEN Tracy,__exh,1195
+lake-macquarie,1,GORE-ESCALANTE Felipe,BEER Joshua,33
+lake-macquarie,1,GORE-ESCALANTE Felipe,GRIERSON Kim,90
+lake-macquarie,1,GORE-ESCALANTE Felipe,LESAGE Jason,110
+lake-macquarie,1,GORE-ESCALANTE Felipe,PIPER Greg,130
+lake-macquarie,1,GORE-ESCALANTE Felipe,RYAN Steve,41
+lake-macquarie,1,GORE-ESCALANTE Felipe,__exh,357
+lake-macquarie,2,GRIERSON Kim,BEER Joshua,65
+lake-macquarie,2,GRIERSON Kim,LESAGE Jason,104
+lake-macquarie,2,GRIERSON Kim,PIPER Greg,695
+lake-macquarie,2,GRIERSON Kim,RYAN Steve,745
+lake-macquarie,2,GRIERSON Kim,__exh,911
+lake-macquarie,3,LESAGE Jason,BEER Joshua,400
+lake-macquarie,3,LESAGE Jason,PIPER Greg,1036
+lake-macquarie,3,LESAGE Jason,RYAN Steve,267
+lake-macquarie,3,LESAGE Jason,__exh,1714
+lake-macquarie,4,BEER Joshua,PIPER Greg,1951
+lake-macquarie,4,BEER Joshua,RYAN Steve,408
+lake-macquarie,4,BEER Joshua,__exh,3230
+lane-cove,1,WISE Ben,ARMSTRONG Heather,150
+lane-cove,1,WISE Ben,DAVIDSON Victoria,239
+lane-cove,1,WISE Ben,PEDERSEN Penelope,103
+lane-cove,1,WISE Ben,ROBERTS Anthony,234
+lane-cove,1,WISE Ben,__exh,463
+lane-cove,2,ARMSTRONG Heather,DAVIDSON Victoria,1538
+lane-cove,2,ARMSTRONG Heather,PEDERSEN Penelope,1580
+lane-cove,2,ARMSTRONG Heather,ROBERTS Anthony,231
+lane-cove,2,ARMSTRONG Heather,__exh,1132
+lane-cove,3,DAVIDSON Victoria,PEDERSEN Penelope,6895
+lane-cove,3,DAVIDSON Victoria,ROBERTS Anthony,2317
+lane-cove,3,DAVIDSON Victoria,__exh,3173
+leppington,1,SAJN Danica,FEDELI Therese,138
+leppington,1,SAJN Danica,HAGARTY Nathan,143
+leppington,1,SAJN Danica,SHUKLA Apurva,206
+leppington,1,SAJN Danica,TAMHANKAR Mandar,143
+leppington,1,SAJN Danica,__exh,624
+leppington,2,SHUKLA Apurva,FEDELI Therese,273
+leppington,2,SHUKLA Apurva,HAGARTY Nathan,1157
+leppington,2,SHUKLA Apurva,TAMHANKAR Mandar,241
+leppington,2,SHUKLA Apurva,__exh,1071
+leppington,3,TAMHANKAR Mandar,FEDELI Therese,1319
+leppington,3,TAMHANKAR Mandar,HAGARTY Nathan,826
+leppington,3,TAMHANKAR Mandar,__exh,2046
+lismore,1,CROSTHWAITE Allen,BERTALLI Matthew,30
+lismore,1,CROSTHWAITE Allen,GUISE Adam,49
+lismore,1,CROSTHWAITE Allen,HONNIBALL Ross,13
+lismore,1,CROSTHWAITE Allen,McKENZIE James,108
+lismore,1,CROSTHWAITE Allen,ROSAYRO Vanessa,23
+lismore,1,CROSTHWAITE Allen,RUBIN Alex,30
+lismore,1,CROSTHWAITE Allen,SAFFIN Janelle,38
+lismore,1,CROSTHWAITE Allen,__exh,220
+lismore,2,HONNIBALL Ross,BERTALLI Matthew,52
+lismore,2,HONNIBALL Ross,GUISE Adam,90
+lismore,2,HONNIBALL Ross,McKENZIE James,65
+lismore,2,HONNIBALL Ross,ROSAYRO Vanessa,94
+lismore,2,HONNIBALL Ross,RUBIN Alex,20
+lismore,2,HONNIBALL Ross,SAFFIN Janelle,60
+lismore,2,HONNIBALL Ross,__exh,298
+lismore,3,McKENZIE James,BERTALLI Matthew,140
+lismore,3,McKENZIE James,GUISE Adam,64
+lismore,3,McKENZIE James,ROSAYRO Vanessa,132
+lismore,3,McKENZIE James,RUBIN Alex,86
+lismore,3,McKENZIE James,SAFFIN Janelle,90
+lismore,3,McKENZIE James,__exh,452
+lismore,4,ROSAYRO Vanessa,BERTALLI Matthew,176
+lismore,4,ROSAYRO Vanessa,GUISE Adam,491
+lismore,4,ROSAYRO Vanessa,RUBIN Alex,58
+lismore,4,ROSAYRO Vanessa,SAFFIN Janelle,203
+lismore,4,ROSAYRO Vanessa,__exh,517
+lismore,5,BERTALLI Matthew,GUISE Adam,243
+lismore,5,BERTALLI Matthew,RUBIN Alex,1029
+lismore,5,BERTALLI Matthew,SAFFIN Janelle,603
+lismore,5,BERTALLI Matthew,__exh,1870
+lismore,6,GUISE Adam,RUBIN Alex,368
+lismore,6,GUISE Adam,SAFFIN Janelle,5554
+lismore,6,GUISE Adam,__exh,1994
+liverpool,1,HARRIS Linda,AMMOUN Richard,62
+liverpool,1,HARRIS Linda,ANDJELKOVIC Milomir (Michael),107
+liverpool,1,HARRIS Linda,CROFT Amy,49
+liverpool,1,HARRIS Linda,HANCOCK Gabriel,80
+liverpool,1,HARRIS Linda,KALIYANDA Charishma,68
+liverpool,1,HARRIS Linda,__exh,616
+liverpool,2,HANCOCK Gabriel,AMMOUN Richard,94
+liverpool,2,HANCOCK Gabriel,ANDJELKOVIC Milomir (Michael),143
+liverpool,2,HANCOCK Gabriel,CROFT Amy,266
+liverpool,2,HANCOCK Gabriel,KALIYANDA Charishma,174
+liverpool,2,HANCOCK Gabriel,__exh,849
+liverpool,3,CROFT Amy,AMMOUN Richard,318
+liverpool,3,CROFT Amy,ANDJELKOVIC Milomir (Michael),300
+liverpool,3,CROFT Amy,KALIYANDA Charishma,1208
+liverpool,3,CROFT Amy,__exh,1528
+liverpool,4,ANDJELKOVIC Milomir (Michael),AMMOUN Richard,900
+liverpool,4,ANDJELKOVIC Milomir (Michael),KALIYANDA Charishma,782
+liverpool,4,ANDJELKOVIC Milomir (Michael),__exh,2376
+londonderry,1,BOWEN David,CAR Prue,156
+londonderry,1,BOWEN David,MAURICE David,151
+londonderry,1,BOWEN David,TALAKOLA Snigdha (Samantha),64
+londonderry,1,BOWEN David,TESTER Luke,186
+londonderry,1,BOWEN David,__exh,725
+londonderry,2,MAURICE David,CAR Prue,1221
+londonderry,2,MAURICE David,TALAKOLA Snigdha (Samantha),229
+londonderry,2,MAURICE David,TESTER Luke,182
+londonderry,2,MAURICE David,__exh,1130
+londonderry,3,TESTER Luke,CAR Prue,689
+londonderry,3,TESTER Luke,TALAKOLA Snigdha (Samantha),1346
+londonderry,3,TESTER Luke,__exh,2561
+macquarie-fields,1,CLARK Michael,CHANTHIVONG Anoulack,146
+macquarie-fields,1,CLARK Michael,CHOWDHURY Khairul,87
+macquarie-fields,1,CLARK Michael,LEE Seamus,93
+macquarie-fields,1,CLARK Michael,NOIOSI Gemma,136
+macquarie-fields,1,CLARK Michael,WILSON Donna,272
+macquarie-fields,1,CLARK Michael,__exh,872
+macquarie-fields,2,LEE Seamus,CHANTHIVONG Anoulack,951
+macquarie-fields,2,LEE Seamus,CHOWDHURY Khairul,118
+macquarie-fields,2,LEE Seamus,NOIOSI Gemma,71
+macquarie-fields,2,LEE Seamus,WILSON Donna,399
+macquarie-fields,2,LEE Seamus,__exh,903
+macquarie-fields,3,WILSON Donna,CHANTHIVONG Anoulack,668
+macquarie-fields,3,WILSON Donna,CHOWDHURY Khairul,206
+macquarie-fields,3,WILSON Donna,NOIOSI Gemma,578
+macquarie-fields,3,WILSON Donna,__exh,1565
+macquarie-fields,4,NOIOSI Gemma,CHANTHIVONG Anoulack,614
+macquarie-fields,4,NOIOSI Gemma,CHOWDHURY Khairul,2048
+macquarie-fields,4,NOIOSI Gemma,__exh,2245
+maitland,1,FERGUSON Sam,AITCHISON Jenny,96
+maitland,1,FERGUSON Sam,COOPER Michael,32
+maitland,1,FERGUSON Sam,DRYDEN Daniel,92
+maitland,1,FERGUSON Sam,KNOX Campbell,88
+maitland,1,FERGUSON Sam,LEE Alex,66
+maitland,1,FERGUSON Sam,TURNER Neil,71
+maitland,1,FERGUSON Sam,__exh,416
+maitland,2,LEE Alex,AITCHISON Jenny,152
+maitland,2,LEE Alex,COOPER Michael,101
+maitland,2,LEE Alex,DRYDEN Daniel,116
+maitland,2,LEE Alex,KNOX Campbell,81
+maitland,2,LEE Alex,TURNER Neil,125
+maitland,2,LEE Alex,__exh,691
+maitland,3,DRYDEN Daniel,AITCHISON Jenny,564
+maitland,3,DRYDEN Daniel,COOPER Michael,160
+maitland,3,DRYDEN Daniel,KNOX Campbell,391
+maitland,3,DRYDEN Daniel,TURNER Neil,339
+maitland,3,DRYDEN Daniel,__exh,1660
+maitland,4,KNOX Campbell,AITCHISON Jenny,2230
+maitland,4,KNOX Campbell,COOPER Michael,415
+maitland,4,KNOX Campbell,TURNER Neil,259
+maitland,4,KNOX Campbell,__exh,1381
+maitland,5,TURNER Neil,AITCHISON Jenny,813
+maitland,5,TURNER Neil,COOPER Michael,1559
+maitland,5,TURNER Neil,__exh,2826
+manly,1,PALETTO Emanuele,ALTMAN Phillip,39
+manly,1,PALETTO Emanuele,GRIFFIN James,49
+manly,1,PALETTO Emanuele,HACKMAN Joeline,75
+manly,1,PALETTO Emanuele,LE ROUX Terry,74
+manly,1,PALETTO Emanuele,MASON Bailey,67
+manly,1,PALETTO Emanuele,THATCHER Jasper,39
+manly,1,PALETTO Emanuele,__exh,368
+manly,2,MASON Bailey,ALTMAN Phillip,39
+manly,2,MASON Bailey,GRIFFIN James,86
+manly,2,MASON Bailey,HACKMAN Joeline,176
+manly,2,MASON Bailey,LE ROUX Terry,237
+manly,2,MASON Bailey,THATCHER Jasper,85
+manly,2,MASON Bailey,__exh,506
+manly,3,ALTMAN Phillip,GRIFFIN James,324
+manly,3,ALTMAN Phillip,HACKMAN Joeline,345
+manly,3,ALTMAN Phillip,LE ROUX Terry,56
+manly,3,ALTMAN Phillip,THATCHER Jasper,199
+manly,3,ALTMAN Phillip,__exh,549
+manly,4,LE ROUX Terry,GRIFFIN James,290
+manly,4,LE ROUX Terry,HACKMAN Joeline,2052
+manly,4,LE ROUX Terry,THATCHER Jasper,1153
+manly,4,LE ROUX Terry,__exh,1606
+manly,5,THATCHER Jasper,GRIFFIN James,1028
+manly,5,THATCHER Jasper,HACKMAN Joeline,4014
+manly,5,THATCHER Jasper,__exh,3228
+maroubra,1,ISENHEIM Monique,AGUILAR Roderick,82
+maroubra,1,ISENHEIM Monique,BURST Bill,51
+maroubra,1,ISENHEIM Monique,CHAPPLE Kym,120
+maroubra,1,ISENHEIM Monique,DALEY Michael,111
+maroubra,1,ISENHEIM Monique,WILLIAMSON Holly,92
+maroubra,1,ISENHEIM Monique,__exh,394
+maroubra,2,WILLIAMSON Holly,AGUILAR Roderick,104
+maroubra,2,WILLIAMSON Holly,BURST Bill,98
+maroubra,2,WILLIAMSON Holly,CHAPPLE Kym,289
+maroubra,2,WILLIAMSON Holly,DALEY Michael,178
+maroubra,2,WILLIAMSON Holly,__exh,519
+maroubra,3,AGUILAR Roderick,BURST Bill,470
+maroubra,3,AGUILAR Roderick,CHAPPLE Kym,318
+maroubra,3,AGUILAR Roderick,DALEY Michael,191
+maroubra,3,AGUILAR Roderick,__exh,761
+maroubra,4,CHAPPLE Kym,BURST Bill,430
+maroubra,4,CHAPPLE Kym,DALEY Michael,4121
+maroubra,4,CHAPPLE Kym,__exh,2011
+miranda,1,HUGHES Nick,CAMERON Gaye,389
+miranda,1,HUGHES Nick,EARLE Simon,256
+miranda,1,HUGHES Nick,MOORE Martin,261
+miranda,1,HUGHES Nick,PETINOS Eleni,384
+miranda,1,HUGHES Nick,__exh,1222
+miranda,2,CAMERON Gaye,EARLE Simon,706
+miranda,2,CAMERON Gaye,MOORE Martin,344
+miranda,2,CAMERON Gaye,PETINOS Eleni,659
+miranda,2,CAMERON Gaye,__exh,1392
+miranda,3,MOORE Martin,EARLE Simon,2471
+miranda,3,MOORE Martin,PETINOS Eleni,443
+miranda,3,MOORE Martin,__exh,1533
+monaro,1,HOLGATE James,GOLDIE Jenny,151
+monaro,1,HOLGATE James,OVERALL Nichole,63
+monaro,1,HOLGATE James,PRYOR Chris,93
+monaro,1,HOLGATE James,TANSON Josie,99
+monaro,1,HOLGATE James,THALER Andrew,55
+monaro,1,HOLGATE James,WHAN Steven,111
+monaro,1,HOLGATE James,__exh,415
+monaro,2,TANSON Josie,GOLDIE Jenny,294
+monaro,2,TANSON Josie,OVERALL Nichole,111
+monaro,2,TANSON Josie,PRYOR Chris,272
+monaro,2,TANSON Josie,THALER Andrew,90
+monaro,2,TANSON Josie,WHAN Steven,227
+monaro,2,TANSON Josie,__exh,827
+monaro,3,THALER Andrew,GOLDIE Jenny,117
+monaro,3,THALER Andrew,OVERALL Nichole,205
+monaro,3,THALER Andrew,PRYOR Chris,484
+monaro,3,THALER Andrew,WHAN Steven,239
+monaro,3,THALER Andrew,__exh,955
+monaro,4,PRYOR Chris,GOLDIE Jenny,280
+monaro,4,PRYOR Chris,OVERALL Nichole,966
+monaro,4,PRYOR Chris,WHAN Steven,686
+monaro,4,PRYOR Chris,__exh,1994
+monaro,5,GOLDIE Jenny,OVERALL Nichole,441
+monaro,5,GOLDIE Jenny,WHAN Steven,3093
+monaro,5,GOLDIE Jenny,__exh,1232
+mount-druitt,1,DUDAS Andrew,ATALLA Edmond,564
+mount-druitt,1,DUDAS Andrew,MORSHED Asm,553
+mount-druitt,1,DUDAS Andrew,SUNIL JAYADEVAN Kandathil,363
+mount-druitt,1,DUDAS Andrew,__exh,1913
+mount-druitt,2,MORSHED Asm,ATALLA Edmond,2332
+mount-druitt,2,MORSHED Asm,SUNIL JAYADEVAN Kandathil,602
+mount-druitt,2,MORSHED Asm,__exh,1792
+murray,1,ADAMSON Greg,BETTS Peta,11
+murray,1,ADAMSON Greg,BULJUBASIC Mirsad (Max),2
+murray,1,ADAMSON Greg,CARLE Adrian,9
+murray,1,ADAMSON Greg,DALTON Helen,36
+murray,1,ADAMSON Greg,FARRELL Kevin,5
+murray,1,ADAMSON Greg,GREGORY Desiree,10
+murray,1,ADAMSON Greg,KING Amelia,7
+murray,1,ADAMSON Greg,LANDINI David,31
+murray,1,ADAMSON Greg,__exh,203
+murray,2,FLORANCE Michael,BETTS Peta,19
+murray,2,FLORANCE Michael,BULJUBASIC Mirsad (Max),16
+murray,2,FLORANCE Michael,CARLE Adrian,23
+murray,2,FLORANCE Michael,DALTON Helen,27
+murray,2,FLORANCE Michael,FARRELL Kevin,22
+murray,2,FLORANCE Michael,GREGORY Desiree,17
+murray,2,FLORANCE Michael,KING Amelia,15
+murray,2,FLORANCE Michael,LANDINI David,8
+murray,2,FLORANCE Michael,__exh,257
+murray,3,FARRELL Kevin,BETTS Peta,21
+murray,3,FARRELL Kevin,BULJUBASIC Mirsad (Max),31
+murray,3,FARRELL Kevin,CARLE Adrian,29
+murray,3,FARRELL Kevin,DALTON Helen,59
+murray,3,FARRELL Kevin,GREGORY Desiree,17
+murray,3,FARRELL Kevin,KING Amelia,21
+murray,3,FARRELL Kevin,LANDINI David,5
+murray,3,FARRELL Kevin,__exh,290
+murray,4,KING Amelia,BETTS Peta,30
+murray,4,KING Amelia,BULJUBASIC Mirsad (Max),219
+murray,4,KING Amelia,CARLE Adrian,83
+murray,4,KING Amelia,DALTON Helen,120
+murray,4,KING Amelia,GREGORY Desiree,26
+murray,4,KING Amelia,LANDINI David,13
+murray,4,KING Amelia,__exh,465
+murray,5,LANDINI David,BETTS Peta,77
+murray,5,LANDINI David,BULJUBASIC Mirsad (Max),19
+murray,5,LANDINI David,CARLE Adrian,25
+murray,5,LANDINI David,DALTON Helen,250
+murray,5,LANDINI David,GREGORY Desiree,174
+murray,5,LANDINI David,__exh,719
+murray,6,CARLE Adrian,BETTS Peta,78
+murray,6,CARLE Adrian,BULJUBASIC Mirsad (Max),276
+murray,6,CARLE Adrian,DALTON Helen,188
+murray,6,CARLE Adrian,GREGORY Desiree,214
+murray,6,CARLE Adrian,__exh,1253
+murray,7,GREGORY Desiree,BETTS Peta,289
+murray,7,GREGORY Desiree,BULJUBASIC Mirsad (Max),135
+murray,7,GREGORY Desiree,DALTON Helen,544
+murray,7,GREGORY Desiree,__exh,1859
+murray,8,BULJUBASIC Mirsad (Max),BETTS Peta,536
+murray,8,BULJUBASIC Mirsad (Max),DALTON Helen,1212
+murray,8,BULJUBASIC Mirsad (Max),__exh,3074
+myall-lakes,1,McDONALD-PRITCHARD Maree,BENDALL Jason,130
+myall-lakes,1,McDONALD-PRITCHARD Maree,MANLEY Keys,160
+myall-lakes,1,McDONALD-PRITCHARD Maree,SPENCE Eleanor,63
+myall-lakes,1,McDONALD-PRITCHARD Maree,THOMPSON Tanya,252
+myall-lakes,1,McDONALD-PRITCHARD Maree,VANSTONE Mark,58
+myall-lakes,1,McDONALD-PRITCHARD Maree,__exh,597
+myall-lakes,2,SPENCE Eleanor,BENDALL Jason,452
+myall-lakes,2,SPENCE Eleanor,MANLEY Keys,391
+myall-lakes,2,SPENCE Eleanor,THOMPSON Tanya,131
+myall-lakes,2,SPENCE Eleanor,VANSTONE Mark,887
+myall-lakes,2,SPENCE Eleanor,__exh,1045
+myall-lakes,3,MANLEY Keys,BENDALL Jason,887
+myall-lakes,3,MANLEY Keys,THOMPSON Tanya,631
+myall-lakes,3,MANLEY Keys,VANSTONE Mark,1002
+myall-lakes,3,MANLEY Keys,__exh,2778
+myall-lakes,4,BENDALL Jason,THOMPSON Tanya,2539
+myall-lakes,4,BENDALL Jason,VANSTONE Mark,3324
+myall-lakes,4,BENDALL Jason,__exh,5173
+newcastle,1,LEKA Niko,CLAYDON Tim,70
+newcastle,1,LEKA Niko,CRAKANTHORP Tim,61
+newcastle,1,LEKA Niko,MACKENZIE John,258
+newcastle,1,LEKA Niko,TAYLOR Freya,43
+newcastle,1,LEKA Niko,TRIEBSEES Thomas,20
+newcastle,1,LEKA Niko,__exh,134
+newcastle,2,TAYLOR Freya,CLAYDON Tim,202
+newcastle,2,TAYLOR Freya,CRAKANTHORP Tim,138
+newcastle,2,TAYLOR Freya,MACKENZIE John,192
+newcastle,2,TAYLOR Freya,TRIEBSEES Thomas,185
+newcastle,2,TAYLOR Freya,__exh,521
+newcastle,3,CLAYDON Tim,CRAKANTHORP Tim,712
+newcastle,3,CLAYDON Tim,MACKENZIE John,787
+newcastle,3,CLAYDON Tim,TRIEBSEES Thomas,305
+newcastle,3,CLAYDON Tim,__exh,1510
+newcastle,4,MACKENZIE John,CRAKANTHORP Tim,7433
+newcastle,4,MACKENZIE John,TRIEBSEES Thomas,762
+newcastle,4,MACKENZIE John,__exh,2529
+newtown,1,THOMAS Christopher,DOUSKOU Fiona,241
+newtown,1,THOMAS Christopher,HETHERINGTON David,214
+newtown,1,THOMAS Christopher,LEONG Jenny,323
+newtown,1,THOMAS Christopher,__exh,497
+newtown,2,DOUSKOU Fiona,HETHERINGTON David,1776
+newtown,2,DOUSKOU Fiona,LEONG Jenny,934
+newtown,2,DOUSKOU Fiona,__exh,3896
+north-shore,1,ANTARES Michael,COMMINS Lachlan,169
+north-shore,1,ANTARES Michael,CONWAY Helen,87
+north-shore,1,ANTARES Michael,MULLAN James,27
+north-shore,1,ANTARES Michael,SANTER Godfrey,28
+north-shore,1,ANTARES Michael,WALKER Victoria,25
+north-shore,1,ANTARES Michael,WILSON Felicity,105
+north-shore,1,ANTARES Michael,__exh,349
+north-shore,2,COMMINS Lachlan,CONWAY Helen,130
+north-shore,2,COMMINS Lachlan,MULLAN James,173
+north-shore,2,COMMINS Lachlan,SANTER Godfrey,162
+north-shore,2,COMMINS Lachlan,WALKER Victoria,94
+north-shore,2,COMMINS Lachlan,WILSON Felicity,105
+north-shore,2,COMMINS Lachlan,__exh,406
+north-shore,3,WALKER Victoria,CONWAY Helen,411
+north-shore,3,WALKER Victoria,MULLAN James,125
+north-shore,3,WALKER Victoria,SANTER Godfrey,107
+north-shore,3,WALKER Victoria,WILSON Felicity,131
+north-shore,3,WALKER Victoria,__exh,452
+north-shore,4,MULLAN James,CONWAY Helen,1890
+north-shore,4,MULLAN James,SANTER Godfrey,1794
+north-shore,4,MULLAN James,WILSON Felicity,338
+north-shore,4,MULLAN James,__exh,1608
+north-shore,5,SANTER Godfrey,CONWAY Helen,5284
+north-shore,5,SANTER Godfrey,WILSON Felicity,1053
+north-shore,5,SANTER Godfrey,__exh,3993
+northern-tablelands,1,HAMPTON Gary,CROWE Alan,20
+northern-tablelands,1,HAMPTON Gary,HAMMOND Margaret,3
+northern-tablelands,1,HAMPTON Gary,HAY Michael,12
+northern-tablelands,1,HAMPTON Gary,LANGENBERG Yvonne,58
+northern-tablelands,1,HAMPTON Gary,LEDGER Natasha,9
+northern-tablelands,1,HAMPTON Gary,MARSHALL Adam,74
+northern-tablelands,1,HAMPTON Gary,O'HARA Elizabeth,26
+northern-tablelands,1,HAMPTON Gary,O'LOGHLIN Peter,20
+northern-tablelands,1,HAMPTON Gary,WOOD Darshan (Billy),9
+northern-tablelands,1,HAMPTON Gary,__exh,194
+northern-tablelands,2,LEDGER Natasha,CROWE Alan,15
+northern-tablelands,2,LEDGER Natasha,HAMMOND Margaret,16
+northern-tablelands,2,LEDGER Natasha,HAY Michael,18
+northern-tablelands,2,LEDGER Natasha,LANGENBERG Yvonne,38
+northern-tablelands,2,LEDGER Natasha,MARSHALL Adam,44
+northern-tablelands,2,LEDGER Natasha,O'HARA Elizabeth,37
+northern-tablelands,2,LEDGER Natasha,O'LOGHLIN Peter,14
+northern-tablelands,2,LEDGER Natasha,WOOD Darshan (Billy),83
+northern-tablelands,2,LEDGER Natasha,__exh,240
+northern-tablelands,3,CROWE Alan,HAMMOND Margaret,8
+northern-tablelands,3,CROWE Alan,HAY Michael,28
+northern-tablelands,3,CROWE Alan,LANGENBERG Yvonne,33
+northern-tablelands,3,CROWE Alan,MARSHALL Adam,56
+northern-tablelands,3,CROWE Alan,O'HARA Elizabeth,57
+northern-tablelands,3,CROWE Alan,O'LOGHLIN Peter,131
+northern-tablelands,3,CROWE Alan,WOOD Darshan (Billy),54
+northern-tablelands,3,CROWE Alan,__exh,263
+northern-tablelands,4,HAMMOND Margaret,HAY Michael,218
+northern-tablelands,4,HAMMOND Margaret,LANGENBERG Yvonne,21
+northern-tablelands,4,HAMMOND Margaret,MARSHALL Adam,112
+northern-tablelands,4,HAMMOND Margaret,O'HARA Elizabeth,18
+northern-tablelands,4,HAMMOND Margaret,O'LOGHLIN Peter,25
+northern-tablelands,4,HAMMOND Margaret,WOOD Darshan (Billy),75
+northern-tablelands,4,HAMMOND Margaret,__exh,341
+northern-tablelands,5,WOOD Darshan (Billy),HAY Michael,266
+northern-tablelands,5,WOOD Darshan (Billy),LANGENBERG Yvonne,97
+northern-tablelands,5,WOOD Darshan (Billy),MARSHALL Adam,213
+northern-tablelands,5,WOOD Darshan (Billy),O'HARA Elizabeth,58
+northern-tablelands,5,WOOD Darshan (Billy),O'LOGHLIN Peter,103
+northern-tablelands,5,WOOD Darshan (Billy),__exh,464
+northern-tablelands,6,O'LOGHLIN Peter,HAY Michael,218
+northern-tablelands,6,O'LOGHLIN Peter,LANGENBERG Yvonne,155
+northern-tablelands,6,O'LOGHLIN Peter,MARSHALL Adam,259
+northern-tablelands,6,O'LOGHLIN Peter,O'HARA Elizabeth,225
+northern-tablelands,6,O'LOGHLIN Peter,__exh,584
+northern-tablelands,7,O'HARA Elizabeth,HAY Michael,168
+northern-tablelands,7,O'HARA Elizabeth,LANGENBERG Yvonne,1278
+northern-tablelands,7,O'HARA Elizabeth,MARSHALL Adam,306
+northern-tablelands,7,O'HARA Elizabeth,__exh,1038
+northern-tablelands,8,HAY Michael,LANGENBERG Yvonne,530
+northern-tablelands,8,HAY Michael,MARSHALL Adam,1015
+northern-tablelands,8,HAY Michael,__exh,1622
+oatley,1,HUNT Glenn,AMBIHAIPAHAR Ash,173
+oatley,1,HUNT Glenn,COURE Mark,146
+oatley,1,HUNT Glenn,MORT Natalie,459
+oatley,1,HUNT Glenn,VANDIJK Taylor,135
+oatley,1,HUNT Glenn,__exh,777
+oatley,2,MORT Natalie,AMBIHAIPAHAR Ash,889
+oatley,2,MORT Natalie,COURE Mark,572
+oatley,2,MORT Natalie,VANDIJK Taylor,376
+oatley,2,MORT Natalie,__exh,1299
+oatley,3,VANDIJK Taylor,AMBIHAIPAHAR Ash,2292
+oatley,3,VANDIJK Taylor,COURE Mark,364
+oatley,3,VANDIJK Taylor,__exh,956
+orange,1,BRAMLEY Gillian,BATE George,44
+orange,1,BRAMLEY Gillian,DONATO Philip,33
+orange,1,BRAMLEY Gillian,DUNN Heather,25
+orange,1,BRAMLEY Gillian,HOLT Patricia,19
+orange,1,BRAMLEY Gillian,KELLY Aaron,18
+orange,1,BRAMLEY Gillian,MALLARD David,19
+orange,1,BRAMLEY Gillian,MILETO Tony,8
+orange,1,BRAMLEY Gillian,__exh,188
+orange,2,BATE George,DONATO Philip,91
+orange,2,BATE George,DUNN Heather,26
+orange,2,BATE George,HOLT Patricia,209
+orange,2,BATE George,KELLY Aaron,32
+orange,2,BATE George,MALLARD David,57
+orange,2,BATE George,MILETO Tony,41
+orange,2,BATE George,__exh,373
+orange,3,HOLT Patricia,DONATO Philip,303
+orange,3,HOLT Patricia,DUNN Heather,103
+orange,3,HOLT Patricia,KELLY Aaron,249
+orange,3,HOLT Patricia,MALLARD David,219
+orange,3,HOLT Patricia,MILETO Tony,43
+orange,3,HOLT Patricia,__exh,912
+orange,4,MALLARD David,DONATO Philip,446
+orange,4,MALLARD David,DUNN Heather,967
+orange,4,MALLARD David,KELLY Aaron,115
+orange,4,MALLARD David,MILETO Tony,76
+orange,4,MALLARD David,__exh,840
+orange,5,KELLY Aaron,DONATO Philip,721
+orange,5,KELLY Aaron,DUNN Heather,255
+orange,5,KELLY Aaron,MILETO Tony,356
+orange,5,KELLY Aaron,__exh,1834
+orange,6,DUNN Heather,DONATO Philip,2803
+orange,6,DUNN Heather,MILETO Tony,578
+orange,6,DUNN Heather,__exh,2934
+oxley,1,IRWIN Troy,DRAIN Bianca,24
+oxley,1,IRWIN Troy,FAIRHALL Joshua,283
+oxley,1,IRWIN Troy,KEMP Michael,151
+oxley,1,IRWIN Troy,KING Dominic,45
+oxley,1,IRWIN Troy,MATHEW Megan,52
+oxley,1,IRWIN Troy,VIGORS Gregory,55
+oxley,1,IRWIN Troy,__exh,706
+oxley,2,DRAIN Bianca,FAIRHALL Joshua,113
+oxley,2,DRAIN Bianca,KEMP Michael,74
+oxley,2,DRAIN Bianca,KING Dominic,156
+oxley,2,DRAIN Bianca,MATHEW Megan,224
+oxley,2,DRAIN Bianca,VIGORS Gregory,91
+oxley,2,DRAIN Bianca,__exh,766
+oxley,3,FAIRHALL Joshua,KEMP Michael,574
+oxley,3,FAIRHALL Joshua,KING Dominic,177
+oxley,3,FAIRHALL Joshua,MATHEW Megan,476
+oxley,3,FAIRHALL Joshua,VIGORS Gregory,390
+oxley,3,FAIRHALL Joshua,__exh,1657
+oxley,4,MATHEW Megan,KEMP Michael,752
+oxley,4,MATHEW Megan,KING Dominic,874
+oxley,4,MATHEW Megan,VIGORS Gregory,719
+oxley,4,MATHEW Megan,__exh,3115
+oxley,5,KING Dominic,KEMP Michael,594
+oxley,5,KING Dominic,VIGORS Gregory,4893
+oxley,5,KING Dominic,__exh,3185
+parramatta,1,MOLL David,DAVIS Donna,164
+parramatta,1,MOLL David,HAMMOND Ben,214
+parramatta,1,MOLL David,MULLENS Katie,75
+parramatta,1,MOLL David,SINGH Mritunjay,149
+parramatta,1,MOLL David,__exh,507
+parramatta,2,SINGH Mritunjay,DAVIS Donna,322
+parramatta,2,SINGH Mritunjay,HAMMOND Ben,175
+parramatta,2,SINGH Mritunjay,MULLENS Katie,889
+parramatta,2,SINGH Mritunjay,__exh,1227
+parramatta,3,HAMMOND Ben,DAVIS Donna,3165
+parramatta,3,HAMMOND Ben,MULLENS Katie,539
+parramatta,3,HAMMOND Ben,__exh,1537
+penrith,1,BROWN Geoff,AYRES Stuart,41
+penrith,1,BROWN Geoff,BLAZI Vanessa,74
+penrith,1,BROWN Geoff,McKEOWN Karen,86
+penrith,1,BROWN Geoff,McWILLIAMS Belinda,59
+penrith,1,BROWN Geoff,PATEMAN Timothy,46
+penrith,1,BROWN Geoff,TOUSSI Fatemeh (Minoo),58
+penrith,1,BROWN Geoff,__exh,380
+penrith,2,BLAZI Vanessa,AYRES Stuart,106
+penrith,2,BLAZI Vanessa,McKEOWN Karen,213
+penrith,2,BLAZI Vanessa,McWILLIAMS Belinda,77
+penrith,2,BLAZI Vanessa,PATEMAN Timothy,365
+penrith,2,BLAZI Vanessa,TOUSSI Fatemeh (Minoo),220
+penrith,2,BLAZI Vanessa,__exh,933
+penrith,3,PATEMAN Timothy,AYRES Stuart,214
+penrith,3,PATEMAN Timothy,McKEOWN Karen,424
+penrith,3,PATEMAN Timothy,McWILLIAMS Belinda,281
+penrith,3,PATEMAN Timothy,TOUSSI Fatemeh (Minoo),571
+penrith,3,PATEMAN Timothy,__exh,1388
+penrith,4,TOUSSI Fatemeh (Minoo),AYRES Stuart,373
+penrith,4,TOUSSI Fatemeh (Minoo),McKEOWN Karen,1837
+penrith,4,TOUSSI Fatemeh (Minoo),McWILLIAMS Belinda,180
+penrith,4,TOUSSI Fatemeh (Minoo),__exh,1102
+penrith,5,McWILLIAMS Belinda,AYRES Stuart,1226
+penrith,5,McWILLIAMS Belinda,McKEOWN Karen,839
+penrith,5,McWILLIAMS Belinda,__exh,2654
+pittwater,1,LAW Craig,AMON Roderick (Rory),175
+pittwater,1,LAW Craig,GREEN Hilary,120
+pittwater,1,LAW Craig,QUINN Jeffrey,254
+pittwater,1,LAW Craig,SCRUBY Jacqui,179
+pittwater,1,LAW Craig,__exh,467
+pittwater,2,GREEN Hilary,AMON Roderick (Rory),179
+pittwater,2,GREEN Hilary,QUINN Jeffrey,646
+pittwater,2,GREEN Hilary,SCRUBY Jacqui,1679
+pittwater,2,GREEN Hilary,__exh,1002
+pittwater,3,QUINN Jeffrey,AMON Roderick (Rory),874
+pittwater,3,QUINN Jeffrey,SCRUBY Jacqui,3147
+pittwater,3,QUINN Jeffrey,__exh,1918
+port-macquarie,1,READ Benjamin,COLEMAN Edward,27
+port-macquarie,1,READ Benjamin,MCMAHON Vivian,14
+port-macquarie,1,READ Benjamin,MOGOROVICH Silvia,225
+port-macquarie,1,READ Benjamin,McMULLEN Keith,15
+port-macquarie,1,READ Benjamin,PINSON Peta,74
+port-macquarie,1,READ Benjamin,WATSON Stuart,6
+port-macquarie,1,READ Benjamin,WILLIAMS Leslie,42
+port-macquarie,1,READ Benjamin,__exh,220
+port-macquarie,2,COLEMAN Edward,MCMAHON Vivian,85
+port-macquarie,2,COLEMAN Edward,MOGOROVICH Silvia,74
+port-macquarie,2,COLEMAN Edward,McMULLEN Keith,57
+port-macquarie,2,COLEMAN Edward,PINSON Peta,65
+port-macquarie,2,COLEMAN Edward,WATSON Stuart,99
+port-macquarie,2,COLEMAN Edward,WILLIAMS Leslie,42
+port-macquarie,2,COLEMAN Edward,__exh,414
+port-macquarie,3,MOGOROVICH Silvia,MCMAHON Vivian,260
+port-macquarie,3,MOGOROVICH Silvia,McMULLEN Keith,186
+port-macquarie,3,MOGOROVICH Silvia,PINSON Peta,178
+port-macquarie,3,MOGOROVICH Silvia,WATSON Stuart,130
+port-macquarie,3,MOGOROVICH Silvia,WILLIAMS Leslie,111
+port-macquarie,3,MOGOROVICH Silvia,__exh,663
+port-macquarie,4,MCMAHON Vivian,McMULLEN Keith,266
+port-macquarie,4,MCMAHON Vivian,PINSON Peta,280
+port-macquarie,4,MCMAHON Vivian,WATSON Stuart,384
+port-macquarie,4,MCMAHON Vivian,WILLIAMS Leslie,201
+port-macquarie,4,MCMAHON Vivian,__exh,1440
+port-macquarie,5,WATSON Stuart,McMULLEN Keith,2016
+port-macquarie,5,WATSON Stuart,PINSON Peta,226
+port-macquarie,5,WATSON Stuart,WILLIAMS Leslie,505
+port-macquarie,5,WATSON Stuart,__exh,1345
+port-macquarie,6,McMULLEN Keith,PINSON Peta,1881
+port-macquarie,6,McMULLEN Keith,WILLIAMS Leslie,3427
+port-macquarie,6,McMULLEN Keith,__exh,7497
+port-stephens,1,JELFS Beverley,BUCKMASTER Michelle,83
+port-stephens,1,JELFS Beverley,ERRINGTON Nathan,31
+port-stephens,1,JELFS Beverley,JENSEN Jordan,53
+port-stephens,1,JELFS Beverley,KETAS Angela,36
+port-stephens,1,JELFS Beverley,WASHINGTON Kate,75
+port-stephens,1,JELFS Beverley,WATSON Mark,79
+port-stephens,1,JELFS Beverley,__exh,395
+port-stephens,2,KETAS Angela,BUCKMASTER Michelle,88
+port-stephens,2,KETAS Angela,ERRINGTON Nathan,22
+port-stephens,2,KETAS Angela,JENSEN Jordan,39
+port-stephens,2,KETAS Angela,WASHINGTON Kate,74
+port-stephens,2,KETAS Angela,WATSON Mark,130
+port-stephens,2,KETAS Angela,__exh,452
+port-stephens,3,BUCKMASTER Michelle,ERRINGTON Nathan,83
+port-stephens,3,BUCKMASTER Michelle,JENSEN Jordan,427
+port-stephens,3,BUCKMASTER Michelle,WASHINGTON Kate,212
+port-stephens,3,BUCKMASTER Michelle,WATSON Mark,119
+port-stephens,3,BUCKMASTER Michelle,__exh,899
+port-stephens,4,JENSEN Jordan,ERRINGTON Nathan,144
+port-stephens,4,JENSEN Jordan,WASHINGTON Kate,1617
+port-stephens,4,JENSEN Jordan,WATSON Mark,170
+port-stephens,4,JENSEN Jordan,__exh,1099
+port-stephens,5,WATSON Mark,ERRINGTON Nathan,1649
+port-stephens,5,WATSON Mark,WASHINGTON Kate,842
+port-stephens,5,WATSON Mark,__exh,4727
+prospect,1,WALSH Emily,BIAG Kalvin,121
+prospect,1,WALSH Emily,McDERMOTT Hugh,221
+prospect,1,WALSH Emily,SELVENTHIRAN Sujan,246
+prospect,1,WALSH Emily,SHAFER Peter,222
+prospect,1,WALSH Emily,__exh,965
+prospect,2,SHAFER Peter,BIAG Kalvin,540
+prospect,2,SHAFER Peter,McDERMOTT Hugh,353
+prospect,2,SHAFER Peter,SELVENTHIRAN Sujan,268
+prospect,2,SHAFER Peter,__exh,953
+prospect,3,SELVENTHIRAN Sujan,BIAG Kalvin,573
+prospect,3,SELVENTHIRAN Sujan,McDERMOTT Hugh,2082
+prospect,3,SELVENTHIRAN Sujan,__exh,1469
+riverstone,1,HORAN Tim,BELCASTRO Anthony,161
+riverstone,1,HORAN Tim,KIRBY Warren,127
+riverstone,1,HORAN Tim,KUMAR Mohit,125
+riverstone,1,HORAN Tim,PONNAMBALAM Tabitha,126
+riverstone,1,HORAN Tim,VAIL Rob,135
+riverstone,1,HORAN Tim,__exh,608
+riverstone,2,PONNAMBALAM Tabitha,BELCASTRO Anthony,168
+riverstone,2,PONNAMBALAM Tabitha,KIRBY Warren,380
+riverstone,2,PONNAMBALAM Tabitha,KUMAR Mohit,314
+riverstone,2,PONNAMBALAM Tabitha,VAIL Rob,230
+riverstone,2,PONNAMBALAM Tabitha,__exh,795
+riverstone,3,BELCASTRO Anthony,KIRBY Warren,299
+riverstone,3,BELCASTRO Anthony,KUMAR Mohit,554
+riverstone,3,BELCASTRO Anthony,VAIL Rob,259
+riverstone,3,BELCASTRO Anthony,__exh,1033
+riverstone,4,VAIL Rob,KIRBY Warren,2276
+riverstone,4,VAIL Rob,KUMAR Mohit,688
+riverstone,4,VAIL Rob,__exh,1629
+rockdale,1,MORRIS James,KAMPER Steve,449
+rockdale,1,MORRIS James,RANA Muhammad,665
+rockdale,1,MORRIS James,STRONG Peter,408
+rockdale,1,MORRIS James,__exh,1605
+rockdale,2,STRONG Peter,KAMPER Steve,3126
+rockdale,2,STRONG Peter,RANA Muhammad,479
+rockdale,2,STRONG Peter,__exh,1912
+ryde,1,DEVINE Barry,EDINGTON Sophie,63
+ryde,1,DEVINE Barry,HOWISON Lyndal,99
+ryde,1,DEVINE Barry,JELFS Bradley,385
+ryde,1,DEVINE Barry,LANE Jordan,181
+ryde,1,DEVINE Barry,__exh,596
+ryde,2,JELFS Bradley,EDINGTON Sophie,356
+ryde,2,JELFS Bradley,HOWISON Lyndal,392
+ryde,2,JELFS Bradley,LANE Jordan,323
+ryde,2,JELFS Bradley,__exh,671
+ryde,3,EDINGTON Sophie,HOWISON Lyndal,3882
+ryde,3,EDINGTON Sophie,LANE Jordan,544
+ryde,3,EDINGTON Sophie,__exh,1765
+shellharbour,1,DAVIS Kenneth,BARNES Mikayla,45
+shellharbour,1,DAVIS Kenneth,DIXON Jamie,74
+shellharbour,1,DAVIS Kenneth,GRANATA Rita,38
+shellharbour,1,DAVIS Kenneth,HOMER Chris,286
+shellharbour,1,DAVIS Kenneth,WATSON Anna,141
+shellharbour,1,DAVIS Kenneth,WILLMOTT Mia,92
+shellharbour,1,DAVIS Kenneth,__exh,630
+shellharbour,2,GRANATA Rita,BARNES Mikayla,402
+shellharbour,2,GRANATA Rita,DIXON Jamie,32
+shellharbour,2,GRANATA Rita,HOMER Chris,169
+shellharbour,2,GRANATA Rita,WATSON Anna,90
+shellharbour,2,GRANATA Rita,WILLMOTT Mia,73
+shellharbour,2,GRANATA Rita,__exh,846
+shellharbour,3,WILLMOTT Mia,BARNES Mikayla,116
+shellharbour,3,WILLMOTT Mia,DIXON Jamie,322
+shellharbour,3,WILLMOTT Mia,HOMER Chris,317
+shellharbour,3,WILLMOTT Mia,WATSON Anna,398
+shellharbour,3,WILLMOTT Mia,__exh,1258
+shellharbour,4,DIXON Jamie,BARNES Mikayla,187
+shellharbour,4,DIXON Jamie,HOMER Chris,493
+shellharbour,4,DIXON Jamie,WATSON Anna,1624
+shellharbour,4,DIXON Jamie,__exh,1313
+shellharbour,5,BARNES Mikayla,HOMER Chris,2469
+shellharbour,5,BARNES Mikayla,WATSON Anna,732
+shellharbour,5,BARNES Mikayla,__exh,4555
+south-coast,1,BUFFIER Deanna,BUTLER Liza,69
+south-coast,1,BUFFIER Deanna,DIGIGLIO Nina,108
+south-coast,1,BUFFIER Deanna,FINDLEY Amanda,99
+south-coast,1,BUFFIER Deanna,KORTEN Robert,95
+south-coast,1,BUFFIER Deanna,SIKORA Luke,39
+south-coast,1,BUFFIER Deanna,__exh,354
+south-coast,2,DIGIGLIO Nina,BUTLER Liza,288
+south-coast,2,DIGIGLIO Nina,FINDLEY Amanda,323
+south-coast,2,DIGIGLIO Nina,KORTEN Robert,547
+south-coast,2,DIGIGLIO Nina,SIKORA Luke,272
+south-coast,2,DIGIGLIO Nina,__exh,1962
+south-coast,3,KORTEN Robert,BUTLER Liza,718
+south-coast,3,KORTEN Robert,FINDLEY Amanda,298
+south-coast,3,KORTEN Robert,SIKORA Luke,1058
+south-coast,3,KORTEN Robert,__exh,2564
+south-coast,4,FINDLEY Amanda,BUTLER Liza,4579
+south-coast,4,FINDLEY Amanda,SIKORA Luke,659
+south-coast,4,FINDLEY Amanda,__exh,3503
+strathfield,1,SAIDI Maurie,BALADI John-Paul,74
+strathfield,1,SAIDI Maurie,BUCKLEY Courtney,251
+strathfield,1,SAIDI Maurie,CROCKER Wally,181
+strathfield,1,SAIDI Maurie,LI Jason Yat-Sen,184
+strathfield,1,SAIDI Maurie,__exh,567
+strathfield,2,CROCKER Wally,BALADI John-Paul,430
+strathfield,2,CROCKER Wally,BUCKLEY Courtney,384
+strathfield,2,CROCKER Wally,LI Jason Yat-Sen,252
+strathfield,2,CROCKER Wally,__exh,703
+strathfield,3,BUCKLEY Courtney,BALADI John-Paul,438
+strathfield,3,BUCKLEY Courtney,LI Jason Yat-Sen,3543
+strathfield,3,BUCKLEY Courtney,__exh,1403
+summer-hill,1,SWAN Michael,ANTONIOU Izabella,154
+summer-hill,1,SWAN Michael,CHENG Bowen,299
+summer-hill,1,SWAN Michael,HADDAD Sandra,208
+summer-hill,1,SWAN Michael,HAYLEN Jo,185
+summer-hill,1,SWAN Michael,__exh,487
+summer-hill,2,HADDAD Sandra,ANTONIOU Izabella,775
+summer-hill,2,HADDAD Sandra,CHENG Bowen,176
+summer-hill,2,HADDAD Sandra,HAYLEN Jo,327
+summer-hill,2,HADDAD Sandra,__exh,497
+summer-hill,3,CHENG Bowen,ANTONIOU Izabella,1011
+summer-hill,3,CHENG Bowen,HAYLEN Jo,2164
+summer-hill,3,CHENG Bowen,__exh,5640
+swansea,1,JACKSON Paul,ANDERSON Megan,580
+swansea,1,JACKSON Paul,CATLEY Yasmin,119
+swansea,1,JACKSON Paul,ELLIS Alan,203
+swansea,1,JACKSON Paul,FOORD Heather,31
+swansea,1,JACKSON Paul,__exh,985
+swansea,2,ELLIS Alan,ANDERSON Megan,422
+swansea,2,ELLIS Alan,CATLEY Yasmin,499
+swansea,2,ELLIS Alan,FOORD Heather,712
+swansea,2,ELLIS Alan,__exh,1823
+swansea,3,FOORD Heather,ANDERSON Megan,759
+swansea,3,FOORD Heather,CATLEY Yasmin,2411
+swansea,3,FOORD Heather,__exh,2036
+sydney,1,WHITTON Mark,GREENWICH Alex,156
+sydney,1,WHITTON Mark,STANTON Phyllisse,172
+sydney,1,WHITTON Mark,TITO Skye,87
+sydney,1,WHITTON Mark,WARD Nick,124
+sydney,1,WHITTON Mark,__exh,433
+sydney,2,WARD Nick,GREENWICH Alex,2310
+sydney,2,WARD Nick,STANTON Phyllisse,194
+sydney,2,WARD Nick,TITO Skye,1893
+sydney,2,WARD Nick,__exh,1676
+sydney,3,STANTON Phyllisse,GREENWICH Alex,4109
+sydney,3,STANTON Phyllisse,TITO Skye,1366
+sydney,3,STANTON Phyllisse,__exh,6110
+tamworth,1,DRAIN Colin,ANDERSON Kevin,36
+tamworth,1,DRAIN Colin,BROOKE Ryan,29
+tamworth,1,DRAIN Colin,McCREDIE Rebecca,20
+tamworth,1,DRAIN Colin,McGRATH Kate,18
+tamworth,1,DRAIN Colin,RAYE Sue,19
+tamworth,1,DRAIN Colin,RODDA Mark,32
+tamworth,1,DRAIN Colin,SCANLAN Matthew,30
+tamworth,1,DRAIN Colin,__exh,144
+tamworth,2,McCREDIE Rebecca,ANDERSON Kevin,88
+tamworth,2,McCREDIE Rebecca,BROOKE Ryan,41
+tamworth,2,McCREDIE Rebecca,McGRATH Kate,48
+tamworth,2,McCREDIE Rebecca,RAYE Sue,87
+tamworth,2,McCREDIE Rebecca,RODDA Mark,176
+tamworth,2,McCREDIE Rebecca,SCANLAN Matthew,163
+tamworth,2,McCREDIE Rebecca,__exh,304
+tamworth,3,RAYE Sue,ANDERSON Kevin,162
+tamworth,3,RAYE Sue,BROOKE Ryan,173
+tamworth,3,RAYE Sue,McGRATH Kate,123
+tamworth,3,RAYE Sue,RODDA Mark,159
+tamworth,3,RAYE Sue,SCANLAN Matthew,279
+tamworth,3,RAYE Sue,__exh,764
+tamworth,4,BROOKE Ryan,ANDERSON Kevin,232
+tamworth,4,BROOKE Ryan,McGRATH Kate,559
+tamworth,4,BROOKE Ryan,RODDA Mark,461
+tamworth,4,BROOKE Ryan,SCANLAN Matthew,130
+tamworth,4,BROOKE Ryan,__exh,647
+tamworth,5,SCANLAN Matthew,ANDERSON Kevin,807
+tamworth,5,SCANLAN Matthew,McGRATH Kate,459
+tamworth,5,SCANLAN Matthew,RODDA Mark,923
+tamworth,5,SCANLAN Matthew,__exh,2118
+tamworth,6,McGRATH Kate,ANDERSON Kevin,1340
+tamworth,6,McGRATH Kate,RODDA Mark,3432
+tamworth,6,McGRATH Kate,__exh,3299
+terrigal,1,RIGG Wayne,BOUGHTON Sam,459
+terrigal,1,RIGG Wayne,CROUCH Adam,426
+terrigal,1,RIGG Wayne,__exh,1133
+terrigal,1,RIGG Wayne,da SILVA Imogen,374
+terrigal,2,da SILVA Imogen,BOUGHTON Sam,3138
+terrigal,2,da SILVA Imogen,CROUCH Adam,534
+terrigal,2,da SILVA Imogen,__exh,1570
+the-entrance,1,LOGAN Bentley,BRACKEN Nathan,463
+the-entrance,1,LOGAN Bentley,LAMB Georgia,120
+the-entrance,1,LOGAN Bentley,MEHAN David,47
+the-entrance,1,LOGAN Bentley,PELAREK Fardin,45
+the-entrance,1,LOGAN Bentley,STEPHENSON Ralph,40
+the-entrance,1,LOGAN Bentley,__exh,657
+the-entrance,2,PELAREK Fardin,BRACKEN Nathan,102
+the-entrance,2,PELAREK Fardin,LAMB Georgia,285
+the-entrance,2,PELAREK Fardin,MEHAN David,221
+the-entrance,2,PELAREK Fardin,STEPHENSON Ralph,365
+the-entrance,2,PELAREK Fardin,__exh,968
+the-entrance,3,LAMB Georgia,BRACKEN Nathan,305
+the-entrance,3,LAMB Georgia,MEHAN David,502
+the-entrance,3,LAMB Georgia,STEPHENSON Ralph,448
+the-entrance,3,LAMB Georgia,__exh,1281
+the-entrance,4,STEPHENSON Ralph,BRACKEN Nathan,490
+the-entrance,4,STEPHENSON Ralph,MEHAN David,2859
+the-entrance,4,STEPHENSON Ralph,__exh,1710
+tweed,1,HEARDER Susie,DENHAM Ciara,288
+tweed,1,HEARDER Susie,ELLIOT Craig,100
+tweed,1,HEARDER Susie,McDONALD Ronald,137
+tweed,1,HEARDER Susie,PROVEST Geoff,82
+tweed,1,HEARDER Susie,SELAN Marc,159
+tweed,1,HEARDER Susie,__exh,656
+tweed,2,McDONALD Ronald,DENHAM Ciara,198
+tweed,2,McDONALD Ronald,ELLIOT Craig,159
+tweed,2,McDONALD Ronald,PROVEST Geoff,204
+tweed,2,McDONALD Ronald,SELAN Marc,777
+tweed,2,McDONALD Ronald,__exh,1097
+tweed,3,SELAN Marc,DENHAM Ciara,677
+tweed,3,SELAN Marc,ELLIOT Craig,667
+tweed,3,SELAN Marc,PROVEST Geoff,602
+tweed,3,SELAN Marc,__exh,1524
+tweed,4,DENHAM Ciara,ELLIOT Craig,3774
+tweed,4,DENHAM Ciara,PROVEST Geoff,693
+tweed,4,DENHAM Ciara,__exh,2213
+upper-hunter,1,BLAIR Calum,LAYZELL Dave,40
+upper-hunter,1,BLAIR Calum,LILLICRAP Tom,104
+upper-hunter,1,BLAIR Calum,LONERGAN Tony,74
+upper-hunter,1,BLAIR Calum,McNAMARA Dale,76
+upper-hunter,1,BLAIR Calum,WATSON Peree,54
+upper-hunter,1,BLAIR Calum,WHITE James,52
+upper-hunter,1,BLAIR Calum,__exh,462
+upper-hunter,2,LILLICRAP Tom,LAYZELL Dave,115
+upper-hunter,2,LILLICRAP Tom,LONERGAN Tony,218
+upper-hunter,2,LILLICRAP Tom,McNAMARA Dale,175
+upper-hunter,2,LILLICRAP Tom,WATSON Peree,280
+upper-hunter,2,LILLICRAP Tom,WHITE James,490
+upper-hunter,2,LILLICRAP Tom,__exh,1569
+upper-hunter,3,LONERGAN Tony,LAYZELL Dave,200
+upper-hunter,3,LONERGAN Tony,McNAMARA Dale,205
+upper-hunter,3,LONERGAN Tony,WATSON Peree,1496
+upper-hunter,3,LONERGAN Tony,WHITE James,321
+upper-hunter,3,LONERGAN Tony,__exh,1277
+upper-hunter,4,McNAMARA Dale,LAYZELL Dave,683
+upper-hunter,4,McNAMARA Dale,WATSON Peree,814
+upper-hunter,4,McNAMARA Dale,WHITE James,1095
+upper-hunter,4,McNAMARA Dale,__exh,3054
+upper-hunter,5,WHITE James,LAYZELL Dave,2058
+upper-hunter,5,WHITE James,WATSON Peree,1600
+upper-hunter,5,WHITE James,__exh,4602
+vaucluse,1,CAMERON Edward,DUNNE Kay,73
+vaucluse,1,CAMERON Edward,FREYER Karen,86
+vaucluse,1,CAMERON Edward,KANAK Dominic WY,170
+vaucluse,1,CAMERON Edward,MERTEN Margaret,53
+vaucluse,1,CAMERON Edward,SLOANE Kellie,56
+vaucluse,1,CAMERON Edward,STEVENS Gail,9
+vaucluse,1,CAMERON Edward,__exh,399
+vaucluse,2,DUNNE Kay,FREYER Karen,138
+vaucluse,2,DUNNE Kay,KANAK Dominic WY,204
+vaucluse,2,DUNNE Kay,MERTEN Margaret,72
+vaucluse,2,DUNNE Kay,SLOANE Kellie,53
+vaucluse,2,DUNNE Kay,STEVENS Gail,24
+vaucluse,2,DUNNE Kay,__exh,445
+vaucluse,3,STEVENS Gail,FREYER Karen,71
+vaucluse,3,STEVENS Gail,KANAK Dominic WY,38
+vaucluse,3,STEVENS Gail,MERTEN Margaret,39
+vaucluse,3,STEVENS Gail,SLOANE Kellie,487
+vaucluse,3,STEVENS Gail,__exh,564
+vaucluse,4,KANAK Dominic WY,FREYER Karen,1949
+vaucluse,4,KANAK Dominic WY,MERTEN Margaret,1894
+vaucluse,4,KANAK Dominic WY,SLOANE Kellie,218
+vaucluse,4,KANAK Dominic WY,__exh,1983
+vaucluse,5,MERTEN Margaret,FREYER Karen,4726
+vaucluse,5,MERTEN Margaret,SLOANE Kellie,765
+vaucluse,5,MERTEN Margaret,__exh,3903
+wagga-wagga,1,GENTLES Raymond,BENJAMIN Andrianna,11
+wagga-wagga,1,GENTLES Raymond,FOLEY Keryn,52
+wagga-wagga,1,GENTLES Raymond,GOODLASS Ray,63
+wagga-wagga,1,GENTLES Raymond,HAM Julia,26
+wagga-wagga,1,GENTLES Raymond,McGIRR Joe,60
+wagga-wagga,1,GENTLES Raymond,SMITH Christopher,40
+wagga-wagga,1,GENTLES Raymond,__exh,212
+wagga-wagga,2,GOODLASS Ray,BENJAMIN Andrianna,66
+wagga-wagga,2,GOODLASS Ray,FOLEY Keryn,908
+wagga-wagga,2,GOODLASS Ray,HAM Julia,134
+wagga-wagga,2,GOODLASS Ray,McGIRR Joe,496
+wagga-wagga,2,GOODLASS Ray,SMITH Christopher,262
+wagga-wagga,2,GOODLASS Ray,__exh,961
+wagga-wagga,3,SMITH Christopher,BENJAMIN Andrianna,375
+wagga-wagga,3,SMITH Christopher,FOLEY Keryn,305
+wagga-wagga,3,SMITH Christopher,HAM Julia,454
+wagga-wagga,3,SMITH Christopher,McGIRR Joe,726
+wagga-wagga,3,SMITH Christopher,__exh,2219
+wagga-wagga,4,HAM Julia,BENJAMIN Andrianna,2332
+wagga-wagga,4,HAM Julia,FOLEY Keryn,661
+wagga-wagga,4,HAM Julia,McGIRR Joe,1190
+wagga-wagga,4,HAM Julia,__exh,2957
+wagga-wagga,5,FOLEY Keryn,BENJAMIN Andrianna,796
+wagga-wagga,5,FOLEY Keryn,McGIRR Joe,4180
+wagga-wagga,5,FOLEY Keryn,__exh,3679
+wahroonga,1,MOLLOY Stephen,ABEDINI Parsia,137
+wahroonga,1,MOLLOY Stephen,DASHWOOD Tim,200
+wahroonga,1,MOLLOY Stephen,HAYWOOD Kristyn,291
+wahroonga,1,MOLLOY Stephen,HENSKENS Alister,342
+wahroonga,1,MOLLOY Stephen,__exh,706
+wahroonga,2,HAYWOOD Kristyn,ABEDINI Parsia,1032
+wahroonga,2,HAYWOOD Kristyn,DASHWOOD Tim,1557
+wahroonga,2,HAYWOOD Kristyn,HENSKENS Alister,779
+wahroonga,2,HAYWOOD Kristyn,__exh,1850
+wahroonga,3,DASHWOOD Tim,ABEDINI Parsia,5438
+wahroonga,3,DASHWOOD Tim,HENSKENS Alister,1092
+wahroonga,3,DASHWOOD Tim,__exh,2614
+wakehurst,1,MAWSON Greg,HRNJAK Ethan,119
+wakehurst,1,MAWSON Greg,REGAN Michael,154
+wakehurst,1,MAWSON Greg,SORENSEN Susan,144
+wakehurst,1,MAWSON Greg,WILLIAMS Toby,70
+wakehurst,1,MAWSON Greg,WRIGHT Sue,223
+wakehurst,1,MAWSON Greg,__exh,417
+wakehurst,2,SORENSEN Susan,HRNJAK Ethan,375
+wakehurst,2,SORENSEN Susan,REGAN Michael,202
+wakehurst,2,SORENSEN Susan,WILLIAMS Toby,106
+wakehurst,2,SORENSEN Susan,WRIGHT Sue,127
+wakehurst,2,SORENSEN Susan,__exh,554
+wakehurst,3,HRNJAK Ethan,REGAN Michael,1484
+wakehurst,3,HRNJAK Ethan,WILLIAMS Toby,282
+wakehurst,3,HRNJAK Ethan,WRIGHT Sue,1335
+wakehurst,3,HRNJAK Ethan,__exh,1393
+wakehurst,4,WRIGHT Sue,REGAN Michael,4319
+wakehurst,4,WRIGHT Sue,WILLIAMS Toby,1157
+wakehurst,4,WRIGHT Sue,__exh,3826
+wallsend,1,AKERS Paul,DI GIROLAMO Pietro,54
+wallsend,1,AKERS Paul,HORNERY Sonia,89
+wallsend,1,AKERS Paul,NOLAN Anna,64
+wallsend,1,AKERS Paul,PULL Callum,39
+wallsend,1,AKERS Paul,STARRETT Joshua,75
+wallsend,1,AKERS Paul,WATKINS Rebecca,83
+wallsend,1,AKERS Paul,__exh,313
+wallsend,2,STARRETT Joshua,DI GIROLAMO Pietro,67
+wallsend,2,STARRETT Joshua,HORNERY Sonia,142
+wallsend,2,STARRETT Joshua,NOLAN Anna,54
+wallsend,2,STARRETT Joshua,PULL Callum,89
+wallsend,2,STARRETT Joshua,WATKINS Rebecca,86
+wallsend,2,STARRETT Joshua,__exh,448
+wallsend,3,NOLAN Anna,DI GIROLAMO Pietro,85
+wallsend,3,NOLAN Anna,HORNERY Sonia,169
+wallsend,3,NOLAN Anna,PULL Callum,49
+wallsend,3,NOLAN Anna,WATKINS Rebecca,338
+wallsend,3,NOLAN Anna,__exh,565
+wallsend,4,DI GIROLAMO Pietro,HORNERY Sonia,445
+wallsend,4,DI GIROLAMO Pietro,PULL Callum,962
+wallsend,4,DI GIROLAMO Pietro,WATKINS Rebecca,175
+wallsend,4,DI GIROLAMO Pietro,__exh,2156
+wallsend,5,WATKINS Rebecca,HORNERY Sonia,4071
+wallsend,5,WATKINS Rebecca,PULL Callum,362
+wallsend,5,WATKINS Rebecca,__exh,1794
+willoughby,1,WANT Michael,GRIFFIN Sarah,66
+willoughby,1,WANT Michael,JAMES Tim,194
+willoughby,1,WANT Michael,MCGRATH Edmund,114
+willoughby,1,WANT Michael,PENN Larissa,212
+willoughby,1,WANT Michael,__exh,381
+willoughby,2,MCGRATH Edmund,GRIFFIN Sarah,1421
+willoughby,2,MCGRATH Edmund,JAMES Tim,217
+willoughby,2,MCGRATH Edmund,PENN Larissa,1567
+willoughby,2,MCGRATH Edmund,__exh,1099
+willoughby,3,GRIFFIN Sarah,JAMES Tim,1284
+willoughby,3,GRIFFIN Sarah,PENN Larissa,6434
+willoughby,3,GRIFFIN Sarah,__exh,4346
+winston-hills,1,CHADSZINOW Anthony,ATKINS Damien,359
+winston-hills,1,CHADSZINOW Anthony,PANDEY Sameer,472
+winston-hills,1,CHADSZINOW Anthony,TAYLOR Mark,434
+winston-hills,1,CHADSZINOW Anthony,__exh,997
+winston-hills,2,ATKINS Damien,PANDEY Sameer,2879
+winston-hills,2,ATKINS Damien,TAYLOR Mark,518
+winston-hills,2,ATKINS Damien,__exh,1631
+wollondilly,1,HAAG Ildiko,BRAIDEN Angus,83
+wollondilly,1,HAAG Ildiko,HANNAN Judy,131
+wollondilly,1,HAAG Ildiko,SMITH Nathaniel,31
+wollondilly,1,HAAG Ildiko,THOMPSON Rebecca,68
+wollondilly,1,HAAG Ildiko,WEBSTER Jason,67
+wollondilly,1,HAAG Ildiko,__exh,412
+wollondilly,2,WEBSTER Jason,BRAIDEN Angus,812
+wollondilly,2,WEBSTER Jason,HANNAN Judy,769
+wollondilly,2,WEBSTER Jason,SMITH Nathaniel,115
+wollondilly,2,WEBSTER Jason,THOMPSON Rebecca,72
+wollondilly,2,WEBSTER Jason,__exh,915
+wollondilly,3,THOMPSON Rebecca,BRAIDEN Angus,293
+wollondilly,3,THOMPSON Rebecca,HANNAN Judy,990
+wollondilly,3,THOMPSON Rebecca,SMITH Nathaniel,1440
+wollondilly,3,THOMPSON Rebecca,__exh,3575
+wollondilly,4,BRAIDEN Angus,HANNAN Judy,6112
+wollondilly,4,BRAIDEN Angus,SMITH Nathaniel,1014
+wollondilly,4,BRAIDEN Angus,__exh,5567
+wollongong,1,NELSON Kristen,BLAKEY Cath,669
+wollongong,1,NELSON Kristen,JOHNSON Joel,235
+wollongong,1,NELSON Kristen,SCULLY Paul,328
+wollongong,1,NELSON Kristen,__exh,1115
+wollongong,2,BLAKEY Cath,JOHNSON Joel,716
+wollongong,2,BLAKEY Cath,SCULLY Paul,5911
+wollongong,2,BLAKEY Cath,__exh,2258
+wyong,1,NEWBURY Susan,HARRIS David,252
+wyong,1,NEWBURY Susan,SQUIRES Matt,76
+wyong,1,NEWBURY Susan,STEVENSON Martin,221
+wyong,1,NEWBURY Susan,WILLIAMSON Doug,302
+wyong,1,NEWBURY Susan,__exh,1046
+wyong,2,WILLIAMSON Doug,HARRIS David,1889
+wyong,2,WILLIAMSON Doug,SQUIRES Matt,305
+wyong,2,WILLIAMSON Doug,STEVENSON Martin,258
+wyong,2,WILLIAMSON Doug,__exh,1645
+wyong,3,STEVENSON Martin,HARRIS David,1183
+wyong,3,STEVENSON Martin,SQUIRES Matt,1738
+wyong,3,STEVENSON Martin,__exh,4408

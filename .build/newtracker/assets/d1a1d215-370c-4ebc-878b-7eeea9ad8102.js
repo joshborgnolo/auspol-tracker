@@ -7681,6 +7681,11 @@ function infoTerms(D) {
             the ballots it inherited. The estimate works out how each group split from the way the
             piles split across every seat, then follows both to the final two. It covers only the
             seats where Labor and the Coalition were the final two.</span>
+            <span className="info-p"><b>New South Wales: counted.</b> Its electoral commission
+            publishes every ballot&rsquo;s preferences, so its lines are counts, like the federal ones.
+            NSW voters may stop numbering before they reach Labor or the Coalition, so each share is
+            of the ballots that reached one of them, and the tooltip gives how many reached
+            neither.</span>
             <span className="info-p"><b>How close it gets.</b> Tried on the last {fhWord(FHB.elections)} federal
             elections, where the counted answer is known, it came within {FHB.grn.model.toFixed(1)} points
             of the Greens’ counted flow on average, and within {FHB.oth.model.toFixed(1)} for everyone
@@ -7691,7 +7696,10 @@ function infoTerms(D) {
             {" "}the bars on the chart show that range.
             {FHB.qld != null ? <> In Queensland, where <a href={FHB.qldSource} target="_blank"
             rel="noopener noreferrer">Antony Green tabulated</a> the electoral commission’s own counts
-            in 2020 and 2024, the estimates came within {FHB.qld.toFixed(1)} points.</> : null}</span>
+            in 2020 and 2024, the estimates came within {FHB.qld.toFixed(1)} points.</> : null}
+            {FHB.nsw && FHB.nsw.grn != null ? <> Run on New South Wales&rsquo;s distributions and
+            checked against its counts, they came within {FHB.nsw.grn.toFixed(1)} points for the Greens
+            and {FHB.nsw.oth.toFixed(1)} for everyone else.</> : null}</span>
             <span className="info-p"><b>What’s left out.</b> One Nation’s estimates miss by more
             ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so its bars run
             wider, and its line shows only where it won at least {FHB.onpMinPrim}% of the primary

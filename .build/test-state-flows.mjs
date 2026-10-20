@@ -20,7 +20,7 @@ const MIN_CLASSIC = 40;
 // ---- the estimator's outputs -----------------------------------------------
 const csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8").trim().split(/\r?\n/);
 const head = csv.shift().split(",");
-assert.deepEqual(head, ["jurisdiction", "year", "party", "est_alp_votes", "est_coal_votes", "est_flow_to_alp", "err90", "n_classic"],
+assert.deepEqual(head, ["jurisdiction", "year", "party", "method", "est_alp_votes", "est_coal_votes", "est_flow_to_alp", "err90", "exhausted_share", "n_classic"],
   "state-flows-est.csv keeps its column contract");
 const rows = csv.map((ln) => Object.fromEntries(ln.split(",").map((v, i) => [head[i], v])));
 const bt0 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8"));
@@ -31,7 +31,12 @@ for (const r of rows) {
   assert.ok(f >= 0 && f <= 1, `${r.jurisdiction} ${r.year} ${r.party}: a share (${f})`);
   // below the calibration's smallest seat count the error was never measured:
   // such an estimate carries none (and gen-data never draws it)
-  if (+r.n_classic < Math.min(...bt0.settings.cal_n)) {
+  assert.ok(["model", "counted"].includes(r.method), `${r.jurisdiction} ${r.year}: a method`);
+  if (r.method === "counted") {
+    assert.equal(r.jurisdiction, "nsw", "only NSW's ballot-level data is counted");
+    assert.equal(r.err90, "", "a count carries no error figure");
+    assert.ok(+r.exhausted_share >= 0 && +r.exhausted_share < 1, `${r.year} ${r.party}: an exhausted share`);
+  } else if (+r.n_classic < Math.min(...bt0.settings.cal_n)) {
     assert.equal(r.err90, "", `${r.jurisdiction} ${r.year} ${r.party}: no untested error figure at ${r.n_classic} seats`);
   } else {
     assert.ok(+r.err90 > 0 && +r.err90 < 15, `${r.jurisdiction} ${r.year} ${r.party}: an error figure (${r.err90})`);
@@ -64,7 +69,8 @@ assert.ok(!FH.nt, "the Northern Territory's small counts stay off the chart");
 assert.deepEqual([...FH.vic.years], [2022], "Victoria shows 2022 alone (its 2006-18 counts stopped at a majority)");
 for (const [k, S] of Object.entries(FH)) {
   if (k === "fed") continue;
-  assert.equal(S.estimated, true, `${k} is drawn as an estimate`);
+  assert.equal(S.estimated, k !== "nsw", `${k} is drawn as ${k === "nsw" ? "a count" : "an estimate"}`);
+  assert.equal(!!S.counted, k === "nsw", `${k}: counted only for NSW`);
   assert.deepEqual([...S.years], [...shown[k]].sort((a, b) => a - b), `${k}: the years the rule allows`);
   S.years.forEach((y, i) => {
     const row = rows.find((r) => r.jurisdiction === k && +r.year === y && r.party === "onp");
@@ -75,7 +81,8 @@ for (const [k, S] of Object.entries(FH)) {
     S[b].forEach((v, i) => {
       if (v == null) return;
       assert.ok(v > 0 && v < 100, `${k} ${S.years[i]} ${b}: a percentage`);
-      assert.ok(S[b + "Err"][i] > 0, `${k} ${S.years[i]} ${b}: carries its 90% error`);
+      if (S.counted) assert.ok(S[b + "Exh"][i] != null, `${k} ${S.years[i]} ${b}: carries its exhausted share`);
+      else assert.ok(S[b + "Err"][i] > 0, `${k} ${S.years[i]} ${b}: carries its 90% error`);
       const row = rows.find((r) => r.jurisdiction === k && +r.year === S.years[i] && r.party === b);
       assert.equal(v, Math.round(+row.est_flow_to_alp * 1000) / 10, `${k} ${S.years[i]} ${b}: the estimator's figure`);
     });
@@ -91,7 +98,10 @@ assert.ok(B.qld != null && B.qld <= 2, `Queensland's counted flows within 2 poin
 // ---- the renderer and the Info entry ---------------------------------------
 const ap = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
 assert.ok(ap.includes("\"Estimated from \" + S.srcAs"), "a state's caption calls it an estimate");
-assert.ok(!ap.includes("\"Counted from \" + S.srcAs"), "no state is captioned as counted");
+// a state is captioned "Counted" only in the branch the counted flag guards (NSW)
+assert.ok(ap.includes("const cnt = !!S.counted;") && ap.includes("? \"Counted from \" + S.srcAs"),
+  "only a counted state is captioned as counted");
+assert.equal(ap.split("\"Counted from \" + S.srcAs").length, 2, "one counted caption, in the cnt branch");
 assert.ok(ap.includes("<RdHow term=\"flow-history\""), "the chart's How it's built opens its Info entry");
 const info = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"), "utf8");
 assert.ok(info.includes("{ id: \"flow-history\", term: \"Counted and estimated flows\""), "the Info entry exists");
@@ -104,5 +114,5 @@ const want = `this site&rsquo;s estimate, ${C.seats} seats)</td><td>${C.model.li
 assert.ok(art.includes(want), `the explainer's SA 2026 row quotes the estimator (${want})`);
 assert.ok(art.includes(`at ${C.model.minor.toFixed(1)}%, below independents`), "the minor-party figure in the prose is the estimator's");
 
-console.log(`PASS: state flows – ${Object.keys(shown).length} states as estimates (${Object.entries(shown).map(([k, s]) => k + " " + s.size).join(", ")}), `
+console.log(`PASS: state flows – ${Object.keys(shown).length} states on the chart (${Object.entries(shown).map(([k, s]) => k + " " + s.size).join(", ")}), `
   + `back-test Greens ${B.grn.model} v replay ${B.grn.replay}, others ${B.oth.model} v ${B.oth.replay}, Queensland within ${B.qld}`);
