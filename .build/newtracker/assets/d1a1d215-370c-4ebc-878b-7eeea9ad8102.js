@@ -7687,15 +7687,19 @@ function infoTerms(D) {
             else. Reading each pile as one block misses by {FHB.grn.replay.toFixed(1)} and
             {" "}{FHB.oth.replay.toFixed(1)}. At a state’s size it missed by no more than
             {" "}{fhRange(FHB.err90.grn)} points for the Greens nine times in ten, and
-            {" "}{fhRange(FHB.err90.oth)} for everyone else; the bars on the chart show that range.
+            {" "}{fhRange(FHB.err90.oth)} for everyone else, and {fhRange(FHB.err90.onp)} for One Nation;
+            {" "}the bars on the chart show that range.
             {FHB.qld != null ? <> In Queensland, where <a href={FHB.qldSource} target="_blank"
             rel="noopener noreferrer">Antony Green tabulated</a> the electoral commission’s own counts
             in 2020 and 2024, the estimates came within {FHB.qld.toFixed(1)} points.</> : null}</span>
-            <span className="info-p"><b>What’s left out.</b> One Nation’s state estimates miss by
-            more ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so the chart
-            leaves them out. It also leaves out counts that reached a Labor v Coalition final in
-            fewer than {FHB.minClassic} seats: the Northern Territory’s, and Victoria’s before 2022,
-            which stopped once a candidate passed half the vote.</span>
+            <span className="info-p"><b>What’s left out.</b> One Nation’s estimates miss by more
+            ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so its bars run
+            wider, and its line shows only where it won at least {FHB.onpMinPrim}% of the primary
+            vote. The chart also leaves out counts that reached a Labor v Coalition final in fewer
+            than {FHB.minClassic} seats: the Northern Territory’s; Victoria’s before 2022, which
+            stopped once a candidate passed half the vote; and South Australia’s in 2026, when One
+            Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the
+            explainer’s Labor v One Nation section instead.</span>
           </>) : null}</>) },
         { id: "fp-flows", term: "Labor v One Nation flows", body: (
           <>The preference table behind the Labor v One Nation figure. No election has ever counted

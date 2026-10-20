@@ -5556,8 +5556,9 @@ function RdFlows({ measure }) {
    counts, and each state's ESTIMATES (the two-class pile model,
    .build/estimate-state-flows.py), so a jurisdiction's chip appears the build
    its estimates land. A state carries `estimated` and each point's 90% error
-   (grnErr/othErr), drawn as a bar at its election and quoted in the tooltip;
-   its One Nation line is absent, too uncertain to draw. */
+   (grnErr/onpErr/othErr), drawn as a bar at its election and quoted in the
+   tooltip; its One Nation line appears only where One Nation stood widely
+   enough (gen-data's ONP_MIN_PRIM), so it can break into lone points. */
 const FLOW_PARTIES = [
   { id: "grn", name: "Greens",     color: "var(--grn)" },
   { id: "onp", name: "One Nation", color: "var(--onp)" },
@@ -5589,7 +5590,9 @@ function ExplainedFlowChart({ jur }) {
       const tail = i === runs.length - 1;
       series.push({
         id: p.id + i, label: p.name, color: p.color, points,
-        smooth: false, width: 2.6, endCap: tail,
+        /* a run of one election (a state One Nation sat out either side
+           of) is no line at all, so it keeps its dot */
+        smooth: false, width: 2.6, endCap: tail || points.length === 1,
         endLabel: tail && !narrow ? p.name : null,
       });
     });
@@ -5642,7 +5645,7 @@ function ExplainedFlowChart({ jur }) {
         ))}
       </span>
       <p className="ex-flow-cap">{est
-        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections. One Nation’s state estimates miss by too much to draw."
+        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where it won at least " + (FH.fed && FH.fed.backtest ? FH.fed.backtest.onpMinPrim : 2) + "% of the vote."
         : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
       <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
     </div>

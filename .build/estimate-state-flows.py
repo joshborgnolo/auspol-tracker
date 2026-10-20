@@ -184,6 +184,8 @@ def sa_elections():
             cands = {n: (coal(p["affils"][n]), float(p["fpv"][n])) for n in p["names"]}
             steps = [([n for n, _ in st["neg"]], dict(st["pos"]), 0.0) for st in p["chain"]]
             seats[name] = seat(cands, steps)
+            if p.get("party_ids"):
+                seats[name]["ids"] = dict(p["party_ids"])
         out[("sa", y)] = seats
     return out
 
@@ -443,18 +445,22 @@ def ipf(seed, rowt, colt, iters=100):
     return T
 
 
-def replay(s, model=None, evidx=None):
-    """origin-tagged piles to the final two; model=None is the plain replay."""
-    piles = {cid: {b: fp} for cid, (b, fp) in s["cands"].items()}
+def replay(s, model=None, evidx=None, label=None):
+    """origin-tagged piles to the final two; model=None is the plain replay.
+    `label` (candidate -> origin tag) tracks origins finer than the buckets
+    the model is keyed by – independents apart from the minor parties."""
+    tag = (lambda c: label[c]) if label else (lambda c: s["cands"][c][0])
+    piles = {cid: {tag(cid): fp} for cid, (b, fp) in s["cands"].items()}
     for excl, rec, exh in s["steps"]:
         if len(excl) == 1 and model is not None and s["cands"][excl[0]][0] in model:
             x = excl[0]
             P = s["cands"][x][0]
+            L = tag(x)
             ev = evidx[x]
             pile = piles.pop(x)
-            own = min(s["cands"][x][1], pile.get(P, 0.0))
+            own = min(s["cands"][x][1], pile.get(L, 0.0))
             inh_pile = dict(pile)
-            inh_pile[P] = inh_pile.get(P, 0.0) - own
+            inh_pile[L] = inh_pile.get(L, 0.0) - own
             inh = sum(v for v in inh_pile.values() if v > 0)
             a, d = model[P]
             po, pi = softmax(a, ev["X"]), softmax([u + v for u, v in zip(a, d)], ev["X"])
@@ -463,7 +469,7 @@ def replay(s, model=None, evidx=None):
                 if rid not in piles:
                     continue
                 if own > 0:
-                    piles[rid][P] = piles[rid].get(P, 0.0) + T[0][j]
+                    piles[rid][L] = piles[rid].get(L, 0.0) + T[0][j]
                 if inh > 0:
                     for b, amt in inh_pile.items():
                         if amt > 0:
@@ -499,6 +505,37 @@ def flows(seats, evs=None, model=None, keys=None):
             agg[b][0] += p[a].get(b, 0.0)
             agg[b][1] += p[o].get(b, 0.0)
     return agg
+
+
+def contest_flows(seats, evs, model):
+    """Labor v One Nation finals: the share of each group's ballots ending with
+    Labor rather than One Nation, origins tagged by party id (Liberal and
+    National together, Greens, independents, the other minor parties)."""
+    idx = collections.defaultdict(dict)
+    for e in evs:
+        idx[e["seat"]][e["x"]] = e
+    tags = {"LIB": "lib", "NAT": "lib", "GRN": "grn", "IND": "ind", "ALP": "alp", "ONP": "onp"}
+    agg = collections.defaultdict(lambda: [0.0, 0.0])
+    n = 0
+    for k, s in seats.items():
+        fin = s["final"]
+        if len(fin) != 2 or {s["cands"][c][0] for c in fin} != {"alp", "onp"} or not s.get("ids"):
+            continue
+        n += 1
+        label = {c: tags.get(s["ids"][c], "minor") for c in s["cands"]}
+        for which, piles in (("model", replay(s, model, idx[k], label)), ("replay", replay(s, label=label))):
+            a = next(c for c in fin if s["cands"][c][0] == "alp")
+            o = next(c for c in fin if c != a)
+            for b in ("lib", "grn", "ind", "minor"):
+                agg[(which, b)][0] += piles[a].get(b, 0.0)
+                agg[(which, b)][1] += piles[o].get(b, 0.0)
+    out = {"seats": n}
+    for which in ("model", "replay"):
+        g = {b: agg[(which, b)] for b in ("lib", "grn", "ind", "minor")}
+        g["oth"] = [g["ind"][0] + g["minor"][0], g["ind"][1] + g["minor"][1]]
+        out[which] = {b: round(pct(v), 2) for b, v in g.items() if sum(v)}
+    out["ballots"] = {b: round(sum(agg[("model", b)])) for b in ("lib", "grn", "ind", "minor")}
+    return out
 
 
 def pct(v):
@@ -634,6 +671,12 @@ def main():
             qld_check[str(y)] = {b: {"counted": v, "model": round(pct(est[b]), 2),
                                      "replay": round(pct(flows(seats)[b]), 2)} for b, v in QLD_GREEN[y].items()}
 
+    # SA 2026's 25 Labor v One Nation finals: the contest the site's Labor v
+    # One Nation table rests on (quoted in the explainer beside Bonham's)
+    contests = {}
+    if ("sa", 2026) in states:
+        contests["sa-2026-alp-onp"] = contest_flows(states[("sa", 2026)], evs[("sa", 2026)], params[("sa", 2026)])
+
     with open(OUT_CSV, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["jurisdiction", "year", "party", "est_alp_votes", "est_coal_votes",
                                           "est_flow_to_alp", "err90", "n_classic"])
@@ -644,7 +687,7 @@ def main():
                                 "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in FED_YEARS],
                                 "cal_n": list(CAL_N), "cal_reps": CAL_REPS},
                    "federal": federal, "calibration": table, "calibration_rows": cal_rows,
-                   "qld_check": qld_check,
+                   "qld_check": qld_check, "contests": contests,
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},
                   f, indent=1)
         f.write("\n")
@@ -652,6 +695,8 @@ def main():
     for y, d in federal.items():
         print(f"  federal {y}: " + "  ".join(f"{b} counted {v['counted']:.1f} model {v['model'] - v['counted']:+.2f} "
                                              f"replay {v['replay'] - v['counted']:+.2f}" for b, v in d.items()))
+    for k, d in contests.items():
+        print(f"  {k} ({d['seats']} seats) to Labor: " + "  ".join(f"{b} {v:.1f}" for b, v in d["model"].items()))
     for y, d in qld_check.items():
         print(f"  qld {y} vs Green: " + "  ".join(f"{b} model {v['model'] - v['counted']:+.2f} "
                                                    f"replay {v['replay'] - v['counted']:+.2f}" for b, v in d.items()))

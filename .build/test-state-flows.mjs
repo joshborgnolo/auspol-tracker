@@ -3,8 +3,8 @@
    two-class pile model's ESTIMATES (data/state-flows-est.csv, written by
    .build/estimate-state-flows.py), never the parsers' blended replay; only
    elections whose counts reached a Labor v Coalition final in at least 40
-   seats, and only the Greens and others lines, reach the chart, each point
-   with its 90% error; the federal back-test that justifies them rides
+   seats reach the chart, One Nation's line only where it won 2% of the
+   primary vote, each point with its 90% error; the federal back-test that justifies them rides
    flowHistory.fed.backtest for the Info entry, and must keep showing the
    model beating the replay it replaced.
    Runs after the build in npm test's chain (the data asset only reflects the
@@ -49,6 +49,9 @@ sandbox, { filename: "9f09dca2.js" });
 // (the sandbox's arrays carry its own realm's prototype: spread before a
 // strict deep comparison)
 const FH = sandbox.window.AUSPOL.flowHistory;
+const prim = {};
+fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8").trim().split(/\r?\n/).slice(1)
+  .forEach((ln) => { const c = ln.split(","); if (c[2] === "onp") prim[c[0] + c[1]] = +c[4]; });
 const shown = {};
 for (const r of rows) {
   if (+r.n_classic >= MIN_CLASSIC && ["grn", "oth"].includes(r.party) && r.est_flow_to_alp !== "") {
@@ -63,8 +66,12 @@ for (const [k, S] of Object.entries(FH)) {
   if (k === "fed") continue;
   assert.equal(S.estimated, true, `${k} is drawn as an estimate`);
   assert.deepEqual([...S.years], [...shown[k]].sort((a, b) => a - b), `${k}: the years the rule allows`);
-  assert.ok(S.onp.every((v) => v == null), `${k}: no One Nation line for a state`);
-  for (const b of ["grn", "oth"]) {
+  S.years.forEach((y, i) => {
+    const row = rows.find((r) => r.jurisdiction === k && +r.year === y && r.party === "onp");
+    const want = (prim[k + y] || 0) >= 2 && row && row.est_flow_to_alp !== "";
+    assert.equal(S.onp[i] != null, !!want, `${k} ${y}: One Nation drawn only at 2%+ of the primary vote (${prim[k + y]})`);
+  });
+  for (const b of ["grn", "onp", "oth"]) {
     S[b].forEach((v, i) => {
       if (v == null) return;
       assert.ok(v > 0 && v < 100, `${k} ${S.years[i]} ${b}: a percentage`);
@@ -88,6 +95,14 @@ assert.ok(!ap.includes("\"Counted from \" + S.srcAs"), "no state is captioned as
 assert.ok(ap.includes("<RdHow term=\"flow-history\""), "the chart's How it's built opens its Info entry");
 const info = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"), "utf8");
 assert.ok(info.includes("{ id: \"flow-history\", term: \"Counted and estimated flows\""), "the Info entry exists");
+
+// ---- SA 2026's Labor v One Nation row in the explainer is the estimator's ----
+const C = bt.contests && bt.contests["sa-2026-alp-onp"];
+assert.ok(C && C.seats === 25, "SA 2026's 25 Labor v One Nation finals are estimated");
+const art = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "explained-article.html"), "utf8");
+const want = `this site&rsquo;s estimate, ${C.seats} seats)</td><td>${C.model.lib.toFixed(1)}</td><td>${C.model.grn.toFixed(1)}</td><td>${C.model.ind.toFixed(1)}</td>`;
+assert.ok(art.includes(want), `the explainer's SA 2026 row quotes the estimator (${want})`);
+assert.ok(art.includes(`at ${C.model.minor.toFixed(1)}%, below independents`), "the minor-party figure in the prose is the estimator's");
 
 console.log(`PASS: state flows – ${Object.keys(shown).length} states as estimates (${Object.entries(shown).map(([k, s]) => k + " " + s.size).join(", ")}), `
   + `back-test Greens ${B.grn.model} v replay ${B.grn.replay}, others ${B.oth.model} v ${B.oth.replay}, Queensland within ${B.qld}`);

@@ -1492,6 +1492,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --t-ink: var(--ink);     --t-ink-2: var(--ink-2);
   --t-dim: var(--ink-3);   --t-faint: var(--ink-faint);
   --k-poll:    var(--accent);
+  --k-conf:    oklch(0.53 0.085 95);
   --k-flows:   oklch(0.50 0.085 295);
   --k-finding: oklch(0.53 0.095 345);
   margin: 28px 0 0; width: min(1180px, calc(100vw - 32px));
@@ -1511,6 +1512,7 @@ body.dark .cl-term {
   --t-ink: oklch(0.945 0.008 80);  --t-ink-2: oklch(0.820 0.009 78);
   --t-dim: oklch(0.640 0.009 70);  --t-faint: oklch(0.480 0.009 66);
   --k-poll:    oklch(0.800 0.085 200);
+  --k-conf:    oklch(0.740 0.090 95);
   --k-flows:   oklch(0.790 0.090 295);
   --k-finding: oklch(0.800 0.095 345);
   box-shadow: 0 1px 0 color-mix(in oklch, var(--t-ink) 6%, transparent) inset,
@@ -1549,6 +1551,7 @@ body.dark .cl-term {
 .cl-tag::before { content: "["; color: var(--t-faint); }
 .cl-tag::after  { content: "]"; color: var(--t-faint); }
 .cl-k-poll .cl-tag    { color: var(--k-poll); }
+.cl-k-conf .cl-tag    { color: var(--k-conf); }
 .cl-k-flows .cl-tag   { color: var(--k-flows); }
 .cl-k-finding .cl-tag { color: var(--k-finding); }
 .cl-k-meta .cl-tag    { color: var(--t-ink); font-weight: 600; }
@@ -8619,6 +8622,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   const flowHistory = {
     "fed": {
       "label": "Federal",
+      "elections": "Australian federal elections",
       "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
       "grn": [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83, 81.9, 82.2, 85.7, 88.2],
       "onp": [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5],
@@ -38726,6 +38730,7 @@ function MenuPageView({
 }
 const CL_KIND = {
   poll: "poll",
+  conf: "conf",
   flows: "flows",
   finding: "finding",
   meta: "headline",
@@ -38798,7 +38803,7 @@ function ChangelogEntries() {
     className: "cl-wait"
   }, React.createElement("b", {
     "aria-hidden": "true"
-  }, "\u203A"), "next entry when the next poll lands", React.createElement("span", {
+  }, "\u203A"), "next entry when the next poll or confidence release lands", React.createElement("span", {
     className: "cl-cur",
     "aria-hidden": "true"
   }))));
@@ -38817,7 +38822,7 @@ function RdChangelog() {
     className: "rd-meta"
   }, "What\u2019s moved numbers when")), React.createElement(RdHed, {
     head: "Latest changelog entries",
-    dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away \u2013 recorded entry by entry as new polls land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
+    dek: React.createElement(React.Fragment, null, "What has moved the aggregate\u2019s two-party preferred estimate, and when each statistical finding appeared or fell away, as well as the four economic-confidence gauges \u2013 recorded entry by entry as new readings land, newest first. Most entries are written by a poll landing \u2013 the ", React.createElement("a", {
       className: "fb-link",
       href: "/feed.xml"
     }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.")
@@ -39369,13 +39374,13 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "States: estimated."), " No state commission publishes that count. Each publishes its distributions of preferences, which show where an excluded candidate\u2019s whole pile went, including ballots it had inherited from candidates excluded earlier. So each pile holds two groups of known size: the candidate\u2019s own voters and the ballots it inherited. The estimate works out how each group split from the way the piles split across every seat, then follows both to the final two. It covers only the seats where Labor and the Coalition were the final two."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How close it gets."), " Tried on the last ", fhWord(FHB.elections), " federal elections, where the counted answer is known, it came within ", FHB.grn.model.toFixed(1), " points of the Greens\u2019 counted flow on average, and within ", FHB.oth.model.toFixed(1), " for everyone else. Reading each pile as one block misses by ", FHB.grn.replay.toFixed(1), " and", " ", FHB.oth.replay.toFixed(1), ". At a state\u2019s size it missed by no more than", " ", fhRange(FHB.err90.grn), " points for the Greens nine times in ten, and", " ", fhRange(FHB.err90.oth), " for everyone else; the bars on the chart show that range.", FHB.qld != null ? React.createElement(React.Fragment, null, " In Queensland, where ", React.createElement("a", {
+      }, React.createElement("b", null, "How close it gets."), " Tried on the last ", fhWord(FHB.elections), " federal elections, where the counted answer is known, it came within ", FHB.grn.model.toFixed(1), " points of the Greens\u2019 counted flow on average, and within ", FHB.oth.model.toFixed(1), " for everyone else. Reading each pile as one block misses by ", FHB.grn.replay.toFixed(1), " and", " ", FHB.oth.replay.toFixed(1), ". At a state\u2019s size it missed by no more than", " ", fhRange(FHB.err90.grn), " points for the Greens nine times in ten, and", " ", fhRange(FHB.err90.oth), " for everyone else, and ", fhRange(FHB.err90.onp), " for One Nation;", " ", "the bars on the chart show that range.", FHB.qld != null ? React.createElement(React.Fragment, null, " In Queensland, where ", React.createElement("a", {
         href: FHB.qldSource,
         target: "_blank",
         rel: "noopener noreferrer"
       }, "Antony Green tabulated"), " the electoral commission\u2019s own counts in 2020 and 2024, the estimates came within ", FHB.qld.toFixed(1), " points.") : null), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "What\u2019s left out."), " One Nation\u2019s state estimates miss by more (", FHB.onp.model.toFixed(1), " points on average federally since 2016), so the chart leaves them out. It also leaves out counts that reached a Labor v Coalition final in fewer than ", FHB.minClassic, " seats: the Northern Territory\u2019s, and Victoria\u2019s before 2022, which stopped once a candidate passed half the vote.")) : null)
+      }, React.createElement("b", null, "What\u2019s left out."), " One Nation\u2019s estimates miss by more (", FHB.onp.model.toFixed(1), " points on average federally since 2016), so its bars run wider, and its line shows only where it won at least ", FHB.onpMinPrim, "% of the primary vote. The chart also leaves out counts that reached a Labor v Coalition final in fewer than ", FHB.minClassic, " seats: the Northern Territory\u2019s; Victoria\u2019s before 2022, which stopped once a candidate passed half the vote; and South Australia\u2019s in 2026, when One Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the explainer\u2019s Labor v One Nation section instead.")) : null)
     }, {
       id: "fp-flows",
       term: "Labor v One Nation flows",
@@ -39681,7 +39686,7 @@ function infoTerms(D) {
   }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.", !window.JUR ? React.createElement(React.Fragment, null, " The ", React.createElement("a", {
     className: "fb-link",
     href: "/changelog/"
-  }, "change log"), " records what has moved the two-party preferred estimate and each statistical finding, entry by entry.") : null), React.createElement("p", {
+  }, "change log"), " records what has moved the two-party preferred estimate, each statistical finding and the economic-confidence gauges, entry by entry.") : null), React.createElement("p", {
     className: "info-about-p"
   }, React.createElement("b", null, "Feedback."), " Spot a wrong number or have any other feedback?", " ", React.createElement("a", {
     className: "fb-link",
@@ -64393,7 +64398,7 @@ function ExplainedFlowChart({
         points,
         smooth: false,
         width: 2.6,
-        endCap: tail,
+        endCap: tail || points.length === 1,
         endLabel: tail && !narrow ? p.name : null
       });
     });
@@ -64433,7 +64438,7 @@ function ExplainedFlowChart({
     className: "ex-chart"
   }, React.createElement("span", {
     className: "fc-unit"
-  }, "share preferencing Labor, % \xB7 ", S.label, est ? ", estimated" : ""), React.createElement(TrendChart, {
+  }, "Share preferencing Labor over the Coalition in ", S.elections || S.label + " elections", ", %"), React.createElement(TrendChart, {
     height: narrow ? 470 : 330,
     xDomain: [x0, x1],
     yDomain: [0, 100],
@@ -64456,12 +64461,6 @@ function ExplainedFlowChart({
     spine: YEARS.map(x => ({
       x
     })),
-    refLines: [{
-      y: 50,
-      label: "even split",
-      color: "var(--ink-faint)",
-      align: "left"
-    }],
     tooltipTitle: i => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : ""),
     ariaLabel: "Share of preferences flowing to Labor, by party, " + S.label + (est ? ", estimated" : "") + ", " + span
   }), React.createElement("span", {
@@ -64476,7 +64475,7 @@ function ExplainedFlowChart({
     }
   }), p.name))), React.createElement("p", {
     className: "ex-flow-cap"
-  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections. One Nation’s state estimates miss by too much to draw." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
+  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where it won at least " + (FH.fed && FH.fed.backtest ? FH.fed.backtest.onpMinPrim : 2) + "% of the vote." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
     className: "ex-flow-how"
   }, React.createElement(RdHow, {
     term: "flow-history",
@@ -67444,7 +67443,7 @@ const TABS = [{
   id: "changelog",
   label: "Changelog",
   menu: true,
-  tip: "What has moved the aggregate and each finding, entry by entry"
+  tip: "What has moved the aggregate, each finding and the confidence gauges, entry by entry"
 }, {
   id: "info",
   label: "Info",

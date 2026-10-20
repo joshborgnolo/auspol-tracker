@@ -307,7 +307,8 @@ def parse_district_2026(dist, static_cands):
     final = {c["candidateName"]: float(c["progressiveTotal"]) for c in rounds[-1]["candidateResults"]
              if not c.get("isExcluded") and c.get("progressiveTotal") is not None}
     return {"names": names, "affils": affils, "fpv": fpv, "chain": chain, "final": final,
-            "formal": sum(fpv.values()), "total_col": None}
+            "formal": sum(fpv.values()), "total_col": None,
+            "party_ids": {n: party[_nkey(n)] for n in names}}
 
 
 def districts_of(year):

@@ -4289,17 +4289,22 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    parsers' own flow_* columns in data/state-flows.csv blend a pile's
    inherited ballots into its party's split – the Greens 2–7 points low on
    the same test – and are never drawn.
-   Shown (user call 2026-10-20): elections whose counts reached a Labor v
-   Coalition final in at least STATE_MIN_CLASSIC seats, and only the Greens
-   and others lines. Smaller counts' errors run wider – the Northern
-   Territory's, and Victoria's to 2018, which stopped once a candidate passed
-   half the vote – and One Nation's state estimates miss by more. A state
+   Shown (user calls 2026-10-20): elections whose counts reached a Labor v
+   Coalition final in at least STATE_MIN_CLASSIC seats – smaller counts'
+   errors run wider: the Northern Territory's, Victoria's to 2018 (stopped
+   once a candidate passed half the vote) and South Australia's 2026 (13
+   Labor v Liberal finals among 25 Labor v One Nation ones). One Nation's
+   line joins where it won at least ONP_MIN_PRIM per cent of the primary
+   vote (data/state-flows.csv's prim_share): its estimates miss by more, so
+   its bars run wider, and where it barely stood a few thousand ballots
+   can't carry a point. A state
    counting Liberal and National piles apart has both as the Coalition, so
    the others line is the crossbench alone. fed.backtest carries the test's
    headline figures for the Info entry. Federal-only: the Vic build reads
    neither file and carries the federal series alone. */
 const STATE_MIN_CLASSIC = 40;
-const STATE_BUCKETS = ["grn", "oth"];
+const STATE_BUCKETS = ["grn", "onp", "oth"];
+const ONP_MIN_PRIM = 2;
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", elections: "Australian federal elections", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
   const JURIS = {
@@ -4314,6 +4319,14 @@ const flowHistory = (() => {
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }
   try { bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")); } catch { /* ditto */ }
   if (!csv || !bt) return h;
+  // One Nation's primary share per state election, off the parsers' CSV
+  const onpPrim = {};
+  try {
+    const pl = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8").split(/\r?\n/).filter((ln) => ln.trim());
+    const ph = pl.shift().split(",");
+    const pi = Object.fromEntries(ph.map((x, i) => [x, i]));
+    pl.forEach((ln) => { const c = ln.split(","); if (c[pi.party] === "onp") onpPrim[c[pi.jurisdiction] + c[pi.year]] = +c[pi.prim_share]; });
+  } catch { /* no primaries: no One Nation line */ }
   const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
   const head = (lines.shift() || "").split(",");
   const ci = Object.fromEntries(head.map((x, i) => [x, i]));
@@ -4323,9 +4336,10 @@ const flowHistory = (() => {
     const jur = c[ci.jurisdiction], year = +c[ci.year], b = c[ci.party];
     if (!JURIS[jur] || +c[ci.n_classic] < STATE_MIN_CLASSIC || !STATE_BUCKETS.includes(b)) return;
     if (c[ci.est_flow_to_alp] === "" || c[ci.err90] === "") return;
+    if (b === "onp" && !((onpPrim[jur + year] || 0) >= ONP_MIN_PRIM)) return;
     ((bag[jur] ||= {})[year] ||= {})[b] = { v: Math.round(+c[ci.est_flow_to_alp] * 1000) / 10, e: Math.round(+c[ci.err90] * 10) / 10 };
   });
-  const errs = { grn: [], oth: [] };
+  const errs = { grn: [], onp: [], oth: [] };
   for (const [jk, meta] of Object.entries(JURIS)) {
     const years = Object.keys(bag[jk] || {}).map(Number).sort((a, b) => a - b);
     if (!years.length) continue;
@@ -4333,8 +4347,8 @@ const flowHistory = (() => {
     STATE_BUCKETS.forEach((b) => errs[b].push(...col(b, "e").filter((e) => e != null)));
     h[jk] = { label: meta.label, elections: meta.elections, srcAs: meta.srcAs, estimated: true,
       asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
-      years, grn: col("grn", "v"), onp: years.map(() => null), oth: col("oth", "v"),
-      grnErr: col("grn", "e"), othErr: col("oth", "e") };
+      years, grn: col("grn", "v"), onp: col("onp", "v"), oth: col("oth", "v"),
+      grnErr: col("grn", "e"), onpErr: col("onp", "e"), othErr: col("oth", "e") };
   }
   // the back-test's headline figures: mean miss against the AEC's counts over
   // the federal elections (One Nation's from 2016, its first wide field)
@@ -4349,7 +4363,7 @@ const flowHistory = (() => {
     grn: { model: mae("grn", "model"), replay: mae("grn", "replay") },
     oth: { model: mae("oth", "model"), replay: mae("oth", "replay") },
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
-    err90: { grn: span(errs.grn), oth: span(errs.oth) },
+    err90: { grn: span(errs.grn), onp: span(errs.onp), oth: span(errs.oth) }, onpMinPrim: ONP_MIN_PRIM,
     qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null };
   return h;
 })();

@@ -1965,5 +1965,30 @@
    }
   }
  },
+ "contests": {
+  "sa-2026-alp-onp": {
+   "seats": 25,
+   "model": {
+    "lib": 35.21,
+    "grn": 86.32,
+    "ind": 54.52,
+    "minor": 47.99,
+    "oth": 49.82
+   },
+   "replay": {
+    "lib": 37.27,
+    "grn": 81.33,
+    "ind": 58.68,
+    "minor": 50.94,
+    "oth": 53.1
+   },
+   "ballots": {
+    "lib": 70785,
+    "grn": 60972,
+    "ind": 13482,
+    "minor": 34800
+   }
+  }
+ },
  "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"
 }
