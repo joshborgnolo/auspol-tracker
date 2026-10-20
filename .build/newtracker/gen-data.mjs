@@ -4353,7 +4353,8 @@ const flowHistory = (() => {
     if (b === "onp" && !counted && +c[ci.est_alp_votes] + +c[ci.est_coal_votes] < onpMin) return;
     ((bag[jur] ||= {})[year] ||= {})[b] = { v: Math.round(+c[ci.est_flow_to_alp] * 1000) / 10,
       e: counted ? null : Math.round(+c[ci.err90] * 10) / 10, counted,
-      x: counted && c[ci.exhausted_share] !== "" ? Math.round(+c[ci.exhausted_share] * 1000) / 10 : null };
+      // exhausted share: optional-preferential counts only (NSW, Qld to 2015)
+      x: c[ci.exhausted_share] !== "" ? Math.round(+c[ci.exhausted_share] * 1000) / 10 : null };
   });
   const errs = { grn: [], onp: [], oth: [] };
   for (const [jk, meta] of Object.entries(JURIS)) {
@@ -4368,7 +4369,9 @@ const flowHistory = (() => {
       asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
       years, grn: col("grn", "v"), onp: col("onp", "v"), oth: col("oth", "v"),
       grnErr: col("grn", "e"), onpErr: col("onp", "e"), othErr: col("oth", "e"),
-      ...(isCounted ? { grnExh: col("grn", "x"), onpExh: col("onp", "x"), othExh: col("oth", "x") } : null) };
+      ...(STATE_BUCKETS.some((b) => col(b, "x").some((x) => x != null))
+        ? { grnExh: col("grn", "x"), onpExh: col("onp", "x"), othExh: col("oth", "x"),
+            opv: years.filter((y) => Object.values(bag[jk][y]).some((x) => x.x != null)) } : null) };
   }
   // the back-test's headline figures: mean miss against the AEC's counts over
   // the federal elections (One Nation's from 2016, its first wide field)

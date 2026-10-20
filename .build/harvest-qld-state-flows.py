@@ -57,34 +57,54 @@ def fetch(url, dest):
     return None
 
 
-BOOTH_2017 = "https://results.ecq.qld.gov.au/elections/state/State2017/results/booth{}.html"
+# the older results site's events (2004-2017; 2001 is not there). 2004-2015
+# were optional preferential: their distributions carry exhausted ballots.
+OLD_EVENTS = {2004: "state2004", 2006: "state2006", 2009: "state2009",
+              2012: "State2012", 2015: "State2015", 2017: "State2017"}
+OLD_SITE = "https://results.ecq.qld.gov.au/elections/state/{}/results/{}{}.html"
 
 
-def harvest_2017():
-    outdir = os.path.join(ROOT, "2017")
+def _get(url):
+    r = subprocess.run(["curl", "-sf", "--max-time", "120", "-A", "Mozilla/5.0", url], capture_output=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def _save_gz(dest, data):
+    with open(dest + ".part", "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as f:
+        f.write(data)
+    os.replace(dest + ".part", dest)
+
+
+def harvest_old(year, event):
+    """booth<N>.html for every district (N from 1 until the pages run out);
+    a district with nothing to distribute (a two-candidate contest) also
+    keeps its district<N>.html, the only page carrying its vote totals."""
+    outdir = os.path.join(ROOT, str(year))
     os.makedirs(outdir, exist_ok=True)
     got = bad = 0
-    for n in range(1, 94):
+    for n in range(1, 100):
         dest = os.path.join(outdir, f"booth{n}.html.gz")
         if os.path.exists(dest):
             got += 1
             continue
-        r = subprocess.run(["curl", "-sf", "--max-time", "120", "-A", "Mozilla/5.0", BOOTH_2017.format(n)],
-                           capture_output=True)
-        if r.returncode != 0 or b"Summary of Distribution of Preferences" not in r.stdout:
-            print(f"2017: booth{n} FAIL ({r.returncode})")
-            bad += 1
-            continue
-        with open(dest + ".part", "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as f:
-            f.write(r.stdout)
-        os.replace(dest + ".part", dest)
+        body = _get(OLD_SITE.format(event, "booth", n))
+        if body is None:
+            break                         # past the last district
+        _save_gz(dest, body)
         got += 1
-    print(f"2017: {got} of 93 district booth pages mirrored")
-    return bad
+        if b"Summary of Distribution of Preferences" not in body:
+            summary = _get(OLD_SITE.format(event, "district", n))
+            if summary is None:
+                print(f"{year}: district{n} FAIL")
+                bad += 1
+            else:
+                _save_gz(os.path.join(outdir, f"district{n}.html.gz"), summary)
+    print(f"{year}: {got} district booth pages mirrored")
+    return bad if got else bad + 1
 
 
 def main():
-    bad = harvest_2017()
+    bad = sum(harvest_old(y, ev) for y, ev in OLD_EVENTS.items())
     cat = get_json(ELECTIONS_JSON)
     if not cat:
         sys.exit("could not read the ECQ elections catalogue")

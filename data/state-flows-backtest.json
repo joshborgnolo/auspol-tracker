@@ -9,6 +9,11 @@
    "nt-2016",
    "nt-2020",
    "nt-2024",
+   "qld-2004",
+   "qld-2006",
+   "qld-2009",
+   "qld-2012",
+   "qld-2015",
    "qld-2017",
    "qld-2020",
    "qld-2024",
@@ -44,19 +49,19 @@
   "2010": {
    "grn": {
     "counted": 79.19,
-    "model": 80.29,
+    "model": 80.27,
     "replay": 77.07,
     "ballots": 1080811
    },
    "onp": {
     "counted": 46.52,
-    "model": 42.68,
+    "model": 42.76,
     "replay": 50.55,
     "ballots": 21058
    },
    "oth": {
     "counted": 43.54,
-    "model": 41.06,
+    "model": 41.12,
     "replay": 48.21,
     "ballots": 432174
    }
@@ -64,19 +69,19 @@
   "2013": {
    "grn": {
     "counted": 82.67,
-    "model": 82.89,
+    "model": 82.86,
     "replay": 77.41,
     "ballots": 980988
    },
    "onp": {
     "counted": 45.24,
-    "model": 50.34,
+    "model": 50.4,
     "replay": 49.09,
     "ballots": 17250
    },
    "oth": {
     "counted": 46.41,
-    "model": 46.21,
+    "model": 46.24,
     "replay": 50.02,
     "ballots": 1351052
    }
@@ -84,19 +89,19 @@
   "2016": {
    "grn": {
     "counted": 81.41,
-    "model": 82.46,
+    "model": 82.42,
     "replay": 77.49,
     "ballots": 1178464
    },
    "onp": {
     "counted": 50.29,
-    "model": 46.73,
+    "model": 46.72,
     "replay": 50.92,
     "ballots": 158973
    },
    "oth": {
     "counted": 46.34,
-    "model": 45.87,
+    "model": 45.91,
     "replay": 49.76,
     "ballots": 1203582
    }
@@ -104,19 +109,19 @@
   "2019": {
    "grn": {
     "counted": 81.62,
-    "model": 82.4,
+    "model": 82.37,
     "replay": 76.82,
     "ballots": 1291638
    },
    "onp": {
     "counted": 35.02,
-    "model": 31.75,
+    "model": 31.74,
     "replay": 37.52,
     "ballots": 425023
    },
    "oth": {
     "counted": 42.5,
-    "model": 42.82,
+    "model": 42.86,
     "replay": 46.03,
     "ballots": 1281720
    }
@@ -124,19 +129,19 @@
   "2022": {
    "grn": {
     "counted": 84.8,
-    "model": 84.37,
+    "model": 84.33,
     "replay": 78.63,
     "ballots": 1407297
    },
    "onp": {
     "counted": 36.38,
-    "model": 35.81,
+    "model": 35.83,
     "replay": 41.92,
     "ballots": 644939
    },
    "oth": {
     "counted": 45.03,
-    "model": 45.7,
+    "model": 45.73,
     "replay": 48.52,
     "ballots": 1416900
    }
@@ -144,7 +149,7 @@
   "2025": {
    "grn": {
     "counted": 87.46,
-    "model": 86.02,
+    "model": 85.99,
     "replay": 80.45,
     "ballots": 1409652
    },
@@ -156,7 +161,7 @@
    },
    "oth": {
     "counted": 48.33,
-    "model": 49.63,
+    "model": 49.67,
     "replay": 51.04,
     "ballots": 1349526
    }
@@ -1946,7 +1951,7 @@
   "2020": {
    "grn": {
     "counted": 80.1,
-    "model": 80.08,
+    "model": 80.05,
     "replay": 75.01
    },
    "onp": {
@@ -1958,7 +1963,7 @@
   "2024": {
    "grn": {
     "counted": 80.7,
-    "model": 81.05,
+    "model": 81.02,
     "replay": 75.82
    },
    "onp": {
@@ -1972,34 +1977,34 @@
   "2019": {
    "grn": {
     "counted": 86.65,
-    "model": 86.96,
+    "model": 87.12,
     "replay": 84.75
    },
    "onp": {
     "counted": 37.88,
-    "model": 38.51,
+    "model": 38.56,
     "replay": 40.09
    },
    "oth": {
     "counted": 54.19,
-    "model": 51.07,
+    "model": 51.39,
     "replay": 55.34
    }
   },
   "2023": {
    "grn": {
     "counted": 88.12,
-    "model": 87.85,
+    "model": 87.98,
     "replay": 85.77
    },
    "onp": {
     "counted": 32.09,
-    "model": 34.26,
+    "model": 34.24,
     "replay": 36.79
    },
    "oth": {
     "counted": 53.32,
-    "model": 51.61,
+    "model": 51.87,
     "replay": 55.29
    }
   }
@@ -2008,11 +2013,11 @@
   "sa-2026-alp-onp": {
    "seats": 25,
    "model": {
-    "lib": 34.52,
-    "grn": 86.43,
-    "ind": 55.19,
-    "minor": 48.95,
-    "oth": 50.69
+    "lib": 34.53,
+    "grn": 86.4,
+    "ind": 55.22,
+    "minor": 48.98,
+    "oth": 50.72
    },
    "replay": {
     "lib": 37.27,

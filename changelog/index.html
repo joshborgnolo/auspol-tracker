@@ -8138,8 +8138,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "qld": 0.7,
         "qldSource": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/",
         "nsw": {
-          "grn": 0.3,
-          "oth": 3.1
+          "grn": 0.5,
+          "oth": 2.8
         }
       }
     },
@@ -8154,7 +8154,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "years": [2022],
       "grn": [84.9],
       "onp": [null],
-      "oth": [44.6],
+      "oth": [44.7],
       "grnErr": [1.8],
       "onpErr": [null],
       "othErr": [2.9]
@@ -8168,9 +8168,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "counted": false,
       "asOf": "2001–2025",
       "years": [2001, 2005, 2008, 2013, 2017, 2021, 2025],
-      "grn": [76.1, 75.9, 73.3, 73.3, 82.8, 84.7, 82.2],
+      "grn": [76, 75.9, 73.3, 73.2, 82.8, 84.7, 82.2],
       "onp": [47.6, null, null, null, 39.2, null, 27.8],
-      "oth": [48.8, 39.2, 32.3, 42.4, 45.7, 44, 43.9],
+      "oth": [48.8, 39.2, 32.4, 42.4, 45.7, 44, 43.9],
       "grnErr": [1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8],
       "onpErr": [3.8, null, null, null, 3.8, null, 3.8],
       "othErr": [2.9, 3, 2.9, 3, 3, 3, 3]
@@ -8198,14 +8198,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "srcAs": "the Electoral Commission of Queensland’s distributions of preferences",
       "estimated": true,
       "counted": false,
-      "asOf": "2017–2024",
-      "years": [2017, 2020, 2024],
-      "grn": [77, 80.1, 81],
-      "onp": [33.7, 33.1, 26.9],
-      "oth": [49.7, 46, 44.3],
-      "grnErr": [1.8, 1.8, 1.8],
-      "onpErr": [3.6, 3.4, 3.4],
-      "othErr": [3, 3, 3]
+      "asOf": "2004–2024",
+      "years": [2004, 2006, 2009, 2012, 2015, 2017, 2020, 2024],
+      "grn": [68.5, 65.8, 70.9, 73.4, 85.5, 77, 80, 81],
+      "onp": [32.2, null, null, null, null, 33.7, 33.1, 26.9],
+      "oth": [35.5, 35.6, 40.4, 38.8, 60.5, 49.7, 46.1, 44.3],
+      "grnErr": [1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8],
+      "onpErr": [3.5, null, null, null, null, 3.6, 3.4, 3.4],
+      "othErr": [3, 3, 3, 3, 3, 3, 3, 3],
+      "grnExh": [44.4, 42.9, 43.8, 44.5, 27, null, null, null],
+      "onpExh": [49, null, null, null, null, null, null, null],
+      "othExh": [54.2, 45.9, 53.5, 55.5, 48, null, null, null],
+      "opv": [2004, 2006, 2009, 2012, 2015]
     },
     "nsw": {
       "label": "New South Wales",
@@ -8224,7 +8228,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "othErr": [null, null],
       "grnExh": [40.5, 34.5],
       "onpExh": [70, 61.3],
-      "othExh": [58.5, 55.3]
+      "othExh": [58.5, 55.3],
+      "opv": [2019, 2023]
     }
   };
   const adjusted = {
@@ -109714,6 +109719,8 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "States: estimated."), " No state commission publishes that count. Each publishes its distributions of preferences, which show where an excluded candidate\u2019s whole pile went, including ballots it had inherited from candidates excluded earlier. So each pile holds two groups of known size: the candidate\u2019s own voters and the ballots it inherited. The estimate works out how each group split from the way the piles split across every seat, then follows both to the final two. It covers only the seats where Labor and the Coalition were the final two."), React.createElement("span", {
         className: "info-p"
+      }, React.createElement("b", null, "Queensland to 2015: optional numbering."), " From 1992 to 2015 Queensland voters could stop numbering, as New South Wales voters still can. Its distributions record the ballots that ran out at each exclusion, so the estimates for 2004 to 2015 follow those too: each share is of the ballots that reached Labor or the Coalition, and the tooltip gives the estimated share that reached neither. The New South Wales check below tests the method on that kind of count."), React.createElement("span", {
+        className: "info-p"
       }, React.createElement("b", null, "New South Wales: counted."), " Its electoral commission publishes every ballot\u2019s preferences, so its lines are counts, like the federal ones. NSW voters may stop numbering before they reach Labor or the Coalition, so each share is of the ballots that reached one of them, and the tooltip gives how many reached neither."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How close it gets."), " Tried on the last ", fhWord(FHB.elections), " federal elections, where the counted answer is known, it came within ", FHB.grn.model.toFixed(1), " points of the Greens\u2019 counted flow on average, and within ", FHB.oth.model.toFixed(1), " for everyone else. Reading each pile as one block misses by ", FHB.grn.replay.toFixed(1), " and", " ", FHB.oth.replay.toFixed(1), ". At a state\u2019s size it missed by no more than", " ", fhRange(FHB.err90.grn), " points for the Greens nine times in ten, and", " ", fhRange(FHB.err90.oth), " for everyone else, and ", fhRange(FHB.err90.onp), " for One Nation;", " ", "the bars on the chart show that range.", FHB.qld != null ? React.createElement(React.Fragment, null, " In Queensland, where ", React.createElement("a", {
@@ -134743,15 +134750,16 @@ function ExplainedFlowChart({
       if (val == null) {
         if (cur.length) runs.push(cur);
         cur = [];
-      } else cur.push({
-        x: YEARS[i],
-        y: T(val),
-        ...(est && err[i] != null ? {
-          note: "±" + err[i].toFixed(1)
-        } : cnt && exh[i] != null ? {
-          note: exh[i].toFixed(0) + "% exhausted"
-        } : null)
-      });
+      } else {
+        const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null, exh[i] != null ? exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        cur.push({
+          x: YEARS[i],
+          y: T(val),
+          ...(note ? {
+            note
+          } : null)
+        });
+      }
     });
     if (cur.length) runs.push(cur);
     runs.forEach((points, i) => {
@@ -134841,7 +134849,7 @@ function ExplainedFlowChart({
     }
   }), p.name))), React.createElement("p", {
     className: "ex-flow-cap"
-  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
+  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
     className: "ex-flow-how"
   }, React.createElement(RdHow, {
     term: "flow-history",

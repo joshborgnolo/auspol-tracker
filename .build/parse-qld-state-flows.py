@@ -50,7 +50,8 @@ import sys
 import xml.etree.ElementTree as ET
 
 ROOT = os.path.join(".build", "state-flow-src", "qld")
-YEARS = (2017, 2020, 2024)
+YEARS = (2004, 2006, 2009, 2012, 2015, 2017, 2020, 2024)
+OLD_YEARS = (2004, 2006, 2009, 2012, 2015, 2017)     # the older results site
 OUT = "data/state-flows.csv"
 COLS = ["jurisdiction", "year", "party", "prim_votes", "prim_share",
         "flow_alp_votes", "flow_coal_votes", "flow_to_alp",
@@ -64,6 +65,8 @@ def bucket_for(code):
     c = (code or "").upper().strip()
     if c in ("ALP", "AUSTRALIAN LABOR PARTY", "LABOR"):
         return "alp"
+    if c in ("NPA",):                 # the Nationals, apart until the 2008 merger
+        return "nat"
     if c in ("LNP", "LIB", "LIBERAL", "NAT", "NATS", "NP", "LIBNATS",
              "LIBERAL NATIONAL PARTY", "LIBERAL NATIONAL PARTY OF QUEENSLAND"):
         return "lib"
@@ -155,6 +158,23 @@ def _num(x):
     return float(x) if re.fullmatch(r"-?\d+(\.\d+)?", x) else None
 
 
+def parse_district_summary(doc):
+    """A district with nothing to distribute (two candidates): its summary
+    page's Candidate | Party | Votes rows give the primaries."""
+    m = re.search(r"\d{4} State General Election - (.*?)\s*-?\s*District Summary", doc)
+    order, party, fpv = [], {}, {}
+    for r in re.findall(r"<tr.*?</tr>", doc, re.S):
+        c = _cells(r)
+        if len(c) >= 3 and "," in c[0] and _num(c[2]) is not None and re.fullmatch(r"[A-Z0-9]{0,6}", c[1] or ""):
+            order.append(c[0])
+            party[c[0]] = bucket_for(c[1] or "IND")
+            fpv[c[0]] = _num(c[2])
+    if not order:
+        return None
+    return {"district": m.group(1) if m else "?", "order": order, "party": party,
+            "fpv": fpv, "chain": [], "tcp": {}}
+
+
 def parse_booth_2017(doc):
     """One 2017 booth page's "Summary of Distribution of Preferences" table
     -> parse_district's shape, candidates keyed by name. The header names
@@ -166,7 +186,7 @@ def parse_booth_2017(doc):
     i = doc.find("Votes Remaining in Count")
     if i < 0:
         return None
-    m = re.search(r"2017 State General Election - (.*?)\s*-?\s*Booth Details", doc)
+    m = re.search(r"\d{4} State General Election - (.*?)\s*-?\s*Booth Details", doc)
     rows = [_cells(r) for r in re.findall(r"<tr.*?</tr>", doc[doc.rfind("<table", 0, i):doc.find("</table>", i)], re.S)]
     head = next((r for r in rows if r and r[0] == "Preference Distribution"), None)
     if not head:
@@ -207,13 +227,16 @@ def parse_booth_2017(doc):
 
 def districts_of(year):
     """[(district, parsed or None)] for one election, whichever its format."""
-    if year == 2017:
-        d17 = os.path.join(ROOT, "2017")
-        out = []
-        for n in range(1, 94):
-            f = os.path.join(d17, f"booth{n}.html.gz")
-            p = parse_booth_2017(gzip.open(f).read().decode("utf-8", "replace")) if os.path.exists(f) else None
+    if year in OLD_YEARS:
+        d = os.path.join(ROOT, str(year))
+        out, n = [], 1
+        while os.path.exists(os.path.join(d, f"booth{n}.html.gz")):
+            p = parse_booth_2017(gzip.open(os.path.join(d, f"booth{n}.html.gz")).read().decode("utf-8", "replace"))
+            summ = os.path.join(d, f"district{n}.html.gz")
+            if p is None and os.path.exists(summ):
+                p = parse_district_summary(gzip.open(summ).read().decode("utf-8", "replace"))
             out.append((p["district"] if p else f"booth{n}", p))
+            n += 1
         return out
     el = parse_election(year)
     if el is None:

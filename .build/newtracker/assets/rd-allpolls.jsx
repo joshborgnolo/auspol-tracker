@@ -5591,8 +5591,13 @@ function ExplainedFlowChart({ jur, inv }) {
          party went unmeasured that year), and drawing a line across the hole
          would invent flows for parliaments nobody counted. Split into runs. */
       if (val == null) { if (cur.length) runs.push(cur); cur = []; }
-      else cur.push({ x: YEARS[i], y: T(val), ...(est && err[i] != null ? { note: "±" + err[i].toFixed(1) }
-        : cnt && exh[i] != null ? { note: exh[i].toFixed(0) + "% exhausted" } : null) });
+      else {
+        // an estimate's 90% miss, then (optional preferential years) the
+        // share of the pile that reached neither Labor nor the Coalition
+        const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null,
+          exh[i] != null ? exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        cur.push({ x: YEARS[i], y: T(val), ...(note ? { note } : null) });
+      }
     });
     if (cur.length) runs.push(cur);
     runs.forEach((points, i) => {
@@ -5655,7 +5660,9 @@ function ExplainedFlowChart({ jur, inv }) {
         ))}
       </span>
       <p className="ex-flow-cap">{est
-        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on."
+        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length
+          ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
+          : "")
         : cnt
           ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
           : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>

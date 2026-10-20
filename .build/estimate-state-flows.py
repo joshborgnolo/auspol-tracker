@@ -43,7 +43,10 @@ preferences and two-candidate-preferred flows by division,
 and data/aec-2025-tcp-flow-by-division.csv).
 Outputs: data/state-flows-est.csv (jurisdiction, year, party, method,
 est_alp_votes, est_coal_votes, est_flow_to_alp, err90, exhausted_share,
-n_classic; method "counted" for NSW, whose ballot-level data gives exact
+n_classic; exhausted_share only where voters could stop numbering – NSW,
+Queensland to 2015, the NT from 2016 – since WA's and the others' few
+savings-provision exhausts are dropped from the shares unreported; method
+"counted" for NSW, whose ballot-level data gives exact
 flows – the model's NSW reading is scored against them in nsw_check) and
 data/state-flows-backtest.json.
 
@@ -77,6 +80,12 @@ CAL_REPS = 6
 # (antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/)
 QLD_GREEN = {2020: {"grn": 80.1, "onp": 33.8}, 2024: {"grn": 80.7, "onp": 26.2}}
 BUCKETS = ("grn", "onp", "oth")
+
+
+def opv(jur, y):
+    """optional preferential voting: a ballot may stop numbering short of
+    the final two (Queensland 1992-2015, the NT from 2016, NSW throughout)"""
+    return (jur == "qld" and y <= 2015) or (jur == "nt" and y >= 2016) or jur == "nsw"
 K = 6
 TYPES5 = ("alp", "grn", "onp", "oth", "exh")
 
@@ -496,6 +505,10 @@ def replay(s, model=None, evidx=None, label=None):
     the model is keyed by – independents apart from the minor parties."""
     tag = (lambda c: label[c]) if label else (lambda c: s["cands"][c][0])
     piles = {cid: {tag(cid): fp} for cid, (b, fp) in s["cands"].items()}
+    # optional preferential counts (Qld to 2015, NSW, NT 2016): ballots that
+    # exhaust collect here by origin, so a flow can say how many reached
+    # neither finalist (the "__exh" recipient of an event)
+    piles["__exh"] = {}
     for excl, rec, exh in s["steps"]:
         if len(excl) == 1 and model is not None and s["cands"][excl[0]][0] in model:
             x = excl[0]
@@ -530,15 +543,18 @@ def replay(s, model=None, evidx=None, label=None):
             for r in live:
                 for b, amt in pile.items():
                     piles[r][b] = piles[r].get(b, 0.0) + amt * rec[r] / den
+            for b, amt in pile.items():
+                if exh > 0:
+                    piles["__exh"][b] = piles["__exh"].get(b, 0.0) + amt * exh / den
     return piles
 
 
 def flows(seats, evs=None, model=None, keys=None):
-    """{bucket: [to Labor, to Coalition]} over the classic seats."""
+    """{bucket: [to Labor, to Coalition, exhausted]} over the classic seats."""
     idx = collections.defaultdict(dict)
     for e in evs or []:
         idx[e["seat"]][e["x"]] = e
-    agg = {b: [0.0, 0.0] for b in BUCKETS}
+    agg = {b: [0.0, 0.0, 0.0] for b in BUCKETS}
     for k in keys if keys is not None else seats:
         s = seats[k]
         if not classic(s):
@@ -549,6 +565,7 @@ def flows(seats, evs=None, model=None, keys=None):
         for b in BUCKETS:
             agg[b][0] += p[a].get(b, 0.0)
             agg[b][1] += p[o].get(b, 0.0)
+            agg[b][2] += p["__exh"].get(b, 0.0)
     return agg
 
 
@@ -746,7 +763,8 @@ def main():
                          "est_alp_votes": round(est[b][0]), "est_coal_votes": round(est[b][1]),
                          "est_flow_to_alp": round(f / 100, 6) if f is not None else "",
                          "err90": e if e is not None else "",
-                         "method": "model", "exhausted_share": "", "n_classic": n_cl})
+                         "method": "model", "n_classic": n_cl,
+                         "exhausted_share": round(est[b][2] / sum(est[b]), 4) if f is not None and opv(jur, y) else ""})
         if jur == "qld" and y in QLD_GREEN:
             qld_check[str(y)] = {b: {"counted": v, "model": round(pct(est[b]), 2),
                                      "replay": round(pct(flows(seats)[b]), 2)} for b, v in QLD_GREEN[y].items()}

@@ -41,6 +41,13 @@ for (const r of rows) {
   } else {
     assert.ok(+r.err90 > 0 && +r.err90 < 15, `${r.jurisdiction} ${r.year} ${r.party}: an error figure (${r.err90})`);
   }
+  // an estimate's exhausted share comes only from optional-preferential
+  // counts: Queensland to 2015, the Northern Territory from 2016
+  if (r.method === "model" && r.exhausted_share !== "") {
+    const opv = (r.jurisdiction === "qld" && +r.year <= 2015) || (r.jurisdiction === "nt" && +r.year >= 2016);
+    assert.ok(opv, `${r.jurisdiction} ${r.year} ${r.party}: an exhausted share only under optional numbering`);
+    assert.ok(+r.exhausted_share > 0 && +r.exhausted_share < 1, `${r.jurisdiction} ${r.year} ${r.party}: an exhausted share`);
+  }
 }
 const bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8"));
 assert.equal(Object.keys(bt.federal).length, 6, "the back-test covers the six federal elections 2010-2025");
@@ -66,6 +73,11 @@ for (const r of rows) {
 assert.deepEqual(Object.keys(FH).filter((k) => k !== "fed").sort(), Object.keys(shown).sort(),
   "exactly the jurisdictions with an election of 40+ classic seats get a chip");
 assert.ok(!FH.nt, "the Northern Territory's small counts stay off the chart");
+assert.deepEqual([...FH.qld.years], [2004, 2006, 2009, 2012, 2015, 2017, 2020, 2024],
+  "Queensland shows 2004-2024, its optional-preferential years included");
+assert.deepEqual([...FH.qld.opv], [2004, 2006, 2009, 2012, 2015], "Queensland's optional-preferential years carry exhausted shares");
+assert.ok(FH.qld.grnExh.slice(0, 5).every((x) => x > 0) && FH.qld.grnExh.slice(5).every((x) => x == null),
+  "Queensland's Greens exhausted share: the OPV years only");
 assert.deepEqual([...FH.vic.years], [2022], "Victoria shows 2022 alone (its 2006-18 counts stopped at a majority)");
 for (const [k, S] of Object.entries(FH)) {
   if (k === "fed") continue;
