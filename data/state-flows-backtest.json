@@ -4,6 +4,7 @@
   "fed_seat": 104000.0,
   "em_iters": 200,
   "pool": [
+   "nsw-2015",
    "nsw-2019",
    "nsw-2023",
    "nt-2016",
@@ -49,13 +50,13 @@
   "2010": {
    "grn": {
     "counted": 79.19,
-    "model": 80.27,
+    "model": 80.26,
     "replay": 77.07,
     "ballots": 1080811
    },
    "onp": {
     "counted": 46.52,
-    "model": 42.76,
+    "model": 42.78,
     "replay": 50.55,
     "ballots": 21058
    },
@@ -69,19 +70,19 @@
   "2013": {
    "grn": {
     "counted": 82.67,
-    "model": 82.86,
+    "model": 82.87,
     "replay": 77.41,
     "ballots": 980988
    },
    "onp": {
     "counted": 45.24,
-    "model": 50.4,
+    "model": 50.47,
     "replay": 49.09,
     "ballots": 17250
    },
    "oth": {
     "counted": 46.41,
-    "model": 46.24,
+    "model": 46.23,
     "replay": 50.02,
     "ballots": 1351052
    }
@@ -89,7 +90,7 @@
   "2016": {
    "grn": {
     "counted": 81.41,
-    "model": 82.42,
+    "model": 82.43,
     "replay": 77.49,
     "ballots": 1178464
    },
@@ -101,7 +102,7 @@
    },
    "oth": {
     "counted": 46.34,
-    "model": 45.91,
+    "model": 45.9,
     "replay": 49.76,
     "ballots": 1203582
    }
@@ -135,13 +136,13 @@
    },
    "onp": {
     "counted": 36.38,
-    "model": 35.83,
+    "model": 35.85,
     "replay": 41.92,
     "ballots": 644939
    },
    "oth": {
     "counted": 45.03,
-    "model": 45.73,
+    "model": 45.72,
     "replay": 48.52,
     "ballots": 1416900
    }
@@ -161,7 +162,7 @@
    },
    "oth": {
     "counted": 48.33,
-    "model": 49.67,
+    "model": 49.66,
     "replay": 51.04,
     "ballots": 1349526
    }
@@ -1956,7 +1957,7 @@
    },
    "onp": {
     "counted": 33.8,
-    "model": 33.11,
+    "model": 33.12,
     "replay": 37.32
    }
   },
@@ -1968,42 +1969,58 @@
    },
    "onp": {
     "counted": 26.2,
-    "model": 26.88,
+    "model": 26.89,
     "replay": 31.58
    }
   }
  },
  "nsw_check": {
+  "2015": {
+   "grn": {
+    "counted": 84.6,
+    "model": 84.37,
+    "replay": 82.92,
+    "exh_counted": 45.91,
+    "exh_model": 43.67
+   },
+   "oth": {
+    "counted": 43.93,
+    "model": 41.96,
+    "replay": 44.97,
+    "exh_counted": 58.95,
+    "exh_model": 61.15
+   }
+  },
   "2019": {
    "grn": {
     "counted": 86.65,
-    "model": 87.12,
+    "model": 87.11,
     "replay": 84.75,
     "exh_counted": 40.5,
-    "exh_model": 37.37
+    "exh_model": 37.35
    },
    "onp": {
     "counted": 37.88,
-    "model": 38.56,
+    "model": 38.58,
     "replay": 40.09,
     "exh_counted": 69.97,
-    "exh_model": 66.91
+    "exh_model": 66.88
    },
    "oth": {
     "counted": 54.19,
-    "model": 51.39,
+    "model": 51.38,
     "replay": 55.34,
     "exh_counted": 58.46,
-    "exh_model": 61.44
+    "exh_model": 61.47
    }
   },
   "2023": {
    "grn": {
     "counted": 88.12,
-    "model": 87.98,
+    "model": 87.97,
     "replay": 85.77,
     "exh_counted": 34.51,
-    "exh_model": 32.17
+    "exh_model": 32.14
    },
    "onp": {
     "counted": 32.09,
@@ -2014,10 +2031,10 @@
    },
    "oth": {
     "counted": 53.32,
-    "model": 51.87,
+    "model": 51.86,
     "replay": 55.29,
     "exh_counted": 55.27,
-    "exh_model": 57.65
+    "exh_model": 57.67
    }
   }
  },
@@ -2026,10 +2043,10 @@
    "seats": 25,
    "model": {
     "lib": 34.53,
-    "grn": 86.4,
-    "ind": 55.22,
-    "minor": 48.98,
-    "oth": 50.72
+    "grn": 86.39,
+    "ind": 55.21,
+    "minor": 48.99,
+    "oth": 50.73
    },
    "replay": {
     "lib": 37.27,

@@ -79,6 +79,7 @@ assert.deepEqual([...FH.qld.years], [2004, 2006, 2009, 2012, 2015, 2017, 2020, 2
 assert.deepEqual([...FH.qld.opv], [2004, 2006, 2009, 2012, 2015], "Queensland's optional-preferential years carry exhausted shares");
 assert.ok(FH.qld.grnExh.slice(0, 5).every((x) => x > 0) && FH.qld.grnExh.slice(5).every((x) => x == null),
   "Queensland's Greens exhausted share: the OPV years only");
+assert.deepEqual([...FH.nsw.years], [2015, 2019, 2023], "NSW counts 2015-2023, every election with ballot-level data (2011 published none)");
 assert.deepEqual([...FH.vic.years], [2022], "Victoria shows 2022 alone (its 2006-18 counts stopped at a majority)");
 for (const [k, S] of Object.entries(FH)) {
   if (k === "fed") continue;

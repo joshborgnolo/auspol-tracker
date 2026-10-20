@@ -1,5 +1,5 @@
 """parse-nsw-state-flows.py - COUNTED NSW Legislative Assembly preference
-flows, 2019 and 2023, from the NSW Electoral Commission's ballot-level
+flows, 2015, 2019 and 2023, from the NSW Electoral Commission's ballot-level
 preference data (see harvest-nsw-state-flows.py).
 
 Unlike every other state on file, NSW publishes each ballot paper's
@@ -48,7 +48,7 @@ OUT = "data/state-flows.csv"
 COLS = ["jurisdiction", "year", "party", "prim_votes", "prim_share",
         "flow_alp_votes", "flow_coal_votes", "flow_to_alp",
         "n_seats", "n_dop", "n_classic", "formal_votes"]
-YEARS = (2019, 2023)
+YEARS = (2015, 2019, 2023)
 BUCKETS = ("alp", "lib", "nat", "grn", "onp", "oth")
 EMIT = ("grn", "onp", "oth", "lib", "nat", "alp")
 
@@ -198,7 +198,8 @@ def main():
     all_rows, failures = list(keep), []
     for year in years:
         ydir = os.path.join(ROOT, str(year))
-        zips = {re.sub(r"^SGE?\d+ LA Pref Data ", "", n)[:-4].lower().replace(" ", "-").replace("'", ""): os.path.join(ydir, "zip", n)
+        # "SG2301 LA Pref Data Albury.zip"; 2015: "SGE2015 LA Pref Data_NA_Albury.zip"
+        zips = {re.sub(r"^SGE?\d+ LA Pref Data( |_NA_)", "", n)[:-4].lower().replace(" ", "-").replace("'", ""): os.path.join(ydir, "zip", n)
                 for n in os.listdir(os.path.join(ydir, "zip")) if n.endswith(".zip")}
         dops = sorted(n[:-len("-dop.html.gz")] for n in os.listdir(ydir) if n.endswith("-dop.html.gz"))
         prim = collections.Counter()

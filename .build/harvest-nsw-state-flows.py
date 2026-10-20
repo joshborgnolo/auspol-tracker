@@ -16,8 +16,11 @@ are a local cache in zip/, gitignored: parse-nsw-state-flows.py reduces
 them to a committed per-candidate count (counts.csv) and records each zip's
 sha256 there, so a re-download can be checked against what was counted.
 
-Events: 2023 (SG2301) and 2019 (SG1901). Earlier elections are not on the
-past-results site in this form (SG1501/SG1101 return server errors).
+Events: 2023 (SG2301), 2019 (SG1901) and 2015 (SGE2015: the older results
+site at pastvtr.elections.nsw.gov.au/SGE2015/la-home.htm, pages under
+la/<district>/{cc/fp_summary,dop/dop,preferences}/index.htm, zips named
+"SGE2015 LA Pref Data_NA_<District>.zip"; its SG1501 alias returns server
+errors). 2011 (SGE2011) published its distributions but no ballot data.
 Idempotent: only fetches what is missing.
 """
 import gzip
@@ -28,7 +31,10 @@ import sys
 import urllib.parse
 
 ROOT = os.path.join(".build", "state-flow-src", "nsw")
-EVENTS = {2023: "SG2301", 2019: "SG1901"}
+EVENTS = {2023: "SG2301", 2019: "SG1901", 2015: "SGE2015"}
+# where each event keeps its district list and pages: the 2015 site is the
+# older static one
+OLD_SITE = {"SGE2015"}
 BASE = "https://pastvtr.elections.nsw.gov.au"
 
 
@@ -49,24 +55,26 @@ def main():
         out = os.path.join(ROOT, str(year))
         zdir = os.path.join(out, "zip")
         os.makedirs(zdir, exist_ok=True)
-        idx = get(f"{BASE}/{ev}/LA/results")
+        old = ev in OLD_SITE
+        idx = get(f"{BASE}/{ev}/la-home.htm" if old else f"{BASE}/{ev}/LA/results")
         if not idx:
             print(f"{year}: FAIL district list")
             bad += 1
             continue
-        districts = sorted(set(re.findall(rf'href="/{ev}/LA/([a-z0-9-]+)/preferences"', idx.decode("utf-8", "replace"))))
+        districts = sorted(set(re.findall(rf'href="/{ev}/{"la" if old else "LA"}/([a-z0-9-]+)/preferences', idx.decode("utf-8", "replace"))))
+        page_url = (lambda d, pg: f"{BASE}/{ev}/la/{d}/{pg}/index.htm") if old else (lambda d, pg: f"{BASE}/{ev}/LA/{d}/{pg}")
         for d in districts:
             for page, suffix in (("cc/fp_summary", "fp"), ("dop/dop", "dop")):
                 dest = os.path.join(out, f"{d}-{suffix}.html.gz")
                 if os.path.exists(dest):
                     continue
-                body = get(f"{BASE}/{ev}/LA/{d}/{page}")
+                body = get(page_url(d, page))
                 if not body or b"Page Not Found" in body:
                     print(f"{year} {d}: FAIL {page}")
                     bad += 1
                     continue
                 save_gz(dest, body)
-            pref = get(f"{BASE}/{ev}/LA/{d}/preferences")
+            pref = get(page_url(d, "preferences"))
             m = re.search(rb'href="([^"]+\.zip)"', pref or b"")
             if not m:
                 print(f"{year} {d}: FAIL no preference zip link")
