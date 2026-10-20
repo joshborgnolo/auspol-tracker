@@ -474,6 +474,19 @@ jobs:
           git fetch -q "$BUNDLE" "refs/heads/main:refs/repair/head" || block "could not read the repair bundle"
           git merge-base --is-ancestor "$BASE" refs/repair/head || block "the repair commits do not descend from the base the agent was given"
           git checkout -q -B main refs/repair/head
+          # The agent's own pipeline runs sync its tree onto origin/main
+          # (freshness_sync), so its history can carry main's commits from
+          # after BASE. Those are main's, not the agent's: gate from the
+          # newest main commit the agent's history contains (2026-10-21: an
+          # upstream .github/ commit blocked a correct news24 repair as
+          # "forbidden paths"). merge-base with origin/main can only name a
+          # commit already on main.
+          git fetch -q origin main
+          SYNCED="$(git merge-base refs/repair/head origin/main)"
+          if [ "$SYNCED" != "$BASE" ] && git merge-base --is-ancestor "$BASE" "$SYNCED"; then
+            echo "agent tree synced onto main at $SYNCED; gating its own commits from there"
+            BASE="$SYNCED"
+          fi
 
           git log --oneline "$BASE..HEAD"
           CHANGED="$(git diff --name-only "$BASE..HEAD")"
