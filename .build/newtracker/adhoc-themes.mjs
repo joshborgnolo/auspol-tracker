@@ -245,6 +245,7 @@ export const THEME_OF = {
   "healthcare-affordability-working-class": "cost-of-living",
   "energy-prices-next-12-months": "cost-of-living",
   "unemployment-next-12-months": "cost-of-living",
+  "unemployment-expectations": "cost-of-living",
   // newspoll
   "inflation-response-priorities": "cost-of-living",
   // redbridge
@@ -301,6 +302,8 @@ export const THEME_OF = {
   "bondi-initiatives": "bondi-cohesion",
   "hate-speech-laws": "bondi-cohesion",
   "bondi-antisemitism-views": "bondi-cohesion",
+  "antisemitism-seriousness": "bondi-cohesion",
+  "radical-islamic-extremism": "bondi-cohesion",
   "antisemitism-policies": "bondi-cohesion",
   "racism": "bondi-cohesion",
   "social-cohesion": "bondi-cohesion",
