@@ -636,8 +636,8 @@ for (const [k, band] of [["consumer", SERIES.consumer.band], ["business", SERIES
   const seen = new Set(dates);
   assert.equal(seen.size, dates.length, k + " has no duplicate dates");
 }
-assert.equal(live.consumer.rows.at(-1).v, 68);
-assert.equal(live.business.rows.at(-1).v, 79.1);
+assert.equal(live.consumer.rows.at(-1).v, 67.7);
+assert.equal(live.business.rows.at(-1).v, 76.5);
 assert.equal(live.consumer.base, "ANZ-Roy Morgan, index, 100 = neutral");
 // westpacConsumer + nabBusiness — own band and URL rules (the roymorgan.com
 // rule above deliberately does NOT reach these lanes)

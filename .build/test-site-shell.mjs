@@ -202,7 +202,7 @@ assert.deepEqual(clTimes.map((m) => [m[1], m[2]]), [...clEntries].reverse().map(
 for (const e of clEntries) assert.ok(clPage.includes(hesc(e.text)), `changelog page carries the ${e.date} entry's text`);
 const clTags = [...clPage.matchAll(/<span class="cl-tag">([^<]+)<\/span>/g)].map((m) => m[1]);
 assert.deepEqual(clTags, [...clEntries].reverse().map((e) =>
-  ({ poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start" })[e.kind] || "headline"),
+  ({ poll: "poll", flows: "flows", finding: "finding", meta: "headline", seed: "start", conf: "conf" })[e.kind] || "headline"),
   "every console row carries its kind tag");
 assert.ok(clPage.includes('class="cl-term"') && clPage.includes('class="cl-log"'),
   "the static article renders the console block");
