@@ -396,7 +396,7 @@
     },
     "conf": {
       "business": 76.5,
-      "consumer": 68,
+      "consumer": 67.7,
       "nabBusiness": -13,
       "westpacConsumer": 80.4
     }
@@ -446,6 +446,12 @@
       "label": "20 Oct 2026",
       "kind": "seed",
       "text": "From today the log also records the four published economic-confidence gauges as each new release moves them: ANZ–Roy Morgan consumer confidence 68.0; Westpac–MI consumer sentiment 80.4; Roy Morgan business confidence 76.5; NAB business confidence −13."
+    },
+    {
+      "date": "2026-10-20",
+      "label": "20 Oct 2026",
+      "kind": "conf",
+      "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 68.0 → 67.7."
     }
   ]
 }
