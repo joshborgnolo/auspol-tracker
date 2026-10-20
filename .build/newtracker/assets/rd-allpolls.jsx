@@ -5588,7 +5588,11 @@ function ExplainedFlowChart({ jur }) {
       });
     });
   });
-  const x0 = YEARS[0], x1 = YEARS[YEARS.length - 1];
+  /* a series of one election would give TrendChart a zero-width domain –
+     0/0 in its x scale, NaN in every coordinate – so pad it a year either
+     side and let the lone readings draw as their end dots */
+  const pad1 = YEARS.length > 1 ? 0 : 1;
+  const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
   return (
     <div className="ex-chart">
       <span className="fc-unit">share preferencing Labor, % · {S.label}</span>

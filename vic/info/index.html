@@ -64382,8 +64382,9 @@ function ExplainedFlowChart({
       });
     });
   });
-  const x0 = YEARS[0],
-    x1 = YEARS[YEARS.length - 1];
+  const pad1 = YEARS.length > 1 ? 0 : 1;
+  const x0 = YEARS[0] - pad1,
+    x1 = YEARS[YEARS.length - 1] + pad1;
   return React.createElement("div", {
     className: "ex-chart"
   }, React.createElement("span", {

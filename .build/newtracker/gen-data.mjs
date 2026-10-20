@@ -4286,7 +4286,18 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    NOT crossbench others – so the others line reads the CSV's oth bucket
    alone (its alphas towards the Coalition sit in the lib/nat cells the chart
    doesn't draw). Federal-only: the Vic build has no CSV and carries the
-   federal series alone. */
+   federal series alone.
+   STATE_FLOWS_SHOWN holds the states back (user call 2026-10-20): every
+   state parser splits an excluded candidate's whole pile, inherited ballots
+   included, in the pile's overall proportions – the origin-blending replay
+   .build/aec-2025-region-tpp-flows.mjs retired. Scored on six federal
+   elections against the AEC's counted per-party flows over the same classic
+   seats, that rule put the Greens 2–7 points too low and One Nation and
+   others up to 7 too high; Queensland's counted 2020/2024 figures (Antony
+   Green's tabulation of the ECQ counts) show the same ~5-point gap. The
+   chart says "counted", so the states stay off it until an estimator passes
+   that back-test; the CSV and the JURIS map stay for that work. */
+const STATE_FLOWS_SHOWN = false;
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
   const JURIS = {
@@ -4296,7 +4307,7 @@ const flowHistory = (() => {
     qld: { label: "Queensland", srcAs: "the Electoral Commission of Queensland’s distributions of preferences", asOf: "2020–2024" },
     nt: { label: "Northern Territory", srcAs: "the NT Electoral Commission’s distributions of preferences", asOf: "2016–2024" },
   };
-  if (!JUR) {
+  if (!JUR && STATE_FLOWS_SHOWN) {
     let csv = null;
     try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8"); } catch { /* not yet written */ }
     if (csv) {
