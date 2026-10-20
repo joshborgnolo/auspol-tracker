@@ -1,0 +1,128 @@
+State/Reports/Albert Park District-Results by Voting Centre.xls
+State/Reports/Ashwood District-Results by Voting Centre.xls
+State/Reports/Bass District-Results by Voting Centre.xls
+State/Reports/Bayswater District-Results by Voting Centre.xls
+State/Reports/Bellarine District-Results by Voting Centre.xls
+State/Reports/Benambra District-Results by Voting Centre.xls
+State/Reports/Bendigo East District-Results by Voting Centre.xls
+State/Reports/Bendigo West District-Results by Voting Centre.xls
+State/Reports/Bentleigh District-Results by Voting Centre.xls
+State/Reports/Berwick District-Results by Voting Centre.xls
+State/Reports/Box Hill District-Results by Voting Centre.xls
+State/Reports/Brighton District-Results by Voting Centre (1).xls
+State/Reports/Brighton District-Results by Voting Centre.xls
+State/Reports/Broadmeadows District-Results by Voting Centre.xls
+State/Reports/Brunswick District-Results by Voting Centre.xls
+State/Reports/Bulleen District-Results by Voting Centre.xls
+State/Reports/Bundoora District-Results by Voting Centre.xls
+State/Reports/Carrum District-Results by Voting Centre.xls
+State/Reports/Caulfield District-Results by Voting Centre.xls
+State/Reports/Clarinda District-Results by Voting Centre.xls
+State/Reports/Cranbourne District-Results by Voting Centre.xls
+State/Reports/Croydon District-Results by Voting Centre.xls
+State/Reports/Dandenong District-Results by Voting Centre.xls
+State/Reports/Eastern Victoria Region-Distribution of Preferences.xls
+State/Reports/Eastern Victoria Region-Results by Voting Centre.xls
+State/Reports/Eastern Victoria Region-Votes Received.xls
+State/Reports/Eildon District-Results by Voting Centre.xls
+State/Reports/Eltham District-Results by Voting Centre.xls
+State/Reports/Essendon District-Results by Voting Centre.xls
+State/Reports/Eureka District-Results by Voting Centre.xls
+State/Reports/Euroa District-Results by Voting Centre.xls
+State/Reports/Evelyn District-Results by Voting Centre.xls
+State/Reports/Footscray District-Results by Voting Centre.xls
+State/Reports/Frankston District-Results by Voting Centre.xls
+State/Reports/Geelong District-Results by Voting Centre.xls
+State/Reports/Gippsland East District-Results by Voting Centre.xls
+State/Reports/Gippsland South District-Results by Voting Centre.xls
+State/Reports/Glen Waverley District-Results by Voting Centre.xls
+State/Reports/Greenvale District-Results by Voting Centre.xls
+State/Reports/Hastings District-Results by Voting Centre.xls
+State/Reports/Hawthorn District-Results by Voting Centre (1).xls
+State/Reports/Hawthorn District-Results by Voting Centre.xls
+State/Reports/Ivanhoe District-Results by Voting Centre.xls
+State/Reports/Kalkallo District-Results by Voting Centre.xls
+State/Reports/Kew District-Results by Voting Centre.xls
+State/Reports/Kororoit District-Results by Voting Centre.xls
+State/Reports/Lara District-Results by Voting Centre.xls
+State/Reports/Laverton District-Results by Voting Centre.xls
+State/Reports/Lowan District-Results by Voting Centre.xls
+State/Reports/Macedon District-Results by Voting Centre.xls
+State/Reports/Malvern District-Results by Voting Centre.xls
+State/Reports/Melbourne District-Results by Voting Centre.xls
+State/Reports/Melton District-Results by Voting Centre.xls
+State/Reports/Mildura District-Results by Voting Centre.xls
+State/Reports/Mill Park District-Results by Voting Centre.xls
+State/Reports/Monbulk District-Results by Voting Centre.xls
+State/Reports/Mordialloc District-Results by Voting Centre.xls
+State/Reports/Mornington District-Results by Voting Centre.xls
+State/Reports/Morwell District-Results by Voting Centre.xls
+State/Reports/Mulgrave District-Results by Voting Centre.xls
+State/Reports/Murray Plains District-Results by Voting Centre.xls
+State/Reports/Narracan District-Results by Voting Centre.xls
+State/Reports/Narre Warren North District-Results by Voting Centre.xls
+State/Reports/Narre Warren South District-Results by Voting Centre.xls
+State/Reports/Nepean District by-election 2026/Nepean District-Results by Voting Centre.xls
+State/Reports/Nepean District-Results by Voting Centre.xls
+State/Reports/Niddrie District-Results by Voting Centre.xls
+State/Reports/North-Eastern Metropolitan Region-Distribution of Preferences.xls
+State/Reports/North-Eastern Metropolitan Region-Results by Voting Centre.xls
+State/Reports/North-Eastern Metropolitan Region-Votes Received.xls
+State/Reports/North-Eastern Victoria Region-Results by Voting Centre.xls
+State/Reports/Northcote District-Results by Voting Centre (1).xls
+State/Reports/Northcote District-Results by Voting Centre.xls
+State/Reports/Northern Metropolitan Region-Distribution of Preferences.xls
+State/Reports/Northern Metropolitan Region-Results by Voting Centre.xls
+State/Reports/Northern Metropolitan Region-Votes Received.xls
+State/Reports/Northern Victoria Region-Distribution of Preferences.xls
+State/Reports/Northern Victoria Region-Results by Voting Centre.xls
+State/Reports/Northern Victoria Region-Votes Received.xls
+State/Reports/Northern Victoria-Results by Voting Centre.xls
+State/Reports/Oakleigh District-Results by Voting Centre.xls
+State/Reports/Ovens Valley District-Results by Voting Centre.xls
+State/Reports/Pakenham District-Results by Voting Centre.xls
+State/Reports/Pascoe Vale District-Results by Voting Centre.xls
+State/Reports/Point Cook District-Results by Voting Centre.xls
+State/Reports/Polwarth District-Results by Voting Centre.xls
+State/Reports/Prahran District-Results by Voting Centre-.xls
+State/Reports/Prahran District-Results by Voting Centre.xls
+State/Reports/Preston District-Results by Voting Centre.xls
+State/Reports/Richmond District-Results by Voting Centre.xls
+State/Reports/Ringwood District-Results by Voting Centre.xls
+State/Reports/Ripon District-Results by Voting Centre.xls
+State/Reports/Rowville District-Results by Voting Centre.xls
+State/Reports/Sandringham District-Results by Voting Centre.xls
+State/Reports/Shepparton District-Results by Voting Centre.xls
+State/Reports/South Barwon District-Results by Voting Centre.xls
+State/Reports/South-Eastern Metropolitan Region-Distribution of Preferences.xls
+State/Reports/South-Eastern Metropolitan Region-Results by Voting Centre..xls
+State/Reports/South-Eastern Metropolitan Region-Results by Voting Centre.xls
+State/Reports/South-Eastern Metropolitan Region-Votes Received.xls
+State/Reports/South-West Coast District-Results by Voting Centre.xls
+State/Reports/Southern Metropolitan Region-Distribution of Preferences.xls
+State/Reports/Southern Metropolitan Region-Results by Voting Centre.xls
+State/Reports/Southern Metropolitan Region-Votes Received.xls
+State/Reports/St Albans District-Results by Voting Centre.xls
+State/Reports/State Election 2022-Eastern Victoria Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-North-Eastern Metropolitan Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-Northern Metropolitan Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-Northern Victoria Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-South-Eastern Metropolitan Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-Southern Metropolitan Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-Western Metropolitan Region-Group Voting Tickets.pdf
+State/Reports/State Election 2022-Western Victoria Region-Group Voting Tickets.pdf
+State/Reports/Sunbury District-Results by Voting Centre.xls
+State/Reports/Sydenham District-Results by Voting Centre.xls
+State/Reports/Tarneit District-Results by Voting Centre.xls
+State/Reports/Thomastown District-Results by Voting Centre.xls
+State/Reports/Warrandyte District-Results by Voting Centre.xls
+State/Reports/Wendouree District-Results by Voting Centre.xls
+State/Reports/Werribee District-Results by Voting Centre.xls
+State/Reports/Western Metropolitan Region-Distribution of Preferences.xls
+State/Reports/Western Metropolitan Region-Results by Voting Centre.xls
+State/Reports/Western Metropolitan Region-Votes Received.xls
+State/Reports/Western Victoria Region-Distribution of Preferences.xls
+State/Reports/Western Victoria Region-Results by Voting Centre.xls
+State/Reports/Western Victoria Region-Votes Received.xls
+State/Reports/Williamstown District-Results by Voting Centre.xls
+State/Reports/Yan Yean District-Results by Voting Centre.xls

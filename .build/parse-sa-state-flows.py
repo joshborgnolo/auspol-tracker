@@ -275,6 +275,7 @@ def main():
             keep = [r for r in csv.DictReader(f)
                     if r.get("jurisdiction") != "sa"]
     all_rows = list(keep)
+    failures = []
     for year in years:
         files = sorted(
             os.path.join(ROOT, n) for n in os.listdir(ROOT)
@@ -329,6 +330,7 @@ def main():
               f"non-classic {nonclassic}")
         if bad_verify:
             print(f"   FINAL-TOTAL-mismatch {bad_verify}")
+            failures += bad_verify
         else:
             print("   all final piles matched FINAL DISTRICT TOTALS (±1)")
         for r in all_rows[-6:]:
@@ -337,6 +339,8 @@ def main():
         if tot_a + tot_c:
             print(f"    pooled classic ALP-vs-Coal: {100*tot_a/(tot_a+tot_c):.2f}% of "
                   f"{round(tot_a+tot_c):,} ballots")
+    if failures:
+        sys.exit(f"{len(failures)} chain(s) miss FINAL DISTRICT TOTALS – {OUT} left as it was")
     all_rows.sort(key=lambda r: (r["jurisdiction"], int(r["year"]),
                                  EMIT.index(r["party"])))
     with open(OUT, "w", newline="") as f:

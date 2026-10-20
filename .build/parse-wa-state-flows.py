@@ -202,13 +202,35 @@ def seat_flow(p):
     return {"classic": True, "flows": flows}
 
 
+def chain_mismatch(p):
+    """Walk the raw level deltas and compare the final pair's totals with the
+    WAEC's own results2CP; a list of (name, walked, printed) misses."""
+    tot = {n: float(p["fpv"][n] or 0) for n in p["names"]}
+    for lv in p["levels"]:
+        if not lv.startswith("Distribution"):
+            continue
+        cells = p["by_level"][lv]
+        out = [n for n in p["names"] if n in cells and (cells[n][0] or 0) < 0]
+        for n in p["names"]:
+            if n in cells and n in tot and cells[n][0]:
+                tot[n] += cells[n][0]
+        for n in out:
+            tot.pop(n, None)
+    got = {n.upper(): v for n, v in tot.items()}
+    cp = {str(r.get("Ballot_Paper_Name", "")).upper(): r.get("Votes_Counted") for r in p["results2CP"]}
+    return [(n, round(got.get(n, -1)), v) for n, v in cp.items()
+            if v is not None and abs(got.get(n, -1e9) - v) > 1]
+
+
 def main():
     years = [int(a) for a in sys.argv[1:]] or list(YEARS)
     keep = []
     if os.path.exists(OUT):
         with open(OUT) as f:
-            keep = [r for r in csv.DictReader(f) if r.get("jurisdiction") != "wa"]
+            keep = [r for r in csv.DictReader(f)
+                    if not (r.get("jurisdiction") == "wa" and int(r["year"]) in years)]
     all_rows = list(keep)
+    failures = []
     for year in years:
         prim = {b: 0.0 for b in BUCKETS}
         flows = {b: {"alp": 0.0, "coal": 0.0} for b in BUCKETS}
@@ -224,6 +246,10 @@ def main():
             n_dop += 1
             for nm, b in p["party"].items():
                 prim[b] += p["fpv"].get(nm, 0.0)
+            miss = chain_mismatch(p)
+            if miss:
+                print(f"  !! {year} {seat}: chain walk misses results2CP {miss}")
+                failures.append((year, seat, miss))
             fl = seat_flow(p)
             if not fl:
                 print(f"  !! {year} {seat}: chain did not resolve to two final candidates")
@@ -256,6 +282,8 @@ def main():
         if tot_a + tot_c:
             print(f"    pooled classic ALP-vs-Coal: {100*tot_a/(tot_a+tot_c):.2f}% of "
                   f"{round(tot_a+tot_c):,} ballots")
+    if failures:
+        sys.exit(f"{len(failures)} chain(s) miss results2CP – {OUT} left as it was")
     all_rows.sort(key=lambda r: (r["jurisdiction"], int(r["year"]), EMIT.index(r["party"])))
     with open(OUT, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLS)

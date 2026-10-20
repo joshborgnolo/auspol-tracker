@@ -196,8 +196,9 @@ def main():
     if os.path.exists(OUT):
         with open(OUT) as f:
             keep = [r for r in csv.DictReader(f)
-                    if r.get("jurisdiction") != "qld"]
+                    if not (r.get("jurisdiction") == "qld" and int(r["year"]) in years)]
     all_rows = list(keep)
+    failures = []
     for year in years:
         el = parse_election(year)
         if el is None:
@@ -251,6 +252,7 @@ def main():
               f"non-classic {nonclassic}")
         if bad_verify:
             print(f"   TCP-mismatch {bad_verify}")
+            failures += [(year, seat, v) for seat, v in bad_verify]
         else:
             print("   all final piles matched the official TCP (±1)")
         for r in all_rows[-6:]:
@@ -259,6 +261,8 @@ def main():
         if tot_a + tot_c:
             print(f"    pooled classic ALP-vs-Coal: {100*tot_a/(tot_a+tot_c):.2f}% of "
                   f"{round(tot_a+tot_c):,} ballots")
+    if failures:
+        sys.exit(f"{len(failures)} chain(s) miss the official TCP – {OUT} left as it was")
     all_rows.sort(key=lambda r: (r["jurisdiction"], int(r["year"]),
                                  EMIT.index(r["party"])))
     with open(OUT, "w", newline="") as f:
