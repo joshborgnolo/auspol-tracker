@@ -413,9 +413,10 @@ const ROYMORGAN_DEMO = {
   // Independents/Others "9" (provably printed, never read at any scale), and a
   // machine-filed wave must read perfectly. The state figures were re-verified
   // against the table images (the release's own PDF is an AccessDenied-private
-  // S3 object); the city/country pair files as `location` verbatim — those
-  // groups join no common-location key, like the birth-country table (the
-  // All-polls Place split still draws their pair, via its alias triple).
+  // S3 object); the city/country pair files as `location` under our
+  // sentence-case names for its printed groups — those groups join no
+  // common-location key, like the birth-country table (the All-polls Place
+  // split still draws their pair, via its alias triple).
   "2026-09-27": {
     source: "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
     total: { alp: 26, lnp: 22.5, onp: 25.5, grn: 14.5, oth: 11 },
@@ -428,8 +429,8 @@ const ROYMORGAN_DEMO = {
         WA: { alp: 27.5, lnp: 20, onp: 26, grn: 15, oth: 12 },
       },
       location: {
-        "Capital Cities": { alp: 28.5, lnp: 22.5, onp: 22, grn: 16, oth: 11.5 },
-        "Regional/Rural Areas": { alp: 22, lnp: 23, onp: 32, grn: 13, oth: 10 },
+        "Capital cities": { alp: 28.5, lnp: 22.5, onp: 22, grn: 16, oth: 11.5 },
+        "Regional/rural areas": { alp: 22, lnp: 23, onp: 32, grn: 13, oth: 10 },
       },
     },
   },

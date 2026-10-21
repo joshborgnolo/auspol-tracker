@@ -3731,8 +3731,8 @@ const DEM_SPLITS = [
   { id: "place", label: "Place", lo: "Rural", hi: "Inner metro", scope: "With a city and country breakdown",
     pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"],
             /* Roy Morgan's city/country table (in print since finding 10363)
-               files its two groups verbatim - no read-time normalisation */
-            ["Capital Cities", "Regional/Rural Areas", "Capital v regional/rural"]] },
+               files its two groups under our sentence-case labels */
+            ["Capital cities", "Regional/rural areas", "Capital v regional/rural"]] },
   { id: "home", label: "Home", lo: "Owners", hi: "Renters", scope: "With a housing breakdown",
     pairs: [["Renting", "Own outright", "Renters v owners"], ["Renting and other", "Own outright", "Renters v owners"]] },
   /* Income is the odd one out in this list: the houses don't just slip on

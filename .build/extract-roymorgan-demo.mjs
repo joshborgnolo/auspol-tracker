@@ -69,7 +69,7 @@
 //   { _about, waves: [ { date, slug, article, published, stateImg, cityImg,
 //                        total {alp,lnp,onp,grn,oth} | null,
 //                        dims: { state: { NSW: {…} … Tas? }, location: { "Capital
-//                        Cities": {…}, "Regional/Rural Areas": {…} } },
+//                        cities": {…}, "Regional/rural areas": {…} } },
 //                        tas? { dateStart, dateEnd, n } } ],
 //     none: { <slug>: <iso day checked> } }
 import fs from "node:fs";

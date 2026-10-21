@@ -33,8 +33,8 @@
 // cell from the row sum (a complement is computed, not printed).
 
 export const STATES_AU = { nsw: "NSW", vic: "Vic", qld: "Qld", sa: "SA", wa: "WA", tas: "Tas" };
-export const CITY_GROUP = "Capital Cities";
-export const REGION_GROUP = "Regional/Rural Areas";
+export const CITY_GROUP = "Capital cities";
+export const REGION_GROUP = "Regional/rural areas";
 export const PARTIES = ["alp", "lnp", "onp", "grn", "oth"];
 
 const squash = (s) => String(s ?? "").toLowerCase().replace(/[^a-z]/g, "");
@@ -223,8 +223,8 @@ export function parseStateTable(lines) {
   return { states: states.map((st) => st.name), now, missing, conflicts, totalOk };
 }
 
-// "Primary Vote by City/Country" OCR lines → {total, Capital Cities,
-// Regional/Rural Areas} shares per party. null = not this table's skeleton.
+// "Primary Vote by City/Country" OCR lines → {total, Capital cities,
+// Regional/rural areas} shares per party. null = not this table's skeleton.
 export function parseCityTable(lines) {
   const rows = skeleton(lines);
   if (!rows) return null;

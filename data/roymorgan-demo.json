@@ -61,14 +61,14 @@
           }
         },
         "location": {
-          "Capital Cities": {
+          "Capital cities": {
             "alp": 29,
             "lnp": 21,
             "onp": 21,
             "grn": 17,
             "oth": 12
           },
-          "Regional/Rural Areas": {
+          "Regional/rural areas": {
             "alp": 21.5,
             "lnp": 22,
             "onp": 30.5,

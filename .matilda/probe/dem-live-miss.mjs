@@ -13,7 +13,7 @@ const SPLITS = [
   { id: "age",       pairs: [["18–34","55+"],["Gen Z","Boomers"],["18–34","65+"],["18–34","50+"]] },
   { id: "gender",    pairs: [["Women","Men"]] },
   { id: "education", pairs: [["University","School"],["University","Year 12 or less"],["University","No tertiary"],["University","High School"]] },
-  { id: "place",     pairs: [["Inner metro","Rural"],["Inner metro","Regional or rural"],["Capital Cities","Regional/Rural Areas"]] },
+  { id: "place",     pairs: [["Inner metro","Rural"],["Inner metro","Regional or rural"],["Capital cities","Regional/rural areas"]] },
   { id: "home",      pairs: [["Renting","Own outright"],["Renting and other","Own outright"]] },
   { id: "income",    pairs: [["$150k+","Under $50k"],["$125k+","Under $45k"],["$100k or more","Under $100k"],["$3,000+ a week","Under $1,000 a week"]] },
   { id: "country",   pairs: [["Vietnam","Australia"],["Mainland China","Australia"],["South Africa","Australia"],["United Kingdom","Australia"]] },

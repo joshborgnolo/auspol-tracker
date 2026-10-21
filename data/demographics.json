@@ -13572,14 +13572,14 @@
      }
     },
     "location": {
-     "Capital Cities": {
+     "Capital cities": {
       "alp": 28.5,
       "lnp": 22.5,
       "onp": 22,
       "grn": 16,
       "oth": 11.5
      },
-     "Regional/Rural Areas": {
+     "Regional/rural areas": {
       "alp": 22,
       "lnp": 23,
       "onp": 32,
@@ -13830,7 +13830,7 @@
    "date": "2026-10-06",
    "dateStart": "2026-09-29",
    "dateEnd": "2026-10-06",
-   "sample": 1500,
+   "sample": 1505,
    "article": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
    "source": "https://e.infogram.com/_/k58LEJVsGG4OersOUxEA",
    "read": "published table",
@@ -14273,14 +14273,14 @@
      }
     },
     "location": {
-     "Capital Cities": {
+     "Capital cities": {
       "alp": 29,
       "lnp": 21,
       "onp": 21,
       "grn": 17,
       "oth": 12
      },
-     "Regional/Rural Areas": {
+     "Regional/rural areas": {
       "alp": 21.5,
       "lnp": 22,
       "onp": 30.5,
