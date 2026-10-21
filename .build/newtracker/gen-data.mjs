@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_NSW_LC } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -4579,6 +4579,22 @@ const flowHistory = (() => {
         grn: [...s.grn], grnNei: [...s.grnNei],
         onp: [...s.onp], onpNei: [...s.onpNei],
         oth: [...s.oth], othNei: [...s.othNei] }])) };
+  /* nsw.sen: the NSW LEGISLATIVE COUNCIL's flows beside the Assembly's —
+     the one state upper house whose commission publishes the ballots (NSW
+     abolished group tickets in 1999), so the explainer's Upper view shows
+     it alone, no other state. FLOW_HISTORY_NSW_LC in flows.mjs, counted
+     from the NSWEC's ballot-level zips (.build/nswec-lc-flow-src/), the
+     three elections 2015–2023, ATL only like the Senate series. Most LC
+     papers are a single "1", so oneOnly rides along for the caption.
+     Federal-only by position: the Vic build returned above. Attached
+     AFTER the JURIS loop below builds h.nsw from the estimate CSV — this
+     spread would not survive it. */
+  const NSW_SEN = { label: "NSW Legislative Council", short: "NSW LC", senate: true, lc: true, elections: "NSW Legislative Council elections",
+    years: [...FLOW_HISTORY_NSW_LC.years],
+    grn: [...FLOW_HISTORY_NSW_LC.grn], grnNei: [...FLOW_HISTORY_NSW_LC.grnNei],
+    onp: [...FLOW_HISTORY_NSW_LC.onp], onpNei: [...FLOW_HISTORY_NSW_LC.onpNei],
+    oth: [...FLOW_HISTORY_NSW_LC.oth], othNei: [...FLOW_HISTORY_NSW_LC.othNei],
+    oneOnly: [...FLOW_HISTORY_NSW_LC.oneOnly] };
   /* fed.states: the same counts split by state, for the explainer's
      Federal sub-row (user 2026-10-21): data/fed-state-flows.json, written by
      .build/fed-state-flows.py from the AEC's per-state TPP flow downloads
@@ -4675,6 +4691,9 @@ const flowHistory = (() => {
         ? { grnExh: col("grn", "x"), onpExh: col("onp", "x"), othExh: col("oth", "x"),
             opv: years.filter((y) => Object.values(bag[jk][y]).some((x) => x.x != null)) } : null) };
   }
+  // NSW's Upper house rides beside its Assembly lines (declared above, after
+  // the JUR return, so the Vic build never carries it; see NSW_SEN there)
+  if (h.nsw) h.nsw.sen = NSW_SEN;
   // the back-test's headline figures: mean miss against the AEC's counts over
   // the federal elections (One Nation's from 2016, its first wide field)
   const mae = (b, k, from = 0) => {

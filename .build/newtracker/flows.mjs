@@ -372,3 +372,26 @@ export const FLOW_HISTORY_SENATE = Object.freeze({
            oth: [36.9, 45.0, 39.5, 61.2], othNei: [3.2, 8.3, 4.7, 4.2] },
   }),
 });
+
+/* FLOW_HISTORY_NSW_LC – the one state UPPER house the explainer can show
+   (NSW keeps no group tickets since 1999, so its Legislative Council prints
+   a per-ballot record; no other state upper house publishes one). Counted
+   from the NSW Electoral Commission's ballot-level preference-data zips by
+   nswec-lc-flow-src/analyse_nsw_lc.py, pinned to its counts
+   (.build/nswec-lc-flow-src/counts.json; test-nsw-lc-atl-flows.mjs
+   recomputes every figure from them). Same estimand as the Senate series:
+   above-the-line ballots only, a figure the share of the family's papers
+   naming at least one major party that named Labor first, each *Nei array
+   the share naming neither major ("named neither", NOT "exhausted" – those
+   ballots mostly stay with minor groups). Most papers carry just one "1"
+   (oneOnly: 84% of ATL ballots in 2015, 72% in 2019, 62% in 2023 – the
+   explainer's caption quotes them, so they are pinned here too). One
+   Nation's 2015 is null, never zero: it ran no LC group that year. Display
+   history, NOT an estimator input. */
+export const FLOW_HISTORY_NSW_LC = Object.freeze({
+  years: [2015, 2019, 2023],
+  grn: [90.9, 91.7, 94.5], grnNei: [74.9, 64.1, 44.8],
+  onp: [null, 33.3, 20.1], onpNei: [null, 89.6, 82.8],
+  oth: [41.4, 54.5, 60.7], othNei: [87.2, 81.5, 77.1],
+  oneOnly: [84.4, 71.6, 62.3],
+});

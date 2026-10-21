@@ -2,13 +2,19 @@
    flip (user 2026-10-22: "House: Lower ⇄ / Upper ⇄"), beside the Share:
    flip. Upper cuts the same chart to the Senate's above-the-line flows for
    the four post-GVT elections 2016–2025 (FLOW_HISTORY_SENATE), national and
-   the eight states/territories through the same Federal menu section; the
-   seat-classification entries and the state-ELECTIONS optgroup are House
-   features and leave the menu under Upper; the Labor-v-One-Nation tab has
-   no Senate bank and snaps back to the Coalition contest on the flip. The
-   counts live in .build/aec-flow-src/senate-atl/counts.json, pinned by
-   .build/test-senate-atl-flows.mjs; this probe pins the chart-side
-   behaviour headlessly against the built page. */
+   the eight states/territories through the same Federal menu section, plus
+   the one state upper house the AEC-less ballot record exists for: NSW's
+   Legislative Council (FLOW_HISTORY_NSW_LC, 2015–2023 — a state-elections
+   optgroup of one under Upper; NSW's state pick flips up to it, its LC
+   pick flips down to the Assembly view, and every other state's pick snaps
+   to federal). The seat-classification entries and every other
+   state-ELECTIONS entry are House features and leave the menu under Upper;
+   the Labor-v-One-Nation tab has no Senate bank and snaps back to the
+   Coalition contest on the flip. The counts live in
+   .build/aec-flow-src/senate-atl/counts.json and
+   .build/nswec-lc-flow-src/counts.json, pinned by test-senate-atl-flows and
+   test-nsw-lc-atl-flows; this probe pins the chart-side behaviour headlessly
+   against the built page. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -90,6 +96,7 @@ const SEN_META = "Australian Senate elections, 2016–2025";
   ok("the menu carries the class entries and the state elections under Lower",
      m.groups.length === 2 && m.groups[0] === "Federal elections" && m.groups[1] === "State elections"
        && m.options.some((v) => v.startsWith("fedcl:")), JSON.stringify(m.groups) + " · " + m.options.length + " options");
+  ok("…and the Legislative Council never appears under Lower", !m.options.includes("nswlc"), m.options.join(" "));
   ok("…and the eight federal states", (m.options.filter((v) => v.startsWith("fed:"))).length === 8,
      m.options.filter((v) => v.startsWith("fed:")).join(" "));
   ok("the scope is the federal House series", (await meta(page)).startsWith(FED_META), await meta(page));
@@ -108,10 +115,13 @@ await sleep(700);
      h.t === "Upper ⇄" && h.pressed === "true" && h.title === "Switch to House of Representatives flows",
      JSON.stringify(h));
   const m = await menuInfo(page);
-  ok("the menu sheds the class entries and the state-elections optgroup",
-     m.groups.length === 1 && m.groups[0] === "Federal elections"
-       && !m.options.some((v) => v.startsWith("fedcl:")), JSON.stringify(m.groups) + " · " + m.options.join(" "));
-  ok("…but keeps national and the eight states", m.options.length === 9 && m.options[0] === "fed", m.options.join(" "));
+  ok("the menu sheds the class entries, and its state group narrows to the one state upper house",
+     m.groups.length === 2 && m.groups[0] === "Federal elections" && m.groups[1] === "State elections"
+       && !m.options.some((v) => v.startsWith("fedcl:"))
+       && m.options.filter((v) => !v.startsWith("fed")).join("") === "nswlc",
+     JSON.stringify(m.groups) + " · " + m.options.join(" "));
+  ok("…but keeps national and the eight states, with NSW's LC beside them",
+     m.options.length === 10 && m.options[0] === "fed" && m.options[9] === "nswlc", m.options.join(" "));
   ok("the scope cuts to the Senate series", (await meta(page)) === SEN_META, await meta(page));
   const yt = await yearTicks(page);
   ok("the chart ticks the four post-GVT Senate elections",
@@ -218,6 +228,118 @@ await sleep(700);
   await sleep(700);
 }
 
+console.log("== desktop: NSW's Legislative Council — the one state upper house ==");
+/* the LC bank's dot coordinates: same desktop frame as the Senate (290px
+   tall, pads 40/16/30 in the 1000-wide viewBox), x taken off the year's own
+   tick text so the aim survives the rendered width */
+const LC_META = "NSW Legislative Council elections, 2015–2023";
+const dotAt = (p, year, share) => p.evaluate(({ year, share }) => {
+  const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+  const r = svg.getBoundingClientRect();
+  const tick = [...svg.querySelectorAll("text")].find((t) => t.textContent.trim() === String(year));
+  if (!tick) return null;
+  const tr = tick.getBoundingClientRect();
+  const sy = r.height / 290;
+  return { x: tr.left + tr.width / 2, y: r.top + (16 + (1 - share / 100) * (290 - 16 - 30)) * sy };
+}, { year, share });
+await clickHouse(page);   // back to Upper, national
+await sleep(700);
+await pickMenu(page, "nswlc");
+await sleep(800);
+{
+  ok("the menu picks the Legislative Council", (await menuInfo(page)).value === "nswlc", (await menuInfo(page)).value);
+  ok("the scope flips to it", (await meta(page)) === LC_META, await meta(page));
+  const yt = await yearTicks(page);
+  ok("the chart ticks the three NSWEC ballot-file elections",
+     JSON.stringify(yt) === JSON.stringify(["2015", "2019", "2023"]), yt.join("/"));
+  ok("the head title still pairs Labor with the Coalition",
+     (await scopeTitle(page)) === "Preferences to Labor over the Coalition, %", await scopeTitle(page));
+  const foot = await footText(page);
+  ok("the caption is the NSWEC count, one-box figures and all",
+     foot.startsWith("Counted from the NSW Electoral Commission’s ballot-level preference files")
+       && foot.includes("84% in 2015, 72% in 2019, 62% in 2023"), foot.slice(0, 60) + " · " + foot.slice(190, 260));
+  ok("…it says named-neither, never exhaust",
+     foot.includes("named neither") && !/[Ee]xhaust[ei]d a ballot/.test(foot), foot.slice(260, 380));
+  ok("…and it promises no other state", foot.includes("only state upper house"), foot.slice(-120));
+  /* the tooltip on the 2023 Greens point (share 94.5, neither 44.8), and
+     One Nation's 2015 hole (no group fielded) answering no tooltip where
+     the 33.3-share 2019 point answers "named neither major: 89.6%" */
+  await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    svg.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await sleep(400);
+  let pt = await dotAt(page, 2023, 94.5);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tipG = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 2023 Greens point tips 94.5, titled for the LC",
+     !!tipG && tipG.includes("2023 · NSW LC") && tipG.includes("94.5"), tipG ? tipG.slice(0, 90) : "no tooltip");
+  ok("…its note names the neither-major share",
+     !!tipG && tipG.includes("named neither major: 44.8%"), tipG ? tipG.slice(60, 200) : "no tooltip");
+  ok("…and nothing says a Council ballot 'exhausted'",
+     !!tipG && !tipG.toLowerCase().includes("exhaust"), tipG ? tipG.slice(0, 60) : "no tooltip");
+  pt = await dotAt(page, 2019, 33.3);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tipOn = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("One Nation's line opens in 2019 (33.3, neither 89.6)",
+     !!tipOn && tipOn.includes("2019 · NSW LC") && tipOn.includes("33.3") && tipOn.includes("named neither major: 89.6%"),
+     tipOn ? tipOn.slice(0, 110) : "no tooltip");
+  /* the tooltip is year-indexed (one card per x, every series listed), so
+     the 2015 hole shows as One Nation ABSENT from the year's card while
+     Greens and Others ride it — the gap drawn, never a zero row */
+  const r = await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    const b = svg.getBoundingClientRect();
+    return { x: b.left + b.width / 2, y: b.bottom - 4 };
+  });
+  await page.mouse.move(r.x, r.y);
+  await sleep(700);
+  pt = await dotAt(page, 2015, 33.3);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tip15 = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("One Nation's 2015 hole is a gap — the year's card rides without it",
+     !!tip15 && tip15.includes("2015 · NSW LC") && tip15.includes("Greens") && !tip15.includes("One Nation"),
+     tip15 ? tip15.slice(0, 120) : "no tooltip");
+}
+console.log("== desktop: the LC flips — NSW survives, every other state snaps ==");
+await clickHouse(page);   // nswlc -> the NSW Assembly view
+await sleep(800);
+{
+  const nswElect = await page.evaluate(() => window.AUSPOL.flowHistory.nsw.elections);
+  ok("flipping down off the LC lands on NSW's Assembly view",
+     (await menuInfo(page)).value === "nsw" && (await meta(page)).startsWith(nswElect),
+     (await menuInfo(page)).value + " · " + (await meta(page)).slice(0, 60));
+  ok("…with the NSW counted caption back", (await footText(page)).startsWith("Counted from"), (await footText(page)).slice(0, 60));
+  await clickHouse(page);  // NSW state pick -> its Legislative Council count
+  await sleep(800);
+  ok("NSW's state pick flips UP to its upper house", (await menuInfo(page)).value === "nswlc", (await menuInfo(page)).value);
+  ok("…and the LC series draws again", (await meta(page)) === LC_META, await meta(page));
+  await clickHouse(page);  // back to the Assembly view
+  await sleep(800);
+  await pickMenu(page, "vic");
+  await sleep(700);
+  ok("a different state's Lower view picks", (await menuInfo(page)).value === "vic", (await menuInfo(page)).value);
+  await clickHouse(page);  // no other state has an upper-house bank
+  await sleep(800);
+  ok("…so Victoria's pick snaps to the federal Senate view",
+     (await menuInfo(page)).value === "fed" && (await meta(page)) === SEN_META,
+     (await menuInfo(page)).value + " · " + (await meta(page)).slice(0, 50));
+  await clickHouse(page);
+  await sleep(700);
+}
+
 console.log("== width sweep: the head controls never overflow (Lower and Upper) ==");
 const widths = [320, 360, 414, 561, 640, 700];
 const sweep = await browser.newPage();
@@ -237,10 +359,17 @@ for (const w of widths) {
   await clickHouse(sweep);
   await sleep(800);
   const m = await menuInfo(sweep);
-  ok(`at ${w}px Upper: the menu is the Senate nine`, m.options.length === 9 && m.groups.length === 1, m.options.join(" "));
+  ok(`at ${w}px Upper: the menu is the Senate nine plus NSW's LC`,
+     m.options.length === 10 && m.groups.length === 2 && m.options[9] === "nswlc", m.options.join(" "));
   g = await cardOverflow(sweep, w);
   ok(`at ${w}px Upper: no document overflow, all three controls within the viewport`,
      g.doc <= 0 && g.els === 0, `doc ${g.doc}px, ${g.els} stray`);
+  await pickMenu(sweep, "nswlc");
+  await sleep(800);
+  g = await cardOverflow(sweep, w);
+  ok(`at ${w}px LC: the long one-box caption never overflows`, g.doc <= 0 && g.els === 0, `doc ${g.doc}px, ${g.els} stray`);
+  await pickMenu(sweep, "fed");
+  await sleep(600);
 }
 await sweep.close();
 

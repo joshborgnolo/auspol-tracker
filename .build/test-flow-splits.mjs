@@ -317,11 +317,15 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
    and its remount key), the menu string "Federal, " + short.
    2026-10-22 (user: "House: Lower ⇄ / Upper ⇄"): a second flip (House:,
    beside Share:) cuts the same chart to the Senate's post-GVT ATL counts;
-   the House-only views leave the menu under Upper. */
+   the House-only views leave the menu under Upper.
+   2026-10-22 (user: NSW's Legislative Council "at least"): the Upper menu
+   gains a one-entry State-elections optgroup riding lc={lcView} - the NSW
+   LC bank (FH.nsw.sen), the only state upper house with a published ballot
+   record; test-nsw-lc-atl-flows pins the table and its emit gating. */
 assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes("const ON_COHORTS = ["),
   "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
 assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
-    && ap.includes(': <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} inv={inv} menu={headCtls} />}'),
+    && ap.includes(': <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} lc={lcView} inv={inv} menu={headCtls} />}'),
   "the contest tabs swap the Coalition history chart for the measured-contest chart (a class pick nulls while the Senate bank is drawn)");
 /* 2026-10-22 (user: "House: Lower ⇄ / Upper ⇄"): a second flip beside
    Share: - Upper cuts the chart to the four post-GVT Senate ATL counts
