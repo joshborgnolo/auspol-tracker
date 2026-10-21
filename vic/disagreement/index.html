@@ -21193,6 +21193,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   }];
   const beyondTopics = null;
   const beyondLatest = null;
+  const beyondByRow = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,
     gov: c.gov,
@@ -21392,6 +21393,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     loadOneOffs,
     beyondTopics,
     beyondLatest,
+    beyondByRow,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,
@@ -54155,6 +54157,9 @@ function RdPolls({
       onLine: id => {
         if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (id === "switching") {
           if (window.AP.gotoSwitching) window.AP.gotoSwitching();
+        } else if (id === "opinion") {
+          const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[ip.pollster + "|" + ip.released];
+          if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
         } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
       },
       sources: r.links && r.links.length ? rdPollLinks(r.links) : null,
@@ -58767,7 +58772,7 @@ function RdApDetail({
   }, isConf ? "How it reads" : "How it counts"), railBody);
   const lineGo = (id, el) => {
     if (RD_LG_PANEL[id]) {
-      if (window.AP.gotoSwitching) window.AP.gotoSwitching();
+      rdLgPanelGo(id, p);
       return;
     }
     const open = el && el.closest(".rd-ap-open");
@@ -58847,7 +58852,22 @@ const RD_LG_LATEST_TABS = {
   leadership: 1
 };
 const RD_LG_PANEL = {
-  switching: "where One Nation’s voters came from"
+  switching: {
+    tip: "where One Nation’s voters came from",
+    where: "the Snapshot",
+    onSnapshot: true
+  },
+  opinion: {
+    tip: "what else this poll asked",
+    where: "Public opinion"
+  }
+};
+const rdLgPanelGo = (id, p) => {
+  if (id === "switching") return window.AP.gotoSwitching && window.AP.gotoSwitching();
+  if (id === "opinion") {
+    const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+    if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
+  }
 };
 function rdLgChgNote(p, keys) {
   const r = p.chg && p.chg.r || {};
@@ -59511,6 +59531,18 @@ function rdLgLines(p, {
       }, def.note))
     });
   }
+  const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+  if (bo) {
+    out.push({
+      id: "opinion",
+      lab: "Public opinion",
+      body: React.createElement(React.Fragment, null, bo.t.map(t => React.createElement(U, {
+        key: t
+      }, t)), React.createElement(U, {
+        soft: true
+      }, bo.n, " question", bo.n === 1 ? "" : "s"))
+    });
+  }
   return out;
 }
 function RdLedger({
@@ -59611,7 +59643,7 @@ function RdLedger({
     const panelGo = RD_LG_PANEL[l.id];
     const can = !!(onLine && (RD_LG_TAB[l.id] || panelGo));
     const Tag = can ? "button" : "div";
-    const away = panelGo ? !latest : latest && !RD_LG_LATEST_TABS[l.id];
+    const away = panelGo ? !panelGo.onSnapshot || !latest : latest && !RD_LG_LATEST_TABS[l.id];
     return React.createElement(Tag, {
       key: l.id,
       type: can ? "button" : undefined,
@@ -59620,7 +59652,7 @@ function RdLedger({
         e.stopPropagation();
         onLine(l.id, e.currentTarget);
       } : undefined,
-      title: can ? panelGo ? away ? "Open " + panelGo + " on the Snapshot" : "Show " + panelGo : away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
+      title: can ? panelGo ? away ? "Open " + panelGo.tip + " on " + panelGo.where : "Show " + panelGo.tip : away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
     }, React.createElement("span", {
       className: "rd-ldg-lab"
     }, l.lab), React.createElement("span", {
@@ -66560,6 +66592,17 @@ function BtvBody() {
       id: "btv-" + id
     });
   };
+  btvUseEffect(() => {
+    window.AP.btvGo = h => {
+      setSort("pollster");
+      setJump({
+        id: h
+      });
+    };
+    return () => {
+      delete window.AP.btvGo;
+    };
+  }, []);
   const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
   const groups = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : sort === "pollster" ? btvByPollster(topics, src && src.houses || {}) : null, [topics, sort, src]);
   if (failed) {
@@ -68836,6 +68879,18 @@ function App() {
       };
       setTimeout(seek, 0);
     };
+    window.AP.gotoOpinion = storeKey => {
+      if (readLocation() !== "public-opinion") navTab("public-opinion", true);
+      let tries = 0;
+      const seek = () => {
+        if (window.AP.btvGo) {
+          window.AP.btvGo("btv-p-" + storeKey);
+          return;
+        }
+        if (++tries < 40) setTimeout(seek, 75);
+      };
+      setTimeout(seek, 0);
+    };
     return () => {
       delete window.AP.openPoll;
       delete window.AP.openTerm;
@@ -68843,6 +68898,7 @@ function App() {
       delete window.AP.gotoNextPolls;
       delete window.AP.gotoFinalPolls;
       delete window.AP.gotoSwitching;
+      delete window.AP.gotoOpinion;
     };
   }, []);
   const restoreY = useRef(null);

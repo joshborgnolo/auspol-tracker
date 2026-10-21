@@ -980,6 +980,14 @@ function BtvBody() {
     setSort("issue");
     setJump({ id: "btv-" + id });
   };
+  /* the go hook for a cross-tab trip (AP.gotoOpinion): flip the page to
+     its By-pollster view and land on the pollster's group. It lives on
+     window.AP only while the page itself is mounted - a trip arriving
+     before that (or after leaving) is gotoOpinion's seek loop's job. */
+  btvUseEffect(() => {
+    window.AP.btvGo = (h) => { setSort("pollster"); setJump({ id: h }); };
+    return () => { delete window.AP.btvGo; };
+  }, []);
   const topics = btvUseMemo(() => (src ? src.topics.filter((t) => t.blocks.length || t.more.length) : []), [src]);
   const groups = btvUseMemo(() => (sort === "recent" ? btvByMonth(topics)
     : sort === "pollster" ? btvByPollster(topics, (src && src.houses) || {}) : null), [topics, sort, src]);

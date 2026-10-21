@@ -2594,8 +2594,23 @@ function App() {
       };
       setTimeout(seek, 0);
     };
+    /* The poll ledger's "Public opinion" line goes to the /public-opinion/
+       page's By-pollster view, landed on the pollster's own group. The
+       page owns its sort and jump state, so the go hook it registers
+       (AP.btvGo, rd-beyond.jsx) does both jobs; the seek loop waits for
+       the hook the way gotoSwitching's waits for the section. */
+    window.AP.gotoOpinion = (storeKey) => {
+      if (readLocation() !== "public-opinion") navTab("public-opinion", true);
+      let tries = 0;
+      const seek = () => {
+        if (window.AP.btvGo) { window.AP.btvGo("btv-p-" + storeKey); return; }
+        if (++tries < 40) setTimeout(seek, 75);
+      };
+      setTimeout(seek, 0);
+    };
     return () => { delete window.AP.openPoll; delete window.AP.openTerm; delete window.AP.openTermPage;
-                   delete window.AP.gotoNextPolls; delete window.AP.gotoFinalPolls; delete window.AP.gotoSwitching; };
+                   delete window.AP.gotoNextPolls; delete window.AP.gotoFinalPolls; delete window.AP.gotoSwitching;
+                   delete window.AP.gotoOpinion; };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
      scroll is handed to a layout effect rather than to requestAnimationFrame:

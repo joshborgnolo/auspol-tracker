@@ -1488,7 +1488,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
      rows carry it off). A line that's no tab at all (RD_LG_PANEL) trips out
      to its panel instead; the row stays open behind the tab that lent it. */
   const lineGo = (id, el) => {
-    if (RD_LG_PANEL[id]) { if (window.AP.gotoSwitching) window.AP.gotoSwitching(); return; }
+    if (RD_LG_PANEL[id]) { rdLgPanelGo(id, p); return; }
     const open = el && el.closest(".rd-ap-open");
     const row = open && open.previousElementSibling;
     if (row) rdPinScroll([row], true);
@@ -1550,9 +1550,22 @@ const rdLgNet = (v) => (v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") +
 const RD_LG_TAB = { primary: "Primary", twopp: "2PP", leadership: "Leadership", direction: "Direction", issues: "Issues", demographics: "Demographics" };
 const RD_LG_LATEST_TABS = { twopp: 1, primary: 1, leadership: 1 };
 /* a line can also trip to somewhere that is no tab at all: the switching
-   line goes to the snapshot's vote-switching panel (AP.gotoSwitching). The
-   value is the destination named on the line's tooltip. */
-const RD_LG_PANEL = { switching: "where One Nation’s voters came from" };
+   line goes to the snapshot's vote-switching panel (AP.gotoSwitching),
+   the opinion line to the pollster's group on the Public opinion page
+   (AP.gotoOpinion). tip is the destination named on the line's tooltip;
+   onSnapshot marks a destination the Latest table shares its tab with,
+   so only the archive's trip counts as away. */
+const RD_LG_PANEL = {
+  switching: { tip: "where One Nation’s voters came from", where: "the Snapshot", onSnapshot: true },
+  opinion: { tip: "what else this poll asked", where: "Public opinion" },
+};
+const rdLgPanelGo = (id, p) => {
+  if (id === "switching") return window.AP.gotoSwitching && window.AP.gotoSwitching();
+  if (id === "opinion") {
+    const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+    if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h);
+  }
+};
 /* which poll a lead's change markers are measured on: the house's previous
    poll that printed each figure (gen-data's chg.r). One wave for the whole
    lead names it; a lead whose figures reach back to different waves (a
@@ -1973,6 +1986,16 @@ function rdLgLines(p, { onM, demSplit }) {
       <U soft>{def.note}</U>
     </> });
   }
+  /* the /public-opinion/ catalogue's one-off questions filed to this wave
+     (gen-data §8e's beyondByRow) - federal only, and only where one of the
+     pollster's store waves pairs to the row's release */
+  const bo = window.AUSPOL.beyondByRow && window.AUSPOL.beyondByRow[p.pollster + "|" + p.released];
+  if (bo) {
+    out.push({ id: "opinion", lab: "Public opinion", body: <>
+      {bo.t.map((t) => <U key={t}>{t}</U>)}
+      <U soft>{bo.n} question{bo.n === 1 ? "" : "s"}</U>
+    </> });
+  }
   return out;
 }
 
@@ -2023,14 +2046,15 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
               const panelGo = RD_LG_PANEL[l.id];
               const can = !!(onLine && (RD_LG_TAB[l.id] || panelGo));
               const Tag = can ? "button" : "div";
-              /* a panel trip leaves the page only from the archive (the Latest
-                 table shares the snapshot with the panel); a tab trip leaves
-                 the page only from the Latest table */
-              const away = panelGo ? !latest : (latest && !RD_LG_LATEST_TABS[l.id]);
+              /* a snapshot-panel trip leaves the page only from the archive
+                 (the Latest table shares the tab with the panel); a trip to
+                 any other destination is away from either home; a tab trip
+                 leaves the page only from the Latest table */
+              const away = panelGo ? (!panelGo.onSnapshot || !latest) : (latest && !RD_LG_LATEST_TABS[l.id]);
               return (
                 <Tag key={l.id} type={can ? "button" : undefined} className={"rd-ldg-line" + (can ? " go" : "")}
                      onClick={can ? (e) => { e.stopPropagation(); onLine(l.id, e.currentTarget); } : undefined}
-                     title={can ? (panelGo ? (away ? "Open " + panelGo + " on the Snapshot" : "Show " + panelGo)
+                     title={can ? (panelGo ? (away ? "Open " + panelGo.tip + " on " + panelGo.where : "Show " + panelGo.tip)
                                           : (away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab")) : undefined}>
                   <span className="rd-ldg-lab">{l.lab}</span>
                   <span className="rd-ldg-lbody">{l.body}</span>

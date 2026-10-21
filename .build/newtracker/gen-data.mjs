@@ -7878,6 +7878,10 @@ window.AUSPOL = (function () {
   const beyondTopics = ${JSON.stringify(beyondTopics)};
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
   const beyondLatest = ${JSON.stringify(beyondLatest)};
+  /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
+     the pollster's store key, n: questions, t: topic shorts }. The poll
+     ledger's "Public opinion" line reads it - null off the federal page */
+  const beyondByRow = ${JSON.stringify(oneOffsSource ? oneOffsSource.byRow : null)};
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -7925,7 +7929,7 @@ window.AUSPOL = (function () {
     loadCycleSource,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, beyondTopics, beyondLatest,
+    loadOneOffs, beyondTopics, beyondLatest, beyondByRow,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)
