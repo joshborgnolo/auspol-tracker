@@ -2132,6 +2132,17 @@ const RM_DIR_GROUPS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8")); }
   catch { return null; }
 })();
+/* Essential's national-mood breakdowns, banked by
+   extract-essential-direction.mjs out of the assimilated CSV mirror into
+   data/essential-direction-groups.json: Men/Women and 18–34/35–54/55+
+   right/wrong/unsure cells per wave, keyed by tracker date with dirRow –
+   the polls.json direction-row date the wave's TOTAL reconciled with,
+   which is the key the group select's dot tips join on. */
+const ESS_DIR_GROUPS = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8")); }
+  catch { return null; }
+})();
 /* Essential's national-mood splits, columned out of the assimilated CSV
    (data/essential-report.csv): every wave's trend table carries Male/Female
    and 18-34/35-54/55+ cuts beside the headline print – keyed here by the
@@ -2350,13 +2361,32 @@ const directionNow = (() => {
      of individual states", five mainland states). right only before the
      cache horizon; points ride `x` exactly (no estimation).
    · directionGroups – Roy Morgan's "Analysis by …" prose splits from
-     data/roymorgan-direction-groups.json: the gender pair, and the
-     voting-intention right/wrong shares (ALP's right share plus the
-     wrong-share of every other group). A fortnight that printed no cut
-     for a group leaves a gap in that group's series, not a zero.
+     data/roymorgan-direction-groups.json (the gender pair, and the
+     voting-intention right/wrong shares; ALP's right share plus the
+     wrong-share of every other group – a fortnight that printed no cut
+     for a group leaves a gap in that group's series, not a zero), and
+     Essential's banked mood splits from
+     data/essential-direction-groups.json (gender and age bands on the
+     wave field of every Essential wave: right/wrong/unsure cells; the
+     unsure cell never charts).
    · directionStateNote – the latest Roy Morgan release's printed state
      highest/lowest extremes; the full state table is paywalled, so the
-     extremes are the only state cut that exists. */
+     extremes are the only state cut that exists.
+
+   Tip provenance: every group/state series row that joins a polls.json
+   direction row carries that row's pollster / dateLabel / released /
+   sample fields, the exact fields TrendChart's dot tip reads off meta
+   (see directionPolls below for the same contract), so a group dot
+   identifies its wave – fieldwork window, n where a sample is on file,
+   and the click-through to the archive row – the way a headline dot
+   does. A banked month or wave with no row to join simply carries none
+   of the fields, and the render layer falls back to the month label. */
+const dirTipOf = (d) => ({
+  pollster: d.pollster,
+  dateLabel: fwLabel(d.dateStart, d.date),
+  released: d.date,
+  sample: POLL_BY_KEY.get(d.date + "|" + d.pollster)?.sample || d.sample || null,
+});
 const directionStateNote = (() => {
   if (!RM_DIR_GROUPS?.waves) return null;
   const dates = Object.keys(RM_DIR_GROUPS.waves).filter((d) => RM_DIR_GROUPS.waves[d]?.stateExtremes).sort();
@@ -2365,37 +2395,83 @@ const directionStateNote = (() => {
 })();
 const directionStates = (() => {
   if (!SEC_STATES?.series) return null;
+  // the states bank keys by month; the tip row resolves the wave-END month
+  // first, then the publication and fieldwork-start months (the same
+  // resolution the expanded-poll breakdown ledger uses)
+  const secTipByMonth = (() => {
+    const byMonth = new Map();
+    const pass = (read) => {
+      for (const d of DIR.filter((x) => x.pollster === "SEC Newgate")) {
+        const s = read(d);
+        if (s) { const ym = ymOf(String(s).slice(0, 10)); if (!byMonth.has(ym)) byMonth.set(ym, d); }
+      }
+    };
+    pass((d) => d.date); pass((d) => d.published); pass((d) => d.dateStart);
+    return byMonth;
+  })();
   const perState = {};
   for (const st of SEC_STATES.states || []) {
     const rows = SEC_STATES.series[st] || [];
     perState[st] = {
       label: st,
+      source: "SEC Newgate",
       head: rows.length ? rows[rows.length - 1] : null,
-      series: rows.map((r) => ({ ym: r.month, x: mx(r.month), right: r.right, wrong: r.wrong ?? null })),
+      series: rows.map((r) => ({
+        ym: r.month, x: mx(r.month), right: r.right, wrong: r.wrong ?? null,
+        ...(secTipByMonth.get(r.month) ? dirTipOf(secTipByMonth.get(r.month)) : {}),
+      })),
     };
   }
   return perState;
 })();
 const directionGroups = (() => {
-  if (!RM_DIR_GROUPS?.waves) return null;
   const out = {};
-  const push = (label, date, right, wrong) => {
-    (out[label] ??= { label, source: "Roy Morgan", series: [] }).series.push({
-      date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
-    });
+  const dirRowByDate = (pollster) => {
+    const m = new Map();
+    for (const d of DIR.filter((x) => x.pollster === pollster)) m.set(d.date, d);
+    return m;
   };
-  for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
-    if (w.gender) {
-      push("Men", date, w.gender.Men.r, w.gender.Men.w);
-      push("Women", date, w.gender.Women.r, w.gender.Women.w);
+  if (RM_DIR_GROUPS?.waves) {
+    const rmRows = dirRowByDate("Roy Morgan");
+    const push = (label, dim, date, right, wrong) => {
+      (out[label] ??= { label, source: "Roy Morgan", dim, series: [] }).series.push({
+        date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
+        ...(rmRows.has(date) ? dirTipOf(rmRows.get(date)) : {}),
+      });
+    };
+    for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
+      if (w.gender) {
+        push("Men", "gender", date, w.gender.Men.r, w.gender.Men.w);
+        push("Women", "gender", date, w.gender.Women.r, w.gender.Women.w);
+      }
+      if (w.vote) {
+        push("One Nation voters", "vote", date, null, w.vote["One Nation"].w);
+        push("Coalition voters", "vote", date, null, w.vote["L-NP"].w);
+        push("Other party voters", "vote", date, null, w.vote.Other.w);
+        push("Independent voters", "vote", date, null, w.vote.Independent.w);
+        push("Greens voters", "vote", date, null, w.vote.Greens.w);
+        push("Labor voters", "vote", date, w.vote.ALP.r ?? null, w.vote.ALP.w);
+      }
     }
-    if (w.vote) {
-      push("One Nation voters", date, null, w.vote["One Nation"].w);
-      push("Coalition voters", date, null, w.vote["L-NP"].w);
-      push("Other party voters", date, null, w.vote.Other.w);
-      push("Independent voters", date, null, w.vote.Independent.w);
-      push("Greens voters", date, null, w.vote.Greens.w);
-      push("Labor voters", date, w.vote.ALP.r ?? null, w.vote.ALP.w);
+  }
+  if (ESS_DIR_GROUPS?.waves) {
+    const essRows = dirRowByDate("Essential");
+    // Men/Women collide with Roy Morgan's group keys, so Essential's gender
+    // pair rides the suffixed key; the age bands collide with nothing
+    const push = (label, dim, date, cell, wave) => {
+      const row = wave.dirRow ? essRows.get(wave.dirRow) : null;
+      (out[label] ??= { label, source: "Essential", dim, series: [] }).series.push({
+        date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365,
+        right: cell.r, wrong: cell.w,
+        ...(row ? dirTipOf(row) : {}),
+      });
+    };
+    for (const [date, w] of Object.entries(ESS_DIR_GROUPS.waves)) {
+      push("Men (Essential)", "gender", date, w.Men, w);
+      push("Women (Essential)", "gender", date, w.Women, w);
+      push("18–34", "age", date, w["18–34"], w);
+      push("35–54", "age", date, w["35–54"], w);
+      push("55+", "age", date, w["55+"], w);
     }
   }
   return Object.keys(out).length ? out : null;
@@ -4401,6 +4477,15 @@ const flowForced = (() => {
      Harbour is Green's count of the early voting centre, 47% of the votes
      (part: drawn hollow) - Green and Bonham both put the whole seat's
      Liberal flow a little more Labor's way. kind: "count" | "est" | "part". */
+  /* Secret Harbour (user 2026-10-22: "data for all polling booths"): no
+     whole-seat count by party exists, but the early polling place's count
+     sheets (47% of the votes) plus the rest of the seat's first preferences
+     and two-candidate total pin it down - .build/secret-harbour-flows.py,
+     data/secret-harbour-flows.json. range: the spread over ways of dividing
+     the rest's known total between parties, not a tested 90% error. */
+  const shf = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "secret-harbour-flows.json"), "utf8")); } catch { return null; }
+  })();
   const saC = (() => {
     try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")).contests["sa-2026-alp-onp"]; } catch { return null; }
   })();
@@ -4419,9 +4504,15 @@ const flowForced = (() => {
       alt: { coal: "Bonham 33.9", grn: "Bonham 84.8", oth: "independents " + saC.model.ind.toFixed(1) + ", Bonham 55.9" },
       lbl: { coal: "Liberal", oth: "all others" },
       sub: "This site’s estimate from the published distributions, " + saC.seats + " seats" }] : []),
-    { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
+    shf ? { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
+      kind: "est", coal: Math.round(shf.estimate.lib * 10) / 10, grn: Math.round(shf.estimate.grn * 10) / 10, oth: Math.round(shf.estimate.oth * 10) / 10,
+      range: { coal: shf.range.lib, grn: shf.range.grn, oth: shf.range.oth },
+      alt: { coal: "early voting centre counted " + shf.early_polling_place.lib.toFixed(1), grn: "early voting centre counted " + shf.early_polling_place.grn.toFixed(1),
+             oth: "early voting centre counted " + shf.early_polling_place.oth.toFixed(1) },
+      lbl: { coal: "Liberal", oth: "all others" },
+      sub: "This site’s estimate: the early voting centre’s count (" + Math.round(shf.early_share) + "% of the votes) plus the rest of the seat’s totals" }
+    : { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
       kind: "part", coal: 29.8, grn: 90.0, lbl: { coal: "Liberal" },
-      alt: { coal: "whole seat a little higher, by Green’s and Bonham’s readings" },
       sub: "Green’s count of the early voting centre: 47% of the votes" },
   ];
   /* DemosAU's MRP reports print one national respondent flow beside
@@ -4611,8 +4702,10 @@ const flowHistory = (() => {
   /* fed.classes: the same counted family split by seat type, for the
      explainer's four class views (user request 2026-10-22): data/
      fed-class-flows.json, written by .build/fed-class-flows.py from the
-     AEC's per-division TCP flow downloads (2007–2025; no per-division
-     product reaches back further) grouped by the AEC's own per-election
+     AEC's per-division TCP flow tables (2001–2025 — 2001 from its
+     statistics pack via aec-tcp-history.py, 2007+ from the downloads; no
+     per-division product of either era reaches further, and 2004 has
+     neither table nor classification) grouped by the AEC's own per-election
      division classifications — the election's own table, so a
      recategorised seat moves classes with it. Classic seats only, like
      aec-2025-region-tpp-flows.mjs: a non-classic final pair can hold a

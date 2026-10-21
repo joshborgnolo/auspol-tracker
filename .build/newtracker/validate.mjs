@@ -997,6 +997,56 @@ export function validateSecDirectionStates() {
   return errors;
 }
 
+/* data/essential-direction-groups.json – Essential's national-mood
+   breakdowns, banked from the CSV mirror by extract-essential-direction.mjs.
+   Shape + plausibility + coverage: every wave key is a tracker-dated ISO
+   day carrying its csv anchor date, the five bands plus total each hold
+   r/w/u shares 0–100 summing to 100±2 (the extractor's own print
+   tolerance), dirRow where present names an Essential direction[] row in
+   polls.json, and every Essential direction row in polls.json is covered
+   by exactly one wave's dirRow – a silently dropped wave. */
+export function validateEssDirectionGroups() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8")); }
+  catch { fail("essential-direction-groups.json", "ess-direction-groups-shape", "missing or unparseable"); return errors; }
+  if (!S || typeof S !== "object" || !S.waves || typeof S.waves !== "object") {
+    fail("essential-direction-groups.json", "ess-direction-groups-shape", "no waves object");
+    return errors;
+  }
+  const P = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+  const essDirDates = new Set((P.direction || []).filter((d) => d.pollster === "Essential").map((d) => d.date));
+  const taken = new Map();
+  for (const [date, wave] of Object.entries(S.waves)) {
+    const where = `essential-direction-groups ${date}`;
+    if (!ISO_DAY.test(date)) fail(where, "date-format", `date "${date}" is not YYYY-MM-DD`);
+    if (!wave || typeof wave !== "object") { fail(where, "ess-direction-groups-shape", "wave is not an object"); continue; }
+    if (!ISO_DAY.test(wave.csv || "")) fail(where, "date-format", `csv anchor "${wave.csv}" is not YYYY-MM-DD`);
+    for (const grp of ["total", "Men", "Women", "18–34", "35–54", "55+"]) {
+      const c = wave[grp];
+      const w2 = `${where} ${grp}`;
+      if (!c || typeof c !== "object") { fail(w2, "ess-direction-groups-shape", `missing ${grp} cell`); continue; }
+      for (const k of ["r", "w", "u"]) {
+        if (typeof c[k] !== "number" || c[k] < 0 || c[k] > 100) fail(w2, "range", `${k} = ${c[k]}`);
+      }
+      if (typeof c.r === "number" && typeof c.w === "number" && typeof c.u === "number" && Math.abs(c.r + c.w + c.u - 100) > 2)
+        fail(w2, "total", `r+w+u ${c.r + c.w + c.u} out by more than 2`);
+    }
+    if (wave.dirRow != null) {
+      if (!essDirDates.has(wave.dirRow)) fail(where, "provenance", `dirRow ${wave.dirRow} names no Essential direction[] row`);
+      else {
+        if (taken.has(wave.dirRow)) fail(where, "provenance", `dirRow ${wave.dirRow} is also claimed by wave ${taken.get(wave.dirRow)}`);
+        taken.set(wave.dirRow, date);
+      }
+    }
+  }
+  for (const d of essDirDates) {
+    if (!taken.has(d)) fail("essential-direction-groups.json", "coverage", `Essential direction row ${d} is claimed by no wave`);
+  }
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -1006,6 +1056,7 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   errors.push(...validatePewSentiment());
   errors.push(...validateDirectionGroups());
   errors.push(...validateSecDirectionStates());
+  errors.push(...validateEssDirectionGroups());
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }

@@ -2,7 +2,9 @@
    generated 9f09dca2 data asset: directionStates (SEC Newgate's per-State
    series, from data/sec-direction-states.json), directionGroups (Roy Morgan's
    "Analysis by …" gender and voting-intention splits, from
-   data/roymorgan-direction-groups.json) and directionStateNote (the latest
+   data/roymorgan-direction-groups.json, plus Essential's national-mood
+   Men/Women and 18–34/35–54/55+ splits, from
+   data/essential-direction-groups.json) and directionStateNote (the latest
    printed state extremes). All are federal-only: a BUILD_JUR=vic run must
    carry none of them.
    Run: node .build/newtracker/test-direction-groups.mjs */
@@ -37,6 +39,7 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
   for (const st of SEC_STATES) {
     const g = ds[st];
     assert.equal(g.label, st);
+    assert.equal(g.source, "SEC Newgate", `${st}: credit rides the bank`);
     assert.equal(g.series.length, (bank.series[st] || []).length,
       `${st}: the whole bank carries over`);
     assert.ok(g.series.length >= 9, `${st}: a series long enough to chart`);
@@ -47,6 +50,9 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
       bankRows.map((r) => [r.month, r.right, r.wrong ?? null]),
       `${st}: the series mirrors the bank's figures month for month`);
     let prevX = -Infinity, prevYm = "";
+    const secRowMonths = new Set((JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).direction || [])
+      .filter((d) => d.pollster === "SEC Newgate")
+      .flatMap((d) => [d.date, d.published, d.dateStart].filter(Boolean).map((s) => String(s).slice(0, 7))));
     for (const p of g.series) {
       assert.match(p.ym, /^\d{4}-\d{2}$/, `${st}: month-shaped ym`);
       assert.ok(p.ym > prevYm, `${st}: months ascend`);
@@ -57,28 +63,42 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
         `${st}: wrong is a printed share or unprinted`);
       assert.ok(!(p.ym > "2026-06" && p.wrong == null),
         `${st}: the paired right/wrong era has both`);
+      // tip provenance rides from the polls.json direction row its month
+      // resolves to: a banked month with no row joins nothing at all
+      if (secRowMonths.has(p.ym)) {
+        assert.equal(p.pollster, "SEC Newgate", `${st} ${p.ym}: tip credit`);
+        assert.match(p.released, /^\d{4}-\d{2}-\d{2}$/, `${st} ${p.ym}: the joined row's date`);
+        assert.ok(typeof p.dateLabel === "string" && p.dateLabel.length, `${st} ${p.ym}: fieldwork window`);
+      } else {
+        assert.equal(p.released, undefined, `${st} ${p.ym}: an unjoined month carries no released date`);
+      }
       prevX = p.x; prevYm = p.ym;
     }
   }
   console.log("directionStates: OK");
 }
 
+// ---- directionGroups: Roy Morgan + Essential ---------------------------
+const dg = D.directionGroups;
+assert.ok(dg, "directionGroups emitted");
+
 // ---- directionGroups: Roy Morgan's gender pair + voting-intention splits ----
 {
-  const dg = D.directionGroups;
-  assert.ok(dg, "directionGroups emitted");
   const store = JSON.parse(readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8"));
   const waves = Object.entries(store.waves).sort(([a], [b]) => a.localeCompare(b));
-  // the groups present are exactly the groups the store's waves print
+  // the RM groups present are exactly the groups the store's waves print
   const expect = new Set();
   for (const [, w] of waves) {
     if (w.gender) { expect.add("Men"); expect.add("Women"); }
     if (w.vote) for (const k of ["One Nation voters", "Coalition voters", "Other party voters",
                                  "Independent voters", "Greens voters", "Labor voters"]) expect.add(k);
   }
-  assert.deepEqual(Object.keys(dg).sort(), [...expect].sort(), "a group per printed block, no others");
-  for (const [label, g] of Object.entries(dg)) {
-    assert.equal(g.source, "Roy Morgan");
+  const rmKeys = Object.keys(dg).filter((k) => dg[k].source === "Roy Morgan");
+  assert.deepEqual(rmKeys.sort(), [...expect].sort(), "a group per printed block, no others");
+  const rmRowDates = new Set((JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).direction || [])
+    .filter((d) => d.pollster === "Roy Morgan").map((d) => d.date));
+  for (const label of rmKeys) {
+    const g = dg[label];
     for (const p of g.series) {
       assert.match(p.date, /^\d{4}-\d{2}-\d{2}$/);
       assert.equal(p.ym, p.date.slice(0, 7), `${label}: ym mirrors the wave date`);
@@ -87,6 +107,15 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
         `${label}: wrong rides on Roy Morgan's half-point scale`);
       assert.ok(p.right === null || (typeof p.right === "number" && p.right >= 0 && p.right <= 100),
         `${label}: right is printed or null, never estimated`);
+      // RM waves key by date exactly: a stored wave with a matching direction
+      // row carries the tip payload, a wave without one joins nothing
+      if (rmRowDates.has(p.date)) {
+        assert.equal(p.pollster, "Roy Morgan", `${label} ${p.date}: tip credit`);
+        assert.ok(typeof p.dateLabel === "string" && p.dateLabel.length, `${label} ${p.date}: fieldwork window`);
+        assert.equal(p.released, p.date, `${label} ${p.date}: released rides the row date`);
+      } else {
+        assert.equal(p.released, undefined, `${label} ${p.date}: an unjoined wave carries no released date`);
+      }
     }
   }
   // figure-for-figure spot pins off the committed store: Men on 10328,
@@ -101,7 +130,48 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
   const menDates = dg.Men.series.map((p) => p.date);
   assert.ok(!menDates.includes("2026-09-13") && !menDates.includes("2026-09-27"),
     "Men has no point on the gender-less fortnights");
-  console.log("directionGroups: OK");
+  console.log("directionGroups (Roy Morgan): OK");
+}
+
+// ---- directionGroups: Essential's gender pair + age bands ------------------
+{
+  const essKeys = Object.keys(dg).filter((k) => dg[k].source === "Essential");
+  assert.deepEqual(essKeys.sort(), ["18–34", "35–54", "55+", "Men (Essential)", "Women (Essential)"].sort(),
+    "Essential rides five groups, its gender pair suffixed to clear Roy Morgan's");
+  const store = JSON.parse(readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8"));
+  const waves = Object.keys(store.waves).length;
+  assert.ok(waves > 0, "the committed Essential store banked waves");
+  const BANDS = { "Men (Essential)": ["gender", "Men"], "Women (Essential)": ["gender", "Women"],
+                  "18–34": ["age", "18–34"], "35–54": ["age", "35–54"], "55+": ["age", "55+"] };
+  for (const [label, [dim, cell]] of Object.entries(BANDS)) {
+    const g = dg[label];
+    assert.ok(g, `${label} emitted`);
+    assert.equal(g.dim, dim, `${label}: dim rides the panel's group taxonomy`);
+    assert.equal(g.series.length, waves, `${label}: one point per banked wave`);
+    for (const p of g.series) {
+      const banked = store.waves[p.date]?.[cell];
+      assert.ok(banked, `${label} ${p.date}: the point's wave is in the store`);
+      assert.deepEqual([p.right, p.wrong], [banked.r, banked.w], `${label} ${p.date}: figures verbatim`);
+      // every banked wave reconciles to a polls.json direction row at the
+      // store level, so every point carries the tip payload
+      assert.equal(p.pollster, "Essential", `${label} ${p.date}: tip credit`);
+      assert.match(p.released, /^\d{4}-\d{2}-\d{2}$/, `${label} ${p.date}: the joined row's date`);
+      assert.ok(typeof p.dateLabel === "string" && p.dateLabel.length, `${label} ${p.date}: fieldwork window`);
+    }
+  }
+  // figure-for-figure spot pins on the latest wave, the tracker-date key
+  // off the curated-outlier csv 2026-01-28, and the first wave
+  const atE = (label, date) => dg[label].series.find((p) => p.date === date) ?? {};
+  assert.deepEqual([atE("Men (Essential)", "2026-09-29").right, atE("Men (Essential)", "2026-09-29").wrong],
+    [29, 61], "Men (Essential) latest");
+  assert.deepEqual([atE("18–34", "2026-09-29").right, atE("18–34", "2026-09-29").wrong], [28, 55],
+    "18–34 latest");
+  assert.ok(atE("Men (Essential)", "2026-09-29").sample > 0, "the joined row carries its sample");
+  assert.deepEqual([atE("55+", "2026-01-27").right, atE("55+", "2026-01-27").wrong], [25, 58],
+    "the curated outlier rides its tracker date");
+  assert.deepEqual([atE("Women (Essential)", "2022-06-14").right, atE("Women (Essential)", "2022-06-14").wrong],
+    [45, 25], "Women (Essential) first wave");
+  console.log("directionGroups (Essential): OK");
 }
 
 // ---- directionStateNote: always the LATEST printed state extremes ----------

@@ -5145,10 +5145,10 @@ function RdFlowSpark({ ck, marks, refv, band, W, H, dom, yr, tip, onTip, onOpen,
             whisker, a count of part of the vote (Secret Harbour's early
             voting centre) draws hollow - user 2026-10-21 */}
         {marks.filter((m) => m.kind === "byelec").map((m) => {
-          const x = X(m.xm), y = Y(m.v), e = m.d.err && m.d.err[ck];
+          const x = X(m.xm), y = Y(m.v), e = m.d.err && m.d.err[ck], rg = m.d.range && m.d.range[ck];
           const xd = `M${x - 3.6} ${y - 3.6}L${x + 3.6} ${y + 3.6}M${x + 3.6} ${y - 3.6}L${x - 3.6} ${y + 3.6}`;
           return <g key={m.id}>
-            {e != null && <path className={"rd-fx-x rd-fx-xerr " + cls} d={`M${x} ${Y(C(m.v + e))}V${Y(C(m.v - e))}`}></path>}
+            {(e != null || rg) && <path className={"rd-fx-x rd-fx-xerr " + cls} d={`M${x} ${Y(C(rg ? rg[1] : m.v + e))}V${Y(C(rg ? rg[0] : m.v - e))}`}></path>}
             <path className={"rd-fx-x " + cls + (m.d.kind === "part" ? " rd-fx-xhol" : "")} d={xd}></path>
             {m.d.kind === "part" && <path className="rd-fx-xcut" d={xd}></path>}
           </g>;
@@ -5388,6 +5388,7 @@ function RdFlows({ measure }) {
       <span className="tip-sub rd-fx-tsub">{m.kind === "byelec" ? m.d.sub : lbl + " voters choosing between " + c.a + " and " + c.r}</span>
       <span className="tip-row on"><span className={"tip-swatch rd-fx-sw " + m.kind + " " + FF_COHORTS[ck].cls}></span><span className="tip-label">{m.kind === "byelec" ? "Preferences to " + c.a : "Pick " + c.a}</span><span className="tip-val">{say(m.v)}%</span></span>
       {m.kind === "byelec" && m.d.err && m.d.err[ck] != null && <span className="tip-row"><span className="tip-label rd-fx-tind">Estimate’s 90% error</span><span className="tip-val">±{say(m.d.err[ck])}</span></span>}
+      {m.kind === "byelec" && m.d.range && m.d.range[ck] && <span className="tip-row"><span className="tip-label rd-fx-tind">Range, by method</span><span className="tip-val">{say(m.d.range[ck][0])}–{say(m.d.range[ck][1])}</span></span>}
       {m.kind === "byelec" && ((m.d.lbl && m.d.lbl[ck]) || (m.d.alt && m.d.alt[ck])) && <span className="tip-sub rd-fx-tnote">{rdCap([m.d.lbl && m.d.lbl[ck], m.d.alt && m.d.alt[ck]].filter(Boolean).join("; "))}</span>}
       {refV != null && <span className="tip-row"><span className="tip-label rd-fx-tind">{c.refName}</span><span className="tip-val rd-fx-tref">{say(refV, c.refDp)}{c.band ? " ±" + say(c.band[ck]) : ""}</span></span>}
       {m.d.n != null && <span className="tip-row"><span className="tip-label rd-fx-tind">Sample</span><span className="tip-val">n = {m.d.n.toLocaleString()}</span></span>}
@@ -5695,7 +5696,8 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
   /* stateKey picks a per-state cut of the FEDERAL counts (AEC per-state TPP
      tables, 2004–2025); classKey its per-seat-type cut (the AEC's per-
      division TCP tables, grouped by its own per-election classifications,
-     2007–2025). Both are counts, so neither draws error bars */
+     2001–2025; 2004 published neither table). Both are counts, so neither
+     draws error bars */
   const S = LC
     || (SEN && stateKey && ((SEN.states || {})[stateKey]))
     || SEN
@@ -5814,7 +5816,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
         ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars
           + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
         : S.fedClass
-          ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2007–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits, and 2007 is as far back as the per-division table goes. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the sparse early One Nation years as small samples, not shares."
+          ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 2001’s ratings are its own division profiles’ as displayed that year, three unrated seats filled from its research report). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. 2001 is as far back as the per-division table goes — 2004 published neither the table nor a classification, so the line steps from 2001 to 2007. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares."
             + noBars
           : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
             + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter((w) => w.year < 2004).map((w, i, a) => (i ? (i === a.length - 1 ? " and " : ", ") : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("")
@@ -5894,8 +5896,10 @@ function ExplainedOnChart({ inv, menu }) {
     BYS.forEach((b, i) => {
       const v = b[p.id];
       if (v == null) return;   /* no Others count ran at Secret Harbour */
-      const e = (b.err || {})[p.id];
-      const note = [(b.lbl || {})[p.id], e != null ? "±" + e.toFixed(1) : null,
+      /* err: a tested 90% miss (±); range: [low, high] where the method's
+         own choices move it (Secret Harbour), not a tested error */
+      const e = (b.err || {})[p.id], r = (b.range || {})[p.id];
+      const note = [(b.lbl || {})[p.id], e != null ? "±" + e.toFixed(1) : r ? "range " + r[0].toFixed(1) + "–" + r[1].toFixed(1) : null,
         b.kind === "part" ? "part of the vote" : null, (b.alt || {})[p.id]].filter(Boolean).join(", ");
       /* each contest its own one-point series: hover reads it, nothing
          joins it to the next contest */
@@ -5906,9 +5910,10 @@ function ExplainedOnChart({ inv, menu }) {
       /* an estimate's cross draws smaller, so its bar (±2 on a 0-100 axis is
          about a full-size cross's height) shows above and below it */
       marks.push({ x: b.xm, y: T(v), color: p.color, cross: true, ...(b.kind === "part" ? { hollow: true } : null),
-        ...(e != null ? { r: 3 } : null) });
-      if (e != null) {
-        const y = T(v), y0 = Math.max(0, y - e), y1 = Math.min(100, y + e);
+        ...(e != null || r ? { r: 3 } : null) });
+      if (e != null || r) {
+        const lo = r ? T(r[0]) : T(v) - e, hi = r ? T(r[1]) : T(v) + e;
+        const y0 = Math.max(0, Math.min(lo, hi)), y1 = Math.min(100, Math.max(lo, hi));
         areas.push({ id: p.id + "-err" + i, color: p.color, opacity: 0.55, edge: false,
           points: [{ x: b.xm - half, y0, y1 }, { x: b.xm + half, y0, y1 }] });
       }
@@ -5921,7 +5926,8 @@ function ExplainedOnChart({ inv, menu }) {
   const cap = BYS.map((b) => b.label + " — " + low(b.sub)).join("; ");
   const side = inv ? "One Nation" : "Labor", other = inv ? "Labor" : "One Nation";
   const scope = "Each contest with a count or estimate, " + BYS[0].date.slice(0, 4) + "–" + BYS[BYS.length - 1].date.slice(0, 4);
-  const hasEst = BYS.some((b) => b.err), hasPart = BYS.some((b) => b.kind === "part");
+  const hasEst = BYS.some((b) => b.err || b.range), hasPart = BYS.some((b) => b.kind === "part");
+  const hasRange = BYS.some((b) => b.range);
   const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
   return (
     <>
@@ -5943,17 +5949,18 @@ function ExplainedOnChart({ inv, menu }) {
         ariaLabel={"Share of preferences flowing to " + side + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
                 sub: "Each contest with a count or estimate. " + rdCap(cap) + ".",
-                caption: "Each cross is one contest’s count or estimate" + (hasEst ? "; a bar, the estimate’s 90% error" : "")
+                caption: "Each cross is one contest’s count or estimate" + (hasEst ? "; a bar, the estimate’s 90% error" + (hasRange ? " or range" : "") : "")
                   + (hasPart ? "; hollow, a count of part of the vote" : "") + ". The groups differ by contest, so no line joins them.",
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={[]}>
         <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>Count or estimate</span>
-        {hasEst && <span className="rd-key-item"><ExBarSwatch />The estimate’s 90% error</span>}
+        {hasEst && <span className="rd-key-item"><ExBarSwatch />{hasRange ? "An estimate’s 90% error or range" : "The estimate’s 90% error"}</span>}
         {hasPart && <span className="rd-key-item"><ExHollowX />Count of part of the vote</span>}
       </RdKey>
       <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{"One reading per contest: " + cap
-        + ". The groups differ by contest, so no line joins them: Hunter’s Coalition voters are Nationals and its Others five minor parties; elsewhere the Coalition voters are Liberals, and South Australia’s Others are every other voter."}</RdFoot>
+        + ". The groups differ by contest, so no line joins them: Hunter’s Coalition voters are Nationals and its Others five minor parties; elsewhere the Coalition voters are Liberals, and South Australia’s and Secret Harbour’s Others are every other voter."
+        + (hasRange ? " Secret Harbour’s bars are ranges: how far its estimate moves with the way the rest of the seat’s known lean is divided between the parties, not a tested error." : "")}</RdFoot>
     </>
   );
 }
