@@ -21,7 +21,11 @@ const server = http.createServer((req, res) => { let p = decodeURIComponent(req.
 await new Promise((r) => server.listen(0, r));
 const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
-const asset = fs.readdirSync(path.join(ROOT, "assets")).find((f) => /^oneoffs-source\..+\.json$/.test(f));
+const pubDoc = fs.readFileSync(path.join(ROOT, "public-opinion", "index.html"), "utf8");
+const hashed = pubDoc.match(/oneoffs-source\.[0-9a-f]+\.json/);
+/* the copy the page fetches: assets/ can hold older oneoffs-source by
+   hash, and .find() landed on the 202 one with +2 reading drift 2026-10-21 */
+const asset = hashed ? hashed[0] : fs.readdirSync(path.join(ROOT, "assets")).find((f) => /^oneoffs-source\..+\.json$/.test(f));
 const src = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", asset), "utf8"));
 const topics = src.topics.filter((t) => t.blocks.length || t.more.length);
 const nTr = topics.flatMap((t) => t.blocks.filter((b) => b.kind === "tracker")).length;
@@ -40,7 +44,7 @@ for (const design of ["new", "old"]) for (const w of [320, 390, 640, 1024, 1440]
   const page = await browser.newPage(); const errs = [];
   page.on("pageerror", (e) => errs.push(String(e.message))); page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
   await page.setViewport({ width: w, height: 1000 });
-  await page.goto(`${base}/beyond-the-vote/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(`${base}/public-opinion/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".btv-topic", { timeout: 20000 }); await sleep(300);
   const pre = await page.evaluate(() => ({ pressed: [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getAttribute("aria-pressed") + ":" + b.textContent),
     after: document.querySelector(".btv-finds").nextElementSibling.className, topics: document.querySelectorAll(".btv-topic:not(.btv-mon)").length,
@@ -120,7 +124,7 @@ for (const design of ["new", "old"]) for (const w of [320, 390, 640, 1024, 1440]
   await page.evaluate(() => document.querySelectorAll(".btv-f")[3].click()); await sleep(600);
   const land = await page.evaluate((id) => { const el = document.getElementById(id); return { ok: !!el, top: el ? el.getBoundingClientRect().top : null, hash: location.hash,
     pressed: [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getAttribute("aria-pressed")).join(), path: location.pathname }; }, id);
-  if (!land.ok || land.top < 0 || land.top > 140 || land.hash !== "#" + id || land.pressed !== "true,false,false" || land.path !== "/beyond-the-vote/") fail(`${design}@${w} finding landing ${JSON.stringify(land)}`);
+  if (!land.ok || land.top < 0 || land.top > 140 || land.hash !== "#" + id || land.pressed !== "true,false,false" || land.path !== "/public-opinion/") fail(`${design}@${w} finding landing ${JSON.stringify(land)}`);
   // keyboard: arrow right flips
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.focus(".btv-sort-b"); await page.keyboard.press("ArrowRight"); await sleep(300);

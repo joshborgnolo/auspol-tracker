@@ -138033,6 +138033,16 @@ function BtvSort({
   sort,
   onSort
 }) {
+  const sortSwipeLive = React.useRef(null);
+  sortSwipeLive.current = dir => {
+    const i = BTV_SORTS.findIndex(o => o.id === sort);
+    if (i < 0) return false;
+    onSort(BTV_SORTS[(i + dir + BTV_SORTS.length) % BTV_SORTS.length].id);
+    return true;
+  };
+  const sortSwipe = React.useCallback(el => {
+    if (el) el.__rdSwipe = dir => sortSwipeLive.current(dir);
+  }, []);
   return React.createElement("div", {
     className: "btv-sort"
   }, React.createElement("span", {
@@ -138042,6 +138052,8 @@ function BtvSort({
     className: "btv-sort-g",
     role: "group",
     "aria-labelledby": "btv-sort-l",
+    ref: sortSwipe,
+    "data-rd-swipe": "",
     onKeyDown: rdTabsKey(BTV_SORTS, onSort),
     onClick: rdTabFocus
   }, BTV_SORTS.map(o => React.createElement("button", {

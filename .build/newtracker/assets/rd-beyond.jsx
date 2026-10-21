@@ -854,10 +854,23 @@ function BtvGroup({ g, houses, byHouse }) {
    and lands there. */
 const BTV_SORTS = [{ id: "issue", label: "By issue" }, { id: "pollster", label: "By pollster" }, { id: "recent", label: "By recency" }];
 function BtvSort({ sort, onSort }) {
+  /* the order choice is a view of its own, so it takes the phone swipe
+     hand-rolled the way RdTabs' `swipe` prop does it (data-rd-swipe +
+     __rdSwipe on the row; the app's touch effect finds and steps it,
+     wrapping as the arrow-key walk does) */
+  const sortSwipeLive = React.useRef(null);
+  sortSwipeLive.current = (dir) => {
+    const i = BTV_SORTS.findIndex((o) => o.id === sort);
+    if (i < 0) return false;
+    onSort(BTV_SORTS[(i + dir + BTV_SORTS.length) % BTV_SORTS.length].id);
+    return true;
+  };
+  const sortSwipe = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => sortSwipeLive.current(dir); }, []);
   return (
     <div className="btv-sort">
       <span className="btv-sort-l" id="btv-sort-l">Sort</span>
-      <div className="btv-sort-g" role="group" aria-labelledby="btv-sort-l" onKeyDown={rdTabsKey(BTV_SORTS, onSort)} onClick={rdTabFocus}>
+      <div className="btv-sort-g" role="group" aria-labelledby="btv-sort-l" ref={sortSwipe} data-rd-swipe=""
+           onKeyDown={rdTabsKey(BTV_SORTS, onSort)} onClick={rdTabFocus}>
         {BTV_SORTS.map((o) => (
           <button key={o.id} type="button" className="btv-sort-b" aria-pressed={sort === o.id} onClick={() => onSort(o.id)}>
             <span className="btv-sort-w" data-t={o.label}>{o.label}</span>

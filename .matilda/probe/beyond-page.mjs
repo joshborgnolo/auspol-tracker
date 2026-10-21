@@ -38,7 +38,11 @@ const browser = await puppeteer.launch({ executablePath: "/Applications/Google C
 let bad = 0;
 const fail = (m) => { console.log("FAIL: " + m); bad++; };
 
-const asset = fs.readdirSync(path.join(ROOT, "assets")).find((f) => /^oneoffs-source\..+\.json$/.test(f));
+const pubDoc41 = fs.readFileSync(path.join(ROOT, "public-opinion", "index.html"), "utf8");
+const hashed41 = pubDoc41.match(/oneoffs-source\.[0-9a-f]+\.json/);
+/* the copy the page fetches: assets/ can hold older oneoffs-source by
+   hash, and .find() landed on the 202 one with +2 reading drift 2026-10-21 */
+const asset = hashed41 ? hashed41[0] : fs.readdirSync(path.join(ROOT, "assets")).find((f) => /^oneoffs-source\..+\.json$/.test(f));
 const src = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", asset), "utf8"));
 const topics = src.topics.filter((t) => t.blocks.length || t.more.length);
 const trackers = topics.flatMap((t) => t.blocks.filter((b) => b.kind === "tracker"));
