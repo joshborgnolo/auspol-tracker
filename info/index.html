@@ -136540,8 +136540,91 @@ function RdExplained() {
     return () => {
       if (node.parentNode === slot) slot.removeChild(node);
     };
-  });
+  }, []);
+  const pairStep = React.useRef(null);
+  pairStep.current = dir => {
+    const i = EX_PAIRS.findIndex(x => x.id === pair);
+    if (i < 0) return false;
+    setPair(EX_PAIRS[(i + dir + EX_PAIRS.length) % EX_PAIRS.length].id);
+    return true;
+  };
+  const viewStep = React.useRef(null);
+  viewStep.current = dir => {
+    const opts = VIEW_OPTS;
+    if (pair !== "co" || opts.length < 2) return false;
+    const i = opts.indexOf(view);
+    if (i < 0) return false;
+    setView(opts[(i + dir + opts.length) % opts.length]);
+    return true;
+  };
+  const cardEl = React.useRef(null);
+  const cardMark = React.useCallback(el => {
+    cardEl.current = el;
+    if (el) el.__rdSwipe = dir => pairStep.current(dir);
+  }, []);
+  const exHover = React.useRef(false);
+  React.useEffect(() => {
+    const card = cardEl.current;
+    if (!card) return undefined;
+    const enter = () => {
+      exHover.current = true;
+    };
+    const leave = () => {
+      exHover.current = false;
+    };
+    exHover.current = card.matches(":hover");
+    card.addEventListener("pointerenter", enter);
+    card.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!exHover.current) return;
+      const k = e.key;
+      if (k !== "ArrowRight" && k !== "ArrowLeft" && k !== "ArrowDown" && k !== "ArrowUp") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const went = k === "ArrowRight" || k === "ArrowLeft" ? pairStep.current(k === "ArrowRight" ? 1 : -1) : viewStep.current(k === "ArrowDown" ? 1 : -1);
+      if (went) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      card.removeEventListener("pointerenter", enter);
+      card.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
+  const spaceShare = React.useRef(null);
+  spaceShare.current = () => setInv(v => !v);
+  React.useEffect(() => {
+    const card = cardEl.current;
+    if (!card) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(card);
+    const key = e => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceShare.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceShare.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const stateKeys = Object.keys(FED_STATES);
+  const VIEW_OPTS = KEYS.length > 1 || stateKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   const menu = KEYS.length > 1 || stateKeys.length > 0 ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
@@ -136601,7 +136684,9 @@ function RdExplained() {
   }), React.createElement("div", {
     ref: ref
   }, React.createElement("div", {
-    className: "card rd-card ex-fl-card"
+    className: "card rd-card ex-fl-card",
+    ref: cardMark,
+    "data-rd-swipe-exact": ""
   }, React.createElement(RdTabs, {
     value: pair,
     onChange: setPair,
@@ -139904,6 +139989,9 @@ const KBD_ROWS = [{
   keys: ["←", "→"],
   what: "Walk a card's tabs or chips while the pointer is over it"
 }, {
+  keys: ["↑", "↓"],
+  what: "In the preference-flows explainer, walk the elections menu while the pointer is on its card"
+}, {
   keys: ["1–9"],
   what: "Pick a numbered party or term on a chips row"
 }, {
@@ -139914,7 +140002,7 @@ const KBD_ROWS = [{
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
-  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu"
+  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu; flip the Share side in the preference-flows explainer"
 }, {
   keys: ["P"],
   what: "In the all-polls two-party table, published figures only"

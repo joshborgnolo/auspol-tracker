@@ -316,8 +316,8 @@ assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes
 assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
     && ap.includes(': <ExplainedFlowChart jur={jur} stateKey={stateKey} inv={inv} menu={headCtls} />}'),
   "the contest tabs swap the Coalition history chart for the measured-contest chart");
-assert.ok(ap.includes('<div className="card rd-card ex-fl-card">') && ap.includes('<RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"'),
-  "the figure is a chart card opening on contest tabs, as /flows/ does");
+assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"'),
+  "the figure is a chart card opening on contest tabs, as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
 assert.ok(ap.includes('<select className="rd-pv-sel ex-fl-sel" aria-label="Elections"') && ap.includes('const [view, setView] = useState("fed");')
     && ap.includes('<optgroup label="Federal elections">') && ap.includes('<optgroup label="State elections">'),
   "one elections menu: federal national, federal by state, then each state's own elections");

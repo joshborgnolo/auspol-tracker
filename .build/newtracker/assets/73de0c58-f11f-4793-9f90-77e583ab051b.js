@@ -2174,10 +2174,11 @@ const KBD_ROWS = [
   { keys: ["⌥", "D"], what: "Dark mode, on or off — ⌥ is Alt on a PC" },
   { keys: ["C"], what: "Copy the chart or poll breakdown under the pointer as an image" },
   { keys: ["←", "→"], what: "Walk a card's tabs or chips while the pointer is over it" },
+  { keys: ["↑", "↓"], what: "In the preference-flows explainer, walk the elections menu while the pointer is on its card" },
   { keys: ["1–9"], what: "Pick a numbered party or term on a chips row" },
   { keys: ["1–9"], what: "While the More menu is open, jump to its numbered page" },
   ...(window.JUR ? [] : [{ keys: ["1–7"], what: "In the all-polls demographics view, pick the Split by group" }]),
-  { keys: ["Space"], what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu" },
+  { keys: ["Space"], what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu; flip the Share side in the preference-flows explainer" },
   { keys: ["P"], what: "In the all-polls two-party table, published figures only" },
   { keys: ["?"], what: "This sheet" },
 ];

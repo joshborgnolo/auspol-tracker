@@ -5876,8 +5876,106 @@ function RdExplained() {
     if (!slot || !node) return undefined;
     slot.appendChild(node);
     return () => { if (node.parentNode === slot) slot.removeChild(node); };
-  });
+  }, []);
+  /* ^ one-shot on purpose: a re-mount-free append/detach cycle on every
+     render used to rob the keyboard of its focus (the detach blurs the
+     focused tab while an arrow-walked rdTabsKey is mid-stride) */
+  /* the key/swipe inputs (user 2026-10-21): hovering the card hands <-/->
+     to the contest tabs and up/down to the elections menu (the pointer-
+     claims-keys contract - the claim never survives the pointer leaving
+     the card, and a focused control's own keys always come first), Space
+     flips Share: Labor/rival while the figure is on screen (the spacebar
+     viewport-claim), and a sideways swipe ON THE CHART flips the contest
+     (data-rd-swipe-exact, the hero 2PP card's shape - the row's plain
+     `swipe` prop is deliberately NOT used: the explainer's section is the
+     whole page, and its reach would claim the article's sideways swipes
+     off the page turn). Every live ref below is rebound each render, so
+     the once-registered listeners never see a stale closure. */
+  const pairStep = React.useRef(null);
+  pairStep.current = (dir) => {
+    const i = EX_PAIRS.findIndex((x) => x.id === pair);
+    if (i < 0) return false;
+    setPair(EX_PAIRS[(i + dir + EX_PAIRS.length) % EX_PAIRS.length].id);
+    return true;
+  };
+  const viewStep = React.useRef(null);
+  viewStep.current = (dir) => {
+    /* the elections menu rides the Coalition history alone - on Labor v
+       One Nation there is no walk to make, and the keys keep their
+       scroll day job. VIEW_OPTS is declared beside the menu below; this
+       closure runs on a keypress, by which time it is initialised */
+    const opts = VIEW_OPTS;
+    if (pair !== "co" || opts.length < 2) return false;
+    const i = opts.indexOf(view);
+    if (i < 0) return false;
+    setView(opts[(i + dir + opts.length) % opts.length]);
+    return true;
+  };
+  const cardEl = React.useRef(null);
+  const cardMark = React.useCallback((el) => { cardEl.current = el; if (el) el.__rdSwipe = (dir) => pairStep.current(dir); }, []);
+  const exHover = React.useRef(false);
+  React.useEffect(() => {
+    const card = cardEl.current;
+    if (!card) return undefined;
+    const enter = () => { exHover.current = true; };
+    const leave = () => { exHover.current = false; };
+    exHover.current = card.matches(":hover");
+    card.addEventListener("pointerenter", enter);
+    card.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!exHover.current) return;
+      const k = e.key;
+      if (k !== "ArrowRight" && k !== "ArrowLeft" && k !== "ArrowDown" && k !== "ArrowUp") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const went = (k === "ArrowRight" || k === "ArrowLeft")
+        ? pairStep.current(k === "ArrowRight" ? 1 : -1)
+        : viewStep.current(k === "ArrowDown" ? 1 : -1);
+      if (went) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      card.removeEventListener("pointerenter", enter);
+      card.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
+  const spaceShare = React.useRef(null);
+  spaceShare.current = () => setInv((v) => !v);
+  React.useEffect(() => {
+    /* the claim is scoped to the CARD (the figure, wherever the article
+       slot has mounted it), as the hero 2PP body's is - the explainer's
+       section is the whole page, and a section-wide claim would make Space
+       flip a chart the reader can't see while they read the article */
+    const card = cardEl.current;
+    if (!card) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver((es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(card);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceShare.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceShare.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
   const stateKeys = Object.keys(FED_STATES);
+  /* the menu's option values in the <select>'s DOM order - the up/down
+     walk below steps this exact list (the hover claim proxies the control's
+     own arrows, which for a native select is line-by-line) */
+  const VIEW_OPTS = (KEYS.length > 1 || stateKeys.length > 0)
+    ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
+    : [];
   const menu = (KEYS.length > 1 || stateKeys.length > 0) ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections" value={stateKey ? "fed:" + stateKey : jur}
             onChange={(e) => setView(e.target.value)}>
@@ -5917,7 +6015,7 @@ function RdExplained() {
         dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
-        <div className="card rd-card ex-fl-card">
+        <div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">
           <RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"
                   options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
             {narrow ? null : share}
