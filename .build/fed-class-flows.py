@@ -8,20 +8,24 @@ over the Coalition at each federal election. Same counted family as the
 national cut-flow series – but while the national and per-state tables come
 from the per-state TPP/TCP downloads, no per-CLASS table is published, so
 this groups the per-DIVISION product instead:
-.build/aec-flow-src/tcpflow-<year>.csv.gz  (HouseTcpFlowByDivisionDownload
-/ HouseTcpFlowOfPrefsByDivisionDownload, 2007–2022; 2007's hauled from
-https://results.aec.gov.au/13745/Website/Downloads/HouseTcpFlowByDivisionDownload-13745.csv),
-data/aec-2025-tcp-flow-by-division.csv for 2025 (its event's same
-download, already committed for estimate-state-flows.py), and
-.build/aec-flow-src/tcp-2001.json.gz for 2001 – the statistics-pack
-"v3_10 … Two Candidate Preferred Preference Flow Result" per-division
-tables, derived by aec-tcp-history.py from the AEC's official 2001
-statistics CD-ROM (the same product, a file per division). 2001 is the
-floor: no per-division flow table of either era reaches further, and 2004
-published none (nor any per-division classification), so the chart steps
-from 2001 to 2007. 2001's classifications come from the AEC's own
-2001-epoch division-profile ratings (data/division-classifications.json's
-"2001" block; three unrated seats filled from AEC Research Report 5).
+.build/aec-flow-src/tcpflow-<year>.csv.gz (HouseTcpFlowByDivisionDownload,
+2004–2022 – 2004's hauled from
+https://results.aec.gov.au/12246/results/Downloads/HouseTcpFlowByDivisionDownload-12246.csv,
+2007–2022 from each event's Downloads page), data/aec-2025-tcp-flow-by-division.csv
+for 2025 (its event's same download, already committed for
+estimate-state-flows.py), and .build/aec-flow-src/tcp-2001.json.gz for 2001
+– the statistics-pack "v3_10 … Two Candidate Preferred Preference Flow
+Result" per-division tables, derived by aec-tcp-history.py from the AEC's
+official 2001 statistics CD-ROM (the same product, a file per division).
+2001 is the floor: the per-division table reaches back to 1996 through the
+statistics packs (tcp-1996/1998 in this dir, feeding the national lane),
+but the grid groups by THAT election's classification and the classification
+store starts at 2001 (its 1996/1998 blocks don't exist). Classifications
+2001 and 2004 are canonical-on-page transcriptions of the AEC's own
+division-profile pages (the 2001-epoch's via Wayback captures with three
+unrated seats filled from AEC Research Report 5; 2004's from the live
+2004 profiles – all 150 rated on-page; data/division-classifications.json's
+_about has the sources).
 
 The per-division product only exists for divisions whose count RAN a
 two-candidate-preferred distribution – that is, it names the final pair by
@@ -65,7 +69,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "aec-flow-src")
 ROOT = os.path.dirname(HERE)
 
-YEARS = (2001, 2007, 2010, 2013, 2016, 2019, 2022, 2025)
+YEARS = (2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025)
 # record key -> (display label, menu short face); the AEC's own
 # classifications, in the chart's order
 CLASSES = {

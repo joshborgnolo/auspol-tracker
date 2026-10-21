@@ -2,36 +2,47 @@
    series (user 2026-10-22: add "Federal, inner metro/outer metro/
    provincial/rural" views to the preference-flow history chart "to the
    extent aec seat classification data is available", extended the same day
-   to 2001 — "there's 2001 seat classification data too"):
+   to 2001 — "there's 2001 seat classification data too" — and then to
+   2004: "there's 2004 data in repo now"):
    data/fed-class-flows.json, computed by .build/fed-class-flows.py from
    the committed AEC "two-candidate-preferred flow of preferences by
    division" tables (.build/aec-flow-src/tcp-2001.json.gz — the 2001
    statistics pack's per-division "v3_10 … Two Candidate Preferred
    Preference Flow Result" tables, derived by aec-tcp-history.py —
-   .build/aec-flow-src/tcpflow-{2007…2022}.csv.gz and
-   data/aec-2025-tcp-flow-by-division.csv), grouped by the AEC's own
+   .build/aec-flow-src/tcpflow-{2004…2022}.csv.gz (2004's hauled from the
+   same downloads product line as 2007–2022:
+   results.aec.gov.au/12246/results/Downloads/HouseTcpFlowByDivisionDownload-12246.csv)
+   and data/aec-2025-tcp-flow-by-division.csv), grouped by the AEC's own
    per-election division classifications (data/division-classifications.json;
-   the 2001 block is its 2001-epoch division-profile ratings), four
-   classes × eight elections (2001–2025; 2004 published neither the table
-   nor a classification, so the chart steps 2001 → 2007). The pins: the
-   data file re-parses exactly from the caches (the Coalition spelling
-   set includes 2010's LNQ LNP; Labor's banner set includes CLR, Country
-   Labor's 2001 rural-NSW banner — nine classic seats' finals name it),
-   the classic-seat counts match the per-year guard, One Nation's lone
-   null is inner metro 2016 (the only class-year its ballots never
-   reached a classic seat's final two), the 2001 column recombines to the
-   CORRECTED national classic totals (145 seats — classic-2001.json's
-   sums are its own reader's 136-seat legacy cut that dropped the CLR
-   seats, aec-tcp-history.py's header documents this, and the national
-   series' 2001 points still ride that file, so the classes' 2001 shares
-   can sit a couple of tenths off the chart beside them), the thin 2013
-   inner-metro One Nation base is the 1,508 ballots the chart's caption
-   quotes, the 2025 column reconciles with the elec2025r region carriers
-   gen-data types from the same source table (cross-checked there against
-   the vendored DoP), and the built data asset hands the chart the
-   classes under flowHistory.fed.classes with no error bars. Runs after
-   the build in npm test's chain (the data asset only reflects the
-   current dataset post-build). */
+   the 2001 and 2004 blocks are canonical-on-page transcriptions of the
+   era's own division-profile pages — 2001's via Wayback captures with
+   three RR5 gap fills, 2004's from the live 2004 profiles), four classes
+   × nine elections (2001–2025; the grid floor is 2001 because the
+   classification store starts there — the flow table itself reaches back
+   to 1996 through the statistics packs). The pins: the data file
+   re-parses exactly from the caches (the Coalition spelling set includes
+   2010's LNQ LNP; Labor's banner set includes CLR, Country Labor's
+   2001 rural-NSW banner — nine classic seats' finals name it), the
+   classic-seat counts match the per-year guard (2004: 146 of 150 — IND
+   reached the final two in Calare, New England, Kennedy and Mayo),
+   One Nation's lone null is inner metro 2016 (the only class-year its
+   ballots never reached a classic seat's final two), the 2001 column
+   recombines to the CORRECTED national classic totals (145 seats —
+   classic-2001.json's sums are its own reader's 136-seat legacy cut
+   that dropped the CLR seats, aec-tcp-history.py's header documents
+   this, and the national series' 2001 points still ride that file, so
+   the classes' 2001 shares can sit a couple of tenths off the chart
+   beside them), the 2004 column reconciles with the state-level
+   TPP-flow table tpp-2004.csv (per-state classic sums are exact for the
+   five jurisdictions with no non-classic final; NSW/QLD/SA are residual
+   by their IND-final seats), the thin 2013 inner-metro One Nation base
+   is the 1,508 ballots the chart's caption quotes, the 2025 column
+   reconciles with the elec2025r region carriers gen-data types from the
+   same source table (cross-checked there against the vendored DoP), and
+   the built data asset hands the chart the classes under
+   flowHistory.fed.classes with no error bars. Runs after the build in
+   npm test's chain (the data asset only reflects the current dataset
+   post-build). */
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -40,7 +51,7 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const YEARS = [2001, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+const YEARS = [2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const CLASS_IDS = ["inner", "outer", "provincial", "rural"];
 const CLASS_SHORTS = { inner: "inner metro", outer: "outer metro", provincial: "provincial", rural: "rural" };
 const CLASS_LABELS = { inner: "Inner metropolitan", outer: "Outer metropolitan", provincial: "Provincial", rural: "Rural" };
@@ -138,7 +149,7 @@ const { out: fresh, classic, divs, classClassic2025 } = recompute();
 
 // ---- the data file matches the recompute ------------------------------------
 const data = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
-assert.deepEqual(data.years, YEARS, "the eight per-division-table elections, in order");
+assert.deepEqual(data.years, YEARS, "the nine per-division-table elections, in order");
 assert.deepEqual(Object.keys(data.classes), CLASS_IDS, "inner, outer, provincial, rural — in the chart's order");
 assert.deepEqual(classic, data.classicSeats, "classic-seat counts per year");
 assert.deepEqual(divs, data.divisions, "total divisions per year");
@@ -152,9 +163,13 @@ CLASS_IDS.forEach((k) => {
     c[b].forEach((v) => { if (v != null) assert.ok(v >= 0 && v <= 100, `${k} ${b}: a share (${v})`); });
   });
 });
-assert.deepEqual(classic, [145, 147, 142, 139, 133, 136, 124, 115], "classic seats fall as crossbench finals rise");
+assert.deepEqual(classic, [145, 146, 147, 142, 139, 133, 136, 124, 115], "classic seats fall as crossbench finals rise");
 assert.equal(classic[0], 145, "2001's CLR-aware classic count — nine CLR-finalist seats over the legacy 136");
-assert.deepEqual(divs, [150, 150, 150, 150, 150, 151, 151, 150], "total divisions (151 in 2019 and 2022)");
+/* 2004's four non-classic finals: Calare (Andren), New England (Windsor) and
+   Kennedy (Katter) on their independent incumbents' coalitions-side pairs,
+   Mayo on independent Brian Deegan's run against Alexander Downer */
+assert.equal(classic[1], 146, "2004 classic count — 150 less Calare, New England, Kennedy, Mayo");
+assert.deepEqual(divs, [150, 150, 150, 150, 150, 150, 151, 151, 150], "total divisions (151 in 2019 and 2022)");
 /* the 2025 per-class classic counts are the elec2025r region carriers'
    own denominators (gen-data types "25 of 43", "40 of 45", "50 of 62") */
 assert.equal(classClassic2025.inner, 25, "inner-metro classic seats 2025 (gen-data's 25 of 43)");
@@ -162,14 +177,14 @@ assert.equal(classClassic2025.outer, 40, "outer-metro classic seats 2025 (gen-da
 assert.equal(classClassic2025.provincial + classClassic2025.rural, 50, "regional or rural classic seats 2025 (gen-data's 50 of 62)");
 
 // ---- the One Nation null map ------------------------------------------------
-assert.equal(data.classes.inner.onp[4], null, "inner-metro One Nation: no classic-seat ballots, 2016");
+assert.equal(data.classes.inner.onp[5], null, "inner-metro One Nation: no classic-seat ballots, 2016");
 CLASS_IDS.forEach((k) => BUCKETS.forEach((b) => data.classes[k][b].forEach((v, yi) => {
-  if (!(k === "inner" && b === "onp" && yi === 4)) assert.ok(v != null, `${k} ${b} ${YEARS[yi]} has a counted base`);
+  if (!(k === "inner" && b === "onp" && yi === 5)) assert.ok(v != null, `${k} ${b} ${YEARS[yi]} has a counted base`);
 })));
 /* every share shown is the share of whatever ballots exist (user 2026-10-22:
    number the points for whatever data exists for each) — the caption carries
    the small-base caveat, and it quotes the thinnest of them */
-const thin = data.classes.inner.votes.onp[3];
+const thin = data.classes.inner.votes.onp[4];
 assert.equal(thin[0] + thin[1], 1508, "the caption's 1,508-ballot inner-metro 2013 One Nation base");
 
 // ---- the 2001 column recombines to the corrected national classic totals ----
@@ -186,6 +201,59 @@ assert.equal(thin[0] + thin[1], 1508, "the caption's 1,508-ballot inner-metro 20
     CLASS_IDS.forEach((k) => { const v = data.classes[k].votes[b][0]; assert.ok(v, `2001 ${k} ${b} has a counted base`); a += v[0]; l += v[1]; });
     assert.ok(Math.abs(a - nat[b][0]) + Math.abs(l - nat[b][1]) <= 4, `2001 ${b}: classes recombine to the corrected national totals`);
   });
+}
+
+// ---- the 2004 column reconciles with the state-level TPP-flow table ---------
+/* tcpflow-2004.csv.gz is the same downloads-product family as 2007–2022, so
+   it answers instead of the DoP-derived fallback the summary sketched — but
+   the event also ships tpp-2004.csv ("… Two Party Preferred Flow of
+   Preferences By State By Party"), the per-state oracle. Summing the
+   per-division file's classic-seat ballots per state per bucket must equal
+   the oracle's sums wherever NO division ran a non-classic final: both
+   products count the same holder-at-exclusion ballots off the same count.
+   In 2004 that holds for ACT, NT, TAS, VIC and WA — and exactly so (to the
+   ballot). NSW (Calare, New England), QLD (Kennedy) and SA (Mayo) are
+   residual by their IND-final seats and pinned here by name instead. */
+{
+  const NONCLASSIC2004 = { NSW: ["Calare", "New England"], QLD: ["Kennedy"], SA: ["Mayo"] };
+  const CLEAN2004 = ["ACT", "NT", "TAS", "VIC", "WA"];
+  const rows = tcpRows(2004);
+  const finals = {};
+  rows.filter((r) => r.fid === "0").forEach((r) => (finals[r.div] ||= new Set()).add(r.to));
+  const ncl = new Set(Object.entries(finals).filter(([, d]) => !([...d].some((p) => LABOR.has(p)) && [...d].every((p) => LABOR.has(p) || COAL.has(p)))).map(([dv]) => dv));
+  assert.deepEqual(Object.values(NONCLASSIC2004).flat().sort(), [...ncl].sort(), "the 2004 non-classic divisions are the four IND finals");
+  assert.equal(ncl.size, 4, "exactly four non-classic finals in 2004");
+  /* the per-division file carries a StateAb column, so the state of every
+     division is in-file; the name map is only for the pinned note */
+  const raw = zlib.gunzipSync(fs.readFileSync(path.join(ROOT, ".build", "aec-flow-src", "tcpflow-2004.csv.gz"))).toString("utf8");
+  const parse4 = (ln) => ln.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => x.replace(/^"|"$/g, ""));
+  const lines4 = raw.split(/\r?\n/);
+  const head4 = parse4(lines4[1]);
+  const [S, D, FID4, FRM4, TO4, N4] = ["StateAb", "DivisionNm", "FromCandidateID", "FromCandidatePartyAb", "ToCandidatePartyAb", "TransferCount"].map((n) => head4.indexOf(n));
+  const mine = {};
+  lines4.slice(2).filter((ln) => ln.trim()).forEach((ln) => {
+    const c = parse4(ln);
+    if (c[FID4] === "0" || ncl.has(c[D])) return;
+    const frm = c[FRM4].trim(), to = c[TO4].trim();
+    if (LABOR.has(frm) || COAL.has(frm)) return;
+    const st = (mine[c[S]] ||= {});
+    const t = (st[bucketOf(frm)] ||= [0, 0]);
+    t[LABOR.has(to) ? 0 : 1] += +c[N4];
+  });
+  const orc = {};
+  fs.readFileSync(path.join(ROOT, ".build", "aec-flow-src", "tpp-2004.csv"), "utf8").split(/\r?\n/).slice(2).filter((ln) => ln.trim()).forEach((ln) => {
+    const c = parse4(ln);
+    if (!c[1] || LABOR.has(c[1]) || COAL.has(c[1])) return;  // the totals row and the majors' own rides
+    const t = ((orc[c[0]] ||= {})[bucketOf(c[1])] ||= [0, 0]);
+    t[0] += +c[5]; t[1] += +c[3];
+  });
+  CLEAN2004.forEach((s) => BUCKETS.forEach((b) => {
+    assert.deepEqual(mine[s][b], orc[s][b], `2004 ${s} ${b}: classic per-division sums == the state TPP-flow table`);
+  }));
+  Object.entries(NONCLASSIC2004).forEach(([s, seats]) => BUCKETS.forEach((b) => {
+    const [a, l] = mine[s][b] ?? [0, 0], [oa, ol] = orc[s][b];
+    assert.ok(oa - a > 0 || ol - l > 0, `2004 ${s} ${b}: the oracle exceeds the classic cut by (${oa - a}, ${ol - l}) — ${seats.join(", ")}'s ballots`);
+  }));
 }
 
 // ---- the 2025 column reconciles with gen-data's elec2025r carriers ----------
