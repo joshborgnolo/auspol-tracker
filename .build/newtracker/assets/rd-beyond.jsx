@@ -546,7 +546,7 @@ function BtvWaves({ q, houses }) {
 
 /* ---- one question as a row: what was asked and by whom on the left, the
    answers on the right (stacked on a phone) ---------------------------------- */
-function BtvItem({ c, houses }) {
+function BtvItem({ c, houses, topic }) {
   const body = c.kind === "split" ? <BtvSplit c={c} />
     : c.kind === "stack" ? <BtvStack c={c} houses={houses} />
     : c.kind === "rank" ? <BtvRank c={c} />
@@ -554,6 +554,7 @@ function BtvItem({ c, houses }) {
   return (
     <article className={"btv-item btv-k-" + c.kind}>
       <div className="btv-il">
+        {topic ? <p className="btv-qt">{topic}</p> : null}
         <h4 className="btv-q">{c.title}</h4>
         {c.summary ? <p className="btv-sum">{c.summary}</p> : null}
         {c.note ? <p className="btv-note">{c.note}</p> : null}
@@ -573,7 +574,7 @@ function BtvItem({ c, houses }) {
    (levels differ with the wording), its name sits at its end, and the list
    beside the chart gives each pollster's latest. A dot is one poll; the
    readout follows the dates the polls ended. */
-function BtvTracker({ c, houses }) {
+function BtvTracker({ c, houses, topic }) {
   const narrow = useNarrow(MQ_PHONE);
   const net = c.measure === "net";
   const pts = c.panels.flatMap((p) => p.points.map((q) => ({ ...q, house: p.house, fam: p.fam })));
@@ -601,6 +602,7 @@ function BtvTracker({ c, houses }) {
   const rows = pts.slice().sort((p, q) => q.x - p.x);
   return (
     <div className="btv-tracker">
+      {topic ? <p className="btv-qt">{topic}</p> : null}
       <p className="btv-tlab">{c.title}</p>
       <p className="btv-tdek">{c.dek}</p>
       <p className="btv-fams">
@@ -694,18 +696,20 @@ function BtvTracker({ c, houses }) {
    One line a question, the question on the left and whose and when on the
    right; a line opens across the full width to the same row as a featured
    question: the pollster's waves and wording on the left, the figures on
-   the right, the breakdowns by group behind their own fold. */
-function BtvMore({ t, houses }) {
+   the right, the breakdowns by group behind their own fold. A month of the
+   newest-first view lists its long tail the same way, each line naming its
+   topic and its day. */
+function BtvMore({ label, qs, houses, meta }) {
   return (
     <details className="btv-more">
-      <summary>More questions on {t.about || t.title}<span> · {t.more.length}</span></summary>
+      <summary>{label}<span> · {qs.length}</span></summary>
       <ul className="btv-ml">
-        {t.more.map((q) => (
+        {qs.map((q) => (
           <li key={q.id + q.house}>
             <details className="btv-mi">
               <summary>
                 <span className="btv-mq">{q.title}</span>
-                <span className="btv-mm">{btvHouse(q, houses)} · {btvMonth(q.last)}{q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : ""}</span>
+                <span className="btv-mm">{meta(q)}</span>
               </summary>
               <div className="btv-mb">
                 <div className="btv-il"><BtvWaves q={q} houses={houses} /></div>
@@ -728,16 +732,17 @@ function BtvMore({ t, houses }) {
     </details>
   );
 }
-
+/* a section's count line: "One chart · 6 questions · 9 more" */
+const btvCount = (trackers, items, more) => [
+  trackers ? (trackers === 1 ? "One chart" : btvCap(btvWord(trackers)) + " charts") : null,
+  items ? items + (items === 1 ? " question" : " questions") : null,
+  more ? more + " more" : null,
+].filter(Boolean).join(" · ");
 /* ---- a topic: its number and name, its finding, then the evidence ---------- */
 function BtvTopic({ t, n, houses }) {
   const trackers = t.blocks.filter((b) => b.kind === "tracker");
   const items = t.blocks.filter((b) => b.kind !== "tracker");
-  const count = [
-    trackers.length ? (trackers.length === 1 ? "One chart" : btvCap(btvWord(trackers.length)) + " charts") : null,
-    items.length ? items.length + (items.length === 1 ? " question" : " questions") : null,
-    t.more.length ? t.more.length + " more" : null,
-  ].filter(Boolean).join(" · ");
+  const count = btvCount(trackers.length, items.length, t.more.length);
   return (
     <section className="btv-topic" id={"btv-" + t.id} aria-labelledby={"btv-h-" + t.id}>
       <div className="btv-tk">
@@ -748,20 +753,84 @@ function BtvTopic({ t, n, houses }) {
       <p className="btv-tdk">{t.dek}</p>
       {trackers.map((c) => <BtvTracker key={c.id} c={c} houses={houses} />)}
       {items.length ? <div className="btv-items">{items.map((c, i) => <BtvItem key={(c.id || "") + i} c={c} houses={houses} />)}</div> : null}
-      {t.more.length ? <BtvMore t={t} houses={houses} /> : null}
+      {t.more.length ? <BtvMore label={"More questions on " + (t.about || t.title)} qs={t.more} houses={houses}
+        meta={(q) => btvHouse(q, houses) + " · " + btvMonth(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")} /> : null}
     </section>
+  );
+}
+/* ---- newest first: the same questions by the month they were last asked ----
+   A tracker dates by its latest reading, a question by its poll's fieldwork
+   end (the latest wave's, where it has several), a listed question by its
+   latest reading. Each month runs like a topic: its charts, its questions,
+   then its long tail behind a fold, newest first within each, every piece
+   naming its topic; a tie keeps the topics' own order. */
+const btvLast = (b) => (b.kind === "tracker" ? b.last : b.src && b.src.field ? b.src.field.end
+  : (b.rows || []).reduce((d, r) => (r.src && r.src.field && r.src.field.end > d ? r.src.field.end : d), ""));
+function btvByMonth(topics) {
+  const all = [];
+  topics.forEach((t) => {
+    t.blocks.forEach((b) => all.push({ t, b, date: btvLast(b) }));
+    t.more.forEach((q) => all.push({ t, q, date: q.last }));
+  });
+  /* Array.prototype.sort is stable, so equal dates keep the topics' order */
+  all.sort((p, q) => (p.date < q.date ? 1 : p.date > q.date ? -1 : 0));
+  const months = [];
+  for (const e of all) {
+    const ym = e.date.slice(0, 7);
+    if (!months.length || months[months.length - 1].ym !== ym) months.push({ ym, all: [] });
+    months[months.length - 1].all.push(e);
+  }
+  return months.map((m) => ({
+    ym: m.ym,
+    trackers: m.all.filter((e) => e.b && e.b.kind === "tracker"),
+    items: m.all.filter((e) => e.b && e.b.kind !== "tracker"),
+    more: m.all.filter((e) => e.q),
+  }));
+}
+function BtvMonth({ m, houses }) {
+  const name = BTV_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
+  const topicOf = new Map(m.more.map((e) => [e.q, e.t]));
+  return (
+    <section className="btv-topic btv-mon" id={"btv-m-" + m.ym} aria-labelledby={"btv-mh-" + m.ym}>
+      <div className="btv-tk">
+        <h3 className="btv-tt" id={"btv-mh-" + m.ym}>{name}</h3>
+        <span className="btv-tc">{btvCount(m.trackers.length, m.items.length, m.more.length)}</span>
+      </div>
+      {m.trackers.map((e) => <BtvTracker key={e.b.id} c={e.b} houses={houses} topic={e.t.short} />)}
+      {m.items.length ? <div className="btv-items">{m.items.map((e, i) => <BtvItem key={(e.b.id || "") + i} c={e.b} houses={houses} topic={e.t.short} />)}</div> : null}
+      {m.more.length ? <BtvMore label={"More questions from " + name} qs={m.more.map((e) => e.q)} houses={houses}
+        meta={(q) => topicOf.get(q).short + " · " + btvHouse(q, houses) + " · " + btvDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")} /> : null}
+    </section>
+  );
+}
+/* ---- the order the questions run in: by issue (the page's own) or newest
+   first. A finding still links to its topic: picked while the page runs
+   newest first, it turns the page back to the issues and lands there. */
+const BTV_SORTS = [{ id: "issue", label: "By issue" }, { id: "recent", label: "Newest first" }];
+function BtvSort({ sort, onSort }) {
+  return (
+    <div className="btv-sort">
+      <span className="btv-sort-l" id="btv-sort-l">Order the questions</span>
+      <div className="btv-sort-g" role="group" aria-labelledby="btv-sort-l" onKeyDown={rdTabsKey(BTV_SORTS, onSort)} onClick={rdTabFocus}>
+        {BTV_SORTS.map((o) => (
+          <button key={o.id} type="button" className="btv-sort-b" aria-pressed={sort === o.id} onClick={() => onSort(o.id)}>
+            <span className="btv-sort-w" data-t={o.label}>{o.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
 /* ---- the findings: one sentence a topic, each a link to its topic ---------- */
-function BtvFindings({ topics }) {
+function BtvFindings({ topics, onGo }) {
   return (
     <section className="btv-finds" aria-labelledby="btv-finds-h">
       <h3 className="btv-fh" id="btv-finds-h">The findings</h3>
       <ol className="btv-fl" role="list">
         {topics.map((t, i) => (t.finding ? (
           <li key={t.id}>
-            <a className="btv-f" href={"#btv-" + t.id}>
+            <a className="btv-f" href={"#btv-" + t.id} onClick={() => onGo(t.id)}>
               <span className="btv-fn" aria-hidden="true">{btvNo(i)}</span>
               <span className="btv-fb">
                 <span className="btv-fk">{t.short}</span>
@@ -781,6 +850,8 @@ function BtvBody() {
   const [src, setSrc] = btvUseState(null);
   const [failed, setFailed] = btvUseState(false);
   const [tries, setTries] = btvUseState(0);
+  const [sort, setSort] = btvUseState("issue");
+  const [jump, setJump] = btvUseState(null);
   btvUseEffect(() => {
     let live = true;
     D.loadOneOffs().then((j) => {
@@ -794,10 +865,12 @@ function BtvBody() {
      browser's own jump found no such id in the static article it painted
      first, and an element's scrollIntoView fired while the first frames are
      still settling overshot to the page foot, so the page scrolls itself,
-     two frames on, to the section's top less the pinned bar's clearance. */
+     two frames on, to the section's top less the pinned bar's clearance.
+     A finding picked while the page runs newest first lands the same way,
+     once the issues are back. */
   btvUseEffect(() => {
     if (!src) return;
-    const h = (window.location.hash || "").replace(/^#/, "");
+    const h = jump ? jump.id : (window.location.hash || "").replace(/^#/, "");
     if (!/^btv-/.test(h)) return;
     let raf = requestAnimationFrame(() => {
       raf = requestAnimationFrame(() => {
@@ -808,8 +881,16 @@ function BtvBody() {
       });
     });
     return () => cancelAnimationFrame(raf);
-  }, [src]);
+  }, [src, jump]);
+  /* the link still sets its hash as ever; the topic it names exists only
+     once the issues are back */
+  const onGo = (id) => {
+    if (sort === "issue") return;
+    setSort("issue");
+    setJump({ id: "btv-" + id });
+  };
   const topics = btvUseMemo(() => (src ? src.topics.filter((t) => t.blocks.length || t.more.length) : []), [src]);
+  const months = btvUseMemo(() => (sort === "recent" ? btvByMonth(topics) : null), [topics, sort]);
 
   if (failed) {
     return (
@@ -825,12 +906,14 @@ function BtvBody() {
   const more = topics.reduce((n, t) => n + t.more.length, 0);
   return (
     <div className="btv">
-      <BtvFindings topics={topics} />
+      <BtvFindings topics={topics} onGo={onGo} />
+      <BtvSort sort={sort} onSort={setSort} />
       <p className="btv-scope">
         {src.counts.featured} questions in charts and answers, and {more} more in the topics’ lists, from {btvWord(Object.keys(houses).length)} pollsters
         {" "}since {btvMonth(src.first)}. Every figure names its pollster, its dates and its sample, and links to its source.
       </p>
-      {topics.map((t, i) => <BtvTopic key={t.id} t={t} n={btvNo(i)} houses={houses} />)}
+      {months ? months.map((m) => <BtvMonth key={m.ym} m={m} houses={houses} />)
+        : topics.map((t, i) => <BtvTopic key={t.id} t={t} n={btvNo(i)} houses={houses} />)}
       <div className="btv-how">
         <p><b>How the findings are called.</b> Each topic opens with what its first chart or question found. A side is said
           to lead only where the gap clears the poll’s 95% margin of error, and to be a majority only where its share clears

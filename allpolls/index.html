@@ -3308,6 +3308,21 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
   text-decoration-color: color-mix(in oklch, var(--ink) 45%, transparent);
 }
+.btv-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; margin-top: 24px; border-bottom: 1px solid var(--line); }
+.btv-sort-l { font-size: 13px; color: var(--ink-3); }
+.btv-sort-g { display: flex; gap: 4px; }
+.btv-sort-b {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  min-height: 44px; padding: 0 12px; display: inline-flex; align-items: center;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  font-size: 15px; color: var(--ink-3); white-space: nowrap;
+}
+.btv-sort-b[aria-pressed="true"] { border-bottom-color: var(--ink); font-weight: 600; color: var(--ink); }
+.btv-sort-b:hover { color: var(--ink); }
+.btv-sort-b:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+.btv-sort-w { display: inline-flex; flex-direction: column; align-items: center; }
+.btv-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
+.btv-qt { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-3); }
 .btv-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
 .btv-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
 .btv-tt { margin: 0; font-family: var(--sans); font-size: 19px; font-weight: 600; line-height: 1.3; color: var(--ink); }
@@ -136552,7 +136567,8 @@ function BtvWaves({
 }
 function BtvItem({
   c,
-  houses
+  houses,
+  topic
 }) {
   const body = c.kind === "split" ? React.createElement(BtvSplit, {
     c: c
@@ -136568,7 +136584,9 @@ function BtvItem({
     className: "btv-item btv-k-" + c.kind
   }, React.createElement("div", {
     className: "btv-il"
-  }, React.createElement("h4", {
+  }, topic ? React.createElement("p", {
+    className: "btv-qt"
+  }, topic) : null, React.createElement("h4", {
     className: "btv-q"
   }, c.title), c.summary ? React.createElement("p", {
     className: "btv-sum"
@@ -136590,7 +136608,8 @@ function BtvItem({
 }
 function BtvTracker({
   c,
-  houses
+  houses,
+  topic
 }) {
   const narrow = useNarrow(MQ_PHONE);
   const net = c.measure === "net";
@@ -136633,7 +136652,9 @@ function BtvTracker({
   const rows = pts.slice().sort((p, q) => q.x - p.x);
   return React.createElement("div", {
     className: "btv-tracker"
-  }, React.createElement("p", {
+  }, topic ? React.createElement("p", {
+    className: "btv-qt"
+  }, topic) : null, React.createElement("p", {
     className: "btv-tlab"
   }, c.title), React.createElement("p", {
     className: "btv-tdek"
@@ -136806,14 +136827,16 @@ function BtvTracker({
   }, "Source \u2197") : null))))))));
 }
 function BtvMore({
-  t,
-  houses
+  label,
+  qs,
+  houses,
+  meta
 }) {
   return React.createElement("details", {
     className: "btv-more"
-  }, React.createElement("summary", null, "More questions on ", t.about || t.title, React.createElement("span", null, " \xB7 ", t.more.length)), React.createElement("ul", {
+  }, React.createElement("summary", null, label, React.createElement("span", null, " \xB7 ", qs.length)), React.createElement("ul", {
     className: "btv-ml"
-  }, t.more.map(q => React.createElement("li", {
+  }, qs.map(q => React.createElement("li", {
     key: q.id + q.house
   }, React.createElement("details", {
     className: "btv-mi"
@@ -136821,7 +136844,7 @@ function BtvMore({
     className: "btv-mq"
   }, q.title), React.createElement("span", {
     className: "btv-mm"
-  }, btvHouse(q, houses), " \xB7 ", btvMonth(q.last), q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")), React.createElement("div", {
+  }, meta(q))), React.createElement("div", {
     className: "btv-mb"
   }, React.createElement("div", {
     className: "btv-il"
@@ -136848,6 +136871,7 @@ function BtvMore({
     when: q.srcs.length > 1 ? q.cutsWhen : null
   }))))))));
 }
+const btvCount = (trackers, items, more) => [trackers ? trackers === 1 ? "One chart" : btvCap(btvWord(trackers)) + " charts" : null, items ? items + (items === 1 ? " question" : " questions") : null, more ? more + " more" : null].filter(Boolean).join(" · ");
 function BtvTopic({
   t,
   n,
@@ -136855,7 +136879,7 @@ function BtvTopic({
 }) {
   const trackers = t.blocks.filter(b => b.kind === "tracker");
   const items = t.blocks.filter(b => b.kind !== "tracker");
-  const count = [trackers.length ? trackers.length === 1 ? "One chart" : btvCap(btvWord(trackers.length)) + " charts" : null, items.length ? items.length + (items.length === 1 ? " question" : " questions") : null, t.more.length ? t.more.length + " more" : null].filter(Boolean).join(" · ");
+  const count = btvCount(trackers.length, items.length, t.more.length);
   return React.createElement("section", {
     className: "btv-topic",
     id: "btv-" + t.id,
@@ -136884,12 +136908,116 @@ function BtvTopic({
     c: c,
     houses: houses
   }))) : null, t.more.length ? React.createElement(BtvMore, {
-    t: t,
-    houses: houses
+    label: "More questions on " + (t.about || t.title),
+    qs: t.more,
+    houses: houses,
+    meta: q => btvHouse(q, houses) + " · " + btvMonth(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
   }) : null);
 }
+const btvLast = b => b.kind === "tracker" ? b.last : b.src && b.src.field ? b.src.field.end : (b.rows || []).reduce((d, r) => r.src && r.src.field && r.src.field.end > d ? r.src.field.end : d, "");
+function btvByMonth(topics) {
+  const all = [];
+  topics.forEach(t => {
+    t.blocks.forEach(b => all.push({
+      t,
+      b,
+      date: btvLast(b)
+    }));
+    t.more.forEach(q => all.push({
+      t,
+      q,
+      date: q.last
+    }));
+  });
+  all.sort((p, q) => p.date < q.date ? 1 : p.date > q.date ? -1 : 0);
+  const months = [];
+  for (const e of all) {
+    const ym = e.date.slice(0, 7);
+    if (!months.length || months[months.length - 1].ym !== ym) months.push({
+      ym,
+      all: []
+    });
+    months[months.length - 1].all.push(e);
+  }
+  return months.map(m => ({
+    ym: m.ym,
+    trackers: m.all.filter(e => e.b && e.b.kind === "tracker"),
+    items: m.all.filter(e => e.b && e.b.kind !== "tracker"),
+    more: m.all.filter(e => e.q)
+  }));
+}
+function BtvMonth({
+  m,
+  houses
+}) {
+  const name = BTV_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
+  const topicOf = new Map(m.more.map(e => [e.q, e.t]));
+  return React.createElement("section", {
+    className: "btv-topic btv-mon",
+    id: "btv-m-" + m.ym,
+    "aria-labelledby": "btv-mh-" + m.ym
+  }, React.createElement("div", {
+    className: "btv-tk"
+  }, React.createElement("h3", {
+    className: "btv-tt",
+    id: "btv-mh-" + m.ym
+  }, name), React.createElement("span", {
+    className: "btv-tc"
+  }, btvCount(m.trackers.length, m.items.length, m.more.length))), m.trackers.map(e => React.createElement(BtvTracker, {
+    key: e.b.id,
+    c: e.b,
+    houses: houses,
+    topic: e.t.short
+  })), m.items.length ? React.createElement("div", {
+    className: "btv-items"
+  }, m.items.map((e, i) => React.createElement(BtvItem, {
+    key: (e.b.id || "") + i,
+    c: e.b,
+    houses: houses,
+    topic: e.t.short
+  }))) : null, m.more.length ? React.createElement(BtvMore, {
+    label: "More questions from " + name,
+    qs: m.more.map(e => e.q),
+    houses: houses,
+    meta: q => topicOf.get(q).short + " · " + btvHouse(q, houses) + " · " + btvDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
+  }) : null);
+}
+const BTV_SORTS = [{
+  id: "issue",
+  label: "By issue"
+}, {
+  id: "recent",
+  label: "Newest first"
+}];
+function BtvSort({
+  sort,
+  onSort
+}) {
+  return React.createElement("div", {
+    className: "btv-sort"
+  }, React.createElement("span", {
+    className: "btv-sort-l",
+    id: "btv-sort-l"
+  }, "Order the questions"), React.createElement("div", {
+    className: "btv-sort-g",
+    role: "group",
+    "aria-labelledby": "btv-sort-l",
+    onKeyDown: rdTabsKey(BTV_SORTS, onSort),
+    onClick: rdTabFocus
+  }, BTV_SORTS.map(o => React.createElement("button", {
+    key: o.id,
+    type: "button",
+    className: "btv-sort-b",
+    "aria-pressed": sort === o.id,
+    onClick: () => onSort(o.id)
+  }, React.createElement("span", {
+    className: "btv-sort-w",
+    "data-t": o.label
+  }, o.label)))));
+}
 function BtvFindings({
-  topics
+  topics,
+  onGo
 }) {
   return React.createElement("section", {
     className: "btv-finds",
@@ -136904,7 +137032,8 @@ function BtvFindings({
     key: t.id
   }, React.createElement("a", {
     className: "btv-f",
-    href: "#btv-" + t.id
+    href: "#btv-" + t.id,
+    onClick: () => onGo(t.id)
   }, React.createElement("span", {
     className: "btv-fn",
     "aria-hidden": "true"
@@ -136925,6 +137054,8 @@ function BtvBody() {
   const [src, setSrc] = btvUseState(null);
   const [failed, setFailed] = btvUseState(false);
   const [tries, setTries] = btvUseState(0);
+  const [sort, setSort] = btvUseState("issue");
+  const [jump, setJump] = btvUseState(null);
   btvUseEffect(() => {
     let live = true;
     D.loadOneOffs().then(j => {
@@ -136940,7 +137071,7 @@ function BtvBody() {
   }, [tries]);
   btvUseEffect(() => {
     if (!src) return;
-    const h = (window.location.hash || "").replace(/^#/, "");
+    const h = jump ? jump.id : (window.location.hash || "").replace(/^#/, "");
     if (!/^btv-/.test(h)) return;
     let raf = requestAnimationFrame(() => {
       raf = requestAnimationFrame(() => {
@@ -136954,8 +137085,16 @@ function BtvBody() {
       });
     });
     return () => cancelAnimationFrame(raf);
-  }, [src]);
+  }, [src, jump]);
+  const onGo = id => {
+    if (sort === "issue") return;
+    setSort("issue");
+    setJump({
+      id: "btv-" + id
+    });
+  };
   const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
+  const months = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : null, [topics, sort]);
   if (failed) {
     return React.createElement("div", {
       className: "btv"
@@ -136982,10 +137121,18 @@ function BtvBody() {
   return React.createElement("div", {
     className: "btv"
   }, React.createElement(BtvFindings, {
-    topics: topics
+    topics: topics,
+    onGo: onGo
+  }), React.createElement(BtvSort, {
+    sort: sort,
+    onSort: setSort
   }), React.createElement("p", {
     className: "btv-scope"
-  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), topics.map((t, i) => React.createElement(BtvTopic, {
+  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), months ? months.map(m => React.createElement(BtvMonth, {
+    key: m.ym,
+    m: m,
+    houses: houses
+  })) : topics.map((t, i) => React.createElement(BtvTopic, {
     key: t.id,
     t: t,
     n: btvNo(i),
