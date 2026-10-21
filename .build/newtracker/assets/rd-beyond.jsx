@@ -866,6 +866,38 @@ function BtvSort({ sort, onSort }) {
     return true;
   };
   const sortSwipe = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => sortSwipeLive.current(dir); }, []);
+  /* the hover-claim contract every walking row honours: a pointer anywhere
+     over the row's reach arms <-/-> for it without moving DOM focus, and
+     real keyboard focus wins. Reach = the whole owner section, matching
+     the row's phone swipe (Compare-with's #cyc-summary claim did the same
+     for its section) - so pointing at the catalogue steps the order, it
+     never turns the page */
+  const sortHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("public-opinion");
+    if (!sec) return undefined;
+    const enter = () => { sortHover.current = true; };
+    const leave = () => { sortHover.current = false; };
+    sortHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!sortHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!sortSwipeLive.current(e.key === "ArrowRight" ? 1 : -1)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   return (
     <div className="btv-sort">
       <span className="btv-sort-l" id="btv-sort-l">Sort</span>

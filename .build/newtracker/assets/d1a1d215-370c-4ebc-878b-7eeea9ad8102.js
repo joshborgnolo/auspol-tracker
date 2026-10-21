@@ -465,6 +465,53 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     if (el) el.focus();
   };
 
+  /* The bar's hover claim: pointing at the nav arms its own arrow walk, so
+     ←/→ step the VISIBLE tabs while the pointer rests there (the page-level
+     walk owns the menu pages too). Focus never moves - the claim flips a
+     ref, and real keyboard focus still wins (the activeElement guard). The
+     stepper is rebound every render so the once-registered listener never
+     goes stale; while the ☰ menu is open it owns the keys alone. */
+  const navHover = React.useRef(false);
+  const navWalkLive = React.useRef(null);
+  navWalkLive.current = (dir) => {
+    const ids = barTabs.map((t) => t.id);
+    const n = ids.length;
+    if (n < 2) return false;
+    const i = ids.indexOf(active);
+    /* on a menu page no bar tab is active: the ☰ sits at the bar's right
+       end, so right wraps to the first tab and left to the last */
+    const next = i < 0 ? (dir > 0 ? ids[0] : ids[n - 1]) : ids[(i + dir + n) % n];
+    if (next == null || next === active) return false;
+    onChange(next);
+    return true;
+  };
+  React.useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return undefined;
+    const enter = () => { navHover.current = true; };
+    const leave = () => { navHover.current = false; };
+    navHover.current = nav.matches(":hover");
+    nav.addEventListener("pointerenter", enter);
+    nav.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!navHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (menuOpen) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!navWalkLive.current(e.key === "ArrowRight" ? 1 : -1)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      nav.removeEventListener("pointerenter", enter);
+      nav.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [menuOpen]);
+
   // The docked score is a shortcut home: switch to Snapshot (where the 2PP
   // hero lives) and ride to the top. If already on Snapshot, just glide up.
   const goHero = () => {

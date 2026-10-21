@@ -105053,6 +105053,48 @@ function Tabs({
     const el = btnRefs.current[next];
     if (el) el.focus();
   };
+  const navHover = React.useRef(false);
+  const navWalkLive = React.useRef(null);
+  navWalkLive.current = dir => {
+    const ids = barTabs.map(t => t.id);
+    const n = ids.length;
+    if (n < 2) return false;
+    const i = ids.indexOf(active);
+    const next = i < 0 ? dir > 0 ? ids[0] : ids[n - 1] : ids[(i + dir + n) % n];
+    if (next == null || next === active) return false;
+    onChange(next);
+    return true;
+  };
+  React.useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return undefined;
+    const enter = () => {
+      navHover.current = true;
+    };
+    const leave = () => {
+      navHover.current = false;
+    };
+    navHover.current = nav.matches(":hover");
+    nav.addEventListener("pointerenter", enter);
+    nav.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!navHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (menuOpen) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!navWalkLive.current(e.key === "ArrowRight" ? 1 : -1)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      nav.removeEventListener("pointerenter", enter);
+      nav.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [menuOpen]);
   const goHero = () => {
     if (active !== "now") onChange("now");else window.scrollTo({
       top: 0,
@@ -138751,6 +138793,36 @@ function BtvSort({
   };
   const sortSwipe = React.useCallback(el => {
     if (el) el.__rdSwipe = dir => sortSwipeLive.current(dir);
+  }, []);
+  const sortHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("public-opinion");
+    if (!sec) return undefined;
+    const enter = () => {
+      sortHover.current = true;
+    };
+    const leave = () => {
+      sortHover.current = false;
+    };
+    sortHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!sortHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!sortSwipeLive.current(e.key === "ArrowRight" ? 1 : -1)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
   }, []);
   return React.createElement("div", {
     className: "btv-sort"
