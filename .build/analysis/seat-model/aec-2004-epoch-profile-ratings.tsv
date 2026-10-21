@@ -1,0 +1,152 @@
+# division	state	classification	party	status	provenance
+# Live AEC 2004 division profile pages (www.aec.gov.au/Elections/federal_elections/2004/profiles/<Slug>.htm), harvested 2026-10-22; all 150 rows carry an on-page Demographic Rating + 2004-election Seat Status (no patches needed). party/status parsed from the printed Seat Status string.
+Adelaide	SA	Inner Metropolitan	Labor	Marginal	aecPage
+Aston	VIC	Outer Metropolitan	Liberal	Safe	aecPage
+Ballarat	VIC	Provincial	Labor	Marginal	aecPage
+Banks	NSW	Inner Metropolitan	Labor	Marginal	aecPage
+Barker	SA	Rural	Liberal	Safe	aecPage
+Barton	NSW	Inner Metropolitan	Labor	Fairly Safe	aecPage
+Bass	TAS	Provincial	Liberal	Marginal	aecPage
+Batman	VIC	Inner Metropolitan	Labor	Safe	aecPage
+Bendigo	VIC	Provincial	Labor	Marginal	aecPage
+Bennelong	NSW	Inner Metropolitan	Liberal	Marginal	aecPage
+Berowra	NSW	Outer Metropolitan	Liberal	Safe	aecPage
+Blair	QLD	Rural	Liberal	Safe	aecPage
+Blaxland	NSW	Inner Metropolitan	Labor	Safe	aecPage
+Bonner	QLD	Outer Metropolitan	Liberal	Marginal	aecPage
+Boothby	SA	Outer Metropolitan	Liberal	Marginal	aecPage
+Bowman	QLD	Outer Metropolitan	Liberal	Fairly Safe	aecPage
+Braddon	TAS	Rural	Liberal	Marginal	aecPage
+Bradfield	NSW	Inner Metropolitan	Liberal	Safe	aecPage
+Brand	WA	Provincial	Labor	Marginal	aecPage
+Brisbane	QLD	Inner Metropolitan	Labor	Marginal	aecPage
+Bruce	VIC	Outer Metropolitan	Labor	Marginal	aecPage
+Calare	NSW	Rural	Independent	Safe	aecPage
+Calwell	VIC	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Canberra	ACT	Inner Metropolitan	Labor	Fairly Safe	aecPage
+Canning	WA	Outer Metropolitan	Liberal	Fairly Safe	aecPage
+Capricornia	QLD	Provincial	Labor	Marginal	aecPage
+Casey	VIC	Outer Metropolitan	Liberal	Safe	aecPage
+Charlton	NSW	Provincial	Labor	Fairly Safe	aecPage
+Chifley	NSW	Outer Metropolitan	Labor	Safe	aecPage
+Chisholm	VIC	Inner Metropolitan	Labor	Marginal	aecPage
+Cook	NSW	Inner Metropolitan	Liberal	Safe	aecPage
+Corangamite	VIC	Provincial	Liberal	Marginal	aecPage
+Corio	VIC	Provincial	Labor	Marginal	aecPage
+Cowan	WA	Outer Metropolitan	Labor	Marginal	aecPage
+Cowper	NSW	Rural	National	Fairly Safe	aecPage
+Cunningham	NSW	Provincial	Labor	Safe	aecPage
+Curtin	WA	Inner Metropolitan	Liberal	Safe	aecPage
+Dawson	QLD	Rural	National	Safe	aecPage
+Deakin	VIC	Outer Metropolitan	Liberal	Marginal	aecPage
+Denison	TAS	Inner Metropolitan	Labor	Safe	aecPage
+Dickson	QLD	Outer Metropolitan	Liberal	Fairly Safe	aecPage
+Dobell	NSW	Provincial	Liberal	Marginal	aecPage
+Dunkley	VIC	Outer Metropolitan	Liberal	Fairly Safe	aecPage
+Eden-Monaro	NSW	Rural	Liberal	Marginal	aecPage
+Fadden	QLD	Outer Metropolitan	Liberal	Safe	aecPage
+Fairfax	QLD	Rural	Liberal	Safe	aecPage
+Farrer	NSW	Rural	Liberal	Safe	aecPage
+Fisher	QLD	Rural	Liberal	Safe	aecPage
+Flinders	VIC	Rural	Liberal	Safe	aecPage
+Forde	QLD	Rural	Liberal	Safe	aecPage
+Forrest	WA	Rural	Liberal	Safe	aecPage
+Fowler	NSW	Outer Metropolitan	Labor	Safe	aecPage
+Franklin	TAS	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Fraser	ACT	Inner Metropolitan	Labor	Safe	aecPage
+Fremantle	WA	Inner Metropolitan	Labor	Fairly Safe	aecPage
+Gellibrand	VIC	Inner Metropolitan	Labor	Safe	aecPage
+Gilmore	NSW	Rural	Liberal	Safe	aecPage
+Gippsland	VIC	Rural	National	Fairly Safe	aecPage
+Goldstein	VIC	Inner Metropolitan	Liberal	Safe	aecPage
+Gorton	VIC	Outer Metropolitan	Labor	Safe	aecPage
+Grayndler	NSW	Inner Metropolitan	Labor	Safe	aecPage
+Greenway	NSW	Outer Metropolitan	Liberal	Marginal	aecPage
+Grey	SA	Rural	Liberal	Safe	aecPage
+Griffith	QLD	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Groom	QLD	Provincial	Liberal	Safe	aecPage
+Gwydir	NSW	Rural	National	Safe	aecPage
+Hasluck	WA	Outer Metropolitan	Liberal	Marginal	aecPage
+Herbert	QLD	Provincial	Liberal	Fairly Safe	aecPage
+Higgins	VIC	Inner Metropolitan	Liberal	Fairly Safe	aecPage
+Hindmarsh	SA	Inner Metropolitan	Labor	Marginal	aecPage
+Hinkler	QLD	Rural	National	Marginal	aecPage
+Holt	VIC	Outer Metropolitan	Labor	Marginal	aecPage
+Hotham	VIC	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Hughes	NSW	Outer Metropolitan	Liberal	Safe	aecPage
+Hume	NSW	Rural	Liberal	Safe	aecPage
+Hunter	NSW	Rural	Labor	Safe	aecPage
+Indi	VIC	Rural	Liberal	Safe	aecPage
+Isaacs	VIC	Outer Metropolitan	Labor	Marginal	aecPage
+Jagajaga	VIC	Outer Metropolitan	Labor	Marginal	aecPage
+Kalgoorlie	WA	Rural	Liberal	Fairly Safe	aecPage
+Kennedy	QLD	Rural	Independent	Safe	aecPage
+Kingsford Smith	NSW	Inner Metropolitan	Labor	Fairly Safe	aecPage
+Kingston	SA	Outer Metropolitan	Liberal	Marginal	aecPage
+Kooyong	VIC	Inner Metropolitan	Liberal	Fairly Safe	aecPage
+La Trobe	VIC	Outer Metropolitan	Liberal	Marginal	aecPage
+Lalor	VIC	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Leichhardt	QLD	Rural	Liberal	Fairly Safe	aecPage
+Lilley	QLD	Inner Metropolitan	Labor	Marginal	aecPage
+Lindsay	NSW	Outer Metropolitan	Liberal	Marginal	aecPage
+Lingiari	NT	Rural	Labor	Fairly Safe	aecPage
+Longman	QLD	Rural	Liberal	Fairly Safe	aecPage
+Lowe	NSW	Inner Metropolitan	Labor	Marginal	aecPage
+Lyne	NSW	Rural	National	Safe	aecPage
+Lyons	TAS	Rural	Labor	Marginal	aecPage
+Macarthur	NSW	Rural	Liberal	Fairly Safe	aecPage
+Mackellar	NSW	Outer Metropolitan	Liberal	Safe	aecPage
+Macquarie	NSW	Outer Metropolitan	Liberal	Fairly Safe	aecPage
+Makin	SA	Outer Metropolitan	Liberal	Marginal	aecPage
+Mallee	VIC	Rural	National	Safe	aecPage
+Maranoa	QLD	Rural	National	Safe	aecPage
+Maribyrnong	VIC	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Mayo	SA	Rural	Liberal	Safe	aecPage
+McEwen	VIC	Rural	Liberal	Fairly Safe	aecPage
+McMillan	VIC	Rural	Liberal	Marginal	aecPage
+McPherson	QLD	Provincial	Liberal	Safe	aecPage
+Melbourne	VIC	Inner Metropolitan	Labor	Safe	aecPage
+Melbourne Ports	VIC	Inner Metropolitan	Labor	Marginal	aecPage
+Menzies	VIC	Outer Metropolitan	Liberal	Safe	aecPage
+Mitchell	NSW	Outer Metropolitan	Liberal	Safe	aecPage
+Moncrieff	QLD	Provincial	Liberal	Safe	aecPage
+Moore	WA	Outer Metropolitan	Liberal	Safe	aecPage
+Moreton	QLD	Inner Metropolitan	Liberal	Marginal	aecPage
+Murray	VIC	Rural	Liberal	Safe	aecPage
+New England	NSW	Rural	Independent	Safe	aecPage
+Newcastle	NSW	Provincial	Labor	Fairly Safe	aecPage
+North Sydney	NSW	Inner Metropolitan	Liberal	Safe	aecPage
+O'Connor	WA	Rural	Liberal	Safe	aecPage
+Oxley	QLD	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Page	NSW	Rural	National	Marginal	aecPage
+Parkes	NSW	Rural	National	Safe	aecPage
+Parramatta	NSW	Inner Metropolitan	Labor	Marginal	aecPage
+Paterson	NSW	Rural	Liberal	Fairly Safe	aecPage
+Pearce	WA	Outer Metropolitan	Liberal	Safe	aecPage
+Perth	WA	Inner Metropolitan	Labor	Fairly Safe	aecPage
+Petrie	QLD	Outer Metropolitan	Liberal	Fairly Safe	aecPage
+Port Adelaide	SA	Inner Metropolitan	Labor	Safe	aecPage
+Prospect	NSW	Outer Metropolitan	Labor	Fairly Safe	aecPage
+Rankin	QLD	Outer Metropolitan	Labor	Marginal	aecPage
+Reid	NSW	Inner Metropolitan	Labor	Safe	aecPage
+Richmond	NSW	Rural	Labor	Marginal	aecPage
+Riverina	NSW	Rural	National	Safe	aecPage
+Robertson	NSW	Provincial	Liberal	Fairly Safe	aecPage
+Ryan	QLD	Outer Metropolitan	Liberal	Safe	aecPage
+Scullin	VIC	Outer Metropolitan	Labor	Safe	aecPage
+Shortland	NSW	Provincial	Labor	Fairly Safe	aecPage
+Solomon	NT	Inner Metropolitan	Country Liberal	Marginal	aecPage
+Stirling	WA	Inner Metropolitan	Liberal	Marginal	aecPage
+Sturt	SA	Inner Metropolitan	Liberal	Fairly Safe	aecPage
+Swan	WA	Inner Metropolitan	Labor	Marginal	aecPage
+Sydney	NSW	Inner Metropolitan	Labor	Safe	aecPage
+Tangney	WA	Inner Metropolitan	Liberal	Safe	aecPage
+Throsby	NSW	Provincial	Labor	Safe	aecPage
+Wakefield	SA	Rural	Liberal	Marginal	aecPage
+Wannon	VIC	Rural	Liberal	Safe	aecPage
+Warringah	NSW	Inner Metropolitan	Liberal	Safe	aecPage
+Watson	NSW	Inner Metropolitan	Labor	Safe	aecPage
+Wentworth	NSW	Inner Metropolitan	Liberal	Marginal	aecPage
+Werriwa	NSW	Outer Metropolitan	Labor	Safe	aecPage
+Wide Bay	QLD	Rural	National	Safe	aecPage
+Wills	VIC	Inner Metropolitan	Labor	Safe	aecPage

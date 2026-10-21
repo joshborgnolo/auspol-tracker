@@ -1,8 +1,8 @@
 ---
 name: aec-division-classifications
-description: AEC per-division demographic classification (Inner Metropolitan / Outer Metropolitan / Provincial / Rural) — the VTR HouseDivisionClassifications product end-to-end for EIGHT election blocks (a CANONICAL-ON-PAGE 2001 block from the Wayback-harvested 2001-epoch profile pages + RR5 gap-fill of its 3 holes, plus live VTR 2007–2025; two markup eras: 2016+ headers="c*" self-label cells vs 2007/2010/2013 positional 7/8-cell rows), chamber-count invariants, the repo's extractor + fixtures + test, and the geography-stratification use it was built for.
+description: AEC per-division demographic classification (Inner Metropolitan / Outer Metropolitan / Provincial / Rural) — the VTR HouseDivisionClassifications product end-to-end for NINE election blocks (canonical-on-page 2001 from the Wayback-harvested 2001-epoch profile pages + RR5 gap-fill of its 3 holes, canonical-on-page 2004 from the LIVE 2004 profile pages, plus live VTR 2007–2025; two markup eras: 2016+ headers="c*" self-label cells vs 2007/2010/2013 positional 7/8-cell rows), chamber-count invariants, the repo's extractor + fixtures + test, and the geography-stratification use it was built for. NOTE 2026-10-22: the supposed 2004 gap is CLOSED — live per-division profile pages under aec.gov.au/Elections/federal_elections/2004/profiles/ carried the rating; the 150-row harvest landed as a committed canonical block. RR5 att2's FROM column records the 2004-epoch print, not 2001's.
 source: auto-skill
-extracted_at: '2026-10-21T06:06:18.696Z'
+extracted_at: '2026-10-22T06:00:00.000Z'
 ---
 
 # AEC division classifications (demographic rating per division)
@@ -67,6 +67,7 @@ VTR pages are cleaner and uniform — prefer them.
 | Election | event | divisions |
 |---|---|---|
 | 2001 | (v2 Wayback pages + 3 RR5 fills — no VTR event) | 150 |
+| 2004 | (live per-division profile pages — no VTR event) | 150 |
 | 2007 | 13745 | 150 |
 | 2010 | 15508 | 150 |
 | 2013 | 17496 | 150 |
@@ -86,20 +87,31 @@ Wentworth Inner, Durack Rural, Lyons Rural; 2013: Denison Inner, Throsby
 Provincial, Lyons Rural, Aston Outer. (Lyons and Aston pin the same class
 across eras — clean anchors.)
 
-Cross-era reclass drift is small and listable: 07→10 Forde R→OM,
-Brand P→OM; 10→13 five (Casey, Hotham, Jagajaga, Maribyrnong, Blair);
-13→16 Hume+Paterson; 16→19 Cowper R→Provincial + Griffith OM→IM;
-19→22 four (Fraser, Jagajaga, La Trobe, Cowan); 22→25 Hume.
+Cross-era reclass drift is small and listable: 01→04 seven (Brand OM→P,
+Cunningham OM→P, Throsby IM→P, Fisher P→R, Macarthur OM→R, Maribyrnong
+IM→OM, Pearce R→OM); 04→07 four (Hinkler R→P, Longman R→P, Macarthur
+R→OM — flipping back within three years — Macquarie OM→P); 07→10 Forde
+R→OM, Brand P→OM; 10→13 five (Casey, Hotham, Jagajaga, Maribyrnong,
+Blair); 13→16 Hume+Paterson; 16→19 Cowper R→Provincial + Griffith
+OM→IM; 19→22 four (Fraser, Jagajaga, La Trobe, Cowan); 22→25 Hume.
 
 The test ALSO pins the 2001 on-page layer: Gwydir Rural, Burke Rural,
 Cowper Rural, Griffith Outer Metropolitan (v2 agrees with RR5's att2 FROM
 column there); **Pearce Rural** (the v2 page's token — RR5's att2 FROM
-says Outer Metropolitan; one of four pinned page-vs-paper divergences);
+says Outer Metropolitan; one of four pinned page-vs-paper divergences —
+**reframed 2026-10-22: those four divergences are four of the seven REAL
+2001→2004 on-page reclassifications; att2's FROM records the 2004-epoch
+print, 15/15 comparable rows** — see the 2004 section);
 Macarthur/Canning Outer Metropolitan (the normalised era tokens); and the
 three RR5 gap fills Bradfield/Maribyrnong Inner Metropolitan, Wide Bay
 Rural. The 2001 distribution is locked (Inner 44 / Outer 45 / Provincial
 16 / Rural 45) and `deltas['2001']` in the JSON is exactly the 20
-v2-vs-att3 divergences with the era tokens preserved.
+v2-vs-att3 divergences with the era tokens preserved. And the 2004
+live-page layer is pinned too: Bonner/Gorton Outer Metropolitan (the
+2003-04 redistribution creations), Hunter/Gwydir/Wide Bay Rural,
+Macarthur Rural, Maribyrnong/Pearce Outer Metropolitan, Solomon Inner
+Metropolitan, with distribution locked at Inner 42 / Outer 45 /
+Provincial 18 / Rural 45.
 
 ## The 1998-epoch on-page rating harvest (B-lane, 2026-10-21 → 148-row TSV)
 
@@ -169,10 +181,59 @@ att3 both Provincial, so att2's FROM row is the outlier) and **Pearce**
 (page Rural vs att2 OM — test pin flipped Outer→Rural). The 20
 v2-vs-att3 divergences land in the JSON as `deltas["2001"]`.
 
+## The 2004 live profile-page harvest (canonical 2004 layer, landed 2026-10-22)
+
+The per-division **4 October 2004** profile pages still exist LIVE:
+`https://www.aec.gov.au/Elections/federal_elections/2004/profiles/<Name>.htm`
+— slug = division name minus spaces/apostrophes/HYPHENS (`deo-ong`… strip
+`-` too), server case-insensitive; bogus slugs return a **55,488-byte
+text/html sentinel** (same anti-soft-200 as the pocket-book probe); the
+era gate is `<title>` starting `2004 Profile of the division of`. Every
+one of the 150 divisions carries a **Demographic Rating** token AND a
+**Seat Status** string (2004 election outcome, e.g. "Safe Labor",
+"Marginal Country Liberal").
+
+Two page templates coexist in the directory and BOTH templates must parse:
+- split: `Demographic Rating:</h2><p>Rural</p>` / `Seat Status:</li><li>…</li>`
+- inline: `…: Rural</li>` / `Seat Status: Marginal Labor</li>`
+
+State is NOT machine-labelled on the pages (body prose carries suburb
+names that defeat substring matching). Source it from RR5 att3 for the
+148 surviving divisions + hardcode the two 2003-04 creations
+(**Bonner = QLD, Gorton = VIC**). The 2004 set is the 2001 set
++ Bonner/Gorton − **Bonython/Burke** (abolished in the 2003-04
+redistributions; per-state counts: NSW 50 / VIC 37 / **QLD 28** /
+**SA 11** / WA 15 / TAS 5 / NT 2 / ACT 2 — Qld gained a seat, SA lost
+one vs 2001).
+
+Harvest kit: `.matilda/divclass-2004/harvest-2004.py` (scratch, gitignored),
+pages cached in `.matilda/divclass-2004/pages/`, output committed as
+`.build/analysis/seat-model/aec-2004-epoch-profile-ratings.tsv`
+(`division,state,classification,party,status,provenance` — all 150 rows
+`aecPage`, no RR5 patches needed, unlike 2001). Party vocabulary Labor /
+Liberal / National / Independent / **Country Liberal** (NT); statuses
+Marginal / Fairly Safe / Safe. Distribution Inner 42 / Outer 45 /
+Provincial 18 / Rural 45. `previous: null` (the pages are single-epoch —
+no prior/after pair printed).
+
+**This harvest settles RR5 att2.** Newman's attachment-2 FROM column
+(labelled "2001 election") matches the 2004 live pages on **15/16** rows
+(Burke, the only att2 division not in the 2004 set, is uncomparable) vs
+only 12/16 against the 2001 pages — att2's FROM records the class **as
+printed at Jan-2005 / 2004-election epoch**, not the 2001 election. The
+four 2001 ATT2_DIVERGES (Fisher, Macarthur, Maribyrnong, Pearce) are four
+of the seven REAL 2001→2004 on-page reclassifications.
+
 ## Repo implementation (committed)
 
 - `.build/analysis/seat-model/extract-division-classifications.mjs` — emits
-  EIGHT blocks. The 2001 block is OFFLINE: `elections2001()` walks the
+  NINE blocks. The 2004 block is OFFLINE too: `elections2004()` walks the
+  committed live-page fixture (no fetch — the pages' fetch happened at
+  harvest time), guards the four-class/state/party/status vocabularies,
+  duplicates, the exact 150-row count, the per-state chamber counts
+  (NSW 50/VIC 37/QLD 28/SA 11/WA 15/TAS 5/NT 2/ACT 2) and exact set
+  membership (2001 set ± the 2003-04 redistribution pivots). The 2001
+  block is OFFLINE: `elections2001()` walks the
   committed v2 fixture (aec — see below) joined to the two RR5 fixtures,
   `out.elections["2001"]` seeds first so keys stay chronological. Per row:
   class = `NORMALISE_2001[raw] ?? raw` over the fixture's
@@ -204,6 +265,13 @@ v2-vs-att3 divergences land in the JSON as `deltas["2001"]`.
   ratings + 3 RR5-att3 gap fills (see the B-lane section for the harvest
   kit and the four-holes map). Vocabulary is the four classes PLUS the two
   era tokens, normalisation happens in the extractor not the fixture.
+- `.build/analysis/seat-model/aec-2004-epoch-profile-ratings.tsv` — the
+  canonical 2004 source (committed 2026-10-22): 150 rows, schema
+  `# division,state,classification,party,status,provenance`; ALL rows
+  aecPage (no patch lanes). Unlike the 2001 fixture this one is
+  ready-keyed: state/party/status live in the fixture (state blamed on
+  RR5 att3 + Bonner/Gorton hardcodes at harvest time — see the 2004
+  harvest section).
 - `.build/analysis/seat-model/rr5-att3-proposed-classifications.tsv` +
   `rr5-att2-changes.tsv` — the RR5 fixtures, DEMOTED 2026-10-22 from
   canonical to gap-fill + corroboration (150-row per-state transcript and
@@ -216,17 +284,21 @@ v2-vs-att3 divergences land in the JSON as `deltas["2001"]`.
   att2 prints title case) so the extractor carries no RR5-specific casing
   logic. Regenerator script:
   `.matilda/gen-rr5-fixtures.mjs` (scratch — see gotchas below).
-- `test-division-classifications.mjs` — chamber counts for 8 blocks
-  (150×5 2001–2016, 151×2, 150), vocabulary with the 2001 `previous ===
-  null` exception SCOPED to `year === "2001"` (current still required),
-  the boundary pins (incl. the 2001 on-page ten — see the pins paragraph),
-  W2 name-set equality,
+- `test-division-classifications.mjs` — chamber counts for 9 blocks
+  (150×6 2001–2016, 151×2, 150), vocabulary with the `previous === null`
+  exception scoped to `year === "2001" || year === "2004"` (both
+  single-epoch page layers; current still required), the boundary pins
+  (incl. the 2001 on-page ten and the 2004 live-page nine — see the pins
+  paragraph), W2 name-set equality, the exact reclass sets 2001→2004
+  (seven) and 2004→2007 (four — incl. Macarthur's R→OM flip-back),
   2016→2019 drift list (still exactly Cowper + Griffith), the era-set
-  invariant: Gwydir PRESENT, Gorton/Bonner/Flynn/Wright ABSENT (all
-  post-2001 creations), and the 2001 layer's own pins: distribution
-  44/45/16/45, `deltas["2001"]` exactly 20 rows (spot rows Burke/Throsby/
-  Macarthur/Canning, RR5 gap-fill rows never appear). Run order: extractor
-  then test, from repo root.
+  invariants: 2001 has Gwydir PRESENT and Gorton/Bonner/Flynn/Wright
+  ABSENT; 2004 has Bonner/Gorton PRESENT and Bonython/Burke ABSENT (the
+  2003-04 redistribution pivots), and the per-layer pins: 2001
+  distribution 44/45/16/45, `deltas["2001"]` exactly 20 rows (spot rows
+  Burke/Throsby/Macarthur/Canning, RR5 gap-fill rows never appear),
+  2004 distribution 42/45/18/45. Run order: extractor then test, from
+  repo root.
   (Extractor fetches live; a `cd` into a cache dir then `node …` heredoc
   broke a run once — run from repo root.)
 - `.build/analysis/seat-model/flow-strength-findings.md` — the use case
@@ -235,8 +307,14 @@ v2-vs-att3 divergences land in the JSON as `deltas["2001"]`.
 ## How far back the record reaches (probe map, 2026-10-21)
 
 Question asked: can the four-class table be sourced before 2007? Answer:
-**2007 is the start of the online per-division table; 2001 is derivable
-exactly from a research paper; earlier is print-only or back-projection.**
+**2007 is the start of the online per-division RESULTS table; 2004 and
+2001 are both canonical-on-page from the AEC's own per-division profile
+pages (2004 live today, 2001 via Wayback); earlier is print-only or
+back-projection.** (2026-10-22 correction: an earlier draft of this map
+claimed "2004 has NO four-class table … back-project" — wrong; it only
+looked at the VTR results product. The 2004 per-division PROFILE pages,
+a different www.aec.gov.au surface, carry the rating — see the 2004
+harvest section above.)
 
 Archive anatomy (results.aec.gov.au):
 - The archive index `https://results.aec.gov.au/` hrefs name every event
@@ -249,11 +327,17 @@ Archive anatomy (results.aec.gov.au):
 - `/10822/` is a "Past Electoral Events" frameset — it links no older
   election results (points at a Stats CD-ROM product). Election results
   simply aren't served before 2004's event.
-- **2004 has NO four-class table**: `HouseResultsMenu-12246.htm` offers no
-  classifications page and the CSV downloads menu no classifications CSV —
-  only aggregate `HouseDemographicFirstPrefsByParty-12246-NAT-Metropolitan`
-  / `-NonMetropolitan` splits (a two-way metro/non-metro cut, not per
-  division).
+- **2004 has NO four-class table AMONG ITS RESULTS PAGES**:
+  `HouseResultsMenu-12246.htm` offers no classifications page and the CSV
+  downloads menu no classifications CSV — only aggregate
+  `HouseDemographicFirstPrefsByParty-12246-NAT-Metropolitan` /
+  `-NonMetropolitan` splits (a two-way metro/non-metro cut, not per
+  division). BUT the same event's per-division PROFILE pages
+  (`www.aec.gov.au/Elections/federal_elections/2004/profiles/<Name>.htm`,
+  still live) carry the rating — the 2004 block is now sourced from
+  them (see the 2004 harvest section). Lesson: "no results table" ≠ "no
+  rating anywhere"; probe the profile-page surface too before calling a
+  gap.
 
 **AEC soft-200 trap** — probed pocket-book PDF URLs for 1998–2010 and every
 guess returned HTTP 200. All were the same 55,488-byte `text/html` error
@@ -277,20 +361,27 @@ pdftotext -layout reads clean):
 - **Attachment 3** = a complete 150-division *proposed* classification
   table (rows `Name | Status Party | Area | Class | SES-band`; SES vocab
   High / Upper middle / Middle / Lower middle / Low — 150 rows).
-- **Attachment 2** = the 16 proposed changes, whose FROM column **is the
-  2001-election classification**.
+- **Attachment 2** = the 16 proposed changes, whose FROM column is
+  *LABELLED* the 2001-election classification but — settled by the 2004
+  live-page harvest (15/16 match, only Burke uncomparable) — actually
+  records the class as printed at the Jan-2005 / 2004-election epoch.
+  For 2001 itself trust the Wayback pages; treat att2's FROM as the
+  2004-epoch cross-check.
 - So derive 2001 by reverting proposed rows by their change rows (only when
   the row's proposed value matches the change's TO value — the pattern
   `if proposed[d] === c.toProposed: y2001[d] = c.from2001`). Landed in the
   extractor 2026-10-21 via the two fixture TSVs, then **DEMOTED
   2026-10-22** when the Wayback page harvest became the canonical 2001
   layer — RR5 is now gap-fill + corroboration (see B-lane above).
-- Verification against the 2007 VTR: the derived-2001 table matches
+- Verification against the 2007 VTR: the att2-reverted table matches
   **135/146** common names; the *proposed* redesign only 124/146 — the
-  SES-informed relabel was never adopted downstream. The 11 diffs are
-  genuine post-2001 rating drift (Cook, Hotham, Maribyrnong, Macarthur,
-  Macquarie, Corangamite, Capricornia, Hinkler, Longman, Mayo, Brand), so
-  derived-2001 stands as an exact 2001 snapshot.
+  SES-informed relabel was never adopted downstream. The 11 diffs (Cook,
+  Hotham, Maribyrnong, Macarthur, Macquarie, Corangamite, Capricornia,
+  Hinkler, Longman, Mayo, Brand) were originally read as "post-2001
+  drift" — **re-dated 2026-10-22**: since att2's FROM is the 2004-epoch
+  print, those 11 are 2004→2007-epoch diffs, not 2001→2007. The old
+  "derived-2001 stands as an exact 2001 snapshot" verdict is VOID —
+  2001 truth is the Wayback page layer.
 - Worked recipe scripts: `.matilda/compare-rr5.mjs` (recon vs VTR) and
   `.matilda/gen-rr5-fixtures.mjs` (the fixture generator), both scratch.
 
@@ -315,10 +406,10 @@ Fixture-generator parse gotchas (all bit once, in `.matilda/gen-rr5-fixtures.mjs
   on the first row of each state subgroup — the regex must allow and drop
   them.
 
-Practical fill ladder for the seat model: **2001 + 2007–2025** = IN THE
-REPO NOW (v2 canonical-on-page 2001 block + VTR pages, one regen
-command);
-**2004/1998** = back-project from 2007 (drift runs 2–5 seats per cycle —
+Practical fill ladder for the seat model: **2001 + 2004 + 2007–2025** =
+IN THE REPO NOW (canonical-on-page 2001 + 2004 profile-page blocks + VTR
+pages, one regen command);
+**1998** = back-project from 2001 (drift runs 2–7 seats per cycle —
 same order as any reconstruction); **pre-2001** = print-only (pocket
 books, National Electoral Division Profiles, Electoral Atlas) — not
 worth scanning unless a workstream truly needs it.
