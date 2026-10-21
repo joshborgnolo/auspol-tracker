@@ -1,9 +1,11 @@
 {
-  "_about": "AEC demographic classification per division (Inner Metropolitan / Outer Metropolitan / Provincial / Rural — AEC definitions: inner = capital-city established suburbs; outer = capital-city expansion areas; provincial = majority of enrolment in major provincial cities; rural = the rest), with previous/current seat status (marginal <56%, fairly safe 56-60%, safe >60%) and parties, per election 2001 and 2007/2010/2013/2016/2019/2022/2025. 2001 is DERIVED from AEC Research Report 5 (Newman, Jan 2005): its attachment-3 per-state 2001-election tables (transcribed verbatim in rr5-att3-proposed-classifications.tsv) with attachment 2's 16 change rows reverted to the printed 2001-election class (rr5-att2-changes.tsv) — attachment 3's raw classes are a never-adopted proposal and are NOT what lands here; 2001 rows carry previous:null (single-epoch source) and the 2001-era division set (Gwydir present; no Gorton/Bonner/Flynn/Wright). 2007+ extracted from the VTR HouseDivisionClassifications per-state pages. The AEC rates divisions per election; names stay in AEC canonical case for that election's era (2001-era and 2007-13 names predate the 2016-17 renames: e.g. 'Denison' not 'Clark', 'Throsby' not 'Whitlam'); join to that year's flows/baseline by exact name.",
+  "_about": "AEC demographic classification per division (Inner Metropolitan / Outer Metropolitan / Provincial / Rural — AEC definitions: inner = capital-city established suburbs; outer = capital-city expansion areas; provincial = majority of enrolment in major provincial cities; rural = the rest), with previous/current seat status (marginal <56%, fairly safe 56-60%, safe >60%) and parties, per election 2001 and 2007/2010/2013/2016/2019/2022/2025. 2001 is CANONICAL-ON-PAGE from the AEC's own 2001-epoch division profile pages (Wayback captures Nov 2001-Apr 2002 of the 'Demographic Rating' token beside the '3 October 1998 Election' Seat Status block, transcribed in aec-2001-epoch-profile-ratings.tsv: 147 on-page ratings + 3 RR5-att3 gap fills — Bradfield/Maribyrnong unarchived, Wide Bay never printed; the era tokens Outer Urban / Outer Metropolitan/Provincial normalise to Outer Metropolitan). AEC Research Report 5 (Newman, Jan 2005) is gap-fill + corroboration only: its attachment-2 FROM column independently confirms 12 of 16 change rows (page-vs-paper divergences Macarthur/Maribyrnong/Fisher/Pearce) and the 20 v2-vs-attachment-3 divergences (attachment 3 being a never-adopted proposed re-rating) land in deltas['2001']; 2001 rows carry previous:null (neither source has a prior/after pair) and the 2001-era division set (Gwydir present; no Gorton/Bonner/Flynn/Wright). 2007+ extracted from the VTR HouseDivisionClassifications per-state pages. The AEC rates divisions per election; names stay in AEC canonical case for that election's era (2001-era and 2007-13 names predate the 2016-17 renames: e.g. 'Denison' not 'Clark', 'Throsby' not 'Whitlam'); join to that year's flows/baseline by exact name.",
   "_provenance": {
     "sourcePattern": "https://results.aec.gov.au/<event>/Website/HouseDivisionClassifications-<event>-<STATE>.htm",
     "rr5": "https://www.aec.gov.au/About_AEC/research/files/research_paper5.pdf",
+    "wayback2001": "AEC 2001-epoch division profile pages, Wayback captures Nov 2001-Apr 2002 (harvest kit: .matilda/divclass-pre2001/harvest-1998-v2.py)",
     "fixtures": [
+      ".build/analysis/seat-model/aec-2001-epoch-profile-ratings.tsv",
       ".build/analysis/seat-model/rr5-att3-proposed-classifications.tsv",
       ".build/analysis/seat-model/rr5-att2-changes.tsv"
     ],
@@ -20,6 +22,33 @@
   },
   "elections": {
     "2001": {
+      "Adelaide": {
+        "state": "SA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Aston": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Ballarat": {
+        "state": "VIC",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
       "Banks": {
         "state": "NSW",
         "classification": "Inner Metropolitan",
@@ -29,6 +58,15 @@
           "status": "Marginal"
         }
       },
+      "Barker": {
+        "state": "SA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
       "Barton": {
         "state": "NSW",
         "classification": "Inner Metropolitan",
@@ -36,6 +74,33 @@
         "current": {
           "party": "ALP",
           "status": "Fairly safe"
+        }
+      },
+      "Bass": {
+        "state": "TAS",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Batman": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Bendigo": {
+        "state": "VIC",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
         }
       },
       "Bennelong": {
@@ -56,6 +121,15 @@
           "status": "Safe"
         }
       },
+      "Blair": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
       "Blaxland": {
         "state": "NSW",
         "classification": "Inner Metropolitan",
@@ -63,6 +137,42 @@
         "current": {
           "party": "ALP",
           "status": "Safe"
+        }
+      },
+      "Bonython": {
+        "state": "SA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Boothby": {
+        "state": "SA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Bowman": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Braddon": {
+        "state": "TAS",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
         }
       },
       "Bradfield": {
@@ -74,6 +184,42 @@
           "status": "Safe"
         }
       },
+      "Brand": {
+        "state": "WA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Brisbane": {
+        "state": "QLD",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Bruce": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Burke": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
       "Calare": {
         "state": "NSW",
         "classification": "Rural",
@@ -81,6 +227,51 @@
         "current": {
           "party": "Ind",
           "status": "Safe"
+        }
+      },
+      "Calwell": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Canberra": {
+        "state": "ACT",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Canning": {
+        "state": "WA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Capricornia": {
+        "state": "QLD",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Casey": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
         }
       },
       "Charlton": {
@@ -101,13 +292,49 @@
           "status": "Safe"
         }
       },
+      "Chisholm": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
       "Cook": {
         "state": "NSW",
-        "classification": "Outer Metropolitan",
+        "classification": "Inner Metropolitan",
         "previous": null,
         "current": {
           "party": "LP",
           "status": "Safe"
+        }
+      },
+      "Corangamite": {
+        "state": "VIC",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Corio": {
+        "state": "VIC",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Cowan": {
+        "state": "WA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
         }
       },
       "Cowper": {
@@ -121,11 +348,56 @@
       },
       "Cunningham": {
         "state": "NSW",
-        "classification": "Provincial",
+        "classification": "Outer Metropolitan",
         "previous": null,
         "current": {
           "party": "ALP",
           "status": "Safe"
+        }
+      },
+      "Curtin": {
+        "state": "WA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Dawson": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "NP",
+          "status": "Fairly safe"
+        }
+      },
+      "Deakin": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Denison": {
+        "state": "TAS",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Dickson": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
         }
       },
       "Dobell": {
@@ -137,6 +409,15 @@
           "status": "Marginal"
         }
       },
+      "Dunkley": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
       "Eden-Monaro": {
         "state": "NSW",
         "classification": "Rural",
@@ -144,6 +425,24 @@
         "current": {
           "party": "LP",
           "status": "Marginal"
+        }
+      },
+      "Fadden": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Fairfax": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
         }
       },
       "Farrer": {
@@ -155,9 +454,81 @@
           "status": "Safe"
         }
       },
+      "Fisher": {
+        "state": "QLD",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Flinders": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Forde": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Forrest": {
+        "state": "WA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
       "Fowler": {
         "state": "NSW",
         "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Franklin": {
+        "state": "TAS",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Fraser": {
+        "state": "ACT",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Fremantle": {
+        "state": "WA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Gellibrand": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
         "previous": null,
         "current": {
           "party": "ALP",
@@ -171,6 +542,24 @@
         "current": {
           "party": "LP",
           "status": "Safe"
+        }
+      },
+      "Gippsland": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "NP",
+          "status": "Fairly safe"
+        }
+      },
+      "Goldstein": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
         }
       },
       "Grayndler": {
@@ -191,12 +580,102 @@
           "status": "Marginal"
         }
       },
+      "Grey": {
+        "state": "SA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Griffith": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Groom": {
+        "state": "QLD",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
       "Gwydir": {
         "state": "NSW",
         "classification": "Rural",
         "previous": null,
         "current": {
           "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Hasluck": {
+        "state": "WA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Herbert": {
+        "state": "QLD",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Higgins": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Hindmarsh": {
+        "state": "SA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Hinkler": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "NP",
+          "status": "Marginal"
+        }
+      },
+      "Holt": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Hotham": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
           "status": "Safe"
         }
       },
@@ -227,6 +706,51 @@
           "status": "Safe"
         }
       },
+      "Indi": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Isaacs": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Jagajaga": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Kalgoorlie": {
+        "state": "WA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Kennedy": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "Ind",
+          "status": "Safe"
+        }
+      },
       "Kingsford Smith": {
         "state": "NSW",
         "classification": "Inner Metropolitan",
@@ -236,6 +760,60 @@
           "status": "Fairly safe"
         }
       },
+      "Kingston": {
+        "state": "SA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Kooyong": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "La Trobe": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Lalor": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Leichhardt": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Lilley": {
+        "state": "QLD",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
       "Lindsay": {
         "state": "NSW",
         "classification": "Outer Metropolitan",
@@ -243,6 +821,24 @@
         "current": {
           "party": "LP",
           "status": "Fairly safe"
+        }
+      },
+      "Lingiari": {
+        "state": "NT",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Longman": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
         }
       },
       "Lowe": {
@@ -263,9 +859,18 @@
           "status": "Safe"
         }
       },
+      "Lyons": {
+        "state": "TAS",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
       "Macarthur": {
         "state": "NSW",
-        "classification": "Rural",
+        "classification": "Outer Metropolitan",
         "previous": null,
         "current": {
           "party": "LP",
@@ -290,6 +895,105 @@
           "status": "Fairly safe"
         }
       },
+      "Makin": {
+        "state": "SA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Mallee": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "NP",
+          "status": "Safe"
+        }
+      },
+      "Maranoa": {
+        "state": "QLD",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "NP",
+          "status": "Safe"
+        }
+      },
+      "Maribyrnong": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Mayo": {
+        "state": "SA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "McEwen": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "McMillan": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "McPherson": {
+        "state": "QLD",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Melbourne": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Melbourne Ports": {
+        "state": "VIC",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
+      "Menzies": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
       "Mitchell": {
         "state": "NSW",
         "classification": "Outer Metropolitan",
@@ -299,13 +1003,40 @@
           "status": "Safe"
         }
       },
-      "Newcastle": {
-        "state": "NSW",
+      "Moncrieff": {
+        "state": "QLD",
         "classification": "Provincial",
         "previous": null,
         "current": {
-          "party": "ALP",
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Moore": {
+        "state": "WA",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
           "status": "Fairly safe"
+        }
+      },
+      "Moreton": {
+        "state": "QLD",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Murray": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
         }
       },
       "New England": {
@@ -317,6 +1048,15 @@
           "status": "Fairly safe"
         }
       },
+      "Newcastle": {
+        "state": "NSW",
+        "classification": "Provincial",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
+        }
+      },
       "North Sydney": {
         "state": "NSW",
         "classification": "Inner Metropolitan",
@@ -324,6 +1064,24 @@
         "current": {
           "party": "LP",
           "status": "Safe"
+        }
+      },
+      "O'Connor": {
+        "state": "WA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Oxley": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
         }
       },
       "Page": {
@@ -362,6 +1120,42 @@
           "status": "Marginal"
         }
       },
+      "Pearce": {
+        "state": "WA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Perth": {
+        "state": "WA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
+      "Petrie": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Marginal"
+        }
+      },
+      "Port Adelaide": {
+        "state": "SA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
       "Prospect": {
         "state": "NSW",
         "classification": "Outer Metropolitan",
@@ -369,6 +1163,15 @@
         "current": {
           "party": "ALP",
           "status": "Safe"
+        }
+      },
+      "Rankin": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Fairly safe"
         }
       },
       "Reid": {
@@ -407,6 +1210,24 @@
           "status": "Fairly safe"
         }
       },
+      "Ryan": {
+        "state": "QLD",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Scullin": {
+        "state": "VIC",
+        "classification": "Outer Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Safe"
+        }
+      },
       "Shortland": {
         "state": "NSW",
         "classification": "Provincial",
@@ -414,6 +1235,42 @@
         "current": {
           "party": "ALP",
           "status": "Fairly safe"
+        }
+      },
+      "Solomon": {
+        "state": "NT",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "CLP",
+          "status": "Marginal"
+        }
+      },
+      "Stirling": {
+        "state": "WA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
+        }
+      },
+      "Sturt": {
+        "state": "SA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
+      "Swan": {
+        "state": "WA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "ALP",
+          "status": "Marginal"
         }
       },
       "Sydney": {
@@ -425,13 +1282,40 @@
           "status": "Safe"
         }
       },
+      "Tangney": {
+        "state": "WA",
+        "classification": "Inner Metropolitan",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
+        }
+      },
       "Throsby": {
         "state": "NSW",
-        "classification": "Provincial",
+        "classification": "Inner Metropolitan",
         "previous": null,
         "current": {
           "party": "ALP",
           "status": "Safe"
+        }
+      },
+      "Wakefield": {
+        "state": "SA",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Safe"
+        }
+      },
+      "Wannon": {
+        "state": "VIC",
+        "classification": "Rural",
+        "previous": null,
+        "current": {
+          "party": "LP",
+          "status": "Fairly safe"
         }
       },
       "Warringah": {
@@ -470,573 +1354,6 @@
           "status": "Fairly safe"
         }
       },
-      "Aston": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Ballarat": {
-        "state": "VIC",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Batman": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Bendigo": {
-        "state": "VIC",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Bruce": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Burke": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Calwell": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Casey": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Chisholm": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Corangamite": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Corio": {
-        "state": "VIC",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Deakin": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Dunkley": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Flinders": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Gellibrand": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Gippsland": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "NP",
-          "status": "Fairly safe"
-        }
-      },
-      "Goldstein": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Higgins": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Holt": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Hotham": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Indi": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Isaacs": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Jagajaga": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Kooyong": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Lalor": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "La Trobe": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Mallee": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "NP",
-          "status": "Safe"
-        }
-      },
-      "Maribyrnong": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "McEwen": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "McMillan": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Melbourne": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Melbourne Ports": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Menzies": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Murray": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Scullin": {
-        "state": "VIC",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Wannon": {
-        "state": "VIC",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Wills": {
-        "state": "VIC",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Blair": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Bowman": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Brisbane": {
-        "state": "QLD",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Capricornia": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Dawson": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "NP",
-          "status": "Fairly safe"
-        }
-      },
-      "Dickson": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Fadden": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Fairfax": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Fisher": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Forde": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Griffith": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Groom": {
-        "state": "QLD",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Herbert": {
-        "state": "QLD",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Hinkler": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "NP",
-          "status": "Marginal"
-        }
-      },
-      "Kennedy": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "Ind",
-          "status": "Safe"
-        }
-      },
-      "Leichhardt": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Lilley": {
-        "state": "QLD",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Longman": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Maranoa": {
-        "state": "QLD",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "NP",
-          "status": "Safe"
-        }
-      },
-      "McPherson": {
-        "state": "QLD",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Moncrieff": {
-        "state": "QLD",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Moreton": {
-        "state": "QLD",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Oxley": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Petrie": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Rankin": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Ryan": {
-        "state": "QLD",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
       "Wide Bay": {
         "state": "QLD",
         "classification": "Rural",
@@ -1046,323 +1363,8 @@
           "status": "Safe"
         }
       },
-      "Adelaide": {
-        "state": "SA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Barker": {
-        "state": "SA",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Bonython": {
-        "state": "SA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Boothby": {
-        "state": "SA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Grey": {
-        "state": "SA",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Hindmarsh": {
-        "state": "SA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Kingston": {
-        "state": "SA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Makin": {
-        "state": "SA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Mayo": {
-        "state": "SA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Port Adelaide": {
-        "state": "SA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Sturt": {
-        "state": "SA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Wakefield": {
-        "state": "SA",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Brand": {
-        "state": "WA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Canning": {
-        "state": "WA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Cowan": {
-        "state": "WA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Curtin": {
-        "state": "WA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Forrest": {
-        "state": "WA",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Fremantle": {
-        "state": "WA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Hasluck": {
-        "state": "WA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Kalgoorlie": {
-        "state": "WA",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Marginal"
-        }
-      },
-      "Moore": {
-        "state": "WA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "O'Connor": {
-        "state": "WA",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Safe"
-        }
-      },
-      "Pearce": {
-        "state": "WA",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Perth": {
-        "state": "WA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Stirling": {
-        "state": "WA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Swan": {
-        "state": "WA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Tangney": {
-        "state": "WA",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "LP",
-          "status": "Fairly safe"
-        }
-      },
-      "Bass": {
-        "state": "TAS",
-        "classification": "Provincial",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Marginal"
-        }
-      },
-      "Braddon": {
-        "state": "TAS",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Denison": {
-        "state": "TAS",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Safe"
-        }
-      },
-      "Franklin": {
-        "state": "TAS",
-        "classification": "Outer Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Lyons": {
-        "state": "TAS",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Lingiari": {
-        "state": "NT",
-        "classification": "Rural",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Solomon": {
-        "state": "NT",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "CLP",
-          "status": "Marginal"
-        }
-      },
-      "Canberra": {
-        "state": "ACT",
-        "classification": "Inner Metropolitan",
-        "previous": null,
-        "current": {
-          "party": "ALP",
-          "status": "Fairly safe"
-        }
-      },
-      "Fraser": {
-        "state": "ACT",
+      "Wills": {
+        "state": "VIC",
         "classification": "Inner Metropolitan",
         "previous": null,
         "current": {
@@ -14008,6 +14010,113 @@
           "status": "Safe"
         }
       }
+    }
+  },
+  "deltas": {
+    "2001": {
+      "_about": "v2 on-page rating token vs RR5 attachment-3's proposed (never-adopted) re-rating, rows where they disagree; all adjacent-class calls, two being the era tokens Outer Urban / Outer Metropolitan/Provincial that normalise to Outer Metropolitan.",
+      "v2vsRR5att3": [
+        {
+          "division": "Burke",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Canning",
+          "pageRating": "Outer Metropolitan/Provincial",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Capricornia",
+          "pageRating": "Provincial",
+          "rr5att3Proposed": "Rural"
+        },
+        {
+          "division": "Cook",
+          "pageRating": "Inner Metropolitan",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Corangamite",
+          "pageRating": "Provincial",
+          "rr5att3Proposed": "Rural"
+        },
+        {
+          "division": "Cowper",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Provincial"
+        },
+        {
+          "division": "Cunningham",
+          "pageRating": "Outer Metropolitan",
+          "rr5att3Proposed": "Provincial"
+        },
+        {
+          "division": "Dobell",
+          "pageRating": "Provincial",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Fairfax",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Provincial"
+        },
+        {
+          "division": "Flinders",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Forde",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Griffith",
+          "pageRating": "Outer Metropolitan",
+          "rr5att3Proposed": "Inner Metropolitan"
+        },
+        {
+          "division": "Longman",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Lyne",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Provincial"
+        },
+        {
+          "division": "Macarthur",
+          "pageRating": "Outer Urban",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Mayo",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "McMillan",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Provincial"
+        },
+        {
+          "division": "Paterson",
+          "pageRating": "Rural",
+          "rr5att3Proposed": "Provincial"
+        },
+        {
+          "division": "Robertson",
+          "pageRating": "Provincial",
+          "rr5att3Proposed": "Outer Metropolitan"
+        },
+        {
+          "division": "Throsby",
+          "pageRating": "Inner Metropolitan",
+          "rr5att3Proposed": "Provincial"
+        }
+      ]
     }
   }
 }
