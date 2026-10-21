@@ -1124,6 +1124,7 @@ const houseLean = Object.fromEntries([
    Keys are absent (not null) wherever the poll has no row in that series. An
    empty 21-day window for the classic/implied nowcast emits nothing rather
    than mixing bases against the monthly-fallback the headline would show. */
+const FOOTPRINT_THIN = 3, footprintThin = new Set(); // see the footprint guard below
 const effByKey = (() => {
   /* /vic/: every poll sits in the trend (w is always 1), so its footprint
      is today's trend without it, rerun through the filter */
@@ -1150,6 +1151,11 @@ const effByKey = (() => {
   const synthOnKeys = new Set(tppRowsSynthOn.map((r) => r.key));
   const inWin = (rows, key) => rows.some((r) => r.key === key
     && ddays(ref, r.mid) >= 0 && ddays(ref, r.mid) <= HL_WINDOW);
+  /* how many OTHER waves the window holds beside `key`: with fewer than
+     FOOTPRINT_THIN, one wave can honestly move a sparse series (the ALP-v-ON
+     head-to-head) by more than the guard below allows */
+  const others = (rows, key) => rows.filter((r) => r.key !== key
+    && ddays(ref, r.mid) >= 0 && ddays(ref, r.mid) <= HL_WINDOW).length;
   const loo = (rows, he, key) => { const r = nowcastAdj(rows.filter((q) => q.key !== key), he, ref); return r ? r.v : null; };
   /* The same pair read at the poll's OWN day. nowcastAdj already drops rows
      with ddays < 0, so passing that day restricts the window to the polls
@@ -1212,6 +1218,11 @@ const effByKey = (() => {
         if (lo != null) eff.onp = { lo: r1(lo), hi: r1(onpMonth.a), w: inWin(altAON.rows, key) ? 1 : 0, m: 1 };
       }
     }
+    const basisRows = { lnp: tppRows, imp: tppRowsSynth, onimp: tppRowsSynthOn, onp: altAON.rows };
+    for (const b of Object.keys(eff)) {
+      const n = eff[b].m ? altAON.rows.filter((q) => q.key !== key && q.ym === onpMonth.ym).length : others(basisRows[b], key);
+      if (n < FOOTPRINT_THIN) footprintThin.add(key + "|" + b);
+    }
     if (Object.keys(eff).length) out.set(key, eff);
   }
   return out;
@@ -1220,9 +1231,14 @@ const effByKey = (() => {
    aggregate a point or so (the window carries ~ten), anything past that is a
    bug in this file, not data – measured moves run ±0.1–1pp */
 for (const [k, eff] of effByKey) {
-  for (const e of Object.values(eff)) {
-    if (!Number.isFinite(e.lo) || !Number.isFinite(e.hi) || Math.abs(e.hi - e.lo) > 4)
-      throw new Error(`poll footprint out of range (${k}): ${JSON.stringify(e)}`);
+  for (const [b, e] of Object.entries(eff)) {
+    if (!Number.isFinite(e.lo) || !Number.isFinite(e.hi))
+      throw new Error(`poll footprint not finite (${k} ${b}): ${JSON.stringify(e)}`);
+    // a thin window's big move is data, not arithmetic (2026-10-21: YouGov's
+    // 20 Oct 50-50 ALP-v-ON against 53-55 readings moved the head-to-head
+    // 4.8pp once the window held little else, and the build threw)
+    if (Math.abs(e.hi - e.lo) > 4 && !footprintThin.has(k + "|" + b))
+      throw new Error(`poll footprint out of range (${k} ${b}): ${JSON.stringify(e)}`);
   }
 }
 
