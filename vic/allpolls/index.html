@@ -5271,7 +5271,8 @@ body.rd .conf-band.lo.thin { opacity: 0.045; }
 body.rd .conf-band.hi.thin { opacity: 0.075; }
 body.rd.dark .conf-band.lo { fill: var(--ink-2); opacity: 0.1; }
 body.rd.dark .conf-band.hi { fill: var(--ink-2); opacity: 0.18; }
-body.rd .rd-acc-card { margin-top: 32px; }
+body.rd .rd-acc-basis { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+body.rd .rd-acc-card { margin-top: 18px; }
 body.rd .rd-acc-card .rd-chead { gap: 12px; }
 body.rd .rd-acc-head, body.rd .rd-acc-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px 170px; column-gap: 16px; align-items: center; }
 body.rd .rd-acc-head { min-height: 56px; align-items: end; padding-bottom: 6px; border-bottom: 1.5px solid var(--ink-2); font-size: 12px; font-weight: 600; color: var(--ink-3); }
@@ -34741,6 +34742,7 @@ function AccuracyPanel() {
   const A = D.accuracy;
   const [hov, setHov] = useState(null);
   const [spread, setSpread] = useState(false);
+  const [basis, setBasis] = useState("pub");
   const rowsRef = useRef(null);
   const [trackW, setTrackW] = useState(0);
   React.useEffect(() => {
@@ -34758,7 +34760,7 @@ function AccuracyPanel() {
   const LANE_SEP = 20;
   const LANE_H = 20;
   const laneOffset = i => i === 0 ? 0 : (i % 2 ? 1 : -1) * Math.ceil(i / 2) * LANE_H;
-  const lanesFor = houses => {
+  const lanesFor = (houses, errF = h => h.err) => {
     const lane = {};
     if (!trackW) {
       houses.forEach(h => {
@@ -34771,7 +34773,7 @@ function AccuracyPanel() {
     }
     const pts = houses.map(h => ({
       firm: h.firm,
-      x: pct(h.err) / 100 * trackW
+      x: pct(errF(h)) / 100 * trackW
     })).sort((a, b) => a.x - b.x);
     const last = [];
     for (const p of pts) {
@@ -34821,34 +34823,70 @@ function AccuracyPanel() {
   const earlier = byRecency.slice(5);
   if (window.AP.rd) {
     const nw = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"][n] ?? String(n);
+    const imp = basis === "imp";
+    const alpOf = h => imp ? h.alp2ppImp ?? h.alp2pp : h.alp2pp;
+    const errOf = h => imp ? h.errImp ?? h.err : h.err;
+    const hh = c => imp ? c.houses.filter(h => h.errImp != null) : c.houses;
+    const cMean = c => imp ? c.meanImp ?? c.mean : c.mean;
+    const cErr = c => imp ? c.errImp ?? c.err : c.err;
+    const cSide = c => imp ? c.sameSideImp : c.sameSide;
+    const firmsSrc = imp ? A.firmsImp || A.firms : A.firms;
+    const meanAbsX = imp && A.meanAbsImp != null ? A.meanAbsImp : A.meanAbs;
+    const stackedX = A.cycles.reduce((n, c) => {
+      const seen = {};
+      return n + hh(c).filter(h => {
+        const k = errOf(h).toFixed(2);
+        const had = seen[k];
+        seen[k] = 1;
+        return had;
+      }).length;
+    }, 0);
+    const oneSidedX = [...A.cycles].filter(c => cSide(c)).sort((a, b) => a.year - b.year);
+    const bothWaysX = oneSidedX.length > 1 && oneSidedX.some(c => cErr(c) > 0) && oneSidedX.some(c => cErr(c) < 0);
     const last = byRecency[0];
-    const opp = last && last.sameSide ? byRecency.slice(1).find(c => c.sameSide && Math.sign(c.err) !== Math.sign(last.err)) : null;
-    const head = "The final polls have missed the result by " + A.meanAbs.toFixed(1) + " points on average" + (bothWays ? ", and not always the same way" : "");
+    const opp = last && cSide(last) ? byRecency.slice(1).find(c => cSide(c) && Math.sign(cErr(c)) !== Math.sign(cErr(last))) : null;
+    const head = "The final polls have missed the result by " + meanAbsX.toFixed(1) + " points on average" + (imp ? " on the flows of the last election" : "") + (bothWaysX ? ", and not always the same way" : "");
     let dek = "";
-    if (last && last.sameSide) dek += "In " + last.year + " all " + nw(last.n) + " pollsters " + (last.err < 0 ? "understated" : "overstated") + " Labor, by " + Math.abs(last.err).toFixed(1) + " points on average";
-    if (opp) dek += "; in " + opp.year + " all " + nw(opp.n) + " " + (opp.err < 0 ? "understated" : "overstated") + " it";
+    if (last && cSide(last)) dek += "In " + last.year + " all " + nw(hh(last).length) + " pollsters " + (cErr(last) < 0 ? "understated" : "overstated") + " Labor, by " + Math.abs(cErr(last)).toFixed(1) + " points on average";
+    if (opp) dek += "; in " + opp.year + " all " + nw(hh(opp).length) + " " + (cErr(opp) < 0 ? "understated" : "overstated") + " it";
     if (dek) dek += ".";
-    if (bothWays) dek += (dek ? " " : "") + "Because misses run both ways, what carries over to today’s figures is their size, not their direction.";
-    const firms = A.firms.filter(f => f.n > 1).slice().sort((a, b) => a.meanAbs - b.meanAbs);
-    const longest = A.firms.slice().sort((a, b) => b.n - a.n);
+    if (bothWaysX) dek += (dek ? " " : "") + "Because misses run both ways, what carries over to today’s figures is their size, not their direction.";
+    const firms = firmsSrc.filter(f => f.n > 1).slice().sort((a, b) => a.meanAbs - b.meanAbs);
+    const longest = firmsSrc.slice().sort((a, b) => b.n - a.n);
     const fHead = firms.length >= 3 ? firms[0].firm + " and " + firms[1].firm + " have come closest; " + firms[firms.length - 1].firm + " has missed by most" : "How each pollster has done";
-    const fDek = "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on. A pollster only counts against the elections it published a final poll for" + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
+    const fDek = (imp ? "Average miss ignoring direction, closest first – with every final poll re-scored on its primaries through the previous election’s preference flows, not the two-party figure it printed – for pollsters with more than one election to judge on." : "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on.") + " A pollster only counts against the elections it published a final poll for" + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
     const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
     return React.createElement(RdSec, {
       id: "final-polls",
       cls: "rd-acc",
       title: "How the final polls have done",
-      meta: "Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"
+      meta: imp ? "Each final poll’s primaries put through the previous election’s preference flows, against the result" : "Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"
     }, React.createElement(RdHed, {
       head: head,
       dek: dek
     }), React.createElement("div", {
+      className: "rd-acc-basis",
+      role: "group",
+      "aria-label": "How the final polls are scored"
+    }, React.createElement("button", {
+      type: "button",
+      className: "rd-chip",
+      "aria-pressed": !imp,
+      onClick: () => setBasis("pub"),
+      title: "The two-party figure each pollster actually printed \u2013 houses that used respondent flows kept them"
+    }, "Published two-party"), React.createElement("button", {
+      type: "button",
+      className: "rd-chip",
+      "aria-pressed": imp,
+      onClick: () => setBasis("imp"),
+      title: "Every final poll\u2019s primaries put through the one preference-flow table \u2013 the flows counted at the previous election"
+    }, "Primaries on last-election flows")), React.createElement("div", {
       className: "card rd-card rd-acc-card"
     }, React.createElement("div", {
       className: "rd-chead"
     }, React.createElement("span", {
       className: "rd-chead-t"
-    }, "Labor\u2019s final two-party figure in the polls, minus the result, points"), stacked > 0 && React.createElement("button", {
+    }, "Labor\u2019s final ", imp && "implied ", "two-party figure in the polls, minus the result, points"), stackedX > 0 && React.createElement("button", {
       type: "button",
       className: "rd-chip",
       "aria-pressed": spread,
@@ -34886,19 +34924,20 @@ function AccuracyPanel() {
       className: "rd-acc-group"
     }, label), list.map((c, rj) => {
       const ri = (gi ? recent.length : 0) + rj;
+      const cc = hh(c);
       const {
         lane,
         n: nLanes
-      } = lanesFor(c.houses);
+      } = lanesFor(cc, errOf);
       const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
-      const solo = c.n === 1 ? c.houses[0] : null;
-      const accErr = solo ? solo.err : c.err;
+      const solo = cc.length === 1 ? cc[0] : null;
+      const accErr = solo ? errOf(solo) : cErr(c);
       return React.createElement("div", {
         className: "rd-acc-row",
         key: c.year
       }, React.createElement("span", {
         className: "rd-acc-lab"
-      }, React.createElement("b", null, c.year), React.createElement("span", null, c.mean.toFixed(1), " v ", c.result.toFixed(1))), React.createElement("div", {
+      }, React.createElement("b", null, c.year), React.createElement("span", null, cMean(c).toFixed(1), " v ", c.result.toFixed(1))), React.createElement("div", {
         className: "acc-track rd-acc-track",
         style: spread && maxOff ? {
           height: 26 + maxOff * 2 + "px"
@@ -34911,37 +34950,37 @@ function AccuracyPanel() {
         style: {
           left: pct(v) + "%"
         }
-      })), !solo && c.houses.map(h => {
+      })), !solo && cc.map(h => {
         const off = spread ? laneOffset(lane[h.firm] || 0) : 0;
         return React.createElement("span", {
           key: h.firm,
           className: "acc-dot",
           role: "img",
           style: {
-            left: pct(h.err) + "%",
-            background: col(h.err),
+            left: pct(errOf(h)) + "%",
+            background: col(errOf(h)),
             top: off ? `calc(50% + ${off}px)` : null
           },
-          "aria-label": `${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`,
-          onMouseEnter: e => open(e, pct(h.err), {
+          "aria-label": `${h.firm}, ${fmtDay(h.date)}: Labor ${alpOf(h).toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(errOf(h))}`,
+          onMouseEnter: e => open(e, pct(errOf(h)), {
             year: c.year,
             flip: ri === 0,
             off,
             title: h.firm,
             date: fmtDay(h.date),
             rows: [{
-              label: "Poll",
-              value: h.alp2pp.toFixed(1),
-              color: col(h.err)
+              label: imp ? "Implied" : "Poll",
+              value: alpOf(h).toFixed(1),
+              color: col(errOf(h))
             }, {
               label: "Result",
               value: c.result.toFixed(1)
             }, {
               label: "Miss",
-              value: sgn(h.err),
-              strong: col(h.err)
+              value: sgn(errOf(h)),
+              strong: col(errOf(h))
             }],
-            sub: lean(h.err)
+            sub: lean(errOf(h))
           }),
           onMouseLeave: close
         });
@@ -34952,15 +34991,15 @@ function AccuracyPanel() {
           left: pct(accErr) + "%",
           background: col(accErr)
         },
-        "aria-label": solo ? `${solo.firm}: a miss of ${sgn(solo.err)}` : `Average of the ${c.n} final polls of ${c.year}: a miss of ${sgn(c.err)}`,
+        "aria-label": solo ? `${solo.firm}: a miss of ${sgn(errOf(solo))}` : `Average of the ${cc.length} final polls of ${c.year}: a miss of ${sgn(cErr(c))}`,
         onMouseEnter: e => open(e, pct(accErr), {
           year: c.year,
           flip: ri === 0,
-          title: solo ? solo.firm : `Average of ${c.n} final polls`,
+          title: solo ? solo.firm : `Average of ${cc.length} final polls`,
           date: solo ? fmtDay(solo.date) : fmtDay(c.eDate),
           rows: [{
-            label: solo ? "Poll" : "Poll average",
-            value: (solo ? solo.alp2pp : c.mean).toFixed(1),
+            label: solo ? imp ? "Implied" : "Poll" : imp ? "Implied average" : "Poll average",
+            value: (solo ? alpOf(solo) : cMean(c)).toFixed(1),
             color: col(accErr)
           }, {
             label: "Result",
@@ -35003,11 +35042,11 @@ function AccuracyPanel() {
       }, hov.sub))), React.createElement("span", {
         className: "rd-acc-err",
         style: {
-          color: inkOf(col(c.err))
+          color: inkOf(col(cErr(c)))
         }
-      }, c.err > 0 ? "+" : c.err < 0 ? "−" : "", Math.abs(c.err).toFixed(1)), React.createElement("span", {
+      }, cErr(c) > 0 ? "+" : cErr(c) < 0 ? "−" : "", Math.abs(cErr(c)).toFixed(1)), React.createElement("span", {
         className: "rd-acc-n"
-      }, c.n, " pollster", c.n === 1 ? "" : "s", c.sameSide && c.n > 1 && React.createElement("b", {
+      }, cc.length, " pollster", cc.length === 1 ? "" : "s", cSide(c) && cc.length > 1 && React.createElement("b", {
         className: "rd-acc-flag"
       }, "All one way")));
     })))), React.createElement("div", {
@@ -35051,7 +35090,7 @@ function AccuracyPanel() {
         term: "how-wrong-are-the-polls",
         from: "How the final polls have done"
       }
-    }, "Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election\u2019s flows, so the miss folds in drift in the flows too."));
+    }, "Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election\u2019s flows, so the miss folds in drift in the flows too. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll\u2019s primaries and the preference flows of the previous election instead."));
   }
   return React.createElement("section", {
     className: "card acc-card",

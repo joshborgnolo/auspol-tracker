@@ -2934,6 +2934,13 @@ function AccuracyPanel() {
      colliding dot into a lane of its own and leaves its place on the scale
      exactly where it was - the shared scale is the point of the panel. */
   const [spread, setSpread] = useState(false);
+  /* The scoring basis: the two-party figure each house printed (what the
+     pollsters said), or their primaries re-read through the previous
+     election's flows (what their votes implied – every final poll on the one
+     table, so a respondent-flows house and a last-election-flows house can be
+     compared like for like). A local toggle of the redesign panel; the classic
+     branch never renders the control, so "pub" is all it ever shows. */
+  const [basis, setBasis] = useState("pub");
   /* Whether two dots collide is a question in PIXELS, not in points: the same
      0.1 gap is 8px of track on a desktop and under 2px on a phone. So the
      track is measured rather than assumed, and the lanes re-pack when it
@@ -2962,10 +2969,10 @@ function AccuracyPanel() {
      Lanes alternate above and below the centre line, which keeps the row
      balanced around the average dot rather than drifting downwards. */
   const laneOffset = (i) => (i === 0 ? 0 : (i % 2 ? 1 : -1) * Math.ceil(i / 2) * LANE_H);
-  const lanesFor = (houses) => {
+  const lanesFor = (houses, errF = (h) => h.err) => {
     const lane = {};
     if (!trackW) { houses.forEach((h) => { lane[h.firm] = 0; }); return { lane, n: 1 }; }
-    const pts = houses.map((h) => ({ firm: h.firm, x: (pct(h.err) / 100) * trackW }))
+    const pts = houses.map((h) => ({ firm: h.firm, x: (pct(errF(h)) / 100) * trackW }))
                       .sort((a, b) => a.x - b.x);
     const last = [];
     for (const p of pts) {
@@ -3020,27 +3027,57 @@ function AccuracyPanel() {
        written out and the pollsters ranked closest first */
     const nw = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
                        "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"][n] ?? String(n);
+    /* Every pick below runs through these, so the basis toggle never forks
+       the render – era rows carry identical bases, so the ?? fallbacks only
+       guard the (today impossible) null imp cell. */
+    const imp = basis === "imp";
+    const alpOf = (h) => imp ? (h.alp2ppImp ?? h.alp2pp) : h.alp2pp;
+    const errOf = (h) => imp ? (h.errImp ?? h.err) : h.err;
+    const hh = (c) => imp ? c.houses.filter((h) => h.errImp != null) : c.houses;
+    const cMean = (c) => imp ? (c.meanImp ?? c.mean) : c.mean;
+    const cErr = (c) => imp ? (c.errImp ?? c.err) : c.err;
+    const cSide = (c) => imp ? c.sameSideImp : c.sameSide;
+    const firmsSrc = imp ? (A.firmsImp || A.firms) : A.firms;
+    const meanAbsX = imp && A.meanAbsImp != null ? A.meanAbsImp : A.meanAbs;
+    const stackedX = A.cycles.reduce((n, c) => {
+      const seen = {};
+      return n + hh(c).filter((h) => { const k = errOf(h).toFixed(2); const had = seen[k]; seen[k] = 1; return had; }).length;
+    }, 0);
+    const oneSidedX = [...A.cycles].filter((c) => cSide(c)).sort((a, b) => a.year - b.year);
+    const bothWaysX = oneSidedX.length > 1
+      && oneSidedX.some((c) => cErr(c) > 0) && oneSidedX.some((c) => cErr(c) < 0);
     const last = byRecency[0];
-    const opp = last && last.sameSide ? byRecency.slice(1).find((c) => c.sameSide && Math.sign(c.err) !== Math.sign(last.err)) : null;
-    const head = "The final polls have missed the result by " + A.meanAbs.toFixed(1) + " points on average" + (bothWays ? ", and not always the same way" : "");
+    const opp = last && cSide(last) ? byRecency.slice(1).find((c) => cSide(c) && Math.sign(cErr(c)) !== Math.sign(cErr(last))) : null;
+    const head = "The final polls have missed the result by " + meanAbsX.toFixed(1) + " points on average" + (imp ? " on the flows of the last election" : "") + (bothWaysX ? ", and not always the same way" : "");
     let dek = "";
-    if (last && last.sameSide) dek += "In " + last.year + " all " + nw(last.n) + " pollsters " + (last.err < 0 ? "understated" : "overstated") + " Labor, by " + Math.abs(last.err).toFixed(1) + " points on average";
-    if (opp) dek += "; in " + opp.year + " all " + nw(opp.n) + " " + (opp.err < 0 ? "understated" : "overstated") + " it";
+    if (last && cSide(last)) dek += "In " + last.year + " all " + nw(hh(last).length) + " pollsters " + (cErr(last) < 0 ? "understated" : "overstated") + " Labor, by " + Math.abs(cErr(last)).toFixed(1) + " points on average";
+    if (opp) dek += "; in " + opp.year + " all " + nw(hh(opp).length) + " " + (cErr(opp) < 0 ? "understated" : "overstated") + " it";
     if (dek) dek += ".";
-    if (bothWays) dek += (dek ? " " : "") + "Because misses run both ways, what carries over to today’s figures is their size, not their direction.";
-    const firms = A.firms.filter((f) => f.n > 1).slice().sort((a, b) => a.meanAbs - b.meanAbs);
-    const longest = A.firms.slice().sort((a, b) => b.n - a.n);
+    if (bothWaysX) dek += (dek ? " " : "") + "Because misses run both ways, what carries over to today’s figures is their size, not their direction.";
+    const firms = firmsSrc.filter((f) => f.n > 1).slice().sort((a, b) => a.meanAbs - b.meanAbs);
+    const longest = firmsSrc.slice().sort((a, b) => b.n - a.n);
     const fHead = firms.length >= 3 ? firms[0].firm + " and " + firms[1].firm + " have come closest; " + firms[firms.length - 1].firm + " has missed by most" : "How each pollster has done";
-    const fDek = "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on. A pollster only counts against the elections it published a final poll for"
+    const fDek = (imp
+      ? "Average miss ignoring direction, closest first – with every final poll re-scored on its primaries through the previous election’s preference flows, not the two-party figure it printed – for pollsters with more than one election to judge on."
+      : "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on.")
+      + " A pollster only counts against the elections it published a final poll for"
       + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
     const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
     return (
       <RdSec id="final-polls" cls="rd-acc" title="How the final polls have done"
-             meta={"Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"}>
+             meta={imp
+               ? "Each final poll’s primaries put through the previous election’s preference flows, against the result"
+               : "Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"}>
         <RdHed head={head} dek={dek} />
+        <div className="rd-acc-basis" role="group" aria-label="How the final polls are scored">
+          <button type="button" className="rd-chip" aria-pressed={!imp} onClick={() => setBasis("pub")}
+            title="The two-party figure each pollster actually printed – houses that used respondent flows kept them">Published two-party</button>
+          <button type="button" className="rd-chip" aria-pressed={imp} onClick={() => setBasis("imp")}
+            title="Every final poll’s primaries put through the one preference-flow table – the flows counted at the previous election">Primaries on last-election flows</button>
+        </div>
         <div className="card rd-card rd-acc-card">
-          <div className="rd-chead"><span className="rd-chead-t">Labor’s final two-party figure in the polls, minus the result, points</span>
-            {stacked > 0 && <button type="button" className="rd-chip" aria-pressed={spread} onClick={() => setSpread(!spread)}
+          <div className="rd-chead"><span className="rd-chead-t">Labor’s final {imp && "implied "}two-party figure in the polls, minus the result, points</span>
+            {stackedX > 0 && <button type="button" className="rd-chip" aria-pressed={spread} onClick={() => setSpread(!spread)}
               title="Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale."><window.RdTabW t="Separate overlapping dots" /></button>}
           </div>
           <div className="rd-acc-head" aria-hidden="true">
@@ -3057,32 +3094,33 @@ function AccuracyPanel() {
                 <div className="rd-acc-group">{label}</div>
                 {list.map((c, rj) => {
                   const ri = (gi ? recent.length : 0) + rj;
-                  const { lane, n: nLanes } = lanesFor(c.houses);
+                  const cc = hh(c);
+                  const { lane, n: nLanes } = lanesFor(cc, errOf);
                   const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
-                  const solo = c.n === 1 ? c.houses[0] : null;
-                  const accErr = solo ? solo.err : c.err;
+                  const solo = cc.length === 1 ? cc[0] : null;
+                  const accErr = solo ? errOf(solo) : cErr(c);
                   return (
                     <div className="rd-acc-row" key={c.year}>
-                      <span className="rd-acc-lab"><b>{c.year}</b><span>{c.mean.toFixed(1)} v {c.result.toFixed(1)}</span></span>
+                      <span className="rd-acc-lab"><b>{c.year}</b><span>{cMean(c).toFixed(1)} v {c.result.toFixed(1)}</span></span>
                       <div className="acc-track rd-acc-track" style={spread && maxOff ? { height: (26 + maxOff * 2) + "px" } : null}>
                         <span className="acc-zero"></span>
                         {[-SPAN / 2, SPAN / 2].map((v) => <span key={v} className="acc-tick" style={{ left: pct(v) + "%" }}></span>)}
-                        {!solo && c.houses.map((h) => {
+                        {!solo && cc.map((h) => {
                           const off = spread ? laneOffset(lane[h.firm] || 0) : 0;
                           return (
-                            <span key={h.firm} className="acc-dot" role="img" style={{ left: pct(h.err) + "%", background: col(h.err), top: off ? `calc(50% + ${off}px)` : null }}
-                                  aria-label={`${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`}
-                                  onMouseEnter={(e) => open(e, pct(h.err), { year: c.year, flip: ri === 0, off, title: h.firm, date: fmtDay(h.date),
-                                    rows: [{ label: "Poll", value: h.alp2pp.toFixed(1), color: col(h.err) }, { label: "Result", value: c.result.toFixed(1) }, { label: "Miss", value: sgn(h.err), strong: col(h.err) }],
-                                    sub: lean(h.err) })}
+                            <span key={h.firm} className="acc-dot" role="img" style={{ left: pct(errOf(h)) + "%", background: col(errOf(h)), top: off ? `calc(50% + ${off}px)` : null }}
+                                  aria-label={`${h.firm}, ${fmtDay(h.date)}: Labor ${alpOf(h).toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(errOf(h))}`}
+                                  onMouseEnter={(e) => open(e, pct(errOf(h)), { year: c.year, flip: ri === 0, off, title: h.firm, date: fmtDay(h.date),
+                                    rows: [{ label: imp ? "Implied" : "Poll", value: alpOf(h).toFixed(1), color: col(errOf(h)) }, { label: "Result", value: c.result.toFixed(1) }, { label: "Miss", value: sgn(errOf(h)), strong: col(errOf(h)) }],
+                                    sub: lean(errOf(h)) })}
                                   onMouseLeave={close}></span>
                           );
                         })}
                         <span className="acc-mean" role="img" style={{ left: pct(accErr) + "%", background: col(accErr) }}
-                              aria-label={solo ? `${solo.firm}: a miss of ${sgn(solo.err)}` : `Average of the ${c.n} final polls of ${c.year}: a miss of ${sgn(c.err)}`}
-                              onMouseEnter={(e) => open(e, pct(accErr), { year: c.year, flip: ri === 0, title: solo ? solo.firm : `Average of ${c.n} final polls`,
+                              aria-label={solo ? `${solo.firm}: a miss of ${sgn(errOf(solo))}` : `Average of the ${cc.length} final polls of ${c.year}: a miss of ${sgn(cErr(c))}`}
+                              onMouseEnter={(e) => open(e, pct(accErr), { year: c.year, flip: ri === 0, title: solo ? solo.firm : `Average of ${cc.length} final polls`,
                                 date: solo ? fmtDay(solo.date) : fmtDay(c.eDate),
-                                rows: [{ label: solo ? "Poll" : "Poll average", value: (solo ? solo.alp2pp : c.mean).toFixed(1), color: col(accErr) }, { label: "Result", value: c.result.toFixed(1) }, { label: "Miss", value: sgn(accErr), strong: col(accErr) }],
+                                rows: [{ label: solo ? (imp ? "Implied" : "Poll") : (imp ? "Implied average" : "Poll average"), value: (solo ? alpOf(solo) : cMean(c)).toFixed(1), color: col(accErr) }, { label: "Result", value: c.result.toFixed(1) }, { label: "Miss", value: sgn(accErr), strong: col(accErr) }],
                                 sub: lean(accErr) })}
                               onMouseLeave={close}></span>
                         {hov && hov.year === c.year && (
@@ -3097,8 +3135,8 @@ function AccuracyPanel() {
                           </div>
                         )}
                       </div>
-                      <span className="rd-acc-err" style={{ color: inkOf(col(c.err)) }}>{c.err > 0 ? "+" : c.err < 0 ? "−" : ""}{Math.abs(c.err).toFixed(1)}</span>
-                      <span className="rd-acc-n">{c.n} pollster{c.n === 1 ? "" : "s"}{c.sameSide && c.n > 1 && <b className="rd-acc-flag">All one way</b>}</span>
+                      <span className="rd-acc-err" style={{ color: inkOf(col(cErr(c))) }}>{cErr(c) > 0 ? "+" : cErr(c) < 0 ? "−" : ""}{Math.abs(cErr(c)).toFixed(1)}</span>
+                      <span className="rd-acc-n">{cc.length} pollster{cc.length === 1 ? "" : "s"}{cSide(c) && cc.length > 1 && <b className="rd-acc-flag">All one way</b>}</span>
                     </div>
                   );
                 })}
@@ -3120,7 +3158,7 @@ function AccuracyPanel() {
           ))}
         </div>
         <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls have done" }}>
-          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too.
+          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
         </RdFoot>
       </RdSec>
     );

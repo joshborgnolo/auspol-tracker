@@ -2488,7 +2488,8 @@ body.rd .conf-band.hi.thin { opacity: 0.075; }
 body.rd.dark .conf-band.lo { fill: var(--ink-2); opacity: 0.1; }
 body.rd.dark .conf-band.hi { fill: var(--ink-2); opacity: 0.18; }
 /* how the final polls have done */
-body.rd .rd-acc-card { margin-top: 32px; }
+body.rd .rd-acc-basis { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+body.rd .rd-acc-card { margin-top: 18px; }
 body.rd .rd-acc-card .rd-chead { gap: 12px; }
 body.rd .rd-acc-head, body.rd .rd-acc-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px 170px; column-gap: 16px; align-items: center; }
 body.rd .rd-acc-head { min-height: 56px; align-items: end; padding-bottom: 6px; border-bottom: 1.5px solid var(--ink-2); font-size: 12px; font-weight: 600; color: var(--ink-3); }

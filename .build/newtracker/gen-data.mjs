@@ -6360,17 +6360,30 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
   /* Raw error kept beside the display pair: the sign test below must read
      the unrounded figure – a +0.04 miss displays as 0.0 but is still a miss
      on the Coalition's side, and rounding it before the sign test would
-     silently flip one-sidedness on a dead-heat display. */
+     silently flip one-sidedness on a dead-heat display. The imp side re-reads
+     the same poll through the implied basis: its primaries put through ONE
+     flow table, the one counted at the election that opened the term
+     (FLOW_LEF) – the eve-of-poll-fair normaliser, which takes each house's
+     own allocation method out of its score. Era rows already score implied
+     figures (tppEra, FLOW_ERAS), so for them both bases are the one number. */
   const raw = [...byHouse.entries()].map(([firm, p]) => {
     const alp = share2pp(p);
-    return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp };
+    const imp = p.tppEra != null ? alp : impliedLefAlp2pp(FLOW_LEF[c.year], p);
+    return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp, imp };
   });
   if (!raw.length) return null;
   const houses = raw.map((h) => ({
     firm: h.firm, date: h.date, alp2pp: r1(h.alp), err: r1(h.errRaw),
+    alp2ppImp: h.imp == null ? null : r1(h.imp),
+    errImp: h.imp == null ? null : r1(h.imp - e.tpp_alp),
   })).sort((a, b) => Math.abs(a.err) - Math.abs(b.err));
   const meanPoll = houses.reduce((t, h) => t + h.alp2pp, 0) / houses.length;
   const err = meanPoll - e.tpp_alp;
+  const impHouses = houses.filter((h) => h.errImp != null);
+  const impRaw = raw.filter((h) => h.imp != null).map((h) => h.imp - e.tpp_alp);
+  const impMean = impHouses.length
+    ? impHouses.reduce((t, h) => t + h.alp2ppImp, 0) / impHouses.length
+    : null;
   return {
     // labelled by the election being CALLED, which is the one a reader
     // remembers – not the election that started the term
@@ -6383,25 +6396,41 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
     // every single-poll election of the 1970s and 80s as an industry failure
     sameSide: raw.length >= 2 && (raw.every((h) => h.errRaw > 0) || raw.every((h) => h.errRaw < 0)),
     worst: r1(Math.max(...houses.map((h) => Math.abs(h.err)))),
+    // the implied-flows reckoning of the same row (see the raw note); the
+    // mean mirrors the published side's arithmetic – a mean OF the rounded
+    // display values – so the card and the dots never disagree
+    meanImp: impMean == null ? null : r1(impMean),
+    errImp: impMean == null ? null : r1(impMean - e.tpp_alp),
+    absErrImp: impMean == null ? null : r1(Math.abs(impMean - e.tpp_alp)),
+    sameSideImp: impRaw.length >= 2 && (impRaw.every((v) => v > 0) || impRaw.every((v) => v < 0)),
+    worstImp: impHouses.length ? r1(Math.max(...impHouses.map((h) => Math.abs(h.errImp)))) : null,
   };
 }).filter(Boolean);
 const accuracy = accuracyCycles.length ? (() => {
-  const byFirm = new Map();
-  for (const c of accuracyCycles)
-    for (const h of c.houses) {
-      const e = byFirm.get(h.firm) || { firm: h.firm, cycles: [] };
-      e.cycles.push({ year: c.year, err: h.err });
-      byFirm.set(h.firm, e);
-    }
-  const firms = [...byFirm.values()].map((f) => ({
-    firm: f.firm, n: f.cycles.length, cycles: f.cycles,
-    meanErr: r1(f.cycles.reduce((t, c) => t + c.err, 0) / f.cycles.length),
-    meanAbs: r1(f.cycles.reduce((t, c) => t + Math.abs(c.err), 0) / f.cycles.length),
-  })).sort((a, b) => b.n - a.n || a.meanAbs - b.meanAbs);
+  const firmsFor = (errOf) => {
+    const byFirm = new Map();
+    for (const c of accuracyCycles)
+      for (const h of c.houses) {
+        const err = errOf(h);
+        if (err == null) continue;
+        const e = byFirm.get(h.firm) || { firm: h.firm, cycles: [] };
+        e.cycles.push({ year: c.year, err });
+        byFirm.set(h.firm, e);
+      }
+    return [...byFirm.values()].map((f) => ({
+      firm: f.firm, n: f.cycles.length, cycles: f.cycles,
+      meanErr: r1(f.cycles.reduce((t, c) => t + c.err, 0) / f.cycles.length),
+      meanAbs: r1(f.cycles.reduce((t, c) => t + Math.abs(c.err), 0) / f.cycles.length),
+    })).sort((a, b) => b.n - a.n || a.meanAbs - b.meanAbs);
+  };
   const abs = accuracyCycles.map((c) => c.absErr);
+  const absImp = accuracyCycles.filter((c) => c.absErrImp != null).map((c) => c.absErrImp);
   return {
-    windowDays: ACC_WINDOW_DAYS, cycles: accuracyCycles, firms,
+    windowDays: ACC_WINDOW_DAYS, cycles: accuracyCycles,
+    firms: firmsFor((h) => h.err),
+    firmsImp: firmsFor((h) => h.errImp),
     meanAbs: r1(abs.reduce((t, v) => t + v, 0) / abs.length),
+    meanAbsImp: absImp.length ? r1(absImp.reduce((t, v) => t + v, 0) / absImp.length) : null,
     worstCycle: accuracyCycles.reduce((w, c) => (c.absErr > w.absErr ? c : w)),
   };
 })() : null;
