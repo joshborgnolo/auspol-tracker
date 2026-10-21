@@ -1822,10 +1822,16 @@ function RdDirection({ rangeId }) {
   /* a group's right line draws only once it can be told from noise */
   const gHasRight = gRaw.filter((d) => d.right != null).length >= 2;
   const gPts = gRaw.map((d) => ({ ...d, right: gHasRight ? d.right : null }));
-  const gDots = gRaw.flatMap((d) => [
-    d.right != null ? { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction" } : null,
-    d.wrong != null ? { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track" } : null,
-  ].filter(Boolean));
+  /* the dot tip credits a house and a date off meta (TrendChart reads
+     meta.pollster/dateLabel); a group reading printed for a month has no
+     sample n to ride along */
+  const gDots = gRaw.flatMap((d) => {
+    const meta = { pollster: gSrc, dateLabel: monthLabelFull(d.ym) };
+    return [
+      d.right != null ? { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta } : null,
+      d.wrong != null ? { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta } : null,
+    ].filter(Boolean);
+  });
   const gVals = gPts.flatMap((p) => [p.right, p.wrong]).filter((v) => v != null);
   const gLo = gVals.length ? Math.floor((Math.min(...gVals) + 0.6) / 10) * 10 : lo;
   const gHi = gVals.length ? Math.max(Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10, gLo + 10) : hi;

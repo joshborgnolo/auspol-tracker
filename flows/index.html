@@ -99964,19 +99964,20 @@ function TrendChart(props) {
       rows: []
     };
   } else if (dot) {
+    const dm = dot.meta || {};
     tip = {
       left: sx(dot.x) / W * 100,
       top: sy(dot.y) / H * 100,
-      title: dot.meta.pollster,
+      title: dm.pollster || "",
       rows: [{
         label: dot.label || "2PP",
         value: fmt(dot.y, dot) + unit,
         color: dot.color
       }, {
-        label: dot.meta.dateLabel ? "Field" : "",
-        value: dot.meta.dateLabel || ""
+        label: dm.dateLabel ? "Field" : "",
+        value: dm.dateLabel || ""
       }].filter(r => r.label),
-      sub: dot.sub || (dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : ""),
+      sub: dot.sub || (dm.sample ? `n = ${dm.sample.toLocaleString()}` : ""),
       hint: openable ? "Click to open this poll in All polls" : ""
     };
   } else if (hover && hoverX != null) {
@@ -121885,17 +121886,25 @@ function RdDirection({
     ...d,
     right: gHasRight ? d.right : null
   }));
-  const gDots = gRaw.flatMap(d => [d.right != null ? {
-    x: d.x,
-    y: d.right,
-    color: "var(--mood-pos)",
-    label: "Right direction"
-  } : null, d.wrong != null ? {
-    x: d.x,
-    y: d.wrong,
-    color: "var(--mood-neg)",
-    label: "Wrong track"
-  } : null].filter(Boolean));
+  const gDots = gRaw.flatMap(d => {
+    const meta = {
+      pollster: gSrc,
+      dateLabel: monthLabelFull(d.ym)
+    };
+    return [d.right != null ? {
+      x: d.x,
+      y: d.right,
+      color: "var(--mood-pos)",
+      label: "Right direction",
+      meta
+    } : null, d.wrong != null ? {
+      x: d.x,
+      y: d.wrong,
+      color: "var(--mood-neg)",
+      label: "Wrong track",
+      meta
+    } : null].filter(Boolean);
+  });
   const gVals = gPts.flatMap(p => [p.right, p.wrong]).filter(v => v != null);
   const gLo = gVals.length ? Math.floor((Math.min(...gVals) + 0.6) / 10) * 10 : lo;
   const gHi = gVals.length ? Math.max(Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10, gLo + 10) : hi;

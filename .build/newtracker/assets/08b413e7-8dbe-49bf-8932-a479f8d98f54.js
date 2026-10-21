@@ -1024,13 +1024,18 @@ function TrendChart(props) {
       title: evt.e.label, date: fmtEventDate(evt.e.date), desc: evt.e.desc, rows: [],
     };
   } else if (dot) {
+    /* meta is the caller's poll credit (pollster/date/sample) - a plain
+       scatter dot must not throw the readout (originally did: direction
+       group views, 2026-10-22 user report; rd-cycles's cross key guards
+       the same way) */
+    const dm = dot.meta || {};
     tip = {
       left: (sx(dot.x) / W) * 100, top: (sy(dot.y) / H) * 100,
-      title: dot.meta.pollster, rows: [
+      title: dm.pollster || "", rows: [
         { label: dot.label || "2PP", value: fmt(dot.y, dot) + unit, color: dot.color },
-        { label: dot.meta.dateLabel ? "Field" : "", value: dot.meta.dateLabel || "" },
+        { label: dm.dateLabel ? "Field" : "", value: dm.dateLabel || "" },
       ].filter((r) => r.label),
-      sub: dot.sub || (dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : ""),
+      sub: dot.sub || (dm.sample ? `n = ${dm.sample.toLocaleString()}` : ""),
       hint: openable ? "Click to open this poll in All polls" : "",
     };
   } else if (hover && hoverX != null) {
