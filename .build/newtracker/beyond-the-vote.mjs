@@ -1771,6 +1771,7 @@ const TITLES = {
   "wealthy-income-threshold": "How much does a household need to earn to be wealthy?",
   "energy-prices-next-12-months": "Will energy prices rise over the next year?",
   "unemployment-next-12-months": "Will unemployment rise over the next year?",
+  "card-surcharge-ban-price-tradeoff": "Ban card surcharges even if it means higher prices? (as reported on TV)",
   "interest-rate-contributors": "What is behind the rate rises?",
   "interest-rate-expectations": "Will interest rates be higher by the end of 2026?",
   "better-or-worse-off": "Are people better or worse off than a year ago?",
