@@ -120,7 +120,7 @@ assert.ok(ap.includes("\"Estimated from \" + S.srcAs"), "a state's caption calls
 assert.ok(ap.includes("const cnt = !!S.counted;") && ap.includes("? \"Counted from \" + S.srcAs"),
   "only a counted state is captioned as counted");
 assert.equal(ap.split("\"Counted from \" + S.srcAs").length, 2, "one counted caption, in the cnt branch");
-assert.ok(ap.includes("<RdHow term=\"flow-history\""), "the chart's How it's built opens its Info entry");
+assert.ok(ap.includes("<RdFoot how={{ term: \"flow-history\""), "the chart's How it's built opens its Info entry");
 const info = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"), "utf8");
 assert.ok(info.includes("{ id: \"flow-history\", term: \"Counted and estimated flows\""), "the Info entry exists");
 

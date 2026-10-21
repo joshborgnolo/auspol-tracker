@@ -5542,49 +5542,64 @@ function RdFlows({ measure }) {
    have no JSX port - and it is a trusted sibling of the sources, so the
    inner-HTML mount carries no escaping risk. */
 /* The preference-flow history chart inside the explainer's "Ask or assume"
-   section, with a chip per jurisdiction. The article body is static HTML
-   (explained-article.html, mounted via dangerouslySetInnerHTML), so the
-   chips + chart can't sit inside it as JSX; they render into this section's
-   own footer and the whole figure mounts into the article's #ex-fig-flow
-   slot on commit - controls and chart move as one node, or the picker would
-   stay stranded at the foot of the page. That covers BOTH parents that
-   mount the article - this redesign RdExplained and the classic
-   MenuPageView branch - through the one mechanism, so the slot is never
-   left empty while a duplicate chart shows at the foot. With JavaScript
-   off the slot is simply an empty div and the text flows on. The data is
-   window.AUSPOL.flowHistory (one home, gen-data): the federal FLOW_HISTORY
-   counts, and each state's ESTIMATES (the two-class pile model,
-   .build/estimate-state-flows.py), so a jurisdiction's chip appears the build
-   its estimates land. A state carries `estimated` and each point's 90% error
-   (grnErr/onpErr/othErr), drawn as a bar at its election and quoted in the
-   tooltip; its One Nation line appears only where One Nation stood widely
-   enough ballots behind an estimate (gen-data's onp_min_ballots rule), so it
-   can break into lone points.
-   Since 2026-10-21 (user calls) the controls sit in ONE menu bar above the
-   chart - the Labor v Labor-v-One-Nation pairing flip, the jurisdiction
-   chips and the Share (Labor v rival) flip - and the Federal chip gets a
-   state/territory sub-row (a generated fed.states payload,
-   data/fed-state-flows.json): counted by the AEC from the same
-   two-party-preferred flow-by-state tables, 2004-2025, so a state view
-   carries counts, never estimates. The resize-arranged phone shell gets a
-   deeper bottom pad (96px) because PX(20) plus glyph descent there pushes
-   the x tick labels past the svg box into the copy button's 30px strip (the
-   2025 tick vanished under it at 320-390px). */
+   section. The article body is static HTML (explained-article.html, mounted
+   via dangerouslySetInnerHTML), so the chart can't sit inside it as JSX; it
+   renders into this section's own footer and the whole card mounts into
+   the article's #ex-fig-flow slot on commit - controls and chart move as
+   one node, or the picker would stay stranded at the foot of the page.
+   That covers BOTH parents that mount the article - this redesign
+   RdExplained and the classic MenuPageView branch - through the one
+   mechanism, so the slot is never left empty while a duplicate chart shows
+   at the foot. With JavaScript off the slot is simply an empty div and the
+   text flows on. The data is window.AUSPOL.flowHistory (one home,
+   gen-data): the federal FLOW_HISTORY counts, the AEC's per-state cuts of
+   them (fed.states, 2004-2025, counts), and each state's ESTIMATES (the
+   two-class pile model, .build/estimate-state-flows.py), so a jurisdiction
+   appears in the menu the build its estimates land. A state carries
+   `estimated` and each point's 90% error (grnErr/onpErr/othErr), drawn as a
+   bar at its election and quoted in the tooltip; its One Nation line
+   appears only where One Nation stood widely enough ballots behind an
+   estimate (gen-data's onp_min_ballots rule), so it can break into lone
+   points.
+   Since 2026-10-21 (user call: "consistent with the design of other
+   charts") the figure is a site chart card: contest tabs (RdTabs, the
+   /flows/ page's views) with the Share flip in the tab row (the All polls
+   idiom), a .rd-chead title naming measure, unit and scope, the elections
+   menu on that head (the /flows/ drift chart's highlight-menu idiom, a
+   native select in place of two rows of chips), a px-sized TrendChart on
+   Past cycles' half-column frame, the phone's key over the chart, the
+   .rd-ckey key under it with the copy button, and the caption + How it's
+   built as an RdFoot. Tooltip titles are short ("Hunter 2025"), so a
+   phone's readout sizes to its rows instead of filling the screen; the
+   contest's source stays in the caption. */
 const FLOW_PARTIES = [
   { id: "grn", name: "Greens",     color: "var(--grn)" },
   { id: "onp", name: "One Nation", color: "var(--onp)" },
   { id: "oth", name: "Others",     color: "var(--oth)" },
 ];
-function ExplainedFlowChart({ jur, inv, stateKey }) {
+/* the frame both views share: Past cycles' half-column chart (the article
+   column is about that wide), 0-100 with the unit on the top tick */
+const EX_TICKS = [0, 25, 50, 75, 100];
+const exTickFmt = (v) => (v === 100 ? "100%" : String(v));
+const exFrame = (narrow) => ({
+  heightPx: narrow ? 260 : 290,
+  padPx: narrow ? { l: 34, r: 16, t: 14, b: 28 } : { l: 40, r: 12, t: 16, b: 30 },
+  yDomain: [0, 100], yTicks: EX_TICKS, yTickFmt: exTickFmt, baseline: true,
+});
+/* an estimate's error bar in the key, drawn as the chart draws it */
+const ExBarSwatch = () => (
+  <svg width="12" height="16" viewBox="0 0 12 16" aria-hidden="true"><rect x="4" y="1" width="4" height="14" rx="1" style={{ fill: "var(--ink-3)", opacity: 0.55 }} /></svg>
+);
+function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
-  /* stateKey picks a per-state cut of the FEDERAL counts (the Federal chip's
-     sub-row; AEC per-state TPP tables, 2004–2025 — counts, no error bars) */
+  /* stateKey picks a per-state cut of the FEDERAL counts (AEC per-state TPP
+     tables, 2004–2025 — counts, no error bars) */
   const S = (jur === "fed" && stateKey && ((FH.fed.states || {})[stateKey])) || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
-  /* the basis toggle's inverse view draws 100 - x; the ± error bars are
+  /* the Share flip's inverse view draws 100 - x; the ± error bars are
      symmetric, so they ride the same transform */
   const T = (v) => (inv ? 100 - v : v);
   /* a counted state (NSW, from its ballot-level data) draws no bar, but NSW
@@ -5619,7 +5634,7 @@ function ExplainedFlowChart({ jur, inv, stateKey }) {
         id: p.id + i, label: p.name, color: p.color, points,
         /* a run of one election (a state One Nation sat out either side
            of) is no line at all, so it keeps its dot */
-        smooth: false, width: 2.6, endCap: tail || points.length === 1,
+        smooth: false, rdWidth: 2.5, endCap: tail || points.length === 1,
         endLabel: tail && !narrow ? p.name : null,
       });
     });
@@ -5649,51 +5664,51 @@ function ExplainedFlowChart({ jur, inv, stateKey }) {
       });
     });
   }
-  const span = YEARS.length > 1 ? YEARS[0] + " to " + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const side = inv ? "the Coalition" : "Labor", other = inv ? "Labor" : "the Coalition";
+  const scope = rdCap(S.elections || S.label + " elections") + ", " + span + (est ? ", estimated" : "");
+  const cap = est
+    ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length
+      ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
+      : "")
+    : cnt
+      ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
+      : S.fedState
+        ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table."
+        : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since).";
+  const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
   return (
-    <div className="ex-chart">
-      <span className="fc-unit">{inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in "}{S.elections || S.label + " elections"}</span>
-      <TrendChart
-        height={narrow ? 470 : 330}
-        xDomain={[x0, x1]} yDomain={[0, 100]}
-        yTicks={[25, 50, 75]}
+    <>
+      <div className="rd-chead ex-fl-head">
+        <span className="rd-chead-t">{"Preferences to " + side + " over " + other + ", %"}
+          <span className="rd-chead-meta">{scope}</span></span>
+        {menu}
+      </div>
+      {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
+      <TrendChart key={"ex-fl-" + jur + (stateKey || "")} {...exFrame(narrow)}
+        xDomain={[x0, x1]}
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
-        axisFont={narrow ? 28 : 15}
-        /* phone bottom pad must top the x labels' PX(20) drop (≈71 units at
-           320px) PLUS the glyph descent below the baseline, or a year label
-           hangs past the svg into the copy button's 30px strip — 2025 sat
-           under the button (user 2026-10-21) */
-        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: narrow ? 96 : 40 }}
         series={series} areas={areas} spine={YEARS.map((x) => ({ x }))}
-        tooltipTitle={(i) => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : "")}
-        ariaLabel={"Share of preferences flowing to " + (inv ? "the Coalition" : "Labor") + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
+        tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
+        ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
+        copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
+                sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences in the seats Labor and the Coalition contested." : "Counted, election by election."),
+                caption: est ? "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+                legend: narrow ? lines : [] }}
       />
-      <span className="hero-legend fc-legend">
-        {parties.map((p) => (
-          <span className="hl-item" key={p.id}>
-            <span className="hl-line" style={{ background: p.color }}></span>{p.name}
-          </span>
-        ))}
-      </span>
-      <p className="ex-flow-cap">{est
-        ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length
-          ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
-          : "")
-        : cnt
-          ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
-          : S.fedState
-            ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table."
-            : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."}</p>
-      <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
-    </div>
+      <RdKey className="rd-ckey" items={est ? [] : [{ kind: "line", color: "var(--ink-3)", label: "Counted flow at each election" }]}>
+        {est && <span className="rd-key-item"><ExBarSwatch />The estimate’s 90% error</span>}
+      </RdKey>
+      <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{cap}</RdFoot>
+    </>
   );
 }
 
 /* the explainer's Labor-v-One-Nation view (user 2026-10-20: "no state-by-
    state, just the elections and by-elections that have shown results", as
-   the "one nation v labor" chart's crosses do on /flows/). No jurisdiction
-   chips — no count or close estimate exists by jurisdiction for this pair —
+   the "one nation v labor" chart's crosses do on /flows/). No elections
+   menu — no count or close estimate exists by jurisdiction for this pair —
    one cross per voter group per contest, from the same flowForced.bys
    crosses the /flows/ One Nation chart plots. Hunter is the AEC's counted
    flow-by-division; South Australia and Secret Harbour are estimates. */
@@ -5702,11 +5717,11 @@ const ON_COHORTS = [
   { id: "grn",  name: "Greens",    color: "var(--grn)" },
   { id: "oth",  name: "Others",    color: "var(--oth)" },
 ];
-function ExplainedOnChart({ inv }) {
+function ExplainedOnChart({ inv, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const BYS = ((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm);
   if (!BYS.length) return null;
-  /* the basis toggle's inverse view draws 100 - x, as in ExplainedFlowChart */
+  /* the Share flip's inverse view draws 100 - x, as in ExplainedFlowChart */
   const T = (v) => (inv ? 100 - v : v);
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const parties = ON_COHORTS.filter((p) => BYS.some((b) => b[p.id] != null));
@@ -5731,7 +5746,7 @@ function ExplainedOnChart({ inv }) {
     runs.forEach((points, i) => {
       const tail = i === runs.length - 1;
       series.push({ id: p.id + i, label: p.name, color: p.color, points,
-        smooth: false, width: 2.6, endCap: false,
+        smooth: false, rdWidth: 2.5, endCap: false,
         endLabel: tail && !narrow ? p.name : null });
     });
   });
@@ -5741,47 +5756,61 @@ function ExplainedOnChart({ inv }) {
      lowercase rewrite would break, so guard it */
   const low = (s) => s.replace(/^The /i, (m) => m.toLowerCase());
   const cap = BYS.map((b) => b.label + " — " + low(b.sub)).join("; ");
+  const side = inv ? "One Nation" : "Labor", other = inv ? "Labor" : "One Nation";
+  const scope = "Each contest that has measured it, " + BYS[0].date.slice(0, 4) + "–" + BYS[BYS.length - 1].date.slice(0, 4);
+  const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
   return (
-    <div className="ex-chart">
-      <span className="fc-unit">{inv ? "Share preferencing One Nation over Labor in each counted contest" : "Share preferencing Labor over One Nation in each counted contest"}</span>
-      <TrendChart
-        height={narrow ? 470 : 330}
-        xDomain={[x0, x1]} yDomain={[0, 100]}
-        yTicks={[25, 50, 75]}
+    <>
+      <div className="rd-chead ex-fl-head">
+        <span className="rd-chead-t">{"Preferences to " + side + " over " + other + ", %"}
+          <span className="rd-chead-meta">{scope}</span></span>
+        {menu}
+      </div>
+      {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
+      <TrendChart key="ex-fl-on" {...exFrame(narrow)}
+        xDomain={[x0, x1]}
         xTicks={ticks}
         unit="%" fmt={(v) => v.toFixed(1)}
-        axisFont={narrow ? 28 : 15}
-        /* same phone bottom-pad rule as the jurisdiction chart: keep the
-           contest labels clear of the copy button's strip */
-        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: narrow ? 96 : 40 }}
         series={series} marks={marks} spine={BYS.map((b) => ({ x: b.xm }))}
-        tooltipTitle={(i) => BYS[i].label + " · " + BYS[i].sub}
-        ariaLabel={"Share of preferences flowing to " + (inv ? "One Nation" : "Labor") + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
+        /* the contest's name alone: its source sentence ran the readout to
+           the full width of a phone (user 2026-10-21); the caption below
+           carries every contest's source */
+        tooltipTitle={(i) => BYS[i].label}
+        ariaLabel={"Share of preferences flowing to " + side + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
+        copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
+                sub: "Each contest that has measured it. " + rdCap(cap) + ".",
+                caption: "Each cross is one contest’s count or estimate.",
+                legend: narrow ? lines : [] }}
       />
-      <span className="hero-legend fc-legend">
-        {parties.map((p) => (
-          <span className="hl-item" key={p.id}>
-            <span className="hl-line" style={{ background: p.color }}></span>{p.name}
-          </span>
-        ))}
-      </span>
-      <p className="ex-flow-cap">{"One reading per contest: " + cap + "."}</p>
-      <div className="ex-flow-how"><RdHow term="flow-history" from="Preference flows explained" /></div>
-    </div>
+      <RdKey className="rd-ckey" items={[]}>
+        <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>One count or estimate per contest</span>
+      </RdKey>
+      <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{"One reading per contest: " + cap + "."}</RdFoot>
+    </>
   );
 }
 
+const EX_PAIRS = [{ id: "co", label: "Labor v Coalition", short: "v Coalition" }, { id: "on", label: "Labor v One Nation", short: "v One Nation" }];
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
+  const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
   const KEYS = Object.keys(FH);
-  const [jur, setJur] = useState("fed");
-  const active = FH[jur] ? jur : "fed";
+  /* one elections menu (user 2026-10-21, replacing the jurisdiction chips
+     and the Federal chip's state sub-row): "fed" is the national series,
+     "fed:<state>" a state's cut of the federal counts (fed.states, the
+     AEC's), a bare key a state's own elections. The pick persists across
+     the contest tabs - the menu just hides on Labor v One Nation. */
+  const FED_STATES = (FH.fed && FH.fed.states) || {};
+  const [view, setView] = useState("fed");
+  const fedView = view === "fed" || view.startsWith("fed:");
+  const jur = fedView ? "fed" : (FH[view] ? view : "fed");
+  const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
   const [inv, setInv] = useState(false);
-  /* the two-party pairing flips Labor v Coalition (the flowHistory election
+  /* the contest tabs flip Labor v Coalition (the flowHistory election
      histories) to Labor v One Nation (the measured flowForced.bys contests;
-     user 2026-10-20). Jurisdiction chips belong to the Coalition history
+     user 2026-10-20). The elections menu belongs to the Coalition history
      alone — no state-by-state counts exist for the One Nation pairing. */
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
@@ -5797,13 +5826,36 @@ function RdExplained() {
     slot.appendChild(node);
     return () => { if (node.parentNode === slot) slot.removeChild(node); };
   });
-  const multi = KEYS.length > 1;
-  /* the Federal chip's own state/territory sub-row (user 2026-10-21): the
-     same national counts split by state (fed.states, gen-data), counted by
-     the AEC. The pick persists across pairing and jurisdiction flips - the
-     row just hides; null is the national series. */
-  const FED_STATES = (FH.fed && FH.fed.states) || null;
-  const [fedState, setFedState] = useState(null);
+  const stateKeys = Object.keys(FED_STATES);
+  const menu = (KEYS.length > 1 || stateKeys.length > 0) ? (
+    <select className="rd-pv-sel ex-fl-sel" aria-label="Elections" value={stateKey ? "fed:" + stateKey : jur}
+            onChange={(e) => setView(e.target.value)}>
+      <optgroup label="Federal elections">
+        <option value="fed">Federal, national</option>
+        {stateKeys.map((k) => <option key={k} value={"fed:" + k}>{"Federal, " + (FED_STATES[k].short || FED_STATES[k].label)}</option>)}
+      </optgroup>
+      {KEYS.length > 1 && (
+        <optgroup label="State elections">
+          {KEYS.filter((k) => k !== "fed").map((k) => <option key={k} value={k}>{(FH[k].short || FH[k].label) + " state elections"}</option>)}
+        </optgroup>
+      )}
+    </select>
+  ) : null;
+  /* the Share flip, the Latest section's idiom - the label names the
+     dimension, the button the ACTIVE side, the title where a press goes.
+     It rides the tab row as All polls' controls do; a phone's row has no
+     room beside the tabs, so it joins the chart's head there */
+  const share = (
+    <span className="rd-pl-ctl ex-share">
+      <span className="rd-pl-ctl-l">Share:</span>
+      <button type="button" className="rd-pl-flip" aria-pressed={inv}
+              title={inv ? ("Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition")) : ("Switch to shares preferencing " + rival + " over Labor")}
+              onClick={() => setInv(!inv)}>
+        <span className="rd-pl-flip-t">{inv ? rival : "Labor"}</span> <span aria-hidden="true">⇄</span>
+      </button>
+    </span>
+  );
+  const headCtls = narrow ? <span className="ex-fl-ctls">{pair === "co" ? menu : null}{share}</span> : (pair === "co" ? menu : null);
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -5814,54 +5866,14 @@ function RdExplained() {
         dek="The pollster can ask respondents which of the final two they would rank higher, or apply its own assumptions, and publish the result. Or the poll’s first preferences can be run through one fixed table of preference flows, the same for every pollster. That implied figure is the default here: it moves only when voters do, never with a pollster’s change of method, and at past elections it has had the better record. Below: how each works, why the implied figure leads, and where the table’s numbers come from." />
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
-        {/* the chart's menu bar (user 2026-10-21): the pairing flip, the
-            jurisdiction chips and the Share flip on one wrapping row, the
-            flips in the Latest section's idiom - the label names the
-            dimension, the button the ACTIVE setting, the title announces
-            where a press goes */}
-        <div className="ex-flow-flip">
-          <span className="rd-pl-ctl">
-            <span className="rd-pl-ctl-l">Two-party:</span>
-            <button type="button" className="rd-pl-flip" aria-pressed={pair === "on"}
-                    title={pair === "on" ? "Switch the chart to Labor v Coalition" : "Switch the chart to Labor v One Nation"}
-                    onClick={() => setPair(pair === "on" ? "co" : "on")}>
-              <span className="rd-pl-flip-t">{"Labor v " + rival}</span> <span aria-hidden="true">⇄</span>
-            </button>
-          </span>
-          {multi && pair === "co" && (
-            <div className="ex-flow-chips" role="tablist" aria-label="Jurisdiction">
-              {KEYS.map((k) => (
-                <button key={k} type="button" role="tab" aria-selected={k === active}
-                  className={"ex-chip" + (k === active ? " on" : "")} onClick={() => setJur(k)}>
-                  {FH[k].short || FH[k].label}
-                </button>
-              ))}
-            </div>
-          )}
-          <span className="rd-pl-ctl ex-share">
-            <span className="rd-pl-ctl-l">Share:</span>
-            <button type="button" className="rd-pl-flip" aria-pressed={inv}
-                    title={inv ? ("Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition")) : ("Switch to shares preferencing " + rival + " over Labor")}
-                    onClick={() => setInv(!inv)}>
-              <span className="rd-pl-flip-t">{inv ? rival : "Labor"}</span> <span aria-hidden="true">⇄</span>
-            </button>
-          </span>
+        <div className="card rd-card ex-fl-card">
+          <RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"
+                  options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
+            {narrow ? null : share}
+          </RdTabs>
+          {pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />
+            : <ExplainedFlowChart jur={jur} stateKey={stateKey} inv={inv} menu={headCtls} />}
         </div>
-        {pair === "co" && active === "fed" && FED_STATES && (
-          <div className="ex-flow-chips ex-flow-sub" role="tablist" aria-label="Federal flows by state or territory">
-            <button type="button" role="tab" aria-selected={fedState === null}
-              className={"ex-chip" + (fedState === null ? " on" : "")} onClick={() => setFedState(null)}>
-              National
-            </button>
-            {Object.keys(FED_STATES).map((k) => (
-              <button key={k} type="button" role="tab" aria-selected={k === fedState}
-                className={"ex-chip" + (k === fedState ? " on" : "")} onClick={() => setFedState(k)}>
-                {FED_STATES[k].short || FED_STATES[k].label}
-              </button>
-            ))}
-          </div>
-        )}
-        {pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} stateKey={active === "fed" ? fedState : null} inv={inv} />}
       </div>
     </section>
   );

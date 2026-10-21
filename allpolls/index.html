@@ -3260,28 +3260,9 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 }
 .ex-body .ex-src a:hover, .ex-body .ex-src a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
 .ex-slot:empty { display: none; }
-.ex-chart { margin: 12px 0 26px; }
-.ex-flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
-.ex-flow-flip { margin: 22px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
-.ex-flow-flip .ex-flow-chips { margin: 0; flex: 0 1 auto; }
-.ex-share { margin-left: auto; }
-.ex-flow-sub { margin-top: 10px; }
-.ex-chip {
-  font-family: var(--sans); font-size: 13px; font-weight: 500; line-height: 1;
-  padding: 7px 13px; border-radius: 999px; cursor: pointer;
-  color: var(--ink-3); background: transparent;
-  border: 1px solid var(--line);
-}
-.ex-chip:hover { color: var(--ink); border-color: var(--ink-3); }
-.ex-chip.on { color: var(--surface); background: var(--ink); border-color: var(--ink); }
-.ex-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.ex-flow-cap { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-3); max-width: 66ch; }
-.ex-flow-how { margin: 0; }
 @media (max-width: 640px) {
   .ex-body h2 { margin: 36px 0 8px; padding-top: 10px; font-size: 19px; }
   .ex-num { font-size: 44px; }
-  .ex-flow-chips { gap: 6px; }
-  .ex-chip { font-size: 12px; padding: 6px 11px; }
 }
 .btv {
   --btv-a2: var(--mood-pos);
@@ -6056,6 +6037,17 @@ body.rd .rd-fx-keyx { position: relative; display: inline-block; width: 9px; hei
 body.rd .rd-fx-keyx::before, body.rd .rd-fx-keyx::after { content: ""; position: absolute; left: 0; right: 0; top: 3.5px; height: 1.75px; border-radius: 1px; background: var(--ink-2); }
 body.rd .rd-fx-keyx::before { transform: rotate(45deg); }
 body.rd .rd-fx-keyx::after { transform: rotate(-45deg); }
+body.rd .ex-fl-card { margin: 24px 0 30px; }
+body.rd .ex-fl-head { flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 14px; }
+body.rd .ex-fl-head > .rd-chead-t { flex: 1 1 260px; min-width: 0; line-height: 1.4; }
+body.rd .ex-fl-head .rd-chead-meta { display: block; margin-left: 0; }
+body.rd .ex-fl-sel { margin-top: 0; }
+body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
+body.rd .ex-fl-ctls > .ex-share { margin-left: auto; }
+@media (max-width: 640px) {
+  body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
+  body.rd .ex-fl-sel { margin-top: 0; }
+}
 body.rd .rd-fx-keyln { position: relative; display: inline-block; width: 24px; height: 14px; margin-right: 6px; }
 body.rd .rd-fx-keyln::before { content: ""; position: absolute; left: 1px; right: 1px; top: 6px; height: 2px; border-radius: 1px; background: var(--ink-2); }
 body.rd .rd-fx-keyln i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--ink-2); }
@@ -135553,10 +135545,47 @@ const FLOW_PARTIES = [{
   name: "Others",
   color: "var(--oth)"
 }];
+const EX_TICKS = [0, 25, 50, 75, 100];
+const exTickFmt = v => v === 100 ? "100%" : String(v);
+const exFrame = narrow => ({
+  heightPx: narrow ? 260 : 290,
+  padPx: narrow ? {
+    l: 34,
+    r: 16,
+    t: 14,
+    b: 28
+  } : {
+    l: 40,
+    r: 12,
+    t: 16,
+    b: 30
+  },
+  yDomain: [0, 100],
+  yTicks: EX_TICKS,
+  yTickFmt: exTickFmt,
+  baseline: true
+});
+const ExBarSwatch = () => React.createElement("svg", {
+  width: "12",
+  height: "16",
+  viewBox: "0 0 12 16",
+  "aria-hidden": "true"
+}, React.createElement("rect", {
+  x: "4",
+  y: "1",
+  width: "4",
+  height: "14",
+  rx: "1",
+  style: {
+    fill: "var(--ink-3)",
+    opacity: 0.55
+  }
+}));
 function ExplainedFlowChart({
   jur,
   inv,
-  stateKey
+  stateKey,
+  menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
@@ -135598,7 +135627,7 @@ function ExplainedFlowChart({
         color: p.color,
         points,
         smooth: false,
-        width: 2.6,
+        rdWidth: 2.5,
         endCap: tail || points.length === 1,
         endLabel: tail && !narrow ? p.name : null
       });
@@ -135635,54 +135664,63 @@ function ExplainedFlowChart({
       });
     });
   }
-  const span = YEARS.length > 1 ? YEARS[0] + " to " + YEARS[YEARS.length - 1] : String(YEARS[0]);
-  return React.createElement("div", {
-    className: "ex-chart"
+  const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const side = inv ? "the Coalition" : "Labor",
+    other = inv ? "Labor" : "the Coalition";
+  const scope = rdCap(S.elections || S.label + " elections") + ", " + span + (est ? ", estimated" : "");
+  const cap = est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since).";
+  const lines = parties.map(p => ({
+    kind: "line",
+    color: p.color,
+    label: p.name
+  }));
+  return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-chead ex-fl-head"
   }, React.createElement("span", {
-    className: "fc-unit"
-  }, inv ? "Share preferencing the Coalition over Labor in " : "Share preferencing Labor over the Coalition in ", S.elections || S.label + " elections"), React.createElement(TrendChart, {
-    height: narrow ? 470 : 330,
+    className: "rd-chead-t"
+  }, "Preferences to " + side + " over " + other + ", %", React.createElement("span", {
+    className: "rd-chead-meta"
+  }, scope)), menu), narrow && React.createElement(RdKey, {
+    items: lines,
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, _extends({
+    key: "ex-fl-" + jur + (stateKey || "")
+  }, exFrame(narrow), {
     xDomain: [x0, x1],
-    yDomain: [0, 100],
-    yTicks: [25, 50, 75],
     xTicks: YEARS.map(x => ({
       x,
       label: String(x)
     })),
     unit: "%",
     fmt: v => v.toFixed(1),
-    axisFont: narrow ? 28 : 15,
-    pad: {
-      l: 46,
-      r: narrow ? 22 : 104,
-      t: 16,
-      b: narrow ? 96 : 40
-    },
     series: series,
     areas: areas,
     spine: YEARS.map(x => ({
       x
     })),
-    tooltipTitle: i => YEARS[i] + " election · " + S.label + (est ? " (estimated)" : ""),
-    ariaLabel: "Share of preferences flowing to " + (inv ? "the Coalition" : "Labor") + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span
-  }), React.createElement("span", {
-    className: "hero-legend fc-legend"
-  }, parties.map(p => React.createElement("span", {
-    className: "hl-item",
-    key: p.id
-  }, React.createElement("span", {
-    className: "hl-line",
-    style: {
-      background: p.color
+    tooltipTitle: i => YEARS[i] + " · " + (S.short || S.label),
+    ariaLabel: "Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span,
+    copy: {
+      title: "Share of each group’s preferences reaching " + side + " over " + other,
+      sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences in the seats Labor and the Coalition contested." : "Counted, election by election."),
+      caption: est ? "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+      legend: narrow ? lines : []
     }
-  }), p.name))), React.createElement("p", {
-    className: "ex-flow-cap"
-  }, est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)."), React.createElement("div", {
-    className: "ex-flow-how"
-  }, React.createElement(RdHow, {
-    term: "flow-history",
-    from: "Preference flows explained"
-  })));
+  })), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: est ? [] : [{
+      kind: "line",
+      color: "var(--ink-3)",
+      label: "Counted flow at each election"
+    }]
+  }, est && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement(ExBarSwatch, null), "The estimate\u2019s 90% error")), React.createElement(RdFoot, {
+    how: {
+      term: "flow-history",
+      from: "Preference flows explained"
+    }
+  }, cap));
 }
 const ON_COHORTS = [{
   id: "coal",
@@ -135698,7 +135736,8 @@ const ON_COHORTS = [{
   color: "var(--oth)"
 }];
 function ExplainedOnChart({
-  inv
+  inv,
+  menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const BYS = ((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm);
@@ -135741,7 +135780,7 @@ function ExplainedOnChart({
         color: p.color,
         points,
         smooth: false,
-        width: 2.6,
+        rdWidth: 2.5,
         endCap: false,
         endLabel: tail && !narrow ? p.name : null
       });
@@ -135755,58 +135794,78 @@ function ExplainedOnChart({
   }));
   const low = s => s.replace(/^The /i, m => m.toLowerCase());
   const cap = BYS.map(b => b.label + " — " + low(b.sub)).join("; ");
-  return React.createElement("div", {
-    className: "ex-chart"
+  const side = inv ? "One Nation" : "Labor",
+    other = inv ? "Labor" : "One Nation";
+  const scope = "Each contest that has measured it, " + BYS[0].date.slice(0, 4) + "–" + BYS[BYS.length - 1].date.slice(0, 4);
+  const lines = parties.map(p => ({
+    kind: "line",
+    color: p.color,
+    label: p.name
+  }));
+  return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-chead ex-fl-head"
   }, React.createElement("span", {
-    className: "fc-unit"
-  }, inv ? "Share preferencing One Nation over Labor in each counted contest" : "Share preferencing Labor over One Nation in each counted contest"), React.createElement(TrendChart, {
-    height: narrow ? 470 : 330,
+    className: "rd-chead-t"
+  }, "Preferences to " + side + " over " + other + ", %", React.createElement("span", {
+    className: "rd-chead-meta"
+  }, scope)), menu), narrow && React.createElement(RdKey, {
+    items: lines,
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, _extends({
+    key: "ex-fl-on"
+  }, exFrame(narrow), {
     xDomain: [x0, x1],
-    yDomain: [0, 100],
-    yTicks: [25, 50, 75],
     xTicks: ticks,
     unit: "%",
     fmt: v => v.toFixed(1),
-    axisFont: narrow ? 28 : 15,
-    pad: {
-      l: 46,
-      r: narrow ? 22 : 104,
-      t: 16,
-      b: narrow ? 96 : 40
-    },
     series: series,
     marks: marks,
     spine: BYS.map(b => ({
       x: b.xm
     })),
-    tooltipTitle: i => BYS[i].label + " · " + BYS[i].sub,
-    ariaLabel: "Share of preferences flowing to " + (inv ? "One Nation" : "Labor") + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label
-  }), React.createElement("span", {
-    className: "hero-legend fc-legend"
-  }, parties.map(p => React.createElement("span", {
-    className: "hl-item",
-    key: p.id
-  }, React.createElement("span", {
-    className: "hl-line",
-    style: {
-      background: p.color
+    tooltipTitle: i => BYS[i].label,
+    ariaLabel: "Share of preferences flowing to " + side + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label,
+    copy: {
+      title: "Share of each group’s preferences reaching " + side + " over " + other,
+      sub: "Each contest that has measured it. " + rdCap(cap) + ".",
+      caption: "Each cross is one contest’s count or estimate.",
+      legend: narrow ? lines : []
     }
-  }), p.name))), React.createElement("p", {
-    className: "ex-flow-cap"
-  }, "One reading per contest: " + cap + "."), React.createElement("div", {
-    className: "ex-flow-how"
-  }, React.createElement(RdHow, {
-    term: "flow-history",
-    from: "Preference flows explained"
-  })));
+  })), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: []
+  }, React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fx-keyx",
+    "aria-hidden": "true"
+  }), "One count or estimate per contest")), React.createElement(RdFoot, {
+    how: {
+      term: "flow-history",
+      from: "Preference flows explained"
+    }
+  }, "One reading per contest: " + cap + "."));
 }
+const EX_PAIRS = [{
+  id: "co",
+  label: "Labor v Coalition",
+  short: "v Coalition"
+}, {
+  id: "on",
+  label: "Labor v One Nation",
+  short: "v One Nation"
+}];
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
+  const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
   const KEYS = Object.keys(FH);
-  const [jur, setJur] = useState("fed");
-  const active = FH[jur] ? jur : "fed";
+  const FED_STATES = FH.fed && FH.fed.states || {};
+  const [view, setView] = useState("fed");
+  const fedView = view === "fed" || view.startsWith("fed:");
+  const jur = fedView ? "fed" : FH[view] ? view : "fed";
+  const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
   const [inv, setInv] = useState(false);
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
@@ -135820,9 +135879,43 @@ function RdExplained() {
       if (node.parentNode === slot) slot.removeChild(node);
     };
   });
-  const multi = KEYS.length > 1;
-  const FED_STATES = FH.fed && FH.fed.states || null;
-  const [fedState, setFedState] = useState(null);
+  const stateKeys = Object.keys(FED_STATES);
+  const menu = KEYS.length > 1 || stateKeys.length > 0 ? React.createElement("select", {
+    className: "rd-pv-sel ex-fl-sel",
+    "aria-label": "Elections",
+    value: stateKey ? "fed:" + stateKey : jur,
+    onChange: e => setView(e.target.value)
+  }, React.createElement("optgroup", {
+    label: "Federal elections"
+  }, React.createElement("option", {
+    value: "fed"
+  }, "Federal, national"), stateKeys.map(k => React.createElement("option", {
+    key: k,
+    value: "fed:" + k
+  }, "Federal, " + (FED_STATES[k].short || FED_STATES[k].label)))), KEYS.length > 1 && React.createElement("optgroup", {
+    label: "State elections"
+  }, KEYS.filter(k => k !== "fed").map(k => React.createElement("option", {
+    key: k,
+    value: k
+  }, (FH[k].short || FH[k].label) + " state elections")))) : null;
+  const share = React.createElement("span", {
+    className: "rd-pl-ctl ex-share"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Share:"), React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": inv,
+    title: inv ? "Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition") : "Switch to shares preferencing " + rival + " over Labor",
+    onClick: () => setInv(!inv)
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, inv ? rival : "Labor"), " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")));
+  const headCtls = narrow ? React.createElement("span", {
+    className: "ex-fl-ctls"
+  }, pair === "co" ? menu : null, share) : pair === "co" ? menu : null;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -135846,70 +135939,25 @@ function RdExplained() {
   }), React.createElement("div", {
     ref: ref
   }, React.createElement("div", {
-    className: "ex-flow-flip"
-  }, React.createElement("span", {
-    className: "rd-pl-ctl"
-  }, React.createElement("span", {
-    className: "rd-pl-ctl-l"
-  }, "Two-party:"), React.createElement("button", {
-    type: "button",
-    className: "rd-pl-flip",
-    "aria-pressed": pair === "on",
-    title: pair === "on" ? "Switch the chart to Labor v Coalition" : "Switch the chart to Labor v One Nation",
-    onClick: () => setPair(pair === "on" ? "co" : "on")
-  }, React.createElement("span", {
-    className: "rd-pl-flip-t"
-  }, "Labor v " + rival), " ", React.createElement("span", {
-    "aria-hidden": "true"
-  }, "\u21C4"))), multi && pair === "co" && React.createElement("div", {
-    className: "ex-flow-chips",
-    role: "tablist",
-    "aria-label": "Jurisdiction"
-  }, KEYS.map(k => React.createElement("button", {
-    key: k,
-    type: "button",
-    role: "tab",
-    "aria-selected": k === active,
-    className: "ex-chip" + (k === active ? " on" : ""),
-    onClick: () => setJur(k)
-  }, FH[k].short || FH[k].label))), React.createElement("span", {
-    className: "rd-pl-ctl ex-share"
-  }, React.createElement("span", {
-    className: "rd-pl-ctl-l"
-  }, "Share:"), React.createElement("button", {
-    type: "button",
-    className: "rd-pl-flip",
-    "aria-pressed": inv,
-    title: inv ? "Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition") : "Switch to shares preferencing " + rival + " over Labor",
-    onClick: () => setInv(!inv)
-  }, React.createElement("span", {
-    className: "rd-pl-flip-t"
-  }, inv ? rival : "Labor"), " ", React.createElement("span", {
-    "aria-hidden": "true"
-  }, "\u21C4")))), pair === "co" && active === "fed" && FED_STATES && React.createElement("div", {
-    className: "ex-flow-chips ex-flow-sub",
-    role: "tablist",
-    "aria-label": "Federal flows by state or territory"
-  }, React.createElement("button", {
-    type: "button",
-    role: "tab",
-    "aria-selected": fedState === null,
-    className: "ex-chip" + (fedState === null ? " on" : ""),
-    onClick: () => setFedState(null)
-  }, "National"), Object.keys(FED_STATES).map(k => React.createElement("button", {
-    key: k,
-    type: "button",
-    role: "tab",
-    "aria-selected": k === fedState,
-    className: "ex-chip" + (k === fedState ? " on" : ""),
-    onClick: () => setFedState(k)
-  }, FED_STATES[k].short || FED_STATES[k].label))), pair === "on" ? React.createElement(ExplainedOnChart, {
-    inv: inv
+    className: "card rd-card ex-fl-card"
+  }, React.createElement(RdTabs, {
+    value: pair,
+    onChange: setPair,
+    ariaLabel: "Contest",
+    className: "ex-fl-tabs",
+    options: EX_PAIRS.map(p => ({
+      id: p.id,
+      label: narrow ? p.short : p.label
+    }))
+  }, narrow ? null : share), pair === "on" ? React.createElement(ExplainedOnChart, {
+    inv: inv,
+    menu: headCtls
   }) : React.createElement(ExplainedFlowChart, {
-    jur: active,
-    stateKey: active === "fed" ? fedState : null,
-    inv: inv
-  })));
+    jur: jur,
+    stateKey: stateKey,
+    inv: inv,
+    menu: headCtls
+  }))));
 }
 const RdDisagreeM = React.memo(RdDisagree);
 const RdHouseLeanM = React.memo(RdHouseLean);

@@ -293,25 +293,30 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
    label "Share:" (was Direction), its button the active side alone —
    and the Federal chip carries its own National+state/territory sub-row
    (fed.states, the AEC's counted per-state cuts). */
-assert.ok(ap.includes("function ExplainedOnChart({ inv })") && ap.includes("const ON_COHORTS = ["),
+/* 2026-10-21 (user: "consistent with the design of other charts"): the
+   figure is a site chart card - contest tabs (RdTabs) with the Share flip in
+   their row, a .rd-chead title, ONE elections menu (a native select over
+   federal national, federal by state and the state elections) in place of
+   the chips, px-sized TrendChart frame, .rd-ckey, RdFoot, a copy prop - and
+   tooltip titles short enough that a phone's readout sizes to its rows. */
+assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes("const ON_COHORTS = ["),
   "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
-assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} /> : <ExplainedFlowChart jur={active} stateKey={active === "fed" ? fedState : null} inv={inv} />}'),
-  "the flip swaps the Coalition history chart for the measured-contest chart; the state pick reaches the chart on the Federal chip alone");
-assert.ok(ap.includes('{"Labor v " + rival}') && ap.includes('aria-pressed={pair === "on"}'),
-  "the Two-party button names the active pairing and exposes its state");
-assert.ok(ap.includes("multi && pair === \"co\" && ("),
-  "the jurisdiction chips ride the Coalition view alone (no state-by-state counts for the One Nation pairing)");
-{
-  const iBar = ap.indexOf('className="ex-flow-flip"'), iPair = ap.indexOf('aria-pressed={pair === "on"}'),
-        iChips = ap.indexOf('aria-label="Jurisdiction"'), iShare = ap.indexOf('className="rd-pl-ctl ex-share"');
-  assert.ok(iBar > 0 && iPair > iBar && iChips > iPair && iShare > iChips,
-    "one menu bar (user 2026-10-21): the Two-party flip, then the jurisdiction chips, then the Share flip");
-}
+assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
+    && ap.includes(': <ExplainedFlowChart jur={jur} stateKey={stateKey} inv={inv} menu={headCtls} />}'),
+  "the contest tabs swap the Coalition history chart for the measured-contest chart");
+assert.ok(ap.includes('<div className="card rd-card ex-fl-card">') && ap.includes('<RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"'),
+  "the figure is a chart card opening on contest tabs, as /flows/ does");
+assert.ok(ap.includes('<select className="rd-pv-sel ex-fl-sel" aria-label="Elections"') && ap.includes('const [view, setView] = useState("fed");')
+    && ap.includes('<optgroup label="Federal elections">') && ap.includes('<optgroup label="State elections">'),
+  "one elections menu: federal national, federal by state, then each state's own elections");
+assert.ok(!/ex-chip|ex-flow-chips|ex-flow-flip/.test(ap) && !/ex-chip|ex-flow-/.test(fs.readFileSync(path.join(ROOT, ".build/newtracker/template.html"), "utf8")),
+  "the pill chips and the old menu bar are gone, code and CSS");
 assert.ok(ap.includes('<span className="rd-pl-ctl-l">Share:</span>') && !ap.includes('>Direction:</span>'),
   "the explainer's Share control names its active side (the Direction label gone)");
-assert.ok(ap.includes('className="ex-flow-chips ex-flow-sub" role="tablist" aria-label="Federal flows by state or territory"')
-    && ap.includes('const [fedState, setFedState] = useState(null);'),
-  "the Federal chip carries its National + state/territory sub-row, the pick defaulting to national");
+assert.ok(ap.includes("tooltipTitle={(i) => BYS[i].label}") && ap.includes('tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}'),
+  "short tooltip titles: a contest's source sentence no longer runs a phone readout to full width");
+assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 2 && (ap.match(/copy=\{\{ title: "Share of each group’s preferences reaching "/g) || []).length === 2,
+  "both views share the px chart frame and carry a copy prop");
 assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),
   "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");
 assert.ok(ap.includes('{"One reading per contest: " + cap + "."}'),
