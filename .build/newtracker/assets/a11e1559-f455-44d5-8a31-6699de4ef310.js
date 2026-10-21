@@ -4176,6 +4176,23 @@ function PollLedger({ r, dirSegments }) {
               undecided, which sits inside the pair and changes how it reads */}
           {dirSegments[1].value != null &&
             <p className="pd-s pd-s-basis">({dirSegments[1].value}% unsure)</p>}
+          {/* the breakdowns this wave's own release printed (gen-data's
+              dir.bg: SEC Newgate's five states; Roy Morgan's gender pair and
+              voting-intention splits) – absent where the release printed
+              none. Same lines as the all-polls ledger's direction row, kept
+              in step with RdLgDir in rd-allpolls.jsx */}
+          {r.dir.bg && r.dir.bg.map((row, i) => (
+            <p key={i} className="pd-s pd-s-basis pd-s-dircut">
+              <em>{row.head}</em>{" "}
+              {row.cuts.map((c, j) => (
+                <React.Fragment key={j}>{j > 0 ? " · " : null}{c.label}{" "}
+                  {row.form === "wrong"
+                    ? <><b>{c.wrong}</b>{c.right != null && <span className="chg">&nbsp;(right {c.right})</span>}</>
+                    : <b>{c.right}–{c.wrong}</b>}
+                </React.Fragment>
+              ))}
+            </p>
+          ))}
         </PdSec>
       )}
 

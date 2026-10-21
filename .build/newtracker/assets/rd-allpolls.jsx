@@ -1785,6 +1785,31 @@ function RdLgDir({ p }) {
         <span>Wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b></span>
         <span className="rd-ldg-dirnet">Net <b>{rdApSigned(d.right - d.wrong).replace(/\.0$/, "")}</b></span>
       </div>
+      {/* the breakdowns THIS wave's own release printed (gen-data's dir.bg):
+          SEC Newgate's five states, Roy Morgan's gender pair and voting-
+          intention splits. Where a release printed no split there are no
+          lines. Party labels take the primary-meta inks, like the
+          Preferences line's party figures. */}
+      {d.bg && d.bg.length > 0 && (
+        <div className="rd-ldg-dircut">
+          {d.bg.map((row, ri) => (
+            <p className="rd-ldg-dircut-r" key={ri}>
+              <em className="rd-ldg-dircut-h">{row.head}</em>
+              {row.cuts.map((c) => (
+                <span className="rd-ldg-li" key={c.label}
+                  title={c.right != null
+                    ? c.label + ": " + rdApNum(c.right) + "% right direction, " + rdApNum(c.wrong) + "% wrong track"
+                    : c.label + ": " + rdApNum(c.wrong) + "% say wrong track"}>
+                  <em style={{ color: c.k && RD_AP_PRIM_META[c.k] ? RD_AP_PRIM_META[c.k].ink : null }}>{c.label}</em>{" "}
+                  {row.form === "wrong"
+                    ? <><b>{rdApNum(c.wrong)}</b>{c.right != null && <i className="rd-ldg-dircut-note"> (right {rdApNum(c.right)})</i>}</>
+                    : <b>{rdApNum(c.right)}–{rdApNum(c.wrong)}</b>}
+                </span>
+              ))}
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

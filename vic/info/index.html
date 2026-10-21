@@ -6291,6 +6291,12 @@ body.rd .rd-ldg-dirbar i { display: block; height: 100%; }
 body.rd .rd-ldg-dirk { margin-top: 8px; display: flex; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; }
 body.rd .rd-ldg-dirk b { font-weight: 600; color: var(--ink); }
 body.rd .rd-ldg-dirnet { margin-left: auto; }
+body.rd .rd-ldg-dircut { margin-top: 10px; }
+body.rd .rd-ldg-dircut-r { margin: 3px 0 0; display: flex; flex-wrap: wrap; column-gap: 14px; row-gap: 2px; font-size: 13px; }
+body.rd .rd-ldg-dircut-h { width: 100%; font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--ink-3); }
+body.rd .rd-ldg-dircut-r em { font-style: normal; }
+body.rd .rd-ldg-dircut-r b { font-weight: 600; font-variant-numeric: tabular-nums; }
+body.rd .rd-ldg-dircut-note { font-style: normal; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-ldg-conf { font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
 body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
@@ -31596,7 +31602,14 @@ function PollLedger({
     d: dirSegments[2].delta
   }))), dirSegments[1].value != null && React.createElement("p", {
     className: "pd-s pd-s-basis"
-  }, "(", dirSegments[1].value, "% unsure)")), r.seats && React.createElement(PdSec, {
+  }, "(", dirSegments[1].value, "% unsure)"), r.dir.bg && r.dir.bg.map((row, i) => React.createElement("p", {
+    key: i,
+    className: "pd-s pd-s-basis pd-s-dircut"
+  }, React.createElement("em", null, row.head), " ", row.cuts.map((c, j) => React.createElement(React.Fragment, {
+    key: j
+  }, j > 0 ? " · " : null, c.label, " ", row.form === "wrong" ? React.createElement(React.Fragment, null, React.createElement("b", null, c.wrong), c.right != null && React.createElement("span", {
+    className: "chg"
+  }, "\xA0(right ", c.right, ")")) : React.createElement("b", null, c.right, "\u2013", c.wrong)))))), r.seats && React.createElement(PdSec, {
     label: "Seat projection"
   }, React.createElement(SeatProjection, {
     seats: r.seats
@@ -59290,7 +59303,24 @@ function RdLgDir({
     }
   }, rdApNum(d.wrong))), React.createElement("span", {
     className: "rd-ldg-dirnet"
-  }, "Net ", React.createElement("b", null, rdApSigned(d.right - d.wrong).replace(/\.0$/, "")))));
+  }, "Net ", React.createElement("b", null, rdApSigned(d.right - d.wrong).replace(/\.0$/, "")))), d.bg && d.bg.length > 0 && React.createElement("div", {
+    className: "rd-ldg-dircut"
+  }, d.bg.map((row, ri) => React.createElement("p", {
+    className: "rd-ldg-dircut-r",
+    key: ri
+  }, React.createElement("em", {
+    className: "rd-ldg-dircut-h"
+  }, row.head), row.cuts.map(c => React.createElement("span", {
+    className: "rd-ldg-li",
+    key: c.label,
+    title: c.right != null ? c.label + ": " + rdApNum(c.right) + "% right direction, " + rdApNum(c.wrong) + "% wrong track" : c.label + ": " + rdApNum(c.wrong) + "% say wrong track"
+  }, React.createElement("em", {
+    style: {
+      color: c.k && RD_AP_PRIM_META[c.k] ? RD_AP_PRIM_META[c.k].ink : null
+    }
+  }, c.label), " ", row.form === "wrong" ? React.createElement(React.Fragment, null, React.createElement("b", null, rdApNum(c.wrong)), c.right != null && React.createElement("i", {
+    className: "rd-ldg-dircut-note"
+  }, " (right ", rdApNum(c.right), ")")) : React.createElement("b", null, rdApNum(c.right), "\u2013", rdApNum(c.wrong))))))));
 }
 const RD_LG_PREFS_REGIONS = [["inner", "Inner metro"], ["outer", "Outer metro"], ["regional", "Regional"], ["all", "All regions"]];
 const RD_LG_PREFS_ALL = "All regions is this site’s weighting of the three regions DemosAU prints: each region’s 2025 enrolment times the group’s vote there in this MRP";

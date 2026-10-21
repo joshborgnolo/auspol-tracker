@@ -3865,6 +3865,13 @@ body.rd .rd-ldg-dirbar i { display: block; height: 100%; }
 body.rd .rd-ldg-dirk { margin-top: 8px; display: flex; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; }
 body.rd .rd-ldg-dirk b { font-weight: 600; color: var(--ink); }
 body.rd .rd-ldg-dirnet { margin-left: auto; }
+/* the release's own printed splits under the national direction bar */
+body.rd .rd-ldg-dircut { margin-top: 10px; }
+body.rd .rd-ldg-dircut-r { margin: 3px 0 0; display: flex; flex-wrap: wrap; column-gap: 14px; row-gap: 2px; font-size: 13px; }
+body.rd .rd-ldg-dircut-h { width: 100%; font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--ink-3); }
+body.rd .rd-ldg-dircut-r em { font-style: normal; }
+body.rd .rd-ldg-dircut-r b { font-weight: 600; font-variant-numeric: tabular-nums; }
+body.rd .rd-ldg-dircut-note { font-style: normal; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-ldg-conf { font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
 /* the lines: a label, then units that wrap between themselves, never inside */

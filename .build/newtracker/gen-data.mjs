@@ -2377,6 +2377,51 @@ const directionGroups = (() => {
   return Object.keys(out).length ? out : null;
 })();
 
+/* The same two banks again, joined onto single waves so an expanded poll
+   can list, under its national direction line, the breakdowns ITS OWN
+   release printed: SEC Newgate's five-state perceived-direction table
+   (banked per wave-END month) and Roy Morgan's release-prose gender /
+   voting-intention splits (banked per release date). Figures as printed –
+   never house-adjusted or smoothed. A wave whose release printed no split
+   carries nothing (Roy Morgan's state-extremes-only fortnights; every
+   other house), and availability is per-wave.
+   Attached HERE because the loaders above hadn't landed when DIR_BY was
+   computed – decorate the committed DIR_BY entries in place and dir's
+   three emitters (directionOnlyPolls, §6 individualPolls, §6c Latest)
+   carry `bg` automatically. */
+{
+  const attach = (key, rows) => { const e = DIR_BY.get(key); if (e && rows) e.bg = rows; };
+  if (SEC_STATES?.series) {
+    // the states bank keys by month; a wave's own month is tried first,
+    // then publication month, then the fieldwork-start month (the Nov-2025
+    // wave ended in the report's month but ran from October)
+    for (const d of DIR) {
+      if (d.pollster !== "SEC Newgate") continue;
+      const ym = [d.date, d.published, d.dateStart].filter(Boolean).map((s) => ymOf(String(s).slice(0, 10)))
+        .find((m) => (SEC_STATES.states || []).some((st) => (SEC_STATES.series[st] || []).some((r) => r.month === m)));
+      if (!ym) continue;
+      const cuts = (SEC_STATES.states || [])
+        .map((st) => { const r = (SEC_STATES.series[st] || []).find((x) => x.month === ym); return r ? { label: st, right: r.right, wrong: r.wrong ?? null } : null; })
+        .filter((c) => c && c.wrong != null);
+      if (cuts.length) attach(d.date + "|" + d.pollster, [{ head: "By state, per cent right–wrong:", cuts }]);
+    }
+  }
+  if (RM_DIR_GROUPS?.waves) {
+    const partOf = { "One Nation": "onp", "L-NP": "lnp", "ALP": "alp", "Greens": "grn", "Independent": "ind", "Other": "oth" };
+    const labOf = { "One Nation": "One Nation", "L-NP": "Coalition", "ALP": "Labor", "Greens": "Greens", "Independent": "Independents", "Other": "Other parties" };
+    for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
+      const rows = [];
+      if (w.gender)
+        rows.push({ head: "By gender, per cent right–wrong:",
+          cuts: ["Men", "Women"].filter((g) => w.gender[g]).map((g) => ({ label: g, right: w.gender[g].r ?? null, wrong: w.gender[g].w })) });
+      if (w.vote)
+        rows.push({ head: "By voting intention, per cent saying wrong track:", form: "wrong",
+          cuts: Object.keys(labOf).filter((g) => w.vote[g]).map((g) => ({ label: labOf[g], k: partOf[g], right: w.vote[g].r ?? null, wrong: w.vote[g].w })) });
+      if (rows.length) attach(date + "|Roy Morgan", rows);
+    }
+  }
+}
+
 /* ---- per-poll leadership / alt builders -------------------------------- */
 const oppKey = JUR
   ? (name) => (name === JUR.eras.opp[JUR.eras.opp.length - 1].name ? "taylor" : "ley")   // see eraOf
