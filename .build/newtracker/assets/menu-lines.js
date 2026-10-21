@@ -289,7 +289,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
      head themselves with these, and the menu quotes them */
   AP.PAGE_HEAD = {
     "flows-explained": "There are two ways to get a two-party figure from a poll",
-    "public-opinion": "Australians' views on topical subjects",
+    "public-opinion": "Australians’ views on topical subjects",
     info: "Answers to questions you may have",
   };
 
