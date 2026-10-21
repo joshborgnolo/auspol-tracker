@@ -137291,9 +137291,8 @@ function Header({
       if (ss) ss.inert = true;
     };
   }, [staticView]);
-  const TAGLINE_N = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
   const pastTerms = D.cycles.filter(c => !c.current).length;
-  const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
+  const pastFirst = pastTerms ? Math.min(...D.cycles.filter(c => !c.current).map(c => c.year)) : null;
   const J = window.JUR;
   const rdLatest = rd ? D.latest.newest || null : null;
   const rdLatestUrl = rdLatest ? rdLatest.releaseUrl || rdLatest.url : null;
@@ -137369,11 +137368,11 @@ function Header({
     className: "tagline"
   }, "Aggregated opinion polling for the next Australian ", React.createElement("br", {
     className: "tagline-br"
-  }), "federal election, set against the last ", pastWord, ".") : React.createElement("p", {
+  }), "federal election, and for all since ", pastFirst, ".") : React.createElement("p", {
     className: "tagline"
   }, "Aggregated opinion polling for the next ", J.electionWords.split(" ")[0], " ", React.createElement("br", {
     className: "tagline-br"
-  }), J.electionWords.split(" ").slice(1).join(" "), " election", pastTerms ? ", set against the last " + pastWord : "", "."), React.createElement("div", {
+  }), J.electionWords.split(" ").slice(1).join(" "), " election", pastTerms ? ", and for all since " + pastFirst : "", "."), React.createElement("div", {
     className: "head-meta-compact",
     "aria-hidden": "true"
   }, React.createElement("span", {

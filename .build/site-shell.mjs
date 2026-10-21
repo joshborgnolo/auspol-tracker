@@ -172,7 +172,7 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
     .replace(/<[^>]+>/g, "").replace(/\s+/g, "");
   const track = one(/className="wm-track"[^>]*>([^<]+)</, "wordmark track");
   const sr = one(/className="wm-sr">([^<]+)</, "wordmark screen-reader suffix");
-  const tagM = headSrc.match(/className="tagline">([\s\S]*?)\{pastWord\}([\s\S]*?)<\/p>/);
+  const tagM = headSrc.match(/className="tagline">([\s\S]*?)\{pastFirst\}([\s\S]*?)<\/p>/);
   if (!tagM) miss("tagline", "the header asset");
   const tagA = unesc(tagM[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").replace(/\s*$/, "") + " ";
   const tagB = unesc(tagM[2].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
@@ -324,7 +324,7 @@ export function shellHeader({ tab, menu } = {}) {
      compact names the newest poll rather than just the day it landed – all
      filled off auspol-now.json. Every WORD here is CHROME's (mainChrome()),
      the main page's own text lifted at apply time, so this markup only ever
-     decides shape; the .sh-past count is the one placeholder, filled live.
+     decides shape; the .sh-past year is the one placeholder, filled live.
      ("The interactive tracker" wordmark link title stays the shell's own –
      the main page's wordmark is a heading, not a link, and has none.) */
   return `<a class="sh-skip" href="#sh-content">${C.skip}</a>
@@ -345,7 +345,7 @@ export function shellHeader({ tab, menu } = {}) {
       </a>
       <span id="wm-action" hidden>${C.dial.action}</span>
     </div>
-    <p class="sh-tagline">${C.tagline.a}<span class="sh-past">twenty</span>${C.tagline.b}</p>
+    <p class="sh-tagline">${C.tagline.a}<span class="sh-past">1943</span>${C.tagline.b}</p>
     <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>${C.compact.b}</b> <span class="sh-latest"></span>${C.compact.sep}<span class="sh-rel"></span>${C.compact.sep}<span class="sh-npolls"></span> ${C.meta.polls}</span></p>
     </div>
     <div class="sh-right">
@@ -1277,7 +1277,7 @@ ${npProjectSrc()}
     if (next && window.ResizeObserver) new ResizeObserver(function () { fitNext(); }).observe(next.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitNext(); });
   };
-  /* the masthead's status block, tagline count and compact line, as the
+  /* the masthead's status block, tagline year and compact line, as the
      main page's Header fills them (rd-head-meta / rd-head-compact); the
      freshness reading is its freshness() (73de0c58…js): whole Sydney
      calendar days, fresh to a week, aging to three */
@@ -1346,7 +1346,7 @@ ${npProjectSrc()}
     }
     var tag = document.querySelector(".sh-tagline");
     if (tag && cp.tagline) {
-      var past0 = tag.querySelector(".sh-past"), pastNow = past0 ? past0.textContent : "twenty";
+      var past0 = tag.querySelector(".sh-past"), pastNow = past0 ? past0.textContent : "1943";
       tag.innerHTML = esc(cp.tagline.a) + '<span class="sh-past">' + esc(pastNow) + "</span>" + esc(cp.tagline.b);
     }
     var skip = document.querySelector(".sh-skip");

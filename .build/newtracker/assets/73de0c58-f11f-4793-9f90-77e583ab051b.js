@@ -346,15 +346,12 @@ function Header({ isDark, onToggleTheme, rd }) {
       if (ss) ss.inert = true;
     };
   }, [staticView]);
-  /* "The last N" counts the PAST terms in the cycle data (the Now term
-     excluded), so a new Past-cycles term renumbers the sentence on its own.
-     Spelled out to twenty; elections come ~3-yearly, so the digit fallback
-     is decades away. */
-  const TAGLINE_N = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
-                     "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
-                     "eighteen","nineteen","twenty"];
+  /* The tagline dates its back-history from the EARLIEST past term in the
+     cycle data (the Now term excluded), so a Past-cycles extension further
+     back re-dates the sentence on its own. pastTerms stays the guard for a
+     jurisdiction with no past terms at all: the clause then stays off. */
   const pastTerms = D.cycles.filter((c) => !c.current).length;
-  const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
+  const pastFirst = pastTerms ? Math.min(...D.cycles.filter((c) => !c.current).map((c) => c.year)) : null;
   /* /vic/'s words (window.JUR): "vicpol", "Victorian state". Each line the
      satellites' shell lifts from this source (site-shell.mjs parseChrome)
      keeps its federal redesign JSX verbatim; the jurisdiction's variant AND
@@ -449,8 +446,8 @@ function Header({ isDark, onToggleTheme, rd }) {
         {/* plain text: the design flip this sentence used to carry moved
             off the page 2026-10-03; the old design is viewable at
             ?design=old while its code ships (see the design flag below). */}
-        {!J ? <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
-            : <p className={"tagline"}>Aggregated opinion polling for the next {J.electionWords.split(" ")[0]} <br className="tagline-br"></br>{J.electionWords.split(" ").slice(1).join(" ")} election{pastTerms ? ", set against the last " + pastWord : ""}.</p>}
+        {!J ? <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, and for all since {pastFirst}.</p>
+            : <p className={"tagline"}>Aggregated opinion polling for the next {J.electionWords.split(" ")[0]} <br className="tagline-br"></br>{J.electionWords.split(" ").slice(1).join(" ")} election{pastTerms ? ", and for all since " + pastFirst : ""}.</p>}
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
                 onClick={() => setStaticView(true)}></span>{" "}

@@ -507,12 +507,13 @@ const raceLine = (v) => {
    preferred section; this is the tag the figure itself carries. */
 const basisClause = (v) => v.basis === "imp" ? " on implied preference flows" : "";
 
-/* "Set against the last N" in the tagline / meta copy is the count of PAST
-   federal terms the tracker has cycles for, derived from the cycle-source
-   rows (one key per past term; the Now term is never among them) so a new
-   Past-cycles term renumbers the sentence on its own. Spelled out to
-   thirty-one – the 1943-58 batch extension already sits the count there,
-   and the digit fallback covers whatever comes after. */
+/* "The last N elections" in the meta description is the count of PAST
+   federal terms the tracker has cycles for; the tagline's "since YYYY" is
+   the same rows' EARLIEST year. Both are derived from the cycle-source rows
+   (one key per past term; the Now term is never among them) so a new
+   Past-cycles term renumbers or re-dates the copy on its own. Spelled out
+   to thirty-one – the 1943-58 batch extension already sits the count
+   there, and the digit fallback covers whatever comes after. */
 const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
                            "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
                            "eighteen","nineteen","twenty","twenty-one","twenty-two","twenty-three",
@@ -520,11 +521,18 @@ const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven
                            "twenty-nine","thirty","thirty-one"];
 /* Called from the tagline, the meta description and the summary table –
    ~240KB of JSON parsed once, not per call. cycle-source.json is gen-data's
-   last word for the whole build, so the count cannot move mid-run. */
-let pastCycleN = null;
+   last word for the whole build, so neither can move mid-run. */
+let pastCycleKeys = null;
+function pastCycleRows() {
+  if (pastCycleKeys == null) pastCycleKeys = Object.keys(JSON.parse(fs.readFileSync(DA("cycle-source.json"), "utf8")));
+  return pastCycleKeys;
+}
 function pastCycleWord() {
-  if (pastCycleN == null) pastCycleN = Object.keys(JSON.parse(fs.readFileSync(DA("cycle-source.json"), "utf8"))).length;
-  return CYCLE_COUNT_WORDS[pastCycleN] || String(pastCycleN);
+  const n = pastCycleRows().length;
+  return CYCLE_COUNT_WORDS[n] || String(n);
+}
+function pastCycleFirst() {
+  return Math.min(...pastCycleRows().map(Number));
 }
 
 const fav = buildFavicon();
@@ -577,7 +585,7 @@ const shellNow = (() => {
                      factUrl: newest ? newest.url : null,
                      // a TBC links where the fieldwork dates will appear, as on the main page
                      ...(newest && newest.fieldPending ? { factHouse: newest.pollster, factTbcUrl: newest.fieldUrl || null } : {}) },
-           past: pastCycleWord(), pollCadence: grab("pollCadence") };
+           past: String(pastCycleFirst()), pollCadence: grab("pollCadence") };
 })();
 /* The masthead's words and artwork as the main page renders them, lifted by
    site-shell.mjs's mainChrome() into the `copy` block: site-shell.js swaps
@@ -887,7 +895,7 @@ function buildStaticSummary() {
 
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last ${pastCycleWord()}.
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, and for all since ${pastCycleFirst()}.
         ${raceLine(L)} two-party preferred${basisClause(L)} (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
