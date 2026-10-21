@@ -6,8 +6,10 @@
      wrong-shares (Labor voters' right share in the "(right N)" tail)
    · Essential waves → gender pair (Men/Women) + age trio (18–34/35–54/55+)
      trend cuts from the assimilated CSV, matched by printed headline
-   · waves with no printed split (RM 2026-10-11, every row still inside
-     the file's own copy) → NO breakdown line
+   · Roy Morgan's extremes-only fortnights (2026-09-27, 2026-10-11) →
+     the printed state-extremes line ("State extremes, % wrong track:"),
+     with no gender/vote rows (user report 2026-10-21: "is missing qld
+     –68.5, SA –54")
    Also pins the cell-row CSS actually applying (13px cells, 11px heads). */
 import http from "node:http";
 import fs from "node:fs";
@@ -69,7 +71,7 @@ console.log("rows walked:", rows.length);
 ok("no boundary anywhere", rows.every((r) => !r.boundary));
 
 const byKey = (frag, date) => rows.find((r) => r.name.includes(frag) && r.name.includes(date) && r.cuts);
-const byKeyAbs = (frag, date) => rows.find((r) => r.name.includes(frag) && r.name.includes(date));
+
 
 // SEC Newgate 2026-09-14 → 2026-09 state table
 const sec = byKey("SEC Newgate", "Sep 2026") || rows.find((r) => r.name.includes("SEC Newgate") && r.cuts);
@@ -92,9 +94,16 @@ if (rm) {
       && /Independents 60/.test(t) && /Greens 59/.test(t), t.slice(0, 260));
   ok("RM Labor right-share tail", /Labor 26\ ?\(right 54\)/.test(t), t.slice(0, 300));
 }
-// Roy Morgan 2026-10-11 (state-extremes-only fortnight) → no breakdown line
-const rm2 = byKeyAbs("Roy Morgan", "Oct 2026");
-ok("RM 2026-10-11 has NO breakdown line", !rm2 || !rm2.cuts, rm2 ? rm2.name + " cuts=" + (rm2.cuts || "").slice(0, 60) : "(row not in walked set)");
+// Roy Morgan 2026-10-11 wave (28 Sep–11 Oct) → the printed state extremes
+// QLD 68.5 / SA 54 (user report above); the facet row's first line is
+// pollster-only, so the wave is found by its figures, never a date string
+const rm2 = rows.find((r) => r.name.includes("Roy Morgan") && r.cuts && r.cuts.includes("QLD 68.5"));
+ok("RM 2026-10-11 wave carries its state-extremes line", !!rm2
+  && rm2.cuts.replace(/\s+/g, " ").includes("State extremes, % wrong track:") && rm2.cuts.includes("SA 54"),
+  rm2 ? "" : "(no such row in walked set)");
+// Roy Morgan 2026-09-27 (the other extremes-only fortnight) rides the same line
+const rm3 = rows.find((r) => r.name.includes("Roy Morgan") && r.cuts && r.cuts.includes("WA 70.5"));
+ok("RM 2026-09-27 carries its state-extremes line", !!rm3 && rm3.cuts.replace(/\s+/g, " ").includes("State extremes, % wrong track:") && rm3.cuts.includes("SA 56.5"), rm3 ? "" : "(no such row in walked set)");
 // Essential 2026-09-29 → gender + age trend cuts from the CSV (user
 // report 2026-10-21: "it's missing for Essential / 24–29 Sep")
 const ess = rows.filter((r) => r.name.includes("Essential") && r.cuts)

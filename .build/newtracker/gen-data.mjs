@@ -2405,14 +2405,16 @@ const directionGroups = (() => {
    can list, under its national direction line, the breakdowns ITS OWN
    release printed: SEC Newgate's five-state perceived-direction table
    (banked per wave-END month), Roy Morgan's release-prose gender /
-   voting-intention splits (banked per release date), and Essential's
+   voting-intention splits plus its printed state extremes (banked per
+   release date; the full state table is paywalled, so the release's
+   named most/least states are the only state cut there is), and
+   Essential's
    national-mood gender / age trend cuts (banked per report date in the
    assimilated CSV; the wave is found by its printed headline figures,
    not its date – the Guardian stamp wanders a day either way).
    Figures as printed – never house-adjusted or smoothed. A wave whose
-   release printed no split carries nothing (Roy Morgan's
-   state-extremes-only fortnights; every other house), and availability
-   is per-wave.
+   release printed no split at all carries nothing, and availability is
+   per-wave.
    Attached HERE because the loaders above hadn't landed when DIR_BY was
    computed – decorate the committed DIR_BY entries in place and dir's
    three emitters (directionOnlyPolls, §6 individualPolls, §6c Latest)
@@ -2437,6 +2439,7 @@ const directionGroups = (() => {
   if (RM_DIR_GROUPS?.waves) {
     const partOf = { "One Nation": "onp", "L-NP": "lnp", "ALP": "alp", "Greens": "grn", "Independent": "ind", "Other": "oth" };
     const labOf = { "One Nation": "One Nation", "L-NP": "Coalition", "ALP": "Labor", "Greens": "Greens", "Independent": "Independents", "Other": "Other parties" };
+    const RM_STATE_ABBR = { "New South Wales": "NSW", Victoria: "VIC", Queensland: "QLD", "South Australia": "SA", "Western Australia": "WA", Tasmania: "TAS", "Australian Capital Territory": "ACT", "Northern Territory": "NT" };
     for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
       const rows = [];
       if (w.gender)
@@ -2445,6 +2448,12 @@ const directionGroups = (() => {
       if (w.vote)
         rows.push({ head: "By voting intention, % saying wrong track:", form: "wrong",
           cuts: Object.keys(labOf).filter((g) => w.vote[g]).map((g) => ({ label: labOf[g], k: partOf[g], right: w.vote[g].r ?? null, wrong: w.vote[g].w })) });
+      // the release's printed state extremes – the full table is paywalled,
+      // so the named most/least pair is the whole state cut; abbreviations
+      // match the SEC bank's so the two state rows read alike
+      if (w.stateExtremes)
+        rows.push({ head: "State extremes, % wrong track:", form: "wrong",
+          cuts: ["highest", "lowest"].map((tag) => ({ label: RM_STATE_ABBR[w.stateExtremes[tag].state] ?? w.stateExtremes[tag].state, wrong: w.stateExtremes[tag].w })) });
       if (rows.length) attach(date + "|Roy Morgan", rows);
     }
   }
