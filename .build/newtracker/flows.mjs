@@ -317,3 +317,58 @@ export const FLOW_HISTORY = Object.freeze({
   onp: [null, 46.3, 44.1, 43.6, null, null, null, 49.5, 34.8, 35.7, 25.5],
   oth: [50.9, 55.2, 57.0, 44.3, 44.5, 41.6, 46.7, 49.2, 46.1, 50.0, 54.5],
 });
+
+/* FLOW_HISTORY_SENATE – the Senate's own display series, the four elections
+   since group voting tickets were abolished (the GVT era ran party tickets,
+   so no per-ballot CSVs exist before it and no flows can be computed). No
+   official Senate flow table exists, so these are counted from the AEC's
+   ballot-level formal-preferences zips by senate-atl/analyse_atl_flows.py
+   and pinned to its counts (.build/aec-flow-src/senate-atl/counts.json,
+   test-senate-atl-flows.mjs recomputes every figure from them). Above-the-
+   line papers only: a figure is the share of the family's papers naming at
+   least one major party that named Labor first; each *Nei array is the one
+   the House series lacks – the share of the family's papers naming neither
+   major ("named neither major", NOT "exhausted": many of those ballots went
+   on to elect a crossbench senator). null = the family had no above-the-line
+   tickets in that state that election (One Nation in the ACT all four, the
+   NT until 2025). Display history, NOT an estimator input. */
+export const FLOW_HISTORY_SENATE = Object.freeze({
+  years: [2016, 2019, 2022, 2025],
+  grn: [86.9, 86.3, 89.2, 91.0], grnNei: [15.3, 12.9, 10.3, 9.5],
+  onp: [47.1, 32.9, 37.0, 19.9], onpNei: [46.6, 36.1, 44.8, 24.4],
+  oth: [49.3, 43.5, 53.5, 50.6], othNei: [35.5, 35.7, 37.3, 30.7],
+  states: Object.freeze({
+    nsw: { label: "New South Wales",           short: "NSW",
+           grn: [89.3, 88.6, 88.3, 90.2], grnNei: [16.1, 16.9, 10.6, 12.4],
+           onp: [48.4, 36.2, 38.2, 18.0], onpNei: [46.3, 41.8, 47.5, 28.1],
+           oth: [43.9, 45.1, 55.1, 43.1], othNei: [36.7, 40.3, 38.7, 35.6] },
+    vic: { label: "Victoria",                  short: "Vic",
+           grn: [88.6, 88.9, 92.1, 93.4], grnNei: [16.1, 12.4, 9.2, 8.4],
+           onp: [49.8, 37.5, 36.6, 21.4], onpNei: [51.2, 41.0, 48.1, 23.0],
+           oth: [55.3, 47.1, 54.9, 58.3], othNei: [39.0, 37.6, 39.8, 29.6] },
+    qld: { label: "Queensland",                short: "Qld",
+           grn: [87.6, 84.6, 87.2, 92.2], grnNei: [18.9, 14.0, 13.1, 10.4],
+           onp: [46.2, 29.1, 35.5, 21.8], onpNei: [49.1, 35.1, 41.9, 26.3],
+           oth: [49.5, 38.2, 49.7, 47.5], othNei: [41.9, 36.4, 42.1, 36.6] },
+    wa:  { label: "Western Australia",         short: "WA",
+           grn: [76.9, 79.6, 89.5, 86.9], grnNei: [11.8, 9.6, 9.5, 6.8],
+           onp: [39.2, 27.9, 43.0, 17.5], onpNei: [35.5, 23.6, 46.6, 17.0],
+           oth: [39.1, 34.4, 52.2, 44.7], othNei: [28.1, 26.0, 35.7, 25.3] },
+    sa:  { label: "South Australia",           short: "SA",
+           grn: [86.4, 84.2, 86.4, 88.8], grnNei: [12.8, 8.6, 8.8, 6.6],
+           onp: [54.4, 40.3, 30.0, 18.9], onpNei: [41.7, 29.8, 38.1, 19.1],
+           oth: [55.3, 45.5, 45.5, 44.7], othNei: [21.0, 24.3, 27.6, 22.5] },
+    tas: { label: "Tasmania",                  short: "Tas",
+           grn: [86.7, 84.6, 90.5, 92.8], grnNei: [13.7, 4.4, 7.6, 5.6],
+           onp: [57.2, 37.6, 48.6, 26.6], onpNei: [35.3, 18.7, 35.1, 18.1],
+           oth: [59.1, 45.5, 56.3, 59.6], othNei: [26.7, 13.7, 22.3, 19.8] },
+    act: { label: "Australian Capital Territory", short: "ACT",
+           grn: [90.0, 88.5, 92.2, 92.9], grnNei: [1.8, 0.7, 4.8, 0.6],
+           onp: [null, null, null, null], onpNei: [null, null, null, null],
+           oth: [53.4, 48.4, 71.1, 76.1], othNei: [9.2, 2.5, 9.0, 0.8] },
+    nt:  { label: "Northern Territory",        short: "NT",
+           grn: [76.9, 80.6, 84.1, 84.5], grnNei: [1.6, 3.0, 1.8, 1.6],
+           onp: [null, null, null, 20.0], onpNei: [null, null, null, 3.6],
+           oth: [36.9, 45.0, 39.5, 61.2], othNei: [3.2, 8.3, 4.7, 4.2] },
+  }),
+});

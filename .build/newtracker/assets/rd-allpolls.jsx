@@ -5631,7 +5631,10 @@ function RdFlows({ measure }) {
    at the foot. With JavaScript off the slot is simply an empty div and the
    text flows on. The data is window.AUSPOL.flowHistory (one home,
    gen-data): the federal FLOW_HISTORY counts, the AEC's per-state cuts of
-   them (fed.states, 2004-2025, counts), and each state's ESTIMATES (the
+   them (fed.states, 2004-2025, counts), the SENATE's above-the-line flows
+   beside them (fed.sen + fed.sen.states, counted from the AEC's ballot-
+   level formal-preferences files, 2016-2025 - the House: control flips the
+   bank, user 2026-10-22), and each state's ESTIMATES (the
    two-class pile model, .build/estimate-state-flows.py), so a jurisdiction
    appears in the menu the build its estimates land. A state carries
    `estimated` and each point's 90% error (grnErr/onpErr/othErr), drawn as a
@@ -5642,7 +5645,8 @@ function RdFlows({ measure }) {
    Since 2026-10-21 (user call: "consistent with the design of other
    charts") the figure is a site chart card: contest tabs (RdTabs, the
    /flows/ page's views) with the Share flip in the tab row (the All polls
-   idiom), a .rd-chead title naming measure, unit and scope, the elections
+   idiom) and the House: flip beside it (user 2026-10-22, Lower ⇄ Upper),
+   a .rd-chead title naming measure, unit and scope, the elections
    menu on that head (the /flows/ drift chart's highlight-menu idiom, a
    native select in place of two rows of chips), a px-sized TrendChart on
    Past cycles' half-column frame, the phone's key over the chart, the
@@ -5676,14 +5680,22 @@ const ExHollowX = () => (
 const ExBarSwatch = () => (
   <svg width="12" height="16" viewBox="0 0 12 16" aria-hidden="true"><rect x="4" y="1" width="4" height="14" rx="1" style={{ fill: "var(--ink-3)", opacity: 0.55 }} /></svg>
 );
-function ExplainedFlowChart({ jur, inv, stateKey, classKey, menu }) {
+function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
+  /* the House: control's Upper bank (fed.sen, FH.fed.sen.states): the
+     Senate's above-the-line flows, counted from the AEC's ballot-level
+     formal-preferences files for the four post-GVT elections. A fed:<key>
+     pick reads the bank's own per-state cut; classifications stay a House
+     feature, so a classKey picks nothing here */
+  const SEN = house === "sen" ? ((FH.fed || {}).sen || null) : null;
   /* stateKey picks a per-state cut of the FEDERAL counts (AEC per-state TPP
      tables, 2004–2025); classKey its per-seat-type cut (the AEC's per-
      division TCP tables, grouped by its own per-election classifications,
      2007–2025). Both are counts, so neither draws error bars */
-  const S = (jur === "fed" && stateKey && ((FH.fed.states || {})[stateKey]))
+  const S = (SEN && stateKey && ((SEN.states || {})[stateKey]))
+    || SEN
+    || (jur === "fed" && stateKey && ((FH.fed.states || {})[stateKey]))
     || (jur === "fed" && classKey && ((FH.fed.classes || {})[classKey]))
     || FH[jur] || FH.fed;
   if (!S) return null;
@@ -5695,6 +5707,11 @@ function ExplainedFlowChart({ jur, inv, stateKey, classKey, menu }) {
   /* a counted state (NSW, from its ballot-level data) draws no bar, but NSW
      voters may stop numbering, so each point says what share exhausted */
   const cnt = !!S.counted;
+  /* the Senate bank (national `senate` or a state's `senState`): every ATL
+     ballot is live at the count's end, so "exhausted" never applies - the
+     tooltip instead gives the share of the group's ATL papers that named
+     NEITHER major (the nei arrays gen-data carries beside each line) */
+  const sen = !!(S.senate || S.senState);
   const parties = FLOW_PARTIES.filter((p) => (S[p.id] || []).some((v) => v != null));
   /* bars wherever a point carries an error: every state estimate, and the
      federal series' 1984-93 estimates ahead of its 1996-2025 counts (user
@@ -5717,8 +5734,10 @@ function ExplainedFlowChart({ jur, inv, stateKey, classKey, menu }) {
         // an estimate's 90% miss, then (optional preferential years) the
         // share of the pile that reached neither Labor nor the Coalition -
         // "about" on an estimate: it missed NSW's counted shares by up to 3
+        const nei = S[p.id + "Nei"] || [];
         const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null,
-          exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+          sen && nei[i] != null ? "named neither major: " + nei[i].toFixed(1) + "%" : null,
+          !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({ x: YEARS[i], y: T(val), ...(note ? { note } : null) });
       }
     });
@@ -5770,7 +5789,13 @@ function ExplainedFlowChart({ jur, inv, stateKey, classKey, menu }) {
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
   const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
   const noBars = " Counts carry no estimation error, so they have no bars.";
-  const cap = est
+  const cap = sen
+    ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching."
+      + (S.senState
+        ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero."
+          + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "")
+        : "")
+    : est
     ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length
       ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
       : "") + stateCut
@@ -5796,18 +5821,19 @@ function ExplainedFlowChart({ jur, inv, stateKey, classKey, menu }) {
         {menu}
       </div>
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
-      <TrendChart key={"ex-fl-" + jur + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
+      <TrendChart key={"ex-fl-" + (house || "rep") + jur + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
         series={series} areas={areas} spine={YEARS.map((x) => ({ x }))}
         tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
-        ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
+        ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (sen ? ", above-the-line Senate ballots" : "") + (est ? ", estimated" : "") + ", " + span}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
-                sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second."
+                sub: rdCap(S.elections || S.label + " elections") + ". " + (sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party."
+                  : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second."
                   : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996."
                   : "Counted, election by election, so no error bars."),
-                caption: hasErr ? (fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections.") : undefined,
+                caption: sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : (hasErr ? (fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections.") : undefined),
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={est ? [] : [{ kind: "line", color: "var(--ink-3)", label: fedEst ? "Counted flow, 1996 on" : "Counted flow at each election" }]}>
@@ -5942,6 +5968,18 @@ function RdExplained() {
   const jur = fedView ? "fed" : (FH[view] ? view : "fed");
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
   const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;
+  /* the House: control (user 2026-10-22): "rep" reads the House banks,
+     "sen" FH.fed.sen - the Senate's above-the-line flows, counted from the
+     AEC's ballot-level files. The federal menu section stays live under
+     Upper (both banks carry the eight states, so a fed:<key> pick survives
+     the flip); seat classifications and the state-ELECTIONS optgroup are
+     House features, and the Labor v One Nation tab has no Senate bank, so
+     flipping to Upper snaps those picks back (to "fed" / the Coalition
+     contest). The toggle renders only where the build ships the bank - the
+     Vic page never carries it */
+  const SEN_BANK = (FH.fed && FH.fed.sen) || null;
+  const SEN_STATES = (SEN_BANK && SEN_BANK.states) || {};
+  const [house, setHouse] = useState("rep");
   const [inv, setInv] = useState(false);
   /* the contest tabs flip Labor v Coalition (the flowHistory election
      histories) to Labor v One Nation (the measured flowForced.bys contests;
@@ -5949,6 +5987,17 @@ function RdExplained() {
      alone — no state-by-state counts exist for the One Nation pairing. */
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
+  /* flipping to Upper snaps the House-only picks away (a class view, a
+     state-election view, the One Nation contest tab); flipping back to
+     Lower never needs a snap - every Senate pick is a House pick too */
+  const flipHouse = () => {
+    const next = house === "sen" ? "rep" : "sen";
+    setHouse(next);
+    if (next === "sen") {
+      if (pair === "on") setPair("co");
+      if (classKey || !fedView) setView("fed");
+    }
+  };
   React.useLayoutEffect(() => {
     /* the static-summary twin of this article carries the same #ex-fig-flow
        slot and sits earlier in the document, hidden (opacity 0) once the app
@@ -6063,23 +6112,32 @@ function RdExplained() {
   }, []);
   const stateKeys = Object.keys(FED_STATES);
   const classKeys = Object.keys(FED_CLASSES);
+  const senStateKeys = Object.keys(SEN_STATES);
   /* the menu's option values in the <select>'s DOM order - the up/down
      walk below steps this exact list (the hover claim proxies the control's
-     own arrows, which for a native select is line-by-line) */
-  const VIEW_OPTS = (KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0)
-    ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...classKeys.map((k) => "fedcl:" + k),
-       ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
-    : [];
-  const menu = (KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0) ? (
+     own arrows, which for a native select is line-by-line). Under House:
+     Upper the federal entries ride SEN_STATES (same fed:<key> values,
+     re-read from the Senate bank) and the House-only sections leave */
+  const VIEW_OPTS = house === "sen"
+    ? (SEN_BANK ? ["fed", ...senStateKeys.map((k) => "fed:" + k)] : [])
+    : ((KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0)
+      ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...classKeys.map((k) => "fedcl:" + k),
+         ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
+      : []);
+  const menuShow = house === "sen" ? VIEW_OPTS.length > 1 : VIEW_OPTS.length > 0;
+  const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
-            value={stateKey ? "fed:" + stateKey : classKey ? "fedcl:" + classKey : jur}
+            value={stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
             onChange={(e) => setView(e.target.value)}>
       <optgroup label="Federal elections">
         <option value="fed">Federal, national</option>
-        {stateKeys.map((k) => <option key={k} value={"fed:" + k}>{"Federal, " + (FED_STATES[k].short || FED_STATES[k].label)}</option>)}
-        {classKeys.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)}</option>)}
+        {(house === "sen" ? senStateKeys : stateKeys).map((k) => {
+          const bank = house === "sen" ? SEN_STATES : FED_STATES;
+          return <option key={k} value={"fed:" + k}>{"Federal, " + (bank[k].short || bank[k].label)}</option>;
+        })}
+        {house !== "sen" && classKeys.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)}</option>)}
       </optgroup>
-      {KEYS.length > 1 && (
+      {house !== "sen" && KEYS.length > 1 && (
         <optgroup label="State elections">
           {KEYS.filter((k) => k !== "fed").map((k) => <option key={k} value={k}>{(FH[k].short || FH[k].label) + " state elections"}</option>)}
         </optgroup>
@@ -6100,7 +6158,22 @@ function RdExplained() {
       </button>
     </span>
   );
-  const headCtls = narrow ? <span className="ex-fl-ctls">{pair === "co" ? menu : null}{share}</span> : (pair === "co" ? menu : null);
+  /* the House: flip (user 2026-10-22), the same idiom beside Share: - the
+     button shows the ACTIVE chamber ("Lower" reads the House banks' seat
+     counts, "Upper" the Senate's above-the-line ballots). It sits in the
+     tab row on both contests so a flip off the One Nation tab snaps it to
+     the Coalition contest, which is the Senate bank's only pairing */
+  const houseCtl = SEN_BANK ? (
+    <span className="rd-pl-ctl ex-house">
+      <span className="rd-pl-ctl-l">House:</span>
+      <button type="button" className="rd-pl-flip" aria-pressed={house === "sen"}
+              title={house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)"}
+              onClick={flipHouse}>
+        <span className="rd-pl-flip-t">{house === "sen" ? "Upper" : "Lower"}</span> <span aria-hidden="true">⇄</span>
+      </button>
+    </span>
+  ) : null;
+  const headCtls = narrow ? <span className="ex-fl-ctls">{pair === "co" ? menu : null}{houseCtl}{share}</span> : (pair === "co" ? menu : null);
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -6114,10 +6187,10 @@ function RdExplained() {
         <div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">
           <RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"
                   options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
-            {narrow ? null : share}
+            {narrow ? null : <>{houseCtl}{share}</>}
           </RdTabs>
           {pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />
-            : <ExplainedFlowChart jur={jur} stateKey={stateKey} classKey={classKey} inv={inv} menu={headCtls} />}
+            : <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} inv={inv} menu={headCtls} />}
         </div>
       </div>
     </section>

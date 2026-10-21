@@ -1,0 +1,992 @@
+{
+ "events": {
+  "2016": {
+   "counts": {
+    "ALP": {
+     "toALP": 3859533,
+     "toCOAL": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "toALP": 0,
+     "toCOAL": 4646490,
+     "neither": 0
+    },
+    "GRN": {
+     "toALP": 771123,
+     "toCOAL": 115929,
+     "neither": 160133
+    },
+    "PHON": {
+     "toALP": 138092,
+     "toCOAL": 155126,
+     "neither": 255465
+    },
+    "OTHER": {
+     "toALP": 862943,
+     "toCOAL": 888513,
+     "neither": 964262
+    }
+   },
+   "states": {
+    "ACT": {
+     "ALP": {
+      "toALP": 81560,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 77262,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 26986,
+      "toCOAL": 3010,
+      "neither": 560
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 12193,
+      "toCOAL": 10622,
+      "neither": 2313
+     }
+    },
+    "NT": {
+     "ALP": {
+      "toALP": 34876,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 35034,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 7155,
+      "toCOAL": 2150,
+      "neither": 149
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 4381,
+      "toCOAL": 7492,
+      "neither": 396
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "toALP": 1323440,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1535069,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 226944,
+      "toCOAL": 27312,
+      "neither": 48844
+     },
+     "PHON": {
+      "toALP": 44842,
+      "toCOAL": 47896,
+      "neither": 79829
+     },
+     "OTHER": {
+      "toALP": 240817,
+      "toCOAL": 308228,
+      "neither": 318095
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "toALP": 1023090,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1128204,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 251827,
+      "toCOAL": 32469,
+      "neither": 54598
+     },
+     "PHON": {
+      "toALP": 14602,
+      "toCOAL": 14703,
+      "neither": 30789
+     },
+     "OTHER": {
+      "toALP": 247503,
+      "toCOAL": 200260,
+      "neither": 286852
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "toALP": 681122,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 919815,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 118434,
+      "toCOAL": 16812,
+      "neither": 31602
+     },
+     "PHON": {
+      "toALP": 53273,
+      "toCOAL": 62107,
+      "neither": 111355
+     },
+     "OTHER": {
+      "toALP": 156680,
+      "toCOAL": 159867,
+      "neither": 228233
+     }
+    },
+    "WA": {
+     "ALP": {
+      "toALP": 366108,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 540646,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 85461,
+      "toCOAL": 25680,
+      "neither": 14909
+     },
+     "PHON": {
+      "toALP": 13199,
+      "toCOAL": 20458,
+      "neither": 18497
+     },
+     "OTHER": {
+      "toALP": 55434,
+      "toCOAL": 86348,
+      "neither": 55334
+     }
+    },
+    "SA": {
+     "ALP": {
+      "toALP": 266808,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 327614,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 38183,
+      "toCOAL": 6018,
+      "neither": 6517
+     },
+     "PHON": {
+      "toALP": 9391,
+      "toCOAL": 7878,
+      "neither": 12339
+     },
+     "OTHER": {
+      "toALP": 125547,
+      "toCOAL": 101604,
+      "neither": 60510
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "toALP": 82529,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 82846,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 16133,
+      "toCOAL": 2478,
+      "neither": 2954
+     },
+     "PHON": {
+      "toALP": 2785,
+      "toCOAL": 2084,
+      "neither": 2656
+     },
+     "OTHER": {
+      "toALP": 20388,
+      "toCOAL": 14092,
+      "neither": 12529
+     }
+    }
+   }
+  },
+  "2019": {
+   "counts": {
+    "ALP": {
+     "toALP": 3932680,
+     "toCOAL": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "toALP": 0,
+     "toCOAL": 5178672,
+     "neither": 0
+    },
+    "GRN": {
+     "toALP": 970763,
+     "toCOAL": 154139,
+     "neither": 166174
+    },
+    "PHON": {
+     "toALP": 153979,
+     "toCOAL": 313706,
+     "neither": 264276
+    },
+    "OTHER": {
+     "toALP": 637440,
+     "toCOAL": 828134,
+     "neither": 812656
+    }
+   },
+   "states": {
+    "ACT": {
+     "ALP": {
+      "toALP": 83361,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 75810,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 30053,
+      "toCOAL": 3901,
+      "neither": 240
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 6851,
+      "toCOAL": 7295,
+      "neither": 364
+     }
+    },
+    "NT": {
+     "ALP": {
+      "toALP": 35512,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 36037,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 7289,
+      "toCOAL": 1759,
+      "neither": 278
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 5652,
+      "toCOAL": 6908,
+      "neither": 1136
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "toALP": 1330865,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1622005,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 278314,
+      "toCOAL": 35932,
+      "neither": 63735
+     },
+     "PHON": {
+      "toALP": 46066,
+      "toCOAL": 81056,
+      "neither": 91414
+     },
+     "OTHER": {
+      "toALP": 207917,
+      "toCOAL": 252662,
+      "neither": 310372
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "toALP": 1097990,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1293482,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 266432,
+      "toCOAL": 33142,
+      "neither": 42519
+     },
+     "PHON": {
+      "toALP": 22220,
+      "toCOAL": 37099,
+      "neither": 41220
+     },
+     "OTHER": {
+      "toALP": 193873,
+      "toCOAL": 218073,
+      "neither": 247921
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "toALP": 619326,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1075175,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 183142,
+      "toCOAL": 33421,
+      "neither": 35223
+     },
+     "PHON": {
+      "toALP": 51889,
+      "toCOAL": 126469,
+      "neither": 96481
+     },
+     "OTHER": {
+      "toALP": 111907,
+      "toCOAL": 181185,
+      "neither": 168104
+     }
+    },
+    "WA": {
+     "ALP": {
+      "toALP": 376888,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 590605,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 109018,
+      "toCOAL": 28019,
+      "neither": 14612
+     },
+     "PHON": {
+      "toALP": 16781,
+      "toCOAL": 43265,
+      "neither": 18570
+     },
+     "OTHER": {
+      "toALP": 40661,
+      "toCOAL": 77426,
+      "neither": 41464
+     }
+    },
+    "SA": {
+     "ALP": {
+      "toALP": 311843,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 392364,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 75731,
+      "toCOAL": 14196,
+      "neither": 8450
+     },
+     "PHON": {
+      "toALP": 13895,
+      "toCOAL": 20625,
+      "neither": 14678
+     },
+     "OTHER": {
+      "toALP": 52205,
+      "toCOAL": 62541,
+      "neither": 36894
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "toALP": 76895,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 93194,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 20784,
+      "toCOAL": 3769,
+      "neither": 1117
+     },
+     "PHON": {
+      "toALP": 3128,
+      "toCOAL": 5192,
+      "neither": 1913
+     },
+     "OTHER": {
+      "toALP": 18374,
+      "toCOAL": 22044,
+      "neither": 6401
+     }
+    }
+   }
+  },
+  "2022": {
+   "counts": {
+    "ALP": {
+     "toALP": 4277491,
+     "toCOAL": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "toALP": 0,
+     "toCOAL": 4916912,
+     "neither": 0
+    },
+    "GRN": {
+     "toALP": 1381413,
+     "toCOAL": 166434,
+     "neither": 177315
+    },
+    "PHON": {
+     "toALP": 116696,
+     "toCOAL": 199101,
+     "neither": 256180
+    },
+    "OTHER": {
+     "toALP": 827078,
+     "toCOAL": 720005,
+     "neither": 918655
+    }
+   },
+   "states": {
+    "ACT": {
+     "ALP": {
+      "toALP": 76202,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 63260,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 20822,
+      "toCOAL": 1753,
+      "neither": 1133
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 42788,
+      "toCOAL": 17354,
+      "neither": 5971
+     }
+    },
+    "NT": {
+     "ALP": {
+      "toALP": 30816,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 28779,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 9378,
+      "toCOAL": 1773,
+      "neither": 200
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 7633,
+      "toCOAL": 11670,
+      "neither": 945
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "toALP": 1385538,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1689586,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 400226,
+      "toCOAL": 52932,
+      "neither": 53967
+     },
+     "PHON": {
+      "toALP": 36143,
+      "toCOAL": 58525,
+      "neither": 85799
+     },
+     "OTHER": {
+      "toALP": 251001,
+      "toCOAL": 204274,
+      "neither": 286911
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "toALP": 1149509,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1191287,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 403508,
+      "toCOAL": 34772,
+      "neither": 44490
+     },
+     "PHON": {
+      "toALP": 19470,
+      "toCOAL": 33678,
+      "neither": 49289
+     },
+     "OTHER": {
+      "toALP": 219201,
+      "toCOAL": 179882,
+      "neither": 264201
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "toALP": 709094,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1009035,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 260743,
+      "toCOAL": 38188,
+      "neither": 45229
+     },
+     "PHON": {
+      "toALP": 39060,
+      "toCOAL": 70952,
+      "neither": 79179
+     },
+     "OTHER": {
+      "toALP": 153302,
+      "toCOAL": 154948,
+      "neither": 224467
+     }
+    },
+    "WA": {
+     "ALP": {
+      "toALP": 507229,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 470989,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 160636,
+      "toCOAL": 18770,
+      "neither": 18851
+     },
+     "PHON": {
+      "toALP": 11181,
+      "toCOAL": 14802,
+      "neither": 22716
+     },
+     "OTHER": {
+      "toALP": 73019,
+      "toCOAL": 66993,
+      "neither": 77589
+     }
+    },
+    "SA": {
+     "ALP": {
+      "toALP": 339901,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 373373,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 96032,
+      "toCOAL": 15073,
+      "neither": 10696
+     },
+     "PHON": {
+      "toALP": 7556,
+      "toCOAL": 17666,
+      "neither": 15541
+     },
+     "OTHER": {
+      "toALP": 53975,
+      "toCOAL": 64582,
+      "neither": 45207
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "toALP": 79202,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 90603,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 30068,
+      "toCOAL": 3173,
+      "neither": 2749
+     },
+     "PHON": {
+      "toALP": 3286,
+      "toCOAL": 3478,
+      "neither": 3656
+     },
+     "OTHER": {
+      "toALP": 26159,
+      "toCOAL": 20302,
+      "neither": 13364
+     }
+    }
+   }
+  },
+  "2025": {
+   "counts": {
+    "ALP": {
+     "toALP": 5308432,
+     "toCOAL": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "toALP": 0,
+     "toCOAL": 4560480,
+     "neither": 0
+    },
+    "GRN": {
+     "toALP": 1404109,
+     "toCOAL": 138388,
+     "neither": 161126
+    },
+    "PHON": {
+     "toALP": 126503,
+     "toCOAL": 509962,
+     "neither": 205108
+    },
+    "OTHER": {
+     "toALP": 876344,
+     "toCOAL": 855907,
+     "neither": 768509
+    }
+   },
+   "states": {
+    "ACT": {
+     "ALP": {
+      "toALP": 80078,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 46727,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 17738,
+      "toCOAL": 1358,
+      "neither": 108
+     },
+     "PHON": {
+      "toALP": 0,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "OTHER": {
+      "toALP": 72516,
+      "toCOAL": 22801,
+      "neither": 784
+     }
+    },
+    "NT": {
+     "ALP": {
+      "toALP": 33940,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 32106,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 7887,
+      "toCOAL": 1447,
+      "neither": 150
+     },
+     "PHON": {
+      "toALP": 1466,
+      "toCOAL": 5877,
+      "neither": 274
+     },
+     "OTHER": {
+      "toALP": 6762,
+      "toCOAL": 4289,
+      "neither": 487
+     }
+    },
+    "NSW": {
+     "ALP": {
+      "toALP": 1785456,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1415602,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 412580,
+      "toCOAL": 44800,
+      "neither": 64573
+     },
+     "PHON": {
+      "toALP": 36730,
+      "toCOAL": 167042,
+      "neither": 79750
+     },
+     "OTHER": {
+      "toALP": 198356,
+      "toCOAL": 261575,
+      "neither": 253944
+     }
+    },
+    "VIC": {
+     "ALP": {
+      "toALP": 1361990,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 1238329,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 403773,
+      "toCOAL": 28491,
+      "neither": 39627
+     },
+     "PHON": {
+      "toALP": 28479,
+      "toCOAL": 104455,
+      "neither": 39610
+     },
+     "OTHER": {
+      "toALP": 256407,
+      "toCOAL": 183567,
+      "neither": 184795
+     }
+    },
+    "QLD": {
+     "ALP": {
+      "toALP": 942062,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 964943,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 257005,
+      "toCOAL": 21699,
+      "neither": 32259
+     },
+     "PHON": {
+      "toALP": 34519,
+      "toCOAL": 123504,
+      "neither": 56270
+     },
+     "OTHER": {
+      "toALP": 185496,
+      "toCOAL": 205045,
+      "neither": 224998
+     }
+    },
+    "WA": {
+     "ALP": {
+      "toALP": 568492,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 476352,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 157267,
+      "toCOAL": 23679,
+      "neither": 13257
+     },
+     "PHON": {
+      "toALP": 13164,
+      "toCOAL": 62128,
+      "neither": 15413
+     },
+     "OTHER": {
+      "toALP": 74116,
+      "toCOAL": 91662,
+      "neither": 56245
+     }
+    },
+    "SA": {
+     "ALP": {
+      "toALP": 424759,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 311277,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 111692,
+      "toCOAL": 14121,
+      "neither": 8843
+     },
+     "PHON": {
+      "toALP": 8840,
+      "toCOAL": 37834,
+      "neither": 11041
+     },
+     "OTHER": {
+      "toALP": 55321,
+      "toCOAL": 68447,
+      "neither": 35934
+     }
+    },
+    "TAS": {
+     "ALP": {
+      "toALP": 111655,
+      "toCOAL": 0,
+      "neither": 0
+     },
+     "COAL": {
+      "toALP": 0,
+      "toCOAL": 75144,
+      "neither": 0
+     },
+     "GRN": {
+      "toALP": 36167,
+      "toCOAL": 2793,
+      "neither": 2309
+     },
+     "PHON": {
+      "toALP": 3305,
+      "toCOAL": 9122,
+      "neither": 2750
+     },
+     "OTHER": {
+      "toALP": 27370,
+      "toCOAL": 18521,
+      "neither": 11322
+     }
+    }
+   }
+  }
+ }
+}

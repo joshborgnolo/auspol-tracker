@@ -314,12 +314,32 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
    2026-10-22 (user: "the following views: 'Federal, inner metro'…"): four
    more options to the federal optgroup ride fedcl:<class> - FH.fed.classes
    (FED_CLASSES in RdExplained, classKey beside stateKey through the chart
-   and its remount key), the menu string "Federal, " + short. */
+   and its remount key), the menu string "Federal, " + short.
+   2026-10-22 (user: "House: Lower ⇄ / Upper ⇄"): a second flip (House:,
+   beside Share:) cuts the same chart to the Senate's post-GVT ATL counts;
+   the House-only views leave the menu under Upper. */
 assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes("const ON_COHORTS = ["),
   "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
 assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
-    && ap.includes(': <ExplainedFlowChart jur={jur} stateKey={stateKey} classKey={classKey} inv={inv} menu={headCtls} />}'),
-  "the contest tabs swap the Coalition history chart for the measured-contest chart");
+    && ap.includes(': <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} inv={inv} menu={headCtls} />}'),
+  "the contest tabs swap the Coalition history chart for the measured-contest chart (a class pick nulls while the Senate bank is drawn)");
+/* 2026-10-22 (user: "House: Lower ⇄ / Upper ⇄"): a second flip beside
+   Share: - Upper cuts the chart to the four post-GVT Senate ATL counts
+   (FLOW_HISTORY_SENATE, national + the eight states; test-senate-atl-flows
+   pins the table and its emit gating). The federal menu section stays live
+   (both banks carry the eight states, a fed:<key> pick re-reads from the
+   Senate bank) while the House-only sections (classifications, state
+   elections) and the One Nation tab snap away. */
+assert.ok(ap.includes('const SEN_BANK = (FH.fed && FH.fed.sen) || null;')
+    && ap.includes('const [house, setHouse] = useState("rep");')
+    && ap.includes('{house === "sen" ? "Upper" : "Lower"}')
+    && ap.includes('title={house === "sen" ? "Switch to House of Representatives flows"'),
+  "the House: flip rides the Share idiom - the button the active chamber, its title the destination, only where the build ships the bank");
+assert.ok(ap.includes('if (pair === "on") setPair("co");') && ap.includes('if (classKey || !fedView) setView("fed");'),
+  "flipping to Upper snaps the One Nation tab and the House-only menu picks back (Lower never snaps)");
+assert.ok(ap.includes('(house === "sen" ? senStateKeys : stateKeys).map(') && ap.includes('{house !== "sen" && classKeys.map(')
+    && ap.includes('{house !== "sen" && KEYS.length > 1 && ('),
+  "the elections menu re-reads the states from the Senate bank under Upper and sheds the House-only sections");
 assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
     && ap.includes('const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;')
     && ap.includes('"fedcl:" + k'),
