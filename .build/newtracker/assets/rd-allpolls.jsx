@@ -1485,8 +1485,10 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   /* a line pressed: the table moves to that line's tab with this row held
      on its pixel (the row keeps its key across the hop, so it is the
      anchor that persists - pinning the table top would let the reshuffled
-     rows carry it off) */
+     rows carry it off). A line that's no tab at all (RD_LG_PANEL) trips out
+     to its panel instead; the row stays open behind the tab that lent it. */
   const lineGo = (id, el) => {
+    if (RD_LG_PANEL[id]) { if (window.AP.gotoSwitching) window.AP.gotoSwitching(); return; }
     const open = el && el.closest(".rd-ap-open");
     const row = open && open.previousElementSibling;
     if (row) rdPinScroll([row], true);
@@ -1547,6 +1549,10 @@ const rdLgNet = (v) => (v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") +
 // the tab a line opens, named as the tab row names it
 const RD_LG_TAB = { primary: "Primary", twopp: "2PP", leadership: "Leadership", direction: "Direction", issues: "Issues", demographics: "Demographics" };
 const RD_LG_LATEST_TABS = { twopp: 1, primary: 1, leadership: 1 };
+/* a line can also trip to somewhere that is no tab at all: the switching
+   line goes to the snapshot's vote-switching panel (AP.gotoSwitching). The
+   value is the destination named on the line's tooltip. */
+const RD_LG_PANEL = { switching: "where One Nation’s voters came from" };
 /* which poll a lead's change markers are measured on: the house's previous
    poll that printed each figure (gen-data's chg.r). One wave for the whole
    lead names it; a lead whose figures reach back to different waves (a
@@ -2014,13 +2020,18 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
           <div className="rd-ldg-lines">
             {rest.map((l) => {
               if (l.self) { const Self = l.self; return <Self key={l.id} pf={l.pf} p={l.p} />; }
-              const can = !!(onLine && RD_LG_TAB[l.id]);
+              const panelGo = RD_LG_PANEL[l.id];
+              const can = !!(onLine && (RD_LG_TAB[l.id] || panelGo));
               const Tag = can ? "button" : "div";
-              const away = latest && !RD_LG_LATEST_TABS[l.id];
+              /* a panel trip leaves the page only from the archive (the Latest
+                 table shares the snapshot with the panel); a tab trip leaves
+                 the page only from the Latest table */
+              const away = panelGo ? !latest : (latest && !RD_LG_LATEST_TABS[l.id]);
               return (
                 <Tag key={l.id} type={can ? "button" : undefined} className={"rd-ldg-line" + (can ? " go" : "")}
                      onClick={can ? (e) => { e.stopPropagation(); onLine(l.id, e.currentTarget); } : undefined}
-                     title={can ? (away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab") : undefined}>
+                     title={can ? (panelGo ? (away ? "Open " + panelGo + " on the Snapshot" : "Show " + panelGo)
+                                          : (away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab")) : undefined}>
                   <span className="rd-ldg-lab">{l.lab}</span>
                   <span className="rd-ldg-lbody">{l.body}</span>
                   {can && <span className="rd-ldg-arrow" aria-hidden="true">{away ? "↗" : "→"}</span>}

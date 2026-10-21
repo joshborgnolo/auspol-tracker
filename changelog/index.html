@@ -126284,7 +126284,9 @@ function RdPolls({
         className: "rd-ldg-noagg"
       }, React.createElement("b", null, "Outside the aggregates."), " ", r.noAggWhy), rhythm) : rhythm,
       onLine: id => {
-        if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
+        if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (id === "switching") {
+          if (window.AP.gotoSwitching) window.AP.gotoSwitching();
+        } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
       },
       sources: r.links && r.links.length ? rdPollLinks(r.links) : null,
       foot: React.createElement(React.Fragment, null, key && window.AP.openPoll && React.createElement("button", {
@@ -130895,6 +130897,10 @@ function RdApDetail({
     className: "rd-apd-h"
   }, isConf ? "How it reads" : "How it counts"), railBody);
   const lineGo = (id, el) => {
+    if (RD_LG_PANEL[id]) {
+      if (window.AP.gotoSwitching) window.AP.gotoSwitching();
+      return;
+    }
     const open = el && el.closest(".rd-ap-open");
     const row = open && open.previousElementSibling;
     if (row) rdPinScroll([row], true);
@@ -130970,6 +130976,9 @@ const RD_LG_LATEST_TABS = {
   twopp: 1,
   primary: 1,
   leadership: 1
+};
+const RD_LG_PANEL = {
+  switching: "where One Nation’s voters came from"
 };
 function rdLgChgNote(p, keys) {
   const r = p.chg && p.chg.r || {};
@@ -131730,9 +131739,10 @@ function RdLedger({
         p: l.p
       });
     }
-    const can = !!(onLine && RD_LG_TAB[l.id]);
+    const panelGo = RD_LG_PANEL[l.id];
+    const can = !!(onLine && (RD_LG_TAB[l.id] || panelGo));
     const Tag = can ? "button" : "div";
-    const away = latest && !RD_LG_LATEST_TABS[l.id];
+    const away = panelGo ? !latest : latest && !RD_LG_LATEST_TABS[l.id];
     return React.createElement(Tag, {
       key: l.id,
       type: can ? "button" : undefined,
@@ -131741,7 +131751,7 @@ function RdLedger({
         e.stopPropagation();
         onLine(l.id, e.currentTarget);
       } : undefined,
-      title: can ? away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
+      title: can ? panelGo ? away ? "Open " + panelGo + " on the Snapshot" : "Show " + panelGo : away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
     }, React.createElement("span", {
       className: "rd-ldg-lab"
     }, l.lab), React.createElement("span", {

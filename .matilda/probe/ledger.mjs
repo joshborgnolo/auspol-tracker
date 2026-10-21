@@ -19,7 +19,10 @@
         the column;
      7. no sideways scroll with a poll open at 320-1440px, and none from the
         pinned bar at 761-790px on Confidence;
-     8. no page errors.
+     8. no page errors;
+     9. the To One Nation line trips out to the switching panel: cross-tab
+        from All polls (history back returns with the poll still open),
+        a same-tab scroll from the Latest table.
    Truth comes from the page's own bundle (window.AUSPOL): the probe pins the
    WIRING, never the day's data.
    Run from the repo root: node .matilda/probe/ledger.mjs
@@ -279,6 +282,79 @@ console.log("== a line press ==");
   ok("Latest: pressing the Primary line switches the table's own tab in place", lat.open && lat.lead1 === "Primary vote, %", JSON.stringify({ lead1: lat.lead1, tab: lat.tabOn }));
   ok("Latest: lines for tabs this table lacks point out (↗)", Array.isArray(lat.away) && lat.away.includes("↗"), JSON.stringify(lat.away));
   await page.close();
+}
+
+/* ---------------------------------------------------------------- 9: the To One Nation line */
+console.log("== the To One Nation line trips to the switching panel ==");
+{
+  const page = await newPage(1440, 2400);
+  await toAllPolls(page);
+  const swv = await page.evaluate(() => {
+    const P = window.AUSPOL.individualPolls.filter((p) => p.sw).sort((a, b) => (a.released < b.released ? 1 : -1));
+    return P.length ? { h: P[0].pollster, r: P[0].released } : null;
+  });
+  if (!swv) console.log("  --  no vote-switching wave in the bundle: skipped");
+  else {
+    await page.evaluate((k) => window.AP.openPoll(k, "twopp", "the probe"), swv.h + "|" + swv.r);
+    await settle(900);
+    const meta = await page.evaluate(() => {
+      const l = [...document.querySelectorAll(".rd-ap-open .rd-ldg-line")].find((n) => (n.querySelector(".rd-ldg-lab") || {}).textContent === "To One Nation");
+      return l ? { tag: l.tagName, go: l.classList.contains("go"), title: l.getAttribute("title") || "", arrow: (l.querySelector(".rd-ldg-arrow") || {}).textContent } : null;
+    });
+    ok(`All polls: ${swv.h}'s To One Nation line is a go line, tipped for the Snapshot (↗)`,
+       !!meta && meta.tag === "BUTTON" && meta.go && meta.title === "Open where One Nation’s voters came from on the Snapshot" && meta.arrow === "↗", JSON.stringify(meta));
+    const line = await page.evaluateHandle(() => [...document.querySelectorAll(".rd-ap-open .rd-ldg-line.go")].find((n) => (n.querySelector(".rd-ldg-lab") || {}).textContent === "To One Nation"));
+    await page.evaluate((el) => el && el.scrollIntoView({ block: "center", behavior: "instant" }), line);
+    await settle(300);
+    const box = await line.boundingBox();
+    if (box) await page.mouse.click(box.x + 30, box.y + box.height / 2);
+    await settle(1400);
+    const hop = await page.evaluate(() => {
+      const sec = document.getElementById("switching");
+      return { path: window.location.pathname, secTop: sec ? Math.round(sec.getBoundingClientRect().top) : null };
+    });
+    ok("…pressing it lands the Snapshot on the switching panel", hop.path === "/" && hop.secTop != null && hop.secTop >= 30 && hop.secTop <= 160, JSON.stringify(hop));
+    await page.evaluate(() => window.history.back());
+    await settle(1400);
+    const back = await page.evaluate((h) => {
+      const row = document.querySelector(".rd-ap-row.open");
+      const nm = row ? ((row.querySelector("[role=rowheader] b") || {}).textContent || "") : "";
+      return { path: window.location.pathname, nm, drawer: !!document.querySelector(".rd-ap-open .rd-ldg") };
+    }, swv.h);
+    ok("…and history back returns to All polls with the poll still open", back.path === "/allpolls/" && back.drawer && back.nm.includes(swv.h), JSON.stringify(back));
+  }
+  await page.close();
+
+  const page2 = await newPage(1440, 2400);
+  await page2.goto(BASE + "/", { waitUntil: "networkidle0", timeout: 90000 });
+  await page2.waitForSelector(".rd-pl-row", { timeout: 30000 });
+  await settle(500);
+  const lat = await page2.evaluate(async () => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const houses = new Set(window.AUSPOL.individualPolls.filter((p) => p.sw).map((p) => p.pollster));
+    const item = [...document.querySelectorAll("#latest-polls .rd-pl-item")].find((n) => {
+      const nm = (n.querySelector(".rd-pl-c-name") || {}).textContent || "";
+      return [...houses].some((h) => nm.includes(h));
+    });
+    if (!item) return { skip: "no vote-switching house in the latest table" };
+    const name = item.querySelector(".rd-pl-c-name").textContent.replace(/↗/g, "").trim();
+    item.querySelector(".rd-pl-c-figs").click();
+    await wait(700);
+    const line = [...item.querySelectorAll(".rd-ldg-line")].find((n) => (n.querySelector(".rd-ldg-lab") || {}).textContent === "To One Nation");
+    if (!line) return { skip: name + " carries no switching line" };
+    const meta = { tag: line.tagName, go: line.classList.contains("go"), title: line.getAttribute("title") || "", arrow: (line.querySelector(".rd-ldg-arrow") || {}).textContent };
+    line.click();
+    await wait(1000);
+    const sec = document.getElementById("switching");
+    return { name, meta, path: window.location.pathname, secTop: sec ? Math.round(sec.getBoundingClientRect().top) : null, stillOpen: item.classList.contains("open") };
+  });
+  if (lat.skip) console.log("  --  " + lat.skip);
+  else {
+    ok(`Latest: ${lat.name}'s line is a go line tipped to the panel on this page (→)`,
+       lat.meta.tag === "BUTTON" && lat.meta.go && lat.meta.title === "Show where One Nation’s voters came from" && lat.meta.arrow === "→", JSON.stringify(lat.meta));
+    ok("…pressing it scrolls to the switching panel, row still open", lat.path === "/" && lat.secTop != null && lat.secTop >= 30 && lat.secTop <= 160 && lat.stillOpen, JSON.stringify({ secTop: lat.secTop, stillOpen: lat.stillOpen }));
+  }
+  await page2.close();
 }
 
 /* ---------------------------------------------------------------- 7: overflow */
