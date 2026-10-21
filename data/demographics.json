@@ -5460,126 +5460,6 @@
    }
   },
   {
-   "pollster": "RedBridge/Accent",
-   "date": "2026-03-19",
-   "dateStart": "2026-03-06",
-   "dateEnd": "2026-03-19",
-   "sample": 5563,
-   "article": "https://www.accent-research.com/projects/australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025",
-   "source": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
-   "read": "published table",
-   "dims": {
-    "gender": {
-     "Men": {
-      "alp": 32,
-      "lnp": 21,
-      "grn": 10,
-      "onp": 29,
-      "oth": 8
-     },
-     "Women": {
-      "alp": 30,
-      "lnp": 20,
-      "grn": 13,
-      "onp": 27,
-      "oth": 10
-     }
-    },
-    "generation": {
-     "Gen Z": {
-      "alp": 33,
-      "lnp": 13,
-      "grn": 31,
-      "onp": 15,
-      "oth": 8
-     },
-     "Millennials": {
-      "alp": 32,
-      "lnp": 17,
-      "grn": 15,
-      "onp": 26,
-      "oth": 10
-     },
-     "Gen X": {
-      "alp": 31,
-      "lnp": 19,
-      "grn": 8,
-      "onp": 33,
-      "oth": 9
-     },
-     "Boomers": {
-      "alp": 30,
-      "lnp": 27,
-      "grn": 3,
-      "onp": 32,
-      "oth": 8
-     }
-    },
-    "country": {
-     "Australia": {
-      "alp": 30,
-      "lnp": 21,
-      "grn": 12,
-      "onp": 28,
-      "oth": 9
-     },
-     "Another country": {
-      "alp": 36,
-      "lnp": 20,
-      "grn": 10,
-      "onp": 26,
-      "oth": 8
-     }
-    },
-    "language": {
-     "English only": {
-      "alp": 30,
-      "lnp": 20,
-      "grn": 12,
-      "onp": 29,
-      "oth": 9
-     },
-     "Other language": {
-      "alp": 39,
-      "lnp": 20,
-      "grn": 15,
-      "onp": 16,
-      "oth": 10
-     }
-    },
-    "state": {
-     "NSW": {
-      "alp": 31,
-      "lnp": 20,
-      "grn": 11,
-      "onp": 28,
-      "oth": 10
-     },
-     "Vic": {
-      "alp": 29,
-      "lnp": 23,
-      "grn": 14,
-      "onp": 25,
-      "oth": 9
-     },
-     "Qld": {
-      "alp": 28,
-      "lnp": 22,
-      "grn": 10,
-      "onp": 33,
-      "oth": 7
-     },
-     "WA": {
-      "alp": 35,
-      "lnp": 19,
-      "grn": 12,
-      "onp": 27,
-      "oth": 7
-     }
-    }
-   }
-  },
-  {
    "pollster": "YouGov",
    "date": "2026-03-19",
    "dateStart": "2026-03-12",
@@ -14302,7 +14182,7 @@
    "date": "2026-10-20",
    "dateStart": "2026-10-13",
    "dateEnd": "2026-10-20",
-   "sample": 1500,
+   "sample": 1542,
    "article": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
    "source": "https://e.infogram.com/_/71v3hcr729lKnlQ7499f",
    "read": "published table",

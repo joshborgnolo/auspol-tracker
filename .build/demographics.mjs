@@ -1637,10 +1637,19 @@ const pend = (k, why) => { pending.push(`${k}: ${why}`); if (have.has(k)) waves.
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "demographics-"));
 const essWaves = essentialWaves(fs.readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8"));
 // the hand-entered waves below (DEMOSAU_EARLY_DEMO…YOUGOV_TAI_DEMO) cover
-// these rows themselves – the readers never get a second pass at them
+// these rows themselves – the readers never get a second pass at them.
+// REDBRIDGE_HAND is the hand loop's own list (further below), kept here so
+// HAND_KEYS and the loop can't drift apart: a hand wave inside the
+// candidate window gets filed by BOTH loops otherwise – the super-poll's
+// 2026-03-19 was the first hand wave past FIRST, and its duplicate row read
+// as a "series" to the drop check
+const REDBRIDGE_HAND = [["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
+  ["RedBridge/Accent", REDBRIDGE_NOV_DEMO], ["RedBridge/Accent", REDBRIDGE_SEP_DEMO],
+  ["RedBridge/Accent", REDBRIDGE_NOV26_DEMO], ["RedBridge/Accent", REDBRIDGE_SHIFTS_DEMO]];
 const HAND_KEYS = new Set(Object.keys(YOUGOV_TAI_DEMO).map((d) => "YouGov|" + d)
   .concat(Object.keys(DEMOSAU_EARLY_DEMO).map((d) => "DemosAU|" + d))
-  .concat(Object.keys(DEMOSAU_MRP_DEMO).map((d) => "DemosAU (MRP)|" + d)));
+  .concat(Object.keys(DEMOSAU_MRP_DEMO).map((d) => "DemosAU (MRP)|" + d))
+  .concat(REDBRIDGE_HAND.flatMap(([house, t]) => Object.keys(t).map((d) => house + "|" + d))));
 try {
   const candidates = polls.filter((p) => !HAND_KEYS.has(key(p))
     && ((["YouGov", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
@@ -1800,9 +1809,7 @@ try {
   // YOUGOV_TAI_DEMO): one-off layouts and MRP reports the readers have never
   // learnt. HAND_KEYS above keeps the candidate loop off them.
   for (const [house, table] of [["DemosAU", DEMOSAU_EARLY_DEMO], ["DemosAU (MRP)", DEMOSAU_MRP_DEMO],
-    ["RedBridge/Accent", REDBRIDGE_JUL_DEMO], ["RedBridge/Accent", REDBRIDGE_OCT_DEMO],
-    ["RedBridge/Accent", REDBRIDGE_NOV_DEMO], ["RedBridge/Accent", REDBRIDGE_SEP_DEMO],
-    ["RedBridge/Accent", REDBRIDGE_NOV26_DEMO], ["RedBridge/Accent", REDBRIDGE_SHIFTS_DEMO],
+    ...REDBRIDGE_HAND,
     ["YouGov (MRP)", YOUGOV_MRP_DEMO], ["YouGov", YOUGOV_TAI_DEMO], ["EMRS (Tas)", EMRS_DEMO]]) {
     for (const [date, h] of Object.entries(table)) {
       const k = house + "|" + date;

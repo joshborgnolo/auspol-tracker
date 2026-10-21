@@ -337,6 +337,15 @@ assert.deepEqual(shifts.dims.state, {
   WA: { alp: 35, lnp: 19, grn: 12, onp: 27, oth: 7 } },
   "One Nation passes Labor in every printed state cut but Western Australia's");
 assert.equal(sharesProblem(shifts.dims.country), null);
+// the super-poll is hand-entered (REDBRIDGE_SHIFTS_DEMO) but its date sits
+// inside the reader's candidate window – HAND_KEYS must keep the candidate
+// loop off it, or both loops file it and the pair reads as a two-wave
+// "series" to demographics.mjs's drop check (its state/country/language
+// groups then false-alarm as dropped on 2026-10-21)
+assert.equal(demoWaves.filter((w) => w.pollster === "RedBridge/Accent" && w.date === "2026-03-19").length, 1,
+  "the super-poll wave is filed exactly once");
+assert.equal(new Set(demoWaves.map((w) => w.pollster + "|" + w.date)).size, demoWaves.length,
+  "no wave in demographics.json is filed twice");
 
 // ---- EMRS: the hand-entered February 2026 Tasmanian-electorate cut --------------------
 /* EMRS's federal Voting Intentions report of February 2026 (fieldwork
