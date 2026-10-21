@@ -96,6 +96,7 @@ export const THEME_OF = {
   "immigration-terror-controlled-regions": "immigration",
   // news24+newspoll
   "immigration-levels": "immigration",
+  "backpacker-visa-cuts": "immigration",
   // resolve
   "immigration-program-handling": "immigration",
   "australia-monoculture": "immigration",
@@ -149,6 +150,7 @@ export const THEME_OF = {
   "one-nation-appeal": "one-nation",
   "one-nation-rise-impact": "one-nation",
   "one-nation-super-policy": "one-nation",
+  "one-nation-super-early-access": "one-nation",
   "one-nation-motivations": "one-nation",
 
   /* housing-budget */
@@ -243,6 +245,8 @@ export const THEME_OF = {
   "chalmers-cost-of-living-verdict": "cost-of-living",
   "financial-situation-3m": "cost-of-living",
   "healthcare-affordability-working-class": "cost-of-living",
+  "household-financial-situation": "cost-of-living",
+  "medical-treatment-access": "cost-of-living",
   "energy-prices-next-12-months": "cost-of-living",
   "unemployment-next-12-months": "cost-of-living",
   "unemployment-expectations": "cost-of-living",
@@ -351,6 +355,7 @@ export const THEME_OF = {
   "youtube-ban-u16s": "tech-society",
   "youtube-ban-circumvent": "tech-society",
   "social-media-duty-of-care": "tech-society",
+  "digital-duty-of-care-bill": "tech-society",
   "algorithm-opt-out": "tech-society",
   "ai-concerns": "tech-society",
   "ai-concern-types": "tech-society",
@@ -402,6 +407,7 @@ export const THEME_OF = {
   "trustwatch-institutions": "trust-democracy",
   "politician-ratings-2026-07": "trust-democracy",
   "leader-attributes": "trust-democracy",
+  "leader-most-attributes": "trust-democracy",
   "former-pm-ratings": "trust-democracy",
   "better-pm-for-cohorts": "trust-democracy",
   "billionaire-ratings": "trust-democracy",

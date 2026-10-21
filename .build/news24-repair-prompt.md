@@ -37,6 +37,31 @@ gate (forbidden-path blocklist, syntax checks, validate.mjs) and pushes
   the parsed waves. `node .build/test-news24-wiki.mjs` and
   `node .build/test-news24-infogram.mjs` must stay green.
 
+## "one-off not filed" warnings (Beyond the vote)
+
+`.build/news24-oneoffs-audit.mjs` reads the Pulse topic page's stories
+since the latest wave closed, and pages for each Infogram embed outside
+the standing battery whose id is not in `data/news24-one-offs.json`.
+These are the wave's rotating questions, and companion stories carry
+some of them. To clear one, append an entry to `one_offs` shaped like the
+existing ones:
+- `waveDate`/`fieldwork`/`sample` from the wave's polls.json row (when an
+  embed caption's window disagrees, the article prose and the wave's
+  voting-intention embeds win; say so in `note`).
+- `question` verbatim from the embed's question caption.
+- `data.tables` = the embed's chart rows verbatim (headers = first row).
+- `data.prose` = News24's own paragraphs quoting the figures, verbatim.
+- `articleUrl` = the story the embed is in, which may not be the wave's
+  main article.
+- `embed: { id, title }`.
+Give the new id a topic in `THEME_OF` (`.build/newtracker/adhoc-themes.mjs`;
+`themeOf` throws on an unmapped id) and keep `node .build/test-beyond.mjs`
+green. Do not rebuild the store with `.matilda/n24-questions/`: that kit
+is stale and would resurrect removed entries. When an embed duplicates a
+figure the main site already carries, or is not a question at all, list it
+under `not_filed` instead (`{ embed, title, story, why }`) — never edit
+the audit to hide it.
+
 ## Hard rules
 
 - Never weaken the guard checks or the cross-source disagreement logging.

@@ -99,6 +99,7 @@ import { fetchText, fetchWithCookies, MONTHS, clean, writeAtomic, pool } from ".
 import { IG_EMBED } from "./infogram.mjs";
 import { n24IdsOf, n24InfogramFetch, n24Figures, n24Corroborate } from "./news24-infogram.mjs";
 import { melbourneMinute } from "./melbourne-time.mjs";
+import { auditN24OneOffs, unfiledWarning } from "./news24-oneoffs-audit.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -1480,6 +1481,29 @@ try {
   // Every wave that hit the fallback and did not file is page-worthy: the
   // run's output is green otherwise and these vanish into the log tail.
   for (const u of status.fallback?.unparsed ?? []) status.warnings.push(`wave not filed: ${u}`);
+
+  // One-off questions (Beyond the vote) are filed by hand into
+  // data/news24-one-offs.json, and companion stories carry some of each
+  // wave's — so each run audits the Pulse stories since the latest wave
+  // closed and pages per unfiled one-off embed (news24-oneoffs-audit.mjs).
+  if (process.env.N24_PULSE !== "0" && !WIKI_FILE && !NEWS24_FILE && !IG_DIR) {
+    try {
+      const waveEnd = D.polls.filter((p) => p.pollster === "YouGov").map((p) => p.date).sort().pop() ?? null;
+      const store = JSON.parse(readFileSync("data/news24-one-offs.json", "utf8"));
+      const audit = await auditN24OneOffs({
+        waveEnd, store,
+        fetchTopic: async () => (await fetchWithCookies(PULSE_TOPIC)).text,
+        fetchArticle: async (url) => (await fetchNews24Article(url)).html,
+        idsOf: n24IdsOf,
+        classify: (ids) => n24InfogramFetch(fetchIgEmbed, ids),
+      });
+      status.oneOffs = { waveEnd, stories: audit.stories.length, unfiled: audit.unfiled.map((u) => u.id), notes: audit.notes };
+      for (const n of audit.notes) console.error(`N24_NOTE one-off audit: ${n}`);
+      for (const u of audit.unfiled) status.warnings.push(unfiledWarning(u));
+    } catch (e) {
+      status.warnings.push(`one-off audit threw: ${e?.message ?? e}`);
+    }
+  }
 
   if (guardFails.length) {
     console.error("N24_GUARD " + guardFails.join(" || "));
