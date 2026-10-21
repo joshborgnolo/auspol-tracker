@@ -7880,223 +7880,284 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "who": "alp_lnp",
     "why": "default"
   }];
+  const lefPollMiss = {
+    "pre": {
+      "n": 15,
+      "tpp": 2.3,
+      "prim": 2.6
+    },
+    "post": {
+      "n": 13,
+      "tpp": 1.6,
+      "prim": 1.8
+    }
+  };
   const lefTables = [{
     "year": 1943,
     "era": true,
     "dlp": null,
     "dem": null,
     "oth": 0.4213,
-    "bt": -1.59
+    "bt": -1.59,
+    "fit": "oth",
+    "assumed": null
   }, {
     "year": 1946,
     "era": true,
     "dlp": null,
     "dem": null,
     "oth": 0.6611,
-    "bt": -0.53
+    "bt": -0.53,
+    "fit": "oth",
+    "assumed": null
   }, {
     "year": 1949,
     "era": true,
     "dlp": null,
     "dem": null,
     "oth": 0.8032,
-    "bt": -0.04
+    "bt": -0.04,
+    "fit": "oth",
+    "assumed": null
   }, {
     "year": 1951,
     "era": true,
     "dlp": null,
     "dem": null,
     "oth": 0.8227,
-    "bt": 1.31
+    "bt": 1.31,
+    "fit": "oth",
+    "assumed": null
   }, {
     "year": 1954,
     "era": true,
     "dlp": null,
     "dem": null,
     "oth": 0.2669,
-    "bt": -0.48
+    "bt": -0.48,
+    "fit": "oth",
+    "assumed": null
   }, {
     "year": 1955,
     "era": true,
     "dlp": 0.27,
     "dem": null,
     "oth": 0.45,
-    "bt": 0
+    "bt": 0,
+    "fit": null,
+    "assumed": null
   }, {
     "year": 1958,
     "era": true,
     "dlp": 0.2698,
     "dem": null,
     "oth": 0.45,
-    "bt": 0.33
+    "bt": 0.33,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1961,
     "era": true,
     "dlp": 0.2319,
     "dem": null,
     "oth": 0.45,
-    "bt": 0.27
+    "bt": 0.27,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1963,
     "era": true,
     "dlp": 0.1952,
     "dem": null,
     "oth": 0.45,
-    "bt": -0.47
+    "bt": -0.47,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1966,
     "era": true,
     "dlp": 0.2594,
     "dem": null,
     "oth": 0.45,
-    "bt": -0.02
+    "bt": -0.02,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1969,
     "era": true,
     "dlp": 0.2633,
     "dem": null,
     "oth": 0.45,
-    "bt": -0.07
+    "bt": -0.07,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1972,
     "era": true,
     "dlp": 0.2765,
     "dem": null,
     "oth": 0.45,
-    "bt": -0.04
+    "bt": -0.04,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1974,
     "era": true,
     "dlp": 0.3032,
     "dem": null,
     "oth": 0.45,
-    "bt": 0.2
+    "bt": 0.2,
+    "fit": "dlp",
+    "assumed": null
   }, {
     "year": 1975,
     "era": true,
     "dlp": 0.1551,
     "dem": 0.5,
     "oth": 0.45,
-    "bt": -0.2
+    "bt": -0.2,
+    "fit": "dlp",
+    "assumed": "dem"
   }, {
     "year": 1977,
     "era": true,
     "dlp": 0.27,
     "dem": 0.5033,
     "oth": 0.45,
-    "bt": -0.35
+    "bt": -0.35,
+    "fit": "dem",
+    "assumed": null
   }, {
     "year": 1980,
     "era": true,
     "dlp": 0.27,
     "dem": 0.5571,
     "oth": 0.45,
-    "bt": -0.14
+    "bt": -0.14,
+    "fit": "dem",
+    "assumed": null
   }, {
     "year": 1983,
     "era": true,
     "dlp": 0.27,
     "dem": 0.584,
     "oth": 0.45,
-    "bt": -0.24
+    "bt": -0.24,
+    "fit": "dem",
+    "assumed": null
   }, {
     "year": 1984,
     "era": true,
     "dlp": 0.27,
     "dem": 0.6287,
     "oth": 0.45,
-    "bt": -0.24
+    "bt": -0.24,
+    "fit": "dem",
+    "assumed": null
   }, {
     "year": 1987,
     "grn": null,
     "onp": null,
     "oth": null,
     "minor": 0.6043,
-    "bt": -0.13
+    "bt": -0.13,
+    "anchor": 0
   }, {
     "year": 1990,
     "grn": null,
     "onp": null,
     "oth": null,
     "minor": 0.6117,
-    "bt": 0.13
+    "bt": 0.13,
+    "anchor": 0
   }, {
     "year": 1993,
     "grn": null,
     "onp": null,
     "oth": null,
     "minor": 0.5994,
-    "bt": 0.77
+    "bt": 0.77,
+    "anchor": 0
   }, {
     "year": 1996,
     "grn": 0.671,
     "onp": null,
     "oth": 0.5088,
     "minor": null,
-    "bt": 0.05
+    "bt": 0.05,
+    "anchor": 0.213
   }, {
     "year": 1998,
     "grn": 0.7328,
     "onp": 0.4634,
     "oth": 0.5523,
     "minor": null,
-    "bt": -0.14
+    "bt": -0.14,
+    "anchor": -0.016
   }, {
     "year": 2001,
     "grn": 0.7483,
     "onp": 0.4413,
     "oth": 0.5699,
     "minor": null,
-    "bt": 0.4
+    "bt": 0.4,
+    "anchor": -0.032
   }, {
     "year": 2004,
     "grn": 0.8079,
     "onp": 0.436,
     "oth": 0.4429,
     "minor": null,
-    "bt": 0.02
+    "bt": 0.02,
+    "anchor": 0.069
   }, {
     "year": 2007,
     "grn": 0.7969,
     "onp": 0.47,
     "oth": 0.4453,
     "minor": null,
-    "bt": 0.31
+    "bt": 0.31,
+    "anchor": 0.111
   }, {
     "year": 2010,
     "grn": 0.7884,
     "onp": 0.4521,
     "oth": 0.4162,
     "minor": null,
-    "bt": -1.04
+    "bt": -1.04,
+    "anchor": 0.09
   }, {
     "year": 2013,
     "grn": 0.8303,
     "onp": 0.449,
     "oth": 0.4671,
     "minor": null,
-    "bt": -0.23
+    "bt": -0.23,
+    "anchor": 0.144
   }, {
     "year": 2016,
     "grn": 0.8194,
     "onp": 0.4953,
     "oth": 0.4922,
     "minor": null,
-    "bt": 0.83
+    "bt": 0.83,
+    "anchor": 0.133
   }, {
     "year": 2019,
     "grn": 0.8221,
     "onp": 0.3478,
     "oth": 0.4607,
     "minor": null,
-    "bt": -0.97
+    "bt": -0.97,
+    "anchor": 0.099
   }, {
     "year": 2022,
     "grn": 0.8566,
     "onp": 0.357,
     "oth": 0.5002,
     "minor": null,
-    "bt": -0.38
+    "bt": -0.38,
+    "anchor": 0.031
   }, {
     "year": 2025,
     "grn": 0.8819,
@@ -94085,6 +94146,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     flowSens,
     rivalWalk,
     lefTables,
+    lefPollMiss,
     flowTables,
     flowHistory,
     adjusted,
@@ -111697,13 +111759,18 @@ function infoTerms(D) {
   const lefT = (D.lefTables || []).slice().sort((a, b) => a.year - b.year);
   const lefAll = lefT.map((t, i) => t.bt == null || !lefT[i + 1] ? null : {
     at: lefT[i + 1].year,
-    bt: t.bt
+    bt: t.bt,
+    era: !!t.era,
+    fit: t.fit
   }).filter(Boolean);
   const lefMiss = lefAll.filter(m => m.at >= 1984);
   const lefOld = lefAll.filter(m => m.at < 1984);
   const meanAbs = a => a.length ? a.reduce((s, m) => s + Math.abs(m.bt), 0) / a.length : null;
   const lefMean = meanAbs(lefMiss),
     lefOldMean = meanAbs(lefOld);
+  const lefMidMean = meanAbs(lefOld.filter(m => m.at >= 1958 && m.fit != null));
+  const lefAnchorMax = Math.max(0, ...lefT.filter(t => !t.era && t.anchor != null).map(t => Math.abs(t.anchor)));
+  const LPM = (D.lefPollMiss || {}).pre;
   const lefBig = lefMiss.slice().sort((a, b) => Math.abs(b.bt) - Math.abs(a.bt)).slice(0, 3);
   const lefBigText = (() => {
     const yrs = a => a.map(m => m.at).sort((x, y) => x - y).reduce((s, y, i, arr) => s + (i ? i === arr.length - 1 ? arr.length > 2 ? ", and " : " and " : ", " : "") + y, "");
@@ -111840,11 +111907,11 @@ function infoTerms(D) {
     key: t.year
   }, React.createElement("td", null, t.year), t.era ? React.createElement("td", {
     colSpan: "3"
-  }, pc(t.dlp), " DLP", t.dem != null ? ", " + pc(t.dem) + " Democrats" : "", ", ", pc(t.oth), " others (calibrated)") : t.minor != null ? React.createElement("td", {
+  }, [["dlp", "DLP"], ["dem", "Democrats"], ["oth", "others"]].filter(([k]) => t[k] != null).map(([k, nm]) => pc(t[k]) + " " + nm + " (" + (t.assumed === k || t.year === 1955 && k === "dlp" ? "assumed" : t.fit === k ? "fitted" : "fixed") + ")").join(", ")) : t.minor != null ? React.createElement("td", {
     colSpan: "3"
-  }, pc(t.minor), " (all minor parties)") : React.createElement(React.Fragment, null, React.createElement("td", null, pc(t.grn)), React.createElement("td", null, pc(t.onp)), React.createElement("td", null, pc(t.oth))), React.createElement("td", null, t.bt == null || !lefT[i + 1] ? "–" : (t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year))))), React.createElement("p", {
+  }, pc(t.minor), " (all minor parties)") : React.createElement(React.Fragment, null, React.createElement("td", null, pc(t.grn)), React.createElement("td", null, pc(t.onp)), React.createElement("td", null, pc(t.oth))), React.createElement("td", null, t.bt == null || !lefT[i + 1] ? "–" : (Math.abs(t.bt) < 0.005 ? "" : t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year))))), React.createElement("p", {
     className: "info-work-note"
-  }, "Per cent of each group\u2019s preferences reaching Labor against the Coalition. The miss is the table applied to the next election\u2019s actual primary votes, minus that election\u2019s official 2PP, in points for Labor. A party a table never counted (One Nation in 1996) is read at that table\u2019s \u201Cothers\u201D flow; a poll that doesn\u2019t list a party separately reads it at the election\u2019s own mix; and a poll whose shares don\u2019t total 100 is rescaled to 100 first. The 1972\u201384 rows pre-date any published two-party figure, so each table is calibrated to its own election\u2019s official result; the 1975 table\u2019s Democrat flow is a debut assumption \u2013 no earlier Democrat vote exists to count.")) : null;
+  }, "Per cent of each group\u2019s preferences reaching Labor against the Coalition. The miss is the table applied to the next election\u2019s actual primary votes, minus that election\u2019s official 2PP, in points for Labor (before 1984, an estimated 2PP). A party a table never counted (One Nation in 1996) is read at that table\u2019s \u201Cothers\u201D flow. In the rows to 1984, \u201Cfitted\u201D is the flow solved to match that election\u2019s official result, \u201Cfixed\u201D and \u201Cassumed\u201D are set, not measured.")) : null;
   const RD = !!(window.AP && window.AP.rd);
   const headFig = L.rivalLead === "alp_on" && L.onImp ? {
     a: L.onImp.a,
@@ -112039,7 +112106,7 @@ function infoTerms(D) {
         href: "/flows-explained/"
       }, "preference flows explainer"), " tracks the share of each group\u2019s ballots that ended with Labor rather than the Coalition, election by election.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Federal: counted."), " The Australian Electoral Commission follows every ballot to the final two and publishes where each party\u2019s voters ended up. From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final two, about nine seats in ten. Since 2004 it covers every seat: the Commission sorts every ballot between Labor and the Coalition, even where someone else made the final two."), FHB && FHB.fedEst ? React.createElement("span", {
+      }, React.createElement("b", null, "Federal: counted."), " The Australian Electoral Commission follows every ballot to the final two and publishes where each party\u2019s voters ended up. From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final two, 142 to 145 of the 148 to 150. Since 2004 it covers every seat: the Commission sorts every ballot between Labor and the Coalition, even where someone else made the final two."), FHB && FHB.fedEst ? React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Federal before 1996: estimated."), " The Commission published no flows by party before 1996, but it has distributed every seat\u2019s preferences in full since 1984. The chart estimates ", FHB.fedEst[0], "\u2013", FHB.fedEst[FHB.fedEst.length - 1], " from those distributions with the method behind the state lines, set out below: from Adam Carr\u2019s transcriptions of the printed results to 1990 and the Commission\u2019s statistics tables for 1993, in the seats where Labor and the Coalition finished first and second. A few seats whose transcribed counts don\u2019t add up are left out. The 1983 count stopped once a candidate passed half the vote, so it can\u2019t be estimated this way.") : null, FHB ? React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
@@ -112301,13 +112368,15 @@ function infoTerms(D) {
     entries: [{
       id: "last-election-flows",
       term: "Last-election flows",
-      body: React.createElement(React.Fragment, null, "The flow table a term\u2019s implied 2PP is read through: the preferences counted at the election that opened the term. It\u2019s the only table anyone inside the term could have used, so each past term sits on the same footing as today\u2019s", " ", xref("implied-2pp", "last-election flows", "implied 2PP"), ". The sitting term follows the rival Labor is doing worse against, as the headline does", onSince ? React.createElement(React.Fragment, null, ": the Coalition until ", onSince, ", One Nation since") : null, ", and the chart marks the change.", lefMean != null ? React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "The flow table a term\u2019s implied 2PP is read through: the preferences counted at the election that opened the term. From 1987 it\u2019s the only table anyone inside the term could have used (the earlier ones are reconstructions, below), so each past term sits on the same footing as today\u2019s", " ", xref("implied-2pp", "last-election flows", "implied 2PP"), ". The sitting term follows the rival Labor is doing worse against, as the headline does", onSince ? React.createElement(React.Fragment, null, ": the Coalition until ", onSince, ", One Nation since") : null, ", and the chart marks the change.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How well it works."), " Applied to the next election\u2019s actual primary votes, each table since 1984 misses the counted 2PP by ", lefMean.toFixed(1), " points on average. The biggest misses were ", lefBigText, ".", lefOldMean != null ? React.createElement(React.Fragment, null, " The older tables miss by ", lefOldMean.toFixed(1), " on average, but before 1984 the official two-party results are themselves estimates, so those misses measure agreement with an estimate, not a count.") : null) : null, React.createElement("span", {
+      }, React.createElement("b", null, "How it\u2019s worked out."), " A poll\u2019s two-party figure for Labor is its Labor primary vote, plus each other group\u2019s primary vote times that group\u2019s flow to Labor in the term\u2019s table, plus a small fixed correction: whatever the table leaves between the opening election\u2019s own primary votes and its official result (Coalition preferences leaking to Labor in three-cornered seats, or the few seats a count didn\u2019t cover), never more than ", lefAnchorMax.toFixed(2), " points. With it, each term starts exactly at the official result. A poll that doesn\u2019t list a party separately reads it at the election\u2019s own mix, and one whose shares don\u2019t total 100 is rescaled first."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Where the tables come from."), " From 2004, the AEC\u2019s count of every ballot between Labor and the Coalition, in every seat. For 1996\u20132001, its official statistics, from the nine seats in ten where the final two were Labor and the Coalition. Before 1996 the AEC published no flows by party. Every seat\u2019s full distribution exists from 1984, and flows by party can be estimated from it (the", " ", React.createElement("a", {
+      }, React.createElement("b", null, "Where the tables come from."), " From 2004, the AEC\u2019s count of every ballot between Labor and the Coalition, in every seat. For 1996\u20132001, its official statistics, from the seats where the final two were Labor and the Coalition: 142 to 145 of the 148 to 150. Before 1996 the AEC published no flows by party. Every seat\u2019s full distribution exists from 1984, and flows by party can be estimated from it (the", " ", React.createElement("a", {
         href: "/flows-explained/"
-      }, "preference flows explainer"), " charts them), but the 1987\u201393 polls on file give one combined figure for the minor parties, so each of those terms uses the single minor-party flow its opening election\u2019s official result implies, which reproduces that election exactly. The Morgan Gallup polls of 1943\u201384 published no two-party figure at all, so those terms are read through tables fitted to the two-party result of the election that opened each term: one flow each for the DLP, the Democrats (an assumption where an election met them for the first time) and all other votes. Before 1984 those results are themselves estimates, by the Parliamentary Library and Malcolm Mackerras, so the older tables are fitted to estimates, not counts."), working(lefWork))
+      }, "preference flows explainer"), " charts them), but the 1987\u201393 polls on file give one combined figure for the minor parties, so each of those terms uses the single minor-party flow its opening election\u2019s official result implies, which reproduces that election exactly. The Morgan Gallup polls of 1943\u201384 published no two-party figure at all, so those terms are read through tables fitted to the two-party result of the election that opened each term. Each table solves one flow so that it reproduces that result: everyone else\u2019s to 1954, the DLP\u2019s to 1975, the Democrats\u2019 from 1977. The rest are fixed: everyone else at 45%, and the DLP at 27% once its vote collapsed. Two are assumptions: the Democrats\u2019 50% in the 1975 table, since they had never stood, and the DLP\u2019s 27% in 1955, the year of the Labor split, whose solved value (0.2%) misread 1957\u201358. With nothing solved, the 1955 table misses its own election by 1.4 points, so that term starts off its official result. Before 1984 those results are themselves estimates, by the Parliamentary Library and Malcolm Mackerras, so these tables are fitted to estimates, not counts. And since no one at the time had the flows, they reconstruct what a last-election reading would have given, rather than one anyone could have made."), lefMean != null ? React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "How well it works."), " Applied to the next election\u2019s actual primary votes, each table since 1984 misses the counted 2PP by ", lefMean.toFixed(1), " points on average. The biggest misses were ", lefBigText, ".", lefOldMean != null ? React.createElement(React.Fragment, null, " The older tables miss by ", lefOldMean.toFixed(1), " on average, but before 1984 the official two-party results are themselves estimates, built partly on assumed preference flows, so those misses measure agreement with an estimate, not a count, and probably flatter the tables: the 1958\u201383 ones miss by only ", lefMidMean != null ? lefMidMean.toFixed(1) : "0.2", ", and the 1955 table\u2019s DLP flow was chosen with the 1958 result in view. Read their real error as at least the counted era\u2019s.") : null, LPM ? React.createElement(React.Fragment, null, " Either way the conversion is the smaller error: the final polls before 1984 missed the official two-party result by ", LPM.tpp.toFixed(1), " points on average, almost all of it through their primary votes (Labor\u2019s alone missed by ", LPM.prim.toFixed(1), ").") : null) : null, working(lefWork))
     }]
   }, {
     id: "s-allpolls",

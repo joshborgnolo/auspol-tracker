@@ -7077,12 +7077,17 @@ function infoTerms(D) {
      two-party results are themselves estimates, so a miss there measures
      agreement with an estimate, not a count. */
   const lefT = (D.lefTables || []).slice().sort((a, b) => a.year - b.year);
-  const lefAll = lefT.map((t, i) => (t.bt == null || !lefT[i + 1] ? null : { at: lefT[i + 1].year, bt: t.bt }))
+  const lefAll = lefT.map((t, i) => (t.bt == null || !lefT[i + 1] ? null : { at: lefT[i + 1].year, bt: t.bt, era: !!t.era, fit: t.fit }))
     .filter(Boolean);
   const lefMiss = lefAll.filter((m) => m.at >= 1984);
   const lefOld = lefAll.filter((m) => m.at < 1984);
   const meanAbs = (a) => (a.length ? a.reduce((s, m) => s + Math.abs(m.bt), 0) / a.length : null);
   const lefMean = meanAbs(lefMiss), lefOldMean = meanAbs(lefOld);
+  /* the 1958-83 tables (Parliamentary Library targets), the 1955 table
+     left out: its DLP flow was chosen with 1958 in view */
+  const lefMidMean = meanAbs(lefOld.filter((m) => m.at >= 1958 && m.fit != null));
+  const lefAnchorMax = Math.max(0, ...lefT.filter((t) => !t.era && t.anchor != null).map((t) => Math.abs(t.anchor)));
+  const LPM = (D.lefPollMiss || {}).pre;
   const lefBig = lefMiss.slice().sort((a, b) => Math.abs(b.bt) - Math.abs(a.bt)).slice(0, 3);
   /* "2013 and 2022, when Labor did 1.0 points better than projected, and
      2019, when it did 0.8 worse" – the misses grouped by direction, each
@@ -7256,23 +7261,22 @@ function infoTerms(D) {
             <tr key={t.year}>
               <td>{t.year}</td>
               {t.era
-                ? <td colSpan="3">{pc(t.dlp)} DLP{t.dem != null ? ", " + pc(t.dem) + " Democrats" : ""}, {pc(t.oth)} others (calibrated)</td>
+                ? <td colSpan="3">{[["dlp", "DLP"], ["dem", "Democrats"], ["oth", "others"]].filter(([k]) => t[k] != null)
+                    .map(([k, nm]) => pc(t[k]) + " " + nm + " (" + (t.assumed === k || (t.year === 1955 && k === "dlp") ? "assumed" : t.fit === k ? "fitted" : "fixed") + ")").join(", ")}</td>
                 : t.minor != null
                 ? <td colSpan="3">{pc(t.minor)} (all minor parties)</td>
                 : <><td>{pc(t.grn)}</td><td>{pc(t.onp)}</td><td>{pc(t.oth)}</td></>}
-              <td>{t.bt == null || !lefT[i + 1] ? "–" : (t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year}</td>
+              <td>{t.bt == null || !lefT[i + 1] ? "–" : (Math.abs(t.bt) < 0.005 ? "" : t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <p className="info-work-note">Per cent of each group’s preferences reaching Labor against the
         Coalition. The miss is the table applied to the next election’s actual primary votes, minus
-        that election’s official 2PP, in points for Labor. A party a table never counted (One Nation
-        in 1996) is read at that table’s “others” flow; a poll that doesn’t list a party separately
-        reads it at the election’s own mix; and a poll whose shares don’t total 100 is rescaled to
-        100 first. The 1972–84 rows pre-date any published two-party figure, so each table is
-        calibrated to its own election’s official result; the 1975 table’s Democrat flow is a debut
-        assumption – no earlier Democrat vote exists to count.</p>
+        that election’s official 2PP, in points for Labor (before 1984, an estimated 2PP). A party a table
+        never counted (One Nation in 1996) is read at that table’s “others” flow. In the rows to
+        1984, “fitted” is the flow solved to match that election&rsquo;s official result, “fixed” and
+        “assumed” are set, not measured.</p>
     </div>
   ) : null;
 
@@ -7649,7 +7653,7 @@ function infoTerms(D) {
           <span className="info-p"><b>Federal: counted.</b> The Australian Electoral Commission
           follows every ballot to the final two and publishes where each party’s voters ended up.
           From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final
-          two, about nine seats in ten. Since 2004 it covers every seat: the Commission sorts every
+          two, 142 to 145 of the 148 to 150. Since 2004 it covers every seat: the Commission sorts every
           ballot between Labor and the Coalition, even where someone else made the final two.</span>
           {FHB && FHB.fedEst ? (
             <span className="info-p"><b>Federal before 1996: estimated.</b> The Commission published no
@@ -8208,22 +8212,25 @@ function infoTerms(D) {
       entries: [
         { id: "last-election-flows", term: "Last-election flows", body: (
           <>The flow table a term’s implied 2PP is read through: the preferences counted at the
-          election that opened the term. It’s the only table anyone inside the term could have
-          used, so each past term sits on the same footing as today’s
+          election that opened the term. From 1987 it&rsquo;s the only table anyone inside the term could
+          have used (the earlier ones are reconstructions, below), so each past term sits on the same
+          footing as today’s
           {" "}{xref("implied-2pp", "last-election flows", "implied 2PP")}. The sitting term follows
           the rival Labor is doing worse against, as the headline does{onSince ? <>: the Coalition
           until {onSince}, One Nation since</> : null}, and the chart marks the change.
-          {lefMean != null ? (
-            <span className="info-p"><b>How well it works.</b> Applied to the next election’s
-            actual primary votes, each table since 1984 misses the counted 2PP by {lefMean.toFixed(1)} points
-            on average. The biggest misses were {lefBigText}.{lefOldMean != null ? <> The older tables
-            miss by {lefOldMean.toFixed(1)} on average, but before 1984 the official two-party results are
-            themselves estimates, so those misses measure agreement with an estimate, not a
-            count.</> : null}</span>
-          ) : null}
+          <span className="info-p"><b>How it&rsquo;s worked out.</b> A poll&rsquo;s two-party figure for
+          Labor is its Labor primary vote, plus each other group&rsquo;s primary vote times that
+          group&rsquo;s flow to Labor in the term&rsquo;s table, plus a small fixed correction: whatever
+          the table leaves between the opening election&rsquo;s own primary votes and its official
+          result (Coalition preferences leaking to Labor in three-cornered seats, or the few seats a
+          count didn&rsquo;t cover), never more than {lefAnchorMax.toFixed(2)} points. With it, each
+          term starts exactly at the official result. A poll that doesn&rsquo;t list a party
+          separately reads it at the election&rsquo;s own mix, and one whose shares don&rsquo;t total 100
+          is rescaled first.</span>
           <span className="info-p"><b>Where the tables come from.</b> From 2004, the AEC’s count of
           every ballot between Labor and the Coalition, in every seat. For 1996–2001, its official
-          statistics, from the nine seats in ten where the final two were Labor and the Coalition.
+          statistics, from the seats where the final two were Labor and the Coalition: 142 to 145 of
+          the 148 to 150.
           Before 1996 the AEC published no flows by party. Every seat&rsquo;s full distribution
           exists from 1984, and flows by party can be estimated from it (the
           {" "}<a href="/flows-explained/">preference flows explainer</a> charts them), but the
@@ -8231,10 +8238,30 @@ function infoTerms(D) {
           terms uses the single minor-party flow its opening election&rsquo;s official result
           implies, which reproduces that election exactly. The Morgan Gallup polls of 1943–84
           published no two-party figure at all, so those terms are read through tables fitted to
-          the two-party result of the election that opened each term: one flow each for the DLP,
-          the Democrats (an assumption where an election met them for the first time) and all other
-          votes. Before 1984 those results are themselves estimates, by the Parliamentary Library
-          and Malcolm Mackerras, so the older tables are fitted to estimates, not counts.</span>
+          the two-party result of the election that opened each term. Each table solves one flow so
+          that it reproduces that result: everyone else&rsquo;s to 1954, the DLP&rsquo;s to 1975, the
+          Democrats&rsquo; from 1977. The rest are fixed: everyone else at 45%, and the DLP at 27% once
+          its vote collapsed. Two are assumptions: the Democrats&rsquo; 50% in the 1975 table, since they
+          had never stood, and the DLP&rsquo;s 27% in 1955, the year of the Labor split, whose solved
+          value (0.2%) misread 1957–58. With nothing solved, the 1955 table misses its own election by
+          1.4 points, so that term starts off its official result. Before 1984 those results are themselves estimates, by the
+          Parliamentary Library and Malcolm Mackerras, so these tables are fitted to estimates, not
+          counts. And since no one at the time had the flows, they reconstruct what a last-election
+          reading would have given, rather than one anyone could have made.</span>
+          {lefMean != null ? (
+            <span className="info-p"><b>How well it works.</b> Applied to the next election’s
+            actual primary votes, each table since 1984 misses the counted 2PP by {lefMean.toFixed(1)} points
+            on average. The biggest misses were {lefBigText}.{lefOldMean != null ? <> The older tables
+            miss by {lefOldMean.toFixed(1)} on average, but before 1984 the official two-party results are
+            themselves estimates, built partly on assumed preference flows, so those misses measure
+            agreement with an estimate, not a count, and probably flatter the tables: the 1958–83 ones
+            miss by only {lefMidMean != null ? lefMidMean.toFixed(1) : "0.2"}, and the 1955 table&rsquo;s DLP
+            flow was chosen with the 1958 result in view. Read their real error as at least the counted
+            era&rsquo;s.</> : null}{LPM ? <> Either way the conversion is the smaller error: the final
+            polls before 1984 missed the official two-party result by {LPM.tpp.toFixed(1)} points on
+            average, almost all of it through their primary votes (Labor&rsquo;s alone missed
+            by {LPM.prim.toFixed(1)}).</> : null}</span>
+          ) : null}
           {working(lefWork)}</>) },
       ] },
     { id: "s-allpolls", title: "All polls", nav: "All polls",

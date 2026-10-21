@@ -7672,9 +7672,34 @@ window.AUSPOL = (function () {
      plus the sitting term's FLOW), for Info's show-the-working table: ALP
      shares per bucket, the one lumped flow where no split was published, and
      each table's miss on the next election's primaries (bt, ALP points). */
+  /* how far each era's final poll (the last within 60 days of the vote)
+     missed the official 2PP, against how far its Labor primary missed: the
+     conversion through a flow table is the small error inside the poll's
+     own (Info's "How well it works") */
+  const lefPollMiss = ${JSON.stringify((() => {
+    const miss = (lo, hi) => {
+      const v = Object.entries(cyclePolls).map(([cy, ps]) => {
+        const e = ELECTIONS["e" + cy];
+        if (!e || +cy < lo || +cy > hi) return null;
+        const pre = ps.filter((p) => p.date < e.date && p.tpp_alp != null && (Date.parse(e.date) - Date.parse(p.date)) / 864e5 <= 60)
+          .sort((a, b) => (a.date < b.date ? -1 : 1));
+        const last = pre[pre.length - 1];
+        return last ? { tpp: Math.abs(last.tpp_alp - e.tpp_alp), prim: Math.abs(last.alp - e.alp) } : null;
+      }).filter(Boolean);
+      const avg = (k) => Math.round((v.reduce((s, x) => s + x[k], 0) / v.length) * 10) / 10;
+      return v.length ? { n: v.length, tpp: avg("tpp"), prim: avg("prim") } : null;
+    };
+    return { pre: miss(0, 1984), post: miss(1985, 9999) };
+  })())};
   const lefTables = ${JSON.stringify([
-    ...Object.entries(FLOW_ERAS).map(([y, t]) => ({ year: +y, era: true, dlp: t.dlp ?? null, dem: t.dem ?? null, oth: t.oth, bt: t.bt ?? null })),
-    ...Object.entries(FLOW_LEF).map(([y, t]) => ({ year: +y, grn: t.grn ?? null, onp: t.onp ?? null, oth: t.oth ?? null, minor: t.minor ?? null, bt: t.bt })),
+    /* fit: the one flow each era election solved, the rest fixed (user
+       review 2026-10-21) - "others" to 1954 (no headline minor yet), none
+       in 1955 (the pooled DLP 27%: the solved 0.2% misread 1957-58), the
+       DLP to 1975, the Democrats from 1977 (others 45% and, once its vote
+       collapsed, the DLP 27% fixed); 1975's Democrat 50% is a debut guess */
+    ...Object.entries(FLOW_ERAS).map(([y, t]) => ({ year: +y, era: true, dlp: t.dlp ?? null, dem: t.dem ?? null, oth: t.oth, bt: t.bt ?? null,
+      fit: +y <= 1954 ? "oth" : +y === 1955 ? null : +y <= 1975 ? "dlp" : "dem", assumed: +y === 1975 ? "dem" : null })),
+    ...Object.entries(FLOW_LEF).map(([y, t]) => ({ year: +y, grn: t.grn ?? null, onp: t.onp ?? null, oth: t.oth ?? null, minor: t.minor ?? null, bt: t.bt, anchor: t.anchor ?? 0 })),
     { year: 2025, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth, minor: null, bt: null },
   ])};
   /* The two frozen tables the implied figures are read through, as the
@@ -7959,7 +7984,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
