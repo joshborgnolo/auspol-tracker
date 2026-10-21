@@ -1943,7 +1943,7 @@ function rdLgLines(p, { onM, demSplit }) {
     })();
     const sg = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + rdApNum(Math.abs(v));
     out.push({ id: "demographics", lab: "Demographics", body: <>
-      {pr && <U lbl>{pr.a} v {pr.b}</U>}
+      {pr && <U lbl>{pr.lab}</U>}
       {pr && rdLgPrims().filter((k) => pr.gap[k.id] != null).map((k) => <U key={k.id}>{pty(k.id, sg(pr.gap[k.id]))}</U>)}
       <U soft>{nG} groups in {rdNumWord(nC)} breakdown{nC === 1 ? "" : "s"}</U>
     </> });

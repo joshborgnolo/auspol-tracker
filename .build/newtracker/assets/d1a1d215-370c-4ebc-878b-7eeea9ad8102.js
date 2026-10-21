@@ -3790,7 +3790,7 @@ function issBestOf(iss) {
    come merged, as the pooling merges them (gen-data's grp.v). */
 const DEM_SPLITS = [
   { id: "age", label: "Age", lo: "Older", hi: "Younger", scope: "With an age breakdown",
-    pairs: [["18–34", "55+", "18–34 v 55+"], ["Gen Z", "Boomers", "Gen Z v Boomers"], ["18–34", "65+", "18–34 v 65+"], ["18–34", "50+", "18–34 v 50+"]] },
+    pairs: [["18–34", "55+", "18–34 v 55+"], ["Gen Z", "Boomers", "Gen Z v boomers"], ["18–34", "65+", "18–34 v 65+"], ["18–34", "50+", "18–34 v 50+"]] },
   { id: "gender", label: "Gender", lo: "Men", hi: "Women", scope: "With a gender breakdown",
     pairs: [["Women", "Men", "Women v men"]] },
   { id: "education", label: "Education", lo: "No tertiary", hi: "University", scope: "With an education breakdown",

@@ -35537,7 +35537,7 @@ const DEM_SPLITS = [{
   lo: "Older",
   hi: "Younger",
   scope: "With an age breakdown",
-  pairs: [["18–34", "55+", "18–34 v 55+"], ["Gen Z", "Boomers", "Gen Z v Boomers"], ["18–34", "65+", "18–34 v 65+"], ["18–34", "50+", "18–34 v 50+"]]
+  pairs: [["18–34", "55+", "18–34 v 55+"], ["Gen Z", "Boomers", "Gen Z v boomers"], ["18–34", "65+", "18–34 v 65+"], ["18–34", "50+", "18–34 v 50+"]]
 }, {
   id: "gender",
   label: "Gender",
@@ -59461,7 +59461,7 @@ function rdLgLines(p, {
       lab: "Demographics",
       body: React.createElement(React.Fragment, null, pr && React.createElement(U, {
         lbl: true
-      }, pr.a, " v ", pr.b), pr && rdLgPrims().filter(k => pr.gap[k.id] != null).map(k => React.createElement(U, {
+      }, pr.lab), pr && rdLgPrims().filter(k => pr.gap[k.id] != null).map(k => React.createElement(U, {
         key: k.id
       }, pty(k.id, sg(pr.gap[k.id])))), React.createElement(U, {
         soft: true
