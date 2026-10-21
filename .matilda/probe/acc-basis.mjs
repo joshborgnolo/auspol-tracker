@@ -89,6 +89,46 @@ await new Promise((r) => setTimeout(r, 400));
 const restored = await firmBoard();
 ok("flipping back restores the published board", restored === before, restored.slice(0, 120));
 
+// the stat table under the chips follows the basis; figures pinned from the
+// worktree bundle (n=71 rows, 2 exact calls, deviation mean 2.1)
+const statRows = () => page.evaluate(() =>
+  [...document.querySelectorAll(".rd-acc-stats tbody tr")].map((tr) =>
+    [...tr.children].map((c) => c.textContent.trim()).join(" = ")));
+const statsText = (rows) => rows.join(" | ");
+
+let rows = await statRows();
+ok("stat table renders 8 tbody rows", rows.length === 8, statsText(rows));
+ok("all row: mean miss 1.3 pts", /All final polls = 1\.3 pts =/.test(rows[0] || ""), rows[0]);
+ok("all row: 48% toward Labor (published)", /= 48%$/.test(rows[0] || ""), rows[0]);
+ok("average election gap is 2.1 pts", /gap from 50–50 = 2\.1 pts/.test(rows[1] || ""), rows[1]);
+ok("best election is 1972", /Best election for the polls = 1972/.test(rows[2] || ""), rows[2]);
+ok("worst election is 1984 (published)", /Worst election for the polls = 1984/.test(rows[3] || ""), rows[3]);
+ok("Essential row: 1.6 pts", /^Essential\d+ polls = 1\.6 pts =/.test(rows[4] || ""), rows[4]);
+ok("Resolve row: 0% toward Labor", /^Resolve\d+ polls = 1\.6 pts = 0%/.test(rows[5] || ""), rows[5]);
+ok("Newspoll row: 1.4 pts", /^Newspoll\d+ polls = 1\.4 pts = 50%/.test(rows[6] || ""), rows[6]);
+ok("Roy Morgan row: 1.8 pts, 62% Labor", /^Roy Morgan\d+ polls = 1\.8 pts = 62%/.test(rows[7] || ""), rows[7]);
+ok("stat note mentions the exact calls", await page.evaluate(() =>
+  /exact calls/.test(document.querySelector(".rd-acc-stats-note")?.textContent || "")));
+
+// flip to implied: the whole table must re-derive
+await page.evaluate(() => {
+  [...document.querySelectorAll(".rd-acc-basis .rd-chip")][1].click();
+});
+await new Promise((r) => setTimeout(r, 400));
+rows = await statRows();
+ok("implied: all row stays 1.3 but 51% toward Labor", /All final polls = 1\.3 pts = 51%/.test(rows[0] || ""), rows[0]);
+ok("implied: worst election becomes 2019", /Worst election for the polls = 2019/.test(rows[3] || ""), rows[3]);
+ok("implied: Essential drops to 1.4", /^Essential\d+ polls = 1\.4 pts = 67%/.test(rows[4] || ""), rows[4]);
+ok("implied: Roy Morgan becomes 1.6 pts, 57%", /^Roy Morgan\d+ polls = 1\.6 pts = 57%/.test(rows[7] || ""), rows[7]);
+
+// flip back restores the published figures
+await page.evaluate(() => {
+  [...document.querySelectorAll(".rd-acc-basis .rd-chip")][0].click();
+});
+await new Promise((r) => setTimeout(r, 400));
+rows = await statRows();
+ok("flipping back restores 48% toward Labor", /= 48%$/.test(rows[0] || ""), rows[0]);
+
 await browser.close();
 server.close();
 if (fails) { console.error(`\n${fails} failure(s)`); process.exit(1); }

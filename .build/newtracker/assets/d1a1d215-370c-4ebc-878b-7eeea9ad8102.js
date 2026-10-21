@@ -3062,6 +3062,26 @@ function AccuracyPanel() {
       : "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on.")
       + " A pollster only counts against the elections it published a final poll for"
       + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
+    /* the ledger table beneath the basis chips: headline miss against the
+       size of the elections themselves, the direction split, the best and
+       worst collective years, and the four current majors on the same two
+       measures – every figure derives from the basis-selected rows, so the
+       chips move the whole table */
+    const allErrs = byRecency.flatMap((c) => hh(c).map(errOf));
+    const nzErrs = allErrs.filter((e) => e !== 0);
+    const labShare = nzErrs.length ? Math.round((nzErrs.filter((e) => e > 0).length / nzErrs.length) * 100) : null;
+    const exactN = allErrs.length - nzErrs.length;
+    const devMean = byRecency.reduce((t, c) => t + Math.abs(c.result - 50), 0) / byRecency.length;
+    const cMiss = (c) => { const es = hh(c).map(errOf); return es.reduce((t, e) => t + Math.abs(e), 0) / es.length; };
+    const byCyMiss = byRecency.slice().sort((a, b) => cMiss(a) - cMiss(b));
+    const bestCyc = byCyMiss[0], worstCyc = byCyMiss[byCyMiss.length - 1];
+    const statHouses = ["Essential", "Resolve", "Newspoll", "Roy Morgan"].map((name) => {
+      const es = byRecency.flatMap((c) => hh(c).filter((h) => h.firm === name).map(errOf));
+      const nz = es.filter((e) => e !== 0);
+      return { name, n: es.length,
+               miss: es.length ? es.reduce((t, e) => t + Math.abs(e), 0) / es.length : null,
+               lab: nz.length ? Math.round((nz.filter((e) => e > 0).length / nz.length) * 100) : null };
+    }).filter((s) => s.n);
     const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
     return (
       <RdSec id="final-polls" cls="rd-acc" title="How the final polls have done"
@@ -3075,6 +3095,33 @@ function AccuracyPanel() {
           <button type="button" className="rd-chip" aria-pressed={imp} onClick={() => setBasis("imp")}
             title="Every final poll’s primaries put through the one preference-flow table – the flows counted at the previous election">Primaries on last-election flows</button>
         </div>
+        <table className="rd-acc-stats">
+          <thead>
+            <tr><th scope="col"></th><th scope="col" className="num">Mean miss</th><th scope="col" className="num">Missed toward Labor</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">All final polls</th><td>{meanAbsX.toFixed(1)} pts</td><td>{labShare != null ? labShare + "%" : "–"}</td>
+            </tr>
+            <tr className="rd-acc-stat-ctx">
+              <th scope="row">Average election result’s gap from 50–50</th><td colSpan="2">{devMean.toFixed(1)} pts</td>
+            </tr>
+            <tr className="rd-acc-stat-ctx">
+              <th scope="row">Best election for the polls</th><td colSpan="2">{bestCyc.year} · off by {cMiss(bestCyc).toFixed(1)} on average</td>
+            </tr>
+            <tr className="rd-acc-stat-ctx">
+              <th scope="row">Worst election for the polls</th><td colSpan="2">{worstCyc.year} · off by {cMiss(worstCyc).toFixed(1)} on average</td>
+            </tr>
+            {statHouses.map((s) => (
+              <tr key={s.name}>
+                <th scope="row">{s.name}<span className="rd-acc-stat-n">{s.n} poll{s.n === 1 ? "" : "s"}</span></th>
+                <td>{s.miss != null ? s.miss.toFixed(1) + " pts" : "–"}</td>
+                <td>{s.lab != null ? s.lab + "%" : "–"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="rd-acc-stats-note">Mean miss weights every election equally; the houses each count their own final polls. “Missed toward Labor” counts the polls that overstated Labor’s two-party share{exactN ? ", and the " + nw(exactN) + " exact call" + (exactN === 1 ? " counts" : "s count") + " neither way" : ""}.</p>
         <div className="card rd-card rd-acc-card">
           <div className="rd-chead"><span className="rd-chead-t">Labor’s final {imp && "implied "}two-party figure in the polls, minus the result, points</span>
             {stackedX > 0 && <button type="button" className="rd-chip" aria-pressed={spread} onClick={() => setSpread(!spread)}

@@ -5280,6 +5280,15 @@ body.rd .conf-band.hi.thin { opacity: 0.075; }
 body.rd.dark .conf-band.lo { fill: var(--ink-2); opacity: 0.1; }
 body.rd.dark .conf-band.hi { fill: var(--ink-2); opacity: 0.18; }
 body.rd .rd-acc-basis { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+body.rd .rd-acc-stats { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; line-height: 1.4; }
+body.rd .rd-acc-stats th, body.rd .rd-acc-stats td { padding: 5px 0; font-weight: 400; text-align: left; vertical-align: baseline; }
+body.rd .rd-acc-stats thead th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); padding-bottom: 4px; }
+body.rd .rd-acc-stats tbody th, body.rd .rd-acc-stats tbody td { border-top: 1px solid var(--line); }
+body.rd .rd-acc-stats td, body.rd .rd-acc-stats th.num { text-align: right; font-variant-numeric: tabular-nums; }
+body.rd .rd-acc-stats tbody th { font-weight: 600; font-size: 12.5px; }
+body.rd .rd-acc-stat-ctx th, body.rd .rd-acc-stat-ctx td { color: var(--ink-2); font-weight: 400; font-size: 12.5px; }
+body.rd .rd-acc-stat-n { display: block; font-size: 11.5px; color: var(--ink-3); font-weight: 400; }
+body.rd .rd-acc-stats-note { margin: 6px 0 0; font-size: 12px; color: var(--ink-3); max-width: 640px; }
 body.rd .rd-acc-card { margin-top: 18px; }
 body.rd .rd-acc-card .rd-chead { gap: 12px; }
 body.rd .rd-acc-head, body.rd .rd-acc-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px 170px; column-gap: 16px; align-items: center; }
@@ -109048,6 +109057,28 @@ function AccuracyPanel() {
     const longest = firmsSrc.slice().sort((a, b) => b.n - a.n);
     const fHead = firms.length >= 3 ? firms[0].firm + " and " + firms[1].firm + " have come closest; " + firms[firms.length - 1].firm + " has missed by most" : "How each pollster has done";
     const fDek = (imp ? "Average miss ignoring direction, closest first – with every final poll re-scored on its primaries through the previous election’s preference flows, not the two-party figure it printed – for pollsters with more than one election to judge on." : "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on.") + " A pollster only counts against the elections it published a final poll for" + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
+    const allErrs = byRecency.flatMap(c => hh(c).map(errOf));
+    const nzErrs = allErrs.filter(e => e !== 0);
+    const labShare = nzErrs.length ? Math.round(nzErrs.filter(e => e > 0).length / nzErrs.length * 100) : null;
+    const exactN = allErrs.length - nzErrs.length;
+    const devMean = byRecency.reduce((t, c) => t + Math.abs(c.result - 50), 0) / byRecency.length;
+    const cMiss = c => {
+      const es = hh(c).map(errOf);
+      return es.reduce((t, e) => t + Math.abs(e), 0) / es.length;
+    };
+    const byCyMiss = byRecency.slice().sort((a, b) => cMiss(a) - cMiss(b));
+    const bestCyc = byCyMiss[0],
+      worstCyc = byCyMiss[byCyMiss.length - 1];
+    const statHouses = ["Essential", "Resolve", "Newspoll", "Roy Morgan"].map(name => {
+      const es = byRecency.flatMap(c => hh(c).filter(h => h.firm === name).map(errOf));
+      const nz = es.filter(e => e !== 0);
+      return {
+        name,
+        n: es.length,
+        miss: es.length ? es.reduce((t, e) => t + Math.abs(e), 0) / es.length : null,
+        lab: nz.length ? Math.round(nz.filter(e => e > 0).length / nz.length * 100) : null
+      };
+    }).filter(s => s.n);
     const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
     return React.createElement(RdSec, {
       id: "final-polls",
@@ -109073,7 +109104,45 @@ function AccuracyPanel() {
       "aria-pressed": imp,
       onClick: () => setBasis("imp"),
       title: "Every final poll\u2019s primaries put through the one preference-flow table \u2013 the flows counted at the previous election"
-    }, "Primaries on last-election flows")), React.createElement("div", {
+    }, "Primaries on last-election flows")), React.createElement("table", {
+      className: "rd-acc-stats"
+    }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+      scope: "col"
+    }), React.createElement("th", {
+      scope: "col",
+      className: "num"
+    }, "Mean miss"), React.createElement("th", {
+      scope: "col",
+      className: "num"
+    }, "Missed toward Labor"))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("th", {
+      scope: "row"
+    }, "All final polls"), React.createElement("td", null, meanAbsX.toFixed(1), " pts"), React.createElement("td", null, labShare != null ? labShare + "%" : "–")), React.createElement("tr", {
+      className: "rd-acc-stat-ctx"
+    }, React.createElement("th", {
+      scope: "row"
+    }, "Average election result\u2019s gap from 50\u201350"), React.createElement("td", {
+      colSpan: "2"
+    }, devMean.toFixed(1), " pts")), React.createElement("tr", {
+      className: "rd-acc-stat-ctx"
+    }, React.createElement("th", {
+      scope: "row"
+    }, "Best election for the polls"), React.createElement("td", {
+      colSpan: "2"
+    }, bestCyc.year, " \xB7 off by ", cMiss(bestCyc).toFixed(1), " on average")), React.createElement("tr", {
+      className: "rd-acc-stat-ctx"
+    }, React.createElement("th", {
+      scope: "row"
+    }, "Worst election for the polls"), React.createElement("td", {
+      colSpan: "2"
+    }, worstCyc.year, " \xB7 off by ", cMiss(worstCyc).toFixed(1), " on average")), statHouses.map(s => React.createElement("tr", {
+      key: s.name
+    }, React.createElement("th", {
+      scope: "row"
+    }, s.name, React.createElement("span", {
+      className: "rd-acc-stat-n"
+    }, s.n, " poll", s.n === 1 ? "" : "s")), React.createElement("td", null, s.miss != null ? s.miss.toFixed(1) + " pts" : "–"), React.createElement("td", null, s.lab != null ? s.lab + "%" : "–"))))), React.createElement("p", {
+      className: "rd-acc-stats-note"
+    }, "Mean miss weights every election equally; the houses each count their own final polls. \u201CMissed toward Labor\u201D counts the polls that overstated Labor\u2019s two-party share", exactN ? ", and the " + nw(exactN) + " exact call" + (exactN === 1 ? " counts" : "s count") + " neither way" : "", "."), React.createElement("div", {
       className: "card rd-card rd-acc-card"
     }, React.createElement("div", {
       className: "rd-chead"
