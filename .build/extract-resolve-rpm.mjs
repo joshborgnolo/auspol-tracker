@@ -537,18 +537,41 @@ console.log("source updated:", data.updated);
 // interactive was just republished (updated within UPDATED_FRESH_DAYS) but
 // its newest wave date lags that republish by more than UPDATED_LAG_DAYS,
 // Nine republished without a wave we could read — extraction gap at release
-// time (an editorial re-touch pages at most a couple of runs, then ages out).
+// time. The lag must be corroborated by the payload itself carrying a
+// timeseries date beyond the committed CSV's newest (payloadWaveMax): an
+// editorial re-touch moves `updated` with zero new dates (the 2026-10-21
+// republish, 10 days into a monthly gap, fired this for two days straight
+// and paged nobody), while a wave present in the payload but lost to a
+// parse break leaves exactly that corroborating date behind.
 const UPDATED_FRESH_DAYS = 2;
 const UPDATED_LAG_DAYS = 3;
 const warnings = [];
+const payloadWaveMax = (() => {
+  let max = "";
+  (function walk(nodes) {
+    for (const n of nodes || []) {
+      for (const a of n.answers || [])
+        for (const segs of [a.states, a.age, a.gender, a.categories])
+          for (const seg of segs || [])
+            for (const p of seg.timeseries || [])
+              if (p.date !== "election 2025") {
+                const d = isoDate(p.date ?? "");
+                if (/^\d{4}-\d{2}-\d{2}$/.test(d) && d > max) max = d;
+              }
+      walk(n.subSections);
+    }
+  })(data.sections);
+  return max;
+})();
 {
   const updatedMs = Date.parse(data.updated ?? "");
   const latestWaveMs = Date.parse(dates.at(-1) ?? "");
+  const csvWaveMax = existingRows.reduce((m, r) => (r.date > m ? r.date : m), "");
   if (Number.isFinite(updatedMs) && Number.isFinite(latestWaveMs)) {
     const ageDays = (Date.now() - updatedMs) / 86400000;
     const lagDays = (updatedMs - latestWaveMs) / 86400000;
-    if (ageDays <= UPDATED_FRESH_DAYS && lagDays > UPDATED_LAG_DAYS)
-      warnings.push(`interactive republished ${data.updated} but newest wave is ${dates.at(-1)} (${lagDays.toFixed(1)}d lag) — new wave not extracted?`);
+    if (ageDays <= UPDATED_FRESH_DAYS && lagDays > UPDATED_LAG_DAYS && payloadWaveMax > csvWaveMax)
+      warnings.push(`interactive republished ${data.updated} but newest wave is ${dates.at(-1)} (${lagDays.toFixed(1)}d lag) and the payload itself carries unread dates to ${payloadWaveMax} — new wave not extracted?`);
   }
 }
 
