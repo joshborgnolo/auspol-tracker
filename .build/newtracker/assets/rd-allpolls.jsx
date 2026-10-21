@@ -3541,7 +3541,11 @@ function RdAllPolls(P) {
       body = <>
         <div className="rd-ap-cpic">{pic}</div>
         <div className="rd-ap-csub">
-          {c.chg != null ? <>Change <b style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)}</b> on last release</> : "The gauge’s first release this term"}
+          {/* null chg is two events: the lane's first release of the term
+             (gen-data flags c.first), or the house printed no numeric
+             change - Roy Morgan's "virtually unchanged" consumer waves.
+             The older copy claimed the first for both. */}
+          {c.chg != null ? <>Change <b style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)}</b> on last release</> : c.first ? "The gauge’s first release this term" : "Change not printed"}
         </div>
       </>;
     }

@@ -2802,6 +2802,11 @@ const confidenceOnlyPolls = (() => {
   for (const [k, by, product, vs, sample] of CONF_LANES) {
     const s = CONF_FILE[k];
     if (!s) continue;
+    // `first` rides the conf payload because a null chg is two different
+    // events - the lane's first release of the term, or the house printed
+    // no numeric change (Roy Morgan's "virtually unchanged" waves). The
+    // phone card's null-change line can only tell them apart with this flag.
+    let first = true;
     for (const r of s.rows) {
       if (dx(r.date) < eX) continue;
       const ym = ymOf(r.date);
@@ -2825,8 +2830,10 @@ const confidenceOnlyPolls = (() => {
         client: product,
         p: {}, appr: {}, chg: null,
         conf: { k, lab: product, v: r.v, chg: r.chg ?? null, vs,
+          ...(first ? { first: true } : {}),
           ...(k === "nabBusiness" && r.cond != null ? { cond: r.cond, condChg: r.condChg ?? null } : {}) },
       });
+      first = false;
     }
   }
   return out.sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));

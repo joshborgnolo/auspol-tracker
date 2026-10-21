@@ -19541,7 +19541,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "lab": "Consumer confidence",
       "v": 87.5,
       "chg": 4.1,
-      "vs": 100
+      "vs": 100,
+      "first": true
     },
     "links": [{
       "k": "release",
@@ -19570,7 +19571,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "lab": "Business confidence",
       "v": 96.7,
       "chg": -9.3,
-      "vs": 100
+      "vs": 100,
+      "first": true
     },
     "links": [{
       "k": "release",
@@ -19630,7 +19632,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "lab": "Consumer sentiment",
       "v": 92.1,
       "chg": 2,
-      "vs": 100
+      "vs": 100,
+      "first": true
     },
     "links": [{
       "k": "cite",
@@ -19661,6 +19664,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "v": -1,
       "chg": 1,
       "vs": 0,
+      "first": true,
       "cond": 2,
       "condChg": null
     },
@@ -134261,7 +134265,7 @@ function RdAllPolls(P) {
         style: chgInk ? {
           color: chgInk
         } : null
-      }, confChg(c.chg)), " on last release") : "The gauge’s first release this term"));
+      }, confChg(c.chg)), " on last release") : c.first ? "The gauge’s first release this term" : "Change not printed"));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",

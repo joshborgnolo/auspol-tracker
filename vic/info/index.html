@@ -61525,7 +61525,7 @@ function RdAllPolls(P) {
         style: chgInk ? {
           color: chgInk
         } : null
-      }, confChg(c.chg)), " on last release") : "The gauge’s first release this term"));
+      }, confChg(c.chg)), " on last release") : c.first ? "The gauge’s first release this term" : "Change not printed"));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
