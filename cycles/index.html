@@ -3324,6 +3324,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .btv-sort-b:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 .btv-sort-w { display: inline-flex; flex-direction: column; align-items: center; }
 .btv-sort-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
+@media (max-width: 380px) { .btv-sort-b { padding: 0 8px; } }
 .btv-qt { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink-3); }
 .btv-topic { margin-top: 64px; padding-top: 12px; border-top: 2px solid var(--ink); scroll-margin-top: 64px; }
 .btv-tk { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
@@ -137167,7 +137168,8 @@ function BtvTopic({
   }) : null);
 }
 const btvLast = b => b.kind === "tracker" ? b.last : b.src && b.src.field ? b.src.field.end : (b.rows || []).reduce((d, r) => r.src && r.src.field && r.src.field.end > d ? r.src.field.end : d, "");
-function btvByMonth(topics) {
+const btvHousesOf = b => b.kind === "tracker" ? [...new Set(b.panels.map(p => p.house))] : b.src && b.src.house ? [b.src.house] : [...new Set((b.rows || []).map(r => r.src && r.src.house).filter(Boolean))];
+function btvDated(topics) {
   const all = [];
   topics.forEach(t => {
     t.blocks.forEach(b => all.push({
@@ -137181,9 +137183,16 @@ function btvByMonth(topics) {
       date: q.last
     }));
   });
-  all.sort((p, q) => p.date < q.date ? 1 : p.date > q.date ? -1 : 0);
+  return all.sort((p, q) => p.date < q.date ? 1 : p.date > q.date ? -1 : 0);
+}
+const btvSplitKinds = all => ({
+  trackers: all.filter(e => e.b && e.b.kind === "tracker"),
+  items: all.filter(e => e.b && e.b.kind !== "tracker"),
+  more: all.filter(e => e.q)
+});
+function btvByMonth(topics) {
   const months = [];
-  for (const e of all) {
+  for (const e of btvDated(topics)) {
     const ym = e.date.slice(0, 7);
     if (!months.length || months[months.length - 1].ym !== ym) months.push({
       ym,
@@ -137191,52 +137200,106 @@ function btvByMonth(topics) {
     });
     months[months.length - 1].all.push(e);
   }
-  return months.map(m => ({
-    ym: m.ym,
-    trackers: m.all.filter(e => e.b && e.b.kind === "tracker"),
-    items: m.all.filter(e => e.b && e.b.kind !== "tracker"),
-    more: m.all.filter(e => e.q)
-  }));
+  return months.map(m => {
+    const title = BTV_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
+    return {
+      id: "m-" + m.ym,
+      title,
+      moreLabel: "More questions from " + title,
+      ...btvSplitKinds(m.all)
+    };
+  });
 }
-function BtvMonth({
-  m,
-  houses
+function btvByPollster(topics, houses) {
+  const own = new Map(),
+    also = new Map(),
+    several = [];
+  for (const e of btvDated(topics)) {
+    const hs = e.q ? [e.q.house] : btvHousesOf(e.b);
+    if (hs.length === 1) {
+      if (!own.has(hs[0])) own.set(hs[0], []);
+      own.get(hs[0]).push(e);
+    } else {
+      several.push(e);
+      hs.forEach(h => also.set(h, (also.get(h) || 0) + 1));
+    }
+  }
+  const name = h => btvHouse({
+    house: h
+  }, houses);
+  const ids = [...new Set([...own.keys(), ...also.keys()])].sort((p, q) => (own.get(q) || []).length - (own.get(p) || []).length || (also.get(q) || 0) - (also.get(p) || 0) || name(p).localeCompare(name(q)));
+  const groups = ids.map(h => {
+    const n = also.get(h) || 0,
+      mine = own.get(h) || [];
+    const cmp = btvWord(n) + (n === 1 ? " comparison" : " comparisons") + " with other pollsters";
+    return {
+      id: "p-" + h,
+      title: btvHouse({
+        house: h
+      }, houses, true),
+      moreLabel: "More questions from " + name(h),
+      lead: n ? React.createElement("p", {
+        className: "btv-tdk"
+      }, mine.length ? "Also in " : "Only in ", React.createElement("a", {
+        href: "#btv-p-several"
+      }, cmp), ".") : null,
+      ...btvSplitKinds(mine)
+    };
+  });
+  if (several.length) groups.push({
+    id: "p-several",
+    title: "Several pollsters",
+    moreLabel: "",
+    lead: React.createElement("p", {
+      className: "btv-tdk"
+    }, "Charts and questions that set two or more pollsters side by side."),
+    ...btvSplitKinds(several)
+  });
+  return groups;
+}
+function BtvGroup({
+  g,
+  houses,
+  byHouse
 }) {
-  const name = BTV_MONF[+m.ym.slice(5, 7) - 1] + " " + m.ym.slice(0, 4);
-  const topicOf = new Map(m.more.map(e => [e.q, e.t]));
+  const topicOf = new Map(g.more.map(e => [e.q, e.t]));
+  const count = btvCount(g.trackers.length, g.items.length, g.more.length);
   return React.createElement("section", {
     className: "btv-topic btv-mon",
-    id: "btv-m-" + m.ym,
-    "aria-labelledby": "btv-mh-" + m.ym
+    id: "btv-" + g.id,
+    "aria-labelledby": "btv-h-" + g.id
   }, React.createElement("div", {
     className: "btv-tk"
   }, React.createElement("h3", {
     className: "btv-tt",
-    id: "btv-mh-" + m.ym
-  }, name), React.createElement("span", {
+    id: "btv-h-" + g.id
+  }, g.title), count ? React.createElement("span", {
     className: "btv-tc"
-  }, btvCount(m.trackers.length, m.items.length, m.more.length))), m.trackers.map(e => React.createElement(BtvTracker, {
+  }, count) : null), g.lead || null, g.trackers.map(e => React.createElement(BtvTracker, {
     key: e.b.id,
     c: e.b,
     houses: houses,
     topic: e.t.short
-  })), m.items.length ? React.createElement("div", {
+  })), g.items.length ? React.createElement("div", {
     className: "btv-items"
-  }, m.items.map((e, i) => React.createElement(BtvItem, {
+  }, g.items.map((e, i) => React.createElement(BtvItem, {
     key: (e.b.id || "") + i,
     c: e.b,
     houses: houses,
     topic: e.t.short
-  }))) : null, m.more.length ? React.createElement(BtvMore, {
-    label: "More questions from " + name,
-    qs: m.more.map(e => e.q),
+  }))) : null, g.more.length ? React.createElement(BtvMore, {
+    label: g.moreLabel,
+    qs: g.more.map(e => e.q),
     houses: houses,
-    meta: q => topicOf.get(q).short + " · " + btvHouse(q, houses) + " · " + btvDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
+    meta: q => topicOf.get(q).short + (byHouse ? "" : " · " + btvHouse(q, houses)) + " · " + btvDay(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")
   }) : null);
 }
 const BTV_SORTS = [{
   id: "issue",
   label: "By issue"
+}, {
+  id: "pollster",
+  label: "By pollster"
 }, {
   id: "recent",
   label: "Newest first"
@@ -137346,7 +137409,7 @@ function BtvBody() {
     });
   };
   const topics = btvUseMemo(() => src ? src.topics.filter(t => t.blocks.length || t.more.length) : [], [src]);
-  const months = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : null, [topics, sort]);
+  const groups = btvUseMemo(() => sort === "recent" ? btvByMonth(topics) : sort === "pollster" ? btvByPollster(topics, src && src.houses || {}) : null, [topics, sort, src]);
   if (failed) {
     return React.createElement("div", {
       className: "btv"
@@ -137380,10 +137443,11 @@ function BtvBody() {
     onSort: setSort
   }), React.createElement("p", {
     className: "btv-scope"
-  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), months ? months.map(m => React.createElement(BtvMonth, {
-    key: m.ym,
-    m: m,
-    houses: houses
+  }, src.counts.featured, " questions in charts and answers, and ", more, " more in the topics\u2019 lists, from ", btvWord(Object.keys(houses).length), " pollsters", " ", "since ", btvMonth(src.first), ". Every figure names its pollster, its dates and its sample, and links to its source."), groups ? groups.map(g => React.createElement(BtvGroup, {
+    key: g.id,
+    g: g,
+    houses: houses,
+    byHouse: sort === "pollster"
   })) : topics.map((t, i) => React.createElement(BtvTopic, {
     key: t.id,
     t: t,
