@@ -2673,10 +2673,16 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
    single publisher, and no election-result anchor exists to adjust
    toward. The panel draws the published series; the current reading is
    the latest release, with the change it printed. */
+/* A row's fieldwork label: the consumer lanes print their survey window,
+   a business release its one survey month; what wasn't printed stays a
+   release date. One law for the panel dots and the archive rows below. */
+const confFieldLabel = (r) => (r.fwStart ? fwLabel(r.fwStart, r.fwEnd || r.date)
+  : r.fwm ? monthName(+r.fwm.slice(5, 7))
+  : fwLabel(null, r.date));
 const confidence = CONF_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "business", "nabBusiness"].map((k) => {
   const s = CONF_FILE[k];
   if (!s) return [k, null];   // a lane added to the file later never breaks an older checkout
-  const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url,
+  const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url, dateLabel: confFieldLabel(r),
     ...(k === "nabBusiness" ? { cond: r.cond, condChg: r.condChg ?? null } : {}) }))
     .filter((r) => r.x >= dx("2019-08-13"))   // the feed's dense coverage begins here (later lanes start later)
     .sort((a, b) => a.x - b.x);
@@ -2725,9 +2731,7 @@ const confidenceOnlyPolls = (() => {
     for (const r of s.rows) {
       if (dx(r.date) < eX) continue;
       const ym = ymOf(r.date);
-      const field = r.fwStart ? fwLabel(r.fwStart, r.fwEnd || r.date)
-        : r.fwm ? monthName(+r.fwm.slice(5, 7))
-        : fwLabel(null, r.date);
+      const field = confFieldLabel(r);
       out.push({
         ym, x: mx(ym) + (dayOf(r.date) - 15) / 365, day: dayOf(r.date),
         pollster: by, field, dateLabel: field, released: r.date,
@@ -2994,7 +2998,7 @@ const onSources = onSourceWaves.length ? {
   now: onNow ? { drawn: r1(onNow.drawn), window: SPARSE_K.label,
                  n: weightedWithSe(nowcastPts(onRateRows.lnp, null, refNow, SPARSE_K))?.n ?? 0,
                  houses: [...new Set(onRateRows.lnp.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))] } : null,
-  waves: onSourceWaves.map(({ x, ym, ...w }) => w),
+  waves: onSourceWaves.map(({ x, ym, ...w }) => ({ dateLabel: fwLabel(w.dateStart, w.date), ...w })),
   houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
   weights: VOTE_SWITCHING.weights2025,
   /* the reverse read, for the panel's Coalition and Labor views: each

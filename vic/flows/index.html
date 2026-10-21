@@ -49871,7 +49871,7 @@ function RdSwitching({
       meta: {
         pollster: w.pollster,
         released: w.date,
-        dateLabel: w.dateStart ? "" : "",
+        dateLabel: w.dateLabel || "",
         sample: w.sample
       }
     };
@@ -50045,7 +50045,7 @@ function RdSwitching({
     meta: {
       pollster: p.pollster,
       released: p.released,
-      dateLabel: "",
+      dateLabel: p.dateLabel || "",
       sample: p.sample
     }
   }));
@@ -52891,6 +52891,7 @@ function RdConfidence({
     y: p.v + l.shift,
     ym: p.ym,
     released: p.released,
+    dateLabel: p.dateLabel || "",
     ...(l.shift ? {
       raw: p.v
     } : {})
@@ -52908,6 +52909,7 @@ function RdConfidence({
     y: p.v + l.shift,
     ym: p.ym,
     released: p.released,
+    dateLabel: p.dateLabel || "",
     ...(l.shift ? {
       raw: p.v
     } : {})
@@ -53267,7 +53269,8 @@ function RdConfidence({
       } : {}),
       meta: {
         pollster: l.by,
-        released: q.released
+        released: q.released,
+        dateLabel: q.dateLabel
       }
     }))),
     pollFacet: "confidence",

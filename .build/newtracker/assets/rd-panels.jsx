@@ -3572,7 +3572,7 @@ function RdSwitching({ rangeId }) {
   const x0 = Math.max(rangeLo, firstX - 0.075), x1 = rangeHi;
   const pollRate = (id) => (S.waves || []).map((w) => {
     const v = w.toOn ? w.toOn[id] : null;
-    return v == null ? null : { x: D.mx(w.date.slice(0, 7)) + ((+w.date.slice(8, 10) - 15) / 365), y: v, h: w.pollster, w: w.sample || 1000, meta: { pollster: w.pollster, released: w.date, dateLabel: w.dateStart ? "" : "", sample: w.sample } };
+    return v == null ? null : { x: D.mx(w.date.slice(0, 7)) + ((+w.date.slice(8, 10) - 15) / 365), y: v, h: w.pollster, w: w.sample || 1000, meta: { pollster: w.pollster, released: w.date, dateLabel: w.dateLabel || "", sample: w.sample } };
   }).filter(Boolean);
   const fits = cols.map((c) => ({ c, fit: withinHouseSlope(pollRate(c.id).map((d) => ({ h: d.h, t: d.x, w: d.w, y: d.y }))) })).filter((f) => f.fit);
   const sig = [];
@@ -3684,7 +3684,7 @@ function RdSwitching({ rangeId }) {
   })();
   const goDots = (r) => r.polls.map((p) => ({
     x: p.x, y: p.v, h: p.pollster, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3),
-    meta: { pollster: p.pollster, released: p.released, dateLabel: "", sample: p.sample } }));
+    meta: { pollster: p.pollster, released: p.released, dateLabel: p.dateLabel || "", sample: p.sample } }));
   const goDotsClipped = (r) => goDots(r).filter((d) => d.x >= x0 && d.x <= x1 + 0.02);
   const goFits = goRows.map((r) => ({
     r, fit: withinHouseSlope(r.polls.map((p) => ({ h: p.pollster, t: p.x, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3), y: p.v }))) })).filter((f) => f.fit);
@@ -5547,13 +5547,13 @@ function RdConfidence({ rangeId }) {
      constant, so smoothing then shifting equals shifting and smoothing —
      the smooth runs on the printed figures themselves. Only the view's
      own lanes price the domain, so the two views fit their own ranges. */
-  const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: toM(p.x), y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))]));
+  const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: toM(p.x), y: p.v + l.shift, ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...(l.shift ? { raw: p.v } : {}) }))]));
   const sePoints = new Map(viewLanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: toM(p.x), y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
   /* The complete-history window draws on the calendar, in the release
      file's own year-fraction x (no toM re-base): the same dots and kernel
      over every release the house has printed, with the deep monthly rows
      as a lighter line underneath where they reach further back */
-  const wideRaw = histOn ? new Map(viewLanes.map((l) => [l.k, l.s.polls.map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))])) : null;
+  const wideRaw = histOn ? new Map(viewLanes.map((l) => [l.k, l.s.polls.map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...(l.shift ? { raw: p.v } : {}) }))])) : null;
   const wideSe = histOn ? new Map(viewLanes.map((l) => [l.k, smooth(l.s.polls, l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: l.s.polls[i].ym, ...(l.shift ? { raw: l.s.polls[i].v } : {}) }))])) : null;
   const deepSeries = histOn ? deepDrawn.map((k) => {
     const l = viewLanes.find((v) => v.k === k);
@@ -5806,7 +5806,7 @@ function RdConfidence({ rangeId }) {
           spine={spine}
           events={histOn ? [] : (badges ? badges.events : evs)}
           evt={histOn ? null : evtOpen} onEvt={setEvtOpen}
-          scatter={viewLanes.flatMap((l) => chartRaw.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.by, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by, released: q.released } })))}
+          scatter={viewLanes.flatMap((l) => chartRaw.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.by, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by, released: q.released, dateLabel: q.dateLabel } })))}
           /* each release is a row on the archive's confidence facet, so a
              dot under a mouse offers the same open trip every poll chart
              does (the engine's ROW_KEYS knows the confidence rows). The
