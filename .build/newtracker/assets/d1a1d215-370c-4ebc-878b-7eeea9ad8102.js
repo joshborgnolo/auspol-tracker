@@ -7728,7 +7728,26 @@ function infoTerms(D) {
             in 2020 and 2024, the estimates came within {FHB.qld.toFixed(1)} points.</> : null}
             {FHB.nsw && FHB.nsw.grn != null ? <> Run on New South Wales&rsquo;s distributions and
             checked against its counts, they came within {FHB.nsw.grn.toFixed(1)} points for the Greens
-            and {FHB.nsw.oth.toFixed(1)} for everyone else.</> : null}</span>
+            and {FHB.nsw.oth.toFixed(1)} for everyone else.</> : null}
+            {FHB.othLean && FHB.othLean.cal && FHB.othLean.cal[1] < 0 ? <> The estimates for everyone
+            else lean low: by {fhRange(FHB.othLean.cal.map((x) => -x).reverse())} points on average in
+            the federal trials at a state&rsquo;s size{FHB.othLean.nsw && FHB.othLean.nsw[1] < 0 ? <>, and
+            by {fhRange(FHB.othLean.nsw.map((x) => -x).reverse())} in every New South Wales election</> : null}.
+            The bars are drawn either side of the estimate, so the true flow more likely sits in their
+            upper half.</> : null}</span>
+            {FHB.contest ? <span className="info-p"><b>Labor v One Nation contests.</b> The
+            explainer&rsquo;s Labor v One Nation view plots one cross per voter group per contest, and
+            draws no line between contests, because the groups differ: Hunter&rsquo;s Coalition voters
+            were Nationals, the others&rsquo; Liberals. Hunter 2025 is the electoral commission&rsquo;s
+            count. South Australia 2026 is this site&rsquo;s estimate over the {FHB.contest.seats} seats
+            where One Nation faced Labor. Its bars are the misses at that size: for the Greens
+            (±{FHB.contest.err.grn.toFixed(1)}) and everyone else (±{FHB.contest.err.oth.toFixed(1)}), the
+            federal trials cut to {FHB.contest.seats} seats; for Liberal voters
+            (±{FHB.contest.err.lib.toFixed(1)}), the federal seats where Labor faced someone other than
+            the Coalition, where the commission counts where Coalition voters went: the largest miss of
+            the last {fhWord(FHB.contest.elections)} elections. Secret Harbour 2026 is Antony Green&rsquo;s
+            count of the early voting centre, 47% of the votes, drawn hollow; both he and Kevin Bonham
+            think the whole seat sent Labor a little more.</span> : null}
             <span className="info-p"><b>What’s left out.</b> One Nation’s estimates miss by more
             ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so its bars run
             wider. An estimate also needs enough One Nation ballots behind it: at least

@@ -128,8 +128,18 @@ assert.ok(info.includes("{ id: \"flow-history\", term: \"Counted and estimated f
 const C = bt.contests && bt.contests["sa-2026-alp-onp"];
 assert.ok(C && C.seats === 25, "SA 2026's 25 Labor v One Nation finals are estimated");
 const art = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "explained-article.html"), "utf8");
-const want = `this site&rsquo;s estimate, ${C.seats} seats)</td><td>${C.model.lib.toFixed(1)}</td><td>${C.model.grn.toFixed(1)}</td><td>${C.model.ind.toFixed(1)}</td>`;
-assert.ok(art.includes(want), `the explainer's SA 2026 row quotes the estimator (${want})`);
+const want = `this site&rsquo;s estimate, ${C.seats} seats, with its 90% error)</td><td>${C.model.lib.toFixed(1)} &plusmn;${C.err90.lib.toFixed(1)}</td><td>${C.model.grn.toFixed(1)} &plusmn;${C.err90.grn.toFixed(1)}</td><td>${C.model.oth.toFixed(1)} &plusmn;${C.err90.oth.toFixed(1)}</td>`;
+assert.ok(art.includes(want), `the explainer's SA 2026 row quotes the estimator, with its 90% errors (${want})`);
+assert.ok(art.includes(`the site&rsquo;s figure for them: ${C.model.ind.toFixed(1)}`), "the independents-only comparison with Bonham quotes the estimator");
+// the prose's "differ by up to X, inside the range" is the estimator's
+const gap = Math.max(Math.abs(C.model.lib - 33.9), Math.abs(C.model.grn - 84.8), Math.abs(C.model.ind - 55.9));
+const inside = Math.abs(C.model.lib - 33.9) <= C.err90.lib && Math.abs(C.model.grn - 84.8) <= C.err90.grn && Math.abs(C.model.ind - 55.9) <= C.err90.oth;
+assert.ok(art.includes(`The two differ by up to ${gap.toFixed(1)} points, ${inside ? "inside" : "outside"} the site&rsquo;s range`), "the SA comparison sentence matches the numbers");
+// the SA bars' sources: the 25-seat contest calibration and the Coalition-cell check
+assert.deepEqual([...bt.settings.contest_n], [C.seats], "the contest calibration runs at the contest's own seat count");
+assert.equal(Object.keys(bt.noncoal_check).length, 6, "the Coalition cell is checked on six federal elections");
+const libMiss = Math.max(...Object.values(bt.noncoal_check).filter((d) => d.coal).map((d) => Math.abs(d.coal.model - d.coal.counted)));
+assert.ok(Math.abs(C.err90.lib - libMiss) < 0.006, "the Liberal bar is the check's largest miss");
 assert.ok(art.includes(`at ${C.model.minor.toFixed(1)}%, below independents`), "the minor-party figure in the prose is the estimator's");
 
 console.log(`PASS: state flows – ${Object.keys(shown).length} states on the chart (${Object.entries(shown).map(([k, s]) => k + " " + s.size).join(", ")}), `

@@ -5077,7 +5077,18 @@ function RdFlowSpark({ ck, marks, refv, band, W, H, dom, yr, tip, onTip, onOpen,
         {!rb.length && dm.length > 1 && <path className={"rd-fx-mline " + cls} d={dm.map((m, i) => (i ? "L" : "M") + X(m.xm) + " " + Y(m.v)).join("")}></path>}
         {rb.slice(0, -1).map((m) => <circle key={m.id} className={"rd-fx-dot " + cls} cx={X(m.xm)} cy={Y(m.v)} r="2.4"></circle>)}
         {dm.map((m) => { const x = X(m.xm), y = Y(m.v); return <path key={m.id} className={"rd-fx-tr " + cls} d={`M${x} ${y - 5.2}L${x + 4.8} ${y + 3.8}L${x - 4.8} ${y + 3.8}Z`}></path>; })}
-        {marks.filter((m) => m.kind === "byelec").map((m) => { const x = X(m.xm), y = Y(m.v); return <path key={m.id} className={"rd-fx-x " + cls} d={`M${x - 3.6} ${y - 3.6}L${x + 3.6} ${y + 3.6}M${x + 3.6} ${y - 3.6}L${x - 3.6} ${y + 3.6}`}></path>; })}
+        {/* a contest's cross: an estimate carries its tested 90% miss as a
+            whisker, a count of part of the vote (Secret Harbour's early
+            voting centre) draws hollow - user 2026-10-21 */}
+        {marks.filter((m) => m.kind === "byelec").map((m) => {
+          const x = X(m.xm), y = Y(m.v), e = m.d.err && m.d.err[ck];
+          const xd = `M${x - 3.6} ${y - 3.6}L${x + 3.6} ${y + 3.6}M${x + 3.6} ${y - 3.6}L${x - 3.6} ${y + 3.6}`;
+          return <g key={m.id}>
+            {e != null && <path className={"rd-fx-x rd-fx-xerr " + cls} d={`M${x} ${Y(C(m.v + e))}V${Y(C(m.v - e))}`}></path>}
+            <path className={"rd-fx-x " + cls + (m.d.kind === "part" ? " rd-fx-xhol" : "")} d={xd}></path>
+            {m.d.kind === "part" && <path className="rd-fx-xcut" d={xd}></path>}
+          </g>;
+        })}
         {pts.length > 0 && <circle className={"rd-fx-end " + cls} cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="3.6"></circle>}
         {tm && <circle className="rd-apd-dothi" cx={X(tm.xm)} cy={Y(tm.v) + (tm.kind === "mrp" ? 0.6 : 0)} r="7.5"></circle>}
         {!marks.length && emptyNote && <text className="rd-fl-empty" x={W / 2} y={refv != null && Y(refv) < H / 2 ? H - 9 : 17} textAnchor="middle">{emptyNote}</text>}
@@ -5312,6 +5323,8 @@ function RdFlows({ measure }) {
       <span className="tip-title">{m.kind === "byelec" ? m.d.label + ", " + m.d.win : (m.kind === "mrp" ? "DemosAU MRP" : m.house) + ", " + m.d.win}</span>
       <span className="tip-sub rd-fx-tsub">{m.kind === "byelec" ? m.d.sub : lbl + " voters choosing between " + c.a + " and " + c.r}</span>
       <span className="tip-row on"><span className={"tip-swatch rd-fx-sw " + m.kind + " " + FF_COHORTS[ck].cls}></span><span className="tip-label">{m.kind === "byelec" ? "Preferences to " + c.a : "Pick " + c.a}</span><span className="tip-val">{say(m.v)}%</span></span>
+      {m.kind === "byelec" && m.d.err && m.d.err[ck] != null && <span className="tip-row"><span className="tip-label rd-fx-tind">Estimate’s 90% error</span><span className="tip-val">±{say(m.d.err[ck])}</span></span>}
+      {m.kind === "byelec" && ((m.d.lbl && m.d.lbl[ck]) || (m.d.alt && m.d.alt[ck])) && <span className="tip-sub rd-fx-tnote">{rdCap([m.d.lbl && m.d.lbl[ck], m.d.alt && m.d.alt[ck]].filter(Boolean).join("; "))}</span>}
       {refV != null && <span className="tip-row"><span className="tip-label rd-fx-tind">{c.refName}</span><span className="tip-val rd-fx-tref">{say(refV, c.refDp)}{c.band ? " ±" + say(c.band[ck]) : ""}</span></span>}
       {m.d.n != null && <span className="tip-row"><span className="tip-label rd-fx-tind">Sample</span><span className="tip-val">n = {m.d.n.toLocaleString()}</span></span>}
       {m.kind === "mrp" && m.d.wt && <span className="tip-sub rd-fx-tnote">All voters is our weighting of the report’s three regional tables, by enrolment and vote.</span>}
@@ -5476,7 +5489,8 @@ function RdFlows({ measure }) {
             <RdKey className="rd-ckey rd-fx-key" items={[]}>
               {c.rb.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyln" aria-hidden="true"><i></i></span>RedBridge/Accent, monthly</span>}
               {c.dm.length > 0 && <span className="rd-key-item"><span className="rd-fx-keydm" aria-hidden="true"></span>DemosAU MRP, quarterly</span>}
-              {c.bys.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>Election and by-election counts</span>}
+              {c.bys.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>Contest counts and estimates</span>}
+              {c.bys.some((w) => w.kind === "part") && <span className="rd-key-item"><ExHollowX />Hollow: a count of part of the vote</span>}
               {c.ref && <span className="rd-key-item"><span className={"rd-fx-keyref" + (c.band ? " band" : "")} aria-hidden="true"></span>{q === "co" ? rdElecYear + " count*" : "Site’s assumption, with its range"}</span>}
               {c.ref && c.rb.length > 0 && <span className="rd-key-item"><span className="rd-fx-keyarea" aria-hidden="true"></span>Gap to it</span>}
             </RdKey>
@@ -5586,6 +5600,14 @@ const exFrame = (narrow) => ({
   padPx: narrow ? { l: 34, r: 16, t: 14, b: 28 } : { l: 40, r: 12, t: 16, b: 30 },
   yDomain: [0, 100], yTicks: EX_TICKS, yTickFmt: exTickFmt, baseline: true,
 });
+/* a count of part of the vote in the key: TrendChart's m.hollow cross
+   (stroked in its colour, then cut through in the chart's background) */
+const ExHollowX = () => (
+  <svg width="11" height="11" viewBox="0 0 11 11" aria-hidden="true" style={{ marginRight: 6, verticalAlign: -1 }}>
+    <path d="M2 2L9 9M9 2L2 9" stroke="var(--ink-2)" strokeWidth="3.6" strokeLinecap="round" fill="none" />
+    <path d="M2 2L9 9M9 2L2 9" stroke="var(--chart-bg)" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+  </svg>
+);
 /* an estimate's error bar in the key, drawn as the chart draws it */
 const ExBarSwatch = () => (
   <svg width="12" height="16" viewBox="0 0 12 16" aria-hidden="true"><rect x="4" y="1" width="4" height="14" rx="1" style={{ fill: "var(--ink-3)", opacity: 0.55 }} /></svg>
@@ -5667,15 +5689,25 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const side = inv ? "the Coalition" : "Labor", other = inv ? "Labor" : "the Coalition";
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span + (est ? ", estimated" : "");
+  /* the federal line and the state lines measure different seats (user
+     2026-10-21 review): since 2004 the AEC's two-party cut sorts every seat's
+     ballots, the states only the seats Labor and the Coalition finished
+     first and second - in 2025 the gap for everyone else was ~6 points */
+  const E25 = ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
+  const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
+  const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
+  const noBars = " Counts carry no estimation error, so they have no bars.";
   const cap = est
     ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length
       ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
-      : "")
+      : "") + stateCut
     : cnt
-      ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither."
+      ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut
       : S.fedState
-        ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table."
-        : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since).";
+        ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars
+          + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
+        : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars
+          + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
   const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
   return (
     <>
@@ -5693,7 +5725,7 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
         tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
         ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
-                sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences in the seats Labor and the Coalition contested." : "Counted, election by election."),
+                sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : "Counted, election by election, so no error bars."),
                 caption: est ? "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
                 legend: narrow ? lines : [] }}
       />
@@ -5711,7 +5743,12 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
    menu — no count or close estimate exists by jurisdiction for this pair —
    one cross per voter group per contest, from the same flowForced.bys
    crosses the /flows/ One Nation chart plots. Hunter is the AEC's counted
-   flow-by-division; South Australia and Secret Harbour are estimates. */
+   flow-by-division; South Australia is this site's estimate, with its
+   tested 90% misses as bars; Secret Harbour is a count of part of the vote
+   (the early voting centre), drawn hollow. No line joins the contests
+   (user 2026-10-21): their groups differ - Hunter's Coalition voters are
+   Nationals, the others' Liberals; Hunter's Others five minor parties - so
+   a line would draw a trend that is only a change of definition. */
 const ON_COHORTS = [
   { id: "coal", name: "Coalition", color: "var(--lnp)" },
   { id: "grn",  name: "Greens",    color: "var(--grn)" },
@@ -5727,37 +5764,47 @@ function ExplainedOnChart({ inv, menu }) {
   const parties = ON_COHORTS.filter((p) => BYS.some((b) => b[p.id] != null));
   const series = [];
   /* every reading draws as a cross - the /flows/ One Nation ledger's mark
-     (user 2026-10-20), one per cohort per contest it was counted in */
+     (user 2026-10-20), one per cohort per contest it was counted in; a
+     count of part of the vote draws hollow */
   const marks = [];
+  const areas = [];
+  const x0 = BYS[0].xm - 0.9, x1 = BYS[BYS.length - 1].xm + 0.9;
+  /* an estimate's 90% miss as a bar, the Labor v Coalition chart's narrow
+     area (out of the tooltip and the hover markers) */
+  const half = (x1 - x0) * 0.005;
   parties.forEach((p) => {
-    const runs = [];
-    let cur = [];
-    BYS.forEach((b) => {
+    const last = BYS.reduce((k, b, i) => (b[p.id] != null ? i : k), -1);
+    BYS.forEach((b, i) => {
       const v = b[p.id];
-      /* a null is a gap, not a zero (no Others count ran at Secret
-         Harbour); a run of one contest keeps its cross, never a lone line */
-      if (v == null) { if (cur.length) runs.push(cur); cur = []; }
-      else {
-        cur.push({ x: b.xm, y: T(v), ...((b.lbl || {})[p.id] ? { note: (b.lbl || {})[p.id] } : null) });
-        marks.push({ x: b.xm, y: T(v), color: p.color, cross: true });
+      if (v == null) return;   /* no Others count ran at Secret Harbour */
+      const e = (b.err || {})[p.id];
+      const note = [(b.lbl || {})[p.id], e != null ? "±" + e.toFixed(1) : null,
+        b.kind === "part" ? "part of the vote" : null, (b.alt || {})[p.id]].filter(Boolean).join(", ");
+      /* each contest its own one-point series: hover reads it, nothing
+         joins it to the next contest */
+      series.push({ id: p.id + i, label: p.name, color: p.color,
+        points: [{ x: b.xm, y: T(v), ...(note ? { note } : null) }],
+        smooth: false, rdWidth: 2.5, endCap: false,
+        endLabel: i === last && !narrow ? p.name : null });
+      /* an estimate's cross draws smaller, so its bar (±2 on a 0-100 axis is
+         about a full-size cross's height) shows above and below it */
+      marks.push({ x: b.xm, y: T(v), color: p.color, cross: true, ...(b.kind === "part" ? { hollow: true } : null),
+        ...(e != null ? { r: 3 } : null) });
+      if (e != null) {
+        const y = T(v), y0 = Math.max(0, y - e), y1 = Math.min(100, y + e);
+        areas.push({ id: p.id + "-err" + i, color: p.color, opacity: 0.55, edge: false,
+          points: [{ x: b.xm - half, y0, y1 }, { x: b.xm + half, y0, y1 }] });
       }
     });
-    if (cur.length) runs.push(cur);
-    runs.forEach((points, i) => {
-      const tail = i === runs.length - 1;
-      series.push({ id: p.id + i, label: p.name, color: p.color, points,
-        smooth: false, rdWidth: 2.5, endCap: false,
-        endLabel: tail && !narrow ? p.name : null });
-    });
   });
-  const x0 = BYS[0].xm - 0.9, x1 = BYS[BYS.length - 1].xm + 0.9;
   const ticks = BYS.map((b) => ({ x: b.xm, label: MON[+b.date.slice(5, 7) - 1] + " " + b.date.slice(0, 4) }));
-  /* a capitalised article ("The AEC's…") is the only lead a fallible
+  /* a capitalised lead word ("The AEC’s…", "This site’s…") is the only one a fallible
      lowercase rewrite would break, so guard it */
-  const low = (s) => s.replace(/^The /i, (m) => m.toLowerCase());
+  const low = (s) => s.replace(/^(The|This) /, (m) => m.toLowerCase());
   const cap = BYS.map((b) => b.label + " — " + low(b.sub)).join("; ");
   const side = inv ? "One Nation" : "Labor", other = inv ? "Labor" : "One Nation";
-  const scope = "Each contest that has measured it, " + BYS[0].date.slice(0, 4) + "–" + BYS[BYS.length - 1].date.slice(0, 4);
+  const scope = "Each contest with a count or estimate, " + BYS[0].date.slice(0, 4) + "–" + BYS[BYS.length - 1].date.slice(0, 4);
+  const hasEst = BYS.some((b) => b.err), hasPart = BYS.some((b) => b.kind === "part");
   const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
   return (
     <>
@@ -5771,21 +5818,25 @@ function ExplainedOnChart({ inv, menu }) {
         xDomain={[x0, x1]}
         xTicks={ticks}
         unit="%" fmt={(v) => v.toFixed(1)}
-        series={series} marks={marks} spine={BYS.map((b) => ({ x: b.xm }))}
+        series={series} marks={marks} areas={areas} spine={BYS.map((b) => ({ x: b.xm }))}
         /* the contest's name alone: its source sentence ran the readout to
            the full width of a phone (user 2026-10-21); the caption below
            carries every contest's source */
         tooltipTitle={(i) => BYS[i].label}
         ariaLabel={"Share of preferences flowing to " + side + " in Labor-v-One Nation contests, by voter group, " + BYS[0].label + " to " + BYS[BYS.length - 1].label}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
-                sub: "Each contest that has measured it. " + rdCap(cap) + ".",
-                caption: "Each cross is one contest’s count or estimate.",
+                sub: "Each contest with a count or estimate. " + rdCap(cap) + ".",
+                caption: "Each cross is one contest’s count or estimate" + (hasEst ? "; a bar, the estimate’s 90% error" : "")
+                  + (hasPart ? "; hollow, a count of part of the vote" : "") + ". The groups differ by contest, so no line joins them.",
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={[]}>
-        <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>One count or estimate per contest</span>
+        <span className="rd-key-item"><span className="rd-fx-keyx" aria-hidden="true"></span>Count or estimate</span>
+        {hasEst && <span className="rd-key-item"><ExBarSwatch />The estimate’s 90% error</span>}
+        {hasPart && <span className="rd-key-item"><ExHollowX />Count of part of the vote</span>}
       </RdKey>
-      <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{"One reading per contest: " + cap + "."}</RdFoot>
+      <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{"One reading per contest: " + cap
+        + ". The groups differ by contest, so no line joins them: Hunter’s Coalition voters are Nationals and its Others five minor parties; elsewhere the Coalition voters are Liberals, and South Australia’s Others are every other voter."}</RdFoot>
     </>
   );
 }

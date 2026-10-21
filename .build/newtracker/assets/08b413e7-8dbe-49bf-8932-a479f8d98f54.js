@@ -1773,10 +1773,20 @@ function TrendChart(props) {
           const x = sx(m.x), y = sy(m.y), h = PX(m.r != null ? m.r : 4.2);
           return (
           <g key={"mk" + i} className={"rd-mark" + (m.hidden != null ? " fade-mark" : "")} style={m.hidden ? { opacity: 0 } : m.opacity != null ? { opacity: m.opacity } : null}>
-            {m.cross ? (
+            {m.cross ? (m.hollow ? (
+              /* m.hollow: a count of part of the vote - the cross stroked
+                 wide in its colour, then cut through in the background
+                 (screen px: .rd-cross is a non-scaling stroke) */
+              <>
+                <path className="rd-cross" style={{ ...(m.color ? { stroke: m.color } : null), strokeWidth: 3.6 }}
+                      d={`M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`} />
+                <path className="rd-cross" style={{ stroke: "var(--chart-bg)", strokeWidth: 1.4 }}
+                      d={`M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`} />
+              </>
+            ) : (
               <path className="rd-cross" style={m.color ? { stroke: m.color } : null}
                     d={`M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`} />
-            ) : (
+            )) : (
               <circle cx={x} cy={y} r={PX(m.r || 5)} className="rd-ring"
                       style={m.color ? { stroke: m.color } : null} />
             )}

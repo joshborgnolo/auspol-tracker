@@ -44,45 +44,48 @@
    50,
    85
   ],
+  "contest_n": [
+   25
+  ],
   "cal_reps": 6
  },
  "federal": {
   "2010": {
    "grn": {
-    "counted": 79.19,
-    "model": 80.26,
-    "replay": 77.07,
-    "ballots": 1080811
+    "counted": 78.55,
+    "model": 79.8,
+    "replay": 76.25,
+    "ballots": 1337613
    },
    "onp": {
-    "counted": 46.52,
-    "model": 42.78,
-    "replay": 50.55,
-    "ballots": 21058
+    "counted": 46.1,
+    "model": 42.16,
+    "replay": 49.87,
+    "ballots": 24979
    },
    "oth": {
-    "counted": 43.54,
-    "model": 41.12,
-    "replay": 48.21,
-    "ballots": 432174
+    "counted": 42.33,
+    "model": 39.67,
+    "replay": 47.13,
+    "ballots": 580921
    }
   },
   "2013": {
    "grn": {
     "counted": 82.67,
-    "model": 82.87,
+    "model": 82.93,
     "replay": 77.41,
     "ballots": 980988
    },
    "onp": {
     "counted": 45.24,
-    "model": 50.47,
+    "model": 50.41,
     "replay": 49.09,
     "ballots": 17250
    },
    "oth": {
     "counted": 46.41,
-    "model": 46.23,
+    "model": 46.18,
     "replay": 50.02,
     "ballots": 1351052
    }
@@ -90,19 +93,19 @@
   "2016": {
    "grn": {
     "counted": 81.41,
-    "model": 82.43,
+    "model": 82.49,
     "replay": 77.49,
     "ballots": 1178464
    },
    "onp": {
     "counted": 50.29,
-    "model": 46.72,
+    "model": 46.71,
     "replay": 50.92,
     "ballots": 158973
    },
    "oth": {
     "counted": 46.34,
-    "model": 45.9,
+    "model": 45.84,
     "replay": 49.76,
     "ballots": 1203582
    }
@@ -110,19 +113,19 @@
   "2019": {
    "grn": {
     "counted": 81.62,
-    "model": 82.37,
+    "model": 82.44,
     "replay": 76.82,
     "ballots": 1291638
    },
    "onp": {
     "counted": 35.02,
-    "model": 31.74,
+    "model": 31.72,
     "replay": 37.52,
     "ballots": 425023
    },
    "oth": {
     "counted": 42.5,
-    "model": 42.86,
+    "model": 42.79,
     "replay": 46.03,
     "ballots": 1281720
    }
@@ -130,19 +133,19 @@
   "2022": {
    "grn": {
     "counted": 84.8,
-    "model": 84.33,
+    "model": 84.41,
     "replay": 78.63,
     "ballots": 1407297
    },
    "onp": {
     "counted": 36.38,
-    "model": 35.85,
+    "model": 35.8,
     "replay": 41.92,
     "ballots": 644939
    },
    "oth": {
     "counted": 45.03,
-    "model": 45.72,
+    "model": 45.66,
     "replay": 48.52,
     "ballots": 1416900
    }
@@ -150,19 +153,19 @@
   "2025": {
    "grn": {
     "counted": 87.46,
-    "model": 85.99,
+    "model": 86.05,
     "replay": 80.45,
     "ballots": 1409652
    },
    "onp": {
     "counted": 25.86,
-    "model": 26.35,
+    "model": 26.32,
     "replay": 33.02,
     "ballots": 823821
    },
    "oth": {
     "counted": 48.33,
-    "model": 49.66,
+    "model": 49.62,
     "replay": 51.04,
     "ballots": 1349526
    }
@@ -171,61 +174,61 @@
  "calibration": {
   "40": {
    "grn": {
-    "mae": 0.97,
-    "p90": 1.9,
-    "bias": 0.29,
+    "mae": 0.99,
+    "p90": 1.83,
+    "bias": 0.37,
     "n": 36
    },
    "onp": {
-    "mae": 2.47,
-    "p90": 3.63,
-    "bias": -0.31,
+    "mae": 2.48,
+    "p90": 3.59,
+    "bias": -0.36,
     "n": 22
    },
    "oth": {
     "mae": 1.12,
-    "p90": 2.79,
-    "bias": -0.66,
+    "p90": 2.77,
+    "bias": -0.7,
     "n": 36
    }
   },
   "50": {
    "grn": {
-    "mae": 0.96,
-    "p90": 1.75,
-    "bias": 0.27,
+    "mae": 1.01,
+    "p90": 1.84,
+    "bias": 0.37,
     "n": 36
    },
    "onp": {
-    "mae": 2.43,
-    "p90": 3.83,
-    "bias": -0.63,
+    "mae": 2.44,
+    "p90": 3.85,
+    "bias": -0.67,
     "n": 24
    },
    "oth": {
-    "mae": 1.07,
-    "p90": 2.96,
-    "bias": -0.76,
+    "mae": 1.09,
+    "p90": 2.87,
+    "bias": -0.83,
     "n": 36
    }
   },
   "85": {
    "grn": {
-    "mae": 0.99,
-    "p90": 1.75,
-    "bias": 0.37,
+    "mae": 1.03,
+    "p90": 1.77,
+    "bias": 0.46,
     "n": 36
    },
    "onp": {
-    "mae": 2.59,
-    "p90": 3.38,
-    "bias": -1.14,
+    "mae": 2.61,
+    "p90": 3.4,
+    "bias": -1.18,
     "n": 24
    },
    "oth": {
     "mae": 0.96,
-    "p90": 2.99,
-    "bias": -0.58,
+    "p90": 3.0,
+    "bias": -0.66,
     "n": 36
    }
   }
@@ -235,85 +238,79 @@
    "year": 2010,
    "n": 40,
    "bucket": "grn",
-   "err": 0.998
+   "err": 1.142
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "grn",
-   "err": 1.027
+   "err": 1.148
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "grn",
-   "err": 1.194
+   "err": 1.305
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "grn",
-   "err": 1.62
+   "err": 1.581
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "grn",
-   "err": 1.763
+   "err": 1.67
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "grn",
-   "err": 1.825
+   "err": 1.72
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "grn",
-   "err": -0.142
+   "err": -0.085
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "grn",
-   "err": -0.013
+   "err": 0.051
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "grn",
-   "err": 0.403
+   "err": 0.474
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "grn",
-   "err": 0.432
+   "err": 0.509
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "grn",
-   "err": 0.55
+   "err": 0.621
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "grn",
-   "err": 0.586
+   "err": 0.636
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "grn",
-   "err": 1.01
-  },
-  {
-   "year": 2016,
-   "n": 40,
-   "bucket": "grn",
-   "err": 1.065
+   "err": 1.079
   },
   {
    "year": 2016,
@@ -325,649 +322,649 @@
    "year": 2016,
    "n": 40,
    "bucket": "grn",
-   "err": 1.416
+   "err": 1.239
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "grn",
-   "err": 1.895
+   "err": 1.51
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "grn",
-   "err": 1.979
+   "err": 1.991
+  },
+  {
+   "year": 2016,
+   "n": 40,
+   "bucket": "grn",
+   "err": 2.073
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "grn",
-   "err": 0.298
+   "err": 0.385
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "grn",
-   "err": 0.351
+   "err": 0.446
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "grn",
-   "err": 0.355
+   "err": 0.453
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "grn",
-   "err": 0.467
+   "err": 0.569
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "grn",
-   "err": 0.83
+   "err": 0.918
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "grn",
-   "err": 0.948
+   "err": 1.049
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "grn",
-   "err": -0.442
+   "err": -0.334
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "grn",
-   "err": -0.375
+   "err": -0.271
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "grn",
-   "err": -0.215
+   "err": -0.119
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "grn",
-   "err": -0.045
+   "err": 0.062
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "grn",
-   "err": 0.194
+   "err": 0.295
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "grn",
-   "err": 0.299
+   "err": 0.413
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "grn",
-   "err": -2.476
+   "err": -2.362
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "grn",
-   "err": -2.438
+   "err": -2.331
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "grn",
-   "err": -1.945
+   "err": -1.829
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "grn",
-   "err": -1.88
+   "err": -1.746
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "grn",
-   "err": -1.399
+   "err": -1.244
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "grn",
-   "err": -0.947
+   "err": -0.801
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "onp",
-   "err": -0.103
+   "err": -0.119
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "onp",
-   "err": 0.512
+   "err": 0.497
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "onp",
-   "err": 1.173
+   "err": 1.149
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "onp",
-   "err": 1.666
+   "err": 1.653
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "onp",
-   "err": -4.227
+   "err": -4.249
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "onp",
-   "err": -3.657
+   "err": -3.689
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "onp",
-   "err": -3.415
+   "err": -3.454
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "onp",
-   "err": -3.108
+   "err": -3.134
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "onp",
-   "err": -2.685
+   "err": -2.718
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "onp",
-   "err": -2.083
+   "err": -2.097
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "onp",
-   "err": -3.516
+   "err": -3.59
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "onp",
-   "err": -2.233
+   "err": -2.316
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "onp",
-   "err": -2.214
+   "err": -2.292
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "onp",
-   "err": -1.775
+   "err": -1.856
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "onp",
-   "err": -1.026
+   "err": -1.095
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "onp",
-   "err": -0.567
+   "err": -0.644
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "onp",
-   "err": 2.247
+   "err": 2.185
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "onp",
-   "err": 3.437
+   "err": 3.379
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "onp",
-   "err": 3.445
+   "err": 3.388
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "onp",
-   "err": 3.627
+   "err": 3.569
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "onp",
-   "err": 3.632
+   "err": 3.593
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "onp",
-   "err": 3.956
+   "err": 3.911
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "oth",
-   "err": -3.777
+   "err": -3.436
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "oth",
-   "err": -3.498
+   "err": -3.323
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "oth",
-   "err": -3.476
+   "err": -3.242
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "oth",
-   "err": -3.458
+   "err": -3.15
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "oth",
-   "err": -2.786
+   "err": -2.775
   },
   {
    "year": 2010,
    "n": 40,
    "bucket": "oth",
-   "err": -2.333
+   "err": -2.615
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "oth",
-   "err": -0.596
+   "err": -0.638
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "oth",
-   "err": -0.529
+   "err": -0.579
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "oth",
-   "err": -0.5
+   "err": -0.535
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "oth",
-   "err": -0.483
+   "err": -0.53
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "oth",
-   "err": -0.193
+   "err": -0.239
   },
   {
    "year": 2013,
    "n": 40,
    "bucket": "oth",
-   "err": -0.1
+   "err": -0.133
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "oth",
-   "err": -2.078
+   "err": -2.172
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "oth",
-   "err": -1.831
+   "err": -1.916
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "oth",
-   "err": -1.46
+   "err": -1.538
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "oth",
-   "err": -1.366
+   "err": -1.442
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "oth",
-   "err": -0.966
+   "err": -1.041
   },
   {
    "year": 2016,
    "n": 40,
    "bucket": "oth",
-   "err": -0.807
+   "err": -0.876
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "oth",
-   "err": -0.127
+   "err": -0.212
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "oth",
-   "err": -0.086
+   "err": -0.183
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "oth",
-   "err": -0.038
+   "err": -0.126
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "oth",
-   "err": 0.235
+   "err": 0.152
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "oth",
-   "err": 0.355
+   "err": 0.28
   },
   {
    "year": 2019,
    "n": 40,
    "bucket": "oth",
-   "err": 0.663
+   "err": 0.58
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "oth",
-   "err": -0.028
+   "err": -0.089
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "oth",
-   "err": 0.685
+   "err": 0.628
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "oth",
-   "err": 0.956
+   "err": 0.894
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "oth",
-   "err": 1.029
+   "err": 0.959
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "oth",
-   "err": 1.266
+   "err": 1.2
   },
   {
    "year": 2022,
    "n": 40,
    "bucket": "oth",
-   "err": 1.675
+   "err": 1.589
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "oth",
-   "err": -0.693
+   "err": -0.809
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "oth",
-   "err": -0.382
+   "err": -0.509
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "oth",
-   "err": -0.332
+   "err": -0.471
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "oth",
-   "err": -0.153
+   "err": -0.252
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "oth",
-   "err": 0.304
+   "err": 0.22
   },
   {
    "year": 2025,
    "n": 40,
    "bucket": "oth",
-   "err": 1.193
+   "err": 1.089
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "grn",
-   "err": 1.007
+   "err": 1.29
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "grn",
-   "err": 1.292
+   "err": 1.382
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "grn",
-   "err": 1.324
+   "err": 1.428
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "grn",
-   "err": 1.337
+   "err": 1.505
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "grn",
-   "err": 1.408
+   "err": 1.577
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "grn",
-   "err": 1.424
+   "err": 1.584
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "grn",
-   "err": 0.061
+   "err": 0.123
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "grn",
-   "err": 0.241
+   "err": 0.309
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "grn",
-   "err": 0.33
+   "err": 0.398
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "grn",
-   "err": 0.387
+   "err": 0.441
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "grn",
-   "err": 0.46
+   "err": 0.533
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "grn",
-   "err": 0.834
+   "err": 0.912
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "grn",
-   "err": 1.0
+   "err": 1.081
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "grn",
-   "err": 1.424
+   "err": 1.511
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "grn",
-   "err": 1.462
+   "err": 1.552
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "grn",
-   "err": 1.539
+   "err": 1.625
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "grn",
-   "err": 1.753
+   "err": 1.842
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "grn",
-   "err": 1.853
+   "err": 1.95
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "grn",
-   "err": -0.003
+   "err": 0.084
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "grn",
-   "err": 0.3
+   "err": 0.386
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "grn",
-   "err": 0.32
+   "err": 0.401
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "grn",
-   "err": 0.321
+   "err": 0.412
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "grn",
-   "err": 0.366
+   "err": 0.441
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "grn",
-   "err": 0.754
+   "err": 0.85
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "grn",
-   "err": -0.446
+   "err": -0.358
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "grn",
-   "err": -0.249
+   "err": -0.15
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "grn",
-   "err": -0.173
+   "err": -0.07
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "grn",
-   "err": 0.14
-  },
-  {
-   "year": 2022,
-   "n": 50,
-   "bucket": "grn",
-   "err": 0.307
+   "err": 0.237
   },
   {
    "year": 2022,
@@ -976,58 +973,64 @@
    "err": 0.417
   },
   {
-   "year": 2025,
+   "year": 2022,
    "n": 50,
    "bucket": "grn",
-   "err": -2.441
+   "err": 0.526
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "grn",
-   "err": -2.231
+   "err": -2.307
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "grn",
-   "err": -1.982
+   "err": -2.115
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "grn",
-   "err": -1.714
+   "err": -1.882
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "grn",
-   "err": -1.71
+   "err": -1.594
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "grn",
-   "err": -1.517
+   "err": -1.592
+  },
+  {
+   "year": 2025,
+   "n": 50,
+   "bucket": "grn",
+   "err": -1.402
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "onp",
-   "err": -3.826
+   "err": -3.846
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "onp",
-   "err": -3.348
+   "err": -3.358
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "onp",
-   "err": -0.626
+   "err": -0.641
   },
   {
    "year": 2016,
@@ -1039,565 +1042,565 @@
    "year": 2016,
    "n": 50,
    "bucket": "onp",
-   "err": 0.262
+   "err": 0.228
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "onp",
-   "err": 1.196
+   "err": 1.188
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "onp",
-   "err": -4.174
+   "err": -4.203
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "onp",
-   "err": -3.959
+   "err": -3.987
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "onp",
-   "err": -3.522
+   "err": -3.554
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "onp",
-   "err": -3.428
+   "err": -3.444
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "onp",
-   "err": -3.415
+   "err": -3.435
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "onp",
-   "err": -2.835
+   "err": -2.856
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "onp",
-   "err": -3.054
+   "err": -3.14
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "onp",
-   "err": -2.393
+   "err": -2.472
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "onp",
-   "err": -1.474
+   "err": -1.558
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "onp",
-   "err": -0.434
+   "err": -0.509
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "onp",
-   "err": -0.246
+   "err": -0.32
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "onp",
-   "err": 0.961
+   "err": 0.876
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "onp",
-   "err": 2.487
+   "err": 2.434
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "onp",
-   "err": 2.67
+   "err": 2.629
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "onp",
-   "err": 2.907
+   "err": 2.874
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "onp",
-   "err": 3.189
+   "err": 3.135
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "onp",
-   "err": 3.58
+   "err": 3.524
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "onp",
-   "err": 4.401
+   "err": 4.347
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "oth",
-   "err": -3.722
+   "err": -3.784
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "oth",
-   "err": -3.295
+   "err": -3.503
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "oth",
-   "err": -3.043
+   "err": -3.159
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "oth",
-   "err": -2.992
+   "err": -3.107
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "oth",
-   "err": -2.963
+   "err": -2.87
   },
   {
    "year": 2010,
    "n": 50,
    "bucket": "oth",
-   "err": -2.791
+   "err": -2.847
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "oth",
-   "err": -0.761
+   "err": -0.813
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "oth",
-   "err": -0.676
+   "err": -0.738
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "oth",
-   "err": -0.421
+   "err": -0.464
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "oth",
-   "err": -0.4
+   "err": -0.444
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "oth",
-   "err": -0.318
+   "err": -0.361
   },
   {
    "year": 2013,
    "n": 50,
    "bucket": "oth",
-   "err": -0.137
+   "err": -0.175
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "oth",
-   "err": -1.86
+   "err": -1.952
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "oth",
-   "err": -1.773
+   "err": -1.861
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "oth",
-   "err": -1.634
+   "err": -1.732
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "oth",
-   "err": -1.506
+   "err": -1.59
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "oth",
-   "err": -1.449
+   "err": -1.536
   },
   {
    "year": 2016,
    "n": 50,
    "bucket": "oth",
-   "err": -0.77
+   "err": -0.848
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "oth",
-   "err": -0.542
+   "err": -0.637
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "oth",
-   "err": -0.113
+   "err": -0.184
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "oth",
-   "err": 0.134
+   "err": 0.058
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "oth",
-   "err": 0.28
+   "err": 0.2
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "oth",
-   "err": 0.403
+   "err": 0.332
   },
   {
    "year": 2019,
    "n": 50,
    "bucket": "oth",
-   "err": 0.842
+   "err": 0.769
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "oth",
-   "err": -0.455
+   "err": -0.514
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "oth",
-   "err": 0.045
+   "err": -0.018
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "oth",
-   "err": 0.178
+   "err": 0.136
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "oth",
-   "err": 0.23
+   "err": 0.148
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "oth",
-   "err": 1.021
+   "err": 0.942
   },
   {
    "year": 2022,
    "n": 50,
    "bucket": "oth",
-   "err": 1.046
+   "err": 0.953
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "oth",
-   "err": -0.805
+   "err": -0.9
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "oth",
-   "err": -0.545
+   "err": -0.636
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "oth",
-   "err": 0.092
+   "err": 0.025
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "oth",
-   "err": 0.43
+   "err": 0.325
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "oth",
-   "err": 0.476
+   "err": 0.382
   },
   {
    "year": 2025,
    "n": 50,
    "bucket": "oth",
+   "err": 0.441
+  },
+  {
+   "year": 2010,
+   "n": 85,
+   "bucket": "grn",
+   "err": 1.38
+  },
+  {
+   "year": 2010,
+   "n": 85,
+   "bucket": "grn",
+   "err": 1.415
+  },
+  {
+   "year": 2010,
+   "n": 85,
+   "bucket": "grn",
+   "err": 1.445
+  },
+  {
+   "year": 2010,
+   "n": 85,
+   "bucket": "grn",
+   "err": 1.467
+  },
+  {
+   "year": 2010,
+   "n": 85,
+   "bucket": "grn",
+   "err": 1.511
+  },
+  {
+   "year": 2010,
+   "n": 85,
+   "bucket": "grn",
+   "err": 1.53
+  },
+  {
+   "year": 2013,
+   "n": 85,
+   "bucket": "grn",
+   "err": 0.322
+  },
+  {
+   "year": 2013,
+   "n": 85,
+   "bucket": "grn",
+   "err": 0.387
+  },
+  {
+   "year": 2013,
+   "n": 85,
+   "bucket": "grn",
    "err": 0.527
   },
   {
-   "year": 2010,
+   "year": 2013,
    "n": 85,
    "bucket": "grn",
-   "err": 1.238
-  },
-  {
-   "year": 2010,
-   "n": 85,
-   "bucket": "grn",
-   "err": 1.248
-  },
-  {
-   "year": 2010,
-   "n": 85,
-   "bucket": "grn",
-   "err": 1.302
-  },
-  {
-   "year": 2010,
-   "n": 85,
-   "bucket": "grn",
-   "err": 1.344
-  },
-  {
-   "year": 2010,
-   "n": 85,
-   "bucket": "grn",
-   "err": 1.375
-  },
-  {
-   "year": 2010,
-   "n": 85,
-   "bucket": "grn",
-   "err": 1.466
+   "err": 0.565
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "grn",
-   "err": 0.257
+   "err": 0.567
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "grn",
-   "err": 0.315
-  },
-  {
-   "year": 2013,
-   "n": 85,
-   "bucket": "grn",
-   "err": 0.464
-  },
-  {
-   "year": 2013,
-   "n": 85,
-   "bucket": "grn",
-   "err": 0.493
-  },
-  {
-   "year": 2013,
-   "n": 85,
-   "bucket": "grn",
-   "err": 0.496
-  },
-  {
-   "year": 2013,
-   "n": 85,
-   "bucket": "grn",
-   "err": 0.551
+   "err": 0.623
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "grn",
-   "err": 1.4
+   "err": 1.482
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "grn",
-   "err": 1.544
+   "err": 1.626
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "grn",
-   "err": 1.544
+   "err": 1.63
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "grn",
-   "err": 1.685
+   "err": 1.771
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "grn",
-   "err": 1.747
+   "err": 1.836
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "grn",
-   "err": 1.859
+   "err": 1.946
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "grn",
-   "err": 0.426
+   "err": 0.515
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "grn",
-   "err": 0.605
+   "err": 0.687
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "grn",
-   "err": 0.702
+   "err": 0.796
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "grn",
-   "err": 0.767
+   "err": 0.859
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "grn",
-   "err": 0.805
+   "err": 0.892
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "grn",
-   "err": 0.834
+   "err": 0.92
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "grn",
-   "err": -0.335
+   "err": -0.245
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "grn",
-   "err": -0.238
+   "err": -0.141
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "grn",
-   "err": -0.12
+   "err": -0.027
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "grn",
-   "err": -0.073
+   "err": 0.021
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "grn",
-   "err": -0.039
+   "err": 0.064
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "grn",
-   "err": 0.03
+   "err": 0.122
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "grn",
-   "err": -1.967
+   "err": -1.863
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "grn",
-   "err": -1.918
+   "err": -1.819
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "grn",
-   "err": -1.84
+   "err": -1.753
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "grn",
-   "err": -1.691
+   "err": -1.579
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "grn",
-   "err": -1.609
+   "err": -1.499
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "grn",
-   "err": -1.444
+   "err": -1.339
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "onp",
-   "err": -4.071
+   "err": -4.091
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "onp",
-   "err": -3.466
+   "err": -3.472
   },
   {
    "year": 2016,
@@ -1609,367 +1612,517 @@
    "year": 2016,
    "n": 85,
    "bucket": "onp",
-   "err": -3.196
+   "err": -3.217
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "onp",
-   "err": -2.946
+   "err": -2.96
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "onp",
-   "err": -2.74
+   "err": -2.752
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "onp",
-   "err": -3.371
+   "err": -3.403
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "onp",
-   "err": -3.076
+   "err": -3.11
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "onp",
-   "err": -3.052
+   "err": -3.083
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "onp",
-   "err": -2.971
+   "err": -2.996
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "onp",
-   "err": -2.958
+   "err": -2.983
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "onp",
-   "err": -2.641
+   "err": -2.667
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "onp",
-   "err": -1.572
+   "err": -1.632
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "onp",
-   "err": -1.448
+   "err": -1.513
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "onp",
-   "err": -1.416
+   "err": -1.483
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "onp",
-   "err": -1.309
+   "err": -1.378
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "onp",
-   "err": -0.714
+   "err": -0.786
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "onp",
-   "err": -0.442
+   "err": -0.507
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "onp",
-   "err": 2.279
+   "err": 2.234
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "onp",
-   "err": 2.372
+   "err": 2.329
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "onp",
-   "err": 2.781
+   "err": 2.736
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "onp",
-   "err": 3.29
+   "err": 3.244
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "onp",
-   "err": 3.295
+   "err": 3.251
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "onp",
-   "err": 3.382
+   "err": 3.337
   },
   {
    "year": 2010,
    "n": 85,
    "bucket": "oth",
-   "err": -3.38
+   "err": -3.418
   },
   {
    "year": 2010,
    "n": 85,
    "bucket": "oth",
-   "err": -3.239
+   "err": -3.273
   },
   {
    "year": 2010,
    "n": 85,
    "bucket": "oth",
-   "err": -3.142
+   "err": -3.259
   },
   {
    "year": 2010,
    "n": 85,
    "bucket": "oth",
-   "err": -3.142
+   "err": -3.229
   },
   {
    "year": 2010,
    "n": 85,
    "bucket": "oth",
-   "err": -2.989
+   "err": -3.002
   },
   {
    "year": 2010,
    "n": 85,
    "bucket": "oth",
-   "err": -2.657
+   "err": -2.923
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "oth",
-   "err": -0.535
+   "err": -0.587
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "oth",
-   "err": -0.477
+   "err": -0.519
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "oth",
-   "err": -0.41
+   "err": -0.461
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "oth",
-   "err": -0.378
+   "err": -0.425
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "oth",
-   "err": -0.366
+   "err": -0.412
   },
   {
    "year": 2013,
    "n": 85,
    "bucket": "oth",
-   "err": -0.29
+   "err": -0.341
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "oth",
-   "err": -1.16
+   "err": -1.242
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "oth",
-   "err": -1.158
+   "err": -1.241
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "oth",
-   "err": -1.131
+   "err": -1.206
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "oth",
-   "err": -1.044
+   "err": -1.123
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "oth",
-   "err": -0.939
+   "err": -1.014
   },
   {
    "year": 2016,
    "n": 85,
    "bucket": "oth",
-   "err": -0.85
+   "err": -0.917
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "oth",
-   "err": 0.11
+   "err": 0.029
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "oth",
-   "err": 0.21
+   "err": 0.138
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "oth",
-   "err": 0.302
+   "err": 0.22
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "oth",
-   "err": 0.31
+   "err": 0.229
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "oth",
-   "err": 0.366
+   "err": 0.282
   },
   {
    "year": 2019,
    "n": 85,
    "bucket": "oth",
-   "err": 0.768
+   "err": 0.687
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "oth",
-   "err": 0.338
+   "err": 0.273
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "oth",
-   "err": 0.534
+   "err": 0.473
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "oth",
-   "err": 0.557
+   "err": 0.495
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "oth",
-   "err": 0.576
+   "err": 0.511
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "oth",
-   "err": 0.737
+   "err": 0.671
   },
   {
    "year": 2022,
    "n": 85,
    "bucket": "oth",
-   "err": 0.876
+   "err": 0.809
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "oth",
-   "err": -0.46
+   "err": -0.534
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "oth",
-   "err": 0.042
+   "err": -0.017
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "oth",
-   "err": 0.118
+   "err": 0.046
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "oth",
-   "err": 0.125
+   "err": 0.047
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "oth",
-   "err": 0.317
+   "err": 0.248
   },
   {
    "year": 2025,
    "n": 85,
    "bucket": "oth",
-   "err": 0.463
+   "err": 0.374
   }
  ],
+ "contest_calibration": {
+  "25": {
+   "grn": {
+    "mae": 0.96,
+    "p90": 1.76,
+    "bias": 0.46,
+    "n": 36
+   },
+   "onp": {
+    "mae": 3.03,
+    "p90": 4.62,
+    "bias": -0.46,
+    "n": 21
+   },
+   "oth": {
+    "mae": 1.42,
+    "p90": 3.5,
+    "bias": -1.04,
+    "n": 36
+   }
+  }
+ },
+ "noncoal_check": {
+  "2010": {
+   "seats": 4,
+   "coal": {
+    "model": 23.59,
+    "replay": 23.41,
+    "counted": 21.37,
+    "ballots": 69038
+   },
+   "oth": {
+    "model": 26.69,
+    "replay": 29.74,
+    "counted": 39.62,
+    "ballots": 10662
+   },
+   "grn": {
+    "model": 42.03,
+    "replay": 40.62,
+    "counted": 43.29,
+    "ballots": 12312
+   }
+  },
+  "2013": {
+   "seats": 4,
+   "coal": {
+    "model": 56.9,
+    "replay": 55.87,
+    "counted": 57.97,
+    "ballots": 75086
+   },
+   "grn": {
+    "model": 42.37,
+    "replay": 41.31,
+    "counted": 42.78,
+    "ballots": 5133
+   },
+   "oth": {
+    "model": 42.53,
+    "replay": 46.65,
+    "counted": 39.66,
+    "ballots": 24372
+   }
+  },
+  "2016": {
+   "seats": 5,
+   "coal": {
+    "model": 54.74,
+    "replay": 54.63,
+    "counted": 54.63,
+    "ballots": 90207
+   },
+   "oth": {
+    "model": 37.03,
+    "replay": 39.7,
+    "counted": 38.72,
+    "ballots": 24144
+   },
+   "grn": {
+    "model": 48.13,
+    "replay": 47.21,
+    "counted": 49.47,
+    "ballots": 13751
+   }
+  },
+  "2019": {
+   "seats": 4,
+   "coal": {
+    "model": 54.03,
+    "replay": 52.88,
+    "counted": 52.8,
+    "ballots": 68818
+   },
+   "oth": {
+    "model": 38.69,
+    "replay": 42.38,
+    "counted": 41.94,
+    "ballots": 27815
+   },
+   "grn": {
+    "model": 36.74,
+    "replay": 35.33,
+    "counted": 36.54,
+    "ballots": 6458
+   }
+  },
+  "2022": {
+   "seats": 8,
+   "coal": {
+    "model": 58.75,
+    "replay": 58.04,
+    "counted": 57.32,
+    "ballots": 126430
+   },
+   "oth": {
+    "model": 39.14,
+    "replay": 42.55,
+    "counted": 41.06,
+    "ballots": 49435
+   },
+   "grn": {
+    "model": 42.9,
+    "replay": 41.13,
+    "counted": 43.43,
+    "ballots": 13052
+   }
+  },
+  "2025": {
+   "seats": 18,
+   "coal": {
+    "model": 51.24,
+    "replay": 51.48,
+    "counted": 50.69,
+    "ballots": 323777
+   },
+   "grn": {
+    "model": 53.29,
+    "replay": 51.73,
+    "counted": 54.35,
+    "ballots": 84943
+   },
+   "oth": {
+    "model": 39.84,
+    "replay": 42.69,
+    "counted": 40.79,
+    "ballots": 95070
+   }
+  }
+ },
  "qld_check": {
   "2020": {
    "grn": {
     "counted": 80.1,
-    "model": 80.05,
+    "model": 80.11,
     "replay": 75.01
    },
    "onp": {
     "counted": 33.8,
-    "model": 33.12,
+    "model": 33.09,
     "replay": 37.32
    }
   },
   "2024": {
    "grn": {
     "counted": 80.7,
-    "model": 81.02,
+    "model": 81.07,
     "replay": 75.82
    },
    "onp": {
     "counted": 26.2,
-    "model": 26.89,
+    "model": 26.86,
     "replay": 31.58
    }
   }
@@ -1978,63 +2131,63 @@
   "2015": {
    "grn": {
     "counted": 84.6,
-    "model": 84.37,
+    "model": 84.38,
     "replay": 82.92,
     "exh_counted": 45.91,
-    "exh_model": 43.67
+    "exh_model": 43.64
    },
    "oth": {
     "counted": 43.93,
-    "model": 41.96,
+    "model": 41.91,
     "replay": 44.97,
     "exh_counted": 58.95,
-    "exh_model": 61.15
+    "exh_model": 61.18
    }
   },
   "2019": {
    "grn": {
     "counted": 86.65,
-    "model": 87.11,
+    "model": 87.14,
     "replay": 84.75,
     "exh_counted": 40.5,
-    "exh_model": 37.35
+    "exh_model": 37.29
    },
    "onp": {
     "counted": 37.88,
-    "model": 38.58,
+    "model": 38.57,
     "replay": 40.09,
     "exh_counted": 69.97,
     "exh_model": 66.88
    },
    "oth": {
     "counted": 54.19,
-    "model": 51.38,
+    "model": 51.3,
     "replay": 55.34,
     "exh_counted": 58.46,
-    "exh_model": 61.47
+    "exh_model": 61.51
    }
   },
   "2023": {
    "grn": {
     "counted": 88.12,
-    "model": 87.97,
+    "model": 88.0,
     "replay": 85.77,
     "exh_counted": 34.51,
-    "exh_model": 32.14
+    "exh_model": 32.09
    },
    "onp": {
     "counted": 32.09,
-    "model": 34.24,
+    "model": 34.23,
     "replay": 36.79,
     "exh_counted": 61.32,
-    "exh_model": 58.39
+    "exh_model": 58.4
    },
    "oth": {
     "counted": 53.32,
-    "model": 51.86,
+    "model": 51.79,
     "replay": 55.29,
     "exh_counted": 55.27,
-    "exh_model": 57.67
+    "exh_model": 57.71
    }
   }
  },
@@ -2042,11 +2195,11 @@
   "sa-2026-alp-onp": {
    "seats": 25,
    "model": {
-    "lib": 34.53,
-    "grn": 86.39,
-    "ind": 55.21,
-    "minor": 48.99,
-    "oth": 50.73
+    "lib": 34.54,
+    "grn": 86.34,
+    "ind": 55.26,
+    "minor": 49.03,
+    "oth": 50.77
    },
    "replay": {
     "lib": 37.27,
@@ -2060,6 +2213,11 @@
     "grn": 60972,
     "ind": 13482,
     "minor": 34800
+   },
+   "err90": {
+    "lib": 2.22,
+    "grn": 1.76,
+    "oth": 3.5
    }
   }
  },

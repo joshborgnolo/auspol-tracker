@@ -148,8 +148,19 @@ assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, byKey.
   "Hunter 2025: the AEC's counted flows (Nationals 17.06 / Greens 87.39 / five minor parties 40.25 to Labor)");
 assert.equal(byKey.get("hunter").date, "2025-05-03", "Hunter rides its election day");
 assert.equal(byKey.get("hunter").lbl.coal, "Nationals", "Hunter's Coalition cohort names the partner — no Liberal stood");
-assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, byKey.get("sa2026")[k]])), { coal: 33.9, grn: 84.8, oth: 55.9 },
-  "SA 2026: Bonham's estimates (Liberal 33.9 / Greens 84.8 / Independent 55.9 to Labor)");
+/* SA 2026 is THIS SITE's estimate (user 2026-10-21 review: a cross with no
+   range hid that it and Bonham's differ), with its tested 90% misses */
+const SAC = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")).contests["sa-2026-alp-onp"];
+const sa = byKey.get("sa2026");
+assert.deepEqual(Object.fromEntries(["coal", "grn", "oth"].map((k) => [k, sa[k]])),
+  { coal: Math.round(SAC.model.lib * 10) / 10, grn: Math.round(SAC.model.grn * 10) / 10, oth: Math.round(SAC.model.oth * 10) / 10 },
+  "SA 2026: the estimator's Liberal / Greens / all-others flows to Labor");
+assert.equal(sa.kind, "est", "SA 2026 is an estimate");
+assert.deepEqual({ ...sa.err }, { coal: SAC.err90.lib, grn: SAC.err90.grn, oth: SAC.err90.oth }, "SA 2026 carries the estimator's tested 90% misses");
+assert.ok(["coal", "grn", "oth"].every((k) => sa.err[k] > 0 && sa.err[k] < 6), "each SA error is a real, bounded figure");
+assert.ok(/Bonham 33\.9/.test(sa.alt.coal) && /Bonham 84\.8/.test(sa.alt.grn), "Bonham's figures ride beside the site's");
+assert.equal(byKey.get("hunter").kind, "count", "Hunter is a count");
+assert.equal(byKey.get("harbour").kind, "part", "Secret Harbour is a count of part of the vote (drawn hollow)");
 assert.equal(byKey.get("sa2026").date, "2026-03-21", "SA 2026 rides its election day");
 assert.equal(byKey.get("sa2026").lbl.coal, "Liberal", "SA's Coalition cohort names the partner");
 assert.deepEqual([byKey.get("harbour").coal, byKey.get("harbour").grn], [29.8, 90],
@@ -241,8 +252,9 @@ assert.ok(ap.includes('{pts.length > 1 && <path className={"rd-fx-line " + cls} 
   "the line path is the waves' own curve");
 assert.ok(ap.includes("{!rb.length && dm.length > 1 && <path className={\"rd-fx-mline \" + cls}"),
   "DemosAU's marks join only where no RedBridge line exists (the Coalition v One Nation contest, a named region)");
-assert.ok(ap.includes('className={"rd-fx-tr " + cls}') && ap.includes('className={"rd-fx-x " + cls}'),
-  "DemosAU's readings are triangles, the 2026 counts crosses");
+assert.ok(ap.includes('className={"rd-fx-tr " + cls}') && ap.includes('className={"rd-fx-x " + cls + (m.d.kind === "part" ? " rd-fx-xhol" : "")}'),
+  "DemosAU's readings are triangles, the 2026 counts and estimates crosses (a count of part of the vote hollow)");
+assert.ok(ap.includes('className={"rd-fx-x rd-fx-xerr " + cls}'), "an estimate's cross carries its 90% error as a whisker");
 assert.ok(ap.includes('<path className="rd-fx-ref"') && ap.includes('<rect className="rd-fx-refb"'),
   "the assumption is a dotted line across the row, its band shaded where it carries one");
 
@@ -319,16 +331,20 @@ assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 2 && (ap.m
   "both views share the px chart frame and carry a copy prop");
 assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),
   "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");
-assert.ok(ap.includes('{"One reading per contest: " + cap + "."}'),
-  "the One Nation chart's caption lists one reading per contest from the crosses' own sub lines");
+assert.ok(ap.includes('{"One reading per contest: " + cap') && ap.includes("so no line joins them: Hunter’s Coalition voters are Nationals"),
+  "the One Nation chart's caption lists one reading per contest from the crosses' own sub lines, and says why no line joins them");
 assert.ok(ap.includes("const marks = [];") && ap.includes("cross: true") && ap.includes("endCap: false,")
-    && ap.includes("series={series} marks={marks} spine="),
-  "the explainer's One Nation readings draw as the /flows/ ledger's crosses (marks channel), never dots");
+    && ap.includes("series={series} marks={marks} areas={areas} spine="),
+  "the explainer's One Nation readings draw as the /flows/ ledger's crosses (marks channel), never dots, estimates with their bars");
+/* no line joins contests (user 2026-10-21): every reading is its own
+   one-point series, so the chart draws no trend across changed definitions */
+assert.ok(ap.includes("points: [{ x: b.xm, y: T(v), ...(note ? { note } : null) }],"),
+  "each contest reading is its own one-point series: no line between contests");
 assert.ok(cssRd.includes(".rd-cross { fill: none; stroke-width: 2; stroke-linecap: round; }")
     && cssRd.includes(".chart-svg .rd-cross,"),
   "the cross mark keeps the ledger's stroke-only look and the chart's non-scaling stroke");
-assert.ok(ap.includes('<span className="rd-fx-keyx" aria-hidden="true"></span>Election and by-election counts</span>'),
-  "the /flows/ key reads across 2025 and 2026 counts now Hunter has joined");
+assert.ok(ap.includes('<span className="rd-fx-keyx" aria-hidden="true"></span>Contest counts and estimates</span>'),
+  "the /flows/ key names counts AND estimates (SA 2026 is an estimate)");
 
 // ---- the retired satellite is a redirect stub --------------------------------------------
 /* preference-flows/index.html retired 2026-10-15 to a hash-preserving

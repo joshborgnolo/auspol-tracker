@@ -4201,9 +4201,19 @@ const flowForced = (() => {
      to Labor; Greens 7,241 of 8,286; the five minor-party piles — Legalise
      Cannabis, Animal Justice, Family First, Shooters, Trumpet of Patriots —
      6,642 of 16,503; no Liberal stood, so its Coalition cell is Nationals-
-     only). SA is Bonham's estimate from the published distributions (the
-     state commission's own flows are due late 2026); Secret Harbour is
-     Green's count of the early voting centre. */
+     only). SA is THIS SITE's estimate from the published distributions
+     (.build/estimate-state-flows.py's 25 Labor v One Nation finals, the
+     state commission's own flows due late 2026), with its tested 90%
+     misses (err) and Bonham's figures beside it (alt) - user 2026-10-21:
+     a cross with no range hid that the two estimates differ; its Others
+     are ALL other voters (the table's "All other voters", like Hunter's
+     five minor parties), not Bonham's independents-only figure. Secret
+     Harbour is Green's count of the early voting centre, 47% of the votes
+     (part: drawn hollow) - Green and Bonham both put the whole seat's
+     Liberal flow a little more Labor's way. kind: "count" | "est" | "part". */
+  const saC = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")).contests["sa-2026-alp-onp"]; } catch { return null; }
+  })();
   const byX = (d) => {
     const y = +d.slice(0, 4), mo = +d.slice(5, 7), dy = +d.slice(8);
     const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
@@ -4211,14 +4221,18 @@ const flowForced = (() => {
   };
   const bys = [
     { key: "hunter", date: "2025-05-03", xm: byX("2025-05-03"), label: "Hunter 2025", win: "3 May 2025",
-      coal: 17.06, grn: 87.39, oth: 40.25, lbl: { coal: "Nationals", oth: "Others" },
+      kind: "count", coal: 17.06, grn: 87.39, oth: 40.25, lbl: { coal: "Nationals", oth: "five minor parties" },
       sub: "The AEC’s count of the full distribution of preferences" },
-    { key: "sa2026", date: "2026-03-21", xm: byX("2026-03-21"), label: "South Australia 2026", win: "21 Mar 2026",
-      coal: 33.9, grn: 84.8, oth: 55.9, lbl: { coal: "Liberal", oth: "Independent" },
-      sub: "Bonham’s estimates from the published distributions" },
+    ...(saC && saC.model && saC.err90 ? [{ key: "sa2026", date: "2026-03-21", xm: byX("2026-03-21"), label: "South Australia 2026", win: "21 Mar 2026",
+      kind: "est", coal: Math.round(saC.model.lib * 10) / 10, grn: Math.round(saC.model.grn * 10) / 10, oth: Math.round(saC.model.oth * 10) / 10,
+      err: { coal: saC.err90.lib, grn: saC.err90.grn, oth: saC.err90.oth },
+      alt: { coal: "Bonham 33.9", grn: "Bonham 84.8", oth: "independents " + saC.model.ind.toFixed(1) + ", Bonham 55.9" },
+      lbl: { coal: "Liberal", oth: "all others" },
+      sub: "This site’s estimate from the published distributions, " + saC.seats + " seats" }] : []),
     { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
-      coal: 29.8, grn: 90.0, lbl: { coal: "Liberal" },
-      sub: "Green’s count of the early voting centre, 47% of the votes" },
+      kind: "part", coal: 29.8, grn: 90.0, lbl: { coal: "Liberal" },
+      alt: { coal: "whole seat a little higher, by Green’s and Bonham’s readings" },
+      sub: "Green’s count of the early voting centre: 47% of the votes" },
   ];
   /* DemosAU's MRP reports print one national respondent flow beside
      RedBridge's: One Nation voters' share reaching Labor in Labor-v-Coalition
@@ -4433,7 +4447,20 @@ const flowHistory = (() => {
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
     err90: { grn: span(errs.grn), onp: span(errs.onp), oth: span(errs.oth) }, onpMinBallots: bt.onp_min_ballots || null,
     qld: qld.length ? Math.round(Math.max(...qld) * 10) / 10 : null, qldSource: bt.qld_source || null,
-    nsw: bt.nsw_check ? { grn: nswMax("grn"), oth: nswMax("oth"), exh: nswExh() } : null };
+    nsw: bt.nsw_check ? { grn: nswMax("grn"), oth: nswMax("oth"), exh: nswExh() } : null,
+    /* the others estimates' lean (user 2026-10-21 review): the calibration's
+       mean signed miss at the state sizes, and the model-minus-count gap in
+       every NSW election - both below zero, so the Info entry says so */
+    othLean: {
+      cal: span(Object.values(bt.calibration || {}).map((t) => t.oth && t.oth.bias).filter((x) => x != null)),
+      nsw: span(Object.values(bt.nsw_check || {}).filter((d) => d.oth).map((d) => Math.round((d.oth.model - d.oth.counted) * 10) / 10)) },
+    /* the Labor v One Nation contest's bars: Greens/others from the
+       calibration at its seat count, the Liberal cell from the federal seats
+       where Labor faced a non-Coalition finalist (largest miss of six) */
+    contest: (() => {
+      const c = (bt.contests || {})["sa-2026-alp-onp"];
+      return c && c.err90 ? { seats: c.seats, err: c.err90, elections: Object.keys(bt.noncoal_check || {}).length } : null;
+    })() };
   return h;
 })();
 

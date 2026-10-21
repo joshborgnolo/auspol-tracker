@@ -75,6 +75,9 @@ FED_SEAT = 104000.0      # mean formal ballots in a 2022/2025 federal seat
 EM_ITERS = 200
 FED_YEARS = (2010, 2013, 2016, 2019, 2022, 2025)
 CAL_N = (40, 50, 85)     # calibration seat counts: SA/Vic 2022, WA, Qld
+# ... and the Labor v One Nation contests' own size, calibrated apart so the
+# state lines' 40-seat floor (and the One Nation ballot floor) stay put
+CONTEST_N = (25,)        # SA 2026: 25 Labor v One Nation finals
 CAL_REPS = 6
 # Antony Green's tabulation of the ECQ's counted flows, Labor v LNP finals
 # (antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/)
@@ -278,7 +281,9 @@ def aec_bucket(ab):
     ab = (ab or "").strip()
     if ab == "ALP":
         return "alp"
-    if ab in ("LP", "NP", "LNP", "CLP", "NAT", "LIB"):
+    # LNQ: the 2010 distribution file's code for Queensland's LNP (its
+    # flow file says LNP) - unmapped, its 30 seats read as "other" finalists
+    if ab in ("LP", "NP", "LNP", "LNQ", "CLP", "NAT", "LIB"):
         return "coal"
     if ab in ("GRN", "GVIC", "TG", "GWA"):
         return "grn"
@@ -643,9 +648,9 @@ def _cal_job(args):
             if sum(tr[b]) >= 20000 and not (b == "onp" and y < 2016) and pct(est[b]) is not None]
 
 
-def calibrate():
+def calibrate(ns=CAL_N):
     from multiprocessing import Pool
-    jobs = [(y, N, rep) for y in FED_YEARS for N in CAL_N for rep in range(CAL_REPS)]
+    jobs = [(y, N, rep) for y in FED_YEARS for N in ns for rep in range(CAL_REPS)]
     rows = []
     with Pool(max(1, min(5, (os.cpu_count() or 2) - 1))) as pool:
         for i, r in enumerate(pool.imap_unordered(_cal_job, jobs)):
@@ -653,7 +658,7 @@ def calibrate():
             print(f"  calibration {i + 1}/{len(jobs)}", file=sys.stderr)
     rows.sort(key=lambda r: (r["n"], r["bucket"], r["year"], r["err"]))
     table = {}
-    for N in CAL_N:
+    for N in ns:
         for b in BUCKETS:
             e = sorted(abs(r["err"]) for r in rows if r["n"] == N and r["bucket"] == b)
             v = [r["err"] for r in rows if r["n"] == N and r["bucket"] == b]
@@ -662,6 +667,52 @@ def calibrate():
                                                    "p90": round(e[int(0.9 * (len(e) - 1))], 2),
                                                    "bias": round(sum(v) / len(v), 2), "n": len(e)}
     return table, rows
+
+
+def noncoal_check(fed, fed_evs, params):
+    """The Coalition cell's test. In a Labor v One Nation final the Liberal
+    pile is a major party's, split between Labor and a non-Coalition
+    finalist; the classic-seat calibration never sees one. Federal seats
+    where Labor faced a non-Coalition finalist (Greens, independents, One
+    Nation...) do, and the AEC counts where each first preference ended:
+    per election, the model's and the plain replay's split of the
+    Coalition's, Greens' and others' ballots against that count, summed over
+    those seats (a finalist's own group skipped)."""
+    out = {}
+    for y in FED_YEARS:
+        seats, _ = fed[y]
+        tcp = fed_paths(y)[1]
+        truth = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
+        for r in _aec_rows(tcp):
+            if r["FromCandidateID"] == "0":
+                continue
+            fb, tb = aec_bucket(r["FromCandidatePartyAb"]), aec_bucket(r["ToCandidatePartyAb"])
+            truth[r["DivisionNm"]][fb][0 if tb == "alp" else 1] += float(r["TransferCount"])
+        idx = collections.defaultdict(dict)
+        for e in fed_evs[y]:
+            idx[e["seat"]][e["x"]] = e
+        agg = collections.defaultdict(lambda: [0.0] * 6)
+        n = 0
+        for k, s in seats.items():
+            fin = s["final"]
+            bs = [s["cands"][c][0] for c in fin]
+            if len(fin) != 2 or "alp" not in bs or "coal" in bs:
+                continue
+            n += 1
+            a = next(c for c in fin if s["cands"][c][0] == "alp")
+            o = next(c for c in fin if c != a)
+            pm, pr = replay(s, params[("fed", y)], idx[k]), replay(s)
+            for b in ("coal", "grn", "oth"):
+                t = truth.get(k, {}).get(b)
+                if b == s["cands"][o][0] or not t or sum(t) == 0:
+                    continue
+                g = agg[b]
+                for j, v in enumerate((pm[a].get(b, 0.0), pm[o].get(b, 0.0), pr[a].get(b, 0.0), pr[o].get(b, 0.0), t[0], t[1])):
+                    g[j] += v
+        out[str(y)] = {"seats": n, **{b: {"model": round(pct(g[0:2]), 2), "replay": round(pct(g[2:4]), 2),
+                                          "counted": round(pct(g[4:6]), 2), "ballots": round(g[4] + g[5])}
+                                      for b, g in agg.items() if g[4] + g[5] > 0}}
+    return out
 
 
 def onp_min_ballots(fed):
@@ -738,6 +789,11 @@ def main():
         table, cal_rows = calibrate()
     else:
         table, cal_rows = old["calibration"], old.get("calibration_rows", [])
+    if redo_cal or "contest_calibration" not in old:
+        ctable, _ = calibrate(CONTEST_N)
+    else:
+        ctable = old["contest_calibration"]
+    noncoal = noncoal_check(fed, fed_evs, params)
 
     rows, qld_check, nsw_check = [], {}, {}
     counted = nsw_counted()
@@ -778,7 +834,14 @@ def main():
     # One Nation table rests on (quoted in the explainer beside Bonham's)
     contests = {}
     if ("sa", 2026) in states:
-        contests["sa-2026-alp-onp"] = contest_flows(states[("sa", 2026)], evs[("sa", 2026)], params[("sa", 2026)])
+        c = contest_flows(states[("sa", 2026)], evs[("sa", 2026)], params[("sa", 2026)])
+        # its 90% misses: Greens and others from the classic-seat calibration
+        # at the contest's own seat count; the Liberal cell from the
+        # non-Coalition-finalist check (the largest of its six misses)
+        miss = [abs(d["coal"]["model"] - d["coal"]["counted"]) for d in noncoal.values() if "coal" in d]
+        c["err90"] = {"lib": round(max(miss), 2) if miss else None,
+                      "grn": err90(ctable, "grn", c["seats"]), "oth": err90(ctable, "oth", c["seats"])}
+        contests["sa-2026-alp-onp"] = c
 
     with open(OUT_CSV, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["jurisdiction", "year", "party", "method", "est_alp_votes", "est_coal_votes",
@@ -788,8 +851,9 @@ def main():
     with open(OUT_JSON, "w") as f:
         json.dump({"settings": {"lam0": LAM0, "fed_seat": FED_SEAT, "em_iters": EM_ITERS,
                                 "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in FED_YEARS],
-                                "cal_n": list(CAL_N), "cal_reps": CAL_REPS},
+                                "cal_n": list(CAL_N), "contest_n": list(CONTEST_N), "cal_reps": CAL_REPS},
                    "federal": federal, "calibration": table, "calibration_rows": cal_rows,
+                   "contest_calibration": ctable, "noncoal_check": noncoal,
                    "qld_check": qld_check, "nsw_check": nsw_check, "contests": contests,
                    "onp_min_ballots": onp_min_ballots(fed),
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},
