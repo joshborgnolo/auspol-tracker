@@ -1,6 +1,7 @@
 /* ---- Public opinion: the topic map -----------------------------------------
-   Where every question in the eight one-off stores lands on the /beyond-the-vote/
-   page (the ☰ menu page that was /ad-hocs/ until 2026-10-18). TWO reads of
+   Where every question in the eight one-off stores lands on the /public-opinion/
+   page (the ☰ menu page that was /ad-hocs/ until 2026-10-18, then
+   /beyond-the-vote/ until 2026-10-21). TWO reads of
    this file must never diverge: gen-data.mjs files every entry under its topic
    as it builds the page's sidecar (via beyond-the-vote.mjs), and build.mjs's
    static article regroups from the same payload. themeOf THROWS on an unmapped

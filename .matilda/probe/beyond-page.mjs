@@ -1,5 +1,6 @@
-/* Probe: the /beyond-the-vote/ page (rd-beyond.jsx over the sidecar that
-   beyond-the-vote.mjs builds), in both designs at four widths. Asserts no
+/* Probe: the /public-opinion/ page (at /beyond-the-vote/ until 2026-10-21;
+   rd-beyond.jsx over the sidecar that beyond-the-vote.mjs builds – both
+   keep their legacy names), in both designs at four widths. Asserts no
    errors and no sideways scroll; the findings index (one link a topic, each
    landing on its topic, each sentence the payload's) and each topic's
    finding; the trackers (one chart each, a line per pollster, the latest
@@ -11,8 +12,9 @@
    no boxed card or per-pollster panel left; every "level" on the page is a
    lead the payload found inside its margin (and none is missing); every row
    names a source; no NaN or undefined reaches a reader; a list item opens
-   to its tables; the old /ad-hocs/ link lands on the new page with its
-   topic anchor; the static article carries the findings and topics as
+   to its tables; both retired links (/ad-hocs/ and /beyond-the-vote/) land
+   on the new page with their topic anchors; the static article carries the
+   findings and topics as
    text. BASE=<worktree> serves another tree's build. */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
@@ -54,7 +56,7 @@ for (const design of ["new", "old"]) {
     page.on("pageerror", (e) => errs.push(String(e.message)));
     page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
     await page.setViewport({ width: w, height: 900 });
-    await page.goto(`${base}/beyond-the-vote/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
+    await page.goto(`${base}/public-opinion/?design=${design}`, { waitUntil: "networkidle0", timeout: 60000 });
     try { await page.waitForSelector(".btv-topic", { timeout: 20000 }); }
     catch { fail(`${design}@${w}: no topics rendered`); await page.close(); continue; }
     await new Promise((r) => setTimeout(r, 400));
@@ -82,7 +84,7 @@ for (const design of ["new", "old"]) {
     const at = `${design}@${w}`;
     if (errs.length) fail(`${at}: errors ${errs.slice(0, 3).join(" | ")}`);
     if (m.sw !== w) fail(`${at}: scrollWidth ${m.sw}`);
-    if (m.title !== "auspol tracker – Beyond the vote") fail(`${at}: title "${m.title}"`);
+    if (m.title !== "auspol tracker – Public opinion") fail(`${at}: title "${m.title}"`);
     if (m.finds.length !== finds.length || m.finds.some((f) => !f.ok)) fail(`${at}: findings index ${m.finds.length}/${finds.length}, every target ${m.finds.every((f) => f.ok)}`);
     if (m.finds.some((f, i) => f.text !== finds[i])) fail(`${at}: an indexed finding is not the payload's`);
     if (m.heads.join("|") !== finds.join("|")) fail(`${at}: the topics' headlines are not their findings`);
@@ -128,25 +130,26 @@ for (const design of ["new", "old"]) {
   }
 }
 
-/* the old path redirects, topic anchor and all, and the topic lands in view */
-{
+/* the two retired paths redirect, topic anchor and all, and the topic lands
+   in view — /ad-hocs/ since 2026-10-18, /beyond-the-vote/ since 2026-10-21 */
+for (const from of ["ad-hocs", "beyond-the-vote"]) {
   const page = await browser.newPage();
   await page.setViewport({ width: 1024, height: 900 });
-  await page.goto(`${base}/ad-hocs/#btv-trump-us`, { waitUntil: "networkidle0", timeout: 60000 });
+  await page.goto(`${base}/${from}/#btv-trump-us`, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector("#btv-trump-us", { timeout: 20000 }).catch(() => {});
   await new Promise((r) => setTimeout(r, 600));
   const r = await page.evaluate(() => ({ path: location.pathname, hash: location.hash,
     top: document.getElementById("btv-trump-us") ? document.getElementById("btv-trump-us").getBoundingClientRect().top : null }));
-  if (r.path !== "/beyond-the-vote/" || r.hash !== "#btv-trump-us") fail(`/ad-hocs/ landed on ${r.path}${r.hash}`);
-  if (r.top == null || r.top < 0 || r.top > 200) fail(`the topic anchor did not land in view (top ${r.top})`);
+  if (r.path !== "/public-opinion/" || r.hash !== "#btv-trump-us") fail(`/${from}/ landed on ${r.path}${r.hash}`);
+  if (r.top == null || r.top < 0 || r.top > 200) fail(`/${from}/: the topic anchor did not land in view (top ${r.top})`);
   await page.close();
 }
 
 /* the static article: the topics as text for a crawler or a no-JS reader */
 {
-  const html = fs.readFileSync(path.join(ROOT, "beyond-the-vote", "index.html"), "utf8");
+  const html = fs.readFileSync(path.join(ROOT, "public-opinion", "index.html"), "utf8");
   const art = (html.match(/<article class="static-summary">[\s\S]*?<\/article>/) || [""])[0];
-  if (!art.includes("<h1>Beyond the vote</h1>")) fail("static article lacks its h1");
+  if (!art.includes("<h1>Public opinion</h1>")) fail("static article lacks its h1");
   const h2 = (art.match(/<h2>/g) || []).length;
   if (h2 < topics.length) fail(`static article has ${h2} topic heads`);
   if (!art.includes(trackers[0].head.replace(/’/g, "’"))) fail("static article lacks the first tracker's head");
@@ -155,5 +158,5 @@ for (const design of ["new", "old"]) {
 
 await browser.close();
 server.close();
-console.log(bad ? `${bad} failure(s)` : `PASS: beyond-the-vote page – ${finds.length} findings, ${topics.length} topics, ${trackers.length} trackers (${panels} lines), ${cards.length} rows, ${levels} levels, no boxes, both designs at 390/640/1024/1440, /ad-hocs/ redirect, static article`);
+console.log(bad ? `${bad} failure(s)` : `PASS: public-opinion page – ${finds.length} findings, ${topics.length} topics, ${trackers.length} trackers (${panels} lines), ${cards.length} rows, ${levels} levels, no boxes, both designs at 390/640/1024/1440, /ad-hocs/ + /beyond-the-vote/ redirects, static article`);
 process.exit(bad ? 1 : 0);

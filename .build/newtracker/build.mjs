@@ -1208,7 +1208,7 @@ ${body.trim()}
      ask beyond voting intention, by topic (ssBeyondBlock); the live tab draws
      the same payload as findings, charts and rows (RdBeyond, rd-beyond.jsx). Federal
      only – /vic/'s menu never holds it */
-  if (id === "beyond-the-vote") {
+  if (id === "public-opinion") {
     /* the topic count the live dek states (gen-data's beyondTopics, counted
        the way the page's own topic list counts) */
     let topics = null;
@@ -1705,10 +1705,11 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
       desc: "How preferences decide the Australian federal two-party figure – the pollsters' published figures, and the figure implied from one fixed preference-flow table, with the counts and contests each setting rests on." }]),
     /* the ☰ menu's fifth page, straight under the explainer: what the
        pollsters ask beyond voting intention, by topic (the 2026-10-17
-       catalogue at /ad-hocs/, curated and renamed 2026-10-18 – the old path
-       is a hand-kept redirect stub; renamed Public opinion 2026-10-20).
+       catalogue at /ad-hocs/, curated and renamed 2026-10-18; renamed Public
+       opinion 2026-10-20; URL became /public-opinion/ 2026-10-21 – both
+       retired paths are hand-kept redirect stubs).
        Federal only, /vic/'s menu never holds it */
-    ...(VIC ? [] : [{ id: "beyond-the-vote", label: "Public opinion",
+    ...(VIC ? [] : [{ id: "public-opinion", label: "Public opinion",
       desc: "What Australians tell the pollsters beyond their vote – Donald Trump, immigration, One Nation, the budget and housing tax, the cost of living, the Iran war, Bondi, climate and more – charted across pollsters, with every figure and source." }]),
     /* the ☰ menu's sixth page, straight under Public opinion (the user's
        2026-10-15 call, same pass as the explainer: the change log was the
@@ -1954,7 +1955,7 @@ const PREDICTION_STAMP = "2026-10-20";
    VIC_STAMP pattern below). Bump yours when a new tab page ships. */
 const TAB_STAMP = { cycles: "2026-10-11", allpolls: "2026-10-11", info: "2026-10-11",
   disagreement: "2026-10-15", leans: "2026-10-15", flows: "2026-10-15",
-  "flows-explained": "2026-10-15", "beyond-the-vote": "2026-10-18", changelog: "2026-10-12" };
+  "flows-explained": "2026-10-15", "public-opinion": "2026-10-21", changelog: "2026-10-12" };
 const tabLastmod = (id) => (TAB_STAMP[id] || "") > dataStamp ? TAB_STAMP[id] : dataStamp;
 /* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
    dated as this page is, by its data – the newest Victorian poll's
@@ -1991,7 +1992,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <loc>${SITE_URL}</loc>
     <lastmod>${dataStamp}</lastmod>
   </url>
-${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "beyond-the-vote", "changelog"].map((id) => `  <url>
+${["cycles", "allpolls", "info", "disagreement", "leans", "flows", "flows-explained", "public-opinion", "changelog"].map((id) => `  <url>
     <loc>${SITE_URL}${id}/</loc>
     <lastmod>${tabLastmod(id)}</lastmod>
   </url>`).join("\n")}

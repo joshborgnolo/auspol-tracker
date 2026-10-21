@@ -57,7 +57,7 @@ let main = null;
 {
   const page = await open({ W: 1280, H: 900 });
   main = await page.evaluate(rowsOf, ".tab-menu-pop .tab-menu-item");
-  ok(main.map((r) => r.id).join(" ") === "disagreement leans flows flows-explained beyond-the-vote changelog",
+  ok(main.map((r) => r.id).join(" ") === "disagreement leans flows flows-explained public-opinion changelog",
     "the menu's six pages, in TABS order (" + main.map((r) => r.id).join(", ") + ")");
   ok(main.every((r, i) => r.n === String(i + 1)), "numbered 1 to " + main.length);
   ok(main.every((r) => r.d && r.d.length > 12), "every page has its line");
@@ -97,11 +97,19 @@ const headOf = async (url, sel) => {
     `flows: ${row("flows").v} is printed in the page's own words`);
   const ex = await headOf("/flows-explained/", ".view-flows-explained .rd-hed");
   ok(ex.head === row("flows-explained").d && row("flows-explained").chip === "Explainer", "explainer: its head, and its kind for a figure");
-  const btv = await headOf("/beyond-the-vote/", ".view-beyond-the-vote .rd-hed");
-  ok(btv.head === row("beyond-the-vote").d, "Beyond the vote: the line is the page's head");
-  ok(String(btv.topics) === row("beyond-the-vote").v, `Beyond the vote: ${row("beyond-the-vote").v} topics, as the page's topics count (${btv.topics})`);
-  const cl = await headOf("/changelog/", ".view-changelog .rd-hed");
+  const btv = await headOf("/public-opinion/", ".view-public-opinion .rd-hed");
+  ok(btv.head === row("public-opinion").d, "Public opinion: the line is the page's head");
   const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  {
+    const oneoffs = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "oneoffs-source.json"), "utf8"));
+    const dates = [];
+    for (const t of oneoffs.topics) for (const o of [...(t.blocks || []), ...(t.more || [])]) for (const d of [o.last, o.wave]) if (d) dates.push(d);
+    dates.sort();
+    const biso = dates[dates.length - 1];
+    ok(row("public-opinion").v === +biso.slice(8, 10) + " " + MN[+biso.slice(5, 7) - 1] && row("public-opinion").c === "Latest entry",
+      `Public opinion: ${row("public-opinion").v}, "Latest entry", is the catalogue's newest wave (${biso})`);
+  }
+  const cl = await headOf("/changelog/", ".view-changelog .rd-hed");
   const iso = cl.clDate || "";
   ok(iso && row("changelog").v === +iso.slice(8, 10) + " " + MN[+iso.slice(5, 7) - 1], `changelog: ${row("changelog").v} is the newest entry's date (${iso})`);
   const info = await headOf("/info/", ".info .rd-hed");

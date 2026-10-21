@@ -21202,6 +21202,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "gapsUsed": 6
   }];
   const beyondTopics = null;
+  const beyondLatest = null;
   const cycles = CYCLE_DEFS.map(c => ({
     year: c.year,
     gov: c.gov,
@@ -21397,6 +21398,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     },
     loadOneOffs,
     beyondTopics,
+    beyondLatest,
     pollCadence,
     domain: {
       x0: mx(MONTHS[0]) - 0.06,
@@ -23384,7 +23386,7 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
   };
   AP.PAGE_HEAD = {
     "flows-explained": "There are two ways to get a two-party figure from a poll",
-    "beyond-the-vote": "What Australians think about the issues",
+    "public-opinion": "Australians' views on topical subjects",
     info: "Answers to questions you may have"
   };
   AP.changelogGist = text => {
@@ -23457,13 +23459,20 @@ const flFig = (v, dp) => dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 ==
         })
       };
     });
-    put("beyond-the-vote", () => ({
-      head: AP.PAGE_HEAD["beyond-the-vote"],
-      fig: D.beyondTopics ? {
-        v: String(D.beyondTopics),
-        cap: "Topics"
-      } : null
-    }));
+    put("public-opinion", () => {
+      if (!D.beyondLatest) return {
+        head: AP.PAGE_HEAD["public-opinion"],
+        fig: null
+      };
+      const [, mo, dd] = D.beyondLatest.split("-").map(Number);
+      return {
+        head: AP.PAGE_HEAD["public-opinion"],
+        fig: {
+          v: dd + " " + D.monthName(mo),
+          cap: "Latest entry"
+        }
+      };
+    });
     put("changelog", () => {
       const log = D.changelog || [];
       const e = log[log.length - 1];
@@ -38745,7 +38754,7 @@ function MenuPageView({
     tppBasis: tppBasis
   }), id === "flows" && React.createElement(RdFlows, {
     measure: measure
-  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "beyond-the-vote" && React.createElement(RdBeyond, null), id === "changelog" && React.createElement(RdChangelog, null));
+  }), id === "flows-explained" && React.createElement(RdExplained, null), id === "public-opinion" && React.createElement(RdBeyond, null), id === "changelog" && React.createElement(RdChangelog, null));
   return React.createElement("div", {
     className: "view view-" + id
   }, id === "disagreement" && React.createElement(VariancePanel, {
@@ -38766,7 +38775,7 @@ function MenuPageView({
     dangerouslySetInnerHTML: {
       __html: window.EXPLAINED_ARTICLE || ""
     }
-  }), id === "beyond-the-vote" && React.createElement(BtvBody, null), id === "changelog" && React.createElement(ChangelogEntries, null));
+  }), id === "public-opinion" && React.createElement(BtvBody, null), id === "changelog" && React.createElement(ChangelogEntries, null));
 }
 const CL_KIND = {
   poll: "poll",
@@ -66267,7 +66276,7 @@ function BtvBody() {
 function RdBeyond() {
   return React.createElement("section", {
     className: "rd-sec rd-btv",
-    id: "beyond-the-vote",
+    id: "public-opinion",
     "aria-labelledby": "rd-btv-t"
   }, React.createElement("div", {
     className: "rd-eyebrow"
@@ -66277,7 +66286,7 @@ function RdBeyond() {
   }, "Public opinion"), React.createElement("span", {
     className: "rd-meta"
   }, "What else Australians tell the pollsters")), React.createElement(RdHed, {
-    head: window.AP.PAGE_HEAD["beyond-the-vote"],
+    head: window.AP.PAGE_HEAD["public-opinion"],
     dek: "Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in " + rdNumWord(window.AUSPOL.beyondTopics) + " topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side."
   }), React.createElement(BtvBody, null));
 }
@@ -67957,7 +67966,7 @@ const TABS = [{
   menu: true,
   tip: "How preferences decide the two-party figure"
 }, {
-  id: "beyond-the-vote",
+  id: "public-opinion",
   label: "Public opinion",
   menu: true,
   tip: "What Australians tell the pollsters beyond their vote, by topic"
@@ -67974,7 +67983,7 @@ const TABS = [{
 }];
 if (!window.AUSPOL.cycles.some(c => !c.current)) TABS.splice(TABS.findIndex(t => t.id === "cycles"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "flows-explained"), 1);
-if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "beyond-the-vote"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex(t => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map(t => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter(t => t.menu).map(t => [t.id, t]));
@@ -67995,7 +68004,9 @@ const TAB_HASH = {
   info: "info",
   disagreement: "disagreement",
   leans: "leans",
-  flows: "flows"
+  flows: "flows",
+  "beyond-the-vote": "public-opinion",
+  "public-opinion": "public-opinion"
 };
 const readLocation = () => {
   const h = (window.location.hash || "").replace(/^#/, "");

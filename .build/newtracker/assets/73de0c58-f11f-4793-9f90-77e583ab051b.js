@@ -1975,8 +1975,8 @@ const TABS = [
      beyond voting intention, by topic, the recurring questions charted
      across pollsters. It was the /ad-hocs/ catalogue of every one-off
      question (2026-10-17); curated and renamed 2026-10-18; renamed
-     Public opinion 2026-10-20 */
-  { id: "beyond-the-vote", label: "Public opinion", menu: true,
+     Public opinion 2026-10-20; URL moved to /public-opinion/ 2026-10-21 */
+  { id: "public-opinion", label: "Public opinion", menu: true,
     tip: "What Australians tell the pollsters beyond their vote, by topic" },
   /* the change log as the ☰ menu's sixth page (2026-10-15): it used to sit
      inside the Info tab as the about-block list; now it is a page of
@@ -2002,7 +2002,7 @@ if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t
    (the Vic build's flow settings and contests differ, vic has no one-off
    stores, and Vic never writes data/changelog.json) */
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "flows-explained"), 1);
-if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "beyond-the-vote"), 1);
+if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "public-opinion"), 1);
 if (window.JUR) TABS.splice(TABS.findIndex((t) => t.id === "changelog"), 1);
 const TAB_IDS = TABS.map((t) => t.id);
 const TAB_MENU = Object.fromEntries(TABS.filter((t) => t.menu).map((t) => [t.id, t]));
@@ -2022,11 +2022,12 @@ const pathToTab = () => {
   if (seg === "") return "now";
   return TAB_IDS.includes(seg) ? seg : null;
 };
-/* Links from the hash era (and from before Now was Now, #snapshot) keep
-   landing on the right tab: the hash is honoured first at boot, then
-   normalised away to the path. */
+/* Links from the hash era (and from before Now was Now, #snapshot, or
+   before Public opinion was public-opinion) keep landing on the right tab:
+   the hash is honoured first at boot, then normalised away to the path. */
 const TAB_HASH = { snapshot: "now", now: "now", cycles: "cycles", allpolls: "allpolls", info: "info",
-  disagreement: "disagreement", leans: "leans", flows: "flows" };
+  disagreement: "disagreement", leans: "leans", flows: "flows",
+  "beyond-the-vote": "public-opinion", "public-opinion": "public-opinion" };
 const readLocation = () => {
   const h = (window.location.hash || "").replace(/^#/, "");
   if (h && TAB_IDS.includes(TAB_HASH[h])) return TAB_HASH[h];
@@ -2963,7 +2964,7 @@ const appRoot = ReactDOM.createRoot(document.getElementById("root"));
 ReactDOM.flushSync(() => appRoot.render(
   <RootBoundary><App /></RootBoundary>
 ));
-/* /beyond-the-vote/'s questions ride a lazily fetched sidecar (the
+/* /public-opinion/'s questions ride a lazily fetched sidecar (the
    loadOneOffs contract in the data layer) - nobody outside the Public
    opinion page needs them, so they are no part of the payload every visitor
    pays for. But a reader heading into the ☰ menu should never meet the

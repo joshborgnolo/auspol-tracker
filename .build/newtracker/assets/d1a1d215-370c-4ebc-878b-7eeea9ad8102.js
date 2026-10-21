@@ -6744,7 +6744,7 @@ function MenuPageView({ id, tppBasis }) {
       {id === "leans" && <RdHouseLean measure={measure} onMeasure={setMeasure} tppBasis={tppBasis} />}
       {id === "flows" && <RdFlows measure={measure} />}
       {id === "flows-explained" && <RdExplained />}
-      {id === "beyond-the-vote" && <RdBeyond />}
+      {id === "public-opinion" && <RdBeyond />}
       {id === "changelog" && <RdChangelog />}
     </div>
   );
@@ -6762,7 +6762,7 @@ function MenuPageView({ id, tppBasis }) {
       {/* Public opinion has no classic-design twin: its body alone mounts
           here (the .btv-* styles are page-level, like the explainer's),
           lazily fetching its sidecar; the rd head lives in RdBeyond */}
-      {id === "beyond-the-vote" && <BtvBody />}
+      {id === "public-opinion" && <BtvBody />}
       {/* the change log's console predates the redesign split: the same
           console marks up both designs (the .cl-* styles are page-level in
           template.html, not rd-gated); the redesign adds its own head above */}

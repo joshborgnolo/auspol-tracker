@@ -7370,9 +7370,10 @@ const changelog = JUR ? null : (() => {
   return committed.entries || [];
 })();
 
-/* ---- §8e Public opinion (/beyond-the-vote/) --------------------------------
-   The /beyond-the-vote/ page (the ☰ menu page that was the /ad-hocs/
-   catalogue): what the pollsters ask beyond voting intention, by topic.
+/* ---- §8e Public opinion (/public-opinion/) ---------------------------------
+   The /public-opinion/ page (the ☰ menu page that was the /ad-hocs/
+   catalogue, and until 2026-10-21 /beyond-the-vote/): what the pollsters
+   ask beyond voting intention, by topic.
    beyond-the-vote.mjs reads the eight hand-curated one-off stores
    (data/*-one-offs.json), files every question on adhoc-themes.mjs's topic
    map (an unmapped id throws, so a new wave fails the build rather than
@@ -7380,7 +7381,7 @@ const changelog = JUR ? null : (() => {
    figures and margin rules – the same design effect as the aggregate's, so a
    "level" on that page means what it means here. The static article in
    build.mjs reads this same payload. Federal only. */
-/* The /beyond-the-vote/ tracker dots open their wave's All-polls row when
+/* The /public-opinion/ tracker dots open their wave's All-polls row when
    the wave sits behind one of the four emitted row sets. BTV_HOUSES maps
    each one-off store key to the pollster name its rows carry in the row
    sets ("RedBridge/Accent" for the redbridge store, "YouGov" and
@@ -7422,6 +7423,17 @@ const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: H
    copy of it, for the page's dek and the More menu's line, which render
    before the sidecar has loaded, or without it */
 const beyondTopics = oneOffsSource ? oneOffsSource.topics.filter((t) => t.blocks.length || t.more.length).length : null;
+/* the catalogue's newest wave, on the same contract, for the More menu's
+   "Latest entry" date beside its line: the max of every block's and
+   listed entry's `last` (ISO strings sort lexicographically) */
+const beyondLatest = oneOffsSource
+  ? oneOffsSource.topics
+      .filter((t) => t.blocks.length || t.more.length)
+      .flatMap((t) => [...t.blocks.map((b) => [b.last, b.wave]), ...t.more.map((m) => [m.last, m.wave])].flat())
+      .filter(Boolean)
+      .sort()
+      .at(-1) ?? null
+  : null;
 
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
@@ -7722,7 +7734,7 @@ window.AUSPOL = (function () {
     }
     return _cyclePromise;
   };
-  /* The questions behind the /beyond-the-vote/ page – the same lazily
+  /* The questions behind the /public-opinion/ page – the same lazily
      fetched sidecar contract as cycle-source above, for the same reason: read
      by nothing outside that one tab's page. The app asset kicks this loader
      once the browser turns idle, so the page opens on a warm cache rather
@@ -7747,8 +7759,10 @@ window.AUSPOL = (function () {
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
   const pollCadence = ${JSON.stringify(pollCadence)};
-  /* the /beyond-the-vote/ page's count of topics (§8e) - null off the federal page */
+  /* the /public-opinion/ page's count of topics (§8e) - null off the federal page */
   const beyondTopics = ${JSON.stringify(beyondTopics)};
+  /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
+  const beyondLatest = ${JSON.stringify(beyondLatest)};
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -7794,9 +7808,9 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
-    // the /beyond-the-vote/ page's questions, on the same contract
+    // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
-    loadOneOffs, beyondTopics,
+    loadOneOffs, beyondTopics, beyondLatest,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
     // the jurisdiction this page covers (absent on the federal page)
@@ -7808,7 +7822,7 @@ writeAtomic(DATA_ASSET, out);
 /* Sidecar, inlined by build.mjs as an application/json block. Kept out of the
    JS module on purpose – see the note beside loadCycleSource above. */
 writeAtomic(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
-/* The /beyond-the-vote/ page's sidecar (§8e); federal-only – the Vic build's
+/* The /public-opinion/ page's sidecar (§8e); federal-only – the Vic build's
    client never mounts the page, and its AP_ONEOFF_SRC is null. */
 if (!JUR) writeAtomic(ONEOFFS_ASSET, JSON.stringify(oneOffsSource));
 

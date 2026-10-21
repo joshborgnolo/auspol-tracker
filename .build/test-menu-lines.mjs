@@ -134,10 +134,16 @@ const fresh = (mutate) => {
 {
   const AP = fresh();
   const L = AP.menuLines();
-  for (const id of ["disagreement", "leans", "flows", "flows-explained", "beyond-the-vote", "changelog", "info"]) assert.ok(L[id] && L[id].head, id + " has its line");
+  for (const id of ["disagreement", "leans", "flows", "flows-explained", "public-opinion", "changelog", "info"]) assert.ok(L[id] && L[id].head, id + " has its line");
   assert.equal(L["flows-explained"].head, AP.PAGE_HEAD["flows-explained"]);
-  assert.match(L["beyond-the-vote"].fig.v, /^\d+$/);
+  assert.match(L["public-opinion"].fig.v, /^\d{1,2} [A-Z][a-z]{2}$/);
+  assert.equal(L["public-opinion"].fig.cap, "Latest entry");
   assert.match(L.changelog.fig.v, /^\d{1,2} [A-Z][a-z]{2}$/);
+  assert.equal(fresh((D) => { D.beyondLatest = "2027-04-03"; }).menuLines()["public-opinion"].fig.v, "3 Apr",
+    "the figure reads beyondLatest, not a restated constant");
+  const undated = JSON.parse(JSON.stringify(fresh((D) => { D.beyondLatest = null; }).menuLines()["public-opinion"]));
+  assert.equal(undated.fig, null, "no catalogue date, no figure");
+  assert.ok(undated.head, "the line stands without it");
   /* a finding that throws gives way to the tip, never takes the menu down */
   const broken = fresh();
   broken.disStory = () => { throw new Error("boom"); };

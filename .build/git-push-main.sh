@@ -306,11 +306,13 @@ freshness_sync() {
 # 2026-10-18 the page became beyond-the-vote/index.html (curated and
 # renamed) and ad-hocs/index.html a hand-kept redirect stub, which stays on
 # the list like preference-flows/ (a quiet refresh writes the same bytes).
+# On 2026-10-21 the URL moved to public-opinion/index.html and
+# beyond-the-vote/index.html became a hand-kept redirect stub in its turn.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html info/index.html
   disagreement/index.html leans/index.html flows/index.html
   flows-explained/index.html preference-flows/index.html
-  beyond-the-vote/index.html ad-hocs/index.html
+  public-opinion/index.html beyond-the-vote/index.html ad-hocs/index.html
   vic/allpolls/index.html vic/info/index.html
   vic/disagreement/index.html vic/leans/index.html vic/flows/index.html
   changelog/index.html

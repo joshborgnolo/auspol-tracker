@@ -1,5 +1,7 @@
-/* test-beyond.mjs – pins the rules behind the /beyond-the-vote/ page
-   (.build/newtracker/beyond-the-vote.mjs): how an answer's wording places
+/* test-beyond.mjs – pins the rules behind the /public-opinion/ page
+   (named /beyond-the-vote/ until 2026-10-21; the builder
+   .build/newtracker/beyond-the-vote.mjs keeps its file name): how an
+   answer's wording places
    it, how a side's printed TOTAL is quoted, the margin behind every
    "level", and every branch of the generated copy – the trackers' heads,
    the cross-pollster tallies and the one-pollster wave summaries – on

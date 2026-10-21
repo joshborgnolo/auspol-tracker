@@ -2,7 +2,7 @@
 /* ====================================================================
    essential-oneoffs.mjs – build data/essential-one-offs.json, the
    Essential Report one-off and occasional-question catalogue behind
-   the /beyond-the-vote/ page (sibling stores: data/news24-one-offs.json,
+   the /public-opinion/ page (sibling stores: data/news24-one-offs.json,
    data/redbridge-one-offs.json).
 
    Everything is derived, never hand-transcribed:

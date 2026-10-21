@@ -978,12 +978,12 @@ function BtvBody() {
 
 function RdBeyond() {
   return (
-    <section className="rd-sec rd-btv" id="beyond-the-vote" aria-labelledby="rd-btv-t">
+    <section className="rd-sec rd-btv" id="public-opinion" aria-labelledby="rd-btv-t">
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-btv-t">Public opinion</h2>
         <span className="rd-meta">What else Australians tell the pollsters</span>
       </div>
-      <RdHed head={window.AP.PAGE_HEAD["beyond-the-vote"]}
+      <RdHed head={window.AP.PAGE_HEAD["public-opinion"]}
         dek={"Voting intention is only part of what the pollsters ask. This page gathers the rest of this term’s questions worth knowing, in " + rdNumWord(window.AUSPOL.beyondTopics) + " topics from Donald Trump and immigration to the budget, the Iran war and the Bondi attack. Each opens with what the polls found; where several pollsters asked the same thing, their answers sit side by side."} />
       <BtvBody />
     </section>

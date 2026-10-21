@@ -289,7 +289,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
      head themselves with these, and the menu quotes them */
   AP.PAGE_HEAD = {
     "flows-explained": "There are two ways to get a two-party figure from a poll",
-    "beyond-the-vote": "What Australians think about the issues",
+    "public-opinion": "Australians' views on topical subjects",
     info: "Answers to questions you may have",
   };
 
@@ -360,8 +360,12 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const fig = AP.flowsExplainedFig();
       return { head: AP.PAGE_HEAD["flows-explained"], fig, ...(fig ? {} : { chip: "Explainer" }) };
     });
-    put("beyond-the-vote", () => ({ head: AP.PAGE_HEAD["beyond-the-vote"],
-      fig: D.beyondTopics ? { v: String(D.beyondTopics), cap: "Topics" } : null }));
+    /* the catalogue's newest wave as a date figure, as the changelog row's */
+    put("public-opinion", () => {
+      if (!D.beyondLatest) return { head: AP.PAGE_HEAD["public-opinion"], fig: null };
+      const [, mo, dd] = D.beyondLatest.split("-").map(Number);
+      return { head: AP.PAGE_HEAD["public-opinion"], fig: { v: dd + " " + D.monthName(mo), cap: "Latest entry" } };
+    });
     put("changelog", () => {
       const log = D.changelog || [];
       const e = log[log.length - 1];
