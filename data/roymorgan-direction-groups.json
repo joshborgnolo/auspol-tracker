@@ -1,0 +1,186 @@
+{
+ "waves": {
+  "2026-08-09": {
+   "slug": "10307-federal-voting-intention-august-10-2026",
+   "gender": {
+    "Men": {
+     "w": 62,
+     "r": 27.5
+    },
+    "Women": {
+     "w": 60,
+     "r": 20.5
+    }
+   }
+  },
+  "2026-08-16": {
+   "slug": "10311-federal-voting-intention-august-17-2026",
+   "gender": {
+    "Men": {
+     "w": 62.5,
+     "r": 27.5
+    },
+    "Women": {
+     "w": 58,
+     "r": 24
+    }
+   }
+  },
+  "2026-08-23": {
+   "slug": "10321-federal-voting-intention-august-24-2026",
+   "gender": {
+    "Men": {
+     "w": 60.5,
+     "r": 27
+    },
+    "Women": {
+     "w": 56.5,
+     "r": 27.5
+    }
+   }
+  },
+  "2026-08-30": {
+   "slug": "10328-federal-voting-intention-august-31-2026",
+   "gender": {
+    "Men": {
+     "w": 60,
+     "r": 29
+    },
+    "Women": {
+     "w": 58,
+     "r": 27
+    }
+   },
+   "vote": {
+    "One Nation": {
+     "w": 92
+    },
+    "L-NP": {
+     "w": 72
+    },
+    "Other": {
+     "w": 69
+    },
+    "Independent": {
+     "w": 56
+    },
+    "Greens": {
+     "w": 53
+    },
+    "ALP": {
+     "w": 26,
+     "r": 57
+    }
+   }
+  },
+  "2026-09-06": {
+   "slug": "10333-federal-voting-intention-september-7-2026",
+   "gender": {
+    "Men": {
+     "w": 62.5,
+     "r": 24.5
+    },
+    "Women": {
+     "w": 61.5,
+     "r": 23
+    }
+   },
+   "vote": {
+    "One Nation": {
+     "w": 91
+    },
+    "L-NP": {
+     "w": 76
+    },
+    "Other": {
+     "w": 69
+    },
+    "Independent": {
+     "w": 60
+    },
+    "Greens": {
+     "w": 59
+    },
+    "ALP": {
+     "w": 26,
+     "r": 54
+    }
+   }
+  },
+  "2026-09-13": {
+   "slug": "10343-federal-voting-intention-september-14-2026",
+   "vote": {
+    "One Nation": {
+     "w": 93
+    },
+    "L-NP": {
+     "w": 73
+    },
+    "Other": {
+     "w": 75
+    },
+    "Independent": {
+     "w": 50
+    },
+    "Greens": {
+     "w": 67
+    },
+    "ALP": {
+     "w": 30,
+     "r": 54
+    }
+   }
+  },
+  "2026-09-20": {
+   "slug": "10353-federal-voting-intention-september-21-2026",
+   "vote": {
+    "One Nation": {
+     "w": 95
+    },
+    "L-NP": {
+     "w": 77
+    },
+    "Other": {
+     "w": 68
+    },
+    "Independent": {
+     "w": 63
+    },
+    "Greens": {
+     "w": 60
+    },
+    "ALP": {
+     "w": 30,
+     "r": 51
+    }
+   }
+  },
+  "2026-09-27": {
+   "slug": "10363-federal-voting-intention-september-29-2026",
+   "stateExtremes": {
+    "highest": {
+     "state": "Western Australia",
+     "w": 70.5
+    },
+    "lowest": {
+     "state": "South Australia",
+     "w": 56.5
+    }
+   }
+  },
+  "2026-10-11": {
+   "slug": "10366-federal-voting-intention-october-12-2026",
+   "stateExtremes": {
+    "highest": {
+     "state": "Queensland",
+     "w": 68.5
+    },
+    "lowest": {
+     "state": "South Australia",
+     "w": 54
+    }
+   }
+  }
+ },
+ "_about": "Roy Morgan's national-direction splits as printed in each fortnightly release's 'Analysis by …' prose – the gender pair, the voting-intention wrong-track shares (ALP carries its right-direction share too), and the state highest/lowest extremes (the full state direction table is paywalled; only the extremes print). Banked by .build/extract-roymorgan-direction.mjs from the committed release caches; the national pair in each cache is re-verified against the wave's direction row in polls.json every run. A release prints whichever blocks it prints – absent blocks are simply not on the record that fortnight. The direction panel's group select reads this via gen-data."
+}

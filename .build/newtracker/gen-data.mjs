@@ -2117,6 +2117,21 @@ const SEC_ISSUES_FILE = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8")); }
   catch { return null; }
 })();
+/* SEC Newgate's per-state state-direction readings (banked by
+   extract-secnewgate.mjs) and Roy Morgan's release-prose direction splits
+   (gender pair, voting-intention wrong-shares, state extremes – banked by
+   extract-roymorgan-direction.mjs). Both feed the National direction
+   panel's group select (§5 directionStates/directionGroups/directionStateNote). */
+const SEC_STATES = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-direction-states.json"), "utf8")); }
+  catch { return null; }
+})();
+const RM_DIR_GROUPS = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8")); }
+  catch { return null; }
+})();
 /* The confidence panel's series (§5j): four published confidence gauges —
    the ANZ–Roy Morgan and Roy Morgan index series, Westpac–MI consumer
    sentiment and NAB's monthly business survey (a net balance the panel
@@ -2301,6 +2316,65 @@ const directionNow = (() => {
     if (net && net.changeCi95 != null) { out.changeCi95 = net.changeCi95; out.changeSig = Math.abs(out.chg) > net.changeCi95; }
   }
   return out;
+})();
+
+/* The panel's GROUP views (the select on the National direction chart).
+   Two federal-only sources, both left as printed – never house-adjusted,
+   never smoothed; the panel caption says so:
+   · directionStates – SEC Newgate's per-State state-direction readings from
+     data/sec-direction-states.json (its own question, "perceived direction
+     of individual states", five mainland states). right only before the
+     cache horizon; points ride `x` exactly (no estimation).
+   · directionGroups – Roy Morgan's "Analysis by …" prose splits from
+     data/roymorgan-direction-groups.json: the gender pair, and the
+     voting-intention right/wrong shares (ALP's right share plus the
+     wrong-share of every other group). A fortnight that printed no cut
+     for a group leaves a gap in that group's series, not a zero.
+   · directionStateNote – the latest Roy Morgan release's printed state
+     highest/lowest extremes; the full state table is paywalled, so the
+     extremes are the only state cut that exists. */
+const directionStateNote = (() => {
+  if (!RM_DIR_GROUPS?.waves) return null;
+  const dates = Object.keys(RM_DIR_GROUPS.waves).filter((d) => RM_DIR_GROUPS.waves[d]?.stateExtremes).sort();
+  const d = dates[dates.length - 1];
+  return d ? { date: d, ...RM_DIR_GROUPS.waves[d].stateExtremes } : null;
+})();
+const directionStates = (() => {
+  if (!SEC_STATES?.series) return null;
+  const perState = {};
+  for (const st of SEC_STATES.states || []) {
+    const rows = SEC_STATES.series[st] || [];
+    perState[st] = {
+      label: st,
+      head: rows.length ? rows[rows.length - 1] : null,
+      series: rows.map((r) => ({ ym: r.month, x: mx(r.month), right: r.right, wrong: r.wrong ?? null })),
+    };
+  }
+  return perState;
+})();
+const directionGroups = (() => {
+  if (!RM_DIR_GROUPS?.waves) return null;
+  const out = {};
+  const push = (label, date, right, wrong) => {
+    (out[label] ??= { label, source: "Roy Morgan", series: [] }).series.push({
+      date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
+    });
+  };
+  for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
+    if (w.gender) {
+      push("Men", date, w.gender.Men.r, w.gender.Men.w);
+      push("Women", date, w.gender.Women.r, w.gender.Women.w);
+    }
+    if (w.vote) {
+      push("One Nation voters", date, null, w.vote["One Nation"].w);
+      push("Coalition voters", date, null, w.vote["L-NP"].w);
+      push("Other party voters", date, null, w.vote.Other.w);
+      push("Independent voters", date, null, w.vote.Independent.w);
+      push("Greens voters", date, null, w.vote.Greens.w);
+      push("Labor voters", date, w.vote.ALP.r ?? null, w.vote.ALP.w);
+    }
+  }
+  return Object.keys(out).length ? out : null;
 })();
 
 /* ---- per-poll leadership / alt builders -------------------------------- */
@@ -7621,6 +7695,13 @@ window.AUSPOL = (function () {
   const flowForced = ${JSON.stringify(flowForced)};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
+  /* The direction panel's GROUP views (§5): SEC Newgate's per-State
+     state-direction series, Roy Morgan's printed gender/voting-intention
+     splits, and Roy Morgan's latest printed state extremes note. Printed
+     figures only – never house-adjusted. */
+  const directionStates = ${JSON.stringify(directionStates)};
+  const directionGroups = ${JSON.stringify(directionGroups)};
+  const directionStateNote = ${JSON.stringify(directionStateNote)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
   const directionHouses = ${JSON.stringify(directionHouses)};
   /* name-list for the direction card's caption: the active houses plus any
@@ -7835,7 +7916,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, flowTables, flowHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

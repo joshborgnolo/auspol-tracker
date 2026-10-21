@@ -898,6 +898,105 @@ export function validatePewSentiment() {
   return errors;
 }
 
+/* data/roymorgan-direction-groups.json – Roy Morgan's "Analysis by …"
+   prose splits, cache-extracted by extract-roymorgan-direction.mjs. Every
+   wave's wave-date must already exist as a direction[] row in polls.json
+   (the reader only files a wave whose national pair reconciles), and each
+   wave must carry gender/vote and (for waves that print them) state
+   extremes. Figures transcodes one anchor's prose, so the gate is shape +
+   plausibility: every share 0-100, right+wrong ≤ 100.6 (rounding), and
+   every wave that carries stateExtremes actually carries both a "high"
+   and a "low" whose states are full names from the canonical set. */
+export function validateDirectionGroups() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let G = null;
+  try { G = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8")); }
+  catch { fail("roymorgan-direction-groups.json", "direction-groups-shape", "missing or unparseable"); return errors; }
+  if (!G || typeof G !== "object" || !G.waves || typeof G.waves !== "object") {
+    fail("roymorgan-direction-groups.json", "direction-groups-shape", "no waves object");
+    return errors;
+  }
+  const P = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+  const rmDirDates = new Set((P.direction || []).filter((d) => d.pollster === "Roy Morgan").map((d) => d.date));
+  const STATES = new Set(["New South Wales", "Victoria", "Queensland", "South Australia", "Western Australia", "Tasmania"]);
+  for (const [date, wave] of Object.entries(G.waves)) {
+    const where = `roymorgan-direction-groups ${date}`;
+    if (!ISO_DAY.test(date)) fail(where, "date-format", `date "${date}" is not YYYY-MM-DD`);
+    if (!rmDirDates.has(date)) fail(where, "provenance", `no Roy Morgan direction[] row on ${date}`);
+    if (!wave.gender && !wave.vote && !wave.stateExtremes)
+      fail(where, "direction-groups-shape", "wave carries no split blocks at all");
+    for (const [blockName, block] of [["gender", wave.gender], ["vote", wave.vote]]) {
+      if (!block) continue;
+      for (const [grp, cells] of Object.entries(block)) {
+        const w2 = `${where} ${blockName}.${grp}`;
+        for (const k of ["w", "r", "right", "wrong"]) {
+          if (cells[k] != null) {
+            if (typeof cells[k] !== "number" || cells[k] < 0 || cells[k] > 100) fail(w2, "range", `${k} = ${cells[k]}`);
+          }
+        }
+        const r = cells.r ?? cells.right;
+        const w = cells.w ?? cells.wrong;
+        if ((typeof r === "number" && typeof w === "number") && r + w > 100.6)
+          fail(w2, "total", `right+wrong ${r + w} > 100.6`);
+      }
+    }
+    if (wave.stateExtremes != null) {
+      const hi = wave.stateExtremes.highest, lo = wave.stateExtremes.lowest;
+      if (!hi || !lo) fail(`${where} stateExtremes`, "direction-groups-shape", "carry both highest and lowest");
+      else {
+        for (const [tag, pt] of [["highest", hi], ["lowest", lo]]) {
+          if (!STATES.has(pt.state)) fail(`${where} stateExtremes.${tag}`, "direction-groups-shape", `state "${pt.state}" not a full name`);
+          if (typeof pt.w !== "number" || pt.w < 0 || pt.w > 100) fail(`${where} stateExtremes.${tag}`, "range", `w = ${pt.w}`);
+        }
+        if (hi.state === lo.state && hi.w !== lo.w)
+          fail(`${where} stateExtremes`, "direction-groups-shape", `both are ${hi.state} but ${hi.w} ≠ ${lo.w}`);
+      }
+    }
+  }
+  return errors;
+}
+
+/* data/sec-direction-states.json – SEC Newgate's "Mood of the Nation"
+   state splits. The extractor banks them as waves land; the gate is shape
+   + plausibility: every state series is keyed by "YYYY-MM", every row
+   carries a 0-100 right figure, wrong (when present) likewise, and every
+   state's key is a member of the printed five-state label list. The store
+   is referenced against itself only; the pieces the direction panel
+   actually reads are emitted by gen-data. */
+export function validateSecDirectionStates() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-direction-states.json"), "utf8")); }
+  catch { fail("sec-direction-states.json", "sec-direction-states-shape", "missing or unparseable"); return errors; }
+  if (!S || typeof S !== "object" || !Array.isArray(S.states) || typeof S.series !== "object" || !S.series) {
+    fail("sec-direction-states.json", "sec-direction-states-shape", "needs {states[], series{}}");
+    return errors;
+  }
+  const SET = new Set(["NSW", "VIC", "QLD", "SA", "WA"]);
+  for (const st of S.states) if (!SET.has(st)) fail(`sec-direction-states ${st}`, "sec-direction-states-shape", `state "${st}" not in ${[...SET].join("/")}`);
+  for (const st of S.states) {
+    const rows = S.series[st];
+    if (!Array.isArray(rows)) { fail(`sec-direction-states ${st}`, "sec-direction-states-shape", "no series array"); continue; }
+    let prev = null;
+    for (const row of rows) {
+      const where = `sec-direction-states ${st} ${row && row.month}`;
+      if (!row || typeof row !== "object") { fail(where, "sec-direction-states-shape", "row is not an object"); continue; }
+      if (!/^\d{4}-\d{2}$/.test(row.month || "")) fail(where, "date-format", `month "${row.month}" is not YYYY-MM`);
+      else {
+        if (prev && row.month < prev) fail(where, "date-order", `precedes previous row (${prev})`);
+        prev = row.month;
+      }
+      for (const k of ["right", "wrong"]) {
+        if (row[k] != null && (typeof row[k] !== "number" || row[k] < 0 || row[k] > 100)) fail(where, "range", `${k} = ${row[k]}`);
+      }
+      if (typeof row.right !== "number") fail(where, "sec-direction-states-shape", "row carries no right figure");
+    }
+  }
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -905,6 +1004,8 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   const { errors, exempted, orphans } = validate(D);
   errors.push(...validateChangelog());
   errors.push(...validatePewSentiment());
+  errors.push(...validateDirectionGroups());
+  errors.push(...validateSecDirectionStates());
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }

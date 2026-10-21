@@ -11,9 +11,18 @@
 # State / CITY-COUNTRY table images into data/roymorgan-demo.json, which
 # demographics.mjs merges. macOS-only (Vision OCR); the CI twin notes and
 # reports changed:false. Warn-only, never blocks the poll pipeline: a guard
-# trip is logged and demo-watch.mjs + the daily crosstabs run are the
+# trip is logged and demo-watch.mjs + the weekly crosstabs run are the
 # backstop. A move here is committed with the poll files when a wave also
 # landed, or alone (validate + rebuild) on a quiet fortnight.
+#
+# DIRECTION SPLITS (2026-10-21): extract-roymorgan-direction.mjs re-reads
+# the committed release caches for each wave's "Analysis by …" prose
+# (gender, voting-intention, state extremes) into
+# data/roymorgan-direction-groups.json — the direction panel's group views.
+# Pure text + cache-only, so BOTH this script and its cloud twin
+# (roymorgan-update.yml runs this same wrapper via poll-agent.yml) file it.
+# Same warn-only posture as the demo pass: a guard trip is logged, never
+# blocks the poll pipeline.
 #
 # ADJUDICATION (2026-10-03): the extract runs with --adjudicate (a no-op
 # unless MATILDA_API_KEY is in the environment — poll-agent.yml carries it,
@@ -131,6 +140,26 @@ else
   fi
 fi
 
+# Direction-groups pass (see the header). Same shape as the demo pass:
+# warn-only, runs before the changed:false early-exit so a split-only
+# fortnight takes the sidecar commit path.
+RMDIR_MOVED=false
+RMDIR_OUT="$(node .build/extract-roymorgan-direction.mjs 2>&1)"
+RMDIR_CODE=$?
+RMDIR_LAST="$(echo "$RMDIR_OUT" | tail -1)"
+if [ $RMDIR_CODE -ne 0 ]; then
+  # exit 2 = guard trip (a block's prose moved, recon drift): warn only
+  log "WARN direction-groups extract (exit $RMDIR_CODE): $RMDIR_LAST"
+elif ! echo "$RMDIR_LAST" | grep -q '^RMDIR_STATUS '; then
+  log "WARN direction-groups extract (no RMDIR_STATUS line): $RMDIR_LAST"
+else
+  log "$RMDIR_LAST"
+  echo "$RMDIR_OUT" | grep '^RMDIR_NOTE ' | while IFS= read -r l; do log "direction-groups: $l"; done
+  if echo "$RMDIR_LAST" | grep -q '"changed":true'; then
+    RMDIR_MOVED=true
+  fi
+fi
+
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   # no poll row moved — but the adjudication ledger or verdict file may have
   LEDGER_FILES=()
@@ -140,7 +169,7 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
       LEDGER_FILES+=("$f")
     fi
   done
-  if [ "$DEMO_MOVED" != "true" ]; then
+  if [ "$DEMO_MOVED" != "true" ] && [ "$RMDIR_MOVED" != "true" ]; then
     if [ ${#LEDGER_FILES[@]} -eq 0 ]; then
       exit 0
     fi
@@ -157,10 +186,11 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
     log "OK committed + pushed: $MSG"
     exit 0
   fi
-  # Demo-only path: the table reader filed a wave or remembered a table-less
-  # release. The demographics land in the page build, so validate + rebuild
-  # exactly like a poll change, with any ledger movement riding along.
-  log "demographic tables moved; running validate/build/commit/push"
+  # Sidecar-only path: a table wave or direction-splits wave landed on a
+  # quiet fortnight. The demographics/splits land in the page build, so
+  # validate + rebuild exactly like a poll change, with any ledger movement
+  # riding along.
+  log "sidecar wave (demographics/direction) moved; running validate/build/commit/push"
   if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
     log "FAIL validate (errors above); no commit made"
     exit 1
@@ -169,10 +199,11 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/roymorgan-demo.json data/demographics.json "${SITE_FILES[@]}")
+  FILES=(data/roymorgan-demo.json data/demographics.json data/roymorgan-direction-groups.json "${SITE_FILES[@]}")
   if [ ${#LEDGER_FILES[@]} -gt 0 ]; then FILES+=("${LEDGER_FILES[@]}"); fi
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update Roy Morgan demographic tables $(date '+%Y-%m-%d')"
+  if [ "$DEMO_MOVED" != "true" ]; then MSG="Update Roy Morgan direction splits $(date '+%Y-%m-%d')"; fi
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
     log "FAIL git commit"
     exit 1
@@ -196,7 +227,7 @@ if ! refresh_site; then
   exit 1
 fi
 
-FILES=(data/polls.json data/roymorgan-demo.json data/demographics.json .build/roymorgan-src/ "${SITE_FILES[@]}")
+FILES=(data/polls.json data/roymorgan-demo.json data/demographics.json data/roymorgan-direction-groups.json .build/roymorgan-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update Roy Morgan poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

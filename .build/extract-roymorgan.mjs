@@ -64,8 +64,10 @@
 //     is the remainder to 100. Like the altTpp pair, the row is filed even
 //     when the wave's polls row already exists, so a wave missed on its
 //     original run self-heals while its release is still in the feed.
-//   - fieldwork period "conducted from Month D – Month D, YYYY", sample
-//     "cross-section of N electors", and (when present) the "can't say" share,
+//   - fieldwork period — current era "conducted from Month D – Month D,
+//     YYYY"; 2025 era "cross-section of N … electors from Month D – Month D,
+//     YYYY"; 2026 weekly era "electors over the week of Month D-D, YYYY".
+//     Sample "cross-section of N electors", and (when present) the "can't say" share,
 //     which is undecided BESIDE the primaries, not inside them.
 //
 // Row shape mirrors the hand-entered Roy Morgan entries already in
@@ -248,7 +250,14 @@ function parseRelease(post) {
   const sampleM = t.match(/cross-section of ([\d,]+) electors/i);
   if (!sampleM) missing.push("sample");
 
-  const pm = t.match(/conducted from\s+([A-Za-z]+)\.?\s+(\d+)\s*[-–]\s*(?:([A-Za-z]+)\.?\s+)?(\d+),\s+(\d{4})/i);
+  /* 2025-era releases print the window behind the cross-section sentence:
+     "…cross-section of N Australian electors from May 5 – June 1, 2025" —
+     no "conducted from" lead-in; the 2026 weekly era prints "…electors
+     over the week of February 2-8, 2026" */
+  const period = /([A-Za-z]+)\.?\s+(\d+)\s*[-–]\s*(?:([A-Za-z]+)\.?\s+)?(\d+),\s+(\d{4})/;
+  const pm = t.match(new RegExp("conducted from\\s+" + period.source, "i"))
+        ?? t.match(new RegExp("electors from\\s+" + period.source, "i"))
+        ?? t.match(new RegExp("over the week of\\s+" + period.source, "i"));
   let dateStart = null, date = null;
   if (!pm) missing.push("field period");
   else {
@@ -319,10 +328,32 @@ function parseRelease(post) {
   let dirRight = null, dirWrong = null, dirPairMissing = false;
   if (/in the wrong direction'/i.test(t)) {
     const norm = normaliseLead(t);
-    const wm = norm.match(/([\d.]+)\s*%[\s,]*(?:of electors[\s,]*)?say (?:Australia|the country) is '(?:going|heading) in the wrong direction'/i);
+    // the weekly era (10187) trails the wrong share AFTER its clause:
+    // "… say the country is 'going in the wrong direction', 60.5% (down
+    // 1.5% points). Only 26% (up 3% points) say the country is 'going in
+    // the right direction'." (parentheticals already stripped). The
+    // trailing form anchors on the quoted phrase + comma + figure so the
+    // group splits (which end the quote with ". In contrast") never match.
+    const wm = norm.match(/([\d.]+)\s*%[\s,]*(?:of (?:electors|Australians)[\s,]*)?say (?:Australia|the country) is '(?:going|heading) in the wrong direction'/i)
+            ?? norm.match(/say (?:Australia|the country) is '(?:going|heading) in the wrong direction',\s*([\d.]+)\s*%/i);
     const rm = norm.match(/\bOnly\s+([\d.]+)\s*%\s*say (?:Australia|the country) is '(?:going|heading) in the right direction'/i);
     if (wm && rm) { dirWrong = parseFloat(wm[1]); dirRight = parseFloat(rm[1]); }
-    else dirPairMissing = true;
+    else {
+      /* the 2025 era prints the pair in ONE sentence, either share leading —
+         "a plurality of X% of Australians say the country is 'going in the
+         [right|wrong] direction' compared to (only )?Y% that say the country
+         is 'going in the [other] direction'" — never the headed "Only M%"
+         form; the words must disagree or it isn't the pair. The early-2026
+         weekly era adds "to": "a rising majority of 57.5% of Australians TO
+         say the country is 'going in the wrong direction' compared to only
+         29.5% that say …" (10126). */
+      const era = norm.match(/([\d.]+)\s*%\s*of Australians\s+(?:to\s+)?say the country is '(?:going|heading) in the (right|wrong) direction' compared to (?:only\s+)?([\d.]+)\s*%\s*that say the country is '(?:going|heading) in the (right|wrong) direction'/i);
+      if (era && era[2].toLowerCase() !== era[4].toLowerCase()) {
+        dirWrong = parseFloat(era[2].toLowerCase() === "wrong" ? era[1] : era[3]);
+        dirRight = parseFloat(era[2].toLowerCase() === "right" ? era[1] : era[3]);
+      }
+      else dirPairMissing = true;
+    }
   }
 
   // CMS post datetime (UTC) → Australia/Melbourne local, "YYYY-MM-DDTHH:MM"

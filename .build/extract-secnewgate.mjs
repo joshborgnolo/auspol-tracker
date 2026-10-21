@@ -929,7 +929,7 @@ async function main() {
       });
     }
     const out = {
-      _about: "Per-state right-direction/wrong-track readings from SEC Newgate's Mood of the Nation tracking study – the 'Perceived direction of individual states' tables in each wave's report (the five mainland states only; per-state subsamples of the national wave, so several points of noise either way). Banked by .build/extract-secnewgate.mjs as waves land; nothing on the site reads this yet. Each wave's entry carries right/wrong from its own report's row pair; entries before the cache horizon (Feb/Apr 2025) and the 2022-03 anchor column come from later reports' trailing reprint columns and carry right-direction only. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+      _about: "Per-state right-direction/wrong-track readings from SEC Newgate's Mood of the Nation tracking study – the 'Perceived direction of individual states' tables in each wave's report (the five mainland states only; per-state subsamples of the national wave, so several points of noise either way). Banked by .build/extract-secnewgate.mjs as waves land; the direction panel's state select reads this via gen-data. Each wave's entry carries right/wrong from its own report's row pair; entries before the cache horizon (Feb/Apr 2025) and the 2022-03 anchor column come from later reports' trailing reprint columns and carry right-direction only. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
       states: Object.keys(series),
       series,
     };
