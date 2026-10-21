@@ -2,7 +2,7 @@
  "generated": "2026-10-21",
  "series": "YouGov — Sky News Pulse / News24 Pulse (federal)",
  "scope": "Rotating one-off questions across all 22 waves (2026-01-27 … 2026-10-20 articles, plus the companion stories News24 runs beside each wave's main article, which carry some of its questions; the 2025-12-02 and 2025-12-23 waves' articles were overwritten in place by the 27 Jan story and cannot be audited). The standing battery asked every wave — primary voting intention, preferred PM (Albanese vs Ley→Taylor; Albanese vs Hanson from 21 Apr), leader satisfaction (both leaders), two 2PPs (Labor v Coalition, Labor v One Nation) — is excluded. Recurring rotating items appear once per fieldwork.",
- "sources": "Every wave's article HTML (and, from 20 Oct 2026, its companion stories) re-fetched past the News24 cookie wall plus every Infogram embed re-downloaded (kit: .matilda/n24-questions/). Tables are the embeds' chart rows verbatim (all disclosed demographic columns); prose entries quote News24's own paragraphs verbatim — except card-surcharge-ban-price-tradeoff, a 20 Oct 2026-wave question carried by the News24 television segment alone (no story or embed carries it, so the audit cannot see it): filed as the segment reported it, wording paraphrased. Embeds read but deliberately not filed are listed under not_filed with the reason; .build/news24-oneoffs-audit.mjs pages on any other unfiled one-off from the latest wave's stories.",
+ "sources": "Every wave's article HTML (and, from 20 Oct 2026, its companion stories) re-fetched past the News24 cookie wall plus every Infogram embed re-downloaded (kit: .matilda/n24-questions/). Tables are the embeds' chart rows verbatim (all disclosed demographic columns); prose entries quote News24's own paragraphs verbatim — except card-surcharge-ban-price-tradeoff, a 20 Oct 2026-wave question carried by the News24 television segment alone (no story or embed carries it, so the audit cannot see it): filed as the segment reported it, wording paraphrased, and its videoUrl points at News24's own YouTube upload of the segment. Embeds read but deliberately not filed are listed under not_filed with the reason; .build/news24-oneoffs-audit.mjs pages on any other unfiled one-off from the latest wave's stories.",
  "one_offs": [
   {
    "id": "immigration-levels",
@@ -4664,13 +4664,14 @@
     "Neither support nor oppose"
    ],
    "articleUrl": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
+   "videoUrl": "https://www.youtube.com/watch?v=Hds-IiuwL6Y",
    "data": {
     "tables": [],
     "prose": [
      "Reported on the News24 television segment covering the 13–20 October 2026 Pulse wave: around a third of voters support the surcharge ban, around a third oppose it, and 40% hold no view either way."
     ]
    },
-   "note": "TV-segment only: the question is in none of the wave's stories or Infogram embeds (the store's audit reads stories and embeds, so it cannot see it either) and no written News24 story carries it. Question wording is the segment's as paraphrased by the reader; figures are the segment's reported thirds and 40% no-view, not exact."
+   "note": "TV-segment only: the question is in none of the wave's stories or Infogram embeds (the store's audit reads stories and embeds, so it cannot see it either) and no written News24 story carries it. Question wording is the segment's as paraphrased by the reader; figures are the segment's reported thirds and 40% no-view, not exact. News24's own upload of the segment (21 Oct 2026) is this entry's videoUrl."
   }
  ],
  "not_filed": [

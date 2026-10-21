@@ -55,10 +55,12 @@ export function readStores(root) {
   for (const [house, file] of [["news24", "news24-one-offs.json"], ["newspoll", "newspoll-one-offs.json"], ["demosau", "demosau-one-offs.json"]]) {
     for (const e of read(file, (j) => j.one_offs || [])) {
       const tables = (e.data && e.data.tables || []).map((t) => ({ title: t.title || t.name || null, headers: t.headers || null, rows: t.rows || [] }));
+      /* a videoUrl outranks the wave's story link when the one-off lives in
+         a TV segment no written story carries (news24's surcharge entry) */
       entries.push({ house, id: e.id, waveDate: e.waveDate,
         dateStart: e.fieldwork ? e.fieldwork.start : null, dateEnd: e.fieldwork ? e.fieldwork.end : null,
         sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
-        question: e.question, note: e.note || null, url: e.articleUrl || null,
+        question: e.question, note: e.note || null, url: e.videoUrl || e.articleUrl || null,
         tables, prose: (e.data && e.data.prose) || [] });
     }
   }
