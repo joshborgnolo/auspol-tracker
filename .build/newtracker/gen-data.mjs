@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -4557,6 +4557,28 @@ const flowHistory = (() => {
     nsw: { label: "New South Wales", short: "NSW", elections: "New South Wales state elections", srcAs: "the NSW Electoral Commission’s ballot-level preference data" },
   };
   if (JUR) return h;
+  /* fed.sen: the SENATE's flows beside the House's (user 2026-10-22, the
+     explainer chart's House: Upper view) — FLOW_HISTORY_SENATE in flows.mjs,
+     computed from the AEC's ballot-level formal-preferences zips for the
+     four elections since group voting tickets went (2016–2025; the
+     committed counts sit in .build/aec-flow-src/senate-atl/). ATL ballots
+     only, each draw cell the share of the family's ATL ballots naming a
+     major that names Labor first; the nei arrays hold the "named neither
+     major" share the Senate tooltip prints (never "exhausted" — every
+     ballot is live at the count's end). A family with no ATL ballots in a
+     state-year is null (One Nation: ACT in all four, NT until 2025),
+     never zero. Federal-only by position: the Vic build returns above. */
+  h.fed.sen = { label: "Senate", short: "Senate", senate: true, elections: "Australian Senate elections",
+    years: [...FLOW_HISTORY_SENATE.years],
+    grn: [...FLOW_HISTORY_SENATE.grn], grnNei: [...FLOW_HISTORY_SENATE.grnNei],
+    onp: [...FLOW_HISTORY_SENATE.onp], onpNei: [...FLOW_HISTORY_SENATE.onpNei],
+    oth: [...FLOW_HISTORY_SENATE.oth], othNei: [...FLOW_HISTORY_SENATE.othNei],
+    states: Object.fromEntries(Object.entries(FLOW_HISTORY_SENATE.states).map(([k, s]) => [k,
+      { label: s.label, short: s.short, elections: "Senate elections in " + s.label, senState: true,
+        years: [...FLOW_HISTORY_SENATE.years],
+        grn: [...s.grn], grnNei: [...s.grnNei],
+        onp: [...s.onp], onpNei: [...s.onpNei],
+        oth: [...s.oth], othNei: [...s.othNei] }])) };
   /* fed.states: the same counts split by state, for the explainer's
      Federal sub-row (user 2026-10-21): data/fed-state-flows.json, written by
      .build/fed-state-flows.py from the AEC's per-state TPP flow downloads

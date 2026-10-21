@@ -65025,18 +65025,21 @@ const ExBarSwatch = () => React.createElement("svg", {
 function ExplainedFlowChart({
   jur,
   inv,
+  house,
   stateKey,
   classKey,
   menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
-  const S = jur === "fed" && stateKey && (FH.fed.states || {})[stateKey] || jur === "fed" && classKey && (FH.fed.classes || {})[classKey] || FH[jur] || FH.fed;
+  const SEN = house === "sen" ? (FH.fed || {}).sen || null : null;
+  const S = SEN && stateKey && (SEN.states || {})[stateKey] || SEN || jur === "fed" && stateKey && (FH.fed.states || {})[stateKey] || jur === "fed" && classKey && (FH.fed.classes || {})[classKey] || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
   const T = v => inv ? 100 - v : v;
   const cnt = !!S.counted;
+  const sen = !!(S.senate || S.senState);
   const parties = FLOW_PARTIES.filter(p => (S[p.id] || []).some(v => v != null));
   const hasErr = parties.some(p => (S[p.id + "Err"] || []).some(e => e != null));
   const fedEst = !est && S.estYears && S.estYears.length ? S.estYears : null;
@@ -65052,7 +65055,8 @@ function ExplainedFlowChart({
         if (cur.length) runs.push(cur);
         cur = [];
       } else {
-        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        const nei = S[p.id + "Nei"] || [];
+        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, sen && nei[i] != null ? "named neither major: " + nei[i].toFixed(1) + "%" : null, !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({
           x: YEARS[i],
           y: T(val),
@@ -65116,7 +65120,7 @@ function ExplainedFlowChart({
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
   const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
   const noBars = " Counts carry no estimation error, so they have no bars.";
-  const cap = est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2007–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits, and 2007 is as far back as the per-division table goes. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the sparse early One Nation years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
+  const cap = sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2007–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits, and 2007 is as far back as the per-division table goes. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the sparse early One Nation years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -65132,7 +65136,7 @@ function ExplainedFlowChart({
     items: lines,
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, _extends({
-    key: "ex-fl-" + jur + (stateKey || "") + (classKey || "")
+    key: "ex-fl-" + (house || "rep") + jur + (stateKey || "") + (classKey || "")
   }, exFrame(narrow), {
     xDomain: [x0, x1],
     xTicks: YEARS.map(x => ({
@@ -65147,11 +65151,11 @@ function ExplainedFlowChart({
       x
     })),
     tooltipTitle: i => YEARS[i] + " · " + (S.short || S.label),
-    ariaLabel: "Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span,
+    ariaLabel: "Share of preferences flowing to " + side + ", by party, " + S.label + (sen ? ", above-the-line Senate ballots" : "") + (est ? ", estimated" : "") + ", " + span,
     copy: {
       title: "Share of each group’s preferences reaching " + side + " over " + other,
-      sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : "Counted, election by election, so no error bars."),
-      caption: hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+      sub: rdCap(S.elections || S.label + " elections") + ". " + (sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party." : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : "Counted, election by election, so no error bars."),
+      caption: sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -65343,9 +65347,20 @@ function RdExplained() {
   const jur = fedView ? "fed" : FH[view] ? view : "fed";
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
   const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;
+  const SEN_BANK = FH.fed && FH.fed.sen || null;
+  const SEN_STATES = SEN_BANK && SEN_BANK.states || {};
+  const [house, setHouse] = useState("rep");
   const [inv, setInv] = useState(false);
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
+  const flipHouse = () => {
+    const next = house === "sen" ? "rep" : "sen";
+    setHouse(next);
+    if (next === "sen") {
+      if (pair === "on") setPair("co");
+      if (classKey || !fedView) setView("fed");
+    }
+  };
   React.useLayoutEffect(() => {
     const sec = secRef.current;
     const slot = sec && sec.querySelector(".ex-body .ex-slot");
@@ -65441,23 +65456,28 @@ function RdExplained() {
   }, []);
   const stateKeys = Object.keys(FED_STATES);
   const classKeys = Object.keys(FED_CLASSES);
-  const VIEW_OPTS = KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
-  const menu = KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? React.createElement("select", {
+  const senStateKeys = Object.keys(SEN_STATES);
+  const VIEW_OPTS = house === "sen" ? SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : [] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const menuShow = house === "sen" ? VIEW_OPTS.length > 1 : VIEW_OPTS.length > 0;
+  const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
-    value: stateKey ? "fed:" + stateKey : classKey ? "fedcl:" + classKey : jur,
+    value: stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
     onChange: e => setView(e.target.value)
   }, React.createElement("optgroup", {
     label: "Federal elections"
   }, React.createElement("option", {
     value: "fed"
-  }, "Federal, national"), stateKeys.map(k => React.createElement("option", {
-    key: k,
-    value: "fed:" + k
-  }, "Federal, " + (FED_STATES[k].short || FED_STATES[k].label))), classKeys.map(k => React.createElement("option", {
+  }, "Federal, national"), (house === "sen" ? senStateKeys : stateKeys).map(k => {
+    const bank = house === "sen" ? SEN_STATES : FED_STATES;
+    return React.createElement("option", {
+      key: k,
+      value: "fed:" + k
+    }, "Federal, " + (bank[k].short || bank[k].label));
+  }), house !== "sen" && classKeys.map(k => React.createElement("option", {
     key: "fedcl:" + k,
     value: "fedcl:" + k
-  }, "Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)))), KEYS.length > 1 && React.createElement("optgroup", {
+  }, "Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)))), house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
     label: "State elections"
   }, KEYS.filter(k => k !== "fed").map(k => React.createElement("option", {
     key: k,
@@ -65478,9 +65498,24 @@ function RdExplained() {
   }, (inv ? rival : "Labor") + "’s"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")));
+  const houseCtl = SEN_BANK ? React.createElement("span", {
+    className: "rd-pl-ctl ex-house"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "House:"), React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": house === "sen",
+    title: house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
+    onClick: flipHouse
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, house === "sen" ? "Upper" : "Lower"), " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"))) : null;
   const headCtls = narrow ? React.createElement("span", {
     className: "ex-fl-ctls"
-  }, pair === "co" ? menu : null, share) : pair === "co" ? menu : null;
+  }, pair === "co" ? menu : null, houseCtl, share) : pair === "co" ? menu : null;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -65516,13 +65551,14 @@ function RdExplained() {
       id: p.id,
       label: narrow ? p.short : p.label
     }))
-  }, narrow ? null : share), pair === "on" ? React.createElement(ExplainedOnChart, {
+  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, share)), pair === "on" ? React.createElement(ExplainedOnChart, {
     inv: inv,
     menu: headCtls
   }) : React.createElement(ExplainedFlowChart, {
     jur: jur,
+    house: house,
     stateKey: stateKey,
-    classKey: classKey,
+    classKey: house === "sen" ? null : classKey,
     inv: inv,
     menu: headCtls
   }))));
