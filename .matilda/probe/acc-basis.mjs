@@ -89,45 +89,44 @@ await new Promise((r) => setTimeout(r, 400));
 const restored = await firmBoard();
 ok("flipping back restores the published board", restored === before, restored.slice(0, 120));
 
-// the stat table under the chips follows the basis; figures pinned from the
-// worktree bundle (n=71 rows, 2 exact calls, deviation mean 2.1)
+// the summary strip and pollster table under the chips follow the basis;
+// figures pinned from the worktree bundle (71 polls, 6 level at 50-50)
+const sumCells = () => page.evaluate(() =>
+  [...document.querySelectorAll(".rd-acc-sum .rd-acc-firm")].map((d) => d.innerText.replace(/\s+/g, " ").trim()));
 const statRows = () => page.evaluate(() =>
   [...document.querySelectorAll(".rd-acc-stats tbody tr")].map((tr) =>
     [...tr.children].map((c) => c.textContent.trim()).join(" = ")));
-const statsText = (rows) => rows.join(" | ");
+const thead = await page.evaluate(() => [...document.querySelectorAll(".rd-acc-stats thead th")].map((t) => getComputedStyle(t).textTransform));
+ok("table heads are sentence case", thead.length && thead.every((t) => t === "none"), thead.join());
 
-let rows = await statRows();
-ok("stat table renders 8 tbody rows", rows.length === 8, statsText(rows));
-ok("all row: mean miss 1.3 pts", /All final polls = 1\.3 pts =/.test(rows[0] || ""), rows[0]);
-ok("all row: 48% toward Labor (published)", /= 48%$/.test(rows[0] || ""), rows[0]);
-ok("average election gap is 2.1 pts", /gap from 50–50 = 2\.1 pts/.test(rows[1] || ""), rows[1]);
-ok("best election is 1972", /Best election for the polls = 1972/.test(rows[2] || ""), rows[2]);
-ok("worst election is 1984 (published)", /Worst election for the polls = 1984/.test(rows[3] || ""), rows[3]);
-ok("Essential row: 1.6 pts", /^Essential\d+ polls = 1\.6 pts =/.test(rows[4] || ""), rows[4]);
-ok("Resolve row: 0% toward Labor", /^Resolve\d+ polls = 1\.6 pts = 0%/.test(rows[5] || ""), rows[5]);
-ok("Newspoll row: 1.4 pts", /^Newspoll\d+ polls = 1\.4 pts = 50%/.test(rows[6] || ""), rows[6]);
-ok("Roy Morgan row: 1.8 pts, 62% Labor", /^Roy Morgan\d+ polls = 1\.8 pts = 62%/.test(rows[7] || ""), rows[7]);
-ok("stat note mentions the exact calls", await page.evaluate(() =>
-  /exact calls/.test(document.querySelector(".rd-acc-stats-note")?.textContent || "")));
+let sum = await sumCells(), rows = await statRows();
+ok("strip has four cells", sum.length === 4, sum.join(" | "));
+ok("average miss 1.3, 33 high / 36 low", /^Average miss 1\.3 pts 33 polls too high on Labor, 36 too low/.test(sum[0] || ""), sum[0]);
+ok("wrong side ahead 11 of 71", /^Wrong side ahead 11 of 71 polls/.test(sum[1] || ""), sum[1]);
+ok("closest is 2016 among multi-pollster elections (not 1972)", /^Closest election 2016 Five pollsters, 0\.4/.test(sum[2] || ""), sum[2]);
+ok("furthest is 2019 (not 1984)", /^Furthest election 2019 Five pollsters, 2\.9/.test(sum[3] || ""), sum[3]);
+ok("table: 2025's pollsters with >1 election, closest first", rows.map((r) => r.split(" = ")[0]).join() === "Newspoll,Resolve,Essential,Roy Morgan,Ipsos", rows.join(" | "));
+ok("Roy Morgan row", rows[3] === "Roy Morgan = 22 = 1.8 pts = 0.7 Labor = 5 of 22", rows[3]);
+ok("Resolve row", rows[1] === "Resolve = 2 = 1.6 pts = 1.6 Coalition = 0 of 2", rows[1]);
+ok("note names the six level polls", await page.evaluate(() =>
+  /six polls at exactly 50–50/.test(document.querySelector(".rd-acc-stats-note")?.textContent || "")));
 
-// flip to implied: the whole table must re-derive
-await page.evaluate(() => {
-  [...document.querySelectorAll(".rd-acc-basis .rd-chip")][1].click();
-});
+// flip to implied: the whole summary must re-derive
+await page.evaluate(() => { [...document.querySelectorAll(".rd-acc-basis .rd-chip")][1].click(); });
 await new Promise((r) => setTimeout(r, 400));
-rows = await statRows();
-ok("implied: all row stays 1.3 but 51% toward Labor", /All final polls = 1\.3 pts = 51%/.test(rows[0] || ""), rows[0]);
-ok("implied: worst election becomes 2019", /Worst election for the polls = 2019/.test(rows[3] || ""), rows[3]);
-ok("implied: Essential drops to 1.4", /^Essential\d+ polls = 1\.4 pts = 67%/.test(rows[4] || ""), rows[4]);
-ok("implied: Roy Morgan becomes 1.6 pts, 57%", /^Roy Morgan\d+ polls = 1\.6 pts = 57%/.test(rows[7] || ""), rows[7]);
+sum = await sumCells(); rows = await statRows();
+ok("implied: 35 high / 34 low", /35 polls too high on Labor, 34 too low/.test(sum[0] || ""), sum[0]);
+ok("implied: wrong side ahead 14 of 71", /^Wrong side ahead 14 of 71/.test(sum[1] || ""), sum[1]);
+ok("implied: furthest 2019 at 3.3", /^Furthest election 2019 Five pollsters, 3\.3/.test(sum[3] || ""), sum[3]);
+ok("implied: Essential 1.4, 0.3 Labor", rows.includes("Essential = 6 = 1.4 pts = 0.3 Labor = 1 of 6"), rows.join(" | "));
+ok("implied: no level-poll clause", await page.evaluate(() =>
+  !/exactly 50–50/.test(document.querySelector(".rd-acc-stats-note")?.textContent || "")));
 
 // flip back restores the published figures
-await page.evaluate(() => {
-  [...document.querySelectorAll(".rd-acc-basis .rd-chip")][0].click();
-});
+await page.evaluate(() => { [...document.querySelectorAll(".rd-acc-basis .rd-chip")][0].click(); });
 await new Promise((r) => setTimeout(r, 400));
-rows = await statRows();
-ok("flipping back restores 48% toward Labor", /= 48%$/.test(rows[0] || ""), rows[0]);
+sum = await sumCells();
+ok("flipping back restores 11 of 71", /^Wrong side ahead 11 of 71/.test(sum[1] || ""), sum[1]);
 
 await browser.close();
 server.close();

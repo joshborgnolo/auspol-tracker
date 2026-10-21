@@ -3062,26 +3062,34 @@ function AccuracyPanel() {
       : "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on.")
       + " A pollster only counts against the elections it published a final poll for"
       + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
-    /* the ledger table beneath the basis chips: headline miss against the
-       size of the elections themselves, the direction split, the best and
-       worst collective years, and the four current majors on the same two
-       measures – every figure derives from the basis-selected rows, so the
-       chips move the whole table */
-    const allErrs = byRecency.flatMap((c) => hh(c).map(errOf));
-    const nzErrs = allErrs.filter((e) => e !== 0);
-    const labShare = nzErrs.length ? Math.round((nzErrs.filter((e) => e > 0).length / nzErrs.length) * 100) : null;
-    const exactN = allErrs.length - nzErrs.length;
+    /* the summary beneath the basis chips: four figures in the pollster
+       board's idiom (the miss, how often a poll had the wrong side ahead,
+       the closest and furthest elections), then the last election's
+       pollsters over their whole record on the measures the board below
+       does not carry – lean and wrong-side calls. Best and worst only rank
+       elections with more than one pollster: a lone Morgan poll exactly on
+       the 1972 result is luck, not a field that did well. Every figure
+       derives from the basis-selected rows, so the chips move all of it. */
+    const allH = byRecency.flatMap((c) => hh(c).map((h) => ({ c, h })));
+    const hiN = allH.filter(({ h }) => errOf(h) > 0).length;
+    const loN = allH.filter(({ h }) => errOf(h) < 0).length;
+    const wrongSide = (c, h) => (alpOf(h) - 50) * (c.result - 50) < 0;
+    const wrongN = allH.filter(({ c, h }) => wrongSide(c, h)).length;
+    const levelN = allH.filter(({ h }) => alpOf(h) === 50).length;
     const devMean = byRecency.reduce((t, c) => t + Math.abs(c.result - 50), 0) / byRecency.length;
     const cMiss = (c) => { const es = hh(c).map(errOf); return es.reduce((t, e) => t + Math.abs(e), 0) / es.length; };
-    const byCyMiss = byRecency.slice().sort((a, b) => cMiss(a) - cMiss(b));
-    const bestCyc = byCyMiss[0], worstCyc = byCyMiss[byCyMiss.length - 1];
-    const statHouses = ["Essential", "Resolve", "Newspoll", "Roy Morgan"].map((name) => {
-      const es = byRecency.flatMap((c) => hh(c).filter((h) => h.firm === name).map(errOf));
-      const nz = es.filter((e) => e !== 0);
-      return { name, n: es.length,
-               miss: es.length ? es.reduce((t, e) => t + Math.abs(e), 0) / es.length : null,
-               lab: nz.length ? Math.round((nz.filter((e) => e > 0).length / nz.length) * 100) : null };
-    }).filter((s) => s.n);
+    const multi = byRecency.filter((c) => hh(c).length > 1).sort((a, b) => cMiss(a) - cMiss(b));
+    const bestCyc = multi[0], worstCyc = multi[multi.length - 1];
+    const lastFirms = new Set(last ? hh(last).map((h) => h.firm) : []);
+    const statHouses = firmsSrc.filter((f) => f.n > 1 && lastFirms.has(f.firm)).map((f) => {
+      const hs = allH.filter(({ h }) => h.firm === f.firm);
+      const es = hs.map(({ h }) => errOf(h));
+      return { name: f.firm, n: es.length,
+               miss: es.reduce((t, e) => t + Math.abs(e), 0) / es.length,
+               lean: es.reduce((t, e) => t + e, 0) / es.length,
+               wrong: hs.filter(({ c, h }) => wrongSide(c, h)).length };
+    }).sort((a, b) => a.miss - b.miss);
+    const leanTxt = (v) => Math.abs(v) < 0.05 ? "Even" : Math.abs(v).toFixed(1) + (v > 0 ? " Labor" : " Coalition");
     const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
     return (
       <RdSec id="final-polls" cls="rd-acc" title="How the final polls have done"
@@ -3095,33 +3103,37 @@ function AccuracyPanel() {
           <button type="button" className="rd-chip" aria-pressed={imp} onClick={() => setBasis("imp")}
             title="Every final poll’s primaries put through the one preference-flow table – the flows counted at the previous election">Primaries on last-election flows</button>
         </div>
-        <table className="rd-acc-stats">
-          <thead>
-            <tr><th scope="col"></th><th scope="col" className="num">Mean miss</th><th scope="col" className="num">Missed toward Labor</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">All final polls</th><td>{meanAbsX.toFixed(1)} pts</td><td>{labShare != null ? labShare + "%" : "–"}</td>
-            </tr>
-            <tr className="rd-acc-stat-ctx">
-              <th scope="row">Average election result’s gap from 50–50</th><td colSpan="2">{devMean.toFixed(1)} pts</td>
-            </tr>
-            <tr className="rd-acc-stat-ctx">
-              <th scope="row">Best election for the polls</th><td colSpan="2">{bestCyc.year} · off by {cMiss(bestCyc).toFixed(1)} on average</td>
-            </tr>
-            <tr className="rd-acc-stat-ctx">
-              <th scope="row">Worst election for the polls</th><td colSpan="2">{worstCyc.year} · off by {cMiss(worstCyc).toFixed(1)} on average</td>
-            </tr>
-            {statHouses.map((s) => (
-              <tr key={s.name}>
-                <th scope="row">{s.name}<span className="rd-acc-stat-n">{s.n} poll{s.n === 1 ? "" : "s"}</span></th>
-                <td>{s.miss != null ? s.miss.toFixed(1) + " pts" : "–"}</td>
-                <td>{s.lab != null ? s.lab + "%" : "–"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p className="rd-acc-stats-note">Mean miss weights every election equally; the houses each count their own final polls. “Missed toward Labor” counts the polls that overstated Labor’s two-party share{exactN ? ", and the " + nw(exactN) + " exact call" + (exactN === 1 ? " counts" : "s count") + " neither way" : ""}.</p>
+        <div className="rd-acc-sum">
+          <div className="rd-acc-firm"><b>Average miss</b><span className="rd-acc-fv">{meanAbsX.toFixed(1)}<small> pts</small></span>
+            <span>{hiN} polls too high on Labor, {loN} too low</span></div>
+          <div className="rd-acc-firm"><b>Wrong side ahead</b><span className="rd-acc-fv">{wrongN}<small> of {allH.length} polls</small></span>
+            <span>Put the loser of the two-party vote in front</span></div>
+          {bestCyc && <div className="rd-acc-firm"><b>Closest election</b><span className="rd-acc-fv">{bestCyc.year}</span>
+            <span>{nw(hh(bestCyc).length)[0].toUpperCase() + nw(hh(bestCyc).length).slice(1)} pollsters, {cMiss(bestCyc).toFixed(1)} pts off on average</span></div>}
+          {worstCyc && worstCyc !== bestCyc && <div className="rd-acc-firm"><b>Furthest election</b><span className="rd-acc-fv">{worstCyc.year}</span>
+            <span>{nw(hh(worstCyc).length)[0].toUpperCase() + nw(hh(worstCyc).length).slice(1)} pollsters, {cMiss(worstCyc).toFixed(1)} pts off on average</span></div>}
+        </div>
+        {statHouses.length > 0 && (
+          <table className="rd-acc-stats">
+            <caption>{last.year}’s pollsters over their whole record</caption>
+            <thead>
+              <tr><th scope="col">Pollster</th><th scope="col" className="num">Elections</th><th scope="col" className="num">Average miss</th>
+                <th scope="col" className="num">Average lean</th><th scope="col" className="num">Wrong side ahead</th></tr>
+            </thead>
+            <tbody>
+              {statHouses.map((s) => (
+                <tr key={s.name}>
+                  <th scope="row">{s.name}</th>
+                  <td>{s.n}</td>
+                  <td>{s.miss.toFixed(1)}<span className="rd-acc-u"> pts</span></td>
+                  <td style={Math.abs(s.lean) < 0.5 ? null : { color: inkOf(col(s.lean)) }}>{leanTxt(s.lean)}</td>
+                  <td>{s.wrong} of {s.n}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <p className="rd-acc-stats-note">The average miss counts each election once; a pollster’s figures count its own final polls. Lean is the average miss with its direction kept, coloured from half a point. Wrong side ahead means the two-party vote, not the seats{levelN ? "; the " + nw(levelN) + " poll" + (levelN === 1 ? "" : "s") + " at exactly 50–50 count" + (levelN === 1 ? "s" : "") + " neither way" : ""}. Closest and furthest rank only elections with more than one pollster. Results themselves have sat {devMean.toFixed(1)} points from 50–50 on average.</p>
         <div className="card rd-card rd-acc-card">
           <div className="rd-chead"><span className="rd-chead-t">Labor’s final {imp && "implied "}two-party figure in the polls, minus the result, points</span>
             {stackedX > 0 && <button type="button" className="rd-chip" aria-pressed={spread} onClick={() => setSpread(!spread)}
