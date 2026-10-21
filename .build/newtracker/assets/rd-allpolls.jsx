@@ -5676,12 +5676,16 @@ const ExHollowX = () => (
 const ExBarSwatch = () => (
   <svg width="12" height="16" viewBox="0 0 12 16" aria-hidden="true"><rect x="4" y="1" width="4" height="14" rx="1" style={{ fill: "var(--ink-3)", opacity: 0.55 }} /></svg>
 );
-function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
+function ExplainedFlowChart({ jur, inv, stateKey, classKey, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
   /* stateKey picks a per-state cut of the FEDERAL counts (AEC per-state TPP
-     tables, 2004–2025 — counts, no error bars) */
-  const S = (jur === "fed" && stateKey && ((FH.fed.states || {})[stateKey])) || FH[jur] || FH.fed;
+     tables, 2004–2025); classKey its per-seat-type cut (the AEC's per-
+     division TCP tables, grouped by its own per-election classifications,
+     2007–2025). Both are counts, so neither draws error bars */
+  const S = (jur === "fed" && stateKey && ((FH.fed.states || {})[stateKey]))
+    || (jur === "fed" && classKey && ((FH.fed.classes || {})[classKey]))
+    || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
@@ -5775,7 +5779,10 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
       : S.fedState
         ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars
           + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
-        : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
+        : S.fedClass
+          ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2007–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits, and 2007 is as far back as the per-division table goes. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the sparse early One Nation years as small samples, not shares."
+            + noBars
+          : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
             + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter((w) => w.year < 2004).map((w, i, a) => (i ? (i === a.length - 1 ? " and " : ", ") : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("")
             + " The AEC counted no flows by party before 1996. " : "")
           + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars
@@ -5789,7 +5796,7 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
         {menu}
       </div>
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
-      <TrendChart key={"ex-fl-" + jur + (stateKey || "")} {...exFrame(narrow)}
+      <TrendChart key={"ex-fl-" + jur + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
@@ -5925,13 +5932,16 @@ function RdExplained() {
   /* one elections menu (user 2026-10-21, replacing the jurisdiction chips
      and the Federal chip's state sub-row): "fed" is the national series,
      "fed:<state>" a state's cut of the federal counts (fed.states, the
-     AEC's), a bare key a state's own elections. The pick persists across
-     the contest tabs - the menu just hides on Labor v One Nation. */
+     AEC's), "fedcl:<class>" its cut by seat type (fed.classes, user
+     2026-10-22), a bare key a state's own elections. The pick persists
+     across the contest tabs - the menu just hides on Labor v One Nation. */
   const FED_STATES = (FH.fed && FH.fed.states) || {};
+  const FED_CLASSES = (FH.fed && FH.fed.classes) || {};
   const [view, setView] = useState("fed");
-  const fedView = view === "fed" || view.startsWith("fed:");
+  const fedView = view === "fed" || view.startsWith("fed:") || view.startsWith("fedcl:");
   const jur = fedView ? "fed" : (FH[view] ? view : "fed");
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
+  const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;
   const [inv, setInv] = useState(false);
   /* the contest tabs flip Labor v Coalition (the flowHistory election
      histories) to Labor v One Nation (the measured flowForced.bys contests;
@@ -6052,18 +6062,22 @@ function RdExplained() {
     return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
   }, []);
   const stateKeys = Object.keys(FED_STATES);
+  const classKeys = Object.keys(FED_CLASSES);
   /* the menu's option values in the <select>'s DOM order - the up/down
      walk below steps this exact list (the hover claim proxies the control's
      own arrows, which for a native select is line-by-line) */
-  const VIEW_OPTS = (KEYS.length > 1 || stateKeys.length > 0)
-    ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
+  const VIEW_OPTS = (KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0)
+    ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...classKeys.map((k) => "fedcl:" + k),
+       ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
     : [];
-  const menu = (KEYS.length > 1 || stateKeys.length > 0) ? (
-    <select className="rd-pv-sel ex-fl-sel" aria-label="Elections" value={stateKey ? "fed:" + stateKey : jur}
+  const menu = (KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0) ? (
+    <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
+            value={stateKey ? "fed:" + stateKey : classKey ? "fedcl:" + classKey : jur}
             onChange={(e) => setView(e.target.value)}>
       <optgroup label="Federal elections">
         <option value="fed">Federal, national</option>
         {stateKeys.map((k) => <option key={k} value={"fed:" + k}>{"Federal, " + (FED_STATES[k].short || FED_STATES[k].label)}</option>)}
+        {classKeys.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)}</option>)}
       </optgroup>
       {KEYS.length > 1 && (
         <optgroup label="State elections">
@@ -6103,7 +6117,7 @@ function RdExplained() {
             {narrow ? null : share}
           </RdTabs>
           {pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />
-            : <ExplainedFlowChart jur={jur} stateKey={stateKey} inv={inv} menu={headCtls} />}
+            : <ExplainedFlowChart jur={jur} stateKey={stateKey} classKey={classKey} inv={inv} menu={headCtls} />}
         </div>
       </div>
     </section>

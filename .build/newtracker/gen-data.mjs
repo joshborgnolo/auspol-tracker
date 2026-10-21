@@ -4570,6 +4570,25 @@ const flowHistory = (() => {
       { label: s.label, short: s.short, elections: "federal elections in " + s.label, fedState: true,
         years: [...fsf.years], grn: [...s.grn], onp: [...s.onp], oth: [...s.oth] }]));
   } catch { /* not yet written */ }
+  /* fed.classes: the same counted family split by seat type, for the
+     explainer's four class views (user request 2026-10-22): data/
+     fed-class-flows.json, written by .build/fed-class-flows.py from the
+     AEC's per-division TCP flow downloads (2007–2025; no per-division
+     product reaches back further) grouped by the AEC's own per-election
+     division classifications — the election's own table, so a
+     recategorised seat moves classes with it. Classic seats only, like
+     aec-2025-region-tpp-flows.mjs: a non-classic final pair can hold a
+     bucket's ballots on a crossbench pile no AEC product splits. AEC
+     counts like the national series — no error bars, a class-year a
+     bucket's ballots never reached a classic seat there is null (One
+     Nation barely stood in inner-metropolitan seats in 2010–2013).
+     Guarded like fed.states: a missing file drops the four options. */
+  try {
+    const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
+    h.fed.classes = Object.fromEntries(Object.entries(fcf.classes).map(([k, s]) => [k,
+      { label: s.label, short: s.short, elections: "federal elections in " + s.short + " seats", fedClass: true,
+        years: [...fcf.years], grn: [...s.grn], onp: [...s.onp], oth: [...s.oth] }]));
+  } catch { /* not yet written */ }
   let csv = null, bt = null;
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }
   try { bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")); } catch { /* ditto */ }

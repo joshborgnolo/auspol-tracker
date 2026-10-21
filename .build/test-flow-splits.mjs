@@ -310,12 +310,20 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
    their row, a .rd-chead title, ONE elections menu (a native select over
    federal national, federal by state and the state elections) in place of
    the chips, px-sized TrendChart frame, .rd-ckey, RdFoot, a copy prop - and
-   tooltip titles short enough that a phone's readout sizes to its rows. */
+   tooltip titles short enough that a phone's readout sizes to its rows.
+   2026-10-22 (user: "the following views: 'Federal, inner metro'…"): four
+   more options to the federal optgroup ride fedcl:<class> - FH.fed.classes
+   (FED_CLASSES in RdExplained, classKey beside stateKey through the chart
+   and its remount key), the menu string "Federal, " + short. */
 assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes("const ON_COHORTS = ["),
   "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
 assert.ok(ap.includes('{pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
-    && ap.includes(': <ExplainedFlowChart jur={jur} stateKey={stateKey} inv={inv} menu={headCtls} />}'),
+    && ap.includes(': <ExplainedFlowChart jur={jur} stateKey={stateKey} classKey={classKey} inv={inv} menu={headCtls} />}'),
   "the contest tabs swap the Coalition history chart for the measured-contest chart");
+assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
+    && ap.includes('const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;')
+    && ap.includes('"fedcl:" + k'),
+  "the fedcl:<class> view ids resolve FH.fed.classes beside fed.states (FED_CLASSES, classKey, the menu's fedcl options)");
 assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"'),
   "the figure is a chart card opening on contest tabs, as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
 assert.ok(ap.includes('<select className="rd-pv-sel ex-fl-sel" aria-label="Elections"') && ap.includes('const [view, setView] = useState("fed");')
