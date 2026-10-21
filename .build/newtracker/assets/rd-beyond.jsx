@@ -852,11 +852,11 @@ function BtvGroup({ g, houses, byHouse }) {
    pollster or newest first. A finding still links to its topic: picked
    while the page runs another way, it turns the page back to the issues
    and lands there. */
-const BTV_SORTS = [{ id: "issue", label: "By issue" }, { id: "pollster", label: "By pollster" }, { id: "recent", label: "Newest first" }];
+const BTV_SORTS = [{ id: "issue", label: "By issue" }, { id: "pollster", label: "By pollster" }, { id: "recent", label: "By recency" }];
 function BtvSort({ sort, onSort }) {
   return (
     <div className="btv-sort">
-      <span className="btv-sort-l" id="btv-sort-l">Order the questions</span>
+      <span className="btv-sort-l" id="btv-sort-l">Sort by</span>
       <div className="btv-sort-g" role="group" aria-labelledby="btv-sort-l" onKeyDown={rdTabsKey(BTV_SORTS, onSort)} onClick={rdTabFocus}>
         {BTV_SORTS.map((o) => (
           <button key={o.id} type="button" className="btv-sort-b" aria-pressed={sort === o.id} onClick={() => onSort(o.id)}>

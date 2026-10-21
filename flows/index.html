@@ -137095,7 +137095,7 @@ const BTV_SORTS = [{
   label: "By pollster"
 }, {
   id: "recent",
-  label: "Newest first"
+  label: "By recency"
 }];
 function BtvSort({
   sort,
@@ -137106,7 +137106,7 @@ function BtvSort({
   }, React.createElement("span", {
     className: "btv-sort-l",
     id: "btv-sort-l"
-  }, "Order the questions"), React.createElement("div", {
+  }, "Sort by"), React.createElement("div", {
     className: "btv-sort-g",
     role: "group",
     "aria-labelledby": "btv-sort-l",

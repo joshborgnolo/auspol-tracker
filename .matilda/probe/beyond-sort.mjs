@@ -3,7 +3,7 @@
    straight under the findings and opens on "By issue"; "By pollster" swaps
    the topics for a group a pollster, each holding only its own questions
    and linking to a last "Several pollsters" group that holds every
-   comparison once; "Newest first" swaps the topics for months that hold
+   comparison once; "By recency" swaps the topics for months that hold
    every chart, question and long-tail question exactly once, each chart
    and question naming its topic; the tabs keep their widths across a pick
    (the bold twin); no sideways scroll, with a month's long tail and a row
@@ -47,7 +47,7 @@ for (const design of ["new", "old"]) for (const w of [320, 390, 640, 1024, 1440]
     bw: [...document.querySelectorAll(".btv-sort-b")].map((b) => b.getBoundingClientRect().width),
     fits: document.querySelector(".btv-sort-g").getBoundingClientRect().right <= document.querySelector(".btv-sort").getBoundingClientRect().right + 0.5 }));
   if (!pre.fits) fail(`${design}@${w} the tabs run past the column`);
-  if (pre.pressed.join() !== "true:By issue,false:By pollster,false:Newest first") fail(`${design}@${w} default ${pre.pressed}`);
+  if (pre.pressed.join() !== "true:By issue,false:By pollster,false:By recency") fail(`${design}@${w} default ${pre.pressed}`);
   if (pre.after !== "btv-sort") fail(`${design}@${w} control not under findings: ${pre.after}`);
   if (pre.topics !== topics.length) fail(`${design}@${w} topics ${pre.topics}`);
   // by pollster
