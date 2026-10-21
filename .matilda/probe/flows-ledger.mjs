@@ -92,7 +92,8 @@ const read = (page) => page.evaluate(() => {
       moBtns: r.querySelectorAll("button.rd-fx-mo").length,
       waves: r.querySelectorAll(".rd-fx-dot").length + r.querySelectorAll(".rd-fx-end").length,
       tris: r.querySelectorAll(".rd-fx-tr").length,
-      crosses: r.querySelectorAll(".rd-fx-x").length,
+      crosses: r.querySelectorAll(".rd-fx-x:not(.rd-fx-xerr)").length,
+      errs: r.querySelectorAll(".rd-fx-xerr").length,
       ref: r.querySelectorAll(".rd-fx-ref").length,
       lineVerts: (() => { const p = r.querySelector(".rd-fx-line"); return p ? (p.getAttribute("d").match(/[MC]/g) || []).length : 0; })(),
       empty: (r.querySelector(".rd-fl-empty") || {}).textContent || null,
@@ -121,6 +122,7 @@ const expect = (page) => page.evaluate(() => {
     demosCo: (FF.demos || []).filter((w) => w.onp != null).length,
     demosOn: (FF.demosOn || []).length,
     bys: { coal: (FF.bys || []).filter((d) => d.coal != null).length, grn: (FF.bys || []).filter((d) => d.grn != null).length, oth: (FF.bys || []).filter((d) => d.oth != null).length },
+    bysErr: { coal: (FF.bys || []).filter((d) => d.err && d.err.coal != null).length, grn: (FF.bys || []).filter((d) => d.err && d.err.grn != null).length, oth: (FF.bys || []).filter((d) => d.err && d.err.oth != null).length },
     share: { grn: PR.grn, onp: PR.onp, oth: PR.oth, coal: PR.lnp, alp: PR.alp },
   };
 });
@@ -157,6 +159,7 @@ for (const w of [1440, 390]) {
     `${w}: Labor v One Nation cells = the site's table, RedBridge, DemosAU's all-regions weighting (${s.rows.map((r) => r.cells.join(" ")).join(" / ")})`);
   check(s.rows.every((r) => r.band && /^±/.test(r.band)), `${w}: the site's table carries its band`);
   check(s.rows.map((r) => r.crosses).join() === [E.bys.coal, E.bys.grn, E.bys.oth].join(), `${w}: the 2026 counts ride as crosses (${s.rows.map((r) => r.crosses)})`);
+  check(s.rows.map((r) => r.errs).join() === [E.bysErr.coal, E.bysErr.grn, E.bysErr.oth].join(), `${w}: the estimated counts carry their error bars (${s.rows.map((r) => r.errs)})`);
   check(s.rows.every((r) => r.tris === E.demosOn), `${w}: DemosAU's quarterlies stand apart as triangles`);
   check(s.rows.every((r) => r.btns === 0) && s.heads[2].btn && s.heads[3].btn,
     `${w}: Labor v One Nation: house figures plain, both column heads the buttons`);

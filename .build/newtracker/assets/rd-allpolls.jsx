@@ -5970,7 +5970,15 @@ function RdExplained() {
       if (!inView.current || e.key !== " ") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      /* the contest row's SELECTED tab owns Space the flip's way: a click
+         leaves the focus on it, where the key would only dead-fire the
+         same contest pick, so the claim flips the Share side with the
+         tab's pick and focus staying put (the /flows/ ledger's contest
+         admission). An unpressed tab keeps the key's day job (its native
+         pick), as does the elections menu (its native open) */
+      const onPairTab = a && a.tagName === "BUTTON" && a.getAttribute("aria-pressed") === "true"
+        && a.matches("#flows-explained .ex-fl-tabs .rd-tab");
+      if (!onPairTab && a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       if (!spaceShare.current) return;
