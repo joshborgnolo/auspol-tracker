@@ -103709,6 +103709,22 @@ function Tabs({
       window.removeEventListener("scroll", re);
     };
   }, [menuOpen]);
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const onDigit = e => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!(e.key >= "1" && e.key <= "9")) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const el = menuItems()[Number(e.key) - 1];
+      if (el) {
+        e.preventDefault();
+        el.click();
+      }
+    };
+    window.addEventListener("keydown", onDigit, true);
+    return () => window.removeEventListener("keydown", onDigit, true);
+  }, [menuOpen]);
   const onMenuBtnKey = e => {
     if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
       e.preventDefault();
@@ -139323,6 +139339,9 @@ const KBD_ROWS = [{
 }, {
   keys: ["1–9"],
   what: "Pick a numbered party or term on a chips row"
+}, {
+  keys: ["1–9"],
+  what: "While the More menu is open, jump to its numbered page"
 }, ...(window.JUR ? [] : [{
   keys: ["1–7"],
   what: "In the all-polls demographics view, pick the Split by group"

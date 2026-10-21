@@ -815,6 +815,18 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       else if (e.key === " ") { e.preventDefault(); if (document.activeElement) document.activeElement.click(); return; }
       if (to) { e.preventDefault(); to.focus(); }
     });
+    /* the ledger's numbers are keys, as on the main page: while the menu
+       is open a digit follows that numbered row (its own link, so the
+       satellite pages load the page for real). A modified chord (Cmd-1's
+       tab switch) and a key typed into a field pass through */
+    document.addEventListener("keydown", function (e) {
+      if (mPop.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!(e.key >= "1" && e.key <= "9")) return;
+      var t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      var el = mItems()[Number(e.key) - 1];
+      if (el) { e.preventDefault(); el.click(); }
+    });
     document.addEventListener("pointerdown", function (e) {
       if (!mPop.hidden && !mPop.contains(e.target) && !mBtn.contains(e.target)) mClose(false);
     }, true);

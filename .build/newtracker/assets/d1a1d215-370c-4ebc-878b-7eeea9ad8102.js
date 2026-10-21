@@ -380,6 +380,27 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     window.addEventListener("scroll", re, { passive: true });
     return () => { window.removeEventListener("resize", re); window.removeEventListener("scroll", re); };
   }, [menuOpen]);
+  /* the ledger's numbers are keys: while the menu is open a digit goes
+     straight to that numbered row, by the count on screen (Info's #7 joins
+     on a phone bar once the score docks). Document-level, so it fires from
+     the button, a row, or nowhere, the way the pointer leaves it; a
+     modified chord (Cmd-1's tab switch) and a key typed into a field pass
+     through. Capture phase, ahead of the hover/viewport digit claims (the
+     All-polls split picker and the chips rows, which honour
+     e.defaultPrevented) - an open menu owns the digit keys alone */
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const onDigit = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!(e.key >= "1" && e.key <= "9")) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const el = menuItems()[Number(e.key) - 1];
+      if (el) { e.preventDefault(); el.click(); }
+    };
+    window.addEventListener("keydown", onDigit, true);
+    return () => window.removeEventListener("keydown", onDigit, true);
+  }, [menuOpen]);
   const onMenuBtnKey = (e) => {
     if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); openMenu(0); }
     else if (e.key === "ArrowUp") { e.preventDefault(); openMenu(-1); }
