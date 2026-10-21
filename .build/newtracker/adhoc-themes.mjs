@@ -251,6 +251,7 @@ export const THEME_OF = {
   "energy-prices-next-12-months": "cost-of-living",
   "unemployment-next-12-months": "cost-of-living",
   "unemployment-expectations": "cost-of-living",
+  "card-surcharge-ban": "cost-of-living",
   "card-surcharge-ban-price-tradeoff": "cost-of-living",
   // newspoll
   "inflation-response-priorities": "cost-of-living",
