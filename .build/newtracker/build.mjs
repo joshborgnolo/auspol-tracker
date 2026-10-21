@@ -1147,7 +1147,7 @@ function buildTabSummary(id) {
       </table>
       </div>
 ${acc ? `
-      <h2>How the final polls did</h2>
+      <h2>How the final polls have done</h2>
       <p>Measured against the ${acc.cycles.length} elections from ${acc.cycles[0].year} to
         ${acc.cycles[acc.cycles.length - 1].year}, the final polls missed the two-party result by
         ${acc.meanAbs} points on average &#8211; at ${accWorst(acc)}. The full record, house by house and

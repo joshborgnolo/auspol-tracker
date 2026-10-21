@@ -2561,7 +2561,7 @@ function App() {
       npJumpRef.current = true;
       navTab("now", true);
     };
-    /* Info's "How the final polls did" mention, as a real link: to Past
+    /* Info's "How the final polls have done" mention, as a real link: to Past
        cycles, then down to the panel once the view (and its lazily fetched
        source rows) has mounted it. */
     window.AP.gotoFinalPolls = () => {

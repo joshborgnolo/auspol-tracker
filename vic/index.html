@@ -32933,7 +32933,7 @@ const CYC_METRICS = [{
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("last-election-flows", "Past cycles")
   }, "last-election flows"), "."),
-  noteMore: [React.createElement(React.Fragment, null, "That is the only table anyone could have used at the time. So a line moves when voting intentions move, not when pollsters change how they allocate preferences, and every term back to 1972 is on the same footing as today\u2019s."), React.createElement(React.Fragment, null, "The sitting term follows Labor\u2019s main rival, as the headline does, and marks where that changed: the rival running Labor clearly closer after preferences or, when the two are too close to call, the one clearly ahead on first preferences. How the final polls did, below, still scores what the pollsters published.")]
+  noteMore: [React.createElement(React.Fragment, null, "That is the only table anyone could have used at the time. So a line moves when voting intentions move, not when pollsters change how they allocate preferences, and every term back to 1972 is on the same footing as today\u2019s."), React.createElement(React.Fragment, null, "The sitting term follows Labor\u2019s main rival, as the headline does, and marks where that changed: the rival running Labor clearly closer after preferences or, when the two are too close to call, the one clearly ahead on first preferences. How the final polls have done, below, still scores what the pollsters published.")]
 }, {
   key: "primary",
   title: "Government primary vote",
@@ -34741,7 +34741,7 @@ function AccuracyPanel() {
     return React.createElement(RdSec, {
       id: "final-polls",
       cls: "rd-acc",
-      title: "How the final polls did",
+      title: "How the final polls have done",
       meta: "Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"
     }, React.createElement(RdHed, {
       head: head,
@@ -34953,7 +34953,7 @@ function AccuracyPanel() {
     }, f.meanAbs.toFixed(1), React.createElement("small", null, " pts")), React.createElement("span", null, f.n, " elections")))), React.createElement(RdFoot, {
       how: {
         term: "how-wrong-are-the-polls",
-        from: "How the final polls did"
+        from: "How the final polls have done"
       }
     }, "Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election\u2019s flows, so the miss folds in drift in the flows too."));
   }
@@ -34964,7 +34964,7 @@ function AccuracyPanel() {
     className: "card-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "How the final polls did"), React.createElement("p", {
+  }, "How the final polls have done"), React.createElement("p", {
     className: "card-sub"
   }, "Each house\u2019s last two-party figure in the ", A.windowDays, " days before polling day, against the result, One row per election")), React.createElement("div", {
     className: "dir-net"
@@ -35419,7 +35419,7 @@ function PastCyclesView() {
     "aria-hidden": "true"
   }, React.createElement("path", {
     d: "M12 4v13M12 17l-5-5M12 17l5-5"
-  })), "Jump to how the final polls did")), React.createElement("div", {
+  })), "Jump to how the final polls have done")), React.createElement("div", {
     className: "cyc-controls"
   }, React.createElement(TextToggle, {
     value: mode,
@@ -39368,11 +39368,11 @@ function infoTerms(D) {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()
-    }, "How the final polls did"), " ", "panel in Past cycles scores each pollster\u2019s last two-party figure in the", " ", acc.windowDays, " days before polling day against the result. Across ", accSpan, ", the final polls missed by ", acc.meanAbs, " points on average, and by", " ", Math.abs(acc.worstCycle.err), " at worst, in ", acc.worstCycle.year, ".", accShared ? React.createElement(React.Fragment, null, " In ", accShared.year, " all ", accShared.n, " houses missed on the same side, by", " ", accShared.absErr, ".") : null, " Unfortunately, no aggregate can see an error every pollster shares, which is why the interval never claims to cover it.") : React.createElement(React.Fragment, null, "The ", xref("interval", "how accurate are the polls", "95% interval"), " says how far chance alone could put a figure off. The", " ", React.createElement("button", {
+    }, "How the final polls have done"), " ", "panel in Past cycles scores each pollster\u2019s last two-party figure in the", " ", acc.windowDays, " days before polling day against the result. Across ", accSpan, ", the final polls missed by ", acc.meanAbs, " points on average, and by", " ", Math.abs(acc.worstCycle.err), " at worst, in ", acc.worstCycle.year, ".", accShared ? React.createElement(React.Fragment, null, " In ", accShared.year, " all ", accShared.n, " houses missed on the same side, by", " ", accShared.absErr, ".") : null, " Unfortunately, no aggregate can see an error every pollster shares, which is why the interval never claims to cover it.") : React.createElement(React.Fragment, null, "The ", xref("interval", "how accurate are the polls", "95% interval"), " says how far chance alone could put a figure off. The", " ", React.createElement("button", {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()
-    }, "How the final polls did"), " ", "panel in Past cycles scores each pollster\u2019s last two-party figure of the campaign against the result, election by election, house by house.")
+    }, "How the final polls have done"), " ", "panel in Past cycles scores each pollster\u2019s last two-party figure of the campaign against the result, election by election, house by house.")
   }, {
     id: "is-this-a-forecast",
     q: "Is it a forecast? What would it mean in seats?",
@@ -39761,7 +39761,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "How it\u2019s built."), " Past terms are averaged month by month the way this term is. A month with no poll is filled in from the months either side, dashed on a drawn term. A line\u2019s dotted start runs from the election\u2019s count to the term\u2019s first poll, and its dotted end from the final poll to the next election\u2019s count."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "The measures."), " Two-party preferred is implied from each poll\u2019s primary votes, through the", " ", xref("last-election-flows", "past cycles", "flows of the election that opened its term"), ". The primary vote is the governing party\u2019s and the main opposition party\u2019s. The leaders are rated by net approval since 1972 and preferred prime minister since 1984, following whoever held the office; the earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s, and favourability ratings are left out. How the final polls did scores the polls against each result (see ", xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?"), "). The CSV download holds every poll behind the terms shown."))
+      }, React.createElement("b", null, "The measures."), " Two-party preferred is implied from each poll\u2019s primary votes, through the", " ", xref("last-election-flows", "past cycles", "flows of the election that opened its term"), ". The primary vote is the governing party\u2019s and the main opposition party\u2019s. The leaders are rated by net approval since 1972 and preferred prime minister since 1984, following whoever held the office; the earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s, and favourability ratings are left out. How the final polls have done scores the polls against each result (see ", xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?"), "). The CSV download holds every poll behind the terms shown."))
     },
     entries: [{
       id: "last-election-flows",
@@ -56525,7 +56525,7 @@ function RdPastCycles(p) {
   }, React.createElement(RdSwatch, {
     kind: "ring"
   }), "Each term\u2019s election results"));
-  const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
+  const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls have done"]];
   const chipBand = i => React.createElement("span", {
     className: "rd-cyc-chipmove",
     ref: chipmoveRef(i)

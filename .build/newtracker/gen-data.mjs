@@ -6155,7 +6155,7 @@ function sparseSeries(points, months, cap) {
   }
   return months.map((m) => (b[m] ? r1(monthOfReadings(b[m])) : null));
 }
-/* ---- how the final polls did, cycle by cycle --------------------------
+/* ---- how the final polls have done, cycle by cycle --------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
    visible: every past election with a dated final poll, each with a result

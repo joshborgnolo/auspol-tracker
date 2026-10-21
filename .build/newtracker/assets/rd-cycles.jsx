@@ -1399,7 +1399,7 @@ function RdPastCycles(p) {
     </RdKey>
   );
   /* the list reads as one sentence, "and" before the last and no commas */
-  const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
+  const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls have done"]];
   /* The Draw-a-term chip and its drawn-over-the-band pills hang over each
      vote-and-leadership section's divider (user call 2026-10-17: the same
      door above the Primary vote and Leadership header lines as Two-party's).

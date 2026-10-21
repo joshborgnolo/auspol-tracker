@@ -4,7 +4,7 @@
    cross-house consensus) and then weights what is left by effective sample,
    recency and a 1/sqrt(waves) de-swamp. It does not weight by whether the
    house has historically been RIGHT. The site already measures that — the
-   "How the final polls did" panel carries every house's mean absolute error
+   "How the final polls have done" panel carries every house's mean absolute error
    against the actual result, over up to 17 elections — and the estimator
    never reads it. Kevin Bonham's aggregate does the opposite: an accuracy
    weight on a 0.5–1.5 scale (Newspoll 1.35, RedBridge 1.11) and a hard cap of

@@ -722,7 +722,7 @@ const CYC_METRICS = [
       back to 1972 is on the same footing as today’s.</>,
       <>The sitting term follows Labor’s main rival, as the headline does, and marks where that
       changed: the rival running Labor clearly closer after preferences or, when the two are too
-      close to call, the one clearly ahead on first preferences. How the final polls did, below,
+      close to call, the one clearly ahead on first preferences. How the final polls have done, below,
       still scores what the pollsters published.</>,
     ] },
   /* primaryIs marks the two primary charts: it draws the sitting term's
@@ -2857,7 +2857,7 @@ function cycleSourceRows(cycles, D) {
     rows.slice(1).sort((x, y) => (x[0] - y[0]) || String(x[2]).localeCompare(String(y[2]))));
 }
 
-/* ---- How the final polls did ------------------------------------------
+/* ---- How the final polls have done ------------------------------------------
    Everywhere else the page can only describe how far the polls disagree with
    EACH OTHER. Twenty-three past elections are the one place a poll can be checked
    against the thing it was estimating, so this is the only honest answer to
@@ -2988,7 +2988,7 @@ function AccuracyPanel() {
       + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
     const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
     return (
-      <RdSec id="final-polls" cls="rd-acc" title="How the final polls did"
+      <RdSec id="final-polls" cls="rd-acc" title="How the final polls have done"
              meta={"Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"}>
         <RdHed head={head} dek={dek} />
         <div className="card rd-card rd-acc-card">
@@ -3072,7 +3072,7 @@ function AccuracyPanel() {
             <div className="rd-acc-firm" key={f.firm}><b>{f.firm}</b><span className="rd-acc-fv">{f.meanAbs.toFixed(1)}<small> pts</small></span><span>{f.n} elections</span></div>
           ))}
         </div>
-        <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls did" }}>
+        <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls have done" }}>
           Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too.
         </RdFoot>
       </RdSec>
@@ -3082,7 +3082,7 @@ function AccuracyPanel() {
     <section className="card acc-card" id="final-polls">
       <div className="card-head">
         <div>
-          <h2 className="card-title">How the final polls did</h2>
+          <h2 className="card-title">How the final polls have done</h2>
           <p className="card-sub">
             Each house’s last two-party figure in the {A.windowDays} days before polling day,
             against the result, One row per election
@@ -3585,7 +3585,7 @@ function PastCyclesView() {
                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
             </svg>
-            Jump to how the final polls did
+            Jump to how the final polls have done
           </button>
         </div>
         <div className="cyc-controls">
@@ -7406,7 +7406,7 @@ function infoTerms(D) {
       alone could put a figure off: ±{hl.ci.toFixed(1)} points on each party’s share for Labor
       against the Coalition today. Past elections show the rest. The
       {" "}<button type="button" className="hi-term"
-        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls have done</button>
       {" "}panel in Past cycles scores each pollster’s last two-party figure in the
       {" "}{acc.windowDays} days before polling day against the result. Across {accSpan}, the
       final polls missed by {acc.meanAbs} points on average, and by
@@ -7417,7 +7417,7 @@ function infoTerms(D) {
       <>The {xref("interval", "how accurate are the polls", "95% interval")} says how far chance
       alone could put a figure off. The
       {" "}<button type="button" className="hi-term"
-        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls have done</button>
       {" "}panel in Past cycles scores each pollster’s last two-party figure of the campaign
       against the result, election by election, house by house.</>) },
     { id: "is-this-a-forecast", q: "Is it a forecast? What would it mean in seats?", a: (
@@ -8230,7 +8230,7 @@ function infoTerms(D) {
         The primary vote is the governing party’s and the main opposition party’s. The leaders are
         rated by net approval since 1972 and preferred prime minister since 1984, following
         whoever held the office; the earliest terms’ ratings are the Morgan Gallup Poll’s, and
-        favourability ratings are left out. How the final polls did scores the polls against each
+        favourability ratings are left out. How the final polls have done scores the polls against each
         result (see {xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?")}).
         The CSV download holds every poll behind the terms shown.</span></>) },
       entries: [
