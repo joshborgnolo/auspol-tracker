@@ -7454,13 +7454,16 @@ const oneOffsSource = JUR ? null : buildBeyond(readOneOffStores(ROOT), { deff: H
    copy of it, for the page's dek and the More menu's line, which render
    before the sidecar has loaded, or without it */
 const beyondTopics = oneOffsSource ? oneOffsSource.topics.filter((t) => t.blocks.length || t.more.length).length : null;
-/* the catalogue's newest wave, on the same contract, for the More menu's
-   "Latest entry" date beside its line: the max of every block's and
-   listed entry's `last` (ISO strings sort lexicographically) */
+/* the catalogue's newest entry, on the same contract, for the More menu's
+   "Latest entry" date beside its line: the max of every tracker's and
+   listed question's publication date (`pub`), with the fieldwork dates
+   (`last`/`wave`) beneath as the fallback for a store that files none - the
+   figure names the day the reading reached the page, not the day fieldwork
+   ended (ISO strings sort lexicographically) */
 const beyondLatest = oneOffsSource
   ? oneOffsSource.topics
       .filter((t) => t.blocks.length || t.more.length)
-      .flatMap((t) => [...t.blocks.map((b) => [b.last, b.wave]), ...t.more.map((m) => [m.last, m.wave])].flat())
+      .flatMap((t) => [...t.blocks.map((b) => [b.pub, b.last, b.wave]), ...t.more.map((m) => [m.pub, m.last, m.wave])].flat())
       .filter(Boolean)
       .sort()
       .at(-1) ?? null

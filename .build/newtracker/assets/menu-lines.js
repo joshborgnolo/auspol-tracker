@@ -38,7 +38,7 @@
                          read through, one mini-row per matchup: each voter
                          group's share of preferences reaching Labor, a bare
                          whole number in the group's tone
-     Public opinion      its count of topics
+     Public opinion      the date the catalogue's newest entry published
      Changelog           the date of the newest entry
    A headline that reports no single quantity ("no pollster leans away from
    the pack", preferences "still flowing much as they did") gets no figure,

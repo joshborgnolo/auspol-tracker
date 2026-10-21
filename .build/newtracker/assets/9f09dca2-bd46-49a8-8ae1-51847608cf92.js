@@ -303,7 +303,7 @@ window.AUSPOL = (function () {
   /* the /public-opinion/ page's count of topics (§8e) - null off the federal page */
   const beyondTopics = 10;
   /* its catalogue's newest wave (same contract) - the menu's "Latest entry" */
-  const beyondLatest = "2026-10-20";
+  const beyondLatest = "2026-10-21";
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,

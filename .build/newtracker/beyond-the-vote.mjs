@@ -224,7 +224,11 @@ const fieldOf = (e) => ({ start: e.dateStart || null, end: e.dateEnd || e.waveDa
    (pollster, fieldwork end) OR, where the fieldwork window is on both
    sides, (pollster, fieldwork span). */
 const sourceOf = (e) => ({ house: e.house, wave: e.waveDate, field: fieldOf(e), ds: e.dateStart || (e.fieldwork && e.fieldwork.start) || null,
-  n: e.sample ?? null, neff: e.sampleEff ?? null, url: e.url || null });
+  n: e.sample ?? null, neff: e.sampleEff ?? null, url: e.url || null, pub: pubOf(e) });
+/* a store wave's publication stamp, cut to its date: the More menu's
+   "Latest entry" figure names the day a reading reached the page, which can
+   sit a day or more after the fieldwork end `wave`/`last` carry */
+const pubOf = (e) => (e.published ? e.published.slice(0, 10) : null);
 
 /* A wave's All-polls row, if it sits behind one of the row sets gen-data
    emits: it hands down a map of (store-key, fieldwork end) and (store-key,
@@ -450,7 +454,8 @@ function buildTracker(spec, ix, deff, rowKeys) {
     families: spec.families, panels,
     head: copy.head, dek: copy.dek, note: spec.note || null,
     first: all.reduce((m, p) => (p.field.end < m ? p.field.end : m), "9999"),
-    last: all.reduce((m, p) => (p.field.end > m ? p.field.end : m), "0000") };
+    last: all.reduce((m, p) => (p.field.end > m ? p.field.end : m), "0000"),
+    pub: all.reduce((m, p) => (p.pub && p.pub > m ? p.pub : m), "") || null };
 }
 
 /* a pollster's latest reading against its first */
@@ -1627,6 +1632,7 @@ export function buildBeyond(entries, { deff, rowKeys }) {
       const { figs, cuts, cutsWhen } = figuresOf(ws.filter((e) => mainTable(e)));
       return {
         id: ws[0].id, house: ws[0].house, title: TITLES[ws[0].id + "|" + ws[0].house] || TITLES[ws[0].id] || cleanQuestion(ws[0]), last: ws[0].waveDate,
+        pub: ws.reduce((m, e) => { const p = pubOf(e); return p && p > m ? p : m; }, "") || null,
         srcs: ws.map((e) => ({ ...sourceOf(e), question: e.question })),
         figs, cuts, cutsWhen,
         prose: ws.filter((e) => !mainTable(e) && (e.prose || []).length).map((e) => ({ when: waveNames([e])[0], text: e.prose.slice(0, 3) })),

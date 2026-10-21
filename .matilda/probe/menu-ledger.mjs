@@ -103,11 +103,11 @@ const headOf = async (url, sel) => {
   {
     const oneoffs = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "oneoffs-source.json"), "utf8"));
     const dates = [];
-    for (const t of oneoffs.topics) for (const o of [...(t.blocks || []), ...(t.more || [])]) for (const d of [o.last, o.wave]) if (d) dates.push(d);
+    for (const t of oneoffs.topics) for (const o of [...(t.blocks || []), ...(t.more || [])]) for (const d of [o.pub, o.last, o.wave]) if (d) dates.push(d);
     dates.sort();
     const biso = dates[dates.length - 1];
     ok(row("public-opinion").v === +biso.slice(8, 10) + " " + MN[+biso.slice(5, 7) - 1] && row("public-opinion").c === "Latest entry",
-      `Public opinion: ${row("public-opinion").v}, "Latest entry", is the catalogue's newest wave (${biso})`);
+      `Public opinion: ${row("public-opinion").v}, "Latest entry", is the catalogue's newest entry by publication (${biso})`);
   }
   const cl = await headOf("/changelog/", ".view-changelog .rd-hed");
   const iso = cl.clDate || "";
