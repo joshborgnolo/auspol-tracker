@@ -137837,7 +137837,7 @@ function RdExplained() {
     onClick: () => setInv(!inv)
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
-  }, inv ? rival : "Labor"), " ", React.createElement("span", {
+  }, (inv ? rival : "Labor") + "’s"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")));
   const headCtls = narrow ? React.createElement("span", {

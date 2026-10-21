@@ -6057,7 +6057,7 @@ function RdExplained() {
       <button type="button" className="rd-pl-flip" aria-pressed={inv}
               title={inv ? ("Switch to shares preferencing Labor over " + (pair === "on" ? "One Nation" : "the Coalition")) : ("Switch to shares preferencing " + rival + " over Labor")}
               onClick={() => setInv(!inv)}>
-        <span className="rd-pl-flip-t">{inv ? rival : "Labor"}</span> <span aria-hidden="true">⇄</span>
+        <span className="rd-pl-flip-t">{(inv ? rival : "Labor") + "’s"}</span> <span aria-hidden="true">⇄</span>
       </button>
     </span>
   );

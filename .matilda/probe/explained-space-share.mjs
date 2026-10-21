@@ -1,7 +1,7 @@
 /* headless probe of the Preference-flows-explained card's Space claim
    (d464f137's spacebar viewport claim, .build/newtracker/assets/
    rd-allpolls.jsx RdExplained): flipping the chart's "Share:" side,
-   "Labor ⇄" / the rival's name.
+   "Labor’s ⇄" / the rival's name.
    The claim flips the Share side while the card intersects the viewport
    and hands Space back the moment it leaves. The 2026-10-21 admission
    (user report): clicking a contest tab ("Labor v Coalition" /
@@ -10,7 +10,7 @@
    SELECTED tab owns Space the flip's way, the /flows/ ledger's contest
    admission (flows-ledger.mjs pins that one). Checks, desktop 1440:
      - landing anatomy: two contest tabs, Labor v Coalition pressed, the
-       Share control reading "Share: Labor ⇄", unpressed;
+       Share control reading "Share: Labor’s ⇄", unpressed;
      - blurred focus: Space flips the Share side (button texts invert,
        the .rd-chead title swaps the sides), the page never moves;
      - selected contest tabs: after a mouse pick of EITHER tab (the
@@ -83,7 +83,7 @@ console.log("== landing anatomy ==");
   const r = await read();
   check(r.tabs.length === 2 && r.tabs[0].on && !r.tabs[1].on, "two contest tabs, Labor v Coalition pressed: " + JSON.stringify(r.tabs));
   check(r.shareLabel === "Share:", "the control is labelled Share: — got " + JSON.stringify(r.shareLabel));
-  check(r.shareText === "Labor ⇄" && !r.shareOn, "Share opens unpressed as Labor ⇄ — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Labor’s ⇄" && !r.shareOn, "Share opens unpressed as Labor ⇄ — got " + JSON.stringify(r.shareText));
   check(r.title.indexOf("Preferences to Labor over the Coalition") === 0, "the title names the Labor side: " + r.title);
 }
 
@@ -92,12 +92,12 @@ console.log("== blurred focus: Space flips the Share side ==");
   const y0 = (await read()).y;
   await space();
   let r = await read();
-  check(r.shareText === "Coalition ⇄" && r.shareOn, "Space flipped Share to Coalition ⇄ — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Coalition’s ⇄" && r.shareOn, "Space flipped Share to Coalition ⇄ — got " + JSON.stringify(r.shareText));
   check(r.title.indexOf("Preferences to the Coalition over Labor") === 0, "the title swapped sides: " + r.title);
   check(r.y === y0, "the page never scrolled while claimed (y " + y0 + " -> " + r.y + ")");
   await space();
   r = await read();
-  check(r.shareText === "Labor ⇄" && !r.shareOn, "a second Space flipped Share back — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Labor’s ⇄" && !r.shareOn, "a second Space flipped Share back — got " + JSON.stringify(r.shareText));
 }
 
 console.log("== the selected contest tab owns Space the flip's way ==");
@@ -112,21 +112,21 @@ console.log("== the selected contest tab owns Space the flip's way ==");
   const y0 = r.y;
   await space();
   r = await read();
-  check(r.shareText === "One Nation ⇄" && r.shareOn, "Space from the selected One Nation tab flipped Share — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "One Nation’s ⇄" && r.shareOn, "Space from the selected One Nation tab flipped Share — got " + JSON.stringify(r.shareText));
   check(r.title.indexOf("Preferences to One Nation over Labor") === 0, "the One Nation chart's title swapped sides: " + r.title);
   check(r.tabs[1].on, "the contest pick stayed put (still Labor v One Nation)");
   check(r.focused && r.focused.indexOf("Labor v One Nation") === 0, "the tab kept its focus — got " + JSON.stringify(r.focused));
   check(r.y === y0, "no scroll from the pressed tab (y " + y0 + " -> " + r.y + ")");
   await space();
   r = await read();
-  check(r.shareText === "Labor ⇄" && !r.shareOn, "and flipped back on the next Space — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Labor’s ⇄" && !r.shareOn, "and flipped back on the next Space — got " + JSON.stringify(r.shareText));
   await clickTab("Labor v Coalition");
   r = await read();
   check(r.tabs[0].on, "back on Labor v Coalition");
   const y1 = r.y;
   await space();
   r = await read();
-  check(r.shareText === "Coalition ⇄" && r.shareOn, "the Coalition tab's admission flips Share too — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Coalition’s ⇄" && r.shareOn, "the Coalition tab's admission flips Share too — got " + JSON.stringify(r.shareText));
   check(r.tabs[0].on && r.y === y1, "pick and scroll both stayed put on the Coalition tab");
 }
 
@@ -140,7 +140,7 @@ console.log("== day jobs kept ==");
   await space();
   let r = await read();
   check(r.tabs[1].on, "an unpressed contest tab keeps Space's day job (native activation picked Labor v One Nation)");
-  check(r.shareOn && r.shareText === "One Nation ⇄", "…and the share side sat that native pick out (the label just followed the pairing) — got " + JSON.stringify(r.shareText));
+  check(r.shareOn && r.shareText === "One Nation’s ⇄", "…and the share side sat that native pick out (the label just followed the pairing) — got " + JSON.stringify(r.shareText));
   // the elections menu keeps its Space (its native open); the menu only
   // mounts on the Coalition history, so pick it back first
   await clickTab("Labor v Coalition");
@@ -148,14 +148,14 @@ console.log("== day jobs kept ==");
   await wait(150);
   await space();
   r = await read();
-  check(r.shareText === "Coalition ⇄", "the elections menu kept its Space (Share untouched) — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Coalition’s ⇄", "the elections menu kept its Space (Share untouched) — got " + JSON.stringify(r.shareText));
   check(r.focused === null || r.focused.endsWith("|SELECT"), "the menu kept its focus — got " + JSON.stringify(r.focused));
   // the focused Share button natively taps itself exactly once
   await page.evaluate(() => document.querySelector("#flows-explained .ex-share .rd-pl-flip").focus());
   await wait(150);
   await space();
   r = await read();
-  check(r.shareText === "Labor ⇄" && !r.shareOn, "a focused Share button taps itself exactly once — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Labor’s ⇄" && !r.shareOn, "a focused Share button taps itself exactly once — got " + JSON.stringify(r.shareText));
 }
 
 console.log("== off the card, Space is the page's again ==");
@@ -174,7 +174,7 @@ console.log("== off the card, Space is the page's again ==");
   await space();
   const r = await read();
   check(r.y > y0, "Space scrolled the page with the claim released (y " + y0 + " -> " + r.y + ")");
-  check(r.shareText === "Labor ⇄", "the Share side sat untouched — got " + JSON.stringify(r.shareText));
+  check(r.shareText === "Labor’s ⇄", "the Share side sat untouched — got " + JSON.stringify(r.shareText));
 }
 
 check(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
