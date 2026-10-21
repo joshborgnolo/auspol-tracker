@@ -2132,6 +2132,17 @@ const RM_DIR_GROUPS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8")); }
   catch { return null; }
 })();
+/* Essential's national-mood breakdowns, banked by
+   extract-essential-direction.mjs out of the assimilated CSV mirror into
+   data/essential-direction-groups.json: Men/Women and 18–34/35–54/55+
+   right/wrong/unsure cells per wave, keyed by tracker date with dirRow –
+   the polls.json direction-row date the wave's TOTAL reconciled with,
+   which is the key the group select's dot tips join on. */
+const ESS_DIR_GROUPS = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8")); }
+  catch { return null; }
+})();
 /* Essential's national-mood splits, columned out of the assimilated CSV
    (data/essential-report.csv): every wave's trend table carries Male/Female
    and 18-34/35-54/55+ cuts beside the headline print – keyed here by the
@@ -2350,13 +2361,32 @@ const directionNow = (() => {
      of individual states", five mainland states). right only before the
      cache horizon; points ride `x` exactly (no estimation).
    · directionGroups – Roy Morgan's "Analysis by …" prose splits from
-     data/roymorgan-direction-groups.json: the gender pair, and the
-     voting-intention right/wrong shares (ALP's right share plus the
-     wrong-share of every other group). A fortnight that printed no cut
-     for a group leaves a gap in that group's series, not a zero.
+     data/roymorgan-direction-groups.json (the gender pair, and the
+     voting-intention right/wrong shares; ALP's right share plus the
+     wrong-share of every other group – a fortnight that printed no cut
+     for a group leaves a gap in that group's series, not a zero), and
+     Essential's banked mood splits from
+     data/essential-direction-groups.json (gender and age bands on the
+     wave field of every Essential wave: right/wrong/unsure cells; the
+     unsure cell never charts).
    · directionStateNote – the latest Roy Morgan release's printed state
      highest/lowest extremes; the full state table is paywalled, so the
-     extremes are the only state cut that exists. */
+     extremes are the only state cut that exists.
+
+   Tip provenance: every group/state series row that joins a polls.json
+   direction row carries that row's pollster / dateLabel / released /
+   sample fields, the exact fields TrendChart's dot tip reads off meta
+   (see directionPolls below for the same contract), so a group dot
+   identifies its wave – fieldwork window, n where a sample is on file,
+   and the click-through to the archive row – the way a headline dot
+   does. A banked month or wave with no row to join simply carries none
+   of the fields, and the render layer falls back to the month label. */
+const dirTipOf = (d) => ({
+  pollster: d.pollster,
+  dateLabel: fwLabel(d.dateStart, d.date),
+  released: d.date,
+  sample: POLL_BY_KEY.get(d.date + "|" + d.pollster)?.sample || d.sample || null,
+});
 const directionStateNote = (() => {
   if (!RM_DIR_GROUPS?.waves) return null;
   const dates = Object.keys(RM_DIR_GROUPS.waves).filter((d) => RM_DIR_GROUPS.waves[d]?.stateExtremes).sort();
@@ -2365,37 +2395,83 @@ const directionStateNote = (() => {
 })();
 const directionStates = (() => {
   if (!SEC_STATES?.series) return null;
+  // the states bank keys by month; the tip row resolves the wave-END month
+  // first, then the publication and fieldwork-start months (the same
+  // resolution the expanded-poll breakdown ledger uses)
+  const secTipByMonth = (() => {
+    const byMonth = new Map();
+    const pass = (read) => {
+      for (const d of DIR.filter((x) => x.pollster === "SEC Newgate")) {
+        const s = read(d);
+        if (s) { const ym = ymOf(String(s).slice(0, 10)); if (!byMonth.has(ym)) byMonth.set(ym, d); }
+      }
+    };
+    pass((d) => d.date); pass((d) => d.published); pass((d) => d.dateStart);
+    return byMonth;
+  })();
   const perState = {};
   for (const st of SEC_STATES.states || []) {
     const rows = SEC_STATES.series[st] || [];
     perState[st] = {
       label: st,
+      source: "SEC Newgate",
       head: rows.length ? rows[rows.length - 1] : null,
-      series: rows.map((r) => ({ ym: r.month, x: mx(r.month), right: r.right, wrong: r.wrong ?? null })),
+      series: rows.map((r) => ({
+        ym: r.month, x: mx(r.month), right: r.right, wrong: r.wrong ?? null,
+        ...(secTipByMonth.get(r.month) ? dirTipOf(secTipByMonth.get(r.month)) : {}),
+      })),
     };
   }
   return perState;
 })();
 const directionGroups = (() => {
-  if (!RM_DIR_GROUPS?.waves) return null;
   const out = {};
-  const push = (label, date, right, wrong) => {
-    (out[label] ??= { label, source: "Roy Morgan", series: [] }).series.push({
-      date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
-    });
+  const dirRowByDate = (pollster) => {
+    const m = new Map();
+    for (const d of DIR.filter((x) => x.pollster === pollster)) m.set(d.date, d);
+    return m;
   };
-  for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
-    if (w.gender) {
-      push("Men", date, w.gender.Men.r, w.gender.Men.w);
-      push("Women", date, w.gender.Women.r, w.gender.Women.w);
+  if (RM_DIR_GROUPS?.waves) {
+    const rmRows = dirRowByDate("Roy Morgan");
+    const push = (label, dim, date, right, wrong) => {
+      (out[label] ??= { label, source: "Roy Morgan", dim, series: [] }).series.push({
+        date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
+        ...(rmRows.has(date) ? dirTipOf(rmRows.get(date)) : {}),
+      });
+    };
+    for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
+      if (w.gender) {
+        push("Men", "gender", date, w.gender.Men.r, w.gender.Men.w);
+        push("Women", "gender", date, w.gender.Women.r, w.gender.Women.w);
+      }
+      if (w.vote) {
+        push("One Nation voters", "vote", date, null, w.vote["One Nation"].w);
+        push("Coalition voters", "vote", date, null, w.vote["L-NP"].w);
+        push("Other party voters", "vote", date, null, w.vote.Other.w);
+        push("Independent voters", "vote", date, null, w.vote.Independent.w);
+        push("Greens voters", "vote", date, null, w.vote.Greens.w);
+        push("Labor voters", "vote", date, w.vote.ALP.r ?? null, w.vote.ALP.w);
+      }
     }
-    if (w.vote) {
-      push("One Nation voters", date, null, w.vote["One Nation"].w);
-      push("Coalition voters", date, null, w.vote["L-NP"].w);
-      push("Other party voters", date, null, w.vote.Other.w);
-      push("Independent voters", date, null, w.vote.Independent.w);
-      push("Greens voters", date, null, w.vote.Greens.w);
-      push("Labor voters", date, w.vote.ALP.r ?? null, w.vote.ALP.w);
+  }
+  if (ESS_DIR_GROUPS?.waves) {
+    const essRows = dirRowByDate("Essential");
+    // Men/Women collide with Roy Morgan's group keys, so Essential's gender
+    // pair rides the suffixed key; the age bands collide with nothing
+    const push = (label, dim, date, cell, wave) => {
+      const row = wave.dirRow ? essRows.get(wave.dirRow) : null;
+      (out[label] ??= { label, source: "Essential", dim, series: [] }).series.push({
+        date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365,
+        right: cell.r, wrong: cell.w,
+        ...(row ? dirTipOf(row) : {}),
+      });
+    };
+    for (const [date, w] of Object.entries(ESS_DIR_GROUPS.waves)) {
+      push("Men (Essential)", "gender", date, w.Men, w);
+      push("Women (Essential)", "gender", date, w.Women, w);
+      push("18–34", "age", date, w["18–34"], w);
+      push("35–54", "age", date, w["35–54"], w);
+      push("55+", "age", date, w["55+"], w);
     }
   }
   return Object.keys(out).length ? out : null;

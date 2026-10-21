@@ -1817,16 +1817,18 @@ function RdDirection({ rangeId }) {
      branch is the original code path, unchanged. */
   const SEC_LABELS = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", SA: "South Australia", WA: "Western Australia" };
   const G = grpId ? (D.directionStates?.[grpId] || D.directionGroups?.[grpId] || null) : null;
-  const gSrc = grpId && D.directionStates?.[grpId] ? "SEC Newgate" : "Roy Morgan";
+  const gSrc = G ? G.source || "this pollster" : "";
   const gRaw = G ? G.series.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
   /* a group's right line draws only once it can be told from noise */
   const gHasRight = gRaw.filter((d) => d.right != null).length >= 2;
   const gPts = gRaw.map((d) => ({ ...d, right: gHasRight ? d.right : null }));
-  /* the dot tip credits a house and a date off meta (TrendChart reads
-     meta.pollster/dateLabel); a group reading printed for a month has no
-     sample n to ride along */
+  /* the dot tip credits a house, fieldwork window and sample off meta
+     (TrendChart reads meta.pollster/dateLabel/sample, and pollRowKey opens
+     the poll when meta carries pollster+released): rows gen-data joined to
+     a polls.json direction row ride the row whole; an unjoined month (SEC
+     Newgate before its direction rows began) falls back to the month label */
   const gDots = gRaw.flatMap((d) => {
-    const meta = { pollster: gSrc, dateLabel: monthLabelFull(d.ym) };
+    const meta = d.released ? d : { pollster: gSrc, dateLabel: monthLabelFull(d.ym) };
     return [
       d.right != null ? { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta } : null,
       d.wrong != null ? { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta } : null,
@@ -1835,10 +1837,18 @@ function RdDirection({ rangeId }) {
   const gVals = gPts.flatMap((p) => [p.right, p.wrong]).filter((v) => v != null);
   const gLo = gVals.length ? Math.floor((Math.min(...gVals) + 0.6) / 10) * 10 : lo;
   const gHi = gVals.length ? Math.max(Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10, gLo + 10) : hi;
+  /* the select's groups ride the emitters' source/dim tags, so a new house
+     or cut joins its own optgroup without this list moving */
+  const gBy = (src, dim, trim) => !D.directionGroups ? []
+    : Object.keys(D.directionGroups)
+        .filter((k) => D.directionGroups[k].source === src && D.directionGroups[k].dim === dim)
+        .map((k) => [k, trim ? k.replace(trim, "") : k]);
   const gGroups = [
     { label: "By state (SEC Newgate)", opts: (D.directionStates ? Object.keys(D.directionStates).map((k) => [k, SEC_LABELS[k] || k]) : []) },
-    { label: "By gender (Roy Morgan)", opts: (D.directionGroups ? ["Men", "Women"].filter((k) => D.directionGroups[k]).map((k) => [k, k]) : []) },
-    { label: "By vote (Roy Morgan)", opts: (D.directionGroups ? Object.keys(D.directionGroups).filter((k) => k !== "Men" && k !== "Women").map((k) => [k, k]) : []) },
+    { label: "By gender (Roy Morgan)", opts: gBy("Roy Morgan", "gender") },
+    { label: "By vote (Roy Morgan)", opts: gBy("Roy Morgan", "vote") },
+    { label: "By gender (Essential)", opts: gBy("Essential", "gender", " (Essential)") },
+    { label: "By age (Essential)", opts: gBy("Essential", "age") },
   ].filter((g) => g.opts.length);
   const gNote = D.directionStateNote
     ? "Roy Morgan’s latest release (" + D.monthNameFull(Number(D.directionStateNote.date.slice(5, 7))) + ") prints " + D.directionStateNote.highest.state
@@ -1888,7 +1898,7 @@ function RdDirection({ rangeId }) {
               { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: gPts.filter((d) => d.wrong != null).map((d) => ({ x: d.x, y: d.wrong })), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
               ...(gHasRight ? [{ id: "right", label: "Right direction", color: "var(--mood-pos)", points: gPts.filter((d) => d.right != null).map((d) => ({ x: d.x, y: d.right })), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" }] : []),
             ]}
-            spine={gPts.filter((d) => d.wrong != null).map((d) => ({ x: d.x, y: d.wrong }))} scatter={gDots.length ? gDots : undefined}
+            spine={gPts.filter((d) => d.wrong != null).map((d) => ({ x: d.x, y: d.wrong }))} scatter={gDots.length ? gDots : undefined} pollFacet="direction"
             tooltipTitle={(i) => { const s = gPts.filter((d) => d.wrong != null); return s[i] ? monthLabelFull(s[i].ym) : ""; }}
             fmt={(v) => v.toFixed(1)}
             copy={{ title: (SEC_LABELS[grpId] || grpId) + ": is the country heading in the right direction?",
@@ -1936,7 +1946,9 @@ function RdDirection({ rangeId }) {
           <>Every point above is a published reading for {SEC_LABELS[grpId] || grpId} printed in a {gSrc} release, taken as found – never house-adjusted, never smoothed.</>,
           gSrc === "Roy Morgan"
             ? <>Roy Morgan prints these splits only some fortnights, so the series has gaps where no cut was released. {gHasRight ? "" : "Where a release names only one share, the other cannot be pieced back from the national figures."}</>
-            : <>SEC Newgate asks about each state’s own direction, not the nation’s – so these readings sit beside, not inside, the national mood above.</>,
+            : gSrc === "Essential"
+              ? <>Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.</>
+              : <>SEC Newgate asks about each state’s own direction, not the nation’s – so these readings sit beside, not inside, the national mood above.</>,
         ]} />
       ) : (
         <HowTo paras={[

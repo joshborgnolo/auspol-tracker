@@ -2,7 +2,9 @@
 # Scheduled Essential Report update: extract -> assimilate (new waves when the
 # CSV changed; retro-fill of late-arriving fields — e.g. a wave's releaseUrl
 # once Essential publishes the release page after the charts — when the
-# extractor reports the report index drifted) -> if anything changed ->
+# extractor reports the report index drifted) -> direction-groups pass (the
+# CSV's national-mood breakdowns banked into data/essential-direction-groups.json,
+# warn-only; a quiet-slot move takes the sidecar commit path) -> if anything changed ->
 # validate -> render-card -> build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.essential.plist from
 # the copy in this directory). Every step logs one line to
@@ -123,6 +125,57 @@ elif echo "$EXTRACT_OUT" | grep -q '^updated .*report-index\.json'; then
   fi
 fi
 
+# Direction-groups pass: Essential's national-mood breakdowns (Men/Women,
+# 18–34/35–54/55+, per wave) live in the same committed CSV the extractor
+# refreshes, so .build/extract-essential-direction.mjs re-banks them into
+# data/essential-direction-groups.json every slot. Runs here — after the
+# assimilator, so a new wave's direction row is on file for the reconcile —
+# and warn-only like the poll pipeline's other sidecars: a guard trip is
+# logged, never blocks a poll commit.
+EDIR_MOVED=false
+EDIR_OUT="$(node .build/extract-essential-direction.mjs --apply 2>&1)"
+EDIR_CODE=$?
+EDIR_LAST="$(echo "$EDIR_OUT" | tail -1)"
+if [ $EDIR_CODE -ne 0 ]; then
+  # exit 2 = guard trip (band cell gone, wave cluster broke, reconcile fail)
+  log "WARN direction-groups extract (exit $EDIR_CODE): $EDIR_LAST"
+  echo "$EDIR_OUT" | grep '^ESS_DIR_GUARD ' | while IFS= read -r l; do log "direction-groups: $l"; done
+elif ! echo "$EDIR_LAST" | grep -q '^ESS_DIR_STATUS '; then
+  log "WARN direction-groups extract (no ESS_DIR_STATUS line): $EDIR_LAST"
+else
+  log "$EDIR_LAST"
+  if echo "$EDIR_LAST" | grep -q '"changed":true'; then
+    EDIR_MOVED=true
+  fi
+fi
+
+if [ "$DATA_CHANGED" = false ] && [ "$EDIR_MOVED" = true ]; then
+  # Sidecar wave: mood breakdowns banked on an otherwise quiet slot. They
+  # land in the page build, so validate + rebuild exactly like a poll change
+  # and commit the store alone.
+  log "direction-groups store moved; running validate/build/commit/push"
+  if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
+    log "FAIL validate (direction-groups); no commit made"
+    exit 1
+  fi
+  if ! refresh_site; then
+    log "FAIL build (direction-groups); no commit made"
+    exit 1
+  fi
+  EDIR_FILES=(data/essential-direction-groups.json "${SITE_FILES[@]}")
+  git add "${EDIR_FILES[@]}" || { log "FAIL git add"; exit 1; }
+  EDIR_MSG="Update Essential mood breakdowns $(date '+%Y-%m-%d')"
+  if ! git commit -m "$EDIR_MSG" >> "$LOG" 2>&1; then
+    log "FAIL git commit (direction-groups)"
+    exit 1
+  fi
+  if ! push_main "$EDIR_MSG" "${EDIR_FILES[@]}"; then
+    exit 1
+  fi
+  log "OK committed + pushed: $EDIR_MSG"
+  EDIR_MOVED=false
+fi
+
 # The crawl preflight's fingerprint (extract-essential-report.mjs) lives in
 # the repo: a fresh CI runner has no other memory of what it last read, so
 # a fingerprint that moved without any data change is committed on its own —
@@ -199,8 +252,9 @@ fi
 
 # essential-src has no tracked files (the extractor writes the CSV directly);
 # add it only if this run produced snapshots, so a fresh checkout doesn't fail
-# the add with "pathspec did not match".
-ESS_FILES=(data/essential-report.csv data/polls.json "${SITE_FILES[@]}")
+# the add with "pathspec did not match". The direction-groups store rides the
+# poll commit when a poll wave and a mood wave land together.
+ESS_FILES=(data/essential-report.csv data/polls.json data/essential-direction-groups.json "${SITE_FILES[@]}")
 git add "${ESS_FILES[@]}" || { log "FAIL git add"; exit 1; }
 [ -d .build/essential-src ] && git add .build/essential-src/ || true
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
