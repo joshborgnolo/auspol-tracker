@@ -51,7 +51,14 @@ for (const r of rows) {
   }
 }
 const bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8"));
-assert.equal(Object.keys(bt.federal).length, 6, "the back-test covers the six federal elections 2010-2025");
+assert.deepEqual(Object.keys(bt.federal).map(Number), [1996, 1998, 2001, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+  "the back-test covers the ten federal elections counted by division (2004 has no such count)");
+// 1984-93 and 2004: estimated only, from full distributions (1983's stopped at a majority)
+assert.deepEqual(Object.keys(bt.federal_hist).map(Number), [1984, 1987, 1990, 1993, 2004], "the estimated-only federal elections");
+for (const [y, d] of Object.entries(bt.federal_hist)) {
+  assert.ok(d.classic >= 130 && d.dropped.length <= 8, `${y}: ${d.classic} classic seats, ${d.dropped.length} dropped`);
+  assert.ok(d.oth && d.oth.err90 > 0, `${y}: others estimated with an error`);
+}
 for (const N of bt.settings.cal_n) assert.ok(bt.calibration[String(N)], `calibration has its ${N}-seat row`);
 
 // ---- what the chart is handed ----------------------------------------------
@@ -104,7 +111,18 @@ for (const [k, S] of Object.entries(FH)) {
   }
 }
 const B = FH.fed.backtest;
-assert.ok(B && B.elections === 6, "the federal back-test rides fed.backtest");
+assert.ok(B && B.elections === 10, "the federal back-test rides fed.backtest");
+// the federal chart: 1984-93 estimates (bars) ahead of the 1996-2025 counts (none)
+assert.deepEqual([...FH.fed.estYears], [1984, 1987, 1990, 1993], "the federal series' estimated years");
+assert.deepEqual([...FH.fed.years.slice(0, 5)], [1984, 1987, 1990, 1993, 1996], "estimates lead into the counts");
+FH.fed.years.forEach((y, i) => {
+  const isEst = y < 1996;
+  for (const b of ["grn", "oth"]) {
+    if (FH.fed[b][i] == null) continue;
+    assert.equal(FH.fed[b + "Err"][i] != null, isEst, `fed ${y} ${b}: a bar only on an estimate`);
+  }
+});
+assert.equal(FH.fed.grn[0], null, "no Greens flow in 1984 (no Greens party stood)");
 assert.ok(B.grn.model < B.grn.replay && B.oth.model < B.oth.replay,
   "the model still beats the replay it replaced, Greens and others alike");
 assert.ok(B.grn.model <= 1.5, `the Greens estimate stays within 1.5 points of the federal counts on average (${B.grn.model})`);
@@ -137,10 +155,13 @@ const inside = Math.abs(C.model.lib - 33.9) <= C.err90.lib && Math.abs(C.model.g
 assert.ok(art.includes(`The two differ by up to ${gap.toFixed(1)} points, ${inside ? "inside" : "outside"} the site&rsquo;s range`), "the SA comparison sentence matches the numbers");
 // the SA bars' sources: the 25-seat contest calibration and the Coalition-cell check
 assert.deepEqual([...bt.settings.contest_n], [C.seats], "the contest calibration runs at the contest's own seat count");
-assert.equal(Object.keys(bt.noncoal_check).length, 6, "the Coalition cell is checked on six federal elections");
+assert.equal(Object.keys(bt.noncoal_check).length, 10, "the Coalition cell is checked on the ten counted federal elections");
 const libMiss = Math.max(...Object.values(bt.noncoal_check).filter((d) => d.coal).map((d) => Math.abs(d.coal.model - d.coal.counted)));
 assert.ok(Math.abs(C.err90.lib - libMiss) < 0.006, "the Liberal bar is the check's largest miss");
 assert.ok(art.includes(`at ${C.model.minor.toFixed(1)}%, below independents`), "the minor-party figure in the prose is the estimator's");
+const dl = C.model.lib - 33.9;
+assert.ok(art.includes("The site puts Liberal voters " + (Math.abs(dl) < 0.3 ? "about where Bonham does" : dl > 0 ? "a little more Labor&rsquo;s way than Bonham does" : "a little less Labor&rsquo;s way than Bonham does")),
+  "the Liberal comparison with Bonham follows the estimate");
 
 console.log(`PASS: state flows – ${Object.keys(shown).length} states on the chart (${Object.entries(shown).map(([k, s]) => k + " " + s.size).join(", ")}), `
   + `back-test Greens ${B.grn.model} v replay ${B.grn.replay}, others ${B.oth.model} v ${B.oth.replay}, Queensland within ${B.qld}`);

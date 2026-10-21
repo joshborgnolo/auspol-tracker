@@ -73,7 +73,10 @@ OUT_JSON = os.path.join(ROOT, "data", "state-flows-backtest.json")
 LAM0 = 3e4               # contrast shrinkage per federal-size seat (ballot units)
 FED_SEAT = 104000.0      # mean formal ballots in a 2022/2025 federal seat
 EM_ITERS = 200
-FED_YEARS = (2010, 2013, 2016, 2019, 2022, 2025)
+# every federal election with a COUNT of each party's voters by division,
+# the back-test and calibration set: 1996-2001 from the AEC statistics packs
+# (tcp-<year>.json.gz, aec-tcp-history.py), 2007-2025 from its downloads
+FED_YEARS = (1996, 1998, 2001, 2007, 2010, 2013, 2016, 2019, 2022, 2025)
 CAL_N = (40, 50, 85)     # calibration seat counts: SA/Vic 2022, WA, Qld
 # ... and the Labor v One Nation contests' own size, calibrated apart so the
 # state lines' 40-seat floor (and the One Nation ballot floor) stay put
@@ -279,17 +282,72 @@ def _aec_rows(path):
 
 def aec_bucket(ab):
     ab = (ab or "").strip()
-    if ab == "ALP":
+    # CLR: Country Labor, Labor's banner in a handful of rural NSW seats at
+    # every election 2001-2013 (unmapped, those seats read as "other" finals)
+    if ab in ("ALP", "CLR"):
         return "alp"
     # LNQ: the 2010 distribution file's code for Queensland's LNP (its
     # flow file says LNP) - unmapped, its 30 seats read as "other" finalists
-    if ab in ("LP", "NP", "LNP", "LNQ", "CLP", "NAT", "LIB"):
+    # ... and the printed 1984-90 volumes' "Lib"/"NPA" (parse-fed-history.py)
+    if ab in ("LP", "NP", "LNP", "LNQ", "CLP", "NAT", "LIB", "Lib", "NPA"):
         return "coal"
-    if ab in ("GRN", "GVIC", "TG", "GWA"):
+    # every Greens party: 1990's printed "Grn", and 1993-2001's state
+    # parties (Australian Greens Victoria, Queensland Greens, Greens SA)
+    if ab in ("GRN", "GVIC", "TG", "GWA", "AGV", "QG", "GSA", "Grn"):
         return "grn"
     if ab in ("ON", "HAN"):
         return "onp"
     return "oth"
+
+
+# federal elections with full distributions but no count by division:
+# estimated only, like a state (1983's count stopped at a majority)
+HIST_YEARS = (1984, 1987, 1990, 1993, 2004)
+PACK_YEARS = (1996, 1998, 2001)
+
+
+def fed_truth_full(y):
+    """{division: {bucket: [to Labor, to the other finalist]}} - every
+    party's own first preferences, Coalition included, in seats Labor
+    reached the final two: the AEC's flow-by-division download (2007-2025)
+    or the statistics packs' Division Summary (1996-2001)."""
+    out = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
+    if y in PACK_YEARS:
+        for d, v in json.load(gzip.open(os.path.join(BUILD, "aec-flow-src", f"tcp-{y}.json.gz"))).items():
+            fin = [aec_bucket(c) for c in v["pair"]]
+            if "alp" not in fin:
+                continue
+            a = fin.index("alp")
+            for code, t1, t2 in v["from"]:
+                t = (t1, t2)
+                out[d][aec_bucket(code)][0] += t[a]
+                out[d][aec_bucket(code)][1] += t[1 - a]
+        return out
+    tcp = fed_paths(y)[1]
+    for r in (_aec_rows(tcp) if os.path.exists(tcp) else []):
+        if r["FromCandidateID"] == "0":
+            continue
+        tb = aec_bucket(r["ToCandidatePartyAb"])
+        out[r["DivisionNm"]][aec_bucket(r["FromCandidatePartyAb"])][0 if tb == "alp" else 1] += float(r["TransferCount"])
+    return out
+
+
+def hist_election(y):
+    """(seats, per-seat truth, dropped divisions) for a federal election
+    before 2007: the VTR download for 2004, parse-fed-history.py's
+    transcribed (1984-90) or HPPDOP (1993-2001) distributions otherwise."""
+    if y == 2004:
+        seats, truth = fed_election(y)
+        return seats, truth, []
+    ph = _load("ph", "parse-fed-history.py")
+    seats, dropped = {}, []
+    for d, p, why in ph.divisions_of(y):
+        if p is None:
+            dropped.append(d)
+            continue
+        cands = {c: (aec_bucket(code), fp) for c, (code, fp) in p["cands"].items()}
+        seats[d] = seat(cands, [(list(ex), dict(rec), float(exh)) for ex, rec, exh in p["steps"]])
+    return seats, {}, dropped
 
 
 def fed_paths(y):
@@ -301,6 +359,10 @@ def fed_paths(y):
 
 
 def fed_election(y):
+    if y in PACK_YEARS:
+        seats, _, _ = hist_election(y)
+        truth = {d: {b: v for b, v in t.items() if b not in ("alp", "coal")} for d, t in fed_truth_full(y).items()}
+        return seats, truth
     dop, tcp = fed_paths(y)
     raw = collections.defaultdict(lambda: collections.defaultdict(dict))
     party = {}
@@ -319,14 +381,8 @@ def fed_election(y):
             if ex:
                 steps.append((ex, {cid: t for cid, t in tr.items() if t > 0}, 0.0))
         seats[key] = seat(cands, steps)
-    truth = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
-    for r in _aec_rows(tcp):
-        if r["FromCandidateID"] == "0":
-            continue
-        fb, tb = aec_bucket(r["FromCandidatePartyAb"]), aec_bucket(r["ToCandidatePartyAb"])
-        if fb in ("alp", "coal"):
-            continue
-        truth[r["DivisionNm"]][fb][0 if tb == "alp" else 1] += float(r["TransferCount"])
+    # 2004 has no flow-by-division file: its seats come without a count
+    truth = {d: {b: v for b, v in t.items() if b not in ("alp", "coal")} for d, t in fed_truth_full(y).items()}
     return seats, truth
 
 
@@ -681,13 +737,7 @@ def noncoal_check(fed, fed_evs, params):
     out = {}
     for y in FED_YEARS:
         seats, _ = fed[y]
-        tcp = fed_paths(y)[1]
-        truth = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
-        for r in _aec_rows(tcp):
-            if r["FromCandidateID"] == "0":
-                continue
-            fb, tb = aec_bucket(r["FromCandidatePartyAb"]), aec_bucket(r["ToCandidatePartyAb"])
-            truth[r["DivisionNm"]][fb][0 if tb == "alp" else 1] += float(r["TransferCount"])
+        truth = fed_truth_full(y)
         idx = collections.defaultdict(dict)
         for e in fed_evs[y]:
             idx[e["seat"]][e["x"]] = e
@@ -766,7 +816,13 @@ def main():
     for y in FED_YEARS:
         evs[("fed", y)] = fed_evs[y]
         lam[("fed", y)] = lam_of(fed[y][0])
-    print(f"fitting {len(evs)} elections ({len(states)} state, {len(FED_YEARS)} federal) …", file=sys.stderr)
+    # 1984-2007: estimated like a state (no per-seat count before 2007),
+    # pooled with the rest
+    hist = {y: hist_election(y) for y in HIST_YEARS}
+    for y, (seats, _, _) in hist.items():
+        evs[("fedh", y)] = events(seats)
+        lam[("fedh", y)] = lam_of(seats)
+    print(f"fitting {len(evs)} elections ({len(states)} state, {len(FED_YEARS) + len(HIST_YEARS)} federal) …", file=sys.stderr)
     params = fit(evs, lam)
 
     federal = {}
@@ -794,6 +850,33 @@ def main():
     else:
         ctable = old["contest_calibration"]
     noncoal = noncoal_check(fed, fed_evs, params)
+
+    # the federal flows before the AEC's per-seat counts: classic-seat
+    # estimates with the calibration's error at their seat count, checked
+    # against what WAS counted - 1996-2001's classic-seat flows by party
+    # (national), 2007's flow by division
+    federal_hist = {}
+    for y, (seats, truth, dropped) in hist.items():
+        est = flows(seats, evs[("fedh", y)], params[("fedh", y)])
+        plain = flows(seats)
+        n_cl = sum(1 for k in seats if classic(seats[k]))
+        cnt = {}
+        if truth:
+            cnt = {b: [0.0, 0.0] for b in BUCKETS}
+            for k in seats:
+                if classic(seats[k]):
+                    for b, (u, v) in truth.get(k, {}).items():
+                        if b in cnt:
+                            cnt[b][0] += u
+                            cnt[b][1] += v
+        federal_hist[str(y)] = {"seats": len(seats), "classic": n_cl, "dropped": dropped, **{
+            b: {"model": round(pct(est[b]), 2), "replay": round(pct(plain[b]), 2),
+                "ballots": round(est[b][0] + est[b][1]), "err90": err90(table, b, n_cl),
+                **({"counted": round(pct(cnt[b]), 2)} if b in cnt and pct(cnt[b]) is not None else {})}
+            for b in BUCKETS if pct(est[b]) is not None}}
+        line = "  ".join(f"{b} {d['model']:.1f}" + (f" (counted {d['counted']:.1f})" if "counted" in d else "")
+                         for b, d in federal_hist[str(y)].items() if isinstance(d, dict) and "model" in d)
+        print(f"  federal {y} ({n_cl} classic of {len(seats)}, {len(dropped)} dropped): {line}", file=sys.stderr)
 
     rows, qld_check, nsw_check = [], {}, {}
     counted = nsw_counted()
@@ -850,10 +933,10 @@ def main():
         w.writerows(rows)
     with open(OUT_JSON, "w") as f:
         json.dump({"settings": {"lam0": LAM0, "fed_seat": FED_SEAT, "em_iters": EM_ITERS,
-                                "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in FED_YEARS],
+                                "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in sorted(HIST_YEARS + FED_YEARS)],
                                 "cal_n": list(CAL_N), "contest_n": list(CONTEST_N), "cal_reps": CAL_REPS},
                    "federal": federal, "calibration": table, "calibration_rows": cal_rows,
-                   "contest_calibration": ctable, "noncoal_check": noncoal,
+                   "contest_calibration": ctable, "noncoal_check": noncoal, "federal_hist": federal_hist,
                    "qld_check": qld_check, "nsw_check": nsw_check, "contests": contests,
                    "onp_min_ballots": onp_min_ballots(fed),
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},

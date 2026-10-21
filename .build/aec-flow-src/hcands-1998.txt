@@ -1,0 +1,1416 @@
+State;Division;Ballot Position;Member;Candidate;Party;Gender;Vote;Vote Percent;Swing
+NSW;Banks;1;;IACONO, Stephen;LP;M;24744;33.79;-5.70
+NSW;Banks;2;;MADDISON, Philip;HAN;M;8010;10.94;10.94
+NSW;Banks;3;;CHEN, Bin;UNI;M;2250;3.07;3.07
+NSW;Banks;4;;ARCHER, Greg;GRN;M;1075;1.47;1.47
+NSW;Banks;5;;BAILEY, Alison;DEM;F;3128;4.27;-3.33
+NSW;Banks;6;#;MELHAM, Daryl;ALP;M;32599;44.52;0.96
+NSW;Banks;7;;GRIGG, Brian;CTA;M;1422;1.94;1.94
+NSW;Banks;903;;;RARI;;0;0.00;-1.33
+NSW;Banks;904;;;AFI;;0;0.00;-5.19
+NSW;Banks;997;;;OTH;;0;0.00;-2.84
+NSW;Barton;1;#;MCCLELLAND, Robert;ALP;M;37382;49.61;1.23
+NSW;Barton;2;;TANG, Lin;UNI;M;3182;4.22;4.22
+NSW;Barton;3;;NELSON, Adam;GRN;M;1161;1.54;1.54
+NSW;Barton;4;;JORDAN, James;LP;M;26430;35.08;-6.09
+NSW;Barton;5;;BAIRD, Neil;HAN;M;5162;6.85;6.85
+NSW;Barton;6;;CHUNG, Craig;DEM;M;2028;2.69;-2.73
+NSW;Barton;901;;;CTA;;0;0.00;-3.20
+NSW;Barton;997;;;OTH;;0;0.00;-1.83
+NSW;Bennelong;1;;PARKER, Jamie;GRN;M;2306;3.07;0.60
+NSW;Bennelong;2;;KING, Gordon;HAN;M;3099;4.13;4.13
+NSW;Bennelong;3;#;HOWARD, John Winston;LP;M;36976;49.24;-4.59
+NSW;Bennelong;4;;DROULERS, Julien Paul;IND;M;128;0.17;-0.08
+NSW;Bennelong;5;;LUNG, David;IND;M;1319;1.76;1.76
+NSW;Bennelong;6;;CARR, Tim;NLP;M;123;0.16;-0.14
+NSW;Bennelong;7;;AUSSIE-STONE, Marcus;IND;M;71;0.09;0.09
+NSW;Bennelong;8;;SPRINGETT, Bob;DEM;M;3504;4.67;-1.57
+NSW;Bennelong;9;;PISS THE FAMILY COURT-LEGAL AID, Prime Minister John;ACS;M;183;0.24;0.24
+NSW;Bennelong;10;;KEMP, Sarah;UNI;F;2923;3.89;3.89
+NSW;Bennelong;11;;GOLLAN, William Edward;NAN;M;341;0.45;-1.28
+NSW;Bennelong;12;;DAWSON, John;IND;M;186;0.25;-0.03
+NSW;Bennelong;13;;MAHON, Wendy;ALP;F;23929;31.87;-0.29
+NSW;Bennelong;903;;;AFI;;0;0.00;-2.61
+NSW;Bennelong;997;;;OTH;;0;0.00;-0.15
+NSW;Berowra;1;;STEWART, Wayne;HAN;M;4788;6.03;6.03
+NSW;Berowra;2;;TEUBEN, Bernard;DEM;M;5255;6.62;-0.82
+NSW;Berowra;3;#;RUDDOCK, Philip;LP;M;43180;54.36;-4.24
+NSW;Berowra;4;;NANNELLI, Owen;CTA;M;1893;2.38;2.38
+NSW;Berowra;5;;BURKE, Andrew;GRN;M;2561;3.22;0.05
+NSW;Berowra;6;;MCCARROLL, Nola;ALP;F;21763;27.40;5.84
+NSW;Berowra;905;;;AFI;;0;0.00;-2.54
+NSW;Berowra;907;;;NLP;;0;0.00;-0.18
+NSW;Berowra;997;;;OTH;;0;0.00;-6.51
+NSW;Blaxland;1;#;HATTON, Michael John;ALP;M;44096;61.42;2.71
+NSW;Blaxland;2;;HUA, Matthew;DEM;M;1733;2.41;-1.05
+NSW;Blaxland;3;;LAURENCE, Kylie Mary;CTA;F;1623;2.26;0.93
+NSW;Blaxland;4;;DONNELLY, Benjamin;GRN;M;1107;1.54;1.54
+NSW;Blaxland;5;;SHELLEY, Maureen;LP;F;15649;21.80;-9.25
+NSW;Blaxland;6;;ABOU-GHAIDA, Hussein;HAN;M;5052;7.04;7.04
+NSW;Blaxland;7;;HASSAPIS, Harold;UNI;M;2536;3.53;3.53
+NSW;Blaxland;904;;;AFI;;0;0.00;-2.75
+NSW;Blaxland;907;;;NLP;;0;0.00;-0.25
+NSW;Blaxland;997;;;OTH;;0;0.00;-2.45
+NSW;Bradfield;1;;KIELY, Alexandra Louisa;NLP;F;412;0.56;0.27
+NSW;Bradfield;2;#;NELSON, Brendan;LP;M;47725;64.37;-0.38
+NSW;Bradfield;3;;WEBECK, Robert;HAN;M;2832;3.82;3.82
+NSW;Bradfield;4;;ALLAS, Marc;GRN;M;2218;2.99;-0.47
+NSW;Bradfield;5;;RATCLIFFE, Margaret;CTA;F;1228;1.66;-0.10
+NSW;Bradfield;6;;KAILAINATHAN, Nadesu;ALP;M;13937;18.80;2.99
+NSW;Bradfield;7;;MORRIS, Carmel Monique Duryea;DEM;F;5791;7.81;-1.46
+NSW;Bradfield;901;;;AFI;;0;0.00;-3.45
+NSW;Bradfield;997;;;OTH;;0;0.00;-1.23
+NSW;Calare;1;;GLEESON, Martin;HAN;M;7954;10.92;10.92
+NSW;Calare;2;#;ANDREN, Peter;IND;M;29522;40.55;11.18
+NSW;Calare;3;;SLOANE, Garry;LP;M;7640;10.49;-5.24
+NSW;Calare;4;;LAMBERT, Joan;GRN;F;676;0.93;-0.85
+NSW;Calare;5;;BLUME, Rod;NP;M;8556;11.75;-9.04
+NSW;Calare;6;;SAUL, Ben;DEM;M;581;0.80;-0.36
+NSW;Calare;7;;SIMPSON, David;CEC;M;168;0.23;0.23
+NSW;Calare;8;;CORKIN, Terence;ALP;M;17425;23.93;-5.03
+NSW;Calare;9;;EDWARDS, Nelle;UNI;F;290;0.40;0.40
+NSW;Calare;901;;;CTA;;0;0.00;-1.97
+NSW;Calare;906;;;NLP;;0;0.00;-0.23
+NSW;Charlton;1;;YOUNG, Pamela;HAN;F;9664;12.03;12.03
+NSW;Charlton;2;;GOURLAY, Ralph;CTA;M;2494;3.11;3.11
+NSW;Charlton;3;;ROSS, Nathan;GRN;M;2679;3.34;-1.66
+NSW;Charlton;4;;BISGROVE, Stephen;DEM;M;3689;4.59;-3.80
+NSW;Charlton;5;#;HOARE, Kelly;ALP;F;39604;49.32;-0.68
+NSW;Charlton;6;;GATGENS, Bruce;LP;M;22175;27.61;-5.86
+NSW;Charlton;904;;;AFI;;0;0.00;-3.14
+NSW;Chifley;1;;OWEN, Andrew;DEM;M;3595;4.90;-4.15
+NSW;Chifley;2;;WYNESS, Joseph;CTA;M;1520;2.07;-0.68
+NSW;Chifley;3;;VINCENT, Dave;IND;M;761;1.04;1.04
+NSW;Chifley;4;;NOLAN, Robert Wayne;GRN;M;1014;1.38;1.38
+NSW;Chifley;5;;COLES, John;LP;M;14485;19.73;-7.11
+NSW;Chifley;6;#;PRICE, Roger;ALP;M;43496;59.26;1.30
+NSW;Chifley;7;;DAMJANOVIC, Joe;HAN;M;7400;10.08;10.08
+NSW;Chifley;8;;RAZAVIKASHAN, Zahra;NLP;F;162;0.22;-0.66
+NSW;Chifley;9;;PIO, Aooe Boyd;UNI;M;969;1.32;1.32
+NSW;Chifley;997;;;OTH;;0;0.00;-2.52
+NSW;Cook;1;;ABDURAHMAN, Zanthe;UNI;F;1103;1.49;1.49
+NSW;Cook;2;#;BAIRD, Bruce;LP;M;37075;50.22;-4.88
+NSW;Cook;3;;RICHARDSON, Terri;DEM;F;3147;4.26;-3.86
+NSW;Cook;4;;KAYE, John;GRN;M;1556;2.11;2.11
+NSW;Cook;5;;YOUNG, Peri;ALP;F;22850;30.95;-0.44
+NSW;Cook;6;;BOEHM, Darren;IND;M;997;1.35;1.35
+NSW;Cook;7;;SMITH, Malcolm;CTA;M;948;1.28;1.28
+NSW;Cook;8;;KIMBERLEY, Gareth;HAN;M;6144;8.32;8.32
+NSW;Cook;902;;;RARI;;0;0.00;-3.96
+NSW;Cook;997;;;OTH;;0;0.00;-1.43
+NSW;Cowper;1;;CRANNY, Jillian;GRN;F;2960;4.04;-2.20
+NSW;Cowper;2;;SEKFY, Paul;ALP;M;24213;33.02;1.03
+NSW;Cowper;3;;WILLEY, John;HAN;M;11234;15.32;15.32
+NSW;Cowper;4;;CORBEN, Paul Anthony;DEM;M;2570;3.50;-1.98
+NSW;Cowper;5;#;NEHL, Garry;NP;M;30810;42.01;-14.28
+NSW;Cowper;6;;SPENCER, Mark;IND;M;1550;2.11;2.11
+NSW;Cunningham;1;;CURTIS, John;HAN;M;5378;7.57;7.57
+NSW;Cunningham;2;;PERROTT, Margaret;DSL;F;663;0.93;0.93
+NSW;Cunningham;3;;COLUCCIO, Frank;IND;M;515;0.73;0.73
+NSW;Cunningham;4;;ROBINSON, Les;GRN;M;3158;4.45;-1.39
+NSW;Cunningham;5;;IVANEZA, Stephen Zeljko;DEM;M;4108;5.79;0.80
+NSW;Cunningham;6;;VAN DER HORN, Jennifer Cynthia;UNI;F;550;0.77;0.77
+NSW;Cunningham;7;#;MARTIN, Stephen;ALP;M;37592;52.94;0.35
+NSW;Cunningham;8;;AKHURST, Alan;LP;M;17285;24.34;-5.47
+NSW;Cunningham;9;;O'NEILL, Robert;CTA;M;1755;2.47;-0.16
+NSW;Cunningham;902;;;NLP;;0;0.00;-0.45
+NSW;Cunningham;997;;;OTH;;0;0.00;-3.69
+NSW;Dobell;1;#;LEE, Michael;ALP;M;34770;45.26;1.40
+NSW;Dobell;2;;RUSSELL, Karen;CTA;F;1564;2.04;0.26
+NSW;Dobell;3;;BECKETT, June;HAN;F;7300;9.50;9.50
+NSW;Dobell;4;;PARKER, David;LP;M;29014;37.77;-5.54
+NSW;Dobell;5;;MOTT, David;DEM;M;2546;3.31;-3.80
+NSW;Dobell;6;;DWYER, Philip;GRN;M;1626;2.12;2.12
+NSW;Dobell;903;;;AFI;;0;0.00;-2.92
+NSW;Dobell;997;;;OTH;;0;0.00;-1.02
+NSW;Eden-Monaro;1;#;NAIRN, Gary;LP;M;31654;43.25;-2.70
+NSW;Eden-Monaro;2;;WHAN, Steve;ALP;M;28692;39.21;1.30
+NSW;Eden-Monaro;3;;MCMILLAN, Dan;DEM;M;3343;4.57;0.98
+NSW;Eden-Monaro;4;;MILLER, Adam;HAN;M;7004;9.57;9.57
+NSW;Eden-Monaro;5;;BEAUMONT, Rosemary;GRN;F;2301;3.14;-0.39
+NSW;Eden-Monaro;6;;HARRIOTT, Gordon Joseph;CEC;M;188;0.26;0.26
+NSW;Eden-Monaro;901;;;AFI;;0;0.00;-1.90
+NSW;Eden-Monaro;902;;;NLP;;0;0.00;-0.28
+NSW;Eden-Monaro;907;;;CTA;;0;0.00;-0.85
+NSW;Eden-Monaro;997;;;OTH;;0;0.00;-5.99
+NSW;Farrer;1;;VOSS, Vivien;ALP;F;16489;23.82;-0.85
+NSW;Farrer;2;#;FISCHER, Tim;NP;M;36602;52.87;-13.46
+NSW;Farrer;3;;SHARP, Rohan;DEM;M;2940;4.25;-0.03
+NSW;Farrer;4;;FURLAN, Maurice;ACS;M;240;0.35;0.35
+NSW;Farrer;5;;BOYD, Alan;CEC;M;329;0.48;0.48
+NSW;Farrer;6;;MCKINNON, Don;HAN;M;9664;13.96;13.96
+NSW;Farrer;7;;DUNCAN-STRELEC, Amanda;IND;F;2234;3.23;3.23
+NSW;Farrer;8;;BRODERICK, Cliff;FST;M;728;1.05;1.05
+NSW;Farrer;902;;;CTA;;0;0.00;-1.47
+NSW;Farrer;997;;;OTH;;0;0.00;-3.25
+NSW;Fowler;1;#;IRWIN, Julia;ALP;F;49472;61.69;0.63
+NSW;Fowler;2;;DOONER, Lorna;LP;F;13705;17.09;-9.31
+NSW;Fowler;3;;SU, Andrew;UNI;M;8532;10.64;10.64
+NSW;Fowler;4;;SMITH, Rodney;HAN;M;5886;7.34;7.34
+NSW;Fowler;5;;STEVENS, Mark A;DEM;M;2603;3.25;-4.12
+NSW;Fowler;903;;;AFI;;0;0.00;-4.19
+NSW;Fowler;904;;;NLP;;0;0.00;-0.99
+NSW;Gilmore;1;;RYAN, Steve;CTA;M;1481;2.00;0.44
+NSW;Gilmore;2;#;GASH, Joanna;LP;F;33390;45.09;-5.42
+NSW;Gilmore;3;;FRASER, Peter D;DEM;M;2444;3.30;-1.50
+NSW;Gilmore;4;;BANGE, Jane;GRN;F;2020;2.73;-0.11
+NSW;Gilmore;5;;MCCARTHY, Sandra;ALP;F;26509;35.80;-2.51
+NSW;Gilmore;6;;DELL, Tom;HAN;M;8206;11.08;11.08
+NSW;Gilmore;903;;;NLP;;0;0.00;-0.31
+NSW;Gilmore;997;;;OTH;;0;0.00;-1.66
+NSW;Grayndler;1;;ARMANI, Michael;LP;M;15628;20.73;-2.87
+NSW;Grayndler;2;;HALE, Sylvia;NAN;F;2816;3.74;-9.87
+NSW;Grayndler;3;;ROBERTS, Sean;GRN;M;3373;4.47;-0.11
+NSW;Grayndler;4;;CUMMINGS, Katherine Fiona;DEM;F;4301;5.70;0.72
+NSW;Grayndler;5;#;ALBANESE, Anthony;ALP;M;41971;55.67;5.19
+NSW;Grayndler;6;;GAO, Ning;UNI;M;3621;4.80;4.80
+NSW;Grayndler;7;;WEBB, Warren;HAN;M;2342;3.11;3.11
+NSW;Grayndler;8;;KARADJIS, Michael;DSL;M;535;0.71;0.71
+NSW;Grayndler;9;;ROBINSON, Michael D;CTA;M;630;0.84;-0.19
+NSW;Grayndler;10;;RYDER, John;NLP;M;177;0.23;-0.20
+NSW;Grayndler;997;;;OTH;;0;0.00;-1.29
+NSW;Greenway;1;;BAWDEN, Bob;CTA;M;3292;4.24;0.99
+NSW;Greenway;2;#;MOSSFIELD, Frank;ALP;M;36010;46.43;2.74
+NSW;Greenway;3;;HOWDEN, Jocelyn;GRN;F;1459;1.88;1.88
+NSW;Greenway;4;;CROSS, Mathew;LP;M;23865;30.77;-7.27
+NSW;Greenway;5;;NIXON, Bill;HAN;M;7774;10.02;10.02
+NSW;Greenway;6;;DHILLON, Salvinder;IND;M;586;0.76;0.76
+NSW;Greenway;7;;BONUEDI, Reynolds;UNI;M;1082;1.39;1.39
+NSW;Greenway;8;;REDDY, Peter;DEM;M;3497;4.51;-3.78
+NSW;Greenway;901;;;NLP;;0;0.00;-2.17
+NSW;Greenway;906;;;AFI;;0;0.00;-4.56
+NSW;Gwydir;1;#;ANDERSON, John;NP;M;30829;46.14;-16.18
+NSW;Gwydir;2;;PAXTON, Derrick;CTA;M;1106;1.66;1.66
+NSW;Gwydir;3;;MURNAIN, Anne;ALP;F;17773;26.60;-1.67
+NSW;Gwydir;4;;GRAHAM, Ken;DEM;M;1624;2.43;-2.79
+NSW;Gwydir;5;;PERRETT, Jim;IND;M;856;1.28;-2.90
+NSW;Gwydir;6;;JOHNS, Bob;HAN;M;13875;20.77;20.77
+NSW;Gwydir;7;;EDWARDS, Gary;IND;M;747;1.12;1.12
+NSW;Hughes;1;;MCGOLDRICK, Jim;IND;M;2069;2.54;2.54
+NSW;Hughes;2;#;VALE, Danna;LP;F;38199;46.97;-2.01
+NSW;Hughes;3;;LENTERN, Jo-Anne;GRN;F;2224;2.73;-0.49
+NSW;Hughes;4;;KUNATHAI, Suthep;UNI;M;655;0.81;0.81
+NSW;Hughes;5;;BOWEN, Jim;ACS;M;211;0.26;0.26
+NSW;Hughes;6;;HILL, David;ALP;M;27711;34.07;-3.98
+NSW;Hughes;7;;BLACKBURN, Adrian;DEM;M;3096;3.81;-2.00
+NSW;Hughes;8;;HEALD, Martin;RPA;M;148;0.18;0.18
+NSW;Hughes;9;;LOWDER, Reginald Lindsay;HAN;M;7020;8.63;8.63
+NSW;Hughes;904;;;CTA;;0;0.00;-2.01
+NSW;Hughes;997;;;OTH;;0;0.00;-1.92
+NSW;Hume;1;;GREEN, Jan;GRN;F;1560;2.26;-0.36
+NSW;Hume;2;;HICKSON, Wayne;HAN;M;7471;10.80;10.80
+NSW;Hume;3;;VEITCH, Mick;ALP;M;22466;32.49;-2.28
+NSW;Hume;4;;FERGUSON, Christine;NP;F;6433;9.30;-47.74
+NSW;Hume;5;;FOWLER, Philip;IND;M;413;0.60;0.60
+NSW;Hume;6;;COX, Dave;IND;M;551;0.80;0.80
+NSW;Hume;7;;MCCLUNG, Jean;CEC;F;142;0.21;0.21
+NSW;Hume;8;#;SCHULTZ, Alby;LP;M;28299;40.92;40.92
+NSW;Hume;9;;BUTLER, Greg;DEM;M;1817;2.63;-2.95
+NSW;Hunter;1;;BENNISON, Rod;DEM;M;2278;3.18;-1.91
+NSW;Hunter;2;;MEDDOWS, Peter;FST;M;296;0.41;0.41
+NSW;Hunter;3;;COOK, Terry;SEP;M;152;0.21;0.21
+NSW;Hunter;4;#;FITZGIBBON, Joel;ALP;M;39187;54.63;3.88
+NSW;Hunter;5;;MCLEAN, Cherrilyn;LP;F;11919;16.62;16.62
+NSW;Hunter;6;;RYAN, James;GRN;M;1433;2.00;-2.15
+NSW;Hunter;7;;LAWLER, Ann;CEC;F;362;0.50;0.50
+NSW;Hunter;8;;MACAULAY, Rob;NP;M;7976;11.12;-25.92
+NSW;Hunter;9;;CULLEY, Darren;HAN;M;8131;11.33;11.33
+NSW;Hunter;997;;;OTH;;0;0.00;-2.99
+NSW;Kingsford-Smith;1;;FAULKNER, Tio;LP;M;21852;30.54;-4.48
+NSW;Kingsford-Smith;2;#;BRERETON, Laurie;ALP;M;37123;51.87;0.30
+NSW;Kingsford-Smith;3;;HARALAMBOUS, Tatiana;UNI;F;2698;3.77;3.77
+NSW;Kingsford-Smith;4;;CASWELL, Allan;DEM;M;2723;3.81;-3.87
+NSW;Kingsford-Smith;5;;MATSON, Murray;GRN;M;2505;3.50;-0.81
+NSW;Kingsford-Smith;6;;MCEWEN, Jack;HAN;M;4167;5.82;5.82
+NSW;Kingsford-Smith;7;;GORYACHEV, Vladimir;IND;M;495;0.69;0.69
+NSW;Kingsford-Smith;902;;;NLP;;0;0.00;-0.67
+NSW;Kingsford-Smith;997;;;OTH;;0;0.00;-0.74
+NSW;Lindsay;1;;GRIM-REAPER, Steve;IND;M;1043;1.36;1.36
+NSW;Lindsay;2;;ACKER, Sidney;UNI;M;475;0.62;0.62
+NSW;Lindsay;3;;LEAR, Stephen;DEM;M;2221;2.91;-3.68
+NSW;Lindsay;4;;EYKAMP, Jean M;CTA;F;1047;1.37;-0.79
+NSW;Lindsay;5;;LIPMAN, David;IND;M;166;0.22;0.22
+NSW;Lindsay;6;;EDWARDS, Lesley;GRN;F;1518;1.99;-2.42
+NSW;Lindsay;7;;O'TOOLE, Cathy;ALP;F;29903;39.12;-1.20
+NSW;Lindsay;8;#;KELLY, Jackie;LP;F;31872;41.70;-0.82
+NSW;Lindsay;9;;IVOR, F;IND;M;126;0.16;0.16
+NSW;Lindsay;10;;PUTRA, Rick;HAN;M;7621;9.97;9.97
+NSW;Lindsay;11;;BAILEY, Dion James;IND;M;446;0.58;0.58
+NSW;Lindsay;904;;;AFI;;0;0.00;-2.73
+NSW;Lindsay;997;;;OTH;;0;0.00;-1.28
+NSW;Lowe;1;;SICARI, Vince;NAN;M;1603;2.16;-0.78
+NSW;Lowe;2;;ZAMMIT, Paul;;M;11700;15.77;15.77
+NSW;Lowe;3;;MEIKLE, Jeff;DEM;M;1714;2.31;-2.01
+NSW;Lowe;4;;LEE, Robert David;LP;M;24617;33.18;-13.50
+NSW;Lowe;5;;VERCO, Natasha;GRN;F;1300;1.75;-0.13
+NSW;Lowe;6;;WILKINSON, Gary;NLP;M;80;0.11;-0.17
+NSW;Lowe;7;;WRIGHT, John;HAN;M;2768;3.73;3.73
+NSW;Lowe;8;#;MURPHY, John;ALP;M;26730;36.03;-3.07
+NSW;Lowe;9;;DAVIES, Owen;CTA;M;597;0.80;-0.27
+NSW;Lowe;10;;WONG, Chris;UNI;M;2813;3.79;3.79
+NSW;Lowe;11;;MAISANO, Giancarlo;IND;M;267;0.36;0.36
+NSW;Lowe;997;;;OTH;;0;0.00;-3.73
+NSW;Lyne;1;;SIMMS, Terrence Lloyd;IND;M;984;1.29;1.29
+NSW;Lyne;2;;JACOBI, Carrie;GRN;F;1501;1.97;-1.34
+NSW;Lyne;3;;GRIEVES, Vicki;ALP;F;22456;29.51;0.50
+NSW;Lyne;4;;MULDOON, Graeme Robert;CEC;M;197;0.26;0.26
+NSW;Lyne;5;;DANTON, Ray;HAN;M;9011;11.84;11.84
+NSW;Lyne;6;#;VAILE, Mark;NP;M;38812;51.00;-7.85
+NSW;Lyne;7;;QUARTLY, Allan;DEM;M;1974;2.59;-1.92
+NSW;Lyne;8;;WATTS, Barry Joseph;CTA;M;1166;1.53;1.53
+NSW;Lyne;902;;;AFI;;0;0.00;-4.32
+NSW;Macarthur;1;#;FAHEY, John;LP;M;40395;47.75;-5.62
+NSW;Macarthur;2;;BANASIK, Michael;ALP;M;28495;33.69;1.67
+NSW;Macarthur;3;;WOOD, Michelle;GRN;F;2692;3.18;0.40
+NSW;Macarthur;4;;ALM, Damian;HAN;M;9246;10.93;10.93
+NSW;Macarthur;5;;KAUFMANN, Anthony;DEM;M;3761;4.45;-0.39
+NSW;Macarthur;904;;;AFI;;0;0.00;-2.72
+NSW;Macarthur;997;;;OTH;;0;0.00;-4.26
+NSW;Mackellar;1;;ELLIS, Bob;IND;M;4729;6.35;6.35
+NSW;Mackellar;2;;OCKENDEN, Trevor;GRN;M;2500;3.36;-0.97
+NSW;Mackellar;3;;DORIC, Stephen;NLP;M;193;0.26;0.07
+NSW;Mackellar;4;#;BISHOP, Bronwyn;LP;F;39966;53.68;-0.98
+NSW;Mackellar;5;;DIMOND, Vicki;DEM;F;7104;9.54;-1.40
+NSW;Mackellar;6;;WEBECK, John;HAN;M;5355;7.19;7.19
+NSW;Mackellar;7;;LORENTZEN, Nick;ALP;M;14605;19.62;0.11
+NSW;Mackellar;902;;;CTA;;0;0.00;-1.83
+NSW;Mackellar;903;;;AFI;;0;0.00;-3.89
+NSW;Mackellar;906;;;RARI;;0;0.00;-0.84
+NSW;Mackellar;997;;;OTH;;0;0.00;-3.81
+NSW;Macquarie;1;;GRIGG, Shirley;ACH;F;1510;1.99;1.99
+NSW;Macquarie;2;#;BARTLETT, Kerry;LP;M;32432;42.74;-5.36
+NSW;Macquarie;3;;PENNY, Michael T;NLP;M;222;0.29;0.29
+NSW;Macquarie;4;;SHEATHER, Les;HAN;M;7870;10.37;10.37
+NSW;Macquarie;5;;DEAHM, Maggie;ALP;F;26391;34.78;1.15
+NSW;Macquarie;6;;DOUST, Adele;GRN;F;2563;3.38;-0.42
+NSW;Macquarie;7;;RICKARD, Jon;DEM;M;4895;6.45;-1.92
+NSW;Macquarie;905;;;CTA;;0;0.00;-2.40
+NSW;Macquarie;907;;;AFI;;0;0.00;-2.47
+NSW;Macquarie;997;;;OTH;;0;0.00;-1.24
+NSW;Mitchell;1;;ELLARD, Anthony;ALP;M;16263;21.26;2.10
+NSW;Mitchell;2;;GREGORY, Ken;CTA;M;1235;1.61;1.61
+NSW;Mitchell;3;;BURKE, Stephen;HAN;M;5090;6.65;6.65
+NSW;Mitchell;4;;TAYLOR, Cindy;GRN;F;1719;2.25;2.25
+NSW;Mitchell;5;#;CADMAN, Alan;LP;M;46203;60.40;-7.03
+NSW;Mitchell;6;;UZUNOSKI, Ilo;UNI;M;1988;2.60;2.60
+NSW;Mitchell;7;;MCAULIFFE, Helen;DEM;F;3852;5.04;-3.20
+NSW;Mitchell;8;;LYONS, Michael Francis;NLP;M;145;0.19;-0.28
+NSW;Mitchell;901;;;AFI;;0;0.00;-3.73
+NSW;Mitchell;903;;;RARI;;0;0.00;-0.97
+NSW;Newcastle;1;;CRITICOS, Harry;IND;M;2718;4.17;4.17
+NSW;Newcastle;2;;JACOBI, Carrie;GRN;F;5965;9.15;0.42
+NSW;Newcastle;3;#;MORRIS, Allan;ALP;M;31441;48.21;-1.94
+NSW;Newcastle;4;;BISGROVE, Stephen;DEM;M;5607;8.60;-1.29
+NSW;Newcastle;5;;PAYNE, Geoff;DSL;M;662;1.01;1.01
+NSW;Newcastle;6;;BUDWORTH, Greg;CTA;M;1798;2.76;2.76
+NSW;Newcastle;7;;WILLIAMS, Harry;PLP;M;1131;1.73;1.73
+NSW;Newcastle;8;;TAYLOR, Kate;HAN;F;10466;16.05;16.05
+NSW;Newcastle;9;;BOYD, Peter;IND;M;757;1.16;1.16
+NSW;Newcastle;10;;WELSH, Ivan;IND;M;4398;6.74;6.74
+NSW;Newcastle;11;;KING, Tony;CEC;M;280;0.43;0.43
+NSW;Newcastle;902;;;LP;;0;0.00;-30.43
+NSW;Newcastle;997;;;OTH;;0;0.00;-0.82
+NSW;New England;1;;CRONIN, James Kenneth;GRN;M;1460;2.13;2.13
+NSW;New England;2;;NUTTALL, Graham;IND;M;6202;9.06;9.06
+NSW;New England;3;;MONLEY, Peter;LP;M;11261;16.45;16.45
+NSW;New England;4;;PEARCE, Oriel;CTA;F;1143;1.67;1.67
+NSW;New England;5;;LETTERS, Frances;NLP;F;162;0.24;-0.82
+NSW;New England;6;;MORTON, David;IND;M;449;0.66;0.66
+NSW;New England;7;;DIXON, Pat;ALP;F;15733;22.98;-1.88
+NSW;New England;8;#;ST CLAIR, Stuart;NP;M;21299;31.11;-29.39
+NSW;New England;9;;GRINDLAY, Rebekah;DEM;F;1466;2.14;-6.71
+NSW;New England;10;;WEARE, Victor;HAN;M;9288;13.57;13.57
+NSW;New England;997;;;OTH;;0;0.00;-4.74
+NSW;North Sydney;1;;WOODROFFE, Andrew;GRN;M;3106;3.93;0.12
+NSW;North Sydney;2;;PONG, Henry;UNI;M;3727;4.72;4.72
+NSW;North Sydney;3;;BOURNE, Roger;CTA;M;698;0.88;0.88
+NSW;North Sydney;4;;RUSSELL, Glenn;NLP;M;136;0.17;0.17
+NSW;North Sydney;5;#;HOCKEY, Joe;LP;M;42887;54.32;-2.97
+NSW;North Sydney;6;;HOCKLEY, John;HAN;M;2270;2.88;2.88
+NSW;North Sydney;7;;SPAIN, Anthony John;DEM;M;5726;7.25;-2.72
+NSW;North Sydney;8;;OWENS, Julie;ALP;F;20403;25.84;0.57
+NSW;North Sydney;997;;;OTH;;0;0.00;-3.65
+NSW;Page;1;#;CAUSLEY, Ian Raymond;NP;M;31313;41.76;5.09
+NSW;Page;2;;WENBAN, Warren;HAN;M;8473;11.30;11.30
+NSW;Page;3;;O'DRISCOLL, Kath;DSL;F;402;0.54;0.54
+NSW;Page;4;;CLAUSEN, Graham Francis;CTA;M;1133;1.51;0.04
+NSW;Page;5;;ROGERS, Nicole;GRN;F;3460;4.61;0.71
+NSW;Page;6;;MATHEWS, Joy;ALP;F;26548;35.40;-2.63
+NSW;Page;7;;WRIGHTSON, Peter;DEM;M;2162;2.88;-0.42
+NSW;Page;8;;BEHN, Doug;IND;M;1498;2.00;2.00
+NSW;Page;903;;;RCG;;0;0.00;-0.70
+NSW;Page;905;;;LP;;0;0.00;-15.93
+NSW;Parkes;1;;WILSON, Robert Ian;IND;M;8657;11.82;11.82
+NSW;Parkes;2;#;LAWLER, Tony;NP;M;20791;28.38;-22.83
+NSW;Parkes;3;;MACDOUGALL, Scott;LP;M;7261;9.91;9.91
+NSW;Parkes;4;;BREBNER, Barry;ALP;M;26070;35.59;-2.60
+NSW;Parkes;5;;BURTON, David;DEM;M;1246;1.70;-0.93
+NSW;Parkes;6;;MCNAUGHT, Donald Hugh;HAN;M;9230;12.60;12.60
+NSW;Parkes;901;;;NLP;;0;0.00;-1.29
+NSW;Parkes;904;;;AFI;;0;0.00;-2.05
+NSW;Parkes;905;;;AWP;;0;0.00;-2.29
+NSW;Parkes;997;;;OTH;;0;0.00;-2.35
+NSW;Parramatta;1;#;CAMERON, Ross;LP;M;31060;43.64;-4.01
+NSW;Parramatta;2;;COGGER, John;NLP;M;108;0.15;-0.92
+NSW;Parramatta;3;;WONG, Matthew;UNI;M;3073;4.32;4.32
+NSW;Parramatta;4;;ELLIOTT, Paul;ALP;M;27521;38.67;-0.76
+NSW;Parramatta;5;;MULLIGAN, Peter;DEM;M;2033;2.86;-2.58
+NSW;Parramatta;6;;SCHEMBRI, Tina;IND;F;707;0.99;0.99
+NSW;Parramatta;7;;CONSANDINE, Peter;RPA;M;79;0.11;0.11
+NSW;Parramatta;8;;JONSSON, Dee Richelle;CTA;F;899;1.26;-0.22
+NSW;Parramatta;9;;HALE, Ian;HAN;M;4495;6.32;6.32
+NSW;Parramatta;10;;WRIGHT, Peter;GRN;M;1195;1.68;1.68
+NSW;Parramatta;906;;;AFI;;0;0.00;-2.78
+NSW;Parramatta;997;;;OTH;;0;0.00;-2.14
+NSW;Paterson;1;;KING, Anthony John;CEC;M;666;0.87;0.87
+NSW;Paterson;2;;BUCHAN, Andrew;IND;M;448;0.58;0.58
+NSW;Paterson;3;#;HORNE, Bob;ALP;M;33066;43.13;-0.22
+NSW;Paterson;4;;BALDWIN, Bob;LP;M;31212;40.71;-4.96
+NSW;Paterson;5;;MOFFAT, Michelle;IND;F;608;0.79;0.79
+NSW;Paterson;6;;DAVIS, Jan;GRN;F;1577;2.06;-1.49
+NSW;Paterson;7;;RUTLEDGE, Geoffrey J;DEM;M;1467;1.91;-3.08
+NSW;Paterson;8;;FULLER, Paul;HAN;M;6355;8.29;8.29
+NSW;Paterson;9;;UNGER, Paul;IND;M;145;0.19;0.19
+NSW;Paterson;10;;DELLIT, Alison;DSL;F;164;0.21;0.21
+NSW;Paterson;11;;MURRAY, David J;CTA;M;957;1.25;-1.20
+NSW;Prospect;1;;POULARAS, Manny;DEM;M;3405;4.91;-5.11
+NSW;Prospect;2;;HUTCHINSON, John;HAN;M;5199;7.49;7.49
+NSW;Prospect;3;;AZIZ, Nahid;LP;F;15965;23.01;-8.97
+NSW;Prospect;4;;HARRIS, Chris;GRN;M;1074;1.55;1.55
+NSW;Prospect;5;#;CROSIO, Janice;ALP;F;41310;59.54;2.86
+NSW;Prospect;6;;COGGER, Linda;NLP;F;235;0.34;-0.99
+NSW;Prospect;7;;TONGSUMRITH, Somchai;UNI;M;2199;3.17;3.17
+NSW;Reid;1;;ANANIN, John;CTA;M;2544;3.56;3.56
+NSW;Reid;2;;POULARAS, David;DEM;M;2052;2.87;-4.08
+NSW;Reid;3;;THOMSON, Jamie;GRN;M;1293;1.81;1.81
+NSW;Reid;4;#;FERGUSON, Laurie;ALP;M;41162;57.56;0.41
+NSW;Reid;5;;O'CONNOR, Shane;HAN;M;4477;6.26;6.26
+NSW;Reid;6;;TONGSUMRITH, Penny Ann;UNI;F;4045;5.66;5.66
+NSW;Reid;7;;FREAME, Alma;LP;F;15637;21.87;-12.67
+NSW;Reid;8;;SAVOULIAN, Rupen;DSL;M;302;0.42;0.42
+NSW;Reid;903;;;NLP;;0;0.00;-1.36
+NSW;Richmond;1;;NEWELL, Neville;ALP;M;31129;38.30;3.66
+NSW;Richmond;2;;PENHALIGON, John;HAN;M;8278;10.18;10.18
+NSW;Richmond;3;;PIEK, Leo;IND;M;621;0.76;0.76
+NSW;Richmond;4;;CULLEN, Peter G;DEM;M;2305;2.84;-2.58
+NSW;Richmond;5;;DEVENDRA, Alan;IND;M;1662;2.04;2.04
+NSW;Richmond;6;#;ANTHONY, Larry;NP;M;32645;40.16;4.73
+NSW;Richmond;7;;PATTERSON, Helen;NLP;F;320;0.39;0.39
+NSW;Richmond;8;;TABART, Tom;GRN;M;4323;5.32;0.06
+NSW;Richmond;903;;;LP;;0;0.00;-18.43
+NSW;Richmond;906;;;RCG;;0;0.00;-0.83
+NSW;Riverina;1;;KIBBEY, David;LP;M;15942;21.44;21.44
+NSW;Riverina;2;;GILLIES, Rosemary;DEM;F;1770;2.38;-1.63
+NSW;Riverina;3;;COLLINS, Denis Wilfred;IND;M;1218;1.64;1.64
+NSW;Riverina;4;;BARTON, David;HAN;M;9129;12.28;12.28
+NSW;Riverina;5;;HARGREAVES, Peter;ALP;M;19234;25.87;-0.33
+NSW;Riverina;6;#;HULL, Kay;NP;F;27060;36.39;-29.58
+NSW;Riverina;997;;;OTH;;0;0.00;-3.82
+NSW;Robertson;1;;GLANCY, Kevin J;HAN;M;6940;9.24;9.24
+NSW;Robertson;2;#;LLOYD, Jim;LP;M;32963;43.90;-2.89
+NSW;Robertson;3;;PENFOLD, Andrew;DEM;M;3303;4.40;-2.89
+NSW;Robertson;4;;MCKENZIE, Ian;GRN;M;1598;2.13;2.13
+NSW;Robertson;5;;ASHBURN, Marie Therese;UNI;F;364;0.48;0.48
+NSW;Robertson;6;;NEAL, Belinda;ALP;F;29917;39.84;0.54
+NSW;Robertson;903;;;CCG;;0;0.00;-2.61
+NSW;Robertson;904;;;AFI;;0;0.00;-3.42
+NSW;Robertson;997;;;OTH;;0;0.00;-0.58
+NSW;Shortland;1;;MORONEY, Rebecca;GRN;F;2681;3.65;-0.66
+NSW;Shortland;2;#;HALL, Jill;ALP;F;38004;51.78;0.90
+NSW;Shortland;3;;WELSH, Ivan;IND;M;1878;2.56;2.56
+NSW;Shortland;4;;POLLNITZ, Aysha;DEM;F;2605;3.55;-3.37
+NSW;Shortland;5;;GARDNIR, Ron;HAN;M;7499;10.22;10.22
+NSW;Shortland;6;;CRAIG, Peter;LP;M;20733;28.25;-6.24
+NSW;Shortland;997;;;OTH;;0;0.00;-3.40
+NSW;Sydney;1;;RYDE, Jenny;GRN;F;4683;6.21;0.42
+NSW;Sydney;2;#;PLIBERSEK, Tanya;ALP;F;38920;51.59;3.21
+NSW;Sydney;3;;PERCY, John;DSL;M;568;0.75;0.75
+NSW;Sydney;4;;HENSLEY, Warren;HAN;M;1917;2.54;2.54
+NSW;Sydney;5;;DOHERTY, Denis;;M;441;0.58;0.58
+NSW;Sydney;6;;MUNRO, Jenny;IND;F;591;0.78;0.78
+NSW;Sydney;7;;LUNSMANN, Anna;NAN;F;538;0.71;-6.10
+NSW;Sydney;8;;ABDURAHMAN, Flavia;UNI;F;1676;2.22;2.22
+NSW;Sydney;9;;HANSON, Ben;DEM;M;5092;6.75;-2.00
+NSW;Sydney;10;;LIPPMANN, Michael;NLP;M;112;0.15;-0.18
+NSW;Sydney;11;;MORROW, Bruce;LP;M;20899;27.70;0.09
+NSW;Sydney;905;;;CTA;;0;0.00;-0.65
+NSW;Sydney;997;;;OTH;;0;0.00;-1.67
+NSW;Throsby;1;;ORR, Dan;HAN;M;8267;11.39;11.39
+NSW;Throsby;2;;STAVROPOULOS, Peter;SEP;M;379;0.52;0.52
+NSW;Throsby;3;;BARRY, Ann;DEM;F;2751;3.79;-4.69
+NSW;Throsby;4;;SPERLING, Karla;GRN;F;2230;3.07;-2.07
+NSW;Throsby;5;;MIFSUD, Charlie;LP;M;12538;17.27;-4.43
+NSW;Throsby;6;;HUGHES, Brian;CTA;M;1949;2.69;-1.16
+NSW;Throsby;7;#;HOLLIS, Colin;ALP;M;44468;61.27;0.43
+NSW;Warringah;1;#;ABBOTT, Tony;LP;M;39753;55.46;-2.25
+NSW;Warringah;2;;JOHNSTONE, Heath;CTA;M;725;1.01;1.01
+NSW;Warringah;3;;HERAGHTY, Julie;ALP;F;19730;27.53;0.88
+NSW;Warringah;4;;LINDRUM, Janne Clara;HAN;F;3873;5.40;5.40
+NSW;Warringah;5;;ALLEN, Tony;ACS;M;150;0.21;0.21
+NSW;Warringah;6;;PATERSON, Brett;DEM;M;4271;5.96;-0.77
+NSW;Warringah;7;;LAM, Keelah;GRN;F;2970;4.14;-0.71
+NSW;Warringah;8;;JUDD, Ines;NLP;F;204;0.28;-0.09
+NSW;Warringah;905;;;AFI;;0;0.00;-3.69
+NSW;Watson;1;;RAFFERTY, Joe;LP;M;19461;26.88;-6.53
+NSW;Watson;2;;PETERSON, Murray;CTA;M;1176;1.62;-1.98
+NSW;Watson;3;;ABDURAHMAN, Zahir;UNI;M;3838;5.30;5.30
+NSW;Watson;4;;WRIGHT, Claire;HAN;F;3392;4.68;4.68
+NSW;Watson;5;;TOOMEY, Caroline;GRN;F;1070;1.48;1.48
+NSW;Watson;6;#;MCLEAY, Leo;ALP;M;41159;56.85;1.74
+NSW;Watson;7;;GAVAGNIN NEWMAN, Amelia;DEM;F;2309;3.19;-4.69
+NSW;Wentworth;1;;KOSTER, Dezi Ann;NLP;F;467;0.64;0.34
+NSW;Wentworth;2;;MCLOUGHLIN, Tom;GRN;M;3592;4.92;-1.04
+NSW;Wentworth;3;#;THOMSON, Andrew;LP;M;36348;49.75;-2.25
+NSW;Wentworth;4;;COLLINGS, Margaret;DEM;F;4470;6.12;-2.55
+NSW;Wentworth;5;;PEARCE, Paul;ALP;M;24198;33.12;1.32
+NSW;Wentworth;6;;JACOBS, Alan;UNI;M;1978;2.71;2.71
+NSW;Wentworth;7;;FORD, Waverney;HAN;M;2004;2.74;2.74
+NSW;Wentworth;997;;;OTH;;0;0.00;-1.26
+NSW;Werriwa;1;;THORN, Andrew;LP;M;21251;28.97;-4.74
+NSW;Werriwa;2;;COCKAYNE, James;DEM;M;2594;3.54;-2.90
+NSW;Werriwa;3;;PECK, Ibrahim;UNI;M;1099;1.50;1.50
+NSW;Werriwa;4;#;LATHAM, Mark;ALP;M;37106;50.58;2.69
+NSW;Werriwa;5;;HYSLOP, John;HAN;M;8440;11.51;11.51
+NSW;Werriwa;6;;FREEMAN, Sharynne;IND;F;1260;1.72;1.72
+NSW;Werriwa;7;;KEARNEY, Vicki;GRN;F;1605;2.19;2.19
+NSW;Werriwa;901;;;ACH;;0;0.00;-3.86
+NSW;Werriwa;904;;;AFI;;0;0.00;-5.63
+NSW;Werriwa;907;;;RARI;;0;0.00;-1.66
+NSW;Werriwa;997;;;OTH;;0;0.00;-0.81
+VIC;Aston;1;;STOSEGAN, Darrell;DEM;M;6000;7.53;-1.38
+VIC;Aston;2;;LOCKWOOD, Peter;ALP;M;30689;38.51;-0.18
+VIC;Aston;3;#;NUGENT, Peter;LP;M;38645;48.49;-3.10
+VIC;Aston;4;;RIGONI, Paul;ARP;M;685;0.86;0.86
+VIC;Aston;5;;CAMERON, Ian;HAN;M;2306;2.89;2.89
+VIC;Aston;6;;CHEN, Guosheng;UNI;F;1371;1.72;1.72
+VIC;Aston;903;;;NLP;;0;0.00;-0.81
+VIC;Ballarat;1;;COLOSIMO, Frank;CTA;M;840;1.10;-1.24
+VIC;Ballarat;2;#;RONALDSON, Michael;LP;M;34527;45.23;-3.77
+VIC;Ballarat;3;;BLANCHARD, John;HAN;M;3738;4.90;4.90
+VIC;Ballarat;4;;PRICE, Peta;DEM;F;2824;3.70;-0.52
+VIC;Ballarat;5;;WILEY, John C;ASP;M;1569;2.06;2.06
+VIC;Ballarat;6;;TAYLOR, Margaret;UNI;F;182;0.24;0.24
+VIC;Ballarat;7;;HARRISON, Ian;IND;M;188;0.25;0.25
+VIC;Ballarat;8;;GRAHAM, Alex;IND;M;147;0.19;0.19
+VIC;Ballarat;9;;CAMPBELL, Malcolm;GRN;M;1083;1.42;1.42
+VIC;Ballarat;10;;CARD, Marg;ALP;F;31232;40.92;-0.98
+VIC;Ballarat;902;;;AFI;;0;0.00;-1.05
+VIC;Ballarat;906;;;NLP;;0;0.00;-0.24
+VIC;Ballarat;997;;;OTH;;0;0.00;-1.25
+VIC;Batman;1;;RICHARDSON, Martin John;NLP;M;1486;1.84;-0.95
+VIC;Batman;2;#;FERGUSON, Martin John;ALP;M;53034;65.84;7.01
+VIC;Batman;3;;ROSENBAUM, Helen;GRN;F;3705;4.60;4.60
+VIC;Batman;4;;BARWICK, Wayne;CEC;M;254;0.32;0.32
+VIC;Batman;5;;NICHOLLS, Marc;DEM;M;4038;5.01;-1.01
+VIC;Batman;6;;ROWE, Lauri;LP;F;16290;20.22;-1.21
+VIC;Batman;7;;MAZLOUM, Sami;UNI;M;659;0.82;0.82
+VIC;Batman;8;;WILSON, Matt;IND;M;1087;1.35;1.35
+VIC;Batman;902;;;AGV;;0;0.00;-3.61
+VIC;Batman;997;;;OTH;;0;0.00;-7.32
+VIC;Bendigo;1;;MCDONALD, Alan;NLP;M;526;0.67;0.37
+VIC;Bendigo;2;;TURNER, Max;LP;M;28004;35.89;-8.86
+VIC;Bendigo;3;;TILLEY, Alan;DEM;M;3533;4.53;-1.11
+VIC;Bendigo;4;;MADDIGAN, Gayle;UNI;F;361;0.46;0.46
+VIC;Bendigo;5;;MITCHELL, Scott;NP;M;2479;3.18;3.18
+VIC;Bendigo;6;;THORPE, Alfred James;ARP;M;1108;1.42;1.42
+VIC;Bendigo;7;;BIGGS, Peter;FST;M;332;0.43;0.43
+VIC;Bendigo;8;;ZEGERS, Karel;HAN;M;5159;6.61;6.61
+VIC;Bendigo;9;#;GIBBONS, Steve;ALP;M;33483;42.91;0.09
+VIC;Bendigo;10;;SPEIRS, Lyn;CEC;F;126;0.16;0.16
+VIC;Bendigo;11;;JONES, David Rhys;GRN;M;2080;2.67;2.67
+VIC;Bendigo;12;;MORLEY, Peter;IND;M;846;1.08;1.08
+VIC;Bendigo;903;;;AGV;;0;0.00;-3.27
+VIC;Bendigo;904;;;AFI;;0;0.00;-1.31
+VIC;Bendigo;907;;;CTA;;0;0.00;-1.91
+VIC;Bruce;1;;MCBETH, Adam;DEM;M;4718;6.02;-0.08
+VIC;Bruce;2;;LOWE, Laurence;HAN;M;2296;2.93;2.93
+VIC;Bruce;3;;SOOS, Michael;NLP;M;209;0.27;-0.17
+VIC;Bruce;4;#;GRIFFIN, Alan;ALP;M;38165;48.66;2.84
+VIC;Bruce;5;;CHABDJIAN, Dikran;ACS;M;253;0.32;0.32
+VIC;Bruce;6;;HUYNH, Toan;UNI;M;1336;1.70;1.70
+VIC;Bruce;7;;SMITH, Colin;GRN;M;1195;1.52;1.52
+VIC;Bruce;8;;WOOD, Jim;LP;M;30257;38.58;-7.05
+VIC;Bruce;903;;;AGV;;0;0.00;-2.01
+VIC;Burke;1;#;O'KEEFE, Neil;ALP;M;36516;50.00;-0.95
+VIC;Burke;2;;HARDY, Rod;IND;M;957;1.31;1.31
+VIC;Burke;3;;PETROVICH, Serge;LP;M;26317;36.03;-2.41
+VIC;Burke;4;;FYFFE, Paul;GRN;M;1397;1.91;1.91
+VIC;Burke;5;;MASON, Ngaire;NLP;F;163;0.22;-0.78
+VIC;Burke;6;;WILLIAMS, Vaughan;DEM;M;4365;5.98;-3.64
+VIC;Burke;7;;PRESTON, Frank;HAN;M;3319;4.54;4.54
+VIC;Calwell;1;;LIVESAY, Robert Eric;DEM;M;5363;6.69;-0.25
+VIC;Calwell;2;;BLAKE, Trevor;LP;M;21111;26.32;-2.52
+VIC;Calwell;3;#;THEOPHANOUS, Andrew Charles;ALP;M;50022;62.36;1.02
+VIC;Calwell;4;;HARRIS, Michael Kingsley;NLP;M;755;0.94;0.21
+VIC;Calwell;5;;KECELI, Benal;UNI;F;2968;3.70;3.70
+VIC;Calwell;997;;;OTH;;0;0.00;-2.17
+VIC;Casey;1;;KENDI, Robert;NLP;M;557;0.75;0.27
+VIC;Casey;2;;ARMENIO, Frank;ALP;M;24732;33.42;-2.38
+VIC;Casey;3;;RASKOVY, Steve;IND;M;396;0.54;0.54
+VIC;Casey;4;;MCLAREN, John;DEM;M;5481;7.41;-2.53
+VIC;Casey;5;;SMART, Gary;UNI;M;405;0.55;0.55
+VIC;Casey;6;;MACKELLAR, John Duncan;IND;M;2067;2.79;2.79
+VIC;Casey;7;;BECK, Stephen;HAN;M;2412;3.26;3.26
+VIC;Casey;8;;JAMES, Chris;GRN;F;1634;2.21;2.21
+VIC;Casey;9;;WARWICK, Judy;ASP;F;1070;1.45;1.45
+VIC;Casey;10;;SMIDT, Basil;CTA;M;917;1.24;1.24
+VIC;Casey;11;#;WOOLDRIDGE, Michael;LP;M;34322;46.39;-3.64
+VIC;Casey;905;;;CIR;;0;0.00;-0.46
+VIC;Casey;906;;;AGV;;0;0.00;-3.28
+VIC;Chisholm;1;;GUESS, Julian;GRN;M;2431;3.10;3.10
+VIC;Chisholm;2;;FELL, Nicholas;RPA;M;176;0.22;0.22
+VIC;Chisholm;3;#;BURKE, Anna Elizabeth;ALP;F;33275;42.38;1.99
+VIC;Chisholm;4;;VLAHOS, Peter;LP;M;32771;41.74;-5.39
+VIC;Chisholm;5;;CHUA, Ka-Sing;UNI;M;2214;2.82;2.82
+VIC;Chisholm;6;;TOOMEY, Mark;NLP;M;193;0.25;-0.22
+VIC;Chisholm;7;;MILLANE, Bernie;DEM;M;5392;6.87;-0.40
+VIC;Chisholm;8;;HESSE, Douglas;HAN;M;2064;2.63;2.63
+VIC;Chisholm;906;;;AFI;;0;0.00;-1.64
+VIC;Chisholm;907;;;AGV;;0;0.00;-2.66
+VIC;Chisholm;997;;;OTH;;0;0.00;-0.44
+VIC;Corangamite;1;;MACLEAN, Duncan;HAN;M;4140;5.55;5.55
+VIC;Corangamite;2;;BJORK-BILLINGS, Michael;ALP;M;26923;36.08;0.22
+VIC;Corangamite;3;;HARWOOD, Robert;UNI;M;525;0.70;0.70
+VIC;Corangamite;4;;WHITEHEAD, Adrian;GRN;M;2292;3.07;3.07
+VIC;Corangamite;5;;ARUNDELL, Simon;IND;M;1634;2.19;2.19
+VIC;Corangamite;6;#;MCARTHUR, Stewart;LP;M;34336;46.02;-6.64
+VIC;Corangamite;7;;PAULL, Jeffrey;DEM;M;4765;6.39;-5.10
+VIC;Corio;1;;SELF, Therese;PLP;F;3116;4.10;4.10
+VIC;Corio;2;;CZAUSOV, Andre M;DEM;M;4352;5.73;-2.04
+VIC;Corio;3;#;O'CONNOR, Gavan;ALP;M;38608;50.82;0.06
+VIC;Corio;4;;JENSEN, Dennis;LP;M;25561;33.64;-5.93
+VIC;Corio;5;;GRANT, Robert;HAN;M;3854;5.07;5.07
+VIC;Corio;6;;GARBUTCHEON SINGH, Michael;UNI;M;486;0.64;0.64
+VIC;Corio;901;;;NLP;;0;0.00;-1.89
+VIC;Deakin;1;;TENG, Geoffrey;UNI;M;1289;1.66;1.66
+VIC;Deakin;2;#;BARRESI, Phillip;LP;M;34047;43.95;-0.77
+VIC;Deakin;3;;PETHERBRIDGE, Tim;;M;1486;1.92;1.92
+VIC;Deakin;4;;SIDDONS, John;DEM;M;6177;7.97;-0.90
+VIC;Deakin;5;;KEATH, Linda;NLP;F;230;0.30;-0.66
+VIC;Deakin;6;;BERTOLUS, Peter;ALP;M;30079;38.83;0.17
+VIC;Deakin;7;;COELLI, Paul Gregory;HAN;M;2232;2.88;2.88
+VIC;Deakin;8;;EVANS, Robyn;GRN;F;1929;2.49;2.49
+VIC;Deakin;903;;;AFI;;0;0.00;-1.60
+VIC;Deakin;905;;;CTA;;0;0.00;-1.95
+VIC;Deakin;908;;;AGV;;0;0.00;-2.44
+VIC;Deakin;997;;;OTH;;0;0.00;-0.81
+VIC;Dunkley;1;;KELSALL, Henry;GRN;M;2971;3.89;3.89
+VIC;Dunkley;2;;QUAYLE, Michael;ALP;M;29755;38.98;-1.12
+VIC;Dunkley;3;;BROWN, Robyn Annette;HAN;F;3399;4.45;4.45
+VIC;Dunkley;4;;CHAPMAN DAVIS, Jan;UNI;F;335;0.44;0.44
+VIC;Dunkley;5;;SEALS, Tony;DEM;M;4392;5.75;-1.25
+VIC;Dunkley;6;;MASON, Ben James;NLP;M;185;0.24;-0.29
+VIC;Dunkley;7;#;BILLSON, Bruce;LP;M;35297;46.24;-2.18
+VIC;Dunkley;905;;;AFI;;0;0.00;-1.52
+VIC;Dunkley;906;;;AGV;;0;0.00;-2.42
+VIC;Flinders;1;;ARMITAGE, John;ALP;M;28874;37.42;4.20
+VIC;Flinders;2;;KAMPS, Tony;UNI;M;451;0.58;0.58
+VIC;Flinders;3;;CHARLWOOD, Jan;NLP;F;264;0.34;-0.14
+VIC;Flinders;4;#;REITH, Peter;LP;M;36570;47.39;-6.31
+VIC;Flinders;5;;VOGT, Mervyn;GRN;M;2057;2.67;2.67
+VIC;Flinders;6;;LANGLEY, Robert;HAN;M;4029;5.22;5.22
+VIC;Flinders;7;;ALLISON, David;DEM;M;4923;6.38;-1.08
+VIC;Flinders;901;;;AGV;;0;0.00;-4.06
+VIC;Flinders;997;;;OTH;;0;0.00;-1.08
+VIC;Gellibrand;1;#;ROXON, Nicola;ALP;F;51443;67.47;4.02
+VIC;Gellibrand;2;;CURSIO, Anthony James;LP;M;15233;19.98;-1.81
+VIC;Gellibrand;3;;KAVALENKA, Nikolas;HAN;M;2638;3.46;3.46
+VIC;Gellibrand;4;;POLLOCK, Michael;NLP;M;249;0.33;-0.09
+VIC;Gellibrand;5;;INGHAM, Liz;GRN;F;2180;2.86;2.86
+VIC;Gellibrand;6;;WARK, David;DEM;M;3420;4.49;-0.82
+VIC;Gellibrand;7;;SHORLAND, Adrian;UNI;M;1078;1.41;1.41
+VIC;Gellibrand;901;;;CTA;;0;0.00;-2.22
+VIC;Gellibrand;903;;;AGV;;0;0.00;-3.33
+VIC;Gellibrand;905;;;AFI;;0;0.00;-1.59
+VIC;Gellibrand;997;;;OTH;;0;0.00;-1.90
+VIC;Gippsland;1;;CLARKE, Frances Mary;NLP;F;751;1.02;0.36
+VIC;Gippsland;2;;THORPE, Robert;UNI;M;567;0.77;0.77
+VIC;Gippsland;3;;CAMERON, Leonie;IND;F;2611;3.53;3.53
+VIC;Gippsland;4;;TREASURE, Doug;IND;M;4076;5.51;5.51
+VIC;Gippsland;5;;STONE, Judith;ALP;F;19438;26.28;0.30
+VIC;Gippsland;6;;PETERS, Tony;HAN;M;8454;11.43;11.43
+VIC;Gippsland;7;;HORSFIELD, Les;IND;M;799;1.08;1.08
+VIC;Gippsland;8;;MCCUBBIN, Jo;DEM;F;3931;5.32;-2.09
+VIC;Gippsland;9;#;MCGAURAN, Peter;NP;M;31774;42.97;-18.24
+VIC;Gippsland;10;;VANDERLAND, Jack;IND;M;900;1.22;1.22
+VIC;Gippsland;11;;WEATHERHEAD, John L;FST;M;650;0.88;0.88
+VIC;Gippsland;997;;;OTH;;0;0.00;-4.75
+VIC;Goldstein;1;;FIELD, Meret;ACS;F;413;0.51;0.51
+VIC;Goldstein;2;;KHOURI, Margaret;ALP;F;26980;33.53;1.44
+VIC;Goldstein;3;;CRAWFORD, Peter;HAN;M;1822;2.26;2.26
+VIC;Goldstein;4;;DICKINS, Joan;NLP;F;225;0.28;-0.25
+VIC;Goldstein;5;;BRUNTON, Nick;GRN;M;2328;2.89;2.89
+VIC;Goldstein;6;#;KEMP, David;LP;M;41881;52.04;-3.23
+VIC;Goldstein;7;;SHTRAMBRANDT, Arkady G;UNI;M;672;0.84;0.84
+VIC;Goldstein;8;;BARRY, Diane;DEM;F;6156;7.65;-0.68
+VIC;Goldstein;901;;;AGV;;0;0.00;-3.79
+VIC;Higgins;1;;LAWSON, Ian Robert;IND;M;584;0.75;0.75
+VIC;Higgins;2;;TRAFFICANTE, Robert;GRN;M;2155;2.78;2.78
+VIC;Higgins;3;#;COSTELLO, Peter;LP;M;41353;53.44;-2.36
+VIC;Higgins;4;;SPENCER, Rod;HAN;M;1208;1.56;1.56
+VIC;Higgins;5;;DWYER, Russell;IND;M;128;0.17;0.17
+VIC;Higgins;6;;TORNEY, President;ACS;M;93;0.12;0.12
+VIC;Higgins;7;;WALLACE, Jude;ALP;F;24852;32.12;1.60
+VIC;Higgins;8;;DICKINS, Michael;NLP;M;205;0.26;-0.37
+VIC;Higgins;9;;ZYNGIER, David;UNI;M;1031;1.33;1.33
+VIC;Higgins;10;;SHAW, Craig;DEM;M;5770;7.46;-1.68
+VIC;Higgins;904;;;AGV;;0;0.00;-3.91
+VIC;Holt;1;;BERK, Daniel;DEM;M;4425;5.99;-1.30
+VIC;Holt;2;;SINGH, Kunwar Raj;UNI;M;931;1.26;1.26
+VIC;Holt;3;;NICHOLLS, Margaret;LP;F;21823;29.54;-2.51
+VIC;Holt;4;;ALLISON, Heath Raymond;NLP;M;379;0.51;-0.08
+VIC;Holt;5;#;EVANS, Gareth;ALP;M;44172;59.78;4.60
+VIC;Holt;6;;BISSET, Robert;IND;M;860;1.16;1.16
+VIC;Holt;7;;DICKSON, Lynne;CTA;F;1296;1.75;1.75
+VIC;Holt;907;;;AFI;;0;0.00;-1.70
+VIC;Holt;997;;;OTH;;0;0.00;-3.19
+VIC;Hotham;1;;SALTER, Alan;HAN;M;2559;3.16;3.16
+VIC;Hotham;2;#;CREAN, Simon;ALP;M;46107;56.98;1.95
+VIC;Hotham;3;;PESUTTO, John;LP;M;26059;32.21;-3.71
+VIC;Hotham;4;;ROSENTHAL, Stan;UNI;M;841;1.04;1.04
+VIC;Hotham;5;;MORGAN, Polly;DEM;F;3720;4.60;-0.72
+VIC;Hotham;6;;CORDON, John;NLP;M;137;0.17;-0.21
+VIC;Hotham;7;;WALTERS, Susan;GRN;F;1492;1.84;1.84
+VIC;Hotham;902;;;AFI;;0;0.00;-1.46
+VIC;Hotham;905;;;AGV;;0;0.00;-1.88
+VIC;Indi;1;;GRIFFITH, Susan;NLP;F;738;0.97;-0.61
+VIC;Indi;2;;LESCHEN, Zuvele;ALP;F;21572;28.43;0.40
+VIC;Indi;3;;PAZ, Jurek Alexander;IND;M;368;0.49;0.49
+VIC;Indi;4;;ROBSON, Brian;FST;M;2157;2.84;2.84
+VIC;Indi;5;;SMITH, Kevin;DEM;M;3708;4.89;-2.91
+VIC;Indi;6;#;LIEBERMAN, Lou;LP;M;38590;50.87;-11.73
+VIC;Indi;7;;MARONEY, David;IND;M;431;0.57;0.57
+VIC;Indi;8;;ANDERSON, John;HAN;M;6023;7.94;7.94
+VIC;Indi;9;;BARDSLEY, Tim;GRN;M;1825;2.41;2.41
+VIC;Indi;10;;RYAN, Norm;IND;M;454;0.60;0.60
+VIC;Isaacs;1;#;WILTON, Greg;ALP;M;35604;48.43;4.38
+VIC;Isaacs;2;;TIRAWA, Daniel;GRN;M;1570;2.14;2.14
+VIC;Isaacs;3;;CARKEEK, Mija;UNI;F;421;0.57;0.57
+VIC;Isaacs;4;;RYAN, Robert;DEM;M;4355;5.92;-3.65
+VIC;Isaacs;5;;MCINTOSH, Amanda;NLP;F;211;0.29;-0.56
+VIC;Isaacs;6;;REED-SMITH, Denis;HAN;M;2971;4.04;4.04
+VIC;Isaacs;7;;RAWLINSON, Mike;LP;M;28060;38.17;-3.89
+VIC;Isaacs;8;;BROOK, Patricia;FST;F;325;0.44;0.44
+VIC;Isaacs;905;;;AFI;;0;0.00;-3.48
+VIC;Jagajaga;1;;ROBERTS, Robyn;GRN;F;2633;3.26;3.26
+VIC;Jagajaga;2;;MASON, Ray;HAN;M;1971;2.44;2.44
+VIC;Jagajaga;3;#;MACKLIN, Jenny;ALP;F;38842;48.15;3.99
+VIC;Jagajaga;4;;GRIFFITH, Steve;NLP;M;265;0.33;0.01
+VIC;Jagajaga;5;;MCPHERSON, John;DEM;M;4732;5.87;-1.07
+VIC;Jagajaga;6;;WALTERS, Grant J;UNI;M;468;0.58;0.58
+VIC;Jagajaga;7;;RAUNIC, Tony;LP;M;31760;39.37;-3.34
+VIC;Jagajaga;902;;;AGV;;0;0.00;-3.29
+VIC;Jagajaga;904;;;AFI;;0;0.00;-1.26
+VIC;Jagajaga;997;;;OTH;;0;0.00;-1.33
+VIC;Kooyong;1;#;GEORGIOU, Petro;LP;M;43028;54.83;-2.18
+VIC;Kooyong;2;;STARKIE, Brad;DEM;M;6366;8.11;-0.17
+VIC;Kooyong;3;;MCKEAN, Ron;HAN;M;1637;2.09;2.09
+VIC;Kooyong;4;;NOMIKOUDIS, Milton;UNI;M;1164;1.48;1.48
+VIC;Kooyong;5;;MORAND, Maxine;ALP;F;23107;29.44;2.16
+VIC;Kooyong;6;;SALTER, Wendy;GRN;F;3177;4.05;4.05
+VIC;Kooyong;903;;;NLP;;0;0.00;-0.43
+VIC;Kooyong;904;;;AFI;;0;0.00;-2.00
+VIC;Kooyong;905;;;AGV;;0;0.00;-5.01
+VIC;Lalor;1;;PAPAELLINAS, George;UNI;M;1446;1.91;1.91
+VIC;Lalor;2;;SHAW, Anthony;DEM;M;4090;5.40;-2.36
+VIC;Lalor;3;#;GILLARD, Julia;ALP;F;46374;61.21;-0.63
+VIC;Lalor;4;;MANSON, Cynthia;GRN;F;1339;1.77;1.77
+VIC;Lalor;5;;BRODEL, John;HAN;M;3127;4.13;4.13
+VIC;Lalor;6;;O'SULLIVAN, Cameron Mitchell;LP;M;19381;25.58;-2.54
+VIC;Lalor;901;;;NLP;;0;0.00;-2.27
+VIC;La Trobe;1;;LEEPER, Amanda;DEM;F;6447;8.78;-0.67
+VIC;La Trobe;2;;HAIDAR, Assyl;UNI;M;411;0.56;0.56
+VIC;La Trobe;3;;THOMAS, Jeff;HAN;M;3173;4.32;4.32
+VIC;La Trobe;4;;DEAN, Frank;IND;M;331;0.45;-0.33
+VIC;La Trobe;5;;VOIGT, Wolf;CTA;M;740;1.01;-0.25
+VIC;La Trobe;6;;HOLTHAM, Robyn;GRN;F;2801;3.81;3.81
+VIC;La Trobe;7;;HIRSH, Carolyn;ALP;F;27733;37.77;-1.06
+VIC;La Trobe;8;#;CHARLES, Bob;LP;M;31456;42.84;-1.62
+VIC;La Trobe;9;;WOOLLEY, Graham;ACS;M;186;0.25;0.25
+VIC;La Trobe;10;;STENBERG, Andrew;NLP;M;152;0.21;-0.30
+VIC;La Trobe;901;;;AGV;;0;0.00;-4.71
+VIC;McEwen;1;;MCEWEN, Graeme;ALP;M;30350;40.03;0.93
+VIC;McEwen;2;;LACEY, Dennis K;HAN;M;3877;5.11;5.11
+VIC;McEwen;3;;CARTER, Sean;DEM;M;3652;4.82;-1.45
+VIC;McEwen;4;;BROWN, Susan;NLP;F;186;0.25;-0.15
+VIC;McEwen;5;;BOWDEN, Stephen;IND;M;611;0.81;0.81
+VIC;McEwen;6;;LAWSON, Pam;GRN;F;2020;2.66;2.66
+VIC;McEwen;7;;TREBLE, Vicki;ASP;F;1808;2.38;2.38
+VIC;McEwen;8;#;BAILEY, Fran;LP;F;32951;43.46;-2.67
+VIC;McEwen;9;;SAVAGE KOOROONYA, Elizabeth;IND;F;363;0.48;0.48
+VIC;McEwen;901;;;AGV;;0;0.00;-3.90
+VIC;McEwen;903;;;AFI;;0;0.00;-3.06
+VIC;McEwen;997;;;OTH;;0;0.00;-1.15
+VIC;McMillan;1;;KELLY, Peter M;ASP;M;2954;3.89;3.89
+VIC;McMillan;2;;CUNNINGHAM, Barry T;IND;M;3800;5.01;5.01
+VIC;McMillan;3;;GEOGHEGAN, Anthony Glenn;IND;M;352;0.46;0.46
+VIC;McMillan;4;;JACKSON, Peter;NLP;M;116;0.15;-0.07
+VIC;McMillan;5;;MILNE, Colin;UNI;M;247;0.33;0.33
+VIC;McMillan;6;;WELLS, Peter;FST;M;2036;2.68;2.68
+VIC;McMillan;7;;BROADBENT, Russell Evan;LP;M;29512;38.91;-1.20
+VIC;McMillan;8;;ATKIN, Bryan;HAN;M;3963;5.22;5.22
+VIC;McMillan;9;;FARRAR, Jenny Maree;GRN;F;1645;2.17;2.17
+VIC;McMillan;10;;WALL, David;DEM;M;3228;4.26;-0.81
+VIC;McMillan;11;#;ZAHRA, Christian John;ALP;M;27995;36.91;-3.95
+VIC;McMillan;902;;;AGV;;0;0.00;-2.67
+VIC;McMillan;908;;;CTA;;0;0.00;-1.07
+VIC;McMillan;909;;;NP;;0;0.00;-8.15
+VIC;McMillan;997;;;OTH;;0;0.00;-1.84
+VIC;Mallee;1;#;FORREST, John;NP;M;43132;57.18;-12.27
+VIC;Mallee;2;;JOYCE, Tom;DEM;M;3440;4.56;-1.30
+VIC;Mallee;3;;CROFT, Bill;HAN;M;9516;12.61;12.61
+VIC;Mallee;4;;CUBIT, Lee;CEC;M;600;0.80;0.80
+VIC;Mallee;5;;MCKENZIE, Lionel;IND;M;2278;3.02;3.02
+VIC;Mallee;6;;ZIGOURAS, John Nicholas;ALP;M;16471;21.83;-1.68
+VIC;Mallee;902;;;NLP;;0;0.00;-1.17
+VIC;Maribyrnong;1;;GALLAGHER, Paul;CEC;M;1366;1.82;1.82
+VIC;Maribyrnong;2;#;SERCOMBE, Bob;ALP;M;48458;64.66;1.96
+VIC;Maribyrnong;3;;KALANTZIS, Diana;UNI;F;1203;1.61;1.61
+VIC;Maribyrnong;4;;CAMILLERI, Tony;GRN;M;1867;2.49;2.49
+VIC;Maribyrnong;5;;TREACY, Paul;NLP;M;273;0.36;-0.30
+VIC;Maribyrnong;6;;CHARLTON, Will;LP;M;18305;24.43;-2.90
+VIC;Maribyrnong;7;;MARTIN, Helen;DEM;F;3469;4.63;-0.36
+VIC;Maribyrnong;997;;;OTH;;0;0.00;-4.32
+VIC;Melbourne;1;;MCKENNA, Brent;DEM;M;7122;8.97;0.31
+VIC;Melbourne;2;;FERRARI, James Stephen;;M;365;0.46;-0.10
+VIC;Melbourne;3;#;TANNER, Lindsay James;ALP;M;45958;57.90;0.17
+VIC;Melbourne;4;;NETTELBECK, Paul;LP;M;19289;24.30;0.21
+VIC;Melbourne;5;;MAXWELL, Sherridan;UNI;F;1095;1.38;1.38
+VIC;Melbourne;6;;CLARKE, Lawrence;NLP;M;176;0.22;-0.22
+VIC;Melbourne;7;;HORVAT, Ivan;CEC;M;133;0.17;0.17
+VIC;Melbourne;8;;SIBELLE, Maurice;DSL;M;425;0.54;0.54
+VIC;Melbourne;9;;TYRRELL, Nolan;GRN;M;4811;6.06;6.06
+VIC;Melbourne;907;;;AGV;;0;0.00;-6.64
+VIC;Melbourne;997;;;OTH;;0;0.00;-1.86
+VIC;Melbourne Ports;1;;HAWLEY, Arthur G L;HAN;M;1380;1.85;1.85
+VIC;Melbourne Ports;2;;WOLOWSKI, Diana;UNI;F;1413;1.90;1.90
+VIC;Melbourne Ports;3;#;DANBY, Michael;ALP;M;32849;44.10;-2.47
+VIC;Melbourne Ports;4;;PETERS, Julie;DEM;F;6099;8.19;1.10
+VIC;Melbourne Ports;5;;SNEDDEN, Fiona;LP;F;29037;38.99;-0.74
+VIC;Melbourne Ports;6;;HAYNES, Tom;NLP;M;180;0.24;-0.25
+VIC;Melbourne Ports;7;;MATHEW, Dinesh;GRN;M;3523;4.73;4.73
+VIC;Melbourne Ports;902;;;AFI;;0;0.00;-0.96
+VIC;Melbourne Ports;905;;;AGV;;0;0.00;-5.16
+VIC;Menzies;1;;WISE, Damian;DEM;M;4395;5.82;-3.02
+VIC;Menzies;2;;CASLEY, John;HAN;M;1383;1.83;1.83
+VIC;Menzies;3;;RIORDAN, Marcia Jane;IND;F;1060;1.40;1.40
+VIC;Menzies;4;;ALLAN, Peter;ALP;M;24812;32.85;-1.02
+VIC;Menzies;5;;NITSCHKE, Philip;IND;M;6843;9.06;9.06
+VIC;Menzies;6;;BUNN, Mark;NLP;M;240;0.32;-1.46
+VIC;Menzies;7;;MORSY, Mohamed Aneis;UNI;M;1383;1.83;1.83
+VIC;Menzies;8;#;ANDREWS, Kevin;LP;M;35415;46.89;-8.63
+VIC;Murray;1;;WILSON, Geoff;ASP;M;5274;6.80;6.80
+VIC;Murray;2;;MULLANE, Eleisha;GRN;F;1243;1.60;1.60
+VIC;Murray;3;;STUART, John;ALP;M;16061;20.72;-0.70
+VIC;Murray;4;;TEASDALE, Diane;FST;F;955;1.23;1.23
+VIC;Murray;5;#;STONE, Sharman Nancy;LP;F;46070;59.43;16.20
+VIC;Murray;6;;HELLEMONS, Robert;HAN;M;5259;6.78;6.78
+VIC;Murray;7;;MARCUCCI, Nino;IND;M;386;0.50;0.50
+VIC;Murray;8;;CADMORE, Ray;DEM;M;2276;2.94;-2.12
+VIC;Murray;902;;;NLP;;0;0.00;-0.64
+VIC;Murray;904;;;NP;;0;0.00;-29.66
+VIC;Scullin;1;;TAHIRI, Hussein;DEM;M;4503;5.83;-2.90
+VIC;Scullin;2;;KHEIRALLAH, M;UNI;M;949;1.23;1.23
+VIC;Scullin;3;;BROWN, Robert Clive;NLP;M;603;0.78;-0.90
+VIC;Scullin;4;;PRATT, Peter Camden;LP;M;18882;24.44;0.17
+VIC;Scullin;5;#;JENKINS, Harry;ALP;M;52320;67.72;4.44
+VIC;Scullin;903;;;AGV;;0;0.00;-2.04
+VIC;Wannon;1;#;HAWKER, David;LP;M;37570;49.07;-8.43
+VIC;Wannon;2;;VITUE, Mia;ALP;F;23897;31.21;-2.21
+VIC;Wannon;3;;O'BRIEN, Robert;IND;M;1824;2.38;2.38
+VIC;Wannon;4;;LINDOP, Maggie;DEM;F;4957;6.47;-2.60
+VIC;Wannon;5;;EDGE, Simon;HAN;M;5889;7.69;7.69
+VIC;Wannon;6;;MCDONALD, Leigh;ARP;M;2427;3.17;3.17
+VIC;Wills;1;#;THOMSON, Kelvin;ALP;M;50507;63.96;13.98
+VIC;Wills;2;;CURRY, David John;LP;M;20280;25.68;4.45
+VIC;Wills;3;;DELLER, Bill;PLP;M;1875;2.37;2.37
+VIC;Wills;4;;STONE, Robert;DEM;M;4507;5.71;2.11
+VIC;Wills;5;;ABDEL-FATTAH, Randa;UNI;F;1363;1.73;1.73
+VIC;Wills;6;;FOX, Andrew Robert;CEC;M;435;0.55;0.55
+VIC;Wills;902;;;NLP;;0;0.00;-0.40
+VIC;Wills;997;;;OTH;;0;0.00;-24.78
+QLD;Blair;1;;MCKENZIE, Neal;DEM;M;2478;3.64;-2.13
+QLD;Blair;2;;WHITE, Brett Ian;NP;M;6989;10.25;-6.91
+QLD;Blair;3;;BASSINGTHWAIGHTE, Owen David;CEC;M;199;0.29;0.29
+QLD;Blair;4;;CLARKE, Virginia;ALP;F;17239;25.29;-0.18
+QLD;Blair;5;;CONNORS, Libby;GRN;F;1230;1.80;-0.43
+QLD;Blair;6;;HANSON, Pauline;HAN;F;24516;35.97;35.97
+QLD;Blair;7;#;THOMPSON, Cameron;LP;M;14787;21.69;-24.19
+QLD;Blair;8;;ROBERTS, Lee;IND;M;556;0.82;0.82
+QLD;Blair;9;;SLOAN, Mark;ACS;M;170;0.25;0.25
+QLD;Blair;907;;;AWP;;0;0.00;-0.16
+QLD;Blair;909;;;AIP;;0;0.00;-0.39
+QLD;Blair;910;;;AFI;;0;0.00;-0.17
+QLD;Blair;912;;;OAP;;0;0.00;-0.94
+QLD;Blair;997;;;OTH;;0;0.00;-1.83
+QLD;Bowman;1;;MYATT, Barry Robert;HAN;M;8227;11.06;11.06
+QLD;Bowman;2;;VAN ROOYEN, Jenny;DEM;F;4021;5.41;-2.97
+QLD;Bowman;3;#;SCIACCA, Con;ALP;M;32606;43.83;1.70
+QLD;Bowman;4;;MOORHEAD, Deeane;GRN;F;1606;2.16;-0.34
+QLD;Bowman;5;;WEST, Andrea;LP;F;27927;37.54;-8.98
+QLD;Bowman;903;;;AIP;;0;0.00;-0.47
+QLD;Brisbane;1;;MASON, Brenda;GRN;F;3824;4.76;0.82
+QLD;Brisbane;2;;FEROS, Marion;LP;F;30570;38.02;-6.05
+QLD;Brisbane;3;;HOLBROOK, Darryl;DEM;M;4878;6.07;-2.77
+QLD;Brisbane;4;;SPENDER, Duncan;IND;M;814;1.01;1.01
+QLD;Brisbane;5;;TORNATORE, Samuel;HAN;M;3895;4.84;4.84
+QLD;Brisbane;6;;MATTHEWS, Graham;DSL;M;778;0.97;0.97
+QLD;Brisbane;7;#;BEVIS, Arch;ALP;M;35653;44.34;5.70
+QLD;Brisbane;906;;;AWP;;0;0.00;-1.61
+QLD;Brisbane;908;;;NLP;;0;0.00;-0.30
+QLD;Brisbane;909;;;AIP;;0;0.00;-0.36
+QLD;Brisbane;912;;;NP;;0;0.00;-0.48
+QLD;Brisbane;913;;;RPA;;0;0.00;-0.02
+QLD;Brisbane;997;;;OTH;;0;0.00;-1.75
+QLD;Capricornia;1;;FURNESS, Joan;GRN;F;1334;1.78;-0.70
+QLD;Capricornia;2;#;LIVERMORE, Kirsten;ALP;F;35229;47.11;6.83
+QLD;Capricornia;3;;LAWRENCE, Fay;DEM;F;2255;3.02;-2.27
+QLD;Capricornia;4;;MAREK, Paul;NP;M;24197;32.35;3.69
+QLD;Capricornia;5;;TIMMS, Len;HAN;M;10393;13.90;13.90
+QLD;Capricornia;6;;SCHUBACK, Peter;IND;M;1107;1.48;1.48
+QLD;Capricornia;7;;PURVIS, Andrew;CEC;M;271;0.36;0.36
+QLD;Capricornia;905;;;LP;;0;0.00;-22.87
+QLD;Capricornia;907;;;AIP;;0;0.00;-0.41
+QLD;Capricornia;997;;;OTH;;0;0.00;-0.02
+QLD;Dawson;1;;EGGERS, Barbara;HAN;F;12350;15.91;15.91
+QLD;Dawson;2;;STROPPIANA, Mark;ALP;M;29507;38.02;3.31
+QLD;Dawson;3;;PRESTON, Darin;DEM;M;1567;2.02;-1.86
+QLD;Dawson;4;#;KELLY, De-Anne;NP;F;32312;41.64;5.49
+QLD;Dawson;5;;KING, Helen;GRN;F;1027;1.32;1.32
+QLD;Dawson;6;;MCLEAN, Kevin Robert;IND;M;840;1.08;1.08
+QLD;Dawson;905;;;LP;;0;0.00;-24.27
+QLD;Dawson;906;;;AIP;;0;0.00;-0.31
+QLD;Dawson;997;;;OTH;;0;0.00;-0.69
+QLD;Dickson;1;;SMITH, Tony;IND;M;6595;8.96;8.96
+QLD;Dickson;2;;KELLY, Mark John;IND;M;264;0.36;0.36
+QLD;Dickson;3;#;KERNOT, Cheryl;ALP;F;29899;40.60;1.26
+QLD;Dickson;4;;CAMFIELD, Bruce;HAN;M;6271;8.52;8.52
+QLD;Dickson;5;;PANTANO, Kim;GRN;F;1536;2.09;-0.96
+QLD;Dickson;6;;HALLIDAY, Robert John;IND;M;227;0.31;0.31
+QLD;Dickson;7;;HENSHAW, Rod;LP;M;25622;34.79;-6.99
+QLD;Dickson;8;;MANKTELOW, Lis;DEM;F;3008;4.08;-1.96
+QLD;Dickson;9;;DUNNE, Eddie;FLR;M;224;0.30;0.30
+QLD;Dickson;905;;;NP;;0;0.00;-6.70
+QLD;Dickson;908;;;NLP;;0;0.00;-0.26
+QLD;Dickson;909;;;RPA;;0;0.00;-0.20
+QLD;Dickson;910;;;AIP;;0;0.00;-0.60
+QLD;Dickson;912;;;OAP;;0;0.00;-0.01
+QLD;Dickson;997;;;OTH;;0;0.00;-2.03
+QLD;Fadden;1;;PITT, Neil;HAN;M;9213;12.79;12.79
+QLD;Fadden;2;#;JULL, David;LP;M;34195;47.49;-12.93
+QLD;Fadden;3;;SMITH, Mike;ALP;M;22460;31.19;4.94
+QLD;Fadden;4;;COTTER, Neil;DEM;M;3248;4.51;-5.30
+QLD;Fadden;5;;MCGUIGAN, John;CTA;M;1418;1.97;1.96
+QLD;Fadden;6;;SMITH, Fay Mary;GRN;F;1472;2.04;-0.48
+QLD;Fadden;906;;;AIP;;0;0.00;-0.90
+QLD;Fadden;907;;;NP;;0;0.00;-0.05
+QLD;Fadden;909;;;NLP;;0;0.00;-0.02
+QLD;Fadden;997;;;OTH;;0;0.00;-0.01
+QLD;Fairfax;1;#;SOMLYAY, Alex;LP;M;24709;36.03;-7.83
+QLD;Fairfax;2;;ANNING, Fraser;HAN;M;12171;17.75;17.75
+QLD;Fairfax;3;;HARPER, Mike;IND;M;921;1.34;1.34
+QLD;Fairfax;4;;COOK, Harry;CTA;M;1279;1.86;1.86
+QLD;Fairfax;5;;BAKHASH, Peter;GRN;M;2381;3.47;-0.85
+QLD;Fairfax;6;;HENDERSON, John;ALP;M;19679;28.69;4.14
+QLD;Fairfax;7;;HORSWOOD, Lindsay;NP;M;4692;6.84;-10.23
+QLD;Fairfax;8;;RYAN, John Leonard;DEM;M;2754;4.02;-4.14
+QLD;Fairfax;906;;;AIP;;0;0.00;-0.66
+QLD;Fairfax;907;;;OAP;;0;0.00;-0.53
+QLD;Fairfax;997;;;OTH;;0;0.00;-0.85
+QLD;Fisher;1;;O'DONNELL, Ray;ALP;M;19205;27.79;4.54
+QLD;Fisher;2;;URQUHART, Peter K;CTA;M;1348;1.95;1.95
+QLD;Fisher;3;;SHOTTON, Les;GRN;M;1852;2.68;-0.47
+QLD;Fisher;4;;JENKINS, Tim;HAN;M;10132;14.66;14.66
+QLD;Fisher;5;;HENMAN, Jenny;DEM;F;2697;3.90;-1.79
+QLD;Fisher;6;;TAYLOR, Alexander Nicholas;IND;M;396;0.57;0.57
+QLD;Fisher;7;;MUMFORD, Trevor;IND;M;289;0.42;0.42
+QLD;Fisher;8;#;SLIPPER, Peter;LP;M;33187;48.02;-9.06
+QLD;Fisher;905;;;NP;;0;0.00;-8.40
+QLD;Fisher;907;;;AWP;;0;0.00;-0.84
+QLD;Fisher;909;;;AIP;;0;0.00;-0.27
+QLD;Fisher;910;;;AFI;;0;0.00;-0.48
+QLD;Fisher;997;;;OTH;;0;0.00;-0.85
+QLD;Forde;1;;DEAN, Adrian;HAN;M;11746;17.10;17.10
+QLD;Forde;2;;HOPE, Danny;CEC;M;229;0.33;0.33
+QLD;Forde;3;;DICKSON, Alan L;DEM;M;3093;4.50;-3.47
+QLD;Forde;4;;HABERMANN, Daniel;GRN;M;1546;2.25;-0.15
+QLD;Forde;5;;DANIELS, Geoff;FLR;M;286;0.42;0.42
+QLD;Forde;6;#;ELSON, Kay;LP;F;29358;42.74;0.29
+QLD;Forde;7;;KEECH, Peter;ALP;M;22431;32.66;0.87
+QLD;Forde;906;;;NP;;0;0.00;-14.42
+QLD;Forde;907;;;AIP;;0;0.00;-0.78
+QLD;Forde;909;;;CTA;;0;0.00;-0.00
+QLD;Forde;910;;;NLP;;0;0.00;0.00
+QLD;Forde;997;;;OTH;;0;0.00;-0.19
+QLD;Griffith;1;;MCDOUGALL, Graeme;LP;M;32018;40.26;-3.52
+QLD;Griffith;2;;RENTON, Iain Scott;DEM;M;3920;4.93;-1.28
+QLD;Griffith;3;;EASTWOOD, Jeni;AWP;F;807;1.01;-0.23
+QLD;Griffith;4;;GEORGE, Greg;GRN;M;2108;2.65;0.08
+QLD;Griffith;5;#;RUDD, Kevin;ALP;M;35121;44.17;2.82
+QLD;Griffith;6;;JORGENSEN, Neil;HAN;M;5546;6.97;6.97
+QLD;Griffith;905;;;NP;;0;0.00;-3.71
+QLD;Griffith;909;;;AIP;;0;0.00;-0.23
+QLD;Griffith;997;;;OTH;;0;0.00;-0.92
+QLD;Groom;1;;BROWN, Geoff;ALP;M;18787;25.23;3.11
+QLD;Groom;2;;MAYNE, Cynthia;IND;F;1629;2.19;2.19
+QLD;Groom;3;;BAYNES, Avril;HAN;F;13382;17.97;17.97
+QLD;Groom;4;;HARRY, Paul;CTA;M;1409;1.89;1.89
+QLD;Groom;5;;POLSON, Glenn Alexander;DEM;M;1993;2.68;-2.99
+QLD;Groom;6;;GREEN, Bruce;NP;M;11335;15.22;8.02
+QLD;Groom;7;;MOLES, Sarah;GRN;F;1307;1.75;-0.38
+QLD;Groom;8;#;MACFARLANE, Ian;LP;M;24631;33.07;-24.99
+QLD;Groom;904;;;OAP;;0;0.00;-1.87
+QLD;Groom;907;;;AIP;;0;0.00;-0.91
+QLD;Groom;997;;;OTH;;0;0.00;-2.04
+QLD;Herbert;1;;SMITH, Rebecca Ann;GRN;F;1747;2.27;2.27
+QLD;Herbert;2;;LINDSAY, Eamon John;ALP;M;28588;37.19;0.64
+QLD;Herbert;3;;SWAIN, Mark;HAN;M;10991;14.30;14.30
+QLD;Herbert;4;;WOODBRIDGE, Pauline;AWP;F;619;0.81;-0.93
+QLD;Herbert;5;;SMITH, Althea;DEM;F;1979;2.57;-3.37
+QLD;Herbert;6;;EDMISTON, John Anthony;CTA;M;948;1.23;1.23
+QLD;Herbert;7;;BRADLEY, Bob;IND;M;503;0.65;0.65
+QLD;Herbert;8;#;LINDSAY, Peter;LP;M;30683;39.91;1.28
+QLD;Herbert;9;;STELEY, Elaine;IND;F;816;1.06;1.06
+QLD;Herbert;904;;;NP;;0;0.00;-15.31
+QLD;Herbert;909;;;AIP;;0;0.00;-0.01
+QLD;Herbert;997;;;OTH;;0;0.00;-1.82
+QLD;Hinkler;1;#;NEVILLE, Paul;NP;M;26471;36.58;-16.07
+QLD;Hinkler;2;;DORRON, Cheryl;ALP;F;29021;40.11;1.86
+QLD;Hinkler;3;;PEARCE, Ray;GRN;M;1139;1.57;1.54
+QLD;Hinkler;4;;RINGUET, Marcus;HAN;M;13739;18.99;18.99
+QLD;Hinkler;5;;HALL, Lance;DEM;M;1677;2.32;-2.84
+QLD;Hinkler;6;;ROLLS, Cindy;CEC;F;309;0.43;0.43
+QLD;Hinkler;903;;;AIP;;0;0.00;-0.99
+QLD;Hinkler;907;;;LP;;0;0.00;-0.61
+QLD;Hinkler;997;;;OTH;;0;0.00;-2.30
+QLD;Kennedy;1;;POHLMANN, Greg;IND;M;2219;2.94;2.94
+QLD;Kennedy;2;;THEODORE, Steve;IND;M;476;0.63;0.63
+QLD;Kennedy;3;;HARRIS, Judy;CEC;F;255;0.34;0.34
+QLD;Kennedy;4;;DALTON, Jayson;HAN;M;14240;18.84;18.84
+QLD;Kennedy;5;;PARKER, Ken;GRN;M;1033;1.37;-1.01
+QLD;Kennedy;6;;ISHERWOOD, Alan;DEM;M;1907;2.52;-4.05
+QLD;Kennedy;7;;STARK, Kenneth;ALP;M;22110;29.25;-0.23
+QLD;Kennedy;8;#;KATTER, Bob;NP;M;33355;44.12;-12.56
+QLD;Kennedy;906;;;AIP;;0;0.00;-1.44
+QLD;Kennedy;907;;;LP;;0;0.00;-3.25
+QLD;Kennedy;908;;;AWP;;0;0.00;-0.05
+QLD;Kennedy;911;;;NLP;;0;0.00;-0.02
+QLD;Kennedy;997;;;OTH;;0;0.00;-0.13
+QLD;Leichhardt;1;;SALIER, Harold;DEM;M;2243;3.15;-1.64
+QLD;Leichhardt;2;#;ENTSCH, Warren;LP;M;29550;41.45;9.36
+QLD;Leichhardt;3;;KENYON, Rob;IND;M;267;0.37;0.37
+QLD;Leichhardt;4;;ALBERTS, Trudy H;IND;F;218;0.31;0.31
+QLD;Leichhardt;5;;DIMITRIOU, Steve;IND;M;522;0.73;-0.44
+QLD;Leichhardt;6;;LEWIS, Chris;ALP;M;26361;36.98;-1.48
+QLD;Leichhardt;7;;HUDSON, Beth;HAN;F;9904;13.89;13.89
+QLD;Leichhardt;8;;NOWAKOWSKI, Steven;GRN;M;2056;2.88;-0.00
+QLD;Leichhardt;9;;PUGH, Rata Hami;IND;M;173;0.24;0.24
+QLD;Leichhardt;904;;;NP;;0;0.00;-19.59
+QLD;Leichhardt;907;;;NLP;;0;0.00;-0.49
+QLD;Leichhardt;909;;;AIP;;0;0.00;-0.54
+QLD;Lilley;1;;BRAY, Warren;HAN;M;6702;8.50;8.50
+QLD;Lilley;2;;MEEHAN, Sue;GRN;F;1785;2.26;-0.57
+QLD;Lilley;3;;FRASER, Kirsty;DEM;F;3863;4.90;-1.72
+QLD;Lilley;4;;GRACE, Elizabeth;LP;F;30185;38.28;-7.83
+QLD;Lilley;5;#;SWAN, Wayne;ALP;M;35617;45.16;2.02
+QLD;Lilley;6;;O'KEEFFE, Gerard;CTA;M;711;0.90;0.90
+QLD;Lilley;906;;;AIP;;0;0.00;-0.27
+QLD;Lilley;909;;;AWP;;0;0.00;-0.01
+QLD;Lilley;910;;;NLP;;0;0.00;-0.00
+QLD;Lilley;997;;;OTH;;0;0.00;-1.01
+QLD;Longman;1;;LANGFORD, John;GRN;M;2206;3.16;-0.11
+QLD;Longman;2;;BARNES, Paul;DEM;M;3477;4.98;-2.53
+QLD;Longman;3;#;BROUGH, Mal;LP;M;27161;38.93;-1.27
+QLD;Longman;4;;BURGETT, Ian;ALP;M;24254;34.77;2.62
+QLD;Longman;5;;BADKE, Gavin Sean;HAN;M;12663;18.15;18.15
+QLD;Longman;904;;;OAP;;0;0.00;-0.37
+QLD;Longman;906;;;NP;;0;0.00;-14.20
+QLD;Longman;909;;;AIP;;0;0.00;-0.23
+QLD;Longman;915;;;AWP;;0;0.00;-0.29
+QLD;Longman;916;;;AFI;;0;0.00;-0.16
+QLD;Longman;997;;;OTH;;0;0.00;-1.61
+QLD;McPherson;1;;POOLE, Robert;ALP;M;24441;33.12;6.96
+QLD;McPherson;2;#;MAY, Margaret;LP;F;33329;45.17;-16.39
+QLD;McPherson;3;;PALMER, John;GRN;M;2390;3.24;-1.25
+QLD;McPherson;4;;GRIMSEY, Lynne;DEM;F;2826;3.83;-2.61
+QLD;McPherson;5;;MURPHY, Peter W;HAN;M;7065;9.58;9.58
+QLD;McPherson;6;;SHEPHERD, Ted;NP;M;3190;4.32;4.30
+QLD;McPherson;7;;GOODWIN, Kevin Patrick;IND;M;544;0.74;-0.18
+QLD;McPherson;907;;;AIP;;0;0.00;-0.41
+QLD;Maranoa;1;;CADZOW, Robyn;HAN;F;16892;22.40;22.40
+QLD;Maranoa;2;;POMMER, Elizabeth;ALP;F;18936;25.11;1.14
+QLD;Maranoa;3;;OLSEN, Kim;GRN;M;1066;1.41;1.29
+QLD;Maranoa;4;;GLEESON, Regina Evelyn;DEM;F;2114;2.80;-3.16
+QLD;Maranoa;5;#;SCOTT, Bruce;NP;M;34075;45.19;-21.48
+QLD;Maranoa;6;;MILLER, Peter Stanley;CEC;M;243;0.32;0.32
+QLD;Maranoa;7;;WHEELDON, Lorraine;IND;F;2076;2.75;2.75
+QLD;Maranoa;905;;;AIP;;0;0.00;-2.35
+QLD;Maranoa;906;;;LP;;0;0.00;-0.92
+QLD;Moncrieff;1;;BENNETT, Anne;ALP;F;21055;29.11;6.43
+QLD;Moncrieff;2;;FENTON, Warren;HAN;M;7357;10.17;10.17
+QLD;Moncrieff;3;;O'BRIEN, Colin;DEM;M;2610;3.61;-1.57
+QLD;Moncrieff;4;#;SULLIVAN, Kathy Martin;LP;F;37527;51.88;-13.10
+QLD;Moncrieff;5;;FALCKE, Julie;CTA;F;1615;2.23;1.54
+QLD;Moncrieff;6;;SPAIN, Sally;GRN;F;2175;3.01;-1.77
+QLD;Moncrieff;907;;;AIP;;0;0.00;-0.49
+QLD;Moncrieff;908;;;NLP;;0;0.00;-0.45
+QLD;Moncrieff;911;;;NP;;0;0.00;-0.01
+QLD;Moncrieff;997;;;OTH;;0;0.00;-0.74
+QLD;Moreton;1;;TAYLOR, Lenore;GRN;F;2627;3.36;0.08
+QLD;Moreton;2;#;HARDGRAVE, Gary;LP;M;33724;43.12;-7.76
+QLD;Moreton;3;;VOTE, Jim;CTA;M;959;1.23;1.23
+QLD;Moreton;4;;BROOKES, Kathleen;ALP;F;31227;39.93;3.99
+QLD;Moreton;5;;LEE, Anthony;DEM;M;4046;5.17;-1.71
+QLD;Moreton;6;;STEWART, Vanessa;HAN;F;5626;7.19;7.19
+QLD;Moreton;903;;;AFI;;0;0.00;-0.83
+QLD;Moreton;907;;;NLP;;0;0.00;-0.21
+QLD;Moreton;910;;;AIP;;0;0.00;-0.28
+QLD;Moreton;997;;;OTH;;0;0.00;-1.70
+QLD;Oxley;1;;TRENCHER, Simon;FLR;M;689;0.96;0.96
+QLD;Oxley;2;;SCOTT, Anne;IND;F;3053;4.26;4.26
+QLD;Oxley;3;;FORBES, Maria;LP;F;17538;24.48;-18.96
+QLD;Oxley;4;;KUNZELMANN, Kate;DEM;F;2773;3.87;-2.75
+QLD;Oxley;5;;HUGHES, Colene Mae;HAN;F;12653;17.66;17.66
+QLD;Oxley;6;;RULE, Dele;IND;F;614;0.86;0.86
+QLD;Oxley;7;;MCKEON, John;GRN;M;1200;1.68;-0.97
+QLD;Oxley;8;#;RIPOLL, Bernie;ALP;M;32770;45.75;1.80
+QLD;Oxley;9;;NGUYEN, Xuan Thu;IND;M;338;0.47;0.47
+QLD;Oxley;908;;;AIP;;0;0.00;-0.96
+QLD;Oxley;911;;;NLP;;0;0.00;0.00
+QLD;Oxley;997;;;OTH;;0;0.00;-2.38
+QLD;Petrie;1;;BOWER, Raymond;HAN;M;8637;11.09;11.09
+QLD;Petrie;2;;STOWELL, Pamela;DEM;F;3962;5.09;-1.42
+QLD;Petrie;3;#;GAMBARO, Teresa;LP;F;32994;42.37;-9.19
+QLD;Petrie;4;;BURGOYNE, Peter;GRN;M;1395;1.79;-0.80
+QLD;Petrie;5;;HUME, Rosemary;ALP;F;30882;39.66;3.60
+QLD;Petrie;909;;;AIP;;0;0.00;-0.33
+QLD;Petrie;912;;;AWP;;0;0.00;-0.03
+QLD;Petrie;913;;;NLP;;0;0.00;-0.02
+QLD;Petrie;916;;;NP;;0;0.00;-0.21
+QLD;Petrie;917;;;RPA;;0;0.00;-0.01
+QLD;Petrie;997;;;OTH;;0;0.00;-2.69
+QLD;Rankin;1;;HAGE, Ann;CTA;F;1556;2.24;2.24
+QLD;Rankin;2;;NORTON, Brian;IND;M;456;0.66;0.66
+QLD;Rankin;3;;BARNES, Lorraine;IND;F;456;0.66;0.66
+QLD;Rankin;4;#;EMERSON, Craig;ALP;M;32924;47.48;4.91
+QLD;Rankin;5;;FROOD, Ron;HAN;M;8749;12.62;12.62
+QLD;Rankin;6;;BUI, Cuong;LP;M;20736;29.91;-12.67
+QLD;Rankin;7;;HERNANDEZ, Robert;DEM;M;2923;4.22;-4.37
+QLD;Rankin;8;;VAN TINTEREN, Sara;GRN;F;1536;2.22;-0.74
+QLD;Rankin;907;;;AIP;;0;0.00;-1.17
+QLD;Rankin;909;;;AFI;;0;0.00;-0.15
+QLD;Rankin;911;;;NLP;;0;0.00;-0.02
+QLD;Rankin;913;;;NP;;0;0.00;-0.96
+QLD;Rankin;997;;;OTH;;0;0.00;-1.00
+QLD;Ryan;1;;HOEPPER, Brian;GRN;M;2945;3.83;0.62
+QLD;Ryan;2;;SKYRING, Alan;IND;M;353;0.46;-0.59
+QLD;Ryan;3;;DENGATE, Lyn;DEM;F;6139;7.98;-2.00
+QLD;Ryan;4;;SMITH, Alan;HAN;M;4032;5.24;5.24
+QLD;Ryan;5;;FARRUGGIO, Teresa;ALP;F;23350;30.35;5.00
+QLD;Ryan;6;;BARKER, John;FST;M;158;0.21;0.21
+QLD;Ryan;7;#;MOORE, John Colinton;LP;M;38785;50.40;-9.17
+QLD;Ryan;8;;MACKENZIE, Peter Boyd;IND;M;1186;1.54;1.54
+QLD;Ryan;905;;;NLP;;0;0.00;-0.34
+QLD;Ryan;908;;;AIP;;0;0.00;-0.35
+QLD;Ryan;910;;;AWP;;0;0.00;-0.09
+QLD;Ryan;997;;;OTH;;0;0.00;-0.07
+QLD;Wide Bay;1;;FRASER, Desley;LP;F;5937;8.28;7.79
+QLD;Wide Bay;2;;WICKS, Graeme;HAN;M;18891;26.33;26.33
+QLD;Wide Bay;3;;RODHOUSE, Phil;DEM;M;1552;2.16;-4.75
+QLD;Wide Bay;4;;NIELSEN, Richard;GRN;M;917;1.28;1.21
+QLD;Wide Bay;5;;POSTLE, Bob;IND;M;1480;2.06;2.06
+QLD;Wide Bay;6;;TREMLIN, Russ;ALP;M;20391;28.42;1.05
+QLD;Wide Bay;7;#;TRUSS, Warren;NP;M;22569;31.46;-27.78
+QLD;Wide Bay;904;;;OAP;;0;0.00;-0.81
+QLD;Wide Bay;907;;;AIP;;0;0.00;-1.45
+QLD;Wide Bay;997;;;OTH;;0;0.00;-3.65
+WA;Brand;1;;LEISHMAN, Anne;NLP;F;343;0.49;0.49
+WA;Brand;2;;REYNOLDS, Kent B;IND;M;308;0.44;0.44
+WA;Brand;3;;ROTH, Paul;IND;M;310;0.44;0.44
+WA;Brand;4;;DUNLOP, Nick;GWA;M;2012;2.88;-1.62
+WA;Brand;5;#;BEAZLEY, Kim;ALP;M;36391;52.00;7.65
+WA;Brand;6;;DORRINGTON, Kate;IND;F;399;0.57;0.57
+WA;Brand;7;;HIGGINS, Ron;ACS;M;167;0.24;0.24
+WA;Brand;8;;DAWSON, Lee;HAN;M;8308;11.87;11.87
+WA;Brand;9;;PALMER, Rick;LP;M;19413;27.74;-14.01
+WA;Brand;10;;LAWN, Graham T;CTA;M;402;0.57;0.57
+WA;Brand;11;;GENT, Carolyn;FST;F;296;0.42;0.42
+WA;Brand;12;;MULLANE, Collin;DEM;M;1630;2.33;-1.44
+WA;Brand;904;;;AFI;;0;0.00;-1.15
+WA;Brand;911;;;NP;;0;0.00;-0.65
+WA;Brand;997;;;OTH;;0;0.00;-3.83
+WA;Canning;1;;SCOTT, Lance;IND;M;918;1.27;1.27
+WA;Canning;2;;CRAIG, Dean;DEM;M;2489;3.43;-2.45
+WA;Canning;3;;JOHNSTON, Ricky;LP;F;25350;34.93;-9.73
+WA;Canning;4;;BEILBY, Margo;GWA;F;3007;4.14;-1.08
+WA;Canning;5;;ROBERTS, Patti;NLP;F;185;0.25;-0.14
+WA;Canning;6;;MCCARTHY, Brian Francis;CEC;M;136;0.19;0.19
+WA;Canning;7;;SHAVE, Michelle;CTA;F;1457;2.01;2.01
+WA;Canning;8;;TAYLOR, Colin;HAN;M;9823;13.54;13.54
+WA;Canning;9;#;GERICK, Jane;ALP;F;29201;40.24;-0.35
+WA;Canning;910;;;AFI;;0;0.00;-0.12
+WA;Canning;913;;;NP;;0;0.00;-0.12
+WA;Canning;997;;;OTH;;0;0.00;-3.01
+WA;Cowan;1;#;EDWARDS, Graham;ALP;M;31312;43.89;4.19
+WA;Cowan;2;;HOLT, Ron;HAN;M;5777;8.10;8.10
+WA;Cowan;3;;HAYES, Phillip;CTA;M;850;1.19;1.19
+WA;Cowan;4;;CASTILLO, Miguel;GWA;M;2760;3.87;-0.46
+WA;Cowan;5;;EVANS, Richard;LP;M;27797;38.96;-6.25
+WA;Cowan;6;;WAKEFORD, Craig;DEM;M;2847;3.99;-3.35
+WA;Cowan;997;;;OTH;;0;0.00;-3.43
+WA;Curtin;1;;ROCHER, Allan;IND;M;13925;17.67;-8.06
+WA;Curtin;2;;WADDELL, Andrew;ALP;M;18026;22.87;2.32
+WA;Curtin;3;;LIPPLE, Stephen;DEM;M;3780;4.80;0.38
+WA;Curtin;4;;TRINDER, Ian Frank;HAN;M;2934;3.72;3.72
+WA;Curtin;5;;FARREN, Phillip;GWA;M;4971;6.31;0.07
+WA;Curtin;6;#;BISHOP, Julie;LP;F;35174;44.63;2.69
+WA;Curtin;907;;;NLP;;0;0.00;-1.12
+WA;Forrest;1;;STONE, Ted;FST;M;897;1.19;1.19
+WA;Forrest;2;;EMBRY, Paddy;HAN;M;10029;13.34;13.34
+WA;Forrest;3;#;PROSSER, Geoff;LP;M;32171;42.78;-14.34
+WA;Forrest;4;;CUMMINS, Jim;CTA;M;1316;1.75;1.75
+WA;Forrest;5;;THOMAS, Steve;NP;M;2354;3.13;3.13
+WA;Forrest;6;;DOUST, Jon;;M;424;0.56;0.56
+WA;Forrest;7;;DENMAN, Alf;DEM;M;2253;3.00;-2.13
+WA;Forrest;8;;WATSON, John;CEC;M;117;0.16;0.16
+WA;Forrest;9;;LLEWELLYN, Paul;GWA;M;5303;7.05;-0.42
+WA;Forrest;10;;DEAN, Tony;ALP;M;20332;27.04;-1.67
+WA;Forrest;997;;;OTH;;0;0.00;-1.57
+WA;Fremantle;1;;HILL, Tony;HAN;M;5834;7.56;7.56
+WA;Fremantle;2;#;LAWRENCE, Carmen;ALP;F;36631;47.45;0.72
+WA;Fremantle;3;;ZAKNIC, Jakica;DEM;F;3450;4.47;-1.40
+WA;Fremantle;4;;DEEGAN, Leonie;GWA;F;5281;6.84;-0.03
+WA;Fremantle;5;;SHAVE, Lawrence;IND;M;957;1.24;1.24
+WA;Fremantle;6;;TILLER, Mick;LP;M;25051;32.45;-8.07
+WA;Fremantle;906;;;NLP;;0;0.00;-0.01
+WA;Kalgoorlie;1;;CHAPPLE, Robin;GWA;M;2899;4.24;0.51
+WA;Kalgoorlie;2;;BUTSON, Clark;ALP;M;18890;27.62;-6.11
+WA;Kalgoorlie;3;#;HAASE, Barry;LP;M;19169;28.03;1.43
+WA;Kalgoorlie;4;;RICHTER, Dean;DEM;M;1367;2.00;-0.18
+WA;Kalgoorlie;5;;FINLAYSON, Kathy;NP;F;4088;5.98;4.78
+WA;Kalgoorlie;6;;CAMPBELL, Graeme;FST;M;15585;22.79;22.79
+WA;Kalgoorlie;7;;SUGG, Laurie;CTA;M;466;0.68;0.68
+WA;Kalgoorlie;8;;SMITH, Neville;HAN;M;5737;8.39;8.39
+WA;Kalgoorlie;9;;BURT, Ian Richard;CEC;M;185;0.27;0.27
+WA;Kalgoorlie;997;;;OTH;;0;0.00;-32.56
+WA;Moore;1;#;WASHER, Mal;LP;M;24754;34.38;8.00
+WA;Moore;2;;FILING, Paul;IND;M;14739;20.47;-13.26
+WA;Moore;3;;WALKER, Allison Ann;HAN;F;4943;6.87;6.87
+WA;Moore;4;;MAGYAR, Steve;GWA;M;3209;4.46;0.22
+WA;Moore;5;;LOCK, Patti;DEM;F;2611;3.63;-1.01
+WA;Moore;6;;POWER, Christine;ALP;F;21743;30.20;0.64
+WA;Moore;997;;;OTH;;0;0.00;-1.46
+WA;O'Connor;1;;MARCIANO, Frank;ALP;M;16877;22.17;-0.93
+WA;O'Connor;2;;FOWLER, Jenny;NP;F;6137;8.06;-7.25
+WA;O'Connor;3;;FORSYTH, Mac;CTA;M;1343;1.76;1.76
+WA;O'Connor;4;#;TUCKEY, Wilson;LP;M;35383;46.48;-6.92
+WA;O'Connor;5;;MCGLADE, Hannah;DEM;F;1799;2.36;-0.93
+WA;O'Connor;6;;SMITH, Stuart;CEC;M;231;0.30;0.30
+WA;O'Connor;7;;HOUGH, Frank;HAN;M;10449;13.73;13.73
+WA;O'Connor;8;;STILES, Ian;FST;M;1054;1.38;1.38
+WA;O'Connor;9;;DOUGLAS, Mark;GWA;M;2845;3.74;0.27
+WA;O'Connor;910;;;AFI;;0;0.00;-0.15
+WA;O'Connor;997;;;OTH;;0;0.00;-1.28
+WA;Pearce;1;;ANDREWS, Paul;ALP;M;22751;30.51;2.85
+WA;Pearce;2;;BURT, John;CEC;M;288;0.39;0.39
+WA;Pearce;3;;GUNNYON, David;HAN;M;9381;12.58;12.58
+WA;Pearce;4;#;MOYLAN, Judi;LP;F;32475;43.54;-11.41
+WA;Pearce;5;;COOPER, Roger;NP;M;1017;1.36;0.59
+WA;Pearce;6;;MOXHAM, Barbara;DEM;F;4248;5.70;-3.96
+WA;Pearce;7;;SCHEKKERMAN, Keith;GWA;M;4420;5.93;-0.95
+WA;Pearce;908;;;NLP;;0;0.00;0.00
+WA;Pearce;997;;;OTH;;0;0.00;-0.09
+WA;Perth;1;;MILLS, Kerry Anne;HAN;F;6555;8.56;8.56
+WA;Perth;2;#;SMITH, Stephen;ALP;M;38395;50.16;2.89
+WA;Perth;3;;CARTER, Gemma;GWA;F;4713;6.16;0.24
+WA;Perth;4;;KIM, Iggy;DSL;M;682;0.89;0.89
+WA;Perth;5;;MONTANI, David;LP;M;22689;29.64;-8.66
+WA;Perth;6;;ENTREKIN, Brendon;DEM;M;3517;4.59;-1.72
+WA;Perth;906;;;NLP;;0;0.00;-0.45
+WA;Perth;997;;;OTH;;0;0.00;-1.76
+WA;Stirling;1;;MCNEILL, Elaine;FST;F;996;1.30;1.30
+WA;Stirling;2;;CAMERON, Eoin;LP;M;32015;41.71;-3.48
+WA;Stirling;3;;HILLEL, Leanne;NLP;F;213;0.28;-0.20
+WA;Stirling;4;;EVANS, John;HAN;M;5096;6.64;6.64
+WA;Stirling;5;;LOCKETT, Mark;GWA;M;3820;4.98;-0.38
+WA;Stirling;6;#;MCFARLANE, Jann;ALP;F;30994;40.38;2.28
+WA;Stirling;7;;MARKHAM, Peter;DEM;M;3303;4.30;-0.91
+WA;Stirling;8;;TABACZYNSKI, Bronislaw;UNI;M;321;0.42;0.42
+WA;Stirling;997;;;OTH;;0;0.00;-5.65
+WA;Swan;1;;TALBOT, Malcolm Lloyd;CEC;M;584;0.77;0.77
+WA;Swan;2;;FRASER, Tim;DEM;M;3720;4.89;-0.88
+WA;Swan;3;#;WILKIE, Kim;ALP;M;30481;40.09;3.10
+WA;Swan;4;;CLAIRS, Elspeth;NLP;F;210;0.28;-0.05
+WA;Swan;5;;MILLER, Juanita;GWA;F;3892;5.12;0.27
+WA;Swan;6;;BIRCHALL, Richard;HAN;M;6278;8.26;8.26
+WA;Swan;7;;CROOK, Brett;CTA;M;1018;1.34;1.34
+WA;Swan;8;;RANDALL, Don;LP;M;29848;39.26;-3.55
+WA;Swan;997;;;OTH;;0;0.00;-9.25
+WA;Tangney;1;;CHANDRASEGARAN, Suryan Robert;CTA;M;1484;1.92;1.92
+WA;Tangney;2;;WHITELY, Martin;ALP;M;25521;33.04;2.18
+WA;Tangney;3;;GOLDBERG, Manny;ACS;M;246;0.32;0.32
+WA;Tangney;4;;BYRNE, Joshua;GWA;M;3542;4.58;-0.35
+WA;Tangney;5;;TAYLOR, Geoff;DEM;M;4350;5.63;-2.95
+WA;Tangney;6;#;WILLIAMS, Daryl;LP;M;36547;47.31;-7.62
+WA;Tangney;7;;O'DWYER, Raymond John;HAN;M;5564;7.20;7.20
+WA;Tangney;906;;;NLP;;0;0.00;-0.52
+WA;Tangney;997;;;OTH;;0;0.00;-0.18
+SA;Adelaide;1;;BEARD, Tyron;DEM;M;7077;9.55;1.33
+SA;Adelaide;2;;HUNT, Rita;IND;F;462;0.62;0.62
+SA;Adelaide;3;;LORENZON, Vladimir;NLP;M;287;0.39;-0.05
+SA;Adelaide;4;;HANNON, Karen;ALP;F;27756;37.45;-0.29
+SA;Adelaide;5;;RAMSEY, Suzanne;HAN;F;3837;5.18;5.18
+SA;Adelaide;6;#;WORTH, Trish;LP;F;32173;43.41;-4.48
+SA;Adelaide;7;;MORAN, Mark;GRN;M;2518;3.40;0.64
+SA;Adelaide;909;;;GRY;;0;0.00;-0.74
+SA;Adelaide;997;;;OTH;;0;0.00;-2.23
+SA;Barker;1;;CORNISH, Philip Maurice;CTA;M;2161;2.78;2.78
+SA;Barker;2;;HAIG, Tom;NP;M;1746;2.25;2.25
+SA;Barker;3;;DETCHON, David;ALP;M;16844;21.69;-1.36
+SA;Barker;4;;JERRAM, Bill;IND;M;784;1.01;1.01
+SA;Barker;5;;BECK, Tony;IND;M;3985;5.13;5.13
+SA;Barker;6;;LUDWIG, Judith Anne;FST;F;713;0.92;0.92
+SA;Barker;7;#;SECKER, Patrick;LP;M;36412;46.89;-15.62
+SA;Barker;8;;LAVERS, John S;DEM;M;4919;6.33;-3.49
+SA;Barker;9;;WRIGHT, Dona;HAN;F;10096;13.00;13.00
+SA;Barker;901;;;GRN;;0;0.00;-3.71
+SA;Barker;903;;;NLP;;0;0.00;-0.90
+SA;Bonython;1;;NEWTON, Phil;LP;M;17253;24.24;-6.75
+SA;Bonython;2;#;EVANS, Martyn;ALP;M;35961;50.52;0.93
+SA;Bonython;3;;SHAW, Ted;HAN;M;10542;14.81;14.81
+SA;Bonython;4;;FISHER, Robert;DEM;M;6539;9.19;-5.27
+SA;Bonython;5;;CARTER, Dave;FST;M;891;1.25;1.25
+SA;Bonython;902;;;GRN;;0;0.00;-3.04
+SA;Bonython;997;;;OTH;;0;0.00;-1.93
+SA;Boothby;1;#;SOUTHCOTT, Andrew;LP;M;36435;48.22;-5.13
+SA;Boothby;2;;WHITTAKER, Trevor Winston;HAN;M;5213;6.90;6.90
+SA;Boothby;3;;MORRIS, Bevan;NLP;M;544;0.72;0.03
+SA;Boothby;4;;GILBERT, Don;DEM;M;9821;13.00;-0.66
+SA;Boothby;5;;CHESSON, Jo;ALP;F;23547;31.16;1.71
+SA;Boothby;904;;;GRN;;0;0.00;-2.85
+SA;Grey;1;;DICKSON, Noel Thomas;HAN;M;9469;12.60;12.60
+SA;Grey;2;;JACKSON, Martin;IND;M;729;0.97;0.97
+SA;Grey;3;;BUCKLAND, Geoff;ALP;M;23581;31.37;-5.06
+SA;Grey;4;;GRAY, Ian;NP;M;1592;2.12;2.12
+SA;Grey;5;;WEETMAN, Nick;DEM;M;3802;5.06;-1.85
+SA;Grey;6;;BROWN, Paul Anthony;NLP;M;325;0.43;0.43
+SA;Grey;7;#;WAKELIN, Barry;LP;M;35669;47.45;-6.84
+SA;Grey;904;;;GRN;;0;0.00;-2.36
+SA;Hindmarsh;1;;GEORGANAS, Steve;ALP;M;29912;39.19;3.44
+SA;Hindmarsh;2;;GIBSON, Colin;HAN;M;5362;7.03;7.03
+SA;Hindmarsh;3;;CASHEL, Deb;GRN;F;2058;2.70;0.23
+SA;Hindmarsh;4;#;GALLUS, Chris;LP;F;33031;43.28;-8.68
+SA;Hindmarsh;5;;DUNNING, Sandra Janette;NLP;F;302;0.40;-0.05
+SA;Hindmarsh;6;;RAW, Neil;DEM;M;5659;7.41;0.31
+SA;Hindmarsh;997;;;OTH;;0;0.00;-2.26
+SA;Kingston;1;;WESTON, Olive;IND;F;980;1.20;1.20
+SA;Kingston;2;;JEANES, Susan;LP;F;32211;39.45;-3.44
+SA;Kingston;3;;DICKSON, Hugh;NLP;M;400;0.49;0.08
+SA;Kingston;4;;PLANETA, Chris;EFF;M;513;0.63;0.63
+SA;Kingston;5;;MCCORMACK, Charlie;HAN;M;7510;9.20;9.20
+SA;Kingston;6;;HAHNHEUSER, Ralph;IND;M;869;1.06;1.06
+SA;Kingston;7;;PRATT, Graham;DEM;M;7725;9.46;-0.49
+SA;Kingston;8;#;COX, David;ALP;M;31441;38.51;-1.04
+SA;Kingston;907;;;AFI;;0;0.00;-2.24
+SA;Kingston;910;;;GRN;;0;0.00;-2.33
+SA;Kingston;997;;;OTH;;0;0.00;-2.62
+SA;Makin;1;;POSTA, Christine;DEM;F;8502;10.27;1.04
+SA;Makin;2;#;DRAPER, Trish;LP;F;33702;40.70;-3.85
+SA;Makin;3;;KOWALD, Rodney Wayne;HAN;M;8009;9.67;9.67
+SA;Makin;4;;WELLS, Geoffrey;NLP;M;391;0.47;-0.44
+SA;Makin;5;;WOHLTMANN, Mike;IND;M;1002;1.21;1.21
+SA;Makin;6;;GAGO, Gail;ALP;F;31194;37.67;-3.07
+SA;Makin;905;;;GRN;;0;0.00;-2.38
+SA;Makin;997;;;OTH;;0;0.00;-2.18
+SA;Mayo;1;;SCHUMANN, John;DEM;M;18791;22.43;9.99
+SA;Mayo;2;;COOMBE, Howie F;IND;M;598;0.71;0.71
+SA;Mayo;3;;EVANS, Jade;ALP;F;18290;21.83;-3.34
+SA;Mayo;4;;WYNN, Ian;CTA;M;1360;1.62;1.62
+SA;Mayo;5;;COOMBE, Anthony M;NLP;M;360;0.43;-0.16
+SA;Mayo;6;#;DOWNER, Alexander;LP;M;38246;45.64;-11.37
+SA;Mayo;7;;PEACOCK, Lee;HAN;F;6146;7.33;7.33
+SA;Mayo;905;;;GRN;;0;0.00;-3.46
+SA;Mayo;997;;;OTH;;0;0.00;-1.32
+SA;Port Adelaide;1;;BAWDEN, Matilda;DEM;F;6696;9.01;-0.55
+SA;Port Adelaide;2;;PERTH, Michael;;M;801;1.08;1.08
+SA;Port Adelaide;3;#;SAWFORD, Rod;ALP;M;39449;53.10;4.68
+SA;Port Adelaide;4;;HILL, Rick;IND;M;1527;2.06;2.06
+SA;Port Adelaide;5;;POWELL, John;HAN;M;6731;9.06;9.06
+SA;Port Adelaide;6;;CAVUOTO, Romeo;LP;M;19083;25.69;-11.12
+SA;Port Adelaide;901;;;GRN;;0;0.00;-4.56
+SA;Port Adelaide;905;;;NLP;;0;0.00;-0.64
+SA;Sturt;1;;VINCENT, Lyndal;NLP;F;917;1.26;0.47
+SA;Sturt;2;;SISSONS, Paul;HAN;M;4385;6.04;6.04
+SA;Sturt;3;;DEARING, Jackie;DEM;F;8174;11.25;0.93
+SA;Sturt;4;;KINASZ, Michal;IND;M;701;0.96;0.96
+SA;Sturt;5;#;PYNE, Christopher;LP;M;34703;47.77;-6.30
+SA;Sturt;6;;WORRALL, Lance;ALP;M;23766;32.71;0.80
+SA;Sturt;904;;;GRN;;0;0.00;-2.90
+SA;Wakefield;1;;HARTWIG, Merv;HAN;M;13473;16.67;16.67
+SA;Wakefield;2;;LANNSTROM, Karrie June;DEM;F;6200;7.67;-3.22
+SA;Wakefield;3;#;ANDREW, Neil;LP;M;40464;50.07;-10.80
+SA;Wakefield;4;;CHALLACOMBE, Jeremy;NP;M;1458;1.80;1.80
+SA;Wakefield;5;;LEVERSEDGE, Carla;ALP;F;17526;21.69;-1.11
+SA;Wakefield;6;;KELLY, Pam;IND;F;1690;2.09;2.09
+SA;Wakefield;901;;;GRY;;0;0.00;-2.83
+SA;Wakefield;902;;;GRN;;0;0.00;-2.61
+TAS;Bass;1;;SMITH, Warwick;LP;M;27974;45.75;-5.48
+TAS;Bass;2;#;O'BYRNE, Michelle;ALP;F;25864;42.30;2.06
+TAS;Bass;3;;BAIRD, Stuart;GRN;M;2595;4.24;4.24
+TAS;Bass;4;;LOCKHART, Allan;HAN;M;2057;3.36;3.36
+TAS;Bass;5;;SMITH, Harvey;TFP;M;1165;1.91;1.91
+TAS;Bass;6;;MUIR, Brian;DEM;M;1491;2.44;-1.12
+TAS;Bass;903;;;TG;;0;0.00;-4.97
+TAS;Braddon;1;;THOMPSON, Clare;GRN;F;2794;4.81;4.81
+TAS;Braddon;2;#;SIDEBOTTOM, Peter Sid;ALP;M;26643;45.85;7.54
+TAS;Braddon;3;;THOMPSON, Gavin;TFP;M;1143;1.97;1.97
+TAS;Braddon;4;;THOMSON, John Dugald;HAN;M;2446;4.21;4.21
+TAS;Braddon;5;;MILES, Chris;LP;M;23480;40.41;-11.73
+TAS;Braddon;6;;MORGAN, Peter;DEM;M;1601;2.76;-1.15
+TAS;Braddon;901;;;TG;;0;0.00;-5.64
+TAS;Denison;1;;GREGSON, Andrew;LP;M;20114;32.12;-2.18
+TAS;Denison;2;;BROSZCZYK, Gregory;NLP;M;497;0.79;0.79
+TAS;Denison;3;;HINES, Mat;GRN;M;4698;7.50;7.50
+TAS;Denison;4;;BLACKBURN, Brent;DEM;M;2460;3.93;-0.45
+TAS;Denison;5;#;KERR, Duncan;ALP;M;34854;55.66;3.38
+TAS;Denison;901;;;TG;;0;0.00;-8.28
+TAS;Denison;997;;;OTH;;0;0.00;-0.77
+TAS;Franklin;1;;FISHER, Irene;DEM;F;3003;4.89;-0.14
+TAS;Franklin;2;;GOODLUCK, Jane;LP;F;24266;39.51;-1.25
+TAS;Franklin;3;#;QUICK, Harry;ALP;M;30180;49.14;3.19
+TAS;Franklin;4;;MCFARLANE, Kay;GRN;F;3962;6.45;6.45
+TAS;Franklin;902;;;TG;;0;0.00;-6.97
+TAS;Franklin;997;;;OTH;;0;0.00;-1.28
+TAS;Lyons;1;#;ADAMS, Dick;ALP;M;32843;51.17;6.74
+TAS;Lyons;2;;WILSON, Andrew A;HAN;M;3050;4.75;4.75
+TAS;Lyons;3;;COLBECK, Richard;LP;M;21543;33.56;-10.73
+TAS;Lyons;4;;WILLOCK, Annie;GRN;F;3042;4.74;4.74
+TAS;Lyons;5;;BENSEMANN, Bob;DEM;M;1469;2.29;-1.29
+TAS;Lyons;6;;GERRITY, Darryl;TFP;M;2243;3.49;3.49
+TAS;Lyons;901;;;NP;;0;0.00;-1.91
+TAS;Lyons;903;;;TG;;0;0.00;-5.80
+ACT;Canberra;1;;ULASOWSKI, Nikki;DSL;F;1427;1.45;1.45
+ACT;Canberra;2;#;ELLIS, Annette;ALP;F;48015;48.90;3.39
+ACT;Canberra;3;;MORISON, Ian;LP;M;32336;32.93;-10.89
+ACT;Canberra;4;;ELLERMAN, Sue;GRN;F;3774;3.84;-3.67
+ACT;Canberra;5;;DOBLE, Burl;HAN;M;5122;5.22;5.22
+ACT;Canberra;6;;ENGLAND, Maryan;NLP;F;281;0.29;-0.10
+ACT;Canberra;7;;ONSMAN, Yulia;DEM;F;7237;7.37;7.37
+ACT;Canberra;997;;;OTH;;0;0.00;-2.78
+ACT;Fraser;1;#;MCMULLAN, Bob;ALP;M;50573;52.41;1.89
+ACT;Fraser;2;;SPENCE, Chris;HAN;M;4773;4.95;4.95
+ACT;Fraser;3;;BULL, Sue;DSL;F;1214;1.26;1.26
+ACT;Fraser;4;;CLARKE, Joanne;IND;F;1057;1.10;1.10
+ACT;Fraser;5;;SMITH, Peter;LP;M;27088;28.07;-9.72
+ACT;Fraser;6;;MCALLISTER, Gordon;GRN;M;4371;4.53;-5.45
+ACT;Fraser;7;;SEATON, David;NLP;M;258;0.27;-0.16
+ACT;Fraser;8;;WOOD, Jason;DEM;M;7157;7.42;7.42
+ACT;Fraser;997;;;OTH;;0;0.00;-1.29
+NT;Northern Territory;1;;SEILER, Craig M P;DEM;M;4658;5.12;5.12
+NT;Northern Territory;2;;NATTRASS, Barry;IND;M;1018;1.12;1.12
+NT;Northern Territory;3;;DONDAS, Nick;CLP;M;36014;39.60;-5.44
+NT;Northern Territory;4;;ZIRNGAST, Natalie;DSL;F;624;0.69;0.69
+NT;Northern Territory;5;;ELDRIDGE, Ilana;GRN;F;2753;3.03;-3.23
+NT;Northern Territory;6;;SCHIRMER, Peter;HAN;M;7401;8.14;8.14
+NT;Northern Territory;7;#;SNOWDON, Warren;ALP;M;38469;42.30;-1.20
+NT;Northern Territory;997;;;OTH;;0;0.00;-5.20

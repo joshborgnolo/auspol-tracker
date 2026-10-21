@@ -38,7 +38,8 @@
    - cyclePollBases "<bucket>|Morgan" — the provenance record for the
      implied FLOW_ERAS basis of each bucket's era rows (validate's 8c can
      never authority-check a printed-table basis that doesn't exist). Four
-     of the seven eras miss the ±0.6 pre-1983 LEF error budget at their
+     of the seven eras miss by more than Bonham's 0.6-point average for
+     1955-80 (an average, not a bound, and his test starts in 1955) at their
      right-edge backtest (the flows.mjs FLOW_ERAS comment records why: a
      12% independent vote in 1943, splinter-Labor remnants in the 1940s
      "others", and the DLP's post-1955 realignment), so each note quotes
@@ -116,7 +117,7 @@ for (const k of ["1946|Morgan", "1949|Morgan", "1951|Morgan", "1954|Morgan", "19
 /* provenance notes — the implied-2PP basis of each bucket's era rows,
    mirroring the 1961-66 notes. The 1943 and 1946 sets calibrate against
    estimated two-party figures, not the AEC series; four right-edge
-   backtests miss the ±0.6 budget and say so. */
+   backtests miss by more than Bonham's 0.6 average (1955-80) and say so. */
 const note = (open, bt, inBudget) => {
   const anchor = open === "1943" || open === "1946"
     ? "that election's published Mackerras-estimate 2PP – the AEC's own TPP series starts in 1949"
@@ -124,8 +125,8 @@ const note = (open, bt, inBudget) => {
   return "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the "
     + open + " election's calibrated constants (FLOW_ERAS[" + open + "] in flows.mjs, anchored to " + anchor
     + " – the Kevin Bonham Wonk Central method; right-edge backtest "
-    + bt + (inBudget ? ", inside the ±0.6 pre-1983 LEF error budget quoted in the piece"
-                     : ", a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece")
+    + bt + (inBudget ? ", smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections"
+                     : ", larger than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections")
     + (open === "1943" ? " against an estimated close itself" : "")
     + "). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.";
 };

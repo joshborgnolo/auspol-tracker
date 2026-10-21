@@ -44,7 +44,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "aec-flow-src")
 ROOT = os.path.dirname(HERE)
 
-MAJ_ALP = {"ALP"}
+# CLR: Country Labor, Labor's banner in rural NSW seats 2001-2013 - the
+# 2001 flow files name it so, and leaving it out dropped nine Labor v
+# Coalition seats from that election's count
+MAJ_ALP = {"ALP", "CLR"}
 MAJ_COAL = {"LP", "NP", "CLP", "LNP", "NAT", "LIB"}
 GREENS = {"GRN", "GWA", "AGV", "TG"}
 ONP = {"HAN", "ON"}
@@ -156,9 +159,29 @@ def national_v16(path):
     return dict(share), alp_2pp
 
 def classic_table(year):
+    """flows by party from the packs' Division Summary blocks, division by
+    division (tcp-<year>.json.gz, aec-tcp-history.py), over the seats whose
+    final pair was Labor (or Country Labor) v a Coalition party; national
+    primaries and 2PP from classic-<year>.json (table V1_6)."""
+    import gzip
     d = os.path.join(SRC, f"classic-{year}.json")
     ex = json.load(open(d))
-    b = {k: v for k, v in ex["flows"].items()}
+    b = collections.defaultdict(lambda: [0.0, 0.0])
+    seats = collections.Counter()
+    for div, v in json.load(gzip.open(os.path.join(SRC, f"tcp-{year}.json.gz"))).items():
+        pair = v["pair"]
+        classic = any(p in MAJ_ALP for p in pair) and any(p in MAJ_COAL for p in pair)
+        seats["classic" if classic else "other"] += 1
+        if not classic:
+            continue
+        ai = 0 if pair[0] in MAJ_ALP else 1
+        for code, t1, t2 in v["from"]:
+            if code in MAJ_ALP or code in MAJ_COAL:
+                continue
+            t = (t1, t2)
+            b[bucket(code)][0] += t[ai]
+            b[bucket(code)][1] += t[1 - ai]
+    ex["seats"] = dict(seats)
     share, alp_2pp = ex["share"], ex["tpp"]
     f = {k: pct(*b[k]) for k in b}
     return {"cut": "classic-tcp", "f": f, "share": share, "tpp": alp_2pp,
@@ -253,6 +276,11 @@ def main():
             **({"seats": t["seats"]} if "seats" in t else {}),
             **({"backtest": {"next": nxt, "err": round(bt, 2)}} if bt is not None else {}),
         }
+    # the committed record flows.mjs's FLOW_LEF and FLOW_HISTORY are typed
+    # from - test-flow-lef.mjs holds them to it
+    with open(os.path.join(ROOT, "data", "flow-lef.json"), "w") as fo:
+        json.dump({str(y): out[y] for y in years}, fo, indent=1)
+        fo.write("\n")
     if "--json" in sys.argv:
         print(json.dumps(out, indent=1)); return
     print(f"{'elec':<5} {'cut':<12} {'grn':>7} {'onp':>7} {'oth':>7} {'minor':>7} {'anchor':>7}   backtest (LEF on next election, pts ALP)")

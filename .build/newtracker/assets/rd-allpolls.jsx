@@ -5663,6 +5663,11 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
      voters may stop numbering, so each point says what share exhausted */
   const cnt = !!S.counted;
   const parties = FLOW_PARTIES.filter((p) => (S[p.id] || []).some((v) => v != null));
+  /* bars wherever a point carries an error: every state estimate, and the
+     federal series' 1984-93 estimates ahead of its 1996-2025 counts (user
+     2026-10-21) - the AEC counted no flow by party before 1996 */
+  const hasErr = parties.some((p) => (S[p.id + "Err"] || []).some((e) => e != null));
+  const fedEst = !est && S.estYears && S.estYears.length ? S.estYears : null;
   const series = [];
   parties.forEach((p) => {
     const v = S[p.id] || [];
@@ -5679,7 +5684,7 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
         // an estimate's 90% miss, then (optional preferential years) the
         // share of the pile that reached neither Labor nor the Coalition -
         // "about" on an estimate: it missed NSW's counted shares by up to 3
-        const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null,
+        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null,
           exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({ x: YEARS[i], y: T(val), ...(note ? { note } : null) });
       }
@@ -5706,10 +5711,10 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
      fixed share of the x span so it draws ~8px wide on a 24-year axis and a
      one-election one alike; the domain widens by that half-width so the
      first and last elections' bars draw whole */
-  const half = est ? (YEARS[YEARS.length - 1] - YEARS[0] + 2 * pad1) * 0.008 : 0;
+  const half = hasErr ? (YEARS[YEARS.length - 1] - YEARS[0] + 2 * pad1) * 0.008 : 0;
   const x0 = YEARS[0] - pad1 - half, x1 = YEARS[YEARS.length - 1] + pad1 + half;
   const areas = [];
-  if (est) {
+  if (hasErr) {
     parties.forEach((p) => {
       const err = S[p.id + "Err"] || [];
       (S[p.id] || []).forEach((v, i) => {
@@ -5741,7 +5746,10 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
       : S.fedState
         ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars
           + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".")
-        : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars
+        : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996."
+            + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter((w) => w.year < 2004).map((w, i, a) => (i ? (i === a.length - 1 ? " and " : ", ") : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("")
+            + " The AEC counted no flows by party before 1996. " : "")
+          + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars
           + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
   const lines = parties.map((p) => ({ kind: "line", color: p.color, label: p.name }));
   return (
@@ -5760,12 +5768,14 @@ function ExplainedFlowChart({ jur, inv, stateKey, menu }) {
         tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
         ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
-                sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : "Counted, election by election, so no error bars."),
-                caption: est ? "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+                sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second."
+                  : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996."
+                  : "Counted, election by election, so no error bars."),
+                caption: hasErr ? (fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections.") : undefined,
                 legend: narrow ? lines : [] }}
       />
-      <RdKey className="rd-ckey" items={est ? [] : [{ kind: "line", color: "var(--ink-3)", label: "Counted flow at each election" }]}>
-        {est && <span className="rd-key-item"><ExBarSwatch />The estimate’s 90% error</span>}
+      <RdKey className="rd-ckey" items={est ? [] : [{ kind: "line", color: "var(--ink-3)", label: fedEst ? "Counted flow, 1996 on" : "Counted flow at each election" }]}>
+        {hasErr && <span className="rd-key-item"><ExBarSwatch />{fedEst ? "Estimated, " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + ", with its 90% error" : "The estimate’s 90% error"}</span>}
       </RdKey>
       <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{cap}</RdFoot>
     </>

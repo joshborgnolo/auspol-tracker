@@ -7069,13 +7069,20 @@ function infoTerms(D) {
 
   /* Last-election flows: the tables Past cycles reads each term through
      (D.lefTables), the month the sitting term's rival changed (D.rivalWalk),
-     and each table's miss on the next election's primaries. Pre-1996 tables
-     are one lumped minor-party flow, since nothing finer was published; the
-     pre-1987 Morgan-era terms carry era-calibrated DLP/Democrat splits. */
+     and each table's miss on the next election's primaries. The 1987-93
+     tables are one lumped minor-party flow (the AEC published no flow by
+     party, and those polls give one combined minor-party vote); the
+     pre-1987 Morgan-era terms carry era-calibrated DLP/Democrat splits.
+     Misses split at 1984 (user review 2026-10-21): before it the official
+     two-party results are themselves estimates, so a miss there measures
+     agreement with an estimate, not a count. */
   const lefT = (D.lefTables || []).slice().sort((a, b) => a.year - b.year);
-  const lefMiss = lefT.map((t, i) => (t.bt == null || !lefT[i + 1] ? null : { at: lefT[i + 1].year, bt: t.bt }))
+  const lefAll = lefT.map((t, i) => (t.bt == null || !lefT[i + 1] ? null : { at: lefT[i + 1].year, bt: t.bt }))
     .filter(Boolean);
-  const lefMean = lefMiss.length ? lefMiss.reduce((s, m) => s + Math.abs(m.bt), 0) / lefMiss.length : null;
+  const lefMiss = lefAll.filter((m) => m.at >= 1984);
+  const lefOld = lefAll.filter((m) => m.at < 1984);
+  const meanAbs = (a) => (a.length ? a.reduce((s, m) => s + Math.abs(m.bt), 0) / a.length : null);
+  const lefMean = meanAbs(lefMiss), lefOldMean = meanAbs(lefOld);
   const lefBig = lefMiss.slice().sort((a, b) => Math.abs(b.bt) - Math.abs(a.bt)).slice(0, 3);
   /* "2013 and 2022, when Labor did 1.0 points better than projected, and
      2019, when it did 0.8 worse" – the misses grouped by direction, each
@@ -7644,6 +7651,16 @@ function infoTerms(D) {
           From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final
           two, about nine seats in ten. Since 2004 it covers every seat: the Commission sorts every
           ballot between Labor and the Coalition, even where someone else made the final two.</span>
+          {FHB && FHB.fedEst ? (
+            <span className="info-p"><b>Federal before 1996: estimated.</b> The Commission published no
+            flows by party before 1996, but it has distributed every seat&rsquo;s preferences in full
+            since 1984. The chart estimates {FHB.fedEst[0]}–{FHB.fedEst[FHB.fedEst.length - 1]} from those
+            distributions with the method behind the state lines, set out below: from Adam Carr&rsquo;s
+            transcriptions of the printed results to 1990 and the Commission&rsquo;s statistics tables
+            for 1993, in the seats where Labor and the Coalition finished first and second. A few seats
+            whose transcribed counts don&rsquo;t add up are left out. The 1983 count stopped once a
+            candidate passed half the vote, so it can&rsquo;t be estimated this way.</span>
+          ) : null}
           {FHB ? (<>
             <span className="info-p"><b>States: estimated.</b> No state commission publishes that
             count. Each publishes its distributions of preferences, which show where an excluded
@@ -7684,7 +7701,12 @@ function infoTerms(D) {
             the federal trials at a state&rsquo;s size{FHB.othLean.nsw && FHB.othLean.nsw[1] < 0 ? <>, and
             by {fhRange(FHB.othLean.nsw.map((x) => -x).reverse())} in every New South Wales election</> : null}.
             The bars are drawn either side of the estimate, so the true flow more likely sits in their
-            upper half.</> : null}</span>
+            upper half.</> : null}
+            {FHB.grnLean && FHB.grnLean.cal && FHB.grnLean.cal[0] > 0 ? <> The Greens estimates lean
+            the other way, high, by {fhRange(FHB.grnLean.cal)} points on average
+            {FHB.grnLean.worst && FHB.grnLean.worst.length ? <>, most in the older elections
+            ({FHB.grnLean.worst.map((w) => w.year + ", " + w.miss.toFixed(1)).join("; ")})</> : null}, so
+            their true flow more likely sits in a bar&rsquo;s lower half.</> : null}</span>
             {FHB.contest ? <span className="info-p"><b>Labor v One Nation contests.</b> The
             explainer&rsquo;s Labor v One Nation view plots one cross per voter group per contest, and
             draws no line between contests, because the groups differ: Hunter&rsquo;s Coalition voters
@@ -8193,17 +8215,26 @@ function infoTerms(D) {
           until {onSince}, One Nation since</> : null}, and the chart marks the change.
           {lefMean != null ? (
             <span className="info-p"><b>How well it works.</b> Applied to the next election’s
-            actual primary votes, each table misses the official 2PP by {lefMean.toFixed(1)} points
-            on average. The biggest misses were {lefBigText}.</span>
+            actual primary votes, each table since 1984 misses the counted 2PP by {lefMean.toFixed(1)} points
+            on average. The biggest misses were {lefBigText}.{lefOldMean != null ? <> The older tables
+            miss by {lefOldMean.toFixed(1)} on average, but before 1984 the official two-party results are
+            themselves estimates, so those misses measure agreement with an estimate, not a
+            count.</> : null}</span>
           ) : null}
           <span className="info-p"><b>Where the tables come from.</b> From 2004, the AEC’s count of
           every ballot between Labor and the Coalition, in every seat. For 1996–2001, its official
           statistics, from the nine seats in ten where the final two were Labor and the Coalition.
-          Before 1996 no flows by party were published, so the 1987–93 tables are each the single
-          minor-party flow the official result implies. The Morgan Gallup polls of 1972–84
-          published no two-party figure at all, so those terms are read through tables calibrated
-          to the election that opened each term: one flow each for the DLP, the Democrats (a debut
-          assumption where an election met them for the first time) and all other votes.</span>
+          Before 1996 the AEC published no flows by party. Every seat&rsquo;s full distribution
+          exists from 1984, and flows by party can be estimated from it (the
+          {" "}<a href="/flows-explained/">preference flows explainer</a> charts them), but the
+          1987–93 polls on file give one combined figure for the minor parties, so each of those
+          terms uses the single minor-party flow its opening election&rsquo;s official result
+          implies, which reproduces that election exactly. The Morgan Gallup polls of 1943–84
+          published no two-party figure at all, so those terms are read through tables fitted to
+          the two-party result of the election that opened each term: one flow each for the DLP,
+          the Democrats (an assumption where an election met them for the first time) and all other
+          votes. Before 1984 those results are themselves estimates, by the Parliamentary Library
+          and Malcolm Mackerras, so the older tables are fitted to estimates, not counts.</span>
           {working(lefWork)}</>) },
       ] },
     { id: "s-allpolls", title: "All polls", nav: "All polls",

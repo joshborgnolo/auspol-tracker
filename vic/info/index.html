@@ -8531,43 +8531,43 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grn": null,
     "onp": null,
     "oth": null,
-    "minor": 0.5882,
-    "bt": -0.44
+    "minor": 0.6043,
+    "bt": -0.13
   }, {
     "year": 1990,
     "grn": null,
     "onp": null,
     "oth": null,
-    "minor": 0.614,
+    "minor": 0.6117,
     "bt": 0.13
   }, {
     "year": 1993,
     "grn": null,
     "onp": null,
     "oth": null,
-    "minor": 0.6019,
-    "bt": 0.81
+    "minor": 0.5994,
+    "bt": 0.77
   }, {
     "year": 1996,
     "grn": 0.671,
     "onp": null,
-    "oth": 0.5092,
+    "oth": 0.5088,
     "minor": null,
-    "bt": 0.06
+    "bt": 0.05
   }, {
     "year": 1998,
     "grn": 0.7328,
     "onp": 0.4634,
-    "oth": 0.5534,
+    "oth": 0.5523,
     "minor": null,
     "bt": -0.14
   }, {
     "year": 2001,
-    "grn": 0.7463,
-    "onp": 0.4415,
-    "oth": 0.5761,
+    "grn": 0.7483,
+    "onp": 0.4413,
+    "oth": 0.5699,
     "minor": null,
-    "bt": 0.38
+    "bt": 0.4
   }, {
     "year": 2004,
     "grn": 0.8079,
@@ -8652,8 +8652,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "elections": "Australian federal elections",
       "years": [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
       "grn": [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83, 81.9, 82.2, 85.7, 88.2],
-      "onp": [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5],
-      "oth": [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50, 54.6]
+      "onp": [null, 46.3, 44.1, 43.6, null, null, null, 49.5, 34.8, 35.7, 25.5],
+      "oth": [50.9, 55.2, 57, 44.3, 44.5, 41.6, 46.7, 49.2, 46.1, 50, 54.5]
     }
   };
   const adjusted = {
@@ -39068,11 +39068,15 @@ function infoTerms(D) {
   const shrinkKeep = n => Math.round(100 * n / (n + shrinkK));
   const eff = React.createElement(React.Fragment, null, "n", React.createElement("sub", null, "eff"));
   const lefT = (D.lefTables || []).slice().sort((a, b) => a.year - b.year);
-  const lefMiss = lefT.map((t, i) => t.bt == null || !lefT[i + 1] ? null : {
+  const lefAll = lefT.map((t, i) => t.bt == null || !lefT[i + 1] ? null : {
     at: lefT[i + 1].year,
     bt: t.bt
   }).filter(Boolean);
-  const lefMean = lefMiss.length ? lefMiss.reduce((s, m) => s + Math.abs(m.bt), 0) / lefMiss.length : null;
+  const lefMiss = lefAll.filter(m => m.at >= 1984);
+  const lefOld = lefAll.filter(m => m.at < 1984);
+  const meanAbs = a => a.length ? a.reduce((s, m) => s + Math.abs(m.bt), 0) / a.length : null;
+  const lefMean = meanAbs(lefMiss),
+    lefOldMean = meanAbs(lefOld);
   const lefBig = lefMiss.slice().sort((a, b) => Math.abs(b.bt) - Math.abs(a.bt)).slice(0, 3);
   const lefBigText = (() => {
     const yrs = a => a.map(m => m.at).sort((x, y) => x - y).reduce((s, y, i, arr) => s + (i ? i === arr.length - 1 ? arr.length > 2 ? ", and " : " and " : ", " : "") + y, "");
@@ -39408,7 +39412,9 @@ function infoTerms(D) {
         href: "/flows-explained/"
       }, "preference flows explainer"), " tracks the share of each group\u2019s ballots that ended with Labor rather than the Coalition, election by election.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Federal: counted."), " The Australian Electoral Commission follows every ballot to the final two and publishes where each party\u2019s voters ended up. From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final two, about nine seats in ten. Since 2004 it covers every seat: the Commission sorts every ballot between Labor and the Coalition, even where someone else made the final two."), FHB ? React.createElement(React.Fragment, null, React.createElement("span", {
+      }, React.createElement("b", null, "Federal: counted."), " The Australian Electoral Commission follows every ballot to the final two and publishes where each party\u2019s voters ended up. From 1996 to 2001 that count covers the seats where Labor and the Coalition were the final two, about nine seats in ten. Since 2004 it covers every seat: the Commission sorts every ballot between Labor and the Coalition, even where someone else made the final two."), FHB && FHB.fedEst ? React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Federal before 1996: estimated."), " The Commission published no flows by party before 1996, but it has distributed every seat\u2019s preferences in full since 1984. The chart estimates ", FHB.fedEst[0], "\u2013", FHB.fedEst[FHB.fedEst.length - 1], " from those distributions with the method behind the state lines, set out below: from Adam Carr\u2019s transcriptions of the printed results to 1990 and the Commission\u2019s statistics tables for 1993, in the seats where Labor and the Coalition finished first and second. A few seats whose transcribed counts don\u2019t add up are left out. The 1983 count stopped once a candidate passed half the vote, so it can\u2019t be estimated this way.") : null, FHB ? React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "States: estimated."), " No state commission publishes that count. Each publishes its distributions of preferences, which show where an excluded candidate\u2019s whole pile went, including ballots it had inherited from candidates excluded earlier. So each pile holds two groups of known size: the candidate\u2019s own voters and the ballots it inherited. The estimate works out how each group split from the way the piles split across every seat, then follows both to the final two. It covers only the seats where Labor and the Coalition were the final two."), React.createElement("span", {
         className: "info-p"
@@ -39420,7 +39426,7 @@ function infoTerms(D) {
         href: FHB.qldSource,
         target: "_blank",
         rel: "noopener noreferrer"
-      }, "Antony Green tabulated"), " the electoral commission\u2019s own counts in 2020 and 2024, the estimates came within ", FHB.qld.toFixed(1), " points.") : null, FHB.nsw && FHB.nsw.grn != null ? React.createElement(React.Fragment, null, " Run on New South Wales\u2019s distributions and checked against its counts, they came within ", FHB.nsw.grn.toFixed(1), " points for the Greens and ", FHB.nsw.oth.toFixed(1), " for everyone else.") : null, FHB.othLean && FHB.othLean.cal && FHB.othLean.cal[1] < 0 ? React.createElement(React.Fragment, null, " The estimates for everyone else lean low: by ", fhRange(FHB.othLean.cal.map(x => -x).reverse()), " points on average in the federal trials at a state\u2019s size", FHB.othLean.nsw && FHB.othLean.nsw[1] < 0 ? React.createElement(React.Fragment, null, ", and by ", fhRange(FHB.othLean.nsw.map(x => -x).reverse()), " in every New South Wales election") : null, ". The bars are drawn either side of the estimate, so the true flow more likely sits in their upper half.") : null), FHB.contest ? React.createElement("span", {
+      }, "Antony Green tabulated"), " the electoral commission\u2019s own counts in 2020 and 2024, the estimates came within ", FHB.qld.toFixed(1), " points.") : null, FHB.nsw && FHB.nsw.grn != null ? React.createElement(React.Fragment, null, " Run on New South Wales\u2019s distributions and checked against its counts, they came within ", FHB.nsw.grn.toFixed(1), " points for the Greens and ", FHB.nsw.oth.toFixed(1), " for everyone else.") : null, FHB.othLean && FHB.othLean.cal && FHB.othLean.cal[1] < 0 ? React.createElement(React.Fragment, null, " The estimates for everyone else lean low: by ", fhRange(FHB.othLean.cal.map(x => -x).reverse()), " points on average in the federal trials at a state\u2019s size", FHB.othLean.nsw && FHB.othLean.nsw[1] < 0 ? React.createElement(React.Fragment, null, ", and by ", fhRange(FHB.othLean.nsw.map(x => -x).reverse()), " in every New South Wales election") : null, ". The bars are drawn either side of the estimate, so the true flow more likely sits in their upper half.") : null, FHB.grnLean && FHB.grnLean.cal && FHB.grnLean.cal[0] > 0 ? React.createElement(React.Fragment, null, " The Greens estimates lean the other way, high, by ", fhRange(FHB.grnLean.cal), " points on average", FHB.grnLean.worst && FHB.grnLean.worst.length ? React.createElement(React.Fragment, null, ", most in the older elections (", FHB.grnLean.worst.map(w => w.year + ", " + w.miss.toFixed(1)).join("; "), ")") : null, ", so their true flow more likely sits in a bar\u2019s lower half.") : null), FHB.contest ? React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Labor v One Nation contests."), " The explainer\u2019s Labor v One Nation view plots one cross per voter group per contest, and draws no line between contests, because the groups differ: Hunter\u2019s Coalition voters were Nationals, the others\u2019 Liberals. Hunter 2025 is the electoral commission\u2019s count. South Australia 2026 is this site\u2019s estimate over the ", FHB.contest.seats, " seats where One Nation faced Labor. Its bars are the misses at that size: for the Greens (\xB1", FHB.contest.err.grn.toFixed(1), ") and everyone else (\xB1", FHB.contest.err.oth.toFixed(1), "), the federal trials cut to ", FHB.contest.seats, " seats; for Liberal voters (\xB1", FHB.contest.err.lib.toFixed(1), "), the federal seats where Labor faced someone other than the Coalition, where the commission counts where Coalition voters went: the largest miss of the last ", fhWord(FHB.contest.elections), " elections. Secret Harbour 2026 is Antony Green\u2019s count of the early voting centre, 47% of the votes, drawn hollow; both he and Kevin Bonham think the whole seat sent Labor a little more.") : null, React.createElement("span", {
         className: "info-p"
@@ -39670,9 +39676,11 @@ function infoTerms(D) {
       term: "Last-election flows",
       body: React.createElement(React.Fragment, null, "The flow table a term\u2019s implied 2PP is read through: the preferences counted at the election that opened the term. It\u2019s the only table anyone inside the term could have used, so each past term sits on the same footing as today\u2019s", " ", xref("implied-2pp", "last-election flows", "implied 2PP"), ". The sitting term follows the rival Labor is doing worse against, as the headline does", onSince ? React.createElement(React.Fragment, null, ": the Coalition until ", onSince, ", One Nation since") : null, ", and the chart marks the change.", lefMean != null ? React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How well it works."), " Applied to the next election\u2019s actual primary votes, each table misses the official 2PP by ", lefMean.toFixed(1), " points on average. The biggest misses were ", lefBigText, ".") : null, React.createElement("span", {
+      }, React.createElement("b", null, "How well it works."), " Applied to the next election\u2019s actual primary votes, each table since 1984 misses the counted 2PP by ", lefMean.toFixed(1), " points on average. The biggest misses were ", lefBigText, ".", lefOldMean != null ? React.createElement(React.Fragment, null, " The older tables miss by ", lefOldMean.toFixed(1), " on average, but before 1984 the official two-party results are themselves estimates, so those misses measure agreement with an estimate, not a count.") : null) : null, React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Where the tables come from."), " From 2004, the AEC\u2019s count of every ballot between Labor and the Coalition, in every seat. For 1996\u20132001, its official statistics, from the nine seats in ten where the final two were Labor and the Coalition. Before 1996 no flows by party were published, so the 1987\u201393 tables are each the single minor-party flow the official result implies. The Morgan Gallup polls of 1972\u201384 published no two-party figure at all, so those terms are read through tables calibrated to the election that opened each term: one flow each for the DLP, the Democrats (a debut assumption where an election met them for the first time) and all other votes."), working(lefWork))
+      }, React.createElement("b", null, "Where the tables come from."), " From 2004, the AEC\u2019s count of every ballot between Labor and the Coalition, in every seat. For 1996\u20132001, its official statistics, from the nine seats in ten where the final two were Labor and the Coalition. Before 1996 the AEC published no flows by party. Every seat\u2019s full distribution exists from 1984, and flows by party can be estimated from it (the", " ", React.createElement("a", {
+        href: "/flows-explained/"
+      }, "preference flows explainer"), " charts them), but the 1987\u201393 polls on file give one combined figure for the minor parties, so each of those terms uses the single minor-party flow its opening election\u2019s official result implies, which reproduces that election exactly. The Morgan Gallup polls of 1943\u201384 published no two-party figure at all, so those terms are read through tables fitted to the two-party result of the election that opened each term: one flow each for the DLP, the Democrats (an assumption where an election met them for the first time) and all other votes. Before 1984 those results are themselves estimates, by the Parliamentary Library and Malcolm Mackerras, so the older tables are fitted to estimates, not counts."), working(lefWork))
     }]
   }, {
     id: "s-allpolls",
@@ -64732,6 +64740,8 @@ function ExplainedFlowChart({
   const T = v => inv ? 100 - v : v;
   const cnt = !!S.counted;
   const parties = FLOW_PARTIES.filter(p => (S[p.id] || []).some(v => v != null));
+  const hasErr = parties.some(p => (S[p.id + "Err"] || []).some(e => e != null));
+  const fedEst = !est && S.estYears && S.estYears.length ? S.estYears : null;
   const series = [];
   parties.forEach(p => {
     const v = S[p.id] || [];
@@ -64744,7 +64754,7 @@ function ExplainedFlowChart({
         if (cur.length) runs.push(cur);
         cur = [];
       } else {
-        const note = [est && err[i] != null ? "±" + err[i].toFixed(1) : null, exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({
           x: YEARS[i],
           y: T(val),
@@ -64770,11 +64780,11 @@ function ExplainedFlowChart({
     });
   });
   const pad1 = YEARS.length > 1 ? 0 : 1;
-  const half = est ? (YEARS[YEARS.length - 1] - YEARS[0] + 2 * pad1) * 0.008 : 0;
+  const half = hasErr ? (YEARS[YEARS.length - 1] - YEARS[0] + 2 * pad1) * 0.008 : 0;
   const x0 = YEARS[0] - pad1 - half,
     x1 = YEARS[YEARS.length - 1] + pad1 + half;
   const areas = [];
-  if (est) {
+  if (hasErr) {
     parties.forEach(p => {
       const err = S[p.id + "Err"] || [];
       (S[p.id] || []).forEach((v, i) => {
@@ -64808,7 +64818,7 @@ function ExplainedFlowChart({
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
   const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
   const noBars = " Counts carry no estimation error, so they have no bars.";
-  const cap = est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
+  const cap = est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -64842,8 +64852,8 @@ function ExplainedFlowChart({
     ariaLabel: "Share of preferences flowing to " + side + ", by party, " + S.label + (est ? ", estimated" : "") + ", " + span,
     copy: {
       title: "Share of each group’s preferences reaching " + side + " over " + other,
-      sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : "Counted, election by election, so no error bars."),
-      caption: est ? "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+      sub: rdCap(S.elections || S.label + " elections") + ". " + (est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : "Counted, election by election, so no error bars."),
+      caption: hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -64851,11 +64861,11 @@ function ExplainedFlowChart({
     items: est ? [] : [{
       kind: "line",
       color: "var(--ink-3)",
-      label: "Counted flow at each election"
+      label: fedEst ? "Counted flow, 1996 on" : "Counted flow at each election"
     }]
-  }, est && React.createElement("span", {
+  }, hasErr && React.createElement("span", {
     className: "rd-key-item"
-  }, React.createElement(ExBarSwatch, null), "The estimate\u2019s 90% error")), React.createElement(RdFoot, {
+  }, React.createElement(ExBarSwatch, null), fedEst ? "Estimated, " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + ", with its 90% error" : "The estimate’s 90% error")), React.createElement(RdFoot, {
     how: {
       term: "flow-history",
       from: "Preference flows explained"

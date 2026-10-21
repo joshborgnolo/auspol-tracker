@@ -161,9 +161,10 @@ export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
 
    The bt field is the right-edge backtest (same convention as FLOW_LEF):
    the set's constants applied to the CLOSING election's actual primaries
-   vs that election's official 2PP, in ALP points. Every set but two lands
-   inside Bonham's measured pre-1983 LEF error budget (±0.6) and the
-   broader post-1983 one (±0.3–1.1); the two that miss it – 1943's
+   vs that election's official 2PP, in ALP points. Bonham's test of
+   last-election flows starts in 1955 and reports an AVERAGE miss of about
+   0.6 for 1955-80 (not a bound); every set but two misses by less than
+   that; the two that miss by more – 1943's
    others were a 12% independent vote plus splinter Labor, which broke
    nothing like 1946's, and 1951's 0.82 overshoots 1954 – and the bt
    field records each miss as it stands; the cyclePollBases notes quote
@@ -216,12 +217,20 @@ export const impliedEraAlp2pp = (era, p) => {
                 ballot in every seat redistributed ALP v Coalition (the TPP
                 cut FLOW ships for 2025).
      1996–2001  AEC official election statistics, "Two Candidate Preferred
-                Preference Flow Result", classic seats only (final two ALP v
-                a Coalition party: 142, 144 and 136 seats) – counted flows
-                over nine seats in ten, since no all-seat TPP cut exists.
-     1987–1993  no flow by party was published before 1996, so the table is
-                the single lumped minor-party flow the official result
-                implies: (ALP 2PP − ALP primary) ÷ (100 − ALP − Coalition).
+                Preference Flow Result", division by division (tcp-<year>.json.gz,
+                aec-tcp-history.py), classic seats only (final two Labor or
+                Country Labor v a Coalition party: 142, 144 and 145 seats;
+                Country Labor's nine 2001 seats were missing until
+                2026-10-21) – counted flows over nine seats in ten, since no
+                all-seat TPP cut exists.
+     1987–1993  the AEC published no flow by party before 1996 (each seat's
+                full distribution exists from 1984, so flows by party can
+                be ESTIMATED - .build/estimate-state-flows.py's federal_hist
+                - but the 1990-93 poll rows give one combined minor-party
+                vote, so a single rate is all they can take). The table is
+                the lumped minor-party flow the official result implies:
+                (ALP 2PP − ALP primary) ÷ (100 − ALP − Coalition), exact for
+                the opening election by construction.
    Buckets are the poll columns they are applied to: grn every Greens party,
    onp One Nation, oth every other non-major ballot (independents in). share
    is the election's own national primary for each bucket – the weights for
@@ -230,19 +239,26 @@ export const impliedEraAlp2pp = (era, p) => {
    three-cornered leak in the TPP cut, like FLOW_3CNR; non-classic seats in
    the classic cut); added back so month 0 of every term is the count.
    Right-edge backtest – each table on the NEXT election's primaries against
-   its official 2PP, ALP points (the LEF error Bonham tabulates): 1990 −0.44,
-   1993 +0.13, 1996 +0.81, 1998 +0.06, 2001 −0.14, 2004 +0.38, 2007 +0.02,
+   its official 2PP, ALP points (the test Bonham runs): 1990 −0.13,
+   1993 +0.13, 1996 +0.77, 1998 +0.05, 2001 −0.14, 2004 +0.40, 2007 +0.02,
    2010 +0.31, 2013 −1.04, 2016 −0.23, 2019 +0.83, 2022 −0.97, 2025 −0.38;
-   mean |error| 0.44. The signs and sizes of the big misses – Labor beating
-   the projection in 1990, 2013 and 2022, the 0.8 shift to the Coalition in
-   2019 – are the ones Bonham documents. */
+   mean |error| 0.42. Every row is aec-flow-history.py's output, recorded in
+   data/flow-lef.json and held to it by test-flow-lef.mjs (until 2026-10-21
+   the 1987-93 rows still carried rates from the elections table's earlier
+   one-decimal primaries: 1987 0.5882 for 0.6043). These are NOT Bonham's
+   figures: he applied
+   party-by-party flows estimated from each seat's distribution, where the
+   1987-93 tables here are one lumped rate (the site's 1990-93 poll rows
+   carry no Democrats/Greens split to apply party flows to). Where both
+   are known they agree in sign; 2013's size matches (1.0), 1990's does
+   not (0.13 here, 1.1 his). */
 export const FLOW_LEF = Object.freeze({
-  1987: { minor: 0.5882, anchor: 0, bt: -0.44 },
-  1990: { minor: 0.6140, anchor: 0, bt: 0.13 },
-  1993: { minor: 0.6019, anchor: 0, bt: 0.81 },
-  1996: { grn: 0.6710, oth: 0.5092, anchor: 0.209, bt: 0.06, share: { grn: 1.74, onp: 0, oth: 12.27 } },
-  1998: { grn: 0.7328, onp: 0.4634, oth: 0.5534, anchor: -0.027, bt: -0.14, share: { grn: 2.14, onp: 8.43, oth: 9.82 } },
-  2001: { grn: 0.7463, onp: 0.4415, oth: 0.5761, anchor: -0.083, bt: 0.38, share: { grn: 4.96, onp: 4.34, oth: 9.85 } },
+  1987: { minor: 0.6043, anchor: 0, bt: -0.13 },
+  1990: { minor: 0.6117, anchor: 0, bt: 0.13 },
+  1993: { minor: 0.5994, anchor: 0, bt: 0.77 },
+  1996: { grn: 0.6710, oth: 0.5088, anchor: 0.213, bt: 0.05, share: { grn: 1.74, onp: 0.00, oth: 12.27 } },
+  1998: { grn: 0.7328, onp: 0.4634, oth: 0.5523, anchor: -0.016, bt: -0.14, share: { grn: 2.14, onp: 8.43, oth: 9.82 } },
+  2001: { grn: 0.7483, onp: 0.4413, oth: 0.5699, anchor: -0.032, bt: 0.40, share: { grn: 4.96, onp: 4.34, oth: 9.85 } },
   2004: { grn: 0.8079, onp: 0.4360, oth: 0.4429, anchor: 0.069, bt: 0.02, share: { grn: 7.19, onp: 1.19, oth: 7.28 } },
   2007: { grn: 0.7969, onp: 0.4700, oth: 0.4453, anchor: 0.111, bt: 0.31, share: { grn: 7.79, onp: 0.26, oth: 6.46 } },
   2010: { grn: 0.7884, onp: 0.4521, oth: 0.4162, anchor: 0.090, bt: -1.04, share: { grn: 11.76, onp: 0.22, oth: 6.42 } },
@@ -286,9 +302,9 @@ export const impliedLefAlp2pp = (t, p) => {
 /* FLOW_HISTORY – the federal flow-by-party DISPLAY series, every election
    1996–2025: the share of each bucket's ballots that ended with Labor at
    that election, in per cent, from the AEC's full preference-distribution
-   tables by party (the classic cut 1996–2001, the TPP cut since 2004 –
-   same sources as FLOW_LEF, so single-cell differences from its cells
-   are the cut's, not rounding). This is the
+   tables by party (the classic cut 1996–2001, the TPP cut since 2004):
+   FLOW_LEF's own cells (data/flow-lef.json, test-flow-lef.mjs), One Nation
+   null below 1% of the primary vote. This is the
    series the Info glossary's flow chart and the /flows-explained/ in-article
    chart both draw; it is display history, NOT an estimator input (FLOW_LEF
    and FLOW are – changing them is an estimator change; changing this is
@@ -298,6 +314,6 @@ export const impliedLefAlp2pp = (t, p) => {
 export const FLOW_HISTORY = Object.freeze({
   years: [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
   grn: [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2],
-  onp: [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5],
-  oth: [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6],
+  onp: [null, 46.3, 44.1, 43.6, null, null, null, 49.5, 34.8, 35.7, 25.5],
+  oth: [50.9, 55.2, 57.0, 44.3, 44.5, 41.6, 46.7, 49.2, 46.1, 50.0, 54.5],
 });

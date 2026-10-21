@@ -128,7 +128,7 @@ for (const k of ["1963|Morgan", "1966|Morgan", "1969|Morgan"])
 const note = (open, bt) =>
   "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the "
   + open + " election's calibrated constants (FLOW_ERAS[" + open + "] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest "
-  + bt + " vs official, inside the ±0.6 pre-1983 LEF error budget quoted in the piece). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.";
+  + bt + " vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.";
 
 D.cyclePollBases["1963|Morgan"] = note("1961", "+0.27");
 D.cyclePollBases["1966|Morgan"] = note("1963", "−0.47");

@@ -4459,6 +4459,30 @@ const flowHistory = (() => {
   try { bt = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")); } catch { /* ditto */ }
   if (!csv || !bt) return h;
   const onpMin = bt.onp_min_ballots || Infinity;
+  /* the federal series before its counts (user 2026-10-21): the AEC
+     counted no flow by party before 1996, but every seat's full
+     distribution exists from 1984, so the estimator's federal_hist
+     classic-seat estimates (1984-93) draw ahead of FLOW_HISTORY's counts,
+     each with the calibration's 90% error at its seat count - the method
+     and the bars of the state lines, tried on the ten counted federal
+     elections since 1996. 1983 stays out (its counts stopped at a
+     majority); 2004 is counted. One Nation by the state rule. */
+  {
+    const FHh = bt.federal_hist || {};
+    const pre = Object.keys(FHh).map(Number).filter((y) => y < h.fed.years[0]).sort((a, b) => a - b);
+    if (pre.length) {
+      const cell = (y, b) => {
+        const d = FHh[y][b];
+        return d && d.err90 != null && (b !== "onp" || d.ballots >= onpMin) ? d : null;
+      };
+      const val = (b) => pre.map((y) => (cell(y, b) ? Math.round(cell(y, b).model * 10) / 10 : null));
+      const err = (b) => pre.map((y) => (cell(y, b) ? Math.round(cell(y, b).err90 * 10) / 10 : null));
+      const none = h.fed.years.map(() => null);
+      h.fed = { ...h.fed, years: [...pre, ...h.fed.years], estYears: pre,
+        grn: [...val("grn"), ...h.fed.grn], onp: [...val("onp"), ...h.fed.onp], oth: [...val("oth"), ...h.fed.oth],
+        grnErr: [...err("grn"), ...none], onpErr: [...err("onp"), ...none], othErr: [...err("oth"), ...none] };
+    }
+  }
   const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
   const head = (lines.shift() || "").split(",");
   const ci = Object.fromEntries(head.map((x, i) => [x, i]));
@@ -4516,6 +4540,7 @@ const flowHistory = (() => {
   const span = (v) => (v.length ? [Math.min(...v), Math.max(...v)] : null);
   h.fed.backtest = {
     elections: Object.keys(bt.federal || {}).length, minClassic: STATE_MIN_CLASSIC,
+    fedEst: h.fed.estYears || null,
     grn: { model: mae("grn", "model"), replay: mae("grn", "replay") },
     oth: { model: mae("oth", "model"), replay: mae("oth", "replay") },
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
@@ -4525,6 +4550,13 @@ const flowHistory = (() => {
     /* the others estimates' lean (user 2026-10-21 review): the calibration's
        mean signed miss at the state sizes, and the model-minus-count gap in
        every NSW election - both below zero, so the Info entry says so */
+    /* ... and the Greens estimates lean HIGH (2026-10-21, once 1996-2007
+       joined the trials): the calibration's mean signed miss, and the
+       federal elections it was largest in */
+    grnLean: {
+      cal: span(Object.values(bt.calibration || {}).map((t) => t.grn && t.grn.bias).filter((x) => x != null)),
+      worst: Object.entries(bt.federal || {}).filter(([, d]) => d.grn && d.grn.model - d.grn.counted >= 2)
+        .map(([y, d]) => ({ year: +y, miss: Math.round((d.grn.model - d.grn.counted) * 10) / 10 })) },
     othLean: {
       cal: span(Object.values(bt.calibration || {}).map((t) => t.oth && t.oth.bias).filter((x) => x != null)),
       nsw: span(Object.values(bt.nsw_check || {}).filter((d) => d.oth).map((d) => Math.round((d.oth.model - d.oth.counted) * 10) / 10)) },

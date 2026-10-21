@@ -94,8 +94,8 @@ const note = (open, bt, inBudget, extra = "") => {
     + open + " election's calibrated constants (FLOW_ERAS[" + open + "] in flows.mjs, anchored to " + anchor
     + extra
     + " – the Kevin Bonham Wonk Central method; right-edge backtest "
-    + bt + (inBudget ? ", inside the ±0.6 pre-1983 LEF error budget quoted in the piece"
-                     : ", a miss outside the ±0.6 pre-1983 LEF error budget quoted in the piece")
+    + bt + (inBudget ? ", smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections"
+                     : ", larger than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections")
     + (open === "1943" ? " against an estimated close itself" : "")
     + "). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".";
 };
