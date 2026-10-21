@@ -4,8 +4,10 @@
    · SEC Newgate waves → the five-state pair line
    · Roy Morgan waves that printed splits → gender pair / voting-intention
      wrong-shares (Labor voters' right share in the "(right N)" tail)
-   · waves with no printed split (RM 2026-10-11, Essential, and every row
-     still inside the file's own copy) → NO breakdown line
+   · Essential waves → gender pair (Men/Women) + age trio (18–34/35–54/55+)
+     trend cuts from the assimilated CSV, matched by printed headline
+   · waves with no printed split (RM 2026-10-11, every row still inside
+     the file's own copy) → NO breakdown line
    Also pins the cell-row CSS actually applying (13px cells, 11px heads). */
 import http from "node:http";
 import fs from "node:fs";
@@ -93,9 +95,18 @@ if (rm) {
 // Roy Morgan 2026-10-11 (state-extremes-only fortnight) → no breakdown line
 const rm2 = byKeyAbs("Roy Morgan", "Oct 2026");
 ok("RM 2026-10-11 has NO breakdown line", !rm2 || !rm2.cuts, rm2 ? rm2.name + " cuts=" + (rm2.cuts || "").slice(0, 60) : "(row not in walked set)");
-// a no-split house row → no breakdown line
-const ess = rows.find((r) => r.name.includes("Essential"));
-ok("an Essential row has NO breakdown line", !ess || !ess.cuts);
+// Essential 2026-09-29 → gender + age trend cuts from the CSV (user
+// report 2026-10-21: "it's missing for Essential / 24–29 Sep")
+const ess = rows.filter((r) => r.name.includes("Essential") && r.cuts)
+  .find((r) => /Men 29–61/.test(r.cuts));
+ok("the Essential 24–29 Sep row carries splits", !!ess);
+if (ess) {
+  const t = ess.cuts.replace(/\s+/g, " ");
+  ok("Essential gender head + pair", t.includes("By gender, per cent right–wrong:") && /Women 21–59/.test(t), t.slice(0, 260));
+  ok("Essential age head + trio",
+    t.includes("By age, per cent right–wrong:") && /18–34 28–55/.test(t) && /35–54 23–62/.test(t) && /55\+ 24–62/.test(t),
+    t.slice(0, 320));
+}
 
 console.log(0);
 server.close();

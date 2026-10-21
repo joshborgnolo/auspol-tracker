@@ -2132,6 +2132,30 @@ const RM_DIR_GROUPS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8")); }
   catch { return null; }
 })();
+/* Essential's national-mood splits, columned out of the assimilated CSV
+   (data/essential-report.csv): every wave's trend table carries Male/Female
+   and 18-34/35-54/55+ cuts beside the headline print – keyed here by the
+   CSV's report date, matched to a direction row by its printed headline
+   (the CSV's date is the Guardian stamp, a day either way of the row's
+   fieldwork date). national_mood lines are never quote-bearing. */
+const ESS_DIR = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try {
+    const txt = fs.readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8");
+    const DIMS = new Set(["Trend", "Male", "Female", "18-34", "35-54", "55+"]);
+    const waves = {};
+    for (const ln of txt.split(/\r?\n/)) {
+      if (!ln.startsWith("national_mood,")) continue;
+      const c = ln.split(",");
+      const dim = c[3], answer = c[4], date = c[7], v = +c[8];
+      if (!DIMS.has(dim) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(v)) continue;
+      if (answer !== "Right direction" && answer !== "Wrong track") continue;
+      const w = (waves[date] ??= {});
+      (w[dim] ??= {})[answer === "Right direction" ? "r" : "w"] = v;
+    }
+    return Object.keys(waves).length ? { waves } : null;
+  } catch { return null; }
+})();
 /* The confidence panel's series (§5j): four published confidence gauges —
    the ANZ–Roy Morgan and Roy Morgan index series, Westpac–MI consumer
    sentiment and NAB's monthly business survey (a net balance the panel
@@ -2377,14 +2401,18 @@ const directionGroups = (() => {
   return Object.keys(out).length ? out : null;
 })();
 
-/* The same two banks again, joined onto single waves so an expanded poll
+/* The same banks again, joined onto single waves so an expanded poll
    can list, under its national direction line, the breakdowns ITS OWN
    release printed: SEC Newgate's five-state perceived-direction table
-   (banked per wave-END month) and Roy Morgan's release-prose gender /
-   voting-intention splits (banked per release date). Figures as printed –
-   never house-adjusted or smoothed. A wave whose release printed no split
-   carries nothing (Roy Morgan's state-extremes-only fortnights; every
-   other house), and availability is per-wave.
+   (banked per wave-END month), Roy Morgan's release-prose gender /
+   voting-intention splits (banked per release date), and Essential's
+   national-mood gender / age trend cuts (banked per report date in the
+   assimilated CSV; the wave is found by its printed headline figures,
+   not its date – the Guardian stamp wanders a day either way).
+   Figures as printed – never house-adjusted or smoothed. A wave whose
+   release printed no split carries nothing (Roy Morgan's
+   state-extremes-only fortnights; every other house), and availability
+   is per-wave.
    Attached HERE because the loaders above hadn't landed when DIR_BY was
    computed – decorate the committed DIR_BY entries in place and dir's
    three emitters (directionOnlyPolls, §6 individualPolls, §6c Latest)
@@ -2418,6 +2446,33 @@ const directionGroups = (() => {
         rows.push({ head: "By voting intention, per cent saying wrong track:", form: "wrong",
           cuts: Object.keys(labOf).filter((g) => w.vote[g]).map((g) => ({ label: labOf[g], k: partOf[g], right: w.vote[g].r ?? null, wrong: w.vote[g].w })) });
       if (rows.length) attach(date + "|Roy Morgan", rows);
+    }
+  }
+  if (ESS_DIR?.waves) {
+    // matched to its wave by the printed headline, never by date alone –
+    // two captures can sit a day apart (2022-08-08 vs 2022-08-09), and
+    // the figures are what the row and the table share
+    const DAY = 864e5;
+    for (const d of DIR) {
+      if (d.pollster !== "Essential" || d.right == null || d.wrong == null) continue;
+      const anchor = +new Date(String(d.published || d.date).slice(0, 10) + "T00:00Z");
+      let best = null;
+      for (const [dt, w] of Object.entries(ESS_DIR.waves)) {
+        if (w.Trend?.r !== d.right || w.Trend?.w !== d.wrong) continue;
+        const gap = Math.abs(+new Date(dt + "T00:00Z") - anchor);
+        if (gap <= 7 * DAY && (!best || gap < best.gap)) best = { gap, w };
+      }
+      if (!best) continue;
+      const rows = [];
+      const pick = (dim) => best.w[dim] ? { label: dim, right: best.w[dim].r ?? null, wrong: best.w[dim].w } : null;
+      // Men/Women, not the CSV's Male/Female – the Roy Morgan bank beside
+      // this one renders the same split that way
+      const gender = ["Male", "Female"].map((dim, i) => { const c = pick(dim); return c ? { ...c, label: ["Men", "Women"][i] } : null; }).filter(Boolean);
+      if (gender.length === 2) rows.push({ head: "By gender, per cent right–wrong:", cuts: gender });
+      const age = [{ dim: "18-34", label: "18–34" }, { dim: "35-54", label: "35–54" }, { dim: "55+", label: "55+" }]
+        .map(({ dim, label }) => { const c = pick(dim); return c ? { ...c, label } : null; }).filter(Boolean);
+      if (age.length === 3) rows.push({ head: "By age, per cent right–wrong:", cuts: age });
+      if (rows.length) attach(d.date + "|" + d.pollster, rows);
     }
   }
 }
