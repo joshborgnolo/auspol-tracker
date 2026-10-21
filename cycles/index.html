@@ -1606,12 +1606,6 @@ a.cl-src:focus-visible { outline: 2px solid var(--k-poll); outline-offset: 2px; 
   padding-left: 15px; margin-left: -17px;
 }
 .info-back { margin-left: 10px; vertical-align: baseline; }
-.info-chart { display: block; margin: 14px 0 12px; }
-.info-chart .fc-unit {
-  display: block; font-size: 12px; font-weight: 500; color: var(--ink-3);
-  margin-bottom: 2px;
-}
-.info-chart .fc-legend { margin-top: 9px; }
 .info-work-wrap { margin: 10px 0 4px; overflow-x: auto; }
 .info-work { border-collapse: collapse; font-size: 13px; line-height: 1.55;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
@@ -111308,98 +111302,6 @@ function RdChangelog() {
     }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.")
   }), React.createElement(ChangelogEntries, null));
 }
-function FlowChart() {
-  const narrow = useNarrow();
-  const FSRC = typeof window !== "undefined" && window.AUSPOL && window.AUSPOL.flowHistory && window.AUSPOL.flowHistory.fed || null;
-  const YEARS = FSRC && FSRC.years ? FSRC.years : [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
-  const PARTIES = [{
-    id: "grn",
-    name: "Greens",
-    color: "var(--grn)",
-    v: FSRC && FSRC.grn ? FSRC.grn : [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2]
-  }, {
-    id: "onp",
-    name: "One Nation",
-    color: "var(--onp)",
-    v: FSRC && FSRC.onp ? FSRC.onp : [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5]
-  }, {
-    id: "oth",
-    name: "Others",
-    color: "var(--oth)",
-    v: FSRC && FSRC.oth ? FSRC.oth : [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6]
-  }];
-  const series = [];
-  PARTIES.forEach(p => {
-    const runs = [];
-    let cur = [];
-    p.v.forEach((val, i) => {
-      if (val == null) {
-        if (cur.length) runs.push(cur);
-        cur = [];
-      } else cur.push({
-        x: YEARS[i],
-        y: val
-      });
-    });
-    if (cur.length) runs.push(cur);
-    runs.forEach((points, i) => {
-      const tail = i === runs.length - 1;
-      series.push({
-        id: p.id + i,
-        label: p.name,
-        color: p.color,
-        points,
-        smooth: false,
-        width: 2.6,
-        endCap: tail,
-        endLabel: tail && !narrow ? p.name : null
-      });
-    });
-  });
-  return React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "fc-unit"
-  }, "share preferencing Labor"), React.createElement(TrendChart, {
-    height: narrow ? 470 : 330,
-    xDomain: [1996, 2025],
-    yDomain: [20, 92],
-    yTicks: [30, 50, 70, 90],
-    xTicks: (narrow ? [1996, 2004, 2013, 2019, 2025] : [1996, 2001, 2007, 2013, 2019, 2025]).map(x => ({
-      x,
-      label: String(x)
-    })),
-    unit: "%",
-    fmt: v => v.toFixed(1),
-    axisFont: narrow ? 28 : 15,
-    pad: {
-      l: 46,
-      r: narrow ? 22 : 104,
-      t: 16,
-      b: 40
-    },
-    series: series,
-    spine: YEARS.map(x => ({
-      x
-    })),
-    refLines: [{
-      y: 50,
-      label: "even split",
-      color: "var(--ink-faint)",
-      align: "left"
-    }],
-    tooltipTitle: i => YEARS[i] + " election",
-    ariaLabel: "Share of preferences flowing to Labor, by party, 1996 to 2025"
-  }), React.createElement("span", {
-    className: "hero-legend fc-legend"
-  }, PARTIES.map(p => React.createElement("span", {
-    className: "hl-item",
-    key: p.id
-  }, React.createElement("span", {
-    className: "hl-line",
-    style: {
-      background: p.color
-    }
-  }), p.name))));
-}
 function infoTerms(D) {
   const L = D.latest,
     prim = D.latest.primary;
@@ -111838,9 +111740,9 @@ function infoTerms(D) {
         href: "https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm",
         target: "_blank",
         rel: "noopener noreferrer"
-      }, "Greens 88.2%, One Nation 25.5% and all others 54.5% to Labor"), ").", React.createElement("span", {
-        className: "info-chart"
-      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
+      }, "Greens 88.2%, One Nation 25.5% and all others 54.5% to Labor"), "). The party-by-party history is charted in the", " ", React.createElement("a", {
+        href: "/flows-explained/"
+      }, "preference flows explainer"), " \u2014 flows exist only from 1996, when full preference data was first published, and One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Are they still flowing that way?"), " The Respondent-allocated preference flows page, in the More menu, checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
     }, {

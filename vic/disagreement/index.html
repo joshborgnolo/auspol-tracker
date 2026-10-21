@@ -1598,12 +1598,6 @@ a.cl-src:focus-visible { outline: 2px solid var(--k-poll); outline-offset: 2px; 
   padding-left: 15px; margin-left: -17px;
 }
 .info-back { margin-left: 10px; vertical-align: baseline; }
-.info-chart { display: block; margin: 14px 0 12px; }
-.info-chart .fc-unit {
-  display: block; font-size: 12px; font-weight: 500; color: var(--ink-3);
-  margin-bottom: 2px;
-}
-.info-chart .fc-legend { margin-top: 9px; }
 .info-work-wrap { margin: 10px 0 4px; overflow-x: auto; }
 .info-work { border-collapse: collapse; font-size: 13px; line-height: 1.55;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
@@ -12175,6 +12169,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_who": "Pickering"
   }];
   const direction = [];
+  const directionStates = null;
+  const directionGroups = null;
+  const directionStateNote = null;
   const directionHouseEffects = {
     "right": {},
     "wrong": {},
@@ -21340,6 +21337,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     flowDriftOn,
     flowForced,
     direction,
+    directionStates,
+    directionGroups,
+    directionStateNote,
     directionAvailable,
     directionHouseEffects,
     directionHouses,
@@ -32620,6 +32620,48 @@ function Tabs({
     const el = btnRefs.current[next];
     if (el) el.focus();
   };
+  const navHover = React.useRef(false);
+  const navWalkLive = React.useRef(null);
+  navWalkLive.current = dir => {
+    const ids = barTabs.map(t => t.id);
+    const n = ids.length;
+    if (n < 2) return false;
+    const i = ids.indexOf(active);
+    const next = i < 0 ? dir > 0 ? ids[0] : ids[n - 1] : ids[(i + dir + n) % n];
+    if (next == null || next === active) return false;
+    onChange(next);
+    return true;
+  };
+  React.useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return undefined;
+    const enter = () => {
+      navHover.current = true;
+    };
+    const leave = () => {
+      navHover.current = false;
+    };
+    navHover.current = nav.matches(":hover");
+    nav.addEventListener("pointerenter", enter);
+    nav.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!navHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (menuOpen) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!navWalkLive.current(e.key === "ArrowRight" ? 1 : -1)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      nav.removeEventListener("pointerenter", enter);
+      nav.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [menuOpen]);
   const goHero = () => {
     if (active !== "now") onChange("now");else window.scrollTo({
       top: 0,
@@ -38900,98 +38942,6 @@ function RdChangelog() {
     }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release.")
   }), React.createElement(ChangelogEntries, null));
 }
-function FlowChart() {
-  const narrow = useNarrow();
-  const FSRC = typeof window !== "undefined" && window.AUSPOL && window.AUSPOL.flowHistory && window.AUSPOL.flowHistory.fed || null;
-  const YEARS = FSRC && FSRC.years ? FSRC.years : [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
-  const PARTIES = [{
-    id: "grn",
-    name: "Greens",
-    color: "var(--grn)",
-    v: FSRC && FSRC.grn ? FSRC.grn : [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2]
-  }, {
-    id: "onp",
-    name: "One Nation",
-    color: "var(--onp)",
-    v: FSRC && FSRC.onp ? FSRC.onp : [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5]
-  }, {
-    id: "oth",
-    name: "Others",
-    color: "var(--oth)",
-    v: FSRC && FSRC.oth ? FSRC.oth : [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6]
-  }];
-  const series = [];
-  PARTIES.forEach(p => {
-    const runs = [];
-    let cur = [];
-    p.v.forEach((val, i) => {
-      if (val == null) {
-        if (cur.length) runs.push(cur);
-        cur = [];
-      } else cur.push({
-        x: YEARS[i],
-        y: val
-      });
-    });
-    if (cur.length) runs.push(cur);
-    runs.forEach((points, i) => {
-      const tail = i === runs.length - 1;
-      series.push({
-        id: p.id + i,
-        label: p.name,
-        color: p.color,
-        points,
-        smooth: false,
-        width: 2.6,
-        endCap: tail,
-        endLabel: tail && !narrow ? p.name : null
-      });
-    });
-  });
-  return React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "fc-unit"
-  }, "share preferencing Labor"), React.createElement(TrendChart, {
-    height: narrow ? 470 : 330,
-    xDomain: [1996, 2025],
-    yDomain: [20, 92],
-    yTicks: [30, 50, 70, 90],
-    xTicks: (narrow ? [1996, 2004, 2013, 2019, 2025] : [1996, 2001, 2007, 2013, 2019, 2025]).map(x => ({
-      x,
-      label: String(x)
-    })),
-    unit: "%",
-    fmt: v => v.toFixed(1),
-    axisFont: narrow ? 28 : 15,
-    pad: {
-      l: 46,
-      r: narrow ? 22 : 104,
-      t: 16,
-      b: 40
-    },
-    series: series,
-    spine: YEARS.map(x => ({
-      x
-    })),
-    refLines: [{
-      y: 50,
-      label: "even split",
-      color: "var(--ink-faint)",
-      align: "left"
-    }],
-    tooltipTitle: i => YEARS[i] + " election",
-    ariaLabel: "Share of preferences flowing to Labor, by party, 1996 to 2025"
-  }), React.createElement("span", {
-    className: "hero-legend fc-legend"
-  }, PARTIES.map(p => React.createElement("span", {
-    className: "hl-item",
-    key: p.id
-  }, React.createElement("span", {
-    className: "hl-line",
-    style: {
-      background: p.color
-    }
-  }), p.name))));
-}
 function infoTerms(D) {
   const L = D.latest,
     prim = D.latest.primary;
@@ -39430,9 +39380,9 @@ function infoTerms(D) {
         href: "https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm",
         target: "_blank",
         rel: "noopener noreferrer"
-      }, "Greens 88.2%, One Nation 25.5% and all others 54.5% to Labor"), ").", React.createElement("span", {
-        className: "info-chart"
-      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
+      }, "Greens 88.2%, One Nation 25.5% and all others 54.5% to Labor"), "). The party-by-party history is charted in the", " ", React.createElement("a", {
+        href: "/flows-explained/"
+      }, "preference flows explainer"), " \u2014 flows exist only from 1996, when full preference data was first published, and One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses its own ", xref("fp-flows", "preference flows", "Labor v One Nation flows"), ", estimated because no election has counted that pairing.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Are they still flowing that way?"), " The Respondent-allocated preference flows page, in the More menu, checks two ways, one contest at a time. It sets what each party\u2019s voters tell pollsters, when asked to choose between the final two, beside the flows the site assumes. And it watches the pollsters\u2019 own two-party figures, which come largely from where their respondents say their preferences would go: if those drift from where the pollster\u2019s primary votes and the 2025 flows put them, voters may be sending preferences differently. Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later. With no counted Labor v One Nation flows, that chart shows drift since each pollster\u2019s first head-to-heads. The check corrects no other figure."))
     }, {
@@ -54055,7 +54005,9 @@ function RdPolls({
         className: "rd-ldg-noagg"
       }, React.createElement("b", null, "Outside the aggregates."), " ", r.noAggWhy), rhythm) : rhythm,
       onLine: id => {
-        if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
+        if (id === "twopp" || id === "primary" || id === "leadership") pickFacet(id);else if (id === "switching") {
+          if (window.AP.gotoSwitching) window.AP.gotoSwitching();
+        } else if (key && window.AP.openPoll) window.AP.openPoll(key, id, "latest and next polls");
       },
       sources: r.links && r.links.length ? rdPollLinks(r.links) : null,
       foot: React.createElement(React.Fragment, null, key && window.AP.openPoll && React.createElement("button", {
@@ -58666,6 +58618,10 @@ function RdApDetail({
     className: "rd-apd-h"
   }, isConf ? "How it reads" : "How it counts"), railBody);
   const lineGo = (id, el) => {
+    if (RD_LG_PANEL[id]) {
+      if (window.AP.gotoSwitching) window.AP.gotoSwitching();
+      return;
+    }
     const open = el && el.closest(".rd-ap-open");
     const row = open && open.previousElementSibling;
     if (row) rdPinScroll([row], true);
@@ -58741,6 +58697,9 @@ const RD_LG_LATEST_TABS = {
   twopp: 1,
   primary: 1,
   leadership: 1
+};
+const RD_LG_PANEL = {
+  switching: "where One Nation’s voters came from"
 };
 function rdLgChgNote(p, keys) {
   const r = p.chg && p.chg.r || {};
@@ -59501,9 +59460,10 @@ function RdLedger({
         p: l.p
       });
     }
-    const can = !!(onLine && RD_LG_TAB[l.id]);
+    const panelGo = RD_LG_PANEL[l.id];
+    const can = !!(onLine && (RD_LG_TAB[l.id] || panelGo));
     const Tag = can ? "button" : "div";
-    const away = latest && !RD_LG_LATEST_TABS[l.id];
+    const away = panelGo ? !latest : latest && !RD_LG_LATEST_TABS[l.id];
     return React.createElement(Tag, {
       key: l.id,
       type: can ? "button" : undefined,
@@ -59512,7 +59472,7 @@ function RdLedger({
         e.stopPropagation();
         onLine(l.id, e.currentTarget);
       } : undefined,
-      title: can ? away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
+      title: can ? panelGo ? away ? "Open " + panelGo + " on the Snapshot" : "Show " + panelGo : away ? "Open this poll on All polls’ " + RD_LG_TAB[l.id] + " tab" : "Show the " + RD_LG_TAB[l.id] + " tab" : undefined
     }, React.createElement("span", {
       className: "rd-ldg-lab"
     }, l.lab), React.createElement("span", {
@@ -64893,8 +64853,91 @@ function RdExplained() {
     return () => {
       if (node.parentNode === slot) slot.removeChild(node);
     };
-  });
+  }, []);
+  const pairStep = React.useRef(null);
+  pairStep.current = dir => {
+    const i = EX_PAIRS.findIndex(x => x.id === pair);
+    if (i < 0) return false;
+    setPair(EX_PAIRS[(i + dir + EX_PAIRS.length) % EX_PAIRS.length].id);
+    return true;
+  };
+  const viewStep = React.useRef(null);
+  viewStep.current = dir => {
+    const opts = VIEW_OPTS;
+    if (pair !== "co" || opts.length < 2) return false;
+    const i = opts.indexOf(view);
+    if (i < 0) return false;
+    setView(opts[(i + dir + opts.length) % opts.length]);
+    return true;
+  };
+  const cardEl = React.useRef(null);
+  const cardMark = React.useCallback(el => {
+    cardEl.current = el;
+    if (el) el.__rdSwipe = dir => pairStep.current(dir);
+  }, []);
+  const exHover = React.useRef(false);
+  React.useEffect(() => {
+    const card = cardEl.current;
+    if (!card) return undefined;
+    const enter = () => {
+      exHover.current = true;
+    };
+    const leave = () => {
+      exHover.current = false;
+    };
+    exHover.current = card.matches(":hover");
+    card.addEventListener("pointerenter", enter);
+    card.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!exHover.current) return;
+      const k = e.key;
+      if (k !== "ArrowRight" && k !== "ArrowLeft" && k !== "ArrowDown" && k !== "ArrowUp") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const went = k === "ArrowRight" || k === "ArrowLeft" ? pairStep.current(k === "ArrowRight" ? 1 : -1) : viewStep.current(k === "ArrowDown" ? 1 : -1);
+      if (went) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      card.removeEventListener("pointerenter", enter);
+      card.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
+  const spaceShare = React.useRef(null);
+  spaceShare.current = () => setInv(v => !v);
+  React.useEffect(() => {
+    const card = cardEl.current;
+    if (!card) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(card);
+    const key = e => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceShare.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceShare.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const stateKeys = Object.keys(FED_STATES);
+  const VIEW_OPTS = KEYS.length > 1 || stateKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   const menu = KEYS.length > 1 || stateKeys.length > 0 ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
@@ -64954,7 +64997,9 @@ function RdExplained() {
   }), React.createElement("div", {
     ref: ref
   }, React.createElement("div", {
-    className: "card rd-card ex-fl-card"
+    className: "card rd-card ex-fl-card",
+    ref: cardMark,
+    "data-rd-swipe-exact": ""
   }, React.createElement(RdTabs, {
     value: pair,
     onChange: setPair,
@@ -66233,6 +66278,36 @@ function BtvSort({
   };
   const sortSwipe = React.useCallback(el => {
     if (el) el.__rdSwipe = dir => sortSwipeLive.current(dir);
+  }, []);
+  const sortHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("public-opinion");
+    if (!sec) return undefined;
+    const enter = () => {
+      sortHover.current = true;
+    };
+    const leave = () => {
+      sortHover.current = false;
+    };
+    sortHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!sortHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!sortSwipeLive.current(e.key === "ArrowRight" ? 1 : -1)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
   }, []);
   return React.createElement("div", {
     className: "btv-sort"
@@ -68257,6 +68332,9 @@ const KBD_ROWS = [{
   keys: ["←", "→"],
   what: "Walk a card's tabs or chips while the pointer is over it"
 }, {
+  keys: ["↑", "↓"],
+  what: "In the preference-flows explainer, walk the elections menu while the pointer is on its card"
+}, {
   keys: ["1–9"],
   what: "Pick a numbered party or term on a chips row"
 }, {
@@ -68267,7 +68345,7 @@ const KBD_ROWS = [{
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
-  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu"
+  what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu; flip the Share side in the preference-flows explainer"
 }, {
   keys: ["P"],
   what: "In the all-polls two-party table, published figures only"
