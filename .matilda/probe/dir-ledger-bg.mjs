@@ -76,7 +76,7 @@ const sec = byKey("SEC Newgate", "Sep 2026") || rows.find((r) => r.name.includes
 ok("an SEC Newgate row carries a state line", !!sec, sec ? sec.name : "");
 if (sec) {
   const t = sec.cuts.replace(/\s+/g, " ");
-  ok("SEC head", t.includes("By state, per cent right–wrong:"));
+  ok("SEC head", t.includes("By state, % right–wrong:"));
   ok("SEC five states", ["NSW", "VIC", "QLD", "SA", "WA"].every((s) => t.includes(" " + s)), t.slice(0, 220));
   ok("SEC head 11px / cells 13px", sec.headPx === "11px" && sec.rowPx === "13px", sec.headPx + " / " + sec.rowPx);
 }
@@ -86,8 +86,8 @@ const rm = rmCutRows.find((r) => r.cuts.includes("By gender"));
 ok("a Roy Morgan September row carries splits", !!rm, rm ? rm.name : rows.filter((r) => r.name.includes("Roy Morgan") && r.cuts).map((r) => r.name).join(" · "));
 if (rm) {
   const t = rm.cuts.replace(/\s+/g, " ");
-  ok("RM gender head + pair", t.includes("By gender, per cent right–wrong:") && /Men 24\.5–62\.5/.test(t) && /Women 23–61\.5/.test(t), t.slice(0, 260));
-  ok("RM vote head + wrong-shares", t.includes("By voting intention, per cent saying wrong track:")
+  ok("RM gender head + pair", t.includes("By gender, % right–wrong:") && /Men 24\.5–62\.5/.test(t) && /Women 23–61\.5/.test(t), t.slice(0, 260));
+  ok("RM vote head + wrong-shares", t.includes("By voting intention, % saying wrong track:")
       && /One Nation 91/.test(t) && /Coalition 76/.test(t) && /Other parties 69/.test(t)
       && /Independents 60/.test(t) && /Greens 59/.test(t), t.slice(0, 260));
   ok("RM Labor right-share tail", /Labor 26\ ?\(right 54\)/.test(t), t.slice(0, 300));
@@ -102,9 +102,9 @@ const ess = rows.filter((r) => r.name.includes("Essential") && r.cuts)
 ok("the Essential 24–29 Sep row carries splits", !!ess);
 if (ess) {
   const t = ess.cuts.replace(/\s+/g, " ");
-  ok("Essential gender head + pair", t.includes("By gender, per cent right–wrong:") && /Women 21–59/.test(t), t.slice(0, 260));
+  ok("Essential gender head + pair", t.includes("By gender, % right–wrong:") && /Women 21–59/.test(t), t.slice(0, 260));
   ok("Essential age head + trio",
-    t.includes("By age, per cent right–wrong:") && /18–34 28–55/.test(t) && /35–54 23–62/.test(t) && /55\+ 24–62/.test(t),
+    t.includes("By age, % right–wrong:") && /18–34 28–55/.test(t) && /35–54 23–62/.test(t) && /55\+ 24–62/.test(t),
     t.slice(0, 320));
 }
 

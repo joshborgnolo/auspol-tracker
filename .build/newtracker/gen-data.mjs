@@ -2431,7 +2431,7 @@ const directionGroups = (() => {
       const cuts = (SEC_STATES.states || [])
         .map((st) => { const r = (SEC_STATES.series[st] || []).find((x) => x.month === ym); return r ? { label: st, right: r.right, wrong: r.wrong ?? null } : null; })
         .filter((c) => c && c.wrong != null);
-      if (cuts.length) attach(d.date + "|" + d.pollster, [{ head: "By state, per cent right–wrong:", cuts }]);
+      if (cuts.length) attach(d.date + "|" + d.pollster, [{ head: "By state, % right–wrong:", cuts }]);
     }
   }
   if (RM_DIR_GROUPS?.waves) {
@@ -2440,10 +2440,10 @@ const directionGroups = (() => {
     for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
       const rows = [];
       if (w.gender)
-        rows.push({ head: "By gender, per cent right–wrong:",
+        rows.push({ head: "By gender, % right–wrong:",
           cuts: ["Men", "Women"].filter((g) => w.gender[g]).map((g) => ({ label: g, right: w.gender[g].r ?? null, wrong: w.gender[g].w })) });
       if (w.vote)
-        rows.push({ head: "By voting intention, per cent saying wrong track:", form: "wrong",
+        rows.push({ head: "By voting intention, % saying wrong track:", form: "wrong",
           cuts: Object.keys(labOf).filter((g) => w.vote[g]).map((g) => ({ label: labOf[g], k: partOf[g], right: w.vote[g].r ?? null, wrong: w.vote[g].w })) });
       if (rows.length) attach(date + "|Roy Morgan", rows);
     }
@@ -2468,10 +2468,10 @@ const directionGroups = (() => {
       // Men/Women, not the CSV's Male/Female – the Roy Morgan bank beside
       // this one renders the same split that way
       const gender = ["Male", "Female"].map((dim, i) => { const c = pick(dim); return c ? { ...c, label: ["Men", "Women"][i] } : null; }).filter(Boolean);
-      if (gender.length === 2) rows.push({ head: "By gender, per cent right–wrong:", cuts: gender });
+      if (gender.length === 2) rows.push({ head: "By gender, % right–wrong:", cuts: gender });
       const age = [{ dim: "18-34", label: "18–34" }, { dim: "35-54", label: "35–54" }, { dim: "55+", label: "55+" }]
         .map(({ dim, label }) => { const c = pick(dim); return c ? { ...c, label } : null; }).filter(Boolean);
-      if (age.length === 3) rows.push({ head: "By age, per cent right–wrong:", cuts: age });
+      if (age.length === 3) rows.push({ head: "By age, % right–wrong:", cuts: age });
       if (rows.length) attach(d.date + "|" + d.pollster, rows);
     }
   }
