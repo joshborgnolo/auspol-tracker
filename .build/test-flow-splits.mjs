@@ -160,11 +160,30 @@ assert.deepEqual({ ...sa.err }, { coal: SAC.err90.lib, grn: SAC.err90.grn, oth: 
 assert.ok(["coal", "grn", "oth"].every((k) => sa.err[k] > 0 && sa.err[k] < 6), "each SA error is a real, bounded figure");
 assert.ok(/Bonham 33\.9/.test(sa.alt.coal) && /Bonham 84\.8/.test(sa.alt.grn), "Bonham's figures ride beside the site's");
 assert.equal(byKey.get("hunter").kind, "count", "Hunter is a count");
-assert.equal(byKey.get("harbour").kind, "part", "Secret Harbour is a count of part of the vote (drawn hollow)");
+
 assert.equal(byKey.get("sa2026").date, "2026-03-21", "SA 2026 rides its election day");
 assert.equal(byKey.get("sa2026").lbl.coal, "Liberal", "SA's Coalition cohort names the partner");
-assert.deepEqual([byKey.get("harbour").coal, byKey.get("harbour").grn], [29.8, 90],
-  "Secret Harbour: Antony Green's early-voting-centre count (Liberal 29.8 / Greens 90.0 to Labor)");
+/* Secret Harbour (user 2026-10-22): the whole-seat estimate from the early
+   voting centre's count sheets plus the rest of the seat's totals
+   (.build/secret-harbour-flows.py), its bars the range over ways of
+   dividing the rest's known total */
+const SHF = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "secret-harbour-flows.json"), "utf8"));
+const hb = byKey.get("harbour");
+assert.deepEqual([hb.coal, hb.grn, hb.oth], ["lib", "grn", "oth"].map((g) => Math.round(SHF.estimate[g] * 10) / 10),
+  "Secret Harbour: the whole-seat estimate");
+assert.equal(hb.kind, "est", "Secret Harbour is an estimate now, not a partial count");
+for (const [ck, g] of [["coal", "lib"], ["grn", "grn"], ["oth", "oth"]]) {
+  assert.deepEqual([...hb.range[ck]], SHF.range[g], `Secret Harbour ${g}: its range`);
+  assert.ok(hb.range[ck][0] <= hb[ck] && hb[ck] <= hb.range[ck][1], `Secret Harbour ${g}: the estimate sits in its range`);
+}
+assert.equal(SHF.early_polling_place.lib, 29.83, "the early voting centre's counted Liberal flow (Green's 70.2% to One Nation)");
+{
+  const art = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "explained-article.html"), "utf8");
+  const f = (x) => x.toFixed(1);
+  const row = `(this site&rsquo;s estimate, whole seat)</td><td>${f(SHF.estimate.lib)} (${f(SHF.range.lib[0])}&ndash;${f(SHF.range.lib[1])})</td>`;
+  assert.ok(art.includes(row), "the explainer's Secret Harbour row quotes the estimate and its range");
+  assert.ok(art.includes(`whole seat&rsquo;s Liberal voters at ${f(100 - SHF.estimate.lib)}% to One Nation`), "the prose quotes it too");
+}
 assert.equal(byKey.get("harbour").date, "2026-08-29", "Secret Harbour rides 29 Aug 2026");
 for (const d of FF.bys) {
   const [y, mo, dy] = d.date.split("-").map(Number);

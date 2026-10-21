@@ -7818,9 +7818,16 @@ function infoTerms(D) {
             federal trials cut to {FHB.contest.seats} seats; for Liberal voters
             (±{FHB.contest.err.lib.toFixed(1)}), the federal seats where Labor faced someone other than
             the Coalition, where the commission counts where Coalition voters went: the largest miss of
-            the last {fhWord(FHB.contest.elections)} elections. Secret Harbour 2026 is Antony Green&rsquo;s
-            count of the early voting centre, 47% of the votes, drawn hollow; both he and Kevin Bonham
-            think the whole seat sent Labor a little more.</span> : null}
+            the last {fhWord(FHB.contest.elections)} elections. Secret Harbour 2026 is this site&rsquo;s
+            estimate for the whole seat: the electoral commission&rsquo;s count sheets for the early voting
+            centre (47% of the votes) give each party&rsquo;s voters there, and its results give the rest
+            of the seat&rsquo;s first preferences and final count, so how the rest&rsquo;s minor-party ballots
+            split in total is known. Dividing that between the parties is the one choice; the bars show
+            how far the estimate moves across four ways of doing it. The site&rsquo;s pile model, run on the
+            seat&rsquo;s full distribution without the counts, puts Liberal voters 2.7 points more
+            Labor&rsquo;s way and Greens voters 6.7 points less: both beyond its tested error for a single
+            seat where Labor faced someone other than the Coalition (2.4 and 5.0 points, nine times in
+            ten), which is why the counts lead here.</span> : null}
             <span className="info-p"><b>What’s left out.</b> One Nation’s estimates miss by more
             ({FHB.onp.model.toFixed(1)} points on average federally since 2016), so its bars run
             wider. An estimate also needs enough One Nation ballots behind it: at least

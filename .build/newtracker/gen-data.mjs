@@ -4477,6 +4477,15 @@ const flowForced = (() => {
      Harbour is Green's count of the early voting centre, 47% of the votes
      (part: drawn hollow) - Green and Bonham both put the whole seat's
      Liberal flow a little more Labor's way. kind: "count" | "est" | "part". */
+  /* Secret Harbour (user 2026-10-22: "data for all polling booths"): no
+     whole-seat count by party exists, but the early polling place's count
+     sheets (47% of the votes) plus the rest of the seat's first preferences
+     and two-candidate total pin it down - .build/secret-harbour-flows.py,
+     data/secret-harbour-flows.json. range: the spread over ways of dividing
+     the rest's known total between parties, not a tested 90% error. */
+  const shf = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "secret-harbour-flows.json"), "utf8")); } catch { return null; }
+  })();
   const saC = (() => {
     try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-backtest.json"), "utf8")).contests["sa-2026-alp-onp"]; } catch { return null; }
   })();
@@ -4495,9 +4504,15 @@ const flowForced = (() => {
       alt: { coal: "Bonham 33.9", grn: "Bonham 84.8", oth: "independents " + saC.model.ind.toFixed(1) + ", Bonham 55.9" },
       lbl: { coal: "Liberal", oth: "all others" },
       sub: "This site’s estimate from the published distributions, " + saC.seats + " seats" }] : []),
-    { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
+    shf ? { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
+      kind: "est", coal: Math.round(shf.estimate.lib * 10) / 10, grn: Math.round(shf.estimate.grn * 10) / 10, oth: Math.round(shf.estimate.oth * 10) / 10,
+      range: { coal: shf.range.lib, grn: shf.range.grn, oth: shf.range.oth },
+      alt: { coal: "early voting centre counted " + shf.early_polling_place.lib.toFixed(1), grn: "early voting centre counted " + shf.early_polling_place.grn.toFixed(1),
+             oth: "early voting centre counted " + shf.early_polling_place.oth.toFixed(1) },
+      lbl: { coal: "Liberal", oth: "all others" },
+      sub: "This site’s estimate: the early voting centre’s count (" + Math.round(shf.early_share) + "% of the votes) plus the rest of the seat’s totals" }
+    : { key: "harbour", date: "2026-08-29", xm: byX("2026-08-29"), label: "Secret Harbour by-election", win: "29 Aug 2026",
       kind: "part", coal: 29.8, grn: 90.0, lbl: { coal: "Liberal" },
-      alt: { coal: "whole seat a little higher, by Green’s and Bonham’s readings" },
       sub: "Green’s count of the early voting centre: 47% of the votes" },
   ];
   /* DemosAU's MRP reports print one national respondent flow beside
