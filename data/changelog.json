@@ -224,7 +224,6 @@
       "lnp|location|Rural": -1,
       "lnp|state|Qld": -1,
       "lnp|state|Vic": 1,
-      "oth|location|Rural": 1,
       "oth|state|Non-NSW/Vic/Qld": -1,
       "oth|state|WA": 1,
       "oth|working|Retired": -1
@@ -300,11 +299,6 @@
         "group": "Vic",
         "setLabel": "By state"
       },
-      "oth|location|Rural": {
-        "party": "oth",
-        "group": "Rural",
-        "setLabel": "By location"
-      },
       "oth|state|Non-NSW/Vic/Qld": {
         "party": "oth",
         "group": "Non-NSW/Vic/Qld",
@@ -322,9 +316,9 @@
       }
     },
     "prim": {
-      "alp": 26.8,
+      "alp": 26.7,
       "grn": 13.6,
-      "lnp": 22.3,
+      "lnp": 22.4,
       "onp": 26,
       "oth": 11.2
     },
@@ -482,6 +476,12 @@
       "label": "21 Oct 2026",
       "kind": "finding",
       "text": "English only voters (by language at home) no longer break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-10-21",
+      "label": "21 Oct 2026",
+      "kind": "finding",
+      "text": "Rural voters (by location) no longer break significantly toward others, relative to all voters."
     }
   ]
 }

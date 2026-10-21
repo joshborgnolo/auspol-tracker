@@ -6141,7 +6141,8 @@
       "dateStart": "2026-10-13",
       "pollster": "YouGov",
       "client": "News24",
-      "sample": 1500,
+      "sample": 1542,
+      "sampleEff": 1066,
       "alp": 24,
       "lnp": 23,
       "grn": 14,
@@ -6151,7 +6152,8 @@
       "tpp_alp": 50,
       "tpp_lnp": 50,
       "published": "2026-10-21T05:20",
-      "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae"
+      "url": "https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae",
+      "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_20_10_26_APC_Methodology_Statement.pdf"
     }
   ],
   "ppm": [
