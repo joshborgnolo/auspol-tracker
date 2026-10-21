@@ -4546,6 +4546,8 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
+body.rd .rd-dir-chart .rd-chead .rd-pv-sel { flex-shrink: 0; }
+body.rd .rd-dir-extremes { margin: 14px 0 0; font-size: 13px; color: var(--ink-3); max-width: 66ch; }
 body.rd .rd-confidence-tabs { margin-top: 40px; }
 body.rd .rd-cc.rd-confidence-cc { margin-top: 24px; }
 body.rd .rd-confidence-draw { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
@@ -47476,6 +47478,20 @@ function RdDirection({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
+  const [grpId, setGrpId] = React.useState("");
+  const grpSelRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = grpSelRef.current;
+    if (!el) return;
+    const fit = () => {
+      const cs = getComputedStyle(el);
+      const cv = document.createElement("canvas").getContext("2d");
+      cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
+    };
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }, [grpId]);
   if (!D.direction.length) return null;
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.direction, xDomain[0]);
@@ -47551,6 +47567,46 @@ function RdDirection({
   const foot = last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
+  const SEC_LABELS = {
+    NSW: "New South Wales",
+    VIC: "Victoria",
+    QLD: "Queensland",
+    SA: "South Australia",
+    WA: "Western Australia"
+  };
+  const G = grpId ? D.directionStates?.[grpId] || D.directionGroups?.[grpId] || null : null;
+  const gSrc = grpId && D.directionStates?.[grpId] ? "SEC Newgate" : "Roy Morgan";
+  const gRaw = G ? G.series.filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
+  const gHasRight = gRaw.filter(d => d.right != null).length >= 2;
+  const gPts = gRaw.map(d => ({
+    ...d,
+    right: gHasRight ? d.right : null
+  }));
+  const gDots = gRaw.flatMap(d => [d.right != null ? {
+    x: d.x,
+    y: d.right,
+    color: "var(--mood-pos)",
+    label: "Right direction"
+  } : null, d.wrong != null ? {
+    x: d.x,
+    y: d.wrong,
+    color: "var(--mood-neg)",
+    label: "Wrong track"
+  } : null].filter(Boolean));
+  const gVals = gPts.flatMap(p => [p.right, p.wrong]).filter(v => v != null);
+  const gLo = gVals.length ? Math.floor((Math.min(...gVals) + 0.6) / 10) * 10 : lo;
+  const gHi = gVals.length ? Math.max(Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10, gLo + 10) : hi;
+  const gGroups = [{
+    label: "By state (SEC Newgate)",
+    opts: D.directionStates ? Object.keys(D.directionStates).map(k => [k, SEC_LABELS[k] || k]) : []
+  }, {
+    label: "By gender (Roy Morgan)",
+    opts: D.directionGroups ? ["Men", "Women"].filter(k => D.directionGroups[k]).map(k => [k, k]) : []
+  }, {
+    label: "By vote (Roy Morgan)",
+    opts: D.directionGroups ? Object.keys(D.directionGroups).filter(k => k !== "Men" && k !== "Women").map(k => [k, k]) : []
+  }].filter(g => g.opts.length);
+  const gNote = D.directionStateNote ? "Roy Morgan’s latest release (" + D.monthNameFull(Number(D.directionStateNote.date.slice(5, 7))) + ") prints " + D.directionStateNote.highest.state + " as the state most convinced the country is on the wrong track (" + D.directionStateNote.highest.w + "%), " + D.directionStateNote.lowest.state + " the least (" + D.directionStateNote.lowest.w + "%). Its full state table is paywalled." : null;
   return React.createElement(RdSec, {
     id: "direction",
     cls: "rd-dir",
@@ -47616,7 +47672,21 @@ function RdDirection({
     className: "rd-chead"
   }, React.createElement("span", {
     className: "rd-chead-t"
-  }, narrow ? "Right direction and wrong track, %" : "Right direction and wrong track, % of voters, month by month")), narrow && React.createElement(RdKey, {
+  }, narrow || G ? "Right direction and wrong track, %" : "Right direction and wrong track, % of voters, month by month"), gGroups.length > 0 && React.createElement("select", {
+    ref: grpSelRef,
+    className: "rd-pv-sel",
+    "aria-label": "The national direction among only some voters",
+    value: grpId,
+    onChange: e => setGrpId(e.target.value)
+  }, React.createElement("option", {
+    value: ""
+  }, "All voters"), gGroups.map(grp => React.createElement("optgroup", {
+    key: grp.label,
+    label: grp.label
+  }, grp.opts.map(([k, label]) => React.createElement("option", {
+    key: k,
+    value: k
+  }, label)))))), narrow && !G && React.createElement(RdKey, {
     items: [{
       kind: "line",
       color: "var(--mood-neg)",
@@ -47627,7 +47697,74 @@ function RdDirection({
       label: "Right direction"
     }],
     className: "rd-tpp-legend"
-  }), React.createElement(TrendChart, {
+  }), G ? React.createElement(TrendChart, {
+    key: "rd-dir-g-" + grpId,
+    heightPx: narrow ? 280 : 360,
+    padPx: narrow ? {
+      l: 34,
+      r: 8,
+      t: 30,
+      b: 28
+    } : {
+      l: 40,
+      r: 16,
+      t: 40,
+      b: 30
+    },
+    xDomain: xDomain,
+    yDomain: [gLo, gHi],
+    yTicks: rdYTicks(gLo, gHi, 10),
+    yTickFmt: v => v === gHi ? v + "%" : String(v),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365),
+    baseline: true,
+    series: [{
+      id: "wrong",
+      label: "Wrong track",
+      color: "var(--mood-neg)",
+      points: gPts.filter(d => d.wrong != null).map(d => ({
+        x: d.x,
+        y: d.wrong
+      })),
+      rdWidth: 2.5,
+      endCap: false,
+      endLabel: narrow ? null : "Wrong track"
+    }, ...(gHasRight ? [{
+      id: "right",
+      label: "Right direction",
+      color: "var(--mood-pos)",
+      points: gPts.filter(d => d.right != null).map(d => ({
+        x: d.x,
+        y: d.right
+      })),
+      rdWidth: 2.5,
+      endCap: false,
+      endLabel: narrow ? null : "Right direction"
+    }] : [])],
+    spine: gPts.filter(d => d.wrong != null).map(d => ({
+      x: d.x,
+      y: d.wrong
+    })),
+    scatter: gDots.length ? gDots : undefined,
+    tooltipTitle: i => {
+      const s = gPts.filter(d => d.wrong != null);
+      return s[i] ? monthLabelFull(s[i].ym) : "";
+    },
+    fmt: v => v.toFixed(1),
+    copy: {
+      title: (SEC_LABELS[grpId] || grpId) + ": is the country heading in the right direction?",
+      sub: "Published readings for " + (SEC_LABELS[grpId] || grpId) + " from " + gSrc + "'s survey releases, as printed (never adjusted for house lean).",
+      caption: "Each dot is one published reading for " + (SEC_LABELS[grpId] || grpId) + " by " + gSrc + ", printed in its releases.",
+      legend: [{
+        label: "Right direction",
+        color: "var(--mood-pos)",
+        kind: "line"
+      }, {
+        label: "Wrong track",
+        color: "var(--mood-neg)",
+        kind: "line"
+      }]
+    }
+  }) : React.createElement(TrendChart, {
     key: "rd-dir",
     heightPx: narrow ? 280 : 360,
     padPx: narrow ? {
@@ -47693,9 +47830,16 @@ function RdDirection({
         kind: "line"
       }]
     }
-  }), badges && React.createElement(RdEventList, {
+  }), badges && !G && React.createElement(RdEventList, {
     list: badges.list
-  }), React.createElement(RdKey, {
+  }), G ? React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: [{
+      kind: "dot",
+      color: "var(--ink-3)",
+      label: "One reading by " + gSrc + (gHasRight ? "" : " (a right-direction line needs both shares printed)")
+    }]
+  }) : React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "dot",
@@ -47706,7 +47850,11 @@ function RdDirection({
       color: "var(--ink-3)",
       label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval"
     }]
-  })), React.createElement(HowTo, {
+  })), !G && gNote && React.createElement("p", {
+    className: "rd-dir-extremes"
+  }, gNote), G ? React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Every point above is a published reading for ", SEC_LABELS[grpId] || grpId, " printed in a ", gSrc, " release, taken as found \u2013 never house-adjusted, never smoothed."), gSrc === "Roy Morgan" ? React.createElement(React.Fragment, null, "Roy Morgan prints these splits only some fortnights, so the series has gaps where no cut was released. ", gHasRight ? "" : "Where a release names only one share, the other cannot be pieced back from the national figures.") : React.createElement(React.Fragment, null, "SEC Newgate asks about each state\u2019s own direction, not the nation\u2019s \u2013 so these readings sit beside, not inside, the national mood above.")]
+  }) : React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(React.Fragment, null, "The lines are adjusted for each pollster\u2019s lean. Only ", (D.directionHouses || []).length, " pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.")]
   }), React.createElement(RdFoot, {
     how: {
@@ -68602,6 +68750,13 @@ function App() {
       behavior: "auto"
     });
   };
+  const swScrollNow = () => {
+    const el = document.getElementById("switching");
+    if (el) el.scrollIntoView({
+      block: "start",
+      behavior: "auto"
+    });
+  };
   React.useEffect(() => {
     window.AP.openPoll = (key, facet, from, split) => {
       if (!key) return;
@@ -68661,12 +68816,33 @@ function App() {
       };
       setTimeout(seek, 0);
     };
+    window.AP.gotoSwitching = () => {
+      if (readLocation() === "now") {
+        swScrollNow();
+        return;
+      }
+      navTab("now", true);
+      let tries = 0;
+      const seek = () => {
+        const el = document.getElementById("switching");
+        if (el) {
+          el.scrollIntoView({
+            block: "start",
+            behavior: "auto"
+          });
+          return;
+        }
+        if (++tries < 40) setTimeout(seek, 75);
+      };
+      setTimeout(seek, 0);
+    };
     return () => {
       delete window.AP.openPoll;
       delete window.AP.openTerm;
       delete window.AP.openTermPage;
       delete window.AP.gotoNextPolls;
       delete window.AP.gotoFinalPolls;
+      delete window.AP.gotoSwitching;
     };
   }, []);
   const restoreY = useRef(null);

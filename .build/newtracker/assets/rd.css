@@ -1427,6 +1427,10 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
+/* the group select and the printed state-extremes note beside/under the
+   chart card (the select sits in the chead's right slot by flex) */
+body.rd .rd-dir-chart .rd-chead .rd-pv-sel { flex-shrink: 0; }
+body.rd .rd-dir-extremes { margin: 14px 0 0; font-size: 13px; color: var(--ink-3); max-width: 66ch; }
 /* the confidence panel's consumer/business tabs take direction's 40px
    drop; the toggled chart card then sits the walked-row distance below
    them. Between them the draw-a-term row rides at 24px and overrides the

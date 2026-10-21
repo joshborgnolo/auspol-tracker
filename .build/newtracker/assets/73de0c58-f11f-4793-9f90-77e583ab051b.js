@@ -2514,6 +2514,10 @@ function App() {
     const el = document.querySelector("section.next-polls, section.rd-polls");
     if (el) el.scrollIntoView({ block: "start", behavior: "auto" });
   };
+  const swScrollNow = () => {
+    const el = document.getElementById("switching");
+    if (el) el.scrollIntoView({ block: "start", behavior: "auto" });
+  };
 
   /* Clicking a dot on any chart crosses to that poll in the archive, opened.
      The charts are six components deep in two different views, so the entry
@@ -2575,8 +2579,23 @@ function App() {
       };
       setTimeout(seek, 0);
     };
+    /* The poll ledger's "To One Nation" line goes to the vote-switching
+       panel. Cross-tab it uses the final-polls trip's seek loop rather than
+       the parked ref - the switching section mounts after the tab change
+       lands, so a one-shot scroll at the layout effect finds nothing. */
+    window.AP.gotoSwitching = () => {
+      if (readLocation() === "now") { swScrollNow(); return; }
+      navTab("now", true);
+      let tries = 0;
+      const seek = () => {
+        const el = document.getElementById("switching");
+        if (el) { el.scrollIntoView({ block: "start", behavior: "auto" }); return; }
+        if (++tries < 40) setTimeout(seek, 75);
+      };
+      setTimeout(seek, 0);
+    };
     return () => { delete window.AP.openPoll; delete window.AP.openTerm; delete window.AP.openTermPage;
-                   delete window.AP.gotoNextPolls; delete window.AP.gotoFinalPolls; };
+                   delete window.AP.gotoNextPolls; delete window.AP.gotoFinalPolls; delete window.AP.gotoSwitching; };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
      scroll is handed to a layout effect rather than to requestAnimationFrame:

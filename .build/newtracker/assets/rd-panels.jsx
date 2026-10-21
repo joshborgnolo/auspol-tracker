@@ -1729,6 +1729,22 @@ function rdRoughPts(v) {
 function RdDirection({ rangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
+  const [grpId, setGrpId] = React.useState("");
+  const grpSelRef = React.useRef(null);
+  // the primary-vote menu's fit trick: the option labels set the width
+  React.useLayoutEffect(() => {
+    const el = grpSelRef.current;
+    if (!el) return;
+    const fit = () => {
+      const cs = getComputedStyle(el);
+      const cv = document.createElement("canvas").getContext("2d");
+      cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width
+        + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
+    };
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }, [grpId]);
   if (!D.direction.length) return null;
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.direction, xDomain[0]);
@@ -1793,6 +1809,37 @@ function RdDirection({ rangeId }) {
   const foot = last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
+
+  /* ---- group mode (the select) ------------------------------------------
+     SEC Newgate's five-state cut and Roy Morgan's prose splits, as printed
+     (never lean-adjusted, never smoothed – the longer series above is).
+     A group swaps every figure-bearing part of the card; the all-voters
+     branch is the original code path, unchanged. */
+  const SEC_LABELS = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", SA: "South Australia", WA: "Western Australia" };
+  const G = grpId ? (D.directionStates?.[grpId] || D.directionGroups?.[grpId] || null) : null;
+  const gSrc = grpId && D.directionStates?.[grpId] ? "SEC Newgate" : "Roy Morgan";
+  const gRaw = G ? G.series.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
+  /* a group's right line draws only once it can be told from noise */
+  const gHasRight = gRaw.filter((d) => d.right != null).length >= 2;
+  const gPts = gRaw.map((d) => ({ ...d, right: gHasRight ? d.right : null }));
+  const gDots = gRaw.flatMap((d) => [
+    d.right != null ? { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction" } : null,
+    d.wrong != null ? { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track" } : null,
+  ].filter(Boolean));
+  const gVals = gPts.flatMap((p) => [p.right, p.wrong]).filter((v) => v != null);
+  const gLo = gVals.length ? Math.floor((Math.min(...gVals) + 0.6) / 10) * 10 : lo;
+  const gHi = gVals.length ? Math.max(Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10, gLo + 10) : hi;
+  const gGroups = [
+    { label: "By state (SEC Newgate)", opts: (D.directionStates ? Object.keys(D.directionStates).map((k) => [k, SEC_LABELS[k] || k]) : []) },
+    { label: "By gender (Roy Morgan)", opts: (D.directionGroups ? ["Men", "Women"].filter((k) => D.directionGroups[k]).map((k) => [k, k]) : []) },
+    { label: "By vote (Roy Morgan)", opts: (D.directionGroups ? Object.keys(D.directionGroups).filter((k) => k !== "Men" && k !== "Women").map((k) => [k, k]) : []) },
+  ].filter((g) => g.opts.length);
+  const gNote = D.directionStateNote
+    ? "Roy Morgan’s latest release (" + D.monthNameFull(Number(D.directionStateNote.date.slice(5, 7))) + ") prints " + D.directionStateNote.highest.state
+      + " as the state most convinced the country is on the wrong track (" + D.directionStateNote.highest.w + "%), "
+      + D.directionStateNote.lowest.state + " the least (" + D.directionStateNote.lowest.w + "%). Its full state table is paywalled."
+    : null;
+
   return (
     <RdSec id="direction" cls="rd-dir" title="National direction" meta={narrow ? question : question + (asked ? ", " + asked : "")}>
       <RdHed head={head} dek={dek} />
@@ -1810,38 +1857,87 @@ function RdDirection({ rangeId }) {
       <p className="rd-dir-net"><b>Net {signedP(now.net)} points</b>
         {now.chg != null && <>, {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig === false ? ", within the margin" : ""}</>}</p>
       <div className="card rd-card rd-dir-chart">
-        <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Right direction and wrong track, %" : "Right direction and wrong track, % of voters, month by month"}</span></div>
-        {narrow && <RdKey items={[{ kind: "line", color: "var(--mood-neg)", label: "Wrong track" }, { kind: "line", color: "var(--mood-pos)", label: "Right direction" }]} className="rd-tpp-legend" />}
-        <TrendChart key="rd-dir" heightPx={narrow ? 280 : 360}
-          padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
-          xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
-          /* the axis opens on the election tick, as the 2PP, primary and
-             mood charts do - 2025 + 122/365 is 3 May 2025 on gen-data's dx
-             counting (rdXTicks's month grid would open at July, May falling
-             between its quarter steps) */
-          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
-          series={[
-            { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
-            { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" },
-          ]}
-          spine={series(pts, "right")} areas={areas} scatter={dots} pollFacet="direction"
-          events={badges ? badges.events : evs} brackets={brackets}
-          tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
-          extraRows={(i) => { const d = pts[i]; return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
-          fmt={(v) => v.toFixed(1)}
-          copy={{ title: "Is Australia heading in the right direction?", sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
-                  caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : ""), legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
-        />
-        {badges && <RdEventList list={badges.list} />}
-        <RdKey className="rd-ckey" items={[
-          { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-          { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
-        ]} />
+        <div className="rd-chead"><span className="rd-chead-t">{narrow || G
+          ? "Right direction and wrong track, %"
+          : "Right direction and wrong track, % of voters, month by month"}</span>
+          {gGroups.length > 0 && (
+            <select ref={grpSelRef} className="rd-pv-sel" aria-label="The national direction among only some voters" value={grpId}
+                    onChange={(e) => setGrpId(e.target.value)}>
+              <option value="">All voters</option>
+              {gGroups.map((grp) => (
+                <optgroup key={grp.label} label={grp.label}>
+                  {grp.opts.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          )}
+        </div>
+        {narrow && !G && <RdKey items={[{ kind: "line", color: "var(--mood-neg)", label: "Wrong track" }, { kind: "line", color: "var(--mood-pos)", label: "Right direction" }]} className="rd-tpp-legend" />}
+        {G ? (
+          <TrendChart key={"rd-dir-g-" + grpId} heightPx={narrow ? 280 : 360}
+            padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
+            xDomain={xDomain} yDomain={[gLo, gHi]} yTicks={rdYTicks(gLo, gHi, 10)} yTickFmt={(v) => (v === gHi ? v + "%" : String(v))}
+            xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
+            series={[
+              { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: gPts.filter((d) => d.wrong != null).map((d) => ({ x: d.x, y: d.wrong })), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
+              ...(gHasRight ? [{ id: "right", label: "Right direction", color: "var(--mood-pos)", points: gPts.filter((d) => d.right != null).map((d) => ({ x: d.x, y: d.right })), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" }] : []),
+            ]}
+            spine={gPts.filter((d) => d.wrong != null).map((d) => ({ x: d.x, y: d.wrong }))} scatter={gDots.length ? gDots : undefined}
+            tooltipTitle={(i) => { const s = gPts.filter((d) => d.wrong != null); return s[i] ? monthLabelFull(s[i].ym) : ""; }}
+            fmt={(v) => v.toFixed(1)}
+            copy={{ title: (SEC_LABELS[grpId] || grpId) + ": is the country heading in the right direction?",
+                    sub: "Published readings for " + (SEC_LABELS[grpId] || grpId) + " from " + gSrc + "'s survey releases, as printed (never adjusted for house lean).",
+                    caption: "Each dot is one published reading for " + (SEC_LABELS[grpId] || grpId) + " by " + gSrc + ", printed in its releases.",
+                    legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
+          />
+        ) : (
+          <TrendChart key="rd-dir" heightPx={narrow ? 280 : 360}
+            padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
+            xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
+            /* the axis opens on the election tick, as the 2PP, primary and
+               mood charts do - 2025 + 122/365 is 3 May 2025 on gen-data's dx
+               counting (rdXTicks's month grid would open at July, May falling
+               between its quarter steps) */
+            xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
+            series={[
+              { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
+              { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" },
+            ]}
+            spine={series(pts, "right")} areas={areas} scatter={dots} pollFacet="direction"
+            events={badges ? badges.events : evs} brackets={brackets}
+            tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
+            extraRows={(i) => { const d = pts[i]; return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
+            fmt={(v) => v.toFixed(1)}
+            copy={{ title: "Is Australia heading in the right direction?", sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
+                    caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : ""), legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
+          />
+        )}
+        {badges && !G && <RdEventList list={badges.list} />}
+        {G ? (
+          <RdKey className="rd-ckey" items={[
+            { kind: "dot", color: "var(--ink-3)", label: "One reading by " + gSrc + (gHasRight ? "" : " (a right-direction line needs both shares printed)") },
+          ]} />
+        ) : (
+          <RdKey className="rd-ckey" items={[
+            { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+            { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
+          ]} />
+        )}
       </div>
-      <HowTo paras={[
-        <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
-        <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
-      ]} />
+      {!G && gNote && <p className="rd-dir-extremes">{gNote}</p>}
+      {G ? (
+        <HowTo paras={[
+          <>Every point above is a published reading for {SEC_LABELS[grpId] || grpId} printed in a {gSrc} release, taken as found – never house-adjusted, never smoothed.</>,
+          gSrc === "Roy Morgan"
+            ? <>Roy Morgan prints these splits only some fortnights, so the series has gaps where no cut was released. {gHasRight ? "" : "Where a release names only one share, the other cannot be pieced back from the national figures."}</>
+            : <>SEC Newgate asks about each state’s own direction, not the nation’s – so these readings sit beside, not inside, the national mood above.</>,
+        ]} />
+      ) : (
+        <HowTo paras={[
+          <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
+          <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
+        ]} />
+      )}
       <RdFoot how={{ term: "direction", from: "National direction" }}>{foot}</RdFoot>
     </RdSec>
   );
