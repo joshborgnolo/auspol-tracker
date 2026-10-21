@@ -153,7 +153,7 @@ function sandbox({ q1Text = Q1_TXT, undatedQ1 = false, dropRows = ["2026-03-26",
   // validate.mjs's main block gates these data files (its run is the sandbox
   // gate): keep this list beside its data-parsing checks or Linux CI fails
   // the step-8/sandboxed validate on "missing or unparseable".
-  for (const f of ["demographics.json", "changelog.json", "pew-econ-sentiment.json"])
+  for (const f of ["demographics.json", "changelog.json", "pew-econ-sentiment.json", "roymorgan-direction-groups.json", "sec-direction-states.json"])
     fs.copyFileSync(path.join(ROOT, "data", f), path.join(sb, "data", f));
   for (const f of ["validate.mjs", "flows.mjs", "house-renames.mjs", "field-tbc.mjs"])
     fs.copyFileSync(path.join(ROOT, ".build", "newtracker", f), path.join(sb, ".build", "newtracker", f));
