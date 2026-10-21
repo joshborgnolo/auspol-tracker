@@ -129,12 +129,19 @@ async function get(url) {
 /* A JSON endpoint over get(): the host sometimes answers the API 200 with
    an HTML interstitial (maintenance/WAF page — 2026-10-06 a blip of a
    minute or two; 2026-10-08 a window of ≥4½ minutes that outlasted six
-   tries twenty seconds apart in the probe AND the full run). Neither the
-   fetch layer nor a status check can see a healthy-looking 200 with the
-   wrong body, so the parse itself is what a retry waits for: three quick
-   tries for the blip class, then a widening ramp that keeps the ladder
-   standing ~12 minutes. An HTML body is named the interstitial it is, so
-   the run's FAIL line says what happened, not "Unexpected token '<'". */
+   tries twenty seconds apart in the probe AND the full run; 2026-10-21 a
+   window of ≥25 minutes, ~03:20–03:45 UTC, that outlasted the whole
+   ladder below in both the probe and the updater run of secnewgate-update).
+   Neither the fetch layer nor a status check can see a healthy-looking 200
+   with the wrong body, so the parse itself is what a retry waits for:
+   three quick tries for the blip class, then a widening ramp that keeps
+   the ladder standing ~12 minutes. An HTML body is named the interstitial
+   it is, so the run's FAIL line says what happened, not "Unexpected token
+   '<'"; and the message names it an HTTP 503-class wall so
+   classify-failure.mjs files the window as the upstream wall it is (a
+   200-masked outage answers "not now" exactly like a 503) — without the
+   vocabulary, a window longer than the ladder escalates to a repair
+   session that finds nothing wrong. */
 const JSON_WAITS = [20, 20, 20, 60, 120, 180, 300];   // seven retries ≈ 12 min
 async function getJson(url) {
   let last;
@@ -142,7 +149,7 @@ async function getJson(url) {
     if (i) await new Promise((r) => setTimeout(r, JSON_WAITS[i - 1] * 1000));
     try {
       const body = (await get(url)).toString("utf8");
-      if (/^\s*</.test(body)) throw new Error("the host answered an HTML page, not JSON (maintenance/WAF interstitial)");
+      if (/^\s*</.test(body)) throw new Error("the host answered an HTML page, not JSON (maintenance/WAF interstitial — a 200-masked service wall; treat as HTTP 503)");
       return JSON.parse(body);
     } catch (e) { last = e; }
   }
