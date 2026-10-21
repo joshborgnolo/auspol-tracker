@@ -856,7 +856,7 @@ const BTV_SORTS = [{ id: "issue", label: "By issue" }, { id: "pollster", label: 
 function BtvSort({ sort, onSort }) {
   return (
     <div className="btv-sort">
-      <span className="btv-sort-l" id="btv-sort-l">Sort by</span>
+      <span className="btv-sort-l" id="btv-sort-l">Sort</span>
       <div className="btv-sort-g" role="group" aria-labelledby="btv-sort-l" onKeyDown={rdTabsKey(BTV_SORTS, onSort)} onClick={rdTabFocus}>
         {BTV_SORTS.map((o) => (
           <button key={o.id} type="button" className="btv-sort-b" aria-pressed={sort === o.id} onClick={() => onSort(o.id)}>
