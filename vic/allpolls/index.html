@@ -65037,6 +65037,19 @@ const FLOW_PARTIES = [{
   name: "Others",
   color: "var(--oth)"
 }];
+const FLOW_ON_PARTIES = [{
+  id: "coal",
+  name: "Coalition",
+  color: "var(--lnp)"
+}, {
+  id: "grn",
+  name: "Greens",
+  color: "var(--grn)"
+}, {
+  id: "oth",
+  name: "Others",
+  color: "var(--oth)"
+}];
 const EX_TICKS = [0, 25, 50, 75, 100];
 const exTickFmt = v => v === 100 ? "100%" : String(v);
 const exFrame = narrow => ({
@@ -65102,21 +65115,22 @@ function ExplainedFlowChart({
   stateKey,
   classKey,
   lc,
-  menu
+  menu,
+  onSen
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
-  const SEN = house === "sen" ? (FH.fed || {}).sen || null : null;
-  const LC = house === "sen" && lc ? (FH.nsw || {}).sen || null : null;
+  const SEN = house === "sen" ? (FH.fed || {})[onSen ? "senOn" : "sen"] || null : null;
+  const LC = house === "sen" && lc && !onSen ? (FH.nsw || {}).sen || null : null;
   const S = LC || SEN && stateKey && (SEN.states || {})[stateKey] || SEN || jur === "fed" && stateKey && (FH.fed.states || {})[stateKey] || jur === "fed" && classKey && (FH.fed.classes || {})[classKey] || FH[jur] || FH.fed;
   if (!S) return null;
   const YEARS = S.years;
   const est = !!S.estimated;
   const T = v => inv ? 100 - v : v;
   const cnt = !!S.counted;
-  const sen = !!(S.senate || S.senState || S.lc);
+  const sen = !!(S.senate || S.senState || S.lc || S.senateOn || S.senStateOn);
   const lcBank = !!S.lc;
-  const parties = FLOW_PARTIES.filter(p => (S[p.id] || []).some(v => v != null));
+  const parties = (onSen ? FLOW_ON_PARTIES : FLOW_PARTIES).filter(p => (S[p.id] || []).some(v => v != null));
   const hasErr = parties.some(p => (S[p.id + "Err"] || []).some(e => e != null));
   const fedEst = !est && S.estYears && S.estYears.length ? S.estYears : null;
   const series = [];
@@ -65132,7 +65146,7 @@ function ExplainedFlowChart({
         cur = [];
       } else {
         const nei = S[p.id + "Nei"] || [];
-        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, sen && nei[i] != null ? "named neither major: " + nei[i].toFixed(1) + "%" : null, !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, sen && nei[i] != null ? (onSen ? "named neither: " : "named neither major: ") + nei[i].toFixed(1) + "%" : null, !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({
           x: YEARS[i],
           y: T(val),
@@ -65189,15 +65203,15 @@ function ExplainedFlowChart({
     });
   }
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
-  const side = inv ? "the Coalition" : "Labor",
-    other = inv ? "Labor" : "the Coalition";
+  const side = inv ? onSen ? "One Nation" : "the Coalition" : "Labor",
+    other = inv ? "Labor" : onSen ? "One Nation" : "the Coalition";
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span + (est ? ", estimated" : "");
-  const E25 = ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
+  const E25 = !onSen && ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
   const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
-  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 2001’s ratings are its own division profiles’ as displayed that year, three unrated seats filled from its research report; 2004’s come from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. 2001 is as far back as the classification store reaches, so that’s where the line starts (the flow table itself goes back to 1996). A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
+  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 2001’s ratings are its own division profiles’ as displayed that year, three unrated seats filled from its research report; 2004’s come from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. 2001 is as far back as the classification store reaches, so that’s where the line starts (the flow table itself goes back to 1996). A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -65213,7 +65227,7 @@ function ExplainedFlowChart({
     items: lines,
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, _extends({
-    key: "ex-fl-" + (house || "rep") + jur + (stateKey || "") + (classKey || "") + (lcBank ? "lc" : "")
+    key: "ex-fl-" + (house || "rep") + jur + (stateKey || "") + (classKey || "") + (lcBank ? "lc" : "") + (onSen ? "on" : "")
   }, exFrame(narrow), {
     xDomain: [x0, x1],
     xTicks: YEARS.map(x => ({
@@ -65231,8 +65245,8 @@ function ExplainedFlowChart({
     ariaLabel: "Share of preferences flowing to " + side + ", by party, " + S.label + (lcBank ? ", above-the-line NSW Legislative Council ballots" : sen ? ", above-the-line Senate ballots" : "") + (est ? ", estimated" : "") + ", " + span,
     copy: {
       title: "Share of each group’s preferences reaching " + side + " over " + other,
-      sub: rdCap(S.elections || S.label + " elections") + ". " + (lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files; above-the-line ballots only, and each share is of papers naming a major party." : sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party." : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : "Counted, election by election, so no error bars."),
-      caption: lcBank ? "Above-the-line NSW upper-house ballots, 2015–2023; on the page, each point’s tooltip gives the share naming neither major." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+      sub: rdCap(S.elections || S.label + " elections") + ". " + (lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files; above-the-line ballots only, and each share is of papers naming a major party." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers ranking Labor or One Nation (or both)." : sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party." : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : "Counted, election by election, so no error bars."),
+      caption: lcBank ? "Above-the-line NSW upper-house ballots, 2015–2023; on the page, each point’s tooltip gives the share naming neither major." : onSen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -65425,6 +65439,12 @@ function RdExplained() {
   const [view, setView] = useState("fed");
   const SEN_BANK = FH.fed && FH.fed.sen || null;
   const LC_BANK = FH.nsw && FH.nsw.sen || null;
+  const SEN_ON_BANK = FH.fed && FH.fed.senOn || null;
+  const ON_SEN_STATES = SEN_ON_BANK && SEN_ON_BANK.states || {};
+  const hasOnCells = k => {
+    const s = ON_SEN_STATES[k];
+    return !!s && ["coal", "grn", "oth"].some(c => (s[c] || []).some(v => v != null));
+  };
   const fedView = view === "fed" || view.startsWith("fed:") || view.startsWith("fedcl:");
   const lcView = view === "nswlc" && !!LC_BANK;
   const jur = fedView ? "fed" : lcView ? "nsw" : FH[view] ? view : "fed";
@@ -65432,6 +65452,7 @@ function RdExplained() {
   const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;
   const SEN_STATES = SEN_BANK && SEN_BANK.states || {};
   const [house, setHouse] = useState("rep");
+  const onSenMode = house === "sen" && !!SEN_ON_BANK;
   const [inv, setInv] = useState(false);
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
@@ -65439,8 +65460,7 @@ function RdExplained() {
     const next = house === "sen" ? "rep" : "sen";
     setHouse(next);
     if (next === "sen") {
-      if (pair === "on") setPair("co");
-      if (view === "nsw" && LC_BANK) setView("nswlc");else if (classKey || !fedView) setView("fed");
+      if (view === "nsw" && LC_BANK) setView("nswlc");else if (classKey || !fedView || pair === "on" && stateKey && !hasOnCells(stateKey)) setView("fed");
     } else if (lcView) setView("nsw");
   };
   React.useLayoutEffect(() => {
@@ -65463,7 +65483,7 @@ function RdExplained() {
   const viewStep = React.useRef(null);
   viewStep.current = dir => {
     const opts = VIEW_OPTS;
-    if (pair !== "co" || opts.length < 2) return false;
+    if (!menuShow || opts.length < 2) return false;
     const i = opts.indexOf(view);
     if (i < 0) return false;
     setView(opts[(i + dir + opts.length) % opts.length]);
@@ -65539,24 +65559,29 @@ function RdExplained() {
   const stateKeys = Object.keys(FED_STATES);
   const classKeys = Object.keys(FED_CLASSES);
   const senStateKeys = Object.keys(SEN_STATES);
-  const VIEW_OPTS = house === "sen" ? [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
-  const menuShow = house === "sen" ? VIEW_OPTS.length > 1 : VIEW_OPTS.length > 0;
+  const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);
+  const senOnView = onSenMode && pair === "on" && !lcView;
+  const onPairPick = p => {
+    setPair(p);
+    if (p === "on" && house === "sen" && (lcView || stateKey && !hasOnCells(stateKey))) setView("fed");
+  };
+  const VIEW_OPTS = house === "sen" ? senOnView ? SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : [] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const menuShow = pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (senOnView ? 0 : 1) : VIEW_OPTS.length > 0;
+  const menuKeys = house === "sen" ? senOnView ? senOnStateKeys : senStateKeys : stateKeys;
+  const menuBank = house === "sen" ? senOnView ? ON_SEN_STATES : SEN_STATES : FED_STATES;
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
-    value: lcView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
+    value: lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
     onChange: e => setView(e.target.value)
   }, React.createElement("optgroup", {
     label: "Federal elections"
   }, React.createElement("option", {
     value: "fed"
-  }, "Federal, national"), (house === "sen" ? senStateKeys : stateKeys).map(k => {
-    const bank = house === "sen" ? SEN_STATES : FED_STATES;
-    return React.createElement("option", {
-      key: k,
-      value: "fed:" + k
-    }, "Federal, " + (bank[k].short || bank[k].label));
-  }), house !== "sen" && classKeys.map(k => React.createElement("option", {
+  }, "Federal, national"), menuKeys.map(k => React.createElement("option", {
+    key: k,
+    value: "fed:" + k
+  }, "Federal, " + (menuBank[k].short || menuBank[k].label))), house !== "sen" && classKeys.map(k => React.createElement("option", {
     key: "fedcl:" + k,
     value: "fedcl:" + k
   }, "Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)))), house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
@@ -65564,7 +65589,7 @@ function RdExplained() {
   }, KEYS.filter(k => k !== "fed").map(k => React.createElement("option", {
     key: k,
     value: k
-  }, (FH[k].short || FH[k].label) + " state elections"))), house === "sen" && LC_BANK && React.createElement("optgroup", {
+  }, (FH[k].short || FH[k].label) + " state elections"))), house === "sen" && !senOnView && LC_BANK && React.createElement("optgroup", {
     label: "State elections"
   }, React.createElement("option", {
     value: "nswlc"
@@ -65601,7 +65626,7 @@ function RdExplained() {
   }, "\u21C4"))) : null;
   const headCtls = narrow ? React.createElement("span", {
     className: "ex-fl-ctls"
-  }, pair === "co" ? menu : null, houseCtl, share) : pair === "co" ? menu : null;
+  }, menu, houseCtl, share) : menu;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -65630,14 +65655,23 @@ function RdExplained() {
     "data-rd-swipe-exact": ""
   }, React.createElement(RdTabs, {
     value: pair,
-    onChange: setPair,
+    onChange: onPairPick,
     ariaLabel: "Contest",
     className: "ex-fl-tabs",
     options: EX_PAIRS.map(p => ({
       id: p.id,
       label: narrow ? p.short : p.label
     }))
-  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, share)), pair === "on" ? React.createElement(ExplainedOnChart, {
+  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, share)), senOnView ? React.createElement(ExplainedFlowChart, {
+    jur: "fed",
+    house: "sen",
+    stateKey: stateKey && hasOnCells(stateKey) ? stateKey : null,
+    classKey: null,
+    lc: false,
+    inv: inv,
+    menu: headCtls,
+    onSen: true
+  }) : pair === "on" ? React.createElement(ExplainedOnChart, {
     inv: inv,
     menu: headCtls
   }) : React.createElement(ExplainedFlowChart, {

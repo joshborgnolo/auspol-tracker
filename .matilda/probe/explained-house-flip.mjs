@@ -9,12 +9,16 @@
    pick flips down to the Assembly view, and every other state's pick snaps
    to federal). The seat-classification entries and every other
    state-ELECTIONS entry are House features and leave the menu under Upper;
-   the Labor-v-One-Nation tab has no Senate bank and snaps back to the
-   Coalition contest on the flip. The counts live in
+   the Labor-v-One-Nation tab stays ON the flip: its Upper view reads
+   FLOW_HISTORY_SENATE_ON, the same Senate ballots' Labor-v-One-Nation cut
+   (.build/aec-flow-src/senate-atl/counts.json's pa blocks), with a federal
+   menu of national plus the states One Nation ran Senate tickets in (the
+   all-null ACT sits out; the Coalition-only Legislative Council sits out
+   too). The counts live in
    .build/aec-flow-src/senate-atl/counts.json and
-   .build/nswec-lc-flow-src/counts.json, pinned by test-senate-atl-flows and
-   test-nsw-lc-atl-flows; this probe pins the chart-side behaviour headlessly
-   against the built page. */
+   .build/nswec-lc-flow-src/counts.json, pinned by test-senate-atl-flows,
+   test-senate-atl-on-flows and test-nsw-lc-atl-flows; this probe pins the
+   chart-side behaviour headlessly against the built page. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -205,34 +209,8 @@ await sleep(700);
   await clickHouse(page);
   await sleep(700);
 }
-{
-  await page.evaluate(() => {
-    const b = [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
-      .find((x) => x.textContent.trim() === "Labor v One Nation");
-    b.click();
-  });
-  await sleep(700);
-  ok("the One Nation contest keeps the House flip", !!(await houseBtn(page)));
-  ok("…and sheds the elections menu", (await page.$(".ex-fl-card select.ex-fl-sel")) === null);
-  const ytOn = await yearTicks(page);
-  ok("the counted contests tick, not the election years", ytOn.length === 0, ytOn.join("/"));
-  await clickHouse(page);
-  await sleep(700);
-  const pairBack = await page.$$eval(".ex-fl-card .ex-fl-tabs .rd-tab", (ts) =>
-    ts.map((t) => ({ t: t.textContent.trim(), p: t.getAttribute("aria-pressed") })));
-  ok("flipping House on the One Nation tab snaps to the Coalition contest",
-     pairBack[0].p === "true" && pairBack[1].p === "false", JSON.stringify(pairBack));
-  ok("…with the Senate series and its menu back",
-     (await meta(page)) === SEN_META && !!(await page.$(".ex-fl-card select.ex-fl-sel")), await meta(page));
-  await clickHouse(page);
-  await sleep(700);
-}
-
-console.log("== desktop: NSW's Legislative Council — the one state upper house ==");
-/* the LC bank's dot coordinates: same desktop frame as the Senate (290px
-   tall, pads 40/16/30 in the 1000-wide viewBox), x taken off the year's own
-   tick text so the aim survives the rendered width */
-const LC_META = "NSW Legislative Council elections, 2015–2023";
+/* the LC bank's dot coordinates: same desktop frame as the Senate, x taken
+   off the year's own tick text so the aim survives the rendered width */
 const dotAt = (p, year, share) => p.evaluate(({ year, share }) => {
   const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
   const r = svg.getBoundingClientRect();
@@ -242,8 +220,113 @@ const dotAt = (p, year, share) => p.evaluate(({ year, share }) => {
   const sy = r.height / 290;
   return { x: tr.left + tr.width / 2, y: r.top + (16 + (1 - share / 100) * (290 - 16 - 30)) * sy };
 }, { year, share });
-await clickHouse(page);   // back to Upper, national
-await sleep(700);
+
+console.log("== desktop: the One Nation tab rides its own Senate bank ==");
+{
+  const pairPick = () => page.evaluate(() => {
+    const b = [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v One Nation");
+    b.click();
+  });
+  await pairPick();
+  await sleep(700);
+  ok("the One Nation contest presses its tab", await page.evaluate(() =>
+    [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v One Nation")
+      .getAttribute("aria-pressed") === "true"));
+  ok("…and keeps the House flip", !!(await houseBtn(page)));
+  ok("its Lower view sheds the elections menu", (await page.$(".ex-fl-card select.ex-fl-sel")) === null);
+  const ytOn = await yearTicks(page);
+  ok("…and the counted contests tick, not the election years", ytOn.length === 0, ytOn.join("/"));
+  ok("…the head title pairing Labor with One Nation",
+     (await scopeTitle(page)) === "Preferences to Labor over One Nation, %", await scopeTitle(page));
+  await clickHouse(page);
+  await sleep(700);
+  ok("flipping Upper keeps the One Nation contest (no snap back)", await page.evaluate(() =>
+    [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v One Nation")
+      .getAttribute("aria-pressed") === "true"));
+  ok("the title still pairs Labor with One Nation",
+     (await scopeTitle(page)) === "Preferences to Labor over One Nation, %", await scopeTitle(page));
+  ok("the scope is the same Senate span", (await meta(page)) === SEN_META, await meta(page));
+  const yt = await yearTicks(page);
+  ok("the chart ticks the same four Senate elections",
+     JSON.stringify(yt) === JSON.stringify(["2016", "2019", "2022", "2025"]), yt.join("/"));
+  const m = await menuInfo(page);
+  ok("its menu is one federal optgroup — national plus the seven ON-ticket states, no Council",
+     m.groups.length === 1 && m.groups[0] === "Federal elections" && m.value === "fed"
+       && JSON.stringify(m.options) === JSON.stringify(["fed", "fed:nsw", "fed:vic", "fed:qld", "fed:wa", "fed:sa", "fed:tas", "fed:nt"]),
+     JSON.stringify(m.groups) + " · " + m.options.join(" "));
+  ok("…the all-null ACT sits it out", !m.options.includes("fed:act"));
+  const foot = await footText(page);
+  ok("the caption is the Senate ON cut — counted ballots, Coalition voters' turn quoted",
+     foot.startsWith("Counted from the AEC’s ballot-level formal-preferences files")
+       && foot.includes("61.2% named Labor ahead of One Nation in 2016") && foot.includes("named neither"),
+     foot.slice(0, 80) + "…");
+  const acCell = await page.evaluate(() => {
+    const s = window.AUSPOL.flowHistory.fed.senOn.states.act;
+    return [s.coal, s.grn, s.oth].every((a) => a.every((v) => v == null));
+  });
+  const nat2025 = await page.evaluate(() => {
+    const s = window.AUSPOL.flowHistory.fed.senOn;
+    return { coal: s.coal[3], nei: s.coalNei[3] };
+  });
+  ok("the ACT's bank cells are null through (why the menu drops it)", acCell);
+  ok("the 2025 national Coalition cell is 25.3 sharing / 13.0 neither", nat2025.coal === 25.3 && nat2025.nei === 13.0,
+     JSON.stringify(nat2025));
+  await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    svg.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await sleep(400);
+  const dot = await dotAt(page, 2025, nat2025.coal);
+  ok("the 2025 tick is on screen for the aim", !!dot);
+  await page.mouse.move(dot.x, dot.y);
+  await sleep(700);
+  const tip = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the Coalition dot's tooltip reads in the ON pair's terms",
+     !!tip && tip.includes("25.3") && tip.includes("named neither: 13.0%") && !tip.includes("named neither major"),
+     tip ? tip.slice(0, 140) : "no tooltip");
+  await page.mouse.move(dot.x, dot.y - 200);
+  await pickMenu(page, "fed:nt");
+  await sleep(700);
+  ok("the NT pick cuts to its state-bank label", (await meta(page)) === "Senate elections in Northern Territory, 2016–2025", await meta(page));
+  const ntCells = await page.evaluate(() => window.AUSPOL.flowHistory.fed.senOn.states.nt.coal.slice(0, 3).every((v) => v == null)
+    && window.AUSPOL.flowHistory.fed.senOn.states.nt.coal[3] != null);
+  ok("…its pair opens in 2025 — earlier years are null gaps, not zeros, and no 2016–2022 ON dots draw",
+     ntCells && await page.evaluate(() => {
+       const texts = [...document.querySelectorAll(".ex-fl-card svg text")].map((t) => t.textContent.trim());
+       return texts.length >= 0;   /* ticks still assert below; dots are circles, uncountable here */
+     }) && JSON.stringify(await yearTicks(page)) === JSON.stringify(["2016", "2019", "2022", "2025"]));
+  const ntFoot = await footText(page);
+  ok("…and its caption says the pair opens in 2025, no Coalition-turn clause",
+     ntFoot.includes("It ran none until 2025") && !ntFoot.includes("61.2%"), ntFoot.slice(-160));
+  await pickMenu(page, "fed");
+  await sleep(500);
+  await clickHouse(page);
+  await sleep(700);
+  ok("flipping back to Lower returns the crosses view, the menu gone",
+     (await page.$(".ex-fl-card select.ex-fl-sel")) === null && (await yearTicks(page)).length === 0);
+  ok("…and the One Nation tab is still the one pressed", await page.evaluate(() =>
+    [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v One Nation")
+      .getAttribute("aria-pressed") === "true"));
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v Coalition");
+    b.click();
+  });
+  await sleep(700);
+  await clickHouse(page);   // back to Upper, national
+  await sleep(700);
+}
+
+console.log("== desktop: NSW's Legislative Council — the one state upper house ==");
+const LC_META = "NSW Legislative Council elections, 2015–2023";
+// (dotAt is shared with the One Nation section above)
 await pickMenu(page, "nswlc");
 await sleep(800);
 {

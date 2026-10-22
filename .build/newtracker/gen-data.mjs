@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_NSW_LC } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_NSW_LC } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -4715,6 +4715,28 @@ const flowHistory = (() => {
         years: [...FLOW_HISTORY_SENATE.years],
         grn: [...s.grn], grnNei: [...s.grnNei],
         onp: [...s.onp], onpNei: [...s.onpNei],
+        oth: [...s.oth], othNei: [...s.othNei] }])) };
+  /* fed.senOn: the SAME Senate ballots cut the other way (user 2026-10-22,
+     the explainer's Labor v One Nation tab under House: Upper) —
+     FLOW_HISTORY_SENATE_ON in flows.mjs, from the pa blocks of the same
+     committed counts (.build/aec-flow-src/senate-atl/counts.json, folded in
+     by merge_pa_counts.py). Each cohort's draw cell is the share of its
+     ATL ballots ranking Labor ahead of One Nation, of those naming either
+     (a ballot naming only one of the pair counts its way, as the House
+     cut's "naming at least one major" does); the nei triples hold its
+     "named neither" share, never "exhausted". Nulls mark a state-year One
+     Nation filed no Senate ticket in (the ACT: all four — the menu drops
+     it). Federal-only like the rest. */
+  h.fed.senOn = { label: "Senate", short: "Senate", senateOn: true, elections: "Australian Senate elections",
+    years: [...FLOW_HISTORY_SENATE_ON.years],
+    coal: [...FLOW_HISTORY_SENATE_ON.coal], coalNei: [...FLOW_HISTORY_SENATE_ON.coalNei],
+    grn: [...FLOW_HISTORY_SENATE_ON.grn], grnNei: [...FLOW_HISTORY_SENATE_ON.grnNei],
+    oth: [...FLOW_HISTORY_SENATE_ON.oth], othNei: [...FLOW_HISTORY_SENATE_ON.othNei],
+    states: Object.fromEntries(Object.entries(FLOW_HISTORY_SENATE_ON.states).map(([k, s]) => [k,
+      { label: s.label, short: s.short, elections: "Senate elections in " + s.label, senStateOn: true,
+        years: [...FLOW_HISTORY_SENATE_ON.years],
+        coal: [...s.coal], coalNei: [...s.coalNei],
+        grn: [...s.grn], grnNei: [...s.grnNei],
         oth: [...s.oth], othNei: [...s.othNei] }])) };
   /* nsw.sen: the NSW LEGISLATIVE COUNCIL's flows beside the Assembly's —
      the one state upper house whose commission publishes the ballots (NSW
