@@ -78,6 +78,10 @@ for (const r of rows) {
     (shown[r.jurisdiction] ||= new Set()).add(+r.year);
   }
 }
+// 2007's NSW tally-sheet count rides the all-seats store, not the estimator CSV
+const nswEarly = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-nsw-allseats.json"), "utf8"))
+  .years.filter((y) => y < 2015);
+if (shown.nsw) nswEarly.forEach((y) => shown.nsw.add(y));
 assert.deepEqual(Object.keys(FH).filter((k) => k !== "fed").sort(), Object.keys(shown).sort(),
   "exactly the jurisdictions with an election of 40+ classic seats get a chip");
 assert.ok(!FH.nt, "the Northern Territory's small counts stay off the chart");
@@ -86,7 +90,8 @@ assert.deepEqual([...FH.qld.years], [2004, 2006, 2009, 2012, 2015, 2017, 2020, 2
 assert.deepEqual([...FH.qld.opv], [2004, 2006, 2009, 2012, 2015], "Queensland's optional-preferential years carry exhausted shares");
 assert.ok(FH.qld.grnExh.slice(0, 5).every((x) => x > 0) && FH.qld.grnExh.slice(5).every((x) => x == null),
   "Queensland's Greens exhausted share: the OPV years only");
-assert.deepEqual([...FH.nsw.years], [2015, 2019, 2023], "NSW counts 2015-2023, every election with ballot-level data (2011 published none)");
+assert.deepEqual([...FH.nsw.years], [2007, 2015, 2019, 2023],
+  "NSW counts 2007 (the Paper's printed tally-sheet count) plus 2015-2023, every election with ballot-level data (2011 published none)");
 assert.deepEqual([...FH.vic.years], [2022], "Victoria shows 2022 alone (its 2006-18 counts stopped at a majority)");
 for (const [k, S] of Object.entries(FH)) {
   if (k === "fed") continue;
@@ -94,17 +99,32 @@ for (const [k, S] of Object.entries(FH)) {
   assert.equal(!!S.counted, k === "nsw", `${k}: counted only for NSW`);
   assert.deepEqual([...S.years], [...shown[k]].sort((a, b) => a - b), `${k}: the years the rule allows`);
   if (k === "nsw") {
-    // NSW is the ballot-file count: allseats, every point solid, classic figures sidecarred
+    // NSW is the count: allseats from 2015 (solid), 2007's tally-sheet count a
+    // classic-coverage point (hollow), classic figures sidecarred from 2015
     assert.equal(S.allSeats, true, "nsw: marked an all-seats count");
-    assert.equal(S.hollowYears, null, "nsw: no classic-seats points");
+    assert.deepEqual([...S.hollowYears], [...S.years.filter((y) => y < 2015)],
+      "nsw: only the pre-file tally-sheet year rings hollow");
     for (const b of ["grn", "onp", "oth"]) {
       assert.ok(S.classic[b] && S.classic[b + "Exh"], `nsw: the classic sidecar carries ${b} and its exhausted share`);
-      assert.deepEqual([...S.classic[b].keys()], [...S.years.keys()], `nsw: classic ${b} covers the three years`);
+      assert.deepEqual([...S.classic[b].keys()], [...S.years.keys()], `nsw: classic ${b} covers the four years`);
+      // 2007 predates the ballot-file count: its classic figure was never counted
+      assert.equal(S.classic[b][0], null, `nsw: no classic ${b} figure for 2007`);
+      // 2015's One Nation row in the estimator is an empty one (they did not
+      // run): the classic figure for it stays null; the other buckets count
+      if (b === "onp") assert.equal(S.classic.onp[1], null, "nsw: no classic onp figure for 2015 (One Nation did not run)");
+      else assert.equal(S.classic[b][1] != null && S.classic[b][2] != null && S.classic[b][3] != null, true, `nsw: classic ${b} is counted from 2015`);
     }
+    assert.equal(S.classicFrom, 2015, "nsw: classicFrom marks the sidecar's first year");
   } else {
     assert.deepEqual([...S.hollowYears], [...S.years], `${k}: estimated views mark every point classic-seats`);
   }
   S.years.forEach((y, i) => {
+    if (k === "nsw" && y < 2015) {
+      // 2007's count predates One Nation's NSW return: no onp estimate row,
+      // no pile in the store (test-nsw-allseats pins the empty piles)
+      assert.equal(S.onp[i], null, "nsw 2007: no One Nation flow (they did not run)");
+      return;
+    }
     const row = rows.find((r) => r.jurisdiction === k && +r.year === y && r.party === "onp");
     const base = row ? +row.est_alp_votes + +row.est_coal_votes : 0;
     const want = row && row.est_flow_to_alp !== "" && (row.method === "counted" || base >= bt.onp_min_ballots);
@@ -119,10 +139,13 @@ for (const [k, S] of Object.entries(FH)) {
       const row = rows.find((r) => r.jurisdiction === k && +r.year === S.years[i] && r.party === b);
       if (S.counted) {
         // NSW's chart figure is the all-seats count from data/state-flows-nsw-allseats.json
-        // (pinned from the ballot files by test-nsw-allseats.mjs); the estimator's classic
-        // figure rides the classic sidecar for the like-for-like tooltip line.
-        assert.equal(S.classic[b][i], Math.round(+row.est_flow_to_alp * 1000) / 10,
-          `${k} ${S.years[i]} ${b}: the classic sidecar is the estimator's figure`);
+        // (pinned from the ballot files by test-nsw-allseats.mjs; its 2007 row
+        // stands alone); the estimator's classic figure rides the classic
+        // sidecar from 2015 for the like-for-like tooltip line.
+        if (row) {
+          assert.equal(S.classic[b][i], Math.round(+row.est_flow_to_alp * 1000) / 10,
+            `${k} ${S.years[i]} ${b}: the classic sidecar is the estimator's figure`);
+        } else assert.equal(S.classic[b][i], null, `${k} ${S.years[i]} ${b}: no classic figure before the ballot files`);
       } else {
         assert.equal(v, Math.round(+row.est_flow_to_alp * 1000) / 10, `${k} ${S.years[i]} ${b}: the estimator's figure`);
       }
@@ -183,6 +206,18 @@ assert.ok(art.includes(`at ${C.model.minor.toFixed(1)}%, below independents`), "
 const dl = C.model.lib - 33.9;
 assert.ok(art.includes("The site puts Liberal voters " + (Math.abs(dl) < 0.3 ? "about where Bonham does" : dl > 0 ? "a little more Labor&rsquo;s way than Bonham does" : "a little less Labor&rsquo;s way than Bonham does")),
   "the Liberal comparison with Bonham follows the estimate");
+
+// FH.nsw's drawn figures equal the all-seats store's, 2007 included
+{
+  const all = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-nsw-allseats.json"), "utf8"));
+  const ix = Object.fromEntries(all.years.map((y, i) => [y, i]));
+  FH.nsw.years.forEach((y, i) => {
+    for (const b of ["grn", "onp", "oth"]) {
+      assert.equal(FH.nsw[b][i], all[b][ix[y]] ?? null, `nsw ${y} ${b}: the store's figure on the chart`);
+      assert.equal(FH.nsw[b + "Exh"][i], all[b + "Exh"]?.[ix[y]] ?? null, `nsw ${y} ${b}: the store's exhausted share`);
+    }
+  });
+}
 
 console.log(`PASS: state flows – ${Object.keys(shown).length} states on the chart (${Object.entries(shown).map(([k, s]) => k + " " + s.size).join(", ")}), `
   + `back-test Greens ${B.grn.model} v replay ${B.grn.replay}, others ${B.oth.model} v ${B.oth.replay}, Queensland within ${B.qld}`);

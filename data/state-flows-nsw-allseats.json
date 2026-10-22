@@ -1,42 +1,53 @@
 {
- "source": "NSW Electoral Commission ballot papers, scanned notionally Labor v Coalition in every district",
+ "source": "NSW Electoral Commission ballot papers, scanned notionally Labor v Coalition in every district (2015 on); 2007 from Antony Green's indicative tally-sheet count as printed in NSW Parliamentary Library Background Paper 1/08 (about four ballots in five, the declaration votes' forms mostly missing) - its per-district rows, reconciled to the Paper's printed statewide table and audited against the booth-level supplement",
  "years": [
+  2007,
   2015,
   2019,
   2023
  ],
  "grn": [
+  77.0,
   85.7,
   87.1,
   89.0
  ],
  "grnExh": [
+  47.1,
   44.1,
   39.7,
   33.2
  ],
  "onp": [
   null,
+  null,
   37.6,
   31.0
  ],
  "onpExh": [
   null,
+  null,
   71.1,
   62.2
  ],
  "oth": [
+  43.8,
   46.5,
   55.0,
   54.6
  ],
  "othExh": [
+  52.7,
   59.4,
   60.3,
   56.3
  ],
  "votes": {
   "grn": [
+   [
+    86350,
+    25745
+   ],
    [
     217164,
     36227
@@ -56,6 +67,10 @@
     0
    ],
    [
+    0,
+    0
+   ],
+   [
     5420,
     9001
    ],
@@ -65,6 +80,10 @@
    ]
   ],
   "oth": [
+   [
+    52897,
+    67808
+   ],
    [
     83176,
     95850
@@ -80,11 +99,34 @@
   ]
  },
  "implied2pp": [
+  54.8,
   45.7,
   48.0,
   54.1
  ],
  "skipped": [
+  [
+   "Balmain",
+   "Barwon",
+   "Dubbo",
+   "Epping",
+   "Goulburn",
+   "Hawkesbury",
+   "Hornsby",
+   "Lake Macquarie",
+   "Manly",
+   "Marrickville",
+   "Myall Lakes",
+   "Newcastle",
+   "North Shore",
+   "Northern Tablelands",
+   "Orange",
+   "Pittwater",
+   "Port Macquarie",
+   "Sydney",
+   "Tamworth",
+   "Willoughby"
+  ],
   [],
   [],
   []

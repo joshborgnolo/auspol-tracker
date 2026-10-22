@@ -387,7 +387,8 @@ assert.ok(!/ex-chip|ex-flow-chips|ex-flow-flip/.test(ap) && !/ex-chip|ex-flow-/.
   "the pill chips and the old menu bar are gone, code and CSS");
 assert.ok(ap.includes('<span className="rd-pl-ctl-l">Share:</span>') && !ap.includes('>Direction:</span>'),
   "the explainer's Share control names its active side (the Direction label gone)");
-assert.ok(ap.includes("tooltipTitle={(i) => BYS[i].label}") && ap.includes('tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}'),
+assert.ok(ap.includes("tooltipTitle={(i) => BYS[i].label}")
+    && ap.includes('tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label) + (basisMixed && S.hollowYears.includes(YEARS[i]) ? " · Labor-v-Coalition seats only" : "")}'),
   "short tooltip titles: a contest's source sentence no longer runs a phone readout to full width");
 assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 2 && (ap.match(/copy=\{\{ title: "Share of each group’s preferences reaching "/g) || []).length === 2,
   "both views share the px chart frame and carry a copy prop");

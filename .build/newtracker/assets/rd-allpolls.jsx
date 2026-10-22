@@ -5879,18 +5879,26 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
      first and second - in 2025 the gap for everyone else was ~6 points */
   const E25 = !onSen && ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
-  /* NSW, the one state counted both ways, prices the classic-seats cut for
-     the states that can count nothing else (user 2026-10-22): its 2023
-     Greens flow ran 89.0% of every seat against 88.1% of the classic seats
-     - the estimates run within about a point of it */
+  /* NSW, the one state counted both ways from 2015, prices the classic-seats
+     cut for the states that can count nothing else (2007's row is the
+     tally-sheet count, all seats only): its 2023 Greens flow ran 89.0% of
+     every seat against 88.1% of the classic seats - the estimates run within
+     about a point of it */
   const nswGap = (() => {
     const n = FH.nsw, c = n && n.classic;
     if (!n || !c || !n.years || !n.years.length) return null;
-    const i = n.years.length - 1, g = n.grn[i], gc = (c.grn || [])[i];
+    const i = n.classicFrom ? n.years.indexOf(n.classicFrom) : -1;
+    const g = n.grn[i], gc = (c.grn || [])[i];
     return g != null && gc != null ? " NSW, the one state counted both ways, split its " + n.years[i] + " Greens "
       + g.toFixed(1) + "% of every seat against " + gc.toFixed(1) + "% of the classic ones — these estimates sit within about a point of the count." : "";
   })() || "";
   const markNote = hasRing && hasSolid ? " Hollow rings count the seats where Labor and the Coalition finished first and second; solid dots count every seat." : "";
+  /* NSW's pre-file years (2007): Antony Green's tally-sheet count, as
+     printed by the Parliamentary Library – 73 of the 93 districts */
+  const tallySheetNote = S.classicFrom && YEARS[0] < S.classicFrom
+    ? " " + YEARS.filter((y) => y < S.classicFrom).join(" and ")
+      + " is the NSW Parliamentary Library’s printed tally-sheet count — 73 of the 93 districts, their declaration forms mostly missing — before the ballot-level files begin."
+    : "";
   const copyBasis = (hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "") + (hasSolid ? (hasRing ? " " : "") + "Solid dots: every seat." : "");
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
@@ -5917,7 +5925,9 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
         : ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither.")
       : "") + nswGap
     : cnt
-      ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district. NSW voters may stop numbering, so each share " + (exhAdj
+      ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district."
+        + tallySheetNote
+        + " NSW voters may stop numbering, so each share " + (exhAdj
         ? "counts the party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings, and the classic-seats figure for like-for-like with the states that can count nothing else."
         : "is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither, and the classic-seats figure for like-for-like with the states that can count nothing else.") + noBars
       : S.fedState
@@ -5961,7 +5971,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
                   : sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party."
                   : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second."
                   : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996."
-                  : S.allSeats ? "Counted from every formal ballot in every district of the state."
+                  : S.allSeats ? "Counted from every formal ballot in every district of the state." + tallySheetNote
                   : "Counted, election by election, so no error bars."),
                 caption: lcBank ? "Above-the-line NSW upper-house ballots, 2011–2023; on the page, each point’s tooltip gives the share naming neither major." : onSen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : ((hasErr ? (fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections.") : "") + (hasErr && copyBasis ? " " : "") + copyBasis + ((hasErr || copyBasis) && adjCopyNote ? " " : "") + adjCopyNote || undefined),
                 legend: narrow ? lines : [] }}

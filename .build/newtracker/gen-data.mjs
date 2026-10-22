@@ -4802,13 +4802,17 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    (data/state-flows-nsw-allseats.json): the same ballots read as a Labor v
    Coalition contest in EVERY district, Antony Green's and the site's
    statewide two-party basis – user call 2026-10-22, "count all seats
-   wherever the data allows". The classic-seats counts stay beside it
-   (FH.nsw.classic) for the tooltip's like-for-like with the other states;
+   wherever the data allows"; its 2007 entry is the NSW Parliamentary
+   Library's printed tally-sheet count (parse-nsw-2007-supplement.py),
+   prepended ahead of the 2015-23 ballot-file scans. The classic-seats
+   counts stay beside it from 2015 (FH.nsw.classic, null for 2007) for
+   the tooltip's like-for-like with the other states;
    views still stuck on the classic cut – the other states' estimates, the
    federal 1996-2001 counts and the seat-class cut – list those years in
    hollowYears, and the chart marks those points open.
    Shown (user calls 2026-10-20): elections whose counts reached a Labor v
-   Coalition final in at least STATE_MIN_CLASSIC seats – smaller counts'
+   Coalition final in at least STATE_MIN_CLASSIC seats (classicFrom marks
+   where a counted line's classic-seats sidecar begins) – smaller counts'
    errors run wider: the Northern Territory's, Victoria's to 2018 (stopped
    once a candidate passed half the vote) and South Australia's 2026 (13
    Labor v Liberal finals among 25 Labor v One Nation ones). One Nation's
@@ -5019,9 +5023,23 @@ const flowHistory = (() => {
     const nswAll = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-nsw-allseats.json"), "utf8"));
     if (h.nsw && nswAll && nswAll.years && nswAll.years.length) {
       const ix = Object.fromEntries(nswAll.years.map((y, i) => [y, i]));
+      /* 2007's tally-sheet count (parse-nsw-2007-supplement.py) predates the
+         ballot-file years the estimator rows cover – prepend it to the view:
+         an all-seats count like the rest of the store, no classic sidecar
+         figure (nothing counted 2007's classic seats) */
+      const extra = nswAll.years.filter((y) => !h.nsw.years.includes(y)).sort((a, b) => a - b);
+      if (extra.length) {
+        h.nsw = { ...h.nsw, years: [...extra, ...h.nsw.years] };
+        for (const k of ["grn", "onp", "oth", "grnExh", "onpExh", "othExh"])
+          h.nsw[k] = [...extra.map(() => null), ...h.nsw[k]];
+        h.nsw.asOf = h.nsw.years[0] + "–" + h.nsw.years[h.nsw.years.length - 1];
+      }
       const pick = (k) => h.nsw.years.map((y) => (ix[y] != null && nswAll[k] ? nswAll[k][ix[y]] : null));
-      h.nsw = { ...h.nsw, allSeats: true, hollowYears: null,
+      /* 2007's tally sheets covered the 73 Labor-v-Coalition districts — a
+         classic-coverage point, so it rings hollow like the other states */
+      h.nsw = { ...h.nsw, allSeats: true, hollowYears: extra.length ? [...extra] : null,
         classic: { grn: h.nsw.grn, grnExh: h.nsw.grnExh, onp: h.nsw.onp, onpExh: h.nsw.onpExh, oth: h.nsw.oth, othExh: h.nsw.othExh },
+        classicFrom: extra.length ? h.nsw.years[extra.length] : null,
         grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
         grnExh: pick("grnExh"), onpExh: pick("onpExh"), othExh: pick("othExh") };
       h.nsw.opv = h.nsw.years.filter((y, i) => h.nsw.grnExh[i] != null || h.nsw.onpExh[i] != null || h.nsw.othExh[i] != null);
