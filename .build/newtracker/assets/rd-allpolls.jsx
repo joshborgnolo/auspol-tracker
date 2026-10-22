@@ -5899,7 +5899,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
      ranked), "named neither" never "exhausted". Its movement clause quotes
      the national Coalition cohort; a state's own caption skips it */
   const cap = lcBank
-    ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others), and a zero-ballot group draws as a gap, never a zero. Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices; NSW’s ballot record is the only state upper-house count of voters’ own preferences."
+    ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others), and a zero-ballot group draws as a gap, never a zero. Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices. Western Australia’s tickets ended a year earlier — its last ticket count was 2021 — and its first no-ticket election, the statewide count of 2025, published count sheets but no ballot-level record; South Australia’s and Tasmania’s commissions publish none either. NSW’s ballot record is the only state upper-house count of voters’ own preferences."
     : onSen
     ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count."
       + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "")
@@ -6111,8 +6111,10 @@ function RdExplained() {
      2026-10-22), a bare key a state's own elections, "nswlc" the NSW
      Legislative Council under Upper (the only state upper house whose
      flows count voters' own preferences: Victoria's Council voted by
-     group tickets until 2022, abolished for 2026, and publishes no
-     per-ballot record - nswlc never appears under Lower). The pick
+     group tickets until 2022, abolished for 2026; Western Australia's
+     tickets went at its 2021 reform, and its first ticket-free count
+     (2025, statewide) prints count sheets, no per-ballot record -
+     none of them publishes one - nswlc never appears under Lower). The pick
      persists across the contest tabs - the menu just hides on Labor v
      One Nation's Lower view (its Upper view carries the ON Senate bank's
      federal menu). */

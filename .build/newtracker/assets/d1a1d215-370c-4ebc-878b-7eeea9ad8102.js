@@ -7852,6 +7852,18 @@ function infoTerms(D) {
             than {FHB.minClassic} seats: the Northern Territory’s; and South Australia’s in 2026, when One
             Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the
             explainer’s Labor v One Nation section instead.</span>
+            <span className="info-p"><b>Upper houses: New South Wales alone.</b> The explainer’s
+            Upper view counts above-the-line Senate ballots federally — the four elections since group
+            voting tickets went — and one state chamber: New South Wales’s Legislative Council, from
+            the ballot-level files its commission publishes. Every other state upper house voted on
+            group voting tickets for most of its history, and an above-the-line vote under a ticket
+            just ran the party’s lodged ordering, so the count keeps none of the voters’ own
+            preferences to tally. Victoria’s Council last did so in 2022 (its tickets were abolished
+            in 2026), Western Australia’s in 2021; the ticket-free counts since — South Australia’s
+            2022 election, Western Australia’s one statewide count in 2025 — publish count sheets
+            only, no ballot-level record, and Tasmania’s single-member chamber publishes none either.
+            The view’s other state picks are cuts of the federal Senate count, not state-chamber
+            series.</span>
           </>) : null}</>) },
         { id: "fp-flows", term: "Labor v One Nation flows", body: (
           <>The preference table behind the Labor v One Nation figure. No election has ever counted
