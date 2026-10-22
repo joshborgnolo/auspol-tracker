@@ -1231,6 +1231,13 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const confFmt = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const outLabel = (q) => { const d = new Date(rdApDays(q.released)); return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1); };
   const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
+  /* the change the detail sentence quotes: the release's printed move,
+     else the measured move on the lane's previous release (chgCalc) -
+     flagged calculated, so the line never poses as the house's print */
+  const confEf = !conf ? null
+    : conf.chg != null && Math.abs(conf.chg) >= 0.05 ? { v: conf.chg, calc: false }
+    : conf.chgCalc != null && Math.abs(conf.chgCalc) >= 0.05 ? { v: conf.chgCalc, calc: true }
+    : null;
   const CONF_BLURB = {
     consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
     westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
@@ -1309,7 +1316,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const confLead = conf && (
     <section className="rd-ldg-sec" data-sec="confidence">
       <h4 className="rd-ldg-h">{conf.lab}</h4>
-      <div className="rd-ldg-conf"><b>{confFmt(conf.v)}</b>{conf.chg != null && Math.abs(conf.chg) >= 0.05 ? <span>{", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod}</span> : null}</div>
+      <div className="rd-ldg-conf"><b>{confFmt(conf.v)}</b>{confEf ? <span>{", " + (confEf.v < 0 ? "down " : "up ") + confFmt(Math.abs(confEf.v)) + " on the " + confPeriod + (confEf.calc ? " (calculated – the release printed no change)" : "")}</span> : null}</div>
       <p className="rd-ldg-foot1">{conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral." : "Index reading – 100 neutral."}{conf.cond != null ? " NAB prints business conditions beside it: " + confFmt(conf.cond) + (conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : "") + "." : ""}</p>
     </section>
   );
@@ -3236,7 +3243,7 @@ function RdAllPolls(P) {
       {facet === "confidence" && <>
         {th("Figure", "conf.v", { title: "Sort by the gauge’s printed figure (the panel chart’s dot)" })}
         <span role="columnheader" aria-label="Each gauge’s figure on a fixed 40–120 scale, more pessimists than optimists below 100 and more optimists above it – NAB’s net balance drawn 100 points up, its figure printed as NAB’s own" className="rd-ap-hpic">{confScale(false)}</span>
-        {th("Change", "conf.chg", { right: true, title: "Change on the gauge’s own previous release" })}
+        {th("Change", "conf.chg", { right: true, title: "Change on the gauge’s own previous release – an asterisk marks one calculated from the previous release, not printed" })}
       </>}
       <span></span>
     </div>
@@ -3533,6 +3540,11 @@ function RdAllPolls(P) {
          read, a second measure, opens with the release */
       const c = p.conf;
       const nab = c.vs === 0;
+      /* the change a surface shows: the release's printed one, else the
+         measured move on the lane's previous release (gen-data's chgCalc)
+         - flagged calculated wherever it renders, never passed off as
+         the house's print */
+      const chgEf = c.chg != null ? { v: c.chg, calc: false } : c.chgCalc != null ? { v: c.chgCalc, calc: true } : null;
       figs = (
         <span role="cell" className="rd-ap-fig">
           <b>{confFig(c.v)}</b>
@@ -3542,7 +3554,7 @@ function RdAllPolls(P) {
       pic = (
         <span className="rd-ap-pic" role="img"
               aria-label={p.client + ", " + confFig(c.v)
-                + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "")
+                + (chgEf ? ", " + confChg(chgEf.v) + " on the gauge’s previous release" + (chgEf.calc ? ", calculated - the release printed no change" : "") : "")
                 + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")}>
           <span className="rd-ap-in">
             {/* the inner ticks only: like every signed strip, the ends go unruled */}
@@ -3552,10 +3564,11 @@ function RdAllPolls(P) {
           </span>
         </span>
       );
-      const chgInk = c.chg == null || Math.abs(c.chg) < 0.05 ? null : c.chg > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
+      const chgInk = !chgEf || Math.abs(chgEf.v) < 0.05 ? null : chgEf.v > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
       val = (
-        <span role="cell" className="rd-ap-val" style={chgInk ? { color: chgInk } : null}>
-          {c.chg != null ? confChg(c.chg) : "—"}
+        <span role="cell" className="rd-ap-val" style={chgInk ? { color: chgInk } : null}
+              title={chgEf && chgEf.calc ? "Calculated from the gauge’s previous release - the release printed no change" : undefined}>
+          {chgEf ? <>{confChg(chgEf.v)}{chgEf.calc ? <sup aria-hidden="true">*</sup> : null}</> : "—"}
         </span>
       );
       /* the phone card lays the desktop cells out in place: the figure (and
@@ -3568,9 +3581,10 @@ function RdAllPolls(P) {
         <div className="rd-ap-csub">
           {/* null chg is two events: the lane's first release of the term
              (gen-data flags c.first), or the house printed no numeric
-             change - Roy Morgan's "virtually unchanged" consumer waves.
-             The older copy claimed the first for both. */}
-          {c.chg != null ? <>Change <b style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)}</b> on last release</> : c.first ? "The gauge’s first release this term" : "Change not printed"}
+             change - Roy Morgan's "virtually unchanged" consumer waves,
+             whose move on the previous release is calculated and flagged
+             (chgCalc). The older copy claimed the first for both. */}
+          {chgEf ? <>Change <b style={chgInk ? { color: chgInk } : null}>{confChg(chgEf.v)}</b> on last release{chgEf.calc ? " (calculated)" : null}</> : c.first ? "The gauge’s first release this term" : "Change not printed"}
         </div>
       </>;
     }

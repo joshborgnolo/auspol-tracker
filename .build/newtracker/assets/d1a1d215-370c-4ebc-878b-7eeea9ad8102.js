@@ -6242,7 +6242,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
         case "conf.lab": return (p.conf && p.conf.lab) || "";
         case "conf.v": return p.conf ? p.conf.v : -Infinity;
-        case "conf.chg": return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+        case "conf.chg": return p.conf && p.conf.chg != null ? p.conf.chg : p.conf && p.conf.chgCalc != null ? p.conf.chgCalc : -Infinity;
         case "conf.cond": return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
         // dem.<party>: that party's gap across the split in view
         default: {
@@ -6424,7 +6424,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     // its printed change, and NAB's conditions reading riding its rows
     ["Confidence series", (p) => (p.conf ? p.conf.lab : "")],
     ["Confidence figure", (p) => (p.conf ? p.conf.v : "")],
-    ["Confidence change", (p) => (p.conf && p.conf.chg != null ? p.conf.chg : "")],
+    ["Confidence change", (p) => (p.conf && p.conf.chg != null ? p.conf.chg : p.conf && p.conf.chgCalc != null ? p.conf.chgCalc : "")],
     ["NAB conditions", (p) => (p.conf && p.conf.cond != null ? p.conf.cond : "")],
   ];
   const exportCsv = () => downloadCsv(

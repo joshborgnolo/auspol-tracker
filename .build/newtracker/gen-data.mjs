@@ -3108,6 +3108,7 @@ const confidenceOnlyPolls = (() => {
     // no numeric change (Roy Morgan's "virtually unchanged" waves). The
     // phone card's null-change line can only tell them apart with this flag.
     let first = true;
+    let prevV = null;
     for (const r of s.rows) {
       if (dx(r.date) < eX) continue;
       const ym = ymOf(r.date);
@@ -3132,9 +3133,15 @@ const confidenceOnlyPolls = (() => {
         p: {}, appr: {}, chg: null,
         conf: { k, lab: product, v: r.v, chg: r.chg ?? null, vs,
           ...(first ? { first: true } : {}),
+          // printed change absent (a "virtually unchanged" verdict wave):
+          // back it with the measured move on the lane's previous term
+          // release, flagged chgCalc so the render can mark it calculated
+          // and never pass it off as the house's print
+          ...(r.chg == null && prevV != null ? { chgCalc: r1(r.v - prevV) } : {}),
           ...(k === "nabBusiness" && r.cond != null ? { cond: r.cond, condChg: r.condChg ?? null } : {}) },
       });
       first = false;
+      prevV = r.v;
     }
   }
   return out.sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
@@ -4733,7 +4740,15 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    ballot's preferences, so parse-nsw-state-flows.py counts each party's
    voters exactly and the estimator passes them through (method "counted",
    no error bar; its exhausted share rides along, NSW being optional
-   preferential).
+   preferential). And the chart's NSW line is the parser's NOTIONAL cut
+   (data/state-flows-nsw-allseats.json): the same ballots read as a Labor v
+   Coalition contest in EVERY district, Antony Green's and the site's
+   statewide two-party basis – user call 2026-10-22, "count all seats
+   wherever the data allows". The classic-seats counts stay beside it
+   (FH.nsw.classic) for the tooltip's like-for-like with the other states;
+   views still stuck on the classic cut – the other states' estimates, the
+   federal 1996-2001 counts and the seat-class cut – list those years in
+   hollowYears, and the chart marks those points open.
    Shown (user calls 2026-10-20): elections whose counts reached a Labor v
    Coalition final in at least STATE_MIN_CLASSIC seats – smaller counts'
    errors run wider: the Northern Territory's, Victoria's to 2018 (stopped
@@ -4859,6 +4874,9 @@ const flowHistory = (() => {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
     h.fed.classes = Object.fromEntries(Object.entries(fcf.classes).map(([k, s]) => [k,
       { label: s.label, short: s.short, elections: "federal elections in " + s.short + " seats", fedClass: true,
+        // a class view can never count all seats (no AEC product splits a
+        // non-classic final pair by division): classic seats throughout
+        hollowYears: [...fcf.years],
         years: [...fcf.years], grn: [...s.grn], onp: [...s.onp], oth: [...s.oth] }]));
   } catch { /* not yet written */ }
   let csv = null, bt = null;
@@ -4890,6 +4908,10 @@ const flowHistory = (() => {
         grnErr: [...err("grn"), ...none], onpErr: [...err("onp"), ...none], othErr: [...err("oth"), ...none] };
     }
   }
+  // the national chart's classic-seats years (user 2026-10-22): 1996-2001's
+  // counts survive only as the national classic cut (state splits start
+  // 2004); the estimated 1984-93 lead-in carries its error bars instead
+  h.fed.hollowYears = h.fed.years.filter((y) => y >= 1996 && y < 2004);
   const lines = csv.split(/\r?\n/).filter((ln) => ln.trim());
   const head = (lines.shift() || "").split(",");
   const ci = Object.fromEntries(head.map((x, i) => [x, i]));
@@ -4918,6 +4940,9 @@ const flowHistory = (() => {
     const isCounted = years.every((y) => Object.values(bag[jk][y]).every((x) => x.counted));
     h[jk] = { label: meta.label, short: meta.short, elections: meta.elections, srcAs: meta.srcAs,
       estimated: !isCounted, counted: isCounted,
+      // an estimate is a classic-seats figure – mark every year open (NSW
+      // is the state on the all-seats basis; its marker flag clears below)
+      hollowYears: isCounted ? null : [...years],
       asOf: years.length > 1 ? years[0] + "–" + years[years.length - 1] : String(years[0]),
       years, grn: col("grn", "v"), onp: col("onp", "v"), oth: col("oth", "v"),
       grnErr: col("grn", "e"), onpErr: col("onp", "e"), othErr: col("oth", "e"),
@@ -4925,6 +4950,25 @@ const flowHistory = (() => {
         ? { grnExh: col("grn", "x"), onpExh: col("onp", "x"), othExh: col("oth", "x"),
             opv: years.filter((y) => Object.values(bag[jk][y]).some((x) => x.x != null)) } : null) };
   }
+  /* NSW on the all-seats basis (user call 2026-10-22: "count all seats
+     wherever the data allows"): the notional Labor v Coalition scan of
+     every district's ballots (data/state-flows-nsw-allseats.json) draws
+     the line; the classic-seats counts move beside it for the tooltip's
+     like-for-like against the other states, whose data allows nothing
+     else. Guarded like the other side-stores: a missing file keeps the
+     classic-seats line (still marked open, hollowYears above stands). */
+  try {
+    const nswAll = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows-nsw-allseats.json"), "utf8"));
+    if (h.nsw && nswAll && nswAll.years && nswAll.years.length) {
+      const ix = Object.fromEntries(nswAll.years.map((y, i) => [y, i]));
+      const pick = (k) => h.nsw.years.map((y) => (ix[y] != null && nswAll[k] ? nswAll[k][ix[y]] : null));
+      h.nsw = { ...h.nsw, allSeats: true, hollowYears: null,
+        classic: { grn: h.nsw.grn, grnExh: h.nsw.grnExh, onp: h.nsw.onp, onpExh: h.nsw.onpExh, oth: h.nsw.oth, othExh: h.nsw.othExh },
+        grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
+        grnExh: pick("grnExh"), onpExh: pick("onpExh"), othExh: pick("othExh") };
+      h.nsw.opv = h.nsw.years.filter((y, i) => h.nsw.grnExh[i] != null || h.nsw.onpExh[i] != null || h.nsw.othExh[i] != null);
+    }
+  } catch { /* not yet written */ }
   // NSW's Upper house rides beside its Assembly lines (declared above, after
   // the JUR return, so the Vic build never carries it; see NSW_SEN there)
   if (h.nsw) h.nsw.sen = NSW_SEN;
