@@ -93,6 +93,17 @@ for (const [k, S] of Object.entries(FH)) {
   assert.equal(S.estimated, k !== "nsw", `${k} is drawn as ${k === "nsw" ? "a count" : "an estimate"}`);
   assert.equal(!!S.counted, k === "nsw", `${k}: counted only for NSW`);
   assert.deepEqual([...S.years], [...shown[k]].sort((a, b) => a - b), `${k}: the years the rule allows`);
+  if (k === "nsw") {
+    // NSW is the ballot-file count: allseats, every point solid, classic figures sidecarred
+    assert.equal(S.allSeats, true, "nsw: marked an all-seats count");
+    assert.equal(S.hollowYears, null, "nsw: no classic-seats points");
+    for (const b of ["grn", "onp", "oth"]) {
+      assert.ok(S.classic[b] && S.classic[b + "Exh"], `nsw: the classic sidecar carries ${b} and its exhausted share`);
+      assert.deepEqual([...S.classic[b].keys()], [...S.years.keys()], `nsw: classic ${b} covers the three years`);
+    }
+  } else {
+    assert.deepEqual([...S.hollowYears], [...S.years], `${k}: estimated views mark every point classic-seats`);
+  }
   S.years.forEach((y, i) => {
     const row = rows.find((r) => r.jurisdiction === k && +r.year === y && r.party === "onp");
     const base = row ? +row.est_alp_votes + +row.est_coal_votes : 0;
@@ -106,7 +117,15 @@ for (const [k, S] of Object.entries(FH)) {
       if (S.counted) assert.ok(S[b + "Exh"][i] != null, `${k} ${S.years[i]} ${b}: carries its exhausted share`);
       else assert.ok(S[b + "Err"][i] > 0, `${k} ${S.years[i]} ${b}: carries its 90% error`);
       const row = rows.find((r) => r.jurisdiction === k && +r.year === S.years[i] && r.party === b);
-      assert.equal(v, Math.round(+row.est_flow_to_alp * 1000) / 10, `${k} ${S.years[i]} ${b}: the estimator's figure`);
+      if (S.counted) {
+        // NSW's chart figure is the all-seats count from data/state-flows-nsw-allseats.json
+        // (pinned from the ballot files by test-nsw-allseats.mjs); the estimator's classic
+        // figure rides the classic sidecar for the like-for-like tooltip line.
+        assert.equal(S.classic[b][i], Math.round(+row.est_flow_to_alp * 1000) / 10,
+          `${k} ${S.years[i]} ${b}: the classic sidecar is the estimator's figure`);
+      } else {
+        assert.equal(v, Math.round(+row.est_flow_to_alp * 1000) / 10, `${k} ${S.years[i]} ${b}: the estimator's figure`);
+      }
     });
   }
 }
@@ -123,6 +142,8 @@ FH.fed.years.forEach((y, i) => {
   }
 });
 assert.equal(FH.fed.grn[0], null, "no Greens flow in 1984 (no Greens party stood)");
+assert.deepEqual([...FH.fed.hollowYears], [1996, 1998, 2001],
+  "only the pre-2004 federal points are marked classic-seats (all-seats from 2004)");
 assert.ok(B.grn.model < B.grn.replay && B.oth.model < B.oth.replay,
   "the model still beats the replay it replaced, Greens and others alike");
 assert.ok(B.grn.model <= 1.5, `the Greens estimate stays within 1.5 points of the federal counts on average (${B.grn.model})`);

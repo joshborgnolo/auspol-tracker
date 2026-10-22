@@ -1791,7 +1791,12 @@ function TrendChart(props) {
             ) : (
               <path className="rd-cross" style={m.color ? { stroke: m.color } : null}
                     d={`M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`} />
-            )) : (
+            )) : m.solid ? (
+              /* m.solid: a small datum disc in the series' own colour -
+                 the all-seats basis mark beside the classic-seats ring
+                 (the explainer's state-flows chart; user 2026-10-22) */
+              <circle cx={x} cy={y} r={PX(m.r != null ? m.r : 3)} style={{ fill: m.color ? m.color : "var(--ink)" }} />
+            ) : (
               <circle cx={x} cy={y} r={PX(m.r || 5)} className="rd-ring"
                       style={m.color ? { stroke: m.color } : null} />
             )}

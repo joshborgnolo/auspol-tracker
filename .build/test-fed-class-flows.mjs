@@ -335,8 +335,9 @@ CLASS_IDS.forEach((k) => {
   const got = FH.fed.classes[k];
   assert.equal(got.fedClass, true, `${k}: marked a federal class view`);
   assert.deepEqual([...got.years], YEARS, `${k}: years`);
+  assert.deepEqual([...got.hollowYears], [...YEARS], `${k}: every class point is classic-seats`);
   BUCKETS.forEach((b) => assert.deepEqual([...got[b]], data.classes[k][b], `${k} ${b} reaches the asset`));
-  assert.deepEqual(Object.keys(got).sort(), ["elections", "fedClass", "grn", "label", "onp", "oth", "short", "years"].sort(),
+  assert.deepEqual(Object.keys(got).sort(), ["elections", "fedClass", "grn", "hollowYears", "label", "onp", "oth", "short", "years"].sort(),
     `${k}: shares only — counts carry no error bars, so no Err arrays`);
   assert.equal(got.elections, `federal elections in ${CLASS_SHORTS[k]} seats`, `${k}: the chart head's scope line`);
 });

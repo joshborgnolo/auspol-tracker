@@ -6059,6 +6059,8 @@ body.rd .ex-fl-head .rd-chead-meta { display: block; margin-left: 0; }
 body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
+body.rd .ex-fl-adj { display: flex; align-items: center; gap: 2px; margin-top: 6px; font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+body.rd .ex-fl-adj .rd-switch { margin: -10px 0; }
 @media (max-width: 640px) {
   body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
   body.rd .ex-fl-sel { margin-top: 0; }
@@ -8698,16 +8700,25 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "hollowYears": null,
       "asOf": "2015–2023",
       "years": [2015, 2019, 2023],
-      "grn": [84.6, 86.7, 88.1],
-      "onp": [null, 37.9, 32.1],
-      "oth": [43.9, 54.2, 53.3],
+      "grn": [85.7, 87.1, 89],
+      "onp": [null, 37.6, 31],
+      "oth": [46.5, 55, 54.6],
       "grnErr": [null, null, null],
       "onpErr": [null, null, null],
       "othErr": [null, null, null],
-      "grnExh": [45.9, 40.5, 34.5],
-      "onpExh": [null, 70, 61.3],
-      "othExh": [59, 58.5, 55.3],
+      "grnExh": [44.1, 39.7, 33.2],
+      "onpExh": [null, 71.1, 62.2],
+      "othExh": [59.4, 60.3, 56.3],
       "opv": [2015, 2019, 2023],
+      "allSeats": true,
+      "classic": {
+        "grn": [84.6, 86.7, 88.1],
+        "grnExh": [45.9, 40.5, 34.5],
+        "onp": [null, 37.9, 32.1],
+        "onpExh": [null, 70, 61.3],
+        "oth": [43.9, 54.2, 53.3],
+        "othExh": [59, 58.5, 55.3]
+      },
       "sen": {
         "label": "NSW Legislative Council",
         "short": "NSW LC",
@@ -103297,6 +103308,13 @@ function TrendChart(props) {
         stroke: m.color
       } : null,
       d: `M${x - h} ${y - h}L${x + h} ${y + h}M${x + h} ${y - h}L${x - h} ${y + h}`
+    }) : m.solid ? React.createElement("circle", {
+      cx: x,
+      cy: y,
+      r: PX(m.r != null ? m.r : 3),
+      style: {
+        fill: m.color ? m.color : "var(--ink)"
+      }
     }) : React.createElement("circle", {
       cx: x,
       cy: y,
@@ -141643,6 +141661,7 @@ function ExplainedFlowChart({
   onSen
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
+  const [exhAdj, setExhAdj] = useState(true);
   const FH = window.AUSPOL.flowHistory || {};
   const SEN = house === "sen" ? (FH.fed || {})[onSen ? "senOn" : "sen"] || null : null;
   const LC = house === "sen" && lc && !onSen ? (FH.nsw || {}).sen || null : null;
@@ -141654,6 +141673,7 @@ function ExplainedFlowChart({
   const cnt = !!S.counted;
   const sen = !!(S.senate || S.senState || S.lc || S.senateOn || S.senStateOn);
   const lcBank = !!S.lc;
+  const opvYears = S.opv && S.opv.length ? S.opv : null;
   const parties = (onSen ? FLOW_ON_PARTIES : FLOW_PARTIES).filter(p => (S[p.id] || []).some(v => v != null));
   const hasErr = parties.some(p => (S[p.id + "Err"] || []).some(e => e != null));
   const fedEst = !est && S.estYears && S.estYears.length ? S.estYears : null;
@@ -141670,10 +141690,15 @@ function ExplainedFlowChart({
         cur = [];
       } else {
         const nei = S[p.id + "Nei"] || [];
-        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, sen && nei[i] != null ? (onSen ? "named neither: " : "named neither major: ") + nei[i].toFixed(1) + "%" : null, !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
+        const hollowY = !!(S.hollowYears && S.hollowYears.includes(YEARS[i]));
+        const cls = S.classic || {};
+        const clsV = (cls[p.id] || [])[i],
+          clsE = (cls[p.id + "Exh"] || [])[i];
+        const adj = exhAdj && exh[i] != null ? 1 - exh[i] / 100 : 1;
+        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null, sen && nei[i] != null ? (onSen ? "named neither: " : "named neither major: ") + nei[i].toFixed(1) + "%" : null, !sen && exh[i] != null ? (exhAdj ? val.toFixed(1) + "% of the ballots that went on, " : "") + (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null, hollowY ? "Labor-v-Coalition seats only" : null, clsV != null ? "classic seats: " + T(clsV).toFixed(1) + "%" + (clsE != null ? ", " + Math.round(clsE) + "% exhausted" : "") : null].filter(Boolean).join(", ");
         cur.push({
           x: YEARS[i],
-          y: T(val),
+          y: T(val) * adj,
           ...(note ? {
             note
           } : null)
@@ -141703,11 +141728,14 @@ function ExplainedFlowChart({
   if (hasErr) {
     parties.forEach(p => {
       const err = S[p.id + "Err"] || [];
+      const exhA = S[p.id + "Exh"] || [];
       (S[p.id] || []).forEach((v, i) => {
         if (v == null || err[i] == null) return;
-        const y = T(v);
-        const y0 = Math.max(0, y - err[i]),
-          y1 = Math.min(100, y + err[i]);
+        const adj = exhAdj && exhA[i] != null ? 1 - exhA[i] / 100 : 1;
+        const y = T(v) * adj,
+          e = err[i] * adj;
+        const y0 = Math.max(0, y - e),
+          y1 = Math.min(100, y + e);
         areas.push({
           id: p.id + "-err" + i,
           color: p.color,
@@ -141726,21 +141754,49 @@ function ExplainedFlowChart({
       });
     });
   }
+  const marks = [];
+  if (!sen && !S.fedState) {
+    series.forEach(s => s.points.forEach(pt => {
+      if (S.hollowYears && S.hollowYears.includes(pt.x)) marks.push({
+        x: pt.x,
+        y: pt.y,
+        color: s.color
+      });else if (!fedEst || !fedEst.includes(pt.x)) marks.push({
+        x: pt.x,
+        y: pt.y,
+        color: s.color,
+        solid: true
+      });
+    }));
+  }
+  const hasRing = marks.some(m => !m.solid),
+    hasSolid = marks.some(m => m.solid);
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const side = inv ? onSen ? "One Nation" : "the Coalition" : "Labor",
     other = inv ? "Labor" : onSen ? "One Nation" : "the Coalition";
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span + (est ? ", estimated" : "");
   const E25 = !onSen && ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
-  const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
+  const nswGap = (() => {
+    const n = FH.nsw,
+      c = n && n.classic;
+    if (!n || !c || !n.years || !n.years.length) return null;
+    const i = n.years.length - 1,
+      g = n.grn[i],
+      gc = (c.grn || [])[i];
+    return g != null && gc != null ? " NSW, the one state counted both ways, split its " + n.years[i] + " Greens " + g.toFixed(1) + "% of every seat against " + gc.toFixed(1) + "% of the classic ones — these estimates sit within about a point of the count." : "";
+  })() || "";
+  const markNote = hasRing && hasSolid ? " Hollow rings count the seats where Labor and the Coalition finished first and second; solid dots count every seat." : "";
+  const copyBasis = (hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "") + (hasSolid ? (hasRing ? " " : "") + "Solid dots: every seat." : "");
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
-  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. The line starts at 1996, as far back as the per-division flow table itself reaches. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
+  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + (exhAdj ? ", so those years’ shares count each party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings." : ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither.") : "") + nswGap : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district. NSW voters may stop numbering, so each share " + (exhAdj ? "counts the party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings, and the classic-seats figure for like-for-like with the states that can count nothing else." : "is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither, and the classic-seats figure for like-for-like with the states that can count nothing else.") + noBars : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. The line starts at 1996, as far back as the per-division flow table itself reaches. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "") + markNote;
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
     label: p.name
   }));
+  const adjCopyNote = opvYears ? exhAdj ? "Exhaustion-adjusted: optional-numbering years count each party’s whole vote, an exhausted paper reaching neither side." : "Optional-numbering years: each share is of the ballots that reached Labor or the Coalition." : "";
   return React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-chead ex-fl-head"
   }, React.createElement("span", {
@@ -141761,6 +141817,7 @@ function ExplainedFlowChart({
     unit: "%",
     fmt: v => v.toFixed(1),
     series: series,
+    marks: marks,
     areas: areas,
     spine: YEARS.map(x => ({
       x
@@ -141769,20 +141826,34 @@ function ExplainedFlowChart({
     ariaLabel: "Share of preferences flowing to " + side + ", by party, " + S.label + (lcBank ? ", above-the-line NSW Legislative Council ballots" : sen ? ", above-the-line Senate ballots" : "") + (est ? ", estimated" : "") + ", " + span,
     copy: {
       title: "Share of each group’s preferences reaching " + side + " over " + other,
-      sub: rdCap(S.elections || S.label + " elections") + ". " + (lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files; above-the-line ballots only, and each share is of papers naming a major party." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers ranking Labor or One Nation (or both)." : sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party." : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : "Counted, election by election, so no error bars."),
-      caption: lcBank ? "Above-the-line NSW upper-house ballots, 2015–2023; on the page, each point’s tooltip gives the share naming neither major." : onSen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : undefined,
+      sub: rdCap(S.elections || S.label + " elections") + ". " + (lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files; above-the-line ballots only, and each share is of papers naming a major party." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers ranking Labor or One Nation (or both)." : sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party." : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second." : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996." : S.allSeats ? "Counted from every formal ballot in every district of the state." : "Counted, election by election, so no error bars."),
+      caption: lcBank ? "Above-the-line NSW upper-house ballots, 2015–2023; on the page, each point’s tooltip gives the share naming neither major." : onSen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : (hasErr ? fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections." : "") + (hasErr && copyBasis ? " " : "") + copyBasis + ((hasErr || copyBasis) && adjCopyNote ? " " : "") + adjCopyNote || undefined,
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
     className: "rd-ckey",
-    items: est ? [] : [{
+    items: (est ? [] : [{
       kind: "line",
       color: "var(--ink-3)",
       label: fedEst ? "Counted flow, 1996 on" : "Counted flow at each election"
-    }]
+    }]).concat(hasRing ? [{
+      kind: "ring",
+      color: "var(--ink)",
+      label: "Labor-v-Coalition seats only"
+    }] : []).concat(hasSolid ? [{
+      kind: "dot-solid",
+      color: "var(--ink)",
+      label: "Every seat"
+    }] : [])
   }, hasErr && React.createElement("span", {
     className: "rd-key-item"
-  }, React.createElement(ExBarSwatch, null), fedEst ? "Estimated, " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + ", with its 90% error" : "The estimate’s 90% error")), React.createElement(RdFoot, {
+  }, React.createElement(ExBarSwatch, null), fedEst ? "Estimated, " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + ", with its 90% error" : "The estimate’s 90% error")), opvYears && React.createElement("div", {
+    className: "ex-fl-adj"
+  }, React.createElement(RdSwitch, {
+    on: exhAdj,
+    onToggle: () => setExhAdj(prev => !prev),
+    label: "Exhaustion-adjusted flows"
+  }), React.createElement("span", null, "Exhaustion-adjusted flows")), React.createElement(RdFoot, {
     how: {
       term: "flow-history",
       from: "Preference flows explained"

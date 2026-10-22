@@ -29,7 +29,16 @@ Outputs:
   * .build/state-flow-src/nsw/<year>/chains.csv – the full exclusion chain
     to the final two, the shape .build/estimate-state-flows.py reads (it
     runs its model on NSW too, scored against these counts).
-Both committed, so nothing downstream needs the zips. Usage:
+  * data/state-flows-nsw-allseats.json – the NOTIONAL scan: the same
+    ballots re-read as a Labor v Coalition contest in EVERY district (not
+    just the ones whose final two were Labor v Coalition), the basis
+    Antony Green's statewide figures (and the /flows-explained/ chart's
+    NSW line) are on. A ballot goes "to Labor" if it ranks the Labor
+    candidate ahead of every Liberal/National candidate, "to Coalition" on
+    the converse, and "exhausted" if it ranks neither. District-years with
+    no Labor or no Coalition candidate are skipped and recorded.
+Both the CSVs and counts.csv/chains.csv are committed, so nothing
+downstream needs the zips. Usage:
 parse-nsw-state-flows.py [year...]
 """
 import collections
@@ -38,6 +47,7 @@ import gzip
 import hashlib
 import html
 import io
+import json
 import os
 import re
 import sys
@@ -45,12 +55,19 @@ import zipfile
 
 ROOT = os.path.join(".build", "state-flow-src", "nsw")
 OUT = "data/state-flows.csv"
+ALL = "data/state-flows-nsw-allseats.json"
 COLS = ["jurisdiction", "year", "party", "prim_votes", "prim_share",
         "flow_alp_votes", "flow_coal_votes", "flow_to_alp",
         "n_seats", "n_dop", "n_classic", "formal_votes"]
 YEARS = (2015, 2019, 2023)
 BUCKETS = ("alp", "lib", "nat", "grn", "onp", "oth")
 EMIT = ("grn", "onp", "oth", "lib", "nat", "alp")
+# the ABC's published statewide ALP two-party-preferred estimates – the
+# audit the notional scan is run against (abc.net.au party-totals pages):
+# 2015 ALP 45.7, 2019 ALP 48.0, 2023 ALP 54.3. The 2023 scan lands 0.2
+# below the ABC figure, the residual of the ABC's own notional estimate vs
+# a strict ballot-level recount.
+ANTONY_2PP = {2015: 45.7, 2019: 48.0, 2023: 54.3}
 
 
 def bucket_for(code):
@@ -196,6 +213,17 @@ def main():
             keep = [r for r in csv.DictReader(f)
                     if not (r.get("jurisdiction") == "nsw" and int(r["year"]) in years)]
     all_rows, failures = list(keep), []
+    # the notional all-seats store persists across single-year invocations
+    aseats = {}
+    if os.path.exists(ALL):
+        old = json.load(open(ALL))
+        skipped = old.get("skipped") or [[] for _ in old["years"]]
+        for i, y in enumerate(old["years"]):
+            aseats[y] = dict(grn=old["grn"][i], grnExh=old["grnExh"][i],
+                             onp=old["onp"][i], onpExh=old["onpExh"][i],
+                             oth=old["oth"][i], othExh=old["othExh"][i],
+                             votes={g: old["votes"][g][i] for g in ("grn", "onp", "oth")},
+                             implied2pp=old["implied2pp"][i], skipped=skipped[i])
     for year in years:
         ydir = os.path.join(ROOT, str(year))
         # "SG2301 LA Pref Data Albury.zip"; 2015: "SGE2015 LA Pref Data_NA_Albury.zip"
@@ -204,8 +232,9 @@ def main():
         dops = sorted(n[:-len("-dop.html.gz")] for n in os.listdir(ydir) if n.endswith("-dop.html.gz"))
         prim = collections.Counter()
         flows = {b: [0.0, 0.0, 0.0] for b in BUCKETS}
+        notion = collections.defaultdict(lambda: [0, 0, 0])
         n_classic = 0
-        crow, chrow, nonclassic = [], [], []
+        crow, chrow, nonclassic, notion_skipped = [], [], [], []
         for d in dops:
             dop = read_dop(gzip.open(os.path.join(ydir, f"{d}-dop.html.gz")).read().decode("utf-8", "replace"))
             zp = zips.get(d)
@@ -253,6 +282,32 @@ def main():
                     flows[b][2] += per[c][2]
             else:
                 nonclassic.append((d, "/".join(sorted(fb))))
+            # the notional Labor v Coalition scan – every district, classic
+            # or not: where does each formal ballot rank Labor vs any
+            # Liberal/National candidate?
+            alp_cs = [c for c in dop["cands"] if bucket_for(dop["code"][c]) == "alp"]
+            coal_cs = frozenset(c for c in dop["cands"] if bucket_for(dop["code"][c]) in ("lib", "nat"))
+            if len(alp_cs) != 1 or not coal_cs:
+                notion_skipped.append(d)
+            else:
+                a0 = alp_cs[0]
+                for b in ballots:
+                    g = bucket_for(dop["code"][b[0]])
+                    ra = rc = None
+                    for k, c in enumerate(b):
+                        if c == a0:
+                            if ra is None:
+                                ra = k
+                        elif c in coal_cs and rc is None:
+                            rc = k
+                        if ra is not None and rc is not None:
+                            break
+                    if ra is None and rc is None:
+                        notion[g][2] += 1
+                    elif ra is not None and (rc is None or ra < rc):
+                        notion[g][0] += 1
+                    else:
+                        notion[g][1] += 1
         for name, rows_, cols in (("counts.csv", crow, ["district", "candidate", "party", "first_prefs", "final1", "final2",
                                                         "to_final1", "to_final2", "exhausted", "zip_sha256"]),
                                   ("chains.csv", chrow, ["district", "step", "excluded", "recipient", "votes"])):
@@ -274,6 +329,26 @@ def main():
             fa, fc, fx = flows[b]
             if fa + fc:
                 print(f"    {b}: {100 * fa / (fa + fc):5.1f}% to Labor of those reaching either; {100 * fx / (fa + fc + fx):4.1f}% exhausted")
+        # the notional all-seats year entry: shares of every formal ballot
+        def nshare(g):
+            a, c, x = notion[g]
+            tot = a + c + x
+            if not tot:
+                return (None, None)
+            return (round(100 * a / (a + c), 1) if a + c else None, round(100 * x / tot, 1))
+        tot_a = sum(notion[g][0] for g in BUCKETS)
+        tot_c = sum(notion[g][1] for g in BUCKETS)
+        ent = {"votes": {g: [notion[g][0], notion[g][1]] for g in ("grn", "onp", "oth")},
+               "implied2pp": round(100 * tot_a / (tot_a + tot_c), 1) if tot_a + tot_c else None,
+               "skipped": list(notion_skipped)}
+        for g in ("grn", "onp", "oth"):
+            ent[g], ent[g + "Exh"] = nshare(g)
+        aseats[year] = ent
+        print(f"    notional all-seats: implied ALP 2PP {ent['implied2pp']} "
+              f"(Antony's published estimate {ANTONY_2PP.get(year, '?')}), skipped {notion_skipped}")
+        for g in ("grn", "onp", "oth"):
+            if ent[g] is not None:
+                print(f"    {g}: {ent[g]:5.1f}% to Labor of those ranking either, {ent[g + 'Exh']:4.1f}% ranking neither")
     if failures:
         for f in failures:
             print("  !!", f)
@@ -284,6 +359,19 @@ def main():
         w.writeheader()
         w.writerows(all_rows)
     print(f"wrote {OUT} ({len(all_rows)} rows total)")
+    ys = sorted(aseats)
+    doc = {"source": "NSW Electoral Commission ballot papers, scanned notionally Labor v Coalition in every district",
+           "years": ys,
+           "grn": [aseats[y]["grn"] for y in ys], "grnExh": [aseats[y]["grnExh"] for y in ys],
+           "onp": [aseats[y]["onp"] for y in ys], "onpExh": [aseats[y]["onpExh"] for y in ys],
+           "oth": [aseats[y]["oth"] for y in ys], "othExh": [aseats[y]["othExh"] for y in ys],
+           "votes": {g: [aseats[y]["votes"][g] for y in ys] for g in ("grn", "onp", "oth")},
+           "implied2pp": [aseats[y]["implied2pp"] for y in ys],
+           "skipped": [aseats[y]["skipped"] for y in ys]}
+    with open(ALL, "w") as f:
+        json.dump(doc, f, indent=1)
+        f.write("\n")
+    print(f"wrote {ALL} (years {ys})")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 ---
 name: auspol-branch-merge-land-race
-description: auspol-tracker — landing YOUR committed worktree ship-branch into the shared main checkout after a sibling land-race (worked 2026-10-11, tab-pages branch 87524cb merged as 4291be9). Local main is N commits behind origin and your ship branch is based on the OLD tip: park the sibling-dirty files blocking `git merge --ff-only origin/main` by MEASURED distance (git diff origin/main -- <file>; 0 diff-lines = landed duplicate → git restore; unique WIP → named "hold:" stash, never silently discard), rm stale UNTRACKED generated dirs the branch adds (allpolls/ cycles/ info/) or the merge aborts, resolve generated-file conflicts by REGENERATING (federal + BUILD_JUR=vic + site-shell), UNION-merge probe conflicts (keep origin's restructure + re-apply your conversion over it), then full npm test on the merged tree BEFORE pushing. Companion: auspol-clean-artifact-commit (the pre-merge slice/park step), ci-main-writer-races (push side).
+description: auspol-tracker — landing YOUR committed worktree ship-branch into the shared main checkout after a sibling land-race (worked 2026-10-11, tab-pages branch 87524cb merged as 4291be9). Local main is N commits behind origin and your ship branch is based on the OLD tip: park the sibling-dirty files blocking `git merge --ff-only origin/main` by MEASURED distance (git diff origin/main -- <file>; 0 diff-lines = landed duplicate → git restore; unique WIP → named "hold:" stash, never silently discard), rm stale UNTRACKED generated dirs the branch adds (allpolls/ cycles/ info/) or the merge aborts, resolve generated-file conflicts by REGENERATING (federal + BUILD_JUR=vic + site-shell), UNION-merge probe conflicts (keep origin's restructure + re-apply your conversion over it), then full npm test on the merged tree BEFORE pushing. PLUS the worktree-direct variant (worked 2026-10-22, direction-merged-groups 65511a95→3aeb91ae): a plain `git push origin HEAD:main` from the worktree is the fast land, but verify `git ls-remote origin main` right before — a `+old…new forced` push over sibling commits means you just clobbered them, and the recovery is merge-the-clobbered-sha-back + regenerate + amend + re-test + fast-forward push. Companion: auspol-clean-artifact-commit (the pre-merge slice/park step), ci-main-writer-races (push side).
 source: auto-skill
 extracted_at: '2026-10-11T00:00:00.000Z'
 ---
@@ -102,6 +102,55 @@ run_shell_command get mangled; see shell-command-pitfalls).
   owner.
 - Live-site smoke after Pages deploys: curl each new URL for a 200 and a
   per-page `<title>`.
+
+## Direct worktree push (skipping the main checkout) + the clobber recovery
+
+When the main checkout is too dirty to park cheaply, you can land straight
+FROM THE WORKTREE: commit there, then `git push origin HEAD:main`. From a
+worktree, pushing the branch name alone usually doesn't resolve the way
+you expect (the branch isn't the worktree's checkout), so use the explicit
+`HEAD:main` refspec.
+
+The FAILURE MODE reads in the push output: worked 2026-10-22
+(direction-merged-groups 65511a95), the branch sat on aa7905c4 while
+origin/main had raced to 88300b8e (two sibling flow-explainer commits).
+A `+`-prefixed/forced push replaced them:
+
+    + 88300b8e...65511a95 HEAD -> main (forced update)
+
+If you see `forced update` with an `old` sha that ISN'T your parent: you
+just deleted sibling commits from main. Recover immediately, in this order:
+
+1. `git fetch origin` — the clobbered commits remain fetchable from the
+   remote object store (nothing was deleted, only the ref moved).
+2. In the worktree: `git merge --no-ff <clobbered-sha> -m "Merge main's
+   …"` — source hunks auto-merge when the lanes are disjoint (this case:
+   sibling's rd-allpolls/rd.css/explainer probes vs my rd-panels/gen-data
+   direction-groups); the generated tab docs only carried ~6-line build-id
+   conflicts that git textually resolves fine.
+3. Regenerate on the merged tree: `node .build/newtracker/build.mjs` then
+   `npm run build:vic`. A stale-glyph favicon warning is normal when no
+   glyph changed.
+4. `git add -u` the regenerated pages; `git commit --amend --no-edit` the
+   merge so the merge commit carries the coherent build. My first amend
+   left sixteen ` M` `*/index.html` behind — `git status --porcelain`
+   must be CLEAN before you test or push.
+5. Full `npm test` on the merged tree — exit 0 is the gate; this is what
+   proves the union (incl. the rewritten direction-groups test + vic JUR
+   gate) is coherent.
+6. `git ls-remote origin main` — if the remote still sits at YOUR
+   pre-merge sha, `git push origin HEAD:main` is now a clean fast-forward
+   (`old..new`, no `forced`). If the remote moved again, another sibling
+   landed: repeat from step 2 with the new sha — never force again.
+7. Probe the live site once Pages deploys (~90s) — dir-gdot-hover against
+   auspoltracker.com was ALL CLEAN on the merged land.
+
+PREVENT it: `git ls-remote origin main` within a breath before ANY
+worktree push; if its sha ≠ the tip you fetched, merge/rebase it BEFORE
+pushing. The sibling's two commits dated the same minute as my push — a
+~30 s race window decided it. And never add `+` to the refSpec "just in
+case": a plain push REFUSES non-ff and forces you to look, which is the
+safety you want.
 
 ## Related
 

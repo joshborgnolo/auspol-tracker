@@ -3544,6 +3544,11 @@ body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 
 /* House and Share ride the phone's head as ONE nowrap group, so the pair
    share a wrapped line instead of splitting across two */
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
+/* the exhaustion-adjustment switch under the chart (user request 2026-10-22):
+   the control, then its words, at the key row's size; the switch's 44px hit
+   zone is negative-margined so the row doesn't balloon */
+body.rd .ex-fl-adj { display: flex; align-items: center; gap: 2px; margin-top: 6px; font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+body.rd .ex-fl-adj .rd-switch { margin: -10px 0; }
 @media (max-width: 640px) {
   body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
   body.rd .ex-fl-sel { margin-top: 0; }
