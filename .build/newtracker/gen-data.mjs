@@ -4770,10 +4770,12 @@ const flowHistory = (() => {
   /* fed.classes: the same counted family split by seat type, for the
      explainer's four class views (user request 2026-10-22): data/
      fed-class-flows.json, written by .build/fed-class-flows.py from the
-     AEC's per-division TCP flow tables (nine elections 2001–2025 — 2001
-     from its statistics pack via aec-tcp-history.py, 2004 on from the
-     downloads; the grid stops at 2001 because that's where the
-     classification store starts, not the table, which reaches 1996)
+     AEC's per-division TCP flow tables (eleven elections 1996–2025 —
+     1996–2001 from their statistics packs via aec-tcp-history.py, 2004
+     on from the downloads; 1996 is now the floor on both sides, the
+     classification store's 1996/1998 blocks transcribed 2026-10-22 from
+     the AEC's whole-chamber "Divisional Classifications" pages — and the
+     per-division flow table reaches it natively)
      grouped by the AEC's own per-election division classifications —
      the election's own table, so a recategorised seat moves classes with
      it. Classic seats only, like aec-2025-region-tpp-flows.mjs: a

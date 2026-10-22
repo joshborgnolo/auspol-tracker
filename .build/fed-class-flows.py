@@ -1,4 +1,4 @@
-"""fed-class-flows.py – federal preference flows by AEC division class, 2001–2025.
+"""fed-class-flows.py – federal preference flows by AEC division class, 1996–2025.
 
 The explainer's inner-metro/outer-metro/provincial/rural companion of the
 national FLOW_HISTORY series (flows.mjs) and of its per-state cut
@@ -13,19 +13,20 @@ this groups the per-DIVISION product instead:
 https://results.aec.gov.au/12246/results/Downloads/HouseTcpFlowByDivisionDownload-12246.csv,
 2007–2022 from each event's Downloads page), data/aec-2025-tcp-flow-by-division.csv
 for 2025 (its event's same download, already committed for
-estimate-state-flows.py), and .build/aec-flow-src/tcp-2001.json.gz for 2001
-– the statistics-pack "v3_10 … Two Candidate Preferred Preference Flow
-Result" per-division tables, derived by aec-tcp-history.py from the AEC's
-official 2001 statistics CD-ROM (the same product, a file per division).
-2001 is the floor: the per-division table reaches back to 1996 through the
-statistics packs (tcp-1996/1998 in this dir, feeding the national lane),
-but the grid groups by THAT election's classification and the classification
-store starts at 2001 (its 1996/1998 blocks don't exist). Classifications
-2001 and 2004 are canonical-on-page transcriptions of the AEC's own
-division-profile pages (the 2001-epoch's via Wayback captures with three
-unrated seats filled from AEC Research Report 5; 2004's from the live
-2004 profiles – all 150 rated on-page; data/division-classifications.json's
-_about has the sources).
+estimate-state-flows.py), and .build/aec-flow-src/tcp-{1996,1998,2001}.json.gz
+for 1996–2001 – the statistics-pack "Two Candidate Preferred Preference Flow
+Result" per-division tables (1996/98's V3_1<state>.TXT, 2001's v3_10 per
+division), derived by aec-tcp-history.py from the AEC's official statistics
+CD-ROMs. 1996 is the floor: that is as far back as the per-division table
+reaches, and the classification store reaches it too – its 1996 and 1998
+blocks (committed 2026-10-22, .build/analysis/seat-model/
+aec-{1996,1998}-epoch-classifications.tsv) are canonical-on-page
+transcriptions of the AEC's own whole-chamber "Divisional Classifications"
+table pages of those elections. Classifications 2001 and 2004 are likewise
+canonical-on-page transcriptions of the AEC's own division-profile pages
+(the 2001-epoch's via Wayback captures with three unrated seats filled from
+AEC Research Report 5; 2004's from the live 2004 profiles – all 150 rated
+on-page; data/division-classifications.json's _about has the sources).
 
 The per-division product only exists for divisions whose count RAN a
 two-candidate-preferred distribution – that is, it names the final pair by
@@ -45,13 +46,14 @@ classification boundary sliding under fixed seats. Every division row must
 join a classification – an unmatched name fails the run.
 
 Buckets and nulls mirror fed-state-flows.py: grn (every Greens party), onp
-(One Nation: HAN in 2001, ON from 2007), oth (every other non-major
-ballot, independents included). A class-year a bucket has ZERO counted
-ballots behind it (One Nation stood in hardly any inner-metropolitan
-seats in 2010–2013, say) is null, matching the national and per-state
-series' gaps – counted figures are shown for every base that exists, as the
-per-state series does; the printed ballots table beside each column says
-how wide the base is (eyeball small numbers as such).
+(One Nation: HAN in 1998–2001, ON from 2004; the party stood federally for
+the first time in 1998, so 1996 carries no One Nation ballots at all),
+oth (every other non-major ballot, independents included). A class-year a
+bucket has ZERO counted ballots behind it (One Nation stood in hardly any
+inner-metropolitan seats in 2010–2013, say) is null, matching the national
+and per-state series' gaps – counted figures are shown for every base that
+exists, as the per-state series does; the printed ballots table beside each
+column says how wide the base is (eyeball small numbers as such).
 
 Writes data/fed-class-flows.json:
 { "source": …, "years": […], "classes": { "inner": { "label", "short",
@@ -69,7 +71,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "aec-flow-src")
 ROOT = os.path.dirname(HERE)
 
-YEARS = (2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025)
+YEARS = (1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025)
 # record key -> (display label, menu short face); the AEC's own
 # classifications, in the chart's order
 CLASSES = {
@@ -86,7 +88,7 @@ CLASS_IDS = {"Inner Metropolitan": "inner", "Outer Metropolitan": "outer",
 # aec-tcp-history.py's header)
 LABOR = {"ALP", "CLR"}
 # the full Coalition spelling space of the TCP files, checked against all
-# eight years' from- and to-party codes: 2010 alone writes Queensland's
+# eleven elections' from- and to-party codes: 2010 alone writes Queensland's
 # LNP as LNQ (29 divisions read non-classic without it)
 COAL = {"LP", "NP", "CLP", "LNP", "LNQ", "NAT", "LIB"}
 GREENS = {"GRN", "GWA", "GVIC", "AGV", "TG"}
@@ -122,11 +124,11 @@ def parse(year, class_of):
     for the year's classic divisions; also (classic, total) division counts."""
     per = collections.defaultdict(lambda: collections.defaultdict(lambda: [0.0, 0.0]))
     classic = 0
-    if year == 2001:
+    if year <= 2001:
         # the statistics-pack flow tables: {div: {"pair": [a, b],
         # "from": [[party, to-a, to-b], …]}}; transfer pairs resolve in
         # pair order, and majors transferring to majors is not a "flow"
-        with gzip.open(os.path.join(SRC, "tcp-2001.json.gz"), "rb") as f:
+        with gzip.open(os.path.join(SRC, f"tcp-{year}.json.gz"), "rb") as f:
             table = json.load(f)
         for name, d in table.items():
             pair = d["pair"]
@@ -189,7 +191,7 @@ def main():
                 classes[cls][b].append(round(100 * a / (a + l), 1) if a + l else None)
                 classes[cls]["votes"][b].append([round(a), round(l)] if a + l else None)
                 ballots[cls][b].append(round(a + l))
-    out = {"source": "AEC two-candidate-preferred flow of preferences by division, 2001–2025, "
+    out = {"source": "AEC two-candidate-preferred flow of preferences by division, 1996–2025, "
                      "grouped by the AEC's own per-election division classifications (classic seats)",
            "years": list(YEARS),
            "classes": {CLASS_IDS[cls]: classes[cls] for cls in CLASSES},
