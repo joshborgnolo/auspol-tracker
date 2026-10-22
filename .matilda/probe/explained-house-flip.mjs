@@ -14,10 +14,16 @@
    (.build/aec-flow-src/senate-atl/counts.json's pa blocks), with a federal
    menu of national plus the states One Nation ran Senate tickets in (the
    all-null ACT sits out; the Coalition-only Legislative Council sits out
-   too). The counts live in
+   too — until 2026-10-23, when the user's "why is there no
+   labor-versus-one-nation data for any of the upper house states" shipped
+   NSW's own LC pair cut (FLOW_HISTORY_NSW_LC_ON, the same NSWEC ballots'
+   pa tally; the ON tab keeps the Council pick and its caption carries the
+   why: Victoria's tickets, Western Australia's, the rest publish none).
+   The counts live in
    .build/aec-flow-src/senate-atl/counts.json and
    .build/nswec-lc-flow-src/counts.json, pinned by test-senate-atl-flows,
-   test-senate-atl-on-flows and test-nsw-lc-atl-flows; this probe pins the
+   test-senate-atl-on-flows, test-nsw-lc-atl-flows and
+   test-nsw-lc-atl-on-flows; this probe pins the
    chart-side behaviour headlessly against the built page. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
@@ -253,9 +259,9 @@ console.log("== desktop: the One Nation tab rides its own Senate bank ==");
   ok("the chart ticks the same four Senate elections",
      JSON.stringify(yt) === JSON.stringify(["2016", "2019", "2022", "2025"]), yt.join("/"));
   const m = await menuInfo(page);
-  ok("its menu is one federal optgroup — national plus the seven ON-ticket states, no Council",
-     m.groups.length === 1 && m.groups[0] === "Federal elections" && m.value === "fed"
-       && JSON.stringify(m.options) === JSON.stringify(["fed", "fed:nsw", "fed:vic", "fed:qld", "fed:wa", "fed:sa", "fed:tas", "fed:nt"]),
+  ok("its menu is national plus the seven ON-ticket states, then NSW's Council alone in the state group",
+     m.groups.length === 2 && m.groups[0] === "Federal elections" && m.groups[1] === "State elections" && m.value === "fed"
+       && JSON.stringify(m.options) === JSON.stringify(["fed", "fed:nsw", "fed:vic", "fed:qld", "fed:wa", "fed:sa", "fed:tas", "fed:nt", "nswlc"]),
      JSON.stringify(m.groups) + " · " + m.options.join(" "));
   ok("…the all-null ACT sits it out", !m.options.includes("fed:act"));
   const foot = await footText(page);
@@ -441,6 +447,103 @@ await sleep(800);
      (await menuInfo(page)).value + " · " + (await meta(page)).slice(0, 50));
   await clickHouse(page);
   await sleep(700);
+}
+
+console.log("== desktop: the One Nation tab's Upper view gains NSW's LC ON cut (user 2026-10-23) ==");
+/* the question "why no labor-versus-one-nation data for any of the upper
+   house states" shipped NSW's computable one with the why in its caption:
+   the ON tab's Upper menu keeps the Council pick, its series is the
+   NSWEC-pa-derived FLOW_HISTORY_NSW_LC_ON (2019/2023 alone alive), and the
+   caption explains Victoria's tickets, Western Australia's and the rest */
+{
+  await clickHouse(page);            // Lower federal national -> Upper (Coalition pairing)
+  await sleep(800);
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v One Nation");
+    b.click();
+  });
+  await sleep(800);
+  const m = await menuInfo(page);
+  ok("the ON tab's Upper menu ends with the Council alone in the state group",
+     m.groups.length === 2 && m.groups[1] === "State elections" && m.options[m.options.length - 1] === "nswlc",
+     m.options.join(" "));
+  await pickMenu(page, "nswlc");
+  await sleep(800);
+  ok("…and the Council pick sticks under the One Nation tab", (await menuInfo(page)).value === "nswlc",
+     (await menuInfo(page)).value);
+  ok("the scope flips to the Council's span", (await meta(page)) === "NSW Legislative Council elections, 2011–2023",
+     await meta(page));
+  ok("the head title still pairs Labor with One Nation",
+     (await scopeTitle(page)) === "Preferences to Labor over One Nation, %", await scopeTitle(page));
+  const yt = await yearTicks(page);
+  ok("the four Council elections tick", JSON.stringify(yt) === JSON.stringify(["2011", "2015", "2019", "2023"]),
+     yt.join("/"));
+  const foot = await footText(page);
+  ok("the caption is the NSWEC count over the pair's own window (its one-box quote opens 2019)",
+     foot.startsWith("Counted from the NSW Electoral Commission’s ballot-level preference files")
+       && foot.includes("72% in 2019, 62% in 2023") && !foot.includes("84% in 2011"),
+     foot.slice(0, 60) + " · " + foot.slice(230, 300));
+  ok("…and it answers the why of no other state upper house (the user's question, verbatim in the caption)",
+     foot.includes("It is the only state upper house this pair can be counted in")
+       && foot.includes("Victoria’s Council used group voting tickets until 2022")
+       && foot.includes("Western Australia’s tickets ended a year earlier") && foot.includes("the rest publish none"),
+     foot.slice(-340));
+  ok("…and the pair's own gap: One Nation ran no upper-house group in 2011 or 2015",
+     foot.includes("One Nation ran no upper-house group in 2011 or 2015"), foot.slice(120, 240));
+  ok("…and each share is of the pair's rankers, never a zero year",
+     foot.includes("a pair nobody could rank is a gap, never a zero"), foot.slice(120, 240));
+  /* the tooltip on the 2023 Coalition point (56.4 sharing, 90.0% naming
+     neither of the pair) — and the 2015 window hole answering nothing */
+  await page.evaluate(() => {
+    const svg = document.querySelector(".ex-fl-card svg.chart-svg") || document.querySelector(".ex-fl-card svg");
+    svg.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await sleep(400);
+  let pt = await dotAt(page, 2023, 56.4);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tip23 = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 2023 Coalition point tips 56.4 in the pair's terms, 90.0 naming neither",
+     !!tip23 && tip23.includes("2023 · NSW LC") && tip23.includes("56.4") && tip23.includes("named neither: 90.0%"),
+     tip23 ? tip23.slice(0, 150) : "no tooltip");
+  pt = await dotAt(page, 2019, 46.3);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tip19 = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the pair's window opens 2019 (Coalition 46.3, neither 93.5)",
+     !!tip19 && tip19.includes("2019 · NSW LC") && tip19.includes("46.3") && tip19.includes("named neither: 93.5%"),
+     tip19 ? tip19.slice(0, 150) : "no tooltip");
+  pt = await dotAt(page, 2015, 46.3);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tip15 = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 2015/2011 hole stands as a bare year card — titled, but no cohort and no figure (a gap, never a zero)",
+     !!tip15 && tip15.includes("2015 · NSW LC") && !tip15.includes("%") && !tip15.includes("Greens") && !tip15.includes("Coalition"),
+     tip15 ? tip15.slice(0, 120) : "no tooltip");
+  /* the Council pick survives the contest flip (both banks ship together) */
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll(".ex-fl-card .ex-fl-tabs .rd-tab")]
+      .find((x) => x.textContent.trim() === "Labor v Coalition");
+    b.click();
+  });
+  await sleep(800);
+  ok("flipping back to Labor v Coalition keeps the Council view",
+     (await menuInfo(page)).value === "nswlc" && (await meta(page)) === "NSW Legislative Council elections, 2011–2023",
+     (await menuInfo(page)).value);
+  ok("…with the title back to the Coalition pairing",
+     (await scopeTitle(page)) === "Preferences to Labor over the Coalition, %", await scopeTitle(page));
+  await clickHouse(page);   // leave the page on Lower, federal national, as the sweep expects
+  await sleep(800);
 }
 
 console.log("== width sweep: the head controls never overflow (Lower and Upper) ==");

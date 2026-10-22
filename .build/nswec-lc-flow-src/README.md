@@ -63,8 +63,22 @@ reports are committed in `published/` (below).
   exactly with the official per-group ATL first preferences (17, 24, 20,
   21 groups — 2011 additionally carries `groupSatl`/`groupRatl` re-pinned
   against the printed BP table), the five families' `toALP` / `toCOAL` /
-  `neither` counts, and `oneOnly` — how many of each family's ATL ballots
-  numbered just the one box.
+  `neither` counts, their `pa` blocks (below), and `oneOnly` — how many
+  of each family's ATL ballots numbered just the one box.
+
+## The second tally (`pa`, added 2026-10-23)
+
+Both analysers also take a **second tally** of the same verified ballots,
+restricted to {ALP, PHON} instead of {ALP, Coalition} — the twin of the
+federal `analyse_atl_flows.py` second tally. Each ballot's group sequence
+is checked for Labor and One Nation: per first-preference family it files
+`ALP_first` / `ALP_only` / `PHON_first` / `PHON_only` / `neither` (a
+ballot naming only one of the pair still counts its way). The five cells
+per family sum exactly to that family's ATL count — the run's own guards
+already pin the ATL totals, so the pa blocks sit on the same reconciled
+ballot set. One Nation ran no LC group in 2011 or 2015, so those years'
+PHON cells are zero and the site's display series nulls them (a pair
+nobody could rank is a gap, never a zero).
 
 ## What the site draws
 
@@ -84,3 +98,14 @@ The "1 only" share (`oneOnly` of `atl`) is most NSW upper-house voters:
 84.0% in 2011, 84.4% in 2015, 71.6% in 2019, 62.3% in 2023 — the caption
 sentence rides these figures, so the test re-derives them from
 `counts.json` too.
+
+The One Nation tab draws the same NSW pick through
+`FLOW_HISTORY_NSW_LC_ON` (pinned by
+`.build/test-nsw-lc-atl-on-flows.mjs` against this folder's `pa` blocks):
+
+- **share** = `100 · (ALP_first + ALP_only) / (ALP_first + ALP_only +
+  PHON_first + PHON_only)` — of that family's ATL ballots naming Labor
+  or One Nation, the share ranking Labor ahead
+- **named neither** = `100 · neither / (the five cells)`
+- **coal / grn / oth** cohorts only (no ALP or PHON self-cohorts); 2011
+  and 2015 are all-null (no One Nation LC group ran)
