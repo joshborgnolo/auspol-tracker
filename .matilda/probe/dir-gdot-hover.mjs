@@ -10,7 +10,9 @@ const browser = await puppeteer.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new", args: ["--no-sandbox"] });
 const SEL = 'select.rd-pv-sel[aria-label*="national direction"]';
-const OPTS = ["QLD", "Men", "One Nation voters", "18–34", "Men (Essential)"];
+/* the merged-group set (2026-10-22): one key per cut - the gender pair has
+   no per-house suffix any more */
+const OPTS = ["Men", "Women", "One Nation voters", "18–34"];
 let fail = 0;
 
 for (const [w, h, tag] of [[1280, 900, "desktop"], [390, 844, "phone"]]) {
@@ -62,10 +64,12 @@ for (const [w, h, tag] of [[1280, 900, "desktop"], [390, 844, "phone"]]) {
       return t ? (t.textContent || "").trim().slice(0, 120) : null;
     });
     console.log(`${tag} "${v}": clean${tip ? `, tip visible: "${tip}"` : ""} (no boundary)`);
-    /* Essential views: a dot tip must read like the main chart's poll dot
-       tips - the house, a precise fieldwork window, the sample n, and the
-       click-to-open hint. Sweep until a tip shows, then check its text. */
-    if (v === "18–34" || v === "Men (Essential)") {
+    /* Essential-bearing views: a dot tip must read like the main chart's
+       poll dot tips - the house, a precise fieldwork window, the sample n,
+       and the click-to-open hint. Sweep until a tip shows, then check its
+       text. In Men, Essential's dots are the solid ones (Roy Morgan's ride
+       as open rings), so a sweep finds one. */
+    if (v === "18–34" || v === "Men") {
       let txt = null;
       outer: for (let fy = 0.2; fy <= 0.85 && !txt; fy += 0.06) {
         for (let fx = 0.05; fx <= 0.95; fx += 0.02) {

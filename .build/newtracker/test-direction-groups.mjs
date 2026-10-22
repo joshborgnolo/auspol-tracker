@@ -1,12 +1,14 @@
 /* Pins for the National-direction panel's group-select payloads in the
    generated 9f09dca2 data asset: directionStates (SEC Newgate's per-State
-   series, from data/sec-direction-states.json), directionGroups (Roy Morgan's
-   "Analysis by …" gender and voting-intention splits, from
-   data/roymorgan-direction-groups.json, plus Essential's national-mood
-   Men/Women and 18–34/35–54/55+ splits, from
-   data/essential-direction-groups.json) and directionStateNote (the latest
-   printed state extremes). All are federal-only: a BUILD_JUR=vic run must
-   carry none of them.
+   series, from data/sec-direction-states.json), directionGroups (the subgroup
+   views as headline-anchored POOLED GAPS: Roy Morgan's "Analysis by …" prose
+   splits, from data/roymorgan-direction-groups.json, and Essential's
+   national-mood gender/age splits, from data/essential-direction-groups.json,
+   each wave differenced against its own all-voters print – so a house's lean
+   cancels – then the gaps pooled n-weighted month by month onto the
+   lean-adjusted average) and directionStateNote (the latest printed state
+   extremes). All are federal-only: a BUILD_JUR=vic run must carry none of
+   them.
    Run: node .build/newtracker/test-direction-groups.mjs */
 import { readdirSync, readFileSync, mkdtempSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -26,6 +28,9 @@ const win = {};
 new Function("window", readFileSync(path.join(NT, "assets", dataFile), "utf8"))(win);
 const D = win.AUSPOL;
 assert.ok(D, "AUSPOL missing from the data asset");
+
+const r10 = (v) => Math.round(v * 10) / 10;
+const head = new Map(D.direction.map((p) => [p.ym, p]));
 
 const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
 
@@ -78,138 +83,168 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
   console.log("directionStates: OK");
 }
 
-// ---- directionGroups: Roy Morgan + Essential ---------------------------
+// ---- directionGroups: the merged group set --------------------------------
 const dg = D.directionGroups;
 assert.ok(dg, "directionGroups emitted");
-
-// ---- directionGroups: Roy Morgan's gender pair + voting-intention splits ----
 {
-  const store = JSON.parse(readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8"));
-  const waves = Object.entries(store.waves).sort(([a], [b]) => a.localeCompare(b));
-  // the RM groups present are exactly the groups the store's waves print
-  const expect = new Set();
-  for (const [, w] of waves) {
-    if (w.gender) { expect.add("Men"); expect.add("Women"); }
-    if (w.vote) for (const k of ["One Nation voters", "Coalition voters", "Other party voters",
-                                 "Independent voters", "Greens voters", "Labor voters"]) expect.add(k);
+  const EXPECT = ["Men", "Women", "One Nation voters", "Coalition voters", "Other party voters",
+                  "Independent voters", "Greens voters", "Labor voters", "18–34", "35–54", "55+"];
+  assert.deepEqual(Object.keys(dg).sort(), EXPECT.slice().sort(),
+    "one merged key per cut – the gender pair pools Essential and Roy Morgan");
+  assert.deepEqual(dg.Men.houses, ["Essential", "Roy Morgan"], "Men merges both houses");
+  assert.deepEqual(dg.Women.houses, ["Essential", "Roy Morgan"], "Women merges both houses");
+  assert.deepEqual(dg["18–34"].houses, ["Essential"], "the age bands are Essential's alone");
+  assert.deepEqual(dg["55+"].houses, ["Essential"], "the age bands are Essential's alone");
+  assert.deepEqual(dg["Coalition voters"].houses, ["Roy Morgan"], "the vote cuts are Roy Morgan's alone");
+  assert.deepEqual(dg["Labor voters"].houses, ["Roy Morgan"], "the vote cuts are Roy Morgan's alone");
+  for (const g of Object.values(dg)) {
+    assert.ok(g.dim === "gender" || g.dim === "age" || g.dim === "vote", `${g.label}: the panel's taxonomy`);
+    assert.ok(Array.isArray(g.series) && Array.isArray(g.raw), `${g.label}: line and dots`);
+    assert.equal(typeof g.sized, "boolean", `${g.label}: sized flag`);
   }
-  const rmKeys = Object.keys(dg).filter((k) => dg[k].source === "Roy Morgan");
-  assert.deepEqual(rmKeys.sort(), [...expect].sort(), "a group per printed block, no others");
-  const rmRowDates = new Set((JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).direction || [])
-    .filter((d) => d.pollster === "Roy Morgan").map((d) => d.date));
-  for (const label of rmKeys) {
-    const g = dg[label];
-    for (const p of g.series) {
-      assert.match(p.date, /^\d{4}-\d{2}-\d{2}$/);
-      assert.equal(p.ym, p.date.slice(0, 7), `${label}: ym mirrors the wave date`);
-      assert.ok(store.waves[p.date], `${label}: the point's wave is on record`);
-      assert.ok(typeof p.wrong === "number" && p.wrong >= 0 && p.wrong <= 100,
-        `${label}: wrong rides on Roy Morgan's half-point scale`);
-      assert.ok(p.right === null || (typeof p.right === "number" && p.right >= 0 && p.right <= 100),
-        `${label}: right is printed or null, never estimated`);
-      // RM waves key by date exactly: a stored wave with a matching direction
-      // row carries the tip payload, a wave without one joins nothing
-      if (rmRowDates.has(p.date)) {
-        assert.equal(p.pollster, "Roy Morgan", `${label} ${p.date}: tip credit`);
-        assert.ok(typeof p.dateLabel === "string" && p.dateLabel.length, `${label} ${p.date}: fieldwork window`);
-        assert.equal(p.released, p.date, `${label} ${p.date}: released rides the row date`);
-      } else {
-        assert.equal(p.released, undefined, `${label} ${p.date}: an unjoined wave carries no released date`);
-      }
-    }
-  }
-  // figure-for-figure spot pins off the committed store: Men on 10328,
-  // One Nation voters on 10353, Labor's right share on 10333
-  const at = (label, date) => dg[label].series.find((p) => p.date === date) ?? {};
-  assert.deepEqual([at("Men", "2026-08-30").right, at("Men", "2026-08-30").wrong], [29, 60], "Men 10328");
-  assert.equal(at("One Nation voters", "2026-09-20").wrong, 95, "One Nation voters 10353");
-  assert.equal(at("One Nation voters", "2026-09-20").right, null, "non-ALP vote groups carry no right share");
-  assert.deepEqual([at("Labor voters", "2026-09-06").right, at("Labor voters", "2026-09-06").wrong], [54, 26],
-    "Labor voters 10333");
-  // a fortnight that printed no cut for a group leaves a gap, not a zero
-  const menDates = dg.Men.series.map((p) => p.date);
-  assert.ok(!menDates.includes("2026-09-13") && !menDates.includes("2026-09-27"),
-    "Men has no point on the gender-less fortnights");
-  console.log("directionGroups (Roy Morgan): OK");
+  console.log("directionGroups (set): OK");
 }
 
-// ---- directionGroups: Essential's gender pair + age bands ------------------
-{
-  const essKeys = Object.keys(dg).filter((k) => dg[k].source === "Essential");
-  assert.deepEqual(essKeys.sort(), ["18–34", "35–54", "55+", "Men (Essential)", "Women (Essential)"].sort(),
-    "Essential rides five groups, its gender pair suffixed to clear Roy Morgan's");
-  const store = JSON.parse(readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8"));
-  const waves = Object.keys(store.waves).length;
-  assert.ok(waves > 0, "the committed Essential store banked waves");
-  const BANDS = { "Men (Essential)": ["gender", "Men"], "Women (Essential)": ["gender", "Women"],
-                  "18–34": ["age", "18–34"], "35–54": ["age", "35–54"], "55+": ["age", "55+"] };
-  for (const [label, [dim, cell]] of Object.entries(BANDS)) {
-    const g = dg[label];
-    assert.ok(g, `${label} emitted`);
-    assert.equal(g.dim, dim, `${label}: dim rides the panel's group taxonomy`);
-    assert.equal(g.series.length, waves, `${label}: one point per banked wave`);
-    for (const p of g.series) {
-      const banked = store.waves[p.date]?.[cell];
-      assert.ok(banked, `${label} ${p.date}: the point's wave is in the store`);
-      assert.deepEqual([p.right, p.wrong], [banked.r, banked.w], `${label} ${p.date}: figures verbatim`);
-      // every banked wave reconciles to a polls.json direction row at the
-      // store level, so every point carries the tip payload
-      assert.equal(p.pollster, "Essential", `${label} ${p.date}: tip credit`);
-      assert.match(p.released, /^\d{4}-\d{2}-\d{2}$/, `${label} ${p.date}: the joined row's date`);
-      assert.ok(typeof p.dateLabel === "string" && p.dateLabel.length, `${label} ${p.date}: fieldwork window`);
-    }
-  }
-  // figure-for-figure spot pins on the latest wave, the tracker-date key
-  // off the curated-outlier csv 2026-01-28, and the first wave
-  const atE = (label, date) => dg[label].series.find((p) => p.date === date) ?? {};
-  assert.deepEqual([atE("Men (Essential)", "2026-09-29").right, atE("Men (Essential)", "2026-09-29").wrong],
-    [29, 61], "Men (Essential) latest");
-  assert.deepEqual([atE("18–34", "2026-09-29").right, atE("18–34", "2026-09-29").wrong], [28, 55],
-    "18–34 latest");
-  assert.ok(atE("Men (Essential)", "2026-09-29").sample > 0, "the joined row carries its sample");
-  assert.deepEqual([atE("55+", "2026-01-27").right, atE("55+", "2026-01-27").wrong], [25, 58],
-    "the curated outlier rides its tracker date");
-  assert.deepEqual([atE("Women (Essential)", "2022-06-14").right, atE("Women (Essential)", "2022-06-14").wrong],
-    [45, 25], "Women (Essential) first wave");
-  console.log("directionGroups (Essential): OK");
-}
-
-// ---- directionGroups: same-house reference + approximate margins ----------
+// ---- directionGroups: raw dots are the wave's own gap, headline-anchored ---
 {
   const polls = JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
-  const rmDir = new Map((polls.direction || []).filter((d) => d.pollster === "Roy Morgan").map((d) => [d.date, d]));
-  const essStore = JSON.parse(readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8"));
-  for (const [label, g] of Object.entries(dg)) {
-    for (const p of g.series) {
-      // the reference is the SAME house's all-voters print on the same wave
-      if (g.source === "Roy Morgan") {
-        const row = rmDir.get(p.date);
-        assert.deepEqual([p.refRight, p.refWrong], row ? [row.right, row.wrong] : [null, null],
-          `${label} ${p.date}: reference is Roy Morgan's own national pair`);
-      } else {
-        const t = essStore.waves[p.date].total;
-        assert.deepEqual([p.refRight, p.refWrong], t ? [t.r, t.w] : [null, null],
-          `${label} ${p.date}: reference is the wave's own TOTAL cell`);
+  const rmRows = new Map((polls.direction || []).filter((d) => d.pollster === "Roy Morgan").map((d) => [d.date, d]));
+  const rmStore = JSON.parse(readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8"));
+  const VOTE = [["One Nation voters", "One Nation", false], ["Coalition voters", "L-NP", false],
+                ["Other party voters", "Other", false], ["Independent voters", "Independent", false],
+                ["Greens voters", "Greens", false], ["Labor voters", "ALP", true]];
+  for (const [date, w] of Object.entries(rmStore.waves)) {
+    const row = rmRows.get(date) || null;
+    const cells = [
+      ...(w.gender ? [["Men", w.gender.Men, true], ["Women", w.gender.Women, true]] : []),
+      ...(w.vote ? VOTE.map(([label, k, hasR]) => [label, w.vote[k], hasR]) : []),
+    ];
+    for (const [label, cell, hasR] of cells) {
+      const dot = dg[label].raw.find((d) => d.date === date);
+      // a wave with no all-voters row cannot be differenced: no pool, no dot
+      if (!row) { assert.equal(dot, undefined, `${label} ${date}: un-differenced, so unfiled`); continue; }
+      assert.ok(dot, `${label} ${date}: the wave's dot rides the panel`);
+      assert.equal(dot.pollster, "Roy Morgan", `${label} ${date}: tip credit`);
+      assert.equal(dot.ym, date.slice(0, 7), `${label} ${date}: ym mirrors the wave`);
+      assert.equal(r10(dot.gapW), r10(cell.w - row.wrong),
+        `${label} ${date}: the store's own print less the wave's all-voters print`);
+      if (hasR) assert.equal(r10(dot.gapR), r10(cell.r - row.right), `${label} ${date}: right gap, verbatim`);
+      else {
+        assert.equal(dot.gapR, null, `${label} ${date}: no right share, no right gap`);
+        assert.equal(dot.right, null, `${label} ${date}: no right share, no right point`);
       }
-      if (p.n == null) {
-        assert.equal(p.wrongCi, null, `${label} ${p.date}: no base, no margin`);
-        assert.equal(p.gapCi, null, `${label} ${p.date}: no base, no gap margin`);
+      const H = head.get(dot.ym);
+      assert.equal(dot.wrong, r10(H.wrong + dot.gapW), `${label} ${date}: anchored on the month's headline`);
+      if (dot.gapR != null) assert.equal(dot.right, r10(H.right + dot.gapR));
+      assert.equal(dot.released, date, `${label} ${date}: the dot identifies its wave`);
+      assert.ok(typeof dot.dateLabel === "string" && dot.dateLabel.length, `${label} ${date}: fieldwork window`);
+    }
+  }
+  const essStore = JSON.parse(readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8"));
+  const waves = Object.keys(essStore.waves).length;
+  assert.ok(waves > 0, "the committed Essential store banked waves");
+  let inEra = 0;
+  for (const [date, w] of Object.entries(essStore.waves)) {
+    // a wave older than the headline era has no month to anchor to, and drops
+    if (!head.has(date.slice(0, 7))) {
+      assert.equal(dg.Men.raw.filter((d) => d.date === date && d.pollster === "Essential").length, 0,
+        `${date}: pre-headline, no Essential dot`);
+      continue;
+    }
+    inEra++;
+    for (const label of ["Men", "Women", "18–34", "35–54", "55+"]) {
+      const cell = w[label];
+      const dots = dg[label].raw.filter((d) => d.date === date && d.pollster === "Essential");
+      assert.equal(dots.length, 1, `${label} ${date}: one Essential dot per banked wave`);
+      const dot = dots[0];
+      assert.equal(r10(dot.gapR), r10(cell.r - w.total.r), `${label} ${date}: gapped to the wave's own TOTAL`);
+      assert.equal(r10(dot.gapW), r10(cell.w - w.total.w));
+      assert.match(dot.released, /^\d{4}-\d{2}-\d{2}$/, `${label} ${date}: tip rides the joined row`);
+      assert.ok(typeof dot.dateLabel === "string" && dot.dateLabel.length, `${label} ${date}: fieldwork window`);
+    }
+  }
+  // the houses' own readings stay marked in the pool: each house's dots
+  // count its own waves inside the headline era
+  const rmGenderWaves = Object.entries(rmStore.waves).filter(([d, w]) => w.gender && rmRows.has(d)).length;
+  assert.equal(dg.Men.raw.filter((d) => d.pollster === "Roy Morgan").length, rmGenderWaves,
+    "Men: every dir-row-matched RM gender wave gets a dot");
+  assert.equal(dg.Men.raw.filter((d) => d.pollster === "Essential").length, inEra,
+    "Men: every headline-era Essential wave gets a dot, nothing older");
+  console.log("directionGroups (raw gaps): OK");
+}
+
+// ---- directionGroups: the pooled line rides the headline ------------------
+{
+  for (const [label, g] of Object.entries(dg)) {
+    const byYm = new Map();
+    for (const d of g.raw) { let a = byYm.get(d.ym); if (!a) byYm.set(d.ym, a = []); a.push(d); }
+    assert.equal(g.series.length, byYm.size, `${label}: one pool month per month with waves`);
+    let prevYm = "";
+    for (const p of g.series) {
+      assert.match(p.ym, /^\d{4}-\d{2}$/);
+      assert.ok(p.ym > prevYm, `${label}: months ascend`);
+      prevYm = p.ym;
+      const H = head.get(p.ym);
+      assert.ok(H, `${label} ${p.ym}: a pool sits only on a headline month`);
+      assert.equal(p.x, H.x, `${label} ${p.ym}: on the headline's x`);
+      assert.equal(p.wrong, r10(H.wrong + p.gapW), `${label} ${p.ym}: headline plus the pooled gap`);
+      if (p.gapR != null) assert.equal(p.right, r10(H.right + p.gapR));
+      else assert.equal(p.right, null, `${label} ${p.ym}: no right share anywhere`);
+      const rs = byYm.get(p.ym);
+      assert.ok(rs && rs.length, `${label} ${p.ym}: a pool to draw from`);
+      const gaps = rs.map((d) => d.gapW);
+      if (rs.length === 1) {
+        assert.deepEqual([p.gapW, p.gapR ?? null], [rs[0].gapW, rs[0].gapR ?? null],
+          `${label} ${p.ym}: a single wave's gap is the pool`);
       } else {
-        assert.ok(p.n > 50 && p.n < 3000, `${label} ${p.date}: a subgroup-sized base`);
-        assert.ok(p.wrongCi > 0, `${label} ${p.date}: a margin on the printed share`);
-        // a subset-of-total gap is always tighter than the group's own margin
-        if (p.gapCi != null) assert.ok(p.gapCi < p.wrongCi, `${label} ${p.date}: gap margin under the group margin`);
+        const lo = Math.min(...gaps), hi = Math.max(...gaps);
+        assert.ok(p.gapW >= lo - 0.11 && p.gapW <= hi + 0.11,
+          `${label} ${p.ym}: the weighted pool lies between its waves' gaps`);
       }
     }
   }
-  // Roy Morgan folds Other into Independent: neither group can be sized
-  for (const k of ["Other party voters", "Independent voters"])
-    assert.ok(dg[k].series.every((p) => p.n == null), `${k}: unsized`);
-  // spot pins: Men 6 Sep (n = 1541 / 1.6 × 0.49), One Nation 20 Sep
-  const at = (label, date) => dg[label].series.find((p) => p.date === date) ?? {};
-  assert.deepEqual([at("Men", "2026-09-06").n, at("Men", "2026-09-06").refWrong], [472, 62], "Men 10333 base + reference");
-  assert.equal(at("One Nation voters", "2026-09-20").n, 246, "One Nation voters 10353 base off onp 25.5% less undecided");
-  console.log("directionGroups (reference + margins): OK");
+  // the unsized cuts: no margin anywhere, and a multi-wave month pools the
+  // waves' gaps UNWEIGHTED (every n null -> every weight 1)
+  for (const k of ["Other party voters", "Independent voters"]) {
+    assert.equal(dg[k].sized, false, `${k}: unsized`);
+    for (const p of dg[k].series) {
+      assert.equal(p.wrongCi, null, `${k} ${p.ym}: no base, no margin`);
+      assert.equal(p.rightCi, null, `${k} ${p.ym}: no base, no margin`);
+    }
+    const byYm = new Map();
+    for (const d of dg[k].raw) { let a = byYm.get(d.ym); if (!a) byYm.set(d.ym, a = []); a.push(d); }
+    let multi = 0;
+    for (const [ym, rs] of byYm) {
+      if (rs.length < 2) continue;
+      multi++;
+      const mean = rs.reduce((s, d) => s + d.gapW, 0) / rs.length;
+      const p = dg[k].series.find((s) => s.ym === ym);
+      assert.ok(p, `${k} ${ym}: the month is pooled`);
+      assert.equal(Math.round(p.gapW * 100), Math.round(mean * 100), `${k} ${ym}: unweighted pool`);
+    }
+    assert.ok(multi > 0, `${k}: a multi-wave month exists to prove the unweighted pool`);
+  }
+  // figure-for-figure spot pins off the committed stores: Men's gap pair in
+  // August and September, Women's September, Labor's September, One Nation's
+  const at = (label, ym) => dg[label].series.find((p) => p.ym === ym) || {};
+  assert.deepEqual([at("Men", "2026-08").gapR, at("Men", "2026-08").gapW, at("Men", "2026-08").rightCi, at("Men", "2026-08").wrongCi],
+    [1.6, 1.4, 1.3, 1.4], "Men Aug-2026 pooled gap + margins");
+  assert.deepEqual([at("Men", "2026-09").gapR, at("Men", "2026-09").gapW, at("Men", "2026-09").rightCi, at("Men", "2026-09").wrongCi],
+    [2.2, 0.7, 2.1, 2.3], "Men Sep-2026 pooled gap + margins");
+  assert.deepEqual([at("Women", "2026-09").gapR, at("Women", "2026-09").gapW], [-2.4, -0.7], "Women Sep-2026");
+  assert.deepEqual([at("Labor voters", "2026-09").gapR, at("Labor voters", "2026-09").gapW], [30.3, -35],
+    "Labor voters Sep-2026");
+  assert.equal(at("One Nation voters", "2026-09").gapW, 29.3, "One Nation voters Sep-2026");
+  assert.equal(at("One Nation voters", "2026-09").right, null, "a non-ALP vote group carries no right share");
+  // the disagreement the panel says plainly: Essential's Men sit further
+  // right-of-the-headline than Roy Morgan's (mean of each house's own gaps)
+  const meanOf = (h) => {
+    const vs = dg.Men.raw.filter((d) => d.pollster === h && d.gapR != null).map((d) => d.gapR);
+    return r10(vs.reduce((a, b) => a + b, 0) / vs.length);
+  };
+  assert.deepEqual([meanOf("Essential"), meanOf("Roy Morgan")], [4.6, 1.3],
+    "Men's right-direction gap: Essential 4.6, Roy Morgan 1.3 – the panel's stated disagreement");
+  console.log("directionGroups (pooled): OK");
 }
 
 // ---- directionStateNote: always the LATEST printed state extremes ----------
@@ -247,7 +282,7 @@ assert.ok(dg, "directionGroups emitted");
   new Function("window", readFileSync(vicAsset, "utf8"))(vwin);
   assert.ok(vwin.AUSPOL, "the vic asset carries AUSPOL");
   assert.equal(vwin.AUSPOL.directionStates, null, "Vic carries no SEC state series");
-  assert.equal(vwin.AUSPOL.directionGroups, null, "Vic carries no Roy Morgan prose splits");
+  assert.equal(vwin.AUSPOL.directionGroups, null, "Vic carries no group splits");
   assert.equal(vwin.AUSPOL.directionStateNote, null, "Vic carries no state-extremes note");
   console.log("vic JUR gate: OK");
 }

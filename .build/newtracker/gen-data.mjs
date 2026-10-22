@@ -2370,15 +2370,25 @@ const directionNow = (() => {
      panel's select: each state rates its own direction, not the nation's,
      so it is no subgroup of the national question – it waits for a home
      of its own.
-   · directionGroups – Roy Morgan's "Analysis by …" prose splits from
+   · directionGroups – the subgroup views, every split read OFF ITS OWN
+     WAVE and anchored to the national headline, never pooled as raw
+     prints: Roy Morgan's "Analysis by …" prose splits from
      data/roymorgan-direction-groups.json (the gender pair, and the
      voting-intention right/wrong shares; ALP's right share plus the
      wrong-share of every other group – a fortnight that printed no cut
-     for a group leaves a gap in that group's series, not a zero), and
+     for a group simply leaves that wave out of its pool) and
      Essential's banked mood splits from
      data/essential-direction-groups.json (gender and age bands on the
      wave field of every Essential wave: right/wrong/unsure cells; the
-     unsure cell never charts).
+     unsure cell never charts). Houses MERGE at group level exactly the
+     way they merge at all-voters level: each wave's group figure is
+     differenced against the all-voters figure its own release printed
+     (the wave's house lean cancels in the difference, so no group-grain
+     house effects are needed), the gaps pool n-weighted month by month
+     across houses, and the pooled gap rides the lean-adjusted
+     all-voters headline. Men appears once – Essential's and Roy
+     Morgan's readings meet in one line, each house's own readings still
+     shown dot by dot.
    · directionStateNote – the latest Roy Morgan release's printed state
      highest/lowest extremes; the full state table is paywalled, so the
      extremes are the only state cut that exists.
@@ -2441,46 +2451,56 @@ const directionGroups = (() => {
     for (const d of DIR.filter((x) => x.pollster === pollster)) m.set(d.date, d);
     return m;
   };
-  /* Every group point also carries what the same house printed for ALL
-     voters on the same wave (refRight/refWrong) – the panel draws it
-     behind the group, so a group's level is read against its own house,
-     never against the lean-adjusted average of every house – and an
-     approximate 95% margin: binomial on the group's base, which is the
-     wave's effective sample (rowN / HL_DEFF, the voting-intention row
-     filed beside the direction row) times the group's share of adults or
-     of that wave's voting intention (a wave with no sample on file takes
-     rowN's standing 1200 convention, as every unsized poll does). `gapCi` is the margin on the group's
-     wrong-track gap to all voters: the group sits inside the total, so
-     the gap's variance is p(1−p)(1/n_group − 1/n_all), not the sum of the
-     two. A group whose share cannot be pinned (Roy Morgan folds its
-     "Other" voters into the Independent figure) carries n: null and no
-     margin – the panel says so rather than guess. */
-  const ci = (v, n) => v == null || !n ? null : r1(196 * Math.sqrt((v / 100) * (1 - v / 100) / n));
-  const sized = (pt, eff, share) => {
-    const n = eff && share ? eff * share : null;
-    const gapCi = n && eff && pt.wrong != null && n < eff
-      ? r1(196 * Math.sqrt((pt.wrong / 100) * (1 - pt.wrong / 100) * (1 / n - 1 / eff))) : null;
-    return { ...pt, n: n ? Math.round(n) : null, rightCi: ci(pt.right, n), wrongCi: ci(pt.wrong, n), gapCi };
+  /* Substrate: one row per (group, wave), ALREADY DIFFERENCED against the
+     all-voters figure the same wave printed – gapR/gapW are the group's
+     right/wrong minus the wave's all-voters right/wrong, so a house's
+     lean on the headline level never enters the pool. The approximate
+     95% margin on a gap is the subset-of-total one: the group sits
+     inside the total, so the gap's variance is p(1−p)(1/n_group −
+     1/n_all), not the sum of the two. The group's base is the wave's
+     effective sample (rowN / HL_DEFF, the voting-intention row filed
+     beside the direction row; a wave with no sample on file takes
+     rowN's standing 1200 convention) times the group's share of adults
+     or of that wave's voting intention. A group whose share cannot be
+     pinned (Roy Morgan folds its "Other" voters into the Independent
+     figure) carries n: null and no margin – it pools at equal weight. */
+  const gapMarg = (v, n, eff) =>
+    v == null || !n || n >= eff ? null
+    : r1(196 * Math.sqrt((v / 100) * (1 - v / 100) * (1 / n - 1 / eff)));
+  const acc = (label, dim, pollster, pt, eff, share, meta) => {
+    const g = (out[label] ??= { label, dim, pollsters: [], rows: [] });
+    if (!g.pollsters.includes(pollster)) g.pollsters.push(pollster);
+    const n = eff && share ? Math.round(eff * share) : null;
+    g.rows.push({
+      ...pt, pollster, n,
+      gapR: pt.right == null || pt.refRight == null ? null : r1(pt.right - pt.refRight),
+      gapW: pt.wrong == null || pt.refWrong == null ? null : r1(pt.wrong - pt.refWrong),
+      gapCiR: gapMarg(pt.right, n, eff),
+      gapCiW: gapMarg(pt.wrong, n, eff),
+      ...meta,
+    });
   };
   if (RM_DIR_GROUPS?.waves) {
     const rmRows = dirRowByDate("Roy Morgan");
     // the wave's voting-intention shares, as fractions of the whole sample
     const RM_VOTE = { "One Nation voters": "onp", "Coalition voters": "lnp", "Greens voters": "grn", "Labor voters": "alp" };
-    const push = (label, dim, date, right, wrong, share) => {
-      const row = rmRows.get(date) || null;
-      const vi = POLL_BY_KEY.get(date + "|Roy Morgan") || null;
-      const eff = rowN(vi) / HL_DEFF;
-      const sh = typeof share === "function" ? share(vi) : share;
-      (out[label] ??= { label, source: "Roy Morgan", dim, series: [] }).series.push(sized({
-        date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
-        refRight: row ? row.right : null, refWrong: row ? row.wrong : null,
-        ...(row ? dirTipOf(row) : {}),
-      }, eff, sh));
-    };
     const voteShare = (label) => (vi) => {
       const k = RM_VOTE[label];
       if (!vi || !k || vi[k] == null) return null;
       return (vi[k] / 100) * (1 - (vi.undecided || 0) / 100);
+    };
+    /* differencing needs the all-voters figure, and Roy Morgan's own
+       all-voters print IS the polls.json direction row: a wave the row
+       bank never reached cannot be differenced, so it joins no pool */
+    const push = (label, dim, date, right, wrong, share) => {
+      const row = rmRows.get(date) || null;
+      if (!row) return;
+      const vi = POLL_BY_KEY.get(date + "|Roy Morgan") || null;
+      const sh = typeof share === "function" ? share(vi) : share;
+      acc(label, dim, "Roy Morgan", {
+        date, ym: ymOf(date), right, wrong,
+        refRight: row.right, refWrong: row.wrong,
+      }, rowN(vi) / HL_DEFF, sh, dirTipOf(row));
     };
     for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
       if (w.gender) {
@@ -2499,29 +2519,79 @@ const directionGroups = (() => {
   }
   if (ESS_DIR_GROUPS?.waves) {
     const essRows = dirRowByDate("Essential");
-    // Men/Women collide with Roy Morgan's group keys, so Essential's gender
-    // pair rides the suffixed key; the age bands collide with nothing
     const push = (label, dim, date, cell, wave, share) => {
       const row = wave.dirRow ? essRows.get(wave.dirRow) : null;
       const vi = wave.dirRow ? POLL_BY_KEY.get(wave.dirRow + "|Essential") : null;
-      // the wave's own TOTAL cell is the reference: the figure printed beside
-      // the bands in the same report
-      (out[label] ??= { label, source: "Essential", dim, series: [] }).series.push(sized({
-        date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365,
-        right: cell.r, wrong: cell.w,
-        refRight: wave.total ? wave.total.r : null, refWrong: wave.total ? wave.total.w : null,
-        ...(row ? dirTipOf(row) : {}),
-      }, rowN(vi || row) / HL_DEFF, share));
+      // the wave's own TOTAL cell is the reference: the figure printed
+      // beside the bands in the same report
+      acc(label, dim, "Essential", {
+        date, ym: ymOf(date), right: cell.r, wrong: cell.w,
+        refRight: wave.total ? wave.total.r : null,
+        refWrong: wave.total ? wave.total.w : null,
+      }, rowN(vi || row) / HL_DEFF, share, row ? dirTipOf(row) : {});
     };
     for (const [date, w] of Object.entries(ESS_DIR_GROUPS.waves)) {
-      push("Men (Essential)", "gender", date, w.Men, w, SEX_SHARE.Men);
-      push("Women (Essential)", "gender", date, w.Women, w, SEX_SHARE.Women);
+      push("Men", "gender", date, w.Men, w, SEX_SHARE.Men);
+      push("Women", "gender", date, w.Women, w, SEX_SHARE.Women);
       push("18–34", "age", date, w["18–34"], w, AGE_SHARE["18-34"]);
       push("35–54", "age", date, w["35–54"], w, AGE_SHARE["35-54"]);
       push("55+", "age", date, w["55+"], w, AGE_SHARE["55+"]);
     }
   }
-  return Object.keys(out).length ? out : null;
+  /* Merge: pool the per-wave gaps n-weighted month by month (a wave
+     with no size joins at equal weight), turn each month's pool into a
+     point ON the lean-adjusted all-voters line for that month, and keep
+     every house's own readings beside the line as dots anchored the
+     same way. The pooled gap's margin pools the per-wave margins as
+     √(Σ(wᵢcᵢ)²)/Σwᵢ – independent waves, so the variances add; a pool
+     of only unsized waves carries none. A wave older than the headline
+     era (the `direction` series starts May 2025) has no month to anchor
+     to, and drops. */
+  const byYm = new Map((direction || []).map((p) => [p.ym, p]));
+  const pool = (rows, gapKey, ciKey) => {
+    const ws = rows.filter((r) => r[gapKey] != null);
+    if (!ws.length) return { v: null, ci: null };
+    const wOf = (r) => r.n || 1;
+    const W = ws.reduce((s, r) => s + wOf(r), 0) || ws.length;
+    const v = r1(ws.reduce((s, r) => s + wOf(r) * r[gapKey], 0) / W);
+    const ci = ws.some((r) => r[ciKey] != null)
+      ? r1(Math.sqrt(ws.reduce((s, r) => (r[ciKey] != null ? s + wOf(r) ** 2 * r[ciKey] ** 2 : s), 0)) / W) : null;
+    return { v, ci };
+  };
+  const emit = {};
+  for (const [label, g] of Object.entries(out)) {
+    const byMonth = new Map();
+    for (const r of g.rows) { let a = byMonth.get(r.ym); if (!a) byMonth.set(r.ym, a = []); a.push(r); }
+    const series = [], raw = [];
+    for (const [ym, rs] of [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+      const H = byYm.get(ym);
+      if (!H) continue;
+      const pr = pool(rs, "gapR", "gapCiR"), pw = pool(rs, "gapW", "gapCiW");
+      series.push({
+        ym, x: H.x,
+        right: pr.v == null || H.right == null ? null : r1(H.right + pr.v),
+        wrong: pw.v == null || H.wrong == null ? null : r1(H.wrong + pw.v),
+        rightCi: pr.ci, wrongCi: pw.ci,
+        gapR: pr.v, gapW: pw.v,
+      });
+      for (const r of rs) raw.push({
+        date: r.date, ym,
+        x: mx(ym) + (dayOf(r.date) - 15) / 365,
+        pollster: r.pollster,
+        right: r.gapR == null || H.right == null ? null : r1(H.right + r.gapR),
+        wrong: r.gapW == null || H.wrong == null ? null : r1(H.wrong + r.gapW),
+        gapR: r.gapR, gapW: r.gapW,
+        ...(r.released ? { dateLabel: r.dateLabel, released: r.released, sample: r.sample } : {}),
+      });
+    }
+    emit[label] = {
+      label, dim: g.dim,
+      houses: [...g.pollsters].sort(),
+      sized: g.rows.some((r) => r.n != null),
+      series, raw,
+    };
+  }
+  return Object.keys(emit).length ? emit : null;
 })();
 
 /* The same banks again, joined onto single waves so an expanded poll
@@ -8120,9 +8190,10 @@ window.AUSPOL = (function () {
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
   /* The direction panel's GROUP views (§5): SEC Newgate's per-State
-     state-direction series, Roy Morgan's printed gender/voting-intention
-     splits, and Roy Morgan's latest printed state extremes note. Printed
-     figures only – never house-adjusted. */
+     state-direction series, the subgroup views as headline-anchored
+     pooled group gaps (each poll differenced against its own wave
+     first, so house lean never enters the pool), and Roy Morgan's
+     latest printed state extremes note. */
   const directionStates = ${JSON.stringify(directionStates)};
   const directionGroups = ${JSON.stringify(directionGroups)};
   const directionStateNote = ${JSON.stringify(directionStateNote)};
