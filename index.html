@@ -6067,6 +6067,15 @@ body.rd .ex-fl-adj[aria-checked="true"] .ex-fl-adj-tk { background: var(--ink); 
 body.rd .ex-fl-adj[aria-checked="true"] .ex-fl-adj-tk::after { left: 12px; }
 body.rd .ex-fl-adj:hover { color: var(--ink); }
 body.rd .ex-fl-adj:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+body.rd .ex-fl-card .tip:not(.tip-cols) { display: grid; grid-template-columns: 9px max-content 1fr auto; column-gap: 7px; row-gap: 2px; align-items: center; }
+body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-title, body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-date,
+body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-desc, body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-sub,
+body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-hint { grid-column: 1 / -1; }
+body.rd .ex-fl-card .tip:not(.tip-cols) .tip-row { display: contents; }
+body.rd .ex-fl-card .tip:not(.tip-cols) .tip-swatch { grid-column: 1; }
+body.rd .ex-fl-card .tip:not(.tip-cols) .tip-label { grid-column: 2; }
+body.rd .ex-fl-card .tip:not(.tip-cols) .tip-note { grid-column: 3; }
+body.rd .ex-fl-card .tip:not(.tip-cols) .tip-val { grid-column: 4; justify-self: end; margin-left: 0; padding-left: 0; }
 @media (max-width: 640px) {
   body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
   body.rd .ex-fl-sel { margin-top: 0; }
