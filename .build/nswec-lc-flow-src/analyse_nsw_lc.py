@@ -12,6 +12,13 @@ first; ballots listing neither are reported beside ("named neither" is NOT
 exhaust - NSW LC ballots that name no major mostly stay with minor groups).
 BTL ballots are excluded, as in the federal script.
 
+Like the federal analyser since the Senate ON bank, every run also takes a
+SECOND tally (pa) of the same ballots, restricted to {ALP, PHON} instead:
+per family, ALP_first / ALP_only / PHON_first / PHON_only / neither (a
+ballot naming only one of the pair still counts its way). This feeds the
+explainer's NSW Legislative Council Labor-v-One-Nation view; the display
+series nulls the years One Nation fielded no LC ticket (2011, 2015).
+
 The authoritative sequence is the PreferenceNumber column: the NSWEC records
 it only for marks forming a valid consecutive run from 1, so a gap or
 duplicate beyond the counted prefix is ignored (matches the NSWEC's count).
@@ -100,6 +107,7 @@ OFFICIAL = {
 }
 
 FAMILIES = ["ALP", "COAL", "GRN", "PHON", "OTHER"]
+PA = ["ALP_first", "ALP_only", "PHON_first", "PHON_only", "neither"]
 
 
 def family(label):
@@ -122,6 +130,7 @@ def analyse(year, zpath):
     name = next(n for n in zf.namelist() if n.lower().endswith(".txt"))
 
     counts = {fam: collections.Counter() for fam in FAMILIES}
+    pa = {fam: collections.Counter() for fam in FAMILIES}
     fam_oneonly = collections.Counter()
     fam_atl = collections.Counter()
     group_first = collections.Counter()
@@ -169,6 +178,16 @@ def analyse(year, zpath):
             fam_oneonly[src] += 1
         ralp = fams.index("ALP") if "ALP" in fams else None
         rco = fams.index("COAL") if "COAL" in fams else None
+        rph = fams.index("PHON") if "PHON" in fams else None
+        srcpa = pa[src]
+        if ralp is not None and rph is not None:
+            srcpa["ALP_first" if ralp < rph else "PHON_first"] += 1
+        elif ralp is not None:
+            srcpa["ALP_only"] += 1
+        elif rph is not None:
+            srcpa["PHON_only"] += 1
+        else:
+            srcpa["neither"] += 1
         if ralp is not None and (rco is None or ralp < rco):
             counts[src]["toALP"] += 1
         elif rco is not None:
@@ -204,6 +223,9 @@ def analyse(year, zpath):
     def full(counter):
         return {k: counter.get(k, 0) for k in ("toALP", "toCOAL", "neither")}
 
+    def full_pa(counter):
+        return {k: counter.get(k, 0) for k in PA}
+
     atl_total = sum(fam_atl.values())
     one_total = sum(fam_oneonly.values())
     print(f"{year}: formal {formal:,} (= official); ATL {atl_total:,} "
@@ -216,6 +238,7 @@ def analyse(year, zpath):
         "btl": rollup["BTL_ballots"],
         "atlOneOnly": one_total,
         "counts": {fam: full(counts[fam]) for fam in FAMILIES},
+        "pa": {fam: full_pa(pa[fam]) for fam in FAMILIES},
         "oneOnly": {fam: fam_oneonly.get(fam, 0) for fam in FAMILIES},
         "atlByFamily": {fam: fam_atl.get(fam, 0) for fam in FAMILIES},
         "groupFirst": {g: group_first.get(g, 0) for g in sorted(labels)},

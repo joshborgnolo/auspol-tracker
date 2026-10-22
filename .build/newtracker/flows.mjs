@@ -410,6 +410,51 @@ export const FLOW_HISTORY_NSW_LC = Object.freeze({
   oneOnly: [84.0, 84.4, 71.6, 62.3],
 });
 
+/* FLOW_HISTORY_NSW_LC_ON – the same NSW Legislative Council ballot files
+   cut the OTHER way: rank between Labor and ONE NATION instead of Labor
+   and the Coalition – FLOW_HISTORY_NSW_LC's sibling contest, the One
+   Nation tab's one state upper house under House: Upper (shipped
+   2026-10-23 on the user's "explain why there is no labor-versus-one-nation
+   data for any of the upper house states" request, scope call: build the
+   NSW LC ON cut too, carry the why in this chart's caption). NSW is the
+   only state whose upper house can be counted this way at all: its Council
+   has kept no group tickets since 1999, so the NSWEC's per-ballot record
+   captures voters' own orders (Victoria's Council voted by party tickets
+   until 2022, abolished for 2026, so its "flows" would record the
+   tickets; Western Australia's tickets ended at the 2021 reform and its
+   first ticket-free count, 2025, printed count sheets but no per-ballot
+   record; South Australia's and Tasmania's commissions publish none). The
+   tallies are the SAME runs' second counters: analyse_nsw_lc.py and
+   analyse_nsw_lc_2011.py tally each family's pa block (ALP_first /
+   ALP_only / PHON_first / PHON_only / neither) beside the major-party
+   counts, in .build/nswec-lc-flow-src/counts.json since 2026-10-23 – the
+   runs reconcile their formal totals and every group's ATL pref-1 count
+   against the printed official figures before writing (and 2011 splits
+   SATL/RATL against Antony Green's tables), so both cuts sit on the same
+   verified ballot set. Same estimand as the Senate ON cut, pinned: a
+   cohort family's cell is 100·(ALP_first+ALP_only)/(the four rank cells)
+   – of its ATL papers naming either Labor or One Nation, the share
+   ranking Labor AHEAD (a paper naming only one of the pair still counts
+   its way); each *Nei array is 100·neither/(the five cells) – "named
+   neither", never "exhausted" (those papers mostly stay with minor
+   groups; most are the one-box papers oneOnly measures). The null map is
+   the CONTEST's, not the cohort's: One Nation ran no LC group in 2011 or
+   2015 (Pauline Hanson's 2011 ticket was her own unnamed independent
+   group, Other family), so all three cohorts null those two years – a
+   pair nobody could rank is a gap, never a zero, exactly as
+   FLOW_HISTORY_SENATE_ON's state tables do. test-nsw-lc-atl-on-flows.mjs
+   recomputes EVERY cell from counts.json's pa blocks; the test file's
+   header documents the exact derivation. oneOnly repeats
+   FLOW_HISTORY_NSW_LC's whole-population series (the caption quotes it on
+   both tabs). Display history, NOT an estimator input. */
+export const FLOW_HISTORY_NSW_LC_ON = Object.freeze({
+  years: [2011, 2015, 2019, 2023],
+  coal: [null, null, 46.3, 56.4], coalNei: [null, null, 93.5, 90.0],
+  grn: [null, null, 97.5, 98.0], grnNei: [null, null, 65.2, 45.7],
+  oth: [null, null, 63.8, 62.5], othNei: [null, null, 83.0, 76.2],
+  oneOnly: [84.0, 84.4, 71.6, 62.3],
+});
+
 /* FLOW_HISTORY_SENATE_ON – the same Senate ballots cut the OTHER way: rank
    between Labor and ONE NATION, by the Coalition/Greens/others cohorts –
    FLOW_HISTORY_SENATE's sibling contest, the explainer's One Nation tab

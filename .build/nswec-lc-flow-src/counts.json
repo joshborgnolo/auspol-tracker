@@ -160,6 +160,43 @@
     "GRN": 351605,
     "OTHER": 530008,
     "PHON": 0
+   },
+   "pa": {
+    "ALP": {
+     "ALP_first": 0,
+     "ALP_only": 953417,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "ALP_first": 0,
+     "ALP_only": 53509,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 1870405
+    },
+    "GRN": {
+     "ALP_first": 0,
+     "ALP_only": 64693,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 376065
+    },
+    "OTHER": {
+     "ALP_first": 0,
+     "ALP_only": 44419,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 622088
+    },
+    "PHON": {
+     "ALP_first": 0,
+     "ALP_only": 0,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    }
    }
   },
   "2015": {
@@ -260,6 +297,43 @@
     "GRN": 286981,
     "OTHER": 546422,
     "PHON": 0
+   },
+   "pa": {
+    "ALP": {
+     "ALP_first": 0,
+     "ALP_only": 1325759,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "ALP_first": 0,
+     "ALP_only": 41248,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 1784232
+    },
+    "GRN": {
+     "ALP_first": 0,
+     "ALP_only": 98675,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 313985
+    },
+    "OTHER": {
+     "ALP_first": 0,
+     "ALP_only": 52456,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 627274
+    },
+    "PHON": {
+     "ALP_first": 0,
+     "ALP_only": 0,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    }
    }
   },
   "2019": {
@@ -352,6 +426,43 @@
     "GRN": 229768,
     "OTHER": 558961,
     "PHON": 240021
+   },
+   "pa": {
+    "ALP": {
+     "ALP_first": 46084,
+     "ALP_only": 1250684,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "ALP_first": 10000,
+     "ALP_only": 35774,
+     "PHON_first": 9106,
+     "PHON_only": 44069,
+     "neither": 1431593
+    },
+    "GRN": {
+     "ALP_first": 17859,
+     "ALP_only": 123584,
+     "PHON_first": 1418,
+     "PHON_only": 2138,
+     "neither": 271267
+    },
+    "OTHER": {
+     "ALP_first": 21988,
+     "ALP_only": 64996,
+     "PHON_first": 12971,
+     "PHON_only": 36324,
+     "neither": 664306
+    },
+    "PHON": {
+     "ALP_first": 0,
+     "ALP_only": 0,
+     "PHON_first": 14966,
+     "PHON_only": 273185,
+     "neither": 0
+    }
    }
   },
   "2023": {
@@ -446,6 +557,43 @@
     "GRN": 150046,
     "OTHER": 500391,
     "PHON": 191381
+   },
+   "pa": {
+    "ALP": {
+     "ALP_first": 88318,
+     "ALP_only": 1578573,
+     "PHON_first": 0,
+     "PHON_only": 0,
+     "neither": 0
+    },
+    "COAL": {
+     "ALP_first": 17133,
+     "ALP_only": 59785,
+     "PHON_first": 15856,
+     "PHON_only": 43491,
+     "neither": 1225398
+    },
+    "GRN": {
+     "ALP_first": 24653,
+     "ALP_only": 192262,
+     "PHON_first": 2242,
+     "PHON_only": 2199,
+     "neither": 185996
+    },
+    "OTHER": {
+     "ALP_first": 29095,
+     "ALP_only": 91869,
+     "PHON_first": 20284,
+     "PHON_only": 52230,
+     "neither": 619972
+    },
+    "PHON": {
+     "ALP_first": 0,
+     "ALP_only": 0,
+     "PHON_first": 17862,
+     "PHON_only": 243050,
+     "neither": 0
+    }
    }
   }
  }

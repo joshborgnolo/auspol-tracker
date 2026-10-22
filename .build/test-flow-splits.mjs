@@ -343,10 +343,27 @@ assert.ok(ap.includes('className="rd-fl-tabs"') && ap.indexOf('className="rd-fl-
    record; test-nsw-lc-atl-flows pins the table and its emit gating. */
 assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes("const ON_COHORTS = ["),
   "the explainer's single-view Labor-v-One-Nation chart exists over its own cohort set");
-assert.ok(ap.includes('{senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
+/* 2026-10-23 (user: "explain why there is no labor-versus-one-nation data
+   for any of the upper house states" — decided: build NSW's computable
+   one and carry the why in its caption): the render chain gained a FOURTH
+   branch riding AHEAD of senOnView — a Council pick kept across the
+   contest flip draws the Council's OWN One Nation cut (FH.nsw.senOn,
+   FLOW_HISTORY_NSW_LC_ON; test-nsw-lc-atl-on-flows pins the table and the
+   emit), the menu's state-elections optgroup and the LC bank gate are now
+   pair-aware (LC_ON_BANK on the One Nation tab), and picking Labor v One
+   Nation sheds the Council only while its ON cut is absent */
+assert.ok(ap.includes('{lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
+    && ap.includes(': senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
     && ap.includes(': pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
     && ap.includes(': <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} lc={lcView} inv={inv} menu={headCtls} />}'),
-  "three-way render: the ON tab's Upper view draws the senOn bank, its Lower the crosses, the Coalition contest the history chart (a class pick nulls while the Senate bank is drawn)");
+  "four-way render: an ON-tab Council pick draws the Council's own ON cut, else the ON tab's Upper view draws the senOn bank, its Lower the crosses, the Coalition contest the history chart (a class pick nulls while the Senate bank is drawn)");
+assert.ok(ap.includes('{house === "sen" && (pair === "on" ? LC_ON_BANK : LC_BANK) && (')
+    && ap.includes('<option value="nswlc">{(pair === "on" ? LC_ON_BANK : LC_BANK).label}</option>'),
+  "the menu's state-elections optgroup rides the contest's Council bank (LC_ON_BANK on the One Nation tab, LC_BANK on the Coalition)");
+assert.ok(ap.includes("if (p === \"on\" && house === \"sen\" && ((lcView && !LC_ON_BANK) || (stateKey && !hasOnCells(stateKey)))) setView(\"fed\");"),
+  "picking Labor v One Nation sheds only the picks its bank never carries - the Council pick survives while LC_ON_BANK ships");
+assert.ok(ap.includes('? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map((k) => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])]'),
+  "the ON tab's Upper menu walks federal-senOn then the Council, never the Coalition bank's entries");
 /* 2026-10-22 (user: "House: Lower ⇄ / Upper ⇄"): a second flip beside
    Share: - Upper cuts the chart to the four post-GVT Senate ATL counts
    (FLOW_HISTORY_SENATE, national + the eight states; test-senate-atl-flows
@@ -369,7 +386,6 @@ assert.ok(!ap.includes('if (pair === "on") setPair("co");')
   "flipping houses never snaps the contest back (the ON bank rides along) - only a pick the ON bank can't carry (a class view, a non-fed state pick, a no-ON-ticket state) drops to federal; Lower never snaps");
 assert.ok(ap.includes('const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);')
     && ap.includes('{menuKeys.map((k) => <option key={k} value={"fed:" + k}>')
-    && ap.includes('house === "sen" && !senOnView && LC_BANK && (')
     && ap.includes('{house !== "sen" && classKeys.map(') && ap.includes('{house !== "sen" && KEYS.length > 1 && ('),
   "the elections menu re-reads the states from the operative bank under Upper (senOn's on the ON tab - never-on-ballot ACT out, the Coalition-only Council out) and sheds the House-only sections");
 assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
@@ -378,8 +394,6 @@ assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
   "the fedcl:<class> view ids resolve FH.fed.classes beside fed.states (FED_CLASSES, classKey, the menu's fedcl options)");
 assert.ok(ap.includes('<div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">') && ap.includes('<RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"'),
   "the figure is a chart card opening on contest tabs, as /flows/ does (the card ref + data-rd-swipe-exact wire its 2026-10-21 key/swipe claims)");
-assert.ok(ap.includes("if (p === \"on\" && house === \"sen\" && (lcView || (stateKey && !hasOnCells(stateKey)))) setView(\"fed\");"),
-  "picking Labor v One Nation sheds the picks its bank never carries (the LC count, a state One Nation ran no Senate tickets in)");
 assert.ok(ap.includes('<select className="rd-pv-sel ex-fl-sel" aria-label="Elections"') && ap.includes('const [view, setView] = useState("fed");')
     && ap.includes('<optgroup label="Federal elections">') && ap.includes('<optgroup label="State elections">'),
   "one elections menu: federal national, federal by state, then each state's own elections");
