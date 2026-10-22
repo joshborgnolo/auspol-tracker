@@ -4886,7 +4886,7 @@ const flowHistory = (() => {
      abolished group tickets in 1999), so the explainer's Upper view shows
      it alone, no other state. FLOW_HISTORY_NSW_LC in flows.mjs, counted
      from the NSWEC's ballot-level zips (.build/nswec-lc-flow-src/), the
-     three elections 2015–2023, ATL only like the Senate series. Most LC
+     four elections 2011–2023, ATL only like the Senate series. Most LC
      papers are a single "1", so oneOnly rides along for the caption.
      Federal-only by position: the Vic build returned above. Attached
      AFTER the JURIS loop below builds h.nsw from the estimate CSV — this

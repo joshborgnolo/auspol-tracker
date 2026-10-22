@@ -4,21 +4,26 @@ The NSW Electoral Commission publishes no Legislative Council
 preference-flow table (a state upper house has no 2PP), so these were
 computed from the commission's published **ballot-level preference-data
 zips** (one statewide file per election, every formal vote's recorded
-preferences) for the three elections it covers: **2015 (SGE2015),
-2019 (SG1901), 2023 (SG2301)**. Source zips, all under
+preferences) for the four elections it covers: **2011 (SGE2011),
+2015 (SGE2015), 2019 (SG1901), 2023 (SG2301)** — 2011 is as far back as
+the ballot-level publication reaches, and the current above-the-line
+group-voting option has been in force since 2003. Source zips, all under
 `https://pastvtr.elections.nsw.gov.au/`:
 
 - `SG2301/LC/statewide/SG2301 LC Pref Data Statewide.zip` — 124,431,335 bytes
 - `SG1901/LC/state/SGE2019 LC Pref Data Statewide.zip` — 124,075,355 bytes
 - `SGE2015/data/lc/SGE2015 LC Pref Data Statewide.zip` — 103,565,020 bytes
+- `SGE2011/data/sge_2011_lc_preferences.zip` — 652,275,238 bytes
 
-(`analyse_nsw_lc.py` reads them as `SGE2015-LC-Statewide.zip` /
+(`analyse_nsw_lc.py` reads the first three as `SGE2015-LC-Statewide.zip` /
 `SGE2019-LC-Statewide.zip` / `SG2301-LC-Statewide.zip` — rename or download
 under those names.) Reconciliation live pages, same host:
 `/SG2301/LC/statewide/cc/fp_summary`, `/SG1901/LC/state/cc/fp_summary`,
-`/SGE2015/lc/state/cc/fp_summary/index.htm`.
+`/SGE2015/lc/state/cc/fp_summary/index.htm`; for 2011, the official
+reports are committed in `published/` (below).
 
-- `analyse_nsw_lc.py` — the analyser. Of each formal above-the-line ballot
+- `analyse_nsw_lc.py` — the 2015–2023 analyser. Of each formal
+  above-the-line ballot
   (types `SATL`, a single "1", and `RATL`, a numbered ATL run; below-the-line
   papers excluded, as in the federal Senate analyser) it takes the counted
   group sequence — the `PreferenceNumber` column, which the NSWEC fills only
@@ -28,12 +33,38 @@ under those names.) Reconciliation live pages, same host:
   ("named neither" — a ballot that names no major is NOT exhausted; most
   stay with minor groups). Guard: the run **stops** if its formal total or
   any group's pref-1 ATL count differs from the NSWEC's `OFFICIAL` table.
-- `counts.json` — its output: per election, the formal total (matching the
-  fp_summary pages at 4,316,498 / 4,451,146 / 4,616,858), ATL and BTL
-  totals, `groupFirst` per group reconciling exactly with the pages'
-  per-group ATL first preferences (24/24, 20/20, 21/21 groups), the five
-  families' `toALP` / `toCOAL` / `neither` counts, and `oneOnly` — how many
-  of each family's ATL ballots numbered just the one box.
+- `analyse_nsw_lc_2011.py` — the 2011 analyser, same estimand and output
+  shape. The 2011 file layout differs (one expanded
+  `BTL_EXPANDED_PREFERENCE_ID,VC_BALLOT_PAPER_ID,PREFERENCE,CANDIDATE_ID,TYPE`
+  csv, ~111M records, each ballot's ATL marks pre-converted to its groups'
+  candidate lists, `TYPE` preserving SATL/RATL/BTL), so it got its own
+  script rather than complicating the 2015-23 one. It merges
+  `events["2011"]` into `counts.json`. Guards: the run **stops** if the
+  formal total differs from the NSWEC r02 report's 4,076,024, if any of
+  the 17 groups' (A–P plus ungrouped) pref-1 ATL count (SATL+RATL ballots)
+  differs from the same table, or if any group's SATL/RATL split differs
+  from Antony Green's *NSW Election 2011 — Final Analysis* (NSW
+  Parliamentary Library Briefing Paper 3/2011, pp.44–53) "Ticket Votes
+  (no preferences)/(with preferences)" rows.
+- `published/` — the committed 2011 evidence: the NSWEC's r02 first
+  preferences by group and r08 group-by-vote-type reports
+  (`sge2011-r02-fp-by-group.pdf`, `sge2011-r08-group-by-votetype.pdf`),
+  BP 3/2011
+  (`pnsw-2011-election-final-analysis-BP3-2011.pdf`, from
+  `parliament.nsw.gov.au` via the Wayback Machine), the printed authority
+  for the 2011 SATL/RATL reconciliation the analyser pins against,
+  the r09 party/group result lists (`sge2011-r09-party-group-result.html`
+  — the candidacies behind the family mapping: group C is John Hatton's,
+  group J Pauline Hanson's unnamed independent ticket, landed in OTHER),
+  and the zip's own layout document (`sge2011-Readme.doc`).
+- `counts.json` — the analysers' output: per election, the formal total
+  (matching the official figures at 4,076,024 / 4,316,498 / 4,451,146 /
+  4,616,858), ATL and BTL totals, `groupFirst` per group reconciling
+  exactly with the official per-group ATL first preferences (17, 24, 20,
+  21 groups — 2011 additionally carries `groupSatl`/`groupRatl` re-pinned
+  against the printed BP table), the five families' `toALP` / `toCOAL` /
+  `neither` counts, and `oneOnly` — how many of each family's ATL ballots
+  numbered just the one box.
 
 ## What the site draws
 
@@ -45,8 +76,11 @@ against this folder's counts):
   ballots naming at least one major party, the share naming Labor first
 - **named neither major** = `100 · neither / (toALP + toCOAL + neither)`
 - a family with **zero ATL ballots** in a year is `null` in the table (One
-  Nation ran no Legislative Council group in 2015), never a zero
+  Nation ran no Legislative Council group in 2011 or 2015 — Pauline
+  Hanson's 2011 ticket was her own unnamed independent group J, family
+  OTHER), never a zero
 
 The "1 only" share (`oneOnly` of `atl`) is most NSW upper-house voters:
-84.4% in 2015, 71.6% in 2019, 62.3% in 2023 — the caption sentence rides
-these figures, so the test re-derives them from `counts.json` too.
+84.0% in 2011, 84.4% in 2015, 71.6% in 2019, 62.3% in 2023 — the caption
+sentence rides these figures, so the test re-derives them from
+`counts.json` too.

@@ -4,7 +4,7 @@
    the four post-GVT elections 2016–2025 (FLOW_HISTORY_SENATE), national and
    the eight states/territories through the same Federal menu section, plus
    the one state upper house the AEC-less ballot record exists for: NSW's
-   Legislative Council (FLOW_HISTORY_NSW_LC, 2015–2023 — a state-elections
+   Legislative Council (FLOW_HISTORY_NSW_LC, 2011–2023 — a state-elections
    optgroup of one under Upper; NSW's state pick flips up to it, its LC
    pick flips down to the Assembly view, and every other state's pick snaps
    to federal). The seat-classification entries and every other
@@ -325,7 +325,7 @@ console.log("== desktop: the One Nation tab rides its own Senate bank ==");
 }
 
 console.log("== desktop: NSW's Legislative Council — the one state upper house ==");
-const LC_META = "NSW Legislative Council elections, 2015–2023";
+const LC_META = "NSW Legislative Council elections, 2011–2023";
 // (dotAt is shared with the One Nation section above)
 await pickMenu(page, "nswlc");
 await sleep(800);
@@ -333,14 +333,14 @@ await sleep(800);
   ok("the menu picks the Legislative Council", (await menuInfo(page)).value === "nswlc", (await menuInfo(page)).value);
   ok("the scope flips to it", (await meta(page)) === LC_META, await meta(page));
   const yt = await yearTicks(page);
-  ok("the chart ticks the three NSWEC ballot-file elections",
-     JSON.stringify(yt) === JSON.stringify(["2015", "2019", "2023"]), yt.join("/"));
+  ok("the chart ticks the four NSWEC ballot-file elections",
+     JSON.stringify(yt) === JSON.stringify(["2011", "2015", "2019", "2023"]), yt.join("/"));
   ok("the head title still pairs Labor with the Coalition",
      (await scopeTitle(page)) === "Preferences to Labor over the Coalition, %", await scopeTitle(page));
   const foot = await footText(page);
   ok("the caption is the NSWEC count, one-box figures and all",
      foot.startsWith("Counted from the NSW Electoral Commission’s ballot-level preference files")
-       && foot.includes("84% in 2015, 72% in 2019, 62% in 2023"), foot.slice(0, 60) + " · " + foot.slice(190, 260));
+       && foot.includes("84% in 2011, 84% in 2015, 72% in 2019, 62% in 2023"), foot.slice(0, 60) + " · " + foot.slice(190, 260));
   ok("…it says named-neither, never exhaust",
      foot.includes("named neither") && !/[Ee]xhaust[ei]d a ballot/.test(foot), foot.slice(260, 380));
   ok("…and it promises no other state", foot.includes("only state upper house"), foot.slice(-120));
@@ -375,6 +375,19 @@ await sleep(800);
   ok("One Nation's line opens in 2019 (33.3, neither 89.6)",
      !!tipOn && tipOn.includes("2019 · NSW LC") && tipOn.includes("33.3") && tipOn.includes("named neither major: 89.6%"),
      tipOn ? tipOn.slice(0, 110) : "no tooltip");
+  pt = await dotAt(page, 2011, 77.0);
+  await page.mouse.move(pt.x, pt.y);
+  await sleep(700);
+  const tip11 = await page.evaluate(() => {
+    const t = document.querySelector(".tip");
+    return t ? t.textContent.replace(/\s+/g, " ").trim() : null;
+  });
+  ok("the 2011 Greens point opens the window (77.0, neither 83.2)",
+     !!tip11 && tip11.includes("2011 · NSW LC") && tip11.includes("77.0") && tip11.includes("named neither major: 83.2%"),
+     tip11 ? tip11.slice(0, 110) : "no tooltip");
+  ok("One Nation's 2011 hole sits in the same card (Hanson's unnamed ticket is Others)",
+     !!tip11 && tip11.includes("Greens") && !tip11.includes("One Nation"),
+     tip11 ? tip11.slice(0, 120) : "no tooltip");
   /* the tooltip is year-indexed (one card per x, every series listed), so
      the 2015 hole shows as One Nation ABSENT from the year's card while
      Greens and Others ride it — the gap drawn, never a zero row */

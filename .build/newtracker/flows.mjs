@@ -377,23 +377,31 @@ export const FLOW_HISTORY_SENATE = Object.freeze({
    (NSW keeps no group tickets since 1999, so its Legislative Council prints
    a per-ballot record; no other state upper house publishes one). Counted
    from the NSW Electoral Commission's ballot-level preference-data zips by
-   nswec-lc-flow-src/analyse_nsw_lc.py, pinned to its counts
+   nswec-lc-flow-src/analyse_nsw_lc.py (2015–2023) and
+   analyse_nsw_lc_2011.py (2011, the earliest year the ballot-level
+   publication reaches, from its expanded per-candidate csv; opened on the
+   user's 2026-10-23 request), pinned to the counts
    (.build/nswec-lc-flow-src/counts.json; test-nsw-lc-atl-flows.mjs
-   recomputes every figure from them). Same estimand as the Senate series:
+   recomputes every figure from them, and 2011's per-group SATL/RATL splits
+   re-pin against the printed "Ticket Votes" tables of Antony Green's
+   BP 3/2011 Final Analysis, committed in nswec-lc-flow-src/published/).
+   Same estimand as the Senate series:
    above-the-line ballots only, a figure the share of the family's papers
    naming at least one major party that named Labor first, each *Nei array
    the share naming neither major ("named neither", NOT "exhausted" – those
    ballots mostly stay with minor groups). Most papers carry just one "1"
-   (oneOnly: 84% of ATL ballots in 2015, 72% in 2019, 62% in 2023 – the
-   explainer's caption quotes them, so they are pinned here too). One
-   Nation's 2015 is null, never zero: it ran no LC group that year. Display
-   history, NOT an estimator input. */
+   (oneOnly: 84% of ATL ballots in 2011, 84% in 2015, 72% in 2019, 62% in
+   2023 – the explainer's caption quotes them, so they are pinned here too).
+   One Nation's 2011 and 2015 are null, never zero: it ran no LC group
+   either year (Pauline Hanson's 2011 ticket was her own unnamed
+   independent group – Other family here). Display history, NOT an
+   estimator input. */
 export const FLOW_HISTORY_NSW_LC = Object.freeze({
-  years: [2015, 2019, 2023],
-  grn: [90.9, 91.7, 94.5], grnNei: [74.9, 64.1, 44.8],
-  onp: [null, 33.3, 20.1], onpNei: [null, 89.6, 82.8],
-  oth: [41.4, 54.5, 60.7], othNei: [87.2, 81.5, 77.1],
-  oneOnly: [84.4, 71.6, 62.3],
+  years: [2011, 2015, 2019, 2023],
+  grn: [77.0, 90.9, 91.7, 94.5], grnNei: [83.2, 74.9, 64.1, 44.8],
+  onp: [null, null, 33.3, 20.1], onpNei: [null, null, 89.6, 82.8],
+  oth: [30.0, 41.4, 54.5, 60.7], othNei: [86.3, 87.2, 81.5, 77.1],
+  oneOnly: [84.0, 84.4, 71.6, 62.3],
 });
 
 /* FLOW_HISTORY_SENATE_ON – the same Senate ballots cut the OTHER way: rank
