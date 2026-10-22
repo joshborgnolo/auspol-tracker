@@ -6264,7 +6264,10 @@ function RdExplained() {
       </button>
     </span>
   ) : null;
-  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}{houseCtl}{share}</span> : menu;
+  /* the phone's head span: the menu, then House and Share in ONE nowrap
+     group, so the pair share a line when the row wraps instead of
+     splitting across two (user 2026-10-22) */
+  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}<span className="ex-fl-flips">{houseCtl}{share}</span></span> : menu;
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">

@@ -6050,7 +6050,7 @@ body.rd .ex-fl-head > .rd-chead-t { flex: 1 1 260px; min-width: 0; line-height: 
 body.rd .ex-fl-head .rd-chead-meta { display: block; margin-left: 0; }
 body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
-body.rd .ex-fl-ctls > .ex-share { margin-left: auto; }
+body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 @media (max-width: 640px) {
   body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
   body.rd .ex-fl-sel { margin-top: 0; }
@@ -47799,31 +47799,42 @@ function RdDirection({
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   const G = grpId ? D.directionGroups?.[grpId] || null : null;
-  const gSrc = G ? G.source || "this pollster" : "";
-  const gName = !G ? "" : G.dim === "age" ? "Aged " + grpId : grpId.replace(" (Essential)", "");
-  const gRaw = G ? G.series.filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
-  const gHasRight = gRaw.filter(d => d.right != null).length >= 2;
-  const gPts = gRaw.map(d => ({
+  const gHouses = G ? G.houses || [] : [];
+  const gSrc = gHouses.join(" and ") || "the pollsters";
+  const gName = !G ? "" : G.dim === "age" ? "Aged " + grpId : grpId;
+  const gSeries = G ? G.series.filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
+  const gHasRight = gSeries.filter(d => d.right != null).length >= 2;
+  const gPts = gSeries.map(d => ({
     ...d,
-    right: gHasRight ? d.right : null
+    right: gHasRight ? d.right : null,
+    gapR: gHasRight ? d.gapR : null,
+    rightCi: gHasRight ? d.rightCi : null
   }));
+  const gRaw = G ? (G.raw || []).filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
+  const gCounts = gRaw.reduce((m, d) => (m[d.pollster] = (m[d.pollster] || 0) + 1, m), {});
+  const gRing = gHouses.length === 2 ? (gCounts[gHouses[0]] || 0) <= (gCounts[gHouses[1]] || 0) ? gHouses[0] : gHouses[1] : null;
   const gDots = gRaw.flatMap(d => {
     const meta = d.released ? d : {
-      pollster: gSrc,
+      pollster: d.pollster,
       dateLabel: monthLabelFull(d.ym)
     };
+    const ring = d.pollster === gRing ? {
+      hollow: true
+    } : {};
     return [d.right != null ? {
       x: d.x,
       y: d.right,
       color: "var(--mood-pos)",
       label: "Right direction",
-      meta
+      meta,
+      ...ring
     } : null, d.wrong != null ? {
       x: d.x,
       y: d.wrong,
       color: "var(--mood-neg)",
       label: "Wrong track",
-      meta
+      meta,
+      ...ring
     } : null].filter(Boolean);
   });
   const gLine = k => gPts.filter(d => d[k] != null).map(d => ({
@@ -47840,52 +47851,52 @@ function RdDirection({
     color: "var(--mood-pos)",
     className: "ci-band",
     edge: false,
-    smooth: false,
     points: gBand("right", "rightCi")
   } : null, {
     id: "g-ci-wrong",
     color: "var(--mood-neg)",
     className: "ci-band",
     edge: false,
-    smooth: false,
     points: gBand("wrong", "wrongCi")
   }].filter(a => a && a.points.length >= 2);
   const gRef = {
-    right: gLine("refRight"),
-    wrong: gLine("refWrong")
+    right: series(pts, "right"),
+    wrong: series(pts, "wrong")
   };
-  const gXDomain = gRaw.length ? [Math.max(xDomain[0], D.mx(gRaw[0].ym) - 0.045), xDomain[1]] : xDomain;
-  const gSized = gPts.some(d => d.n != null);
-  const gVals = gPts.flatMap(p => [p.right, p.wrong, p.refRight, p.refWrong]).concat(gAreas.flatMap(a => a.points.flatMap(d => [d.y0, d.y1]))).filter(v => v != null);
+  const gXDomain = gPts.length ? [Math.max(xDomain[0], D.mx(gPts[0].ym) - 0.045), xDomain[1]] : xDomain;
+  const gSized = !!(G && G.sized);
+  const gVals = gPts.flatMap(p => [p.right, p.wrong]).concat(gDots.map(d => d.y)).concat(gAreas.flatMap(a => a.points.flatMap(d => [d.y0, d.y1]))).filter(v => v != null);
   const gLo = gVals.length ? Math.min(lo, Math.floor((Math.min(...gVals) + 0.6) / 10) * 10) : lo;
   const gHi = gVals.length ? Math.max(hi, Math.min(100, Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10)) : hi;
-  const gLast = gRaw.length ? gRaw[gRaw.length - 1] : null;
-  const pctOf = v => (Number.isInteger(v) ? String(v) : v.toFixed(1)) + "%";
+  const gLast = gPts.length ? [...gPts].reverse().find(d => d.wrong != null) : null;
   const gRead = !gLast ? null : (() => {
-    const day = gLast.date ? Number(gLast.date.slice(8, 10)) + " " + D.monthNameFull(Number(gLast.date.slice(5, 7))) : monthLabelFull(gLast.ym);
-    const own = pctOf(gLast.wrong) + " wrong track" + (gLast.right != null ? ", " + pctOf(gLast.right) + " right direction" : "");
-    const ref = gLast.refWrong == null ? "" : " All voters in the same poll: " + pctOf(gLast.refWrong) + (gLast.right != null && gLast.refRight != null ? " and " + pctOf(gLast.refRight) : "") + ".";
-    let gap = "";
-    if (gLast.refWrong != null) {
-      const g = gLast.wrong - gLast.refWrong;
-      const gTxt = (g > 0 ? "+" : g < 0 ? "−" : "") + (Number.isInteger(g) ? String(Math.abs(g)) : Math.abs(g).toFixed(1));
-      gap = gLast.gapCi == null ? " " + gSrc + " doesn’t print how many respondents this group is, so the " + gTxt + "-point wrong-track gap carries no margin." : Math.abs(g) > gLast.gapCi ? " The wrong-track gap, " + gTxt + " points, clears its ±" + gLast.gapCi.toFixed(1) + " margin." : " The wrong-track gap, " + gTxt + " points, is within its ±" + gLast.gapCi.toFixed(1) + " margin.";
+    const side = g => g > 0 ? " over " : " under ";
+    const absW = Math.abs(gLast.gapW).toFixed(1);
+    let s = gName + ", " + monthLabelFull(gLast.ym) + ": wrong track " + absW + " points" + side(gLast.gapW) + "all voters" + (gLast.wrongCi != null ? " (±" + gLast.wrongCi.toFixed(1) + ")" : "");
+    if (gLast.gapR != null) s += "; right direction " + Math.abs(gLast.gapR).toFixed(1) + " points" + side(gLast.gapR) + "all voters" + (gLast.rightCi != null ? " (±" + gLast.rightCi.toFixed(1) + ")" : "");
+    s += ".";
+    if (gHouses.length === 2) {
+      const gapKey = gRaw.some(d => d.gapR != null) ? "gapR" : "gapW";
+      const mean = h => {
+        const vs = gRaw.filter(d => d.pollster === h && d[gapKey] != null).map(d => d[gapKey]);
+        return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null;
+      };
+      const m0 = mean(gHouses[0]),
+        m1 = mean(gHouses[1]);
+      if (m0 != null && m1 != null) s += " The pollsters disagree on how big the " + (gapKey === "gapR" ? "right-direction" : "wrong-track") + " gap is: " + gHouses[0] + "’s readings average " + signedP(Math.round(m0 * 10) / 10) + " points, " + gHouses[1] + "’s " + signedP(Math.round(m1 * 10) / 10) + " points.";
     }
-    return gName + ", " + gSrc + " " + day + ": " + own + "." + ref + gap;
+    return s;
   })();
-  const gBy = (src, dim, trim) => !D.directionGroups ? [] : Object.keys(D.directionGroups).filter(k => D.directionGroups[k].source === src && D.directionGroups[k].dim === dim).map(k => [k, trim ? k.replace(trim, "") : k]);
+  const gBy = dim => !D.directionGroups ? [] : Object.keys(D.directionGroups).filter(k => D.directionGroups[k].dim === dim).map(k => [k, k]);
   const gGroups = [{
-    label: "By gender (Roy Morgan)",
-    opts: gBy("Roy Morgan", "gender")
-  }, {
-    label: "By vote (Roy Morgan)",
-    opts: gBy("Roy Morgan", "vote")
-  }, {
-    label: "By gender (Essential)",
-    opts: gBy("Essential", "gender", " (Essential)")
+    label: "By gender",
+    opts: gBy("gender")
   }, {
     label: "By age (Essential)",
-    opts: gBy("Essential", "age")
+    opts: gBy("age")
+  }, {
+    label: "By vote (Roy Morgan)",
+    opts: gBy("vote")
   }].filter(g => g.opts.length);
   const gNote = D.directionStateNote ? "Roy Morgan’s latest release (" + D.monthNameFull(Number(D.directionStateNote.date.slice(5, 7))) + ") prints " + D.directionStateNote.highest.state + " as the state most convinced the country is on the wrong track (" + D.directionStateNote.highest.w + "%), " + D.directionStateNote.lowest.state + " the least (" + D.directionStateNote.lowest.w + "%). Its full state table is paywalled." : null;
   return React.createElement(RdSec, {
@@ -48008,8 +48019,7 @@ function RdDirection({
       rdWidth: 1.25,
       dash: "4 4",
       opacity: 0.7,
-      endCap: false,
-      smooth: false
+      endCap: false
     }] : []), ...(gHasRight && gRef.right.length ? [{
       id: "ref-right",
       label: "All voters, right direction",
@@ -48018,8 +48028,7 @@ function RdDirection({
       rdWidth: 1.25,
       dash: "4 4",
       opacity: 0.7,
-      endCap: false,
-      smooth: false
+      endCap: false
     }] : []), {
       id: "wrong",
       label: gName + ", wrong track",
@@ -48027,7 +48036,6 @@ function RdDirection({
       points: gLine("wrong"),
       rdWidth: 2.5,
       endCap: false,
-      smooth: false,
       endLabel: narrow ? null : "Wrong track"
     }, ...(gHasRight ? [{
       id: "right",
@@ -48036,7 +48044,6 @@ function RdDirection({
       points: gLine("right"),
       rdWidth: 2.5,
       endCap: false,
-      smooth: false,
       endLabel: narrow ? null : "Right direction"
     }] : [])],
     spine: gLine("wrong"),
@@ -48045,20 +48052,22 @@ function RdDirection({
     pollFacet: "direction",
     tooltipTitle: i => {
       const s = gPts.filter(d => d.wrong != null);
-      return s[i] ? s[i].date ? s[i].date.slice(8, 10).replace(/^0/, "") + " " + monthLabelFull(s[i].ym) : monthLabelFull(s[i].ym) : "";
+      return s[i] ? monthLabelFull(s[i].ym) : "";
     },
     extraRows: i => {
       const d = gPts.filter(p => p.wrong != null)[i];
-      return d && d.wrongCi != null ? [{
-        label: "95% margin",
-        value: (d.right != null && d.rightCi != null ? "±" + d.rightCi.toFixed(1) + ", " : "") + "±" + d.wrongCi.toFixed(1)
-      }] : [];
+      if (!d) return [];
+      const gapRow = (label, g, ci) => ({
+        label,
+        value: signedP(g) + (ci != null ? " ±" + ci.toFixed(1) : "")
+      });
+      return [gapRow("Wrong-track gap to all voters", d.gapW, d.wrongCi), ...(d.gapR != null ? [gapRow("Right-direction gap", d.gapR, d.rightCi)] : [])];
     },
     fmt: v => v.toFixed(1),
     copy: {
       title: gName + ": is the country heading in the right direction?",
-      sub: (gRead || "") + " As " + gSrc + " printed them, never adjusted for house lean.",
-      caption: "Each dot is one " + gSrc + " reading for " + gName + "; dashed lines are all voters in the same polls" + (gSized ? ", shading the group’s approximate 95% margin." : "."),
+      sub: (gRead || "") + " Built like the headline: each poll’s group figure less the all-voters figure its own poll printed, the gaps pooled month by month on the lean-adjusted average.",
+      caption: "Each dot is one house’s reading for " + gName + ", anchored the same way" + (gRing ? " (" + gRing + "’s are the open rings)" : "") + "; dashed lines are all voters, the lean-adjusted average" + (gSized ? ", shading the gap’s approximate 95% margin." : "."),
       legend: [{
         label: gName + ", right direction",
         color: "var(--mood-pos)",
@@ -48068,7 +48077,7 @@ function RdDirection({
         color: "var(--mood-neg)",
         kind: "line"
       }, {
-        label: "All voters, same polls",
+        label: "All voters, lean-adjusted average",
         color: "var(--ink-3)",
         kind: "dashed"
       }]
@@ -48146,19 +48155,19 @@ function RdDirection({
     items: [{
       kind: "dot",
       color: "var(--ink-3)",
-      label: "One reading by " + gSrc + (gHasRight ? "" : " (" + gSrc + " prints only the wrong-track share for this group)")
+      label: "One reading" + (gRing ? " (" + gRing + "’s ride as open rings)" : "") + (gHasRight ? "" : " (" + gSrc + " print only the wrong-track share for this group)")
     }, gSized ? {
       kind: "lineband",
       color: "var(--ink-3)",
-      label: gName + ", with its approximate 95% margin"
+      label: gName + ": the all-voters average plus the pooled gap, with its 95% margin"
     } : {
       kind: "line",
       color: "var(--ink-3)",
-      label: gName + " (no margin: the group’s size isn’t printed)"
+      label: gName + ": the all-voters average plus the pooled gap (no margin: the group’s size isn’t printed)"
     }, {
       kind: "dash",
       color: "var(--ink-3)",
-      label: "All voters, same polls"
+      label: "All voters, lean-adjusted average"
     }]
   }) : React.createElement(RdKey, {
     className: "rd-ckey",
@@ -48174,7 +48183,7 @@ function RdDirection({
   })), !G && gNote && React.createElement("p", {
     className: "rd-dir-extremes"
   }, gNote), G ? React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Every point above is a ", gSrc, " reading for ", gName, " as printed in its release \u2013 never house-adjusted, never smoothed. The dashed lines are what ", gSrc, " printed for all voters in the same polls, so a gap between them is the group, not the pollster\u2019s lean. The headline figures above stay the average of all pollsters."), React.createElement(React.Fragment, null, "The shading is an approximate 95% margin: ", gSrc, " doesn\u2019t print how many respondents each group is, so the base is the poll\u2019s effective sample times the group\u2019s share of adults", G.dim === "vote" ? " (of that poll’s voting intention, for a party’s voters)" : "", ".", G.dim === "vote" ? " Roy Morgan folds its other-party voters into the Independent figure, so neither of those two groups can be sized." : ""), gSrc === "Roy Morgan" ? React.createElement(React.Fragment, null, "Roy Morgan prints these splits only some weeks, so the series has gaps where no cut was released.", gHasRight ? "" : " Where a release names only one share, the other cannot be pieced back from the national figures.") : React.createElement(React.Fragment, null, "Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.")]
+    paras: [React.createElement(React.Fragment, null, "The line rides the lean-adjusted all-voters average through ", gName, "\u2019s own gap: in each poll, ", gName, "\u2019s figure less the all-voters figure its own poll printed \u2013 differencing drops that poll\u2019s house lean \u2013 the gaps pooled month by month, weighted by sample. Each dot is one house\u2019s reading for ", gName, ", anchored the same way", gRing ? "; " + gRing + "’s ride as open rings" : "", "."), React.createElement(React.Fragment, null, "The shading is the gap\u2019s approximate 95% margin. ", gHouses.length === 2 ? "Neither house prints" : gSrc + " doesn’t print", " how many respondents this group is, so the base is the poll\u2019s effective sample times the group\u2019s share of adults", G.dim === "vote" ? " (of that poll’s voting intention, for a party’s voters)" : "", ".", G.dim === "vote" ? " Roy Morgan folds its other-party voters into the Independent figure, so neither of those two groups can be sized." : "", gHasRight ? "" : " Where a release names only one share, the other cannot be pieced back from the national figures."), gHouses.length === 2 ? React.createElement(React.Fragment, null, "Essential prints these splits most fortnights; Roy Morgan only some weeks, so a month\u2019s pool leans on whichever asked, and some months rest on one of them.") : gHouses[0] === "Roy Morgan" ? React.createElement(React.Fragment, null, "Roy Morgan prints these splits only some weeks, so the series has months with nothing to pool.") : React.createElement(React.Fragment, null, "Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.")]
   }) : React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(React.Fragment, null, "The lines are adjusted for each pollster\u2019s lean. Only ", (D.directionHouses || []).length, " pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.")]
   }), React.createElement(RdFoot, {
@@ -65580,7 +65589,9 @@ function RdExplained() {
   }, "\u21C4"))) : null;
   const headCtls = narrow ? React.createElement("span", {
     className: "ex-fl-ctls"
-  }, menu, houseCtl, share) : menu;
+  }, menu, React.createElement("span", {
+    className: "ex-fl-flips"
+  }, houseCtl, share)) : menu;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
