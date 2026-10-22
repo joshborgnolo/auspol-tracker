@@ -1431,6 +1431,9 @@ body.rd .rd-dir-chart { margin-top: 40px; }
    chart card (the select sits in the chead's right slot by flex) */
 body.rd .rd-dir-chart .rd-chead .rd-pv-sel { flex-shrink: 0; }
 body.rd .rd-dir-extremes { margin: 14px 0 0; font-size: 13px; color: var(--ink-3); max-width: 66ch; }
+/* a group view's readout, under the chart's name: the group's latest print
+   beside its house's all-voters print and whether the gap clears its margin */
+body.rd .rd-dir-grp { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); max-width: 66ch; }
 /* the confidence panel's consumer/business tabs take direction's 40px
    drop; the toggled chart card then sits the walked-row distance below
    them. Between them the draw-a-term row rides at 24px and overrides the

@@ -174,6 +174,44 @@ assert.ok(dg, "directionGroups emitted");
   console.log("directionGroups (Essential): OK");
 }
 
+// ---- directionGroups: same-house reference + approximate margins ----------
+{
+  const polls = JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+  const rmDir = new Map((polls.direction || []).filter((d) => d.pollster === "Roy Morgan").map((d) => [d.date, d]));
+  const essStore = JSON.parse(readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8"));
+  for (const [label, g] of Object.entries(dg)) {
+    for (const p of g.series) {
+      // the reference is the SAME house's all-voters print on the same wave
+      if (g.source === "Roy Morgan") {
+        const row = rmDir.get(p.date);
+        assert.deepEqual([p.refRight, p.refWrong], row ? [row.right, row.wrong] : [null, null],
+          `${label} ${p.date}: reference is Roy Morgan's own national pair`);
+      } else {
+        const t = essStore.waves[p.date].total;
+        assert.deepEqual([p.refRight, p.refWrong], t ? [t.r, t.w] : [null, null],
+          `${label} ${p.date}: reference is the wave's own TOTAL cell`);
+      }
+      if (p.n == null) {
+        assert.equal(p.wrongCi, null, `${label} ${p.date}: no base, no margin`);
+        assert.equal(p.gapCi, null, `${label} ${p.date}: no base, no gap margin`);
+      } else {
+        assert.ok(p.n > 50 && p.n < 3000, `${label} ${p.date}: a subgroup-sized base`);
+        assert.ok(p.wrongCi > 0, `${label} ${p.date}: a margin on the printed share`);
+        // a subset-of-total gap is always tighter than the group's own margin
+        if (p.gapCi != null) assert.ok(p.gapCi < p.wrongCi, `${label} ${p.date}: gap margin under the group margin`);
+      }
+    }
+  }
+  // Roy Morgan folds Other into Independent: neither group can be sized
+  for (const k of ["Other party voters", "Independent voters"])
+    assert.ok(dg[k].series.every((p) => p.n == null), `${k}: unsized`);
+  // spot pins: Men 6 Sep (n = 1541 / 1.6 × 0.49), One Nation 20 Sep
+  const at = (label, date) => dg[label].series.find((p) => p.date === date) ?? {};
+  assert.deepEqual([at("Men", "2026-09-06").n, at("Men", "2026-09-06").refWrong], [472, 62], "Men 10333 base + reference");
+  assert.equal(at("One Nation voters", "2026-09-20").n, 246, "One Nation voters 10353 base off onp 25.5% less undecided");
+  console.log("directionGroups (reference + margins): OK");
+}
+
 // ---- directionStateNote: always the LATEST printed state extremes ----------
 {
   const note = D.directionStateNote;

@@ -358,6 +358,13 @@ const midMs = (p) => (new Date(p.dateStart || p.date).getTime() + new Date(p.dat
 const share2pp = (p) => (p.tpp_lnp != null && p.tpp_alp + p.tpp_lnp > 0) ? (p.tpp_alp / (p.tpp_alp + p.tpp_lnp)) * 100 : p.tpp_alp;
 const ddays = (a, b) => (a - b) / 86400000;
 const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
+/* Adults' shares by age band and sex (ABS 2021 Census, those 18 and over):
+   a subgroup's base when a house prints its cut but not the count behind
+   it is the wave's effective sample times the group's share – the
+   weighting the sample is drawn to. Undecided's By age view and the
+   direction panel's group bands both size their margins this way. */
+const AGE_SHARE = { "18-34": 0.295, "35-54": 0.334, "55+": 0.371 };
+const SEX_SHARE = { Men: 0.49, Women: 0.51 };
 /* Highway: recency decay alone would step from ~14% weight to nothing at the
    window's edge, so a big poll exiting overnight used to move the estimate
    discontinuously. Taper (half-cosine) runs from HL_TAPER days to zero at
@@ -2359,7 +2366,10 @@ const directionNow = (() => {
    · directionStates – SEC Newgate's per-State state-direction readings from
      data/sec-direction-states.json (its own question, "perceived direction
      of individual states", five mainland states). right only before the
-     cache horizon; points ride `x` exactly (no estimation).
+     cache horizon; points ride `x` exactly (no estimation). NOT in the
+     panel's select: each state rates its own direction, not the nation's,
+     so it is no subgroup of the national question – it waits for a home
+     of its own.
    · directionGroups – Roy Morgan's "Analysis by …" prose splits from
      data/roymorgan-direction-groups.json (the gender pair, and the
      voting-intention right/wrong shares; ALP's right share plus the
@@ -2431,26 +2441,59 @@ const directionGroups = (() => {
     for (const d of DIR.filter((x) => x.pollster === pollster)) m.set(d.date, d);
     return m;
   };
+  /* Every group point also carries what the same house printed for ALL
+     voters on the same wave (refRight/refWrong) – the panel draws it
+     behind the group, so a group's level is read against its own house,
+     never against the lean-adjusted average of every house – and an
+     approximate 95% margin: binomial on the group's base, which is the
+     wave's effective sample (rowN / HL_DEFF, the voting-intention row
+     filed beside the direction row) times the group's share of adults or
+     of that wave's voting intention (a wave with no sample on file takes
+     rowN's standing 1200 convention, as every unsized poll does). `gapCi` is the margin on the group's
+     wrong-track gap to all voters: the group sits inside the total, so
+     the gap's variance is p(1−p)(1/n_group − 1/n_all), not the sum of the
+     two. A group whose share cannot be pinned (Roy Morgan folds its
+     "Other" voters into the Independent figure) carries n: null and no
+     margin – the panel says so rather than guess. */
+  const ci = (v, n) => v == null || !n ? null : r1(196 * Math.sqrt((v / 100) * (1 - v / 100) / n));
+  const sized = (pt, eff, share) => {
+    const n = eff && share ? eff * share : null;
+    const gapCi = n && eff && pt.wrong != null && n < eff
+      ? r1(196 * Math.sqrt((pt.wrong / 100) * (1 - pt.wrong / 100) * (1 / n - 1 / eff))) : null;
+    return { ...pt, n: n ? Math.round(n) : null, rightCi: ci(pt.right, n), wrongCi: ci(pt.wrong, n), gapCi };
+  };
   if (RM_DIR_GROUPS?.waves) {
     const rmRows = dirRowByDate("Roy Morgan");
-    const push = (label, dim, date, right, wrong) => {
-      (out[label] ??= { label, source: "Roy Morgan", dim, series: [] }).series.push({
+    // the wave's voting-intention shares, as fractions of the whole sample
+    const RM_VOTE = { "One Nation voters": "onp", "Coalition voters": "lnp", "Greens voters": "grn", "Labor voters": "alp" };
+    const push = (label, dim, date, right, wrong, share) => {
+      const row = rmRows.get(date) || null;
+      const vi = POLL_BY_KEY.get(date + "|Roy Morgan") || null;
+      const eff = rowN(vi) / HL_DEFF;
+      const sh = typeof share === "function" ? share(vi) : share;
+      (out[label] ??= { label, source: "Roy Morgan", dim, series: [] }).series.push(sized({
         date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365, right, wrong,
-        ...(rmRows.has(date) ? dirTipOf(rmRows.get(date)) : {}),
-      });
+        refRight: row ? row.right : null, refWrong: row ? row.wrong : null,
+        ...(row ? dirTipOf(row) : {}),
+      }, eff, sh));
+    };
+    const voteShare = (label) => (vi) => {
+      const k = RM_VOTE[label];
+      if (!vi || !k || vi[k] == null) return null;
+      return (vi[k] / 100) * (1 - (vi.undecided || 0) / 100);
     };
     for (const [date, w] of Object.entries(RM_DIR_GROUPS.waves)) {
       if (w.gender) {
-        push("Men", "gender", date, w.gender.Men.r, w.gender.Men.w);
-        push("Women", "gender", date, w.gender.Women.r, w.gender.Women.w);
+        push("Men", "gender", date, w.gender.Men.r, w.gender.Men.w, SEX_SHARE.Men);
+        push("Women", "gender", date, w.gender.Women.r, w.gender.Women.w, SEX_SHARE.Women);
       }
       if (w.vote) {
-        push("One Nation voters", "vote", date, null, w.vote["One Nation"].w);
-        push("Coalition voters", "vote", date, null, w.vote["L-NP"].w);
-        push("Other party voters", "vote", date, null, w.vote.Other.w);
-        push("Independent voters", "vote", date, null, w.vote.Independent.w);
-        push("Greens voters", "vote", date, null, w.vote.Greens.w);
-        push("Labor voters", "vote", date, w.vote.ALP.r ?? null, w.vote.ALP.w);
+        push("One Nation voters", "vote", date, null, w.vote["One Nation"].w, voteShare("One Nation voters"));
+        push("Coalition voters", "vote", date, null, w.vote["L-NP"].w, voteShare("Coalition voters"));
+        push("Other party voters", "vote", date, null, w.vote.Other.w, null);
+        push("Independent voters", "vote", date, null, w.vote.Independent.w, null);
+        push("Greens voters", "vote", date, null, w.vote.Greens.w, voteShare("Greens voters"));
+        push("Labor voters", "vote", date, w.vote.ALP.r ?? null, w.vote.ALP.w, voteShare("Labor voters"));
       }
     }
   }
@@ -2458,20 +2501,24 @@ const directionGroups = (() => {
     const essRows = dirRowByDate("Essential");
     // Men/Women collide with Roy Morgan's group keys, so Essential's gender
     // pair rides the suffixed key; the age bands collide with nothing
-    const push = (label, dim, date, cell, wave) => {
+    const push = (label, dim, date, cell, wave, share) => {
       const row = wave.dirRow ? essRows.get(wave.dirRow) : null;
-      (out[label] ??= { label, source: "Essential", dim, series: [] }).series.push({
+      const vi = wave.dirRow ? POLL_BY_KEY.get(wave.dirRow + "|Essential") : null;
+      // the wave's own TOTAL cell is the reference: the figure printed beside
+      // the bands in the same report
+      (out[label] ??= { label, source: "Essential", dim, series: [] }).series.push(sized({
         date, ym: ymOf(date), x: mx(ymOf(date)) + (dayOf(date) - 15) / 365,
         right: cell.r, wrong: cell.w,
+        refRight: wave.total ? wave.total.r : null, refWrong: wave.total ? wave.total.w : null,
         ...(row ? dirTipOf(row) : {}),
-      });
+      }, rowN(vi || row) / HL_DEFF, share));
     };
     for (const [date, w] of Object.entries(ESS_DIR_GROUPS.waves)) {
-      push("Men (Essential)", "gender", date, w.Men, w);
-      push("Women (Essential)", "gender", date, w.Women, w);
-      push("18–34", "age", date, w["18–34"], w);
-      push("35–54", "age", date, w["35–54"], w);
-      push("55+", "age", date, w["55+"], w);
+      push("Men (Essential)", "gender", date, w.Men, w, SEX_SHARE.Men);
+      push("Women (Essential)", "gender", date, w.Women, w, SEX_SHARE.Women);
+      push("18–34", "age", date, w["18–34"], w, AGE_SHARE["18-34"]);
+      push("35–54", "age", date, w["35–54"], w, AGE_SHARE["35-54"]);
+      push("55+", "age", date, w["55+"], w, AGE_SHARE["55+"]);
     }
   }
   return Object.keys(out).length ? out : null;
@@ -2838,7 +2885,6 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
    37.1% of those 18 and over) – the weighting Resolve's sample is drawn to.
    The 95% margin is binomial on the pooled base. */
 const SOFT_AGE_POOL = 3;
-const AGE_SHARE = { "18-34": 0.295, "35-54": 0.334, "55+": 0.371 };
 const softAgeWaves = POLLS.filter((p) => p.softAge).sort((a, b) => (a.date < b.date ? -1 : 1)).map((p) => ({
   x: dx(p.date), ym: ymOf(p.date), released: p.date, dateLabel: fwLabel(p.dateStart, p.date),
   pollster: p.pollster, sample: p.sample ?? null,
