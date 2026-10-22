@@ -29,11 +29,22 @@
    committed); those rows print the committed bt flagged, and are kept out
    of the re-derivation counts.
 
+   Two readings are printed. The SITE'S BUCKETS reading above runs the
+   repo's own tables (fixed Greens / One Nation / rest buckets, one lumped
+   flow 1987-93). BONHAM'S RULE re-runs the test the way his piece sets it
+   up - every party that polled 4%+ at the opening election read at its own
+   flow (Democrats kept for 1996 at 3.75%), everything else at that
+   election's flow of the untracked rest - on party-level tables from
+   bonham-party-flows.json (bonham-party-flows.py: AEC counts by party
+   1996-2025, the pile-model estimate 1984-93). Only the second is his
+   test; the first is the site's.
+
    Run from the repo root: node .build/analysis/bonham-lef-track-record.mjs
    Exit code 1 if a re-derived error drifts from its committed bt, or a
    documented summary figure fails to reproduce. */
 
 import { execSync } from "node:child_process";
+import fs from "node:fs";
 import { FLOW_ERAS } from "../newtracker/flows.mjs";
 
 const show = (p) => JSON.parse(execSync(`git show origin/main:${p}`, { maxBuffer: 1 << 28, encoding: "utf8" }));
@@ -160,32 +171,35 @@ for (const r of rows) {
 }
 
 /* ---- summary statistics, Bonham's frames -------------------------------- */
+/* normalising scales by 21.1 ÷ the closing's minor share, so with a 2-4%
+   minor vote (1946-54) it multiplies a miss five to ten times: Bonham
+   starts at 1955 and so do the normalised figures here */
 const statLine = (label, list) => {
   const errs = list.map(errOf);
-  const norms = list.map(normErr);
-  console.log(`${label.padEnd(34)} n=${String(list.length).padStart(2)}  mean ${f2(r2(mean(errs)))}  |err| ${r2(mae(errs)).toFixed(2)}  sd ${r2(sd(errs)).toFixed(2)}  norm'd |err| ${r2(mae(norms)).toFixed(2)}`);
+  const norms = list.filter((r) => r.closing >= 1955).map(normErr);
+  const cb = list.filter((r) => r.err == null).length;
+  console.log(`${label.padEnd(34)} n=${String(list.length).padStart(2)}  mean ${f2(r2(mean(errs)))}  |err| ${r2(mae(errs)).toFixed(2)}  sd ${r2(sd(errs)).toFixed(2)}  norm'd |err| ${norms.length ? r2(mae(norms)).toFixed(2) : " — "}${cb ? `   (${cb} committed-bt only)` : ""}`);
 };
-console.log("\nsummary (errors in ALP points; norm'd = scaled to 2013-level minor-party voting, ALL share 21.1)");
+console.log("\nsummary (errors in ALP points; norm'd = scaled to 2013-level minor-party voting, ALL share 21.1, closings 1955+ only)");
+console.log("committed-bt rows are the 1955-87 era tables, whose pinned constants (f_oth 0.45, DLP 0.27) were pooled across the era - hindsight, see flows.mjs FLOW_ERAS");
 statLine("closings 1990–2025 (itemised+lumped)", inWindow(1990, 2025));
 statLine("closings 1983–2013 (his 'last twelve')", inWindow(1983, 2013));
 statLine("last twelve as of 2025 (1993–2025)", inWindow(1993, 2025));
 statLine("closings 1955–1980 (his pre-1983 era)", inWindow(1955, 1980));
 statLine("closings 1946–1955 (oth-only tables)", inWindow(1946, 1955));
 statLine("all closings 1946–2025", inWindow(1946, 2025));
+statLine("closings 1955–2025 (his span)", inWindow(1955, 2025));
 
 console.log("\nversus Bonham's published figures");
 console.log("election-level errors (his sign converted: negative = Labor outperformed the model):");
 const HIS = { 1990: -1.1, 2013: -1.0, 2016: -0.17, 2019: 0.81, 2022: -0.99 };
 const NOTE = {
-  1990: "divergent by construction — the repo's 1987–93 tables are one lumped minor-party flow (exact vs the opening result by design); his were party-level estimates from seat distributions. flows.mjs documents this.",
-  2013: "matches (1.0 his, 1.04 ours) — the case his piece builds around.",
-  2016: "close (0.17 his, 0.23 ours) — differences are bucket granularity + anchor, not direction.",
-  2019: "matches (0.81 his, 0.83 ours).",
-  2022: "matches (0.99 his, 0.97 ours).",
+  1990: "the site's 1987 table is one lumped minor-party flow, so the Greens joining the minor pool in 1990 (his stated cause of the miss) is absorbed; Bonham's rule below reads it",
 };
 for (const [y, his] of Object.entries(HIS)) {
-  const ours = rows.find((r) => r.closing === +y);
-  console.log(`  ${y}: ours ${f2(errOf(ours))}  his ${f2(his)}  — ${NOTE[y]}`);
+  const ours = errOf(rows.find((r) => r.closing === +y));
+  const gap = Math.abs(ours - his);
+  console.log(`  ${y}: ours ${f2(ours)}  his ${f2(his)}  — ${gap < 0.1 ? "matches" : gap < 0.3 ? "close" : "differs"} (gap ${gap.toFixed(2)})${NOTE[y] ? "; " + NOTE[y] : ""}`);
 }
 console.log("  2025: ours " + f2(errOf(rows.find((r) => r.closing === 2025))) + " — postdates his updates (the 2022 table understated Labor by 0.39 pts).");
 console.log(`  last twelve to 2013: ours |err| ${r2(mae(inWindow(1983, 2013).map(errOf))).toFixed(2)}  vs his 0.3 points (0.4 norm'd; ours ${r2(mae(inWindow(1983, 2013).map(normErr))).toFixed(2)}).`);
@@ -193,13 +207,87 @@ console.log(`  last twelve to 2013: ours |err| ${r2(mae(inWindow(1983, 2013).map
   const l12 = inWindow(1993, 2025);
   console.log(`  updated to 2025: the last twelve elections now run 1993–2025 — |err| ${r2(mae(l12.map(errOf))).toFixed(2)} (norm'd ${r2(mae(l12.map(normErr))).toFixed(2)}), signed mean ${f2(r2(mean(l12.map(errOf))))}, vs the 0.3/0.4 he reported to 2013.`);
 }
-console.log(`  pre-1983 elections: ours |err| ${r2(mae(inWindow(1955, 1980).map(errOf))).toFixed(2)} (norm'd ${r2(mae(inWindow(1955, 1980).map(normErr))).toFixed(2)}) vs his ~0.6 (~1.5 norm'd) — his era flows were measured from partial preference throws; the repo's are solved against each official 2PP, so the repo's pre-1984 miss is mechanically smaller. Different instruments, same conclusion.`);
+console.log(`  pre-1983 elections: ours |err| ${r2(mae(inWindow(1955, 1980).map(errOf))).toFixed(2)} (norm'd ${r2(mae(inWindow(1955, 1980).map(normErr))).toFixed(2)}) vs his ~0.6 (~1.5 norm'd) — NOT comparable: his flows were measured from partial preference throws; the repo's era tables pin constants pooled over the whole era (f_oth 0.45, DLP 0.27, the 1955 set chosen to land 1958), so they carry knowledge of the elections they are tested on, and the pre-1984 2PPs they are scored against are themselves estimates.`);
 
-console.log("\nthe respondent-polling comparison (his §'15,000')");
-const obsSD = sd(inWindow(1990, 2025).map(errOf));
-console.log(`  A flow estimated from n minor-party voters has sampling sd √(0.25/n); Bonham equates the LEF average-error-as-sd with that (0.4 pts → 0.25/0.004² ≈ 15,600 voters ≈ his 15,000).`);
-console.log(`  Same arithmetic on the repo's 1990–2025 record (sd ${r2(obsSD).toFixed(2)} pts): n = 0.25/(${r2(obsSD).toFixed(2)}/100)² ≈ ${Math.round(0.25 / (obsSD / 100) ** 2).toLocaleString()} minor-party voters per poll.`);
-console.log(`  Scaling the error on to the 2PP by the 2013 minor share (m=${(ALL_SHARE_2013 / 100).toFixed(3)}) instead gives n = m²·0.25/sd² ≈ ${Math.round(((ALL_SHARE_2013 / 100) ** 2) * 0.25 / (obsSD / 100) ** 2).toLocaleString()} — either way, far beyond any respondent sample a pollster fields (>2,000 minors is rare).`);
+console.log("\nthe respondent-polling comparison (his '15,000')");
+{
+  /* Bonham states the figure without its working. The sampling arithmetic:
+     asking n minor-party voters estimates their flow with sd √(0.25/n); that
+     moves the 2PP by m × that, m the minor share. RMS (not sd about the
+     mean) is the error that bias counts in. */
+  const list = inWindow(1990, 2025).map(errOf);
+  const rms = Math.sqrt(mean(list.map((x) => x * x)));
+  const m = ALL_SHARE_2013 / 100;
+  console.log(`  Bonham gives "about 15,000 minor party voters" without working; 0.25/0.004² ≈ 15,600 is what treating a 0.4-pt 2PP error as a FLOW error gives — a guess at his arithmetic, not his.`);
+  console.log(`  On the 2PP, n = m²·0.25/rms²: the 1990–2025 record (rms ${rms.toFixed(2)} pts) at m=${m.toFixed(3)} needs n ≈ ${Math.round(m * m * 0.25 / (rms / 100) ** 2).toLocaleString()} minor-party voters; at 2025's m=0.336, ≈ ${Math.round(0.336 ** 2 * 0.25 / (rms / 100) ** 2).toLocaleString()}.`);
+  console.log(`  So sampling error alone does not rule respondent preferences out — a 3,000-person poll holds ~1,000 minor-party voters today. Their record against LEF (2004, 2013's mixed result) is a matter of respondents' answers not matching their ballots, not of sample size.`);
+}
+
+/* ---- Bonham's rule: party-level tables ---------------------------------- */
+const BPF = JSON.parse(fs.readFileSync(new URL("./bonham-party-flows.json", import.meta.url), "utf8")).tables;
+const MAJOR = new Set(["alp", "lnp"]);
+const flowOf = (v) => (v && v[0] + v[1] > 0 ? v[0] / (v[0] + v[1]) : null);
+/* tracked at opening E: 4%+ of the vote at E, the Democrats kept for 1996 */
+const trackedAt = (y, t) => Object.keys(t.share).filter((p) => !MAJOR.has(p) && !p.startsWith("x:") && (t.share[p] >= 4 || (p === "dem" && +y === 1993)));
+function bonhamTable(y) {
+  const t = BPF[y];
+  const tr = trackedAt(y, t);
+  const rest = [0, 0];
+  for (const [p, v] of Object.entries(t.votes)) if (!tr.includes(p)) { rest[0] += v[0]; rest[1] += v[1]; }
+  const f = Object.fromEntries(tr.map((p) => [p, flowOf(t.votes[p])]));
+  const fOth = flowOf(rest);
+  const minor = (s) => 100 - s.alp - s.lnp;
+  const read = (s) => s.alp + tr.reduce((a, p) => a + (s[p] ?? 0) * f[p], 0) + (minor(s) - tr.reduce((a, p) => a + (s[p] ?? 0), 0)) * fOth;
+  return { y: +y, cut: t.cut, tr, f, fOth, anchor: t.tpp - read(t.share), read };
+}
+const BY = Object.keys(BPF).map(Number).sort((a, b) => a - b);
+const bonhamRows = BY.slice(0, -1).map((y, i) => {
+  const T = bonhamTable(y), c = BY[i + 1], C = BPF[c];
+  const imp = T.read(C.share) + T.anchor;
+  return { table: y, closing: c, cut: T.cut, tr: T.tr, f: T.f, fOth: T.fOth, imp, official: C.tpp, err: r2(imp - C.tpp), all: 100 - C.share.alp - C.share.lnp, demShare: C.share.dem ?? 0, demOpen: BPF[y].share.dem ?? 0 };
+});
+console.log("\nBONHAM'S RULE — 4%+ parties at their own last-election flow, the rest at the untracked flow (bonham-party-flows.json)");
+console.log("closing | via  | flows from      | tracked (flow to ALP)                       | Others | err   | site's buckets | his");
+for (const r of bonhamRows) {
+  const site = rows.find((x) => x.closing === r.closing);
+  const tr = r.tr.map((p) => `${p} ${(r.f[p] * 100).toFixed(1)}`).join(", ") || "none";
+  const src = r.cut === "model" ? "model estimate" : r.cut === "classic-tcp" ? "AEC classic seats" : "AEC all seats";
+  console.log(`${r.closing}   | ${r.table} | ${src.padEnd(15)} | ${tr.padEnd(43)} | ${(r.fOth * 100).toFixed(1)}   | ${f2(r.err)} | ${f2(site ? errOf(site) : null)}          | ${HIS[r.closing] != null ? f2(HIS[r.closing]) : ""}`);
+}
+const bw = (lo, hi) => bonhamRows.filter((r) => r.closing >= lo && r.closing <= hi);
+const bStat = (label, l) => console.log(`${label.padEnd(34)} n=${String(l.length).padStart(2)}  mean ${f2(r2(mean(l.map((r) => r.err))))}  |err| ${r2(mae(l.map((r) => r.err))).toFixed(2)}  norm'd |err| ${r2(mae(l.map((r) => r.err * ALL_SHARE_2013 / r.all))).toFixed(2)}`);
+bStat("closings 1987–2013 (his window, from 1987)", bw(1987, 2013));
+bStat("closings 1987–2025", bw(1987, 2025));
+bStat("last twelve as of 2025 (1993–2025)", bw(1993, 2025));
+{
+  const chk = JSON.parse(fs.readFileSync(new URL("./bonham-party-flows.json", import.meta.url), "utf8")).dem_check;
+  const gaps = Object.values(chk).map((c) => c.model - c.counted);
+  console.log(`  1984–93 tables are model estimates: the same labelled model on 1996–2001, where the AEC counted Democrats by party, reads them ${Object.entries(chk).map(([y, c]) => `${y} ${f2(r2(c.model - c.counted))}`).join(", ")} pts (mean ${f2(r2(mean(gaps)))});`);
+  for (const r of bonhamRows.filter((r) => r.cut === "model"))
+    /* the anchor takes up the opening's share × the flow error, so what
+       reaches the closing is the CHANGE in the Democrat share × that error */
+    console.log(`    ${r.closing}: a ${Math.abs(mean(gaps)).toFixed(1)}-pt Democrat flow error moves its err by ~${((r.demShare - r.demOpen) * Math.abs(mean(gaps)) / 100).toFixed(2)} pts (Democrats ${r.demOpen.toFixed(1)}% → ${r.demShare.toFixed(1)}%; the anchor absorbs the opening's share)`);
+  console.log("  1983's count stopped at a majority, so no 1983 table and no 1984 closing under this rule.");
+  /* 2025's judgement call: the UAP (4.1% in 2022) is tracked but did not
+     stand; Clive Palmer's 2025 vehicle was Trumpet of Patriots (AEC code
+     CYA, the renamed Australian Federation Party) - a different registered
+     party, so the code-strict rule reads it at Others */
+  /* 2022's: under the 4% rule One Nation (3.1%) and the UAP (3.4%) are
+     2019 Others; his 2022 update names their flows apart, so he likely
+     tracked them - that reading lands within 0.04 of his -0.99 */
+  {
+    const t = BPF[2019], C = BPF[2022], tr = ["grn", "onp", "uap"];
+    const rest = [0, 0];
+    for (const [p, v] of Object.entries(t.votes)) if (!tr.includes(p)) { rest[0] += v[0]; rest[1] += v[1]; }
+    const fo = flowOf(rest);
+    const rd = (s) => s.alp + tr.reduce((a, p) => a + (s[p] ?? 0) * flowOf(t.votes[p]), 0) + (100 - s.alp - s.lnp - tr.reduce((a, p) => a + (s[p] ?? 0), 0)) * fo;
+    console.log(`  2022 sensitivity: One Nation and the UAP read at their own 2019 flows moves 2022 from ${f2(bonhamRows.find((r) => r.closing === 2022).err)} to ${f2(r2(rd(C.share) + t.tpp - rd(t.share) - C.tpp))} (his -0.99).`);
+  }
+  const r25 = bonhamRows.find((r) => r.closing === 2025);
+  const cya = BPF[2025].share["x:CYA"] ?? 0;
+  const alt = r2(r25.err + cya * (r25.f.uap - r25.fOth));
+  console.log(`  2025 sensitivity: Trumpet of Patriots (${cya.toFixed(1)}%) read at the UAP's 2022 flow (${(r25.f.uap * 100).toFixed(1)}) instead of Others (${(r25.fOth * 100).toFixed(1)}) moves 2025 from ${f2(r25.err)} to ${f2(alt)}.`);
+}
 
 /* ---- verification -------------------------------------------------------- */
 /* The committed bt comes from aec-flow-history.py's full-precision primary
