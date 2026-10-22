@@ -137166,13 +137166,7 @@ function RdApDetail({
     return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
   };
   const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
-  const confEf = !conf ? null : conf.chg != null && Math.abs(conf.chg) >= 0.05 ? {
-    v: conf.chg,
-    calc: false
-  } : conf.chgCalc != null && Math.abs(conf.chgCalc) >= 0.05 ? {
-    v: conf.chgCalc,
-    calc: true
-  } : null;
+  const confEf = !conf ? null : conf.chg != null && Math.abs(conf.chg) >= 0.05 ? conf.chg : conf.chgCalc != null && Math.abs(conf.chgCalc) >= 0.05 ? conf.chgCalc : null;
   const CONF_BLURB = {
     consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
     westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
@@ -137293,7 +137287,7 @@ function RdApDetail({
     className: "rd-ldg-h"
   }, conf.lab), React.createElement("div", {
     className: "rd-ldg-conf"
-  }, React.createElement("b", null, confFmt(conf.v)), confEf ? React.createElement("span", null, ", " + (confEf.v < 0 ? "down " : "up ") + confFmt(Math.abs(confEf.v)) + " on the " + confPeriod + (confEf.calc ? " (calculated – the release printed no change)" : "")) : null), React.createElement("p", {
+  }, React.createElement("b", null, confFmt(conf.v)), confEf != null ? React.createElement("span", null, ", " + (confEf < 0 ? "down " : "up ") + confFmt(Math.abs(confEf)) + " on the " + confPeriod) : null), React.createElement("p", {
     className: "rd-ldg-foot1"
   }, conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral." : "Index reading – 100 neutral.", conf.cond != null ? " NAB prints business conditions beside it: " + confFmt(conf.cond) + (conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : "") + "." : ""));
   const rk = (lab, v, words, ink) => React.createElement("tr", {
@@ -139601,7 +139595,7 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, confScale(false)), th("Change", "conf.chg", {
     right: true,
-    title: "Change on the gauge’s own previous release – an asterisk marks one calculated from the previous release, not printed"
+    title: "Change on the gauge’s own previous release"
   })), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
@@ -140171,13 +140165,7 @@ function RdAllPolls(P) {
     } else if (facet === "confidence") {
       const c = p.conf;
       const nab = c.vs === 0;
-      const chgEf = c.chg != null ? {
-        v: c.chg,
-        calc: false
-      } : c.chgCalc != null ? {
-        v: c.chgCalc,
-        calc: true
-      } : null;
+      const chgEf = c.chg != null ? c.chg : c.chgCalc != null ? c.chgCalc : null;
       figs = React.createElement("span", {
         role: "cell",
         className: "rd-ap-fig"
@@ -140187,7 +140175,7 @@ function RdAllPolls(P) {
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": p.client + ", " + confFig(c.v) + (chgEf ? ", " + confChg(chgEf.v) + " on the gauge’s previous release" + (chgEf.calc ? ", calculated - the release printed no change" : "") : "") + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
+        "aria-label": p.client + ", " + confFig(c.v) + (chgEf != null ? ", " + confChg(chgEf) + " on the gauge’s previous release" : "") + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
       }, React.createElement("span", {
         className: "rd-ap-in"
       }, [60, 80].map(v => React.createElement("i", {
@@ -140208,17 +140196,14 @@ function RdAllPolls(P) {
           background: confInk(c)
         }
       })));
-      const chgInk = !chgEf || Math.abs(chgEf.v) < 0.05 ? null : chgEf.v > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
+      const chgInk = chgEf == null || Math.abs(chgEf) < 0.05 ? null : chgEf > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
       val = React.createElement("span", {
         role: "cell",
         className: "rd-ap-val",
         style: chgInk ? {
           color: chgInk
-        } : null,
-        title: chgEf && chgEf.calc ? "Calculated from the gauge’s previous release - the release printed no change" : undefined
-      }, chgEf ? React.createElement(React.Fragment, null, confChg(chgEf.v), chgEf.calc ? React.createElement("sup", {
-        "aria-hidden": "true"
-      }, "*") : null) : "—");
+        } : null
+      }, chgEf != null ? confChg(chgEf) : "—");
       right1 = React.createElement("b", null, confFig(c.v));
       right2 = nab ? React.createElement("span", {
         className: "rd-ap-sub"
@@ -140227,11 +140212,11 @@ function RdAllPolls(P) {
         className: "rd-ap-cpic"
       }, pic), React.createElement("div", {
         className: "rd-ap-csub"
-      }, chgEf ? React.createElement(React.Fragment, null, "Change ", React.createElement("b", {
+      }, chgEf != null ? React.createElement(React.Fragment, null, "Change ", React.createElement("b", {
         style: chgInk ? {
           color: chgInk
         } : null
-      }, confChg(chgEf.v)), " on last release", chgEf.calc ? " (calculated)" : null) : c.first ? "The gauge’s first release this term" : "Change not printed"));
+      }, confChg(chgEf)), " on last release") : c.first ? "The gauge’s first release this term" : "Change not printed"));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",

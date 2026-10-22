@@ -1,22 +1,23 @@
 /* Probe (run: node .matilda/probe/conf-chgcalc.mjs; PAGE=http://… to load
    the webfonts): the Confidence facet's calculated-change fallback (user
-   call 2026-10-22, "push when fixed").
+   call 2026-10-22, "push when fixed"; display call 2026-10-23,
+   "invisible to the user").
 
    Roy Morgan's "virtually unchanged" consumer waves print no numeric
    change, so the facet's printed-only law showed "Change not printed" on
    the 2026-10-20 release (67.7, versus 68.0 the wave before). gen-data
-   now emits chgCalc (figure minus the lane's previous term release) and
-   every surface shows it FLAGGED calculated, never as the house's print:
-   1. desktop (?f=c): the 2026-10-20 consumer row draws "−0.3" with an
-      asterisk and the calculated tooltip, the 2026-10-13 printed wave
-      (68, +0.9) stays unmarked, the lane's chgCalc row count matches the
-      dataset's, and the Change head's title explains the asterisk
+   emits chgCalc (figure minus the lane's previous term release) and every
+   surface shows it EXACTLY AS A PRINTED MOVE — no asterisk, no tooltip,
+   no aria suffix, no "(calculated)" flag anywhere:
+   1. desktop (?f=c): the 2026-10-20 consumer row draws "−0.3" bare (no
+      asterisk, no title), the strip's aria names no calculation, the
+      2026-10-13 printed wave (68, +0.9) renders identically in form, and
+      the Change head's title is the plain pre-flag one
    2. phone (390): the newest ANZ–Roy Morgan card's sub reads
-      "Change −0.3 on last release (calculated)", the +0.9 card has no
-      marker, and a first-release row keeps "first release" copy elsewhere
-   3. the opened detail's ledger line carries
-      "(calculated – the release printed no change)" on the 20 Oct wave
-      and the bare printed clause on the +0.9 wave */
+      "Change −0.3 on last release" unflagged, like the +0.9 card
+   3. the opened detail's ledger line carries the bare "down 0.3 on the
+      week" clause, identical in form to a printed move, with no
+      calculated clause — and "Change not printed" appears nowhere */
 import puppeteer from "puppeteer-core";
 import path from "path";
 import process from "process";
@@ -68,34 +69,35 @@ let rs = await rows(".rd-ap-pic");
 const latest = rs.find((x) => x.aria.startsWith("Consumer confidence, 67.7"));
 check(!!latest, "the 2026-10-20 consumer row (67.7) is on the table");
 if (latest) {
-  check(/−0\.3/.test(latest.val || "") && latest.hasSup, `20 Oct cell: −0.3 with the asterisk (${JSON.stringify(latest.val)})`);
-  check(latest.valTitle === "Calculated from the gauge’s previous release - the release printed no change", "20 Oct cell carries the calculated tooltip");
-  check(latest.aria.includes("calculated - the release printed no change"), "20 Oct strip aria names the change calculated");
+  check(/^−0\.3$/.test((latest.val || "").trim()) && !latest.hasSup, `20 Oct cell: −0.3 bare, no asterisk (${JSON.stringify(latest.val)})`);
+  check(!latest.valTitle, "20 Oct cell carries no title");
+  check(/−0\.3/.test(latest.aria) && !latest.aria.includes("calculated") && latest.aria.includes("on the gauge’s previous release"),
+    "20 Oct strip aria names the change, no calculated rider");
 }
 const printed = rs.find((x) => x.aria.startsWith("Consumer confidence, 68,"));
 check(!!printed, "the 2026-10-13 consumer row (68) is on the table");
 if (printed) {
-  check(/\+0\.9/.test(printed.val || "") && !printed.hasSup, `13 Oct cell: +0.9 unmarked (${JSON.stringify(printed.val)})`);
-  check(!printed.valTitle && !printed.aria.includes("calculated"), "13 Oct keeps its printed-change face");
+  check(/^\+0\.9$/.test((printed.val || "").trim()) && !printed.hasSup, `13 Oct cell: +0.9 bare (${JSON.stringify(printed.val)})`);
+  check(!printed.valTitle && !printed.aria.includes("calculated"), "13 Oct's face is the same bare form");
 }
-const calcN = rs.filter((x) => x.aria.includes("calculated -")).length;
 const supN = rs.filter((x) => x.hasSup).length;
-console.log(`     consumer lane: ${rs.length} rows, ${calcN} calculated by aria, ${supN} by asterisk`);
-check(calcN > 0 && calcN === supN, "every calculated aria is asterisked and vice versa");
+const markN = rs.filter((x) => x.hasSup || x.valTitle || (x.aria || "").includes("calculated")).length;
+console.log(`     consumer lane: ${rs.length} rows, ${supN} asterisked, ${markN} carrying any calculated tell`);
+check(markN === 0, "no confidence row carries a calculated tell");
 const thTitle = await page.evaluate(() => {
   const b = [...document.querySelectorAll(".rd-ap-th")].find((x) => x.textContent.includes("Change"));
   return b ? b.title : null;
 });
-check(/an asterisk marks one calculated/.test(thTitle || ""), "Change head explains the asterisk");
+check(thTitle === "Change on the gauge’s own previous release", `Change head's title is the plain one (${JSON.stringify(thTitle)})`);
 
 /* 2. the phone card */
 console.log("== 2. phone card (390, ?f=c) ==");
 await open(390);
 rs = await rows(".rd-ap-pic");
 const pLatest = rs.find((x) => x.aria.startsWith("Consumer confidence, 67.7"));
-check(!!pLatest && /Change\s+−0\.3\s+on last release \(calculated\)/.test(pLatest.sub || ""), `newest card sub: "…(calculated)" (${JSON.stringify(pLatest && pLatest.sub)})`);
+check(!!pLatest && /Change\s+−0\.3\s+on last release$/.test((pLatest.sub || "").trim()), `newest card sub: bare "Change −0.3 on last release" (${JSON.stringify(pLatest && pLatest.sub)})`);
 const pPrinted = rs.find((x) => x.aria.startsWith("Consumer confidence, 68,"));
-check(!!pPrinted && /Change\s+\+0\.9\s+on last release$/.test((pPrinted.sub || "").trim()), `printed card sub unmarked (${JSON.stringify(pPrinted && pPrinted.sub)})`);
+check(!!pPrinted && /Change\s+\+0\.9\s+on last release$/.test((pPrinted.sub || "").trim()), `printed card sub, the identical form (${JSON.stringify(pPrinted && pPrinted.sub)})`);
 const firsts = rs.filter((x) => /first release/.test(x.sub || "")).length;
 check(firsts <= 1, `at most one first-release row stands (${firsts})`);
 const notPrinted = rs.filter((x) => /Change not printed/.test(x.sub || "")).length;
@@ -107,13 +109,13 @@ await open(1280);
 check(await openRow("Consumer confidence, 67.7"), "20 Oct row opens");
 await sleep(700);
 let conf = await page.evaluate(() => (document.querySelector(".rd-ldg-conf") || {}).textContent || null);
-check(!!conf && /down 0\.3/.test(conf) && conf.includes("(calculated – the release printed no change)"), `20 Oct ledger flags the calculated fall (${JSON.stringify(conf)})`);
+check(!!conf && /down 0\.3 on the week/.test(conf) && !conf.includes("calculated") && !conf.includes("printed"), `20 Oct ledger: the bare calculated fall (${JSON.stringify(conf)})`);
 await openRow("Consumer confidence, 67.7"); /* close it */
 await sleep(400);
 check(await openRow("Consumer confidence, 68,"), "13 Oct row opens");
 await sleep(700);
 conf = await page.evaluate(() => (document.querySelector(".rd-ldg-conf") || {}).textContent || null);
-check(!!conf && /up 0\.9/.test(conf) && !conf.includes("calculated"), `13 Oct ledger reads the bare printed rise (${JSON.stringify(conf)})`);
+check(!!conf && /up 0\.9 on the week/.test(conf) && !conf.includes("calculated"), `13 Oct ledger: the same bare form on the printed rise (${JSON.stringify(conf)})`);
 
 await browser.close();
 console.log(fails ? `FAIL (${fails})` : "ALL CHECKS PASSED");
