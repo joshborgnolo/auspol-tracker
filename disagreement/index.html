@@ -110852,6 +110852,8 @@ function NextPollTicker({
     const settle = setTimeout(compute, 420);
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(compute) : null;
     if (ro && el.parentElement) ro.observe(el.parentElement);
+    const setEl = el.parentElement && el.parentElement.querySelector(".tabs-set");
+    if (ro && setEl) ro.observe(setEl);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
     return () => {
       cancelAnimationFrame(raf);

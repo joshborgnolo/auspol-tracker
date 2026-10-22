@@ -244,6 +244,14 @@ function NextPollTicker({ showScore }) {
     const settle = setTimeout(compute, 420);
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(compute) : null;
     if (ro && el.parentElement) ro.observe(el.parentElement);
+    /* the tab set itself: a ☰ menu page opened by its number key or the
+       menu joins the set as a tab of its own ("Preference flows explained"
+       is ~190px), which moves the set's edge without resizing the row -
+       the strip kept its old count and drew over the new tab (user report
+       2026-10-23). The pin's condense is a transform, so it never fires
+       this; only real width changes do. */
+    const setEl = el.parentElement && el.parentElement.querySelector(".tabs-set");
+    if (ro && setEl) ro.observe(setEl);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
     return () => { cancelAnimationFrame(raf); clearTimeout(settle); if (ro) ro.disconnect(); };
   }, [itemsKey, showScore]);
