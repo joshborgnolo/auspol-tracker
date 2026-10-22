@@ -8579,6 +8579,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "elections": 10,
         "minClassic": 40,
         "fedEst": [1984, 1987, 1990, 1993],
+        "vicstop": null,
         "grn": {
           "model": 1.4,
           "replay": 5.3
@@ -54574,6 +54575,29 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "sameSideImp": false,
       "worstImp": 2.5
     }, {
+      "year": 1977,
+      "eDate": "1977-12-10",
+      "result": 45.4,
+      "mean": 50.9,
+      "err": 5.5,
+      "absErr": 5.5,
+      "houses": [{
+        "firm": "Roy Morgan",
+        "date": "1977-11-20",
+        "alp2pp": 50.9,
+        "err": 5.5,
+        "alp2ppImp": 50.9,
+        "errImp": 5.5
+      }],
+      "n": 1,
+      "sameSide": false,
+      "worst": 5.5,
+      "meanImp": 50.9,
+      "errImp": 5.5,
+      "absErrImp": 5.5,
+      "sameSideImp": false,
+      "worstImp": 5.5
+    }, {
       "year": 1980,
       "eDate": "1980-10-18",
       "result": 49.6,
@@ -55280,7 +55304,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }],
     "firms": [{
       "firm": "Roy Morgan",
-      "n": 22,
+      "n": 23,
       "cycles": [{
         "year": 1946,
         "err": 0.7
@@ -55302,6 +55326,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       }, {
         "year": 1975,
         "err": -2.5
+      }, {
+        "year": 1977,
+        "err": 5.5
       }, {
         "year": 1980,
         "err": 1.4
@@ -55348,8 +55375,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "year": 2025,
         "err": -2.2
       }],
-      "meanErr": 0.7,
-      "meanAbs": 1.8
+      "meanErr": 0.9,
+      "meanAbs": 2
     }, {
       "firm": "Newspoll",
       "n": 12,
@@ -55626,7 +55653,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }],
     "firmsImp": [{
       "firm": "Roy Morgan",
-      "n": 22,
+      "n": 23,
       "cycles": [{
         "year": 1946,
         "err": 0.7
@@ -55648,6 +55675,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       }, {
         "year": 1975,
         "err": -2.5
+      }, {
+        "year": 1977,
+        "err": 5.5
       }, {
         "year": 1980,
         "err": 1.4
@@ -55694,8 +55724,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "year": 2025,
         "err": -2
       }],
-      "meanErr": 0.5,
-      "meanAbs": 1.6
+      "meanErr": 0.7,
+      "meanAbs": 1.8
     }, {
       "firm": "Newspoll",
       "n": 12,
@@ -55970,31 +56000,31 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "meanErr": -4,
       "meanAbs": 4
     }],
-    "meanAbs": 1.3,
-    "meanAbsImp": 1.3,
+    "meanAbs": 1.5,
+    "meanAbsImp": 1.4,
     "worstCycle": {
-      "year": 1984,
-      "eDate": "1984-12-01",
-      "result": 51.8,
-      "mean": 55,
-      "err": 3.2,
-      "absErr": 3.2,
+      "year": 1977,
+      "eDate": "1977-12-10",
+      "result": 45.4,
+      "mean": 50.9,
+      "err": 5.5,
+      "absErr": 5.5,
       "houses": [{
         "firm": "Roy Morgan",
-        "date": "1984-11-18",
-        "alp2pp": 55,
-        "err": 3.2,
-        "alp2ppImp": 55,
-        "errImp": 3.2
+        "date": "1977-11-20",
+        "alp2pp": 50.9,
+        "err": 5.5,
+        "alp2ppImp": 50.9,
+        "errImp": 5.5
       }],
       "n": 1,
       "sameSide": false,
-      "worst": 3.2,
-      "meanImp": 55,
-      "errImp": 3.2,
-      "absErrImp": 3.2,
+      "worst": 5.5,
+      "meanImp": 50.9,
+      "errImp": 5.5,
+      "absErrImp": 5.5,
       "sameSideImp": false,
-      "worstImp": 3.2
+      "worstImp": 5.5
     }
   };
   const extAgg = {
@@ -113511,7 +113541,7 @@ function AccuracyPanel() {
         term: "how-wrong-are-the-polls",
         from: "How the final polls have done"
       }
-    }, "Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election\u2019s flows, so the miss folds in drift in the flows too. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll\u2019s primaries and the preference flows of the previous election instead."));
+    }, "Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election\u2019s flows, so the miss folds in drift in the flows too. 1977 is the one exception to the ", A.windowDays, "-day window: no pollster printed within a fortnight of that election, so Morgan\u2019s final poll, twenty days out, scores it. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll\u2019s primaries and the preference flows of the previous election instead."));
   }
   return React.createElement("section", {
     className: "card acc-card",
@@ -117997,7 +118027,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Labor v One Nation contests."), " The explainer\u2019s Labor v One Nation view plots one cross per voter group per contest, and draws no line between contests, because the groups differ: Hunter\u2019s Coalition voters were Nationals, the others\u2019 Liberals. Hunter 2025 is the electoral commission\u2019s count. South Australia 2026 is this site\u2019s estimate over the ", FHB.contest.seats, " seats where One Nation faced Labor. Its bars are the misses at that size: for the Greens (\xB1", FHB.contest.err.grn.toFixed(1), ") and everyone else (\xB1", FHB.contest.err.oth.toFixed(1), "), the federal trials cut to ", FHB.contest.seats, " seats; for Liberal voters (\xB1", FHB.contest.err.lib.toFixed(1), "), the federal seats where Labor faced someone other than the Coalition, where the commission counts where Coalition voters went: the largest miss of the last ", fhWord(FHB.contest.elections), " elections. Secret Harbour 2026 is this site\u2019s estimate for the whole seat: the electoral commission\u2019s count sheets for the early voting centre (47% of the votes) give each party\u2019s voters there, and its results give the rest of the seat\u2019s first preferences and final count, so how the rest\u2019s minor-party ballots split in total is known. Dividing that between the parties is the one choice; the bars show how far the estimate moves across four ways of doing it. The site\u2019s pile model, run on the seat\u2019s full distribution without the counts, puts Liberal voters 2.7 points more Labor\u2019s way and Greens voters 6.7 points less: both beyond its tested error for a single seat where Labor faced someone other than the Coalition (2.4 and 5.0 points, nine times in ten), which is why the counts lead here.") : null, React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "What\u2019s left out."), " One Nation\u2019s estimates miss by more (", FHB.onp.model.toFixed(1), " points on average federally since 2016), so its bars run wider. An estimate also needs enough One Nation ballots behind it: at least", " ", FHB.onpMinBallots ? (Math.round(FHB.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000", ",", " ", "the smallest base the method was tested on, because on about 20,000 it missed federal counts by 4\u20135 points. New South Wales\u2019s One Nation lines are counts, so they need no such floor. The chart also leaves out counts that reached a Labor v Coalition final in fewer than ", FHB.minClassic, " seats: the Northern Territory\u2019s; Victoria\u2019s before 2022, which stopped once a candidate passed half the vote; and South Australia\u2019s in 2026, when One Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the explainer\u2019s Labor v One Nation section instead.")) : null)
+      }, React.createElement("b", null, "What\u2019s left out."), " One Nation\u2019s estimates miss by more (", FHB.onp.model.toFixed(1), " points on average federally since 2016), so its bars run wider. An estimate also needs enough One Nation ballots behind it: at least", " ", FHB.onpMinBallots ? (Math.round(FHB.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000", ",", " ", "the smallest base the method was tested on, because on about 20,000 it missed federal counts by 4\u20135 points. New South Wales\u2019s One Nation lines are counts, so they need no such floor.", FHB.vicstop ? React.createElement(React.Fragment, null, " Victoria\u2019s 2006\u20132018 counts stopped once a candidate passed half the vote, landing them below the ", FHB.minClassic, "-seat line; the estimator was then tried under that same stopping rule, missing by ", FHB.vicstop.grn.toFixed(1), " points on Greens and ", FHB.vicstop.oth.toFixed(1), " on others nine times in ten, so those years show with their own bars.") : null, "The chart also leaves out counts that reached a Labor v Coalition final in fewer than ", FHB.minClassic, " seats: the Northern Territory\u2019s; and South Australia\u2019s in 2026, when One Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the explainer\u2019s Labor v One Nation section instead.")) : null)
     }, {
       id: "fp-flows",
       term: "Labor v One Nation flows",
@@ -143593,7 +143623,7 @@ function ExplainedFlowChart({
   const copyBasis = (hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "") + (hasSolid ? (hasRing ? " " : "") + "Solid dots: every seat." : "");
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
-  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others), and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + (exhAdj ? ", so those years’ shares count each party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings." : ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither.") : "") + nswGap : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district. NSW voters may stop numbering, so each share " + (exhAdj ? "counts the party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings, and the classic-seats figure for like-for-like with the states that can count nothing else." : "is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither, and the classic-seats figure for like-for-like with the states that can count nothing else.") + noBars : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. The line starts at 1996, as far back as the per-division flow table itself reaches. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "") + markNote;
+  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2011 or 2015 (Pauline Hanson’s 2011 independent ticket sits with the Others), and a zero-ballot group draws as a gap, never a zero. Victoria’s Council used group voting tickets until 2022 — abolished from 2026 — so its flows would record the parties’ tickets, not voters’ choices; NSW’s ballot record is the only state upper-house count of voters’ own preferences." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + (exhAdj ? ", so those years’ shares count each party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings." : ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither.") : "") + nswGap : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "): every formal vote, in every district. NSW voters may stop numbering, so each share " + (exhAdj ? "counts the party’s whole vote, an exhausted paper reaching neither side — the switch under the chart turns the adjustment off; the tooltip gives both readings, and the classic-seats figure for like-for-like with the states that can count nothing else." : "is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither, and the classic-seats figure for like-for-like with the states that can count nothing else.") + noBars : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. The line starts at 1996, as far back as the per-division flow table itself reaches. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "") + markNote;
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,

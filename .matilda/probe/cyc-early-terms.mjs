@@ -8,8 +8,10 @@
    - the Trove corpus' final waves put 1946, 1951 and 1954 back into the
      accuracy record (.build/bootstrap-trove-final-waves.mjs: firm "Morgan",
      tppEra-tagged, no dateApprox; 1966/1969 stay out on month-placeholder
-     finals) at err 1946 +0.7 / 1951 −1.5 / 1954 −1.9, and 1949 scores on
-     its 1949-12-03 final;
+     finals) at err 1946 +0.7 / 1951 −1.5 / 1954 −1.9, 1949 scores on
+     its 1949-12-03 final, and 1977 joins on a 21-day window exception
+     (gen-data ACC_WINDOW_OVERRIDES: Morgan's 1977-11-20 final ran 20 days
+     out, scoring +5.5 – the record's worst cycle);
    - the source-polls CSV export marks month-placeholder dates in a
      date_approx column, fed by gen-data's dateApprox passthrough on the
      cycle-source rows;
@@ -83,12 +85,20 @@ for (const [b, date, alp, lnp, oth, era] of [
 
 const acc = grab("accuracy"), defs = grab("CYCLE_DEFS");
 const years = acc.cycles.map((c) => c.year);
-ok(acc.cycles.length === 23, `23 elections in the final-polls record (${acc.cycles.length})`);
+ok(acc.cycles.length === 24, `24 elections in the final-polls record (${acc.cycles.length})`);
 ok(![1966, 1969].some((y) => years.includes(y)), "1966/1969 month-placeholder finals are not scored");
 for (const [y, date, err] of [[1946, "1946-09-27", 0.7], [1951, "1951-04-22", -1.5], [1954, "1954-05-23", -1.9]]) {
   const c = acc.cycles.find((x) => x.year === y);
   ok(c && c.n === 1 && c.houses[0].firm === "Roy Morgan" && c.houses[0].date === date && c.houses[0].err === err,
      `${y} scores the Trove ${date} final at err ${err}`);
+}
+/* the 21-day 1977 exception (ACC_WINDOW_OVERRIDES): Morgan's last wave ran
+   20 days before polling day, so the standard 14-day net starved the cycle */
+{
+  const c = acc.cycles.find((x) => x.year === 1977);
+  ok(c && c.n === 1 && c.houses[0].firm === "Roy Morgan" && c.houses[0].date === "1977-11-20"
+       && c.houses[0].err === 5.5 && c.err === 5.5 && acc.worstCycle.year === 1977,
+     "1977 scores Morgan's 20-Nov wave at +5.5 under the 21-day exception, the record's worst cycle");
 }
 ok(years.includes(1949) && acc.cycles.find((c) => c.year === 1949).houses[0].date === "1949-12-03", "1949 scores on its 1949-12-03 final");
 const datesScored = new Set(acc.cycles.flatMap((c) => c.houses.map((h) => c.year + "|" + h.date)));

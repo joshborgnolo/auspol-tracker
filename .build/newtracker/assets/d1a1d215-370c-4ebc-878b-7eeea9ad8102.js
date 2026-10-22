@@ -2914,7 +2914,7 @@ function cycleSourceRows(cycles, D) {
 
 /* ---- How the final polls have done ------------------------------------------
    Everywhere else the page can only describe how far the polls disagree with
-   EACH OTHER. Twenty-three past elections are the one place a poll can be checked
+   EACH OTHER. Twenty-four past elections are the one place a poll can be checked
    against the thing it was estimating, so this is the only honest answer to
    "should I believe the number at the top of this page".
    Pre-1993 rows score Morgan's implied last-election-flows 2PP (FLOW_ERAS),
@@ -3225,7 +3225,7 @@ function AccuracyPanel() {
           ))}
         </div>
         <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls have done" }}>
-          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
+          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too. 1977 is the one exception to the {A.windowDays}-day window: no pollster printed within a fortnight of that election, so Morgan’s final poll, twenty days out, scores it. Published two-party scores each final poll against the two-party figure it printed; Primaries on last-election flows re-derives a figure from the poll’s primaries and the preference flows of the previous election instead.
         </RdFoot>
       </RdSec>
     );
@@ -7842,9 +7842,14 @@ function infoTerms(D) {
             {" "}{FHB.onpMinBallots ? (Math.round(FHB.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000"},
             {" "}the smallest base the method was tested on, because on about 20,000 it missed federal
             counts by 4&ndash;5 points. New South Wales&rsquo;s One Nation lines are counts, so they
-            need no such floor. The chart also leaves out counts that reached a Labor v Coalition final in fewer
-            than {FHB.minClassic} seats: the Northern Territory’s; Victoria’s before 2022, which
-            stopped once a candidate passed half the vote; and South Australia’s in 2026, when One
+            need no such floor.
+            {FHB.vicstop ? <> Victoria’s 2006&ndash;2018 counts stopped once a candidate passed half the
+            vote, landing them below the {FHB.minClassic}-seat line; the estimator was then tried under
+            that same stopping rule, missing by {FHB.vicstop.grn.toFixed(1)} points on Greens
+            and {FHB.vicstop.oth.toFixed(1)} on others nine times in ten, so those years show with their
+            own bars.</> : null}
+            The chart also leaves out counts that reached a Labor v Coalition final in fewer
+            than {FHB.minClassic} seats: the Northern Territory’s; and South Australia’s in 2026, when One
             Nation, not the Liberals, faced Labor in most seats. Those 2026 contests appear in the
             explainer’s Labor v One Nation section instead.</span>
           </>) : null}</>) },
