@@ -4813,9 +4813,12 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    Shown (user calls 2026-10-20): elections whose counts reached a Labor v
    Coalition final in at least STATE_MIN_CLASSIC seats (classicFrom marks
    where a counted line's classic-seats sidecar begins) – smaller counts'
-   errors run wider: the Northern Territory's, Victoria's to 2018 (stopped
-   once a candidate passed half the vote) and South Australia's 2026 (13
-   Labor v Liberal finals among 25 Labor v One Nation ones). One Nation's
+   errors run wider: the Northern Territory's and South Australia's 2026
+   (13 Labor v Liberal finals among 25 Labor v One Nation ones). Victoria's
+   2006-18 counts, stopped once a candidate passed half the vote, run
+   26-32 classic seats – under their own floor STATE_MIN_CLASSIC_JUR.vic,
+   their error measured at that size under the same stopping rule (the
+   estimator's vicstop band, user call 2026-10-23). One Nation's
    line (user call 2026-10-20): a COUNT is always drawn (NSW: every ballot
    counted, whatever One Nation's share); an ESTIMATE only where at least
    the backtest's onp_min_ballots One Nation ballots stand behind it – the
@@ -4827,6 +4830,12 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    headline figures for the Info entry. Federal-only: the Vic build reads
    neither file and carries the federal series alone. */
 const STATE_MIN_CLASSIC = 40;
+// per-jurisdiction floors (user call 2026-10-23): Victoria's 2006-18 counts
+// stopped once a candidate passed half the vote, so its classic counts run
+// 26-32; their error was measured under that same stopping rule (the
+// estimator's vicstop band, 24-34 seats), which the random-seat grid never
+// reaches down to - so vic shows at the band's own floor
+const STATE_MIN_CLASSIC_JUR = { vic: 24 };
 const STATE_BUCKETS = ["grn", "onp", "oth"];
 const flowHistory = (() => {
   const h = { fed: { label: "Federal", elections: "Australian federal elections", years: FLOW_HISTORY.years, grn: FLOW_HISTORY.grn, onp: FLOW_HISTORY.onp, oth: FLOW_HISTORY.oth } };
@@ -4981,7 +4990,8 @@ const flowHistory = (() => {
   lines.forEach((ln) => {
     const c = ln.split(",");
     const jur = c[ci.jurisdiction], year = +c[ci.year], b = c[ci.party];
-    if (!JURIS[jur] || +c[ci.n_classic] < STATE_MIN_CLASSIC || !STATE_BUCKETS.includes(b)) return;
+    const minCl = STATE_MIN_CLASSIC_JUR[jur] || STATE_MIN_CLASSIC;
+    if (!JURIS[jur] || +c[ci.n_classic] < minCl || !STATE_BUCKETS.includes(b)) return;
     // NSW's rows are COUNTS (method "counted": ballot-level data) and carry
     // no error; every estimate must carry its calibrated one
     const counted = c[ci.method] === "counted";
@@ -5071,6 +5081,14 @@ const flowHistory = (() => {
   h.fed.backtest = {
     elections: Object.keys(bt.federal || {}).length, minClassic: STATE_MIN_CLASSIC,
     fedEst: h.fed.estYears || null,
+    /* vic's stop-rule band (the 2026-10-23 call's measurement): the
+       estimator's vicstop block, so the Info entry can quote the error
+       measured under the VEC's own stopping rule at Vic-sized counts */
+    vicstop: bt.vicstop && bt.vicstop.grn ? {
+      grn: bt.vicstop.grn.p90, oth: bt.vicstop.oth ? bt.vicstop.oth.p90 : null,
+      onp: bt.vicstop.onp ? bt.vicstop.onp.p90 : null,
+      band: (bt.vicstop.band && bt.vicstop.band.band) || null,
+    } : null,
     grn: { model: mae("grn", "model"), replay: mae("grn", "replay") },
     oth: { model: mae("oth", "model"), replay: mae("oth", "replay") },
     onp: { model: mae("onp", "model", 2016), replay: mae("onp", "replay", 2016) },
@@ -6808,8 +6826,13 @@ function sparseSeries(points, months, cap) {
    single-house era's miss folds poll error and flow-constant drift into one
    figure. Essential's undecided-inclusive pair is normalised
    first, the same way the trend series normalises it, or its 48/47 would score
-   as a 4-point miss that is really an arithmetic difference. */
+   as a 4-point miss that is really an arithmetic difference. 1977 is the one
+   exception to the window: F2F Morgan went quiet after its 20 November wave,
+   twenty days before polling day, so the cycle scores that wave under a
+   21-day net rather than dropping the only election the standard window
+   starves. */
 const ACC_WINDOW_DAYS = 14;
+const ACC_WINDOW_OVERRIDES = { 1977: 21 };
 /* Same operation, renamed on the letterhead. Only renames go in here - Galaxy
    and YouGov are NOT merged, because merging houses to build one longer record
    is a claim about continuity of method that this table is in no position to
@@ -6823,6 +6846,7 @@ const accCanon = (f) => ACC_CANON[f] || f;
 const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
   const e = ELECTIONS["e" + c.src];
   const eMs = new Date(e.date).getTime();
+  const winDays = ACC_WINDOW_OVERRIDES[c.src] || ACC_WINDOW_DAYS;
   const inWindow = (cyclePolls[c.src] || []).filter((p) => {
     if (p.firm === "Election" || /exit/i.test(p.firm)) return false;
     if (p.tpp_alp == null) return false;
@@ -6830,7 +6854,7 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
     // inside a 14-day window: "May 1954" may have been fielded on the 2nd
     if (p.dateApprox) return false;
     const d = ddays(eMs, new Date(p.date).getTime());
-    return d >= 0 && d <= ACC_WINDOW_DAYS;
+    return d >= 0 && d <= winDays;
   });
   const byHouse = new Map();
   for (const p of [...inWindow].sort((a, b) => a.date.localeCompare(b.date)))

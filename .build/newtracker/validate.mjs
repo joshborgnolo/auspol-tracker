@@ -1048,18 +1048,20 @@ export function validateEssDirectionGroups() {
 }
 
 /* data/redbridge-direction-groups.json – RedBridge/Accent's AFR data-table
-   statement national-direction breakdowns, hand-entered verbatim from
-   the council-accepted methodology PDFs behind the poll rows' methodUrl.
-   Shape + plausibility + reconciliation: every wave key is an ISO day on
-   which polls.json has a RedBridge/Accent direction[] row; the wave's
-   printed all-voters total must reconcile exactly with that row's
-   right/wrong and its unsure (row's remainder); every printed cell is
-   a {r,w,u} triple whose elements are 0–100 and sum to 100±1 (the
-   tables print integers); only the three wave dates the statements
-   carry the section for (2025-11-13, 2026-01-29, 2026-05-28) may
-   appear – the rest print no direction table. The June-2025 direction
-   row's provenance is the November statement's trend figure, not a
-   table, so it has no wave here. */
+   statement national-direction breakdowns, machine-banked by
+   .build/extract-redbridge-direction.mjs from the committed statement
+   texts (the council-accepted methodology PDFs behind the poll rows'
+   methodUrl). Shape + plausibility + reconciliation: every wave key is
+   an ISO day on which polls.json has a RedBridge/Accent direction[]
+   row; the wave's printed all-voters total must reconcile exactly with
+   that row's right/wrong and its unsure (row's remainder); every
+   printed cell is a {r,w,u} triple whose elements are 0–100 and sum to
+   100±1 (the tables print integers). There is no wave-date roster: the
+   extractor's own guard chain (a printed section ⇒ the row exists and
+   matches; a recorded store wave re-reads figure for figure) is the
+   coverage contract, so a newly printed section validates the moment it
+   lands. The June-2025 direction row's provenance is the November
+   statement's trend figure, not a table, so it has no wave here. */
 export function validateRbDirectionGroups() {
   const errors = [];
   const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
@@ -1072,13 +1074,11 @@ export function validateRbDirectionGroups() {
   }
   const P = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const rbDirByDate = new Map((P.direction || []).filter((d) => d.pollster === "RedBridge/Accent").map((d) => [d.date, d]));
-  const KNOWN = new Set(["2025-11-13", "2026-01-29", "2026-05-28"]);
   const ALLOWED_DIMS = new Set(["vote", "softness", "income", "ownership", "stress", "generation", "gender", "location", "religion", "education", "language", "birthplace"]);
   for (const [date, wave] of Object.entries(S.waves)) {
     const where = `redbridge-direction-groups ${date}`;
     if (!ISO_DAY.test(date)) fail(where, "date-format", `date "${date}" is not YYYY-MM-DD`);
     if (!wave || typeof wave !== "object") { fail(where, "rb-direction-groups-shape", "wave is not an object"); continue; }
-    if (!KNOWN.has(date)) fail(where, "coverage", `wave ${date} is not one of the statements' three direction-table dates`);
     const row = rbDirByDate.get(date);
     if (!row) fail(where, "provenance", `no RedBridge/Accent direction[] row on ${date}`);
     if (!wave.src || typeof wave.src !== "object" || typeof wave.src.url !== "string" || typeof wave.src.tables !== "string")
@@ -1105,9 +1105,6 @@ export function validateRbDirectionGroups() {
           fail(w2, "total", `r+w+u ${cell.r + cell.w + cell.u} out by more than 1`);
       }
     }
-  }
-  for (const k of KNOWN) {
-    if (!S.waves[k]) fail("redbridge-direction-groups.json", "coverage", `statement wave ${k} is missing`);
   }
   return errors;
 }

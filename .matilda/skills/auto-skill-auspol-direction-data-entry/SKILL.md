@@ -1,6 +1,6 @@
 ---
 name: auspol-direction-data-entry
-description: auspol-tracker — hand-entering a ONE-OFF national-direction (right direction/wrong track) reading for a house with no direction pipeline. direction[] rows live in data/polls.json (date-sorted), pollster string must byte-match the poll row for the POLL_BY_KEY sample join, and the built index.html data block is PRETTY-PRINTED multi-line JSON so one-line greps fail — parse the block.
+description: auspol-tracker — hand-entering a ONE-OFF national-direction (right direction/wrong track) reading for a house with no direction pipeline. direction[] rows live in data/polls.json (date-sorted), pollster string must byte-match the poll row for the POLL_BY_KEY sample join, and the built index.html data block is PRETTY-PRINTED multi-line JSON so one-line greps fail — parse the block. NOTE 2026-10-23: RedBridge/Accent is NO LONGER hand-entry — extract-redbridge-direction.mjs files its rows from the statement caches; never hand-add an RB row.
 source: auto-skill
 extracted_at: '2026-09-28T04:54:02.149Z'
 ---
@@ -8,9 +8,21 @@ extracted_at: '2026-09-28T04:54:02.149Z'
 # Hand-entering a national-direction reading
 
 Worked 2026-09-28: RedBridge/Accent's one-off 25–28 May 2026 direction wave
-(25 right / 63 wrong / 12 unsure). The National-direction panel's data is
-NOT wired to any RedBridge extractor — a house that asks the question once
-gets a hand-entered row.
+(25 right / 63 wrong / 12 unsure). ~~The National-direction panel's data is
+NOT wired to any RedBridge extractor~~ — SINCE 2026-10-23 it IS:
+`.build/extract-redbridge-direction.mjs` sweeps the committed statement
+caches (`.build/redbridge-src/<slug>.{json,txt}`) and files BOTH the
+headline `direction[]` rows and the breakdown store from the printed
+direction tables (warn-only pass in redbridge-updater.sh before the
+changed:false early-exit; the CI twin rides the same wrapper). RedBridge
+rows are now machine-owned — never hand-add or hand-edit one (the
+extractor's reconcile guard treats any drift between a committed row and
+the committed cache as exit 2). The one RB row it never touches is the
+June-2025 legacy (2025-06-30: no statement cache covers it; provenance is
+the November statement's trend figure). Everything below still applies to
+the genuinely hand-entered houses. (This skill covers HEADLINE `direction[]`
+rows; for the per-house GROUP-BREAKDOWN stores and which houses fill them
+automatically, see auspol-direction-groups-stores.)
 
 ## Where the data lives
 
@@ -40,9 +52,10 @@ insertion convention as every other array in the file). Row schema:
   Roy Morgan's arrive from `extract-roymorgan.mjs`'s prose-parse direction
   leg (~:263-280, row built ~:434-442 with `unsure = 100−right−wrong`
   rounded to halves, merged at ~:480; `dirPairMissing` warns when the
-  sentence vanishes). Spectre/Freshwater/RedBridge one-offs land here by
-  hand. SEC Newgate (no-VI house) has its own pipeline design — see
-  secnewgate-extraction.
+  sentence vanishes). RedBridge/Accent's arrive from
+  `extract-redbridge-direction.mjs` (see the skill head; 2026-10-23).
+  Spectre/Freshwater one-offs land here by hand. SEC Newgate (no-VI house)
+  has its own pipeline design — see secnewgate-extraction.
 
 ## Constraints (validate.mjs gates)
 

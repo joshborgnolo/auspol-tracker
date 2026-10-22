@@ -86,48 +86,57 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
 }
 
 // ---- directionGroups: the merged group set --------------------------------
+// The expected key/house sets are DERIVED from the committed stores below,
+// never hand-listed: automation banks new waves as the statements print
+// them, so this walks the stores with the panel's own label maps instead of
+// pinning a count that a routine fourth statement wave would rightly break.
 const dg = D.directionGroups;
 assert.ok(dg, "directionGroups emitted");
+const RM_VOTE_LABEL = {
+  "One Nation": "One Nation voters", "L-NP": "Coalition voters",
+  Other: "Other party voters", Independent: "Independent voters",
+  Greens: "Greens voters", ALP: "Labor voters",
+};
+const RB_LABEL = {
+  "Labor": "Labor voters", "Coalition": "Coalition voters",
+  "Liberal": "Liberal voters", "CLP/LNP/Nat": "CLP/LNP/Nat voters",
+  "One Nation": "One Nation voters", "Greens": "Greens voters",
+  "Other parties and candidates": "Other voters",
+  "Undecided / will not vote": "Undecided voters",
+  "Solid": "Solid voters", "Soft": "Soft voters", "Very soft": "Very soft voters",
+};
+const RB_SURFACED = new Set(["vote", "softness", "generation", "gender", "location", "education", "ownership"]);
+const STORE_READ = (f) => JSON.parse(readFileSync(path.join(ROOT, "data", f), "utf8"));
+const rmStore = STORE_READ("roymorgan-direction-groups.json");
+const essStore = STORE_READ("essential-direction-groups.json");
+const rbStore = STORE_READ("redbridge-direction-groups.json");
+const expectHousesOf = new Map(); // label -> Set(houses) that print the cut
+const expectHouse = (label, house) => {
+  const s = expectHousesOf.get(label) ?? new Set();
+  s.add(house);
+  expectHousesOf.set(label, s);
+};
+for (const w of Object.values(essStore.waves))
+  for (const k of Object.keys(w))
+    if (!["total", "dirRow", "ym", "csv"].includes(k)) expectHouse(k, "Essential");
+for (const w of Object.values(rmStore.waves)) {
+  if (w.gender) { expectHouse("Men", "Roy Morgan"); expectHouse("Women", "Roy Morgan"); }
+  for (const k of Object.keys(w.vote ?? {})) expectHouse(RM_VOTE_LABEL[k], "Roy Morgan");
+}
+for (const [date, w] of Object.entries(rbStore.waves))
+  for (const [dim, cells] of Object.entries(w.dims ?? {}))
+    if (RB_SURFACED.has(dim))
+      for (const printed of Object.keys(cells)) expectHouse(RB_LABEL[printed] || printed, "RedBridge/Accent");
 {
-  const EXPECT = [
-    // gender (all three houses)
-    "Men", "Women",
-    // age (Essential only)
-    "18–34", "35–54", "55+",
-    // vote (Roy Morgan only)
-    "Other party voters", "Independent voters",
-    // vote (Roy Morgan and RedBridge/Accent share these four)
-    "One Nation voters", "Coalition voters", "Greens voters", "Labor voters",
-    // vote (RedBridge/Accent only)
-    "Liberal voters", "CLP/LNP/Nat voters", "Other voters", "Undecided voters",
-    // softness (RedBridge/Accent only)
-    "Solid voters", "Soft voters", "Very soft voters",
-    // generation (RedBridge/Accent only)
-    "Gen-Z", "Millennials", "Gen-X", "Baby Boomers",
-    // location (RedBridge/Accent only)
-    "Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural",
-    // education (RedBridge/Accent only)
-    "Less than year 12", "Year 12 or equivalent", "TAFE, trade or vocational", "University degree",
-    // ownership (RedBridge/Accent only)
-    "Owned outright", "Owned with a mortgage", "Renting and other",
-  ];
+  const EXPECT = [...expectHousesOf.keys()];
   assert.deepEqual(Object.keys(dg).sort(), EXPECT.slice().sort(),
-    "one merged key per cut");
+    "one merged key per cut the stores carry");
+  for (const [label, houses] of expectHousesOf)
+    assert.deepEqual(dg[label].houses, [...houses].sort(), `${label}: houses are exactly the stores that print it`);
   assert.deepEqual(dg.Men.houses, ["Essential", "RedBridge/Accent", "Roy Morgan"],
-    "Men's gender pair pools all three");
+    "fixture sanity: Men's gender pair pools all three");
   assert.deepEqual(dg.Women.houses, ["Essential", "RedBridge/Accent", "Roy Morgan"],
-    "Women's gender pair pools all three");
-  assert.deepEqual(dg["18–34"].houses, ["Essential"], "the age bands are Essential's alone");
-  assert.deepEqual(dg["55+"].houses, ["Essential"], "the age bands are Essential's alone");
-  for (const k of ["Other party voters", "Independent voters"])
-    assert.deepEqual(dg[k].houses, ["Roy Morgan"], `${k}: every-house merge`);
-  for (const k of ["One Nation voters", "Coalition voters", "Greens voters", "Labor voters"])
-    assert.deepEqual(dg[k].houses, ["RedBridge/Accent", "Roy Morgan"],
-      `${k}: the two houses' vote rows merge onto the shared label`);
-  for (const k of ["Liberal voters", "CLP/LNP/Nat voters", "Other voters", "Undecided voters"])
-    assert.deepEqual(dg[k].houses, ["RedBridge/Accent"], `${k}: no paired print in anyone else`);
-  for (const [k, dim] of [["Solid voters", "softness"], ["Gen-Z", "generation"], ["Inner Metropolitan", "location"], ["Less than year 12", "education"], ["Owned outright", "ownership"]])
-    assert.deepEqual(dg[k].houses, ["RedBridge/Accent"], `${k}: ${dim} is RedBridge's own print`);
+    "fixture sanity: Women's gender pair pools all three");
   for (const g of Object.values(dg)) {
     assert.ok(["gender", "age", "vote", "softness", "generation", "location", "education", "ownership"].includes(g.dim),
       `${g.label}: the panel's taxonomy`);
@@ -144,14 +153,13 @@ assert.ok(dg, "directionGroups emitted");
     assert.equal(dg[k].sized, true, `${k}: sized`);
   for (const k of Object.keys(dg).filter((k) => !SIZED.includes(k)))
     assert.equal(dg[k].sized, false, `${k}: no base printed, no margin`);
-  console.log("directionGroups (set): OK");
+  console.log(`directionGroups (set, ${EXPECT.length} derived keys): OK`);
 }
 
 // ---- directionGroups: raw dots are the wave's own gap, headline-anchored ---
 {
   const polls = JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const rmRows = new Map((polls.direction || []).filter((d) => d.pollster === "Roy Morgan").map((d) => [d.date, d]));
-  const rmStore = JSON.parse(readFileSync(path.join(ROOT, "data", "roymorgan-direction-groups.json"), "utf8"));
   const VOTE = [["One Nation voters", "One Nation", false], ["Coalition voters", "L-NP", false],
                 ["Other party voters", "Other", false], ["Independent voters", "Independent", false],
                 ["Greens voters", "Greens", false], ["Labor voters", "ALP", true]];
@@ -182,7 +190,6 @@ assert.ok(dg, "directionGroups emitted");
       assert.ok(typeof dot.dateLabel === "string" && dot.dateLabel.length, `${label} ${date}: fieldwork window`);
     }
   }
-  const essStore = JSON.parse(readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8"));
   const waves = Object.keys(essStore.waves).length;
   assert.ok(waves > 0, "the committed Essential store banked waves");
   let inEra = 0;
@@ -208,17 +215,7 @@ assert.ok(dg, "directionGroups emitted");
   // RedBridge/Accent: each wave's every printed cell lands as a raw dot, the
   // wave's own all-voters total differenced against the SAME wave's direction
   // row (the gate: every printed cell's gap equals cell minus row)
-  const rbStore = JSON.parse(readFileSync(path.join(ROOT, "data", "redbridge-direction-groups.json"), "utf8"));
   const rbDirByDate = new Map((polls.direction || []).filter((d) => d.pollster === "RedBridge/Accent").map((d) => [d.date, d]));
-  const RB_LABEL = {
-    "Labor": "Labor voters", "Coalition": "Coalition voters",
-    "Liberal": "Liberal voters", "CLP/LNP/Nat": "CLP/LNP/Nat voters",
-    "One Nation": "One Nation voters", "Greens": "Greens voters",
-    "Other parties and candidates": "Other voters",
-    "Undecided / will not vote": "Undecided voters",
-    "Solid": "Solid voters", "Soft": "Soft voters", "Very soft": "Very soft voters",
-  };
-  const RB_SURFACED = new Set(["vote", "softness", "generation", "gender", "location", "education", "ownership"]);
   for (const [date, wave] of Object.entries(rbStore.waves)) {
     const row = rbDirByDate.get(date);
     assert.ok(row, `redbridge-direction-groups ${date}: a matched direction row exists (validate enforces)`);

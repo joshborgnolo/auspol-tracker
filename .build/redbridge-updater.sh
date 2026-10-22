@@ -70,7 +70,59 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true' && echo "$LAST_LINE" | grep -q
   fi
 fi
 
+# Direction pass (warn-only; same discipline as Roy Morgan's sidecars).
+# Reads the committed statement caches only — files the occasional
+# national-direction section's headline polls.json direction[] row AND its
+# demographic breakdowns into data/redbridge-direction-groups.json. Runs
+# before the changed:false early-exit so a section-only slot still ships.
+RBDIR_MOVED=false
+RBDIR_OUT="$(node .build/extract-redbridge-direction.mjs 2>&1)"
+RBDIR_CODE=$?
+RBDIR_LAST="$(echo "$RBDIR_OUT" | tail -1)"
+if [ $RBDIR_CODE -ne 0 ]; then
+  # exit 2 = guard trip (statement layout moved, recon drift): warn only
+  log "WARN direction-groups extract (exit $RBDIR_CODE): $RBDIR_LAST"
+elif ! echo "$RBDIR_LAST" | grep -q '^RBDIR_STATUS '; then
+  log "WARN direction-groups extract (no RBDIR_STATUS line): $RBDIR_LAST"
+else
+  log "$RBDIR_LAST"
+  echo "$RBDIR_OUT" | grep '^RBDIR_NOTE ' | while IFS= read -r l; do log "direction-groups: $l"; done
+  if echo "$RBDIR_LAST" | grep -q '"changed":true'; then
+    RBDIR_MOVED=true
+  fi
+fi
+
 if [ -z "$FROM_AFR" ] && ! echo "$LAST_LINE" | grep -q '"changed":true'; then
+  if [ "$RBDIR_MOVED" = "true" ]; then
+    # Sidecar-only slot: a statement's direction section landed (headline
+    # row in polls.json and/or the breakdown store) with no poll wave.
+    # Ship it exactly like a data change: validate, rebuild, commit, push.
+    log "sidecar wave (direction splits) moved; running validate/build/commit/push"
+    if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
+      log "FAIL validate (errors above); no commit made"
+      exit 1
+    fi
+    if ! refresh_site; then
+      log "FAIL build; no commit made"
+      exit 1
+    fi
+    FILES=(data/polls.json data/redbridge-direction-groups.json "${SITE_FILES[@]}")
+    git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
+    MSG="Update RedBridge/Accent direction splits $(date '+%Y-%m-%d')"
+    if git diff --cached --quiet; then
+      log "direction extract moved but nothing staged to commit; leaving tree for review"
+      exit 1
+    fi
+    if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
+      log "FAIL git commit"
+      exit 1
+    fi
+    if ! push_main "$MSG" "${FILES[@]}"; then
+      exit 1
+    fi
+    log "OK committed + pushed: $MSG"
+    exit 0
+  fi
   # No new wave: give the skip-confirm a go. It verifies — from the AFR topic
   # list this run's extractor parsed a moment ago, not a cached state file —
   # that nothing has been filed since before the slot day and that it's past
@@ -150,7 +202,7 @@ if ! refresh_site; then
   exit 1
 fi
 
-FILES=(data/polls.json data/demographics.json data/issues.json .build/redbridge-src/ "${SITE_FILES[@]}")
+FILES=(data/polls.json data/demographics.json data/issues.json data/redbridge-direction-groups.json .build/redbridge-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update RedBridge/Accent poll data $(date '+%Y-%m-%d')"
 [ -n "$FROM_AFR" ] && MSG="RedBridge/Accent: file the new wave from the AFR article's chart $(date '+%Y-%m-%d') (Accent report to follow)"

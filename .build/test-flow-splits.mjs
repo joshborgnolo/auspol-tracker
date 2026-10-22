@@ -385,11 +385,26 @@ assert.ok(ap.includes('<select className="rd-pv-sel ex-fl-sel" aria-label="Elect
   "one elections menu: federal national, federal by state, then each state's own elections");
 assert.ok(!/ex-chip|ex-flow-chips|ex-flow-flip/.test(ap) && !/ex-chip|ex-flow-/.test(fs.readFileSync(path.join(ROOT, ".build/newtracker/template.html"), "utf8")),
   "the pill chips and the old menu bar are gone, code and CSS");
+/* the readout's notes indent to ONE shared column (user report 2026-10-23,
+   the phone's NSW state view: "40% exhausted, 87.1% of the rest" started
+   after its own row's label, so "One Nation" indented it deeper than
+   "Greens" did): the tip renders as one grid table - rows display:contents,
+   each cell pinned to its column, so a row without a note never displaces
+   its figure from the aligned value column */
+assert.ok(cssRd.includes("body.rd .ex-fl-card .tip:not(.tip-cols) { display: grid; grid-template-columns: 9px max-content 1fr auto;")
+    && cssRd.includes("body.rd .ex-fl-card .tip:not(.tip-cols) .tip-row { display: contents; }"),
+  "the explainer card's tips lay their rows out as one table (the label column no longer decides where a note starts)");
+assert.ok(cssRd.includes("body.rd .ex-fl-card .tip:not(.tip-cols) .tip-note { grid-column: 3; }")
+    && cssRd.includes("body.rd .ex-fl-card .tip:not(.tip-cols) .tip-val { grid-column: 4;"),
+  "every note pinned to the shared third column, every figure to the aligned fourth");
+assert.ok(cssRd.includes("body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-title") && cssRd.includes("{ grid-column: 1 / -1; }")
+    && cssRd.includes("body.rd .ex-fl-card .tip:not(.tip-cols) > .tip-hint"),
+  "the readout's own lines (title, date, description, subtext, hint) span the table's full width");
 assert.ok(ap.includes('<span className="rd-pl-ctl-l">Share:</span>') && !ap.includes('>Direction:</span>'),
   "the explainer's Share control names its active side (the Direction label gone)");
 assert.ok(ap.includes("tooltipTitle={(i) => BYS[i].label}")
     && ap.includes('tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label) + (basisMixed && S.hollowYears.includes(YEARS[i]) ? " · Labor-v-Coalition seats only" : "")}'),
-  "short tooltip titles: a contest's source sentence no longer runs a phone readout to full width");
+  "short tooltip titles: a contest's source sentence no longer runs a phone readout to full width (b5398ce8's hollow-ring basis note is the one suffix, and only on mixed-basis views)");
 assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 2 && (ap.match(/copy=\{\{ title: "Share of each group’s preferences reaching "/g) || []).length === 2,
   "both views share the px chart frame and carry a copy prop");
 assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),

@@ -3,10 +3,13 @@
    two-class pile model's ESTIMATES (data/state-flows-est.csv, written by
    .build/estimate-state-flows.py), never the parsers' blended replay; only
    elections whose counts reached a Labor v Coalition final in at least 40
-   seats reach the chart, One Nation's line only where it won 2% of the
-   primary vote, each point with its 90% error; the federal back-test that justifies them rides
-   flowHistory.fed.backtest for the Info entry, and must keep showing the
-   model beating the replay it replaced.
+   seats reach the chart (Victoria from 24: its 2006-18 counts stopped once
+   a candidate passed half the vote, their error measured under that same
+   stopping rule in the vicstop band – user call 2026-10-23), One Nation's
+   line only where at least the calibrated minimum ballots stand behind it,
+   each point with its 90% error; the federal back-test that justifies them
+   rides flowHistory.fed.backtest for the Info entry, and must keep showing
+   the model beating the replay it replaced.
    Runs after the build in npm test's chain (the data asset only reflects the
    current dataset post-build). */
 import assert from "node:assert/strict";
@@ -16,6 +19,9 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MIN_CLASSIC = 40;
+// per-jurisdiction floors (user call 2026-10-23): mirror STATE_MIN_CLASSIC_JUR
+const MIN_JUR = { vic: 24 };
+const minCl = (j) => MIN_JUR[j] || MIN_CLASSIC;
 
 // ---- the estimator's outputs -----------------------------------------------
 const csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8").trim().split(/\r?\n/);
@@ -36,6 +42,15 @@ for (const r of rows) {
     assert.equal(r.jurisdiction, "nsw", "only NSW's ballot-level data is counted");
     assert.equal(r.err90, "", "a count carries no error figure");
     assert.ok(+r.exhausted_share >= 0 && +r.exhausted_share < 1, `${r.year} ${r.party}: an exhausted share`);
+  } else if (r.jurisdiction === "vic" && bt0.settings.vic_band &&
+             +r.n_classic >= bt0.settings.vic_band[0] && +r.n_classic <= bt0.settings.vic_band[1]) {
+    // vic's stop-rule years: the vicstop band's own measured error (user
+    // call 2026-10-23: shipped only while the band keeps it under 8 points)
+    assert.ok(+r.n_classic >= minCl("vic") && +r.n_classic < Math.min(...bt0.settings.cal_n),
+      `vic ${r.year}: a stop-rule count (${r.n_classic})`);
+    assert.ok(+r.err90 > 0 && +r.err90 < 8, `vic ${r.year} ${r.party}: within the ship gate (${r.err90})`);
+    const want = bt0.vicstop[r.party];
+    assert.ok(want && +r.err90 === want.p90, `vic ${r.year} ${r.party}: quotes the vicstop band's p90 (${bt0.vicstop[r.party] && bt0.vicstop[r.party].p90})`);
   } else if (+r.n_classic < Math.min(...bt0.settings.cal_n)) {
     assert.equal(r.err90, "", `${r.jurisdiction} ${r.year} ${r.party}: no untested error figure at ${r.n_classic} seats`);
   } else {
@@ -74,7 +89,7 @@ fs.readFileSync(path.join(ROOT, "data", "state-flows.csv"), "utf8").trim().split
   .forEach((ln) => { const c = ln.split(","); if (c[2] === "onp") prim[c[0] + c[1]] = +c[4]; });
 const shown = {};
 for (const r of rows) {
-  if (+r.n_classic >= MIN_CLASSIC && ["grn", "oth"].includes(r.party) && r.est_flow_to_alp !== "") {
+  if (+r.n_classic >= minCl(r.jurisdiction) && ["grn", "oth"].includes(r.party) && r.est_flow_to_alp !== "") {
     (shown[r.jurisdiction] ||= new Set()).add(+r.year);
   }
 }
@@ -83,7 +98,7 @@ const nswEarly = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "state-flows
   .years.filter((y) => y < 2015);
 if (shown.nsw) nswEarly.forEach((y) => shown.nsw.add(y));
 assert.deepEqual(Object.keys(FH).filter((k) => k !== "fed").sort(), Object.keys(shown).sort(),
-  "exactly the jurisdictions with an election of 40+ classic seats get a chip");
+  "exactly the jurisdictions with an election of 40+ classic seats (Vic 24+) get a chip");
 assert.ok(!FH.nt, "the Northern Territory's small counts stay off the chart");
 assert.deepEqual([...FH.qld.years], [2004, 2006, 2009, 2012, 2015, 2017, 2020, 2024],
   "Queensland shows 2004-2024, its optional-preferential years included");
@@ -92,7 +107,14 @@ assert.ok(FH.qld.grnExh.slice(0, 5).every((x) => x > 0) && FH.qld.grnExh.slice(5
   "Queensland's Greens exhausted share: the OPV years only");
 assert.deepEqual([...FH.nsw.years], [2007, 2015, 2019, 2023],
   "NSW counts 2007 (the Paper's printed tally-sheet count) plus 2015-2023, every election with ballot-level data (2011 published none)");
-assert.deepEqual([...FH.vic.years], [2022], "Victoria shows 2022 alone (its 2006-18 counts stopped at a majority)");
+assert.deepEqual([...FH.vic.years], [2006, 2010, 2014, 2018, 2022],
+  "Victoria shows all five: 2006-18 ship under their own floor with the vicstop band's measured error (user call 2026-10-23)");
+const VS = bt.vicstop;
+assert.ok(VS && VS.grn && VS.oth, "the vicstop band rides the back-test json");
+assert.ok(VS.oth.p90 < 8, `the vicstop others error ships under the user's 8-point gate (${VS.oth.p90})`);
+assert.ok(VS.grn.mae < VS.grn.replay_mae && VS.oth.mae < VS.oth.replay_mae,
+  "the vicstop model still beats the replay behind it");
+assert.ok(VS.band && VS.band.in_band > 0, "vicstop's band measured at least one trial");
 for (const [k, S] of Object.entries(FH)) {
   if (k === "fed") continue;
   assert.equal(S.estimated, k !== "nsw", `${k} is drawn as ${k === "nsw" ? "a count" : "an estimate"}`);

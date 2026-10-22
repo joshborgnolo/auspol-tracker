@@ -343,7 +343,14 @@ await sleep(800);
        && foot.includes("84% in 2011, 84% in 2015, 72% in 2019, 62% in 2023"), foot.slice(0, 60) + " · " + foot.slice(190, 260));
   ok("…it says named-neither, never exhaust",
      foot.includes("named neither") && !/[Ee]xhaust[ei]d a ballot/.test(foot), foot.slice(260, 380));
-  ok("…and it promises no other state", foot.includes("only state upper house"), foot.slice(-120));
+  ok("…and it promises no other state", foot.includes("only state upper-house count"), foot.slice(-120));
+  /* …saying why: group voting tickets kept no per-ballot ordering (Vic to
+     2022, WA to 2021), and the ticket-free counts since publish sheet
+     tallies, no ballot-level record (76b3830c + the WA/SA/Tas companion) */
+  ok("…and it says why (tickets kept no orderings; no ballot record published after)",
+     foot.includes("Victoria’s Council used group voting tickets until 2022")
+       && foot.includes("Western Australia’s tickets ended a year earlier")
+       && foot.includes("published count sheets but no ballot-level record"), foot.slice(-300));
   /* the tooltip on the 2023 Greens point (share 94.5, neither 44.8), and
      One Nation's 2015 hole (no group fielded) answering no tooltip where
      the 33.3-share 2019 point answers "named neither major: 89.6%" */

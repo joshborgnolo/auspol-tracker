@@ -82,6 +82,18 @@ CAL_N = (40, 50, 85)     # calibration seat counts: SA/Vic 2022, WA, Qld
 # state lines' 40-seat floor (and the One Nation ballot floor) stay put
 CONTEST_N = (25,)        # SA 2026: 25 Labor v One Nation finals
 CAL_REPS = 6
+# Vic's 2006-18 classic rows (26-32 seats) get their own stop-rule
+# calibration (user call 2026-10-23): the VEC halted those counts once a
+# candidate passed half the vote, and seats whose count it halted are the
+# fragmented marginals, not a random draw - so the plain random-seat
+# calibration understates their error. The vicstop trials replay each drawn
+# federal seat's chain with the same stopping rule and score the model only
+# over the seats that still reach a Labor v Coalition final, the selection
+# the VEC's own practice left behind. First-preference majorities leave the
+# emulated election entirely (the VEC distributed no preferences there:
+# Victoria 2010 and 2018 never published chains for 44 and 40 seats).
+VIC_DRAW = (88,)         # a Victoria-sized slate: its district count, so its stop-classic counts fall as Vic's did
+VIC_BAND = (24, 34)      # the stop-classic counts the vicstop band claims to measure (Vic 2006-18 ran 26-32)
 # Antony Green's tabulation of the ECQ's counted flows, Labor v LNP finals
 # (antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/)
 QLD_GREEN = {2020: {"grn": 80.1, "onp": 33.8}, 2024: {"grn": 80.7, "onp": 26.2}}
@@ -725,6 +737,107 @@ def calibrate(ns=CAL_N):
     return table, rows
 
 
+def stop_chain(s):
+    """the chain the VEC's old practice (Vic 2006-18) would have published
+    for this seat: nothing at all for a first-preference majority (those
+    seats were never distributed - 2010 and 2018 publish 44 and 48 of 88),
+    otherwise the chain up to the count at which a candidate first clears
+    half the votes remaining. A seat that stays classic after this
+    truncation keeps its chain intact: the stop rule must fire at a count
+    with two candidates left, and that count is the chain's own last step.
+    """
+    tot = {c: fp for c, (_b, fp) in s["cands"].items()}
+    if sum(tot.values()) and max(tot.values()) > 0.5 * sum(tot.values()):
+        return []
+    out = []
+    for excl, rec, exh in s["steps"]:
+        out.append((excl, rec, exh))
+        for x in excl:
+            tot[x] = 0.0
+        for r, v in rec.items():
+            tot[r] = tot.get(r, 0.0) + v
+        full = sum(tot.values())
+        if full and max(tot.values()) > 0.5 * full:
+            break
+    return out
+
+
+def _cal_stop_job(args):
+    """one VIC-SHAPED trial over federal seats: draw N seats, truncate their
+    chains with the VEC's stopping rule (first-preference majorities drop
+    out, as their counts were never published), fit the model over the
+    emulated election pooled with the other federal years, and score the
+    estimate against the complete-count truth on exactly the seats the stop
+    rule would still have left classic - the selection Victoria's own 26-32
+    classic counts of 2006-18 are, so the observed error is the one those
+    rows carry. Scored on the model flow and on the plain replay alike.
+    """
+    y, N, rep = args
+    if not _CAL:
+        _CAL["fed"] = {yy: fed_election(yy) for yy in FED_YEARS}
+        _CAL["evs"] = {yy: events(_CAL["fed"][yy][0]) for yy in FED_YEARS}
+    fed, fed_evs = _CAL["fed"], _CAL["evs"]
+    seats, truth = fed[y]
+    keys = random.Random(7331 * N + 29 * rep + y).sample(sorted(seats), N)
+    raw = {k: seats[k] for k in keys}
+    sub = {}
+    for k, s in raw.items():
+        st = stop_chain(s)
+        if st:
+            sub[k] = seat(s["cands"], st)
+    cl = [k for k in sub if classic(sub[k])]
+    can = [k for k in cl if len(sub[k]["steps"]) != len(raw[k]["steps"])]
+    assert not can, f"vicstop truncation touched a classic seat: {y}/{N}/{rep} {can}"
+    evs, lam = {("cut", y): events(sub)}, {("cut", y): LAM0}
+    for yy in FED_YEARS:
+        if yy != y:
+            evs[("fed", yy)] = fed_evs[yy]
+            lam[("fed", yy)] = lam_of(fed[yy][0])
+    p = fit(evs, lam, em_iters=150)
+    est = flows(sub, evs[("cut", y)], p[("cut", y)], keys=cl)
+    plain = flows(sub, keys=cl)
+    tr = {b: [0.0, 0.0] for b in BUCKETS}
+    for k in cl:
+        for b, (u, v) in truth.get(k, {}).items():
+            tr[b][0] += u
+            tr[b][1] += v
+    return [{"year": y, "draw": N, "n_obs": len(cl), "bucket": b,
+             "err": round(pct(est[b]) - pct(tr[b]), 3),
+             "rerr": round(pct(plain[b]) - pct(tr[b]), 3)}
+            for b in BUCKETS
+            if sum(tr[b]) >= 20000 and not (b == "onp" and y < 2016) and pct(est[b]) is not None]
+
+
+def calibrate_vicstop(ns=VIC_DRAW):
+    """the vicstop band: error figures pooled over the trials whose surviving
+    stop-classic count lands in VIC_BAND (where Victoria's 2006-18 elections
+    sit), so the vic rows of those years quote the error measured under
+    their own publication practice rather than a random-seat one."""
+    from multiprocessing import Pool
+    jobs = [(y, N, rep) for y in FED_YEARS for N in ns for rep in range(CAL_REPS)]
+    rows = []
+    with Pool(max(1, min(5, (os.cpu_count() or 2) - 1))) as pool:
+        for i, r in enumerate(pool.imap_unordered(_cal_stop_job, jobs)):
+            rows += r
+            print(f"  vicstop calibration {i + 1}/{len(jobs)}", file=sys.stderr)
+    sel = [r for r in rows if VIC_BAND[0] <= r["n_obs"] <= VIC_BAND[1]]
+    table = {}
+    for b in BUCKETS:
+        e = sorted(abs(r["err"]) for r in sel if r["bucket"] == b)
+        v = [r["err"] for r in sel if r["bucket"] == b]
+        re_ = sorted(abs(r["rerr"]) for r in sel if r["bucket"] == b)
+        if e:
+            table[b] = {"mae": round(sum(e) / len(e), 2),
+                        "p90": round(e[int(0.9 * (len(e) - 1))], 2),
+                        "bias": round(sum(v) / len(v), 2),
+                        "replay_mae": round(sum(re_) / len(re_), 2), "n": len(e)}
+    obs = sorted(r["n_obs"] for r in rows)
+    table["band"] = {"draw": list(ns), "band": list(VIC_BAND), "trials": len(rows), "in_band": len(sel),
+                     "classicMin": obs[0] if obs else None, "classicMax": obs[-1] if obs else None,
+                     "classicMedian": obs[len(obs) // 2] if obs else None}
+    return table, rows
+
+
 def noncoal_check(fed, fed_evs, params):
     """The Coalition cell's test. In a Labor v One Nation final the Liberal
     pile is a major party's, split between Labor and a non-Coalition
@@ -849,6 +962,10 @@ def main():
         ctable, _ = calibrate(CONTEST_N)
     else:
         ctable = old["contest_calibration"]
+    if redo_cal or "vicstop" not in old:
+        vtable, vrows = calibrate_vicstop()
+    else:
+        vtable, vrows = old["vicstop"], old.get("vicstop_rows", [])
     noncoal = noncoal_check(fed, fed_evs, params)
 
     # the federal flows before the AEC's per-seat counts: classic-seat
@@ -903,6 +1020,11 @@ def main():
         for b in BUCKETS:
             f = pct(est[b])
             e = err90(table, b, n_cl) if f is not None else None
+            # vic's 2006-18 rows: the random-seat calibration stops at 40
+            # seats, but those counts' truncation was measured on its own
+            # terms (vicstop) - quote that band's error at their seat count
+            if e is None and jur == "vic" and f is not None and VIC_BAND[0] <= n_cl <= VIC_BAND[1]:
+                e = vtable.get(b, {}).get("p90")
             rows.append({"jurisdiction": jur, "year": y, "party": b,
                          "est_alp_votes": round(est[b][0]), "est_coal_votes": round(est[b][1]),
                          "est_flow_to_alp": round(f / 100, 6) if f is not None else "",
@@ -934,15 +1056,23 @@ def main():
     with open(OUT_JSON, "w") as f:
         json.dump({"settings": {"lam0": LAM0, "fed_seat": FED_SEAT, "em_iters": EM_ITERS,
                                 "pool": [f"{j}-{y}" for j, y in sorted(states)] + [f"fed-{y}" for y in sorted(HIST_YEARS + FED_YEARS)],
-                                "cal_n": list(CAL_N), "contest_n": list(CONTEST_N), "cal_reps": CAL_REPS},
+                                "cal_n": list(CAL_N), "contest_n": list(CONTEST_N), "cal_reps": CAL_REPS,
+                                "vic_draw": list(VIC_DRAW), "vic_band": list(VIC_BAND)},
                    "federal": federal, "calibration": table, "calibration_rows": cal_rows,
-                   "contest_calibration": ctable, "noncoal_check": noncoal, "federal_hist": federal_hist,
+                   "contest_calibration": ctable, "vicstop": vtable, "vicstop_rows": vrows,
+                   "noncoal_check": noncoal, "federal_hist": federal_hist,
                    "qld_check": qld_check, "nsw_check": nsw_check, "contests": contests,
                    "onp_min_ballots": onp_min_ballots(fed),
                    "qld_source": "https://antonygreen.com.au/qld2024-preference-flows-and-vote-by-type-compared-to-2020/"},
                   f, indent=1)
         f.write("\n")
     print(f"wrote {os.path.relpath(OUT_CSV, ROOT)} ({len(rows)} rows) and {os.path.relpath(OUT_JSON, ROOT)}")
+    if vtable.get("band"):
+        print(f"  vicstop draw {vtable['band']['draw']} -> classic {vtable['band']['classicMin']}-"
+              f"{vtable['band']['classicMax']} (median {vtable['band']['classicMedian']}), "
+              f"{vtable['band']['in_band']} of {vtable['band']['trials']} bucket trials in band {VIC_BAND}: "
+              + "  ".join(f"{b} mae {vtable[b]['mae']} p90 {vtable[b]['p90']} (plain replay {vtable[b]['replay_mae']})"
+                          for b in BUCKETS if b in vtable), file=sys.stderr)
     for y, d in federal.items():
         print(f"  federal {y}: " + "  ".join(f"{b} counted {v['counted']:.1f} model {v['model'] - v['counted']:+.2f} "
                                              f"replay {v['replay'] - v['counted']:+.2f}" for b, v in d.items()))
