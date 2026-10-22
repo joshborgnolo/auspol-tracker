@@ -5786,7 +5786,6 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
         // a hollow-ring point says its basis outright; NSW's all-seats
         // points carry the classic-seats figure beside them, so the
         // counted state still reads like-for-like against the estimates
-        const hollowY = !!(S.hollowYears && S.hollowYears.includes(YEARS[i]));
         const cls = S.classic || {};
         const clsV = (cls[p.id] || [])[i], clsE = (cls[p.id + "Exh"] || [])[i];
         /* exhaustion-adjusted flows (the switch under the chart, on by
@@ -5796,12 +5795,19 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
            Applied after the Share flip, so an inverted view shows the
            other side's own adjusted share, not 100 minus Labor's */
         const adj = exhAdj && exh[i] != null ? 1 - exh[i] / 100 : 1;
-        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null,
+        /* the readout's note, kept to one short line (user 2026-10-23: the
+           optional-numbering rows ran to three): the ± is the drawn bar's,
+           so it shrinks with the adjustment; the exhausted share leads and
+           an adjusted row adds the other reading as "of the rest"; the
+           basis ring is a per-year fact, so it rides the title (basisTitle),
+           not every row; and NSW's classic-seats sidecar quotes just its
+           figure, on the drawn basis so the two compare directly */
+        const clsAdj = exhAdj && clsE != null ? 1 - clsE / 100 : 1;
+        const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + (err[i] * adj).toFixed(1) : null,
           sen && nei[i] != null ? (onSen ? "named neither: " : "named neither major: ") + nei[i].toFixed(1) + "%" : null,
-          !sen && exh[i] != null ? (exhAdj ? val.toFixed(1) + "% of the ballots that went on, " : "")
-            + (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null,
-          hollowY ? "Labor-v-Coalition seats only" : null,
-          clsV != null ? "classic seats: " + T(clsV).toFixed(1) + "%" + (clsE != null ? ", " + Math.round(clsE) + "% exhausted" : "") : null].filter(Boolean).join(", ");
+          !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted"
+            + (exhAdj ? ", " + T(val).toFixed(1) + "% of the rest" : "") : null,
+          clsV != null ? "classic seats " + (T(clsV) * clsAdj).toFixed(1) + "%" : null].filter(Boolean).join(", ");
         cur.push({ x: YEARS[i], y: T(val) * adj, ...(note ? { note } : null) });
       }
     });
@@ -5859,6 +5865,10 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
     }));
   }
   const hasRing = marks.some((m) => !m.solid), hasSolid = marks.some((m) => m.solid);
+  /* a view that rings only some years (the federal 1996-2001) names the
+     basis in those years' readout titles; one that rings them all says it
+     once, in the key */
+  const basisMixed = !!(S.hollowYears && S.hollowYears.length && S.hollowYears.length < YEARS.length);
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const side = inv ? (onSen ? "One Nation" : "the Coalition") : "Labor",
         other = inv ? "Labor" : (onSen ? "One Nation" : "the Coalition");
@@ -5943,7 +5953,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
         series={series} marks={marks} areas={areas} spine={YEARS.map((x) => ({ x }))}
-        tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
+        tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label) + (basisMixed && S.hollowYears.includes(YEARS[i]) ? " · Labor-v-Coalition seats only" : "")}
         ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (lcBank ? ", above-the-line NSW Legislative Council ballots" : sen ? ", above-the-line Senate ballots" : "") + (est ? ", estimated" : "") + ", " + span}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
                 sub: rdCap(S.elections || S.label + " elections") + ". " + (lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files; above-the-line ballots only, and each share is of papers naming a major party."
@@ -5960,13 +5970,19 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
         .concat(hasRing ? [{ kind: "ring", color: "var(--ink)", label: "Labor-v-Coalition seats only" }] : [])
         .concat(hasSolid ? [{ kind: "dot-solid", color: "var(--ink)", label: "Every seat" }] : [])}>
         {hasErr && <span className="rd-key-item"><ExBarSwatch />{fedEst ? "Estimated, " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + ", with its 90% error" : "The estimate’s 90% error"}</span>}
+        {/* the exhaustion switch rides the key row as its last item (user
+            2026-10-23: the full-size switch on a row of its own was bulky
+            and opened a gap): a key-sized track, the words part of the one
+            button, and the years it touches named where they aren't all */}
+        {opvYears && (
+          <button type="button" role="switch" aria-checked={exhAdj} className="rd-key-item ex-fl-adj"
+                  title={exhAdj ? "Show each share of the ballots that reached Labor or the Coalition" : "Count each party’s whole vote, an exhausted paper reaching neither side"}
+                  onClick={() => setExhAdj((prev) => !prev)}>
+            <span className="ex-fl-adj-tk" aria-hidden="true"></span>
+            {"Exhaustion-adjusted flows" + (opvYears.length < YEARS.length ? ", " + (opvYears.length > 1 ? opvYears[0] + "–" + opvYears[opvYears.length - 1] : opvYears[0]) : "")}
+          </button>
+        )}
       </RdKey>
-      {opvYears && (
-        <div className="ex-fl-adj">
-          <RdSwitch on={exhAdj} onToggle={() => setExhAdj((prev) => !prev)} label="Exhaustion-adjusted flows" />
-          <span>Exhaustion-adjusted flows</span>
-        </div>
-      )}
       <RdFoot how={{ term: "flow-history", from: "Preference flows explained" }}>{cap}</RdFoot>
     </>
   );

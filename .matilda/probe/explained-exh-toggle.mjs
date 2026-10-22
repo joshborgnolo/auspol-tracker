@@ -49,9 +49,9 @@ const browser = await puppeteer.launch({
 const pageErrors = [];
 const wire = (p) => p.on("pageerror", (e) => pageErrors.push(String(e).slice(0, 160)));
 const pickMenu = (p, v) => p.select(".ex-fl-card select.ex-fl-sel", v);
-const hasSwitch = (p) => p.$(".ex-fl-card .ex-fl-adj .rd-switch").then((x) => !!x);
-const switchState = (p) => p.$eval(".ex-fl-card .ex-fl-adj .rd-switch", (b) => b.getAttribute("aria-checked"));
-const clickSwitch = (p) => p.$eval(".ex-fl-card .ex-fl-adj .rd-switch", (b) => b.click());
+const hasSwitch = (p) => p.$(".ex-fl-card .ex-fl-adj[role=switch]").then((x) => !!x);
+const switchState = (p) => p.$eval(".ex-fl-card .ex-fl-adj[role=switch]", (b) => b.getAttribute("aria-checked"));
+const clickSwitch = (p) => p.$eval(".ex-fl-card .ex-fl-adj[role=switch]", (b) => b.click());
 const footText = (p) => p.$eval(".ex-fl-card .rd-foot-text", (el) => el.textContent.replace(/\s+/g, " ").trim());
 /* cy(v) from the chart's own y-axis tick labels: the numeric texts 0-100 in
    the chart's svg, mapped to their svg y. hover-marker circles sit at cy 0
@@ -135,6 +135,40 @@ console.log("== desktop 1280: federal landing carries no switch ==");
   ok("NSW 2023 One Nation adjusted (" + n23on.adj.toFixed(1) + ")", await anyNear(p, n23on.adj, 2.0));
   const nFoot = await footText(p);
   ok("NSW caption counts the whole vote", nFoot.includes("share counts the party’s whole vote"));
+  await p.close();
+}
+
+console.log("== readouts: one short note per row (user 2026-10-23) ==");
+{
+  const p = await browser.newPage(); wire(p);
+  await p.setViewport({ width: 1280, height: 900 });
+  await p.goto(`http://127.0.0.1:${PORT}/flows-explained/`, { waitUntil: "networkidle0", timeout: 60000 });
+  await p.waitForSelector(".ex-fl-card .chart svg", { timeout: 30000 });
+  /* hover the n-th election column and read the readout */
+  const tipAt = async (n) => {
+    await p.$eval(".ex-fl-card", (el) => el.scrollIntoView({ block: "start" })); await sleep(150);
+    const xs = await p.$$eval(".ex-fl-card .chart svg circle:not(.hover-marker)", (cs) =>
+      [...new Set(cs.map((c) => Math.round(c.getBoundingClientRect().left + c.getBoundingClientRect().width / 2)))].sort((a, b) => a - b));
+    const cols = xs.filter((x, i) => i === 0 || x - xs[i - 1] > 4);
+    const y = await p.$eval(".ex-fl-card .chart svg", (s) => { const r = s.getBoundingClientRect(); return r.top + r.height / 2; });
+    await p.mouse.move(cols[n] + 1, y); await sleep(350);
+    const t = await p.$eval(".ex-fl-card .tip", (e) => ({ title: e.querySelector(".tip-title").textContent,
+      notes: [...e.querySelectorAll(".tip-note")].map((x) => x.textContent) })).catch(() => null);
+    await p.mouse.move(2, 2); await sleep(150);
+    return t;
+  };
+  await pickMenu(p, "qld"); await sleep(400);
+  const q = await tipAt(0);
+  const q04 = await cellFor(p, "qld", "grn", 2004);
+  ok("Qld 2004 Greens note: scaled ±, exhausted, the unadjusted share as 'of the rest'",
+    q && /^±\d+\.\d, about \d+% exhausted, \d+\.\d% of the rest$/.test(q.notes[0]) && q.notes[0].includes(q04.v.toFixed(1) + "% of the rest"), q && q.notes[0]);
+  ok("Qld readout: no per-row basis words (every year rings; the key says it)", q && !q.notes.some((n) => /seats only/.test(n)) && !/seats only/.test(q.title));
+  await pickMenu(p, "nsw"); await sleep(400);
+  const n = await tipAt(0);
+  ok("NSW 2015 note: exhausted, of the rest, classic figure alone", n && /^\d+% exhausted, \d+\.\d% of the rest, classic seats \d+\.\d%$/.test(n.notes[0]), n && n.notes[0]);
+  await pickMenu(p, "fed"); await sleep(400);
+  const f = await tipAt(1);
+  ok("federal 1998: the basis rides the title, once", f && /1998.*Labor-v-Coalition seats only/.test(f.title) && !f.notes.some((x) => /seats only/.test(x)), f && f.title);
   await p.close();
 }
 
