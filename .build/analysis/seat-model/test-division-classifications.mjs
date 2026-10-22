@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /* test-division-classifications.mjs — pin data/division-classifications.json
    (extract-division-classifications.mjs). Invariants:
-   1. Seat counts per election are chamber truth: 150 (2001, 2004, 2007,
-      2010, 2013, 2016), 151 (2019, 2022), 150 (2025).
+   1. Seat counts per election are chamber truth: 148 (1996, 1998), 150
+      (2001, 2004, 2007, 2010, 2013, 2016), 151 (2019, 2022), 150 (2025).
    2. Every division carries exactly one of the four AEC classes, a known
       state, and a present party/status pair — with one exception: the
-      2001 and 2004 blocks are single-epoch (their profile pages carry no
+      1996/1998/2001/2004 blocks are single-epoch (their pages carry no
       prior/after pair), so their previous is exactly null.
    3. The 2025 file's division set is exactly the W2 seat-flows file's set
       (same 150 names, exact spelling — joins by name must never miss).
@@ -52,6 +52,21 @@
    9. The 2004 set pivots on the 2003-04 redistributions: Bonner/Gorton
       present, Bonython/Burke absent; and the 2004 class distribution is
       locked (Inner Metro 42 / Outer Metro 45 / Provincial 18 / Rural 45).
+   10. The 1996 and 1998 recovered-on-page layers carry the 148-division
+      chamber (Namadgi-era ACT 3; the 1997 redistribution pivots: Blair in,
+      Namadgi out; era party tokens LP/ALP/NP/CLP/IND — Northern Territory
+      is Rural in both, which supersedes two bad guesses)
+      and epoch distributions are locked (1996: 42/43/18/45; 1998: 41/42/20/45).
+   11. Cross-boundary reclasses are pinned exactly on the recovered boundaries
+      too: 1996->1998 is Fisher (Rural -> Provincial) and Pearce (Outer
+      Metropolitan -> Provincial); 1998->2001 is the six rows Brand/Cunningham
+      (Provincial -> Outer Metropolitan), Macarthur (Rural -> Outer
+      Metropolitan), Maribyrnong (Outer Metropolitan -> Inner Metropolitan),
+      Pearce (Provincial -> Rural) and Throsby (Provincial -> Inner
+      Metropolitan). Note these are exactly the 2001->2004 moves inverted —
+      the AEC re-rated episodically and the 2001 v2 profile-page layer is a
+      transitional print (both neighbours are independent transcriptions: the
+      1998 Pocket-Book table and the Nov 2001-Apr 2002 profile pages).
    Run from the repo root:
      node .build/analysis/seat-model/test-division-classifications.mjs */
 import { readFileSync } from "node:fs";
@@ -64,7 +79,7 @@ const flows = JSON.parse(readFileSync("data/aec-2025-seat-flows.json", "utf8"));
 
 const CLASSES = ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"];
 const STATES = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
-const EXPECT = { 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150 };
+const EXPECT = { 1996: 148, 1998: 148, 2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150, 2019: 151, 2022: 151, 2025: 150 };
 
 console.log("1. chamber seat counts");
 for (const [year, n] of Object.entries(EXPECT)) {
@@ -77,9 +92,9 @@ for (const [year, divs] of Object.entries(D.elections)) {
   let bad = 0;
   for (const [name, d] of Object.entries(divs)) {
     if (!STATES.includes(d.state) || !CLASSES.includes(d.classification)) bad++;
-    // 2001 and 2004 are single-epoch (their profile pages carry no
+    // 1996/1998/2001/2004 are single-epoch (their pages carry no
     // prior/after pair): previous === null
-    const singleEpoch = year === "2001" || year === "2004";
+    const singleEpoch = ["1996", "1998", "2001", "2004"].includes(year);
     if (singleEpoch ? d.previous !== null : !d.previous || typeof d.previous?.party !== "string" || !d.previous.party || !d.previous.status) bad++;
     const c = d.current;
     if (!c || typeof c.party !== "string" || !c.party || !c.status) bad++;
@@ -135,6 +150,18 @@ const pins = [
   ["2004", "Pearce", "Outer Metropolitan"],
   ["2004", "Solomon", "Inner Metropolitan"],
   ["2004", "Wide Bay", "Rural"],
+  ["1998", "Northern Territory", "Rural"],
+  ["1998", "Blair", "Rural"],
+  ["1998", "Pearce", "Provincial"],
+  ["1998", "Fisher", "Provincial"],
+  ["1998", "Aston", "Outer Metropolitan"],
+  ["1998", "Macarthur", "Rural"],
+  ["1996", "Northern Territory", "Rural"],
+  ["1996", "Namadgi", "Inner Metropolitan"],
+  ["1996", "Aston", "Outer Metropolitan"],
+  ["1996", "Gwydir", "Rural"],
+  ["1996", "Fisher", "Rural"],
+  ["1996", "Pearce", "Outer Metropolitan"],
 ];
 for (const [year, seat, want] of pins) {
   const got = D.elections[year]?.[seat]?.classification;
@@ -217,6 +244,49 @@ for (const d of Object.values(y04)) dist04[d.classification] = (dist04[d.classif
 const dist04Want = { "Inner Metropolitan": 42, "Outer Metropolitan": 45, Provincial: 18, Rural: 45 };
 ok(JSON.stringify(Object.fromEntries(Object.entries(dist04).sort())) === JSON.stringify(Object.fromEntries(Object.entries(dist04Want).sort())),
   `distribution ${JSON.stringify(dist04)} (expect ${JSON.stringify(dist04Want)})`);
+
+console.log("10. 1996/1998 era division sets + distributions");
+const y96 = D.elections["1996"], y98 = D.elections["1998"];
+ok("Namadgi" in y96 && !("Blair" in y96), "1996: Namadgi present, Blair absent (1997 redistribution)");
+ok("Blair" in y98 && !("Namadgi" in y98), "1998: Blair present, Namadgi absent");
+ok("Kingsford-Smith" in y96 && "Kingsford-Smith" in y98, "Kingsford-Smith present (hyphenated era name; 2001 uses 'Kingsford Smith')");
+for (const ghost of ["Solomon", "Lingiari", "Hasluck"])
+  ok(!(ghost in y98), `${ghost} absent from 1998 (created for 2001)`);
+const distWant9698 = {
+  1996: { "Inner Metropolitan": 42, "Outer Metropolitan": 43, Provincial: 18, Rural: 45 },
+  1998: { "Inner Metropolitan": 41, "Outer Metropolitan": 42, Provincial: 20, Rural: 45 },
+};
+for (const [year, want] of Object.entries(distWant9698)) {
+  const distY = {};
+  for (const d of Object.values(D.elections[year])) distY[d.classification] = (distY[d.classification] || 0) + 1;
+  ok(JSON.stringify(Object.fromEntries(Object.entries(distY).sort())) === JSON.stringify(Object.fromEntries(Object.entries(want).sort())),
+    `${year} distribution ${JSON.stringify(distY)} (expect ${JSON.stringify(want)})`);
+}
+
+console.log("11. reclassifications 1996->1998 and 1998->2001 (recovered layers)");
+const drift9698 = Object.keys(y98).filter((n) => y96[n] && y96[n].classification !== y98[n].classification)
+  .map((n) => `${n}: ${y96[n].classification} -> ${y98[n].classification}`).sort();
+ok(
+  JSON.stringify(drift9698) === JSON.stringify([
+    "Fisher: Rural -> Provincial",
+    "Pearce: Outer Metropolitan -> Provincial",
+  ]),
+  `1996->1998: ${drift9698.length} reclassed: ${drift9698.join("; ")}`
+);
+const y01b = D.elections["2001"];
+const drift9801 = Object.keys(y01b).filter((n) => y98[n] && y98[n].classification !== y01b[n].classification)
+  .map((n) => `${n}: ${y98[n].classification} -> ${y01b[n].classification}`).sort();
+ok(
+  JSON.stringify(drift9801) === JSON.stringify([
+    "Brand: Provincial -> Outer Metropolitan",
+    "Cunningham: Provincial -> Outer Metropolitan",
+    "Macarthur: Rural -> Outer Metropolitan",
+    "Maribyrnong: Outer Metropolitan -> Inner Metropolitan",
+    "Pearce: Provincial -> Rural",
+    "Throsby: Provincial -> Inner Metropolitan",
+  ]),
+  `1998->2001: ${drift9801.length} reclassed: ${drift9801.join("; ")}`
+);
 
 console.log(fails ? `\n${fails} FAIL` : "\nALL CHECKS PASSED");
 process.exit(fails ? 1 : 0);

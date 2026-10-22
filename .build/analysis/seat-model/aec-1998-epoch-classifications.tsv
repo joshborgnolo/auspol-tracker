@@ -1,0 +1,153 @@
+# division	state	classification	party	status	provenance
+# AEC whole-chamber "Divisional Classifications" table for the post-1998-election epoch, recovered from Wayback: aec.gov.au/Elections/federal_elections/1998/classification.htm, capture 20070831140251 (fetched https://web.archive.org/web/20070831140251id_/http://aec.gov.au/Elections/federal_elections/1998/classification.htm).
+# Page <title> "1998 Divisional Classifications"; stamped "last updated Thursday, August 09, 2007"; prints "Source: Electoral Pocket Book, August 1999".
+# Column note: the page's six columns are Code / Division / Enrolment / Socio-Demographic / Seat Status / Classification — its "Socio-Demographic" column is the four-class rating transcribed here as classification; its final "Classification" column is the winning party. Party tokens are raw page vocabulary (LP/ALP/NP/CLP/IND).
+# Raw capture: .matilda/1998-classification-raw.html (sha256 760ff820c4e062508ff198f08be4041ebf52b941e397d09ff7672eafe09d8248); full transcript incl. enrolment + division codes: .matilda/1998-classification.tsv.
+Adelaide	SA	Inner Metropolitan	LP	Marginal	aecPage
+Aston	VIC	Outer Metropolitan	LP	Marginal	aecPage
+Ballarat	VIC	Provincial	LP	Marginal	aecPage
+Banks	NSW	Inner Metropolitan	ALP	Fairly Safe	aecPage
+Barker	SA	Rural	LP	Safe	aecPage
+Barton	NSW	Inner Metropolitan	ALP	Fairly Safe	aecPage
+Bass	TAS	Provincial	ALP	Marginal	aecPage
+Batman	VIC	Inner Metropolitan	ALP	Safe	aecPage
+Bendigo	VIC	Provincial	ALP	Marginal	aecPage
+Bennelong	NSW	Inner Metropolitan	LP	Fairly Safe	aecPage
+Berowra	NSW	Outer Metropolitan	LP	Safe	aecPage
+Blair	QLD	Rural	LP	Marginal	aecPage
+Blaxland	NSW	Inner Metropolitan	ALP	Safe	aecPage
+Bonython	SA	Outer Metropolitan	ALP	Safe	aecPage
+Boothby	SA	Outer Metropolitan	LP	Fairly Safe	aecPage
+Bowman	QLD	Outer Metropolitan	ALP	Marginal	aecPage
+Braddon	TAS	Rural	ALP	Marginal	aecPage
+Bradfield	NSW	Inner Metropolitan	LP	Safe	aecPage
+Brand	WA	Provincial	ALP	Safe	aecPage
+Brisbane	QLD	Inner Metropolitan	ALP	Marginal	aecPage
+Bruce	VIC	Outer Metropolitan	ALP	Fairly Safe	aecPage
+Burke	VIC	Rural	ALP	Fairly Safe	aecPage
+Calare	NSW	Rural	IND	Safe	aecPage
+Calwell	VIC	Outer Metropolitan	ALP	Safe	aecPage
+Canberra	ACT	Inner Metropolitan	ALP	Safe	aecPage
+Canning	WA	Outer Metropolitan	ALP	Marginal	aecPage
+Capricornia	QLD	Provincial	ALP	Marginal	aecPage
+Casey	VIC	Outer Metropolitan	LP	Marginal	aecPage
+Charlton	NSW	Provincial	ALP	Safe	aecPage
+Chifley	NSW	Outer Metropolitan	ALP	Safe	aecPage
+Chisholm	VIC	Inner Metropolitan	ALP	Marginal	aecPage
+Cook	NSW	Inner Metropolitan	LP	Fairly Safe	aecPage
+Corangamite	VIC	Provincial	LP	Marginal	aecPage
+Corio	VIC	Provincial	ALP	Safe	aecPage
+Cowan	WA	Outer Metropolitan	ALP	Marginal	aecPage
+Cowper	NSW	Rural	NP	Fairly Safe	aecPage
+Cunningham	NSW	Provincial	ALP	Safe	aecPage
+Curtin	WA	Inner Metropolitan	LP	Safe	aecPage
+Dawson	QLD	Rural	NP	Marginal	aecPage
+Deakin	VIC	Outer Metropolitan	LP	Marginal	aecPage
+Denison	TAS	Inner Metropolitan	ALP	Safe	aecPage
+Dickson	QLD	Outer Metropolitan	ALP	Marginal	aecPage
+Dobell	NSW	Provincial	ALP	Marginal	aecPage
+Dunkley	VIC	Outer Metropolitan	LP	Marginal	aecPage
+Eden-Monaro	NSW	Rural	LP	Marginal	aecPage
+Fadden	QLD	Outer Metropolitan	LP	Fairly Safe	aecPage
+Fairfax	QLD	Rural	LP	Marginal	aecPage
+Farrer	NSW	Rural	NP	Safe	aecPage
+Fisher	QLD	Provincial	LP	Safe	aecPage
+Flinders	VIC	Rural	LP	Marginal	aecPage
+Forde	QLD	Rural	LP	Marginal	aecPage
+Forrest	WA	Rural	LP	Fairly Safe	aecPage
+Fowler	NSW	Outer Metropolitan	ALP	Safe	aecPage
+Franklin	TAS	Outer Metropolitan	ALP	Fairly Safe	aecPage
+Fraser	ACT	Inner Metropolitan	ALP	Safe	aecPage
+Fremantle	WA	Inner Metropolitan	ALP	Safe	aecPage
+Gellibrand	VIC	Inner Metropolitan	ALP	Safe	aecPage
+Gilmore	NSW	Rural	LP	Marginal	aecPage
+Gippsland	VIC	Rural	NP	Fairly Safe	aecPage
+Goldstein	VIC	Inner Metropolitan	LP	Fairly Safe	aecPage
+Grayndler	NSW	Inner Metropolitan	ALP	Safe	aecPage
+Greenway	NSW	Outer Metropolitan	ALP	Fairly Safe	aecPage
+Grey	SA	Rural	LP	Fairly Safe	aecPage
+Griffith	QLD	Outer Metropolitan	ALP	Marginal	aecPage
+Groom	QLD	Provincial	LP	Safe	aecPage
+Gwydir	NSW	Rural	NP	Safe	aecPage
+Herbert	QLD	Provincial	LP	Marginal	aecPage
+Higgins	VIC	Inner Metropolitan	LP	Fairly Safe	aecPage
+Hindmarsh	SA	Inner Metropolitan	LP	Marginal	aecPage
+Hinkler	QLD	Rural	NP	Marginal	aecPage
+Holt	VIC	Outer Metropolitan	ALP	Safe	aecPage
+Hotham	VIC	Outer Metropolitan	ALP	Safe	aecPage
+Hughes	NSW	Outer Metropolitan	LP	Marginal	aecPage
+Hume	NSW	Rural	LP	Fairly Safe	aecPage
+Hunter	NSW	Rural	ALP	Safe	aecPage
+Indi	VIC	Rural	LP	Safe	aecPage
+Isaacs	VIC	Outer Metropolitan	ALP	Fairly Safe	aecPage
+Jagajaga	VIC	Outer Metropolitan	ALP	Marginal	aecPage
+Kalgoorlie	WA	Rural	LP	Marginal	aecPage
+Kennedy	QLD	Rural	NP	Safe	aecPage
+Kingsford-Smith	NSW	Inner Metropolitan	ALP	Safe	aecPage
+Kingston	SA	Outer Metropolitan	ALP	Marginal	aecPage
+Kooyong	VIC	Inner Metropolitan	LP	Safe	aecPage
+La Trobe	VIC	Outer Metropolitan	LP	Marginal	aecPage
+Lalor	VIC	Outer Metropolitan	ALP	Safe	aecPage
+Leichhardt	QLD	Rural	LP	Marginal	aecPage
+Lilley	QLD	Inner Metropolitan	ALP	Marginal	aecPage
+Lindsay	NSW	Outer Metropolitan	LP	Marginal	aecPage
+Longman	QLD	Rural	LP	Marginal	aecPage
+Lowe	NSW	Inner Metropolitan	ALP	Marginal	aecPage
+Lyne	NSW	Rural	NP	Fairly Safe	aecPage
+Lyons	TAS	Rural	ALP	Safe	aecPage
+Macarthur	NSW	Rural	LP	Marginal	aecPage
+Mackellar	NSW	Outer Metropolitan	LP	Safe	aecPage
+Macquarie	NSW	Outer Metropolitan	LP	Marginal	aecPage
+Makin	SA	Outer Metropolitan	LP	Marginal	aecPage
+Mallee	VIC	Rural	NP	Safe	aecPage
+Maranoa	QLD	Rural	NP	Safe	aecPage
+Maribyrnong	VIC	Outer Metropolitan	ALP	Safe	aecPage
+Mayo	SA	Rural	LP	Marginal	aecPage
+McEwen	VIC	Rural	LP	Marginal	aecPage
+McMillan	VIC	Rural	ALP	Marginal	aecPage
+McPherson	QLD	Provincial	LP	Fairly Safe	aecPage
+Melbourne	VIC	Inner Metropolitan	ALP	Safe	aecPage
+Melbourne Ports	VIC	Inner Metropolitan	ALP	Marginal	aecPage
+Menzies	VIC	Outer Metropolitan	LP	Marginal	aecPage
+Mitchell	NSW	Outer Metropolitan	LP	Safe	aecPage
+Moncrieff	QLD	Provincial	LP	Safe	aecPage
+Moore	WA	Outer Metropolitan	LP	Marginal	aecPage
+Moreton	QLD	Inner Metropolitan	LP	Marginal	aecPage
+Murray	VIC	Rural	LP	Safe	aecPage
+New England	NSW	Rural	NP	Safe	aecPage
+Newcastle	NSW	Provincial	ALP	Safe	aecPage
+North Sydney	NSW	Inner Metropolitan	LP	Safe	aecPage
+Northern Territory	NT	Rural	ALP	Marginal	aecPage
+O'Connor	WA	Rural	LP	Safe	aecPage
+Oxley	QLD	Outer Metropolitan	ALP	Fairly Safe	aecPage
+Page	NSW	Rural	NP	Marginal	aecPage
+Parkes	NSW	Rural	NP	Marginal	aecPage
+Parramatta	NSW	Inner Metropolitan	LP	Marginal	aecPage
+Paterson	NSW	Rural	ALP	Marginal	aecPage
+Pearce	WA	Provincial	LP	Marginal	aecPage
+Perth	WA	Inner Metropolitan	ALP	Safe	aecPage
+Petrie	QLD	Outer Metropolitan	LP	Marginal	aecPage
+Port Adelaide	SA	Inner Metropolitan	ALP	Safe	aecPage
+Prospect	NSW	Outer Metropolitan	ALP	Safe	aecPage
+Rankin	QLD	Outer Metropolitan	ALP	Fairly Safe	aecPage
+Reid	NSW	Inner Metropolitan	ALP	Safe	aecPage
+Richmond	NSW	Rural	NP	Marginal	aecPage
+Riverina	NSW	Rural	NP	Safe	aecPage
+Robertson	NSW	Provincial	LP	Marginal	aecPage
+Ryan	QLD	Outer Metropolitan	LP	Fairly Safe	aecPage
+Scullin	VIC	Outer Metropolitan	ALP	Safe	aecPage
+Shortland	NSW	Provincial	ALP	Safe	aecPage
+Stirling	WA	Inner Metropolitan	ALP	Marginal	aecPage
+Sturt	SA	Inner Metropolitan	LP	Fairly Safe	aecPage
+Swan	WA	Inner Metropolitan	ALP	Marginal	aecPage
+Sydney	NSW	Inner Metropolitan	ALP	Safe	aecPage
+Tangney	WA	Inner Metropolitan	LP	Marginal	aecPage
+Throsby	NSW	Provincial	ALP	Safe	aecPage
+Wakefield	SA	Rural	LP	Safe	aecPage
+Wannon	VIC	Rural	LP	Fairly Safe	aecPage
+Warringah	NSW	Inner Metropolitan	LP	Safe	aecPage
+Watson	NSW	Inner Metropolitan	ALP	Safe	aecPage
+Wentworth	NSW	Inner Metropolitan	LP	Fairly Safe	aecPage
+Werriwa	NSW	Outer Metropolitan	ALP	Safe	aecPage
+Wide Bay	QLD	Rural	NP	Marginal	aecPage
+Wills	VIC	Inner Metropolitan	ALP	Safe	aecPage

@@ -1,6 +1,6 @@
 ---
 name: aec-division-classifications
-description: AEC per-division demographic classification (Inner Metropolitan / Outer Metropolitan / Provincial / Rural) — the VTR HouseDivisionClassifications product end-to-end for NINE election blocks (canonical-on-page 2001 from the Wayback-harvested 2001-epoch profile pages + RR5 gap-fill of its 3 holes, canonical-on-page 2004 from the LIVE 2004 profile pages, plus live VTR 2007–2025; two markup eras: 2016+ headers="c*" self-label cells vs 2007/2010/2013 positional 7/8-cell rows), chamber-count invariants, the repo's extractor + fixtures + test, and the geography-stratification use it was built for. NOTE 2026-10-22: the supposed 2004 gap is CLOSED — live per-division profile pages under aec.gov.au/Elections/federal_elections/2004/profiles/ carried the rating; the 150-row harvest landed as a committed canonical block. RR5 att2's FROM column records the 2004-epoch print, not 2001's.
+description: AEC per-division demographic classification (Inner Metropolitan / Outer Metropolitan / Provincial / Rural) — the VTR HouseDivisionClassifications product end-to-end for ELEVEN election blocks (recovered-on-page 1996 + 1998 from the AEC's own whole-chamber "Divisional Classifications" table pages via Wayback, canonical-on-page 2001 from the Wayback-harvested 2001-epoch profile pages + RR5 gap-fill of its 3 holes, canonical-on-page 2004 from the LIVE 2004 profile pages, plus live VTR 2007–2025; two markup eras: 2016+ headers="c*" self-label cells vs 2007/2010/2013 positional 7/8-cell rows), chamber-count invariants, the repo's extractor + fixtures + test, and the geography-stratification use it was built for. NOTE 2026-10-22: the supposed 2004 gap is CLOSED — live per-division profile pages under aec.gov.au/Elections/federal_elections/2004/profiles/ carried the rating; the 150-row harvest landed as a committed canonical block. RR5 att2's FROM column records the 2004-epoch print, not 2001's.
 source: auto-skill
 extracted_at: '2026-10-22T06:00:00.000Z'
 ---
@@ -66,6 +66,8 @@ VTR pages are cleaner and uniform — prefer them.
 
 | Election | event | divisions |
 |---|---|---|
+| 1996 | (recovered Wayback whole-chamber classification page) | 148 |
+| 1998 | (recovered Wayback whole-chamber classification page) | 148 |
 | 2001 | (v2 Wayback pages + 3 RR5 fills — no VTR event) | 150 |
 | 2004 | (live per-division profile pages — no VTR event) | 150 |
 | 2007 | 13745 | 150 |
@@ -85,9 +87,19 @@ Provincial** (not metro), Lyons Rural. Legacy era — 2007: Lyons Rural,
 Throsby Provincial, McEwen Rural, Aston Outer, Adelaide Inner; 2010:
 Wentworth Inner, Durack Rural, Lyons Rural; 2013: Denison Inner, Throsby
 Provincial, Lyons Rural, Aston Outer. (Lyons and Aston pin the same class
-across eras — clean anchors.)
+across eras — clean anchors.) Recovered-on-page era — 1996: Northern
+Territory Rural (CLP), Namadgi Inner Metro, Aston Outer, Gwydir Rural,
+Fisher Rural, Pearce Outer Metro; 1998: Northern Territory Rural (ALP —
+the 1998-election flip), Blair Rural, Pearce Provincial, Fisher
+Provincial, Aston Outer Metro, Macarthur Rural.
 
-Cross-era reclass drift is small and listable: 01→04 seven (Brand OM→P,
+Cross-era reclass drift is small and listable: 96→98 two (Fisher R→P,
+Pearce OM→P); 98→01 six (Brand P→OM, Cunningham P→OM, Macarthur R→OM,
+Maribyrnong OM→IM, Pearce P→R, Throsby P→IM — **exactly the inverse of
+the 2001→04 set minus Fisher**: the v2 2001 profile-page layer is a
+transitional print nearest the 1998 Pocket-Book epoch, and Fisher keeps
+moving Provincial through 2001 before returning to its 1996 Rural print
+at 2004); 01→04 seven (Brand OM→P,
 Cunningham OM→P, Throsby IM→P, Fisher P→R, Macarthur OM→R, Maribyrnong
 IM→OM, Pearce R→OM); 04→07 four (Hinkler R→P, Longman R→P, Macarthur
 R→OM — flipping back within three years — Macquarie OM→P); 07→10 Forde
@@ -227,7 +239,19 @@ of the seven REAL 2001→2004 on-page reclassifications.
 ## Repo implementation (committed)
 
 - `.build/analysis/seat-model/extract-division-classifications.mjs` — emits
-  NINE blocks. The 2004 block is OFFLINE too: `elections2004()` walks the
+  ELEVEN blocks. The 1996 and 1998 blocks are OFFLINE and share
+  `electionsClassicEra(fixture, stateCounts)`: a document-order regex walk
+  of the committed whole-chamber TSVs (`<p><b>STATE</b></p>` banner
+  paragraphs interleaved with six-column `<tr>` rows at transcription
+  time — the column-inversion trap: the RATING rides the printed
+  "Socio-Demographic" column and the WINNING PARTY rides the printed
+  "Classification" column). Guards: exact 148-row count, per-state
+  chamber counts (1996: ACT 3/QLD 26/NT 1; 1998: ACT 2/QLD 27 — the
+  1997-redistribution pivots), four-class/state vocabularies, era party
+  vocabulary (LP/ALP/NP/CLP/IND), duplicate divisions, fixture schema
+  header required, provenance ∈ {aecPage}, and the Namadgi↔Blair set
+  pivot asserted between the two blocks. Both seed before 2001 so keys
+  stay chronological. The 2004 block is OFFLINE too: `elections2004()` walks the
   committed live-page fixture (no fetch — the pages' fetch happened at
   harvest time), guards the four-class/state/party/status vocabularies,
   duplicates, the exact 150-row count, the per-state chamber counts
@@ -259,6 +283,39 @@ of the seven REAL 2001→2004 on-page reclassifications.
   Join to flow files **by exact division name** (AEC canonical case for the
   election's era) — the test pins name-set equality with
   `data/aec-2025-seat-flows.json` so joins never silently miss.
+- `.build/analysis/seat-model/aec-1996-epoch-classifications.tsv` +
+  `.build/analysis/seat-model/aec-1998-epoch-classifications.tsv` — the
+  canonical 1996/1998 sources (committed 2026-10-22): 148 rows each,
+  schema `# division, state, classification, party, status, provenance`
+  (tab-separated, all rows `aecPage`). Transcribed from the AEC's own
+  whole-chamber "Divisional Classifications" table pages via Wayback
+  raw-capture (`id_`) fetches — provenance header carries the source URL,
+  capture id, page title/stamp and the raw HTML's sha256. 1996:
+  `aec.gov.au/_content/When/elections/1996/info/classification.htm`
+  capture 20060524142147, title "1996 Divisional Classifcations" (sic),
+  stamp "last updated 08 September 2005", sha256
+  `cead85a74fd7a970b67ea1c436a9e05b18edd1e80f87b43f5d72acf5310a4ba6`;
+  raw cached `.matilda/1996-classification-2006.html`. 1998:
+  `aec.gov.au/Elections/federal_elections/1998/classification.htm`
+  capture 20070831140251, title "1998 Divisional Classifications", stamp
+  "last updated Thursday, August 09, 2007", source note printed on-page
+  "Source: Electoral Pocket Book, August 1999", sha256
+  `760ff820c4e062508ff198f08be4041ebf52b941e397d09ff7672eafe09d8248`;
+  raw cached `.matilda/1998-classification-raw.html`, parsed transcript
+  `.matilda/1998-classification.tsv`. Both pages print six columns
+  Code/Division/Enrolment/Socio-Demographic/Seat Status/Classification
+  with state banners as `<p><b>STATE</b></p>` paragraphs between tables,
+  and both are COLUMN-INVERTED: the rating sits under "Socio-Demographic"
+  and the winning party under "Classification" — resolved at
+  transcription, the fixture carries the corrected columns. Chamber sets:
+  1996 has Namadgi (ACT 3) and no Blair; 1998 has Blair (QLD 27) and no
+  Namadgi — the 1997-redistribution pivot. NT is single-seat **Rural** in
+  both (CLP 1996, ALP 1998 — see
+  `.matilda/divclass-pre2001/nt-1998-rating-placeholder.md`, now fully
+  resolved; two earlier guesses, "Provincial" and Wikipedia's
+  "Provincial, rural and remote" composite, were both wrong). Era party
+  tokens: LP/ALP/NP/CLP/IND. Distributions: 1996 Inner 42/Outer 43/
+  Provincial 18/Rural 45; 1998 Inner 41/Outer 42/Provincial 20/Rural 45.
 - `.build/analysis/seat-model/aec-2001-epoch-profile-ratings.tsv` — the
   canonical 2001 classification source (committed 2026-10-22): 150 rows,
   schema `# division, classificationV2page, provenance`; 147 Wayback-page
@@ -284,17 +341,26 @@ of the seven REAL 2001→2004 on-page reclassifications.
   att2 prints title case) so the extractor carries no RR5-specific casing
   logic. Regenerator script:
   `.matilda/gen-rr5-fixtures.mjs` (scratch — see gotchas below).
-- `test-division-classifications.mjs` — chamber counts for 9 blocks
-  (150×6 2001–2016, 151×2, 150), vocabulary with the `previous === null`
-  exception scoped to `year === "2001" || year === "2004"` (both
-  single-epoch page layers; current still required), the boundary pins
-  (incl. the 2001 on-page ten and the 2004 live-page nine — see the pins
-  paragraph), W2 name-set equality, the exact reclass sets 2001→2004
+- `test-division-classifications.mjs` — chamber counts for 11 blocks
+  (148×2 1996/1998, 150×6 2001–2016, 151×2, 150), vocabulary with the
+  `previous === null` exception scoped to the four single-epoch years
+  1996/1998/2001/2004 (all single-print page layers; current still
+  required), the boundary pins (incl. the 1996 six, the 1998 six, the
+  2001 on-page ten and the 2004 live-page nine — see the pins
+  paragraph), W2 name-set equality, the exact reclass sets 1996→1998
+  (two: Fisher R→P, Pearce OM→P), 1998→2001 (six — Brand/Cunningham
+  P→OM, Macarthur R→OM, Maribyrnong OM→IM, Pearce P→R, Throsby P→IM;
+  the test header records the transitional-2001-layer finding), 2001→2004
   (seven) and 2004→2007 (four — incl. Macarthur's R→OM flip-back),
   2016→2019 drift list (still exactly Cowper + Griffith), the era-set
-  invariants: 2001 has Gwydir PRESENT and Gorton/Bonner/Flynn/Wright
+  invariants: 1996 has Namadgi PRESENT and Blair ABSENT; 1998 has Blair
+  PRESENT and Namadgi ABSENT (the 1997-redistribution pivot);
+  Kingsford-Smith hyphenated in 1996/1998 (2001 drops the hyphen);
+  Solomon/Lingiari/Hasluck ABSENT from 1998 (created for 2001);
+  2001 has Gwydir PRESENT and Gorton/Bonner/Flynn/Wright
   ABSENT; 2004 has Bonner/Gorton PRESENT and Bonython/Burke ABSENT (the
-  2003-04 redistribution pivots), and the per-layer pins: 2001
+  2003-04 redistribution pivots), and the per-layer pins: 1996
+  distribution 42/43/18/45, 1998 distribution 41/42/20/45, 2001
   distribution 44/45/16/45, `deltas["2001"]` exactly 20 rows (spot rows
   Burke/Throsby/Macarthur/Canning, RR5 gap-fill rows never appear),
   2004 distribution 42/45/18/45. Run order: extractor then test, from
@@ -309,12 +375,18 @@ of the seven REAL 2001→2004 on-page reclassifications.
 Question asked: can the four-class table be sourced before 2007? Answer:
 **2007 is the start of the online per-division RESULTS table; 2004 and
 2001 are both canonical-on-page from the AEC's own per-division profile
-pages (2004 live today, 2001 via Wayback); earlier is print-only or
-back-projection.** (2026-10-22 correction: an earlier draft of this map
+pages (2004 live today, 2001 via Wayback); and 1996 + 1998 are
+canonical-on-page from the AEC's own whole-chamber "Divisional
+Classifications" table pages, both recovered from Wayback and committed
+as fixtures (2026-10-22 — see the fixture bullets above). Earlier than
+1996 is print-only or back-projection.** (2026-10-22 correction: an earlier draft of this map
 claimed "2004 has NO four-class table … back-project" — wrong; it only
 looked at the VTR results product. The 2004 per-division PROFILE pages,
 a different www.aec.gov.au surface, carry the rating — see the 2004
-harvest section above.)
+harvest section above. Same lesson repeated: the 1996/1998
+whole-chamber classification pages lived under yet another aec.gov.au
+surface — `aec.gov.au/Elections/federal_elections/<year>/…` — and never
+surfaced in the results.aec.gov.au probes at all.)
 
 Archive anatomy (results.aec.gov.au):
 - The archive index `https://results.aec.gov.au/` hrefs name every event
@@ -406,11 +478,10 @@ Fixture-generator parse gotchas (all bit once, in `.matilda/gen-rr5-fixtures.mjs
   on the first row of each state subgroup — the regex must allow and drop
   them.
 
-Practical fill ladder for the seat model: **2001 + 2004 + 2007–2025** =
-IN THE REPO NOW (canonical-on-page 2001 + 2004 profile-page blocks + VTR
-pages, one regen command);
-**1998** = back-project from 2001 (drift runs 2–7 seats per cycle —
-same order as any reconstruction); **pre-2001** = print-only (pocket
+Practical fill ladder for the seat model: **1996 + 1998 + 2001 + 2004 +
+2007–2025** = IN THE REPO NOW (recovered-on-page 1996/1998 whole-chamber
+blocks + canonical-on-page 2001 + 2004 profile-page blocks + VTR pages,
+one regen command); **pre-1996** = print-only (pocket
 books, National Electoral Division Profiles, Electoral Atlas) — not
 worth scanning unless a workstream truly needs it.
 

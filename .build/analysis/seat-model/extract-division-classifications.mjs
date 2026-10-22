@@ -1,12 +1,32 @@
 #!/usr/bin/env node
 /* extract-division-classifications.mjs — the AEC's per-division demographic
    classification (Inner Metropolitan / Outer Metropolitan / Provincial /
-   Rural), previous-and-current seat status, and parties, for nine election
-   blocks: canonical-on-page 2001 and 2004 blocks plus the seven VTR
-   elections (2007/2010/2013/2016/2019/2022/2025). The classification is
+   Rural), previous-and-current seat status, and parties, for eleven
+   election blocks: recovered-on-page 1996 and 1998 blocks, canonical-on-page
+   2001 and 2004 blocks, plus the seven VTR elections
+   (2007/2010/2013/2016/2019/2022/2025). The classification is
    the AEC's own geography rating — the flow-strength findings name
    "regional" composition as a confound; this is the covariate that answers
    for it.
+
+   The 1996 and 1998 blocks are canonical-on-page from the AEC's own
+   whole-chamber "Divisional Classifications" table pages, recovered from
+   Wayback: 1996 (aec.gov.au/_content/When/elections/1996/info/
+   classification.htm, capture 20060524142147) and 1998
+   (aec.gov.au/Elections/federal_elections/1998/classification.htm, capture
+   20070831140251 — the page prints "Source: Electoral Pocket Book, August
+   1999"), transcribed into the committed aec-1996- and aec-1998-epoch-
+   classifications.tsv fixtures (148 divisions each; each fixture header
+   carries its source URL, capture id, page stamp and the raw capture's
+   sha256 — the HTML lives under .matilda/). Both pages print the same
+   six-column table: Code / Division / Enrolment / Socio-Demographic / Seat
+   Status / Classification — note the inversion: their "Socio-Demographic"
+   column is the four-class rating and their final "Classification" column
+   is the winning party. Party tokens are raw page vocabulary
+   (LP/ALP/NP/CLP/IND). The 148-division set pivots on the 1997
+   redistributions exactly twice: Namadgi out (ACT 3->2), Blair in (Qld
+   26->27). Like 2001/2004 the pages are single-epoch (no prior/after
+   pair), so previous:null.
 
    The 2001 block is canonical-on-page, not derived (the online VTR starts
    at 2004 and carries no classifications): the AEC's own 2001-epoch
@@ -53,10 +73,10 @@
    the page's own; 2013: 8 cols, state is col 2).
 
    Invariants pinned by test-division-classifications.mjs: seat counts
-   (2001-2016 150 blocks, 2019/2022 151, 2025 150), every division carries
-   one of the four classes, the 2001→2004 and 2004→2007 reclassification
-   sets are pinned exactly, and seat names line up with
-   data/aec-2025-seat-flows.json for 2025.
+   (1996/1998 148 blocks, 2001-2016 150 blocks, 2019/2022 151, 2025 150),
+   every division carries one of the four classes, the 1996→1998, 2001→2004
+   and 2004→2007 reclassification sets are pinned exactly, and seat names
+   line up with data/aec-2025-seat-flows.json for 2025.
 
    Run from the repo root:
      node .build/analysis/seat-model/extract-division-classifications.mjs
@@ -72,6 +92,14 @@ const RR5_FIXTURES = {
 };
 const V2_FIXTURE = ".build/analysis/seat-model/aec-2001-epoch-profile-ratings.tsv";
 const V2_2004_FIXTURE = ".build/analysis/seat-model/aec-2004-epoch-profile-ratings.tsv";
+const CLASS_1996_FIXTURE = ".build/analysis/seat-model/aec-1996-epoch-classifications.tsv";
+const CLASS_1998_FIXTURE = ".build/analysis/seat-model/aec-1998-epoch-classifications.tsv";
+// The 148-division chamber pivots on the 1997 redistributions.
+const ADDED_1998 = ["Blair"];
+const ABOLISHED_1998 = ["Namadgi"];
+const PARTIES_CLASSIC = ["LP", "ALP", "NP", "CLP", "IND"];
+const STATE_COUNTS_1996 = { NSW: 50, VIC: 37, QLD: 26, SA: 12, WA: 14, TAS: 5, NT: 1, ACT: 3 };
+const STATE_COUNTS_1998 = { NSW: 50, VIC: 37, QLD: 27, SA: 12, WA: 14, TAS: 5, NT: 1, ACT: 2 };
 // The 2004-division-set pivots on the 2003-04 redistributions.
 const ADDED_2004 = ["Bonner", "Gorton"];
 const ABOLISHED_2004 = ["Bonython", "Burke"];
@@ -197,12 +225,58 @@ const elections2004 = () => {
   return { block };
 };
 
+/* The 1996 and 1998 blocks: canonical-on-page from the recovered AEC
+   whole-chamber "Divisional Classifications" table pages (see header), fully
+   transcribed into committed fixtures — every row aecPage, no patch lanes.
+   Single-epoch pages, so previous:null. Guards: 148 rows, the per-state
+   chamber counts for the year, closed class/state/party/status vocabularies
+   (party tokens raw: LP/ALP/NP/CLP/IND; statuses Marginal/Fairly Safe/Safe —
+   the same vocabulary the 2004 pages print), provenance, duplicates. The
+   1997-redistribution pivot (Namadgi out / Blair in) is asserted where the
+   two blocks are composed below. The column inversion on the source pages
+   (demographic rating under "Socio-Demographic", winning party under
+   "Classification") is resolved at transcription time — the fixture schemas
+   are authoritative. */
+const electionsClassicEra = (fixture, stateCountsWant) => {
+  const block = {}, stateCounts = {};
+  for (const r of loadTsv(fixture)) {
+    if (!CLASSES.includes(r.classification)) throw new Error(`${fixture}: ${r.division}: bad class ${r.classification}`);
+    if (!STATES.includes(r.state)) throw new Error(`${fixture}: ${r.division}: bad state ${r.state}`);
+    if (!PARTIES_CLASSIC.includes(r.party)) throw new Error(`${fixture}: ${r.division}: bad party ${r.party}`);
+    if (!STATUSES_2004.includes(r.status)) throw new Error(`${fixture}: ${r.division}: bad status ${r.status}`);
+    if (r.provenance !== "aecPage") throw new Error(`${fixture}: ${r.division}: bad provenance ${r.provenance}`);
+    if (block[r.division]) throw new Error(`${fixture}: duplicate ${r.division}`);
+    block[r.division] = {
+      state: r.state,
+      classification: r.classification,
+      previous: null,
+      current: { party: r.party, status: r.status },
+    };
+    stateCounts[r.state] = (stateCounts[r.state] || 0) + 1;
+  }
+  if (Object.keys(block).length !== 148) throw new Error(`${fixture}: ${Object.keys(block).length} rows (expect 148)`);
+  const sortKeys = (o) => JSON.stringify(Object.fromEntries(Object.entries(o).sort()));
+  if (sortKeys(stateCounts) !== sortKeys(stateCountsWant))
+    throw new Error(`${fixture}: state counts ${JSON.stringify(stateCounts)} (expect ${JSON.stringify(stateCountsWant)})`);
+  return { block };
+};
+
 const out = {
-  _about: "AEC demographic classification per division (Inner Metropolitan / Outer Metropolitan / Provincial / Rural — AEC definitions: inner = capital-city established suburbs; outer = capital-city expansion areas; provincial = majority of enrolment in major provincial cities; rural = the rest), with previous/current seat status (marginal <56%, fairly safe 56-60%, safe >60%) and parties, per election 2001, 2004 and 2007/2010/2013/2016/2019/2022/2025. 2001 is CANONICAL-ON-PAGE from the AEC's own 2001-epoch division profile pages (Wayback captures Nov 2001-Apr 2002 of the 'Demographic Rating' token beside the '3 October 1998 Election' Seat Status block, transcribed in aec-2001-epoch-profile-ratings.tsv: 147 on-page ratings + 3 RR5-att3 gap fills — Bradfield/Maribyrnong unarchived, Wide Bay never printed; the era tokens Outer Urban / Outer Metropolitan/Provincial normalise to Outer Metropolitan). 2004 is likewise CANONICAL-ON-PAGE, from the LIVE 2004 division profile pages (www.aec.gov.au/Elections/federal_elections/2004/profiles/, transcribed 2026-10-22 in aec-2004-epoch-profile-ratings.tsv: all 150 divisions carry an on-page rating, no patches; the 2004 set is the 2001 set plus Bonner/Gorton minus Bonython/Burke after the 2003-04 redistributions, and the division's 2004-election Seat Status string supplies current party/status). AEC Research Report 5 (Newman, Jan 2005) is gap-fill + corroboration only: its attachment-2 FROM column independently confirms 12 of 16 change rows — the four exceptions Macarthur/Maribyrnong/Fisher/Pearce are four of the seven REAL 2001->2004 on-page reclassifications (Newman's '2001' FROM column actually describes the 2004-epoch printed rating, matching the 2004 pages on all 15 comparable rows) — and the 20 v2-vs-attachment-3 divergences (attachment 3 being a never-adopted proposed re-rating) land in deltas['2001']; 2001 and 2004 rows carry previous:null (their pages have no prior/after pair) and the year-era division sets (2001: Gwydir present, no Bonner/Gorton; 2004: Bonner/Gorton in, Bonython/Burke out). 2007+ extracted from the VTR HouseDivisionClassifications per-state pages. The AEC rates divisions per election; names stay in AEC canonical case for that election's era (2001-2013 names predate the 2016-17 renames: e.g. 'Denison' not 'Clark', 'Throsby' not 'Whitlam'); join to that year's flows/baseline by exact name.",
-  _provenance: { sourcePattern: "https://results.aec.gov.au/<event>/Website/HouseDivisionClassifications-<event>-<STATE>.htm", rr5: "https://www.aec.gov.au/About_AEC/research/files/research_paper5.pdf", wayback2001: "AEC 2001-epoch division profile pages, Wayback captures Nov 2001-Apr 2002 (harvest kit: .matilda/divclass-pre2001/harvest-1998-v2.py)", live2004: "AEC 2004 division profile pages, live www.aec.gov.au/Elections/federal_elections/2004/profiles/<Name>.htm (harvest kit: .matilda/divclass-2004/harvest-2004.py)", fixtures: [V2_FIXTURE, V2_2004_FIXTURE, ...Object.values(RR5_FIXTURES)], events: EVENTS, extractedAt: new Date().toISOString().slice(0, 10) },
+  _about: "AEC demographic classification per division (Inner Metropolitan / Outer Metropolitan / Provincial / Rural — AEC definitions: inner = capital-city established suburbs; outer = capital-city expansion areas; provincial = majority of enrolment in major provincial cities; rural = the rest), with previous/current seat status (marginal <56%, fairly safe 56-60%, safe >60%) and parties, per election 1996, 1998, 2001, 2004 and 2007/2010/2013/2016/2019/2022/2025. 1996 and 1998 are CANONICAL-ON-PAGE from the AEC's own whole-chamber 'Divisional Classifications' table pages recovered from Wayback (1996: aec.gov.au/_content/When/elections/1996/info/classification.htm, capture 20060524142147; 1998: aec.gov.au/Elections/federal_elections/1998/classification.htm, capture 20070831140251, 'Source: Electoral Pocket Book, August 1999'), fully transcribed into aec-1996/aec-1998-epoch-classifications.tsv (148 divisions each, every row aecPage; on the printed table the four-class rating is the 'Socio-Demographic' column and the winning party the final 'Classification' column; party tokens are raw page vocabulary LP/ALP/NP/CLP/IND; both pages single-epoch so previous:null; the 148-division set pivots on the 1997 redistributions exactly twice: Namadgi out, Blair in). 2001 is CANONICAL-ON-PAGE from the AEC's own 2001-epoch division profile pages (Wayback captures Nov 2001-Apr 2002 of the 'Demographic Rating' token beside the '3 October 1998 Election' Seat Status block, transcribed in aec-2001-epoch-profile-ratings.tsv: 147 on-page ratings + 3 RR5-att3 gap fills — Bradfield/Maribyrnong unarchived, Wide Bay never printed; the era tokens Outer Urban / Outer Metropolitan/Provincial normalise to Outer Metropolitan). 2004 is likewise CANONICAL-ON-PAGE, from the LIVE 2004 division profile pages (www.aec.gov.au/Elections/federal_elections/2004/profiles/, transcribed 2026-10-22 in aec-2004-epoch-profile-ratings.tsv: all 150 divisions carry an on-page rating, no patches; the 2004 set is the 2001 set plus Bonner/Gorton minus Bonython/Burke after the 2003-04 redistributions, and the division's 2004-election Seat Status string supplies current party/status). AEC Research Report 5 (Newman, Jan 2005) is gap-fill + corroboration only: its attachment-2 FROM column independently confirms 12 of 16 change rows — the four exceptions Macarthur/Maribyrnong/Fisher/Pearce are four of the seven REAL 2001->2004 on-page reclassifications (Newman's '2001' FROM column actually describes the 2004-epoch printed rating, matching the 2004 pages on all 15 comparable rows) — and the 20 v2-vs-attachment-3 divergences (attachment 3 being a never-adopted proposed re-rating) land in deltas['2001']; 1996, 1998, 2001 and 2004 rows carry previous:null (their pages have no prior/after pair) and the year-era division sets (1996: Namadgi present, no Blair; 1998: Blair in, Namadgi out; 2001: Gwydir present, no Bonner/Gorton; 2004: Bonner/Gorton in, Bonython/Burke out). 2007+ extracted from the VTR HouseDivisionClassifications per-state pages. The AEC rates divisions per election; names stay in AEC canonical case for that election's era (2001-2013 names predate the 2016-17 renames: e.g. 'Denison' not 'Clark', 'Throsby' not 'Whitlam'); join to that year's flows/baseline by exact name.",
+  _provenance: { sourcePattern: "https://results.aec.gov.au/<event>/Website/HouseDivisionClassifications-<event>-<STATE>.htm", rr5: "https://www.aec.gov.au/About_AEC/research/files/research_paper5.pdf", wayback1996: "AEC 'Divisional Classifications' page, capture 20060524142147 of aec.gov.au/_content/When/elections/1996/info/classification.htm (transcript: .matilda/1996-classification.tsv; raw capture: .matilda/1996-classification-2006.html, sha256-fingerprinted in the fixture header)", wayback1998: "AEC 'Divisional Classifications' page, capture 20070831140251 of aec.gov.au/Elections/federal_elections/1998/classification.htm (transcript: .matilda/1998-classification.tsv; raw capture: .matilda/1998-classification-raw.html, sha256-fingerprinted in the fixture header)", wayback2001: "AEC 2001-epoch division profile pages, Wayback captures Nov 2001-Apr 2002 (harvest kit: .matilda/divclass-pre2001/harvest-1998-v2.py)", live2004: "AEC 2004 division profile pages, live www.aec.gov.au/Elections/federal_elections/2004/profiles/<Name>.htm (harvest kit: .matilda/divclass-2004/harvest-2004.py)", fixtures: [CLASS_1996_FIXTURE, CLASS_1998_FIXTURE, V2_FIXTURE, V2_2004_FIXTURE, ...Object.values(RR5_FIXTURES)], events: EVENTS, extractedAt: new Date().toISOString().slice(0, 10) },
   elections: {},
   deltas: {},
 };
+const e96 = electionsClassicEra(CLASS_1996_FIXTURE, STATE_COUNTS_1996);
+const e98 = electionsClassicEra(CLASS_1998_FIXTURE, STATE_COUNTS_1998);
+const missing98 = Object.keys(e96.block).filter((n) => !(n in e98.block));
+const added98 = Object.keys(e98.block).filter((n) => !(n in e96.block));
+if (missing98.join() !== ABOLISHED_1998.join() || added98.join() !== ADDED_1998.join())
+  throw new Error(`1996->1998 set pivots out:[${missing98}] in:[${added98}] (expect ${ABOLISHED_1998}/${ADDED_1998})`);
+out.elections["1996"] = e96.block;
+out.elections["1998"] = e98.block;
+console.log(`1996: ${Object.keys(e96.block).length} divisions (recovered Wayback page canonical)`);
+console.log(`1998: ${Object.keys(e98.block).length} divisions (recovered Wayback page canonical)`);
 const e01 = elections2001();
 out.elections["2001"] = e01.block;
 out.deltas["2001"] = {
