@@ -38226,7 +38226,7 @@ function AllPollsView({
         case "conf.v":
           return p.conf ? p.conf.v : -Infinity;
         case "conf.chg":
-          return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+          return p.conf && p.conf.chg != null ? p.conf.chg : p.conf && p.conf.chgCalc != null ? p.conf.chgCalc : -Infinity;
         case "conf.cond":
           return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
         default:
@@ -38399,7 +38399,7 @@ function AllPollsView({
   }], ["Best on it %", p => {
     const b = issBestOf(p.iss);
     return b ? b.v : "";
-  }], ["Confidence series", p => p.conf ? p.conf.lab : ""], ["Confidence figure", p => p.conf ? p.conf.v : ""], ["Confidence change", p => p.conf && p.conf.chg != null ? p.conf.chg : ""], ["NAB conditions", p => p.conf && p.conf.cond != null ? p.conf.cond : ""]];
+  }], ["Confidence series", p => p.conf ? p.conf.lab : ""], ["Confidence figure", p => p.conf ? p.conf.v : ""], ["Confidence change", p => p.conf && p.conf.chg != null ? p.conf.chg : p.conf && p.conf.chgCalc != null ? p.conf.chgCalc : ""], ["NAB conditions", p => p.conf && p.conf.cond != null ? p.conf.cond : ""]];
   const exportCsv = () => downloadCsv(`auspol-tracker-polls-${D.latest.updatedISO}.csv`, [CSV_COLS.map(c => c[0]), ...sorted.map(p => CSV_COLS.map(c => c[1](p)))]);
   if (window.AP.rd) return React.createElement("div", {
     className: "view view-allpolls"
@@ -47823,13 +47823,19 @@ function RdDirection({
   }));
   const gRaw = G ? (G.raw || []).filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
   const gCounts = gRaw.reduce((m, d) => (m[d.pollster] = (m[d.pollster] || 0) + 1, m), {});
-  const gRing = gHouses.length === 2 ? (gCounts[gHouses[0]] || 0) <= (gCounts[gHouses[1]] || 0) ? gHouses[0] : gHouses[1] : null;
+  const gRings = (() => {
+    if (gHouses.length < 2) return new Set();
+    const modal = gHouses.reduce((a, b) => (gCounts[a] || 0) >= (gCounts[b] || 0) ? a : b);
+    return new Set(gHouses.filter(h => h !== modal));
+  })();
+  const gRingNames = [...gRings];
+  const gRingPoss = gRingNames.length ? rdList(gRingNames.map(h => h + "’s")) : null;
   const gDots = gRaw.flatMap(d => {
     const meta = d.released ? d : {
       pollster: d.pollster,
       dateLabel: monthLabelFull(d.ym)
     };
-    const ring = d.pollster === gRing ? {
+    const ring = gRings.has(d.pollster) ? {
       hollow: true
     } : {};
     return [d.right != null ? {
@@ -47886,15 +47892,14 @@ function RdDirection({
     let s = gName + ", " + monthLabelFull(gLast.ym) + ": wrong track " + absW + " points" + side(gLast.gapW) + "all voters" + (gLast.wrongCi != null ? " (±" + gLast.wrongCi.toFixed(1) + ")" : "");
     if (gLast.gapR != null) s += "; right direction " + Math.abs(gLast.gapR).toFixed(1) + " points" + side(gLast.gapR) + "all voters" + (gLast.rightCi != null ? " (±" + gLast.rightCi.toFixed(1) + ")" : "");
     s += ".";
-    if (gHouses.length === 2) {
+    if (gHouses.length >= 2) {
       const gapKey = gRaw.some(d => d.gapR != null) ? "gapR" : "gapW";
       const mean = h => {
         const vs = gRaw.filter(d => d.pollster === h && d[gapKey] != null).map(d => d[gapKey]);
         return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null;
       };
-      const m0 = mean(gHouses[0]),
-        m1 = mean(gHouses[1]);
-      if (m0 != null && m1 != null) s += " The pollsters disagree on how big the " + (gapKey === "gapR" ? "right-direction" : "wrong-track") + " gap is: " + gHouses[0] + "’s readings average " + signedP(Math.round(m0 * 10) / 10) + " points, " + gHouses[1] + "’s " + signedP(Math.round(m1 * 10) / 10) + " points.";
+      const ms = gHouses.map(h => [h, mean(h)]);
+      if (ms.every(([, m]) => m != null)) s += " The pollsters disagree on how big the " + (gapKey === "gapR" ? "right-direction" : "wrong-track") + " gap is: " + rdList(ms.map(([h, m], i) => h + "’s " + (i === 0 ? "readings average " : "") + signedP(Math.round(m * 10) / 10) + " points")) + ".";
     }
     return s;
   })();
@@ -47906,8 +47911,23 @@ function RdDirection({
     label: "By age (Essential)",
     opts: gBy("age")
   }, {
-    label: "By vote (Roy Morgan)",
+    label: "By generation (RedBridge)",
+    opts: gBy("generation")
+  }, {
+    label: "By vote",
     opts: gBy("vote")
+  }, {
+    label: "By vote firmness (RedBridge)",
+    opts: gBy("softness")
+  }, {
+    label: "By location (RedBridge)",
+    opts: gBy("location")
+  }, {
+    label: "By education (RedBridge)",
+    opts: gBy("education")
+  }, {
+    label: "By home ownership (RedBridge)",
+    opts: gBy("ownership")
   }].filter(g => g.opts.length);
   const gNote = D.directionStateNote ? "Roy Morgan’s latest release (" + D.monthNameFull(Number(D.directionStateNote.date.slice(5, 7))) + ") prints " + D.directionStateNote.highest.state + " as the state most convinced the country is on the wrong track (" + D.directionStateNote.highest.w + "%), " + D.directionStateNote.lowest.state + " the least (" + D.directionStateNote.lowest.w + "%). Its full state table is paywalled." : null;
   return React.createElement(RdSec, {
@@ -48078,7 +48098,7 @@ function RdDirection({
     copy: {
       title: gName + ": is the country heading in the right direction?",
       sub: (gRead || "") + " Built like the headline: each poll’s group figure less the all-voters figure its own poll printed, the gaps pooled month by month on the lean-adjusted average.",
-      caption: "Each dot is one house’s reading for " + gName + ", anchored the same way" + (gRing ? " (" + gRing + "’s are the open rings)" : "") + "; dashed lines are all voters, the lean-adjusted average" + (gSized ? ", shading the gap’s approximate 95% margin." : "."),
+      caption: "Each dot is one house’s reading for " + gName + ", anchored the same way" + (gRingPoss ? " (" + gRingPoss + " are the open rings)" : "") + "; dashed lines are all voters, the lean-adjusted average" + (gSized ? ", shading the gap’s approximate 95% margin." : "."),
       legend: [{
         label: gName + ", right direction",
         color: "var(--mood-pos)",
@@ -48166,7 +48186,7 @@ function RdDirection({
     items: [{
       kind: "dot",
       color: "var(--ink-3)",
-      label: "One reading" + (gRing ? " (" + gRing + "’s ride as open rings)" : "") + (gHasRight ? "" : " (" + gSrc + " print only the wrong-track share for this group)")
+      label: "One reading" + (gRingPoss ? " (" + gRingPoss + " ride as open rings)" : "") + (gHasRight ? "" : " (" + gSrc + " print only the wrong-track share for this group)")
     }, gSized ? {
       kind: "lineband",
       color: "var(--ink-3)",
@@ -48194,7 +48214,7 @@ function RdDirection({
   })), !G && gNote && React.createElement("p", {
     className: "rd-dir-extremes"
   }, gNote), G ? React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "The line rides the lean-adjusted all-voters average through ", gName, "\u2019s own gap: in each poll, ", gName, "\u2019s figure less the all-voters figure its own poll printed \u2013 differencing drops that poll\u2019s house lean \u2013 the gaps pooled month by month, weighted by sample. Each dot is one house\u2019s reading for ", gName, ", anchored the same way", gRing ? "; " + gRing + "’s ride as open rings" : "", "."), React.createElement(React.Fragment, null, "The shading is the gap\u2019s approximate 95% margin. ", gHouses.length === 2 ? "Neither house prints" : gSrc + " doesn’t print", " how many respondents this group is, so the base is the poll\u2019s effective sample times the group\u2019s share of adults", G.dim === "vote" ? " (of that poll’s voting intention, for a party’s voters)" : "", ".", G.dim === "vote" ? " Roy Morgan folds its other-party voters into the Independent figure, so neither of those two groups can be sized." : "", gHasRight ? "" : " Where a release names only one share, the other cannot be pieced back from the national figures."), gHouses.length === 2 ? React.createElement(React.Fragment, null, "Essential prints these splits most fortnights; Roy Morgan only some weeks, so a month\u2019s pool leans on whichever asked, and some months rest on one of them.") : gHouses[0] === "Roy Morgan" ? React.createElement(React.Fragment, null, "Roy Morgan prints these splits only some weeks, so the series has months with nothing to pool.") : React.createElement(React.Fragment, null, "Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.")]
+    paras: [React.createElement(React.Fragment, null, "The line rides the lean-adjusted all-voters average through ", gName, "\u2019s own gap: in each poll, ", gName, "\u2019s figure less the all-voters figure its own poll printed \u2013 differencing drops that poll\u2019s house lean \u2013 the gaps pooled month by month, weighted by sample. Each dot is one house\u2019s reading for ", gName, ", anchored the same way", gRingPoss ? "; " + gRingPoss + " ride as open rings" : "", "."), React.createElement(React.Fragment, null, "The shading is the gap\u2019s approximate 95% margin. ", gHouses.length >= 2 ? "No house prints" : gSrc + " doesn’t print", " how many respondents this group is, so the base is the poll\u2019s effective sample times the group\u2019s share of adults", G.dim === "vote" ? " (of that poll’s voting intention, for a party’s voters)" : "", ".", G.dim === "vote" && G.houses.includes("Roy Morgan") ? " Roy Morgan folds its other-party voters into the Independent figure, so neither of those two groups can be sized from its prints." : "", gHasRight ? "" : " Where a release names only one share, the other cannot be pieced back from the national figures."), gHouses.length >= 2 ? gHouses.length === 2 ? React.createElement(React.Fragment, null, "Essential prints these splits most fortnights; Roy Morgan only some weeks, so a month\u2019s pool leans on whichever asked, and some months rest on one of them.") : React.createElement(React.Fragment, null, "Essential prints these splits most fortnights, Roy Morgan only some weeks and RedBridge/Accent\u2019s data-table statements have carried them for three waves so far \u2013 a month\u2019s pool leans on whichever asked, and some months rest on one of them.") : gHouses[0] === "Roy Morgan" ? React.createElement(React.Fragment, null, "Roy Morgan prints these splits only some weeks, so the series has months with nothing to pool.") : gHouses[0] === "RedBridge/Accent" ? React.createElement(React.Fragment, null, "RedBridge/Accent\u2019s data-table statements have printed these breakdowns for three waves so far, so the series has a point wherever a statement carried them.") : React.createElement(React.Fragment, null, "Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.")]
   }) : React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(React.Fragment, null, "The lines are adjusted for each pollster\u2019s lean. Only ", (D.directionHouses || []).length, " pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.")]
   }), React.createElement(RdFoot, {
@@ -58814,6 +58834,13 @@ function RdApDetail({
     return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
   };
   const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
+  const confEf = !conf ? null : conf.chg != null && Math.abs(conf.chg) >= 0.05 ? {
+    v: conf.chg,
+    calc: false
+  } : conf.chgCalc != null && Math.abs(conf.chgCalc) >= 0.05 ? {
+    v: conf.chgCalc,
+    calc: true
+  } : null;
   const CONF_BLURB = {
     consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
     westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
@@ -58934,7 +58961,7 @@ function RdApDetail({
     className: "rd-ldg-h"
   }, conf.lab), React.createElement("div", {
     className: "rd-ldg-conf"
-  }, React.createElement("b", null, confFmt(conf.v)), conf.chg != null && Math.abs(conf.chg) >= 0.05 ? React.createElement("span", null, ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod) : null), React.createElement("p", {
+  }, React.createElement("b", null, confFmt(conf.v)), confEf ? React.createElement("span", null, ", " + (confEf.v < 0 ? "down " : "up ") + confFmt(Math.abs(confEf.v)) + " on the " + confPeriod + (confEf.calc ? " (calculated – the release printed no change)" : "")) : null), React.createElement("p", {
     className: "rd-ldg-foot1"
   }, conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral." : "Index reading – 100 neutral.", conf.cond != null ? " NAB prints business conditions beside it: " + confFmt(conf.cond) + (conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : "") + "." : ""));
   const rk = (lab, v, words, ink) => React.createElement("tr", {
@@ -61242,7 +61269,7 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, confScale(false)), th("Change", "conf.chg", {
     right: true,
-    title: "Change on the gauge’s own previous release"
+    title: "Change on the gauge’s own previous release – an asterisk marks one calculated from the previous release, not printed"
   })), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
@@ -61812,6 +61839,13 @@ function RdAllPolls(P) {
     } else if (facet === "confidence") {
       const c = p.conf;
       const nab = c.vs === 0;
+      const chgEf = c.chg != null ? {
+        v: c.chg,
+        calc: false
+      } : c.chgCalc != null ? {
+        v: c.chgCalc,
+        calc: true
+      } : null;
       figs = React.createElement("span", {
         role: "cell",
         className: "rd-ap-fig"
@@ -61821,7 +61855,7 @@ function RdAllPolls(P) {
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": p.client + ", " + confFig(c.v) + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "") + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
+        "aria-label": p.client + ", " + confFig(c.v) + (chgEf ? ", " + confChg(chgEf.v) + " on the gauge’s previous release" + (chgEf.calc ? ", calculated - the release printed no change" : "") : "") + (nab ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
       }, React.createElement("span", {
         className: "rd-ap-in"
       }, [60, 80].map(v => React.createElement("i", {
@@ -61842,14 +61876,17 @@ function RdAllPolls(P) {
           background: confInk(c)
         }
       })));
-      const chgInk = c.chg == null || Math.abs(c.chg) < 0.05 ? null : c.chg > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
+      const chgInk = !chgEf || Math.abs(chgEf.v) < 0.05 ? null : chgEf.v > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
       val = React.createElement("span", {
         role: "cell",
         className: "rd-ap-val",
         style: chgInk ? {
           color: chgInk
-        } : null
-      }, c.chg != null ? confChg(c.chg) : "—");
+        } : null,
+        title: chgEf && chgEf.calc ? "Calculated from the gauge’s previous release - the release printed no change" : undefined
+      }, chgEf ? React.createElement(React.Fragment, null, confChg(chgEf.v), chgEf.calc ? React.createElement("sup", {
+        "aria-hidden": "true"
+      }, "*") : null) : "—");
       right1 = React.createElement("b", null, confFig(c.v));
       right2 = nab ? React.createElement("span", {
         className: "rd-ap-sub"
@@ -61858,11 +61895,11 @@ function RdAllPolls(P) {
         className: "rd-ap-cpic"
       }, pic), React.createElement("div", {
         className: "rd-ap-csub"
-      }, c.chg != null ? React.createElement(React.Fragment, null, "Change ", React.createElement("b", {
+      }, chgEf ? React.createElement(React.Fragment, null, "Change ", React.createElement("b", {
         style: chgInk ? {
           color: chgInk
         } : null
-      }, confChg(c.chg)), " on last release") : c.first ? "The gauge’s first release this term" : "Change not printed"));
+      }, confChg(chgEf.v)), " on last release", chgEf.calc ? " (calculated)" : null) : c.first ? "The gauge’s first release this term" : "Change not printed"));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
@@ -65185,7 +65222,7 @@ function ExplainedFlowChart({
   const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
-  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 2001–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 2001’s ratings are its own division profiles’ as displayed that year, three unrated seats filled from its research report; 2004’s come from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. 2001 is as far back as the classification store reaches, so that’s where the line starts (the flow table itself goes back to 1996). A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
+  const cap = lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view." : onSen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count." + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "") + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "") : sen ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching." + (S.senState ? " A gap in One Nation’s line is an election it had no " + S.short + " Senate tickets — a zero-ballot group draws as a gap, never a zero." + (stateKey === "act" || stateKey === "nt" ? " Two senators from a small field leave the territories’ “neither” shares tiny, so " + S.short + "’s lines sit nearer a true two-way split than the states’." : "") : "") : est ? "Estimated from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. Each bar shows how far the method missed, nine times in ten, when it was tried on federal elections; One Nation’s run widest, and its line shows only where at least " + (FH.fed && FH.fed.backtest && FH.fed.backtest.onpMinBallots ? (Math.round(FH.fed.backtest.onpMinBallots / 1000) * 1000).toLocaleString("en-AU") : "39,000") + " of its ballots stand behind the estimate, the smallest base the method was tested on." + (S.opv && S.opv.length ? " Voters could stop numbering " + (S.opv.length > 1 ? "from " + S.opv[0] + " to " + S.opv[S.opv.length - 1] : "in " + S.opv[0]) + ", so those years’ shares are of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." : "") + stateCut : cnt ? "Counted from " + S.srcAs + " (" + S.asOf + "), in the seats where Labor and the Coalition finished first and second. NSW voters may stop numbering, so each share is of the ballots that reached Labor or the Coalition; the tooltip gives how many reached neither." + noBars + stateCut : S.fedState ? "Counted by the AEC: its two-party-preferred flow by state by party, 2004–2025 — the per-state cut of the national series (the pre-2004 flows were counted nationally only). A gap in One Nation’s line is a year its " + S.short + " count never reached the AEC’s table." + noBars + " The state elections’ lines count only seats where Labor and the Coalition finished first and second, so the two can differ" + (cutGap ? ": nationally in 2025, everyone else’s flow was " + cutGap[0] + " on this cut and " + cutGap[1] + " on that one." : ".") : S.fedClass ? "Counted by the AEC: its two-candidate-preferred flow of preferences by division, 1996–2025, each seat filed to " + S.short + " by the AEC’s own classification of that division at that election (a seat the AEC recategorised moved classes, so a kink never comes from sliding boundaries; 1996’s and 1998’s ratings were transcribed from the AEC’s whole-chamber classification pages of those years, 2001’s from its division profiles as displayed that year — three unrated seats filled from its research report — and 2004’s from its live profile pages). Only seats where Labor and the Coalition finished first and second count — a seat a crossbencher reached the final two in can hold these ballots on a pile no AEC table splits. The line starts at 1996, as far back as the per-division flow table itself reaches. A gap in One Nation’s line is an election its " + S.short + " ballots never reached the AEC’s table — 1996’s is the party’s own absence ahead of its first federal campaign; a thin base can still swing a point — inner-metropolitan seats counted only 1,508 One Nation ballots in 2013 — so read the thin early-2010s years as small samples, not shares." + noBars : (fedEst ? "Estimated for " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences, by the method behind the state lines, in the seats where Labor and the Coalition finished first and second; the bars are its 90% error, from trials on the federal elections since 1996." + (((FH.fed.backtest || {}).grnLean || {}).worst || []).filter(w => w.year < 2004).map((w, i, a) => (i ? i === a.length - 1 ? " and " : ", " : " It ran high on the Greens in the oldest trials, ") + w.year + " by " + w.miss.toFixed(1) + (i === a.length - 1 ? " points, so the early Greens points more likely sit low in their bars, and part of the fall to 1996 is the method’s." : "")).join("") + " The AEC counted no flows by party before 1996. " : "") + "Counted by the AEC: its preference-distribution tables by party, 1996–2025 (classic cut to 2001, two-party cut since)." + noBars + (cutGap ? " The state lines count only seats where Labor and the Coalition finished first and second; on that cut, everyone else’s 2025 flow was " + cutGap[1] + ", not " + cutGap[0] + "." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,

@@ -1,9 +1,11 @@
 /* Pins for the National-direction panel's group-select payloads in the
    generated 9f09dca2 data asset: directionStates (SEC Newgate's per-State
    series, from data/sec-direction-states.json), directionGroups (the subgroup
-   views as headline-anchored POOLED GAPS: Roy Morgan's "Analysis by …" prose
-   splits, from data/roymorgan-direction-groups.json, and Essential's
-   national-mood gender/age splits, from data/essential-direction-groups.json,
+   views as headline-anchored POOLED GAPS over THREE stores: Roy Morgan's
+   "Analysis by …" prose splits in data/roymorgan-direction-groups.json,
+   Essential's national-mood gender/age trend splits in
+   data/essential-direction-groups.json, and RedBridge/Accent's AFR
+   data-table statement breakdowns in data/redbridge-direction-groups.json,
    each wave differenced against its own all-voters print – so a house's lean
    cancels – then the gaps pooled n-weighted month by month onto the
    lean-adjusted average) and directionStateNote (the latest printed state
@@ -87,21 +89,61 @@ const SEC_STATES = ["NSW", "VIC", "QLD", "SA", "WA"];
 const dg = D.directionGroups;
 assert.ok(dg, "directionGroups emitted");
 {
-  const EXPECT = ["Men", "Women", "One Nation voters", "Coalition voters", "Other party voters",
-                  "Independent voters", "Greens voters", "Labor voters", "18–34", "35–54", "55+"];
+  const EXPECT = [
+    // gender (all three houses)
+    "Men", "Women",
+    // age (Essential only)
+    "18–34", "35–54", "55+",
+    // vote (Roy Morgan only)
+    "Other party voters", "Independent voters",
+    // vote (Roy Morgan and RedBridge/Accent share these four)
+    "One Nation voters", "Coalition voters", "Greens voters", "Labor voters",
+    // vote (RedBridge/Accent only)
+    "Liberal voters", "CLP/LNP/Nat voters", "Other voters", "Undecided voters",
+    // softness (RedBridge/Accent only)
+    "Solid voters", "Soft voters", "Very soft voters",
+    // generation (RedBridge/Accent only)
+    "Gen-Z", "Millennials", "Gen-X", "Baby Boomers",
+    // location (RedBridge/Accent only)
+    "Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural",
+    // education (RedBridge/Accent only)
+    "Less than year 12", "Year 12 or equivalent", "TAFE, trade or vocational", "University degree",
+    // ownership (RedBridge/Accent only)
+    "Owned outright", "Owned with a mortgage", "Renting and other",
+  ];
   assert.deepEqual(Object.keys(dg).sort(), EXPECT.slice().sort(),
-    "one merged key per cut – the gender pair pools Essential and Roy Morgan");
-  assert.deepEqual(dg.Men.houses, ["Essential", "Roy Morgan"], "Men merges both houses");
-  assert.deepEqual(dg.Women.houses, ["Essential", "Roy Morgan"], "Women merges both houses");
+    "one merged key per cut");
+  assert.deepEqual(dg.Men.houses, ["Essential", "RedBridge/Accent", "Roy Morgan"],
+    "Men's gender pair pools all three");
+  assert.deepEqual(dg.Women.houses, ["Essential", "RedBridge/Accent", "Roy Morgan"],
+    "Women's gender pair pools all three");
   assert.deepEqual(dg["18–34"].houses, ["Essential"], "the age bands are Essential's alone");
   assert.deepEqual(dg["55+"].houses, ["Essential"], "the age bands are Essential's alone");
-  assert.deepEqual(dg["Coalition voters"].houses, ["Roy Morgan"], "the vote cuts are Roy Morgan's alone");
-  assert.deepEqual(dg["Labor voters"].houses, ["Roy Morgan"], "the vote cuts are Roy Morgan's alone");
+  for (const k of ["Other party voters", "Independent voters"])
+    assert.deepEqual(dg[k].houses, ["Roy Morgan"], `${k}: every-house merge`);
+  for (const k of ["One Nation voters", "Coalition voters", "Greens voters", "Labor voters"])
+    assert.deepEqual(dg[k].houses, ["RedBridge/Accent", "Roy Morgan"],
+      `${k}: the two houses' vote rows merge onto the shared label`);
+  for (const k of ["Liberal voters", "CLP/LNP/Nat voters", "Other voters", "Undecided voters"])
+    assert.deepEqual(dg[k].houses, ["RedBridge/Accent"], `${k}: no paired print in anyone else`);
+  for (const [k, dim] of [["Solid voters", "softness"], ["Gen-Z", "generation"], ["Inner Metropolitan", "location"], ["Less than year 12", "education"], ["Owned outright", "ownership"]])
+    assert.deepEqual(dg[k].houses, ["RedBridge/Accent"], `${k}: ${dim} is RedBridge's own print`);
   for (const g of Object.values(dg)) {
-    assert.ok(g.dim === "gender" || g.dim === "age" || g.dim === "vote", `${g.label}: the panel's taxonomy`);
+    assert.ok(["gender", "age", "vote", "softness", "generation", "location", "education", "ownership"].includes(g.dim),
+      `${g.label}: the panel's taxonomy`);
     assert.ok(Array.isArray(g.series) && Array.isArray(g.raw), `${g.label}: line and dots`);
     assert.equal(typeof g.sized, "boolean", `${g.label}: sized flag`);
   }
+  // sized: the gender pair (off the adult-split share), Essential's age
+  // bands (off the census AGE_SHARE ladder) and Roy Morgan's vote cuts (off
+  // the poll row's voting-intention shares less undecided). RedBridge
+  // prints no bases and the statements carry no undecided share, so its
+  // non-gender groups stay UNSIZED.
+  const SIZED = ["Men", "Women", "18–34", "35–54", "55+", "One Nation voters", "Coalition voters", "Greens voters", "Labor voters"];
+  for (const k of SIZED)
+    assert.equal(dg[k].sized, true, `${k}: sized`);
+  for (const k of Object.keys(dg).filter((k) => !SIZED.includes(k)))
+    assert.equal(dg[k].sized, false, `${k}: no base printed, no margin`);
   console.log("directionGroups (set): OK");
 }
 
@@ -163,6 +205,41 @@ assert.ok(dg, "directionGroups emitted");
       assert.ok(typeof dot.dateLabel === "string" && dot.dateLabel.length, `${label} ${date}: fieldwork window`);
     }
   }
+  // RedBridge/Accent: each wave's every printed cell lands as a raw dot, the
+  // wave's own all-voters total differenced against the SAME wave's direction
+  // row (the gate: every printed cell's gap equals cell minus row)
+  const rbStore = JSON.parse(readFileSync(path.join(ROOT, "data", "redbridge-direction-groups.json"), "utf8"));
+  const rbDirByDate = new Map((polls.direction || []).filter((d) => d.pollster === "RedBridge/Accent").map((d) => [d.date, d]));
+  const RB_LABEL = {
+    "Labor": "Labor voters", "Coalition": "Coalition voters",
+    "Liberal": "Liberal voters", "CLP/LNP/Nat": "CLP/LNP/Nat voters",
+    "One Nation": "One Nation voters", "Greens": "Greens voters",
+    "Other parties and candidates": "Other voters",
+    "Undecided / will not vote": "Undecided voters",
+    "Solid": "Solid voters", "Soft": "Soft voters", "Very soft": "Very soft voters",
+  };
+  const RB_SURFACED = new Set(["vote", "softness", "generation", "gender", "location", "education", "ownership"]);
+  for (const [date, wave] of Object.entries(rbStore.waves)) {
+    const row = rbDirByDate.get(date);
+    assert.ok(row, `redbridge-direction-groups ${date}: a matched direction row exists (validate enforces)`);
+    for (const [dim, cells] of Object.entries(wave.dims || {})) {
+      for (const [printed, cell] of Object.entries(cells)) {
+        const label = RB_LABEL[printed] || printed;
+        const isSurfaced = RB_SURFACED.has(dim);
+        const dot = (dg[label]?.raw || []).find((d) => d.date === date && d.pollster === "RedBridge/Accent");
+        if (!isSurfaced) { assert.equal(dot, undefined, `${dim}.${printed} ${date}: banked only, never surfaced`); continue; }
+        assert.ok(dot, `${dim}.${printed} ${date}: a surfaced dot`);
+        assert.equal(dot.ym, date.slice(0, 7));
+        assert.equal(r10(dot.gapR), r10(cell.r - row.right),
+          `${dim}.${printed} ${date}: right gap is the wave's own print less the wave's all-voters row`);
+        assert.equal(r10(dot.gapW), r10(cell.w - row.wrong),
+          `${dim}.${printed} ${date}: wrong gap as printed`);
+        const H = head.get(dot.ym);
+        assert.equal(dot.right, r10(H.right + dot.gapR));
+        assert.equal(dot.wrong, r10(H.wrong + dot.gapW));
+      }
+    }
+  }
   // the houses' own readings stay marked in the pool: each house's dots
   // count its own waves inside the headline era
   const rmGenderWaves = Object.entries(rmStore.waves).filter(([d, w]) => w.gender && rmRows.has(d)).length;
@@ -170,6 +247,9 @@ assert.ok(dg, "directionGroups emitted");
     "Men: every dir-row-matched RM gender wave gets a dot");
   assert.equal(dg.Men.raw.filter((d) => d.pollster === "Essential").length, inEra,
     "Men: every headline-era Essential wave gets a dot, nothing older");
+  assert.equal(dg.Men.raw.filter((d) => d.pollster === "RedBridge/Accent").length,
+    Object.keys(rbStore.waves).length,
+    "Men: every RedBridge statement wave the store banked carries Men");
   console.log("directionGroups (raw gaps): OK");
 }
 
@@ -236,14 +316,15 @@ assert.ok(dg, "directionGroups emitted");
     "Labor voters Sep-2026");
   assert.equal(at("One Nation voters", "2026-09").gapW, 29.3, "One Nation voters Sep-2026");
   assert.equal(at("One Nation voters", "2026-09").right, null, "a non-ALP vote group carries no right share");
-  // the disagreement the panel says plainly: Essential's Men sit further
-  // right-of-the-headline than Roy Morgan's (mean of each house's own gaps)
+  // the disagreement the panel says plainly: Essential's Men sit furthest
+  // right-of-the-headline of the three, Roy Morgan's furthest left (mean of
+  // each house's own gaps, RedBridge in between)
   const meanOf = (h) => {
     const vs = dg.Men.raw.filter((d) => d.pollster === h && d.gapR != null).map((d) => d.gapR);
     return r10(vs.reduce((a, b) => a + b, 0) / vs.length);
   };
-  assert.deepEqual([meanOf("Essential"), meanOf("Roy Morgan")], [4.6, 1.3],
-    "Men's right-direction gap: Essential 4.6, Roy Morgan 1.3 – the panel's stated disagreement");
+  assert.deepEqual([meanOf("Essential"), meanOf("RedBridge/Accent"), meanOf("Roy Morgan")], [4.6, 3, 1.3],
+    "Men's right-direction gap: Essential 4.6, RedBridge/Accent 3.0, Roy Morgan 1.3 – the panel's stated disagreement");
   console.log("directionGroups (pooled): OK");
 }
 

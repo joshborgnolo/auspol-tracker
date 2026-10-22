@@ -1047,6 +1047,71 @@ export function validateEssDirectionGroups() {
   return errors;
 }
 
+/* data/redbridge-direction-groups.json – RedBridge/Accent's AFR data-table
+   statement national-direction breakdowns, hand-entered verbatim from
+   the council-accepted methodology PDFs behind the poll rows' methodUrl.
+   Shape + plausibility + reconciliation: every wave key is an ISO day on
+   which polls.json has a RedBridge/Accent direction[] row; the wave's
+   printed all-voters total must reconcile exactly with that row's
+   right/wrong and its unsure (row's remainder); every printed cell is
+   a {r,w,u} triple whose elements are 0–100 and sum to 100±1 (the
+   tables print integers); only the three wave dates the statements
+   carry the section for (2025-11-13, 2026-01-29, 2026-05-28) may
+   appear – the rest print no direction table. The June-2025 direction
+   row's provenance is the November statement's trend figure, not a
+   table, so it has no wave here. */
+export function validateRbDirectionGroups() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "redbridge-direction-groups.json"), "utf8")); }
+  catch { fail("redbridge-direction-groups.json", "rb-direction-groups-shape", "missing or unparseable"); return errors; }
+  if (!S || typeof S !== "object" || !S.waves || typeof S.waves !== "object") {
+    fail("redbridge-direction-groups.json", "rb-direction-groups-shape", "no waves object");
+    return errors;
+  }
+  const P = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+  const rbDirByDate = new Map((P.direction || []).filter((d) => d.pollster === "RedBridge/Accent").map((d) => [d.date, d]));
+  const KNOWN = new Set(["2025-11-13", "2026-01-29", "2026-05-28"]);
+  const ALLOWED_DIMS = new Set(["vote", "softness", "income", "ownership", "stress", "generation", "gender", "location", "religion", "education", "language", "birthplace"]);
+  for (const [date, wave] of Object.entries(S.waves)) {
+    const where = `redbridge-direction-groups ${date}`;
+    if (!ISO_DAY.test(date)) fail(where, "date-format", `date "${date}" is not YYYY-MM-DD`);
+    if (!wave || typeof wave !== "object") { fail(where, "rb-direction-groups-shape", "wave is not an object"); continue; }
+    if (!KNOWN.has(date)) fail(where, "coverage", `wave ${date} is not one of the statements' three direction-table dates`);
+    const row = rbDirByDate.get(date);
+    if (!row) fail(where, "provenance", `no RedBridge/Accent direction[] row on ${date}`);
+    if (!wave.src || typeof wave.src !== "object" || typeof wave.src.url !== "string" || typeof wave.src.tables !== "string")
+      fail(where, "rb-direction-groups-shape", "src carries no {url, tables}");
+    const total = wave.total;
+    if (!total || typeof total !== "object") fail(`${where} total`, "rb-direction-groups-shape", "no total cell");
+    else if (row) {
+      if (total.r !== row.right) fail(`${where} total`, "reconcile", `total.r ${total.r} ≠ direction row right ${row.right}`);
+      if (total.w !== row.wrong) fail(`${where} total`, "reconcile", `total.w ${total.w} ≠ direction row wrong ${row.wrong}`);
+      const u = row.unsure != null ? row.unsure : (typeof row.right === "number" && typeof row.wrong === "number" ? 100 - row.right - row.wrong : null);
+      if (u != null && total.u !== u) fail(`${where} total`, "reconcile", `total.u ${total.u} ≠ direction row unsure ${u}`);
+    }
+    if (!wave.dims || typeof wave.dims !== "object") { fail(where, "rb-direction-groups-shape", "no dims object"); continue; }
+    for (const [dim, table] of Object.entries(wave.dims)) {
+      if (!ALLOWED_DIMS.has(dim)) fail(where, "rb-direction-groups-shape", `unknown dim "${dim}"`);
+      if (!table || typeof table !== "object") continue;
+      for (const [grp, cell] of Object.entries(table)) {
+        const w2 = `${where} ${dim}.${grp}`;
+        if (!cell || typeof cell !== "object") { fail(w2, "rb-direction-groups-shape", "cell is not an object"); continue; }
+        for (const k of ["r", "w", "u"]) {
+          if (typeof cell[k] !== "number" || cell[k] < 0 || cell[k] > 100) fail(w2, "range", `${k} = ${cell[k]}`);
+        }
+        if (typeof cell.r === "number" && typeof cell.w === "number" && typeof cell.u === "number" && Math.abs(cell.r + cell.w + cell.u - 100) > 1)
+          fail(w2, "total", `r+w+u ${cell.r + cell.w + cell.u} out by more than 1`);
+      }
+    }
+  }
+  for (const k of KNOWN) {
+    if (!S.waves[k]) fail("redbridge-direction-groups.json", "coverage", `statement wave ${k} is missing`);
+  }
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -1057,6 +1122,7 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   errors.push(...validateDirectionGroups());
   errors.push(...validateSecDirectionStates());
   errors.push(...validateEssDirectionGroups());
+  errors.push(...validateRbDirectionGroups());
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }

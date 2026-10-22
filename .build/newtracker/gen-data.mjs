@@ -2150,6 +2150,18 @@ const ESS_DIR_GROUPS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "essential-direction-groups.json"), "utf8")); }
   catch { return null; }
 })();
+/* RedBridge/Accent's national-direction breakdowns, hand-entered into
+   data/redbridge-direction-groups.json from the three AFR data-table
+   statements that carry them (Nov 2025 Tables 47–48, Jan 2026 Table 27,
+   May 2026 Table 38 – the only statements with the section; the store's
+   _about records the full checked set). Cells are dim-blocked printed
+   rows; the wave's `total` is the statement's all-voters row, which
+   reconciles exactly with the polls.json direction row for its date. */
+const RB_DIR_GROUPS = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "redbridge-direction-groups.json"), "utf8")); }
+  catch { return null; }
+})();
 /* Essential's national-mood splits, columned out of the assimilated CSV
    (data/essential-report.csv): every wave's trend table carries Male/Female
    and 18-34/35-54/55+ cuts beside the headline print – keyed here by the
@@ -2376,19 +2388,24 @@ const directionNow = (() => {
      data/roymorgan-direction-groups.json (the gender pair, and the
      voting-intention right/wrong shares; ALP's right share plus the
      wrong-share of every other group – a fortnight that printed no cut
-     for a group simply leaves that wave out of its pool) and
+     for a group simply leaves that wave out of its pool),
      Essential's banked mood splits from
      data/essential-direction-groups.json (gender and age bands on the
      wave field of every Essential wave: right/wrong/unsure cells; the
-     unsure cell never charts). Houses MERGE at group level exactly the
+     unsure cell never charts), and RedBridge/Accent's statement
+     tables from data/redbridge-direction-groups.json (vote, vote
+     softness, generation, gender, location, education and home
+     ownership on the three waves that print them; income, stress and
+     the Nov-only trims are banked, not surfaced). Houses MERGE at
+     group level exactly the
      way they merge at all-voters level: each wave's group figure is
      differenced against the all-voters figure its own release printed
      (the wave's house lean cancels in the difference, so no group-grain
      house effects are needed), the gaps pool n-weighted month by month
      across houses, and the pooled gap rides the lean-adjusted
-     all-voters headline. Men appears once – Essential's and Roy
-     Morgan's readings meet in one line, each house's own readings still
-     shown dot by dot.
+     all-voters headline. Men appears once – Essential's, Roy
+     Morgan's and RedBridge/Accent's readings meet in one line, each
+     house's own readings still shown dot by dot.
    · directionStateNote – the latest Roy Morgan release's printed state
      highest/lowest extremes; the full state table is paywalled, so the
      extremes are the only state cut that exists.
@@ -2536,6 +2553,47 @@ const directionGroups = (() => {
       push("18–34", "age", date, w["18–34"], w, AGE_SHARE["18-34"]);
       push("35–54", "age", date, w["35–54"], w, AGE_SHARE["35-54"]);
       push("55+", "age", date, w["55+"], w, AGE_SHARE["55+"]);
+    }
+  }
+  if (RB_DIR_GROUPS?.waves) {
+    const rbRows = dirRowByDate("RedBridge/Accent");
+    /* Only gender can be sized: the statements print no group bases,
+       and the vote-intention cuts are shares of ALL voters while the
+       poll row's primaries exclude undecided – with no undecided share
+       on the row or in the statement, a vote group's size can't be
+       pinned without inventing a figure. Every other group pools at
+       equal weight with no margin. Income, stress and the Nov-only
+       trims stay banked – a print that appeared once gives the select
+       a one-point series. */
+    const VOTE_LABEL = {
+      "Labor": "Labor voters", "Coalition": "Coalition voters",
+      "Liberal": "Liberal voters", "CLP/LNP/Nat": "CLP/LNP/Nat voters",
+      "One Nation": "One Nation voters", "Greens": "Greens voters",
+      "Other parties and candidates": "Other voters",
+      "Undecided / will not vote": "Undecided voters",
+    };
+    const SOFT_LABEL = { "Solid": "Solid voters", "Soft": "Soft voters", "Very soft": "Very soft voters" };
+    const DIMS = ["vote", "softness", "generation", "gender", "location", "education", "ownership"];
+    const push = (label, dim, date, cell, share) => {
+      if (!cell) return;
+      const row = rbRows.get(date) || null;
+      if (!row) return;
+      const vi = POLL_BY_KEY.get(date + "|RedBridge/Accent") || null;
+      acc(label, dim, "RedBridge/Accent", {
+        date, ym: ymOf(date), right: cell.r, wrong: cell.w,
+        refRight: row.right, refWrong: row.wrong,
+      }, rowN(vi || row) / HL_DEFF, share, dirTipOf(row));
+    };
+    for (const [date, w] of Object.entries(RB_DIR_GROUPS.waves)) {
+      const dims = w.dims || {};
+      for (const dim of DIMS) {
+        for (const [printed, cell] of Object.entries(dims[dim] || {})) {
+          const label = dim === "vote" ? (VOTE_LABEL[printed] || printed)
+            : dim === "softness" ? (SOFT_LABEL[printed] || printed)
+            : printed;
+          push(label, dim, date, cell, dim === "gender" ? SEX_SHARE[printed] ?? null : null);
+        }
+      }
     }
   }
   /* Merge: pool the per-wave gaps n-weighted month by month (a wave

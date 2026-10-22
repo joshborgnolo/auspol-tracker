@@ -1,0 +1,171 @@
+{
+  "_about": "RedBridge/Accent's national-direction demographic breakdowns, hand-entered verbatim from the house's AFR data-table statements (the APC methodology PDFs behind the poll rows' methodUrl). The question is Roy Morgan-style all-voters: 'Generally headed in the right direction / wrong direction / not sure' – cells {r,w,u} per printed row. Every national-direction section printed in the 2025-26 statements was scanned across the full statement set (ugd slugs b86980_bfa36468* Oct-25, b86980_abdcc392* Nov-25 = Tables 47-48, b86980_4df02b5e* Dec-25, b86980_a04c3282* Jan-26 = Table 27, b86980_50fedc6a* Feb-26, b86980_61030f1f* Mar-26, b86980_604e597b* Apr-26, b86980_c99eef2f* May-26 = Table 38, b86980_0fe4f080* Jun-26, b86980_e09c2025* Jul-26, b86980_cab524c6* Aug-26, b86980_db6216a1a759* Oct-26, b86980_93009c71* Jun-25 'Shifts'): exactly THREE statements carry the section (Nov-2025, Jan-2026, May-2026) – the others, latest included, print none, so there is no fourth wave to hunt for. The June-2025 polls.json direction row (36/43/21) came from November's all-voters trend figure, not a table, so no June-2025 wave exists here. Wave keys are the direction rows' fieldwork-end dates; each wave's printed ALL-VOTERS row reconciles exactly with the polls.json direction row for its date (validate.mjs enforces). Income, financial stress, religion, language and birthplace appear only in the Nov-2025 table – banked verbatim under dims but NOT surfaced by gen-data (one-wave dims would give the group select single-point series).January/May split the Coalition print into Liberal and CLP/LNP/Nat rows; the rows are kept split because the statements print no group sample sizes to combine them by.",
+  "waves": {
+    "2025-11-13": {
+      "src": { "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf", "tables": "Tables 47–48" },
+      "total": { "r": 34, "w": 49, "u": 17 },
+      "dims": {
+        "vote": {
+          "Labor": { "r": 62, "w": 19, "u": 19 },
+          "Coalition": { "r": 20, "w": 67, "u": 13 },
+          "One Nation": { "r": 4, "w": 91, "u": 5 },
+          "Greens": { "r": 38, "w": 39, "u": 23 },
+          "Other parties and candidates": { "r": 25, "w": 59, "u": 16 }
+        },
+        "softness": {
+          "Solid": { "r": 38, "w": 51, "u": 11 },
+          "Soft": { "r": 36, "w": 46, "u": 18 },
+          "Very soft": { "r": 20, "w": 58, "u": 22 }
+        },
+        "income": {
+          "$3,000 or more per week": { "r": 42, "w": 44, "u": 14 },
+          "$2,000 to $2,999 per week": { "r": 33, "w": 49, "u": 18 },
+          "$1,000 to $1,999 per week": { "r": 34, "w": 51, "u": 15 },
+          "Less than $1,000 per week": { "r": 37, "w": 46, "u": 17 },
+          "Prefer not to say": { "r": 22, "w": 55, "u": 23 }
+        },
+        "ownership": {
+          "Owned outright": { "r": 36, "w": 49, "u": 15 },
+          "Owned with a mortgage": { "r": 33, "w": 48, "u": 19 },
+          "Renting and other": { "r": 34, "w": 51, "u": 15 }
+        },
+        "stress": {
+          "A great deal of stress": { "r": 18, "w": 65, "u": 17 },
+          "Some stress": { "r": 34, "w": 49, "u": 17 },
+          "Not much stress": { "r": 43, "w": 40, "u": 17 },
+          "No stress at all": { "r": 47, "w": 37, "u": 16 }
+        },
+        "generation": {
+          "Gen-Z": { "r": 48, "w": 36, "u": 16 },
+          "Millennials": { "r": 25, "w": 54, "u": 21 },
+          "Gen-X": { "r": 37, "w": 48, "u": 15 },
+          "Baby Boomers": { "r": 32, "w": 53, "u": 15 }
+        },
+        "gender": {
+          "Women": { "r": 29, "w": 49, "u": 22 },
+          "Men": { "r": 40, "w": 49, "u": 11 }
+        },
+        "location": {
+          "Inner Metropolitan": { "r": 38, "w": 45, "u": 17 },
+          "Outer Metropolitan": { "r": 35, "w": 46, "u": 19 },
+          "Provincial": { "r": 30, "w": 55, "u": 15 },
+          "Rural": { "r": 31, "w": 53, "u": 16 }
+        },
+        "religion": {
+          "Protestant": { "r": 31, "w": 54, "u": 15 },
+          "Catholic": { "r": 32, "w": 52, "u": 16 },
+          "Other religions": { "r": 36, "w": 44, "u": 20 },
+          "No religion": { "r": 37, "w": 45, "u": 18 }
+        },
+        "education": {
+          "Less than year 12": { "r": 31, "w": 53, "u": 16 },
+          "Year 12 or equivalent": { "r": 38, "w": 47, "u": 15 },
+          "TAFE, trade or vocational": { "r": 31, "w": 50, "u": 19 },
+          "University degree": { "r": 36, "w": 47, "u": 17 }
+        },
+        "language": {
+          "English only": { "r": 34, "w": 49, "u": 17 },
+          "Other languages": { "r": 38, "w": 45, "u": 17 }
+        },
+        "birthplace": {
+          "Australia": { "r": 33, "w": 49, "u": 18 },
+          "Another country": { "r": 39, "w": 48, "u": 13 }
+        }
+      }
+    },
+    "2026-01-29": {
+      "src": { "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_a04c3282929c4378a2f96d0134bfd344.pdf", "tables": "Table 27" },
+      "total": { "r": 29, "w": 55, "u": 16 },
+      "dims": {
+        "vote": {
+          "Labor": { "r": 62, "w": 19, "u": 19 },
+          "Liberal": { "r": 21, "w": 61, "u": 18 },
+          "CLP/LNP/Nat": { "r": 11, "w": 79, "u": 10 },
+          "One Nation": { "r": 6, "w": 88, "u": 6 },
+          "Greens": { "r": 19, "w": 55, "u": 26 },
+          "Other parties and candidates": { "r": 25, "w": 65, "u": 10 },
+          "Undecided / will not vote": { "r": 6, "w": 56, "u": 38 }
+        },
+        "softness": {
+          "Solid": { "r": 30, "w": 58, "u": 12 },
+          "Soft": { "r": 32, "w": 52, "u": 16 },
+          "Very soft": { "r": 27, "w": 54, "u": 19 }
+        },
+        "generation": {
+          "Gen-Z": { "r": 35, "w": 47, "u": 18 },
+          "Millennials": { "r": 25, "w": 56, "u": 19 },
+          "Gen-X": { "r": 28, "w": 59, "u": 13 },
+          "Baby Boomers": { "r": 29, "w": 55, "u": 16 }
+        },
+        "gender": {
+          "Women": { "r": 28, "w": 51, "u": 21 },
+          "Men": { "r": 30, "w": 59, "u": 11 }
+        },
+        "location": {
+          "Inner Metropolitan": { "r": 37, "w": 42, "u": 21 },
+          "Outer Metropolitan": { "r": 25, "w": 61, "u": 14 },
+          "Provincial": { "r": 32, "w": 55, "u": 13 },
+          "Rural": { "r": 23, "w": 62, "u": 15 }
+        },
+        "education": {
+          "Less than year 12": { "r": 22, "w": 59, "u": 19 },
+          "Year 12 or equivalent": { "r": 27, "w": 58, "u": 15 },
+          "TAFE, trade or vocational": { "r": 28, "w": 59, "u": 13 },
+          "University degree": { "r": 34, "w": 45, "u": 21 }
+        },
+        "ownership": {
+          "Owned outright": { "r": 33, "w": 54, "u": 13 },
+          "Owned with a mortgage": { "r": 30, "w": 55, "u": 15 },
+          "Renting and other": { "r": 23, "w": 56, "u": 21 }
+        }
+      }
+    },
+    "2026-05-28": {
+      "src": { "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf", "tables": "Table 38" },
+      "total": { "r": 25, "w": 63, "u": 12 },
+      "dims": {
+        "vote": {
+          "Labor": { "r": 62, "w": 23, "u": 15 },
+          "Liberal": { "r": 11, "w": 78, "u": 11 },
+          "CLP/LNP/Nat": { "r": 13, "w": 81, "u": 6 },
+          "One Nation": { "r": 5, "w": 90, "u": 5 },
+          "Greens": { "r": 32, "w": 56, "u": 12 },
+          "Other parties and candidates": { "r": 16, "w": 67, "u": 17 },
+          "Undecided / will not vote": { "r": 12, "w": 61, "u": 27 }
+        },
+        "softness": {
+          "Solid": { "r": 29, "w": 61, "u": 10 },
+          "Soft": { "r": 25, "w": 65, "u": 10 },
+          "Very soft": { "r": 21, "w": 63, "u": 16 }
+        },
+        "generation": {
+          "Gen-Z": { "r": 28, "w": 58, "u": 14 },
+          "Millennials": { "r": 25, "w": 59, "u": 16 },
+          "Gen-X": { "r": 21, "w": 68, "u": 11 },
+          "Baby Boomers": { "r": 27, "w": 64, "u": 9 }
+        },
+        "gender": {
+          "Women": { "r": 23, "w": 63, "u": 14 },
+          "Men": { "r": 27, "w": 63, "u": 10 }
+        },
+        "location": {
+          "Inner Metropolitan": { "r": 27, "w": 63, "u": 10 },
+          "Outer Metropolitan": { "r": 22, "w": 62, "u": 16 },
+          "Provincial": { "r": 29, "w": 60, "u": 11 },
+          "Rural": { "r": 24, "w": 65, "u": 11 }
+        },
+        "education": {
+          "Less than year 12": { "r": 19, "w": 72, "u": 9 },
+          "Year 12 or equivalent": { "r": 28, "w": 58, "u": 14 },
+          "TAFE, trade or vocational": { "r": 20, "w": 67, "u": 13 },
+          "University degree": { "r": 32, "w": 57, "u": 11 }
+        },
+        "ownership": {
+          "Owned outright": { "r": 27, "w": 63, "u": 10 },
+          "Owned with a mortgage": { "r": 22, "w": 64, "u": 14 },
+          "Renting and other": { "r": 27, "w": 61, "u": 12 }
+        }
+      }
+    }
+  }
+}

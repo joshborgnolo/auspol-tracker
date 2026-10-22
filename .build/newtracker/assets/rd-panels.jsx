@@ -1818,10 +1818,12 @@ function RdDirection({ rangeId }) {
      weighted by sample, and the pooled gap rides the lean-adjusted
      all-voters average (the thin dashed lines), its approximate 95%
      margin shaded. Dots are the houses' own readings, anchored the same
-     way – where two houses print a group (the gender pair, Essential and
-     Roy Morgan), the pool merges them, the minority house's dots ride as
-     open rings and the readout says plainly that the two disagree on how
-     big the gap is. SEC Newgate's state readings are not offered: each
+     way – where more than one house prints the same group (the gender
+     pair now comes from all three of Essential, Roy Morgan and
+     RedBridge/Accent), the pool merges them, every house but the most-
+     printed rides as open rings and the readout says plainly that the
+     houses disagree on how big the gap is. SEC Newgate's state readings
+     are not offered: each
      state rates its own direction, not the nation's. The all-voters
      branch is the original code path, unchanged. */
   const G = grpId ? (D.directionGroups?.[grpId] || null) : null;
@@ -1833,15 +1835,20 @@ function RdDirection({ rangeId }) {
   const gHasRight = gSeries.filter((d) => d.right != null).length >= 2;
   const gPts = gSeries.map((d) => ({ ...d, right: gHasRight ? d.right : null, gapR: gHasRight ? d.gapR : null, rightCi: gHasRight ? d.rightCi : null }));
   /* each dot is one house's own reading for a wave, the wave's gap sat on
-     that month's headline; where two houses print the group, the one with
-     the fewer readings rides as open rings */
+     that month's headline; where several houses print the group, every
+     house but the most-printed rides as open rings */
   const gRaw = G ? (G.raw || []).filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
   const gCounts = gRaw.reduce((m, d) => (m[d.pollster] = (m[d.pollster] || 0) + 1, m), {});
-  const gRing = gHouses.length === 2
-    ? ((gCounts[gHouses[0]] || 0) <= (gCounts[gHouses[1]] || 0) ? gHouses[0] : gHouses[1]) : null;
+  const gRings = (() => {
+    if (gHouses.length < 2) return new Set();
+    const modal = gHouses.reduce((a, b) => ((gCounts[a] || 0) >= (gCounts[b] || 0) ? a : b));
+    return new Set(gHouses.filter((h) => h !== modal));
+  })();
+  const gRingNames = [...gRings];
+  const gRingPoss = gRingNames.length ? rdList(gRingNames.map((h) => h + "’s")) : null;
   const gDots = gRaw.flatMap((d) => {
     const meta = d.released ? d : { pollster: d.pollster, dateLabel: monthLabelFull(d.ym) };
-    const ring = d.pollster === gRing ? { hollow: true } : {};
+    const ring = gRings.has(d.pollster) ? { hollow: true } : {};
     return [
       d.right != null ? { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta, ...ring } : null,
       d.wrong != null ? { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta, ...ring } : null,
@@ -1870,9 +1877,9 @@ function RdDirection({ rangeId }) {
   const gLo = gVals.length ? Math.min(lo, Math.floor((Math.min(...gVals) + 0.6) / 10) * 10) : lo;
   const gHi = gVals.length ? Math.max(hi, Math.min(100, Math.ceil((Math.max(...gVals) - 0.6) / 10) * 10)) : hi;
   /* the readout: the latest pooled month quoted against the headline –
-     each measure's gap to all voters, with its margin – and, where two
-     houses print the group, plainly that they disagree on the gap's size
-     (each house's own gaps averaged over the window) */
+     each measure's gap to all voters, with its margin – and, where
+     several houses print the group, plainly that they disagree on the
+     gap's size (each house's own gaps averaged over the window) */
   const gLast = gPts.length ? [...gPts].reverse().find((d) => d.wrong != null) : null;
   const gRead = !gLast ? null : (() => {
     const side = (g) => (g > 0 ? " over " : " under ");
@@ -1882,29 +1889,34 @@ function RdDirection({ rangeId }) {
     if (gLast.gapR != null) s += "; right direction " + Math.abs(gLast.gapR).toFixed(1) + " points" + side(gLast.gapR) + "all voters"
       + (gLast.rightCi != null ? " (±" + gLast.rightCi.toFixed(1) + ")" : "");
     s += ".";
-    if (gHouses.length === 2) {
+    if (gHouses.length >= 2) {
       const gapKey = gRaw.some((d) => d.gapR != null) ? "gapR" : "gapW";
       const mean = (h) => {
         const vs = gRaw.filter((d) => d.pollster === h && d[gapKey] != null).map((d) => d[gapKey]);
         return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null;
       };
-      const m0 = mean(gHouses[0]), m1 = mean(gHouses[1]);
-      if (m0 != null && m1 != null) s += " The pollsters disagree on how big the "
+      const ms = gHouses.map((h) => [h, mean(h)]);
+      if (ms.every(([, m]) => m != null)) s += " The pollsters disagree on how big the "
         + (gapKey === "gapR" ? "right-direction" : "wrong-track") + " gap is: "
-        + gHouses[0] + "’s readings average " + signedP(Math.round(m0 * 10) / 10) + " points, "
-        + gHouses[1] + "’s " + signedP(Math.round(m1 * 10) / 10) + " points.";
+        + rdList(ms.map(([h, m], i) => h + "’s " + (i === 0 ? "readings average " : "") + signedP(Math.round(m * 10) / 10) + " points")) + ".";
     }
     return s;
   })();
   /* the select's groups ride the emitters' dim tags, so a new house or
-     cut joins its own optgroup without this list moving; only the gender
-     pair is printed by two houses, and its entry bears no house name */
+     cut joins its own optgroup without this list moving; the gender and
+     vote cuts are printed by more than one house and bear no house name,
+     while a single-house dim carries its house's tag */
   const gBy = (dim) => !D.directionGroups ? []
     : Object.keys(D.directionGroups).filter((k) => D.directionGroups[k].dim === dim).map((k) => [k, k]);
   const gGroups = [
     { label: "By gender", opts: gBy("gender") },
     { label: "By age (Essential)", opts: gBy("age") },
-    { label: "By vote (Roy Morgan)", opts: gBy("vote") },
+    { label: "By generation (RedBridge)", opts: gBy("generation") },
+    { label: "By vote", opts: gBy("vote") },
+    { label: "By vote firmness (RedBridge)", opts: gBy("softness") },
+    { label: "By location (RedBridge)", opts: gBy("location") },
+    { label: "By education (RedBridge)", opts: gBy("education") },
+    { label: "By home ownership (RedBridge)", opts: gBy("ownership") },
   ].filter((g) => g.opts.length);
   const gNote = D.directionStateNote
     ? "Roy Morgan’s latest release (" + D.monthNameFull(Number(D.directionStateNote.date.slice(5, 7))) + ") prints " + D.directionStateNote.highest.state
@@ -1974,7 +1986,7 @@ function RdDirection({ rangeId }) {
             fmt={(v) => v.toFixed(1)}
             copy={{ title: gName + ": is the country heading in the right direction?",
                     sub: (gRead || "") + " Built like the headline: each poll’s group figure less the all-voters figure its own poll printed, the gaps pooled month by month on the lean-adjusted average.",
-                    caption: "Each dot is one house’s reading for " + gName + ", anchored the same way" + (gRing ? " (" + gRing + "’s are the open rings)" : "") + "; dashed lines are all voters, the lean-adjusted average" + (gSized ? ", shading the gap’s approximate 95% margin." : "."),
+                    caption: "Each dot is one house’s reading for " + gName + ", anchored the same way" + (gRingPoss ? " (" + gRingPoss + " are the open rings)" : "") + "; dashed lines are all voters, the lean-adjusted average" + (gSized ? ", shading the gap’s approximate 95% margin." : "."),
                     legend: [{ label: gName + ", right direction", color: "var(--mood-pos)", kind: "line" }, { label: gName + ", wrong track", color: "var(--mood-neg)", kind: "line" }, { label: "All voters, lean-adjusted average", color: "var(--ink-3)", kind: "dashed" }] }}
           />
         ) : (
@@ -2002,7 +2014,7 @@ function RdDirection({ rangeId }) {
         {badges && !G && <RdEventList list={badges.list} />}
         {G ? (
           <RdKey className="rd-ckey" items={[
-            { kind: "dot", color: "var(--ink-3)", label: "One reading" + (gRing ? " (" + gRing + "’s ride as open rings)" : "") + (gHasRight ? "" : " (" + gSrc + " print only the wrong-track share for this group)") },
+            { kind: "dot", color: "var(--ink-3)", label: "One reading" + (gRingPoss ? " (" + gRingPoss + " ride as open rings)" : "") + (gHasRight ? "" : " (" + gSrc + " print only the wrong-track share for this group)") },
             gSized ? { kind: "lineband", color: "var(--ink-3)", label: gName + ": the all-voters average plus the pooled gap, with its 95% margin" } : { kind: "line", color: "var(--ink-3)", label: gName + ": the all-voters average plus the pooled gap (no margin: the group’s size isn’t printed)" },
             { kind: "dash", color: "var(--ink-3)", label: "All voters, lean-adjusted average" },
           ]} />
@@ -2016,13 +2028,17 @@ function RdDirection({ rangeId }) {
       {!G && gNote && <p className="rd-dir-extremes">{gNote}</p>}
       {G ? (
         <HowTo paras={[
-          <>The line rides the lean-adjusted all-voters average through {gName}’s own gap: in each poll, {gName}’s figure less the all-voters figure its own poll printed – differencing drops that poll’s house lean – the gaps pooled month by month, weighted by sample. Each dot is one house’s reading for {gName}, anchored the same way{gRing ? "; " + gRing + "’s ride as open rings" : ""}.</>,
-          <>The shading is the gap’s approximate 95% margin. {gHouses.length === 2 ? "Neither house prints" : gSrc + " doesn’t print"} how many respondents this group is, so the base is the poll’s effective sample times the group’s share of adults{G.dim === "vote" ? " (of that poll’s voting intention, for a party’s voters)" : ""}.{G.dim === "vote" ? " Roy Morgan folds its other-party voters into the Independent figure, so neither of those two groups can be sized." : ""}{gHasRight ? "" : " Where a release names only one share, the other cannot be pieced back from the national figures."}</>,
-          gHouses.length === 2
-            ? <>Essential prints these splits most fortnights; Roy Morgan only some weeks, so a month’s pool leans on whichever asked, and some months rest on one of them.</>
+          <>The line rides the lean-adjusted all-voters average through {gName}’s own gap: in each poll, {gName}’s figure less the all-voters figure its own poll printed – differencing drops that poll’s house lean – the gaps pooled month by month, weighted by sample. Each dot is one house’s reading for {gName}, anchored the same way{gRingPoss ? "; " + gRingPoss + " ride as open rings" : ""}.</>,
+          <>The shading is the gap’s approximate 95% margin. {gHouses.length >= 2 ? "No house prints" : gSrc + " doesn’t print"} how many respondents this group is, so the base is the poll’s effective sample times the group’s share of adults{G.dim === "vote" ? " (of that poll’s voting intention, for a party’s voters)" : ""}.{G.dim === "vote" && G.houses.includes("Roy Morgan") ? " Roy Morgan folds its other-party voters into the Independent figure, so neither of those two groups can be sized from its prints." : ""}{gHasRight ? "" : " Where a release names only one share, the other cannot be pieced back from the national figures."}</>,
+          gHouses.length >= 2
+            ? (gHouses.length === 2
+                ? <>Essential prints these splits most fortnights; Roy Morgan only some weeks, so a month’s pool leans on whichever asked, and some months rest on one of them.</>
+                : <>Essential prints these splits most fortnights, Roy Morgan only some weeks and RedBridge/Accent’s data-table statements have carried them for three waves so far – a month’s pool leans on whichever asked, and some months rest on one of them.</>)
             : gHouses[0] === "Roy Morgan"
               ? <>Roy Morgan prints these splits only some weeks, so the series has months with nothing to pool.</>
-              : <>Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.</>,
+              : gHouses[0] === "RedBridge/Accent"
+                ? <>RedBridge/Accent’s data-table statements have printed these breakdowns for three waves so far, so the series has a point wherever a statement carried them.</>
+                : <>Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.</>,
         ]} />
       ) : (
         <HowTo paras={[
