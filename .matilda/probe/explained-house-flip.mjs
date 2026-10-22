@@ -439,6 +439,20 @@ for (const w of widths) {
   let g = await cardOverflow(sweep, w);
   ok(`at ${w}px Lower: no document overflow, all three controls within the viewport`,
      g.doc <= 0 && g.els === 0, `doc ${g.doc}px, ${g.els} stray`);
+  /* 2026-10-22 (user: the pair split across two phone lines): House and
+     Share ride ONE nowrap group (ex-fl-flips), same line at every width */
+  if (narrow) {
+    const same = await sweep.evaluate(() => {
+      const grp = document.querySelector(".ex-fl-card .ex-fl-flips");
+      const h = document.querySelector(".ex-fl-card .ex-house .rd-pl-flip");
+      const s = document.querySelector(".ex-fl-card .ex-share .rd-pl-flip");
+      if (!grp || !h || !s) return { grouped: !!grp };
+      return { grouped: true, same: Math.abs(h.getBoundingClientRect().top - s.getBoundingClientRect().top) < 2,
+               ht: Math.round(h.getBoundingClientRect().top), st: Math.round(s.getBoundingClientRect().top) };
+    });
+    ok(`at ${w}px House and Share share one phone line`,
+       same.grouped && same.same, JSON.stringify(same));
+  }
   await clickHouse(sweep);
   await sleep(800);
   const m = await menuInfo(sweep);

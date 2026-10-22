@@ -6050,7 +6050,7 @@ body.rd .ex-fl-head > .rd-chead-t { flex: 1 1 260px; min-width: 0; line-height: 
 body.rd .ex-fl-head .rd-chead-meta { display: block; margin-left: 0; }
 body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
-body.rd .ex-fl-ctls > .ex-share { margin-left: auto; }
+body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 @media (max-width: 640px) {
   body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
   body.rd .ex-fl-sel { margin-top: 0; }
@@ -65626,7 +65626,9 @@ function RdExplained() {
   }, "\u21C4"))) : null;
   const headCtls = narrow ? React.createElement("span", {
     className: "ex-fl-ctls"
-  }, menu, houseCtl, share) : menu;
+  }, menu, React.createElement("span", {
+    className: "ex-fl-flips"
+  }, houseCtl, share)) : menu;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",

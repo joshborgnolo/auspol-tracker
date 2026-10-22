@@ -3541,7 +3541,9 @@ body.rd .ex-fl-head > .rd-chead-t { flex: 1 1 260px; min-width: 0; line-height: 
 body.rd .ex-fl-head .rd-chead-meta { display: block; margin-left: 0; }
 body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
-body.rd .ex-fl-ctls > .ex-share { margin-left: auto; }
+/* House and Share ride the phone's head as ONE nowrap group, so the pair
+   share a wrapped line instead of splitting across two */
+body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 @media (max-width: 640px) {
   body.rd .ex-fl-head > .rd-chead-t { flex-basis: 100%; }
   body.rd .ex-fl-sel { margin-top: 0; }
