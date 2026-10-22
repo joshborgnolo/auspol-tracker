@@ -375,7 +375,9 @@ export const FLOW_HISTORY_SENATE = Object.freeze({
 
 /* FLOW_HISTORY_NSW_LC – the one state UPPER house the explainer can show
    (NSW keeps no group tickets since 1999, so its Legislative Council prints
-   a per-ballot record; no other state upper house publishes one). Counted
+   a per-ballot record; Victoria's Council – the view's missing sibling -
+   voted by group tickets until 2022, abolished for 2026, so its flows
+   would record the parties' tickets, not voters' choices). Counted
    from the NSW Electoral Commission's ballot-level preference-data zips by
    nswec-lc-flow-src/analyse_nsw_lc.py (2015–2023) and
    analyse_nsw_lc_2011.py (2011, the earliest year the ballot-level

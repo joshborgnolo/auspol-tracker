@@ -8722,7 +8722,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "elections": 10,
         "minClassic": 40,
         "fedEst": [1984, 1987, 1990, 1993],
-        "vicstop": null,
+        "vicstop": {
+          "grn": 3.23,
+          "oth": 3.16,
+          "onp": 3.44,
+          "band": [24, 34]
+        },
         "grn": {
           "model": 1.4,
           "replay": 5.3
@@ -8736,9 +8741,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "replay": 4
         },
         "err90": {
-          "grn": [3.5, 3.7],
+          "grn": [3.2, 3.7],
           "onp": [3.5, 3.7],
-          "oth": [2.4, 2.6]
+          "oth": [2.4, 3.2]
         },
         "onpMinBallots": 39264,
         "qld": 0.7,
@@ -8783,15 +8788,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "srcAs": "the Victorian Electoral Commission’s distributions of preferences",
       "estimated": true,
       "counted": false,
-      "hollowYears": [2022],
-      "asOf": "2022",
-      "years": [2022],
-      "grn": [84.9],
-      "onp": [null],
-      "oth": [44.7],
-      "grnErr": [3.6],
-      "onpErr": [null],
-      "othErr": [2.6]
+      "hollowYears": [2006, 2010, 2014, 2018, 2022],
+      "asOf": "2006–2022",
+      "years": [2006, 2010, 2014, 2018, 2022],
+      "grn": [78.2, 79.3, 84.6, 83.3, 84.9],
+      "onp": [null, null, null, null, null],
+      "oth": [37.9, 45.3, 50.3, 50.5, 44.7],
+      "grnErr": [3.2, 3.2, 3.2, 3.2, 3.6],
+      "onpErr": [null, null, null, null, null],
+      "othErr": [3.2, 3.2, 3.2, 3.2, 2.6]
     },
     "wa": {
       "label": "Western Australia",
