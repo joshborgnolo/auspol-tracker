@@ -395,3 +395,61 @@ export const FLOW_HISTORY_NSW_LC = Object.freeze({
   oth: [41.4, 54.5, 60.7], othNei: [87.2, 81.5, 77.1],
   oneOnly: [84.4, 71.6, 62.3],
 });
+
+/* FLOW_HISTORY_SENATE_ON – the same Senate ballots cut the OTHER way: rank
+   between Labor and ONE NATION, by the Coalition/Greens/others cohorts –
+   FLOW_HISTORY_SENATE's sibling contest, the explainer's One Nation tab
+   under House: Upper. Same four post-GVT Senate elections, same ballot set
+   (above-the-line only), same counts provenance (.build/aec-flow-src/
+   senate-atl/counts.json's pa/paStates blocks, folded in by
+   merge_pa_counts.py from analyse_atl_flows.py's second tally;
+   test-senate-atl-on-flows.mjs recomputes EVERY cell from them, and the
+   test file's header documents the exact derivation). The estimand, pinned:
+   a cohort family's cell is 100·(ALP_first+ALP_only)/(the four rank cells)
+   – of its ATL papers naming either Labor or One Nation, the share ranking
+   Labor AHEAD (a paper naming only one of the pair still counts its way);
+   each *Nei array is 100·neither/(the five cells) – "named neither", never
+   "exhausted". The null map is the CONTEST's, not the cohort's: a state
+   One Nation filed no Senate ticket in nulls ALL THREE cohorts (the ACT in
+   all four elections, the NT until 2025) – a pair nobody could rank is a
+   gap, never a zero. Display history, NOT an estimator input. */
+export const FLOW_HISTORY_SENATE_ON = Object.freeze({
+  years: [2016, 2019, 2022, 2025],
+  coal: [61.2, 47.6, 42.5, 25.3], coalNei: [61.1, 53.5, 38.4, 13.0],
+  grn: [96.7, 96.2, 96.2, 95.6], grnNei: [17.9, 15.7, 11.9, 10.6],
+  oth: [60.9, 50.1, 50.3, 49.1], othNei: [39.1, 36.3, 28.2, 22.6],
+  states: Object.freeze({
+    nsw: { label: "New South Wales",            short: "NSW",
+           coal: [57.5, 46.8, 43.9, 21.8], coalNei: [62.5, 57.7, 44.5, 15.0],
+           grn: [97.2, 97.3, 96.5, 95.5], grnNei: [18.2, 19.5, 13.1, 14.3],
+           oth: [60.3, 52.6, 49.6, 40.6], othNei: [44.9, 41.9, 30.9, 28.4] },
+    vic: { label: "Victoria",                   short: "Vic",
+           coal: [68.9, 50.9, 54.5, 26.0], coalNei: [71.0, 63.1, 51.6, 15.3],
+           grn: [98.3, 98.2, 97.8, 97.2], grnNei: [19.2, 16.0, 10.5, 9.2],
+           oth: [66.1, 55.1, 49.3, 56.0], othNei: [43.7, 40.9, 26.9, 23.2] },
+    qld: { label: "Queensland",                 short: "Qld",
+           coal: [48.1, 35.7, 24.0, 22.8], coalNei: [59.1, 44.0, 12.2, 8.7],
+           grn: [94.4, 93.5, 93.8, 94.6], grnNei: [20.0, 15.9, 14.2, 10.1],
+           oth: [48.6, 37.6, 40.5, 41.0], othNei: [36.5, 29.8, 31.1, 20.9] },
+    wa:  { label: "Western Australia",          short: "WA",
+           coal: [61.9, 50.4, 44.8, 26.5], coalNei: [59.3, 52.7, 35.5, 11.9],
+           grn: [94.0, 94.4, 95.6, 94.9], grnNei: [17.2, 14.0, 10.4, 8.9],
+           oth: [56.3, 48.2, 49.3, 49.0], othNei: [38.4, 33.7, 26.0, 22.7] },
+    sa:  { label: "South Australia",            short: "SA",
+           coal: [61.5, 47.5, 59.8, 29.4], coalNei: [55.1, 49.6, 51.0, 11.6],
+           grn: [95.5, 93.6, 95.2, 94.4], grnNei: [14.5, 10.4, 10.8, 7.8],
+           oth: [69.2, 51.1, 56.6, 49.5], othNei: [20.9, 21.5, 25.1, 17.8] },
+    tas: { label: "Tasmania",                   short: "Tas",
+           coal: [69.9, 48.2, 47.1, 36.8], coalNei: [22.5, 30.3, 18.6, 8.1],
+           grn: [94.6, 95.7, 95.7, 93.7], grnNei: [14.5, 7.3, 8.4, 5.0],
+           oth: [57.3, 48.0, 57.1, 49.6], othNei: [21.1, 15.8, 18.4, 12.2] },
+    act: { label: "Australian Capital Territory", short: "ACT",
+           coal: [null, null, null, null], coalNei: [null, null, null, null],
+           grn: [null, null, null, null], grnNei: [null, null, null, null],
+           oth: [null, null, null, null], othNei: [null, null, null, null] },
+    nt:  { label: "Northern Territory",         short: "NT",
+           coal: [null, null, null, 29.4], coalNei: [null, null, null, 1.9],
+           grn: [null, null, null, 88.7], grnNei: [null, null, null, 1.6],
+           oth: [null, null, null, 65.7], othNei: [null, null, null, 3.2] },
+  }),
+});

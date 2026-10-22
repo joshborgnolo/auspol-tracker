@@ -5660,6 +5660,16 @@ const FLOW_PARTIES = [
   { id: "onp", name: "One Nation", color: "var(--onp)" },
   { id: "oth", name: "Others",     color: "var(--oth)" },
 ];
+/* the Labor v One Nation pairing's trio rides the RIVAL cohorts instead:
+   the Coalition's own voters join the panel (One Nation voters no longer
+   carry a line - their ballots name their party first). Only the Senate's
+   ATL counts hold this pairing (the explainer's House: Upper view on the
+   One Nation tab, user 2026-10-22) */
+const FLOW_ON_PARTIES = [
+  { id: "coal", name: "Coalition", color: "var(--lnp)" },
+  { id: "grn",  name: "Greens",    color: "var(--grn)" },
+  { id: "oth",  name: "Others",    color: "var(--oth)" },
+];
 /* the frame both views share: Past cycles' half-column chart (the article
    column is about that wide), 0-100 with the unit on the top tick */
 const EX_TICKS = [0, 25, 50, 75, 100];
@@ -5681,18 +5691,23 @@ const ExHollowX = () => (
 const ExBarSwatch = () => (
   <svg width="12" height="16" viewBox="0 0 12 16" aria-hidden="true"><rect x="4" y="1" width="4" height="14" rx="1" style={{ fill: "var(--ink-3)", opacity: 0.55 }} /></svg>
 );
-function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
+function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onSen }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const FH = window.AUSPOL.flowHistory || {};
   /* the House: control's Upper bank (fed.sen, FH.fed.sen.states): the
      Senate's above-the-line flows, counted from the AEC's ballot-level
-     formal-preferences files for the four post-GVT elections. A fed:<key>
-     pick reads the bank's own per-state cut; classifications stay a House
-     feature, so a classKey picks nothing here. Its one state sibling is
-     nsw.sen (lc): the NSW Legislative Council's counts, the only state
-     upper house with a published ballot record */
-  const SEN = house === "sen" ? ((FH.fed || {}).sen || null) : null;
-  const LC = house === "sen" && lc ? (((FH.nsw || {}).sen) || null) : null;
+     formal-preferences files for the four post-GVT elections. onSen picks
+     the SAME ballots' Labor-v-One-Nation cut instead (fed.senOn): the
+     cohort trio becomes Coalition/Greens/Others, and a state with no
+     One Nation Senate tickets anywhere in the four holds only nulls
+     (the ACT - the ON tab's menu leaves it out; the NT opens in 2025).
+     A fed:<key> pick reads the bank's own per-state cut; classifications
+     stay a House feature, so a classKey picks nothing here. Its one state
+     sibling is nsw.sen (lc): the NSW Legislative Council's counts, the
+     only state upper house with a published ballot record - Coalition
+     pairing only, so onSen never reads it */
+  const SEN = house === "sen" ? (((FH.fed || {})[onSen ? "senOn" : "sen"]) || null) : null;
+  const LC = house === "sen" && lc && !onSen ? (((FH.nsw || {}).sen) || null) : null;
   /* stateKey picks a per-state cut of the FEDERAL counts (AEC per-state TPP
      tables, 2004–2025); classKey its per-seat-type cut (the AEC's per-
      division TCP tables, grouped by its own per-election classifications,
@@ -5713,14 +5728,15 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
   /* a counted state (NSW, from its ballot-level data) draws no bar, but NSW
      voters may stop numbering, so each point says what share exhausted */
   const cnt = !!S.counted;
-  /* the Senate bank (national `senate` or a state's `senState`) and its NSW
+  /* the Senate bank (national `senate` or a state's `senState`, plus the
+     `senateOn`/`senStateOn` Labor-v-One-Nation cut) and its NSW
      Legislative Council sibling (`lc`): every ATL ballot is live at the
      count's end, so "exhausted" never applies - the tooltip instead gives
-     the share of the group's ATL papers that named NEITHER major (the nei
-     arrays gen-data carries beside each line) */
-  const sen = !!(S.senate || S.senState || S.lc);
+     the share of the group's ATL papers that named NEITHER of the pair
+     (the nei arrays gen-data carries beside each line) */
+  const sen = !!(S.senate || S.senState || S.lc || S.senateOn || S.senStateOn);
   const lcBank = !!S.lc;
-  const parties = FLOW_PARTIES.filter((p) => (S[p.id] || []).some((v) => v != null));
+  const parties = (onSen ? FLOW_ON_PARTIES : FLOW_PARTIES).filter((p) => (S[p.id] || []).some((v) => v != null));
   /* bars wherever a point carries an error: every state estimate, and the
      federal series' 1984-93 estimates ahead of its 1996-2025 counts (user
      2026-10-21) - the AEC counted no flow by party before 1996 */
@@ -5744,7 +5760,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
         // "about" on an estimate: it missed NSW's counted shares by up to 3
         const nei = S[p.id + "Nei"] || [];
         const note = [err[i] != null ? (est ? "" : "estimated, ") + "±" + err[i].toFixed(1) : null,
-          sen && nei[i] != null ? "named neither major: " + nei[i].toFixed(1) + "%" : null,
+          sen && nei[i] != null ? (onSen ? "named neither: " : "named neither major: ") + nei[i].toFixed(1) + "%" : null,
           !sen && exh[i] != null ? (est ? "about " : "") + exh[i].toFixed(0) + "% exhausted" : null].filter(Boolean).join(", ");
         cur.push({ x: YEARS[i], y: T(val), ...(note ? { note } : null) });
       }
@@ -5787,19 +5803,28 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
     });
   }
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
-  const side = inv ? "the Coalition" : "Labor", other = inv ? "Labor" : "the Coalition";
+  const side = inv ? (onSen ? "One Nation" : "the Coalition") : "Labor",
+        other = inv ? "Labor" : (onSen ? "One Nation" : "the Coalition");
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span + (est ? ", estimated" : "");
   /* the federal line and the state lines measure different seats (user
      2026-10-21 review): since 2004 the AEC's two-party cut sorts every seat's
      ballots, the states only the seats Labor and the Coalition finished
      first and second - in 2025 the gap for everyone else was ~6 points */
-  const E25 = ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
+  const E25 = !onSen && ((window.AUSPOL.flowForced || {}).elec2025r || {}).all;
   const cutGap = E25 && E25.nat && E25.oth != null ? [E25.nat.oth.toFixed(1), E25.oth.toFixed(1)] : null;
   const stateCut = cutGap ? " The federal line counts every seat, so don’t compare the two directly: in 2025 everyone else sent Labor " + cutGap[0] + "% across all seats but " + cutGap[1] + "% in these seats." : "";
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
+  /* the Labor-v-One-Nation Senate cut's caption mirrors the Coalition
+     pairing's (user 2026-10-22): counted ballots, pair ranked (or one
+     ranked), "named neither" never "exhausted". Its movement clause quotes
+     the national Coalition cohort; a state's own caption skips it */
   const cap = lcBank
     ? "Counted from the NSW Electoral Commission’s ballot-level preference files: every formal above-the-line vote at the " + span + " Legislative Council elections (below-the-line papers excluded, as on the Senate view). Most NSW upper-house voters number just one box above the line — " + oneOnly + " — so most ballots name neither major; each share is of the ballots that went on to rank Labor or the Coalition, and each point’s tooltip gives how many named neither — “named neither”, never “exhausted”: a paper that names no major mostly still counts for a minor group. One Nation’s line opens in 2019 — it ran no upper-house group in 2015, and a zero-ballot group draws as a gap, never a zero. NSW is the only state upper house with a published ballot record, so no other state can ride this view."
+    : onSen
+    ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots that ranked Labor or One Nation (or both) — a ballot naming only one of the pair still counts its way — and each point’s tooltip gives the share naming neither — “named neither”, never “exhausted”: no ballot exhausts in a Senate count."
+      + (!stateKey ? " Coalition voters turned: 61.2% named Labor ahead of One Nation in 2016, but only 25.3% by 2025 — Greens voters named Labor ahead of One Nation throughout (95.6% by 2025). The ACT sits out the elections menu: One Nation ran no ACT Senate tickets in any of the four — a pair nobody could rank is a gap, never a zero." : "")
+      + (S.senStateOn ? " A gap in the lines is an election One Nation had no " + S.short + " Senate tickets — a pair nobody could rank that year." + (stateKey === "nt" ? " It ran none until 2025, so " + S.short + "’s pair opens in 2025." : "") : "")
     : sen
     ? "Counted from the AEC’s ballot-level formal-preferences files: every above-the-line Senate ballot, " + span + " (below-the-line papers excluded; the group-voting-ticket era kept no per-ballot record before 2016). Each share is of the group’s ballots naming a major party, and each point’s tooltip gives the share naming neither major — “named neither”, not exhausted: no ballot exhausts in a Senate count. Senate flows run well above the House’s (the Greens’ ballots named Labor 86.9% in 2016 against 81.9% of their House ballots), and One Nation’s neither-share fell from 46.6% to 24.4% — mostly where it stood tickets, not its voters switching."
       + (S.senState
@@ -5832,7 +5857,7 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
         {menu}
       </div>
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
-      <TrendChart key={"ex-fl-" + (house || "rep") + jur + (stateKey || "") + (classKey || "") + (lcBank ? "lc" : "")} {...exFrame(narrow)}
+      <TrendChart key={"ex-fl-" + (house || "rep") + jur + (stateKey || "") + (classKey || "") + (lcBank ? "lc" : "") + (onSen ? "on" : "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}
@@ -5841,11 +5866,12 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu }) {
         ariaLabel={"Share of preferences flowing to " + side + ", by party, " + S.label + (lcBank ? ", above-the-line NSW Legislative Council ballots" : sen ? ", above-the-line Senate ballots" : "") + (est ? ", estimated" : "") + ", " + span}
         copy={{ title: "Share of each group’s preferences reaching " + side + " over " + other,
                 sub: rdCap(S.elections || S.label + " elections") + ". " + (lcBank ? "Counted from the NSW Electoral Commission’s ballot-level preference files; above-the-line ballots only, and each share is of papers naming a major party."
+                  : onSen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers ranking Labor or One Nation (or both)."
                   : sen ? "Counted from the AEC’s ballot-level formal-preferences files; above-the-line ballots only, and each share is of papers naming a major party."
                   : est ? "Estimated from distributions of preferences, in the seats where Labor and the Coalition finished first and second."
                   : fedEst ? "Estimated " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " from each seat’s distribution of preferences; counted by the AEC from 1996."
                   : "Counted, election by election, so no error bars."),
-                caption: lcBank ? "Above-the-line NSW upper-house ballots, 2015–2023; on the page, each point’s tooltip gives the share naming neither major." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : (hasErr ? (fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections.") : undefined),
+                caption: lcBank ? "Above-the-line NSW upper-house ballots, 2015–2023; on the page, each point’s tooltip gives the share naming neither major." : onSen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither." : sen ? "Above-the-line Senate ballots, 2016 on; on the page, each point’s tooltip gives the share naming neither major." : (hasErr ? (fedEst ? "Bars: the " + fedEst[0] + "–" + fedEst[fedEst.length - 1] + " estimates’ 90% error; 1996 on, the AEC’s counts." : "Each bar shows how far the estimate missed, nine times in ten, on federal elections.") : undefined),
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={est ? [] : [{ kind: "line", color: "var(--ink-3)", label: fedEst ? "Counted flow, 1996 on" : "Counted flow at each election" }]}>
@@ -5979,13 +6005,22 @@ function RdExplained() {
      2026-10-22), a bare key a state's own elections, "nswlc" the NSW
      Legislative Council under Upper (the only state upper house with a
      published ballot record - it never appears under Lower). The pick
-     persists across the contest tabs - the menu just hides on Labor v One
-     Nation. */
+     persists across the contest tabs - the menu just hides on Labor v
+     One Nation's Lower view (its Upper view carries the ON Senate bank's
+     federal menu). */
   const FED_STATES = (FH.fed && FH.fed.states) || {};
   const FED_CLASSES = (FH.fed && FH.fed.classes) || {};
   const [view, setView] = useState("fed");
   const SEN_BANK = (FH.fed && FH.fed.sen) || null;
   const LC_BANK = (FH.nsw && FH.nsw.sen) || null;
+  /* the SAME Senate ballots' Labor-v-One-Nation cut (user 2026-10-22): the
+     ON tab's Upper view, so flipping houses no longer snaps the contest
+     back. Its states are the federal bank's, minus any state where One
+     Nation ran no Senate ticket in all four years (the ACT - all-null
+     trios stay out of the menu) */
+  const SEN_ON_BANK = (FH.fed && FH.fed.senOn) || null;
+  const ON_SEN_STATES = (SEN_ON_BANK && SEN_ON_BANK.states) || {};
+  const hasOnCells = (k) => { const s = ON_SEN_STATES[k]; return !!s && ["coal", "grn", "oth"].some((c) => (s[c] || []).some((v) => v != null)); };
   const fedView = view === "fed" || view.startsWith("fed:") || view.startsWith("fedcl:");
   const lcView = view === "nswlc" && !!LC_BANK;
   const jur = fedView ? "fed" : lcView ? "nsw" : (FH[view] ? view : "fed");
@@ -5996,33 +6031,38 @@ function RdExplained() {
      AEC's ballot-level files. The federal menu section stays live under
      Upper (both banks carry the eight states, so a fed:<key> pick survives
      the flip); seat classifications and every state election except NSW's
-     upper house are House features, and the Labor v One Nation tab has no
-     Senate bank, so flipping to Upper snaps those picks back (to "fed" /
-     the Coalition contest) - excepting the NSW state pick, which becomes
+     upper house are House features, so flipping to Upper snaps those
+     picks back to "fed" - excepting the NSW state pick, which becomes
      its Legislative Council count (FH.nsw.sen, banked beside the Senate
-     series, user 2026-10-22). The toggle renders only where the build
-     ships the bank - the Vic page never carries either */
+     series, user 2026-10-22). The One Nation contest follows the flip
+     too: its Upper view reads FH.fed.senOn, the same ballots' other cut.
+     The toggle renders only where the build ships the bank - the Vic
+     page never carries either */
   const SEN_STATES = (SEN_BANK && SEN_BANK.states) || {};
   const [house, setHouse] = useState("rep");
+  const onSenMode = house === "sen" && !!SEN_ON_BANK;   /* pair-independent: drives the ON tab's menu */
   const [inv, setInv] = useState(false);
   /* the contest tabs flip Labor v Coalition (the flowHistory election
-     histories) to Labor v One Nation (the measured flowForced.bys contests;
-     user 2026-10-20). The elections menu belongs to the Coalition history
-     alone — no state-by-state counts exist for the One Nation pairing. */
+     histories) to Labor v One Nation. The One Nation card differs by
+     house: Lower reads the measured flowForced.bys contests (the crosses
+     chart, no elections menu - no state-by-state counts exist); Upper
+     reads the SAME Senate bank's Labor-v-One-Nation cut (user 2026-10-22,
+     the elections menu narrowed to the states One Nation filed Senate
+     tickets in) */
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
   /* flipping to Upper snaps the House-only picks away (a class view, a
-     state-election view other than NSW's, the One Nation contest tab),
-     except a NSW state pick, which becomes its upper-house count; flipping
-     back to Lower returns a Legislative Council pick to the NSW state
-     elections - every other Senate pick is a House pick too */
+     state-election view other than NSW's), except a NSW state pick, which
+     becomes its upper-house count; an ON-tab pick of a state with no One
+     Nation Senate tickets (no counted pair) drops to the national series;
+     flipping back to Lower returns a Legislative Council pick to the NSW
+     state elections - every other Senate pick is a House pick too */
   const flipHouse = () => {
     const next = house === "sen" ? "rep" : "sen";
     setHouse(next);
     if (next === "sen") {
-      if (pair === "on") setPair("co");
       if (view === "nsw" && LC_BANK) setView("nswlc");
-      else if (classKey || !fedView) setView("fed");
+      else if (classKey || !fedView || (pair === "on" && stateKey && !hasOnCells(stateKey))) setView("fed");
     } else if (lcView) setView("nsw");
   };
   React.useLayoutEffect(() => {
@@ -6060,12 +6100,13 @@ function RdExplained() {
   };
   const viewStep = React.useRef(null);
   viewStep.current = (dir) => {
-    /* the elections menu rides the Coalition history alone - on Labor v
-       One Nation there is no walk to make, and the keys keep their
-       scroll day job. VIEW_OPTS is declared beside the menu below; this
-       closure runs on a keypress, by which time it is initialised */
+    /* the elections menu walks only where one renders - Labor v One
+       Nation's Lower view has none, and the keys keep their scroll day
+       job there. VIEW_OPTS/menuShow are declared beside the menu below;
+       this closure runs on a keypress, by which time both are
+       initialised */
     const opts = VIEW_OPTS;
-    if (pair !== "co" || opts.length < 2) return false;
+    if (!menuShow || opts.length < 2) return false;
     const i = opts.indexOf(view);
     if (i < 0) return false;
     setView(opts[(i + dir + opts.length) % opts.length]);
@@ -6140,30 +6181,47 @@ function RdExplained() {
   const stateKeys = Object.keys(FED_STATES);
   const classKeys = Object.keys(FED_CLASSES);
   const senStateKeys = Object.keys(SEN_STATES);
+  const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);
+  /* the ON tab's OWN Upper view (senOnView): the federal menu rides the
+     senOn bank's states (every state One Nation filed a Senate ticket
+     in), and NSW's Coalition-only Legislative Council sits it out */
+  const senOnView = onSenMode && pair === "on" && !lcView;
+  const onPairPick = (p) => {
+    setPair(p);
+    /* a pick to Labor v One Nation leaves the picks that contest's bank
+       never carries: the LC count, and a state One Nation ran no Senate
+       tickets in */
+    if (p === "on" && house === "sen" && (lcView || (stateKey && !hasOnCells(stateKey)))) setView("fed");
+  };
   /* the menu's option values in the <select>'s DOM order - the up/down
      walk below steps this exact list (the hover claim proxies the control's
      own arrows, which for a native select is line-by-line). Under House:
      Upper the federal entries ride SEN_STATES (same fed:<key> values,
      re-read from the Senate bank) and the House-only sections leave, bar
      the one state upper house: NSW's Legislative Council rides alone in
-     the state-elections section (LC_BANK) */
+     the state-elections section (LC_BANK). The One Nation tab's Upper view
+     swaps the federal bank for senOn's and drops the Council */
   const VIEW_OPTS = house === "sen"
-    ? [...(SEN_BANK ? ["fed", ...senStateKeys.map((k) => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])]
+    ? (senOnView
+      ? (SEN_ON_BANK ? ["fed", ...senOnStateKeys.map((k) => "fed:" + k)] : [])
+      : [...(SEN_BANK ? ["fed", ...senStateKeys.map((k) => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])])
     : ((KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0)
       ? ["fed", ...stateKeys.map((k) => "fed:" + k), ...classKeys.map((k) => "fedcl:" + k),
          ...(KEYS.length > 1 ? KEYS.filter((k) => k !== "fed") : [])]
       : []);
-  const menuShow = house === "sen" ? VIEW_OPTS.length > 1 : VIEW_OPTS.length > 0;
+  /* Labor v One Nation's Lower view carries no menu (its counts are the
+     measured contests alone) - every other view's menu shows the banks */
+  const menuShow = pair === "on" && house !== "sen" ? false
+    : house === "sen" ? VIEW_OPTS.length > (senOnView ? 0 : 1) : VIEW_OPTS.length > 0;
+  const menuKeys = house === "sen" ? (senOnView ? senOnStateKeys : senStateKeys) : stateKeys;
+  const menuBank = house === "sen" ? (senOnView ? ON_SEN_STATES : SEN_STATES) : FED_STATES;
   const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
-            value={lcView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
+            value={lcView && !senOnView ? "nswlc" : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
             onChange={(e) => setView(e.target.value)}>
       <optgroup label="Federal elections">
         <option value="fed">Federal, national</option>
-        {(house === "sen" ? senStateKeys : stateKeys).map((k) => {
-          const bank = house === "sen" ? SEN_STATES : FED_STATES;
-          return <option key={k} value={"fed:" + k}>{"Federal, " + (bank[k].short || bank[k].label)}</option>;
-        })}
+        {menuKeys.map((k) => <option key={k} value={"fed:" + k}>{"Federal, " + (menuBank[k].short || menuBank[k].label)}</option>)}
         {house !== "sen" && classKeys.map((k) => <option key={"fedcl:" + k} value={"fedcl:" + k}>{"Federal, " + (FED_CLASSES[k].short || FED_CLASSES[k].label)}</option>)}
       </optgroup>
       {house !== "sen" && KEYS.length > 1 && (
@@ -6171,7 +6229,7 @@ function RdExplained() {
           {KEYS.filter((k) => k !== "fed").map((k) => <option key={k} value={k}>{(FH[k].short || FH[k].label) + " state elections"}</option>)}
         </optgroup>
       )}
-      {house === "sen" && LC_BANK && (
+      {house === "sen" && !senOnView && LC_BANK && (
         <optgroup label="State elections">
           <option value="nswlc">{LC_BANK.label}</option>
         </optgroup>
@@ -6194,9 +6252,8 @@ function RdExplained() {
   );
   /* the House: flip (user 2026-10-22), the same idiom beside Share: - the
      button shows the ACTIVE chamber ("Lower" reads the House banks' seat
-     counts, "Upper" the Senate's above-the-line ballots). It sits in the
-     tab row on both contests so a flip off the One Nation tab snaps it to
-     the Coalition contest, which is the Senate bank's only pairing */
+     counts, "Upper" the Senate's above-the-line ballots). It rides the
+     tab row on both contests - each contest ships its own Upper bank */
   const houseCtl = SEN_BANK ? (
     <span className="rd-pl-ctl ex-house">
       <span className="rd-pl-ctl-l">House:</span>
@@ -6207,7 +6264,7 @@ function RdExplained() {
       </button>
     </span>
   ) : null;
-  const headCtls = narrow ? <span className="ex-fl-ctls">{pair === "co" ? menu : null}{houseCtl}{share}</span> : (pair === "co" ? menu : null);
+  const headCtls = narrow ? <span className="ex-fl-ctls">{menu}{houseCtl}{share}</span> : menu;
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
       <div className="rd-eyebrow">
@@ -6219,11 +6276,12 @@ function RdExplained() {
       <div className="ex-body" dangerouslySetInnerHTML={{ __html: window.EXPLAINED_ARTICLE || "" }} />
       <div ref={ref}>
         <div className="card rd-card ex-fl-card" ref={cardMark} data-rd-swipe-exact="">
-          <RdTabs value={pair} onChange={setPair} ariaLabel="Contest" className="ex-fl-tabs"
+          <RdTabs value={pair} onChange={onPairPick} ariaLabel="Contest" className="ex-fl-tabs"
                   options={EX_PAIRS.map((p) => ({ id: p.id, label: narrow ? p.short : p.label }))}>
             {narrow ? null : <>{houseCtl}{share}</>}
           </RdTabs>
-          {pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />
+          {senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />
+            : pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />
             : <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} lc={lcView} inv={inv} menu={headCtls} />}
         </div>
       </div>
