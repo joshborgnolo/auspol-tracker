@@ -1109,12 +1109,63 @@ export function validateRbDirectionGroups() {
   return errors;
 }
 
+/* primary-history.json — the shares behind the flows-explained chart's
+   "View: Primary votes" flip. Shape + fold contract only (the figures'
+   AEC-derivation is pinned by test-primary-history.mjs): every view's
+   years ascend with alp/lnp/oth drawn alongside as numbers; a named
+   minor's cell is null (folded, never 0) or at the file's foldPt; and the
+   shown lines plus oth rejoin to 100 per year — oth is the fold, not a
+   counted series. */
+export function validatePrimaryHistory() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "primary-history.json"), "utf8")); }
+  catch { fail("primary-history.json", "primary-history-shape", "missing or unparseable"); return errors; }
+  const FOLD = typeof S.foldPt === "number" && S.foldPt > 0 && S.foldPt < 20 ? S.foldPt : (fail("primary-history.json", "primary-history-shape", `bad foldPt ${S.foldPt}`), null);
+  const GATED = ["grn", "onp", "dem", "dlp", "uap", "xnt", "jln", "ind"];
+  const checkView = (where, v) => {
+    if (!v || typeof v !== "object") { fail(where, "primary-history-shape", "view is not an object"); return; }
+    if (typeof v.label !== "string" || typeof v.elections !== "string") fail(where, "primary-history-shape", "no label/elections copy");
+    const ys = v.years;
+    if (!Array.isArray(ys) || !ys.length || !ys.every((y) => Number.isInteger(y))) { fail(where, "primary-history-shape", "bad years"); return; }
+    if (!ys.every((y, i) => i === 0 || y > ys[i - 1])) fail(where, "primary-history-shape", "years out of order");
+    for (const k of ["alp", "lnp", "oth"]) {
+      if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "primary-history-shape", `${k} not aligned to years`); continue; }
+      v[k].forEach((x, i) => {
+        if (typeof x !== "number" || x < 0 || x > 100) fail(where, "range", `${k}[${ys[i]}] = ${x} (must be a 0–100 number — only lines above the fold gap)`);
+      });
+    }
+    for (const k of GATED) {
+      if (v[k] == null) continue;
+      if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "primary-history-shape", `${k} not aligned to years`); continue; }
+      v[k].forEach((x, i) => {
+        if (x == null) return;
+        if (FOLD != null && (typeof x !== "number" || x < FOLD - 0.005 || x > 100)) fail(where, "fold", `${k}[${ys[i]}] = ${x} (below the fold—fold to null, never a sub-fold count or 0)`);
+      });
+    }
+    ys.forEach((y, i) => {
+      const shown = ["alp", "lnp", ...GATED].reduce((t, k) => t + (Array.isArray(v[k]) && v[k][i] != null ? v[k][i] : 0), 0);
+      if (Array.isArray(v.oth) && v.oth[i] != null && Math.abs(shown + v.oth[i] - 100) > 0.06)
+        fail(where, "reconcile", `${y}: lines ${Math.round(shown * 100) / 100} + oth ${v.oth[i]} ≠ 100`);
+    });
+  };
+  if (!S.fed || typeof S.fed !== "object") { fail("primary-history.json", "primary-history-shape", "no fed view"); return errors; }
+  checkView("fed", S.fed);
+  if (S.fed.sen) checkView("fed.sen", S.fed.sen); else fail("primary-history.json", "primary-history-shape", "no fed.sen view");
+  if (!S.fed.states || typeof S.fed.states !== "object") fail("primary-history.json", "primary-history-shape", "no fed.states");
+  else for (const [st, v] of Object.entries(S.fed.states)) checkView(`fed.${st}`, v);
+  for (const [st, v] of Object.entries((S.fed.sen && S.fed.sen.states) || {})) checkView(`fed.sen.${st}`, v);
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const { errors, exempted, orphans } = validate(D);
   errors.push(...validateChangelog());
+  errors.push(...validatePrimaryHistory());
   errors.push(...validatePewSentiment());
   errors.push(...validateDirectionGroups());
   errors.push(...validateSecDirectionStates());
