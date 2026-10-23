@@ -3089,7 +3089,10 @@ function AccuracyPanel() {
     const multi = byRecency.filter((c) => hh(c).length > 1).sort((a, b) => cMiss(a) - cMiss(b));
     const bestCyc = multi[0], worstCyc = multi[multi.length - 1];
     const lastFirms = new Set(last ? hh(last).map((h) => h.firm) : []);
-    const statHouses = firmsSrc.filter((f) => f.n > 1 && lastFirms.has(f.firm)).map((f) => {
+    /* the last election's pollsters over their whole record – Ipsos stays out
+       (no longer a current house) while YouGov, on its one final poll, comes
+       in beside the houses with a repeat record: user call 2026-10-23 */
+    const statHouses = firmsSrc.filter((f) => f.firm !== "Ipsos" && (f.n > 1 || f.firm === "YouGov") && lastFirms.has(f.firm)).map((f) => {
       const hs = allH.filter(({ h }) => h.firm === f.firm);
       const es = hs.map(({ h }) => errOf(h));
       return { name: f.firm, n: es.length,

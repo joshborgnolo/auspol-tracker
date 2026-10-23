@@ -113508,7 +113508,7 @@ function AccuracyPanel() {
     const bestCyc = multi[0],
       worstCyc = multi[multi.length - 1];
     const lastFirms = new Set(last ? hh(last).map(h => h.firm) : []);
-    const statHouses = firmsSrc.filter(f => f.n > 1 && lastFirms.has(f.firm)).map(f => {
+    const statHouses = firmsSrc.filter(f => f.firm !== "Ipsos" && (f.n > 1 || f.firm === "YouGov") && lastFirms.has(f.firm)).map(f => {
       const hs = allH.filter(({
         h
       }) => h.firm === f.firm);
