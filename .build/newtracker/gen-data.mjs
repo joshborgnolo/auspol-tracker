@@ -5299,9 +5299,12 @@ if (primaryHistory && !JUR) {
    Labor's and the Coalition's two-party-preferred shares at each federal
    election – national 1972–2025 (polls.json's canonical election records,
    the same figures every past-cycle panel quotes), states and the four
-   seat classes 2004–2025 (the AEC's Two Party Preferred By Division
-   notional counts, summed). No Senate view: no 2PP exists there, so in
-   this figure the House: control sets aside. Guarded like the primary
+   seat classes 1996–2025 (the AEC's per-division notional counts summed:
+   TPP-by-division downloads 2004 on, statistics-pack HTPP tables before).
+   fed.sen rides the House: control's Upper (2026-10-24): the IMPLIED
+   Senate two-party from the committed ATL tallies, national and the eight
+   states 2016–2025 – an estimate, never a count, and no classes (the
+   Senate has no divisions). Guarded like the primary
    lane: a missing file drops the flip. */
 const twoPPHistory = (() => {
   try {
@@ -8499,7 +8502,10 @@ window.AUSPOL = (function () {
   /* The two-party-preferred history behind the explainer chart's View: 2PP
      flip – Labor's and the Coalition's 2PP shares at each federal election,
      national since 1972, per state and per seat class 1996–2025; the pair
-     sums to 100 by construction, and no Senate view exists. */
+     sums to 100 by construction. fed.sen is the IMPLIED Senate two-party
+     (no official one exists – the AEC counts no 2PP in the Senate): ATL
+     tallies only, the four post-GVT events 2016–2025, national plus the
+     eight states, no classes, implied: true. */
   const twoPPHistory = ${JSON.stringify(twoPPHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};

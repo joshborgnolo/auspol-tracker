@@ -6313,20 +6313,32 @@ function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, me
    should remain constant at all times"): the other side sits at 100
    minus it, so the Share: flip draws the mirror, and the axis prices
    the whole bank's furthest cell from the half once, never moving on a
-   pick or a flip. Divisions never exist in the Senate, so
-   there is no House: ambiguity here: this view is House-only (the
-   control sets aside), and state and class picks ride the same elections
-   menu positions the other two modes teach. */
+   pick or a flip. The House: control (user 2026-10-24: "add House:
+   Lower ⇄ to 2pp view") reaches it too: Upper rides TP.fed.sen, the
+   IMPLIED Senate two-party (no official one exists - the AEC counts no
+   2PP in the chamber it never fills), national and the eight states,
+   2016-2025 - divisions never exist in the Senate, so the class cuts
+   stay House-only and the selector snaps them away before they arrive. */
 const TWO_PARTIES = [
   { id: "alp", name: "Labor",     color: "var(--alp)" },
   { id: "lnp", name: "Coalition", color: "var(--lnp)" },
 ];
-function Explained2ppChart({ stateKey, classKey, inv, menu }) {
+function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const TP = window.AUSPOL.twoPPHistory || null;
   if (!TP || !TP.fed) return null;
-  const S = (classKey && ((TP.fed.classes || {})[classKey]))
-    || (stateKey && (TP.fed.states || {})[stateKey]) || TP.fed;
+  /* the House: flip's bank pick (user 2026-10-24): Upper rides fed.sen -
+     the IMPLIED Senate two-party from the committed ATL tallies (no
+     official Senate 2PP exists, so the series is marked and captioned as
+     the estimate it is). House-only cuts (a class pick) can never be
+     live here - the selector snaps them before they reach this line, so
+     the Senate bank is asked for none */
+  const senAll = TP.fed.sen || null;
+  const senBank = house === "sen" ? senAll : null;
+  const S = senBank
+    ? ((stateKey && (senBank.states || {})[stateKey]) || senBank)
+    : ((classKey && ((TP.fed.classes || {})[classKey]))
+    || (stateKey && (TP.fed.states || {})[stateKey]) || TP.fed);
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
   /* one side's line at a time - the other always sits at 100 minus it
@@ -6343,25 +6355,32 @@ function Explained2ppChart({ stateKey, classKey, inv, menu }) {
   const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (classKey
+  const cap = (senBank
+    ? ("Implied two-party shares of the formal above-the-line Senate ballots"
+      + (stateKey ? " in " + (S.short || S.label) : "")
+      + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter.")
+    : classKey
     ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions."
     : stateKey
     ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed."
     : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.")
-    + (classKey || stateKey ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "")
-    + (classKey || stateKey ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "")
+    + (!senBank && (classKey || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "")
+    + (!senBank && (classKey || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "")
     + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
   /* the constant axis (user 2026-10-24: the range "should remain
      constant at all times"): the furthest cell of the WHOLE bank from
-     the half - national and every state and class cut, so no elections
-     pick ever moves it - mirrored on its other side, so the Share: flip
-     never moves it either (Labor's cells price both sides by the count's
-     sum). 50 itself stays a tick - the yard a two-party chart is read
+     the half - national and every state and class cut, PLUS the implied
+     Senate bank's cells when the build ships them, so neither an
+     elections pick nor the House: flip ever moves it - mirrored on its
+     other side, so the Share: flip never moves it either (Labor's cells
+     price both sides by the count's sum). 50 itself stays a tick - the
+     yard a two-party chart is read
      against - and it is the one tick drawn emphatic (user 2026-10-24:
      the halfway label bold, its rule a rung darker, via yTickEmph) */
   let dev = 0;
   [TP.fed, ...Object.keys(TP.fed.states || {}).map((k) => TP.fed.states[k]),
-    ...Object.keys(TP.fed.classes || {}).map((k) => TP.fed.classes[k])].forEach((v) =>
+    ...Object.keys(TP.fed.classes || {}).map((k) => TP.fed.classes[k]),
+    ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : [])].forEach((v) =>
     (v.alp || []).forEach((x) => { if (x != null) dev = Math.max(dev, Math.abs(x - 50)); }));
   const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);
   const hi = 100 - lo;
@@ -6372,12 +6391,12 @@ function Explained2ppChart({ stateKey, classKey, inv, menu }) {
   return (
     <>
       <div className="rd-chead ex-fl-head">
-        <span className="rd-chead-t">{"Two-party preferred, " + active.name + "’s share, %"}
+        <span className="rd-chead-t">{(senBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}
           <span className="rd-chead-meta">{scope}</span></span>
         {menu}
       </div>
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
-      <TrendChart key={"ex-2pp-" + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
+      <TrendChart key={"ex-2pp-" + (house || "") + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
         yDomain={[lo, hi]}
         yTicks={YT}
@@ -6389,8 +6408,8 @@ function Explained2ppChart({ stateKey, classKey, inv, menu }) {
         tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
         ariaLabel={"Two-party-preferred vote share, " + active.name + ", " + S.label + ", " + span}
         copy={{ title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
-                sub: rdCap(S.elections || S.label + " elections") + ". Official AEC counts.",
-                caption: "Official AEC counts; the other side always sits at 100 minus this share - the two-party count has no third choice.",
+                sub: rdCap(S.elections || S.label + " elections") + (senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
+                caption: (senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={[]} />
@@ -6474,23 +6493,31 @@ function RdExplained() {
      Senate, so the Upper pick resolves no class */
   const PH_HIST = window.AUSPOL.primaryHistory || null;
   const TP_HIST = window.AUSPOL.twoPPHistory || null;
+  /* the 2PP bank's implied Senate twin (user 2026-10-24: "add House:
+     Lower ⇄ to 2pp view (adding upper house data)") - absent only if the
+     shipped file predates it; every build reads the same
+     data/2pp-history.json (the Vic page carries it too), so the House:
+     control and the Upper picks key off this pointer alone and the view
+     degrades to House-only on the old file alone */
+  const TP_SEN = (TP_HIST && TP_HIST.fed && TP_HIST.fed.sen) || null;
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
   /* figView: either vote-share figure's controls displace the flows' -
      the pair tabs and Share: flip set aside (the 2PP view carries its own
-     Share: twin; House: sets aside there too: no two-party count exists
-     for the Senate), and the elections menu loses every section the
-     mode's bank never holds */
+     Share: twin; its House: flip reads the implied Senate bank TP_SEN),
+     and the elections menu loses every section the mode's bank never
+     holds */
   const figView = primMode || twoMode;
   /* the class bank is figure-specific: the flows classes count ballots
      through their final pair, the primary classes (PH_CLASSES) count
      first preferences - both grouped by the election's own AEC division
-     classifications, both House-only. Upper resolves no class: a class
-     pick there reads badClass and the primary snap walks it to "fed" */
+     classifications, both House-only. Upper resolves no class in ANY
+     figure (no division exists in the Senate): a class pick there reads
+     badClass and the snap walks it to "fed" */
   const PH_CLASSES = (PH_HIST && PH_HIST.fed && PH_HIST.fed.classes) || {};
   const TP_CLASSES = (TP_HIST && TP_HIST.fed && TP_HIST.fed.classes) || {};
-  const classBank = primMode ? (house === "sen" ? {} : PH_CLASSES) : twoMode ? TP_CLASSES : FED_CLASSES;
+  const classBank = primMode ? (house === "sen" ? {} : PH_CLASSES) : twoMode ? (house === "sen" ? {} : TP_CLASSES) : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
   /* the primary view's own state banks (user 2026-10-23: "what about
@@ -6553,8 +6580,10 @@ function RdExplained() {
        has its upper-house twin in the primary bank (that Council's own
        first-preference series), so it becomes that; every other
        state-election pick is a House feature and drops to the national
-       series. The 2PP view never reaches a house flip at all - its
-       House: control is set aside (no Senate 2PP exists) */
+       series. The 2PP banks both carry the national series and the same
+       eight state cuts, so a fed/fed:<key> pick survives the flip; a
+       class pick (a House feature - the Senate bank holds no divisions)
+       drops to the national series */
     if (primMode) {
       if (next === "sen") {
         if (steKey && STE_LCS[steKey]) setView("ste:" + steKey + "lc");
@@ -6562,7 +6591,10 @@ function RdExplained() {
       } else if (steLcView) setView("ste:" + steLcKey);
       return;
     }
-    if (twoMode) return;
+    if (twoMode) {
+      if (classKey) setView("fed");
+      return;
+    }
     if (next === "sen") {
       if (view === "nsw" && LC_BANK) setView("nswlc");
       else if (classKey || !fedView || (pair === "on" && stateKey && !hasOnCells(stateKey))) setView("fed");
@@ -6689,6 +6721,9 @@ function RdExplained() {
   const stateKeys = Object.keys(FED_STATES);
   const classKeys = Object.keys(FED_CLASSES);
   const senStateKeys = Object.keys(SEN_STATES);
+  /* the 2PP Upper menu rides its own bank's states (the implied Senate
+     series' eight cuts, no classes - never the flows' SEN_STATES) */
+  const tpSenStateKeys = Object.keys((TP_SEN && TP_SEN.states) || {});
   const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);
   /* the ON tab's OWN Upper view (senOnView): the federal menu rides the
      senOn bank's states (every state One Nation filed a Senate ticket
@@ -6723,8 +6758,10 @@ function RdExplained() {
          ? STE_LC_KEYS.map((k) => "ste:" + k + "lc")
          : [...Object.keys(PH_CLASSES).map((k) => "fedcl:" + k), ...STE_KEYS.map((k) => "ste:" + k)])]
     : twoMode
-    ? ["fed", ...Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}).map((k) => "fed:" + k),
-       ...Object.keys(TP_CLASSES).map((k) => "fedcl:" + k)]
+    ? (house === "sen"
+      ? ["fed", ...tpSenStateKeys.map((k) => "fed:" + k)]
+      : ["fed", ...Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}).map((k) => "fed:" + k),
+         ...Object.keys(TP_CLASSES).map((k) => "fedcl:" + k)])
     : house === "sen"
     ? (pair === "on"
       ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map((k) => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])]
@@ -6746,17 +6783,19 @@ function RdExplained() {
     if (primMode && (badClass || lcView || (!fedView && !steView))) setView("fed");
     if (!primMode && steView) setView("fed");
     if (twoMode && (badClass || lcView || !fedView)) setView("fed");   /* the 2PP menu never offers a pick outside the federal sections */
-    if (twoMode && house !== "rep") setHouse("rep");   /* no two-party count exists for the Senate */
+    /* entering the 2PP view always lands on Lower; Upper is live there
+       only while the implied Senate bank shipped with the build */
+    if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
   }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
   /* Labor v One Nation's Lower view carries no menu (its counts are the
      measured contests alone) - every other view's menu shows the banks */
   const menuShow = figView ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false
     : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
   const menuKeys = primMode ? Object.keys((PH_HIST.fed && PH_HIST.fed.states) || {})
-    : twoMode ? Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {})
+    : twoMode ? (house === "sen" ? tpSenStateKeys : Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}))
     : house === "sen" ? (pair === "on" ? senOnStateKeys : senStateKeys) : stateKeys;
   const menuBank = primMode ? (PH_HIST.fed && PH_HIST.fed.states) || {}
-    : twoMode ? (TP_HIST.fed && TP_HIST.fed.states) || {}
+    : twoMode ? (house === "sen" ? (TP_SEN.states || {}) : (TP_HIST.fed && TP_HIST.fed.states) || {})
     : house === "sen" ? (pair === "on" ? ON_SEN_STATES : SEN_STATES) : FED_STATES;
   const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
@@ -6827,14 +6866,18 @@ function RdExplained() {
      primary mode the titles point at the first-preference banks (the
      national House's official results, the Senate's whole-chamber ATL
      ballots) so the flip still names what it reads, not the flows' bank.
-     The 2PP view sets it aside entirely: no two-party count exists for
-     the Senate, so the chamber question is moot there */
-  const houseCtl = SEN_BANK && !twoMode ? (
+     The 2PP view carries its own pair of banks (user 2026-10-24): Lower
+     the official House two-party counts, Upper the IMPLIED Senate
+     two-party from the formal ATL ballots - an estimate, never an AEC
+     count, and only while the build ships TP_SEN */
+  const houseCtl = (twoMode ? !!TP_SEN : SEN_BANK) ? (
     <span className="rd-pl-ctl ex-house">
       <span className="rd-pl-ctl-l">House:</span>
       <button type="button" className="rd-pl-flip" aria-pressed={house === "sen"}
               title={primMode
                 ? (house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)")
+                : twoMode
+                ? (house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)")
                 : (house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)")}
               onClick={flipHouse}>
         <span className="rd-pl-flip-t">{house === "sen" ? "Upper" : "Lower"}</span> <span aria-hidden="true">⇄</span>
@@ -6875,9 +6918,9 @@ function RdExplained() {
      group, so the pair share a line when the row wraps instead of
      splitting across two (user 2026-10-22). In a vote-share view the
      flows' Share: sets aside (the primary keeps no share control; the
-     2PP view carries its twin - House: sets aside there: no Senate 2PP
-     exists); View: rides the row above the tabs on every layout, so the
-     phone head never carries it */
+     2PP view carries its twin, and its House: flip reads the implied
+     Senate bank); View: rides the row above the tabs on every layout,
+     so the phone head never carries it */
   const headCtls = narrow ? <span className="ex-fl-ctls">{menu}<span className="ex-fl-flips">{houseCtl}{shareSlot}</span></span> : menu;
   return (
     <section ref={secRef} className="rd-sec rd-explained" id="flows-explained" aria-labelledby="rd-ex-t">
@@ -6904,7 +6947,7 @@ function RdExplained() {
               its head; the classKey rides the primary bank's own classes
               and stePrim its own state-election banks (a flows-side state
               pick still drops to "fed" on the way in) */}
-          {twoMode ? <Explained2ppChart stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} />
+          {twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} />
             : primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />
             : lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />
             : senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />

@@ -1169,10 +1169,14 @@ export function validatePrimaryHistory() {
    every view's years ascend with alp/lnp drawn as 0–100 numbers that
    recommbine to 100 per year (the file emits Labor's cell; the Coalition
    cell is by construction 100 minus it — no third share exists in a
-   two-party count). No sen view: the AEC counts no two-party preferred
-   there. National spans 1972–2025 (canonical election records), the state
-   and class cuts the AEC counts' 1996–2025 span (tppdiv downloads 2004 on;
-   the statistics packs' HTPP tables 1996–2001). */
+   two-party count). fed.sen is the IMPLIED senate two-party (no official
+   one exists — the AEC counts no 2PP in the Senate): ATL tallies only,
+   the four post-GVT events 2016–2025, national plus the eight states,
+   no classes, and it must carry implied: true so no reader takes an
+   estimate for a record. National spans 1972–2025 (canonical election
+   records), the state and class cuts the AEC counts' 1996–2025 span
+   (tppdiv downloads 2004 on; the statistics packs' HTPP tables
+   1996–2001). */
 export function validate2ppHistory() {
   const errors = [];
   const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
@@ -1198,7 +1202,6 @@ export function validate2ppHistory() {
       });
   };
   if (!S.fed || typeof S.fed !== "object") { fail("2pp-history.json", "2pp-history-shape", "no fed view"); return errors; }
-  if (S.fed.sen) fail("2pp-history.json", "2pp-history-shape", "a senate view exists — no 2PP is ever counted there");
   checkView("fed", S.fed);
   if (S.fed.years && S.fed.years.length >= 2) {
     if (S.fed.years[0] !== 1972 || S.fed.years[S.fed.years.length - 1] !== 2025)
@@ -1210,6 +1213,29 @@ export function validate2ppHistory() {
       checkView(`fed.${k}`, v);
       if (Array.isArray(v.years) && v.years.length && (v.years[0] !== 1996 || v.years[v.years.length - 1] !== 2025))
         fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected the AEC counts' 1996–2025`);
+    }
+  }
+  // fed.sen: the implied Senate two-party (never counted — pinned hard so no
+  // reader mistakes the estimate for a record, and no classes are ever cut
+  // from a chamber the classifications don't join to).
+  const SEN_YRS = [2016, 2019, 2022, 2025];
+  const SEN_STATE_KEYS = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
+  const sen = S.fed.sen;
+  if (!sen || typeof sen !== "object") { fail("2pp-history.json", "2pp-history-shape", "no fed.sen implied view"); return errors; }
+  if (sen.implied !== true) fail("2pp-history.json fed.sen", "2pp-history-shape", "senate view must carry implied: true — it is an estimate, not a count");
+  if (sen.classes) fail("2pp-history.json fed.sen", "2pp-history-shape", "no division-class cuts exist for the Senate");
+  checkView("fed.sen", sen);
+  if (JSON.stringify(sen.years) !== JSON.stringify(SEN_YRS))
+    fail("2pp-history.json fed.sen", "2pp-history-shape", `senate years ${JSON.stringify(sen.years)}, expected the post-GVT events [2016,2019,2022,2025]`);
+  const senStates = sen.states && typeof sen.states === "object" ? sen.states : null;
+  if (!senStates || JSON.stringify(Object.keys(senStates).sort()) !== JSON.stringify([...SEN_STATE_KEYS].sort())) {
+    fail("2pp-history.json fed.sen", "2pp-history-shape", "senate view must hold exactly the eight state cuts");
+  } else {
+    for (const [k, v] of Object.entries(senStates)) {
+      if (typeof v.short !== "string" || !v.short) fail(`2pp-history.json fed.sen.${k}`, "2pp-history-shape", "state cut carries no short name");
+      checkView(`fed.sen.${k}`, v);
+      if (JSON.stringify(v.years) !== JSON.stringify(SEN_YRS))
+        fail(`2pp-history.json fed.sen.${k}`, "2pp-history-shape", `state cut years ${JSON.stringify(v.years)}, expected [2016,2019,2022,2025]`);
     }
   }
   return errors;

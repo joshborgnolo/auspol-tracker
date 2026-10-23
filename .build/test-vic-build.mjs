@@ -96,4 +96,11 @@ assert.ok(meanMove < 1.0, `the 2PP trend moves ${meanMove.toFixed(2)} pts a mont
 assert.ok(line.every((m) => m.ci95 > 0), "every month carries the trend's interval, empty months included");
 assert.ok(D.individualPolls.filter((q) => q.eff && q.eff.imp).every((q) => q.eff.imp.w === 1), "every poll counts in the trend");
 assert.ok(D.synthLatest.changeSe > 0 && typeof D.synthLatest.changeSig === "boolean", "the month's change is tested");
+/* the federal election-history banks ride every build (the Vic page shows
+   them beside its own line, the same as the flow history's federal
+   table): the 2PP file's implied Senate bank (2026-10-24) comes too, so
+   the explainer's House: control offers Upper on the Vic page as well */
+assert.ok(D.twoPPHistory && D.twoPPHistory.fed && D.twoPPHistory.fed.sen && D.twoPPHistory.fed.sen.implied === true,
+  "the Vic build carries the federal 2PP history, implied Senate bank and all");
+assert.ok(D.primaryHistory && D.primaryHistory.fed, "the Vic build carries the federal primary history");
 console.log(`vic build ok: ${D.individualPolls.length} polls, ${rm.length} Roy Morgan SMS archived, Premier now ${albWho[albWho.length - 1]}`);

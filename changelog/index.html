@@ -9395,6 +9395,80 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "lnp": [61.37, 55.93, 57.74, 60.23, 54.33, 57.29, 60.84, 57.47, 60.28, 58.02, 56.05],
           "short": "rural"
         }
+      },
+      "sen": {
+        "implied": true,
+        "label": "Federal Senate",
+        "elections": "Australian Senate elections",
+        "years": [2016, 2019, 2022, 2025],
+        "alp": [49.24, 46.8, 52.38, 55.99],
+        "lnp": [50.76, 53.2, 47.62, 44.01],
+        "states": {
+          "nsw": {
+            "label": "New South Wales",
+            "elections": "New South Wales Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [48.9, 48.33, 50.83, 56.29],
+            "lnp": [51.1, 51.67, 49.17, 43.71],
+            "short": "NSW"
+          },
+          "vic": {
+            "label": "Victoria",
+            "elections": "Victoria Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [52.77, 49.98, 55.45, 56.88],
+            "lnp": [47.23, 50.02, 44.55, 43.12],
+            "short": "Vic"
+          },
+          "qld": {
+            "label": "Queensland",
+            "elections": "Queensland Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [46.56, 40.56, 47.72, 51.9],
+            "lnp": [53.44, 59.44, 52.28, 48.1],
+            "short": "Qld"
+          },
+          "wa": {
+            "label": "Western Australia",
+            "elections": "Western Australia Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [43.59, 42.36, 56.82, 55.43],
+            "lnp": [56.41, 57.64, 43.18, 44.57],
+            "short": "WA"
+          },
+          "sa": {
+            "label": "South Australia",
+            "elections": "South Australia Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [49.82, 48.09, 51.38, 58.18],
+            "lnp": [50.18, 51.91, 48.62, 41.82],
+            "short": "SA"
+          },
+          "tas": {
+            "label": "Tasmania",
+            "elections": "Tasmania Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [54.55, 48.97, 54.13, 62.83],
+            "lnp": [45.45, 51.03, 45.87, 37.17],
+            "short": "Tas"
+          },
+          "act": {
+            "label": "Australian Capital Territory",
+            "elections": "Australian Capital Territory Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [57.05, 58.02, 62.93, 70.61],
+            "lnp": [42.95, 41.98, 37.07, 29.39],
+            "short": "ACT"
+          },
+          "nt": {
+            "label": "Northern Territory",
+            "elections": "Northern Territory Senate",
+            "years": [2016, 2019, 2022, 2025],
+            "alp": [50.95, 52.01, 53.11, 53.38],
+            "lnp": [49.05, 47.99, 46.89, 46.62],
+            "short": "NT"
+          }
+        }
       }
     }
   };
@@ -144751,12 +144825,15 @@ function Explained2ppChart({
   stateKey,
   classKey,
   inv,
-  menu
+  menu,
+  house
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const TP = window.AUSPOL.twoPPHistory || null;
   if (!TP || !TP.fed) return null;
-  const S = classKey && (TP.fed.classes || {})[classKey] || stateKey && (TP.fed.states || {})[stateKey] || TP.fed;
+  const senAll = TP.fed.sen || null;
+  const senBank = house === "sen" ? senAll : null;
+  const S = senBank ? stateKey && (senBank.states || {})[stateKey] || senBank : classKey && (TP.fed.classes || {})[classKey] || stateKey && (TP.fed.states || {})[stateKey] || TP.fed;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
   const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];
@@ -144778,9 +144855,9 @@ function Explained2ppChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (classKey || stateKey ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (classKey || stateKey ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
+  const cap = (senBank ? "Implied two-party shares of the formal above-the-line Senate ballots" + (stateKey ? " in " + (S.short || S.label) : "") + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter." : classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (!senBank && (classKey || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (!senBank && (classKey || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
   let dev = 0;
-  [TP.fed, ...Object.keys(TP.fed.states || {}).map(k => TP.fed.states[k]), ...Object.keys(TP.fed.classes || {}).map(k => TP.fed.classes[k])].forEach(v => (v.alp || []).forEach(x => {
+  [TP.fed, ...Object.keys(TP.fed.states || {}).map(k => TP.fed.states[k]), ...Object.keys(TP.fed.classes || {}).map(k => TP.fed.classes[k]), ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map(k => senAll.states[k])] : [])].forEach(v => (v.alp || []).forEach(x => {
     if (x != null) dev = Math.max(dev, Math.abs(x - 50));
   }));
   const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);
@@ -144798,13 +144875,13 @@ function Explained2ppChart({
     className: "rd-chead ex-fl-head"
   }, React.createElement("span", {
     className: "rd-chead-t"
-  }, "Two-party preferred, " + active.name + "’s share, %", React.createElement("span", {
+  }, (senBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %", React.createElement("span", {
     className: "rd-chead-meta"
   }, scope)), menu), narrow && React.createElement(RdKey, {
     items: lines,
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, _extends({
-    key: "ex-2pp-" + (stateKey || "") + (classKey || "")
+    key: "ex-2pp-" + (house || "") + (stateKey || "") + (classKey || "")
   }, exFrame(narrow), {
     xDomain: [x0, x1],
     yDomain: [lo, hi],
@@ -144822,8 +144899,8 @@ function Explained2ppChart({
     ariaLabel: "Two-party-preferred vote share, " + active.name + ", " + S.label + ", " + span,
     copy: {
       title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
-      sub: rdCap(S.elections || S.label + " elections") + ". Official AEC counts.",
-      caption: "Official AEC counts; the other side always sits at 100 minus this share - the two-party count has no third choice.",
+      sub: rdCap(S.elections || S.label + " elections") + (senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
+      caption: (senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -144864,13 +144941,14 @@ function RdExplained() {
   const [inv, setInv] = useState(false);
   const PH_HIST = window.AUSPOL.primaryHistory || null;
   const TP_HIST = window.AUSPOL.twoPPHistory || null;
+  const TP_SEN = TP_HIST && TP_HIST.fed && TP_HIST.fed.sen || null;
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
   const figView = primMode || twoMode;
   const PH_CLASSES = PH_HIST && PH_HIST.fed && PH_HIST.fed.classes || {};
   const TP_CLASSES = TP_HIST && TP_HIST.fed && TP_HIST.fed.classes || {};
-  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? TP_CLASSES : FED_CLASSES;
+  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? house === "sen" ? {} : TP_CLASSES : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
   const STATE_PRIM = PH_HIST && PH_HIST.stateElections || {};
@@ -144898,7 +144976,10 @@ function RdExplained() {
       } else if (steLcView) setView("ste:" + steLcKey);
       return;
     }
-    if (twoMode) return;
+    if (twoMode) {
+      if (classKey) setView("fed");
+      return;
+    }
     if (next === "sen") {
       if (view === "nsw" && LC_BANK) setView("nswlc");else if (classKey || !fedView || pair === "on" && stateKey && !hasOnCells(stateKey)) setView("fed");
     } else if (lcView) setView("nsw");
@@ -145002,22 +145083,23 @@ function RdExplained() {
   const stateKeys = Object.keys(FED_STATES);
   const classKeys = Object.keys(FED_CLASSES);
   const senStateKeys = Object.keys(SEN_STATES);
+  const tpSenStateKeys = Object.keys(TP_SEN && TP_SEN.states || {});
   const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);
   const senOnView = onSenMode && pair === "on" && !lcView;
   const onPairPick = p => {
     setPair(p);
     if (p === "on" && house === "sen" && (lcView && !LC_ON_BANK || stateKey && !hasOnCells(stateKey))) setView("fed");
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k)] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
     if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
     if (!primMode && steView) setView("fed");
     if (twoMode && (badClass || lcView || !fedView)) setView("fed");
-    if (twoMode && house !== "rep") setHouse("rep");
+    if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
   }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
   const menuShow = figView ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
-  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
-  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
+  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
+  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
@@ -145084,7 +145166,7 @@ function RdExplained() {
     "aria-hidden": "true"
   }, "\u21C4")));
   const shareSlot = primMode ? null : twoMode ? share2pp : share;
-  const houseCtl = SEN_BANK && !twoMode ? React.createElement("span", {
+  const houseCtl = (twoMode ? !!TP_SEN : SEN_BANK) ? React.createElement("span", {
     className: "rd-pl-ctl ex-house"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -145092,7 +145174,7 @@ function RdExplained() {
     type: "button",
     className: "rd-pl-flip",
     "aria-pressed": house === "sen",
-    title: primMode ? house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)" : house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
+    title: primMode ? house === "sen" ? "Switch to House of Representatives first preferences" : "Switch to Senate first preferences (formal ballots over the whole chamber)" : twoMode ? house === "sen" ? "Switch to House of Representatives two-party shares (official AEC counts)" : "Switch to the implied Senate two-party (the formal above-the-line ballots naming a major that put Labor first - no official count exists)" : house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)",
     onClick: flipHouse
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
@@ -145170,6 +145252,7 @@ function RdExplained() {
       label: narrow ? p.short : p.label
     }))
   }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, shareSlot)), twoMode ? React.createElement(Explained2ppChart, {
+    house: house,
     stateKey: stateKey,
     classKey: classKey,
     inv: twoInv,

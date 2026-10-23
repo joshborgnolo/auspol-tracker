@@ -20,7 +20,17 @@
       independent, so the AEC's own table omits it.
    3. The story pins hold: the canonical records' extremes, and the urban-
       ladder readings behind "Federal, inner metro" & "Federal, rural".
-   4. gen-data emits twoPPHistory into the data asset, validate.mjs gates
+   4. fed.sen is the IMPLIED Senate two-party (user 2026-10-24: "add House:
+      Lower ⇄ to 2pp view (adding upper house data)") - an estimate, never
+      a count: the AEC tallies no two-party figure for the Senate. This
+      probe's own sums over the committed ATL tallies (.build/aec-flow-src/
+      senate-atl/counts.json, five family rows {ALP,COAL,GRN,PHON,OTHER},
+      national and the eight states) - 100·toALP/(toALP+toCOAL) - reproduce
+      every cell to <0.005; the view carries implied: true, spans exactly
+      the four post-GVT events 2016–2025 and no classes (the Senate has no
+      divisions), and the constant y axis prices its cells too so the
+      House: flip never moves the band.
+   5. gen-data emits twoPPHistory into the data asset, validate.mjs gates
       the file's shape, and the built page carries the flip wiring. */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -46,6 +56,11 @@ const STATE_SHORT = { nsw: "NSW", vic: "Vic", qld: "Qld", wa: "WA", sa: "SA", ta
 const CLASSES = ["inner", "outer", "provincial", "rural"];
 const CLS_KEY = { "inner metropolitan": "inner", "outer metropolitan": "outer",
   "provincial": "provincial", "rural": "rural" };
+/* the implied Senate two-party: the four post-GVT events (group tickets
+   kept no per-ballot record before 2016), and the family rows this
+   probe's own recompute sums - the same five the generator allowlists */
+const SEN_YEARS = [2016, 2019, 2022, 2025];
+const SEN_FAMS = ["ALP", "COAL", "GRN", "PHON", "OTHER"];
 
 /* independent recompute: per-division two-party votes from the downloads -
    the generator's files reread by this probe's OWN parser and summed */
@@ -146,7 +161,16 @@ AEC_YEARS.forEach((y) => {
 const doc = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "2pp-history.json"), "utf8"));
 const FED = doc.fed;
 assert.ok(FED, "the fed view");
-assert.equal(FED.sen, undefined, "no Senate view - no 2PP is ever counted there");
+const SEN = FED.sen;
+assert.ok(SEN, "fed.sen rides the House: control's Upper (the implied Senate two-party)");
+assert.equal(SEN.implied, true, "an estimate is marked, never mistaken for a count");
+assert.equal(SEN.classes, undefined, "no division-class cuts exist for the Senate");
+assert.deepEqual(SEN.years, SEN_YEARS, "the implied span: the four post-GVT events");
+assert.deepEqual(Object.keys(SEN.states).sort(), [...STATES].sort(), "the eight implied state cuts");
+STATES.forEach((s) => {
+  assert.equal(SEN.states[s].short, STATE_SHORT[s], `sen ${s}: the menu short label`);
+  assert.deepEqual(SEN.states[s].years, SEN_YEARS, `sen ${s}: the same four events`);
+});
 assert.deepEqual(Object.keys(FED.states), STATES, "the eight state cuts");
 assert.deepEqual(Object.keys(FED.classes), CLASSES, "the four class cuts, in menu order");
 assert.deepEqual(FED.years, NAT_YEARS, "national span: 1972–2025");
@@ -156,8 +180,10 @@ CLASSES.forEach((c) => assert.deepEqual(FED.classes[c].years, AEC_YEARS, `${c}: 
 const cell = (v, k, y) => v[k][v.years.indexOf(y)];
 
 /* every view: the two-line contract - numeric cells, aligned to years, and
-   the pair summing to the count */
-const allViews = [FED, ...STATES.map((s) => FED.states[s]), ...CLASSES.map((c) => FED.classes[c])];
+   the pair summing to the count (the implied Senate bank's pair too: the
+   estimand keeps the count's shape) */
+const allViews = [FED, ...STATES.map((s) => FED.states[s]), ...CLASSES.map((c) => FED.classes[c]),
+  SEN, ...STATES.map((s) => SEN.states[s])];
 allViews.forEach((v) => {
   assert.ok(v.label && v.elections, `${v.label}: label + elections copy`);
   v.years.forEach((y, i) => {
@@ -189,6 +215,34 @@ AEC_YEARS.forEach((y) => {
     `${y} ${c}: ${rec[y].perClass[c].toFixed(2)} v cell ${cell(FED.classes[c], "alp", y)}`));
 });
 
+/* the implied Senate cells recompute from the committed ATL tallies - this
+   probe's OWN sums, never the generator's faith: 100·ΣtoALP ÷ (ΣtoALP +
+   ΣtoCOAL) over the five family rows, national and each state, each event */
+const ATL = JSON.parse(fs.readFileSync(path.join(SRC, "senate-atl", "counts.json"), "utf8")).events;
+assert.deepEqual(Object.keys(ATL).map(Number).sort(), SEN_YEARS, "the ATL tallies' event set");
+const implied = (block) => {
+  let a = 0, c = 0;
+  SEN_FAMS.forEach((f) => {
+    const r = block[f];
+    assert.ok(r, `an ATL family row for ${f}`);
+    a += r.toALP; c += r.toCOAL;
+  });
+  return (100 * a) / (a + c);
+};
+SEN_YEARS.forEach((y, i) => {
+  const ev = ATL[String(y)];
+  const nat = implied(ev.counts);
+  assert.ok(Math.abs(nat - SEN.alp[i]) < 0.005,
+    `sen ${y} national: ATL recompute ${nat.toFixed(2)} v cell ${SEN.alp[i]}`);
+  STATES.forEach((s) => {
+    const blk = ev.states[s.toUpperCase()];
+    assert.ok(blk, `sen ${y} ${s}: an ATL state block`);
+    const v = implied(blk);
+    assert.ok(Math.abs(v - SEN.states[s].alp[i]) < 0.005,
+      `sen ${y} ${s}: ATL recompute ${v.toFixed(2)} v cell ${SEN.states[s].alp[i]}`);
+  });
+});
+
 /* the story pins (recomputed from the downloads 2026-10-23): the canonical
    series' extremes, the states' range, and the urban ladder */
 assert.equal(cell(FED, "alp", 1975), 44.3, "the canonical series' trough (1975 flows on)");
@@ -211,12 +265,24 @@ AEC_YEARS.forEach((y) => {
   assert.ok(cell(FED.classes.rural, "alp", y) < cell(FED, "alp", y),
     `${y}: rural runs behind the national line`);
 });
+/* the implied Senate pins (recomputed from the tallies 2026-10-24): Labor's
+   implied line crosses the Coalition's between 2019 and 2022, and the
+   ACT's 2025 cell is the whole bank's furthest from the half */
+assert.equal(cell(SEN, "alp", 2016), 49.24);
+assert.equal(cell(SEN, "alp", 2019), 46.8);
+assert.equal(cell(SEN, "alp", 2022), 52.38);
+assert.equal(cell(SEN, "alp", 2025), 55.99);
+assert.equal(cell(SEN.states.act, "alp", 2016), 57.05);
+assert.equal(cell(SEN.states.act, "alp", 2025), 70.61);
+assert.equal(cell(SEN.states.tas, "alp", 2025), 62.83);
 
 // ---- the constant y axis (user 2026-10-24) ----------------------------------
 /* "the 2pp view y-axis range should remain constant at all times":
    Explained2ppChart prices the WHOLE bank's furthest cell from the half,
-   mirrored - never the drawn view's - so neither an elections pick nor
-   the Share: flip moves the axis. Recompute the band as the renderer
+   mirrored - never the drawn view's - so neither an elections pick, the
+   Share: flip nor the House: flip moves the axis (the implied Senate
+   bank's cells price it too; its furthest, ACT 2025's 20.61, sits inside
+   the House bank's 22.49). Recompute the band as the renderer
    does and pin what the 2026-10-24 file prices it at */
 const DEV = Math.max(...allViews.flatMap((v) => v.alp.map((x) => Math.abs(x - 50))));
 const LO = Math.max(0, Math.floor((50 - DEV) / 5) * 5);
