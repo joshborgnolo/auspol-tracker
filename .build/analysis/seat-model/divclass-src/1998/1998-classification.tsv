@@ -1,0 +1,157 @@
+# 1998 AEC per-division demographic classifications (post-1998 federal election)
+# division,state,enrolment,classification,seatStatus,party,code
+# source-url: http://aec.gov.au/Elections/federal_elections/1998/classification.htm
+# wayback-capture: 20070831140251 (fetched https://web.archive.org/web/20070831140251id_/http://aec.gov.au/Elections/federal_elections/1998/classification.htm)
+# page-title: 1998 Divisional Classifications
+# page-stamp: last updated Thursday, August 09, 2007
+# page-note: Source: Electoral Pocket Book, August 1999
+# raw-html: .build/analysis/seat-model/divclass-src/1998/1998-classification-raw.html
+# raw-sha256: 760ff820c4e062508ff198f08be4041ebf52b941e397d09ff7672eafe09d8248
+Banks,NSW,80108,Inner Metropolitan,Fairly Safe,ALP,BANK
+Barton,NSW,83151,Inner Metropolitan,Fairly Safe,ALP,BART
+Bennelong,NSW,83725,Inner Metropolitan,Fairly Safe,LP,BENN
+Berowra,NSW,86091,Outer Metropolitan,Safe,LP,BERO
+Blaxland,NSW,80590,Inner Metropolitan,Safe,ALP,BLAX
+Bradfield,NSW,80669,Inner Metropolitan,Safe,LP,BRFD
+Calare,NSW,78339,Rural,Safe,IND,CALA
+Charlton,NSW,86091,Provincial,Safe,ALP,CHAR
+Chifley,NSW,82386,Outer Metropolitan,Safe,ALP,CHIF
+Cook,NSW,80773,Inner Metropolitan,Fairly Safe,LP,COOK
+Cowper,NSW,79213,Rural,Fairly Safe,NP,COWP
+Cunningham,NSW,77221,Provincial,Safe,ALP,CUNN
+Dobell,NSW,82861,Provincial,Marginal,ALP,DOBE
+Eden-Monaro,NSW,78927,Rural,Marginal,LP,EMON
+Farrer,NSW,75126,Rural,Safe,NP,FARR
+Fowler,NSW,90623,Outer Metropolitan,Safe,ALP,FOWL
+Gilmore,NSW,78777,Rural,Marginal,LP,GILM
+Grayndler,NSW,85901,Inner Metropolitan,Safe,ALP,GRAY
+Greenway,NSW,86328,Outer Metropolitan,Fairly Safe,ALP,GREE
+Gwydir,NSW,72930,Rural,Safe,NP,GWYD
+Hughes,NSW,87821,Outer Metropolitan,Marginal,LP,HUGH
+Hume,NSW,75237,Rural,Fairly Safe,LP,HUME
+Hunter,NSW,77139,Rural,Safe,ALP,HUNT
+Kingsford-Smith,NSW,80581,Inner Metropolitan,Safe,ALP,KSMI
+Lindsay,NSW,84257,Outer Metropolitan,Marginal,LP,LIND
+Lowe,NSW,81910,Inner Metropolitan,Marginal,ALP,LOWE
+Lyne,NSW,82215,Rural,Fairly Safe,NP,LYNE
+Macarthur,NSW,91700,Rural,Marginal,LP,MACA
+Mackellar,NSW,81571,Outer Metropolitan,Safe,LP,MACK
+Macquarie,NSW,82050,Outer Metropolitan,Marginal,LP,MACQ
+Mitchell,NSW,82764,Outer Metropolitan,Safe,LP,MITC
+Newcastle,NSW,77596,Provincial,Safe,ALP,NEWC
+New England,NSW,74637,Rural,Safe,NP,NENG
+North Sydney,NSW,87686,Inner Metropolitan,Safe,LP,NSYD
+Page,NSW,80248,Rural,Marginal,NP,PAGE
+Parkes,NSW,79589,Rural,Marginal,NP,PARK
+Parramatta,NSW,78800,Inner Metropolitan,Marginal,LP,PARR
+Paterson,NSW,82019,Rural,Marginal,ALP,PATE
+Prospect,NSW,78030,Outer Metropolitan,Safe,ALP,PROS
+Reid,NSW,82635,Inner Metropolitan,Safe,ALP,REID
+Richmond,NSW,87997,Rural,Marginal,NP,RICH
+Riverina,NSW,79880,Rural,Safe,NP,RIVE
+Robertson,NSW,80631,Provincial,Marginal,LP,ROBE
+Shortland,NSW,78527,Provincial,Safe,ALP,SHOR
+Sydney,NSW,87278,Inner Metropolitan,Safe,ALP,SYDN
+Throsby,NSW,78779,Provincial,Safe,ALP,THRO
+Warringah,NSW,79007,Inner Metropolitan,Safe,LP,WARR
+Watson,NSW,81571,Inner Metropolitan,Safe,ALP,WATS
+Wentworth,NSW,82463,Inner Metropolitan,Fairly Safe,LP,WENT
+Werriwa,NSW,81573,Outer Metropolitan,Safe,ALP,WERR
+Aston,VIC,84875,Outer Metropolitan,Marginal,LP,ASTO
+Ballarat,VIC,81818,Provincial,Marginal,LP,BALL
+Batman,VIC,88729,Inner Metropolitan,Safe,ALP,BATM
+Bendigo,VIC,83912,Provincial,Marginal,ALP,BEND
+Bruce,VIC,84659,Outer Metropolitan,Fairly Safe,ALP,BRUC
+Burke,VIC,80245,Rural,Fairly Safe,ALP,BURK
+Calwell,VIC,87318,Outer Metropolitan,Safe,ALP,CALW
+Casey,VIC,80213,Outer Metropolitan,Marginal,LP,CASE
+Chisholm,VIC,85104,Inner Metropolitan,Marginal,ALP,CHIS
+Corangamite,VIC,79927,Provincial,Marginal,LP,CORA
+Corio,VIC,82075,Provincial,Safe,ALP,CORI
+Deakin,VIC,83312,Outer Metropolitan,Marginal,LP,DEAK
+Dunkley,VIC,81845,Outer Metropolitan,Marginal,LP,DUNK
+Flinders,VIC,82771,Rural,Marginal,LP,FLIN
+Gellibrand,VIC,84912,Inner Metropolitan,Safe,ALP,GELL
+Gippsland,VIC,81036,Rural,Fairly Safe,NP,GIPP
+Goldstein,VIC,81036,Inner Metropolitan,Fairly Safe,LP,GOLD
+Higgins,VIC,84801,Inner Metropolitan,Fairly Safe,LP,HIGG
+Holt,VIC,81285,Outer Metropolitan,Safe,ALP,HOLT
+Hotham,VIC,88126,Outer Metropolitan,Safe,ALP,HOTH
+Indi,VIC,82066,Rural,Safe,LP,INDI
+Isaacs,VIC,79279,Outer Metropolitan,Fairly Safe,ALP,ISAA
+Jagajaga,VIC,86159,Outer Metropolitan,Marginal,ALP,JAGA
+Kooyong,VIC,84069,Inner Metropolitan,Safe,LP,KOOY
+Lalor,VIC,81299,Outer Metropolitan,Safe,ALP,LALO
+La Trobe,VIC,79276,Outer Metropolitan,Marginal,LP,LTRO
+McEwen,VIC,81561,Rural,Marginal,LP,MCEW
+McMillan,VIC,81944,Rural,Marginal,ALP,MCMI
+Mallee,VIC,80825,Rural,Safe,NP,MALL
+Maribyrnong,VIC,82207,Outer Metropolitan,Safe,ALP,MARI
+Melbourne,VIC,88798,Inner Metropolitan,Safe,ALP,MELB
+Melbourne Ports,VIC,83247,Inner Metropolitan,Marginal,ALP,MPOR
+Menzies,VIC,81442,Outer Metropolitan,Marginal,LP,MENZ
+Murray,VIC,83571,Rural,Safe,LP,MURR
+Scullin,VIC,83213,Outer Metropolitan,Safe,ALP,SCUL
+Wannon,VIC,81344,Rural,Fairly Safe,LP,WANN
+Wills,VIC,87245,Inner Metropolitan,Safe,ALP,WILL
+Blair,QLD,74211,Rural,Marginal,LP,BLAI
+Bowman,QLD,80403,Outer Metropolitan,Marginal,ALP,BOWM
+Brisbane,QLD,89164,Inner Metropolitan,Marginal,ALP,BRIS
+Capricornia,QLD,80603,Provincial,Marginal,ALP,CAPR
+Dawson,QLD,84011,Rural,Marginal,NP,DAWS
+Dickson,QLD,79756,Outer Metropolitan,Marginal,ALP,DICK
+Fadden,QLD,79593,Outer Metropolitan,Fairly Safe,LP,FADD
+Fairfax,QLD,76052,Rural,Marginal,LP,FAIR
+Fisher,QLD,75815,Provincial,Safe,LP,FISH
+Forde,QLD,76745,Rural,Marginal,LP,FORD
+Griffith,QLD,86293,Outer Metropolitan,Marginal,ALP,GRIF
+Groom,QLD,80378,Provincial,Safe,LP,GROO
+Herbert,QLD,84458,Provincial,Marginal,LP,HERB
+Hinkler,QLD,78336,Rural,Marginal,NP,HINK
+Kennedy,QLD,84340,Rural,Safe,NP,KENN
+Leichhardt,QLD,80711,Rural,Marginal,LP,LEIC
+Lilley,QLD,85940,Inner Metropolitan,Marginal,ALP,LILL
+Longman,QLD,75890,Rural,Marginal,LP,LONG
+McPherson,QLD,82104,Provincial,Fairly Safe,LP,MCPH
+Maranoa,QLD,82834,Rural,Safe,NP,MARA
+Moncrieff,QLD,81725,Provincial,Safe,LP,MONC
+Moreton,QLD,85564,Inner Metropolitan,Marginal,LP,MORE
+Oxley,QLD,79232,Outer Metropolitan,Fairly Safe,ALP,OXLE
+Petrie,QLD,84436,Outer Metropolitan,Marginal,LP,PETR
+Rankin,QLD,77968,Outer Metropolitan,Fairly Safe,ALP,RANK
+Ryan,QLD,83445,Outer Metropolitan,Fairly Safe,LP,RYAN
+Wide Bay,QLD,78007,Rural,Marginal,NP,WBAY
+Brand,WA,77633,Provincial,Safe,ALP,BRAN
+Canning,WA,80030,Outer Metropolitan,Marginal,ALP,CANN
+Cowan,WA,77186,Outer Metropolitan,Marginal,ALP,COWA
+Curtin,WA,85855,Inner Metropolitan,Safe,LP,CURT
+Forrest,WA,82666,Rural,Fairly Safe,LP,FORR
+Fremantle,WA,84812,Inner Metropolitan,Safe,ALP,FREM
+Kalgoorlie,WA,82463,Rural,Marginal,LP,KALG
+Moore,WA,77573,Outer Metropolitan,Marginal,LP,MOOR
+O'Connor,WA,83913,Rural,Safe,LP,OCON
+Pearce,WA,81260,Provincial,Marginal,LP,PEAR
+Perth,WA,84448,Inner Metropolitan,Safe,ALP,PERT
+Stirling,WA,84758,Inner Metropolitan,Marginal,ALP,STIR
+Swan,WA,83576,Inner Metropolitan,Marginal,ALP,SWAN
+Tangney,WA,83446,Inner Metropolitan,Marginal,LP,TANG
+Adelaide,SA,82157,Inner Metropolitan,Marginal,LP,ADEL
+Barker,SA,84771,Rural,Safe,LP,BARK
+Bonython,SA,78747,Outer Metropolitan,Safe,ALP,BONY
+Boothby,SA,81353,Outer Metropolitan,Fairly Safe,LP,BOOT
+Grey,SA,82921,Rural,Fairly Safe,LP,GREY
+Hindmarsh,SA,83627,Inner Metropolitan,Marginal,LP,HIND
+Kingston,SA,88999,Outer Metropolitan,Marginal,ALP,KING
+Makin,SA,89832,Outer Metropolitan,Marginal,LP,MAKI
+Mayo,SA,90861,Rural,Marginal,LP,MAYO
+Port Adelaide,SA,82248,Inner Metropolitan,Safe,ALP,PADE
+Sturt,SA,79823,Inner Metropolitan,Fairly Safe,LP,STUR
+Wakefield,SA,88650,Rural,Safe,LP,WAKE
+Bass,TAS,65933,Provincial,Marginal,ALP,BASS
+Braddon,TAS,62419,Rural,Marginal,ALP,BRAD
+Denison,TAS,67361,Inner Metropolitan,Safe,ALP,DENI
+Franklin,TAS,65769,Outer Metropolitan,Fairly Safe,ALP,FRAN
+Lyons,TAS,68639,Rural,Safe,ALP,LYON
+Canberra,ACT,105359,Inner Metropolitan,Safe,ALP,CANB
+Fraser,ACT,104177,Inner Metropolitan,Safe,ALP,FRAS
+Northern Territory,NT,105048,Rural,Marginal,ALP,NTER
