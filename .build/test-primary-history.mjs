@@ -287,7 +287,7 @@ assert.ok(/const primaryHistory = \$\{/.test(gen), "gen-data emits primaryHistor
 assert.ok(/validatePrimaryHistory\(\)/.test(fs.readFileSync(
   path.join(ROOT, ".build", "newtracker", "validate.mjs"), "utf8")), "validate.mjs checks primaryHistory");
 const tmpl = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "template.html"), "utf8");
-["dem", "uap", "xnt", "jln", "dlp"].forEach((k) => {
+["dem", "uap", "xnt", "jln", "dlp", "ind"].forEach((k) => {
   const marks = tmpl.match(new RegExp(`--${k}:\\s`, "g")) || [];
   assert.ok(marks.length >= 2, `template.html: --${k} token in light AND dark themes`);
   const texts = tmpl.match(new RegExp(`--${k}-text:`, "g")) || [];
@@ -307,5 +307,14 @@ const wanted = { ...doc };
 delete wanted._comment;
 // the vm realm's Array/Object prototypes differ – re-serialise before comparing
 assert.deepEqual(JSON.parse(JSON.stringify(PH)), wanted, "the asset carries the data file verbatim");
+
+// ---- the View flip's renderer wiring shipped in the built page ------------
+/* build.mjs inlines every layer into index.html (transpiled); the uuid-named
+   d1a1d215 source in assets/ is NOT what the page executes, so the wiring is
+   asserted on the built document itself */
+const page = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+assert.ok(page.includes("Primary votes"), "the View: Primary votes flip label is built into the page");
+assert.ok(page.includes("ExplainedPrimaryChart") && page.includes("primaryHistory"),
+  "the primary-history view wiring is built into the page");
 
 console.log("test-primary-history: all assertions passed");
