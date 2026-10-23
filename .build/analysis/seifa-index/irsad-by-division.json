@@ -1,7 +1,7 @@
 {
  "product": "irsad-by-division",
- "generated": "2026-10-23T23:58:52",
- "description": "IRSAD per Commonwealth electoral division per election — published tables (AEC RR5 Att1; APH 2008/2010 research papers) plus ABS-cube population-weighted derivations (ABS guidance 2039.0 §2.2).",
+ "generated": "2026-10-24T08:12:23",
+ "description": "IRSAD per Commonwealth electoral division per election — published tables (AEC RR5 Att1; APH CIB 1/2004-05 and the 2008/2010 research papers) plus ABS-cube population-weighted derivations (ABS guidance 2039.0 §2.2).",
  "comparability": "Index definitions are recomputed each census — compare across eras via rank/decile/quartile only, never raw scores.",
  "rankConvention": "rank 1 = most advantaged (highest IRSAD score); decile/quartile ascend with disadvantage. RR5's printed ranks (1 = most disadvantaged) are re-ranked by score on ingest.",
  "elections": {
@@ -1217,21 +1217,20 @@
    "censusYear": 2001,
    "editionInForce": 2003,
    "derivation": "published",
-   "sourceProduct": "AEC Research Report No. 5 (2005), Attachment 1 — 2001 Census, 2001 boundaries",
-   "note": "RR5 Att1 prints the 2000-boundary set; the 2004 election ran on the 2003 edition. Exact 2003-edition re-derivation (2001 CD cube + 2003 concordance) is rr6 open item 3.",
+   "sourceProduct": "APH Current Issues Brief no.1 2004-05 (2001 Census, 2003 boundaries) — Index of Relative Socio-Economic Advantage/Disadvantage table",
    "rows": [
     {
-     "division": "North Sydney",
+     "division": "Bradfield",
      "state": "NSW",
-     "irsad": 1204,
+     "irsad": 1203.7,
      "rank": 1,
      "quartile": 1,
      "decile": 1
     },
     {
-     "division": "Bradfield",
+     "division": "North Sydney",
      "state": "NSW",
-     "irsad": 1204,
+     "irsad": 1203.6,
      "rank": 2,
      "quartile": 1,
      "decile": 1
@@ -1239,7 +1238,7 @@
     {
      "division": "Wentworth",
      "state": "NSW",
-     "irsad": 1182,
+     "irsad": 1181.9,
      "rank": 3,
      "quartile": 1,
      "decile": 1
@@ -1247,7 +1246,7 @@
     {
      "division": "Kooyong",
      "state": "Vic",
-     "irsad": 1175,
+     "irsad": 1174.6,
      "rank": 4,
      "quartile": 1,
      "decile": 1
@@ -1255,7 +1254,7 @@
     {
      "division": "Higgins",
      "state": "Vic",
-     "irsad": 1162,
+     "irsad": 1162.0,
      "rank": 5,
      "quartile": 1,
      "decile": 1
@@ -1263,39 +1262,39 @@
     {
      "division": "Warringah",
      "state": "NSW",
-     "irsad": 1152,
+     "irsad": 1152.2,
      "rank": 6,
+     "quartile": 1,
+     "decile": 1
+    },
+    {
+     "division": "Ryan",
+     "state": "Qld",
+     "irsad": 1150.7,
+     "rank": 7,
      "quartile": 1,
      "decile": 1
     },
     {
      "division": "Curtin",
      "state": "WA",
-     "irsad": 1150,
-     "rank": 7,
+     "irsad": 1149.7,
+     "rank": 8,
      "quartile": 1,
      "decile": 1
     },
     {
      "division": "Mitchell",
      "state": "NSW",
-     "irsad": 1145,
-     "rank": 8,
+     "irsad": 1145.3,
+     "rank": 9,
      "quartile": 1,
      "decile": 1
     },
     {
      "division": "Melbourne Ports",
      "state": "Vic",
-     "irsad": 1144,
-     "rank": 9,
-     "quartile": 1,
-     "decile": 1
-    },
-    {
-     "division": "Sydney",
-     "state": "NSW",
-     "irsad": 1140,
+     "irsad": 1143.5,
      "rank": 10,
      "quartile": 1,
      "decile": 1
@@ -1303,15 +1302,15 @@
     {
      "division": "Berowra",
      "state": "NSW",
-     "irsad": 1140,
+     "irsad": 1140.1,
      "rank": 11,
      "quartile": 1,
      "decile": 1
     },
     {
-     "division": "Ryan",
-     "state": "Qld",
-     "irsad": 1135,
+     "division": "Sydney",
+     "state": "NSW",
+     "irsad": 1139.6,
      "rank": 12,
      "quartile": 1,
      "decile": 1
@@ -1319,7 +1318,7 @@
     {
      "division": "Goldstein",
      "state": "Vic",
-     "irsad": 1127,
+     "irsad": 1127.1,
      "rank": 13,
      "quartile": 1,
      "decile": 1
@@ -1327,7 +1326,7 @@
     {
      "division": "Canberra",
      "state": "ACT",
-     "irsad": 1123,
+     "irsad": 1123.1,
      "rank": 14,
      "quartile": 1,
      "decile": 1
@@ -1335,7 +1334,7 @@
     {
      "division": "Fraser",
      "state": "ACT",
-     "irsad": 1121,
+     "irsad": 1120.9,
      "rank": 15,
      "quartile": 1,
      "decile": 1
@@ -1343,7 +1342,7 @@
     {
      "division": "Mackellar",
      "state": "NSW",
-     "irsad": 1115,
+     "irsad": 1114.8,
      "rank": 16,
      "quartile": 1,
      "decile": 2
@@ -1351,31 +1350,31 @@
     {
      "division": "Bennelong",
      "state": "NSW",
-     "irsad": 1114,
+     "irsad": 1114.5,
      "rank": 17,
-     "quartile": 1,
-     "decile": 2
-    },
-    {
-     "division": "Brisbane",
-     "state": "Qld",
-     "irsad": 1103,
-     "rank": 18,
      "quartile": 1,
      "decile": 2
     },
     {
      "division": "Menzies",
      "state": "Vic",
-     "irsad": 1101,
-     "rank": 19,
+     "irsad": 1101.4,
+     "rank": 18,
      "quartile": 1,
      "decile": 2
     },
     {
      "division": "Melbourne",
      "state": "Vic",
-     "irsad": 1095,
+     "irsad": 1097.5,
+     "rank": 19,
+     "quartile": 1,
+     "decile": 2
+    },
+    {
+     "division": "Brisbane",
+     "state": "Qld",
+     "irsad": 1097.1,
      "rank": 20,
      "quartile": 1,
      "decile": 2
@@ -1383,7 +1382,7 @@
     {
      "division": "Lowe",
      "state": "NSW",
-     "irsad": 1095,
+     "irsad": 1095.4,
      "rank": 21,
      "quartile": 1,
      "decile": 2
@@ -1391,7 +1390,7 @@
     {
      "division": "Hughes",
      "state": "NSW",
-     "irsad": 1093,
+     "irsad": 1092.5,
      "rank": 22,
      "quartile": 1,
      "decile": 2
@@ -1399,7 +1398,7 @@
     {
      "division": "Tangney",
      "state": "WA",
-     "irsad": 1086,
+     "irsad": 1085.7,
      "rank": 23,
      "quartile": 1,
      "decile": 2
@@ -1407,7 +1406,7 @@
     {
      "division": "Cook",
      "state": "NSW",
-     "irsad": 1085,
+     "irsad": 1085.3,
      "rank": 24,
      "quartile": 1,
      "decile": 2
@@ -1415,39 +1414,39 @@
     {
      "division": "Grayndler",
      "state": "NSW",
-     "irsad": 1082,
+     "irsad": 1081.6,
      "rank": 25,
-     "quartile": 1,
-     "decile": 2
-    },
-    {
-     "division": "Chisholm",
-     "state": "Vic",
-     "irsad": 1077,
-     "rank": 26,
      "quartile": 1,
      "decile": 2
     },
     {
      "division": "Jagajaga",
      "state": "Vic",
-     "irsad": 1076,
-     "rank": 27,
+     "irsad": 1078.7,
+     "rank": 26,
      "quartile": 1,
      "decile": 2
     },
     {
-     "division": "Kingston-Smith",
-     "state": "NSW",
-     "irsad": 1069,
-     "rank": 28,
+     "division": "Chisholm",
+     "state": "Vic",
+     "irsad": 1078.1,
+     "rank": 27,
      "quartile": 1,
      "decile": 2
     },
     {
      "division": "Griffith",
      "state": "Qld",
-     "irsad": 1064,
+     "irsad": 1071.0,
+     "rank": 28,
+     "quartile": 1,
+     "decile": 2
+    },
+    {
+     "division": "Kingsford Smith",
+     "state": "NSW",
+     "irsad": 1069.5,
      "rank": 29,
      "quartile": 1,
      "decile": 2
@@ -1455,23 +1454,23 @@
     {
      "division": "Moore",
      "state": "WA",
-     "irsad": 1064,
+     "irsad": 1064.1,
      "rank": 30,
      "quartile": 1,
      "decile": 2
     },
     {
-     "division": "Deakin",
-     "state": "Vic",
-     "irsad": 1057,
+     "division": "Adelaide",
+     "state": "SA",
+     "irsad": 1059.3,
      "rank": 31,
      "quartile": 1,
      "decile": 3
     },
     {
-     "division": "Moreton",
-     "state": "Qld",
-     "irsad": 1055,
+     "division": "Deakin",
+     "state": "Vic",
+     "irsad": 1055.7,
      "rank": 32,
      "quartile": 1,
      "decile": 3
@@ -1479,7 +1478,7 @@
     {
      "division": "Aston",
      "state": "Vic",
-     "irsad": 1055,
+     "irsad": 1054.6,
      "rank": 33,
      "quartile": 1,
      "decile": 3
@@ -1487,47 +1486,47 @@
     {
      "division": "Boothby",
      "state": "SA",
-     "irsad": 1054,
+     "irsad": 1054.1,
      "rank": 34,
      "quartile": 1,
      "decile": 3
     },
     {
-     "division": "Adelaide",
-     "state": "SA",
-     "irsad": 1053,
+     "division": "Moreton",
+     "state": "Qld",
+     "irsad": 1053.5,
      "rank": 35,
-     "quartile": 1,
-     "decile": 3
-    },
-    {
-     "division": "Solomon",
-     "state": "NT",
-     "irsad": 1052,
-     "rank": 36,
      "quartile": 1,
      "decile": 3
     },
     {
      "division": "Parramatta",
      "state": "NSW",
-     "irsad": 1052,
-     "rank": 37,
+     "irsad": 1052.0,
+     "rank": 36,
      "quartile": 1,
      "decile": 3
     },
     {
-     "division": "Sturt",
-     "state": "SA",
-     "irsad": 1052,
-     "rank": 38,
+     "division": "Solomon",
+     "state": "NT",
+     "irsad": 1051.6,
+     "rank": 37,
      "quartile": 1,
      "decile": 3
     },
     {
      "division": "Macquarie",
      "state": "NSW",
-     "irsad": 1043,
+     "irsad": 1043.4,
+     "rank": 38,
+     "quartile": 1,
+     "decile": 3
+    },
+    {
+     "division": "Sturt",
+     "state": "SA",
+     "irsad": 1039.0,
      "rank": 39,
      "quartile": 2,
      "decile": 3
@@ -1535,55 +1534,55 @@
     {
      "division": "Barton",
      "state": "NSW",
-     "irsad": 1038,
+     "irsad": 1037.7,
      "rank": 40,
-     "quartile": 2,
-     "decile": 3
-    },
-    {
-     "division": "Mayo",
-     "state": "SA",
-     "irsad": 1035,
-     "rank": 41,
-     "quartile": 2,
-     "decile": 3
-    },
-    {
-     "division": "Dickson",
-     "state": "Qld",
-     "irsad": 1029,
-     "rank": 42,
      "quartile": 2,
      "decile": 3
     },
     {
      "division": "Cunningham",
      "state": "NSW",
-     "irsad": 1029,
-     "rank": 43,
+     "irsad": 1029.2,
+     "rank": 41,
+     "quartile": 2,
+     "decile": 3
+    },
+    {
+     "division": "Bonner",
+     "state": "Qld",
+     "irsad": 1028.7,
+     "rank": 42,
      "quartile": 2,
      "decile": 3
     },
     {
      "division": "La Trobe",
      "state": "Vic",
-     "irsad": 1028,
-     "rank": 44,
+     "irsad": 1027.7,
+     "rank": 43,
      "quartile": 2,
      "decile": 3
     },
     {
-     "division": "Lilley",
+     "division": "Dickson",
      "state": "Qld",
-     "irsad": 1021,
-     "rank": 45,
+     "irsad": 1025.7,
+     "rank": 44,
      "quartile": 2,
      "decile": 3
     },
     {
      "division": "Banks",
      "state": "NSW",
-     "irsad": 1020,
+     "irsad": 1019.5,
+     "rank": 45,
+     "quartile": 2,
+     "decile": 3
+    },
+    {
+     "division": "Lilley",
+     "state": "Qld",
+     "irsad": 1019.3,
      "rank": 46,
      "quartile": 2,
      "decile": 4
@@ -1591,7 +1590,7 @@
     {
      "division": "Casey",
      "state": "Vic",
-     "irsad": 1020,
+     "irsad": 1019.3,
      "rank": 47,
      "quartile": 2,
      "decile": 4
@@ -1599,103 +1598,103 @@
     {
      "division": "Swan",
      "state": "WA",
-     "irsad": 1018,
+     "irsad": 1018.1,
      "rank": 48,
-     "quartile": 2,
-     "decile": 4
-    },
-    {
-     "division": "Bruce",
-     "state": "Vic",
-     "irsad": 1017,
-     "rank": 49,
      "quartile": 2,
      "decile": 4
     },
     {
      "division": "Greenway",
      "state": "NSW",
-     "irsad": 1016,
-     "rank": 50,
+     "irsad": 1015.7,
+     "rank": 49,
      "quartile": 2,
      "decile": 4
     },
     {
      "division": "Perth",
      "state": "WA",
-     "irsad": 1015,
-     "rank": 51,
+     "irsad": 1015.3,
+     "rank": 50,
      "quartile": 2,
      "decile": 4
     },
     {
      "division": "Lindsay",
      "state": "NSW",
-     "irsad": 1014,
-     "rank": 52,
+     "irsad": 1014.1,
+     "rank": 51,
      "quartile": 2,
      "decile": 4
     },
     {
-     "division": "Denison",
-     "state": "Tas",
-     "irsad": 1008,
-     "rank": 53,
+     "division": "Mayo",
+     "state": "SA",
+     "irsad": 1008.8,
+     "rank": 52,
      "quartile": 2,
      "decile": 4
     },
     {
      "division": "Fremantle",
      "state": "WA",
-     "irsad": 1008,
+     "irsad": 1008.4,
+     "rank": 53,
+     "quartile": 2,
+     "decile": 4
+    },
+    {
+     "division": "Denison",
+     "state": "Tas",
+     "irsad": 1007.6,
      "rank": 54,
+     "quartile": 2,
+     "decile": 4
+    },
+    {
+     "division": "Hindmarsh",
+     "state": "SA",
+     "irsad": 1006.2,
+     "rank": 55,
      "quartile": 2,
      "decile": 4
     },
     {
      "division": "Stirling",
      "state": "WA",
-     "irsad": 1005,
-     "rank": 55,
-     "quartile": 2,
-     "decile": 4
-    },
-    {
-     "division": "Wills",
-     "state": "Vic",
-     "irsad": 1004,
+     "irsad": 1005.2,
      "rank": 56,
      "quartile": 2,
      "decile": 4
     },
     {
-     "division": "Corangamite",
+     "division": "McEwen",
      "state": "Vic",
-     "irsad": 1004,
+     "irsad": 1005.1,
      "rank": 57,
+     "quartile": 2,
+     "decile": 4
+    },
+    {
+     "division": "Moncrieff",
+     "state": "Qld",
+     "irsad": 1004.3,
+     "rank": 58,
      "quartile": 2,
      "decile": 4
     },
     {
      "division": "Dunkley",
      "state": "Vic",
-     "irsad": 1003,
-     "rank": 58,
-     "quartile": 2,
-     "decile": 4
-    },
-    {
-     "division": "Bowman",
-     "state": "Qld",
-     "irsad": 1002,
+     "irsad": 1002.7,
      "rank": 59,
      "quartile": 2,
      "decile": 4
     },
     {
-     "division": "Robertson",
-     "state": "NSW",
-     "irsad": 1002,
+     "division": "Corangamite",
+     "state": "Vic",
+     "irsad": 1002.6,
      "rank": 60,
      "quartile": 2,
      "decile": 4
@@ -1703,63 +1702,63 @@
     {
      "division": "Cowan",
      "state": "WA",
-     "irsad": 1002,
+     "irsad": 1002.2,
      "rank": 61,
      "quartile": 2,
      "decile": 5
     },
     {
-     "division": "Hindmarsh",
-     "state": "SA",
-     "irsad": 1000,
+     "division": "Bowman",
+     "state": "Qld",
+     "irsad": 1002.1,
      "rank": 62,
+     "quartile": 2,
+     "decile": 5
+    },
+    {
+     "division": "Robertson",
+     "state": "NSW",
+     "irsad": 1001.8,
+     "rank": 63,
+     "quartile": 2,
+     "decile": 5
+    },
+    {
+     "division": "Bruce",
+     "state": "Vic",
+     "irsad": 1000.5,
+     "rank": 64,
      "quartile": 2,
      "decile": 5
     },
     {
      "division": "Hotham",
      "state": "Vic",
-     "irsad": 1000,
-     "rank": 63,
-     "quartile": 2,
-     "decile": 5
-    },
-    {
-     "division": "Isaacs",
-     "state": "Vic",
-     "irsad": 999,
-     "rank": 64,
-     "quartile": 2,
-     "decile": 5
-    },
-    {
-     "division": "Macarthur",
-     "state": "NSW",
-     "irsad": 997,
+     "irsad": 999.8,
      "rank": 65,
-     "quartile": 2,
-     "decile": 5
-    },
-    {
-     "division": "Fadden",
-     "state": "Qld",
-     "irsad": 997,
-     "rank": 66,
      "quartile": 2,
      "decile": 5
     },
     {
      "division": "Petrie",
      "state": "Qld",
-     "irsad": 997,
+     "irsad": 998.4,
+     "rank": 66,
+     "quartile": 2,
+     "decile": 5
+    },
+    {
+     "division": "Wills",
+     "state": "Vic",
+     "irsad": 998.0,
      "rank": 67,
      "quartile": 2,
      "decile": 5
     },
     {
-     "division": "Moncrieff",
-     "state": "Qld",
-     "irsad": 994,
+     "division": "Macarthur",
+     "state": "NSW",
+     "irsad": 996.5,
      "rank": 68,
      "quartile": 2,
      "decile": 5
@@ -1767,103 +1766,103 @@
     {
      "division": "Herbert",
      "state": "Qld",
-     "irsad": 993,
+     "irsad": 995.4,
      "rank": 69,
-     "quartile": 2,
-     "decile": 5
-    },
-    {
-     "division": "McEwan",
-     "state": "Vic",
-     "irsad": 991,
-     "rank": 70,
-     "quartile": 2,
-     "decile": 5
-    },
-    {
-     "division": "Burke",
-     "state": "Vic",
-     "irsad": 991,
-     "rank": 71,
-     "quartile": 2,
-     "decile": 5
-    },
-    {
-     "division": "Newcastle",
-     "state": "NSW",
-     "irsad": 990,
-     "rank": 72,
      "quartile": 2,
      "decile": 5
     },
     {
      "division": "Leichhardt",
      "state": "Qld",
-     "irsad": 990,
-     "rank": 73,
+     "irsad": 990.5,
+     "rank": 70,
      "quartile": 2,
      "decile": 5
     },
     {
-     "division": "Batman",
-     "state": "Vic",
-     "irsad": 989,
-     "rank": 74,
+     "division": "Newcastle",
+     "state": "NSW",
+     "irsad": 989.8,
+     "rank": 71,
      "quartile": 2,
      "decile": 5
     },
     {
      "division": "Kalgoorlie",
      "state": "WA",
-     "irsad": 989,
-     "rank": 75,
+     "irsad": 989.3,
+     "rank": 72,
+     "quartile": 2,
+     "decile": 5
+    },
+    {
+     "division": "Batman",
+     "state": "Vic",
+     "irsad": 989.2,
+     "rank": 73,
+     "quartile": 2,
+     "decile": 5
+    },
+    {
+     "division": "Isaacs",
+     "state": "Vic",
+     "irsad": 988.5,
+     "rank": 74,
      "quartile": 2,
      "decile": 5
     },
     {
      "division": "Hume",
      "state": "NSW",
-     "irsad": 988,
+     "irsad": 988.5,
+     "rank": 75,
+     "quartile": 2,
+     "decile": 5
+    },
+    {
+     "division": "Gellibrand",
+     "state": "Vic",
+     "irsad": 987.8,
      "rank": 76,
+     "quartile": 3,
+     "decile": 6
+    },
+    {
+     "division": "Maribyrnong",
+     "state": "Vic",
+     "irsad": 987.4,
+     "rank": 77,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Lingiari",
      "state": "NT",
-     "irsad": 987,
-     "rank": 77,
+     "irsad": 987.0,
+     "rank": 78,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Eden-Monaro",
      "state": "NSW",
-     "irsad": 986,
-     "rank": 78,
-     "quartile": 3,
-     "decile": 6
-    },
-    {
-     "division": "Watson",
-     "state": "NSW",
-     "irsad": 985,
+     "irsad": 986.3,
      "rank": 79,
-     "quartile": 3,
-     "decile": 6
-    },
-    {
-     "division": "McPherson",
-     "state": "Qld",
-     "irsad": 985,
-     "rank": 80,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Makin",
      "state": "SA",
-     "irsad": 985,
+     "irsad": 984.8,
+     "rank": 80,
+     "quartile": 3,
+     "decile": 6
+    },
+    {
+     "division": "Watson",
+     "state": "NSW",
+     "irsad": 984.8,
      "rank": 81,
      "quartile": 3,
      "decile": 6
@@ -1871,15 +1870,15 @@
     {
      "division": "Pearce",
      "state": "WA",
-     "irsad": 984,
+     "irsad": 983.9,
      "rank": 82,
      "quartile": 3,
      "decile": 6
     },
     {
-     "division": "Werriwa",
-     "state": "NSW",
-     "irsad": 979,
+     "division": "McPherson",
+     "state": "Qld",
+     "irsad": 983.0,
      "rank": 83,
      "quartile": 3,
      "decile": 6
@@ -1887,135 +1886,135 @@
     {
      "division": "Lalor",
      "state": "Vic",
-     "irsad": 979,
+     "irsad": 980.1,
      "rank": 84,
+     "quartile": 3,
+     "decile": 6
+    },
+    {
+     "division": "Werriwa",
+     "state": "NSW",
+     "irsad": 978.6,
+     "rank": 85,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Dobell",
      "state": "NSW",
-     "irsad": 977,
-     "rank": 85,
+     "irsad": 976.7,
+     "rank": 86,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Canning",
      "state": "WA",
-     "irsad": 976,
-     "rank": 86,
+     "irsad": 976.4,
+     "rank": 87,
      "quartile": 3,
      "decile": 6
     },
     {
-     "division": "Flinders",
-     "state": "Vic",
-     "irsad": 973,
-     "rank": 87,
+     "division": "Fadden",
+     "state": "Qld",
+     "irsad": 973.0,
+     "rank": 88,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Hasluck",
      "state": "WA",
-     "irsad": 973,
-     "rank": 88,
+     "irsad": 973.0,
+     "rank": 89,
+     "quartile": 3,
+     "decile": 6
+    },
+    {
+     "division": "Fisher",
+     "state": "Qld",
+     "irsad": 972.5,
+     "rank": 90,
      "quartile": 3,
      "decile": 6
     },
     {
      "division": "Groom",
      "state": "Qld",
-     "irsad": 972,
-     "rank": 89,
+     "irsad": 972.2,
+     "rank": 91,
      "quartile": 3,
-     "decile": 6
+     "decile": 7
+    },
+    {
+     "division": "Flinders",
+     "state": "Vic",
+     "irsad": 971.2,
+     "rank": 92,
+     "quartile": 3,
+     "decile": 7
     },
     {
      "division": "Prospect",
      "state": "NSW",
-     "irsad": 971,
-     "rank": 90,
-     "quartile": 3,
-     "decile": 6
-    },
-    {
-     "division": "Gellibrand",
-     "state": "Vic",
-     "irsad": 970,
-     "rank": 91,
+     "irsad": 970.8,
+     "rank": 93,
      "quartile": 3,
      "decile": 7
     },
     {
      "division": "Charlton",
      "state": "NSW",
-     "irsad": 969,
-     "rank": 92,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Calwell",
-     "state": "Vic",
-     "irsad": 968,
-     "rank": 93,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Fisher",
-     "state": "Qld",
-     "irsad": 967,
+     "irsad": 969.1,
      "rank": 94,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Franklin",
-     "state": "Tas",
-     "irsad": 967,
-     "rank": 95,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Scullin",
-     "state": "Vic",
-     "irsad": 967,
-     "rank": 96,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Capricornia",
-     "state": "Qld",
-     "irsad": 965,
-     "rank": 97,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Indi",
-     "state": "Vic",
-     "irsad": 965,
-     "rank": 98,
      "quartile": 3,
      "decile": 7
     },
     {
      "division": "Ballarat",
      "state": "Vic",
-     "irsad": 963,
-     "rank": 99,
+     "irsad": 968.9,
+     "rank": 95,
+     "quartile": 3,
+     "decile": 7
+    },
+    {
+     "division": "Franklin",
+     "state": "Tas",
+     "irsad": 967.0,
+     "rank": 96,
+     "quartile": 3,
+     "decile": 7
+    },
+    {
+     "division": "Indi",
+     "state": "Vic",
+     "irsad": 966.9,
+     "rank": 97,
+     "quartile": 3,
+     "decile": 7
+    },
+    {
+     "division": "Holt",
+     "state": "Vic",
+     "irsad": 964.5,
+     "rank": 98,
      "quartile": 3,
      "decile": 7
     },
     {
      "division": "Calare",
      "state": "NSW",
-     "irsad": 963,
+     "irsad": 962.8,
+     "rank": 99,
+     "quartile": 3,
+     "decile": 7
+    },
+    {
+     "division": "Capricornia",
+     "state": "Qld",
+     "irsad": 961.5,
      "rank": 100,
      "quartile": 3,
      "decile": 7
@@ -2023,223 +2022,223 @@
     {
      "division": "Gilmore",
      "state": "NSW",
-     "irsad": 961,
+     "irsad": 960.9,
      "rank": 101,
+     "quartile": 3,
+     "decile": 7
+    },
+    {
+     "division": "Scullin",
+     "state": "Vic",
+     "irsad": 960.7,
+     "rank": 102,
      "quartile": 3,
      "decile": 7
     },
     {
      "division": "Riverina",
      "state": "NSW",
-     "irsad": 959,
-     "rank": 102,
+     "irsad": 959.2,
+     "rank": 103,
      "quartile": 3,
      "decile": 7
     },
     {
-     "division": "Maribyrnong",
-     "state": "Vic",
-     "irsad": 959,
-     "rank": 103,
+     "division": "Fairfax",
+     "state": "Qld",
+     "irsad": 958.8,
+     "rank": 104,
      "quartile": 3,
      "decile": 7
     },
     {
      "division": "Forrest",
      "state": "WA",
-     "irsad": 958,
-     "rank": 104,
-     "quartile": 3,
-     "decile": 7
-    },
-    {
-     "division": "Farrer",
-     "state": "NSW",
-     "irsad": 956,
+     "irsad": 958.1,
      "rank": 105,
      "quartile": 3,
      "decile": 7
     },
     {
-     "division": "Forde",
-     "state": "Qld",
-     "irsad": 953,
+     "division": "Gorton",
+     "state": "Vic",
+     "irsad": 957.1,
      "rank": 106,
+     "quartile": 3,
+     "decile": 8
+    },
+    {
+     "division": "Farrer",
+     "state": "NSW",
+     "irsad": 955.6,
+     "rank": 107,
+     "quartile": 3,
+     "decile": 8
+    },
+    {
+     "division": "Calwell",
+     "state": "Vic",
+     "irsad": 952.9,
+     "rank": 108,
      "quartile": 3,
      "decile": 8
     },
     {
      "division": "Wannon",
      "state": "Vic",
-     "irsad": 952,
-     "rank": 107,
+     "irsad": 951.9,
+     "rank": 109,
      "quartile": 3,
      "decile": 8
     },
     {
      "division": "Blaxland",
      "state": "NSW",
-     "irsad": 951,
-     "rank": 108,
+     "irsad": 950.8,
+     "rank": 110,
      "quartile": 3,
      "decile": 8
     },
     {
-     "division": "McMillan",
+     "division": "Bendigo",
      "state": "Vic",
-     "irsad": 951,
-     "rank": 109,
+     "irsad": 950.5,
+     "rank": 111,
+     "quartile": 3,
+     "decile": 8
+    },
+    {
+     "division": "Kingston",
+     "state": "SA",
+     "irsad": 949.7,
+     "rank": 112,
      "quartile": 3,
      "decile": 8
     },
     {
      "division": "New England",
      "state": "NSW",
-     "irsad": 950,
-     "rank": 110,
-     "quartile": 3,
-     "decile": 8
-    },
-    {
-     "division": "Fairfax",
-     "state": "Qld",
-     "irsad": 950,
-     "rank": 111,
-     "quartile": 3,
-     "decile": 8
-    },
-    {
-     "division": "Reid",
-     "state": "NSW",
-     "irsad": 949,
-     "rank": 112,
-     "quartile": 3,
-     "decile": 8
-    },
-    {
-     "division": "Corio",
-     "state": "Vic",
-     "irsad": 949,
+     "irsad": 949.7,
      "rank": 113,
      "quartile": 3,
      "decile": 8
     },
     {
-     "division": "Shortland",
-     "state": "NSW",
-     "irsad": 948,
+     "division": "Gippsland",
+     "state": "Vic",
+     "irsad": 949.7,
      "rank": 114,
      "quartile": 4,
      "decile": 8
     },
     {
-     "division": "Bendigo",
+     "division": "Corio",
      "state": "Vic",
-     "irsad": 948,
+     "irsad": 949.6,
      "rank": 115,
+     "quartile": 4,
+     "decile": 8
+    },
+    {
+     "division": "Reid",
+     "state": "NSW",
+     "irsad": 948.8,
+     "rank": 116,
+     "quartile": 4,
+     "decile": 8
+    },
+    {
+     "division": "Forde",
+     "state": "Qld",
+     "irsad": 948.1,
+     "rank": 117,
+     "quartile": 4,
+     "decile": 8
+    },
+    {
+     "division": "McMillan",
+     "state": "Vic",
+     "irsad": 947.9,
+     "rank": 118,
      "quartile": 4,
      "decile": 8
     },
     {
      "division": "Richmond",
      "state": "NSW",
-     "irsad": 948,
-     "rank": 116,
+     "irsad": 947.9,
+     "rank": 119,
+     "quartile": 4,
+     "decile": 8
+    },
+    {
+     "division": "Shortland",
+     "state": "NSW",
+     "irsad": 947.8,
+     "rank": 120,
      "quartile": 4,
      "decile": 8
     },
     {
      "division": "Bass",
      "state": "Tas",
-     "irsad": 947,
-     "rank": 117,
-     "quartile": 4,
-     "decile": 8
-    },
-    {
-     "division": "Dawson",
-     "state": "Qld",
-     "irsad": 947,
-     "rank": 118,
-     "quartile": 4,
-     "decile": 8
-    },
-    {
-     "division": "Rankin",
-     "state": "Qld",
-     "irsad": 947,
-     "rank": 119,
-     "quartile": 4,
-     "decile": 8
-    },
-    {
-     "division": "O'Connor",
-     "state": "WA",
-     "irsad": 946,
-     "rank": 120,
-     "quartile": 4,
-     "decile": 8
-    },
-    {
-     "division": "Gippsland",
-     "state": "Vic",
-     "irsad": 946,
+     "irsad": 946.8,
      "rank": 121,
      "quartile": 4,
      "decile": 9
     },
     {
-     "division": "Kingston",
-     "state": "SA",
-     "irsad": 946,
+     "division": "Dawson",
+     "state": "Qld",
+     "irsad": 946.6,
      "rank": 122,
+     "quartile": 4,
+     "decile": 9
+    },
+    {
+     "division": "O'Connor",
+     "state": "WA",
+     "irsad": 946.3,
+     "rank": 123,
+     "quartile": 4,
+     "decile": 9
+    },
+    {
+     "division": "Oxley",
+     "state": "Qld",
+     "irsad": 945.0,
+     "rank": 124,
      "quartile": 4,
      "decile": 9
     },
     {
      "division": "Murray",
      "state": "Vic",
-     "irsad": 944,
-     "rank": 123,
-     "quartile": 4,
-     "decile": 9
-    },
-    {
-     "division": "Mallee",
-     "state": "Vic",
-     "irsad": 943,
-     "rank": 124,
+     "irsad": 943.8,
+     "rank": 125,
      "quartile": 4,
      "decile": 9
     },
     {
      "division": "Hunter",
      "state": "NSW",
-     "irsad": 943,
-     "rank": 125,
-     "quartile": 4,
-     "decile": 9
-    },
-    {
-     "division": "Holt",
-     "state": "Vic",
-     "irsad": 942,
+     "irsad": 943.4,
      "rank": 126,
      "quartile": 4,
      "decile": 9
     },
     {
-     "division": "Parkes",
-     "state": "NSW",
-     "irsad": 940,
+     "division": "Rankin",
+     "state": "Qld",
+     "irsad": 942.2,
      "rank": 127,
      "quartile": 4,
      "decile": 9
     },
     {
-     "division": "Maranoa",
-     "state": "Qld",
-     "irsad": 939,
+     "division": "Mallee",
+     "state": "Vic",
+     "irsad": 941.4,
      "rank": 128,
      "quartile": 4,
      "decile": 9
@@ -2247,39 +2246,39 @@
     {
      "division": "Kennedy",
      "state": "Qld",
-     "irsad": 939,
+     "irsad": 941.3,
      "rank": 129,
+     "quartile": 4,
+     "decile": 9
+    },
+    {
+     "division": "Maranoa",
+     "state": "Qld",
+     "irsad": 940.6,
+     "rank": 130,
+     "quartile": 4,
+     "decile": 9
+    },
+    {
+     "division": "Parkes",
+     "state": "NSW",
+     "irsad": 940.4,
+     "rank": 131,
      "quartile": 4,
      "decile": 9
     },
     {
      "division": "Paterson",
      "state": "NSW",
-     "irsad": 938,
-     "rank": 130,
-     "quartile": 4,
-     "decile": 9
-    },
-    {
-     "division": "Port Adelaide",
-     "state": "SA",
-     "irsad": 936,
-     "rank": 131,
-     "quartile": 4,
-     "decile": 9
-    },
-    {
-     "division": "Wakefield",
-     "state": "SA",
-     "irsad": 935,
+     "irsad": 937.8,
      "rank": 132,
      "quartile": 4,
      "decile": 9
     },
     {
-     "division": "Oxley",
-     "state": "Qld",
-     "irsad": 935,
+     "division": "Brand",
+     "state": "WA",
+     "irsad": 933.0,
      "rank": 133,
      "quartile": 4,
      "decile": 9
@@ -2287,7 +2286,7 @@
     {
      "division": "Chifley",
      "state": "NSW",
-     "irsad": 933,
+     "irsad": 933.0,
      "rank": 134,
      "quartile": 4,
      "decile": 9
@@ -2295,31 +2294,31 @@
     {
      "division": "Throsby",
      "state": "NSW",
-     "irsad": 933,
+     "irsad": 933.0,
      "rank": 135,
      "quartile": 4,
      "decile": 9
     },
     {
-     "division": "Brand",
-     "state": "WA",
-     "irsad": 933,
-     "rank": 136,
-     "quartile": 4,
-     "decile": 10
-    },
-    {
      "division": "Blair",
      "state": "Qld",
-     "irsad": 932,
-     "rank": 137,
+     "irsad": 931.6,
+     "rank": 136,
      "quartile": 4,
      "decile": 10
     },
     {
      "division": "Gwydir",
      "state": "NSW",
-     "irsad": 929,
+     "irsad": 929.1,
+     "rank": 137,
+     "quartile": 4,
+     "decile": 10
+    },
+    {
+     "division": "Lyne",
+     "state": "NSW",
+     "irsad": 925.4,
      "rank": 138,
      "quartile": 4,
      "decile": 10
@@ -2327,71 +2326,71 @@
     {
      "division": "Longman",
      "state": "Qld",
-     "irsad": 928,
+     "irsad": 924.7,
      "rank": 139,
-     "quartile": 4,
-     "decile": 10
-    },
-    {
-     "division": "Grey",
-     "state": "SA",
-     "irsad": 927,
-     "rank": 140,
-     "quartile": 4,
-     "decile": 10
-    },
-    {
-     "division": "Hinkler",
-     "state": "Qld",
-     "irsad": 925,
-     "rank": 141,
-     "quartile": 4,
-     "decile": 10
-    },
-    {
-     "division": "Lyne",
-     "state": "NSW",
-     "irsad": 925,
-     "rank": 142,
-     "quartile": 4,
-     "decile": 10
-    },
-    {
-     "division": "Page",
-     "state": "NSW",
-     "irsad": 923,
-     "rank": 143,
      "quartile": 4,
      "decile": 10
     },
     {
      "division": "Barker",
      "state": "SA",
-     "irsad": 923,
-     "rank": 144,
+     "irsad": 924.6,
+     "rank": 140,
+     "quartile": 4,
+     "decile": 10
+    },
+    {
+     "division": "Page",
+     "state": "NSW",
+     "irsad": 922.9,
+     "rank": 141,
+     "quartile": 4,
+     "decile": 10
+    },
+    {
+     "division": "Hinkler",
+     "state": "Qld",
+     "irsad": 922.7,
+     "rank": 142,
      "quartile": 4,
      "decile": 10
     },
     {
      "division": "Cowper",
      "state": "NSW",
-     "irsad": 922,
-     "rank": 145,
+     "irsad": 922.0,
+     "rank": 143,
      "quartile": 4,
      "decile": 10
     },
     {
-     "division": "Lyons",
-     "state": "Tas",
-     "irsad": 908,
-     "rank": 146,
+     "division": "Grey",
+     "state": "SA",
+     "irsad": 920.6,
+     "rank": 144,
+     "quartile": 4,
+     "decile": 10
+    },
+    {
+     "division": "Port Adelaide",
+     "state": "SA",
+     "irsad": 910.8,
+     "rank": 145,
      "quartile": 4,
      "decile": 10
     },
     {
      "division": "Braddon",
      "state": "Tas",
-     "irsad": 908,
+     "irsad": 908.2,
+     "rank": 146,
+     "quartile": 4,
+     "decile": 10
+    },
+    {
+     "division": "Lyons",
+     "state": "Tas",
+     "irsad": 907.5,
      "rank": 147,
      "quartile": 4,
      "decile": 10
@@ -2399,23 +2398,23 @@
     {
      "division": "Wide Bay",
      "state": "Qld",
-     "irsad": 906,
+     "irsad": 902.3,
      "rank": 148,
+     "quartile": 4,
+     "decile": 10
+    },
+    {
+     "division": "Wakefield",
+     "state": "SA",
+     "irsad": 895.8,
+     "rank": 149,
      "quartile": 4,
      "decile": 10
     },
     {
      "division": "Fowler",
      "state": "NSW",
-     "irsad": 891,
-     "rank": 149,
-     "quartile": 4,
-     "decile": 10
-    },
-    {
-     "division": "Bonython",
-     "state": "SA",
-     "irsad": 882,
+     "irsad": 890.9,
      "rank": 150,
      "quartile": 4,
      "decile": 10

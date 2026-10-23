@@ -205,8 +205,10 @@ rationale, and treat §9 as the build record.
   on ingest so **rank 1 = most advantaged** (highest IRSAD); decile/quartile
   ascend with disadvantage. RR5's printed ranks (1 = most disadvantaged)
   are re-based; the JSON documents it in its `rankConvention` key.
-- Row recipes by election: 2001/2004 = AEC RR5 att1 (150, 2001-boundary
-  set — e2004 carries the 2000-era set with a caveat note in the JSON);
+- Row recipes by election: 2001 = AEC RR5 att1 (150, 2001-boundary set);
+  **2004 = APH 05cib01's IRSAD alpha table (150, 2003-boundary set — the
+  caveated RR5 reuse was replaced 2026-10-24; the ranked re-print is
+  parsed too and kept as the parser's per-division cross-check)**;
   2007/2010 = APH Table 2a slices (09rp02 = 2006c×2006b; 11rp01 =
   2006c×2009b); 2013 = SEIFA 2011 SA1 cube × MB→SA1→CED 2011
   (150, Charlton/Hunter/Throsby-era set); 2016 = SEIFA 2016 cube × the same
@@ -232,8 +234,10 @@ rationale, and treat §9 as the build record.
   pins above), SA1-decile histogram recon vs the ABS CED distributions
   cube (2011+2016, EXACT, 150/0 + 150/0 clean), and the 2021-era national
   decile-population-share check (10%±0.5%).
-- Sanity spot-checks of the emitted store: 2001/2004 top-bottom
-  North Sydney…Bonython; 2007/2010 Bradfield…Wakefield; 2013–2019
+- Sanity spot-checks of the emitted store: 2001 top-bottom
+  North Sydney…Bonython; 2004 Bradfield…Fowler (Lingiari prints 987.0,
+  printed rank 73 disadvantaged-first → store rank 78);
+  2007/2010 Bradfield…Wakefield; 2013–2019
   Bradfield…Lingiari; 2022/2025 Warringah…Fowler; 2028 Warringah…Lingiari.
   Bullwinkel decile 4.
 

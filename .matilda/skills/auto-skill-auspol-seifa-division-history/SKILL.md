@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-division-history
-description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH four-paper set = CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed later), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json, all nine elections 2001–2025 incl. 2004).
+description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (the ONLY published 2001-census per-division scores are AEC RR5-Att1 on the 2000/01-edition boundaries AND APH CIB 1/2004-05 on the 2003-edition ones; the APH four-paper set = CIB13/2000-01 1996×2000 + CIB1/2004-05 2001×2003 + RP09rp02 2006×2006 + RP11rp01 2006×2009, first three PDFs committed 53831398, 05cib01 committed 9cfc5df0), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json, all nine elections 2001–2025 incl. 2004).
 source: auto-skill
 extracted_at: '2026-10-23T06:20:52.767Z'
 ---
@@ -142,9 +142,14 @@ the sibling lane's job.
   editions: AEC RR5-Att1 (2000/01 boundaries) and APH CIB 1/2004-05 (2003
   boundaries — the 2004 election's set). This skill previously claimed no
   APH 2001-census paper existed (verified-negative, wrong): CIB 13/00–01
-  is 1996-census but its successor 05cib01 was found on 2026-10-24. The
-  3-index store's 2004 lane is the CIB (landed); the IRSAD sibling's
-  2004 row moves from its caveated RR5 reuse to the CIB in tandem.
+  is 1996-census but its successor 05cib01 was found on 2026-10-24. BOTH
+  stores' 2004 lanes are the CIB (landed 2026-10-24, same day): the
+  3-index store carries its irsd/ier/ieo scores+ranks, and the IRSAD
+  sibling re-derives e2004 from its IRSAD alpha table (printed rank 73
+  disadvantaged-first re-bases to store rank 78 advantaged-first —
+  derive-irsad.py parse_aph05cib01, ranked re-print kept as the
+  per-division cross-check; mind its thousands-separated four-figure
+  scores, 1,059.3-style — a naive \d{3}\.\d silently eats the tail).
   **Earlier "08xp01 = 2006 update" graffiti was wrong** — the 09rp02 (Aug
   2008) paper IS the 2006-census APH edition; 11rp01 is its 2009-boundary
   re-issue with explicit-2009 in the title, published after the

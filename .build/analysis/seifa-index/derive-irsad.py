@@ -8,6 +8,7 @@ contract (IRSAD ONLY, user call 2026-10-23):
 
 Sources
   published   AEC RR5 Attachment 1        cache/rr5.txt        (2001c x 2000b)
+              APH CIB 05cib01 IRSAD tbl   src/aph/aph-05cib01.txt (2001c x 2003b)
               APH RP 09rp02 Table 2a      src/aph/aph-09rp02.txt (2006c x 2006b)
               APH RP 11rp01 Table 2a      src/aph/aph-11rp01.txt (2006c x 2009b)
   derived     ABS SEIFA SA1 cubes + MB/CED anallocation products, per ABS
@@ -104,6 +105,69 @@ def parse_aph_table2a(path, tag):
             break
     assert len(rows) == 150, f"{tag}: parsed {len(rows)} rows, expected 150"
     return rows
+
+_CIB_CAP_ALPHA = "Index of Relative Socio-Economic Advantage/Disadvantage"
+_CIB_CAP_RANKED = "Ranked by the Index of Relative Socio-Economic Advantage/Disadvantage"
+_CIB_STATE = r"(?:NSW|Vic|Qld|SA|WA|Tas|NT|ACT)"
+_CIB_PARTY = r"(?:LIB|ALP|NP|CLP|IND|GRN|DEM)"
+_CIB_SCORE = r"(\d{1,2},\d{3}\.\d|\d{3}\.\d)"  # four-figure scores print 1,059.3
+_CIB_ALPHA_SEG = re.compile(
+    r"([A-Za-z'.\- ]+?\(" + _CIB_STATE + r"\))\s+" + _CIB_PARTY + r"\s+" + _CIB_SCORE
+)
+_CIB_RANK_SEG = re.compile(
+    r"\b(\d{1,3})\s+([A-Za-z'.\- ]+?\(" + _CIB_STATE + r"\))\s+" + _CIB_PARTY + r"\s+" + _CIB_SCORE
+)
+
+def parse_aph05cib01(path):
+    """APH CIB 1/2004-05 (05cib01): IRSAD only. The paper prints one
+    alphabetical score table (`Index of Relative … Advantage/Disadvantage`,
+    two name/party/score segments per line, thousands-separated scores) and a
+    ranked re-print (`Ranked by the Index …`, ascending-disadvantage ranks).
+    Parse both and require per-division score agreement — the ranked table is
+    the cross-check, never the source. Header lines can't match the segment
+    grammar (no `Name (ST) PARTY score` triple), so captions alone bracket
+    the slices."""
+    lines = open(path, encoding="utf-8").read().splitlines()
+    norm_lines = [l.replace("\f", " ").replace("’", "'") for l in lines]
+    stripped = [re.sub(r"\s+", " ", l).strip() for l in norm_lines]
+    try:
+        a0 = stripped.index(_CIB_CAP_ALPHA)
+        r0 = stripped.index(_CIB_CAP_RANKED)
+    except ValueError:
+        raise AssertionError("05cib01: caption(s) not found")
+    r1 = next((i for i in range(r0 + 1, len(stripped))
+               if stripped[i].startswith("Index of Relative Socio-Economic Disadvantage")),
+              len(stripped))
+    def cibrows(line_iter, seg, tag):
+        rows = {}
+        for line in line_iter:
+            for m in seg.finditer(line):
+                if seg is _CIB_ALPHA_SEG:
+                    name, val = m.group(1), m.group(2)
+                else:
+                    rank, name, val = int(m.group(1)), m.group(2), m.group(3)
+                div, st = norm(name).rsplit("(", 1)
+                key = norm(div[:-1])
+                assert key not in rows, f"{tag}: duplicate division {key}"
+                row = dict(division=key, state=st[:-1],
+                           irsad=float(val.replace(",", "")))
+                if seg is _CIB_RANK_SEG:
+                    row["printedRank"] = rank
+                rows[key] = row
+        assert len(rows) == 150, f"{tag}: parsed {len(rows)} divisions, expected 150"
+        return rows
+    alpha = cibrows(norm_lines[a0:r0], _CIB_ALPHA_SEG, "05cib01-alpha")
+    ranked = cibrows(norm_lines[r0:r1], _CIB_RANK_SEG, "05cib01-ranked")
+    order = sorted(ranked.values(), key=lambda r: r["printedRank"])
+    assert [r["printedRank"] for r in order] == list(range(1, 151)), \
+        "05cib01: printed ranks not 1..150"
+    scores = [r["irsad"] for r in order]
+    assert all(a <= b for a, b in zip(scores, scores[1:])), \
+        "05cib01: printed ranked table not ascending in IRSAD (rank 1 = most disadvantaged)"
+    for div, r in ranked.items():
+        assert alpha[div]["irsad"] == r["irsad"], \
+            f"05cib01: {div} alpha/ranked score mismatch"
+    return list(alpha.values())
 
 # ------------------------------------------------------------- ABS loaders
 
@@ -425,8 +489,11 @@ def assert_names(tag, rows, inside, outside, count):
 def main():
     # -- published tables
     rr5 = parse_rr5_att1(f"{ROOT}/cache/rr5.txt")
+    aph04 = parse_aph05cib01(f"{ROOT}/src/aph/aph-05cib01.txt")
     aph06 = parse_aph_table2a(f"{ROOT}/src/aph/aph-09rp02.txt", "09rp02")
     aph10 = parse_aph_table2a(f"{ROOT}/src/aph/aph-11rp01.txt", "11rp01")
+    assert_names("e2004", aph04, inside=["Bonner", "Gorton"],
+                 outside=["Bonython", "Burke"], count=150)
 
     # -- ABS-cube derivations
     d13, dec13, pop13 = derive_2011()
@@ -467,10 +534,9 @@ def main():
                    sourceProduct="AEC Research Report No. 5 (2005), Attachment 1 — 2001 Census, 2001 boundaries",
                    rows=ranks_for(rr5)),
         2004: dict(censusYear=2001, editionInForce=2003, derivation="published",
-                   sourceProduct="AEC Research Report No. 5 (2005), Attachment 1 — 2001 Census, 2001 boundaries",
-                   note="RR5 Att1 prints the 2000-boundary set; the 2004 election ran on the 2003 edition. "
-                        "Exact 2003-edition re-derivation (2001 CD cube + 2003 concordance) is rr6 open item 3.",
-                   rows=ranks_for(rr5)),
+                   sourceProduct="APH Current Issues Brief no.1 2004-05 (2001 Census, 2003 boundaries) — "
+                                 "Index of Relative Socio-Economic Advantage/Disadvantage table",
+                   rows=ranks_for(aph04)),
         2007: dict(censusYear=2006, editionInForce=2006, derivation="published",
                    sourceProduct="APH Research Paper no.2 2008-09, Table 2a — 2006 Census, 2006 boundaries",
                    rows=ranks_for(aph06)),
@@ -501,8 +567,9 @@ def main():
         "product": "irsad-by-division",
         "generated": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
         "description": "IRSAD per Commonwealth electoral division per election — published "
-                       "tables (AEC RR5 Att1; APH 2008/2010 research papers) plus ABS-cube "
-                       "population-weighted derivations (ABS guidance 2039.0 §2.2).",
+                       "tables (AEC RR5 Att1; APH CIB 1/2004-05 and the 2008/2010 research "
+                       "papers) plus ABS-cube population-weighted derivations (ABS guidance "
+                       "2039.0 §2.2).",
         "comparability": "Index definitions are recomputed each census — compare across "
                          "eras via rank/decile/quartile only, never raw scores.",
         "rankConvention": "rank 1 = most advantaged (highest IRSAD score); decile/quartile "
@@ -520,6 +587,12 @@ if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "selftest":
     r5 = parse_rr5_att1(f"{ROOT}/cache/rr5.txt")
     assert r5[0]["division"] == "Bonython" and r5[0]["irsad"] == 882
     assert r5[-1]["irsad"] == 1204 and r5[-1]["division"] == "Bradfield"
+    q04 = parse_aph05cib01(f"{ROOT}/src/aph/aph-05cib01.txt")
+    by04 = {r["division"]: r["irsad"] for r in q04}
+    assert by04["Lingiari"] == 987.0 and by04["Bradfield"] == 1203.7
+    assert by04["Adelaide"] == 1059.3 and "O'Connor" in by04
+    assert "Bonner" in by04 and "Gorton" in by04
+    assert "Bonython" not in by04 and "Burke" not in by04
     q06 = parse_aph_table2a(f"{ROOT}/src/aph/aph-09rp02.txt", "09rp02")
     q10 = parse_aph_table2a(f"{ROOT}/src/aph/aph-11rp01.txt", "11rp01")
     assert q06[0]["division"] == "Adelaide" and q06[0]["irsad"] == 1029.0
