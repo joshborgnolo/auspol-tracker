@@ -4946,21 +4946,43 @@ const flowHistory = (() => {
      per-division flow table reaches it natively)
      grouped by the AEC's own per-election division classifications —
      the election's own table, so a recategorised seat moves classes with
-     it. Classic seats only, like aec-2025-region-tpp-flows.mjs: a
-     non-classic final pair can hold a bucket's ballots on a crossbench
-     pile no AEC product splits. AEC counts like the national series — no
-     error bars, a class-year a bucket's ballots never reached a classic
-     seat there is null (One Nation barely stood in inner-metropolitan
-     seats in 2010–2013). Guarded like fed.states: a missing file drops
-     the four options. */
+     it. AEC counts like the national series — no error bars, a class-
+     year a bucket's ballots never reached a classic seat there is null
+     (One Nation barely stood in inner-metropolitan seats in 2010–2013).
+     Guarded like fed.states: a missing file drops the four options.
+     Since 2026-10-23 (user-approved plan, "don't accept 'can't be
+     done'") the views SWITCH BASIS in place: before 2004 the classic
+     seats are all any product reaches (ringed), from 2004 the count
+     covers every seat — the TPP-by-division cut pairs Labor and the
+     Coalition everywhere, and the ballots sitting on a non-classic
+     final pair are recovered from the state flow table's leftovers
+     (the store's allSeats block; the lump line sums the buckets so the
+     three-cornered Coalition drift never touches it). Cells whose
+     state's crossbench seats span seat types are the allSeats.est
+     estimates (diamonds on the page). The user's lumped minor line —
+     the 4th line — runs 1996–2025, classic-based ahead of 2004 like
+     the buckets. */
   try {
     const fcf = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "fed-class-flows.json"), "utf8"));
-    h.fed.classes = Object.fromEntries(Object.entries(fcf.classes).map(([k, s]) => [k,
-      { label: s.label, short: s.short, elections: "federal elections in " + s.short + " seats", fedClass: true,
-        // a class view can never count all seats (no AEC product splits a
-        // non-classic final pair by division): classic seats throughout
-        hollowYears: [...fcf.years],
-        years: [...fcf.years], grn: [...s.grn], onp: [...s.onp], oth: [...s.oth] }]));
+    const CLASS_CUT = 2004;
+    h.fed.classes = Object.fromEntries(Object.entries(fcf.classes).map(([k, s]) => {
+      /* the all-seats block sits beside classes at the store's top */
+      const A = (fcf.allSeats || {})[k] || {};
+      const pick = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT && A[b] ? A[b][i] : s[b][i]));
+      const est = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT && A.est && A.est[b] ? !!A.est[b][i] : false));
+      const ballots = (b) => fcf.years.map((y, i) => (y >= CLASS_CUT ? ((A.votes || {})[b] || [])[i] || null : (s.votes || {})[b] ? s.votes[b][i] : null));
+      const buckets = ["grn", "onp", "oth"];
+      /* the lump is estimated any year ANY bucket is */
+      const estLump = fcf.years.map((y, i) => buckets.some((b) => est(b)[i]));
+      return [k,
+        { label: s.label, short: s.short, elections: "federal elections in " + s.short + " seats", fedClass: true,
+          hollowYears: fcf.years.filter((y) => y < CLASS_CUT),
+          years: [...fcf.years], grn: pick("grn"), onp: pick("onp"), oth: pick("oth"),
+          lump: A.lump ? [...A.lump] : null,
+          estGrn: est("grn"), estOnp: est("onp"), estOth: est("oth"), estLump,
+          ballots: Object.fromEntries([...buckets, "lump"].map((b) => [b,
+            b === "lump" ? (A.lumpVotes ? [...A.lumpVotes] : fcf.years.map(() => null)) : ballots(b)])) }];
+    }));
   } catch { /* not yet written */ }
   let csv = null, bt = null;
   try { csv = fs.readFileSync(path.join(ROOT, "data", "state-flows-est.csv"), "utf8"); } catch { /* not yet written */ }

@@ -736,6 +736,10 @@ function RdSwatch({ kind = "line", color = "var(--ink-3)" }) {
       return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style={{ fill: "var(--bg)", stroke: color, strokeWidth: 2 }} /></svg>;
     case "ring":
       return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style={{ fill: "var(--bg)", stroke: "var(--ink)", strokeWidth: 2 }} /></svg>;
+    case "diamond":
+      /* the estimated-cell mark (the explainer's class views, 2026-10-23):
+         a hollow diamond beside the counted bases' ring and solid dot */
+      return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2L12 7L7 12L2 7Z" style={{ fill: "var(--bg)", stroke: color, strokeWidth: 2, strokeLinejoin: "round" }} /></svg>;
     case "band":
       return <svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style={{ fill: color, opacity: 0.2 }} /></svg>;
     case "lineband":

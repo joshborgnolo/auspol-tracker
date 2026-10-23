@@ -50,6 +50,19 @@
    region carriers gen-data types from the same source table (cross-checked
    there against the vendored DoP), and the built data asset hands the
    chart the classes under flowHistory.fed.classes with no error bars.
+   2026-10-23 (user-approved "don't accept 'can't be done'" plan): the
+   views switch basis in place at 2004 — the classic-seat figures stay as
+   the pre-2004 hollow rings, while from 2004 the count covers every seat
+   (the store's TOP-LEVEL allSeats block beside classes, recovered from
+   the per-division TPP table plus the state flow tables' non-classic
+   leftovers; mixed-class state cells are first-preference estimates,
+   flagged in allSeats.est). A fourth lumped "All minor parties" line
+   runs the full 1996–2025 span off the store's merged allSeats.lump
+   (classic basis pre-2004), summing the three buckets so three-cornered
+   Coalition drift never touches it. The asset pins here assert the
+   merged per-bucket series, hollowYears = 1996–2001, the lumped line
+   (allSeats.lump verbatim), the boolean est flags, and ballots's four
+   cohorts (grn/onp/oth/lump — vote pairs behind every figure).
    Runs after the build in npm test's chain (the data asset only reflects
    the current dataset post-build). */
 import assert from "node:assert/strict";
@@ -577,10 +590,22 @@ CLASS_IDS.forEach((k) => {
   const got = FH.fed.classes[k];
   assert.equal(got.fedClass, true, `${k}: marked a federal class view`);
   assert.deepEqual([...got.years], YEARS, `${k}: years`);
-  assert.deepEqual([...got.hollowYears], [...YEARS], `${k}: every class point is classic-seats`);
-  BUCKETS.forEach((b) => assert.deepEqual([...got[b]], data.classes[k][b], `${k} ${b} reaches the asset`));
-  assert.deepEqual(Object.keys(got).sort(), ["elections", "fedClass", "grn", "hollowYears", "label", "onp", "oth", "short", "years"].sort(),
-    `${k}: shares only — counts carry no error bars, so no Err arrays`);
+  /* classic seats only until 2004 (hollow rings); all-seats from 2004 */
+  assert.deepEqual([...got.hollowYears], [...YEARS.slice(0, 3)], `${k}: classic-seats rings stop at 2001`);
+  /* per-party shares merge classic ≤2001 with all-seats ≥2004 */
+  const allSeats = data.allSeats[k];
+  BUCKETS.forEach((b) => {
+    const merged = YEARS.map((y, yi) => (yi < 3 ? data.classes[k][b][yi] : allSeats[b][yi]));
+    assert.deepEqual([...got[b]], merged, `${k} ${b} merges classic ≤2001 with all-seats ≥2004`);
+    assert.equal(typeof got["est" + b[0].toUpperCase() + b.slice(1)][0], "boolean", `${k} est${b} reaches the asset as booleans`);
+  });
+  /* the fourth lumped line is the full 1996–2025 run; the store's
+     allSeats.lump already carries the classic-basis lump pre-2004 and
+     the all-seats lump from 2004, so the emitted series passes through */
+  assert.deepEqual([...got.lump], [...allSeats.lump], `${k} lump is the store's merged 11-year run`);
+  assert.deepEqual(Object.keys(got.ballots).sort(), ["grn", "lump", "onp", "oth"].sort(), `${k}: ballots carries the four cohorts`);
+  assert.deepEqual(Object.keys(got).sort(), ["ballots", "elections", "estGrn", "estLump", "estOnp", "estOth", "fedClass", "grn", "hollowYears", "label", "lump", "onp", "oth", "short", "years"].sort(),
+    `${k}: shares and estimate flags, no Err arrays`);
   assert.equal(got.elections, `federal elections in ${CLASS_SHORTS[k]} seats`, `${k}: the chart head's scope line`);
 });
 assert.ok(!Object.keys(FH).includes("classes"), "classes nests under fed, never a chip key of its own");
