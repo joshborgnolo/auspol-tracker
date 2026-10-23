@@ -33,6 +33,9 @@ far back can census-based SEIFA-by-division figures be derived, and from where?*
   both tails), and its three sister indexes ship in the same ABS cubes if a
   later workstream wants them. Cross-era comparability stays rank/decile-only
   regardless (§8).
+- **The ladder is BUILT (2026-10-24).** `derive-irsad.py` runs every
+  B-grade row green end-to-end and the emitted store
+  `irsad-by-division.json` covers every election 2001→2028 — see §9.
 
 ## 2. ABS official SEIFA products, per census (verified this session)
 
@@ -169,6 +172,11 @@ sourced from ABS census geography units + boundary polygons).
 | 2025 | 2025 | 2021 (~3.7 y before) | SEIFA 2021 SA1 file + 2021-SA1→2025-CED weights (repo's own `map-census-2025-frame.mjs` pattern) | B |
 | 2028 | next gazettal | 2021 (SEIFA 2026 lands ~2029, too late) | SEIFA 2021 SA1 + new-edition weights | B |
 
+**Status 2026-10-24: every election row 2001→2028 above is derived and
+stored in `irsad-by-division.json` (§9).** The ladder's B recipes are the
+recipes the pipeline implements; keep this table as the census-↔-proximity
+rationale, and treat §9 as the build record.
+
 ## 8. Warnings that sit on every exported number
 
 - Index recomputation: 1986/1991/1996 five-index systems vs 2001-onwards
@@ -178,6 +186,53 @@ sourced from ABS census geography units + boundary polygons).
   paper's aggregation guidance (2039.0 §2.2) is the canonical method.
 - Census vintage vs edition vintage always differs by months-to-years;
   record both in provenance (`editionInForce`, `censusYear`).
+
+## 9. Landed — the derived store (2026-10-24)
+
+- `derive-irsad.py` (this dir) runs the whole ladder green end-to-end
+  (`selftest OK`); the emitted store is **`irsad-by-division.json`** beside
+  it, carrying per-election row sets:
+  `{2001: 150, 2004: 150, 2007: 150, 2010: 150, 2013: 150, 2016: 150,
+  2019: 151, 2022: 151, 2025: 150, 2028: 150}`. Each row is
+  `{division, censusYear, editionInForce, irsad, rank, decile, quartile,
+  derivation, sourceProduct}` with derivation `published` (RR5 / APH Table
+  2a slices) or `weighted` (the ABS 2039.0 §2.2 population-weighted recipe
+  of §1).
+- **Rank convention**: every row set — published and derived — is re-ranked
+  on ingest so **rank 1 = most advantaged** (highest IRSAD); decile/quartile
+  ascend with disadvantage. RR5's printed ranks (1 = most disadvantaged)
+  are re-based; the JSON documents it in its `rankConvention` key.
+- Row recipes by election: 2001/2004 = AEC RR5 att1 (150, 2001-boundary
+  set — e2004 carries the 2000-era set with a caveat note in the JSON);
+  2007/2010 = APH Table 2a slices (09rp02 = 2006c×2006b; 11rp01 =
+  2006c×2009b); 2013 = SEIFA 2011 SA1 cube × MB→SA1→CED 2011
+  (150, Charlton/Hunter/Throsby-era set); 2016 = SEIFA 2016 cube × the same
+  2016 members (150); 2019 = SEIFA 2016 cube × MB2016→SA1_2016→CED_2018
+  (151, Cooper/Macnamara/Monash/Bean/Spence-era set); 2022 = SEIFA 2021 cube
+  × MB2021→SA1→CED_2021 (151, Hawke era); 2025/2028 = SEIFA 2021 cube ×
+  MB2021→CED_2024/2025 (150, Bullwinkel-era set).
+- Boundary-set pins, empirically verified from the ABS allocation files
+  (do **not** re-litigate): CED_2011-era (2010 edition) = 150 seats with
+  Wright, Charlton, Hunter, Fraser, Throsby IN and Fenner/Whitlam OUT;
+  CED_2016-era = **150** (Fenner replaced **Fraser** by NSW rename; Burt
+  new in WA; Charlton abolished → net zero; Whitlam in for Throsby; Hunter
+  retained) — the 2016-row's "151" sketch in early drafts of this note was
+  wrong; CED_2021 xlsx = 151 with Hawke (Stirling renamed); CED_2024 xlsx
+  and CED_2025 xlsx name sets are identical: 150, Bullwinkel IN, Higgins
+  and North Sydney OUT. 2024 = 2025 name sets regardless of the year in the
+  filename.
+- Input product list (what to re-fetch if the Git-ignored
+  `.matilda/seifa-irsad-abs/` caches disappear): `docs/abs-input-sources.md`
+  — SEIFA cubes cat 2033.0.55.001 per census, ASGS Vol 1/3 allocation zips
+  (1270.0.55.001/…003), Ed3 hub allocation files, 2074.0 mesh-block counts.
+- QA gates in-pipeline (fail-loud): per-store boundary-name asserts (the
+  pins above), SA1-decile histogram recon vs the ABS CED distributions
+  cube (2011+2016, EXACT, 150/0 + 150/0 clean), and the 2021-era national
+  decile-population-share check (10%±0.5%).
+- Sanity spot-checks of the emitted store: 2001/2004 top-bottom
+  North Sydney…Bonython; 2007/2010 Bradfield…Wakefield; 2013–2019
+  Bradfield…Lingiari; 2022/2025 Warringah…Fowler; 2028 Warringah…Lingiari.
+  Bullwinkel decile 4.
 
 ## Open items (if a workstream proceeds)
 

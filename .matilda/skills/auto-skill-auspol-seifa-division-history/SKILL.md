@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-division-history
-description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (RR5-Att1 is the ONLY published 2001-census per-division score; the APH trilogy = CIB13/2000-01 1996×2000 + RP09rp02 2006×2006 + RP11rp01 2006×2009, all three PDFs committed 53831398), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/.
+description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (RR5-Att1 is the ONLY published 2001-census per-division score; the APH trilogy = CIB13/2000-01 1996×2000 + RP09rp02 2006×2006 + RP11rp01 2006×2009, all three PDFs committed 53831398), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028.
 source: auto-skill
 extracted_at: '2026-10-23T06:20:52.767Z'
 ---
@@ -14,6 +14,27 @@ released 24/11/1988, five-index variant series). Nothing earlier exists; do
 not extrapolate backward. Full note: `.build/analysis/seifa-index/rr6-official-seifa-products.md`;
 source-page caches in its `src/`, the 2019 pocketbook full-text in
 `pocketbook/`, RR5 pdftotext in `cache/rr5.txt`.
+
+## Landed: the IRSAD store (2026-10-24)
+
+The per-division IRSAD dataset for the seat-model W-history is **built and
+stored**: `.build/analysis/seifa-index/derive-irsad.py` (pipeline + green
+selftest) emits `.build/analysis/seifa-index/irsad-by-division.json` —
+per-election row sets `{2001,2004,2007,2010,2013,2016: 150 · 2019,2022:
+151 · 2025,2028: 150}` of
+`{division, censusYear, editionInForce, irsad, rank, decile, quartile,
+derivation, sourceProduct}`. Rank convention everywhere: **rank 1 = most
+advantaged** (RR5's printed 1=most-disadvantaged is re-based on ingest;
+`rankConvention` key in the JSON documents it). Recipes per election and
+the empirically-pinned boundary name sets (2016-era = **150**, Fenner↔
+Charlton swap, NO net gain; 2024 xlsx == 2025 xlsx name sets, Bullwinkel
+era) are recorded in `rr6-official-seifa-products.md` §9 — read that before
+touching the ladder. The re-fetch manifest for the Git-ignored
+`.matilda/seifa-irsad-abs/` ABS caches is `docs/abs-input-sources.md`.
+QA gates that failed loud during the build and now pass: per-store
+boundary-name pins; 2011+2016 SA1-decile histogram recon vs the ABS CED
+distributions cubes (EXACT, 150/0 twice); 2021-era national decile
+population shares within 10%±0.5%.
 
 ## Who publishes what (the load-bearing facts)
 
