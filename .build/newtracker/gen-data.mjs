@@ -5259,6 +5259,24 @@ if (primaryHistory && !JUR) {
   if (Object.keys(ste).length) primaryHistory.stateElections = ste;
 }
 
+/* twoPPHistory – behind the explainer chart's "View: 2PP" flip (2026-10-23,
+   the facets the user asked for beside the sibling "View: Primary votes":
+   national, each state and territory, and the AEC demographic-rating seat
+   classifications). data/2pp-history.json, written by .build/aec-2pp-history.py:
+   Labor's and the Coalition's two-party-preferred shares at each federal
+   election – national 1972–2025 (polls.json's canonical election records,
+   the same figures every past-cycle panel quotes), states and the four
+   seat classes 2004–2025 (the AEC's Two Party Preferred By Division
+   notional counts, summed). No Senate view: no 2PP exists there, so in
+   this figure the House: control sets aside. Guarded like the primary
+   lane: a missing file drops the flip. */
+const twoPPHistory = (() => {
+  try {
+    const { _comment, ...tp } = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "2pp-history.json"), "utf8"));
+    return tp;
+  } catch { return null; }
+})();
+
 /* ---- 7e. current primary = the 21-day nowcast, per party -----------------
    The reader-facing "current primary" is the headline construction itself –
    trailing 21d, 7d half-life, per-party house effects, sqrt-wave deflation –
@@ -8445,6 +8463,11 @@ window.AUSPOL = (function () {
      vote at each federal election, national and per state, House and
      Senate; nulls are below the 4% fold, never zeros. */
   const primaryHistory = ${JSON.stringify(primaryHistory)};
+  /* The two-party-preferred history behind the explainer chart's View: 2PP
+     flip – Labor's and the Coalition's 2PP shares at each federal election,
+     national since 1972, per state and per seat class 2004–2025; the pair
+     sums to 100 by construction, and no Senate view exists. */
+  const twoPPHistory = ${JSON.stringify(twoPPHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -8708,7 +8731,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

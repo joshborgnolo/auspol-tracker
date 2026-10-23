@@ -6084,6 +6084,7 @@ body.rd .ex-fl-sel { margin-top: 0; }
 body.rd .ex-fl-ctls { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; width: 100%; }
 body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; gap: 0 12px; margin-left: auto; white-space: nowrap; }
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
+body.rd .ex-fl-viewrow > .ex-view + .ex-view { margin-left: 12px; }
 body.rd .ex-fl-adj { all: unset; box-sizing: border-box; position: relative; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); }
 body.rd .ex-fl-adj::before { content: ""; position: absolute; inset: -12px -6px; }
 body.rd .ex-fl-adj-tk { position: relative; flex-shrink: 0; width: 26px; height: 16px; border-radius: 8px; background: var(--ink-faint); transition: background .15s ease; }
@@ -9474,6 +9475,107 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "grn": [11.06, 9.72, 9.61, 9.03],
           "onp": [null, null, 6.65, 5.78],
           "oth": [16.73, 16.02, 18.48, 18.04]
+        }
+      }
+    }
+  };
+  const twoPPHistory = {
+    "fed": {
+      "label": "Federal",
+      "elections": "Australian federal elections",
+      "years": [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+      "alp": [52.7, 51.7, 44.3, 45.4, 49.6, 53.2, 51.8, 50.8, 49.9, 51.4, 46.4, 51, 49, 47.3, 52.7, 50.1, 46.5, 49.6, 48.47, 52.1, 55.2],
+      "lnp": [47.3, 48.3, 55.7, 54.6, 50.4, 46.8, 48.2, 49.2, 50.1, 48.6, 53.6, 49, 51, 52.7, 47.3, 49.9, 53.5, 50.4, 51.53, 47.9, 44.8],
+      "states": {
+        "nsw": {
+          "label": "New South Wales",
+          "elections": "New South Wales electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [48.07, 53.68, 48.84, 45.65, 49.47, 48.22, 51.42, 55.27],
+          "lnp": [51.93, 46.32, 51.16, 54.35, 50.53, 51.78, 48.58, 44.73]
+        },
+        "vic": {
+          "label": "Victoria",
+          "elections": "Victoria electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [49, 54.27, 55.31, 50.2, 51.83, 53.14, 54.83, 56.35],
+          "lnp": [51, 45.73, 44.69, 49.8, 48.17, 46.86, 45.17, 43.65]
+        },
+        "qld": {
+          "label": "Queensland",
+          "elections": "Queensland electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [42.91, 50.44, 44.86, 43.02, 45.9, 41.56, 45.95, 49.42],
+          "lnp": [57.09, 49.56, 55.14, 56.98, 54.1, 58.44, 54.05, 50.58]
+        },
+        "wa": {
+          "label": "Western Australia",
+          "elections": "Western Australia electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [44.6, 46.74, 43.59, 41.72, 45.34, 44.45, 55, 55.84],
+          "lnp": [55.4, 53.26, 56.41, 58.28, 54.66, 55.55, 45, 44.16]
+        },
+        "sa": {
+          "label": "South Australia",
+          "elections": "South Australia electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [45.64, 52.4, 53.18, 47.64, 52.27, 50.71, 53.97, 59.2],
+          "lnp": [54.36, 47.6, 46.82, 52.36, 47.73, 49.29, 46.03, 40.8]
+        },
+        "tas": {
+          "label": "Tasmania",
+          "elections": "Tasmania electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [54.19, 56.21, 60.62, 51.23, 57.36, 55.96, 54.33, 63.34],
+          "lnp": [45.81, 43.79, 39.38, 48.77, 42.64, 44.04, 45.67, 36.66]
+        },
+        "act": {
+          "label": "Australian Capital Territory",
+          "elections": "Australian Capital Territory electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [61.54, 63.4, 61.67, 59.91, 61.13, 61.61, 66.95, 72.49],
+          "lnp": [38.46, 36.6, 38.33, 40.09, 38.87, 38.39, 33.05, 27.51]
+        },
+        "nt": {
+          "label": "Northern Territory",
+          "elections": "Northern Territory electorates at federal elections",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [52.15, 55.41, 50.74, 49.65, 57.06, 54.2, 55.54, 54.25],
+          "lnp": [47.85, 44.59, 49.26, 50.35, 42.94, 45.8, 44.46, 45.75]
+        }
+      },
+      "classes": {
+        "inner": {
+          "label": "Inner metropolitan",
+          "elections": "federal elections in inner metro seats",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [53.01, 56.94, 53.37, 50.64, 52.48, 53.34, 59.17, 63.31],
+          "lnp": [46.99, 43.06, 46.63, 49.36, 47.52, 46.66, 40.83, 36.69],
+          "short": "inner metro"
+        },
+        "outer": {
+          "label": "Outer metropolitan",
+          "elections": "federal elections in outer metro seats",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [48.45, 53.97, 52.72, 48.16, 52.14, 50.94, 54.24, 57.94],
+          "lnp": [51.55, 46.03, 47.28, 51.84, 47.86, 49.06, 45.76, 42.06],
+          "short": "outer metro"
+        },
+        "provincial": {
+          "label": "Provincial",
+          "elections": "federal elections in provincial seats",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [49.72, 55.31, 52.88, 48.98, 52.01, 48.79, 51.46, 53.5],
+          "lnp": [50.28, 44.69, 47.12, 51.02, 47.99, 51.21, 48.54, 46.5],
+          "short": "provincial"
+        },
+        "rural": {
+          "label": "Rural",
+          "elections": "federal elections in rural seats",
+          "years": [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025],
+          "alp": [39.77, 45.67, 42.71, 39.16, 42.53, 39.72, 41.98, 43.95],
+          "lnp": [60.23, 54.33, 57.29, 60.84, 57.47, 60.28, 58.02, 56.05],
+          "short": "rural"
         }
       }
     }
@@ -100633,6 +100735,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     flowTables,
     flowHistory,
     primaryHistory,
+    twoPPHistory,
     adjusted,
     houseEffects,
     houseLean,
@@ -144813,6 +144916,97 @@ function ExplainedPrimaryChart({
     }
   }, cap));
 }
+const TWO_PARTIES = [{
+  id: "alp",
+  name: "Labor",
+  color: "var(--alp)"
+}, {
+  id: "lnp",
+  name: "Coalition",
+  color: "var(--lnp)"
+}];
+function Explained2ppChart({
+  stateKey,
+  classKey,
+  menu
+}) {
+  const narrow = useNarrow(window.MQ_PHONE);
+  const TP = window.AUSPOL.twoPPHistory || null;
+  if (!TP || !TP.fed) return null;
+  const S = classKey && (TP.fed.classes || {})[classKey] || stateKey && (TP.fed.states || {})[stateKey] || TP.fed;
+  const YEARS = S.years || [];
+  if (!YEARS.length) return null;
+  const series = TWO_PARTIES.filter(p => (S[p.id] || []).some(v => v != null)).map(p => ({
+    id: p.id,
+    label: p.name,
+    color: p.color,
+    points: YEARS.map((x, i) => ({
+      x,
+      y: S[p.id][i]
+    })),
+    smooth: false,
+    rdWidth: 2.5,
+    endCap: true,
+    endLabel: !narrow ? p.name : null
+  }));
+  const pad1 = YEARS.length > 1 ? 0 : 1;
+  const x0 = YEARS[0] - pad1,
+    x1 = YEARS[YEARS.length - 1] + pad1;
+  const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
+  const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
+  const cap = (classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (classKey || stateKey ? " The per-division two-party download reaches back to the 2004 election." : "") + (classKey ? " The class cuts run 2004 on, not 1996 like the primary view's: the notional count does not exist for the typed era." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the two lines are each other's mirror, and the halfway mark is where the lead changes hands.";
+  const lo = Math.floor(series.reduce((m, s) => s.points.reduce((mm, p) => Math.min(mm, p.y), m), 100) / 5) * 5;
+  const hi = 100 - lo;
+  const yStep = hi - lo > 30 ? 10 : 5;
+  const YT = [];
+  for (let v = lo; v <= hi; v += yStep) YT.push(v);
+  if (!YT.includes(50)) YT.splice(YT.findIndex(v => v > 50), 0, 50);
+  const lines = series.map(s => ({
+    kind: "line",
+    color: s.color,
+    label: s.label
+  }));
+  return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-chead ex-fl-head"
+  }, React.createElement("span", {
+    className: "rd-chead-t"
+  }, "Two-party preferred, Labor v Coalition, %", React.createElement("span", {
+    className: "rd-chead-meta"
+  }, scope)), menu), narrow && React.createElement(RdKey, {
+    items: lines,
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, _extends({
+    key: "ex-2pp-" + (stateKey || "") + (classKey || "")
+  }, exFrame(narrow), {
+    xDomain: [x0, x1],
+    yDomain: [lo, hi],
+    yTicks: YT,
+    yTickFmt: v => v === YT[YT.length - 1] ? v + "%" : String(v),
+    xTicks: YEARS.map(x => ({
+      x,
+      label: String(x)
+    })),
+    unit: "%",
+    fmt: v => v.toFixed(1),
+    series: series,
+    tooltipTitle: i => YEARS[i] + " · " + (S.short || S.label),
+    ariaLabel: "Two-party-preferred vote shares, Labor v Coalition, " + S.label + ", " + span,
+    copy: {
+      title: "Two-party-preferred shares, Labor v Coalition, " + (S.short || S.label),
+      sub: rdCap(S.elections || S.label + " elections") + ". Official AEC counts.",
+      caption: "Official AEC counts; the two lines mirror around 50%, the half of the two-party count.",
+      legend: narrow ? lines : []
+    }
+  })), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: []
+  }), React.createElement(RdFoot, {
+    how: {
+      term: "flow-history",
+      from: "Preference flows explained"
+    }
+  }, cap));
+}
 function RdExplained() {
   const ref = useRef(null);
   const secRef = useRef(null);
@@ -144840,10 +145034,14 @@ function RdExplained() {
   const onSenMode = house === "sen" && !!SEN_ON_BANK;
   const [inv, setInv] = useState(false);
   const PH_HIST = window.AUSPOL.primaryHistory || null;
+  const TP_HIST = window.AUSPOL.twoPPHistory || null;
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
+  const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
+  const figView = primMode || twoMode;
   const PH_CLASSES = PH_HIST && PH_HIST.fed && PH_HIST.fed.classes || {};
-  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : FED_CLASSES;
+  const TP_CLASSES = TP_HIST && TP_HIST.fed && TP_HIST.fed.classes || {};
+  const classBank = primMode ? house === "sen" ? {} : PH_CLASSES : twoMode ? TP_CLASSES : FED_CLASSES;
   const classKey = view.startsWith("fedcl:") && classBank[view.slice(6)] ? view.slice(6) : null;
   const badClass = view.startsWith("fedcl:") && !classKey;
   const STATE_PRIM = PH_HIST && PH_HIST.stateElections || {};
@@ -144853,7 +145051,8 @@ function RdExplained() {
   const steLcView = view === "ste:nswlc" && !!LC_PRIM;
   const steView = !!steKey || steLcView;
   const stePrim = steLcView ? LC_PRIM : steKey ? STATE_PRIM[steKey] : null;
-  const setFlowsFig = () => setFig(m => m === "flows" ? "primary" : "flows");
+  const setPrimaryFig = () => setFig(m => m === "primary" ? "flows" : "primary");
+  const setTwoFig = () => setFig(m => m === "2pp" ? "flows" : "2pp");
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
   const flipHouse = () => {
@@ -144865,6 +145064,7 @@ function RdExplained() {
       } else if (steLcView) setView("ste:nsw");
       return;
     }
+    if (twoMode) return;
     if (next === "sen") {
       if (view === "nsw" && LC_BANK) setView("nswlc");else if (classKey || !fedView || pair === "on" && stateKey && !hasOnCells(stateKey)) setView("fed");
     } else if (lcView) setView("nsw");
@@ -144881,7 +145081,7 @@ function RdExplained() {
   }, []);
   const pairStep = React.useRef(null);
   pairStep.current = dir => {
-    if (primMode) return false;
+    if (figView) return false;
     const i = EX_PAIRS.findIndex(x => x.id === pair);
     if (i < 0) return false;
     setPair(EX_PAIRS[(i + dir + EX_PAIRS.length) % EX_PAIRS.length].id);
@@ -144935,7 +145135,7 @@ function RdExplained() {
   }, []);
   const spaceShare = React.useRef(null);
   spaceShare.current = () => {
-    if (!primMode) setInv(v => !v);
+    if (!figView) setInv(v => !v);
   };
   React.useEffect(() => {
     const card = cardEl.current;
@@ -144974,14 +145174,16 @@ function RdExplained() {
     setPair(p);
     if (p === "on" && house === "sen" && (lcView && !LC_ON_BANK || stateKey && !hasOnCells(stateKey))) setView("fed");
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? LC_PRIM ? ["ste:nswlc"] : [] : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? LC_PRIM ? ["ste:nswlc"] : [] : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
     if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
     if (!primMode && steView) setView("fed");
-  }, [primMode, badClass, lcView, fedView, steView]);
-  const menuShow = primMode ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
-  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
-  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
+    if (twoMode && (badClass || lcView || !fedView)) setView("fed");
+    if (twoMode && house !== "rep") setHouse("rep");
+  }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
+  const menuShow = figView ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
+  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
+  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
@@ -144994,15 +145196,15 @@ function RdExplained() {
   }, "Federal, national"), menuKeys.map(k => React.createElement("option", {
     key: k,
     value: "fed:" + k
-  }, "Federal, " + (menuBank[k].short || menuBank[k].label))), (primMode ? Object.keys(classBank) : house === "sen" ? [] : classKeys).map(k => React.createElement("option", {
+  }, "Federal, " + (menuBank[k].short || menuBank[k].label))), (figView ? Object.keys(classBank) : house === "sen" ? [] : classKeys).map(k => React.createElement("option", {
     key: "fedcl:" + k,
     value: "fedcl:" + k
-  }, "Federal, " + (classBank[k].short || classBank[k].label)))), !primMode && house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
+  }, "Federal, " + (classBank[k].short || classBank[k].label)))), !figView && house !== "sen" && KEYS.length > 1 && React.createElement("optgroup", {
     label: "State elections"
   }, KEYS.filter(k => k !== "fed").map(k => React.createElement("option", {
     key: k,
     value: k
-  }, (FH[k].short || FH[k].label) + " state elections"))), !primMode && house === "sen" && (pair === "on" ? LC_ON_BANK : LC_BANK) && React.createElement("optgroup", {
+  }, (FH[k].short || FH[k].label) + " state elections"))), !figView && house === "sen" && (pair === "on" ? LC_ON_BANK : LC_BANK) && React.createElement("optgroup", {
     label: "State elections"
   }, React.createElement("option", {
     value: "nswlc"
@@ -145031,7 +145233,7 @@ function RdExplained() {
   }, (inv ? rival : "Labor") + "’s"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4")));
-  const houseCtl = SEN_BANK ? React.createElement("span", {
+  const houseCtl = SEN_BANK && !twoMode ? React.createElement("span", {
     className: "rd-pl-ctl ex-house"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -145046,7 +145248,9 @@ function RdExplained() {
   }, house === "sen" ? "Upper" : "Lower"), " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"))) : null;
-  const viewCtl = PH_HIST && PH_HIST.fed && PH_HIST.fed.sen ? React.createElement("span", {
+  const phViewOk = !!(PH_HIST && PH_HIST.fed && PH_HIST.fed.sen);
+  const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
+  const viewCtl = phViewOk || tpViewOk ? React.createElement(React.Fragment, null, phViewOk && React.createElement("span", {
     className: "rd-pl-ctl ex-view"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -145055,17 +145259,31 @@ function RdExplained() {
     className: "rd-pl-flip",
     "aria-pressed": primMode,
     title: primMode ? "Switch to the preference-flow history" : "Switch to first-preference vote shares at every election",
-    onClick: setFlowsFig
+    onClick: setPrimaryFig
   }, React.createElement("span", {
     className: "rd-pl-flip-t"
-  }, primMode ? "Primary votes" : "Preference flows"), " ", React.createElement("span", {
+  }, "Primary votes"), " ", React.createElement("span", {
     "aria-hidden": "true"
-  }, "\u21C4"))) : null;
+  }, "\u21C4"))), tpViewOk && React.createElement("span", {
+    className: "rd-pl-ctl ex-view"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "View:"), React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    "aria-pressed": twoMode,
+    title: twoMode ? "Switch to the preference-flow history" : "Switch to two-party preferred shares at every election",
+    onClick: setTwoFig
+  }, React.createElement("span", {
+    className: "rd-pl-flip-t"
+  }, "2PP"), " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")))) : null;
   const headCtls = narrow ? React.createElement("span", {
     className: "ex-fl-ctls"
   }, menu, React.createElement("span", {
     className: "ex-fl-flips"
-  }, houseCtl, primMode ? null : share)) : menu;
+  }, houseCtl, figView ? null : share)) : menu;
   return React.createElement("section", {
     ref: secRef,
     className: "rd-sec rd-explained",
@@ -145103,7 +145321,11 @@ function RdExplained() {
       id: p.id,
       label: narrow ? p.short : p.label
     }))
-  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, primMode ? null : share)), primMode ? React.createElement(ExplainedPrimaryChart, {
+  }, narrow ? null : React.createElement(React.Fragment, null, houseCtl, figView ? null : share)), twoMode ? React.createElement(Explained2ppChart, {
+    stateKey: stateKey,
+    classKey: classKey,
+    menu: headCtls
+  }) : primMode ? React.createElement(ExplainedPrimaryChart, {
     house: house,
     stateKey: stateKey,
     classKey: classKey,
