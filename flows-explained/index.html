@@ -1076,6 +1076,7 @@ body.dark .sens-band { opacity: 0.10; }
 .poll-detail.copy-wide .poll-copy-btn,
 .poll-detail.copy-wide .pd-meta-tail { display: none; }
 .grid { stroke: var(--line-2); stroke-width: 1; }
+.grid.tick-emph { stroke: var(--line); }
 .refline { stroke-width: 1.4; stroke-dasharray: 2 5; opacity: 0.85; }
 .refline-label {
   font-family: var(--sans); font-size: 12px; font-weight: 600;
@@ -1113,6 +1114,7 @@ body.dark .sens-band { opacity: 0.10; }
 .axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13px; transition: fill .35s ease; }
 .axis-label.y { text-anchor: end; font-weight: 500; }
 .axis-label.x { font-weight: 500; }
+.axis-label.tick-emph { font-weight: 700; }
 .scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .2s ease; cursor: pointer; }
 .series-line { transition: opacity .2s ease; }
 .fade-mark { transition: opacity .2s ease; }
@@ -104498,6 +104500,7 @@ function TrendChart(props) {
     yTicks = [],
     xTicks = [],
     refLines = [],
+    yTickEmph = null,
     padSeries = null,
     bands = [],
     areas = [],
@@ -105620,9 +105623,11 @@ function TrendChart(props) {
       now = new Set(yTicks);
     const all = was ? [...new Set(yTicks.concat(mf.yTicks || []))] : yTicks;
     const labWas = was ? yLabelledOf(mf.yTicks || []) : null;
+    const emphSet = yTickEmph == null ? null : new Set([].concat(yTickEmph));
     return all.map(t => {
       const e = edgeOp(t);
       if (e <= 0) return null;
+      const emph = emphSet && emphSet.has(t) ? " tick-emph" : "";
       const inNow = now.has(t),
         inWas = !!was && was.has(t);
       const gOp = e * (was ? inNow && inWas ? 1 : inNow ? mT : 1 - mT : 1);
@@ -105631,7 +105636,7 @@ function TrendChart(props) {
       const txt = (s0, op) => s0 == null || op <= 0 ? null : React.createElement("text", {
         x: pad.l - (rd ? PX(8) : 10),
         y: sy(t),
-        className: "axis-label y",
+        className: "axis-label y" + emph,
         dominantBaseline: "middle",
         style: op < 1 ? {
           fontSize: axisUnits,
@@ -105648,7 +105653,7 @@ function TrendChart(props) {
         x2: W - pad.r,
         y1: sy(t),
         y2: sy(t),
-        className: "grid",
+        className: "grid" + emph,
         style: gOp < 1 ? {
           opacity: gOp
         } : null
@@ -145050,6 +145055,7 @@ function Explained2ppChart({
     xDomain: [x0, x1],
     yDomain: [lo, hi],
     yTicks: YT,
+    yTickEmph: 50,
     yTickFmt: v => v === YT[YT.length - 1] ? v + "%" : String(v),
     xTicks: YEARS.map(x => ({
       x,

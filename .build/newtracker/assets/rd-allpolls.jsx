@@ -6357,7 +6357,8 @@ function Explained2ppChart({ stateKey, classKey, inv, menu }) {
      pick ever moves it - mirrored on its other side, so the Share: flip
      never moves it either (Labor's cells price both sides by the count's
      sum). 50 itself stays a tick - the yard a two-party chart is read
-     against */
+     against - and it is the one tick drawn emphatic (user 2026-10-24:
+     the halfway label bold, its rule a rung darker, via yTickEmph) */
   let dev = 0;
   [TP.fed, ...Object.keys(TP.fed.states || {}).map((k) => TP.fed.states[k]),
     ...Object.keys(TP.fed.classes || {}).map((k) => TP.fed.classes[k])].forEach((v) =>
@@ -6380,6 +6381,7 @@ function Explained2ppChart({ stateKey, classKey, inv, menu }) {
         xDomain={[x0, x1]}
         yDomain={[lo, hi]}
         yTicks={YT}
+        yTickEmph={50}
         yTickFmt={(v) => (v === YT[YT.length - 1] ? v + "%" : String(v))}
         xTicks={YEARS.map((x) => ({ x, label: String(x) }))}
         unit="%" fmt={(v) => v.toFixed(1)}

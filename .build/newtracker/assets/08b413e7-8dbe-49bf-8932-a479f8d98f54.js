@@ -153,6 +153,9 @@ function straightPath(pts, sx, sy) {
  *           panel's group view, whose dots rest on a subsample, not the
  *           poll's full n).
  *  yTicks:  [numbers]   xTicks: [{x,label}]
+ *  yTickEmph: number | [numbers]  y tick(s) drawn emphatic - the two-party
+ *           chart's halfway mark 50 (user 2026-10-24): the rule deepens a
+ *           rung and the label goes bold (the .tick-emph pair in template)
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y, point?) => string  for tooltip/axis – the point comes along
@@ -205,6 +208,7 @@ function TrendChart(props) {
        one frame later, the trade the lead gauge's seed already takes. */
     widthSeed = null,
     series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
+    yTickEmph = null,
     /* `padSeries`: extra series to reserve right margin for even though they
        are not being drawn. The PPM switch's two views print different end
        labels; priced per drawn set, each view would reserve its own margin
@@ -1505,20 +1509,24 @@ function TrendChart(props) {
           const was = mf ? new Set(mf.yTicks || []) : null, now = new Set(yTicks);
           const all = was ? [...new Set(yTicks.concat(mf.yTicks || []))] : yTicks;
           const labWas = was ? yLabelledOf(mf.yTicks || []) : null;
+          const emphSet = yTickEmph == null ? null : new Set([].concat(yTickEmph));
           return all.map((t) => {
             const e = edgeOp(t);
             if (e <= 0) return null;
+            /* an emphatic tick (yTickEmph - the two-party chart's halfway
+               50, user 2026-10-24): deeper rule, bold label */
+            const emph = emphSet && emphSet.has(t) ? " tick-emph" : "";
             const inNow = now.has(t), inWas = !!was && was.has(t);
             const gOp = e * (was ? (inNow && inWas ? 1 : inNow ? mT : 1 - mT) : 1);
             const tNow = inNow && yLabelled.has(t) ? lab(yTickFmt, t) : null;
             const tWas = inWas && labWas.has(t) ? lab(mf.yTickFmt || yTickFmt, t) : null;
             const txt = (s0, op) => (s0 == null || op <= 0 ? null : (
-              <text x={pad.l - (rd ? PX(8) : 10)} y={sy(t)} className="axis-label y" dominantBaseline="middle"
+              <text x={pad.l - (rd ? PX(8) : 10)} y={sy(t)} className={"axis-label y" + emph} dominantBaseline="middle"
                     style={op < 1 ? { fontSize: axisUnits, opacity: op } : { fontSize: axisUnits }}>{s0}</text>
             ));
             return (
               <g key={"y" + t} data-k={"y" + t}>
-                <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className="grid" style={gOp < 1 ? { opacity: gOp } : null} />
+                <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className={"grid" + emph} style={gOp < 1 ? { opacity: gOp } : null} />
                 {was && tWas !== tNow
                   ? <>{txt(tWas, e * textOut(mT))}{txt(tNow, e * textIn(mT))}</>
                   : txt(tNow, e)}

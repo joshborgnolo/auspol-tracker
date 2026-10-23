@@ -1679,6 +1679,9 @@ body.dark .sens-band { opacity: 0.10; }
 .poll-detail.copy-wide .poll-copy-btn,
 .poll-detail.copy-wide .pd-meta-tail { display: none; }
 .grid { stroke: var(--line-2); stroke-width: 1; }
+/* an emphatic y tick (TrendChart's yTickEmph, the two-party chart's
+   halfway mark; user 2026-10-24): the rule deepens a rung */
+.grid.tick-emph { stroke: var(--line); }
 .refline { stroke-width: 1.4; stroke-dasharray: 2 5; opacity: 0.85; }
 .refline-label {
   font-family: var(--sans); font-size: 12px; font-weight: 600;
@@ -1729,6 +1732,7 @@ body.dark .sens-band { opacity: 0.10; }
 .axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13px; transition: fill .35s ease; }
 .axis-label.y { text-anchor: end; font-weight: 500; }
 .axis-label.x { font-weight: 500; }
+.axis-label.tick-emph { font-weight: 700; }
 /* No colour transitions on the marks: a switch moves their colour on its
    own clock, frame by frame, and a CSS transition restarted by every one of
    those frames dragged the colour behind the line and was still settling
