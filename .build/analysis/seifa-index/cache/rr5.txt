@@ -1,0 +1,560 @@
+Research Report Number 5
+January 2005
+
+
+
+
+      Analysis of Electoral Divisions Classifications
+ISSN             0816-3154
+Author           Gerry Newman
+
+
+
+
+Enquiries
+
+Information on Research publications are available on the AEC website: www.aec.gov.au. Other
+enquiries can be made by e-mail to the Research Section of the AEC: info@aec.gov.au. Phone (02)
+6271 4411
+
+
+                                                                                                  2
+Analysis of Electoral Divisions Classifications
+
+Introduction
+
+The Australian Electoral Commission (AEC) has been classifying electoral divisions since
+1975. The current classification system categorises electorates on the basis of party safeness
+and socio-demographic criteria and forms an integral part of the AEC’s mandate to inform the
+public by making election results more meaningful.
+The definition and application of these criteria over the period have not been consistent and
+this has led to anomalies in the classification process. To address this situation the AEC has
+reviewed the classification system. A new system will be in place following the 2004 federal
+election.
+
+Classification of electoral divisions will be based on three categories:
+
+Party safeness;
+Geographic criteria; and
+Socio-economic classification.
+
+The proposed system will build on and enhance the existing categories to provide a more
+consistent and accurate classification system. The enhanced system will allow for better
+targeting of like areas by the AEC and enhance the quality of election result analysis.
+
+Current electoral division classifications
+
+The AEC currently categorises electoral divisions according to two classifications:
+      Party safeness; and
+      Socio-demographic criteria.
+
+Party safeness
+
+The party safeness classification categorises divisions according to the party holding the
+division (or notionally holding the division after the effects of a redistribution are taken into
+account) and the margin in two party preferred terms. In the case of a division held by an
+Independent the margin is based on a two candidate preferred analysis.
+
+There are currently five party categories:
+   • Australian Labor Party (ALP);
+   • Liberal Party (LP);
+   • National Party (NP);
+   • Northern Territory Country Liberal Party (CLP); and
+   • Independent.
+
+The margin categories are classified as:
+   • Marginal: requiring a swing of 0<6% to change;
+   • Fairly safe: requiring a swing of between 6<10% to change; and
+   • Safe: requiring a swing of 10%+ to change.
+
+
+
+
+Socio-demographic criteria
+
+The socio-demographic classification categorises divisions according to geographic location.
+There are four categories:
+
+
+                                                                                               3
+    •   Inner metropolitan: located in a capital city and comprising well-established, built-up
+        suburbs;
+    •   Outer metropolitan: located in capital cities and containing areas of more recent urban
+        expansion;
+    •   Provincial: divisions with a majority of enrolment in major provincial cities; and
+    •   Rural: divisions without a majority of enrolment in major provincial cities.
+
+The current classifications have been used since at least the 1975 election.
+
+Improving the classification of electoral divisions
+
+The allocation of divisions to categories has not been centrally co-ordinated and this has
+resulted in ad hoc, and at times inconsistent, classification decisions. Inconsistencies also
+occur because although there are definitions to assist in categorising divisions, these are not
+particularly exhaustive nor have they been consistently followed. For example, at the 2004
+election the division of Capricornia was classified as provincial as 50.5% of its electors are
+enrolled in Rockhampton. However, both Fairfax and Leichhardt were classified as rural
+even though their respective enrolment was 51.1% based in the Sunshine Coast and 73.9% in
+Cairns. This kind of anomaly is undesirable as areas with the same demographic and
+geographic characteristics should be similarly classified.
+
+The two current classifications cover geographic and political considerations. They do not
+address socio-economic status issues. A third socio-economic classification will be added to
+the existing categories to enable the analysis of election results by socio-economic status as
+well as geographic area and party preference.
+
+A third category: socio-economic classification
+
+The Australian Bureau of Statistics (ABS) publishes Socio-economic Indexes for Areas based
+on aggregations of Census data. These indexes can be aggregated to electoral division level1
+and provide a useful summary of the socio-economic characteristics of the area. The ABS
+publishes four socio-economic indexes.                The “Index of Socio-Economic
+Advantage/Disadvantage” is a general measure of the social and economic well-being of an
+area and, of the four, is the most appropriate measure to indicate a division’s relative socio-
+economic status.
+
+The socio-economic classification of electoral divisions will divide divisions into four
+roughly equal categories – high, upper middle, lower middle and low – based on each
+division’s index of socio-economic advantage score. Attachment 1 provides a socio-
+economic index score for each electoral division contested at the 2001 federal election.
+
+Reviewing geographic classification
+
+The following table outlines revised definitions of current socio-demographic classifications.
+Based on the addition of the socio-economic classification to more accurately reflect issues of
+socio-economic status, this category will now be referred to as geographic classification and
+focus specifically on the characteristics of a division’s geographic area.
+
+
+        Inner Metropolitan        Divisions with an area of less than 10 000 sq kms, and
+                                  Divisions with a majority of electors within capital city
+                                  statistical division, and
+                                  Divisions comprising well established built up suburbs.
+
+1
+ The index scores for the Electoral Divisions are calculated by taking the weighted average, using
+population counts from the 2001 census across all Census Collection Districts for the Division. For
+more information see Socio-Economic Indexes for Areas Australia 2001 Australian Bureau of
+Statistics, Information Paper 2039.0, Section 2.2
+                                                                                                      4
+       Outer Metropolitan        Divisions with an area of less than 10 000 sq kms, and
+                                 Divisions with a majority of electors within capital city
+                                 statistical division, and
+                                 Divisions containing areas of more recent urban expansion.
+       Provincial                Divisions with an area of less than 10 000 sq kms, and
+                                 Divisions with a majority of electors outside capital city
+                                 statistical division, and
+                                 Divisions with a majority of electors in major provincial
+                                 centres with a population of 50 000 or more.
+       Rural                     Divisions with an area of 10 000 sq kms or more, or
+                                 Divisions with an area of less than 10 000 sq kms and not
+                                 classified as Metropolitan or Provincial.
+
+All divisions of 10,000 square kilometres or more will be classified as rural, regardless of
+where the majority of their enrolment is located.
+
+The new geographic classification is simply a refinement to the existing classification
+structure. It is more rigorous and subject to less subjective judgement than the existing
+classification. Refining the definition will have a minimal impact on current classifications, as
+less than 15% of divisions will have their classification altered. It will however make
+classification decisions more accurate and ensure like divisions are categorised consistently.
+The use of area specific criteria will also assist in making more meaningful the classification
+of divisions such as the Northern Territory, where there are a number of contradictory
+indicators.
+
+A list of divisions whose geographic classification is proposed to change is at Attachment 2.
+
+Managing the Classification Process
+
+The AEC will continue assigning classification categories to electoral divisions.
+Classification decisions will only be made after consultation with the Australian Electoral
+Officer of the relevant State or Territory.
+
+There will be three categories of classification:
+   • the existing classification according to party safeness;
+   • geographic classification which, as outlined above will build on and clarify the
+       existing socio-demographic classification; and
+   • a new category based on socio-economic criteria and as outlined above.
+
+The allocation of electoral divisions to classification categories will be undertaken according
+to the following schedule:
+     • geographic classification: after each redistribution in a State or Territory;
+     • party safeness classification: after each House of Representatives election OR after
+         each redistribution in a State or Territory; and
+     • socio-economic classification: after each population census OR after each
+         redistribution of a State or Territory.
+
+Attachment 3 lists of electoral divisions against the three categories of classification.
+
+The classification of divisions will be reviewed following a House of Representatives
+election, a population census or a redistribution. The results of this review will be
+promulgated through AEC publications and web media with a record of divisional
+classification to be kept on the Roll Management System (RMANS). The first review of
+electoral divisions against the three categories of party safeness, geographic criteria and
+socio-economic status will occur following the 2004 federal election.
+
+
+
+
+                                                                                                5
+Any comments?
+
+If you have any comments to make on the proposed change to the system of electoral division
+classification please send them to the Australian Electoral Commission via: info@aec.gov.au.
+We appreciate your feedback.
+
+
+
+
+                                                                                          6
+Attachment 1: Electoral Divisions ranked by the Index of Relative Socio-Economic Advantage/Disadvantage
+2001 Electoral Boundaries, 2001 Census
+
+
+Rank     Electoral Division                Index      Rank     Electoral Division                    Index
+LOW                                                   UPPER MIDDLE
+    1 Bonython (SA)                             882      76 Batman (Vic)                                   989
+    2 Fowler (NSW)                              891      77 Kalgoorlie (WA)                                989
+    3 Wide Bay (Qld)                            906      78 Newcastle (NSW)                                990
+    4 Lyons (Tas)                               908      79 Leichhardt (Qld)                               990
+    5 Braddon (Tas)                             908      80 McEwan (Vic)                                   991
+    6 Cowper (NSW)                              922      81 Burke (Vic)                                    991
+    7 Page (NSW)                                923      82 Herbert (Qld)                                  993
+    8 Barker (SA)                               923      83 Moncrieff (Qld)                                994
+    9 Hinkler (Qld)                             925      84 Macarthur (NSW)                                997
+   10 Lyne (NSW)                                925      85 Fadden (Qld)                                   997
+   11 Grey (SA)                                 927      86 Petrie (Qld)                                   997
+   12 Longman (Qld)                             928      87 Isaacs (Vic)                                   999
+   13 Gwydir (NSW)                              929      88 Hindmarsh (SA)                                1000
+   14 Blair (Qld)                               932      89 Hotham (Vic)                                  1000
+   15 Chifley (NSW)                             933      90 Bowman (Qld)                                  1002
+   16 Throsby (NSW)                             933      91 Robertson (NSW)                               1002
+   17 Brand (WA)                                933      92 Cowan (WA)                                    1002
+   18 Wakefield (SA)                            935      93 Dunkley (Vic)                                 1003
+   19 Oxley (Qld)                               935      94 Wills (Vic)                                   1004
+   20 Port Adelaide (SA)                        936      95 Corangamite (Vic)                             1004
+   21 Paterson (NSW)                            938      96 Stirling (WA)                                 1005
+   22 Maranoa (Qld)                             939      97 Denison (Tas)                                 1008
+   23 Kennedy (Qld)                             939      98 Fremantle (WA)                                1008
+   24 Parkes (NSW)                              940      99 Lindsay (NSW)                                 1014
+   25 Holt (Vic)                                942    100 Perth (WA)                                     1015
+   26 Mallee (Vic)                              943    101 Greenway (NSW)                                 1016
+   27 Hunter (NSW)                              943    102 Bruce (Vic)                                    1017
+   28 Murray (Vic)                              944    103 Swan (WA)                                      1018
+   29 O’Connor (WA)                             946    104 Banks (NSW)                                    1020
+   30 Gippsland (Vic)                           946    105 Casey (Vic)                                    1020
+   31 Kingston (SA)                             946    106 Lilley (Qld)                                   1021
+   32 Bass (Tas)                                947    107 La Trobe (Vic)                                 1028
+   33 Dawson (Qld)                              947    108 Dickson (Qld)                                  1029
+   34 Rankin (Qld)                              947    109 Cunningham (NSW)                               1029
+   35 Shortland (NSW)                           948    110 Mayo (SA)                                      1035
+   36 Bendigo (Vic)                             948    111 Barton (NSW)                                   1038
+   37 Richmond (NSW)                            948 HIGH
+LOWER MIDDLE                                           112 Macquarie (NSW)                                1043
+   38 Reid (NSW)                                949    113 Solomon (NT)                                   1052
+   39 Corio (Vic)                               949    114 Parramatta (NSW)                               1052
+   40 New England (NSW)                         950    115 Sturt (SA)                                     1052
+   41 Fairfax (Qld)                             950    116 Adelaide (SA)                                  1053
+   42 Blaxland (NSW)                            951    117 Boothby (SA)                                   1054
+   43 McMillan (Vic)                            951    118 Moreton (Qld)                                  1055
+   44 Wannon (Vic)                              952    119 Aston (Vic)                                    1055
+   45 Forde (Qld)                               953    120 Deakin (Vic)                                   1057
+   46 Farrer (NSW)                              956    121 Griffith (Qld)                                 1064
+   47 Forrest (WA)                              958    122 Moore (WA)                                     1064
+   48 Riverina (NSW)                            959    123 Kingston-Smith (NSW)                           1069
+   49 Maribyrnong (Vic)                         959    124 Jagajaga (Vic)                                 1076
+   50 Gilmore (NSW)                             961    125 Chisholm (Vic)                                 1077
+   51 Ballarat (Vic)                            963    126 Grayndler (NSW)                                1082
+   52 Calare (NSW)                              963    127 Cook (NSW)                                     1085
+   53 Capricornia (Qld)                         965    128 Tangney (WA)                                   1086
+
+                                                                                                      7
+LOWER MIDDLE (continued)         HIGH (continued)
+   54 Indi (Vic)           965      129 Hughes (NSW)                1093
+   55 Fisher (Qld)         967      130 Melbourne (Vic)             1095
+   56 Franklin (Tas)       967      131 Lowe (NSW)                  1095
+   57 Scullin (Vic)        967      132 Menzies (Vic)               1101
+   58 Calwell (Vic)        968      133 Brisbane (Qld)              1103
+   59 Charlton (NSW)       969      134 Bennelong (NSW)             1114
+   60 Gellibrand (Vic)     970      135 Mackellar (NSW)             1115
+   61 Prospect (NSW)       971      136 Fraser (ACT)                1121
+   62 Groom (Qld)          972      137 Canberra (ACT)              1123
+   63 Flinders (Vic)       973      138 Goldstein (Vic)             1127
+   64 Hasluck (WA)         973      139 Ryan (Qld)                  1135
+   65 Canning (WA)         976      140 Sydney (NSW)                1140
+   66 Dobell (NSW)         977      141 Berowra (NSW)               1140
+   67 Werriwa (NSW)        979      142 Melbourne Ports (Vic)       1144
+   68 Lalor (Vic)          979      143 Mitchell (NSW)              1145
+   69 Pearce (WA)          984      144 Curtin (WA)                 1150
+   70 Watson (NSW)         985      145 Warringah (NSW)             1152
+   71 McPherson (Qld)      985      146 Higgins (Vic)               1162
+   72 Makin (SA)           985      147 Kooyong (Vic)               1175
+   73 Eden-Monaro (NSW)    986      148 Wentworth (NSW)             1182
+   74 Lingiari (NT)        987      149 North Sydney (NSW)          1204
+   75 Hume (NSW)           988      150 Bradfield (NSW)             1204
+
+
+
+
+                                                                8
+Attachment 2 Proposed Changes in Geographic Classification
+
+State           Division      2001 Election             Proposed Classification
+NSW             Cook          Inner Metropolitan        Outer Metropolitan
+                Cowper        Rural                     Provincial
+                Dobell        Provincial                Outer Metropolitan
+                Lyne          Rural                     Provincial
+                Macarthur     Rural                     Outer Metropolitan
+                Paterson      Rural                     Provincial
+                Robertson     Provincial                Outer Metropolitan
+                Burke         Rural                     Outer Metropolitan
+Victoria        Corangamite   Provincial                Rural
+                Flinders      Rural                     Outer Metropolitan
+                McMillan      Rural                     Provincial
+                Maribrynong   Outer Metropolitan        Inner Metropolitan
+Queensland      Capricornia   Provincial                Rural
+                Fairfax       Rural                     Provincial
+                Fisher        Rural                     Provincial
+                Forde         Rural                     Outer Metropolitan
+                Griffith      Outer Metropolitan        Inner Metropolitan
+                Longman       Rural                     Outer Metropolitan
+WA              Brand         Provincial                Outer Metropolitan
+                Pearce        Outer Metropolitan        Rural
+
+
+
+
+                                                                                  9
+Attachment 3 Proposed Electoral Division Classification, After 2001
+Election
+
+                                          Area (sq
+State                   Party Status      kms)     Geographic           Socio-economic Status (a)
+NEW SOUTH WALES
+Banks                   Marginal ALP      54       Inner metropolitan   Upper middle
+Barton                  Fairly safe ALP   42       Inner metropolitan   Upper middle
+Bennelong               Fairly safe LP    53       Inner metropolitan   High
+Berowra                 Safe LP           712      Outer metropolitan   High
+Blaxland                Safe ALP          54       Inner metropolitan   Lower middle
+Bradfield               Safe LP           97       Inner metropolitan   High
+Calare                  Safe Ind          21621    Rural                Lower middle
+Charlton                Fairly safe ALP   568      Provincial           Lower middle
+Chifley                 Safe ALP          110      Outer metropolitan   Low
+Cook                    Safe LP           189      Outer metropolitan   High
+Cowper                  Marginal NP       7700     Provincial           Low
+Cunningham              Safe ALP          490      Provincial           Upper middle
+Dobell                  Marginal LP       952      Outer metropolitan   Lower middle
+Eden-Monaro             Marginal LP       30946    Rural                Lower middle
+Farrer                  Safe LP           96844    Rural                Lower middle
+Fowler                  Safe ALP          47       Outer metropolitan   Low
+Gilmore                 Safe LP           5612     Rural                Lower middle
+Grayndler               Safe ALP          29       Inner metropolitan   High
+Greenway                Marginal ALP      120      Outer metropolitan   Upper middle
+Gwydir                  Safe LP           185604   Rural                Low
+Hughes                  Safe LP           265      Outer metropolitan   High
+Hume                    Fairly safe LP    25948    Rural                Lower middle
+Hunter                  Safe ALP          10594    Rural                Low
+Kingsford Smith         Fairly safe ALP   62       Inner metropolitan   High
+Lindsay                 Fairly safe LP    351      Outer metropolitan   Upper middle
+Lowe                    Marginal ALP      41       Inner metropolitan   High
+Lyne                    Safe NP           9291     Provincial           Low
+Macarthur               Fairly safe LP    572      Outer metropolitan   Upper middle
+Mackellar               Safe LP           229      Outer metropolitan   High
+Macquarie               Fairly safe LP    4197     Outer metropolitan   High
+Mitchell                Safe LP           182      Outer metropolitan   High
+Newcastle               Fairly safe ALP   199      Provincial           Upper middle
+New England             Fairly safe Ind   53858    Rural                Lower middle
+North Sydney            Safe LP           39       Inner metropolitan   High
+Page                    Marginal NP       16682    Rural                Low
+Parkes                  Fairly safe NP    268674   Rural                Low
+Parramatta              Marginal LP       61       Inner metropolitan   High
+Paterson                Marginal LP       9632     Provincial           Low
+Prospect                Safe ALP          159      Outer metropolitan   Lower middle
+Reid                    Safe ALP          62       Inner metropolitan   Lower middle
+Richmond                Marginal NP       2137     Rural                Lower middle
+Riverina                Safe NP           44971    Rural                Lower middle
+Robertson               Fairly safe LP    785      Outer metropolitan   Upper middle
+Shortland               Fairly safe ALP   304      Provincial           Low
+Sydney                  Safe ALP          50       Inner metropolitan   High
+Throsby                 Safe ALP          387      Provincial           Low
+Warringah               Safe LP           56       Inner metropolitan   High
+Watson                  Safe ALP          33       Inner metropolitan   Lower middle
+
+                                                                                       10
+Wentworth         Fairly safe LP    26       Inner metropolitan   High
+Werriwa           Fairly safe ALP   168      Outer metropolitan   Lower middle
+
+VICTORIA
+Aston             Fairly safe LP    101      Outer metropolitan   High
+Ballarat          Marginal ALP      8816     Provincial           Lower middle
+Batman            Safe ALP          54       Inner metropolitan   Upper middle
+Bendigo           Marginal ALP      9939     Provincial           Low
+Bruce             Fairly safe ALP   64       Outer metropolitan   Upper middle
+Burke             Fairly safe ALP   3117     Outer metropolitan   Upper middle
+Calwell           Safe ALP          234      Outer metropolitan   Lower middle
+Casey             Fairly safe LP    411      Outer metropolitan   Upper middle
+Chisholm          Marginal ALP      60       Inner metropolitan   High
+Corangamite       Fairly safe LP    7566     Rural                Upper middle
+Corio             Fairly safe ALP   808      Provincial           Lower middle
+Deakin            Marginal LP       59       Outer metropolitan   High
+Dunkley           Fairly safe LP    124      Outer metropolitan   Upper middle
+Flinders          Fairly safe LP    2089     Outer metropolitan   Lower middle
+Gellibrand        Safe ALP          75       Inner metropolitan   Lower middle
+Gippsland         Fairly safe NP    35534    Rural                Low
+Goldstein         Fairly safe LP    48       Inner metropolitan   High
+Higgins           Fairly safe LP    39       Inner metropolitan   High
+Holt              Safe ALP          106      Outer metropolitan   Low
+Hotham            Safe ALP          71       Outer metropolitan   Upper middle
+Indi              Safe LP           24044    Rural                Lower middle
+Isaacs            Marginal ALP      179      Outer metropolitan   Upper middle
+Jagajaga          Fairly safe ALP   84       Outer metropolitan   High
+Kooyong           Safe LP           49       Inner metropolitan   High
+Lalor             Safe ALP          653      Outer metropolitan   Lower middle
+La Trobe          Marginal LP       549      Outer metropolitan   Upper middle
+Mallee            Safe NP           66632    Rural                Low
+Maribyrnong       Safe ALP          64       Inner metropolitan   Lower middle
+McEwen            Marginal LP       14328    Rural                Upper middle
+McMillan          Marginal ALP      5744     Provincial           Lower middle
+Melbourne         Safe ALP          54       Inner metropolitan   High
+Melbourne Ports   Fairly safe ALP   43       Inner metropolitan   High
+Menzies           Fairly safe LP    116      Outer metropolitan   High
+Murray            Safe LP           15907    Rural                Low
+Scullin           Safe ALP          104      Outer metropolitan   Lower middle
+Wannon            Fairly safe LP    29693    Rural                Lower middle
+Wills             Safe ALP          52       Inner metropolitan   Upper middle
+
+QUEENSLAND
+Blair             Fairly safe LP    15095    Rural                Low
+Bowman            Marginal ALP      600      Outer metropolitan   Upper middle
+Brisbane          Marginal ALP      72       Inner metropolitan   High
+Capricornia       Fairly safe ALP   235400   Rural                Lower middle
+Dawson            Fairly safe NP    22440    Rural                Low
+Dickson           Fairly safe LP    754      Outer metropolitan   Upper middle
+Fadden            Safe LP           591      Outer metropolitan   Upper middle
+Fairfax           Fairly safe LP    4270     Provincial           Lower middle
+Fisher            Safe LP           558      Provincial           Lower middle
+Forde             Fairly safe LP    4873     Outer metropolitan   Lower middle
+Griffith          Fairly safe ALP   123      Inner metropolitan   High
+                                                                                 11
+Groom               Safe LP           6417      Provincial           Lower middle
+Herbert             Marginal LP       2966      Provincial           Upper middle
+Hinkler             Marginal NP       15427     Rural                Low
+Kennedy             Safe Ind          562160    Rural                Low
+Leichhardt          Fairly safe LP    150236    Rural                Upper middle
+Lilley              Marginal ALP      139       Inner metropolitan   Upper middle
+Longman             Marginal LP       1984      Outer metropolitan   Low
+Maranoa             Safe NP           650504    Rural                Low
+McPherson           Safe LP           369       Provincial           Lower middle
+Moncrieff           Safe LP           182       Provincial           Upper middle
+Moreton             Marginal LP       107       Inner metropolitan   High
+Oxley               Fairly safe ALP   669       Outer metropolitan   Low
+Petrie              Marginal LP       149       Outer metropolitan   Upper middle
+Rankin              Fairly safe ALP   151       Outer metropolitan   Low
+Ryan                Fairly safe LP    238       Outer metropolitan   High
+Wide Bay            Safe NP           53826     Rural                Low
+
+SOUTH AUSTRALIA
+Adelaide            Marginal LP       71        Inner metropolitan   High
+Barker              Safe LP           52006     Rural                Low
+Bonython            Safe ALP          269       Outer metropolitan   Low
+Boothby             Fairly safe LP    119       Outer metropolitan   High
+Grey                Safe LP           897822    Rural                Low
+Hindmarsh           Marginal LP       63        Inner metropolitan   Upper middle
+Kingston            Marginal ALP      170       Outer metropolitan   Low
+Makin               Marginal LP       110       Outer metropolitan   Lower middle
+Mayo                Safe LP           2035      Outer metropolitan   Upper middle
+Port Adelaide       Safe ALP          234       Inner metropolitan   Low
+Sturt               Fairly safe LP    66        Inner metropolitan   High
+Wakefield           Safe LP           31123     Rural                Low
+
+WESTERN AUSTRALIA
+Brand             Safe ALP            430       Outer metropolitan   Low
+Canning           Marginal LP         4174      Outer metropolitan   Lower middle
+Cowan             Fairly safe ALP     195       Outer metropolitan   Upper middle
+Curtin            Safe LP             90        Inner metropolitan   High
+Forrest           Fairly safe LP      21143     Rural                Lower middle
+Fremantle         Safe ALP            200       Inner metropolitan   Upper middle
+Hasluck           Marginal ALP        227       Outer metropolitan   Lower middle
+Kalgoorlie        Marginal LP         2295354   Rural                Upper middle
+Moore             Fairly safe LP      78        Outer metropolitan   High
+O'Connor          Safe LP             179047    Rural                Low
+Pearce            Fairly safe LP      26251     Rural                Lower middle
+Perth             Safe ALP            74        Inner metropolitan   Upper middle
+Stirling          Marginal ALP        76        Inner metropolitan   Upper middle
+Swan              Marginal ALP        108       Inner metropolitan   Upper middle
+Tangney           Fairly safe LP      70        Inner metropolitan   High
+
+TASMANIA
+Bass                Marginal ALP      7343      Provincial           Low
+Braddon             Fairly safe ALP   11760     Rural                Low
+Denison             Safe ALP          221       Inner metropolitan   Upper middle
+Franklin            Fairly safe ALP   7933      Outer metropolitan   Lower middle
+Lyons               Fairly safe ALP   40604     Rural                Low
+                                                                                    12
+NORTHERN TERRITORY
+Lingiari         Fairly safe ALP           1347849 Rural                   Lower middle
+Solomon          Marginal CLP              326     Inner metropolitan      High
+
+AUSTRALIAN CAPITAL TERRITORY
+Canberra           Fairly safe ALP         1900       Inner metropolitan   High
+Fraser             Safe ALP                       535 Inner metropolitan   High
+
+VICTORIA (After 2002 Redistribution)
+Aston                  Fairly safe LP             96 Outer metropolitan
+Ballarat               Marginal ALP             4652 Provincial
+Batman                 Safe ALP                   53 Inner metropolitan
+Bendigo                Marginal ALP             7286 Provincial
+Bruce                  Fairly safe ALP            68 Outer metropolitan
+Calwell                Safe ALP                  504 Outer metropolitan
+Casey                  Fairly safe LP            409 Outer metropolitan
+Chisholm               Marginal ALP               61 Inner metropolitan
+Corangamite            Fairly safe LP           7724 Rural
+Corio                  Fairly safe ALP           815 Provincial
+Deakin                 Marginal LP                61 Outer metropolitan
+Dunkley                Fairly safe LP            138 Outer metropolitan
+Flinders               Fairly safe LP           1955 Outer metropolitan
+Gellibrand             Safe ALP                   91 Inner metropolitan
+Gippsland              Marginal NP             33164 Rural
+Goldstein              Fairly safe LP             49 Inner metropolitan
+Gorton                 Safe ALP                  166 Outer metropolitan
+Higgins                Fairly safe LP             39 Inner metropolitan
+Holt                   Fairly safe ALP           145 Outer metropolitan
+Hotham                 Safe ALP                   72 Inner metropolitan
+Indi                   Safe LP                 28008 Rural
+Isaacs                 Fairly safe ALP           171 Outer metropolitan
+Jagajaga               Fairly safe ALP            87 Outer metropolitan
+Kooyong                Safe LP                    49 Inner metropolitan
+Lalor                  Safe ALP                  991 Outer metropolitan
+La Trobe               Marginal LP               588 Outer metropolitan
+Mallee                 Safe NP                 70694 Rural
+Maribyrnong            Safe ALP                   71 Inner metropolitan
+McEwen                 Marginal LP             10675 Rural
+McMillan               Marginal LP/NP           8328 Rural
+Melbourne              Safe ALP                   53 Inner metropolitan
+Melbourne Ports        Fairly safe ALP            44 Inner metropolitan
+Menzies                Fairly safe LP            119 Outer metropolitan
+Murray                 Safe LP                 16229 Rural
+Scullin                Safe ALP                  101 Outer metropolitan
+Wannon                 Fairly safe LP          33854 Rural
+Wills                  Safe ALP                   57 Inner metropolitan
+
+Northern Territory (after 2003 Determination)
+Northern Territory         Marginal ALP       1348175 Rural
+
+(a) Based on 2001 Census.
+
+
+
+                                                                                          13
+Other Publications in this Series
+
+Research Report 1 – Informal Votes Survey, House of Representatives 2001   2003
+Research Report 2 – Redistribution Forward Estimates 1984-1999             Dec 2003
+Research Report 3 – Analysis of Declaration Voting                         Jun 2004
+Research Report 4 – Australian Federal redistributions 1901 – 2003         Apr 2004
+
+
+
+
+                                                                                      14
+
