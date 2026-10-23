@@ -49,6 +49,10 @@ STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"]
 STATE_FULL = {"nsw": "New South Wales", "vic": "Victoria", "qld": "Queensland",
               "wa": "Western Australia", "sa": "South Australia", "tas": "Tasmania",
               "act": "Australian Capital Territory", "nt": "Northern Territory"}
+# the flow-history states' short forms — the explainer menus and tooltips
+# show these ("Federal, NT"), never the full name spelt out
+STATE_SHORT = {"nsw": "NSW", "vic": "Vic", "qld": "Qld", "wa": "WA",
+               "sa": "SA", "tas": "Tas", "act": "ACT", "nt": "NT"}
 CLASS_META = (("inner", "Inner metropolitan", "inner metro"),
               ("outer", "Outer metropolitan", "outer metro"),
               ("provincial", "Provincial", "provincial"),
@@ -150,7 +154,7 @@ def build():
     for s in STATES:
         doc["fed"]["states"][s] = view(STATE_FULL[s],
                                        STATE_FULL[s] + " electorates at federal elections",
-                                       per_state[s])
+                                       per_state[s], short=STATE_SHORT[s])
     doc["fed"]["classes"] = {}
     for ck, label, short in CLASS_META:
         doc["fed"]["classes"][ck] = view(label, f"federal elections in {short} seats",

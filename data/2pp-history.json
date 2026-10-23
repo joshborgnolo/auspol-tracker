@@ -105,7 +105,8 @@
      51.78,
      48.58,
      44.73
-    ]
+    ],
+    "short": "NSW"
    },
    "vic": {
     "label": "Victoria",
@@ -139,7 +140,8 @@
      46.86,
      45.17,
      43.65
-    ]
+    ],
+    "short": "Vic"
    },
    "qld": {
     "label": "Queensland",
@@ -173,7 +175,8 @@
      58.44,
      54.05,
      50.58
-    ]
+    ],
+    "short": "Qld"
    },
    "wa": {
     "label": "Western Australia",
@@ -207,7 +210,8 @@
      55.55,
      45.0,
      44.16
-    ]
+    ],
+    "short": "WA"
    },
    "sa": {
     "label": "South Australia",
@@ -241,7 +245,8 @@
      49.29,
      46.03,
      40.8
-    ]
+    ],
+    "short": "SA"
    },
    "tas": {
     "label": "Tasmania",
@@ -275,7 +280,8 @@
      44.04,
      45.67,
      36.66
-    ]
+    ],
+    "short": "Tas"
    },
    "act": {
     "label": "Australian Capital Territory",
@@ -309,7 +315,8 @@
      38.39,
      33.05,
      27.51
-    ]
+    ],
+    "short": "ACT"
    },
    "nt": {
     "label": "Northern Territory",
@@ -343,7 +350,8 @@
      45.8,
      44.46,
      45.75
-    ]
+    ],
+    "short": "NT"
    }
   },
   "classes": {

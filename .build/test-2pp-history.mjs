@@ -30,6 +30,10 @@ const AEC_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001];
 const NAT_YEARS = [...HIST_YEARS, ...AEC_YEARS];
 const STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
+/* the explainer menu shows the flow-history short forms ("Federal, NT") -
+   never the full name spelt out (2026-10-24, user: "the view dropdown menu
+   is inconsistent (eg northen territory vs NT)") */
+const STATE_SHORT = { nsw: "NSW", vic: "Vic", qld: "Qld", wa: "WA", sa: "SA", tas: "Tas", act: "ACT", nt: "NT" };
 const CLASSES = ["inner", "outer", "provincial", "rural"];
 const CLS_KEY = { "inner metropolitan": "inner", "outer metropolitan": "outer",
   "provincial": "provincial", "rural": "rural" };
@@ -89,6 +93,7 @@ assert.deepEqual(Object.keys(FED.states), STATES, "the eight state cuts");
 assert.deepEqual(Object.keys(FED.classes), CLASSES, "the four class cuts, in menu order");
 assert.deepEqual(FED.years, NAT_YEARS, "national span: 1972–2025");
 STATES.forEach((s) => assert.deepEqual(FED.states[s].years, AEC_YEARS, `${s}: the downloads' span`));
+STATES.forEach((s) => assert.equal(FED.states[s].short, STATE_SHORT[s], `${s}: the menu short label`));
 CLASSES.forEach((c) => assert.deepEqual(FED.classes[c].years, AEC_YEARS, `${c}: the downloads' span`));
 const cell = (v, k, y) => v[k][v.years.indexOf(y)];
 
