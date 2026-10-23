@@ -1173,7 +1173,10 @@ export function validatePrimaryHistory() {
    one exists — the AEC counts no 2PP in the Senate): ATL tallies only,
    the four post-GVT events 2016–2025, national plus the eight states,
    no classes, and it must carry implied: true so no reader takes an
-   estimate for a record. National spans 1972–2025 (canonical election
+   estimate for a record. nswLc is its only state-upper-house sibling
+   (2026-10-24): the implied NSW Legislative Council two-party over the
+   NSWEC ballot record, 2011–2023 — the same implied:true contract, one
+   jurisdiction, no state or class cuts. National spans 1972–2025 (canonical election
    records), the state and class cuts the AEC counts' 1996–2025 span
    (tppdiv downloads 2004 on; the statistics packs' HTPP tables
    1996–2001). */
@@ -1238,6 +1241,18 @@ export function validate2ppHistory() {
         fail(`2pp-history.json fed.sen.${k}`, "2pp-history-shape", `state cut years ${JSON.stringify(v.years)}, expected [2016,2019,2022,2025]`);
     }
   }
+  // nswLc: the implied senate view's only state-upper-house sibling (the
+  // NSWEC's ballot-level record is the only state upper-house count of
+  // voters' own preferences) — the same implied:true contract, one
+  // jurisdiction's view, no state or class cuts beside it.
+  const LC_YRS = [2011, 2015, 2019, 2023];
+  const lc = S.nswLc;
+  if (!lc || typeof lc !== "object") { fail("2pp-history.json", "2pp-history-shape", "no nswLc implied view"); return errors; }
+  if (lc.implied !== true) fail("2pp-history.json nswLc", "2pp-history-shape", "the council view must carry implied: true — it is an estimate, not a count");
+  if (lc.states || lc.classes) fail("2pp-history.json nswLc", "2pp-history-shape", "one jurisdiction's implied view: no state or class cuts");
+  checkView("nswLc", lc);
+  if (JSON.stringify(lc.years) !== JSON.stringify(LC_YRS))
+    fail("2pp-history.json nswLc", "2pp-history-shape", `council years ${JSON.stringify(lc.years)}, expected the banked elections [2011,2015,2019,2023]`);
   return errors;
 }
 

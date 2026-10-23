@@ -5304,7 +5304,11 @@ if (primaryHistory && !JUR) {
    fed.sen rides the House: control's Upper (2026-10-24): the IMPLIED
    Senate two-party from the committed ATL tallies, national and the eight
    states 2016–2025 – an estimate, never a count, and no classes (the
-   Senate has no divisions). Guarded like the primary
+   Senate has no divisions). nswLc rides beside it as the Upper menu's one
+   banked state council (2026-10-24, user "add it"): the implied NSW
+   Legislative Council two-party from the committed NSWEC ballot record,
+   2011–2023 – the same implied estimation, one jurisdiction's view.
+   Guarded like the primary
    lane: a missing file drops the flip. */
 const twoPPHistory = (() => {
   try {

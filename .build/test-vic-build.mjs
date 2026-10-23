@@ -100,7 +100,8 @@ assert.ok(D.synthLatest.changeSe > 0 && typeof D.synthLatest.changeSig === "bool
    them beside its own line, the same as the flow history's federal
    table): the 2PP file's implied Senate bank (2026-10-24) comes too, so
    the explainer's House: control offers Upper on the Vic page as well */
-assert.ok(D.twoPPHistory && D.twoPPHistory.fed && D.twoPPHistory.fed.sen && D.twoPPHistory.fed.sen.implied === true,
-  "the Vic build carries the federal 2PP history, implied Senate bank and all");
+assert.ok(D.twoPPHistory && D.twoPPHistory.fed && D.twoPPHistory.fed.sen && D.twoPPHistory.fed.sen.implied === true
+    && D.twoPPHistory.nswLc && D.twoPPHistory.nswLc.implied === true && D.twoPPHistory.nswLc.years.length === 4,
+  "the Vic build carries the federal 2PP history, implied Senate and NSW council banks and all");
 assert.ok(D.primaryHistory && D.primaryHistory.fed, "the Vic build carries the federal primary history");
 console.log(`vic build ok: ${D.individualPolls.length} polls, ${rm.length} Roy Morgan SMS archived, Premier now ${albWho[albWho.length - 1]}`);

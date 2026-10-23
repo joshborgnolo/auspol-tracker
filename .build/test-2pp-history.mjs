@@ -30,6 +30,13 @@
       the four post-GVT events 2016–2025 and no classes (the Senate has no
       divisions), and the constant y axis prices its cells too so the
       House: flip never moves the band.
+      4b. nswLc is its ONE state-council twin (user 2026-10-24: "what about
+      state-level upper house 2pps" / "add it") - the only state upper
+      house whose ballot record can be counted: the committed NSWEC
+      family tallies (.build/nswec-lc-flow-src/counts.json, the same
+      five family rows) recompose its four cells (2011–2023) by the same
+      estimand, and the view is a top-level bank - it carries neither
+      states nor classes.
    5. gen-data emits twoPPHistory into the data asset, validate.mjs gates
       the file's shape, and the built page carries the flip wiring. */
 import assert from "node:assert/strict";
@@ -171,6 +178,22 @@ STATES.forEach((s) => {
   assert.equal(SEN.states[s].short, STATE_SHORT[s], `sen ${s}: the menu short label`);
   assert.deepEqual(SEN.states[s].years, SEN_YEARS, `sen ${s}: the same four events`);
 });
+/* nswLc is the implied NSW Legislative Council two-party twin (user
+   2026-10-24: "what about state-level upper house 2pps" / "add it") - the
+   ONLY state upper house with a countable ballot record (Victoria's
+   council ran party tickets to 2022; Western Australia's first ticket-
+   free count prints no per-ballot record; South Australia's and
+   Tasmania's commissions publish none): the committed NSWEC ballot-level
+   family tallies (.build/nswec-lc-flow-src/counts.json, the same five
+   family rows the Senate probe sums) recompose its four cells below */
+const LC_YEARS = [2011, 2015, 2019, 2023];
+const LC = doc.nswLc;
+assert.ok(LC, "nswLc: the ONE state-council twin rides the file");
+assert.equal(LC.implied, true, "an estimate is marked, never mistaken for a count");
+assert.equal(LC.classes, undefined, "a state council has no federal division classes");
+assert.equal(LC.states, undefined, "a state election has no state cuts");
+assert.deepEqual(LC.years, LC_YEARS, "the council span: the NSWEC ballot record's four events, 2011-2023");
+assert.equal(LC.short, "NSW LC", "the menu short label");
 assert.deepEqual(Object.keys(FED.states), STATES, "the eight state cuts");
 assert.deepEqual(Object.keys(FED.classes), CLASSES, "the four class cuts, in menu order");
 assert.deepEqual(FED.years, NAT_YEARS, "national span: 1972–2025");
@@ -183,7 +206,7 @@ const cell = (v, k, y) => v[k][v.years.indexOf(y)];
    the pair summing to the count (the implied Senate bank's pair too: the
    estimand keeps the count's shape) */
 const allViews = [FED, ...STATES.map((s) => FED.states[s]), ...CLASSES.map((c) => FED.classes[c]),
-  SEN, ...STATES.map((s) => SEN.states[s])];
+  SEN, ...STATES.map((s) => SEN.states[s]), LC];
 allViews.forEach((v) => {
   assert.ok(v.label && v.elections, `${v.label}: label + elections copy`);
   v.years.forEach((y, i) => {
@@ -243,6 +266,20 @@ SEN_YEARS.forEach((y, i) => {
   });
 });
 
+/* the implied council cells recompute from the committed NSWEC tallies -
+   this probe's OWN sums again, the same estimand as the Senate's: the
+   tallies are counted in the flow bank's source dir (the Senate's senate-
+   atl twin), keyed by year with the same five family rows */
+const LC_ATL = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "nswec-lc-flow-src", "counts.json"), "utf8")).events;
+assert.deepEqual(Object.keys(LC_ATL).map(Number).sort(), LC_YEARS, "the council tallies' event set");
+LC_YEARS.forEach((y, i) => {
+  const ev = LC_ATL[String(y)];
+  assert.ok(ev && ev.counts, `lc ${y}: a tallies block`);
+  const v = implied(ev.counts);
+  assert.ok(Math.abs(v - LC.alp[i]) < 0.005,
+    `lc ${y}: NSWEC recompute ${v.toFixed(2)} v cell ${LC.alp[i]}`);
+});
+
 /* the story pins (recomputed from the downloads 2026-10-23): the canonical
    series' extremes, the states' range, and the urban ladder */
 assert.equal(cell(FED, "alp", 1975), 44.3, "the canonical series' trough (1975 flows on)");
@@ -275,6 +312,16 @@ assert.equal(cell(SEN, "alp", 2025), 55.99);
 assert.equal(cell(SEN.states.act, "alp", 2016), 57.05);
 assert.equal(cell(SEN.states.act, "alp", 2025), 70.61);
 assert.equal(cell(SEN.states.tas, "alp", 2025), 62.83);
+/* the implied council pins (recomputed from the NSWEC tallies
+   2026-10-24): Labor's council line runs behind its federal NSW line at
+   first, then crosses ahead of it between 2019 and 2023 - the same four
+   cells the generator hard-pins against its own recompute */
+assert.equal(cell(LC, "alp", 2011), 34.11, "the Coalition landslide, counted off its papers");
+assert.equal(cell(LC, "alp", 2015), 43.57);
+assert.equal(cell(LC, "alp", 2019), 48.32);
+assert.equal(cell(LC, "alp", 2023), 57.44);
+assert.ok(cell(LC, "alp", 2019) < 50 && cell(LC, "alp", 2023) > 50,
+  "the council pair changes hands between 2019 and 2023");
 
 // ---- the constant y axis (user 2026-10-24) ----------------------------------
 /* "the 2pp view y-axis range should remain constant at all times":

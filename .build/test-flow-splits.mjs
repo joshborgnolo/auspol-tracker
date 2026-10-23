@@ -352,7 +352,7 @@ assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes
    emit), the menu's state-elections optgroup and the LC bank gate are now
    pair-aware (LC_ON_BANK on the One Nation tab), and picking Labor v One
    Nation sheds the Council only while its ON cut is absent */
-assert.ok(ap.includes('{twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} />')
+assert.ok(ap.includes('{twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} lc={lcView} />')
     && ap.includes(': primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />')
     && ap.includes(': lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
     && ap.includes(': senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
@@ -408,9 +408,9 @@ assert.ok(ap.includes('...Object.keys(PH_CLASSES).map((k) => "fedcl:" + k), ...S
     && ap.includes('...Object.keys(TP_CLASSES).map((k) => "fedcl:" + k)]')
     && ap.includes('if (primMode && (badClass || lcView || (!fedView && !steView))) setView("fed");')
     && ap.includes('if (!primMode && steView) setView("fed");')
-    && ap.includes('if (twoMode && (badClass || lcView || !fedView)) setView("fed");')
+    && ap.includes('if (twoMode && (badClass || (lcView && house !== "sen") || (!fedView && !lcView))) setView("fed");')
     && ap.includes('const badClass = view.startsWith("fedcl:") && !classKey;'),
-  "each vote-share view lists its own bank's seat-class cuts (primary's beside the state assemblies, never under Upper, whose bank holds none), and each mode snaps the picks its bank doesn't hold back to federal - class, flow-side and primary-state picks alike");
+  "each vote-share view lists its own bank's seat-class cuts (primary's beside the state assemblies, never under Upper, whose bank holds none), and each mode snaps the picks its bank doesn't hold back to federal - class, flow-side and primary-state picks alike (the 2PP view's council pick is legal, under Upper alone)");
 assert.ok(ap.includes('function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, menu })')
     && ap.includes('(classKey && house !== "sen" && ((PH.fed.classes || {})[classKey]))'),
   "ExplainedPrimaryChart draws a class cut when one is picked (the Senate bank holds no classes; lcKey names the Council view for its caption)");
@@ -521,30 +521,49 @@ assert.ok(ap.includes('const tpViewOk = !!(TP_HIST && TP_HIST.fed && TP_HIST.fed
     && !ap.includes('setPrimaryFig') && !ap.includes('setTwoFig')
     && !ap.includes('aria-pressed={primMode}') && !ap.includes('aria-pressed={twoMode}'),
   "the ONE View: flip: label is the live figure, the press cycles to the next stop (no per-facet buttons left)");
-assert.ok(ap.includes('function Explained2ppChart({ stateKey, classKey, inv, menu, house })')
+assert.ok(ap.includes('function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc })')
     && ap.includes('const TP = window.AUSPOL.twoPPHistory || null;')
     && ap.includes('const senAll = TP.fed.sen || null;')
-    && ap.includes('const senBank = house === "sen" ? senAll : null;')
-    && ap.includes('? ((stateKey && (senBank.states || {})[stateKey]) || senBank)')
+    && ap.includes('const lcAll = TP.nswLc || null;')
+    && ap.includes('const lcBank = (lc && house === "sen") ? lcAll : null;')
+    && ap.includes('const senBank = (house === "sen" && !lcBank) ? senAll : null;')
+    && ap.includes('? ((stateKey && (impBank.states || {})[stateKey]) || impBank)')
     && ap.includes('(classKey && ((TP.fed.classes || {})[classKey]))')
     && ap.includes('|| (stateKey && (TP.fed.states || {})[stateKey]) || TP.fed);'),
-  "Explained2ppChart resolves class and state cuts off the twoPPHistory bank - the implied Senate bank under House: Upper");
+  "Explained2ppChart resolves class and state cuts off the twoPPHistory bank - one implied bank at a time under House: Upper (the NSW council pick pre-empts the Senate's; user 2026-10-24: 'add it')");
 assert.ok(ap.includes('const TP_SEN = (TP_HIST && TP_HIST.fed && TP_HIST.fed.sen) || null;')
     && ap.includes('const houseCtl = (twoMode ? !!TP_SEN : SEN_BANK) ? (')
     && ap.includes('if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");')
     && ap.includes('"Switch to the implied Senate two-party'),
   "the House: control flips in the 2PP view too, only while the implied Senate bank shipped - a build without it snaps an Upper pick back to Lower");
 assert.ok(ap.includes('const tpSenStateKeys = Object.keys((TP_SEN && TP_SEN.states) || {});')
-    && ap.includes('? ["fed", ...tpSenStateKeys.map((k) => "fed:" + k)]')
-    && ap.includes(': twoMode ? (house === "sen" ? tpSenStateKeys : Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}))')
+    && ap.includes('? ["fed", ...tpSenStateKeys.map((k) => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])]')
+    && ap.includes(': twoMode ? (house === "sen" ? (lcView ? [] : tpSenStateKeys) : Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}))')
     && ap.includes('if (twoMode) {')
-    && ap.includes('if (classKey) setView("fed");'),
-  "the 2PP Upper menu walks the implied bank's eight states only (no classes - the Senate has no divisions), and the House: flip drops a class pick to the national series");
+    && ap.includes('if (classKey || lcView) setView("fed");'),
+  "the 2PP Upper menu walks the implied bank's eight states plus the ONE council twin (no classes - the Senate has no divisions), and the House: flip drops a class or council pick to the national series");
+/* 2026-10-24 (user: "what about state-level upper house 2pps" / "add
+   it"): the 2PP Upper menu's State-elections section gains the ONE
+   countable state council - window.AUSPOL.twoPPHistory.nswLc, the NSW
+   Legislative Council's implied two-party off the committed NSWEC ballot
+   files (test-2pp-history.mjs pins the recompute). lcView widens off the
+   2PP file beside the flows bank so the council pick rides both figure
+   lines; the snap keeps it legal under Upper alone, and the House: flip
+   to Lower drops it to the national series */
+assert.ok(ap.includes('const TP_NSWLC = (TP_HIST && TP_HIST.nswLc) || null;')
+    && ap.includes('const lcView = view === "nswlc" && !!(LC_BANK || TP_NSWLC);')
+    && ap.includes('if (twoMode && (badClass || (lcView && house !== "sen") || (!fedView && !lcView))) setView("fed");')
+    && ap.includes('{twoMode && house === "sen" && TP_NSWLC && (')
+    && ap.includes('<option value="nswlc">{TP_NSWLC.label}</option>')
+    && ap.includes('lc={lcView}'),
+  "the 2PP Upper menu gains the ONE state-council twin: nswlc rides lcView widened off the twoPP file, offered from its own State-elections section, legal under Upper alone");
 assert.ok(ap.includes('IMPLIED, never an AEC count')
-    && ap.includes('(senBank ? "Implied two-party preferred, " : "Two-party preferred, ")')
-    && ap.includes('key={"ex-2pp-" + (house || "") + (stateKey || "") + (classKey || "")}')
-    && ap.includes('...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : [])'),
-  "the implied Senate view captions and titles itself as the estimate it is, keys its chart by chamber, and prices its cells into the constant axis");
+    && ap.includes('(impBank ? "Implied two-party preferred, " : "Two-party preferred, ")')
+    && ap.includes('key={"ex-2pp-" + (house || "") + (lc ? "lc" : "") + (stateKey || "") + (classKey || "")}')
+    && ap.includes('...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : [])')
+    && ap.includes('...(lcAll ? [lcAll] : [])')
+    && ap.includes("it is the only state upper house this pair can be counted in"),
+  "the implied Senate and council views caption and title themselves as the estimates they are, key their charts by chamber and council, and price their cells into the constant axis");
 assert.ok(ap.includes('const hi = 100 - lo;')
     && ap.includes('if (!YT.includes(50))'),
   "the 2PP axis mirrors around the half and always ticks 50 (the pair sums to 100 by construction)");
@@ -565,7 +584,7 @@ assert.ok(ap.includes('const [twoInv, setTwoInv] = useState(false);')
   "the 2PP Share: twin (button names the drawn side, Space follows it, primary keeps none)");
 assert.ok(ap.includes('const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];')
     && ap.includes('id: "share", label: active.name, color: active.color,')
-    && ap.includes('{(senBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}')
+    && ap.includes('{(impBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}')
     && ap.includes("the Share: flip's other side always sits at 100 minus the line on the chart"),
   "ONE side's line at a time (the constant series id glides the flip to the mirror); head and caption name the drawn side");
 assert.ok(ap.includes('const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);')

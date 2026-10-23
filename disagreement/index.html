@@ -9442,6 +9442,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           }
         }
       }
+    },
+    "nswLc": {
+      "implied": true,
+      "label": "NSW Legislative Council",
+      "elections": "NSW Legislative Council elections",
+      "years": [2011, 2015, 2019, 2023],
+      "alp": [34.11, 43.57, 48.32, 57.44],
+      "lnp": [65.89, 56.43, 51.68, 42.56],
+      "short": "NSW LC"
     }
   };
   const adjusted = {
@@ -144798,14 +144807,18 @@ function Explained2ppChart({
   classKey,
   inv,
   menu,
-  house
+  house,
+  lc
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const TP = window.AUSPOL.twoPPHistory || null;
   if (!TP || !TP.fed) return null;
   const senAll = TP.fed.sen || null;
-  const senBank = house === "sen" ? senAll : null;
-  const S = senBank ? stateKey && (senBank.states || {})[stateKey] || senBank : classKey && (TP.fed.classes || {})[classKey] || stateKey && (TP.fed.states || {})[stateKey] || TP.fed;
+  const lcAll = TP.nswLc || null;
+  const lcBank = lc && house === "sen" ? lcAll : null;
+  const senBank = house === "sen" && !lcBank ? senAll : null;
+  const impBank = senBank || lcBank;
+  const S = impBank ? stateKey && (impBank.states || {})[stateKey] || impBank : classKey && (TP.fed.classes || {})[classKey] || stateKey && (TP.fed.states || {})[stateKey] || TP.fed;
   const YEARS = S.years || [];
   if (!YEARS.length) return null;
   const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];
@@ -144827,9 +144840,9 @@ function Explained2ppChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (senBank ? "Implied two-party shares of the formal above-the-line Senate ballots" + (stateKey ? " in " + (S.short || S.label) : "") + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter." : classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (!senBank && (classKey || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (!senBank && (classKey || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
+  const cap = (lcBank ? "Implied two-party shares of the formal above-the-line New South Wales Legislative Council ballots at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. Counted from the Electoral Commission's own ballot-level record: it is the only state upper house this pair can be counted in (Victoria's council ran party tickets to 2022, Western Australia's first ticket-free count prints no ballot record, and South Australia's and Tasmania's commissions publish none). Most council papers rank just one group above the line - roughly a ballot in four names neither major - so each figure stands on the papers that went on to rank one of the pair. IMPLIED, never an official count: no two-party figure is tallied for the council." : senBank ? "Implied two-party shares of the formal above-the-line Senate ballots" + (stateKey ? " in " + (S.short || S.label) : "") + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter." : classKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " seats - every division's notional Labor-v-Coalition count summed, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed." : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.") + (!senBank && (classKey || stateKey) ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "") + (!senBank && (classKey || stateKey) ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "") + " The pair always sums to 100 - a two-party count has no third choice - so the Share: flip's other side always sits at 100 minus the line on the chart, and the halfway mark is where the lead changes hands.";
   let dev = 0;
-  [TP.fed, ...Object.keys(TP.fed.states || {}).map(k => TP.fed.states[k]), ...Object.keys(TP.fed.classes || {}).map(k => TP.fed.classes[k]), ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map(k => senAll.states[k])] : [])].forEach(v => (v.alp || []).forEach(x => {
+  [TP.fed, ...Object.keys(TP.fed.states || {}).map(k => TP.fed.states[k]), ...Object.keys(TP.fed.classes || {}).map(k => TP.fed.classes[k]), ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map(k => senAll.states[k])] : []), ...(lcAll ? [lcAll] : [])].forEach(v => (v.alp || []).forEach(x => {
     if (x != null) dev = Math.max(dev, Math.abs(x - 50));
   }));
   const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);
@@ -144847,13 +144860,13 @@ function Explained2ppChart({
     className: "rd-chead ex-fl-head"
   }, React.createElement("span", {
     className: "rd-chead-t"
-  }, (senBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %", React.createElement("span", {
+  }, (impBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %", React.createElement("span", {
     className: "rd-chead-meta"
   }, scope)), menu), narrow && React.createElement(RdKey, {
     items: lines,
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, _extends({
-    key: "ex-2pp-" + (house || "") + (stateKey || "") + (classKey || "")
+    key: "ex-2pp-" + (house || "") + (lc ? "lc" : "") + (stateKey || "") + (classKey || "")
   }, exFrame(narrow), {
     xDomain: [x0, x1],
     yDomain: [lo, hi],
@@ -144871,8 +144884,8 @@ function Explained2ppChart({
     ariaLabel: "Two-party-preferred vote share, " + active.name + ", " + S.label + ", " + span,
     copy: {
       title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
-      sub: rdCap(S.elections || S.label + " elections") + (senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
-      caption: (senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
+      sub: rdCap(S.elections || S.label + " elections") + (lcBank ? ". Counted from the NSW Electoral Commission's ballot-level record of the council's formal above-the-line ballots - no official two-party count exists for that chamber." : senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
+      caption: (lcBank ? "Implied from the NSW Electoral Commission's ballot-level record; " : senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
       legend: narrow ? lines : []
     }
   })), React.createElement(RdKey, {
@@ -144903,8 +144916,11 @@ function RdExplained() {
     return !!s && ["coal", "grn", "oth"].some(c => (s[c] || []).some(v => v != null));
   };
   const LC_ON_BANK = FH.nsw && FH.nsw.senOn || null;
+  const TP_HIST = window.AUSPOL.twoPPHistory || null;
+  const TP_SEN = TP_HIST && TP_HIST.fed && TP_HIST.fed.sen || null;
+  const TP_NSWLC = TP_HIST && TP_HIST.nswLc || null;
   const fedView = view === "fed" || view.startsWith("fed:") || view.startsWith("fedcl:");
-  const lcView = view === "nswlc" && !!LC_BANK;
+  const lcView = view === "nswlc" && !!(LC_BANK || TP_NSWLC);
   const jur = fedView ? "fed" : lcView ? "nsw" : FH[view] ? view : "fed";
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
   const SEN_STATES = SEN_BANK && SEN_BANK.states || {};
@@ -144912,8 +144928,6 @@ function RdExplained() {
   const onSenMode = house === "sen" && !!SEN_ON_BANK;
   const [inv, setInv] = useState(false);
   const PH_HIST = window.AUSPOL.primaryHistory || null;
-  const TP_HIST = window.AUSPOL.twoPPHistory || null;
-  const TP_SEN = TP_HIST && TP_HIST.fed && TP_HIST.fed.sen || null;
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
@@ -144949,7 +144963,7 @@ function RdExplained() {
       return;
     }
     if (twoMode) {
-      if (classKey) setView("fed");
+      if (classKey || lcView) setView("fed");
       return;
     }
     if (next === "sen") {
@@ -145062,16 +145076,16 @@ function RdExplained() {
     setPair(p);
     if (p === "on" && house === "sen" && (lcView && !LC_ON_BANK || stateKey && !hasOnCells(stateKey))) setView("fed");
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k)] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : twoMode ? house === "sen" ? ["fed", ...tpSenStateKeys.map(k => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])] : ["fed", ...Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}).map(k => "fed:" + k), ...Object.keys(TP_CLASSES).map(k => "fedcl:" + k)] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
     if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
     if (!primMode && steView) setView("fed");
-    if (twoMode && (badClass || lcView || !fedView)) setView("fed");
+    if (twoMode && (badClass || lcView && house !== "sen" || !fedView && !lcView)) setView("fed");
     if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
   }, [primMode, twoMode, badClass, lcView, fedView, steView, house]);
   const menuShow = figView ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
-  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
-  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
+  const menuKeys = primMode ? Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}) : twoMode ? house === "sen" ? lcView ? [] : tpSenStateKeys : Object.keys(TP_HIST.fed && TP_HIST.fed.states || {}) : house === "sen" ? pair === "on" ? senOnStateKeys : senStateKeys : stateKeys;
+  const menuBank = primMode ? PH_HIST.fed && PH_HIST.fed.states || {} : twoMode ? house === "sen" ? lcView ? {} : TP_SEN.states || {} : TP_HIST.fed && TP_HIST.fed.states || {} : house === "sen" ? pair === "on" ? ON_SEN_STATES : SEN_STATES : FED_STATES;
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
@@ -145106,7 +145120,11 @@ function RdExplained() {
   }, STE_LC_KEYS.map(k => React.createElement("option", {
     key: k,
     value: "ste:" + k + "lc"
-  }, STE_LCS[k].label)))) : null;
+  }, STE_LCS[k].label))), twoMode && house === "sen" && TP_NSWLC && React.createElement("optgroup", {
+    label: "State elections"
+  }, React.createElement("option", {
+    value: "nswlc"
+  }, TP_NSWLC.label))) : null;
   const share = React.createElement("span", {
     className: "rd-pl-ctl ex-share"
   }, React.createElement("span", {
@@ -145235,7 +145253,8 @@ function RdExplained() {
     stateKey: stateKey,
     classKey: classKey,
     inv: twoInv,
-    menu: headCtls
+    menu: headCtls,
+    lc: lcView
   }) : primMode ? React.createElement(ExplainedPrimaryChart, {
     house: house,
     stateKey: stateKey,

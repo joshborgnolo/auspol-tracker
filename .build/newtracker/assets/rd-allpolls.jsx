@@ -6323,20 +6323,27 @@ const TWO_PARTIES = [
   { id: "alp", name: "Labor",     color: "var(--alp)" },
   { id: "lnp", name: "Coalition", color: "var(--lnp)" },
 ];
-function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
+function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const TP = window.AUSPOL.twoPPHistory || null;
   if (!TP || !TP.fed) return null;
   /* the House: flip's bank pick (user 2026-10-24): Upper rides fed.sen -
      the IMPLIED Senate two-party from the committed ATL tallies (no
      official Senate 2PP exists, so the series is marked and captioned as
-     the estimate it is). House-only cuts (a class pick) can never be
-     live here - the selector snaps them before they reach this line, so
-     the Senate bank is asked for none */
+     the estimate it is) - and beside it the ONE bankable state council:
+     TP.nswLc, the NSW Legislative Council's own implied two-party from
+     the NSWEC ballot record (2026-10-24, user "add it"), reached through
+     the Upper menu's "nswlc" pick, the id the flows menu already wears.
+     House-only cuts (a class pick) can never be live here - the selector
+     snaps them before they reach this line, so an implied bank is asked
+     for none */
   const senAll = TP.fed.sen || null;
-  const senBank = house === "sen" ? senAll : null;
-  const S = senBank
-    ? ((stateKey && (senBank.states || {})[stateKey]) || senBank)
+  const lcAll = TP.nswLc || null;
+  const lcBank = (lc && house === "sen") ? lcAll : null;
+  const senBank = (house === "sen" && !lcBank) ? senAll : null;
+  const impBank = senBank || lcBank;   /* either implied bank, never both */
+  const S = impBank
+    ? ((stateKey && (impBank.states || {})[stateKey]) || impBank)
     : ((classKey && ((TP.fed.classes || {})[classKey]))
     || (stateKey && (TP.fed.states || {})[stateKey]) || TP.fed);
   const YEARS = S.years || [];
@@ -6355,7 +6362,9 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
   const x0 = YEARS[0] - pad1, x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (senBank
+  const cap = (lcBank
+    ? ("Implied two-party shares of the formal above-the-line New South Wales Legislative Council ballots at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. Counted from the Electoral Commission's own ballot-level record: it is the only state upper house this pair can be counted in (Victoria's council ran party tickets to 2022, Western Australia's first ticket-free count prints no ballot record, and South Australia's and Tasmania's commissions publish none). Most council papers rank just one group above the line - roughly a ballot in four names neither major - so each figure stands on the papers that went on to rank one of the pair. IMPLIED, never an official count: no two-party figure is tallied for the council.")
+    : senBank
     ? ("Implied two-party shares of the formal above-the-line Senate ballots"
       + (stateKey ? " in " + (S.short || S.label) : "")
       + " at the " + span + " elections - the papers naming a major party that put Labor first, of those naming either. IMPLIED, never an AEC count: the Commission tallies no two-party figure for the chamber seats are not filled from, and the figures' span opens at 2016, the first count after group tickets handed the preferences to the voter.")
@@ -6370,8 +6379,9 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
   /* the constant axis (user 2026-10-24: the range "should remain
      constant at all times"): the furthest cell of the WHOLE bank from
      the half - national and every state and class cut, PLUS the implied
-     Senate bank's cells when the build ships them, so neither an
-     elections pick nor the House: flip ever moves it - mirrored on its
+     upper banks' cells (the Senate bank's and the council bank's) when
+     the build ships them, so neither an elections pick, a council pick
+     nor the House: flip ever moves it - mirrored on its
      other side, so the Share: flip never moves it either (Labor's cells
      price both sides by the count's sum). 50 itself stays a tick - the
      yard a two-party chart is read
@@ -6380,7 +6390,8 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
   let dev = 0;
   [TP.fed, ...Object.keys(TP.fed.states || {}).map((k) => TP.fed.states[k]),
     ...Object.keys(TP.fed.classes || {}).map((k) => TP.fed.classes[k]),
-    ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : [])].forEach((v) =>
+    ...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : []),
+    ...(lcAll ? [lcAll] : [])].forEach((v) =>
     (v.alp || []).forEach((x) => { if (x != null) dev = Math.max(dev, Math.abs(x - 50)); }));
   const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);
   const hi = 100 - lo;
@@ -6391,12 +6402,12 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
   return (
     <>
       <div className="rd-chead ex-fl-head">
-        <span className="rd-chead-t">{(senBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}
+        <span className="rd-chead-t">{(impBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}
           <span className="rd-chead-meta">{scope}</span></span>
         {menu}
       </div>
       {narrow && <RdKey items={lines} className="rd-tpp-legend" />}
-      <TrendChart key={"ex-2pp-" + (house || "") + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
+      <TrendChart key={"ex-2pp-" + (house || "") + (lc ? "lc" : "") + (stateKey || "") + (classKey || "")} {...exFrame(narrow)}
         xDomain={[x0, x1]}
         yDomain={[lo, hi]}
         yTicks={YT}
@@ -6408,8 +6419,8 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house }) {
         tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label)}
         ariaLabel={"Two-party-preferred vote share, " + active.name + ", " + S.label + ", " + span}
         copy={{ title: active.name + "’s two-party-preferred share, " + (S.short || S.label),
-                sub: rdCap(S.elections || S.label + " elections") + (senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
-                caption: (senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
+                sub: rdCap(S.elections || S.label + " elections") + (lcBank ? ". Counted from the NSW Electoral Commission's ballot-level record of the council's formal above-the-line ballots - no official two-party count exists for that chamber." : senBank ? ". Implied from the formal above-the-line Senate ballots - no official two-party count exists for that chamber." : ". Official AEC counts."),
+                caption: (lcBank ? "Implied from the NSW Electoral Commission's ballot-level record; " : senBank ? "Implied from the formal above-the-line Senate ballots; " : "Official AEC counts; ") + "the other side always sits at 100 minus this share - the two-party count has no third choice.",
                 legend: narrow ? lines : [] }}
       />
       <RdKey className="rd-ckey" items={[]} />
@@ -6455,11 +6466,24 @@ function RdExplained() {
      ballot files' Labor-v-One-Nation cut - nsw.senOn rides "nswlc" too,
      so the state pick survives the contest flip within Upper */
   const LC_ON_BANK = (FH.nsw && FH.nsw.senOn) || null;
+  /* the 2PP bank (declared ahead of the view flags: the Council's
+     implied two-party bank widens lcView below) and its Upper pair -
+     fed.sen the implied Senate two-party (user 2026-10-24: "add House:
+     Lower ⇄ to 2pp view (adding upper house data)"), TP.nswLc its only
+     state council twin (same day, user "what about state-level upper
+     house 2pps" / "add it"). Either bank absent means the shipped file
+     predates it; every build reads the same data/2pp-history.json (the
+     Vic page carries it too), so the view degrades on the old file
+     alone */
+  const TP_HIST = window.AUSPOL.twoPPHistory || null;
+  const TP_SEN = (TP_HIST && TP_HIST.fed && TP_HIST.fed.sen) || null;
+  const TP_NSWLC = (TP_HIST && TP_HIST.nswLc) || null;
   const fedView = view === "fed" || view.startsWith("fed:") || view.startsWith("fedcl:");
-  /* the two Council banks ship together (gen-data's one slot), so nswlc
-     stays live across the contest flip - pair-awareness would need
+  /* the Council banks ship together (gen-data's one flows slot, and the
+     2PP file's own nswLc beside them), so nswlc stays live across the
+     contest flip and the figure flips alike - pair-awareness would need
      `pair`, which is declared below */
-  const lcView = view === "nswlc" && !!LC_BANK;
+  const lcView = view === "nswlc" && !!(LC_BANK || TP_NSWLC);
   const jur = fedView ? "fed" : lcView ? "nsw" : (FH[view] ? view : "fed");
   const stateKey = view.startsWith("fed:") && FED_STATES[view.slice(4)] ? view.slice(4) : null;
   /* the House: control (user 2026-10-22): "rep" reads the House banks,
@@ -6492,14 +6516,8 @@ function RdExplained() {
      classes, a House feature on both sides: no division exists in the
      Senate, so the Upper pick resolves no class */
   const PH_HIST = window.AUSPOL.primaryHistory || null;
-  const TP_HIST = window.AUSPOL.twoPPHistory || null;
-  /* the 2PP bank's implied Senate twin (user 2026-10-24: "add House:
-     Lower ⇄ to 2pp view (adding upper house data)") - absent only if the
-     shipped file predates it; every build reads the same
-     data/2pp-history.json (the Vic page carries it too), so the House:
-     control and the Upper picks key off this pointer alone and the view
-     degrades to House-only on the old file alone */
-  const TP_SEN = (TP_HIST && TP_HIST.fed && TP_HIST.fed.sen) || null;
+  /* TP_HIST / TP_SEN / TP_NSWLC are declared with the view flags above -
+     the Council's implied bank reaches lcView there */
   const [figMode, setFig] = useState("flows");
   const primMode = figMode === "primary" && !!PH_HIST && !!(PH_HIST.fed && PH_HIST.fed.sen);
   const twoMode = figMode === "2pp" && !!TP_HIST && !!(TP_HIST.fed && TP_HIST.fed.states && TP_HIST.fed.classes);
@@ -6592,7 +6610,10 @@ function RdExplained() {
       return;
     }
     if (twoMode) {
-      if (classKey) setView("fed");
+      /* a class pick is House-only; so is the NSW Council pick (the
+         Council bank sits in Upper alone) - both drop to the national
+         series on the flip */
+      if (classKey || lcView) setView("fed");
       return;
     }
     if (next === "sen") {
@@ -6759,7 +6780,7 @@ function RdExplained() {
          : [...Object.keys(PH_CLASSES).map((k) => "fedcl:" + k), ...STE_KEYS.map((k) => "ste:" + k)])]
     : twoMode
     ? (house === "sen"
-      ? ["fed", ...tpSenStateKeys.map((k) => "fed:" + k)]
+      ? ["fed", ...tpSenStateKeys.map((k) => "fed:" + k), ...(TP_NSWLC ? ["nswlc"] : [])]
       : ["fed", ...Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}).map((k) => "fed:" + k),
          ...Object.keys(TP_CLASSES).map((k) => "fedcl:" + k)])
     : house === "sen"
@@ -6782,7 +6803,10 @@ function RdExplained() {
   React.useEffect(() => {
     if (primMode && (badClass || lcView || (!fedView && !steView))) setView("fed");
     if (!primMode && steView) setView("fed");
-    if (twoMode && (badClass || lcView || !fedView)) setView("fed");   /* the 2PP menu never offers a pick outside the federal sections */
+    /* the 2PP menu's legal picks: the federal sections, and the NSW
+       Council's implied bank while House: Upper rides (a Lower pick of
+       it never arises - flipHouse drops it, and the menu never offers it) */
+    if (twoMode && (badClass || (lcView && house !== "sen") || (!fedView && !lcView))) setView("fed");
     /* entering the 2PP view always lands on Lower; Upper is live there
        only while the implied Senate bank shipped with the build */
     if (twoMode && house === "sen" && !TP_SEN) setHouse("rep");
@@ -6792,10 +6816,10 @@ function RdExplained() {
   const menuShow = figView ? VIEW_OPTS.length > 0 : pair === "on" && house !== "sen" ? false
     : house === "sen" ? VIEW_OPTS.length > (pair === "on" ? 0 : 1) : VIEW_OPTS.length > 0;
   const menuKeys = primMode ? Object.keys((PH_HIST.fed && PH_HIST.fed.states) || {})
-    : twoMode ? (house === "sen" ? tpSenStateKeys : Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}))
+    : twoMode ? (house === "sen" ? (lcView ? [] : tpSenStateKeys) : Object.keys((TP_HIST.fed && TP_HIST.fed.states) || {}))
     : house === "sen" ? (pair === "on" ? senOnStateKeys : senStateKeys) : stateKeys;
   const menuBank = primMode ? (PH_HIST.fed && PH_HIST.fed.states) || {}
-    : twoMode ? (house === "sen" ? (TP_SEN.states || {}) : (TP_HIST.fed && TP_HIST.fed.states) || {})
+    : twoMode ? (house === "sen" ? (lcView ? {} : (TP_SEN.states || {})) : (TP_HIST.fed && TP_HIST.fed.states) || {})
     : house === "sen" ? (pair === "on" ? ON_SEN_STATES : SEN_STATES) : FED_STATES;
   const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
@@ -6824,6 +6848,11 @@ function RdExplained() {
       {primMode && house === "sen" && STE_LC_KEYS.length > 0 && (
         <optgroup label="State elections">
           {STE_LC_KEYS.map((k) => <option key={k} value={"ste:" + k + "lc"}>{STE_LCS[k].label}</option>)}
+        </optgroup>
+      )}
+      {twoMode && house === "sen" && TP_NSWLC && (
+        <optgroup label="State elections">
+          <option value="nswlc">{TP_NSWLC.label}</option>
         </optgroup>
       )}
     </select>
@@ -6969,7 +6998,7 @@ function RdExplained() {
               its head; the classKey rides the primary bank's own classes
               and stePrim its own state-election banks (a flows-side state
               pick still drops to "fed" on the way in) */}
-          {twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} />
+          {twoMode ? <Explained2ppChart house={house} stateKey={stateKey} classKey={classKey} inv={twoInv} menu={headCtls} lc={lcView} />
             : primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />
             : lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />
             : senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />
