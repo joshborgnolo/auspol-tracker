@@ -5896,10 +5896,14 @@ function ExplainedFlowChart({ jur, inv, house, stateKey, classKey, lc, menu, onS
   })() || "";
   const markNote = hasRing && hasSolid ? " Hollow rings count the seats where Labor and the Coalition finished first and second; solid dots count every seat." : "";
   /* NSW's pre-file years (2007): Antony Green's tally-sheet count, as
-     printed by the Parliamentary Library – 73 of the 93 districts */
+     printed by the Parliamentary Library – 73 of the 93 districts. 2011
+     sits out: the Commission stopped running full preference counts for
+     information from that election (BP 3/2011's own Introduction), so no
+     party-by-party flow count exists to file (verified 2026-10-23) */
   const tallySheetNote = S.classicFrom && YEARS[0] < S.classicFrom
     ? " " + YEARS.filter((y) => y < S.classicFrom).join(" and ")
       + " is the NSW Parliamentary Library’s printed tally-sheet count — 73 of the 93 districts, their declaration forms mostly missing — before the ballot-level files begin."
+      + " There’s no 2011 point — the Electoral Commission stopped running full preference counts for information that year, so no count of party-by-party flows exists."
     : "";
   const copyBasis = (hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "") + (hasSolid ? (hasRing ? " " : "") + "Solid dots: every seat." : "");
   const noBars = " Counts carry no estimation error, so they have no bars.";

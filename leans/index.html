@@ -143675,7 +143675,7 @@ function ExplainedFlowChart({
     return g != null && gc != null ? " NSW, the one state counted both ways, split its " + n.years[i] + " Greens " + g.toFixed(1) + "% of every seat against " + gc.toFixed(1) + "% of the classic ones — these estimates sit within about a point of the count." : "";
   })() || "";
   const markNote = hasRing && hasSolid ? " Hollow rings count the seats where Labor and the Coalition finished first and second; solid dots count every seat." : "";
-  const tallySheetNote = S.classicFrom && YEARS[0] < S.classicFrom ? " " + YEARS.filter(y => y < S.classicFrom).join(" and ") + " is the NSW Parliamentary Library’s printed tally-sheet count — 73 of the 93 districts, their declaration forms mostly missing — before the ballot-level files begin." : "";
+  const tallySheetNote = S.classicFrom && YEARS[0] < S.classicFrom ? " " + YEARS.filter(y => y < S.classicFrom).join(" and ") + " is the NSW Parliamentary Library’s printed tally-sheet count — 73 of the 93 districts, their declaration forms mostly missing — before the ballot-level files begin." + " There’s no 2011 point — the Electoral Commission stopped running full preference counts for information that year, so no count of party-by-party flows exists." : "";
   const copyBasis = (hasRing ? "Hollow rings: Labor-v-Coalition seats only." : "") + (hasSolid ? (hasRing ? " " : "") + "Solid dots: every seat." : "");
   const noBars = " Counts carry no estimation error, so they have no bars.";
   const oneOnly = lcBank ? (S.oneOnly || []).map((v, i) => Math.round(v) + "% in " + YEARS[i]).join(", ") : null;
