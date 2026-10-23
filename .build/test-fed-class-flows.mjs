@@ -317,6 +317,248 @@ BUCKETS.forEach((b) => {
   assert.ok(Math.abs(recomb(CLASS_IDS, b) - ref.all[b]) < 0.051, `all-classic ${b} 2025 matches elec2025r`);
 });
 
+// ---- the all-seats 2004+ blocks: an independent recompute -------------------
+/* data/fed-class-flows.json's allSeats block adds the whole-chamber cut:
+   per class, every seat's non-major ballots (the lump) and each bucket's
+   share over all seats. This recomputes the whole derivation from the
+   caches: classic TCP flows by division, the state's TPP-by-party table
+   minus those classic seats = the non-classic leftover, taken exactly
+   where the state's non-classic seats share one class and allocated over
+   bucket first preferences (flagged est) where they span classes. The
+   lump is the buckets summed — a TPP-minus-first-preferences lump would
+   carry three-cornered Coalition→ALP ballots, which are not minor-party
+   votes (the consistency-guard exemplar is pinned below: NSW 2004's
+   1,570 such ballots inside Calare + New England). */
+const csvSplit = (ln) => ln.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => x.replace(/^"|"$/g, ""));
+const pyr = (x) => { const f = Math.floor(x), d = x - f; return d > 0.5 ? f + 1 : d < 0.5 ? f : (f % 2 ? f + 1 : f); };
+const pyr1 = (x) => pyr(x * 10) / 10;
+const CLASS_OF_LABEL = { "Inner Metropolitan": "inner", "Outer Metropolitan": "outer", Provincial: "provincial", Rural: "rural" };
+const tcpFlowByDiv = (y) => {
+  /* {flow: Map(div -> {b:[toALP,toCOAL]}), cross: Map(div -> Coalition→ALP n)} –
+     classic divisions only, from the per-division TCP flow table */
+  const byDiv = new Map();
+  tcpRows(y).forEach((r) => { const m = byDiv.get(r.div) ?? byDiv.set(r.div, []).get(r.div); m.push(r); });
+  const flow = new Map(), cross = new Map();
+  for (const [name, rows] of byDiv) {
+    const dest = new Set(rows.map((r) => r.to));
+    if (![...dest].some((p) => LABOR.has(p)) || ![...dest].every((p) => LABOR.has(p) || COAL.has(p))) continue;
+    const b = { grn: [0, 0], onp: [0, 0], oth: [0, 0] };
+    let drift = 0;
+    for (const r of rows) {
+      if (r.fid === "0") continue;              // the First Preferences pseudo-row names the final two
+      if (LABOR.has(r.frm)) { assert.ok(!COAL.has(r.to), `${y}: Labor ballots to Coalition in classic ${name}`); continue; }
+      if (COAL.has(r.frm)) { if (LABOR.has(r.to)) drift += r.n; continue; }  // three-cornered drift / same-pile shuffles
+      b[bucketOf(r.frm)][LABOR.has(r.to) ? 0 : 1] += r.n;
+    }
+    flow.set(name, b);
+    if (drift) cross.set(name, drift);
+  }
+  return { flow, cross };
+};
+const dopFirstPrefs = (y) => {
+  /* Map(div -> {alp, coal, grn, onp, oth}) from the distribution-of-preferences
+     download's CountNumber-0 Preference Count rows (never the Percent pair) */
+  const raw = zlib.gunzipSync(fs.readFileSync(path.join(ROOT, ".build", "aec-flow-src", `dop-${y}.csv.gz`))).toString("utf8");
+  const lines = raw.split(/\r?\n/);
+  const head = csvSplit(lines[1]);
+  const [D, CN, CT, PA, CV] = ["DivisionNm", "CountNumber", "CalculationType", "PartyAb", "CalculationValue"].map((n) => head.indexOf(n));
+  const per = new Map();
+  lines.slice(2).filter((ln) => ln.trim()).forEach((ln) => {
+    const c = csvSplit(ln);
+    const t = c[CT].toLowerCase();
+    if (c[CN].trim() !== "0" || !t.includes("preference") || !t.includes("count")) return;
+    const p = c[PA].trim();
+    const key = LABOR.has(p) ? "alp" : COAL.has(p) ? "coal" : bucketOf(p);
+    const rec = per.get(c[D].trim()) ?? per.set(c[D].trim(), { alp: 0, coal: 0, grn: 0, onp: 0, oth: 0 }).get(c[D].trim());
+    rec[key] += +c[CV];
+  });
+  return per;
+};
+const tppdivTotals = (y) => {
+  /* Map(name -> [toCOAL, toALP]) over every division of the chamber */
+  const lines = fs.readFileSync(path.join(ROOT, ".build", "aec-flow-src", `tppdiv-${y}.csv`), "utf8").split(/\r?\n/);
+  const head = csvSplit(lines[1]);
+  const ci = head.findIndex((h) => /coalition votes/i.test(h));
+  const ai = head.findIndex((h) => /labor party votes/i.test(h));
+  assert.ok(ci > 0 && ai > 0, `${y}: tppdiv vote columns found by name`);
+  const out = new Map();
+  lines.slice(2).filter((ln) => ln.trim()).forEach((ln) => {
+    const c = csvSplit(ln);
+    const name = c[0].trim();
+    if (!name || name === "Total") return;
+    out.set(name, [+c[ci], +c[ai]]);
+  });
+  return out;
+};
+const stateFlowTable = (y) => {
+  /* {per: {st: {b:[toALP,toCOAL]}}, drift: {st: Coalition→ALP}} from the
+     TPP flow by state by party. A Labor-source row is a layout surprise
+     (Labor is a finalist in every seat's TPP cut, so it never transfers). */
+  const ext = fs.existsSync(path.join(ROOT, ".build", "aec-flow-src", `tpp-${y}.csv`)) ? "csv" : "txt";
+  const lines = fs.readFileSync(path.join(ROOT, ".build", "aec-flow-src", `tpp-${y}.${ext}`), "utf8").split(/\r?\n/);
+  const head = lines[1].split(ext === "csv" ? "," : "\t");
+  const alpFirst = /labor/i.test(head[3]);
+  const per = {}, drift = {};
+  const splitl = (ln) => (ext === "csv" ? csvSplit(ln) : ln.split("\t"));
+  lines.slice(2).filter((ln) => ln.trim()).forEach((ln) => {
+    const c = splitl(ln);
+    if (c.length < 7) return;
+    const code = c[1].trim();
+    if (!code) return;                          // each state's First Preferences aggregate row
+    const [toA, toC] = alpFirst ? [+c[3], +c[5]] : [+c[5], +c[3]];
+    const st = c[0].trim();
+    if (LABOR.has(code)) throw new Error(`${y}: Labor-source row in the state flow table (${st} ${code})`);
+    if (COAL.has(code)) { drift[st] = (drift[st] || 0) + toA; return; }
+    const b = (per[st] ??= { grn: [0, 0], onp: [0, 0], oth: [0, 0] })[bucketOf(code)];
+    b[0] += toA; b[1] += toC;
+  });
+  return { per, drift };
+};
+const expectedAll = {};
+CLASS_IDS.forEach((k) => { expectedAll[k] = { grn: [], onp: [], oth: [], lump: [], lumpVotes: [], votes: { grn: [], onp: [], oth: [] }, est: { grn: [], onp: [], oth: [] } }; });
+const mixedRoster = {};                        // {year: {state: [class ids]}} over multi-class state cells
+const census = [];                             // every (year,state) cell with its classes, for the exact-side pin
+YEARS.forEach((y, yi) => {
+  if (y < 2004) {
+    CLASS_IDS.forEach((k) => {
+      let a = 0, l = 0;
+      BUCKETS.forEach((b) => { expectedAll[k][b][yi] = null; expectedAll[k].votes[b][yi] = null; expectedAll[k].est[b][yi] = false; const v = fresh[k].votes[b][yi]; if (v) { a += v[0]; l += v[1]; } });
+      expectedAll[k].lump[yi] = a + l ? pyr1(100 * a / (a + l)) : null;
+      expectedAll[k].lumpVotes[yi] = a + l ? [pyr(a), pyr(l)] : null;
+    });
+    return;
+  }
+  const { flow, cross } = tcpFlowByDiv(y);
+  const fpd = dopFirstPrefs(y);
+  const tpp = tppdivTotals(y);
+  const { per: sf, drift } = stateFlowTable(y);
+  const clas = classesOf[String(y)];
+  const leftover = {};
+  Object.entries(sf).forEach(([st, m]) => { leftover[st] = { grn: [...(m.grn || [0, 0])], onp: [...(m.onp || [0, 0])], oth: [...(m.oth || [0, 0])] }; });
+  const classicSum = {};                       // class id -> {b: [a,c]}
+  flow.forEach((b, name) => {
+    const rec = clas[name];
+    assert.ok(rec, `${y}: classic division ${name} matches a classification row`);
+    const k = CLASS_OF_LABEL[rec.classification];
+    assert.ok(k, `${y}: ${name} class ${rec.classification}`);
+    BUCKETS.forEach((bk) => {
+      leftover[rec.state][bk][0] -= b[bk][0];
+      leftover[rec.state][bk][1] -= b[bk][1];
+      const t = (classicSum[k] ??= { grn: [0, 0], onp: [0, 0], oth: [0, 0] })[bk];
+      t[0] += b[bk][0]; t[1] += b[bk][1];
+    });
+  });
+  Object.entries(leftover).forEach(([st, m]) => BUCKETS.forEach((bk) => {
+    assert.ok(Math.min(...m[bk]) >= -0.75, `${y}: ${st} ${bk} non-classic leftover negative: ${m[bk]}`);
+  }));
+  // non-classic census + the three-cornered drift consistency identity
+  const nc = {};                               // st -> classId -> [divisions]
+  const crossByState = {};
+  flow.forEach((_, name) => { const st = clas[name].state; crossByState[st] = (crossByState[st] || 0) + (cross.get(name) || 0); });
+  tpp.forEach((_, name) => {
+    if (flow.has(name)) return;
+    const rec = clas[name];
+    assert.ok(rec, `${y}: non-classic division ${name} matches a classification row`);
+    const k = CLASS_OF_LABEL[rec.classification];
+    ((nc[rec.state] ??= {})[k] ??= []).push(name);
+  });
+  Object.entries(nc).forEach(([st, bycls]) => {
+    const ks = Object.keys(bycls).sort();
+    census.push([y, st, ks]);
+    if (ks.length > 1) (mixedRoster[y] ??= {})[st] = ks;
+    const ncDrift = (drift[st] || 0) - (crossByState[st] || 0);
+    const lv = [0, 1].map((i) => BUCKETS.reduce((s, bk) => s + leftover[st][bk][i], 0));
+    const divs = ks.flatMap((k) => bycls[k]);
+    const mn = [0, 1].map((i) => divs.reduce((s, d) => {
+      const t = tpp.get(d), p = fpd.get(d);
+      assert.ok(t && p, `${y}: ${d} has tppdiv and first-preference rows`);
+      return s + (i ? t[0] - p.coal : t[1] - p.alp);
+    }, 0));
+    assert.ok(Math.abs(lv[0] + ncDrift - mn[0]) <= 1, `${y}: ${st} leftover ${lv[0].toFixed(0)} + drift ${ncDrift} != per-division minors ${mn[0].toFixed(0)} (ALP side)`);
+    assert.ok(Math.abs(lv[1] - ncDrift - mn[1]) <= 1, `${y}: ${st} leftover ${lv[1].toFixed(0)} - drift ${ncDrift} != per-division minors ${mn[1].toFixed(0)} (Coalition side)`);
+  });
+  // assign: exact for single-class states, allocated over bucket first prefs otherwise
+  const acc = {}, est = {};
+  CLASS_IDS.forEach((k) => { acc[k] = { grn: [0, 0], onp: [0, 0], oth: [0, 0] }; est[k] = new Set(); });
+  Object.entries(nc).forEach(([st, bycls]) => {
+    const ks = Object.keys(bycls);
+    if (ks.length === 1) {
+      BUCKETS.forEach((bk) => { acc[ks[0]][bk][0] += leftover[st][bk][0]; acc[ks[0]][bk][1] += leftover[st][bk][1]; });
+    } else {
+      BUCKETS.forEach((bk) => {
+        const w = {}, tot = ks.reduce((s, k) => s + (w[k] = bycls[k].reduce((z, d) => z + fpd.get(d)[bk], 0)), 0);
+        const [la, ll] = leftover[st][bk];
+        if (la + ll <= 0.5) return;
+        assert.ok(tot > 0, `${y}: ${st} ${bk} leftover ${la}+${ll} with no first-preference base`);
+        ks.forEach((k) => {
+          if (w[k] <= 0) return;
+          acc[k][bk][0] += la * w[k] / tot; acc[k][bk][1] += ll * w[k] / tot;
+          est[k].add(bk);
+        });
+      });
+    }
+  });
+  CLASS_IDS.forEach((k) => {
+    let la = 0, ll = 0;
+    BUCKETS.forEach((b) => {
+      const a = (classicSum[k]?.[b][0] || 0) + acc[k][b][0], l = (classicSum[k]?.[b][1] || 0) + acc[k][b][1];
+      expectedAll[k][b][yi] = a + l ? pyr1(100 * a / (a + l)) : null;
+      expectedAll[k].votes[b][yi] = a + l ? [pyr(a), pyr(l)] : null;
+      expectedAll[k].est[b][yi] = est[k].has(b);
+      la += a; ll += l;
+    });
+    expectedAll[k].lump[yi] = pyr1(100 * la / (la + ll));
+    expectedAll[k].lumpVotes[yi] = [pyr(la), pyr(ll)];
+  });
+});
+assert.deepEqual(data.allSeats ? Object.keys(data.allSeats) : [], CLASS_IDS, "allSeats carries the four classes in chart order");
+CLASS_IDS.forEach((k) => {
+  BUCKETS.forEach((b) => {
+    assert.deepEqual(data.allSeats[k][b], expectedAll[k][b], `allSeats ${k} ${b}: shares recomputed from the AEC caches`);
+    assert.deepEqual(data.allSeats[k].votes[b], expectedAll[k].votes[b], `allSeats ${k} ${b}: ballots recomputed from the AEC caches`);
+    assert.deepEqual(data.allSeats[k].est[b], expectedAll[k].est[b], `allSeats ${k} ${b}: the est roster`);
+  });
+  assert.deepEqual(data.allSeats[k].lump, expectedAll[k].lump, `allSeats ${k} lump: every non-major ballot`);
+  assert.deepEqual(data.allSeats[k].lumpVotes, expectedAll[k].lumpVotes, `allSeats ${k} lump ballots`);
+});
+
+// ---- the mixed-cell est roster is deliberate --------------------------------
+/* A state-year's non-classic seats spanning classes forces the leftover
+   allocation (and the est flag); the roster is pinned so a redistribution
+   or a new crossbench era changes it by conscious edit, never silently. */
+assert.deepEqual(mixedRoster, {
+  2010: { NSW: ["inner", "rural"] },
+  2013: { VIC: ["inner", "rural"] },
+  2016: { NSW: ["inner", "rural"], SA: ["inner", "rural"], VIC: ["inner", "rural"] },
+  2019: { NSW: ["inner", "provincial", "rural"], VIC: ["inner", "rural"] },
+  2022: { NSW: ["inner", "outer", "provincial", "rural"], QLD: ["inner", "outer", "provincial", "rural"], VIC: ["inner", "rural"] },
+  2025: { NSW: ["inner", "outer", "provincial", "rural"], QLD: ["inner", "outer", "provincial", "rural"], TAS: ["inner", "outer"], VIC: ["inner", "outer", "rural"] },
+}, "the 14 mixed state-year cells (2010 NSW through 2025 VIC)");
+assert.equal(census.filter(([, , ks]) => ks.length === 1).length, 26, "26 single-class state-year cells land exactly");
+
+// ---- consistency-guard exemplar: the NSW 2004 three-cornered drift ---------
+/* Calare and New England 2004 were fought by BOTH Coalition parties; the
+   1,570 Coalition-to-ALP ballots inside them (the state table's LP 672 +
+   NP 898) are not minor-party flows – the lump excludes them and the
+   consistency guard puts the drift back when cross-checking the products. */
+{
+  const { flow, cross } = tcpFlowByDiv(2004);
+  const fpd = dopFirstPrefs(2004);
+  const tpp = tppdivTotals(2004);
+  const { per: sf, drift } = stateFlowTable(2004);
+  const lv2004 = [0, 1].map((i) => BUCKETS.reduce((s, bk) => s + sf.NSW[bk][i], 0) -
+    [...flow].filter(([nm]) => classesOf["2004"][nm].state === "NSW")
+      .reduce((s, [, b]) => s + BUCKETS.reduce((z, bk) => z + b[bk][i], 0), 0));
+  assert.deepEqual(lv2004.map(Math.round), [47369, 47309], "NSW 2004 non-classic bucket leftovers");
+  const mn2004 = [0, 1].map((i) => ["Calare", "New England"].reduce((s, d) => s + (i ? tpp.get(d)[0] - fpd.get(d).coal : tpp.get(d)[1] - fpd.get(d).alp), 0));
+  assert.deepEqual(mn2004.map(Math.round), [48939, 45739], "Calare + New England TPP-minus-first-preferences");
+  assert.equal(Math.round(drift.NSW), 1570, "NSW 2004 Coalition-to-ALP drift (LP 672 + NP 898)");
+  assert.equal(Math.round(drift.NSW - ["Calare", "New England"].reduce((s, d) => s + (cross.get(d) || 0), 0)), 1570, "none of NSW 2004's drift sits in a classic seat");
+}
+
+// ---- the Grayndler 2022 tppdiv oracle ---------------------------------------
+assert.deepEqual(tppdivTotals(2022).get("Grayndler").map(Math.round), [20002, 74571], "Grayndler 2022: ALP 74,571 v Coalition 20,002 in the TPP-by-division table");
+
 // ---- the view reaches the elections menu ------------------------------------
 const jsx = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd-allpolls.jsx"), "utf8");
 assert.ok(/"fedcl:" \+ k/.test(jsx), "the elections menu emits the fedcl:<class> options");
