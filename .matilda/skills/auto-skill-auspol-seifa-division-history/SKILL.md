@@ -1,6 +1,6 @@
 ---
 name: auspol-seifa-division-history
-description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (RR5-Att1 is the ONLY published 2001-census per-division score; the APH trilogy = CIB13/2000-01 1996×2000 + RP09rp02 2006×2006 + RP11rp01 2006×2009, all three PDFs committed 53831398), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028.
+description: Sourcing census SEIFA scores at federal-division level for historical elections (1987→2028) — the ABS/AEC/APH product map (RR5-Att1 is the ONLY published 2001-census per-division score; the APH trilogy = CIB13/2000-01 1996×2000 + RP09rp02 2006×2006 + RP11rp01 2006×2009, all three PDFs committed 53831398), the ABS population-weighted derivation recipe, the census↔election pairing table, AEC deep-history WMTS (Electoral_1984_CED…) + 2026-10-23-24h DNS NODATA failure with multi-resolver ladder, plus the Wayback-CDX-vs-playback recovery trick for a 403-walled host. Mapped 2026-10-23 in .build/analysis/seifa-index/; the IRSAD-only store is BUILT (2026-10-24) — derive-irsad.py + irsad-by-division.json cover every election 2001→2028 — and the IRSD/IER/IEO store landed the same day (extract-division-seifa.mjs + derive-division-seifa-abs.py → data/division-seifa-indexes.json, elections 2001–2025 bar 2004).
 source: auto-skill
 extracted_at: '2026-10-23T06:20:52.767Z'
 ---
@@ -35,6 +35,48 @@ QA gates that failed loud during the build and now pass: per-store
 boundary-name pins; 2011+2016 SA1-decile histogram recon vs the ABS CED
 distributions cubes (EXACT, 150/0 twice); 2021-era national decile
 population shares within 10%±0.5%.
+
+## Landed: the IRSD/IER/IEO store (2026-10-24)
+
+The published-source **three-index** sibling store is **built and stored**:
+`.build/analysis/seat-model/extract-division-seifa.mjs` (fixture parsers +
+merge) consumes `.build/analysis/seat-model/derive-division-seifa-abs.py`
+(ABS lanes) and emits `data/division-seifa-indexes.json` — elections
+`{2001,2007,2010,2013,2016: 150 · 2019,2022: 151 · 2025: 150}` = **1,202
+rows** of `{state, irsd, ier, ieo, via}`, pinned by
+`.build/analysis/seat-model/test-division-seifa.mjs` (8-election set,
+name-exact vs division-classifications, rank permutations, 18+ pinned
+cells, provenance census-year pins). IRSAD stays deliberately absent —
+that's the sibling store's index. **Rank convention DANGER: this store's
+ranks are rank 1 = most DISadvantaged (the APH tapes' order, kept); the
+IRSAD sibling store re-based itself to rank 1 = most ADVANTAGED.** Lane
+map: 2007/2010 = APH printed tables (scores+ranks verbatim);
+**2001 = the ABS's own published 2001-CED cube** (`AUS_ced_s01.xls`,
+2001C×2000/01-edition CEDs, scores printed / ranks computed, IRSAD column
+verified 150/150 vs RR5-Att1 within printed rounding) — graded A after
+all; **2013–2025 = ABS 2039.0 §2.2 weighted derivations** (SEIFA SA1
+cubes × 2010/2016/2018-edition memberships for 2013–2019; SEIFA-2021 MB
+cube × 2021/2024-edition MB allocations + 2074.0 MB counts for 2022/2025),
+ranks computed from 3dp scores. QA: 2013+2016 SA1-decile histograms per
+CED EXACT vs the ABS CED SA1-distributions cubes (3 indexes each);
+national decile pop-shares sanity **10%±2** (±0.5 is unattainable — ABS
+buckets SA1s by COUNT so IEO d1 sits at 8.8% of population in 2021).
+**2004 stays open** — the 2004 election ran on the 2003-edition boundaries
+(Bonython→Bonner, Burke→Gorton) and no official 2001-CD→2003-CED
+concordance exists (ABS 2905.0 Vol 2 approximates census-geographic CEDs
+at the 2001 census alone — web-checked again 2026-10-24).
+**ABS header-drift trap (now confirmed, not speculation)**: ABS swapped
+the IRSD/IRSAD lead-column order between SEIFA editions — 2011 SA1
+summary leads IRSAD, 2016+2021 lead **IRSD** — so positional column reads
+misread silently. derive-division-seifa-abs.py resolves every cube column
+by header NAME because of this. Corollary reported to the user 2026-10-24:
+the sibling `derive-irsad.py` does positional reads (col1/col2/col1),
+correct for 2011 but **misreads IRSD as IRSAD for 2016 and 2021** —
+so `irsad-by-division.json`'s SA1-derived rows (2013, 2016, 2019, 2022,
+2025, 2028) carry IRSD values under the IRSAD key; its exact recon gates
+pass because the distributions-cube table pick swaps the same disease in
+step. Printed-lane rows (2001/2004/2007/2010) are true IRSAD. Repair is
+the sibling lane's job.
 
 ## Who publishes what (the load-bearing facts)
 
@@ -115,13 +157,13 @@ nearest by mere distance — check direction):
 | 1990/1993 | 1987/1990 | 1986→1991 | CD cubes + era concordances | C |
 | 1996 | 1993 | 1996 (6 wk after — use 1991? no: 1996 census too late; **1991**) | CD cubes | C |
 | 1998 | 1996 | 1996 | SEIFA-1996 CD + 1996-edition concordance | B |
-| 2001/2004 | 2000/2003 | 2001 | **RR5-Att1 (2001 edition)** — no APH 2001-census paper exists (CIB13 is 1996-census); 2004 needs 2003-edition re-aggregation | A/B |
-| 2007 | 2006 | 2006 | **APH RP09rp02 (2006×2006)** + ABS 2007-CED dist xlsx | A |
-| 2010 | 2009 | 2006 | **APH RP11rp01 (2006×2009 re-issue)** | A |
-| 2013/2016 | 2010/2016 | 2011/2016 | ABS CED Population/SA1 Distributions → weighted derivation | B |
-| 2019 | 2018 | 2016 | ABS 2016 CED cubes VERIFIED on the **2016-edition** boundaries (`CED_CODE_2016`; Hunter/Whitlam/Burt/Fenner in, Charlton/Throsby out) — one edition behind the 2018 set the 2019 election used; changed seats (Cooper/Macnamara/Monash/Fraser, Bean, Spence/Port-Adelaide-out) need SA1-SEIFA-2016 + an SA1→CED(2018) allocation | B |
-| 2022 | 2021 | 2021 | ABS 2021 CED SA1-distributions cube → mechanical | A/B |
-| 2025 | 2025 | 2021 | SEIFA-2021 SA1 file + 2021-SA1→2025-CED weights (repo's own `map-census-2025-frame.mjs` re-aggregation pattern) | B |
+| 2001/2004 | 2000/2003 | 2001 | **2001 LANDED: ABS's own AUS_ced_s01.xls cube** (2000/01-edition CEDs) — no APH 2001-census paper exists (CIB13 is 1996-census); 2004 needs 2003-edition re-aggregation — NO official 2001-CD→2003-CED concordance, stays open | A / open |
+| 2007 | 2006 | 2006 | **APH RP09rp02 (2006×2006)** + ABS 2007-CED dist xlsx — LANDED | A |
+| 2010 | 2009 | 2006 | **APH RP11rp01 (2006×2009 re-issue)** — LANDED | A |
+| 2013/2016 | 2010/2016 | 2011/2016 | ABS CED Population/SA1 Distributions → weighted derivation — LANDED (SA1 cubes × CED memberships) | B |
+| 2019 | 2018 | 2016 | ABS 2016 CED cubes VERIFIED on the **2016-edition** boundaries (`CED_CODE_2016`; Hunter/Whitlam/Burt/Fenner in, Charlton/Throsby out) — one edition behind the 2018 set the 2019 election used; changed seats (Cooper/Macnamara/Monash/Fraser, Bean, Spence/Port-Adelaide-out) landed via SA1-SEIFA-2016 × SA1→CED(2018) allocation (1270.0.55.003 July 2018 zip) | B ✓ |
+| 2022 | 2021 | 2021 | SEIFA-2021 at MB level × CED_2021 allocation (`ced2021.xlsx`) + 2074.0 MB counts × MB→SA1 keys — LANDED | A/B ✓ |
+| 2025 | 2025 | 2021 | Same MB recipe × CED_2024 allocation (`ced2024.xlsx` == ced2025 name sets) — LANDED | B ✓ |
 | 2028 | post-2025 gazettal | 2021 (SEIFA-2026 lands ~2029 — too late) | same recipe on the new edition | B |
 
 Grades: **A** published per-division score exists; **B** mechanical

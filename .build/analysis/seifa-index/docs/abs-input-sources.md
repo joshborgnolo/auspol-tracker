@@ -29,6 +29,7 @@ This note is the manifest to rebuild that cache from scratch.
 | `abs-seifa-2011-sa1-indexes.xls` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012011?OpenDocument` → "Socio-Economic Indexes for Areas (SEIFA) – Postal Area, SA2, SA1, State Suburb, Local Government Area, State Electoral Division" cubes |
 | `abs-seifa-2016-sa1-indexes.xls` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012016?OpenDocument` → SA1 cube |
 | `abs-seifa-2021-sa1-indexes.xlsx` | SEIFA 2021 release page, "Index of Relative Socio-economic Advantage and Disadvantage" … `abs.gov.au` → SEIFA 2021 → Statistical Area Level 1 |
+| `dl/seifa2001-aus.zip` | ABS cat 2033.0.55.001, `DetailsPage/2033.0.55.0012001?OpenDocument` — the "Commonwealth Electoral Division" cube set (`AUS_ced_s01.xls`, published per-division scores on 2000/01-edition CEDs; consumed by seat-model's 3-index pipeline) |
 
 ### Allocation / membership + weights (`<root>/.matilda/seifa-irsad-abs/dl/`)
 
