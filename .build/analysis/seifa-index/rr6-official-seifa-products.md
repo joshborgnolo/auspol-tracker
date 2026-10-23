@@ -27,6 +27,12 @@ far back can census-based SEIFA-by-division figures be derived, and from where?*
   contemporary CED census profiles from the ABS's own census-by-division
   output; AEC boundary geometry back to the 1984 edition via the AEC map
   proxy, §5). Effort is real but bounded; see §7.
+- **Covariate decision (2026-10-23, user call): the seat-model W-history
+  SEIFA input is IRSAD ONLY** — not IRSD. IRSAD is the index AEC RR5
+  Attachment 1 prints, it is not strictly disadvantage-denominated (captures
+  both tails), and its three sister indexes ship in the same ABS cubes if a
+  later workstream wants them. Cross-era comparability stays rank/decile-only
+  regardless (§8).
 
 ## 2. ABS official SEIFA products, per census (verified this session)
 
@@ -40,7 +46,7 @@ Source pages cached under `.build/analysis/seifa-index/src/`:
 | 2001 | 2033.0.55.001 "data cube only" (reissue 05/10/2006) | 2003/2006 | CD, SLA, LGA, POA — **4 indexes** | none |
 | 2006 | 2033.0.55.001 | 26/03/2008 | CD, SLA, LGA, POA (+SSC added 29/05/2008) | **"2007 Commonwealth Electoral Divisions" population-distributions tables** (added 29/05/2008, "illustrative tools") |
 | 2011 | 2033.0.55.001 | (DetailsPage fetched) | SA1/SA2/SLA/LGA/SSC/POA per-index xlsx | **CED Population Distributions + CED SA1 Distributions** |
-| 2016 | 2033.0.55.001 | 27/03/2018 | SA1/SA2/LGA/SSC/POA per-index xlsx | **CED Population Distributions + CED SA1 Distributions** |
+| 2016 | 2033.0.55.001 | 27/03/2018 | SA1/SA2/LGA/SSC/POA per-index xlsx | **CED Population Distributions + CED SA1 Distributions** — downloaded (`src/abs/…ced-populations.xls`, `…sa1-distributions-ced.xls`); verified on the **2016-edition** boundary set (`CED_CODE_2016`/`CED_NAME_2016`; Hunter/Whitlam/Burt/Fenner in, Charlton/Throsby out), all four index families in the Data sheet |
 | 2021 | abs.gov.au latest-release | 27/04/2023 | SA1 (+SA2/SA3/SA4? no — SA1, SA2, LGA, Suburb, POA, SED index cubes) | **CED Population Distributions xlsx (267 KB) + CED SA1 Distributions xlsx (698 KB)** — both quote-checked from `abs-seifa-2021-release.html` |
 
 Notes:
@@ -117,7 +123,10 @@ Method note from 01cib13/09rp02/11rp01 §2: all three papers use the same popula
   ns-1628.awsdns-11.co.uk.` only, zero A/AAAA/CNAME. Persistent DNS-side
   removal rather than a blip; would re-check next session before declaring
   the mapproxy surface permanently changed. Earlier same-day it served the
-  full capabilities documents.
+  full capabilities documents. Third check ~18:22 (dig @8.8.8.8 and
+  @1.1.1.1): still zero A records — and the SOA query now returns empty
+  too, so even the NS-side glue has gone. Still dead; GetCapabilities pull
+  stays parked (open item 4).
 - Authoritative edition/in-force schedule 1984→2025 + the AE ledger is in
   `cache/rr5.txt` successor note (the rr5 summary file) — 13 editions:
   1984/1987/1990/1993/1996/2000/2003/2006/2009/2010/2016/2018/2021/2025
@@ -155,7 +164,7 @@ sourced from ABS census geography units + boundary polygons).
 | 2010 | 2009 | 2006 (4 y before) | **APH RP 1/2010–11 (2006 census × 2009 divisions)** | **A** |
 | 2013 | 2010 | 2011 (23 mo before) | ABS SEIFA 2011 CED population/SA1 distributions → weighted derivation | B |
 | 2016 | 2016 | 2016 (6 wk after) | ABS SEIFA 2016 CED population/SA1 distributions → weighted derivation | B |
-| 2019 | 2018 | 2016 (~2.7 y before) | ABS SEIFA 2016 CED dist (verify which boundary vintage the xlsx uses) | B |
+| 2019 | 2018 | 2016 (~2.7 y before) | ABS SEIFA 2016 CED dist — VERIFIED on the **2016-edition** boundaries (`CED_CODE_2016`; Hunter/Whitlam/Burt/Fenner in, Charlton/Throsby out), i.e. one edition behind the 2018 set the 2019 election used. Δ seats: Vic (Batman→Cooper, Melbourne Ports→Macnamara, McMillan→Monash renames + new Fraser), ACT (Bean new 3rd seat), SA (11→10: Port Adelaide out, Wakefield→Spence). Untouched seats derive directly; changed seats need the 2016→2018 concordance — SA1-level SEIFA 2016 file + an SA1→CED(2018) allocation, same recipe as the 2025 row | **B** |
 | 2022 | 2021 | 2021 (9 mo before) | ABS SEIFA 2021 CED distributions + SA1-distributions (mechanical) | **A/B** |
 | 2025 | 2025 | 2021 (~3.7 y before) | SEIFA 2021 SA1 file + 2021-SA1→2025-CED weights (repo's own `map-census-2025-frame.mjs` pattern) | B |
 | 2028 | next gazettal | 2021 (SEIFA 2026 lands ~2029, too late) | SEIFA 2021 SA1 + new-edition weights | B |
@@ -176,10 +185,15 @@ sourced from ABS census geography units + boundary polygons).
    (`aph-01cib13.{pdf,txt}` 1996×2000; `aph-09rp02.{pdf,txt}` 2006×2006;
    `aph-11rp01.{pdf,txt}` 2006×2009) committed under `src/aph/`. No
    2001-census APH edition exists.
-2. Verify which boundary edition the ABS 2016 CED distributions xlsx targets
-   (the 2016 publication could be on the 2013 or the 2016 set — its release
-   27/03/2018 postdates the 2016-edition gazettal, so likely 2016; still
-   worth one xlsx download to confirm).
+2. ~~Verify which boundary edition the ABS 2016 CED distributions xlsx
+   targets~~ — **DONE 2026-10-23**: both files downloaded to `src/abs/`
+   (`abs-seifa-2016-ced-populations.xls` 439 KB, `abs-seifa-2016-
+   sa1-distributions-ced.xls` 158 KB — subscriber.nsf 302-redirects through
+   ausstats.abs.gov.au twice, `curl -L` handles it). Column headers
+   `CED_CODE_2016`/`CED_NAME_2016` and the seat set (Hunter/Whitlam/Burt/
+   Fenner in; Charlton/Throsby out) prove the **2016 edition** — the set in
+   force at the 2016 election, one edition behind the 2018 set used in 2019.
+   §7's 2019 row now records the 2016→2018 concordance requirement.
 3. For pre-2001-census works (1987–1998 elections), source ABS correspondence
    files (CD→CED) per census from ABS catalogue 1217/2900-era products or
    the ABS Unlodged-CD catalogue (research-visit territory).
