@@ -9186,7 +9186,20 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "lnp": [39.6, 44.78, 42, 35.19, 34.48],
         "grn": [10.04, 11.21, 11.48, 10.71, 11.5],
         "onp": [null, null, null, null, null],
-        "oth": [7.3, 7.76, 8.43, 11.23, 17.36]
+        "oth": [7.3, 7.76, 8.43, 11.23, 17.36],
+        "sen": {
+          "label": "Victorian Legislative Council",
+          "short": "Vic LC",
+          "lc": true,
+          "elections": "Victorian Legislative Council elections",
+          "srcLine": "the Victorian Electoral Commission’s official results",
+          "years": [2006, 2010, 2014, 2018, 2022],
+          "alp": [41.45, 35.36, 33.46, 39.22, 33.01],
+          "lnp": [38.98, 43.16, 36.13, 29.43, 29.44],
+          "grn": [10.58, 12.01, 10.75, 9.25, 10.32],
+          "onp": [null, null, null, null, null],
+          "oth": [8.99, 9.47, 19.65, 22.09, 27.23]
+        }
       },
       "wa": {
         "label": "Western Australia",
@@ -9198,7 +9211,20 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "lnp": [34.42, 39.33, 43.27, 53.16, 36.62, 25.3, 33.17],
         "grn": [7.27, 7.57, 11.92, 8.39, 8.91, 6.92, 11.06],
         "onp": [9.58, null, null, null, 4.93, null, 4],
-        "oth": [11.5, 11.22, 8.98, 5.32, 7.33, 7.86, 10.33]
+        "oth": [11.5, 11.22, 8.98, 5.32, 7.33, 7.86, 10.33],
+        "sen": {
+          "label": "Western Australian Legislative Council",
+          "short": "WA LC",
+          "lc": true,
+          "elections": "Western Australian Legislative Council elections",
+          "srcLine": "the Western Australian Electoral Commission’s official results",
+          "years": [2001, 2005, 2008, 2013, 2017, 2021, 2025],
+          "alp": [41.23, 43.42, 36.14, 32.51, 40.41, 60.34, 40.89],
+          "lnp": [33.01, 39.32, 44.92, 52.51, 31.14, 20.47, 32.61],
+          "grn": [6.81, 7.52, 11.09, 8.21, 8.6, 6.38, 10.94],
+          "onp": [10.68, null, null, null, 8.19, null, null],
+          "oth": [8.27, 9.75, 7.84, 6.78, 11.66, 12.8, 15.55]
+        }
       },
       "sa": {
         "label": "South Australia",
@@ -9210,7 +9236,20 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "lnp": [36.15, 19.05],
         "grn": [9.12, 10.37],
         "onp": [null, 22.88],
-        "oth": [14.76, 10.22]
+        "oth": [14.76, 10.22],
+        "sen": {
+          "label": "South Australian Legislative Council",
+          "short": "SA LC",
+          "lc": true,
+          "elections": "South Australian Legislative Council elections",
+          "srcLine": "the Electoral Commission SA’s official results",
+          "years": [2022, 2026],
+          "alp": [36.96, 36.71],
+          "lnp": [35.05, 18.17],
+          "grn": [9.03, 10.2],
+          "onp": [4.23, 24.43],
+          "oth": [14.73, 10.49]
+        }
       },
       "qld": {
         "label": "Queensland",
@@ -144501,6 +144540,7 @@ function ExplainedPrimaryChart({
   stateKey,
   classKey,
   statePrim,
+  lcKey,
   menu
 }) {
   const narrow = useNarrow(window.MQ_PHONE);
@@ -144547,7 +144587,7 @@ function ExplainedPrimaryChart({
     x1 = YEARS[YEARS.length - 1] + pad1;
   const span = YEARS.length > 1 ? YEARS[0] + "–" + YEARS[YEARS.length - 1] : String(YEARS[0]);
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
-  const cap = (statePrim ? statePrim.lc ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019." : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + "." : classKey && house !== "sen" ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" && !statePrim ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
+  const cap = (statePrim ? statePrim.lc ? lcKey === "nsw" ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019." : "First preferences by party at the " + span + " " + S.elections + ", every formal vote from " + S.srcLine + "." : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + "." : classKey && house !== "sen" ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions." : stateKey ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + ", from the AEC's official results (its per-state first-preference tables, which reach back to 2004)." : "First preferences by party at the " + span + " " + (house === "sen" ? "Senate" : "federal") + " elections, from the AEC's official results (1972–2001 transcribed from its published election tables; the per-state cut starts 2004).") + " A party polling under " + foldPt + "% draws no line of its own - its share joins Others, which is what remains after the shown lines - so a gap is a small or absent vote, never a zero." + (house === "sen" && !statePrim ? " Senate first preferences are of formal ballots over the whole chamber, so a minor party's line runs ahead of its final-seat share." : "");
   const lines = parties.map(p => ({
     kind: "line",
     color: p.color,
@@ -144633,11 +144673,17 @@ function RdExplained() {
   const badClass = view.startsWith("fedcl:") && !classKey;
   const STATE_PRIM = PH_HIST && PH_HIST.stateElections || {};
   const STE_KEYS = Object.keys(STATE_PRIM);
-  const LC_PRIM = STATE_PRIM.nsw && STATE_PRIM.nsw.sen || null;
+  const STE_LCS = {};
+  STE_KEYS.forEach(k => {
+    const s = STATE_PRIM[k] && STATE_PRIM[k].sen;
+    if (s && s.lc) STE_LCS[k] = s;
+  });
+  const STE_LC_KEYS = Object.keys(STE_LCS);
   const steKey = view.startsWith("ste:") && STATE_PRIM[view.slice(4)] ? view.slice(4) : null;
-  const steLcView = view === "ste:nswlc" && !!LC_PRIM;
+  const steLcKey = view.startsWith("ste:") && view.endsWith("lc") && STE_LCS[view.slice(4, -2)] ? view.slice(4, -2) : null;
+  const steLcView = !!steLcKey;
   const steView = !!steKey || steLcView;
-  const stePrim = steLcView ? LC_PRIM : steKey ? STATE_PRIM[steKey] : null;
+  const stePrim = steLcView ? STE_LCS[steLcKey] : steKey ? STATE_PRIM[steKey] : null;
   const setFlowsFig = () => setFig(m => m === "flows" ? "primary" : "flows");
   const [pair, setPair] = useState("co");
   const rival = pair === "on" ? "One Nation" : "Coalition";
@@ -144646,8 +144692,8 @@ function RdExplained() {
     setHouse(next);
     if (primMode) {
       if (next === "sen") {
-        if (view === "ste:nsw" && LC_PRIM) setView("ste:nswlc");else if (steKey) setView("fed");
-      } else if (steLcView) setView("ste:nsw");
+        if (steKey && STE_LCS[steKey]) setView("ste:" + steKey + "lc");else if (steKey) setView("fed");
+      } else if (steLcView) setView("ste:" + steLcKey);
       return;
     }
     if (next === "sen") {
@@ -144759,7 +144805,7 @@ function RdExplained() {
     setPair(p);
     if (p === "on" && house === "sen" && (lcView && !LC_ON_BANK || stateKey && !hasOnCells(stateKey))) setView("fed");
   };
-  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? LC_PRIM ? ["ste:nswlc"] : [] : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
+  const VIEW_OPTS = primMode ? ["fed", ...Object.keys(PH_HIST.fed && PH_HIST.fed.states || {}).map(k => "fed:" + k), ...(house === "sen" ? STE_LC_KEYS.map(k => "ste:" + k + "lc") : [...Object.keys(PH_CLASSES).map(k => "fedcl:" + k), ...STE_KEYS.map(k => "ste:" + k)])] : house === "sen" ? pair === "on" ? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map(k => "fed:" + k)] : []), ...(LC_ON_BANK ? ["nswlc"] : [])] : [...(SEN_BANK ? ["fed", ...senStateKeys.map(k => "fed:" + k)] : []), ...(LC_BANK ? ["nswlc"] : [])] : KEYS.length > 1 || stateKeys.length > 0 || classKeys.length > 0 ? ["fed", ...stateKeys.map(k => "fed:" + k), ...classKeys.map(k => "fedcl:" + k), ...(KEYS.length > 1 ? KEYS.filter(k => k !== "fed") : [])] : [];
   React.useEffect(() => {
     if (primMode && (badClass || lcView || !fedView && !steView)) setView("fed");
     if (!primMode && steView) setView("fed");
@@ -144770,7 +144816,7 @@ function RdExplained() {
   const menu = menuShow ? React.createElement("select", {
     className: "rd-pv-sel ex-fl-sel",
     "aria-label": "Elections",
-    value: lcView && !senOnView ? "nswlc" : steLcView ? "ste:nswlc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
+    value: lcView && !senOnView ? "nswlc" : steLcView ? "ste:" + steLcKey + "lc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur,
     onChange: e => setView(e.target.value)
   }, React.createElement("optgroup", {
     label: "Federal elections"
@@ -144796,11 +144842,12 @@ function RdExplained() {
   }, STE_KEYS.map(k => React.createElement("option", {
     key: k,
     value: "ste:" + k
-  }, (STATE_PRIM[k].short || STATE_PRIM[k].label) + " state elections"))), primMode && house === "sen" && LC_PRIM && React.createElement("optgroup", {
+  }, (STATE_PRIM[k].short || STATE_PRIM[k].label) + " state elections"))), primMode && house === "sen" && STE_LC_KEYS.length > 0 && React.createElement("optgroup", {
     label: "State elections"
-  }, React.createElement("option", {
-    value: "ste:nswlc"
-  }, LC_PRIM.label))) : null;
+  }, STE_LC_KEYS.map(k => React.createElement("option", {
+    key: k,
+    value: "ste:" + k + "lc"
+  }, STE_LCS[k].label)))) : null;
   const share = React.createElement("span", {
     className: "rd-pl-ctl ex-share"
   }, React.createElement("span", {
@@ -144893,6 +144940,7 @@ function RdExplained() {
     stateKey: stateKey,
     classKey: classKey,
     statePrim: stePrim,
+    lcKey: steLcKey,
     menu: headCtls
   }) : lcView && pair === "on" ? React.createElement(ExplainedFlowChart, {
     jur: "nsw",

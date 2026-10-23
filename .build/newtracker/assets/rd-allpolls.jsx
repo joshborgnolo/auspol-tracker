@@ -6194,10 +6194,11 @@ const EX_PAIRS = [{ id: "co", label: "Labor v Coalition", short: "v Coalition" }
    bank carries no class views and the menu hides them there. A "State
    elections" section rides the menu too (same day, the stateElections
    bank gen-data derives at build time): the six covered assemblies'
-   official results under Lower, and to pick one upper house the NSW
-   Legislative Council's above-the-line family shares under Upper -
-   banked beside its Assembly exactly as the flows card banks its own. */
-function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, menu }) {
+   official results under Lower, and the banked upper houses under
+   Upper - NSW's above-the-line family shares (2026-10-23) and the Vic,
+   SA and WA full-formal counts (2026-10-24), each banked beside its
+   Assembly exactly as the flows card banks its own. */
+function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, menu }) {
   const narrow = useNarrow(window.MQ_PHONE);
   const PH = window.AUSPOL.primaryHistory || null;
   if (!PH || !PH.fed) return null;
@@ -6243,7 +6244,12 @@ function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, menu }) {
   const scope = rdCap(S.elections || S.label + " elections") + ", " + span;
   const cap = (statePrim
     ? (statePrim.lc
-      ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019."
+      ? lcKey === "nsw"
+        /* NSW's is the only ballot-paper count - the ATL wording and its
+           2011/2015 One Nation note stay its own; the full-formal Council
+           banks (Vic, SA, WA, 2026-10-24) name every formal vote */
+        ? "First preferences by party at the " + span + " NSW Legislative Council elections, every formal above-the-line vote from " + S.srcLine + " (below-the-line papers excluded, as on the Senate view). One Nation ran no upper-house group in 2011 or 2015 - Pauline Hanson’s 2011 independent ticket sits with the Others - so its line opens in 2019."
+        : "First preferences by party at the " + span + " " + S.elections + ", every formal vote from " + S.srcLine + "."
       : "First preferences by party at the " + span + " " + S.elections + ", from " + S.srcLine + ".")
     : classKey && house !== "sen"
     ? "First preferences by party at the " + span + " federal elections in " + (S.short || S.label) + " seats, from the AEC's official results, each seat grouped by the AEC's own classification for that election's divisions."
@@ -6379,17 +6385,25 @@ function RdExplained() {
      primary votes for state elections, lower and upper houses"):
      primaryHistory.stateElections, gen-data's build-time derivation -
      the six assemblies' official first preferences under Lower
-     (ste:<key>), and the NSW Legislative Council's ATL family shares
-     under Upper (ste:nswlc, banked beside its Assembly's just as the
-     flows card banks FH.nsw.sen). Flows features stay flows-side: these
+     (ste:<key>), and the banked Legislative Councils under Upper
+     (ste:<key>lc, each banked beside its Assembly just as the flows card
+     banks FH.nsw.sen): NSW's ATL family shares (2026-10-23) joined by the
+     Vic, SA and WA full-formal counts (2026-10-24 - user "why only nsw
+     state upper house?", "yes"). Flows features stay flows-side: these
      ids never join VIEW_OPTS outside primMode. */
   const STATE_PRIM = (PH_HIST && PH_HIST.stateElections) || {};
   const STE_KEYS = Object.keys(STATE_PRIM);
-  const LC_PRIM = (STATE_PRIM.nsw && STATE_PRIM.nsw.sen) || null;
+  /* one ste:<jur>lc view per banked Council, riding Upper beside its
+     Assembly; NSW's keeps its ATL caption (the only ballot-paper count),
+     the rest name every formal vote */
+  const STE_LCS = {};
+  STE_KEYS.forEach((k) => { const s = STATE_PRIM[k] && STATE_PRIM[k].sen; if (s && s.lc) STE_LCS[k] = s; });
+  const STE_LC_KEYS = Object.keys(STE_LCS);
   const steKey = view.startsWith("ste:") && STATE_PRIM[view.slice(4)] ? view.slice(4) : null;
-  const steLcView = view === "ste:nswlc" && !!LC_PRIM;
+  const steLcKey = view.startsWith("ste:") && view.endsWith("lc") && STE_LCS[view.slice(4, -2)] ? view.slice(4, -2) : null;
+  const steLcView = !!steLcKey;
   const steView = !!steKey || steLcView;
-  const stePrim = steLcView ? LC_PRIM : steKey ? STATE_PRIM[steKey] : null;
+  const stePrim = steLcView ? STE_LCS[steLcKey] : steKey ? STATE_PRIM[steKey] : null;
   const setFlowsFig = () => setFig((m) => (m === "flows" ? "primary" : "flows"));
   /* the contest tabs flip Labor v Coalition (the flowHistory election
      histories) to Labor v One Nation. The One Nation card differs by
@@ -6413,15 +6427,16 @@ function RdExplained() {
        class pick needs no direct snap: the Upper bank has no classes, so
        classKey reads null on the next render and the primary snap effect
        below walks the stale pick to "fed". The primary state picks are
-       house-aware the flows way: NSW's Assembly view has its upper-house
-       twin in the primary bank (NSW LC's own first-preference series), so
-       it becomes that; every other state-election pick is a House feature
-       and drops to the national series */
+       house-aware the flows way: an Assembly view whose Council is banked
+       has its upper-house twin in the primary bank (that Council's own
+       first-preference series), so it becomes that; every other
+       state-election pick is a House feature and drops to the national
+       series */
     if (primMode) {
       if (next === "sen") {
-        if (view === "ste:nsw" && LC_PRIM) setView("ste:nswlc");
+        if (steKey && STE_LCS[steKey]) setView("ste:" + steKey + "lc");
         else if (steKey) setView("fed");
-      } else if (steLcView) setView("ste:nsw");
+      } else if (steLcView) setView("ste:" + steLcKey);
       return;
     }
     if (next === "sen") {
@@ -6571,13 +6586,13 @@ function RdExplained() {
      federal bank for senOn's but keeps the Council. The primary mode
      walks the federal section (national, states, and the House-only
      classes) then the primary bank's own State-elections views: the six
-     assemblies ste:<key> under Lower and NSW's Council ste:nswlc alone
-     under Upper (the flows card's one upper house is also the primary
-     card's one) */
+     assemblies ste:<key> under Lower and the banked Councils ste:<key>lc
+     under Upper (NSW's ATL count; the Vic, SA and WA full-formal banks,
+     2026-10-24) */
   const VIEW_OPTS = primMode
     ? ["fed", ...Object.keys((PH_HIST.fed && PH_HIST.fed.states) || {}).map((k) => "fed:" + k),
        ...(house === "sen"
-         ? (LC_PRIM ? ["ste:nswlc"] : [])
+         ? STE_LC_KEYS.map((k) => "ste:" + k + "lc")
          : [...Object.keys(PH_CLASSES).map((k) => "fedcl:" + k), ...STE_KEYS.map((k) => "ste:" + k)])]
     : house === "sen"
     ? (pair === "on"
@@ -6610,7 +6625,7 @@ function RdExplained() {
     : house === "sen" ? (pair === "on" ? ON_SEN_STATES : SEN_STATES) : FED_STATES;
   const menu = menuShow ? (
     <select className="rd-pv-sel ex-fl-sel" aria-label="Elections"
-            value={lcView && !senOnView ? "nswlc" : steLcView ? "ste:nswlc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
+            value={lcView && !senOnView ? "nswlc" : steLcView ? "ste:" + steLcKey + "lc" : steKey ? "ste:" + steKey : stateKey ? "fed:" + stateKey : classKey && house !== "sen" ? "fedcl:" + classKey : jur}
             onChange={(e) => setView(e.target.value)}>
       <optgroup label="Federal elections">
         <option value="fed">Federal, national</option>
@@ -6632,9 +6647,9 @@ function RdExplained() {
           {STE_KEYS.map((k) => <option key={k} value={"ste:" + k}>{(STATE_PRIM[k].short || STATE_PRIM[k].label) + " state elections"}</option>)}
         </optgroup>
       )}
-      {primMode && house === "sen" && LC_PRIM && (
+      {primMode && house === "sen" && STE_LC_KEYS.length > 0 && (
         <optgroup label="State elections">
-          <option value="ste:nswlc">{LC_PRIM.label}</option>
+          {STE_LC_KEYS.map((k) => <option key={k} value={"ste:" + k + "lc"}>{STE_LCS[k].label}</option>)}
         </optgroup>
       )}
     </select>
@@ -6722,7 +6737,7 @@ function RdExplained() {
               its head; the classKey rides the primary bank's own classes
               and stePrim its own state-election banks (a flows-side state
               pick still drops to "fed" on the way in) */}
-          {primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} menu={headCtls} />
+          {primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} classKey={classKey} statePrim={stePrim} lcKey={steLcKey} menu={headCtls} />
             : lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />
             : senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />
             : pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />

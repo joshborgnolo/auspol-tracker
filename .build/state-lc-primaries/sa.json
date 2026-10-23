@@ -1,0 +1,66 @@
+{
+ "events": {
+  "2022": {
+   "byFamily": {
+    "ALP": 402441,
+    "COAL": 381652,
+    "GRN": 98324,
+    "ONP": 46051,
+    "OTHER": 160372
+   },
+   "byParty": {
+    "Advance SA": 3623,
+    "Animal Justice Party": 16299,
+    "Aust Family Party": 9315,
+    "Australian Labor Party": 402441,
+    "Family First": 33342,
+    "Independent Annabel Digance": 1359,
+    "Independent Belinda Valentine Team": 1508,
+    "Independent Defend Local Business": 3237,
+    "Independent Environment Heritage History": 531,
+    "Independent Prioritise Health": 4841,
+    "Independent Truth Accountability Responsibility": 2461,
+    "Legalise Cannabis South Australia Party": 22731,
+    "Liberal Democrats Less Government More Freedom": 36445,
+    "Liberal Party": 374289,
+    "Pauline Hanson's One Nation": 46051,
+    "Real Change SA": 9417,
+    "SA Party - Stop Overdevelopment & Corruption": 3871,
+    "SA-BEST": 11329,
+    "The Greens": 98324,
+    "The Nationals": 7363,
+    "Ungrouped": 63
+   },
+   "formal": 1088840
+  },
+  "2026": {
+   "byFamily": {
+    "ALP": 417728,
+    "COAL": 206789,
+    "GRN": 116048,
+    "ONP": 278006,
+    "OTHER": 119371
+   },
+   "byParty": {
+    "Animal Justice Party": 14862,
+    "Australian Family Party": 6155,
+    "Australian Labor Party": 417728,
+    "Family First": 24452,
+    "Independent": 390,
+    "Independent (Franks Coleman)": 6309,
+    "Independent (Pickering Hutchinson)": 8452,
+    "Jing Lee - Better Community": 6862,
+    "Legalise Cannabis South Australia Party": 26803,
+    "Liberal Party": 201823,
+    "Pauline Hanson's One Nation": 278006,
+    "SA-BEST": 7437,
+    "STEPHEN PALLARAS REAL CHANGE SA": 11936,
+    "Sarah Game Fair Go for Australians": 3459,
+    "The Greens": 116048,
+    "The Nationals": 4966,
+    "United Voice Australia": 2254
+   },
+   "formal": 1137942
+  }
+ }
+}

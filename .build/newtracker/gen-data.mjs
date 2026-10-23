@@ -5175,8 +5175,10 @@ const primaryHistory = (() => {
 /* primaryHistory.stateElections – the same chart's STATE-election views
    (user 2026-10-23: "what about primary votes for state elections, lower
    and upper houses"; scope: the six jurisdictions the flow bank covers
-   under Lower, the NSW Legislative Council alone under Upper – the flow
-   chart's Council note says why no other upper house can count one). The
+   under Lower, plus the NSW, Vic, SA and WA Legislative Councils under
+   Upper – the chambers whose official counts let the bank book every
+   family's share; Tas's fifteen-by-five-member Hare-Clark Council sits
+   out for the same reason the flow chart's Council note gives). The
    assemblies' first preferences come from the state flow parsers' one CSV
    (data/state-flows.csv, prim_share – the same vote figures their flows
    are estimated from); the Council's family shares ride its own NSWEC
@@ -5256,6 +5258,37 @@ if (primaryHistory && !JUR) {
         oth: years.map((y) => r2p(fam(y, "OTHER") + (fam(y, "GRN") < FOLD ? fam(y, "GRN") : 0) + (fam(y, "PHON") < FOLD ? fam(y, "PHON") : 0))) };
     }
   } catch { /* counts bank missing: the Council view stays out */ }
+  /* the Vic, SA and WA Legislative Councils (2026-10-24, user "why only
+     nsw state upper house?… yes"): full-formal banks parsed per
+     commission in .build/state-lc-primaries/ (parse-<jur>-lc.py, {jur}.json
+     – byFamily shares of EVERY formal first preference, so no ATL
+     qualifier rides these the way NSW's ballot-paper count's does).
+     WAEC party codes are year-qualified ({code}:{year}) in the parser, so
+     a recycled code can never silently mis-map here. A jurisdiction the
+     Assembly CSV never covered keeps no Council view either. */
+  const LC_SRC = {
+    vic: ["Victorian Legislative Council", "Vic LC", "the Victorian Electoral Commission’s official results"],
+    sa: ["South Australian Legislative Council", "SA LC", "the Electoral Commission SA’s official results"],
+    wa: ["Western Australian Legislative Council", "WA LC", "the Western Australian Electoral Commission’s official results"],
+  };
+  for (const [jk, [label, short, srcLine]] of Object.entries(LC_SRC)) {
+    try {
+      const lc = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "state-lc-primaries", `${jk}.json`), "utf8"));
+      const years = Object.keys(lc.events || {}).map(Number).sort((a, b) => a - b);
+      if (!ste[jk] || !years.length) continue;
+      const fam = (y, k) => ((lc.events[y].byFamily || {})[k] || 0) / lc.events[y].formal * 100;
+      const gate = (y, k) => { const v = fam(y, k); return v >= FOLD ? r2p(v) : null; };
+      ste[jk].sen = { label, short, lc: true,
+        elections: `${label} elections`,
+        srcLine,
+        years,
+        alp: years.map((y) => r2p(fam(y, "ALP"))),
+        lnp: years.map((y) => r2p(fam(y, "COAL"))),
+        grn: years.map((y) => gate(y, "GRN")),
+        onp: years.map((y) => gate(y, "ONP")),
+        oth: years.map((y) => r2p(fam(y, "OTHER") + (fam(y, "GRN") < FOLD ? fam(y, "GRN") : 0) + (fam(y, "ONP") < FOLD ? fam(y, "ONP") : 0))) };
+    } catch { /* bank missing: that Council view stays out */ }
+  }
   if (Object.keys(ste).length) primaryHistory.stateElections = ste;
 }
 

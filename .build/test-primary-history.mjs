@@ -373,7 +373,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(assetRest)), wanted,
   "the asset carries the data file verbatim (the state elections ride beside it)");
 const PH_STE = PH_STE_RAW && JSON.parse(JSON.stringify(PH_STE_RAW));
 
-// ---- stateElections: the six assemblies + the NSW Legislative Council ----
+// ---- stateElections: the six assemblies + the banked Legislative Councils ----
 /* 2026-10-23 (user: "what about primary votes for state elections, lower and
    upper houses"): gen-data derives these banks at BUILD time; the data file
    knows nothing of them. The assemblies' cells recompute independently from
@@ -463,6 +463,59 @@ assert.deepEqual(LC.onp, [null, null, r2p(fam(2019, "PHON")), r2p(fam(2023, "PHO
 assert.equal(cellSt("nsw", "alp", 2019), 33.31, "assembly nsw 2019 alp (the Council's twin guards the file)");
 assert.equal(LC.lnp[0], 48.28, "LC 2011 Coalition: the O'Farrell landslide's ATL papers");
 assert.equal(LC.oth[2], 18.48, "LC 2019 Others share of ATL");
+
+// the Vic, SA and WA Legislative Councils (2026-10-24, user: "why only nsw
+// state upper house?" → "yes"): full-formal banks, parsed per commission
+// into .build/state-lc-primaries/<jur>.json – byFamily shares of EVERY
+// formal first preference, no ATL qualifier. The shares recompute here
+// from the committed banks exactly as the assemblies recompute from the
+// flow CSV; the fold is the same 4%, grn/onp alone.
+const LC_FULL = {
+  vic: { short: "Vic LC", label: "Victorian Legislative Council", srcLine: "the Victorian Electoral Commission’s official results" },
+  sa: { short: "SA LC", label: "South Australian Legislative Council", srcLine: "the Electoral Commission SA’s official results" },
+  wa: { short: "WA LC", label: "Western Australian Legislative Council", srcLine: "the Western Australian Electoral Commission’s official results" },
+};
+for (const [jk, meta] of Object.entries(LC_FULL)) {
+  const S = PH_STE[jk].sen;
+  assert.ok(S, `${jk}: the Legislative Council view banks beside the Assembly's`);
+  assert.equal(S.short, meta.short, `${jk} LC: short name`);
+  assert.equal(S.label, meta.label, `${jk} LC: label`);
+  assert.equal(S.elections, meta.label + " elections", `${jk} LC: elections wording`);
+  assert.equal(S.srcLine, meta.srcLine, `${jk} LC: the commission's credit`);
+  assert.equal(S.lc, true, `${jk} LC: the lc marker`);
+  assert.ok(!PH_STE[jk].senOn, `${jk}: no One Nation pair cut on the primary side`);
+  const bank = JSON.parse(fs.readFileSync(path.join(ROOT, ".build", "state-lc-primaries", jk + ".json"), "utf8"));
+  const years = Object.keys(bank.events).map(Number).sort((a, b) => a - b);
+  assert.deepEqual(S.years, years, `${jk} LC: the banked election years`);
+  const sfam = (y, k) => ((bank.events[y].byFamily || {})[k] || 0) / bank.events[y].formal * 100;
+  S.years.forEach((y, i) => {
+    assert.equal(S.alp[i], r2p(sfam(y, "ALP")), `${jk} LC ${y} ALP share of the formal vote`);
+    assert.equal(S.lnp[i], r2p(sfam(y, "COAL")), `${jk} LC ${y} Coalition share of the formal vote`);
+    const g = sfam(y, "GRN"), p = sfam(y, "ONP");
+    assert.equal(S.grn[i], g >= 4 ? r2p(g) : null, `${jk} LC ${y} Greens ${g >= 4 ? "shown" : "fold"}`);
+    assert.equal(S.onp[i], p >= 4 ? r2p(p) : null, `${jk} LC ${y} One Nation ${p >= 4 ? "shown" : "folds or no ballot line"}`);
+    const shown = S.alp[i] + S.lnp[i] + (S.grn[i] ?? 0) + (S.onp[i] ?? 0) + S.oth[i];
+    assert.ok(Math.abs(shown - 100) <= 0.06, `${jk} LC ${y}: families + oth recombine (${shown.toFixed(2)})`);
+    for (const k of ["alp", "lnp", "grn", "onp", "oth"]) {
+      const v = S[k][i];
+      assert.ok(v === null || Math.abs(v) >= 0.01 || v === 0, `${jk} LC ${y} ${k}: no phantom near-zero`);
+    }
+  });
+}
+// their typed pins (the banks are committed; these stand against a silent
+// re-parse or a family-map slip)
+const cellLc = (jk, key, year) => PH_STE[jk].sen[key][PH_STE[jk].sen.years.indexOf(year)];
+assert.equal(cellLc("vic", "alp", 2006), 41.45, "vic LC 2006 alp: Bracks's last");
+assert.equal(cellLc("vic", "oth", 2018), 22.09, "vic LC 2018 oth: the minor-party ballot");
+assert.equal(cellLc("vic", "onp", 2022), null, "vic LC 2022 onp folds (2.04%)");
+assert.equal(cellLc("sa", "onp", 2022), 4.23, "sa LC 2022 onp stands (just over the fold)");
+assert.equal(cellLc("sa", "onp", 2026), 24.43, "sa LC 2026 onp: the surge");
+assert.equal(cellLc("sa", "lnp", 2026), 18.17, "sa LC 2026 lnp: the collapse");
+assert.equal(cellLc("wa", "onp", 2001), 10.68, "wa LC 2001 onp: One Nation's debut");
+assert.equal(cellLc("wa", "onp", 2005), null, "wa LC 2005 onp: One Nation (WA)'s split books OTHER, never PHON's line");
+assert.equal(cellLc("wa", "onp", 2025), null, "wa LC 2025 onp folds (3.82%)");
+assert.equal(cellLc("wa", "alp", 2021), 60.34, "wa LC 2021 alp: the McGowan landslide");
+assert.equal(cellLc("wa", "lnp", 2013), 52.51, "wa LC 2013 lnp: Liberal + Nationals");
 
 // ---- the View flip's renderer wiring shipped in the built page ------------
 /* build.mjs inlines every layer into index.html (transpiled); the uuid-named

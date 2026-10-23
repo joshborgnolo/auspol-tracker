@@ -1,0 +1,154 @@
+{
+ "events": {
+  "2006": {
+   "byFamily": {
+    "ALP": 1234082,
+    "COAL": 1160367,
+    "GRN": 314847,
+    "ONP": 0,
+    "OTHER": 267633
+   },
+   "byParty": {
+    "ALP": 1234082,
+    "CA": 13329,
+    "CDP": 5819,
+    "DLP": 58722,
+    "Democrats": 24673,
+    "FAMILY FIRST": 114739,
+    "Greens": 314847,
+    "Liberal": 1028421,
+    "Nationals": 131946,
+    "PEOPLE POWER": 30433,
+    "SA": 1130,
+    "Ungrouped": 18788
+   },
+   "formal": 2976929
+  },
+  "2010": {
+   "byFamily": {
+    "ALP": 1137461,
+    "COAL": 1388032,
+    "GRN": 386172,
+    "ONP": 0,
+    "OTHER": 304721
+   },
+   "byParty": {
+    "ALP": 1137461,
+    "CA": 53149,
+    "CDP": 12322,
+    "DLP": 75080,
+    "FAMILY FIRST": 91982,
+    "Greens": 386172,
+    "Liberal": 1384452,
+    "Nationals": 3580,
+    "SEX PARTY": 61542,
+    "Ungrouped": 10646
+   },
+   "formal": 3216386
+  },
+  "2014": {
+   "byFamily": {
+    "ALP": 1143883,
+    "COAL": 1235228,
+    "GRN": 367625,
+    "ONP": 0,
+    "OTHER": 671935
+   },
+   "byParty": {
+    "ANIMAL JUSTICE PARTY": 58133,
+    "AUSTRALIAN CHRISTIANS": 35164,
+    "AUSTRALIAN COUNTRY ALLIANCE": 23164,
+    "AUSTRALIAN CYCLISTS PARTY": 20703,
+    "AUSTRALIAN GREENS": 367625,
+    "AUSTRALIAN LABOR PARTY": 1143883,
+    "DEMOCRATIC LABOUR PARTY (DLP)": 79308,
+    "FAMILY FIRST": 62431,
+    "LIBERAL": 1231741,
+    "LIBERAL DEMOCRATS": 104516,
+    "PALMER UNITED PARTY": 66679,
+    "PEOPLE POWER VICTORIA/NO SMART METERS": 12022,
+    "RISE UP AUSTRALIA PARTY": 17674,
+    "SEX PARTY": 89748,
+    "SHOOTERS AND FISHERS PARTY VICTORIA": 56536,
+    "THE BASICS ROCK 'N' ROLL PARTY": 6340,
+    "THE NATIONALS": 3487,
+    "Ungrouped": 4573,
+    "VOICE FOR THE WEST": 11064,
+    "VOLUNTARY EUTHANASIA PARTY (VICTORIA)": 16772,
+    "VOTE 1 LOCAL JOBS": 7108
+   },
+   "formal": 3418671
+  },
+  "2018": {
+   "byFamily": {
+    "ALP": 1405475,
+    "COAL": 1054779,
+    "GRN": 331479,
+    "ONP": 0,
+    "OTHER": 791745
+   },
+   "byParty": {
+    "ANIMAL JUSTICE PARTY": 88520,
+    "AUSSIE BATTLER PARTY": 33172,
+    "AUSTRALIAN COUNTRY PARTY": 24295,
+    "AUSTRALIAN GREENS": 331479,
+    "AUSTRALIAN LABOR PARTY": 1405475,
+    "AUSTRALIAN LIBERTY ALLIANCE": 20065,
+    "DERRYN HINCH'S JUSTICE PARTY": 134266,
+    "FIONA PATTEN'S REASON PARTY": 49013,
+    "HEALTH AUSTRALIA PARTY": 28132,
+    "HUDSON 4 NV": 6363,
+    "LABOUR DLP": 75221,
+    "LIBERAL": 1051137,
+    "LIBERAL DEMOCRATS": 89428,
+    "SHOOTERS, FISHERS &amp; FARMERS VIC": 108280,
+    "SUSTAINABLE AUSTRALIA": 29831,
+    "THE NATIONALS": 3642,
+    "TRANSPORT MATTERS": 22051,
+    "Ungrouped": 2556,
+    "VICTORIAN SOCIALISTS": 32603,
+    "VOLUNTARY EUTHANASIA PARTY (VICTORIA)": 42611,
+    "VOTE 1 LOCAL JOBS": 5338
+   },
+   "formal": 3583478
+  },
+  "2022": {
+   "byFamily": {
+    "ALP": 1238710,
+    "COAL": 1104774,
+    "GRN": 387190,
+    "ONP": 76734,
+    "OTHER": 944998
+   },
+   "byParty": {
+    "Angry Victorians Party": 14896,
+    "Animal Justice Party": 56819,
+    "Australian Greens": 387190,
+    "Australian Labor Party - Victorian Branch": 1238710,
+    "Companions and Pets Party": 16464,
+    "Derryn Hinch's Justice Party": 57381,
+    "Family First Victoria": 75283,
+    "Fiona Patten's Reason Party": 47070,
+    "Freedom Party of Victoria": 39910,
+    "Group E (no party)": 1845,
+    "Group U (no party)": 1623,
+    "Health Australia Party": 21694,
+    "Labour DLP": 131600,
+    "Legalise Cannabis Victoria": 153347,
+    "Liberal": 636485,
+    "Liberal / The Nationals": 468289,
+    "Liberal Democrats": 99054,
+    "New Democrats": 7743,
+    "Pauline Hanson's One Nation": 76734,
+    "Sack Dan Andrews Restore Democracy": 31262,
+    "Shooters, Fishers & Farmers Vic": 76742,
+    "Sustainable Australia Party \u2013 Stop Overdevelopment / Corruption": 17537,
+    "Transport Matters": 10605,
+    "Ungrouped": 835,
+    "United Australia Party": 31043,
+    "Victorian Socialists": 52245
+   },
+   "formal": 3752406
+  }
+ }
+}
