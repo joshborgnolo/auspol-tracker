@@ -88,7 +88,7 @@ export const SHELL_PAGES = [
   { file: "404.html" },                                     // GitHub Pages' not-found page
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
-  { file: "LEF-performance/index.html" },                   // hand-maintained: bonham-lef-track-record.mjs written up
+  { file: "lef-success/index.html" },                       // hand-maintained: bonham-lef-track-record.mjs written up (renamed from /LEF-performance/ 2026-10-23; a redirect stub sits at the old path)
   { file: "feedback/index.html", page: "feedback" },
   { file: "archives/newspoll/index.html", page: "archives" },
   { file: "archives/acnielsen/index.html", page: "archives" },
@@ -977,7 +977,7 @@ nav.tabs[aria-label="Poll archives"] {
           calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-left, 0px));
 }
 
-/* the article head of a prose satellite (/LEF-performance/, /feedback/, the
+/* the article head of a prose satellite (/lef-success/, /feedback/, the
    404): the main build's section anatomy, rd.css's .rd-eyebrow / .rd-title /
    .rd-meta, then the finding as .rd-hed and its .rd-dek, values verbatim, so
    these pages open the way the ☰ menu's pages do. .sh-page is the shell's
