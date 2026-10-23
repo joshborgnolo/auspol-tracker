@@ -155,7 +155,8 @@ function straightPath(pts, sx, sy) {
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  yTickEmph: number | [numbers]  y tick(s) drawn emphatic - the two-party
  *           chart's halfway mark 50 (user 2026-10-24): the rule deepens a
- *           rung and the label goes bold (the .tick-emph pair in template)
+ *           rung and the label goes bold (the body.rd .tick-emph pair in
+ *           rd.css - template.html's pair was a no-op under the clamps)
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y, point?) => string  for tooltip/axis – the point comes along

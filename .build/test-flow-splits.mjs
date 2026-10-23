@@ -535,12 +535,15 @@ assert.ok(ap.includes('const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);')
   "the constant axis: the whole bank's furthest cell from 50, mirrored - never recomputed from the drawn view");
 /* 2026-10-24 (user: 'in 2pp view the tick for "50" (the number itself)
    should be bold and the 50 line a little darker than the other grid
-   lines'): TrendChart's yTickEmph marks a tick emphatic, the .tick-emph
-   pair in template.html deepens its rule a rung and bolds its label, and
-   the 2PP chart hands its halfway mark over */
+   lines'): TrendChart's yTickEmph marks a tick emphatic, the body.rd
+   .tick-emph pair in rd.css deepens its rule a rung and bolds its label,
+   and the 2PP chart hands its halfway mark over. The pair belongs to
+   rd.css, not template.html: rd.css's body.rd-prefixed .grid/.axis-label
+   clamps tie-and-beat an un-prefixed template rule into a no-op (probe-
+   verified computed styles 2026-10-24) */
 const tc = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets",
   fs.readdirSync(path.join(ROOT, ".build", "newtracker", "assets")).find((f) => /^08b413e7-.*\.js$/.test(f))), "utf8");
-const tpl = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "template.html"), "utf8");
+const rdc = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "rd.css"), "utf8");
 assert.ok(ap.includes("yTickEmph={50}"),
   "the 2PP chart hands the halfway mark over as its one emphatic tick");
 assert.ok(tc.includes("yTickEmph = null,")
@@ -548,9 +551,12 @@ assert.ok(tc.includes("yTickEmph = null,")
     && tc.includes('className={"axis-label y" + emph}')
     && tc.includes('className={"grid" + emph}'),
   "TrendChart's yTickEmph lands the tick-emph class on an emphatic tick's rule and label");
-assert.ok(tpl.includes(".grid.tick-emph { stroke: var(--line); }")
-    && tpl.includes(".axis-label.tick-emph { font-weight: 700; }"),
+assert.ok(rdc.includes("body.rd .grid.tick-emph { stroke: var(--line); }")
+    && rdc.includes("body.rd .axis-label.tick-emph { font-weight: 700; }"),
   "the tick-emph pair: the rule deepens a rung (--line-2 -> --line), the label goes bold");
+assert.ok(rdc.indexOf("body.rd .grid.tick-emph") > rdc.indexOf("body.rd .grid {")
+    && rdc.indexOf("body.rd .axis-label.tick-emph") > rdc.indexOf("body.rd .axis-label.y,"),
+  "the tick-emph pair sits AFTER the body.rd clamps it must outrank at equal specificity");
 /* 2026-10-23 (user: "y axis max should be 55, biggest recorded primary
    vote + however much to get to the nearest 5"): the primary view
    replaces the shared frame's 0-100 with its own axis, topped at the
