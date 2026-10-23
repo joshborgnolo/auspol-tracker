@@ -104476,7 +104476,8 @@ function TrendChart(props) {
     const spills = el.scrollWidth > el.clientWidth + 1;
     if (spills && !(tipTight && tipTight.n === rows.length && tipTight.cw === cw)) setTipTight({
       n: rows.length,
-      cw
+      cw,
+      w: el.scrollWidth + 2
     });else if (!spills && tipTight && (tipTight.n !== rows.length || tipTight.cw !== cw)) setTipTight(null);
     if (!el.classList.contains("tip-guide") || rows.length === tipLay.n && cw === tipLay.cw) return;
     let colW = 0;
@@ -105992,7 +105993,7 @@ function TrendChart(props) {
     style: {
       left: tip.left + "%",
       top: tip.top + "%",
-      width: tipCols ? tipLay.w : tight ? tipRoom : undefined,
+      width: tipCols ? tipLay.w : tight ? Math.min(tipTight.w, tipRoom) : undefined,
       maxWidth: evt ? undefined : tipRoom
     }
   }, tip.title && React.createElement("div", {

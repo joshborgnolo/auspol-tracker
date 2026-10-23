@@ -554,12 +554,21 @@ function TrendChart(props) {
      rather than centred on the chart, where it ran off the edge (2026-10-13
      sweep: 207-220px tips over 150px panels sat 14px off a 360px phone) */
   const [tipBox, setTipBox] = useState({ x: 0, vw: 0 });
-  /* tight: the readout's rows run past the screen cap (a row with a
-     headcount note - "Mean of past terms · 19 of 20 terms · 18 polled ·
-     +0.1" - is wider than a 320px phone). Kept while the row count and the
-     plot width hold, as the cols decision is, so it can't flip back and
-     forth as the wrapped shape measures narrower: the readout takes the
-     cap as its width and its notes wrap (template.html .tip-tight) */
+  /* tight: the readout's rows run past its box. That used to pin the box to
+     tipRoom (the screen cap) - built for "a row with a headcount note is
+     wider than a 320px phone". But a hover near the plot's right edge gives
+     the shrink-to-fit box less room than the content needs WITHOUT the cap
+     being involved, and the same spill read latched tipRoom: a 212px ACT
+     readout ballooned to the 1424px laptop screen (user report 2026-10-23,
+     explainer card's primary view). So measure the CONTENT instead: at the
+     spill every row is still nowrap, so scrollWidth is the readout's own
+     natural width; the pin is min(scrollWidth, tipRoom) - the genuine
+     phone-wide case still lands on the cap, the edge-clipped case just
+     becomes a normal-width readout that the end clamp then moves. Kept while
+     the row count and the plot width hold, as the cols decision is, so it
+     can't flip back and forth as the wrapped shape measures narrower: the
+     readout takes the cap as its width and its notes wrap (template.html
+     .tip-tight) */
   const [tipTight, setTipTight] = useState(null);
   /* LAYOUT effect, not a plain one: it runs before the browser paints, so the
      corrected left lands in the same frame the readout appears in. Measured on
@@ -583,7 +592,9 @@ function TrendChart(props) {
     setTipSpill(over && !el.classList.contains("tip-dot"));
     const rows = [...el.querySelectorAll(".tip-row")];
     const spills = el.scrollWidth > el.clientWidth + 1;
-    if (spills && !(tipTight && tipTight.n === rows.length && tipTight.cw === cw)) setTipTight({ n: rows.length, cw });
+    /* content width read off the un-wrapped rows as they spill (+2 borders:
+       scrollWidth is the content box, the inline width pins the border box) */
+    if (spills && !(tipTight && tipTight.n === rows.length && tipTight.cw === cw)) setTipTight({ n: rows.length, cw, w: el.scrollWidth + 2 });
     else if (!spills && tipTight && (tipTight.n !== rows.length || tipTight.cw !== cw)) setTipTight(null);
     if (!el.classList.contains("tip-guide") || (rows.length === tipLay.n && cw === tipLay.cw)) return;
     let colW = 0;
@@ -2093,7 +2104,7 @@ function TrendChart(props) {
         <div key={evt ? "evt" : dot ? "dot" : "guide"}
              ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")
                                      + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : "") + (tight ? " tip-tight" : "")}
-             style={{ left: tip.left + "%", top: tip.top + "%", width: tipCols ? tipLay.w : tight ? tipRoom : undefined, maxWidth: evt ? undefined : tipRoom }}>
+             style={{ left: tip.left + "%", top: tip.top + "%", width: tipCols ? tipLay.w : tight ? Math.min(tipTight.w, tipRoom) : undefined, maxWidth: evt ? undefined : tipRoom }}>
           {tip.title && <div className="tip-title">{tip.title}</div>}
           {tip.date && <div className="tip-date">{tip.date}</div>}
           {(() => {
