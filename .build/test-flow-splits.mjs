@@ -558,7 +558,7 @@ assert.ok(ap.includes('const TP_NSWLC = (TP_HIST && TP_HIST.nswLc) || null;')
     && ap.includes('lc={lcView}'),
   "the 2PP Upper menu gains the ONE state-council twin: nswlc rides lcView widened off the twoPP file, offered from its own State-elections section, legal under Upper alone");
 assert.ok(ap.includes('IMPLIED, never an AEC count')
-    && ap.includes('(impBank ? "Implied two-party preferred, " : "Two-party preferred, ")')
+    && ap.includes('(impBank ? "Implied classic two-party preferred, " : "Classic two-party preferred, ")')
     && ap.includes('key={"ex-2pp-" + (house || "") + (lc ? "lc" : "") + (stateKey || "") + (classKey || "")}')
     && ap.includes('...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : [])')
     && ap.includes('...(lcAll ? [lcAll] : [])')
@@ -584,7 +584,7 @@ assert.ok(ap.includes('const [twoInv, setTwoInv] = useState(false);')
   "the 2PP Share: twin (button names the drawn side, Space follows it, primary keeps none)");
 assert.ok(ap.includes('const active = inv ? TWO_PARTIES[1] : TWO_PARTIES[0];')
     && ap.includes('id: "share", label: active.name, color: active.color,')
-    && ap.includes('{(impBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}')
+    && ap.includes('{(impBank ? "Implied classic two-party preferred, " : "Classic two-party preferred, ") + active.name + "’s share, %"}')
     && ap.includes("the Share: flip's other side always sits at 100 minus the line on the chart"),
   "ONE side's line at a time (the constant series id glides the flip to the mirror); head and caption name the drawn side");
 assert.ok(ap.includes('const lo = Math.max(0, Math.floor((50 - dev) / 5) * 5);')

@@ -6402,7 +6402,7 @@ function Explained2ppChart({ stateKey, classKey, inv, menu, house, lc }) {
   return (
     <>
       <div className="rd-chead ex-fl-head">
-        <span className="rd-chead-t">{(impBank ? "Implied two-party preferred, " : "Two-party preferred, ") + active.name + "’s share, %"}
+        <span className="rd-chead-t">{(impBank ? "Implied classic two-party preferred, " : "Classic two-party preferred, ") + active.name + "’s share, %"}
           <span className="rd-chead-meta">{scope}</span></span>
         {menu}
       </div>
