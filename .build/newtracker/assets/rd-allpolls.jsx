@@ -6300,9 +6300,11 @@ function ExplainedPrimaryChart({ house, stateKey, classKey, statePrim, lcKey, me
    Coalition's two-party-preferred shares at each federal election -
    national 1972–2025 (the site's canonical election records, the same
    figures the past-cycles panels quote), per-state and per seat-class
-   2004–2025 (the AEC's notional per-division Labor-v-Coalition counts,
-   summed). window.AUSPOL.twoPPHistory (validated; a missing file floors
-   the handoff to null and the flip never renders). Simpler than the
+   1996–2025 (the AEC's per-division Labor-v-Coalition counts as published
+   summed: the tppdiv downloads 2004 on, the statistics packs' House TPP
+   by-place tables for 1996–2001; user 2026-10-24: "it should extend to
+   1996, no?"). window.AUSPOL.twoPPHistory (validated; a missing file
+   floors the handoff to null and the flip never renders). Simpler than the
    primary view by construction: every cell is a drawn number (no fold,
    no gaps), and the two lines always sum to 100 - a two-party count has
    no third choice, so the pair mirrors around the halfway tick, which
@@ -6337,8 +6339,8 @@ function Explained2ppChart({ stateKey, classKey, menu }) {
     : stateKey
     ? "Two-party-preferred shares at the " + span + " federal elections in " + (S.short || S.label) + " - every division's notional Labor-v-Coalition count summed."
     : "Labor's and the Coalition's shares of the two-party-preferred vote at the " + span + " federal elections, from the AEC's official counts.")
-    + (classKey || stateKey ? " The per-division two-party download reaches back to the 2004 election." : "")
-    + (classKey ? " The class cuts run 2004 on, not 1996 like the primary view's: the notional count does not exist for the typed era." : "")
+    + (classKey || stateKey ? " The per-division counts run 1996 on - the AEC's two-party downloads joined by its statistics-era polling-place tables; 1993's counts informal votes only, so 1996 is the floor." : "")
+    + (classKey || stateKey ? " The 1998 cut counts 147 divisions: Newcastle's pair ran Labor v independent, so the AEC's own table omits it." : "")
     + " The pair always sums to 100 - a two-party count has no third choice - so the two lines are each other's mirror, and the halfway mark is where the lead changes hands.";
   /* symmetric around the half: the pair sums to 100, so the axis runs the
      same distance either side of it (user 2026-10-23's cap rule applied

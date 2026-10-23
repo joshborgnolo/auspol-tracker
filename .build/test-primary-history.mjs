@@ -51,6 +51,10 @@ const AEC_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
 const HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001];
 const HIST_SEN_YEARS = HIST_YEARS.filter((y) => y !== 1972);
 const STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
+/* the explainer menu shows the flow-history short forms ("Federal, NT") -
+   never the full name spelt out (2026-10-24, user: "the view dropdown menu
+   is inconsistent (eg northen territory vs NT)") */
+const STATE_SHORT = { nsw: "NSW", vic: "Vic", qld: "Qld", wa: "WA", sa: "SA", tas: "Tas", act: "ACT", nt: "NT" };
 /* fixed code vocab (enumerated from the committed caches 2026-10-23;
    complementary to the generator's name sets – a drift in either trips) */
 const CODES = {
@@ -135,6 +139,8 @@ assert.deepEqual(SEN.years, [...HIST_SEN_YEARS, ...AEC_YEARS], "senate years: hi
 STATES.forEach((s) => {
   assert.deepEqual(FED.states[s].years, AEC_YEARS, `${s} house: per-state span starts 2004`);
   assert.deepEqual(SEN.states[s].years, AEC_YEARS, `${s} senate: per-state span starts 2004`);
+  assert.equal(FED.states[s].short, STATE_SHORT[s], `${s} house: the menu short label`);
+  assert.equal(SEN.states[s].short, STATE_SHORT[s], `${s} senate: the menu short label`);
 });
 
 // ---- the AEC division-classification cuts (House only) ---------------------

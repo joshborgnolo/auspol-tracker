@@ -8498,7 +8498,7 @@ window.AUSPOL = (function () {
   const primaryHistory = ${JSON.stringify(primaryHistory)};
   /* The two-party-preferred history behind the explainer chart's View: 2PP
      flip – Labor's and the Coalition's 2PP shares at each federal election,
-     national since 1972, per state and per seat class 2004–2025; the pair
+     national since 1972, per state and per seat class 1996–2025; the pair
      sums to 100 by construction, and no Senate view exists. */
   const twoPPHistory = ${JSON.stringify(twoPPHistory)};
   // which measures carry a house-effect adjustment (drives the method labels)

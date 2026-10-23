@@ -29,6 +29,23 @@ Schema: State;Division;Polling Place;Count;Ballot Position;Candidate Status;
 Vote Distributed;Vote;Vote Pc;Elected Swing;Exhausted Transfer;Exhausted
 The ~160MB source zips are not committed (same rule as aec-flow-history.py).
 
+## AEC statistics packs (HTPPBYPP.TXT, House two-party preferred by place)
+
+Same two zips, pulled 2026-10-24 to extend the explainer's 2PP state and
+seat-class cuts back to 1996 (they floored at 2004, the tppdiv downloads'
+reach — the "no notional count before 2004" note was wrong; 1993's member
+is informal votes only, so 1996 is the true floor):
+- htpp-1996.txt, htpp-1998.txt ← tables96/tables98 members of
+  aec-1993-1996-1998-election-statistics.zip
+- htpp-2001.txt ← data/import/htppbypp.txt of
+  aec-2001-election-statistics.zip
+Committed verbatim (sha256-checked against the zip members). Schema:
+Division;Polling Place;ALP TPP Vote;ALP TPP Pc;ALP Swing;Coalition TPP
+Vote;Coalition Party;TPP Exhausted;Informal Vote. No state column — the
+Divisional Classifications blocks' state field groups the divisions.
+1998's table omits Newcastle: its final pair ran Labor v independent
+(Morris), so the AEC counted no Labor-v-Coalition figure for it.
+
 ## psephos transcriptions (1983–1990, pre-digital AEC era)
 
 psephos/<year>/<year>reps<state>.txt — Adam Carr's verbatim transcriptions
