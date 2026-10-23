@@ -11,21 +11,29 @@ preferred vote at each federal election:
                        verbatim; the AEC's per-division two-party counts
                        recompose them to within 0.05 every download year,
                        asserted below)
-  states   2004–2025   .build/aec-flow-src/tppdiv-<year>.csv, the committed
-                       AEC Two Party Preferred By Division downloads: every
-                       division's notional Labor-v-Coalition count, ALP and
-                       Coalition votes summed per state. No per-state cut
-                       before 2004 – the downloads' own floor (the primary
-                       history's per-state span matches it).
-  classes  2004–2025   the same per-division counts regrouped by the
+  states   1996–2025   2004–2025 from .build/aec-flow-src/tppdiv-<year>.csv
+                       (the committed AEC Two Party Preferred By Division
+                       downloads); 1996–2001 from the AEC statistics packs'
+                       House Two Party Preferred By Polling Place tables
+                       (htpp-<year>.txt, committed beside the downloads – a
+                       genuine notional Labor-v-Coalition count per
+                       division, summed per state via the Divisional
+                       Classifications blocks' state field, the file itself
+                       carrying no state column). 1998 counts 147
+                       divisions: Newcastle's final pair ran Labor v
+                       independent (Morris), so the AEC's own table omits
+                       it – that exclusion is the product's, never ours.
+  classes  1996–2025   the same per-division counts regrouped by the
                        election's own AEC Divisional Classifications block
                        (data/division-classifications.json), so a
-                       recategorised seat moves classes with it. Starts
-                       2004, not 1996 like the primary classes: the
-                       downloads' notional two-party count does not exist
-                       for the typed era (the hcands files are first
-                       preferences only, and the 1996–2001 tcp files are
-                       final-pair flows, not Labor-v-Coalition counts).
+                       recategorised seat moves classes with it. The
+                       primary view's class span, reached the same day the
+                       explainer asked for the 2PP facet (user 2026-10-24:
+                       "it should extend to 1996, no?") – the earlier
+                       "no notional count before 2004" note was wrong: the
+                       HTPP tables were in the statistics zips all along
+                       (1993's is informal votes only, so 1996 is the
+                       true floor).
 
 Every emitted cell is Labor's share; the Coalition cell is 100 minus it
 (two lines that always sum to exactly 100) – the margin line a third party
@@ -43,8 +51,14 @@ SRC = os.path.join(HERE, "aec-flow-src")
 OUT = os.path.join(ROOT, "data", "2pp-history.json")
 
 YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]
+HTT_YEARS = [1996, 1998, 2001]   # the statistics packs' HTPP-by-place years
+CUT_YEARS = HTT_YEARS + YEARS    # every state/class cut year, in order
 HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993,
               1996, 1998, 2001]   # national only, from the canonical records
+# divisions a statistics pack's own HTPP table omits: 1998's Newcastle ran
+# its final pair Labor v independent (Allan Morris held it 1983–2001), so
+# no Labor-v-Coalition count exists for it in the AEC's table
+HTT_EXCLUDED = {1998: {"Newcastle"}}
 STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"]
 STATE_FULL = {"nsw": "New South Wales", "vic": "Victoria", "qld": "Queensland",
               "wa": "Western Australia", "sa": "South Australia", "tas": "Tasmania",
@@ -93,6 +107,42 @@ def tppdiv_votes(year):
         out["perDiv"][r[idiv].strip()] = [a, l]
     return out
 
+def htpp_votes(year):
+    """htpp-<year>.txt -> {"perDiv": {div: [alp, coalition]}}: the statistics
+       packs' House Two Party Preferred By Polling Place table (semicolon
+       CSV, one notional Labor-v-Coalition count per division summed from
+       its polling places). No state column in the file – state and class
+       both come from the classifications block it joins below. 1998
+       omits Newcastle (its final pair ran Labor v independent) – the
+       AEC's own table, so the exclusion is the product's, never ours."""
+    path = os.path.join(SRC, f"htpp-{year}.txt")
+    with open(path, encoding="utf-8-sig") as f:
+        rows = list(csv.reader(f, delimiter=";"))
+    hi = next(i for i, r in enumerate(rows) if r and r[0].strip() == "Division")
+    h = {c: i for i, c in enumerate(rows[hi])}
+    ia, ic, idiv = h["ALP TPP Vote"], h["Coalition TPP Vote"], h["Division"]
+    # the product's own formality check: the ALP and Coalition columns'
+    # share field must read back off every row (a drift there means the
+    # file's shape moved, not a seat)
+    ipc = h["ALP TPP Pc"]
+    out = {"perDiv": {}}
+    for r in rows[hi + 1:]:
+        if len(r) <= ic or not r[idiv].strip():
+            continue
+        a, c = float(r[ia]), float(r[ic])
+        if a + c:
+            assert abs(100 * a / (a + c) - float(r[ipc])) < 0.02, \
+                f"{year} {r[idiv]} {r[1]}: ALP pc {r[ipc]} != shares of ({a}, {c})"
+        else:
+            # a mobile team that recorded nobody prints 0 + 0; the AEC
+            # carries its share as 0.00, and the pair adds nothing to a sum
+            assert float(r[ipc] or 0) == 0.0, \
+                f"{year} {r[idiv]} {r[1]}: empty team prints a nonzero share ({r[ipc]})"
+        p = out["perDiv"].setdefault(r[idiv].strip(), [0.0, 0.0])
+        p[0] += a
+        p[1] += c
+    return out
+
 def alp_share(v):
     return 100.0 * v[0] / sum(v)
 
@@ -135,6 +185,36 @@ def build():
         for ck, _, _ in CLASS_META:
             a = alp_share(sums[ck])
             per_class[ck][y] = (a, 100.0 - a)
+    for y in HTT_YEARS:
+        v = htpp_votes(y)["perDiv"]
+        blk = cls_blocks.get(str(y))
+        assert blk, f"{y}: no Divisional Classifications block"
+        excl = HTT_EXCLUDED.get(y, set())
+        assert set(v) == set(blk) - excl, \
+            f"{y}: HTPP join drifted - counted {sorted(set(v) - set(blk))[:3]}, classified-only {sorted(set(blk) - excl - set(v))[:3]}"
+        # the file names no state: the block's own state field groups the
+        # divisions, exactly the key the class sums below reuse
+        per_st, per_cl = {}, {k: [0.0, 0.0] for k, _, _ in CLASS_META}
+        nat = [0.0, 0.0]
+        for div, pair in v.items():
+            rec = blk[div]
+            st = rec["state"].strip().lower()
+            assert st in STATES, f"{y} {div}: unmapped state {st}"
+            p = per_st.setdefault(st, [0.0, 0.0])
+            p[0] += pair[0]; p[1] += pair[1]
+            ck = CLS_KEY[rec["classification"].lower()]
+            per_cl[ck][0] += pair[0]; per_cl[ck][1] += pair[1]
+            nat[0] += pair[0]; nat[1] += pair[1]
+        assert sorted(per_st) == sorted(STATES), f"{y}: a state is missing"
+        derived = alp_share(nat)
+        assert abs(derived - nat_rows[y][0]) < 0.06, \
+            f"{y} national 2PP: HTPP count {derived:.2f} != canonical {nat_rows[y][0]}"
+        for st in STATES:
+            a = alp_share(per_st[st])
+            per_state[st][y] = (a, 100.0 - a)
+        for ck, _, _ in CLASS_META:
+            a = alp_share(per_cl[ck])
+            per_class[ck][y] = (a, 100.0 - a)
 
     def view(label, elections_copy, rows, short=None):
         d = {"label": label, "elections": elections_copy,
@@ -146,7 +226,7 @@ def build():
         return d
 
     doc = {
-        "_comment": "GENERATED by .build/aec-2pp-history.py – Labor v Coalition two-party-preferred shares behind the flows-explained chart's 2PP view. National cells are data/polls.json's canonical election records verbatim; state and class cuts are the AEC's Two Party Preferred By Division downloads (tppdiv-*.csv, 2004–2025) summed per state, or per AEC division classification (fed.classes). The Coalition cell is 100 minus Labor's. No Senate view: the AEC counts no 2PP there.",
+        "_comment": "GENERATED by .build/aec-2pp-history.py – Labor v Coalition two-party-preferred shares behind the flows-explained chart's 2PP view. National cells are data/polls.json's canonical election records verbatim; state and class cuts are the AEC's own per-division two-party counts summed per state, or per AEC division classification (fed.classes) – the TPP By Division downloads 2004–2025 (tppdiv-*.csv), extended to 1996 by the statistics packs' House TPP By Polling Place tables (htpp-*.txt; 1998 counts 147 divisions, the AEC's table omitting Newcastle's Labor-v-independent pair). The Coalition cell is 100 minus Labor's. No Senate view: the AEC counts no 2PP there.",
         "fed": view("Federal", "Australian federal elections", nat_rows,
                     ),
     }

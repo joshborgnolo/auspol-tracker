@@ -1171,7 +1171,8 @@ export function validatePrimaryHistory() {
    cell is by construction 100 minus it — no third share exists in a
    two-party count). No sen view: the AEC counts no two-party preferred
    there. National spans 1972–2025 (canonical election records), the state
-   and class cuts the downloads' 2004–2025 span. */
+   and class cuts the AEC counts' 1996–2025 span (tppdiv downloads 2004 on;
+   the statistics packs' HTPP tables 1996–2001). */
 export function validate2ppHistory() {
   const errors = [];
   const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
@@ -1207,8 +1208,8 @@ export function validate2ppHistory() {
     if (!S.fed[sect] || typeof S.fed[sect] !== "object") { fail("2pp-history.json", "2pp-history-shape", `no fed.${sect}`); continue; }
     for (const [k, v] of Object.entries(S.fed[sect])) {
       checkView(`fed.${k}`, v);
-      if (Array.isArray(v.years) && v.years.length && (v.years[0] !== 2004 || v.years[v.years.length - 1] !== 2025))
-        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected the downloads' 2004–2025`);
+      if (Array.isArray(v.years) && v.years.length && (v.years[0] !== 1996 || v.years[v.years.length - 1] !== 2025))
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected the AEC counts' 1996–2025`);
     }
   }
   return errors;

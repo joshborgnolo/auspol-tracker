@@ -8,12 +8,16 @@
       (data/polls.json's tpp_alp/tpp_lnp, 1972–2025), never a recomputed
       shadow of them; the downloads' per-division counts independently
       recompose each download year's cell to within 0.06.
-   2. State and class cells recompute from the committed downloads (this
-      file's own arithmetic: per-division ALP/Coalition vote sums by state,
-      or by the division-classifications.json blocks grouped per election),
-      span exactly 2004–2025 (the downloads' floor and ceiling), and every
-      emitted pair sums to 100 (the file emits Labor's cell; the Coalition
-      cell is by construction 100 minus it).
+   2. State and class cells recompute from the committed AEC counts (this
+      file's own arithmetic: the tppdiv downloads 2004–2025, extended to
+      1996 by the statistics packs' HTPP-by-place tables htpp-1996/1998/
+      2001.txt - per-division ALP/Coalition vote sums by state, or by the
+      division-classifications.json blocks grouped per election), span
+      exactly 1996–2025 (the AEC's floor and ceiling: 1993's table counts
+      informal votes only), and every emitted pair sums to 100 (the file
+      emits Labor's cell; the Coalition cell is by construction 100 minus
+      it). 1998 counts 147 divisions: Newcastle's final pair ran Labor v
+      independent, so the AEC's own table omits it.
    3. The story pins hold: the canonical records' extremes, and the urban-
       ladder readings behind "Federal, inner metro" & "Federal, rural".
    4. gen-data emits twoPPHistory into the data asset, validate.mjs gates
@@ -26,9 +30,14 @@ import vm from "node:vm";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(ROOT, ".build", "aec-flow-src");
 
-const AEC_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+const HTT_YEARS = [1996, 1998, 2001];   // the statistics packs' HTPP tables
+const DL_YEARS = [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+const AEC_YEARS = [...HTT_YEARS, ...DL_YEARS];
+/* 1998's table omits Newcastle - its final pair ran Labor v independent
+   (Morris), so the AEC's own product counts no Labor-v-Coalition for it */
+const HTT_EXCLUDED = { 1998: ["Newcastle"] };
 const HIST_YEARS = [1972, 1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001];
-const NAT_YEARS = [...HIST_YEARS, ...AEC_YEARS];
+const NAT_YEARS = [...HIST_YEARS, ...DL_YEARS];
 const STATES = ["nsw", "vic", "qld", "wa", "sa", "tas", "act", "nt"];
 /* the explainer menu shows the flow-history short forms ("Federal, NT") -
    never the full name spelt out (2026-10-24, user: "the view dropdown menu
@@ -64,14 +73,63 @@ const tppdiv = (y) => {
   });
   return { nat, perState, perDiv };
 };
+/* the statistics packs' HTPP tables, this probe's own parser: semicolon
+   CSV summed to per-division Labor-v-Coalition pairs (no state column in
+   the file - the classifications block supplies state and class alike) */
+const htpp = (y) => {
+  const text = fs.readFileSync(path.join(SRC, `htpp-${y}.txt`), "utf8").replace(/^﻿/, "");
+  const lines = text.split(/\r?\n/);
+  const hi = lines.findIndex((l) => /^Division;/.test(l));
+  assert.ok(hi >= 0, `${y}: HTPP header row found`);
+  const head = lines[hi].split(";");
+  const ia = head.indexOf("ALP TPP Vote");
+  const ic = head.indexOf("Coalition TPP Vote");
+  const id = head.indexOf("Division");
+  const ipc = head.indexOf("ALP TPP Pc");
+  assert.ok(ia >= 0 && ic >= 0 && id >= 0 && ipc >= 0, `${y}: the counted + pc columns`);
+  const perDiv = {};
+  lines.slice(hi + 1).forEach((l) => {
+    const r = l.split(";");
+    if (r.length <= ic || !r[id].trim()) return;
+    const a = +r[ia], c = +r[ic];
+    assert.ok(Number.isFinite(a) && Number.isFinite(c), `${y}: numeric votes in ${r[id]}`);
+    if (a + c) {
+      assert.ok(Math.abs((100 * a) / (a + c) - parseFloat(r[ipc])) < 0.02,
+        `${y} ${r[id]} (${r[1].trim()}): the row's own share cell ${r[ipc]} reads back off (${a}, ${c})`);
+    } else {
+      // a mobile team that recorded nobody prints 0 + 0 with a 0.00 share
+      assert.equal(parseFloat(r[ipc] || 0), 0, `${y} ${r[id]}: empty team prints a nonzero share`);
+    }
+    (perDiv[r[id].trim()] ||= [0, 0])[0] += a;
+    perDiv[r[id].trim()][1] += c;
+  });
+  return perDiv;
+};
 const share = (pair) => (100 * pair[0]) / (pair[0] + pair[1]);
 
 const DIVCLS = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "division-classifications.json"), "utf8")).elections;
 const rec = {};   // year -> {nat, perState, perClass}
 AEC_YEARS.forEach((y) => {
-  const { nat, perState, perDiv } = tppdiv(y);
   const blk = DIVCLS[String(y)];
   assert.ok(blk, `${y}: a classifications block`);
+  let nat, perState, perDiv;
+  if (DL_YEARS.includes(y)) {
+    ({ nat, perState, perDiv } = tppdiv(y));
+  } else {
+    perDiv = htpp(y);
+    nat = [0, 0]; perState = {};
+    for (const [div, pair] of Object.entries(perDiv)) {
+      const d = blk[div];
+      assert.ok(d, `${y}: ${div} classified`);
+      const st = d.state.trim().toLowerCase();
+      assert.ok(STATES.includes(st), `${y}: ${div} maps to a state (${d.state})`);
+      nat[0] += pair[0]; nat[1] += pair[1];
+      (perState[st] ||= [0, 0])[0] += pair[0]; perState[st][1] += pair[1];
+    }
+    assert.deepEqual(Object.keys(perDiv).sort(),
+      Object.keys(blk).filter((d) => !(HTT_EXCLUDED[y] || []).includes(d)).sort(),
+      `${y}: HTPP join covers the block less its own omission`);
+  }
   const perClass = {};
   for (const [div, pair] of Object.entries(perDiv)) {
     const d = blk[div];
@@ -143,6 +201,10 @@ assert.equal(cell(FED.classes.inner, "alp", 2004), 53.01);
 assert.equal(cell(FED.classes.inner, "alp", 2025), 63.31);
 assert.equal(cell(FED.classes.rural, "alp", 2004), 39.77);
 assert.equal(cell(FED.classes.rural, "alp", 2013), 39.16);
+assert.equal(cell(FED.classes.inner, "alp", 1996), 50.49, "the HTPP era's inner-metro cell");
+assert.equal(cell(FED.classes.rural, "alp", 1996), 38.63, "the HTPP era's rural cell");
+assert.equal(cell(FED.states.nsw, "alp", 1996), 47.44, "the HTPP era's biggest-state cell");
+assert.equal(cell(FED.states.act, "alp", 1996), 55.46, "the HTPP era's capital cell");
 AEC_YEARS.forEach((y) => {
   assert.ok(cell(FED.classes.inner, "alp", y) > cell(FED.classes.rural, "alp", y),
     `${y}: inner metro runs ahead of rural for Labor`);
