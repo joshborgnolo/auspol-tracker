@@ -3547,7 +3547,8 @@ body.rd .ex-fl-flips { display: flex; flex-wrap: nowrap; align-items: center; ga
 /* the View: switch's own row above the contest tabs (user 2026-10-23 -
    "should sit on top of 'Labor v Coalition / Labor v One Nation'";
    left-aligned later the same day: "make 'View: Primary votes ⇄'
-   left-aligned") */
+   left-aligned"). 2026-10-24: one cycling button covers all three views,
+   so the row never holds siblings */
 body.rd .ex-fl-viewrow { display: flex; justify-content: flex-start; margin: 10px 0 0; }
 /* the exhaustion-adjustment switch, the key row's last item (user 2026-10-22,
    resized 2026-10-23): a key-sized track where a swatch would sit, the words

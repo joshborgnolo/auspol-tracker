@@ -1163,6 +1163,57 @@ export function validatePrimaryHistory() {
   return errors;
 }
 
+/* 2pp-history.json — the shares behind the flows-explained chart's "View:
+   2PP" flip (2026-10-23). Shape only (the figures' AEC recomposition is
+   pinned at generation by aec-2pp-history.py and by test-2pp-history.mjs):
+   every view's years ascend with alp/lnp drawn as 0–100 numbers that
+   recommbine to 100 per year (the file emits Labor's cell; the Coalition
+   cell is by construction 100 minus it — no third share exists in a
+   two-party count). No sen view: the AEC counts no two-party preferred
+   there. National spans 1972–2025 (canonical election records), the state
+   and class cuts the downloads' 2004–2025 span. */
+export function validate2ppHistory() {
+  const errors = [];
+  const fail = (where, t, d) => errors.push({ type: t, poll: where, detail: d });
+  let S = null;
+  try { S = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "2pp-history.json"), "utf8")); }
+  catch { fail("2pp-history.json", "2pp-history-shape", "missing or unparseable"); return errors; }
+  const checkView = (where, v) => {
+    if (!v || typeof v !== "object") { fail(where, "2pp-history-shape", "view is not an object"); return; }
+    if (typeof v.label !== "string" || typeof v.elections !== "string") fail(where, "2pp-history-shape", "no label/elections copy");
+    const ys = v.years;
+    if (!Array.isArray(ys) || !ys.length || !ys.every((y) => Number.isInteger(y))) { fail(where, "2pp-history-shape", "bad years"); return; }
+    if (!ys.every((y, i) => i === 0 || y > ys[i - 1])) fail(where, "2pp-history-shape", "years out of order");
+    for (const k of ["alp", "lnp"]) {
+      if (!Array.isArray(v[k]) || v[k].length !== ys.length) { fail(where, "2pp-history-shape", `${k} not aligned to years`); continue; }
+      v[k].forEach((x, i) => {
+        if (typeof x !== "number" || x < 0 || x > 100) fail(where, "range", `${k}[${ys[i]}] = ${x} (must be a 0–100 number)`);
+      });
+    }
+    if (Array.isArray(v.alp) && Array.isArray(v.lnp) && v.alp.length === ys.length && v.lnp.length === ys.length)
+      ys.forEach((y, i) => {
+        if (Math.abs(v.alp[i] + v.lnp[i] - 100) > 0.02)
+          fail(where, "reconcile", `${y}: alp ${v.alp[i]} + lnp ${v.lnp[i]} ≠ 100 (a two-party pair sums to the count)`);
+      });
+  };
+  if (!S.fed || typeof S.fed !== "object") { fail("2pp-history.json", "2pp-history-shape", "no fed view"); return errors; }
+  if (S.fed.sen) fail("2pp-history.json", "2pp-history-shape", "a senate view exists — no 2PP is ever counted there");
+  checkView("fed", S.fed);
+  if (S.fed.years && S.fed.years.length >= 2) {
+    if (S.fed.years[0] !== 1972 || S.fed.years[S.fed.years.length - 1] !== 2025)
+      fail("2pp-history.json", "2pp-history-shape", `national span ${S.fed.years[0]}–${S.fed.years[S.fed.years.length - 1]}, expected 1972–2025`);
+  }
+  for (const sect of ["states", "classes"]) {
+    if (!S.fed[sect] || typeof S.fed[sect] !== "object") { fail("2pp-history.json", "2pp-history-shape", `no fed.${sect}`); continue; }
+    for (const [k, v] of Object.entries(S.fed[sect])) {
+      checkView(`fed.${k}`, v);
+      if (Array.isArray(v.years) && v.years.length && (v.years[0] !== 2004 || v.years[v.years.length - 1] !== 2025))
+        fail(`2pp-history.json fed.${k}`, "2pp-history-shape", `cut span starts ${v.years[0]}, expected the downloads' 2004–2025`);
+    }
+  }
+  return errors;
+}
+
 // argv[1] is undefined under `node -e 'import("…validate.mjs")'` – the
 // gate must skip the CLI block there, not throw on path.resolve().
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
@@ -1170,6 +1221,7 @@ if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(p
   const { errors, exempted, orphans } = validate(D);
   errors.push(...validateChangelog());
   errors.push(...validatePrimaryHistory());
+  errors.push(...validate2ppHistory());
   errors.push(...validatePewSentiment());
   errors.push(...validateDirectionGroups());
   errors.push(...validateSecDirectionStates());
