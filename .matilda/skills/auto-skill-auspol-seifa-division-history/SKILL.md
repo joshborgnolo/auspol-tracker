@@ -73,14 +73,16 @@ APH CIB 1/2004-05, which did its own bespoke CD weighting on exactly the
 the IRSD/IRSAD lead-column order between SEIFA editions — 2011 SA1
 summary leads IRSAD, 2016+2021 lead **IRSD** — so positional column reads
 misread silently. derive-division-seifa-abs.py resolves every cube column
-by header NAME because of this. Corollary reported to the user 2026-10-24:
-the sibling `derive-irsad.py` does positional reads (col1/col2/col1),
-correct for 2011 but **misreads IRSD as IRSAD for 2016 and 2021** —
-so `irsad-by-division.json`'s SA1-derived rows (2013, 2016, 2019, 2022,
-2025, 2028) carry IRSD values under the IRSAD key; its exact recon gates
-pass because the distributions-cube table pick swaps the same disease in
-step. Printed-lane rows (2001/2004/2007/2010) are true IRSAD. Repair is
-the sibling lane's job.
+by header NAME because of this. The sibling `derive-irsad.py` had the
+same disease until it was **fixed 2026-10-24**: its SA1 loaders +
+distributions-recon sheet pick now resolve IRSAD by header caption
+("Index of Relative Socio-economic Advantage and Disadvantage"), never
+positionally; e2016/e2019/e2022/e2025/e2028 in
+`irsad-by-division.json` were re-derived as true IRSAD that day
+(e2013 and the printed lanes were always correct; the 2016 recon gate
+had previously passed because it compared against the IRSD Table 1
+pick — the compensating second defect). The distributions cube's per-index
+order is Table1=IRSAD in 2011, Table1=IRSD in 2016 — same swap.
 
 ## Who publishes what (the load-bearing facts)
 
@@ -147,9 +149,19 @@ the sibling lane's job.
   3-index store carries its irsd/ier/ieo scores+ranks, and the IRSAD
   sibling re-derives e2004 from its IRSAD alpha table (printed rank 73
   disadvantaged-first re-bases to store rank 78 advantaged-first —
+  re-base formula: store rank = 150 − printed + 1 —
   derive-irsad.py parse_aph05cib01, ranked re-print kept as the
   per-division cross-check; mind its thousands-separated four-figure
-  scores, 1,059.3-style — a naive \d{3}\.\d silently eats the tail).
+  scores, 1,059.3-style — a naive \d{3}\.\d silently eats the tail, so
+  score regexes need (\d{1,2},\d{3}\.\d|\d{3}\.\d)).
+  CIB-ranked-table traps that cost a debug cycle in both parser lanes:
+  scores print WITH trailing whitespace ("\d+\.\d $" matches only via the
+  ungreedy line slice — expect SOME rows to drop out if you tighten to a
+  header-shaped exemption), and the ranked table's monotonicity gate is
+  non-DEcreasing by score (rank 1 = most DISadvantaged = lowest score,
+  ascending rank → ascending score; an "assert a < b" direction check
+  written the advantaged-first way trips on the adjacent-tie back-to-back
+  like Adelaide 987.9 / Lingiari 987.0 pair).
   **Earlier "08xp01 = 2006 update" graffiti was wrong** — the 09rp02 (Aug
   2008) paper IS the 2006-census APH edition; 11rp01 is its 2009-boundary
   re-issue with explicit-2009 in the title, published after the

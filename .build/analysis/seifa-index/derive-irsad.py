@@ -196,43 +196,68 @@ def _data_start(rows, codepred):
             return i
     raise RuntimeError("no data start found")
 
+def _seifa_cols(rows, tag):
+    """Resolve (score, decile, urp) column indexes of the IRSAD block by
+    header NAME. ABS swapped the lead index pair between editions (2011 SA1
+    summary leads IRSAD; 2016 and 2021 lead IRSD), so a positional read
+    silently returns IRSD on the later cubes. Returns (sc, dc, urp)."""
+    cell = lambda r, c: str(r[c]).strip() if c < len(r) and r[c] is not None else ""
+    for gi, g in enumerate(rows[:8]):
+        sc = next((c for c in range(len(g))
+                   if cell(g, c).startswith("Index of Relative Socio-economic Advantage")),
+                  None)
+        if sc is None:
+            continue
+        assert cell(rows[gi + 1], sc) == "Score" and cell(rows[gi + 1], sc + 1) == "Decile", \
+            f"{tag}: sub-labels under IRSAD header are {cell(rows[gi+1], sc)!r}, {cell(rows[gi+1], sc+1)!r}"
+        urp = next((j for r in (rows[gi], rows[gi + 1])
+                    for j in range(len(r))
+                    if cell(r, j).startswith("Usual Resident Population")), None)
+        assert urp is not None, f"{tag}: URP column not found"
+        return sc, sc + 1, urp
+    raise RuntimeError(f"{tag}: IRSAD group header not found")
+
 def load_seifa2011():
     """SEIFA 2011 SA1 cube Table* (all-index sheet):
-    col0 = 7-digit SA1 code, col1 = IRSAD score (may be ''), col9 = URP."""
+    col0 = 7-digit SA1 code; IRSAD score/decile located by header name
+    (2011 happens to lead with IRSAD — later editions lead IRSD)."""
     rows, name = _sheet_rows_xls(f"{CUBES}/abs-seifa-2011-sa1-indexes.xls", summary_only=True)
+    sc, dc, uc = _seifa_cols(rows, "seifa2011")
     i0 = _data_start(rows, lambda c: isinstance(c, float) and c > 1e6)
     m = {}
     for r in rows[i0:]:
         if not isinstance(r[0], float) or r[0] < 1e6:
             continue
         sa1 = str(int(r[0]))
-        score = r[1] if isinstance(r[1], float) else None
-        dec = r[2] if isinstance(r[2], float) else None
-        urp = r[9] if isinstance(r[9], float) else 0.0
+        score = r[sc] if isinstance(r[sc], float) else None
+        dec = r[dc] if isinstance(r[dc], float) else None
+        urp = r[uc] if isinstance(r[uc], float) else 0.0
         m[sa1] = (score, urp, dec)
-    print(f"seifa2011 cube ({name}): {len(m)} SA1 rows")
+    print(f"seifa2011 cube ({name}, IRSAD cols {sc}/{dc}): {len(m)} SA1 rows")
     return m  # sa1_7digit_code -> (irsad|None, urp, decile|None)
 
 def load_seifa2016():
-    """SEIFA 2016 SA1 cube: col0 = 7-digit name, col1 = 11-digit SA1 code,
-    col2 = IRSAD score, col10 = URP."""
+    """SEIFA 2016 SA1 cube: col0 = 7-digit name, col1 = 11-digit SA1 code;
+    IRSAD score/decile located by header name (2016 leads IRSD — a
+    positional read at col2 was IRSD, fixed 2026-10-24)."""
     rows, name = _sheet_rows_xls(f"{CUBES}/abs-seifa-2016-sa1-indexes.xls", summary_only=True)
+    sc, dc, uc = _seifa_cols(rows, "seifa2016")
     i0 = _data_start(rows, lambda c: isinstance(c, float) and 1e6 < c < 1e10)
     m = {}
     for r in rows[i0:]:
         if len(r) < 11 or not isinstance(r[1], float):
             continue
         sa1 = str(int(r[1]))
-        score = r[2] if isinstance(r[2], float) else None
-        dec = r[3] if isinstance(r[3], float) else None
-        urp = r[10] if isinstance(r[10], float) else 0.0
+        score = r[sc] if isinstance(r[sc], float) else None
+        dec = r[dc] if isinstance(r[dc], float) else None
+        urp = r[uc] if isinstance(r[uc], float) else 0.0
         m[sa1] = (score, urp, dec)
-    print(f"seifa2016 cube ({name}): {len(m)} SA1 rows")
+    print(f"seifa2016 cube ({name}, IRSAD cols {sc}/{dc}): {len(m)} SA1 rows")
     return m  # sa1_maincode -> (irsad|None, urp, decile|None)
 
 def load_seifa2021():
-    """SEIFA 2021 SA1 cube Table 1: col0 = 11-digit SA1 (string),
-    col1 = IRSAD score, col9 = URP."""
+    """SEIFA 2021 SA1 cube Table 1: col0 = 11-digit SA1 (string);
+    IRSAD score/decile located by header name (2021 also leads IRSD)."""
     wb = openpyxl.load_workbook(f"{CUBES}/abs-seifa-2021-sa1-indexes.xlsx",
                                 read_only=True)
     sh = None
@@ -243,6 +268,12 @@ def load_seifa2021():
     if sh is None:
         sh = max((s for s in wb.worksheets if s.max_row > 1000),
                  key=lambda s: s.max_row)
+    rows21 = []
+    for idx, row in enumerate(sh.iter_rows(values_only=True)):
+        rows21.append(row)
+        if idx >= 8:
+            break
+    sc, dc, uc = _seifa_cols([list(r) for r in rows21], "seifa2021")
     m = {}
     for idx, row in enumerate(sh.iter_rows(values_only=True)):
         if idx < 6:
@@ -250,12 +281,12 @@ def load_seifa2021():
         c0 = row[0]
         if c0 is None or not re.fullmatch(r"\d{11}", str(c0)):
             continue
-        score = row[1] if isinstance(row[1], (int, float)) else None
-        dec = row[2] if isinstance(row[2], (int, float)) else None
-        urp = row[9] if isinstance(row[9], (int, float)) else 0.0
+        score = row[sc] if isinstance(row[sc], (int, float)) else None
+        dec = row[dc] if isinstance(row[dc], (int, float)) else None
+        urp = row[uc] if isinstance(row[uc], (int, float)) else 0.0
         m[str(c0)] = (float(score) if score is not None else None,
                       float(urp), float(dec) if dec is not None else None)
-    print(f"seifa2021 cube ({sh.title}): {len(m)} SA1 rows")
+    print(f"seifa2021 cube ({sh.title}, IRSAD cols {sc}/{dc}): {len(m)} SA1 rows")
     return m  # sa1_maincode -> (irsad|None, urp, decile|None)
 
 def load_mb_sa1_keys(year):
@@ -428,12 +459,34 @@ def derive_2021(edition):
 
 def recon_sa1_deciles(tag, dist_xlsx, table_cols, mine, year):
     """Compare recomputed SA1-decile counts per CED with the ABS CED SA1
-    Distributions cube table (IRSAD table). Exact-equality expected — any
-    delta means a parse/membership defect, not methodology disagreement."""
-    rows, _sheet = _sheet_rows_xls(dist_xlsx) if dist_xlsx.endswith(".xls") else (None, None)
-    if rows is None:
+    Distributions cube's IRSAD table. Exact-equality expected — any delta
+    means a parse/membership defect, not methodology disagreement. The
+    distributions cube's index tables sit one per sheet and the IRSAD sheet
+    is Table 1 in 2011 but Table 2 in 2016 (IRSD takes the lead), so the
+    sheet is picked by its Advantage-and-Disadvantage caption, never by
+    position."""
+    if dist_xlsx.endswith(".xls"):
+        wbx = xlrd.open_workbook(dist_xlsx)
+        sh = None
+        for sn in wbx.sheet_names():
+            if not sn.startswith("Table"):
+                continue
+            s = wbx.sheet_by_name(sn)
+            if s.nrows > 3 and "Advantage and Disadvantage" in str(s.row_values(3)[0]):
+                sh = s
+                break
+        assert sh is not None, f"{tag}: IRSAD distributions sheet not found"
+        rows = [sh.row_values(r) for r in range(sh.nrows)]
+    else:
         wbx = openpyxl.load_workbook(dist_xlsx, read_only=True)
-        sh = max((s for s in wbx.worksheets if s.max_row > 40), key=lambda s: s.max_row)
+        sh = None
+        for s in wbx.worksheets:
+            if s.max_row > 3:
+                hdr = [str(v or "") for v in next(s.iter_rows(min_row=4, max_row=4, values_only=True))]
+                if "Advantage and Disadvantage" in hdr[0]:
+                    sh = s
+                    break
+        assert sh is not None, f"{tag}: IRSAD distributions sheet not found"
         rows = [list(r) for r in sh.iter_rows(values_only=True)]
     # data rows: first col numeric CED code, then name, blank, 10x decile counts
     c0 = table_cols[0] if isinstance(table_cols, (list, tuple)) else int(table_cols)
@@ -522,12 +575,16 @@ def main():
     assert_names("e2028set", d28, inside=["Bullwinkel"],
                  outside=["Higgins", "North Sydney"], count=150)
     # national-scale population sanity for the 2021-era rows: each national
-    # decile should carry ~10% of the counted population.
+    # decile should carry ~10% of the counted population. Band is ±1.5, not
+    # ±0.5 — ABS assigns deciles by SA1 COUNT, and true-IRSAD d1 sits at
+    # 9.16% of population (the old ±0.5 band was calibrated on the IRSD
+    # column misread; the 3-index store's sibling gate uses ±2 for the same
+    # reason).
     nat = [sum(v[i] for v in dcp22.values() if v) for i in range(10)]
     tot = sum(nat)
     shares = [x / tot * 100 for x in nat]
     print("  e2022 national decile pop shares:", [round(x, 2) for x in shares])
-    assert all(9.5 < x < 10.5 for x in shares), "2021 decile national pop shares out of 10%±0.5"
+    assert all(8.5 < x < 11.5 for x in shares), "2021 decile national pop shares out of 10%±1.5"
 
     elections = {
         2001: dict(censusYear=2001, editionInForce=2000, derivation="published",
