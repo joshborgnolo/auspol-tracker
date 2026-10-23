@@ -133,7 +133,7 @@ Nov 2001 – Apr 2002. Their page bodies still showed the
 "3 October 1998 Election" Seat Status block plus a
 **Demographic Rating** token — i.e. the rating the AEC physically
 displayed at that epoch, as opposed to RR5's later SES re-derivation.
-Harvest kit (uncommitted, `.matilda/divclass-pre2001/`):
+Harvest kit (committed, `.build/analysis/seat-model/divclass-src/2001/`):
 - **Enumeration: CDX, not the site's map indexes.** v1 walked the eight
   `electorates/maps/<st>/index.htm` pages and surfaced only the
   geographic/rural subset listing (43/148). The full 150-slug enumerate is
@@ -175,15 +175,15 @@ listable and both are defensible.
 TSV caveat: the harvest wrote `\t` joins but rating/status fields
 themselves contain SPACES — `awk -F'\t'` works, awk's default FS does NOT
 (it collapses the string fields and makes every row look anomalous). The
-file is `.matilda/divclass-pre2001/aec-profiles-2001epoch-v2.tsv`; v1's
+file is `.build/analysis/seat-model/divclass-src/2001/aec-profiles-2001epoch-v2.tsv`; v1's
 partial 43-row `aec-profiles-1998-candidates.tsv` is superseded.
 
 **LANDED 2026-10-22 as the canonical 2001 layer (option C).** The harvest
 was committed as `.build/analysis/seat-model/aec-2001-epoch-profile-ratings.tsv`
 (`division × classificationV2page × provenance`, 150 rows: 147 aecPage +
 the three RR5 fills Bradfield/Maribyrnong Inner Metropolitan, Wide Bay
-Rural with provenance=rr5Patch; the
-`.matilda/divclass-pre2001/` harvest kit stays as the regenerator). The
+Rural with provenance=rr5Patch; the harvest kit lives committed beside it
+in `.build/analysis/seat-model/divclass-src/2001/` as the regenerator). The
 extractor normalises the two era tokens to Outer Metropolitan and asserts
 att2's FROM column corroborates v2 on 12 of 16 rows with exactly the four
 known page-vs-paper divergences pinned by name —
@@ -218,8 +218,8 @@ redistributions; per-state counts: NSW 50 / VIC 37 / **QLD 28** /
 **SA 11** / WA 15 / TAS 5 / NT 2 / ACT 2 — Qld gained a seat, SA lost
 one vs 2001).
 
-Harvest kit: `.matilda/divclass-2004/harvest-2004.py` (scratch, gitignored),
-pages cached in `.matilda/divclass-2004/pages/`, output committed as
+Harvest kit: `.build/analysis/seat-model/divclass-src/2004/harvest-2004.py` (committed),
+pages captured in `.build/analysis/seat-model/divclass-src/2004/pages/`, output committed as
 `.build/analysis/seat-model/aec-2004-epoch-profile-ratings.tsv`
 (`division,state,classification,party,status,provenance` — all 150 rows
 `aecPage`, no RR5 patches needed, unlike 2001). Party vocabulary Labor /
@@ -295,14 +295,14 @@ of the seven REAL 2001→2004 on-page reclassifications.
   capture 20060524142147, title "1996 Divisional Classifcations" (sic),
   stamp "last updated 08 September 2005", sha256
   `cead85a74fd7a970b67ea1c436a9e05b18edd1e80f87b43f5d72acf5310a4ba6`;
-  raw cached `.matilda/1996-classification-2006.html`. 1998:
+  raw cached `.build/analysis/seat-model/divclass-src/1996/1996-classification-2006.html`. 1998:
   `aec.gov.au/Elections/federal_elections/1998/classification.htm`
   capture 20070831140251, title "1998 Divisional Classifications", stamp
   "last updated Thursday, August 09, 2007", source note printed on-page
   "Source: Electoral Pocket Book, August 1999", sha256
   `760ff820c4e062508ff198f08be4041ebf52b941e397d09ff7672eafe09d8248`;
-  raw cached `.matilda/1998-classification-raw.html`, parsed transcript
-  `.matilda/1998-classification.tsv`. Both pages print six columns
+  raw cached `.build/analysis/seat-model/divclass-src/1998/1998-classification-raw.html`, parsed transcript
+  `.build/analysis/seat-model/divclass-src/1998/1998-classification.tsv`. Both pages print six columns
   Code/Division/Enrolment/Socio-Demographic/Seat Status/Classification
   with state banners as `<p><b>STATE</b></p>` paragraphs between tables,
   and both are COLUMN-INVERTED: the rating sits under "Socio-Demographic"
@@ -311,7 +311,7 @@ of the seven REAL 2001→2004 on-page reclassifications.
   1996 has Namadgi (ACT 3) and no Blair; 1998 has Blair (QLD 27) and no
   Namadgi — the 1997-redistribution pivot. NT is single-seat **Rural** in
   both (CLP 1996, ALP 1998 — see
-  `.matilda/divclass-pre2001/nt-1998-rating-placeholder.md`, now fully
+  `.build/analysis/seat-model/divclass-src/2001/nt-1998-rating-placeholder.md`, now fully
   resolved; two earlier guesses, "Provincial" and Wikipedia's
   "Provincial, rural and remote" composite, were both wrong). Era party
   tokens: LP/ALP/NP/CLP/IND. Distributions: 1996 Inner 42/Outer 43/

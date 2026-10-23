@@ -67,6 +67,11 @@
       the AEC re-rated episodically and the 2001 v2 profile-page layer is a
       transitional print (both neighbours are independent transcriptions: the
       1998 Pocket-Book table and the Nov 2001-Apr 2002 profile pages).
+   12. Every division row in every election carries via — "aecPage"
+       (read straight from an AEC page) everywhere except 2001's three
+       RR5-att3 gap fills Bradfield/Maribyrnong/Wide Bay, which are exactly
+       "rr5Patch" (the only rows not canonical-on-page; the value derives
+       from the fixture's own provenance column, 147 aecPage + 3 rr5Patch).
    Run from the repo root:
      node .build/analysis/seat-model/test-division-classifications.mjs */
 import { readFileSync } from "node:fs";
@@ -287,6 +292,21 @@ ok(
   ]),
   `1998->2001: ${drift9801.length} reclassed: ${drift9801.join("; ")}`
 );
+
+console.log("12. per-division via provenance");
+const RR5_FILLS = ["Bradfield", "Maribyrnong", "Wide Bay"];
+let badVia = 0;
+const viaCount01 = { aecPage: 0, rr5Patch: 0 };
+for (const [year, divs] of Object.entries(D.elections)) {
+  for (const [name, d] of Object.entries(divs)) {
+    const want = year === "2001" && RR5_FILLS.includes(name) ? "rr5Patch" : "aecPage";
+    if (d.via !== want) badVia++;
+    if (year === "2001") viaCount01[d.via] = (viaCount01[d.via] || 0) + 1;
+  }
+}
+ok(badVia === 0, `${badVia} rows with missing/unexpected via (expect aecPage everywhere but 2001's 3 fills)`);
+ok(viaCount01.aecPage === 147 && viaCount01.rr5Patch === 3,
+  `2001 via split ${viaCount01.aecPage}/${viaCount01.rr5Patch} (expect 147 aecPage / 3 rr5Patch)`);
 
 console.log(fails ? `\n${fails} FAIL` : "\nALL CHECKS PASSED");
 process.exit(fails ? 1 : 0);

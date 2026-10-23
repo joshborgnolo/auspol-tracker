@@ -2,7 +2,7 @@
 # AEC whole-chamber "Divisional Classifications" table for the post-1998-election epoch, recovered from Wayback: aec.gov.au/Elections/federal_elections/1998/classification.htm, capture 20070831140251 (fetched https://web.archive.org/web/20070831140251id_/http://aec.gov.au/Elections/federal_elections/1998/classification.htm).
 # Page <title> "1998 Divisional Classifications"; stamped "last updated Thursday, August 09, 2007"; prints "Source: Electoral Pocket Book, August 1999".
 # Column note: the page's six columns are Code / Division / Enrolment / Socio-Demographic / Seat Status / Classification — its "Socio-Demographic" column is the four-class rating transcribed here as classification; its final "Classification" column is the winning party. Party tokens are raw page vocabulary (LP/ALP/NP/CLP/IND).
-# Raw capture: .matilda/1998-classification-raw.html (sha256 760ff820c4e062508ff198f08be4041ebf52b941e397d09ff7672eafe09d8248); full transcript incl. enrolment + division codes: .matilda/1998-classification.tsv.
+# Raw capture: .build/analysis/seat-model/divclass-src/1998/1998-classification-raw.html (sha256 760ff820c4e062508ff198f08be4041ebf52b941e397d09ff7672eafe09d8248); full transcript incl. enrolment + division codes: .build/analysis/seat-model/divclass-src/1998/1998-classification.tsv.
 Adelaide	SA	Inner Metropolitan	LP	Marginal	aecPage
 Aston	VIC	Outer Metropolitan	LP	Marginal	aecPage
 Ballarat	VIC	Provincial	LP	Marginal	aecPage
