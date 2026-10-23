@@ -81,25 +81,11 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
 }
-.frame-wrap {
-  flex: 1; display: flex; flex-direction: column; align-items: flex-start;
-  max-width: 680px; margin: 0 auto;
-  padding: 40px 28px calc(64px + env(safe-area-inset-bottom, 0px)) 28px;
-}
-.frame-wrap h1 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 30px;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin: 0 0 10px;
-}
-.frame-wrap p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 12px; }
-.frame-wrap a { color: inherit; }
-.ways { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 18px 0 0; }
+/* the frame and head are the shell's (.sh-page, .sh-arow, .sh-hed, .sh-dek
+   in site-shell.css); the ways on are the main page's four views */
+.ways { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 22px 0 0; }
 .ways a {
-  font-size: 14px; font-weight: 600; text-decoration: none;
+  color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: none;
   border-bottom: 1px solid var(--ink-faint);
   padding-bottom: 1px;
 }
@@ -110,7 +96,7 @@ body {
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site-shell.css?v=6e5f0f41e6">
+<link rel="stylesheet" href="/assets/site-shell.css?v=7a4fa4ccb1">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
@@ -173,15 +159,20 @@ body {
   <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
 </nav>
 <!--/shell:header-->
-<main id="sh-content" class="frame-wrap">
-  <h1>Page not found</h1>
-  <p>That address isn't here – the page may have moved, or the link may have a mistake in it.</p>
-  <p>auspol tracker averages every published Australian federal opinion poll. The tracker itself, and everything around it, is one step away:</p>
+<main id="sh-content" class="sh-page">
+  <header>
+    <div class="sh-arow">
+      <h1 class="sh-atitle">Page not found</h1>
+      <span class="sh-ameta">Error 404</span>
+    </div>
+    <p class="sh-hed">That address isn&#8217;t here</p>
+    <p class="sh-dek">The page may have moved, or the link may have a mistake in it. auspol tracker averages every published Australian federal opinion poll, and all of it is one step away:</p>
+  </header>
   <nav class="ways" aria-label="Main views">
-    <a href="/">The tracker</a>
+    <a href="/">Now</a>
     <a href="/cycles/">Past cycles</a>
-    <a href="/allpolls/">Every poll</a>
-    <a href="/info/">How it works</a>
+    <a href="/allpolls/">All polls</a>
+    <a href="/info/">Info</a>
   </nav>
 </main>
 <!--shell:footer-->
@@ -200,7 +191,7 @@ body {
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js?v=6e5f0f41e6" defer></script>
+<script src="/assets/site-shell.js?v=7a4fa4ccb1" defer></script>
 <!--/shell:footer-->
 </body>
 </html>

@@ -10,8 +10,9 @@
      Every figure here is that script's "Bonham's rule" output as at
      23 October 2026, from .build/analysis/bonham-party-flows.json
      (bonham-party-flows.py); if either changes, re-sync this page by hand.
-     Styles: the feedback page's article column (fonts, palette, base), plus
-     the lp-* table rules. Shell (header/footer) filled by
+     Styles: the shell's article head (.sh-page/.sh-arow/.sh-hed/.sh-dek,
+     site-shell.css), the explainer's .ex-* article rules, and lp-* for this
+     page's table. Shell (header/footer) filled by
      node .build/site-shell.mjs. Unlisted: no page links here yet. -->
 <meta name="description" content="If a pollster had known every party's vote exactly and used the last election's preference flows, how close would its two-party figure have been? Kevin Bonham's 2015 test, re-run on the AEC's counts for every election from 1987 to 2025.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
@@ -39,14 +40,6 @@
   font-weight: 600;
   font-display: swap;
   src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Crimson Text';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
@@ -100,41 +93,6 @@ body {
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-}
-
-/* ------- page frame: the shell's own frame, so the head lines up with
-   the masthead the way the main build's menu pages do (not the archives'
-   692px .frame-wrap column, whose 30px-regular heads are the archives') */
-.lp-page {
-  flex: 1; box-sizing: border-box; width: 100%;
-  max-width: calc(var(--sh-maxw, 1152px) + 2 * var(--sh-gutter, 20px)); margin: 0 auto;
-  padding: 28px var(--sh-gutter, 20px) calc(64px + env(safe-area-inset-bottom, 0px));
-}
-
-/* ------- the head: rd.css's section anatomy (.rd-eyebrow/.rd-title/
-   .rd-meta, then the finding as .rd-hed and its .rd-dek), values verbatim */
-.lp-eyebrow {
-  display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
-  border-top: 2px solid var(--ink); padding-top: 12px;
-  font-size: 13px; color: var(--ink-3);
-}
-.lp-title {
-  margin: 0; font-family: var(--sans);
-  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
-}
-.lp-meta { font-size: 13px; color: var(--ink-3); }
-.lp-hed {
-  margin: 16px 0 0; max-width: 1000px;
-  font-family: var(--serif); font-weight: 700;
-  font-size: 46px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: pretty;
-}
-.lp-dek { margin: 12px 0 0; max-width: 860px; font-size: 18px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
-@media (max-width: 640px) {
-  .lp-eyebrow { flex-direction: column; align-items: flex-start; padding-top: 10px; font-size: 12px; }
-  .lp-title { font-size: 19px; }
-  .lp-meta { font-size: 12px; }
-  .lp-hed { margin-top: 14px; font-size: 30px; line-height: 1.1; }
-  .lp-dek { margin-top: 8px; font-size: 15px; line-height: 1.4; }
 }
 
 /* ------- the article: template.html's preference-flows explainer rules
@@ -201,7 +159,7 @@ body {
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site-shell.css?v=ae54365062">
+<link rel="stylesheet" href="/assets/site-shell.css?v=7a4fa4ccb1">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
@@ -264,14 +222,14 @@ body {
   <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
 </nav>
 <!--/shell:header-->
-<main id="sh-content" class="lp-page">
+<main id="sh-content" class="sh-page">
   <header>
-    <div class="lp-eyebrow">
-      <h1 class="lp-title">How last-election preferences have performed</h1>
-      <span class="lp-meta">Kevin Bonham&#8217;s 2015 test, re-run on every election from 1987 to 2025</span>
+    <div class="sh-arow">
+      <h1 class="sh-atitle">How last-election preferences have performed</h1>
+      <span class="sh-ameta">Kevin Bonham&#8217;s 2015 test, re-run on every election from 1987 to 2025</span>
     </div>
-    <p class="lp-hed">Last-election flows have missed the two-party vote by less than half a point on average</p>
-    <p class="lp-dek">Most two-party figures, including this site&#8217;s, assume each party&#8217;s preferences will flow the way they did at the last election. Across 14 elections that assumption missed by 0.43 points on average, and by a third of a point or less eight times. The big misses were 2013 and 2022, when Labor did about a point better, and 2019, when the Coalition did 0.8 better. The misses don&#8217;t lean one way.</p>
+    <p class="sh-hed">Last-election flows have missed the two-party vote by less than half a point on average</p>
+    <p class="sh-dek">Most two-party figures, including this site&#8217;s, assume each party&#8217;s preferences will flow the way they did at the last election. Across 14 elections that assumption missed by 0.43 points on average, and by a third of a point or less eight times. The big misses were 2013 and 2022, when Labor did about a point better, and 2019, when the Coalition did 0.8 better. The misses don&#8217;t lean one way.</p>
   </header>
 
   <div class="ex-body">
@@ -377,7 +335,7 @@ body {
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js?v=ae54365062" defer></script>
+<script src="/assets/site-shell.js?v=7a4fa4ccb1" defer></script>
 <!--/shell:footer-->
 </body>
 </html>

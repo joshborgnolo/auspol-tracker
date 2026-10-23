@@ -11,6 +11,11 @@
   font-family: "Crimson Text"; font-style: italic; font-weight: 700; font-display: swap;
   src: url("/assets/fonts/crimsontext-italic-700-latin.875b693a.woff2") format("woff2");
 }
+/* the article head's headline (.sh-hed): the main page's .rd-hed weight */
+@font-face {
+  font-family: "Crimson Text"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format("woff2");
+}
 :root {
   /* the main page's party tokens, lifted verbatim from its template
      (shell-copy:tokens), so this page's dial uses the site's own colours */
@@ -566,6 +571,41 @@ nav.tabs[aria-label="Poll archives"] {
   box-sizing: border-box; width: auto; max-width: 692px; padding-left: 0; padding-right: 0;
   margin: 0 calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-right, 0px)) 22px
           calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-left, 0px));
+}
+
+/* the article head of a prose satellite (/LEF-performance/, /feedback/, the
+   404): the main build's section anatomy, rd.css's .rd-eyebrow / .rd-title /
+   .rd-meta, then the finding as .rd-hed and its .rd-dek, values verbatim, so
+   these pages open the way the ☰ menu's pages do. .sh-page is the shell's
+   own frame, its text edge on the masthead's. (The archives keep
+   .frame-wrap's 692px column and its regular-weight heads.) */
+.sh-page {
+  flex: 1; box-sizing: border-box; width: 100%;
+  max-width: calc(var(--sh-maxw) + 2 * var(--sh-gutter)); margin: 0 auto;
+  padding: 28px calc(var(--sh-gutter) + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(var(--sh-gutter) + env(safe-area-inset-left, 0px));
+}
+.sh-arow {
+  display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
+  border-top: 2px solid var(--ink); padding-top: 12px;
+  font-size: 13px; color: var(--ink-3);
+}
+.sh-atitle {
+  margin: 0; font-family: var(--sans);
+  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: var(--ink);
+}
+.sh-ameta { font-size: 13px; color: var(--ink-3); }
+.sh-hed {
+  margin: 16px 0 0; max-width: 1000px;
+  font-family: var(--serif); font-weight: 700;
+  font-size: 46px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: pretty;
+}
+.sh-dek { margin: 12px 0 0; max-width: 860px; font-size: 18px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+@media (max-width: 640px) {
+  .sh-arow { flex-direction: column; align-items: flex-start; padding-top: 10px; font-size: 12px; }
+  .sh-atitle { font-size: 19px; }
+  .sh-ameta { font-size: 12px; }
+  .sh-hed { margin-top: 14px; font-size: 30px; line-height: 1.1; }
+  .sh-dek { margin-top: 8px; font-size: 15px; line-height: 1.4; }
 }
 
 /* the colophon (.method .colophon): identity left, ways in right */

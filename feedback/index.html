@@ -90,30 +90,14 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- article: the static summary's column + type rhythm ------- */
-.frame-wrap {
-  flex: 1; display: flex; flex-direction: column;
-  max-width: 680px; width: 100%; margin: 0 auto;
-  padding: 40px 28px calc(64px + env(safe-area-inset-bottom, 0px)) 28px;
-}
-.frame-wrap h1 {
-  font-family: var(--serif); font-size: 34px; font-weight: 600;
-  letter-spacing: -0.01em; margin: 0 0 6px;
-}
-/* .ss-sub/.ss-note copy the static page's RENDERED values, not the source
-   rules: on the live page .static-summary p outranks both, so the sub and
-   the footer note actually run at body-copy 14.5px/1.6 ink-2. */
-.ss-sub { margin: 0 0 4px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
-.ss-sub a { color: inherit; }
-.ss-note { margin-top: 20px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
-.ss-note a { color: var(--ink-2); }
-.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+/* ------- the page: the shell's article frame and head (.sh-page, .sh-arow,
+   .sh-hed, .sh-dek in site-shell.css), the menu pages' anatomy ------- */
 
 /* ------- report an error: the fb-* block, ported from template.html -------
    The form lives here rather than in the main page's footer; the rules are
    the same ones the footer ran, minus the colophon placement (no margins
    inherited from the right column of a two-up footer). */
-.fb { margin-top: 22px; }
+.fb { margin-top: 32px; }
 .fb-form, .fb-thanks { animation: fb-in .22s ease both; }
 @keyframes fb-in { from { opacity: 0; transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .fb-form, .fb-thanks { animation: none; } }
@@ -187,7 +171,7 @@ body {
 <link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site-shell.css?v=6e5f0f41e6">
+<link rel="stylesheet" href="/assets/site-shell.css?v=7a4fa4ccb1">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
@@ -251,9 +235,15 @@ body {
   <div class="sh-menu" id="sh-menu" role="menu" aria-label="More pages" hidden><div class="sh-menu-list"><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/disagreement/" data-id="disagreement"><span class="sh-menu-n" aria-hidden="true">1</span><span class="sh-menu-txt"><span class="sh-menu-t">Poll disagreement</span><span class="sh-menu-d">How much the polls disagree with one another</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/leans/" data-id="leans"><span class="sh-menu-n" aria-hidden="true">2</span><span class="sh-menu-txt"><span class="sh-menu-t">Pollster leans</span><span class="sh-menu-d">How each pollster leans against the others</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows/" data-id="flows"><span class="sh-menu-n" aria-hidden="true">3</span><span class="sh-menu-txt"><span class="sh-menu-t">Respondent-allocated preference flows</span><span class="sh-menu-d">Where minor-party preferences are flowing now, against the last election</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/flows-explained/" data-id="flows-explained"><span class="sh-menu-n" aria-hidden="true">4</span><span class="sh-menu-txt"><span class="sh-menu-t">Preference flows explained</span><span class="sh-menu-d">How preferences decide the two-party figure</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/public-opinion/" data-id="public-opinion"><span class="sh-menu-n" aria-hidden="true">5</span><span class="sh-menu-txt"><span class="sh-menu-t">Public opinion</span><span class="sh-menu-d">What Australians tell the pollsters beyond their vote, by topic</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item" href="/changelog/" data-id="changelog"><span class="sh-menu-n" aria-hidden="true">6</span><span class="sh-menu-txt"><span class="sh-menu-t">Changelog</span><span class="sh-menu-d">What has moved the aggregate, each finding and the confidence gauges, entry by entry</span></span><span class="sh-menu-f"></span></a><a role="menuitem" tabindex="-1" class="sh-menu-item sh-menu-info" href="/info/" data-id="info"><span class="sh-menu-n" aria-hidden="true">7</span><span class="sh-menu-txt"><span class="sh-menu-t">Info</span></span><span class="sh-menu-f"></span></a></div></div>
 </nav>
 <!--/shell:header-->
-<main id="sh-content" class="frame-wrap">
-  <h1>Feedback</h1>
-  <p class="ss-sub">Spotted a wrong figure, a missing poll, a site bug, or have any other feedback?</p>
+<main id="sh-content" class="sh-page">
+  <header>
+    <div class="sh-arow">
+      <h1 class="sh-atitle">Feedback</h1>
+      <span class="sh-ameta">Wrong figures, missing polls, site bugs</span>
+    </div>
+    <p class="sh-hed">Spotted a wrong figure, a missing poll or a bug?</p>
+    <p class="sh-dek">Report it here, or send any other feedback. Reports go straight to my inbox, and a figure only moves once it&#8217;s been checked against the pollster&#8217;s own release.</p>
+  </header>
 
   <div class="fb" id="fb">
     <form class="fb-form" id="fb-form">
@@ -405,7 +395,7 @@ body {
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js?v=6e5f0f41e6" defer></script>
+<script src="/assets/site-shell.js?v=7a4fa4ccb1" defer></script>
 <!--/shell:footer-->
 </body>
 </html>
