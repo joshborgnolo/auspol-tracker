@@ -551,9 +551,9 @@ assert.ok(tc.includes("yTickEmph = null,")
     && tc.includes('className={"axis-label y" + emph}')
     && tc.includes('className={"grid" + emph}'),
   "TrendChart's yTickEmph lands the tick-emph class on an emphatic tick's rule and label");
-assert.ok(rdc.includes("body.rd .grid.tick-emph { stroke: var(--line); }")
+assert.ok(rdc.includes("body.rd .grid.tick-emph { stroke: var(--line); stroke-width: 1.3; }")
     && rdc.includes("body.rd .axis-label.tick-emph { font-weight: 700; }"),
-  "the tick-emph pair: the rule deepens a rung (--line-2 -> --line), the label goes bold");
+  "the tick-emph pair: the rule deepens a rung (--line-2 -> --line) and thickens a third (user 2026-10-24: 'emphasised 30% more'), the label goes bold");
 assert.ok(rdc.indexOf("body.rd .grid.tick-emph") > rdc.indexOf("body.rd .grid {")
     && rdc.indexOf("body.rd .axis-label.tick-emph") > rdc.indexOf("body.rd .axis-label.y,"),
   "the tick-emph pair sits AFTER the body.rd clamps it must outrank at equal specificity");

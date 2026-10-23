@@ -257,8 +257,9 @@ body.rd .axis-label { font-weight: 400; }
 body.rd .axis-label.y, body.rd .axis-label.x { font-weight: 400; font-variant-numeric: tabular-nums; }
 /* an emphatic y tick (TrendChart's yTickEmph, the two-party chart's halfway
    mark 50; user 2026-10-24): must sit in THIS sheet - the body.rd-prefixed
-   clamps above tie-and-late an un-prefixed .tick-emph rule into a no-op */
-body.rd .grid.tick-emph { stroke: var(--line); }
+   clamps above tie-and-late an un-prefixed .tick-emph rule into a no-op.
+   The rule also thickens a third (user same day: "emphasised 30% more") */
+body.rd .grid.tick-emph { stroke: var(--line); stroke-width: 1.3; }
 body.rd .axis-label.tick-emph { font-weight: 700; }
 body.rd .evt-line { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 1 3; opacity: 0.8; }
 body.rd .evt-conn { opacity: 0.8; }
