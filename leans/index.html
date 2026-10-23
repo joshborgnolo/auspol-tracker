@@ -111161,6 +111161,38 @@ function Tabs({
       document.removeEventListener("keydown", key, true);
     };
   }, [menuOpen]);
+  const menuDigitLive = React.useRef(null);
+  menuDigitLive.current = key => {
+    if (!window.AP.rd || menuOpen) return false;
+    const infoOut = pinHideTab && btnRefs.current[pinHideTab.id] && btnRefs.current[pinHideTab.id].offsetParent === null;
+    const t = (infoOut ? [...menuTabs, pinHideTab] : menuTabs)[Number(key) - 1];
+    if (!t) return false;
+    onChange(t.id);
+    return true;
+  };
+  React.useEffect(() => {
+    const key = e => {
+      if (!(e.key >= "1" && e.key <= "9")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const nav = navRef.current;
+      if (!nav) return;
+      const a = document.activeElement;
+      const inside = !!(a && nav.contains(a));
+      if (!inside) {
+        if (!navHover.current) return;
+        if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+        const sel = window.getSelection && window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+      }
+      if (!menuDigitLive.current(e.key)) return;
+      e.preventDefault();
+      if (inside && menuBtn.current) menuBtn.current.focus();
+    };
+    window.addEventListener("keydown", key, true);
+    return () => window.removeEventListener("keydown", key, true);
+  }, []);
   const goHero = () => {
     if (active !== "now") onChange("now");else window.scrollTo({
       top: 0,
@@ -147484,7 +147516,7 @@ const KBD_ROWS = [{
   what: "Pick a numbered party or term on a chips row"
 }, {
   keys: ["1–9"],
-  what: "While the More menu is open, jump to its numbered page"
+  what: "Jump to the More menu's numbered page — the menu open, or the pointer or focus on the bar"
 }, ...(window.JUR ? [] : [{
   keys: ["1–7"],
   what: "In the all-polls demographics view, pick the Split by group"

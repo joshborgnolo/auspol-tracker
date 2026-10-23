@@ -1208,6 +1208,39 @@ ${npProjectSrc()}
       var el = mItems()[Number(e.key) - 1];
       if (el) { e.preventDefault(); el.click(); }
     });
+    /* ...and before the sheet opens, as on the main page's bar (its
+       menuDigitLive claim): a digit with the pointer resting on the bar,
+       or focus held inside it, follows the page the ledger numbers for it.
+       The guards are the same set, and Info joins the list only where the
+       bar has hidden its tab */
+    var mHover = false;
+    nav.addEventListener("pointerenter", function () { mHover = true; });
+    nav.addEventListener("pointerleave", function () { mHover = false; });
+    document.addEventListener("keydown", function (e) {
+      if (!mPop.hidden) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!(e.key >= "1" && e.key <= "9")) return;
+      var t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      var a = document.activeElement, inside = a && nav.contains(a);
+      if (!inside) {
+        if (!mHover) return;
+        if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+        var sel = window.getSelection && window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+      }
+      var infoTab = nav.querySelector(".sh-tab-pinhide");
+      var infoOut = !!(infoTab && infoTab.offsetParent === null);
+      var rows = mPop.querySelectorAll('[role="menuitem"]'), list = [];
+      for (var mi = 0; mi < rows.length; mi++) {
+        if (rows[mi].className.indexOf("sh-menu-info") >= 0 && !infoOut) continue;
+        list.push(rows[mi]);
+      }
+      var el = list[Number(e.key) - 1];
+      if (!el) return;
+      e.preventDefault();
+      el.click();
+    });
     document.addEventListener("pointerdown", function (e) {
       if (!mPop.hidden && !mPop.contains(e.target) && !mBtn.contains(e.target)) mClose(false);
     }, true);

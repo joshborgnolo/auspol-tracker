@@ -520,6 +520,53 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
     };
   }, [menuOpen]);
 
+  /* The ledger's numbers work before the sheet opens: a digit pressed with
+     the pointer resting anywhere on the bar, or the focus anywhere inside
+     it, jumps straight to the menu page the ledger numbers it (user ask
+     2026-10-23 - the digits used to wait for the menu to open). The list is
+     the open sheet's: the menu pages, then Info wherever the bar has hidden
+     its tab (the .tab-menu-info gate, which .tab-pinhide's hide mirrors).
+     The guards are the arrow walk's - an open menu owns the digits alone,
+     a modifier chord or a key typed into a field passes through, and a
+     digit with no page at that number keeps its day job. Window capture,
+     as the open menu's handler registers it, so the hover claims on the
+     rows below (which honour e.defaultPrevented) yield while the pointer
+     is on the bar. The stepper is rebound every render so the
+     once-registered listener never goes stale. */
+  const menuDigitLive = React.useRef(null);
+  menuDigitLive.current = (key) => {
+    if (!window.AP.rd || menuOpen) return false;
+    const infoOut = pinHideTab && btnRefs.current[pinHideTab.id]
+      && btnRefs.current[pinHideTab.id].offsetParent === null;
+    const t = (infoOut ? [...menuTabs, pinHideTab] : menuTabs)[Number(key) - 1];
+    if (!t) return false;
+    onChange(t.id);
+    return true;
+  };
+  React.useEffect(() => {
+    const key = (e) => {
+      if (!(e.key >= "1" && e.key <= "9")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const nav = navRef.current;
+      if (!nav) return;
+      const a = document.activeElement;
+      const inside = !!(a && nav.contains(a));
+      if (!inside) {
+        if (!navHover.current) return;
+        if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+        const sel = window.getSelection && window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+      }
+      if (!menuDigitLive.current(e.key)) return;
+      e.preventDefault();
+      if (inside && menuBtn.current) menuBtn.current.focus();
+    };
+    window.addEventListener("keydown", key, true);
+    return () => window.removeEventListener("keydown", key, true);
+  }, []);
+
   // The docked score is a shortcut home: switch to Snapshot (where the 2PP
   // hero lives) and ride to the top. If already on Snapshot, just glide up.
   const goHero = () => {
