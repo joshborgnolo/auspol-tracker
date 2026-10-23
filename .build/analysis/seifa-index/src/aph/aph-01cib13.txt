@@ -1,0 +1,1261 @@
+    Department of the         INFORMATION   AND   RESEARCH   SERVICES
+Parliamentary Library
+
+
+
+                                                    Current Issues Brief
+                                                    No. 13 2000–01
+
+
+
+
+                    Socioeconomic Indexes for Electoral Divisions
+                    (2000 Electoral Boundaries)
+ISSN 1440-2009
+
+ Copyright Commonwealth of Australia 2001
+
+Except to the extent of the uses permitted under the Copyright Act 1968, no part of this publication may be
+reproduced or transmitted in any form or by any means including information storage and retrieval systems,
+without the prior written consent of the Department of the Parliamentary Library, other than by Senators and
+Members of the Australian Parliament in the course of their official duties.
+
+
+
+
+This paper has been prepared for general distribution to Senators and Members of the Australian Parliament.
+While great care is taken to ensure that the paper is accurate and balanced, the paper is written using
+information publicly available at the time of production. The views expressed are those of the author and
+should not be attributed to the Information and Research Services (IRS). Advice on legislation or legal
+policy issues contained in this paper is provided for use in parliamentary debate and for related
+parliamentary purposes. This paper is not professional legal opinion. Readers are reminded that the paper is
+not an official parliamentary or Australian government document. IRS staff are available to discuss the
+paper's contents with Senators and Members and their staff but not with members of the public.
+
+
+
+
+                 Published by the Department of the Parliamentary Library, 2001
+      INFORMATION        A N D    RESEARCH SERVICES
+
+
+
+
+                                          Current Issues Brief
+                                             No. 13 2000–01
+
+
+
+
+Socioeconomic Indexes for Electoral Divisions
+(2000 Electoral Boundaries)
+
+
+
+
+Gerard Newman and Andrew Kopras
+Statistics Group
+3 April 2001
+Acknowledgments
+
+
+
+
+The author would like to thank Judy Hutchinson and Jan Pearson for their assistance in the production of
+this paper.
+
+
+
+
+Enquiries
+
+
+
+
+Information and Research Services publications are available on the ParlInfo database.
+On the Internet the Department of the Parliamentary Library can be found at: http://www.aph.gov.au/library/
+
+
+IRS Publications Office
+Telephone: (02) 6277 2778
+Contents
+
+
+
+
+Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1
+Highlights . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+Description of the Indexes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+Data Limitations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+Endnotes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+Appendix . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+                                                    Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+Introduction
+
+
+
+
+This paper provides data on four summary indexes, derived from the 1996 Census of
+Population and Housing, that measure different aspects of socioeconomic conditions for
+Commonwealth Electoral Divisions. It updates a paper published in 19981 to take account
+of the effects of the 1999–2000 electoral redistributions.
+
+The five-yearly censuses of population conducted by the Australian Bureau of Statistics
+(ABS) collect data on a broad range of social and economic aspects of the Australian
+population. Each household is required to answer nearly fifty questions, covering such
+diverse topics as birthplace, occupation, educational qualifications, method of travel to
+work and ownership of dwellings. While it is possible to compare Electoral Divisions on
+the basis of each census variable it is often more useful to compare divisions on the basis
+of a summary of related variables. The indexes shown in this paper have been derived by
+the ABS for this purpose. A paper comparing Electoral Divisions on the basis of a number
+of individual census variables has been published previously by the Parliamentary
+Library.2
+
+This paper shows each Electoral Division ranked on the basis of each index together with
+a description of each index and some notable features of the rankings. It has been
+produced from data obtained from the Australian Bureau of Statistics for Census
+Collection Districts (CCD) and aggregated to Commonwealth Electoral Divisions using
+the methodology recommended by the ABS (for details of the aggregation methodology
+see the Appendix pages 17–19). A more detailed explanation of the indexes is available
+from an Information Paper published by the ABS.3
+
+Data for each index is presented in two tables. The first table shows each Electoral
+Division in alphabetical order and the second shows each Electoral Division ranked by the
+index (divisions are ranked from lowest to highest). The political party notionally holding
+the Electoral Division after the 1999–2000 redistributions is shown on each table.
+
+In the Highlights section of the paper reference is made to the geographic classification of
+individual Electoral Divisions. The geographic classification used has been devised by the
+Australian Electoral Commission, which classifies Electoral Divisions into one of four
+categories: inner-metropolitan; outer-metropolitan; provincial or rural.
+
+
+
+
+                                                                                               1
+Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+Highlights
+The following section provides comment on the main features of each index. Because of
+the similar variables used to construct each index there are certain similarities in the
+rankings of Electoral Divisions for the various indexes. For instance, the division of
+Bradfield is ranked highest on each index while the divisions of Fowler and Bonython are
+the two lowest ranked divisions for three out of the four indexes. A number of divisions in
+the north shore area of Sydney and in the eastern suburbs of Melbourne appear in the top
+20 rankings for each index. Similarly a number of rural and outer-metropolitan divisions
+appear in the bottom 20 rankings for all indexes.
+
+
+Index of Relative Socioeconomic Advantage
+This index measures the relative social and economic well-being of the area. The Electoral
+Division with the highest index score is the Sydney north shore division of Bradfield,
+while the division with the lowest score is the outer-suburban Sydney division of Fowler.
+The median divisions (index score where there are an equal number of divisions above and
+below that score) are the Queensland Sunshine Coast division of Fairfax and the
+Newcastle based division of Charlton
+
+Most of the 20 highest ranked divisions are located on the north shore of Sydney
+(Bradfield, North Sydney, Berowra, Warringah, Mackellar and Bennelong) and in the
+Eastern suburbs of Melbourne (Kooyong, Menzies, Higgins and Goldstein). Other
+divisions to feature in the top 20 are the traditionally well-off areas of Brisbane (Ryan) and
+Perth (Curtin). No South Australian or Tasmanian divisions feature in the top 20. All but
+two of the top 20 divisions are held by the Liberal Party, the exceptions being the two
+ACT divisions (Canberra and Fraser).
+
+Divisions with a low score are typically either outer-suburban or rural. Of the 20 divisions
+with the lowest score, eight are outer-suburban (Fowler, Chifley and Werriwa in Sydney,
+Holt in Melbourne, Oxley and Rankin in Brisbane and Bonython and Kingston in
+Adelaide) and six are rural (Gwydir in New South Wales, Maranoa and Wide Bay in
+Queensland, Grey and Barker in South Australia and the new division of Lingiari in the
+NT). Fourteen of the 20 lowest ranked divisions are held by the Labor Party while the six
+rural divisions are held by the Coalition parties (Maranoa, Gwydir and Wide Bay by the
+National Party, Grey and Barker by the Liberal Party and Lingiari by the Country Liberal
+Party).
+
+
+Index of Relative Socioeconomic Disadvantage
+This index measures the relative social and economic hardship in an area and to a certain
+extent displays a similar pattern to the Index of Relative Socioeconomic Advantage
+described above. It should be noted that to maintain consistency with the other indexes this
+
+
+
+2
+                                                      Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+index has been inverted so that the higher the index score the better-off an area is while the
+lower the index score the less well-off an area is. The Electoral Division with the highest
+score is Bradfield while the division with the lowest score is Fowler. The median divisions
+are Perth and the southern NSW division of Riverina.
+
+As with the Index of Socioeconomic Advantage most of the 20 highest ranked divisions
+are located on the north shore of Sydney (Bradfield, North Sydney, Berowra, Warringah,
+Mackellar and Bennelong) or in the eastern suburbs of Melbourne (Kooyong, Higgins,
+Menzies, Goldstein and Aston). Two southern Sydney divisions (Hughes and Cook) also
+feature in the top 20 divisions. All but two of the top 20 divisions are held by the Liberal
+Party, the exceptions once again being the two Labor Party held divisions in the ACT
+(Canberra and Fraser).
+
+Rural areas are prominent in the lower ranked divisions, reflecting the lower family
+incomes and lack of educational opportunities in rural Australia. Of the 20 lowest ranked
+divisions, nine are rural divisions (Cowper, Lyne and Gwydir in New South Wales, Wide
+Bay, Hinkler and Longman in Queensland, Grey in South Australia, Braddon in Tasmania
+and Lingiari in the NT). Two provincial divisions, Throsby based on Wollongong and
+Brand in Western Australia, also feature in the bottom 20. Because of the presence of a
+number of rural divisions the political representation in the bottom 20 divisions is more
+evenly spread than in the Index of Advantage. Twelve divisions are held by the Labor
+Party and eight by the Coalition parties.
+
+An indication of the lack of homogeneity within a particular Electoral Division can be
+obtained by comparing the relative positions on the rankings between the two indexes of
+advantage and disadvantage. For example, if an Electoral Division has a concentration of
+people who are relatively well-off in one part of the division and a concentration of people
+who are not so well-off in another part this will be reflected in a relatively high ranking on
+the Index of Advantage and a relatively low ranking on the Index of Disadvantage. By this
+measure the two least homogenous divisions are the new Darwin based division of
+Solomon and the outer-suburban Melbourne division of Isaacs. Solomon is ranked in the
+bottom third (49th) on the Index of Advantage yet is ranked in the top third (111th) on the
+Index of Disadvantage. The division of Isaacs has a similar pattern, being ranked 41st on
+the Index of Advantage and 99th on the Index of Disadvantage. Other divisions to display a
+wide discrepancy are: Melbourne and Lalor in Victoria and Makin in South Australia.
+
+
+Index of Economic Resources
+This index measures the economic resources or income and expenditure patterns of
+families. Not surprisingly the distribution of Electoral Divisions in this index are very
+similar to the distribution in the Indexes of Advantage and Disadvantage. Once again the
+Electoral Division with the highest index score is Bradfield in Sydney, while the division
+with the lowest score is the new Northern Territory rural division of Lingiari. The median
+divisions are Rankin in southern Brisbane and Melbourne Ports.
+
+
+                                                                                                 3
+Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+As with the Indexes of Advantage and Disadvantage the top 20 places in the rankings for
+this index are dominated by divisions located in the well-off suburbs in the capital cities,
+although neither Adelaide nor Hobart divisions are included in the top 20. All but two of
+the top 20 divisions are held by the Liberal Party, the exceptions being Canberra and the
+northern Perth division of Cowan.
+
+At the bottom end of the rankings rural divisions predominate, reflecting low family
+incomes and low rental and mortgage payments in rural Australia. The Index of Economic
+Resources is the only index where the Coalition parties hold more divisions in the bottom
+20 than the Labor Party. The preponderance of rural divisions at the lower end of the
+rankings is further emphasised by the fact that the National Party holds no divisions with a
+ranking over 55.
+
+
+Index of Education and Occupation
+This index is designed to measure the educational attainment and occupational status of
+the population. Like the other indexes a familiar pattern emerges. The division with the
+highest ranking is Bradfield, while the division with the lowest ranking is Fowler. The
+median divisions are the northern Brisbane division of Petrie and Fremantle in Western
+Australia.
+
+Once again the top 20 places in the rankings for this index are dominated by divisions
+located on the north shore of Sydney and in the eastern suburbs of Melbourne. However,
+there are a number of divisions appearing in the top 20 for this index that are not in the top
+20 for the other indexes. These divisions are: Sydney, Melbourne, Brisbane and the inner-
+suburban Sydney division of Lowe. The high ranking for these divisions is probably a
+function of the location of tertiary education institutions in or near these divisions. Given
+the more diverse spread of divisions in the top 20 it is not surprising to find that the
+political complexion is also more evenly spread. Of the top 20 divisions, the Liberal Party
+holds thirteen, while the Labor Party holds seven.
+
+Rural divisions make up the majority of the divisions at the bottom end of the rankings,
+reflecting the lack of tertiary education opportunities and professional occupational groups
+in rural Australia. Perhaps reflecting the gentrification of the inner suburbs of the capital
+cities, no inner-metropolitan divisions are in the bottom 20. Out of the 20 divisions at the
+bottom of the rankings, the Labor Party holds eleven divisions, while the National Party
+holds five and the Liberal Party four.
+
+Description of the Indexes
+There are four indexes shown in this paper. Each index summarises a different aspect of
+the socioeconomic conditions in the Electoral Divisions. The indexes have been obtained
+by summarising the information from a variety of social and economic variables. While
+
+
+
+
+4
+                                                      Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+there are similarities in the rankings of the Electoral Divisions, each index uses a different
+set of underlying variables.
+
+The four indexes are:
+
+• Index of Relative Socioeconomic Advantage
+
+• Index of Relative Socioeconomic Disadvantage
+
+• Index of Economic Resources
+
+• Index of Education and Occupation.
+
+All the indexes (including the Index of Relative Disadvantage) have been constructed so
+that relatively advantaged areas have high index values. For the Index of Relative
+Disadvantage this means that relatively disadvantaged areas have low index numbers. To
+enable easy recognition of high and low scores, the index scores have been standardised to
+have a mean of 1000 across all Collection Districts in Australia.
+
+The Index of Relative Socioeconomic Advantage includes variables that measure
+relative social and economic well-being. Indicators included are: high income families;
+professional occupations; tertiary educational qualifications; dwellings owner occupied or
+being purchased; dwellings with a large number of bedrooms and a large number of motor
+vehicles. A higher score on this index means that the Electoral Division has a relatively
+large proportion of people with the above attributes (i.e. high incomes, professional
+occupations, tertiary qualifications, etc.). Conversely, a lower score on this index means
+that the Electoral Division has a relatively low proportion of people with these
+characteristics.
+
+The Index of Relative Socioeconomic Advantage was constructed by combining two
+indexes—the Urban Index of Relative Socioeconomic Advantage and the Rural Index of
+Relative Socioeconomic Advantage. Because the index is a combination of two other
+indexes with slightly different components it should be treated with some caution. See the
+Appendix to this paper for a further explanation of the construction of the index.
+
+As the name implies the Index of Relative Socioeconomic Disadvantage is derived from
+attributes that indicate relative social and economic hardship. Variables included are low
+income, low educational attainment, unskilled occupations, unemployment, one-parent
+families, renting households and Aboriginal and Torres Strait Islanders. To maintain
+consistency with the other indexes, the Index of Socioeconomic Disadvantage has been
+inverted so that advantaged Electoral Divisions have a high index score and disadvantaged
+divisions have a low score. Thus a high score on this index means that the Electoral
+Division has relatively fewer people with the above attributes, while a low score indicates
+relatively more people with these attributes.
+
+
+
+
+                                                                                                 5
+Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+In most cases Electoral Divisions that have a high score on the Index of Relative
+Socioeconomic Advantage will also have a high score on the Index of Relative
+Socioeconomic Disadvantage. However, it is possible for an Electoral Division to contain
+two distinct population groups, one relatively well-off and one relatively less well-off,
+thus giving a high score on the Index of Advantage and a low score on the Index of
+Disadvantage. The Division of Melbourne for example is ranked 108th (i.e. relatively high)
+on the Index of Relative Socioeconomic Advantage, yet is ranked 53rd (i.e. relatively low)
+on the Index of Relative Socioeconomic Disadvantage.
+
+The Index of Economic Resources reflects the profile of the economic resources of
+families in Electoral Divisions. The indicators summarised in this index reflect the income
+and expenditure of families. Variables included are: home owner or purchaser households;
+high family incomes; high mortgage repayments and high rental payments. Variables
+covering non-income assets such as dwelling size and number of motor vehicles are also
+included. A high score on this index means that the Electoral Division has a higher
+proportion of families with these characteristics, while a low score indicates a lower
+proportion of families with these characteristics.
+
+The Index of Education and Occupation is designed to reflect the educational and
+occupation of the population in Electoral Divisions. Education variables included in the
+index are the level of educational qualification attained or whether further study is being
+undertaken. Occupational variables include the major occupation groups and the
+unemployed. An Electoral Division with a high score on this index would have a high
+concentration of people with higher educational qualifications or undertaking further study
+and persons employed in higher skilled occupations. A low score indicates a concentration
+of people with low education attainment, low occupation skills or unemployed persons.
+
+A list of the variables included in each index is shown in the Appendix to this paper.
+
+
+Data Limitations
+The indexes contained in this paper are subject to a number of limitations which should be
+borne in mind when the indexes are used to compare Electoral Divisions.
+
+Firstly, the indexes include only some of the social and economic variables for which data
+was collected in the 1996 Census of Population and Housing. There are a number of social
+and economic indicators, such as wealth, savings, health, access to infrastructure, etc. that
+affect the well-being of the population but were not collected in the census and are
+therefore not included in the indexes. In addition, the indexes include only a limited
+number of the available census variables. Some notable exclusions from the indexes are
+age, country of birth, religion and hours of work.
+
+Secondly, the indexes which have been produced depend upon the variables that have
+been included and the relative weights attached to those variables. The inclusion of a
+
+
+
+6
+                                                      Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+different range of variables or a different weighting pattern would result in a different
+index score. The indexes included in this paper are only four of the many indexes that
+could have been produced using census data.
+
+In addition to the above conceptual limitations in the indexes there are a number of
+technical limitations. Non-response to individual census items may affect the accuracy of
+the indexes if there is a socioeconomic bias to non-response. Persons in non-private
+dwellings (e.g. boarding houses, etc.) are under-represented in the indexes as the variables
+pertaining to families and dwellings include only occupied private dwellings. The census
+results are based on place of enumeration rather than place of usual residence, thus holiday
+resort areas (e.g. Gold Coast) may be affected.
+
+Other aspects of the indexes that should be borne in mind when comparing the indexes for
+different Electoral Divisions are that:
+
+• The indexes are 'ordinal measures' and not 'interval measures', i.e. the indexes can be used
+  to order Electoral Divisions into a ranked order but cannot be used to show that one
+  Division is twice as well-off if its index score is twice that of an other Division.
+
+• The indexes reflect the socioeconomic well-being of an Electoral Division rather than of
+  individuals. Because all people in an Electoral Division are not identical the index scores
+  do not apply to individuals but rather the way people are summed together for the area.
+
+• The degree of heterogeneity within a Collection District influences the index score of that
+  Collection District and hence the Electoral Division; the more homogeneous Collection
+  Districts tend towards the extreme index scores.
+
+• Partly because of the above, the interpretation of the index is more straightforward for
+  Electoral Divisions that have extreme values. For example, it is usually easy to see why an
+  Electoral Division with a high index score has that status, but it is more difficult to draw
+  comparisons between Electoral Divisions with mid-ranked scores.
+
+
+Endnotes
+
+
+1.   G. Newman and A. Kopras, 'Socio-Economic Indexes for Electoral Divisions', Current Issues
+     Brief no. 4 1998–99, Department of the Parliamentary Library, 1998.
+2.   A. Kopras, 'Electorate Rankings: Census 1996 (2000 Electoral Boundaries)', Research Paper
+     no. 11 2000–01, Department of the Parliamentary Library, 2000.
+3.   Australian Bureau of Statistics, 1996 Census of Population and Housing: Socio-Economic
+     Indexes for Areas, Information Paper, Cat.No. 2039.0 ABS Canberra, 1998.
+
+
+
+
+                                                                                                 7
+                       Index of Relative Socioeconomic Advantage by Electoral Division
+                                          2000 Electoral Boundaries
+                                   1996 Census of Population and Housing
+Electoral Division   Party             Index         Electoral Division          Party    Index
+Adelaide (SA)        LIB              1029.7         Hunter (NSW)                ALP      972.3
+Aston (Vic)          LIB              1055.4         Indi (Vic)                  LIB      983.4
+Ballarat (Vic)       LIB               999.9         Isaacs (Vic)                ALP      969.1
+Banks (NSW)          ALP              1004.0         Jagajaga (Vic)              ALP     1065.6
+Barker (SA)          LIB               950.1         Kalgoorlie (WA)             LIB      956.2
+Barton (NSW)         ALP              1005.0         Kennedy (Qld)               NP       953.8
+Bass (Tas)           ALP               975.5         Kingsford Smith (NSW)       ALP      996.8
+Batman (Vic)         ALP               961.2         Kingston (SA)               ALP      942.1
+Bendigo (Vic)        ALP               995.7         Kooyong (Vic)               LIB     1168.2
+Bennelong (NSW)      LIB              1078.5         Lalor (Vic)                 ALP      960.0
+Berowra (NSW)        LIB              1145.2         La Trobe (Vic)              LIB     1022.6
+Blair (Qld)          LIB               983.9         Leichhardt (Qld)            LIB      950.4
+Blaxland (NSW)       ALP               942.0         Lilley (Qld)                ALP      997.3
+Bonython (SA)        ALP               893.3         Lindsay (NSW)               LIB      988.0
+Boothby (SA)         LIB              1057.0         Lingiari (NT)               ALP      937.6
+Bowman (Qld)         ALP               999.5         Longman (Qld)               LIB      985.7
+Braddon (Tas)        ALP               961.7         Lowe (NSW)                  ALP     1052.8
+Bradfield (NSW)      LIB              1246.7         Lyne (NSW)                  NP       971.3
+Brand (WA)           ALP               973.3         Lyons (Tas)                 ALP      979.5
+Brisbane (Qld)       ALP              1043.1         Macarthur (NSW)             ALP      970.5
+Bruce (Vic)          ALP              1038.3         Mackellar (NSW)             LIB     1102.8
+Burke (Vic)          ALP              1004.3         Macquarie (NSW)             LIB     1042.8
+Calare (NSW)         IND               981.7         Makin (SA)                  LIB      978.0
+Calwell (Vic)        ALP               963.6         Mallee (Vic)                NP       958.6
+Canberra (ACT)       ALP              1097.5         Maranoa (Qld)               NP       938.6
+Canning (WA)         ALP              1011.9         Maribyrnong (Vic)           ALP      979.2
+Capricornia (Qld)    ALP               965.2         Mayo (SA)                   LIB     1061.1
+Casey (Vic)          LIB              1016.9         McEwen (Vic)                LIB     1018.8
+Charlton (NSW)       ALP               987.5         McMillan (Vic)              ALP      983.6
+Chifley (NSW)        ALP               901.4         McPherson (Qld)             LIB      978.4
+Chisholm (Vic)       ALP              1060.5         Melbourne (Vic)             ALP     1018.6
+Cook (NSW)           LIB              1070.8         Melbourne Ports (Vic)       ALP     1068.5
+Corangamite (Vic)    LIB              1026.4         Menzies (Vic)               LIB     1145.2
+Corio (Vic)          ALP               959.9         Mitchell (NSW)              LIB     1178.5
+Cowan (WA)           ALP              1029.6         Moncrieff (Qld)             LIB      974.6
+Cowper (NSW)         NP                980.6         Moore (WA)                  LIB     1077.2
+Cunningham (NSW)     ALP              1015.0         Moreton (Qld)               LIB     1048.5
+Curtin (WA)          LIB              1147.5         Murray (Vic)                LIB      959.2
+Dawson (Qld)         NP                954.0         Newcastle (NSW)             ALP      983.7
+Deakin (Vic)         LIB              1042.2         New England (NSW)           NP       978.4
+Denison (Tas)        ALP              1010.1         North Sydney (NSW)          LIB     1152.9
+Dickson (Qld)        ALP              1022.5         O'Connor (WA)               LIB      957.1
+Dobell (NSW)         ALP               983.8         Oxley (Qld)                 ALP      927.7
+Dunkley (Vic)        LIB              1003.1         Page (NSW)                  NP       976.9
+Eden-Monaro (NSW)    LIB              1004.3         Parkes (NSW)                NP       958.3
+Fadden (Qld)         LIB              1013.7         Parramatta (NSW)            ALP     1008.0
+Fairfax (Qld)        LIB               986.5         Paterson (NSW)              LIB      974.0
+Farrer (NSW)         NP                964.0         Pearce (WA)                 LIB     1026.7
+Fisher (Qld)         LIB               982.4         Perth (WA)                  ALP      999.5
+Flinders (Vic)       LIB               996.1         Petrie (Qld)                LIB     1001.6
+Forde (Qld)          LIB               989.5         Port Adelaide (SA)          ALP      939.5
+Forrest (WA)         LIB               982.2         Prospect (NSW)              ALP      968.7
+Fowler (NSW)         ALP               892.4         Rankin (Qld)                ALP      946.7
+Franklin (Tas)       ALP              1000.0         Reid (NSW)                  ALP      924.8
+Fraser (ACT)         ALP              1091.6         Richmond (NSW)              NP       983.4
+Fremantle (WA)       ALP              1005.5         Riverina (NSW)              NP       968.2
+Gellibrand (Vic)     ALP               945.3         Robertson (NSW)             LIB      993.2
+Gilmore (NSW)        LIB              1004.3         Ryan (Qld)                  LIB     1151.0
+Gippsland (Vic)      NP                985.9         Scullin (Vic)               ALP      975.4
+Goldstein (Vic)      LIB              1111.3         Shortland (NSW)             ALP      971.3
+Grayndler (NSW)      ALP               990.7         Solomon (NT)                CLP      975.0
+Greenway (NSW)       ALP               976.5         Stirling (WA)               ALP     1009.7
+Grey (SA)            LIB               939.5         Sturt (SA)                  LIB     1044.9
+Griffith (Qld)       ALP              1036.8         Swan (WA)                   ALP      994.7
+Groom (Qld)          LIB               984.5         Sydney (NSW)                ALP     1032.0
+Gwydir (NSW)         NP                947.3         Tangney (WA)                LIB     1116.6
+Hasluck (WA)         ALP               997.9         Throsby (NSW)               ALP      938.9
+Herbert (Qld)        LIB               967.5         Wakefield (SA)              LIB      979.8
+Higgins (Vic)        LIB              1123.6         Wannon (Vic)                LIB      967.6
+Hindmarsh (SA)       LIB               984.1         Warringah (NSW)             LIB     1108.8
+Hinkler (Qld)        NP                954.0         Watson (NSW)                ALP      945.5
+Holt (Vic)           ALP               939.7         Wentworth (NSW)             LIB     1105.7
+Hotham (Vic)         ALP               987.7         Werriwa (NSW)               ALP      943.0
+Hughes (NSW)         LIB              1075.7         Wide Bay (Qld)              NP       950.2
+Hume (NSW)           LIB              1010.4         Wills (Vic)                 ALP      978.7
+
+
+8
+                        Electoral Divisions Ranked by the Index of Relative Socioeconomic Advantage
+                                                  2000 Electoral Boundaries
+                                            1996 Census of Population and Housing
+Rank   Electoral Division             Party            Index          Rank     Electoral Division      Party    Index
+ 1     Fowler (NSW)                   ALP              892.4           76      Charlton (NSW)          ALP      987.5
+ 2     Bonython (SA)                  ALP              893.3           77      Hotham (Vic)            ALP      987.7
+ 3     Chifley (NSW)                  ALP              901.4           78      Lindsay (NSW)           LIB      988.0
+ 4     Reid (NSW)                     ALP              924.8           79      Forde (Qld)             LIB      989.5
+ 5     Oxley (Qld)                    ALP              927.7           80      Grayndler (NSW)         ALP      990.7
+ 6     Lingiari (NT)                  ALP              937.6           81      Robertson (NSW)         LIB      993.2
+ 7     Maranoa (Qld)                  NP               938.6           82      Swan (WA)               ALP      994.7
+ 8     Throsby (NSW)                  ALP              938.9           83      Bendigo (Vic)           ALP      995.7
+ 9     Grey (SA)                      LIB              939.5           84      Flinders (Vic)          LIB      996.1
+10     Port Adelaide (SA)             ALP              939.5           85      Kingsford Smith (NSW)   ALP      996.8
+11     Holt (Vic)                     ALP              939.7           86      Lilley (Qld)            ALP      997.3
+12     Blaxland (NSW)                 ALP              942.0           87      Hasluck (WA)            ALP      997.9
+13     Kingston (SA)                  ALP              942.1           88      Bowman (Qld)            ALP      999.5
+14     Werriwa (NSW)                  ALP              943.0           89      Perth (WA)              ALP      999.5
+15     Gellibrand (Vic)               ALP              945.3           90      Ballarat (Vic)          LIB      999.9
+16     Watson (NSW)                   ALP              945.5           91      Franklin (Tas)          ALP     1000.0
+17     Rankin (Qld)                   ALP              946.7           92      Petrie (Qld)            LIB     1001.6
+18     Gwydir (NSW)                   NP               947.3           93      Dunkley (Vic)           LIB     1003.1
+19     Barker (SA)                    LIB              950.1           94      Banks (NSW)             ALP     1004.0
+20     Wide Bay (Qld)                 NP               950.2           95      Eden-Monaro (NSW)       LIB     1004.3
+21     Leichhardt (Qld)               LIB               950.4          96      Gilmore (NSW)           LIB     1004.3
+22     Kennedy (Qld)                  NP               953.8           97      Burke (Vic)             ALP     1004.3
+23     Hinkler (Qld)                  NP               954.0           98      Barton (NSW)            ALP     1005.0
+24     Dawson (Qld)                   NP               954.0           99      Fremantle (WA)          ALP     1005.5
+25     Kalgoorlie (WA)                LIB              956.2           100     Parramatta (NSW)        ALP     1008.0
+26     O'Connor (WA)                  LIB              957.1           101     Stirling (WA)           ALP     1009.7
+27     Parkes (NSW)                   NP               958.3           102     Denison (Tas)           ALP     1010.1
+28     Mallee (Vic)                   NP               958.6           103     Hume (NSW)              LIB     1010.4
+29     Murray (Vic)                   LIB              959.2           104     Canning (WA)            ALP     1011.9
+30     Corio (Vic)                    ALP              959.9           105     Fadden (Qld)            LIB     1013.7
+31     Lalor (Vic)                    ALP              960.0           106     Cunningham (NSW)        ALP     1015.0
+32     Batman (Vic)                   ALP              961.2           107     Casey (Vic)             LIB     1016.9
+33     Braddon (Tas)                  ALP              961.7           108     Melbourne (Vic)         ALP     1018.6
+34     Calwell (Vic)                  ALP              963.6           109     McEwen (Vic)            LIB     1018.8
+35     Farrer (NSW)                   NP               964.0           110     Dickson (Qld)           ALP     1022.5
+36     Capricornia (Qld)              ALP              965.2           111     La Trobe (Vic)          LIB     1022.6
+37     Herbert (Qld)                  LIB              967.5           112     Corangamite (Vic)       LIB     1026.4
+38     Wannon (Vic)                   LIB              967.6           113     Pearce (WA)             LIB     1026.7
+39     Riverina (NSW)                 NP               968.2           114     Cowan (WA)              ALP     1029.6
+40     Prospect (NSW)                 ALP              968.7           115     Adelaide (SA)           LIB     1029.7
+41     Isaacs (Vic)                   ALP               969.1          116     Sydney (NSW)            ALP     1032.0
+42     Macarthur (NSW)                ALP              970.5           117     Griffith (Qld)          ALP     1036.8
+43     Lyne (NSW)                     NP               971.3           118     Bruce (Vic)             ALP     1038.3
+44     Shortland (NSW)                ALP              971.3           119     Deakin (Vic)            LIB     1042.2
+45     Hunter (NSW)                   ALP              972.3           120     Macquarie (NSW)         LIB     1042.8
+46     Brand (WA)                     ALP              973.3           121     Brisbane (Qld)          ALP     1043.1
+47     Paterson (NSW)                 LIB              974.0           122     Sturt (SA)              LIB     1044.9
+48     Moncrieff (Qld)                LIB              974.6           123     Moreton (Qld)           LIB     1048.5
+49     Solomon (NT)                   CLP              975.0           124     Lowe (NSW)              ALP     1052.8
+50     Scullin (Vic)                  ALP              975.4           125     Aston (Vic)             LIB     1055.4
+51     Bass (Tas)                     ALP              975.5           126     Boothby (SA)            LIB     1057.0
+52     Greenway (NSW)                 ALP              976.5           127     Chisholm (Vic)          ALP     1060.5
+53     Page (NSW)                     NP               976.9           128     Mayo (SA)               LIB     1061.1
+54     Makin (SA)                     LIB              978.0           129     Jagajaga (Vic)          ALP     1065.6
+55     New England (NSW)              NP               978.4           130     Melbourne Ports (Vic)   ALP     1068.5
+56     McPherson (Qld)                LIB              978.4           131     Cook (NSW)              LIB     1070.8
+57     Wills (Vic)                    ALP              978.7           132     Hughes (NSW)            LIB     1075.7
+58     Maribyrnong (Vic)              ALP              979.2           133     Moore (WA)              LIB     1077.2
+59     Lyons (Tas)                    ALP              979.5           134     Bennelong (NSW)         LIB     1078.5
+60     Wakefield (SA)                 LIB              979.8           135     Fraser (ACT)            ALP     1091.6
+61     Cowper (NSW)                   NP               980.6           136     Canberra (ACT)          ALP     1097.5
+62     Calare (NSW)                   IND              981.7           137     Mackellar (NSW)         LIB     1102.8
+63     Forrest (WA)                   LIB              982.2           138     Wentworth (NSW)         LIB     1105.7
+64     Fisher (Qld)                   LIB              982.4           139     Warringah (NSW)         LIB     1108.8
+65     Richmond (NSW)                 NP               983.4           140     Goldstein (Vic)         LIB     1111.3
+66     Indi (Vic)                     LIB              983.4           141     Tangney (WA)            LIB     1116.6
+67     McMillan (Vic)                 ALP              983.6           142     Higgins (Vic)           LIB     1123.6
+68     Newcastle (NSW)                ALP              983.7           143     Berowra (NSW)           LIB     1145.2
+69     Dobell (NSW)                   ALP              983.8           144     Menzies (Vic)           LIB     1145.2
+70     Blair (Qld)                    LIB              983.9           145     Curtin (WA)             LIB     1147.5
+71     Hindmarsh (SA)                 LIB              984.1           146     Ryan (Qld)              LIB     1151.0
+72     Groom (Qld)                    LIB              984.5           147     North Sydney (NSW)      LIB     1152.9
+73     Longman (Qld)                  LIB              985.7           148     Kooyong (Vic)           LIB     1168.2
+74     Gippsland (Vic)                NP               985.9           149     Mitchell (NSW)          LIB     1178.5
+75     Fairfax (Qld)                  LIB              986.5           150     Bradfield (NSW)         LIB     1246.7
+
+
+                                                                                                               9
+                     Index of Relative Socioeconomic Disadvantage by Electoral Division
+                                          2000 Electoral Boundaries
+                                   1996 Census of Population and Housing
+Electoral Division   Party             Index         Electoral Division         Party      Index
+Adelaide (SA)        LIB             1013.6          Hunter (NSW)               ALP        959.3
+Aston (Vic)          LIB             1074.3          Indi (Vic)                 LIB       1002.5
+Ballarat (Vic)       LIB               988.3         Isaacs (Vic)               ALP       1014.1
+Banks (NSW)          ALP             1007.7          Jagajaga (Vic)             ALP       1068.8
+Barker (SA)          LIB               962.8         Kalgoorlie (WA)            LIB        966.4
+Barton (NSW)         ALP             1019.3          Kennedy (Qld)              NP         959.9
+Bass (Tas)           ALP               969.2         Kingsford Smith (NSW)      ALP       1015.2
+Batman (Vic)         ALP               945.6         Kingston (SA)              ALP        978.1
+Bendigo (Vic)        ALP               979.1         Kooyong (Vic)              LIB       1135.1
+Bennelong (NSW)      LIB             1086.3          Lalor (Vic)                ALP        998.4
+Berowra (NSW)        LIB             1124.2          La Trobe (Vic)             LIB       1058.7
+Blair (Qld)          LIB               959.6         Leichhardt (Qld)           LIB        983.0
+Blaxland (NSW)       ALP               946.1         Lilley (Qld)               ALP       1001.3
+Bonython (SA)        ALP               884.7         Lindsay (NSW)              LIB       1019.4
+Boothby (SA)         LIB             1053.7          Lingiari (NT)              ALP        909.9
+Bowman (Qld)         ALP             1007.8          Longman (Qld)              LIB        951.6
+Braddon (Tas)        ALP               945.3         Lowe (NSW)                 ALP       1051.5
+Bradfield (NSW)      LIB             1163.5          Lyne (NSW)                 NP         947.1
+Brand (WA)           ALP               940.5         Lyons (Tas)                ALP        955.9
+Brisbane (Qld)       ALP             1040.1          Macarthur (NSW)            ALP        989.9
+Bruce (Vic)          ALP             1022.9          Mackellar (NSW)            LIB       1105.2
+Burke (Vic)          ALP             1026.8          Macquarie (NSW)            LIB       1052.0
+Calare (NSW)         IND               986.6         Makin (SA)                 LIB       1018.4
+Calwell (Vic)        ALP               979.7         Mallee (Vic)               NP         989.8
+Canberra (ACT)       ALP             1102.5          Maranoa (Qld)              NP         965.2
+Canning (WA)         ALP               991.5         Maribyrnong (Vic)          ALP        975.2
+Capricornia (Qld)    ALP               973.7         Mayo (SA)                  LIB       1060.2
+Casey (Vic)          LIB             1055.3          McEwen (Vic)               LIB       1030.3
+Charlton (NSW)       ALP               986.7         McMillan (Vic)             ALP        983.5
+Chifley (NSW)        ALP               920.6         McPherson (Qld)            LIB        979.8
+Chisholm (Vic)       ALP             1054.0          Melbourne (Vic)            ALP        980.1
+Cook (NSW)           LIB             1073.9          Melbourne Ports (Vic)      ALP       1067.8
+Corangamite (Vic)    LIB             1032.7          Menzies (Vic)              LIB       1099.8
+Corio (Vic)          ALP               961.7         Mitchell (NSW)             LIB       1129.4
+Cowan (WA)           ALP             1023.8          Moncrieff (Qld)            LIB        990.0
+Cowper (NSW)         NP                946.1         Moore (WA)                 LIB       1072.2
+Cunningham (NSW)     ALP             1009.8          Moreton (Qld)              LIB       1036.9
+Curtin (WA)          LIB             1102.6          Murray (Vic)               LIB        991.2
+Dawson (Qld)         NP                975.9         Newcastle (NSW)            ALP        968.2
+Deakin (Vic)         LIB             1055.2          New England (NSW)          NP         983.8
+Denison (Tas)        ALP             1014.7          North Sydney (NSW)         LIB       1135.8
+Dickson (Qld)        ALP             1045.3          O'Connor (WA)              LIB        982.6
+Dobell (NSW)         ALP               985.9         Oxley (Qld)                ALP        933.9
+Dunkley (Vic)        LIB             1015.4          Page (NSW)                 NP         955.9
+Eden-Monaro (NSW)    LIB             1008.1          Parkes (NSW)               NP         962.7
+Fadden (Qld)         LIB             1020.1          Parramatta (NSW)           ALP       1020.2
+Fairfax (Qld)        LIB               966.3         Paterson (NSW)             LIB        965.8
+Farrer (NSW)         NP                990.6         Pearce (WA)                LIB       1010.1
+Fisher (Qld)         LIB               971.8         Perth (WA)                 ALP        991.6
+Flinders (Vic)       LIB               996.1         Petrie (Qld)               LIB        996.0
+Forde (Qld)          LIB               975.5         Port Adelaide (SA)         ALP        918.0
+Forrest (WA)         LIB               978.3         Prospect (NSW)             ALP        992.0
+Fowler (NSW)         ALP               861.8         Rankin (Qld)               ALP        961.8
+Franklin (Tas)       ALP               984.2         Reid (NSW)                 ALP        937.4
+Fraser (ACT)         ALP             1078.7          Richmond (NSW)             NP         961.3
+Fremantle (WA)       ALP               984.4         Riverina (NSW)             NP         991.7
+Gellibrand (Vic)     ALP               914.4         Robertson (NSW)            LIB       1000.3
+Gilmore (NSW)        LIB               980.3         Ryan (Qld)                 LIB       1114.0
+Gippsland (Vic)      NP                989.2         Scullin (Vic)              ALP       1000.0
+Goldstein (Vic)      LIB             1097.6          Shortland (NSW)            ALP        953.9
+Grayndler (NSW)      ALP             1002.8          Solomon (NT)               CLP       1025.8
+Greenway (NSW)       ALP             1003.8          Stirling (WA)              ALP        989.4
+Grey (SA)            LIB               942.4         Sturt (SA)                 LIB       1032.3
+Griffith (Qld)       ALP             1035.2          Swan (WA)                  ALP        986.2
+Groom (Qld)          LIB               995.8         Sydney (NSW)               ALP       1015.1
+Gwydir (NSW)         NP                948.4         Tangney (WA)               LIB       1081.9
+Hasluck (WA)         ALP               995.6         Throsby (NSW)              ALP        936.3
+Herbert (Qld)        LIB               991.9         Wakefield (SA)             LIB        969.2
+Higgins (Vic)        LIB             1104.6          Wannon (Vic)               LIB        997.2
+Hindmarsh (SA)       LIB               989.9         Warringah (NSW)            LIB       1108.7
+Hinkler (Qld)        NP                944.0         Watson (NSW)               ALP        973.5
+Holt (Vic)           ALP               969.9         Wentworth (NSW)            LIB       1108.0
+Hotham (Vic)         ALP               996.0         Werriwa (NSW)              ALP        966.0
+Hughes (NSW)         LIB             1095.2          Wide Bay (Qld)             NP         923.9
+Hume (NSW)           LIB             1012.8          Wills (Vic)                ALP        972.9
+
+
+10
+                      Electoral Divisions Ranked by the Index of Relative Socioeconomic Disadvantage
+                                                  2000 Electoral Boundaries
+                                            1996 Census of Population and Housing
+Rank   Electoral Division             Party            Index          Rank    Electoral Division       Party     Index
+ 1     Fowler (NSW)                   ALP              861.8           76      Riverina (NSW)          NP        991.7
+ 2     Bonython (SA)                  ALP              884.7           77      Herbert (Qld)           LIB       991.9
+ 3     Lingiari (NT)                  ALP              909.9           78      Prospect (NSW)          ALP       992.0
+ 4     Gellibrand (Vic)               ALP              914.4           79      Hasluck (WA)            ALP       995.6
+ 5     Port Adelaide (SA)             ALP              918.0           80      Groom (Qld)             LIB       995.8
+ 6     Chifley (NSW)                  ALP              920.6           81      Petrie (Qld)            LIB       996.0
+ 7     Wide Bay (Qld)                 NP               923.9           82      Hotham (Vic)            ALP       996.0
+ 8     Oxley (Qld)                    ALP              933.9           83      Flinders (Vic)          LIB       996.1
+ 9     Throsby (NSW)                  ALP              936.3           84      Wannon (Vic)            LIB       997.2
+10     Reid (NSW)                     ALP              937.4           85      Lalor (Vic)             ALP       998.4
+11     Brand (WA)                     ALP              940.5           86      Scullin (Vic)           ALP      1000.0
+12     Grey (SA)                      LIB              942.4           87      Robertson (NSW)         LIB      1000.3
+13     Hinkler (Qld)                  NP               944.0           88      Lilley (Qld)            ALP      1001.3
+14     Braddon (Tas)                  ALP              945.3           89      Indi (Vic)              LIB      1002.5
+15     Batman (Vic)                   ALP              945.6           90      Grayndler (NSW)         ALP      1002.8
+16     Blaxland (NSW)                 ALP              946.1           91      Greenway (NSW)          ALP      1003.8
+17     Cowper (NSW)                   NP               946.1           92      Banks (NSW)             ALP      1007.7
+18     Lyne (NSW)                     NP               947.1           93      Bowman (Qld)            ALP      1007.8
+19     Gwydir (NSW)                   NP               948.4           94      Eden-Monaro (NSW)       LIB      1008.1
+20     Longman (Qld)                  LIB              951.6           95      Cunningham (NSW)        ALP      1009.8
+21     Shortland (NSW)                ALP              953.9           96      Pearce (WA)             LIB      1010.1
+22     Lyons (Tas)                    ALP              955.9           97      Hume (NSW)              LIB      1012.8
+23     Page (NSW)                     NP               955.9           98      Adelaide (SA)           LIB      1013.6
+24     Hunter (NSW)                   ALP              959.3           99      Isaacs (Vic)            ALP      1014.1
+25     Blair (Qld)                    LIB              959.6           100     Denison (Tas)           ALP      1014.7
+26     Kennedy (Qld)                  NP               959.9           101     Sydney (NSW)            ALP      1015.1
+27     Richmond (NSW)                 NP               961.3           102     Kingsford Smith (NSW)   ALP      1015.2
+28     Corio (Vic)                    ALP              961.7           103     Dunkley (Vic)           LIB      1015.4
+29     Rankin (Qld)                   ALP              961.8           104     Makin (SA)              LIB      1018.4
+30     Parkes (NSW)                   NP               962.7           105     Barton (NSW)            ALP      1019.3
+31     Barker (SA)                    LIB              962.8           106     Lindsay (NSW)           LIB      1019.4
+32     Maranoa (Qld)                  NP               965.2           107     Fadden (Qld)            LIB      1020.1
+33     Paterson (NSW)                 LIB              965.8           108     Parramatta (NSW)        ALP      1020.2
+34     Werriwa (NSW)                  ALP              966.0           109     Bruce (Vic)             ALP      1022.9
+35     Fairfax (Qld)                  LIB              966.3           110     Cowan (WA)              ALP      1023.8
+36     Kalgoorlie (WA)                LIB              966.4           111     Solomon (NT)            CLP      1025.8
+37     Newcastle (NSW)                ALP              968.2           112     Burke (Vic)             ALP      1026.8
+38     Bass (Tas)                     ALP              969.2           113     McEwen (Vic)            LIB      1030.3
+39     Wakefield (SA)                 LIB              969.2           114     Sturt (SA)              LIB      1032.3
+40     Holt (Vic)                     ALP              969.9           115     Corangamite (Vic)       LIB      1032.7
+41     Fisher (Qld)                   LIB              971.8           116     Griffith (Qld)          ALP      1035.2
+42     Wills (Vic)                    ALP              972.9           117     Moreton (Qld)           LIB      1036.9
+43     Watson (NSW)                   ALP              973.5           118     Brisbane (Qld)          ALP      1040.1
+44     Capricornia (Qld)              ALP              973.7           119     Dickson (Qld)           ALP      1045.3
+45     Maribyrnong (Vic)              ALP              975.2           120     Lowe (NSW)              ALP      1051.5
+46     Forde (Qld)                    LIB              975.5           121     Macquarie (NSW)         LIB      1052.0
+47     Dawson (Qld)                   NP               975.9           122     Boothby (SA)            LIB      1053.7
+48     Kingston (SA)                  ALP              978.1           123     Chisholm (Vic)          ALP      1054.0
+49     Forrest (WA)                   LIB              978.3           124     Deakin (Vic)            LIB      1055.2
+50     Bendigo (Vic)                  ALP              979.1           125     Casey (Vic)             LIB      1055.3
+51     Calwell (Vic)                  ALP              979.7           126     La Trobe (Vic)          LIB      1058.7
+52     McPherson (Qld)                LIB              979.8           127     Mayo (SA)               LIB      1060.2
+53     Melbourne (Vic)                ALP              980.1           128     Melbourne Ports (Vic)   ALP      1067.8
+54     Gilmore (NSW)                  LIB              980.3           129     Jagajaga (Vic)          ALP      1068.8
+55     O'Connor (WA)                  LIB              982.6           130     Moore (WA)              LIB      1072.2
+56     Leichhardt (Qld)               LIB              983.0           131     Cook (NSW)              LIB      1073.9
+57     McMillan (Vic)                 ALP              983.5           132     Aston (Vic)             LIB      1074.3
+58     New England (NSW)              NP               983.8           133     Fraser (ACT)            ALP      1078.7
+59     Franklin (Tas)                 ALP              984.2           134     Tangney (WA)            LIB      1081.9
+60     Fremantle (WA)                 ALP              984.4           135     Bennelong (NSW)         LIB      1086.3
+61     Dobell (NSW)                   ALP              985.9           136     Hughes (NSW)            LIB      1095.2
+62     Swan (WA)                      ALP              986.2           137     Goldstein (Vic)         LIB      1097.6
+63     Calare (NSW)                   IND              986.6           138     Menzies (Vic)           LIB      1099.8
+64     Charlton (NSW)                 ALP              986.7           139     Canberra (ACT)          ALP      1102.5
+65     Ballarat (Vic)                 LIB              988.3           140     Curtin (WA)             LIB      1102.6
+66     Gippsland (Vic)                NP               989.2           141     Higgins (Vic)           LIB      1104.6
+67     Stirling (WA)                  ALP              989.4           142     Mackellar (NSW)         LIB      1105.2
+68     Mallee (Vic)                   NP               989.8           143     Wentworth (NSW)         LIB      1108.0
+69     Macarthur (NSW)                ALP              989.9           144     Warringah (NSW)         LIB      1108.7
+70     Hindmarsh (SA)                 LIB              989.9           145     Ryan (Qld)              LIB      1114.0
+71     Moncrieff (Qld)                LIB              990.0           146     Berowra (NSW)           LIB      1124.2
+72     Farrer (NSW)                   NP               990.6           147     Mitchell (NSW)          LIB      1129.4
+73     Murray (Vic)                   LIB              991.2           148     Kooyong (Vic)           LIB      1135.1
+74     Canning (WA)                   ALP              991.5           149     North Sydney (NSW)      LIB      1135.8
+75     Perth (WA)                     ALP              991.6           150     Bradfield (NSW)         LIB      1163.5
+
+
+                                                                                                               11
+                             Index of Economic Resources by Electoral Division
+                                         2000 Electoral Boundaries
+                                  1996 Census of Population and Housing
+Electoral Division   Party            Index         Electoral Division           Party    Index
+Adelaide (SA)        LIB              984.1         Hunter (NSW)                 ALP      998.4
+Aston (Vic)          LIB             1099.5         Indi (Vic)                   LIB      973.0
+Ballarat (Vic)       LIB              975.8         Isaacs (Vic)                 ALP     1019.6
+Banks (NSW)          ALP            1037.7          Jagajaga (Vic)               ALP     1070.1
+Barker (SA)          LIB              952.3         Kalgoorlie (WA)              LIB      974.3
+Barton (NSW)         ALP             1040.5         Kennedy (Qld)                NP       958.4
+Bass (Tas)           ALP              964.7         Kingsford Smith (NSW)        ALP     1012.2
+Batman (Vic)         ALP              954.8         Kingston (SA)                ALP      994.4
+Bendigo (Vic)        ALP              966.6         Kooyong (Vic)                LIB     1116.4
+Bennelong (NSW)      LIB             1081.2         Lalor (Vic)                  ALP     1025.8
+Berowra (NSW)        LIB            1159.3          La Trobe (Vic)               LIB     1058.2
+Blair (Qld)          LIB              978.6         Leichhardt (Qld)             LIB      960.9
+Blaxland (NSW)       ALP              974.1         Lilley (Qld)                 ALP     1002.9
+Bonython (SA)        ALP              942.4         Lindsay (NSW)                LIB     1052.2
+Boothby (SA)         LIB             1039.4         Lingiari (NT)                ALP      890.0
+Bowman (Qld)         ALP             1036.0         Longman (Qld)                LIB      982.1
+Braddon (Tas)        ALP              952.9         Lowe (NSW)                   ALP     1062.0
+Bradfield (NSW)      LIB             1222.0         Lyne (NSW)                   NP       942.1
+Brand (WA)           ALP             1006.9         Lyons (Tas)                  ALP      957.6
+Brisbane (Qld)       ALP              995.5         Macarthur (NSW)              ALP     1034.8
+Bruce (Vic)          ALP             1054.9         Mackellar (NSW)              LIB     1150.3
+Burke (Vic)          ALP             1039.1         Macquarie (NSW)              LIB     1044.5
+Calare (NSW)         IND              982.0         Makin (SA)                   LIB     1027.0
+Calwell (Vic)        ALP             1027.6         Mallee (Vic)                 NP       953.2
+Canberra (ACT)       ALP             1108.6         Maranoa (Qld)                NP       945.0
+Canning (WA)         ALP             1048.6         Maribyrnong (Vic)            ALP     1016.0
+Capricornia (Qld)    ALP              972.0         Mayo (SA)                    LIB     1046.6
+Casey (Vic)          LIB             1062.8         McEwen (Vic)                 LIB     1027.4
+Charlton (NSW)       ALP             1008.9         McMillan (Vic)               ALP      979.9
+Chifley (NSW)        ALP              968.3         McPherson (Qld)              LIB      987.4
+Chisholm (Vic)       ALP             1039.5         Melbourne (Vic)              ALP      946.3
+Cook (NSW)           LIB            1112.2          Melbourne Ports (Vic)        ALP     1002.8
+Corangamite (Vic)    LIB             1006.7         Menzies (Vic)                LIB     1136.4
+Corio (Vic)          ALP              976.4         Mitchell (NSW)               LIB     1207.3
+Cowan (WA)           ALP             1072.6         Moncrieff (Qld)              LIB      991.2
+Cowper (NSW)         NP               932.2         Moore (WA)                   LIB     1114.5
+Cunningham (NSW)     ALP             1009.9         Moreton (Qld)                LIB     1035.2
+Curtin (WA)          LIB             1086.0         Murray (Vic)                 LIB      968.5
+Dawson (Qld)         NP               980.2         Newcastle (NSW)              ALP      970.7
+Deakin (Vic)         LIB             1048.2         New England (NSW)            NP       953.2
+Denison (Tas)        ALP              987.6         North Sydney (NSW)           LIB     1125.7
+Dickson (Qld)        ALP             1069.7         O'Connor (WA)                LIB      970.2
+Dobell (NSW)         ALP             1003.7         Oxley (Qld)                  ALP      972.3
+Dunkley (Vic)        LIB             1028.7         Page (NSW)                   NP       946.1
+Eden-Monaro (NSW)    LIB              974.7         Parkes (NSW)                 NP       951.0
+Fadden (Qld)         LIB             1039.3         Parramatta (NSW)             ALP     1016.2
+Fairfax (Qld)        LIB              958.4         Paterson (NSW)               LIB      970.5
+Farrer (NSW)         NP               967.6         Pearce (WA)                  LIB     1032.6
+Fisher (Qld)         LIB              970.1         Perth (WA)                   ALP      987.1
+Flinders (Vic)       LIB              999.7         Petrie (Qld)                 LIB     1024.4
+Forde (Qld)          LIB             1003.0         Port Adelaide (SA)           ALP      942.9
+Forrest (WA)         LIB              992.5         Prospect (NSW)               ALP     1041.7
+Fowler (NSW)         ALP              923.0         Rankin (Qld)                 ALP     1001.5
+Franklin (Tas)       ALP              987.3         Reid (NSW)                   ALP      956.2
+Fraser (ACT)         ALP             1061.4         Richmond (NSW)               NP       951.8
+Fremantle (WA)       ALP             1011.7         Riverina (NSW)               NP       975.3
+Gellibrand (Vic)     ALP              947.2         Robertson (NSW)              LIB     1004.0
+Gilmore (NSW)        LIB              976.7         Ryan (Qld)                   LIB     1118.0
+Gippsland (Vic)      NP               960.7         Scullin (Vic)                ALP     1036.6
+Goldstein (Vic)      LIB             1086.9         Shortland (NSW)              ALP      984.5
+Grayndler (NSW)      ALP              993.7         Solomon (NT)                 CLP     1017.6
+Greenway (NSW)       ALP             1036.0         Stirling (WA)                ALP     1004.8
+Grey (SA)            LIB              926.8         Sturt (SA)                   LIB     1013.6
+Griffith (Qld)       ALP             1036.4         Swan (WA)                    ALP      972.0
+Groom (Qld)          LIB              990.0         Sydney (NSW)                 ALP      968.0
+Gwydir (NSW)         NP               932.2         Tangney (WA)                 LIB     1101.9
+Hasluck (WA)         ALP             1038.1         Throsby (NSW)                ALP      978.4
+Herbert (Qld)        LIB              990.9         Wakefield (SA)               LIB      968.4
+Higgins (Vic)        LIB             1068.3         Wannon (Vic)                 LIB      966.6
+Hindmarsh (SA)       LIB              970.5         Warringah (NSW)              LIB     1122.0
+Hinkler (Qld)        NP               963.7         Watson (NSW)                 ALP      981.4
+Holt (Vic)           ALP             1007.6         Wentworth (NSW)              LIB     1082.3
+Hotham (Vic)         ALP             1013.5         Werriwa (NSW)                ALP     1008.9
+Hughes (NSW)         LIB            1149.9          Wide Bay (Qld)               NP       932.0
+Hume (NSW)           LIB             1009.4         Wills (Vic)                  ALP      980.3
+
+
+12
+                          Electoral Divisions Ranked by the Index of Economic Resources
+                                             2000 Electoral Boundaries
+                                       1996 Census of Population and Housing
+Rank   Electoral Division        Party            Index          Rank    Electoral Division      Party     Index
+ 1     Lingiari (NT)             ALP              890.0           76     Melbourne Ports (Vic)   ALP      1002.8
+ 2     Fowler (NSW)              ALP              923.0           77     Lilley (Qld)            ALP      1002.9
+ 3     Grey (SA)                 LIB              926.8           78     Forde (Qld)             LIB      1003.0
+ 4     Wide Bay (Qld)            NP               932.0           79     Dobell (NSW)            ALP      1003.7
+ 5     Cowper (NSW)              NP               932.2           80     Robertson (NSW)         LIB      1004.0
+ 6     Gwydir (NSW)              NP               932.2           81     Stirling (WA)           ALP      1004.8
+ 7     Lyne (NSW)                NP               942.1           82     Corangamite (Vic)       LIB      1006.7
+ 8     Bonython (SA)             ALP              942.4           83     Brand (WA)              ALP      1006.9
+ 9     Port Adelaide (SA)        ALP              942.9           84     Holt (Vic)              ALP      1007.6
+10     Maranoa (Qld)             NP               945.0           85     Charlton (NSW)          ALP      1008.9
+11     Page (NSW)                NP               946.1           86     Werriwa (NSW)           ALP      1008.9
+12     Melbourne (Vic)           ALP              946.3           87     Hume (NSW)              LIB      1009.4
+13     Gellibrand (Vic)          ALP              947.2           88     Cunningham (NSW)        ALP      1009.9
+14     Parkes (NSW)              NP               951.0           89     Fremantle (WA)          ALP      1011.7
+15     Richmond (NSW)            NP               951.8           90     Kingsford Smith (NSW)   ALP      1012.2
+16     Barker (SA)               LIB              952.3           91     Hotham (Vic)            ALP      1013.5
+17     Braddon (Tas)             ALP              952.9           92     Sturt (SA)              LIB      1013.6
+18     Mallee (Vic)              NP               953.2           93     Maribyrnong (Vic)       ALP      1016.0
+19     New England (NSW)         NP               953.2           94     Parramatta (NSW)        ALP      1016.2
+20     Batman (Vic)              ALP              954.8           95     Solomon (NT)            CLP      1017.6
+21     Reid (NSW)                ALP              956.2           96     Isaacs (Vic)            ALP      1019.6
+22     Lyons (Tas)               ALP              957.6           97     Petrie (Qld)            LIB      1024.4
+23     Fairfax (Qld)             LIB              958.4           98     Lalor (Vic)             ALP      1025.8
+24     Kennedy (Qld)             NP               958.4           99     Makin (SA)              LIB      1027.0
+25     Gippsland (Vic)           NP               960.7           100    McEwen (Vic)            LIB      1027.4
+26     Leichhardt (Qld)          LIB              960.9           101    Calwell (Vic)           ALP      1027.6
+27     Hinkler (Qld)             NP               963.7           102    Dunkley (Vic)           LIB      1028.7
+28     Bass (Tas)                ALP              964.7           103    Pearce (WA)             LIB      1032.6
+29     Bendigo (Vic)             ALP              966.6           104    Macarthur (NSW)         ALP      1034.8
+30     Wannon (Vic)              LIB              966.6           105    Moreton (Qld)           LIB      1035.2
+31     Farrer (NSW)              NP               967.6           106    Greenway (NSW)          ALP      1036.0
+32     Sydney (NSW)              ALP              968.0           107    Bowman (Qld)            ALP      1036.0
+33     Chifley (NSW)             ALP              968.3           108    Griffith (Qld)          ALP      1036.4
+34     Wakefield (SA)            LIB              968.4           109    Scullin (Vic)           ALP      1036.6
+35     Murray (Vic)              LIB              968.5           110    Banks (NSW)             ALP      1037.7
+36     Fisher (Qld)              LIB              970.1           111    Hasluck (WA)            ALP      1038.1
+37     O'Connor (WA)             LIB              970.2           112    Burke (Vic)             ALP      1039.1
+38     Hindmarsh (SA)            LIB              970.5           113    Fadden (Qld)            LIB      1039.3
+39     Paterson (NSW)            LIB              970.5           114    Boothby (SA)            LIB      1039.4
+40     Newcastle (NSW)           ALP              970.7           115    Chisholm (Vic)          ALP      1039.5
+41     Swan (WA)                 ALP              972.0           116    Barton (NSW)            ALP      1040.5
+42     Capricornia (Qld)         ALP              972.0           117    Prospect (NSW)          ALP      1041.7
+43     Oxley (Qld)               ALP              972.3           118    Macquarie (NSW)         LIB      1044.5
+44     Indi (Vic)                LIB              973.0           119    Mayo (SA)               LIB      1046.6
+45     Blaxland (NSW)            ALP              974.1           120    Deakin (Vic)            LIB      1048.2
+46     Kalgoorlie (WA)           LIB              974.3           121    Canning (WA)            ALP      1048.6
+47     Eden-Monaro (NSW)         LIB              974.7           122    Lindsay (NSW)           LIB      1052.2
+48     Riverina (NSW)            NP               975.3           123    Bruce (Vic)             ALP      1054.9
+49     Ballarat (Vic)            LIB              975.8           124    La Trobe (Vic)          LIB      1058.2
+50     Corio (Vic)               ALP              976.4           125    Fraser (ACT)            ALP      1061.4
+51     Gilmore (NSW)             LIB              976.7           126    Lowe (NSW)              ALP      1062.0
+52     Throsby (NSW)             ALP              978.4           127    Casey (Vic)             LIB      1062.8
+53     Blair (Qld)               LIB              978.6           128    Higgins (Vic)           LIB      1068.3
+54     McMillan (Vic)            ALP              979.9           129    Dickson (Qld)           ALP      1069.7
+55     Dawson (Qld)              NP               980.2           130    Jagajaga (Vic)          ALP      1070.1
+56     Wills (Vic)               ALP              980.3           131    Cowan (WA)              ALP      1072.6
+57     Watson (NSW)              ALP              981.4           132    Bennelong (NSW)         LIB      1081.2
+58     Calare (NSW)              IND              982.0           133    Wentworth (NSW)         LIB      1082.3
+59     Longman (Qld)             LIB              982.1           134    Curtin (WA)             LIB      1086.0
+60     Adelaide (SA)             LIB              984.1           135    Goldstein (Vic)         LIB      1086.9
+61     Shortland (NSW)           ALP              984.5           136    Aston (Vic)             LIB      1099.5
+62     Perth (WA)                ALP              987.1           137    Tangney (WA)            LIB      1101.9
+63     Franklin (Tas)            ALP              987.3           138    Canberra (ACT)          ALP      1108.6
+64     McPherson (Qld)           LIB              987.4           139    Cook (NSW)              LIB      1112.2
+65     Denison (Tas)             ALP              987.6           140    Moore (WA)              LIB      1114.5
+66     Groom (Qld)               LIB              990.0           141    Kooyong (Vic)           LIB      1116.4
+67     Herbert (Qld)             LIB              990.9           142    Ryan (Qld)              LIB      1118.0
+68     Moncrieff (Qld)           LIB              991.2           143    Warringah (NSW)         LIB      1122.0
+69     Forrest (WA)              LIB              992.5           144    North Sydney (NSW)      LIB      1125.7
+70     Grayndler (NSW)           ALP              993.7           145    Menzies (Vic)           LIB      1136.4
+71     Kingston (SA)             ALP              994.4           146    Hughes (NSW)            LIB      1149.9
+72     Brisbane (Qld)            ALP              995.5           147    Mackellar (NSW)         LIB      1150.3
+73     Hunter (NSW)              ALP              998.4           148    Berowra (NSW)           LIB      1159.3
+74     Flinders (Vic)            LIB              999.7           149    Mitchell (NSW)          LIB      1207.3
+75     Rankin (Qld)              ALP             1001.5           150    Bradfield (NSW)         LIB      1222.0
+
+
+                                                                                                         13
+                           Index of Education and Occupation by Electoral Division
+                                          2000 Electoral Boundaries
+                                    1996 Census of Population and Housing
+Electoral Division   Party             Index         Electoral Division          Party    Index
+Adelaide (SA)        LIB              1075.2         Hunter (NSW)                ALP      930.4
+Aston (Vic)          LIB              1043.9         Indi (Vic)                  LIB      980.1
+Ballarat (Vic)       LIB               986.5         Isaacs (Vic)                ALP      984.3
+Banks (NSW)          ALP              1009.4         Jagajaga (Vic)              ALP     1081.1
+Barker (SA)          LIB               923.4         Kalgoorlie (WA)             LIB      951.5
+Barton (NSW)         ALP              1025.2         Kennedy (Qld)               NP       930.8
+Bass (Tas)           ALP               964.1         Kingsford Smith (NSW)       ALP     1053.7
+Batman (Vic)         ALP               981.3         Kingston (SA)               ALP      947.7
+Bendigo (Vic)        ALP               975.1         Kooyong (Vic)               LIB     1189.2
+Bennelong (NSW)      LIB              1115.5         Lalor (Vic)                 ALP      961.8
+Berowra (NSW)        LIB              1131.6         La Trobe (Vic)              LIB     1025.0
+Blair (Qld)          LIB               924.5         Leichhardt (Qld)            LIB      986.9
+Blaxland (NSW)       ALP               957.7         Lilley (Qld)                ALP     1010.1
+Bonython (SA)        ALP               873.1         Lindsay (NSW)               LIB      993.8
+Boothby (SA)         LIB              1072.8         Lingiari (NT)               ALP      969.3
+Bowman (Qld)         ALP               976.9         Longman (Qld)               LIB      919.4
+Braddon (Tas)        ALP               927.7         Lowe (NSW)                  ALP     1085.4
+Bradfield (NSW)      LIB              1198.2         Lyne (NSW)                  NP       947.1
+Brand (WA)           ALP               900.4         Lyons (Tas)                 ALP      922.2
+Brisbane (Qld)       ALP              1105.6         Macarthur (NSW)             ALP      973.0
+Bruce (Vic)          ALP              1011.7         Mackellar (NSW)             LIB     1084.8
+Burke (Vic)          ALP               992.2         Macquarie (NSW)             LIB     1049.2
+Calare (NSW)         IND               972.9         Makin (SA)                  LIB      986.3
+Calwell (Vic)        ALP               946.3         Mallee (Vic)                NP       960.2
+Canberra (ACT)       ALP              1115.4         Maranoa (Qld)               NP       927.4
+Canning (WA)         ALP               940.6         Maribyrnong (Vic)           ALP      958.2
+Capricornia (Qld)    ALP               947.7         Mayo (SA)                   LIB     1044.7
+Casey (Vic)          LIB              1015.2         McEwen (Vic)                LIB      993.6
+Charlton (NSW)       ALP               971.3         McMillan (Vic)              ALP      967.6
+Chifley (NSW)        ALP               915.8         McPherson (Qld)             LIB      972.4
+Chisholm (Vic)       ALP              1084.2         Melbourne (Vic)             ALP     1101.8
+Cook (NSW)           LIB              1062.3         Melbourne Ports (Vic)       ALP     1147.7
+Corangamite (Vic)    LIB              1018.8         Menzies (Vic)               LIB     1097.3
+Corio (Vic)          ALP               951.8         Mitchell (NSW)              LIB     1115.1
+Cowan (WA)           ALP               983.6         Moncrieff (Qld)             LIB      986.7
+Cowper (NSW)         NP                953.9         Moore (WA)                  LIB     1037.0
+Cunningham (NSW)     ALP              1038.3         Moreton (Qld)               LIB     1054.2
+Curtin (WA)          LIB              1162.8         Murray (Vic)                LIB      958.0
+Dawson (Qld)         NP                929.1         Newcastle (NSW)             ALP     1003.3
+Deakin (Vic)         LIB              1061.5         New England (NSW)           NP       984.9
+Denison (Tas)        ALP              1040.8         North Sydney (NSW)          LIB     1189.9
+Dickson (Qld)        ALP              1004.9         O'Connor (WA)               LIB      942.4
+Dobell (NSW)         ALP               971.3         Oxley (Qld)                 ALP      919.0
+Dunkley (Vic)        LIB              1000.7         Page (NSW)                  NP       958.8
+Eden-Monaro (NSW)    LIB               994.0         Parkes (NSW)                NP       955.1
+Fadden (Qld)         LIB               984.7         Parramatta (NSW)            ALP     1048.0
+Fairfax (Qld)        LIB               952.7         Paterson (NSW)              LIB      945.1
+Farrer (NSW)         NP                964.9         Pearce (WA)                 LIB      971.4
+Fisher (Qld)         LIB               961.1         Perth (WA)                  ALP     1013.0
+Flinders (Vic)       LIB               966.6         Petrie (Qld)                LIB      981.4
+Forde (Qld)          LIB               933.8         Port Adelaide (SA)          ALP      939.2
+Forrest (WA)         LIB               934.5         Prospect (NSW)              ALP      958.8
+Fowler (NSW)         ALP               893.2         Rankin (Qld)                ALP      933.8
+Franklin (Tas)       ALP               980.7         Reid (NSW)                  ALP      949.4
+Fraser (ACT)         ALP              1125.9         Richmond (NSW)              NP       966.0
+Fremantle (WA)       ALP               983.6         Riverina (NSW)              NP       971.3
+Gellibrand (Vic)     ALP               949.6         Robertson (NSW)             LIB      997.9
+Gilmore (NSW)        LIB               976.8         Ryan (Qld)                  LIB     1148.2
+Gippsland (Vic)      NP                970.3         Scullin (Vic)               ALP      958.3
+Goldstein (Vic)      LIB              1125.0         Shortland (NSW)             ALP      947.0
+Grayndler (NSW)      ALP              1060.4         Solomon (NT)                CLP     1044.6
+Greenway (NSW)       ALP               987.8         Stirling (WA)               ALP      995.2
+Grey (SA)            LIB               937.8         Sturt (SA)                  LIB     1069.5
+Griffith (Qld)       ALP              1047.6         Swan (WA)                   ALP     1013.1
+Groom (Qld)          LIB               974.3         Sydney (NSW)                ALP     1130.8
+Gwydir (NSW)         NP                942.7         Tangney (WA)                LIB     1081.5
+Hasluck (WA)         ALP               955.6         Throsby (NSW)               ALP      923.1
+Herbert (Qld)        LIB               985.3         Wakefield (SA)              LIB      933.9
+Higgins (Vic)        LIB              1164.5         Wannon (Vic)                LIB      966.7
+Hindmarsh (SA)       LIB              1008.8         Warringah (NSW)             LIB     1123.3
+Hinkler (Qld)        NP                914.0         Watson (NSW)                ALP      980.2
+Holt (Vic)           ALP               932.9         Wentworth (NSW)             LIB     1164.5
+Hotham (Vic)         ALP               990.0         Werriwa (NSW)               ALP      956.9
+Hughes (NSW)         LIB              1065.3         Wide Bay (Qld)              NP       908.7
+Hume (NSW)           LIB               988.8         Wills (Vic)                 ALP      997.9
+
+
+14
+                            Electoral Divisions Ranked by Index of Education and Occupation
+                                                2000 Electoral Boundaries
+                                          1996 Census of Population and Housing
+Rank   Electoral Division           Party            Index          Rank    Electoral Division      Party     Index
+ 1     Bonython (SA)                ALP              873.1           76     Fremantle (WA)          ALP       983.6
+ 2     Fowler (NSW)                 ALP              893.2           77     Cowan (WA)              ALP       983.6
+ 3     Brand (WA)                   ALP              900.4           78     Isaacs (Vic)            ALP       984.3
+ 4     Wide Bay (Qld)               NP               908.7           79     Fadden (Qld)            LIB       984.7
+ 5     Hinkler (Qld)                NP               914.0           80     New England (NSW)       NP        984.9
+ 6     Chifley (NSW)                ALP              915.8           81     Herbert (Qld)           LIB       985.3
+ 7     Oxley (Qld)                  ALP              919.0           82     Makin (SA)              LIB       986.3
+ 8     Longman (Qld)                LIB              919.4           83     Ballarat (Vic)          LIB       986.5
+ 9     Lyons (Tas)                  ALP              922.2           84     Moncrieff (Qld)         LIB       986.7
+10     Throsby (NSW)                ALP              923.1           85     Leichhardt (Qld)        LIB       986.9
+11     Barker (SA)                  LIB              923.4           86     Greenway (NSW)          ALP       987.8
+12     Blair (Qld)                  LIB              924.5           87     Hume (NSW)              LIB       988.8
+13     Maranoa (Qld)                NP               927.4           88     Hotham (Vic)            ALP       990.0
+14     Braddon (Tas)                ALP              927.7           89     Burke (Vic)             ALP       992.2
+15     Dawson (Qld)                 NP               929.1           90     McEwen (Vic)            LIB       993.6
+16     Hunter (NSW)                 ALP              930.4           91     Lindsay (NSW)           LIB       993.8
+17     Kennedy (Qld)                NP               930.8           92     Eden-Monaro (NSW)       LIB       994.0
+18     Holt (Vic)                   ALP              932.9           93     Stirling (WA)           ALP       995.2
+19     Rankin (Qld)                 ALP              933.8           94     Wills (Vic)             ALP       997.9
+20     Forde (Qld)                  LIB              933.8           95     Robertson (NSW)         LIB       997.9
+21     Wakefield (SA)               LIB              933.9           96     Dunkley (Vic)           LIB      1000.7
+22     Forrest (WA)                 LIB              934.5           97     Newcastle (NSW)         ALP      1003.3
+23     Grey (SA)                    LIB              937.8           98     Dickson (Qld)           ALP      1004.9
+24     Port Adelaide (SA)           ALP              939.2           99     Hindmarsh (SA)          LIB      1008.8
+25     Canning (WA)                 ALP              940.6           100    Banks (NSW)             ALP      1009.4
+26     O'Connor (WA)                LIB              942.4           101    Lilley (Qld)            ALP      1010.1
+27     Gwydir (NSW)                 NP               942.7           102    Bruce (Vic)             ALP      1011.7
+28     Paterson (NSW)               LIB              945.1           103    Perth (WA)              ALP      1013.0
+29     Calwell (Vic)                ALP              946.3           104    Swan (WA)               ALP      1013.1
+30     Shortland (NSW)              ALP              947.0           105    Casey (Vic)             LIB      1015.2
+31     Lyne (NSW)                   NP               947.1           106    Corangamite (Vic)       LIB      1018.8
+32     Kingston (SA)                ALP              947.7           107    La Trobe (Vic)          LIB      1025.0
+33     Capricornia (Qld)            ALP              947.7           108    Barton (NSW)            ALP      1025.2
+34     Reid (NSW)                   ALP              949.4           109    Moore (WA)              LIB      1037.0
+35     Gellibrand (Vic)             ALP              949.6           110    Cunningham (NSW)        ALP      1038.3
+36     Kalgoorlie (WA)              LIB              951.5           111    Denison (Tas)           ALP      1040.8
+37     Corio (Vic)                  ALP              951.8           112    Aston (Vic)             LIB      1043.9
+38     Fairfax (Qld)                LIB              952.7           113    Solomon (NT)            CLP      1044.6
+39     Cowper (NSW)                 NP               953.9           114    Mayo (SA)               LIB      1044.7
+40     Parkes (NSW)                 NP               955.1           115    Griffith (Qld)          ALP      1047.6
+41     Hasluck (WA)                 ALP              955.6           116    Parramatta (NSW)        ALP      1048.0
+42     Werriwa (NSW)                ALP              956.9           117    Macquarie (NSW)         LIB      1049.2
+43     Blaxland (NSW)               ALP              957.7           118    Kingsford Smith (NSW)   ALP      1053.7
+44     Murray (Vic)                 LIB              958.0           119    Moreton (Qld)           LIB      1054.2
+45     Maribyrnong (Vic)            ALP              958.2           120    Grayndler (NSW)         ALP      1060.4
+46     Scullin (Vic)                ALP              958.3           121    Deakin (Vic)            LIB      1061.5
+47     Page (NSW)                   NP               958.8           122    Cook (NSW)              LIB      1062.3
+48     Prospect (NSW)               ALP              958.8           123    Hughes (NSW)            LIB      1065.3
+49     Mallee (Vic)                 NP               960.2           124    Sturt (SA)              LIB      1069.5
+50     Fisher (Qld)                 LIB              961.1           125    Boothby (SA)            LIB      1072.8
+51     Lalor (Vic)                  ALP              961.8           126    Adelaide (SA)           LIB      1075.2
+52     Bass (Tas)                   ALP              964.1           127    Jagajaga (Vic)          ALP      1081.1
+53     Farrer (NSW)                 NP               964.9           128    Tangney (WA)            LIB      1081.5
+54     Richmond (NSW)               NP               966.0           129    Chisholm (Vic)          ALP      1084.2
+55     Flinders (Vic)               LIB              966.6           130    Mackellar (NSW)         LIB      1084.8
+56     Wannon (Vic)                 LIB              966.7           131    Lowe (NSW)              ALP      1085.4
+57     McMillan (Vic)               ALP              967.6           132    Menzies (Vic)           LIB      1097.3
+58     Lingiari (NT)                ALP              969.3           133    Melbourne (Vic)         ALP      1101.8
+59     Gippsland (Vic)              NP               970.3           134    Brisbane (Qld)          ALP      1105.6
+60     Charlton (NSW)               ALP              971.3           135    Mitchell (NSW)          LIB      1115.1
+61     Dobell (NSW)                 ALP              971.3           136    Canberra (ACT)          ALP      1115.4
+62     Riverina (NSW)               NP               971.3           137    Bennelong (NSW)         LIB      1115.5
+63     Pearce (WA)                  LIB              971.4           138    Warringah (NSW)         LIB      1123.3
+64     McPherson (Qld)              LIB              972.4           139    Goldstein (Vic)         LIB      1125.0
+65     Calare (NSW)                 IND              972.9           140    Fraser (ACT)            ALP      1125.9
+66     Macarthur (NSW)              ALP              973.0           141    Sydney (NSW)            ALP      1130.8
+67     Groom (Qld)                  LIB              974.3           142    Berowra (NSW)           LIB      1131.6
+68     Bendigo (Vic)                ALP              975.1           143    Melbourne Ports (Vic)   ALP      1147.7
+69     Gilmore (NSW)                LIB              976.8           144    Ryan (Qld)              LIB      1148.2
+70     Bowman (Qld)                 ALP              976.9           145    Curtin (WA)             LIB      1162.8
+71     Indi (Vic)                   LIB              980.1           146    Higgins (Vic)           LIB      1164.5
+72     Watson (NSW)                 ALP              980.2           147    Wentworth (NSW)         LIB      1164.5
+73     Franklin (Tas)               ALP              980.7           148    Kooyong (Vic)           LIB      1189.2
+74     Batman (Vic)                 ALP               981.3          149    North Sydney (NSW)      LIB      1189.9
+75     Petrie (Qld)                 LIB              981.4           150    Bradfield (NSW)         LIB      1198.2
+
+
+                                                                                                            15
+Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+Appendix
+The indexes in this paper are derived from Socioeconomic Indexes for Areas produced by
+the Australian Bureau of Statistics (ABS). The indexes are based on a variety of
+underlying social and economic variables from the 1996 Census on Population and
+Housing. The ABS has constructed these indexes for each Census Collection District
+(CCD) in Australia. The Indexes for Commonwealth Electoral Divisions were calculated
+as a weighted average of the indexes for the CCDs in each Division (with the weight being
+the total population of the CCD). All the indexes (including the Index of Relative
+Disadvantage) have been constructed so that relatively advantaged areas have high index
+values. To enable easy recognition of high and low scores, the index scores have been
+standardised to have a mean of 1000 and a standard deviation of 100 across all CCDs in
+Australia.
+The Index of Relative Socioeconomic Advantage was constructed by combining two
+separate indexes—the Urban Index of Relative Socioeconomic Advantage and the Rural
+Index of Relative Socioeconomic Advantage. The urban index covers CCDs in urban
+centres with a population of 1000 and over, and the rural index covers CCDs in the
+remaining areas of Australia. The urban/rural split is considered necessary because major
+structural differences exist in the relationships between Socioeconomic variables related to
+advantage for the urban and rural areas. However, it is possible to combine the two
+indexes to produce a composite Index of Advantage for geographic units that are
+comprised of both urban and rural CCDs.
+The variables used to construct each index are given below:
+
+Urban Index of Relative Socioeconomic Advantage
+Families with income greater than $77 999 (%)
+Employed males classified as 'Managers or Administrators' (%)
+Employed persons classified as 'Professionals' (%)
+Persons aged 15 and over with a degree or higher educational qualification (%)
+Employed females classified as 'Managers or Administrators' (%)
+Employed males classified as 'Associate Professionals' (%)
+Dwellings with 4 or more bedrooms (%)
+Persons aged 15 and over at CAE or university (%)
+Employed females classified as 'Advanced Clerical and Social Workers' (%)
+Employed males classified as 'Advanced Clerical and Social Workers' (%)
+Employed females classified as 'Associate Professionals' (%)
+Dwellings with 3 or more cars (%)
+Households owning dwellings (%)
+Average number of bedrooms per person
+Households owning or purchasing dwellings (%)
+
+
+
+
+16
+                                                  Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+Rural Index of Relative Socioeconomic Advantage
+Employed males classified as 'Professionals' (%)
+Employed males classified as 'Associate Professionals' (%)
+Persons aged 15 and over with a degree or higher educational qualification (%)
+Households purchasing dwelling (%)
+Employed females classified as 'Professionals' (%)
+Employed females classified as 'Advanced Clerical and Social Workers' (%)
+Employed females classified as 'Associate Professionals' (%)
+Employed males classified as 'Intermediate Clerical, Sales and Service Workers' (%)
+Persons aged 15 and over with trade or 'other' qualification (%)
+Persons aged 15 and over at CAE or university (%)
+Families with income greater than $77 999 (%)
+Persons aged 15 and over at TAFE (%)
+Employed males classified as 'Advanced Clerical and Social Workers' (%)
+
+Index of Relative Socioeconomic Disadvantage
+Persons aged 15 and over with no qualifications (%)
+Families with income less than $15 600 (%)
+Families with offspring having parental income less than $15 600 (%)
+Females (in labour force) unemployed (%)
+Males (in labour force) unemployed (%)
+Employed females classified as 'Labourer and Related Workers' (%)
+Employed males classified as 'Labourer and Related Workers' (%)
+Employed males classified as 'Intermediate Production and Transport Workers' (%)
+Persons aged 15 and over who left school at or under 15 years of age (%)
+One-parent families with dependent offspring only (%)
+Households renting (government authority) (%)
+Persons aged 15 and over separated or divorced (%)
+Dwellings with no motor cars at dwelling (%)
+Employed females classified as 'Intermediate Production and Transport Workers' (%)
+Employed females classified as 'Elementary Clerical, Sales and Service Workers' (%)
+Employed males classified as 'Tradespersons' (%)
+Persons aged 15 and over who did not go to school (%)
+Aboriginals or Torres Strait Islanders (%)
+Occupied private dwellings with two or more families (%)
+Lacking fluency in English (%)
+
+Index of Economic Resources
+Households owning or purchasing dwelling (%)
+Dwellings with 4 or more bedrooms (%)
+Families with family structure other than two parent or single parent with dependent
+ offspring or consisting of a couple only, and income greater than $77 999 (%)
+
+
+                                                                                            17
+Socioeconomic Indexes for Electoral Divisions
+
+
+
+
+Families consisting of a two parent family with dependent offspring, and income greater
+ than $77 999 (%)
+Families consisting of a couple only, and with income greater than $62 399 (%)
+Families consisting of a single parent with dependent offspring, with income greater than
+ $31 199 (%)
+Mortgage greater than $1 300 per month (%)
+Rent greater than $249 per week (%)
+Households purchasing dwelling (%)
+Households owning dwelling (%)
+Dwellings with 3 or more motor cars (%)
+Average number bedrooms per person
+Households in improvised dwellings (%)
+Households renting (government authority) (%)
+Households renting (non-government authority) (%)
+Dwellings with 1 or no bedrooms (%)
+Rent less than $74 per week (%)
+Families consisting of a single parent with dependent offspring, with income less than
+ $15 600 (%)
+Families consisting of a couple only, and with income less than $15 600 (%)
+Families with family structure other than two parent or single parent with dependent
+ offspring or consisting of a couple only, and income less than $26 000 (%)
+Families consisting of a two parent family with dependent offspring, and income less than
+ $26 000 (%)
+Dwellings with no motor cars (%)
+
+Index of Education and Occupation
+Employed males classified as 'Professionals' (%)
+Employed females classified as 'Professionals' (%)
+Persons aged 15 and over at CAE or university (%)
+Employed males classified as 'Associate Professionals' (%)
+Employed females classified as 'Advanced Clerical and Social Workers' (%)
+Employed males classified as 'Advanced Clerical and Social Workers' (%)
+Employed males classified as 'Intermediate Clerical, Sales and Service Workers' (%)
+Employed females classified as 'Tradespersons' (%)
+Employed males classified as Tradespersons' (%)
+Employed females classified as 'Elementary Clerical, Sales and Service Workers' (%)
+Employed females classified as 'Intermediate Production and Transport Workers' (%)
+Employed males classified as 'Intermediate Production and Transport Workers' (%)
+Employed females classified as 'Labourer and Related Workers' (%)
+Employed males classified as 'Labourer and Related Workers' (%)
+Males (in labour force) unemployed (%)
+Females (in labour force) unemployed (%)
+Persons aged 15 and over who left school at or under 15 years of age (%)
+Persons aged 15 and over with no qualifications (%)
+
+
+18
+
