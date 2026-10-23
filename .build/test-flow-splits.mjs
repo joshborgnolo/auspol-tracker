@@ -352,12 +352,13 @@ assert.ok(ap.includes("function ExplainedOnChart({ inv, menu })") && ap.includes
    emit), the menu's state-elections optgroup and the LC bank gate are now
    pair-aware (LC_ON_BANK on the One Nation tab), and picking Labor v One
    Nation sheds the Council only while its ON cut is absent */
-assert.ok(ap.includes('{lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
+assert.ok(ap.includes('{primMode ? <ExplainedPrimaryChart house={house} stateKey={stateKey} menu={headCtls} />')
+    && ap.includes(': lcView && pair === "on" ? <ExplainedFlowChart jur="nsw" house="sen" stateKey={null} classKey={null} lc inv={inv} menu={headCtls} onSen />')
     && ap.includes(': senOnView ? <ExplainedFlowChart jur="fed" house="sen" stateKey={stateKey && hasOnCells(stateKey) ? stateKey : null} classKey={null} lc={false} inv={inv} menu={headCtls} onSen />')
     && ap.includes(': pair === "on" ? <ExplainedOnChart inv={inv} menu={headCtls} />')
     && ap.includes(': <ExplainedFlowChart jur={jur} house={house} stateKey={stateKey} classKey={house === "sen" ? null : classKey} lc={lcView} inv={inv} menu={headCtls} />}'),
   "four-way render: an ON-tab Council pick draws the Council's own ON cut, else the ON tab's Upper view draws the senOn bank, its Lower the crosses, the Coalition contest the history chart (a class pick nulls while the Senate bank is drawn)");
-assert.ok(ap.includes('{house === "sen" && (pair === "on" ? LC_ON_BANK : LC_BANK) && (')
+assert.ok(ap.includes('{!primMode && house === "sen" && (pair === "on" ? LC_ON_BANK : LC_BANK) && (')
     && ap.includes('<option value="nswlc">{(pair === "on" ? LC_ON_BANK : LC_BANK).label}</option>'),
   "the menu's state-elections optgroup rides the contest's Council bank (LC_ON_BANK on the One Nation tab, LC_BANK on the Coalition)");
 assert.ok(ap.includes("if (p === \"on\" && house === \"sen\" && ((lcView && !LC_ON_BANK) || (stateKey && !hasOnCells(stateKey)))) setView(\"fed\");"),
@@ -378,15 +379,15 @@ assert.ok(ap.includes('? [...(SEN_ON_BANK ? ["fed", ...senOnStateKeys.map((k) =>
 assert.ok(ap.includes('const SEN_BANK = (FH.fed && FH.fed.sen) || null;')
     && ap.includes('const SEN_ON_BANK = (FH.fed && FH.fed.senOn) || null;')
     && ap.includes('const [house, setHouse] = useState("rep");')
-    && ap.includes('{house === "sen" ? "Upper" : "Lower"}')
-    && ap.includes('title={house === "sen" ? "Switch to House of Representatives flows"'),
+    && ap.includes('<span className="rd-pl-flip-t">{house === "sen" ? "Upper" : "Lower"}</span>')
+    && ap.includes(': (house === "sen" ? "Switch to House of Representatives flows" : "Switch to Senate flows (above-the-line ballots)")'),
   "the House: flip rides the Share idiom - the button the active chamber, its title the destination, only where the build ships the bank");
 assert.ok(!ap.includes('if (pair === "on") setPair("co");')
     && ap.includes('else if (classKey || !fedView || (pair === "on" && stateKey && !hasOnCells(stateKey))) setView("fed");'),
   "flipping houses never snaps the contest back (the ON bank rides along) - only a pick the ON bank can't carry (a class view, a non-fed state pick, a no-ON-ticket state) drops to federal; Lower never snaps");
 assert.ok(ap.includes('const senOnStateKeys = Object.keys(ON_SEN_STATES).filter(hasOnCells);')
     && ap.includes('{menuKeys.map((k) => <option key={k} value={"fed:" + k}>')
-    && ap.includes('{house !== "sen" && classKeys.map(') && ap.includes('{house !== "sen" && KEYS.length > 1 && ('),
+    && ap.includes('{!primMode && house !== "sen" && classKeys.map(') && ap.includes('{!primMode && house !== "sen" && KEYS.length > 1 && ('),
   "the elections menu re-reads the states from the operative bank under Upper (senOn's on the ON tab - never-on-ballot ACT out, the Coalition-only Council out) and sheds the House-only sections");
 assert.ok(ap.includes('const FED_CLASSES = (FH.fed && FH.fed.classes) || {};')
     && ap.includes('const classKey = view.startsWith("fedcl:") && FED_CLASSES[view.slice(6)] ? view.slice(6) : null;')
@@ -419,8 +420,10 @@ assert.ok(ap.includes('<span className="rd-pl-ctl-l">Share:</span>') && !ap.incl
 assert.ok(ap.includes("tooltipTitle={(i) => BYS[i].label}")
     && ap.includes('tooltipTitle={(i) => YEARS[i] + " · " + (S.short || S.label) + (basisMixed && S.hollowYears.includes(YEARS[i]) ? " · Labor-v-Coalition seats only" : "")}'),
   "short tooltip titles: a contest's source sentence no longer runs a phone readout to full width (b5398ce8's hollow-ring basis note is the one suffix, and only on mixed-basis views)");
-assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 2 && (ap.match(/copy=\{\{ title: "Share of each group’s preferences reaching "/g) || []).length === 2,
-  "both views share the px chart frame and carry a copy prop");
+assert.ok((ap.match(/\{\.\.\.exFrame\(narrow\)\}/g) || []).length === 3
+    && (ap.match(/copy=\{\{ title: "Share of each group’s preferences reaching "/g) || []).length === 2
+    && (ap.match(/copy=\{\{ title: "First-preference vote shares by party, " \+/g) || []).length === 1,
+  "all three views share the px chart frame and carry a copy prop");
 assert.ok(ap.includes("((window.AUSPOL.flowForced || {}).bys || []).slice().sort((a, b) => a.xm - b.xm)"),
   "the One Nation chart reads the same flowForced.bys crosses as the /flows/ chart, on their own days");
 assert.ok(ap.includes('{"One reading per contest: " + cap') && ap.includes("so no line joins them: Hunter’s Coalition voters are Nationals"),
